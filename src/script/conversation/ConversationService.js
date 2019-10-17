@@ -482,17 +482,17 @@ export class ConversationService {
 
   /**
    * Saves a conversation entity in the local database.
-   * @param {Conversation} conversation_et - Conversation entity
+   * @param {Conversation} conversationEt - Conversation entity
    * @returns {Promise} Resolves with the conversation entity
    */
-  save_conversation_state_in_db(conversation_et) {
-    const conversationData = conversation_et.serialize();
+  save_conversation_state_in_db(conversationEt) {
+    const conversationData = conversationEt.serialize();
 
     return this.storageService
-      .save(this.CONVERSATION_STORE_NAME, conversation_et.id, conversationData)
+      .save(this.CONVERSATION_STORE_NAME, conversationEt.id, conversationData)
       .then(primary_key => {
         this.logger.info(`State of conversation '${primary_key}' was stored`, conversationData);
-        return conversation_et;
+        return conversationEt;
       });
   }
 

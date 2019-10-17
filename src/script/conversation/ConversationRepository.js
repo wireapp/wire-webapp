@@ -747,11 +747,11 @@ export class ConversationRepository {
 
   /**
    * Update conversation with a user you just unblocked
-   * @param {User} user_et - User you unblocked
+   * @param {User} userEt - User you unblocked
    * @returns {undefined} No return value
    */
-  unblocked_user(user_et) {
-    this.get1To1Conversation(user_et).then(conversationEntity =>
+  unblocked_user(userEt) {
+    this.get1To1Conversation(userEt).then(conversationEntity =>
       conversationEntity.status(ConversationStatus.CURRENT_MEMBER),
     );
   }
@@ -1060,7 +1060,7 @@ export class ConversationRepository {
     return this.get_conversation_by_id(conversation_id)
       .then(conversationEntity => {
         return this.get_message_in_conversation_by_id(conversationEntity, message_id).then(
-          message_et => conversationEntity.last_read_timestamp() >= message_et.timestamp(),
+          messageEt => conversationEntity.last_read_timestamp() >= messageEt.timestamp(),
         );
       })
       .catch(error => {
@@ -1834,7 +1834,7 @@ export class ConversationRepository {
         });
 
         if (conversationEntity.messageTimer()) {
-          genericMessage = this._wrap_in_ephemeral_message(genericMessage, conversationEntity.messageTimer());
+          genericMessage = this._wrapInEphemeralMessage(genericMessage, conversationEntity.messageTimer());
         }
 
         const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id);
@@ -1858,7 +1858,7 @@ export class ConversationRepository {
         assetAddEvent.id = messageId;
         assetAddEvent.time = payload.time;
 
-        return this._on_asset_upload_complete(conversationEntity, assetAddEvent);
+        return this._onAssetUploadComplete(conversationEntity, assetAddEvent);
       });
   }
 
@@ -1903,7 +1903,7 @@ export class ConversationRepository {
         });
 
         if (conversationEntity.messageTimer()) {
-          genericMessage = this._wrap_in_ephemeral_message(genericMessage, conversationEntity.messageTimer());
+          genericMessage = this._wrapInEphemeralMessage(genericMessage, conversationEntity.messageTimer());
         }
 
         return this._send_and_inject_generic_message(conversationEntity, genericMessage);
@@ -2076,7 +2076,7 @@ export class ConversationRepository {
     });
 
     if (conversationEntity.messageTimer()) {
-      genericMessage = this._wrap_in_ephemeral_message(genericMessage, conversationEntity.messageTimer());
+      genericMessage = this._wrapInEphemeralMessage(genericMessage, conversationEntity.messageTimer());
     }
 
     return this._send_and_inject_generic_message(conversationEntity, genericMessage).catch(error => {
@@ -2223,15 +2223,15 @@ export class ConversationRepository {
    * Toggle like status of message.
    *
    * @param {Conversation} conversationEntity - Conversation entity
-   * @param {Message} message_et - Message to react to
+   * @param {Message} messageEt - Message to react to
    * @returns {undefined} No return value
    */
-  toggle_like(conversationEntity, message_et) {
+  toggleLike(conversationEntity, messageEt) {
     if (!conversationEntity.removed_from_conversation()) {
-      const reaction = message_et.is_liked() ? ReactionType.NONE : ReactionType.LIKE;
-      message_et.is_liked(!message_et.is_liked());
+      const reaction = messageEt.is_liked() ? ReactionType.NONE : ReactionType.LIKE;
+      messageEt.is_liked(!messageEt.is_liked());
 
-      window.setTimeout(() => this.sendReaction(conversationEntity, message_et, reaction), 100);
+      window.setTimeout(() => this.sendReaction(conversationEntity, messageEt, reaction), 100);
     }
   }
 
@@ -2314,7 +2314,7 @@ export class ConversationRepository {
     });
 
     if (conversationEntity.messageTimer()) {
-      genericMessage = this._wrap_in_ephemeral_message(genericMessage, conversationEntity.messageTimer());
+      genericMessage = this._wrapInEphemeralMessage(genericMessage, conversationEntity.messageTimer());
     }
 
     return this._send_and_inject_generic_message(conversationEntity, genericMessage).then(() => genericMessage);
@@ -2395,7 +2395,7 @@ export class ConversationRepository {
    * @param {number} millis - Expire time in milliseconds
    * @returns {Message} New proto message
    */
-  _wrap_in_ephemeral_message(genericMessage, millis) {
+  _wrapInEphemeralMessage(genericMessage, millis) {
     const ephemeralExpiration = ConversationEphemeralHandler.validateTimer(millis);
 
     const protoEphemeral = new Ephemeral({
@@ -2427,13 +2427,13 @@ export class ConversationRepository {
     return this.get_all_users_in_conversation(conversation_id).then(user_ets => {
       const recipients = {};
 
-      for (const user_et of user_ets) {
-        if (!(skipOwnClients && user_et.isMe)) {
-          if (user_ids && !user_ids.includes(user_et.id)) {
+      for (const userEt of user_ets) {
+        if (!(skipOwnClients && userEt.isMe)) {
+          if (user_ids && !user_ids.includes(userEt.id)) {
             continue;
           }
 
-          recipients[user_et.id] = user_et.devices().map(client_et => client_et.id);
+          recipients[userEt.id] = userEt.devices().map(client_et => client_et.id);
         }
       }
 
@@ -2976,9 +2976,9 @@ export class ConversationRepository {
           `Failed to upload asset for conversation '${conversationEntity.id}': ${error.message}`,
           error,
         );
-        return this.get_message_in_conversation_by_id(conversationEntity, message_id).then(message_et => {
-          this.send_asset_upload_failed(conversationEntity, message_et.id);
-          return this.update_message_as_upload_failed(message_et);
+        return this.get_message_in_conversation_by_id(conversationEntity, message_id).then(messageEt => {
+          this.send_asset_upload_failed(conversationEntity, messageEt.id);
+          return this.update_message_as_upload_failed(messageEt);
         });
       });
   }
@@ -3455,18 +3455,18 @@ export class ConversationRepository {
    *
    * @private
    * @param {Conversation} conversationEntity - Conversation to add the event to
-   * @param {Object} event_json - JSON data of 'conversation.asset-upload-complete' event
+   * @param {Object} eventJson - JSON data of 'conversation.asset-upload-complete' event
    * @returns {Promise} Resolves when the event was handled
    */
-  _on_asset_upload_complete(conversationEntity, event_json) {
-    return this.get_message_in_conversation_by_id(conversationEntity, event_json.id)
-      .then(message_et => this.update_message_as_upload_complete(conversationEntity, message_et, event_json))
+  _onAssetUploadComplete(conversationEntity, eventJson) {
+    return this.get_message_in_conversation_by_id(conversationEntity, eventJson.id)
+      .then(messageEt => this.update_message_as_upload_complete(conversationEntity, messageEt, eventJson))
       .catch(error => {
         if (error.type !== z.error.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
           throw error;
         }
 
-        this.logger.error(`Upload complete: Could not find message with id '${event_json.id}'`, event_json);
+        this.logger.error(`Upload complete: Could not find message with id '${eventJson.id}'`, eventJson);
       });
   }
 
@@ -4013,11 +4013,11 @@ export class ConversationRepository {
    *
    * @private
    * @param {Conversation} conversationEntity - Conversation that contains the message
-   * @param {Message} message_et - Message to delete
+   * @param {Message} messageEt - Message to delete
    * @returns {Promise} Resolves when message was deleted
    */
-  _delete_message(conversationEntity, message_et) {
-    return this.eventService.deleteEventByKey(message_et.primary_key);
+  _delete_message(conversationEntity, messageEt) {
+    return this.eventService.deleteEventByKey(messageEt.primary_key);
   }
 
   /**
@@ -4043,8 +4043,8 @@ export class ConversationRepository {
   _deleteMessages(conversationEntity, timestamp) {
     conversationEntity.hasCreationMessage = false;
 
-    const iso_date = timestamp ? new Date(timestamp).toISOString() : undefined;
-    this.eventService.deleteEvents(conversationEntity.id, iso_date);
+    const isoDate = timestamp ? new Date(timestamp).toISOString() : undefined;
+    this.eventService.deleteEvents(conversationEntity.id, isoDate);
   }
 
   /**
@@ -4068,28 +4068,28 @@ export class ConversationRepository {
 
   /**
    * Update asset in UI and DB as failed
-   * @param {Message} message_et - Message to update
+   * @param {Message} messageEt - Message to update
    * @param {string} [reason=AssetTransferState.UPLOAD_FAILED] - Failure reason
    * @returns {Promise} Resolve when message was updated
    */
-  update_message_as_upload_failed(message_et, reason = AssetTransferState.UPLOAD_FAILED) {
-    if (message_et) {
-      if (!message_et.is_content()) {
-        throw new Error(`Tried to update wrong message type as upload failed '${message_et.super_type}'`);
+  update_message_as_upload_failed(messageEt, reason = AssetTransferState.UPLOAD_FAILED) {
+    if (messageEt) {
+      if (!messageEt.is_content()) {
+        throw new Error(`Tried to update wrong message type as upload failed '${messageEt.super_type}'`);
       }
 
-      const asset_et = message_et.get_first_asset();
-      if (asset_et) {
-        const is_proper_asset = asset_et.is_audio() || asset_et.is_file() || asset_et.is_video();
+      const assetEt = messageEt.get_first_asset();
+      if (assetEt) {
+        const is_proper_asset = assetEt.is_audio() || assetEt.is_file() || assetEt.is_video();
         if (!is_proper_asset) {
-          throw new Error(`Tried to update message with wrong asset type as upload failed '${asset_et.type}'`);
+          throw new Error(`Tried to update message with wrong asset type as upload failed '${assetEt.type}'`);
         }
 
-        asset_et.status(reason);
-        asset_et.upload_failed_reason(AssetUploadFailedReason.FAILED);
+        assetEt.status(reason);
+        assetEt.upload_failed_reason(AssetUploadFailedReason.FAILED);
       }
 
-      return this.eventService.updateEventAsUploadFailed(message_et.primary_key, reason);
+      return this.eventService.updateEventAsUploadFailed(messageEt.primary_key, reason);
     }
   }
 
@@ -4109,23 +4109,23 @@ export class ConversationRepository {
    * Update asset in UI and DB as completed.
    *
    * @param {Conversation} conversationEntity - Conversation that contains the message
-   * @param {Message} message_et - Message to update
-   * @param {Object} event_json - Uploaded asset event information
+   * @param {Message} messageEt - Message to update
+   * @param {Object} eventJson - Uploaded asset event information
    * @returns {Promise} Resolve when message was updated
    */
-  update_message_as_upload_complete(conversationEntity, message_et, event_json) {
-    const {id, key, otr_key, sha256, token} = event_json.data;
-    const asset_et = message_et.get_first_asset();
+  update_message_as_upload_complete(conversationEntity, messageEt, eventJson) {
+    const {id, key, otr_key, sha256, token} = eventJson.data;
+    const assetEt = messageEt.get_first_asset();
 
     const resource = key
       ? AssetRemoteData.v3(key, otr_key, sha256, token)
       : AssetRemoteData.v2(conversationEntity.id, id, otr_key, sha256);
 
-    asset_et.original_resource(resource);
-    asset_et.status(AssetTransferState.UPLOADED);
-    message_et.status(StatusType.SENT);
+    assetEt.original_resource(resource);
+    assetEt.status(AssetTransferState.UPLOADED);
+    messageEt.status(StatusType.SENT);
 
-    return this.eventService.updateEventAsUploadSucceeded(message_et.primary_key, event_json);
+    return this.eventService.updateEventAsUploadSucceeded(messageEt.primary_key, eventJson);
   }
 
   //##############################################################################

@@ -913,7 +913,7 @@ class AuthViewModel {
       const {type: event_type, user} = event;
       const is_user_update = event_type === BackendEvent.USER.UPDATE;
 
-      this.logger.info(`»» Event: '${event_type}'`, {event_json: JSON.stringify(event), event_object: event});
+      this.logger.info(`»» Event: '${event_type}'`, {eventJson: JSON.stringify(event), eventObject: event});
       if (is_user_update && user.email) {
         this.logger.info('User account verified. User can now login.');
         this._authentication_successful();

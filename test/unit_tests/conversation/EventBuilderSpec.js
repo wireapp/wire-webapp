@@ -30,71 +30,71 @@ import {SuperType} from 'src/script/message/SuperType';
 
 describe('z.conversation.EventBuilder', () => {
   let event_mapper = undefined;
-  let conversation_et = undefined;
+  let conversationEt = undefined;
   let self_user_et = undefined;
 
   beforeEach(() => {
     self_user_et = new User(createRandomUuid());
     self_user_et.isMe = true;
 
-    conversation_et = new Conversation(createRandomUuid());
-    conversation_et.selfUser(self_user_et);
+    conversationEt = new Conversation(createRandomUuid());
+    conversationEt.selfUser(self_user_et);
 
     event_mapper = new EventMapper();
   });
 
   it('buildAllVerified', () => {
-    const event = z.conversation.EventBuilder.buildAllVerified(conversation_et, 0);
+    const event = z.conversation.EventBuilder.buildAllVerified(conversationEt, 0);
 
-    return event_mapper.mapJsonEvent(event, conversation_et).then(messageEntity => {
+    return event_mapper.mapJsonEvent(event, conversationEt).then(messageEntity => {
       expect(messageEntity).toBeDefined();
       expect(messageEntity.super_type).toBe(SuperType.VERIFICATION);
       expect(messageEntity.verificationMessageType()).toBe(VerificationMessageType.VERIFIED);
-      expect(messageEntity.from).toBe(conversation_et.selfUser().id);
-      expect(messageEntity.conversation_id).toBe(conversation_et.id);
+      expect(messageEntity.from).toBe(conversationEt.selfUser().id);
+      expect(messageEntity.conversation_id).toBe(conversationEt.id);
     });
   });
 
   it('buildDegraded', () => {
     const user_ids = [createRandomUuid()];
     const event = z.conversation.EventBuilder.buildDegraded(
-      conversation_et,
+      conversationEt,
       user_ids,
       VerificationMessageType.NEW_DEVICE,
       0,
     );
 
-    return event_mapper.mapJsonEvent(event, conversation_et).then(messageEntity => {
+    return event_mapper.mapJsonEvent(event, conversationEt).then(messageEntity => {
       expect(messageEntity).toBeDefined();
       expect(messageEntity.super_type).toBe(SuperType.VERIFICATION);
       expect(messageEntity.verificationMessageType()).toBe(VerificationMessageType.NEW_DEVICE);
-      expect(messageEntity.from).toBe(conversation_et.selfUser().id);
-      expect(messageEntity.conversation_id).toBe(conversation_et.id);
+      expect(messageEntity.from).toBe(conversationEt.selfUser().id);
+      expect(messageEntity.conversation_id).toBe(conversationEt.id);
       expect(messageEntity.userIds()).toEqual(user_ids);
     });
   });
 
   it('buildMissed', () => {
-    const event = z.conversation.EventBuilder.buildMissed(conversation_et, 0);
+    const event = z.conversation.EventBuilder.buildMissed(conversationEt, 0);
 
-    return event_mapper.mapJsonEvent(event, conversation_et).then(messageEntity => {
+    return event_mapper.mapJsonEvent(event, conversationEt).then(messageEntity => {
       expect(messageEntity).toBeDefined();
       expect(messageEntity.super_type).toBe(SuperType.MISSED);
-      expect(messageEntity.from).toBe(conversation_et.selfUser().id);
-      expect(messageEntity.conversation_id).toBe(conversation_et.id);
+      expect(messageEntity.from).toBe(conversationEt.selfUser().id);
+      expect(messageEntity.conversation_id).toBe(conversationEt.id);
     });
   });
 
   it('buildGroupCreation', () => {
-    conversation_et.participating_user_ids(['one', 'two', 'three']);
-    conversation_et.creator = 'one';
-    const event = z.conversation.EventBuilder.buildGroupCreation(conversation_et);
+    conversationEt.participating_user_ids(['one', 'two', 'three']);
+    conversationEt.creator = 'one';
+    const event = z.conversation.EventBuilder.buildGroupCreation(conversationEt);
 
-    return event_mapper.mapJsonEvent(event, conversation_et).then(messageEntity => {
+    return event_mapper.mapJsonEvent(event, conversationEt).then(messageEntity => {
       expect(messageEntity).toBeDefined();
       expect(messageEntity.type).toBe(ClientEvent.CONVERSATION.GROUP_CREATION);
-      expect(messageEntity.conversation_id).toBe(conversation_et.id);
-      expect(conversation_et.participating_user_ids().length).toBe(3);
+      expect(messageEntity.conversation_id).toBe(conversationEt.id);
+      expect(conversationEt.participating_user_ids().length).toBe(3);
     });
   });
 });

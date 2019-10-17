@@ -24,94 +24,94 @@ import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {Text} from 'src/script/entity/message/Text';
 
 describe('Message Entities', () => {
-  let message_et = null;
+  let messageEt = null;
 
   describe('is_downloadable', () => {
     it('message with text asset should not be downloadable', () => {
-      message_et = new ContentMessage();
-      message_et.assets.push(new Text());
+      messageEt = new ContentMessage();
+      messageEt.assets.push(new Text());
 
-      expect(message_et.is_downloadable()).toBeFalsy();
+      expect(messageEt.is_downloadable()).toBeFalsy();
     });
 
     it('message with image asset should be downloadable', () => {
-      message_et = new ContentMessage();
-      message_et.assets.push(new MediumImage());
+      messageEt = new ContentMessage();
+      messageEt.assets.push(new MediumImage());
 
-      expect(message_et.is_downloadable()).toBeTruthy();
+      expect(messageEt.is_downloadable()).toBeTruthy();
     });
 
     it('message with file asset should be downloadable', () => {
-      message_et = new ContentMessage();
-      message_et.assets.push(new File());
+      messageEt = new ContentMessage();
+      messageEt.assets.push(new File());
 
-      expect(message_et.is_downloadable()).toBeTruthy();
+      expect(messageEt.is_downloadable()).toBeTruthy();
     });
 
     it('ephemeral message with image asset should be downloadable', () => {
-      message_et = new ContentMessage();
-      message_et.assets.push(new MediumImage());
-      message_et.ephemeral_expires(12312123);
+      messageEt = new ContentMessage();
+      messageEt.assets.push(new MediumImage());
+      messageEt.ephemeral_expires(12312123);
 
-      expect(message_et.is_downloadable()).toBeTruthy();
+      expect(messageEt.is_downloadable()).toBeTruthy();
     });
 
     it('expired ephemeral message with image asset should not be downloadable', () => {
-      message_et = new ContentMessage();
-      message_et.assets.push(new MediumImage());
-      message_et.ephemeral_expires(true);
+      messageEt = new ContentMessage();
+      messageEt.assets.push(new MediumImage());
+      messageEt.ephemeral_expires(true);
 
-      expect(message_et.is_downloadable()).toBeFalsy();
+      expect(messageEt.is_downloadable()).toBeFalsy();
     });
   });
 
   describe('ContentMessage', () => {
     beforeEach(() => {
-      message_et = new ContentMessage();
+      messageEt = new ContentMessage();
     });
 
     describe('no asset', () => {
       it('has_asset_medium_image return false', () => {
-        expect(message_et.has_asset_image()).toBeFalsy();
+        expect(messageEt.has_asset_image()).toBeFalsy();
       });
 
       it('has_asset_text return false', () => {
-        expect(message_et.has_asset_text()).toBeFalsy();
+        expect(messageEt.has_asset_text()).toBeFalsy();
       });
     });
 
     describe('medium asset', () => {
       beforeEach(() => {
-        message_et.assets.push(new MediumImage());
+        messageEt.assets.push(new MediumImage());
       });
 
       it('has_asset_medium_image return true', () => {
-        expect(message_et.has_asset_image()).toBeTruthy();
+        expect(messageEt.has_asset_image()).toBeTruthy();
       });
 
       it('has_asset_text return false', () => {
-        expect(message_et.has_asset_text()).toBeFalsy();
+        expect(messageEt.has_asset_text()).toBeFalsy();
       });
     });
 
     describe('text asset', () => {
       beforeEach(() => {
-        message_et.assets.push(new Text());
+        messageEt.assets.push(new Text());
       });
 
       it('has_asset_medium_image return false', () => {
-        expect(message_et.has_asset_image()).toBeFalsy();
+        expect(messageEt.has_asset_image()).toBeFalsy();
       });
 
       it('has_asset_text return true', () => {
-        expect(message_et.has_asset_text()).toBeTruthy();
+        expect(messageEt.has_asset_text()).toBeTruthy();
       });
 
       it('isObfuscated returns false if it is ephemeral and still sending', () => {
-        message_et.status(StatusType.SENDING);
-        message_et.ephemeral_expires(12312123);
+        messageEt.status(StatusType.SENDING);
+        messageEt.ephemeral_expires(12312123);
 
-        expect(message_et.isObfuscated()).toBeFalsy();
+        expect(messageEt.isObfuscated()).toBeFalsy();
       });
     });
   });

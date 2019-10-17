@@ -117,12 +117,12 @@ class MessageListViewModel {
 
   /**
    * Remove all subscriptions and reset states.
-   * @param {Conversation} [conversation_et] - Conversation entity to change to
+   * @param {Conversation} [conversationEt] - Conversation entity to change to
    * @returns {undefined} No return value
    */
-  release_conversation(conversation_et) {
-    if (conversation_et) {
-      conversation_et.release();
+  release_conversation(conversationEt) {
+    if (conversationEt) {
+      conversationEt.release();
     }
     if (this.messagesBeforeChangeSubscription) {
       this.messagesBeforeChangeSubscription.dispose();
@@ -403,19 +403,19 @@ class MessageListViewModel {
 
   /**
    * Triggered when user clicks on the session reset link in a decrypt error message.
-   * @param {DecryptErrorMessage} message_et - Decrypt error message
+   * @param {DecryptErrorMessage} messageEt - Decrypt error message
    * @returns {undefined} No return value
    */
-  on_session_reset_click(message_et) {
+  on_session_reset_click(messageEt) {
     const reset_progress = () =>
       window.setTimeout(() => {
-        message_et.is_resetting_session(false);
+        messageEt.is_resetting_session(false);
         amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.SESSION_RESET);
       }, MotionDuration.LONG);
 
-    message_et.is_resetting_session(true);
+    messageEt.is_resetting_session(true);
     this.conversation_repository
-      .reset_session(message_et.from, message_et.client_id, this.conversation().id)
+      .reset_session(messageEt.from, messageEt.client_id, this.conversation().id)
       .then(() => reset_progress())
       .catch(() => reset_progress());
   }
@@ -423,12 +423,12 @@ class MessageListViewModel {
   /**
    * Shows detail image view.
    *
-   * @param {Message} message_et - Message with asset to be displayed
+   * @param {Message} messageEt - Message with asset to be displayed
    * @param {UIEvent} event - Actual scroll event
    * @returns {undefined} No return value
    */
-  show_detail(message_et, event) {
-    if (message_et.is_expired() || $(event.currentTarget).hasClass('image-loading')) {
+  show_detail(messageEt, event) {
+    if (messageEt.is_expired() || $(event.currentTarget).hasClass('image-loading')) {
       return;
     }
 
@@ -436,9 +436,9 @@ class MessageListViewModel {
       const message_ets = items.filter(
         item => item.category & MessageCategory.IMAGE && !(item.category & MessageCategory.GIF),
       );
-      const [image_message_et] = message_ets.filter(item => item.id === message_et.id);
+      const [image_message_et] = message_ets.filter(item => item.id === messageEt.id);
 
-      amplify.publish(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, image_message_et || message_et, message_ets);
+      amplify.publish(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, image_message_et || messageEt, message_ets);
     });
   }
 
@@ -470,30 +470,30 @@ class MessageListViewModel {
 
   /**
    * Checks its older neighbor in order to see if the avatar should be rendered or not
-   * @param {Message} message_et - Message to check
+   * @param {Message} messageEt - Message to check
    * @returns {boolean} Should user avatar be hidden
    */
-  should_hide_user_avatar(message_et) {
+  should_hide_user_avatar(messageEt) {
     // @todo avoid double check
-    if (this.get_timestamp_class(message_et)) {
+    if (this.get_timestamp_class(messageEt)) {
       return false;
     }
 
-    if (message_et.is_content() && message_et.replacing_message_id) {
+    if (messageEt.is_content() && messageEt.replacing_message_id) {
       return false;
     }
 
-    const last_message = this.conversation().get_previous_message(message_et);
-    return last_message && last_message.is_content() && last_message.user().id === message_et.user().id;
+    const last_message = this.conversation().get_previous_message(messageEt);
+    return last_message && last_message.is_content() && last_message.user().id === messageEt.user().id;
   }
 
   /**
    * Checks if the given message is the last delivered one
-   * @param {Message} message_et - Message to check
+   * @param {Message} messageEt - Message to check
    * @returns {boolean} Message is last delivered one
    */
-  is_last_delivered_message(message_et) {
-    return this.conversation().getLastDeliveredMessage() === message_et;
+  is_last_delivered_message(messageEt) {
+    return this.conversation().getLastDeliveredMessage() === messageEt;
   }
 
   click_on_cancel_request(messageEntity) {
@@ -502,8 +502,8 @@ class MessageListViewModel {
     this.actionsViewModel.cancelConnectionRequest(messageEntity.otherUser(), true, nextConversationEntity);
   }
 
-  click_on_like(message_et, button = true) {
-    this.conversation_repository.toggle_like(this.conversation(), message_et, button);
+  click_on_like(messageEt, button = true) {
+    this.conversation_repository.toggleLike(this.conversation(), messageEt, button);
   }
 
   clickOnInvitePeople() {

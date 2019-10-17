@@ -134,14 +134,14 @@ export class UserRepository {
 
     this.connect_requests = ko
       .pureComputed(() => {
-        return this.users().filter(user_et => user_et.isIncomingRequest());
+        return this.users().filter(userEt => userEt.isIncomingRequest());
       })
       .extend({rateLimit: 50});
 
     this.connected_users = ko
       .pureComputed(() => {
         return this.users()
-          .filter(user_et => user_et.isConnected())
+          .filter(userEt => userEt.isConnected())
           .sort((user_a, user_b) => sortByPriority(user_a.first_name(), user_b.first_name()));
       })
       .extend({rateLimit: TIME_IN_MILLIS.SECOND});
@@ -155,7 +155,7 @@ export class UserRepository {
 
     this.number_of_contacts = ko.pureComputed(() => {
       const contacts = this.isTeam() ? this.teamUsers() : this.connected_users();
-      return contacts.filter(user_et => !user_et.isService).length;
+      return contacts.filter(userEt => !userEt.isService).length;
     });
     this.number_of_contacts.subscribe(number_of_contacts => {
       amplify.publish(WebAppEvents.ANALYTICS.SUPER_PROPERTY, SuperProperty.CONTACTS, number_of_contacts);
@@ -280,14 +280,14 @@ export class UserRepository {
   userUpdate({user}: {user: UserUpdate}): Promise<User> {
     const is_self_user = user.id === this.self().id;
     const user_promise = is_self_user ? Promise.resolve(this.self()) : this.getUserById(user.id);
-    return user_promise.then(user_et => {
-      this.user_mapper.updateUserFromObject(user_et, user);
+    return user_promise.then(userEt => {
+      this.user_mapper.updateUserFromObject(userEt, user);
 
       if (is_self_user) {
         amplify.publish(WebAppEvents.TEAM.UPDATE_INFO);
       }
 
-      return user_et;
+      return userEt;
     });
   }
 
@@ -365,8 +365,8 @@ export class UserRepository {
     return this.client_repository
       .removeClient(user_id, client_id)
       .then(() => this.getUserById(user_id))
-      .then(user_et => {
-        user_et.remove_client(client_id);
+      .then(userEt => {
+        userEt.remove_client(client_id);
         amplify.publish(WebAppEvents.USER.CLIENT_REMOVED, user_id, client_id);
       });
   }
@@ -375,8 +375,8 @@ export class UserRepository {
    * Update clients for given user.
    */
   updateClientsFromUser(user_id: string, client_ets: ClientEntity[]): void {
-    this.getUserById(user_id).then(user_et => {
-      user_et.devices(client_ets);
+    this.getUserById(user_id).then(userEt => {
+      userEt.devices(client_ets);
       amplify.publish(WebAppEvents.USER.CLIENTS_UPDATED, user_id, client_ets);
     });
   }
@@ -627,16 +627,16 @@ export class UserRepository {
    * Is the user the logged in user.
    * @param isMe - `true` if self user
    */
-  saveUser(user_et: User, isMe: boolean = false): User {
-    const user = this.findUserById(user_et.id);
+  saveUser(userEt: User, isMe: boolean = false): User {
+    const user = this.findUserById(userEt.id);
     if (!user) {
       if (isMe) {
-        user_et.isMe = true;
-        this.self(user_et);
+        userEt.isMe = true;
+        this.self(userEt);
       }
-      this.users.push(user_et);
+      this.users.push(userEt);
     }
-    return user_et;
+    return userEt;
   }
 
   /**
@@ -644,7 +644,7 @@ export class UserRepository {
    * @returns Resolves with users passed as parameter
    */
   saveUsers(user_ets: User[]): User[] {
-    const newUsers = user_ets.filter(user_et => !this.findUserById(user_et.id));
+    const newUsers = user_ets.filter(userEt => !this.findUserById(userEt.id));
     koArrayPushAll(this.users, newUsers);
     return user_ets;
   }
@@ -674,7 +674,7 @@ export class UserRepository {
    */
   private _addSuspendedUsers(userIds: string[], userEntities: User[]): User[] {
     for (const userId of userIds) {
-      const matching_userIds = userEntities.find(user_et => user_et.id === userId);
+      const matching_userIds = userEntities.find(userEt => userEt.id === userId);
 
       if (!matching_userIds) {
         const userEntity = new User(userId);

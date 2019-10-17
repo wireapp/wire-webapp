@@ -459,14 +459,14 @@ export class Conversation {
    * @returns {undefined} No return value
    */
   add_messages(message_ets) {
-    message_ets = message_ets.map(message_et => this._checkForDuplicate(message_et)).filter(message_et => message_et);
+    message_ets = message_ets.map(messageEt => this._checkForDuplicate(messageEt)).filter(messageEt => messageEt);
 
     // in order to avoid multiple db writes check the messages from the end and stop once
     // we found a message from self user
     for (let counter = message_ets.length - 1; counter >= 0; counter--) {
-      const message_et = message_ets[counter];
-      if (message_et.user() && message_et.user().isMe) {
-        this.update_timestamps(message_et);
+      const messageEt = message_ets[counter];
+      if (messageEt.user() && messageEt.user().isMe) {
+        this.update_timestamps(messageEt);
         break;
       }
     }
@@ -527,7 +527,7 @@ export class Conversation {
    * @returns {undefined} No return value
    */
   prepend_messages(message_ets) {
-    message_ets = message_ets.map(message_et => this._checkForDuplicate(message_et)).filter(message_et => message_et);
+    message_ets = message_ets.map(messageEt => this._checkForDuplicate(messageEt)).filter(messageEt => messageEt);
 
     koArrayUnshiftAll(this.messages_unordered, message_ets);
   }
@@ -538,7 +538,7 @@ export class Conversation {
    * @returns {undefined} No return value
    */
   remove_message_by_id(message_id) {
-    this.messages_unordered.remove(message_et => message_id && message_id === message_et.id);
+    this.messages_unordered.remove(messageEt => message_id && message_id === messageEt.id);
   }
 
   /**
@@ -548,7 +548,7 @@ export class Conversation {
    */
   remove_messages(timestamp) {
     if (timestamp && typeof timestamp === 'number') {
-      return this.messages_unordered.remove(message_et => timestamp >= message_et.timestamp());
+      return this.messages_unordered.remove(messageEt => timestamp >= messageEt.timestamp());
     }
     this.messages_unordered.removeAll();
   }
@@ -627,18 +627,18 @@ export class Conversation {
    * Update information about conversation activity from single message.
    *
    * @private
-   * @param {Message} message_et - Message to be added to conversation
+   * @param {Message} messageEt - Message to be added to conversation
    * @returns {undefined} No return value
    */
-  update_timestamps(message_et) {
-    if (message_et) {
-      const timestamp = message_et.timestamp();
+  update_timestamps(messageEt) {
+    if (messageEt) {
+      const timestamp = messageEt.timestamp();
 
       if (timestamp <= this.last_server_timestamp()) {
-        if (message_et.timestamp_affects_order()) {
+        if (messageEt.timestamp_affects_order()) {
           this.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.LAST_EVENT);
 
-          const from_self = message_et.user() && message_et.user().isMe;
+          const from_self = messageEt.user() && messageEt.user().isMe;
           if (from_self) {
             this.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.LAST_READ);
           }
@@ -673,12 +673,12 @@ export class Conversation {
 
   /**
    * Get the message before a given message.
-   * @param {Message} message_et - Message to look up from
+   * @param {Message} messageEt - Message to look up from
    * @returns {Message | undefined} Previous message
    */
-  get_previous_message(message_et) {
+  get_previous_message(messageEt) {
     const messages_visible = this.messages_visible();
-    const message_index = messages_visible.indexOf(message_et);
+    const message_index = messages_visible.indexOf(messageEt);
     if (message_index > 0) {
       return messages_visible[message_index - 1];
     }
@@ -691,9 +691,9 @@ export class Conversation {
   get_last_editable_message() {
     const messages = this.messages();
     for (let index = messages.length - 1; index >= 0; index--) {
-      const message_et = messages[index];
-      if (message_et.is_editable()) {
-        return message_et;
+      const messageEt = messages[index];
+      if (messageEt.is_editable()) {
+        return messageEt;
       }
     }
   }
