@@ -223,7 +223,7 @@ describe('ConversationRepository', () => {
       missingClientsError.redundant = {};
       missingClientsError.time = new Date().toISOString();
 
-      spyOn(TestFactory.conversation_service, 'post_encrypted_message').and.returnValue(
+      spyOn(TestFactory.conversation_service, 'postEncryptedMessage').and.returnValue(
         Promise.reject(missingClientsError),
       );
 
@@ -330,7 +330,7 @@ describe('ConversationRepository', () => {
       missingClientsError.redundant = {};
       missingClientsError.time = new Date().toISOString();
 
-      spyOn(TestFactory.conversation_service, 'post_encrypted_message').and.returnValue(
+      spyOn(TestFactory.conversation_service, 'postEncryptedMessage').and.returnValue(
         Promise.reject(missingClientsError),
       );
 
@@ -1351,7 +1351,7 @@ describe('ConversationRepository', () => {
       spyOn(conversationRepository, 'get_message_in_conversation_by_id').and.returnValue(
         Promise.resolve(new Message()),
       );
-      spyOn(conversationRepository.conversation_service, 'post_encrypted_message').and.returnValue(Promise.resolve({}));
+      spyOn(conversationRepository.conversation_service, 'postEncryptedMessage').and.returnValue(Promise.resolve({}));
       spyOn(conversationRepository.conversationMapper, 'mapConversations').and.returnValue(conversationPromise);
       spyOn(conversationRepository.cryptography_repository, 'encryptGenericMessage').and.callFake(
         (conversationId, genericMessage) => {
@@ -1373,7 +1373,7 @@ describe('ConversationRepository', () => {
         return conversationRepository.sendTextWithLinkPreview(conversation, messageText);
       });
       return Promise.all(sentPromises).then(sentMessages => {
-        expect(conversationRepository.conversation_service.post_encrypted_message).toHaveBeenCalledTimes(
+        expect(conversationRepository.conversation_service.postEncryptedMessage).toHaveBeenCalledTimes(
           sentMessages.length * 2,
         );
       });

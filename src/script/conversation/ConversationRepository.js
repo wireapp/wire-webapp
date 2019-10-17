@@ -2419,16 +2419,16 @@ export class ConversationRepository {
    * Create a user client map for a given conversation.
    *
    * @param {string} conversation_id - Conversation ID
-   * @param {boolean} [skip_own_clients=false] - True, if other own clients should be skipped (to not sync messages on own clients)
+   * @param {boolean} [skipOwnClients=false] - True, if other own clients should be skipped (to not sync messages on own clients)
    * @param {Array<string>} user_ids - Optionally the intended recipient users
    * @returns {Promise} Resolves with a user client map
    */
-  create_recipients(conversation_id, skip_own_clients = false, user_ids) {
+  create_recipients(conversation_id, skipOwnClients = false, user_ids) {
     return this.get_all_users_in_conversation(conversation_id).then(user_ets => {
       const recipients = {};
 
       for (const user_et of user_ets) {
-        if (!(skip_own_clients && user_et.isMe)) {
+        if (!(skipOwnClients && user_et.isMe)) {
           if (user_ids && !user_ids.includes(user_et.id)) {
             continue;
           }
@@ -2629,7 +2629,7 @@ export class ConversationRepository {
     }
 
     return this.conversation_service
-      .post_encrypted_message(conversationId, payload, options.precondition)
+      .postEncryptedMessage(conversationId, payload, options.precondition)
       .then(response => {
         this.clientMismatchHandler.onClientMismatch(eventInfoEntity, response, payload);
         return response;
@@ -2658,7 +2658,7 @@ export class ConversationRepository {
               `Updated '${messageType}' message (${messageId}) for conversation '${conversationId}'. Will ignore missing receivers.`,
               updatedPayload,
             );
-            return this.conversation_service.post_encrypted_message(conversationId, updatedPayload, true);
+            return this.conversation_service.postEncryptedMessage(conversationId, updatedPayload, true);
           });
       });
   }
@@ -2669,7 +2669,7 @@ export class ConversationRepository {
     }
     const sender = this.client_repository.currentClient().id;
     try {
-      await this.conversation_service.post_encrypted_message(conversationEntity.id, {recipients: {}, sender});
+      await this.conversation_service.postEncryptedMessage(conversationEntity.id, {recipients: {}, sender});
     } catch (error) {
       if (error.missing) {
         const remoteUserClients = error.missing;

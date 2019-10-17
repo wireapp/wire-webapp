@@ -365,7 +365,7 @@ export class ConversationService {
    * @param {Array<string>|boolean} precondition_option - Level that backend checks for missing clients
    * @returns {Promise} Promise that resolves when the message was sent
    */
-  post_encrypted_message(conversation_id, payload, precondition_option) {
+  postEncryptedMessage(conversation_id, payload, precondition_option) {
     let url = `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversation_id}/otr/messages`;
 
     if (Array.isArray(precondition_option)) {
