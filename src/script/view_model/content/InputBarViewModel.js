@@ -57,7 +57,9 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         CONCURRENT_UPLOAD_LIMIT: 10,
       },
       FILES: {
-        ALLOWED_FILE_UPLOAD_EXTENSIONS: Config.FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS.split(','),
+        ALLOWED_FILE_UPLOAD_EXTENSIONS: Config.FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS.split(',').map(extension =>
+          extension.trim(),
+        ),
       },
       GIPHY_TEXT_LENGTH: 256,
       IMAGE: {
