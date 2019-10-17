@@ -1256,10 +1256,10 @@
   resolved "https://registry.yarnpkg.com/@types/long/-/long-4.0.0.tgz#719551d2352d301ac8b81db732acb6bdc28dbdef"
   integrity sha512-1w52Nyx4Gq47uuu0EVcsHBxZFJgurQ+rTKS3qMHxR1GY2T8c2AJYd6vZoZ9q1rupaDjU0yT+Jc2XTyXkjeMA+Q==
 
-"@types/markdown-it@0.0.8":
-  version "0.0.8"
-  resolved "https://registry.yarnpkg.com/@types/markdown-it/-/markdown-it-0.0.8.tgz#9af8704acde87fec70475369ba0413d50717bd8d"
-  integrity sha512-ouaTOi5kAdkTPl97u6uDkth9od4pQffPF9STcjYVZKFrEwLYf15s7Z772WxWE3IOcYBJglaT0XqdyNEiEfGgYg==
+"@types/markdown-it@0.0.9":
+  version "0.0.9"
+  resolved "https://registry.yarnpkg.com/@types/markdown-it/-/markdown-it-0.0.9.tgz#a5d552f95216c478e0a27a5acc1b28dcffd989ce"
+  integrity sha512-IFSepyZXbF4dgSvsk8EsgaQ/8Msv1I5eTL0BZ0X3iGO9jw6tCVtPG8HchIPm3wrkmGdqZOD42kE0zplVi1gYDA==
   dependencies:
     "@types/linkify-it" "*"
 
