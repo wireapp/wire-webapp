@@ -32,7 +32,7 @@ import {
   Overlay,
   Text,
 } from '@wireapp/react-ui-kit';
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
@@ -51,9 +51,9 @@ import SingleSignOnForm from './SingleSignOnForm';
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {}
 
-let ssoWindow: Window = undefined;
 const SingleSignOn = ({selfName, selfHandle, doInit}: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
+  const ssoWindowRef = useRef<Window>();
   const {match} = useReactRouter<{code?: string}>();
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
 
@@ -78,7 +78,7 @@ const SingleSignOn = ({selfName, selfHandle, doInit}: Props & ConnectedProps & D
         const isExpectedOrigin = event.origin === Config.BACKEND_REST;
         if (!isExpectedOrigin) {
           onChildWindowClose();
-          ssoWindow.close();
+          ssoWindowRef.current.close();
           return reject(
             new BackendError({
               code: 500,
@@ -94,12 +94,12 @@ const SingleSignOn = ({selfName, selfHandle, doInit}: Props & ConnectedProps & D
         switch (eventType) {
           case 'AUTH_SUCCESS': {
             onChildWindowClose();
-            ssoWindow.close();
+            ssoWindowRef.current.close();
             return resolve();
           }
           case 'AUTH_ERROR': {
             onChildWindowClose();
-            ssoWindow.close();
+            ssoWindowRef.current.close();
             return reject(
               new BackendError({
                 code: 401,
@@ -110,7 +110,7 @@ const SingleSignOn = ({selfName, selfHandle, doInit}: Props & ConnectedProps & D
           }
           default: {
             onChildWindowClose();
-            ssoWindow.close();
+            ssoWindowRef.current.close();
             return reject(
               new BackendError({
                 code: 500,
@@ -125,7 +125,7 @@ const SingleSignOn = ({selfName, selfHandle, doInit}: Props & ConnectedProps & D
 
       const childPosition = calculateChildPosition(POPUP_HEIGHT, POPUP_WIDTH);
 
-      ssoWindow = window.open(
+      ssoWindowRef.current = window.open(
         `${Config.BACKEND_REST}/sso/initiate-login/${code}`,
         'WIRE_SSO',
         `
@@ -143,16 +143,16 @@ const SingleSignOn = ({selfName, selfHandle, doInit}: Props & ConnectedProps & D
 
       setIsOverlayOpen(true);
 
-      if (ssoWindow) {
+      if (ssoWindowRef.current) {
         timerId = window.setInterval(() => {
-          if (ssoWindow && ssoWindow.closed) {
+          if (ssoWindowRef.current && ssoWindowRef.current.closed) {
             onChildWindowClose();
             reject(new BackendError({code: 500, label: BackendError.LABEL.SSO_USER_CANCELLED_ERROR}));
           }
         }, SSO_WINDOW_CLOSE_POLLING_INTERVAL);
 
         onParentWindowClose = () => {
-          ssoWindow.close();
+          ssoWindowRef.current.close();
           reject(new BackendError({code: 500, label: BackendError.LABEL.SSO_USER_CANCELLED_ERROR}));
         };
         window.addEventListener('unload', onParentWindowClose);
@@ -177,7 +177,7 @@ const SingleSignOn = ({selfName, selfHandle, doInit}: Props & ConnectedProps & D
     const top = parentHeight / 2 - childHeight / 2 + screenTop;
     return {left, top};
   };
-  const focusChildWindow = () => ssoWindow && ssoWindow.focus();
+  const focusChildWindow = () => ssoWindowRef.current && ssoWindowRef.current.focus();
   const backArrow = (
     <RouterLink to={ROUTE.LOGIN} data-uie-name="go-login">
       <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
