@@ -42,7 +42,7 @@ export const areSomeUsersOnLegalHold = (users: User[]): boolean => {
 
 export const isConversationOnLegalHold = (conversation: Conversation): boolean => {
   const amIonLegalHold = isUserOnLegalHold(conversation.selfUser());
-  const areOthersOnLegalHold = areSomeUsersOnLegalHold(conversation.participatingUserEts());
+  const areOthersOnLegalHold = areSomeUsersOnLegalHold(conversation.participating_user_ets());
   return amIonLegalHold || areOthersOnLegalHold;
 };
 

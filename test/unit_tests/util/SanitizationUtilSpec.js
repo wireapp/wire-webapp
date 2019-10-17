@@ -51,7 +51,7 @@ describe('SanitizationUtil', () => {
       const unescapedFirstName = getFirstName(userEntity, undefined, true);
 
       expect(unescapedFirstName).toEqual(`<script>alert('Unsanitzed');</script>`);
-      userEntity.isMe = true;
+      userEntity.is_me = true;
       const escapedSelfName = getFirstName(userEntity);
 
       expect(escapedSelfName).toEqual('you');

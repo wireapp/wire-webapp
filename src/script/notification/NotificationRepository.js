@@ -693,7 +693,7 @@ export class NotificationRepository {
    */
   _notifySound(messageEntity) {
     const muteSound = !document.hasFocus() && Environment.browser.firefox && Environment.os.mac;
-    const isFromSelf = messageEntity.user().isMe;
+    const isFromSelf = messageEntity.user().is_me;
     const shouldPlaySound = !muteSound && !isFromSelf;
 
     if (shouldPlaySound) {
@@ -765,7 +765,7 @@ export class NotificationRepository {
       this.callingRepository.joinedCall() && !this.contentViewModelState.multitasking.isMinimized();
 
     const activeConversation = document.hasFocus() && inConversationView && inActiveConversation && !inMaximizedCall;
-    const messageFromSelf = messageEntity.user().isMe;
+    const messageFromSelf = messageEntity.user().is_me;
     const permissionDenied = this.permissionState() === PermissionStatusState.DENIED;
     const preferenceIsNone = this.notificationsPreference() === NotificationPreference.NONE;
     const supportsNotification = Environment.browser.supports.notifications;

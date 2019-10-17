@@ -205,7 +205,7 @@ class Message {
       });
     }
 
-    if (messageEntity.isDeletable()) {
+    if (messageEntity.is_deletable()) {
       entries.push({
         click: () => this.actionsViewModel.deleteMessage(this.conversation(), messageEntity),
         label: t('conversationContextMenuDelete'),
@@ -214,7 +214,7 @@ class Message {
 
     const isSendingMessage = messageEntity.status() === StatusType.SENDING;
     const canDelete =
-      messageEntity.user().isMe && !this.conversation().removed_from_conversation() && !isSendingMessage;
+      messageEntity.user().is_me && !this.conversation().removed_from_conversation() && !isSendingMessage;
     if (canDelete) {
       entries.push({
         click: () => this.actionsViewModel.deleteMessageEveryone(this.conversation(), messageEntity),
@@ -583,7 +583,7 @@ const memberTemplate = `
       <!-- /ko -->
     <!-- /ko -->
 
-    <!-- ko if: message.isMemberLeave() && message.user().isMe && isSelfTemporaryGuest -->
+    <!-- ko if: message.isMemberLeave() && message.user().is_me && isSelfTemporaryGuest -->
       <div class="message-member-footer">
         <div class="message-member-footer-description" data-bind="text: t('temporaryGuestLeaveDescription')"></div>
       </div>

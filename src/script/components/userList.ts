@@ -132,8 +132,8 @@ ko.components.register('user-list', {
         );
       }
       // make sure the self user is the first one in the list
-      const selfUser = resultUsers.filter(user => user.isMe);
-      const otherUsers = resultUsers.filter(user => !user.isMe);
+      const selfUser = resultUsers.filter(user => user.is_me);
+      const otherUsers = resultUsers.filter(user => !user.is_me);
       return selfUser.concat(otherUsers);
     });
 

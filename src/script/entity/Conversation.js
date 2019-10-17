@@ -73,13 +73,13 @@ export class Conversation {
     this.is_loaded = ko.observable(false);
     this.is_pending = ko.observable(false);
 
-    this.participatingUserEts = ko.observableArray([]); // Does not include self user
-    this.participatingUserIds = ko.observableArray([]); // Does not include self user
+    this.participating_user_ets = ko.observableArray([]); // Does not include self user
+    this.participating_user_ids = ko.observableArray([]); // Does not include self user
     this.selfUser = ko.observable();
 
     this.hasCreationMessage = false;
 
-    this.firstUserEntity = ko.pureComputed(() => this.participatingUserEts()[0]);
+    this.firstUserEntity = ko.pureComputed(() => this.participating_user_ets()[0]);
     this.availabilityOfUser = ko.pureComputed(() => this.firstUserEntity() && this.firstUserEntity().availability());
 
     this.isGuest = ko.observable(false);
@@ -92,7 +92,7 @@ export class Conversation {
 
     this.isTeam1to1 = ko.pureComputed(() => {
       const isGroupConversation = this.type() === ConversationType.GROUP;
-      const hasOneParticipant = this.participatingUserIds().length === 1;
+      const hasOneParticipant = this.participating_user_ids().length === 1;
       return isGroupConversation && hasOneParticipant && this.team_id && !this.name();
     });
     this.isGroup = ko.pureComputed(() => {
@@ -107,17 +107,17 @@ export class Conversation {
     this.isSelf = ko.pureComputed(() => this.type() === ConversationType.SELF);
 
     this.hasGuest = ko.pureComputed(() => {
-      const hasGuestUser = this.participatingUserEts().some(userEntity => userEntity.isGuest());
+      const hasGuestUser = this.participating_user_ets().some(userEntity => userEntity.isGuest());
       return hasGuestUser && this.isGroup() && this.selfUser() && this.selfUser().inTeam();
     });
-    this.hasService = ko.pureComputed(() => this.participatingUserEts().some(userEntity => userEntity.isService));
+    this.hasService = ko.pureComputed(() => this.participating_user_ets().some(userEntity => userEntity.isService));
 
     // in case this is a one2one conversation this is the connection to that user
     this.connection = ko.observable(new ConnectionEntity());
     this.connection.subscribe(connectionEntity => {
       const connectedUserId = connectionEntity && connectionEntity.userId;
-      if (connectedUserId && !this.participatingUserIds().includes(connectedUserId)) {
-        this.participatingUserIds.push(connectedUserId);
+      if (connectedUserId && !this.participating_user_ids().includes(connectedUserId)) {
+        this.participating_user_ids.push(connectedUserId);
       }
     });
 
@@ -253,7 +253,7 @@ export class Conversation {
       for (let index = this.messages().length - 1; index >= 0; index--) {
         const messageEntity = this.messages()[index];
         if (messageEntity.visible()) {
-          const isReadMessage = messageEntity.timestamp() <= this.last_read_timestamp() || messageEntity.user().isMe;
+          const isReadMessage = messageEntity.timestamp() <= this.last_read_timestamp() || messageEntity.user().is_me;
           if (isReadMessage) {
             break;
           }
@@ -306,7 +306,7 @@ export class Conversation {
      */
     this.display_name = ko.pureComputed(() => {
       if (this.isRequest() || this.is1to1()) {
-        const [userEntity] = this.participatingUserEts();
+        const [userEntity] = this.participating_user_ets();
         const userName = userEntity && userEntity.name();
         return userName ? userName : '…';
       }
@@ -316,10 +316,10 @@ export class Conversation {
           return this.name();
         }
 
-        const hasUserEntities = !!this.participatingUserEts().length;
+        const hasUserEntities = !!this.participating_user_ets().length;
         if (hasUserEntities) {
-          const isJustServices = this.participatingUserEts().every(userEntity => userEntity.isService);
-          const joinedNames = this.participatingUserEts()
+          const isJustServices = this.participating_user_ets().every(userEntity => userEntity.isService);
+          const joinedNames = this.participating_user_ets()
             .filter(userEntity => isJustServices || !userEntity.isService)
             .map(userEntity => userEntity.first_name())
             .join(', ');
@@ -328,7 +328,7 @@ export class Conversation {
           return truncate(joinedNames, maxLength, false);
         }
 
-        const hasUserIds = !!this.participatingUserIds().length;
+        const hasUserIds = !!this.participating_user_ids().length;
         if (!hasUserIds) {
           return t('conversationsEmptyConversation');
         }
@@ -344,7 +344,7 @@ export class Conversation {
   }
 
   _isInitialized() {
-    const hasMappedUsers = this.participatingUserEts().length || !this.participatingUserIds().length;
+    const hasMappedUsers = this.participating_user_ets().length || !this.participating_user_ids().length;
     return Boolean(this.selfUser() && hasMappedUsers);
   }
 
@@ -361,7 +361,7 @@ export class Conversation {
       this.mutedState,
       this.mutedTimestamp,
       this.name,
-      this.participatingUserIds,
+      this.participating_user_ids,
       this.receiptMode,
       this.status,
       this.type,
@@ -370,7 +370,7 @@ export class Conversation {
   }
 
   get allUserEntities() {
-    return [this.selfUser()].concat(this.participatingUserEts());
+    return [this.selfUser()].concat(this.participating_user_ets());
   }
 
   persistState() {
@@ -455,23 +455,23 @@ export class Conversation {
 
   /**
    * Adds multiple messages to the conversation.
-   * @param {Array<Message>} messageEts - Array of message entities to be added to the conversation
+   * @param {Array<Message>} message_ets - Array of message entities to be added to the conversation
    * @returns {undefined} No return value
    */
-  add_messages(messageEts) {
-    messageEts = messageEts.map(messageEt => this._checkForDuplicate(messageEt)).filter(messageEt => messageEt);
+  add_messages(message_ets) {
+    message_ets = message_ets.map(message_et => this._checkForDuplicate(message_et)).filter(message_et => message_et);
 
     // in order to avoid multiple db writes check the messages from the end and stop once
     // we found a message from self user
-    for (let counter = messageEts.length - 1; counter >= 0; counter--) {
-      const messageEt = messageEts[counter];
-      if (messageEt.user() && messageEt.user().isMe) {
-        this.update_timestamps(messageEt);
+    for (let counter = message_ets.length - 1; counter >= 0; counter--) {
+      const message_et = message_ets[counter];
+      if (message_et.user() && message_et.user().is_me) {
+        this.update_timestamps(message_et);
         break;
       }
     }
 
-    koArrayPushAll(this.messages_unordered, messageEts);
+    koArrayPushAll(this.messages_unordered, message_ets);
   }
 
   getFirstUnreadSelfMention() {
@@ -498,20 +498,20 @@ export class Conversation {
   }
 
   getNumberOfServices() {
-    return this.participatingUserEts().filter(userEntity => userEntity.isService).length;
+    return this.participating_user_ets().filter(userEntity => userEntity.isService).length;
   }
 
   getNumberOfParticipants(countSelf = true, countServices = true) {
     const adjustCountForSelf = countSelf && !this.removed_from_conversation() ? 1 : 0;
     const adjustCountForServices = countServices ? 0 : this.getNumberOfServices();
 
-    return this.participatingUserIds().length + adjustCountForSelf - adjustCountForServices;
+    return this.participating_user_ids().length + adjustCountForSelf - adjustCountForServices;
   }
 
   getNumberOfClients() {
-    const participantsMapped = this.participatingUserIds().length === this.participatingUserEts().length;
+    const participantsMapped = this.participating_user_ids().length === this.participating_user_ets().length;
     if (participantsMapped) {
-      return this.participatingUserEts().reduce((accumulator, userEntity) => {
+      return this.participating_user_ets().reduce((accumulator, userEntity) => {
         return userEntity.devices().length
           ? accumulator + userEntity.devices().length
           : accumulator + ClientRepository.CONFIG.AVERAGE_NUMBER_OF_CLIENTS;
@@ -523,13 +523,13 @@ export class Conversation {
 
   /**
    * Prepends messages with new batch of messages.
-   * @param {Array<Message>} messageEts - Array of messages to be added to conversation
+   * @param {Array<Message>} message_ets - Array of messages to be added to conversation
    * @returns {undefined} No return value
    */
-  prepend_messages(messageEts) {
-    messageEts = messageEts.map(messageEt => this._checkForDuplicate(messageEt)).filter(messageEt => messageEt);
+  prepend_messages(message_ets) {
+    message_ets = message_ets.map(message_et => this._checkForDuplicate(message_et)).filter(message_et => message_et);
 
-    koArrayUnshiftAll(this.messages_unordered, messageEts);
+    koArrayUnshiftAll(this.messages_unordered, message_ets);
   }
 
   /**
@@ -538,7 +538,7 @@ export class Conversation {
    * @returns {undefined} No return value
    */
   remove_message_by_id(message_id) {
-    this.messages_unordered.remove(messageEt => message_id && message_id === messageEt.id);
+    this.messages_unordered.remove(message_et => message_id && message_id === message_et.id);
   }
 
   /**
@@ -548,7 +548,7 @@ export class Conversation {
    */
   remove_messages(timestamp) {
     if (timestamp && typeof timestamp === 'number') {
-      return this.messages_unordered.remove(messageEt => timestamp >= messageEt.timestamp());
+      return this.messages_unordered.remove(message_et => timestamp >= message_et.timestamp());
     }
     this.messages_unordered.removeAll();
   }
@@ -627,19 +627,19 @@ export class Conversation {
    * Update information about conversation activity from single message.
    *
    * @private
-   * @param {Message} messageEt - Message to be added to conversation
+   * @param {Message} message_et - Message to be added to conversation
    * @returns {undefined} No return value
    */
-  update_timestamps(messageEt) {
-    if (messageEt) {
-      const timestamp = messageEt.timestamp();
+  update_timestamps(message_et) {
+    if (message_et) {
+      const timestamp = message_et.timestamp();
 
       if (timestamp <= this.last_server_timestamp()) {
-        if (messageEt.timestamp_affects_order()) {
+        if (message_et.timestamp_affects_order()) {
           this.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.LAST_EVENT);
 
-          const fromSelf = messageEt.user() && messageEt.user().isMe;
-          if (fromSelf) {
+          const from_self = message_et.user() && message_et.user().is_me;
+          if (from_self) {
             this.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.LAST_READ);
           }
         }
@@ -651,7 +651,7 @@ export class Conversation {
    * Get all messages.
    * @returns {Array<Message>} Array of all message in the conversation
    */
-  getAllMessages() {
+  get_all_messages() {
     return this.messages();
   }
 
@@ -673,12 +673,12 @@ export class Conversation {
 
   /**
    * Get the message before a given message.
-   * @param {Message} messageEt - Message to look up from
+   * @param {Message} message_et - Message to look up from
    * @returns {Message | undefined} Previous message
    */
-  getPreviousMessage(messageEt) {
+  get_previous_message(message_et) {
     const messages_visible = this.messages_visible();
-    const message_index = messages_visible.indexOf(messageEt);
+    const message_index = messages_visible.indexOf(message_et);
     if (message_index > 0) {
       return messages_visible[message_index - 1];
     }
@@ -688,12 +688,12 @@ export class Conversation {
    * Get the last text message that was added by self user.
    * @returns {Message} Last message edited
    */
-  getLastEditableMessage() {
+  get_last_editable_message() {
     const messages = this.messages();
     for (let index = messages.length - 1; index >= 0; index--) {
-      const messageEt = messages[index];
-      if (messageEt.is_editable()) {
-        return messageEt;
+      const message_et = messages[index];
+      if (message_et.is_editable()) {
+        return message_et;
       }
     }
   }
@@ -708,7 +708,7 @@ export class Conversation {
       .reverse()
       .find(messageEntity => {
         const isDelivered = messageEntity.status() >= StatusType.DELIVERED;
-        return isDelivered && messageEntity.user().isMe;
+        return isDelivered && messageEntity.user().is_me;
       });
   }
 
@@ -729,15 +729,15 @@ export class Conversation {
 
   getTemporaryGuests() {
     const userEntities = this.selfUser()
-      ? this.participatingUserEts().concat(this.selfUser())
-      : this.participatingUserEts();
+      ? this.participating_user_ets().concat(this.selfUser())
+      : this.participating_user_ets();
     return userEntities.filter(userEntity => userEntity.isTemporaryGuest());
   }
 
   getUsersWithUnverifiedClients() {
     const userEntities = this.selfUser()
-      ? this.participatingUserEts().concat(this.selfUser())
-      : this.participatingUserEts();
+      ? this.participating_user_ets().concat(this.selfUser())
+      : this.participating_user_ets();
     return userEntities.filter(userEntity => !userEntity.is_verified());
   }
 
@@ -781,7 +781,7 @@ export class Conversation {
       muted_state: this.mutedState(),
       muted_timestamp: this.mutedTimestamp(),
       name: this.name(),
-      others: this.participatingUserIds(),
+      others: this.participating_user_ids(),
       receipt_mode: this.receiptMode(),
       status: this.status(),
       team_id: this.team_id,

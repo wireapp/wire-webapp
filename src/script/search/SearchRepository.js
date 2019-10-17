@@ -158,7 +158,7 @@ export class SearchRepository {
     const searchPromises = [directorySearch];
 
     if (validateHandle(name)) {
-      searchPromises.push(this.userRepository.getUserIdByHandle(name));
+      searchPromises.push(this.userRepository.get_user_id_by_handle(name));
     }
 
     return Promise.all(searchPromises)
@@ -169,10 +169,10 @@ export class SearchRepository {
 
         return directoryResults;
       })
-      .then(userIds => this.userRepository.getUsersById(userIds))
+      .then(userIds => this.userRepository.get_users_by_id(userIds))
       .then(userEntities => {
         return userEntities.filter(userEntity => {
-          return !userEntity.isMe && !userEntity.isConnected() && !userEntity.isTeamMember();
+          return !userEntity.is_me && !userEntity.isConnected() && !userEntity.isTeamMember();
         });
       })
       .then(userEntities => {

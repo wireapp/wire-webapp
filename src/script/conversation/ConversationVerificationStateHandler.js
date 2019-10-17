@@ -189,7 +189,7 @@ export class ConversationVerificationStateHandler {
       .map(conversationEntity => {
         if (!conversationEntity.removed_from_conversation()) {
           const selfUserId = this.conversationRepository.selfUser().id;
-          const userIdsInConversation = conversationEntity.participatingUserIds().concat(selfUserId);
+          const userIdsInConversation = conversationEntity.participating_user_ids().concat(selfUserId);
           const matchingUserIds = intersection(userIdsInConversation, userIds);
 
           if (!!matchingUserIds.length) {

@@ -320,7 +320,7 @@ export class EventService {
       record.data.token = assetData.token;
       record.status = StatusType.SENT;
 
-      return this.replaceEvent(record).then(() => this.logger.info('Updated asset messageEt (uploaded)', primaryKey));
+      return this.replaceEvent(record).then(() => this.logger.info('Updated asset message_et (uploaded)', primaryKey));
     });
   }
 
@@ -340,7 +340,7 @@ export class EventService {
       record.data.status = AssetTransferState.UPLOAD_FAILED;
 
       return this.replaceEvent(record).then(() => {
-        this.logger.info('Updated asset messageEt (failed)', primaryKey);
+        this.logger.info('Updated asset message_et (failed)', primaryKey);
         return record;
       });
     });

@@ -34,7 +34,7 @@ describe('ConversationCellState', () => {
     const conversationEntity = new Conversation(createRandomUuid());
 
     const selfUserEntity = new User(createRandomUuid());
-    selfUserEntity.isMe = true;
+    selfUserEntity.is_me = true;
     selfUserEntity.inTeam(true);
     conversationEntity.selfUser(selfUserEntity);
 
@@ -71,7 +71,7 @@ describe('ConversationCellState', () => {
     const conversationEntity = new Conversation(createRandomUuid());
 
     const selfUserEntity = new User(createRandomUuid());
-    selfUserEntity.isMe = true;
+    selfUserEntity.is_me = true;
     selfUserEntity.inTeam(true);
     conversationEntity.selfUser(selfUserEntity);
 

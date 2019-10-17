@@ -174,7 +174,7 @@ export class IntegrationRepository {
         return false;
       }
 
-      const [userEntity] = conversationEntity.participatingUserEts();
+      const [userEntity] = conversationEntity.participating_user_ets();
       if (!userEntity) {
         // Disregard conversations with no user entities
         return false;

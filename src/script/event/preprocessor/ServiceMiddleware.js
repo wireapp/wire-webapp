@@ -58,7 +58,7 @@ export class ServiceMiddleware {
     const getUsersPromise = containsSelfUser
       ? this.conversationRepository
           .get_conversation_by_id(conversationId)
-          .then(conversationEntity => conversationEntity.participatingUserIds())
+          .then(conversationEntity => conversationEntity.participating_user_ids())
       : Promise.resolve(eventData.user_ids);
 
     return getUsersPromise
@@ -74,7 +74,7 @@ export class ServiceMiddleware {
   }
 
   _containsService(userIds) {
-    return this.userRepository.getUsersById(userIds).then(userEntities => {
+    return this.userRepository.get_users_by_id(userIds).then(userEntities => {
       return userEntities.some(userEntity => userEntity.isService);
     });
   }

@@ -134,14 +134,14 @@ export class UserRepository {
 
     this.connect_requests = ko
       .pureComputed(() => {
-        return this.users().filter(userEt => userEt.isIncomingRequest());
+        return this.users().filter(user_et => user_et.isIncomingRequest());
       })
       .extend({rateLimit: 50});
 
     this.connected_users = ko
       .pureComputed(() => {
         return this.users()
-          .filter(userEt => userEt.isConnected())
+          .filter(user_et => user_et.isConnected())
           .sort((user_a, user_b) => sortByPriority(user_a.first_name(), user_b.first_name()));
       })
       .extend({rateLimit: TIME_IN_MILLIS.SECOND});
@@ -155,17 +155,17 @@ export class UserRepository {
 
     this.number_of_contacts = ko.pureComputed(() => {
       const contacts = this.isTeam() ? this.teamUsers() : this.connected_users();
-      return contacts.filter(userEt => !userEt.isService).length;
+      return contacts.filter(user_et => !user_et.isService).length;
     });
     this.number_of_contacts.subscribe(number_of_contacts => {
       amplify.publish(WebAppEvents.ANALYTICS.SUPER_PROPERTY, SuperProperty.CONTACTS, number_of_contacts);
     });
 
     amplify.subscribe(WebAppEvents.CLIENT.ADD, this.addClientToUser.bind(this));
-    amplify.subscribe(WebAppEvents.CLIENT.REMOVE, this.removeClientFromUser.bind(this));
-    amplify.subscribe(WebAppEvents.CLIENT.UPDATE, this.updateClientsFromUser.bind(this));
+    amplify.subscribe(WebAppEvents.CLIENT.REMOVE, this.remove_client_from_user.bind(this));
+    amplify.subscribe(WebAppEvents.CLIENT.UPDATE, this.update_clients_from_user.bind(this));
     amplify.subscribe(WebAppEvents.USER.SET_AVAILABILITY, this.setAvailability.bind(this));
-    amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent.bind(this));
+    amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.on_user_event.bind(this));
     amplify.subscribe(WebAppEvents.USER.PERSIST, this.saveUserInDb.bind(this));
     amplify.subscribe(WebAppEvents.USER.UPDATE, this.updateUserById.bind(this));
   }
@@ -173,7 +173,7 @@ export class UserRepository {
   /**
    * Listener for incoming user events.
    */
-  onUserEvent(eventJson: any, source: EventSource): void {
+  on_user_event(eventJson: any, source: EventSource): void {
     const type = eventJson.type;
 
     const logObject = {eventJson: JSON.stringify(eventJson), eventObject: eventJson};
@@ -181,10 +181,10 @@ export class UserRepository {
 
     switch (type) {
       case BackendEvent.USER.DELETE:
-        this.userDelete(eventJson);
+        this.user_delete(eventJson);
         break;
       case BackendEvent.USER.UPDATE:
-        this.userUpdate(eventJson);
+        this.user_update(eventJson);
         break;
       case ClientEvent.USER.AVAILABILITY:
         this.onUserAvailability(eventJson);
@@ -221,7 +221,7 @@ export class UserRepository {
             this.logger.log(`Loaded state of '${users.length}' users from database`, users);
 
             const mappingPromises = users.map(user => {
-              return this.getUserById(user.id).then(userEntity => userEntity.availability(user.availability));
+              return this.get_user_by_id(user.id).then(userEntity => userEntity.availability(user.availability));
             });
 
             return Promise.all(mappingPromises);
@@ -250,7 +250,7 @@ export class UserRepository {
   /**
    * Event to delete the matching user.
    */
-  userDelete({id}: {id: string}): void {
+  user_delete({id}: {id: string}): void {
     // @todo Add user deletion cases for other users
     const is_self_user = id === this.self().id;
     if (is_self_user) {
@@ -270,24 +270,24 @@ export class UserRepository {
         from: userId,
         data: {availability},
       } = event;
-      this.getUserById(userId).then(userEntity => userEntity.availability(availability));
+      this.get_user_by_id(userId).then(userEntity => userEntity.availability(availability));
     }
   }
 
   /**
    * Event to update the matching user.
    */
-  userUpdate({user}: {user: UserUpdate}): Promise<User> {
+  user_update({user}: {user: UserUpdate}): Promise<User> {
     const is_self_user = user.id === this.self().id;
-    const user_promise = is_self_user ? Promise.resolve(this.self()) : this.getUserById(user.id);
-    return user_promise.then(userEt => {
-      this.user_mapper.updateUserFromObject(userEt, user);
+    const user_promise = is_self_user ? Promise.resolve(this.self()) : this.get_user_by_id(user.id);
+    return user_promise.then(user_et => {
+      this.user_mapper.updateUserFromObject(user_et, user);
 
       if (is_self_user) {
         amplify.publish(WebAppEvents.TEAM.UPDATE_INFO);
       }
 
-      return userEt;
+      return user_et;
     });
   }
 
@@ -296,7 +296,7 @@ export class UserRepository {
    */
   updateUsersFromConnections(connectionEntities: ConnectionEntity[]): Promise<User[]> {
     const userIds = connectionEntities.map(connectionEntity => connectionEntity.userId);
-    return this.getUsersById(userIds).then(userEntities => {
+    return this.get_users_by_id(userIds).then(userEntities => {
       userEntities.forEach(userEntity => {
         const connectionEntity = connectionEntities.find(({userId}) => userId === userEntity.id);
         userEntity.connection(connectionEntity);
@@ -314,7 +314,7 @@ export class UserRepository {
       const userIds = Object.keys(recipients);
       this.logger.info(`Found locally stored clients for '${userIds.length}' users`, recipients);
 
-      return this.getUsersById(userIds).then(userEntities => {
+      return this.get_users_by_id(userIds).then(userEntities => {
         userEntities.forEach(userEntity => {
           const clientEntities = recipients[userEntity.id];
           const tooManyClients = clientEntities > 8;
@@ -335,8 +335,8 @@ export class UserRepository {
    * @returns Resolves with `true` when a client has been added
    */
   addClientToUser(userId: string, clientPayload: object, publishClient: boolean = false): Promise<boolean> {
-    return this.getUserById(userId).then(userEntity => {
-      const clientEntity = this.client_repository.clientMapper.mapClient(clientPayload, userEntity.isMe);
+    return this.get_user_by_id(userId).then(userEntity => {
+      const clientEntity = this.client_repository.clientMapper.mapClient(clientPayload, userEntity.is_me);
       const wasClientAdded = userEntity.add_client(clientEntity);
 
       if (wasClientAdded) {
@@ -361,12 +361,12 @@ export class UserRepository {
   /**
    * Removes a stored client and the session connected with it.
    */
-  removeClientFromUser(user_id: string, client_id: string): Promise<void> {
+  remove_client_from_user(user_id: string, client_id: string): Promise<void> {
     return this.client_repository
       .removeClient(user_id, client_id)
-      .then(() => this.getUserById(user_id))
-      .then(userEt => {
-        userEt.remove_client(client_id);
+      .then(() => this.get_user_by_id(user_id))
+      .then(user_et => {
+        user_et.remove_client(client_id);
         amplify.publish(WebAppEvents.USER.CLIENT_REMOVED, user_id, client_id);
       });
   }
@@ -374,10 +374,10 @@ export class UserRepository {
   /**
    * Update clients for given user.
    */
-  updateClientsFromUser(user_id: string, clientEts: ClientEntity[]): void {
-    this.getUserById(user_id).then(userEt => {
-      userEt.devices(clientEts);
-      amplify.publish(WebAppEvents.USER.CLIENTS_UPDATED, user_id, clientEts);
+  update_clients_from_user(user_id: string, client_ets: ClientEntity[]): void {
+    this.get_user_by_id(user_id).then(user_et => {
+      user_et.devices(client_ets);
+      amplify.publish(WebAppEvents.USER.CLIENTS_UPDATED, user_id, client_ets);
     });
   }
 
@@ -454,7 +454,7 @@ export class UserRepository {
    * Request account deletion.
    * @returns Resolves when account deletion process has been initiated
    */
-  deleteMe(): Promise<void> {
+  delete_me(): Promise<void> {
     return this.selfService
       .deleteSelf()
       .then(() => this.logger.info('Account deletion initiated'))
@@ -500,13 +500,13 @@ export class UserRepository {
           this.mapGuestStatus(newUserEntities);
         }
 
-        return this.saveUsers(newUserEntities);
+        return this.save_users(newUserEntities);
       })
       .then(fetchedUserEntities => {
         // If there is a difference then we most likely have a case with a suspended user
         const isAllUserIds = userIds.length === fetchedUserEntities.length;
         if (!isAllUserIds) {
-          fetchedUserEntities = this._addSuspendedUsers(userIds, fetchedUserEntities);
+          fetchedUserEntities = this._add_suspended_users(userIds, fetchedUserEntities);
         }
 
         return fetchedUserEntities;
@@ -529,7 +529,7 @@ export class UserRepository {
       .then(userData => this._upgradePictureAsset(userData))
       .then(response => this.user_mapper.mapSelfUserFromJson(response))
       .then(userEntity => {
-        this.saveUser(userEntity, true);
+        this.save_user(userEntity, true);
         return this.initMarketingConsent().then(() => userEntity);
       })
       .catch(error => {
@@ -550,7 +550,7 @@ export class UserRepository {
       if (!hasAsset) {
         // if there are no assets, just upload the old picture to the new api
         const {medium} = mapProfileAssetsV1(userData.id, userData.picture);
-        medium.load().then(imageBlob => this.changePicture(imageBlob as Blob));
+        medium.load().then(imageBlob => this.change_picture(imageBlob as Blob));
       } else {
         // if an asset is already there, remove the pointer to the old picture
         this.selfService.putSelf({picture: []});
@@ -562,7 +562,7 @@ export class UserRepository {
   /**
    * Check for user locally and fetch it from the server otherwise.
    */
-  getUserById(user_id: string): Promise<User> {
+  get_user_by_id(user_id: string): Promise<User> {
     const user = this.findUserById(user_id);
     return user
       ? Promise.resolve(user)
@@ -575,7 +575,7 @@ export class UserRepository {
         });
   }
 
-  getUserIdByHandle(handle: string): Promise<void | User> {
+  get_user_id_by_handle(handle: string): Promise<void | User> {
     return this.user_service
       .getUserByHandle(handle.toLowerCase())
       .then(({user: user_id}) => user_id)
@@ -590,7 +590,7 @@ export class UserRepository {
    * Check for users locally and fetch them from the server otherwise.
    * @param offline - Should we only look for cached contacts
    */
-  getUsersById(user_ids: string[] = [], offline: boolean = false): Promise<User[]> {
+  get_users_by_id(user_ids: string[] = [], offline: boolean = false): Promise<User[]> {
     if (!user_ids.length) {
       return Promise.resolve([]);
     }
@@ -599,24 +599,24 @@ export class UserRepository {
       return this.findUserById(user_id) || user_id;
     };
 
-    const findUsers = user_ids.map(user_id => _find_user(user_id));
+    const find_users = user_ids.map(user_id => _find_user(user_id));
 
-    return Promise.all(findUsers).then(resolve_array => {
-      const knownUserEts = resolve_array.filter(arrayItem => typeof arrayItem !== 'string') as User[];
-      const unknownUserIds = resolve_array.filter(arrayItem => typeof arrayItem === 'string') as string[];
+    return Promise.all(find_users).then(resolve_array => {
+      const known_user_ets = resolve_array.filter(array_item => typeof array_item !== 'string') as User[];
+      const unknown_user_ids = resolve_array.filter(array_item => typeof array_item === 'string') as string[];
 
-      if (offline || !unknownUserIds.length) {
-        return knownUserEts;
+      if (offline || !unknown_user_ids.length) {
+        return known_user_ets;
       }
 
-      return this.fetchUsersById(unknownUserIds).then(userEts => knownUserEts.concat(userEts));
+      return this.fetchUsersById(unknown_user_ids).then(user_ets => known_user_ets.concat(user_ets));
     });
   }
 
   /**
    * Is the user the logged in user.
    */
-  isMe(user_id: User | string): boolean {
+  is_me(user_id: User | string): boolean {
     if (typeof user_id !== 'string') {
       user_id = user_id.id;
     }
@@ -625,28 +625,28 @@ export class UserRepository {
 
   /**
    * Is the user the logged in user.
-   * @param isMe - `true` if self user
+   * @param is_me - `true` if self user
    */
-  saveUser(userEt: User, isMe: boolean = false): User {
-    const user = this.findUserById(userEt.id);
+  save_user(user_et: User, is_me: boolean = false): User {
+    const user = this.findUserById(user_et.id);
     if (!user) {
-      if (isMe) {
-        userEt.isMe = true;
-        this.self(userEt);
+      if (is_me) {
+        user_et.is_me = true;
+        this.self(user_et);
       }
-      this.users.push(userEt);
+      this.users.push(user_et);
     }
-    return userEt;
+    return user_et;
   }
 
   /**
    * Save multiple users at once.
    * @returns Resolves with users passed as parameter
    */
-  saveUsers(userEts: User[]): User[] {
-    const newUsers = userEts.filter(userEt => !this.findUserById(userEt.id));
+  save_users(user_ets: User[]): User[] {
+    const newUsers = user_ets.filter(user_et => !this.findUserById(user_et.id));
     koArrayPushAll(this.users, newUsers);
-    return userEts;
+    return user_ets;
   }
 
   /**
@@ -672,9 +672,9 @@ export class UserRepository {
    * Add user entities for suspended users.
    * @returns User entities
    */
-  private _addSuspendedUsers(userIds: string[], userEntities: User[]): User[] {
+  private _add_suspended_users(userIds: string[], userEntities: User[]): User[] {
     for (const userId of userIds) {
-      const matching_userIds = userEntities.find(userEt => userEt.id === userId);
+      const matching_userIds = userEntities.find(user_et => user_et.id === userId);
 
       if (!matching_userIds) {
         const userEntity = new User(userId);
@@ -689,16 +689,16 @@ export class UserRepository {
   /**
    * Change the accent color.
    */
-  changeAccentColor(accent_id: typeof ACCENT_ID): Promise<User> {
-    return this.selfService.putSelf({accent_id}).then(() => this.userUpdate({user: {accent_id, id: this.self().id}}));
+  change_accent_color(accent_id: typeof ACCENT_ID): Promise<User> {
+    return this.selfService.putSelf({accent_id}).then(() => this.user_update({user: {accent_id, id: this.self().id}}));
   }
 
   /**
    * Change name.
    */
-  changeName(name: string): Promise<User> {
+  change_name(name: string): Promise<User> {
     if (name.length >= UserRepository.CONFIG.MINIMUM_NAME_LENGTH) {
-      return this.selfService.putSelf({name}).then(() => this.userUpdate({user: {id: this.self().id, name}}));
+      return this.selfService.putSelf({name}).then(() => this.user_update({user: {id: this.self().id, name}}));
     }
 
     return Promise.reject(new z.error.UserError((z as any).error.UserError.TYPE.INVALID_UPDATE));
@@ -714,13 +714,13 @@ export class UserRepository {
   /**
    * Tries to generate a username suggestion.
    */
-  getUsernameSuggestion(): Promise<void> {
+  get_username_suggestion(): Promise<void> {
     let suggestions = null;
 
     return Promise.resolve()
       .then(() => {
         suggestions = createSuggestions(this.self().name());
-        return this.verifyUsernames(suggestions);
+        return this.verify_usernames(suggestions);
       })
       .then(valid_suggestions => {
         this.should_set_username = true;
@@ -738,13 +738,13 @@ export class UserRepository {
   /**
    * Change username.
    */
-  changeUsername(username: string): Promise<User> {
+  change_username(username: string): Promise<User> {
     if (username.length >= UserRepository.CONFIG.MINIMUM_USERNAME_LENGTH) {
       return this.selfService
         .putSelfHandle(username)
         .then(() => {
           this.should_set_username = false;
-          return this.userUpdate({user: {handle: username, id: this.self().id}});
+          return this.user_update({user: {handle: username, id: this.self().id}});
         })
         .catch(({code: error_code}) => {
           if (
@@ -764,7 +764,7 @@ export class UserRepository {
    * @param usernames - Username suggestions
    * @returns A list with usernames that are not taken.
    */
-  verifyUsernames(usernames: string[]): Promise<string[]> {
+  verify_usernames(usernames: string[]): Promise<string[]> {
     return this.user_service.checkUserHandles(usernames);
   }
 
@@ -772,7 +772,7 @@ export class UserRepository {
    * Verify a username against the backend.
    * @returns Username which is not taken.
    */
-  verifyUsername(username: string): Promise<string> {
+  verify_username(username: string): Promise<string> {
     return this.user_service
       .checkUserHandle(username)
       .catch(({code: error_code}) => {
@@ -795,7 +795,7 @@ export class UserRepository {
   /**
    * Change the profile image.
    */
-  changePicture(picture: Blob): Promise<User> {
+  change_picture(picture: Blob): Promise<User> {
     return this.asset_service
       .uploadProfileImage(picture)
       .then(({previewImageKey, mediumImageKey}) => {
@@ -805,7 +805,7 @@ export class UserRepository {
         ];
         return this.selfService
           .putSelf({assets, picture: []})
-          .then(() => this.userUpdate({user: {assets, id: this.self().id}}));
+          .then(() => this.user_update({user: {assets, id: this.self().id}}));
       })
       .catch(error => {
         throw new Error(`Error during profile image upload: ${error.message || error.code || error}`);
@@ -815,13 +815,13 @@ export class UserRepository {
   /**
    * Set the user's default profile image.
    */
-  setDefaultPicture(): Promise<User> {
-    return loadUrlBlob(UNSPLASH_URL).then(blob => this.changePicture(blob));
+  set_default_picture(): Promise<User> {
+    return loadUrlBlob(UNSPLASH_URL).then(blob => this.change_picture(blob));
   }
 
   mapGuestStatus(userEntities = this.users()): void {
     userEntities.forEach(userEntity => {
-      if (!userEntity.isMe) {
+      if (!userEntity.is_me) {
         const isTeamMember = this.teamMembers().some(teamMember => teamMember.id === userEntity.id);
         const isGuest = !userEntity.isService && !isTeamMember;
         userEntity.isGuest(isGuest);

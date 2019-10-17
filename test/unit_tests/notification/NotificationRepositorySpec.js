@@ -61,9 +61,9 @@ window.wire.app = window.wire.app || {};
 
 describe('NotificationRepository', () => {
   const test_factory = new TestFactory();
-  let conversationEt = null;
-  let messageEt = null;
-  let userEt = null;
+  let conversation_et = null;
+  let message_et = null;
+  let user_et = null;
   let verify_notification;
   let verify_notification_ephemeral;
   let verify_notification_obfuscated;
@@ -79,25 +79,25 @@ describe('NotificationRepository', () => {
 
       // Create entities
       const conversationMapper = TestFactory.conversation_repository.conversationMapper;
-      userEt = TestFactory.user_repository.user_mapper.mapUserFromJson(payload.users.get.one[0]);
-      [conversationEt] = conversationMapper.mapConversations([entities.conversation]);
-      conversationEt.team_id = undefined;
+      user_et = TestFactory.user_repository.user_mapper.mapUserFromJson(payload.users.get.one[0]);
+      [conversation_et] = conversationMapper.mapConversations([entities.conversation]);
+      conversation_et.team_id = undefined;
       const selfUserEntity = new User(createRandomUuid());
-      selfUserEntity.isMe = true;
+      selfUserEntity.is_me = true;
       selfUserEntity.inTeam(true);
-      conversationEt.selfUser(selfUserEntity);
+      conversation_et.selfUser(selfUserEntity);
 
       // Notification
-      const title = conversationEt.display_name();
+      const title = conversation_et.display_name();
       notification_content = {
         options: {
           body: '',
           data: {
-            conversationId: conversationEt.id,
+            conversationId: conversation_et.id,
           },
           icon: '/image/logo/notification.png',
           silent: true,
-          tag: conversationEt.id,
+          tag: conversation_et.id,
         },
         timeout: NotificationRepository.CONFIG.TIMEOUT,
         title: truncate(title, NotificationRepository.CONFIG.TITLE_LENGTH, false),
@@ -127,7 +127,7 @@ describe('NotificationRepository', () => {
         return TestFactory.notification_repository.notify(_message, undefined, _conversation).then(() => {
           expect(TestFactory.notification_repository._showNotification).toHaveBeenCalledTimes(1);
 
-          const trigger = TestFactory.notification_repository._createTrigger(messageEt, null, conversationEt);
+          const trigger = TestFactory.notification_repository._createTrigger(message_et, null, conversation_et);
           notification_content.options.body = _expected_body;
           notification_content.options.data.messageType = _message.type;
           notification_content.trigger = trigger;
@@ -151,7 +151,7 @@ describe('NotificationRepository', () => {
         return TestFactory.notification_repository.notify(_message, undefined, _conversation).then(() => {
           expect(TestFactory.notification_repository._showNotification).toHaveBeenCalledTimes(1);
 
-          const trigger = TestFactory.notification_repository._createTrigger(messageEt, null, conversationEt);
+          const trigger = TestFactory.notification_repository._createTrigger(message_et, null, conversation_et);
           notification_content.options.body = z.string.notificationObfuscated;
           notification_content.options.data.messageType = _message.type;
           notification_content.title = z.string.notificationObfuscatedTitle;
@@ -167,13 +167,13 @@ describe('NotificationRepository', () => {
         return TestFactory.notification_repository.notify(_message, undefined, _conversation).then(() => {
           expect(TestFactory.notification_repository._showNotification).toHaveBeenCalledTimes(1);
 
-          const trigger = TestFactory.notification_repository._createTrigger(messageEt, null, conversationEt);
+          const trigger = TestFactory.notification_repository._createTrigger(message_et, null, conversation_et);
           notification_content.trigger = trigger;
 
           const obfuscateMessage = _setting === NotificationPreference.OBFUSCATE_MESSAGE;
           if (obfuscateMessage) {
             const titleLength = NotificationRepository.CONFIG.TITLE_LENGTH;
-            const titleText = `${messageEt.user().first_name()} in ${conversationEt.display_name()}`;
+            const titleText = `${message_et.user().first_name()} in ${conversation_et.display_name()}`;
 
             notification_content.options.body = z.string.notificationObfuscated;
             notification_content.title = truncate(titleText, titleLength, false);
@@ -193,7 +193,7 @@ describe('NotificationRepository', () => {
         return TestFactory.notification_repository.notify(_message, undefined, _conversation).then(() => {
           expect(TestFactory.notification_repository._showNotification).toHaveBeenCalledTimes(1);
 
-          const trigger = TestFactory.notification_repository._createTrigger(messageEt, null, conversationEt);
+          const trigger = TestFactory.notification_repository._createTrigger(message_et, null, conversation_et);
           notification_content.trigger = trigger;
           notification_content.options.body = _expected_body;
           notification_content.options.data.messageType = _message.type;
@@ -214,32 +214,32 @@ describe('NotificationRepository', () => {
 
   describe('does not show a notification', () => {
     beforeEach(() => {
-      messageEt = new PingMessage();
-      messageEt.user(userEt);
+      message_et = new PingMessage();
+      message_et.user(user_et);
     });
 
     it('if the browser does not support them', () => {
       Environment.browser.supports.notifications = false;
       TestFactory.notification_repository.__test__assignEnvironment(Environment);
 
-      return TestFactory.notification_repository.notify(messageEt, undefined, conversationEt).then(() => {
+      return TestFactory.notification_repository.notify(message_et, undefined, conversation_et).then(() => {
         expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled();
       });
     });
 
     it('if the browser tab has focus and conversation is active', () => {
-      TestFactory.conversation_repository.active_conversation(conversationEt);
+      TestFactory.conversation_repository.active_conversation(conversation_et);
       document.hasFocus = () => true;
       TestFactory.calling_repository.joinedCall = () => true;
 
       return TestFactory.notification_repository
-        .notify(messageEt, undefined, conversationEt)
+        .notify(message_et, undefined, conversation_et)
         .then(() => {
           expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled();
 
           contentViewModelState.multitasking.isMinimized = () => false;
 
-          return TestFactory.notification_repository.notify(messageEt, undefined, conversationEt);
+          return TestFactory.notification_repository.notify(message_et, undefined, conversation_et);
         })
         .then(() => {
           expect(TestFactory.notification_repository._showNotification).toHaveBeenCalledTimes(1);
@@ -247,27 +247,27 @@ describe('NotificationRepository', () => {
     });
 
     it('if the event was triggered by the user', () => {
-      messageEt.user().isMe = true;
+      message_et.user().is_me = true;
 
-      return TestFactory.notification_repository.notify(messageEt, undefined, conversationEt).then(() => {
+      return TestFactory.notification_repository.notify(message_et, undefined, conversation_et).then(() => {
         expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled();
       });
     });
 
     it('if the conversation is muted', () => {
-      conversationEt.mutedState(NOTIFICATION_STATE.NOTHING);
+      conversation_et.mutedState(NOTIFICATION_STATE.NOTHING);
 
-      return TestFactory.notification_repository.notify(messageEt, undefined, conversationEt).then(() => {
+      return TestFactory.notification_repository.notify(message_et, undefined, conversation_et).then(() => {
         expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled();
       });
     });
 
     it('for a successfully completed call', () => {
-      messageEt = new CallMessage();
-      messageEt.call_message_type = CALL_MESSAGE_TYPE.DEACTIVATED;
-      messageEt.finished_reason = TERMINATION_REASON.COMPLETED;
+      message_et = new CallMessage();
+      message_et.call_message_type = CALL_MESSAGE_TYPE.DEACTIVATED;
+      message_et.finished_reason = TERMINATION_REASON.COMPLETED;
 
-      return TestFactory.notification_repository.notify(messageEt, undefined, conversationEt).then(() => {
+      return TestFactory.notification_repository.notify(message_et, undefined, conversation_et).then(() => {
         expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled();
       });
     });
@@ -275,7 +275,7 @@ describe('NotificationRepository', () => {
     it('if preference is set to none', () => {
       TestFactory.notification_repository.notificationsPreference(NotificationPreference.NONE);
 
-      return TestFactory.notification_repository.notify(messageEt, undefined, conversationEt).then(() => {
+      return TestFactory.notification_repository.notify(message_et, undefined, conversation_et).then(() => {
         expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled();
       });
     });
@@ -283,7 +283,7 @@ describe('NotificationRepository', () => {
     it('if the user permission was denied', () => {
       TestFactory.notification_repository.permissionState(PermissionStatusState.DENIED);
 
-      return TestFactory.notification_repository.notify(messageEt, undefined, conversationEt).then(() => {
+      return TestFactory.notification_repository.notify(message_et, undefined, conversation_et).then(() => {
         expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled();
       });
     });
@@ -323,7 +323,7 @@ describe('NotificationRepository', () => {
       TestFactory.notification_repository.permissionState(PermissionStatusState.GRANTED);
 
       const testPromises = Object.values(allMessageTypes).map(messageEntity => {
-        return TestFactory.notification_repository.notify(messageEntity, undefined, conversationEt).then(() => {
+        return TestFactory.notification_repository.notify(messageEntity, undefined, conversation_et).then(() => {
           expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled();
         });
       });
@@ -344,7 +344,7 @@ describe('NotificationRepository', () => {
         .map(([, message]) => message);
 
       const testPromises = ignoredMessages.map(messageEntity => {
-        return TestFactory.notification_repository.notify(messageEntity, undefined, conversationEt);
+        return TestFactory.notification_repository.notify(messageEntity, undefined, conversation_et);
       });
 
       return Promise.all(testPromises).then(() => {
@@ -365,7 +365,7 @@ describe('NotificationRepository', () => {
         .map(([, message]) => message);
 
       const testPromises = notifiedMessages.map(messageEntity => {
-        return TestFactory.notification_repository.notify(messageEntity, undefined, conversationEt);
+        return TestFactory.notification_repository.notify(messageEntity, undefined, conversation_et);
       });
 
       return Promise.all(testPromises).then(() => {
@@ -379,18 +379,18 @@ describe('NotificationRepository', () => {
       const expected_body = z.string.notificationVoiceChannelActivate;
 
       beforeEach(() => {
-        messageEt = new CallMessage();
-        messageEt.call_message_type = CALL_MESSAGE_TYPE.ACTIVATED;
-        messageEt.user(userEt);
+        message_et = new CallMessage();
+        message_et.call_message_type = CALL_MESSAGE_TYPE.ACTIVATED;
+        message_et.user(user_et);
       });
 
       it('in a 1:1 conversation', () => {
-        conversationEt.type(ConversationType.ONE2ONE);
-        return verify_notification(conversationEt, messageEt, expected_body);
+        conversation_et.type(ConversationType.ONE2ONE);
+        return verify_notification(conversation_et, message_et, expected_body);
       });
 
       it('in a group conversation', () => {
-        return verify_notification(conversationEt, messageEt, expected_body);
+        return verify_notification(conversation_et, message_et, expected_body);
       });
     });
 
@@ -398,19 +398,19 @@ describe('NotificationRepository', () => {
       const expected_body = z.string.notificationVoiceChannelDeactivate;
 
       beforeEach(() => {
-        messageEt = new CallMessage();
-        messageEt.call_message_type = CALL_MESSAGE_TYPE.DEACTIVATED;
-        messageEt.finished_reason = TERMINATION_REASON.MISSED;
-        messageEt.user(userEt);
+        message_et = new CallMessage();
+        message_et.call_message_type = CALL_MESSAGE_TYPE.DEACTIVATED;
+        message_et.finished_reason = TERMINATION_REASON.MISSED;
+        message_et.user(user_et);
       });
 
       it('in a 1:1 conversation', () => {
-        conversationEt.type(ConversationType.ONE2ONE);
-        return verify_notification(conversationEt, messageEt, expected_body);
+        conversation_et.type(ConversationType.ONE2ONE);
+        return verify_notification(conversation_et, message_et, expected_body);
       });
 
       it('in a group conversation', () => {
-        return verify_notification(conversationEt, messageEt, expected_body);
+        return verify_notification(conversation_et, message_et, expected_body);
       });
     });
   });
@@ -419,113 +419,113 @@ describe('NotificationRepository', () => {
     let expected_body = undefined;
 
     beforeEach(() => {
-      messageEt = new ContentMessage();
-      messageEt.user(userEt);
+      message_et = new ContentMessage();
+      message_et.user(user_et);
     });
 
     describe('for a text message', () => {
       beforeEach(() => {
-        const assetEt = new Text('id', 'Lorem ipsum');
-        messageEt.assets.push(assetEt);
-        expected_body = assetEt.text;
+        const asset_et = new Text('id', 'Lorem ipsum');
+        message_et.assets.push(asset_et);
+        expected_body = asset_et.text;
       });
 
       it('in a 1:1 conversation', () => {
-        conversationEt.type(ConversationType.ONE2ONE);
-        return verify_notification(conversationEt, messageEt, expected_body);
+        conversation_et.type(ConversationType.ONE2ONE);
+        return verify_notification(conversation_et, message_et, expected_body);
       });
 
       it('in a group conversation', () => {
-        return verify_notification(conversationEt, messageEt, expected_body);
+        return verify_notification(conversation_et, message_et, expected_body);
       });
 
       it('when preference is set to obfuscate-message', () => {
         const notification_preference = NotificationPreference.OBFUSCATE_MESSAGE;
         TestFactory.notification_repository.notificationsPreference(notification_preference);
-        return verify_notification_obfuscated(conversationEt, messageEt, notification_preference);
+        return verify_notification_obfuscated(conversation_et, message_et, notification_preference);
       });
 
       it('when preference is set to obfuscate', () => {
         const notification_preference = NotificationPreference.OBFUSCATE;
         TestFactory.notification_repository.notificationsPreference(notification_preference);
-        return verify_notification_obfuscated(conversationEt, messageEt, notification_preference);
+        return verify_notification_obfuscated(conversation_et, message_et, notification_preference);
       });
     });
 
     describe('for a picture', () => {
       beforeEach(() => {
-        messageEt.assets.push(new MediumImage());
+        message_et.assets.push(new MediumImage());
         expected_body = z.string.notificationAssetAdd;
       });
 
       it('in a 1:1 conversation', () => {
-        conversationEt.type(ConversationType.ONE2ONE);
-        return verify_notification(conversationEt, messageEt, expected_body);
+        conversation_et.type(ConversationType.ONE2ONE);
+        return verify_notification(conversation_et, message_et, expected_body);
       });
 
       it('in a group conversation', () => {
-        return verify_notification(conversationEt, messageEt, expected_body);
+        return verify_notification(conversation_et, message_et, expected_body);
       });
 
       it('when preference is set to obfuscate-message', () => {
         const notification_preference = NotificationPreference.OBFUSCATE_MESSAGE;
         TestFactory.notification_repository.notificationsPreference(notification_preference);
-        return verify_notification_obfuscated(conversationEt, messageEt, notification_preference);
+        return verify_notification_obfuscated(conversation_et, message_et, notification_preference);
       });
 
       it('when preference is set to obfuscate', () => {
         const notification_preference = NotificationPreference.OBFUSCATE;
         TestFactory.notification_repository.notificationsPreference(notification_preference);
-        return verify_notification_obfuscated(conversationEt, messageEt, notification_preference);
+        return verify_notification_obfuscated(conversation_et, message_et, notification_preference);
       });
     });
 
     describe('for a location', () => {
       beforeEach(() => {
-        messageEt.assets.push(new Location());
+        message_et.assets.push(new Location());
         expected_body = z.string.notificationSharedLocation;
       });
 
       it('in a 1:1 conversation', () => {
-        conversationEt.type(ConversationType.ONE2ONE);
-        return verify_notification(conversationEt, messageEt, expected_body);
+        conversation_et.type(ConversationType.ONE2ONE);
+        return verify_notification(conversation_et, message_et, expected_body);
       });
 
       it('in a group conversation', () => {
-        return verify_notification(conversationEt, messageEt, expected_body);
+        return verify_notification(conversation_et, message_et, expected_body);
       });
 
       it('when preference is set to obfuscate-message', () => {
         const notification_preference = NotificationPreference.OBFUSCATE_MESSAGE;
         TestFactory.notification_repository.notificationsPreference(notification_preference);
-        return verify_notification_obfuscated(conversationEt, messageEt, notification_preference);
+        return verify_notification_obfuscated(conversation_et, message_et, notification_preference);
       });
 
       it('when preference is set to obfuscate', () => {
         const notification_preference = NotificationPreference.OBFUSCATE;
         TestFactory.notification_repository.notificationsPreference(notification_preference);
-        return verify_notification_obfuscated(conversationEt, messageEt, notification_preference);
+        return verify_notification_obfuscated(conversation_et, message_et, notification_preference);
       });
     });
 
     describe('for ephemeral messages', () => {
       beforeEach(() => {
-        messageEt.ephemeral_expires(5000);
+        message_et.ephemeral_expires(5000);
       });
 
       it('that contains text', () => {
-        messageEt.assets.push(new Text('id', 'Hello world!'));
-        return verify_notification_ephemeral(conversationEt, messageEt);
+        message_et.assets.push(new Text('id', 'Hello world!'));
+        return verify_notification_ephemeral(conversation_et, message_et);
       });
 
       it('that contains an image', () => {
-        messageEt.assets.push(new Location());
-        return verify_notification_ephemeral(conversationEt, messageEt);
+        message_et.assets.push(new Location());
+        return verify_notification_ephemeral(conversation_et, message_et);
       });
 
       it('that contains a location', () => {
-        messageEt.assets.push(new MediumImage());
-        return verify_notification_ephemeral(conversationEt, messageEt);
+        message_et.assets.push(new MediumImage());
+        return verify_notification_ephemeral(conversation_et, message_et);
       });
     });
   });
@@ -533,45 +533,45 @@ describe('NotificationRepository', () => {
   describe('shows a well-formed group notification', () => {
     beforeEach(() => {
       const titleLength = NotificationRepository.CONFIG.TITLE_LENGTH;
-      const titleText = `${messageEt.user().first_name()} in ${conversationEt.display_name()}`;
+      const titleText = `${message_et.user().first_name()} in ${conversation_et.display_name()}`;
 
       notification_content.title = truncate(titleText, titleLength, false);
     });
 
     it('if a group is created', () => {
-      conversationEt.from = payload.users.get.one[0].id;
-      messageEt = new MemberMessage();
-      messageEt.user(userEt);
-      messageEt.type = BackendEvent.CONVERSATION.CREATE;
-      messageEt.memberMessageType = SystemMessageType.CONVERSATION_CREATE;
+      conversation_et.from = payload.users.get.one[0].id;
+      message_et = new MemberMessage();
+      message_et.user(user_et);
+      message_et.type = BackendEvent.CONVERSATION.CREATE;
+      message_et.memberMessageType = SystemMessageType.CONVERSATION_CREATE;
 
       const expected_body = `${first_name} started a conversation`;
-      return verify_notification_system(conversationEt, messageEt, expected_body);
+      return verify_notification_system(conversation_et, message_et, expected_body);
     });
 
     it('if a group is renamed', () => {
-      messageEt = new RenameMessage();
-      messageEt.user(userEt);
-      messageEt.name = 'Lorem Ipsum Conversation';
+      message_et = new RenameMessage();
+      message_et.user(user_et);
+      message_et.name = 'Lorem Ipsum Conversation';
 
-      const expected_body = `${first_name} renamed the conversation to ${messageEt.name}`;
-      return verify_notification_system(conversationEt, messageEt, expected_body);
+      const expected_body = `${first_name} renamed the conversation to ${message_et.name}`;
+      return verify_notification_system(conversation_et, message_et, expected_body);
     });
 
     it('if a group message timer is updated', () => {
-      messageEt = new MessageTimerUpdateMessage(5000);
-      messageEt.user(userEt);
+      message_et = new MessageTimerUpdateMessage(5000);
+      message_et.user(user_et);
 
       const expectedBody = `${first_name} set the message timer to 5 ${t('ephemeralUnitsSeconds')}`;
-      return verify_notification_system(conversationEt, messageEt, expectedBody);
+      return verify_notification_system(conversation_et, message_et, expectedBody);
     });
 
     it('if a group message timer is reset', () => {
-      messageEt = new MessageTimerUpdateMessage(null);
-      messageEt.user(userEt);
+      message_et = new MessageTimerUpdateMessage(null);
+      message_et.user(user_et);
 
       const expectedBody = `${first_name} turned off the message timer`;
-      return verify_notification_system(conversationEt, messageEt, expectedBody);
+      return verify_notification_system(conversation_et, message_et, expectedBody);
     });
   });
 
@@ -579,85 +579,85 @@ describe('NotificationRepository', () => {
     let other_user_et = undefined;
 
     beforeEach(() => {
-      messageEt = new MemberMessage();
-      messageEt.user(userEt);
-      messageEt.memberMessageType = SystemMessageType.NORMAL;
+      message_et = new MemberMessage();
+      message_et.user(user_et);
+      message_et.memberMessageType = SystemMessageType.NORMAL;
       other_user_et = TestFactory.user_repository.user_mapper.mapUserFromJson(payload.users.get.many[1]);
     });
 
     describe('if people are added', () => {
       beforeEach(() => {
-        messageEt.type = BackendEvent.CONVERSATION.MEMBER_JOIN;
+        message_et.type = BackendEvent.CONVERSATION.MEMBER_JOIN;
 
         const titleLength = NotificationRepository.CONFIG.TITLE_LENGTH;
-        const titleText = `${messageEt.user().first_name()} in ${conversationEt.display_name()}`;
+        const titleText = `${message_et.user().first_name()} in ${conversation_et.display_name()}`;
 
         notification_content.title = truncate(titleText, titleLength, false);
       });
 
       it('with one user being added to the conversation', () => {
-        messageEt.userEntities([other_user_et]);
+        message_et.userEntities([other_user_et]);
 
         const [first_name_added] = entities.user.jane_roe.name.split(' ');
         const expected_body = `${first_name} added ${first_name_added} to the conversation`;
-        return verify_notification_system(conversationEt, messageEt, expected_body);
+        return verify_notification_system(conversation_et, message_et, expected_body);
       });
 
       it('with you being added to the conversation', () => {
-        other_user_et.isMe = true;
-        messageEt.userEntities([other_user_et]);
+        other_user_et.is_me = true;
+        message_et.userEntities([other_user_et]);
 
         const expected_body = `${first_name} added you to the conversation`;
-        return verify_notification_system(conversationEt, messageEt, expected_body);
+        return verify_notification_system(conversation_et, message_et, expected_body);
       });
 
       it('with multiple users being added to the conversation', () => {
         const user_ids = [entities.user.john_doe.id, entities.user.jane_roe.id];
-        messageEt.userIds(user_ids);
+        message_et.userIds(user_ids);
 
         const expected_body = `${first_name} added 2 people to the conversation`;
-        return verify_notification_system(conversationEt, messageEt, expected_body);
+        return verify_notification_system(conversation_et, message_et, expected_body);
       });
     });
 
     describe('if people are removed', () => {
       beforeEach(() => {
-        messageEt.type = BackendEvent.CONVERSATION.MEMBER_LEAVE;
+        message_et.type = BackendEvent.CONVERSATION.MEMBER_LEAVE;
         const titleLength = NotificationRepository.CONFIG.TITLE_LENGTH;
-        const titleText = `${messageEt.user().first_name()} in ${conversationEt.display_name()}`;
+        const titleText = `${message_et.user().first_name()} in ${conversation_et.display_name()}`;
 
         notification_content.title = truncate(titleText, titleLength, false);
       });
 
       it('with one user being removed from the conversation', () => {
-        messageEt.userEntities([other_user_et]);
+        message_et.userEntities([other_user_et]);
 
-        return TestFactory.notification_repository.notify(messageEt, undefined, conversationEt).then(() => {
+        return TestFactory.notification_repository.notify(message_et, undefined, conversation_et).then(() => {
           expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled();
         });
       });
 
       it('with you being removed from the conversation', () => {
-        other_user_et.isMe = true;
-        messageEt.userEntities([other_user_et]);
+        other_user_et.is_me = true;
+        message_et.userEntities([other_user_et]);
 
         const expected_body = `${first_name} removed you from the conversation`;
-        return verify_notification_system(conversationEt, messageEt, expected_body);
+        return verify_notification_system(conversation_et, message_et, expected_body);
       });
 
       it('with multiple users being removed from the conversation', () => {
-        const userEts = TestFactory.user_repository.user_mapper.mapUsersFromJson(payload.users.get.many);
-        messageEt.userEntities(userEts);
+        const user_ets = TestFactory.user_repository.user_mapper.mapUsersFromJson(payload.users.get.many);
+        message_et.userEntities(user_ets);
 
-        return TestFactory.notification_repository.notify(messageEt, undefined, conversationEt).then(() => {
+        return TestFactory.notification_repository.notify(message_et, undefined, conversation_et).then(() => {
           expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled();
         });
       });
 
       it('with someone leaving the conversation by himself', () => {
-        messageEt.userEntities([messageEt.user()]);
+        message_et.userEntities([message_et.user()]);
 
-        return TestFactory.notification_repository.notify(messageEt, undefined, conversationEt).then(() => {
+        return TestFactory.notification_repository.notify(message_et, undefined, conversation_et).then(() => {
           expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled();
         });
       });
@@ -669,34 +669,34 @@ describe('NotificationRepository', () => {
     const expected_title = '…';
 
     beforeEach(() => {
-      conversationEt.type(ConversationType.ONE2ONE);
+      conversation_et.type(ConversationType.ONE2ONE);
 
       const connectionMapper = new ConnectionMapper();
       connectionEntity = connectionMapper.mapConnectionFromJson(entities.connection);
-      messageEt = new MemberMessage();
-      messageEt.user(userEt);
+      message_et = new MemberMessage();
+      message_et.user(user_et);
     });
 
     it('if a connection request is incoming', () => {
       connectionEntity.status = 'pending';
-      messageEt.memberMessageType = SystemMessageType.CONNECTION_REQUEST;
+      message_et.memberMessageType = SystemMessageType.CONNECTION_REQUEST;
 
       const expected_body = z.string.notificationConnectionRequest;
-      return verify_notification_system(conversationEt, messageEt, expected_body, expected_title);
+      return verify_notification_system(conversation_et, message_et, expected_body, expected_title);
     });
 
     it('if your connection request was accepted', () => {
-      messageEt.memberMessageType = SystemMessageType.CONNECTION_ACCEPTED;
+      message_et.memberMessageType = SystemMessageType.CONNECTION_ACCEPTED;
 
       const expected_body = z.string.notificationConnectionAccepted;
-      return verify_notification_system(conversationEt, messageEt, expected_body, expected_title);
+      return verify_notification_system(conversation_et, message_et, expected_body, expected_title);
     });
 
     it('if you are automatically connected', () => {
-      messageEt.memberMessageType = SystemMessageType.CONNECTION_CONNECTED;
+      message_et.memberMessageType = SystemMessageType.CONNECTION_CONNECTED;
 
       const expected_body = z.string.notificationConnectionConnected;
-      return verify_notification_system(conversationEt, messageEt, expected_body, expected_title);
+      return verify_notification_system(conversation_et, message_et, expected_body, expected_title);
     });
   });
 
@@ -704,26 +704,26 @@ describe('NotificationRepository', () => {
     const expected_body = z.string.notificationPing;
 
     beforeAll(() => {
-      userEt = TestFactory.user_repository.user_mapper.mapUserFromJson(payload.users.get.one[0]);
+      user_et = TestFactory.user_repository.user_mapper.mapUserFromJson(payload.users.get.one[0]);
     });
 
     beforeEach(() => {
-      messageEt = new PingMessage();
-      messageEt.user(userEt);
+      message_et = new PingMessage();
+      message_et.user(user_et);
     });
 
     it('in a 1:1 conversation', () => {
-      conversationEt.type(ConversationType.ONE2ONE);
-      return verify_notification(conversationEt, messageEt, expected_body);
+      conversation_et.type(ConversationType.ONE2ONE);
+      return verify_notification(conversation_et, message_et, expected_body);
     });
 
     it('in a group conversation', () => {
-      return verify_notification(conversationEt, messageEt, expected_body);
+      return verify_notification(conversation_et, message_et, expected_body);
     });
 
     it('as an ephemeral message', () => {
-      messageEt.ephemeral_expires(5000);
-      return verify_notification_ephemeral(conversationEt, messageEt);
+      message_et.ephemeral_expires(5000);
+      return verify_notification_ephemeral(conversation_et, message_et);
     });
   });
 
@@ -746,7 +746,7 @@ describe('NotificationRepository', () => {
 
     beforeEach(() => {
       const selfUserEntity = new User(userId);
-      selfUserEntity.isMe = true;
+      selfUserEntity.is_me = true;
       selfUserEntity.inTeam(true);
 
       conversationEntity = new Conversation(createRandomUuid());

@@ -44,7 +44,7 @@ export class UserMapper {
 
   mapSelfUserFromJson(userData: any): User {
     const userEntity = this.updateUserFromObject(new User(), userData) as any;
-    userEntity.isMe = true;
+    userEntity.is_me = true;
 
     if (userData.locale) {
       userEntity.locale = userData.locale;

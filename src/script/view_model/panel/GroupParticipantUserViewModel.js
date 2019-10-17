@@ -43,7 +43,7 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
   }
 
   showActionDevices(userEntity) {
-    return !userEntity.isMe;
+    return !userEntity.is_me;
   }
 
   onUserAction(action) {
