@@ -433,12 +433,12 @@ class MessageListViewModel {
     }
 
     this.conversation_repository.get_events_for_category(this.conversation(), MessageCategory.IMAGE).then(items => {
-      const message_ets = items.filter(
+      const messageEts = items.filter(
         item => item.category & MessageCategory.IMAGE && !(item.category & MessageCategory.GIF),
       );
-      const [image_message_et] = message_ets.filter(item => item.id === messageEt.id);
+      const [image_message_et] = messageEts.filter(item => item.id === messageEt.id);
 
-      amplify.publish(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, image_message_et || messageEt, message_ets);
+      amplify.publish(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, image_message_et || messageEt, messageEts);
     });
   }
 

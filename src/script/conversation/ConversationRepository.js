@@ -2424,10 +2424,10 @@ export class ConversationRepository {
    * @returns {Promise} Resolves with a user client map
    */
   create_recipients(conversation_id, skipOwnClients = false, user_ids) {
-    return this.get_all_users_in_conversation(conversation_id).then(user_ets => {
+    return this.get_all_users_in_conversation(conversation_id).then(userEts => {
       const recipients = {};
 
-      for (const userEt of user_ets) {
+      for (const userEt of userEts) {
         if (!(skipOwnClients && userEt.isMe)) {
           if (user_ids && !user_ids.includes(userEt.id)) {
             continue;

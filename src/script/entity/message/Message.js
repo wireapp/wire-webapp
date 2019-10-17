@@ -33,11 +33,11 @@ import {User} from '../User';
 export class Message {
   /**
    * Sort messages by timestamp
-   * @param {Array<Message>} message_ets - Message entities
+   * @param {Array<Message>} messageEts - Message entities
    * @returns {boolean} Sorted message entities
    */
-  static sort_by_timestamp(message_ets) {
-    return message_ets.sort((m1, m2) => m1.timestamp() > m2.timestamp());
+  static sort_by_timestamp(messageEts) {
+    return messageEts.sort((m1, m2) => m1.timestamp() > m2.timestamp());
   }
 
   constructor(id = '0', super_type = '') {

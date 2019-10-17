@@ -609,7 +609,7 @@ export class UserRepository {
         return known_user_ets;
       }
 
-      return this.fetchUsersById(unknown_user_ids).then(user_ets => known_user_ets.concat(user_ets));
+      return this.fetchUsersById(unknown_user_ids).then(userEts => known_user_ets.concat(userEts));
     });
   }
 
@@ -643,10 +643,10 @@ export class UserRepository {
    * Save multiple users at once.
    * @returns Resolves with users passed as parameter
    */
-  saveUsers(user_ets: User[]): User[] {
-    const newUsers = user_ets.filter(userEt => !this.findUserById(userEt.id));
+  saveUsers(userEts: User[]): User[] {
+    const newUsers = userEts.filter(userEt => !this.findUserById(userEt.id));
     koArrayPushAll(this.users, newUsers);
-    return user_ets;
+    return userEts;
   }
 
   /**

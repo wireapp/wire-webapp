@@ -646,8 +646,8 @@ describe('NotificationRepository', () => {
       });
 
       it('with multiple users being removed from the conversation', () => {
-        const user_ets = TestFactory.user_repository.user_mapper.mapUsersFromJson(payload.users.get.many);
-        messageEt.userEntities(user_ets);
+        const userEts = TestFactory.user_repository.user_mapper.mapUsersFromJson(payload.users.get.many);
+        messageEt.userEntities(userEts);
 
         return TestFactory.notification_repository.notify(messageEt, undefined, conversationEt).then(() => {
           expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled();

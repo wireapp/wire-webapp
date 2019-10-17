@@ -455,23 +455,23 @@ export class Conversation {
 
   /**
    * Adds multiple messages to the conversation.
-   * @param {Array<Message>} message_ets - Array of message entities to be added to the conversation
+   * @param {Array<Message>} messageEts - Array of message entities to be added to the conversation
    * @returns {undefined} No return value
    */
-  add_messages(message_ets) {
-    message_ets = message_ets.map(messageEt => this._checkForDuplicate(messageEt)).filter(messageEt => messageEt);
+  add_messages(messageEts) {
+    messageEts = messageEts.map(messageEt => this._checkForDuplicate(messageEt)).filter(messageEt => messageEt);
 
     // in order to avoid multiple db writes check the messages from the end and stop once
     // we found a message from self user
-    for (let counter = message_ets.length - 1; counter >= 0; counter--) {
-      const messageEt = message_ets[counter];
+    for (let counter = messageEts.length - 1; counter >= 0; counter--) {
+      const messageEt = messageEts[counter];
       if (messageEt.user() && messageEt.user().isMe) {
         this.update_timestamps(messageEt);
         break;
       }
     }
 
-    koArrayPushAll(this.messages_unordered, message_ets);
+    koArrayPushAll(this.messages_unordered, messageEts);
   }
 
   getFirstUnreadSelfMention() {
@@ -523,13 +523,13 @@ export class Conversation {
 
   /**
    * Prepends messages with new batch of messages.
-   * @param {Array<Message>} message_ets - Array of messages to be added to conversation
+   * @param {Array<Message>} messageEts - Array of messages to be added to conversation
    * @returns {undefined} No return value
    */
-  prepend_messages(message_ets) {
-    message_ets = message_ets.map(messageEt => this._checkForDuplicate(messageEt)).filter(messageEt => messageEt);
+  prepend_messages(messageEts) {
+    messageEts = messageEts.map(messageEt => this._checkForDuplicate(messageEt)).filter(messageEt => messageEt);
 
-    koArrayUnshiftAll(this.messages_unordered, message_ets);
+    koArrayUnshiftAll(this.messages_unordered, messageEts);
   }
 
   /**

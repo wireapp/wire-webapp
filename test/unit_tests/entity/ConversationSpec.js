@@ -285,8 +285,8 @@ describe('Conversation', () => {
     message2.timestamp(reference_timestamp - 5000);
 
     it('adds multiple messages', () => {
-      const message_ets = [message1, message2];
-      conversationEt.add_messages(message_ets);
+      const messageEts = [message1, message2];
+      conversationEt.add_messages(messageEts);
 
       expect(conversationEt.messages_unordered().length).toBe(2);
     });

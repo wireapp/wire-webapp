@@ -90,25 +90,25 @@ describe('User Mapper', () => {
 
   describe('mapUsersFromJson', () => {
     it('can convert JSON into multiple user entities', () => {
-      const user_ets = mapper.mapUsersFromJson(payload.users.get.many);
+      const userEts = mapper.mapUsersFromJson(payload.users.get.many);
 
-      expect(user_ets.length).toBe(2);
-      expect(user_ets[0].email()).toBe('jd@wire.com');
-      expect(user_ets[1].name()).toBe('Jane Roe');
+      expect(userEts.length).toBe(2);
+      expect(userEts[0].email()).toBe('jd@wire.com');
+      expect(userEts[1].name()).toBe('Jane Roe');
     });
 
     it('returns an empty array if input was undefined', () => {
-      const user_ets = mapper.mapUsersFromJson(undefined);
+      const userEts = mapper.mapUsersFromJson(undefined);
 
-      expect(user_ets).toBeDefined();
-      expect(user_ets.length).toBe(0);
+      expect(userEts).toBeDefined();
+      expect(userEts.length).toBe(0);
     });
 
     it('returns an empty array if input was an empty array', () => {
-      const user_ets = mapper.mapUsersFromJson([]);
+      const userEts = mapper.mapUsersFromJson([]);
 
-      expect(user_ets).toBeDefined();
-      expect(user_ets.length).toBe(0);
+      expect(userEts).toBeDefined();
+      expect(userEts.length).toBe(0);
     });
   });
 

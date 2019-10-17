@@ -1447,21 +1447,21 @@ describe('ConversationRepository', () => {
 
     it('should know all users participating in a conversation (including the self user)', () => {
       const [, dudes] = TestFactory.conversation_repository.conversations();
-      return TestFactory.conversation_repository.get_all_users_in_conversation(dudes.id).then(user_ets => {
-        expect(user_ets.length).toBe(3);
+      return TestFactory.conversation_repository.get_all_users_in_conversation(dudes.id).then(userEts => {
+        expect(userEts.length).toBe(3);
         expect(TestFactory.conversation_repository.conversations().length).toBe(4);
       });
     });
 
     it('should generate a user-client-map including users with clients', () => {
       const [, dudes] = TestFactory.conversation_repository.conversations();
-      const user_ets = dudes.participatingUserEts();
+      const userEts = dudes.participatingUserEts();
 
       return TestFactory.conversation_repository.create_recipients(dudes.id).then(recipients => {
         expect(Object.keys(recipients).length).toBe(2);
         expect(recipients[bob.id].length).toBe(2);
         expect(recipients[john.id].length).toBe(1);
-        expect(user_ets.length).toBe(2);
+        expect(userEts.length).toBe(2);
       });
     });
   });
