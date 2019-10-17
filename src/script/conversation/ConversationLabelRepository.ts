@@ -191,26 +191,6 @@ export class ConversationLabelRepository {
     this.saveLabels();
   };
 
-  /**
-   * Returns the conversation label with the highest order:
-   * 1. Favorites
-   * 2. Groups
-   * 3. Contacts
-   * 4. Custom
-   */
-  getConversationLabelId = (conversation: Conversation): string => {
-    if (this.getFavorites().includes(conversation)) {
-      return DefaultLabelIds.Favorites;
-    }
-    if (this.allLabeledConversations().includes(conversation)) {
-      return this.getConversationCustomLabel(conversation).id;
-    }
-    if (conversation.isGroup()) {
-      return DefaultLabelIds.Groups;
-    }
-    return DefaultLabelIds.Contacts;
-  };
-
   // TODO: Write test cases!
   getConversationLabelIds = (conversation: Conversation): string[] => {
     const ids: string[] = [];

@@ -40,13 +40,12 @@ export const showLabelContextMenu = (
     label: t('conversationsPopoverNoCustomFolders'),
   };
 
-  const conversationLabelId = labelRepository.getConversationLabelId(conversation);
-
+  const conversationLabel = labelRepository.getConversationCustomLabel(conversation);
   const labels = labelRepository.getLabels().filter(label => !!labelRepository.getLabelConversations(label).length);
   const namedLabels = labels.length
     ? labels.map(label => ({
         click: () => labelRepository.addConversationToLabel(label, conversation),
-        isChecked: label.id === conversationLabelId,
+        isChecked: label === conversationLabel,
         label: label.name,
       }))
     : [noLabels];
