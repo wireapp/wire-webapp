@@ -73,7 +73,7 @@ class ConversationListCell {
       .computed(() => this.cell_state(generateCellState(this.conversation)))
       .extend({rateLimit: 500});
 
-    this.destroy = () => {
+    this.dispose = () => {
       viewportObserver.removeElement(element);
       cell_state_observable.dispose();
     };
