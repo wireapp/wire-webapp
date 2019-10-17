@@ -176,10 +176,12 @@
     eventemitter2 "^4.1.0"
     ws "^3.0.0"
 
-"@types/ansi-regex@4.0.0":
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/@types/ansi-regex/-/ansi-regex-4.0.0.tgz#cb20bb66da7700ea9b26f16971f03f0e092eddad"
-  integrity sha512-r1W316vjsZXn1/csLC4HcCJs6jIHIzksHJd7xx+Dl+PAb0S2Dh9cR8ZsIMEfGmbBtP7JNWlf2KKahSkDP6rg3g==
+"@types/ansi-regex@5.0.0":
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/@types/ansi-regex/-/ansi-regex-5.0.0.tgz#569a5189a92cc46d63fb2ad91e6b130f33d999c1"
+  integrity sha512-SQafVL3pXFh/5qq/nN6p5858g//zSVzcb8JzCLtoVxm8YNPggMQfEIm7aaTNysxpw1S+lFTaW8kv+aR0/CEhCA==
+  dependencies:
+    ansi-regex "*"
 
 "@types/body-parser@*":
   version "1.17.0"
@@ -305,16 +307,16 @@
     "@types/express-serve-static-core" "*"
     "@types/mime" "*"
 
-"@wireapp/commons@2.2.13":
-  version "2.2.13"
-  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-2.2.13.tgz#ced70769b249ed1db1e84364bb10cd2cd60e4a0c"
-  integrity sha512-38TGAo35Wn7jSMy8LgiJhMF/wgBjQVhYvPZ4xAuyhafO9zRybh6D2F+WZncHA5a0H6B6KO/D3+jsHCSFW+GYow==
+"@wireapp/commons@2.2.17":
+  version "2.2.17"
+  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-2.2.17.tgz#58b8dd136b811b90c8ca59046883b9981956ddf7"
+  integrity sha512-to3gyUC/bDPR81Iler9ehtIpnbo/fZ6qIi26z5zz0YOnEW5B8/KcTebP0IFPwBGIhWm702sqIeOTa6lPla7Sng==
   dependencies:
-    "@types/ansi-regex" "4.0.0"
+    "@types/ansi-regex" "5.0.0"
     "@types/fs-extra" "8.0.0"
     "@types/node" "~10"
     "@types/platform" "1.3.2"
-    ansi-regex "4.1.0"
+    ansi-regex "5.0.0"
     fs-extra "8.1.0"
     logdown "3.2.8"
     moment "2.24.0"
@@ -360,10 +362,10 @@ amp@0.3.1, amp@~0.3.1:
   resolved "https://registry.yarnpkg.com/amp/-/amp-0.3.1.tgz#6adf8d58a74f361e82c1fa8d389c079e139fc47d"
   integrity sha1-at+NWKdPNh6CwfqNOJwHnhOfxH0=
 
-ansi-regex@4.1.0, ansi-regex@^4.1.0:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/ansi-regex/-/ansi-regex-4.1.0.tgz#8b9f8f08cf1acb843756a839ca8c7e3168c51997"
-  integrity sha512-1apePfXM1UOSqw0o9IiFAovVz9M5S1Dg+4TrDwfMewQ6p/rmMueb7tWZjQ1rx4Loy1ArBggoqGpfqqdI4rondg==
+ansi-regex@*, ansi-regex@5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/ansi-regex/-/ansi-regex-5.0.0.tgz#388539f55179bf39339c81af30a654d69f87cb75"
+  integrity sha512-bY6fj56OUQ0hU1KjFNDQuJFezqKdrAyFdIevADiqrWHwSlbmBNMHp5ak2f40Pm8JTFyM2mqxkG6ngkHO11f/lg==
 
 ansi-regex@^2.0.0:
   version "2.1.1"
@@ -374,6 +376,11 @@ ansi-regex@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/ansi-regex/-/ansi-regex-3.0.0.tgz#ed0317c322064f79466c02966bddb605ab37d998"
   integrity sha1-7QMXwyIGT3lGbAKWa922Bas32Zg=
+
+ansi-regex@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/ansi-regex/-/ansi-regex-4.1.0.tgz#8b9f8f08cf1acb843756a839ca8c7e3168c51997"
+  integrity sha512-1apePfXM1UOSqw0o9IiFAovVz9M5S1Dg+4TrDwfMewQ6p/rmMueb7tWZjQ1rx4Loy1ArBggoqGpfqqdI4rondg==
 
 ansi-styles@^2.2.1:
   version "2.2.1"
