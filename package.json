@@ -59,7 +59,7 @@
     "@hot-loader/react-dom": "16.10.2",
     "@types/crypto-js": "3.1.43",
     "@types/enzyme": "3.10.3",
-    "@types/faker": "4.1.5",
+    "@types/faker": "4.1.6",
     "@types/helmet": "0.0.43",
     "@types/highlightjs": "9.12.0",
     "@types/jasmine": "3.4.0",
