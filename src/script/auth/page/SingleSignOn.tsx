@@ -43,14 +43,13 @@ import RouterLink from '../component/RouterLink';
 import {Config} from '../config';
 import {BackendError} from '../module/action/BackendError';
 import {RootState, bindActionCreators} from '../module/reducer';
-import * as SelfSelector from '../module/selector/SelfSelector';
 import {ROUTE} from '../route';
 import Page from './Page';
 import SingleSignOnForm from './SingleSignOnForm';
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {}
 
-const SingleSignOn = ({selfName, selfHandle, doInit}: Props & ConnectedProps & DispatchProps) => {
+const SingleSignOn = ({}: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
   const ssoWindowRef = useRef<Window>();
   const {match} = useReactRouter<{code?: string}>();
@@ -248,10 +247,7 @@ const SingleSignOn = ({selfName, selfHandle, doInit}: Props & ConnectedProps & D
 };
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
-const mapStateToProps = (state: RootState) => ({
-  selfHandle: SelfSelector.getSelfHandle(state),
-  selfName: SelfSelector.getSelfName(state),
-});
+const mapStateToProps = (state: RootState) => ({});
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
 const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => bindActionCreators({}, dispatch);
