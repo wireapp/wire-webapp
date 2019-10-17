@@ -911,10 +911,10 @@ class AuthViewModel {
     this.web_socket_service.connect(notification => {
       const [event] = notification.payload;
       const {type: event_type, user} = event;
-      const is_user_update = event_type === BackendEvent.USER.UPDATE;
+      const isUserUpdate = event_type === BackendEvent.USER.UPDATE;
 
       this.logger.info(`»» Event: '${event_type}'`, {eventJson: JSON.stringify(event), eventObject: event});
-      if (is_user_update && user.email) {
+      if (isUserUpdate && user.email) {
         this.logger.info('User account verified. User can now login.');
         this._authentication_successful();
       }

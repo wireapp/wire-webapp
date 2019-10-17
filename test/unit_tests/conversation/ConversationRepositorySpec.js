@@ -94,15 +94,15 @@ describe('ConversationRepository', () => {
       conversationEt = _generate_conversation(ConversationType.SELF);
       conversationEt.id = payload.conversations.knock.post.conversation;
 
-      const ping_url = `${backendConfig.restUrl}/conversations/${conversationEt.id}/knock`;
-      server.respondWith('POST', ping_url, [
+      const pingUrl = `${backendConfig.restUrl}/conversations/${conversationEt.id}/knock`;
+      server.respondWith('POST', pingUrl, [
         201,
         {'Content-Type': 'application/json'},
         JSON.stringify(payload.conversations.knock.post),
       ]);
 
-      const mark_as_read_url = `${backendConfig.restUrl}/conversations/${conversationEt.id}/self`;
-      server.respondWith('PUT', mark_as_read_url, [200, {}, '']);
+      const markAsReadUrl = `${backendConfig.restUrl}/conversations/${conversationEt.id}/self`;
+      server.respondWith('PUT', markAsReadUrl, [200, {}, '']);
 
       return conversation_repository.save_conversation(conversationEt);
     });
