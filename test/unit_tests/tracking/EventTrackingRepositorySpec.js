@@ -17,7 +17,6 @@
  *
  */
 
-import {WebappProperties} from 'src/script/properties/WebappProperties';
 import {WebAppEvents} from 'src/script/event/WebApp';
 import {EventTrackingRepository} from 'src/script/tracking/EventTrackingRepository';
 
@@ -38,7 +37,32 @@ describe('EventTrackingRepository', () => {
       spyOn(TestFactory.tracking_repository, '_enableAnalytics').and.callThrough();
       spyOn(TestFactory.tracking_repository, '_subscribeToAnalyticsEvents').and.callThrough();
 
-      const properties = new WebappProperties();
+      const properties = {
+        contact_import: {
+          macos: undefined,
+        },
+        enable_debugging: false,
+        settings: {
+          emoji: {
+            replace_inline: true,
+          },
+          interface: {
+            theme: 'default',
+          },
+          notifications: 'on',
+          previews: {
+            send: true,
+          },
+          privacy: {
+            improve_wire: undefined,
+            report_errors: undefined,
+          },
+          sound: {
+            alerts: 'all',
+          },
+        },
+        version: 1,
+      };
       const privacyPreference = properties.settings.privacy.improve_wire;
 
       expect(privacyPreference).toBeFalsy();
