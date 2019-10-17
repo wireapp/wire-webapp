@@ -17,23 +17,37 @@
  *
  */
 
-import {getLogger} from 'Util/Logger';
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
+import {Logger, getLogger} from 'Util/Logger';
 
+import {AudioPreference, NotificationPreference, WebappProperties} from '@wireapp/api-client/dist/commonjs/user/data';
+import {amplify} from 'amplify';
 import {Config} from '../auth/config';
+import {config} from '../config';
+import {ReceiptMode} from '../conversation/ReceiptMode';
+import {User} from '../entity/User';
+import {WebAppEvents} from '../event/WebApp';
+import {SelfService} from '../self/SelfService';
 import {ConsentType} from '../user/ConsentType';
 import {ConsentValue} from '../user/ConsentValue';
-import {ReceiptMode} from '../conversation/ReceiptMode';
-import {WebappProperties} from './WebappProperties';
+import {ModalsViewModel} from '../view_model/ModalsViewModel';
+import {PropertiesService} from './PropertiesService';
 import {PROPERTIES_TYPE} from './PropertiesType';
 
-import {ModalsViewModel} from '../view_model/ModalsViewModel';
-import {WebAppEvents} from '../event/WebApp';
-
-class PropertiesRepository {
+export class PropertiesRepository {
   // Value names are specified by the protocol but key names can be changed.
-  static get CONFIG() {
+  static get CONFIG(): {
+    WEBAPP_ACCOUNT_SETTINGS: string;
+    WIRE_MARKETING_CONSENT: {
+      defaultValue: ConsentValue;
+      key: string;
+    };
+    WIRE_RECEIPT_MODE: {
+      defaultValue: ReceiptMode;
+      key: string;
+    };
+  } {
     return {
       WEBAPP_ACCOUNT_SETTINGS: 'webapp',
       WIRE_MARKETING_CONSENT: {
@@ -47,20 +61,53 @@ class PropertiesRepository {
     };
   }
 
-  constructor(propertiesService, selfService) {
+  private readonly logger: Logger;
+  private readonly propertiesService: PropertiesService;
+  private readonly receiptMode: ko.Observable<any>;
+  private readonly selfService: SelfService;
+  private readonly selfUser: ko.Observable<User>;
+  public properties: WebappProperties;
+  public readonly marketingConsent: ko.Observable<ConsentValue | boolean>;
+
+  constructor(propertiesService: PropertiesService, selfService: SelfService) {
     this.propertiesService = propertiesService;
     this.selfService = selfService;
     this.logger = getLogger('PropertiesRepository');
 
-    this.properties = new WebappProperties();
+    this.properties = {
+      contact_import: {
+        macos: undefined,
+      },
+      enable_debugging: false,
+      settings: {
+        emoji: {
+          replace_inline: true,
+        },
+        interface: {
+          theme: 'default',
+        },
+        notifications: NotificationPreference.ON,
+        previews: {
+          send: true,
+        },
+        privacy: {
+          improve_wire: undefined,
+          report_errors: undefined,
+        },
+        sound: {
+          alerts: AudioPreference.ALL,
+        },
+      },
+      version: 1,
+    };
     this.selfUser = ko.observable();
     this.receiptMode = ko.observable(PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.defaultValue);
     /** @type {ko.Observable<ConsentValue | boolean>} */
     this.marketingConsent = ko.observable(PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT.defaultValue);
   }
 
-  checkPrivacyPermission() {
-    const isCheckConsentDisabled = !z.config.FEATURE.CHECK_CONSENT;
+  checkPrivacyPermission(): Promise<void> {
+    const isCheckConsentDisabled = !config.FEATURE.CHECK_CONSENT;
     const isPrivacyPreferenceSet = this.getPreference(PROPERTIES_TYPE.PRIVACY) !== undefined;
 
     return isCheckConsentDisabled || isPrivacyPreferenceSet
@@ -91,12 +138,7 @@ class PropertiesRepository {
         });
   }
 
-  /**
-   * Get the current preference for a property type.
-   * @param {string} propertiesType - Type of preference to get
-   * @returns {*} Preference value
-   */
-  getPreference(propertiesType) {
+  getPreference(propertiesType: string): any {
     const typeParts = propertiesType.split('.');
     const [partOne, partTwo, partThree] = typeParts;
 
@@ -112,18 +154,13 @@ class PropertiesRepository {
     }
   }
 
-  /**
-   * Initialize properties on app startup.
-   * @param {User} selfUserEntity - Self user
-   * @returns {Promise} Resolves when repository has been initialized
-   */
-  init(selfUserEntity) {
+  init(selfUserEntity: User): Promise<void> | Promise<WebappProperties> {
     this.selfUser(selfUserEntity);
 
     return this.selfUser().isTemporaryGuest() ? this._initTemporaryGuestAccount() : this._initActivatedAccount();
   }
 
-  _fetchWebAppAccountSettings() {
+  _fetchWebAppAccountSettings(): Promise<void> {
     return this.propertiesService
       .getPropertiesByKey(PropertiesRepository.CONFIG.WEBAPP_ACCOUNT_SETTINGS)
       .then(properties => {
@@ -136,7 +173,7 @@ class PropertiesRepository {
       });
   }
 
-  _fetchReadReceiptsSetting() {
+  _fetchReadReceiptsSetting(): Promise<void> {
     const property = PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE;
 
     return this.propertiesService
@@ -150,32 +187,25 @@ class PropertiesRepository {
       });
   }
 
-  _initActivatedAccount() {
+  _initActivatedAccount(): Promise<void> {
     return Promise.all([this._fetchWebAppAccountSettings(), this._fetchReadReceiptsSetting()]).then(() => {
       this.logger.info('Loaded user properties', this.properties);
       this._publishProperties();
     });
   }
 
-  _initTemporaryGuestAccount() {
+  _initTemporaryGuestAccount(): Promise<WebappProperties> {
     this.logger.info('Temporary guest user: Using default properties');
     this.savePreference(PROPERTIES_TYPE.PRIVACY, false);
     return Promise.resolve(this._publishProperties());
   }
 
-  _publishProperties() {
+  _publishProperties(): WebappProperties {
     amplify.publish(WebAppEvents.PROPERTIES.UPDATED, this.properties);
     return this.properties;
   }
 
-  /**
-   * Save property setting.
-   *
-   * @param {string} propertiesType - Type of preference to update
-   * @param {*} updatedPreference - New property setting
-   * @returns {undefined} No return value
-   */
-  savePreference(propertiesType, updatedPreference) {
+  savePreference(propertiesType: string, updatedPreference: any): void {
     if (updatedPreference === undefined) {
       switch (propertiesType) {
         case PROPERTIES_TYPE.CONTACT_IMPORT.MACOS:
@@ -197,8 +227,7 @@ class PropertiesRepository {
     }
   }
 
-  // Reset a property to it's default state. This method is only called from external event sources (when other clients sync the settings).
-  deleteProperty(key) {
+  deleteProperty(key: string): void {
     switch (key) {
       case PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key:
         this.setProperty(key, ReceiptMode.DELIVERY);
@@ -209,14 +238,13 @@ class PropertiesRepository {
     }
   }
 
-  // Map a property and set it into our state
-  setProperty(key, value) {
+  setProperty(key: string, value: any): void {
     this.logger.info(`Setting key "${key}"...`, value);
 
     switch (key) {
       case PropertiesRepository.CONFIG.WEBAPP_ACCOUNT_SETTINGS:
         if (this.properties.version === value.version) {
-          this.properties = Object.assign({}, this.properties, value);
+          this.properties = {...this.properties, ...value};
           this._publishProperties();
         }
         break;
@@ -229,7 +257,7 @@ class PropertiesRepository {
     }
   }
 
-  updateProperty(key, value) {
+  updateProperty(key: string, value: any): Promise<void> | void {
     switch (key) {
       case PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key:
         if (value === ReceiptMode.DELIVERY) {
@@ -250,18 +278,18 @@ class PropertiesRepository {
     }
   }
 
-  _savePreferenceActivatedAccount(propertiesType, updatedPreference) {
+  _savePreferenceActivatedAccount(propertiesType: string, updatedPreference: any): Promise<void> {
     return this.propertiesService
       .putPropertiesByKey(PropertiesRepository.CONFIG.WEBAPP_ACCOUNT_SETTINGS, this.properties)
       .then(() => this.logger.info(`Saved updated preference: '${propertiesType}' - '${updatedPreference}'`));
   }
 
-  _savePreferenceTemporaryGuestAccount(propertiesType, updatedPreference) {
+  _savePreferenceTemporaryGuestAccount(propertiesType: string, updatedPreference: any): Promise<void> {
     this.logger.info(`Updated preference: '${propertiesType}' - '${updatedPreference}'`);
     return Promise.resolve();
   }
 
-  _publishPropertyUpdate(propertiesType, updatedPreference) {
+  _publishPropertyUpdate(propertiesType: string, updatedPreference: any): void {
     switch (propertiesType) {
       case PROPERTIES_TYPE.CONTACT_IMPORT.MACOS:
         amplify.publish(WebAppEvents.PROPERTIES.UPDATE.CONTACTS, updatedPreference);
@@ -292,15 +320,7 @@ class PropertiesRepository {
     }
   }
 
-  /**
-   * Set the preference of specified type
-   *
-   * @private
-   * @param {PROPERTIES_TYPE} propertiesType - Type of preference to set
-   * @param {*} changedPreference - New preference to set
-   * @returns {undefined} No return value
-   */
-  _setPreference(propertiesType, changedPreference) {
+  _setPreference(propertiesType: string, changedPreference: {}): void {
     const typeParts = propertiesType.split('.');
     const [partOne, partTwo, partThree] = typeParts;
 
@@ -319,5 +339,3 @@ class PropertiesRepository {
     }
   }
 }
-
-export {PropertiesRepository};
