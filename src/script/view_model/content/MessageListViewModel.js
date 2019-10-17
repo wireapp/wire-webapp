@@ -436,9 +436,9 @@ class MessageListViewModel {
       const messageEts = items.filter(
         item => item.category & MessageCategory.IMAGE && !(item.category & MessageCategory.GIF),
       );
-      const [image_message_et] = messageEts.filter(item => item.id === messageEt.id);
+      const [imageMessageEt] = messageEts.filter(item => item.id === messageEt.id);
 
-      amplify.publish(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, image_message_et || messageEt, messageEts);
+      amplify.publish(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, imageMessageEt || messageEt, messageEts);
     });
   }
 
