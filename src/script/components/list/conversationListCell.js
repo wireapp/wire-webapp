@@ -50,8 +50,9 @@ class ConversationListCell {
       viewportObserver.trackElement(
         element,
         isInViewport => {
-          if (!this.isInViewport() && isInViewport) {
+          if (isInViewport) {
             this.isInViewport(true);
+            viewportObserver.removeElement(element);
           }
         },
         false,
