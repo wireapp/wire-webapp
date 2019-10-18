@@ -77,6 +77,7 @@ const SingleSignOnForm = ({
   const [ssoError, setSsoError] = useState(null);
   const [isCodeInputValid, setIsCodeInputValid] = useState(true);
   const [validationError, setValidationError] = useState();
+  const [nextRoute, setNextRoute] = useState();
 
   useEffect(() => {
     if (initialCode && initialCode !== code) {
@@ -92,12 +93,13 @@ const SingleSignOnForm = ({
   }, [code]);
 
   useEffect(() => {
-    if (isAuthenticated) {
-      navigateChooseHandleOrWebapp();
+    if (nextRoute && isAuthenticated) {
+      navigateNext();
     }
-  }, [isAuthenticated]);
+  }, [nextRoute, isAuthenticated]);
 
   const handleSubmit = (event?: React.FormEvent) => {
+    setNextRoute(null);
     if (event) {
       event.preventDefault();
     }
@@ -127,6 +129,7 @@ const SingleSignOnForm = ({
         const clientType = persist ? ClientType.PERMANENT : ClientType.TEMPORARY;
         return doFinalizeSSOLogin({clientType});
       })
+      .then(() => setNextRoute(EXTERNAL_ROUTE.WEBAPP))
       .catch(error => {
         switch (error.label) {
           case BackendError.LABEL.NEW_CLIENT: {
@@ -138,21 +141,20 @@ const SingleSignOnForm = ({
              *   3. new local client is temporary
              */
             return doGetAllClients().then(clients => {
-              const shouldShowHistoryInfo = hasHistory || clients.length > 1 || !persist;
-              if (shouldShowHistoryInfo) {
-                history.push(ROUTE.HISTORY_INFO);
+              const shouldshowHistory = hasHistory || clients.length > 1 || !persist;
+              if (shouldshowHistory) {
+                setNextRoute(ROUTE.HISTORY_INFO);
               }
             });
           }
           case BackendError.LABEL.TOO_MANY_CLIENTS: {
             resetAuthError();
-            return history.push(ROUTE.CLIENTS);
+            setNextRoute(ROUTE.CLIENTS);
+            return undefined;
           }
-          case BackendError.LABEL.SSO_USER_CANCELLED_ERROR: {
-            return;
-          }
+          case BackendError.LABEL.SSO_USER_CANCELLED_ERROR:
           case BackendError.LABEL.SSO_NOT_FOUND: {
-            return;
+            return undefined;
           }
           default: {
             setSsoError(error);
@@ -163,15 +165,22 @@ const SingleSignOnForm = ({
               // tslint:disable-next-line:no-console
               console.warn('SSO authentication error', JSON.stringify(Object.entries(error)), error);
             }
+            return undefined;
           }
         }
       });
   };
 
-  const navigateChooseHandleOrWebapp = () => {
-    return hasSelfHandle
-      ? window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP))
-      : history.push(ROUTE.CHOOSE_HANDLE);
+  const navigateNext = () => {
+    if (nextRoute === EXTERNAL_ROUTE.WEBAPP) {
+      if (hasSelfHandle) {
+        return window.location.replace(pathWithParams(nextRoute));
+      } else {
+        return history.push(ROUTE.CHOOSE_HANDLE);
+      }
+    } else {
+      return history.push(nextRoute);
+    }
   };
 
   const extractSSOLink = (event: React.MouseEvent, shouldEmitError = true) => {
