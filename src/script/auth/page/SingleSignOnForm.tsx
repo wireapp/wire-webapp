@@ -67,7 +67,6 @@ const SingleSignOnForm = ({
   handleSSOWindow,
   doGetAllClients,
   doFinalizeSSOLogin,
-  isAuthenticated,
 }: Props & ConnectedProps & DispatchProps) => {
   const codeInput = useRef<HTMLInputElement>();
   const [code, setCode] = useState('');
@@ -79,6 +78,7 @@ const SingleSignOnForm = ({
   const [validationError, setValidationError] = useState();
   const [shouldShowHistoryInfo, setShouldShowHistoryInfo] = useState(false);
   const [shouldShowMaxClients, setShouldShowMaxClients] = useState(false);
+  const [canNavigate, setCanNavigate] = useState(false);
 
   useEffect(() => {
     if (initialCode && initialCode !== code) {
@@ -94,10 +94,10 @@ const SingleSignOnForm = ({
   }, [code]);
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (canNavigate) {
       navigateNext();
     }
-  }, [isAuthenticated]);
+  }, [canNavigate]);
 
   const handleSubmit = (event?: React.FormEvent) => {
     setShouldShowHistoryInfo(false);
@@ -131,6 +131,7 @@ const SingleSignOnForm = ({
         const clientType = persist ? ClientType.PERMANENT : ClientType.TEMPORARY;
         return doFinalizeSSOLogin({clientType});
       })
+      .then(() => setCanNavigate(true))
       .catch(error => {
         switch (error.label) {
           case BackendError.LABEL.NEW_CLIENT: {
@@ -143,11 +144,13 @@ const SingleSignOnForm = ({
              */
             return doGetAllClients().then(clients => {
               setShouldShowHistoryInfo(hasHistory || clients.length > 1 || !persist);
+              setCanNavigate(true);
             });
           }
           case BackendError.LABEL.TOO_MANY_CLIENTS: {
             resetAuthError();
             setShouldShowMaxClients(true);
+            setCanNavigate(true);
             break;
           }
           case BackendError.LABEL.SSO_USER_CANCELLED_ERROR: {
@@ -295,7 +298,6 @@ type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
   hasHistory: ClientSelector.hasHistory(state),
   hasSelfHandle: SelfSelector.hasSelfHandle(state),
-  isAuthenticated: AuthSelector.isAuthenticated(state),
   isFetching: AuthSelector.isFetching(state),
   loginError: AuthSelector.getError(state),
 });
