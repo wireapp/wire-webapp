@@ -118,7 +118,7 @@ export class PropertiesRepository {
             primaryAction: {
               action: () => {
                 this.savePreference(PROPERTIES_TYPE.PRIVACY, true);
-                this._publishProperties();
+                this.publishProperties();
                 resolve();
               },
               text: t('modalImproveWireAction'),
@@ -157,10 +157,10 @@ export class PropertiesRepository {
   init(selfUserEntity: User): Promise<void> | Promise<WebappProperties> {
     this.selfUser(selfUserEntity);
 
-    return this.selfUser().isTemporaryGuest() ? this._initTemporaryGuestAccount() : this._initActivatedAccount();
+    return this.selfUser().isTemporaryGuest() ? this.initTemporaryGuestAccount() : this.initActivatedAccount();
   }
 
-  _fetchWebAppAccountSettings(): Promise<void> {
+  private fetchWebAppAccountSettings(): Promise<void> {
     return this.propertiesService
       .getPropertiesByKey(PropertiesRepository.CONFIG.WEBAPP_ACCOUNT_SETTINGS)
       .then(properties => {
@@ -173,7 +173,7 @@ export class PropertiesRepository {
       });
   }
 
-  _fetchReadReceiptsSetting(): Promise<void> {
+  private fetchReadReceiptsSetting(): Promise<void> {
     const property = PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE;
 
     return this.propertiesService
@@ -187,20 +187,20 @@ export class PropertiesRepository {
       });
   }
 
-  _initActivatedAccount(): Promise<void> {
-    return Promise.all([this._fetchWebAppAccountSettings(), this._fetchReadReceiptsSetting()]).then(() => {
+  private initActivatedAccount(): Promise<void> {
+    return Promise.all([this.fetchWebAppAccountSettings(), this.fetchReadReceiptsSetting()]).then(() => {
       this.logger.info('Loaded user properties', this.properties);
-      this._publishProperties();
+      this.publishProperties();
     });
   }
 
-  _initTemporaryGuestAccount(): Promise<WebappProperties> {
+  private initTemporaryGuestAccount(): Promise<WebappProperties> {
     this.logger.info('Temporary guest user: Using default properties');
     this.savePreference(PROPERTIES_TYPE.PRIVACY, false);
-    return Promise.resolve(this._publishProperties());
+    return Promise.resolve(this.publishProperties());
   }
 
-  _publishProperties(): WebappProperties {
+  private publishProperties(): WebappProperties {
     amplify.publish(WebAppEvents.PROPERTIES.UPDATED, this.properties);
     return this.properties;
   }
@@ -217,13 +217,13 @@ export class PropertiesRepository {
     }
 
     if (updatedPreference !== this.getPreference(propertiesType)) {
-      this._setPreference(propertiesType, updatedPreference);
+      this.setPreference(propertiesType, updatedPreference);
 
       const savePromise = this.selfUser().isTemporaryGuest()
-        ? this._savePreferenceTemporaryGuestAccount(propertiesType, updatedPreference)
-        : this._savePreferenceActivatedAccount(propertiesType, updatedPreference);
+        ? this.savePreferenceTemporaryGuestAccount(propertiesType, updatedPreference)
+        : this.savePreferenceActivatedAccount(propertiesType, updatedPreference);
 
-      savePromise.then(() => this._publishPropertyUpdate(propertiesType, updatedPreference));
+      savePromise.then(() => this.publishPropertyUpdate(propertiesType, updatedPreference));
     }
   }
 
@@ -245,7 +245,7 @@ export class PropertiesRepository {
       case PropertiesRepository.CONFIG.WEBAPP_ACCOUNT_SETTINGS:
         if (this.properties.version === value.version) {
           this.properties = {...this.properties, ...value};
-          this._publishProperties();
+          this.publishProperties();
         }
         break;
       case PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT.key:
@@ -278,18 +278,18 @@ export class PropertiesRepository {
     }
   }
 
-  _savePreferenceActivatedAccount(propertiesType: string, updatedPreference: any): Promise<void> {
+  private savePreferenceActivatedAccount(propertiesType: string, updatedPreference: any): Promise<void> {
     return this.propertiesService
       .putPropertiesByKey(PropertiesRepository.CONFIG.WEBAPP_ACCOUNT_SETTINGS, this.properties)
       .then(() => this.logger.info(`Saved updated preference: '${propertiesType}' - '${updatedPreference}'`));
   }
 
-  _savePreferenceTemporaryGuestAccount(propertiesType: string, updatedPreference: any): Promise<void> {
+  private savePreferenceTemporaryGuestAccount(propertiesType: string, updatedPreference: any): Promise<void> {
     this.logger.info(`Updated preference: '${propertiesType}' - '${updatedPreference}'`);
     return Promise.resolve();
   }
 
-  _publishPropertyUpdate(propertiesType: string, updatedPreference: any): void {
+  private publishPropertyUpdate(propertiesType: string, updatedPreference: any): void {
     switch (propertiesType) {
       case PROPERTIES_TYPE.CONTACT_IMPORT.MACOS:
         amplify.publish(WebAppEvents.PROPERTIES.UPDATE.CONTACTS, updatedPreference);
@@ -320,7 +320,7 @@ export class PropertiesRepository {
     }
   }
 
-  _setPreference(propertiesType: string, changedPreference: {}): void {
+  private setPreference(propertiesType: string, changedPreference: {}): void {
     const typeParts = propertiesType.split('.');
     const [partOne, partTwo, partThree] = typeParts;
 
