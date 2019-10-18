@@ -67,6 +67,7 @@ const SingleSignOnForm = ({
   handleSSOWindow,
   doGetAllClients,
   doFinalizeSSOLogin,
+  isAuthenticated,
 }: Props & ConnectedProps & DispatchProps) => {
   const codeInput = useRef<HTMLInputElement>();
   const [code, setCode] = useState('');
@@ -89,6 +90,12 @@ const SingleSignOnForm = ({
       handleSubmit();
     }
   }, [code]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigateChooseHandleOrWebapp();
+    }
+  }, [isAuthenticated]);
 
   const handleSubmit = (event?: React.FormEvent) => {
     if (event) {
@@ -120,7 +127,6 @@ const SingleSignOnForm = ({
         const clientType = persist ? ClientType.PERMANENT : ClientType.TEMPORARY;
         return doFinalizeSSOLogin({clientType});
       })
-      .then(navigateChooseHandleOrWebapp)
       .catch(error => {
         switch (error.label) {
           case BackendError.LABEL.NEW_CLIENT: {
@@ -133,7 +139,9 @@ const SingleSignOnForm = ({
              */
             return doGetAllClients().then(clients => {
               const shouldShowHistoryInfo = hasHistory || clients.length > 1 || !persist;
-              return shouldShowHistoryInfo ? history.push(ROUTE.HISTORY_INFO) : navigateChooseHandleOrWebapp();
+              if (shouldShowHistoryInfo) {
+                history.push(ROUTE.HISTORY_INFO);
+              }
             });
           }
           case BackendError.LABEL.TOO_MANY_CLIENTS: {
@@ -277,6 +285,7 @@ type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
   hasHistory: ClientSelector.hasHistory(state),
   hasSelfHandle: SelfSelector.hasSelfHandle(state),
+  isAuthenticated: AuthSelector.isAuthenticated(state),
   isFetching: AuthSelector.isFetching(state),
   loginError: AuthSelector.getError(state),
 });
