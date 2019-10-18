@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.2.20](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@2.2.19...@wireapp/commons@2.2.20) (2019-10-18)
+
+
+### Bug Fixes
+
+* **commons:** Use the system's new line character ([#2447](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/issues/2447)) ([3d76e17](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/commit/3d76e1792ffdaf0f4f913a9abd112b0d80aa91dc))
+
+
+
+
+
 ## [2.2.19](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@2.2.18...@wireapp/commons@2.2.19) (2019-10-17)
 
 **Note:** Version bump only for package @wireapp/commons

@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.4.47](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@11.4.46...@wireapp/cryptobox@11.4.47) (2019-10-18)
+
+**Note:** Version bump only for package @wireapp/cryptobox
+
+
+
+
+
 ## [11.4.46](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@11.4.45...@wireapp/cryptobox@11.4.46) (2019-10-17)
 
 **Note:** Version bump only for package @wireapp/cryptobox

@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.23](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-fs/compare/@wireapp/store-engine-fs@1.4.22...@wireapp/store-engine-fs@1.4.23) (2019-10-18)
+
+**Note:** Version bump only for package @wireapp/store-engine-fs
+
+
+
+
+
 ## [1.4.22](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-fs/compare/@wireapp/store-engine-fs@1.4.21...@wireapp/store-engine-fs@1.4.22) (2019-10-17)
 
 **Note:** Version bump only for package @wireapp/store-engine-fs
