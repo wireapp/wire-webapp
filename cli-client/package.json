@@ -3,7 +3,7 @@
     "wire-cli": "dist/commonjs/index.js"
   },
   "dependencies": {
-    "@types/fs-extra": "8.0.0",
+    "@types/fs-extra": "8.0.1",
     "@types/long": "4.0.0",
     "@wireapp/core": "13.4.0",
     "@wireapp/store-engine-fs": "1.4.22",
