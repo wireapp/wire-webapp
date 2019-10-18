@@ -42,7 +42,7 @@ describe('UserRepository', () => {
 
   describe('Account preferences ', () => {
     beforeEach(() => {
-      spyOn(TestFactory.user_repository.propertyRepository, '_publishProperties').and.callFake(properties => {
+      spyOn(TestFactory.user_repository.propertyRepository, 'publishProperties').and.callFake(properties => {
         return properties;
       });
     });

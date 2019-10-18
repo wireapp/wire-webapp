@@ -98,6 +98,8 @@ import {AppLockViewModel} from '../view_model/content/AppLockViewModel';
 import {CacheRepository} from '../cache/CacheRepository';
 import {SelfService} from '../self/SelfService';
 import {BroadcastService} from '../broadcast/BroadcastService';
+import {PropertiesRepository} from '../properties/PropertiesRepository';
+import {PropertiesService} from '../properties/PropertiesService';
 
 class App {
   static get CONFIG() {
@@ -158,11 +160,12 @@ class App {
    */
   _setupRepositories() {
     const repositories = {};
+    const selfService = new SelfService(this.backendClient);
 
     repositories.audio = resolve(graph.AudioRepository);
     repositories.auth = resolve(graph.AuthRepository);
     repositories.giphy = resolve(graph.GiphyRepository);
-    repositories.properties = resolve(graph.PropertiesRepository);
+    repositories.properties = new PropertiesRepository(new PropertiesService(this.backendClient), selfService);
     repositories.serverTime = serverTimeHandler;
     repositories.storage = new StorageRepository(this.service.storage);
 
@@ -173,7 +176,7 @@ class App {
     repositories.user = new UserRepository(
       resolve(graph.UserService),
       this.service.asset,
-      new SelfService(this.backendClient),
+      selfService,
       repositories.client,
       serverTimeHandler,
       repositories.properties,
