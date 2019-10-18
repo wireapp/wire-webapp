@@ -29,7 +29,7 @@ import {
   InputSubmitCombo,
   RoundIconButton,
 } from '@wireapp/react-ui-kit';
-import React, {useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
@@ -68,14 +68,27 @@ const SingleSignOnForm = ({
   doGetAllClients,
   doFinalizeSSOLogin,
 }: Props & ConnectedProps & DispatchProps) => {
-  const inputs: {code: React.RefObject<any>} = {code: React.createRef()};
-  const [code, setCode] = useState(initialCode);
+  const codeInput = useRef<HTMLInputElement>();
+  const [code, setCode] = useState('');
   const {formatMessage: _} = useIntl();
   const {history} = useReactRouter<{code?: string}>();
   const [persist, setPersist] = useState(true);
   const [ssoError, setSsoError] = useState(null);
   const [isCodeInputValid, setIsCodeInputValid] = useState(true);
-  const [validationErrors, setValidationErrors] = useState([]);
+  const [validationError, setValidationError] = useState();
+
+  useEffect(() => {
+    if (initialCode && initialCode !== code) {
+      setCode(initialCode);
+    }
+  }, [initialCode]);
+
+  // Automatically submit if code is set via url
+  useEffect(() => {
+    if (initialCode === code) {
+      handleSubmit();
+    }
+  }, [code]);
 
   const handleSubmit = (event?: React.FormEvent) => {
     if (event) {
@@ -85,28 +98,20 @@ const SingleSignOnForm = ({
     if (isFetching) {
       return undefined;
     }
-    inputs.code.current.value = inputs.code.current.value.trim();
-    const validationErrors: Error[] = [];
-    const validInputs: {[field: string]: boolean} = {
-      code: isCodeInputValid,
-    };
+    codeInput.current.value = codeInput.current.value.trim();
 
-    Object.entries(inputs).forEach(([inputKey, {current}]) => {
-      if (!current.checkValidity()) {
-        validationErrors.push(ValidationError.handleValidationState(current.name, current.validity));
-      }
-      if (inputKey === 'code') {
-        validInputs[inputKey] = current.validity.valid;
-      }
-    });
+    setValidationError(
+      codeInput.current.checkValidity()
+        ? null
+        : ValidationError.handleValidationState(codeInput.current.name, codeInput.current.validity),
+    );
 
-    setIsCodeInputValid(validInputs['code']);
-    setValidationErrors(validationErrors);
+    setIsCodeInputValid(codeInput.current.validity.valid);
 
-    return Promise.resolve(validationErrors)
-      .then(errors => {
-        if (errors.length) {
-          throw errors[0];
+    return Promise.resolve(validationError)
+      .then(error => {
+        if (error) {
+          throw error;
         }
         return validateSSOCode(stripPrefix(code));
       })
@@ -188,9 +193,9 @@ const SingleSignOnForm = ({
     return containsSSOCode(text) ? text.match(new RegExp(`${SSO_CODE_PREFIX}${UUID_REGEX}`, 'gm'))[0] : '';
   };
 
-  const stripPrefix = (code: string) =>
-    code &&
-    code
+  const stripPrefix = (prefixedCode: string) =>
+    prefixedCode &&
+    prefixedCode
       .trim()
       .toLowerCase()
       .replace(SSO_CODE_PREFIX, '');
@@ -209,6 +214,7 @@ const SingleSignOnForm = ({
               minWidth: '100px',
               padding: '0 12px',
             }}
+            type="button"
             onClick={extractSSOLink}
             data-uie-name="do-paste-sso-code"
           >
@@ -222,7 +228,7 @@ const SingleSignOnForm = ({
             setCode(event.target.value);
             setIsCodeInputValid(true);
           }}
-          ref={inputs.code}
+          ref={codeInput}
           markInvalid={!isCodeInputValid}
           placeholder={isSupportingClipboard() ? '' : _(ssoLoginStrings.codeInputPlaceholder)}
           value={code}
@@ -243,8 +249,8 @@ const SingleSignOnForm = ({
           data-uie-name="do-sso-sign-in"
         />
       </InputSubmitCombo>
-      {validationErrors.length ? (
-        parseValidationErrors(validationErrors)
+      {validationError ? (
+        parseValidationErrors([validationError])
       ) : loginError ? (
         <ErrorMessage data-uie-name="error-message">{parseError(loginError)}</ErrorMessage>
       ) : ssoError ? (
