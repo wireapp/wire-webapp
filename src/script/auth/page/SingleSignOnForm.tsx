@@ -150,13 +150,11 @@ const SingleSignOnForm = ({
           case BackendError.LABEL.TOO_MANY_CLIENTS: {
             resetAuthError();
             setNextRoute(ROUTE.CLIENTS);
-            break;
+            return undefined;
           }
-          case BackendError.LABEL.SSO_USER_CANCELLED_ERROR: {
-            break;
-          }
+          case BackendError.LABEL.SSO_USER_CANCELLED_ERROR:
           case BackendError.LABEL.SSO_NOT_FOUND: {
-            break;
+            return undefined;
           }
           default: {
             setSsoError(error);
@@ -167,6 +165,7 @@ const SingleSignOnForm = ({
               // tslint:disable-next-line:no-console
               console.warn('SSO authentication error', JSON.stringify(Object.entries(error)), error);
             }
+            return undefined;
           }
         }
       });
