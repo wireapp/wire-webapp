@@ -98,14 +98,14 @@ const SingleSignOnForm = ({
     }
   }, [nextRoute, isAuthenticated]);
 
-  const handleSubmit = (event?: React.FormEvent) => {
+  const handleSubmit = async (event?: React.FormEvent): Promise<void> => {
     setNextRoute(null);
     if (event) {
       event.preventDefault();
     }
     resetAuthError();
     if (isFetching) {
-      return undefined;
+      return;
     }
     codeInput.current.value = codeInput.current.value.trim();
 
@@ -117,58 +117,54 @@ const SingleSignOnForm = ({
 
     setIsCodeInputValid(codeInput.current.validity.valid);
 
-    return Promise.resolve(validationError)
-      .then(error => {
-        if (error) {
-          throw error;
+    try {
+      if (validationError) {
+        throw validationError;
+      }
+      await validateSSOCode(stripPrefix(code));
+      handleSSOWindow(stripPrefix(code));
+      const clientType = persist ? ClientType.PERMANENT : ClientType.TEMPORARY;
+      await doFinalizeSSOLogin({clientType});
+      setNextRoute(EXTERNAL_ROUTE.WEBAPP);
+    } catch (error) {
+      switch (error.label) {
+        case BackendError.LABEL.NEW_CLIENT: {
+          resetAuthError();
+          /**
+           * Show history screen if:
+           *   1. database contains at least one event
+           *   2. there is at least one previously registered client
+           *   3. new local client is temporary
+           */
+          const clients = await doGetAllClients();
+          const shouldshowHistory = hasHistory || clients.length > 1 || !persist;
+          if (shouldshowHistory) {
+            setNextRoute(ROUTE.HISTORY_INFO);
+          }
+          break;
         }
-        return validateSSOCode(stripPrefix(code));
-      })
-      .then(() => handleSSOWindow(stripPrefix(code)))
-      .then(() => {
-        const clientType = persist ? ClientType.PERMANENT : ClientType.TEMPORARY;
-        return doFinalizeSSOLogin({clientType});
-      })
-      .then(() => setNextRoute(EXTERNAL_ROUTE.WEBAPP))
-      .catch(error => {
-        switch (error.label) {
-          case BackendError.LABEL.NEW_CLIENT: {
-            resetAuthError();
-            /**
-             * Show history screen if:
-             *   1. database contains at least one event
-             *   2. there is at least one previously registered client
-             *   3. new local client is temporary
-             */
-            return doGetAllClients().then(clients => {
-              const shouldshowHistory = hasHistory || clients.length > 1 || !persist;
-              if (shouldshowHistory) {
-                setNextRoute(ROUTE.HISTORY_INFO);
-              }
-            });
-          }
-          case BackendError.LABEL.TOO_MANY_CLIENTS: {
-            resetAuthError();
-            setNextRoute(ROUTE.CLIENTS);
-            return undefined;
-          }
-          case BackendError.LABEL.SSO_USER_CANCELLED_ERROR:
-          case BackendError.LABEL.SSO_NOT_FOUND: {
-            return undefined;
-          }
-          default: {
-            setSsoError(error);
-            const isValidationError = Object.values(ValidationError.ERROR).some(
-              errorType => error.label && error.label.endsWith(errorType),
-            );
-            if (!isValidationError) {
-              // tslint:disable-next-line:no-console
-              console.warn('SSO authentication error', JSON.stringify(Object.entries(error)), error);
-            }
-            return undefined;
-          }
+        case BackendError.LABEL.TOO_MANY_CLIENTS: {
+          resetAuthError();
+          setNextRoute(ROUTE.CLIENTS);
+          break;
         }
-      });
+        case BackendError.LABEL.SSO_USER_CANCELLED_ERROR:
+        case BackendError.LABEL.SSO_NOT_FOUND: {
+          break;
+        }
+        default: {
+          setSsoError(error);
+          const isValidationError = Object.values(ValidationError.ERROR).some(
+            errorType => error.label && error.label.endsWith(errorType),
+          );
+          if (!isValidationError) {
+            // tslint:disable-next-line:no-console
+            console.warn('SSO authentication error', JSON.stringify(Object.entries(error)), error);
+          }
+          break;
+        }
+      }
+    }
   };
 
   const navigateNext = () => {
