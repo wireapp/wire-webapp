@@ -18,6 +18,9 @@
  */
 
 const {LogFactory} = require('@wireapp/commons');
+const fs = require('fs-extra');
+const path = require('path');
+const os = require('os');
 
 describe('LogFactory', () => {
   describe('createLoggerName', () => {
@@ -52,6 +55,24 @@ describe('LogFactory', () => {
       const separator = '-';
       const logger = LogFactory.getLogger('LogFactory', {namespace, separator});
       expect(logger.opts.prefix).toBe(`${namespace}${separator}${name}`);
+    });
+  });
+
+  describe('writeMessage', () => {
+    const logDir = path.join(__dirname, '../../.temp');
+
+    afterEach(() => fs.remove(logDir));
+
+    it('appends text to a log file', async () => {
+      const logFile = path.join(logDir, 'test.log');
+
+      const logMessage1 = 'This is a first test';
+      const logMessage2 = 'This is a second test';
+
+      await LogFactory.writeMessage(logMessage1, logFile);
+      await LogFactory.writeMessage(logMessage2, logFile);
+      const result = await fs.readFile(logFile, 'utf-8');
+      expect(result).toBe(`${logMessage1}${os.EOL}${logMessage2}${os.EOL}`);
     });
   });
 });

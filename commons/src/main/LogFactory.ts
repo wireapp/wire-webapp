@@ -21,6 +21,7 @@ import ansiRegex = require('ansi-regex');
 import * as fs from 'fs-extra';
 import * as logdown from 'logdown';
 import * as moment from 'moment';
+import * as os from 'os';
 import * as path from 'path';
 
 export type Logger = logdown.Logger;
@@ -77,10 +78,7 @@ export class LogFactory {
 
   static async writeMessage(message: string, logFilePath: string): Promise<void> {
     const withoutColor = message.replace(ansiRegex(), '');
-    return fs.outputFile(logFilePath, `${withoutColor}\r\n`, {
-      encoding: 'utf8',
-      flag: 'a',
-    });
+    await fs.outputFile(logFilePath, `${withoutColor}${os.EOL}`, {flag: 'a'});
   }
 
   static createLoggerName(fileName: string, namespace?: string, separator?: string): string {
