@@ -174,7 +174,7 @@ const SingleSignOnForm = ({
   const navigateNext = () => {
     if (nextRoute === EXTERNAL_ROUTE.WEBAPP) {
       if (hasSelfHandle) {
-        return window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP));
+        return window.location.replace(pathWithParams(nextRoute));
       } else {
         return history.push(ROUTE.CHOOSE_HANDLE);
       }
