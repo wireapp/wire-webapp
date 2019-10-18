@@ -67,6 +67,7 @@ const SingleSignOnForm = ({
   handleSSOWindow,
   doGetAllClients,
   doFinalizeSSOLogin,
+  isAuthenticated,
 }: Props & ConnectedProps & DispatchProps) => {
   const codeInput = useRef<HTMLInputElement>();
   const [code, setCode] = useState('');
@@ -76,9 +77,7 @@ const SingleSignOnForm = ({
   const [ssoError, setSsoError] = useState(null);
   const [isCodeInputValid, setIsCodeInputValid] = useState(true);
   const [validationError, setValidationError] = useState();
-  const [shouldShowHistoryInfo, setShouldShowHistoryInfo] = useState(false);
-  const [shouldShowMaxClients, setShouldShowMaxClients] = useState(false);
-  const [canNavigate, setCanNavigate] = useState(false);
+  const [nextRoute, setNextRoute] = useState();
 
   useEffect(() => {
     if (initialCode && initialCode !== code) {
@@ -94,14 +93,13 @@ const SingleSignOnForm = ({
   }, [code]);
 
   useEffect(() => {
-    if (canNavigate) {
+    if (nextRoute && isAuthenticated) {
       navigateNext();
     }
-  }, [canNavigate]);
+  }, [nextRoute, isAuthenticated]);
 
   const handleSubmit = (event?: React.FormEvent) => {
-    setShouldShowHistoryInfo(false);
-    setShouldShowMaxClients(false);
+    setNextRoute(null);
     if (event) {
       event.preventDefault();
     }
@@ -131,7 +129,7 @@ const SingleSignOnForm = ({
         const clientType = persist ? ClientType.PERMANENT : ClientType.TEMPORARY;
         return doFinalizeSSOLogin({clientType});
       })
-      .then(() => setCanNavigate(true))
+      .then(() => setNextRoute(EXTERNAL_ROUTE.WEBAPP))
       .catch(error => {
         switch (error.label) {
           case BackendError.LABEL.NEW_CLIENT: {
@@ -143,14 +141,15 @@ const SingleSignOnForm = ({
              *   3. new local client is temporary
              */
             return doGetAllClients().then(clients => {
-              setShouldShowHistoryInfo(hasHistory || clients.length > 1 || !persist);
-              setCanNavigate(true);
+              const shouldshowHistory = hasHistory || clients.length > 1 || !persist;
+              if (shouldshowHistory) {
+                setNextRoute(ROUTE.HISTORY_INFO);
+              }
             });
           }
           case BackendError.LABEL.TOO_MANY_CLIENTS: {
             resetAuthError();
-            setShouldShowMaxClients(true);
-            setCanNavigate(true);
+            setNextRoute(ROUTE.CLIENTS);
             break;
           }
           case BackendError.LABEL.SSO_USER_CANCELLED_ERROR: {
@@ -174,16 +173,14 @@ const SingleSignOnForm = ({
   };
 
   const navigateNext = () => {
-    if (shouldShowHistoryInfo) {
-      return history.push(ROUTE.HISTORY_INFO);
-    }
-    if (shouldShowMaxClients) {
-      return history.push(ROUTE.CLIENTS);
-    }
-    if (hasSelfHandle) {
-      return window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP));
+    if (nextRoute === EXTERNAL_ROUTE.WEBAPP) {
+      if (hasSelfHandle) {
+        return window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP));
+      } else {
+        return history.push(ROUTE.CHOOSE_HANDLE);
+      }
     } else {
-      return history.push(ROUTE.CHOOSE_HANDLE);
+      return history.push(nextRoute);
     }
   };
 
@@ -298,6 +295,7 @@ type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
   hasHistory: ClientSelector.hasHistory(state),
   hasSelfHandle: SelfSelector.hasSelfHandle(state),
+  isAuthenticated: AuthSelector.isAuthenticated(state),
   isFetching: AuthSelector.isFetching(state),
   loginError: AuthSelector.getError(state),
 });
