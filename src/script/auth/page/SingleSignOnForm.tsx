@@ -77,6 +77,8 @@ const SingleSignOnForm = ({
   const [ssoError, setSsoError] = useState(null);
   const [isCodeInputValid, setIsCodeInputValid] = useState(true);
   const [validationError, setValidationError] = useState();
+  const [shouldShowHistoryInfo, setShouldShowHistoryInfo] = useState(false);
+  const [shouldShowMaxClients, setShouldShowMaxClients] = useState(false);
 
   useEffect(() => {
     if (initialCode && initialCode !== code) {
@@ -93,11 +95,13 @@ const SingleSignOnForm = ({
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigateChooseHandleOrWebapp();
+      navigateNext();
     }
   }, [isAuthenticated]);
 
   const handleSubmit = (event?: React.FormEvent) => {
+    setShouldShowHistoryInfo(false);
+    setShouldShowMaxClients(false);
     if (event) {
       event.preventDefault();
     }
@@ -138,21 +142,19 @@ const SingleSignOnForm = ({
              *   3. new local client is temporary
              */
             return doGetAllClients().then(clients => {
-              const shouldShowHistoryInfo = hasHistory || clients.length > 1 || !persist;
-              if (shouldShowHistoryInfo) {
-                history.push(ROUTE.HISTORY_INFO);
-              }
+              setShouldShowHistoryInfo(hasHistory || clients.length > 1 || !persist);
             });
           }
           case BackendError.LABEL.TOO_MANY_CLIENTS: {
             resetAuthError();
-            return history.push(ROUTE.CLIENTS);
+            setShouldShowMaxClients(true);
+            break;
           }
           case BackendError.LABEL.SSO_USER_CANCELLED_ERROR: {
-            return;
+            break;
           }
           case BackendError.LABEL.SSO_NOT_FOUND: {
-            return;
+            break;
           }
           default: {
             setSsoError(error);
@@ -168,10 +170,18 @@ const SingleSignOnForm = ({
       });
   };
 
-  const navigateChooseHandleOrWebapp = () => {
-    return hasSelfHandle
-      ? window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP))
-      : history.push(ROUTE.CHOOSE_HANDLE);
+  const navigateNext = () => {
+    if (shouldShowHistoryInfo) {
+      return history.push(ROUTE.HISTORY_INFO);
+    }
+    if (shouldShowMaxClients) {
+      return history.push(ROUTE.CLIENTS);
+    }
+    if (hasSelfHandle) {
+      return window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP));
+    } else {
+      return history.push(ROUTE.CHOOSE_HANDLE);
+    }
   };
 
   const extractSSOLink = (event: React.MouseEvent, shouldEmitError = true) => {
