@@ -84,7 +84,7 @@
     "@types/uint32": "0.2.0",
     "@types/underscore": "1.9.3",
     "@types/uuid": "3.4.5",
-    "@types/webpack-env": "1.14.0",
+    "@types/webpack-env": "1.14.1",
     "@wireapp/copy-config": "0.8.4",
     "@wireapp/eslint-config": "1.2.1",
     "@wireapp/prettier-config": "0.3.0",
