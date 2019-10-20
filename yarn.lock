@@ -9242,10 +9242,10 @@ performance-now@^2.1.0:
   resolved "https://registry.yarnpkg.com/performance-now/-/performance-now-2.1.0.tgz#6309f4e0e5fa913ec1c69307ae364b4b377c9e7b"
   integrity sha1-Ywn04OX6kT7BxpMHrjZLSzd8nns=
 
-phoneformat.js@1.0.8:
-  version "1.0.8"
-  resolved "https://registry.yarnpkg.com/phoneformat.js/-/phoneformat.js-1.0.8.tgz#1d18748c662264f3cbea26fae44fbbfc39ec8dea"
-  integrity sha512-85I6H/XlIgsr62dUJpgAkZNT/4QpNyUqXYxjwwVXPw2g6tbY+xchjGOub0Y/qcQ4+UFSjZZn67uz1pgtKkBXBA==
+phoneformat.js@1.0.9:
+  version "1.0.9"
+  resolved "https://registry.yarnpkg.com/phoneformat.js/-/phoneformat.js-1.0.9.tgz#ac397d459db0d914ea4df3e84337f7d5bb93e58e"
+  integrity sha512-KdFjWtfuxTOEKw65TAuStLsNPAgKpels1pSb2lv2OSMT/8YzKcumh7lgGiZ7CIOzUswOplXQAZU+OKONSzqdzw==
 
 picomatch@^2.0.4, picomatch@^2.0.5:
   version "2.0.7"
