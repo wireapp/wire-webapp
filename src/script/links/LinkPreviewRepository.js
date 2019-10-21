@@ -25,15 +25,14 @@ import {WebAppEvents} from '../event/WebApp';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {isBlacklisted} from './LinkPreviewBlackList';
 import {buildFromOpenGraphData} from './LinkPreviewProtoBuilder';
-import {getLogger} from 'Util/Logger';
 
 class LinkPreviewRepository {
-  constructor(assetService, propertiesRepository) {
+  constructor(assetService, propertiesRepository, logger) {
     this.getLinkPreviewFromString = this.getLinkPreviewFromString.bind(this);
     this.updatedSendPreference = this.updatedSendPreference.bind(this);
 
     this.assetService = assetService;
-    this.logger = getLogger('LinkPreviewRepository');
+    this.logger = logger;
 
     this.shouldSendPreviews = propertiesRepository.getPreference(PROPERTIES_TYPE.PREVIEWS.SEND);
 
