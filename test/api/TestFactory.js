@@ -51,8 +51,6 @@ import {SearchRepository} from 'src/script/search/SearchRepository';
 import {ConversationService} from 'src/script/conversation/ConversationService';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {SelfService} from 'src/script/self/SelfService';
-import {LinkPreviewRepository} from 'src/script/links/LinkPreviewRepository';
-import {AssetService} from 'src/script/assets/AssetService';
 
 window.testConfig = {
   connection: backendConfig,
@@ -300,10 +298,7 @@ window.TestFactory = class TestFactory {
       TestFactory.cryptography_repository,
       TestFactory.event_repository,
       undefined,
-      new LinkPreviewRepository(
-        new AssetService(resolveDependency(graph.BackendClient)),
-        resolveDependency(graph.PropertiesRepository),
-      ),
+      resolveDependency(graph.LinkPreviewRepository),
       resolveDependency(graph.MessageSender),
       serverTimeHandler,
       TestFactory.team_repository,
