@@ -48,12 +48,8 @@ export interface RemoteData extends Asset.IRemoteData {
   sha256: Uint8Array | Buffer;
 }
 
-export interface AudioMetaData extends Asset.IAudioMetaData {
+export interface AudioMetaData extends Omit<Asset.IAudioMetaData, 'normalizedLoudness'> {
   normalizedLoudness?: Uint8Array | Buffer | null;
-}
-
-export interface AudioAssetMetaDataContent extends AssetBase {
-  metaData: AudioMetaData;
 }
 
 export interface ImageAssetContent extends AssetBase {

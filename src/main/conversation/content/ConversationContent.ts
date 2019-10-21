@@ -53,9 +53,9 @@ export type ConversationContent =
   | ConnectionContent
   | DeletedContent
   | EditedTextContent
+  | FileAssetAbortContent
   | FileAssetContent
   | FileAssetMetaDataContent
-  | FileAssetAbortContent
   | HiddenContent
   | ImageAssetContent
   | ImageContent

@@ -408,9 +408,11 @@ export class ConversationService {
     const {expectsReadConfirmation, legalHoldStatus, metaData} = payloadBundle.content;
 
     const original = Asset.Original.create({
+      audio: metaData.audio,
       mimeType: metaData.type,
       name: metaData.name,
       size: metaData.length,
+      video: metaData.video,
     });
 
     const assetMessage = Asset.create({
