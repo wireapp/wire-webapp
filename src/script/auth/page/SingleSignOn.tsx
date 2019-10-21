@@ -55,12 +55,12 @@ const SingleSignOn = ({}: Props & ConnectedProps & DispatchProps) => {
   const {match} = useReactRouter<{code?: string}>();
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
 
-  const handleSSOWindow = (code: string) => {
+  const handleSSOWindow = (code: string): Promise<void> => {
     const POPUP_HEIGHT = 520;
     const POPUP_WIDTH = 480;
     const SSO_WINDOW_CLOSE_POLLING_INTERVAL = 1000;
 
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       let timerId: number = undefined;
       let onReceiveChildWindowMessage: (event: MessageEvent) => void = undefined;
       let onParentWindowClose: (event: Event) => void = undefined;
