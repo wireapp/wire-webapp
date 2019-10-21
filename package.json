@@ -9,7 +9,7 @@
     "@wireapp/commons": "2.2.20",
     "@wireapp/core": "13.5.0",
     "@wireapp/protocol-messaging": "1.24.2",
-    "@wireapp/react-ui-kit": "7.19.2",
+    "@wireapp/react-ui-kit": "7.23.14",
     "@wireapp/store-engine-dexie": "0.6.18",
     "amplify": "git+https://git@github.com/wireapp/amplify",
     "core-js": "2.6.10",
