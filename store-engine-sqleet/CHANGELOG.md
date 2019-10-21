@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.10.8](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/compare/@wireapp/store-engine-sqleet@0.10.7...@wireapp/store-engine-sqleet@0.10.8) (2019-10-21)
+
+
+### Bug Fixes
+
+* **store-engine-sqleet:** Use Windows-compatible Worker thread ([#2453](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/issues/2453)) ([6a8d62d](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/commit/6a8d62d09e54856157257194a205dab3040439b5))
+
+
+
+
+
 ## [0.10.7](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/compare/@wireapp/store-engine-sqleet@0.10.6...@wireapp/store-engine-sqleet@0.10.7) (2019-10-17)
 
 **Note:** Version bump only for package @wireapp/store-engine-sqleet
