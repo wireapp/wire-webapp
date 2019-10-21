@@ -6,7 +6,7 @@
     "@bower_components/webapp-module-namespace": "wireapp/webapp-module-namespace#1.0.2",
     "@wireapp/antiscroll-2": "1.0.2",
     "@wireapp/avs": "release-5.1",
-    "@wireapp/commons": "2.2.18",
+    "@wireapp/commons": "2.2.20",
     "@wireapp/core": "13.3.9",
     "@wireapp/protocol-messaging": "1.24.2",
     "@wireapp/react-ui-kit": "7.19.2",
