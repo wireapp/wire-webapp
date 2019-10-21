@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [13.5.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@13.4.1...@wireapp/core@13.5.0) (2019-10-21)
+
+
+### Features
+
+* **core:** Send audio and video metadata ([#2454](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/2454)) ([a6ab965](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/a6ab965b3b3e3de8404252eb9c0953e46660e22b))
+
+
+
+
+
 ## [13.4.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@13.4.0...@wireapp/core@13.4.1) (2019-10-18)
 
 **Note:** Version bump only for package @wireapp/core
