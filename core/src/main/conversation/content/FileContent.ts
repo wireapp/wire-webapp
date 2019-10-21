@@ -17,12 +17,16 @@
  *
  */
 
+import {AudioMetaData, VideoMetaData} from './AssetContent';
+
 export interface FileContent {
   data: Buffer;
 }
 
 export interface FileMetaDataContent {
+  audio?: AudioMetaData;
   name: string;
   length: number;
   type: string;
+  video?: VideoMetaData;
 }
