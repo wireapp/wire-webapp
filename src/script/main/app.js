@@ -100,6 +100,8 @@ import {SelfService} from '../self/SelfService';
 import {BroadcastService} from '../broadcast/BroadcastService';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {PropertiesService} from '../properties/PropertiesService';
+import {LinkPreviewRepository} from '../links/LinkPreviewRepository';
+import {AssetService} from '../assets/AssetService';
 
 class App {
   static get CONFIG() {
@@ -203,7 +205,7 @@ class App {
       repositories.cryptography,
       repositories.event,
       repositories.giphy,
-      resolve(graph.LinkPreviewRepository),
+      new LinkPreviewRepository(new AssetService(resolve(graph.BackendClient)), repositories.properties),
       resolve(graph.MessageSender),
       serverTimeHandler,
       repositories.team,
