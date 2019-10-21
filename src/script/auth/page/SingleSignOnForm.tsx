@@ -50,7 +50,7 @@ import {UUID_REGEX} from '../util/stringUtil';
 import {pathWithParams} from '../util/urlUtil';
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {
-  handleSSOWindow: (code: string) => {};
+  handleSSOWindow: (code: string) => Promise<void>;
   initialCode?: string;
 }
 
@@ -121,8 +121,9 @@ const SingleSignOnForm = ({
       if (validationError) {
         throw validationError;
       }
-      await validateSSOCode(stripPrefix(code));
-      handleSSOWindow(stripPrefix(code));
+      const strippedCode = stripPrefix(code);
+      await validateSSOCode(strippedCode);
+      await handleSSOWindow(strippedCode);
       const clientType = persist ? ClientType.PERMANENT : ClientType.TEMPORARY;
       await doFinalizeSSOLogin({clientType});
       setNextRoute(EXTERNAL_ROUTE.WEBAPP);
