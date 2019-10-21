@@ -108,18 +108,16 @@ const SingleSignOnForm = ({
       return;
     }
     codeInput.current.value = codeInput.current.value.trim();
+    const currentValidationError = codeInput.current.checkValidity()
+      ? null
+      : ValidationError.handleValidationState(codeInput.current.name, codeInput.current.validity);
 
-    setValidationError(
-      codeInput.current.checkValidity()
-        ? null
-        : ValidationError.handleValidationState(codeInput.current.name, codeInput.current.validity),
-    );
-
+    setValidationError(currentValidationError);
     setIsCodeInputValid(codeInput.current.validity.valid);
 
     try {
-      if (validationError) {
-        throw validationError;
+      if (currentValidationError) {
+        throw currentValidationError;
       }
       const strippedCode = stripPrefix(code);
       await validateSSOCode(strippedCode);
