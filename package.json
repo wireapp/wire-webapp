@@ -12,7 +12,7 @@
     "@wireapp/react-ui-kit": "7.19.2",
     "@wireapp/store-engine-dexie": "0.6.18",
     "amplify": "git+https://git@github.com/wireapp/amplify",
-    "core-js": "2.6.9",
+    "core-js": "2.6.10",
     "crypto-js": "3.1.9-1",
     "dexie-batch": "0.4.2",
     "highlightjs": "9.12.0",
