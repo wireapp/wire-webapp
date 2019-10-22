@@ -17,35 +17,25 @@
  *
  */
 
-import {RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
 import {ContainerXS, H1, Link, Muted} from '@wireapp/react-ui-kit';
 import React, {useEffect} from 'react';
-import {InjectedIntlProps, injectIntl} from 'react-intl';
+import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
-import {RouteComponentProps, withRouter} from 'react-router';
+import {AnyAction, Dispatch} from 'redux';
+import useReactRouter from 'use-react-router';
 import {clientManagerStrings} from '../../strings';
 import ClientList from '../component/ClientList';
 import {Config} from '../config';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
-import {RootState, ThunkDispatch} from '../module/reducer';
+import {RootState, bindActionCreators} from '../module/reducer';
 import {ROUTE} from '../route';
 import Page from './Page';
 
-interface Props extends React.HTMLProps<HTMLDivElement>, RouteComponentProps {}
+interface Props extends React.HTMLProps<HTMLDivElement> {}
 
-interface ConnectedProps {}
-
-interface DispatchProps {
-  doGetAllClients: () => Promise<RegisteredClient[]>;
-  doLogout: () => Promise<void>;
-}
-
-const ClientManager = ({
-  doGetAllClients,
-  doLogout,
-  history,
-  intl: {formatMessage: _},
-}: Props & ConnectedProps & DispatchProps & InjectedIntlProps) => {
+const ClientManager = ({doGetAllClients, doLogout}: Props & ConnectedProps & DispatchProps) => {
+  const {formatMessage: _} = useIntl();
+  const {history} = useReactRouter();
   useEffect(() => {
     doGetAllClients();
   }, []);
@@ -77,14 +67,20 @@ const ClientManager = ({
   );
 };
 
-export default withRouter(
-  injectIntl(
-    connect(
-      (state: RootState): ConnectedProps => ({}),
-      (dispatch: ThunkDispatch): DispatchProps => ({
-        doGetAllClients: () => dispatch(ROOT_ACTIONS.clientAction.doGetAllClients()),
-        doLogout: () => dispatch(ROOT_ACTIONS.authAction.doLogout()),
-      }),
-    )(ClientManager),
-  ),
-);
+type ConnectedProps = ReturnType<typeof mapStateToProps>;
+const mapStateToProps = (state: RootState) => ({});
+
+type DispatchProps = ReturnType<typeof mapDispatchToProps>;
+const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
+  bindActionCreators(
+    {
+      doGetAllClients: ROOT_ACTIONS.clientAction.doGetAllClients,
+      doLogout: ROOT_ACTIONS.authAction.doLogout,
+    },
+    dispatch,
+  );
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(ClientManager);
