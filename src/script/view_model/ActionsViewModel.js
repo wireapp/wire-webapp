@@ -24,10 +24,7 @@ import {ModalsViewModel} from './ModalsViewModel';
 import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
 import {WebAppEvents} from '../event/WebApp';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-
-z.viewModel.ActionsViewModel = class ActionsViewModel {
+export class ActionsViewModel {
   constructor(mainViewModel, repositories) {
     this.clientRepository = repositories.client;
     this.connectionRepository = repositories.connection;
@@ -328,4 +325,4 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
       });
     }
   }
-};
+}

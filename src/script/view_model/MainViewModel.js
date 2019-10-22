@@ -25,6 +25,7 @@ import {modals} from './ModalsViewModel';
 import {WarningsViewModel} from './WarningsViewModel';
 import {ContentViewModel} from './ContentViewModel';
 import {CallingViewModel} from './CallingViewModel';
+import {ActionsViewModel} from './ActionsViewModel';
 
 export class MainViewModel {
   static get CONFIG() {
@@ -74,7 +75,7 @@ export class MainViewModel {
 
     this.isPanelOpen = ko.observable(false);
 
-    this.actions = new z.viewModel.ActionsViewModel(this, repositories);
+    this.actions = new ActionsViewModel(this, repositories);
 
     this.panel = new z.viewModel.PanelViewModel(this, repositories);
     this.calling = new CallingViewModel(

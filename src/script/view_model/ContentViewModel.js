@@ -30,6 +30,7 @@ import {EmojiInputViewModel} from './content/EmojiInputViewModel';
 import {ModalsViewModel} from './ModalsViewModel';
 import {WebAppEvents} from '../event/WebApp';
 import {PreferencesAVViewModel} from './content/PreferencesAVViewModel.js';
+import {ServiceModalViewModel} from './content/ServiceModalViewModel';
 
 export class ContentViewModel {
   static get STATE() {
@@ -78,6 +79,7 @@ export class ContentViewModel {
       repositories.user,
     );
     this.userModal = new UserModalViewModel(repositories.user, mainViewModel.actions);
+    this.serviceModal = new ServiceModalViewModel(repositories.integration, mainViewModel.actions);
     this.legalHoldModal = new LegalHoldModalViewModel(
       repositories.user,
       repositories.conversation,
