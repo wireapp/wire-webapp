@@ -50,15 +50,7 @@ const ClientList = ({
 }: Props & ConnectedProps & DispatchProps) => {
   const {history} = useReactRouter();
   const [showLoading, setShowLoading] = React.useState(false);
-  const [loadingTimeoutId, setLoadingTimeoutId] = React.useState();
   const [currentlySelectedClient, setCurrentlySelectedClient] = React.useState();
-
-  React.useEffect(() => resetLoadingSpinner);
-
-  const resetLoadingSpinner = () => {
-    window.clearTimeout(loadingTimeoutId);
-    setShowLoading(false);
-  };
 
   const setSelectedClient = (clientId: string) => {
     const isSelectedClient = currentlySelectedClient === clientId;
@@ -67,27 +59,22 @@ const ClientList = ({
     resetAuthError();
   };
 
-  const removeClient = (clientId: string, password?: string) => {
-    setShowLoading(true);
-    return Promise.resolve()
-      .then(() => doRemoveClient(clientId, password))
-      .then(() => {
-        const persist = getLocalStorage(LocalStorageAction.LocalStorageKey.AUTH.PERSIST);
-        return doInitializeClient(persist ? ClientType.PERMANENT : ClientType.TEMPORARY, password);
-      })
-      .then(() => {
-        setLoadingTimeoutId(window.setTimeout(resetLoadingSpinner, 1000));
-        setShowLoading(true);
-      })
-      .then(() => window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP)))
-      .catch(error => {
-        if (error.label === BackendError.LABEL.NEW_CLIENT) {
-          history.push(ROUTE.HISTORY_INFO);
-        } else {
-          resetLoadingSpinner();
-          logger.error(error);
-        }
-      });
+  const removeClient = async (clientId: string, password?: string) => {
+    try {
+      setShowLoading(true);
+      await doRemoveClient(clientId, password);
+      const persist = getLocalStorage(LocalStorageAction.LocalStorageKey.AUTH.PERSIST);
+      await doInitializeClient(persist ? ClientType.PERMANENT : ClientType.TEMPORARY, password);
+      return window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP));
+    } catch (error) {
+      if (error.label === BackendError.LABEL.NEW_CLIENT) {
+        history.push(ROUTE.HISTORY_INFO);
+      } else {
+        logger.error(error);
+      }
+    } finally {
+      setShowLoading(false);
+    }
   };
 
   const isSelectedClient = (clientId: string) => clientId === currentlySelectedClient;
