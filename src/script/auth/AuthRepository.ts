@@ -115,7 +115,7 @@ export class AuthRepository {
 
           this.queueState(QUEUE_STATE.READY);
           this.logger.error(`Refreshing access token failed: '${type}'`, error);
-          amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
+          return amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
         });
     }
   }
