@@ -27,11 +27,11 @@ import {AudioPlayingType} from './AudioPlayingType';
 import {AudioPreference} from './AudioPreference';
 import {AudioType} from './AudioType';
 
-const AUDIO_PLAY_PERMISSION = {
-  ALLOWED: 0,
-  DISALLOWED_BY_MUTE_STATE: 3,
-  DISALLOWED_BY_PREFERENCES: 2,
-};
+enum AUDIO_PLAY_PERMISSION {
+  ALLOWED = 0,
+  DISALLOWED_BY_MUTE_STATE = 3,
+  DISALLOWED_BY_PREFERENCES = 2,
+}
 
 export class AudioRepository {
   private readonly logger: Logger;
@@ -52,7 +52,7 @@ export class AudioRepository {
     this.subscribeToEvents();
   }
 
-  private canPlaySound(audioId: AudioType): number {
+  private canPlaySound(audioId: AudioType): AUDIO_PLAY_PERMISSION {
     if (this.muted && !AudioPlayingType.MUTED.includes(audioId)) {
       return AUDIO_PLAY_PERMISSION.DISALLOWED_BY_MUTE_STATE;
     }
