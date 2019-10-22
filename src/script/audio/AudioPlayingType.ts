@@ -19,7 +19,11 @@
 
 import {AudioType} from './AudioType';
 
-const audioPlayingType = {};
+const audioPlayingType: {MUTED: AudioType[]; NONE: AudioType[]; SOME: AudioType[]} = {
+  MUTED: [],
+  NONE: [],
+  SOME: [],
+};
 
 audioPlayingType.MUTED = [AudioType.CALL_DROP, AudioType.NETWORK_INTERRUPTION];
 
