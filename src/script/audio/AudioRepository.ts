@@ -45,14 +45,14 @@ export class AudioRepository {
     this.audioPreference = ko.observable(AudioPreference.ALL);
     this.audioPreference.subscribe(audioPreference => {
       if (audioPreference === AudioPreference.NONE) {
-        this._stopAll();
+        this.stopAll();
       }
     });
     this.muted = true;
-    this._subscribeToEvents();
+    this.subscribeToEvents();
   }
 
-  _canPlaySound(audioId: AudioType): number {
+  private canPlaySound(audioId: AudioType): number {
     if (this.muted && !AudioPlayingType.MUTED.includes(audioId)) {
       return AUDIO_PLAY_PERMISSION.DISALLOWED_BY_MUTE_STATE;
     }
@@ -70,7 +70,7 @@ export class AudioRepository {
     return AUDIO_PLAY_PERMISSION.ALLOWED;
   }
 
-  _createAudioElement(sourcePath: string, preload: boolean): HTMLAudioElement {
+  private createAudioElement(sourcePath: string, preload: boolean): HTMLAudioElement {
     const audioElement = new Audio();
     audioElement.preload = preload ? 'auto' : 'none';
     if (preload) {
@@ -80,19 +80,45 @@ export class AudioRepository {
     return audioElement;
   }
 
-  _getSoundById(audioId: AudioType): HTMLAudioElement {
+  private getSoundById(audioId: AudioType): HTMLAudioElement {
     return this.audioElements[audioId];
   }
 
-  _initSounds(preload: boolean): void {
+  private initSounds(preload: boolean): void {
     Object.values(AudioType).forEach(audioId => {
-      this.audioElements[audioId] = this._createAudioElement(`/audio/${audioId}.mp3`, preload);
+      this.audioElements[audioId] = this.createAudioElement(`/audio/${audioId}.mp3`, preload);
     });
 
     this.logger.info(`Sounds initialized (preload: '${preload}')`);
   }
 
-  _play(audioElement: HTMLAudioElement, playInLoop: boolean = false): Promise<void> {
+  private stopAll(): void {
+    Object.keys(this.audioElements).forEach((audioId: AudioType) =>
+      this.stopAudio(this.audioElements[audioId], audioId),
+    );
+  }
+
+  private subscribeToAudioEvents(): void {
+    amplify.subscribe(WebAppEvents.AUDIO.PLAY, this.play.bind(this));
+    amplify.subscribe(WebAppEvents.AUDIO.STOP, this.stop.bind(this));
+  }
+
+  private subscribeToEvents(): void {
+    amplify.subscribe(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, this.setMutedState.bind(this));
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, this.updatedProperties.bind(this));
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.SOUND_ALERTS, this.setAudioPreference.bind(this));
+  }
+
+  init(preload: boolean = false): void {
+    this.initSounds(preload);
+    this.subscribeToAudioEvents();
+  }
+
+  loop(audioId: AudioType): Promise<void> {
+    return this.play(audioId, true);
+  }
+
+  private playAudio(audioElement: HTMLAudioElement, playInLoop: boolean = false): Promise<void> {
     if (!audioElement.paused) {
       // element already playing, nothing to do
       return Promise.resolve();
@@ -109,40 +135,16 @@ export class AudioRepository {
     return playPromise || Promise.resolve();
   }
 
-  _stopAll(): void {
-    Object.keys(this.audioElements).forEach((audioId: AudioType) => this._stop(this.audioElements[audioId], audioId));
-  }
-
-  _subscribeToAudioEvents(): void {
-    amplify.subscribe(WebAppEvents.AUDIO.PLAY, this.play.bind(this));
-    amplify.subscribe(WebAppEvents.AUDIO.STOP, this.stop.bind(this));
-  }
-
-  _subscribeToEvents(): void {
-    amplify.subscribe(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, this.setMutedState.bind(this));
-    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, this.updatedProperties.bind(this));
-    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.SOUND_ALERTS, this.setAudioPreference.bind(this));
-  }
-
-  init(preload: boolean = false): void {
-    this._initSounds(preload);
-    this._subscribeToAudioEvents();
-  }
-
-  loop(audioId: AudioType): Promise<void> {
-    return this.play(audioId, true);
-  }
-
   play(audioId: AudioType, playInLoop: boolean = false): Promise<void> {
-    const audioElement = this._getSoundById(audioId);
+    const audioElement = this.getSoundById(audioId);
     if (!audioElement) {
       this.logger.error(`Failed to play '${audioId}': sound not found`);
       return Promise.resolve();
     }
 
-    switch (this._canPlaySound(audioId)) {
+    switch (this.canPlaySound(audioId)) {
       case AUDIO_PLAY_PERMISSION.ALLOWED:
-        return this._play(audioElement, playInLoop)
+        return this.playAudio(audioElement, playInLoop)
           .then(() => {
             this.logger.info(`Playing sound '${audioId}' (loop: '${playInLoop}')`);
           })
@@ -179,14 +181,8 @@ export class AudioRepository {
   }
 
   stop(audioId: AudioType): void {
-    const audioElement = this._getSoundById(audioId);
-    if (audioElement) {
-      this._stop(audioElement, audioId);
-    }
-  }
-
-  _stop(audioElement: HTMLAudioElement, audioId: AudioType): void {
-    if (!audioElement.paused) {
+    const audioElement = this.getSoundById(audioId);
+    if (audioElement && !audioElement.paused) {
       this.logger.info(`Stopping sound '${audioId}'`);
       audioElement.pause();
     }
