@@ -53,8 +53,8 @@ import {BackendClient} from '../service/BackendClient';
 import {StorageService} from '../storage';
 
 export class ClientRepository {
-  private readonly clientService: ClientService;
-  private readonly cryptographyRepository: CryptographyRepository;
+  readonly clientService: ClientService;
+  readonly cryptographyRepository: CryptographyRepository;
   selfUser: ko.Observable<User>;
   logger: Logger;
   clients: ko.PureComputed<any[]>;
@@ -106,7 +106,7 @@ export class ClientRepository {
   //##############################################################################
 
   deleteClientFromDb(userId: string, clientId: string): Promise<string> {
-    return this.clientService.deleteClientFromDb(this._constructPrimaryKey(userId, clientId));
+    return this.clientService.deleteClientFromDb(this.constructPrimaryKey(userId, clientId));
   }
 
   /**
@@ -179,13 +179,12 @@ export class ClientRepository {
 
   /**
    * Construct the primary key to store clients in database.
-   * @private
    *
    * @param userId User ID from the owner of the client
    * @param clientId ID of the client
    * @returns Primary key
    */
-  _constructPrimaryKey(userId: string, clientId: string): string {
+  private constructPrimaryKey(userId: string, clientId: string): string {
     if (!userId) {
       throw new z.error.ClientError(z.error.ClientError.TYPE.NO_USER_ID);
     }
@@ -198,13 +197,12 @@ export class ClientRepository {
   /**
    * Save the a client into the database.
    *
-   * @private
    * @param userId ID of user client to be stored belongs to
    * @param clientPayload Client data to be stored in database
    * @returns Resolves with the record stored in database
    */
-  saveClientInDb(userId: string, clientPayload: any): Promise<any> {
-    const primaryKey = this._constructPrimaryKey(userId, clientPayload.id);
+  private saveClientInDb(userId: string, clientPayload: any): Promise<any> {
+    const primaryKey = this.constructPrimaryKey(userId, clientPayload.id);
     return this.clientService.saveClientInDb(primaryKey, clientPayload);
   }
 
@@ -218,7 +216,7 @@ export class ClientRepository {
    * @returns Number of updated records
    */
   updateClientInDb(userId: string, clientId: string, changes: Record<string, any>): Promise<number> {
-    const primaryKey = this._constructPrimaryKey(userId, clientId);
+    const primaryKey = this.constructPrimaryKey(userId, clientId);
     // Preserve primary key on update
     changes.meta.primary_key = primaryKey;
     return this.clientService.updateClientInDb(primaryKey, changes);
@@ -242,11 +240,10 @@ export class ClientRepository {
   /**
    * Save the local client into the database.
    *
-   * @private
    * @param clientPayload Client data to be stored in database
    * @returns Resolves with the record stored in database
    */
-  _saveCurrentClientInDb(clientPayload: any): Promise<any> {
+  private saveCurrentClientInDb(clientPayload: any): Promise<any> {
     clientPayload.meta = {is_verified: true};
     return this.clientService.saveClientInDb(ClientRepository.PRIMARY_KEY_CURRENT_CLIENT, clientPayload);
   }
@@ -254,15 +251,14 @@ export class ClientRepository {
   /**
    * Updates a client payload if it does not fit the current database structure.
    *
-   * @private
    * @param  userId User ID of the client owner
    * @param clientPayload Client data to be stored in database
    * @returns Resolves with the record stored in database
    */
-  _updateClientSchemaInDb(userId: string, clientPayload: any): Promise<any> {
+  private updateClientSchemaInDb(userId: string, clientPayload: any): Promise<any> {
     clientPayload.meta = {
       is_verified: false,
-      primary_key: this._constructPrimaryKey(userId, clientPayload.id),
+      primary_key: this.constructPrimaryKey(userId, clientPayload.id),
     };
     return this.saveClientInDb(userId, clientPayload);
   }
@@ -277,7 +273,7 @@ export class ClientRepository {
    * @param clientType Temporary or permanent client type
    * @returns Cookie label
    */
-  constructCookieLabel(login: string, clientType = this._loadCurrentClientType()): string {
+  constructCookieLabel(login: string, clientType = this.loadCurrentClientType()): string {
     const loginHash = murmurhash3(login || this.selfUser().id, 42);
     return `webapp@${loginHash}@${clientType}@${Date.now()}`;
   }
@@ -288,7 +284,7 @@ export class ClientRepository {
    * @param clientType Temporary or permanent client type
    * @returns Cookie label key
    */
-  constructCookieLabelKey(login: string, clientType: ClientType = this._loadCurrentClientType()): string {
+  constructCookieLabelKey(login: string, clientType: ClientType = this.loadCurrentClientType()): string {
     const loginHash = murmurhash3(login || this.selfUser().id, 42);
     return `${StorageKey.AUTH.COOKIE_LABEL}@${loginHash}@${clientType}`;
   }
@@ -323,11 +319,11 @@ export class ClientRepository {
    * @returns Resolves with the newly registered client
    */
   registerClient(password?: string): Promise<ko.Observable<ClientEntity>> {
-    const clientType = this._loadCurrentClientType();
+    const clientType = this.loadCurrentClientType();
 
     return this.cryptographyRepository
       .generateClientKeys()
-      .then(keys => this.clientService.postClients(this._createRegistrationPayload(clientType, password, keys)))
+      .then(keys => this.clientService.postClients(this.createRegistrationPayload(clientType, password, keys)))
       .catch(error => {
         const tooManyClients = error.label === BackendClientError.LABEL.TOO_MANY_CLIENTS;
         if (tooManyClients) {
@@ -341,7 +337,7 @@ export class ClientRepository {
         this.logger.info(`Registered '${type}' client '${id}' with cookie label '${cookie}'`, response);
         const currentClient = ClientMapper.mapClient(response, true);
         this.currentClient(currentClient);
-        return this._saveCurrentClientInDb(response);
+        return this.saveCurrentClientInDb(response);
       })
       .catch(error => {
         const handledErrors = [z.error.ClientError.TYPE.REQUEST_FAILURE, z.error.ClientError.TYPE.TOO_MANY_CLIENTS];
@@ -352,7 +348,7 @@ export class ClientRepository {
         this.logger.error(`Failed to save client: ${error.message}`, error);
         throw new z.error.ClientError(z.error.ClientError.TYPE.DATABASE_FAILURE);
       })
-      .then(clientPayload => this._transferCookieLabel(clientType, clientPayload.cookie))
+      .then(clientPayload => this.transferCookieLabel(clientType, clientPayload.cookie))
       .then(() => this.currentClient)
       .catch(error => {
         this.logger.error(`Client registration failed: ${error.message}`, error);
@@ -363,13 +359,12 @@ export class ClientRepository {
   /**
    * Create payload for client registration.
    *
-   * @private
    * @param clientType Type of client to be registered
    * @param password User password
    * @param keys Last resort key, pre-keys and signaling keys
    * @returns Payload to register client with backend
    */
-  _createRegistrationPayload(
+  private createRegistrationPayload(
     clientType: ClientType,
     password: string,
     [lastResortKey, preKeys, signalingKeys]: [PreKey, PreKey[], PreKey[]],
@@ -401,7 +396,7 @@ export class ClientRepository {
 
     return {
       class: ClientClassification.DESKTOP,
-      cookie: this._getCookieLabelValue(this.selfUser().email() || this.selfUser().phone()),
+      cookie: this.getCookieLabelValue(this.selfUser().email() || this.selfUser().phone()),
       label: deviceLabel,
       lastkey: lastResortKey,
       model: deviceModel,
@@ -414,23 +409,21 @@ export class ClientRepository {
 
   /**
    * Gets the value for a cookie label.
-   * @private
    * @param login - Email or phone number of the user
    * @returns Cookie label
    */
-  _getCookieLabelValue(login: string): string {
+  private getCookieLabelValue(login: string): string {
     return loadValue(this.constructCookieLabelKey(login));
   }
 
   /**
    * Loads the cookie label value from the Local Storage and saves it into IndexedDB.
    *
-   * @private
    * @param clientType Temporary or permanent client type
    * @param cookieLabel Cookie label, something like "webapp@2153234453@temporary@145770538393"
    * @returns Resolves with the key of the stored cookie label
    */
-  _transferCookieLabel(clientType: ClientType, cookieLabel: string): Promise<string> {
+  private transferCookieLabel(clientType: ClientType, cookieLabel: string): Promise<string> {
     const indexedDbKey = StorageKey.AUTH.COOKIE_LABEL;
     const userIdentifier = this.selfUser().email() || this.selfUser().phone();
     const localStorageKey = this.constructCookieLabelKey(userIdentifier, clientType);
@@ -451,10 +444,9 @@ export class ClientRepository {
 
   /**
    * Load current client type from amplify store.
-   * @private
    * @returns Type of current client
    */
-  _loadCurrentClientType(): ClientType {
+  private loadCurrentClientType(): ClientType {
     if (this.currentClient()) {
       return this.currentClient().type;
     }
@@ -546,11 +538,11 @@ export class ClientRepository {
    * @returns Resolves with an array of client entities
    */
   async getClientsByUserId(userId: string, updateClients: false): Promise<PublicClient[]>;
-  async getClientsByUserId(userId: string, updateClients?: true): Promise<ClientEntity[]>;
-  async getClientsByUserId(userId: string, updateClients = true): Promise<ClientEntity[] | PublicClient[]> {
+  async getClientsByUserId(userId: string, updateClients?: boolean): Promise<ClientEntity[]>;
+  async getClientsByUserId(userId: string, updateClients: boolean = true): Promise<ClientEntity[] | PublicClient[]> {
     const clientsData = await this.clientService.getClientsByUserId(userId);
     if (updateClients) {
-      return this._updateClientsOfUserById(userId, clientsData);
+      return this.updateClientsOfUserById(userId, clientsData);
     }
     return clientsData;
   }
@@ -596,7 +588,7 @@ export class ClientRepository {
   updateClientsForSelf(): Promise<ClientEntity[]> {
     return this.clientService
       .getClients()
-      .then(clientsData => this._updateClientsOfUserById(this.selfUser().id, clientsData, false));
+      .then(clientsData => this.updateClientsOfUserById(this.selfUser().id, clientsData, false));
   }
 
   /**
@@ -604,13 +596,12 @@ export class ClientRepository {
    * @note This function matches clients retrieved from the backend with the data stored in the local database.
    *   Clients will then be updated with the backend payload in the database and mapped into entities.
    *
-   * @private
    * @param userId ID of user whose clients are updated
    * @param clientsData Clients data from backend
    * @param publish Change clients using amplify
    * @returns Resolves with the entities once clients have been updated
    */
-  _updateClientsOfUserById(
+  private updateClientsOfUserById(
     userId: string,
     clientsData: RegisteredClient[] | PublicClient[],
     publish: boolean = true,
@@ -637,7 +628,7 @@ export class ClientRepository {
 
             delete clientsFromBackend[clientId];
 
-            if (this.currentClient() && this._isCurrentClient(userId, clientId)) {
+            if (this.currentClient() && this.isCurrentClient(userId, clientId)) {
               this.logger.warn(`Removing duplicate self client '${clientId}' locally`);
               this.removeClient(userId, clientId);
             }
@@ -662,7 +653,7 @@ export class ClientRepository {
         for (const clientId in clientsFromBackend) {
           const clientPayload = clientsFromBackend[clientId];
 
-          if (this.currentClient() && this._isCurrentClient(userId, clientId)) {
+          if (this.currentClient() && this.isCurrentClient(userId, clientId)) {
             continue;
           }
 
@@ -671,7 +662,7 @@ export class ClientRepository {
           if (this.selfUser().id === userId) {
             this.onClientAdd({client: clientPayload as RegisteredClient});
           }
-          promises.push(this._updateClientSchemaInDb(userId, clientPayload));
+          promises.push(this.updateClientSchemaInDb(userId, clientPayload));
         }
 
         return Promise.all(promises);
@@ -692,12 +683,11 @@ export class ClientRepository {
   /**
    * Check if client is current local client.
    *
-   * @private
    * @param userId User ID to be checked
    * @param clientId ID of client to be checked
    * @returnsIs the client the current local client
    */
-  _isCurrentClient(userId: string, clientId: string): boolean {
+  private isCurrentClient(userId: string, clientId: string): boolean {
     if (!this.currentClient()) {
       throw new z.error.ClientError(z.error.ClientError.TYPE.CLIENT_NOT_SET);
     }

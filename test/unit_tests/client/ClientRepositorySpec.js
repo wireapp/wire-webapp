@@ -23,6 +23,7 @@ import {Environment} from 'src/script/util/Environment';
 import {ClientRepository} from 'src/script/client/ClientRepository';
 import {ClientType} from 'src/script/client/ClientType';
 import {ClientEntity} from 'src/script/client/ClientEntity';
+import {ClientMapper} from 'src/script/client/ClientMapper';
 
 describe('ClientRepository', () => {
   const testFactory = new TestFactory();
@@ -179,7 +180,7 @@ describe('ClientRepository', () => {
 
     it('returns true on Electron', () => {
       const clientPayload = {type: ClientType.PERMANENT};
-      const clientEntity = TestFactory.client_repository.clientMapper.mapClient(clientPayload, true);
+      const clientEntity = ClientMapper.mapClient(clientPayload, true);
       TestFactory.client_repository.currentClient(clientEntity);
       Environment.electron = true;
       TestFactory.client_repository.__test__assignEnvironment(Environment);
@@ -190,7 +191,7 @@ describe('ClientRepository', () => {
 
     it('returns true on Electron even if client is temporary', () => {
       const clientPayload = {type: ClientType.TEMPORARY};
-      const clientEntity = TestFactory.client_repository.clientMapper.mapClient(clientPayload, true);
+      const clientEntity = ClientMapper.mapClient(clientPayload, true);
       TestFactory.client_repository.currentClient(clientEntity);
       Environment.electron = true;
       TestFactory.client_repository.__test__assignEnvironment(Environment);
@@ -209,7 +210,7 @@ describe('ClientRepository', () => {
 
     it('returns true if current client is permanent', () => {
       const clientPayload = {type: ClientType.PERMANENT};
-      const clientEntity = TestFactory.client_repository.clientMapper.mapClient(clientPayload, true);
+      const clientEntity = ClientMapper.mapClient(clientPayload, true);
       TestFactory.client_repository.currentClient(clientEntity);
       const isPermanent = TestFactory.client_repository.isCurrentClientPermanent();
 
@@ -218,7 +219,7 @@ describe('ClientRepository', () => {
 
     it('returns false if current client is temporary', () => {
       const clientPayload = {type: ClientType.TEMPORARY};
-      const clientEntity = TestFactory.client_repository.clientMapper.mapClient(clientPayload, true);
+      const clientEntity = ClientMapper.mapClient(clientPayload, true);
       TestFactory.client_repository.currentClient(clientEntity);
       const isPermanent = TestFactory.client_repository.isCurrentClientPermanent();
 
