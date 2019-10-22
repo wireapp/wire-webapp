@@ -18,7 +18,7 @@
  */
 import {COLOR, ContainerXS, H2, Text} from '@wireapp/react-ui-kit';
 import React from 'react';
-import {FormattedHTMLMessage, InjectedIntlProps, injectIntl} from 'react-intl';
+import {FormattedHTMLMessage, useIntl} from 'react-intl';
 import {conversationJoinStrings} from '../../strings';
 import UnsupportedBrowser from '../component/UnsupportedBrowser';
 import WirelessContainer from '../component/WirelessContainer';
@@ -26,13 +26,8 @@ import {Config} from '../config';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
-interface ConnectedProps {}
-
-interface DispatchProps {}
-
-const ConversationJoinInvalid = ({
-  intl: {formatMessage: _},
-}: Props & ConnectedProps & DispatchProps & InjectedIntlProps) => {
+const ConversationJoinInvalid = ({}: Props) => {
+  const {formatMessage: _} = useIntl();
   return (
     <UnsupportedBrowser isTemporaryGuest>
       <WirelessContainer>
@@ -56,4 +51,4 @@ const ConversationJoinInvalid = ({
   );
 };
 
-export default injectIntl(ConversationJoinInvalid);
+export default ConversationJoinInvalid;
