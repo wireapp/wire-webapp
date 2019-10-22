@@ -18,45 +18,48 @@
  */
 
 import {Button, COLOR, Column, Columns, Container, H3, Link, Modal, Text} from '@wireapp/react-ui-kit';
-import * as React from 'react';
-import {FormattedHTMLMessage, InjectedIntlProps, injectIntl} from 'react-intl';
+import React from 'react';
+import {FormattedHTMLMessage, useIntl} from 'react-intl';
 import {acceptNewsModalStrings} from '../../strings';
 import {Config} from '../config';
 import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
 
-export interface Props extends React.HTMLAttributes<HTMLDivElement> {
+export interface Props extends React.HTMLProps<HTMLDivElement> {
   onConfirm: (event: React.MouseEvent<HTMLButtonElement>) => void;
   onDecline: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
-const AcceptNewsModal: React.SFC<Props & InjectedIntlProps> = ({onConfirm, onDecline, intl: {formatMessage: _}}) => (
-  <Modal>
-    <Container style={{maxWidth: '400px'}} data-uie-name="modal-marketing-consent">
-      <H3 style={{fontWeight: 500, marginTop: '10px'}} data-uie-name="modal-marketing-consent-title">
-        {_(acceptNewsModalStrings.headline, {brandName: Config.BRAND_NAME})}
-      </H3>
-      <div data-uie-name="modal-marketing-consent-description">
-        <Text block>{_(acceptNewsModalStrings.unsubscribeDescription)}</Text>
-        <Link href={EXTERNAL_ROUTE.WIRE_PRIVACY_POLICY} target="_blank" data-uie-name="go-privacy">
-          <Text block>
-            <FormattedHTMLMessage {...acceptNewsModalStrings.privacyDescription} />
-          </Text>
-        </Link>
-      </div>
-      <Columns style={{margin: '20px 0 10px'}}>
-        <Column style={{textAlign: 'center'}}>
-          <Button onClick={onDecline} backgroundColor={COLOR.GRAY} data-uie-name="do-decline-marketing-consent">
-            {_(acceptNewsModalStrings.declineButton)}
-          </Button>
-        </Column>
-        <Column style={{textAlign: 'center'}}>
-          <Button onClick={onConfirm} data-uie-name="do-confirm-marketing-consent">
-            {_(acceptNewsModalStrings.confirmButton)}
-          </Button>
-        </Column>
-      </Columns>
-    </Container>
-  </Modal>
-);
+const AcceptNewsModal = ({onConfirm, onDecline}: Props) => {
+  const {formatMessage: _} = useIntl();
+  return (
+    <Modal>
+      <Container style={{maxWidth: '400px'}} data-uie-name="modal-marketing-consent">
+        <H3 style={{fontWeight: 500, marginTop: '10px'}} data-uie-name="modal-marketing-consent-title">
+          {_(acceptNewsModalStrings.headline, {brandName: Config.BRAND_NAME})}
+        </H3>
+        <div data-uie-name="modal-marketing-consent-description">
+          <Text block>{_(acceptNewsModalStrings.unsubscribeDescription)}</Text>
+          <Link href={EXTERNAL_ROUTE.WIRE_PRIVACY_POLICY} target="_blank" data-uie-name="go-privacy">
+            <Text block>
+              <FormattedHTMLMessage {...acceptNewsModalStrings.privacyDescription} />
+            </Text>
+          </Link>
+        </div>
+        <Columns style={{margin: '20px 0 10px'}}>
+          <Column style={{textAlign: 'center'}}>
+            <Button onClick={onDecline} backgroundColor={COLOR.GRAY} data-uie-name="do-decline-marketing-consent">
+              {_(acceptNewsModalStrings.declineButton)}
+            </Button>
+          </Column>
+          <Column style={{textAlign: 'center'}}>
+            <Button onClick={onConfirm} data-uie-name="do-confirm-marketing-consent">
+              {_(acceptNewsModalStrings.confirmButton)}
+            </Button>
+          </Column>
+        </Columns>
+      </Container>
+    </Modal>
+  );
+};
 
-export default injectIntl(AcceptNewsModal);
+export default AcceptNewsModal;
