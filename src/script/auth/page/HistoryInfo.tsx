@@ -21,12 +21,11 @@ import {Button, ContainerXS, H1, Link, Paragraph} from '@wireapp/react-ui-kit';
 import React from 'react';
 import {FormattedHTMLMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
-import {AnyAction, Dispatch} from 'redux';
 import useReactRouter from 'use-react-router';
 import {historyInfoStrings} from '../../strings';
 import {Config} from '../config';
 import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
-import {RootState, bindActionCreators} from '../module/reducer';
+import {RootState} from '../module/reducer';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import * as SelfSelector from '../module/selector/SelfSelector';
 import {ROUTE} from '../route';
@@ -35,7 +34,7 @@ import Page from './Page';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
-const HistoryInfo = ({hasHistory, hasSelfHandle}: Props & ConnectedProps & DispatchProps) => {
+const HistoryInfo = ({hasHistory, hasSelfHandle}: Props & ConnectedProps) => {
   const {formatMessage: _} = useIntl();
   const {history} = useReactRouter();
   const onContinue = () => {
@@ -87,10 +86,4 @@ const mapStateToProps = (state: RootState) => ({
   hasSelfHandle: SelfSelector.hasSelfHandle(state),
 });
 
-type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => bindActionCreators({}, dispatch);
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(HistoryInfo);
+export default connect(mapStateToProps)(HistoryInfo);
