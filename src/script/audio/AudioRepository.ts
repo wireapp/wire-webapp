@@ -93,9 +93,7 @@ export class AudioRepository {
   }
 
   private stopAll(): void {
-    Object.keys(this.audioElements).forEach((audioId: AudioType) =>
-      this.stopAudio(this.audioElements[audioId], audioId),
-    );
+    Object.keys(this.audioElements).forEach((audioId: AudioType) => this.stop(audioId));
   }
 
   private subscribeToAudioEvents(): void {
