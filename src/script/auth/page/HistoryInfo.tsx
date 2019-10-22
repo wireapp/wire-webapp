@@ -18,10 +18,10 @@
  */
 
 import {Button, ContainerXS, H1, Link, Paragraph} from '@wireapp/react-ui-kit';
-import * as React from 'react';
-import {FormattedHTMLMessage, InjectedIntlProps, injectIntl} from 'react-intl';
+import React from 'react';
+import {FormattedHTMLMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
-import {RouteComponentProps, withRouter} from 'react-router';
+import useReactRouter from 'use-react-router';
 import {historyInfoStrings} from '../../strings';
 import {Config} from '../config';
 import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
@@ -32,21 +32,11 @@ import {ROUTE} from '../route';
 import * as URLUtil from '../util/urlUtil';
 import Page from './Page';
 
-interface Props extends React.HTMLProps<HTMLDivElement>, RouteComponentProps {}
+interface Props extends React.HTMLProps<HTMLDivElement> {}
 
-interface ConnectedProps {
-  hasHistory: boolean;
-  hasSelfHandle: boolean;
-}
-
-interface DispatchProps {}
-
-const HistoryInfo: React.SFC<Props & ConnectedProps & DispatchProps & InjectedIntlProps> = ({
-  hasHistory,
-  hasSelfHandle,
-  history,
-  intl: {formatMessage: _},
-}) => {
+const HistoryInfo = ({hasHistory, hasSelfHandle}: Props & ConnectedProps) => {
+  const {formatMessage: _} = useIntl();
+  const {history} = useReactRouter();
   const onContinue = () => {
     return hasSelfHandle
       ? window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP))
@@ -90,13 +80,10 @@ const HistoryInfo: React.SFC<Props & ConnectedProps & DispatchProps & InjectedIn
   );
 };
 
-export default withRouter(
-  injectIntl(
-    connect(
-      (state: RootState): ConnectedProps => ({
-        hasHistory: ClientSelector.hasHistory(state),
-        hasSelfHandle: SelfSelector.hasSelfHandle(state),
-      }),
-    )(HistoryInfo),
-  ),
-);
+type ConnectedProps = ReturnType<typeof mapStateToProps>;
+const mapStateToProps = (state: RootState) => ({
+  hasHistory: ClientSelector.hasHistory(state),
+  hasSelfHandle: SelfSelector.hasSelfHandle(state),
+});
+
+export default connect(mapStateToProps)(HistoryInfo);

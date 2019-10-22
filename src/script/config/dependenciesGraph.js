@@ -29,8 +29,6 @@ import {GiphyService} from '../extension/GiphyService';
 import {MediaRepository} from '../media/MediaRepository';
 import {MessageSender} from '../message/MessageSender';
 import {PermissionRepository} from '../permission/PermissionRepository';
-import {PropertiesRepository} from '../properties/PropertiesRepository';
-import {PropertiesService} from '../properties/PropertiesService';
 import {RichProfileRepository} from '../user/RichProfileRepository';
 import {SelfService} from '../self/SelfService';
 import {StorageService} from '../storage/StorageService';
@@ -54,8 +52,6 @@ dependencies.set(GiphyService, {dependencies: [BackendClient], name: 'GiphyServi
 dependencies.set(MediaRepository, {dependencies: [PermissionRepository], name: 'MediaRepository'});
 dependencies.set(MessageSender, {dependencies: [], name: 'MessageSender'});
 dependencies.set(PermissionRepository, {dependencies: [], name: 'PermissionRepository'});
-dependencies.set(PropertiesRepository, {dependencies: [PropertiesService, SelfService], name: 'PropertiesRepository'});
-dependencies.set(PropertiesService, {dependencies: [BackendClient], name: 'PropertiesService'});
 dependencies.set(RichProfileRepository, {dependencies: [BackendClient], name: 'RichProfileRepository'});
 dependencies.set(SelfService, {dependencies: [BackendClient], name: 'SelfService'});
 dependencies.set(StorageService, {dependencies: [], name: 'StorageService'});
@@ -75,7 +71,6 @@ export {
   MessageSender,
   RichProfileRepository,
   PermissionRepository,
-  PropertiesRepository,
   SelfService,
   StorageService,
   UserService,
