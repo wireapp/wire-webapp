@@ -21,7 +21,7 @@ import platform from 'platform';
 
 import {ClientClassification} from '@wireapp/api-client/dist/commonjs/client/';
 import {getLogger} from 'Util/Logger';
-import {loadValue} from 'Util/StorageUtil';
+import {loadValue, storeValue} from 'Util/StorageUtil';
 import {t} from 'Util/LocalizerUtil';
 import {murmurhash3} from 'Util/util';
 import {Environment} from 'Util/Environment';
@@ -411,7 +411,7 @@ export class ClientRepository {
     if (cookieLabel === undefined) {
       cookieLabel = this.constructCookieLabel(userIdentifier, clientType);
       this.logger.warn(`Cookie label is in an invalid state. We created a new one: '${cookieLabel}'`);
-      loadValue(localStorageKey, cookieLabel);
+      storeValue(localStorageKey, cookieLabel);
     }
 
     this.logger.info(`Saving cookie label '${cookieLabel}' in IndexedDB`, {
