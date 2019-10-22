@@ -20,6 +20,7 @@
 import {resolve, graph} from './../../api/testResolver';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {PropertiesService} from 'src/script/properties/PropertiesService';
+import {SelfService} from 'src/script/self/SelfService';
 
 describe('PropertiesRepository', () => {
   let propertiesRepository = undefined;
@@ -27,7 +28,8 @@ describe('PropertiesRepository', () => {
 
   beforeEach(() => {
     const propertiesService = new PropertiesService(backendClient);
-    propertiesRepository = new PropertiesRepository(propertiesService);
+    const selfService = new SelfService(backendClient);
+    propertiesRepository = new PropertiesRepository(propertiesService, selfService);
   });
 
   describe('deleteProperty', () => {

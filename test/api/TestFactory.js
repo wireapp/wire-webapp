@@ -53,6 +53,8 @@ import {ConversationRepository} from 'src/script/conversation/ConversationReposi
 import {SelfService} from 'src/script/self/SelfService';
 import {LinkPreviewRepository} from 'src/script/links/LinkPreviewRepository';
 import {AssetService} from 'src/script/assets/AssetService';
+import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
+import {PropertiesService} from 'src/script/properties/PropertiesService';
 
 window.testConfig = {
   connection: backendConfig,
@@ -214,7 +216,10 @@ window.TestFactory = class TestFactory {
     TestFactory.asset_service = resolveDependency(graph.AssetService);
     TestFactory.connection_service = new ConnectionService(resolveDependency(graph.BackendClient));
     TestFactory.user_service = resolveDependency(graph.UserService);
-    TestFactory.propertyRepository = resolveDependency(graph.PropertiesRepository);
+    TestFactory.propertyRepository = TestFactory.propertyRepository = new PropertiesRepository(
+      new PropertiesService(resolveDependency(graph.BackendClient)),
+      new SelfService(resolveDependency(graph.BackendClient)),
+    );
 
     TestFactory.user_repository = new UserRepository(
       TestFactory.user_service,
@@ -292,6 +297,11 @@ window.TestFactory = class TestFactory {
       TestFactory.storage_service,
     );
 
+    const propertiesRepository = new PropertiesRepository(
+      new PropertiesService(resolveDependency(graph.BackendClient)),
+      new SelfService(resolveDependency(graph.BackendClient)),
+    );
+
     TestFactory.conversation_repository = new ConversationRepository(
       TestFactory.conversation_service,
       TestFactory.asset_service,
@@ -300,10 +310,7 @@ window.TestFactory = class TestFactory {
       TestFactory.cryptography_repository,
       TestFactory.event_repository,
       undefined,
-      new LinkPreviewRepository(
-        new AssetService(resolveDependency(graph.BackendClient)),
-        resolveDependency(graph.PropertiesRepository),
-      ),
+      new LinkPreviewRepository(new AssetService(resolveDependency(graph.BackendClient)), propertiesRepository),
       resolveDependency(graph.MessageSender),
       serverTimeHandler,
       TestFactory.team_repository,
