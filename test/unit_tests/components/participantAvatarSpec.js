@@ -33,28 +33,6 @@ describe('participant-avatar', () => {
     });
   });
 
-  it("loads user's preview avatar when element is visible for LowDPI", () => {
-    const viewModel = {participant: new User()};
-    const avatarPreview = AssetRemoteData.v3();
-    window.devicePixelRatio = 1;
-    viewModel.participant.previewPictureResource(avatarPreview);
-
-    spyOn(avatarPreview, 'getObjectUrl').and.returnValue(Promise.resolve('/avatar'));
-
-    return instantiateComponent('participant-avatar', viewModel).then(domContainer => {
-      return new Promise(resolve => {
-        setTimeout(() => {
-          expect(avatarPreview.getObjectUrl).toHaveBeenCalled();
-
-          const imageElement = domContainer.querySelector('.avatar-image img');
-
-          expect(imageElement.src).toContain('/avatar');
-          resolve();
-        }, 20);
-      });
-    });
-  });
-
   it("loads user's medium avatar when element is visible for HiDPI", () => {
     const viewModel = {participant: new User()};
     const avatarPreview = AssetRemoteData.v3();
