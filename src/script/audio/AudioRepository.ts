@@ -17,41 +17,42 @@
  *
  */
 
+import {WebappProperties} from '@wireapp/api-client/dist/commonjs/user/data';
 import {amplify} from 'amplify';
-import {AudioType} from './AudioType';
+import ko from 'knockout';
+import {Logger} from 'logdown';
+import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
+import {WebAppEvents} from '../event/WebApp';
 import {AudioPlayingType} from './AudioPlayingType';
 import {AudioPreference} from './AudioPreference';
-import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
+import {AudioType} from './AudioType';
 
-import {WebAppEvents} from '../event/WebApp';
-
-const AUDIO_PLAY_PERMISSION = {
-  ALLOWED: 0,
-  DISALLOWED_BY_MUTE_STATE: 3,
-  DISALLOWED_BY_PREFERENCES: 2,
-};
+enum AUDIO_PLAY_PERMISSION {
+  ALLOWED = 0,
+  DISALLOWED_BY_MUTE_STATE = 3,
+  DISALLOWED_BY_PREFERENCES = 2,
+}
 
 export class AudioRepository {
-  constructor(logger) {
+  private readonly logger: Logger;
+  private readonly audioElements: Record<string, HTMLAudioElement>;
+  private readonly audioPreference: ko.Observable<AudioPreference>;
+  private muted: boolean;
+
+  constructor(logger: Logger) {
     this.logger = logger;
     this.audioElements = {};
     this.audioPreference = ko.observable(AudioPreference.ALL);
     this.audioPreference.subscribe(audioPreference => {
       if (audioPreference === AudioPreference.NONE) {
-        this._stopAll();
+        this.stopAll();
       }
     });
     this.muted = true;
-    this._subscribeToEvents();
+    this.subscribeToEvents();
   }
 
-  /**
-   * Check if sound should be played with current setting.
-   * @private
-   * @param {AudioType} audioId - Sound identifier
-   * @returns {AUDIO_PLAY_PERMISSION} Is the sound allowed to be played
-   */
-  _canPlaySound(audioId) {
+  private canPlaySound(audioId: AudioType): AUDIO_PLAY_PERMISSION {
     if (this.muted && !AudioPlayingType.MUTED.includes(audioId)) {
       return AUDIO_PLAY_PERMISSION.DISALLOWED_BY_MUTE_STATE;
     }
@@ -69,14 +70,7 @@ export class AudioRepository {
     return AUDIO_PLAY_PERMISSION.ALLOWED;
   }
 
-  /**
-   * Create HTMLAudioElement.
-   * @private
-   * @param {string} sourcePath - Source for HTMLAudioElement
-   * @param {boolean} preload - Should sounds be pre-loaded with `false` as default
-   * @returns {HTMLAudioElement} Returns the audio element.
-   */
-  _createAudioElement(sourcePath, preload) {
+  private createAudioElement(sourcePath: string, preload: boolean): HTMLAudioElement {
     const audioElement = new Audio();
     audioElement.preload = preload ? 'auto' : 'none';
     if (preload) {
@@ -86,38 +80,43 @@ export class AudioRepository {
     return audioElement;
   }
 
-  /**
-   * Get the sound object
-   * @private
-   * @param {AudioType} audioId - Sound identifier
-   * @returns {Promise} Resolves with the HTMLAudioElement.
-   */
-  _getSoundById(audioId) {
+  private getSoundById(audioId: AudioType): HTMLAudioElement {
     return this.audioElements[audioId];
   }
 
-  /**
-   * Initialize all sounds.
-   * @private
-   * @param {boolean} preload - Should sounds be pre-loaded
-   * @returns {undefined} No return value
-   */
-  _initSounds(preload) {
+  private initSounds(preload: boolean): void {
     Object.values(AudioType).forEach(audioId => {
-      this.audioElements[audioId] = this._createAudioElement(`/audio/${audioId}.mp3`, preload);
+      this.audioElements[audioId] = this.createAudioElement(`/audio/${audioId}.mp3`, preload);
     });
 
     this.logger.info(`Sounds initialized (preload: '${preload}')`);
   }
 
-  /**
-   * Start playback of a sound.
-   * @private
-   * @param {HTMLAudioElement} audioElement - AudioElement to play
-   * @param {boolean} playInLoop - Play sound in loop
-   * @returns {Promise} Resolves with the HTMLAudioElement
-   */
-  _play(audioElement, playInLoop = false) {
+  private stopAll(): void {
+    Object.keys(this.audioElements).forEach((audioId: AudioType) => this.stop(audioId));
+  }
+
+  private subscribeToAudioEvents(): void {
+    amplify.subscribe(WebAppEvents.AUDIO.PLAY, this.play.bind(this));
+    amplify.subscribe(WebAppEvents.AUDIO.STOP, this.stop.bind(this));
+  }
+
+  private subscribeToEvents(): void {
+    amplify.subscribe(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, this.setMutedState.bind(this));
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, this.updatedProperties.bind(this));
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.SOUND_ALERTS, this.setAudioPreference.bind(this));
+  }
+
+  init(preload: boolean = false): void {
+    this.initSounds(preload);
+    this.subscribeToAudioEvents();
+  }
+
+  loop(audioId: AudioType): Promise<void> {
+    return this.play(audioId, true);
+  }
+
+  private playAudio(audioElement: HTMLAudioElement, playInLoop: boolean = false): Promise<void> {
     if (!audioElement.paused) {
       // element already playing, nothing to do
       return Promise.resolve();
@@ -134,72 +133,16 @@ export class AudioRepository {
     return playPromise || Promise.resolve();
   }
 
-  /**
-   * Stop all sounds playing in loop.
-   * @private
-   * @returns {undefined} No return value
-   */
-  _stopAll() {
-    Object.keys(this.audioElements).forEach(audioId => this._stop(this.audioElements[audioId], audioId));
-  }
-
-  /**
-   * Use Amplify to subscribe to all audio playback related events.
-   * @private
-   * @returns {undefined} No return value
-   */
-  _subscribeToAudioEvents() {
-    amplify.subscribe(WebAppEvents.AUDIO.PLAY, this.play.bind(this));
-    amplify.subscribe(WebAppEvents.AUDIO.STOP, this.stop.bind(this));
-  }
-
-  /**
-   * Use Amplify to subscribe to required events.
-   * @private
-   * @returns {undefined} No return value
-   */
-  _subscribeToEvents() {
-    amplify.subscribe(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, this.setMutedState.bind(this));
-    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, this.updatedProperties.bind(this));
-    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.SOUND_ALERTS, this.setAudioPreference.bind(this));
-  }
-
-  /**
-   * Initialize the repository.
-   * @param {boolean} preload - Should sounds be pre-loaded with `false` as default
-   * @returns {undefined} No return value
-   */
-  init(preload = false) {
-    this._initSounds(preload);
-    this._subscribeToAudioEvents();
-  }
-
-  /**
-   * Start playback of a sound in a loop.
-   * @note Prevent playing multiples instances of looping sounds
-   * @param {AudioType} audioId - Sound identifier
-   * @returns {undefined} No return value
-   */
-  loop(audioId) {
-    return this.play(audioId, true);
-  }
-
-  /**
-   * Start playback of a sound.
-   * @param {AudioType} audioId - Sound identifier
-   * @param {boolean} playInLoop - Play sound in loop
-   * @returns {Promise<void>} Resolves when the sound has been played (or ignored)
-   */
-  play(audioId, playInLoop = false) {
-    const audioElement = this._getSoundById(audioId);
+  play(audioId: AudioType, playInLoop: boolean = false): Promise<void> {
+    const audioElement = this.getSoundById(audioId);
     if (!audioElement) {
       this.logger.error(`Failed to play '${audioId}': sound not found`);
       return Promise.resolve();
     }
 
-    switch (this._canPlaySound(audioId)) {
+    switch (this.canPlaySound(audioId)) {
       case AUDIO_PLAY_PERMISSION.ALLOWED:
-        return this._play(audioElement, playInLoop)
+        return this.playAudio(audioElement, playInLoop)
           .then(() => {
             this.logger.info(`Playing sound '${audioId}' (loop: '${playInLoop}')`);
           })
@@ -221,11 +164,11 @@ export class AudioRepository {
     return Promise.resolve();
   }
 
-  setAudioPreference(audioPreference) {
+  setAudioPreference(audioPreference: AudioPreference): void {
     this.audioPreference(audioPreference);
   }
 
-  setMutedState(handlingNotifications) {
+  setMutedState(handlingNotifications: NOTIFICATION_HANDLING_STATE): void {
     const updatedMutedState = handlingNotifications !== NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
 
     const isStateChange = this.muted !== updatedMutedState;
@@ -235,27 +178,15 @@ export class AudioRepository {
     }
   }
 
-  stop(audioId) {
-    const audioElement = this._getSoundById(audioId);
-    if (audioElement) {
-      this._stop(audioElement, audioId);
-    }
-  }
-
-  /**
-   * Stop playback of a sound.
-   * @param {Audio} audioElement - Audio element that is playing the sound
-   * @param {AudioType} audioId - Sound identifier
-   * @returns {undefined} No return value
-   */
-  _stop(audioElement, audioId) {
-    if (!audioElement.paused) {
+  stop(audioId: AudioType): void {
+    const audioElement = this.getSoundById(audioId);
+    if (audioElement && !audioElement.paused) {
       this.logger.info(`Stopping sound '${audioId}'`);
       audioElement.pause();
     }
   }
 
-  updatedProperties(properties) {
+  updatedProperties(properties: WebappProperties): void {
     this.setAudioPreference(properties.settings.sound.alerts);
   }
 }
