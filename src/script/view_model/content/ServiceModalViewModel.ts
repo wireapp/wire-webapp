@@ -27,7 +27,7 @@ import {ActionsViewModel} from '../ActionsViewModel';
 export class ServiceModalViewModel {
   isVisible: ko.Observable<boolean>;
   service: ko.Observable<ServiceEntity>;
-  ParticipantAvatar: typeof ParticipantAvatar;
+  avatarSize: string;
 
   constructor(
     private readonly integrationRepository: IntegrationRepository,
@@ -35,7 +35,7 @@ export class ServiceModalViewModel {
   ) {
     this.isVisible = ko.observable(false);
     this.service = ko.observable(null);
-    this.ParticipantAvatar = ParticipantAvatar;
+    this.avatarSize = ParticipantAvatar.SIZE.LARGE;
   }
 
   showService = (service: ServiceEntity) => {
