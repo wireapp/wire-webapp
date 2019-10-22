@@ -19,7 +19,7 @@
 
 import {ValidationUtil} from '@wireapp/commons';
 import {Button, Checkbox, CheckboxLabel, ErrorMessage, Form, Input, InputBlock, Small} from '@wireapp/react-ui-kit';
-import * as React from 'react';
+import React from 'react';
 import {FormattedHTMLMessage, InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {accountFormStrings} from '../../strings';
