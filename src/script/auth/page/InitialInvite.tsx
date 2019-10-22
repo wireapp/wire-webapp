@@ -16,8 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-import {Self} from '@wireapp/api-client/dist/commonjs/self';
-import {TeamInvitation} from '@wireapp/api-client/dist/commonjs/team';
+
 import {
   ButtonLink,
   COLOR,
@@ -37,12 +36,13 @@ import {
 import React from 'react';
 import {InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
+import {AnyAction, Dispatch} from 'redux';
 import {inviteStrings} from '../../strings';
 import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {BackendError} from '../module/action/BackendError';
 import {ValidationError} from '../module/action/ValidationError';
-import {RootState, ThunkDispatch} from '../module/reducer';
+import {RootState, bindActionCreators} from '../module/reducer';
 import * as InviteSelector from '../module/selector/InviteSelector';
 import * as LanguageSelector from '../module/selector/LanguageSelector';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
@@ -50,19 +50,6 @@ import {pathWithParams} from '../util/urlUtil';
 import Page from './Page';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
-
-interface ConnectedProps {
-  error: Error;
-  invites: TeamInvitation[];
-  isFetching: boolean;
-  language: string;
-}
-
-interface DispatchProps {
-  fetchSelf: () => Promise<Self>;
-  resetInviteErrors: () => Promise<void>;
-  invite: (inviteData: {email: string}) => Promise<void>;
-}
 
 interface State {
   enteredEmail: string;
@@ -202,18 +189,26 @@ class InitialInvite extends React.PureComponent<Props & ConnectedProps & Dispatc
   }
 }
 
-export default injectIntl(
-  connect(
-    (state: RootState): ConnectedProps => ({
-      error: InviteSelector.getError(state),
-      invites: InviteSelector.getInvites(state),
-      isFetching: InviteSelector.isFetching(state),
-      language: LanguageSelector.getLanguage(state),
-    }),
-    (dispatch: ThunkDispatch): DispatchProps => ({
-      fetchSelf: () => dispatch(ROOT_ACTIONS.selfAction.fetchSelf()),
-      invite: (invitation: {email: string}) => dispatch(ROOT_ACTIONS.invitationAction.invite(invitation)),
-      resetInviteErrors: () => dispatch(ROOT_ACTIONS.invitationAction.resetInviteErrors()),
-    }),
-  )(InitialInvite),
-);
+type ConnectedProps = ReturnType<typeof mapStateToProps>;
+const mapStateToProps = (state: RootState) => ({
+  error: InviteSelector.getError(state),
+  invites: InviteSelector.getInvites(state),
+  isFetching: InviteSelector.isFetching(state),
+  language: LanguageSelector.getLanguage(state),
+});
+
+type DispatchProps = ReturnType<typeof mapDispatchToProps>;
+const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
+  bindActionCreators(
+    {
+      fetchSelf: ROOT_ACTIONS.selfAction.fetchSelf,
+      invite: ROOT_ACTIONS.invitationAction.invite,
+      resetInviteErrors: ROOT_ACTIONS.invitationAction.resetInviteErrors,
+    },
+    dispatch,
+  );
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(injectIntl(InitialInvite));
