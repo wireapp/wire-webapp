@@ -20,6 +20,7 @@
 import {ClientEntity} from './ClientEntity';
 
 export class ClientMapper {
+  // tslint:disable-next-line:typedef
   static get CONFIG() {
     return {
       CLIENT_PAYLOAD: ['class', 'id'],
@@ -27,23 +28,21 @@ export class ClientMapper {
     };
   }
 
-  // TODO: Remove "constructor" and make functions "static"
-  constructor() {}
-
   /**
    * Maps a JSON into a Client entity.
    *
-   * @param {Object} clientPayload - Client data
-   * @param {boolean} isSelfClient - Creating self client
-   * @returns {ClientEntity} Mapped client entity
+   * @param isSelfClient Creating self client
+   * @returns Mapped client entity
    */
-  mapClient(clientPayload, isSelfClient) {
+  static mapClient(clientPayload: Record<string, any>, isSelfClient: boolean): ClientEntity {
     const clientEntity = new ClientEntity(isSelfClient);
 
-    ClientMapper.CONFIG.CLIENT_PAYLOAD.forEach(name => this._mapMember(clientEntity, clientPayload, name));
+    ClientMapper.CONFIG.CLIENT_PAYLOAD.forEach(name => ClientMapper._mapMember(clientEntity, clientPayload, name));
 
     if (isSelfClient) {
-      ClientMapper.CONFIG.SELF_CLIENT_PAYLOAD.forEach(name => this._mapMember(clientEntity, clientPayload, name));
+      ClientMapper.CONFIG.SELF_CLIENT_PAYLOAD.forEach(name =>
+        ClientMapper._mapMember(clientEntity, clientPayload, name),
+      );
     }
 
     if (clientPayload.meta) {
@@ -60,22 +59,25 @@ export class ClientMapper {
   /**
    * Maps an object of client IDs with their payloads to client entities.
    *
-   * @param {Array<Object>} clientsPayload - Clients data
-   * @param {boolean} isSelfClient - Creating self client
-   * @returns {Array<ClientEntity>} - Mapped client entities
+   * @param clientsPayload Clients data
+   * @param isSelfClient Creating self client
+   * @returns Mapped client entities
    */
-  mapClients(clientsPayload, isSelfClient) {
-    return clientsPayload.map(clientPayload => this.mapClient(clientPayload, isSelfClient));
+  static mapClients(clientsPayload: any[], isSelfClient: boolean): ClientEntity[] {
+    return clientsPayload.map(clientPayload => ClientMapper.mapClient(clientPayload, isSelfClient));
   }
 
   /**
    * Update a client entity or object from JSON.
    *
-   * @param {ClientEntity|Object} clientData - Client data
-   * @param {Object} updatePayload - JSON possibly containing updates
-   * @returns {Object} Contains the client and whether there was a change
+   * @param clientData Client data as entity or object
+   * @param updatePayload JSON possibly containing updates
+   * @returns Contains the client and whether there was a change
    */
-  updateClient(clientData, updatePayload) {
+  static updateClient<T extends Record<string, any>, U extends T>(
+    clientData: T,
+    updatePayload: U,
+  ): {client: T; wasUpdated: boolean} {
     let containsUpdate = false;
 
     for (const member in updatePayload) {
@@ -90,7 +92,7 @@ export class ClientMapper {
     return {client: clientData, wasUpdated: containsUpdate};
   }
 
-  _mapMember(clientEntity, clientPayload, memberName) {
+  static _mapMember(clientEntity: Record<string, any>, clientPayload: Record<string, any>, memberName: string): void {
     const payloadValue = clientPayload[memberName];
     const isMemberUndefined = payloadValue === undefined;
     if (!isMemberUndefined) {
