@@ -18,7 +18,7 @@
  */
 
 import {Button, Column, Columns, Container, H3, Modal, Text} from '@wireapp/react-ui-kit';
-import * as React from 'react';
+import React from 'react';
 import {InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {appAlreadyOpenStrings} from '../../strings';

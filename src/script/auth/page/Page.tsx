@@ -18,7 +18,7 @@
  */
 
 import {TeamData} from '@wireapp/api-client/dist/commonjs/team';
-import * as React from 'react';
+import React from 'react';
 import {connect} from 'react-redux';
 import {Redirect} from 'react-router';
 import UnsupportedBrowser from '../component/UnsupportedBrowser';

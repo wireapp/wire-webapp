@@ -21,7 +21,7 @@ import {APIClient} from '@wireapp/api-client';
 import {StyledApp} from '@wireapp/react-ui-kit';
 import {MemoryEngine} from '@wireapp/store-engine/dist/commonjs/engine';
 import {mount} from 'enzyme';
-import * as React from 'react';
+import React from 'react';
 import {IntlProvider} from 'react-intl';
 import {Provider} from 'react-redux';
 import {HashRouter} from 'react-router-dom';

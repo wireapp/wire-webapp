@@ -18,7 +18,7 @@
  */
 
 import {COLOR, Container, ContainerXS, H1, H2, H3, Loading, Logo, Text} from '@wireapp/react-ui-kit';
-import * as React from 'react';
+import React from 'react';
 import {FormattedHTMLMessage, FormattedMessage, InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {unsupportedJoinStrings, unsupportedStrings} from '../../strings';

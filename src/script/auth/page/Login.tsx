@@ -42,7 +42,7 @@ import {
   RoundIconButton,
   Small,
 } from '@wireapp/react-ui-kit';
-import * as React from 'react';
+import React from 'react';
 import {FormattedHTMLMessage, InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {Redirect, RouteComponentProps, withRouter} from 'react-router';

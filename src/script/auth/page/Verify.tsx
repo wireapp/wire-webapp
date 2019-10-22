@@ -19,7 +19,7 @@
 
 import {RegisterData} from '@wireapp/api-client/dist/commonjs/auth';
 import {CodeInput, ContainerXS, ErrorMessage, H1, Link, Muted} from '@wireapp/react-ui-kit';
-import * as React from 'react';
+import React from 'react';
 import {FormattedHTMLMessage, InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {RouteComponentProps, withRouter} from 'react-router';
