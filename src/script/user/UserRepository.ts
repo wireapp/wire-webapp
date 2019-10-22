@@ -317,7 +317,7 @@ export class UserRepository {
       return this.get_users_by_id(userIds).then(userEntities => {
         userEntities.forEach(userEntity => {
           const clientEntities = recipients[userEntity.id];
-          const tooManyClients = clientEntities > 8;
+          const tooManyClients = clientEntities.length > 8;
           if (tooManyClients) {
             this.logger.warn(`Found '${clientEntities.length}' clients for '${userEntity.name()}'`, clientEntities);
           }
