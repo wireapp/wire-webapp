@@ -19,17 +19,19 @@
 
 import {ArrowIcon, COLOR, Column, Columns, Container, ContainerXS, H1, IsMobile} from '@wireapp/react-ui-kit';
 import * as React from 'react';
-import {InjectedIntlProps, injectIntl} from 'react-intl';
-import {RouteComponentProps, withRouter} from 'react-router';
+import {useIntl} from 'react-intl';
+import useReactRouter from 'use-react-router';
 import {createAccountStrings} from '../../strings';
 import AccountForm from '../component/AccountForm';
 import RouterLink from '../component/RouterLink';
 import {ROUTE} from '../route';
 import Page from './Page';
 
-interface Props extends React.HTMLAttributes<HTMLDivElement>, RouteComponentProps {}
+interface Props extends React.HTMLProps<HTMLDivElement> {}
 
-const CreateAccount: React.SFC<Props & InjectedIntlProps> = ({history, intl: {formatMessage: _}}) => {
+const CreateAccount = ({}: Props) => {
+  const {formatMessage: _} = useIntl();
+  const {history} = useReactRouter();
   const backArrow = (
     <RouterLink to={ROUTE.CREATE_TEAM} data-uie-name="go-register-team">
       <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
@@ -66,4 +68,4 @@ const CreateAccount: React.SFC<Props & InjectedIntlProps> = ({history, intl: {fo
   );
 };
 
-export default withRouter(injectIntl(CreateAccount));
+export default CreateAccount;
