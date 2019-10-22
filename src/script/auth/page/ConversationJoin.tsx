@@ -17,8 +17,6 @@
  *
  */
 
-import {RegisterData} from '@wireapp/api-client/dist/commonjs/auth';
-import {ConversationEvent} from '@wireapp/api-client/dist/commonjs/event';
 import {
   Button,
   COLOR,
@@ -38,9 +36,8 @@ import * as React from 'react';
 import {FormattedHTMLMessage, InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {Redirect, RouteComponentProps, withRouter} from 'react-router';
-
+import {AnyAction, Dispatch} from 'redux';
 import {noop} from 'Util/util';
-
 import {conversationJoinStrings} from '../../strings';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import RouterLink from '../component/RouterLink';
@@ -51,7 +48,7 @@ import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {BackendError} from '../module/action/BackendError';
 import {ValidationError} from '../module/action/ValidationError';
-import {RootState, ThunkDispatch} from '../module/reducer';
+import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as ConversationSelector from '../module/selector/ConversationSelector';
 import * as SelfSelector from '../module/selector/SelfSelector';
@@ -62,24 +59,7 @@ import {parseError, parseValidationErrors} from '../util/errorUtil';
 import * as StringUtil from '../util/stringUtil';
 import {getURLParameter, hasURLParameter, pathWithParams} from '../util/urlUtil';
 
-interface Props extends React.HTMLAttributes<ConversationJoin>, RouteComponentProps {}
-
-interface ConnectedProps {
-  error: Error;
-  isAuthenticated: boolean;
-  isFetching: boolean;
-  isTemporaryGuest: boolean;
-  selfName: string;
-}
-
-interface DispatchProps {
-  doCheckConversationCode: (conversationCode: string, conversationKey: string) => Promise<void>;
-  doJoinConversationByCode: (conversationKey: string, conversationCode: string) => Promise<ConversationEvent>;
-  doInit: (options: {}) => Promise<void>;
-  doRegisterWireless: (registrationData: {}, options: {}) => Promise<void>;
-  doLogout: () => Promise<void>;
-  setLastEventDate: (date: Date) => Promise<void>;
-}
+interface Props extends React.HTMLProps<HTMLDivElement>, RouteComponentProps {}
 
 interface State {
   accentColor: AccentColor.AccentColor;
@@ -147,7 +127,7 @@ class ConversationJoin extends React.Component<CombinedProps, State> {
 
   componentDidMount = () => {
     this.props
-      .doInit({shouldValidateLocalClient: true})
+      .doInit({isImmediateLogin: false, shouldValidateLocalClient: true})
       .catch(noop)
       .then(() => this.readAndUpdateParamsFromUrl(this.props));
   };
@@ -382,28 +362,32 @@ class ConversationJoin extends React.Component<CombinedProps, State> {
   }
 }
 
+type ConnectedProps = ReturnType<typeof mapStateToProps>;
+const mapStateToProps = (state: RootState) => ({
+  error: ConversationSelector.getError(state),
+  isAuthenticated: AuthSelector.isAuthenticated(state),
+  isFetching: ConversationSelector.isFetching(state),
+  isTemporaryGuest: SelfSelector.isTemporaryGuest(state),
+  selfName: SelfSelector.getSelfName(state),
+});
+
+type DispatchProps = ReturnType<typeof mapDispatchToProps>;
+const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
+  bindActionCreators(
+    {
+      doCheckConversationCode: ROOT_ACTIONS.conversationAction.doCheckConversationCode,
+      doInit: ROOT_ACTIONS.authAction.doInit,
+      doJoinConversationByCode: ROOT_ACTIONS.conversationAction.doJoinConversationByCode,
+      doLogout: ROOT_ACTIONS.authAction.doLogout,
+      doRegisterWireless: ROOT_ACTIONS.authAction.doRegisterWireless,
+      setLastEventDate: ROOT_ACTIONS.notificationAction.setLastEventDate,
+    },
+    dispatch,
+  );
+
 export default withRouter(
-  injectIntl(
-    connect(
-      (state: RootState): ConnectedProps => ({
-        error: ConversationSelector.getError(state),
-        isAuthenticated: AuthSelector.isAuthenticated(state),
-        isFetching: ConversationSelector.isFetching(state),
-        isTemporaryGuest: SelfSelector.isTemporaryGuest(state),
-        selfName: SelfSelector.getSelfName(state),
-      }),
-      (dispatch: ThunkDispatch): DispatchProps => ({
-        doCheckConversationCode: (conversationCode: string, conversationKey: string) =>
-          dispatch(ROOT_ACTIONS.conversationAction.doCheckConversationCode(conversationCode, conversationKey)),
-        doInit: (options: {isImmediateLogin: boolean; shouldValidateLocalClient: boolean}) =>
-          dispatch(ROOT_ACTIONS.authAction.doInit(options)),
-        doJoinConversationByCode: (conversationKey: string, conversationCode: string) =>
-          dispatch(ROOT_ACTIONS.conversationAction.doJoinConversationByCode(conversationKey, conversationCode)),
-        doLogout: () => dispatch(ROOT_ACTIONS.authAction.doLogout()),
-        doRegisterWireless: (registrationData: RegisterData, options: {shouldInitializeClient: boolean}) =>
-          dispatch(ROOT_ACTIONS.authAction.doRegisterWireless(registrationData, options)),
-        setLastEventDate: (date: Date) => dispatch(ROOT_ACTIONS.notificationAction.setLastEventDate(date)),
-      }),
-    )(ConversationJoin),
-  ),
+  connect(
+    mapStateToProps,
+    mapDispatchToProps,
+  )(injectIntl(ConversationJoin)),
 );
