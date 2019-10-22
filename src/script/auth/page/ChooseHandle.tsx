@@ -31,15 +31,16 @@ import {
   Text,
 } from '@wireapp/react-ui-kit';
 import React, {useEffect, useState} from 'react';
-import {InjectedIntlProps, injectIntl} from 'react-intl';
+import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
-import {RouteComponentProps, withRouter} from 'react-router';
+import {AnyAction, Dispatch} from 'redux';
+import useReactRouter from 'use-react-router';
 import {chooseHandleStrings} from '../../strings';
 import AcceptNewsModal from '../component/AcceptNewsModal';
 import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {BackendError} from '../module/action/BackendError';
-import {RootState, ThunkDispatch} from '../module/reducer';
+import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as SelfSelector from '../module/selector/SelfSelector';
 import {ROUTE} from '../route';
@@ -48,24 +49,9 @@ import {createSuggestions} from '../util/handleUtil';
 import {pathWithParams} from '../util/urlUtil';
 import Page from './Page';
 
-interface Props extends React.HTMLProps<HTMLDivElement>, RouteComponentProps {}
-
-interface ConnectedProps {
-  hasUnsetMarketingConsent: boolean;
-  isFetching: boolean;
-  isTeamFlow: boolean;
-  name: string;
-}
-
-interface DispatchProps {
-  doGetConsents: () => Promise<void>;
-  checkHandles: (handles: string[]) => Promise<string>;
-  doSetHandle: (handle: string) => Promise<void>;
-  doSetConsent: (consentType: ConsentType, value: number) => Promise<void>;
-}
+interface Props extends React.HTMLProps<HTMLDivElement> {}
 
 const ChooseHandle = ({
-  history,
   doGetConsents,
   doSetConsent,
   doSetHandle,
@@ -74,8 +60,9 @@ const ChooseHandle = ({
   checkHandles,
   isFetching,
   name,
-  intl: {formatMessage: _},
-}: Props & ConnectedProps & DispatchProps & InjectedIntlProps) => {
+}: Props & ConnectedProps & DispatchProps) => {
+  const {formatMessage: _} = useIntl();
+  const {history} = useReactRouter();
   const [error, setError] = useState(null);
   const [handle, setHandle] = useState('');
   useEffect(() => {
@@ -152,22 +139,27 @@ const ChooseHandle = ({
   );
 };
 
-export default injectIntl(
-  withRouter(
-    connect(
-      (state: RootState): ConnectedProps => ({
-        hasUnsetMarketingConsent: SelfSelector.hasUnsetConsent(state, ConsentType.MARKETING) || false,
-        isFetching: SelfSelector.isFetching(state),
-        isTeamFlow: AuthSelector.isTeamFlow(state),
-        name: SelfSelector.getSelfName(state),
-      }),
-      (dispatch: ThunkDispatch): DispatchProps => ({
-        checkHandles: (handles: string[]) => dispatch(ROOT_ACTIONS.userAction.checkHandles(handles)),
-        doGetConsents: () => dispatch(ROOT_ACTIONS.selfAction.doGetConsents()),
-        doSetConsent: (consentType: ConsentType, value: number) =>
-          dispatch(ROOT_ACTIONS.selfAction.doSetConsent(consentType, value)),
-        doSetHandle: (handle: string) => dispatch(ROOT_ACTIONS.selfAction.setHandle(handle)),
-      }),
-    )(ChooseHandle),
-  ),
-);
+type ConnectedProps = ReturnType<typeof mapStateToProps>;
+const mapStateToProps = (state: RootState) => ({
+  hasUnsetMarketingConsent: SelfSelector.hasUnsetConsent(state, ConsentType.MARKETING) || false,
+  isFetching: SelfSelector.isFetching(state),
+  isTeamFlow: AuthSelector.isTeamFlow(state),
+  name: SelfSelector.getSelfName(state),
+});
+
+type DispatchProps = ReturnType<typeof mapDispatchToProps>;
+const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
+  bindActionCreators(
+    {
+      checkHandles: ROOT_ACTIONS.userAction.checkHandles,
+      doGetConsents: ROOT_ACTIONS.selfAction.doGetConsents,
+      doSetConsent: ROOT_ACTIONS.selfAction.doSetConsent,
+      doSetHandle: ROOT_ACTIONS.selfAction.setHandle,
+    },
+    dispatch,
+  );
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(ChooseHandle);
