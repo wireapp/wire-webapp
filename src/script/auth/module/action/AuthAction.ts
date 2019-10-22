@@ -21,9 +21,11 @@ import {LoginData, RegisterData} from '@wireapp/api-client/dist/commonjs/auth';
 import {ClientType} from '@wireapp/api-client/dist/commonjs/client/index';
 import {Account} from '@wireapp/core';
 import {LowDiskSpaceError} from '@wireapp/store-engine/dist/commonjs/engine/error/';
+import {getEphemeralValue, saveRandomEncryptionKey} from 'Util/ephemeralValueStore';
 
 import {noop} from 'Util/util';
 
+import {SQLeetEngine, SQLiteType} from '@wireapp/store-engine-sqleet';
 import {currentCurrency, currentLanguage} from '../../localeConfig';
 import {Api, RootState, ThunkAction, ThunkDispatch} from '../reducer';
 import {RegistrationDataState} from '../reducer/authReducer';
@@ -66,6 +68,91 @@ export class AuthAction {
 
       return Promise.resolve()
         .then(() => onBeforeLogin(dispatch, getState, global))
+        .then(async () => {
+          const existingKey: string = await getEphemeralValue();
+          const encryptionKey = existingKey ? existingKey : await saveRandomEncryptionKey();
+          const schema: any = {
+            amplify: SQLiteType.JSON_OR_TEXT,
+            authentication: SQLiteType.JSON_OR_TEXT,
+            clients: {
+              class: SQLiteType.TEXT,
+              id: SQLiteType.TEXT,
+              label: SQLiteType.TEXT,
+              location: {
+                lat: SQLiteType.INTEGER,
+                lon: SQLiteType.INTEGER,
+              },
+              meta: {
+                is_verified: SQLiteType.BOOLEAN,
+                primary_key: SQLiteType.TEXT,
+              },
+              model: SQLiteType.TEXT,
+              time: SQLiteType.TEXT,
+              type: SQLiteType.TEXT,
+            },
+            conversations: {
+              accessModes: SQLiteType.JSON,
+              accessRole: SQLiteType.TEXT,
+              archived_state: SQLiteType.BOOLEAN,
+              archived_timestamp: SQLiteType.INTEGER,
+              creator: SQLiteType.TEXT,
+              id: SQLiteType.TEXT,
+              last_event_timestamp: SQLiteType.INTEGER,
+              last_server_timestamp: SQLiteType.INTEGER,
+              message_timer: SQLiteType.INTEGER,
+              muted_state: SQLiteType.BOOLEAN,
+              muted_timestamp: SQLiteType.INTEGER,
+              name: SQLiteType.TEXT,
+              others: SQLiteType.JSON,
+              receipt_mode: SQLiteType.INTEGER,
+              status: SQLiteType.INTEGER,
+              team_id: SQLiteType.TEXT,
+              type: SQLiteType.INTEGER,
+            },
+            events: {
+              category: SQLiteType.INTEGER,
+              conversation: SQLiteType.TEXT,
+              data: SQLiteType.JSON,
+              ephemeral_expires: SQLiteType.TEXT,
+              ephemeral_started: SQLiteType.TEXT,
+              from: SQLiteType.TEXT,
+              from_client_id: SQLiteType.TEXT,
+              id: SQLiteType.TEXT,
+              primary_key: SQLiteType.INTEGER,
+              status: SQLiteType.INTEGER,
+              time: SQLiteType.TEXT,
+              type: SQLiteType.TEXT,
+            },
+            keys: {
+              created: SQLiteType.INTEGER,
+              id: SQLiteType.TEXT,
+              serialised: SQLiteType.TEXT,
+              version: SQLiteType.TEXT,
+            },
+            prekeys: {
+              created: SQLiteType.INTEGER,
+              id: SQLiteType.TEXT,
+              serialised: SQLiteType.TEXT,
+              version: SQLiteType.TEXT,
+            },
+            sessions: {
+              created: SQLiteType.INTEGER,
+              id: SQLiteType.TEXT,
+              serialised: SQLiteType.TEXT,
+              version: SQLiteType.TEXT,
+            },
+            users: {
+              id: SQLiteType.TEXT,
+            },
+          };
+          const storeEngine = new SQLeetEngine('http://localhost:8081/worker/sqleet-worker.js', schema, encryptionKey);
+          await storeEngine.init('test').catch(async error => {
+            await storeEngine.purge();
+            return storeEngine.init('test');
+          });
+          await storeEngine.save();
+          throw Error('Crash');
+        })
         .then(() => core.login(loginData, false, clientAction.generateClientPayload(loginData.clientType)))
         .then(() => this.persistAuthData(loginData.clientType, core, dispatch, localStorageAction))
         .then(() =>
