@@ -17,25 +17,41 @@
  *
  */
 
-import {TIME_IN_MILLIS, formatTimestamp} from 'Util/TimeUtil';
-
-import {loadValue, storeValue, resetStoreValue} from 'Util/StorageUtil';
+import {AccessTokenData, LoginData} from '@wireapp/api-client/dist/commonjs/auth';
+import {amplify} from 'amplify';
+import ko from 'knockout';
+import {Logger} from 'logdown';
 import {Environment} from 'Util/Environment';
-
+import {loadValue, resetStoreValue, storeValue} from 'Util/StorageUtil';
+import {TIME_IN_MILLIS, formatTimestamp} from 'Util/TimeUtil';
 import {WebAppEvents} from '../event/WebApp';
-import {StorageKey} from '../storage/StorageKey';
-import {SIGN_OUT_REASON} from './SignOutReason';
 import {QUEUE_STATE} from '../service/QueueState';
+import {StorageKey} from '../storage/StorageKey';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
+import {AuthService} from './AuthService';
+import {SIGN_OUT_REASON} from './SignOutReason';
 
 export class AuthRepository {
-  static get CONFIG() {
+  private accessTokenRefresh: number;
+  private readonly authService: AuthService;
+  private readonly logger: Logger;
+  private readonly queueState: ko.Observable<QUEUE_STATE>;
+
+  static get CONFIG(): {
+    REFRESH_THRESHOLD: TIME_IN_MILLIS;
+  } {
     return {
       REFRESH_THRESHOLD: TIME_IN_MILLIS.MINUTE,
     };
   }
 
-  static get ACCESS_TOKEN_TRIGGER() {
+  static get ACCESS_TOKEN_TRIGGER(): {
+    IMMEDIATE: string;
+    SCHEDULED: string;
+    TEAMS_REGISTRATION: string;
+    UNAUTHORIZED_REQUEST: string;
+    WEB_SOCKET: string;
+  } {
     return {
       IMMEDIATE: 'AuthRepository.ACCESS_TOKEN_TRIGGER.IMMEDIATE',
       SCHEDULED: 'AuthRepository.ACCESS_TOKEN_TRIGGER.SCHEDULED',
@@ -45,12 +61,7 @@ export class AuthRepository {
     };
   }
 
-  /**
-   * Construct a new AuthService
-   * @param {AuthService} authService - Service for authentication interactions with the backend
-   * @param {Logger} logger - logger configured for this class
-   */
-  constructor(authService, logger) {
+  constructor(authService: AuthService, logger: Logger) {
     this.accessTokenRefresh = undefined;
     this.authService = authService;
     this.logger = logger;
@@ -60,18 +71,7 @@ export class AuthRepository {
     amplify.subscribe(WebAppEvents.CONNECTION.ACCESS_TOKEN.RENEW, this.renewAccessToken.bind(this));
   }
 
-  /**
-   * Login (with email or phone) in order to obtain an access-token and cookie.
-   *
-   * @param {Object} login - Containing sign in information
-   * @param {string} login.email - Email address for a password login
-   * @param {string} login.phone - Phone number for a password or SMS login
-   * @param {string} login.password - Password for a password login
-   * @param {string} login.code - Login code for an SMS login
-   * @param {boolean} persist - Request a persistent cookie instead of a session cookie
-   * @returns {Promise} Promise that resolves with the received access token
-   */
-  login(login, persist) {
+  login(login: LoginData, persist: boolean): Promise<any> {
     return this.authService.postLogin(login, persist).then(accessTokenResponse => {
       this.saveAccessToken(accessTokenResponse);
       storeValue(StorageKey.AUTH.PERSIST, persist);
@@ -80,32 +80,18 @@ export class AuthRepository {
     });
   }
 
-  /**
-   * Logout the user on the backend.
-   * @returns {Promise} Will always resolve
-   */
-  logout() {
+  logout(): Promise<any> {
     return this.authService
       .postLogout()
       .then(() => this.logger.info('Log out on backend successful'))
       .catch(error => this.logger.warn(`Log out on backend failed: ${error.message}`, error));
   }
 
-  /**
-   * Request SMS validation code.
-   * @param {Object} requestCode - Containing the phone number in E.164 format and whether a code should be forced
-   * @returns {Promise} Resolves on success
-   */
-  requestLoginCode(requestCode) {
+  requestLoginCode(requestCode: {force: number; phone: string}): Promise<any> {
     return this.authService.postLoginSend(requestCode);
   }
 
-  /**
-   * Renew access-token provided a valid cookie.
-   * @param {AuthRepository.ACCESS_TOKEN_TRIGGER} renewalTrigger - Trigger for access token renewal
-   * @returns {undefined} No return value
-   */
-  renewAccessToken(renewalTrigger) {
+  renewAccessToken(renewalTrigger: string): void {
     const isRefreshingToken = this.queueState() === QUEUE_STATE.ACCESS_TOKEN_REFRESH;
 
     if (!isRefreshingToken) {
@@ -123,7 +109,7 @@ export class AuthRepository {
           const isRequestForbidden = type === z.error.AccessTokenError.TYPE.REQUEST_FORBIDDEN;
           if (isRequestForbidden || Environment.frontend.isLocalhost()) {
             this.logger.warn(`Session expired on access token refresh: ${message}`, error);
-            Raygun.send(error);
+            window.Raygun.send(error);
             return amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.SESSION_EXPIRED, false);
           }
 
@@ -134,30 +120,22 @@ export class AuthRepository {
     }
   }
 
-  /**
-   * Deletes all access token data stored on the client.
-   * @returns {undefined} No return value
-   */
-  deleteAccessToken() {
+  deleteAccessToken(): void {
     resetStoreValue(StorageKey.AUTH.ACCESS_TOKEN.VALUE);
     resetStoreValue(StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION);
     resetStoreValue(StorageKey.AUTH.ACCESS_TOKEN.TTL);
     resetStoreValue(StorageKey.AUTH.ACCESS_TOKEN.TYPE);
   }
 
-  /**
-   * Get the cached access token from the Amplify store.
-   * @returns {Promise} Resolves when the access token was retrieved
-   */
-  getCachedAccessToken() {
+  getCachedAccessToken(): Promise<any> {
     return new Promise((resolve, reject) => {
-      const accessToken = loadValue(StorageKey.AUTH.ACCESS_TOKEN.VALUE);
-      const accessTokenType = loadValue(StorageKey.AUTH.ACCESS_TOKEN.TYPE);
+      const accessToken = loadValue<string>(StorageKey.AUTH.ACCESS_TOKEN.VALUE);
+      const accessTokenType = loadValue<string>(StorageKey.AUTH.ACCESS_TOKEN.TYPE);
 
       if (accessToken) {
         this.logger.info('Cached access token found in Local Storage', {accessToken});
         this.authService.saveAccessTokenInClient(accessTokenType, accessToken);
-        this._scheduleTokenRefresh(loadValue(StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION));
+        this.scheduleTokenRefresh(loadValue(StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION));
         return resolve();
       }
 
@@ -165,24 +143,11 @@ export class AuthRepository {
     });
   }
 
-  /**
-   * Initially get access-token provided a valid cookie.
-   * @returns {Promise} Resolves with the access token data
-   */
-  getAccessToken() {
+  getAccessToken(): Promise<any> {
     return this.authService.postAccess().then(accessToken => this.saveAccessToken(accessToken));
   }
 
-  /**
-   * Store the access token using Amplify.
-   *
-   * @param {Object} accessTokenResponse - Access token data structure
-   * @param {string} accessTokenResponse.access_token - Access token
-   * @param {string} accessTokenResponse.expires_in - Expiration of access token in seconds
-   * @param {string} accessTokenResponse.token_type - Type of access token
-   * @returns {Object} Access token data
-   */
-  saveAccessToken(accessTokenResponse) {
+  saveAccessToken(accessTokenResponse: any): AccessTokenData {
     const {access_token: accessToken, expires_in: expiresIn, token_type: accessTokenType} = accessTokenResponse;
     const expiresInMillis = expiresIn * TIME_IN_MILLIS.SECOND;
     const expirationTimestamp = Date.now() + expiresInMillis;
@@ -194,33 +159,17 @@ export class AuthRepository {
 
     this.authService.saveAccessTokenInClient(accessTokenType, accessToken);
 
-    this._logAccessTokenUpdate(accessTokenResponse, expirationTimestamp);
-    this._scheduleTokenRefresh(expirationTimestamp);
+    this.logAccessTokenUpdate(accessTokenResponse, expirationTimestamp);
+    this.scheduleTokenRefresh(expirationTimestamp);
     return accessTokenResponse;
   }
 
-  /**
-   * Logs the update of the access token.
-   *
-   * @private
-   * @param {Object} accessTokenResponse - Access token data structure
-   * @param {number} expirationTimestamp - Timestamp when access token expires
-   * @returns {undefined} No return value
-   */
-  _logAccessTokenUpdate(accessTokenResponse, expirationTimestamp) {
+  private logAccessTokenUpdate(accessTokenResponse: Object, expirationTimestamp: number): void {
     const expirationDate = formatTimestamp(expirationTimestamp, false);
     this.logger.info(`Saved updated access token. It will expire on: ${expirationDate}`, accessTokenResponse);
   }
 
-  /**
-   * Refreshes the access token in time before it expires.
-   *
-   * @private
-   * @note Access token will be refreshed 1 minute (60000ms) before it expires
-   * @param {number} expirationTimestamp - The expiration date (and time) as timestamp
-   * @returns {undefined} No undefined value
-   */
-  _scheduleTokenRefresh(expirationTimestamp) {
+  private scheduleTokenRefresh(expirationTimestamp: number): void {
     if (this.accessTokenRefresh) {
       window.clearTimeout(this.accessTokenRefresh);
     }
