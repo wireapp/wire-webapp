@@ -18,7 +18,7 @@
  */
 
 import {LoginData} from '@wireapp/api-client/dist/commonjs/auth';
-import {ClientType, RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
+import {ClientType} from '@wireapp/api-client/dist/commonjs/client/index';
 import {
   ArrowIcon,
   COLOR,
@@ -50,6 +50,7 @@ import {Redirect, RouteComponentProps, withRouter} from 'react-router';
 import {noop} from 'Util/util';
 import {isValidEmail, isValidPhoneNumber, isValidUsername} from 'Util/ValidationUtil';
 
+import {AnyAction, Dispatch} from 'redux';
 import {save} from 'Util/ephemeralValueStore';
 import {loginStrings, logoutReasonStrings} from '../../strings';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
@@ -60,7 +61,7 @@ import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {BackendError} from '../module/action/BackendError';
 import {LabeledError} from '../module/action/LabeledError';
 import {ValidationError} from '../module/action/ValidationError';
-import {RootState, ThunkDispatch} from '../module/reducer';
+import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import * as SelfSelector from '../module/selector/SelfSelector';
@@ -71,23 +72,6 @@ import * as URLUtil from '../util/urlUtil';
 import Page from './Page';
 
 interface Props extends React.HTMLAttributes<Login>, RouteComponentProps {}
-
-interface ConnectedProps {
-  hasHistory: boolean;
-  hasSelfHandle: boolean;
-  isFetching: boolean;
-  loginError: Error;
-}
-
-interface DispatchProps {
-  doCheckConversationCode: (conversationKey: string, conversationCode: string) => Promise<void>;
-  resetAuthError: () => Promise<void>;
-  doInitializeClient: (clientType: ClientType, password?: string) => Promise<void>;
-  doInit: (options: {isImmediateLogin: boolean}) => Promise<void>;
-  doLoginAndJoin: (login: LoginData, conversationKey: string, conversationCode: string) => Promise<void>;
-  doLogin: (login: LoginData) => Promise<void>;
-  doGetAllClients: () => Promise<RegisteredClient[]>;
-}
 
 interface State {
   conversationCode: string;
@@ -182,7 +166,7 @@ class Login extends React.Component<CombinedProps, State> {
 
   immediateLogin = () => {
     return Promise.resolve()
-      .then(() => this.props.doInit({isImmediateLogin: true}))
+      .then(() => this.props.doInit({isImmediateLogin: true, shouldValidateLocalClient: false}))
       .then(() => this.props.doInitializeClient(ClientType.PERMANENT, undefined))
       .then(this.navigateChooseHandleOrWebapp)
       .catch(noop);
@@ -458,28 +442,32 @@ class Login extends React.Component<CombinedProps, State> {
   }
 }
 
+type ConnectedProps = ReturnType<typeof mapStateToProps>;
+const mapStateToProps = (state: RootState) => ({
+  hasHistory: ClientSelector.hasHistory(state),
+  hasSelfHandle: SelfSelector.hasSelfHandle(state),
+  isFetching: AuthSelector.isFetching(state),
+  loginError: AuthSelector.getError(state),
+});
+
+type DispatchProps = ReturnType<typeof mapDispatchToProps>;
+const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
+  bindActionCreators(
+    {
+      doCheckConversationCode: ROOT_ACTIONS.conversationAction.doCheckConversationCode,
+      doGetAllClients: ROOT_ACTIONS.clientAction.doGetAllClients,
+      doInit: ROOT_ACTIONS.authAction.doInit,
+      doInitializeClient: ROOT_ACTIONS.clientAction.doInitializeClient,
+      doLogin: ROOT_ACTIONS.authAction.doLogin,
+      doLoginAndJoin: ROOT_ACTIONS.authAction.doLoginAndJoin,
+      resetAuthError: ROOT_ACTIONS.authAction.resetAuthError,
+    },
+    dispatch,
+  );
+
 export default withRouter(
-  injectIntl(
-    connect(
-      (state: RootState): ConnectedProps => ({
-        hasHistory: ClientSelector.hasHistory(state),
-        hasSelfHandle: SelfSelector.hasSelfHandle(state),
-        isFetching: AuthSelector.isFetching(state),
-        loginError: AuthSelector.getError(state),
-      }),
-      (dispatch: ThunkDispatch): DispatchProps => ({
-        doCheckConversationCode: (conversationKey: string, conversationCode: string) =>
-          dispatch(ROOT_ACTIONS.conversationAction.doCheckConversationCode(conversationKey, conversationCode)),
-        doGetAllClients: () => dispatch(ROOT_ACTIONS.clientAction.doGetAllClients()),
-        doInit: (options: {isImmediateLogin: boolean; shouldValidateLocalClient: boolean}) =>
-          dispatch(ROOT_ACTIONS.authAction.doInit(options)),
-        doInitializeClient: (clientType: ClientType, password?: string) =>
-          dispatch(ROOT_ACTIONS.clientAction.doInitializeClient(clientType, password)),
-        doLogin: (login: LoginData) => dispatch(ROOT_ACTIONS.authAction.doLogin(login)),
-        doLoginAndJoin: (login: LoginData, conversationKey: string, conversationCode: string) =>
-          dispatch(ROOT_ACTIONS.authAction.doLoginAndJoin(login, conversationKey, conversationCode)),
-        resetAuthError: () => dispatch(ROOT_ACTIONS.authAction.resetAuthError()),
-      }),
-    )(Login),
-  ),
+  connect(
+    mapStateToProps,
+    mapDispatchToProps,
+  )(injectIntl(Login)),
 );
