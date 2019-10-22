@@ -22,7 +22,7 @@ import {mockStore, mountComponent} from '../util/TestUtil';
 import Login from './Login';
 import {Config} from '../config';
 
-describe('when visiting the login page', () => {
+describe('"Login"', () => {
   let wrapper;
   const initialState = {
     authState: {
@@ -43,9 +43,37 @@ describe('when visiting the login page', () => {
     selfState: {},
   };
 
-  const backButton = () => wrapper.find('[data-uie-name="go-index"]').first();
+  beforeAll(() => {
+    Config.FEATURE = {
+      DEFAULT_LOGIN_TEMPORARY_CLIENT: false,
+      ENABLE_ACCOUNT_REGISTRATION: true,
+    };
+  });
 
-  describe('and the account registration is disabled', () => {
+  afterAll(() => (Config.FEATURE = {}));
+
+  const backButton = () => wrapper.find('[data-uie-name="go-index"]').first();
+  const emailInput = () => wrapper.find('[data-uie-name="enter-email"]').first();
+  const passwordInput = () => wrapper.find('[data-uie-name="enter-password"]').first();
+  const loginButton = () => wrapper.find('[data-uie-name="do-sign-in"]').first();
+
+  it('has disabled submit button as long as one input is empty', () => {
+    wrapper = mountComponent(<Login />, mockStore(initialState));
+
+    expect(emailInput().exists()).toBe(true);
+    expect(passwordInput().exists()).toBe(true);
+    expect(loginButton().exists()).toBe(true);
+
+    expect(loginButton().props().disabled).toBe(true);
+    emailInput().simulate('change', {target: {value: 'e'}});
+
+    expect(loginButton().props().disabled).toBe(true);
+    passwordInput().simulate('change', {target: {value: 'p'}});
+
+    expect(loginButton().props().disabled).toBe(false);
+  });
+
+  describe('with account registration disabled', () => {
     beforeAll(() => {
       Config.FEATURE = {
         ENABLE_ACCOUNT_REGISTRATION: false,
@@ -54,7 +82,7 @@ describe('when visiting the login page', () => {
 
     afterAll(() => (Config.FEATURE = {}));
 
-    it('the back button is hidden', () => {
+    it('hides the back button', () => {
       Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION = false;
       wrapper = mountComponent(<Login />, mockStore(initialState));
       Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION = true;
@@ -63,16 +91,8 @@ describe('when visiting the login page', () => {
     });
   });
 
-  describe('and the account registration is enabled', () => {
-    beforeAll(() => {
-      Config.FEATURE = {
-        ENABLE_ACCOUNT_REGISTRATION: true,
-      };
-    });
-
-    afterAll(() => (Config.FEATURE = {}));
-
-    it('the back button is shown', () => {
+  describe('with account registration enabled', () => {
+    it('shows the back button', () => {
       Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION = true;
       wrapper = mountComponent(<Login />, mockStore(initialState));
 
