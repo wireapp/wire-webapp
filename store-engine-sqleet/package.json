@@ -13,7 +13,7 @@
     "@types/karma-webpack": "2.0.7",
     "@types/node": "~12",
     "@types/uint32": "0.2.0",
-    "@types/webpack": "4.39.4",
+    "@types/webpack": "4.39.5",
     "@wireapp/store-engine": "3.9.21",
     "babel-loader": "8.0.6",
     "bazinga64": "5.5.26",
