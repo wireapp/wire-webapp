@@ -37,7 +37,7 @@ export class AudioRepository {
   private readonly logger: Logger;
   private readonly audioElements: Record<string, HTMLAudioElement>;
   private readonly audioPreference: ko.Observable<AudioPreference>;
-  private muted: Boolean;
+  private muted: boolean;
 
   constructor(logger: Logger) {
     this.logger = logger;
