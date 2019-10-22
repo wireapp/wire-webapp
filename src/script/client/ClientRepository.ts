@@ -201,7 +201,7 @@ export class ClientRepository {
    * @param clientPayload Client data to be stored in database
    * @returns Resolves with the record stored in database
    */
-  private saveClientInDb(userId: string, clientPayload: any): Promise<any> {
+  saveClientInDb(userId: string, clientPayload: any): Promise<any> {
     const primaryKey = this.constructPrimaryKey(userId, clientPayload.id);
     return this.clientService.saveClientInDb(primaryKey, clientPayload);
   }
