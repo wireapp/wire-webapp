@@ -34,7 +34,7 @@ import {
   RoundIconButton,
   Text,
 } from '@wireapp/react-ui-kit';
-import * as React from 'react';
+import React from 'react';
 import {InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {inviteStrings} from '../../strings';

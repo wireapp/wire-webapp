@@ -18,7 +18,7 @@
  */
 
 import {ArrowIcon, COLOR, Column, Columns, Container, ContainerXS, H1, IsMobile} from '@wireapp/react-ui-kit';
-import * as React from 'react';
+import React from 'react';
 import {useIntl} from 'react-intl';
 import useReactRouter from 'use-react-router';
 import {createAccountStrings} from '../../strings';

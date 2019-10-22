@@ -19,7 +19,7 @@
 
 import {pathWithParams} from '@wireapp/commons/dist/commonjs/util/UrlUtil';
 import {StyledApp} from '@wireapp/react-ui-kit';
-import * as React from 'react';
+import React from 'react';
 import {IntlProvider} from 'react-intl';
 import {connect} from 'react-redux';
 import {HashRouter as Router, Redirect, Route, Switch} from 'react-router-dom';

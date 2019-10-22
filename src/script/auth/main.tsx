@@ -20,7 +20,7 @@
 // Polyfill "Object.entries" & "Object.values"
 import 'core-js/es7/object';
 import * as cookieStore from 'js-cookie';
-import * as React from 'react';
+import React from 'react';
 import * as ReactDOM from 'react-dom';
 import {AppContainer} from 'react-hot-loader';
 import {Provider} from 'react-redux';

@@ -17,7 +17,7 @@
  *
  */
 
-import * as React from 'react';
+import React from 'react';
 import {mockStore, mountComponent} from '../util/TestUtil';
 import Login from './Login';
 import {Config} from '../config';
