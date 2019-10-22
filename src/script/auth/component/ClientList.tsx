@@ -17,47 +17,39 @@
  *
  */
 
-import {ClientType, RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
+import {ClientType} from '@wireapp/api-client/dist/commonjs/client/index';
 import {ContainerXS, Loading} from '@wireapp/react-ui-kit';
-import * as React from 'react';
-import {InjectedIntlProps, injectIntl} from 'react-intl';
+import React from 'react';
 import {connect} from 'react-redux';
-import {RouteComponentProps, withRouter} from 'react-router';
-
+import {AnyAction, Dispatch} from 'redux';
+import useReactRouter from 'use-react-router';
 import {getLogger} from 'Util/Logger';
-
 import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {BackendError} from '../module/action/BackendError';
 import * as LocalStorageAction from '../module/action/LocalStorageAction';
-import {RootState, ThunkDispatch} from '../module/reducer';
+import {RootState, bindActionCreators} from '../module/reducer';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import * as SelfSelector from '../module/selector/SelfSelector';
 import {ROUTE} from '../route';
 import {pathWithParams} from '../util/urlUtil';
 import ClientItem from './ClientItem';
 
-export interface Props extends React.HTMLAttributes<HTMLDivElement>, RouteComponentProps {}
-
-interface ConnectedProps {
-  clientError: Error;
-  isFetching: boolean;
-  isSSOUser: boolean;
-  permanentClients: RegisteredClient[];
-}
-
-interface DispatchProps {
-  doInitializeClient: (clientType: ClientType, password?: string) => Promise<void>;
-  doRemoveClient: (clientId: string, password?: string) => Promise<void>;
-  getLocalStorage: (key: string) => Promise<string | boolean | number>;
-  resetAuthError: () => Promise<void>;
-}
-
-type CombinedProps = Props & ConnectedProps & DispatchProps & InjectedIntlProps;
+interface Props extends React.HTMLProps<HTMLDivElement> {}
 
 const logger = getLogger('ClientList');
 
-const ClientList = (props: CombinedProps) => {
+const ClientList = ({
+  clientError,
+  isFetching,
+  isSSOUser,
+  permanentClients,
+  doInitializeClient,
+  doRemoveClient,
+  getLocalStorage,
+  resetAuthError,
+}: Props & ConnectedProps & DispatchProps) => {
+  const {history} = useReactRouter();
   const [showLoading, setShowLoading] = React.useState(false);
   const [loadingTimeoutId, setLoadingTimeoutId] = React.useState();
   const [currentlySelectedClient, setCurrentlySelectedClient] = React.useState();
@@ -73,16 +65,16 @@ const ClientList = (props: CombinedProps) => {
     const isSelectedClient = currentlySelectedClient === clientId;
     clientId = isSelectedClient ? null : clientId;
     setCurrentlySelectedClient(clientId);
-    props.resetAuthError();
+    resetAuthError();
   };
 
   const removeClient = (clientId: string, password?: string) => {
     setShowLoading(true);
     return Promise.resolve()
-      .then(() => props.doRemoveClient(clientId, password))
+      .then(() => doRemoveClient(clientId, password))
       .then(() => {
-        const persist = props.getLocalStorage(LocalStorageAction.LocalStorageKey.AUTH.PERSIST);
-        return props.doInitializeClient(persist ? ClientType.PERMANENT : ClientType.TEMPORARY, password);
+        const persist = getLocalStorage(LocalStorageAction.LocalStorageKey.AUTH.PERSIST);
+        return doInitializeClient(persist ? ClientType.PERMANENT : ClientType.TEMPORARY, password);
       })
       .then(() => {
         setLoadingTimeoutId(window.setTimeout(resetLoadingSpinner, 1000));
@@ -91,7 +83,7 @@ const ClientList = (props: CombinedProps) => {
       .then(() => window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP)))
       .catch(error => {
         if (error.label === BackendError.LABEL.NEW_CLIENT) {
-          props.history.push(ROUTE.HISTORY_INFO);
+          history.push(ROUTE.HISTORY_INFO);
         } else {
           resetLoadingSpinner();
           logger.error(error);
@@ -101,7 +93,7 @@ const ClientList = (props: CombinedProps) => {
 
   const isSelectedClient = (clientId: string) => clientId === currentlySelectedClient;
 
-  return props.isFetching || showLoading ? (
+  return isFetching || showLoading ? (
     <ContainerXS centerText verticalCenter style={{justifyContent: 'center'}}>
       <Loading />
     </ContainerXS>
@@ -111,14 +103,14 @@ const ClientList = (props: CombinedProps) => {
       verticalCenter
       style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-around'}}
     >
-      {props.permanentClients.map(client => (
+      {permanentClients.map(client => (
         <ClientItem
           client={client}
-          clientError={isSelectedClient(client.id) && props.clientError}
+          clientError={isSelectedClient(client.id) && clientError}
           key={client.id}
           onClick={() => setSelectedClient(client.id)}
           onClientRemoval={(password?: string) => removeClient(client.id, password)}
-          requirePassword={!props.isSSOUser}
+          requirePassword={!isSSOUser}
           selected={isSelectedClient(client.id)}
         />
       ))}
@@ -126,23 +118,27 @@ const ClientList = (props: CombinedProps) => {
   );
 };
 
-export default withRouter(
-  injectIntl(
-    connect(
-      (state: RootState): ConnectedProps => ({
-        clientError: ClientSelector.getError(state),
-        isFetching: ClientSelector.isFetching(state),
-        isSSOUser: SelfSelector.isSSOUser(state),
-        permanentClients: ClientSelector.getPermanentClients(state),
-      }),
-      (dispatch: ThunkDispatch): DispatchProps => ({
-        doInitializeClient: (clientType: ClientType, password?: string) =>
-          dispatch(ROOT_ACTIONS.clientAction.doInitializeClient(clientType, password)),
-        doRemoveClient: (clientId: string, password?: string) =>
-          dispatch(ROOT_ACTIONS.clientAction.doRemoveClient(clientId, password)),
-        getLocalStorage: (key: string) => dispatch(ROOT_ACTIONS.localStorageAction.getLocalStorage(key)),
-        resetAuthError: () => dispatch(ROOT_ACTIONS.authAction.resetAuthError()),
-      }),
-    )(ClientList),
-  ),
-);
+type ConnectedProps = ReturnType<typeof mapStateToProps>;
+const mapStateToProps = (state: RootState) => ({
+  clientError: ClientSelector.getError(state),
+  isFetching: ClientSelector.isFetching(state),
+  isSSOUser: SelfSelector.isSSOUser(state),
+  permanentClients: ClientSelector.getPermanentClients(state),
+});
+
+type DispatchProps = ReturnType<typeof mapDispatchToProps>;
+const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
+  bindActionCreators(
+    {
+      doInitializeClient: ROOT_ACTIONS.clientAction.doInitializeClient,
+      doRemoveClient: ROOT_ACTIONS.clientAction.doRemoveClient,
+      getLocalStorage: ROOT_ACTIONS.localStorageAction.getLocalStorage,
+      resetAuthError: ROOT_ACTIONS.authAction.resetAuthError,
+    },
+    dispatch,
+  );
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(ClientList);
