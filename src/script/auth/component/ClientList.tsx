@@ -35,10 +35,9 @@ import {ROUTE} from '../route';
 import {pathWithParams} from '../util/urlUtil';
 import ClientItem from './ClientItem';
 
-interface Props extends React.HTMLProps<HTMLDivElement> {}
-
 const logger = getLogger('ClientList');
 
+interface Props extends React.HTMLProps<HTMLDivElement> {}
 const ClientList = ({
   clientError,
   isFetching,
