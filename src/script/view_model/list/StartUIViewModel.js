@@ -36,8 +36,6 @@ import {generatePermissionHelpers} from '../../user/UserPermission';
 import {validateHandle} from '../../user/UserHandleGenerator';
 import {ParticipantAvatar} from 'Components/participantAvatar';
 import {WebAppEvents} from '../../event/WebApp';
-import {ServiceEntity} from '../../integration/ServiceEntity';
-import {MotionDuration} from '../../motion/MotionDuration';
 import {EventName} from '../../tracking/EventName';
 import {SearchRepository} from '../../search/SearchRepository';
 
@@ -60,13 +58,6 @@ class StartUIViewModel {
     this.alreadyClickedOnContact = {};
     this.clickOnConversation = this.clickOnConversation.bind(this);
     this.clickOnOther = this.clickOnOther.bind(this);
-    this.clickToOpenService = this.clickToOpenService.bind(this);
-
-    this.clickToAcceptInvite = this.clickToAcceptInvite.bind(this);
-    this.clickToIgnoreInvite = this.clickToIgnoreInvite.bind(this);
-    this.clickToSendRequest = this.clickToSendRequest.bind(this);
-    this.clickToUnblock = this.clickToUnblock.bind(this);
-
     this.handleSearchInput = this.handleSearchInput.bind(this);
 
     this.mainViewModel = mainViewModel;
@@ -203,23 +194,6 @@ class StartUIViewModel {
     });
     this.inviteMessageSelected = ko.observable(true);
 
-    // Selected user bubble
-    this.userProfile = ko.observable(null);
-    this.userProfileIsService = ko.pureComputed(() => this.userProfile() instanceof ServiceEntity);
-
-    this.additionalBubbleClasses = ko.pureComputed(() => {
-      return this.userProfileIsService() ? 'start-ui-service-bubble' : '';
-    });
-
-    this.renderAvatar = ko.observable(false);
-    this.renderAvatarComputed = ko.computed(() => {
-      const hasUserId = !!this.userProfile();
-
-      // swap value to re-render avatar
-      this.renderAvatar(false);
-      window.setTimeout(() => this.renderAvatar(hasUserId), 0);
-    });
-
     this.serviceConversations = ko.observable([]);
 
     this.isInitialServiceSearch = ko.observable(true);
@@ -296,44 +270,7 @@ class StartUIViewModel {
     if (isUser) {
       return this.mainViewModel.content.userModal.showUser(participantEntity.id);
     }
-    const createBubble = elementId => {
-      this.userProfile(participantEntity);
-      this.userBubbleLastId = elementId;
-      this.userBubble = new zeta.webapp.module.Bubble({
-        host_selector: `#${element.attr('id')}`,
-        on_hide: () => {
-          this.userBubble = undefined;
-          return (this.userBubbleLastId = undefined);
-        },
-        on_show: () => $('.start-ui-user-bubble .user-profile-connect-message').focus(),
-        scroll_selector: '.start-ui-list',
-      });
-
-      if (this.userProfileIsService()) {
-        this.integrationRepository.addProviderNameToParticipant(this.userProfile());
-      }
-
-      this.userBubble.toggle();
-    };
-
-    // We clicked on the same bubble
-    const isCurrentBubble = this.userBubbleLastId === event.currentTarget.id;
-    if (this.userBubble && isCurrentBubble) {
-      return this.userBubble.toggle();
-    }
-
-    const element = $(event.currentTarget).attr({
-      'data-bubble': '#start-ui-user-bubble',
-      'data-placement': 'right-flex',
-      id: Date.now(),
-    });
-
-    // Dismiss old bubble and wait with creating the new one when another bubble is open
-    const timeout = this.userBubble ? MotionDuration.LONG : 0;
-    if (this.userBubble) {
-      this.userBubble.hide();
-    }
-    window.setTimeout(() => createBubble(element[0].id), timeout);
+    return this.mainViewModel.content.serviceModal.showService(participantEntity);
   }
 
   clickOnShowPeople() {
@@ -342,14 +279,6 @@ class StartUIViewModel {
 
   clickOnShowServices() {
     this.updateList(StartUIViewModel.STATE.ADD_SERVICE);
-  }
-
-  clickToOpenService() {
-    if (this.userBubble) {
-      this.userBubble.hide();
-    }
-
-    this.actionsViewModel.open1to1ConversationWithService(this.userProfile());
   }
 
   handleSearchInput() {
@@ -388,7 +317,6 @@ class StartUIViewModel {
 
     // Clean up
     this._clearSearchResults();
-    this.userProfile(null);
     $('user-input input').focus();
 
     this.state(state);
@@ -437,29 +365,6 @@ class StartUIViewModel {
       })
       .then(userIds => this.userRepository.get_users_by_id(userIds))
       .then(userEntities => userEntities.filter(userEntity => !userEntity.isBlocked()));
-  }
-
-  clickToAcceptInvite(userEntity) {
-    this._closeList();
-    this.actionsViewModel.acceptConnectionRequest(userEntity, true);
-  }
-
-  clickToIgnoreInvite(userEntity) {
-    this.actionsViewModel.ignoreConnectionRequest(userEntity).then(() => {
-      if (this.userBubble) {
-        this.userBubble.hide();
-      }
-    });
-  }
-
-  clickToSendRequest(userEntity) {
-    this._closeList();
-    this.actionsViewModel.sendConnectionRequest(userEntity, true);
-  }
-
-  clickToUnblock(userEntity) {
-    this._closeList();
-    this.actionsViewModel.unblockUser(userEntity, true);
   }
 
   //##############################################################################

@@ -1,0 +1,39 @@
+<div class="service-modal" data-bind="with: $root.serviceModal">
+  <modal
+    params="isShown: isVisible, onBgClick: hide, onClosed: onClosed"
+    data-bind="attr: {'data-uie-name': service() ? 'modal-service' : ''}"
+  >
+    <!-- ko if: service() -->
+      <div class="modal__header">
+        <close-icon class="modal__header__button" data-bind="click: hide" data-uie-name="do-close"></close-icon>
+      </div>
+      <div class="modal__body service-modal__body">
+        <div class="service-modal__details">
+          <participant-avatar params="participant: service, size: avatarSize"></participant-avatar>
+          <div class="service-modal__details__content">
+            <div class="service-modal__name" data-bind="text: service().name" data-uie-name="status-service-name"></div>
+            <div
+              class="service-modal__provider"
+              data-bind="text: service().providerName()"
+              data-uie-name="status-service-provider"
+            ></div>
+          </div>
+        </div>
+
+        <div
+          class="service-modal__description"
+          data-bind="text: service().description"
+          data-uie-name="status-service-description"
+        ></div>
+      </div>
+
+      <div class="service-modal__footer">
+        <button
+          class="service-modal__button"
+          data-bind="click: openService, text: t('searchServiceConfirmButton')"
+          data-uie-name="do-service-confirm"
+        ></button>
+      </div>
+    <!-- /ko -->
+  </modal>
+</div>

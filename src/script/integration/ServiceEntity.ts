@@ -41,16 +41,15 @@ export class ServiceEntity {
   previewPictureResource: ko.Observable<string>;
 
   constructor(serviceData: ServiceData = {}) {
-    const {description, id, name, provider: providerId, summary, tags} = serviceData;
+    const {description = '', id = '', name = '', provider: providerId = '', summary = '', tags = []} = serviceData;
 
-    this.id = id || '';
-
-    this.description = description || '';
-    this.name = name || '';
-    this.providerId = providerId || '';
+    this.id = id;
+    this.description = description;
+    this.name = name;
+    this.providerId = providerId;
     this.providerName = ko.observable(' ');
-    this.summary = summary || '';
-    this.tags = tags || [];
+    this.summary = summary;
+    this.tags = tags;
 
     this.mediumPictureResource = ko.observable();
     this.previewPictureResource = ko.observable();

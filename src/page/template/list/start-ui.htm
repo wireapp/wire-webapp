@@ -172,40 +172,6 @@
     </div>
   <!-- /ko -->
 
-  <!-- ko if: userProfile() -->
-    <div id="start-ui-user-bubble" class="start-ui-user-bubble bubble" data-bind="css: additionalBubbleClasses">
-      <!-- ko ifnot: userProfileIsService() -->
-        <user-profile params="user: userProfile,
-                              accept: clickToAcceptInvite,
-                              connect: clickToSendRequest,
-                              ignore: clickToIgnoreInvite,
-                              unblock: clickToUnblock"></user-profile>
-      <!-- /ko -->
-
-      <!-- ko if: userProfileIsService() -->
-        <div class="start-ui-service">
-          <div class="start-ui-service-body">
-            <div class="start-ui-service-details">
-              <!-- ko if: renderAvatar() -->
-                <participant-avatar params="participant: userProfile, size: ParticipantAvatar.SIZE.LARGE"></participant-avatar>
-              <!-- /ko -->
-              <div class="start-ui-service-details-content">
-                <div class="start-ui-service-name" data-bind="text: userProfile().name" data-uie-name="status-service-name"></div>
-                <div class="start-ui-service-provider" data-bind="text: userProfile().providerName()" data-uie-name="status-service-provider"></div>
-              </div>
-            </div>
-
-            <div class="start-ui-service-description" data-bind="text: userProfile().description" data-uie-name="status-service-description"></div>
-          </div>
-
-          <div class="start-ui-service-footer">
-            <button class="start-ui-service-button" data-bind="click: clickToOpenService, text: t('searchServiceConfirmButton')" data-uie-name="do-service-confirm"></button>
-          </div>
-        </div>
-      <!-- /ko -->
-    </div>
-  <!-- /ko -->
-
   <div id="invite-bubble" class="invite-bubble bubble">
     <div class="invite-bubble-inner">
       <!-- ko if: showInviteForm() -->
