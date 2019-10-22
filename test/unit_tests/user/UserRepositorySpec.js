@@ -23,6 +23,7 @@ import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {ReceiptMode} from 'src/script/conversation/ReceiptMode';
 import {User} from 'src/script/entity/User';
 import {EventRepository} from 'src/script/event/EventRepository';
+import {ClientMapper} from 'src/script/client/ClientMapper';
 
 describe('UserRepository', () => {
   let server = null;
@@ -218,13 +219,9 @@ describe('UserRepository', () => {
         user_john_doe = new User(entities.user.john_doe.id);
 
         TestFactory.user_repository.save_users([user_jane_roe, user_john_doe]);
-        const permanent_client = TestFactory.client_repository.clientMapper.mapClient(
-          entities.clients.john_doe.permanent,
-        );
-        const plain_client = TestFactory.client_repository.clientMapper.mapClient(entities.clients.jane_roe.plain);
-        const temporary_client = TestFactory.client_repository.clientMapper.mapClient(
-          entities.clients.john_doe.temporary,
-        );
+        const permanent_client = ClientMapper.mapClient(entities.clients.john_doe.permanent);
+        const plain_client = ClientMapper.mapClient(entities.clients.jane_roe.plain);
+        const temporary_client = ClientMapper.mapClient(entities.clients.john_doe.temporary);
         const recipients = {
           [entities.user.john_doe.id]: [permanent_client, temporary_client],
           [entities.user.jane_roe.id]: [plain_client],

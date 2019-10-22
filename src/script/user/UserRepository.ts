@@ -57,8 +57,10 @@ import {protoFromType, valueFromType} from './AvailabilityMapper';
 import {showAvailabilityModal} from './AvailabilityModal';
 import {createSuggestions} from './UserHandleGenerator';
 
+import {PublicClient} from '@wireapp/api-client/dist/commonjs/client';
 import {AssetService} from '../assets/AssetService';
 import {ClientEntity} from '../client/ClientEntity';
+import {ClientMapper} from '../client/ClientMapper';
 import {ClientRepository} from '../client/ClientRepository';
 import {ACCENT_ID, config} from '../config';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
@@ -236,7 +238,9 @@ export class UserRepository {
   /**
    * Retrieves meta information about all the clients of a given user.
    */
-  getClientsByUserId(userId: string, updateClients: boolean = true): Promise<ClientEntity[]> {
+  getClientsByUserId(userId: string, updateClients: false): Promise<PublicClient[]>;
+  getClientsByUserId(userId: string, updateClients?: boolean): Promise<ClientEntity[]>;
+  getClientsByUserId(userId: string, updateClients: boolean = true): Promise<ClientEntity[] | PublicClient[]> {
     return this.client_repository.getClientsByUserId(userId, updateClients);
   }
 
@@ -336,7 +340,7 @@ export class UserRepository {
    */
   addClientToUser(userId: string, clientPayload: object, publishClient: boolean = false): Promise<boolean> {
     return this.get_user_by_id(userId).then(userEntity => {
-      const clientEntity = this.client_repository.clientMapper.mapClient(clientPayload, userEntity.is_me);
+      const clientEntity = ClientMapper.mapClient(clientPayload, userEntity.is_me);
       const wasClientAdded = userEntity.add_client(clientEntity);
 
       if (wasClientAdded) {

@@ -23,6 +23,7 @@ import {Environment} from 'src/script/util/Environment';
 import {ClientRepository} from 'src/script/client/ClientRepository';
 import {ClientType} from 'src/script/client/ClientType';
 import {ClientEntity} from 'src/script/client/ClientEntity';
+import {ClientMapper} from 'src/script/client/ClientMapper';
 
 describe('ClientRepository', () => {
   const testFactory = new TestFactory();
@@ -149,22 +150,22 @@ describe('ClientRepository', () => {
     });
   });
 
-  describe('_constructPrimaryKey', () => {
+  describe('constructPrimaryKey', () => {
     it('returns a proper primary key for a client', () => {
-      const actualPrimaryKey = TestFactory.client_repository._constructPrimaryKey(userId, clientId);
+      const actualPrimaryKey = TestFactory.client_repository.constructPrimaryKey(userId, clientId);
       const expectedPrimaryKey = `${userId}@${clientId}`;
 
       expect(actualPrimaryKey).toEqual(expectedPrimaryKey);
     });
 
     it('throws an error if missing user ID', () => {
-      const functionCall = () => TestFactory.client_repository._constructPrimaryKey(undefined, clientId);
+      const functionCall = () => TestFactory.client_repository.constructPrimaryKey(undefined, clientId);
 
       expect(functionCall).toThrowError(z.error.ClientError, z.error.ClientError.MESSAGE.NO_USER_ID);
     });
 
     it('throws and error if missing client ID', () => {
-      const functionCall = () => TestFactory.client_repository._constructPrimaryKey(userId, undefined);
+      const functionCall = () => TestFactory.client_repository.constructPrimaryKey(userId, undefined);
 
       expect(functionCall).toThrowError(z.error.ClientError, z.error.ClientError.MESSAGE.NO_CLIENT_ID);
     });
@@ -179,7 +180,7 @@ describe('ClientRepository', () => {
 
     it('returns true on Electron', () => {
       const clientPayload = {type: ClientType.PERMANENT};
-      const clientEntity = TestFactory.client_repository.clientMapper.mapClient(clientPayload, true);
+      const clientEntity = ClientMapper.mapClient(clientPayload, true);
       TestFactory.client_repository.currentClient(clientEntity);
       Environment.electron = true;
       TestFactory.client_repository.__test__assignEnvironment(Environment);
@@ -190,7 +191,7 @@ describe('ClientRepository', () => {
 
     it('returns true on Electron even if client is temporary', () => {
       const clientPayload = {type: ClientType.TEMPORARY};
-      const clientEntity = TestFactory.client_repository.clientMapper.mapClient(clientPayload, true);
+      const clientEntity = ClientMapper.mapClient(clientPayload, true);
       TestFactory.client_repository.currentClient(clientEntity);
       Environment.electron = true;
       TestFactory.client_repository.__test__assignEnvironment(Environment);
@@ -209,7 +210,7 @@ describe('ClientRepository', () => {
 
     it('returns true if current client is permanent', () => {
       const clientPayload = {type: ClientType.PERMANENT};
-      const clientEntity = TestFactory.client_repository.clientMapper.mapClient(clientPayload, true);
+      const clientEntity = ClientMapper.mapClient(clientPayload, true);
       TestFactory.client_repository.currentClient(clientEntity);
       const isPermanent = TestFactory.client_repository.isCurrentClientPermanent();
 
@@ -218,7 +219,7 @@ describe('ClientRepository', () => {
 
     it('returns false if current client is temporary', () => {
       const clientPayload = {type: ClientType.TEMPORARY};
-      const clientEntity = TestFactory.client_repository.clientMapper.mapClient(clientPayload, true);
+      const clientEntity = ClientMapper.mapClient(clientPayload, true);
       TestFactory.client_repository.currentClient(clientEntity);
       const isPermanent = TestFactory.client_repository.isCurrentClientPermanent();
 
@@ -232,7 +233,7 @@ describe('ClientRepository', () => {
     });
   });
 
-  describe('_isCurrentClient', () => {
+  describe('isCurrentClient', () => {
     beforeEach(() => TestFactory.client_repository.currentClient(undefined));
 
     it('returns true if user ID and client ID match', () => {
@@ -240,7 +241,7 @@ describe('ClientRepository', () => {
       clientEntity.id = clientId;
       TestFactory.client_repository.currentClient(clientEntity);
       TestFactory.client_repository.selfUser(new User(userId));
-      const result = TestFactory.client_repository._isCurrentClient(userId, clientId);
+      const result = TestFactory.client_repository.isCurrentClient(userId, clientId);
 
       expect(result).toBeTruthy();
     });
@@ -249,7 +250,7 @@ describe('ClientRepository', () => {
       const clientEntity = new ClientEntity();
       clientEntity.id = clientId;
       TestFactory.client_repository.currentClient(clientEntity);
-      const result = TestFactory.client_repository._isCurrentClient(userId, 'ABCDE');
+      const result = TestFactory.client_repository.isCurrentClient(userId, 'ABCDE');
 
       expect(result).toBeFalsy();
     });
@@ -258,27 +259,27 @@ describe('ClientRepository', () => {
       const clientEntity = new ClientEntity();
       clientEntity.id = clientId;
       TestFactory.client_repository.currentClient(clientEntity);
-      const result = TestFactory.client_repository._isCurrentClient('ABCDE', clientId);
+      const result = TestFactory.client_repository.isCurrentClient('ABCDE', clientId);
 
       expect(result).toBeFalsy();
     });
 
     it('throws an error if current client is not set', () => {
-      const functionCall = () => TestFactory.client_repository._isCurrentClient(userId, clientId);
+      const functionCall = () => TestFactory.client_repository.isCurrentClient(userId, clientId);
 
       expect(functionCall).toThrowError(z.error.ClientError, z.error.ClientError.MESSAGE.CLIENT_NOT_SET);
     });
 
     it('throws an error if client ID is not specified', () => {
       TestFactory.client_repository.currentClient(new ClientEntity());
-      const functionCall = () => TestFactory.client_repository._isCurrentClient(userId);
+      const functionCall = () => TestFactory.client_repository.isCurrentClient(userId);
 
       expect(functionCall).toThrowError(z.error.ClientError, z.error.ClientError.MESSAGE.NO_CLIENT_ID);
     });
 
     it('throws an error if user ID is not specified', () => {
       TestFactory.client_repository.currentClient(new ClientEntity());
-      const functionCall = () => TestFactory.client_repository._isCurrentClient(undefined, clientId);
+      const functionCall = () => TestFactory.client_repository.isCurrentClient(undefined, clientId);
 
       expect(functionCall).toThrowError(z.error.ClientError, z.error.ClientError.MESSAGE.NO_USER_ID);
     });

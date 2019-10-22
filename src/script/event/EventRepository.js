@@ -297,7 +297,7 @@ export class EventRepository {
         // we will receive a HTTP 404 status code with a `notifications` payload
         // TODO: In the future we should ask the backend for the last known notification id (HTTP GET /notifications/{id}) instead of using the "errorResponse.notifications" payload
         if (errorResponse.notifications) {
-          await this._triggerMissedSystemEventMessageRendering();
+          this._triggerMissedSystemEventMessageRendering();
           return _gotNotifications(errorResponse);
         }
 

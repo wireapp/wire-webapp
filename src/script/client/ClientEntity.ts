@@ -36,7 +36,11 @@ export class ClientEntity {
   isSelfClient: boolean;
   label?: string;
   location?: object;
-  meta: {isVerified: ko.Observable<boolean>; primaryKey?: string};
+  meta: {
+    isVerified?: ko.Observable<boolean>;
+    primaryKey?: string;
+    userId?: string;
+  };
   model?: string;
   time?: string;
   type?: ClientType;
