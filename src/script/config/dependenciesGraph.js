@@ -19,7 +19,6 @@
 
 import {AssetService} from '../assets/AssetService';
 import {AssetUploader} from '../assets/AssetUploader';
-import {AudioRepository} from '../audio/AudioRepository';
 import {AuthRepository} from '../auth/AuthRepository';
 import {AuthService} from '../auth/AuthService';
 import {BackendClient} from '../service/BackendClient';
@@ -42,7 +41,6 @@ const dependencies = new WeakMap();
 
 dependencies.set(AssetService, {dependencies: [BackendClient], name: 'AssetService'});
 dependencies.set(AssetUploader, {dependencies: [AssetService], name: 'AssetUploader'});
-dependencies.set(AudioRepository, {dependencies: [], name: 'AudioRepository'});
 dependencies.set(AuthRepository, {dependencies: [AuthService], name: 'AuthRepository'});
 dependencies.set(AuthService, {dependencies: [BackendClient], name: 'AuthService'});
 dependencies.set(BackendClient, {dependencies: [], name: 'BackendClient'});
@@ -61,7 +59,6 @@ export {
   dependencies,
   AssetService,
   AssetUploader,
-  AudioRepository,
   AuthRepository,
   BackendClient,
   BackupService,
