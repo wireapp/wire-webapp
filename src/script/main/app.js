@@ -102,6 +102,7 @@ import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {PropertiesService} from '../properties/PropertiesService';
 import {LinkPreviewRepository} from '../links/LinkPreviewRepository';
 import {AssetService} from '../assets/AssetService';
+import {AudioRepository} from '../audio/AudioRepository';
 
 class App {
   static get CONFIG() {
@@ -164,7 +165,7 @@ class App {
     const repositories = {};
     const selfService = new SelfService(this.backendClient);
 
-    repositories.audio = resolve(graph.AudioRepository);
+    repositories.audio = new AudioRepository();
     repositories.auth = resolve(graph.AuthRepository);
     repositories.giphy = resolve(graph.GiphyRepository);
     repositories.properties = new PropertiesRepository(new PropertiesService(this.backendClient), selfService);
