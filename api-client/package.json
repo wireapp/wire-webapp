@@ -40,7 +40,7 @@
     "karma-spec-reporter": "0.0.32",
     "nock": "11.4.0",
     "optimist": "0.6.1",
-    "react": "16.10.2",
+    "react": "16.11.0",
     "react-dom": "16.10.2",
     "react-hot-loader": "4.12.15",
     "rimraf": "3.0.0",
