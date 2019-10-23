@@ -46,8 +46,7 @@ import * as React from 'react';
 import {FormattedHTMLMessage, InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {Redirect, RouteComponentProps, withRouter} from 'react-router';
-import {save} from 'Util/ephemeralValueStore';
-import {isTemporaryClientAndNonPersistent, noop} from 'Util/util';
+import {noop} from 'Util/util';
 import {isValidEmail, isValidPhoneNumber, isValidUsername} from 'Util/ValidationUtil';
 import {loginStrings, logoutReasonStrings} from '../../strings';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
@@ -164,17 +163,6 @@ class Login extends React.Component<CombinedProps, State> {
   };
 
   componentDidMount = () => {
-    if (isTemporaryClientAndNonPersistent()) {
-      const secretKey = new Uint32Array(64);
-      window.crypto.getRandomValues(secretKey);
-      const hexKey: string[] = [];
-      for (var i = 0; i < secretKey.length; i++) {
-        const x = secretKey[i];
-        hexKey.push(`00${x.toString(16)}`.slice(-2));
-      }
-      save<string>(hexKey.join(''));
-    }
-
     this.props.resetAuthError();
     const immediateLogin = URLUtil.hasURLParameter(QUERY_KEY.IMMEDIATE_LOGIN);
     if (immediateLogin) {
