@@ -23,7 +23,7 @@ import {AudioPreference} from 'src/script/audio/AudioPreference';
 import {AudioPlayingType} from 'src/script/audio/AudioPlayingType';
 import {AudioType} from 'src/script/audio/AudioType';
 import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
-import {AudioRepository} from 'audio/AudioRepository';
+import {AudioRepository} from 'src/script/audio/AudioRepository';
 
 describe('AudioRepository', () => {
   const audioRepository = new AudioRepository();
