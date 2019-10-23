@@ -59,7 +59,7 @@ import TitleBarViewModelGlobal from '../view_model/content/TitleBarViewModel.js'
 import PanelViewModelGlobal from '../view_model/PanelViewModel.js';
 import ListViewModelGlobal from '../view_model/ListViewModel.js';
 import accentColorPickerGlobal from 'Components/accentColorPicker.js';
-import copyToClipboardGlobal from 'Components/copyToClipboard.js';
+import copyToClipboardGlobal from 'Components/copyToClipboard.ts';
 import deviceRemoveGlobal from 'Components/deviceRemove.js';
 import ephemeralTimerGlobal from 'Components/ephemeralTimer.js';
 import fullSearchGlobal from 'Components/fullSearch.js';

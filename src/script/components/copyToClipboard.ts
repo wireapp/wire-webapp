@@ -18,14 +18,17 @@
  */
 
 class CopyToClipboard {
-  constructor(params) {
+  // tslint:disable-next-line
+  private readonly text: string;
+
+  constructor(params: {text: string}) {
     this.text = params.text;
   }
 
-  onClick(viewModel, event) {
+  onClick(viewModel: CopyToClipboard, event: JQuery.Event): void {
     if (window.getSelection) {
       const selectionRange = document.createRange();
-      selectionRange.selectNode(event.currentTarget);
+      selectionRange.selectNode(event.currentTarget as Node);
       window.getSelection().removeAllRanges();
       window.getSelection().addRange(selectionRange);
     }
