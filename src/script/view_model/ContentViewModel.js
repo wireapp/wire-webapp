@@ -31,6 +31,7 @@ import {ModalsViewModel} from './ModalsViewModel';
 import {WebAppEvents} from '../event/WebApp';
 import {PreferencesAVViewModel} from './content/PreferencesAVViewModel.js';
 import {ServiceModalViewModel} from './content/ServiceModalViewModel';
+import {InviteModalViewModel} from './content/InviteModalViewModel';
 
 export class ContentViewModel {
   static get STATE() {
@@ -80,6 +81,7 @@ export class ContentViewModel {
     );
     this.userModal = new UserModalViewModel(repositories.user, mainViewModel.actions);
     this.serviceModal = new ServiceModalViewModel(repositories.integration, mainViewModel.actions);
+    this.inviteModal = new InviteModalViewModel(repositories.user);
     this.legalHoldModal = new LegalHoldModalViewModel(
       repositories.user,
       repositories.conversation,

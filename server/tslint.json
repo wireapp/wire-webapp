@@ -32,6 +32,6 @@
   },
   "rulesDirectory": ["node_modules/tslint-eslint-rules/dist/rules"],
   "linterOptions": {
-    "exclude": ["**/bower_components/**", "**/dist/**", "**/node_modules/**"]
+    "exclude": ["**/dist/**", "**/node_modules/**"]
   }
 }

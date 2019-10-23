@@ -1,9 +1,6 @@
 {
   "dependencies": {
     "@babel/plugin-syntax-dynamic-import": "7.2.0",
-    "@bower_components/normalize-css": "necolas/normalize.css#8.0.1",
-    "@bower_components/webapp-module-bubble": "wireapp/webapp-module-bubble#1.1.2",
-    "@bower_components/webapp-module-namespace": "wireapp/webapp-module-namespace#1.0.2",
     "@wireapp/antiscroll-2": "1.0.2",
     "@wireapp/avs": "release-5.1",
     "@wireapp/commons": "2.2.20",
@@ -65,7 +62,7 @@
     "@types/highlightjs": "9.12.0",
     "@types/jasmine": "3.4.4",
     "@types/js-cookie": "2.2.4",
-    "@types/libsodium-wrappers-sumo": "0.7.1",
+    "@types/libsodium-wrappers-sumo": "0.7.2",
     "@types/linkify-it": "2.1.0",
     "@types/markdown-it": "0.0.9",
     "@types/open-graph": "0.2.0",
@@ -119,7 +116,6 @@
     "grunt-contrib-watch": "1.1.0",
     "grunt-gitinfo": "0.1.9",
     "grunt-include-replace": "5.0.0",
-    "grunt-npm-bower": "0.0.4",
     "grunt-open": "0.2.4",
     "grunt-postcss": "0.9.0",
     "grunt-shell": "3.0.1",
@@ -171,21 +167,6 @@
   },
   "engines": {
     "yarn": ">= 1.0.0"
-  },
-  "exportsOverride": {
-    "@bower_components/normalize-css": {
-      "css": "normalize.css"
-    },
-    "@bower_components/webapp-module-bubble": {
-      "js": "dist/script/*.js",
-      "less": "app/style/webapp-module-bubble.less"
-    },
-    "@bower_components/webapp-module-namespace": {
-      "js": "js/*.js"
-    },
-    "@bower_components/wire-theme": {
-      "less": "app/style/{wire-theme,variables,input}.less"
-    }
   },
   "license": "GPL-3.0",
   "lint-staged": {
@@ -248,7 +229,7 @@
     "lint:ts:app": "tslint --config tslint.json --project tsconfig.json \"src/script/**/*.ts\"",
     "lint:ts:react": "tslint --config tslint.react.json --project tsconfig.json \"src/script/**/*.tsx\"",
     "lint:ts:server": "cd server && yarn lint",
-    "postinstall": "yarn configure && grunt init && cd server && yarn",
+    "postinstall": "yarn configure && cd server && yarn",
     "prettier": "prettier --ignore-path .gitignore \"**/*.{json,md}\"",
     "start": "yarn build:server && grunt build && concurrently \"yarn start:server:dev\" \"grunt watch\"",
     "start:server:dev": "cross-env NODE_ENV=development node ./server/dist/index.js",

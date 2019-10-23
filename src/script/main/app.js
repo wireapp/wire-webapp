@@ -40,8 +40,6 @@ import {serverTimeHandler} from '../time/serverTimeHandler';
 import {CallingRepository} from '../calling/CallingRepository';
 import {BackupRepository} from '../backup/BackupRepository';
 import {BroadcastRepository} from '../broadcast/BroadcastRepository';
-import {ConnectService} from '../connect/ConnectService';
-import {ConnectRepository} from '../connect/ConnectRepository';
 import {NotificationRepository} from '../notification/NotificationRepository';
 import {IntegrationRepository} from '../integration/IntegrationRepository';
 import {IntegrationService} from '../integration/IntegrationService';
@@ -192,7 +190,6 @@ class App {
       serverTimeHandler,
       repositories.user,
     );
-    repositories.connect = new ConnectRepository(this.service.connect, repositories.properties);
     repositories.search = new SearchRepository(resolve(graph.BackendClient), repositories.user);
     repositories.team = new TeamRepository(resolve(graph.BackendClient), repositories.user);
     repositories.eventTracker = new EventTrackingRepository(repositories.team, repositories.user);
@@ -279,7 +276,6 @@ class App {
 
     return {
       asset: resolve(graph.AssetService),
-      connect: new ConnectService(this.backendClient),
       conversation: new ConversationService(this.backendClient, eventService, storageService),
       event: eventService,
       integration: new IntegrationService(this.backendClient),

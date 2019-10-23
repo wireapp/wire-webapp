@@ -5,9 +5,6 @@ import jQuery from 'jquery';
 import ko from 'knockout';
 import raygun from '../../../node_modules/raygun4js/dist/raygun.vanilla.js';
 
-import namespace from '../../ext/js/webapp-module-namespace/Namespace.js';
-import bubble from '../../ext/js/webapp-module-bubble/webapp-module-bubble.js';
-
 // Needed for the wrapper
 import '../event/WebApp';
 
@@ -71,7 +68,6 @@ import messageQuoteGlobal from 'Components/messageQuote.js';
 import messageTimerButtonGlobal from 'Components/messageTimerButton.js';
 import serviceListGlobal from 'Components/serviceList.js';
 import topPeopleGlobal from 'Components/topPeople.js';
-import userProfileGlobal from 'Components/userProfile.js';
 import userInputGlobal from 'Components/userInput.js';
 import guestModeToggleGlobal from 'Components/guestModeToggle.js';
 import infoToggleGlobal from 'Components/infoToggle.js';

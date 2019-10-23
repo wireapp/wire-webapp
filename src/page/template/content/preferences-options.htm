@@ -1,18 +1,6 @@
 <div id="preferences-options" class="preferences-page preferences-options" data-bind="with: $root.preferencesOptions">
   <div class="preferences-titlebar" data-bind="text: t('preferencesOptions')"></div>
   <div class="preferences-content" data-bind="fadingscrollbar">
-    <!-- ko if: isActivatedAccount() && !isTeam() && window.wAddressBook -->
-      <section class="preferences-section">
-        <header class="preferences-header" data-bind="text: t('preferencesOptionsContacts')"></header>
-          <div class="preferences-option" data-uie-name="do-share-osx-contacts">
-            <div class="preferences-option-icon preferences-option-pointer" data-bind="click: connectMacOSContacts, attr: {title: t('tooltipPreferencesContactsMacos')}">
-              <div class="icon-contacts"></div>
-            </div>
-            <label class="preferences-option-label" data-bind="click: connectMacOSContacts, text: t('preferencesOptionsContactsMacos'), attr: {title: t('tooltipPreferencesContactsMacos')}"></label>
-          </div>
-        <div class="preferences-detail" data-bind="text: t('preferencesOptionsContactsDetail')"></div>
-      </section>
-    <!-- /ko -->
 
     <section class="preferences-section">
       <header class="preferences-header" data-bind="text: t('preferencesOptionsAudio')"></header>
