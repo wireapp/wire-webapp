@@ -19,7 +19,7 @@
 
 import {resolve, graph} from './../../api/testResolver';
 import UUID from 'uuidjs';
-import {RichProfileRepository} from 'user/RichProfileRepository';
+import {RichProfileRepository} from 'src/script/user/RichProfileRepository';
 
 describe('RichProfileRepository', () => {
   let richProfileRepository;
