@@ -18,6 +18,7 @@
  */
 
 import {CONVERSATION_TYPING} from '@wireapp/api-client/dist/commonjs/conversation/data';
+import {User} from '@wireapp/api-client/dist/commonjs/user/';
 import {Account} from '@wireapp/core';
 import {PayloadBundle, ReactionType} from '@wireapp/core/dist/conversation/';
 import {
@@ -40,6 +41,10 @@ export abstract class MessageHandler {
     if (this.account && this.account.service) {
       await this.account.service.conversation.addUser(conversationId, userId);
     }
+  }
+
+  public async getUser(userId: string): Promise<User> {
+    return this.account!.service!.user.getUsers(userId);
   }
 
   async clearConversation(conversationId: string): Promise<void> {
