@@ -29,8 +29,6 @@ import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 import {User} from 'src/script/entity/User';
 import {BackupRepository} from 'src/script/backup/BackupRepository';
 import {UserRepository} from 'src/script/user/UserRepository';
-import {ConnectService} from 'src/script/connect/ConnectService';
-import {ConnectRepository} from 'src/script/connect/ConnectRepository';
 import {NotificationRepository} from 'src/script/notification/NotificationRepository';
 import {StorageRepository} from 'src/script/storage/StorageRepository';
 import {ClientRepository} from 'src/script/client/ClientRepository';
@@ -246,19 +244,7 @@ window.TestFactory = class TestFactory {
       TestFactory.user_repository,
     );
 
-    return TestFactory.connect_repository;
-  }
-
-  /**
-   * @returns {Promise<ConnectRepository>} The connect repository.
-   */
-  async exposeConnectActors() {
-    await this.exposeUserActors();
-    TestFactory.connectService = new ConnectService(resolveDependency(graph.BackendClient));
-
-    TestFactory.connect_repository = new ConnectRepository(TestFactory.connectService, TestFactory.user_repository);
-
-    return TestFactory.connect_repository;
+    return TestFactory.connection_repository;
   }
 
   /**

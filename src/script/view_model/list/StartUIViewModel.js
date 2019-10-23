@@ -20,9 +20,6 @@
 import {debounce} from 'underscore';
 
 import {getLogger} from 'Util/Logger';
-import {alias} from 'Util/util';
-import {t} from 'Util/LocalizerUtil';
-import {Environment} from 'Util/Environment';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 
 import {UserlistMode} from 'Components/userList';
@@ -30,8 +27,6 @@ import {UserlistMode} from 'Components/userList';
 import {getManageTeamUrl, getManageServicesUrl} from '../../externalRoute';
 import {Config} from '../../auth/config';
 import {User} from '../../entity/User';
-import {ConnectSource} from '../../connect/ConnectSource';
-import {ModalsViewModel} from '../ModalsViewModel';
 import {generatePermissionHelpers} from '../../user/UserPermission';
 import {validateHandle} from '../../user/UserHandleGenerator';
 import {ParticipantAvatar} from 'Components/participantAvatar';
@@ -62,7 +57,6 @@ class StartUIViewModel {
 
     this.mainViewModel = mainViewModel;
     this.listViewModel = listViewModel;
-    this.connectRepository = repositories.connect;
     this.conversationRepository = repositories.conversation;
     this.integrationRepository = repositories.integration;
     this.propertiesRepository = repositories.properties;
@@ -172,34 +166,9 @@ class StartUIViewModel {
     this.showSpinner = ko.observable(false);
     this.showTopPeople = ko.pureComputed(() => !this.isTeam() && this.topUsers().length && !this.showMatches());
 
-    // Invite bubble states
-    this.showInviteForm = ko.observable(true);
-
-    // Invite bubble
-    this.inviteBubble = null;
-
-    this.inviteHint = ko.pureComputed(() => {
-      const metaKey = Environment.os.mac ? t('inviteMetaKeyMac') : t('inviteMetaKeyPc');
-
-      return this.inviteMessageSelected() ? t('inviteHintSelected', metaKey) : t('inviteHintUnselected', metaKey);
-    });
-    this.inviteMessage = ko.pureComputed(() => {
-      if (this.selfUser()) {
-        const username = this.selfUser().username();
-        return username
-          ? t('inviteMessage', {brandName: Config.BRAND_NAME, username: `@${username}`})
-          : t('inviteMessageNoEmail', Config.BRAND_NAME);
-      }
-      return '';
-    });
-    this.inviteMessageSelected = ko.observable(true);
-
     this.serviceConversations = ko.observable([]);
 
     this.isInitialServiceSearch = ko.observable(true);
-
-    this.userBubble = undefined;
-    this.userBubbleLastId = undefined;
 
     this.manageTeamUrl = getManageTeamUrl('client_landing');
     this.manageServicesUrl = getManageServicesUrl('client_landing');
@@ -211,12 +180,6 @@ class StartUIViewModel {
     this.shouldUpdateServiceScrollbar = ko
       .computed(() => this.serviceConversations())
       .extend({notify: 'always', rateLimit: 500});
-
-    this._initSubscriptions();
-  }
-
-  _initSubscriptions() {
-    amplify.subscribe(WebAppEvents.CONNECT.IMPORT_CONTACTS, this.importContacts.bind(this));
   }
 
   clickOnClose() {
@@ -297,14 +260,6 @@ class StartUIViewModel {
   }
 
   resetView() {
-    if (this.userBubble) {
-      this.userBubble.hide();
-    }
-
-    if (this.inviteBubble) {
-      this.inviteBubble.hide();
-    }
-
     this.showMatches(false);
     this.showSpinner(false);
 
@@ -367,113 +322,7 @@ class StartUIViewModel {
       .then(userEntities => userEntities.filter(userEntity => !userEntity.isBlocked()));
   }
 
-  //##############################################################################
-  // Invite bubble
-  //##############################################################################
-
-  clickOnImportContacts() {
-    this._importContacts(ConnectSource.ICLOUD);
-  }
-
-  clickToCloseGenericInvite() {
-    this.showInviteForm(false);
-  }
-
-  clickToShowGenericInvite() {
-    this.showInviteForm(true);
-    this._focusInviteForm();
-  }
-
-  clickToShowInviteBubble() {
-    if (!this.inviteBubble) {
-      this.inviteBubble = new zeta.webapp.module.Bubble({
-        host_selector: '#invite-button',
-        on_hide: () => {
-          $('.invite-link-box .fade-wrapper').removeClass('bg-animation');
-          $('.invite-link-box .message').off('copy blur focus');
-          this.inviteBubble = null;
-          this.showInviteForm(true);
-        },
-        on_show: () => {
-          if (this.showInviteForm()) {
-            this._focusInviteForm();
-          }
-        },
-        scroll_selector: '.start-ui-list',
-      });
-
-      this.inviteBubble.show();
-    }
-  }
-
-  _importContacts(type) {
-    if (this.inviteBubble) {
-      this.inviteBubble.hide();
-    }
-    this.importContacts(type);
-  }
-
-  _focusInviteForm() {
-    $('.invite-link-box .message')
-      .on('copy', event => {
-        $(event.currentTarget)
-          .closest('.fade-wrapper')
-          .addClass('bg-animation')
-          .on(alias.animationend, _event => {
-            if (_event.originalEvent.animationName === 'message-bg-fadeout') {
-              $(this).off(alias.animationend);
-
-              if (this.inviteBubble) {
-                this.inviteBubble.hide();
-              }
-            }
-          });
-      })
-      .on('blur', () => this.inviteMessageSelected(false))
-      .on('click', event => {
-        this.inviteMessageSelected(true);
-        $(event.target).select();
-      })
-      .trigger('click');
-  }
-
-  //##############################################################################
-  // Contacts import
-  //##############################################################################
-
-  /**
-   * Connect with contacts.
-   * @param {ConnectSource} source - Source for the contacts import
-   * @returns {undefined} No return value
-   */
-  importContacts(source) {
-    this.connectRepository
-      .getContacts(source)
-      .then((userIds = []) => this.userRepository.get_users_by_id(userIds))
-      .then(userEntities => {
-        this.matchedUsers(userEntities);
-        this.showMatches(true);
-      })
-      .catch(error => {
-        const isNoContacts = error.type === z.error.ConnectError.TYPE.NO_CONTACTS;
-        if (!isNoContacts) {
-          this.logger.error(`Importing contacts from '${source}' failed: ${error.message}`, error);
-
-          amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
-            primaryAction: {
-              action: () => this.importContacts(source),
-              text: t('modalUploadContactsAction'),
-            },
-            text: {
-              message: t('modalUploadContactsMessage'),
-            },
-          });
-        }
-      })
-      .then(() => {
-        this.showSpinner(false);
-      });
-  }
+  clickToShowInviteModal = () => this.mainViewModel.content.inviteModal.show();
 
   //##############################################################################
   // Search
