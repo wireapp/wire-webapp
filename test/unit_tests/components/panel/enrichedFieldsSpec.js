@@ -22,7 +22,7 @@ import UUID from 'uuidjs';
 import {resolve, graph} from '../../../api/testResolver';
 
 import 'src/script/components/panel/enrichedFields';
-import {RichProfileRepository} from 'user/RichProfileRepository';
+import {RichProfileRepository} from 'src/script/user/RichProfileRepository';
 
 const entriesListSelector = '.enriched-fields__entry';
 
