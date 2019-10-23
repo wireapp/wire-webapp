@@ -18,8 +18,7 @@
  */
 
 class CopyToClipboard {
-  // tslint:disable-next-line
-  private readonly text: string;
+  public readonly text: string;
 
   constructor(params: {text: string}) {
     this.text = params.text;
