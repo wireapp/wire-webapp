@@ -33,12 +33,12 @@ export class UserService {
     this.broadcastService = broadcastService;
   }
 
-  public async getUsers(userId: string): Promise<User>;
-  public async getUsers(userIds: string[]): Promise<User[]>;
-  public async getUsers(userIds: string | string[]): Promise<User | User[]> {
-    if (typeof userIds === 'string') {
-      userIds = [userIds];
-    }
+  public async getUser(userId: string): Promise<User> {
+    const users = await this.getUsers([userId]);
+    return users[0];
+  }
+
+  public async getUsers(userIds: string[]): Promise<User[]> {
     return this.apiClient.user.api.getUsers({ids: userIds});
   }
 
