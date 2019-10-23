@@ -17,11 +17,11 @@
  *
  */
 
-import {resolve, graph} from '../../api/testResolver';
+import {MessageSender} from 'message/MessageSender';
 
 describe('MessageSender', () => {
   it('is in a paused state by default', done => {
-    const messageSender = resolve(graph.MessageSender);
+    const messageSender = new MessageSender();
     const testData = {sendMessageFunction: () => Promise.resolve()};
     spyOn(testData, 'sendMessageFunction').and.callThrough();
 
@@ -33,7 +33,7 @@ describe('MessageSender', () => {
   });
 
   it('execute the sending queue when set to an active state', () => {
-    const messageSender = resolve(graph.MessageSender);
+    const messageSender = new MessageSender();
     const testData = {sendMessageFunction: () => Promise.resolve()};
     spyOn(testData, 'sendMessageFunction').and.callThrough();
 

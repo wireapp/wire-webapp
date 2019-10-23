@@ -101,6 +101,7 @@ import {PropertiesService} from '../properties/PropertiesService';
 import {LinkPreviewRepository} from '../links/LinkPreviewRepository';
 import {AssetService} from '../assets/AssetService';
 import {AudioRepository} from '../audio/AudioRepository';
+import {MessageSender} from '../message/MessageSender';
 
 class App {
   static get CONFIG() {
@@ -204,7 +205,7 @@ class App {
       repositories.event,
       repositories.giphy,
       new LinkPreviewRepository(new AssetService(resolve(graph.BackendClient)), repositories.properties),
-      resolve(graph.MessageSender),
+      new MessageSender(),
       serverTimeHandler,
       repositories.team,
       repositories.user,
@@ -238,7 +239,7 @@ class App {
       repositories.client,
       repositories.conversation,
       repositories.cryptography,
-      resolve(graph.MessageSender),
+      new MessageSender(),
       repositories.user,
     );
     repositories.calling = new CallingRepository(
