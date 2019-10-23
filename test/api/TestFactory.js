@@ -55,7 +55,7 @@ import {LinkPreviewRepository} from 'src/script/links/LinkPreviewRepository';
 import {AssetService} from 'src/script/assets/AssetService';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {PropertiesService} from 'src/script/properties/PropertiesService';
-import {UserService} from 'user/UserService';
+import {UserService} from 'src/script/user/UserService';
 
 window.testConfig = {
   connection: backendConfig,

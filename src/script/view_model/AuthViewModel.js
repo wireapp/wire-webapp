@@ -69,6 +69,7 @@ import {BackendClientError} from '../error/BackendClientError';
 import {FORWARDED_QUERY_KEYS} from '../auth/route';
 import {SelfService} from '../self/SelfService';
 import {UserService} from '../user/UserService';
+import {AudioRepository} from '../audio/AudioRepository';
 
 class AuthViewModel {
   static get CONFIG() {
@@ -88,7 +89,7 @@ class AuthViewModel {
     this.logger = getLogger('z.viewModel.AuthViewModel');
 
     this.authRepository = resolveDependency(graph.AuthRepository);
-    this.audio_repository = resolveDependency(graph.AudioRepository);
+    this.audio_repository = new AudioRepository();
 
     // Cryptography
     this.asset_service = new AssetService(backendClient);
