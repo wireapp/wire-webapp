@@ -1253,17 +1253,17 @@
   resolved "https://registry.yarnpkg.com/@types/js-cookie/-/js-cookie-2.2.4.tgz#f79720b4755aa197c2e15e982e2f438f5748e348"
   integrity sha512-WTfSE1Eauak/Nrg6cA9FgPTFvVawejsai6zXoq0QYTQ3mxONeRtGhKxa7wMlUzWWmzrmTeV+rwLjHgsCntdrsA==
 
-"@types/libsodium-wrappers-sumo@0.7.1":
-  version "0.7.1"
-  resolved "https://registry.yarnpkg.com/@types/libsodium-wrappers-sumo/-/libsodium-wrappers-sumo-0.7.1.tgz#139ba151727eca796b4bd945922e7e9f5c4afa97"
-  integrity sha512-lba5h8X5zhgZSg39fpPUKz+uUuR2h/lzbB2+I4gCRJpIhI2IiVEzJwpQMkivG+W4HAAaarewq2EayEF1x9WbEQ==
+"@types/libsodium-wrappers-sumo@0.7.2":
+  version "0.7.2"
+  resolved "https://registry.yarnpkg.com/@types/libsodium-wrappers-sumo/-/libsodium-wrappers-sumo-0.7.2.tgz#5baa1addb47faa004dc29eac1ddce9ed4a01b1db"
+  integrity sha512-UzvwlqL+X4pj9SreP/oD0ZdlKh2shJROwWgKtkvQXNYqtsQtEmhihHa4BaZvMBnRnk9ucZQJLPwTOl1uRVRIUw==
   dependencies:
     "@types/libsodium-wrappers" "*"
 
 "@types/libsodium-wrappers@*":
-  version "0.7.5"
-  resolved "https://registry.yarnpkg.com/@types/libsodium-wrappers/-/libsodium-wrappers-0.7.5.tgz#3cdda11ebf6b70bf40cfa2c483d7622897277bc4"
-  integrity sha512-CfxNQj3+fUwGhV20/yRoiMRjLN6+3cDRAjN2eQ0XKgq/IBhvROsbWxPa34JIiMKGdfHKy92OaMnViyoWw2Nrkg==
+  version "0.7.6"
+  resolved "https://registry.yarnpkg.com/@types/libsodium-wrappers/-/libsodium-wrappers-0.7.6.tgz#0702395d73de9556dbde05c91ba4925eb64f5aee"
+  integrity sha512-CrTY7kY5s7dxdioA2N5x6iTNgRllWGENzGCqQD/aazsakxKB4NYTJdh83ERCScev3Po5FRnVHj2TUkc6sD1oqw==
 
 "@types/linkify-it@*", "@types/linkify-it@2.1.0":
   version "2.1.0"
