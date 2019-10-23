@@ -44,7 +44,11 @@ export abstract class MessageHandler {
   }
 
   public async getUser(userId: string): Promise<User> {
-    return this.account!.service!.user.getUsers(userId);
+    return this.account!.service!.user.getUser(userId);
+  }
+
+  public async getUsers(userIds: string[]): Promise<User[]> {
+    return this.account!.service!.user.getUsers(userIds);
   }
 
   async clearConversation(conversationId: string): Promise<void> {
