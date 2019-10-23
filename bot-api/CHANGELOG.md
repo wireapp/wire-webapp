@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@5.0.24...@wireapp/bot-api@5.1.0) (2019-10-23)
+
+
+### Features
+
+* **bot-api:** Query user info ([#2458](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/issues/2458)) ([8b38edd](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/commit/8b38edd85d2140c6bdb04b22e0e71d61563355f7))
+
+
+
+
+
 ## [5.0.24](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@5.0.23...@wireapp/bot-api@5.0.24) (2019-10-21)
 
 **Note:** Version bump only for package @wireapp/bot-api
