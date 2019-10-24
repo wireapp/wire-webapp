@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [13.5.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@13.5.1...@wireapp/core@13.5.2) (2019-10-24)
+
+
+### Bug Fixes
+
+* **core:** Return single user info ([#2472](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/2472)) ([e636cdd](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/e636cddd41bd66d8cb12ee8e1a33d1a2bd665c7f))
+
+
+
+
+
 ## [13.5.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@13.5.0...@wireapp/core@13.5.1) (2019-10-23)
 
 **Note:** Version bump only for package @wireapp/core

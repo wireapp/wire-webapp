@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.1.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@5.1.0...@wireapp/bot-api@5.1.1) (2019-10-24)
+
+
+### Bug Fixes
+
+* **core:** Return single user info ([#2472](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/issues/2472)) ([e636cdd](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/commit/e636cddd41bd66d8cb12ee8e1a33d1a2bd665c7f))
+
+
+
+
+
 # [5.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@5.0.24...@wireapp/bot-api@5.1.0) (2019-10-23)
 
 

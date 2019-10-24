@@ -16,7 +16,7 @@
     "@types/webpack": "4.39.5",
     "@wireapp/store-engine": "3.9.21",
     "babel-loader": "8.0.6",
-    "bazinga64": "5.5.26",
+    "bazinga64": "5.5.27",
     "jasmine": "3.5.0",
     "karma": "4.4.1",
     "karma-chrome-launcher": "3.1.0",
@@ -46,5 +46,5 @@
     "test": "karma start",
     "test:project": "yarn dist && yarn test"
   },
-  "version": "0.10.10"
+  "version": "0.10.11"
 }
