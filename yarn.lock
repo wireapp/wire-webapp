@@ -1645,9 +1645,9 @@
     ws "7.2.0"
 
 "@wireapp/avs@release-5.3":
-  version "5.3.3"
-  resolved "https://registry.yarnpkg.com/@wireapp/avs/-/avs-5.3.3.tgz#523e7f34f38ba2418ddea7352569877ae7b245a5"
-  integrity sha512-XUum8rbZ4HVHQ+2KAum8BNlTHuJzgfSwde4GKbRJDegVwc9ii6fbMVrSCq1AENmNsPsJPl+WDK4pn7V0otG2cw==
+  version "5.3.6"
+  resolved "https://registry.yarnpkg.com/@wireapp/avs/-/avs-5.3.6.tgz#76b90dcd860c7f16a5b3f84a54e84ca1a264d841"
+  integrity sha512-MfUyJU1wWo9FU9tL+GHfuGOM6cvN69K9OKUU32ZysBznRDCuwntetFYiiBTEIRxa3j92LIkLzs6KBhcsXtyONg==
 
 "@wireapp/cbor@4.3.22":
   version "4.3.22"
