@@ -100,6 +100,7 @@ import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {PropertiesService} from '../properties/PropertiesService';
 import {LinkPreviewRepository} from '../links/LinkPreviewRepository';
 import {AssetService} from '../assets/AssetService';
+import {UserService} from '../user/UserService';
 import {AudioRepository} from '../audio/AudioRepository';
 
 class App {
@@ -175,7 +176,7 @@ class App {
     repositories.client = new ClientRepository(this.backendClient, storageService, repositories.cryptography);
     repositories.media = resolve(graph.MediaRepository);
     repositories.user = new UserRepository(
-      resolve(graph.UserService),
+      new UserService(this.backendClient, this.service.storage),
       this.service.asset,
       selfService,
       repositories.client,

@@ -68,6 +68,7 @@ import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {BackendClientError} from '../error/BackendClientError';
 import {FORWARDED_QUERY_KEYS} from '../auth/route';
 import {SelfService} from '../self/SelfService';
+import {UserService} from '../user/UserService';
 import {AudioRepository} from '../audio/AudioRepository';
 
 class AuthViewModel {
@@ -101,7 +102,7 @@ class AuthViewModel {
 
     this.selfService = new SelfService(backendClient);
     this.user_repository = new UserRepository(
-      resolveDependency(graph.UserService),
+      new UserService(backendClient, this.storageService),
       this.asset_service,
       this.selfService,
       this.client_repository,
