@@ -3,7 +3,7 @@
         data-bind="css: {'flex-center': verticallyCenterMessage},
                    foreach: {data: conversation().messages_visible, as: 'message', noChildContext: true}">
     <div class="message"
-         data-bind="in_viewport: {onVisible: getInViewportCallback(conversation(), message), container: getMessagesContainer()[0]},
+         data-bind="in_viewport: {onVisible: getInViewportCallback(conversation(), message), container: getMessagesContainer()},
                     attr: {'data-uie-uid': message.id, 'data-uie-value': message.super_type, 'data-uie-expired-status': message.ephemeral_expires, 'data-uie-send-status': message.status}"
          data-uie-name="item-message">
 
