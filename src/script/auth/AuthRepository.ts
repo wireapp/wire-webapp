@@ -71,7 +71,7 @@ export class AuthRepository {
     amplify.subscribe(WebAppEvents.CONNECTION.ACCESS_TOKEN.RENEW, this.renewAccessToken.bind(this));
   }
 
-  login(login: LoginData, persist: boolean): Promise<any> {
+  login(login: LoginData, persist: boolean): Promise<AccessTokenData> {
     return this.authService.postLogin(login, persist).then(accessTokenResponse => {
       this.saveAccessToken(accessTokenResponse);
       storeValue(StorageKey.AUTH.PERSIST, persist);
@@ -80,14 +80,14 @@ export class AuthRepository {
     });
   }
 
-  logout(): Promise<any> {
+  logout(): Promise<void> {
     return this.authService
       .postLogout()
       .then(() => this.logger.info('Log out on backend successful'))
       .catch(error => this.logger.warn(`Log out on backend failed: ${error.message}`, error));
   }
 
-  requestLoginCode(requestCode: {force: number; phone: string}): Promise<any> {
+  requestLoginCode(requestCode: {force: number; phone: string}): Promise<{expires_in: number}> {
     return this.authService.postLoginSend(requestCode);
   }
 
@@ -127,7 +127,7 @@ export class AuthRepository {
     resetStoreValue(StorageKey.AUTH.ACCESS_TOKEN.TYPE);
   }
 
-  getCachedAccessToken(): Promise<any> {
+  getCachedAccessToken(): Promise<void> {
     return new Promise((resolve, reject) => {
       const accessToken = loadValue<string>(StorageKey.AUTH.ACCESS_TOKEN.VALUE);
       const accessTokenType = loadValue<string>(StorageKey.AUTH.ACCESS_TOKEN.TYPE);
@@ -143,11 +143,11 @@ export class AuthRepository {
     });
   }
 
-  getAccessToken(): Promise<any> {
+  getAccessToken(): Promise<AccessTokenData> {
     return this.authService.postAccess().then(accessToken => this.saveAccessToken(accessToken));
   }
 
-  saveAccessToken(accessTokenResponse: any): AccessTokenData {
+  saveAccessToken(accessTokenResponse: AccessTokenData): AccessTokenData {
     const {access_token: accessToken, expires_in: expiresIn, token_type: accessTokenType} = accessTokenResponse;
     const expiresInMillis = expiresIn * TIME_IN_MILLIS.SECOND;
     const expirationTimestamp = Date.now() + expiresInMillis;
