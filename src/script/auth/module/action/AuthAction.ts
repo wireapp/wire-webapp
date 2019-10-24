@@ -21,12 +21,12 @@ import {LoginData, RegisterData} from '@wireapp/api-client/dist/commonjs/auth';
 import {ClientType} from '@wireapp/api-client/dist/commonjs/client/index';
 import {Account} from '@wireapp/core';
 
-import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
 import {LowDiskSpaceError} from '@wireapp/store-engine/dist/commonjs/engine/error/';
 import {getEphemeralValue, saveRandomEncryptionKey} from 'Util/ephemeralValueStore';
 
+import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
 import {isTemporaryClientAndNonPersistent, noop} from 'Util/util';
-import {SQLeetSchemata} from '../../../storage/SQLeetSchemata';
+import {StorageService} from '../../../storage';
 import {currentCurrency, currentLanguage} from '../../localeConfig';
 import {Api, RootState, ThunkAction, ThunkDispatch} from '../reducer';
 import {RegistrationDataState} from '../reducer/authReducer';
@@ -71,7 +71,7 @@ export class AuthAction {
       return Promise.resolve()
         .then(() => onBeforeLogin(dispatch, getState, global))
         .then(async () => {
-          if (isTemporaryClientAndNonPersistent()) {
+          if (isTemporaryClientAndNonPersistent(loginData.clientType !== ClientType.TEMPORARY)) {
             apiClient.config.store = await this.initEncryptedDatabase();
           }
         })
@@ -156,11 +156,7 @@ export class AuthAction {
   private async initEncryptedDatabase(): Promise<SQLeetEngine> {
     const existingKey: string = await getEphemeralValue();
     const encryptionKey = existingKey ? existingKey : await saveRandomEncryptionKey();
-    return new SQLeetEngine(
-      '/worker/sqleet-worker.js',
-      SQLeetSchemata.SCHEMATA[SQLeetSchemata.SCHEMATA.length - 1].schema,
-      encryptionKey,
-    );
+    return StorageService.initEncryptedDatabase(encryptionKey);
   }
 
   persistAuthData = (
@@ -310,11 +306,6 @@ export class AuthAction {
       let clientType: ClientType;
       dispatch(AuthActionCreator.startRefresh());
       return Promise.resolve()
-        .then(async () => {
-          if (isTemporaryClientAndNonPersistent()) {
-            apiClient.config.store = await this.initEncryptedDatabase();
-          }
-        })
         .then(() => {
           if (options.isImmediateLogin) {
             return dispatch(localStorageAction.setLocalStorage(LocalStorageKey.AUTH.PERSIST, true));
@@ -322,11 +313,14 @@ export class AuthAction {
           return undefined;
         })
         .then(() => dispatch(localStorageAction.getLocalStorage(LocalStorageKey.AUTH.PERSIST)))
-        .then((persist: boolean) => {
+        .then(async (persist: boolean) => {
           if (persist === undefined) {
             throw new Error(`Could not find value for '${LocalStorageKey.AUTH.PERSIST}'`);
           }
           clientType = persist ? ClientType.PERMANENT : ClientType.TEMPORARY;
+          if (isTemporaryClientAndNonPersistent()) {
+            apiClient.config.store = await this.initEncryptedDatabase();
+          }
           return apiClient.init(clientType);
         })
         .then(() => core.init())

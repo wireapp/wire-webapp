@@ -17,17 +17,19 @@
  *
  */
 
-import {CRUDEngine, MemoryEngine, error as StoreEngineError} from '@wireapp/store-engine';
+import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
 import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
+import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
+
+import {MemoryStore} from '@wireapp/store-engine/dist/commonjs/engine';
 import Dexie from 'dexie';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {loadValue, storeValue} from 'Util/StorageUtil';
-
-import {MemoryStore} from '@wireapp/store-engine/dist/commonjs/engine';
 import {isTemporaryClientAndNonPersistent} from 'Util/util';
 import {Config} from '../auth/config';
 import {ClientType} from '../client/ClientType';
+import {SQLeetSchemata} from './SQLeetSchemata';
 import {StorageKey} from './StorageKey';
 import {StorageSchemata} from './StorageSchemata';
 
@@ -58,7 +60,7 @@ export class StorageService {
   private userId?: string;
   public dbName?: string;
 
-  constructor() {
+  constructor(encryptedEngine?: CRUDEngine) {
     this.logger = getLogger('StorageService');
 
     this.dbName = undefined;
@@ -66,10 +68,18 @@ export class StorageService {
 
     this.isTemporaryAndNonPersistent = isTemporaryClientAndNonPersistent();
 
-    this.engine = this.isTemporaryAndNonPersistent ? new MemoryEngine() : new IndexedDBEngine();
+    this.engine = this.isTemporaryAndNonPersistent ? encryptedEngine : new IndexedDBEngine();
     this.hasHookSupport = this.engine instanceof IndexedDBEngine;
 
     this.dbListeners = [];
+  }
+
+  static initEncryptedDatabase(encryptionKey: string): SQLeetEngine {
+    return new SQLeetEngine(
+      '/worker/sqleet-worker.js',
+      SQLeetSchemata.SCHEMATA[SQLeetSchemata.SCHEMATA.length - 1].schema,
+      encryptionKey,
+    );
   }
 
   //##############################################################################
@@ -90,14 +100,12 @@ export class StorageService {
     this.userId = userId;
     this.dbName = `wire@${Config.ENVIRONMENT}@${userId}@${clientType}`;
 
-    this.db = new Dexie(this.dbName);
-    this._upgradeStores(this.db);
-
     try {
       if (this.isTemporaryAndNonPersistent) {
-        await this.moveDexieToMemory();
-        this.logger.info(`Storage Service initialized with in-memory database '${this.dbName}'`);
+        this.logger.info(`Storage Service initialized with encrypted database '${this.dbName}'`);
       } else {
+        this.db = new Dexie(this.dbName);
+        this._upgradeStores(this.db);
         try {
           await this.engine.initWithDb(this.db, requestPersistentStorage);
         } catch (error) {
@@ -113,26 +121,6 @@ export class StorageService {
       this.logger.error(logMessage, {error});
       throw new z.error.StorageError(z.error.StorageError.TYPE.FAILED_TO_OPEN);
     }
-  }
-
-  private async moveDexieToMemory(): Promise<void> {
-    const objectDb: MemoryStore = {};
-
-    for (const table of this.db.tables as Dexie.Table<Record<string, any>, string>[]) {
-      const keys = await table.toCollection().keys();
-      objectDb[table.name] = {};
-      for (const key of keys.map(key => key.toString())) {
-        objectDb[table.name][key] = await table.get(key);
-      }
-    }
-
-    await this.engine.initWithObject(this.dbName, objectDb);
-    this.objectDb = objectDb;
-
-    await this.db.delete();
-    await this.db.close();
-
-    this.db = undefined;
   }
 
   _initCrudHooks(): void {

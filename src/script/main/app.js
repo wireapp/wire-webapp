@@ -100,6 +100,8 @@ import {SelfService} from '../self/SelfService';
 import {BroadcastService} from '../broadcast/BroadcastService';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {PropertiesService} from '../properties/PropertiesService';
+import {getEphemeralValue} from 'Util/ephemeralValueStore';
+import {StorageService} from '../storage';
 
 class App {
   static get CONFIG() {
@@ -123,15 +125,16 @@ class App {
    * Construct a new app.
    * @param {BackendClient} backendClient - Configured backend client
    * @param {Element} appContainer - DOM element that will hold the app
+   * @param {SQLeetEngine} [encryptedEngine] - Encrypted database handler
    */
-  constructor(backendClient, appContainer) {
+  constructor(backendClient, appContainer, encryptedEngine) {
     this.backendClient = backendClient;
     this.logger = getLogger('App');
     this.appContainer = appContainer;
 
     new WindowHandler();
 
-    this.service = this._setupServices();
+    this.service = this._setupServices(encryptedEngine);
     this.repository = this._setupRepositories();
     if (Config.FEATURE.ENABLE_DEBUG) {
       import('Util/DebugUtil').then(({DebugUtil}) => {
@@ -170,8 +173,7 @@ class App {
     repositories.storage = new StorageRepository(this.service.storage);
 
     repositories.cryptography = new CryptographyRepository(this.backendClient, repositories.storage);
-    const storageService = resolve(graph.StorageService);
-    repositories.client = new ClientRepository(this.backendClient, storageService, repositories.cryptography);
+    repositories.client = new ClientRepository(this.backendClient, this.service.storage, repositories.cryptography);
     repositories.media = resolve(graph.MediaRepository);
     repositories.user = new UserRepository(
       resolve(graph.UserService),
@@ -267,10 +269,11 @@ class App {
 
   /**
    * Create all app services.
+   * @param {SQLeetEngine} [encryptedEngine] - Encrypted database handler
    * @returns {Object} All services
    */
-  _setupServices() {
-    const storageService = resolve(graph.StorageService);
+  _setupServices(encryptedEngine) {
+    const storageService = new StorageService(encryptedEngine);
     const eventService = Environment.browser.edge
       ? new EventServiceNoCompound(storageService)
       : new EventService(storageService);
@@ -906,16 +909,22 @@ class App {
 // Setting up the App
 //##############################################################################
 
-$(() => {
+$(async () => {
   enableLogging(Config.FEATURE.ENABLE_DEBUG);
   const appContainer = document.getElementById('wire-main');
   if (appContainer) {
+    const encryptionKey = await getEphemeralValue();
     const backendClient = resolve(graph.BackendClient);
     backendClient.setSettings({
       restUrl: Config.BACKEND_REST,
       webSocketUrl: Config.BACKEND_WS,
     });
-    wire.app = new App(backendClient, appContainer);
+    if (encryptionKey) {
+      const engine = StorageService.initEncryptedDatabase(encryptionKey);
+      wire.app = new App(backendClient, appContainer, engine);
+    } else {
+      wire.app = new App(backendClient, appContainer);
+    }
   }
 });
 
