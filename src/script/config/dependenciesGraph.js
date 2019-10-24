@@ -29,7 +29,6 @@ import {MediaRepository} from '../media/MediaRepository';
 import {MessageSender} from '../message/MessageSender';
 import {PermissionRepository} from '../permission/PermissionRepository';
 import {RichProfileRepository} from '../user/RichProfileRepository';
-import {SelfService} from '../self/SelfService';
 import {StorageService} from '../storage/StorageService';
 import {UserService} from '../user/UserService';
 
@@ -51,7 +50,6 @@ dependencies.set(MediaRepository, {dependencies: [PermissionRepository], name: '
 dependencies.set(MessageSender, {dependencies: [], name: 'MessageSender'});
 dependencies.set(PermissionRepository, {dependencies: [], name: 'PermissionRepository'});
 dependencies.set(RichProfileRepository, {dependencies: [BackendClient], name: 'RichProfileRepository'});
-dependencies.set(SelfService, {dependencies: [BackendClient], name: 'SelfService'});
 dependencies.set(StorageService, {dependencies: [], name: 'StorageService'});
 dependencies.set(UserService, {dependencies: [BackendClient, StorageService], name: 'UserService'});
 
@@ -68,7 +66,6 @@ export {
   MessageSender,
   RichProfileRepository,
   PermissionRepository,
-  SelfService,
   StorageService,
   UserService,
 };
