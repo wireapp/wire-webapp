@@ -27,7 +27,7 @@ describe('UserService', () => {
     server = sinon.fakeServer.create();
     const test_factory = new TestFactory();
     await test_factory.exposeUserActors();
-    userService = test_factory.user_service;
+    userService = TestFactory.user_service;
   });
 
   afterEach(() => server.restore());
