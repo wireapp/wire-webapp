@@ -33,7 +33,7 @@ import {
   ConversationTypingData,
 } from '@wireapp/api-client/dist/commonjs/conversation/data';
 import {ConversationMapper} from './ConversationMapper';
-import {PayloadBundle, PayloadBundleState, PayloadBundleType} from './message/PayloadBundle';
+import {PayloadBundle, PayloadBundleSource, PayloadBundleState, PayloadBundleType} from './message/PayloadBundle';
 
 describe('ConversationMapper', () => {
   describe('"mapConversationEvent"', () => {
@@ -48,7 +48,10 @@ describe('ConversationMapper', () => {
         type: CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE,
       };
 
-      const incomingEvent = ConversationMapper.mapConversationEvent(event) as PayloadBundle & {
+      const incomingEvent = ConversationMapper.mapConversationEvent(
+        event,
+        PayloadBundleSource.WEBSOCKET,
+      ) as PayloadBundle & {
         content: ConversationMessageTimerUpdateData;
       };
 
@@ -77,7 +80,10 @@ describe('ConversationMapper', () => {
         type: CONVERSATION_EVENT.MEMBER_JOIN,
       };
 
-      const incomingEvent = ConversationMapper.mapConversationEvent(event) as PayloadBundle & {
+      const incomingEvent = ConversationMapper.mapConversationEvent(
+        event,
+        PayloadBundleSource.WEBSOCKET,
+      ) as PayloadBundle & {
         content: ConversationMemberJoinData;
       };
 
@@ -102,7 +108,10 @@ describe('ConversationMapper', () => {
         type: CONVERSATION_EVENT.RENAME,
       };
 
-      const incomingEvent = ConversationMapper.mapConversationEvent(event) as PayloadBundle & {
+      const incomingEvent = ConversationMapper.mapConversationEvent(
+        event,
+        PayloadBundleSource.WEBSOCKET,
+      ) as PayloadBundle & {
         content: ConversationRenameData;
       };
 
@@ -125,7 +134,10 @@ describe('ConversationMapper', () => {
         type: CONVERSATION_EVENT.TYPING,
       };
 
-      const incomingEvent = ConversationMapper.mapConversationEvent(event) as PayloadBundle & {
+      const incomingEvent = ConversationMapper.mapConversationEvent(
+        event,
+        PayloadBundleSource.WEBSOCKET,
+      ) as PayloadBundle & {
         content: ConversationTypingData;
       };
 

@@ -20,7 +20,13 @@
 import logdown from 'logdown';
 
 import {ConversationOtrMessageAddEvent} from '@wireapp/api-client/dist/commonjs/event/';
-import {GenericMessageType, PayloadBundle, PayloadBundleState, PayloadBundleType} from '../conversation';
+import {
+  GenericMessageType,
+  PayloadBundle,
+  PayloadBundleSource,
+  PayloadBundleState,
+  PayloadBundleType,
+} from '../conversation';
 import {
   AssetContent,
   ClearedContent,
@@ -39,7 +45,11 @@ export class GenericMessageMapper {
     logger: console,
     markdown: false,
   });
-  public static mapGenericMessage(genericMessage: any, event: ConversationOtrMessageAddEvent): PayloadBundle {
+  public static mapGenericMessage(
+    genericMessage: any,
+    event: ConversationOtrMessageAddEvent,
+    source: PayloadBundleSource,
+  ): PayloadBundle {
     switch (genericMessage.content) {
       case GenericMessageType.TEXT: {
         const {
@@ -76,6 +86,7 @@ export class GenericMessageMapper {
           fromClientId: event.data.sender,
           id: genericMessage.messageId,
           messageTimer: 0,
+          source,
           state: PayloadBundleState.INCOMING,
           timestamp: new Date(event.time).getTime(),
           type: PayloadBundleType.TEXT,
@@ -89,6 +100,7 @@ export class GenericMessageMapper {
           fromClientId: event.data.sender,
           id: genericMessage.messageId,
           messageTimer: 0,
+          source,
           state: PayloadBundleState.INCOMING,
           timestamp: new Date(event.time).getTime(),
           type: PayloadBundleType.CALL,
@@ -106,6 +118,7 @@ export class GenericMessageMapper {
           fromClientId: event.data.sender,
           id: genericMessage.messageId,
           messageTimer: 0,
+          source,
           state: PayloadBundleState.INCOMING,
           timestamp: new Date(event.time).getTime(),
           type: PayloadBundleType.CONFIRMATION,
@@ -121,6 +134,7 @@ export class GenericMessageMapper {
           fromClientId: event.data.sender,
           id: genericMessage.messageId,
           messageTimer: 0,
+          source,
           state: PayloadBundleState.INCOMING,
           timestamp: new Date(event.time).getTime(),
           type: PayloadBundleType.CLEARED,
@@ -138,6 +152,7 @@ export class GenericMessageMapper {
           fromClientId: event.data.sender,
           id: genericMessage.messageId,
           messageTimer: 0,
+          source,
           state: PayloadBundleState.INCOMING,
           timestamp: new Date(event.time).getTime(),
           type: PayloadBundleType.MESSAGE_DELETE,
@@ -182,6 +197,7 @@ export class GenericMessageMapper {
           fromClientId: event.data.sender,
           id: genericMessage.messageId,
           messageTimer: 0,
+          source,
           state: PayloadBundleState.INCOMING,
           timestamp: new Date(event.time).getTime(),
           type: PayloadBundleType.MESSAGE_EDIT,
@@ -202,6 +218,7 @@ export class GenericMessageMapper {
           fromClientId: event.data.sender,
           id: genericMessage.messageId,
           messageTimer: 0,
+          source,
           state: PayloadBundleState.INCOMING,
           timestamp: new Date(event.time).getTime(),
           type: PayloadBundleType.MESSAGE_HIDE,
@@ -218,6 +235,7 @@ export class GenericMessageMapper {
           fromClientId: event.data.sender,
           id: genericMessage.messageId,
           messageTimer: 0,
+          source,
           state: PayloadBundleState.INCOMING,
           timestamp: new Date(event.time).getTime(),
           type: PayloadBundleType.PING,
@@ -244,6 +262,7 @@ export class GenericMessageMapper {
           fromClientId: event.data.sender,
           id: genericMessage.messageId,
           messageTimer: 0,
+          source,
           state: PayloadBundleState.INCOMING,
           timestamp: new Date(event.time).getTime(),
           type: PayloadBundleType.LOCATION,
@@ -278,6 +297,7 @@ export class GenericMessageMapper {
           fromClientId: event.data.sender,
           id: genericMessage.messageId,
           messageTimer: 0,
+          source,
           state: PayloadBundleState.INCOMING,
           timestamp: new Date(event.time).getTime(),
           type: isImage ? PayloadBundleType.ASSET_IMAGE : PayloadBundleType.ASSET,
@@ -299,6 +319,7 @@ export class GenericMessageMapper {
           fromClientId: event.data.sender,
           id: genericMessage.messageId,
           messageTimer: 0,
+          source,
           state: PayloadBundleState.INCOMING,
           timestamp: new Date(event.time).getTime(),
           type: PayloadBundleType.REACTION,
@@ -313,6 +334,7 @@ export class GenericMessageMapper {
           fromClientId: event.data.sender,
           id: genericMessage.messageId,
           messageTimer: 0,
+          source,
           state: PayloadBundleState.INCOMING,
           timestamp: new Date(event.time).getTime(),
           type: PayloadBundleType.UNKNOWN,

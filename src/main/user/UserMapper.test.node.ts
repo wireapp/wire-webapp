@@ -20,7 +20,7 @@
 import {Connection, ConnectionStatus} from '@wireapp/api-client/dist/commonjs/connection';
 import {USER_EVENT, UserConnectionEvent} from '@wireapp/api-client/dist/commonjs/event';
 
-import {PayloadBundle, PayloadBundleState, PayloadBundleType} from '../conversation';
+import {PayloadBundle, PayloadBundleSource, PayloadBundleState, PayloadBundleType} from '../conversation';
 import {UserMapper} from './UserMapper';
 
 describe('UserMapper', () => {
@@ -42,7 +42,11 @@ describe('UserMapper', () => {
         },
       };
 
-      const incomingEvent = UserMapper.mapUserEvent(event, selfUserId) as PayloadBundle & {content: Connection};
+      const incomingEvent = UserMapper.mapUserEvent(
+        event,
+        selfUserId,
+        PayloadBundleSource.WEBSOCKET,
+      ) as PayloadBundle & {content: Connection};
 
       expect(incomingEvent.content).toBe(event.connection);
       expect(incomingEvent.conversation).toBe(event.connection.conversation);

@@ -37,6 +37,7 @@ import {
   AssetTransferState,
   GenericMessageType,
   MessageTimer,
+  PayloadBundleSource,
   PayloadBundleState,
   PayloadBundleType,
 } from '../conversation/';
@@ -770,6 +771,7 @@ export class ConversationService {
       from: this.apiClient.context!.userId,
       id: messageId,
       messageTimer: 0,
+      source: PayloadBundleSource.LOCAL,
       state: PayloadBundleState.OUTGOING_SENT,
       timestamp: Date.now(),
       type: PayloadBundleType.CLEARED,
@@ -799,6 +801,7 @@ export class ConversationService {
       from: this.apiClient.context!.userId,
       id: messageId,
       messageTimer: this.messageTimer.getMessageTimer(conversationId),
+      source: PayloadBundleSource.LOCAL,
       state: PayloadBundleState.OUTGOING_SENT,
       timestamp: Date.now(),
       type: PayloadBundleType.MESSAGE_HIDE,
@@ -808,7 +811,7 @@ export class ConversationService {
   public async deleteMessageEveryone(
     conversationId: string,
     messageIdToDelete: string,
-    userIds?: string[],
+    userIds: string[] | undefined,
   ): Promise<DeleteMessage> {
     const messageId = MessageBuilder.createId();
 
@@ -829,6 +832,7 @@ export class ConversationService {
       from: this.apiClient.context!.userId,
       id: messageId,
       messageTimer: this.messageTimer.getMessageTimer(conversationId),
+      source: PayloadBundleSource.LOCAL,
       state: PayloadBundleState.OUTGOING_SENT,
       timestamp: Date.now(),
       type: PayloadBundleType.MESSAGE_DELETE,

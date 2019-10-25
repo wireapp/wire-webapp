@@ -24,11 +24,11 @@ import {
   UserConnectionEvent,
   UserEvent,
 } from '@wireapp/api-client/dist/commonjs/event';
-import {PayloadBundle, PayloadBundleState, PayloadBundleType} from '../conversation';
+import {PayloadBundle, PayloadBundleSource, PayloadBundleState, PayloadBundleType} from '../conversation';
 import {MessageBuilder} from '../conversation/message/MessageBuilder';
 
 export class UserMapper {
-  public static mapUserEvent(event: UserEvent, selfUserId: string): PayloadBundle | void {
+  public static mapUserEvent(event: UserEvent, selfUserId: string, source: PayloadBundleSource): PayloadBundle | void {
     switch (event.type) {
       case USER_EVENT.CONNECTION: {
         const {connection} = event as UserConnectionEvent;
@@ -38,6 +38,7 @@ export class UserMapper {
           from: connection.from,
           id: MessageBuilder.createId(),
           messageTimer: 0,
+          source,
           state: PayloadBundleState.INCOMING,
           timestamp: new Date(connection.last_update).getTime(),
           type: PayloadBundleType.CONNECTION_REQUEST,
@@ -51,6 +52,7 @@ export class UserMapper {
           from: selfUserId,
           id: MessageBuilder.createId(),
           messageTimer: 0,
+          source,
           state: PayloadBundleState.INCOMING,
           timestamp: new Date().getTime(),
           type: PayloadBundleType.CLIENT_ADD,
@@ -64,6 +66,7 @@ export class UserMapper {
           from: selfUserId,
           id: MessageBuilder.createId(),
           messageTimer: 0,
+          source,
           state: PayloadBundleState.INCOMING,
           timestamp: new Date().getTime(),
           type: PayloadBundleType.CLIENT_REMOVE,
