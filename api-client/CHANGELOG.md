@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.5.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@7.4.4...@wireapp/api-client@7.5.0) (2019-10-25)
+
+
+### Features
+
+* **api-client,core:** Declare event source for payload bundles ([#2480](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2480)) ([4c45b54](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/4c45b545d0080094518fa92810385a176d11e943))
+
+
+
+
+
 ## [7.4.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@7.4.3...@wireapp/api-client@7.4.4) (2019-10-24)
 
 **Note:** Version bump only for package @wireapp/api-client

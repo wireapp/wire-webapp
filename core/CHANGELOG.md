@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [13.6.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@13.5.2...@wireapp/core@13.6.0) (2019-10-25)
+
+
+### Features
+
+* **api-client,core:** Declare event source for payload bundles ([#2480](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/2480)) ([4c45b54](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/4c45b545d0080094518fa92810385a176d11e943))
+
+
+
+
+
 ## [13.5.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@13.5.1...@wireapp/core@13.5.2) (2019-10-24)
 
 
