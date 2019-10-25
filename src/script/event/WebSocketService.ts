@@ -58,15 +58,15 @@ export class WebSocketService {
   private reconnectTimeoutId?: number;
   private socket: WebSocket;
 
+  static get CHANGE_TRIGGER(): typeof CHANGE_TRIGGER {
+    return CHANGE_TRIGGER;
+  }
+
   static get CONFIG(): {PING_INTERVAL: number; RECONNECT_INTERVAL: number} {
     return {
       PING_INTERVAL: TIME_IN_MILLIS.SECOND * 5,
       RECONNECT_INTERVAL: TIME_IN_MILLIS.SECOND * 15,
     };
-  }
-
-  static get CHANGE_TRIGGER(): typeof CHANGE_TRIGGER {
-    return CHANGE_TRIGGER;
   }
 
   constructor(backendClient: BackendClient) {
