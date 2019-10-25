@@ -17,10 +17,6 @@
  *
  */
 
-// OpenGraphData is used in JSDoc
-// eslint-disable-next-line no-unused-vars
-import {Data as OpenGraphData} from 'open-graph';
-
 import {base64ToBlob} from 'Util/util';
 
 import {getFirstLinkWithOffset} from './LinkPreviewHelpers';
