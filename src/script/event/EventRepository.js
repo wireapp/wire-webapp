@@ -204,7 +204,7 @@ export class EventRepository {
 
   /**
    * Close the WebSocket connection.
-   * @param {CHANGE_TRIGGER} trigger - Trigger of the disconnect
+   * @param {WebSocketService.CHANGE_TRIGGER} trigger - Trigger of the disconnect
    * @returns {undefined} No return value
    */
   disconnectWebSocket(trigger) {
@@ -213,7 +213,7 @@ export class EventRepository {
 
   /**
    * Re-connect the WebSocket connection.
-   * @param {CHANGE_TRIGGER} trigger - Trigger of the reconnect
+   * @param {WebSocketService.CHANGE_TRIGGER} trigger - Trigger of the reconnect
    * @returns {undefined} No return value
    */
   reconnectWebSocket(trigger) {

@@ -30,7 +30,7 @@ import {StorageKey} from '../storage/StorageKey';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {WebAppEvents} from './WebApp';
 
-export enum CHANGE_TRIGGER {
+enum CHANGE_TRIGGER {
   CLEANUP = 'CHANGE_TRIGGER.CLEANUP',
   CLOSE = 'CHANGE_TRIGGER.CLOSE',
   ERROR = 'CHANGE_TRIGGER.ERROR',
@@ -63,6 +63,10 @@ export class WebSocketService {
       PING_INTERVAL: TIME_IN_MILLIS.SECOND * 5,
       RECONNECT_INTERVAL: TIME_IN_MILLIS.SECOND * 15,
     };
+  }
+
+  static get CHANGE_TRIGGER(): typeof CHANGE_TRIGGER {
+    return CHANGE_TRIGGER;
   }
 
   constructor(backendClient: BackendClient) {
