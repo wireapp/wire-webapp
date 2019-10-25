@@ -23,6 +23,7 @@ import {CloseEvent, ErrorEvent, Event} from 'reconnecting-websocket';
 
 import {InvalidTokenError} from '../auth/';
 import {BackendErrorMapper, HttpClient, NetworkError} from '../http/';
+import {Notification} from '../notification/';
 import {ReconnectingWebsocket, WEBSOCKET_STATE} from './ReconnectingWebsocket';
 
 export enum WebSocketTopic {

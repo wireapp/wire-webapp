@@ -20,6 +20,7 @@
 import {APIClient} from '@wireapp/api-client';
 import {Notification} from '@wireapp/api-client/dist/commonjs/notification';
 import {MemoryEngine} from '@wireapp/store-engine';
+import {PayloadBundleSource} from '../conversation';
 import {CryptographyService} from '../cryptography';
 import {NotificationService} from './NotificationService';
 
@@ -52,7 +53,7 @@ describe('NotificationService', () => {
         payload: [{}],
       } as unknown) as Notification;
 
-      await notificationService.handleNotification(notification);
+      await notificationService.handleNotification(notification, PayloadBundleSource.NOTIFICATION_STREAM);
     });
   });
 
@@ -72,7 +73,7 @@ describe('NotificationService', () => {
         transient: false,
       } as unknown) as Notification;
 
-      await notificationService.handleNotification(notification);
+      await notificationService.handleNotification(notification, PayloadBundleSource.NOTIFICATION_STREAM);
 
       expect(spySetLastNotificationId.calls.count()).toBe(1);
     });
@@ -92,7 +93,7 @@ describe('NotificationService', () => {
         transient: true,
       } as unknown) as Notification;
 
-      await notificationService.handleNotification(notification);
+      await notificationService.handleNotification(notification, PayloadBundleSource.NOTIFICATION_STREAM);
 
       expect(spySetLastNotificationId.calls.count()).toBe(0);
     });
@@ -117,7 +118,7 @@ describe('NotificationService', () => {
         transient: true,
       } as unknown) as Notification;
 
-      await notificationService.handleNotification(notification);
+      await notificationService.handleNotification(notification, PayloadBundleSource.NOTIFICATION_STREAM);
     });
   });
 });

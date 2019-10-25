@@ -29,7 +29,7 @@ import {GenericMessage} from '@wireapp/protocol-messaging';
 import {CRUDEngine} from '@wireapp/store-engine';
 import {Decoder, Encoder} from 'bazinga64';
 import logdown from 'logdown';
-import {GenericMessageType, PayloadBundle} from '../conversation';
+import {GenericMessageType, PayloadBundle, PayloadBundleSource} from '../conversation';
 import {SessionPayloadBundle} from '../cryptography/';
 import {CryptographyDatabaseRepository} from './CryptographyDatabaseRepository';
 import {GenericMessageMapper} from './GenericMessageMapper';
@@ -150,7 +150,10 @@ export class CryptographyService {
     this.logger.log(`Deleted session ID "${sessionId}".`);
   }
 
-  public async decodeGenericMessage(otrMessage: ConversationOtrMessageAddEvent): Promise<PayloadBundle> {
+  public async decodeGenericMessage(
+    otrMessage: ConversationOtrMessageAddEvent,
+    source: PayloadBundleSource,
+  ): Promise<PayloadBundle> {
     const {
       from,
       data: {sender, text: cipherText},
@@ -161,7 +164,7 @@ export class CryptographyService {
     const genericMessage = GenericMessage.decode(decryptedMessage);
 
     if (genericMessage.content === GenericMessageType.EPHEMERAL) {
-      const unwrappedMessage = GenericMessageMapper.mapGenericMessage(genericMessage.ephemeral, otrMessage);
+      const unwrappedMessage = GenericMessageMapper.mapGenericMessage(genericMessage.ephemeral, otrMessage, source);
       unwrappedMessage.id = genericMessage.messageId;
       if (genericMessage.ephemeral) {
         const expireAfterMillis = genericMessage.ephemeral.expireAfterMillis;
@@ -170,6 +173,6 @@ export class CryptographyService {
       }
       return unwrappedMessage;
     }
-    return GenericMessageMapper.mapGenericMessage(genericMessage, otrMessage);
+    return GenericMessageMapper.mapGenericMessage(genericMessage, otrMessage, source);
   }
 }

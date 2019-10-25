@@ -20,6 +20,14 @@
 import {ConversationEventData, TeamEventData, UserEventData} from '@wireapp/api-client/dist/commonjs/event/';
 import {ConversationContent} from '../content';
 
+export type PayloadBundleContent = ConversationContent | ConversationEventData | TeamEventData | UserEventData;
+
+export enum PayloadBundleSource {
+  LOCAL = 'PayloadBundleSource.LOCAL',
+  NOTIFICATION_STREAM = 'PayloadBundleSource.NOTIFICATION_STREAM',
+  WEBSOCKET = 'PayloadBundleSource.WEBSOCKET',
+}
+
 export enum PayloadBundleState {
   INCOMING = 'PayloadBundleState.INCOMING',
   OUTGOING_SENT = 'PayloadBundleState.OUTGOING_SENT',
@@ -27,15 +35,16 @@ export enum PayloadBundleState {
 }
 
 export interface PayloadBundle {
-  content?: ConversationContent | ConversationEventData | TeamEventData | UserEventData;
+  content?: PayloadBundleContent;
   conversation: string;
   from: string;
   fromClientId?: string;
   id: string;
+  messageTimer?: number;
+  source: PayloadBundleSource;
   state: PayloadBundleState;
   timestamp: number;
   type: PayloadBundleType;
-  messageTimer?: number;
 }
 
 export enum PayloadBundleType {

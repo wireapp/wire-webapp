@@ -26,10 +26,10 @@ import {Notification, NotificationAPI} from '@wireapp/api-client/dist/commonjs/n
 import {ValidationUtil} from '@wireapp/commons';
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
 import {MemoryEngine} from '@wireapp/store-engine';
-import nock = require('nock');
 
+import nock = require('nock');
 import {Account} from './Account';
-import {PayloadBundleType} from './conversation';
+import {PayloadBundleSource, PayloadBundleType} from './conversation';
 
 const BASE_URL = 'mock-backend.wire.com';
 const MOCK_BACKEND = {
@@ -216,9 +216,12 @@ describe('Account', () => {
       done();
     });
 
-    await account.service!.notification.handleNotification(({
-      payload: [{}],
-      transient: true,
-    } as unknown) as Notification);
+    await account.service!.notification.handleNotification(
+      ({
+        payload: [{}],
+        transient: true,
+      } as unknown) as Notification,
+      PayloadBundleSource.WEBSOCKET,
+    );
   });
 });
