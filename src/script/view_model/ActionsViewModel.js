@@ -138,6 +138,7 @@ export class ActionsViewModel {
                 resolve();
               } catch (error) {
                 this.modalsViewModel.errorMessage(expectedErrors[error.label] || error.message);
+              } finally {
                 isSending = false;
               }
             }
