@@ -197,7 +197,6 @@ export class WebSocketService {
 
   /**
    * Reset the WebSocket connection.
-   *
    * @param reconnect Re-establish the WebSocket connection
    */
   reset(trigger: CHANGE_TRIGGER, reconnect: boolean = false): void {
@@ -217,10 +216,6 @@ export class WebSocketService {
     }
   }
 
-  /**
-   * Send a WebSocket ping.
-   * @returns {undefined} No return value
-   */
   sendPing = () => {
     const isReadyStateOpen = this.socket.readyState === 1;
     if (isReadyStateOpen) {
