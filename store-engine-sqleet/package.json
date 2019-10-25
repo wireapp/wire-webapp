@@ -14,7 +14,7 @@
     "@types/node": "~12",
     "@types/uint32": "0.2.0",
     "@types/webpack": "4.39.5",
-    "@wireapp/store-engine": "3.9.21",
+    "@wireapp/store-engine": "4.0.0",
     "babel-loader": "8.0.6",
     "bazinga64": "5.5.27",
     "jasmine": "3.5.0",
@@ -46,5 +46,5 @@
     "test": "karma start",
     "test:project": "yarn dist && yarn test"
   },
-  "version": "0.10.12"
+  "version": "0.10.13"
 }
