@@ -17,9 +17,9 @@
  *
  */
 
-// OpenGraphResult is used in JSDoc
+// OpenGraphData is used in JSDoc
 // eslint-disable-next-line no-unused-vars
-import {Data as OpenGraphResult} from 'open-graph';
+import {Data as OpenGraphData} from 'open-graph';
 
 import {base64ToBlob} from 'Util/util';
 
@@ -143,7 +143,7 @@ class LinkPreviewRepository {
    *
    * @private
    * @param {string} link - Link to fetch open graph data from
-   * @returns {Promise<OpenGraphResult | Error>} Resolves with the retrieved open graph data
+   * @returns {Promise<OpenGraphData | Error>} Resolves with the retrieved open graph data
    */
   async _fetchOpenGraphData(link) {
     try {
