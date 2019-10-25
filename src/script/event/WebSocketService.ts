@@ -17,46 +17,55 @@
  *
  */
 
-import {getLogger} from 'Util/Logger';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {amplify} from 'amplify';
+
+import {Logger, getLogger} from 'Util/Logger';
 import {loadValue} from 'Util/StorageUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {appendParameter} from 'Util/UrlUtil';
 
 import {AuthRepository} from '../auth/AuthRepository';
+import {BackendClient} from '../service/BackendClient';
 import {StorageKey} from '../storage/StorageKey';
-import {WebAppEvents} from './WebApp';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
+import {WebAppEvents} from './WebApp';
+
+export enum CHANGE_TRIGGER {
+  CLEANUP = 'CHANGE_TRIGGER.CLEANUP',
+  CLOSE = 'CHANGE_TRIGGER.CLOSE',
+  ERROR = 'CHANGE_TRIGGER.ERROR',
+  LOGOUT = 'CHANGE_TRIGGER.LOGOUT',
+  OFFLINE = 'CHANGE_TRIGGER.OFFLINE',
+  ONLINE = 'CHANGE_TRIGGER.ONLINE',
+  PAGE_NAVIGATION = 'CHANGE_TRIGGER.PAGE_NAVIGATION',
+  PING_INTERVAL = 'CHANGE_TRIGGER.PING_INTERVAL',
+  READY_STATE = 'CHANGE_TRIGGER.READY_STATE',
+  WARNING_BAR = 'CHANGE_TRIGGER.WARNING_BAR',
+}
+
+export type OnNotificationCallback = (data: string) => void;
 
 export class WebSocketService {
-  static get CHANGE_TRIGGER() {
-    return {
-      CLEANUP: 'WebSocketService.CHANGE_TRIGGER.CLEANUP',
-      CLOSE: 'WebSocketService.CHANGE_TRIGGER.CLOSE',
-      ERROR: 'WebSocketService.CHANGE_TRIGGER.ERROR',
-      LOGOUT: 'WebSocketService.CHANGE_TRIGGER.LOGOUT',
-      OFFLINE: 'WebSocketService.CHANGE_TRIGGER.OFFLINE',
-      ONLINE: 'WebSocketService.CHANGE_TRIGGER.ONLINE',
-      PAGE_NAVIGATION: 'WebSocketService.CHANGE_TRIGGER.PAGE_NAVIGATION',
-      PING_INTERVAL: 'WebSocketService.CHANGE_TRIGGER.PING_INTERVAL',
-      READY_STATE: 'WebSocketService.CHANGE_TRIGGER.READY_STATE',
-      WARNING_BAR: 'WebSocketService.CHANGE_TRIGGER.WARNING_BAR',
-    };
-  }
+  private readonly backendClient: BackendClient;
+  private readonly clientId?: string;
+  private readonly logger: Logger;
+  private connectionUrl: string;
+  private hasAlreadySentUnansweredPing: boolean;
+  private onNotification?: OnNotificationCallback;
+  private pendingReconnectTrigger?: CHANGE_TRIGGER;
+  private pingIntervalId?: number;
+  private reconnectCount: number;
+  private reconnectTimeoutId?: number;
+  private socket: WebSocket;
 
-  static get CONFIG() {
+  static get CONFIG(): {PING_INTERVAL: number; RECONNECT_INTERVAL: number} {
     return {
       PING_INTERVAL: TIME_IN_MILLIS.SECOND * 5,
       RECONNECT_INTERVAL: TIME_IN_MILLIS.SECOND * 15,
     };
   }
 
-  /**
-   * Construct a new WebSocket Service.
-   * @param {BackendClient} backendClient - Client for the API calls
-   */
-  constructor(backendClient) {
-    this.sendPing = this.sendPing.bind(this);
-
+  constructor(backendClient: BackendClient) {
     this.backendClient = backendClient;
     this.logger = getLogger('WebSocketService');
 
@@ -79,10 +88,10 @@ export class WebSocketService {
 
   /**
    * Establish the WebSocket connection.
-   * @param {Function} onNotification - Function to be called on incoming notifications
-   * @returns {Promise} Resolves once the WebSocket connects
+   * @param onNotification Function to be called on incoming notifications
+   * @returns Resolves once the WebSocket connects
    */
-  connect(onNotification) {
+  connect(onNotification: OnNotificationCallback): Promise<void> {
     this.onNotification = onNotification;
 
     return new Promise(resolve => {
@@ -93,14 +102,14 @@ export class WebSocketService {
 
       const wrongSocketType = typeof this.socket === 'object';
       if (wrongSocketType) {
-        this.reset(WebSocketService.CHANGE_TRIGGER.CLEANUP);
+        this.reset(CHANGE_TRIGGER.CLEANUP);
       }
 
       this.socket = new WebSocket(this.connectionUrl);
       this.socket.binaryType = 'blob';
 
       // http://stackoverflow.com/a/27828483/451634
-      delete this.socket.URL;
+      delete (this.socket as any).URL;
 
       this.socket.onopen = () => {
         this.logger.info(`Connected WebSocket to: ${this.backendClient.webSocketUrl}/await`);
@@ -110,12 +119,12 @@ export class WebSocketService {
 
       this.socket.onerror = event => {
         this.logger.error('WebSocket connection error.', event);
-        this.reset(WebSocketService.CHANGE_TRIGGER.ERROR, true);
+        this.reset(CHANGE_TRIGGER.ERROR, true);
       };
 
       this.socket.onclose = event => {
         this.logger.warn('Closed WebSocket connection', event);
-        this.reset(WebSocketService.CHANGE_TRIGGER.CLOSE, true);
+        this.reset(CHANGE_TRIGGER.CLOSE, true);
       };
 
       this.socket.onmessage = event => {
@@ -125,7 +134,7 @@ export class WebSocketService {
             if (blobReader.result === 'pong') {
               this.hasAlreadySentUnansweredPing = false;
             } else {
-              onNotification(JSON.parse(blobReader.result));
+              this.onNotification(JSON.parse(blobReader.result.toString()));
             }
           };
           blobReader.readAsText(event.data);
@@ -136,9 +145,8 @@ export class WebSocketService {
 
   /**
    * Reconnect WebSocket after access token has been refreshed.
-   * @returns {undefined} No return value
    */
-  pendingReconnect() {
+  pendingReconnect(): void {
     if (this.pendingReconnectTrigger) {
       this.logger.info(`Reconnecting WebSocket (TRIGGER: ${this.pendingReconnectTrigger}) after access token refresh`);
       this.reconnect(this.pendingReconnectTrigger);
@@ -148,17 +156,12 @@ export class WebSocketService {
 
   /**
    * Try to re-establish the WebSocket connection.
-   * @param {WebSocketService.CHANGE_TRIGGER} trigger - Trigger of the reconnect
-   * @returns {undefined} No return value
    */
-  reconnect(trigger) {
+  reconnect(trigger: CHANGE_TRIGGER): Promise<void> {
     if (!loadValue(StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION)) {
       this.logger.info(`Access token has to be refreshed before reconnecting the WebSocket triggered by '${trigger}'`);
       this.pendingReconnectTrigger = trigger;
-      return amplify.publish(
-        WebAppEvents.CONNECTION.ACCESS_TOKEN.RENEW,
-        AuthRepository.ACCESS_TOKEN_TRIGGER.WEB_SOCKET,
-      );
+      amplify.publish(WebAppEvents.CONNECTION.ACCESS_TOKEN.RENEW, AuthRepository.ACCESS_TOKEN_TRIGGER.WEB_SOCKET);
     }
 
     this.reconnectCount++;
@@ -176,13 +179,13 @@ export class WebSocketService {
       return reconnect();
     }
     this.reconnectTimeoutId = window.setTimeout(() => reconnect(), WebSocketService.CONFIG.RECONNECT_INTERVAL);
+    return Promise.resolve();
   }
 
   /**
    * Behavior when WebSocket connection is re-established after a connection drop.
-   * @returns {undefined} No return value
    */
-  reconnected() {
+  reconnected(): void {
     amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
     this.logger.warn('Re-established WebSocket connection.');
     amplify.publish(WebAppEvents.CONNECTION.ONLINE);
@@ -191,11 +194,9 @@ export class WebSocketService {
   /**
    * Reset the WebSocket connection.
    *
-   * @param {WebSocketService.CHANGE_TRIGGER} trigger - Trigger of the reset
-   * @param {boolean} [reconnect=false] - Re-establish the WebSocket connection
-   * @returns {undefined} No return value
+   * @param reconnect Re-establish the WebSocket connection
    */
-  reset(trigger, reconnect = false) {
+  reset(trigger: CHANGE_TRIGGER, reconnect: boolean = false): void {
     if (this.socket && this.socket.onclose) {
       this.logger.info(`WebSocket reset triggered by '${trigger}'`);
       this.socket.onerror = undefined;
@@ -216,18 +217,18 @@ export class WebSocketService {
    * Send a WebSocket ping.
    * @returns {undefined} No return value
    */
-  sendPing() {
+  sendPing = () => {
     const isReadyStateOpen = this.socket.readyState === 1;
     if (isReadyStateOpen) {
       if (this.hasAlreadySentUnansweredPing) {
         this.logger.warn('Ping interval check failed');
-        return this.reconnect(WebSocketService.CHANGE_TRIGGER.PING_INTERVAL);
+        return this.reconnect(CHANGE_TRIGGER.PING_INTERVAL);
       }
       this.hasAlreadySentUnansweredPing = true;
       return this.socket.send('ping');
     }
 
     this.logger.warn(`WebSocket connection is closed. Current ready state: ${this.socket.readyState}`);
-    this.reconnect(WebSocketService.CHANGE_TRIGGER.READY_STATE);
-  }
+    this.reconnect(CHANGE_TRIGGER.READY_STATE);
+  };
 }
