@@ -28,14 +28,22 @@ import {BackendErrorMapper, ConnectionState, ContentType, NetworkError, StatusCo
 import * as ObfuscationUtil from '../obfuscation/';
 import {sendRequestWithCookie} from '../shims/node/cookie';
 
+enum TOPIC {
+  ON_CONNECTION_STATE_CHANGE = 'HttpClient.TOPIC.ON_CONNECTION_STATE_CHANGE',
+}
+
+export declare interface HttpClient {
+  on(event: TOPIC.ON_CONNECTION_STATE_CHANGE, listener: (state: ConnectionState) => void): this;
+}
+
 export class HttpClient extends EventEmitter {
   private readonly logger: logdown.Logger;
   private connectionState: ConnectionState;
   private readonly requestQueue: PriorityQueue;
 
-  public static TOPIC = {
-    ON_CONNECTION_STATE_CHANGE: 'HttpClient.TOPIC.ON_CONNECTION_STATE_CHANGE',
-  };
+  public static get TOPIC(): typeof TOPIC {
+    return TOPIC;
+  }
 
   constructor(
     private readonly baseUrl: string,

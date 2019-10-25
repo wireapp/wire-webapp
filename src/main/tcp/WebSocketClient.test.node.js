@@ -17,7 +17,7 @@
  *
  */
 
-const {WebSocketClient, WebSocketTopic} = require('@wireapp/api-client/dist/commonjs/tcp/WebSocketClient');
+const {WebSocketClient} = require('@wireapp/api-client/dist/commonjs/tcp/WebSocketClient');
 const {InvalidTokenError} = require('@wireapp/api-client/dist/commonjs/auth/');
 
 const accessTokenPayload = {
@@ -130,7 +130,7 @@ describe('WebSocketClient', () => {
       const socket = websocketClient.socket;
       spyOn(socket, 'getReconnectingWebsocket').and.returnValue(fakeSocket);
 
-      websocketClient.on(WebSocketTopic.ON_ERROR, error => {
+      websocketClient.on(WebSocketClient.TOPIC.ON_ERROR, error => {
         expect(onBeforeConnectResult.calls.count()).toBe(1);
         expect(error).toBe(testError);
         errorHandlerCalled = true;
@@ -155,7 +155,7 @@ describe('WebSocketClient', () => {
 
       await websocketClient.connect();
 
-      websocketClient.on(WebSocketTopic.ON_INVALID_TOKEN, () => done());
+      websocketClient.on(WebSocketClient.TOPIC.ON_INVALID_TOKEN, () => done());
 
       fakeSocket.onerror(new Error('error'));
     });
@@ -173,7 +173,7 @@ describe('WebSocketClient', () => {
       expect(websocketClient.isLocked()).toBe(false);
 
       const message = 'hello';
-      websocketClient.on(WebSocketTopic.ON_MESSAGE, notification => {
+      websocketClient.on(WebSocketClient.TOPIC.ON_MESSAGE, notification => {
         expect(onMessageSpy.calls.count()).toBe(1);
         expect(websocketClient.bufferedMessages.length).toBe(0);
         expect(notification).toEqual({message});
@@ -199,7 +199,7 @@ describe('WebSocketClient', () => {
       expect(onMessageSpy.calls.count()).toBe(1);
       expect(websocketClient.bufferedMessages.length).toBe(1);
 
-      websocketClient.on(WebSocketTopic.ON_MESSAGE, notification => {
+      websocketClient.on(WebSocketClient.TOPIC.ON_MESSAGE, notification => {
         expect(notification).toEqual({message});
         expect(onMessageSpy.calls.count()).toBe(2);
         done();

@@ -21,6 +21,14 @@ import EventEmitter from 'events';
 import logdown from 'logdown';
 import {AccessTokenData} from '../auth/';
 
+enum TOPIC {
+  ACCESS_TOKEN_REFRESH = 'AccessTokenStore.TOPIC.ACCESS_TOKEN_REFRESH',
+}
+
+export declare interface AccessTokenStore {
+  on(event: TOPIC.ACCESS_TOKEN_REFRESH, listener: (accessToken: AccessTokenData) => void): this;
+}
+
 export class AccessTokenStore extends EventEmitter {
   private readonly logger: logdown.Logger;
 
@@ -33,9 +41,9 @@ export class AccessTokenStore extends EventEmitter {
     });
   }
 
-  public static TOPIC = {
-    ACCESS_TOKEN_REFRESH: 'AccessTokenStore.TOPIC.ACCESS_TOKEN_REFRESH',
-  };
+  public static get TOPIC(): typeof TOPIC {
+    return TOPIC;
+  }
 
   public accessToken: AccessTokenData | undefined;
 
