@@ -105,7 +105,7 @@ export interface ResetSessionMessage extends PayloadBundle {
 
 export interface ClearConversationMessage extends PayloadBundle {
   content: ClearedContent;
-  type: PayloadBundleType.CLEARED;
+  type: PayloadBundleType.CONVERSATION_CLEAR;
 }
 
 export interface HideMessage extends PayloadBundle {

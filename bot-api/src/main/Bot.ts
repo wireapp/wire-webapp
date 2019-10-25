@@ -25,6 +25,7 @@ import {CRUDEngine, MemoryEngine} from '@wireapp/store-engine';
 import logdown from 'logdown';
 import UUID from 'pure-uuid';
 
+import {ConversationEvent, TeamEvent, UserEvent} from '@wireapp/api-client/dist/commonjs/event';
 import {BotConfig, BotCredentials} from './Interfaces';
 import {MessageHandler} from './MessageHandler';
 
@@ -95,40 +96,19 @@ export class Bot {
     });
     this.account = new Account(apiClient);
 
-    this.account.on(PayloadBundleType.ASSET, this.handlePayload.bind(this));
-    this.account.on(PayloadBundleType.ASSET_ABORT, this.handlePayload.bind(this));
-    this.account.on(PayloadBundleType.ASSET_IMAGE, this.handlePayload.bind(this));
-    this.account.on(PayloadBundleType.ASSET_META, this.handlePayload.bind(this));
-    this.account.on(PayloadBundleType.AVAILABILITY, this.handlePayload.bind(this));
-    this.account.on(PayloadBundleType.CALL, this.handlePayload.bind(this));
-    this.account.on(PayloadBundleType.CLEARED, this.handlePayload.bind(this));
-    this.account.on(PayloadBundleType.CLIENT_ACTION, this.handlePayload.bind(this));
-    this.account.on(PayloadBundleType.CONFIRMATION, this.handlePayload.bind(this));
-    this.account.on(PayloadBundleType.CONNECTION_REQUEST, this.handlePayload.bind(this));
-    this.account.on(PayloadBundleType.CONVERSATION_CLEAR, this.handlePayload.bind(this));
-    this.account.on(PayloadBundleType.CONVERSATION_RENAME, this.handlePayload.bind(this));
-    this.account.on(PayloadBundleType.LAST_READ_UPDATE, this.handlePayload.bind(this));
-    this.account.on(PayloadBundleType.LOCATION, this.handlePayload.bind(this));
-    this.account.on(PayloadBundleType.MEMBER_JOIN, this.handlePayload.bind(this));
-    this.account.on(PayloadBundleType.MESSAGE_DELETE, this.handlePayload.bind(this));
-    this.account.on(PayloadBundleType.MESSAGE_EDIT, this.handlePayload.bind(this));
-    this.account.on(PayloadBundleType.MESSAGE_HIDE, this.handlePayload.bind(this));
-    this.account.on(PayloadBundleType.PING, this.handlePayload.bind(this));
-    this.account.on(PayloadBundleType.REACTION, this.handlePayload.bind(this));
-    this.account.on(PayloadBundleType.TEXT, this.handlePayload.bind(this));
-    this.account.on(PayloadBundleType.TIMER_UPDATE, this.handlePayload.bind(this));
-    this.account.on(PayloadBundleType.TYPING, this.handlePayload.bind(this));
-    this.account.on(PayloadBundleType.UNKNOWN, this.handlePayload.bind(this));
+    for (const payloadType of Object.values(PayloadBundleType)) {
+      this.account.removeAllListeners(payloadType);
+      this.account.on(payloadType as any, this.handlePayload.bind(this));
+    }
 
     await this.account.login(login);
     await this.account.listen();
-    this.account.on('error', error => this.logger.error(error));
 
     this.handlers.forEach(handler => (handler.account = this.account));
   }
 
-  private handlePayload(payload: PayloadBundle): void {
-    if (this.validateMessage(payload.conversation, payload.from)) {
+  private handlePayload(payload: PayloadBundle | ConversationEvent | UserEvent | TeamEvent): void {
+    if ('conversation' in payload && this.validateMessage(payload.conversation, payload.from)) {
       this.handlers.forEach(handler => handler.handleEvent(payload));
     }
   }

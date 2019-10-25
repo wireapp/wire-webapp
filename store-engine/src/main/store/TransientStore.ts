@@ -23,10 +23,18 @@ import {RecordAlreadyExistsError, RecordNotFoundError} from '../engine/error/';
 import {ExpiredBundle} from './ExpiredBundle';
 import {TransientBundle} from './TransientBundle';
 
+enum TOPIC {
+  EXPIRED = 'expired',
+}
+
+export declare interface TransientStore {
+  on(event: TOPIC.EXPIRED, listener: (bundle: ExpiredBundle) => void): this;
+}
+
 export class TransientStore extends EventEmitter {
-  public static TOPIC = {
-    EXPIRED: 'expired',
-  };
+  public static get TOPIC(): typeof TOPIC {
+    return TOPIC;
+  }
   private readonly bundles: Record<string, TransientBundle> = {};
   private tableName = '';
 
@@ -181,7 +189,7 @@ export class TransientStore extends EventEmitter {
       await this.expireBundle(cacheKey);
     } else if (!timeoutID) {
       bundle.timeoutID = setTimeout(async () => {
-        const expiredBundle: ExpiredBundle = await this.expireBundle(cacheKey);
+        const expiredBundle = await this.expireBundle(cacheKey);
         this.emit(TransientStore.TOPIC.EXPIRED, expiredBundle);
       }, timespan);
     }

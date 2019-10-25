@@ -23,7 +23,7 @@ import {APIClient} from '@wireapp/api-client';
 import {ClientType, RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/';
 import {BackendErrorLabel} from '@wireapp/api-client/dist/commonjs/http/';
 import {Account} from '@wireapp/core';
-import {PayloadBundle, PayloadBundleType} from '@wireapp/core/dist/conversation/';
+import {PayloadBundleType} from '@wireapp/core/dist/conversation/';
 import {FileEngine} from '@wireapp/store-engine-fs';
 import {AxiosError} from 'axios';
 import * as program from 'commander';
@@ -58,17 +58,15 @@ const storeEngine = new FileEngine(directory);
 storeEngine
   .init('', {fileExtension: '.json'})
   .then(() => {
-    const apiClient: APIClient = new APIClient({store: storeEngine, urls: APIClient.BACKEND.PRODUCTION});
+    const apiClient = new APIClient({store: storeEngine, urls: APIClient.BACKEND.PRODUCTION});
 
     const account = new Account(apiClient);
 
-    account.on(PayloadBundleType.TEXT, (data: PayloadBundle) => {
+    account.on(PayloadBundleType.TEXT, textMessage => {
       console.log(
-        `Received message from user ID "${data.from}" in conversation ID "${data.conversation}": ${data.content}`,
+        `Received message from user ID "${textMessage.from}" in conversation ID "${textMessage.conversation}": ${textMessage.content}`,
       );
     });
-
-    account.on('error', error => console.error(error));
 
     return account
       .login(loginData)

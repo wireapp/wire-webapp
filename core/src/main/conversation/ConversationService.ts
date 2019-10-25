@@ -774,7 +774,7 @@ export class ConversationService {
       source: PayloadBundleSource.LOCAL,
       state: PayloadBundleState.OUTGOING_SENT,
       timestamp: Date.now(),
-      type: PayloadBundleType.CLEARED,
+      type: PayloadBundleType.CONVERSATION_CLEAR,
     };
   }
 

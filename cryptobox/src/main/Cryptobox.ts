@@ -34,11 +34,20 @@ import {CryptoboxCRUDStore} from './store/';
 const DEFAULT_CAPACITY = 1000;
 const {version}: {version: string} = require('../../package.json');
 
+enum TOPIC {
+  NEW_PREKEYS = 'new-prekeys',
+  NEW_SESSION = 'new-session',
+}
+
+export declare interface Cryptobox {
+  on(event: TOPIC.NEW_PREKEYS, listener: (prekeys: ProteusKeys.PreKey[]) => void): this;
+  on(event: TOPIC.NEW_SESSION, listener: (session: string) => void): this;
+}
+
 export class Cryptobox extends EventEmitter {
-  public static TOPIC = {
-    NEW_PREKEYS: 'new-prekeys',
-    NEW_SESSION: 'new-session',
-  };
+  public static get TOPIC(): typeof TOPIC {
+    return TOPIC;
+  }
 
   private cachedSessions: LRUCache<CryptoboxSession>;
   private readonly logger: logdown.Logger;
@@ -186,7 +195,7 @@ export class Cryptobox extends EventEmitter {
     );
   }
 
-  private publish_event(topic: string, event: any): void {
+  private publish_event(topic: TOPIC, event: ProteusKeys.PreKey[] | string): void {
     this.emit(topic, event);
     this.logger.log(`Published event "${topic}".`, event);
   }

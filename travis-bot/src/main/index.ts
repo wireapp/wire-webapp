@@ -83,8 +83,6 @@ export class TravisBot {
     await account.login(this.loginData);
     await account.listen();
 
-    account.on('error', error => console.error(error));
-
     if (!conversationIds) {
       const allConversations = await client.conversation.api.getAllConversations();
       const groupConversations = allConversations.filter(conversation => conversation.type === 0);
@@ -98,7 +96,7 @@ export class TravisBot {
         }
         if (id) {
           logger.log(`Sending message to conversation ${id} ...`);
-          const textPayload = await account.service.conversation.messageBuilder.createText(id, this.message).build();
+          const textPayload = account.service.conversation.messageBuilder.createText(id, this.message).build();
           await account.service.conversation.send(textPayload);
         }
       }),
