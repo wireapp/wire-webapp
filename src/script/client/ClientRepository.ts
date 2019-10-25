@@ -466,24 +466,12 @@ export class ClientRepository {
    * @param password Password entered by user
    * @returns Resolves with the remaining user devices
    */
-  deleteClient(clientId: string, password: string): Promise<any> {
-    return this.clientService
-      .deleteClient(clientId, password)
-      .then(() => this.deleteClientFromDb(this.selfUser().id, clientId))
-      .then(() => {
-        this.selfUser().remove_client(clientId);
-        amplify.publish(WebAppEvents.USER.CLIENT_REMOVED, this.selfUser().id, clientId);
-        return this.clients();
-      })
-      .catch(error => {
-        this.logger.error(`Unable to delete client '${clientId}': ${error.message}`, error);
-
-        const isForbidden = BackendClientError.STATUS_CODE.FORBIDDEN;
-        const errorType = isForbidden
-          ? z.error.ClientError.TYPE.REQUEST_FORBIDDEN
-          : z.error.ClientError.TYPE.REQUEST_FAILURE;
-        throw new z.error.ClientError(errorType);
-      });
+  async deleteClient(clientId: string, password: string): Promise<any> {
+    await this.clientService.deleteClient(clientId, password);
+    await this.deleteClientFromDb(this.selfUser().id, clientId);
+    this.selfUser().remove_client(clientId);
+    amplify.publish(WebAppEvents.USER.CLIENT_REMOVED, this.selfUser().id, clientId);
+    return this.clients();
   }
 
   removeLocalClient(): void {
