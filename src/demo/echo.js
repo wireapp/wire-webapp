@@ -32,7 +32,7 @@ const logdown = require('logdown');
 const {Account} = require('@wireapp/core');
 const {PayloadBundleType} = require('@wireapp/core/dist/conversation/');
 const {APIClient} = require('@wireapp/api-client');
-const {WebSocketTopic} = require('@wireapp/api-client/dist/commonjs/tcp/');
+const {WebSocketClient} = require('@wireapp/api-client/dist/commonjs/tcp/');
 const {ClientType} = require('@wireapp/api-client/dist/commonjs/client/ClientType');
 const {ConnectionStatus} = require('@wireapp/api-client/dist/commonjs/connection/');
 const {CONVERSATION_TYPING} = require('@wireapp/api-client/dist/commonjs/conversation/data/');
@@ -176,9 +176,9 @@ const messageIdCache = {};
     return newLinkPreviews;
   };
 
-  apiClient.transport.ws.on(WebSocketTopic.ON_OFFLINE, () => logger.info('API Client is offline'));
+  apiClient.transport.ws.on(WebSocketClient.TOPIC.ON_OFFLINE, () => logger.info('API Client is offline'));
 
-  apiClient.transport.ws.on(WebSocketTopic.ON_ONLINE, () => logger.info('API Client is online'));
+  apiClient.transport.ws.on(WebSocketClient.TOPIC.ON_ONLINE, () => logger.info('API Client is online'));
 
   account.on(PayloadBundleType.TEXT, async data => {
     const {
@@ -334,7 +334,7 @@ const messageIdCache = {};
     logger.info(`Received calling payload`, JSON.parse(data.content));
   });
 
-  account.on(PayloadBundleType.CLEARED, handleIncomingMessage);
+  account.on(PayloadBundleType.CONVERSATION_CLEAR, handleIncomingMessage);
 
   account.on(PayloadBundleType.LOCATION, async data => {
     const {content, conversation: conversationId} = data;
