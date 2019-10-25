@@ -65,6 +65,8 @@ export class MainViewModel {
     this.userRepository = repositories.user;
     this.logger = getLogger('MainViewModel');
 
+    this.modals = modals;
+
     this.multitasking = {
       autoMinimize: ko.observable(true),
       isMinimized: ko.observable(false),
@@ -91,7 +93,6 @@ export class MainViewModel {
     this.content = new ContentViewModel(this, repositories);
     this.list = new z.viewModel.ListViewModel(this, repositories);
 
-    this.modals = modals;
     this.lightbox = new z.viewModel.ImageDetailViewViewModel(this, repositories);
     this.title = new WindowTitleViewModel(this, repositories);
     this.favicon = new z.viewModel.FaviconViewModel(window.amplify);
