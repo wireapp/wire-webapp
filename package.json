@@ -89,7 +89,7 @@
     "autoprefixer": "9.6.5",
     "babel-eslint": "10.0.3",
     "babel-loader": "8.0.6",
-    "babel-plugin-react-intl": "4.1.20",
+    "babel-plugin-react-intl": "4.1.21",
     "concurrently": "5.0.0",
     "cross-env": "6.0.3",
     "cssnano": "4.1.10",
