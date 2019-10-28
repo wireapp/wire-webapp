@@ -811,7 +811,7 @@ export class ConversationService {
   public async deleteMessageEveryone(
     conversationId: string,
     messageIdToDelete: string,
-    userIds: string[] | undefined,
+    userIds?: string[],
   ): Promise<DeleteMessage> {
     const messageId = MessageBuilder.createId();
 
