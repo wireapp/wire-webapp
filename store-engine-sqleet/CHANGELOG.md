@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.10.14](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/compare/@wireapp/store-engine-sqleet@0.10.13...@wireapp/store-engine-sqleet@0.10.14) (2019-10-28)
+
+
+### Bug Fixes
+
+* **store-engine-sqleet:** Free memory after "readAll" operation ([#2485](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/issues/2485)) ([7479b46](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/commit/7479b468ca2416a490bf3b659e881af1c3c82449))
+
+
+
+
+
 ## [0.10.13](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/compare/@wireapp/store-engine-sqleet@0.10.12...@wireapp/store-engine-sqleet@0.10.13) (2019-10-25)
 
 **Note:** Version bump only for package @wireapp/store-engine-sqleet
