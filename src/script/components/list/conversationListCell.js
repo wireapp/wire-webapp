@@ -70,13 +70,14 @@ class ConversationListCell {
       onJoinCall(conversation, MediaType.AUDIO);
     };
 
-    const cell_state_observable = ko
+    const cellStateObservable = ko
       .computed(() => this.cell_state(generateCellState(this.conversation)))
       .extend({rateLimit: 500});
 
     this.dispose = () => {
       viewportObserver.removeElement(element);
-      cell_state_observable.dispose();
+      cellStateObservable.dispose();
+      this.isSelected.dispose();
     };
   }
 }

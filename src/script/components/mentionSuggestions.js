@@ -41,7 +41,7 @@ class MentionSuggestions {
     this.position = ko.observable({});
 
     this.selectedSuggestionIndex = ko.observable(0);
-    this.selectedSuggestionIndex.subscribe(this.updateScrollPosition);
+    this.selectedSuggestionIndexSubscription = this.selectedSuggestionIndex.subscribe(this.updateScrollPosition);
     this.selectedSuggestion = ko.pureComputed(() => this.suggestions()[this.selectedSuggestionIndex()]);
 
     this.suggestionSubscription = this.suggestions.subscribe(suggestions => {
@@ -169,6 +169,7 @@ class MentionSuggestions {
 
   dispose() {
     this.suggestionSubscription.dispose();
+    this.selectedSuggestionIndexSubscription.dispose();
   }
 }
 
