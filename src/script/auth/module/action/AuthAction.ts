@@ -76,6 +76,17 @@ export class AuthAction {
           }
         })
         .then(() => core.login(loginData, false, clientAction.generateClientPayload(loginData.clientType)))
+        .catch(async error => {
+          if (error.name === 'InvalidEncryptionKeyError') {
+            await new Promise(resolve => {
+              const request = indexedDB.deleteDatabase('/sqleet');
+              request.onsuccess = resolve;
+            });
+            return core.login(loginData, false, clientAction.generateClientPayload(loginData.clientType));
+          } else {
+            throw error;
+          }
+        })
         .then(() => this.persistAuthData(loginData.clientType, core, dispatch, localStorageAction))
         .then(() =>
           dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: global.config.APP_INSTANCE_ID})),

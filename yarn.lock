@@ -1807,23 +1807,23 @@
     emotion-theming "10.0.17"
     react-transition-group "4.3.0"
 
-"@wireapp/store-engine-dexie@0.6.18":
-  version "0.6.18"
-  resolved "https://registry.yarnpkg.com/@wireapp/store-engine-dexie/-/store-engine-dexie-0.6.18.tgz#b2039e1688066bb437843fe3e54d4ee01e4e09a3"
-  integrity sha512-RdPd8F6usSbcf57egZw9sWNz3oemxINWEqNvSZBkEPTyq4qpUwpR1SaO6LJ5rAp0Tw7Ag9B5Ee3o6lvVKD14rQ==
+"@wireapp/store-engine-dexie@0.6.20":
+  version "0.6.20"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine-dexie/-/store-engine-dexie-0.6.20.tgz#66b8b6c170f6bef56f54b4826a0c3e4395afc0ba"
+  integrity sha512-tTG3lYHk4GjPvD2emzFtyoQCee9B0IdBZq3kAYO2iycZApWCqVYAHXMMSyc6CrdUL9eYHqw5KMTK99hNj46nTw==
   dependencies:
     dexie "2.0.4"
 
-"@wireapp/store-engine-sqleet@0.10.9":
-  version "0.10.9"
-  resolved "https://registry.yarnpkg.com/@wireapp/store-engine-sqleet/-/store-engine-sqleet-0.10.9.tgz#d4e795163a5b76fd8737ad11ffff87b35deb284f"
-  integrity sha512-8bk0sRhuZcXc5JNQJRcGcocfeGOZJa3QZHLZVAHQ3UXm/TGAK1izMGBjqb7PSOvABSZKFgGx97hsVFt0Azs+yw==
+"@wireapp/store-engine-sqleet@0.10.14":
+  version "0.10.14"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine-sqleet/-/store-engine-sqleet-0.10.14.tgz#8a967e237d8819999bc9236dd2b70c6885567b8b"
+  integrity sha512-rkjbgJi5uORMuw6Hxln3lpiriumJoi5XVSpyUUcihYAbiuffXhnUtXJTAT4BBRgHpffzUNLNOJWyTBE6TEejUA==
   dependencies:
     "@babel/core" "7.6.4"
     "@babel/plugin-proposal-class-properties" "7.5.5"
     "@babel/plugin-proposal-object-rest-spread" "7.6.2"
     "@babel/preset-typescript" "7.6.0"
-    "@wireapp/websql" "0.0.8"
+    "@wireapp/websql" "0.0.9"
     uint32 "0.2.1"
 
 "@wireapp/store-engine@3.9.19":
@@ -1838,10 +1838,10 @@
   resolved "https://registry.yarnpkg.com/@wireapp/tslint-config/-/tslint-config-1.4.1.tgz#2089af720f65279d696293cbc3ca13063529139a"
   integrity sha512-hPoEUTlnjJ38r/NDHMhfCgWQAue4Q3Zf8iWQeLKn/aOxUVQTEY1/oALplooKwoX/ei5KulBQveEu/foBQ2TYsw==
 
-"@wireapp/websql@0.0.8":
-  version "0.0.8"
-  resolved "https://registry.yarnpkg.com/@wireapp/websql/-/websql-0.0.8.tgz#35f4cd2b9e055b324c211f199f7edbe01bf27677"
-  integrity sha512-2J4Z0JRHRH2VOVdQIHSUtWacMbkt6g1pPFwTEVMjxGr7lFlcWLq8rLty2mVRCi5TRgASgPSdUeUnOX/QBEiztA==
+"@wireapp/websql@0.0.9":
+  version "0.0.9"
+  resolved "https://registry.yarnpkg.com/@wireapp/websql/-/websql-0.0.9.tgz#129aa113759a25069d19d70eb4c4ae2a8fed702e"
+  integrity sha512-OQ8LWQg2c70ojwGLGt8bgFO5svt07UOwnxhMkeHwbzgHOZOT9EyVJthRDrIreh6bX4K/jZuTSn08nPLDZbYGcA==
   dependencies:
     "@types/emscripten" "1.38.0"
     "@types/node" "12.7.1"
