@@ -67,6 +67,7 @@ ko.components.register('modal', {
 
     this.dispose = () => {
       isShownSubscription.dispose();
+      this.hasVisibleClass.dispose();
       window.clearTimeout(timeoutId);
     };
   },

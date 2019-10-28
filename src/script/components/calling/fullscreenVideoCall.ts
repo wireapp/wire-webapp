@@ -153,12 +153,13 @@ export class FullscreenVideoCalling {
       }
     });
 
+    const updateUnreadCount = (unreadCount: number) => this.hasUnreadMessages(unreadCount > 0);
+
     this.hasUnreadMessages = ko.observable(false);
-    amplify.subscribe(WebAppEvents.LIFECYCLE.UNREAD_COUNT, (unreadCount: number) =>
-      this.hasUnreadMessages(unreadCount > 0),
-    );
+    amplify.subscribe(WebAppEvents.LIFECYCLE.UNREAD_COUNT, updateUnreadCount);
 
     this.dispose = () => {
+      amplify.unsubscribe(WebAppEvents.LIFECYCLE.UNREAD_COUNT, updateUnreadCount);
       window.clearInterval(callDurationUpdateInterval);
       startedAtSubscription.dispose();
       gridSubscription.dispose();

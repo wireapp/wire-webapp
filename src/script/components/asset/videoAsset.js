@@ -29,16 +29,16 @@ class VideoAssetComponent extends AbstractAssetTransferStateTracker {
    *
    * @param {Object} params - Component parameters
    * @param {Message} params.message - Message entity
-   * @param {Object} component_info - Component information
+   * @param {Object} componentInfo - Component information
    */
-  constructor(params, component_info) {
+  constructor(params, {element}) {
     super(ko.unwrap(params.message));
     this.logger = getLogger('VideoAssetComponent');
 
     this.message = ko.unwrap(params.message);
     this.asset = this.message.get_first_asset();
 
-    this.video_element = $(component_info.element).find('video')[0];
+    this.video_element = $(element).find('video')[0];
     this.video_src = ko.observable();
     this.video_time = ko.observable();
 
@@ -49,11 +49,14 @@ class VideoAssetComponent extends AbstractAssetTransferStateTracker {
 
     this.preview = ko.observable();
 
-    ko.computed(() => {
-      if (this.asset.preview_resource()) {
-        this.asset.load_preview().then(blob => this.preview(window.URL.createObjectURL(blob)));
-      }
-    });
+    ko.computed(
+      () => {
+        if (this.asset.preview_resource()) {
+          this.asset.load_preview().then(blob => this.preview(window.URL.createObjectURL(blob)));
+        }
+      },
+      {disposeWhenNodeIsRemoved: element},
+    );
 
     this.onPlayButtonClicked = this.onPlayButtonClicked.bind(this);
     this.on_pause_button_clicked = this.on_pause_button_clicked.bind(this);
@@ -174,8 +177,8 @@ ko.components.register('video-asset', {
     <!-- /ko -->
   `,
   viewModel: {
-    createViewModel(params, component_info) {
-      return new VideoAssetComponent(params, component_info);
+    createViewModel(params, componentInfo) {
+      return new VideoAssetComponent(params, componentInfo);
     },
   },
 });
