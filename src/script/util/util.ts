@@ -32,7 +32,7 @@ import * as URLUtil from '../auth/util/urlUtil';
 import {Conversation} from '../entity/Conversation';
 import {StorageKey} from '../storage/StorageKey';
 
-export const isTemporaryClientAndNonPersistent = (persist?: boolean): boolean => {
+export const isTemporaryClientAndNonPersistent = (persist: boolean = false): boolean => {
   const enableTransientTemporaryClients =
     URLUtil.getURLParameter(QUERY_KEY.PERSIST_TEMPORARY_CLIENTS) === 'false' ||
     (Config.FEATURE && Config.FEATURE.PERSIST_TEMPORARY_CLIENTS === false);
