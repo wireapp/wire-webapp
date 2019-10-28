@@ -249,6 +249,7 @@ export class SQLeetEngine implements CRUDEngine {
     const selectRecordStatement = `SELECT ${columns} FROM ${escapedTableName};`;
     const statement = await this.db.prepare(selectRecordStatement);
     const records = (await statement.getAsObject()) as T[];
+    await statement.free();
 
     return records;
   }
