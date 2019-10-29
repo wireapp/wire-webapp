@@ -33,7 +33,7 @@ import 'Components/availabilityState';
 interface ConversationListCellProps {
   showJoinButton: boolean;
   conversation: Conversation;
-  onJoinCall: (conversation: Conversation, arg1: MediaType) => void;
+  onJoinCall: (conversation: Conversation, MediaType: MediaType) => void;
   is_selected: (conversation: Conversation) => boolean;
   click: () => void;
   index: ko.Observable<number>;
@@ -54,7 +54,7 @@ class ConversationListCell {
   users: any;
   cell_state: ko.Observable<ReturnType<typeof generateCellState>>;
   ConversationStatusIcon: typeof ConversationStatusIcon;
-  onJoinCall: (data: any, event: any) => void;
+  onClickJoinCall: (viewModel: ConversationListCell, event: MouseEvent) => void;
   dispose: () => void;
   constructor(
     {
@@ -112,7 +112,7 @@ class ConversationListCell {
 
     this.ConversationStatusIcon = ConversationStatusIcon;
 
-    this.onJoinCall = (data, event) => {
+    this.onClickJoinCall = (viewModel, event) => {
       event.preventDefault();
       onJoinCall(conversation, MediaType.AUDIO);
     };
@@ -181,7 +181,7 @@ ko.components.register('conversation-list-cell', {
           <!-- /ko -->
         <!-- /ko -->
         <!-- ko if: showJoinButton -->
-          <div class="call-ui__button call-ui__button--green call-ui__button--join" data-bind="click: onJoinCall, text: t('callJoin')" data-uie-name="do-call-controls-call-join"></div>
+          <div class="call-ui__button call-ui__button--green call-ui__button--join" data-bind="click: onClickJoinCall, text: t('callJoin')" data-uie-name="do-call-controls-call-join"></div>
         <!-- /ko -->
       </div>
       <!-- /ko -->
