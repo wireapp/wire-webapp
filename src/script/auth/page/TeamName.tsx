@@ -40,6 +40,7 @@ import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 import useReactRouter from 'use-react-router';
+import {getLogger} from 'Util/Logger';
 import {teamNameStrings} from '../../strings';
 import RouterLink from '../component/RouterLink';
 import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
@@ -60,6 +61,8 @@ const TeamName = ({
   pushAccountRegistrationData,
   authError,
 }: Props & ConnectedProps & DispatchProps) => {
+  const logger = getLogger('TeamName');
+
   const {formatMessage: _} = useIntl();
   const {history} = useReactRouter();
   const [enteredTeamName, setEnteredTeamName] = useState(teamName || '');
@@ -76,27 +79,28 @@ const TeamName = ({
     setIsValidTeamName(true);
     resetInviteErrors();
   };
-  const handleSubmit = (event: React.FormEvent): void => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     teamNameInput.current.value = teamNameInput.current.value.trim();
     if (!teamNameInput.current.checkValidity()) {
       setError(ValidationError.handleValidationState('name', teamNameInput.current.validity));
       setIsValidTeamName(false);
     } else {
-      Promise.resolve(teamNameInput.current.value)
-        .then(teamName => teamName.trim())
-        .then(teamName =>
-          pushAccountRegistrationData({
-            team: {
-              binding: undefined,
-              creator: undefined,
-              icon: undefined,
-              id: undefined,
-              name: teamName,
-            },
-          }),
-        )
-        .then(() => history.push(ROUTE.CREATE_TEAM_ACCOUNT));
+      try {
+        const teamName = teamNameInput.current.value.trim();
+        await pushAccountRegistrationData({
+          team: {
+            binding: undefined,
+            creator: undefined,
+            icon: undefined,
+            id: undefined,
+            name: teamName,
+          },
+        });
+        history.push(ROUTE.CREATE_TEAM_ACCOUNT);
+      } catch (error) {
+        logger.error('Unable to push account data', error);
+      }
     }
     teamNameInput.current.focus();
   };
