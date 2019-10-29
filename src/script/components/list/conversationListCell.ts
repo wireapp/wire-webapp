@@ -21,16 +21,54 @@ import ko from 'knockout';
 
 import {noop} from 'Util/util';
 
-import {ConversationStatusIcon} from '../../conversation/ConversationStatusIcon';
-import {MediaType} from '../../media/MediaType';
 import {ParticipantAvatar} from 'Components/participantAvatar';
 import {generateCellState} from '../../conversation/ConversationCellState';
+import {ConversationStatusIcon} from '../../conversation/ConversationStatusIcon';
+import {Conversation} from '../../entity/Conversation';
+import {MediaType} from '../../media/MediaType';
 import {viewportObserver} from '../../ui/viewportObserver';
 
 import 'Components/availabilityState';
 
+interface ConversationListCellProps {
+  showJoinButton: boolean;
+  conversation: Conversation;
+  onJoinCall: (conversation: Conversation, arg1: MediaType) => void;
+  is_selected: (conversation: Conversation) => boolean;
+  click: () => void;
+  index: ko.Observable<number>;
+  isVisibleFunc: (top: number, bottom: number) => boolean;
+  offsetTop: ko.Observable<number>;
+}
+
 class ConversationListCell {
-  constructor({showJoinButton, conversation, onJoinCall, is_selected = noop, click = noop}, {element}) {
+  conversation: Conversation;
+  isSelected: ko.Computed<boolean>;
+  on_click: () => void;
+  ParticipantAvatar: typeof ParticipantAvatar;
+  showJoinButton: boolean;
+  isGroup: boolean;
+  is1To1: boolean;
+  isInTeam: boolean;
+  isInViewport: ko.Observable<boolean>;
+  users: any;
+  cell_state: ko.Observable<ReturnType<typeof generateCellState>>;
+  ConversationStatusIcon: typeof ConversationStatusIcon;
+  onJoinCall: (data: any, event: any) => void;
+  dispose: () => void;
+  constructor(
+    {
+      showJoinButton,
+      conversation,
+      onJoinCall,
+      is_selected = () => false,
+      click = noop,
+      index = ko.observable(0),
+      isVisibleFunc = () => false,
+      offsetTop = ko.observable(0),
+    }: ConversationListCellProps,
+    element: HTMLElement,
+  ) {
     this.conversation = conversation;
     this.isSelected = ko.computed(() => is_selected(conversation));
     // TODO: "click" should be renamed to "right_click"
@@ -41,27 +79,36 @@ class ConversationListCell {
     this.is1To1 = conversation.is1to1();
     this.isInTeam = conversation.selfUser().inTeam();
 
-    const {bottom, top} = element.getBoundingClientRect();
-    const isInitiallyInViewport = bottom > 0 && top < window.innerHeight;
+    const cellHeight = 56;
+    const cellTop = index() * cellHeight + offsetTop();
+    const cellBottom = cellTop + cellHeight;
 
-    this.isInViewport = ko.observable(isInitiallyInViewport);
+    /*
+     *  We did use getBoundingClientRect to determine the initial visibility
+     *  of an element, but this proved to be a major bottleneck with lots
+     *  of <conversation-list-cell>s
+     */
+    const isInitiallyVisible = isVisibleFunc(cellTop, cellBottom);
 
-    if (!isInitiallyInViewport) {
+    this.isInViewport = ko.observable(isInitiallyVisible);
+
+    if (!isInitiallyVisible) {
       viewportObserver.trackElement(
         element,
-        isInViewport => {
+        (isInViewport: boolean) => {
           if (isInViewport) {
             this.isInViewport(true);
             viewportObserver.removeElement(element);
           }
         },
         false,
+        undefined,
       );
     }
 
     this.users = this.conversation.participating_user_ets;
 
-    this.cell_state = ko.observable('');
+    this.cell_state = ko.observable({icon: null, description: null});
 
     this.ConversationStatusIcon = ConversationStatusIcon;
 
@@ -141,8 +188,7 @@ ko.components.register('conversation-list-cell', {
     </div>
   `,
   viewModel: {
-    createViewModel(props, componentInfo) {
-      return new ConversationListCell(props, componentInfo);
-    },
+    createViewModel: (props: ConversationListCellProps, componentInfo: any) =>
+      new ConversationListCell(props, componentInfo.element),
   },
 });
