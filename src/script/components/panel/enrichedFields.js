@@ -23,7 +23,7 @@ import {t} from 'Util/LocalizerUtil';
 import {noop} from 'Util/util';
 
 import {resolve, graph} from '../../config/appResolver';
-import {RichProfileRepository} from 'src/script/user/RichProfileRepository';
+import {RichProfileRepository} from '../../user/RichProfileRepository';
 
 ko.components.register('enriched-fields', {
   template: `
