@@ -152,7 +152,7 @@ class ConversationJoin extends React.Component<CombinedProps, State> {
     window.location.replace(redirectLocation);
   };
 
-  handleSubmit = (event: React.FormEvent) => {
+  handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     this.nameInput.current.value = this.nameInput.current.value.trim();
     if (!this.nameInput.current.checkValidity()) {
@@ -161,39 +161,40 @@ class ConversationJoin extends React.Component<CombinedProps, State> {
         isValidName: false,
       });
     } else {
-      Promise.resolve(this.nameInput.current.value)
-        .then(name => name.trim())
-        .then(name => {
-          const registrationData = {
-            accent_id: this.state.accentColor.id,
-            expires_in: this.state.expiresIn,
-            name,
-          };
-          return this.props.doRegisterWireless(registrationData, {
-            shouldInitializeClient: !this.isPwaEnabled(),
-          });
-        })
-        .then(() => this.props.doJoinConversationByCode(this.state.conversationKey, this.state.conversationCode))
-        .then(conversationEvent => this.props.setLastEventDate(new Date(conversationEvent.time)))
-        .then(() => this.routeToApp())
-        .catch(error => {
-          if (error.label) {
-            switch (error.label) {
-              default: {
-                const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
-                  error.label.endsWith(errorType),
-                );
-                if (!isValidationError) {
-                  this.props.doLogout();
-                  throw error;
-                }
+      try {
+        const name = this.nameInput.current.value.trim();
+        const registrationData = {
+          accent_id: this.state.accentColor.id,
+          expires_in: this.state.expiresIn,
+          name,
+        };
+        await this.props.doRegisterWireless(registrationData, {
+          shouldInitializeClient: !this.isPwaEnabled(),
+        });
+        const conversationEvent = await this.props.doJoinConversationByCode(
+          this.state.conversationKey,
+          this.state.conversationCode,
+        );
+        await this.props.setLastEventDate(new Date(conversationEvent.time));
+        this.routeToApp();
+      } catch (error) {
+        if (error.label) {
+          switch (error.label) {
+            default: {
+              const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
+                error.label.endsWith(errorType),
+              );
+              if (!isValidationError) {
+                this.props.doLogout();
+                throw error;
               }
             }
-          } else {
-            this.props.doLogout();
-            throw error;
           }
-        });
+        } else {
+          await this.props.doLogout();
+          throw error;
+        }
+      }
     }
     this.nameInput.current.focus();
   };
