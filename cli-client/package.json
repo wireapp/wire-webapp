@@ -5,7 +5,7 @@
   "dependencies": {
     "@types/fs-extra": "8.0.1",
     "@types/long": "4.0.0",
-    "@wireapp/core": "14.0.2",
+    "@wireapp/core": "14.0.3",
     "@wireapp/store-engine-fs": "1.4.25",
     "commander": "3.0.2",
     "dotenv": "8.2.0",
@@ -33,5 +33,5 @@
     "test:node": "exit 0",
     "prepare": "yarn build"
   },
-  "version": "7.0.2"
+  "version": "7.0.3"
 }
