@@ -87,14 +87,13 @@ const TeamName = ({
       setIsValidTeamName(false);
     } else {
       try {
-        const teamName = teamNameInput.current.value.trim();
         await pushAccountRegistrationData({
           team: {
             binding: undefined,
             creator: undefined,
             icon: undefined,
             id: undefined,
-            name: teamName,
+            name: teamNameInput.current.value.trim(),
           },
         });
         history.push(ROUTE.CREATE_TEAM_ACCOUNT);
