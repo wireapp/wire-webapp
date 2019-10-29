@@ -17,7 +17,7 @@
  *
  */
 
-import {MessageSender} from 'message/MessageSender';
+import {MessageSender} from 'src/script/message/MessageSender';
 
 describe('MessageSender', () => {
   it('is in a paused state by default', done => {
