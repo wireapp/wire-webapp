@@ -92,14 +92,14 @@ class Message {
     this.includesOnlyEmojis = includesOnlyEmojis;
     this.ParticipantAvatar = ParticipantAvatar;
 
-    const markedSubscription = ko.computed(() => {
-      const marked = isMarked();
-      if (marked) {
-        setTimeout(() => onMessageMarked(componentInfo.element));
-      }
-    });
-
-    this.dispose = () => markedSubscription.dispose();
+    ko.computed(
+      () => {
+        if (isMarked()) {
+          setTimeout(() => onMessageMarked(componentInfo.element));
+        }
+      },
+      {disposeWhenNodeIsRemoved: componentInfo.element},
+    );
 
     this.conversationRepository = conversationRepository;
     this.EphemeralStatusType = EphemeralStatusType;
@@ -107,9 +107,9 @@ class Message {
 
     if (message.has_asset_text()) {
       // add a listener to any changes to the assets. This will warn the parent that the message has changed
-      message.assets.subscribe(onContentUpdated);
+      this.assetSubscription = message.assets.subscribe(onContentUpdated);
       // also listen for link previews on a single Text entity
-      message.get_first_asset().previews.subscribe(onContentUpdated);
+      this.previewSubscription = message.get_first_asset().previews.subscribe(onContentUpdated);
     }
 
     this.actionsViewModel = actionsViewModel;
@@ -134,6 +134,13 @@ class Message {
       const is1to1 = this.conversation().is1to1();
       return is1to1 ? moment(receipts[0].time).format('LT') : receipts.length.toString(10);
     });
+
+    this.dispose = () => {
+      if (this.assetSubscription) {
+        this.assetSubscription.dispose();
+        this.previewSubscription.dispose();
+      }
+    };
   }
 
   getSystemMessageIconComponent(message) {

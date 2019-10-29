@@ -28,7 +28,7 @@ class DeviceRemove {
     this.remove_form_visible = ko.observable(false);
 
     this.password = ko.observable('');
-    this.password_subscription = this.password.subscribe(value => {
+    this.passwordSubscription = this.password.subscribe(value => {
       if (value.length > 0) {
         return this.device_remove_error(false);
       }
@@ -53,7 +53,7 @@ class DeviceRemove {
   }
 
   dispose() {
-    this.password_subscription.dispose();
+    this.passwordSubscription.dispose();
   }
 }
 

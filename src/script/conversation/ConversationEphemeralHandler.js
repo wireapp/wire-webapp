@@ -68,7 +68,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
     this.timedMessages = ko.observableArray([]);
 
     let updateIntervalId = null;
-    this.timedMessages.subscribe(messageEntities => {
+    this.timedMessagesSubscription = this.timedMessages.subscribe(messageEntities => {
       const shouldClearInterval = !messageEntities.length && updateIntervalId;
       if (shouldClearInterval) {
         window.clearInterval(updateIntervalId);
@@ -289,5 +289,9 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
         return false;
       });
     }
+  }
+
+  dispose() {
+    this.timedMessagesSubscription.dispose();
   }
 }

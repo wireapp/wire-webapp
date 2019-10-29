@@ -36,31 +36,11 @@ describe('LinkPreviewRepository', () => {
     link_preview_repository = new LinkPreviewRepository(new AssetService(backendClient), propertiesRepository);
   });
 
-  afterEach(() => (window.openGraph = undefined));
-
-  function mockSucceedingOpenGraph() {
-    return (url, callback) => {
-      return Promise.resolve()
-        .then(meta => {
-          if (callback) {
-            callback(null, meta);
-          }
-
-          return meta;
-        })
-        .catch(error => {
-          if (callback) {
-            callback(error);
-          }
-
-          throw error;
-        });
-    };
-  }
+  afterEach(() => (window.openGraphAsync = undefined));
 
   describe('_getLinkPreview', () => {
     it('fetches open graph data if openGraph lib is available', done => {
-      window.openGraph = mockSucceedingOpenGraph();
+      window.openGraphAsync = () => Promise.resolve();
 
       link_preview_repository
         ._getLinkPreview('https://app.wire.com/')
@@ -72,7 +52,7 @@ describe('LinkPreviewRepository', () => {
     });
 
     it('rejects if a link is blacklisted', done => {
-      window.openGraph = mockSucceedingOpenGraph();
+      window.openGraphAsync = () => Promise.resolve();
 
       link_preview_repository
         ._getLinkPreview('https://www.youtube.com/watch?v=t4gjl-uwUHc')
@@ -84,7 +64,7 @@ describe('LinkPreviewRepository', () => {
     });
 
     it('catches errors that are raised by the openGraph lib when invalid URIs are parsed', done => {
-      window.openGraph = () => Promise.reject(new Error('Invalid URI'));
+      window.openGraphAsync = () => Promise.reject(new Error('Invalid URI'));
 
       const invalidUrl = 'http:////api/apikey';
       link_preview_repository

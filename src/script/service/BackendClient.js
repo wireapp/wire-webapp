@@ -139,8 +139,11 @@ export class BackendClient {
    */
   status() {
     return $.ajax({
+      headers: {
+        Authorization: `${this.accessTokenType} ${window.decodeURIComponent(this.accessToken)}`,
+      },
       timeout: BackendClient.CONFIG.CONNECTIVITY_CHECK.REQUEST_TIMEOUT,
-      type: 'HEAD',
+      type: 'GET',
       url: this.createUrl('/self'),
     });
   }

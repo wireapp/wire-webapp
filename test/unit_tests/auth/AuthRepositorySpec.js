@@ -22,7 +22,7 @@ describe('AuthRepository', () => {
 
   beforeAll(() => test_factory.exposeAuthActors());
 
-  describe('_scheduleTokenRefresh', () => {
+  describe('scheduleTokenRefresh', () => {
     beforeEach(() => {
       spyOn(TestFactory.auth_repository, 'renewAccessToken');
       jasmine.clock().install();
@@ -34,21 +34,21 @@ describe('AuthRepository', () => {
 
     it('renews the access token immediately if expiring in the past', () => {
       const expiration_timestamp = Date.now() - 30000;
-      TestFactory.auth_repository._scheduleTokenRefresh(expiration_timestamp);
+      TestFactory.auth_repository.scheduleTokenRefresh(expiration_timestamp);
 
       expect(TestFactory.auth_repository.renewAccessToken).toHaveBeenCalled();
     });
 
     it('renews the access token immediately if expiring within the next minute', () => {
       const expiration_timestamp = Date.now() + 30000;
-      TestFactory.auth_repository._scheduleTokenRefresh(expiration_timestamp);
+      TestFactory.auth_repository.scheduleTokenRefresh(expiration_timestamp);
 
       expect(TestFactory.auth_repository.renewAccessToken).toHaveBeenCalled();
     });
 
     it('renews the access token at the scheduled time', () => {
       const expiration_timestamp = Date.now() + 60500;
-      TestFactory.auth_repository._scheduleTokenRefresh(expiration_timestamp);
+      TestFactory.auth_repository.scheduleTokenRefresh(expiration_timestamp);
 
       expect(TestFactory.auth_repository.renewAccessToken).not.toHaveBeenCalled();
       jasmine.clock().tick(1000);
@@ -61,13 +61,13 @@ describe('AuthRepository', () => {
       const first_timestamp = Date.now() + 60500;
       const second_timestamp = Date.now() + 61000;
 
-      TestFactory.auth_repository._scheduleTokenRefresh(first_timestamp);
+      TestFactory.auth_repository.scheduleTokenRefresh(first_timestamp);
 
       expect(TestFactory.auth_repository.renewAccessToken).not.toHaveBeenCalled();
       jasmine.clock().tick(250);
 
       expect(TestFactory.auth_repository.renewAccessToken).not.toHaveBeenCalled();
-      TestFactory.auth_repository._scheduleTokenRefresh(second_timestamp);
+      TestFactory.auth_repository.scheduleTokenRefresh(second_timestamp);
 
       expect(TestFactory.auth_repository.renewAccessToken).not.toHaveBeenCalled();
       expect(window.clearTimeout).toHaveBeenCalled();

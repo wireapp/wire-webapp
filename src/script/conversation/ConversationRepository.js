@@ -82,7 +82,7 @@ import {ClientMismatchHandler} from './ClientMismatchHandler';
 import {ConversationLabelRepository} from './ConversationLabelRepository';
 
 import {ConnectionStatus} from '../connection/ConnectionStatus';
-import * as AssetMetaDataBuilder from '../assets/AssetMetaDataBuilder';
+import {buildMetadata, isVideo, isImage, isAudio} from '../assets/AssetMetaDataBuilder';
 import {AssetTransferState} from '../assets/AssetTransferState';
 import {AssetRemoteData} from '../assets/AssetRemoteData';
 
@@ -1871,7 +1871,7 @@ export class ConversationRepository {
    * @returns {Promise} Resolves when the asset metadata was sent
    */
   send_asset_metadata(conversationEntity, file, allowImageDetection) {
-    return AssetMetaDataBuilder.buildMetadata(file)
+    return buildMetadata(file)
       .catch(error => {
         const logMessage = `Couldn't render asset preview from metadata. Asset might be corrupt: ${error.message}`;
         this.logger.warn(logMessage, error);
@@ -1880,11 +1880,11 @@ export class ConversationRepository {
       .then(metadata => {
         const assetOriginal = new Asset.Original({mimeType: file.type, name: file.name, size: file.size});
 
-        if (AssetMetaDataBuilder.isAudio(file)) {
+        if (isAudio(file)) {
           assetOriginal.audio = metadata;
-        } else if (AssetMetaDataBuilder.isVideo(file)) {
+        } else if (isVideo(file)) {
           assetOriginal.video = metadata;
-        } else if (allowImageDetection && AssetMetaDataBuilder.isImage(file)) {
+        } else if (allowImageDetection && isImage(file)) {
           assetOriginal.image = metadata;
         }
 
@@ -2953,34 +2953,27 @@ export class ConversationRepository {
    * @param {AssetType} [asImage=false] - whether or not the file should be treated as an image
    * @returns {Promise} Resolves when file was uploaded
    */
-  upload_file(conversationEntity, file, asImage) {
-    let message_id;
-    const upload_started = Date.now();
 
-    return this.send_asset_metadata(conversationEntity, file, asImage)
-      .then(({id}) => {
-        message_id = id;
-        return this.sendAssetPreview(conversationEntity, file, message_id);
-      })
-      .then(() => this.send_asset_remotedata(conversationEntity, file, message_id, asImage))
-      .then(() => {
-        const upload_duration = (Date.now() - upload_started) / TIME_IN_MILLIS.SECOND;
-        this.logger.info(`Finished to upload asset for conversation'${conversationEntity.id} in ${upload_duration}`);
-      })
-      .catch(error => {
-        if (this._isUserCancellationError(error)) {
-          throw error;
-        }
-
-        this.logger.error(
-          `Failed to upload asset for conversation '${conversationEntity.id}': ${error.message}`,
-          error,
-        );
-        return this.get_message_in_conversation_by_id(conversationEntity, message_id).then(message_et => {
-          this.send_asset_upload_failed(conversationEntity, message_et.id);
-          return this.update_message_as_upload_failed(message_et);
-        });
-      });
+  async upload_file(conversationEntity, file, asImage) {
+    let messageId;
+    try {
+      const uploadStarted = Date.now();
+      messageId = (await this.send_asset_metadata(conversationEntity, file, asImage)).id;
+      if (isVideo(file)) {
+        await this.sendAssetPreview(conversationEntity, file, messageId);
+      }
+      await this.send_asset_remotedata(conversationEntity, file, messageId, asImage);
+      const uploadDuration = (Date.now() - uploadStarted) / TIME_IN_MILLIS.SECOND;
+      this.logger.info(`Finished to upload asset for conversation'${conversationEntity.id} in ${uploadDuration}`);
+    } catch (error) {
+      if (this._isUserCancellationError(error)) {
+        throw error;
+      }
+      this.logger.error(`Failed to upload asset for conversation '${conversationEntity.id}': ${error.message}`, error);
+      const messageEntity = await this.get_message_in_conversation_by_id(conversationEntity, messageId);
+      this.send_asset_upload_failed(conversationEntity, messageEntity.id);
+      return this.update_message_as_upload_failed(messageEntity);
+    }
   }
 
   /**

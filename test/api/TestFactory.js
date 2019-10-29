@@ -54,6 +54,7 @@ import {AssetService} from 'src/script/assets/AssetService';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {PropertiesService} from 'src/script/properties/PropertiesService';
 import {MessageSender} from 'message/MessageSender';
+import {UserService} from 'src/script/user/UserService';
 
 window.testConfig = {
   connection: backendConfig,
@@ -214,7 +215,7 @@ window.TestFactory = class TestFactory {
     await this.exposeClientActors();
     TestFactory.asset_service = resolveDependency(graph.AssetService);
     TestFactory.connection_service = new ConnectionService(resolveDependency(graph.BackendClient));
-    TestFactory.user_service = resolveDependency(graph.UserService);
+    TestFactory.user_service = new UserService(resolveDependency(graph.BackendClient), TestFactory.storage_service);
     TestFactory.propertyRepository = TestFactory.propertyRepository = new PropertiesRepository(
       new PropertiesService(resolveDependency(graph.BackendClient)),
       new SelfService(resolveDependency(graph.BackendClient)),

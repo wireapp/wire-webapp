@@ -28,9 +28,7 @@ import {GiphyService} from '../extension/GiphyService';
 import {MediaRepository} from '../media/MediaRepository';
 import {PermissionRepository} from '../permission/PermissionRepository';
 import {RichProfileRepository} from '../user/RichProfileRepository';
-import {SelfService} from '../self/SelfService';
 import {StorageService} from '../storage/StorageService';
-import {UserService} from '../user/UserService';
 
 /**
  * Dependencies is a Map that will contain all the dependencies of the app
@@ -49,9 +47,7 @@ dependencies.set(GiphyService, {dependencies: [BackendClient], name: 'GiphyServi
 dependencies.set(MediaRepository, {dependencies: [PermissionRepository], name: 'MediaRepository'});
 dependencies.set(PermissionRepository, {dependencies: [], name: 'PermissionRepository'});
 dependencies.set(RichProfileRepository, {dependencies: [BackendClient], name: 'RichProfileRepository'});
-dependencies.set(SelfService, {dependencies: [BackendClient], name: 'SelfService'});
 dependencies.set(StorageService, {dependencies: [], name: 'StorageService'});
-dependencies.set(UserService, {dependencies: [BackendClient, StorageService], name: 'UserService'});
 
 export {
   dependencies,
@@ -65,7 +61,5 @@ export {
   MediaRepository,
   RichProfileRepository,
   PermissionRepository,
-  SelfService,
   StorageService,
-  UserService,
 };

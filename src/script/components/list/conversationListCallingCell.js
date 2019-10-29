@@ -112,6 +112,7 @@ class ConversationListCallingCell {
     this.dispose = () => {
       window.clearInterval(callDurationUpdateInterval);
       startedAtSubscription.dispose();
+      this.showNoCameraPreview.dispose();
     };
   }
 

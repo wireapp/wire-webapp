@@ -27,6 +27,7 @@ declare global {
     bazinga64: any;
     jQuery: any;
     platform: any;
+    Raygun: any;
     wire: {
       app: {
         service: {
