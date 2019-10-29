@@ -93,7 +93,7 @@ const TeamName = ({
             creator: undefined,
             icon: undefined,
             id: undefined,
-            name: teamNameInput.current.value.trim(),
+            name: teamNameInput.current.value,
           },
         });
         history.push(ROUTE.CREATE_TEAM_ACCOUNT);
