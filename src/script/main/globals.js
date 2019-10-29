@@ -78,7 +78,7 @@ import audioSeekBarGlobal from 'Components/asset/controls/audioSeekBar.js';
 import seekBarGlobal from 'Components/asset/controls/seekBar.js';
 import mediaButtonGlobal from 'Components/asset/controls/mediaButton.js';
 import conversationListCallingCellGlobal from 'Components/list/conversationListCallingCell.js';
-import conversationListCellGlobal from 'Components/list/conversationListCell.js';
+import conversationListCellGlobal from 'Components/list/conversationListCell.ts';
 import groupAvatarGlobal from 'Components/list/groupAvatar.js';
 import userDetailsGlobal from 'Components/panel/userDetails.js';
 import serviceDetailsGlobal from 'Components/panel/serviceDetails.js';

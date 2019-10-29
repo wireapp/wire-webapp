@@ -64,25 +64,28 @@
             </div>
           </li>
         <!-- /ko -->
-        <div data-uie-name="recent-view" data-bind="visible: showRecentConversations()">
-          <!-- ko foreach: {data: unarchivedConversations, as: 'conversation', noChildContext: true} -->
-            <conversation-list-cell
-              data-bind="link_to: getConversationUrl(conversation.id), event: {'contextmenu': (_, event) => listViewModel.onContextMenu(conversation, event)}"
-              data-uie-name="item-conversation"
-              params="click: (_, event) => listViewModel.onContextMenu(conversation, event), conversation: conversation, showJoinButton: hasJoinableCall(conversation.id), is_selected: isSelectedConversation, onJoinCall: onJoinCall">
-            </conversation-list-cell>
-          <!-- /ko -->   
-        </div>
-        <div data-uie-name="folder-view" data-bind="hidden: showRecentConversations()">
-          <grouped-conversations params="
-            conversationRepository: conversationRepository, 
-            listViewModel: listViewModel,
-            hasJoinableCall: hasJoinableCall,
-            onJoinCall: onJoinCall,
-            isSelectedConversation: isSelectedConversation,      
-            expandedFolders: expandedFolders">
-          </grouped-conversations>
-        </div>
+        <!-- ko let: {isVisibleFunc: getIsVisibleFunc()} -->
+          <div data-uie-name="recent-view" data-bind="visible: showRecentConversations()">
+            <!-- ko foreach: {data: unarchivedConversations, as: 'conversation', noChildContext: true} -->
+              <conversation-list-cell
+                data-bind="link_to: getConversationUrl(conversation.id), event: {'contextmenu': (_, event) => listViewModel.onContextMenu(conversation, event)}"
+                data-uie-name="item-conversation"
+                params="click: (_, event) => listViewModel.onContextMenu(conversation, event), conversation: conversation, showJoinButton: hasJoinableCall(conversation.id), is_selected: isSelectedConversation, onJoinCall: onJoinCall, index: $index, isVisibleFunc: isVisibleFunc">
+              </conversation-list-cell>
+            <!-- /ko -->
+          </div>
+          <div data-uie-name="folder-view" data-bind="hidden: showRecentConversations()">
+            <grouped-conversations params="
+              conversationRepository: conversationRepository, 
+              listViewModel: listViewModel,
+              hasJoinableCall: hasJoinableCall,
+              onJoinCall: onJoinCall,
+              isSelectedConversation: isSelectedConversation,      
+              expandedFolders: expandedFolders,
+              isVisibleFunc: isVisibleFunc">
+            </grouped-conversations>
+          </div>
+        <!-- /ko -->
       </ul>
     <!-- /ko -->
     <!-- ko if: noConversations() -->
