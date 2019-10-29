@@ -42,7 +42,7 @@ export class CookieAction {
     };
   };
 
-  stopPolling = (name: string): ThunkAction => {
+  stopPolling = (name: string = CookieSelector.COOKIE_NAME_APP_OPENED): ThunkAction => {
     return (dispatch, getState, {}) => {
       return Promise.resolve()
         .then(() => {

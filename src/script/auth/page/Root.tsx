@@ -23,10 +23,11 @@ import React from 'react';
 import {IntlProvider} from 'react-intl';
 import {connect} from 'react-redux';
 import {HashRouter as Router, Redirect, Route, Switch} from 'react-router-dom';
+import {AnyAction, Dispatch} from 'redux';
 import {Config} from '../config';
 import {mapLanguage, normalizeLanguage} from '../localeConfig';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
-import {RootState, ThunkDispatch} from '../module/reducer';
+import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as CookieSelector from '../module/selector/CookieSelector';
 import * as LanguageSelector from '../module/selector/LanguageSelector';
@@ -45,18 +46,7 @@ import SingleSignOn from './SingleSignOn';
 import TeamName from './TeamName';
 import Verify from './Verify';
 
-interface Props extends React.HTMLAttributes<Root> {}
-
-interface ConnectedProps {
-  language: string;
-  isAuthenticated: boolean;
-}
-
-interface DispatchProps {
-  startPolling: (name?: string, interval?: number, asJSON?: boolean) => Promise<void>;
-  safelyRemoveCookie: (name: string, value: string) => Promise<void>;
-  stopPolling: (name?: string) => Promise<void>;
-}
+interface Props extends React.HTMLProps<Root> {}
 
 interface State {}
 
@@ -121,16 +111,24 @@ class Root extends React.Component<Props & ConnectedProps & DispatchProps, State
   };
 }
 
+type ConnectedProps = ReturnType<typeof mapStateToProps>;
+const mapStateToProps = (state: RootState) => ({
+  isAuthenticated: AuthSelector.isAuthenticated(state),
+  language: LanguageSelector.getLanguage(state),
+});
+
+type DispatchProps = ReturnType<typeof mapDispatchToProps>;
+const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
+  bindActionCreators(
+    {
+      safelyRemoveCookie: ROOT_ACTIONS.cookieAction.safelyRemoveCookie,
+      startPolling: ROOT_ACTIONS.cookieAction.startPolling,
+      stopPolling: ROOT_ACTIONS.cookieAction.stopPolling,
+    },
+    dispatch,
+  );
+
 export default connect(
-  (state: RootState): ConnectedProps => ({
-    isAuthenticated: AuthSelector.isAuthenticated(state),
-    language: LanguageSelector.getLanguage(state),
-  }),
-  (dispatch: ThunkDispatch): DispatchProps => ({
-    safelyRemoveCookie: (name: string, value: string) =>
-      dispatch(ROOT_ACTIONS.cookieAction.safelyRemoveCookie(name, value)),
-    startPolling: (name?: string, interval?: number, asJSON?: boolean) =>
-      dispatch(ROOT_ACTIONS.cookieAction.startPolling(name, interval, asJSON)),
-    stopPolling: (name?: string) => dispatch(ROOT_ACTIONS.cookieAction.stopPolling(name)),
-  }),
+  mapStateToProps,
+  mapDispatchToProps,
 )(Root);
