@@ -53,6 +53,7 @@ import {LinkPreviewRepository} from 'src/script/links/LinkPreviewRepository';
 import {AssetService} from 'src/script/assets/AssetService';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {PropertiesService} from 'src/script/properties/PropertiesService';
+import {MessageSender} from 'src/script/message/MessageSender';
 import {UserService} from 'src/script/user/UserService';
 
 window.testConfig = {
@@ -298,7 +299,7 @@ window.TestFactory = class TestFactory {
       TestFactory.event_repository,
       undefined,
       new LinkPreviewRepository(new AssetService(resolveDependency(graph.BackendClient)), propertiesRepository),
-      resolveDependency(graph.MessageSender),
+      new MessageSender(),
       serverTimeHandler,
       TestFactory.team_repository,
       TestFactory.user_repository,

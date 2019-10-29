@@ -102,6 +102,7 @@ import {LinkPreviewRepository} from '../links/LinkPreviewRepository';
 import {AssetService} from '../assets/AssetService';
 import {UserService} from '../user/UserService';
 import {AudioRepository} from '../audio/AudioRepository';
+import {MessageSender} from '../message/MessageSender';
 
 class App {
   static get CONFIG() {
@@ -163,6 +164,7 @@ class App {
   _setupRepositories() {
     const repositories = {};
     const selfService = new SelfService(this.backendClient);
+    const sendingMessageQueue = new MessageSender();
 
     repositories.audio = new AudioRepository();
     repositories.auth = resolve(graph.AuthRepository);
@@ -205,7 +207,7 @@ class App {
       repositories.event,
       repositories.giphy,
       new LinkPreviewRepository(new AssetService(resolve(graph.BackendClient)), repositories.properties),
-      resolve(graph.MessageSender),
+      sendingMessageQueue,
       serverTimeHandler,
       repositories.team,
       repositories.user,
@@ -239,7 +241,7 @@ class App {
       repositories.client,
       repositories.conversation,
       repositories.cryptography,
-      resolve(graph.MessageSender),
+      sendingMessageQueue,
       repositories.user,
     );
     repositories.calling = new CallingRepository(
