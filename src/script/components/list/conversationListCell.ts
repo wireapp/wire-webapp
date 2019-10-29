@@ -33,7 +33,7 @@ import 'Components/availabilityState';
 interface ConversationListCellProps {
   showJoinButton: boolean;
   conversation: Conversation;
-  onJoinCall: (conversation: Conversation, MediaType: MediaType) => void;
+  onJoinCall: (conversation: Conversation, mediaType: MediaType) => void;
   is_selected: (conversation: Conversation) => boolean;
   click: () => void;
   index: ko.Observable<number>;
