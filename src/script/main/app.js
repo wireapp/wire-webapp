@@ -164,6 +164,7 @@ class App {
   _setupRepositories() {
     const repositories = {};
     const selfService = new SelfService(this.backendClient);
+    const sendingMessageQueue = new MessageSender();
 
     repositories.audio = new AudioRepository();
     repositories.auth = resolve(graph.AuthRepository);
@@ -206,7 +207,7 @@ class App {
       repositories.event,
       repositories.giphy,
       new LinkPreviewRepository(new AssetService(resolve(graph.BackendClient)), repositories.properties),
-      new MessageSender(),
+      sendingMessageQueue,
       serverTimeHandler,
       repositories.team,
       repositories.user,
@@ -240,7 +241,7 @@ class App {
       repositories.client,
       repositories.conversation,
       repositories.cryptography,
-      new MessageSender(),
+      sendingMessageQueue,
       repositories.user,
     );
     repositories.calling = new CallingRepository(
