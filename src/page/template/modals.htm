@@ -20,14 +20,17 @@
         <!-- /ko -->
       </div>
       <!-- ko if: hasPassword() -->
-        <form data-bind="submit: () => doAction(confirm)">
+        <form data-bind="submit: () => doAction(confirm, content().closeOnConfirm)">
           <input class="modal__input" type="password" data-bind="textInput: passwordValue, attr: {placeholder: content().inputPlaceholder}, hasFocus: inputFocus"/>
         </form>
       <!-- /ko -->
       <!-- ko if: hasInput() -->
-        <form data-bind="submit: () => doAction(confirm)">
+        <form data-bind="submit: () => doAction(confirm, content().closeOnConfirm)">
           <input maxlength="64" class="modal__input" data-bind="textInput: inputValue, attr: {placeholder: content().inputPlaceholder}, hasFocus: inputFocus"/>
         </form>
+      <!-- /ko -->
+      <!-- ko if: errorMessage() -->
+        <div class="modal__input__error" data-bind="text: errorMessage"></div>
       <!-- /ko -->
       <!-- ko if: hasOption() -->
         <div class="modal-option">
@@ -41,10 +44,10 @@
       <!-- /ko -->
       <div class="modal__buttons" data-bind="css: {'modal__buttons--column': hasMultipleSecondary()}">
         <!-- ko foreach: {data: content().secondaryAction, as: 'secondary', noChildContext: true} -->
-          <div data-bind="text: secondary.text, click: () => doAction(secondary.action, true), css: {'modal__button--full': hasMultipleSecondary()}, attr: {'data-uie-name': secondary.uieName}" class="modal__button modal__button--secondary"></div>
+          <div data-bind="text: secondary.text, click: () => doAction(secondary.action, true, true), css: {'modal__button--full': hasMultipleSecondary()}, attr: {'data-uie-name': secondary.uieName}" class="modal__button modal__button--secondary"></div>
         <!-- /ko -->
         <!-- ko if: content().primaryAction.text -->
-          <div data-bind="text: content().primaryAction.text, click: () => doAction(confirm), css: {'modal__button--full': hasMultipleSecondary(), 'modal__button--disabled': !actionEnabled()}" class="modal__button modal__button--primary" data-uie-name="do-action"></div>
+          <div data-bind="text: content().primaryAction.text, click: () => doAction(confirm, content().closeOnConfirm), css: {'modal__button--full': hasMultipleSecondary(), 'modal__button--disabled': !actionEnabled()}" class="modal__button modal__button--primary" data-uie-name="do-action"></div>
         <!-- /ko -->
       </div>
     </div>

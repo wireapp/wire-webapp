@@ -60,7 +60,7 @@ class MessageQuote {
 
     this.includesOnlyEmojis = includesOnlyEmojis;
 
-    this.quotedMessage.subscribe(() => this.showFullText(false));
+    const quotedMessageSubscription = this.quotedMessage.subscribe(() => this.showFullText(false));
 
     this.quotedMessageIsBeforeToday = ko.pureComputed(() => {
       if (!this.quotedMessage()) {
@@ -103,7 +103,8 @@ class MessageQuote {
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, handleQuoteDeleted);
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.UPDATED, handleQuoteUpdated);
 
-    this.removedFromView = () => {
+    this.dispose = () => {
+      quotedMessageSubscription.dispose();
       amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, handleQuoteDeleted);
       amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.UPDATED, handleQuoteUpdated);
     };

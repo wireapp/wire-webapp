@@ -27,7 +27,7 @@ import {BackendClient} from '../service/BackendClient';
 import {QUEUE_STATE} from '../service/QueueState';
 
 export class AuthService {
-  private readonly backendClient: any;
+  public readonly backendClient: any;
   private readonly logger: Logger;
 
   static get CONFIG(): {

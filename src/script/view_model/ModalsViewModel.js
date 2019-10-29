@@ -76,6 +76,7 @@ export class ModalsViewModel {
     this.content = ko.observable(defaultContent);
     this.state = ko.observable(States.NONE);
     this.queue = [];
+    this.errorMessage = ko.observable('');
     this.actionEnabled = ko.pureComputed(() => !this.hasInput() || !!this.inputValue().trim().length);
 
     amplify.subscribe(WebAppEvents.WARNING.MODAL, this.showModal);
@@ -125,6 +126,7 @@ export class ModalsViewModel {
     }
 
     const {
+      closeOnConfirm = true,
       close = noop,
       data,
       preventClose = false,
@@ -137,6 +139,7 @@ export class ModalsViewModel {
     const content = {
       checkboxLabel: text.option,
       closeFn: close,
+      closeOnConfirm,
       currentType: type,
       inputPlaceholder: text.input,
       messageHtml: text.htmlMessage,
@@ -240,14 +243,16 @@ export class ModalsViewModel {
     }
   };
 
-  doAction = (action, skipValidation = false) => {
+  doAction = (action, closeAfter, skipValidation = false) => {
     if (!skipValidation && !this.actionEnabled()) {
       return;
     }
     if (typeof action === 'function') {
       action();
     }
-    this.hide();
+    if (closeAfter) {
+      this.hide();
+    }
   };
 
   hide = () => {
@@ -260,6 +265,7 @@ export class ModalsViewModel {
     this.content(defaultContent);
     this.inputValue('');
     this.passwordValue('');
+    this.errorMessage('');
     this.optionChecked(false);
     this.state(States.READY);
     this.unqueue();

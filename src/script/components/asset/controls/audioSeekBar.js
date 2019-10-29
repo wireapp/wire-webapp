@@ -40,11 +40,14 @@ class AudioSeekBarComponent {
     this.loudness = [];
     this.levels = [];
 
-    this.disabled = ko.computed(() => {
-      if (typeof params.disabled === 'function') {
-        this.element.classList.toggle('element-disabled', params.disabled());
-      }
-    });
+    this.disabled = ko.computed(
+      () => {
+        if (typeof params.disabled === 'function') {
+          this.element.classList.toggle('element-disabled', params.disabled());
+        }
+      },
+      {disposeWhenNodeIsRemoved: componentInfo.element},
+    );
 
     const assetMeta = params.asset.meta;
     if (assetMeta !== null && assetMeta.loudness !== null) {

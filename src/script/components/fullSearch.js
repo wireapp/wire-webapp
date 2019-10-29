@@ -59,7 +59,7 @@ class FullSearch {
     this.showNoResultsText = ko.observable(false);
 
     this.input = ko.observable();
-    this.input.subscribe(
+    this.inputSubscription = this.input.subscribe(
       debounce(searchQuery => {
         searchQuery = searchQuery.trim();
 
@@ -140,6 +140,7 @@ class FullSearch {
   }
 
   dispose() {
+    this.inputSubscription.dispose();
     $('.collection-list').off('scroll');
   }
 }

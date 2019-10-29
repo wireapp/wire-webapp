@@ -39,16 +39,19 @@ class ImageAssetComponent extends AbstractAssetTransferStateTracker {
 
     this.isIdle = () => this.uploadProgress() === -1 && !this.asset.resource() && !this.message.isObfuscated();
 
-    ko.computed(() => {
-      if (this.isVisible() && asset.resource()) {
-        asset
-          .resource()
-          .load()
-          .then(blob => {
-            this.imageUrl(window.URL.createObjectURL(blob));
-          });
-      }
-    });
+    ko.computed(
+      () => {
+        if (this.isVisible() && asset.resource()) {
+          asset
+            .resource()
+            .load()
+            .then(blob => {
+              this.imageUrl(window.URL.createObjectURL(blob));
+            });
+        }
+      },
+      {disposeWhenNodeIsRemoved: element},
+    );
 
     this.container = element;
     viewportObserver.onElementInViewport(this.container, () => this.isVisible(true));
