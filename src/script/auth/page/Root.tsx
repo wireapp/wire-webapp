@@ -19,7 +19,7 @@
 
 import {pathWithParams} from '@wireapp/commons/dist/commonjs/util/UrlUtil';
 import {StyledApp} from '@wireapp/react-ui-kit';
-import React from 'react';
+import React, {useEffect} from 'react';
 import {IntlProvider} from 'react-intl';
 import {connect} from 'react-redux';
 import {HashRouter as Router, Redirect, Route, Switch} from 'react-router-dom';
@@ -46,70 +46,70 @@ import SingleSignOn from './SingleSignOn';
 import TeamName from './TeamName';
 import Verify from './Verify';
 
-interface Props extends React.HTMLProps<Root> {}
+interface Props extends React.HTMLProps<HTMLDivElement> {}
 
-interface State {}
-
-class Root extends React.Component<Props & ConnectedProps & DispatchProps, State> {
-  componentDidMount = () => {
-    this.props.startPolling();
+const Root = ({
+  isAuthenticated,
+  language,
+  startPolling,
+  safelyRemoveCookie,
+  stopPolling,
+}: Props & ConnectedProps & DispatchProps) => {
+  useEffect(() => {
+    startPolling();
     window.onbeforeunload = () => {
-      this.props.safelyRemoveCookie(CookieSelector.COOKIE_NAME_APP_OPENED, Config.APP_INSTANCE_ID);
-      this.props.stopPolling();
+      safelyRemoveCookie(CookieSelector.COOKIE_NAME_APP_OPENED, Config.APP_INSTANCE_ID);
+      stopPolling();
     };
-  };
+  }, []);
 
-  loadLanguage = (language: string) => {
+  const loadLanguage = (language: string) => {
     return require(`Resource/translation/${mapLanguage(language)}.json`);
   };
 
-  render = () => {
-    const {isAuthenticated, language} = this.props;
-
-    const navigate = (route: string): null => {
-      window.location.assign(pathWithParams(route));
-      return null;
-    };
-
-    const isAuthenticatedCheck = (page: any): any => (page ? (isAuthenticated ? page : navigate('/auth#login')) : null);
-
-    const ProtectedChooseHandle = () => isAuthenticatedCheck(<ChooseHandle />);
-    const ProtectedHistoryInfo = () => isAuthenticatedCheck(<HistoryInfo />);
-    const ProtectedInitialInvite = () => isAuthenticatedCheck(<InitialInvite />);
-    const ProtectedClientManager = () => isAuthenticatedCheck(<ClientManager />);
-
-    return (
-      <IntlProvider locale={normalizeLanguage(language)} messages={this.loadLanguage(language)}>
-        <StyledApp style={{display: 'flex', height: '100%', minHeight: '100vh'}}>
-          <Router hashType="noslash">
-            <Switch>
-              <Route exact path={ROUTE.INDEX} component={Index} />
-              <Route path={ROUTE.CLIENTS} component={ProtectedClientManager} />
-              <Route path={ROUTE.LOGIN} component={Login} />
-              <Route path={ROUTE.CONVERSATION_JOIN} component={ConversationJoin} />
-              <Route path={ROUTE.CONVERSATION_JOIN_INVALID} component={ConversationJoinInvalid} />
-              <Route path={ROUTE.CREATE_TEAM} component={Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && TeamName} />
-              <Route
-                path={ROUTE.CREATE_ACCOUNT}
-                component={Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && CreatePersonalAccount}
-              />
-              <Route
-                path={ROUTE.CREATE_TEAM_ACCOUNT}
-                component={Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && CreateAccount}
-              />
-              <Route path={ROUTE.VERIFY} component={Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && Verify} />
-              <Route path={ROUTE.INITIAL_INVITE} component={ProtectedInitialInvite} />
-              <Route path={ROUTE.CHOOSE_HANDLE} component={ProtectedChooseHandle} />
-              <Route path={ROUTE.HISTORY_INFO} component={ProtectedHistoryInfo} />
-              <Route path={ROUTE.SSO} component={SingleSignOn} />
-              <Redirect to={ROUTE.INDEX} />
-            </Switch>
-          </Router>
-        </StyledApp>
-      </IntlProvider>
-    );
+  const navigate = (route: string): null => {
+    window.location.assign(pathWithParams(route));
+    return null;
   };
-}
+
+  const isAuthenticatedCheck = (page: any): any => (page ? (isAuthenticated ? page : navigate('/auth#login')) : null);
+
+  const ProtectedChooseHandle = () => isAuthenticatedCheck(<ChooseHandle />);
+  const ProtectedHistoryInfo = () => isAuthenticatedCheck(<HistoryInfo />);
+  const ProtectedInitialInvite = () => isAuthenticatedCheck(<InitialInvite />);
+  const ProtectedClientManager = () => isAuthenticatedCheck(<ClientManager />);
+
+  return (
+    <IntlProvider locale={normalizeLanguage(language)} messages={loadLanguage(language)}>
+      <StyledApp style={{display: 'flex', height: '100%', minHeight: '100vh'}}>
+        <Router hashType="noslash">
+          <Switch>
+            <Route exact path={ROUTE.INDEX} component={Index} />
+            <Route path={ROUTE.CLIENTS} component={ProtectedClientManager} />
+            <Route path={ROUTE.LOGIN} component={Login} />
+            <Route path={ROUTE.CONVERSATION_JOIN} component={ConversationJoin} />
+            <Route path={ROUTE.CONVERSATION_JOIN_INVALID} component={ConversationJoinInvalid} />
+            <Route path={ROUTE.CREATE_TEAM} component={Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && TeamName} />
+            <Route
+              path={ROUTE.CREATE_ACCOUNT}
+              component={Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && CreatePersonalAccount}
+            />
+            <Route
+              path={ROUTE.CREATE_TEAM_ACCOUNT}
+              component={Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && CreateAccount}
+            />
+            <Route path={ROUTE.VERIFY} component={Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && Verify} />
+            <Route path={ROUTE.INITIAL_INVITE} component={ProtectedInitialInvite} />
+            <Route path={ROUTE.CHOOSE_HANDLE} component={ProtectedChooseHandle} />
+            <Route path={ROUTE.HISTORY_INFO} component={ProtectedHistoryInfo} />
+            <Route path={ROUTE.SSO} component={SingleSignOn} />
+            <Redirect to={ROUTE.INDEX} />
+          </Switch>
+        </Router>
+      </StyledApp>
+    </IntlProvider>
+  );
+};
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
