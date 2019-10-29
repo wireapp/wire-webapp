@@ -907,7 +907,6 @@ class App {
 //##############################################################################
 
 $(() => {
-  ko.options.deferUpdates = true;
   enableLogging(Config.FEATURE.ENABLE_DEBUG);
   const appContainer = document.getElementById('wire-main');
   if (appContainer) {
