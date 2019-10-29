@@ -96,7 +96,7 @@ const TeamName = ({
             name: teamNameInput.current.value,
           },
         });
-        history.push(ROUTE.CREATE_TEAM_ACCOUNT);
+        return history.push(ROUTE.CREATE_TEAM_ACCOUNT);
       } catch (error) {
         logger.error('Unable to push account data', error);
       }
