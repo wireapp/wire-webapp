@@ -27,7 +27,7 @@ import logdown = require('logdown');
 import {PayloadBundle, PayloadBundleSource, PayloadBundleType} from '../conversation';
 import {AssetContent} from '../conversation/content';
 import {ConversationMapper} from '../conversation/ConversationMapper';
-import * as Messages from '../conversation/message/Message';
+import * as OtrMessage from '../conversation/message/OtrMessage';
 import {CoreError, NotificationError} from '../CoreError';
 import {CryptographyService} from '../cryptography';
 import {UserMapper} from '../user/UserMapper';
@@ -41,26 +41,29 @@ enum TOPIC {
 export type NotificationHandler = (notification: Notification, source: PayloadBundleSource) => Promise<void>;
 
 export declare interface NotificationService {
-  on(event: PayloadBundleType.ASSET, listener: (payload: Messages.FileAssetMessage) => void): this;
-  on(event: PayloadBundleType.ASSET_ABORT, listener: (payload: Messages.FileAssetAbortMessage) => void): this;
-  on(event: PayloadBundleType.ASSET_IMAGE, listener: (payload: Messages.ImageAssetMessage) => void): this;
-  on(event: PayloadBundleType.ASSET_META, listener: (payload: Messages.FileAssetMetaDataMessage) => void): this;
-  on(event: PayloadBundleType.CALL, listener: (payload: Messages.CallMessage) => void): this;
-  on(event: PayloadBundleType.CLIENT_ACTION, listener: (payload: Messages.ResetSessionMessage) => void): this;
+  on(event: PayloadBundleType.ASSET, listener: (payload: OtrMessage.FileAssetMessage) => void): this;
+  on(event: PayloadBundleType.ASSET_ABORT, listener: (payload: OtrMessage.FileAssetAbortMessage) => void): this;
+  on(event: PayloadBundleType.ASSET_IMAGE, listener: (payload: OtrMessage.ImageAssetMessage) => void): this;
+  on(event: PayloadBundleType.ASSET_META, listener: (payload: OtrMessage.FileAssetMetaDataMessage) => void): this;
+  on(event: PayloadBundleType.CALL, listener: (payload: OtrMessage.CallMessage) => void): this;
+  on(event: PayloadBundleType.CLIENT_ACTION, listener: (payload: OtrMessage.ResetSessionMessage) => void): this;
   on(event: PayloadBundleType.CLIENT_ADD, listener: (payload: Events.UserClientAddEvent) => void): this;
   on(event: PayloadBundleType.CLIENT_REMOVE, listener: (payload: Events.UserClientRemoveEvent) => void): this;
-  on(event: PayloadBundleType.CONFIRMATION, listener: (payload: Messages.ConfirmationMessage) => void): this;
+  on(event: PayloadBundleType.CONFIRMATION, listener: (payload: OtrMessage.ConfirmationMessage) => void): this;
   on(event: PayloadBundleType.CONNECTION_REQUEST, listener: (payload: Events.UserConnectionEvent) => void): this;
-  on(event: PayloadBundleType.CONVERSATION_CLEAR, listener: (payload: Messages.ClearConversationMessage) => void): this;
+  on(
+    event: PayloadBundleType.CONVERSATION_CLEAR,
+    listener: (payload: OtrMessage.ClearConversationMessage) => void,
+  ): this;
   on(event: PayloadBundleType.CONVERSATION_RENAME, listener: (payload: Events.ConversationRenameEvent) => void): this;
-  on(event: PayloadBundleType.LOCATION, listener: (payload: Messages.LocationMessage) => void): this;
+  on(event: PayloadBundleType.LOCATION, listener: (payload: OtrMessage.LocationMessage) => void): this;
   on(event: PayloadBundleType.MEMBER_JOIN, listener: (payload: Events.TeamMemberJoinEvent) => void): this;
-  on(event: PayloadBundleType.MESSAGE_DELETE, listener: (payload: Messages.DeleteMessage) => void): this;
-  on(event: PayloadBundleType.MESSAGE_EDIT, listener: (payload: Messages.EditedTextMessage) => void): this;
-  on(event: PayloadBundleType.MESSAGE_HIDE, listener: (payload: Messages.HideMessage) => void): this;
-  on(event: PayloadBundleType.PING, listener: (payload: Messages.PingMessage) => void): this;
-  on(event: PayloadBundleType.REACTION, listener: (payload: Messages.ReactionMessage) => void): this;
-  on(event: PayloadBundleType.TEXT, listener: (payload: Messages.TextMessage) => void): this;
+  on(event: PayloadBundleType.MESSAGE_DELETE, listener: (payload: OtrMessage.DeleteMessage) => void): this;
+  on(event: PayloadBundleType.MESSAGE_EDIT, listener: (payload: OtrMessage.EditedTextMessage) => void): this;
+  on(event: PayloadBundleType.MESSAGE_HIDE, listener: (payload: OtrMessage.HideMessage) => void): this;
+  on(event: PayloadBundleType.PING, listener: (payload: OtrMessage.PingMessage) => void): this;
+  on(event: PayloadBundleType.REACTION, listener: (payload: OtrMessage.ReactionMessage) => void): this;
+  on(event: PayloadBundleType.TEXT, listener: (payload: OtrMessage.TextMessage) => void): this;
   on(
     event: PayloadBundleType.TIMER_UPDATE,
     listener: (payload: Events.ConversationMessageTimerUpdateEvent) => void,

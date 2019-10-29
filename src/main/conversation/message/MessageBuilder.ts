@@ -54,7 +54,7 @@ import {
   ReactionMessage,
   ResetSessionMessage,
   TextMessage,
-} from './Message';
+} from './OtrMessage';
 import {TextContentBuilder} from './TextContentBuilder';
 
 const UUID = require('pure-uuid');
