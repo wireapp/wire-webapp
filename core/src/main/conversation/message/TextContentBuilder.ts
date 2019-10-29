@@ -26,7 +26,7 @@ import {
   QuoteMessageContent,
   TextContent,
 } from '../content';
-import {EditedTextMessage, TextMessage} from './Message';
+import {EditedTextMessage, TextMessage} from './OtrMessage';
 
 export class TextContentBuilder {
   private readonly content: TextContent;

@@ -78,6 +78,7 @@ import {CryptographyService, EncryptedAsset} from '../cryptography/';
 import * as AssetCryptography from '../cryptography/AssetCryptography.node';
 
 import {APIClient} from '@wireapp/api-client';
+import {MessageBuilder} from './message/MessageBuilder';
 import {
   CallMessage,
   ClearConversationMessage,
@@ -91,13 +92,12 @@ import {
   ImageAssetMessage,
   ImageAssetMessageOutgoing,
   LocationMessage,
-  Message,
+  OtrMessage,
   PingMessage,
   ReactionMessage,
   ResetSessionMessage,
   TextMessage,
-} from './message/Message';
-import {MessageBuilder} from './message/MessageBuilder';
+} from './message/OtrMessage';
 
 export class ConversationService {
   public readonly messageTimer: MessageTimer;
@@ -985,7 +985,7 @@ export class ConversationService {
    * @returns Sent message
    */
   // tslint:disable-next-line:typedef
-  public async send(payloadBundle: Message, userIds?: string[]) {
+  public async send(payloadBundle: OtrMessage, userIds?: string[]) {
     switch (payloadBundle.type) {
       case PayloadBundleType.ASSET:
         return this.sendFileData(payloadBundle, userIds);
