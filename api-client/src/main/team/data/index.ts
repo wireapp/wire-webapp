@@ -17,7 +17,8 @@
  *
  */
 
-export * from './TeamUpdateData';
-export * from './TeamConversationDeleteData';
-export * from './TeamMemberLeaveData';
 export * from './TeamConversationCreateData';
+export * from './TeamConversationDeleteData';
+export * from './TeamMemberJoinData';
+export * from './TeamMemberLeaveData';
+export * from './TeamUpdateData';

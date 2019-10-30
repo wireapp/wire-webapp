@@ -20,6 +20,7 @@
 import {
   TeamConversationCreateData,
   TeamConversationDeleteData,
+  TeamMemberJoinData,
   TeamMemberLeaveData,
   TeamUpdateData,
 } from '../team/data';
@@ -80,7 +81,7 @@ export interface TeamDeleteEvent extends BaseTeamEvent {
 }
 
 export interface TeamMemberJoinEvent extends BaseTeamEvent {
-  // TODO: add data
+  data: TeamMemberJoinData;
   type: TEAM_EVENT.MEMBER_JOIN;
 }
 

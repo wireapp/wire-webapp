@@ -17,17 +17,6 @@
  *
  */
 
-import {TeamMemberJoinData, TeamMemberLeaveData} from '@wireapp/api-client/dist/commonjs/team/data';
-import {BasePayloadBundle, PayloadBundleType} from './PayloadBundle';
-
-export interface TeamMemberLeaveMessage extends BasePayloadBundle {
-  content: TeamMemberLeaveData;
-  type: PayloadBundleType.TEAM_MEMBER_LEAVE;
+export interface TeamMemberJoinData {
+  user: string;
 }
-
-export interface TeamMemberJoinMessage extends BasePayloadBundle {
-  content: TeamMemberJoinData;
-  type: PayloadBundleType.TEAM_MEMBER_JOIN;
-}
-
-export type TeamMessage = TeamMemberJoinMessage | TeamMemberLeaveMessage;
