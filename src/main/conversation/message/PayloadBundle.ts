@@ -36,7 +36,7 @@ export enum PayloadBundleState {
 }
 
 export interface BasePayloadBundle {
-  content?: PayloadBundleContent;
+  content: PayloadBundleContent;
   conversation: string;
   from: string;
   fromClientId?: string;
