@@ -920,11 +920,7 @@ $(async () => {
       webSocketUrl: Config.BACKEND_WS,
     });
     if (encryptionKey) {
-      // const storeName = 'wire@development@ce1a2792-fb51-4977-a8e5-7a1dd8f2bb0b@temporary';
       const engine = StorageService.initEncryptedDatabase(encryptionKey);
-      // await engine.init(storeName);
-      // const ourClient = await engine.read('clients', 'local_identity');
-      // alert('WOOOOW'+ourClient.id);
       wire.app = new App(backendClient, appContainer, engine);
     } else {
       wire.app = new App(backendClient, appContainer);
