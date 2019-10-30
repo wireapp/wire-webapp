@@ -115,9 +115,7 @@ const Login = ({
 
   useEffect(() => {
     const queryLogoutReason = URLUtil.getURLParameter(QUERY_KEY.LOGOUT_REASON) || null;
-    const logoutReasonChanged = logoutReason !== queryLogoutReason;
-
-    if (queryLogoutReason && logoutReasonChanged) {
+    if (queryLogoutReason) {
       setLogoutReason(queryLogoutReason);
     }
   }, []);
@@ -127,21 +125,14 @@ const Login = ({
     const queryConversationKey = URLUtil.getURLParameter(QUERY_KEY.CONVERSATION_KEY) || null;
 
     const keyAndCodeExistent = queryConversationKey && queryConversationCode;
-    const keyChanged = queryConversationKey !== conversationKey;
-    const codeChanged = conversationCode !== queryConversationCode;
-    const keyOrCodeChanged = keyChanged || codeChanged;
-    if (keyAndCodeExistent && keyOrCodeChanged) {
-      Promise.resolve()
-        .then(() => {
-          setConversationCode(queryConversationCode);
-          setConversationKey(queryConversationKey);
-          setIsValidLink(true);
-        })
-        .then(() => doCheckConversationCode(conversationKey, conversationCode))
-        .catch(error => {
-          logger.warn('Invalid conversation code', error);
-          setIsValidLink(false);
-        });
+    if (keyAndCodeExistent) {
+      setConversationCode(queryConversationCode);
+      setConversationKey(queryConversationKey);
+      setIsValidLink(true);
+      doCheckConversationCode(queryConversationKey, queryConversationCode).catch(error => {
+        logger.warn('Invalid conversation code', error);
+        setIsValidLink(false);
+      });
     }
   }, []);
 
