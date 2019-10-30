@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [14.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@14.1.0...@wireapp/core@14.2.0) (2019-10-30)
+
+
+### Features
+
+* **core:** Add team message content types ([#2496](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/2496)) ([6911ccb](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/6911ccbf4c0cceb01bc34bc06c6768f37cb644de))
+
+
+
+
+
 # [14.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@14.0.5...@wireapp/core@14.1.0) (2019-10-30)
 
 
