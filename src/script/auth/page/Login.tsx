@@ -42,16 +42,15 @@ import {
   RoundIconButton,
   Small,
 } from '@wireapp/react-ui-kit';
-import React from 'react';
-import {FormattedHTMLMessage, InjectedIntlProps, injectIntl} from 'react-intl';
+import React, {useEffect, useRef, useState} from 'react';
+import {FormattedHTMLMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
-import {Redirect, RouteComponentProps, withRouter} from 'react-router';
-
-import {noop} from 'Util/util';
-import {isValidEmail, isValidPhoneNumber, isValidUsername} from 'Util/ValidationUtil';
-
+import {Redirect} from 'react-router';
 import {AnyAction, Dispatch} from 'redux';
+import useReactRouter from 'use-react-router';
 import {save} from 'Util/ephemeralValueStore';
+import {getLogger} from 'Util/Logger';
+import {isValidEmail, isValidPhoneNumber, isValidUsername} from 'Util/ValidationUtil';
 import {loginStrings, logoutReasonStrings} from '../../strings';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import RouterLink from '../component/RouterLink';
@@ -71,354 +70,307 @@ import {parseError, parseValidationErrors} from '../util/errorUtil';
 import * as URLUtil from '../util/urlUtil';
 import Page from './Page';
 
-interface Props extends React.HTMLProps<HTMLDivElement>, RouteComponentProps {}
+interface Props extends React.HTMLProps<HTMLDivElement> {}
 
-interface State {
-  conversationCode: string;
-  conversationKey: string;
-  email: string;
-  isValidLink: boolean;
-  logoutReason: string;
-  password: string;
-  persist: boolean;
-  validInputs: {
-    [field: string]: boolean;
-  };
-  validationErrors: Error[];
-}
+const Login = ({
+  loginError,
+  resetAuthError,
+  doCheckConversationCode,
+  doInit,
+  doInitializeClient,
+  doLoginAndJoin,
+  doLogin,
+  isFetching,
+  hasSelfHandle,
+  doGetAllClients,
+  hasHistory,
+}: Props & ConnectedProps & DispatchProps) => {
+  const logger = getLogger('Login');
+  const {formatMessage: _} = useIntl();
+  const {history} = useReactRouter();
 
-type CombinedProps = Props & ConnectedProps & DispatchProps & InjectedIntlProps;
+  const emailInput = useRef<HTMLInputElement>();
+  const passwordInput = useRef<HTMLInputElement>();
 
-class Login extends React.Component<CombinedProps, State> {
-  private readonly inputs: {
-    email: React.RefObject<any>;
-    password: React.RefObject<any>;
-  } = {
-    email: React.createRef(),
-    password: React.createRef(),
-  };
+  const [conversationCode, setConversationCode] = useState();
+  const [conversationKey, setConversationKey] = useState();
 
-  state: State = {
-    conversationCode: null,
-    conversationKey: null,
-    email: '',
-    isValidLink: true,
-    logoutReason: null,
-    password: '',
-    persist: !Config.FEATURE.DEFAULT_LOGIN_TEMPORARY_CLIENT,
-    validInputs: {
-      email: true,
-      password: true,
-    },
-    validationErrors: [],
-  };
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-  readAndUpdateParamsFromUrl = (nextProps: CombinedProps) => {
-    const logoutReason = URLUtil.getURLParameter(QUERY_KEY.LOGOUT_REASON) || null;
-    const logoutReasonChanged = logoutReason !== this.state.logoutReason;
+  const [isValidLink, setIsValidLink] = useState(true);
+  const [logoutReason, setLogoutReason] = useState();
+  const [persist, setPersist] = useState(!Config.FEATURE.DEFAULT_LOGIN_TEMPORARY_CLIENT);
+  const [validEmailInput, setValidEmailInput] = useState(true);
+  const [validPasswordInput, setValidPasswordInput] = useState(true);
+  const [validationErrors, setValidationErrors] = useState([]);
 
-    if (logoutReason && logoutReasonChanged) {
-      this.setState((state, props) => ({...state, logoutReason}));
+  useEffect(() => {
+    const queryLogoutReason = URLUtil.getURLParameter(QUERY_KEY.LOGOUT_REASON) || null;
+    const logoutReasonChanged = logoutReason !== queryLogoutReason;
+
+    if (queryLogoutReason && logoutReasonChanged) {
+      setLogoutReason(queryLogoutReason);
     }
+  });
 
-    const conversationCode = URLUtil.getURLParameter(QUERY_KEY.CONVERSATION_CODE) || null;
-    const conversationKey = URLUtil.getURLParameter(QUERY_KEY.CONVERSATION_KEY) || null;
+  useEffect(() => {
+    const queryConversationCode = URLUtil.getURLParameter(QUERY_KEY.CONVERSATION_CODE) || null;
+    const queryConversationKey = URLUtil.getURLParameter(QUERY_KEY.CONVERSATION_KEY) || null;
 
-    const keyAndCodeExistent = conversationKey && conversationCode;
-    const keyChanged = conversationKey !== this.state.conversationKey;
-    const codeChanged = conversationCode !== this.state.conversationCode;
+    const keyAndCodeExistent = queryConversationKey && queryConversationCode;
+    const keyChanged = queryConversationKey !== conversationKey;
+    const codeChanged = conversationCode !== queryConversationCode;
     const keyOrCodeChanged = keyChanged || codeChanged;
     if (keyAndCodeExistent && keyOrCodeChanged) {
       Promise.resolve()
         .then(() => {
-          this.setState((state, props) => ({
-            ...state,
-            conversationCode,
-            conversationKey,
-            isValidLink: true,
-            logoutReason,
-          }));
+          setConversationCode(queryConversationCode);
+          setConversationKey(queryConversationKey);
+          setIsValidLink(true);
         })
-        .then(() => this.props.doCheckConversationCode(conversationKey, conversationCode))
+        .then(() => doCheckConversationCode(conversationKey, conversationCode))
         .catch(error => {
-          this.setState((state, props) => ({
-            ...state,
-            isValidLink: false,
-          }));
+          logger.warn('Invalid conversation code', error);
+          setIsValidLink(false);
         });
     }
-  };
+  });
 
-  componentDidMount = () => {
-    this.props.resetAuthError();
-    const immediateLogin = URLUtil.hasURLParameter(QUERY_KEY.IMMEDIATE_LOGIN);
-    if (immediateLogin) {
-      return this.immediateLogin();
+  useEffect(() => {
+    resetAuthError();
+    const isImmediateLogin = URLUtil.hasURLParameter(QUERY_KEY.IMMEDIATE_LOGIN);
+    if (isImmediateLogin) {
+      immediateLogin();
     }
-    return this.readAndUpdateParamsFromUrl(this.props);
+    return () => resetAuthError();
+  }, []);
+
+  const immediateLogin = async () => {
+    try {
+      await doInit({isImmediateLogin: true, shouldValidateLocalClient: false});
+      await doInitializeClient(ClientType.PERMANENT, undefined);
+      navigateChooseHandleOrWebapp();
+    } catch (error) {
+      logger.error('Unable to login immediately', error);
+    }
   };
 
-  componentWillReceiveProps = (nextProps: CombinedProps) => this.readAndUpdateParamsFromUrl(nextProps);
-
-  componentWillUnmount = () => {
-    this.props.resetAuthError();
-  };
-
-  immediateLogin = () => {
-    return Promise.resolve()
-      .then(() => this.props.doInit({isImmediateLogin: true, shouldValidateLocalClient: false}))
-      .then(() => this.props.doInitializeClient(ClientType.PERMANENT, undefined))
-      .then(this.navigateChooseHandleOrWebapp)
-      .catch(noop);
-  };
-
-  navigateChooseHandleOrWebapp = () => {
-    return this.props.hasSelfHandle
+  const navigateChooseHandleOrWebapp = () => {
+    return hasSelfHandle
       ? window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP))
-      : this.props.history.push(ROUTE.CHOOSE_HANDLE);
+      : history.push(ROUTE.CHOOSE_HANDLE);
   };
 
-  forgotPassword = () => URLUtil.openTab(EXTERNAL_ROUTE.WIRE_ACCOUNT_PASSWORD_RESET);
+  const forgotPassword = () => URLUtil.openTab(EXTERNAL_ROUTE.WIRE_ACCOUNT_PASSWORD_RESET);
 
-  handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (this.props.isFetching) {
+    if (isFetching) {
       return undefined;
     }
-    this.inputs.email.current.value = this.inputs.email.current.value.trim();
+    emailInput.current.value = emailInput.current.value.trim();
     const validationErrors: Error[] = [];
-    const validInputs: {[field: string]: boolean} = this.state.validInputs;
 
-    Object.entries(this.inputs).forEach(([inputKey, currentInput]) => {
-      if (!currentInput.current.checkValidity()) {
-        validationErrors.push(
-          ValidationError.handleValidationState(currentInput.current.name, currentInput.current.validity),
-        );
+    if (!emailInput.current.checkValidity()) {
+      validationErrors.push(
+        ValidationError.handleValidationState(emailInput.current.name, emailInput.current.validity),
+      );
+    }
+    setValidEmailInput(emailInput.current.validity.valid);
+    if (!passwordInput.current.checkValidity()) {
+      validationErrors.push(
+        ValidationError.handleValidationState(passwordInput.current.name, passwordInput.current.validity),
+      );
+    }
+    setValidPasswordInput(passwordInput.current.validity.valid);
+
+    setValidationErrors(validationErrors);
+
+    try {
+      if (validationErrors.length) {
+        throw validationErrors[0];
       }
-      validInputs[inputKey] = currentInput.current.validity.valid;
-    });
+      const localEmail = email.trim();
+      const login: LoginData = {clientType: persist ? ClientType.PERMANENT : ClientType.TEMPORARY, password};
 
-    this.setState({validInputs, validationErrors});
-    return Promise.resolve(validationErrors)
-      .then(errors => {
-        if (errors.length) {
-          throw errors[0];
-        }
-      })
-      .then(() => {
-        const {password, persist} = this.state;
-        const email = this.state.email.trim();
-        const login: LoginData = {clientType: persist ? ClientType.PERMANENT : ClientType.TEMPORARY, password};
+      if (isValidEmail(localEmail)) {
+        login.email = localEmail;
+      } else if (isValidUsername(localEmail)) {
+        login.handle = localEmail.replace('@', '');
+      } else if (Config.FEATURE.ENABLE_PHONE_LOGIN && isValidPhoneNumber(localEmail)) {
+        login.phone = localEmail;
+      }
 
-        if (isValidEmail(email)) {
-          login.email = email;
-        } else if (isValidUsername(email)) {
-          login.handle = email.replace('@', '');
-        } else if (Config.FEATURE.ENABLE_PHONE_LOGIN && isValidPhoneNumber(email)) {
-          login.phone = email;
-        }
+      const hasKeyAndCode = conversationKey && conversationCode;
+      if (hasKeyAndCode) {
+        await doLoginAndJoin(login, conversationKey, conversationCode);
+      } else {
+        await doLogin(login);
+      }
 
-        const hasKeyAndCode = this.state.conversationKey && this.state.conversationCode;
-        return hasKeyAndCode
-          ? this.props.doLoginAndJoin(login, this.state.conversationKey, this.state.conversationCode)
-          : this.props.doLogin(login);
-      })
-      .then(() => {
-        const secretKey = new Uint32Array(64);
-        self.crypto.getRandomValues(secretKey);
-        return save(secretKey);
-      })
-      .then(this.navigateChooseHandleOrWebapp)
-      .catch((error: Error | BackendError) => {
-        if ((error as BackendError).label) {
-          const backendError = error as BackendError;
-          switch (backendError.label) {
-            case BackendError.LABEL.NEW_CLIENT: {
-              this.props.resetAuthError();
-              /**
-               * Show history screen if:
-               *   1. database contains at least one event
-               *   2. there is at least one previously registered client
-               *   3. new local client is temporary
-               */
-              return this.props.doGetAllClients().then(clients => {
-                const shouldShowHistoryInfo = this.props.hasHistory || clients.length > 1 || !this.state.persist;
-                return shouldShowHistoryInfo
-                  ? this.props.history.push(ROUTE.HISTORY_INFO)
-                  : this.navigateChooseHandleOrWebapp();
-              });
-            }
-            case BackendError.LABEL.TOO_MANY_CLIENTS: {
-              this.props.resetAuthError();
-              return this.props.history.push(ROUTE.CLIENTS);
-            }
-            case BackendError.LABEL.INVALID_CREDENTIALS:
-            case LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE: {
-              return;
-            }
-            default: {
-              const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
-                backendError.label.endsWith(errorType),
-              );
-              if (!isValidationError) {
-                throw backendError;
-              }
+      // Save encrypted database key
+      const secretKey = new Uint32Array(64);
+      self.crypto.getRandomValues(secretKey);
+      await save(secretKey);
+
+      return navigateChooseHandleOrWebapp();
+    } catch (error) {
+      if ((error as BackendError).label) {
+        const backendError = error as BackendError;
+        switch (backendError.label) {
+          case BackendError.LABEL.NEW_CLIENT: {
+            resetAuthError();
+            /**
+             * Show history screen if:
+             *   1. database contains at least one event
+             *   2. there is at least one previously registered client
+             *   3. new local client is temporary
+             */
+            const clients = await doGetAllClients();
+            const shouldShowHistoryInfo = hasHistory || clients.length > 1 || !persist;
+            return shouldShowHistoryInfo ? history.push(ROUTE.HISTORY_INFO) : navigateChooseHandleOrWebapp();
+          }
+          case BackendError.LABEL.TOO_MANY_CLIENTS: {
+            resetAuthError();
+            return history.push(ROUTE.CLIENTS);
+          }
+          case BackendError.LABEL.INVALID_CREDENTIALS:
+          case LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE: {
+            return;
+          }
+          default: {
+            const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
+              backendError.label.endsWith(errorType),
+            );
+            if (!isValidationError) {
+              throw backendError;
             }
           }
-        } else {
-          throw error;
         }
-      });
+      } else {
+        throw error;
+      }
+    }
   };
 
-  render() {
-    const {
-      intl: {formatMessage: _},
-      loginError,
-    } = this.props;
-    const {logoutReason, isValidLink, email, password, persist, validInputs, validationErrors} = this.state;
-    const backArrow = (
-      <RouterLink to={ROUTE.INDEX} data-uie-name="go-index">
-        <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
-      </RouterLink>
-    );
-    const isSSOCapable = !isDesktopApp() || (isDesktopApp() && window.wSSOCapable === true);
-    return (
-      <Page>
-        {Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
-          <IsMobile>
-            <div style={{margin: 16}}>{backArrow}</div>
+  const backArrow = (
+    <RouterLink to={ROUTE.INDEX} data-uie-name="go-index">
+      <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
+    </RouterLink>
+  );
+  const isSSOCapable = !isDesktopApp() || (isDesktopApp() && window.wSSOCapable === true);
+  return (
+    <Page>
+      {Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
+        <IsMobile>
+          <div style={{margin: 16}}>{backArrow}</div>
+        </IsMobile>
+      )}
+      <Container centerText verticalCenter style={{width: '100%'}}>
+        {!isValidLink && <Redirect to={ROUTE.CONVERSATION_JOIN_INVALID} />}
+        <AppAlreadyOpen />
+        <Columns>
+          <IsMobile not>
+            <Column style={{display: 'flex'}}>
+              {Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && <div style={{margin: 'auto'}}>{backArrow}</div>}
+            </Column>
           </IsMobile>
-        )}
-        <Container centerText verticalCenter style={{width: '100%'}}>
-          {!isValidLink && <Redirect to={ROUTE.CONVERSATION_JOIN_INVALID} />}
-          <AppAlreadyOpen />
-          <Columns>
-            <IsMobile not>
-              <Column style={{display: 'flex'}}>
-                {Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && <div style={{margin: 'auto'}}>{backArrow}</div>}
-              </Column>
-            </IsMobile>
-            <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
-              <ContainerXS
-                centerText
-                style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
-              >
-                <div>
-                  <H1 center>{_(loginStrings.headline)}</H1>
-                  <Muted>{_(loginStrings.subhead)}</Muted>
-                  <Form style={{marginTop: 30}} data-uie-name="login">
-                    <InputBlock>
+          <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
+            <ContainerXS
+              centerText
+              style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
+            >
+              <div>
+                <H1 center>{_(loginStrings.headline)}</H1>
+                <Muted>{_(loginStrings.subhead)}</Muted>
+                <Form style={{marginTop: 30}} data-uie-name="login">
+                  <InputBlock>
+                    <Input
+                      name="email"
+                      tabIndex={1}
+                      onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        setEmail(event.target.value);
+                        setValidEmailInput(true);
+                      }}
+                      ref={emailInput}
+                      markInvalid={!validEmailInput}
+                      value={email}
+                      autoComplete="username email"
+                      placeholder={_(loginStrings.emailPlaceholder)}
+                      maxLength={128}
+                      type="text"
+                      required
+                      data-uie-name="enter-email"
+                    />
+                    <InputSubmitCombo>
                       <Input
-                        name="email"
-                        tabIndex={1}
-                        onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                          this.setState({
-                            email: event.target.value,
-                            validInputs: {...validInputs, email: true},
-                          })
-                        }
-                        ref={this.inputs.email}
-                        markInvalid={!validInputs.email}
-                        value={email}
-                        autoComplete="username email"
-                        placeholder={_(loginStrings.emailPlaceholder)}
-                        maxLength={128}
-                        type="text"
+                        name="password-login"
+                        tabIndex={2}
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                          setPassword(event.target.value);
+                          setValidPasswordInput(true);
+                        }}
+                        ref={passwordInput}
+                        markInvalid={!validPasswordInput}
+                        value={password}
+                        autoComplete="section-login password"
+                        type="password"
+                        placeholder={_(loginStrings.passwordPlaceholder)}
+                        pattern={`.{1,1024}`}
                         required
-                        data-uie-name="enter-email"
+                        data-uie-name="enter-password"
                       />
-                      <InputSubmitCombo>
-                        <Input
-                          name="password-login"
-                          tabIndex={2}
-                          onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                            this.setState({
-                              password: event.target.value,
-                              validInputs: {...validInputs, password: true},
-                            })
-                          }
-                          ref={this.inputs.password}
-                          markInvalid={!validInputs.password}
-                          value={password}
-                          autoComplete="section-login password"
-                          type="password"
-                          placeholder={_(loginStrings.passwordPlaceholder)}
-                          pattern={`.{1,1024}`}
-                          required
-                          data-uie-name="enter-password"
+                      {isFetching ? (
+                        <Loading size={32} />
+                      ) : (
+                        <RoundIconButton
+                          style={{marginLeft: 16}}
+                          tabIndex={4}
+                          disabled={!email || !password}
+                          type="submit"
+                          formNoValidate
+                          icon={ICON_NAME.ARROW}
+                          onClick={handleSubmit}
+                          data-uie-name="do-sign-in"
                         />
-                        {this.props.isFetching ? (
-                          <Loading size={32} />
-                        ) : (
-                          <RoundIconButton
-                            style={{marginLeft: 16}}
-                            tabIndex={4}
-                            disabled={!email || !password}
-                            type="submit"
-                            formNoValidate
-                            icon={ICON_NAME.ARROW}
-                            onClick={this.handleSubmit}
-                            data-uie-name="do-sign-in"
-                          />
-                        )}
-                      </InputSubmitCombo>
-                    </InputBlock>
-                    {validationErrors.length ? (
-                      parseValidationErrors(validationErrors)
-                    ) : loginError ? (
-                      <ErrorMessage data-uie-name="error-message">{parseError(loginError)}</ErrorMessage>
-                    ) : logoutReason ? (
-                      <Small center style={{marginBottom: '16px'}} data-uie-name="status-logout-reason">
-                        <FormattedHTMLMessage {...logoutReasonStrings[logoutReason]} />
-                      </Small>
-                    ) : (
-                      <div style={{marginTop: '4px'}}>&nbsp;</div>
-                    )}
-                    {!isDesktopApp() && (
-                      <Checkbox
-                        tabIndex={3}
-                        onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                          this.setState({persist: !event.target.checked})
-                        }
-                        checked={!persist}
-                        data-uie-name="enter-public-computer-sign-in"
-                        style={{justifyContent: 'center', marginTop: '12px'}}
-                      >
-                        <CheckboxLabel>{_(loginStrings.publicComputer)}</CheckboxLabel>
-                      </Checkbox>
-                    )}
-                  </Form>
-                </div>
-                {Config.FEATURE.ENABLE_SSO && isSSOCapable ? (
-                  <div style={{marginTop: '36px'}}>
-                    <Link center onClick={this.forgotPassword} data-uie-name="go-forgot-password">
-                      {_(loginStrings.forgotPassword)}
-                    </Link>
-                    <Columns style={{marginTop: '36px'}}>
-                      <Column>
-                        <RouterLink to="/sso" data-uie-name="go-sign-in-sso">
-                          {_(loginStrings.ssoLogin)}
-                        </RouterLink>
-                      </Column>
-                      {Config.FEATURE.ENABLE_PHONE_LOGIN && (
-                        <Column>
-                          <Link
-                            href={URLUtil.pathWithParams(EXTERNAL_ROUTE.PHONE_LOGIN)}
-                            data-uie-name="go-sign-in-phone"
-                          >
-                            {_(loginStrings.phoneLogin)}
-                          </Link>
-                        </Column>
                       )}
-                    </Columns>
-                  </div>
-                ) : (
-                  <Columns>
+                    </InputSubmitCombo>
+                  </InputBlock>
+                  {validationErrors.length ? (
+                    parseValidationErrors(validationErrors)
+                  ) : loginError ? (
+                    <ErrorMessage data-uie-name="error-message">{parseError(loginError)}</ErrorMessage>
+                  ) : logoutReason ? (
+                    <Small center style={{marginBottom: '16px'}} data-uie-name="status-logout-reason">
+                      <FormattedHTMLMessage {...logoutReasonStrings[logoutReason]} />
+                    </Small>
+                  ) : (
+                    <div style={{marginTop: '4px'}}>&nbsp;</div>
+                  )}
+                  {!isDesktopApp() && (
+                    <Checkbox
+                      tabIndex={3}
+                      onChange={(event: React.ChangeEvent<HTMLInputElement>) => setPersist(!event.target.checked)}
+                      checked={!persist}
+                      data-uie-name="enter-public-computer-sign-in"
+                      style={{justifyContent: 'center', marginTop: '12px'}}
+                    >
+                      <CheckboxLabel>{_(loginStrings.publicComputer)}</CheckboxLabel>
+                    </Checkbox>
+                  )}
+                </Form>
+              </div>
+              {Config.FEATURE.ENABLE_SSO && isSSOCapable ? (
+                <div style={{marginTop: '36px'}}>
+                  <Link center onClick={forgotPassword} data-uie-name="go-forgot-password">
+                    {_(loginStrings.forgotPassword)}
+                  </Link>
+                  <Columns style={{marginTop: '36px'}}>
                     <Column>
-                      <Link onClick={this.forgotPassword} data-uie-name="go-forgot-password">
-                        {_(loginStrings.forgotPassword)}
-                      </Link>
+                      <RouterLink to="/sso" data-uie-name="go-sign-in-sso">
+                        {_(loginStrings.ssoLogin)}
+                      </RouterLink>
                     </Column>
                     {Config.FEATURE.ENABLE_PHONE_LOGIN && (
                       <Column>
@@ -431,16 +383,31 @@ class Login extends React.Component<CombinedProps, State> {
                       </Column>
                     )}
                   </Columns>
-                )}
-              </ContainerXS>
-            </Column>
-            <Column />
-          </Columns>
-        </Container>
-      </Page>
-    );
-  }
-}
+                </div>
+              ) : (
+                <Columns>
+                  <Column>
+                    <Link onClick={forgotPassword} data-uie-name="go-forgot-password">
+                      {_(loginStrings.forgotPassword)}
+                    </Link>
+                  </Column>
+                  {Config.FEATURE.ENABLE_PHONE_LOGIN && (
+                    <Column>
+                      <Link href={URLUtil.pathWithParams(EXTERNAL_ROUTE.PHONE_LOGIN)} data-uie-name="go-sign-in-phone">
+                        {_(loginStrings.phoneLogin)}
+                      </Link>
+                    </Column>
+                  )}
+                </Columns>
+              )}
+            </ContainerXS>
+          </Column>
+          <Column />
+        </Columns>
+      </Container>
+    </Page>
+  );
+};
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
@@ -465,9 +432,7 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default withRouter(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps,
-  )(injectIntl(Login)),
-);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(Login);
