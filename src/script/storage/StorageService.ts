@@ -103,6 +103,7 @@ export class StorageService {
     try {
       if (this.isTemporaryAndNonPersistent) {
         this.logger.info(`Storage Service initialized with encrypted database '${this.dbName}'`);
+        await this.engine.init(this.dbName);
       } else {
         this.db = new Dexie(this.dbName);
         this._upgradeStores(this.db);
