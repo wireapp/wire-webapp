@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@8.0.2...@wireapp/api-client@8.1.0) (2019-10-30)
+
+
+### Features
+
+* **api-client,core:** Add team member join data typings ([#2494](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2494)) ([cb53d03](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/cb53d03648bf0ad5bd4222a34db2a906541d2d10))
+
+
+
+
+
 ## [8.0.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@8.0.1...@wireapp/api-client@8.0.2) (2019-10-30)
 
 
