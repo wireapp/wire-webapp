@@ -123,7 +123,7 @@ class ParticipanItem {
 
 ko.components.register('participant-item', {
   template: `
-    <div class="participant-item" data-bind="attr: isInViewport() ? {'data-uie-name': isUser ? 'item-user' : 'item-service', 'data-uie-value': participant.name} : {}">
+    <div class="participant-item" data-bind="attr: {'data-uie-name': isUser ? 'item-user' : 'item-service', 'data-uie-value': participant.name}">
       <!-- ko if: isInViewport() -->
         <div class="participant-item-image">
           <participant-avatar params="participant: participant, size: avatarSize"></participant-avatar>
