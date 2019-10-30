@@ -139,6 +139,8 @@ const SingleSignOnForm = ({
           const shouldshowHistory = hasHistory || clients.length > 1 || !persist;
           if (shouldshowHistory) {
             setNextRoute(ROUTE.HISTORY_INFO);
+          } else {
+            setNextRoute(EXTERNAL_ROUTE.WEBAPP);
           }
           break;
         }

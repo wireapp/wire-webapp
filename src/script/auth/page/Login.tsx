@@ -82,6 +82,7 @@ const Login = ({
   doLogin,
   isFetching,
   hasSelfHandle,
+  isAuthenticated,
   doGetAllClients,
   hasHistory,
 }: Props & ConnectedProps & DispatchProps) => {
@@ -104,6 +105,13 @@ const Login = ({
   const [validEmailInput, setValidEmailInput] = useState(true);
   const [validPasswordInput, setValidPasswordInput] = useState(true);
   const [validationErrors, setValidationErrors] = useState([]);
+  const [nextRoute, setNextRoute] = useState();
+
+  useEffect(() => {
+    if (nextRoute && isAuthenticated) {
+      navigateNext();
+    }
+  }, [nextRoute, isAuthenticated]);
 
   useEffect(() => {
     const queryLogoutReason = URLUtil.getURLParameter(QUERY_KEY.LOGOUT_REASON) || null;
@@ -150,16 +158,22 @@ const Login = ({
     try {
       await doInit({isImmediateLogin: true, shouldValidateLocalClient: false});
       await doInitializeClient(ClientType.PERMANENT, undefined);
-      navigateChooseHandleOrWebapp();
+      setNextRoute(EXTERNAL_ROUTE.WEBAPP);
     } catch (error) {
       logger.error('Unable to login immediately', error);
     }
   };
 
-  const navigateChooseHandleOrWebapp = () => {
-    return hasSelfHandle
-      ? window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP))
-      : history.push(ROUTE.CHOOSE_HANDLE);
+  const navigateNext = () => {
+    if (nextRoute === EXTERNAL_ROUTE.WEBAPP) {
+      if (hasSelfHandle) {
+        return window.location.replace(URLUtil.pathWithParams(nextRoute));
+      } else {
+        return history.push(ROUTE.CHOOSE_HANDLE);
+      }
+    } else {
+      return history.push(nextRoute);
+    }
   };
 
   const forgotPassword = () => URLUtil.openTab(EXTERNAL_ROUTE.WIRE_ACCOUNT_PASSWORD_RESET);
@@ -214,7 +228,7 @@ const Login = ({
       self.crypto.getRandomValues(secretKey);
       await save(secretKey);
 
-      return navigateChooseHandleOrWebapp();
+      setNextRoute(EXTERNAL_ROUTE.WEBAPP);
     } catch (error) {
       if ((error as BackendError).label) {
         const backendError = error as BackendError;
@@ -229,15 +243,16 @@ const Login = ({
              */
             const clients = await doGetAllClients();
             const shouldShowHistoryInfo = hasHistory || clients.length > 1 || !persist;
-            return shouldShowHistoryInfo ? history.push(ROUTE.HISTORY_INFO) : navigateChooseHandleOrWebapp();
+            return shouldShowHistoryInfo ? setNextRoute(ROUTE.HISTORY_INFO) : setNextRoute(EXTERNAL_ROUTE.WEBAPP);
           }
           case BackendError.LABEL.TOO_MANY_CLIENTS: {
             resetAuthError();
-            return history.push(ROUTE.CLIENTS);
+            setNextRoute(ROUTE.CLIENTS);
+            break;
           }
           case BackendError.LABEL.INVALID_CREDENTIALS:
           case LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE: {
-            return;
+            break;
           }
           default: {
             const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
@@ -413,6 +428,7 @@ type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
   hasHistory: ClientSelector.hasHistory(state),
   hasSelfHandle: SelfSelector.hasSelfHandle(state),
+  isAuthenticated: AuthSelector.isAuthenticated(state),
   isFetching: AuthSelector.isFetching(state),
   loginError: AuthSelector.getError(state),
 });
