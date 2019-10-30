@@ -89,7 +89,7 @@ export interface ConversationAccessUpdateEvent extends BaseConversationEvent {
 }
 
 export interface ConversationCodeDeleteEvent extends BaseConversationEvent {
-  // TODO: Explicitly set data to null like ConversationDeleteEvent.data?
+  data: null;
   type: CONVERSATION_EVENT.CODE_DELETE;
 }
 

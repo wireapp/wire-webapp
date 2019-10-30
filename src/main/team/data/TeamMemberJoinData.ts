@@ -17,8 +17,6 @@
  *
  */
 
-export * from './TeamConversationCreateData';
-export * from './TeamConversationDeleteData';
-export * from './TeamMemberJoinData';
-export * from './TeamMemberLeaveData';
-export * from './TeamUpdateData';
+export interface TeamMemberJoinData {
+  user: string;
+}
