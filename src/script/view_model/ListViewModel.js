@@ -148,7 +148,6 @@ z.viewModel.ListViewModel = class ListViewModel {
     amplify.subscribe(WebAppEvents.SHORTCUT.ARCHIVE, this.clickToArchive.bind(this));
     amplify.subscribe(WebAppEvents.SHORTCUT.DELETE, this.clickToClear.bind(this));
     amplify.subscribe(WebAppEvents.SHORTCUT.NOTIFICATIONS, this.changeNotificationSetting);
-    amplify.subscribe(WebAppEvents.SHORTCUT.SILENCE, this.changeNotificationSetting); // todo: deprecated - remove when user base of wrappers version >= 3.4 is large enough
   }
 
   answerCall = conversationEntity => {

@@ -197,15 +197,11 @@ export const WebAppEvents = {
     PICTURE: 'wire.webapp.shortcut.picture',
     PING: 'wire.webapp.shortcut.ping',
     PREV: 'wire.webapp.shortcut.prev',
-    SILENCE: 'wire.webapp.shortcut.silence', // todo: deprecated - remove when user base of wrappers version >= 3.4 is large enough
     START: 'wire.webapp.shortcut.start',
   },
   SIGN_OUT: 'wire.webapp.logout',
   STORAGE: {
     SAVE_ENTITY: 'wire.webapp.storage.save_entity',
-  },
-  SYSTEM_NOTIFICATION: {
-    CLICK: 'wire.webapp.notification.click', // todo: deprecated - remove when user base of wrappers version >= 3.2 is large enough
   },
   TEAM: {
     EVENT_FROM_BACKEND: 'wire.webapp.team.event_from_backend',
