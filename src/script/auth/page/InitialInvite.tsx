@@ -91,6 +91,7 @@ const InitialInvite = ({
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     emailInput.current.value = emailInput.current.value.trim();
+    emailInput.current.focus();
     if (!emailInput.current.checkValidity()) {
       setError(ValidationError.handleValidationState('email', emailInput.current.validity));
     } else {
@@ -101,6 +102,8 @@ const InitialInvite = ({
           switch (error.label) {
             case BackendError.LABEL.EMAIL_EXISTS:
             case BackendError.LABEL.ALREADY_INVITED: {
+              setEnteredEmail('');
+              emailInput.current.value = '';
               return;
             }
             default: {
@@ -116,10 +119,7 @@ const InitialInvite = ({
           throw error;
         }
       }
-      setEnteredEmail('');
-      emailInput.current.value = '';
     }
-    emailInput.current.focus();
   };
 
   const resetErrors = (): void => {
