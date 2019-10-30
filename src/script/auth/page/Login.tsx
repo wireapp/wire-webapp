@@ -139,7 +139,7 @@ const Login = ({
     try {
       await doInit({isImmediateLogin: true, shouldValidateLocalClient: false});
       await doInitializeClient(ClientType.PERMANENT, undefined);
-      return history.push(ROUTE.CHOOSE_HANDLE);
+      return history.push(ROUTE.HISTORY_INFO);
     } catch (error) {
       logger.error('Unable to login immediately', error);
     }
@@ -197,23 +197,11 @@ const Login = ({
       self.crypto.getRandomValues(secretKey);
       await save(secretKey);
 
-      return history.push(ROUTE.CHOOSE_HANDLE);
+      return history.push(ROUTE.HISTORY_INFO);
     } catch (error) {
       if ((error as BackendError).label) {
         const backendError = error as BackendError;
         switch (backendError.label) {
-          case BackendError.LABEL.NEW_CLIENT: {
-            resetAuthError();
-            /**
-             * Show history screen if:
-             *   1. database contains at least one event
-             *   2. there is at least one previously registered client
-             *   3. new local client is temporary
-             */
-            const clients = await doGetAllClients();
-            const shouldShowHistoryInfo = hasHistory || clients.length > 1 || !persist;
-            return shouldShowHistoryInfo ? history.push(ROUTE.HISTORY_INFO) : history.push(ROUTE.CHOOSE_HANDLE);
-          }
           case BackendError.LABEL.TOO_MANY_CLIENTS: {
             resetAuthError();
             history.push(ROUTE.CLIENTS);

@@ -111,26 +111,9 @@ const SingleSignOnForm = ({
       await handleSSOWindow(strippedCode);
       const clientType = persist ? ClientType.PERMANENT : ClientType.TEMPORARY;
       await doFinalizeSSOLogin({clientType});
-      history.push(ROUTE.CHOOSE_HANDLE);
+      history.push(ROUTE.HISTORY_INFO);
     } catch (error) {
       switch (error.label) {
-        case BackendError.LABEL.NEW_CLIENT: {
-          resetAuthError();
-          /**
-           * Show history screen if:
-           *   1. database contains at least one event
-           *   2. there is at least one previously registered client
-           *   3. new local client is temporary
-           */
-          const clients = await doGetAllClients();
-          const shouldshowHistory = hasHistory || clients.length > 1 || !persist;
-          if (shouldshowHistory) {
-            history.push(ROUTE.HISTORY_INFO);
-          } else {
-            history.push(ROUTE.CHOOSE_HANDLE);
-          }
-          break;
-        }
         case BackendError.LABEL.TOO_MANY_CLIENTS: {
           resetAuthError();
           history.push(ROUTE.CLIENTS);
