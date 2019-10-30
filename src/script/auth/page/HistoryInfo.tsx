@@ -55,6 +55,7 @@ const HistoryInfo = ({hasHistory, clients, currentSelfClient, isNewCurrentSelfCl
 
   if (!shouldShowHistoryInfo) {
     history.push(ROUTE.CHOOSE_HANDLE);
+    return null;
   }
 
   return (
