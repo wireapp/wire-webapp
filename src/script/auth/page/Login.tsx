@@ -120,7 +120,7 @@ const Login = ({
     if (queryLogoutReason && logoutReasonChanged) {
       setLogoutReason(queryLogoutReason);
     }
-  });
+  }, []);
 
   useEffect(() => {
     const queryConversationCode = URLUtil.getURLParameter(QUERY_KEY.CONVERSATION_CODE) || null;
@@ -143,7 +143,7 @@ const Login = ({
           setIsValidLink(false);
         });
     }
-  });
+  }, []);
 
   useEffect(() => {
     resetAuthError();
