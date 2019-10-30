@@ -97,13 +97,13 @@ const InitialInvite = ({
     } else {
       try {
         await invite({email: emailInput.current.value});
+        clearEmailInput();
       } catch (error) {
         if (error.label) {
           switch (error.label) {
             case BackendError.LABEL.EMAIL_EXISTS:
             case BackendError.LABEL.ALREADY_INVITED: {
-              setEnteredEmail('');
-              emailInput.current.value = '';
+              clearEmailInput();
               return;
             }
             default: {
@@ -120,6 +120,11 @@ const InitialInvite = ({
         }
       }
     }
+  };
+
+  const clearEmailInput = () => {
+    setEnteredEmail('');
+    emailInput.current.value = '';
   };
 
   const resetErrors = (): void => {
