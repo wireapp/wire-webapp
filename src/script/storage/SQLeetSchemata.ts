@@ -29,14 +29,8 @@ export class SQLeetSchemata {
             class: SQLiteType.TEXT,
             id: SQLiteType.TEXT,
             label: SQLiteType.TEXT,
-            location: {
-              lat: SQLiteType.INTEGER,
-              lon: SQLiteType.INTEGER,
-            },
-            meta: {
-              is_verified: SQLiteType.BOOLEAN,
-              primary_key: SQLiteType.TEXT,
-            },
+            location: SQLiteType.JSON_OR_TEXT,
+            meta: SQLiteType.JSON_OR_TEXT,
             model: SQLiteType.TEXT,
             time: SQLiteType.TEXT,
             type: SQLiteType.TEXT,
