@@ -18,7 +18,7 @@
  */
 
 import {
-  ButtonLink,
+  Button,
   COLOR,
   CheckIcon,
   ContainerXS,
@@ -97,13 +97,12 @@ const InitialInvite = ({
     } else {
       try {
         await invite({email: emailInput.current.value});
+        setEnteredEmail('');
       } catch (error) {
         if (error.label) {
           switch (error.label) {
             case BackendError.LABEL.EMAIL_EXISTS:
             case BackendError.LABEL.ALREADY_INVITED: {
-              setEnteredEmail('');
-              emailInput.current.value = '';
               return;
             }
             default: {
@@ -150,6 +149,7 @@ const InitialInvite = ({
                   resetErrors();
                   setEnteredEmail(event.target.value);
                 }}
+                value={enteredEmail}
                 ref={emailInput}
                 autoFocus
                 data-uie-name="enter-invite-email"
@@ -169,9 +169,9 @@ const InitialInvite = ({
         </div>
         <div>
           {invites.length ? (
-            <ButtonLink style={{margin: '0 auto -16px'}} onClick={onInviteDone} data-uie-name="do-next">
+            <Button onClick={onInviteDone} data-uie-name="do-next">
               {_(inviteStrings.nextButton)}
-            </ButtonLink>
+            </Button>
           ) : (
             <Link onClick={onInviteDone} data-uie-name="do-skip">
               {_(inviteStrings.skipForNow)}
