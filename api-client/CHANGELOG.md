@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.0.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@8.0.1...@wireapp/api-client@8.0.2) (2019-10-30)
+
+
+### Bug Fixes
+
+* **api-client:** Add data to the TeamDeleteEvent ([#2495](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2495)) ([4a235b4](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/4a235b4eb3ca5dfade13c54184b0442a0da72182))
+
+
+
+
+
 ## [8.0.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@8.0.0...@wireapp/api-client@8.0.1) (2019-10-28)
 
 **Note:** Version bump only for package @wireapp/api-client
