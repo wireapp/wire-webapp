@@ -27,20 +27,16 @@ import {Config} from '../config';
 import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
 import {RootState} from '../module/reducer';
 import * as ClientSelector from '../module/selector/ClientSelector';
-import * as SelfSelector from '../module/selector/SelfSelector';
 import {ROUTE} from '../route';
-import * as URLUtil from '../util/urlUtil';
 import Page from './Page';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
-const HistoryInfo = ({hasHistory, hasSelfHandle}: Props & ConnectedProps) => {
+const HistoryInfo = ({hasHistory}: Props & ConnectedProps) => {
   const {formatMessage: _} = useIntl();
   const {history} = useReactRouter();
   const onContinue = () => {
-    return hasSelfHandle
-      ? window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP))
-      : history.push(ROUTE.CHOOSE_HANDLE);
+    return history.push(ROUTE.CHOOSE_HANDLE);
   };
   const headline = hasHistory ? historyInfoStrings.hasHistoryHeadline : historyInfoStrings.noHistoryHeadline;
   const infoText = hasHistory ? historyInfoStrings.hasHistoryInfo : historyInfoStrings.noHistoryInfo;
@@ -83,7 +79,6 @@ const HistoryInfo = ({hasHistory, hasSelfHandle}: Props & ConnectedProps) => {
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
   hasHistory: ClientSelector.hasHistory(state),
-  hasSelfHandle: SelfSelector.hasSelfHandle(state),
 });
 
 export default connect(mapStateToProps)(HistoryInfo);

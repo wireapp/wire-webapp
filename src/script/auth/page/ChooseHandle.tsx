@@ -37,16 +37,13 @@ import {AnyAction, Dispatch} from 'redux';
 import useReactRouter from 'use-react-router';
 import {chooseHandleStrings} from '../../strings';
 import AcceptNewsModal from '../component/AcceptNewsModal';
-import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {BackendError} from '../module/action/BackendError';
 import {RootState, bindActionCreators} from '../module/reducer';
-import * as AuthSelector from '../module/selector/AuthSelector';
 import * as SelfSelector from '../module/selector/SelfSelector';
 import {ROUTE} from '../route';
 import {parseError} from '../util/errorUtil';
 import {createSuggestions} from '../util/handleUtil';
-import {pathWithParams} from '../util/urlUtil';
 import Page from './Page';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
@@ -55,7 +52,7 @@ const ChooseHandle = ({
   doGetConsents,
   doSetConsent,
   doSetHandle,
-  isTeamFlow,
+  hasSelfHandle,
   hasUnsetMarketingConsent,
   checkHandles,
   isFetching,
@@ -65,6 +62,13 @@ const ChooseHandle = ({
   const {history} = useReactRouter();
   const [error, setError] = useState(null);
   const [handle, setHandle] = useState('');
+
+  useEffect(() => {
+    if (hasSelfHandle) {
+      history.push(ROUTE.INITIAL_INVITE);
+    }
+  }, [hasSelfHandle]);
+
   useEffect(() => {
     (async () => {
       doGetConsents();
@@ -77,17 +81,13 @@ const ChooseHandle = ({
       }
     })();
   }, []);
+
   const updateConsent = (consentType: ConsentType, value: number): Promise<void> => doSetConsent(consentType, value);
 
   const onSetHandle = async (event: React.FormEvent): Promise<void> => {
     event.preventDefault();
     try {
       await doSetHandle(handle);
-      if (isTeamFlow) {
-        history.push(ROUTE.INITIAL_INVITE);
-      } else {
-        window.location.assign(pathWithParams(EXTERNAL_ROUTE.WEBAPP));
-      }
     } catch (error) {
       if (error.label === BackendError.HANDLE_ERRORS.INVALID_HANDLE && handle.trim().length < 2) {
         error.label = BackendError.HANDLE_ERRORS.HANDLE_TOO_SHORT;
@@ -141,9 +141,9 @@ const ChooseHandle = ({
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
+  hasSelfHandle: SelfSelector.hasSelfHandle(state),
   hasUnsetMarketingConsent: SelfSelector.hasUnsetConsent(state, ConsentType.MARKETING) || false,
   isFetching: SelfSelector.isFetching(state),
-  isTeamFlow: AuthSelector.isTeamFlow(state),
   name: SelfSelector.getSelfName(state),
 });
 
