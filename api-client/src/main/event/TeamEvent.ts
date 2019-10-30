@@ -75,7 +75,7 @@ export interface TeamCreateEvent extends BaseTeamEvent {
 }
 
 export interface TeamDeleteEvent extends BaseTeamEvent {
-  // TODO: add data
+  data: null;
   type: TEAM_EVENT.DELETE;
 }
 
