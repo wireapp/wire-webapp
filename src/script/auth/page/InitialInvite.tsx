@@ -18,7 +18,7 @@
  */
 
 import {
-  ButtonLink,
+  Button,
   COLOR,
   CheckIcon,
   ContainerXS,
@@ -149,6 +149,7 @@ const InitialInvite = ({
                   resetErrors();
                   setEnteredEmail(event.target.value);
                 }}
+                value={enteredEmail}
                 ref={emailInput}
                 autoFocus
                 data-uie-name="enter-invite-email"
@@ -168,9 +169,9 @@ const InitialInvite = ({
         </div>
         <div>
           {invites.length ? (
-            <ButtonLink style={{margin: '0 auto -16px'}} onClick={onInviteDone} data-uie-name="do-next">
+            <Button onClick={onInviteDone} data-uie-name="do-next">
               {_(inviteStrings.nextButton)}
-            </ButtonLink>
+            </Button>
           ) : (
             <Link onClick={onInviteDone} data-uie-name="do-skip">
               {_(inviteStrings.skipForNow)}
