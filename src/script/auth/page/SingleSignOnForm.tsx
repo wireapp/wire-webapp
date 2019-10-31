@@ -35,19 +35,16 @@ import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 import useReactRouter from 'use-react-router';
 import {loginStrings, ssoLoginStrings} from '../../strings';
-import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {BackendError} from '../module/action/BackendError';
 import {ValidationError} from '../module/action/ValidationError';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as ClientSelector from '../module/selector/ClientSelector';
-import * as SelfSelector from '../module/selector/SelfSelector';
 import {ROUTE} from '../route';
 import {isDesktopApp, isSupportingClipboard} from '../Runtime';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {UUID_REGEX} from '../util/stringUtil';
-import {pathWithParams} from '../util/urlUtil';
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {
   handleSSOWindow: (code: string) => Promise<void>;
@@ -61,13 +58,11 @@ const SingleSignOnForm = ({
   isFetching,
   loginError,
   hasHistory,
-  hasSelfHandle,
   resetAuthError,
   validateSSOCode,
   handleSSOWindow,
   doGetAllClients,
   doFinalizeSSOLogin,
-  isAuthenticated,
 }: Props & ConnectedProps & DispatchProps) => {
   const codeInput = useRef<HTMLInputElement>();
   const [code, setCode] = useState('');
@@ -77,7 +72,6 @@ const SingleSignOnForm = ({
   const [ssoError, setSsoError] = useState(null);
   const [isCodeInputValid, setIsCodeInputValid] = useState(true);
   const [validationError, setValidationError] = useState();
-  const [nextRoute, setNextRoute] = useState();
 
   useEffect(() => {
     if (initialCode && initialCode !== code) {
@@ -92,14 +86,7 @@ const SingleSignOnForm = ({
     }
   }, [code]);
 
-  useEffect(() => {
-    if (nextRoute && isAuthenticated) {
-      navigateNext();
-    }
-  }, [nextRoute, isAuthenticated]);
-
   const handleSubmit = async (event?: React.FormEvent): Promise<void> => {
-    setNextRoute(null);
     if (event) {
       event.preventDefault();
     }
@@ -124,29 +111,12 @@ const SingleSignOnForm = ({
       await handleSSOWindow(strippedCode);
       const clientType = persist ? ClientType.PERMANENT : ClientType.TEMPORARY;
       await doFinalizeSSOLogin({clientType});
-      setNextRoute(EXTERNAL_ROUTE.WEBAPP);
+      history.push(ROUTE.HISTORY_INFO);
     } catch (error) {
       switch (error.label) {
-        case BackendError.LABEL.NEW_CLIENT: {
-          resetAuthError();
-          /**
-           * Show history screen if:
-           *   1. database contains at least one event
-           *   2. there is at least one previously registered client
-           *   3. new local client is temporary
-           */
-          const clients = await doGetAllClients();
-          const shouldshowHistory = hasHistory || clients.length > 1 || !persist;
-          if (shouldshowHistory) {
-            setNextRoute(ROUTE.HISTORY_INFO);
-          } else {
-            setNextRoute(EXTERNAL_ROUTE.WEBAPP);
-          }
-          break;
-        }
         case BackendError.LABEL.TOO_MANY_CLIENTS: {
           resetAuthError();
-          setNextRoute(ROUTE.CLIENTS);
+          history.push(ROUTE.CLIENTS);
           break;
         }
         case BackendError.LABEL.SSO_USER_CANCELLED_ERROR:
@@ -165,18 +135,6 @@ const SingleSignOnForm = ({
           break;
         }
       }
-    }
-  };
-
-  const navigateNext = () => {
-    if (nextRoute === EXTERNAL_ROUTE.WEBAPP) {
-      if (hasSelfHandle) {
-        return window.location.replace(pathWithParams(nextRoute));
-      } else {
-        return history.push(ROUTE.CHOOSE_HANDLE);
-      }
-    } else {
-      return history.push(nextRoute);
     }
   };
 
@@ -290,8 +248,6 @@ const SingleSignOnForm = ({
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
   hasHistory: ClientSelector.hasHistory(state),
-  hasSelfHandle: SelfSelector.hasSelfHandle(state),
-  isAuthenticated: AuthSelector.isAuthenticated(state),
   isFetching: AuthSelector.isFetching(state),
   loginError: AuthSelector.getError(state),
 });

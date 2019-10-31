@@ -63,7 +63,6 @@ import {ValidationError} from '../module/action/ValidationError';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as ClientSelector from '../module/selector/ClientSelector';
-import * as SelfSelector from '../module/selector/SelfSelector';
 import {QUERY_KEY, ROUTE} from '../route';
 import {isDesktopApp} from '../Runtime';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
@@ -81,8 +80,6 @@ const Login = ({
   doLoginAndJoin,
   doLogin,
   isFetching,
-  hasSelfHandle,
-  isAuthenticated,
   doGetAllClients,
   hasHistory,
 }: Props & ConnectedProps & DispatchProps) => {
@@ -105,13 +102,6 @@ const Login = ({
   const [validEmailInput, setValidEmailInput] = useState(true);
   const [validPasswordInput, setValidPasswordInput] = useState(true);
   const [validationErrors, setValidationErrors] = useState([]);
-  const [nextRoute, setNextRoute] = useState();
-
-  useEffect(() => {
-    if (nextRoute && isAuthenticated) {
-      navigateNext();
-    }
-  }, [nextRoute, isAuthenticated]);
 
   useEffect(() => {
     const queryLogoutReason = URLUtil.getURLParameter(QUERY_KEY.LOGOUT_REASON) || null;
@@ -149,21 +139,9 @@ const Login = ({
     try {
       await doInit({isImmediateLogin: true, shouldValidateLocalClient: false});
       await doInitializeClient(ClientType.PERMANENT, undefined);
-      setNextRoute(EXTERNAL_ROUTE.WEBAPP);
+      return history.push(ROUTE.HISTORY_INFO);
     } catch (error) {
       logger.error('Unable to login immediately', error);
-    }
-  };
-
-  const navigateNext = () => {
-    if (nextRoute === EXTERNAL_ROUTE.WEBAPP) {
-      if (hasSelfHandle) {
-        return window.location.replace(URLUtil.pathWithParams(nextRoute));
-      } else {
-        return history.push(ROUTE.CHOOSE_HANDLE);
-      }
-    } else {
-      return history.push(nextRoute);
     }
   };
 
@@ -219,26 +197,14 @@ const Login = ({
       self.crypto.getRandomValues(secretKey);
       await save(secretKey);
 
-      setNextRoute(EXTERNAL_ROUTE.WEBAPP);
+      return history.push(ROUTE.HISTORY_INFO);
     } catch (error) {
       if ((error as BackendError).label) {
         const backendError = error as BackendError;
         switch (backendError.label) {
-          case BackendError.LABEL.NEW_CLIENT: {
-            resetAuthError();
-            /**
-             * Show history screen if:
-             *   1. database contains at least one event
-             *   2. there is at least one previously registered client
-             *   3. new local client is temporary
-             */
-            const clients = await doGetAllClients();
-            const shouldShowHistoryInfo = hasHistory || clients.length > 1 || !persist;
-            return shouldShowHistoryInfo ? setNextRoute(ROUTE.HISTORY_INFO) : setNextRoute(EXTERNAL_ROUTE.WEBAPP);
-          }
           case BackendError.LABEL.TOO_MANY_CLIENTS: {
             resetAuthError();
-            setNextRoute(ROUTE.CLIENTS);
+            history.push(ROUTE.CLIENTS);
             break;
           }
           case BackendError.LABEL.INVALID_CREDENTIALS:
@@ -418,8 +384,6 @@ const Login = ({
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
   hasHistory: ClientSelector.hasHistory(state),
-  hasSelfHandle: SelfSelector.hasSelfHandle(state),
-  isAuthenticated: AuthSelector.isAuthenticated(state),
   isFetching: AuthSelector.isFetching(state),
   loginError: AuthSelector.getError(state),
 });

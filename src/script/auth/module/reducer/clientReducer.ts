@@ -22,6 +22,7 @@ import {AUTH_ACTION, AppActions, CLIENT_ACTION, NOTIFICATION_ACTION} from '../ac
 
 export interface ClientState {
   clients: RegisteredClient[];
+  currentClient: RegisteredClient;
   error: Error;
   fetching: boolean;
   hasHistory: boolean;
@@ -30,6 +31,7 @@ export interface ClientState {
 
 const initialState: ClientState = {
   clients: [],
+  currentClient: null,
   error: null,
   fetching: false,
   hasHistory: null,
@@ -41,6 +43,7 @@ export function clientReducer(state: ClientState = initialState, action: AppActi
     case CLIENT_ACTION.CLIENT_INIT_SUCCESS: {
       return {
         ...state,
+        currentClient: action.payload.localClient,
         isNewClient: action.payload.isNewClient,
       };
     }
