@@ -29,7 +29,7 @@ export interface ClientState {
   isNewClient: boolean;
 }
 
-const initialState: ClientState = {
+export const initialState: ClientState = {
   clients: [],
   currentClient: null,
   error: null,
