@@ -34,7 +34,6 @@ import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {PropertiesService} from '../properties/PropertiesService';
 import {RichProfileRepository} from '../user/RichProfileRepository';
 import {SelfService} from '../self/SelfService';
-import {StorageService} from '../storage/StorageService';
 import {UserService} from '../user/UserService';
 
 /**
@@ -49,7 +48,7 @@ dependencies.set(AudioRepository, {dependencies: [], name: 'AudioRepository'});
 dependencies.set(AuthRepository, {dependencies: [AuthService], name: 'AuthRepository'});
 dependencies.set(AuthService, {dependencies: [BackendClient], name: 'AuthService'});
 dependencies.set(BackendClient, {dependencies: [], name: 'BackendClient'});
-dependencies.set(BackupService, {dependencies: [StorageService], name: 'BackupService'});
+// dependencies.set(BackupService, {dependencies: [StorageService], name: 'BackupService'});
 dependencies.set(GiphyRepository, {dependencies: [GiphyService], name: 'GiphyRepository'});
 dependencies.set(GiphyService, {dependencies: [BackendClient], name: 'GiphyService'});
 dependencies.set(LinkPreviewRepository, {
@@ -63,8 +62,8 @@ dependencies.set(PropertiesRepository, {dependencies: [PropertiesService, SelfSe
 dependencies.set(PropertiesService, {dependencies: [BackendClient], name: 'PropertiesService'});
 dependencies.set(RichProfileRepository, {dependencies: [BackendClient], name: 'RichProfileRepository'});
 dependencies.set(SelfService, {dependencies: [BackendClient], name: 'SelfService'});
-dependencies.set(StorageService, {dependencies: [], name: 'StorageService'});
-dependencies.set(UserService, {dependencies: [BackendClient, StorageService], name: 'UserService'});
+// dependencies.set(StorageService, {dependencies: [], name: 'StorageService'});
+// dependencies.set(UserService, {dependencies: [BackendClient, StorageService], name: 'UserService'});
 
 export {
   dependencies,
@@ -83,6 +82,6 @@ export {
   PermissionRepository,
   PropertiesRepository,
   SelfService,
-  StorageService,
+  // StorageService,
   UserService,
 };
