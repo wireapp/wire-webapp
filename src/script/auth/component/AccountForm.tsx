@@ -19,42 +19,29 @@
 
 import {ValidationUtil} from '@wireapp/commons';
 import {Button, Checkbox, CheckboxLabel, ErrorMessage, Form, Input, InputBlock, Small} from '@wireapp/react-ui-kit';
-import * as React from 'react';
-import {FormattedHTMLMessage, InjectedIntlProps, injectIntl} from 'react-intl';
+import React from 'react';
+import {FormattedHTMLMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
+import {AnyAction, Dispatch} from 'redux';
 import {accountFormStrings} from '../../strings';
 import {Config} from '../config';
 import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {BackendError} from '../module/action/BackendError';
 import {ValidationError} from '../module/action/ValidationError';
-import {RootState, ThunkDispatch} from '../module/reducer';
-import {RegistrationDataState} from '../module/reducer/authReducer';
+import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as AccentColor from '../util/AccentColor';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 
-interface Props extends React.FormHTMLAttributes<HTMLFormElement> {
+interface Props extends React.HTMLProps<HTMLFormElement> {
   beforeSubmit?: () => Promise<void>;
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
   submitText?: string;
 }
 
-interface ConnectedProps {
-  account: RegistrationDataState;
-  authError: Error;
-  isFetching: boolean;
-  isPersonalFlow: boolean;
-}
-
-interface DispatchProps {
-  doSendActivationCode: (email: string) => Promise<void>;
-  pushAccountRegistrationData: (registrationData: Partial<RegistrationDataState>) => Promise<void>;
-}
-
-type CombinedProps = Props & ConnectedProps & DispatchProps & InjectedIntlProps;
-
-const AccountForm = ({account, intl: {formatMessage: _}, ...props}: CombinedProps) => {
+const AccountForm = ({account, ...props}: Props & ConnectedProps & DispatchProps) => {
+  const {formatMessage: _} = useIntl();
   const [registrationData, setRegistrationData] = React.useState({
     accent_id: AccentColor.random().id,
     email: account.email || '',
@@ -281,18 +268,25 @@ const AccountForm = ({account, intl: {formatMessage: _}, ...props}: CombinedProp
   );
 };
 
-export default injectIntl(
-  connect(
-    (state: RootState): ConnectedProps => ({
-      account: AuthSelector.getAccount(state),
-      authError: AuthSelector.getError(state),
-      isFetching: AuthSelector.isFetching(state),
-      isPersonalFlow: AuthSelector.isPersonalFlow(state),
-    }),
-    (dispatch: ThunkDispatch): DispatchProps => ({
-      doSendActivationCode: (email: string) => dispatch(ROOT_ACTIONS.userAction.doSendActivationCode(email)),
-      pushAccountRegistrationData: (registrationData: Partial<RegistrationDataState>) =>
-        dispatch(ROOT_ACTIONS.authAction.pushAccountRegistrationData(registrationData)),
-    }),
-  )(AccountForm),
-);
+type ConnectedProps = ReturnType<typeof mapStateToProps>;
+const mapStateToProps = (state: RootState) => ({
+  account: AuthSelector.getAccount(state),
+  authError: AuthSelector.getError(state),
+  isFetching: AuthSelector.isFetching(state),
+  isPersonalFlow: AuthSelector.isPersonalFlow(state),
+});
+
+type DispatchProps = ReturnType<typeof mapDispatchToProps>;
+const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
+  bindActionCreators(
+    {
+      doSendActivationCode: ROOT_ACTIONS.userAction.doSendActivationCode,
+      pushAccountRegistrationData: ROOT_ACTIONS.authAction.pushAccountRegistrationData,
+    },
+    dispatch,
+  );
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(AccountForm);

@@ -31,10 +31,10 @@ export const backendConfig = {
 dependenciesResolver.init(graph.dependencies);
 
 beforeEach(() => {
-  // revoke cache to avoid having statefull entities between tests
+  // revoke cache to avoid having stateful entities between tests
   dependenciesResolver.resolve.cache = {};
 
-  // always reinit the backend client with the test config
+  // always re-init the backend client with the test config
   const backendClient = dependenciesResolver.resolve(BackendClient);
   backendClient.setSettings(backendConfig);
 });

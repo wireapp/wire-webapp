@@ -20,7 +20,6 @@
 import {instantiateComponent} from '../../helper/knockoutHelpers';
 
 import {User} from 'src/script/entity/User';
-import {AssetRemoteData} from 'src/script/assets/AssetRemoteData';
 import 'src/script/components/participantAvatar';
 
 describe('participant-avatar', () => {
@@ -30,50 +29,6 @@ describe('participant-avatar', () => {
     spyOn(viewModel.participant, 'initials').and.returnValue(testInitials);
     return instantiateComponent('participant-avatar', viewModel).then(domContainer => {
       expect(domContainer.querySelector('.avatar-initials').innerText).toBe(testInitials);
-    });
-  });
-
-  it("loads user's preview avatar when element is visible for LowDPI", () => {
-    const viewModel = {participant: new User()};
-    const avatarPreview = AssetRemoteData.v3();
-    window.devicePixelRatio = 1;
-    viewModel.participant.previewPictureResource(avatarPreview);
-
-    spyOn(avatarPreview, 'getObjectUrl').and.returnValue(Promise.resolve('/avatar'));
-
-    return instantiateComponent('participant-avatar', viewModel).then(domContainer => {
-      return new Promise(resolve => {
-        setTimeout(() => {
-          expect(avatarPreview.getObjectUrl).toHaveBeenCalled();
-
-          const imageElement = domContainer.querySelector('.avatar-image img');
-
-          expect(imageElement.src).toContain('/avatar');
-          resolve();
-        }, 20);
-      });
-    });
-  });
-
-  it("loads user's medium avatar when element is visible for HiDPI", () => {
-    const viewModel = {participant: new User()};
-    const avatarPreview = AssetRemoteData.v3();
-    window.devicePixelRatio = 2;
-    viewModel.participant.mediumPictureResource(avatarPreview);
-
-    spyOn(avatarPreview, 'getObjectUrl').and.returnValue(Promise.resolve('/avatar'));
-
-    return instantiateComponent('participant-avatar', viewModel).then(domContainer => {
-      return new Promise(resolve => {
-        setTimeout(() => {
-          expect(avatarPreview.getObjectUrl).toHaveBeenCalled();
-
-          const imageElement = domContainer.querySelector('.avatar-image img');
-
-          expect(imageElement.src).toContain('/avatar');
-          resolve();
-        }, 20);
-      });
     });
   });
 });

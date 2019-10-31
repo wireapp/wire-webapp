@@ -25,14 +25,15 @@ import {WebAppEvents} from '../event/WebApp';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {isBlacklisted} from './LinkPreviewBlackList';
 import {buildFromOpenGraphData} from './LinkPreviewProtoBuilder';
+import {getLogger} from 'Util/Logger';
 
 class LinkPreviewRepository {
-  constructor(assetService, propertiesRepository, logger) {
+  constructor(assetService, propertiesRepository) {
     this.getLinkPreviewFromString = this.getLinkPreviewFromString.bind(this);
     this.updatedSendPreference = this.updatedSendPreference.bind(this);
 
     this.assetService = assetService;
-    this.logger = logger;
+    this.logger = getLogger('LinkPreviewRepository');
 
     this.shouldSendPreviews = propertiesRepository.getPreference(PROPERTIES_TYPE.PREVIEWS.SEND);
 
@@ -50,7 +51,7 @@ class LinkPreviewRepository {
    * @returns {Promise} Resolves with link preview proto message
    */
   getLinkPreviewFromString(string) {
-    if (!this.shouldSendPreviews || !(window.openGraph || window.openGraphAsync)) {
+    if (!this.shouldSendPreviews || !window.openGraphAsync) {
       return Promise.resolve();
     }
     const linkData = getFirstLinkWithOffset(string);
@@ -138,43 +139,21 @@ class LinkPreviewRepository {
    *
    * @private
    * @param {string} link - Link to fetch open graph data from
-   * @returns {Promise} Resolves with the retrieved open graph data
+   * @returns {Promise<OpenGraphData | Error>} Resolves with the retrieved open graph data
    */
-  _fetchOpenGraphData(link) {
-    const mergeOpenGraphData = data => {
+  async _fetchOpenGraphData(link) {
+    try {
+      const data = await window.openGraphAsync(link);
       if (data) {
         return Object.entries(data).reduce((result, [key, value]) => {
           result[key] = Array.isArray(value) ? value[0] : value;
           return result;
         }, {});
       }
-    };
-
-    if (typeof window.openGraphAsync === 'function') {
-      return window
-        .openGraphAsync(link)
-        .then(mergeOpenGraphData)
-        .catch(error => {
-          this.logger.warn(`Error while fetching OpenGraph data: ${error.message}`);
-          return Promise.resolve();
-        });
+    } catch (error) {
+      this.logger.warn(`Error while fetching OpenGraph data: ${error.message}`);
+      return error;
     }
-
-    return new Promise(resolve => {
-      return window
-        .openGraph(link, (error, data) => {
-          if (error) {
-            this.logger.warn(`Error while fetching OpenGraph data: ${error.message}`);
-            resolve();
-          }
-
-          resolve(mergeOpenGraphData(data));
-        })
-        .catch(error => {
-          this.logger.warn(`Error while fetching OpenGraph data: ${error.message}`);
-          resolve(error);
-        });
-    });
   }
 
   /**

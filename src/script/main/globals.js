@@ -5,9 +5,6 @@ import jQuery from 'jquery';
 import ko from 'knockout';
 import raygun from '../../../node_modules/raygun4js/dist/raygun.vanilla.js';
 
-import namespace from '../../ext/js/webapp-module-namespace/Namespace.js';
-import bubble from '../../ext/js/webapp-module-bubble/webapp-module-bubble.js';
-
 // Needed for the wrapper
 import '../event/WebApp';
 
@@ -33,7 +30,6 @@ import UserErrorGlobal from '../error/UserError.js';
 import LocalizerGlobal from '../localization/Localizer.js';
 import ErrorGlobal from '../backup/Error.js';
 import EventBuilderGlobal from '../conversation/EventBuilder.js';
-import ActionsViewModelGlobal from '../view_model/ActionsViewModel.js';
 import FaviconViewModelGlobal from '../view_model/FaviconViewModel.js';
 import ImageDetailViewViewModelGlobal from '../view_model/ImageDetailViewViewModel.js';
 import LoadingViewModelGlobal from '../view_model/LoadingViewModel.js';
@@ -60,7 +56,7 @@ import TitleBarViewModelGlobal from '../view_model/content/TitleBarViewModel.js'
 import PanelViewModelGlobal from '../view_model/PanelViewModel.js';
 import ListViewModelGlobal from '../view_model/ListViewModel.js';
 import accentColorPickerGlobal from 'Components/accentColorPicker.js';
-import copyToClipboardGlobal from 'Components/copyToClipboard.js';
+import copyToClipboardGlobal from 'Components/copyToClipboard.ts';
 import deviceRemoveGlobal from 'Components/deviceRemove.js';
 import ephemeralTimerGlobal from 'Components/ephemeralTimer.js';
 import fullSearchGlobal from 'Components/fullSearch.js';
@@ -72,7 +68,6 @@ import messageQuoteGlobal from 'Components/messageQuote.js';
 import messageTimerButtonGlobal from 'Components/messageTimerButton.js';
 import serviceListGlobal from 'Components/serviceList.js';
 import topPeopleGlobal from 'Components/topPeople.js';
-import userProfileGlobal from 'Components/userProfile.js';
 import userInputGlobal from 'Components/userInput.js';
 import guestModeToggleGlobal from 'Components/guestModeToggle.js';
 import infoToggleGlobal from 'Components/infoToggle.js';
@@ -83,7 +78,7 @@ import audioSeekBarGlobal from 'Components/asset/controls/audioSeekBar.js';
 import seekBarGlobal from 'Components/asset/controls/seekBar.js';
 import mediaButtonGlobal from 'Components/asset/controls/mediaButton.js';
 import conversationListCallingCellGlobal from 'Components/list/conversationListCallingCell.js';
-import conversationListCellGlobal from 'Components/list/conversationListCell.js';
+import conversationListCellGlobal from 'Components/list/conversationListCell.ts';
 import groupAvatarGlobal from 'Components/list/groupAvatar.js';
 import userDetailsGlobal from 'Components/panel/userDetails.js';
 import serviceDetailsGlobal from 'Components/panel/serviceDetails.js';

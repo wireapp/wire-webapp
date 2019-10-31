@@ -24,7 +24,7 @@ import {TIME_IN_MILLIS, formatSeconds} from 'Util/TimeUtil';
 import {Call} from '../../calling/Call';
 import {Grid} from '../../calling/videoGridHandler';
 import {Conversation} from '../../entity/Conversation';
-import {MediaDevicesHandler} from '../../media/MediaDevicesHandler';
+import {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
 
 import {WebAppEvents} from '../../event/WebApp';
 
@@ -107,10 +107,14 @@ export class FullscreenVideoCalling {
     this.currentScreenDevice = mediaDevicesHandler.currentDeviceId.screenInput;
 
     this.availableCameras = ko.pureComputed(() =>
-      mediaDevicesHandler.availableDevices.videoInput().map(device => device.deviceId),
+      mediaDevicesHandler.availableDevices
+        .videoInput()
+        .map(device => (device as MediaDeviceInfo).deviceId || (device as ElectronDesktopCapturerSource).id),
     );
     this.availableScreens = ko.pureComputed(() =>
-      mediaDevicesHandler.availableDevices.screenInput().map(device => device.deviceId),
+      mediaDevicesHandler.availableDevices
+        .screenInput()
+        .map(device => (device as MediaDeviceInfo).deviceId || (device as ElectronDesktopCapturerSource).id),
     );
     this.showSwitchCamera = ko.pureComputed(() => {
       return this.selfSharesCamera() && this.availableCameras().length > 1;
@@ -153,12 +157,13 @@ export class FullscreenVideoCalling {
       }
     });
 
+    const updateUnreadCount = (unreadCount: number) => this.hasUnreadMessages(unreadCount > 0);
+
     this.hasUnreadMessages = ko.observable(false);
-    amplify.subscribe(WebAppEvents.LIFECYCLE.UNREAD_COUNT, (unreadCount: number) =>
-      this.hasUnreadMessages(unreadCount > 0),
-    );
+    amplify.subscribe(WebAppEvents.LIFECYCLE.UNREAD_COUNT, updateUnreadCount);
 
     this.dispose = () => {
+      amplify.unsubscribe(WebAppEvents.LIFECYCLE.UNREAD_COUNT, updateUnreadCount);
       window.clearInterval(callDurationUpdateInterval);
       startedAtSubscription.dispose();
       gridSubscription.dispose();

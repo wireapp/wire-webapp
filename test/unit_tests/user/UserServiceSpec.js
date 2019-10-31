@@ -17,16 +17,17 @@
  *
  */
 
-import {resolve, graph, backendConfig} from './../../api/testResolver';
+import {backendConfig} from './../../api/testResolver';
 
 describe('UserService', () => {
   let server = null;
   let userService = null;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     server = sinon.fakeServer.create();
-
-    userService = resolve(graph.UserService);
+    const test_factory = new TestFactory();
+    await test_factory.exposeUserActors();
+    userService = TestFactory.user_service;
   });
 
   afterEach(() => server.restore());

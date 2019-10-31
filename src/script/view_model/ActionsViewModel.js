@@ -23,11 +23,9 @@ import {t} from 'Util/LocalizerUtil';
 import {ModalsViewModel} from './ModalsViewModel';
 import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
 import {WebAppEvents} from '../event/WebApp';
+import {BackendClientError} from '../error/BackendClientError';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-
-z.viewModel.ActionsViewModel = class ActionsViewModel {
+export class ActionsViewModel {
   constructor(mainViewModel, repositories) {
     this.clientRepository = repositories.client;
     this.connectionRepository = repositories.connection;
@@ -35,6 +33,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
     this.integrationRepository = repositories.integration;
     this.userRepository = repositories.user;
     this.logger = getLogger('z.viewModel.ListViewModel');
+    this.modalsViewModel = mainViewModel.modals;
   }
 
   acceptConnectionRequest(userEntity, showConversation) {
@@ -115,23 +114,34 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
   }
 
   deleteClient(clientEntity) {
-    // @todo Add failure case ux WEBAPP-3570
     if (this.userRepository.self().isSingleSignOn) {
       // SSO users can remove their clients without the need of entering a password
       return this.clientRepository.deleteClient(clientEntity.id);
     }
 
     return new Promise((resolve, reject) => {
-      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.PASSWORD, {
+      const expectedErrors = {
+        [BackendClientError.LABEL.BAD_REQUEST]: t('BackendError.LABEL.BAD_REQUEST'),
+        [BackendClientError.LABEL.INVALID_CREDENTIALS]: t('BackendError.LABEL.INVALID_CREDENTIALS'),
+      };
+      let isSending = false;
+      this.modalsViewModel.showModal(ModalsViewModel.TYPE.PASSWORD, {
+        closeOnConfirm: false,
         preventClose: true,
         primaryAction: {
-          action: password => {
-            this.clientRepository
-              .deleteClient(clientEntity.id, password)
-              .then(resolve)
-              .catch(error => {
-                reject(error);
-              });
+          action: async password => {
+            if (!isSending) {
+              isSending = true;
+              try {
+                await this.clientRepository.deleteClient(clientEntity.id, password);
+                this.modalsViewModel.hide();
+                resolve();
+              } catch (error) {
+                this.modalsViewModel.errorMessage(expectedErrors[error.label] || error.message);
+              } finally {
+                isSending = false;
+              }
+            }
           },
           text: t('modalAccountRemoveDeviceAction'),
         },
@@ -328,4 +338,4 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
       });
     }
   }
-};
+}

@@ -17,11 +17,28 @@
  *
  */
 
-// https://github.com/wireapp/grunt-npm-bower
+import {AudioType} from './AudioType';
 
-module.exports = {
-  options: {
-    cleanTargetDir: true,
-    targetDir: 'src/ext',
-  },
+const audioPlayingType: {MUTED: AudioType[]; NONE: AudioType[]; SOME: AudioType[]} = {
+  MUTED: [],
+  NONE: [],
+  SOME: [],
 };
+
+audioPlayingType.MUTED = [AudioType.CALL_DROP, AudioType.NETWORK_INTERRUPTION];
+
+audioPlayingType.NONE = [
+  ...audioPlayingType.MUTED,
+  AudioType.OUTGOING_CALL,
+  AudioType.READY_TO_TALK,
+  AudioType.TALK_LATER,
+];
+
+audioPlayingType.SOME = [
+  ...audioPlayingType.NONE,
+  AudioType.INCOMING_CALL,
+  AudioType.INCOMING_PING,
+  AudioType.OUTGOING_PING,
+];
+
+export const AudioPlayingType = audioPlayingType;

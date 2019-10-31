@@ -71,9 +71,6 @@ export const WebAppEvents = {
     UPDATE: 'wire.webapp.client.update',
     VERIFICATION_STATE_CHANGED: 'wire.webapp.client.verification_state_changed',
   },
-  CONNECT: {
-    IMPORT_CONTACTS: 'wire.webapp.connect.import_contacts',
-  },
   CONNECTION: {
     ACCESS_TOKEN: {
       RENEW: 'wire.webapp.connection.access_token.renew',

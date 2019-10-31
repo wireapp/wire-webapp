@@ -168,15 +168,6 @@
           window.setTimeout(() => avatar.addClass('avatar-loading-transition avatar-image-loaded'), 200);
         });
 
-        // popovers
-        $('#popovers .button-round').each(function(element) {
-          new zeta.webapp.module.Bubble({
-            host_selector: '#' + $(this).attr('id'),
-            scroll_selector: window,
-            enable_click: true,
-          });
-        });
-
         const generateEmojis = () => {
           const generateRange = (from, to = from) =>
             Array.from({length: to - from + 1}, (value, index) => index + from);

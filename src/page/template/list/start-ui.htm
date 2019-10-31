@@ -151,93 +151,13 @@
   </div>
 
   <!-- ko if: showNoContacts() -->
-    <div class="start-ui-import-container">
-      <!-- ko if: window.wAddressBook -->
-        <div>
-          <h1 class="start-ui-import-headline" data-bind="text: t('searchInviteHeadline')"></h1>
-          <div class="start-ui-import-buttons" data-bind="click: clickOnImportContacts" data-uie-name="from-contacts">
-            <div class="start-ui-import-buttons-icon icon-contacts"></div>
-            <span class="label-bold-xs" data-bind="text: t('searchInviteButtonContacts')"></span>
-          </div>
-          <div class="start-ui-import-detail" data-bind="text: t('searchInviteDetail')"></div>
-        </div>
-      <!-- /ko -->
-    </div>
+    <div class="start-ui-import-container"></div>
   <!-- /ko -->
 
   <!-- ko if: showInvitePeople() -->
-    <div class="start-ui-import" id="invite-button" data-bind="click: clickToShowInviteBubble" data-bubble="#invite-bubble" data-placement="top">
+    <div class="start-ui-import" data-bind="click: clickToShowInviteModal" data-uie-name="show-invite-modal">
       <span class="icon-invite start-ui-import-icon"></span>
       <span data-bind="text: t('searchInvite', brandName)"></span>
     </div>
   <!-- /ko -->
-
-  <!-- ko if: userProfile() -->
-    <div id="start-ui-user-bubble" class="start-ui-user-bubble bubble" data-bind="css: additionalBubbleClasses">
-      <!-- ko ifnot: userProfileIsService() -->
-        <user-profile params="user: userProfile,
-                              accept: clickToAcceptInvite,
-                              connect: clickToSendRequest,
-                              ignore: clickToIgnoreInvite,
-                              unblock: clickToUnblock"></user-profile>
-      <!-- /ko -->
-
-      <!-- ko if: userProfileIsService() -->
-        <div class="start-ui-service">
-          <div class="start-ui-service-body">
-            <div class="start-ui-service-details">
-              <!-- ko if: renderAvatar() -->
-                <participant-avatar params="participant: userProfile, size: ParticipantAvatar.SIZE.LARGE"></participant-avatar>
-              <!-- /ko -->
-              <div class="start-ui-service-details-content">
-                <div class="start-ui-service-name" data-bind="text: userProfile().name" data-uie-name="status-service-name"></div>
-                <div class="start-ui-service-provider" data-bind="text: userProfile().providerName()" data-uie-name="status-service-provider"></div>
-              </div>
-            </div>
-
-            <div class="start-ui-service-description" data-bind="text: userProfile().description" data-uie-name="status-service-description"></div>
-          </div>
-
-          <div class="start-ui-service-footer">
-            <button class="start-ui-service-button" data-bind="click: clickToOpenService, text: t('searchServiceConfirmButton')" data-uie-name="do-service-confirm"></button>
-          </div>
-        </div>
-      <!-- /ko -->
-    </div>
-  <!-- /ko -->
-
-  <div id="invite-bubble" class="invite-bubble bubble">
-    <div class="invite-bubble-inner">
-      <!-- ko if: showInviteForm() -->
-        <div class="invite-bubble-link">
-          <div class="invite-content">
-            <div class="invite-header" data-bind="text: t('inviteHeadline', brandName)"></div>
-            <div class="invite-link-box">
-              <div class="fade-wrapper">
-                <textarea data-bind="value: inviteMessage" class="message" dir="auto"></textarea>
-              </div>
-            </div>
-          </div>
-          <div class="invite-footer" data-bind="text: inviteHint"></div>
-        </div>
-        <!-- ko if: window.wAddressBook -->
-          <div class="invite-bubble-button" data-bind="click: clickToCloseGenericInvite, text: t('searchInviteShare')" data-uie-name="go-import-form"></div>
-        <!-- /ko -->
-      <!-- /ko -->
-
-      <!-- ko ifnot: showInviteForm() -->
-        <div class="invite-bubble-link">
-          <div class="invite-content">
-            <h1 class="invite-header" data-bind="text: t('searchInviteHeadline')"></h1>
-              <div class="start-ui-import-buttons" data-bind="click: clickOnImportContacts" data-uie-name="do-contacts-import">
-                <div class="start-ui-import-buttons-icon icon-contacts"></div>
-                <span class="label-bold-xs" data-bind="text: t('searchInviteButtonContacts')"></span>
-              </div>
-            <div class="start-ui-import-detail" data-bind="text: t('searchInviteDetail')"></div>
-          </div>
-        </div>
-        <div class="invite-bubble-button" data-bind="click: clickToShowGenericInvite, text: t('searchInvite')" data-uie-name="go-invite-form"></div>
-      <!-- /ko -->
-    </div>
-  </div>
 </div>

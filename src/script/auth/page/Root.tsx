@@ -19,36 +19,15 @@
 
 import {pathWithParams} from '@wireapp/commons/dist/commonjs/util/UrlUtil';
 import {StyledApp} from '@wireapp/react-ui-kit';
-import * as React from 'react';
-import {IntlProvider, addLocaleData} from 'react-intl';
-import * as cs from 'react-intl/locale-data/cs';
-import * as da from 'react-intl/locale-data/da';
-import * as de from 'react-intl/locale-data/de';
-import * as el from 'react-intl/locale-data/el';
-import * as en from 'react-intl/locale-data/en';
-import * as es from 'react-intl/locale-data/es';
-import * as et from 'react-intl/locale-data/et';
-import * as fi from 'react-intl/locale-data/fi';
-import * as fr from 'react-intl/locale-data/fr';
-import * as hr from 'react-intl/locale-data/hr';
-import * as hu from 'react-intl/locale-data/hu';
-import * as it from 'react-intl/locale-data/it';
-import * as lt from 'react-intl/locale-data/lt';
-import * as nl from 'react-intl/locale-data/nl';
-import * as pl from 'react-intl/locale-data/pl';
-import * as pt from 'react-intl/locale-data/pt';
-import * as ro from 'react-intl/locale-data/ro';
-import * as ru from 'react-intl/locale-data/ru';
-import * as sk from 'react-intl/locale-data/sk';
-import * as sl from 'react-intl/locale-data/sl';
-import * as tr from 'react-intl/locale-data/tr';
-import * as uk from 'react-intl/locale-data/uk';
+import React, {useEffect} from 'react';
+import {IntlProvider} from 'react-intl';
 import {connect} from 'react-redux';
 import {HashRouter as Router, Redirect, Route, Switch} from 'react-router-dom';
+import {AnyAction, Dispatch} from 'redux';
 import {Config} from '../config';
 import {mapLanguage, normalizeLanguage} from '../localeConfig';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
-import {RootState, ThunkDispatch} from '../module/reducer';
+import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as CookieSelector from '../module/selector/CookieSelector';
 import * as LanguageSelector from '../module/selector/LanguageSelector';
@@ -67,117 +46,89 @@ import SingleSignOn from './SingleSignOn';
 import TeamName from './TeamName';
 import Verify from './Verify';
 
-addLocaleData([
-  ...cs,
-  ...da,
-  ...de,
-  ...el,
-  ...en,
-  ...es,
-  ...et,
-  ...fi,
-  ...fr,
-  ...hr,
-  ...hu,
-  ...it,
-  ...lt,
-  ...nl,
-  ...pl,
-  ...pt,
-  ...ro,
-  ...ru,
-  ...sk,
-  ...sl,
-  ...tr,
-  ...uk,
-]);
+interface Props extends React.HTMLProps<HTMLDivElement> {}
 
-interface Props extends React.HTMLAttributes<Root> {}
-
-interface ConnectedProps {
-  language: string;
-  isAuthenticated: boolean;
-}
-
-interface DispatchProps {
-  startPolling: (name?: string, interval?: number, asJSON?: boolean) => Promise<void>;
-  safelyRemoveCookie: (name: string, value: string) => Promise<void>;
-  stopPolling: (name?: string) => Promise<void>;
-}
-
-interface State {}
-
-class Root extends React.Component<Props & ConnectedProps & DispatchProps, State> {
-  componentDidMount = () => {
-    this.props.startPolling();
+const Root = ({
+  isAuthenticated,
+  language,
+  startPolling,
+  safelyRemoveCookie,
+  stopPolling,
+}: Props & ConnectedProps & DispatchProps) => {
+  useEffect(() => {
+    startPolling();
     window.onbeforeunload = () => {
-      this.props.safelyRemoveCookie(CookieSelector.COOKIE_NAME_APP_OPENED, Config.APP_INSTANCE_ID);
-      this.props.stopPolling();
+      safelyRemoveCookie(CookieSelector.COOKIE_NAME_APP_OPENED, Config.APP_INSTANCE_ID);
+      stopPolling();
     };
-  };
+  }, []);
 
-  loadLanguage = (language: string) => {
+  const loadLanguage = (language: string) => {
     return require(`Resource/translation/${mapLanguage(language)}.json`);
   };
 
-  render = () => {
-    const {isAuthenticated, language} = this.props;
-
-    const navigate = (route: string): null => {
-      window.location.assign(pathWithParams(route));
-      return null;
-    };
-
-    const isAuthenticatedCheck = (page: any): any => (page ? (isAuthenticated ? page : navigate('/auth#login')) : null);
-
-    const ProtectedChooseHandle = () => isAuthenticatedCheck(<ChooseHandle />);
-    const ProtectedHistoryInfo = () => isAuthenticatedCheck(<HistoryInfo />);
-    const ProtectedInitialInvite = () => isAuthenticatedCheck(<InitialInvite />);
-    const ProtectedClientManager = () => isAuthenticatedCheck(<ClientManager />);
-
-    return (
-      <IntlProvider locale={normalizeLanguage(language)} messages={this.loadLanguage(language)}>
-        <StyledApp style={{display: 'flex', height: '100%', minHeight: '100vh'}}>
-          <Router hashType="noslash">
-            <Switch>
-              <Route exact path={ROUTE.INDEX} component={Index} />
-              <Route path={ROUTE.CLIENTS} component={ProtectedClientManager} />
-              <Route path={ROUTE.LOGIN} component={Login} />
-              <Route path={ROUTE.CONVERSATION_JOIN} component={ConversationJoin} />
-              <Route path={ROUTE.CONVERSATION_JOIN_INVALID} component={ConversationJoinInvalid} />
-              <Route path={ROUTE.CREATE_TEAM} component={Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && TeamName} />
-              <Route
-                path={ROUTE.CREATE_ACCOUNT}
-                component={Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && CreatePersonalAccount}
-              />
-              <Route
-                path={ROUTE.CREATE_TEAM_ACCOUNT}
-                component={Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && CreateAccount}
-              />
-              <Route path={ROUTE.VERIFY} component={Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && Verify} />
-              <Route path={ROUTE.INITIAL_INVITE} component={ProtectedInitialInvite} />
-              <Route path={ROUTE.CHOOSE_HANDLE} component={ProtectedChooseHandle} />
-              <Route path={ROUTE.HISTORY_INFO} component={ProtectedHistoryInfo} />
-              <Route path={ROUTE.SSO} component={SingleSignOn} />
-              <Redirect to={ROUTE.INDEX} />
-            </Switch>
-          </Router>
-        </StyledApp>
-      </IntlProvider>
-    );
+  const navigate = (route: string): null => {
+    window.location.assign(pathWithParams(route));
+    return null;
   };
-}
+
+  const isAuthenticatedCheck = (page: any): any => (page ? (isAuthenticated ? page : navigate('/auth#login')) : null);
+
+  const ProtectedChooseHandle = () => isAuthenticatedCheck(<ChooseHandle />);
+  const ProtectedHistoryInfo = () => isAuthenticatedCheck(<HistoryInfo />);
+  const ProtectedInitialInvite = () => isAuthenticatedCheck(<InitialInvite />);
+  const ProtectedClientManager = () => isAuthenticatedCheck(<ClientManager />);
+
+  return (
+    <IntlProvider locale={normalizeLanguage(language)} messages={loadLanguage(language)}>
+      <StyledApp style={{display: 'flex', height: '100%', minHeight: '100vh'}}>
+        <Router hashType="noslash">
+          <Switch>
+            <Route exact path={ROUTE.INDEX} component={Index} />
+            <Route path={ROUTE.CLIENTS} component={ProtectedClientManager} />
+            <Route path={ROUTE.LOGIN} component={Login} />
+            <Route path={ROUTE.CONVERSATION_JOIN} component={ConversationJoin} />
+            <Route path={ROUTE.CONVERSATION_JOIN_INVALID} component={ConversationJoinInvalid} />
+            <Route path={ROUTE.CREATE_TEAM} component={Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && TeamName} />
+            <Route
+              path={ROUTE.CREATE_ACCOUNT}
+              component={Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && CreatePersonalAccount}
+            />
+            <Route
+              path={ROUTE.CREATE_TEAM_ACCOUNT}
+              component={Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && CreateAccount}
+            />
+            <Route path={ROUTE.VERIFY} component={Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && Verify} />
+            <Route path={ROUTE.INITIAL_INVITE} component={ProtectedInitialInvite} />
+            <Route path={ROUTE.CHOOSE_HANDLE} component={ProtectedChooseHandle} />
+            <Route path={ROUTE.HISTORY_INFO} component={ProtectedHistoryInfo} />
+            <Route path={ROUTE.SSO} component={SingleSignOn} />
+            <Redirect to={ROUTE.INDEX} />
+          </Switch>
+        </Router>
+      </StyledApp>
+    </IntlProvider>
+  );
+};
+
+type ConnectedProps = ReturnType<typeof mapStateToProps>;
+const mapStateToProps = (state: RootState) => ({
+  isAuthenticated: AuthSelector.isAuthenticated(state),
+  language: LanguageSelector.getLanguage(state),
+});
+
+type DispatchProps = ReturnType<typeof mapDispatchToProps>;
+const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
+  bindActionCreators(
+    {
+      safelyRemoveCookie: ROOT_ACTIONS.cookieAction.safelyRemoveCookie,
+      startPolling: ROOT_ACTIONS.cookieAction.startPolling,
+      stopPolling: ROOT_ACTIONS.cookieAction.stopPolling,
+    },
+    dispatch,
+  );
 
 export default connect(
-  (state: RootState): ConnectedProps => ({
-    isAuthenticated: AuthSelector.isAuthenticated(state),
-    language: LanguageSelector.getLanguage(state),
-  }),
-  (dispatch: ThunkDispatch): DispatchProps => ({
-    safelyRemoveCookie: (name: string, value: string) =>
-      dispatch(ROOT_ACTIONS.cookieAction.safelyRemoveCookie(name, value)),
-    startPolling: (name?: string, interval?: number, asJSON?: boolean) =>
-      dispatch(ROOT_ACTIONS.cookieAction.startPolling(name, interval, asJSON)),
-    stopPolling: (name?: string) => dispatch(ROOT_ACTIONS.cookieAction.stopPolling(name)),
-  }),
+  mapStateToProps,
+  mapDispatchToProps,
 )(Root);

@@ -1,0 +1,19 @@
+<div class="invite-modal" data-bind="with: $root.inviteModal">
+  <modal
+    params="isShown: isVisible, onBgClick: hide"
+    data-bind="attr: {'data-uie-name': isVisible() ? 'modal-invite' : ''}"
+  >
+    <div class="modal__header">
+      <div
+        class="modal__header__title"
+        data-bind="text: t('inviteHeadline', brandName)"
+        data-uie-name="status-modal-title"
+      ></div>
+      <close-icon class="modal__header__button" data-bind="click: hide" data-uie-name="do-close"></close-icon>
+    </div>
+    <div class="modal__body invite-modal__body">
+      <textarea data-bind="value: inviteMessage, event:{click: (_, event) => onTextClick(event.target), blur: onBlur}" class="modal__input reset-textarea invite-modal__message" dir="auto"></textarea>
+      <div class="modal__info invite-modal__info" data-bind="text: inviteHint"></div>
+    </div>
+  </modal>
+</div>

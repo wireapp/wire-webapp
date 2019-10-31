@@ -18,24 +18,46 @@
  */
 
 import ko from 'knockout';
-import {Environment} from 'Util/Environment';
 
+import {Environment} from 'Util/Environment';
 import {Logger, getLogger} from 'Util/Logger';
 import {loadValue, storeValue} from 'Util/StorageUtil';
 import {koArrayPushAll} from 'Util/util';
 
 import {MediaDeviceType} from './MediaDeviceType';
 
-type DeviceTypes = 'audioInput' | 'audioOutput' | 'screenInput' | 'videoInput';
-
-type Devices = Record<DeviceTypes, ko.ObservableArray<MediaDeviceInfo>>;
-type DeviceIds = Record<DeviceTypes, ko.Observable<string>>;
-export type CurrentAvailableDeviceId = Record<DeviceTypes, ko.PureComputed<string>>;
-export type DeviceSupport = Record<DeviceTypes, ko.PureComputed<boolean>>;
 declare global {
   interface Window {
-    desktopCapturer: any;
+    desktopCapturer?: {
+      // Electron <= 4
+      getSources(options: ElectronGetSourcesOptions, callback: ElectronDesktopCapturerCallback): void;
+      // Electron > 4
+      getSources(options: ElectronGetSourcesOptions): Promise<ElectronDesktopCapturerSource[]>;
+    };
   }
+}
+
+export type CurrentAvailableDeviceId = Record<DeviceTypes, ko.PureComputed<string>>;
+export type DeviceSupport = Record<DeviceTypes, ko.PureComputed<boolean>>;
+
+type DeviceTypes = 'audioInput' | 'audioOutput' | 'screenInput' | 'videoInput';
+type Devices = Record<DeviceTypes, ko.ObservableArray<ElectronDesktopCapturerSource | MediaDeviceInfo>>;
+type DeviceIds = Record<DeviceTypes, ko.Observable<string>>;
+type ElectronDesktopCapturerCallback = (error: Error | null, screenSources: ElectronDesktopCapturerSource[]) => void;
+
+interface ElectronGetSourcesOptions {
+  fetchWindowIcons?: boolean;
+  thumbnailSize?: {
+    height: number;
+    width: number;
+  };
+  types: string[];
+}
+
+export interface ElectronDesktopCapturerSource {
+  display_id: string;
+  id: string;
+  name: string;
 }
 
 interface Config {
@@ -86,7 +108,8 @@ export class MediaDevicesHandler {
         return '';
       }
       const isAvailable = this.availableDevices[deviceType]().find(
-        device => (device.deviceId || (device as any).id) === currentDeviceId,
+        device =>
+          ((device as MediaDeviceInfo).deviceId || (device as ElectronDesktopCapturerSource).id) === currentDeviceId,
       );
       if (isAvailable) {
         return currentDeviceId;
@@ -195,6 +218,7 @@ export class MediaDevicesHandler {
           this.logger.info('Updated MediaDevice list', mediaDevices);
           return mediaDevices;
         }
+
         throw new Error('No media devices found');
       });
   }
@@ -203,25 +227,33 @@ export class MediaDevicesHandler {
    * Update list of available screens.
    * @returns Resolves with all screen sources when the list has been updated
    */
-  getScreenSources(): Promise<any[]> {
-    return new Promise((resolve, reject) => {
-      const options = {
-        thumbnailSize: {
-          height: 176,
-          width: 312,
-        },
-        types: [MediaDevicesHandler.CONFIG.DEFAULT_DEVICE.screenInput],
-      };
+  async getScreenSources(): Promise<ElectronDesktopCapturerSource[]> {
+    const options: ElectronGetSourcesOptions = {
+      thumbnailSize: {
+        height: 176,
+        width: 312,
+      },
+      types: [MediaDevicesHandler.CONFIG.DEFAULT_DEVICE.screenInput],
+    };
 
-      return window.desktopCapturer.getSources(options, (error: Error, screenSources: MediaDeviceInfo[]) => {
-        if (error) {
-          return reject(error);
-        }
-        this.logger.info(`Detected '${screenSources.length}' sources for screen sharing from Electron`, screenSources);
-        this.availableDevices.screenInput(screenSources);
-        return resolve(screenSources);
-      });
-    });
+    const getSourcesWrapper = (options: ElectronGetSourcesOptions): Promise<ElectronDesktopCapturerSource[]> => {
+      if (window.desktopCapturer.getSources.constructor.name === 'AsyncFunction') {
+        // Electron > 4
+        return window.desktopCapturer.getSources(options);
+      }
+      // Electron <= 4
+      return new Promise((resolve, reject) =>
+        window.desktopCapturer.getSources(options, (error, screenSources) =>
+          error ? reject(error) : resolve(screenSources),
+        ),
+      );
+    };
+
+    const screenSources = await getSourcesWrapper(options);
+
+    this.logger.info(`Detected '${screenSources.length}' sources for screen sharing from Electron`, screenSources);
+    this.availableDevices.screenInput(screenSources);
+    return screenSources;
   }
 
   /**

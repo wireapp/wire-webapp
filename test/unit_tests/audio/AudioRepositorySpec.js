@@ -19,14 +19,14 @@
 
 import {difference} from 'underscore';
 
-import {resolve, graph} from './../../api/testResolver';
 import {AudioPreference} from 'src/script/audio/AudioPreference';
 import {AudioPlayingType} from 'src/script/audio/AudioPlayingType';
 import {AudioType} from 'src/script/audio/AudioType';
 import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
+import {AudioRepository} from 'src/script/audio/AudioRepository';
 
 describe('AudioRepository', () => {
-  const audioRepository = resolve(graph.AudioRepository);
+  const audioRepository = new AudioRepository();
 
   describe('init', () => {
     it('inits all the sounds without preload', () => {

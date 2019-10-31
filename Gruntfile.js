@@ -59,15 +59,12 @@ module.exports = grunt => {
     compress: require('./grunt/config/compress'),
     copy: require('./grunt/config/copy'),
     includereplace: require('./grunt/config/includereplace'),
-    npmBower: require('./grunt/config/npmBower'),
     open: require('./grunt/config/open'),
     postcss: require('./grunt/config/postcss'),
     shell: require('./grunt/config/shell'),
     watch: require('./grunt/config/watch'),
   });
   /* eslint-enable sort-keys */
-
-  grunt.registerTask('init', 'npmBower');
 
   grunt.registerTask('build', [
     'clean:dist',

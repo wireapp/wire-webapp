@@ -357,10 +357,10 @@ class MessageListViewModel {
    */
   focusMessage(messageId) {
     const messageIsLoaded = !!this.conversation().getMessage(messageId);
-    const conversationEntity = this.conversation();
     this.focusedMessage(messageId);
 
     if (!messageIsLoaded) {
+      const conversationEntity = this.conversation();
       this.conversation_repository
         .get_message_in_conversation_by_id(conversationEntity, messageId)
         .then(messageEntity => {
@@ -373,8 +373,7 @@ class MessageListViewModel {
   onMessageMarked = messageElement => {
     const messagesContainer = this.getMessagesContainer();
     messageElement.classList.remove('message-marked');
-    const offsetTop = messageElement.getBoundingClientRect().top - messagesContainer.scrollTop;
-    scrollBy(messagesContainer, offsetTop - messagesContainer.offsetHeight / 2);
+    scrollBy(messagesContainer, messageElement.getBoundingClientRect().top - messagesContainer.offsetHeight / 2);
     messageElement.classList.add('message-marked');
     this.focusedMessage(null);
   };

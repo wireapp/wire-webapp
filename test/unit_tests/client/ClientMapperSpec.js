@@ -21,13 +21,11 @@ import {ClientType} from 'src/script/client/ClientType';
 import {ClientMapper} from 'src/script/client/ClientMapper';
 
 describe('ClientMapper', () => {
-  const mapper = new ClientMapper();
-
   describe('mapClient', () => {
     it('can map a permanent client payload from the backend', () => {
       const clientPayload = entities.clients.john_doe.permanent;
 
-      const clientEntity = mapper.mapClient(clientPayload, true);
+      const clientEntity = ClientMapper.mapClient(clientPayload, true);
 
       expect(clientEntity.address).toBe(clientPayload.address);
       expect(clientEntity.class).toBe(clientPayload.class);
@@ -47,7 +45,7 @@ describe('ClientMapper', () => {
     it('can map a temporary client payload from the backend', () => {
       const clientPayload = entities.clients.john_doe.temporary;
 
-      const clientEntity = mapper.mapClient(clientPayload, true);
+      const clientEntity = ClientMapper.mapClient(clientPayload, true);
 
       expect(clientEntity.address).toBe(clientPayload.address);
       expect(clientEntity.class).toBe(clientPayload.class);
@@ -67,7 +65,7 @@ describe('ClientMapper', () => {
     it('can map a remote client payload from the backend', () => {
       const clientPayload = entities.clients.jane_roe.plain;
 
-      const clientEntity = mapper.mapClient(clientPayload, false);
+      const clientEntity = ClientMapper.mapClient(clientPayload, false);
 
       expect(clientEntity.id).toBe(clientPayload.id);
       expect(clientEntity.class).toBe(clientPayload.class);
@@ -85,7 +83,7 @@ describe('ClientMapper', () => {
         },
       };
 
-      const clientEntity = mapper.mapClient(clientPayload, false);
+      const clientEntity = ClientMapper.mapClient(clientPayload, false);
 
       expect(clientEntity.id).toBe(clientPayload.id);
       expect(clientEntity.class).toBe(clientPayload.class);
@@ -103,7 +101,7 @@ describe('ClientMapper', () => {
         },
       };
 
-      const clientEntity = mapper.mapClient(clientPayload, false);
+      const clientEntity = ClientMapper.mapClient(clientPayload, false);
       const clientJson = clientEntity.toJson();
 
       expect(clientJson).toEqual(clientPayload);
@@ -112,7 +110,7 @@ describe('ClientMapper', () => {
 
   describe('mapClients', () =>
     it('can map a multiple clients at once', () => {
-      const clientEntities = mapper.mapClients(payload.clients.get.many, true);
+      const clientEntities = ClientMapper.mapClients(payload.clients.get.many, true);
       const [firstClientEntity, secondClientEntity] = clientEntities;
 
       expect(clientEntities.length).toBe(2);
@@ -124,10 +122,10 @@ describe('ClientMapper', () => {
 
   describe('updateClient', () => {
     it('can map changes into a client', () => {
-      const initialClientEntity = mapper.mapClient(entities.clients.john_doe.plain, true);
+      const initialClientEntity = ClientMapper.mapClient(entities.clients.john_doe.plain, true);
       const clientPayload = entities.clients.john_doe.permanent;
 
-      const {client: clientEntity, wasUpdated} = mapper.updateClient(initialClientEntity, clientPayload);
+      const {client: clientEntity, wasUpdated} = ClientMapper.updateClient(initialClientEntity, clientPayload);
 
       expect(wasUpdated).toBe(true);
       expect(clientEntity.address).toBe(clientPayload.address);
@@ -147,9 +145,9 @@ describe('ClientMapper', () => {
 
     it('does not change the client if there are no updates', () => {
       const clientPayload = entities.clients.john_doe.permanent;
-      const initialClientEntity = mapper.mapClient(clientPayload, true);
+      const initialClientEntity = ClientMapper.mapClient(clientPayload, true);
 
-      const {client: clientEntity, wasUpdated} = mapper.updateClient(initialClientEntity, clientPayload);
+      const {client: clientEntity, wasUpdated} = ClientMapper.updateClient(initialClientEntity, clientPayload);
 
       expect(wasUpdated).toBe(false);
       expect(clientEntity.address).toBe(clientPayload.address);

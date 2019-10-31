@@ -17,7 +17,7 @@
  *
  */
 
-import {ClientType, RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
+import {ClientType} from '@wireapp/api-client/dist/commonjs/client/index';
 import {
   Button,
   Checkbox,
@@ -29,16 +29,17 @@ import {
   InputSubmitCombo,
   RoundIconButton,
 } from '@wireapp/react-ui-kit';
-import * as React from 'react';
-import {InjectedIntlProps, injectIntl} from 'react-intl';
+import React, {useEffect, useRef, useState} from 'react';
+import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
-import {RouteComponentProps, withRouter} from 'react-router';
+import {AnyAction, Dispatch} from 'redux';
+import useReactRouter from 'use-react-router';
 import {loginStrings, ssoLoginStrings} from '../../strings';
 import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {BackendError} from '../module/action/BackendError';
 import {ValidationError} from '../module/action/ValidationError';
-import {RootState, ThunkDispatch} from '../module/reducer';
+import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import * as SelfSelector from '../module/selector/SelfSelector';
@@ -48,301 +49,266 @@ import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {UUID_REGEX} from '../util/stringUtil';
 import {pathWithParams} from '../util/urlUtil';
 
-interface Props extends React.HTMLAttributes<SingleSignOnForm>, RouteComponentProps<{code?: string}> {
-  handleSSOWindow: (code: string) => {};
+interface Props extends React.HTMLAttributes<HTMLDivElement> {
+  handleSSOWindow: (code: string) => Promise<void>;
+  initialCode?: string;
 }
 
-interface ConnectedProps {
-  code?: string;
-  hasHistory: boolean;
-  hasSelfHandle: boolean;
-  isFetching: boolean;
-  loginError: Error;
-}
+const SSO_CODE_PREFIX = 'wire-';
+const SSO_CODE_PREFIX_REGEX = '[wW][iI][rR][eE]-';
+const SingleSignOnForm = ({
+  initialCode,
+  isFetching,
+  loginError,
+  hasHistory,
+  hasSelfHandle,
+  resetAuthError,
+  validateSSOCode,
+  handleSSOWindow,
+  doGetAllClients,
+  doFinalizeSSOLogin,
+  isAuthenticated,
+}: Props & ConnectedProps & DispatchProps) => {
+  const codeInput = useRef<HTMLInputElement>();
+  const [code, setCode] = useState('');
+  const {formatMessage: _} = useIntl();
+  const {history} = useReactRouter<{code?: string}>();
+  const [persist, setPersist] = useState(true);
+  const [ssoError, setSsoError] = useState(null);
+  const [isCodeInputValid, setIsCodeInputValid] = useState(true);
+  const [validationError, setValidationError] = useState();
+  const [nextRoute, setNextRoute] = useState();
 
-interface DispatchProps {
-  resetAuthError: () => Promise<void>;
-  validateSSOCode: (code: string) => Promise<void>;
-  doFinalizeSSOLogin: (options: {clientType: ClientType}) => Promise<void>;
-  doGetAllClients: () => Promise<RegisteredClient[]>;
-}
-
-interface State {
-  code: string;
-  isOverlayOpen: boolean;
-  persist: boolean;
-  ssoError: Error;
-  validInputs: {
-    [field: string]: boolean;
-  };
-  validationErrors: Error[];
-}
-
-class SingleSignOnForm extends React.PureComponent<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
-  private static readonly SSO_CODE_PREFIX = 'wire-';
-  private static readonly SSO_CODE_PREFIX_REGEX = '[wW][iI][rR][eE]-';
-
-  private readonly inputs: {code: React.RefObject<any>} = {code: React.createRef()};
-  state: State = {
-    code: '',
-    isOverlayOpen: false,
-    persist: true,
-    ssoError: null,
-    validInputs: {
-      code: true,
-    },
-    validationErrors: [],
-  };
-
-  updateCodeFromProps = (props: ConnectedProps) => {
-    const ssoCode = props.code;
-    const ssoCodeChanged = ssoCode !== this.state.code;
-
-    if (ssoCodeChanged) {
-      this.setState({code: ssoCode}, () => {
-        if (this.inputs.code.current) {
-          this.handleSubmit();
-        }
-      });
+  useEffect(() => {
+    if (initialCode && initialCode !== code) {
+      setCode(initialCode);
     }
-  };
+  }, [initialCode]);
 
-  componentDidMount = () => {
-    if (this.props.code) {
-      this.updateCodeFromProps(this.props);
-    } else if (isDesktopApp() && isSupportingClipboard()) {
-      this.extractSSOLink(undefined, false);
+  // Automatically submit if code is set via url
+  useEffect(() => {
+    if (initialCode === code) {
+      handleSubmit();
     }
-  };
+  }, [code]);
 
-  componentWillReceiveProps = (nextProps: ConnectedProps) => {
-    if (nextProps.code) {
-      this.updateCodeFromProps(nextProps);
+  useEffect(() => {
+    if (nextRoute && isAuthenticated) {
+      navigateNext();
     }
-  };
+  }, [nextRoute, isAuthenticated]);
 
-  componentWillUnmount = () => {
-    this.props.resetAuthError();
-  };
-
-  handleSubmit = (event?: React.FormEvent) => {
+  const handleSubmit = async (event?: React.FormEvent): Promise<void> => {
+    setNextRoute(null);
     if (event) {
       event.preventDefault();
     }
-    this.props.resetAuthError();
-    if (this.props.isFetching) {
-      return undefined;
+    resetAuthError();
+    if (isFetching) {
+      return;
     }
-    this.inputs.code.current.value = this.inputs.code.current.value.trim();
-    const validationErrors: Error[] = [];
-    const validInputs: {[field: string]: boolean} = this.state.validInputs;
+    codeInput.current.value = codeInput.current.value.trim();
+    const currentValidationError = codeInput.current.checkValidity()
+      ? null
+      : ValidationError.handleValidationState(codeInput.current.name, codeInput.current.validity);
 
-    Object.entries(this.inputs).forEach(([inputKey, {current}]) => {
-      if (!current.checkValidity()) {
-        validationErrors.push(ValidationError.handleValidationState(current.name, current.validity));
+    setValidationError(currentValidationError);
+    setIsCodeInputValid(codeInput.current.validity.valid);
+
+    try {
+      if (currentValidationError) {
+        throw currentValidationError;
       }
-      validInputs[inputKey] = current.validity.valid;
-    });
-
-    this.setState({validInputs, validationErrors});
-    return Promise.resolve(validationErrors)
-      .then(errors => {
-        if (errors.length) {
-          throw errors[0];
+      const strippedCode = stripPrefix(code);
+      await validateSSOCode(strippedCode);
+      await handleSSOWindow(strippedCode);
+      const clientType = persist ? ClientType.PERMANENT : ClientType.TEMPORARY;
+      await doFinalizeSSOLogin({clientType});
+      setNextRoute(EXTERNAL_ROUTE.WEBAPP);
+    } catch (error) {
+      switch (error.label) {
+        case BackendError.LABEL.NEW_CLIENT: {
+          resetAuthError();
+          /**
+           * Show history screen if:
+           *   1. database contains at least one event
+           *   2. there is at least one previously registered client
+           *   3. new local client is temporary
+           */
+          const clients = await doGetAllClients();
+          const shouldshowHistory = hasHistory || clients.length > 1 || !persist;
+          if (shouldshowHistory) {
+            setNextRoute(ROUTE.HISTORY_INFO);
+          } else {
+            setNextRoute(EXTERNAL_ROUTE.WEBAPP);
+          }
+          break;
         }
-        return this.props.validateSSOCode(this.stripPrefix(this.state.code));
-      })
-      .then(() => this.props.handleSSOWindow(this.stripPrefix(this.state.code)))
-      .then(() => {
-        const clientType = this.state.persist ? ClientType.PERMANENT : ClientType.TEMPORARY;
-        return this.props.doFinalizeSSOLogin({clientType});
-      })
-      .then(this.navigateChooseHandleOrWebapp)
-      .catch(error => {
-        switch (error.label) {
-          case BackendError.LABEL.NEW_CLIENT: {
-            this.props.resetAuthError();
-            /**
-             * Show history screen if:
-             *   1. database contains at least one event
-             *   2. there is at least one previously registered client
-             *   3. new local client is temporary
-             */
-            return this.props.doGetAllClients().then(clients => {
-              const shouldShowHistoryInfo = this.props.hasHistory || clients.length > 1 || !this.state.persist;
-              return shouldShowHistoryInfo
-                ? this.props.history.push(ROUTE.HISTORY_INFO)
-                : this.navigateChooseHandleOrWebapp();
-            });
-          }
-          case BackendError.LABEL.TOO_MANY_CLIENTS: {
-            this.props.resetAuthError();
-            return this.props.history.push(ROUTE.CLIENTS);
-          }
-          case BackendError.LABEL.SSO_USER_CANCELLED_ERROR: {
-            return;
-          }
-          case BackendError.LABEL.SSO_NOT_FOUND: {
-            return;
-          }
-          default: {
-            this.setState({ssoError: error});
-            const isValidationError = Object.values(ValidationError.ERROR).some(
-              errorType => error.label && error.label.endsWith(errorType),
-            );
-            if (!isValidationError) {
-              // tslint:disable-next-line:no-console
-              console.warn('SSO authentication error', JSON.stringify(Object.entries(error)), error);
-            }
-          }
+        case BackendError.LABEL.TOO_MANY_CLIENTS: {
+          resetAuthError();
+          setNextRoute(ROUTE.CLIENTS);
+          break;
         }
-      });
+        case BackendError.LABEL.SSO_USER_CANCELLED_ERROR:
+        case BackendError.LABEL.SSO_NOT_FOUND: {
+          break;
+        }
+        default: {
+          setSsoError(error);
+          const isValidationError = Object.values(ValidationError.ERROR).some(
+            errorType => error.label && error.label.endsWith(errorType),
+          );
+          if (!isValidationError) {
+            // tslint:disable-next-line:no-console
+            console.warn('SSO authentication error', JSON.stringify(Object.entries(error)), error);
+          }
+          break;
+        }
+      }
+    }
   };
 
-  navigateChooseHandleOrWebapp = () => {
-    return this.props.hasSelfHandle
-      ? window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP))
-      : this.props.history.push(ROUTE.CHOOSE_HANDLE);
+  const navigateNext = () => {
+    if (nextRoute === EXTERNAL_ROUTE.WEBAPP) {
+      if (hasSelfHandle) {
+        return window.location.replace(pathWithParams(nextRoute));
+      } else {
+        return history.push(ROUTE.CHOOSE_HANDLE);
+      }
+    } else {
+      return history.push(nextRoute);
+    }
   };
 
-  extractSSOLink = (event: React.MouseEvent, shouldEmitError = true) => {
+  const extractSSOLink = (event: React.MouseEvent, shouldEmitError = true) => {
     if (event) {
       event.preventDefault();
     }
     if (isSupportingClipboard()) {
-      this.readFromClipboard()
+      readFromClipboard()
         .then(text => {
-          const isContainingValidSSOLink = this.containsSSOCode(text);
+          const isContainingValidSSOLink = containsSSOCode(text);
           if (isContainingValidSSOLink) {
-            const code = this.extractCode(text);
-            this.setState({code});
+            const code = extractCode(text);
+            setCode(code);
           } else if (shouldEmitError) {
             throw new BackendError({code: 400, label: BackendError.SSO_ERRORS.SSO_NO_SSO_CODE});
           }
         })
-        .catch(error => this.setState({ssoError: error}));
+        .catch(error => setSsoError(error));
     }
   };
 
-  readFromClipboard = () => window.navigator.clipboard.readText();
+  const readFromClipboard = () => window.navigator.clipboard.readText();
 
-  containsSSOCode = (text: string) =>
-    text && new RegExp(`${SingleSignOnForm.SSO_CODE_PREFIX}${UUID_REGEX}`, 'gm').test(text);
+  const containsSSOCode = (text: string) => text && new RegExp(`${SSO_CODE_PREFIX}${UUID_REGEX}`, 'gm').test(text);
 
-  isSSOCode = (text: string) =>
-    text && new RegExp(`^${SingleSignOnForm.SSO_CODE_PREFIX}${UUID_REGEX}$`, 'i').test(text);
-
-  extractCode = (text: string) => {
-    return this.containsSSOCode(text)
-      ? text.match(new RegExp(`${SingleSignOnForm.SSO_CODE_PREFIX}${UUID_REGEX}`, 'gm'))[0]
-      : '';
+  const extractCode = (text: string) => {
+    return containsSSOCode(text) ? text.match(new RegExp(`${SSO_CODE_PREFIX}${UUID_REGEX}`, 'gm'))[0] : '';
   };
 
-  stripPrefix = (code: string) =>
-    code &&
-    code
+  const stripPrefix = (prefixedCode: string) =>
+    prefixedCode &&
+    prefixedCode
       .trim()
       .toLowerCase()
-      .replace(SingleSignOnForm.SSO_CODE_PREFIX, '');
+      .replace(SSO_CODE_PREFIX, '');
 
-  render() {
-    const {
-      intl: {formatMessage: _},
-      loginError,
-    } = this.props;
-    const {persist, code, validInputs, validationErrors, ssoError} = this.state;
-    return (
-      <Form style={{marginTop: 30}} data-uie-name="sso" onSubmit={this.handleSubmit}>
-        <InputSubmitCombo>
-          {isSupportingClipboard() && !code && (
-            <Button
-              style={{
-                borderRadius: '4px',
-                fontSize: '11px',
-                lineHeight: '16px',
-                margin: '0 0 0 12px',
-                maxHeight: '32px',
-                minWidth: '100px',
-                padding: '0 12px',
-              }}
-              onClick={this.extractSSOLink}
-              data-uie-name="do-paste-sso-code"
-            >
-              {_(ssoLoginStrings.pasteButton)}
-            </Button>
-          )}
-          <Input
-            name="sso-code"
-            tabIndex={1}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-              this.setState({
-                code: event.target.value,
-                validInputs: {...validInputs, code: true},
-              })
-            }
-            ref={this.inputs.code}
-            markInvalid={!validInputs.code}
-            placeholder={isSupportingClipboard() ? '' : _(ssoLoginStrings.codeInputPlaceholder)}
-            value={code}
-            autoComplete="section-login sso-code"
-            maxLength={1024}
-            pattern={`${SingleSignOnForm.SSO_CODE_PREFIX_REGEX}${UUID_REGEX}`}
-            autoFocus
-            type="text"
-            required
-            data-uie-name="enter-code"
-          />
-          <RoundIconButton
-            tabIndex={2}
-            disabled={!code}
-            type="submit"
-            formNoValidate
-            icon={ICON_NAME.ARROW}
-            data-uie-name="do-sso-sign-in"
-          />
-        </InputSubmitCombo>
-        {validationErrors.length ? (
-          parseValidationErrors(validationErrors)
-        ) : loginError ? (
-          <ErrorMessage data-uie-name="error-message">{parseError(loginError)}</ErrorMessage>
-        ) : ssoError ? (
-          <ErrorMessage data-uie-name="error-message">{parseError(ssoError)}</ErrorMessage>
-        ) : (
-          <span style={{marginBottom: '4px'}}>&nbsp;</span>
-        )}
-        {!isDesktopApp() && (
-          <Checkbox
-            tabIndex={3}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => this.setState({persist: !event.target.checked})}
-            checked={!persist}
-            data-uie-name="enter-public-computer-sso-sign-in"
-            style={{justifyContent: 'center', marginTop: '36px'}}
+  return (
+    <Form style={{marginTop: 30}} data-uie-name="sso" onSubmit={handleSubmit}>
+      <InputSubmitCombo>
+        {isSupportingClipboard() && !code && (
+          <Button
+            style={{
+              borderRadius: '4px',
+              fontSize: '11px',
+              lineHeight: '16px',
+              margin: '0 0 0 12px',
+              maxHeight: '32px',
+              minWidth: '100px',
+              padding: '0 12px',
+            }}
+            type="button"
+            onClick={extractSSOLink}
+            data-uie-name="do-paste-sso-code"
           >
-            <CheckboxLabel>{_(loginStrings.publicComputer)}</CheckboxLabel>
-          </Checkbox>
+            {_(ssoLoginStrings.pasteButton)}
+          </Button>
         )}
-      </Form>
-    );
-  }
-}
+        <Input
+          name="sso-code"
+          tabIndex={1}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            setCode(event.target.value);
+            setIsCodeInputValid(true);
+          }}
+          ref={codeInput}
+          markInvalid={!isCodeInputValid}
+          placeholder={isSupportingClipboard() ? '' : _(ssoLoginStrings.codeInputPlaceholder)}
+          value={code}
+          autoComplete="section-login sso-code"
+          maxLength={1024}
+          pattern={`${SSO_CODE_PREFIX_REGEX}${UUID_REGEX}`}
+          autoFocus
+          type="text"
+          required
+          data-uie-name="enter-code"
+        />
+        <RoundIconButton
+          tabIndex={2}
+          disabled={!code}
+          type="submit"
+          formNoValidate
+          icon={ICON_NAME.ARROW}
+          data-uie-name="do-sso-sign-in"
+        />
+      </InputSubmitCombo>
+      {validationError ? (
+        parseValidationErrors([validationError])
+      ) : loginError ? (
+        <ErrorMessage data-uie-name="error-message">{parseError(loginError)}</ErrorMessage>
+      ) : ssoError ? (
+        <ErrorMessage data-uie-name="error-message">{parseError(ssoError)}</ErrorMessage>
+      ) : (
+        <span style={{marginBottom: '4px'}}>&nbsp;</span>
+      )}
+      {!isDesktopApp() && (
+        <Checkbox
+          tabIndex={3}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => setPersist(!event.target.checked)}
+          checked={!persist}
+          data-uie-name="enter-public-computer-sso-sign-in"
+          style={{justifyContent: 'center', marginTop: '36px'}}
+        >
+          <CheckboxLabel>{_(loginStrings.publicComputer)}</CheckboxLabel>
+        </Checkbox>
+      )}
+    </Form>
+  );
+};
 
-export default withRouter(
-  injectIntl(
-    connect(
-      (state: RootState, ownProps: Props): ConnectedProps => ({
-        code: ownProps.match.params.code,
-        hasHistory: ClientSelector.hasHistory(state),
-        hasSelfHandle: SelfSelector.hasSelfHandle(state),
-        isFetching: AuthSelector.isFetching(state),
-        loginError: AuthSelector.getError(state),
-      }),
-      (dispatch: ThunkDispatch): DispatchProps => ({
-        doFinalizeSSOLogin: (options: {clientType: ClientType}) =>
-          dispatch(ROOT_ACTIONS.authAction.doFinalizeSSOLogin(options)),
-        doGetAllClients: () => dispatch(ROOT_ACTIONS.clientAction.doGetAllClients()),
-        resetAuthError: () => dispatch(ROOT_ACTIONS.authAction.resetAuthError()),
-        validateSSOCode: (code: string) => dispatch(ROOT_ACTIONS.authAction.validateSSOCode(code)),
-      }),
-    )(SingleSignOnForm),
-  ),
-);
+type ConnectedProps = ReturnType<typeof mapStateToProps>;
+const mapStateToProps = (state: RootState) => ({
+  hasHistory: ClientSelector.hasHistory(state),
+  hasSelfHandle: SelfSelector.hasSelfHandle(state),
+  isAuthenticated: AuthSelector.isAuthenticated(state),
+  isFetching: AuthSelector.isFetching(state),
+  loginError: AuthSelector.getError(state),
+});
+
+type DispatchProps = ReturnType<typeof mapDispatchToProps>;
+const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
+  bindActionCreators(
+    {
+      doFinalizeSSOLogin: ROOT_ACTIONS.authAction.doFinalizeSSOLogin,
+      doGetAllClients: ROOT_ACTIONS.clientAction.doGetAllClients,
+      resetAuthError: ROOT_ACTIONS.authAction.resetAuthError,
+      validateSSOCode: ROOT_ACTIONS.authAction.validateSSOCode,
+    },
+    dispatch,
+  );
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(SingleSignOnForm);

@@ -20,9 +20,6 @@
 import {debounce} from 'underscore';
 
 import {getLogger} from 'Util/Logger';
-import {alias} from 'Util/util';
-import {t} from 'Util/LocalizerUtil';
-import {Environment} from 'Util/Environment';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 
 import {UserlistMode} from 'Components/userList';
@@ -30,14 +27,10 @@ import {UserlistMode} from 'Components/userList';
 import {getManageTeamUrl, getManageServicesUrl} from '../../externalRoute';
 import {Config} from '../../auth/config';
 import {User} from '../../entity/User';
-import {ConnectSource} from '../../connect/ConnectSource';
-import {ModalsViewModel} from '../ModalsViewModel';
 import {generatePermissionHelpers} from '../../user/UserPermission';
 import {validateHandle} from '../../user/UserHandleGenerator';
 import {ParticipantAvatar} from 'Components/participantAvatar';
 import {WebAppEvents} from '../../event/WebApp';
-import {ServiceEntity} from '../../integration/ServiceEntity';
-import {MotionDuration} from '../../motion/MotionDuration';
 import {EventName} from '../../tracking/EventName';
 import {SearchRepository} from '../../search/SearchRepository';
 
@@ -60,18 +53,10 @@ class StartUIViewModel {
     this.alreadyClickedOnContact = {};
     this.clickOnConversation = this.clickOnConversation.bind(this);
     this.clickOnOther = this.clickOnOther.bind(this);
-    this.clickToOpenService = this.clickToOpenService.bind(this);
-
-    this.clickToAcceptInvite = this.clickToAcceptInvite.bind(this);
-    this.clickToIgnoreInvite = this.clickToIgnoreInvite.bind(this);
-    this.clickToSendRequest = this.clickToSendRequest.bind(this);
-    this.clickToUnblock = this.clickToUnblock.bind(this);
-
     this.handleSearchInput = this.handleSearchInput.bind(this);
 
     this.mainViewModel = mainViewModel;
     this.listViewModel = listViewModel;
-    this.connectRepository = repositories.connect;
     this.conversationRepository = repositories.conversation;
     this.integrationRepository = repositories.integration;
     this.propertiesRepository = repositories.properties;
@@ -181,51 +166,9 @@ class StartUIViewModel {
     this.showSpinner = ko.observable(false);
     this.showTopPeople = ko.pureComputed(() => !this.isTeam() && this.topUsers().length && !this.showMatches());
 
-    // Invite bubble states
-    this.showInviteForm = ko.observable(true);
-
-    // Invite bubble
-    this.inviteBubble = null;
-
-    this.inviteHint = ko.pureComputed(() => {
-      const metaKey = Environment.os.mac ? t('inviteMetaKeyMac') : t('inviteMetaKeyPc');
-
-      return this.inviteMessageSelected() ? t('inviteHintSelected', metaKey) : t('inviteHintUnselected', metaKey);
-    });
-    this.inviteMessage = ko.pureComputed(() => {
-      if (this.selfUser()) {
-        const username = this.selfUser().username();
-        return username
-          ? t('inviteMessage', {brandName: Config.BRAND_NAME, username: `@${username}`})
-          : t('inviteMessageNoEmail', Config.BRAND_NAME);
-      }
-      return '';
-    });
-    this.inviteMessageSelected = ko.observable(true);
-
-    // Selected user bubble
-    this.userProfile = ko.observable(null);
-    this.userProfileIsService = ko.pureComputed(() => this.userProfile() instanceof ServiceEntity);
-
-    this.additionalBubbleClasses = ko.pureComputed(() => {
-      return this.userProfileIsService() ? 'start-ui-service-bubble' : '';
-    });
-
-    this.renderAvatar = ko.observable(false);
-    this.renderAvatarComputed = ko.computed(() => {
-      const hasUserId = !!this.userProfile();
-
-      // swap value to re-render avatar
-      this.renderAvatar(false);
-      window.setTimeout(() => this.renderAvatar(hasUserId), 0);
-    });
-
     this.serviceConversations = ko.observable([]);
 
     this.isInitialServiceSearch = ko.observable(true);
-
-    this.userBubble = undefined;
-    this.userBubbleLastId = undefined;
 
     this.manageTeamUrl = getManageTeamUrl('client_landing');
     this.manageServicesUrl = getManageServicesUrl('client_landing');
@@ -237,12 +180,6 @@ class StartUIViewModel {
     this.shouldUpdateServiceScrollbar = ko
       .computed(() => this.serviceConversations())
       .extend({notify: 'always', rateLimit: 500});
-
-    this._initSubscriptions();
-  }
-
-  _initSubscriptions() {
-    amplify.subscribe(WebAppEvents.CONNECT.IMPORT_CONTACTS, this.importContacts.bind(this));
   }
 
   clickOnClose() {
@@ -296,44 +233,7 @@ class StartUIViewModel {
     if (isUser) {
       return this.mainViewModel.content.userModal.showUser(participantEntity.id);
     }
-    const createBubble = elementId => {
-      this.userProfile(participantEntity);
-      this.userBubbleLastId = elementId;
-      this.userBubble = new zeta.webapp.module.Bubble({
-        host_selector: `#${element.attr('id')}`,
-        on_hide: () => {
-          this.userBubble = undefined;
-          return (this.userBubbleLastId = undefined);
-        },
-        on_show: () => $('.start-ui-user-bubble .user-profile-connect-message').focus(),
-        scroll_selector: '.start-ui-list',
-      });
-
-      if (this.userProfileIsService()) {
-        this.integrationRepository.addProviderNameToParticipant(this.userProfile());
-      }
-
-      this.userBubble.toggle();
-    };
-
-    // We clicked on the same bubble
-    const isCurrentBubble = this.userBubbleLastId === event.currentTarget.id;
-    if (this.userBubble && isCurrentBubble) {
-      return this.userBubble.toggle();
-    }
-
-    const element = $(event.currentTarget).attr({
-      'data-bubble': '#start-ui-user-bubble',
-      'data-placement': 'right-flex',
-      id: Date.now(),
-    });
-
-    // Dismiss old bubble and wait with creating the new one when another bubble is open
-    const timeout = this.userBubble ? MotionDuration.LONG : 0;
-    if (this.userBubble) {
-      this.userBubble.hide();
-    }
-    window.setTimeout(() => createBubble(element[0].id), timeout);
+    return this.mainViewModel.content.serviceModal.showService(participantEntity);
   }
 
   clickOnShowPeople() {
@@ -342,14 +242,6 @@ class StartUIViewModel {
 
   clickOnShowServices() {
     this.updateList(StartUIViewModel.STATE.ADD_SERVICE);
-  }
-
-  clickToOpenService() {
-    if (this.userBubble) {
-      this.userBubble.hide();
-    }
-
-    this.actionsViewModel.open1to1ConversationWithService(this.userProfile());
   }
 
   handleSearchInput() {
@@ -368,14 +260,6 @@ class StartUIViewModel {
   }
 
   resetView() {
-    if (this.userBubble) {
-      this.userBubble.hide();
-    }
-
-    if (this.inviteBubble) {
-      this.inviteBubble.hide();
-    }
-
     this.showMatches(false);
     this.showSpinner(false);
 
@@ -388,7 +272,6 @@ class StartUIViewModel {
 
     // Clean up
     this._clearSearchResults();
-    this.userProfile(null);
     $('user-input input').focus();
 
     this.state(state);
@@ -439,136 +322,7 @@ class StartUIViewModel {
       .then(userEntities => userEntities.filter(userEntity => !userEntity.isBlocked()));
   }
 
-  clickToAcceptInvite(userEntity) {
-    this._closeList();
-    this.actionsViewModel.acceptConnectionRequest(userEntity, true);
-  }
-
-  clickToIgnoreInvite(userEntity) {
-    this.actionsViewModel.ignoreConnectionRequest(userEntity).then(() => {
-      if (this.userBubble) {
-        this.userBubble.hide();
-      }
-    });
-  }
-
-  clickToSendRequest(userEntity) {
-    this._closeList();
-    this.actionsViewModel.sendConnectionRequest(userEntity, true);
-  }
-
-  clickToUnblock(userEntity) {
-    this._closeList();
-    this.actionsViewModel.unblockUser(userEntity, true);
-  }
-
-  //##############################################################################
-  // Invite bubble
-  //##############################################################################
-
-  clickOnImportContacts() {
-    this._importContacts(ConnectSource.ICLOUD);
-  }
-
-  clickToCloseGenericInvite() {
-    this.showInviteForm(false);
-  }
-
-  clickToShowGenericInvite() {
-    this.showInviteForm(true);
-    this._focusInviteForm();
-  }
-
-  clickToShowInviteBubble() {
-    if (!this.inviteBubble) {
-      this.inviteBubble = new zeta.webapp.module.Bubble({
-        host_selector: '#invite-button',
-        on_hide: () => {
-          $('.invite-link-box .fade-wrapper').removeClass('bg-animation');
-          $('.invite-link-box .message').off('copy blur focus');
-          this.inviteBubble = null;
-          this.showInviteForm(true);
-        },
-        on_show: () => {
-          if (this.showInviteForm()) {
-            this._focusInviteForm();
-          }
-        },
-        scroll_selector: '.start-ui-list',
-      });
-
-      this.inviteBubble.show();
-    }
-  }
-
-  _importContacts(type) {
-    if (this.inviteBubble) {
-      this.inviteBubble.hide();
-    }
-    this.importContacts(type);
-  }
-
-  _focusInviteForm() {
-    $('.invite-link-box .message')
-      .on('copy', event => {
-        $(event.currentTarget)
-          .closest('.fade-wrapper')
-          .addClass('bg-animation')
-          .on(alias.animationend, _event => {
-            if (_event.originalEvent.animationName === 'message-bg-fadeout') {
-              $(this).off(alias.animationend);
-
-              if (this.inviteBubble) {
-                this.inviteBubble.hide();
-              }
-            }
-          });
-      })
-      .on('blur', () => this.inviteMessageSelected(false))
-      .on('click', event => {
-        this.inviteMessageSelected(true);
-        $(event.target).select();
-      })
-      .trigger('click');
-  }
-
-  //##############################################################################
-  // Contacts import
-  //##############################################################################
-
-  /**
-   * Connect with contacts.
-   * @param {ConnectSource} source - Source for the contacts import
-   * @returns {undefined} No return value
-   */
-  importContacts(source) {
-    this.connectRepository
-      .getContacts(source)
-      .then((userIds = []) => this.userRepository.get_users_by_id(userIds))
-      .then(userEntities => {
-        this.matchedUsers(userEntities);
-        this.showMatches(true);
-      })
-      .catch(error => {
-        const isNoContacts = error.type === z.error.ConnectError.TYPE.NO_CONTACTS;
-        if (!isNoContacts) {
-          this.logger.error(`Importing contacts from '${source}' failed: ${error.message}`, error);
-
-          amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
-            primaryAction: {
-              action: () => this.importContacts(source),
-              text: t('modalUploadContactsAction'),
-            },
-            text: {
-              message: t('modalUploadContactsMessage'),
-            },
-          });
-        }
-      })
-      .then(() => {
-        this.showSpinner(false);
-      });
-  }
+  clickToShowInviteModal = () => this.mainViewModel.content.inviteModal.show();
 
   //##############################################################################
   // Search

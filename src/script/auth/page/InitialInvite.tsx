@@ -16,10 +16,9 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-import {Self} from '@wireapp/api-client/dist/commonjs/self';
-import {TeamInvitation} from '@wireapp/api-client/dist/commonjs/team';
+
 import {
-  ButtonLink,
+  Button,
   COLOR,
   CheckIcon,
   ContainerXS,
@@ -34,15 +33,16 @@ import {
   RoundIconButton,
   Text,
 } from '@wireapp/react-ui-kit';
-import * as React from 'react';
-import {InjectedIntlProps, injectIntl} from 'react-intl';
+import React, {useEffect, useState} from 'react';
+import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
+import {AnyAction, Dispatch} from 'redux';
 import {inviteStrings} from '../../strings';
 import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {BackendError} from '../module/action/BackendError';
 import {ValidationError} from '../module/action/ValidationError';
-import {RootState, ThunkDispatch} from '../module/reducer';
+import {RootState, bindActionCreators} from '../module/reducer';
 import * as InviteSelector from '../module/selector/InviteSelector';
 import * as LanguageSelector from '../module/selector/LanguageSelector';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
@@ -51,38 +51,26 @@ import Page from './Page';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
-interface ConnectedProps {
-  error: Error;
-  invites: TeamInvitation[];
-  isFetching: boolean;
-  language: string;
-}
+const InitialInvite = ({
+  fetchSelf,
+  invites,
+  isFetching,
+  inviteError,
+  resetInviteErrors,
+  invite,
+}: Props & ConnectedProps & DispatchProps) => {
+  useEffect(() => {
+    fetchSelf();
+  }, []);
 
-interface DispatchProps {
-  fetchSelf: () => Promise<Self>;
-  resetInviteErrors: () => Promise<void>;
-  invite: (inviteData: {email: string}) => Promise<void>;
-}
+  const {formatMessage: _} = useIntl();
+  const emailInput = React.useRef<HTMLInputElement>();
+  const [enteredEmail, setEnteredEmail] = useState('');
+  const [error, setError] = useState(null);
 
-interface State {
-  enteredEmail: string;
-  error: Error;
-}
+  const onInviteDone = (): void => window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP));
 
-class InitialInvite extends React.PureComponent<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
-  emailInput: React.RefObject<any> = React.createRef();
-  state: State = {
-    enteredEmail: '',
-    error: null,
-  };
-
-  componentDidMount(): void {
-    this.props.fetchSelf();
-  }
-
-  onInviteDone = (): void => window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP));
-
-  renderEmail = (email: string): JSX.Element => (
+  const renderEmail = (email: string): JSX.Element => (
     <div
       style={{
         alignItems: 'center',
@@ -100,13 +88,18 @@ class InitialInvite extends React.PureComponent<Props & ConnectedProps & Dispatc
     </div>
   );
 
-  handleSubmit = (event: React.FormEvent): void => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    this.emailInput.current.value = this.emailInput.current.value.trim();
-    if (!this.emailInput.current.checkValidity()) {
-      this.setState({error: ValidationError.handleValidationState('email', this.emailInput.current.validity)});
+    emailInput.current.value = emailInput.current.value.trim();
+    emailInput.current.focus();
+    if (!emailInput.current.checkValidity()) {
+      setError(ValidationError.handleValidationState('email', emailInput.current.validity));
     } else {
-      this.props.invite({email: this.emailInput.current.value}).catch(error => {
+      try {
+        await invite({email: emailInput.current.value});
+        setEnteredEmail('');
+        emailInput.current.value = '';
+      } catch (error) {
         if (error.label) {
           switch (error.label) {
             case BackendError.LABEL.EMAIL_EXISTS:
@@ -125,95 +118,93 @@ class InitialInvite extends React.PureComponent<Props & ConnectedProps & Dispatc
         } else {
           throw error;
         }
-      });
-      this.setState({enteredEmail: ''});
-      this.emailInput.current.value = '';
+      }
     }
-    this.emailInput.current.focus();
   };
 
-  resetErrors = (): void => {
-    this.setState({error: null});
-    this.props.resetInviteErrors();
+  const resetErrors = (): void => {
+    setError(null);
+    resetInviteErrors();
   };
 
-  render() {
-    const {
-      invites,
-      isFetching,
-      error,
-      intl: {formatMessage: _},
-    } = this.props;
-    const {enteredEmail} = this.state;
-    return (
-      <Page>
-        <ContainerXS
-          centerText
-          verticalCenter
-          style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: 428}}
-        >
-          <div>
-            <H1 center>{_(inviteStrings.headline)}</H1>
-            <Muted>{_(inviteStrings.subhead)}</Muted>
-          </div>
-          <div style={{margin: '18px 0', minHeight: 220}}>
-            {invites.map(({email}) => this.renderEmail(email))}
-            <Form onSubmit={this.handleSubmit}>
-              <InputSubmitCombo>
-                <Input
-                  name="email"
-                  placeholder={_(inviteStrings.emailPlaceholder)}
-                  type="email"
-                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                    this.resetErrors();
-                    this.setState({enteredEmail: event.target.value});
-                  }}
-                  ref={this.emailInput}
-                  autoFocus
-                  data-uie-name="enter-invite-email"
-                />
-                <RoundIconButton
-                  disabled={isFetching || !enteredEmail}
-                  type="submit"
-                  icon={ICON_NAME.PLANE}
-                  data-uie-name="do-send-invite"
-                  formNoValidate
-                />
-              </InputSubmitCombo>
-            </Form>
-            <ErrorMessage data-uie-name="error-message">
-              {this.state.error ? parseValidationErrors(this.state.error) : parseError(error)}
-            </ErrorMessage>
-          </div>
-          <div>
-            {invites.length ? (
-              <ButtonLink style={{margin: '0 auto -16px'}} onClick={this.onInviteDone} data-uie-name="do-next">
-                {_(inviteStrings.nextButton)}
-              </ButtonLink>
-            ) : (
-              <Link onClick={this.onInviteDone} data-uie-name="do-skip">
-                {_(inviteStrings.skipForNow)}
-              </Link>
-            )}
-          </div>
-        </ContainerXS>
-      </Page>
-    );
-  }
-}
+  return (
+    <Page>
+      <ContainerXS
+        centerText
+        verticalCenter
+        style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: 428}}
+      >
+        <div>
+          <H1 center>{_(inviteStrings.headline)}</H1>
+          <Muted>{_(inviteStrings.subhead)}</Muted>
+        </div>
+        <div style={{margin: '18px 0', minHeight: 220}}>
+          {invites.map(({email}) => renderEmail(email))}
+          <Form onSubmit={handleSubmit}>
+            <InputSubmitCombo>
+              <Input
+                name="email"
+                placeholder={_(inviteStrings.emailPlaceholder)}
+                type="email"
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                  resetErrors();
+                  setEnteredEmail(event.target.value);
+                }}
+                // Note: Curser issues when using controlled input
+                // value={enteredEmail}
+                ref={emailInput}
+                autoFocus
+                data-uie-name="enter-invite-email"
+              />
+              <RoundIconButton
+                disabled={isFetching || !enteredEmail}
+                type="submit"
+                icon={ICON_NAME.PLANE}
+                data-uie-name="do-send-invite"
+                formNoValidate
+              />
+            </InputSubmitCombo>
+          </Form>
+          <ErrorMessage data-uie-name="error-message">
+            {error ? parseValidationErrors(error) : parseError(inviteError)}
+          </ErrorMessage>
+        </div>
+        <div>
+          {invites.length ? (
+            <Button onClick={onInviteDone} data-uie-name="do-next">
+              {_(inviteStrings.nextButton)}
+            </Button>
+          ) : (
+            <Link onClick={onInviteDone} data-uie-name="do-skip">
+              {_(inviteStrings.skipForNow)}
+            </Link>
+          )}
+        </div>
+      </ContainerXS>
+    </Page>
+  );
+};
 
-export default injectIntl(
-  connect(
-    (state: RootState): ConnectedProps => ({
-      error: InviteSelector.getError(state),
-      invites: InviteSelector.getInvites(state),
-      isFetching: InviteSelector.isFetching(state),
-      language: LanguageSelector.getLanguage(state),
-    }),
-    (dispatch: ThunkDispatch): DispatchProps => ({
-      fetchSelf: () => dispatch(ROOT_ACTIONS.selfAction.fetchSelf()),
-      invite: (invitation: {email: string}) => dispatch(ROOT_ACTIONS.invitationAction.invite(invitation)),
-      resetInviteErrors: () => dispatch(ROOT_ACTIONS.invitationAction.resetInviteErrors()),
-    }),
-  )(InitialInvite),
-);
+type ConnectedProps = ReturnType<typeof mapStateToProps>;
+const mapStateToProps = (state: RootState) => ({
+  inviteError: InviteSelector.getError(state),
+  invites: InviteSelector.getInvites(state),
+  isFetching: InviteSelector.isFetching(state),
+  language: LanguageSelector.getLanguage(state),
+});
+
+type DispatchProps = ReturnType<typeof mapDispatchToProps>;
+const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
+  bindActionCreators(
+    {
+      fetchSelf: ROOT_ACTIONS.selfAction.fetchSelf,
+      invite: ROOT_ACTIONS.invitationAction.invite,
+      resetInviteErrors: ROOT_ACTIONS.invitationAction.resetInviteErrors,
+    },
+    dispatch,
+  );
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(InitialInvite);

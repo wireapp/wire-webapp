@@ -20,7 +20,7 @@
 import {APIClient} from '@wireapp/api-client';
 import {Account} from '@wireapp/core';
 import {CookiesStatic} from 'js-cookie';
-import {AnyAction} from 'redux';
+import {ActionCreatorsMapObject, AnyAction, Dispatch, bindActionCreators as bindActionCreatorsRedux} from 'redux';
 import {ThunkAction as ReduxThunkAction, ThunkDispatch as ReduxThunkDispatch} from 'redux-thunk';
 import {Config} from '../../config';
 import {ActionRoot} from '../action';
@@ -55,6 +55,17 @@ export interface RootState {
 
 export type ThunkAction<T = Promise<void>> = ReduxThunkAction<T, RootState, Api, AnyAction>;
 export type ThunkDispatch = ReduxThunkDispatch<RootState, Api, AnyAction>;
+
+export type BindActionCreators = <M extends ActionCreatorsMapObject<any>>(
+  actionCreators: M,
+  dispatch: Dispatch,
+) => {
+  [N in keyof M]: ReturnType<M[N]> extends ReduxThunkAction<any, any, any, any>
+    ? (...args: Parameters<M[N]>) => ReturnType<ReturnType<M[N]>>
+    : M[N];
+};
+
+export const bindActionCreators: BindActionCreators = bindActionCreatorsRedux;
 
 export const reducers = {
   authState: authReducer,

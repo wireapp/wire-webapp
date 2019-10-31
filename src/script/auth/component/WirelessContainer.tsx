@@ -18,8 +18,8 @@
  */
 
 import {CloseIcon, Content, Footer, Header, Link, Logo, Small} from '@wireapp/react-ui-kit';
-import * as React from 'react';
-import {FormattedHTMLMessage, InjectedIntlProps, injectIntl} from 'react-intl';
+import React from 'react';
+import {FormattedHTMLMessage, useIntl} from 'react-intl';
 import {cookiePolicyStrings, footerStrings} from '../../strings';
 import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
 
@@ -28,62 +28,60 @@ export interface Props extends React.HTMLAttributes<HTMLDivElement> {
   onCookiePolicyBannerClose?: (event: React.MouseEvent<HTMLElement>) => void;
 }
 
-export const WirelessContainer: React.SFC<Props & InjectedIntlProps> = ({
-  showCookiePolicyBanner,
-  onCookiePolicyBannerClose,
-  children,
-  intl: {formatMessage: _},
-}) => (
-  <div
-    style={{
-      display: 'flex',
-      flexDirection: 'column',
-      minHeight: '100vh',
-      width: '100%',
-    }}
-  >
-    {showCookiePolicyBanner && (
-      <Header
-        style={{
-          backgroundColor: 'rgba(254, 191, 2, 0.2)',
-          display: 'flex',
-          height: 'auto',
-          margin: '0',
-        }}
-      >
-        <div style={{margin: '16px 40px', textAlign: 'center', width: '100%'}}>
-          <Link
-            onClick={(event: React.MouseEvent<HTMLAnchorElement>) => onCookiePolicyBannerClose(event)}
-            href={EXTERNAL_ROUTE.WIRE_PRIVACY_POLICY}
-            style={{fontSize: '16px'}}
-            target="_blank"
-            textTransform="none"
-            bold={false}
-            data-uie-name="go-privacy"
-          >
-            <FormattedHTMLMessage {...cookiePolicyStrings.bannerText} />
-          </Link>
-        </div>
-        <div
-          onClick={(event: React.MouseEvent<HTMLDivElement>) => onCookiePolicyBannerClose(event)}
-          style={{cursor: 'pointer', padding: '16px', position: 'absolute', right: 0, top: 0}}
-          data-uie-name="do-close-cookie-banner"
+export const WirelessContainer: React.SFC<Props> = ({showCookiePolicyBanner, onCookiePolicyBannerClose, children}) => {
+  const {formatMessage: _} = useIntl();
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: '100vh',
+        width: '100%',
+      }}
+    >
+      {showCookiePolicyBanner && (
+        <Header
+          style={{
+            backgroundColor: 'rgba(254, 191, 2, 0.2)',
+            display: 'flex',
+            height: 'auto',
+            margin: '0',
+          }}
         >
-          <CloseIcon />
-        </div>
-      </Header>
-    )}
-    <Content>
-      <Header style={{height: '40px', marginLeft: '8px', marginTop: '20px'}}>
-        <Logo width={72} />
-      </Header>
-      <Content style={{flex: '1', paddingLeft: '8px', width: '100%'}}>{children}</Content>
-      <Footer style={{height: '30px', justifyContent: 'flex-end', margin: '0 0 18px 8px'}}>
-        <Link href={EXTERNAL_ROUTE.WIRE_WEBSITE}>{_(footerStrings.wireLink)}</Link>
-        <Small> &middot; {_(footerStrings.copy)}</Small>
-      </Footer>
-    </Content>
-  </div>
-);
+          <div style={{margin: '16px 40px', textAlign: 'center', width: '100%'}}>
+            <Link
+              onClick={(event: React.MouseEvent<HTMLAnchorElement>) => onCookiePolicyBannerClose(event)}
+              href={EXTERNAL_ROUTE.WIRE_PRIVACY_POLICY}
+              style={{fontSize: '16px'}}
+              target="_blank"
+              textTransform="none"
+              bold={false}
+              data-uie-name="go-privacy"
+            >
+              <FormattedHTMLMessage {...cookiePolicyStrings.bannerText} />
+            </Link>
+          </div>
+          <div
+            onClick={(event: React.MouseEvent<HTMLDivElement>) => onCookiePolicyBannerClose(event)}
+            style={{cursor: 'pointer', padding: '16px', position: 'absolute', right: 0, top: 0}}
+            data-uie-name="do-close-cookie-banner"
+          >
+            <CloseIcon />
+          </div>
+        </Header>
+      )}
+      <Content>
+        <Header style={{height: '40px', marginLeft: '8px', marginTop: '20px'}}>
+          <Logo width={72} />
+        </Header>
+        <Content style={{flex: '1', paddingLeft: '8px', width: '100%'}}>{children}</Content>
+        <Footer style={{height: '30px', justifyContent: 'flex-end', margin: '0 0 18px 8px'}}>
+          <Link href={EXTERNAL_ROUTE.WIRE_WEBSITE}>{_(footerStrings.wireLink)}</Link>
+          <Small> &middot; {_(footerStrings.copy)}</Small>
+        </Footer>
+      </Content>
+    </div>
+  );
+};
 
-export default injectIntl(WirelessContainer);
+export default WirelessContainer;

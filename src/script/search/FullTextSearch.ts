@@ -25,6 +25,7 @@ export const getSearchRegex = (query: string): RegExp => {
   const regex = query
     .trim()
     .split(delimiter)
+    .filter(word => !!word)
     .map(word => `(${escapeRegex(word)})`)
     .join('(?:.*)');
 

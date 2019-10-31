@@ -46,8 +46,13 @@ describe('media-button', () => {
       const playButton = domContainer.querySelector('[data-uie-name=do-play-media]');
       const pauseButton = domContainer.querySelector('[data-uie-name=do-pause-media]');
 
-      expect(playButton.style.display).toBe('');
-      expect(pauseButton.style.display).toBe('none');
+      expect(playButton.style.display)
+        .withContext('play button style')
+        .toBe('');
+
+      expect(pauseButton.style.display)
+        .withContext('pause button style')
+        .toBe('none');
 
       playButton.click();
 
@@ -78,8 +83,13 @@ describe('media-button', () => {
       const playButton = domContainer.querySelector('[data-uie-name=do-play-media]');
       const pauseButton = domContainer.querySelector('[data-uie-name=do-pause-media]');
 
-      expect(playButton).toBe(null);
-      expect(pauseButton).toBe(null);
+      expect(playButton)
+        .withContext('play button')
+        .toBe(null);
+
+      expect(pauseButton)
+        .withContext('pause button')
+        .toBe(null);
 
       expect(domContainer.querySelector('asset-loader')).not.toBe(null);
     });

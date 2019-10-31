@@ -17,124 +17,89 @@
  *
  */
 
-import {RegisterData} from '@wireapp/api-client/dist/commonjs/auth';
 import {ArrowIcon, COLOR, Column, Columns, Container, ContainerXS, H1, IsMobile} from '@wireapp/react-ui-kit';
-import * as React from 'react';
-import {InjectedIntlProps, injectIntl} from 'react-intl';
+import React from 'react';
+import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
-import {RouteComponentProps, withRouter} from 'react-router';
+import useReactRouter from 'use-react-router';
 
-import {getLogger} from 'Util/Logger';
-
+import {AnyAction, Dispatch} from 'redux';
 import {createPersonalAccountStrings} from '../../strings';
 import AccountForm from '../component/AccountForm';
 import RouterLink from '../component/RouterLink';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
-import {RootState, ThunkDispatch} from '../module/reducer';
-import {RegistrationDataState} from '../module/reducer/authReducer';
+import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
 import Page from './Page';
 
-interface URLParams {
-  invitationCode: string;
-}
+interface Props extends React.HTMLAttributes<HTMLDivElement> {}
 
-interface Props extends React.HTMLAttributes<CreatePersonalAccount>, RouteComponentProps<URLParams> {}
+const CreatePersonalAccount = ({isPersonalFlow, enterPersonalCreationFlow}: Props & ConnectedProps & DispatchProps) => {
+  const {history} = useReactRouter();
+  const {formatMessage: _} = useIntl();
+  React.useEffect(() => {
+    enterPersonalCreationFlow();
+  }, []);
 
-interface ConnectedProps {
-  account: RegistrationDataState;
-  currentFlow: string;
-  isPersonalFlow: boolean;
-}
-
-interface DispatchProps {
-  enterPersonalCreationFlow: () => Promise<void>;
-  enterGenericInviteCreationFlow: () => Promise<void>;
-  doRegisterPersonal: (registrationData: RegisterData) => Promise<void>;
-}
-
-interface State {}
-
-type CombinedProps = Props & ConnectedProps & DispatchProps & InjectedIntlProps;
-
-const logger = getLogger('CreatePersonalAccount');
-
-class CreatePersonalAccount extends React.PureComponent<CombinedProps, State> {
-  componentDidMount(): Promise<void> {
-    return this.props.enterPersonalCreationFlow();
-  }
-
-  createAccount = (): void => {
-    const {account, history, doRegisterPersonal, match} = this.props;
-    doRegisterPersonal({...account, invitation_code: match.params.invitationCode})
-      .then(() => history.push(ROUTE.CHOOSE_HANDLE))
-      .catch(error => logger.error('Failed to create personal account from invite', error));
+  const handleSubmit = (): void => {
+    history.push(ROUTE.VERIFY);
   };
 
-  handleSubmit = (): void => {
-    this.props.history.push(ROUTE.VERIFY);
-  };
+  const pageContent = (
+    <ContainerXS
+      centerText
+      verticalCenter
+      style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: 428}}
+    >
+      <H1 center>{_(createPersonalAccountStrings.headLine)}</H1>
+      <AccountForm onSubmit={handleSubmit} submitText={_(createPersonalAccountStrings.submitButton)} />
+    </ContainerXS>
+  );
+  const backArrow = (
+    <RouterLink to={ROUTE.INDEX} data-uie-name="go-index">
+      <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
+    </RouterLink>
+  );
+  return (
+    <Page>
+      <IsMobile>
+        <div style={{margin: 16}}>{backArrow}</div>
+      </IsMobile>
+      {isPersonalFlow ? (
+        <Container centerText verticalCenter style={{width: '100%'}}>
+          <Columns>
+            <IsMobile not>
+              <Column style={{display: 'flex'}}>
+                <div style={{margin: 'auto'}}>{backArrow}</div>
+              </Column>
+            </IsMobile>
+            <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>{pageContent}</Column>
+            <Column />
+          </Columns>
+        </Container>
+      ) : (
+        pageContent
+      )}
+    </Page>
+  );
+};
 
-  render() {
-    const {
-      isPersonalFlow,
-      intl: {formatMessage: _},
-    } = this.props;
-    const pageContent = (
-      <ContainerXS
-        centerText
-        verticalCenter
-        style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: 428}}
-      >
-        <H1 center>{_(createPersonalAccountStrings.headLine)}</H1>
-        <AccountForm onSubmit={this.handleSubmit} submitText={_(createPersonalAccountStrings.submitButton)} />
-      </ContainerXS>
-    );
-    const backArrow = (
-      <RouterLink to={ROUTE.INDEX} data-uie-name="go-index">
-        <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
-      </RouterLink>
-    );
-    return (
-      <Page>
-        <IsMobile>
-          <div style={{margin: 16}}>{backArrow}</div>
-        </IsMobile>
-        {isPersonalFlow ? (
-          <Container centerText verticalCenter style={{width: '100%'}}>
-            <Columns>
-              <IsMobile not>
-                <Column style={{display: 'flex'}}>
-                  <div style={{margin: 'auto'}}>{backArrow}</div>
-                </Column>
-              </IsMobile>
-              <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>{pageContent}</Column>
-              <Column />
-            </Columns>
-          </Container>
-        ) : (
-          pageContent
-        )}
-      </Page>
-    );
-  }
-}
+type ConnectedProps = ReturnType<typeof mapStateToProps>;
+const mapStateToProps = (state: RootState) => ({
+  isPersonalFlow: AuthSelector.isPersonalFlow(state),
+});
 
-export default withRouter(
-  injectIntl(
-    connect(
-      (state: RootState): ConnectedProps => ({
-        account: AuthSelector.getAccount(state),
-        currentFlow: AuthSelector.getCurrentFlow(state),
-        isPersonalFlow: AuthSelector.isPersonalFlow(state),
-      }),
-      (dispatch: ThunkDispatch): DispatchProps => ({
-        doRegisterPersonal: (registrationData: RegisterData) =>
-          dispatch(ROOT_ACTIONS.authAction.doRegisterPersonal(registrationData)),
-        enterGenericInviteCreationFlow: () => dispatch(ROOT_ACTIONS.authAction.enterGenericInviteCreationFlow()),
-        enterPersonalCreationFlow: () => dispatch(ROOT_ACTIONS.authAction.enterPersonalCreationFlow()),
-      }),
-    )(CreatePersonalAccount),
-  ),
-);
+type DispatchProps = ReturnType<typeof mapDispatchToProps>;
+const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
+  bindActionCreators(
+    {
+      enterPersonalCreationFlow: ROOT_ACTIONS.authAction.enterPersonalCreationFlow,
+    },
+    dispatch,
+  );
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(CreatePersonalAccount);

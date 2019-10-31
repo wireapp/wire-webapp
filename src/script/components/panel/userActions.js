@@ -177,5 +177,10 @@ ko.components.register('user-actions', {
     ];
 
     this.items = ko.computed(() => (user() ? allItems.filter(({condition}) => condition()).map(({item}) => item) : []));
+    this.dispose = () => {
+      isMe.dispose();
+      isNotMe.dispose();
+      this.items.dispose();
+    };
   },
 });

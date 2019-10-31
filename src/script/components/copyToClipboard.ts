@@ -17,24 +17,24 @@
  *
  */
 
-import {AudioType} from './AudioType';
+class CopyToClipboard {
+  public readonly text: string;
 
-const audioPlayingType = {};
+  constructor(params: {text: string}) {
+    this.text = params.text;
+  }
 
-audioPlayingType.MUTED = [AudioType.CALL_DROP, AudioType.NETWORK_INTERRUPTION];
+  onClick(viewModel: CopyToClipboard, event: JQuery.Event): void {
+    if (window.getSelection) {
+      const selectionRange = document.createRange();
+      selectionRange.selectNode(event.currentTarget as Node);
+      window.getSelection().removeAllRanges();
+      window.getSelection().addRange(selectionRange);
+    }
+  }
+}
 
-audioPlayingType.NONE = [
-  ...audioPlayingType.MUTED,
-  AudioType.OUTGOING_CALL,
-  AudioType.READY_TO_TALK,
-  AudioType.TALK_LATER,
-];
-
-audioPlayingType.SOME = [
-  ...audioPlayingType.NONE,
-  AudioType.INCOMING_CALL,
-  AudioType.INCOMING_PING,
-  AudioType.OUTGOING_PING,
-];
-
-export const AudioPlayingType = audioPlayingType;
+ko.components.register('copy-to-clipboard', {
+  template: `<div class="copy-to-clipboard" data-bind="click: onClick, text: text()"></div>`,
+  viewModel: CopyToClipboard,
+});

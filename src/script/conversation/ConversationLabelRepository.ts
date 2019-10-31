@@ -24,10 +24,10 @@ import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
 import {createRandomUuid} from 'Util/util';
 
-import {PropertiesService} from '../config/dependenciesGraph';
 import {Conversation} from '../entity/Conversation';
 import {BackendEvent} from '../event/Backend';
 import {WebAppEvents} from '../event/WebApp';
+import {PropertiesService} from '../properties/PropertiesService';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 
 export enum LabelType {
@@ -189,26 +189,6 @@ export class ConversationLabelRepository {
       );
     }
     this.saveLabels();
-  };
-
-  /**
-   * Returns the conversation label with the highest order:
-   * 1. Favorites
-   * 2. Groups
-   * 3. Contacts
-   * 4. Custom
-   */
-  getConversationLabelId = (conversation: Conversation): string => {
-    if (this.getFavorites().includes(conversation)) {
-      return DefaultLabelIds.Favorites;
-    }
-    if (conversation.isGroup()) {
-      return DefaultLabelIds.Groups;
-    }
-    if (this.allLabeledConversations().includes(conversation)) {
-      return this.getConversationCustomLabel(conversation).id;
-    }
-    return DefaultLabelIds.Contacts;
   };
 
   // TODO: Write test cases!

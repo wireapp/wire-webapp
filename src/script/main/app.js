@@ -40,8 +40,6 @@ import {serverTimeHandler} from '../time/serverTimeHandler';
 import {CallingRepository} from '../calling/CallingRepository';
 import {BackupRepository} from '../backup/BackupRepository';
 import {BroadcastRepository} from '../broadcast/BroadcastRepository';
-import {ConnectService} from '../connect/ConnectService';
-import {ConnectRepository} from '../connect/ConnectRepository';
 import {NotificationRepository} from '../notification/NotificationRepository';
 import {IntegrationRepository} from '../integration/IntegrationRepository';
 import {IntegrationService} from '../integration/IntegrationService';
@@ -96,6 +94,15 @@ import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {ContentViewModel} from '../view_model/ContentViewModel';
 import {AppLockViewModel} from '../view_model/content/AppLockViewModel';
 import {CacheRepository} from '../cache/CacheRepository';
+import {SelfService} from '../self/SelfService';
+import {BroadcastService} from '../broadcast/BroadcastService';
+import {PropertiesRepository} from '../properties/PropertiesRepository';
+import {PropertiesService} from '../properties/PropertiesService';
+import {LinkPreviewRepository} from '../links/LinkPreviewRepository';
+import {AssetService} from '../assets/AssetService';
+import {UserService} from '../user/UserService';
+import {AudioRepository} from '../audio/AudioRepository';
+import {MessageSender} from '../message/MessageSender';
 
 class App {
   static get CONFIG() {
@@ -156,22 +163,24 @@ class App {
    */
   _setupRepositories() {
     const repositories = {};
+    const selfService = new SelfService(this.backendClient);
+    const sendingMessageQueue = new MessageSender();
 
-    repositories.audio = resolve(graph.AudioRepository);
+    repositories.audio = new AudioRepository();
     repositories.auth = resolve(graph.AuthRepository);
     repositories.giphy = resolve(graph.GiphyRepository);
-    repositories.properties = resolve(graph.PropertiesRepository);
+    repositories.properties = new PropertiesRepository(new PropertiesService(this.backendClient), selfService);
     repositories.serverTime = serverTimeHandler;
     repositories.storage = new StorageRepository(this.service.storage);
 
-    repositories.cryptography = new CryptographyRepository(resolve(graph.BackendClient), repositories.storage);
+    repositories.cryptography = new CryptographyRepository(this.backendClient, repositories.storage);
     const storageService = resolve(graph.StorageService);
     repositories.client = new ClientRepository(this.backendClient, storageService, repositories.cryptography);
     repositories.media = resolve(graph.MediaRepository);
     repositories.user = new UserRepository(
-      resolve(graph.UserService),
+      new UserService(this.backendClient, this.service.storage),
       this.service.asset,
-      resolve(graph.SelfService),
+      selfService,
       repositories.client,
       serverTimeHandler,
       repositories.properties,
@@ -185,7 +194,6 @@ class App {
       serverTimeHandler,
       repositories.user,
     );
-    repositories.connect = new ConnectRepository(this.service.connect, repositories.properties);
     repositories.search = new SearchRepository(resolve(graph.BackendClient), repositories.user);
     repositories.team = new TeamRepository(resolve(graph.BackendClient), repositories.user);
     repositories.eventTracker = new EventTrackingRepository(repositories.team, repositories.user);
@@ -198,8 +206,8 @@ class App {
       repositories.cryptography,
       repositories.event,
       repositories.giphy,
-      resolve(graph.LinkPreviewRepository),
-      resolve(graph.MessageSender),
+      new LinkPreviewRepository(new AssetService(resolve(graph.BackendClient)), repositories.properties),
+      sendingMessageQueue,
       serverTimeHandler,
       repositories.team,
       repositories.user,
@@ -229,11 +237,11 @@ class App {
       repositories.user,
     );
     repositories.broadcast = new BroadcastRepository(
-      resolve(graph.BroadcastService),
+      new BroadcastService(resolve(graph.BackendClient)),
       repositories.client,
       repositories.conversation,
       repositories.cryptography,
-      resolve(graph.MessageSender),
+      sendingMessageQueue,
       repositories.user,
     );
     repositories.calling = new CallingRepository(
@@ -272,7 +280,6 @@ class App {
 
     return {
       asset: resolve(graph.AssetService),
-      connect: new ConnectService(this.backendClient),
       conversation: new ConversationService(this.backendClient, eventService, storageService),
       event: eventService,
       integration: new IntegrationService(this.backendClient),

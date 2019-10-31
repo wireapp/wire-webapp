@@ -28,7 +28,7 @@ import {Call} from '../calling/Call';
 import {CallingRepository} from '../calling/CallingRepository';
 import {Grid, getGrid} from '../calling/videoGridHandler';
 import {User} from '../entity/User';
-import {MediaDevicesHandler} from '../media/MediaDevicesHandler';
+import {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import {MediaStreamHandler} from '../media/MediaStreamHandler';
 import {PermissionState} from '../notification/PermissionState';
 
@@ -50,7 +50,7 @@ export class CallingViewModel {
   public readonly activeCalls: ko.PureComputed<Call[]>;
   public readonly multitasking: any;
   public readonly callActions: any;
-  public readonly selectableScreens: ko.Observable<any[]>;
+  public readonly selectableScreens: ko.Observable<ElectronDesktopCapturerSource[]>;
   public readonly isChoosingScreen: ko.PureComputed<boolean>;
   private onChooseScreen: (deviceId: string) => void;
   private readonly logger: Logger;
@@ -159,7 +159,7 @@ export class CallingViewModel {
               this.selectableScreens([]);
               resolve();
             };
-            this.mediaDevicesHandler.getScreenSources().then((sources: any[]) => {
+            this.mediaDevicesHandler.getScreenSources().then((sources: ElectronDesktopCapturerSource[]) => {
               if (sources.length === 1) {
                 return this.onChooseScreen(sources[0].id);
               }

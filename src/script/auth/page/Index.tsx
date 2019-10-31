@@ -30,8 +30,9 @@ import {
   Text,
 } from '@wireapp/react-ui-kit';
 import React from 'react';
-import {InjectedIntlProps, injectIntl} from 'react-intl';
-import {Redirect, RouteComponentProps} from 'react-router';
+import {useIntl} from 'react-intl';
+import {Redirect} from 'react-router';
+import useReactRouter from 'use-react-router';
 import {indexStrings} from '../../strings';
 import {Config} from '../config';
 import {ROUTE} from '../route';
@@ -39,9 +40,11 @@ import {isDesktopApp, isMacOS} from '../Runtime';
 import {pathWithParams} from '../util/urlUtil';
 import Page from './Page';
 
-interface Props extends React.HTMLProps<HTMLDivElement>, RouteComponentProps {}
+interface Props extends React.HTMLProps<HTMLDivElement> {}
 
-const Index = ({history, intl: {formatMessage: _}}: Props & InjectedIntlProps) => {
+const Index = ({}: Props) => {
+  const {formatMessage: _} = useIntl();
+  const {history} = useReactRouter();
   const isMacOsWrapper = isDesktopApp() && isMacOS();
   return (
     <Page>
@@ -119,4 +122,4 @@ const Index = ({history, intl: {formatMessage: _}}: Props & InjectedIntlProps) =
   );
 };
 
-export default injectIntl(Index);
+export default Index;

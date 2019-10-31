@@ -25,6 +25,7 @@ import {modals} from './ModalsViewModel';
 import {WarningsViewModel} from './WarningsViewModel';
 import {ContentViewModel} from './ContentViewModel';
 import {CallingViewModel} from './CallingViewModel';
+import {ActionsViewModel} from './ActionsViewModel';
 
 export class MainViewModel {
   static get CONFIG() {
@@ -64,6 +65,8 @@ export class MainViewModel {
     this.userRepository = repositories.user;
     this.logger = getLogger('MainViewModel');
 
+    this.modals = modals;
+
     this.multitasking = {
       autoMinimize: ko.observable(true),
       isMinimized: ko.observable(false),
@@ -74,7 +77,7 @@ export class MainViewModel {
 
     this.isPanelOpen = ko.observable(false);
 
-    this.actions = new z.viewModel.ActionsViewModel(this, repositories);
+    this.actions = new ActionsViewModel(this, repositories);
 
     this.panel = new z.viewModel.PanelViewModel(this, repositories);
     this.calling = new CallingViewModel(
@@ -90,7 +93,6 @@ export class MainViewModel {
     this.content = new ContentViewModel(this, repositories);
     this.list = new z.viewModel.ListViewModel(this, repositories);
 
-    this.modals = modals;
     this.lightbox = new z.viewModel.ImageDetailViewViewModel(this, repositories);
     this.title = new WindowTitleViewModel(this, repositories);
     this.favicon = new z.viewModel.FaviconViewModel(window.amplify);

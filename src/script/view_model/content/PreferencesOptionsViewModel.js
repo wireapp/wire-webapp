@@ -29,7 +29,6 @@ import {WebAppEvents} from '../../event/WebApp';
 import {Config} from '../../auth/config';
 import {THEMES as ThemeViewModelThemes} from '../ThemeViewModel';
 import {ModalsViewModel} from '../ModalsViewModel';
-import {ConnectSource} from '../../connect/ConnectSource';
 import {AudioPreference} from '../../audio/AudioPreference';
 
 window.z = window.z || {};
@@ -89,10 +88,6 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
 
     this.AudioPreference = AudioPreference;
     this.brandName = Config.BRAND_NAME;
-  }
-
-  connectMacOSContacts() {
-    amplify.publish(WebAppEvents.CONNECT.IMPORT_CONTACTS, ConnectSource.ICLOUD);
   }
 
   saveCallLogs() {

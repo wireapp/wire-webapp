@@ -18,28 +18,20 @@
  */
 
 import {TeamData} from '@wireapp/api-client/dist/commonjs/team';
-import * as React from 'react';
+import React from 'react';
 import {connect} from 'react-redux';
 import {Redirect} from 'react-router';
 import UnsupportedBrowser from '../component/UnsupportedBrowser';
-import {RootState, ThunkDispatch} from '../module/reducer';
+import {RootState} from '../module/reducer';
 import {RegistrationDataState} from '../module/reducer/authReducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
 
-interface Props extends React.HTMLAttributes<HTMLDivElement> {
+interface Props extends React.HTMLProps<HTMLDivElement> {
   hasAccountData?: boolean;
   hasTeamData?: boolean;
   isAuthenticated?: boolean;
 }
-
-interface ConnectedProps {
-  account: RegistrationDataState;
-  currentFlow: string;
-  isStateAuthenticated: boolean;
-}
-
-interface DispatchProps {}
 
 const hasInvalidAccountData = (account: RegistrationDataState) => !account.name || !account.email || !account.password;
 
@@ -51,7 +43,7 @@ const redirects = {
   [AuthSelector.REGISTER_FLOW.TEAM]: ROUTE.CREATE_TEAM,
 };
 
-const Page: React.SFC<Props & ConnectedProps & DispatchProps> = ({
+const Page = ({
   hasAccountData,
   hasTeamData,
   currentFlow,
@@ -59,7 +51,7 @@ const Page: React.SFC<Props & ConnectedProps & DispatchProps> = ({
   isStateAuthenticated,
   account,
   children,
-}) => {
+}: Props & ConnectedProps) => {
   if (
     (hasAccountData && hasInvalidAccountData(account) && !isStateAuthenticated) ||
     (hasTeamData && hasInvalidTeamData(account) && !isStateAuthenticated) ||
@@ -70,11 +62,11 @@ const Page: React.SFC<Props & ConnectedProps & DispatchProps> = ({
   return <UnsupportedBrowser>{children}</UnsupportedBrowser>;
 };
 
-export default connect(
-  (state: RootState): ConnectedProps => ({
-    account: AuthSelector.getAccount(state),
-    currentFlow: AuthSelector.getCurrentFlow(state),
-    isStateAuthenticated: AuthSelector.isAuthenticated(state),
-  }),
-  (dispatch: ThunkDispatch): DispatchProps => ({}),
-)(Page);
+type ConnectedProps = ReturnType<typeof mapStateToProps>;
+const mapStateToProps = (state: RootState) => ({
+  account: AuthSelector.getAccount(state),
+  currentFlow: AuthSelector.getCurrentFlow(state),
+  isStateAuthenticated: AuthSelector.isAuthenticated(state),
+});
+
+export default connect(mapStateToProps)(Page);

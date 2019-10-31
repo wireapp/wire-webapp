@@ -17,22 +17,21 @@
  *
  */
 
+import {UserClients} from '@wireapp/api-client/dist/commonjs/conversation';
+import {BackendClient} from '../service/BackendClient';
+
 // Broadcast service for all broadcast calls to the backend REST API.
 export class BroadcastService {
-  static get CONFIG() {
+  private readonly backendClient: BackendClient;
+
+  static get CONFIG(): {URL_BROADCAST: string} {
     return {
       URL_BROADCAST: '/broadcast',
     };
   }
 
-  /**
-   * Construct a new Broadcast Service.
-   * @param {BackendClient} backendClient - Client for the API calls
-   * @param {Logger} logger - logger configured for this class
-   */
-  constructor(backendClient, logger) {
+  constructor(backendClient: BackendClient) {
     this.backendClient = backendClient;
-    this.logger = logger;
   }
 
   /**
@@ -46,7 +45,10 @@ export class BroadcastService {
    * @param {Array<string>|boolean} preconditionOption - Level that backend checks for missing clients
    * @returns {Promise} Promise that resolve when the message was sent
    */
-  postBroadcastMessage(payload, preconditionOption) {
+  postBroadcastMessage(
+    payload: {recipients: {}; sender: string},
+    preconditionOption: string[] | boolean,
+  ): Promise<UserClients> {
     let url = `${BroadcastService.CONFIG.URL_BROADCAST}/otr/messages`;
     if (Array.isArray(preconditionOption)) {
       url = `${url}?report_missing=${preconditionOption.join(',')}`;

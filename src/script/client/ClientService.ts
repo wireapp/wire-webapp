@@ -17,25 +17,34 @@
  *
  */
 
-import {getLogger} from 'Util/Logger';
+import {Logger, getLogger} from 'Util/Logger';
 
+import {NewClient, PublicClient, RegisteredClient} from '@wireapp/api-client/dist/commonjs/client';
+import {BackendClient} from '../service/BackendClient';
+import {StorageService} from '../storage';
 import {StorageSchemata} from '../storage/StorageSchemata';
 
 export class ClientService {
+  private readonly backendClient: BackendClient;
+  private readonly storageService: StorageService;
+  private readonly logger: Logger;
+  private readonly CLIENT_STORE_NAME: string;
+
+  // tslint:disable-next-line:typedef
   static get URL_CLIENTS() {
     return '/clients';
   }
 
+  // tslint:disable-next-line:typedef
   static get URL_USERS() {
     return '/users';
   }
 
   /**
-   * Construct a new client service.
-   * @param {BackendClient} backendClient - Client for the API calls
-   * @param {StorageService} storageService - Service for all storage interactions
+   * @param backendClient Client for the API calls
+   * @param storageService Service for all storage interactions
    */
-  constructor(backendClient, storageService) {
+  constructor(backendClient: BackendClient, storageService: StorageService) {
     this.backendClient = backendClient;
     this.storageService = storageService;
     this.logger = getLogger('ClientService');
@@ -51,11 +60,11 @@ export class ClientService {
    * Deletes a specific client from a user.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/deleteClient
    *
-   * @param {string} clientId - ID of client to be deleted
-   * @param {string} password - User password
-   * @returns {Promise} Resolves once the deletion of the client is complete
+   * @param clientId ID of client to be deleted
+   * @param password User password
+   * @returns Resolves once the deletion of the client is complete
    */
-  deleteClient(clientId, password) {
+  deleteClient(clientId: string, password: string): Promise<void> {
     return this.backendClient.sendJson({
       data: {
         password,
@@ -67,10 +76,10 @@ export class ClientService {
 
   /**
    * Deletes the temporary client of a user.
-   * @param {string} clientId - ID of the temporary client to be deleted
-   * @returns {Promise} - Resolves once the deletion of the temporary client is complete
+   * @param clientId ID of the temporary client to be deleted
+   * @returns Resolves once the deletion of the temporary client is complete
    */
-  deleteTemporaryClient(clientId) {
+  deleteTemporaryClient(clientId: string): Promise<void> {
     return this.backendClient.sendJson({
       data: {},
       type: 'DELETE',
@@ -82,10 +91,10 @@ export class ClientService {
    * Retrieves meta information about a specific client.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getClients
    *
-   * @param {string} clientId - ID of client to be retrieved
-   * @returns {Promise} Resolves with the requested client
+   * @param clientId ID of client to be retrieved
+   * @returns Resolves with the requested client
    */
-  getClientById(clientId) {
+  getClientById(clientId: string): Promise<RegisteredClient> {
     return this.backendClient.sendRequest({
       type: 'GET',
       url: `${ClientService.URL_CLIENTS}/${clientId}`,
@@ -95,9 +104,9 @@ export class ClientService {
   /**
    * Retrieves meta information about all the clients self user.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/listClients
-   * @returns {Promise} Resolves with the clients of the self user
+   * @returns Resolves with the clients of the self user
    */
-  getClients() {
+  getClients(): Promise<RegisteredClient[]> {
     return this.backendClient.sendRequest({
       type: 'GET',
       url: ClientService.URL_CLIENTS,
@@ -108,10 +117,10 @@ export class ClientService {
    * Retrieves meta information about all the clients of a specific user.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getClients
    *
-   * @param {string} userId - ID of user to retrieve clients for
-   * @returns {Promise} Resolves with the clients of a user
+   * @param userId ID of user to retrieve clients for
+   * @returns Resolves with the clients of a user
    */
-  getClientsByUserId(userId) {
+  getClientsByUserId(userId: string): Promise<PublicClient[]> {
     return this.backendClient.sendRequest({
       type: 'GET',
       url: `${ClientService.URL_USERS}/${userId}${ClientService.URL_CLIENTS}`,
@@ -120,12 +129,12 @@ export class ClientService {
 
   /**
    * Register a new client.
-   * @param {Object} payload - Client payload
-   * @returns {Promise} Resolves with the registered client information
+   * @param newClient Client payload
+   * @returns Resolves with the registered client information
    */
-  postClients(payload) {
+  postClients(newClient: NewClient): Promise<RegisteredClient> {
     return this.backendClient.sendJson({
-      data: payload,
+      data: newClient,
       type: 'POST',
       url: ClientService.URL_CLIENTS,
     });
@@ -137,27 +146,27 @@ export class ClientService {
 
   /**
    * Removes a client from the database.
-   * @param {string} primaryKey - Primary key used to find the client for deletion in the database
-   * @returns {Promise} Resolves once the client is deleted
+   * @param primaryKey Primary key used to find the client for deletion in the database
+   * @returns Resolves once the client is deleted
    */
-  deleteClientFromDb(primaryKey) {
+  deleteClientFromDb(primaryKey: string): Promise<string> {
     return this.storageService.delete(this.CLIENT_STORE_NAME, primaryKey);
   }
 
   /**
    * Load all clients we have stored in the database.
-   * @returns {Promise} Resolves with all the clients payloads
+   * @returns Resolves with all the clients payloads
    */
-  loadAllClientsFromDb() {
+  loadAllClientsFromDb(): Promise<any[]> {
     return this.storageService.getAll(this.CLIENT_STORE_NAME);
   }
 
   /**
    * Loads a persisted client from the database.
-   * @param {string} primaryKey - Primary key used to find a client in the database
-   * @returns {Promise<JSON|string>} Resolves with the client's payload or the primary key if not found
+   * @param primaryKey Primary key used to find a client in the database
+   * @returns Resolves with the client's payload or the primary key if not found
    */
-  async loadClientFromDb(primaryKey) {
+  async loadClientFromDb(primaryKey: string): Promise<object | string> {
     let clientRecord;
 
     if (this.storageService.db) {
@@ -182,11 +191,11 @@ export class ClientService {
   /**
    * Persists a client.
    *
-   * @param {string} primaryKey - Primary key used to find a client in the database
-   * @param {Object} clientPayload - Client payload
-   * @returns {Promise<Object>} Resolves with the client payload stored in database
+   * @param primaryKey Primary key used to find a client in the database
+   * @param clientPayload Client payload
+   * @returns Resolves with the client payload stored in database
    */
-  saveClientInDb(primaryKey, clientPayload) {
+  saveClientInDb(primaryKey: string, clientPayload: any): Promise<any> {
     if (!clientPayload.meta) {
       clientPayload.meta = {};
     }
@@ -202,11 +211,11 @@ export class ClientService {
   /**
    * Updates a persisted client in the database.
    *
-   * @param {string} primaryKey - Primary key used to find a client in the database
-   * @param {Object} changes - Incremental update changes of the client JSON
-   * @returns {Promise<Integer>} Number of updated records (1 if an object was updated, otherwise 0)
+   * @param primaryKey Primary key used to find a client in the database
+   * @param changes Incremental update changes of the client JSON
+   * @returns Number of updated records (1 if an object was updated, otherwise 0)
    */
-  updateClientInDb(primaryKey, changes) {
+  updateClientInDb(primaryKey: string, changes: object): Promise<number> {
     return this.storageService.update(this.CLIENT_STORE_NAME, primaryKey, changes);
   }
 }

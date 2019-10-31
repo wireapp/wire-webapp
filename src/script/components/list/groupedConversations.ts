@@ -38,6 +38,7 @@ interface GroupedConversationsParams {
   onJoinCall: (conversationEntity: Conversation) => void;
   isSelectedConversation: (conversationEntity: Conversation) => boolean;
   expandedFolders: ko.ObservableArray<string>;
+  isVisibleFunc: (top: number, bottom: number) => boolean;
 }
 
 ko.components.register('grouped-conversations', {
@@ -52,7 +53,7 @@ ko.components.register('grouped-conversations', {
             <conversation-list-cell
               data-bind="link_to: getConversationUrl(conversation.id), event: {'contextmenu': (_, event) => listViewModel.onContextMenu(conversation, event)}"
               data-uie-name="item-conversation"
-              params="click: (_, event) => listViewModel.onContextMenu(conversation, event), conversation: conversation, showJoinButton: hasJoinableCall(conversation.id), is_selected: isSelectedConversation, onJoinCall: onJoinCall">
+              params="click: (_, event) => listViewModel.onContextMenu(conversation, event), conversation: conversation, showJoinButton: hasJoinableCall(conversation.id), is_selected: isSelectedConversation, onJoinCall: onJoinCall,offsetTop: getOffsetTop(folder, conversation), index: $index, isVisibleFunc: isVisibleFunc">
             </conversation-list-cell>
           <!-- /ko -->
         </div>
@@ -66,6 +67,7 @@ ko.components.register('grouped-conversations', {
     onJoinCall,
     isSelectedConversation,
     expandedFolders = ko.observableArray([]),
+    isVisibleFunc = () => false,
   }: GroupedConversationsParams): void {
     const {conversationLabelRepository} = conversationRepository;
     this.listViewModel = listViewModel;
@@ -73,6 +75,7 @@ ko.components.register('grouped-conversations', {
     this.onJoinCall = onJoinCall;
     this.isSelectedConversation = isSelectedConversation;
     this.getConversationUrl = generateConversationUrl;
+    this.isVisibleFunc = isVisibleFunc;
 
     this.folders = ko.pureComputed<ConversationLabel[]>(() => {
       const folders: ConversationLabel[] = [];
@@ -107,6 +110,28 @@ ko.components.register('grouped-conversations', {
       } else {
         expandedFolders.push(folderId);
       }
+    };
+
+    /*
+     *  We need to calculate the offset from the top for the isVisibleFunc as we can't rely
+     *  on the index of the conversation alone. We need to account for the folder headers and
+     *  the height of the <conversation-list-cell>s of the previous open folders.
+     */
+    this.getOffsetTop = (folder: ConversationLabel, conversation: Conversation) => {
+      const folderHeaderHeight = 53;
+      const firstFolderHeaderHeight = 33;
+      const cellHeight = 56;
+
+      const folders = this.folders() as ConversationLabel[];
+      const folderIndex = folders.indexOf(folder);
+      const totalHeaderHeight = folderHeaderHeight * folderIndex + firstFolderHeaderHeight;
+      const previousExpandedFolders = folders.slice(0, folderIndex).filter(({id}) => this.isExpanded(id));
+      const previousCellsHeight = previousExpandedFolders.reduce(
+        (height, {conversations}) => height + conversations.length * cellHeight,
+        0,
+      );
+      const currentCellsHeight = folder.conversations.indexOf(conversation) * cellHeight;
+      return totalHeaderHeight + previousCellsHeight + currentCellsHeight;
     };
   },
 });

@@ -29,8 +29,6 @@ import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 import {User} from 'src/script/entity/User';
 import {BackupRepository} from 'src/script/backup/BackupRepository';
 import {UserRepository} from 'src/script/user/UserRepository';
-import {ConnectService} from 'src/script/connect/ConnectService';
-import {ConnectRepository} from 'src/script/connect/ConnectRepository';
 import {NotificationRepository} from 'src/script/notification/NotificationRepository';
 import {StorageRepository} from 'src/script/storage/StorageRepository';
 import {ClientRepository} from 'src/script/client/ClientRepository';
@@ -50,6 +48,13 @@ import {TeamRepository} from 'src/script/team/TeamRepository';
 import {SearchRepository} from 'src/script/search/SearchRepository';
 import {ConversationService} from 'src/script/conversation/ConversationService';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
+import {SelfService} from 'src/script/self/SelfService';
+import {LinkPreviewRepository} from 'src/script/links/LinkPreviewRepository';
+import {AssetService} from 'src/script/assets/AssetService';
+import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
+import {PropertiesService} from 'src/script/properties/PropertiesService';
+import {MessageSender} from 'src/script/message/MessageSender';
+import {UserService} from 'src/script/user/UserService';
 
 window.testConfig = {
   connection: backendConfig,
@@ -210,13 +215,16 @@ window.TestFactory = class TestFactory {
     await this.exposeClientActors();
     TestFactory.asset_service = resolveDependency(graph.AssetService);
     TestFactory.connection_service = new ConnectionService(resolveDependency(graph.BackendClient));
-    TestFactory.user_service = resolveDependency(graph.UserService);
-    TestFactory.propertyRepository = resolveDependency(graph.PropertiesRepository);
+    TestFactory.user_service = new UserService(resolveDependency(graph.BackendClient), TestFactory.storage_service);
+    TestFactory.propertyRepository = TestFactory.propertyRepository = new PropertiesRepository(
+      new PropertiesService(resolveDependency(graph.BackendClient)),
+      new SelfService(resolveDependency(graph.BackendClient)),
+    );
 
     TestFactory.user_repository = new UserRepository(
       TestFactory.user_service,
       TestFactory.asset_service,
-      resolveDependency(graph.SelfService),
+      new SelfService(resolveDependency(graph.BackendClient)),
       TestFactory.client_repository,
       serverTimeHandler,
       TestFactory.propertyRepository,
@@ -238,19 +246,7 @@ window.TestFactory = class TestFactory {
       TestFactory.user_repository,
     );
 
-    return TestFactory.connect_repository;
-  }
-
-  /**
-   * @returns {Promise<ConnectRepository>} The connect repository.
-   */
-  async exposeConnectActors() {
-    await this.exposeUserActors();
-    TestFactory.connectService = new ConnectService(resolveDependency(graph.BackendClient));
-
-    TestFactory.connect_repository = new ConnectRepository(TestFactory.connectService, TestFactory.user_repository);
-
-    return TestFactory.connect_repository;
+    return TestFactory.connection_repository;
   }
 
   /**
@@ -289,6 +285,11 @@ window.TestFactory = class TestFactory {
       TestFactory.storage_service,
     );
 
+    const propertiesRepository = new PropertiesRepository(
+      new PropertiesService(resolveDependency(graph.BackendClient)),
+      new SelfService(resolveDependency(graph.BackendClient)),
+    );
+
     TestFactory.conversation_repository = new ConversationRepository(
       TestFactory.conversation_service,
       TestFactory.asset_service,
@@ -297,8 +298,8 @@ window.TestFactory = class TestFactory {
       TestFactory.cryptography_repository,
       TestFactory.event_repository,
       undefined,
-      resolveDependency(graph.LinkPreviewRepository),
-      resolveDependency(graph.MessageSender),
+      new LinkPreviewRepository(new AssetService(resolveDependency(graph.BackendClient)), propertiesRepository),
+      new MessageSender(),
       serverTimeHandler,
       TestFactory.team_repository,
       TestFactory.user_repository,
