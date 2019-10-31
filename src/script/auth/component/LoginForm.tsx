@@ -1,18 +1,39 @@
+/*
+ * Wire
+ * Copyright (C) 2019 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
 import {LoginData} from '@wireapp/api-client/dist/commonjs/auth';
 import {ICON_NAME, Input, InputBlock, InputSubmitCombo, Loading, RoundIconButton} from '@wireapp/react-ui-kit';
-import React, {Dispatch, SetStateAction, useRef, useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {useIntl} from 'react-intl';
 
+import {isValidEmail, isValidPhoneNumber, isValidUsername} from 'Util/ValidationUtil';
+
 import {loginStrings} from '../../strings';
+import {Config} from '../config';
 import {ValidationError} from '../module/action/ValidationError';
 
 interface LoginFormProps {
-  setValidationErrors: Dispatch<SetStateAction<Error[]>>;
   isFetching: boolean;
-  onSubmit: (LoginData: Partial<LoginData>, validationErrors: Error[]) => Promise<void>;
+  onSubmit: (loginData: Partial<LoginData>, validationErrors: Error[]) => Promise<void>;
 }
 
-const LoginForm = ({isFetching, setValidationErrors, onSubmit}: LoginFormProps) => {
+const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
   const {formatMessage: _} = useIntl();
   const emailInput = useRef<HTMLInputElement>();
   const passwordInput = useRef<HTMLInputElement>();
@@ -40,9 +61,16 @@ const LoginForm = ({isFetching, setValidationErrors, onSubmit}: LoginFormProps) 
         ValidationError.handleValidationState(passwordInput.current.name, passwordInput.current.validity),
       );
     }
-    const loginData: Partial<LoginData> = {};
+    const loginData: Partial<LoginData> = {password};
     setValidPasswordInput(passwordInput.current.validity.valid);
-    setValidationErrors(validationErrors);
+    const localEmail = email.trim();
+    if (isValidEmail(localEmail)) {
+      loginData.email = localEmail;
+    } else if (isValidUsername(localEmail)) {
+      loginData.handle = localEmail.replace('@', '');
+    } else if (Config.FEATURE.ENABLE_PHONE_LOGIN && isValidPhoneNumber(localEmail)) {
+      loginData.phone = localEmail;
+    }
     onSubmit(loginData, validationErrors);
   };
 
