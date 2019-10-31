@@ -31,18 +31,12 @@ import {
   ErrorMessage,
   Form,
   H1,
-  ICON_NAME,
-  Input,
-  InputBlock,
-  InputSubmitCombo,
   IsMobile,
   Link,
-  Loading,
   Muted,
-  RoundIconButton,
   Small,
 } from '@wireapp/react-ui-kit';
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {FormattedHTMLMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {Redirect} from 'react-router';
@@ -50,9 +44,9 @@ import {AnyAction, Dispatch} from 'redux';
 import useReactRouter from 'use-react-router';
 import {save} from 'Util/ephemeralValueStore';
 import {getLogger} from 'Util/Logger';
-import {isValidEmail, isValidPhoneNumber, isValidUsername} from 'Util/ValidationUtil';
 import {loginStrings, logoutReasonStrings} from '../../strings';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
+import LoginForm from '../component/LoginForm';
 import RouterLink from '../component/RouterLink';
 import {Config} from '../config';
 import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
@@ -62,7 +56,6 @@ import {LabeledError} from '../module/action/LabeledError';
 import {ValidationError} from '../module/action/ValidationError';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
-import * as ClientSelector from '../module/selector/ClientSelector';
 import {QUERY_KEY, ROUTE} from '../route';
 import {isDesktopApp} from '../Runtime';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
@@ -80,27 +73,17 @@ const Login = ({
   doLoginAndJoin,
   doLogin,
   isFetching,
-  doGetAllClients,
-  hasHistory,
 }: Props & ConnectedProps & DispatchProps) => {
   const logger = getLogger('Login');
   const {formatMessage: _} = useIntl();
   const {history} = useReactRouter();
 
-  const emailInput = useRef<HTMLInputElement>();
-  const passwordInput = useRef<HTMLInputElement>();
-
   const [conversationCode, setConversationCode] = useState();
   const [conversationKey, setConversationKey] = useState();
-
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
 
   const [isValidLink, setIsValidLink] = useState(true);
   const [logoutReason, setLogoutReason] = useState();
   const [persist, setPersist] = useState(!Config.FEATURE.DEFAULT_LOGIN_TEMPORARY_CLIENT);
-  const [validEmailInput, setValidEmailInput] = useState(true);
-  const [validPasswordInput, setValidPasswordInput] = useState(true);
   const [validationErrors, setValidationErrors] = useState([]);
 
   useEffect(() => {
@@ -147,43 +130,13 @@ const Login = ({
 
   const forgotPassword = () => URLUtil.openTab(EXTERNAL_ROUTE.WIRE_ACCOUNT_PASSWORD_RESET);
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-    if (isFetching) {
-      return undefined;
-    }
-    emailInput.current.value = emailInput.current.value.trim();
-    const validationErrors: Error[] = [];
-
-    if (!emailInput.current.checkValidity()) {
-      validationErrors.push(
-        ValidationError.handleValidationState(emailInput.current.name, emailInput.current.validity),
-      );
-    }
-    setValidEmailInput(emailInput.current.validity.valid);
-    if (!passwordInput.current.checkValidity()) {
-      validationErrors.push(
-        ValidationError.handleValidationState(passwordInput.current.name, passwordInput.current.validity),
-      );
-    }
-    setValidPasswordInput(passwordInput.current.validity.valid);
-
+  const handleSubmit = async (loginData: Partial<LoginData>, validationErrors: Error[]) => {
     setValidationErrors(validationErrors);
-
     try {
       if (validationErrors.length) {
         throw validationErrors[0];
       }
-      const localEmail = email.trim();
-      const login: LoginData = {clientType: persist ? ClientType.PERMANENT : ClientType.TEMPORARY, password};
-
-      if (isValidEmail(localEmail)) {
-        login.email = localEmail;
-      } else if (isValidUsername(localEmail)) {
-        login.handle = localEmail.replace('@', '');
-      } else if (Config.FEATURE.ENABLE_PHONE_LOGIN && isValidPhoneNumber(localEmail)) {
-        login.phone = localEmail;
-      }
+      const login: LoginData = {...loginData, clientType: persist ? ClientType.PERMANENT : ClientType.TEMPORARY};
 
       const hasKeyAndCode = conversationKey && conversationCode;
       if (hasKeyAndCode) {
@@ -257,58 +210,7 @@ const Login = ({
                 <H1 center>{_(loginStrings.headline)}</H1>
                 <Muted>{_(loginStrings.subhead)}</Muted>
                 <Form style={{marginTop: 30}} data-uie-name="login">
-                  <InputBlock>
-                    <Input
-                      name="email"
-                      tabIndex={1}
-                      onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        setEmail(event.target.value);
-                        setValidEmailInput(true);
-                      }}
-                      ref={emailInput}
-                      markInvalid={!validEmailInput}
-                      value={email}
-                      autoComplete="username email"
-                      placeholder={_(loginStrings.emailPlaceholder)}
-                      maxLength={128}
-                      type="text"
-                      required
-                      data-uie-name="enter-email"
-                    />
-                    <InputSubmitCombo>
-                      <Input
-                        name="password-login"
-                        tabIndex={2}
-                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                          setPassword(event.target.value);
-                          setValidPasswordInput(true);
-                        }}
-                        ref={passwordInput}
-                        markInvalid={!validPasswordInput}
-                        value={password}
-                        autoComplete="section-login password"
-                        type="password"
-                        placeholder={_(loginStrings.passwordPlaceholder)}
-                        pattern={`.{1,1024}`}
-                        required
-                        data-uie-name="enter-password"
-                      />
-                      {isFetching ? (
-                        <Loading size={32} />
-                      ) : (
-                        <RoundIconButton
-                          style={{marginLeft: 16}}
-                          tabIndex={4}
-                          disabled={!email || !password}
-                          type="submit"
-                          formNoValidate
-                          icon={ICON_NAME.ARROW}
-                          onClick={handleSubmit}
-                          data-uie-name="do-sign-in"
-                        />
-                      )}
-                    </InputSubmitCombo>
-                  </InputBlock>
+                  <LoginForm isFetching={isFetching} onSubmit={handleSubmit} />
                   {validationErrors.length ? (
                     parseValidationErrors(validationErrors)
                   ) : loginError ? (
@@ -383,7 +285,6 @@ const Login = ({
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
-  hasHistory: ClientSelector.hasHistory(state),
   isFetching: AuthSelector.isFetching(state),
   loginError: AuthSelector.getError(state),
 });
@@ -393,7 +294,6 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
   bindActionCreators(
     {
       doCheckConversationCode: ROOT_ACTIONS.conversationAction.doCheckConversationCode,
-      doGetAllClients: ROOT_ACTIONS.clientAction.doGetAllClients,
       doInit: ROOT_ACTIONS.authAction.doInit,
       doInitializeClient: ROOT_ACTIONS.clientAction.doInitializeClient,
       doLogin: ROOT_ACTIONS.authAction.doLogin,
