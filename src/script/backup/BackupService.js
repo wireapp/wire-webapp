@@ -19,6 +19,7 @@
 
 import DexieBatch from 'dexie-batch';
 import {StorageSchemata} from '../storage/StorageSchemata';
+import {getLogger} from 'Util/Logger';
 
 export class BackupService {
   static get CONFIG() {
@@ -28,8 +29,8 @@ export class BackupService {
     };
   }
 
-  constructor(storageService, logger) {
-    this.logger = logger;
+  constructor(storageService) {
+    this.logger = getLogger('BackupService');
     this.storageService = storageService;
 
     this.EVENTS_STORE_NAME = StorageSchemata.OBJECT_STORE.EVENTS;

@@ -17,13 +17,12 @@
  *
  */
 
-import {resolve, graph} from '../../api/testResolver';
-import {StorageSchemata} from 'src/script/storage/StorageSchemata';
+import {StorageSchemata, StorageService} from 'src/script/storage/StorageSchemata';
 
 describe('StorageRepository', () => {
   describe('save', () => {
     it('does not save "null" values', () => {
-      const storageService = resolve(graph.StorageService);
+      const storageService = new StorageService();
       return storageService
         .save(StorageSchemata.OBJECT_STORE.AMPLIFY, 'primary_key', null)
         .then(fail)
