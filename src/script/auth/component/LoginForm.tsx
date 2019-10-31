@@ -1,10 +1,10 @@
-import React, {useState, useRef, Dispatch, SetStateAction, RefObject} from 'react';
-import {useIntl} from 'react-intl';
-import {InputBlock, Input, InputSubmitCombo, Loading, RoundIconButton, ICON_NAME} from '@wireapp/react-ui-kit';
 import {LoginData} from '@wireapp/api-client/dist/commonjs/auth';
+import {ICON_NAME, Input, InputBlock, InputSubmitCombo, Loading, RoundIconButton} from '@wireapp/react-ui-kit';
+import React, {Dispatch, SetStateAction, useRef, useState} from 'react';
+import {useIntl} from 'react-intl';
 
-import {ValidationError} from '../module/action/ValidationError';
 import {loginStrings} from '../../strings';
+import {ValidationError} from '../module/action/ValidationError';
 
 interface LoginFormProps {
   setValidationErrors: Dispatch<SetStateAction<Error[]>>;
