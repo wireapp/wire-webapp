@@ -98,6 +98,7 @@ const InitialInvite = ({
       try {
         await invite({email: emailInput.current.value});
         setEnteredEmail('');
+        emailInput.current.value = '';
       } catch (error) {
         if (error.label) {
           switch (error.label) {
@@ -149,7 +150,8 @@ const InitialInvite = ({
                   resetErrors();
                   setEnteredEmail(event.target.value);
                 }}
-                value={enteredEmail}
+                // Note: Curser issues when using controlled input
+                // value={enteredEmail}
                 ref={emailInput}
                 autoFocus
                 data-uie-name="enter-invite-email"
