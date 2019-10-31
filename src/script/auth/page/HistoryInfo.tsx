@@ -17,6 +17,7 @@
  *
  */
 
+import {ClientType} from '@wireapp/api-client/dist/commonjs/client';
 import {Button, ContainerXS, H1, Link, Paragraph} from '@wireapp/react-ui-kit';
 import React from 'react';
 import {FormattedHTMLMessage, useIntl} from 'react-intl';
@@ -27,23 +28,35 @@ import {Config} from '../config';
 import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
 import {RootState} from '../module/reducer';
 import * as ClientSelector from '../module/selector/ClientSelector';
-import * as SelfSelector from '../module/selector/SelfSelector';
 import {ROUTE} from '../route';
-import * as URLUtil from '../util/urlUtil';
 import Page from './Page';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
-const HistoryInfo = ({hasHistory, hasSelfHandle}: Props & ConnectedProps) => {
+const HistoryInfo = ({hasHistory, clients, currentSelfClient, isNewCurrentSelfClient}: Props & ConnectedProps) => {
   const {formatMessage: _} = useIntl();
   const {history} = useReactRouter();
+
   const onContinue = () => {
-    return hasSelfHandle
-      ? window.location.replace(URLUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP))
-      : history.push(ROUTE.CHOOSE_HANDLE);
+    return history.push(ROUTE.CHOOSE_HANDLE);
   };
   const headline = hasHistory ? historyInfoStrings.hasHistoryHeadline : historyInfoStrings.noHistoryHeadline;
   const infoText = hasHistory ? historyInfoStrings.hasHistoryInfo : historyInfoStrings.noHistoryInfo;
+
+  /**
+   * Show history screen when a new client was created and:
+   *   1. database contains at least one event
+   *   2. there is at least one previously registered client
+   *   3. new local client is temporary
+   */
+  const shouldShowHistoryInfo =
+    isNewCurrentSelfClient &&
+    (hasHistory || clients.length > 1 || (currentSelfClient && currentSelfClient.type === ClientType.TEMPORARY));
+
+  if (!shouldShowHistoryInfo) {
+    history.push(ROUTE.CHOOSE_HANDLE);
+    return null;
+  }
 
   return (
     <Page>
@@ -82,8 +95,10 @@ const HistoryInfo = ({hasHistory, hasSelfHandle}: Props & ConnectedProps) => {
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
+  clients: ClientSelector.getClients(state),
+  currentSelfClient: ClientSelector.getCurrentSelfClient(state),
   hasHistory: ClientSelector.hasHistory(state),
-  hasSelfHandle: SelfSelector.hasSelfHandle(state),
+  isNewCurrentSelfClient: ClientSelector.isNewCurrentSelfClient(state),
 });
 
 export default connect(mapStateToProps)(HistoryInfo);

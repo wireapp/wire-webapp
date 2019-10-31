@@ -24,15 +24,12 @@ import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 import useReactRouter from 'use-react-router';
 import {getLogger} from 'Util/Logger';
-import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
-import {BackendError} from '../module/action/BackendError';
 import * as LocalStorageAction from '../module/action/LocalStorageAction';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import * as SelfSelector from '../module/selector/SelfSelector';
 import {ROUTE} from '../route';
-import {pathWithParams} from '../util/urlUtil';
 import ClientItem from './ClientItem';
 
 const logger = getLogger('ClientList');
@@ -65,13 +62,9 @@ const ClientList = ({
       await doRemoveClient(clientId, password);
       const persist = getLocalStorage(LocalStorageAction.LocalStorageKey.AUTH.PERSIST);
       await doInitializeClient(persist ? ClientType.PERMANENT : ClientType.TEMPORARY, password);
-      return window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP));
+      return history.push(ROUTE.HISTORY_INFO);
     } catch (error) {
-      if (error.label === BackendError.LABEL.NEW_CLIENT) {
-        history.push(ROUTE.HISTORY_INFO);
-      } else {
-        logger.error(error);
-      }
+      logger.error(error);
     } finally {
       setShowLoading(false);
     }
