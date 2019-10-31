@@ -17,20 +17,25 @@
  *
  */
 
-import {ClientActionCreator} from './creator/';
-import {actionRoot as ROOT_ACTIONS} from './';
-import {mockStore} from '../../util/TestUtil';
+import {ClientType, RegisteredClient} from '@wireapp/api-client/dist/commonjs/client';
+import {AnyAction} from 'redux';
+import {actionRoot as ROOT_ACTIONS} from '.';
+import {mockStoreFactory} from '../../util/test/mockStoreFactory';
 import {BackendError} from './BackendError';
-import {ClientType} from '@wireapp/api-client/dist/commonjs/client';
+import {ClientActionCreator} from './creator';
 
-function printActions(actions) {
-  console.log(JSON.stringify(actions, null, 2)); // eslint-disable-line no-console
+function printActions(actions: AnyAction[]): void {
+  // tslint:disable-next-line:no-console
+  console.log(JSON.stringify(actions, null, 2));
 }
 
 describe('ClientAction', () => {
   describe('Permanent device', () => {
     it('doesn`t create NewClientError when it is the first', () => {
-      const creationStatus = {isNewClient: true};
+      const creationStatus: {isNewClient: boolean; localClient: RegisteredClient} = {
+        isNewClient: true,
+        localClient: undefined,
+      };
       const mockedActions = {
         clientAction: {
           doGetAllClients: () => () => Promise.resolve([]),
@@ -42,16 +47,13 @@ describe('ClientAction', () => {
         initClient: () => Promise.resolve(creationStatus),
       };
 
-      const store = mockStore(
-        {
-          selfState: {},
-        },
-        {
-          actions: mockedActions,
-          apiClient: mockedApiClient,
-          core: mockedCore,
-        },
-      );
+      const store = mockStoreFactory({
+        actions: mockedActions,
+        apiClient: mockedApiClient,
+        core: mockedCore,
+      })({
+        selfState: {},
+      });
       return store.dispatch(ROOT_ACTIONS.clientAction.doInitializeClient(ClientType.PERMANENT)).then(() => {
         printActions(store.getActions());
 
@@ -63,7 +65,10 @@ describe('ClientAction', () => {
     });
 
     it('does create NewClientError when it is the second', () => {
-      const creationStatus = {isNewClient: true};
+      const creationStatus: {isNewClient: boolean; localClient: RegisteredClient} = {
+        isNewClient: true,
+        localClient: undefined,
+      };
       const mockedActions = {
         clientAction: {
           doGetAllClients: () => () => Promise.resolve([{id: ''}]),
@@ -78,16 +83,13 @@ describe('ClientAction', () => {
         initClient: () => Promise.resolve(creationStatus),
       };
 
-      const store = mockStore(
-        {
-          selfState: {},
-        },
-        {
-          actions: mockedActions,
-          apiClient: mockedApiClient,
-          core: mockedCore,
-        },
-      );
+      const store = mockStoreFactory({
+        actions: mockedActions,
+        apiClient: mockedApiClient,
+        core: mockedCore,
+      })({
+        selfState: {},
+      });
       return store.dispatch(ROOT_ACTIONS.clientAction.doInitializeClient(ClientType.PERMANENT)).catch(expectedError => {
         printActions(store.getActions());
 
@@ -103,7 +105,10 @@ describe('ClientAction', () => {
 
   describe('Temporary device', () => {
     it('does create NewClientError when it is the first', () => {
-      const creationStatus = {isNewClient: true};
+      const creationStatus: {isNewClient: boolean; localClient: RegisteredClient} = {
+        isNewClient: true,
+        localClient: undefined,
+      };
       const mockedActions = {
         clientAction: {
           doGetAllClients: () => () => Promise.resolve([]),
@@ -118,16 +123,13 @@ describe('ClientAction', () => {
         initClient: () => Promise.resolve(creationStatus),
       };
 
-      const store = mockStore(
-        {
-          selfState: {},
-        },
-        {
-          actions: mockedActions,
-          apiClient: mockedApiClient,
-          core: mockedCore,
-        },
-      );
+      const store = mockStoreFactory({
+        actions: mockedActions,
+        apiClient: mockedApiClient,
+        core: mockedCore,
+      })({
+        selfState: {},
+      });
       return store.dispatch(ROOT_ACTIONS.clientAction.doInitializeClient(ClientType.TEMPORARY)).catch(expectedError => {
         printActions(store.getActions());
 
@@ -141,7 +143,10 @@ describe('ClientAction', () => {
     });
 
     it('does create NewClientError when it is the second', () => {
-      const creationStatus = {isNewClient: true};
+      const creationStatus: {isNewClient: boolean; localClient: RegisteredClient} = {
+        isNewClient: true,
+        localClient: undefined,
+      };
       const mockedActions = {
         clientAction: {
           doGetAllClients: () => () => Promise.resolve([{id: ''}]),
@@ -156,16 +161,13 @@ describe('ClientAction', () => {
         initClient: () => Promise.resolve(creationStatus),
       };
 
-      const store = mockStore(
-        {
-          selfState: {},
-        },
-        {
-          actions: mockedActions,
-          apiClient: mockedApiClient,
-          core: mockedCore,
-        },
-      );
+      const store = mockStoreFactory({
+        actions: mockedActions,
+        apiClient: mockedApiClient,
+        core: mockedCore,
+      })({
+        selfState: {},
+      });
       return store.dispatch(ROOT_ACTIONS.clientAction.doInitializeClient(ClientType.TEMPORARY)).catch(expectedError => {
         printActions(store.getActions());
 

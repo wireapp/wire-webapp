@@ -17,31 +17,18 @@
  *
  */
 
+import {ReactWrapper} from 'enzyme';
 import React from 'react';
-import {mockStore, mountComponent} from '../util/TestUtil';
+import {Config as ReadOnlyConfig} from '../config';
+import {initialRootState} from '../module/reducer';
+import {mockStoreFactory} from '../util/test/mockStoreFactory';
+import {mountComponent} from '../util/test/TestUtil';
 import Login from './Login';
-import {Config} from '../config';
+
+const Config = ReadOnlyConfig as any;
 
 describe('"Login"', () => {
-  let wrapper;
-  const initialState = {
-    authState: {
-      account: {},
-    },
-    clientState: {
-      hasHistory: false,
-    },
-    cookieState: {},
-    languageState: {
-      language: 'en',
-    },
-    runtimeState: {
-      hasCookieSupport: true,
-      hasIndexedDbSupport: true,
-      isSupportedBrowser: true,
-    },
-    selfState: {},
-  };
+  let wrapper: ReactWrapper;
 
   beforeAll(() => {
     Config.FEATURE = {
@@ -58,7 +45,17 @@ describe('"Login"', () => {
   const loginButton = () => wrapper.find('[data-uie-name="do-sign-in"]').first();
 
   it('has disabled submit button as long as one input is empty', () => {
-    wrapper = mountComponent(<Login />, mockStore(initialState));
+    wrapper = mountComponent(
+      <Login />,
+      mockStoreFactory()({
+        ...initialRootState,
+        runtimeState: {
+          hasCookieSupport: true,
+          hasIndexedDbSupport: true,
+          isSupportedBrowser: true,
+        },
+      }),
+    );
 
     expect(emailInput().exists()).toBe(true);
     expect(passwordInput().exists()).toBe(true);
@@ -84,7 +81,17 @@ describe('"Login"', () => {
 
     it('hides the back button', () => {
       Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION = false;
-      wrapper = mountComponent(<Login />, mockStore(initialState));
+      wrapper = mountComponent(
+        <Login />,
+        mockStoreFactory()({
+          ...initialRootState,
+          runtimeState: {
+            hasCookieSupport: true,
+            hasIndexedDbSupport: true,
+            isSupportedBrowser: true,
+          },
+        }),
+      );
       Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION = true;
 
       expect(backButton().exists()).toBe(false);
@@ -94,7 +101,17 @@ describe('"Login"', () => {
   describe('with account registration enabled', () => {
     it('shows the back button', () => {
       Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION = true;
-      wrapper = mountComponent(<Login />, mockStore(initialState));
+      wrapper = mountComponent(
+        <Login />,
+        mockStoreFactory()({
+          ...initialRootState,
+          runtimeState: {
+            hasCookieSupport: true,
+            hasIndexedDbSupport: true,
+            isSupportedBrowser: true,
+          },
+        }),
+      );
 
       expect(backButton().exists()).toBe(true);
     });

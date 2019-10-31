@@ -28,7 +28,7 @@ export interface ClientState {
   isNewClient: boolean;
 }
 
-const initialState: ClientState = {
+export const initialState: ClientState = {
   clients: [],
   error: null,
   fetching: false,

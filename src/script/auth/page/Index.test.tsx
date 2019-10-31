@@ -17,26 +17,18 @@
  *
  */
 
+import {ReactWrapper} from 'enzyme';
 import React from 'react';
-import {mockStore, mountComponent} from '../util/TestUtil';
+import {Config as ReadOnlyConfig} from '../config';
+import {initialRootState} from '../module/reducer';
+import {mockStoreFactory} from '../util/test/mockStoreFactory';
+import {mountComponent} from '../util/test/TestUtil';
 import Index from './Index';
-import {Config} from '../config';
+
+const Config = ReadOnlyConfig as any;
 
 describe('when visiting the index page', () => {
-  let wrapper;
-  const initialState = {
-    authState: {
-      account: {},
-    },
-    languageState: {
-      language: 'en',
-    },
-    runtimeState: {
-      hasCookieSupport: true,
-      hasIndexedDbSupport: true,
-      isSupportedBrowser: true,
-    },
-  };
+  let wrapper: ReactWrapper;
 
   describe('and the account registration is disabled', () => {
     beforeAll(() => {
@@ -48,7 +40,17 @@ describe('when visiting the index page', () => {
     afterAll(() => (Config.FEATURE = {}));
 
     it('redirects to the login page', () => {
-      wrapper = mountComponent(<Index />, mockStore(initialState));
+      wrapper = mountComponent(
+        <Index />,
+        mockStoreFactory()({
+          ...initialRootState,
+          runtimeState: {
+            hasCookieSupport: true,
+            hasIndexedDbSupport: true,
+            isSupportedBrowser: true,
+          },
+        }),
+      );
 
       expect(wrapper.find('[data-uie-name="redirect-login"]').exists()).toBe(true);
     });
@@ -64,25 +66,65 @@ describe('when visiting the index page', () => {
     afterAll(() => (Config.FEATURE = {}));
 
     it('shows the Wire logo', () => {
-      wrapper = mountComponent(<Index />, mockStore(initialState));
+      wrapper = mountComponent(
+        <Index />,
+        mockStoreFactory()({
+          ...initialRootState,
+          runtimeState: {
+            hasCookieSupport: true,
+            hasIndexedDbSupport: true,
+            isSupportedBrowser: true,
+          },
+        }),
+      );
 
       expect(wrapper.find('[data-uie-name="ui-wire-logo"]').exists()).toBe(true);
     });
 
     it('shows an option to create a private account', () => {
-      wrapper = mountComponent(<Index />, mockStore(initialState));
+      wrapper = mountComponent(
+        <Index />,
+        mockStoreFactory()({
+          ...initialRootState,
+          runtimeState: {
+            hasCookieSupport: true,
+            hasIndexedDbSupport: true,
+            isSupportedBrowser: true,
+          },
+        }),
+      );
 
       expect(wrapper.find('[data-uie-name="go-register-personal"]').exists()).toBe(true);
     });
 
     it('shows an option to create a team', () => {
-      wrapper = mountComponent(<Index />, mockStore(initialState));
+      wrapper = mountComponent(
+        <Index />,
+        mockStoreFactory()({
+          ...initialRootState,
+          runtimeState: {
+            hasCookieSupport: true,
+            hasIndexedDbSupport: true,
+            isSupportedBrowser: true,
+          },
+        }),
+      );
 
       expect(wrapper.find('[data-uie-name="go-register-team"]').exists()).toBe(true);
     });
 
     it('shows an option to login', () => {
-      wrapper = mountComponent(<Index />, mockStore(initialState));
+      wrapper = mountComponent(
+        <Index />,
+        mockStoreFactory()({
+          ...initialRootState,
+          runtimeState: {
+            hasCookieSupport: true,
+            hasIndexedDbSupport: true,
+            isSupportedBrowser: true,
+          },
+        }),
+      );
 
       expect(wrapper.find('[data-uie-name="go-login"]').exists()).toBe(true);
     });
