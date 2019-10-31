@@ -17,10 +17,12 @@
  *
  */
 
-import {ClientType} from '@wireapp/api-client/dist/commonjs/client/index';
+import {ClientType, RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
 import {RootState} from '../reducer';
 
 export const getClients = (state: RootState) => state.clientState.clients || [];
+export const getCurrentSelfClient = (state: RootState): RegisteredClient => state.clientState.currentClient;
+export const isNewCurrentSelfClient = (state: RootState): boolean => state.clientState.isNewClient;
 export const getPermanentClients = (state: RootState) =>
   getClients(state).filter(client => client.type === ClientType.PERMANENT) || [];
 export const getTemporaryClients = (state: RootState) =>

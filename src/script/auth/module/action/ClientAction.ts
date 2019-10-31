@@ -22,8 +22,6 @@ import {ClientInfo} from '@wireapp/core/dist/client/';
 import * as Runtime from '../../Runtime';
 import * as StringUtil from '../../util/stringUtil';
 import {ThunkAction} from '../reducer';
-import * as SelfSelector from '../selector/SelfSelector';
-import {BackendError} from './BackendError';
 import {ClientActionCreator} from './creator/';
 
 export class ClientAction {
@@ -59,33 +57,13 @@ export class ClientAction {
   };
 
   doInitializeClient = (clientType: ClientType, password?: string): ThunkAction => {
-    return (dispatch, getState, {core, actions: {clientAction, notificationAction}}) => {
+    return (dispatch, getState, {core, actions: {clientAction}}) => {
       dispatch(ClientActionCreator.startInitializeClient());
-      const isTemporaryClient = clientType === ClientType.TEMPORARY;
-      const isTemporaryGuest = SelfSelector.isTemporaryGuest(getState());
-      const checkIfFirstClient = !isTemporaryClient || isTemporaryGuest;
-      let isFirstClient = false;
       return Promise.resolve()
         .then(() => dispatch(clientAction.doGetAllClients()))
-        .then(clients => (isFirstClient = checkIfFirstClient && (!clients || !clients.length)))
         .then(() => core.initClient({clientType, password}, clientAction.generateClientPayload(clientType)))
-        .then(creationStatus =>
-          Promise.resolve()
-            .then(() => dispatch(ClientActionCreator.successfulInitializeClient(creationStatus)))
-            .then(() => creationStatus),
-        )
         .then(creationStatus => {
-          const isNewSubsequentClient = !isFirstClient && creationStatus.isNewClient;
-          if (isNewSubsequentClient) {
-            return dispatch(notificationAction.checkHistory()).then(() => {
-              throw new BackendError({
-                code: 201,
-                label: BackendError.LABEL.NEW_CLIENT,
-                message: 'New client is created.',
-              });
-            });
-          }
-          return undefined;
+          dispatch(ClientActionCreator.successfulInitializeClient(creationStatus));
         })
         .catch(error => {
           dispatch(ClientActionCreator.failedInitializeClient(error));
