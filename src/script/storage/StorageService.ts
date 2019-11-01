@@ -17,15 +17,15 @@
  *
  */
 
-import {CRUDEngine, MemoryEngine, error as StoreEngineError} from '@wireapp/store-engine';
+import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
 import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
+
+import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
+import {MemoryStore} from '@wireapp/store-engine/dist/commonjs/engine';
 import Dexie from 'dexie';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {loadValue, storeValue} from 'Util/StorageUtil';
-
-import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
-import {MemoryStore} from '@wireapp/store-engine/dist/commonjs/engine';
 import {isTemporaryClientAndNonPersistent} from 'Util/util';
 import {Config} from '../auth/config';
 import {ClientType} from '../client/ClientType';
@@ -60,7 +60,7 @@ export class StorageService {
   private userId?: string;
   public dbName?: string;
 
-  constructor() {
+  constructor(encryptedEngine?: CRUDEngine) {
     this.logger = getLogger('StorageService');
 
     this.dbName = undefined;
@@ -68,7 +68,7 @@ export class StorageService {
 
     this.isTemporaryAndNonPersistent = isTemporaryClientAndNonPersistent();
 
-    this.engine = this.isTemporaryAndNonPersistent ? new MemoryEngine() : new IndexedDBEngine();
+    this.engine = encryptedEngine || new IndexedDBEngine();
     this.hasHookSupport = this.engine instanceof IndexedDBEngine;
 
     this.dbListeners = [];

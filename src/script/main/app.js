@@ -105,6 +105,7 @@ import {AudioRepository} from '../audio/AudioRepository';
 import {MessageSender} from '../message/MessageSender';
 import {StorageService} from '../storage';
 import {BackupService} from '../backup/BackupService';
+import {getEphemeralValue} from 'Util/ephemeralValueStore';
 
 class App {
   static get CONFIG() {
@@ -128,15 +129,16 @@ class App {
    * Construct a new app.
    * @param {BackendClient} backendClient - Configured backend client
    * @param {Element} appContainer - DOM element that will hold the app
+   * @param {SQLeetEngine} [encryptedEngine] - Encrypted database handler
    */
-  constructor(backendClient, appContainer) {
+  constructor(backendClient, appContainer, encryptedEngine) {
     this.backendClient = backendClient;
     this.logger = getLogger('App');
     this.appContainer = appContainer;
 
     new WindowHandler();
 
-    this.service = this._setupServices();
+    this.service = this._setupServices(encryptedEngine);
     this.repository = this._setupRepositories();
     if (Config.FEATURE.ENABLE_DEBUG) {
       import('Util/DebugUtil').then(({DebugUtil}) => {
@@ -271,10 +273,11 @@ class App {
 
   /**
    * Create all app services.
+   * @param {SQLeetEngine} [encryptedEngine] - Encrypted database handler
    * @returns {Object} All services
    */
-  _setupServices() {
-    const storageService = new StorageService();
+  _setupServices(encryptedEngine) {
+    const storageService = new StorageService(encryptedEngine);
     const eventService = Environment.browser.edge
       ? new EventServiceNoCompound(storageService)
       : new EventService(storageService);
@@ -909,7 +912,7 @@ class App {
 // Setting up the App
 //##############################################################################
 
-$(() => {
+$(async () => {
   enableLogging(Config.FEATURE.ENABLE_DEBUG);
   const appContainer = document.getElementById('wire-main');
   if (appContainer) {
@@ -918,7 +921,13 @@ $(() => {
       restUrl: Config.BACKEND_REST,
       webSocketUrl: Config.BACKEND_WS,
     });
-    wire.app = new App(backendClient, appContainer);
+    if (isTemporaryClientAndNonPersistent()) {
+      const encryptionKey = await getEphemeralValue();
+      const engine = StorageService.initEncryptedDatabase(encryptionKey);
+      wire.app = new App(backendClient, appContainer, engine);
+    } else {
+      wire.app = new App(backendClient, appContainer);
+    }
   }
 });
 
