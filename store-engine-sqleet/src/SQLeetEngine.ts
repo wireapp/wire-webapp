@@ -25,7 +25,7 @@ import {
   RESERVED_COLUMN,
   SQLeetEnginePrimaryKeyName,
   SQLiteDatabaseDefinition,
-  SQLiteDatabaseSingleColumnDefinition,
+  SQLiteProvidedSchema,
   SQLiteTableDefinition,
   SQLiteType,
   createTableIfNotExists,
@@ -42,20 +42,18 @@ declare const WebAssembly: any;
 export class SQLeetEngine implements CRUDEngine {
   private autoIncrementedPrimaryKey: number = 1;
   private readonly db: websql.Database;
-  private readonly schema: SQLiteDatabaseDefinition<Record<string, any>> = {};
+  private readonly schema: SQLiteDatabaseDefinition<string> = {};
   public storeName = '';
 
   constructor(
     private readonly workerLocation: string,
-    providedSchema: SQLiteDatabaseSingleColumnDefinition | SQLiteDatabaseDefinition<Record<string, any>>,
+    providedSchema: SQLiteProvidedSchema<string>,
     private readonly encryptionKey: string,
     private readonly nodeDatabaseDir?: string,
   ) {
     // Map single column to SQL entity
-    for (const tableName in providedSchema) {
-      const entity = providedSchema[tableName];
+    for (const [tableName, entity] of Object.entries(providedSchema)) {
       const isSingleColumnTable = typeof entity === 'string';
-      // tslint:disable-next-line: no-object-literal-type-assertion
       this.schema[tableName] = isSingleColumnTable
         ? {[RESERVED_COLUMN]: entity as SQLiteType}
         : (entity as SQLiteTableDefinition<string>);

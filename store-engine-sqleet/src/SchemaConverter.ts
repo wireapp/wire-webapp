@@ -20,7 +20,7 @@
 const uint32 = require('uint32');
 
 export const SQLeetEnginePrimaryKeyName: string = '`key`';
-export const RESERVED_COLUMN = '__single_column_value';
+export const RESERVED_COLUMN: string = '__single_column_value';
 
 export enum SQLiteType {
   BOOLEAN = 'boolean',
@@ -33,17 +33,19 @@ export enum SQLiteType {
   TEXT = 'text',
 }
 
-export type SQLiteTableDefinition<T> = Partial<Record<keyof T, SQLiteType>>;
-export type SQLiteTableSingleColumnDefinition = Record<string, SQLiteType>;
-
-export type SQLiteDatabaseDefinition<T> = Record<string, SQLiteTableDefinition<T>>;
-export type SQLiteDatabaseSingleColumnDefinition = Record<string, SQLiteType>;
+export type SQLiteTableDefinition<T extends string | number | symbol> = Record<T, SQLiteType>;
+export type SQLiteDatabaseDefinition<T extends string | number | symbol> = Record<T, SQLiteTableDefinition<T>>;
+export type SQLiteTableSingleColumnDefinition<T extends string | number | symbol> = Record<T, SQLiteType>;
+export type SQLiteProvidedSchema<T extends string | number | symbol> = Record<T, SQLiteType | SQLiteTableDefinition<T>>;
 
 export const escape = (value: string, delimiter: string = '`') => {
   return `${delimiter}${value.replace(new RegExp(delimiter, 'g'), `\\${delimiter}`)}${delimiter}`;
 };
 
-export function createTableIfNotExists<T>(tableName: string, columns: SQLiteTableDefinition<T>): string {
+export function createTableIfNotExists<T extends string | number | symbol>(
+  tableName: string,
+  columns: SQLiteTableDefinition<T>,
+): string {
   const statements = ['`key` varchar(255) PRIMARY KEY'].concat(
     Object.entries(columns).map(([key, type]) => `${escape(key)} ${type}`),
   );
@@ -51,7 +53,7 @@ export function createTableIfNotExists<T>(tableName: string, columns: SQLiteTabl
 }
 
 export function getFormattedColumnsFromTableName(
-  tableNameColumns: Partial<Record<string, SQLiteType>>,
+  tableNameColumns: SQLiteTableDefinition<string>,
   withKey: boolean = false,
 ): string {
   return `${withKey ? `${SQLeetEnginePrimaryKeyName},` : ''}${Object.keys(tableNameColumns)
@@ -70,7 +72,7 @@ export function getFormattedColumnsFromColumns(
 
 export function getProtectedColumnReferences(columns: Record<string, string>): string {
   return Object.keys(columns)
-    .map((reference: string) => `${escape(columns[reference])}=${reference}`)
+    .map(reference => `${escape(columns[reference])}=${reference}`)
     .join(',');
 }
 
