@@ -17,7 +17,7 @@
  *
  */
 
-import {error as StoreEngineError, MemoryEngine} from '@wireapp/store-engine';
+import {error as StoreEngineError} from '@wireapp/store-engine';
 import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 import {Cryptobox, version as cryptoboxVersion} from '@wireapp/cryptobox';
 import {errors as ProteusErrors} from '@wireapp/proteus';
@@ -33,6 +33,8 @@ import {EventName} from '../tracking/EventName';
 import {ClientEntity} from '../client/ClientEntity';
 
 import {BackendClientError} from '../error/BackendClientError';
+import {getEphemeralValue} from 'Util/ephemeralValueStore';
+import {StorageService} from '../storage/StorageService';
 
 export class CryptographyRepository {
   static get CONFIG() {
@@ -107,8 +109,9 @@ export class CryptographyRepository {
     let storeEngine;
 
     if (isTemporaryClientAndNonPersistent()) {
-      this.logger.info(`Initializing Cryptobox with in-memory database '${databaseName}'...`);
-      storeEngine = new MemoryEngine();
+      this.logger.info(`Initializing Cryptobox with encrypted database '${databaseName}'...`);
+      const encryptionKey = await getEphemeralValue();
+      storeEngine = await StorageService.initEncryptedDatabase(encryptionKey);
       await storeEngine.initWithObject(databaseName, database);
     } else {
       this.logger.info(`Initializing Cryptobox with database '${databaseName}'...`);
