@@ -25,7 +25,11 @@ function keepAlive() {
 (global => {
   let storeValue = undefined;
   const actions = {
-    get: () => storeValue,
+    get: () => {
+      const cachedValue = storeValue;
+      storeValue = undefined;
+      return cachedValue;
+    },
     save: value => {
       storeValue = value;
     },

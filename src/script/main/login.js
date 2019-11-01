@@ -22,7 +22,6 @@ $(async () => {
     if (isTemporaryClientAndNonPersistent()) {
       const encryptionKey = await getEphemeralValue();
       const engine = StorageService.initEncryptedDatabase(encryptionKey);
-      // TODO: Delete "encryptionKey" after successfully creating a database
       new AuthViewModel(backendClient, engine);
     } else {
       new AuthViewModel(backendClient);
