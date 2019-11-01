@@ -47,6 +47,7 @@ import {getLogger} from 'Util/Logger';
 import {loginStrings, logoutReasonStrings} from '../../strings';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import LoginForm from '../component/LoginForm';
+import PhoneLoginForm from '../component/PhoneLoginForm';
 import RouterLink from '../component/RouterLink';
 import {Config} from '../config';
 import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
@@ -85,6 +86,8 @@ const Login = ({
   const [logoutReason, setLogoutReason] = useState();
   const [persist, setPersist] = useState(!Config.FEATURE.DEFAULT_LOGIN_TEMPORARY_CLIENT);
   const [validationErrors, setValidationErrors] = useState([]);
+
+  const [showPhoneLogin, setShowPhoneLogin] = useState(false);
 
   useEffect(() => {
     const queryLogoutReason = URLUtil.getURLParameter(QUERY_KEY.LOGOUT_REASON) || null;
@@ -210,7 +213,11 @@ const Login = ({
                 <H1 center>{_(loginStrings.headline)}</H1>
                 <Muted>{_(loginStrings.subhead)}</Muted>
                 <Form style={{marginTop: 30}} data-uie-name="login">
-                  <LoginForm isFetching={isFetching} onSubmit={handleSubmit} />
+                  {showPhoneLogin ? (
+                    <PhoneLoginForm isFetching={isFetching} onSubmit={handleSubmit} />
+                  ) : (
+                    <LoginForm isFetching={isFetching} onSubmit={handleSubmit} />
+                  )}
                   {validationErrors.length ? (
                     parseValidationErrors(validationErrors)
                   ) : loginError ? (
@@ -248,10 +255,7 @@ const Login = ({
                     </Column>
                     {Config.FEATURE.ENABLE_PHONE_LOGIN && (
                       <Column>
-                        <Link
-                          href={URLUtil.pathWithParams(EXTERNAL_ROUTE.PHONE_LOGIN)}
-                          data-uie-name="go-sign-in-phone"
-                        >
+                        <Link onClick={() => setShowPhoneLogin(showing => !showing)} data-uie-name="go-sign-in-phone">
                           {_(loginStrings.phoneLogin)}
                         </Link>
                       </Column>
@@ -267,7 +271,7 @@ const Login = ({
                   </Column>
                   {Config.FEATURE.ENABLE_PHONE_LOGIN && (
                     <Column>
-                      <Link href={URLUtil.pathWithParams(EXTERNAL_ROUTE.PHONE_LOGIN)} data-uie-name="go-sign-in-phone">
+                      <Link onClick={() => setShowPhoneLogin(showing => !showing)} data-uie-name="go-sign-in-phone">
                         {_(loginStrings.phoneLogin)}
                       </Link>
                     </Column>
