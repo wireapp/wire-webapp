@@ -36,8 +36,7 @@ export async function saveRandomEncryptionKey(): Promise<string> {
   const secretKey = new Uint32Array(64);
   window.crypto.getRandomValues(secretKey);
   const hexKey: string[] = [];
-  for (var i = 0; i < secretKey.length; i++) {
-    const x = secretKey[i];
+  for (const x of secretKey) {
     hexKey.push(`00${x.toString(16)}`.slice(-2));
   }
   const encryptionKey = hexKey.join('');
