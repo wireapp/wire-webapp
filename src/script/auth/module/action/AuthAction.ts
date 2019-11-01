@@ -20,13 +20,11 @@
 import {LoginData, RegisterData} from '@wireapp/api-client/dist/commonjs/auth';
 import {ClientType} from '@wireapp/api-client/dist/commonjs/client/index';
 import {Account} from '@wireapp/core';
-import {LowDiskSpaceError} from '@wireapp/store-engine/dist/commonjs/engine/error/';
-import {getEphemeralValue, saveRandomEncryptionKey} from 'Util/ephemeralValueStore';
-
-import {isTemporaryClientAndNonPersistent, noop} from 'Util/util';
-
 import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
+import {LowDiskSpaceError} from '@wireapp/store-engine/dist/commonjs/engine/error/';
 import {StorageService} from 'src/script/storage';
+import {getEphemeralValue, saveRandomEncryptionKey} from 'Util/ephemeralValueStore';
+import {isTemporaryClientAndNonPersistent, noop} from 'Util/util';
 import {currentCurrency, currentLanguage} from '../../localeConfig';
 import {Api, RootState, ThunkAction, ThunkDispatch} from '../reducer';
 import {RegistrationDataState} from '../reducer/authReducer';
@@ -100,6 +98,25 @@ export class AuthAction {
     };
   };
 
+  /**
+   * Temporary solution to be used ONLY with non-persistent temporary clients. It's a workaround to switch between
+   * Dexie (IndexedDB) and SQLeetEngine (encrypted IndexedDB). When we fully use SQLeetEngine we can move this
+   * configuration to `configureClient`.
+   */
+  private async initEncryptedDatabase(): Promise<SQLeetEngine> {
+    const existingKey: string = await getEphemeralValue();
+    const encryptionKey = existingKey || (await saveRandomEncryptionKey());
+    return StorageService.initEncryptedDatabase(encryptionKey);
+  }
+
+  doFlushDatabase = (): ThunkAction => {
+    return async (dispatch, getState, {apiClient}) => {
+      if (apiClient.config.store instanceof SQLeetEngine) {
+        apiClient.config.store.save();
+      }
+    };
+  };
+
   doFinalizeSSOLogin = ({clientType}: {clientType: ClientType}): ThunkAction => {
     return (
       dispatch,
@@ -147,17 +164,6 @@ export class AuthAction {
       });
     };
   };
-
-  /**
-   * Temporary solution to be used ONLY with non-persistent temporary clients. It's a workaround to switch between
-   * Dexie (IndexedDB) and SQLeetEngine (encrypted IndexedDB). When we fully use SQLeetEngine we can move this
-   * configuration to `configureClient`.
-   */
-  private async initEncryptedDatabase(): Promise<SQLeetEngine> {
-    const existingKey: string = await getEphemeralValue();
-    const encryptionKey = existingKey || (await saveRandomEncryptionKey());
-    return StorageService.initEncryptedDatabase(encryptionKey);
-  }
 
   persistAuthData = (
     clientType: ClientType,
