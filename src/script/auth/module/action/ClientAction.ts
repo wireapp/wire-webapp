@@ -57,18 +57,19 @@ export class ClientAction {
   };
 
   doInitializeClient = (clientType: ClientType, password?: string): ThunkAction => {
-    return (dispatch, getState, {core, actions: {clientAction}}) => {
+    return async (dispatch, getState, {core, actions: {clientAction}}) => {
       dispatch(ClientActionCreator.startInitializeClient());
-      return Promise.resolve()
-        .then(() => dispatch(clientAction.doGetAllClients()))
-        .then(() => core.initClient({clientType, password}, clientAction.generateClientPayload(clientType)))
-        .then(creationStatus => {
-          dispatch(ClientActionCreator.successfulInitializeClient(creationStatus));
-        })
-        .catch(error => {
-          dispatch(ClientActionCreator.failedInitializeClient(error));
-          throw error;
-        });
+      try {
+        const creationStatus = await core.initClient(
+          {clientType, password},
+          clientAction.generateClientPayload(clientType),
+        );
+        await dispatch(clientAction.doGetAllClients());
+        dispatch(ClientActionCreator.successfulInitializeClient(creationStatus));
+      } catch (error) {
+        dispatch(ClientActionCreator.failedInitializeClient(error));
+        throw error;
+      }
     };
   };
 
