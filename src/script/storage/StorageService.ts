@@ -24,10 +24,12 @@ import Dexie from 'dexie';
 import {Logger, getLogger} from 'Util/Logger';
 import {loadValue, storeValue} from 'Util/StorageUtil';
 
+import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
 import {MemoryStore} from '@wireapp/store-engine/dist/commonjs/engine';
 import {isTemporaryClientAndNonPersistent} from 'Util/util';
 import {Config} from '../auth/config';
 import {ClientType} from '../client/ClientType';
+import {SQLeetSchemata} from './SQLeetSchemata';
 import {StorageKey} from './StorageKey';
 import {StorageSchemata} from './StorageSchemata';
 
@@ -95,8 +97,8 @@ export class StorageService {
 
     try {
       if (this.isTemporaryAndNonPersistent) {
-        await this.moveDexieToMemory();
-        this.logger.info(`Storage Service initialized with in-memory database '${this.dbName}'`);
+        this.logger.info(`Storage Service initialized with encrypted database '${this.dbName}'`);
+        await this.engine.init(this.dbName);
       } else {
         try {
           await this.engine.initWithDb(this.db, requestPersistentStorage);
@@ -115,24 +117,12 @@ export class StorageService {
     }
   }
 
-  private async moveDexieToMemory(): Promise<void> {
-    const objectDb: MemoryStore = {};
-
-    for (const table of this.db.tables as Dexie.Table<Record<string, any>, string>[]) {
-      const keys = await table.toCollection().keys();
-      objectDb[table.name] = {};
-      for (const key of keys.map(key => key.toString())) {
-        objectDb[table.name][key] = await table.get(key);
-      }
-    }
-
-    await this.engine.initWithObject(this.dbName, objectDb);
-    this.objectDb = objectDb;
-
-    await this.db.delete();
-    await this.db.close();
-
-    this.db = undefined;
+  static initEncryptedDatabase(encryptionKey: string): SQLeetEngine {
+    return new SQLeetEngine(
+      '/worker/sqleet-worker.js',
+      SQLeetSchemata.SCHEMATA[SQLeetSchemata.SCHEMATA.length - 1].schema,
+      encryptionKey,
+    );
   }
 
   _initCrudHooks(): void {

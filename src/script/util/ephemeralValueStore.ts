@@ -27,9 +27,22 @@ import {Config} from '../auth/config';
  */
 let worker: ServiceWorker;
 
-export async function get(): Promise<any> {
+export async function getEphemeralValue(): Promise<any> {
   const worker = await getWorker();
   return sendMessage(worker, {action: 'get'});
+}
+
+export async function saveRandomEncryptionKey(): Promise<string> {
+  const secretKey = new Uint32Array(64);
+  window.crypto.getRandomValues(secretKey);
+  const hexKey: string[] = [];
+  for (var i = 0; i < secretKey.length; i++) {
+    const x = secretKey[i];
+    hexKey.push(`00${x.toString(16)}`.slice(-2));
+  }
+  const encryptionKey = hexKey.join('');
+  await save<string>(encryptionKey);
+  return encryptionKey;
 }
 
 export async function save<T>(value: T): Promise<T> {

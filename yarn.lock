@@ -270,7 +270,7 @@
     "@babel/helper-plugin-utils" "^7.0.0"
     "@babel/plugin-syntax-json-strings" "^7.2.0"
 
-"@babel/plugin-proposal-object-rest-spread@^7.6.2":
+"@babel/plugin-proposal-object-rest-spread@7.6.2", "@babel/plugin-proposal-object-rest-spread@^7.6.2":
   version "7.6.2"
   resolved "https://registry.yarnpkg.com/@babel/plugin-proposal-object-rest-spread/-/plugin-proposal-object-rest-spread-7.6.2.tgz#8ffccc8f3a6545e9f78988b6bf4fe881b88e8096"
   integrity sha512-LDBXlmADCsMZV1Y9OQwMc0MyGZ8Ta/zlD9N67BfQT8uYwkRswiu2hU6nJKrjrt/58aH/vqfQlR/9yId/7A2gWw==
@@ -1106,6 +1106,11 @@
   dependencies:
     tweetnacl "^1.0.0"
 
+"@types/emscripten@1.38.0":
+  version "1.38.0"
+  resolved "https://registry.yarnpkg.com/@types/emscripten/-/emscripten-1.38.0.tgz#eba859e3bf94249dcd25bcf853481065a92a6c5c"
+  integrity sha512-qfuBbl9hC0ybmW9s8SDORPgg+LdPV+KRpB8AMdTRqxuQZR4G5T7ozIAVUJLO26N7SFSM1zvDVuZ9+qOX7qt/EQ==
+
 "@types/enzyme@3.10.3":
   version "3.10.3"
   resolved "https://registry.yarnpkg.com/@types/enzyme/-/enzyme-3.10.3.tgz#02b6c5ac7d0472005944a652e79045e2f6c66804"
@@ -1255,6 +1260,11 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-12.11.5.tgz#6c3c8dc84988aff11fd2a63d7b5fbf39eaaab7b1"
   integrity sha512-LC8ALj/24PhByn39nr5jnTvpE7MujK8y7LQmV74kHYF5iQ0odCPkMH4IZNZw+cobKfSXqaC8GgegcbIsQpffdA==
 
+"@types/node@12.7.1":
+  version "12.7.1"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-12.7.1.tgz#3b5c3a26393c19b400844ac422bd0f631a94d69d"
+  integrity sha512-aK9jxMypeSrhiYofWWBf/T7O+KwaiAHzM4sveCdWPn71lzUSMimRnKzhXDKfKwV1kWoBo2P1aGgaIYGLf9/ljw==
+
 "@types/node@^10.1.0":
   version "10.14.22"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.14.22.tgz#34bcdf6b6cb5fc0db33d24816ad9d3ece22feea4"
@@ -1368,6 +1378,11 @@
   dependencies:
     "@types/express-serve-static-core" "*"
     "@types/mime" "*"
+
+"@types/sharedworker@0.0.28":
+  version "0.0.28"
+  resolved "https://registry.yarnpkg.com/@types/sharedworker/-/sharedworker-0.0.28.tgz#8690549388cdb67ec76c31aafa99caafcb06530c"
+  integrity sha512-7E7NdJh+6dV6aT5yvSyyCmDWIS3/TWcXeOlYe1xLTe5+dU9vZazT+6E+/bUiGU+ull6KwWcxEXMXdBix6VML0g==
 
 "@types/sizzle@*":
   version "2.3.2"
@@ -1734,6 +1749,18 @@
   dependencies:
     dexie "2.0.4"
 
+"@wireapp/store-engine-sqleet@0.10.14":
+  version "0.10.14"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine-sqleet/-/store-engine-sqleet-0.10.14.tgz#8a967e237d8819999bc9236dd2b70c6885567b8b"
+  integrity sha512-rkjbgJi5uORMuw6Hxln3lpiriumJoi5XVSpyUUcihYAbiuffXhnUtXJTAT4BBRgHpffzUNLNOJWyTBE6TEejUA==
+  dependencies:
+    "@babel/core" "7.6.4"
+    "@babel/plugin-proposal-class-properties" "7.5.5"
+    "@babel/plugin-proposal-object-rest-spread" "7.6.2"
+    "@babel/preset-typescript" "7.6.0"
+    "@wireapp/websql" "0.0.9"
+    uint32 "0.2.1"
+
 "@wireapp/store-engine@4.0.0":
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-4.0.0.tgz#b4f45887a794fafb34490277b9e96d030cb66dc2"
@@ -1745,6 +1772,18 @@
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/@wireapp/tslint-config/-/tslint-config-1.4.1.tgz#2089af720f65279d696293cbc3ca13063529139a"
   integrity sha512-hPoEUTlnjJ38r/NDHMhfCgWQAue4Q3Zf8iWQeLKn/aOxUVQTEY1/oALplooKwoX/ei5KulBQveEu/foBQ2TYsw==
+
+"@wireapp/websql@0.0.9":
+  version "0.0.9"
+  resolved "https://registry.yarnpkg.com/@wireapp/websql/-/websql-0.0.9.tgz#129aa113759a25069d19d70eb4c4ae2a8fed702e"
+  integrity sha512-OQ8LWQg2c70ojwGLGt8bgFO5svt07UOwnxhMkeHwbzgHOZOT9EyVJthRDrIreh6bX4K/jZuTSn08nPLDZbYGcA==
+  dependencies:
+    "@types/emscripten" "1.38.0"
+    "@types/node" "12.7.1"
+    "@types/sharedworker" "0.0.28"
+    cpr "3.0.1"
+    pseudo-worker "git+https://github.com/pwnsdx/pseudo-worker.git#c8bcc87e3730b0d6593d9ef5bc60df0860d84643"
+    webpack "4.39.2"
 
 "@xtuc/ieee754@^1.2.0":
   version "1.2.0"
@@ -3585,6 +3624,16 @@ cosmiconfig@5.2.1, cosmiconfig@^5.0.0, cosmiconfig@^5.2.0, cosmiconfig@^5.2.1:
     is-directory "^0.3.1"
     js-yaml "^3.13.1"
     parse-json "^4.0.0"
+
+cpr@3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/cpr/-/cpr-3.0.1.tgz#b9a55038b7cd81a35c17b9761895bd8496aef1e5"
+  integrity sha1-uaVQOLfNgaNcF7l2GJW9hJau8eU=
+  dependencies:
+    graceful-fs "^4.1.5"
+    minimist "^1.2.0"
+    mkdirp "~0.5.1"
+    rimraf "^2.5.4"
 
 crc32-stream@^2.0.0:
   version "2.0.0"
@@ -5760,6 +5809,11 @@ graceful-fs@^4.0.0, graceful-fs@^4.1.0, graceful-fs@^4.1.11, graceful-fs@^4.1.15
   version "4.2.2"
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.2.tgz#6f0952605d0140c1cfdb138ed005775b92d67b02"
   integrity sha512-IItsdsea19BoLC7ELy13q1iJFNmd7ofZH5+X/pJr90/nRoPEX0DJo1dHDbgtYWOhJhcCgMDTOw84RZ72q6lB+Q==
+
+graceful-fs@^4.1.5:
+  version "4.2.3"
+  resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.3.tgz#4a12ff1b60376ef09862c2093edd908328be8423"
+  integrity sha512-a30VEBm4PEdx1dRB7MFK7BejejvCvBronbLjht+sHuGYj8PHs7M/5Z+rt5lw551vZ7yfTCj4Vuyy3mSJytDWRQ==
 
 growl@1.10.5:
   version "1.10.5"
@@ -10063,6 +10117,10 @@ prr@~1.0.1:
   resolved "https://registry.yarnpkg.com/prr/-/prr-1.0.1.tgz#d3fc114ba06995a45ec6893f484ceb1d78f5f476"
   integrity sha1-0/wRS6BplaRexok/SEzrHXj19HY=
 
+"pseudo-worker@git+https://github.com/pwnsdx/pseudo-worker.git#c8bcc87e3730b0d6593d9ef5bc60df0860d84643":
+  version "1.2.0"
+  resolved "git+https://github.com/pwnsdx/pseudo-worker.git#c8bcc87e3730b0d6593d9ef5bc60df0860d84643"
+
 pseudomap@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/pseudomap/-/pseudomap-1.0.2.tgz#f052a28da70e618917ef0a8ac34c1ae5a68286b3"
@@ -13001,6 +13059,35 @@ webpack-sources@^1.4.0, webpack-sources@^1.4.1, webpack-sources@^1.4.3:
   dependencies:
     source-list-map "^2.0.0"
     source-map "~0.6.1"
+
+webpack@4.39.2:
+  version "4.39.2"
+  resolved "https://registry.yarnpkg.com/webpack/-/webpack-4.39.2.tgz#c9aa5c1776d7c309d1b3911764f0288c8c2816aa"
+  integrity sha512-AKgTfz3xPSsEibH00JfZ9sHXGUwIQ6eZ9tLN8+VLzachk1Cw2LVmy+4R7ZiwTa9cZZ15tzySjeMui/UnSCAZhA==
+  dependencies:
+    "@webassemblyjs/ast" "1.8.5"
+    "@webassemblyjs/helper-module-context" "1.8.5"
+    "@webassemblyjs/wasm-edit" "1.8.5"
+    "@webassemblyjs/wasm-parser" "1.8.5"
+    acorn "^6.2.1"
+    ajv "^6.10.2"
+    ajv-keywords "^3.4.1"
+    chrome-trace-event "^1.0.2"
+    enhanced-resolve "^4.1.0"
+    eslint-scope "^4.0.3"
+    json-parse-better-errors "^1.0.2"
+    loader-runner "^2.4.0"
+    loader-utils "^1.2.3"
+    memory-fs "^0.4.1"
+    micromatch "^3.1.10"
+    mkdirp "^0.5.1"
+    neo-async "^2.6.1"
+    node-libs-browser "^2.2.1"
+    schema-utils "^1.0.0"
+    tapable "^1.1.3"
+    terser-webpack-plugin "^1.4.1"
+    watchpack "^1.6.0"
+    webpack-sources "^1.4.1"
 
 webpack@4.41.2:
   version "4.41.2"

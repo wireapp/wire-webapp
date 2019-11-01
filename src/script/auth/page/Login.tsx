@@ -42,7 +42,6 @@ import {connect} from 'react-redux';
 import {Redirect} from 'react-router';
 import {AnyAction, Dispatch} from 'redux';
 import useReactRouter from 'use-react-router';
-import {save} from 'Util/ephemeralValueStore';
 import {getLogger} from 'Util/Logger';
 import {loginStrings, logoutReasonStrings} from '../../strings';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
@@ -144,11 +143,6 @@ const Login = ({
       } else {
         await doLogin(login);
       }
-
-      // Save encrypted database key
-      const secretKey = new Uint32Array(64);
-      self.crypto.getRandomValues(secretKey);
-      await save(secretKey);
 
       return history.push(ROUTE.HISTORY_INFO);
     } catch (error) {

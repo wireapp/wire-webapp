@@ -21,9 +21,12 @@ import {LoginData, RegisterData} from '@wireapp/api-client/dist/commonjs/auth';
 import {ClientType} from '@wireapp/api-client/dist/commonjs/client/index';
 import {Account} from '@wireapp/core';
 import {LowDiskSpaceError} from '@wireapp/store-engine/dist/commonjs/engine/error/';
+import {getEphemeralValue, saveRandomEncryptionKey} from 'Util/ephemeralValueStore';
 
-import {noop} from 'Util/util';
+import {isTemporaryClientAndNonPersistent, noop} from 'Util/util';
 
+import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
+import {StorageService} from 'src/script/storage';
 import {currentCurrency, currentLanguage} from '../../localeConfig';
 import {Api, RootState, ThunkAction, ThunkDispatch} from '../reducer';
 import {RegistrationDataState} from '../reducer/authReducer';
@@ -58,6 +61,7 @@ export class AuthAction {
   ): ThunkAction => {
     return (dispatch, getState, global) => {
       const {
+        apiClient,
         core,
         actions: {clientAction, cookieAction, selfAction, localStorageAction},
       } = global;
@@ -66,6 +70,11 @@ export class AuthAction {
 
       return Promise.resolve()
         .then(() => onBeforeLogin(dispatch, getState, global))
+        .then(async () => {
+          if (isTemporaryClientAndNonPersistent(loginData.clientType !== ClientType.TEMPORARY)) {
+            apiClient.config.store = await this.initEncryptedDatabase();
+          }
+        })
         .then(() => core.login(loginData, false, clientAction.generateClientPayload(loginData.clientType)))
         .then(() => this.persistAuthData(loginData.clientType, core, dispatch, localStorageAction))
         .then(() =>
@@ -138,6 +147,17 @@ export class AuthAction {
       });
     };
   };
+
+  /**
+   * Temporary solution to be used ONLY with non-persistent temporary clients. It's a workaround to switch between
+   * Dexie (IndexedDB) and SQLeetEngine (encrypted IndexedDB). When we fully use SQLeetEngine we can move this
+   * configuration to `configureClient`.
+   */
+  private async initEncryptedDatabase(): Promise<SQLeetEngine> {
+    const existingKey: string = await getEphemeralValue();
+    const encryptionKey = existingKey ? existingKey : await saveRandomEncryptionKey();
+    return StorageService.initEncryptedDatabase(encryptionKey);
+  }
 
   persistAuthData = (
     clientType: ClientType,
@@ -281,11 +301,14 @@ export class AuthAction {
           return undefined;
         })
         .then(() => dispatch(localStorageAction.getLocalStorage(LocalStorageKey.AUTH.PERSIST)))
-        .then((persist: boolean) => {
+        .then(async (persist: boolean) => {
           if (persist === undefined) {
             throw new Error(`Could not find value for '${LocalStorageKey.AUTH.PERSIST}'`);
           }
           clientType = persist ? ClientType.PERMANENT : ClientType.TEMPORARY;
+          if (isTemporaryClientAndNonPersistent()) {
+            apiClient.config.store = await this.initEncryptedDatabase();
+          }
           return apiClient.init(clientType);
         })
         .then(() => core.init())
