@@ -112,7 +112,6 @@ export class CryptographyRepository {
       this.logger.info(`Initializing Cryptobox with encrypted database '${databaseName}'...`);
       const encryptionKey = await getEphemeralValue();
       storeEngine = await StorageService.initEncryptedDatabase(encryptionKey);
-      await storeEngine.initWithObject(databaseName, database);
     } else {
       this.logger.info(`Initializing Cryptobox with database '${databaseName}'...`);
       storeEngine = new IndexedDBEngine();

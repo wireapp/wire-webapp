@@ -6,8 +6,11 @@ import {AuthViewModel} from '../view_model/AuthViewModel';
 import {resolve, graph} from '../config/appResolver';
 import {Config} from '../auth/config';
 import {exposeWrapperGlobals} from 'Util/wrapper';
+import {isTemporaryClientAndNonPersistent} from 'Util/util';
+import {getEphemeralValue} from 'Util/ephemeralValueStore';
+import {StorageService} from '../storage';
 
-$(() => {
+$(async () => {
   enableLogging(Config.FEATURE.ENABLE_DEBUG);
   exposeWrapperGlobals();
   if ($('.auth-page').length) {
@@ -16,6 +19,13 @@ $(() => {
       restUrl: Config.BACKEND_REST,
       webSocketUrl: Config.BACKEND_WS,
     });
-    new AuthViewModel(backendClient);
+    if (isTemporaryClientAndNonPersistent()) {
+      const encryptionKey = await getEphemeralValue();
+      const engine = StorageService.initEncryptedDatabase(encryptionKey);
+      // TODO: Delete "encryptionKey" after successfully creating a database
+      new AuthViewModel(backendClient, engine);
+    } else {
+      new AuthViewModel(backendClient);
+    }
   }
 });

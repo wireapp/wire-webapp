@@ -82,8 +82,9 @@ class AuthViewModel {
   /**
    * View model for the auth page.
    * @param {BackendClient} backendClient - Configured backend client
+   * @param {SQLeetEngine} [encryptedEngine] - Encrypted database handler
    */
-  constructor(backendClient) {
+  constructor(backendClient, encryptedEngine) {
     this.click_on_remove_device_submit = this.click_on_remove_device_submit.bind(this);
 
     this.logger = getLogger('z.viewModel.AuthViewModel');
@@ -94,7 +95,7 @@ class AuthViewModel {
     // Cryptography
     this.asset_service = new AssetService(backendClient);
     // @todo Don't operate with the service directly. Get a repository!
-    this.storageService = new StorageService();
+    this.storageService = new StorageService(encryptedEngine);
     this.storage_repository = new StorageRepository(this.storageService);
 
     this.cryptography_repository = new CryptographyRepository(backendClient, this.storage_repository);

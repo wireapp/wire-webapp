@@ -924,6 +924,7 @@ $(async () => {
     if (isTemporaryClientAndNonPersistent()) {
       const encryptionKey = await getEphemeralValue();
       const engine = StorageService.initEncryptedDatabase(encryptionKey);
+      // TODO: Delete "encryptionKey" after successfully creating a database
       wire.app = new App(backendClient, appContainer, engine);
     } else {
       wire.app = new App(backendClient, appContainer);
