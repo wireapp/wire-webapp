@@ -17,11 +17,16 @@
  *
  */
 
-import {SQLiteType} from '@wireapp/store-engine-sqleet';
+import {SQLiteProvidedSchema, SQLiteType} from '@wireapp/store-engine-sqleet';
 import {StorageSchemata} from './StorageSchemata';
 
+interface SQLeetSchema {
+  schema: SQLiteProvidedSchema<string>;
+  version: number;
+}
+
 export class SQLeetSchemata {
-  static get SCHEMATA(): {schema: Record<string, any>; version: number}[] {
+  static get SCHEMATA(): SQLeetSchema[] {
     return [
       {
         schema: {
