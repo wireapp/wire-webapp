@@ -17,7 +17,7 @@
  *
  */
 
-import {getEphemeralValue, save} from './ephemeralValueStore';
+import {getEphemeralValue, saveEphemeralValue} from './ephemeralValueStore';
 
 describe('ephemeralValueStore', () => {
   describe('ServiceWorker is not available', () => {
@@ -31,7 +31,7 @@ describe('ephemeralValueStore', () => {
     });
 
     it('does not crash if serviceWorker is not available', async () => {
-      const notSavedValue = await save('value');
+      const notSavedValue = await saveEphemeralValue('value');
       expect(notSavedValue).not.toBeDefined();
     });
   });
@@ -45,11 +45,11 @@ describe('ephemeralValueStore', () => {
     const value1 = 'first value';
     const value2 = 'second value';
 
-    await save(value1);
+    await saveEphemeralValue(value1);
     const storedValue1 = await getEphemeralValue();
     expect(storedValue1).toBe(value1);
 
-    await save(value2);
+    await saveEphemeralValue(value2);
     const storedValue2 = await getEphemeralValue();
     expect(storedValue2).toBe(value2);
   });

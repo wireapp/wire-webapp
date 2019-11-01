@@ -41,11 +41,11 @@ export async function saveRandomEncryptionKey(): Promise<string> {
     hexKey.push(`00${x.toString(16)}`.slice(-2));
   }
   const encryptionKey = hexKey.join('');
-  await save<string>(encryptionKey);
+  await saveEphemeralValue<string>(encryptionKey);
   return encryptionKey;
 }
 
-export async function save<T>(value: T): Promise<T> {
+export async function saveEphemeralValue<T>(value: T): Promise<T> {
   const worker = await getWorker();
   return sendMessage(worker, {action: 'save', params: value});
 }

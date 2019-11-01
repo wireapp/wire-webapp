@@ -155,7 +155,7 @@ export class AuthAction {
    */
   private async initEncryptedDatabase(): Promise<SQLeetEngine> {
     const existingKey: string = await getEphemeralValue();
-    const encryptionKey = existingKey ? existingKey : await saveRandomEncryptionKey();
+    const encryptionKey = existingKey || (await saveRandomEncryptionKey());
     return StorageService.initEncryptedDatabase(encryptionKey);
   }
 

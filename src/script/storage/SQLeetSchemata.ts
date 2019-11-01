@@ -16,11 +16,12 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+
 import {SQLiteType} from '@wireapp/store-engine-sqleet';
 import {StorageSchemata} from './StorageSchemata';
 
 export class SQLeetSchemata {
-  static get SCHEMATA(): {schema: Record<string, any>; version: number}[] {
+  static get SCHEMATA(): {schema: Record<string, SQLiteType | Record<string, SQLiteType>>; version: number}[] {
     return [
       {
         schema: {
