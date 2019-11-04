@@ -17,7 +17,7 @@
  *
  */
 
-import {ConsentType, Self} from '@wireapp/api-client/dist/commonjs/self';
+import {ChangePassword, ConsentType, Self} from '@wireapp/api-client/dist/commonjs/self';
 
 import {Environment} from 'Util/Environment';
 import {getLogger} from 'Util/Logger';
@@ -107,6 +107,32 @@ export class SelfAction {
           dispatch(SelfActionCreator.failedSetConsent(error));
           throw error;
         });
+    };
+  };
+
+  doSetPassword = (changePassword: ChangePassword): ThunkAction => {
+    return async (dispatch, getState, {apiClient}) => {
+      dispatch(SelfActionCreator.startSetSelfPassword());
+      try {
+        apiClient.self.api.putPassword(changePassword);
+        dispatch(SelfActionCreator.successfulSetSelfPassword());
+      } catch (error) {
+        dispatch(SelfActionCreator.failedSetSelfPassword(error));
+        throw error;
+      }
+    };
+  };
+
+  doSetEmail = (email: string): ThunkAction => {
+    return async (dispatch, getState, {apiClient}) => {
+      dispatch(SelfActionCreator.startSetSelfEmail());
+      try {
+        apiClient.self.api.putEmail({email});
+        dispatch(SelfActionCreator.successfulSetSelfEmail());
+      } catch (error) {
+        dispatch(SelfActionCreator.failedSetSelfEmail(error));
+        throw error;
+      }
     };
   };
 }
