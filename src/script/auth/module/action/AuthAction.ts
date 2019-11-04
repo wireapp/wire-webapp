@@ -17,7 +17,7 @@
  *
  */
 
-import {LoginData, RegisterData} from '@wireapp/api-client/dist/commonjs/auth';
+import {LoginData, RegisterData, SendLoginCode} from '@wireapp/api-client/dist/commonjs/auth';
 import {ClientType} from '@wireapp/api-client/dist/commonjs/client/index';
 import {Account} from '@wireapp/core';
 import {LowDiskSpaceError} from '@wireapp/store-engine/dist/commonjs/engine/error/';
@@ -88,6 +88,19 @@ export class AuthAction {
           }
           throw error;
         });
+    };
+  };
+
+  doSendPhoneLoginCode = (loginRequest: Omit<SendLoginCode, 'voice_call'>): ThunkAction => {
+    return async (dispatch, getState, {apiClient}) => {
+      dispatch(AuthActionCreator.startSendPhoneLoginCode());
+      try {
+        const {data} = await apiClient.auth.api.postLoginSend(loginRequest);
+        dispatch(AuthActionCreator.successfulSendPhoneLoginCode(data.expires_in));
+      } catch (error) {
+        dispatch(AuthActionCreator.failedSendPhoneLoginCode(error));
+        throw error;
+      }
     };
   };
 
