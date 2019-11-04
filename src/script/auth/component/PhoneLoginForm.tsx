@@ -35,11 +35,13 @@ const PhoneLoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
   const [validInput, setValidInput] = useState(true);
   const phoneInput = useRef();
   const countryCodeInput = useRef();
+
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     if (isFetching) {
       return;
     }
+    onSubmit({phone: phoneNumber}, []);
   };
 
   return (
