@@ -67,7 +67,7 @@ const InitialInvite = ({
   const [error, setError] = useState(null);
 
   const onInviteDone = async () => {
-    doFlushDatabase();
+    await doFlushDatabase();
     window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP));
   };
 

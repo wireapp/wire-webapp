@@ -112,7 +112,7 @@ export class AuthAction {
   doFlushDatabase = (): ThunkAction => {
     return async (dispatch, getState, {apiClient}) => {
       if (apiClient.config.store instanceof SQLeetEngine) {
-        apiClient.config.store.save();
+        await apiClient.config.store.save();
       }
     };
   };
