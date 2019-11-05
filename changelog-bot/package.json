@@ -7,7 +7,7 @@
     "@types/long": "4.0.0",
     "@types/node": "~12",
     "@wireapp/core": "14.3.0",
-    "commander": "3.0.2",
+    "commander": "4.0.0",
     "generate-changelog": "1.8.0"
   },
   "description": "A changelog notification bot.",
