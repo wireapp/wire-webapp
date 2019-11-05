@@ -31,6 +31,10 @@ import {
 } from '../../conversation/ConversationLabelRepository';
 import {generateConversationUrl} from '../../router/routeGenerator';
 
+interface ConversationLabelWithBadge extends ConversationLabel {
+  badge: number;
+}
+
 interface GroupedConversationsParams {
   conversationRepository: ConversationRepository;
   listViewModel: ConversationListViewModel;
@@ -41,12 +45,18 @@ interface GroupedConversationsParams {
   isVisibleFunc: (top: number, bottom: number) => boolean;
 }
 
+const countUnread = (conversations: Conversation[]) =>
+  conversations.filter(({unreadState}) => unreadState().allEvents.length > 0).length;
+
 ko.components.register('grouped-conversations', {
   template: `
     <!-- ko foreach: {data: folders, as: 'folder', noChildContext: true} -->
       <div class="conversation-folder" data-uie-name="conversation-folder" data-bind="attr: {'data-uie-value': folder.name}">
         <div class="conversation-folder__head" data-uie-name="conversation-folder-head" data-bind="click: () => toggle(folder.id), css: {'conversation-folder__head--open': isExpanded(folder.id)}">
-          <disclose-icon></disclose-icon><span data-bind="text: folder.name"></span>
+          <disclose-icon></disclose-icon><span class="conversation-folder__head__name" data-bind="text: folder.name"></span>
+          <!-- ko if: folder.badge -->
+            <span class="conversation-folder__head__badge" data-bind="text: folder.badge" data-uie-name="conversation-folder-badge"></span>
+          <!-- /ko -->
         </div>
         <div data-bind="visible: isExpanded(folder.id)">
           <!-- ko foreach: {data: folder.conversations, as: 'conversation', noChildContext: true} -->
@@ -77,27 +87,30 @@ ko.components.register('grouped-conversations', {
     this.getConversationUrl = generateConversationUrl;
     this.isVisibleFunc = isVisibleFunc;
 
-    this.folders = ko.pureComputed<ConversationLabel[]>(() => {
-      const folders: ConversationLabel[] = [];
+    this.folders = ko.pureComputed<ConversationLabelWithBadge[]>(() => {
+      const folders: ConversationLabelWithBadge[] = [];
 
       const favorites = conversationLabelRepository.getFavorites();
       if (favorites.length) {
-        folders.push(createLabelFavorites(favorites));
+        folders.push({...createLabelFavorites(favorites), badge: countUnread(favorites)});
       }
 
       const groups = conversationLabelRepository.getGroupsWithoutLabel();
       if (groups.length) {
-        folders.push(createLabelGroups(groups));
+        folders.push({...createLabelGroups(groups), badge: countUnread(groups)});
       }
 
       const contacts = conversationLabelRepository.getContactsWithoutLabel();
       if (contacts.length) {
-        folders.push(createLabelPeople(contacts));
+        folders.push({...createLabelPeople(contacts), badge: countUnread(contacts)});
       }
 
       const custom = conversationLabelRepository
         .getLabels()
-        .map(label => createLabel(label.name, conversationLabelRepository.getLabelConversations(label), label.id))
+        .map(label => {
+          const conversations = conversationLabelRepository.getLabelConversations(label);
+          return {...createLabel(label.name, conversations, label.id), badge: countUnread(conversations)};
+        })
         .filter(({conversations}) => !!conversations().length);
       folders.push(...custom);
 
