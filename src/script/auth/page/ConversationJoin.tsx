@@ -153,17 +153,21 @@ const ConversationJoin = ({
               );
               if (!isValidationError) {
                 doLogout();
-                throw error;
+                // tslint:disable-next-line:no-console
+                console.warn('Unable to create wireless account', error);
               }
             }
           }
         } else {
           await doLogout();
-          throw error;
+          // tslint:disable-next-line:no-console
+          console.warn('Unable to create wireless account', error);
         }
       }
     }
-    nameInput.current.focus();
+    if (nameInput.current) {
+      nameInput.current.focus();
+    }
   };
 
   const resetErrors = () => {
@@ -172,7 +176,9 @@ const ConversationJoin = ({
   };
 
   const isFullConversation =
-    error && error.label && error.label === BackendError.CONVERSATION_ERRORS.CONVERSATION_TOO_MANY_MEMBERS;
+    conversationError &&
+    conversationError.label &&
+    conversationError.label === BackendError.CONVERSATION_ERRORS.CONVERSATION_TOO_MANY_MEMBERS;
   const renderTemporaryGuestAccountCreation = !isAuthenticated || isTemporaryGuest || forceNewTemporaryGuestAccount;
 
   if (!isValidLink) {
@@ -282,7 +288,7 @@ const ConversationJoin = ({
                   routeToApp();
                 } catch (error) {
                   // tslint:disable-next-line:no-console
-                  console.error('Unable to join conversation with existing account', error);
+                  console.warn('Unable to join conversation with existing account', error);
                 }
               }}
               data-uie-name="do-open"
