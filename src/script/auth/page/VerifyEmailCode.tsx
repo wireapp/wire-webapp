@@ -27,7 +27,7 @@ import useReactRouter from 'use-react-router';
 import {getLogger} from 'Util/Logger';
 import {verifyStrings} from '../../strings';
 import RouterLink from '../component/RouterLink';
-import {actionRoot as ROOT_ACTIONS} from '../module/action/';
+import {actionRoot as ROOT_ACTIONS} from '../module/action';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
@@ -42,7 +42,7 @@ const changeEmailRedirect = {
   [AuthSelector.REGISTER_FLOW.TEAM]: ROUTE.CREATE_TEAM_ACCOUNT,
 };
 
-const Verify = ({
+const VerifyEmailCode = ({
   account,
   authError,
   currentFlow,
@@ -135,4 +135,4 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
 export default connect(
   mapStateToProps,
   mapDispatchToProps,
-)(Verify);
+)(VerifyEmailCode);
