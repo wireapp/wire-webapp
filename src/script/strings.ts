@@ -198,6 +198,17 @@ export const chooseHandleStrings = defineMessages({
   },
 });
 
+export const setEmailStrings = defineMessages({
+  handlePlaceholder: {
+    defaultMessage: 'Email',
+    id: 'setEmail.handlePlaceholder',
+  },
+  headline: {
+    defaultMessage: 'Set email',
+    id: 'setEmail.headline',
+  },
+});
+
 export const appAlreadyOpenStrings = defineMessages({
   continueButton: {
     defaultMessage: 'Continue',

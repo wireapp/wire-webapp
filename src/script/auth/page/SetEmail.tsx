@@ -19,21 +19,40 @@
 
 import {Button, ContainerXS, ErrorMessage, H1, Input} from '@wireapp/react-ui-kit';
 import React, {useState} from 'react';
+import {useIntl} from 'react-intl';
+import {connect} from 'react-redux';
+import {AnyAction, Dispatch} from 'redux';
+import {setEmailStrings} from 'src/script/strings';
 import useReactRouter from 'use-react-router';
+import {actionRoot} from '../module/action';
+import {RootState, bindActionCreators} from '../module/reducer';
+import * as SelfSelector from '../module/selector/SelfSelector';
 import {ROUTE} from '../route';
 import {parseError} from '../util/errorUtil';
 import Page from './Page';
 
-const SetEmail = () => {
-  //const {formatMessage: _} = useIntl();
-  const [error /*, setError*/] = useState();
+interface Props extends React.HTMLProps<HTMLDivElement> {}
 
+const SetEmail = ({hasSelfEmail, isSelfSSOUser, doSetEmail, isFetching}: Props & ConnectedProps & DispatchProps) => {
+  const {formatMessage: _} = useIntl();
+  const [error, setError] = useState();
+  const [email, setEmail] = useState('');
   const {history} = useReactRouter();
 
-  const navigateNext = () => {
-    history.push(ROUTE.VERIFY_EMAIL_LINK);
+  const onSetHandle = async (event: React.FormEvent): Promise<void> => {
+    event.preventDefault();
+    try {
+      // TODO: Validate email
+      await doSetEmail(email);
+    } catch (error) {
+      setError(error);
+    }
   };
 
+  if (hasSelfEmail || isSelfSSOUser) {
+    history.push(ROUTE.SET_PASSWORD);
+    return null;
+  }
   return (
     <Page>
       <ContainerXS
@@ -42,14 +61,44 @@ const SetEmail = () => {
         style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
       >
         <div>
-          <H1 center>{'Set Email'}</H1>
-          <Input />
+          <H1 center>{_(setEmailStrings.headline)}</H1>
+          <Input
+            name="email"
+            placeholder={_(setEmailStrings.handlePlaceholder)}
+            type="text"
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              setError(null);
+              setEmail(event.currentTarget.value);
+            }}
+            value={email}
+            autoFocus
+            data-uie-name="enter-email"
+          />
           <ErrorMessage data-uie-name="error-message">{parseError(error)}</ErrorMessage>
-          <Button onClick={navigateNext}>{'Next'}</Button>
+          <Button onClick={onSetHandle} showLoading={isFetching} disabled={isFetching} />
         </div>
       </ContainerXS>
     </Page>
   );
 };
 
-export default SetEmail;
+type ConnectedProps = ReturnType<typeof mapStateToProps>;
+const mapStateToProps = (state: RootState) => ({
+  hasSelfEmail: SelfSelector.hasSelfEmail(state),
+  isFetching: SelfSelector.isFetching(state),
+  isSelfSSOUser: SelfSelector.isSSOUser(state),
+});
+
+type DispatchProps = ReturnType<typeof mapDispatchToProps>;
+const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
+  bindActionCreators(
+    {
+      doSetEmail: actionRoot.selfAction.doSetEmail,
+    },
+    dispatch,
+  );
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(SetEmail);
