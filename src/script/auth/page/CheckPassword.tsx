@@ -17,44 +17,30 @@
  *
  */
 
-import {CodeInput, ContainerXS, ErrorMessage, H1, Link} from '@wireapp/react-ui-kit';
+import {ContainerXS, ErrorMessage, H1, Input} from '@wireapp/react-ui-kit';
 import React, {useState} from 'react';
-
 import {parseError} from '../util/errorUtil';
-
 import Page from './Page';
 
-const VerifyPhoneCode = () => {
+const CheckPassword = () => {
   //const {formatMessage: _} = useIntl();
   const [error /*, setError*/] = useState();
 
-  const verifyCode = () => {};
-  const resendCode = () => {};
   return (
-    <Page hasAccountData>
+    <Page>
       <ContainerXS
         centerText
         verticalCenter
         style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
       >
         <div>
-          <H1 center>{'headline'}</H1>
-          <CodeInput autoFocus style={{marginTop: 10}} onCodeComplete={verifyCode} data-uie-name="enter-code" />
+          <H1 center>{'Enter password'}</H1>
+          <Input />
           <ErrorMessage data-uie-name="error-message">{parseError(error)}</ErrorMessage>
-        </div>
-        <div>
-          <Link onClick={resendCode} data-uie-name="do-resend-code">
-            {'resend'}
-          </Link>
-          {/*
-          <RouterLink to={changeEmailRedirect[currentFlow]} style={{marginLeft: 35}} data-uie-name="go-change-email">
-            {_(verifyStrings.changeEmail)}
-          </RouterLink>
-          */}
         </div>
       </ContainerXS>
     </Page>
   );
 };
 
-export default VerifyPhoneCode;
+export default CheckPassword;
