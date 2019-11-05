@@ -46,7 +46,7 @@ interface GroupedConversationsParams {
 }
 
 const countUnread = (conversations: Conversation[]) =>
-  conversations.reduce((sum, conversation) => (conversation.unreadState().allEvents.length > 0 ? sum + 1 : sum), 0);
+  conversations.filter(({unreadState}) => unreadState().allEvents.length > 0).length;
 
 ko.components.register('grouped-conversations', {
   template: `
