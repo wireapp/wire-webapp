@@ -17,14 +17,22 @@
  *
  */
 
-import {ContainerXS, ErrorMessage, H1, Input} from '@wireapp/react-ui-kit';
+import {Button, ContainerXS, ErrorMessage, H1, Input} from '@wireapp/react-ui-kit';
 import React, {useState} from 'react';
+import useReactRouter from 'use-react-router';
+import {ROUTE} from '../route';
 import {parseError} from '../util/errorUtil';
 import Page from './Page';
 
 const SetEmail = () => {
   //const {formatMessage: _} = useIntl();
   const [error /*, setError*/] = useState();
+
+  const {history} = useReactRouter();
+
+  const navigateNext = () => {
+    history.push(ROUTE.VERIFY_EMAIL_LINK);
+  };
 
   return (
     <Page>
@@ -37,6 +45,7 @@ const SetEmail = () => {
           <H1 center>{'Set Email'}</H1>
           <Input />
           <ErrorMessage data-uie-name="error-message">{parseError(error)}</ErrorMessage>
+          <Button onClick={navigateNext}>{'Next'}</Button>
         </div>
       </ContainerXS>
     </Page>

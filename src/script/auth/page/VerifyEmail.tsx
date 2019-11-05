@@ -17,12 +17,19 @@
  *
  */
 
-import {ContainerXS, H1} from '@wireapp/react-ui-kit';
+import {Button, ContainerXS, H1} from '@wireapp/react-ui-kit';
 import React from 'react';
+import useReactRouter from 'use-react-router';
+import {ROUTE} from '../route';
 import Page from './Page';
 
 const VerifyEmail = () => {
   //const {formatMessage: _} = useIntl();
+  const {history} = useReactRouter();
+
+  const navigateNext = () => {
+    history.push(ROUTE.SET_PASSWORD);
+  };
 
   return (
     <Page>
@@ -33,6 +40,7 @@ const VerifyEmail = () => {
       >
         <div>
           <H1 center>{'Verify Email'}</H1>
+          <Button onClick={navigateNext}>{'Next'}</Button>
         </div>
       </ContainerXS>
     </Page>

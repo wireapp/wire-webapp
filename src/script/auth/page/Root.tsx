@@ -32,6 +32,7 @@ import * as AuthSelector from '../module/selector/AuthSelector';
 import * as CookieSelector from '../module/selector/CookieSelector';
 import * as LanguageSelector from '../module/selector/LanguageSelector';
 import {ROUTE} from '../route';
+import CheckPassword from './CheckPassword';
 import ChooseHandle from './ChooseHandle';
 import ClientManager from './ClientManager';
 import ConversationJoin from './ConversationJoin';
@@ -42,9 +43,13 @@ import HistoryInfo from './HistoryInfo';
 import Index from './Index';
 import InitialInvite from './InitialInvite';
 import Login from './Login';
+import SetEmail from './SetEmail';
+import SetPassword from './SetPassword';
 import SingleSignOn from './SingleSignOn';
 import TeamName from './TeamName';
 import Verify from './Verify';
+import VerifyEmail from './VerifyEmail';
+import VerifyPhoneCode from './VerifyPhoneCode';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
@@ -78,6 +83,9 @@ const Root = ({
   const ProtectedHistoryInfo = () => isAuthenticatedCheck(<HistoryInfo />);
   const ProtectedInitialInvite = () => isAuthenticatedCheck(<InitialInvite />);
   const ProtectedClientManager = () => isAuthenticatedCheck(<ClientManager />);
+  const ProtectedSetEmail = () => isAuthenticatedCheck(<SetEmail />);
+  const ProtectedVerifyEmail = () => isAuthenticatedCheck(<VerifyEmail />);
+  const ProtectedSetPassword = () => isAuthenticatedCheck(<SetPassword />);
 
   return (
     <IntlProvider locale={normalizeLanguage(language)} messages={loadLanguage(language)}>
@@ -98,11 +106,16 @@ const Root = ({
               path={ROUTE.CREATE_TEAM_ACCOUNT}
               component={Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && CreateAccount}
             />
-            <Route path={ROUTE.VERIFY} component={Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && Verify} />
+            <Route path={ROUTE.VERIFY_EMAIL_CODE} component={Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && Verify} />
             <Route path={ROUTE.INITIAL_INVITE} component={ProtectedInitialInvite} />
             <Route path={ROUTE.CHOOSE_HANDLE} component={ProtectedChooseHandle} />
             <Route path={ROUTE.HISTORY_INFO} component={ProtectedHistoryInfo} />
             <Route path={ROUTE.SSO} component={SingleSignOn} />
+            <Route path={ROUTE.VERIFY_PHONE_CODE} component={VerifyPhoneCode} />
+            <Route path={ROUTE.SET_EMAIL} component={ProtectedSetEmail} />
+            <Route path={ROUTE.VERIFY_EMAIL_LINK} component={ProtectedVerifyEmail} />
+            <Route path={ROUTE.SET_PASSWORD} component={ProtectedSetPassword} />
+            <Route path={ROUTE.CHECK_PASSWORD} component={CheckPassword} />
             <Redirect to={ROUTE.INDEX} />
           </Switch>
         </Router>
