@@ -65,7 +65,7 @@ export const ROUTE = {
   SET_HANDLE: '/sethandle',
   SET_PASSWORD: '/setpassword',
   SSO: '/sso/:code?',
-  VERIFY_EMAIL_CODE: '/verify',
-  VERIFY_EMAIL_LINK: '/verifyemail',
+  VERIFY_EMAIL_CODE: '/verifyemailcode',
+  VERIFY_EMAIL_LINK: '/verifyemaillink',
   VERIFY_PHONE_CODE: '/verifyphonecode',
 };
