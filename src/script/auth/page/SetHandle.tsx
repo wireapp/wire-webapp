@@ -37,7 +37,7 @@ import {AnyAction, Dispatch} from 'redux';
 import useReactRouter from 'use-react-router';
 import {chooseHandleStrings} from '../../strings';
 import AcceptNewsModal from '../component/AcceptNewsModal';
-import {actionRoot as ROOT_ACTIONS} from '../module/action/';
+import {actionRoot as ROOT_ACTIONS} from '../module/action';
 import {BackendError} from '../module/action/BackendError';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as SelfSelector from '../module/selector/SelfSelector';
@@ -48,7 +48,7 @@ import Page from './Page';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
-const ChooseHandle = ({
+const SetHandle = ({
   doGetConsents,
   doSetConsent,
   doSetHandle,
@@ -162,4 +162,4 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
 export default connect(
   mapStateToProps,
   mapDispatchToProps,
-)(ChooseHandle);
+)(SetHandle);

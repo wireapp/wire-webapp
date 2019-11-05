@@ -33,7 +33,6 @@ import * as CookieSelector from '../module/selector/CookieSelector';
 import * as LanguageSelector from '../module/selector/LanguageSelector';
 import {ROUTE} from '../route';
 import CheckPassword from './CheckPassword';
-import ChooseHandle from './ChooseHandle';
 import ClientManager from './ClientManager';
 import ConversationJoin from './ConversationJoin';
 import ConversationJoinInvalid from './ConversationJoinInvalid';
@@ -44,6 +43,7 @@ import Index from './Index';
 import InitialInvite from './InitialInvite';
 import Login from './Login';
 import SetEmail from './SetEmail';
+import SetHandle from './SetHandle';
 import SetPassword from './SetPassword';
 import SingleSignOn from './SingleSignOn';
 import TeamName from './TeamName';
@@ -79,12 +79,13 @@ const Root = ({
 
   const isAuthenticatedCheck = (page: any): any => (page ? (isAuthenticated ? page : navigate('/auth#login')) : null);
 
-  const ProtectedChooseHandle = () => isAuthenticatedCheck(<ChooseHandle />);
   const ProtectedHistoryInfo = () => isAuthenticatedCheck(<HistoryInfo />);
   const ProtectedInitialInvite = () => isAuthenticatedCheck(<InitialInvite />);
   const ProtectedClientManager = () => isAuthenticatedCheck(<ClientManager />);
-  const ProtectedSetEmail = () => isAuthenticatedCheck(<SetEmail />);
   const ProtectedVerifyEmail = () => isAuthenticatedCheck(<VerifyEmail />);
+
+  const ProtectedSetHandle = () => isAuthenticatedCheck(<SetHandle />);
+  const ProtectedSetEmail = () => isAuthenticatedCheck(<SetEmail />);
   const ProtectedSetPassword = () => isAuthenticatedCheck(<SetPassword />);
 
   return (
@@ -108,7 +109,7 @@ const Root = ({
             />
             <Route path={ROUTE.VERIFY_EMAIL_CODE} component={Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && Verify} />
             <Route path={ROUTE.INITIAL_INVITE} component={ProtectedInitialInvite} />
-            <Route path={ROUTE.CHOOSE_HANDLE} component={ProtectedChooseHandle} />
+            <Route path={ROUTE.SET_HANDLE} component={ProtectedSetHandle} />
             <Route path={ROUTE.HISTORY_INFO} component={ProtectedHistoryInfo} />
             <Route path={ROUTE.SSO} component={SingleSignOn} />
             <Route path={ROUTE.VERIFY_PHONE_CODE} component={VerifyPhoneCode} />

@@ -51,7 +51,6 @@ export const LOGOUT_REASON = {
 
 export const ROUTE = {
   CHECK_PASSWORD: '/checkpassword',
-  CHOOSE_HANDLE: '/choosehandle',
   CLIENTS: '/clients',
   CONVERSATION_JOIN: '/join-conversation',
   CONVERSATION_JOIN_INVALID: '/join-conversation-invalid',
@@ -63,6 +62,7 @@ export const ROUTE = {
   INITIAL_INVITE: '/teaminvite',
   LOGIN: '/login',
   SET_EMAIL: '/setemail',
+  SET_HANDLE: '/sethandle',
   SET_PASSWORD: '/setpassword',
   SSO: '/sso/:code?',
   VERIFY_EMAIL_CODE: '/verify',

@@ -59,7 +59,7 @@ const Verify = ({
       case AuthSelector.REGISTER_FLOW.TEAM: {
         try {
           await doRegisterTeam({...account, email_code});
-          history.push(ROUTE.CHOOSE_HANDLE);
+          history.push(ROUTE.SET_HANDLE);
         } catch (error) {
           logger.error('Failed to create team account', error);
         }
@@ -70,7 +70,7 @@ const Verify = ({
       case AuthSelector.REGISTER_FLOW.GENERIC_INVITATION: {
         try {
           await doRegisterPersonal({...account, email_code});
-          history.push(ROUTE.CHOOSE_HANDLE);
+          history.push(ROUTE.SET_HANDLE);
         } catch (error) {
           logger.error('Failed to create personal account', error);
         }

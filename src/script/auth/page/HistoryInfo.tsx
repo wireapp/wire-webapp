@@ -38,7 +38,7 @@ const HistoryInfo = ({hasHistory, clients, currentSelfClient, isNewCurrentSelfCl
   const {history} = useReactRouter();
 
   const onContinue = () => {
-    return history.push(ROUTE.CHOOSE_HANDLE);
+    return history.push(ROUTE.SET_HANDLE);
   };
   const headline = hasHistory ? historyInfoStrings.hasHistoryHeadline : historyInfoStrings.noHistoryHeadline;
   const infoText = hasHistory ? historyInfoStrings.hasHistoryInfo : historyInfoStrings.noHistoryInfo;
@@ -54,7 +54,7 @@ const HistoryInfo = ({hasHistory, clients, currentSelfClient, isNewCurrentSelfCl
     (hasHistory || clients.length > 1 || (currentSelfClient && currentSelfClient.type === ClientType.TEMPORARY));
 
   if (!shouldShowHistoryInfo) {
-    history.push(ROUTE.CHOOSE_HANDLE);
+    history.push(ROUTE.SET_HANDLE);
     return null;
   }
 
