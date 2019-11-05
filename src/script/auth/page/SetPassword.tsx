@@ -19,20 +19,46 @@
 
 import {Button, ContainerXS, ErrorMessage, H1, Input} from '@wireapp/react-ui-kit';
 import React, {useState} from 'react';
+import {useIntl} from 'react-intl';
+import {connect} from 'react-redux';
+import {AnyAction, Dispatch} from 'redux';
+import {setPasswordStrings} from 'src/script/strings';
 import useReactRouter from 'use-react-router';
+import {actionRoot} from '../module/action';
+import {RootState, bindActionCreators} from '../module/reducer';
+import * as SelfSelector from '../module/selector/SelfSelector';
 import {ROUTE} from '../route';
 import {parseError} from '../util/errorUtil';
 import Page from './Page';
 
-const SetPassword = () => {
-  //const {formatMessage: _} = useIntl();
-  const [error /*, setError*/] = useState();
+interface Props extends React.HTMLProps<HTMLDivElement> {}
 
+const SetPassword = ({
+  isSelfSSOUser,
+  hasSelfPassword,
+  doSetPassword,
+  isFetching,
+}: Props & ConnectedProps & DispatchProps) => {
+  const {formatMessage: _} = useIntl();
+  const [error, setError] = useState();
+  const [password, setPassword] = useState('');
   const {history} = useReactRouter();
 
-  const navigateNext = () => {
-    history.push(ROUTE.HISTORY_INFO);
+  const onSetPassword = async (event: React.FormEvent): Promise<void> => {
+    event.preventDefault();
+    try {
+      // TODO: Validate password
+      await doSetPassword({new_password: password});
+      history.push(ROUTE.SET_HANDLE);
+    } catch (error) {
+      setError(error);
+    }
   };
+
+  if (hasSelfPassword || isSelfSSOUser) {
+    history.push(ROUTE.SET_HANDLE);
+    return null;
+  }
 
   return (
     <Page>
@@ -42,14 +68,45 @@ const SetPassword = () => {
         style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
       >
         <div>
-          <H1 center>{'Set Password'}</H1>
-          <Input />
+          <H1 center>{_(setPasswordStrings.headline)}</H1>
+          <Input
+            name="new-password"
+            placeholder={_(setPasswordStrings.passwordPlaceholder)}
+            type="password"
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              setError(null);
+              setPassword(event.currentTarget.value);
+            }}
+            value={password}
+            autoFocus
+            required
+            data-uie-name="enter-password"
+          />
           <ErrorMessage data-uie-name="error-message">{parseError(error)}</ErrorMessage>
-          <Button onClick={navigateNext}>{'Next'}</Button>
+          <Button onClick={onSetPassword} showLoading={isFetching} disabled={isFetching} />
         </div>
       </ContainerXS>
     </Page>
   );
 };
 
-export default SetPassword;
+type ConnectedProps = ReturnType<typeof mapStateToProps>;
+const mapStateToProps = (state: RootState) => ({
+  hasSelfPassword: false,
+  isFetching: SelfSelector.isFetching(state),
+  isSelfSSOUser: SelfSelector.isSSOUser(state),
+});
+
+type DispatchProps = ReturnType<typeof mapDispatchToProps>;
+const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
+  bindActionCreators(
+    {
+      doSetPassword: actionRoot.selfAction.doSetPassword,
+    },
+    dispatch,
+  );
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(SetPassword);

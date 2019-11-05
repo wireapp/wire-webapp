@@ -199,13 +199,24 @@ export const chooseHandleStrings = defineMessages({
 });
 
 export const setEmailStrings = defineMessages({
-  handlePlaceholder: {
+  emailPlaceholder: {
     defaultMessage: 'Email',
-    id: 'setEmail.handlePlaceholder',
+    id: 'setEmail.emailPlaceholder',
   },
   headline: {
     defaultMessage: 'Set email',
     id: 'setEmail.headline',
+  },
+});
+
+export const setPasswordStrings = defineMessages({
+  headline: {
+    defaultMessage: 'Set password',
+    id: 'setPassword.headline',
+  },
+  passwordPlaceholder: {
+    defaultMessage: 'Password',
+    id: 'setPassword.passwordPlaceholder',
   },
 });
 

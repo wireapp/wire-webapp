@@ -54,7 +54,7 @@ const HistoryInfo = ({hasHistory, clients, currentSelfClient, isNewCurrentSelfCl
     (hasHistory || clients.length > 1 || (currentSelfClient && currentSelfClient.type === ClientType.TEMPORARY));
 
   if (!shouldShowHistoryInfo) {
-    history.push(ROUTE.SET_HANDLE);
+    history.push(ROUTE.SET_EMAIL);
     return null;
   }
 

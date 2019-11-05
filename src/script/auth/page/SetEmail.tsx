@@ -44,6 +44,7 @@ const SetEmail = ({hasSelfEmail, isSelfSSOUser, doSetEmail, isFetching}: Props &
     try {
       // TODO: Validate email
       await doSetEmail(email);
+      history.push(ROUTE.VERIFY_EMAIL_LINK);
     } catch (error) {
       setError(error);
     }
@@ -64,14 +65,15 @@ const SetEmail = ({hasSelfEmail, isSelfSSOUser, doSetEmail, isFetching}: Props &
           <H1 center>{_(setEmailStrings.headline)}</H1>
           <Input
             name="email"
-            placeholder={_(setEmailStrings.handlePlaceholder)}
-            type="text"
+            placeholder={_(setEmailStrings.emailPlaceholder)}
+            type="email"
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               setError(null);
               setEmail(event.currentTarget.value);
             }}
             value={email}
             autoFocus
+            required
             data-uie-name="enter-email"
           />
           <ErrorMessage data-uie-name="error-message">{parseError(error)}</ErrorMessage>
