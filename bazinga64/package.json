@@ -3,7 +3,7 @@
   "devDependencies": {
     "@types/jasmine": "3.4.4",
     "@types/karma": "3.0.3",
-    "@types/libsodium-wrappers-sumo": "0.7.2",
+    "@types/libsodium-wrappers-sumo": "0.7.3",
     "@types/node": "~12",
     "cross-env": "6.0.3",
     "jasmine": "3.5.0",
