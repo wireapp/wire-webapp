@@ -31,9 +31,7 @@ import {
 } from '../../conversation/ConversationLabelRepository';
 import {generateConversationUrl} from '../../router/routeGenerator';
 
-interface ConversationLabelWithBadge extends ConversationLabel {
-  badge: number;
-}
+import './groupedConversationHeader';
 
 interface GroupedConversationsParams {
   conversationRepository: ConversationRepository;
@@ -45,19 +43,11 @@ interface GroupedConversationsParams {
   isVisibleFunc: (top: number, bottom: number) => boolean;
 }
 
-const countUnread = (conversations: Conversation[]) =>
-  conversations.filter(({unreadState}) => unreadState().allEvents.length > 0).length;
-
 ko.components.register('grouped-conversations', {
   template: `
     <!-- ko foreach: {data: folders, as: 'folder', noChildContext: true} -->
       <div class="conversation-folder" data-uie-name="conversation-folder" data-bind="attr: {'data-uie-value': folder.name}">
-        <div class="conversation-folder__head" data-uie-name="conversation-folder-head" data-bind="click: () => toggle(folder.id), css: {'conversation-folder__head--open': isExpanded(folder.id)}">
-          <disclose-icon></disclose-icon><span class="conversation-folder__head__name" data-bind="text: folder.name"></span>
-          <!-- ko if: folder.badge -->
-            <span class="conversation-folder__head__badge" data-bind="text: folder.badge" data-uie-name="conversation-folder-badge"></span>
-          <!-- /ko -->
-        </div>
+      <grouped-conversation-header data-bind="click: () => toggle(folder.id)" params="conversationLabel: folder, isOpen: isExpanded(folder.id)"></grouped-conversation-header>
         <div data-bind="visible: isExpanded(folder.id)">
           <!-- ko foreach: {data: folder.conversations, as: 'conversation', noChildContext: true} -->
             <conversation-list-cell
@@ -86,31 +76,30 @@ ko.components.register('grouped-conversations', {
     this.isSelectedConversation = isSelectedConversation;
     this.getConversationUrl = generateConversationUrl;
     this.isVisibleFunc = isVisibleFunc;
+    this.countUnread = (conversations: ko.Observable<Conversation[]>) =>
+      conversations().reduce((sum, conversation) => (conversation.hasUnread() ? sum + 1 : sum), 0);
 
-    this.folders = ko.pureComputed<ConversationLabelWithBadge[]>(() => {
-      const folders: ConversationLabelWithBadge[] = [];
+    this.folders = ko.pureComputed<ConversationLabel[]>(() => {
+      const folders: ConversationLabel[] = [];
 
       const favorites = conversationLabelRepository.getFavorites();
       if (favorites.length) {
-        folders.push({...createLabelFavorites(favorites), badge: countUnread(favorites)});
+        folders.push(createLabelFavorites(favorites));
       }
 
       const groups = conversationLabelRepository.getGroupsWithoutLabel();
       if (groups.length) {
-        folders.push({...createLabelGroups(groups), badge: countUnread(groups)});
+        folders.push(createLabelGroups(groups));
       }
 
       const contacts = conversationLabelRepository.getContactsWithoutLabel();
       if (contacts.length) {
-        folders.push({...createLabelPeople(contacts), badge: countUnread(contacts)});
+        folders.push(createLabelPeople(contacts));
       }
 
       const custom = conversationLabelRepository
         .getLabels()
-        .map(label => {
-          const conversations = conversationLabelRepository.getLabelConversations(label);
-          return {...createLabel(label.name, conversations, label.id), badge: countUnread(conversations)};
-        })
+        .map(label => createLabel(label.name, conversationLabelRepository.getLabelConversations(label), label.id))
         .filter(({conversations}) => !!conversations().length);
       folders.push(...custom);
 
