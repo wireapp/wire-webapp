@@ -39,14 +39,17 @@ ko.components.register('grouped-conversation-header', {
   viewModel: function({conversationLabel, isOpen}: GroupedConversationHeaderParams): void {
     this.label = conversationLabel;
     this.isOpen = isOpen;
-    this.badge = conversationLabel.conversations().filter(conversation => {
-      if (conversation.mutedState() === NOTIFICATION_STATE.NOTHING) {
-        return false;
-      }
-      if (conversation.mutedState() === NOTIFICATION_STATE.EVERYTHING) {
-        return conversation.hasUnread();
-      }
-      return conversation.hasUnreadTargeted();
-    }).length;
+    this.badge = ko.pureComputed(
+      () =>
+        conversationLabel.conversations().filter(conversation => {
+          if (conversation.mutedState() === NOTIFICATION_STATE.NOTHING) {
+            return false;
+          }
+          if (conversation.mutedState() === NOTIFICATION_STATE.EVERYTHING) {
+            return conversation.hasUnread();
+          }
+          return conversation.hasUnreadTargeted();
+        }).length,
+    );
   },
 });
