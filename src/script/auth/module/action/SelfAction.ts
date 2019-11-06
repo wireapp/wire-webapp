@@ -29,25 +29,20 @@ const logger = getLogger('SelfAction');
 
 export class SelfAction {
   fetchSelf = (): ThunkAction<Promise<Self>> => {
-    return (dispatch, getState, {apiClient}) => {
+    return async (dispatch, getState, {actions: {selfAction}, apiClient}) => {
       dispatch(SelfActionCreator.startFetchSelf());
-      return apiClient.self.api
-        .getSelf()
-        .then(selfUser => {
-          return apiClient.teams.team.api.getTeams().then(({teams}) => {
-            const [boundTeam] = teams.filter(team => team.binding);
-            selfUser.team = boundTeam && boundTeam.id;
-            return selfUser;
-          });
-        })
-        .then(selfUser => {
-          dispatch(SelfActionCreator.successfulFetchSelf(selfUser));
-          return selfUser;
-        })
-        .catch(error => {
-          dispatch(SelfActionCreator.failedFetchSelf(error));
-          throw error;
-        });
+      try {
+        const selfUser = await apiClient.self.api.getSelf();
+        dispatch(selfAction.doCheckPasswordState());
+        const {teams} = await apiClient.teams.team.api.getTeams();
+        const [boundTeam] = teams.filter(team => team.binding);
+        selfUser.team = boundTeam && boundTeam.id;
+        dispatch(SelfActionCreator.successfulFetchSelf(selfUser));
+        return selfUser;
+      } catch (error) {
+        dispatch(SelfActionCreator.failedFetchSelf(error));
+        throw error;
+      }
     };
   };
 
@@ -131,6 +126,28 @@ export class SelfAction {
         dispatch(SelfActionCreator.successfulSetSelfEmail());
       } catch (error) {
         dispatch(SelfActionCreator.failedSetSelfEmail(error));
+        throw error;
+      }
+    };
+  };
+
+  doCheckPasswordState = (): ThunkAction<Promise<boolean>> => {
+    return async (dispatch, getState, {apiClient}) => {
+      dispatch(SelfActionCreator.startSetPasswordState());
+      try {
+        const response = await apiClient.self.api.headPassword();
+        switch (response.status) {
+          case 200: {
+            dispatch(SelfActionCreator.successfulSetPasswordState({hasPassword: true}));
+            return true;
+          }
+          default: {
+            dispatch(SelfActionCreator.successfulSetPasswordState({hasPassword: false}));
+            return false;
+          }
+        }
+      } catch (error) {
+        dispatch(SelfActionCreator.failedSetPasswordState(error));
         throw error;
       }
     };

@@ -92,7 +92,7 @@ const SetPassword = ({
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
-  hasSelfPassword: false,
+  hasSelfPassword: SelfSelector.hasSelfPassword(state),
   isFetching: SelfSelector.isFetching(state),
   isSelfSSOUser: SelfSelector.isSSOUser(state),
 });
