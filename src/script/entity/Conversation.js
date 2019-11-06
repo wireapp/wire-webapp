@@ -288,15 +288,13 @@ export class Conversation {
     });
 
     this.hasUnread = () => {
-      const lastMessage = this.messages()
-        .reverse()
-        .find(message => message.isIncoming());
+      const lastMessage = [...this.messages()].reverse().find(message => message.isIncoming());
       return !!lastMessage && lastMessage.timestamp() > this.last_read_timestamp();
     };
 
     this.hasUnreadTargeted = () => {
       const selfId = this.selfUser().id;
-      const lastMessage = this.messages()
+      const lastMessage = [...this.messages()]
         .reverse()
         .find(message => !message.user().is_me && message.is_content() && message.isUserTargeted(selfId));
       return !!lastMessage && lastMessage.timestamp() > this.last_read_timestamp();
