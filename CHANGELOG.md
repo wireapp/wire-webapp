@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@8.1.0...@wireapp/api-client@8.2.0) (2019-11-06)
+
+
+### Features
+
+* **api-client:** HEAD /self/password endpoint ([#2513](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2513)) ([d47909f](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/d47909f070ff541ccb713f6199f7306b50f9d275))
+
+
+
+
+
 # [8.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@8.0.2...@wireapp/api-client@8.1.0) (2019-10-30)
 
 
