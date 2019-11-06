@@ -17,7 +17,7 @@
  *
  */
 
-import {AxiosRequestConfig} from 'axios';
+import {AxiosRequestConfig, AxiosResponse} from 'axios';
 
 import {HttpClient} from '../http/';
 import {ChangePassword, Delete, SearchableStatus, Self} from '../self/';
@@ -252,5 +252,17 @@ export class SelfAPI {
     };
 
     await this.client.sendJSON(config);
+  }
+
+  /**
+   * Check if password is set.
+   */
+  public headPassword(): Promise<AxiosResponse<void>> {
+    const config: AxiosRequestConfig = {
+      method: 'head',
+      url: `${SelfAPI.URL.SELF}/${SelfAPI.URL.PASSWORD}`,
+    };
+
+    return this.client.sendJSON(config);
   }
 }
