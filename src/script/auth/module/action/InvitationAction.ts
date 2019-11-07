@@ -28,7 +28,7 @@ import {InvitationActionCreator} from './creator/';
 
 export class InvitationAction {
   invite = (invitation: {email: string}): ThunkAction => {
-    return (dispatch, getState, {apiClient}) => {
+    return async (dispatch, getState, {apiClient}) => {
       dispatch(InvitationActionCreator.startAddInvite());
       const state = getState();
       const inviteList = InviteSelector.getInvites(state);
@@ -52,22 +52,19 @@ export class InvitationAction {
       };
 
       const teamId = selfSelector.getSelfTeamId(state);
-      return Promise.resolve()
-        .then(() => apiClient.teams.invitation.api.postInvitation(teamId, newInvite))
-        .then(createdInvite => {
-          dispatch(InvitationActionCreator.successfulAddInvite(createdInvite));
-        })
-        .catch(error => {
-          dispatch(InvitationActionCreator.failedAddInvite(error));
-          throw error;
-        });
+      try {
+        const createdInvite = await apiClient.teams.invitation.api.postInvitation(teamId, newInvite);
+        dispatch(InvitationActionCreator.successfulAddInvite(createdInvite));
+      } catch (error_1) {
+        dispatch(InvitationActionCreator.failedAddInvite(error_1));
+        throw error_1;
+      }
     };
   };
+
   resetInviteErrors = (): ThunkAction => {
-    return dispatch => {
-      return Promise.resolve().then(() => {
-        dispatch(InvitationActionCreator.resetError());
-      });
+    return async dispatch => {
+      dispatch(InvitationActionCreator.resetError());
     };
   };
 }
