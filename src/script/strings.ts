@@ -199,6 +199,10 @@ export const chooseHandleStrings = defineMessages({
 });
 
 export const setEmailStrings = defineMessages({
+  button: {
+    defaultMessage: 'Set email',
+    id: 'setEmail.button',
+  },
   emailPlaceholder: {
     defaultMessage: 'Email',
     id: 'setEmail.emailPlaceholder',

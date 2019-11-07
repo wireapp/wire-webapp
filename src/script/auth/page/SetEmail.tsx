@@ -17,32 +17,46 @@
  *
  */
 
-import {Button, ContainerXS, ErrorMessage, H1, Input} from '@wireapp/react-ui-kit';
-import React, {useState} from 'react';
+import {Button, ContainerXS, ErrorMessage, Form, H1, Input} from '@wireapp/react-ui-kit';
+import React, {useRef, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 import useReactRouter from 'use-react-router';
 import {setEmailStrings} from '../../strings';
 import {actionRoot} from '../module/action';
+import {ValidationError} from '../module/action/ValidationError';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as SelfSelector from '../module/selector/SelfSelector';
 import {ROUTE} from '../route';
-import {parseError} from '../util/errorUtil';
+import {isValidationError, parseError, parseValidationErrors} from '../util/errorUtil';
 import Page from './Page';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
 const SetEmail = ({hasSelfEmail, isSelfSSOUser, doSetEmail, isFetching}: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
+
+  const emailInput = useRef<HTMLInputElement>();
   const [error, setError] = useState();
+  const [isValidEmail, setIsValidEmail] = useState(true);
   const [email, setEmail] = useState('');
   const {history} = useReactRouter();
 
-  const onSetHandle = async (event: React.FormEvent): Promise<void> => {
+  const onSetEmail = async (event: React.FormEvent): Promise<void> => {
     event.preventDefault();
+    let validationError: Error;
+
+    const currentInputNode = emailInput.current;
+    currentInputNode.focus();
+    if (!currentInputNode.checkValidity()) {
+      validationError = ValidationError.handleValidationState(currentInputNode.name, currentInputNode.validity);
+    }
+    setIsValidEmail(currentInputNode.validity.valid);
     try {
-      // TODO: Validate email
+      if (validationError) {
+        throw validationError;
+      }
       await doSetEmail(email);
       history.push(ROUTE.VERIFY_EMAIL_LINK);
     } catch (error) {
@@ -61,24 +75,34 @@ const SetEmail = ({hasSelfEmail, isSelfSSOUser, doSetEmail, isFetching}: Props &
         verticalCenter
         style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
       >
-        <div>
+        <Form onSubmit={onSetEmail}>
           <H1 center>{_(setEmailStrings.headline)}</H1>
           <Input
             name="email"
             placeholder={_(setEmailStrings.emailPlaceholder)}
             type="email"
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              setError(null);
+              emailInput.current.setCustomValidity('');
               setEmail(event.currentTarget.value);
+              setError(null);
+              setIsValidEmail(true);
             }}
+            autoComplete="email"
             value={email}
+            ref={emailInput}
+            markInvalid={!isValidEmail}
             autoFocus
+            maxLength={128}
             required
             data-uie-name="enter-email"
           />
-          <ErrorMessage data-uie-name="error-message">{parseError(error)}</ErrorMessage>
-          <Button onClick={onSetHandle} showLoading={isFetching} disabled={isFetching} />
-        </div>
+          <ErrorMessage data-uie-name="error-message">
+            {!error ? <>&nbsp;</> : isValidationError(error) ? parseValidationErrors(error) : parseError(error)}
+          </ErrorMessage>
+          <Button block showLoading={isFetching} disabled={isFetching || !email} formNoValidate type="submit">
+            {_(setEmailStrings.button)}
+          </Button>
+        </Form>
       </ContainerXS>
     </Page>
   );
