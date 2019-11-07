@@ -31,7 +31,7 @@ ko.components.register('grouped-conversation-header', {
     <div class="conversation-folder__head" data-uie-name="conversation-folder-head" data-bind="css: {'conversation-folder__head--open': isOpen}">
       <disclose-icon></disclose-icon>
       <span class="conversation-folder__head__name" data-bind="text: label.name"></span>
-      <!-- ko if: badge -->
+      <!-- ko if: badge() -->
         <span class="conversation-folder__head__badge" data-bind="text: badge" data-uie-name="conversation-folder-badge"></span>
       <!-- /ko -->
     </div>
@@ -45,10 +45,10 @@ ko.components.register('grouped-conversation-header', {
           if (conversation.mutedState() === NOTIFICATION_STATE.NOTHING) {
             return false;
           }
-          if (conversation.mutedState() === NOTIFICATION_STATE.EVERYTHING) {
-            return conversation.hasUnread();
+          if (conversation.mutedState() === NOTIFICATION_STATE.MENTIONS_AND_REPLIES) {
+            return conversation.hasUnreadTargeted();
           }
-          return conversation.hasUnreadTargeted();
+          return conversation.hasUnread();
         }).length,
     );
   },
