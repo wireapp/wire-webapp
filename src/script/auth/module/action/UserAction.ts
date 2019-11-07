@@ -24,8 +24,8 @@ import {UserActionCreator} from './creator/';
 export class UserAction {
   checkHandles = (handles: string[]): ThunkAction<Promise<string>> => {
     return async (dispatch, getState, {apiClient}) => {
-      const availableHandles = await apiClient.user.api.postHandles({handles, return: 1});
-      return availableHandles[0];
+      const [availableHandle] = await apiClient.user.api.postHandles({handles, return: 1});
+      return availableHandle;
     };
   };
 
