@@ -26,33 +26,29 @@ import {ClientActionCreator} from './creator/';
 
 export class ClientAction {
   doGetAllClients = (): ThunkAction<Promise<RegisteredClient[]>> => {
-    return (dispatch, getState, {apiClient}) => {
+    return async (dispatch, getState, {apiClient}) => {
       dispatch(ClientActionCreator.startGetAllClients());
-      return Promise.resolve()
-        .then(() => apiClient.client.api.getClients())
-        .then(clients => {
-          dispatch(ClientActionCreator.successfulGetAllClients(clients));
-          return clients;
-        })
-        .catch(error => {
-          dispatch(ClientActionCreator.failedGetAllClients(error));
-          throw error;
-        });
+      try {
+        const clients = await apiClient.client.api.getClients();
+        dispatch(ClientActionCreator.successfulGetAllClients(clients));
+        return clients;
+      } catch (error) {
+        dispatch(ClientActionCreator.failedGetAllClients(error));
+        throw error;
+      }
     };
   };
 
   doRemoveClient = (clientId: string, password?: string): ThunkAction => {
-    return (dispatch, getState, {apiClient}) => {
+    return async (dispatch, getState, {apiClient}) => {
       dispatch(ClientActionCreator.startRemoveClient());
-      return Promise.resolve()
-        .then(() => apiClient.client.api.deleteClient(clientId, password))
-        .then(clients => {
-          dispatch(ClientActionCreator.successfulRemoveClient(clientId));
-        })
-        .catch(error => {
-          dispatch(ClientActionCreator.failedRemoveClient(error));
-          throw error;
-        });
+      try {
+        await apiClient.client.api.deleteClient(clientId, password);
+        dispatch(ClientActionCreator.successfulRemoveClient(clientId));
+      } catch (error) {
+        dispatch(ClientActionCreator.failedRemoveClient(error));
+        throw error;
+      }
     };
   };
 
