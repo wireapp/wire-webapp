@@ -210,6 +210,10 @@ export const setEmailStrings = defineMessages({
 });
 
 export const setPasswordStrings = defineMessages({
+  button: {
+    defaultMessage: 'Set password',
+    id: 'setPassword.button',
+  },
   headline: {
     defaultMessage: 'Set password',
     id: 'setPassword.headline',

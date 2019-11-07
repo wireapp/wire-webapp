@@ -21,6 +21,7 @@ import {ErrorMessage} from '@wireapp/react-ui-kit';
 import React from 'react';
 import {FormattedHTMLMessage} from 'react-intl';
 import {errorHandlerStrings, validationErrorStrings} from '../../strings';
+import {ValidationError} from '../module/action/ValidationError';
 
 export function parseError(error: any): JSX.Element | null {
   if (error) {
@@ -44,3 +45,7 @@ export function parseValidationErrors(errors: any | any[]): JSX.Element[] {
     </ErrorMessage>
   ));
 }
+
+export const isValidationError = (error: any) => {
+  return error instanceof ValidationError;
+};

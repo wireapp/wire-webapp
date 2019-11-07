@@ -17,18 +17,21 @@
  *
  */
 
-import {Button, ContainerXS, ErrorMessage, H1, Input} from '@wireapp/react-ui-kit';
-import React, {useState} from 'react';
+import {ValidationUtil} from '@wireapp/commons';
+import {Button, ContainerXS, ErrorMessage, Form, H1, Input} from '@wireapp/react-ui-kit';
+import React, {useRef, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 import useReactRouter from 'use-react-router';
 import {setPasswordStrings} from '../../strings';
+import {Config} from '../config';
 import {actionRoot} from '../module/action';
+import {ValidationError} from '../module/action/ValidationError';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as SelfSelector from '../module/selector/SelfSelector';
 import {ROUTE} from '../route';
-import {parseError} from '../util/errorUtil';
+import {isValidationError, parseError, parseValidationErrors} from '../util/errorUtil';
 import Page from './Page';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
@@ -40,14 +43,27 @@ const SetPassword = ({
   isFetching,
 }: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
+
+  const passwordInput = useRef<HTMLInputElement>();
   const [error, setError] = useState();
+  const [isValidPassword, setIsValidPassword] = useState(true);
   const [password, setPassword] = useState('');
   const {history} = useReactRouter();
 
   const onSetPassword = async (event: React.FormEvent): Promise<void> => {
     event.preventDefault();
+    let validationError: Error;
+
+    const currentInputNode = passwordInput.current;
+    currentInputNode.focus();
+    if (!currentInputNode.checkValidity()) {
+      validationError = ValidationError.handleValidationState(currentInputNode.name, currentInputNode.validity);
+    }
+    setIsValidPassword(currentInputNode.validity.valid);
     try {
-      // TODO: Validate password
+      if (validationError) {
+        throw validationError;
+      }
       await doSetPassword({new_password: password});
       history.push(ROUTE.SET_HANDLE);
     } catch (error) {
@@ -67,24 +83,34 @@ const SetPassword = ({
         verticalCenter
         style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
       >
-        <div>
+        <Form onSubmit={onSetPassword}>
           <H1 center>{_(setPasswordStrings.headline)}</H1>
           <Input
-            name="new-password"
+            autoComplete="new-password"
+            name="password"
             placeholder={_(setPasswordStrings.passwordPlaceholder)}
             type="password"
+            markInvalid={!isValidPassword}
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              passwordInput.current.setCustomValidity('');
               setError(null);
               setPassword(event.currentTarget.value);
+              setIsValidPassword(true);
             }}
+            ref={passwordInput}
             value={password}
             autoFocus
             required
+            pattern={ValidationUtil.getNewPasswordPattern(Config.NEW_PASSWORD_MINIMUM_LENGTH)}
             data-uie-name="enter-password"
           />
-          <ErrorMessage data-uie-name="error-message">{parseError(error)}</ErrorMessage>
-          <Button onClick={onSetPassword} showLoading={isFetching} disabled={isFetching} />
-        </div>
+          <ErrorMessage data-uie-name="error-message">
+            {!error ? <>&nbsp;</> : isValidationError(error) ? parseValidationErrors(error) : parseError(error)}
+          </ErrorMessage>
+          <Button block showLoading={isFetching} disabled={isFetching || !password} formNoValidate type="submit">
+            {_(setPasswordStrings.button)}
+          </Button>
+        </Form>
       </ContainerXS>
     </Page>
   );
@@ -92,7 +118,7 @@ const SetPassword = ({
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
-  hasSelfPassword: SelfSelector.hasSelfPassword(state),
+  hasSelfPassword: false, //SelfSelector.hasSelfPassword(state),
   isFetching: SelfSelector.isFetching(state),
   isSelfSSOUser: SelfSelector.isSSOUser(state),
 });
