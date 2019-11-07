@@ -728,7 +728,14 @@ export class CallingRepository {
         this.mediaStreamQuery = undefined;
         this.logger.warn('Could not get mediaStream for call', error);
         this.handleMediaStreamError(call, missingStreams);
-        return selfParticipant.getMediaStream();
+        return new Promise(resolve => {
+          /*
+            There is a bug in Chrome (from version 73, the version where it's fixed is unknown).
+            This bug crashes the browser if the mediaStream is returned right away (probably some race condition in Chrome internal code)
+            The timeout(0) fixes this issue.
+          */
+          setTimeout(() => resolve(selfParticipant.getMediaStream()), 0);
+        });
       });
 
     return this.mediaStreamQuery;
