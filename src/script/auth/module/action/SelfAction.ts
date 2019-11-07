@@ -29,65 +29,55 @@ const logger = getLogger('SelfAction');
 
 export class SelfAction {
   fetchSelf = (): ThunkAction<Promise<Self>> => {
-    return (dispatch, getState, {apiClient}) => {
+    return async (dispatch, getState, {apiClient}) => {
       dispatch(SelfActionCreator.startFetchSelf());
-      return apiClient.self.api
-        .getSelf()
-        .then(selfUser => {
-          return apiClient.teams.team.api.getTeams().then(({teams}) => {
-            const [boundTeam] = teams.filter(team => team.binding);
-            selfUser.team = boundTeam && boundTeam.id;
-            return selfUser;
-          });
-        })
-        .then(selfUser => {
-          dispatch(SelfActionCreator.successfulFetchSelf(selfUser));
-          return selfUser;
-        })
-        .catch(error => {
-          dispatch(SelfActionCreator.failedFetchSelf(error));
-          throw error;
-        });
+      try {
+        const selfUser = await apiClient.self.api.getSelf();
+        const {teams} = await apiClient.teams.team.api.getTeams();
+        const [boundTeam] = teams.filter(team => team.binding);
+        selfUser.team = boundTeam && boundTeam.id;
+        dispatch(SelfActionCreator.successfulFetchSelf(selfUser));
+        return selfUser;
+      } catch (error) {
+        dispatch(SelfActionCreator.failedFetchSelf(error));
+        throw error;
+      }
     };
   };
 
   setHandle = (handle: string): ThunkAction => {
-    return (dispatch, getState, {apiClient, actions: {selfAction}}) => {
+    return async (dispatch, getState, {apiClient, actions: {selfAction}}) => {
       dispatch(SelfActionCreator.startSetHandle());
-      return apiClient.self.api
-        .putHandle({handle: handle.trim().toLowerCase()})
-        .then(() => dispatch(selfAction.fetchSelf()))
-        .then(result => {
-          dispatch(SelfActionCreator.successfulSetHandle(result));
-        })
-        .catch(error => {
-          dispatch(SelfActionCreator.failedSetHandle(error));
-          throw error;
-        });
+      try {
+        await apiClient.self.api.putHandle({handle: handle.trim().toLowerCase()});
+        const selfUser = await dispatch(selfAction.fetchSelf());
+        dispatch(SelfActionCreator.successfulSetHandle(selfUser));
+      } catch (error) {
+        dispatch(SelfActionCreator.failedSetHandle(error));
+        throw error;
+      }
     };
   };
 
   doGetConsents = (): ThunkAction => {
-    return (dispatch, getState, {apiClient, config}) => {
+    return async (dispatch, getState, {apiClient, config}) => {
       if (!config.FEATURE.CHECK_CONSENT) {
         logger.warn('Consent check feature is disabled.');
         return Promise.resolve();
       }
       dispatch(SelfActionCreator.startGetConsents());
-      return apiClient.self.api
-        .getConsents()
-        .then(({results}) => {
-          dispatch(SelfActionCreator.successfulGetConsents(results));
-        })
-        .catch(error => {
-          dispatch(SelfActionCreator.failedGetConsents(error));
-          throw error;
-        });
+      try {
+        const {results} = await apiClient.self.api.getConsents();
+        dispatch(SelfActionCreator.successfulGetConsents(results));
+      } catch (error) {
+        dispatch(SelfActionCreator.failedGetConsents(error));
+        throw error;
+      }
     };
   };
 
   doSetConsent = (consentType: ConsentType, value: number): ThunkAction => {
-    return (dispatch, getState, {apiClient, config}) => {
+    return async (dispatch, getState, {apiClient, config}) => {
       if (!config.FEATURE.CHECK_CONSENT) {
         logger.warn('Consent check feature is disabled.');
         return Promise.resolve();
@@ -98,15 +88,13 @@ export class SelfAction {
         type: consentType,
         value,
       };
-      return apiClient.self.api
-        .putConsent(consent)
-        .then(() => {
-          dispatch(SelfActionCreator.successfulSetConsent(consent));
-        })
-        .catch(error => {
-          dispatch(SelfActionCreator.failedSetConsent(error));
-          throw error;
-        });
+      try {
+        await apiClient.self.api.putConsent(consent);
+        dispatch(SelfActionCreator.successfulSetConsent(consent));
+      } catch (error) {
+        dispatch(SelfActionCreator.failedSetConsent(error));
+        throw error;
+      }
     };
   };
 
@@ -114,7 +102,7 @@ export class SelfAction {
     return async (dispatch, getState, {apiClient}) => {
       dispatch(SelfActionCreator.startSetSelfPassword());
       try {
-        apiClient.self.api.putPassword(changePassword);
+        await apiClient.self.api.putPassword(changePassword);
         dispatch(SelfActionCreator.successfulSetSelfPassword());
       } catch (error) {
         dispatch(SelfActionCreator.failedSetSelfPassword(error));
@@ -127,7 +115,7 @@ export class SelfAction {
     return async (dispatch, getState, {apiClient}) => {
       dispatch(SelfActionCreator.startSetSelfEmail());
       try {
-        apiClient.self.api.putEmail({email});
+        await apiClient.self.api.putEmail({email});
         dispatch(SelfActionCreator.successfulSetSelfEmail());
       } catch (error) {
         dispatch(SelfActionCreator.failedSetSelfEmail(error));
