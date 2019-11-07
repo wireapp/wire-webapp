@@ -22,8 +22,13 @@ const tolerance = 0.8;
 const onIntersect = entries => {
   entries.forEach(({intersectionRatio, intersectionRect, isIntersecting, target: element}) => {
     const {onVisible, onChange, fullyInView, container} = observedElements.get(element) || {};
-    const isFullyInView = () =>
-      container ? intersectionRect.height >= container.clientHeight * tolerance : intersectionRatio >= tolerance;
+    const isFullyInView = () => {
+      if (container) {
+        const minHeight = Math.min(container.clientHeight, element.clientHeight) * tolerance;
+        return intersectionRect.height >= minHeight;
+      }
+      return intersectionRatio >= tolerance;
+    };
     const isVisible = isIntersecting && (!fullyInView || isFullyInView());
 
     if (onChange) {
