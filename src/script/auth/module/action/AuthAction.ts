@@ -134,8 +134,9 @@ export class AuthAction {
         }
         return new BackendError({code: 500, label: BackendError.SSO_ERRORS.SSO_GENERIC_ERROR});
       };
+
       try {
-        return apiClient.auth.api.headInitiateLogin(code);
+        return await apiClient.auth.api.headInitiateLogin(code);
       } catch (error) {
         const mappedError = mapError(error);
         dispatch(AuthActionCreator.failedLogin(mappedError));
