@@ -83,7 +83,7 @@ const SetEmail = ({hasSelfEmail, isSelfSSOUser, doSetEmail, isFetching}: Props &
             type="email"
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               emailInput.current.setCustomValidity('');
-              setEmail(event.currentTarget.value);
+              setEmail(event.target.value);
               setError(null);
               setIsValidEmail(true);
             }}
@@ -99,7 +99,14 @@ const SetEmail = ({hasSelfEmail, isSelfSSOUser, doSetEmail, isFetching}: Props &
           <ErrorMessage data-uie-name="error-message">
             {!error ? <>&nbsp;</> : isValidationError(error) ? parseValidationErrors(error) : parseError(error)}
           </ErrorMessage>
-          <Button block showLoading={isFetching} disabled={isFetching || !email} formNoValidate type="submit">
+          <Button
+            block
+            showLoading={isFetching}
+            disabled={isFetching || !email}
+            formNoValidate
+            type="submit"
+            data-uie-name="do-verify-email"
+          >
             {_(setEmailStrings.button)}
           </Button>
         </Form>

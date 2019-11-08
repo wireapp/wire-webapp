@@ -94,7 +94,7 @@ const SetPassword = ({
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               passwordInput.current.setCustomValidity('');
               setError(null);
-              setPassword(event.currentTarget.value);
+              setPassword(event.target.value);
               setIsValidPassword(true);
             }}
             ref={passwordInput}
@@ -107,7 +107,14 @@ const SetPassword = ({
           <ErrorMessage data-uie-name="error-message">
             {!error ? <>&nbsp;</> : isValidationError(error) ? parseValidationErrors(error) : parseError(error)}
           </ErrorMessage>
-          <Button block showLoading={isFetching} disabled={isFetching || !password} formNoValidate type="submit">
+          <Button
+            block
+            showLoading={isFetching}
+            disabled={isFetching || !password}
+            formNoValidate
+            type="submit"
+            data-uie-name="do-set-password"
+          >
             {_(setPasswordStrings.button)}
           </Button>
         </Form>

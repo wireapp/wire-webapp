@@ -112,7 +112,7 @@ const SetHandle = ({
               type="text"
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                 setError(null);
-                setHandle(event.currentTarget.value);
+                setHandle(event.target.value);
               }}
               value={handle}
               autoFocus
