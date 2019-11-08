@@ -151,7 +151,7 @@ describe('videoGridHandler', () => {
 
   function generateVideoParticipant(id) {
     const participant = new Participant(id, 'deviceid');
-    spyOn(participant, 'hasActiveVideo').and.returnValue(true);
+    participant.hasActiveVideo = () => true;
     return participant;
   }
 

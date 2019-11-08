@@ -24,7 +24,7 @@ export interface LanguageState {
   language: string;
 }
 
-const initialState: LanguageState = {
+export const initialState: LanguageState = {
   language: mapLanguage(currentLanguage()),
 };
 

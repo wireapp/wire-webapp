@@ -138,7 +138,7 @@ describe('EventRepository', () => {
       TestFactory.event_repository.connectWebSocket();
       await TestFactory.event_repository.initializeFromStream();
 
-      expect(TestFactory.notification_service.getLastNotificationIdFromDb);
+      expect(TestFactory.notification_service.getLastNotificationIdFromDb).toBeDefined();
       expect(TestFactory.notification_service.getNotificationsLast).toHaveBeenCalledWith(clientId);
       expect(TestFactory.notification_service.getNotifications).toHaveBeenCalledWith(
         clientId,

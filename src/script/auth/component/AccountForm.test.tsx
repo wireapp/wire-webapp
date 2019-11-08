@@ -17,39 +17,15 @@
  *
  */
 
+import {ReactWrapper} from 'enzyme';
 import React from 'react';
-
-import {mockStore, mountComponent} from '../util/TestUtil';
+import {initialRootState} from '../module/reducer';
+import {mockStoreFactory} from '../util/test/mockStoreFactory';
+import {mountComponent} from '../util/test/TestUtil';
 import AccountForm from './AccountForm';
 
 describe('when entering account data', () => {
-  let wrapper;
-  const initialState = {
-    authState: {
-      account: {
-        accent_id: undefined,
-        assets: undefined,
-        email: undefined,
-        email_code: undefined,
-        invitation_code: undefined,
-        label: undefined,
-        locale: undefined,
-        name: undefined,
-        password: undefined,
-        phone: undefined,
-        phone_code: undefined,
-        team: undefined,
-      },
-      error: null,
-      fetched: false,
-      fetching: false,
-      isAuthenticated: false,
-      isInTeamFlow: false,
-    },
-    languageState: {
-      language: 'en',
-    },
-  };
+  let wrapper: ReactWrapper;
 
   const nameInput = () => wrapper.find('[data-uie-name="enter-name"]').first();
   const emailInput = () => wrapper.find('[data-uie-name="enter-email"]').first();
@@ -58,20 +34,19 @@ describe('when entering account data', () => {
   const doTermsCheckbox = () => wrapper.find('[data-uie-name="do-terms"]').first();
   const validationErrorMessage = () => wrapper.find('[data-uie-name="error-message"]').last();
 
-  const createAccountState = account => ({
-    ...initialState,
-    authState: {
-      ...initialState.authState,
-      account: {
-        ...initialState.authState.account,
-        ...account,
-      },
-    },
-  });
-
   describe('the submit button', () => {
     it('is disabled if input is insufficient', () => {
-      wrapper = mountComponent(<AccountForm />, mockStore(initialState));
+      wrapper = mountComponent(
+        <AccountForm onSubmit={() => {}} />,
+        mockStoreFactory()({
+          ...initialRootState,
+          runtimeState: {
+            hasCookieSupport: true,
+            hasIndexedDbSupport: true,
+            isSupportedBrowser: true,
+          },
+        }),
+      );
 
       expect(nameInput().props().required).toBe(true);
       expect(emailInput().props().required).toBe(true);
@@ -82,67 +57,96 @@ describe('when entering account data', () => {
     });
 
     it('is enabled when data is prefilled', () => {
-      const prefilledAccount = {
-        email: 'email@email.com',
-        name: 'name',
-        password: 'Ab1!Ab1!Ab1!Ab1!Ab1!',
-        termsAccepted: true,
-      };
+      wrapper = mountComponent(
+        <AccountForm onSubmit={() => {}} />,
+        mockStoreFactory()({
+          ...initialRootState,
+          authState: {
+            account: {
+              email: 'email@email.com',
+              name: 'name',
+              password: 'Ab1!Ab1!Ab1!Ab1!Ab1!',
+              termsAccepted: true,
+            },
+          },
+          runtimeState: {
+            hasCookieSupport: true,
+            hasIndexedDbSupport: true,
+            isSupportedBrowser: true,
+          },
+        }),
+      );
 
-      wrapper = mountComponent(<AccountForm />, mockStore(createAccountState(prefilledAccount)));
-
-      expect(doNextButton().props().disabled).toBe(false);
+      expect(doNextButton().props().disabled).toBe(undefined);
     });
   });
 
   describe('an error message', () => {
-    it('appears if too few characters are entered in the name field', done => {
+    it('appears if too few characters are entered in the name field', () => {
       const expectedName = 'M';
       const expectedErrorMessage = 'Enter a name with at least 2 characters';
 
-      const prefilledAccount = {
-        email: 'email@email.com',
-        password: 'Ab1!Ab1!Ab1!Ab1!Ab1!',
-        termsAccepted: true,
-      };
-
-      wrapper = mountComponent(<AccountForm />, mockStore(createAccountState(prefilledAccount)));
+      wrapper = mountComponent(
+        <AccountForm onSubmit={() => {}} />,
+        mockStoreFactory()({
+          ...initialRootState,
+          authState: {
+            account: {
+              email: 'email@email.com',
+              password: 'Ab1!Ab1!Ab1!Ab1!Ab1!',
+              termsAccepted: true,
+            },
+          },
+          runtimeState: {
+            hasCookieSupport: true,
+            hasIndexedDbSupport: true,
+            isSupportedBrowser: true,
+          },
+        }),
+      );
 
       expect(doNextButton().props().disabled).toBe(true);
       nameInput().simulate('change', {target: {value: expectedName}});
 
       expect(nameInput().props().value).toBe(expectedName);
-      expect(doNextButton().props().disabled).toBe(false);
+      expect(doNextButton().props().disabled).toBe(undefined);
       doNextButton().simulate('submit');
 
       expect(validationErrorMessage().text()).toBe(expectedErrorMessage);
-
-      done();
     });
 
-    it('appears when input gets trimmed', done => {
+    it('appears when input gets trimmed', () => {
       const actualName = '  ';
       const expectedName = '  ';
       const expectedErrorMessage = 'Enter a name with at least 2 characters';
 
-      const prefilledAccount = {
-        email: 'email@email.com',
-        password: 'Ab1!Ab1!Ab1!Ab1!Ab1!',
-        termsAccepted: true,
-      };
-
-      wrapper = mountComponent(<AccountForm />, mockStore(createAccountState(prefilledAccount)));
+      wrapper = mountComponent(
+        <AccountForm onSubmit={() => {}} />,
+        mockStoreFactory()({
+          ...initialRootState,
+          authState: {
+            account: {
+              email: 'email@email.com',
+              password: 'Ab1!Ab1!Ab1!Ab1!Ab1!',
+              termsAccepted: true,
+            },
+          },
+          runtimeState: {
+            hasCookieSupport: true,
+            hasIndexedDbSupport: true,
+            isSupportedBrowser: true,
+          },
+        }),
+      );
 
       expect(doNextButton().props().disabled).toBe(true);
       nameInput().simulate('change', {target: {value: actualName}});
 
       expect(nameInput().props().value).toBe(expectedName);
-      expect(doNextButton().props().disabled).toBe(false);
+      expect(doNextButton().props().disabled).toBe(undefined);
       doNextButton().simulate('submit');
 
       expect(validationErrorMessage().text()).toBe(expectedErrorMessage);
-
-      done();
     });
   });
 });

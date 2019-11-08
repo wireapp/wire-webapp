@@ -17,38 +17,24 @@
  *
  */
 
-import {RegisterData} from '@wireapp/api-client/dist/commonjs/auth';
 import {CodeInput, ContainerXS, ErrorMessage, H1, Link, Muted} from '@wireapp/react-ui-kit';
 import React from 'react';
-import {FormattedHTMLMessage, InjectedIntlProps, injectIntl} from 'react-intl';
+import {FormattedHTMLMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
-import {RouteComponentProps, withRouter} from 'react-router';
-
+import {RouteComponentProps} from 'react-router';
+import {AnyAction, Dispatch} from 'redux';
+import useReactRouter from 'use-react-router';
 import {getLogger} from 'Util/Logger';
-
 import {verifyStrings} from '../../strings';
 import RouterLink from '../component/RouterLink';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
-import {RootState, ThunkDispatch} from '../module/reducer';
-import {RegistrationDataState} from '../module/reducer/authReducer';
+import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
 import {parseError} from '../util/errorUtil';
 import Page from './Page';
 
-interface Props extends React.HTMLAttributes<HTMLDivElement>, RouteComponentProps<{}> {}
-
-interface ConnectedProps {
-  account: RegistrationDataState;
-  authError: Error;
-  currentFlow: string;
-}
-
-interface DispatchProps {
-  doRegisterTeam: (registrationData: RegisterData) => Promise<void>;
-  doRegisterPersonal: (registrationData: RegisterData) => Promise<void>;
-  doSendActivationCode: (code: string) => Promise<void>;
-}
+interface Props extends React.HTMLProps<HTMLDivElement>, RouteComponentProps<{}> {}
 
 const changeEmailRedirect = {
   [AuthSelector.REGISTER_FLOW.PERSONAL]: ROUTE.CREATE_ACCOUNT,
@@ -56,40 +42,49 @@ const changeEmailRedirect = {
   [AuthSelector.REGISTER_FLOW.TEAM]: ROUTE.CREATE_TEAM_ACCOUNT,
 };
 
-const Verify: React.SFC<Props & ConnectedProps & DispatchProps & InjectedIntlProps> = ({
+const Verify = ({
   account,
   authError,
-  history,
   currentFlow,
-  intl: {formatMessage: _},
-  ...connected
-}) => {
+  doRegisterPersonal,
+  doRegisterTeam,
+  doSendActivationCode,
+}: Props & ConnectedProps & DispatchProps) => {
+  const {history} = useReactRouter();
+  const {formatMessage: _} = useIntl();
+
   const logger = getLogger('Verify');
-  const createAccount = (email_code: string) => {
+  const createAccount = async (email_code: string) => {
     switch (currentFlow) {
       case AuthSelector.REGISTER_FLOW.TEAM: {
-        connected
-          .doRegisterTeam({...account, email_code})
-          .then(() => history.push(ROUTE.CHOOSE_HANDLE))
-          .catch(error => logger.error('Failed to create team account', error));
+        try {
+          await doRegisterTeam({...account, email_code});
+          history.push(ROUTE.CHOOSE_HANDLE);
+        } catch (error) {
+          logger.error('Failed to create team account', error);
+        }
         break;
       }
 
       case AuthSelector.REGISTER_FLOW.PERSONAL:
       case AuthSelector.REGISTER_FLOW.GENERIC_INVITATION: {
-        connected
-          .doRegisterPersonal({...account, email_code})
-          .then(() => history.push(ROUTE.CHOOSE_HANDLE))
-          .catch(error => logger.error('Failed to create personal account', error));
+        try {
+          await doRegisterPersonal({...account, email_code});
+          history.push(ROUTE.CHOOSE_HANDLE);
+        } catch (error) {
+          logger.error('Failed to create personal account', error);
+        }
       }
     }
   };
 
-  const resendCode = (event: React.MouseEvent) => {
+  const resendCode = async (event: React.MouseEvent) => {
     event.preventDefault();
-    return connected
-      .doSendActivationCode(account.email)
-      .catch(error => logger.error('Failed to send email code', error));
+    try {
+      await doSendActivationCode(account.email);
+    } catch (error) {
+      logger.error('Failed to send email code', error);
+    }
   };
   return (
     <Page hasAccountData>
@@ -119,21 +114,25 @@ const Verify: React.SFC<Props & ConnectedProps & DispatchProps & InjectedIntlPro
   );
 };
 
-export default withRouter(
-  injectIntl(
-    connect(
-      (state: RootState): ConnectedProps => ({
-        account: AuthSelector.getAccount(state),
-        authError: AuthSelector.getError(state),
-        currentFlow: AuthSelector.getCurrentFlow(state),
-      }),
-      (dispatch: ThunkDispatch): DispatchProps => ({
-        doRegisterPersonal: (registrationData: RegisterData) =>
-          dispatch(ROOT_ACTIONS.authAction.doRegisterPersonal(registrationData)),
-        doRegisterTeam: (registrationData: RegisterData) =>
-          dispatch(ROOT_ACTIONS.authAction.doRegisterTeam(registrationData)),
-        doSendActivationCode: (code: string) => dispatch(ROOT_ACTIONS.userAction.doSendActivationCode(code)),
-      }),
-    )(Verify),
-  ),
-);
+type ConnectedProps = ReturnType<typeof mapStateToProps>;
+const mapStateToProps = (state: RootState) => ({
+  account: AuthSelector.getAccount(state),
+  authError: AuthSelector.getError(state),
+  currentFlow: AuthSelector.getCurrentFlow(state),
+});
+
+type DispatchProps = ReturnType<typeof mapDispatchToProps>;
+const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
+  bindActionCreators(
+    {
+      doRegisterPersonal: ROOT_ACTIONS.authAction.doRegisterPersonal,
+      doRegisterTeam: ROOT_ACTIONS.authAction.doRegisterTeam,
+      doSendActivationCode: ROOT_ACTIONS.userAction.doSendActivationCode,
+    },
+    dispatch,
+  );
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(Verify);

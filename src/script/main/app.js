@@ -103,6 +103,8 @@ import {AssetService} from '../assets/AssetService';
 import {UserService} from '../user/UserService';
 import {AudioRepository} from '../audio/AudioRepository';
 import {MessageSender} from '../message/MessageSender';
+import {StorageService} from '../storage';
+import {BackupService} from '../backup/BackupService';
 
 class App {
   static get CONFIG() {
@@ -174,8 +176,7 @@ class App {
     repositories.storage = new StorageRepository(this.service.storage);
 
     repositories.cryptography = new CryptographyRepository(this.backendClient, repositories.storage);
-    const storageService = resolve(graph.StorageService);
-    repositories.client = new ClientRepository(this.backendClient, storageService, repositories.cryptography);
+    repositories.client = new ClientRepository(this.backendClient, this.service.storage, repositories.cryptography);
     repositories.media = resolve(graph.MediaRepository);
     repositories.user = new UserRepository(
       new UserService(this.backendClient, this.service.storage),
@@ -230,7 +231,7 @@ class App {
       readReceiptMiddleware.processEvent.bind(readReceiptMiddleware),
     ]);
     repositories.backup = new BackupRepository(
-      resolve(graph.BackupService),
+      new BackupService(this.service.storage),
       repositories.client,
       repositories.connection,
       repositories.conversation,
@@ -273,7 +274,7 @@ class App {
    * @returns {Object} All services
    */
   _setupServices() {
-    const storageService = resolve(graph.StorageService);
+    const storageService = new StorageService();
     const eventService = Environment.browser.edge
       ? new EventServiceNoCompound(storageService)
       : new EventService(storageService);

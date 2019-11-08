@@ -26,6 +26,10 @@ export enum AUTH_ACTION {
   LOGIN_SUCCESS = 'LOGIN_SUCCESS',
   LOGIN_FAILED = 'LOGIN_FAILED',
 
+  SEND_PHONE_LOGIN_CODE_START = 'SEND_PHONE_LOGIN_CODE_START',
+  SEND_PHONE_LOGIN_CODE_SUCCESS = 'SEND_PHONE_LOGIN_CODE_SUCCESS',
+  SEND_PHONE_LOGIN_CODE_FAILED = 'SEND_PHONE_LOGIN_CODE_FAILED',
+
   REGISTER_PUSH_ACCOUNT_DATA = 'REGISTER_PUSH_ACCOUNT_DATA',
   REGISTER_RESET_ACCOUNT_DATA = 'REGISTER_RESET_ACCOUNT_DATA',
 
@@ -75,6 +79,9 @@ export type AuthActions =
   | LoginStartAction
   | LoginSuccessAction
   | LoginFailedAction
+  | SendPhoneLoginCodeStartAction
+  | SendPhoneLoginCodeSuccessAction
+  | SendPhoneLoginCodeFailedAction
   | RegisterTeamStartAction
   | RegisterTeamSuccessAction
   | RegisterTeamFailedAction
@@ -113,6 +120,20 @@ export interface LoginSuccessAction extends AppAction {
 }
 export interface LoginFailedAction extends AppAction {
   readonly type: AUTH_ACTION.LOGIN_FAILED;
+  readonly error: Error;
+}
+
+export interface SendPhoneLoginCodeStartAction extends AppAction {
+  readonly type: AUTH_ACTION.SEND_PHONE_LOGIN_CODE_START;
+}
+export interface SendPhoneLoginCodeSuccessAction extends AppAction {
+  readonly payload: {
+    expiresIn: number;
+  };
+  readonly type: AUTH_ACTION.SEND_PHONE_LOGIN_CODE_SUCCESS;
+}
+export interface SendPhoneLoginCodeFailedAction extends AppAction {
+  readonly type: AUTH_ACTION.SEND_PHONE_LOGIN_CODE_FAILED;
   readonly error: Error;
 }
 
@@ -239,6 +260,20 @@ export class AuthActionCreator {
   static failedLogin = (error: Error): LoginFailedAction => ({
     error,
     type: AUTH_ACTION.LOGIN_FAILED,
+  });
+
+  static startSendPhoneLoginCode = (): SendPhoneLoginCodeStartAction => ({
+    type: AUTH_ACTION.SEND_PHONE_LOGIN_CODE_START,
+  });
+
+  static successfulSendPhoneLoginCode = (expiresIn: number): SendPhoneLoginCodeSuccessAction => ({
+    payload: {expiresIn},
+    type: AUTH_ACTION.SEND_PHONE_LOGIN_CODE_SUCCESS,
+  });
+
+  static failedSendPhoneLoginCode = (error: Error): SendPhoneLoginCodeFailedAction => ({
+    error,
+    type: AUTH_ACTION.SEND_PHONE_LOGIN_CODE_FAILED,
   });
 
   static startRegisterTeam = (): RegisterTeamStartAction => ({

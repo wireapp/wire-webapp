@@ -22,13 +22,11 @@ import {AssetUploader} from '../assets/AssetUploader';
 import {AuthRepository} from '../auth/AuthRepository';
 import {AuthService} from '../auth/AuthService';
 import {BackendClient} from '../service/BackendClient';
-import {BackupService} from '../backup/BackupService';
 import {GiphyRepository} from '../extension/GiphyRepository';
 import {GiphyService} from '../extension/GiphyService';
 import {MediaRepository} from '../media/MediaRepository';
 import {PermissionRepository} from '../permission/PermissionRepository';
 import {RichProfileRepository} from '../user/RichProfileRepository';
-import {StorageService} from '../storage/StorageService';
 
 /**
  * Dependencies is a Map that will contain all the dependencies of the app
@@ -41,13 +39,11 @@ dependencies.set(AssetUploader, {dependencies: [AssetService], name: 'AssetUploa
 dependencies.set(AuthRepository, {dependencies: [AuthService], name: 'AuthRepository'});
 dependencies.set(AuthService, {dependencies: [BackendClient], name: 'AuthService'});
 dependencies.set(BackendClient, {dependencies: [], name: 'BackendClient'});
-dependencies.set(BackupService, {dependencies: [StorageService], name: 'BackupService'});
 dependencies.set(GiphyRepository, {dependencies: [GiphyService], name: 'GiphyRepository'});
 dependencies.set(GiphyService, {dependencies: [BackendClient], name: 'GiphyService'});
 dependencies.set(MediaRepository, {dependencies: [PermissionRepository], name: 'MediaRepository'});
 dependencies.set(PermissionRepository, {dependencies: [], name: 'PermissionRepository'});
 dependencies.set(RichProfileRepository, {dependencies: [BackendClient], name: 'RichProfileRepository'});
-dependencies.set(StorageService, {dependencies: [], name: 'StorageService'});
 
 export {
   dependencies,
@@ -55,11 +51,9 @@ export {
   AssetUploader,
   AuthRepository,
   BackendClient,
-  BackupService,
   GiphyRepository,
   GiphyService,
   MediaRepository,
   RichProfileRepository,
   PermissionRepository,
-  StorageService,
 };

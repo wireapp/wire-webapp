@@ -17,13 +17,11 @@
  *
  */
 
-import {LoginData, RegisterData} from '@wireapp/api-client/dist/commonjs/auth';
+import {LoginData, RegisterData, SendLoginCode} from '@wireapp/api-client/dist/commonjs/auth';
 import {ClientType} from '@wireapp/api-client/dist/commonjs/client/index';
 import {Account} from '@wireapp/core';
 import {LowDiskSpaceError} from '@wireapp/store-engine/dist/commonjs/engine/error/';
-
 import {noop} from 'Util/util';
-
 import {currentCurrency, currentLanguage} from '../../localeConfig';
 import {Api, RootState, ThunkAction, ThunkDispatch} from '../reducer';
 import {RegistrationDataState} from '../reducer/authReducer';
@@ -56,71 +54,76 @@ export class AuthAction {
     onBeforeLogin: LoginLifecycleFunction = noop,
     onAfterLogin: LoginLifecycleFunction = noop,
   ): ThunkAction => {
-    return (dispatch, getState, global) => {
+    return async (dispatch, getState, global) => {
       const {
         core,
         actions: {clientAction, cookieAction, selfAction, localStorageAction},
       } = global;
-
       dispatch(AuthActionCreator.startLogin());
-
-      return Promise.resolve()
-        .then(() => onBeforeLogin(dispatch, getState, global))
-        .then(() => core.login(loginData, false, clientAction.generateClientPayload(loginData.clientType)))
-        .then(() => this.persistAuthData(loginData.clientType, core, dispatch, localStorageAction))
-        .then(() =>
-          dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: global.config.APP_INSTANCE_ID})),
-        )
-        .then(() => dispatch(selfAction.fetchSelf()))
-        .then(() => onAfterLogin(dispatch, getState, global))
-        .then(() => dispatch(clientAction.doInitializeClient(loginData.clientType, String(loginData.password))))
-        .then(() => {
+      try {
+        onBeforeLogin(dispatch, getState, global);
+        await core.login(loginData, false, clientAction.generateClientPayload(loginData.clientType));
+        await this.persistAuthData(loginData.clientType, core, dispatch, localStorageAction);
+        await dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: global.config.APP_INSTANCE_ID}));
+        await dispatch(selfAction.fetchSelf());
+        onAfterLogin(dispatch, getState, global);
+        await dispatch(clientAction.doInitializeClient(loginData.clientType, String(loginData.password)));
+        dispatch(AuthActionCreator.successfulLogin());
+      } catch (error) {
+        if (error.label === BackendError.LABEL.TOO_MANY_CLIENTS) {
           dispatch(AuthActionCreator.successfulLogin());
-        })
-        .catch(error => {
-          if (error.label === BackendError.LABEL.NEW_CLIENT || error.label === BackendError.LABEL.TOO_MANY_CLIENTS) {
-            dispatch(AuthActionCreator.successfulLogin());
-          } else {
-            if (error instanceof LowDiskSpaceError) {
-              error = new LabeledError(LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE, error);
-            }
-            dispatch(AuthActionCreator.failedLogin(error));
+        } else {
+          if (error instanceof LowDiskSpaceError) {
+            error = new LabeledError(LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE, error);
           }
-          throw error;
-        });
+          dispatch(AuthActionCreator.failedLogin(error));
+        }
+        throw error;
+      }
+    };
+  };
+
+  doSendPhoneLoginCode = (loginRequest: Omit<SendLoginCode, 'voice_call'>): ThunkAction => {
+    return async (dispatch, getState, {apiClient}) => {
+      dispatch(AuthActionCreator.startSendPhoneLoginCode());
+      try {
+        const {data} = await apiClient.auth.api.postLoginSend(loginRequest);
+        dispatch(AuthActionCreator.successfulSendPhoneLoginCode(data.expires_in));
+      } catch (error) {
+        dispatch(AuthActionCreator.failedSendPhoneLoginCode(error));
+        throw error;
+      }
     };
   };
 
   doFinalizeSSOLogin = ({clientType}: {clientType: ClientType}): ThunkAction => {
-    return (
+    return async (
       dispatch,
       getState,
       {apiClient, config, core, actions: {cookieAction, clientAction, selfAction, localStorageAction}},
     ) => {
       dispatch(AuthActionCreator.startLogin());
-      return Promise.resolve()
-        .then(() => apiClient.init(clientType))
-        .then(() => core.init())
-        .then(() => this.persistAuthData(clientType, core, dispatch, localStorageAction))
-        .then(() => dispatch(selfAction.fetchSelf()))
-        .then(() => dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: config.APP_INSTANCE_ID})))
-        .then(() => dispatch(clientAction.doInitializeClient(clientType)))
-        .then(() => {
+      try {
+        await apiClient.init(clientType);
+        await core.init();
+        await this.persistAuthData(clientType, core, dispatch, localStorageAction);
+        await dispatch(selfAction.fetchSelf());
+        await dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: config.APP_INSTANCE_ID}));
+        await dispatch(clientAction.doInitializeClient(clientType));
+        dispatch(AuthActionCreator.successfulLogin());
+      } catch (error) {
+        if (error.label === BackendError.LABEL.TOO_MANY_CLIENTS) {
           dispatch(AuthActionCreator.successfulLogin());
-        })
-        .catch(error => {
-          if (error.label === BackendError.LABEL.NEW_CLIENT || error.label === BackendError.LABEL.TOO_MANY_CLIENTS) {
-            dispatch(AuthActionCreator.successfulLogin());
-          } else {
-            dispatch(AuthActionCreator.failedLogin(error));
-          }
-          throw error;
-        });
+        } else {
+          dispatch(AuthActionCreator.failedLogin(error));
+        }
+        throw error;
+      }
     };
   };
 
   validateSSOCode = (code: string): ThunkAction => {
-    return (dispatch, getState, {apiClient}) => {
+    return async (dispatch, getState, {apiClient}) => {
       const mapError = (error: any) => {
         const statusCode = error && error.response && error.response.status;
         if (statusCode === 404) {
@@ -131,11 +134,14 @@ export class AuthAction {
         }
         return new BackendError({code: 500, label: BackendError.SSO_ERRORS.SSO_GENERIC_ERROR});
       };
-      return apiClient.auth.api.headInitiateLogin(code).catch(error => {
+
+      try {
+        return await apiClient.auth.api.headInitiateLogin(code);
+      } catch (error) {
         const mappedError = mapError(error);
         dispatch(AuthActionCreator.failedLogin(mappedError));
         throw mappedError;
-      });
+      }
     };
   };
 
@@ -164,15 +170,13 @@ export class AuthAction {
   };
 
   pushAccountRegistrationData = (registration: Partial<RegistrationDataState>): ThunkAction => {
-    return dispatch => {
-      return Promise.resolve().then(() => {
-        dispatch(AuthActionCreator.pushAccountRegistrationData(registration));
-      });
+    return async dispatch => {
+      dispatch(AuthActionCreator.pushAccountRegistrationData(registration));
     };
   };
 
   doRegisterTeam = (registration: RegisterData): ThunkAction => {
-    return (
+    return async (
       dispatch,
       getState,
       {apiClient, config, core, actions: {cookieAction, clientAction, selfAction, localStorageAction}},
@@ -187,30 +191,24 @@ export class AuthAction {
       registration.team.name = registration.team.name.trim();
 
       dispatch(AuthActionCreator.startRegisterTeam());
-      return Promise.resolve()
-        .then(() => dispatch(this.doSilentLogout()))
-        .then(() => apiClient.register(registration, clientType))
-        .then(() => core.init())
-        .then(() => this.persistAuthData(clientType, core, dispatch, localStorageAction))
-        .then(() => dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: config.APP_INSTANCE_ID})))
-        .then(() => dispatch(selfAction.fetchSelf()))
-        .then(() => dispatch(clientAction.doInitializeClient(clientType)))
-        .then(() => {
-          dispatch(AuthActionCreator.successfulRegisterTeam(registration));
-        })
-        .catch(error => {
-          if (error.label === BackendError.LABEL.NEW_CLIENT) {
-            dispatch(AuthActionCreator.successfulRegisterTeam(registration));
-          } else {
-            dispatch(AuthActionCreator.failedRegisterTeam(error));
-          }
-          throw error;
-        });
+      try {
+        await dispatch(this.doSilentLogout());
+        await apiClient.register(registration, clientType);
+        await core.init();
+        await this.persistAuthData(clientType, core, dispatch, localStorageAction);
+        await dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: config.APP_INSTANCE_ID}));
+        await dispatch(selfAction.fetchSelf());
+        await dispatch(clientAction.doInitializeClient(clientType));
+        dispatch(AuthActionCreator.successfulRegisterTeam(registration));
+      } catch (error) {
+        dispatch(AuthActionCreator.failedRegisterTeam(error));
+        throw error;
+      }
     };
   };
 
   doRegisterPersonal = (registration: RegisterData): ThunkAction => {
-    return (
+    return async (
       dispatch,
       getState,
       {apiClient, config, core, actions: {authAction, clientAction, cookieAction, selfAction, localStorageAction}},
@@ -221,30 +219,24 @@ export class AuthAction {
       registration.email = registration.email.trim();
 
       dispatch(AuthActionCreator.startRegisterPersonal());
-      return Promise.resolve()
-        .then(() => dispatch(authAction.doSilentLogout()))
-        .then(() => apiClient.register(registration, clientType))
-        .then(() => core.init())
-        .then(() => this.persistAuthData(clientType, core, dispatch, localStorageAction))
-        .then(() => dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: config.APP_INSTANCE_ID})))
-        .then(() => dispatch(selfAction.fetchSelf()))
-        .then(() => dispatch(clientAction.doInitializeClient(clientType)))
-        .then(() => {
-          dispatch(AuthActionCreator.successfulRegisterPersonal(registration));
-        })
-        .catch(error => {
-          if (error.label === BackendError.LABEL.NEW_CLIENT) {
-            dispatch(AuthActionCreator.successfulRegisterPersonal(registration));
-          } else {
-            dispatch(AuthActionCreator.failedRegisterPersonal(error));
-          }
-          throw error;
-        });
+      try {
+        await dispatch(authAction.doSilentLogout());
+        await apiClient.register(registration, clientType);
+        await core.init();
+        await this.persistAuthData(clientType, core, dispatch, localStorageAction);
+        await dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: config.APP_INSTANCE_ID}));
+        await dispatch(selfAction.fetchSelf());
+        await dispatch(clientAction.doInitializeClient(clientType));
+        dispatch(AuthActionCreator.successfulRegisterPersonal(registration));
+      } catch (error) {
+        dispatch(AuthActionCreator.failedRegisterPersonal(error));
+        throw error;
+      }
     };
   };
 
   doRegisterWireless = (registrationData: RegisterData, options = {shouldInitializeClient: true}): ThunkAction => {
-    return (
+    return async (
       dispatch,
       getState,
       {apiClient, config, core, actions: {authAction, cookieAction, clientAction, selfAction, localStorageAction}},
@@ -254,123 +246,95 @@ export class AuthAction {
       registrationData.name = registrationData.name.trim();
 
       dispatch(AuthActionCreator.startRegisterWireless());
-
-      return Promise.resolve()
-        .then(() => dispatch(authAction.doSilentLogout()))
-        .then(() => apiClient.register(registrationData, clientType))
-        .then(() => core.init())
-        .then(() => this.persistAuthData(clientType, core, dispatch, localStorageAction))
-        .then(() => dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: config.APP_INSTANCE_ID})))
-        .then(() => dispatch(selfAction.fetchSelf()))
-        .then(() => clientType !== ClientType.NONE && dispatch(clientAction.doInitializeClient(clientType)))
-        .then(() => {
-          dispatch(AuthActionCreator.successfulRegisterWireless(registrationData));
-        })
-        .catch(error => {
-          if (error.label === BackendError.LABEL.NEW_CLIENT) {
-            dispatch(AuthActionCreator.successfulRegisterWireless(registrationData));
-          } else {
-            dispatch(AuthActionCreator.failedRegisterWireless(error));
-          }
-          throw error;
-        });
+      try {
+        await dispatch(authAction.doSilentLogout());
+        await apiClient.register(registrationData, clientType);
+        await core.init();
+        await this.persistAuthData(clientType, core, dispatch, localStorageAction);
+        await dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: config.APP_INSTANCE_ID}));
+        await dispatch(selfAction.fetchSelf());
+        await (clientType !== ClientType.NONE && dispatch(clientAction.doInitializeClient(clientType)));
+        dispatch(AuthActionCreator.successfulRegisterWireless(registrationData));
+      } catch (error) {
+        dispatch(AuthActionCreator.failedRegisterWireless(error));
+        throw error;
+      }
     };
   };
 
   doInit = (options = {isImmediateLogin: false, shouldValidateLocalClient: false}): ThunkAction => {
-    return (
-      dispatch,
-      getState,
-      {apiClient, core, actions: {authAction, clientAction, selfAction, localStorageAction}},
-    ) => {
-      let clientType: ClientType;
+    return async (dispatch, getState, {apiClient, core, actions: {authAction, selfAction, localStorageAction}}) => {
       dispatch(AuthActionCreator.startRefresh());
-      return Promise.resolve()
-        .then(() => {
-          if (options.isImmediateLogin) {
-            return dispatch(localStorageAction.setLocalStorage(LocalStorageKey.AUTH.PERSIST, true));
-          }
-          return undefined;
-        })
-        .then(() => dispatch(localStorageAction.getLocalStorage(LocalStorageKey.AUTH.PERSIST)))
-        .then((persist: boolean) => {
-          if (persist === undefined) {
-            throw new Error(`Could not find value for '${LocalStorageKey.AUTH.PERSIST}'`);
-          }
-          clientType = persist ? ClientType.PERMANENT : ClientType.TEMPORARY;
-          return apiClient.init(clientType);
-        })
-        .then(() => core.init())
-        .then(() => this.persistAuthData(clientType, core, dispatch, localStorageAction))
-        .then(() => {
-          if (options.shouldValidateLocalClient) {
-            return dispatch(authAction.validateLocalClient());
-          }
-          return undefined;
-        })
-        .then(() => dispatch(selfAction.fetchSelf()))
-        .then(() => {
-          dispatch(AuthActionCreator.successfulRefresh());
-        })
-        .catch(error => {
-          const doLogout = options.shouldValidateLocalClient ? dispatch(authAction.doLogout()) : Promise.resolve();
-          const deleteClientType = options.isImmediateLogin
-            ? dispatch(localStorageAction.deleteLocalStorage(LocalStorageKey.AUTH.PERSIST))
-            : Promise.resolve();
+      try {
+        if (options.isImmediateLogin) {
+          await dispatch(localStorageAction.setLocalStorage(LocalStorageKey.AUTH.PERSIST, true));
+        }
 
-          return Promise.all([doLogout, deleteClientType])
-            .catch(() => undefined)
-            .then(() => {
-              dispatch(AuthActionCreator.failedRefresh(error));
-            });
-        });
+        const persist = await dispatch(localStorageAction.getLocalStorage(LocalStorageKey.AUTH.PERSIST));
+        if (persist === undefined) {
+          throw new Error(`Could not find value for '${LocalStorageKey.AUTH.PERSIST}'`);
+        }
+        const clientType = persist ? ClientType.PERMANENT : ClientType.TEMPORARY;
+
+        await apiClient.init(clientType);
+        await core.init();
+        await this.persistAuthData(clientType, core, dispatch, localStorageAction);
+
+        if (options.shouldValidateLocalClient) {
+          await dispatch(authAction.validateLocalClient());
+        }
+
+        await dispatch(selfAction.fetchSelf());
+        dispatch(AuthActionCreator.successfulRefresh());
+      } catch (error) {
+        const doLogout = options.shouldValidateLocalClient ? dispatch(authAction.doLogout()) : Promise.resolve();
+        const deleteClientType = options.isImmediateLogin
+          ? dispatch(localStorageAction.deleteLocalStorage(LocalStorageKey.AUTH.PERSIST))
+          : Promise.resolve();
+        await Promise.all([doLogout, deleteClientType]);
+        dispatch(AuthActionCreator.failedRefresh(error));
+      }
     };
   };
 
   validateLocalClient = (): ThunkAction => {
-    return (dispatch, getState, {core}) => {
+    return async (dispatch, getState, {core}) => {
       dispatch(AuthActionCreator.startValidateLocalClient());
-      return Promise.resolve()
-        .then(() => core.loadAndValidateLocalClient())
-        .then(() => {
-          dispatch(AuthActionCreator.successfulValidateLocalClient());
-        })
-        .catch(error => {
-          dispatch(AuthActionCreator.failedValidateLocalClient(error));
-          throw error;
-        });
+      try {
+        await core.loadAndValidateLocalClient();
+        dispatch(AuthActionCreator.successfulValidateLocalClient());
+      } catch (error) {
+        dispatch(AuthActionCreator.failedValidateLocalClient(error));
+        throw error;
+      }
     };
   };
 
   doLogout = (): ThunkAction => {
-    return (dispatch, getState, {config, core, actions: {cookieAction, localStorageAction}}) => {
+    return async (dispatch, getState, {config, core, actions: {cookieAction, localStorageAction}}) => {
       dispatch(AuthActionCreator.startLogout());
-      return core
-        .logout()
-        .then(() => dispatch(cookieAction.safelyRemoveCookie(COOKIE_NAME_APP_OPENED, config.APP_INSTANCE_ID)))
-        .then(() => dispatch(localStorageAction.deleteLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.VALUE)))
-        .then(() => {
-          dispatch(AuthActionCreator.successfulLogout());
-        })
-        .catch(error => {
-          dispatch(AuthActionCreator.failedLogout(error));
-        });
+      try {
+        await core.logout();
+        await dispatch(cookieAction.safelyRemoveCookie(COOKIE_NAME_APP_OPENED, config.APP_INSTANCE_ID));
+        await dispatch(localStorageAction.deleteLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.VALUE));
+        dispatch(AuthActionCreator.successfulLogout());
+      } catch (error) {
+        dispatch(AuthActionCreator.failedLogout(error));
+      }
     };
   };
 
   doSilentLogout = (): ThunkAction => {
-    return (dispatch, getState, {config, core, actions: {cookieAction, localStorageAction}}) => {
+    return async (dispatch, getState, {config, core, actions: {cookieAction, localStorageAction}}) => {
       dispatch(AuthActionCreator.startLogout());
-      return core
-        .logout()
-        .then(() => dispatch(cookieAction.safelyRemoveCookie(COOKIE_NAME_APP_OPENED, config.APP_INSTANCE_ID)))
-        .then(() => dispatch(localStorageAction.deleteLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.VALUE)))
-        .then(() => {
-          dispatch(AuthActionCreator.successfulSilentLogout());
-        })
-        .catch(error => {
-          dispatch(AuthActionCreator.failedLogout(error));
-        });
+      try {
+        await core.logout();
+        await dispatch(cookieAction.safelyRemoveCookie(COOKIE_NAME_APP_OPENED, config.APP_INSTANCE_ID));
+        await dispatch(localStorageAction.deleteLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.VALUE));
+        dispatch(AuthActionCreator.successfulSilentLogout());
+      } catch (error) {
+        dispatch(AuthActionCreator.failedLogout(error));
+      }
     };
   };
 

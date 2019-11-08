@@ -26,7 +26,7 @@ export interface InvitationState {
   invites: TeamInvitation[];
 }
 
-const initialState: InvitationState = {
+export const initialState: InvitationState = {
   error: null,
   fetching: false,
   invites: [],

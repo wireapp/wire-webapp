@@ -22,33 +22,27 @@ import {NotificationActionCreator} from './creator/';
 
 export class NotificationAction {
   checkHistory = (): ThunkAction => {
-    return (dispatch, getState, {core}) => {
+    return async (dispatch, getState, {core}) => {
       dispatch(NotificationActionCreator.startCheckHistory());
-      return Promise.resolve()
-        .then(() => core.service.notification.hasHistory())
-        .then(hasHistory => {
-          dispatch(NotificationActionCreator.successfulCheckHistory(hasHistory));
-        })
-        .catch(error => {
-          dispatch(NotificationActionCreator.failedCheckHistory(error));
-          throw error;
-        });
+      try {
+        const hasHistory = await core.service.notification.hasHistory();
+        dispatch(NotificationActionCreator.successfulCheckHistory(hasHistory));
+      } catch (error) {
+        dispatch(NotificationActionCreator.failedCheckHistory(error));
+        throw error;
+      }
     };
   };
 
   resetHistoryCheck = (): ThunkAction => {
-    return dispatch => {
-      return Promise.resolve().then(() => {
-        dispatch(NotificationActionCreator.resetHistoryCheck());
-      });
+    return async dispatch => {
+      dispatch(NotificationActionCreator.resetHistoryCheck());
     };
   };
 
   setLastEventDate = (lastEventDate: Date): ThunkAction => {
-    return (dispatch, getState, {core}) => {
-      return Promise.resolve().then(() => {
-        core.service.notification.setLastEventDate(lastEventDate);
-      });
+    return async (dispatch, getState, {core}) => {
+      core.service.notification.setLastEventDate(lastEventDate);
     };
   };
 }
