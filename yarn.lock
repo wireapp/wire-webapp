@@ -1351,6 +1351,11 @@
   dependencies:
     redux "^4.0.0"
 
+"@types/schema-utils@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@types/schema-utils/-/schema-utils-1.0.0.tgz#295d36f01e2cb8bc3207ca1d9a68e210db6b40cb"
+  integrity sha512-YesPanU1+WCigC/Aj1Mga8UCOjHIfMNHZ3zzDsUY7lI8GlKnh/Kv2QwJOQ+jNQ36Ru7IfzSedlG14hppYaN13A==
+
 "@types/sdp-transform@2.4.1":
   version "2.4.1"
   resolved "https://registry.yarnpkg.com/@types/sdp-transform/-/sdp-transform-2.4.1.tgz#380e61333191a2c650c435b3beac0668e3def486"
@@ -2411,16 +2416,18 @@ babel-plugin-macros@^2.0.0:
     cosmiconfig "^5.2.0"
     resolve "^1.10.0"
 
-babel-plugin-react-intl@4.1.21:
-  version "4.1.21"
-  resolved "https://registry.yarnpkg.com/babel-plugin-react-intl/-/babel-plugin-react-intl-4.1.21.tgz#2670e958f8c477931ce0b36faf187af0e14a4f0f"
-  integrity sha512-lcMnHogFGMWNJHjOAEKsfxGVRcW8D858jjipbETACH8oFUwK1IqVf8iwk+zqC2WKamrCxbGe2JZ9XiqEd4GYHQ==
+babel-plugin-react-intl@5.1.1:
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/babel-plugin-react-intl/-/babel-plugin-react-intl-5.1.1.tgz#3c3d8af13aeb7b50c6470fc3d7abe9bdbae9f6da"
+  integrity sha512-kkghFOjjssYRiVPxwV/6q4WFhpkYw2LnpQAuvqHHDvPbOH2bcAz2U+GXy+W7pzSwH2FPnqegCbzJ4nPogVRGwg==
   dependencies:
     "@babel/core" "^7.6.2"
     "@babel/helper-plugin-utils" "^7.0.0"
     "@types/babel__core" "^7.1.2"
+    "@types/schema-utils" "^1.0.0"
     fs-extra "^8.0.1"
     intl-messageformat-parser "^3.2.2"
+    schema-utils "^2.2.0"
 
 babel-plugin-syntax-jsx@^6.18.0:
   version "6.18.0"
@@ -11092,7 +11099,7 @@ schema-utils@^1.0.0:
     ajv-errors "^1.0.0"
     ajv-keywords "^3.1.0"
 
-schema-utils@^2.5.0:
+schema-utils@^2.2.0, schema-utils@^2.5.0:
   version "2.5.0"
   resolved "https://registry.yarnpkg.com/schema-utils/-/schema-utils-2.5.0.tgz#8f254f618d402cc80257486213c8970edfd7c22f"
   integrity sha512-32ISrwW2scPXHUSusP8qMg5dLUawKkyV+/qIEV9JdXKx+rsM6mi8vZY8khg2M69Qom16rtroWXD3Ybtiws38gQ==
