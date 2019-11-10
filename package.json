@@ -62,7 +62,7 @@
     "@types/highlightjs": "9.12.0",
     "@types/jasmine": "3.4.4",
     "@types/js-cookie": "2.2.4",
-    "@types/libsodium-wrappers-sumo": "0.7.2",
+    "@types/libsodium-wrappers-sumo": "0.7.3",
     "@types/linkify-it": "2.1.0",
     "@types/markdown-it": "0.0.9",
     "@types/open-graph": "0.2.0",
