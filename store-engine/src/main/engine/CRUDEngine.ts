@@ -22,15 +22,6 @@ export interface CRUDEngine {
   storeName: string;
 
   /**
-   * Appends a string to an existing record.
-   * @param tableName - Table name
-   * @param primaryKey - Primary key of record which should get extended
-   * @param additions - Text to append
-   * @returns Resolves with the primary key of the extended record.
-   */
-  append<PrimaryKey = string>(tableName: string, primaryKey: PrimaryKey, additions: string): Promise<PrimaryKey>;
-
-  /**
    * Creates a record by its primary key within a table.
    * @param tableName - Table name
    * @param primaryKey - Primary key to be used to store the record

@@ -227,19 +227,4 @@ export class IndexedDBEngine implements CRUDEngine {
   ): Promise<PrimaryKey> {
     return this.db.table<ChangesType, PrimaryKey>(tableName).put(changes, primaryKey);
   }
-
-  public async append<PrimaryKey = string>(
-    tableName: string,
-    primaryKey: PrimaryKey,
-    additions: string,
-  ): Promise<PrimaryKey> {
-    let record = await this.db.table(tableName).get(primaryKey);
-    if (typeof record === 'string') {
-      record += additions;
-    } else {
-      const message = `Cannot append text to record "${primaryKey}" because it's not a string.`;
-      throw new StoreEngineError.RecordTypeError(message);
-    }
-    return this.updateOrCreate(tableName, primaryKey, record);
-  }
 }

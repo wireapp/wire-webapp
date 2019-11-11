@@ -19,7 +19,6 @@
 
 import Dexie from 'dexie';
 
-import {appendSpec} from '@wireapp/store-engine/dist/commonjs/test/appendSpec';
 import {createSpec} from '@wireapp/store-engine/dist/commonjs/test/createSpec';
 import {deleteAllSpec} from '@wireapp/store-engine/dist/commonjs/test/deleteAllSpec';
 import {deleteSpec} from '@wireapp/store-engine/dist/commonjs/test/deleteSpec';
@@ -73,12 +72,6 @@ describe('IndexedDBEngine', () => {
       engine = new IndexedDBEngine();
       const instance = await engine.init(STORE_NAME);
       expect(instance instanceof Dexie).toBe(true);
-    });
-  });
-
-  describe('append', () => {
-    Object.entries(appendSpec).map(([description, testFunction]) => {
-      it(description, () => testFunction(engine));
     });
   });
 

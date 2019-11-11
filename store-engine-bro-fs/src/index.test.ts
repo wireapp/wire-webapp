@@ -17,7 +17,6 @@
  *
  */
 
-import {appendSpec} from '@wireapp/store-engine/dist/commonjs/test/appendSpec';
 import {createSpec} from '@wireapp/store-engine/dist/commonjs/test/createSpec';
 import {deleteAllSpec} from '@wireapp/store-engine/dist/commonjs/test/deleteAllSpec';
 import {deleteSpec} from '@wireapp/store-engine/dist/commonjs/test/deleteSpec';
@@ -51,12 +50,6 @@ describe('FileSystemEngine', () => {
     it('resolves with a browser-specific URL to the filesystem.', async () => {
       const fileSystem = await engine.init('test-store');
       expect(fileSystem.root.toURL().startsWith('filesystem:')).toBe(true);
-    });
-  });
-
-  describe('append', () => {
-    Object.entries(appendSpec).map(([description, testFunction]) => {
-      it(description, () => testFunction(engine));
     });
   });
 

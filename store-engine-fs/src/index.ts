@@ -187,24 +187,6 @@ export class FileEngine implements CRUDEngine {
     return files.map(file => FileEngine.path.parse(file).name);
   }
 
-  public async append<PrimaryKey = string>(
-    tableName: string,
-    primaryKey: PrimaryKey,
-    additions: string,
-  ): Promise<PrimaryKey> {
-    const file = this.resolvePath(tableName, primaryKey);
-    let record = await this.read(tableName, primaryKey);
-    if (typeof record === 'string') {
-      record += additions;
-    } else {
-      const message = `Cannot append text to record "${primaryKey}" because it's not a string.`;
-      throw new StoreEngineError.RecordTypeError(message);
-    }
-    const updatedRecord = record;
-    await fs.outputFile(file, updatedRecord);
-    return primaryKey;
-  }
-
   public async update<PrimaryKey = string, ChangesType = Object>(
     tableName: string,
     primaryKey: PrimaryKey,

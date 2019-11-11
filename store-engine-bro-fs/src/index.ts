@@ -65,19 +65,6 @@ export class FileSystemEngine implements CRUDEngine {
     return `${directory}/${primaryKey}${this.config.fileExtension}`;
   }
 
-  async append<PrimaryKey = string>(tableName: string, primaryKey: PrimaryKey, additions: string): Promise<PrimaryKey> {
-    const filePath = this.createFilePath(tableName, primaryKey);
-    const record = await this.read(tableName, primaryKey);
-
-    if (typeof record === 'string') {
-      await fs.writeFile(filePath, record + additions);
-      return primaryKey;
-    } else {
-      const message = `Cannot append text to record "${primaryKey}" because it's not a string.`;
-      throw new StoreEngineError.RecordTypeError(message);
-    }
-  }
-
   async create<EntityType = Object, PrimaryKey = string>(
     tableName: string,
     primaryKey: PrimaryKey,

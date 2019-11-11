@@ -28,23 +28,6 @@ export class WebStorageEngine implements CRUDEngine {
     this.webStorage = useSessionStorage ? window.sessionStorage : window.localStorage;
   }
 
-  public async append<PrimaryKey = string>(
-    tableName: string,
-    primaryKey: PrimaryKey,
-    additions: string,
-  ): Promise<PrimaryKey> {
-    let record = await this.read(tableName, primaryKey);
-    if (typeof record === 'string') {
-      record += additions;
-    } else {
-      const message = `Cannot append text to record "${primaryKey}" because it's not a string.`;
-      throw new StoreEngineError.RecordTypeError(message);
-    }
-    const key = this.createKey<PrimaryKey>(tableName, primaryKey);
-    this.webStorage.setItem(`${key}`, record);
-    return primaryKey;
-  }
-
   public async create<EntityType, PrimaryKey = string>(
     tableName: string,
     primaryKey: PrimaryKey,

@@ -17,7 +17,6 @@
  *
  */
 
-import {appendSpec} from '../test/appendSpec';
 import {createSpec} from '../test/createSpec';
 import {deleteAllSpec} from '../test/deleteAllSpec';
 import {deleteSpec} from '../test/deleteSpec';
@@ -79,12 +78,6 @@ describe('MemoryEngine', () => {
 
       const result = await engine.read(TABLE_NAME, PRIMARY_KEY_PETER);
       expect(result).toEqual(entityPeter);
-    });
-  });
-
-  describe('append', () => {
-    Object.entries(appendSpec).map(([description, testFunction]) => {
-      it(description, () => testFunction(engine));
     });
   });
 

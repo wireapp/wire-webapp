@@ -201,16 +201,6 @@ describe('SQLeetEngine', () => {
     });
   });
 
-  describe('append', () => {
-    it('throws an error', async () => {
-      const engine = await initEngine({});
-      try {
-        await engine.append('test', '1', 'string');
-        fail();
-      } catch (error) {}
-    });
-  });
-
   describe('updateOrCreate', () => {
     Object.entries(updateOrCreateSpec).map(([description, testFunction]) => {
       it(description, async () => {

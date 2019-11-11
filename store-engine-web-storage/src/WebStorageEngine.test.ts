@@ -17,7 +17,6 @@
  *
  */
 
-import {appendSpec} from '@wireapp/store-engine/dist/commonjs/test/appendSpec';
 import {createSpec} from '@wireapp/store-engine/dist/commonjs/test/createSpec';
 import {deleteAllSpec} from '@wireapp/store-engine/dist/commonjs/test/deleteAllSpec';
 import {deleteSpec} from '@wireapp/store-engine/dist/commonjs/test/deleteSpec';
@@ -51,12 +50,6 @@ describe('WebStorageEngine', () => {
       engine = new WebStorageEngine();
       const instance = await engine.init(STORE_NAME);
       expect(instance).toBe(window.localStorage);
-    });
-  });
-
-  describe('append', () => {
-    Object.entries(appendSpec).map(([description, testFunction]) => {
-      it(description, () => testFunction(engine));
     });
   });
 

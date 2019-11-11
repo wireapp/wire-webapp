@@ -27,19 +27,6 @@ export class MemoryEngine implements CRUDEngine {
   private readonly stores: MemoryStore = {};
   private autoIncrementedPrimaryKey: number = 1;
 
-  async append<PrimaryKey = string>(tableName: string, primaryKey: PrimaryKey, additions: string): Promise<PrimaryKey> {
-    this.prepareTable(tableName);
-    let record = await this.read(tableName, primaryKey);
-    if (typeof record === 'string') {
-      record += additions;
-    } else {
-      const message = `Cannot append text to record "${primaryKey}" because it's not a string.`;
-      throw new RecordTypeError(message);
-    }
-    this.stores[this.storeName][tableName][primaryKey] = record;
-    return primaryKey;
-  }
-
   create<EntityType, PrimaryKey = string>(
     tableName: string,
     primaryKey: PrimaryKey,

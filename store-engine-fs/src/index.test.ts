@@ -21,7 +21,6 @@ import fs from 'fs-extra';
 import path from 'path';
 
 import {error as StoreEngineError} from '@wireapp/store-engine';
-import {appendSpec} from '@wireapp/store-engine/dist/commonjs/test/appendSpec';
 import {createSpec} from '@wireapp/store-engine/dist/commonjs/test/createSpec';
 import {deleteAllSpec} from '@wireapp/store-engine/dist/commonjs/test/deleteAllSpec';
 import {deleteSpec} from '@wireapp/store-engine/dist/commonjs/test/deleteSpec';
@@ -120,7 +119,6 @@ describe('FileEngine', () => {
 
     it('is applied to all store operations.', async () => {
       const functionNames = [
-        'append',
         'create',
         'delete',
         'deleteAll',
@@ -151,26 +149,6 @@ describe('FileEngine', () => {
       const directory = await engine.init(STORE_NAME, options);
       const fileStatus = fs.statSync(directory);
       expect(fileStatus.isDirectory()).toBe(true);
-    });
-  });
-
-  describe('append', () => {
-    Object.entries(appendSpec).map(([description, testFunction]) => {
-      it(description, () => testFunction(engine));
-    });
-
-    it('throws if record is not a string', async () => {
-      const options = {
-        fileExtension: '.json',
-      };
-      engine = new FileEngine(BASE_DIRECTORY);
-      await engine.init(STORE_NAME, options);
-      await engine.create('test', 'index', {});
-
-      try {
-        await engine.append('test', 'index', 'oh no');
-        fail('Did not throw on append');
-      } catch (error) {}
     });
   });
 
