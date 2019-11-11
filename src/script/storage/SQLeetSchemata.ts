@@ -35,7 +35,7 @@ export class SQLeetSchemata {
             class: SQLiteType.TEXT,
             id: SQLiteType.TEXT,
             label: SQLiteType.TEXT,
-            location: SQLiteType.JSON_OR_TEXT,
+            location: SQLiteType.JSON,
             meta: SQLiteType.JSON_OR_TEXT,
             model: SQLiteType.TEXT,
             time: SQLiteType.TEXT,
