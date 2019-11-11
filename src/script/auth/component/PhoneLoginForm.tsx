@@ -41,7 +41,7 @@ const PhoneLoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
     if (isFetching) {
       return;
     }
-    onSubmit({phone: phoneNumber}, []);
+    onSubmit({phone: `+${countryCode}${phoneNumber}`}, []);
   };
 
   return (

@@ -61,6 +61,7 @@ export const ROUTE = {
   INDEX: '/',
   INITIAL_INVITE: '/teaminvite',
   LOGIN: '/login',
+  LOGIN_PHONE: '/phonelogin',
   SET_EMAIL: '/setemail',
   SET_HANDLE: '/sethandle',
   SET_PASSWORD: '/setpassword',

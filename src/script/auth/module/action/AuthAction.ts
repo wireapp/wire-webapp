@@ -174,6 +174,12 @@ export class AuthAction {
     };
   };
 
+  pushLoginData = (loginData: Partial<LoginData>): ThunkAction => {
+    return async dispatch => {
+      dispatch(AuthActionCreator.pushLoginData(loginData));
+    };
+  };
+
   doRegisterTeam = (registration: RegisterData): ThunkAction => {
     return async (
       dispatch,

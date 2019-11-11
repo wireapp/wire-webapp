@@ -42,6 +42,7 @@ import HistoryInfo from './HistoryInfo';
 import Index from './Index';
 import InitialInvite from './InitialInvite';
 import Login from './Login';
+import PhoneLogin from './PhoneLogin';
 import SetEmail from './SetEmail';
 import SetHandle from './SetHandle';
 import SetPassword from './SetPassword';
@@ -82,7 +83,6 @@ const Root = ({
   const ProtectedHistoryInfo = () => isAuthenticatedCheck(<HistoryInfo />);
   const ProtectedInitialInvite = () => isAuthenticatedCheck(<InitialInvite />);
   const ProtectedClientManager = () => isAuthenticatedCheck(<ClientManager />);
-  const ProtectedVerifyEmailLink = () => isAuthenticatedCheck(<VerifyEmailLink />);
 
   const ProtectedSetHandle = () => isAuthenticatedCheck(<SetHandle />);
   const ProtectedSetEmail = () => isAuthenticatedCheck(<SetEmail />);
@@ -102,11 +102,12 @@ const Root = ({
             <Route path={ROUTE.HISTORY_INFO} component={ProtectedHistoryInfo} />
             <Route path={ROUTE.INITIAL_INVITE} component={ProtectedInitialInvite} />
             <Route path={ROUTE.LOGIN} component={Login} />
+            <Route path={ROUTE.LOGIN_PHONE} component={PhoneLogin} />
             <Route path={ROUTE.SET_EMAIL} component={ProtectedSetEmail} />
             <Route path={ROUTE.SET_HANDLE} component={ProtectedSetHandle} />
             <Route path={ROUTE.SET_PASSWORD} component={ProtectedSetPassword} />
             <Route path={ROUTE.SSO} component={SingleSignOn} />
-            <Route path={ROUTE.VERIFY_EMAIL_LINK} component={ProtectedVerifyEmailLink} />
+            <Route path={ROUTE.VERIFY_EMAIL_LINK} component={VerifyEmailLink} />
             <Route path={ROUTE.VERIFY_PHONE_CODE} component={VerifyPhoneCode} />
             <Route
               path={ROUTE.VERIFY_EMAIL_CODE}
