@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [14.4.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@14.3.2...@wireapp/core@14.4.0) (2019-11-11)
+
+
+### Features
+
+* **api-client,core:** Process user.update events ([#2530](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/2530)) ([b0702c3](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/b0702c3b8d2703b0af9405164c1b49484510ed87))
+
+
+
+
+
 ## [14.3.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@14.3.1...@wireapp/core@14.3.2) (2019-11-11)
 
 **Note:** Version bump only for package @wireapp/core
