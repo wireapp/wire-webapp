@@ -99,8 +99,10 @@ export class AuthAPI {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/tab.html#!/sendLoginCode
    */
   public postLoginSend(loginRequest: SendLoginCode): Promise<AxiosResponse<LoginCodeResponse>> {
+    // https://github.com/zinfra/backend-issues/issues/974
+    const defaultLoginRequest = {force: false};
     const config: AxiosRequestConfig = {
-      data: loginRequest,
+      data: {...defaultLoginRequest, ...loginRequest},
       method: 'post',
       url: `${AuthAPI.URL.LOGIN}/${AuthAPI.URL.SEND}`,
       withCredentials: true,

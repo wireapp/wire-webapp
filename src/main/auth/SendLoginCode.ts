@@ -18,6 +18,8 @@
  */
 
 export interface SendLoginCode {
+  /** Forces validation via SMS/voice call code */
+  force?: boolean;
   /** E.164 phone number to send the code to. */
   phone: string;
   /** Request the code with a call instead (default is SMS). */
