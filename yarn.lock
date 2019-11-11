@@ -1320,10 +1320,10 @@
   resolved "https://registry.yarnpkg.com/@types/range-parser/-/range-parser-1.2.3.tgz#7ee330ba7caafb98090bece86a5ee44115904c2c"
   integrity sha512-ewFXqrQHlFsgc09MK5jP5iR7vumV/BYayNC6PgJO2LPe8vrnNFyjQjSppfEngITi0qvfKtzFvgKymGheFM9UOA==
 
-"@types/raygun4js@2.13.1":
-  version "2.13.1"
-  resolved "https://registry.yarnpkg.com/@types/raygun4js/-/raygun4js-2.13.1.tgz#0d261ccf66e2e7073b7f250391b00d30bbd20b72"
-  integrity sha512-H4NXOOkTbBmo336TSW/2LnctMaHTdnaLwL3Fl7fg69MmtqdRn0fHP2kfR3WCdFeWARjKlJIvnAlA9jFooq0OFg==
+"@types/raygun4js@2.13.2":
+  version "2.13.2"
+  resolved "https://registry.yarnpkg.com/@types/raygun4js/-/raygun4js-2.13.2.tgz#5ca323687c6a2e7e0f744d176e81ff3c3b35f28f"
+  integrity sha512-lcEfBC5dIoSuRT5A9JaUXD5HetgXYnFJaj3+5e9FfEer1Z2Hr7UzSMCbRbF91x86IW1IhbTpH7CpZx1LvoNOIQ==
 
 "@types/react-dom@16.9.3":
   version "16.9.3"
