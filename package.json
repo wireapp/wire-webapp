@@ -12,7 +12,7 @@
     "@babel/cli": "7.6.4",
     "@babel/core": "7.7.2",
     "@babel/plugin-proposal-class-properties": "7.5.5",
-    "@babel/preset-env": "7.6.3",
+    "@babel/preset-env": "7.7.1",
     "@babel/preset-react": "7.6.3",
     "@babel/preset-typescript": "7.6.0",
     "@hot-loader/react-dom": "16.11.0",
