@@ -1765,10 +1765,10 @@ map-age-cleaner@^0.1.1, map-age-cleaner@^0.1.3:
   dependencies:
     p-defer "^1.0.0"
 
-maxmind@3.1.2:
-  version "3.1.2"
-  resolved "https://registry.yarnpkg.com/maxmind/-/maxmind-3.1.2.tgz#6b3e6b8b8d1bb19ca5b66dce2c9ca5f2791780e2"
-  integrity sha512-YOWYxgw0ydQYK7UlvjkwWJx9Xo4xBmUgo1wzQpgQVmGK0yfdGpkckOd27tDE7DoZQvtRWVN3DNqMqH+LIbBAXw==
+maxmind@4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/maxmind/-/maxmind-4.0.0.tgz#d288a61e3c8539547541041288d55391abe2bf5b"
+  integrity sha512-8pAhn0SfqOYzaQSBHkeBb7W7yYMwOHaEVkHPulSZ1cgbFqSZk6sZcYoJ+TxVswcnqlqtkwkVCXqTEUOJaz8+DA==
   dependencies:
     tiny-lru "6.0.1"
 
