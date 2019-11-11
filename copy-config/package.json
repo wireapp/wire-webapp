@@ -5,7 +5,7 @@
   "dependencies": {
     "axios": "0.19.0",
     "copy": "0.3.2",
-    "cosmiconfig": "5.2.1",
+    "cosmiconfig": "6.0.0",
     "fs-extra": "8.1.0",
     "jszip": "3.2.2",
     "logdown": "3.2.8",
@@ -14,7 +14,6 @@
   "description": "Wire's internal configuration copy tool",
   "devDependencies": {
     "@types/copy": "0.3.1",
-    "@types/cosmiconfig": "5.0.3",
     "@types/fs-extra": "8.0.1",
     "@types/jszip": "3.1.6",
     "@types/rimraf": "2.0.3",

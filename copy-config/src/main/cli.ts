@@ -19,7 +19,7 @@
  *
  */
 
-import cosmiconfig from 'cosmiconfig';
+import {cosmiconfig} from 'cosmiconfig';
 import logdown from 'logdown';
 
 import {CopyConfig, CopyConfigOptions} from './';
@@ -36,8 +36,8 @@ configExplorer
     if (configFile) {
       logger.info(`Found configuration file "${configFile.filepath}".`);
     }
-    const config = configFile ? configFile.config : undefined;
-    return new CopyConfig(config as CopyConfigOptions).copy();
+    const config: CopyConfigOptions = configFile ? configFile.config : undefined;
+    return new CopyConfig(config).copy();
   })
   .then(copiedFiles => {
     const copyMessage = copiedFiles.length ? `Copied ${copiedFiles.length}` : "Didn't copy any";
