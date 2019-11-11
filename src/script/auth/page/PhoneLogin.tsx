@@ -75,7 +75,7 @@ const PhoneLogin = ({
         throw validationErrors[0];
       }
       await doSendPhoneLoginCode({phone: formLoginData.phone});
-
+      await pushLoginData({phone: formLoginData.phone});
       return history.push(ROUTE.VERIFY_PHONE_CODE);
     } catch (error) {
       logger.warn('Unable to request login code', error);

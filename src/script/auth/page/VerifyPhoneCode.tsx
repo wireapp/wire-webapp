@@ -49,7 +49,7 @@ const VerifyPhoneCode = ({doLogin, resetAuthError, loginData}: Props & Connected
       // if (validationError.length) {
       //   throw validationError[0];
       // }
-      const login: LoginData = {clientType: loginData.clientType, code};
+      const login: LoginData = {clientType: loginData.clientType, phone: loginData.phone, code};
 
       await doLogin(login);
 
