@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.2.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@8.2.0...@wireapp/api-client@8.2.1) (2019-11-11)
+
+
+### Bug Fixes
+
+* **api-client:** Add undocumented force flag to /login/send endpoint data ([#2528](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2528)) ([ecedc33](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/ecedc337578577c0ab4a42c694240b1e8fb6751f))
+
+
+
+
+
 # [8.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@8.1.0...@wireapp/api-client@8.2.0) (2019-11-06)
 
 
