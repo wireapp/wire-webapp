@@ -46,26 +46,16 @@ export async function saveRandomEncryptionKey(): Promise<string> {
 
 export async function saveEphemeralValue<T>(value: T): Promise<T> {
   const worker = await getWorker();
-  return sendMessage(worker, {action: 'save', params: value});
+  return sendMessage<T>(worker, {action: 'save', params: value});
 }
 
-async function getWorker(): Promise<ServiceWorker | undefined> {
-  if (!navigator.serviceWorker) {
-    return undefined;
-  }
-  if (worker) {
-    return worker;
-  }
-
+async function getWorker(): Promise<ServiceWorker> {
   const registration = await navigator.serviceWorker.register(`/worker/sw-value-store.js?${Config.VERSION}`);
   worker = registration.installing || registration.waiting || registration.active;
   return worker;
 }
 
-function sendMessage(worker: ServiceWorker | undefined, action: any): Promise<any> {
-  if (!worker) {
-    return Promise.resolve(undefined);
-  }
+function sendMessage<T>(worker: ServiceWorker, action: {action: string; params?: T}): Promise<any> {
   const messageChannel = new MessageChannel();
   return new Promise((resolve, reject) => {
     messageChannel.port1.onmessage = event => {
