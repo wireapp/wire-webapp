@@ -635,10 +635,15 @@ class App {
     const instanceId = createRandomUuid();
 
     if (this.singleInstanceHandler.registerInstance(instanceId)) {
-      window.addEventListener('beforeunload', () => this.singleInstanceHandler.deregisterInstance());
+      return this._registerSingleInstanceCleaning();
     }
-
     throw new z.error.AuthError(z.error.AuthError.TYPE.MULTIPLE_TABS);
+  }
+
+  _registerSingleInstanceCleaning() {
+    $(window).on('beforeunload', () => {
+      this.singleInstanceHandler.deregisterInstance();
+    });
   }
 
   /**

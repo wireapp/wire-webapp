@@ -27,9 +27,19 @@ import {Config} from '../auth/config';
  */
 let worker: ServiceWorker;
 
+enum ValueStoreActionType {
+  GET = 'get',
+  SAVE = 'save',
+}
+
+interface ValueStoreAction {
+  action: ValueStoreActionType;
+  value?: string;
+}
+
 export async function getEphemeralValue(): Promise<any> {
   const worker = await getWorker();
-  return sendMessage(worker, {action: 'get'});
+  return sendMessage(worker, {action: ValueStoreActionType.GET});
 }
 
 export async function saveRandomEncryptionKey(): Promise<string> {
@@ -40,13 +50,13 @@ export async function saveRandomEncryptionKey(): Promise<string> {
     hexKey.push(`00${x.toString(16)}`.slice(-2));
   }
   const encryptionKey = hexKey.join('');
-  await saveEphemeralValue<string>(encryptionKey);
+  await saveEphemeralValue(encryptionKey);
   return encryptionKey;
 }
 
-export async function saveEphemeralValue<T>(value: T): Promise<T> {
+export async function saveEphemeralValue(value: string): Promise<string> {
   const worker = await getWorker();
-  return sendMessage<T>(worker, {action: 'save', params: value});
+  return sendMessage(worker, {action: ValueStoreActionType.SAVE, value});
 }
 
 async function getWorker(): Promise<ServiceWorker> {
@@ -55,7 +65,7 @@ async function getWorker(): Promise<ServiceWorker> {
   return worker;
 }
 
-function sendMessage<T>(worker: ServiceWorker, action: {action: string; params?: T}): Promise<any> {
+function sendMessage(worker: ServiceWorker, action: ValueStoreAction): Promise<string> {
   const messageChannel = new MessageChannel();
   return new Promise((resolve, reject) => {
     messageChannel.port1.onmessage = event => {
