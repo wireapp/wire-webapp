@@ -38,7 +38,7 @@ const HistoryInfo = ({hasHistory, clients, currentSelfClient, isNewCurrentSelfCl
   const {history} = useReactRouter();
 
   const onContinue = () => {
-    return history.push(ROUTE.SET_HANDLE);
+    return history.push(ROUTE.SET_EMAIL);
   };
   const headline = hasHistory ? historyInfoStrings.hasHistoryHeadline : historyInfoStrings.noHistoryHeadline;
   const infoText = hasHistory ? historyInfoStrings.hasHistoryInfo : historyInfoStrings.noHistoryInfo;

@@ -28,7 +28,9 @@ export class Configuration {
   readonly BACKEND_WS = window.wire.env.BACKEND_WS || 'wss://prod-nginz-ssl.wire.com';
   readonly BRAND_NAME = window.wire.env.BRAND_NAME || 'Wire';
   readonly ENVIRONMENT = window.wire.env.ENVIRONMENT || 'production';
-  readonly FEATURE = window.wire.env.FEATURE;
+  readonly FEATURE = window.wire.env.FEATURE || {
+    DEFAULT_LOGIN_TEMPORARY_CLIENT: false,
+  };
   readonly MAX_GROUP_PARTICIPANTS = window.wire.env.MAX_GROUP_PARTICIPANTS || 500;
   readonly MAX_VIDEO_PARTICIPANTS = window.wire.env.MAX_VIDEO_PARTICIPANTS || 4;
   readonly NEW_PASSWORD_MINIMUM_LENGTH =
