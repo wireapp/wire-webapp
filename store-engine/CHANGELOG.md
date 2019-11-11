@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@4.0.2...@wireapp/store-engine@4.1.0) (2019-11-11)
+
+
+### Features
+
+* **store-engine,store-engine-bro-fs,store-engine-dexie,store-engine-fs,store-engine-sqleet,store-engine-web-storage:** Remove "append" functionality ([#2529](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/issues/2529)) ([d8cb079](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/commit/d8cb0797d8553ce40a41d501e46a1d7efe81495f))
+
+
+
+
+
 ## [4.0.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@4.0.1...@wireapp/store-engine@4.0.2) (2019-11-11)
 
 **Note:** Version bump only for package @wireapp/store-engine
