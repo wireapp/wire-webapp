@@ -17,14 +17,10 @@
  *
  */
 
-import {Picture} from '../../self';
-import {UserAsset} from '../UserAsset';
+import {User} from '../User';
 
 export interface UserUpdateData {
   user: {
-    assets?: UserAsset[];
     id: string;
-    picture?: Picture[];
-    name?: string;
-  };
+  } & Partial<User>;
 }
