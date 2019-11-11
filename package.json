@@ -53,7 +53,7 @@
     "@babel/preset-env": "7.6.3",
     "@babel/preset-react": "7.6.3",
     "@babel/preset-typescript": "7.6.0",
-    "@emotion/babel-preset-css-prop": "10.0.22",
+    "@emotion/babel-preset-css-prop": "10.0.23",
     "@hot-loader/react-dom": "16.11.0",
     "@types/crypto-js": "3.1.43",
     "@types/enzyme": "3.10.3",
