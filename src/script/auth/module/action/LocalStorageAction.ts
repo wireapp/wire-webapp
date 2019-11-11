@@ -35,49 +35,43 @@ export const LocalStorageKey = {
 
 export class LocalStorageAction {
   setLocalStorage = (key: string, value: any): ThunkAction => {
-    return (dispatch, getState, {localStorage}) => {
+    return async (dispatch, getState, {localStorage}) => {
       dispatch(LocalStorageActionCreator.startLocalStorageSet());
-      return Promise.resolve()
-        .then(() => localStorage.setItem(key, JSON.stringify({data: value})))
-        .then(() => {
-          dispatch(LocalStorageActionCreator.successfulLocalStorageSet(key, value));
-        })
-        .catch(error => {
-          dispatch(LocalStorageActionCreator.failedLocalStorageSet(error));
-          throw error;
-        });
+      try {
+        localStorage.setItem(key, JSON.stringify({data: value}));
+        dispatch(LocalStorageActionCreator.successfulLocalStorageSet(key, value));
+      } catch (error) {
+        dispatch(LocalStorageActionCreator.failedLocalStorageSet(error));
+        throw error;
+      }
     };
   };
 
   getLocalStorage = (key: string): ThunkAction<Promise<string | boolean | number>> => {
-    return (dispatch, getState, {localStorage}) => {
+    return async (dispatch, getState, {localStorage}) => {
       dispatch(LocalStorageActionCreator.startLocalStorageGet());
       let data: string | boolean | number;
-      return Promise.resolve()
-        .then(() => (data = JSON.parse(localStorage.getItem(key)).data))
-        .then(() => {
-          dispatch(LocalStorageActionCreator.successfulLocalStorageGet(key, data));
-        })
-        .then(() => data)
-        .catch(error => {
-          dispatch(LocalStorageActionCreator.failedLocalStorageGet(error));
-          throw error;
-        });
+      try {
+        data = JSON.parse(localStorage.getItem(key)).data;
+        dispatch(LocalStorageActionCreator.successfulLocalStorageGet(key, data));
+        return data;
+      } catch (error) {
+        dispatch(LocalStorageActionCreator.failedLocalStorageGet(error));
+        throw error;
+      }
     };
   };
 
   deleteLocalStorage = (key: string): ThunkAction => {
-    return (dispatch, getState, {localStorage}) => {
+    return async (dispatch, getState, {localStorage}) => {
       dispatch(LocalStorageActionCreator.startLocalStorageDelete());
-      return Promise.resolve()
-        .then(() => localStorage.removeItem(key))
-        .then(() => {
-          dispatch(LocalStorageActionCreator.successfulLocalStorageDelete(key));
-        })
-        .catch(error => {
-          dispatch(LocalStorageActionCreator.failedLocalStorageDelete(error));
-          throw error;
-        });
+      try {
+        localStorage.removeItem(key);
+        dispatch(LocalStorageActionCreator.successfulLocalStorageDelete(key));
+      } catch (error) {
+        dispatch(LocalStorageActionCreator.failedLocalStorageDelete(error));
+        throw error;
+      }
     };
   };
 }

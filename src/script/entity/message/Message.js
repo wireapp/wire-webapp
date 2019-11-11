@@ -41,9 +41,6 @@ export class Message {
   }
 
   constructor(id = '0', super_type = '') {
-    this.equals = this.equals.bind(this);
-    this.is_expired = this.is_expired.bind(this);
-    this.startMessageTimer = this.startMessageTimer.bind(this);
     this.id = id;
     this.super_type = super_type;
     this.ephemeral_caption = ko.pureComputed(() => {
@@ -112,9 +109,7 @@ export class Message {
     this.accent_color = ko.pureComputed(() => `accent-color-${this.user().accent_id()}`);
   }
 
-  equals(messageEntity) {
-    return messageEntity && this.id ? this.id === messageEntity.id : false;
-  }
+  equals = messageEntity => (messageEntity && this.id ? this.id === messageEntity.id : false);
 
   /**
    * Check if message contains an asset of type file.
@@ -287,9 +282,17 @@ export class Message {
    * Check if ephemeral message is expired.
    * @returns {boolean} True, if message expired.
    */
-  is_expired() {
-    return this.ephemeral_expires() === true;
-  }
+  is_expired = () => this.ephemeral_expires() === true;
+
+  isIncoming = () => {
+    if (this.user().is_me) {
+      return false;
+    }
+    const isMissedCall = this.is_call() && !this.was_completed();
+    const isPing = this.is_ping();
+    const isMessage = this.is_content();
+    return isMissedCall || isPing || isMessage;
+  };
 
   /**
    * Check if message has an unavailable (uploading or failed) asset.
@@ -331,7 +334,7 @@ export class Message {
   }
 
   // Start the ephemeral timer for the message.
-  startMessageTimer(timeOffset) {
+  startMessageTimer = timeOffset => {
     if (this.messageTimerStarted) {
       return;
     }
@@ -346,7 +349,7 @@ export class Message {
     const remainingTime = this.ephemeral_expires() - this.ephemeral_started();
     this.ephemeral_remaining(remainingTime);
     this.messageTimerStarted = true;
-  }
+  };
 
   /**
    * Update the status of a message.

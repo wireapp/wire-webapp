@@ -257,10 +257,10 @@
   dependencies:
     "@types/express" "*"
 
-"@types/jasmine@3.4.4":
-  version "3.4.4"
-  resolved "https://registry.yarnpkg.com/@types/jasmine/-/jasmine-3.4.4.tgz#be3fbd73e72725edb44e6f7f509cd52912d1550c"
-  integrity sha512-+/sHcTPyDS1JQacDRRRWb+vNrjBwnD+cKvTaWlxlJ/uOOFvzCkjOwNaqVjYMLfsjzNi0WtDH9RyReDXPG1Cdug==
+"@types/jasmine@3.4.6":
+  version "3.4.6"
+  resolved "https://registry.yarnpkg.com/@types/jasmine/-/jasmine-3.4.6.tgz#afcb210af0fa751b85a96b2034eedada65390be1"
+  integrity sha512-hpQHs+lmZ0uuCrGyqypdI1Ho7jRFolOBT6OkNdZPFziLSSEKvWu+VxWU6bGdNEA/hoV4jV8pdDeNx8EWlmfNAw==
 
 "@types/mime@*":
   version "2.0.1"
@@ -300,10 +300,10 @@
     "@types/express-serve-static-core" "*"
     "@types/mime" "*"
 
-"@wireapp/commons@2.2.21":
-  version "2.2.21"
-  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-2.2.21.tgz#ae79afecc5e0aba06c61653b7bbdabd7f3535fd3"
-  integrity sha512-1uKqmatI/aK+zMYLEyntfUE3AA9kA0yjJepLGptUaJoYxo30Hd2kN9JO8KD2dbjuy5r8YMefBfG5xBXkEv45dw==
+"@wireapp/commons@2.2.22":
+  version "2.2.22"
+  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-2.2.22.tgz#43154a328e4714cd16a15e3d6ce9a45fe2dd4c5b"
+  integrity sha512-D1CH97sZnD4T6e3Fp+LNLbzUs/Wwak2cDZKZZP5SSDOAZkoAo6gWwFjGLk5uhZ5/IT32SdBLAGKyenWJXlaK7A==
   dependencies:
     "@types/ansi-regex" "5.0.0"
     "@types/fs-extra" "8.0.1"
@@ -1765,10 +1765,10 @@ map-age-cleaner@^0.1.1, map-age-cleaner@^0.1.3:
   dependencies:
     p-defer "^1.0.0"
 
-maxmind@3.1.2:
-  version "3.1.2"
-  resolved "https://registry.yarnpkg.com/maxmind/-/maxmind-3.1.2.tgz#6b3e6b8b8d1bb19ca5b66dce2c9ca5f2791780e2"
-  integrity sha512-YOWYxgw0ydQYK7UlvjkwWJx9Xo4xBmUgo1wzQpgQVmGK0yfdGpkckOd27tDE7DoZQvtRWVN3DNqMqH+LIbBAXw==
+maxmind@4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/maxmind/-/maxmind-4.0.0.tgz#d288a61e3c8539547541041288d55391abe2bf5b"
+  integrity sha512-8pAhn0SfqOYzaQSBHkeBb7W7yYMwOHaEVkHPulSZ1cgbFqSZk6sZcYoJ+TxVswcnqlqtkwkVCXqTEUOJaz8+DA==
   dependencies:
     tiny-lru "6.0.1"
 
@@ -2837,10 +2837,10 @@ tslint-plugin-prettier@2.0.1:
     lines-and-columns "^1.1.6"
     tslib "^1.7.1"
 
-tslint@5.20.0:
-  version "5.20.0"
-  resolved "https://registry.yarnpkg.com/tslint/-/tslint-5.20.0.tgz#fac93bfa79568a5a24e7be9cdde5e02b02d00ec1"
-  integrity sha512-2vqIvkMHbnx8acMogAERQ/IuINOq6DFqgF8/VDvhEkBqQh/x6SP0Y+OHnKth9/ZcHQSroOZwUQSN18v8KKF0/g==
+tslint@5.20.1:
+  version "5.20.1"
+  resolved "https://registry.yarnpkg.com/tslint/-/tslint-5.20.1.tgz#e401e8aeda0152bc44dd07e614034f3f80c67b7d"
+  integrity sha512-EcMxhzCFt8k+/UP5r8waCf/lzmeSyVlqxqMEDQE7rWYiQky8KpIBz1JAoYXfROHrPZ1XXd43q8yQnULOLiBRQg==
   dependencies:
     "@babel/code-frame" "^7.0.0"
     builtin-modules "^1.1.1"

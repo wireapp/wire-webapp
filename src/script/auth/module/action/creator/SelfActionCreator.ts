@@ -36,6 +36,14 @@ export enum SELF_ACTION {
   SELF_FETCH_START = 'SELF_FETCH_START',
   SELF_FETCH_SUCCESS = 'SELF_FETCH_SUCCESS',
   SELF_FETCH_FAILED = 'SELF_FETCH_FAILED',
+
+  SELF_SET_PASSWORD_START = 'SELF_SET_PASSWORD_START',
+  SELF_SET_PASSWORD_SUCCESS = 'SELF_SET_PASSWORD_SUCCESS',
+  SELF_SET_PASSWORD_FAILED = 'SELF_SET_PASSWORD_FAILED',
+
+  SELF_SET_EMAIL_START = 'SELF_SET_EMAIL_START',
+  SELF_SET_EMAIL_SUCCESS = 'SELF_SET_EMAIL_SUCCESS',
+  SELF_SET_EMAIL_FAILED = 'SELF_SET_EMAIL_FAILED',
 }
 
 export type SelfActions =
@@ -50,7 +58,13 @@ export type SelfActions =
   | GetConsentsFailedAction
   | SetConsentStartAction
   | SetConsentSuccessAction
-  | SetConsentFailedAction;
+  | SetConsentFailedAction
+  | SetSelfEmailStartAction
+  | SetSelfEmailSuccessAction
+  | SetSelfEmailFailedAction
+  | SetSelfPasswordStartAction
+  | SetSelfPasswordSuccessAction
+  | SetSelfPasswordFailedAction;
 
 export interface SetHandleStartAction extends AppAction {
   readonly type: SELF_ACTION.HANDLE_SET_START;
@@ -97,6 +111,28 @@ export interface SetConsentSuccessAction extends AppAction {
 }
 export interface SetConsentFailedAction extends AppAction {
   readonly type: SELF_ACTION.CONSENT_SET_FAILED;
+  readonly error: Error;
+}
+
+export interface SetSelfEmailStartAction extends AppAction {
+  readonly type: SELF_ACTION.SELF_SET_EMAIL_START;
+}
+export interface SetSelfEmailSuccessAction extends AppAction {
+  readonly type: SELF_ACTION.SELF_SET_EMAIL_SUCCESS;
+}
+export interface SetSelfEmailFailedAction extends AppAction {
+  readonly type: SELF_ACTION.SELF_SET_EMAIL_FAILED;
+  readonly error: Error;
+}
+
+export interface SetSelfPasswordStartAction extends AppAction {
+  readonly type: SELF_ACTION.SELF_SET_PASSWORD_START;
+}
+export interface SetSelfPasswordSuccessAction extends AppAction {
+  readonly type: SELF_ACTION.SELF_SET_PASSWORD_SUCCESS;
+}
+export interface SetSelfPasswordFailedAction extends AppAction {
+  readonly type: SELF_ACTION.SELF_SET_PASSWORD_FAILED;
   readonly error: Error;
 }
 
@@ -147,5 +183,27 @@ export class SelfActionCreator {
   static failedSetConsent = (error: Error): SetConsentFailedAction => ({
     error,
     type: SELF_ACTION.CONSENT_SET_FAILED,
+  });
+
+  static startSetSelfEmail = (): SetSelfEmailStartAction => ({
+    type: SELF_ACTION.SELF_SET_EMAIL_START,
+  });
+  static successfulSetSelfEmail = (): SetSelfEmailSuccessAction => ({
+    type: SELF_ACTION.SELF_SET_EMAIL_SUCCESS,
+  });
+  static failedSetSelfEmail = (error: Error): SetSelfEmailFailedAction => ({
+    error,
+    type: SELF_ACTION.SELF_SET_EMAIL_FAILED,
+  });
+
+  static startSetSelfPassword = (): SetSelfPasswordStartAction => ({
+    type: SELF_ACTION.SELF_SET_PASSWORD_START,
+  });
+  static successfulSetSelfPassword = (): SetSelfPasswordSuccessAction => ({
+    type: SELF_ACTION.SELF_SET_PASSWORD_SUCCESS,
+  });
+  static failedSetSelfPassword = (error: Error): SetSelfPasswordFailedAction => ({
+    error,
+    type: SELF_ACTION.SELF_SET_PASSWORD_FAILED,
   });
 }

@@ -32,13 +32,13 @@ import {
   Small,
   Text,
 } from '@wireapp/react-ui-kit';
-import React from 'react';
-import {InjectedIntlProps, injectIntl} from 'react-intl';
+import React, {useEffect, useState} from 'react';
+import {useIntl} from 'react-intl';
 import {clientItemStrings} from '../../strings';
 import {ValidationError} from '../module/action/ValidationError';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 
-export interface Props extends React.HTMLAttributes<HTMLDivElement> {
+export interface Props extends React.HTMLProps<HTMLDivElement> {
   client: RegisteredClient;
   clientError: Error;
   onClick: (event: React.MouseEvent<HTMLDivElement>) => void;
@@ -47,77 +47,65 @@ export interface Props extends React.HTMLAttributes<HTMLDivElement> {
   selected: boolean;
 }
 
-interface State {
-  animationStep: number;
-  isAnimating: boolean;
-  password: string;
-  validationError: Error;
-  validPassword: boolean;
-}
+const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, requirePassword}: Props) => {
+  const {formatMessage: _} = useIntl();
+  const passwordInput = React.useRef<HTMLInputElement>();
 
-type CombinedProps = Props & InjectedIntlProps;
-
-class ClientItem extends React.Component<CombinedProps, State> {
-  private readonly passwordInput: React.RefObject<any> = React.createRef();
-  state: State;
-
-  static CONFIG = {
+  const CONFIG = {
     animationSteps: 8,
   };
 
-  static initialState: State = {
-    animationStep: 0,
-    isAnimating: false,
-    password: '',
-    validPassword: true,
-    validationError: null,
-  };
+  const [animationStep, setAnimationStep] = useState(selected ? CONFIG.animationSteps : 0);
+  const [isSelected, setIsSelected] = useState(selected);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [password, setPassword] = useState('');
+  const [isValidPassword, setIsValidPassword] = useState(true);
+  const [validationError, setValidationError] = useState();
 
-  formatId = (id = '?', outputLength = 16) => {
+  useEffect(() => {
+    if (!selected && isSelected) {
+      setIsAnimating(true);
+      setIsSelected(false);
+      requestAnimationFrame(() => executeAnimateOut());
+    } else if (selected && !isSelected) {
+      setIsAnimating(true);
+      setIsSelected(true);
+      requestAnimationFrame(() => executeAnimateIn());
+    } else {
+      setAnimationStep(0);
+    }
+  }, [selected]);
+
+  const formatId = (id = '?', outputLength = 16) => {
     const paddedId = id.padStart(outputLength, '0');
     return paddedId.toUpperCase().replace(/(..)/g, '$1 ');
   };
 
-  constructor(props: CombinedProps) {
-    super(props);
-    this.state = {
-      ...ClientItem.initialState,
-      animationStep: props.selected ? ClientItem.CONFIG.animationSteps : 0,
-      isAnimating: false,
-    };
-  }
+  const executeAnimateIn = (): void => {
+    setAnimationStep(step => {
+      if (step < CONFIG.animationSteps) {
+        window.requestAnimationFrame(executeAnimateIn);
+        return step + 1;
+      } else {
+        setIsAnimating(false);
+        return step;
+      }
+    });
+  };
 
-  componentWillReceiveProps(newProps: CombinedProps): void {
-    if (!this.props.selected && newProps.selected) {
-      this.setState({isAnimating: true});
-      this.executeAnimateIn();
-    } else if (this.props.selected && !newProps.selected) {
-      this.setState({isAnimating: true});
-      this.executeAnimateOut();
-    } else {
-      this.setState({animationStep: 0});
-    }
-  }
+  const executeAnimateOut = (): void => {
+    setAnimationStep(step => {
+      if (step > 0) {
+        window.requestAnimationFrame(executeAnimateOut);
+        return step - 1;
+      } else {
+        setIsAnimating(false);
+        return step;
+      }
+    });
+  };
 
-  executeAnimateIn(): void {
-    if (this.state.animationStep < ClientItem.CONFIG.animationSteps) {
-      window.requestAnimationFrame(this.executeAnimateIn.bind(this));
-      this.setState(state => ({animationStep: state.animationStep + 1}));
-    } else {
-      this.setState({isAnimating: false});
-    }
-  }
-
-  executeAnimateOut(): void {
-    if (this.state.animationStep > 0) {
-      window.requestAnimationFrame(this.executeAnimateOut.bind(this));
-      this.setState(state => ({animationStep: state.animationStep - 1}));
-    } else {
-      this.setState({isAnimating: false});
-    }
-  }
-
-  formatDate = (dateString: string): string =>
+  const formatDate = (dateString: string): string =>
     dateString
       ? new Date(dateString).toLocaleString('en-US', {
           day: 'numeric',
@@ -130,7 +118,7 @@ class ClientItem extends React.Component<CombinedProps, State> {
         })
       : '?';
 
-  formatName = (model: string, clazz: string): string | JSX.Element =>
+  const formatName = (model: string, clazz: string): string | JSX.Element =>
     model || (
       <Text bold textTransform={'capitalize'}>
         {clazz}
@@ -138,18 +126,21 @@ class ClientItem extends React.Component<CombinedProps, State> {
     ) ||
     '?';
 
-  resetState = () => this.setState(ClientItem.initialState);
-
-  wrappedOnClick = (event: React.MouseEvent<HTMLDivElement>): void => {
-    this.resetState();
-    this.props.onClick(event);
+  const resetState = () => {
+    setAnimationStep(selected ? CONFIG.animationSteps : 0);
+    setIsAnimating(false);
   };
 
-  handlePasswordlessClientDeletion = (event: React.FormEvent): Promise<void> => {
+  const wrappedOnClick = (event: React.MouseEvent<HTMLDivElement>): void => {
+    resetState();
+    onClick(event);
+  };
+
+  const handlePasswordlessClientDeletion = (event: React.FormEvent): Promise<void> => {
     event.preventDefault();
 
     return Promise.resolve()
-      .then(() => this.props.onClientRemoval())
+      .then(() => onClientRemoval())
       .catch(error => {
         if (!error.label) {
           throw error;
@@ -157,23 +148,24 @@ class ClientItem extends React.Component<CombinedProps, State> {
       });
   };
 
-  handleSubmit = (event: React.FormEvent): Promise<void> => {
+  const handleSubmit = (event: React.FormEvent): Promise<void> => {
     event.preventDefault();
-    let validationError = null;
-    if (!this.passwordInput.current.checkValidity()) {
-      validationError = ValidationError.handleValidationState(
-        this.passwordInput.current.name,
-        this.passwordInput.current.validity,
+    let localValidationError = null;
+    if (!passwordInput.current.checkValidity()) {
+      localValidationError = ValidationError.handleValidationState(
+        passwordInput.current.name,
+        passwordInput.current.validity,
       );
     }
-    this.setState({validPassword: this.passwordInput.current.validity.valid, validationError});
-    return Promise.resolve(validationError)
+    setIsValidPassword(passwordInput.current.validity.valid);
+    setValidationError(localValidationError);
+    return Promise.resolve(localValidationError)
       .then(error => {
         if (error) {
           throw error;
         }
       })
-      .then(() => this.props.onClientRemoval(this.state.password))
+      .then(() => onClientRemoval(password))
       .catch(error => {
         if (error.label) {
           switch (error.label) {
@@ -192,113 +184,100 @@ class ClientItem extends React.Component<CombinedProps, State> {
       });
   };
 
-  render() {
-    const {
-      client,
-      selected,
-      clientError,
-      requirePassword,
-      intl: {formatMessage: _},
-    } = this.props;
+  const animationPosition = animationStep / CONFIG.animationSteps;
+  const height = animationPosition * 56;
+  const marginTop = animationPosition * 16;
+  const paddingHorizontal = animationPosition * 2;
 
-    const {validationError, validPassword, password, animationStep, isAnimating} = this.state;
-    const animationPosition = animationStep / ClientItem.CONFIG.animationSteps;
-    const height = animationPosition * 56;
-    const marginTop = animationPosition * 16;
-    const paddingHorizontal = animationPosition * 2;
-
-    return (
-      <ContainerXS>
+  return (
+    <ContainerXS>
+      <ContainerXS
+        style={{
+          backgroundColor: selected ? 'white' : '',
+          borderRadius: '4px',
+          transition: 'background-color .35s linear',
+        }}
+        data-uie-value={client.model}
+      >
         <ContainerXS
+          onClick={(event: React.MouseEvent<HTMLDivElement>) => requirePassword && wrappedOnClick(event)}
           style={{
-            backgroundColor: selected ? 'white' : '',
-            borderRadius: '4px',
-            transition: 'background-color .35s linear',
+            cursor: requirePassword ? 'pointer' : 'auto',
+            margin: `${marginTop}px 0 0 0`,
+            padding: '5px 16px 0 16px',
           }}
-          data-uie-value={client.model}
+          data-uie-name="go-remove-device"
         >
-          <ContainerXS
-            onClick={(event: React.MouseEvent<HTMLDivElement>) => requirePassword && this.wrappedOnClick(event)}
-            style={{
-              cursor: requirePassword ? 'pointer' : 'auto',
-              margin: `${marginTop}px 0 0 0`,
-              padding: '5px 16px 0 16px',
-            }}
-            data-uie-name="go-remove-device"
-          >
-            <div style={{display: 'flex', flexDirection: 'row'}}>
-              <div style={{flexBasis: '32px', margin: 'auto'}}>
-                <DeviceIcon color="#323639" />
-              </div>
-              <div style={{flexGrow: 1}}>
-                <Text bold block color="#323639" data-uie-name="device-header-model">
-                  {this.formatName(client.model, client.class)}
-                </Text>
-                <Small block data-uie-name="device-id">{`ID: ${this.formatId(client.id)}`}</Small>
-                <Small block>{this.formatDate(client.time)}</Small>
-              </div>
-              {!requirePassword && (
+          <div style={{display: 'flex', flexDirection: 'row'}}>
+            <div style={{flexBasis: '32px', margin: 'auto'}}>
+              <DeviceIcon color="#323639" />
+            </div>
+            <div style={{flexGrow: 1}}>
+              <Text bold block color="#323639" data-uie-name="device-header-model">
+                {formatName(client.model, client.class)}
+              </Text>
+              <Small block data-uie-name="device-id">{`ID: ${formatId(client.id)}`}</Small>
+              <Small block>{formatDate(client.time)}</Small>
+            </div>
+            {!requirePassword && (
+              <RoundIconButton
+                color={COLOR.RED}
+                data-uie-name="do-remove-device"
+                formNoValidate
+                icon={ICON_NAME.TRASH}
+                onClick={handlePasswordlessClientDeletion}
+                style={{margin: 'auto'}}
+                type="submit"
+              />
+            )}
+          </div>
+          <Line color="rgba(51, 55, 58, .04)" style={{backgroundColor: 'transparent', margin: '4px 0 0 0'}} />
+        </ContainerXS>
+        {requirePassword && (isSelected || isAnimating) && (
+          <ContainerXS style={{maxHeight: `${height}px`, overflow: 'hidden', padding: `${paddingHorizontal}px 0`}}>
+            <Form>
+              <InputSubmitCombo style={{background: 'transparent', marginBottom: '0'}}>
+                <Input
+                  autoComplete="section-login password"
+                  autoFocus
+                  data-uie-name="remove-device-password"
+                  ref={passwordInput}
+                  name="password"
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    setPassword(event.target.value);
+                    setIsValidPassword(true);
+                  }}
+                  pattern={`.{1,1024}`}
+                  placeholder={_(clientItemStrings.passwordPlaceholder)}
+                  required
+                  style={{background: 'transparent'}}
+                  type="password"
+                  value={password}
+                />
                 <RoundIconButton
                   color={COLOR.RED}
                   data-uie-name="do-remove-device"
+                  disabled={!password || !isValidPassword}
                   formNoValidate
                   icon={ICON_NAME.TRASH}
-                  onClick={this.handlePasswordlessClientDeletion}
-                  style={{margin: 'auto'}}
+                  onClick={handleSubmit}
+                  style={{marginBottom: '-4px'}}
                   type="submit"
                 />
-              )}
-            </div>
-            <Line color="rgba(51, 55, 58, .04)" style={{backgroundColor: 'transparent', margin: '4px 0 0 0'}} />
+              </InputSubmitCombo>
+            </Form>
           </ContainerXS>
-          {requirePassword && (selected || isAnimating) && (
-            <ContainerXS style={{maxHeight: `${height}px`, overflow: 'hidden', padding: `${paddingHorizontal}px 0`}}>
-              <Form>
-                <InputSubmitCombo style={{background: 'transparent', marginBottom: '0'}}>
-                  <Input
-                    autoComplete="section-login password"
-                    autoFocus
-                    data-uie-name="remove-device-password"
-                    ref={this.passwordInput}
-                    name="password"
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                      this.setState({
-                        password: event.target.value,
-                        validPassword: true,
-                      })
-                    }
-                    pattern={`.{1,1024}`}
-                    placeholder={_(clientItemStrings.passwordPlaceholder)}
-                    required
-                    style={{background: 'transparent'}}
-                    type="password"
-                    value={password}
-                  />
-                  <RoundIconButton
-                    color={COLOR.RED}
-                    data-uie-name="do-remove-device"
-                    disabled={!password || !validPassword}
-                    formNoValidate
-                    icon={ICON_NAME.TRASH}
-                    onClick={this.handleSubmit}
-                    style={{marginBottom: '-4px'}}
-                    type="submit"
-                  />
-                </InputSubmitCombo>
-              </Form>
-            </ContainerXS>
-          )}
-        </ContainerXS>
-        {validationError && selected ? (
-          <div style={{margin: '16px 0 0 0'}}>{parseValidationErrors(validationError)}</div>
-        ) : clientError && selected ? (
-          <ErrorMessage style={{margin: '16px 0 0 0'}} data-uie-name="error-message">
-            {parseError(clientError)}
-          </ErrorMessage>
-        ) : null}
+        )}
       </ContainerXS>
-    );
-  }
-}
+      {validationError && selected ? (
+        <div style={{margin: '16px 0 0 0'}}>{parseValidationErrors(validationError)}</div>
+      ) : clientError && selected ? (
+        <ErrorMessage style={{margin: '16px 0 0 0'}} data-uie-name="error-message">
+          {parseError(clientError)}
+        </ErrorMessage>
+      ) : null}
+    </ContainerXS>
+  );
+};
 
-export default injectIntl(ClientItem);
+export default ClientItem;

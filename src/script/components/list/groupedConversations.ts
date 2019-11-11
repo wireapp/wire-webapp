@@ -31,6 +31,8 @@ import {
 } from '../../conversation/ConversationLabelRepository';
 import {generateConversationUrl} from '../../router/routeGenerator';
 
+import './groupedConversationHeader';
+
 interface GroupedConversationsParams {
   conversationRepository: ConversationRepository;
   listViewModel: ConversationListViewModel;
@@ -45,9 +47,7 @@ ko.components.register('grouped-conversations', {
   template: `
     <!-- ko foreach: {data: folders, as: 'folder', noChildContext: true} -->
       <div class="conversation-folder" data-uie-name="conversation-folder" data-bind="attr: {'data-uie-value': folder.name}">
-        <div class="conversation-folder__head" data-uie-name="conversation-folder-head" data-bind="click: () => toggle(folder.id), css: {'conversation-folder__head--open': isExpanded(folder.id)}">
-          <disclose-icon></disclose-icon><span data-bind="text: folder.name"></span>
-        </div>
+      <grouped-conversation-header data-bind="click: () => toggle(folder.id)" params="conversationLabel: folder, isOpen: isExpanded(folder.id)"></grouped-conversation-header>
         <div data-bind="visible: isExpanded(folder.id)">
           <!-- ko foreach: {data: folder.conversations, as: 'conversation', noChildContext: true} -->
             <conversation-list-cell
@@ -76,6 +76,8 @@ ko.components.register('grouped-conversations', {
     this.isSelectedConversation = isSelectedConversation;
     this.getConversationUrl = generateConversationUrl;
     this.isVisibleFunc = isVisibleFunc;
+    this.countUnread = (conversations: ko.Observable<Conversation[]>) =>
+      conversations().reduce((sum, conversation) => (conversation.hasUnread() ? sum + 1 : sum), 0);
 
     this.folders = ko.pureComputed<ConversationLabel[]>(() => {
       const folders: ConversationLabel[] = [];

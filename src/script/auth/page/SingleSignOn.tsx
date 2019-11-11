@@ -101,7 +101,7 @@ const SingleSignOn = ({}: Props & ConnectedProps & DispatchProps) => {
             return reject(
               new BackendError({
                 code: 401,
-                label: event.data.payload.label,
+                label: event.data.payload.label || BackendError.LABEL.SSO_GENERIC_ERROR,
                 message: `Authentication error: "${JSON.stringify(event.data.payload)}"`,
               }),
             );
