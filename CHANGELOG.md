@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@8.2.1...@wireapp/api-client@8.3.0) (2019-11-11)
+
+
+### Features
+
+* **api-client,core:** Process user.update events ([#2530](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2530)) ([b0702c3](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/b0702c3b8d2703b0af9405164c1b49484510ed87))
+
+
+
+
+
 ## [8.2.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@8.2.0...@wireapp/api-client@8.2.1) (2019-11-11)
 
 
