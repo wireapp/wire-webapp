@@ -22,7 +22,7 @@ import {ClientType} from '@wireapp/api-client/dist/commonjs/client/index';
 import {Account} from '@wireapp/core';
 import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
 import {LowDiskSpaceError} from '@wireapp/store-engine/dist/commonjs/engine/error/';
-import {getEphemeralValue, saveRandomEncryptionKey} from 'Util/ephemeralValueStore';
+import {saveRandomEncryptionKey} from 'Util/ephemeralValueStore';
 import {isTemporaryClientAndNonPersistent, noop} from 'Util/util';
 import {StorageService} from '../../../storage';
 import {currentCurrency, currentLanguage} from '../../localeConfig';
@@ -43,8 +43,7 @@ export class AuthAction {
    * configuration to `configureClient`.
    */
   private async initEncryptedDatabase(): Promise<SQLeetEngine> {
-    const existingKey: string = await getEphemeralValue();
-    const encryptionKey = existingKey || (await saveRandomEncryptionKey());
+    const encryptionKey = await saveRandomEncryptionKey();
     return StorageService.initEncryptedDatabase(encryptionKey);
   }
 
