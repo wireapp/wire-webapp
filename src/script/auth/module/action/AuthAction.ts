@@ -20,8 +20,11 @@
 import {LoginData, RegisterData, SendLoginCode} from '@wireapp/api-client/dist/commonjs/auth';
 import {ClientType} from '@wireapp/api-client/dist/commonjs/client/index';
 import {Account} from '@wireapp/core';
+import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
 import {LowDiskSpaceError} from '@wireapp/store-engine/dist/commonjs/engine/error/';
-import {noop} from 'Util/util';
+import {getEphemeralValue, saveRandomEncryptionKey} from 'Util/ephemeralValueStore';
+import {isTemporaryClientAndNonPersistent, noop} from 'Util/util';
+import {StorageService} from '../../../storage';
 import {currentCurrency, currentLanguage} from '../../localeConfig';
 import {Api, RootState, ThunkAction, ThunkDispatch} from '../reducer';
 import {RegistrationDataState} from '../reducer/authReducer';
@@ -34,6 +37,25 @@ import {LocalStorageAction, LocalStorageKey} from './LocalStorageAction';
 type LoginLifecycleFunction = (dispatch: ThunkDispatch, getState: () => RootState, global: Api) => void;
 
 export class AuthAction {
+  /**
+   * Temporary solution to be used ONLY with non-persistent temporary clients. It's a workaround to switch between
+   * Dexie (IndexedDB) and SQLeetEngine (encrypted IndexedDB). When we fully use SQLeetEngine we can move this
+   * configuration to `configureClient`.
+   */
+  private async initEncryptedDatabase(): Promise<SQLeetEngine> {
+    const existingKey: string = await getEphemeralValue();
+    const encryptionKey = existingKey || (await saveRandomEncryptionKey());
+    return StorageService.initEncryptedDatabase(encryptionKey);
+  }
+
+  doFlushDatabase = (): ThunkAction => {
+    return async (dispatch, getState, {apiClient}) => {
+      if (apiClient.config.store instanceof SQLeetEngine) {
+        await apiClient.config.store.save();
+      }
+    };
+  };
+
   doLogin = (loginData: LoginData): ThunkAction => {
     const onBeforeLogin: LoginLifecycleFunction = (dispatch, getState, {actions: {authAction}}) =>
       dispatch(authAction.doSilentLogout());
@@ -56,12 +78,16 @@ export class AuthAction {
   ): ThunkAction => {
     return async (dispatch, getState, global) => {
       const {
+        apiClient,
         core,
         actions: {clientAction, cookieAction, selfAction, localStorageAction},
       } = global;
       dispatch(AuthActionCreator.startLogin());
       try {
         onBeforeLogin(dispatch, getState, global);
+        if (isTemporaryClientAndNonPersistent(loginData.clientType === ClientType.PERMANENT)) {
+          apiClient.config.store = await this.initEncryptedDatabase();
+        }
         await core.login(loginData, false, clientAction.generateClientPayload(loginData.clientType));
         await this.persistAuthData(loginData.clientType, core, dispatch, localStorageAction);
         await dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: global.config.APP_INSTANCE_ID}));
@@ -104,6 +130,9 @@ export class AuthAction {
     ) => {
       dispatch(AuthActionCreator.startLogin());
       try {
+        if (isTemporaryClientAndNonPersistent(clientType === ClientType.PERMANENT)) {
+          apiClient.config.store = await this.initEncryptedDatabase();
+        }
         await apiClient.init(clientType);
         await core.init();
         await this.persistAuthData(clientType, core, dispatch, localStorageAction);
@@ -275,7 +304,9 @@ export class AuthAction {
           throw new Error(`Could not find value for '${LocalStorageKey.AUTH.PERSIST}'`);
         }
         const clientType = persist ? ClientType.PERMANENT : ClientType.TEMPORARY;
-
+        if (isTemporaryClientAndNonPersistent(clientType === ClientType.PERMANENT)) {
+          apiClient.config.store = await this.initEncryptedDatabase();
+        }
         await apiClient.init(clientType);
         await core.init();
         await this.persistAuthData(clientType, core, dispatch, localStorageAction);
