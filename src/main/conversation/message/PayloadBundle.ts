@@ -89,4 +89,5 @@ export enum PayloadBundleType {
   USER_LEGAL_HOLD_DISABLE = 'PayloadBundleType.USER_LEGAL_HOLD_DISABLE',
   USER_LEGAL_HOLD_ENABLE = 'PayloadBundleType.USER_LEGAL_HOLD_ENABLE',
   USER_PROPERTIES_SET = 'PayloadBundleType.USER_PROPERTIES_SET',
+  USER_UPDATE = 'PayloadBundleType.USER_UPDATE',
 }

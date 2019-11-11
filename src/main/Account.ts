@@ -63,6 +63,7 @@ export declare interface Account {
   on(event: PayloadBundleType.CLIENT_REMOVE, listener: (payload: Events.UserClientRemoveEvent) => void): this;
   on(event: PayloadBundleType.CONFIRMATION, listener: (payload: OtrMessage.ConfirmationMessage) => void): this;
   on(event: PayloadBundleType.CONNECTION_REQUEST, listener: (payload: Events.UserConnectionEvent) => void): this;
+  on(event: PayloadBundleType.USER_UPDATE, listener: (payload: Events.UserUpdateEvent) => void): this;
   on(
     event: PayloadBundleType.CONVERSATION_CLEAR,
     listener: (payload: OtrMessage.ClearConversationMessage) => void,

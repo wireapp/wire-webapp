@@ -56,6 +56,7 @@ export declare interface NotificationService {
     listener: (payload: OtrMessage.ClearConversationMessage) => void,
   ): this;
   on(event: PayloadBundleType.CONVERSATION_RENAME, listener: (payload: Events.ConversationRenameEvent) => void): this;
+  on(event: PayloadBundleType.USER_UPDATE, listener: (payload: Events.UserUpdateEvent) => void): this;
   on(event: PayloadBundleType.LOCATION, listener: (payload: OtrMessage.LocationMessage) => void): this;
   on(event: PayloadBundleType.MEMBER_JOIN, listener: (payload: Events.TeamMemberJoinEvent) => void): this;
   on(event: PayloadBundleType.MESSAGE_DELETE, listener: (payload: OtrMessage.DeleteMessage) => void): this;
@@ -187,6 +188,7 @@ export class NotificationService extends EventEmitter {
           case PayloadBundleType.PING:
           case PayloadBundleType.REACTION:
           case PayloadBundleType.TEXT:
+          case PayloadBundleType.USER_UPDATE:
             this.emit(data.type, data);
             break;
           case PayloadBundleType.ASSET: {

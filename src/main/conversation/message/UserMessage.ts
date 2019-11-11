@@ -27,6 +27,7 @@ import {
   UserLegalHoldDisableData,
   UserLegalHoldEnableData,
   UserPropertiesSetData,
+  UserUpdateData,
 } from '@wireapp/api-client/dist/commonjs/user/data';
 import {BasePayloadBundle, PayloadBundleType} from './PayloadBundle';
 
@@ -75,6 +76,11 @@ export interface UserPropertiesSetEvent extends BasePayloadBundle {
   type: PayloadBundleType.USER_PROPERTIES_SET;
 }
 
+export interface UserUpdateMessage extends BasePayloadBundle {
+  content: UserUpdateData;
+  type: PayloadBundleType.USER_UPDATE;
+}
+
 export type UserMessage =
   | UserActivateMessage
   | UserClientAddMessage
@@ -84,4 +90,5 @@ export type UserMessage =
   | UserClientRemoveMessage
   | UserConnectionMessage
   | UserDeleteMessage
-  | UserPropertiesSetEvent;
+  | UserPropertiesSetEvent
+  | UserUpdateMessage;
