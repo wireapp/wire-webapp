@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [14.4.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@14.4.1...@wireapp/core@14.4.2) (2019-11-12)
+
+
+### Bug Fixes
+
+* **core:** Map user events ([#2533](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/2533)) ([67bb1e3](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/67bb1e3b04dca2f5d305a70501e4bdccdd26ea38))
+
+
+
+
+
 ## [14.4.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@14.4.0...@wireapp/core@14.4.1) (2019-11-11)
 
 **Note:** Version bump only for package @wireapp/core
