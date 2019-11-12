@@ -17,19 +17,14 @@
  *
  */
 
-import {Button, ContainerXS, H1} from '@wireapp/react-ui-kit';
+import {Button, ContainerXS, H1, Muted} from '@wireapp/react-ui-kit';
 import React from 'react';
-import useReactRouter from 'use-react-router';
-import {ROUTE} from '../route';
+import {useIntl} from 'react-intl';
+import {setEmailStrings} from '../../strings';
 import Page from './Page';
 
 const VerifyEmailLink = () => {
-  //const {formatMessage: _} = useIntl();
-  const {history} = useReactRouter();
-
-  const navigateNext = () => {
-    history.push(ROUTE.SET_PASSWORD);
-  };
+  const {formatMessage: _} = useIntl();
 
   return (
     <Page>
@@ -39,8 +34,10 @@ const VerifyEmailLink = () => {
         style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
       >
         <div>
-          <H1 center>{'Verify Email'}</H1>
-          <Button onClick={navigateNext}>{'Next'}</Button>
+          <H1 center>{_(setEmailStrings.verifyHeadline)}</H1>
+          <Muted>{_(setEmailStrings.verifySubhead)}</Muted>
+          <Muted>{_(setEmailStrings.resendHeadline)}</Muted>
+          <Button>{_(setEmailStrings.resendAction)}</Button>
         </div>
       </ContainerXS>
     </Page>

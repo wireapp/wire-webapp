@@ -211,6 +211,22 @@ export const setEmailStrings = defineMessages({
     defaultMessage: 'Set email',
     id: 'setEmail.headline',
   },
+  resendAction: {
+    defaultMessage: 'Resend to {email}',
+    id: 'authPostedResend',
+  },
+  resendHeadline: {
+    defaultMessage: 'No email showing up?',
+    id: 'authPostedResendAction',
+  },
+  verifyHeadline: {
+    defaultMessage: 'You’ve got mail.',
+    id: 'authPostedResendHeadline',
+  },
+  verifySubhead: {
+    defaultMessage: 'Check your email inbox and follow the instructions.',
+    id: 'authPostedResendDetail',
+  },
 });
 
 export const setPasswordStrings = defineMessages({
@@ -654,6 +670,33 @@ export const ssoLoginStrings = defineMessages({
   subhead: {
     defaultMessage: 'Enter the company SSO access code.',
     id: 'ssoLogin.subhead',
+  },
+});
+
+export const phoneLoginStrings = defineMessages({
+  accountSignIn: {
+    defaultMessage: 'Log in',
+    id: 'authAccountSignIn',
+  },
+  loginHead: {
+    defaultMessage: 'Phone Log in',
+    id: 'authAccountSignInPhone',
+  },
+  verifyCodeChangePhone: {
+    defaultMessage: 'Change phone number',
+    id: 'authVerifyCodeChangePhone',
+  },
+  verifyCodeDescription: {
+    defaultMessage: 'Enter the verification code\nwe sent to {number}.',
+    id: 'authVerifyCodeDescription',
+  },
+  verifyCodeResend: {
+    defaultMessage: 'Resend',
+    id: 'authVerifyCodeResendDetail',
+  },
+  verifyPasswordHeadline: {
+    defaultMessage: 'Enter your password',
+    id: 'authVerifyPasswordHeadline',
   },
 });
 

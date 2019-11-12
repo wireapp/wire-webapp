@@ -19,13 +19,15 @@
 
 import {Button, ContainerXS, ErrorMessage, H1, Input} from '@wireapp/react-ui-kit';
 import React, {useState} from 'react';
+import {useIntl} from 'react-intl';
 import useReactRouter from 'use-react-router';
+import {phoneLoginStrings} from '../../strings';
 import {ROUTE} from '../route';
 import {parseError} from '../util/errorUtil';
 import Page from './Page';
 
 const CheckPassword = () => {
-  //const {formatMessage: _} = useIntl();
+  const {formatMessage: _} = useIntl();
   const [error /*, setError*/] = useState();
 
   const {history} = useReactRouter();
@@ -42,10 +44,13 @@ const CheckPassword = () => {
         style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
       >
         <div>
-          <H1 center>{'Enter password'}</H1>
+          <H1 center>{_(phoneLoginStrings.verifyPasswordHeadline)}</H1>
           <Input />
           <ErrorMessage data-uie-name="error-message">{parseError(error)}</ErrorMessage>
-          <Button onClick={navigateNext}>{'Next'}</Button>
+          <Button onClick={navigateNext}>{_(phoneLoginStrings.accountSignIn)}</Button>
+          {/*
+            TODO: forgot password link
+          */}
         </div>
       </ContainerXS>
     </Page>

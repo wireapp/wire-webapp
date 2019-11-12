@@ -32,7 +32,6 @@ import {
   Form,
   H1,
   IsMobile,
-  Muted,
 } from '@wireapp/react-ui-kit';
 import React, {useState} from 'react';
 import {useIntl} from 'react-intl';
@@ -40,7 +39,7 @@ import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 import useReactRouter from 'use-react-router';
 import {getLogger} from 'Util/Logger';
-import {loginStrings} from '../../strings';
+import {loginStrings, phoneLoginStrings} from '../../strings';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import PhoneLoginForm from '../component/PhoneLoginForm';
 import RouterLink from '../component/RouterLink';
@@ -98,7 +97,7 @@ const PhoneLogin = ({
   };
 
   const backArrow = (
-    <RouterLink to={ROUTE.LOGIN} data-uie-name="go-index">
+    <RouterLink to={ROUTE.LOGIN} data-uie-name="go-login">
       <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
     </RouterLink>
   );
@@ -121,8 +120,7 @@ const PhoneLogin = ({
               style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
             >
               <div>
-                <H1 center>{_(loginStrings.headline)}</H1>
-                <Muted>{_(loginStrings.subhead)}</Muted>
+                <H1 center>{_(phoneLoginStrings.loginHead)}</H1>
                 <Form style={{marginTop: 30}} data-uie-name="login">
                   <PhoneLoginForm isFetching={isFetching} onSubmit={handleSubmit} />
                   {validationErrors.length ? (

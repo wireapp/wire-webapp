@@ -20,9 +20,11 @@
 import {LoginData} from '@wireapp/api-client/dist/commonjs/auth';
 import {CodeInput, ContainerXS, ErrorMessage, H1, Link} from '@wireapp/react-ui-kit';
 import React, {useState} from 'react';
+import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 import useReactRouter from 'use-react-router';
+import {phoneLoginStrings} from '../../strings';
 import {actionRoot} from '../module/action';
 import {BackendError} from '../module/action/BackendError';
 import {LabeledError} from '../module/action/LabeledError';
@@ -36,7 +38,7 @@ import Page from './Page';
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
 const VerifyPhoneCode = ({doLogin, resetAuthError, loginData}: Props & ConnectedProps & DispatchProps) => {
-  //const {formatMessage: _} = useIntl();
+  const {formatMessage: _} = useIntl();
   const [error /*, setError*/] = useState();
   // const [validationError, setValidationError] = useState();
   const {history} = useReactRouter();
@@ -89,19 +91,17 @@ const VerifyPhoneCode = ({doLogin, resetAuthError, loginData}: Props & Connected
         style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
       >
         <div>
-          <H1 center>{'headline'}</H1>
+          <H1 center>{_(phoneLoginStrings.verifyCodeDescription, {number: loginData.phone})}</H1>
           <CodeInput autoFocus style={{marginTop: 10}} onCodeComplete={handleLogin} data-uie-name="enter-code" />
           <ErrorMessage data-uie-name="error-message">{parseError(error)}</ErrorMessage>
         </div>
         <div>
           <Link onClick={resendCode} data-uie-name="do-resend-code">
-            {'resend'}
+            {_(phoneLoginStrings.verifyCodeResend)}
           </Link>
-          {/*
-          <RouterLink to={changeEmailRedirect[currentFlow]} style={{marginLeft: 35}} data-uie-name="go-change-email">
-            {_(verifyStrings.changeEmail)}
-          </RouterLink>
-          */}
+          <Link onClick={() => history.push(ROUTE.LOGIN_PHONE)} data-uie-name="go-change-phone">
+            {_(phoneLoginStrings.verifyCodeChangePhone)}
+          </Link>
         </div>
       </ContainerXS>
     </Page>
