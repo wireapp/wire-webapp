@@ -23,6 +23,7 @@ import {
   UserClientRemoveEvent,
   UserConnectionEvent,
   UserEvent,
+  UserUpdateEvent,
 } from '@wireapp/api-client/dist/commonjs/event';
 import {PayloadBundle, PayloadBundleSource, PayloadBundleState, PayloadBundleType} from '../conversation';
 import {MessageBuilder} from '../conversation/message/MessageBuilder';
@@ -56,6 +57,19 @@ export class UserMapper {
           state: PayloadBundleState.INCOMING,
           timestamp: new Date().getTime(),
           type: PayloadBundleType.CLIENT_ADD,
+        };
+      }
+      case USER_EVENT.UPDATE: {
+        const {user} = event as UserUpdateEvent;
+        return {
+          content: {user},
+          conversation: selfUserId,
+          from: selfUserId,
+          id: MessageBuilder.createId(),
+          source,
+          state: PayloadBundleState.INCOMING,
+          timestamp: new Date().getTime(),
+          type: PayloadBundleType.USER_UPDATE,
         };
       }
       case USER_EVENT.CLIENT_REMOVE: {
