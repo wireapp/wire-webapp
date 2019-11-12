@@ -106,6 +106,7 @@ import {MessageSender} from '../message/MessageSender';
 import {StorageService} from '../storage';
 import {BackupService} from '../backup/BackupService';
 import {MediaRepository} from '../media/MediaRepository';
+import {PermissionRepository} from '../permission/PermissionRepository';
 
 class App {
   static get CONFIG() {
@@ -178,7 +179,7 @@ class App {
 
     repositories.cryptography = new CryptographyRepository(this.backendClient, repositories.storage);
     repositories.client = new ClientRepository(this.backendClient, this.service.storage, repositories.cryptography);
-    repositories.media = new MediaRepository(resolve(graph.PermissionRepository));
+    repositories.media = new MediaRepository(new PermissionRepository());
     repositories.user = new UserRepository(
       new UserService(this.backendClient, this.service.storage),
       this.service.asset,
@@ -258,11 +259,11 @@ class App {
       repositories.conversation,
       repositories.team,
     );
-    repositories.permission = resolve(graph.PermissionRepository);
+    repositories.permission = new PermissionRepository();
     repositories.notification = new NotificationRepository(
       repositories.calling,
       repositories.conversation,
-      resolve(graph.PermissionRepository),
+      repositories.permission,
       repositories.user,
     );
     repositories.preferenceNotification = new PreferenceNotificationRepository(repositories.user.self);
