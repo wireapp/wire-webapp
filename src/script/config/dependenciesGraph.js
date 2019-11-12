@@ -17,8 +17,6 @@
  *
  */
 
-import {AssetService} from '../assets/AssetService';
-import {AssetUploader} from '../assets/AssetUploader';
 import {AuthRepository} from '../auth/AuthRepository';
 import {AuthService} from '../auth/AuthService';
 import {BackendClient} from '../service/BackendClient';
@@ -30,11 +28,9 @@ import {RichProfileRepository} from '../user/RichProfileRepository';
  */
 const dependencies = new WeakMap();
 
-dependencies.set(AssetService, {dependencies: [BackendClient], name: 'AssetService'});
-dependencies.set(AssetUploader, {dependencies: [AssetService], name: 'AssetUploader'});
 dependencies.set(AuthRepository, {dependencies: [AuthService], name: 'AuthRepository'});
 dependencies.set(AuthService, {dependencies: [BackendClient], name: 'AuthService'});
 dependencies.set(BackendClient, {dependencies: [], name: 'BackendClient'});
 dependencies.set(RichProfileRepository, {dependencies: [BackendClient], name: 'RichProfileRepository'});
 
-export {dependencies, AssetService, AssetUploader, AuthRepository, BackendClient, RichProfileRepository};
+export {dependencies, AuthRepository, BackendClient, RichProfileRepository};

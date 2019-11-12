@@ -20,13 +20,15 @@
 import UUID from 'uuidjs';
 
 import {resolve as resolveDependency, graph} from './../../api/testResolver';
+import {AssetService} from 'src/script/assets/AssetService';
+import {AssetUploader} from 'src/script/assets/AssetUploader';
 
 const messageId = UUID.genV4().hexString;
 const file = new Blob();
 const options = {};
 
 describe('AssetsUploader', () => {
-  const assetUploader = resolveDependency(graph.AssetUploader);
+  const assetUploader = new AssetUploader(new AssetService(resolveDependency(graph.BackendClient)));
   it('starts uploading when given an asset message', () => {
     spyOn(assetUploader.assetService, 'uploadAsset').and.returnValue(Promise.resolve());
     assetUploader.uploadAsset(messageId, file, options);

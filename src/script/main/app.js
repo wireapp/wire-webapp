@@ -107,6 +107,7 @@ import {StorageService} from '../storage';
 import {BackupService} from '../backup/BackupService';
 import {MediaRepository} from '../media/MediaRepository';
 import {PermissionRepository} from '../permission/PermissionRepository';
+import {AssetUploader} from '../assets/AssetUploader';
 
 class App {
   static get CONFIG() {
@@ -201,6 +202,7 @@ class App {
     repositories.team = new TeamRepository(resolve(graph.BackendClient), repositories.user);
     repositories.eventTracker = new EventTrackingRepository(repositories.team, repositories.user);
 
+    const assetService = new AssetService(resolve(graph.BackendClient));
     repositories.conversation = new ConversationRepository(
       this.service.conversation,
       this.service.asset,
@@ -209,13 +211,13 @@ class App {
       repositories.cryptography,
       repositories.event,
       repositories.giphy,
-      new LinkPreviewRepository(new AssetService(resolve(graph.BackendClient)), repositories.properties),
+      new LinkPreviewRepository(assetService, repositories.properties),
       sendingMessageQueue,
       serverTimeHandler,
       repositories.team,
       repositories.user,
       repositories.properties,
-      resolve(graph.AssetUploader),
+      new AssetUploader(assetService),
     );
 
     const serviceMiddleware = new ServiceMiddleware(repositories.conversation, repositories.user);
