@@ -59,6 +59,8 @@ import {BackupService} from 'src/script/backup/BackupService';
 import {StorageService} from 'src/script/storage';
 import {MediaRepository} from 'src/script/media/MediaRepository';
 import {PermissionRepository} from 'src/script/permission/PermissionRepository';
+import {AuthRepository} from 'src/script/auth/AuthRepository';
+import {AuthService} from 'src/script/auth/AuthService';
 
 window.testConfig = {
   connection: backendConfig,
@@ -69,7 +71,7 @@ window.TestFactory = class TestFactory {
    * @returns {Promise<AuthRepository>} The authentication repository.
    */
   async exposeAuthActors() {
-    TestFactory.auth_repository = resolveDependency(graph.AuthRepository);
+    TestFactory.auth_repository = new AuthRepository(new AuthService(resolveDependency(graph.BackendClient)));
     return TestFactory.auth_repository;
   }
 
