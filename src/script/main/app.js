@@ -108,6 +108,7 @@ import {BackupService} from '../backup/BackupService';
 import {MediaRepository} from '../media/MediaRepository';
 import {PermissionRepository} from '../permission/PermissionRepository';
 import {AssetUploader} from '../assets/AssetUploader';
+import {GiphyRepository} from '../extension/GiphyRepository';
 
 class App {
   static get CONFIG() {
@@ -173,7 +174,7 @@ class App {
 
     repositories.audio = new AudioRepository();
     repositories.auth = resolve(graph.AuthRepository);
-    repositories.giphy = resolve(graph.GiphyRepository);
+    repositories.giphy = new GiphyRepository(resolve(graph.GiphyService));
     repositories.properties = new PropertiesRepository(new PropertiesService(this.backendClient), selfService);
     repositories.serverTime = serverTimeHandler;
     repositories.storage = new StorageRepository(this.service.storage);
