@@ -218,7 +218,7 @@ class App {
       repositories.team,
       repositories.user,
       repositories.properties,
-      new AssetUploader(resolve(graph.AssetService)),
+      new AssetUploader(new AssetService(resolve(graph.BackendClient))),
     );
 
     const serviceMiddleware = new ServiceMiddleware(repositories.conversation, repositories.user);
@@ -285,7 +285,7 @@ class App {
       : new EventService(storageService);
 
     return {
-      asset: resolve(graph.AssetService),
+      asset: new AssetService(resolve(graph.BackendClient)),
       conversation: new ConversationService(this.backendClient, eventService, storageService),
       event: eventService,
       integration: new IntegrationService(this.backendClient),
