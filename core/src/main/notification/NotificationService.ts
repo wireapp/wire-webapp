@@ -243,6 +243,7 @@ export class NotificationService extends EventEmitter {
       // User events
       case Events.USER_EVENT.CONNECTION:
       case Events.USER_EVENT.CLIENT_ADD:
+      case Events.USER_EVENT.UPDATE:
       case Events.USER_EVENT.CLIENT_REMOVE: {
         return UserMapper.mapUserEvent(event, this.apiClient.context!.userId, source);
       }
