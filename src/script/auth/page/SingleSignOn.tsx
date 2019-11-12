@@ -252,7 +252,4 @@ const mapStateToProps = (state: RootState) => ({});
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
 const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => bindActionCreators({}, dispatch);
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(SingleSignOn);
+export default connect(mapStateToProps, mapDispatchToProps)(SingleSignOn);

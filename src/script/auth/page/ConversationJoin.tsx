@@ -338,7 +338,4 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(ConversationJoin);
+export default connect(mapStateToProps, mapDispatchToProps)(ConversationJoin);

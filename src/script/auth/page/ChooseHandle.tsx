@@ -159,7 +159,4 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(ChooseHandle);
+export default connect(mapStateToProps, mapDispatchToProps)(ChooseHandle);
