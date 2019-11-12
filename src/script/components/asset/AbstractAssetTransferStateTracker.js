@@ -23,10 +23,11 @@ import {AssetTransferState} from '../../assets/AssetTransferState';
 import {resolve, graph} from '../../config/appResolver';
 import {WebAppEvents} from '../../event/WebApp';
 import {AssetUploader} from '../../assets/AssetUploader';
+import {AssetService} from '../../assets/AssetService';
 
 export class AbstractAssetTransferStateTracker {
   constructor(message = {}) {
-    this.assetUploader = new AssetUploader(resolve(graph.AssetService));
+    this.assetUploader = new AssetUploader(new AssetService(resolve(graph.BackendClient)));
     this.uploadProgress = this.assetUploader.getUploadProgress(message.id);
     this.AssetTransferState = AssetTransferState;
 
