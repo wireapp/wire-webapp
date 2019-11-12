@@ -138,7 +138,7 @@ export class DebugUtil {
     const isOTRMessage = notification => notification.type === BackendEvent.CONVERSATION.OTR_MESSAGE_ADD;
     const isInCurrentConversation = notification => notification.conversation === conversationId;
     const wasSentByOurCurrentClient = notification =>
-      notification.from === userId && (notification.data && notification.data.sender === clientId);
+      notification.from === userId && notification.data && notification.data.sender === clientId;
     const hasExpectedTimestamp = (notification, dateTime) => notification.time === dateTime.toISOString();
 
     return this.conversationRepository

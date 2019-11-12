@@ -99,7 +99,4 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(CreatePersonalAccount);
+export default connect(mapStateToProps, mapDispatchToProps)(CreatePersonalAccount);
