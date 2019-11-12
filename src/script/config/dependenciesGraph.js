@@ -18,7 +18,6 @@
  */
 
 import {BackendClient} from '../service/BackendClient';
-import {GiphyService} from '../extension/GiphyService';
 import {RichProfileRepository} from '../user/RichProfileRepository';
 
 /**
@@ -28,7 +27,6 @@ import {RichProfileRepository} from '../user/RichProfileRepository';
 const dependencies = new WeakMap();
 
 dependencies.set(BackendClient, {dependencies: [], name: 'BackendClient'});
-dependencies.set(GiphyService, {dependencies: [BackendClient], name: 'GiphyService'});
 dependencies.set(RichProfileRepository, {dependencies: [BackendClient], name: 'RichProfileRepository'});
 
-export {dependencies, BackendClient, GiphyService, RichProfileRepository};
+export {dependencies, BackendClient, RichProfileRepository};
