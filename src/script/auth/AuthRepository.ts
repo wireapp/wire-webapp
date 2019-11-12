@@ -21,6 +21,7 @@ import {AccessTokenData, LoginData} from '@wireapp/api-client/dist/commonjs/auth
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {Logger} from 'logdown';
+
 import {Environment} from 'Util/Environment';
 import {getLogger} from 'Util/Logger';
 import {loadValue, resetStoreValue, storeValue} from 'Util/StorageUtil';
