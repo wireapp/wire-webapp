@@ -22,7 +22,6 @@ import {AssetUploader} from '../assets/AssetUploader';
 import {AuthRepository} from '../auth/AuthRepository';
 import {AuthService} from '../auth/AuthService';
 import {BackendClient} from '../service/BackendClient';
-import {PermissionRepository} from '../permission/PermissionRepository';
 import {RichProfileRepository} from '../user/RichProfileRepository';
 
 /**
@@ -36,15 +35,6 @@ dependencies.set(AssetUploader, {dependencies: [AssetService], name: 'AssetUploa
 dependencies.set(AuthRepository, {dependencies: [AuthService], name: 'AuthRepository'});
 dependencies.set(AuthService, {dependencies: [BackendClient], name: 'AuthService'});
 dependencies.set(BackendClient, {dependencies: [], name: 'BackendClient'});
-dependencies.set(PermissionRepository, {dependencies: [], name: 'PermissionRepository'});
 dependencies.set(RichProfileRepository, {dependencies: [BackendClient], name: 'RichProfileRepository'});
 
-export {
-  dependencies,
-  AssetService,
-  AssetUploader,
-  AuthRepository,
-  BackendClient,
-  RichProfileRepository,
-  PermissionRepository,
-};
+export {dependencies, AssetService, AssetUploader, AuthRepository, BackendClient, RichProfileRepository};

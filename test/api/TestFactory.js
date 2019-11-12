@@ -20,44 +20,42 @@
 /* eslint no-undef: "off" */
 
 import ko from 'knockout';
-
-import 'src/script/main/globals';
-
-import {backendConfig, graph, resolve as resolveDependency} from './testResolver';
-import {CallingRepository} from 'src/script/calling/CallingRepository';
-import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
-import {User} from 'src/script/entity/User';
+import {AssetService} from 'src/script/assets/AssetService';
 import {BackupRepository} from 'src/script/backup/BackupRepository';
-import {UserRepository} from 'src/script/user/UserRepository';
-import {NotificationRepository} from 'src/script/notification/NotificationRepository';
-import {StorageRepository} from 'src/script/storage/StorageRepository';
-import {ClientRepository} from 'src/script/client/ClientRepository';
-import {EventTrackingRepository} from 'src/script/tracking/EventTrackingRepository';
+import {BackupService} from 'src/script/backup/BackupService';
+import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {ClientEntity} from 'src/script/client/ClientEntity';
-
-import {EventRepository} from 'src/script/event/EventRepository';
-import {EventServiceNoCompound} from 'src/script/event/EventServiceNoCompound';
-import {EventService} from 'src/script/event/EventService';
-import {NotificationService} from 'src/script/event/NotificationService';
-import {WebSocketService} from 'src/script/event/WebSocketService';
-import {ConnectionService} from 'src/script/connection/ConnectionService';
+import {ClientRepository} from 'src/script/client/ClientRepository';
 import {ConnectionRepository} from 'src/script/connection/ConnectionRepository';
+import {ConnectionService} from 'src/script/connection/ConnectionService';
+import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
+import {ConversationService} from 'src/script/conversation/ConversationService';
 import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
 import {CryptographyService} from 'src/script/cryptography/CryptographyService';
-import {TeamRepository} from 'src/script/team/TeamRepository';
-import {SearchRepository} from 'src/script/search/SearchRepository';
-import {ConversationService} from 'src/script/conversation/ConversationService';
-import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
-import {SelfService} from 'src/script/self/SelfService';
+import {User} from 'src/script/entity/User';
+import {EventRepository} from 'src/script/event/EventRepository';
+import {EventService} from 'src/script/event/EventService';
+import {EventServiceNoCompound} from 'src/script/event/EventServiceNoCompound';
+import {NotificationService} from 'src/script/event/NotificationService';
+import {WebSocketService} from 'src/script/event/WebSocketService';
 import {LinkPreviewRepository} from 'src/script/links/LinkPreviewRepository';
-import {AssetService} from 'src/script/assets/AssetService';
+import 'src/script/main/globals';
+import {MediaRepository} from 'src/script/media/MediaRepository';
+import {MessageSender} from 'src/script/message/MessageSender';
+import {NotificationRepository} from 'src/script/notification/NotificationRepository';
+import {PermissionRepository} from 'src/script/permission/PermissionRepository';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {PropertiesService} from 'src/script/properties/PropertiesService';
-import {MessageSender} from 'src/script/message/MessageSender';
-import {UserService} from 'src/script/user/UserService';
-import {BackupService} from 'src/script/backup/BackupService';
+import {SearchRepository} from 'src/script/search/SearchRepository';
+import {SelfService} from 'src/script/self/SelfService';
 import {StorageService} from 'src/script/storage';
-import {MediaRepository} from 'src/script/media/MediaRepository';
+import {StorageRepository} from 'src/script/storage/StorageRepository';
+import {TeamRepository} from 'src/script/team/TeamRepository';
+import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
+import {EventTrackingRepository} from 'src/script/tracking/EventTrackingRepository';
+import {UserRepository} from 'src/script/user/UserRepository';
+import {UserService} from 'src/script/user/UserService';
+import {backendConfig, graph, resolve as resolveDependency} from './testResolver';
 
 window.testConfig = {
   connection: backendConfig,
@@ -321,7 +319,7 @@ window.TestFactory = class TestFactory {
       resolveDependency(graph.BackendClient),
       TestFactory.conversation_repository,
       TestFactory.event_repository,
-      new MediaRepository(resolveDependency(graph.PermissionRepository)).streamHandler,
+      new MediaRepository(new PermissionRepository()).streamHandler,
       serverTimeHandler,
     );
 
@@ -338,7 +336,7 @@ window.TestFactory = class TestFactory {
     TestFactory.notification_repository = new NotificationRepository(
       TestFactory.calling_repository,
       TestFactory.conversation_repository,
-      resolveDependency(graph.PermissionRepository),
+      new PermissionRepository(),
       TestFactory.user_repository,
     );
 
