@@ -20,6 +20,8 @@
 import {AuthRepository} from '../auth/AuthRepository';
 import {AuthService} from '../auth/AuthService';
 import {BackendClient} from '../service/BackendClient';
+import {GiphyRepository} from '../extension/GiphyRepository';
+import {GiphyService} from '../extension/GiphyService';
 import {RichProfileRepository} from '../user/RichProfileRepository';
 
 /**
@@ -31,6 +33,8 @@ const dependencies = new WeakMap();
 dependencies.set(AuthRepository, {dependencies: [AuthService], name: 'AuthRepository'});
 dependencies.set(AuthService, {dependencies: [BackendClient], name: 'AuthService'});
 dependencies.set(BackendClient, {dependencies: [], name: 'BackendClient'});
+dependencies.set(GiphyRepository, {dependencies: [GiphyService], name: 'GiphyRepository'});
+dependencies.set(GiphyService, {dependencies: [BackendClient], name: 'GiphyService'});
 dependencies.set(RichProfileRepository, {dependencies: [BackendClient], name: 'RichProfileRepository'});
 
-export {dependencies, AuthRepository, BackendClient, RichProfileRepository};
+export {dependencies, AuthRepository, BackendClient, GiphyRepository, GiphyService, RichProfileRepository};
