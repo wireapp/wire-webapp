@@ -58,6 +58,7 @@ import {UserService} from 'src/script/user/UserService';
 import {BackupService} from 'src/script/backup/BackupService';
 import {StorageService} from 'src/script/storage';
 import {MediaRepository} from 'src/script/media/MediaRepository';
+import {PermissionRepository} from 'src/script/permission/PermissionRepository';
 
 window.testConfig = {
   connection: backendConfig,
@@ -321,7 +322,7 @@ window.TestFactory = class TestFactory {
       resolveDependency(graph.BackendClient),
       TestFactory.conversation_repository,
       TestFactory.event_repository,
-      new MediaRepository(resolveDependency(graph.PermissionRepository)).streamHandler,
+      new MediaRepository(new PermissionRepository()).streamHandler,
       serverTimeHandler,
     );
 
@@ -338,7 +339,7 @@ window.TestFactory = class TestFactory {
     TestFactory.notification_repository = new NotificationRepository(
       TestFactory.calling_repository,
       TestFactory.conversation_repository,
-      resolveDependency(graph.PermissionRepository),
+      new PermissionRepository(),
       TestFactory.user_repository,
     );
 

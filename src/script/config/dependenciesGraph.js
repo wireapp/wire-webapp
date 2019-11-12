@@ -24,7 +24,6 @@ import {AuthService} from '../auth/AuthService';
 import {BackendClient} from '../service/BackendClient';
 import {GiphyRepository} from '../extension/GiphyRepository';
 import {GiphyService} from '../extension/GiphyService';
-import {PermissionRepository} from '../permission/PermissionRepository';
 import {RichProfileRepository} from '../user/RichProfileRepository';
 
 /**
@@ -40,7 +39,6 @@ dependencies.set(AuthService, {dependencies: [BackendClient], name: 'AuthService
 dependencies.set(BackendClient, {dependencies: [], name: 'BackendClient'});
 dependencies.set(GiphyRepository, {dependencies: [GiphyService], name: 'GiphyRepository'});
 dependencies.set(GiphyService, {dependencies: [BackendClient], name: 'GiphyService'});
-dependencies.set(PermissionRepository, {dependencies: [], name: 'PermissionRepository'});
 dependencies.set(RichProfileRepository, {dependencies: [BackendClient], name: 'RichProfileRepository'});
 
 export {
@@ -52,5 +50,4 @@ export {
   GiphyRepository,
   GiphyService,
   RichProfileRepository,
-  PermissionRepository,
 };
