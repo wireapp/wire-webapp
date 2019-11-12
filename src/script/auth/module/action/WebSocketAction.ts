@@ -20,8 +20,10 @@
 import {ConnectionState, HttpClient} from '@wireapp/api-client/dist/commonjs/http';
 import {Account} from '@wireapp/core';
 import {PayloadBundleType} from '@wireapp/core/dist/conversation/';
+import {UserUpdateMessage} from '@wireapp/core/dist/conversation/message/UserMessage';
 import {getLogger} from 'Util/Logger';
 import {ThunkAction} from '../../module/reducer';
+import * as SelfSelector from '../../module/selector/SelfSelector';
 
 export class WebSocketAction {
   private readonly logger = getLogger('WebSocketAction');
@@ -40,9 +42,16 @@ export class WebSocketAction {
   };
 
   listen = (): ThunkAction => {
-    return async (dispatch, getState, {apiClient, core, actions: {conversationAction}}) => {
+    return async (dispatch, getState, {apiClient, core, actions: {selfAction}}) => {
       core.removeAllListeners(Account.TOPIC.ERROR);
       core.on(Account.TOPIC.ERROR, error => this.logger.error('CoreError', error));
+
+      core.on(PayloadBundleType.USER_UPDATE as any, async (message: UserUpdateMessage) => {
+        const isSelfId = message.content.user.id === SelfSelector.getSelf(getState()).id;
+        if (isSelfId) {
+          await dispatch(selfAction.fetchSelf());
+        }
+      });
 
       apiClient.transport.http.removeAllListeners(HttpClient.TOPIC.ON_CONNECTION_STATE_CHANGE);
       apiClient.transport.http.on(HttpClient.TOPIC.ON_CONNECTION_STATE_CHANGE, (event: ConnectionState) => {

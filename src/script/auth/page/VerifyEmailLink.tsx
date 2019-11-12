@@ -18,14 +18,31 @@
  */
 
 import {Button, ContainerXS, H1, Muted} from '@wireapp/react-ui-kit';
-import React from 'react';
+import React, {useEffect} from 'react';
 import {useIntl} from 'react-intl';
+import {connect} from 'react-redux';
+import useReactRouter from 'use-react-router';
 import {setEmailStrings} from '../../strings';
+import {RootState} from '../module/reducer';
+import * as SelfSelector from '../module/selector/SelfSelector';
+import {ROUTE} from '../route';
 import Page from './Page';
 
-const VerifyEmailLink = () => {
-  const {formatMessage: _} = useIntl();
+interface Props extends React.HTMLProps<HTMLDivElement> {}
 
+const VerifyEmailLink = ({hasSelfEmail}: Props & ConnectedProps) => {
+  const {formatMessage: _} = useIntl();
+  const {history} = useReactRouter();
+
+  useEffect(() => {
+    if (hasSelfEmail) {
+      history.push(ROUTE.SET_PASSWORD);
+    }
+  }, [hasSelfEmail]);
+
+  if (hasSelfEmail) {
+    return null;
+  }
   return (
     <Page>
       <ContainerXS
@@ -44,4 +61,9 @@ const VerifyEmailLink = () => {
   );
 };
 
-export default VerifyEmailLink;
+type ConnectedProps = ReturnType<typeof mapStateToProps>;
+const mapStateToProps = (state: RootState) => ({
+  hasSelfEmail: SelfSelector.hasSelfEmail(state),
+});
+
+export default connect(mapStateToProps)(VerifyEmailLink);
