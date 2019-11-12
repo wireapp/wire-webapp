@@ -18,12 +18,13 @@
  */
 
 import {resolve, graph} from '../../api/testResolver';
+import {MediaRepository} from 'src/script/media/MediaRepository';
 
 describe('MediaStreamHandler', () => {
   let streamHandler;
 
   beforeEach(() => {
-    streamHandler = resolve(graph.MediaRepository).streamHandler;
+    streamHandler = new MediaRepository(resolve(graph.PermissionRepository)).streamHandler;
   });
 
   describe('requestMediaStream', () => {

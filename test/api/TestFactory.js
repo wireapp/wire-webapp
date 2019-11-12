@@ -53,7 +53,11 @@ import {LinkPreviewRepository} from 'src/script/links/LinkPreviewRepository';
 import {AssetService} from 'src/script/assets/AssetService';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {PropertiesService} from 'src/script/properties/PropertiesService';
+import {MessageSender} from 'src/script/message/MessageSender';
 import {UserService} from 'src/script/user/UserService';
+import {BackupService} from 'src/script/backup/BackupService';
+import {StorageService} from 'src/script/storage';
+import {MediaRepository} from 'src/script/media/MediaRepository';
 
 window.testConfig = {
   connection: backendConfig,
@@ -72,7 +76,7 @@ window.TestFactory = class TestFactory {
    * @returns {Promise<StorageRepository>} The storage repository.
    */
   async exposeStorageActors() {
-    TestFactory.storage_service = resolveDependency(graph.StorageService);
+    TestFactory.storage_service = new StorageService();
     if (!TestFactory.storage_service.db) {
       TestFactory.storage_service.init(entities.user.john_doe.id, false);
     }
@@ -84,7 +88,7 @@ window.TestFactory = class TestFactory {
   async exposeBackupActors() {
     await this.exposeStorageActors();
     await this.exposeConversationActors();
-    TestFactory.backup_service = resolveDependency(graph.BackupService);
+    TestFactory.backup_service = new BackupService(TestFactory.storage_service);
 
     TestFactory.backup_repository = new BackupRepository(
       TestFactory.backup_service,
@@ -298,7 +302,7 @@ window.TestFactory = class TestFactory {
       TestFactory.event_repository,
       undefined,
       new LinkPreviewRepository(new AssetService(resolveDependency(graph.BackendClient)), propertiesRepository),
-      resolveDependency(graph.MessageSender),
+      new MessageSender(),
       serverTimeHandler,
       TestFactory.team_repository,
       TestFactory.user_repository,
@@ -317,7 +321,7 @@ window.TestFactory = class TestFactory {
       resolveDependency(graph.BackendClient),
       TestFactory.conversation_repository,
       TestFactory.event_repository,
-      resolveDependency(graph.MediaRepository).streamHandler,
+      new MediaRepository(resolveDependency(graph.PermissionRepository)).streamHandler,
       serverTimeHandler,
     );
 

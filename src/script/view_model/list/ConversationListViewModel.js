@@ -166,6 +166,24 @@ export class ConversationListViewModel {
       })
       .extend({notify: 'always', rateLimit: 500});
 
+    /*
+     *  We generate a helper function to determine wether a <conversation-list-cell> is
+     *  initially visible or not.
+     *  We need this as we use an IntersectionObserver to improve rendering performance
+     *  and only render cells as they become visible.
+     *  If we would set them to be invisible initially on every render, we would get a
+     *  lot of flickering everytime the list updates.
+     */
+    this.getIsVisibleFunc = () => {
+      const conversationList = document.querySelector('.conversation-list');
+      if (!conversationList) {
+        return () => false;
+      }
+      const containerTop = conversationList.scrollTop;
+      const containerBottom = containerTop + conversationList.offsetHeight;
+      return (top, bottom) => bottom > containerTop && top < containerBottom;
+    };
+
     this._initSubscriptions();
   }
 

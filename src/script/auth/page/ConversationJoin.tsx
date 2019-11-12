@@ -32,10 +32,10 @@ import {
   Small,
   Text,
 } from '@wireapp/react-ui-kit';
-import React from 'react';
-import {FormattedHTMLMessage, InjectedIntlProps, injectIntl} from 'react-intl';
+import React, {useEffect, useState} from 'react';
+import {FormattedHTMLMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
-import {Redirect, RouteComponentProps, withRouter} from 'react-router';
+import {Redirect} from 'react-router';
 import {AnyAction, Dispatch} from 'redux';
 import {noop} from 'Util/util';
 import {conversationJoinStrings} from '../../strings';
@@ -59,312 +59,265 @@ import {parseError, parseValidationErrors} from '../util/errorUtil';
 import * as StringUtil from '../util/stringUtil';
 import {getURLParameter, hasURLParameter, pathWithParams} from '../util/urlUtil';
 
-interface Props extends React.HTMLProps<HTMLDivElement>, RouteComponentProps {}
+interface Props extends React.HTMLProps<HTMLDivElement> {}
 
-interface State {
-  accentColor: AccentColor.AccentColor;
-  conversationCode: string;
-  conversationKey: string;
-  enteredName: string;
-  error: Error;
-  expiresIn: number;
-  forceNewTemporaryGuestAccount: boolean;
-  isValidLink: boolean;
-  isValidName: boolean;
-  showCookiePolicyBanner: boolean;
-}
+const ConversationJoin = ({
+  doCheckConversationCode,
+  doJoinConversationByCode,
+  doInit,
+  doRegisterWireless,
+  setLastEventDate,
+  doLogout,
+  isAuthenticated,
+  isTemporaryGuest,
+  selfName,
+  conversationError,
+}: Props & ConnectedProps & DispatchProps) => {
+  const nameInput = React.useRef<HTMLInputElement>();
+  const {formatMessage: _} = useIntl();
 
-type CombinedProps = Props & ConnectedProps & DispatchProps & InjectedIntlProps;
+  const [accentColor] = useState(AccentColor.random());
+  const [isPwaEnabled, setIsPwaEnabled] = useState();
+  const [conversationCode, setConversationCode] = useState();
+  const [conversationKey, setConversationKey] = useState();
+  const [enteredName, setEnteredName] = useState();
+  const [error, setError] = useState();
+  const [expiresIn, setExpiresIn] = useState();
+  const [forceNewTemporaryGuestAccount, setForceNewTemporaryGuestAccount] = useState(false);
+  const [isValidLink, setIsValidLink] = useState(true);
+  const [isValidName, setIsValidName] = useState(true);
+  const [showCookiePolicyBanner, setShowCookiePolicyBanner] = useState(true);
 
-class ConversationJoin extends React.Component<CombinedProps, State> {
-  nameInput: React.RefObject<any> = React.createRef();
-  state: State = {
-    accentColor: AccentColor.random(),
-    conversationCode: null,
-    conversationKey: null,
-    enteredName: '',
-    error: null,
-    expiresIn: undefined,
-    forceNewTemporaryGuestAccount: false,
-    isValidLink: true,
-    isValidName: true,
-    showCookiePolicyBanner: true,
-  };
+  useEffect(() => {
+    const localConversationCode = getURLParameter(QUERY_KEY.CONVERSATION_CODE);
+    const localConversationKey = getURLParameter(QUERY_KEY.CONVERSATION_KEY);
+    const localExpiresIn = parseInt(getURLParameter(QUERY_KEY.JOIN_EXPIRES), 10) || undefined;
 
-  readAndUpdateParamsFromUrl = (nextProps: CombinedProps) => {
-    if (this.isPwaEnabled()) {
-      this.setState({forceNewTemporaryGuestAccount: true});
-    }
-    const conversationCode = getURLParameter(QUERY_KEY.CONVERSATION_CODE);
-    const conversationKey = getURLParameter(QUERY_KEY.CONVERSATION_KEY);
-    const expiresIn = parseInt(getURLParameter(QUERY_KEY.JOIN_EXPIRES), 10) || undefined;
-
-    const codeParamChanged = conversationCode !== this.state.conversationCode;
-    const keyParamChanged = conversationKey !== this.state.conversationKey;
-    const expiresInParamChanged = expiresIn !== this.state.expiresIn;
-    const urlParamChanged = codeParamChanged || keyParamChanged || expiresInParamChanged;
-
-    if (urlParamChanged) {
-      Promise.resolve()
-        .then(() => {
-          this.setState((state, props) => ({
-            ...state,
-            conversationCode,
-            conversationKey,
-            expiresIn,
-            isValidLink: true,
-          }));
-        })
-        .then(() => this.props.doCheckConversationCode(conversationKey, conversationCode))
-        .catch(error => {
-          this.setState((state, props) => ({
-            ...state,
-            isValidLink: false,
-          }));
-        });
-    }
-  };
-
-  componentDidMount = () => {
-    this.props
-      .doInit({isImmediateLogin: false, shouldValidateLocalClient: true})
+    setConversationCode(localConversationCode);
+    setConversationKey(localConversationKey);
+    setExpiresIn(localExpiresIn);
+    setIsValidLink(true);
+    doInit({isImmediateLogin: false, shouldValidateLocalClient: true})
       .catch(noop)
-      .then(() => this.readAndUpdateParamsFromUrl(this.props));
-  };
+      .then(() =>
+        localConversationCode && localConversationKey
+          ? doCheckConversationCode(localConversationKey, localConversationCode)
+          : null,
+      )
+      .catch(error => {
+        setIsValidLink(false);
+      });
+  }, []);
 
-  componentWillReceiveProps = (nextProps: CombinedProps) => this.readAndUpdateParamsFromUrl(nextProps);
+  useEffect(() => {
+    const isEnabled = Config.URL.MOBILE_BASE && hasURLParameter(QUERY_KEY.PWA_AWARE) && isPwaSupportedBrowser();
+    setIsPwaEnabled(isEnabled);
+    if (isEnabled) {
+      setForceNewTemporaryGuestAccount(true);
+    }
+  }, []);
 
-  onOpenWireClick = () => {
-    this.props
-      .doJoinConversationByCode(this.state.conversationKey, this.state.conversationCode)
-      .then(() => this.routeToApp());
-  };
-
-  isPwaEnabled = () => {
-    const pwaAware = hasURLParameter(QUERY_KEY.PWA_AWARE);
-    return Config.URL.MOBILE_BASE && pwaAware && isPwaSupportedBrowser();
-  };
-
-  routeToApp = () => {
-    const redirectLocation = this.isPwaEnabled()
+  const routeToApp = () => {
+    const redirectLocation = isPwaEnabled
       ? pathWithParams(EXTERNAL_ROUTE.PWA_LOGIN, QUERY_KEY.IMMEDIATE_LOGIN)
       : pathWithParams(EXTERNAL_ROUTE.WEBAPP);
     window.location.replace(redirectLocation);
   };
 
-  handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    this.nameInput.current.value = this.nameInput.current.value.trim();
-    if (!this.nameInput.current.checkValidity()) {
-      this.setState({
-        error: ValidationError.handleValidationState('name', this.nameInput.current.validity),
-        isValidName: false,
-      });
+    nameInput.current.value = nameInput.current.value.trim();
+    if (!nameInput.current.checkValidity()) {
+      setError(ValidationError.handleValidationState('name', nameInput.current.validity));
+      setIsValidName(false);
     } else {
-      Promise.resolve(this.nameInput.current.value)
-        .then(name => name.trim())
-        .then(name => {
-          const registrationData = {
-            accent_id: this.state.accentColor.id,
-            expires_in: this.state.expiresIn,
-            name,
-          };
-          return this.props.doRegisterWireless(registrationData, {
-            shouldInitializeClient: !this.isPwaEnabled(),
-          });
-        })
-        .then(() => this.props.doJoinConversationByCode(this.state.conversationKey, this.state.conversationCode))
-        .then(conversationEvent => this.props.setLastEventDate(new Date(conversationEvent.time)))
-        .then(() => this.routeToApp())
-        .catch(error => {
-          if (error.label) {
-            switch (error.label) {
-              default: {
-                const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
-                  error.label.endsWith(errorType),
-                );
-                if (!isValidationError) {
-                  this.props.doLogout();
-                  throw error;
-                }
+      try {
+        const name = nameInput.current.value.trim();
+        const registrationData = {
+          accent_id: accentColor.id,
+          expires_in: expiresIn,
+          name,
+        };
+        await doRegisterWireless(registrationData, {
+          shouldInitializeClient: !isPwaEnabled,
+        });
+        const conversationEvent = await doJoinConversationByCode(conversationKey, conversationCode);
+        await setLastEventDate(new Date(conversationEvent.time));
+        routeToApp();
+      } catch (error) {
+        if (error.label) {
+          switch (error.label) {
+            default: {
+              const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
+                error.label.endsWith(errorType),
+              );
+              if (!isValidationError) {
+                doLogout();
+                // tslint:disable-next-line:no-console
+                console.warn('Unable to create wireless account', error);
               }
             }
-          } else {
-            this.props.doLogout();
-            throw error;
           }
-        });
+        } else {
+          await doLogout();
+          // tslint:disable-next-line:no-console
+          console.warn('Unable to create wireless account', error);
+        }
+      }
     }
-    this.nameInput.current.focus();
-  };
-
-  isConversationFullError = (error: BackendError) =>
-    error && error.label && error.label === BackendError.CONVERSATION_ERRORS.CONVERSATION_TOO_MANY_MEMBERS;
-
-  resetErrors = () => this.setState({error: null, isValidName: true});
-
-  renderActivatedAccount = () => {
-    const {
-      selfName,
-      intl: {formatMessage: _},
-    } = this.props;
-    const {error} = this.state;
-    return (
-      <ContainerXS style={{margin: 'auto 0'}}>
-        <AppAlreadyOpen fullscreen={this.isPwaEnabled()} />
-        <H2
-          style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}}
-          color={COLOR.GRAY}
-          data-uie-name="status-join-headline"
-        >
-          {selfName ? (
-            <FormattedHTMLMessage
-              {...conversationJoinStrings.existentAccountHeadline}
-              values={{brandName: Config.BRAND_NAME, name: StringUtil.capitalize(selfName)}}
-            />
-          ) : (
-            <FormattedHTMLMessage {...conversationJoinStrings.headline} values={{brandName: Config.BRAND_NAME}} />
-          )}
-        </H2>
-        <Text block style={{fontSize: '16px', marginTop: '10px'}}>
-          {_(conversationJoinStrings.existentAccountSubhead)}
-        </Text>
-        <Button style={{marginTop: 16}} onClick={this.onOpenWireClick} data-uie-name="do-open">
-          {_(conversationJoinStrings.existentAccountOpenButton, {brandName: Config.BRAND_NAME})}
-        </Button>
-        <ErrorMessage data-uie-name="error-message">
-          {error ? parseValidationErrors(error) : parseError(this.props.error)}
-        </ErrorMessage>
-        <Small block>
-          <Link
-            onClick={() => this.setState({...this.state, forceNewTemporaryGuestAccount: true})}
-            textTransform={'none'}
-            data-uie-name="go-join"
-          >
-            {_(conversationJoinStrings.existentAccountJoinWithoutLink)}
-          </Link>
-          {` ${_(conversationJoinStrings.existentAccountJoinWithoutText)}`}
-        </Small>
-      </ContainerXS>
-    );
-  };
-
-  renderTemporaryGuestAccount = () => {
-    const {
-      intl: {formatMessage: _},
-    } = this.props;
-    const {enteredName, isValidName, error} = this.state;
-    return (
-      <ContainerXS style={{margin: 'auto 0'}}>
-        <AppAlreadyOpen fullscreen={this.isPwaEnabled()} />
-        <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} color={COLOR.GRAY}>
-          <FormattedHTMLMessage {...conversationJoinStrings.headline} values={{brandName: Config.BRAND_NAME}} />
-        </H2>
-        <Text style={{fontSize: '16px', marginTop: '10px'}}>
-          <FormattedHTMLMessage {...conversationJoinStrings.subhead} />
-        </Text>
-        <Form style={{marginTop: 30}}>
-          <InputSubmitCombo>
-            <Input
-              name="name"
-              autoComplete="username"
-              value={enteredName}
-              ref={this.nameInput}
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                this.resetErrors();
-                this.setState({enteredName: event.target.value});
-              }}
-              placeholder={_(conversationJoinStrings.namePlaceholder)}
-              autoFocus
-              maxLength={64}
-              minLength={2}
-              pattern=".{2,64}"
-              required
-              data-uie-name="enter-name"
-            />
-            <RoundIconButton
-              disabled={!enteredName || !isValidName}
-              type="submit"
-              formNoValidate
-              icon={ICON_NAME.ARROW}
-              onClick={this.handleSubmit}
-              data-uie-name="do-next"
-            />
-          </InputSubmitCombo>
-          <ErrorMessage data-uie-name="error-message">
-            {error ? parseValidationErrors(error) : parseError(this.props.error)}
-          </ErrorMessage>
-        </Form>
-        {!this.isPwaEnabled() && (
-          <Small block>
-            {`${_(conversationJoinStrings.hasAccount)} `}
-            <RouterLink
-              to={`${ROUTE.LOGIN}/${this.state.conversationKey}/${this.state.conversationCode}`}
-              textTransform={'none'}
-              data-uie-name="go-login"
-            >
-              {_(conversationJoinStrings.loginLink)}
-            </RouterLink>
-          </Small>
-        )}
-      </ContainerXS>
-    );
-  };
-
-  renderFullConversation = () => {
-    const {
-      intl: {formatMessage: _},
-    } = this.props;
-    return (
-      <ContainerXS style={{margin: 'auto 0'}}>
-        <H2
-          style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}}
-          color={COLOR.GRAY}
-          data-uie-name="status-full-headline"
-        >
-          <FormattedHTMLMessage
-            {...conversationJoinStrings.fullConversationHeadline}
-            values={{brandName: Config.BRAND_NAME}}
-          />
-        </H2>
-        <Text style={{fontSize: '16px', marginTop: '10px'}} data-uie-name="status-full-text">
-          {_(conversationJoinStrings.fullConversationSubhead)}
-        </Text>
-      </ContainerXS>
-    );
-  };
-
-  renderJoin = () => {
-    const {error, isAuthenticated, isTemporaryGuest} = this.props;
-    const {isValidLink, forceNewTemporaryGuestAccount} = this.state;
-
-    if (!isValidLink) {
-      return <Redirect to={ROUTE.CONVERSATION_JOIN_INVALID} />;
+    if (nameInput.current) {
+      nameInput.current.focus();
     }
-    if (this.isConversationFullError(error as BackendError)) {
-      return this.renderFullConversation();
-    }
-    const renderTemporaryGuestAccountCreation = !isAuthenticated || isTemporaryGuest || forceNewTemporaryGuestAccount;
-    return renderTemporaryGuestAccountCreation ? this.renderTemporaryGuestAccount() : this.renderActivatedAccount();
   };
 
-  render() {
-    return (
-      <UnsupportedBrowser isTemporaryGuest>
-        <WirelessContainer
-          showCookiePolicyBanner={this.state.showCookiePolicyBanner}
-          onCookiePolicyBannerClose={() => this.setState({...this.state, showCookiePolicyBanner: false})}
-        >
-          {this.renderJoin()}
-        </WirelessContainer>
-      </UnsupportedBrowser>
-    );
+  const resetErrors = () => {
+    setError(null);
+    setIsValidName(true);
+  };
+
+  const isFullConversation =
+    conversationError &&
+    conversationError.label &&
+    conversationError.label === BackendError.CONVERSATION_ERRORS.CONVERSATION_TOO_MANY_MEMBERS;
+  const renderTemporaryGuestAccountCreation = !isAuthenticated || isTemporaryGuest || forceNewTemporaryGuestAccount;
+
+  if (!isValidLink) {
+    return <Redirect to={ROUTE.CONVERSATION_JOIN_INVALID} />;
   }
-}
+  return (
+    <UnsupportedBrowser isTemporaryGuest>
+      <WirelessContainer
+        showCookiePolicyBanner={showCookiePolicyBanner}
+        onCookiePolicyBannerClose={() => setShowCookiePolicyBanner(false)}
+      >
+        {isFullConversation ? (
+          <ContainerXS style={{margin: 'auto 0'}}>
+            <H2
+              style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}}
+              color={COLOR.GRAY}
+              data-uie-name="status-full-headline"
+            >
+              <FormattedHTMLMessage
+                {...conversationJoinStrings.fullConversationHeadline}
+                values={{brandName: Config.BRAND_NAME}}
+              />
+            </H2>
+            <Text style={{fontSize: '16px', marginTop: '10px'}} data-uie-name="status-full-text">
+              {_(conversationJoinStrings.fullConversationSubhead)}
+            </Text>
+          </ContainerXS>
+        ) : renderTemporaryGuestAccountCreation ? (
+          <ContainerXS style={{margin: 'auto 0'}}>
+            <AppAlreadyOpen fullscreen={isPwaEnabled} />
+            <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} color={COLOR.GRAY}>
+              <FormattedHTMLMessage {...conversationJoinStrings.headline} values={{brandName: Config.BRAND_NAME}} />
+            </H2>
+            <Text style={{fontSize: '16px', marginTop: '10px'}}>
+              <FormattedHTMLMessage {...conversationJoinStrings.subhead} />
+            </Text>
+            <Form style={{marginTop: 30}}>
+              <InputSubmitCombo>
+                <Input
+                  name="name"
+                  autoComplete="username"
+                  value={enteredName}
+                  ref={nameInput}
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    resetErrors();
+                    setEnteredName(event.target.value);
+                  }}
+                  placeholder={_(conversationJoinStrings.namePlaceholder)}
+                  autoFocus
+                  maxLength={64}
+                  minLength={2}
+                  pattern=".{2,64}"
+                  required
+                  data-uie-name="enter-name"
+                />
+                <RoundIconButton
+                  disabled={!enteredName || !isValidName}
+                  type="submit"
+                  formNoValidate
+                  icon={ICON_NAME.ARROW}
+                  onClick={handleSubmit}
+                  data-uie-name="do-next"
+                />
+              </InputSubmitCombo>
+              <ErrorMessage data-uie-name="error-message">
+                {error ? parseValidationErrors(error) : parseError(conversationError)}
+              </ErrorMessage>
+            </Form>
+            {!isPwaEnabled && (
+              <Small block>
+                {`${_(conversationJoinStrings.hasAccount)} `}
+                <RouterLink
+                  to={`${ROUTE.LOGIN}/${conversationKey}/${conversationCode}`}
+                  textTransform={'none'}
+                  data-uie-name="go-login"
+                >
+                  {_(conversationJoinStrings.loginLink)}
+                </RouterLink>
+              </Small>
+            )}
+          </ContainerXS>
+        ) : (
+          <ContainerXS style={{margin: 'auto 0'}}>
+            <AppAlreadyOpen fullscreen={isPwaEnabled} />
+            <H2
+              style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}}
+              color={COLOR.GRAY}
+              data-uie-name="status-join-headline"
+            >
+              {selfName ? (
+                <FormattedHTMLMessage
+                  {...conversationJoinStrings.existentAccountHeadline}
+                  values={{brandName: Config.BRAND_NAME, name: StringUtil.capitalize(selfName)}}
+                />
+              ) : (
+                <FormattedHTMLMessage {...conversationJoinStrings.headline} values={{brandName: Config.BRAND_NAME}} />
+              )}
+            </H2>
+            <Text block style={{fontSize: '16px', marginTop: '10px'}}>
+              {_(conversationJoinStrings.existentAccountSubhead)}
+            </Text>
+            <Button
+              style={{marginTop: 16}}
+              onClick={async () => {
+                try {
+                  await doJoinConversationByCode(conversationKey, conversationCode);
+                  routeToApp();
+                } catch (error) {
+                  // tslint:disable-next-line:no-console
+                  console.warn('Unable to join conversation with existing account', error);
+                }
+              }}
+              data-uie-name="do-open"
+            >
+              {_(conversationJoinStrings.existentAccountOpenButton, {brandName: Config.BRAND_NAME})}
+            </Button>
+            <ErrorMessage data-uie-name="error-message">
+              {error ? parseValidationErrors(error) : parseError(conversationError)}
+            </ErrorMessage>
+            <Small block>
+              <Link
+                onClick={() => setForceNewTemporaryGuestAccount(true)}
+                textTransform={'none'}
+                data-uie-name="go-join"
+              >
+                {_(conversationJoinStrings.existentAccountJoinWithoutLink)}
+              </Link>
+              {` ${_(conversationJoinStrings.existentAccountJoinWithoutText)}`}
+            </Small>
+          </ContainerXS>
+        )}
+      </WirelessContainer>
+    </UnsupportedBrowser>
+  );
+};
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
-  error: ConversationSelector.getError(state),
+  conversationError: ConversationSelector.getError(state),
   isAuthenticated: AuthSelector.isAuthenticated(state),
   isFetching: ConversationSelector.isFetching(state),
   isTemporaryGuest: SelfSelector.isTemporaryGuest(state),
@@ -385,9 +338,4 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default withRouter(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps,
-  )(injectIntl(ConversationJoin)),
-);
+export default connect(mapStateToProps, mapDispatchToProps)(ConversationJoin);

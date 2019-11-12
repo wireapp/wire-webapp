@@ -16,12 +16,3 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-
-import {InjectedIntl} from 'react-intl';
-
-/// <reference types="react-intl" />
-
-// TODO: Remove when all components make use of `useIntl` hook instead of `injectIntl` HOC
-declare module 'react-intl' {
-  export function useIntl(): InjectedIntl;
-}

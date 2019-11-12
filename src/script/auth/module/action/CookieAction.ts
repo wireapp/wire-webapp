@@ -29,105 +29,93 @@ export class CookieAction {
     interval: number = COOKIE_POLL_INTERVAL,
     asJSON: boolean = true,
   ): ThunkAction => {
-    return (dispatch, getState, {actions: {cookieAction}}) => {
-      return Promise.resolve()
-        .then(() => dispatch(cookieAction.getCookie(name, asJSON)))
-        .then(() => window.setInterval(() => dispatch(cookieAction.getCookie(name, asJSON)), interval))
-        .then(timerId => {
-          dispatch(CookieActionCreator.startCookiePolling({name, timerId}));
-        })
-        .catch(error => {
-          dispatch(CookieActionCreator.failedCookiePolling(error));
-        });
+    return async (dispatch, getState, {actions: {cookieAction}}) => {
+      try {
+        await dispatch(cookieAction.getCookie(name, asJSON));
+        const timerId = window.setInterval(() => dispatch(cookieAction.getCookie(name, asJSON)), interval);
+        dispatch(CookieActionCreator.startCookiePolling({name, timerId}));
+      } catch (error) {
+        dispatch(CookieActionCreator.failedCookiePolling(error));
+      }
     };
   };
 
-  stopPolling = (name: string): ThunkAction => {
-    return (dispatch, getState, {}) => {
-      return Promise.resolve()
-        .then(() => {
-          const timerId = getState().cookieState.cookieTimer[name];
-          if (timerId) {
-            clearTimeout(timerId);
-            dispatch(CookieActionCreator.stopCookiePolling({name, timerId}));
-          }
-        })
-        .catch(error => {
-          dispatch(CookieActionCreator.failedCookiePolling(error));
-        });
+  stopPolling = (name: string = CookieSelector.COOKIE_NAME_APP_OPENED): ThunkAction => {
+    return async (dispatch, getState, {}) => {
+      try {
+        const timerId = getState().cookieState.cookieTimer[name];
+        if (timerId) {
+          clearTimeout(timerId);
+          dispatch(CookieActionCreator.stopCookiePolling({name, timerId}));
+        }
+      } catch (error) {
+        dispatch(CookieActionCreator.failedCookiePolling(error));
+      }
     };
   };
 
   getCookie = (name: string, asJSON: boolean = false): ThunkAction => {
-    return (dispatch, getState, {cookieStore}) => {
-      return Promise.resolve(asJSON ? cookieStore.getJSON(name) : cookieStore.get(name))
-        .then(cookie => {
-          const previousCookie: object = CookieSelector.getCookies(getState())[name];
-          const isCookieModified = JSON.stringify(previousCookie) !== JSON.stringify(cookie);
-          if (isCookieModified) {
-            dispatch(CookieActionCreator.successfulGetCookie({cookie, name}));
-          }
-        })
-        .catch(error => {
-          dispatch(CookieActionCreator.failedGetCookie(error));
-        });
+    return async (dispatch, getState, {cookieStore}) => {
+      try {
+        const cookie = asJSON ? cookieStore.getJSON(name) : cookieStore.get(name);
+        const previousCookie: object = CookieSelector.getCookies(getState())[name];
+        const isCookieModified = JSON.stringify(previousCookie) !== JSON.stringify(cookie);
+        if (isCookieModified) {
+          dispatch(CookieActionCreator.successfulGetCookie({cookie, name}));
+        }
+      } catch (error) {
+        dispatch(CookieActionCreator.failedGetCookie(error));
+      }
     };
   };
 
   safelyRemoveCookie = (name: string, value: string): ThunkAction => {
-    return (dispatch, getState, {cookieStore}) => {
-      return Promise.resolve()
-        .then(() => {
-          const cookie = cookieStore.get(name);
-          if (cookie && cookie.includes(value)) {
-            cookieStore.remove(name);
-            dispatch(CookieActionCreator.successfulRemoveCookie({name}));
-          }
-        })
-        .catch(error => {
-          dispatch(CookieActionCreator.failedRemoveCookie(error));
-        });
+    return async (dispatch, getState, {cookieStore}) => {
+      try {
+        const cookie = cookieStore.get(name);
+        if (cookie && cookie.includes(value)) {
+          cookieStore.remove(name);
+          dispatch(CookieActionCreator.successfulRemoveCookie({name}));
+        }
+      } catch (error) {
+        dispatch(CookieActionCreator.failedRemoveCookie(error));
+      }
     };
   };
 
   removeCookie = (name: string): ThunkAction => {
-    return (dispatch, getState, {cookieStore}) => {
-      return Promise.resolve()
-        .then(() => {
-          cookieStore.remove(name);
-          dispatch(CookieActionCreator.successfulRemoveCookie({name}));
-        })
-        .catch(error => {
-          dispatch(CookieActionCreator.failedRemoveCookie(error));
-        });
+    return async (dispatch, getState, {cookieStore}) => {
+      try {
+        cookieStore.remove(name);
+        dispatch(CookieActionCreator.successfulRemoveCookie({name}));
+      } catch (error) {
+        dispatch(CookieActionCreator.failedRemoveCookie(error));
+      }
     };
   };
 
   setCookie = (name: string, value: object): ThunkAction => {
-    return (dispatch, getState, {cookieStore}) => {
-      return Promise.resolve(cookieStore.set(name, value))
-        .then(() => {
-          dispatch(CookieActionCreator.successfulSetCookie({name}));
-        })
-        .catch(error => {
-          dispatch(CookieActionCreator.failedSetCookie(error));
-        });
+    return async (dispatch, getState, {cookieStore}) => {
+      try {
+        cookieStore.set(name, value);
+        dispatch(CookieActionCreator.successfulSetCookie({name}));
+      } catch (error) {
+        dispatch(CookieActionCreator.failedSetCookie(error));
+      }
     };
   };
 
   setCookieIfAbsent = (name: string, value: object): ThunkAction => {
-    return (dispatch, getState, {cookieStore}) => {
-      return Promise.resolve()
-        .then(() => {
-          if (!cookieStore.get(name)) {
-            cookieStore.set(name, value);
-            const cookie = cookieStore.get(name);
-            dispatch(CookieActionCreator.successfulSetCookie({cookie, name}));
-          }
-        })
-        .catch(error => {
-          dispatch(CookieActionCreator.failedSetCookie(error));
-        });
+    return async (dispatch, getState, {cookieStore}) => {
+      try {
+        if (!cookieStore.get(name)) {
+          cookieStore.set(name, value);
+          const cookie = cookieStore.get(name);
+          dispatch(CookieActionCreator.successfulSetCookie({cookie, name}));
+        }
+      } catch (error) {
+        dispatch(CookieActionCreator.failedSetCookie(error));
+      }
     };
   };
 }

@@ -35,71 +35,71 @@ import {
   Muted,
   RoundIconButton,
 } from '@wireapp/react-ui-kit';
-import React from 'react';
-import {InjectedIntlProps, injectIntl} from 'react-intl';
+import React, {useEffect, useRef, useState} from 'react';
+import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
-import {RouteComponentProps, withRouter} from 'react-router';
+import {AnyAction, Dispatch} from 'redux';
+import useReactRouter from 'use-react-router';
+import {getLogger} from 'Util/Logger';
 import {teamNameStrings} from '../../strings';
 import RouterLink from '../component/RouterLink';
 import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {ValidationError} from '../module/action/ValidationError';
-import {RootState, ThunkDispatch} from '../module/reducer';
-import {RegistrationDataState} from '../module/reducer/authReducer';
+import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import Page from './Page';
 
-interface Props extends React.HTMLProps<HTMLDivElement>, RouteComponentProps<{}> {}
+interface Props extends React.HTMLProps<HTMLDivElement> {}
 
-interface ConnectedProps {
-  error: Error;
-  teamName: string;
-}
+const TeamName = ({
+  teamName,
+  enterTeamCreationFlow,
+  resetInviteErrors,
+  pushAccountRegistrationData,
+  authError,
+}: Props & ConnectedProps & DispatchProps) => {
+  const logger = getLogger('TeamName');
 
-interface DispatchProps {
-  enterTeamCreationFlow: () => Promise<void>;
-  pushAccountRegistrationData: (teamData: Partial<RegistrationDataState>) => Promise<void>;
-  resetInviteErrors: () => Promise<void>;
-}
+  const {formatMessage: _} = useIntl();
+  const {history} = useReactRouter();
+  const [enteredTeamName, setEnteredTeamName] = useState(teamName || '');
+  const [error, setError] = useState(null);
+  const [isValidTeamName, setIsValidTeamName] = useState(!!teamName);
+  const teamNameInput = useRef<HTMLInputElement>();
 
-const TeamName = ({intl: {formatMessage: _}, ...props}: Props & ConnectedProps & DispatchProps & InjectedIntlProps) => {
-  const [enteredTeamName, setEnteredTeamName] = React.useState(props.teamName || '');
-  const [error, setError] = React.useState(null);
-  const [isValidTeamName, setIsValidTeamName] = React.useState(!!props.teamName);
-  const teamNameInput = React.useRef<HTMLInputElement>();
-
-  React.useEffect(() => {
-    props.enterTeamCreationFlow();
+  useEffect(() => {
+    enterTeamCreationFlow();
   }, []);
 
   const resetErrors = () => {
     setError(null);
     setIsValidTeamName(true);
-    props.resetInviteErrors();
+    resetInviteErrors();
   };
-  const handleSubmit = (event: React.FormEvent): void => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     teamNameInput.current.value = teamNameInput.current.value.trim();
     if (!teamNameInput.current.checkValidity()) {
       setError(ValidationError.handleValidationState('name', teamNameInput.current.validity));
       setIsValidTeamName(false);
     } else {
-      Promise.resolve(teamNameInput.current.value)
-        .then(teamName => teamName.trim())
-        .then(teamName =>
-          props.pushAccountRegistrationData({
-            team: {
-              binding: undefined,
-              creator: undefined,
-              icon: undefined,
-              id: undefined,
-              name: teamName,
-            },
-          }),
-        )
-        .then(() => props.history.push(ROUTE.CREATE_TEAM_ACCOUNT));
+      try {
+        await pushAccountRegistrationData({
+          team: {
+            binding: undefined,
+            creator: undefined,
+            icon: undefined,
+            id: undefined,
+            name: teamNameInput.current.value,
+          },
+        });
+        return history.push(ROUTE.CREATE_TEAM_ACCOUNT);
+      } catch (error) {
+        logger.error('Unable to push account data', error);
+      }
     }
     teamNameInput.current.focus();
   };
@@ -157,7 +157,7 @@ const TeamName = ({intl: {formatMessage: _}, ...props}: Props & ConnectedProps &
                     />
                   </InputSubmitCombo>
                   <ErrorMessage data-uie-name="error-message">
-                    {error ? parseValidationErrors(error) : parseError(props.error)}
+                    {error ? parseValidationErrors(error) : parseError(authError)}
                   </ErrorMessage>
                 </Form>
               </div>
@@ -175,19 +175,21 @@ const TeamName = ({intl: {formatMessage: _}, ...props}: Props & ConnectedProps &
   );
 };
 
-export default withRouter(
-  injectIntl(
-    connect(
-      (state: RootState): ConnectedProps => ({
-        error: AuthSelector.getError(state),
-        teamName: AuthSelector.getAccountTeamName(state),
-      }),
-      (dispatch: ThunkDispatch): DispatchProps => ({
-        enterTeamCreationFlow: () => dispatch(ROOT_ACTIONS.authAction.enterTeamCreationFlow()),
-        pushAccountRegistrationData: (teamData: Partial<RegistrationDataState>) =>
-          dispatch(ROOT_ACTIONS.authAction.pushAccountRegistrationData(teamData)),
-        resetInviteErrors: () => dispatch(ROOT_ACTIONS.invitationAction.resetInviteErrors()),
-      }),
-    )(TeamName),
-  ),
-);
+type ConnectedProps = ReturnType<typeof mapStateToProps>;
+const mapStateToProps = (state: RootState) => ({
+  authError: AuthSelector.getError(state),
+  teamName: AuthSelector.getAccountTeamName(state),
+});
+
+type DispatchProps = ReturnType<typeof mapDispatchToProps>;
+const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
+  bindActionCreators(
+    {
+      enterTeamCreationFlow: ROOT_ACTIONS.authAction.enterTeamCreationFlow,
+      pushAccountRegistrationData: ROOT_ACTIONS.authAction.pushAccountRegistrationData,
+      resetInviteErrors: ROOT_ACTIONS.invitationAction.resetInviteErrors,
+    },
+    dispatch,
+  );
+
+export default connect(mapStateToProps, mapDispatchToProps)(TeamName);

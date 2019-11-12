@@ -19,18 +19,18 @@
 
 import {COLOR, Container, ContainerXS, H1, H2, H3, Loading, Logo, Text} from '@wireapp/react-ui-kit';
 import React from 'react';
-import {FormattedHTMLMessage, FormattedMessage, InjectedIntlProps, injectIntl} from 'react-intl';
+import {FormattedHTMLMessage, FormattedMessage, MessageDescriptor} from 'react-intl';
 import {connect} from 'react-redux';
 import {unsupportedJoinStrings, unsupportedStrings} from '../../strings';
 import {Config} from '../config';
-import {RootState, ThunkDispatch} from '../module/reducer';
+import {RootState} from '../module/reducer';
 import * as RuntimeSelector from '../module/selector/RuntimeSelector';
 import {isMobileOs} from '../Runtime';
 import WirelessContainer from './WirelessContainer';
 
 interface UnsupportedProps extends React.HTMLProps<HTMLDivElement> {
-  headline: FormattedMessage.MessageDescriptor;
-  subhead: FormattedMessage.MessageDescriptor;
+  headline: MessageDescriptor;
+  subhead: MessageDescriptor;
 }
 
 const UnsupportedMessage: React.SFC<UnsupportedProps> = ({headline, subhead}) => (
@@ -49,17 +49,6 @@ export interface Props extends React.HTMLProps<HTMLDivElement> {
   isTemporaryGuest?: boolean;
 }
 
-interface ConnectedProps {
-  hasCookieSupport: boolean;
-  hasIndexedDbSupport: boolean;
-  isCheckingSupport: boolean;
-  isSupportedBrowser: boolean;
-}
-
-interface DispatchProps {}
-
-type CombinedProps = Props & DispatchProps & ConnectedProps & InjectedIntlProps;
-
 export const UnsupportedBrowser = ({
   children,
   hasCookieSupport,
@@ -67,7 +56,7 @@ export const UnsupportedBrowser = ({
   isCheckingSupport,
   isSupportedBrowser,
   isTemporaryGuest,
-}: CombinedProps) => {
+}: Props & ConnectedProps) => {
   if (!isSupportedBrowser) {
     return (
       <WirelessContainer>
@@ -120,14 +109,12 @@ export const UnsupportedBrowser = ({
   return <>{children}</>;
 };
 
-export default injectIntl(
-  connect(
-    (state: RootState) => ({
-      hasCookieSupport: RuntimeSelector.hasCookieSupport(state),
-      hasIndexedDbSupport: RuntimeSelector.hasIndexedDbSupport(state),
-      isCheckingSupport: RuntimeSelector.isChecking(state),
-      isSupportedBrowser: RuntimeSelector.isSupportedBrowser(state),
-    }),
-    (dispatch: ThunkDispatch): DispatchProps => ({}),
-  )(UnsupportedBrowser),
-);
+type ConnectedProps = ReturnType<typeof mapStateToProps>;
+const mapStateToProps = (state: RootState) => ({
+  hasCookieSupport: RuntimeSelector.hasCookieSupport(state),
+  hasIndexedDbSupport: RuntimeSelector.hasIndexedDbSupport(state),
+  isCheckingSupport: RuntimeSelector.isChecking(state),
+  isSupportedBrowser: RuntimeSelector.isSupportedBrowser(state),
+});
+
+export default connect(mapStateToProps)(UnsupportedBrowser);

@@ -36,30 +36,26 @@ export class RuntimeAction {
   };
 
   checkIndexedDbSupport = (): ThunkAction<void> => {
-    return (dispatch, getState, {actions: {runtimeAction}}) => {
+    return async (dispatch, getState, {actions: {runtimeAction}}) => {
       dispatch(RuntimeActionCreator.startCheckIndexedDb());
-      runtimeAction
-        .hasIndexedDbSupport()
-        .then(() => {
-          dispatch(RuntimeActionCreator.finishCheckIndexedDb(true));
-        })
-        .catch(() => {
-          dispatch(RuntimeActionCreator.finishCheckIndexedDb(false));
-        });
+      try {
+        await runtimeAction.hasIndexedDbSupport();
+        dispatch(RuntimeActionCreator.finishCheckIndexedDb(true));
+      } catch (error) {
+        dispatch(RuntimeActionCreator.finishCheckIndexedDb(false));
+      }
     };
   };
 
   checkCookieSupport = (): ThunkAction<void> => {
-    return (dispatch, getState, {actions: {runtimeAction}, cookieStore}) => {
+    return async (dispatch, getState, {actions: {runtimeAction}, cookieStore}) => {
       dispatch(RuntimeActionCreator.startCheckCookie());
-      runtimeAction
-        .hasCookieSupport(cookieStore)
-        .then(() => {
-          dispatch(RuntimeActionCreator.finishCheckCookie(true));
-        })
-        .catch(() => {
-          dispatch(RuntimeActionCreator.finishCheckCookie(false));
-        });
+      try {
+        await runtimeAction.hasCookieSupport(cookieStore);
+        dispatch(RuntimeActionCreator.finishCheckCookie(true));
+      } catch (error) {
+        dispatch(RuntimeActionCreator.finishCheckCookie(false));
+      }
     };
   };
 

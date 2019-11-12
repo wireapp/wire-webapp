@@ -25,6 +25,7 @@ import {capitalizeFirstChar} from 'Util/StringUtil';
 
 import {User} from '../../entity/User';
 import {ServiceEntity} from '../../integration/ServiceEntity';
+import {viewportObserver} from '../../ui/viewportObserver';
 
 import 'Components/availabilityState';
 
@@ -40,73 +41,47 @@ interface ParticipantItemParams {
   selfInTeam: boolean;
 }
 
-ko.components.register('participant-item', {
-  template: `
-    <div class="participant-item" data-bind="attr: {'data-uie-name': isUser ? 'item-user' : 'item-service', 'data-uie-value': participant.name}">
-      <div class="participant-item-image">
-        <participant-avatar params="participant: participant, size: avatarSize"></participant-avatar>
-      </div>
+class ParticipanItem {
+  avatarSize: string;
+  participant: User | ServiceEntity;
+  participantName: () => string | ko.Observable<string>;
+  isService: boolean;
+  isUser: boolean;
+  selfInTeam: boolean;
+  badge: boolean;
+  isDefaultMode: boolean;
+  isOthersMode: boolean;
+  canSelect: boolean;
+  isSelected: boolean;
+  showCamera: boolean;
+  hasUsernameInfo: boolean;
+  contentInfo: string | ko.Observable<string>;
+  isInViewport: ko.Observable<boolean>;
 
-      <div class="participant-item-content">
-        <!-- ko if: isUser && selfInTeam -->
-          <availability-state class="participant-item-content-availability participant-item-content-name"
-            data-uie-name="status-name"
-            params="availability: participant.availability, label: participantName()"></availability-state>
-        <!-- /ko -->
-
-        <!-- ko if: isService || !selfInTeam -->
-          <div class="participant-item-content-name" data-bind="text: participantName()" data-uie-name="status-name"></div>
-        <!-- /ko -->
-        <div class="participant-item-content-info">
-          <!-- ko if: contentInfo -->
-            <span class="participant-item-content-username label-username-notext" data-bind="text: contentInfo, css: {'label-username': hasUsernameInfo}" data-uie-name="status-username"></span>
-            <!-- ko if: hasUsernameInfo && badge -->
-              <span class="participant-item-content-badge" data-uie-name="status-partner">Partner</span>
-            <!-- /ko -->
-          <!-- /ko -->
-        </div>
-      </div>
-
-      <!-- ko if: isUser && participant.is_verified() -->
-        <verified-icon data-uie-name="status-verified"></verified-icon>
-      <!-- /ko -->
-
-      <!-- ko if: isUser && !isOthersMode && participant.isGuest() -->
-        <guest-icon class="participant-item-guest-indicator" data-uie-name="status-guest"></guest-icon>
-      <!-- /ko -->
-
-      <!-- ko if: showCamera -->
-        <camera-icon data-uie-name="status-video"></camera-icon>
-      <!-- /ko -->
-
-      <!-- ko if: canSelect -->
-        <div class="search-list-item-select icon-check" data-bind="css: {'selected': isSelected}" data-uie-name="status-selected"></div>
-      <!-- /ko -->
-
-      <disclose-icon></disclose-icon>
-    </div>
-  `,
-  viewModel: function({
-    participant,
-    badge,
-    mode = UserlistMode.DEFAULT,
-    canSelect,
-    isSelected,
-    showCamera,
-    customInfo,
-    hideInfo,
-    selfInTeam,
-  }: ParticipantItemParams): void {
+  constructor(
+    {
+      participant,
+      badge,
+      mode = UserlistMode.DEFAULT,
+      canSelect,
+      isSelected,
+      showCamera,
+      customInfo,
+      hideInfo,
+      selfInTeam,
+    }: ParticipantItemParams,
+    element: HTMLElement,
+  ) {
     this.avatarSize = ParticipantAvatar.SIZE.SMALL;
     this.participant = ko.unwrap(participant);
     this.participantName = () =>
-      this.participant.is_me
-        ? `${this.participant.name()} (${capitalizeFirstChar(t('conversationYouNominative'))})`
+      (this.participant as User).is_me
+        ? `${(this.participant as User).name()} (${capitalizeFirstChar(t('conversationYouNominative'))})`
         : this.participant.name;
     this.isService = this.participant instanceof ServiceEntity || this.participant.isService;
     this.isUser = this.participant instanceof User && !this.participant.isService;
     this.selfInTeam = selfInTeam;
-    const isTemporaryGuest = this.isUser && this.participant.isTemporaryGuest();
+    const isTemporaryGuest = this.isUser && (this.participant as User).isTemporaryGuest();
     this.badge = badge;
 
     this.isDefaultMode = mode === UserlistMode.DEFAULT;
@@ -117,18 +92,85 @@ ko.components.register('participant-item', {
     this.showCamera = showCamera;
     const hasCustomInfo = !!customInfo;
 
-    this.hasUsernameInfo = this.isUser && !hideInfo && !hasCustomInfo && !this.isTemporaryGuest;
+    this.hasUsernameInfo = this.isUser && !hideInfo && !hasCustomInfo && !isTemporaryGuest;
 
     if (hasCustomInfo) {
       this.contentInfo = customInfo;
     } else if (hideInfo) {
       this.contentInfo = null;
     } else if (this.isService) {
-      this.contentInfo = this.participant.summary;
+      this.contentInfo = (this.participant as ServiceEntity).summary;
     } else if (isTemporaryGuest) {
-      this.contentInfo = this.participant.expirationText;
+      this.contentInfo = (this.participant as User).expirationText;
     } else {
-      this.contentInfo = this.participant.username();
+      this.contentInfo = (this.participant as User).username();
     }
+    this.isInViewport = ko.observable(false);
+
+    viewportObserver.trackElement(
+      element,
+      (isInViewport: boolean) => {
+        if (isInViewport) {
+          this.isInViewport(true);
+          viewportObserver.removeElement(element);
+        }
+      },
+      false,
+      undefined,
+    );
+  }
+}
+
+ko.components.register('participant-item', {
+  template: `
+    <div class="participant-item" data-bind="attr: {'data-uie-name': isUser ? 'item-user' : 'item-service', 'data-uie-value': participant.name}">
+      <!-- ko if: isInViewport() -->
+        <div class="participant-item-image">
+          <participant-avatar params="participant: participant, size: avatarSize"></participant-avatar>
+        </div>
+
+        <div class="participant-item-content">
+          <!-- ko if: isUser && selfInTeam -->
+            <availability-state class="participant-item-content-availability participant-item-content-name"
+              data-uie-name="status-name"
+              params="availability: participant.availability, label: participantName()"></availability-state>
+          <!-- /ko -->
+
+          <!-- ko if: isService || !selfInTeam -->
+            <div class="participant-item-content-name" data-bind="text: participantName()" data-uie-name="status-name"></div>
+          <!-- /ko -->
+          <div class="participant-item-content-info">
+            <!-- ko if: contentInfo -->
+              <span class="participant-item-content-username label-username-notext" data-bind="text: contentInfo, css: {'label-username': hasUsernameInfo}" data-uie-name="status-username"></span>
+              <!-- ko if: hasUsernameInfo && badge -->
+                <span class="participant-item-content-badge" data-uie-name="status-partner" data-bind="text: badge"></span>
+              <!-- /ko -->
+            <!-- /ko -->
+          </div>
+        </div>
+
+        <!-- ko if: isUser && participant.is_verified() -->
+          <verified-icon data-uie-name="status-verified"></verified-icon>
+        <!-- /ko -->
+
+        <!-- ko if: isUser && !isOthersMode && participant.isGuest() -->
+          <guest-icon class="participant-item-guest-indicator" data-uie-name="status-guest"></guest-icon>
+        <!-- /ko -->
+
+        <!-- ko if: showCamera -->
+          <camera-icon data-uie-name="status-video"></camera-icon>
+        <!-- /ko -->
+
+        <!-- ko if: canSelect -->
+          <div class="search-list-item-select icon-check" data-bind="css: {'selected': isSelected}" data-uie-name="status-selected"></div>
+        <!-- /ko -->
+
+        <disclose-icon></disclose-icon>
+      <!-- /ko -->
+    </div>
+  `,
+  viewModel: {
+    createViewModel: (props: ParticipantItemParams, componentInfo: any) =>
+      new ParticipanItem(props, componentInfo.element),
   },
 });

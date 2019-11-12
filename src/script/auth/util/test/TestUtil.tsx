@@ -17,45 +17,22 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client';
+import {RecursivePartial} from '@wireapp/commons/dist/commonjs/util/TypeUtil';
 import {StyledApp} from '@wireapp/react-ui-kit';
-import {MemoryEngine} from '@wireapp/store-engine/dist/commonjs/engine';
 import {mount} from 'enzyme';
 import React from 'react';
 import {IntlProvider} from 'react-intl';
 import {Provider} from 'react-redux';
 import {HashRouter} from 'react-router-dom';
-import {Store} from 'redux';
-import configureStore from 'redux-mock-store';
-import thunk from 'redux-thunk';
-import {RootState} from '../module/reducer';
+import {AnyAction} from 'redux';
+import {MockStoreEnhanced} from 'redux-mock-store';
+import {ThunkDispatch} from 'redux-thunk';
+import {Api, RootState} from '../../module/reducer';
 
-const engine = new MemoryEngine();
-engine.init('test-execution');
-
-const apiClient = new APIClient({
-  store: engine,
-  urls: APIClient.BACKEND.STAGING,
-});
-
-export const mockStore = (
-  state = {
-    authState: {},
-    languageState: {
-      language: 'en',
-    },
-  },
-  extraArgument = {
-    apiClient,
-  },
-) => {
-  const middlewares = [thunk.withExtraArgument(extraArgument)];
-  return configureStore(middlewares)(state);
-};
-
-export const withStore = (children: React.ReactNode, store: Store<RootState>) => (
-  <Provider store={store}>{children}</Provider>
-);
+export const withStore = (
+  children: React.ReactNode,
+  store: MockStoreEnhanced<RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
+) => <Provider store={store}>{children}</Provider>;
 
 export const withIntl = (component: React.ReactNode) => (
   <IntlProvider locale="en">
@@ -65,5 +42,7 @@ export const withIntl = (component: React.ReactNode) => (
 
 export const withTheme = (component: React.ReactNode) => <StyledApp>{component}</StyledApp>;
 
-export const mountComponent = (component: React.ReactNode, store: Store<RootState>) =>
-  mount(withTheme(withStore(withIntl(component), store)));
+export const mountComponent = (
+  component: React.ReactNode,
+  store: MockStoreEnhanced<RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
+) => mount(withTheme(withStore(withIntl(component), store)));

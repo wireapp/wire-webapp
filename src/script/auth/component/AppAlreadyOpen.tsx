@@ -19,59 +19,61 @@
 
 import {Button, Column, Columns, Container, H3, Modal, Text} from '@wireapp/react-ui-kit';
 import React from 'react';
-import {InjectedIntlProps, injectIntl} from 'react-intl';
+import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
+import {AnyAction, Dispatch} from 'redux';
 import {appAlreadyOpenStrings} from '../../strings';
 import {Config} from '../config';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
-import {RootState, ThunkDispatch} from '../module/reducer';
+import {RootState, bindActionCreators} from '../module/reducer';
 import * as CookieSelector from '../module/selector/CookieSelector';
 
 export interface Props {
   fullscreen?: boolean;
 }
 
-interface ConnectedProps {
-  isAppAlreadyOpen: boolean;
-}
+type AppAlreadyOpenProps = Props & ConnectedProps & DispatchProps;
 
-interface DispatchProps {
-  removeCookie: (name: string) => Promise<void>;
-}
+const AppAlreadyOpen = ({isAppAlreadyOpen, fullscreen, removeCookie}: AppAlreadyOpenProps) => {
+  const {formatMessage: _} = useIntl();
+  return (
+    isAppAlreadyOpen && (
+      <Modal fullscreen={fullscreen}>
+        <Container style={{maxWidth: '320px'}} data-uie-name="modal-already-open">
+          <H3 style={{fontWeight: 500, marginTop: '10px'}} data-uie-name="status-modal-title">
+            {_(appAlreadyOpenStrings.headline, {brandName: Config.BRAND_NAME})}
+          </H3>
+          <Text data-uie-name="status-modal-text">{_(appAlreadyOpenStrings.text)}</Text>
+          <Columns style={{marginTop: '20px'}}>
+            <Column style={{textAlign: 'center'}}>
+              <Button
+                block
+                onClick={() => removeCookie(CookieSelector.COOKIE_NAME_APP_OPENED)}
+                style={{marginBottom: '10px'}}
+                data-uie-name="do-action"
+              >
+                {_(appAlreadyOpenStrings.continueButton)}
+              </Button>
+            </Column>
+          </Columns>
+        </Container>
+      </Modal>
+    )
+  );
+};
 
-type AppAlreadyOpenProps = Props & ConnectedProps & DispatchProps & InjectedIntlProps;
+type ConnectedProps = ReturnType<typeof mapStateToProps>;
+const mapStateToProps = (state: RootState) => ({
+  isAppAlreadyOpen: CookieSelector.isAppAlreadyOpen(state),
+});
 
-const AppAlreadyOpen = ({isAppAlreadyOpen, fullscreen, intl: {formatMessage: _}, removeCookie}: AppAlreadyOpenProps) =>
-  isAppAlreadyOpen && (
-    <Modal fullscreen={fullscreen}>
-      <Container style={{maxWidth: '320px'}} data-uie-name="modal-already-open">
-        <H3 style={{fontWeight: 500, marginTop: '10px'}} data-uie-name="status-modal-title">
-          {_(appAlreadyOpenStrings.headline, {brandName: Config.BRAND_NAME})}
-        </H3>
-        <Text data-uie-name="status-modal-text">{_(appAlreadyOpenStrings.text)}</Text>
-        <Columns style={{marginTop: '20px'}}>
-          <Column style={{textAlign: 'center'}}>
-            <Button
-              block
-              onClick={() => removeCookie(CookieSelector.COOKIE_NAME_APP_OPENED)}
-              style={{marginBottom: '10px'}}
-              data-uie-name="do-action"
-            >
-              {_(appAlreadyOpenStrings.continueButton)}
-            </Button>
-          </Column>
-        </Columns>
-      </Container>
-    </Modal>
+type DispatchProps = ReturnType<typeof mapDispatchToProps>;
+const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
+  bindActionCreators(
+    {
+      removeCookie: ROOT_ACTIONS.cookieAction.removeCookie,
+    },
+    dispatch,
   );
 
-export default injectIntl(
-  connect(
-    (state: RootState): ConnectedProps => ({
-      isAppAlreadyOpen: CookieSelector.isAppAlreadyOpen(state),
-    }),
-    (dispatch: ThunkDispatch): DispatchProps => ({
-      removeCookie: (name: string) => dispatch(ROOT_ACTIONS.cookieAction.removeCookie(name)),
-    }),
-  )(AppAlreadyOpen),
-);
+export default connect(mapStateToProps, mapDispatchToProps)(AppAlreadyOpen);
