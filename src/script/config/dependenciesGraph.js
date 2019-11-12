@@ -40,7 +40,6 @@ dependencies.set(AuthService, {dependencies: [BackendClient], name: 'AuthService
 dependencies.set(BackendClient, {dependencies: [], name: 'BackendClient'});
 dependencies.set(GiphyRepository, {dependencies: [GiphyService], name: 'GiphyRepository'});
 dependencies.set(GiphyService, {dependencies: [BackendClient], name: 'GiphyService'});
-// dependencies.set(MediaRepository, {dependencies: [PermissionRepository], name: 'MediaRepository'});
 dependencies.set(PermissionRepository, {dependencies: [], name: 'PermissionRepository'});
 dependencies.set(RichProfileRepository, {dependencies: [BackendClient], name: 'RichProfileRepository'});
 
