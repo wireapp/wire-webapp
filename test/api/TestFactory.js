@@ -217,7 +217,7 @@ window.TestFactory = class TestFactory {
    */
   async exposeUserActors() {
     await this.exposeClientActors();
-    TestFactory.asset_service = resolveDependency(graph.AssetService);
+    TestFactory.asset_service = new AssetService(resolveDependency(graph.BackendClient));
     TestFactory.connection_service = new ConnectionService(resolveDependency(graph.BackendClient));
     TestFactory.user_service = new UserService(resolveDependency(graph.BackendClient), TestFactory.storage_service);
     TestFactory.propertyRepository = TestFactory.propertyRepository = new PropertiesRepository(
