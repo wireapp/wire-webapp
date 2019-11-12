@@ -44,8 +44,8 @@ import {MentionEntity} from '../../message/MentionEntity';
 import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
 import {Config} from '../../auth/config';
-import {AssetUploader} from 'src/script/assets/AssetUploader';
-import {AssetService} from 'src/script/assets/AssetService';
+import {AssetUploader} from '../../assets/AssetUploader';
+import {AssetService} from '../../assets/AssetService';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};

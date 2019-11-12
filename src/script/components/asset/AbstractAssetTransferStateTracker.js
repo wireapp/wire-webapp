@@ -22,8 +22,8 @@ import {amplify} from 'amplify';
 import {AssetTransferState} from '../../assets/AssetTransferState';
 import {resolve, graph} from '../../config/appResolver';
 import {WebAppEvents} from '../../event/WebApp';
-import {AssetUploader} from 'src/script/assets/AssetUploader';
-import {AssetService} from 'src/script/assets/AssetService';
+import {AssetUploader} from '../../assets/AssetUploader';
+import {AssetService} from '../../assets/AssetService';
 
 export class AbstractAssetTransferStateTracker {
   constructor(message = {}) {
