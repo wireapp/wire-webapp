@@ -44,7 +44,8 @@ ko.components.register('grouped-conversation-header', {
         conversationLabel.conversations().filter(conversation => {
           const mutedState = conversation.mutedState();
           if (typeof mutedState === 'boolean') {
-            return mutedState ? false : conversation.hasUnread();
+            const isMuted = mutedState === true;
+            return isMuted ? false : conversation.hasUnread();
           }
           if (mutedState === NOTIFICATION_STATE.NOTHING) {
             return false;
