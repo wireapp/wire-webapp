@@ -29,7 +29,13 @@ export class Configuration {
   readonly BRAND_NAME = window.wire.env.BRAND_NAME || 'Wire';
   readonly ENVIRONMENT = window.wire.env.ENVIRONMENT || 'production';
   readonly FEATURE = window.wire.env.FEATURE || {
+    APPLOCK_SCHEDULED_TIMEOUT: false,
+    APPLOCK_UNFOCUS_TIMEOUT: false,
+    CHECK_CONSENT: true,
     DEFAULT_LOGIN_TEMPORARY_CLIENT: false,
+    ENABLE_ACCOUNT_REGISTRATION: true,
+    ENABLE_DEBUG: true,
+    ENABLE_PHONE_LOGIN: true,
   };
   readonly MAX_GROUP_PARTICIPANTS = window.wire.env.MAX_GROUP_PARTICIPANTS || 500;
   readonly MAX_VIDEO_PARTICIPANTS = window.wire.env.MAX_VIDEO_PARTICIPANTS || 4;
