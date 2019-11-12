@@ -109,6 +109,7 @@ import {MediaRepository} from '../media/MediaRepository';
 import {PermissionRepository} from '../permission/PermissionRepository';
 import {AssetUploader} from '../assets/AssetUploader';
 import {GiphyRepository} from '../extension/GiphyRepository';
+import {GiphyService} from '../extension/GiphyService';
 
 class App {
   static get CONFIG() {
@@ -174,7 +175,7 @@ class App {
 
     repositories.audio = new AudioRepository();
     repositories.auth = resolve(graph.AuthRepository);
-    repositories.giphy = new GiphyRepository(resolve(graph.GiphyService));
+    repositories.giphy = new GiphyRepository(new GiphyService(resolve(graph.BackendClient)));
     repositories.properties = new PropertiesRepository(new PropertiesService(this.backendClient), selfService);
     repositories.serverTime = serverTimeHandler;
     repositories.storage = new StorageRepository(this.service.storage);
