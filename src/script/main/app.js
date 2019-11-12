@@ -108,6 +108,8 @@ import {BackupService} from '../backup/BackupService';
 import {MediaRepository} from '../media/MediaRepository';
 import {PermissionRepository} from '../permission/PermissionRepository';
 import {AssetUploader} from '../assets/AssetUploader';
+import {AuthRepository} from '../auth/AuthRepository';
+import {AuthService} from '../auth/AuthService';
 
 class App {
   static get CONFIG() {
@@ -172,7 +174,7 @@ class App {
     const sendingMessageQueue = new MessageSender();
 
     repositories.audio = new AudioRepository();
-    repositories.auth = resolve(graph.AuthRepository);
+    repositories.auth = new AuthRepository(new AuthService(resolve(graph.BackendClient)));
     repositories.giphy = resolve(graph.GiphyRepository);
     repositories.properties = new PropertiesRepository(new PropertiesService(this.backendClient), selfService);
     repositories.serverTime = serverTimeHandler;
