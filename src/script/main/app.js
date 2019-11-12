@@ -105,6 +105,7 @@ import {AudioRepository} from '../audio/AudioRepository';
 import {MessageSender} from '../message/MessageSender';
 import {StorageService} from '../storage';
 import {BackupService} from '../backup/BackupService';
+import {MediaRepository} from '../media/MediaRepository';
 
 class App {
   static get CONFIG() {
@@ -177,7 +178,7 @@ class App {
 
     repositories.cryptography = new CryptographyRepository(this.backendClient, repositories.storage);
     repositories.client = new ClientRepository(this.backendClient, this.service.storage, repositories.cryptography);
-    repositories.media = resolve(graph.MediaRepository);
+    repositories.media = new MediaRepository(resolve(graph.PermissionRepository));
     repositories.user = new UserRepository(
       new UserService(this.backendClient, this.service.storage),
       this.service.asset,

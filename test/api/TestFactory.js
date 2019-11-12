@@ -57,6 +57,7 @@ import {MessageSender} from 'src/script/message/MessageSender';
 import {UserService} from 'src/script/user/UserService';
 import {BackupService} from 'src/script/backup/BackupService';
 import {StorageService} from 'src/script/storage';
+import {MediaRepository} from 'src/script/media/MediaRepository';
 
 window.testConfig = {
   connection: backendConfig,
@@ -320,7 +321,7 @@ window.TestFactory = class TestFactory {
       resolveDependency(graph.BackendClient),
       TestFactory.conversation_repository,
       TestFactory.event_repository,
-      resolveDependency(graph.MediaRepository).streamHandler,
+      new MediaRepository(resolveDependency(graph.PermissionRepository)).streamHandler,
       serverTimeHandler,
     );
 
