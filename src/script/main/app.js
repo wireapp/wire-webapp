@@ -107,6 +107,7 @@ import {StorageService} from '../storage';
 import {BackupService} from '../backup/BackupService';
 import {MediaRepository} from '../media/MediaRepository';
 import {PermissionRepository} from '../permission/PermissionRepository';
+import {AssetUploader} from '../assets/AssetUploader';
 
 class App {
   static get CONFIG() {
@@ -215,7 +216,7 @@ class App {
       repositories.team,
       repositories.user,
       repositories.properties,
-      resolve(graph.AssetUploader),
+      new AssetUploader(resolve(graph.AssetService)),
     );
 
     const serviceMiddleware = new ServiceMiddleware(repositories.conversation, repositories.user);
