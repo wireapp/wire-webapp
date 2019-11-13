@@ -17,7 +17,7 @@
  *
  */
 
-import {Button, ContainerXS, H1, Muted} from '@wireapp/react-ui-kit';
+import {ContainerXS, H1, H3, Link, Muted} from '@wireapp/react-ui-kit';
 import React, {useEffect} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
@@ -52,9 +52,13 @@ const VerifyEmailLink = ({hasSelfEmail}: Props & ConnectedProps) => {
       >
         <div>
           <H1 center>{_(setEmailStrings.verifyHeadline)}</H1>
-          <Muted>{_(setEmailStrings.verifySubhead)}</Muted>
-          <Muted>{_(setEmailStrings.resendHeadline)}</Muted>
-          <Button>{_(setEmailStrings.resendAction)}</Button>
+          <H3 center block>
+            {_(setEmailStrings.verifySubhead)}
+          </H3>
+          <Muted center block style={{marginTop: 64}}>
+            {_(setEmailStrings.resendHeadline)}
+          </Muted>
+          <Link>{_(setEmailStrings.resendAction)}</Link>
         </div>
       </ContainerXS>
     </Page>

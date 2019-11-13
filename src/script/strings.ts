@@ -212,8 +212,8 @@ export const setEmailStrings = defineMessages({
     id: 'setEmail.headline',
   },
   resendAction: {
-    defaultMessage: 'Resend to {email}',
-    id: 'authPostedResend',
+    defaultMessage: 'Resend email',
+    id: 'setEmail.resend',
   },
   resendHeadline: {
     defaultMessage: 'No email showing up?',
