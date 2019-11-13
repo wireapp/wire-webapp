@@ -211,13 +211,13 @@ export const setEmailStrings = defineMessages({
     defaultMessage: 'Set email',
     id: 'setEmail.headline',
   },
-  resendAction: {
-    defaultMessage: 'Resend email',
-    id: 'setEmail.resend',
-  },
-  resendHeadline: {
+  noMailHeadline: {
     defaultMessage: 'No email showing up?',
     id: 'authPostedResendAction',
+  },
+  tryAgain: {
+    defaultMessage: 'Try again',
+    id: 'setEmail.tryAgain',
   },
   verifyHeadline: {
     defaultMessage: 'You’ve got mail.',

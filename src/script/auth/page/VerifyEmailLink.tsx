@@ -56,9 +56,9 @@ const VerifyEmailLink = ({hasSelfEmail}: Props & ConnectedProps) => {
             {_(setEmailStrings.verifySubhead)}
           </H3>
           <Muted center block style={{marginTop: 64}}>
-            {_(setEmailStrings.resendHeadline)}
+            {_(setEmailStrings.noMailHeadline)}
           </Muted>
-          <Link>{_(setEmailStrings.resendAction)}</Link>
+          <Link onClick={() => history.push(ROUTE.SET_EMAIL)}>{_(setEmailStrings.tryAgain)}</Link>
         </div>
       </ContainerXS>
     </Page>
