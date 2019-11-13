@@ -152,15 +152,13 @@ const CheckPassword = ({loginData, doLogin, resetAuthError, isFetching}: Props &
             {!error ? null : isValidationError(error) ? parseValidationErrors(error) : parseError(error)}
           </ErrorMessage>
         </Form>
-        <div style={{marginTop: '36px'}}>
-          <Link
-            center
-            onClick={() => UrlUtil.openTab(EXTERNAL_ROUTE.WIRE_ACCOUNT_PASSWORD_RESET)}
-            data-uie-name="go-forgot-password"
-          >
-            {_(loginStrings.forgotPassword)}
-          </Link>
-        </div>
+        <Link
+          center
+          onClick={() => UrlUtil.openTab(EXTERNAL_ROUTE.WIRE_ACCOUNT_PASSWORD_RESET)}
+          data-uie-name="go-forgot-password"
+        >
+          {_(loginStrings.forgotPassword)}
+        </Link>
       </ContainerXS>
     </Page>
   );
