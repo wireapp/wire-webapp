@@ -25,7 +25,7 @@ import {connect} from 'react-redux';
 import useReactRouter from 'use-react-router';
 import {historyInfoStrings} from '../../strings';
 import {Config} from '../config';
-import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
+import {EXTERNAL_ROUTE} from '../externalRoute';
 import {RootState} from '../module/reducer';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import {ROUTE} from '../route';

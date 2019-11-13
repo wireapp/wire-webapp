@@ -21,7 +21,7 @@ import {CloseIcon, Content, Footer, Header, Link, Logo, Small} from '@wireapp/re
 import React from 'react';
 import {FormattedHTMLMessage, useIntl} from 'react-intl';
 import {cookiePolicyStrings, footerStrings} from '../../strings';
-import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
+import {EXTERNAL_ROUTE} from '../externalRoute';
 
 export interface Props extends React.HTMLAttributes<HTMLDivElement> {
   showCookiePolicyBanner?: boolean;

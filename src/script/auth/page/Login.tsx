@@ -49,7 +49,7 @@ import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import LoginForm from '../component/LoginForm';
 import RouterLink from '../component/RouterLink';
 import {Config} from '../config';
-import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
+import {EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot} from '../module/action/';
 import {BackendError} from '../module/action/BackendError';
 import {LabeledError} from '../module/action/LabeledError';

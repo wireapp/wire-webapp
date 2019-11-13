@@ -26,6 +26,7 @@ import {
   ICON_NAME,
   Input,
   InputSubmitCombo,
+  Link,
   Loading,
   RoundIconButton,
 } from '@wireapp/react-ui-kit';
@@ -35,6 +36,7 @@ import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 import useReactRouter from 'use-react-router';
 import {loginStrings, phoneLoginStrings} from '../../strings';
+import {EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot} from '../module/action';
 import {BackendError} from '../module/action/BackendError';
 import {LabeledError} from '../module/action/LabeledError';
@@ -43,6 +45,7 @@ import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
 import {isValidationError, parseError, parseValidationErrors} from '../util/errorUtil';
+import * as UrlUtil from '../util/urlUtil';
 import Page from './Page';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
@@ -111,48 +114,52 @@ const CheckPassword = ({loginData, doLogin, resetAuthError, isFetching}: Props &
         verticalCenter
         style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
       >
-        <div>
-          <H1 center>{_(phoneLoginStrings.verifyPasswordHeadline)}</H1>
-          <Form style={{marginTop: 30}} data-uie-name="login">
-            <InputSubmitCombo>
-              <Input
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) => setPassword(event.target.value)}
-                tabIndex={1}
-                type="password"
-                name="password-login"
-                autoComplete="section-login password"
-                placeholder={_(loginStrings.passwordPlaceholder)}
-                pattern={`.{1,1024}`}
-                data-uie-name="enter-password"
-                required
-                autoFocus
-                ref={passwordInput}
-                markInvalid={!validPasswordInput}
-                value={password}
+        <H1 center>{_(phoneLoginStrings.verifyPasswordHeadline)}</H1>
+        <Form style={{marginTop: 30}} data-uie-name="login">
+          <InputSubmitCombo>
+            <Input
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => setPassword(event.target.value)}
+              tabIndex={1}
+              type="password"
+              name="password-login"
+              autoComplete="section-login password"
+              placeholder={_(loginStrings.passwordPlaceholder)}
+              pattern={`.{1,1024}`}
+              data-uie-name="enter-password"
+              required
+              autoFocus
+              ref={passwordInput}
+              markInvalid={!validPasswordInput}
+              value={password}
+            />
+            {isFetching ? (
+              <Loading size={32} />
+            ) : (
+              <RoundIconButton
+                style={{marginLeft: 16}}
+                tabIndex={2}
+                type="submit"
+                formNoValidate
+                icon={ICON_NAME.ARROW}
+                onClick={handleLogin}
+                disabled={isFetching || !password}
+                showLoading={isFetching}
+                data-uie-name="do-sign-in"
               />
-              {isFetching ? (
-                <Loading size={32} />
-              ) : (
-                <RoundIconButton
-                  style={{marginLeft: 16}}
-                  tabIndex={2}
-                  type="submit"
-                  formNoValidate
-                  icon={ICON_NAME.ARROW}
-                  onClick={handleLogin}
-                  disabled={isFetching || !password}
-                  showLoading={isFetching}
-                  data-uie-name="do-sign-in"
-                />
-              )}
-            </InputSubmitCombo>
-            <ErrorMessage>
-              {!error ? null : isValidationError(error) ? parseValidationErrors(error) : parseError(error)}
-            </ErrorMessage>
-          </Form>
-          {/*
-            TODO: forgot password link
-          */}
+            )}
+          </InputSubmitCombo>
+          <ErrorMessage>
+            {!error ? null : isValidationError(error) ? parseValidationErrors(error) : parseError(error)}
+          </ErrorMessage>
+        </Form>
+        <div style={{marginTop: '36px'}}>
+          <Link
+            center
+            onClick={() => UrlUtil.openTab(EXTERNAL_ROUTE.WIRE_ACCOUNT_PASSWORD_RESET)}
+            data-uie-name="go-forgot-password"
+          >
+            {_(loginStrings.forgotPassword)}
+          </Link>
         </div>
       </ContainerXS>
     </Page>
