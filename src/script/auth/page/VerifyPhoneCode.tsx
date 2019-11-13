@@ -37,7 +37,12 @@ import Page from './Page';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
-const VerifyPhoneCode = ({doLogin, resetAuthError, loginData}: Props & ConnectedProps & DispatchProps) => {
+const VerifyPhoneCode = ({
+  doLogin,
+  resetAuthError,
+  loginData,
+  doSendPhoneLoginCode,
+}: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
   const [error, setError] = useState();
   const {history} = useReactRouter();
@@ -48,7 +53,27 @@ const VerifyPhoneCode = ({doLogin, resetAuthError, loginData}: Props & Connected
     }
   }, []);
 
-  const resendCode = () => {};
+  const resendCode = async () => {
+    try {
+      await doSendPhoneLoginCode({phone: loginData.phone});
+    } catch (error) {
+      if (error instanceof ValidationError) {
+        setError(error);
+      } else if (error.hasOwnProperty('label')) {
+        switch (error.label) {
+          case BackendError.LABEL.PASSWORD_EXISTS: {
+            return history.push(ROUTE.CHECK_PASSWORD);
+          }
+          default: {
+            setError(error);
+            throw error;
+          }
+        }
+      } else {
+        throw error;
+      }
+    }
+  };
 
   const handleLogin = async (code: string) => {
     try {
@@ -62,7 +87,7 @@ const VerifyPhoneCode = ({doLogin, resetAuthError, loginData}: Props & Connected
         switch (error.label) {
           case BackendError.LABEL.TOO_MANY_CLIENTS: {
             resetAuthError();
-            history.push(ROUTE.CLIENTS);
+            return history.push(ROUTE.CLIENTS);
             break;
           }
           case BackendError.LABEL.INVALID_CREDENTIALS:
@@ -119,6 +144,7 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
   bindActionCreators(
     {
       doLogin: actionRoot.authAction.doLogin,
+      doSendPhoneLoginCode: actionRoot.authAction.doSendPhoneLoginCode,
       resetAuthError: actionRoot.authAction.resetAuthError,
     },
     dispatch,
