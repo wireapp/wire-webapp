@@ -42,10 +42,15 @@ ko.components.register('grouped-conversation-header', {
     this.badge = ko.pureComputed(
       () =>
         conversationLabel.conversations().filter(conversation => {
-          if (conversation.mutedState() === NOTIFICATION_STATE.NOTHING) {
+          const mutedState = conversation.mutedState();
+          if (typeof mutedState === 'boolean') {
+            const isMuted = mutedState === true;
+            return isMuted ? false : conversation.hasUnread();
+          }
+          if (mutedState === NOTIFICATION_STATE.NOTHING) {
             return false;
           }
-          if (conversation.mutedState() === NOTIFICATION_STATE.MENTIONS_AND_REPLIES) {
+          if (mutedState === NOTIFICATION_STATE.MENTIONS_AND_REPLIES) {
             return conversation.hasUnreadTargeted();
           }
           return conversation.hasUnread();
