@@ -18,7 +18,7 @@
  */
 
 import {LoginData} from '@wireapp/api-client/dist/commonjs/auth';
-import {CodeInput, ContainerXS, ErrorMessage, H1, Link} from '@wireapp/react-ui-kit';
+import {CodeInput, Column, Columns, ContainerXS, ErrorMessage, H1, Link} from '@wireapp/react-ui-kit';
 import React, {useEffect, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
@@ -39,8 +39,7 @@ interface Props extends React.HTMLProps<HTMLDivElement> {}
 
 const VerifyPhoneCode = ({doLogin, resetAuthError, loginData}: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
-  const [error /*, setError*/] = useState();
-  // const [validationError, setValidationError] = useState();
+  const [error, setError] = useState();
   const {history} = useReactRouter();
 
   useEffect(() => {
@@ -52,36 +51,26 @@ const VerifyPhoneCode = ({doLogin, resetAuthError, loginData}: Props & Connected
   const resendCode = () => {};
 
   const handleLogin = async (code: string) => {
-    // setValidationError(validationError);
     try {
-      // if (validationError.length) {
-      //   throw validationError[0];
-      // }
       const login: LoginData = {clientType: loginData.clientType, phone: loginData.phone, code};
-
       await doLogin(login);
-
       return history.push(ROUTE.HISTORY_INFO);
     } catch (error) {
-      if ((error as BackendError).label) {
-        const backendError = error as BackendError;
-        switch (backendError.label) {
+      if (error instanceof ValidationError) {
+        setError(error);
+      } else if (error.hasOwnProperty('label')) {
+        switch (error.label) {
           case BackendError.LABEL.TOO_MANY_CLIENTS: {
             resetAuthError();
             history.push(ROUTE.CLIENTS);
             break;
           }
           case BackendError.LABEL.INVALID_CREDENTIALS:
-          case LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE: {
-            break;
-          }
+          case LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE:
+          case BackendError.LABEL.BAD_REQUEST:
           default: {
-            const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
-              backendError.label.endsWith(errorType),
-            );
-            if (!isValidationError) {
-              throw backendError;
-            }
+            setError(error);
+            throw error;
           }
         }
       } else {
@@ -101,14 +90,18 @@ const VerifyPhoneCode = ({doLogin, resetAuthError, loginData}: Props & Connected
           <CodeInput autoFocus style={{marginTop: 10}} onCodeComplete={handleLogin} data-uie-name="enter-code" />
           <ErrorMessage data-uie-name="error-message">{parseError(error)}</ErrorMessage>
         </div>
-        <div>
-          <Link onClick={resendCode} data-uie-name="do-resend-code">
-            {_(phoneLoginStrings.verifyCodeResend)}
-          </Link>
-          <Link onClick={() => history.push(ROUTE.LOGIN_PHONE)} data-uie-name="go-change-phone">
-            {_(phoneLoginStrings.verifyCodeChangePhone)}
-          </Link>
-        </div>
+        <Columns>
+          <Column>
+            <Link onClick={resendCode} data-uie-name="do-resend-code">
+              {_(phoneLoginStrings.verifyCodeResend)}
+            </Link>
+          </Column>
+          <Column>
+            <Link onClick={() => history.push(ROUTE.LOGIN_PHONE)} data-uie-name="go-change-phone">
+              {_(phoneLoginStrings.verifyCodeChangePhone)}
+            </Link>
+          </Column>
+        </Columns>
       </ContainerXS>
     </Page>
   );
