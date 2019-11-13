@@ -32,7 +32,7 @@ ko.components.register('grouped-conversation-header', {
       <disclose-icon></disclose-icon>
       <span class="conversation-folder__head__name" data-bind="text: label.name"></span>
       <!-- ko if: badge() -->
-        <span class="conversation-folder__head__badge" data-bind="text: badge" data-uie-name="conversation-folder-badge"></span>
+        <span class="cell-badge-dark conversation-folder__head__badge" data-bind="text: badge" data-uie-name="conversation-folder-badge"></span>
       <!-- /ko -->
     </div>
   `,
