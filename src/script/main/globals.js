@@ -29,7 +29,6 @@ import TeamErrorGlobal from '../error/TeamError.js';
 import UserErrorGlobal from '../error/UserError.js';
 import LocalizerGlobal from '../localization/Localizer.js';
 import ErrorGlobal from '../backup/Error.js';
-import EventBuilderGlobal from '../conversation/EventBuilder.js';
 import FaviconViewModelGlobal from '../view_model/FaviconViewModel.js';
 import ImageDetailViewViewModelGlobal from '../view_model/ImageDetailViewViewModel.js';
 import LoadingViewModelGlobal from '../view_model/LoadingViewModel.js';

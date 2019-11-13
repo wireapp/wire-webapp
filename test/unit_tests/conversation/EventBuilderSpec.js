@@ -20,6 +20,7 @@
 import {createRandomUuid} from 'Util/util';
 
 import {EventMapper} from 'src/script/conversation/EventMapper';
+import {EventBuilder} from 'src/script/conversation/EventBuilder';
 
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
@@ -28,7 +29,7 @@ import {ClientEvent} from 'src/script/event/Client';
 import {VerificationMessageType} from 'src/script/message/VerificationMessageType';
 import {SuperType} from 'src/script/message/SuperType';
 
-describe('z.conversation.EventBuilder', () => {
+describe('EventBuilder', () => {
   let event_mapper = undefined;
   let conversation_et = undefined;
   let self_user_et = undefined;
@@ -44,7 +45,7 @@ describe('z.conversation.EventBuilder', () => {
   });
 
   it('buildAllVerified', () => {
-    const event = z.conversation.EventBuilder.buildAllVerified(conversation_et, 0);
+    const event = EventBuilder.buildAllVerified(conversation_et, 0);
 
     return event_mapper.mapJsonEvent(event, conversation_et).then(messageEntity => {
       expect(messageEntity).toBeDefined();
@@ -57,12 +58,7 @@ describe('z.conversation.EventBuilder', () => {
 
   it('buildDegraded', () => {
     const user_ids = [createRandomUuid()];
-    const event = z.conversation.EventBuilder.buildDegraded(
-      conversation_et,
-      user_ids,
-      VerificationMessageType.NEW_DEVICE,
-      0,
-    );
+    const event = EventBuilder.buildDegraded(conversation_et, user_ids, VerificationMessageType.NEW_DEVICE, 0);
 
     return event_mapper.mapJsonEvent(event, conversation_et).then(messageEntity => {
       expect(messageEntity).toBeDefined();
@@ -75,7 +71,7 @@ describe('z.conversation.EventBuilder', () => {
   });
 
   it('buildMissed', () => {
-    const event = z.conversation.EventBuilder.buildMissed(conversation_et, 0);
+    const event = EventBuilder.buildMissed(conversation_et, 0);
 
     return event_mapper.mapJsonEvent(event, conversation_et).then(messageEntity => {
       expect(messageEntity).toBeDefined();
@@ -88,7 +84,7 @@ describe('z.conversation.EventBuilder', () => {
   it('buildGroupCreation', () => {
     conversation_et.participating_user_ids(['one', 'two', 'three']);
     conversation_et.creator = 'one';
-    const event = z.conversation.EventBuilder.buildGroupCreation(conversation_et);
+    const event = EventBuilder.buildGroupCreation(conversation_et);
 
     return event_mapper.mapJsonEvent(event, conversation_et).then(messageEntity => {
       expect(messageEntity).toBeDefined();

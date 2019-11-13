@@ -38,9 +38,6 @@ import {
 } from '@wireapp/protocol-messaging';
 import {flatten} from 'underscore';
 
-import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
-import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
-
 import {getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {PromiseQueue} from 'Util/PromiseQueue';
@@ -52,6 +49,9 @@ import {capitalizeFirstChar, compareTransliteration, sortByPriority, startsWith}
 
 import {AssetUploadFailedReason} from '../assets/AssetUploadFailedReason';
 import {encryptAesAsset} from '../assets/AssetCrypto';
+
+import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
+import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 
 import {ClientEvent} from '../event/Client';
 import {EventTypeHandling} from '../event/EventTypeHandling';
@@ -71,6 +71,7 @@ import {ConversationStateHandler} from './ConversationStateHandler';
 import {EventInfoEntity} from './EventInfoEntity';
 import {EventMapper} from './EventMapper';
 import {ACCESS_MODE} from './AccessMode';
+import {EventBuilder} from './EventBuilder';
 import {ACCESS_ROLE} from './AccessRole';
 import {ACCESS_STATE} from './AccessState';
 import {ConversationStatus} from './ConversationStatus';
@@ -626,8 +627,8 @@ export class ConversationRepository {
     }
 
     const creationEvent = conversationEntity.isGroup()
-      ? z.conversation.EventBuilder.buildGroupCreation(conversationEntity, isTemporaryGuest, timestamp)
-      : z.conversation.EventBuilder.build1to1Creation(conversationEntity);
+      ? EventBuilder.buildGroupCreation(conversationEntity, isTemporaryGuest, timestamp)
+      : EventBuilder.build1to1Creation(conversationEntity);
 
     this.eventRepository.injectEvent(creationEvent, eventSource);
   }
@@ -1328,7 +1329,7 @@ export class ConversationRepository {
   addMissingMember(conversationId, userIds, timestamp) {
     return this.get_conversation_by_id(conversationId).then(conversationEntity => {
       const [sender] = userIds;
-      const event = z.conversation.EventBuilder.buildMemberJoin(conversationEntity, sender, userIds, timestamp);
+      const event = EventBuilder.buildMemberJoin(conversationEntity, sender, userIds, timestamp);
       return this.eventRepository.injectEvent(event, EventRepository.SOURCE.INJECTED);
     });
   }
@@ -1462,7 +1463,7 @@ export class ConversationRepository {
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
       const event = !!response
         ? response
-        : z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
+        : EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
 
       this.eventRepository.injectEvent(event, EventRepository.SOURCE.BACKEND_RESPONSE);
       return event;
@@ -1482,7 +1483,7 @@ export class ConversationRepository {
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
       const event = hasResponse
         ? response.event
-        : z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
+        : EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
 
       this.eventRepository.injectEvent(event, EventRepository.SOURCE.BACKEND_RESPONSE);
       return event;
@@ -1594,7 +1595,7 @@ export class ConversationRepository {
           return conversationInTeam && userIsParticipant && !conversationEntity.removed_from_conversation();
         })
         .forEach(conversationEntity => {
-          const leaveEvent = z.conversation.EventBuilder.buildTeamMemberLeave(conversationEntity, userEntity, isoDate);
+          const leaveEvent = EventBuilder.buildTeamMemberLeave(conversationEntity, userEntity, isoDate);
           this.eventRepository.injectEvent(leaveEvent);
         });
     });
@@ -1853,7 +1854,7 @@ export class ConversationRepository {
         };
 
         const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-        const assetAddEvent = z.conversation.EventBuilder.buildAssetAdd(conversationEntity, data, currentTimestamp);
+        const assetAddEvent = EventBuilder.buildAssetAdd(conversationEntity, data, currentTimestamp);
 
         assetAddEvent.id = messageId;
         assetAddEvent.time = payload.time;
@@ -2458,7 +2459,7 @@ export class ConversationRepository {
         }
 
         const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-        const optimisticEvent = z.conversation.EventBuilder.buildMessageAdd(conversationEntity, currentTimestamp);
+        const optimisticEvent = EventBuilder.buildMessageAdd(conversationEntity, currentTimestamp);
         return this.cryptography_repository.cryptographyMapper.mapGenericMessage(genericMessage, optimisticEvent);
       })
       .then(mappedEvent => {
@@ -2733,7 +2734,7 @@ export class ConversationRepository {
       const servertime = this.serverTimeHandler.toServerTimestamp();
       timestamp = conversation.get_latest_timestamp(servertime);
     }
-    const legalHoldUpdateMessage = z.conversation.EventBuilder.buildLegalHoldMessage(
+    const legalHoldUpdateMessage = EventBuilder.buildLegalHoldMessage(
       conversationId || conversationEntity.id,
       userId,
       timestamp,
@@ -3422,7 +3423,7 @@ export class ConversationRepository {
       .filter(conversationEntity => !conversationEntity.removed_from_conversation())
       .forEach(conversationEntity => {
         const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-        const missed_event = z.conversation.EventBuilder.buildMissed(conversationEntity, currentTimestamp);
+        const missed_event = EventBuilder.buildMissed(conversationEntity, currentTimestamp);
         this.eventRepository.injectEvent(missed_event);
       });
   }
@@ -4051,7 +4052,7 @@ export class ConversationRepository {
    * @returns {undefined} No return value
    */
   _addDeleteMessage(conversationId, messageId, time, messageEntity) {
-    const deleteEvent = z.conversation.EventBuilder.buildDelete(conversationId, messageId, time, messageEntity);
+    const deleteEvent = EventBuilder.buildDelete(conversationId, messageId, time, messageEntity);
     this.eventRepository.injectEvent(deleteEvent);
   }
 

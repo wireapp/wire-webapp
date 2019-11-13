@@ -22,6 +22,8 @@ import {isEmpty} from 'underscore';
 import {getLogger} from 'Util/Logger';
 import {getDifference} from 'Util/ArrayUtil';
 
+import {EventBuilder} from './EventBuilder';
+
 export class ClientMismatchHandler {
   constructor(conversationRepository, cryptographyRepository, eventRepository, serverTimeHandler, userRepository) {
     this.conversationRepository = conversationRepository;
@@ -182,7 +184,7 @@ export class ClientMismatchHandler {
           const isGroupConversation = conversationEntity && conversationEntity.isGroup();
           if (isGroupConversation) {
             const timestamp = this.serverTimeHandler.toServerTimestamp();
-            const event = z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, false, timestamp);
+            const event = EventBuilder.buildMemberLeave(conversationEntity, userId, false, timestamp);
 
             this.eventRepository.injectEvent(event);
           }
