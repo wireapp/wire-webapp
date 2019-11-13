@@ -19,7 +19,7 @@
 
 import {LoginData} from '@wireapp/api-client/dist/commonjs/auth';
 import {CodeInput, ContainerXS, ErrorMessage, H1, Link} from '@wireapp/react-ui-kit';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
@@ -42,6 +42,12 @@ const VerifyPhoneCode = ({doLogin, resetAuthError, loginData}: Props & Connected
   const [error /*, setError*/] = useState();
   // const [validationError, setValidationError] = useState();
   const {history} = useReactRouter();
+
+  useEffect(() => {
+    if (!loginData.phone) {
+      history.push(ROUTE.LOGIN_PHONE);
+    }
+  }, []);
 
   const resendCode = () => {};
 

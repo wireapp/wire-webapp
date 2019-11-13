@@ -81,6 +81,10 @@ const PhoneLogin = ({
       if ((error as BackendError).label) {
         const backendError = error as BackendError;
         switch (backendError.label) {
+          case BackendError.LABEL.PASSWORD_EXISTS: {
+            await pushLoginData({phone: formLoginData.phone});
+            return history.push(ROUTE.CHECK_PASSWORD);
+          }
           default: {
             const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
               backendError.label.endsWith(errorType),
