@@ -36,6 +36,7 @@ export class Configuration {
     ENABLE_ACCOUNT_REGISTRATION: true,
     ENABLE_DEBUG: true,
     ENABLE_PHONE_LOGIN: true,
+    ENABLE_SSO: true,
   };
   readonly MAX_GROUP_PARTICIPANTS = window.wire.env.MAX_GROUP_PARTICIPANTS || 500;
   readonly MAX_VIDEO_PARTICIPANTS = window.wire.env.MAX_VIDEO_PARTICIPANTS || 4;

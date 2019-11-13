@@ -18,13 +18,23 @@
  */
 
 import {LoginData} from '@wireapp/api-client/dist/commonjs/auth';
-import {Button, ContainerXS, ErrorMessage, H1, Input} from '@wireapp/react-ui-kit';
-import React, {useEffect, useState} from 'react';
+import {
+  ContainerXS,
+  ErrorMessage,
+  Form,
+  H1,
+  ICON_NAME,
+  Input,
+  InputSubmitCombo,
+  Loading,
+  RoundIconButton,
+} from '@wireapp/react-ui-kit';
+import React, {useEffect, useRef, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 import useReactRouter from 'use-react-router';
-import {phoneLoginStrings} from '../../strings';
+import {loginStrings, phoneLoginStrings} from '../../strings';
 import {actionRoot} from '../module/action';
 import {BackendError} from '../module/action/BackendError';
 import {LabeledError} from '../module/action/LabeledError';
@@ -32,17 +42,20 @@ import {ValidationError} from '../module/action/ValidationError';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
-import {parseError} from '../util/errorUtil';
+import {isValidationError, parseError, parseValidationErrors} from '../util/errorUtil';
 import Page from './Page';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
 const CheckPassword = ({loginData, doLogin, resetAuthError, isFetching}: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
-  const [error] = useState();
-  const [password, setPassword] = useState();
-
   const {history} = useReactRouter();
+
+  const passwordInput = useRef<HTMLInputElement>();
+
+  const [error, setError] = useState();
+  const [password, setPassword] = useState();
+  const [validPasswordInput, setValidPasswordInput] = useState(true);
 
   useEffect(() => {
     if (!loginData.phone) {
@@ -51,36 +64,38 @@ const CheckPassword = ({loginData, doLogin, resetAuthError, isFetching}: Props &
   }, []);
 
   const handleLogin = async () => {
-    // setValidationError(validationError);
+    let validationError: Error;
+
+    if (!passwordInput.current.checkValidity()) {
+      validationError = ValidationError.handleValidationState(
+        passwordInput.current.name,
+        passwordInput.current.validity,
+      );
+    }
+    setValidPasswordInput(passwordInput.current.validity.valid);
     try {
-      // if (validationError.length) {
-      //   throw validationError[0];
-      // }
+      if (validationError) {
+        throw validationError;
+      }
       const login: LoginData = {clientType: loginData.clientType, phone: loginData.phone, password};
-
       await doLogin(login);
-
       return history.push(ROUTE.HISTORY_INFO);
     } catch (error) {
-      if ((error as BackendError).label) {
-        const backendError = error as BackendError;
-        switch (backendError.label) {
+      if (error instanceof ValidationError) {
+        setError(error);
+      } else if (error.hasOwnProperty('label')) {
+        switch (error.label) {
           case BackendError.LABEL.TOO_MANY_CLIENTS: {
             resetAuthError();
             history.push(ROUTE.CLIENTS);
             break;
           }
           case BackendError.LABEL.INVALID_CREDENTIALS:
-          case LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE: {
-            break;
-          }
+          case LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE:
+          case BackendError.LABEL.BAD_REQUEST:
           default: {
-            const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
-              backendError.label.endsWith(errorType),
-            );
-            if (!isValidationError) {
-              throw backendError;
-            }
+            setError(error);
+            throw error;
           }
         }
       } else {
@@ -98,14 +113,43 @@ const CheckPassword = ({loginData, doLogin, resetAuthError, isFetching}: Props &
       >
         <div>
           <H1 center>{_(phoneLoginStrings.verifyPasswordHeadline)}</H1>
-          <Input
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => setPassword(event.target.value)}
-            type="password"
-          />
-          <ErrorMessage data-uie-name="error-message">{parseError(error)}</ErrorMessage>
-          <Button block onClick={handleLogin} disabled={isFetching} showLoading={isFetching}>
-            {_(phoneLoginStrings.accountSignIn)}
-          </Button>
+          <Form style={{marginTop: 30}} data-uie-name="login">
+            <InputSubmitCombo>
+              <Input
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => setPassword(event.target.value)}
+                tabIndex={1}
+                type="password"
+                name="password-login"
+                autoComplete="section-login password"
+                placeholder={_(loginStrings.passwordPlaceholder)}
+                pattern={`.{1,1024}`}
+                data-uie-name="enter-password"
+                required
+                autoFocus
+                ref={passwordInput}
+                markInvalid={!validPasswordInput}
+                value={password}
+              />
+              {isFetching ? (
+                <Loading size={32} />
+              ) : (
+                <RoundIconButton
+                  style={{marginLeft: 16}}
+                  tabIndex={2}
+                  type="submit"
+                  formNoValidate
+                  icon={ICON_NAME.ARROW}
+                  onClick={handleLogin}
+                  disabled={isFetching || !password}
+                  showLoading={isFetching}
+                  data-uie-name="do-sign-in"
+                />
+              )}
+            </InputSubmitCombo>
+            <ErrorMessage>
+              {!error ? null : isValidationError(error) ? parseValidationErrors(error) : parseError(error)}
+            </ErrorMessage>
+          </Form>
           {/*
             TODO: forgot password link
           */}
@@ -119,7 +163,6 @@ type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
   isFetching: AuthSelector.isFetching(state),
   loginData: AuthSelector.getLoginData(state),
-  loginError: AuthSelector.getError(state),
 });
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;

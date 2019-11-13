@@ -674,10 +674,6 @@ export const ssoLoginStrings = defineMessages({
 });
 
 export const phoneLoginStrings = defineMessages({
-  accountSignIn: {
-    defaultMessage: 'Log in',
-    id: 'authAccountSignIn',
-  },
   loginHead: {
     defaultMessage: 'Phone Log in',
     id: 'authAccountSignInPhone',
