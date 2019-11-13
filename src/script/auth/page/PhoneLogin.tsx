@@ -38,7 +38,6 @@ import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 import useReactRouter from 'use-react-router';
-import {getLogger} from 'Util/Logger';
 import {loginStrings, phoneLoginStrings} from '../../strings';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import PhoneLoginForm from '../component/PhoneLoginForm';
@@ -50,25 +49,23 @@ import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
 import {isDesktopApp} from '../Runtime';
-import {parseError, parseValidationErrors} from '../util/errorUtil';
+import {isValidationError, parseError, parseValidationErrors} from '../util/errorUtil';
 import Page from './Page';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
 const PhoneLogin = ({
-  loginError,
   pushLoginData,
   doSendPhoneLoginCode,
   isFetching,
   loginData,
 }: Props & ConnectedProps & DispatchProps) => {
-  const logger = getLogger('PhoneLogin');
   const {formatMessage: _} = useIntl();
   const {history} = useReactRouter();
-  const [validationErrors, setValidationErrors] = useState([]);
+
+  const [error, setError] = useState();
 
   const handleSubmit = async (formLoginData: Partial<LoginData>, validationErrors: Error[]) => {
-    setValidationErrors(validationErrors);
     try {
       if (validationErrors.length) {
         throw validationErrors[0];
@@ -77,21 +74,17 @@ const PhoneLogin = ({
       await pushLoginData({phone: formLoginData.phone});
       return history.push(ROUTE.VERIFY_PHONE_CODE);
     } catch (error) {
-      logger.warn('Unable to request login code', error);
-      if ((error as BackendError).label) {
-        const backendError = error as BackendError;
-        switch (backendError.label) {
+      if (error instanceof ValidationError) {
+        setError(error);
+      } else if (error.hasOwnProperty('label')) {
+        switch (error.label) {
           case BackendError.LABEL.PASSWORD_EXISTS: {
             await pushLoginData({phone: formLoginData.phone});
             return history.push(ROUTE.CHECK_PASSWORD);
           }
           default: {
-            const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
-              backendError.label.endsWith(errorType),
-            );
-            if (!isValidationError) {
-              throw backendError;
-            }
+            setError(error);
+            throw error;
           }
         }
       } else {
@@ -127,13 +120,15 @@ const PhoneLogin = ({
                 <H1 center>{_(phoneLoginStrings.loginHead)}</H1>
                 <Form style={{marginTop: 30}} data-uie-name="login">
                   <PhoneLoginForm isFetching={isFetching} onSubmit={handleSubmit} />
-                  {validationErrors.length ? (
-                    parseValidationErrors(validationErrors)
-                  ) : loginError ? (
-                    <ErrorMessage data-uie-name="error-message">{parseError(loginError)}</ErrorMessage>
-                  ) : (
-                    <div style={{marginTop: '4px'}}>&nbsp;</div>
-                  )}
+                  <ErrorMessage data-uie-name="error-message">
+                    {!error ? (
+                      <div style={{marginTop: '4px'}}>&nbsp;</div>
+                    ) : isValidationError(error) ? (
+                      parseValidationErrors(error)
+                    ) : (
+                      parseError(error)
+                    )}
+                  </ErrorMessage>
                   {!isDesktopApp() && (
                     <Checkbox
                       tabIndex={3}
@@ -162,7 +157,6 @@ type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
   isFetching: AuthSelector.isFetching(state),
   loginData: AuthSelector.getLoginData(state),
-  loginError: AuthSelector.getError(state),
 });
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
