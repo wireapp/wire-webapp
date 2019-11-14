@@ -20,6 +20,7 @@
 import ko from 'knockout';
 
 import {ConversationRepository} from '../conversation/ConversationRepository';
+import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 import {SearchRepository} from '../search/SearchRepository';
 import {TeamRepository} from '../team/TeamRepository';
@@ -46,16 +47,39 @@ interface UserListParams {
   noUnderline: boolean;
   arrow: boolean;
   mode: UserlistMode;
+  conversation: ko.Observable<Conversation>;
 }
 
 ko.components.register('user-list', {
   template: `
-    <div class="search-list" data-bind="css: cssClasses(), foreach: {data: filteredUserEntities(), as: 'user', noChildContext: true }">
-      <participant-item
-        params="participant: user, customInfo: infos && infos()[user.id], canSelect: isSelectEnabled, isSelected: isSelected(user), mode: mode, badge: teamRepository.getRoleBadge(user.id), selfInTeam: selfInTeam"
-        data-bind="click: (viewmodel, event) => onUserClick(user, event), css: {'no-underline': noUnderline, 'show-arrow': arrow, 'highlighted': highlightedUserIds.includes(user.id)}">
-      </participant-item>
-    </div>
+    <!-- ko if: showRoles() -->
+      <!-- ko if: adminUsers().length > 0 -->
+        <div class="conversation-details__list-head" data-bind="text: 'Admins'"></div>
+        <div class="search-list" data-bind="css: cssClasses(), foreach: {data: adminUsers(), as: 'user', noChildContext: true }">
+          <participant-item
+            params="participant: user, customInfo: infos && infos()[user.id], canSelect: isSelectEnabled, isSelected: isSelected(user), mode: mode, badge: teamRepository.getRoleBadge(user.id), selfInTeam: selfInTeam"
+            data-bind="click: (viewmodel, event) => onUserClick(user, event), css: {'no-underline': noUnderline, 'show-arrow': arrow, 'highlighted': highlightedUserIds.includes(user.id)}">
+          </participant-item>
+        </div>
+      <!-- /ko -->
+      <!-- ko if: memberUsers().length > 0 -->
+        <div class="conversation-details__list-head" data-bind="text: 'Members'"></div>
+        <div class="search-list" data-bind="css: cssClasses(), foreach: {data: memberUsers(), as: 'user', noChildContext: true }">
+          <participant-item
+            params="participant: user, customInfo: infos && infos()[user.id], canSelect: isSelectEnabled, isSelected: isSelected(user), mode: mode, badge: teamRepository.getRoleBadge(user.id), selfInTeam: selfInTeam"
+            data-bind="click: (viewmodel, event) => onUserClick(user, event), css: {'no-underline': noUnderline, 'show-arrow': arrow, 'highlighted': highlightedUserIds.includes(user.id)}">
+          </participant-item>
+        </div>
+      <!-- /ko -->
+    <!-- /ko -->
+    <!-- ko ifnot: showRoles() -->
+      <div class="search-list" data-bind="css: cssClasses(), foreach: {data: filteredUserEntities(), as: 'user', noChildContext: true }">
+        <participant-item
+          params="participant: user, customInfo: infos && infos()[user.id], canSelect: isSelectEnabled, isSelected: isSelected(user), mode: mode, badge: teamRepository.getRoleBadge(user.id), selfInTeam: selfInTeam"
+          data-bind="click: (viewmodel, event) => onUserClick(user, event), css: {'no-underline': noUnderline, 'show-arrow': arrow, 'highlighted': highlightedUserIds.includes(user.id)}">
+        </participant-item>
+      </div>
+    <!-- /ko -->
 
     <!-- ko if: typeof filter === 'function' -->
       <!-- ko if: userEntities().length === 0 -->
@@ -80,6 +104,7 @@ ko.components.register('user-list', {
     noUnderline = false,
     arrow = false,
     mode = UserlistMode.DEFAULT,
+    conversation,
   }: UserListParams): void {
     this.filter = filter;
     this.mode = mode;
@@ -91,6 +116,7 @@ ko.components.register('user-list', {
     this.noUnderline = noUnderline;
     this.arrow = arrow;
     this.selfInTeam = teamRepository.selfUser().inTeam();
+    this.showRoles = ko.pureComputed(() => !!conversation);
 
     const isCompactMode = mode === UserlistMode.COMPACT;
 
@@ -142,6 +168,33 @@ ko.components.register('user-list', {
         return selectedUsers().includes(userEntity);
       }
       return false;
+    };
+
+    this.memberUsers = ko.observable<User[]>([]);
+    this.adminUsers = ko.observable<User[]>([]);
+
+    const filteredUsersSubscription = ko.computed(() => {
+      if (conversation && conversation()) {
+        const members: User[] = [];
+        const admins: User[] = [];
+        this.filteredUserEntities().forEach((userEntity: User) => {
+          if (userEntity.isService) {
+            return;
+          }
+          if (conversation().creator === userEntity.id) {
+            admins.push(userEntity);
+          } else {
+            members.push(userEntity);
+          }
+        });
+
+        this.memberUsers(members);
+        this.adminUsers(admins);
+      }
+    });
+
+    this.dispose = () => {
+      filteredUsersSubscription.dispose();
     };
   },
 });

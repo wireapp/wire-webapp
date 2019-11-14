@@ -17,11 +17,21 @@
  *
  */
 
-import {BasePanelViewModel} from './BasePanelViewModel';
+import ko from 'knockout';
+
+import {User} from '../../entity/User';
 import {MotionDuration} from '../../motion/MotionDuration';
+import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
 
 export class ConversationParticipantsViewModel extends BasePanelViewModel {
-  constructor(params) {
+  searchRepository: any;
+  teamRepository: any;
+  conversationRepository: any;
+  participants: any;
+  highlightedUsers: any;
+  searchInput: any;
+  MotionDuration: typeof MotionDuration;
+  constructor(params: PanelViewModelProps) {
     super(params);
     this.clickOnShowUser = this.clickOnShowUser.bind(this);
 
@@ -34,7 +44,7 @@ export class ConversationParticipantsViewModel extends BasePanelViewModel {
       if (this.activeConversation()) {
         return this.activeConversation()
           .participating_user_ets()
-          .filter(userEntity => !userEntity.isService);
+          .filter((userEntity: User) => !userEntity.isService);
       }
       return [];
     });
@@ -45,15 +55,15 @@ export class ConversationParticipantsViewModel extends BasePanelViewModel {
     this.MotionDuration = MotionDuration;
   }
 
-  getElementId() {
+  getElementId(): string {
     return 'conversation-participants';
   }
 
-  clickOnShowUser(userEntity) {
+  clickOnShowUser(userEntity: User): void {
     this.navigateTo(z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_USER, {entity: userEntity});
   }
 
-  initView(highlightedUsers = []) {
+  initView(highlightedUsers: User[] = []): void {
     this.searchInput('');
     this.highlightedUsers(highlightedUsers);
   }

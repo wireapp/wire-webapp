@@ -80,7 +80,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
 
         this.activeConversation()
           .participating_user_ets()
-          .map(userEntity => {
+          .forEach(userEntity => {
             if (userEntity.isService) {
               return this.serviceParticipants.push(userEntity);
             }
