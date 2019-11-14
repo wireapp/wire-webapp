@@ -24,14 +24,14 @@ import {ActionCreatorsMapObject, AnyAction, Dispatch, bindActionCreators as bind
 import {ThunkAction as ReduxThunkAction, ThunkDispatch as ReduxThunkDispatch} from 'redux-thunk';
 import {Config} from '../../config';
 import {ActionRoot} from '../action';
-import {AuthState, authReducer} from './authReducer';
-import {ClientState, clientReducer} from './clientReducer';
-import {ConversationState, conversationReducer} from './conversationReducer';
-import {CookieState, cookieReducer} from './cookieReducer';
-import {InvitationState, invitationReducer} from './inviteReducer';
-import {LanguageState, languageReducer} from './languageReducer';
-import {RuntimeState, runtimeReducer} from './runtimeReducer';
-import {SelfState, selfReducer} from './selfReducer';
+import {AuthState, authReducer, initialState as initialAuthState} from './authReducer';
+import {ClientState, clientReducer, initialState as initialClientState} from './clientReducer';
+import {ConversationState, conversationReducer, initialState as initialConversationState} from './conversationReducer';
+import {CookieState, cookieReducer, initialState as initialCookieState} from './cookieReducer';
+import {InvitationState, initialState as initialInvitationState, invitationReducer} from './inviteReducer';
+import {LanguageState, initialState as initialLanguageState, languageReducer} from './languageReducer';
+import {RuntimeState, initialState as initialRuntimeState, runtimeReducer} from './runtimeReducer';
+import {SelfState, initialState as initialSelfState, selfReducer} from './selfReducer';
 
 export type Api = {
   actions: ActionRoot;
@@ -52,6 +52,17 @@ export interface RootState {
   runtimeState: RuntimeState;
   selfState: SelfState;
 }
+
+export const initialRootState: RootState = {
+  authState: initialAuthState,
+  clientState: initialClientState,
+  conversationState: initialConversationState,
+  cookieState: initialCookieState,
+  inviteState: initialInvitationState,
+  languageState: initialLanguageState,
+  runtimeState: initialRuntimeState,
+  selfState: initialSelfState,
+};
 
 export type ThunkAction<T = Promise<void>> = ReduxThunkAction<T, RootState, Api, AnyAction>;
 export type ThunkDispatch = ReduxThunkDispatch<RootState, Api, AnyAction>;

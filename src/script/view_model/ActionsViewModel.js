@@ -114,8 +114,10 @@ export class ActionsViewModel {
   }
 
   deleteClient(clientEntity) {
-    if (this.userRepository.self().isSingleSignOn) {
-      // SSO users can remove their clients without the need of entering a password
+    const isSSO = this.userRepository.self().isSingleSignOn;
+    const isTemporary = clientEntity.isTemporary();
+    if (isSSO || isTemporary) {
+      // Temporary clients and clients of SSO users don't require a password to be removed
       return this.clientRepository.deleteClient(clientEntity.id);
     }
 

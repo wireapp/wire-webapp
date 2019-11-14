@@ -20,11 +20,16 @@
 const observedElements = new Map();
 const tolerance = 0.8;
 const onIntersect = entries => {
-  entries.forEach(({intersectionRatio, isIntersecting, target: element}) => {
+  entries.forEach(({intersectionRatio, intersectionRect, isIntersecting, target: element}) => {
     const {onVisible, onChange, fullyInView, container} = observedElements.get(element) || {};
-
-    const minRatio = container ? Math.min(1, container.clientHeight / element.clientHeight) : 1;
-    const isVisible = isIntersecting && (!fullyInView || intersectionRatio >= minRatio * tolerance);
+    const isFullyInView = () => {
+      if (container) {
+        const minHeight = Math.min(container.clientHeight, element.clientHeight) * tolerance;
+        return intersectionRect.height >= minHeight;
+      }
+      return intersectionRatio >= tolerance;
+    };
+    const isVisible = isIntersecting && (!fullyInView || isFullyInView());
 
     if (onChange) {
       onChange(isVisible);

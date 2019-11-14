@@ -105,7 +105,10 @@ describe('EventRepository', () => {
           window.setTimeout(() => {
             resolve({
               has_more: false,
-              notifications: [{id: createRandomUuid(), payload: []}, {id: latestNotificationId, payload: []}],
+              notifications: [
+                {id: createRandomUuid(), payload: []},
+                {id: latestNotificationId, payload: []},
+              ],
             });
           }, 10);
         });
@@ -138,7 +141,7 @@ describe('EventRepository', () => {
       TestFactory.event_repository.connectWebSocket();
       await TestFactory.event_repository.initializeFromStream();
 
-      expect(TestFactory.notification_service.getLastNotificationIdFromDb);
+      expect(TestFactory.notification_service.getLastNotificationIdFromDb).toBeDefined();
       expect(TestFactory.notification_service.getNotificationsLast).toHaveBeenCalledWith(clientId);
       expect(TestFactory.notification_service.getNotifications).toHaveBeenCalledWith(
         clientId,

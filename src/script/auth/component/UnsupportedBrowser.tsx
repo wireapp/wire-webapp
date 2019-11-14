@@ -19,7 +19,7 @@
 
 import {COLOR, Container, ContainerXS, H1, H2, H3, Loading, Logo, Text} from '@wireapp/react-ui-kit';
 import React from 'react';
-import {FormattedHTMLMessage, FormattedMessage} from 'react-intl';
+import {FormattedHTMLMessage, FormattedMessage, MessageDescriptor} from 'react-intl';
 import {connect} from 'react-redux';
 import {unsupportedJoinStrings, unsupportedStrings} from '../../strings';
 import {Config} from '../config';
@@ -29,8 +29,8 @@ import {isMobileOs} from '../Runtime';
 import WirelessContainer from './WirelessContainer';
 
 interface UnsupportedProps extends React.HTMLProps<HTMLDivElement> {
-  headline: FormattedMessage.MessageDescriptor;
-  subhead: FormattedMessage.MessageDescriptor;
+  headline: MessageDescriptor;
+  subhead: MessageDescriptor;
 }
 
 const UnsupportedMessage: React.SFC<UnsupportedProps> = ({headline, subhead}) => (

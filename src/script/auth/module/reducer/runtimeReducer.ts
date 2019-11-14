@@ -27,7 +27,7 @@ export interface RuntimeState {
   isSupportedBrowser: boolean;
 }
 
-const initialState: RuntimeState = {
+export const initialState: RuntimeState = {
   hasCookieSupport: false,
   hasIndexedDbSupport: false,
   isCheckingCookie: false,
