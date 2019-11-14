@@ -117,7 +117,4 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(ClientList);
+export default connect(mapStateToProps, mapDispatchToProps)(ClientList);

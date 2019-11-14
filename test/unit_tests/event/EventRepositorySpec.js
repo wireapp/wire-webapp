@@ -105,7 +105,10 @@ describe('EventRepository', () => {
           window.setTimeout(() => {
             resolve({
               has_more: false,
-              notifications: [{id: createRandomUuid(), payload: []}, {id: latestNotificationId, payload: []}],
+              notifications: [
+                {id: createRandomUuid(), payload: []},
+                {id: latestNotificationId, payload: []},
+              ],
             });
           }, 10);
         });

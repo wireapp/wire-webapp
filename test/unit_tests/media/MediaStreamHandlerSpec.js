@@ -17,13 +17,14 @@
  *
  */
 
-import {resolve, graph} from '../../api/testResolver';
+import {MediaRepository} from 'src/script/media/MediaRepository';
+import {PermissionRepository} from 'src/script/permission/PermissionRepository';
 
 describe('MediaStreamHandler', () => {
   let streamHandler;
 
   beforeEach(() => {
-    streamHandler = resolve(graph.MediaRepository).streamHandler;
+    streamHandler = new MediaRepository(new PermissionRepository()).streamHandler;
   });
 
   describe('requestMediaStream', () => {

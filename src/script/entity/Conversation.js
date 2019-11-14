@@ -288,7 +288,7 @@ export class Conversation {
     });
 
     this.hasUnread = () => {
-      const lastMessage = [...this.messages()].reverse().find(message => message.isIncoming());
+      const lastMessage = [...this.messages()].reverse().find(message => message.visible() && message.isIncoming());
       return !!lastMessage && lastMessage.timestamp() > this.last_read_timestamp();
     };
 

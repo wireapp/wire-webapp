@@ -57,6 +57,10 @@ import {MessageSender} from 'src/script/message/MessageSender';
 import {UserService} from 'src/script/user/UserService';
 import {BackupService} from 'src/script/backup/BackupService';
 import {StorageService} from 'src/script/storage';
+import {MediaRepository} from 'src/script/media/MediaRepository';
+import {PermissionRepository} from 'src/script/permission/PermissionRepository';
+import {AuthRepository} from 'src/script/auth/AuthRepository';
+import {AuthService} from 'src/script/auth/AuthService';
 
 window.testConfig = {
   connection: backendConfig,
@@ -67,7 +71,7 @@ window.TestFactory = class TestFactory {
    * @returns {Promise<AuthRepository>} The authentication repository.
    */
   async exposeAuthActors() {
-    TestFactory.auth_repository = resolveDependency(graph.AuthRepository);
+    TestFactory.auth_repository = new AuthRepository(new AuthService(resolveDependency(graph.BackendClient)));
     return TestFactory.auth_repository;
   }
 
@@ -215,7 +219,7 @@ window.TestFactory = class TestFactory {
    */
   async exposeUserActors() {
     await this.exposeClientActors();
-    TestFactory.asset_service = resolveDependency(graph.AssetService);
+    TestFactory.asset_service = new AssetService(resolveDependency(graph.BackendClient));
     TestFactory.connection_service = new ConnectionService(resolveDependency(graph.BackendClient));
     TestFactory.user_service = new UserService(resolveDependency(graph.BackendClient), TestFactory.storage_service);
     TestFactory.propertyRepository = TestFactory.propertyRepository = new PropertiesRepository(
@@ -320,7 +324,7 @@ window.TestFactory = class TestFactory {
       resolveDependency(graph.BackendClient),
       TestFactory.conversation_repository,
       TestFactory.event_repository,
-      resolveDependency(graph.MediaRepository).streamHandler,
+      new MediaRepository(new PermissionRepository()).streamHandler,
       serverTimeHandler,
     );
 
@@ -337,7 +341,7 @@ window.TestFactory = class TestFactory {
     TestFactory.notification_repository = new NotificationRepository(
       TestFactory.calling_repository,
       TestFactory.conversation_repository,
-      resolveDependency(graph.PermissionRepository),
+      new PermissionRepository(),
       TestFactory.user_repository,
     );
 

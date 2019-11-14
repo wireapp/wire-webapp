@@ -105,6 +105,13 @@ import {AudioRepository} from '../audio/AudioRepository';
 import {MessageSender} from '../message/MessageSender';
 import {StorageService} from '../storage';
 import {BackupService} from '../backup/BackupService';
+import {MediaRepository} from '../media/MediaRepository';
+import {PermissionRepository} from '../permission/PermissionRepository';
+import {AssetUploader} from '../assets/AssetUploader';
+import {AuthRepository} from '../auth/AuthRepository';
+import {AuthService} from '../auth/AuthService';
+import {GiphyRepository} from '../extension/GiphyRepository';
+import {GiphyService} from '../extension/GiphyService';
 
 class App {
   static get CONFIG() {
@@ -169,15 +176,15 @@ class App {
     const sendingMessageQueue = new MessageSender();
 
     repositories.audio = new AudioRepository();
-    repositories.auth = resolve(graph.AuthRepository);
-    repositories.giphy = resolve(graph.GiphyRepository);
+    repositories.auth = new AuthRepository(new AuthService(resolve(graph.BackendClient)));
+    repositories.giphy = new GiphyRepository(new GiphyService(resolve(graph.BackendClient)));
     repositories.properties = new PropertiesRepository(new PropertiesService(this.backendClient), selfService);
     repositories.serverTime = serverTimeHandler;
     repositories.storage = new StorageRepository(this.service.storage);
 
     repositories.cryptography = new CryptographyRepository(this.backendClient, repositories.storage);
     repositories.client = new ClientRepository(this.backendClient, this.service.storage, repositories.cryptography);
-    repositories.media = resolve(graph.MediaRepository);
+    repositories.media = new MediaRepository(new PermissionRepository());
     repositories.user = new UserRepository(
       new UserService(this.backendClient, this.service.storage),
       this.service.asset,
@@ -213,7 +220,7 @@ class App {
       repositories.team,
       repositories.user,
       repositories.properties,
-      resolve(graph.AssetUploader),
+      new AssetUploader(new AssetService(resolve(graph.BackendClient))),
     );
 
     const serviceMiddleware = new ServiceMiddleware(repositories.conversation, repositories.user);
@@ -257,11 +264,11 @@ class App {
       repositories.conversation,
       repositories.team,
     );
-    repositories.permission = resolve(graph.PermissionRepository);
+    repositories.permission = new PermissionRepository();
     repositories.notification = new NotificationRepository(
       repositories.calling,
       repositories.conversation,
-      resolve(graph.PermissionRepository),
+      repositories.permission,
       repositories.user,
     );
     repositories.preferenceNotification = new PreferenceNotificationRepository(repositories.user.self);
@@ -280,7 +287,7 @@ class App {
       : new EventService(storageService);
 
     return {
-      asset: resolve(graph.AssetService),
+      asset: new AssetService(resolve(graph.BackendClient)),
       conversation: new ConversationService(this.backendClient, eventService, storageService),
       event: eventService,
       integration: new IntegrationService(this.backendClient),

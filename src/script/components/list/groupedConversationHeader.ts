@@ -32,7 +32,7 @@ ko.components.register('grouped-conversation-header', {
       <disclose-icon></disclose-icon>
       <span class="conversation-folder__head__name" data-bind="text: label.name"></span>
       <!-- ko if: badge() -->
-        <span class="conversation-folder__head__badge" data-bind="text: badge" data-uie-name="conversation-folder-badge"></span>
+        <span class="cell-badge-dark conversation-folder__head__badge" data-bind="text: badge" data-uie-name="conversation-folder-badge"></span>
       <!-- /ko -->
     </div>
   `,
@@ -42,10 +42,15 @@ ko.components.register('grouped-conversation-header', {
     this.badge = ko.pureComputed(
       () =>
         conversationLabel.conversations().filter(conversation => {
-          if (conversation.mutedState() === NOTIFICATION_STATE.NOTHING) {
+          const mutedState = conversation.mutedState();
+          if (typeof mutedState === 'boolean') {
+            const isMuted = mutedState === true;
+            return isMuted ? false : conversation.hasUnread();
+          }
+          if (mutedState === NOTIFICATION_STATE.NOTHING) {
             return false;
           }
-          if (conversation.mutedState() === NOTIFICATION_STATE.MENTIONS_AND_REPLIES) {
+          if (mutedState === NOTIFICATION_STATE.MENTIONS_AND_REPLIES) {
             return conversation.hasUnreadTargeted();
           }
           return conversation.hasUnread();

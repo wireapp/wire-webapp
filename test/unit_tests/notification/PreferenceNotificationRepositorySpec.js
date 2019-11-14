@@ -82,7 +82,10 @@ describe('PreferenceNotificationRepository', () => {
   it('stores in local storage any notification added', () => {
     const preferenceNotificationRepository = new PreferenceNotificationRepository(userObservable);
 
-    const notifications = [{data: 1, type: 'preference-changed'}, {data: 2, type: 'device-changed'}];
+    const notifications = [
+      {data: 1, type: 'preference-changed'},
+      {data: 2, type: 'device-changed'},
+    ];
 
     amplify.store.calls.reset();
     notifications.forEach((notification, index) => {
@@ -93,7 +96,10 @@ describe('PreferenceNotificationRepository', () => {
   });
 
   it('restores saved notifications from local storage', () => {
-    const storedNotifications = [{data: 1, type: 'type-1'}, {data: 2, type: 'type-2'}];
+    const storedNotifications = [
+      {data: 1, type: 'type-1'},
+      {data: 2, type: 'type-2'},
+    ];
     amplify.store.and.returnValue(JSON.stringify(storedNotifications));
     const preferenceNotificationRepository = new PreferenceNotificationRepository(userObservable);
 
