@@ -42,11 +42,23 @@ const defaultClient = new APIClient({store: new StoreEngine.MemoryEngine(), urls
 const defaultCore = new Account(defaultClient);
 const defaultLocalStorage = window.localStorage;
 const defaultCookieStore = Cookies;
+const defaultConfig = {
+  FEATURE: {
+    CHECK_CONSENT: true,
+    DEFAULT_LOGIN_TEMPORARY_CLIENT: false,
+    ENABLE_ACCOUNT_REGISTRATION: true,
+    ENABLE_DEBUG: true,
+    ENABLE_PHONE_LOGIN: true,
+    ENABLE_SSO: true,
+    PERSIST_TEMPORARY_CLIENTS: true,
+  },
+};
 
 export const mockStoreFactory = (
   parameters: MockStoreParameters = {
     actions: defaultActions,
     apiClient: defaultClient,
+    config: defaultConfig,
     cookieStore: defaultCookieStore,
     core: defaultCore,
     localStorage: defaultLocalStorage,

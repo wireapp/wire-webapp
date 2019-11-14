@@ -80,9 +80,10 @@ const PhoneLoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
             setCountryCode(codeNumbers);
             setCountry(codeNumbers ? getCountryByCode(codeNumbers) || 'X1' : 'X0');
           }}
+          data-uie-name="enter-country-code"
         />
         <Input
-          name="password-login"
+          name="phone-login"
           tabIndex={3}
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
             setPhoneNumber(event.target.value);
@@ -91,12 +92,12 @@ const PhoneLoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
           ref={phoneInput}
           markInvalid={!validInput}
           value={phoneNumber}
-          autoComplete="section-login password"
+          autoComplete="section-login phone"
           pattern={`.{1,1024}`}
           type="tel"
           required
           placeholder="phone number"
-          data-uie-name="enter-password"
+          data-uie-name="enter-phone"
         />
         {isFetching ? (
           <Loading size={32} />

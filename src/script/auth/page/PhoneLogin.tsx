@@ -32,6 +32,7 @@ import {
   Form,
   H1,
   IsMobile,
+  Link,
 } from '@wireapp/react-ui-kit';
 import React, {useState} from 'react';
 import {useIntl} from 'react-intl';
@@ -41,7 +42,6 @@ import useReactRouter from 'use-react-router';
 import {loginStrings, phoneLoginStrings} from '../../strings';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import PhoneLoginForm from '../component/PhoneLoginForm';
-import RouterLink from '../component/RouterLink';
 import {actionRoot} from '../module/action';
 import {BackendError} from '../module/action/BackendError';
 import {ValidationError} from '../module/action/ValidationError';
@@ -94,9 +94,14 @@ const PhoneLogin = ({
   };
 
   const backArrow = (
-    <RouterLink to={ROUTE.LOGIN} data-uie-name="go-login">
+    <Link
+      onClick={() => {
+        history.push(ROUTE.LOGIN);
+      }}
+      data-uie-name="go-login"
+    >
       <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
-    </RouterLink>
+    </Link>
   );
   return (
     <Page>

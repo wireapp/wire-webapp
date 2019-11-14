@@ -54,7 +54,6 @@ module.exports = {
     fs: 'empty',
     path: 'empty',
   },
-
   optimization: {
     runtimeChunk: 'single',
     splitChunks: {
