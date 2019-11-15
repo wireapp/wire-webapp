@@ -21,7 +21,9 @@ import {AccessTokenData, LoginData} from '@wireapp/api-client/dist/commonjs/auth
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {Logger} from 'logdown';
+
 import {Environment} from 'Util/Environment';
+import {getLogger} from 'Util/Logger';
 import {loadValue, resetStoreValue, storeValue} from 'Util/StorageUtil';
 import {TIME_IN_MILLIS, formatTimestamp} from 'Util/TimeUtil';
 import {WebAppEvents} from '../event/WebApp';
@@ -61,10 +63,10 @@ export class AuthRepository {
     };
   }
 
-  constructor(authService: AuthService, logger: Logger) {
+  constructor(authService: AuthService) {
     this.accessTokenRefresh = undefined;
     this.authService = authService;
-    this.logger = logger;
+    this.logger = getLogger('AuthRepository');
 
     this.queueState = this.authService.backendClient.queueState;
 

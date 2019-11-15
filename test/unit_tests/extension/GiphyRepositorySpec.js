@@ -18,6 +18,8 @@
  */
 
 import {resolve, graph, backendConfig} from './../../api/testResolver';
+import {GiphyRepository} from 'src/script/extension/GiphyRepository';
+import {GiphyService} from 'src/script/extension/GiphyService';
 
 describe('Giphy Repository', () => {
   let server = null;
@@ -29,7 +31,7 @@ describe('Giphy Repository', () => {
   beforeEach(() => {
     server = sinon.fakeServer.create();
 
-    giphyRepository = resolve(graph.GiphyRepository);
+    giphyRepository = new GiphyRepository(new GiphyService(resolve(graph.BackendClient)));
     giphyService = giphyRepository.giphyService;
 
     spyOn(giphyService, 'getRandom').and.callThrough();

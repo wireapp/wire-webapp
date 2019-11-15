@@ -17,14 +17,7 @@
  *
  */
 
-import {AssetService} from '../assets/AssetService';
-import {AssetUploader} from '../assets/AssetUploader';
-import {AuthRepository} from '../auth/AuthRepository';
-import {AuthService} from '../auth/AuthService';
 import {BackendClient} from '../service/BackendClient';
-import {GiphyRepository} from '../extension/GiphyRepository';
-import {GiphyService} from '../extension/GiphyService';
-import {PermissionRepository} from '../permission/PermissionRepository';
 
 /**
  * Dependencies is a Map that will contain all the dependencies of the app
@@ -32,22 +25,6 @@ import {PermissionRepository} from '../permission/PermissionRepository';
  */
 const dependencies = new WeakMap();
 
-dependencies.set(AssetService, {dependencies: [BackendClient], name: 'AssetService'});
-dependencies.set(AssetUploader, {dependencies: [AssetService], name: 'AssetUploader'});
-dependencies.set(AuthRepository, {dependencies: [AuthService], name: 'AuthRepository'});
-dependencies.set(AuthService, {dependencies: [BackendClient], name: 'AuthService'});
 dependencies.set(BackendClient, {dependencies: [], name: 'BackendClient'});
-dependencies.set(GiphyRepository, {dependencies: [GiphyService], name: 'GiphyRepository'});
-dependencies.set(GiphyService, {dependencies: [BackendClient], name: 'GiphyService'});
-dependencies.set(PermissionRepository, {dependencies: [], name: 'PermissionRepository'});
 
-export {
-  dependencies,
-  AssetService,
-  AssetUploader,
-  AuthRepository,
-  BackendClient,
-  GiphyRepository,
-  GiphyService,
-  PermissionRepository,
-};
+export {dependencies, BackendClient};
