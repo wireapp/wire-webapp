@@ -70,8 +70,8 @@ const PhoneLogin = ({
       if (validationErrors.length) {
         throw validationErrors[0];
       }
-      await doSendPhoneLoginCode({phone: formLoginData.phone});
       await pushLoginData({phone: formLoginData.phone});
+      await doSendPhoneLoginCode({phone: formLoginData.phone});
       return history.push(ROUTE.VERIFY_PHONE_CODE);
     } catch (error) {
       if (error instanceof ValidationError) {
@@ -79,7 +79,6 @@ const PhoneLogin = ({
       } else if (error.hasOwnProperty('label')) {
         switch (error.label) {
           case BackendError.LABEL.PASSWORD_EXISTS: {
-            await pushLoginData({phone: formLoginData.phone});
             return history.push(ROUTE.CHECK_PASSWORD);
           }
           default: {
@@ -174,7 +173,4 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(PhoneLogin);
+export default connect(mapStateToProps, mapDispatchToProps)(PhoneLogin);
