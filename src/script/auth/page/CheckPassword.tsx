@@ -148,7 +148,7 @@ const CheckPassword = ({loginData, doLogin, resetAuthError, isFetching}: Props &
               />
             )}
           </InputSubmitCombo>
-          <ErrorMessage>
+          <ErrorMessage data-uie-name="error-message">
             {!error ? null : isValidationError(error) ? parseValidationErrors(error) : parseError(error)}
           </ErrorMessage>
         </Form>
@@ -180,7 +180,4 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(CheckPassword);
+export default connect(mapStateToProps, mapDispatchToProps)(CheckPassword);
