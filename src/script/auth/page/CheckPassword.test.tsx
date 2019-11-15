@@ -103,8 +103,7 @@ describe('"CheckPassword"', () => {
   });
 
   it('handles invalid credentials', async () => {
-    const error: any = new Error();
-    error.label = BackendError.LABEL.INVALID_CREDENTIALS;
+    const error = new BackendError({code: 404, label: BackendError.LABEL.INVALID_CREDENTIALS});
     spyOn(actionRoot.authAction, 'doLogin').and.returnValue(() => Promise.reject(error));
 
     wrapper = mountComponent(
@@ -140,8 +139,7 @@ describe('"CheckPassword"', () => {
     const history = createMemoryHistory();
     const historyPushSpy = spyOn(history, 'push');
 
-    const error: any = new Error();
-    error.label = BackendError.LABEL.TOO_MANY_CLIENTS;
+    const error = new BackendError({code: 404, label: BackendError.LABEL.TOO_MANY_CLIENTS});
     spyOn(actionRoot.authAction, 'doLogin').and.returnValue(() => Promise.reject(error));
 
     wrapper = mountComponent(
