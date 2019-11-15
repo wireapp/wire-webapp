@@ -23,7 +23,7 @@ import ko from 'knockout';
 
 import 'src/script/main/globals';
 
-import {backendConfig, graph, resolve as resolveDependency} from './testResolver';
+import {backendConfig} from './testResolver';
 import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 import {User} from 'src/script/entity/User';
@@ -61,6 +61,7 @@ import {MediaRepository} from 'src/script/media/MediaRepository';
 import {PermissionRepository} from 'src/script/permission/PermissionRepository';
 import {AuthRepository} from 'src/script/auth/AuthRepository';
 import {AuthService} from 'src/script/auth/AuthService';
+import {BackendClient} from 'src/script/service/BackendClient';
 
 window.testConfig = {
   connection: backendConfig,
@@ -71,7 +72,7 @@ window.TestFactory = class TestFactory {
    * @returns {Promise<AuthRepository>} The authentication repository.
    */
   async exposeAuthActors() {
-    TestFactory.auth_repository = new AuthRepository(new AuthService(resolveDependency(graph.BackendClient)));
+    TestFactory.auth_repository = new AuthRepository(new AuthService(new BackendClient()));
     return TestFactory.auth_repository;
   }
 
@@ -112,10 +113,10 @@ window.TestFactory = class TestFactory {
     await this.exposeStorageActors();
     const currentClient = new ClientEntity(true);
     currentClient.id = entities.clients.john_doe.permanent.id;
-    TestFactory.cryptography_service = new CryptographyService(resolveDependency(graph.BackendClient));
+    TestFactory.cryptography_service = new CryptographyService(new BackendClient());
 
     TestFactory.cryptography_repository = new CryptographyRepository(
-      resolveDependency(graph.BackendClient),
+      new BackendClient(),
       TestFactory.storage_repository,
     );
     TestFactory.cryptography_repository.currentClient = ko.observable(currentClient);
@@ -150,7 +151,7 @@ window.TestFactory = class TestFactory {
     user.phone(entities.user.john_doe.phone);
 
     TestFactory.client_repository = new ClientRepository(
-      resolveDependency(graph.BackendClient),
+      new BackendClient(),
       TestFactory.storage_service,
       TestFactory.cryptography_repository,
     );
@@ -185,18 +186,12 @@ window.TestFactory = class TestFactory {
     await this.exposeCryptographyActors();
     await this.exposeUserActors();
 
-    TestFactory.web_socket_service = new WebSocketService(
-      resolveDependency(graph.BackendClient),
-      TestFactory.storage_service,
-    );
+    TestFactory.web_socket_service = new WebSocketService(new BackendClient(), TestFactory.storage_service);
     TestFactory.event_service = new EventService(TestFactory.storage_service);
     TestFactory.event_service_no_compound = new EventServiceNoCompound(TestFactory.storage_service);
-    TestFactory.notification_service = new NotificationService(
-      resolveDependency(graph.BackendClient),
-      TestFactory.storage_service,
-    );
+    TestFactory.notification_service = new NotificationService(new BackendClient(), TestFactory.storage_service);
     TestFactory.conversation_service = new ConversationService(
-      resolveDependency(graph.BackendClient),
+      new BackendClient(),
       TestFactory.event_service,
       TestFactory.storage_service,
     );
@@ -219,18 +214,18 @@ window.TestFactory = class TestFactory {
    */
   async exposeUserActors() {
     await this.exposeClientActors();
-    TestFactory.asset_service = new AssetService(resolveDependency(graph.BackendClient));
-    TestFactory.connection_service = new ConnectionService(resolveDependency(graph.BackendClient));
-    TestFactory.user_service = new UserService(resolveDependency(graph.BackendClient), TestFactory.storage_service);
+    TestFactory.asset_service = new AssetService(new BackendClient());
+    TestFactory.connection_service = new ConnectionService(new BackendClient());
+    TestFactory.user_service = new UserService(new BackendClient(), TestFactory.storage_service);
     TestFactory.propertyRepository = TestFactory.propertyRepository = new PropertiesRepository(
-      new PropertiesService(resolveDependency(graph.BackendClient)),
-      new SelfService(resolveDependency(graph.BackendClient)),
+      new PropertiesService(new BackendClient()),
+      new SelfService(new BackendClient()),
     );
 
     TestFactory.user_repository = new UserRepository(
       TestFactory.user_service,
       TestFactory.asset_service,
-      new SelfService(resolveDependency(graph.BackendClient)),
+      new SelfService(new BackendClient()),
       TestFactory.client_repository,
       serverTimeHandler,
       TestFactory.propertyRepository,
@@ -245,12 +240,9 @@ window.TestFactory = class TestFactory {
    */
   async exposeConnectionActors() {
     await this.exposeUserActors();
-    TestFactory.connection_service = new ConnectionService(resolveDependency(graph.BackendClient));
+    TestFactory.connection_service = new ConnectionService(new BackendClient());
 
-    TestFactory.connection_repository = new ConnectionRepository(
-      resolveDependency(graph.BackendClient),
-      TestFactory.user_repository,
-    );
+    TestFactory.connection_repository = new ConnectionRepository(new BackendClient(), TestFactory.user_repository);
 
     return TestFactory.connection_repository;
   }
@@ -260,20 +252,14 @@ window.TestFactory = class TestFactory {
    */
   async exposeSearchActors() {
     await this.exposeUserActors();
-    TestFactory.search_repository = new SearchRepository(
-      resolveDependency(graph.BackendClient),
-      TestFactory.user_repository,
-    );
+    TestFactory.search_repository = new SearchRepository(new BackendClient(), TestFactory.user_repository);
 
     return TestFactory.search_repository;
   }
 
   async exposeTeamActors() {
     await this.exposeUserActors();
-    TestFactory.team_repository = new TeamRepository(
-      resolveDependency(graph.BackendClient),
-      TestFactory.user_repository,
-    );
+    TestFactory.team_repository = new TeamRepository(new BackendClient(), TestFactory.user_repository);
     return TestFactory.team_repository;
   }
 
@@ -286,14 +272,14 @@ window.TestFactory = class TestFactory {
     await this.exposeEventActors();
 
     TestFactory.conversation_service = new ConversationService(
-      resolveDependency(graph.BackendClient),
+      new BackendClient(),
       TestFactory.event_service,
       TestFactory.storage_service,
     );
 
     const propertiesRepository = new PropertiesRepository(
-      new PropertiesService(resolveDependency(graph.BackendClient)),
-      new SelfService(resolveDependency(graph.BackendClient)),
+      new PropertiesService(new BackendClient()),
+      new SelfService(new BackendClient()),
     );
 
     TestFactory.conversation_repository = new ConversationRepository(
@@ -304,7 +290,7 @@ window.TestFactory = class TestFactory {
       TestFactory.cryptography_repository,
       TestFactory.event_repository,
       undefined,
-      new LinkPreviewRepository(new AssetService(resolveDependency(graph.BackendClient)), propertiesRepository),
+      new LinkPreviewRepository(new AssetService(new BackendClient()), propertiesRepository),
       new MessageSender(),
       serverTimeHandler,
       TestFactory.team_repository,
@@ -321,7 +307,7 @@ window.TestFactory = class TestFactory {
   async exposeCallingActors() {
     await this.exposeConversationActors();
     TestFactory.calling_repository = new CallingRepository(
-      resolveDependency(graph.BackendClient),
+      new BackendClient(),
       TestFactory.conversation_repository,
       TestFactory.event_repository,
       new MediaRepository(new PermissionRepository()).streamHandler,

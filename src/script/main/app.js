@@ -82,7 +82,6 @@ import {ReceiptsMiddleware} from '../event/preprocessor/ReceiptsMiddleware';
 
 import {getWebsiteUrl} from '../externalRoute';
 
-import {resolve, graph} from '../config/appResolver';
 import {modals} from '../view_model/ModalsViewModel';
 import {showInitialModal} from '../user/AvailabilityModal';
 import {WebAppEvents} from '../event/WebApp';
@@ -176,8 +175,8 @@ class App {
     const sendingMessageQueue = new MessageSender();
 
     repositories.audio = new AudioRepository();
-    repositories.auth = new AuthRepository(new AuthService(resolve(graph.BackendClient)));
-    repositories.giphy = new GiphyRepository(new GiphyService(resolve(graph.BackendClient)));
+    repositories.auth = new AuthRepository(new AuthService(new BackendClient()));
+    repositories.giphy = new GiphyRepository(new GiphyService(new BackendClient()));
     repositories.properties = new PropertiesRepository(new PropertiesService(this.backendClient), selfService);
     repositories.serverTime = serverTimeHandler;
     repositories.storage = new StorageRepository(this.service.storage);
@@ -202,8 +201,8 @@ class App {
       serverTimeHandler,
       repositories.user,
     );
-    repositories.search = new SearchRepository(resolve(graph.BackendClient), repositories.user);
-    repositories.team = new TeamRepository(resolve(graph.BackendClient), repositories.user);
+    repositories.search = new SearchRepository(new BackendClient(), repositories.user);
+    repositories.team = new TeamRepository(new BackendClient(), repositories.user);
     repositories.eventTracker = new EventTrackingRepository(repositories.team, repositories.user);
 
     repositories.conversation = new ConversationRepository(
@@ -214,13 +213,13 @@ class App {
       repositories.cryptography,
       repositories.event,
       repositories.giphy,
-      new LinkPreviewRepository(new AssetService(resolve(graph.BackendClient)), repositories.properties),
+      new LinkPreviewRepository(new AssetService(new BackendClient()), repositories.properties),
       sendingMessageQueue,
       serverTimeHandler,
       repositories.team,
       repositories.user,
       repositories.properties,
-      new AssetUploader(new AssetService(resolve(graph.BackendClient))),
+      new AssetUploader(new AssetService(new BackendClient())),
     );
 
     const serviceMiddleware = new ServiceMiddleware(repositories.conversation, repositories.user);
@@ -245,7 +244,7 @@ class App {
       repositories.user,
     );
     repositories.broadcast = new BroadcastRepository(
-      new BroadcastService(resolve(graph.BackendClient)),
+      new BroadcastService(new BackendClient()),
       repositories.client,
       repositories.conversation,
       repositories.cryptography,
@@ -253,7 +252,7 @@ class App {
       repositories.user,
     );
     repositories.calling = new CallingRepository(
-      resolve(graph.BackendClient),
+      new BackendClient(),
       repositories.conversation,
       repositories.event,
       repositories.media.streamHandler,
@@ -287,7 +286,7 @@ class App {
       : new EventService(storageService);
 
     return {
-      asset: new AssetService(resolve(graph.BackendClient)),
+      asset: new AssetService(new BackendClient()),
       conversation: new ConversationService(this.backendClient, eventService, storageService),
       event: eventService,
       integration: new IntegrationService(this.backendClient),
@@ -920,7 +919,7 @@ $(() => {
   enableLogging(Config.FEATURE.ENABLE_DEBUG);
   const appContainer = document.getElementById('wire-main');
   if (appContainer) {
-    const backendClient = resolve(graph.BackendClient);
+    const backendClient = new BackendClient();
     backendClient.setSettings({
       restUrl: Config.BACKEND_REST,
       webSocketUrl: Config.BACKEND_WS,

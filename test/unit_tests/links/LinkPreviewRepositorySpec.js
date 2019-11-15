@@ -18,17 +18,17 @@
  */
 
 import {AssetService} from 'src/script/assets/AssetService';
-import {graph, resolve as resolveDependency} from '../../api/testResolver';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {PropertiesService} from 'src/script/properties/PropertiesService';
 import {SelfService} from 'src/script/self/SelfService';
 import {LinkPreviewRepository} from 'src/script/links/LinkPreviewRepository';
+import {BackendClient} from 'src/script/service/BackendClient';
 
 describe('LinkPreviewRepository', () => {
   let link_preview_repository = null;
 
   beforeEach(() => {
-    const backendClient = resolveDependency(graph.BackendClient);
+    const backendClient = new BackendClient();
     const propertiesRepository = new PropertiesRepository(
       new PropertiesService(backendClient),
       new SelfService(backendClient),

@@ -26,6 +26,7 @@ import {QUEUE_STATE} from '../service/QueueState';
 import {WebAppEvents} from '../event/WebApp';
 
 import {BackendClientError} from '../error/BackendClientError';
+import {getLogger} from 'Util/Logger';
 
 export class BackendClient {
   static get CONFIG() {
@@ -79,8 +80,8 @@ export class BackendClient {
    * Construct a new client.
    * @param {Logger} logger - app logger
    */
-  constructor(logger) {
-    this.logger = logger;
+  constructor() {
+    this.logger = getLogger('BackendClient');
 
     this.connectivityTimeout = undefined;
     this.connectivityQueue = new PromiseQueue({name: 'BackendClient.Connectivity'});

@@ -58,8 +58,6 @@ import {NotificationService} from '../event/NotificationService';
 import {WebSocketService} from '../event/WebSocketService';
 import {MotionDuration} from '../motion/MotionDuration';
 
-import {resolve as resolveDependency, graph} from '../config/appResolver';
-
 import {Modal} from '../ui/Modal';
 import {ClientRepository} from '../client/ClientRepository';
 import {ClientType} from '../client/ClientType';
@@ -72,6 +70,7 @@ import {UserService} from '../user/UserService';
 import {AudioRepository} from '../audio/AudioRepository';
 import {AuthRepository} from '../auth/AuthRepository';
 import {AuthService} from '../auth/AuthService';
+import {BackendClient} from '../service/BackendClient';
 
 class AuthViewModel {
   static get CONFIG() {
@@ -90,7 +89,7 @@ class AuthViewModel {
 
     this.logger = getLogger('z.viewModel.AuthViewModel');
 
-    this.authRepository = new AuthRepository(new AuthService(resolveDependency(graph.BackendClient)));
+    this.authRepository = new AuthRepository(new AuthService(new BackendClient()));
     this.audio_repository = new AudioRepository();
 
     // Cryptography

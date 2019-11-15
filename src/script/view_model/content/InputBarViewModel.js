@@ -30,7 +30,6 @@ import {KEY, isFunctionKey, insertAtCaret} from 'Util/KeyboardUtil';
 import {escapeString} from 'Util/SanitizationUtil';
 import {trimEnd, trimStart} from 'Util/StringUtil';
 
-import {resolve, graph} from '../../config/appResolver';
 import {ModalsViewModel} from '../ModalsViewModel';
 import {ParticipantAvatar} from 'Components/participantAvatar';
 
@@ -46,6 +45,7 @@ import {ShortcutType} from '../../ui/ShortcutType';
 import {Config} from '../../auth/config';
 import {AssetUploader} from '../../assets/AssetUploader';
 import {AssetService} from '../../assets/AssetService';
+import {BackendClient} from '../../service/BackendClient';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -79,7 +79,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.onWindowClick = this.onWindowClick.bind(this);
     this.setElements = this.setElements.bind(this);
     this.updateSelectionState = this.updateSelectionState.bind(this);
-    this.assetUploader = new AssetUploader(new AssetService(resolve(graph.BackendClient)));
+    this.assetUploader = new AssetUploader(new AssetService(new BackendClient()));
 
     this.shadowInput = null;
     this.textarea = null;

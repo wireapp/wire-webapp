@@ -17,15 +17,15 @@
  *
  */
 
-import {resolve, graph} from './../../api/testResolver';
 import {WebAppEvents} from 'src/script/event/WebApp';
+import {BackendClient} from 'src/script/service/BackendClient';
 
 describe('BackendClient', () => {
   let backend_client = null;
   let server = null;
 
   beforeEach(() => {
-    backend_client = resolve(graph.BackendClient);
+    backend_client = new BackendClient();
   });
 
   afterEach(() => {

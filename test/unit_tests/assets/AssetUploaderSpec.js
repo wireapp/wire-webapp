@@ -19,16 +19,16 @@
 
 import UUID from 'uuidjs';
 
-import {resolve as resolveDependency, graph} from './../../api/testResolver';
 import {AssetUploader} from 'src/script/assets/AssetUploader';
 import {AssetService} from 'src/script/assets/AssetService';
+import {BackendClient} from 'src/script/service/BackendClient';
 
 const messageId = UUID.genV4().hexString;
 const file = new Blob();
 const options = {};
 
 describe('AssetsUploader', () => {
-  const assetUploader = new AssetUploader(new AssetService(resolveDependency(graph.BackendClient)));
+  const assetUploader = new AssetUploader(new AssetService(new BackendClient()));
   it('starts uploading when given an asset message', () => {
     spyOn(assetUploader.assetService, 'uploadAsset').and.returnValue(Promise.resolve());
     assetUploader.uploadAsset(messageId, file, options);
