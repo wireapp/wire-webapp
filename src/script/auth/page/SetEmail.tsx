@@ -48,6 +48,7 @@ const SetEmail = ({hasSelfEmail, isSelfSSOUser, doSetEmail, isFetching}: Props &
     let validationError: Error;
 
     const currentInputNode = emailInput.current;
+    currentInputNode.value = currentInputNode.value.trim();
     currentInputNode.focus();
     if (!currentInputNode.checkValidity()) {
       validationError = ValidationError.handleValidationState(currentInputNode.name, currentInputNode.validity);
@@ -57,7 +58,7 @@ const SetEmail = ({hasSelfEmail, isSelfSSOUser, doSetEmail, isFetching}: Props &
       if (validationError) {
         throw validationError;
       }
-      await doSetEmail(email);
+      await doSetEmail(currentInputNode.value);
       history.push(ROUTE.VERIFY_EMAIL_LINK);
     } catch (error) {
       setError(error);
@@ -131,7 +132,4 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(SetEmail);
+export default connect(mapStateToProps, mapDispatchToProps)(SetEmail);

@@ -19,6 +19,7 @@
 
 import {ReactWrapper} from 'enzyme';
 import React from 'react';
+import {actionRoot} from '../module/action';
 import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
@@ -87,5 +88,30 @@ describe('"SetEmail"', () => {
     expect(errorMessage().text())
       .withContext('Shows invalid email error')
       .toEqual('Please enter a valid email address');
+  });
+
+  fit('trims email', () => {
+    spyOn(actionRoot.selfAction, 'doSetEmail').and.returnValue(() => Promise.resolve());
+
+    const email = 'e@e.com';
+
+    wrapper = mountComponent(
+      <SetEmail />,
+      mockStoreFactory()({
+        ...initialRootState,
+        runtimeState: {
+          hasCookieSupport: true,
+          hasIndexedDbSupport: true,
+          isSupportedBrowser: true,
+        },
+      }),
+    );
+
+    emailInput().simulate('change', {target: {value: ` ${email} `}});
+    verifyEmailButton().simulate('submit');
+
+    expect(actionRoot.selfAction.doSetEmail)
+      .withContext('action was called')
+      .toHaveBeenCalledWith(email);
   });
 });

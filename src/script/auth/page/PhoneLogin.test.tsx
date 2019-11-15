@@ -166,10 +166,10 @@ describe('"PhoneLogin"', () => {
 
     await waitForExpect(() => {
       expect(actionRoot.authAction.doSendPhoneLoginCode)
-        .withContext('action for sending login code was called')
+        .withContext('action was called')
         .toHaveBeenCalled();
       expect(historyPushSpy)
-        .withContext('Navigation to verify phone code page was triggered')
+        .withContext('navigation to verify phone code page was triggered')
         .toHaveBeenCalledWith(ROUTE.CHECK_PASSWORD as any);
     });
   });
