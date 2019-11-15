@@ -3,6 +3,8 @@ branch-defaults:
     environment: wire-webapp-dev
   master:
     environment: wire-webapp-master
+  feat/phone-login:
+    environment: wire-webapp-qa
 deploy:
   artifact: server/dist/s3/ebs.zip
 global:
