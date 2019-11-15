@@ -20,6 +20,9 @@
 import {ReactWrapper} from 'enzyme';
 import {createMemoryHistory} from 'history';
 import React from 'react';
+import waitForExpect from 'wait-for-expect';
+import {actionRoot} from '../module/action';
+import {BackendError} from '../module/action/BackendError';
 import {initialRootState} from '../module/reducer';
 import {ROUTE} from '../route';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
@@ -47,17 +50,27 @@ describe('"PhoneLogin"', () => {
       }),
     );
 
-    expect(phoneInput().exists()).toBe(true);
-    expect(countryCodeInput().exists()).toBe(true);
-    expect(loginButton().exists()).toBe(true);
+    expect(phoneInput().exists())
+      .withContext('phone number input is present')
+      .toBe(true);
+    expect(countryCodeInput().exists())
+      .withContext('country code input is present')
+      .toBe(true);
+    expect(loginButton().exists())
+      .withContext('login button is present')
+      .toBe(true);
 
-    expect(loginButton().props().disabled).toBe(true);
+    expect(loginButton().props().disabled)
+      .withContext('login button is disabled')
+      .toBe(true);
     phoneInput().simulate('change', {target: {value: '1'}});
 
-    expect(loginButton().props().disabled).toBe(false);
+    expect(loginButton().props().disabled)
+      .withContext('login button is not disabled')
+      .toBe(false);
   });
 
-  it('has an option to navigate back', () => {
+  it('has an option to navigate back', async () => {
     const history = createMemoryHistory();
     const historyPushSpy = spyOn(history, 'push');
     wrapper = mountComponent(
@@ -73,8 +86,91 @@ describe('"PhoneLogin"', () => {
       history,
     );
 
-    expect(backButton().exists()).toBe(true);
+    expect(backButton().exists())
+      .withContext('back button is present')
+      .toBe(true);
     backButton().simulate('click');
-    expect(historyPushSpy).toHaveBeenCalledWith(ROUTE.LOGIN as any);
+
+    await waitForExpect(() => {
+      expect(historyPushSpy)
+        .withContext('Navigation to email login was triggered')
+        .toHaveBeenCalledWith(ROUTE.LOGIN as any);
+    });
+  });
+
+  it('navigates to verify phone code page if no password is set', async () => {
+    const history = createMemoryHistory();
+    const historyPushSpy = spyOn(history, 'push');
+
+    spyOn(actionRoot.authAction, 'doSendPhoneLoginCode').and.returnValue(() => Promise.resolve());
+
+    wrapper = mountComponent(
+      <PhoneLogin />,
+      mockStoreFactory()({
+        ...initialRootState,
+        runtimeState: {
+          hasCookieSupport: true,
+          hasIndexedDbSupport: true,
+          isSupportedBrowser: true,
+        },
+      }),
+      history,
+    );
+
+    countryCodeInput().simulate('change', {target: {value: '+0'}});
+    phoneInput().simulate('change', {target: {value: '1111111'}});
+
+    expect(loginButton().props().disabled)
+      .withContext('login button is not disabled')
+      .toBe(false);
+    loginButton().simulate('click');
+
+    await waitForExpect(() => {
+      expect(actionRoot.authAction.doSendPhoneLoginCode)
+        .withContext('action for sending login code was called')
+        .toHaveBeenCalled();
+      expect(historyPushSpy)
+        .withContext('Navigation to verify phone code page was triggered')
+        .toHaveBeenCalledWith(ROUTE.VERIFY_PHONE_CODE as any);
+    });
+  });
+
+  it('navigates to check password page if password is set', async () => {
+    const history = createMemoryHistory();
+    const historyPushSpy = spyOn(history, 'push');
+
+    const error: any = new Error('test error') as any;
+    error['label'] = BackendError.LABEL.PASSWORD_EXISTS;
+    spyOn(actionRoot.authAction, 'doSendPhoneLoginCode').and.returnValue(() => Promise.reject(error));
+
+    wrapper = mountComponent(
+      <PhoneLogin />,
+      mockStoreFactory()({
+        ...initialRootState,
+        runtimeState: {
+          hasCookieSupport: true,
+          hasIndexedDbSupport: true,
+          isSupportedBrowser: true,
+        },
+      }),
+      history,
+    );
+
+    countryCodeInput().simulate('change', {target: {value: '+0'}});
+    phoneInput().simulate('change', {target: {value: '1111111'}});
+
+    expect(loginButton().props().disabled)
+      .withContext('login button is not disabled')
+      .toBe(false);
+    loginButton().simulate('click');
+
+    await waitForExpect(() => {
+      expect(actionRoot.authAction.doSendPhoneLoginCode)
+        .withContext('action for sending login code was called')
+        .toHaveBeenCalled();
+      expect(historyPushSpy)
+        .withContext('Navigation to verify phone code page was triggered')
+        .toHaveBeenCalledWith(ROUTE.CHECK_PASSWORD as any);
+    });
   });
 });

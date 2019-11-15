@@ -65,7 +65,9 @@ export const mockStoreFactory = (
   },
 ) => {
   const {actions, apiClient, cookieStore, core, localStorage} = parameters;
-  (core as any).apiClient = apiClient;
+  if (core) {
+    (core as any).apiClient = apiClient;
+  }
   return configureStore<TypeUtil.RecursivePartial<RootState>, ThunkDispatch>([
     thunk.withExtraArgument({actions, apiClient, cookieStore, core, localStorage}),
     createLogger({

@@ -160,6 +160,7 @@
     "tslint-react": "4.1.0",
     "tslint-react-hooks": "2.2.1",
     "typescript": "3.6.4",
+    "wait-for-expect": "3.0.1",
     "webpack": "4.41.2",
     "webpack-cli": "3.3.10",
     "webpack-dev-middleware": "3.7.2",
