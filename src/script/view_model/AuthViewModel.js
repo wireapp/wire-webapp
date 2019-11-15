@@ -70,6 +70,8 @@ import {FORWARDED_QUERY_KEYS} from '../auth/route';
 import {SelfService} from '../self/SelfService';
 import {UserService} from '../user/UserService';
 import {AudioRepository} from '../audio/AudioRepository';
+import {AuthRepository} from '../auth/AuthRepository';
+import {AuthService} from '../auth/AuthService';
 
 class AuthViewModel {
   static get CONFIG() {
@@ -89,7 +91,7 @@ class AuthViewModel {
 
     this.logger = getLogger('z.viewModel.AuthViewModel');
 
-    this.authRepository = resolveDependency(graph.AuthRepository);
+    this.authRepository = new AuthRepository(new AuthService(resolveDependency(graph.BackendClient)));
     this.audio_repository = new AudioRepository();
 
     // Cryptography

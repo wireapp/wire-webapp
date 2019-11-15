@@ -17,7 +17,7 @@
  *
  */
 
-import {Logger} from '../util/Logger';
+import {Logger, getLogger} from '../util/Logger';
 import {GiphyService, GiphySorting} from './GiphyService';
 
 export interface Gif {
@@ -63,9 +63,9 @@ export class GiphyRepository {
   /**
    * @param giphyService Giphy REST API implementation
    */
-  constructor(giphyService: GiphyService, logger: Logger) {
+  constructor(giphyService: GiphyService) {
     this.giphyService = giphyService;
-    this.logger = logger;
+    this.logger = getLogger('GiphyRepository');
     this.gifQueryCache = {};
   }
 

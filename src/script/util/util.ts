@@ -18,7 +18,7 @@
  */
 
 import {Decoder, Encoder} from 'bazinga64';
-import CryptoJS from 'crypto-js';
+import JsMD5 from 'js-md5';
 import {ObservableArray} from 'knockout';
 import {formatE164} from 'phoneformat.js';
 import UUID from 'uuidjs';
@@ -189,23 +189,23 @@ export const getContentTypeFromDataUrl = (dataUrl: string): string => {
 export const stripDataUri = (string: string): string => string.replace(/^data:.*,/, '');
 
 /**
- * Convert base64 string to UInt8Array.
+ * Convert a base64 string to an Uint8Array.
  * @note Function will remove "data-uri" attribute if present.
  */
 export const base64ToArray = (base64: string): Uint8Array => Decoder.fromBase64(stripDataUri(base64)).asBytes;
 
 /**
- * Convert ArrayBuffer or UInt8Array to base64 string
+ * Convert an ArrayBuffer or an Uint8Array to a base64 string
  */
 export const arrayToBase64 = (array: ArrayBuffer | Uint8Array): string =>
   Encoder.toBase64(new Uint8Array(array)).asString;
 
 /**
- * Returns base64 encoded md5 of the the given array.
+ * Returns a base64 encoded MD5 hash of the the given array.
  */
 export const arrayToMd5Base64 = (array: Uint8Array): string => {
-  const wordArray = CryptoJS.lib.WordArray.create(array);
-  return CryptoJS.MD5(wordArray).toString(CryptoJS.enc.Base64);
+  const md5Hash = JsMD5.arrayBuffer(array);
+  return Encoder.toBase64(md5Hash).asString;
 };
 
 /**
@@ -258,9 +258,6 @@ export const phoneNumberToE164 = (phoneNumber: string, countryCode: string): str
 };
 
 export const createRandomUuid = (): string => UUID.genV4().hexString;
-
-export const encodeSha256Base64 = (text: string | CryptoJS.LibWordArray): string =>
-  CryptoJS.SHA256(text).toString(CryptoJS.enc.Base64);
 
 // Note IE10 listens to "transitionend" instead of "animationend"
 export const alias = {

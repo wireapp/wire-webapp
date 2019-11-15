@@ -23,7 +23,6 @@ import {
   createRandomUuid,
   arrayToMd5Base64,
   arrayToBase64,
-  encodeSha256Base64,
   base64ToBlob,
   formatBytes,
   getFileExtension,
@@ -43,24 +42,8 @@ import {
 import {Conversation} from 'src/script/entity/Conversation';
 
 describe('arrayToMd5Base64', () => {
-  it('can convert typed array to base64', () => {
+  it('converts a typed array to base64', () => {
     expect(arrayToMd5Base64(new Uint8Array([8, 8]))).toBe('w+7NCDwPSCf1JgWbA7deTA==');
-  });
-});
-
-describe('encodeSha256Base64', () => {
-  it('encodes Base64 and SHA-256 empty string', () => {
-    expect(encodeSha256Base64('')).toBe('47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=');
-  });
-
-  it('encodes Base64 and SHA-256 text', () => {
-    expect(encodeSha256Base64('Hello, world!')).toBe('MV9b23bQeMQ7isAGTkoBZGErH853yGk0W/yUx1iU7dM=');
-  });
-
-  it('encodes Base64 and SHA-256 symbols', () => {
-    expect(encodeSha256Base64('Hello, world!@#$%^&*()_+{}[]|<>,.?/~`"')).toBe(
-      'lt/heVPfGQB07sONclI2TZBZHuIMH86noUEWEbahMw4=',
-    );
   });
 });
 

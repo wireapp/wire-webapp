@@ -76,7 +76,4 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(AppAlreadyOpen);
+export default connect(mapStateToProps, mapDispatchToProps)(AppAlreadyOpen);

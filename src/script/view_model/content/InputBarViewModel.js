@@ -44,6 +44,8 @@ import {MentionEntity} from '../../message/MentionEntity';
 import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
 import {Config} from '../../auth/config';
+import {AssetUploader} from '../../assets/AssetUploader';
+import {AssetService} from '../../assets/AssetService';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -77,7 +79,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.onWindowClick = this.onWindowClick.bind(this);
     this.setElements = this.setElements.bind(this);
     this.updateSelectionState = this.updateSelectionState.bind(this);
-    this.assetUploader = resolve(graph.AssetUploader);
+    this.assetUploader = new AssetUploader(new AssetService(resolve(graph.BackendClient)));
 
     this.shadowInput = null;
     this.textarea = null;
