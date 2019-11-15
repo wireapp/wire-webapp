@@ -90,7 +90,7 @@ describe('"SetEmail"', () => {
       .toEqual('Please enter a valid email address');
   });
 
-  fit('trims email', () => {
+  it('trims the email', () => {
     spyOn(actionRoot.selfAction, 'doSetEmail').and.returnValue(() => Promise.resolve());
 
     const email = 'e@e.com';

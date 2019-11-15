@@ -20,6 +20,7 @@
 import {ReactWrapper} from 'enzyme';
 import React from 'react';
 import {Config as ReadOnlyConfig} from '../config';
+import {actionRoot} from '../module/action';
 import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
@@ -66,5 +67,30 @@ describe('"SetHandle"', () => {
     expect(setHandleButton().props().disabled)
       .withContext('Submit button should be enabled')
       .toBe(false);
+  });
+
+  it('trims the handle', () => {
+    spyOn(actionRoot.selfAction, 'setHandle').and.returnValue(() => Promise.resolve());
+
+    const handle = 'handle';
+
+    wrapper = mountComponent(
+      <SetHandle />,
+      mockStoreFactory()({
+        ...initialRootState,
+        runtimeState: {
+          hasCookieSupport: true,
+          hasIndexedDbSupport: true,
+          isSupportedBrowser: true,
+        },
+      }),
+    );
+
+    handleInput().simulate('change', {target: {value: ` ${handle} `}});
+    setHandleButton().simulate('submit');
+
+    expect(actionRoot.selfAction.setHandle)
+      .withContext('action was called')
+      .toHaveBeenCalledWith(handle);
   });
 });

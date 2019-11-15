@@ -87,7 +87,7 @@ const SetHandle = ({
   const onSetHandle = async (event: React.FormEvent): Promise<void> => {
     event.preventDefault();
     try {
-      await doSetHandle(handle);
+      await doSetHandle(handle.trim());
     } catch (error) {
       if (error.label === BackendError.HANDLE_ERRORS.INVALID_HANDLE && handle.trim().length < 2) {
         error.label = BackendError.HANDLE_ERRORS.HANDLE_TOO_SHORT;
@@ -159,7 +159,4 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(SetHandle);
+export default connect(mapStateToProps, mapDispatchToProps)(SetHandle);
