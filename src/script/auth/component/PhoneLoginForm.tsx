@@ -104,7 +104,7 @@ const PhoneLoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
         ) : (
           <RoundIconButton
             style={{marginLeft: 16}}
-            tabIndex={4}
+            tabIndex={5}
             disabled={!phoneNumber}
             type="submit"
             formNoValidate

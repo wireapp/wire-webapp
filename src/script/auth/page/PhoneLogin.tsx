@@ -135,7 +135,7 @@ const PhoneLogin = ({
                   </ErrorMessage>
                   {!isDesktopApp() && (
                     <Checkbox
-                      tabIndex={3}
+                      tabIndex={4}
                       onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         pushLoginData({clientType: event.target.checked ? ClientType.TEMPORARY : ClientType.PERMANENT});
                       }}
