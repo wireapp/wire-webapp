@@ -11373,10 +11373,10 @@ simple-swizzle@^0.2.2:
   dependencies:
     is-arrayish "^0.3.1"
 
-simplebar@5.0.6:
-  version "5.0.6"
-  resolved "https://registry.yarnpkg.com/simplebar/-/simplebar-5.0.6.tgz#2392bc27211bb3d4f9077e521d3c00d6311fbc69"
-  integrity sha512-PAbvrH/eKon7NUTpD0ZxH+xnEeVGPaaQINJFWxJzTj6TtaN7KG80+US2HEU/xgaxaBGotqb1SmDhczaR5YuxYw==
+simplebar@5.0.7:
+  version "5.0.7"
+  resolved "https://registry.yarnpkg.com/simplebar/-/simplebar-5.0.7.tgz#9c35a944a7abff1a3c4b6bc5dfb53997dc9b14ed"
+  integrity sha512-Bp/s94+3hHBXkhi8VBkuXiNHePMGLDVjMwUEJckC3uIBwLUmJbYnT6jqoETal46l+zXbEklffLRr/TtsQwjw0A==
   dependencies:
     can-use-dom "^0.1.0"
     core-js "^3.0.1"
