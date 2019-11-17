@@ -1213,10 +1213,10 @@ function.name@^1.0.3:
   dependencies:
     noop6 "^1.0.1"
 
-geolite2@1.3.0:
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/geolite2/-/geolite2-1.3.0.tgz#47094a5e1278d592fd1b41693d223d83c9dfe4c1"
-  integrity sha512-/m+vdLjYEZ3ScekuGNDdO/HaJi32vZ/hKh20HgEoeV5z1DzlT18FF39Mfin1wTlF4EtYyNgcUg5kaBaMCfwAhQ==
+geolite2@2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/geolite2/-/geolite2-2.0.0.tgz#b6f634913bf6bf96f5f35be9d153a26098d901be"
+  integrity sha512-vzq623dPf4LcSkx+ORMfqWUWYwUYFouGPTtJCOKWehqV8zTFeA+/706tGcJHBhJrayzjLxaUPnuYIkse4e/wdQ==
 
 get-caller-file@^2.0.1:
   version "2.0.5"
