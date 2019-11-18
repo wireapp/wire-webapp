@@ -300,10 +300,10 @@
     "@types/express-serve-static-core" "*"
     "@types/mime" "*"
 
-"@wireapp/commons@2.2.22":
-  version "2.2.22"
-  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-2.2.22.tgz#43154a328e4714cd16a15e3d6ce9a45fe2dd4c5b"
-  integrity sha512-D1CH97sZnD4T6e3Fp+LNLbzUs/Wwak2cDZKZZP5SSDOAZkoAo6gWwFjGLk5uhZ5/IT32SdBLAGKyenWJXlaK7A==
+"@wireapp/commons@2.2.23":
+  version "2.2.23"
+  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-2.2.23.tgz#2beaa6ea0673d0d87719a3fc2ae37346f7963440"
+  integrity sha512-yVhEMEJ9+a1IcBVl6GHJ/f7ke8AbL1p+MPND1aCh7bOhnf7oGh5phYJj3Z8iqjyDt6kCxLKyBMSJxdJnNMHj3g==
   dependencies:
     "@types/ansi-regex" "5.0.0"
     "@types/fs-extra" "8.0.1"
@@ -1213,10 +1213,10 @@ function.name@^1.0.3:
   dependencies:
     noop6 "^1.0.1"
 
-geolite2@1.3.0:
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/geolite2/-/geolite2-1.3.0.tgz#47094a5e1278d592fd1b41693d223d83c9dfe4c1"
-  integrity sha512-/m+vdLjYEZ3ScekuGNDdO/HaJi32vZ/hKh20HgEoeV5z1DzlT18FF39Mfin1wTlF4EtYyNgcUg5kaBaMCfwAhQ==
+geolite2@2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/geolite2/-/geolite2-2.0.0.tgz#b6f634913bf6bf96f5f35be9d153a26098d901be"
+  integrity sha512-vzq623dPf4LcSkx+ORMfqWUWYwUYFouGPTtJCOKWehqV8zTFeA+/706tGcJHBhJrayzjLxaUPnuYIkse4e/wdQ==
 
 get-caller-file@^2.0.1:
   version "2.0.5"
@@ -2797,10 +2797,10 @@ trim-right@^1.0.1:
   resolved "https://registry.yarnpkg.com/trim-right/-/trim-right-1.0.1.tgz#cb2e1203067e0c8de1f614094b9fe45704ea6003"
   integrity sha1-yy4SAwZ+DI3h9hQJS5/kVwTqYAM=
 
-ts-node@8.4.1:
-  version "8.4.1"
-  resolved "https://registry.yarnpkg.com/ts-node/-/ts-node-8.4.1.tgz#270b0dba16e8723c9fa4f9b4775d3810fd994b4f"
-  integrity sha512-5LpRN+mTiCs7lI5EtbXmF/HfMeCjzt7DH9CZwtkr6SywStrNQC723wG+aOWFiLNn7zT3kD/RnFqi3ZUfr4l5Qw==
+ts-node@8.5.2:
+  version "8.5.2"
+  resolved "https://registry.yarnpkg.com/ts-node/-/ts-node-8.5.2.tgz#434f6c893bafe501a30b32ac94ee36809ba2adce"
+  integrity sha512-W1DK/a6BGoV/D4x/SXXm6TSQx6q3blECUzd5TN+j56YEMX3yPVMpHsICLedUw3DvGF3aTQ8hfdR9AKMaHjIi+A==
   dependencies:
     arg "^4.1.0"
     diff "^4.0.1"
