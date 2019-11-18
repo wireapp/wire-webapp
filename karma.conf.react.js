@@ -47,9 +47,9 @@ module.exports = function(config) {
         emitWarning: false,
         global: {
           branches: 36,
-          functions: 37,
-          lines: 42,
-          statements: 42,
+          functions: 39,
+          lines: 44,
+          statements: 44,
         },
       },
     },
