@@ -63,4 +63,38 @@ describe('SelfAction', () => {
     ]);
     expect(spies.doCheckPasswordState.calls.count()).toEqual(1);
   });
+
+  it('fetches the set password state', async () => {
+    const mockedActions = {};
+    const mockedApiClient = {
+      self: {api: {headPassword: () => Promise.resolve({status: 200})}},
+    };
+
+    const store = mockStoreFactory({
+      actions: mockedActions,
+      apiClient: mockedApiClient,
+    })({});
+    await store.dispatch(actionRoot.selfAction.doCheckPasswordState());
+    expect(store.getActions()).toEqual([
+      SelfActionCreator.startSetPasswordState(),
+      SelfActionCreator.successfulSetPasswordState({hasPassword: true}),
+    ]);
+  });
+
+  it('fetches the unset password state', async () => {
+    const mockedActions = {};
+    const mockedApiClient = {
+      self: {api: {headPassword: () => Promise.resolve({status: 404})}},
+    };
+
+    const store = mockStoreFactory({
+      actions: mockedActions,
+      apiClient: mockedApiClient,
+    })({});
+    await store.dispatch(actionRoot.selfAction.doCheckPasswordState());
+    expect(store.getActions()).toEqual([
+      SelfActionCreator.startSetPasswordState(),
+      SelfActionCreator.successfulSetPasswordState({hasPassword: false}),
+    ]);
+  });
 });
