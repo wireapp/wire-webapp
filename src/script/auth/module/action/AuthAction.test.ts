@@ -25,7 +25,7 @@ import {actionRoot} from './';
 import {AUTH_ACTION, AuthActionCreator} from './creator/';
 
 describe('AuthAction', () => {
-  it(`creates '${AUTH_ACTION.LOGIN_START}' and '${AUTH_ACTION.LOGIN_SUCCESS}' when authenticating`, done => {
+  it(`creates '${AUTH_ACTION.LOGIN_START}' and '${AUTH_ACTION.LOGIN_SUCCESS}' when authenticating`, async () => {
     const email = 'test@example.com';
     const password = 'password';
     const accessToken =
@@ -65,23 +65,16 @@ describe('AuthAction', () => {
       apiClient: mockedApiClient as TypeUtil.RecursivePartial<APIClient>,
       core: mockedCore,
     })({});
-    return store
-      .dispatch(actionRoot.authAction.doLoginPlain({email, password, clientType: ClientType.PERMANENT}))
-      .then(() => {
-        expect(store.getActions()).toEqual([AuthActionCreator.startLogin(), AuthActionCreator.successfulLogin()]);
-      })
-      .then(() => {
-        expect(spies.setLocalStorage.calls.count()).toEqual(5);
-        expect(spies.setCookie.calls.count()).toEqual(1);
-        expect(spies.fetchSelf.calls.count()).toEqual(1);
-        expect(spies.generateClientPayload.calls.count()).toEqual(1);
-        expect(spies.doInitializeClient.calls.count()).toEqual(1);
-        done();
-      })
-      .catch((testError: any) => done.fail(testError));
+    await store.dispatch(actionRoot.authAction.doLoginPlain({email, password, clientType: ClientType.PERMANENT}));
+    expect(store.getActions()).toEqual([AuthActionCreator.startLogin(), AuthActionCreator.successfulLogin()]);
+    expect(spies.setLocalStorage.calls.count()).toEqual(5);
+    expect(spies.setCookie.calls.count()).toEqual(1);
+    expect(spies.fetchSelf.calls.count()).toEqual(1);
+    expect(spies.generateClientPayload.calls.count()).toEqual(1);
+    expect(spies.doInitializeClient.calls.count()).toEqual(1);
   });
 
-  it(`creates '${AUTH_ACTION.LOGIN_START}' and '${AUTH_ACTION.LOGIN_FAILED}' when authenticating fails`, done => {
+  it(`creates '${AUTH_ACTION.LOGIN_START}' and '${AUTH_ACTION.LOGIN_FAILED}' when authenticating fails`, async () => {
     const email = 'test@example.com';
     const backendError = new Error() as any;
     backendError.code = 403;
@@ -103,26 +96,22 @@ describe('AuthAction', () => {
       apiClient: {},
       core: mockedCore,
     })();
-    return store
-      .dispatch(actionRoot.authAction.doLoginPlain({email, password: 'password', clientType: ClientType.PERMANENT}))
-      .catch(expectedError => {
-        expect(expectedError).toBeDefined();
-        expect(expectedError.message).toEqual(backendError.message);
-        expect(expectedError.code).toEqual(backendError.code);
-        expect(expectedError.label).toEqual(backendError.label);
-        expect(store.getActions()).toEqual([
-          AuthActionCreator.startLogin(),
-          AuthActionCreator.failedLogin(backendError),
-        ]);
-      })
-      .then(() => {
-        expect(spies.generateClientPayload.calls.count()).toEqual(1);
-        done();
-      })
-      .catch(testError => done.fail(testError));
+    try {
+      await store.dispatch(
+        actionRoot.authAction.doLoginPlain({email, password: 'password', clientType: ClientType.PERMANENT}),
+      );
+      fail();
+    } catch (expectedError) {
+      expect(expectedError).toBeDefined();
+      expect(expectedError.message).toEqual(backendError.message);
+      expect(expectedError.code).toEqual(backendError.code);
+      expect(expectedError.label).toEqual(backendError.label);
+      expect(store.getActions()).toEqual([AuthActionCreator.startLogin(), AuthActionCreator.failedLogin(backendError)]);
+      expect(spies.generateClientPayload.calls.count()).toEqual(1);
+    }
   });
 
-  it(`creates '${AUTH_ACTION.LOGOUT_START}' and '${AUTH_ACTION.LOGOUT_FAILED}' when log out fails`, done => {
+  it(`creates '${AUTH_ACTION.LOGOUT_START}' and '${AUTH_ACTION.LOGOUT_FAILED}' when log out fails`, async () => {
     const backendError = new Error() as any;
     backendError.code = 403;
     backendError.label = 'invalid-credentials';
@@ -135,15 +124,7 @@ describe('AuthAction', () => {
       apiClient: {},
       core: mockedCore,
     })({});
-    return store
-      .dispatch(actionRoot.authAction.doLogout())
-      .then(() => {
-        expect(store.getActions()).toEqual([
-          AuthActionCreator.startLogout(),
-          AuthActionCreator.failedLogout(backendError),
-        ]);
-      })
-      .then(() => done())
-      .catch(testError => done.fail(testError));
+    await store.dispatch(actionRoot.authAction.doLogout());
+    expect(store.getActions()).toEqual([AuthActionCreator.startLogout(), AuthActionCreator.failedLogout(backendError)]);
   });
 });
