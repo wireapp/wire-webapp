@@ -130,4 +130,41 @@ describe('SelfAction', () => {
       ]);
     }
   });
+
+  it('can set the self password', async () => {
+    const password = 'password';
+    const mockedApiClient = {
+      self: {api: {putPassword: () => Promise.resolve()}},
+    };
+
+    const store = mockStoreFactory({
+      apiClient: mockedApiClient,
+    })({});
+    await store.dispatch(actionRoot.selfAction.doSetPassword({new_password: password}));
+    expect(store.getActions()).toEqual([
+      SelfActionCreator.startSetSelfPassword(),
+      SelfActionCreator.successfulSetSelfPassword(),
+    ]);
+  });
+
+  it('handles failed attempt to set self password', async () => {
+    const password = 'password';
+    const error = new Error('testerror');
+    const mockedApiClient = {
+      self: {api: {putPassword: () => Promise.reject(error)}},
+    };
+
+    const store = mockStoreFactory({
+      apiClient: mockedApiClient,
+    })({});
+    try {
+      await store.dispatch(actionRoot.selfAction.doSetPassword({new_password: password}));
+      fail();
+    } catch (backendError) {
+      expect(store.getActions()).toEqual([
+        SelfActionCreator.startSetSelfPassword(),
+        SelfActionCreator.failedSetSelfPassword(error),
+      ]);
+    }
+  });
 });
