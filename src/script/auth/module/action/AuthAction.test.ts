@@ -22,10 +22,10 @@ import {ClientType} from '@wireapp/api-client/dist/commonjs/client';
 import {TypeUtil} from '@wireapp/commons';
 import {mockStoreFactory} from '../../util/test/mockStoreFactory';
 import {actionRoot} from './';
-import {AUTH_ACTION, AuthActionCreator} from './creator/';
+import {AuthActionCreator} from './creator/';
 
 describe('AuthAction', () => {
-  it(`creates '${AUTH_ACTION.LOGIN_START}' and '${AUTH_ACTION.LOGIN_SUCCESS}' when authenticating`, async () => {
+  it('authenticates a user successfully', async () => {
     const email = 'test@example.com';
     const password = 'password';
     const accessToken =
@@ -74,7 +74,7 @@ describe('AuthAction', () => {
     expect(spies.doInitializeClient.calls.count()).toEqual(1);
   });
 
-  it(`creates '${AUTH_ACTION.LOGIN_START}' and '${AUTH_ACTION.LOGIN_FAILED}' when authenticating fails`, async () => {
+  it('handles failed authentication', async () => {
     const email = 'test@example.com';
     const backendError = new Error() as any;
     backendError.code = 403;
@@ -111,7 +111,7 @@ describe('AuthAction', () => {
     }
   });
 
-  it(`creates '${AUTH_ACTION.LOGOUT_START}' and '${AUTH_ACTION.LOGOUT_FAILED}' when log out fails`, async () => {
+  it('handles failed logout', async () => {
     const backendError = new Error() as any;
     backendError.code = 403;
     backendError.label = 'invalid-credentials';

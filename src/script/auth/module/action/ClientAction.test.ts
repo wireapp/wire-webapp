@@ -19,10 +19,10 @@
 
 import {actionRoot} from '.';
 import {mockStoreFactory} from '../../util/test/mockStoreFactory';
-import {CLIENT_ACTION, ClientActionCreator} from '../action/creator/';
+import {ClientActionCreator} from '../action/creator/';
 
 describe('ClientAction', () => {
-  it(`creates '${CLIENT_ACTION.CLIENTS_FETCH_START}' and '${CLIENT_ACTION.CLIENTS_FETCH_SUCCESS}' when successfully fetching all clients`, async () => {
+  it('fetches all self clients', async () => {
     const mockedActions = {};
     const mockedApiClient = {
       client: {api: {getClients: () => Promise.resolve([])}},
@@ -41,7 +41,7 @@ describe('ClientAction', () => {
     ]);
   });
 
-  it(`creates '${CLIENT_ACTION.CLIENTS_FETCH_START}' and '${CLIENT_ACTION.CLIENTS_FETCH_FAILED}' when fetching all clients fails`, async () => {
+  it('handles failed fetch of all self clients', async () => {
     const backendError = new Error() as any;
     backendError.code = 403;
     backendError.label = 'invalid-credentials';
@@ -72,7 +72,7 @@ describe('ClientAction', () => {
     }
   });
 
-  it(`creates '${CLIENT_ACTION.CLIENT_REMOVE_START}' and '${CLIENT_ACTION.CLIENT_REMOVE_SUCCESS}' when successfully removing a client`, async () => {
+  it('removes a self client', async () => {
     const clientId = 'clientId';
     const password = 'password';
     const mockedActions = {};
@@ -93,7 +93,7 @@ describe('ClientAction', () => {
     ]);
   });
 
-  it(`creates '${CLIENT_ACTION.CLIENTS_FETCH_START}' and '${CLIENT_ACTION.CLIENT_REMOVE_FAILED}' when removing a client fails`, async () => {
+  it('handles failed self client removal', async () => {
     const clientId = 'clientId';
     const password = 'password';
     const backendError = new Error() as any;

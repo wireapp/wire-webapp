@@ -20,10 +20,10 @@
 import {Self} from '@wireapp/api-client/dist/commonjs/self';
 import {actionRoot} from '.';
 import {mockStoreFactory} from '../../util/test/mockStoreFactory';
-import {SELF_ACTION, SelfActionCreator} from './creator/';
+import {SelfActionCreator} from './creator/';
 
 describe('SelfAction', () => {
-  it(`creates '${SELF_ACTION.SELF_FETCH_START}' and '${SELF_ACTION.SELF_FETCH_SUCCESS}' when fetching self user`, async () => {
+  it('fetches the self user', async () => {
     const selfUser = ({assets: [], id: 'selfUserId'} as unknown) as Self;
     const team = {teams: [{binding: true, id: 'team'}]};
     const expectedSelfUser = ({assets: [], id: 'selfUserId', team: 'team'} as unknown) as Self;
