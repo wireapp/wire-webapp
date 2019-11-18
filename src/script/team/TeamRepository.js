@@ -61,13 +61,9 @@ export class TeamRepository {
       return this.memberRoles()[userId] !== ROLE.PARTNER || this.memberInviters()[userId] === this.selfUser().id;
     };
 
-    this.getRoleBadge = userId => {
-      const userRole = this.memberRoles()[userId];
-      if (userRole === ROLE.PARTNER) {
-        return t('rolePartner');
-      }
-      return '';
-    };
+    this.getRoleBadge = userId => (this.isExternal(userId) ? t('rolePartner') : '');
+
+    this.isExternal = userId => this.memberRoles()[userId] === ROLE.PARTNER;
 
     this.teamName = ko.pureComputed(() => (this.isTeam() ? this.team().name() : this.selfUser().name()));
     this.teamSize = ko.pureComputed(() => (this.isTeam() ? this.teamMembers().length + 1 : 0));

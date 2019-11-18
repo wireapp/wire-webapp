@@ -20,7 +20,7 @@
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {formatDuration} from 'Util/TimeUtil';
-import {removeLineBreaks} from 'Util/StringUtil';
+import {removeLineBreaks, sortByPriority} from 'Util/StringUtil';
 
 import 'Components/receiptModeToggle';
 import {BasePanelViewModel} from './BasePanelViewModel';
@@ -75,24 +75,28 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
 
     ko.computed(() => {
       if (this.activeConversation()) {
-        this.serviceParticipants.removeAll();
-        this.userParticipants.removeAll();
+        const users = [];
+        const services = [];
 
         this.activeConversation()
           .participating_user_ets()
           .forEach(userEntity => {
             if (userEntity.isService) {
-              return this.serviceParticipants.push(userEntity);
+              return services.push(userEntity);
             }
-            this.userParticipants.push(userEntity);
+            users.push(userEntity);
           });
 
-        const userCount = this.userParticipants().length;
+        const userCount = users.length;
         const exceedsMaxUserCount = userCount > ConversationDetailsViewModel.CONFIG.MAX_USERS_VISIBLE;
-        if (exceedsMaxUserCount) {
-          this.userParticipants.splice(ConversationDetailsViewModel.CONFIG.REDUCED_USERS_COUNT);
-        }
+
         this.showAllUsersCount(exceedsMaxUserCount ? userCount : 0);
+        this.serviceParticipants(services);
+        if (!this.activeConversation().removed_from_conversation()) {
+          users.push(this.activeConversation().selfUser());
+          this.userParticipants(users.sort((userA, userB) => sortByPriority(userA.first_name(), userB.first_name())));
+        }
+        this.userParticipants(users);
       }
     });
 

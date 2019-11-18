@@ -19,6 +19,8 @@
 
 import ko from 'knockout';
 
+import {sortByPriority} from 'Util/StringUtil';
+
 import {User} from '../../entity/User';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
@@ -42,9 +44,14 @@ export class ConversationParticipantsViewModel extends BasePanelViewModel {
 
     this.participants = ko.pureComputed(() => {
       if (this.activeConversation()) {
-        return this.activeConversation()
+        const users = this.activeConversation()
           .participating_user_ets()
           .filter((userEntity: User) => !userEntity.isService);
+        if (!this.activeConversation().removed_from_conversation()) {
+          users.push(this.activeConversation().selfUser());
+          return users.sort((userA, userB) => sortByPriority(userA.first_name(), userB.first_name()));
+        }
+        return users;
       }
       return [];
     });
