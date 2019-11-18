@@ -137,6 +137,7 @@ export interface SetSelfEmailStartAction extends AppAction {
   readonly type: SELF_ACTION.SELF_SET_EMAIL_START;
 }
 export interface SetSelfEmailSuccessAction extends AppAction {
+  payload: string;
   readonly type: SELF_ACTION.SELF_SET_EMAIL_SUCCESS;
 }
 export interface SetSelfEmailFailedAction extends AppAction {
@@ -219,7 +220,8 @@ export class SelfActionCreator {
   static startSetSelfEmail = (): SetSelfEmailStartAction => ({
     type: SELF_ACTION.SELF_SET_EMAIL_START,
   });
-  static successfulSetSelfEmail = (): SetSelfEmailSuccessAction => ({
+  static successfulSetSelfEmail = (email: string): SetSelfEmailSuccessAction => ({
+    payload: email,
     type: SELF_ACTION.SELF_SET_EMAIL_SUCCESS,
   });
   static failedSetSelfEmail = (error: Error): SetSelfEmailFailedAction => ({

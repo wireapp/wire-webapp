@@ -65,13 +65,11 @@ describe('SelfAction', () => {
   });
 
   it('fetches the set password state', async () => {
-    const mockedActions = {};
     const mockedApiClient = {
       self: {api: {headPassword: () => Promise.resolve({status: 200})}},
     };
 
     const store = mockStoreFactory({
-      actions: mockedActions,
       apiClient: mockedApiClient,
     })({});
     await store.dispatch(actionRoot.selfAction.doCheckPasswordState());
@@ -82,13 +80,11 @@ describe('SelfAction', () => {
   });
 
   it('fetches the unset password state', async () => {
-    const mockedActions = {};
     const mockedApiClient = {
       self: {api: {headPassword: () => Promise.resolve({status: 404})}},
     };
 
     const store = mockStoreFactory({
-      actions: mockedActions,
       apiClient: mockedApiClient,
     })({});
     await store.dispatch(actionRoot.selfAction.doCheckPasswordState());
@@ -96,5 +92,42 @@ describe('SelfAction', () => {
       SelfActionCreator.startSetPasswordState(),
       SelfActionCreator.successfulSetPasswordState({hasPassword: false}),
     ]);
+  });
+
+  it('can set the self email', async () => {
+    const email = 'myemail@mail.com';
+    const mockedApiClient = {
+      self: {api: {putEmail: () => Promise.resolve()}},
+    };
+
+    const store = mockStoreFactory({
+      apiClient: mockedApiClient,
+    })({});
+    await store.dispatch(actionRoot.selfAction.doSetEmail(email));
+    expect(store.getActions()).toEqual([
+      SelfActionCreator.startSetSelfEmail(),
+      SelfActionCreator.successfulSetSelfEmail(email),
+    ]);
+  });
+
+  it('handles failed attempt to set self email', async () => {
+    const email = 'myemail@mail.com';
+    const error = new Error('testerror');
+    const mockedApiClient = {
+      self: {api: {putEmail: () => Promise.reject(error)}},
+    };
+
+    const store = mockStoreFactory({
+      apiClient: mockedApiClient,
+    })({});
+    try {
+      await store.dispatch(actionRoot.selfAction.doSetEmail(email));
+      fail();
+    } catch (backendError) {
+      expect(store.getActions()).toEqual([
+        SelfActionCreator.startSetSelfEmail(),
+        SelfActionCreator.failedSetSelfEmail(error),
+      ]);
+    }
   });
 });

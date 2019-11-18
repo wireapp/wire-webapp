@@ -117,7 +117,7 @@ export class SelfAction {
       dispatch(SelfActionCreator.startSetSelfEmail());
       try {
         await apiClient.self.api.putEmail({email});
-        dispatch(SelfActionCreator.successfulSetSelfEmail());
+        dispatch(SelfActionCreator.successfulSetSelfEmail(email));
       } catch (error) {
         dispatch(SelfActionCreator.failedSetSelfEmail(error));
         throw error;
