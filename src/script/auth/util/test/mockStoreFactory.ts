@@ -43,6 +43,7 @@ const defaultCore = new Account(defaultClient);
 const defaultLocalStorage = window.localStorage;
 const defaultCookieStore = Cookies;
 const defaultConfig = {
+  APP_INSTANCE_ID: 'app-id',
   FEATURE: {
     CHECK_CONSENT: true,
     DEFAULT_LOGIN_TEMPORARY_CLIENT: false,
@@ -64,12 +65,12 @@ export const mockStoreFactory = (
     localStorage: defaultLocalStorage,
   },
 ) => {
-  const {actions, apiClient, cookieStore, core, localStorage} = parameters;
+  const {actions, apiClient, cookieStore, core, config, localStorage} = parameters;
   if (core) {
     (core as any).apiClient = apiClient;
   }
   return configureStore<TypeUtil.RecursivePartial<RootState>, ThunkDispatch>([
-    thunk.withExtraArgument({actions, apiClient, cookieStore, core, localStorage}),
+    thunk.withExtraArgument({actions, apiClient, cookieStore, core, config: config || defaultConfig, localStorage}),
     createLogger({
       actionTransformer(action: any): string {
         return JSON.stringify(action);
