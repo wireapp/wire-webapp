@@ -61,7 +61,7 @@ describe('AuthAction', () => {
     };
 
     const store = mockStoreFactory({
-      actions: mockedActions as any,
+      actions: mockedActions,
       apiClient: mockedApiClient as TypeUtil.RecursivePartial<APIClient>,
       core: mockedCore,
     })({});
