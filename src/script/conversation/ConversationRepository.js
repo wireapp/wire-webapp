@@ -320,9 +320,13 @@ export class ConversationRepository {
     this.eventService.addEventDeletedListener(this._deleteLocalMessageEntity.bind(this));
   }
 
-  _updateLocalMessageEntity({obj: updatedEvent, oldObj: oldEvent}) {
+  async _updateLocalMessageEntity({obj: updatedEvent, oldObj: oldEvent}) {
     const conversationEntity = this.find_conversation_by_id(updatedEvent.conversation);
-    const replacedMessageEntity = this._replaceMessageInConversation(conversationEntity, oldEvent.id, updatedEvent);
+    const replacedMessageEntity = await this._replaceMessageInConversation(
+      conversationEntity,
+      oldEvent.id,
+      updatedEvent,
+    );
     if (replacedMessageEntity) {
       this._updateMessageUserEntities(replacedMessageEntity).then(messageEntity => {
         amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.UPDATED, oldEvent.id, messageEntity);
@@ -2532,35 +2536,34 @@ export class ConversationRepository {
    * @param {EventInfoEntity} eventInfoEntity - Event to be send
    * @returns {Promise} Resolves after sending the external message
    */
-  _sendExternalGenericMessage(eventInfoEntity) {
+  async _sendExternalGenericMessage(eventInfoEntity) {
     const {genericMessage, options} = eventInfoEntity;
     const messageType = eventInfoEntity.getType();
     this.logger.info(`Sending external message of type '${messageType}'`, genericMessage);
 
-    return encryptAesAsset(GenericMessage.encode(genericMessage).finish())
-      .then(({cipherText, keyBytes, sha256}) => {
-        keyBytes = new Uint8Array(keyBytes);
-        sha256 = new Uint8Array(sha256);
+    try {
+      const encryptedAsset = await encryptAesAsset(GenericMessage.encode(genericMessage).finish());
+      const keyBytes = new Uint8Array(encryptedAsset.keyBytes);
+      const sha256 = new Uint8Array(encryptedAsset.sha256);
 
-        const externalMessage = new External({otrKey: keyBytes, sha256});
+      const externalMessage = new External({otrKey: keyBytes, sha256});
 
-        const genericMessageExternal = new GenericMessage({
-          [GENERIC_MESSAGE_TYPE.EXTERNAL]: externalMessage,
-          messageId: createRandomUuid(),
-        });
-
-        return this.cryptography_repository
-          .encryptGenericMessage(options.recipients, genericMessageExternal)
-          .then(payload => {
-            payload.data = arrayToBase64(cipherText);
-            payload.native_push = options.nativePush;
-            return this._sendEncryptedMessage(eventInfoEntity, payload);
-          });
-      })
-      .catch(error => {
-        this.logger.info('Failed sending external message', error);
-        throw error;
+      const genericMessageExternal = new GenericMessage({
+        [GENERIC_MESSAGE_TYPE.EXTERNAL]: externalMessage,
+        messageId: createRandomUuid(),
       });
+
+      const payload = await this.cryptography_repository.encryptGenericMessage(
+        options.recipients,
+        genericMessageExternal,
+      );
+      payload.data = await arrayToBase64(encryptedAsset.cipherText);
+      payload.native_push = options.nativePush;
+      return this._sendEncryptedMessage(eventInfoEntity, payload);
+    } catch (error) {
+      this.logger.info('Failed sending external message', error);
+      throw error;
+    }
   }
 
   /**
@@ -3860,12 +3863,12 @@ export class ConversationRepository {
       .then(messageEntity => this._updateMessageUserEntities(messageEntity));
   }
 
-  _replaceMessageInConversation(conversationEntity, eventId, newData) {
+  async _replaceMessageInConversation(conversationEntity, eventId, newData) {
     const originalMessage = conversationEntity.getMessage(eventId);
     if (!originalMessage) {
       return undefined;
     }
-    const replacedMessageEntity = this.event_mapper.updateMessageEvent(originalMessage, newData);
+    const replacedMessageEntity = await this.event_mapper.updateMessageEvent(originalMessage, newData);
     this.ephemeralHandler.validateMessage(replacedMessageEntity);
     return replacedMessageEntity;
   }

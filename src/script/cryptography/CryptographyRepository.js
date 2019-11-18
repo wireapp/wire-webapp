@@ -337,27 +337,21 @@ export class CryptographyRepository {
       });
   }
 
-  _createSessionFromPreKey(preKey, userId, clientId) {
-    return Promise.resolve()
-      .then(() => {
-        if (preKey) {
-          this.logger.log(`Initializing session with user '${userId}' (${clientId}) with pre-key ID '${preKey.id}'.`);
-          const sessionId = this._constructSessionId(userId, clientId);
-
-          return this.cryptobox.session_from_prekey(sessionId, base64ToArray(preKey.key).buffer);
-        }
-
-        Raygun.send(new Error('Failed to create session: No pre-key found'));
-        this.logger.warn(`No pre-key for user '${userId}' ('${clientId}') found. The client might have been deleted.`);
-        return undefined;
-      })
-      .catch(error => {
-        Raygun.send(new Error(`Failed to create session: ${error.message}`));
-
-        const message = `Pre-key for user '${userId}' ('${clientId}') invalid. Skipping encryption: ${error.message}`;
-        this.logger.warn(message, error);
-        return undefined;
-      });
+  async _createSessionFromPreKey(preKey, userId, clientId) {
+    try {
+      if (preKey) {
+        this.logger.log(`Initializing session with user '${userId}' (${clientId}) with pre-key ID '${preKey.id}'.`);
+        const sessionId = this._constructSessionId(userId, clientId);
+        const preKeyArray = await base64ToArray(preKey.key);
+        return this.cryptobox.session_from_prekey(sessionId, preKeyArray.buffer);
+      }
+      Raygun.send(new Error('Failed to create session: No pre-key found'));
+      this.logger.warn(`No pre-key for user '${userId}' ('${clientId}') found. The client might have been deleted.`);
+    } catch (error) {
+      Raygun.send(new Error(`Failed to create session: ${error.message}`));
+      const message = `Pre-key for user '${userId}' ('${clientId}') invalid. Skipping encryption: ${error.message}`;
+      this.logger.warn(message, error);
+    }
   }
 
   _encryptGenericMessage(recipients, genericMessage, messagePayload) {
@@ -382,30 +376,27 @@ export class CryptographyRepository {
       .then(cipherPayload => this._mapCipherTextToPayload(messagePayload, cipherPayload));
   }
 
-  _encryptGenericMessageForMissingRecipients(missingRecipients, genericMessage, messagePayload) {
-    return this.getUsersPreKeys(missingRecipients)
-      .then(userPreKeyMap => {
-        this.logger.info(`Fetched pre-keys for '${Object.keys(userPreKeyMap).length}' users.`, userPreKeyMap);
+  async _encryptGenericMessageForMissingRecipients(missingRecipients, genericMessage, messagePayload) {
+    const userPreKeyMap = await this.getUsersPreKeys(missingRecipients);
+    this.logger.info(`Fetched pre-keys for '${Object.keys(userPreKeyMap).length}' users.`, userPreKeyMap);
+    const cipherPayloadPromises = [];
 
-        const cipherPayloadPromises = [];
-
-        Object.entries(userPreKeyMap).forEach(([userId, clientPreKeyMap]) => {
-          if (clientPreKeyMap && Object.keys(clientPreKeyMap).length) {
-            Object.entries(clientPreKeyMap).forEach(([clientId, preKeyPayload]) => {
-              if (preKeyPayload) {
-                const sessionId = this._constructSessionId(userId, clientId);
-                const preKeyBundle = base64ToArray(preKeyPayload.key).buffer;
-                const encryptionPromise = this._encryptPayloadForSession(sessionId, genericMessage, preKeyBundle);
-
-                cipherPayloadPromises.push(encryptionPromise);
-              }
-            });
+    for (const [userId, clientPreKeyMap] of Object.entries(userPreKeyMap)) {
+      if (clientPreKeyMap && Object.keys(clientPreKeyMap).length) {
+        for (const [clientId, preKeyPayload] of Object.entries(clientPreKeyMap)) {
+          if (preKeyPayload) {
+            const sessionId = this._constructSessionId(userId, clientId);
+            const encryptionPromise = base64ToArray(preKeyPayload.key).then(payloadArray =>
+              this._encryptPayloadForSession(sessionId, genericMessage, payloadArray.buffer),
+            );
+            cipherPayloadPromises.push(encryptionPromise);
           }
-        });
+        }
+      }
+    }
 
-        return Promise.all(cipherPayloadPromises);
-      })
-      .then(cipherPayload => this._mapCipherTextToPayload(messagePayload, cipherPayload));
+    const cipherPayload = await Promise.all(cipherPayloadPromises);
+    return this._mapCipherTextToPayload(messagePayload, cipherPayload);
   }
 
   _mapCipherTextToPayload(messagePayload, cipherPayload) {
@@ -465,20 +456,25 @@ export class CryptographyRepository {
    * @param {Object} [preKeyBundle] - Pre-key bundle
    * @returns {Object} Contains session ID and encrypted message as base64 encoded string
    */
-  _encryptPayloadForSession(sessionId, genericMessage, preKeyBundle) {
-    return this.cryptobox
-      .encrypt(sessionId, GenericMessage.encode(genericMessage).finish(), preKeyBundle)
-      .then(cipherText => ({cipherText: arrayToBase64(cipherText), sessionId}))
-      .catch(error => {
-        if (error instanceof StoreEngineError.RecordNotFoundError) {
-          this.logger.log(`Session '${sessionId}' needs to get initialized...`);
-          return {sessionId};
-        }
+  async _encryptPayloadForSession(sessionId, genericMessage, preKeyBundle) {
+    try {
+      const cipherText = await this.cryptobox.encrypt(
+        sessionId,
+        GenericMessage.encode(genericMessage).finish(),
+        preKeyBundle,
+      );
+      const cipherTextArray = await arrayToBase64(cipherText);
+      return {cipherText: cipherTextArray, sessionId};
+    } catch (error) {
+      if (error instanceof StoreEngineError.RecordNotFoundError) {
+        this.logger.log(`Session '${sessionId}' needs to get initialized...`);
+        return {sessionId};
+      }
 
-        const message = `Failed encrypting '${genericMessage.content}' for session '${sessionId}': ${error.message}`;
-        this.logger.warn(message, error);
-        return {cipherText: CryptographyRepository.REMOTE_ENCRYPTION_FAILURE, sessionId};
-      });
+      const message = `Failed encrypting '${genericMessage.content}' for session '${sessionId}': ${error.message}`;
+      this.logger.warn(message, error);
+      return {cipherText: CryptographyRepository.REMOTE_ENCRYPTION_FAILURE, sessionId};
+    }
   }
 
   _handleDecryptionFailure(error, event) {

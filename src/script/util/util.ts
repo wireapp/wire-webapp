@@ -20,6 +20,7 @@
 import {Decoder, Encoder} from 'bazinga64';
 import JsMD5 from 'js-md5';
 import {ObservableArray} from 'knockout';
+import sodium from 'libsodium-wrappers-sumo';
 import {formatE164} from 'phoneformat.js';
 import UUID from 'uuidjs';
 
@@ -192,29 +193,47 @@ export const stripDataUri = (string: string): string => string.replace(/^data:.*
  * Convert a base64 string to an Uint8Array.
  * @note Function will remove "data-uri" attribute if present.
  */
-export const base64ToArray = (base64: string): Uint8Array => Decoder.fromBase64(stripDataUri(base64)).asBytes;
+export const base64ToArraySync = (base64: string): Uint8Array => Decoder.fromBase64(stripDataUri(base64)).asBytes;
+
+/**
+ * Convert a base64 string to an Uint8Array asynchronously.
+ * @note Function will remove "data-uri" attribute if present.
+ */
+export const base64ToArray = async (base64: string): Promise<Uint8Array> => {
+  await sodium.ready;
+  return sodium.from_base64(stripDataUri(base64), sodium.base64_variants.ORIGINAL);
+};
 
 /**
  * Convert an ArrayBuffer or an Uint8Array to a base64 string
  */
-export const arrayToBase64 = (array: ArrayBuffer | Uint8Array): string =>
+export const arrayToBase64Sync = (array: ArrayBuffer | Uint8Array): string =>
   Encoder.toBase64(new Uint8Array(array)).asString;
+
+/**
+ * Convert an ArrayBuffer or an Uint8Array to a base64 string asynchronously
+ */
+export const arrayToBase64 = async (array: ArrayBuffer | Uint8Array): Promise<string> => {
+  await sodium.ready;
+  return sodium.to_base64(new Uint8Array(array), sodium.base64_variants.ORIGINAL);
+};
 
 /**
  * Returns a base64 encoded MD5 hash of the the given array.
  */
-export const arrayToMd5Base64 = (array: Uint8Array): string => {
+export const arrayToMd5Base64 = async (array: Uint8Array): Promise<string> => {
+  await sodium.ready;
   const md5Hash = JsMD5.arrayBuffer(array);
-  return Encoder.toBase64(md5Hash).asString;
+  return sodium.to_base64(new Uint8Array(md5Hash), sodium.base64_variants.ORIGINAL);
 };
 
 /**
  * Convert base64 dataURI to Blob
  */
 
-export const base64ToBlob = (base64: string): Blob => {
+export const base64ToBlob = async (base64: string): Promise<Blob> => {
   const mimeType = getContentTypeFromDataUrl(base64);
-  const bytes = base64ToArray(base64);
+  const bytes = await base64ToArray(base64);
   return new Blob([bytes], {type: mimeType});
 };
 

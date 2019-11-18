@@ -22,7 +22,7 @@ import {Article, LinkPreview} from '@wireapp/protocol-messaging';
 import {getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {clamp} from 'Util/NumberUtil';
-import {arrayToBase64, noop} from 'Util/util';
+import {arrayToBase64Sync, noop} from 'Util/util';
 import {obfuscate} from 'Util/StringUtil';
 
 import {EphemeralStatusType} from '../message/EphemeralStatusType';
@@ -215,7 +215,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
         url: linkPreview.url,
         urlOffset: 0,
       });
-      return arrayToBase64(LinkPreview.encode(linkPreviewProto).finish());
+      return arrayToBase64Sync(LinkPreview.encode(linkPreviewProto).finish());
     });
 
     obfuscatedAsset.text = obfuscate(assetEntity.text);

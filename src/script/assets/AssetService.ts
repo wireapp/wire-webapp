@@ -164,7 +164,7 @@ export class AssetService {
     return isEternal ? AssetRetentionPolicy.ETERNAL : AssetRetentionPolicy.PERSISTENT;
   }
 
-  postAsset(
+  async postAsset(
     assetData: Uint8Array,
     options: AssetUploadOptions,
     xhrAccessorFunction?: Function,
@@ -179,7 +179,7 @@ export class AssetService {
 
     const optionsString = JSON.stringify(options);
 
-    const md5Base64Hash = arrayToMd5Base64(assetData);
+    const md5Base64Hash = await arrayToMd5Base64(assetData);
 
     const body = [
       `--${BOUNDARY}`,
@@ -205,12 +205,14 @@ export class AssetService {
     xhr.setRequestHeader('Authorization', `${this.backendClient.accessTokenType} ${this.backendClient.accessToken}`);
     xhr.send(new Blob([body, assetData, footer]));
 
-    return new Promise<UploadAssetResponse>((resolve, reject) => {
+    const xhrResult = await new Promise<UploadAssetResponse>((resolve, reject) => {
       xhr.onload = function(event): void {
         return this.status === 201 ? resolve(JSON.parse(this.response)) : reject(event);
       };
       xhr.onerror = reject;
     });
+
+    return xhrResult;
   }
 
   _compressImage(image: File | Blob): Promise<CompressedImage> {

@@ -21,7 +21,7 @@ import {Availability, Confirmation, GenericMessage, LinkPreview, Mention, Quote}
 
 import {getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {base64ToArray, arrayToBase64, createRandomUuid} from 'Util/util';
+import {base64ToArray, arrayToBase64Sync, createRandomUuid} from 'Util/util';
 
 import {decryptAesAsset} from '../assets/AssetCrypto';
 import {AssetTransferState} from '../assets/AssetTransferState';
@@ -321,26 +321,22 @@ export class CryptographyMapper {
    * @param {JSON} event - Backend event of type 'conversation.otr-message-add'
    * @returns {Promise} Resolves with generic message
    */
-  _unwrapExternal(external, event) {
-    return Promise.resolve(external)
-      .then(({otrKey, sha256}) => {
-        const eventData = event.data;
-
-        if (!eventData.data || !otrKey || !sha256) {
-          throw new Error('Not all expected properties defined');
-        }
-
-        const cipherText = base64ToArray(eventData.data).buffer;
-        const keyBytes = new Uint8Array(otrKey).buffer;
-        const referenceSha256 = new Uint8Array(sha256).buffer;
-
-        return decryptAesAsset(cipherText, keyBytes, referenceSha256);
-      })
-      .then(externalMessageBuffer => GenericMessage.decode(new Uint8Array(externalMessageBuffer)))
-      .catch(error => {
-        this.logger.error(`Failed to unwrap external message: ${error.message}`, error);
-        throw new z.error.CryptographyError(z.error.CryptographyError.TYPE.BROKEN_EXTERNAL);
-      });
+  async _unwrapExternal(external, event) {
+    const {otrKey, sha256} = external;
+    try {
+      const eventData = event.data;
+      if (!eventData.data || !otrKey || !sha256) {
+        throw new Error('Not all expected properties defined');
+      }
+      const cipherText = (await base64ToArray(eventData.data)).buffer;
+      const keyBytes = new Uint8Array(otrKey).buffer;
+      const referenceSha256 = new Uint8Array(sha256).buffer;
+      const externalMessageBuffer = await decryptAesAsset(cipherText, keyBytes, referenceSha256);
+      return GenericMessage.decode(new Uint8Array(externalMessageBuffer));
+    } catch (error) {
+      this.logger.error(`Failed to unwrap external message: ${error.message}`, error);
+      throw new z.error.CryptographyError(z.error.CryptographyError.TYPE.BROKEN_EXTERNAL);
+    }
   }
 
   _mapHidden(hidden) {
@@ -438,11 +434,11 @@ export class CryptographyMapper {
     return {
       data: {
         content: `${text.content}`,
-        mentions: protoMentions.map(protoMention => arrayToBase64(Mention.encode(protoMention).finish())),
+        mentions: protoMentions.map(protoMention => arrayToBase64Sync(Mention.encode(protoMention).finish())),
         previews: protoLinkPreviews.map(protoLinkPreview =>
-          arrayToBase64(LinkPreview.encode(protoLinkPreview).finish()),
+          arrayToBase64Sync(LinkPreview.encode(protoLinkPreview).finish()),
         ),
-        quote: protoQuote && arrayToBase64(Quote.encode(protoQuote).finish()),
+        quote: protoQuote && arrayToBase64Sync(Quote.encode(protoQuote).finish()),
       },
       type: ClientEvent.CONVERSATION.MESSAGE_ADD,
     };
