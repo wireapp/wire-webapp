@@ -266,32 +266,33 @@ export class CryptographyRepository {
    * @param {Object} [payload={sender: string, recipients: {}, native_push: true}] - Object to contain encrypted message payload
    * @returns {Promise} Resolves with the encrypted payload
    */
-  encryptGenericMessage(recipients, genericMessage, payload = this._constructPayload(this.currentClient().id)) {
-    return Promise.resolve()
-      .then(() => {
-        const receivingUsers = Object.keys(recipients).length;
-        const logMessage = `Encrypting message of type '${genericMessage.content}' for '${receivingUsers}' users.`;
-        this.logger.log(logMessage, recipients);
+  async encryptGenericMessage(recipients, genericMessage, payload = this._constructPayload(this.currentClient().id)) {
+    const receivingUsers = Object.keys(recipients).length;
+    const encryptLogMessage = `Encrypting message of type '${genericMessage.content}' for '${receivingUsers}' users.`;
+    this.logger.log(encryptLogMessage, recipients);
 
-        return this._encryptGenericMessage(recipients, genericMessage, payload);
-      })
-      .then(({messagePayload, missingRecipients}) => {
-        return Object.keys(missingRecipients).length
-          ? this._encryptGenericMessageForMissingRecipients(missingRecipients, genericMessage, messagePayload)
-          : {messagePayload, missingRecipients};
-      })
-      .then(({messagePayload, missingRecipients}) => {
-        const payloadUsers = Object.keys(messagePayload.recipients).length;
-        const logMessage = `Encrypted message of type '${genericMessage.content}' for '${payloadUsers}' users.`;
-        this.logger.log(logMessage, messagePayload.recipients);
+    let {messagePayload, missingRecipients} = await this._encryptGenericMessage(recipients, genericMessage, payload);
 
-        const missingUsers = Object.keys(missingRecipients).length;
-        if (missingUsers) {
-          this.logger.warn(`Failed to encrypt message for '${missingUsers}' users`, missingRecipients);
-        }
+    if (Object.keys(missingRecipients).length) {
+      const reEncryptedMessage = await this._encryptGenericMessageForMissingRecipients(
+        missingRecipients,
+        genericMessage,
+        messagePayload,
+      );
+      messagePayload = reEncryptedMessage.messagePayload;
+      missingRecipients = reEncryptedMessage.missingRecipients;
+    }
 
-        return messagePayload;
-      });
+    const payloadUsers = Object.keys(messagePayload.recipients).length;
+    const successLogMessage = `Encrypted message of type '${genericMessage.content}' for '${payloadUsers}' users.`;
+    this.logger.log(successLogMessage, messagePayload.recipients);
+
+    const missingUsers = Object.keys(missingRecipients).length;
+    if (missingUsers) {
+      this.logger.warn(`Failed to encrypt message for '${missingUsers}' users`, missingRecipients);
+    }
+
+    return messagePayload;
   }
 
   /**
@@ -459,11 +460,8 @@ export class CryptographyRepository {
    */
   async _encryptPayloadForSession(sessionId, genericMessage, preKeyBundle) {
     try {
-      const cipherText = await this.cryptobox.encrypt(
-        sessionId,
-        GenericMessage.encode(genericMessage).finish(),
-        preKeyBundle,
-      );
+      const messageArray = GenericMessage.encode(genericMessage).finish();
+      const cipherText = await this.cryptobox.encrypt(sessionId, messageArray, preKeyBundle);
       const cipherTextArray = await arrayToBase64(cipherText);
       return {cipherText: cipherTextArray, sessionId};
     } catch (error) {

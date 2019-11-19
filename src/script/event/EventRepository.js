@@ -640,18 +640,20 @@ export class EventRepository {
    */
   async processEvent(event, source) {
     const isEncryptedEvent = event.type === BackendEvent.CONVERSATION.OTR_MESSAGE_ADD;
-    let mappedEvent = isEncryptedEvent ? await this.cryptographyRepository.handleEncryptedEvent(event) : event;
+    if (isEncryptedEvent) {
+      event = await this.cryptographyRepository.handleEncryptedEvent(event);
+    }
 
     for (const eventProcessMiddleware of this.eventProcessMiddlewares) {
-      await eventProcessMiddleware(mappedEvent);
+      event = await eventProcessMiddleware(event);
     }
 
-    const shouldSaveEvent = EventTypeHandling.STORE.includes(mappedEvent.type);
+    const shouldSaveEvent = EventTypeHandling.STORE.includes(event.type);
     if (shouldSaveEvent) {
-      mappedEvent = await this._handleEventSaving(mappedEvent, source);
+      event = await this._handleEventSaving(event, source);
     }
 
-    return this._handleEventDistribution(mappedEvent, source);
+    return this._handleEventDistribution(event, source);
   }
 
   /**
@@ -796,25 +798,25 @@ export class EventRepository {
     if (originalEvent.from !== newEvent.from) {
       const logMessage = `ID previously used by user '${newEvent.from}'`;
       const errorMessage = 'ID reused by other user';
-      this._throwValidationError(newEvent, errorMessage, logMessage);
+      return this._throwValidationError(newEvent, errorMessage, logMessage);
     }
 
     const containsLinkPreview = newEventData.previews && !!newEventData.previews.length;
     if (!containsLinkPreview) {
       const errorMessage = 'Link preview event does not contain previews';
-      this._throwValidationError(newEvent, errorMessage);
+      return this._throwValidationError(newEvent, errorMessage);
     }
 
     const textContentMatches = newEventData.content === originalData.content;
     if (!textContentMatches) {
       const errorMessage = 'ID of link preview reused';
       const logMessage = 'Text content for link preview not matching';
-      this._throwValidationError(newEvent, errorMessage, logMessage);
+      return this._throwValidationError(newEvent, errorMessage, logMessage);
     }
 
     const bothAreMessageAddType = newEvent.type === originalEvent.type;
     if (!bothAreMessageAddType) {
-      this._throwValidationError(newEvent, 'ID reused by same user');
+      return this._throwValidationError(newEvent, 'ID reused by same user');
     }
 
     const updates = this._getUpdatesForLinkPreview(originalEvent, newEvent);
