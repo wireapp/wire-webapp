@@ -137,5 +137,3 @@ export function t(
 }
 
 export const joinNames = LocalizerUtil.joinNames;
-
-window.t = LocalizerUtil.translate;

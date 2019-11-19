@@ -5,12 +5,12 @@ import jQuery from 'jquery';
 import ko from 'knockout';
 import raygun from '../../../node_modules/raygun4js/dist/raygun.vanilla.js';
 
+import {LocalizerUtil} from 'Util/LocalizerUtil';
+
 // Needed for the wrapper
 import '../event/WebApp';
 
 import configGlobal from '../config.js';
-
-import LocalizerUtilGlobal from 'Util/LocalizerUtil.js';
 
 import AccessTokenErrorGlobal from '../error/AccessTokenError.js';
 import AuthErrorGlobal from '../error/AuthError.js';
@@ -90,3 +90,4 @@ window.Cookies = Cookies;
 // we need to publish jQuery on the window so that knockout can use it
 window.jQuery = jQuery;
 window.ko = ko;
+window.t = LocalizerUtil.translate;
