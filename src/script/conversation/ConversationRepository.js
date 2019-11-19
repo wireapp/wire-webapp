@@ -328,9 +328,8 @@ export class ConversationRepository {
       updatedEvent,
     );
     if (replacedMessageEntity) {
-      this._updateMessageUserEntities(replacedMessageEntity).then(messageEntity => {
-        amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.UPDATED, oldEvent.id, messageEntity);
-      });
+      const messageEntity = await this._updateMessageUserEntities(replacedMessageEntity);
+      amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.UPDATED, oldEvent.id, messageEntity);
     }
   }
 

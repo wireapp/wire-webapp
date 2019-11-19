@@ -52,14 +52,16 @@ export class CryptographyMapper {
    * @param {Object} event - Event of BackendEvent.CONVERSATION.OTR-ASSET-ADD or BackendEvent.CONVERSATION.OTR-MESSAGE-ADD
    * @returns {Promise} Resolves with the mapped event
    */
-  mapGenericMessage(genericMessage, event) {
+  async mapGenericMessage(genericMessage, event) {
     if (!genericMessage) {
-      return Promise.reject(new z.error.CryptographyError(z.error.CryptographyError.TYPE.NO_GENERIC_MESSAGE));
+      throw new z.error.CryptographyError(z.error.CryptographyError.TYPE.NO_GENERIC_MESSAGE);
     }
 
-    return Promise.resolve()
-      .then(() => (genericMessage.external ? this._unwrapExternal(genericMessage.external, event) : genericMessage))
-      .then(unwrappedGenericMessage => this._mapGenericMessage(unwrappedGenericMessage, event));
+    if (genericMessage.external) {
+      genericMessage = await this._unwrapExternal(genericMessage.external, event);
+    }
+
+    return this._mapGenericMessage(genericMessage, event);
   }
 
   _mapGenericMessage(genericMessage, event) {
@@ -328,7 +330,8 @@ export class CryptographyMapper {
       if (!eventData.data || !otrKey || !sha256) {
         throw new Error('Not all expected properties defined');
       }
-      const cipherText = (await base64ToArray(eventData.data)).buffer;
+      const cipherTextArray = await base64ToArray(eventData.data);
+      const cipherText = cipherTextArray.buffer;
       const keyBytes = new Uint8Array(otrKey).buffer;
       const referenceSha256 = new Uint8Array(sha256).buffer;
       const externalMessageBuffer = await decryptAesAsset(cipherText, keyBytes, referenceSha256);

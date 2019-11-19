@@ -767,8 +767,8 @@ export class EventMapper {
    * @returns {Promise<LinkPreview[]>} Array of mapped link previews
    */
   async _mapAssetLinkPreviews(linkPreviews) {
-    const arrays = await Promise.all(linkPreviews.map(base64 => base64ToArray(base64)));
-    return arrays
+    const encodedLinkPreviews = await Promise.all(linkPreviews.map(base64 => base64ToArray(base64)));
+    return encodedLinkPreviews
       .map(encodedLinkPreview => LinkPreview.decode(encodedLinkPreview))
       .map(linkPreview => this._mapAssetLinkPreview(linkPreview))
       .filter(linkPreviewEntity => linkPreviewEntity);

@@ -638,25 +638,20 @@ export class EventRepository {
    * @param {EventRepository.SOURCE} source - Source of event
    * @returns {Promise} Resolves with the saved record or `true` if the event was skipped
    */
-  processEvent(event, source) {
+  async processEvent(event, source) {
     const isEncryptedEvent = event.type === BackendEvent.CONVERSATION.OTR_MESSAGE_ADD;
-    const mapEvent = isEncryptedEvent
-      ? this.cryptographyRepository.handleEncryptedEvent(event)
-      : Promise.resolve(event);
+    let mappedEvent = isEncryptedEvent ? await this.cryptographyRepository.handleEncryptedEvent(event) : event;
 
-    return mapEvent
-      .then(mappedEvent => {
-        return this.eventProcessMiddlewares.reduce((eventPromise, middleware) => {
-          // use reduce to resolve promises sequentially
-          // see https://hackernoon.com/functional-javascript-resolving-promises-sequentially-7aac18c4431e
-          return eventPromise.then(middleware);
-        }, Promise.resolve(mappedEvent));
-      })
-      .then(mappedEvent => {
-        const shouldSaveEvent = EventTypeHandling.STORE.includes(mappedEvent.type);
-        return shouldSaveEvent ? this._handleEventSaving(mappedEvent, source) : mappedEvent;
-      })
-      .then(savedEvent => this._handleEventDistribution(savedEvent, source));
+    for (const eventProcessMiddleware of this.eventProcessMiddlewares) {
+      await eventProcessMiddleware(mappedEvent);
+    }
+
+    const shouldSaveEvent = EventTypeHandling.STORE.includes(mappedEvent.type);
+    if (shouldSaveEvent) {
+      mappedEvent = await this._handleEventSaving(mappedEvent, source);
+    }
+
+    return this._handleEventDistribution(mappedEvent, source);
   }
 
   /**

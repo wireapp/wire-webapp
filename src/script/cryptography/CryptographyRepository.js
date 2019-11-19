@@ -339,14 +339,15 @@ export class CryptographyRepository {
 
   async _createSessionFromPreKey(preKey, userId, clientId) {
     try {
-      if (preKey) {
+      if (!preKey) {
+        Raygun.send(new Error('Failed to create session: No pre-key found'));
+        this.logger.warn(`No pre-key for user '${userId}' ('${clientId}') found. The client might have been deleted.`);
+      } else {
         this.logger.log(`Initializing session with user '${userId}' (${clientId}) with pre-key ID '${preKey.id}'.`);
         const sessionId = this._constructSessionId(userId, clientId);
         const preKeyArray = await base64ToArray(preKey.key);
         return this.cryptobox.session_from_prekey(sessionId, preKeyArray.buffer);
       }
-      Raygun.send(new Error('Failed to create session: No pre-key found'));
-      this.logger.warn(`No pre-key for user '${userId}' ('${clientId}') found. The client might have been deleted.`);
     } catch (error) {
       Raygun.send(new Error(`Failed to create session: ${error.message}`));
       const message = `Pre-key for user '${userId}' ('${clientId}') invalid. Skipping encryption: ${error.message}`;

@@ -205,14 +205,12 @@ export class AssetService {
     xhr.setRequestHeader('Authorization', `${this.backendClient.accessTokenType} ${this.backendClient.accessToken}`);
     xhr.send(new Blob([body, assetData, footer]));
 
-    const xhrResult = await new Promise<UploadAssetResponse>((resolve, reject) => {
+    return new Promise<UploadAssetResponse>((resolve, reject) => {
       xhr.onload = function(event): void {
         return this.status === 201 ? resolve(JSON.parse(this.response)) : reject(event);
       };
       xhr.onerror = reject;
     });
-
-    return xhrResult;
   }
 
   _compressImage(image: File | Blob): Promise<CompressedImage> {
