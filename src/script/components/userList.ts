@@ -56,8 +56,8 @@ interface UserListParams {
   noSelfInteraction: boolean;
 }
 
-const listTemplate = (dataObservable: string): string => `
-  <div class="search-list" data-bind="css: cssClasses(), foreach: {data: ${dataObservable}(), as: 'user', noChildContext: true }">
+const listTemplate = (dataObservable: string, uieName: string = ''): string => `
+  <div class="search-list" data-bind="css: cssClasses(), foreach: {data: ${dataObservable}(), as: 'user', noChildContext: true }" data-uie-name="${uieName}>
     <!-- ko if: noSelfInteraction && user.is_me -->
       <participant-item
         params="participant: user, customInfo: infos && infos()[user.id], canSelect: isSelectEnabled, isSelected: isSelected(user), mode: mode, external: teamRepository.isExternal(user.id), selfInTeam: selfInTeam"
@@ -77,17 +77,17 @@ ko.components.register('user-list', {
   template: `
     <!-- ko if: showRoles() -->
       <!-- ko if: adminUsers().length > 0 || showEmptyAdmin -->
-        <div class="user-list__header" data-bind="text: t('searchListAdmins')"></div>
+        <div class="user-list__header" data-bind="text: t('searchListAdmins')" data-uie-name="label-conversation-admins"></div>
         <!-- ko if: adminUsers().length > 0 -->
-          ${listTemplate('adminUsers')}
+          ${listTemplate('adminUsers', 'list-admins')}
         <!-- /ko -->
         <!-- ko ifnot: adminUsers().length > 0 -->
-          <div class="user-list__no-admin" data-bind="text: t('searchListNoAdmins')"></div>
+          <div class="user-list__no-admin" data-bind="text: t('searchListNoAdmins')" data-uie-name="status-no-admins"></div>
         <!-- /ko -->
       <!-- /ko -->
       <!-- ko if: memberUsers().length > 0 -->
-        <div class="user-list__header" data-bind="text: t('searchListMembers')"></div>
-        ${listTemplate('memberUsers')}
+        <div class="user-list__header" data-bind="text: t('searchListMembers')" data-uie-name="label-conversation-members"></div>
+        ${listTemplate('memberUsers', 'list-members')}
       <!-- /ko -->
     <!-- /ko -->
     <!-- ko ifnot: showRoles() -->
