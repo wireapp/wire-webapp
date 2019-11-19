@@ -21,7 +21,7 @@ import {Availability, Confirmation, GenericMessage, LinkPreview, Mention, Quote}
 
 import {getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {base64ToArray, arrayToBase64Sync, createRandomUuid} from 'Util/util';
+import {base64ToArray, arrayToBase64, createRandomUuid} from 'Util/util';
 
 import {decryptAesAsset} from '../assets/AssetCrypto';
 import {AssetTransferState} from '../assets/AssetTransferState';
@@ -64,7 +64,7 @@ export class CryptographyMapper {
     return this._mapGenericMessage(genericMessage, event);
   }
 
-  _mapGenericMessage(genericMessage, event) {
+  async _mapGenericMessage(genericMessage, event) {
     let specificContent;
 
     switch (genericMessage.content) {
@@ -104,7 +104,7 @@ export class CryptographyMapper {
       }
 
       case GENERIC_MESSAGE_TYPE.EPHEMERAL: {
-        specificContent = this._mapEphemeral(genericMessage, event);
+        specificContent = await this._mapEphemeral(genericMessage, event);
         break;
       }
 
@@ -139,7 +139,8 @@ export class CryptographyMapper {
       }
 
       case GENERIC_MESSAGE_TYPE.TEXT: {
-        specificContent = addMetadata(this._mapText(genericMessage.text), genericMessage.text);
+        const mappedText = await this._mapText(genericMessage.text);
+        specificContent = addMetadata(mappedText, genericMessage.text);
         break;
       }
 
@@ -299,17 +300,17 @@ export class CryptographyMapper {
     };
   }
 
-  _mapEdited(edited, eventId) {
-    const mappedMessage = this._mapText(edited.text, eventId);
+  async _mapEdited(edited, eventId) {
+    const mappedMessage = await this._mapText(edited.text, eventId);
     mappedMessage.data.replacing_message_id = edited.replacingMessageId;
     return mappedMessage;
   }
 
-  _mapEphemeral(genericMessage, event) {
+  async _mapEphemeral(genericMessage, event) {
     const messageTimer = genericMessage.ephemeral[PROTO_MESSAGE_TYPE.EPHEMERAL_EXPIRATION];
     genericMessage.ephemeral.messageId = genericMessage.messageId;
 
-    const embeddedMessage = this._mapGenericMessage(genericMessage.ephemeral, event);
+    const embeddedMessage = await this._mapGenericMessage(genericMessage.ephemeral, event);
     embeddedMessage.ephemeral_expires = ConversationEphemeralHandler.validateTimer(messageTimer);
 
     return embeddedMessage;
@@ -424,7 +425,7 @@ export class CryptographyMapper {
     };
   }
 
-  _mapText(text) {
+  async _mapText(text) {
     const {mentions: protoMentions, quote: protoQuote} = text;
 
     const protoLinkPreviews = text[PROTO_MESSAGE_TYPE.LINK_PREVIEWS];
@@ -434,17 +435,28 @@ export class CryptographyMapper {
       protoMentions.length = CryptographyMapper.CONFIG.MAX_MENTIONS_PER_MESSAGE;
     }
 
-    return {
+    const mentions = await Promise.all(
+      protoMentions.map(protoMention => arrayToBase64(Mention.encode(protoMention).finish())),
+    );
+    const previews = await Promise.all(
+      protoLinkPreviews.map(protoLinkPreview => arrayToBase64(LinkPreview.encode(protoLinkPreview).finish())),
+    );
+
+    const mappedText = {
       data: {
         content: `${text.content}`,
-        mentions: protoMentions.map(protoMention => arrayToBase64Sync(Mention.encode(protoMention).finish())),
-        previews: protoLinkPreviews.map(protoLinkPreview =>
-          arrayToBase64Sync(LinkPreview.encode(protoLinkPreview).finish()),
-        ),
-        quote: protoQuote && arrayToBase64Sync(Quote.encode(protoQuote).finish()),
+        mentions,
+        previews,
       },
       type: ClientEvent.CONVERSATION.MESSAGE_ADD,
     };
+
+    if (protoQuote) {
+      const quote = await arrayToBase64(Quote.encode(protoQuote).finish());
+      mappedText.data.quote = quote;
+    }
+
+    return mappedText;
   }
 }
 

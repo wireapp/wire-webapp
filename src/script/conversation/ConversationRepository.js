@@ -3868,7 +3868,7 @@ export class ConversationRepository {
       return undefined;
     }
     const replacedMessageEntity = await this.event_mapper.updateMessageEvent(originalMessage, newData);
-    this.ephemeralHandler.validateMessage(replacedMessageEntity);
+    await this.ephemeralHandler.validateMessage(replacedMessageEntity);
     return replacedMessageEntity;
   }
 
@@ -3880,16 +3880,15 @@ export class ConversationRepository {
    * @param {Object} eventJson - Event data
    * @returns {Promise} Promise that resolves with the message entity for the event
    */
-  _addEventToConversation(conversationEntity, eventJson) {
-    return this._initMessageEntity(conversationEntity, eventJson).then(messageEntity => {
-      if (conversationEntity && messageEntity) {
-        const wasAdded = conversationEntity.add_message(messageEntity);
-        if (wasAdded) {
-          this.ephemeralHandler.validateMessage(messageEntity);
-        }
+  async _addEventToConversation(conversationEntity, eventJson) {
+    const messageEntity = await this._initMessageEntity(conversationEntity, eventJson);
+    if (conversationEntity && messageEntity) {
+      const wasAdded = conversationEntity.add_message(messageEntity);
+      if (wasAdded) {
+        await this.ephemeralHandler.validateMessage(messageEntity);
       }
-      return {conversationEntity, messageEntity};
-    });
+    }
+    return {conversationEntity, messageEntity};
   }
 
   /**
@@ -3901,19 +3900,16 @@ export class ConversationRepository {
    * @param {boolean} [prepend=true] - Should existing messages be prepended
    * @returns {Promise} Resolves with an array of mapped messages
    */
-  _addEventsToConversation(events, conversationEntity, prepend = true) {
-    return this.event_mapper
-      .mapJsonEvents(events, conversationEntity, true)
-      .then(messageEntities => this._updateMessagesUserEntities(messageEntities))
-      .then(messageEntities => this.ephemeralHandler.validateMessages(messageEntities))
-      .then(messageEntities => {
-        if (prepend && conversationEntity.messages().length) {
-          conversationEntity.prepend_messages(messageEntities);
-        } else {
-          conversationEntity.add_messages(messageEntities);
-        }
-        return messageEntities;
-      });
+  async _addEventsToConversation(events, conversationEntity, prepend = true) {
+    const mappedEvents = await this.event_mapper.mapJsonEvents(events, conversationEntity, true);
+    const updatedEvents = await this._updateMessagesUserEntities(mappedEvents);
+    const validatedMessages = await this.ephemeralHandler.validateMessages(updatedEvents);
+    if (prepend && conversationEntity.messages().length) {
+      conversationEntity.prepend_messages(validatedMessages);
+    } else {
+      conversationEntity.add_messages(validatedMessages);
+    }
+    return validatedMessages;
   }
 
   /**

@@ -17,7 +17,7 @@
  *
  */
 
-import {Decoder, Encoder} from 'bazinga64';
+import {Decoder} from 'bazinga64';
 import JsMD5 from 'js-md5';
 import {ObservableArray} from 'knockout';
 import sodium from 'libsodium-wrappers-sumo';
@@ -203,12 +203,6 @@ export const base64ToArray = async (base64: string): Promise<Uint8Array> => {
   await sodium.ready;
   return sodium.from_base64(stripDataUri(base64), sodium.base64_variants.ORIGINAL);
 };
-
-/**
- * Convert an ArrayBuffer or an Uint8Array to a base64 string
- */
-export const arrayToBase64Sync = (array: ArrayBuffer | Uint8Array): string =>
-  Encoder.toBase64(new Uint8Array(array)).asString;
 
 /**
  * Convert an ArrayBuffer or an Uint8Array to a base64 string asynchronously

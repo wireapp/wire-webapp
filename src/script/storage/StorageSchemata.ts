@@ -16,7 +16,9 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+
 import {Dexie} from 'dexie';
+
 import {base64ToArraySync} from 'Util/util';
 import {categoryFromEvent} from '../message/MessageCategorization';
 
