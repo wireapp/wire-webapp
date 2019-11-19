@@ -1704,10 +1704,10 @@
     tough-cookie "3.0.1"
     ws "7.2.0"
 
-"@wireapp/avs@5.3.36":
-  version "5.3.36"
-  resolved "https://registry.yarnpkg.com/@wireapp/avs/-/avs-5.3.36.tgz#155b52881ba8f2646f18642dd6b0d6fe85b65c6f"
-  integrity sha512-yzU20LHLz0yJy5Pif4RAldvlZ3pWLer36c92vXMgIBxcQGh2xA3YNni5NS77eJADYzu96oWDXIkvS8GBJaCpxA==
+"@wireapp/avs@5.3.29":
+  version "5.3.29"
+  resolved "https://registry.yarnpkg.com/@wireapp/avs/-/avs-5.3.29.tgz#ad927ab32792dab862ea7c934202475e26fc8f8e"
+  integrity sha512-6WWklepEo0irnXPeQt8uJiR5rjkHkHcy9TPLGp6tHwuLzcvtTviEXbqqd5Ce1MQ+vRv53vGQXI233KWcOs85Dg==
 
 "@wireapp/cbor@4.3.23":
   version "4.3.23"
@@ -1829,10 +1829,10 @@
     emotion-theming "10.0.17"
     react-transition-group "4.3.0"
 
-"@wireapp/store-engine-dexie@0.6.21":
-  version "0.6.21"
-  resolved "https://registry.yarnpkg.com/@wireapp/store-engine-dexie/-/store-engine-dexie-0.6.21.tgz#3a161e18c9c5e52fbe9a8609f901260c9c510f1a"
-  integrity sha512-zCzaL8r1ra+YZiz0lw5Ll4Z/7ZF0dZxMGm4bI13d3cahE8CIoekfN9Wu7dTCD/ZnYQ5QZCq9EdU2XgivRkWqCA==
+"@wireapp/store-engine-dexie@0.7.0":
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine-dexie/-/store-engine-dexie-0.7.0.tgz#5b86f8fbbdfb4f9105d3537d93e4dbec5c446aa4"
+  integrity sha512-hBXwIDZFH3Dw+jLCt4g0vV/xxIWs2Mq+3I83pFztfbYJM8/BSM4+Rz5hgHMA0GanSYFbLwdTByltnd8PlOGzQQ==
   dependencies:
     dexie "2.0.4"
 
