@@ -93,13 +93,13 @@ export function clientReducer(state: ClientState = initialClientState, action: A
       return {...state, hasHistory: action.payload};
     }
     case NOTIFICATION_ACTION.NOTIFICATION_CHECK_HISTORY_RESET: {
-      return {...state, hasHistory: initialState.hasHistory};
+      return {...state, hasHistory: initialClientState.hasHistory};
     }
     case CLIENT_ACTION.CLIENT_RESET_ERROR: {
       return {...state, error: null};
     }
     case AUTH_ACTION.LOGOUT_SUCCESS: {
-      return {...initialState};
+      return {...initialClientState};
     }
     default:
       return state;

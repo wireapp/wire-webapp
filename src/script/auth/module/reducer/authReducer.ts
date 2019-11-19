@@ -122,7 +122,7 @@ export function authReducer(state: AuthState = initialAuthState, action: AppActi
     case AUTH_ACTION.REGISTER_TEAM_SUCCESS: {
       return {
         ...state,
-        account: {...initialState.account},
+        account: {...initialAuthState.account},
         error: null,
         fetched: true,
         fetching: false,
@@ -133,16 +133,16 @@ export function authReducer(state: AuthState = initialAuthState, action: AppActi
       return {...state, account: {...state.account, ...action.payload}, error: null};
     }
     case AUTH_ACTION.REGISTER_RESET_ACCOUNT_DATA: {
-      return {...state, account: {...initialState.account}, error: null};
+      return {...state, account: {...initialAuthState.account}, error: null};
     }
     case AUTH_ACTION.PUSH_LOGIN_DATA: {
       return {...state, loginData: {...state.loginData, ...action.payload}, error: null};
     }
     case AUTH_ACTION.RESET_LOGIN_DATA: {
-      return {...state, loginData: {...initialState.loginData}, error: null};
+      return {...state, loginData: {...initialAuthState.loginData}, error: null};
     }
     case AUTH_ACTION.LOGOUT_SUCCESS: {
-      return {...initialState};
+      return {...initialAuthState};
     }
     case AUTH_ACTION.SILENT_LOGOUT_SUCCESS: {
       return {
