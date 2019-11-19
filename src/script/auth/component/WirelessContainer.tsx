@@ -20,6 +20,7 @@
 import {CloseIcon, Content, Footer, Header, Link, Logo, Small} from '@wireapp/react-ui-kit';
 import React from 'react';
 import {FormattedHTMLMessage, useIntl} from 'react-intl';
+import {addLocaleToUrl} from '../../externalRoute';
 import {cookiePolicyStrings, footerStrings} from '../../strings';
 import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
 
@@ -76,7 +77,7 @@ export const WirelessContainer: React.SFC<Props> = ({showCookiePolicyBanner, onC
         </Header>
         <Content style={{flex: '1', paddingLeft: '8px', width: '100%'}}>{children}</Content>
         <Footer style={{height: '30px', justifyContent: 'flex-end', margin: '0 0 18px 8px'}}>
-          <Link href={EXTERNAL_ROUTE.WIRE_WEBSITE}>{_(footerStrings.wireLink)}</Link>
+          <Link href={addLocaleToUrl(EXTERNAL_ROUTE.WIRE_WEBSITE)}>{_(footerStrings.wireLink)}</Link>
           <Small> &middot; {_(footerStrings.copy)}</Small>
         </Footer>
       </Content>
