@@ -70,24 +70,21 @@ export class EventMapper {
    * @param {Conversation} conversationEntity - Conversation entity the events belong to
    * @returns {Promise<Array<Message>>} Resolves with the mapped message entities
    */
-  mapJsonEvents(events, conversationEntity) {
-    return Promise.resolve().then(() => {
-      return events
-        .filter(event => event)
-        .reverse()
-        .map(event => {
-          try {
-            return this._mapJsonEvent(event, conversationEntity);
-          } catch (error) {
-            const errorMessage = `Failure while mapping events. Affected '${event.type}' event: ${error.message}`;
-            this.logger.error(errorMessage, {error, event});
-
-            const customData = {eventTime: new Date(event.time).toISOString(), eventType: event.type};
-            Raygun.send(new Error(errorMessage), customData);
-          }
-        })
-        .filter(messageEntity => messageEntity);
-    });
+  async mapJsonEvents(events, conversationEntity) {
+    const reversedEvents = events.filter(event => !!event).reverse();
+    const mappedEvents = await Promise.all(
+      reversedEvents.map(async event => {
+        try {
+          return await this._mapJsonEvent(event, conversationEntity);
+        } catch (error) {
+          const errorMessage = `Failure while mapping events. Affected '${event.type}' event: ${error.message}`;
+          this.logger.error(errorMessage, {error, event});
+          const customData = {eventTime: new Date(event.time).toISOString(), eventType: event.type};
+          Raygun.send(new Error(errorMessage), customData);
+        }
+      }),
+    );
+    return mappedEvents.filter(messageEntity => !!messageEntity);
   }
 
   /**
@@ -121,9 +118,9 @@ export class EventMapper {
    *
    * @param {Message} originalEntity - the original message to update
    * @param {Object} event - new json data to feed into the entity
-   * @returns {Message} - the updated message entity
+   * @returns {Promise<Message>} - the updated message entity
    */
-  updateMessageEvent(originalEntity, event) {
+  async updateMessageEvent(originalEntity, event) {
     const {id, data: eventData, edited_time: editedTime} = event;
 
     if (eventData.quote) {
@@ -133,7 +130,8 @@ export class EventMapper {
 
     if (id !== originalEntity.id && originalEntity.has_asset_text()) {
       originalEntity.assets.removeAll();
-      originalEntity.assets.push(this._mapAssetText(eventData));
+      const textAsset = await this._mapAssetText(eventData);
+      originalEntity.assets.push(textAsset);
     } else if (originalEntity.get_first_asset) {
       const asset = originalEntity.get_first_asset();
       if (eventData.status && asset.status) {
@@ -142,7 +140,8 @@ export class EventMapper {
       }
       if (eventData.previews) {
         if (asset.previews().length !== eventData.previews.length) {
-          asset.previews(this._mapAssetLinkPreviews(eventData.previews));
+          const previews = await this._mapAssetLinkPreviews(eventData.previews);
+          asset.previews(previews);
         }
       }
 
@@ -179,9 +178,9 @@ export class EventMapper {
    *
    * @param {Object} event - Event data
    * @param {Conversation} conversationEntity - Conversation entity the event belong to
-   * @returns {Message} Mapped message entity
+   * @returns {Promise<Message>} Mapped message entity
    */
-  _mapJsonEvent(event, conversationEntity) {
+  async _mapJsonEvent(event, conversationEntity) {
     let messageEntity;
 
     switch (event.type) {
@@ -247,7 +246,8 @@ export class EventMapper {
       }
 
       case ClientEvent.CONVERSATION.MESSAGE_ADD: {
-        messageEntity = addMetadata(this._mapEventMessageAdd(event), event);
+        const addMessage = await this._mapEventMessageAdd(event);
+        messageEntity = addMetadata(addMessage, event);
         break;
       }
 
@@ -475,13 +475,14 @@ export class EventMapper {
    *
    * @private
    * @param {Object} event - Message data
-   * @returns {ContentMessage} Content message entity
+   * @returns {Promise<ContentMessage>} Content message entity
    */
-  _mapEventMessageAdd(event) {
+  async _mapEventMessageAdd(event) {
     const {data: eventData, edited_time: editedTime} = event;
     const messageEntity = new ContentMessage();
 
-    messageEntity.assets.push(this._mapAssetText(eventData));
+    const assets = await this._mapAssetText(eventData);
+    messageEntity.assets.push(assets);
     messageEntity.replacing_message_id = eventData.replacing_message_id;
     messageEntity.edited_timestamp(new Date(editedTime || eventData.edited_time).getTime());
 
@@ -763,11 +764,12 @@ export class EventMapper {
    *
    * @private
    * @param {Array} linkPreviews - Link previews as base64 encoded proto messages
-   * @returns {Array<LinkPreview>} Array of mapped link previews
+   * @returns {Promise<LinkPreview[]>} Array of mapped link previews
    */
-  _mapAssetLinkPreviews(linkPreviews) {
-    return linkPreviews
-      .map(encodedLinkPreview => LinkPreview.decode(base64ToArray(encodedLinkPreview)))
+  async _mapAssetLinkPreviews(linkPreviews) {
+    const encodedLinkPreviews = await Promise.all(linkPreviews.map(base64 => base64ToArray(base64)));
+    return encodedLinkPreviews
+      .map(encodedLinkPreview => LinkPreview.decode(encodedLinkPreview))
       .map(linkPreview => this._mapAssetLinkPreview(linkPreview))
       .filter(linkPreviewEntity => linkPreviewEntity);
   }
@@ -778,12 +780,13 @@ export class EventMapper {
    * @private
    * @param {Array} mentions - Mentions as base64 encoded proto messages
    * @param {string} messageText - Text of message
-   * @returns {Array<MentionEntity>} Array of mapped mentions
+   * @returns {Promise<MentionEntity[]>} Array of mapped mentions
    */
-  _mapAssetMentions(mentions, messageText) {
-    return mentions
+  async _mapAssetMentions(mentions, messageText) {
+    const encodedMentions = await Promise.all(mentions.map(base64 => base64ToArray(base64)));
+    return encodedMentions
       .map(encodedMention => {
-        const protoMention = Mention.decode(base64ToArray(encodedMention));
+        const protoMention = Mention.decode(encodedMention);
         return new MentionEntity(protoMention.start, protoMention.length, protoMention.userId);
       })
       .filter((mentionEntity, _, allMentions) => {
@@ -803,18 +806,20 @@ export class EventMapper {
    *
    * @private
    * @param {Object} eventData - Asset data received as JSON
-   * @returns {Text} Text asset entity
+   * @returns {Promise<Text>} Text asset entity
    */
-  _mapAssetText(eventData) {
+  async _mapAssetText(eventData) {
     const {id, content, mentions, message, previews} = eventData;
     const messageText = content || message;
     const assetEntity = new Text(id, messageText);
 
     if (mentions && mentions.length) {
-      assetEntity.mentions(this._mapAssetMentions(mentions, messageText));
+      const mappedMentions = await this._mapAssetMentions(mentions, messageText);
+      assetEntity.mentions(mappedMentions);
     }
     if (previews && previews.length) {
-      assetEntity.previews(this._mapAssetLinkPreviews(previews));
+      const mappedLinkPreviews = await this._mapAssetLinkPreviews(previews);
+      assetEntity.previews(mappedLinkPreviews);
     }
 
     return assetEntity;

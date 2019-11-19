@@ -87,9 +87,10 @@ describe('MentionEntity', () => {
       expect(endMentionEntity.validate(endTextMessage)).toBe(true);
     });
 
-    it('supports line breaks in texts with mentions', () => {
+    it('supports line breaks in texts with mentions', async () => {
       const encodedMention = 'CAEQCBokNDRiZDc3NmUtODcxOS00MzIwLWIxYTAtMzU0Y2NkOGU5ODNh';
-      const protoMention = Mention.decode(base64ToArray(encodedMention));
+      const mentionArray = await base64ToArray(encodedMention);
+      const protoMention = Mention.decode(mentionArray);
       const mentionEntity = new MentionEntity(protoMention.start, protoMention.length, protoMention.userId);
       const messageText = '\n@Firefox';
 

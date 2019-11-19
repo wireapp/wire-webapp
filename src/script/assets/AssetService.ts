@@ -164,7 +164,7 @@ export class AssetService {
     return isEternal ? AssetRetentionPolicy.ETERNAL : AssetRetentionPolicy.PERSISTENT;
   }
 
-  postAsset(
+  async postAsset(
     assetData: Uint8Array,
     options: AssetUploadOptions,
     xhrAccessorFunction?: Function,
@@ -179,7 +179,7 @@ export class AssetService {
 
     const optionsString = JSON.stringify(options);
 
-    const md5Base64Hash = arrayToMd5Base64(assetData);
+    const md5Base64Hash = await arrayToMd5Base64(assetData);
 
     const body = [
       `--${BOUNDARY}`,
