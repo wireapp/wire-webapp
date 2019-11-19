@@ -593,7 +593,7 @@ describe('CryptographyMapper', () => {
         });
     });
 
-    it('can map a text wrapped inside an external message', () => {
+    it('can map a text wrapped inside an external message', async () => {
       const plaintext = 'Test';
       const text = new Text({content: plaintext});
       const generic_message = new GenericMessage({
@@ -601,27 +601,23 @@ describe('CryptographyMapper', () => {
         messageId: createRandomUuid(),
       });
 
-      return encryptAesAsset(GenericMessage.encode(generic_message).finish())
-        .then(({cipherText, keyBytes, sha256}) => {
-          keyBytes = new Uint8Array(keyBytes);
-          sha256 = new Uint8Array(sha256);
-          event.data.data = arrayToBase64(cipherText);
+      const encryptedAsset = await encryptAesAsset(GenericMessage.encode(generic_message).finish());
+      const keyBytes = new Uint8Array(encryptedAsset.keyBytes);
+      const sha256 = new Uint8Array(encryptedAsset.sha256);
+      event.data.data = await arrayToBase64(encryptedAsset.cipherText);
 
-          const external_message = new GenericMessage({
-            external: new External({otrKey: keyBytes, sha256}),
-            messageId: createRandomUuid(),
-          });
+      const external_message = new GenericMessage({
+        external: new External({otrKey: keyBytes, sha256}),
+        messageId: createRandomUuid(),
+      });
+      const event_json = await mapper.mapGenericMessage(external_message, event);
 
-          return mapper.mapGenericMessage(external_message, event);
-        })
-        .then(event_json => {
-          expect(event_json.data.content).toBe(plaintext);
-          expect(event_json.type).toBe(ClientEvent.CONVERSATION.MESSAGE_ADD);
-          expect(event_json.id).toBe(generic_message.messageId);
-        });
+      expect(event_json.data.content).toBe(plaintext);
+      expect(event_json.type).toBe(ClientEvent.CONVERSATION.MESSAGE_ADD);
+      expect(event_json.id).toBe(generic_message.messageId);
     });
 
-    it('can map a ping wrapped inside an external message', () => {
+    it('can map a ping wrapped inside an external message', async () => {
       let external_message = undefined;
 
       const genericMessage = new GenericMessage({
@@ -629,26 +625,23 @@ describe('CryptographyMapper', () => {
         messageId: createRandomUuid(),
       });
 
-      return encryptAesAsset(GenericMessage.encode(genericMessage).finish())
-        .then(({cipherText, keyBytes, sha256}) => {
-          keyBytes = new Uint8Array(keyBytes);
-          sha256 = new Uint8Array(sha256);
-          event.data.data = arrayToBase64(cipherText);
+      const encryptedAsset = await encryptAesAsset(GenericMessage.encode(genericMessage).finish());
+      const keyBytes = new Uint8Array(encryptedAsset.keyBytes);
+      const sha256 = new Uint8Array(encryptedAsset.sha256);
+      event.data.data = await arrayToBase64(encryptedAsset.cipherText);
 
-          external_message = new GenericMessage({
-            external: new External({otrKey: keyBytes, sha256}),
-            messageId: createRandomUuid(),
-          });
-          return mapper.mapGenericMessage(external_message, event);
-        })
-        .then(event_json => {
-          expect(isObject(event_json)).toBeTruthy();
-          expect(event_json.type).toBe(ClientEvent.CONVERSATION.KNOCK);
-          expect(event_json.conversation).toBe(event.conversation);
-          expect(event_json.from).toBe(event.from);
-          expect(event_json.time).toBe(event.time);
-          expect(event_json.id).toBe(genericMessage.messageId);
-        });
+      external_message = new GenericMessage({
+        external: new External({otrKey: keyBytes, sha256}),
+        messageId: createRandomUuid(),
+      });
+      const event_json = await mapper.mapGenericMessage(external_message, event);
+
+      expect(isObject(event_json)).toBeTruthy();
+      expect(event_json.type).toBe(ClientEvent.CONVERSATION.KNOCK);
+      expect(event_json.conversation).toBe(event.conversation);
+      expect(event_json.from).toBe(event.from);
+      expect(event_json.time).toBe(event.time);
+      expect(event_json.id).toBe(genericMessage.messageId);
     });
 
     it('resolves with a mapped location message', () => {
