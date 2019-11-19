@@ -64,6 +64,35 @@ describe('SelfAction', () => {
     expect(spies.doCheckPasswordState.calls.count()).toEqual(1);
   });
 
+  it('handles failed self user fetch', async () => {
+    const error = new Error('testerror');
+
+    const mockedActions = {
+      selfAction: {},
+    };
+    const mockedApiClient = {
+      self: {
+        api: {
+          getSelf: () => Promise.reject(error),
+        },
+      },
+    };
+
+    const store = mockStoreFactory({
+      actions: mockedActions,
+      apiClient: mockedApiClient,
+    })({});
+    try {
+      await store.dispatch(actionRoot.selfAction.fetchSelf());
+      fail();
+    } catch (backendError) {
+      expect(store.getActions()).toEqual([
+        SelfActionCreator.startFetchSelf(),
+        SelfActionCreator.failedFetchSelf(error),
+      ]);
+    }
+  });
+
   it('fetches the set password state', async () => {
     const mockedApiClient = {
       self: {api: {headPassword: () => Promise.resolve({status: 200})}},
