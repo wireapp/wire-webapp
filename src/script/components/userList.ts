@@ -23,6 +23,7 @@ import {ConversationRepository} from '../conversation/ConversationRepository';
 import {User} from '../entity/User';
 import {SearchRepository} from '../search/SearchRepository';
 import {TeamRepository} from '../team/TeamRepository';
+import {viewportObserver} from '../ui/viewportObserver';
 import {validateHandle} from '../user/UserHandleGenerator';
 
 import 'Components/list/participantItem';
@@ -32,6 +33,8 @@ export enum UserlistMode {
   DEFAULT = 'UserlistMode.DEFAULT',
   OTHERS = 'UserlistMode.OTHERS',
 }
+
+const USER_CHUNK_SIZE = 64;
 
 interface UserListParams {
   click: (userEntity: User, event: MouseEvent) => void;
@@ -50,12 +53,15 @@ interface UserListParams {
 
 ko.components.register('user-list', {
   template: `
-    <div class="search-list" data-bind="css: cssClasses(), foreach: {data: filteredUserEntities(), as: 'user', noChildContext: true }">
+    <div class="search-list" data-bind="css: cssClasses(), foreach: {data: filteredUserEntities().slice(0, maxShownUsers()), as: 'user', noChildContext: true }">
       <participant-item
         params="participant: user, customInfo: infos && infos()[user.id], canSelect: isSelectEnabled, isSelected: isSelected(user), mode: mode, badge: teamRepository.getRoleBadge(user.id), selfInTeam: selfInTeam"
         data-bind="click: (viewmodel, event) => onUserClick(user, event), css: {'no-underline': noUnderline, 'show-arrow': arrow, 'highlighted': highlightedUserIds.includes(user.id)}">
       </participant-item>
     </div>
+    <!-- ko if: filteredUserEntities().length > maxShownUsers() -->
+      <div data-bind="template: {afterRender: attachLazyTrigger}"><div style="height: 100px"></div></div>
+    <!-- /ko -->
 
     <!-- ko if: typeof filter === 'function' -->
       <!-- ko if: userEntities().length === 0 -->
@@ -91,6 +97,8 @@ ko.components.register('user-list', {
     this.noUnderline = noUnderline;
     this.arrow = arrow;
     this.selfInTeam = teamRepository.selfUser().inTeam();
+    this.maxShownUsers = ko.observable(USER_CHUNK_SIZE);
+    this.lazyTriggerElement = null;
 
     const isCompactMode = mode === UserlistMode.COMPACT;
 
@@ -141,7 +149,26 @@ ko.components.register('user-list', {
       if (this.isSelectEnabled) {
         return selectedUsers().includes(userEntity);
       }
-      return false;
+    };
+
+    this.attachLazyTrigger = ([element]: HTMLElement[]) => {
+      viewportObserver.trackElement(
+        element,
+        (isInViewport: boolean) => {
+          if (isInViewport) {
+            this.maxShownUsers(this.maxShownUsers() + USER_CHUNK_SIZE);
+          }
+        },
+        false,
+        undefined,
+      );
+      this.lazyTriggerElement = element;
+    };
+
+    this.dispose = () => {
+      if (this.lazyTriggerElement) {
+        viewportObserver.removeElement(this.lazyTriggerElement);
+      }
     };
   },
 });
