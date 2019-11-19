@@ -136,7 +136,6 @@ export class SearchRepository {
     return tokens.reverse().reduce((weight, token, index) => {
       const indexWeight = index + 1;
       let tokenWeight = 0;
-      //const tokenSlug = computeTransliteration(token, excludedChars);
       const tokenIndex = transliterationIndex(token, termSlug);
 
       if (tokenIndex === 0) {
