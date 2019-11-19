@@ -103,6 +103,7 @@ export class UserRepository {
   // tslint:disable-next-line:typedef
   static get CONFIG() {
     return {
+      MAXIMUM_TEAM_SIZE_BROADCAST: 400,
       MINIMUM_NAME_LENGTH: 2,
       MINIMUM_PICTURE_SIZE: {
         HEIGHT: 320,
@@ -386,6 +387,8 @@ export class UserRepository {
   }
 
   setAvailability(availability: Availability.Type, method: string): void {
+    const teamUsers = this.teamUsers();
+
     const hasAvailabilityChanged = availability !== this.self().availability();
     const newAvailabilityValue = valueFromType(availability);
     if (hasAvailabilityChanged) {
@@ -398,13 +401,20 @@ export class UserRepository {
       this.logger.log(`Availability was again set to '${newAvailabilityValue}'`);
     }
 
+    if (teamUsers.length > UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST) {
+      this.logger.warn(
+        `Availability not changed since the team size is larger than "${UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST}".`,
+      );
+      return;
+    }
+
     const protoAvailability = new Availability({type: protoFromType(availability)});
     const genericMessage = new GenericMessage({
       [GENERIC_MESSAGE_TYPE.AVAILABILITY]: protoAvailability,
       messageId: createRandomUuid(),
     });
 
-    const recipients = this.teamUsers().concat(this.self());
+    const recipients = teamUsers.concat(this.self());
     amplify.publish(WebAppEvents.BROADCAST.SEND_MESSAGE, {genericMessage, recipients});
   }
 
