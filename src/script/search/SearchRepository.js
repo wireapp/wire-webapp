@@ -89,6 +89,7 @@ export class SearchRepository {
         .slice()
         .reverse()
         .map(property => (typeof userEntity[property] === 'function' ? userEntity[property]() : userEntity[property]));
+
       const uniqueValues = Array.from(new Set(values));
       const matchWeight = uniqueValues.reduce((weight, value, index) => {
         const propertyWeight = 10 * index + 1;
