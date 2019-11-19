@@ -28,6 +28,7 @@ declare global {
     jQuery: any;
     platform: any;
     Raygun: any;
+    t: any;
     wire: {
       app: {
         service: {

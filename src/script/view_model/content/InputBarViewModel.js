@@ -18,6 +18,7 @@
  */
 
 import moment from 'moment';
+import {escape} from 'underscore';
 import {Availability} from '@wireapp/protocol-messaging';
 
 import {getLogger} from 'Util/Logger';
@@ -25,13 +26,11 @@ import {t} from 'Util/LocalizerUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {afterRender, formatBytes} from 'Util/util';
 import {renderMessage} from 'Util/messageRenderer';
-
 import {KEY, isFunctionKey, insertAtCaret} from 'Util/KeyboardUtil';
-import {escapeString} from 'Util/SanitizationUtil';
+import {ParticipantAvatar} from 'Components/participantAvatar';
 
 import {resolve, graph} from '../../config/appResolver';
 import {ModalsViewModel} from '../ModalsViewModel';
-import {ParticipantAvatar} from 'Components/participantAvatar';
 
 import {StorageKey} from '../../storage/StorageKey';
 import {WebAppEvents} from '../../event/WebApp';
@@ -203,7 +202,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
       return pieces
         .map((piece, index) => {
-          const textPiece = escapeString(piece).replace(/[\r\n]/g, '<br>');
+          const textPiece = escape(piece).replace(/[\r\n]/g, '<br>');
           return `<span${index % 2 ? mentionAttributes : ''}>${textPiece}</span>`;
         })
         .join('')

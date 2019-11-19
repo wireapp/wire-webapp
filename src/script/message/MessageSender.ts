@@ -17,7 +17,7 @@
  *
  */
 
-import {PromiseQueue} from 'Util/PromiseQueue';
+import {PromiseFn, PromiseQueue} from 'Util/PromiseQueue';
 
 export class MessageSender {
   private readonly sendingQueue: PromiseQueue;
@@ -26,8 +26,8 @@ export class MessageSender {
     this.sendingQueue = new PromiseQueue({name: 'MessageSender', paused: true});
   }
 
-  queueMessage<T extends Function>(sendingFunction: T): Promise<void> {
-    return this.sendingQueue.push(sendingFunction);
+  async queueMessage<T>(sendingFunction: PromiseFn<T>): Promise<void> {
+    await this.sendingQueue.push(sendingFunction);
   }
 
   pauseQueue(pauseState = true): void {

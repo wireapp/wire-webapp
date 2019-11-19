@@ -17,32 +17,47 @@
  *
  */
 
-import {escapeString, getSelfName} from './SanitizationUtil';
+import {escape} from 'underscore';
+
+import {User} from '../entity/User';
+import {getSelfName} from './SanitizationUtil';
 import {sortByPriority} from './StringUtil';
 
 export const DEFAULT_LOCALE = 'en';
 
 let locale = DEFAULT_LOCALE;
-let strings = {};
+let strings: Record<string, Record<string, string>> = {};
 
-const isStringOrNumber = toTest => typeof toTest === 'string' || typeof toTest === 'number';
+const isStringOrNumber = (toTest: any): toTest is string => typeof toTest === 'string' || typeof toTest === 'number';
 
-const replaceSubstituteEscaped = (string, regex, substitute) => {
-  const replacement = isStringOrNumber(substitute)
-    ? escapeString(substitute)
-    : (found, content) => (substitute.hasOwnProperty(content) ? escapeString(substitute[content]) : found);
-  return string.replace(regex, replacement);
+const replaceSubstituteEscaped = (
+  string: string,
+  regex: RegExp | string,
+  substitute: Record<string, string> | string | number,
+) => {
+  if (isStringOrNumber(substitute)) {
+    return string.replace(regex, escape(substitute.toString()));
+  }
+  return string.replace(regex, (found: string, content: string) =>
+    substitute.hasOwnProperty(content) ? escape((substitute as Record<string, string>)[content]) : found,
+  );
 };
 
-const replaceSubstitute = (string, regex, substitute) => {
-  const replacement = isStringOrNumber(substitute)
-    ? substitute
-    : (found, content) => (substitute.hasOwnProperty(content) ? substitute[content] : found);
-  return string.replace(regex, replacement);
+const replaceSubstitute = (
+  string: string,
+  regex: RegExp | string,
+  substitute: Record<string, string> | string | number,
+) => {
+  if (isStringOrNumber(substitute)) {
+    return substitute;
+  }
+  return string.replace(regex, (found: string, content: string) =>
+    substitute.hasOwnProperty(content) ? (substitute as Record<string, string>)[content] : found,
+  );
 };
 
 export const LocalizerUtil = {
-  joinNames: (userEntities, declension = Declension.ACCUSATIVE, skipAnd = false, boldNames = false) => {
+  joinNames: (userEntities: User[], declension = Declension.ACCUSATIVE, skipAnd = false, boldNames = false) => {
     const containsSelfUser = userEntities.some(userEntity => userEntity.is_me);
     if (containsSelfUser) {
       userEntities = userEntities.filter(userEntity => !userEntity.is_me);
@@ -74,7 +89,12 @@ export const LocalizerUtil = {
     return firstNames.join(', ');
   },
 
-  translate: (identifier, substitutions = {}, dangerousSubstitutions = {}, skipEscape = false) => {
+  translate: (
+    identifier: string,
+    substitutions: Record<string, string> = {},
+    dangerousSubstitutions: Record<string, string> = {},
+    skipEscape: boolean = false,
+  ) => {
     const localeValue = strings[locale] && strings[locale][identifier];
     const defaultValue =
       strings[DEFAULT_LOCALE] && strings[DEFAULT_LOCALE].hasOwnProperty(identifier)
@@ -82,15 +102,13 @@ export const LocalizerUtil = {
         : identifier;
     const value = localeValue || defaultValue;
 
-    const replaceDangerously = Object.assign(
-      {
-        '/bold': '</strong>',
-        '/italic': '</i>',
-        bold: '<strong>',
-        italic: '<i>',
-      },
-      dangerousSubstitutions,
-    );
+    const replaceDangerously = {
+      '/bold': '</strong>',
+      '/italic': '</i>',
+      bold: '<strong>',
+      italic: '<i>',
+      ...dangerousSubstitutions,
+    };
 
     const substitutedEscaped = skipEscape
       ? replaceSubstitute(value, /{{(.+?)}}/g, substitutions)
@@ -107,11 +125,20 @@ export const Declension = {
   NOMINATIVE: 'nominative',
 };
 
-export const setLocale = newLocale => (locale = newLocale);
+export const setLocale = (newLocale: string): void => {
+  locale = newLocale;
+};
 
-export const setStrings = newStrings => (strings = newStrings);
+export const setStrings = (newStrings: Record<string, Record<string, string>>): void => {
+  strings = newStrings;
+};
 
-export function t(identifier, substitutions, dangerousSubstitutions, skipEscape = false) {
+export function t(
+  identifier: string,
+  substitutions?: Record<string, string>,
+  dangerousSubstitutions?: Record<string, string>,
+  skipEscape: boolean = false,
+): string {
   return LocalizerUtil.translate(identifier, substitutions, dangerousSubstitutions, skipEscape);
 }
 
