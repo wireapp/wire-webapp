@@ -73,9 +73,9 @@ export class EventMapper {
   async mapJsonEvents(events, conversationEntity) {
     const reversedEvents = events.filter(event => !!event).reverse();
     const mappedEvents = await Promise.all(
-      reversedEvents.map(event => {
+      reversedEvents.map(async event => {
         try {
-          return this._mapJsonEvent(event, conversationEntity);
+          return await this._mapJsonEvent(event, conversationEntity);
         } catch (error) {
           const errorMessage = `Failure while mapping events. Affected '${event.type}' event: ${error.message}`;
           this.logger.error(errorMessage, {error, event});
@@ -783,9 +783,8 @@ export class EventMapper {
    * @returns {Promise<MentionEntity[]>} Array of mapped mentions
    */
   async _mapAssetMentions(mentions, messageText) {
-    const arrays = await Promise.all(mentions.map(base64 => base64ToArray(base64)));
-
-    return arrays
+    const encodedMentions = await Promise.all(mentions.map(base64 => base64ToArray(base64)));
+    return encodedMentions
       .map(encodedMention => {
         const protoMention = Mention.decode(encodedMention);
         return new MentionEntity(protoMention.start, protoMention.length, protoMention.userId);

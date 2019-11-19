@@ -300,14 +300,14 @@ export class CryptographyRepository {
    * @param {Object} event - Backend event to decrypt
    * @returns {Promise} Resolves with decrypted and mapped message
    */
-  handleEncryptedEvent(event) {
+  async handleEncryptedEvent(event) {
     const {data: eventData, from: userId, id} = event;
 
     if (!eventData) {
       const logMessage = `Encrypted event with ID '${id}' from user '${userId}' does not have a 'data' property.`;
       this.logger.error(logMessage, event);
 
-      return Promise.reject(new z.error.CryptographyError(z.error.CryptographyError.TYPE.NO_DATA_CONTENT));
+      throw new z.error.CryptographyError(z.error.CryptographyError.TYPE.NO_DATA_CONTENT);
     }
 
     // Check the length of the message
@@ -317,25 +317,27 @@ export class CryptographyRepository {
     if (genericMessageIsTooBig || externalMessageIsTooBig) {
       const error = new ProteusErrors.DecryptError.InvalidMessage('The received message was too big.', 300);
       const errorEvent = z.conversation.EventBuilder.buildIncomingMessageTooBig(event, error, error.code);
-      return Promise.resolve(errorEvent);
+      return errorEvent;
     }
 
     const failedEncryption = eventData.text === CryptographyRepository.REMOTE_ENCRYPTION_FAILURE;
     if (failedEncryption) {
       const decryptionError = new ProteusErrors.DecryptError.InvalidMessage('Sender failed to encrypt a message.', 213);
-      return Promise.resolve(this._handleDecryptionFailure(decryptionError, event));
+      return this._handleDecryptionFailure(decryptionError, event);
     }
 
-    return this._decryptEvent(event)
-      .then(genericMessage => this.cryptographyMapper.mapGenericMessage(genericMessage, event))
-      .catch(error => {
-        const isUnhandledType = error.type === z.error.CryptographyError.TYPE.UNHANDLED_TYPE;
-        if (isUnhandledType) {
-          throw error;
-        }
+    try {
+      const genericMessage = await this._decryptEvent(event);
+      const mappedMessage = await this.cryptographyMapper.mapGenericMessage(genericMessage, event);
+      return mappedMessage;
+    } catch (error) {
+      const isUnhandledType = error.type === z.error.CryptographyError.TYPE.UNHANDLED_TYPE;
+      if (isUnhandledType) {
+        throw error;
+      }
 
-        return this._handleDecryptionFailure(error, event);
-      });
+      return this._handleDecryptionFailure(error, event);
+    }
   }
 
   async _createSessionFromPreKey(preKey, userId, clientId) {
@@ -440,12 +442,14 @@ export class CryptographyRepository {
    * @param {Object} event - Backend event to decrypt
    * @returns {Promise} Resolves with the decrypted message in ProtocolBuffer format
    */
-  _decryptEvent(event) {
+  async _decryptEvent(event) {
     const {data: eventData, from: userId} = event;
-    const cipherText = base64ToArray(eventData.text || eventData.key).buffer;
+    const cipherTextArray = await base64ToArray(eventData.text || eventData.key);
+    const cipherText = cipherTextArray.buffer;
     const sessionId = this._constructSessionId(userId, eventData.sender);
 
-    return this.cryptobox.decrypt(sessionId, cipherText).then(plaintext => GenericMessage.decode(plaintext));
+    const plaintext = await this.cryptobox.decrypt(sessionId, cipherText);
+    return GenericMessage.decode(plaintext);
   }
 
   /**

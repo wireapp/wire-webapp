@@ -669,7 +669,12 @@ export class EventRepository {
     const isInjectedEvent = source === EventRepository.SOURCE.INJECTED;
     const canSetEventDate = !isInjectedEvent && eventDate;
     if (canSetEventDate) {
-      // HOTFIX: The "conversation.voice-channel-deactivate" event is the ONLY event which we inject with a source set to WebSocket. This is wrong but changing it will break our current conversation archive functionality (WEBAPP-6435). That's why we need to explicitly list the "conversation.voice-channel-deactivate" here because injected events should NEVER modify the last event timestamp which we use to query the backend's notification stream.
+      /*
+       * HOTFIX: The "conversation.voice-channel-deactivate" event is the ONLY event which we inject with a source set to WebSocket.
+       * This is wrong but changing it will break our current conversation archive functionality (WEBAPP-6435).
+       * That's why we need to explicitly list the "conversation.voice-channel-deactivate" here because injected events should NEVER
+       * modify the last event timestamp which we use to query the backend's notification stream.
+       */
       if (event.type !== ClientEvent.CONVERSATION.VOICE_CHANNEL_DEACTIVATE) {
         this._updateLastEventDate(eventDate);
       }
