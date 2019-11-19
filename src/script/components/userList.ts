@@ -169,13 +169,14 @@ ko.components.register('user-list', {
         const searchResults = searchRepository.searchUserInSet(normalizedQuery, userEntities(), properties);
         resultUsers = searchResults.filter(
           user =>
+            user.is_me ||
             connectedUsers.includes(user) ||
             teamRepository.isSelfConnectedTo(user.id) ||
             user.username() === normalizedQuery,
         );
       } else {
         resultUsers = userEntities().filter(
-          user => connectedUsers.includes(user) || teamRepository.isSelfConnectedTo(user.id),
+          user => user.is_me || connectedUsers.includes(user) || teamRepository.isSelfConnectedTo(user.id),
         );
       }
 
