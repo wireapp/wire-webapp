@@ -145,13 +145,9 @@ ko.components.register('user-list', {
       return selfUser.concat(otherUsers);
     });
 
-    this.isSelected = (userEntity: User) => {
-      if (this.isSelectEnabled) {
-        return selectedUsers().includes(userEntity);
-      }
-    };
+    this.isSelected = (userEntity: User): boolean => this.isSelectEnabled && selectedUsers().includes(userEntity);
 
-    this.attachLazyTrigger = ([element]: [HTMLElement]) => {
+    this.attachLazyTrigger = ([element]: [HTMLElement]): void => {
       viewportObserver.trackElement(
         element,
         (isInViewport: boolean) => {
