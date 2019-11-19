@@ -57,7 +57,7 @@ interface UserListParams {
 }
 
 const listTemplate = (dataObservable: string, uieName: string = ''): string => `
-  <div class="search-list" data-bind="css: cssClasses(), foreach: {data: ${dataObservable}(), as: 'user', noChildContext: true }" data-uie-name="${uieName}>
+  <div class="search-list" data-bind="css: cssClasses(), foreach: {data: ${dataObservable}(), as: 'user', noChildContext: true }" data-uie-name="${uieName}">
     <!-- ko if: noSelfInteraction && user.is_me -->
       <participant-item
         params="participant: user, customInfo: infos && infos()[user.id], canSelect: isSelectEnabled, isSelected: isSelected(user), mode: mode, external: teamRepository.isExternal(user.id), selfInTeam: selfInTeam"
