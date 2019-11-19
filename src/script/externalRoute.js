@@ -94,6 +94,6 @@ export const addLocaleToUrl = url => {
     return url;
   }
   const language = currentLanguage().slice(0, 2);
-  const supportedWebsiteLanguage = language == 'de' ? language : 'en';
-  return url.replace(Config.URL.WEBSITE_BASE, `${Config.URL.WEBSITE_BASE}/${supportedWebsiteLanguage}`);
+  const websiteLanguage = language == 'de' ? language : 'en';
+  return url.replace(Config.URL.WEBSITE_BASE, `${Config.URL.WEBSITE_BASE}/${websiteLanguage}`);
 };
