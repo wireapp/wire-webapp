@@ -535,9 +535,9 @@ class MessageListViewModel {
       conversationEntity.setTimestamp(messageEntity.timestamp(), Conversation.TIMESTAMP_TYPE.LAST_READ);
     };
 
-    const startTimer = () => {
+    const startTimer = async () => {
       if (messageEntity.conversation_id === conversationEntity.id) {
-        this.conversation_repository.checkMessageTimer(messageEntity);
+        await this.conversation_repository.checkMessageTimer(messageEntity);
       }
     };
 

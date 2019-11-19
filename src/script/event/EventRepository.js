@@ -638,25 +638,22 @@ export class EventRepository {
    * @param {EventRepository.SOURCE} source - Source of event
    * @returns {Promise} Resolves with the saved record or `true` if the event was skipped
    */
-  processEvent(event, source) {
+  async processEvent(event, source) {
     const isEncryptedEvent = event.type === BackendEvent.CONVERSATION.OTR_MESSAGE_ADD;
-    const mapEvent = isEncryptedEvent
-      ? this.cryptographyRepository.handleEncryptedEvent(event)
-      : Promise.resolve(event);
+    if (isEncryptedEvent) {
+      event = await this.cryptographyRepository.handleEncryptedEvent(event);
+    }
 
-    return mapEvent
-      .then(mappedEvent => {
-        return this.eventProcessMiddlewares.reduce((eventPromise, middleware) => {
-          // use reduce to resolve promises sequentially
-          // see https://hackernoon.com/functional-javascript-resolving-promises-sequentially-7aac18c4431e
-          return eventPromise.then(middleware);
-        }, Promise.resolve(mappedEvent));
-      })
-      .then(mappedEvent => {
-        const shouldSaveEvent = EventTypeHandling.STORE.includes(mappedEvent.type);
-        return shouldSaveEvent ? this._handleEventSaving(mappedEvent, source) : mappedEvent;
-      })
-      .then(savedEvent => this._handleEventDistribution(savedEvent, source));
+    for (const eventProcessMiddleware of this.eventProcessMiddlewares) {
+      event = await eventProcessMiddleware(event);
+    }
+
+    const shouldSaveEvent = EventTypeHandling.STORE.includes(event.type);
+    if (shouldSaveEvent) {
+      event = await this._handleEventSaving(event, source);
+    }
+
+    return this._handleEventDistribution(event, source);
   }
 
   /**
@@ -672,7 +669,12 @@ export class EventRepository {
     const isInjectedEvent = source === EventRepository.SOURCE.INJECTED;
     const canSetEventDate = !isInjectedEvent && eventDate;
     if (canSetEventDate) {
-      // HOTFIX: The "conversation.voice-channel-deactivate" event is the ONLY event which we inject with a source set to WebSocket. This is wrong but changing it will break our current conversation archive functionality (WEBAPP-6435). That's why we need to explicitly list the "conversation.voice-channel-deactivate" here because injected events should NEVER modify the last event timestamp which we use to query the backend's notification stream.
+      /*
+       * HOTFIX: The "conversation.voice-channel-deactivate" event is the ONLY event which we inject with a source set to WebSocket.
+       * This is wrong but changing it will break our current conversation archive functionality (WEBAPP-6435).
+       * That's why we need to explicitly list the "conversation.voice-channel-deactivate" here because injected events should NEVER
+       * modify the last event timestamp which we use to query the backend's notification stream.
+       */
       if (event.type !== ClientEvent.CONVERSATION.VOICE_CHANNEL_DEACTIVATE) {
         this._updateLastEventDate(eventDate);
       }
@@ -801,25 +803,25 @@ export class EventRepository {
     if (originalEvent.from !== newEvent.from) {
       const logMessage = `ID previously used by user '${newEvent.from}'`;
       const errorMessage = 'ID reused by other user';
-      this._throwValidationError(newEvent, errorMessage, logMessage);
+      return this._throwValidationError(newEvent, errorMessage, logMessage);
     }
 
     const containsLinkPreview = newEventData.previews && !!newEventData.previews.length;
     if (!containsLinkPreview) {
       const errorMessage = 'Link preview event does not contain previews';
-      this._throwValidationError(newEvent, errorMessage);
+      return this._throwValidationError(newEvent, errorMessage);
     }
 
     const textContentMatches = newEventData.content === originalData.content;
     if (!textContentMatches) {
       const errorMessage = 'ID of link preview reused';
       const logMessage = 'Text content for link preview not matching';
-      this._throwValidationError(newEvent, errorMessage, logMessage);
+      return this._throwValidationError(newEvent, errorMessage, logMessage);
     }
 
     const bothAreMessageAddType = newEvent.type === originalEvent.type;
     if (!bothAreMessageAddType) {
-      this._throwValidationError(newEvent, 'ID reused by same user');
+      return this._throwValidationError(newEvent, 'ID reused by same user');
     }
 
     const updates = this._getUpdatesForLinkPreview(originalEvent, newEvent);
