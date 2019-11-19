@@ -91,7 +91,7 @@ export const getSupportContactUrl = () => getSupportUrl(URL_PATH.SUPPORT_CONTACT
 
 export const addLocaleToUrl = url => {
   if (!url) {
-    return url;
+    return undefined;
   }
   const language = currentLanguage().slice(0, 2);
   const websiteLanguage = language == 'de' ? language : 'en';
