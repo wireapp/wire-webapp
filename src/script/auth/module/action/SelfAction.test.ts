@@ -110,7 +110,7 @@ describe('SelfAction', () => {
 
   it('fetches the unset password state', async () => {
     const mockedApiClient = {
-      self: {api: {headPassword: () => Promise.resolve({status: 404})}},
+      self: {api: {headPassword: () => Promise.reject({response: {status: 404}})}},
     };
 
     const store = mockStoreFactory({
@@ -121,6 +121,26 @@ describe('SelfAction', () => {
       SelfActionCreator.startSetPasswordState(),
       SelfActionCreator.successfulSetPasswordState({hasPassword: false}),
     ]);
+  });
+
+  it('handles failed password check', async () => {
+    const error = ({response: {status: 400}} as unknown) as Error;
+    const mockedApiClient = {
+      self: {api: {headPassword: () => Promise.reject(error)}},
+    };
+
+    const store = mockStoreFactory({
+      apiClient: mockedApiClient,
+    })({});
+    try {
+      await store.dispatch(actionRoot.selfAction.doCheckPasswordState());
+      fail();
+    } catch (backendError) {
+      expect(store.getActions()).toEqual([
+        SelfActionCreator.startSetPasswordState(),
+        SelfActionCreator.failedSetPasswordState(error),
+      ]);
+    }
   });
 
   it('can set the self email', async () => {
