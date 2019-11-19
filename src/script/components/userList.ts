@@ -151,7 +151,7 @@ ko.components.register('user-list', {
       }
     };
 
-    this.attachLazyTrigger = ([element]: HTMLElement[]) => {
+    this.attachLazyTrigger = ([element]: [HTMLElement]) => {
       viewportObserver.trackElement(
         element,
         (isInViewport: boolean) => {
