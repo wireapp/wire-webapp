@@ -23,6 +23,8 @@ import {User} from '../entity/User';
 import {getSelfName} from './SanitizationUtil';
 import {sortByPriority} from './StringUtil';
 
+type Substitute = Record<string, string> | string | number;
+
 export const DEFAULT_LOCALE = 'en';
 
 let locale = DEFAULT_LOCALE;
@@ -30,11 +32,7 @@ let strings: Record<string, Record<string, string>> = {};
 
 const isStringOrNumber = (toTest: any): toTest is string => typeof toTest === 'string' || typeof toTest === 'number';
 
-const replaceSubstituteEscaped = (
-  string: string,
-  regex: RegExp | string,
-  substitute: Record<string, string> | string | number,
-) => {
+const replaceSubstituteEscaped = (string: string, regex: RegExp | string, substitute: Substitute) => {
   if (isStringOrNumber(substitute)) {
     return string.replace(regex, escape(substitute.toString()));
   }
@@ -43,11 +41,7 @@ const replaceSubstituteEscaped = (
   );
 };
 
-const replaceSubstitute = (
-  string: string,
-  regex: RegExp | string,
-  substitute: Record<string, string> | string | number,
-) => {
+const replaceSubstitute = (string: string, regex: RegExp | string, substitute: Substitute) => {
   if (isStringOrNumber(substitute)) {
     return substitute;
   }
@@ -91,7 +85,7 @@ export const LocalizerUtil = {
 
   translate: (
     identifier: string,
-    substitutions: Record<string, string> = {},
+    substitution: Substitute = {},
     dangerousSubstitutions: Record<string, string> = {},
     skipEscape: boolean = false,
   ) => {
@@ -111,8 +105,8 @@ export const LocalizerUtil = {
     };
 
     const substitutedEscaped = skipEscape
-      ? replaceSubstitute(value, /{{(.+?)}}/g, substitutions)
-      : replaceSubstituteEscaped(value, /{{(.+?)}}/g, substitutions);
+      ? replaceSubstitute(value, /{{(.+?)}}/g, substitution)
+      : replaceSubstituteEscaped(value, /{{(.+?)}}/g, substitution);
     const substituted = replaceSubstitute(substitutedEscaped, /\[(.+?)\]/g, replaceDangerously);
 
     return substituted;
@@ -135,11 +129,11 @@ export const setStrings = (newStrings: Record<string, Record<string, string>>): 
 
 export function t(
   identifier: string,
-  substitutions?: Record<string, string>,
+  substitution?: Substitute,
   dangerousSubstitutions?: Record<string, string>,
   skipEscape: boolean = false,
 ): string {
-  return LocalizerUtil.translate(identifier, substitutions, dangerousSubstitutions, skipEscape);
+  return LocalizerUtil.translate(identifier, substitution, dangerousSubstitutions, skipEscape);
 }
 
 export const joinNames = LocalizerUtil.joinNames;
