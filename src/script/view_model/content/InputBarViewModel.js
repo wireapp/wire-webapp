@@ -28,7 +28,6 @@ import {renderMessage} from 'Util/messageRenderer';
 
 import {KEY, isFunctionKey, insertAtCaret} from 'Util/KeyboardUtil';
 import {escapeString} from 'Util/SanitizationUtil';
-import {trimEnd, trimStart} from 'Util/StringUtil';
 
 import {resolve, graph} from '../../config/appResolver';
 import {ModalsViewModel} from '../ModalsViewModel';
@@ -529,13 +528,13 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     }
 
     const beforeLength = this.input().length;
-    const messageTrimmedStart = trimStart(this.input());
+    const messageTrimmedStart = this.input().trimLeft();
     const afterLength = messageTrimmedStart.length;
 
     const updatedMentions = this.updateMentionRanges(this.currentMentions(), 0, 0, afterLength - beforeLength);
     this.currentMentions(updatedMentions);
 
-    const messageText = trimEnd(messageTrimmedStart);
+    const messageText = messageTrimmedStart.trimRight();
 
     const isMessageTextTooLong = messageText.length > z.config.MAXIMUM_MESSAGE_LENGTH;
     if (isMessageTextTooLong) {
