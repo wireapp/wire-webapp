@@ -51,7 +51,7 @@ export type AuthState = {
   readonly loginData: Partial<LoginData>;
 };
 
-export const initialState: AuthState = {
+export const initialAuthState: AuthState = {
   account: {
     accent_id: null,
     assets: null,
@@ -75,7 +75,7 @@ export const initialState: AuthState = {
   loginData: {clientType: Config.FEATURE.DEFAULT_LOGIN_TEMPORARY_CLIENT ? ClientType.TEMPORARY : ClientType.PERMANENT},
 };
 
-export function authReducer(state: AuthState = initialState, action: AppActions): AuthState {
+export function authReducer(state: AuthState = initialAuthState, action: AppActions): AuthState {
   switch (action.type) {
     case AUTH_ACTION.LOGIN_START:
     case AUTH_ACTION.REGISTER_JOIN_START:

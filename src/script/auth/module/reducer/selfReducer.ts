@@ -29,7 +29,7 @@ export interface SelfState {
   hasPassword: boolean;
 }
 
-export const initialState: SelfState = {
+export const initialSelfState: SelfState = {
   consents: {},
   error: null,
   fetched: false,
@@ -38,7 +38,7 @@ export const initialState: SelfState = {
   self: {assets: [], id: null, locale: null, name: null, team: null},
 };
 
-export function selfReducer(state: SelfState = initialState, action: AppActions): SelfState {
+export function selfReducer(state: SelfState = initialSelfState, action: AppActions): SelfState {
   switch (action.type) {
     case SELF_ACTION.CONSENT_GET_START:
     case SELF_ACTION.HANDLE_SET_START:

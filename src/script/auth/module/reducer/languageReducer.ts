@@ -24,11 +24,11 @@ export interface LanguageState {
   language: string;
 }
 
-export const initialState: LanguageState = {
+export const initialLanguageState: LanguageState = {
   language: mapLanguage(currentLanguage()),
 };
 
-export function languageReducer(state: LanguageState = initialState, action: AppActions): LanguageState {
+export function languageReducer(state: LanguageState = initialLanguageState, action: AppActions): LanguageState {
   switch (action.type) {
     case LANGUAGE_ACTION.SWITCH_LANGUAGE_SUCCESS:
       return {

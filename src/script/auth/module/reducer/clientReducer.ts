@@ -29,7 +29,7 @@ export interface ClientState {
   isNewClient: boolean;
 }
 
-export const initialState: ClientState = {
+export const initialClientState: ClientState = {
   clients: [],
   currentClient: null,
   error: null,
@@ -38,7 +38,7 @@ export const initialState: ClientState = {
   isNewClient: null,
 };
 
-export function clientReducer(state: ClientState = initialState, action: AppActions): ClientState {
+export function clientReducer(state: ClientState = initialClientState, action: AppActions): ClientState {
   switch (action.type) {
     case CLIENT_ACTION.CLIENT_INIT_SUCCESS: {
       return {
