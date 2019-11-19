@@ -99,7 +99,7 @@ export class CryptographyMapper {
       }
 
       case GENERIC_MESSAGE_TYPE.EDITED: {
-        specificContent = this._mapEdited(genericMessage.edited, genericMessage.messageId);
+        specificContent = await this._mapEdited(genericMessage.edited, genericMessage.messageId);
         break;
       }
 

@@ -2499,33 +2499,29 @@ export class ConversationRepository {
    * @param {string} isoDate - If defined it will update event timestamp
    * @returns {Promise} Resolves when sent status was updated
    */
-  _updateMessageAsSent(conversationEntity, eventJson, isoDate) {
-    return this.get_message_in_conversation_by_id(conversationEntity, eventJson.id)
-      .then(messageEntity => {
-        messageEntity.status(StatusType.SENT);
-
-        const changes = {status: StatusType.SENT};
-        if (isoDate) {
-          changes.time = isoDate;
-
-          const timestamp = new Date(isoDate).getTime();
-          if (!isNaN(timestamp)) {
-            messageEntity.timestamp(timestamp);
-            conversationEntity.update_timestamp_server(timestamp, true);
-            conversationEntity.update_timestamps(messageEntity);
-          }
+  async _updateMessageAsSent(conversationEntity, eventJson, isoDate) {
+    try {
+      const messageEntity = await this.get_message_in_conversation_by_id(conversationEntity, eventJson.id);
+      messageEntity.status(StatusType.SENT);
+      const changes = {status: StatusType.SENT};
+      if (isoDate) {
+        changes.time = isoDate;
+        const timestamp = new Date(isoDate).getTime();
+        if (!isNaN(timestamp)) {
+          messageEntity.timestamp(timestamp);
+          conversationEntity.update_timestamp_server(timestamp, true);
+          conversationEntity.update_timestamps(messageEntity);
         }
-
-        this.checkMessageTimer(messageEntity);
-        if (EventTypeHandling.STORE.includes(messageEntity.type) || messageEntity.has_asset_image()) {
-          return this.eventService.updateEvent(messageEntity.primary_key, changes);
-        }
-      })
-      .catch(error => {
-        if (error.type !== z.error.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
-          throw error;
-        }
-      });
+      }
+      this.checkMessageTimer(messageEntity);
+      if (EventTypeHandling.STORE.includes(messageEntity.type) || messageEntity.has_asset_image()) {
+        return this.eventService.updateEvent(messageEntity.primary_key, changes);
+      }
+    } catch (error) {
+      if (error.type !== z.error.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
+        throw error;
+      }
+    }
   }
 
   /**
