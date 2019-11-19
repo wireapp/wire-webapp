@@ -81,7 +81,10 @@ export class SearchRepository {
     }
     const excludedEmojis = Array.from(term).reduce((emojis, char) => {
       const isEmoji = EMOJI_RANGES.includes(char);
-      return isEmoji ? Object.assign({}, emojis, {[char]: char}) : emojis;
+      if (isEmoji) {
+        emojis[char] = char;
+      }
+      return emojis;
     }, {});
     const termSlug = computeTransliteration(term, excludedEmojis);
     const weightedResults = userEntities.reduce((results, userEntity) => {
