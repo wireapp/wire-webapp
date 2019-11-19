@@ -17,10 +17,12 @@
  *
  */
 
+import * as Events from '@wireapp/api-client/dist/commonjs/event';
 import {ConnectionState, HttpClient} from '@wireapp/api-client/dist/commonjs/http';
-import {Account} from '@wireapp/core';
-import {PayloadBundleType} from '@wireapp/core/dist/conversation/';
+import {Notification} from '@wireapp/api-client/dist/commonjs/notification';
+import {PayloadBundle, PayloadBundleSource, PayloadBundleType} from '@wireapp/core/dist/conversation/';
 import {UserUpdateMessage} from '@wireapp/core/dist/conversation/message/UserMessage';
+import {UserMapper} from '@wireapp/core/dist/user/UserMapper';
 import {getLogger} from 'Util/Logger';
 import {ThunkAction} from '../../module/reducer';
 import * as SelfSelector from '../../module/selector/SelfSelector';
@@ -43,16 +45,6 @@ export class WebSocketAction {
 
   listen = (): ThunkAction => {
     return async (dispatch, getState, {apiClient, core, actions: {selfAction}}) => {
-      core.removeAllListeners(Account.TOPIC.ERROR);
-      core.on(Account.TOPIC.ERROR, error => this.logger.error('CoreError', error));
-
-      core.on(PayloadBundleType.USER_UPDATE as any, async (message: UserUpdateMessage) => {
-        const isSelfId = message.content.user.id === SelfSelector.getSelf(getState()).id;
-        if (isSelfId) {
-          await dispatch(selfAction.fetchSelf());
-        }
-      });
-
       apiClient.transport.http.removeAllListeners(HttpClient.TOPIC.ON_CONNECTION_STATE_CHANGE);
       apiClient.transport.http.on(HttpClient.TOPIC.ON_CONNECTION_STATE_CHANGE, (event: ConnectionState) => {
         this.logger.log(
@@ -60,7 +52,34 @@ export class WebSocketAction {
         );
       });
 
-      await core.listen();
+      await core.listen(async (notification: Notification, source: PayloadBundleSource) => {
+        for (const event of notification.payload) {
+          let data: PayloadBundle | void;
+
+          try {
+            switch (event.type) {
+              case Events.USER_EVENT.CLIENT_REMOVE: {
+                data = UserMapper.mapUserEvent(event, apiClient.context!.userId, source);
+              }
+              // Note: We do not want to update the last message timestamp
+            }
+          } catch (error) {
+            this.logger.error(`There was an error with notification ID "${notification.id}": ${error.message}`, error);
+            continue;
+          }
+          if (data) {
+            switch (data.type) {
+              case PayloadBundleType.USER_UPDATE:
+                const message = data as UserUpdateMessage;
+                const isSelfId = message.content.user.id === SelfSelector.getSelf(getState()).id;
+                if (isSelfId) {
+                  await dispatch(selfAction.fetchSelf());
+                }
+                break;
+            }
+          }
+        }
+      });
     };
   };
 }
