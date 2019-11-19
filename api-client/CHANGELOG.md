@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.3.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@8.3.1...@wireapp/api-client@8.3.2) (2019-11-19)
+
+
+### Bug Fixes
+
+* **api-client:** Handle WS reconnect with unset access token ([#2557](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2557)) ([19261ca](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/19261ca18a7701c5ddb1f089a0ea65be747b24a5))
+
+
+
+
+
 ## [8.3.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@8.3.0...@wireapp/api-client@8.3.1) (2019-11-11)
 
 **Note:** Version bump only for package @wireapp/api-client
