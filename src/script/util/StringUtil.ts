@@ -106,14 +106,15 @@ export const replaceInRange = (text: string, replacement: string, startIndex: nu
   return `${beforePartial}${replacement}${afterPartial}`;
 };
 
-export const sortByPriority = (stringA = '', stringB = '', query?: string): number => {
+export const sortByPriority = (stringA: string = '', stringB: string = '', query: string = ''): number => {
   stringA = stringA.toLowerCase();
   stringB = stringB.toLowerCase();
+  query = query.toLowerCase();
 
   if (query) {
-    if (startsWith(stringA, query) && !startsWith(stringB, query)) {
+    if (stringA.startsWith(query) && !stringB.startsWith(query)) {
       return -1;
-    } else if (startsWith(stringB, query) && !startsWith(stringA, query)) {
+    } else if (stringB.startsWith(query) && !stringA.startsWith(query)) {
       return 1;
     }
   }
