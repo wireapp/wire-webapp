@@ -24,8 +24,8 @@ import {useIntl} from 'react-intl';
 
 import {isValidEmail, isValidPhoneNumber, isValidUsername} from 'Util/ValidationUtil';
 
+import {Config} from '../../Config';
 import {loginStrings} from '../../strings';
-import {Config} from '../Config';
 import {ValidationError} from '../module/action/ValidationError';
 
 interface LoginFormProps {

@@ -19,7 +19,7 @@
 
 import {getLogger} from 'Util/Logger';
 import {Environment} from 'Util/Environment';
-import {Config} from '../../auth/Config';
+import {Config} from '../../Config';
 import {MediaType} from '../../media/MediaType';
 import {MediaError} from '../../error/MediaError';
 

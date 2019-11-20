@@ -21,7 +21,7 @@ import ko from 'knockout';
 
 import {t} from 'Util/LocalizerUtil';
 
-import {Config} from '../auth/Config';
+import {Config} from '../Config';
 import {WebAppEvents} from '../event/WebApp';
 
 import 'Components/loadingBar';

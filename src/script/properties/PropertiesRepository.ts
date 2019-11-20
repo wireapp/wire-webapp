@@ -23,7 +23,7 @@ import {Logger, getLogger} from 'Util/Logger';
 
 import {AudioPreference, NotificationPreference, WebappProperties} from '@wireapp/api-client/dist/commonjs/user/data';
 import {amplify} from 'amplify';
-import {Config} from '../auth/Config';
+import {Config} from '../Config';
 import {ReceiptMode} from '../conversation/ReceiptMode';
 import {User} from '../entity/User';
 import {WebAppEvents} from '../event/WebApp';

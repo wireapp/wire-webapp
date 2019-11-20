@@ -34,7 +34,7 @@ import {isValidPhoneNumber, isValidEmail} from 'Util/ValidationUtil';
 import {forwardParameter, getParameter} from 'Util/UrlUtil';
 
 import {URLParameter} from '../auth/URLParameter';
-import {Config} from '../auth/Config';
+import {Config} from '../Config';
 import {ValidationError} from '../auth/ValidationError';
 
 import {App} from '../main/app';

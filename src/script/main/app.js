@@ -30,7 +30,7 @@ import {exposeWrapperGlobals} from 'Util/wrapper';
 import {includesString} from 'Util/StringUtil';
 import {appendParameter} from 'Util/UrlUtil';
 
-import {Config} from '../auth/Config';
+import {Config} from '../Config';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {LoadingViewModel} from '../view_model/LoadingViewModel';
 import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';

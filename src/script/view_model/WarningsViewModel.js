@@ -24,7 +24,7 @@ import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {buildSupportUrl} from 'Util/UrlUtil';
 import {afterRender} from 'Util/util';
 
-import {Config} from '../auth/Config';
+import {Config} from '../Config';
 import {ModalsViewModel} from './ModalsViewModel';
 import {PermissionState} from '../notification/PermissionState';
 import {WebAppEvents} from '../event/WebApp';

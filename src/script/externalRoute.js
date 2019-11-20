@@ -18,7 +18,7 @@
  */
 
 import {currentLanguage} from './auth/localeConfig';
-import {Config} from './auth/Config';
+import {Config} from './/Config';
 
 const env = window.wire.env;
 

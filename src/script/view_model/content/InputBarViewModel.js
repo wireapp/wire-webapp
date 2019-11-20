@@ -42,7 +42,7 @@ import {MentionEntity} from '../../message/MentionEntity';
 
 import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
-import {Config} from '../../auth/Config';
+import {Config} from '../..//Config';
 import {AssetUploader} from '../../assets/AssetUploader';
 import {AssetService} from '../../assets/AssetService';
 

@@ -25,7 +25,7 @@ import {t} from 'Util/LocalizerUtil';
 import {buildSupportUrl} from 'Util/UrlUtil';
 import {noop, afterRender} from 'Util/util';
 
-import {Config} from '../auth/Config';
+import {Config} from '../Config';
 import {WebAppEvents} from '../event/WebApp';
 
 const defaultContent = {

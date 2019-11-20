@@ -60,10 +60,10 @@ import {UserMapper} from './UserMapper';
 import {UserService} from './UserService';
 
 import {AssetService} from '../assets/AssetService';
-import {ACCENT_ID, Config} from '../auth/Config';
 import {ClientEntity} from '../client/ClientEntity';
 import {ClientMapper} from '../client/ClientMapper';
 import {ClientRepository} from '../client/ClientRepository';
+import {ACCENT_ID, Config} from '../Config';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
 import {AssetPayload} from '../entity/message/Asset';
 import {BackendClientError} from '../error/BackendClientError';

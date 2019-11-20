@@ -35,7 +35,7 @@ import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 import {modals, ModalsViewModel} from '../ModalsViewModel';
 import {User} from '../../entity/User';
 
-import {Config} from '../../auth/Config';
+import {Config} from '../../Config';
 import {ConsentValue} from '../../user/ConsentValue';
 import {validateCharacter, validateHandle} from '../../user/UserHandleGenerator';
 import {UserRepository} from '../../user/UserRepository';

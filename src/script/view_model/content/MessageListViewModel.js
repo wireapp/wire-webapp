@@ -26,7 +26,7 @@ import {scrollEnd, scrollToBottom, scrollBy} from 'Util/scroll-helpers';
 import {t} from 'Util/LocalizerUtil';
 import {safeWindowOpen, safeMailOpen} from 'Util/SanitizationUtil';
 
-import {Config} from '../../auth/Config';
+import {Config} from '../../Config';
 import {Conversation} from '../../entity/Conversation';
 import {ModalsViewModel} from '../ModalsViewModel';
 import {WebAppEvents} from '../../event/WebApp';
