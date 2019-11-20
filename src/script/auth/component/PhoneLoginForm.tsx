@@ -21,8 +21,8 @@ import {LoginData} from '@wireapp/api-client/dist/commonjs/auth';
 import {ICON_NAME, Input, InputBlock, InputSubmitCombo, Loading, RoundIconButton, Select} from '@wireapp/react-ui-kit';
 import React, {useRef, useState} from 'react';
 import {useIntl} from 'react-intl';
-import {phoneLoginStrings} from 'src/script/strings';
 import {COUNTRY_CODES, getCountryByCode, getCountryCode} from 'Util/CountryCodes';
+import {phoneLoginStrings} from '../../strings';
 
 interface LoginFormProps {
   isFetching: boolean;
