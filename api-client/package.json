@@ -42,7 +42,7 @@
     "optimist": "0.6.1",
     "react": "16.11.0",
     "react-dom": "16.11.0",
-    "react-hot-loader": "4.12.16",
+    "react-hot-loader": "4.12.18",
     "rimraf": "3.0.0",
     "sinon": "7.5.0",
     "sinon-har-server": "0.3.0",

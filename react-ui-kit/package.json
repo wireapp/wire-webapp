@@ -27,7 +27,7 @@
     "react": "16.11.0",
     "react-dom": "16.11.0",
     "react-helmet": "5.2.1",
-    "react-hot-loader": "4.12.16",
+    "react-hot-loader": "4.12.18",
     "react-test-renderer": "16.11.0",
     "rimraf": "3.0.0",
     "typescript": "3.6.4",
