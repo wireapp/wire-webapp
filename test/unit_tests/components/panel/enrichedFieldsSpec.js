@@ -26,7 +26,7 @@ import {RichProfileRepository} from 'src/script/user/RichProfileRepository';
 
 const entriesListSelector = '.enriched-fields__entry';
 
-xdescribe('enriched-fields', () => {
+describe('enriched-fields', () => {
   it('displays all the given fields', () => {
     const richProfileRepository = new RichProfileRepository(resolve(graph.BackendClient));
     const userId = UUID.genV4().hexString;
@@ -49,7 +49,7 @@ xdescribe('enriched-fields', () => {
   it('displays the email if set on user', () => {
     const richProfileRepository = new RichProfileRepository(resolve(graph.BackendClient));
     const userId = UUID.genV4().hexString;
-    const params = {user: () => ({email: () => 'user@inter.net', id: userId})};
+    const params = {richProfileRepository, user: () => ({email: () => 'user@inter.net', id: userId})};
 
     spyOn(richProfileRepository, 'getUserRichProfile').and.returnValue(
       Promise.resolve({
@@ -68,7 +68,7 @@ xdescribe('enriched-fields', () => {
   it('calls the `onFieldsLoaded` function when fields are loaded', () => {
     const richProfileRepository = new RichProfileRepository(resolve(graph.BackendClient));
     const userId = UUID.genV4().hexString;
-    const params = {onFieldsLoaded: () => {}, user: () => ({email: () => {}, id: userId})};
+    const params = {onFieldsLoaded: () => {}, richProfileRepository, user: () => ({email: () => {}, id: userId})};
     const richProfile = {
       fields: [
         {type: 'field1', value: 'value1'},
