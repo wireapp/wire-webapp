@@ -81,6 +81,10 @@ const PhoneLogin = ({
           case BackendError.LABEL.PASSWORD_EXISTS: {
             return history.push(ROUTE.CHECK_PASSWORD);
           }
+          case BackendError.LABEL.BAD_REQUEST: {
+            setError(error);
+            break;
+          }
           default: {
             setError(error);
             throw error;
@@ -140,7 +144,7 @@ const PhoneLogin = ({
                         pushLoginData({clientType: event.target.checked ? ClientType.TEMPORARY : ClientType.PERMANENT});
                       }}
                       checked={loginData.clientType === ClientType.TEMPORARY}
-                      data-uie-name="enter-public-computer-sign-in"
+                      data-uie-name="enter-public-computer-phone-sign-in"
                       style={{justifyContent: 'center', marginTop: '12px'}}
                     >
                       <CheckboxLabel>{_(loginStrings.publicComputer)}</CheckboxLabel>
