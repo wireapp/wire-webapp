@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.3.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@8.3.2...@wireapp/api-client@8.3.3) (2019-11-20)
+
+
+### Bug Fixes
+
+* **api-client:** Don't include credentials on /login/send ([#2567](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2567)) ([1950a24](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/1950a246038a119c94c1055a6607091d86f2a504))
+
+
+
+
+
 ## [8.3.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@8.3.1...@wireapp/api-client@8.3.2) (2019-11-19)
 
 
