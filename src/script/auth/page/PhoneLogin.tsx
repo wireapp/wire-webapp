@@ -81,6 +81,7 @@ const PhoneLogin = ({
           case BackendError.LABEL.PASSWORD_EXISTS: {
             return history.push(ROUTE.CHECK_PASSWORD);
           }
+          case BackendError.LABEL.UNAUTHORIZED:
           case BackendError.LABEL.BAD_REQUEST: {
             setError(error);
             break;
