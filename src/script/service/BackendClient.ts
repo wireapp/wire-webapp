@@ -294,19 +294,6 @@ export class BackendClient {
    * Send jQuery AJAX request.
    *
    * @see http://api.jquery.com/jquery.ajax/#jQuery-ajax-settings
-   *
-   * @private
-   * @param {Object} config - Request configuration
-   * @param {string} config.contentType - Request content type
-   * @param {boolean} config.crossDomain - Cross domain request
-   * @param {Object} config.data - Request data payload
-   * @param {Object} config.headers - Request headers
-   * @param {boolean} config.processData - Process data before sending
-   * @param {number} config.timeout - Request timeout
-   * @param {string} config.type - Request type
-   * @param {string} config.url - Request URL
-   * @param {boolean} config.withCredentials - Request send with credentials
-   * @returns {Promise} Resolves when the request has been executed
    */
   _sendRequest(config: RequestConfig): Promise<any> {
     const {cache, contentType, crossDomain, data, headers, processData, timeout, type, url, withCredentials} = config;
