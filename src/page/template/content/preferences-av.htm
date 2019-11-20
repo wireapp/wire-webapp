@@ -7,7 +7,7 @@
         <header class="preferences-header preferences-av-header" data-bind="text: t('preferencesAVMicrophone')"></header>
         <!-- ko if: !audioMediaStream() -->
           <div class="preferences-av-detail">
-            <a rel="nofollow noopener noreferrer" target="_blank" data-bind="text: t('preferencesAVPermissionDetail'), supportLink: z.config.SUPPORT.ID.DEVICE_ACCESS_DENIED"></a>
+            <a rel="nofollow noopener noreferrer" target="_blank" data-bind="text: t('preferencesAVPermissionDetail'), supportLink: Config.SUPPORT.ID.DEVICE_ACCESS_DENIED"></a>
           </div>
         <!-- /ko -->
         <div class="preferences-option" data-bind="css: {'preferences-av-select-disabled': !audioMediaStream()}">
@@ -58,7 +58,7 @@
         <header class="preferences-header preferences-av-header" data-bind="text: t('preferencesAVCamera')"></header>
         <!-- ko if: !videoMediaStream() -->
           <div class="preferences-av-detail">
-            <a rel="nofollow noopener noreferrer" target="_blank" data-bind="text: t('preferencesAVPermissionDetail'), supportLink: z.config.SUPPORT.ID.DEVICE_ACCESS_DENIED"></a>
+            <a rel="nofollow noopener noreferrer" target="_blank" data-bind="text: t('preferencesAVPermissionDetail'), supportLink: Config.SUPPORT.ID.DEVICE_ACCESS_DENIED"></a>
           </div>
         <!-- /ko -->
         <div class="preferences-option" data-bind="css: {'preferences-av-select-disabled': !videoMediaStream()}">

@@ -34,7 +34,7 @@ import {useIntl} from 'react-intl';
 import {Redirect} from 'react-router';
 import useReactRouter from 'use-react-router';
 import {indexStrings} from '../../strings';
-import {Config} from '../config';
+import {Config} from '../Config';
 import {ROUTE} from '../route';
 import {isDesktopApp, isMacOS} from '../Runtime';
 import {pathWithParams} from '../util/urlUtil';

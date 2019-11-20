@@ -40,7 +40,7 @@ import useReactRouter from 'use-react-router';
 import {ssoLoginStrings} from '../../strings';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import RouterLink from '../component/RouterLink';
-import {Config} from '../config';
+import {Config} from '../Config';
 import {BackendError} from '../module/action/BackendError';
 import {RootState, bindActionCreators} from '../module/reducer';
 import {ROUTE} from '../route';

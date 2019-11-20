@@ -18,7 +18,7 @@
  */
 
 import ko from 'knockout';
-import {Config} from '../../auth/config';
+import {Config} from '../../auth/Config';
 import {ClientRepository} from '../../client/ClientRepository';
 import {ClientService} from '../../client/ClientService';
 import {User} from '../../entity/User';

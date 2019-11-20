@@ -19,7 +19,7 @@
 
 import {getLogger} from 'Util/Logger';
 
-import {Config} from '../../auth/config';
+import {Config} from '../../auth/Config';
 import {getSupportUsernameUrl} from '../../externalRoute';
 import {WebAppEvents} from '../../event/WebApp';
 import {ContentViewModel} from '../ContentViewModel';

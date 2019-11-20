@@ -60,10 +60,10 @@ import {UserMapper} from './UserMapper';
 import {UserService} from './UserService';
 
 import {AssetService} from '../assets/AssetService';
+import {ACCENT_ID, Config} from '../auth/Config';
 import {ClientEntity} from '../client/ClientEntity';
 import {ClientMapper} from '../client/ClientMapper';
 import {ClientRepository} from '../client/ClientRepository';
-import {ACCENT_ID, config} from '../config';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
 import {AssetPayload} from '../entity/message/Asset';
 import {BackendClientError} from '../error/BackendClientError';
@@ -503,7 +503,7 @@ export class UserRepository {
         });
     };
 
-    const chunksOfUserIds = chunk(userIds, config.MAXIMUM_USERS_PER_REQUEST) as string[][];
+    const chunksOfUserIds = chunk(userIds, Config.MAXIMUM_USERS_PER_REQUEST) as string[][];
     return Promise.all(chunksOfUserIds.map(chunkOfUserIds => _getUsers(chunkOfUserIds)))
       .then(resolveArray => {
         const newUserEntities = flatten(resolveArray);
@@ -843,7 +843,7 @@ export class UserRepository {
   }
 
   initMarketingConsent(): Promise<void> {
-    if (!config.FEATURE.CHECK_CONSENT) {
+    if (!Config.FEATURE.CHECK_CONSENT) {
       this.logger.warn(
         `Consent check feature is disabled. Defaulting to '${this.propertyRepository.marketingConsent()}'`,
       );

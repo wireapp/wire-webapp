@@ -27,7 +27,7 @@ import {t} from 'Util/LocalizerUtil';
 import {koArrayPushAll, koArrayUnshiftAll} from 'Util/util';
 import {truncate} from 'Util/StringUtil';
 
-import {Config} from '../auth/config';
+import {Config} from '../auth/Config';
 
 import {ReceiptMode} from '../conversation/ReceiptMode';
 import {ACCESS_STATE} from '../conversation/AccessState';

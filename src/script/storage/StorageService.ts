@@ -26,7 +26,7 @@ import {loadValue, storeValue} from 'Util/StorageUtil';
 
 import {MemoryStore} from '@wireapp/store-engine/dist/commonjs/engine';
 import {isTemporaryClientAndNonPersistent} from 'Util/util';
-import {Config} from '../auth/config';
+import {Config} from '../auth/Config';
 import {ClientType} from '../client/ClientType';
 import {StorageKey} from './StorageKey';
 import {StorageSchemata} from './StorageSchemata';

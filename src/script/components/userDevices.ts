@@ -24,7 +24,7 @@ import {capitalizeFirstChar} from 'Util/StringUtil';
 import {amplify} from 'amplify';
 import Dexie from 'dexie';
 import ko from 'knockout';
-import {Config} from '../auth/config';
+import {Config} from '../auth/Config';
 import {ClientEntity} from '../client/ClientEntity';
 import {ClientRepository} from '../client/ClientRepository';
 import {ConversationRepository} from '../conversation/ConversationRepository';

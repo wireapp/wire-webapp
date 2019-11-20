@@ -26,6 +26,7 @@ import {scrollEnd, scrollToBottom, scrollBy} from 'Util/scroll-helpers';
 import {t} from 'Util/LocalizerUtil';
 import {safeWindowOpen, safeMailOpen} from 'Util/SanitizationUtil';
 
+import {Config} from '../../auth/Config';
 import {Conversation} from '../../entity/Conversation';
 import {ModalsViewModel} from '../ModalsViewModel';
 import {WebAppEvents} from '../../event/WebApp';
@@ -138,7 +139,7 @@ class MessageListViewModel {
     const messagesContainer = this.getMessagesContainer();
     const scrollPosition = Math.ceil(messagesContainer.scrollTop);
     const scrollEndValue = Math.ceil(scrollEnd(messagesContainer));
-    return scrollPosition > scrollEndValue - z.config.SCROLL_TO_LAST_MESSAGE_THRESHOLD;
+    return scrollPosition > scrollEndValue - Config.SCROLL_TO_LAST_MESSAGE_THRESHOLD;
   }
 
   /**

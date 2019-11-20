@@ -18,7 +18,7 @@
  */
 
 import {currentLanguage} from './auth/localeConfig';
-import {Config} from './auth/config';
+import {Config} from './auth/Config';
 
 const env = window.wire.env;
 
@@ -82,7 +82,7 @@ export const getManageServicesUrl = utmSource => getTeamSettingsUrl(URL_PATH.MAN
 export const getManageTeamUrl = utmSource => getTeamSettingsUrl(URL_PATH.MANAGE_TEAM, utmSource);
 
 export const getCreateTeamUrl = pkCampaign =>
-  z.config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && getWebsiteUrl(URL_PATH.CREATE_TEAM, pkCampaign);
+  Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && getWebsiteUrl(URL_PATH.CREATE_TEAM, pkCampaign);
 export const getPrivacyHowUrl = () => getWebsiteUrl(URL_PATH.PRIVACY_HOW);
 export const getPrivacyWhyUrl = () => getWebsiteUrl(URL_PATH.PRIVACY_WHY);
 export const getSupportUsernameUrl = () => getWebsiteUrl(URL_PATH.SUPPORT_USERNAME);

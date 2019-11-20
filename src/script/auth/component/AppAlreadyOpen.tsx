@@ -23,7 +23,7 @@ import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 import {appAlreadyOpenStrings} from '../../strings';
-import {Config} from '../config';
+import {Config} from '../Config';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as CookieSelector from '../module/selector/CookieSelector';

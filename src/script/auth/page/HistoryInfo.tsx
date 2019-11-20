@@ -24,7 +24,7 @@ import {FormattedHTMLMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import useReactRouter from 'use-react-router';
 import {historyInfoStrings} from '../../strings';
-import {Config} from '../config';
+import {Config} from '../Config';
 import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
 import {RootState} from '../module/reducer';
 import * as ClientSelector from '../module/selector/ClientSelector';

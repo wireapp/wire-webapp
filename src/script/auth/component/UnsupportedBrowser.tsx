@@ -22,7 +22,7 @@ import React from 'react';
 import {FormattedHTMLMessage, FormattedMessage, MessageDescriptor} from 'react-intl';
 import {connect} from 'react-redux';
 import {unsupportedJoinStrings, unsupportedStrings} from '../../strings';
-import {Config} from '../config';
+import {Config} from '../Config';
 import {RootState} from '../module/reducer';
 import * as RuntimeSelector from '../module/selector/RuntimeSelector';
 import {isMobileOs} from '../Runtime';

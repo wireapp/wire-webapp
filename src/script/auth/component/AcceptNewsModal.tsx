@@ -22,7 +22,7 @@ import React from 'react';
 import {FormattedHTMLMessage, useIntl} from 'react-intl';
 import {addLocaleToUrl} from '../../externalRoute';
 import {acceptNewsModalStrings} from '../../strings';
-import {Config} from '../config';
+import {Config} from '../Config';
 import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
 
 export interface Props extends React.HTMLProps<HTMLDivElement> {

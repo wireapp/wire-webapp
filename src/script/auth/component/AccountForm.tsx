@@ -25,7 +25,7 @@ import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 import {addLocaleToUrl} from '../../externalRoute';
 import {accountFormStrings} from '../../strings';
-import {Config} from '../config';
+import {Config} from '../Config';
 import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {BackendError} from '../module/action/BackendError';

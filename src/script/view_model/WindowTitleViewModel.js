@@ -22,7 +22,7 @@ import ko from 'knockout';
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 
-import {Config} from '../auth/config';
+import {Config} from '../auth/Config';
 import {WebAppEvents} from '../event/WebApp';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {ContentViewModel} from './ContentViewModel';

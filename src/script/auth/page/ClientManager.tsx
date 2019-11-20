@@ -25,7 +25,7 @@ import {AnyAction, Dispatch} from 'redux';
 import useReactRouter from 'use-react-router';
 import {clientManagerStrings} from '../../strings';
 import ClientList from '../component/ClientList';
-import {Config} from '../config';
+import {Config} from '../Config';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {RootState, bindActionCreators} from '../module/reducer';
 import {ROUTE} from '../route';

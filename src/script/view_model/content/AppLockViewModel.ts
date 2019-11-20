@@ -23,7 +23,7 @@ import ko from 'knockout';
 import sodium from 'libsodium-wrappers-sumo';
 import {t} from 'Util/LocalizerUtil';
 import {afterRender} from 'Util/util';
-import {Config} from '../../auth/config';
+import {Config} from '../../auth/Config';
 import {QUERY_KEY} from '../../auth/route';
 import {SIGN_OUT_REASON} from '../../auth/SignOutReason';
 import {getURLParameter} from '../../auth/util/urlUtil';

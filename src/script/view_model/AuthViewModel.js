@@ -34,7 +34,7 @@ import {isValidPhoneNumber, isValidEmail} from 'Util/ValidationUtil';
 import {forwardParameter, getParameter} from 'Util/UrlUtil';
 
 import {URLParameter} from '../auth/URLParameter';
-import {Config} from '../auth/config';
+import {Config} from '../auth/Config';
 import {ValidationError} from '../auth/ValidationError';
 
 import {App} from '../main/app';
@@ -242,6 +242,8 @@ class AuthViewModel {
         asset: new AssetService(backendClient),
       },
     };
+
+    this.Config = Config;
 
     const elementSelector = '.auth-page';
     ko.applyBindings(this, document.querySelector(elementSelector));
@@ -456,7 +458,7 @@ class AuthViewModel {
         if (response.expires_in) {
           this.code_expiration_timestamp(getUnixTimestamp() + response.expires_in);
         } else if (!response.label) {
-          this.code_expiration_timestamp(getUnixTimestamp() + z.config.LOGIN_CODE_EXPIRATION);
+          this.code_expiration_timestamp(getUnixTimestamp() + Config.LOGIN_CODE_EXPIRATION);
         }
         this._set_hash(AuthView.MODE.VERIFY_CODE);
         this.pending_server_request(false);

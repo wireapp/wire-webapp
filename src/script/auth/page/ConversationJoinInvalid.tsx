@@ -22,7 +22,7 @@ import {FormattedHTMLMessage, useIntl} from 'react-intl';
 import {conversationJoinStrings} from '../../strings';
 import UnsupportedBrowser from '../component/UnsupportedBrowser';
 import WirelessContainer from '../component/WirelessContainer';
-import {Config} from '../config';
+import {Config} from '../Config';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 

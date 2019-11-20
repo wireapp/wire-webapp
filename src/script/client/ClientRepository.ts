@@ -32,7 +32,7 @@ import {Logger, getLogger} from 'Util/Logger';
 import {loadValue, storeValue} from 'Util/StorageUtil';
 import {murmurhash3} from 'Util/util';
 
-import {Config} from '../auth/config';
+import {Config} from '../auth/Config';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {BackendEvent} from '../event/Backend';
 import {WebAppEvents} from '../event/WebApp';

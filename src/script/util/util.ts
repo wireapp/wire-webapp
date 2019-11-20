@@ -27,7 +27,7 @@ import UUID from 'uuidjs';
 import {Environment} from './Environment';
 import {loadValue} from './StorageUtil';
 
-import {Config} from '../auth/config';
+import {Config} from '../auth/Config';
 import {QUERY_KEY} from '../auth/route';
 import * as URLUtil from '../auth/util/urlUtil';
 import {Conversation} from '../entity/Conversation';
