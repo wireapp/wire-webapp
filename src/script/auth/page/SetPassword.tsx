@@ -24,8 +24,8 @@ import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 import useReactRouter from 'use-react-router';
+import {Config} from '../../Config';
 import {setPasswordStrings} from '../../strings';
-import {Config} from '../config';
 import {actionRoot} from '../module/action';
 import {ValidationError} from '../module/action/ValidationError';
 import {RootState, bindActionCreators} from '../module/reducer';
@@ -139,7 +139,4 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(SetPassword);
+export default connect(mapStateToProps, mapDispatchToProps)(SetPassword);

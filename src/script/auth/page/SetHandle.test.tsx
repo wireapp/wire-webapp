@@ -19,7 +19,7 @@
 
 import {ReactWrapper} from 'enzyme';
 import React from 'react';
-import {Config as ReadOnlyConfig} from '../config';
+import {Config as ReadOnlyConfig} from '../../Config';
 import {actionRoot} from '../module/action';
 import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';

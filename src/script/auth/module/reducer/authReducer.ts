@@ -21,7 +21,7 @@ import {LoginData} from '@wireapp/api-client/dist/commonjs/auth';
 import {ClientType} from '@wireapp/api-client/dist/commonjs/client';
 import {TeamData} from '@wireapp/api-client/dist/commonjs/team';
 import {UserAsset} from '@wireapp/api-client/dist/commonjs/user';
-import {Config} from '../../config';
+import {Config} from '../../../Config';
 import {AUTH_ACTION, AppActions, USER_ACTION} from '../action/creator/';
 import {REGISTER_FLOW} from '../selector/AuthSelector';
 
