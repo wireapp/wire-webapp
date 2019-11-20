@@ -110,7 +110,7 @@ const PhoneLoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
             formNoValidate
             icon={ICON_NAME.ARROW}
             onClick={handleSubmit}
-            data-uie-name="do-sign-in"
+            data-uie-name="do-sign-in-phone"
           />
         )}
       </InputSubmitCombo>
