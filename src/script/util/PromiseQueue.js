@@ -31,7 +31,7 @@ export class PromiseQueue {
    * Construct a new Promise Queue.
    *
    * @param {Object} [options={}] - Initialization options
-   * @param {boolean} [options.concurrent=1] - Concurrent promise execution
+   * @param {number} [options.concurrent=1] - Concurrent promise execution
    * @param {string} options.name - Name for Promise queue
    * @param {boolean} [options.paused=false] - Initial paused state
    * @param {number} [options.timeout=PromiseQueue.CONFIG.UNBLOCK_INTERVAL] - Timeout in ms
