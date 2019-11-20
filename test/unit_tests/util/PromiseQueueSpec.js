@@ -21,7 +21,7 @@ import {PromiseQueue} from 'Util/PromiseQueue';
 
 describe('PromiseQueue', () => {
   describe('push', () => {
-    it('should process promises', () => {
+    it('processes promises', () => {
       let counter = 0;
       const result = [];
 
@@ -38,7 +38,7 @@ describe('PromiseQueue', () => {
       });
     });
 
-    it('should process promises that are added during execution', done => {
+    it('processes promises that are added during execution', done => {
       let counter = 0;
       const result = [];
 
@@ -70,7 +70,7 @@ describe('PromiseQueue', () => {
       }, 25);
     });
 
-    it('should process promises even when one of them rejects', () => {
+    it('processes promises even when one of them rejects', () => {
       const resolvingPromise = () => Promise.resolve();
 
       const rejectingPromise = () => Promise.reject(new Error('Unit test error'));
@@ -80,7 +80,7 @@ describe('PromiseQueue', () => {
       return queue.push(resolvingPromise);
     });
 
-    it('should process promises even when one of them times out (with retries)', () => {
+    it('processes promises even when one of them times out (with retries)', () => {
       let counter = 0;
 
       const resolvingPromise = () => Promise.resolve(counter++);
