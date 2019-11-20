@@ -37,17 +37,17 @@ interface Settings {
 }
 
 interface RequestConfig {
-  cache: boolean;
-  contentType: string;
-  crossDomain: boolean;
-  data: JQuery.PlainObject<any>;
-  headers: JQuery.PlainObject<string>;
-  processData: boolean;
-  skipRetry: boolean;
-  timeout: number;
-  type: string;
-  url: string;
-  withCredentials: boolean;
+  cache?: boolean;
+  contentType?: string;
+  crossDomain?: boolean;
+  data?: JQuery.PlainObject<any>;
+  headers?: JQuery.PlainObject<string>;
+  processData?: boolean;
+  skipRetry?: boolean;
+  timeout?: number;
+  type?: string;
+  url?: string;
+  withCredentials?: boolean;
 }
 
 export class BackendClient {

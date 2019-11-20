@@ -69,7 +69,7 @@ class PropertiesService {
     });
   }
 
-  putPropertiesByKey(key: string, properties: {} | boolean): Promise<void> {
+  putPropertiesByKey(key: string, properties: any): Promise<void> {
     return this.backendClient.sendJson({
       data: properties,
       type: 'PUT',
