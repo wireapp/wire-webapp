@@ -20,7 +20,8 @@
 import {LoginData} from '@wireapp/api-client/dist/commonjs/auth';
 import {ICON_NAME, Input, InputBlock, InputSubmitCombo, Loading, RoundIconButton, Select} from '@wireapp/react-ui-kit';
 import React, {useRef, useState} from 'react';
-
+import {useIntl} from 'react-intl';
+import {phoneLoginStrings} from 'src/script/strings';
 import {COUNTRY_CODES, getCountryByCode, getCountryCode} from 'Util/CountryCodes';
 
 interface LoginFormProps {
@@ -29,6 +30,7 @@ interface LoginFormProps {
 }
 
 const PhoneLoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
+  const {formatMessage: _} = useIntl();
   const [phoneNumber, setPhoneNumber] = useState('');
   const [countryCode, setCountryCode] = useState('1');
   const [country, setCountry] = useState('US');
@@ -57,10 +59,10 @@ const PhoneLoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
         }}
       >
         <option value="X0" style={{display: 'none'}}>
-          authAccountCountryCode
+          {_(phoneLoginStrings.accountCountryCode)}
         </option>
         <option value="X1" style={{display: 'none'}}>
-          authErrorCountryCodeInvalid
+          {_(phoneLoginStrings.errorCountryCodeInvalid)}
         </option>
         {COUNTRY_CODES.map(({iso, name}) => (
           <option key={iso} value={iso}>

@@ -674,6 +674,14 @@ export const ssoLoginStrings = defineMessages({
 });
 
 export const phoneLoginStrings = defineMessages({
+  accountCountryCode: {
+    defaultMessage: 'Country Code',
+    id: 'authAccountCountryCode',
+  },
+  errorCountryCodeInvalid: {
+    defaultMessage: 'Invalid Country Code',
+    id: 'authErrorCountryCodeInvalid',
+  },
   loginHead: {
     defaultMessage: 'Phone Log in',
     id: 'authAccountSignInPhone',
