@@ -23,6 +23,7 @@ import {t} from 'Util/LocalizerUtil';
 import {noop} from 'Util/util';
 
 import {resolve, graph} from '../../config/appResolver';
+import {RichProfileRepository} from '../../user/RichProfileRepository';
 
 ko.components.register('enriched-fields', {
   template: `
@@ -38,8 +39,11 @@ ko.components.register('enriched-fields', {
     <!-- /ko -->
   `,
   viewModel: {
-    createViewModel: function({user, onFieldsLoaded = noop}, {element}) {
-      this.richProfileRepository = resolve(graph.RichProfileRepository);
+    createViewModel: function(
+      {user, onFieldsLoaded = noop, richProfileRepository = new RichProfileRepository(resolve(graph.BackendClient))},
+      {element},
+    ) {
+      this.richProfileRepository = richProfileRepository;
       this.fields = ko.observable([]);
       ko.computed(
         () => {
