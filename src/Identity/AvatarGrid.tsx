@@ -27,7 +27,7 @@ import {Avatar, DEFAULT_AVATAR_SIZE} from './Avatar';
 import {COLOR} from './colors';
 
 interface Props<T = HTMLDivElement> extends React.HTMLProps<T> {
-  items: (Omit<AvatarProps, 'borderColor' | 'size' | 'borderColor' | 'isAvatarGridItem' | 'fetchImage'>)[];
+  items: Omit<AvatarProps, 'borderColor' | 'size' | 'borderColor' | 'isAvatarGridItem' | 'fetchImage'>[];
   size?: number;
   backgroundColor?: string;
   borderColor?: string;
