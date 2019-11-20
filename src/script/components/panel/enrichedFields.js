@@ -39,8 +39,11 @@ ko.components.register('enriched-fields', {
     <!-- /ko -->
   `,
   viewModel: {
-    createViewModel: function({user, onFieldsLoaded = noop}, {element}) {
-      this.richProfileRepository = new RichProfileRepository(resolve(graph.BackendClient));
+    createViewModel: function(
+      {user, onFieldsLoaded = noop, richProfileRepository = new RichProfileRepository(resolve(graph.BackendClient))},
+      {element},
+    ) {
+      this.richProfileRepository = richProfileRepository;
       this.fields = ko.observable([]);
       ko.computed(
         () => {

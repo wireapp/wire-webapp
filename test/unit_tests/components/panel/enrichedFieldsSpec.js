@@ -30,7 +30,7 @@ describe('enriched-fields', () => {
   it('displays all the given fields', () => {
     const richProfileRepository = new RichProfileRepository(resolve(graph.BackendClient));
     const userId = UUID.genV4().hexString;
-    const params = {user: () => ({email: () => {}, id: userId})};
+    const params = {richProfileRepository, user: () => ({email: () => {}, id: userId})};
 
     spyOn(richProfileRepository, 'getUserRichProfile').and.returnValue(
       Promise.resolve({
