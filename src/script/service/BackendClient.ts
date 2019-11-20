@@ -53,13 +53,13 @@ interface RequestConfig {
 export class BackendClient {
   private connectivityTimeout: number;
   private queueTimeout: number;
-  private readonly accessToken: string;
   private readonly accessTokenType: string;
   private readonly connectivityQueue: PromiseQueue;
   private readonly logger: Logger;
   private readonly numberOfRequests: ko.Observable<number>;
   private readonly queueState: ko.Observable<string>;
   private readonly requestQueue: PromiseQueue;
+  public accessToken: string;
   public restUrl: string;
   public webSocketUrl: string;
 
