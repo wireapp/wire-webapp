@@ -17,7 +17,7 @@
  *
  */
 
-import {Config} from './config';
+import {Config} from '../Config';
 
 export const externalRoute = {
   PHONE_LOGIN: `/login/`,

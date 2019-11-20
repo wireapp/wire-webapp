@@ -22,7 +22,7 @@ import ko from 'knockout';
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
 
-import {Config} from '../../auth/config';
+import {Config} from '../../Config';
 import {UserRepository} from '../../user/UserRepository';
 
 export class InviteModalViewModel {

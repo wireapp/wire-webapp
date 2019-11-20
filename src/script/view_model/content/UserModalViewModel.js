@@ -19,7 +19,7 @@
 
 import {noop} from 'Util/util';
 
-import {Config} from '../../auth/config';
+import {Config} from '../../Config';
 import {Actions} from 'Components/panel/userActions';
 
 export class UserModalViewModel {

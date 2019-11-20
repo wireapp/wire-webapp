@@ -8,8 +8,6 @@ import raygun from '../../../node_modules/raygun4js/dist/raygun.vanilla.js';
 // Needed for the wrapper
 import '../event/WebApp';
 
-import configGlobal from '../config.js';
-
 import LocalizerUtilGlobal from 'Util/LocalizerUtil.js';
 
 import AccessTokenErrorGlobal from '../error/AccessTokenError.js';

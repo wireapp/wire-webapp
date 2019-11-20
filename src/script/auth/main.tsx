@@ -28,7 +28,7 @@ import {Provider} from 'react-redux';
 import {enableLogging} from 'Util/LoggerUtil';
 import {exposeWrapperGlobals} from 'Util/wrapper';
 
-import {Config} from './config';
+import {Config} from '../Config';
 import {configureClient} from './configureClient';
 import {configureCore} from './configureCore';
 import {configureEnvironment} from './configureEnvironment';
