@@ -21,7 +21,7 @@ import {getLogger} from 'Util/Logger';
 import {copyText} from 'Util/ClipboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import {Config} from '../../auth/config';
+import {Config} from '../../Config';
 import {BasePanelViewModel} from './BasePanelViewModel';
 import {ModalsViewModel} from '../ModalsViewModel';
 import {ACCESS_STATE} from '../../conversation/AccessState';

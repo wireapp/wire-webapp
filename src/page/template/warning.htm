@@ -13,7 +13,7 @@
         <div class="warning-bar warning-bar-feature">
           <div class="warning-bar-message">
             <span data-bind="text: t('warningPermissionDeniedCamera')"></span>&nbsp;
-            <a class="warning-bar-link" data-bind="supportLink: z.config.SUPPORT.ID.CAMERA_ACCESS_DENIED, text: t('warningLearnMore')" rel="nofollow noopener noreferrer" target="_blank"></a>
+            <a class="warning-bar-link" data-bind="supportLink: Config.SUPPORT.ID.CAMERA_ACCESS_DENIED, text: t('warningLearnMore')" rel="nofollow noopener noreferrer" target="_blank"></a>
           </div>
           <span class="warning-bar-close icon-close button-round button-round-dark" data-bind="click: closeWarning"></span>
         </div>
@@ -30,7 +30,7 @@
         <div class="warning-bar warning-bar-feature">
           <div class="warning-bar-message">
             <span data-bind="text: t('warningPermissionDeniedMicrophone')"></span>&nbsp;
-            <a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="supportLink: z.config.SUPPORT.ID.MICROPHONE_ACCESS_DENIED, text: t('warningLearnMore')"></a>
+            <a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="supportLink: Config.SUPPORT.ID.MICROPHONE_ACCESS_DENIED, text: t('warningLearnMore')"></a>
           </div>
           <span class="warning-bar-close icon-close button-round button-round-dark" data-bind="click: closeWarning"></span>
         </div>
@@ -47,7 +47,7 @@
         <div class="warning-bar warning-bar-feature">
           <div class="warning-bar-message">
             <span data-bind="text: t('warningPermissionDeniedScreen')"></span>&nbsp;
-            <a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="supportLink: z.config.SUPPORT.ID.SCREEN_ACCESS_DENIED, text: t('warningLearnMore')"></a>
+            <a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="supportLink: Config.SUPPORT.ID.SCREEN_ACCESS_DENIED, text: t('warningLearnMore')"></a>
           </div>
           <span class="warning-bar-close icon-close button-round button-round-dark" data-bind="click: closeWarning"></span>
         </div>
@@ -57,7 +57,7 @@
         <div class="warning-bar warning-bar-feature">
           <div class="warning-bar-message">
             <span data-bind="text: t('warningNotFoundCamera')"></span>&nbsp;
-            <a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="supportLink: z.config.SUPPORT.ID.DEVICE_NOT_FOUND, text: t('warningLearnMore')"></a>
+            <a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="supportLink: Config.SUPPORT.ID.DEVICE_NOT_FOUND, text: t('warningLearnMore')"></a>
           </div>
           <span class="warning-bar-close icon-close button-round button-round-dark" data-bind="click: closeWarning"></span>
         </div>
@@ -67,7 +67,7 @@
         <div class="warning-bar warning-bar-feature">
           <div class="warning-bar-message">
             <span data-bind="text: t('warningNotFoundMicrophone')"></span>&nbsp;
-            <a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="supportLink: z.config.SUPPORT.ID.DEVICE_NOT_FOUND, text: t('warningLearnMore')"></a>
+            <a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="supportLink: Config.SUPPORT.ID.DEVICE_NOT_FOUND, text: t('warningLearnMore')"></a>
           </div>
           <span class="warning-bar-close icon-close button-round button-round-dark" data-bind="click: closeWarning"></span>
         </div>
@@ -84,7 +84,7 @@
         <div class="warning-bar warning-bar-feature">
           <!-- ko ifnot: Environment.browser.chrome -->
             <div class="warning-bar-message">
-              <span data-bind="text: t('warningCallUnsupportedIncoming', name())"></span>&nbsp;<a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="supportLink: z.config.SUPPORT.ID.CALLING, text: t('warningLearnMore')"></a>
+              <span data-bind="text: t('warningCallUnsupportedIncoming', name())"></span>&nbsp;<a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="supportLink: Config.SUPPORT.ID.CALLING, text: t('warningLearnMore')"></a>
             </div>
           <!-- /ko -->
           <!-- ko if: Environment.browser.chrome -->
@@ -107,7 +107,7 @@
         <div class="warning-bar warning-bar-feature">
           <!-- ko ifnot: Environment.browser.chrome -->
             <div class="warning-bar-message">
-              <span data-bind="text: t('warningCallUnsupportedOutgoing')"></span>&nbsp;<a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="supportLink: z.config.SUPPORT.ID.CALLING, text: t('warningLearnMore')"></a>
+              <span data-bind="text: t('warningCallUnsupportedOutgoing')"></span>&nbsp;<a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="supportLink: Config.SUPPORT.ID.CALLING, text: t('warningLearnMore')"></a>
             </div>
           <!-- /ko -->
           <!-- ko if: Environment.browser.chrome -->

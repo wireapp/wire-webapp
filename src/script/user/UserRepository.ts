@@ -17,11 +17,11 @@
  *
  */
 
+import {PublicClient} from '@wireapp/api-client/dist/commonjs/client';
 import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {flatten} from 'underscore';
-import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 
 import {chunk} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -29,22 +29,20 @@ import {Logger, getLogger} from 'Util/Logger';
 import {sortByPriority} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {createRandomUuid, koArrayPushAll, loadUrlBlob} from 'Util/util';
-import {EventSource} from '../event/EventSource';
 
 import {UNSPLASH_URL} from '../externalRoute';
-import {ConsentType} from './ConsentType';
-import {ConsentValue} from './ConsentValue';
 
 import {mapProfileAssetsV1} from '../assets/AssetMapper';
 import {User} from '../entity/User';
-import {UserMapper} from './UserMapper';
 
 import {BackendEvent} from '../event/Backend';
 import {ClientEvent} from '../event/Client';
 import {EventRepository} from '../event/EventRepository';
+import {EventSource} from '../event/EventSource';
 import {WebAppEvents} from '../event/WebApp';
 
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
+import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 import {EventName} from '../tracking/EventName';
 import {SuperProperty} from '../tracking/SuperProperty';
 
@@ -55,21 +53,23 @@ import {
 } from '../view_model/content/LegalHoldModalViewModel';
 import {protoFromType, valueFromType} from './AvailabilityMapper';
 import {showAvailabilityModal} from './AvailabilityModal';
+import {ConsentType} from './ConsentType';
+import {ConsentValue} from './ConsentValue';
 import {createSuggestions} from './UserHandleGenerator';
+import {UserMapper} from './UserMapper';
+import {UserService} from './UserService';
 
-import {PublicClient} from '@wireapp/api-client/dist/commonjs/client';
 import {AssetService} from '../assets/AssetService';
 import {ClientEntity} from '../client/ClientEntity';
 import {ClientMapper} from '../client/ClientMapper';
 import {ClientRepository} from '../client/ClientRepository';
-import {ACCENT_ID, config} from '../config';
+import {ACCENT_ID, Config} from '../Config';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
 import {AssetPayload} from '../entity/message/Asset';
 import {BackendClientError} from '../error/BackendClientError';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {SelfService} from '../self/SelfService';
 import {ServerTimeHandler} from '../time/serverTimeHandler';
-import {UserService} from './UserService';
 
 interface UserUpdate {
   accent_id?: typeof ACCENT_ID;
@@ -215,25 +215,23 @@ export class UserRepository {
     }
   }
 
-  loadUsers(): Promise<void> {
+  async loadUsers(): Promise<void> {
     if (this.isTeam()) {
-      return this.user_service
-        .loadUserFromDb()
-        .then(users => {
-          if (users.length) {
-            this.logger.log(`Loaded state of '${users.length}' users from database`, users);
+      const users = await this.user_service.loadUserFromDb();
 
-            const mappingPromises = users.map(user => {
-              return this.get_user_by_id(user.id).then(userEntity => userEntity.availability(user.availability));
-            });
+      if (users.length && users.length <= UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST) {
+        this.logger.log(`Loaded state of '${users.length}' users from database`, users);
 
-            return Promise.all(mappingPromises);
-          }
-          return [];
-        })
-        .then(() => this.users().forEach(userEntity => userEntity.subscribeToChanges()));
+        const mappingPromises = users.map(async user => {
+          const userEntity = await this.get_user_by_id(user.id);
+          userEntity.availability(user.availability);
+        });
+
+        await Promise.all(mappingPromises);
+      }
+
+      this.users().forEach(userEntity => userEntity.subscribeToChanges());
     }
-    return Promise.resolve();
   }
 
   /**
@@ -267,10 +265,10 @@ export class UserRepository {
   }
 
   /**
-   * Event to update availability of user.
+   * Event to update availability of a user.
    */
   onUserAvailability(event: {data: {availability: Availability.Type}; from: string}): void {
-    if (this.isTeam()) {
+    if (this.isTeam() && this.teamUsers().length <= UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST) {
       const {
         from: userId,
         data: {availability},
@@ -403,7 +401,7 @@ export class UserRepository {
 
     if (teamUsers.length > UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST) {
       this.logger.warn(
-        `Availability not changed since the team size is larger than "${UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST}".`,
+        `Availability update not sent since the team size is larger than "${UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST}".`,
       );
       return;
     }
@@ -505,7 +503,7 @@ export class UserRepository {
         });
     };
 
-    const chunksOfUserIds = chunk(userIds, config.MAXIMUM_USERS_PER_REQUEST) as string[][];
+    const chunksOfUserIds = chunk(userIds, Config.MAXIMUM_USERS_PER_REQUEST) as string[][];
     return Promise.all(chunksOfUserIds.map(chunkOfUserIds => _getUsers(chunkOfUserIds)))
       .then(resolveArray => {
         const newUserEntities = flatten(resolveArray);
@@ -556,7 +554,7 @@ export class UserRepository {
    * Detects if the user has a profile picture that uses the outdated picture API.
    * Will migrate the picture to the newer assets API if so.
    */
-  _upgradePictureAsset<T extends UserUpdate>(userData: T): T {
+  _upgradePictureAsset(userData: UserUpdate): UserUpdate {
     const hasPicture = userData.picture.length;
     const hasAsset = userData.assets.length;
 
@@ -845,7 +843,7 @@ export class UserRepository {
   }
 
   initMarketingConsent(): Promise<void> {
-    if (!config.FEATURE.CHECK_CONSENT) {
+    if (!Config.FEATURE.CHECK_CONSENT) {
       this.logger.warn(
         `Consent check feature is disabled. Defaulting to '${this.propertyRepository.marketingConsent()}'`,
       );

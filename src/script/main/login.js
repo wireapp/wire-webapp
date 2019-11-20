@@ -4,7 +4,7 @@ import {enableLogging} from 'Util/LoggerUtil';
 
 import {AuthViewModel} from '../view_model/AuthViewModel';
 import {resolve, graph} from '../config/appResolver';
-import {Config} from '../auth/config';
+import {Config} from '../Config';
 import {exposeWrapperGlobals} from 'Util/wrapper';
 
 $(() => {

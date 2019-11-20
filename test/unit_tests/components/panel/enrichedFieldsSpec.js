@@ -22,14 +22,15 @@ import UUID from 'uuidjs';
 import {resolve, graph} from '../../../api/testResolver';
 
 import 'src/script/components/panel/enrichedFields';
+import {RichProfileRepository} from 'src/script/user/RichProfileRepository';
 
 const entriesListSelector = '.enriched-fields__entry';
 
 describe('enriched-fields', () => {
   it('displays all the given fields', () => {
-    const richProfileRepository = resolve(graph.RichProfileRepository);
+    const richProfileRepository = new RichProfileRepository(resolve(graph.BackendClient));
     const userId = UUID.genV4().hexString;
-    const params = {user: () => ({email: () => {}, id: userId})};
+    const params = {richProfileRepository, user: () => ({email: () => {}, id: userId})};
 
     spyOn(richProfileRepository, 'getUserRichProfile').and.returnValue(
       Promise.resolve({
@@ -46,9 +47,9 @@ describe('enriched-fields', () => {
   });
 
   it('displays the email if set on user', () => {
-    const richProfileRepository = resolve(graph.RichProfileRepository);
+    const richProfileRepository = new RichProfileRepository(resolve(graph.BackendClient));
     const userId = UUID.genV4().hexString;
-    const params = {user: () => ({email: () => 'user@inter.net', id: userId})};
+    const params = {richProfileRepository, user: () => ({email: () => 'user@inter.net', id: userId})};
 
     spyOn(richProfileRepository, 'getUserRichProfile').and.returnValue(
       Promise.resolve({
@@ -65,9 +66,9 @@ describe('enriched-fields', () => {
   });
 
   it('calls the `onFieldsLoaded` function when fields are loaded', () => {
-    const richProfileRepository = resolve(graph.RichProfileRepository);
+    const richProfileRepository = new RichProfileRepository(resolve(graph.BackendClient));
     const userId = UUID.genV4().hexString;
-    const params = {onFieldsLoaded: () => {}, user: () => ({email: () => {}, id: userId})};
+    const params = {onFieldsLoaded: () => {}, richProfileRepository, user: () => ({email: () => {}, id: userId})};
     const richProfile = {
       fields: [
         {type: 'field1', value: 'value1'},

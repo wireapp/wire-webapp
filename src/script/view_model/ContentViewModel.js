@@ -21,7 +21,7 @@ import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {alias} from 'Util/util';
 
-import {Config} from '../auth/config';
+import {Config} from '../Config';
 import {MessageListViewModel} from './content/MessageListViewModel';
 import {UserModalViewModel} from './content/UserModalViewModel';
 import {LegalHoldModalViewModel} from './content/LegalHoldModalViewModel';

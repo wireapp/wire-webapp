@@ -23,7 +23,7 @@ import ko from 'knockout';
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
 import 'webrtc-adapter';
-import {Config} from '../auth/config';
+import {Config} from '../Config';
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 
 import {Environment} from 'Util/Environment';

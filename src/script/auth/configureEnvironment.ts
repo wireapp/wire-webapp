@@ -24,7 +24,6 @@ import * as platform from 'platform';
 
 import {noop} from 'Util/util';
 
-import '../config';
 import '../event/Client';
 import '../event/WebApp';
 import '../message/MessageCategorization';
