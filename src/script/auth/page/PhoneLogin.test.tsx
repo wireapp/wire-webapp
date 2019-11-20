@@ -35,7 +35,7 @@ describe('"PhoneLogin"', () => {
   const backButton = () => wrapper.find('a[data-uie-name="go-login"]').first();
   const phoneInput = () => wrapper.find('input[data-uie-name="enter-phone"]').first();
   const countryCodeInput = () => wrapper.find('input[data-uie-name="enter-country-code"]').first();
-  const loginButton = () => wrapper.find('button[data-uie-name="do-sign-in"]').first();
+  const loginButton = () => wrapper.find('button[data-uie-name="do-sign-in-phone"]').first();
 
   it('has disabled submit button as long as one input is empty', () => {
     wrapper = mountComponent(
