@@ -52,24 +52,24 @@ export const URL_PATH = {
   SUPPORT_USERNAME: '/support/username/',
 };
 
-const getTeamSettingsUrl = (path: string = '', utmSource?: string) => {
+const getTeamSettingsUrl = (path: string = '', utmSource?: string): string => {
   const query = utmSource ? `?utm_source=${utmSource}&utm_term=desktop` : '';
   const teamSettingsUrl = `${URL.TEAM_SETTINGS}${path}${query}`;
   return URL.TEAM_SETTINGS ? teamSettingsUrl : undefined;
 };
 
-export const getWebsiteUrl = (path: string = '', pkCampaign?: string) => {
+export const getWebsiteUrl = (path: string = '', pkCampaign?: string): string => {
   const query = pkCampaign ? `?pk_campaign=${pkCampaign}&pk_kwd=desktop` : '';
   const websiteUrl = `${URL.WEBSITE}${path}${query}`;
   return addLocaleToUrl(URL.WEBSITE ? websiteUrl : undefined);
 };
 
-export const getAccountPagesUrl = (path: string = '') => {
+export const getAccountPagesUrl = (path: string = ''): string => {
   const accountPagesUrl = `${URL.ACCOUNT}${path}`;
   return URL.ACCOUNT ? accountPagesUrl : undefined;
 };
 
-export const getSupportUrl = (path: string = '') => {
+export const getSupportUrl = (path: string = ''): string => {
   const supportUrl = `${URL.SUPPORT}${path}`;
   return URL.SUPPORT ? supportUrl : undefined;
 };
@@ -78,10 +78,11 @@ export const getPrivacyPolicyUrl = (): string => addLocaleToUrl(URL.PRIVACY_POLI
 export const getTermsOfUsePersonalUrl = (): string => addLocaleToUrl(URL.TERMS_OF_USE_PERSONAL || undefined);
 export const getTermsOfUseTeamUrl = (): string => addLocaleToUrl(URL.TERMS_OF_USE_TEAMS || undefined);
 
-export const getManageServicesUrl = (utmSource?: string) => getTeamSettingsUrl(URL_PATH.MANAGE_SERVICES, utmSource);
-export const getManageTeamUrl = (utmSource?: string) => getTeamSettingsUrl(URL_PATH.MANAGE_TEAM, utmSource);
+export const getManageServicesUrl = (utmSource?: string): string =>
+  getTeamSettingsUrl(URL_PATH.MANAGE_SERVICES, utmSource);
+export const getManageTeamUrl = (utmSource?: string): string => getTeamSettingsUrl(URL_PATH.MANAGE_TEAM, utmSource);
 
-export const getCreateTeamUrl = (pkCampaign?: string) =>
+export const getCreateTeamUrl = (pkCampaign?: string): string =>
   Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && getWebsiteUrl(URL_PATH.CREATE_TEAM, pkCampaign);
 export const getPrivacyHowUrl = (): string => getWebsiteUrl(URL_PATH.PRIVACY_HOW);
 export const getPrivacyWhyUrl = (): string => getWebsiteUrl(URL_PATH.PRIVACY_WHY);
