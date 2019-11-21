@@ -220,7 +220,11 @@ export class UserRepository {
       const users = await this.user_service.loadUserFromDb();
 
       if (users.length) {
-        if (users.length < UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST) {
+        if (users.length >= UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST) {
+          this.logger.warn(
+            `Availability not displayed since the team size is larger than "${UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST}".`,
+          );
+        } else {
           this.logger.log(`Loaded state of '${users.length}' users from database`, users);
 
           const mappingPromises = users.map(async user => {
@@ -229,10 +233,6 @@ export class UserRepository {
           });
 
           await Promise.all(mappingPromises);
-        } else {
-          this.logger.warn(
-            `Availability not displayed since the team size is larger than "${UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST}".`,
-          );
         }
       }
 
@@ -275,16 +275,14 @@ export class UserRepository {
    */
   onUserAvailability(event: {data: {availability: Availability.Type}; from: string}): void {
     if (this.isTeam()) {
-      if (this.teamUsers().length < UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST) {
-        const {
-          from: userId,
-          data: {availability},
-        } = event;
-        this.get_user_by_id(userId).then(userEntity => userEntity.availability(availability));
-      } else {
+      if (this.teamUsers().length >= UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST) {
         this.logger.warn(
           `Availability not updated since the team size is larger than "${UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST}".`,
         );
+      } else {
+        // prettier-ignore
+        const {from: userId, data: {availability}} = event;
+        this.get_user_by_id(userId).then(userEntity => userEntity.availability(availability));
       }
     }
   }
