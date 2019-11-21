@@ -37,6 +37,9 @@ interface Settings {
   webSocketUrl: string;
 }
 
+/**
+ * AJAX request configuration
+ */
 interface RequestConfig {
   cache?: boolean;
   contentType?: string;
