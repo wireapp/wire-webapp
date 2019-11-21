@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.0.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.0.0...@wireapp/api-client@9.0.1) (2019-11-21)
+
+
+### Bug Fixes
+
+* **api-client:** Remove colliding dependency to "@wireapp/store-engine" ([5d6c244](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/5d6c24443636d6bd70f9585e6350d16e21bea1f7))
+
+
+
+
+
 # [9.0.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@8.3.4...@wireapp/api-client@9.0.0) (2019-11-21)
 
 
