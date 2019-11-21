@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.0.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@8.3.4...@wireapp/api-client@9.0.0) (2019-11-21)
+
+
+### Code Refactoring
+
+* **api-client,bot-api,changelog-bot,cli-client,commons,core,store-engine-bro-fs,store-engine-dexie,store-engine-fs,store-engine-sqleet,store-engine-web-storage,travis-bot:** Remove store engine from API client ([#2558](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2558)) ([6b8ba89](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/6b8ba892c85ca43cd498a7b3d56a20a31f8578a4))
+
+
+### Features
+
+* POST /login/send error mapping ([#2574](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2574)) ([1bb0c33](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/1bb0c33511d7a8e36dfae4b63f131cb11cb1bc21))
+
+
+### BREAKING CHANGES
+
+* **api-client,bot-api,changelog-bot,cli-client,commons,core,store-engine-bro-fs,store-engine-dexie,store-engine-fs,store-engine-sqleet,store-engine-web-storage,travis-bot:** Store engine has been removed from "api-client" and needs to be initialized with a provider function within the "core" construction.
+
+
+
+
+
 ## [8.3.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@8.3.3...@wireapp/api-client@8.3.4) (2019-11-21)
 
 **Note:** Version bump only for package @wireapp/api-client
