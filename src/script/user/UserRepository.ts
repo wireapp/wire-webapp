@@ -218,7 +218,7 @@ export class UserRepository {
 
   async loadUsers(): Promise<void> {
     if (this.isTeam()) {
-      if (this.teamUsers().length + 1 >= UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST) {
+      if (this.isTeamTooLargeForBroadcast()) {
         this.logger.warn(
           `Availability not displayed since the team size is larger or equal to "${UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST}".`,
         );
@@ -276,7 +276,7 @@ export class UserRepository {
    */
   onUserAvailability(event: {data: {availability: Availability.Type}; from: string}): void {
     if (this.isTeam()) {
-      if (this.teamUsers().length + 1 >= UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST) {
+      if (this.isTeamTooLargeForBroadcast()) {
         this.logger.warn(
           `Availability not updated since the team size is larger or equal to "${UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST}".`,
         );
@@ -341,6 +341,11 @@ export class UserRepository {
         return userEntities;
       });
     });
+  }
+
+  private isTeamTooLargeForBroadcast(): boolean {
+    const teamSizeIncludingSelf = this.teamUsers().length + 1;
+    return teamSizeIncludingSelf >= UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST;
   }
 
   /**
@@ -410,7 +415,7 @@ export class UserRepository {
       this.logger.log(`Availability was again set to '${newAvailabilityValue}'`);
     }
 
-    if (teamUsers.length + 1 >= UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST) {
+    if (this.isTeamTooLargeForBroadcast()) {
       this.logger.warn(
         `Availability update not sent since the team size is larger or equal to "${UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST}".`,
       );
