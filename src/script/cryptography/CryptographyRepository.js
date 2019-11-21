@@ -29,7 +29,7 @@ import {arrayToBase64, base64ToArray, isTemporaryClientAndNonPersistent, zeroPad
 import {CryptographyMapper} from './CryptographyMapper';
 import {CryptographyService} from './CryptographyService';
 
-import {Config} from '..//Config';
+import {Config} from '../Config';
 import {WebAppEvents} from '../event/WebApp';
 import {EventName} from '../tracking/EventName';
 import {ClientEntity} from '../client/ClientEntity';
