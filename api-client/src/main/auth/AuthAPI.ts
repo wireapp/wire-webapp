@@ -21,9 +21,10 @@ import {AxiosRequestConfig, AxiosResponse} from 'axios';
 
 import {AccessTokenData, LoginData, SendLoginCode} from '../auth/';
 import {ClientType} from '../client/';
-import {HttpClient} from '../http/';
+import {BackendErrorLabel, HttpClient} from '../http/';
 import {retrieveCookie, sendRequestWithCookie} from '../shims/node/cookie';
 import {User} from '../user/';
+import {ForbiddenPhoneNumberError, InvalidPhoneNumberError, PasswordExistsError} from './AuthenticationError';
 import {CookieList} from './CookieList';
 import {LoginCodeResponse} from './LoginCodeResponse';
 import {RegisterData} from './RegisterData';
@@ -99,7 +100,7 @@ export class AuthAPI {
    * @param loginRequest Phone number to use for login SMS or voice call.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/tab.html#!/sendLoginCode
    */
-  public postLoginSend(loginRequest: SendLoginCode): Promise<AxiosResponse<LoginCodeResponse>> {
+  public async postLoginSend(loginRequest: SendLoginCode): Promise<LoginCodeResponse> {
     // https://github.com/zinfra/backend-issues/issues/974
     const defaultLoginRequest = {force: false};
     const config: AxiosRequestConfig = {
@@ -108,7 +109,27 @@ export class AuthAPI {
       url: `${AuthAPI.URL.LOGIN}/${AuthAPI.URL.SEND}`,
     };
 
-    return this.client.sendJSON(config);
+    try {
+      const response = await this.client.sendJSON<LoginCodeResponse>(config);
+      return response.data;
+    } catch (error) {
+      const backendErrorLabel = error.response && error.response.data && error.response.data.label;
+      if (backendErrorLabel) {
+        const backendErrorMessage = error.response.data && error.response.data.message;
+        switch (backendErrorLabel) {
+          case BackendErrorLabel.BAD_REQUEST: {
+            throw new InvalidPhoneNumberError(backendErrorMessage);
+          }
+          case BackendErrorLabel.UNAUTHORIZED: {
+            throw new ForbiddenPhoneNumberError(backendErrorMessage);
+          }
+          case BackendErrorLabel.PASSWORD_EXISTS: {
+            throw new PasswordExistsError(backendErrorMessage);
+          }
+        }
+      }
+      throw error;
+    }
   }
 
   public async postLogout(): Promise<void> {
