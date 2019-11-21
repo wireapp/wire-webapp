@@ -49,7 +49,6 @@
   "rules": {
     "id-length": "off",
     "jasmine/no-expect-in-setup-teardown": "off",
-    "jasmine/no-focused-tests": "off",
     "jasmine/no-spec-dupes": "off",
     "jasmine/no-suite-dupes": "off",
     "jasmine/prefer-toHaveBeenCalledWith": "off",
