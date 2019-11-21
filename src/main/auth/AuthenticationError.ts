@@ -82,3 +82,27 @@ export class MissingCookieError extends AuthenticationError {
     this.name = 'MissingCookieError';
   }
 }
+
+export class InvalidPhoneNumberError extends AuthenticationError {
+  constructor(message: string, label = BackendErrorLabel.BAD_REQUEST, code = StatusCode.BAD_REQUEST) {
+    super(message, label, code);
+    Object.setPrototypeOf(this, InvalidPhoneNumberError.prototype);
+    this.name = 'InvalidPhoneNumberError';
+  }
+}
+
+export class ForbiddenPhoneNumberError extends AuthenticationError {
+  constructor(message: string, label = BackendErrorLabel.UNAUTHORIZED, code = StatusCode.FORBIDDEN) {
+    super(message, label, code);
+    Object.setPrototypeOf(this, ForbiddenPhoneNumberError.prototype);
+    this.name = 'ForbiddenPhoneNumberError';
+  }
+}
+
+export class PasswordExistsError extends AuthenticationError {
+  constructor(message: string, label = BackendErrorLabel.PASSWORD_EXISTS, code = StatusCode.UNAUTHORIZED) {
+    super(message, label, code);
+    Object.setPrototypeOf(this, PasswordExistsError.prototype);
+    this.name = 'PasswordExistsError';
+  }
+}
