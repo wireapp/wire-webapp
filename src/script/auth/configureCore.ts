@@ -19,7 +19,27 @@
 
 import {APIClient} from '@wireapp/api-client';
 import {Account} from '@wireapp/core';
+import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
+import Dexie from 'dexie';
+import {StorageSchemata} from '../storage';
 
-const configureCore = (apiClient: APIClient) => new Account(apiClient);
+const storeEngineProvider = async (storeName: string) => {
+  const db = new Dexie(storeName);
+  const databaseSchemata = StorageSchemata.SCHEMATA;
+  databaseSchemata.forEach(({schema, upgrade, version}) => {
+    if (upgrade) {
+      return db
+        .version(version)
+        .stores(schema)
+        .upgrade((transaction: Dexie.Transaction) => upgrade(transaction, db));
+    }
+    return db.version(version).stores(schema);
+  });
+  const engine = new IndexedDBEngine();
+  await engine.initWithDb(db);
+  return engine;
+};
+
+const configureCore = (apiClient: APIClient) => new Account(apiClient, storeEngineProvider);
 
 export {configureCore};
