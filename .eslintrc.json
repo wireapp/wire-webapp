@@ -2,7 +2,7 @@
   "env": {
     "jasmine": true
   },
-  "extends": ["@wireapp/eslint-config"],
+  "extends": ["@wireapp/eslint-config", "plugin:jasmine/recommended"],
   "globals": {
     "$": true,
     "_": true,
