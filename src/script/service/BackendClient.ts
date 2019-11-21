@@ -141,13 +141,21 @@ export class BackendClient {
     } as any);
 
     // http://stackoverflow.com/a/18996758/451634
-    $.ajaxPrefilter((options, originalOptions, jqXHR: any) => {
-      jqXHR.wireRequest = {
-        originalRequestOptions: originalOptions,
-        requestDate: new Date(),
-        requestId: this.numberOfRequests(),
-      };
-    });
+    $.ajaxPrefilter(
+      (
+        options,
+        originalOptions,
+        jqXHR: JQueryXHR & {
+          wireRequest: {originalRequestOptions: JQuery.AjaxSettings; requestDate: Date; requestId: number};
+        },
+      ) => {
+        jqXHR.wireRequest = {
+          originalRequestOptions: originalOptions,
+          requestDate: new Date(),
+          requestId: this.numberOfRequests(),
+        };
+      },
+    );
   }
 
   setSettings(settings: Settings): void {
