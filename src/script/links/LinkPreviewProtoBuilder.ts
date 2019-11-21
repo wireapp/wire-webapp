@@ -25,7 +25,7 @@ import {deArrayify} from 'Util/ArrayUtil';
 import {truncate} from 'Util/StringUtil';
 import {isTweetUrl} from 'Util/ValidationUtil';
 
-import {Config} from '..//Config';
+import {Config} from '../Config';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 
 /**
