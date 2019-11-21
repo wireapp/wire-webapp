@@ -21,10 +21,10 @@ import $ from 'jquery';
 
 import {enableLogging} from 'Util/LoggerUtil';
 
-import {exposeWrapperGlobals} from 'Util/wrapper';
-import {Config} from '../Config';
-import {graph, resolve} from '../config/appResolver';
 import {AuthViewModel} from '../view_model/AuthViewModel';
+import {resolve, graph} from '../config/appResolver';
+import {Config} from '../Config';
+import {exposeWrapperGlobals} from 'Util/wrapper';
 
 $(() => {
   enableLogging(Config.FEATURE.ENABLE_DEBUG);
@@ -35,7 +35,6 @@ $(() => {
       restUrl: Config.BACKEND_REST,
       webSocketUrl: Config.BACKEND_WS,
     });
-    // tslint:disable-next-line
     new AuthViewModel(backendClient);
   }
 });
