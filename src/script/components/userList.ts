@@ -24,6 +24,7 @@ import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 import {SearchRepository} from '../search/SearchRepository';
 import {TeamRepository} from '../team/TeamRepository';
+import {viewportObserver} from '../ui/viewportObserver';
 import {validateHandle} from '../user/UserHandleGenerator';
 
 import 'Components/list/participantItem';
@@ -34,11 +35,14 @@ export enum UserlistMode {
   OTHERS = 'UserlistMode.OTHERS',
 }
 
+const USER_CHUNK_SIZE = 64;
+
 interface UserListParams {
   click: (userEntity: User, event: MouseEvent) => void;
   filter: ko.Observable<string>;
   selected: ko.ObservableArray<User>;
   searchRepository: SearchRepository;
+  skipSearch: boolean;
   teamRepository: TeamRepository;
   conversationRepository: ConversationRepository;
   user: ko.Observable<User[]>;
@@ -56,8 +60,11 @@ interface UserListParams {
   noSelfInteraction: boolean;
 }
 
-const listTemplate = (dataObservable: string, uieName: string = ''): string => `
-  <div class="search-list" data-bind="css: cssClasses(), foreach: {data: ${dataObservable}(), as: 'user', noChildContext: true }" data-uie-name="${uieName}">
+const listTemplate = (data: string, uieName: string = ''): string => `
+  <div class="search-list" data-bind="
+      css: cssClasses(),
+      foreach: {data: ${data}, as: 'user', noChildContext: true }"
+      ${uieName ? ` data-uie-name="${uieName}"` : ''}>
     <!-- ko if: noSelfInteraction && user.is_me -->
       <participant-item
         params="participant: user, customInfo: infos && infos()[user.id], canSelect: isSelectEnabled, isSelected: isSelected(user), mode: mode, external: teamRepository.isExternal(user.id), selfInTeam: selfInTeam"
@@ -79,19 +86,24 @@ ko.components.register('user-list', {
       <!-- ko if: adminUsers().length > 0 || showEmptyAdmin -->
         <div class="user-list__header" data-bind="text: t('searchListAdmins')" data-uie-name="label-conversation-admins"></div>
         <!-- ko if: adminUsers().length > 0 -->
-          ${listTemplate('adminUsers', 'list-admins')}
+          ${listTemplate('adminUsers().slice(0, maxShownUsers())', 'list-admins')}
         <!-- /ko -->
         <!-- ko ifnot: adminUsers().length > 0 -->
           <div class="user-list__no-admin" data-bind="text: t('searchListNoAdmins')" data-uie-name="status-no-admins"></div>
         <!-- /ko -->
       <!-- /ko -->
-      <!-- ko if: memberUsers().length > 0 -->
+      <!-- ko if: memberUsers().length > 0 && maxShownUsers() > adminUsers().length -->
         <div class="user-list__header" data-bind="text: t('searchListMembers')" data-uie-name="label-conversation-members"></div>
-        ${listTemplate('memberUsers', 'list-members')}
+        ${listTemplate('memberUsers().slice(0, maxShownUsers() - adminUsers().length)', 'list-members')}
       <!-- /ko -->
     <!-- /ko -->
+
     <!-- ko ifnot: showRoles() -->
-    ${listTemplate('filteredUserEntities')}
+    ${listTemplate('filteredUserEntities().slice(0, maxShownUsers())')}
+    <!-- /ko -->
+
+    <!-- ko if: filteredUserEntities().length > maxShownUsers() -->
+      <div data-bind="template: {afterRender: attachLazyTrigger}"><div style="height: 100px"></div></div>
     <!-- /ko -->
 
     <!-- ko if: typeof filter === 'function' -->
@@ -107,6 +119,7 @@ ko.components.register('user-list', {
   viewModel: function({
     click,
     filter = ko.observable(''),
+    skipSearch = false,
     selected: selectedUsers,
     searchRepository,
     teamRepository,
@@ -138,6 +151,8 @@ ko.components.register('user-list', {
     this.showRoles = ko.pureComputed(() => !!conversation);
     this.showEmptyAdmin = showEmptyAdmin;
     this.noSelfInteraction = noSelfInteraction;
+    this.maxShownUsers = ko.observable(USER_CHUNK_SIZE);
+    this.lazyTriggerElement = null;
 
     const isCompactMode = mode === UserlistMode.COMPACT;
 
@@ -162,12 +177,14 @@ ko.components.register('user-list', {
       let resultUsers: User[] = userEntities();
       const normalizedQuery = SearchRepository.normalizeQuery(filter());
       if (normalizedQuery) {
-        const SEARCHABLE_FIELDS = SearchRepository.CONFIG.SEARCHABLE_FIELDS;
-        const trimmedQuery = filter().trim();
-        const isHandle = trimmedQuery.startsWith('@') && validateHandle(normalizedQuery);
-        const properties = isHandle ? [SEARCHABLE_FIELDS.USERNAME] : undefined;
-        const searchResults = searchRepository.searchUserInSet(normalizedQuery, userEntities(), properties);
-        resultUsers = searchResults.filter(
+        if (!skipSearch) {
+          const SEARCHABLE_FIELDS = SearchRepository.CONFIG.SEARCHABLE_FIELDS;
+          const trimmedQuery = filter().trim();
+          const isHandle = trimmedQuery.startsWith('@') && validateHandle(normalizedQuery);
+          const properties = isHandle ? [SEARCHABLE_FIELDS.USERNAME] : undefined;
+          resultUsers = searchRepository.searchUserInSet(normalizedQuery, userEntities(), properties);
+        }
+        resultUsers = resultUsers.filter(
           user =>
             user.is_me ||
             connectedUsers.includes(user) ||
@@ -190,11 +207,26 @@ ko.components.register('user-list', {
       return selfUser.concat(otherUsers);
     });
 
-    this.isSelected = (userEntity: User) => {
-      if (this.isSelectEnabled) {
-        return selectedUsers().includes(userEntity);
+    this.isSelected = (userEntity: User): boolean => this.isSelectEnabled && selectedUsers().includes(userEntity);
+
+    this.attachLazyTrigger = ([element]: [HTMLElement]): void => {
+      viewportObserver.trackElement(
+        element,
+        (isInViewport: boolean) => {
+          if (isInViewport) {
+            this.maxShownUsers(this.maxShownUsers() + USER_CHUNK_SIZE);
+          }
+        },
+        false,
+        undefined,
+      );
+      this.lazyTriggerElement = element;
+    };
+
+    this.dispose = () => {
+      if (this.lazyTriggerElement) {
+        viewportObserver.removeElement(this.lazyTriggerElement);
       }
-      return false;
     };
 
     this.memberUsers = ko.observable<User[]>([]);

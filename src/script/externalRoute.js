@@ -17,6 +17,9 @@
  *
  */
 
+import {currentLanguage} from './auth/localeConfig';
+import {Config} from './/Config';
+
 const env = window.wire.env;
 
 export const UNSPLASH_URL = 'https://source.unsplash.com/1200x1200/?landscape';
@@ -58,7 +61,7 @@ const getTeamSettingsUrl = (path = '', utmSource) => {
 export const getWebsiteUrl = (path = '', pkCampaign) => {
   const query = pkCampaign ? `?pk_campaign=${pkCampaign}&pk_kwd=desktop` : '';
   const websiteUrl = `${URL.WEBSITE}${path}${query}`;
-  return URL.WEBSITE ? websiteUrl : undefined;
+  return addLocaleToUrl(URL.WEBSITE ? websiteUrl : undefined);
 };
 
 export const getAccountPagesUrl = (path = '') => {
@@ -71,17 +74,26 @@ export const getSupportUrl = (path = '') => {
   return URL.SUPPORT ? supportUrl : undefined;
 };
 
-export const getPrivacyPolicyUrl = () => URL.PRIVACY_POLICY || undefined;
-export const getTermsOfUsePersonalUrl = () => URL.TERMS_OF_USE_PERSONAL || undefined;
-export const getTermsOfUseTeamUrl = () => URL.TERMS_OF_USE_TEAMS || undefined;
+export const getPrivacyPolicyUrl = () => addLocaleToUrl(URL.PRIVACY_POLICY || undefined);
+export const getTermsOfUsePersonalUrl = () => addLocaleToUrl(URL.TERMS_OF_USE_PERSONAL || undefined);
+export const getTermsOfUseTeamUrl = () => addLocaleToUrl(URL.TERMS_OF_USE_TEAMS || undefined);
 
 export const getManageServicesUrl = utmSource => getTeamSettingsUrl(URL_PATH.MANAGE_SERVICES, utmSource);
 export const getManageTeamUrl = utmSource => getTeamSettingsUrl(URL_PATH.MANAGE_TEAM, utmSource);
 
 export const getCreateTeamUrl = pkCampaign =>
-  z.config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && getWebsiteUrl(URL_PATH.CREATE_TEAM, pkCampaign);
+  Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && getWebsiteUrl(URL_PATH.CREATE_TEAM, pkCampaign);
 export const getPrivacyHowUrl = () => getWebsiteUrl(URL_PATH.PRIVACY_HOW);
 export const getPrivacyWhyUrl = () => getWebsiteUrl(URL_PATH.PRIVACY_WHY);
 export const getSupportUsernameUrl = () => getWebsiteUrl(URL_PATH.SUPPORT_USERNAME);
 
 export const getSupportContactUrl = () => getSupportUrl(URL_PATH.SUPPORT_CONTACT);
+
+export const addLocaleToUrl = url => {
+  if (!url) {
+    return undefined;
+  }
+  const language = currentLanguage().slice(0, 2);
+  const websiteLanguage = language == 'de' ? language : 'en';
+  return url.replace(Config.URL.WEBSITE_BASE, `${Config.URL.WEBSITE_BASE}/${websiteLanguage}`);
+};

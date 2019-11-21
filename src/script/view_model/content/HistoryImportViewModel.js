@@ -22,7 +22,7 @@ import JSZip from 'jszip';
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 
-import {Config} from '../../auth/config';
+import {Config} from '../../Config';
 import {WebAppEvents} from '../../event/WebApp';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {EventName} from '../../tracking/EventName';

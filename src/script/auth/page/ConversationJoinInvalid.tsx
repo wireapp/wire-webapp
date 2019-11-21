@@ -19,10 +19,10 @@
 import {COLOR, ContainerXS, H2, Text} from '@wireapp/react-ui-kit';
 import React from 'react';
 import {FormattedHTMLMessage, useIntl} from 'react-intl';
+import {Config} from '../../Config';
 import {conversationJoinStrings} from '../../strings';
 import UnsupportedBrowser from '../component/UnsupportedBrowser';
 import WirelessContainer from '../component/WirelessContainer';
-import {Config} from '../config';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
