@@ -154,7 +154,7 @@ describe('BackendClient', () => {
       server.requests[0].respond(200);
     });
 
-    fit('should cache the request if it was unauthorized', done => {
+    it('should cache the request if it was unauthorized', done => {
       const tokenRefresh = () => {
         expect(backendClient.requestQueue.getLength()).toBe(1);
         done();

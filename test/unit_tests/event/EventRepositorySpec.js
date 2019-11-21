@@ -17,6 +17,7 @@
  *
  */
 
+import {amplify} from 'amplify';
 import {MemoryEngine} from '@wireapp/store-engine';
 import {Cryptobox} from '@wireapp/cryptobox';
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';

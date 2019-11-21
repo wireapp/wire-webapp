@@ -17,6 +17,7 @@
  *
  */
 
+import {amplify} from 'amplify';
 import {createRandomUuid} from 'Util/util';
 
 import {backendConfig} from '../../api/testResolver';

@@ -17,6 +17,7 @@
  *
  */
 
+import {amplify} from 'amplify';
 import {WebAppEvents} from 'src/script/event/WebApp';
 import {EventTrackingRepository} from 'src/script/tracking/EventTrackingRepository';
 

@@ -17,6 +17,7 @@
  *
  */
 
+import {amplify} from 'amplify';
 import ko from 'knockout';
 
 import {t} from 'Util/LocalizerUtil';
