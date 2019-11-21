@@ -17,15 +17,13 @@
  *
  */
 
-/* eslint no-magic-numbers: "off" */
+// tslint:disable:no-magic-numbers
 
-const Proteus = require('@wireapp/proteus');
-const _sodium = require('libsodium-wrappers-sumo');
-let sodium = _sodium;
+import * as Proteus from '@wireapp/proteus';
+import * as sodium from 'libsodium-wrappers-sumo';
 
 beforeAll(async () => {
-  await _sodium.ready;
-  sodium = _sodium;
+  await sodium.ready;
 });
 
 describe('Message', () => {
@@ -34,17 +32,17 @@ describe('Message', () => {
 
   const bk = Proteus.keys.PublicKey.new(
     new Uint8Array(32).fill(0xff),
-    // eslint-disable-next-line
+    // prettier-ignore
     new Uint8Array([63, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75]),
   );
   const rk = Proteus.keys.PublicKey.new(
     new Uint8Array(32).fill(0xf0),
-    // eslint-disable-next-line
+    // prettier-ignore
     new Uint8Array([185, 178, 44, 203, 178, 44, 203, 178, 44, 203, 178, 44, 203, 178, 44, 203, 178, 44, 203, 178, 44, 203, 178, 44, 203, 178, 44, 203, 178, 44, 203, 114]),
   );
   const ik_pk = Proteus.keys.PublicKey.new(
     new Uint8Array(32).fill(0xa0),
-    // eslint-disable-next-line
+    // prettier-ignore
     new Uint8Array([92, 62, 6, 231, 99, 112, 62, 6, 231, 99, 112, 62, 6, 231, 99, 112, 62, 6, 231, 99, 112, 62, 6, 231, 99, 112, 62, 6, 231, 99, 112, 126]),
   );
   const ik = Proteus.keys.IdentityKey.new(ik_pk);
@@ -58,7 +56,7 @@ describe('Message', () => {
     const bytes = new Uint8Array(msg.serialise());
     expect(expected).toBe(sodium.to_hex(bytes).toLowerCase());
 
-    const deserialised = Proteus.message.Message.deserialise(bytes.buffer);
+    const deserialised = Proteus.message.Message.deserialise(bytes.buffer) as Proteus.message.CipherMessage;
     expect(deserialised.constructor).toBe(Proteus.message.CipherMessage);
     expect(deserialised.ratchet_key.fingerprint()).toBe(rk.fingerprint());
   });
@@ -73,7 +71,7 @@ describe('Message', () => {
     const bytes = new Uint8Array(pkmsg.serialise());
     expect(expected).toBe(sodium.to_hex(bytes).toLowerCase());
 
-    const deserialised = Proteus.message.Message.deserialise(bytes.buffer);
+    const deserialised = Proteus.message.Message.deserialise(bytes.buffer) as Proteus.message.PreKeyMessage;
     expect(deserialised.constructor).toBe(Proteus.message.PreKeyMessage);
 
     expect(deserialised.base_key.fingerprint()).toBe(bk.fingerprint());

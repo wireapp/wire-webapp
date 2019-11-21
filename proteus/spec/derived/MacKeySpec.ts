@@ -17,15 +17,13 @@
  *
  */
 
-/* eslint no-magic-numbers: "off" */
+// tslint:disable:no-magic-numbers
 
-const Proteus = require('@wireapp/proteus');
-const _sodium = require('libsodium-wrappers-sumo');
-let sodium = _sodium;
+import * as Proteus from '@wireapp/proteus';
+import * as sodium from 'libsodium-wrappers-sumo';
 
 beforeAll(async () => {
-  await _sodium.ready;
-  sodium = _sodium;
+  await sodium.ready;
 });
 
 describe('Mac Key', () => {
@@ -37,18 +35,19 @@ describe('Mac Key', () => {
 
     const authentication_code = mac_key.sign(message);
 
-    // eslint-disable-next-line
+    // prettier-ignore
     const expected = new Uint8Array([67, 82, 178, 110, 51, 254, 13, 118, 154, 137, 34, 166, 186, 41, 0, 65, 9, 240, 22, 136, 226, 106, 204, 158, 108, 179, 71, 229, 165, 175, 196, 218]);
 
     expect(authentication_code).toEqual(expected);
   });
 
   it('verifies correct data', () => {
-    /* eslint-disable */
+    // prettier-ignore
     const signature = new Uint8Array([200, 47, 165, 205, 79, 32, 199, 25, 126, 101, 210, 67, 90, 11, 202, 247, 9, 67, 144, 173, 147, 174, 155, 244, 121, 55, 21, 198, 18, 27, 0, 99]);
+    // prettier-ignore
     const msg = new Uint8Array([1, 165, 0, 80, 82, 255, 214, 194, 215, 199, 190, 124, 44, 155, 253, 88, 108, 182, 97, 218, 1, 0, 2, 1, 3, 161, 0, 88, 32, 81, 164, 93, 189, 218, 73, 99, 191, 236, 250, 188, 97, 212, 13, 88, 41, 115, 127, 228, 229, 168, 46, 142, 241, 211, 60, 155, 78, 219, 59, 171, 17, 4, 66, 130, 57]);
+    // prettier-ignore
     const key = new Uint8Array([15, 61, 178, 141, 34, 114, 210, 82, 206, 161, 179, 78, 187, 60, 132, 17, 255, 23, 66, 215, 138, 84, 215, 117, 169, 50, 70, 165, 78, 243, 39, 242]);
-    /* eslint-enable */
 
     const mac_key = new Proteus.derived.MacKey(key);
 
@@ -56,10 +55,10 @@ describe('Mac Key', () => {
   });
 
   it('verifies a calculated signature', () => {
-    /* eslint-disable */
+    // prettier-ignore
     const msg = new Uint8Array([1, 165, 0, 80, 82, 255, 214, 194, 215, 199, 190, 124, 44, 155, 253, 88, 108, 182, 97, 218, 1, 0, 2, 1, 3, 161, 0, 88, 32, 81, 164, 93, 189, 218, 73, 99, 191, 236, 250, 188, 97, 212, 13, 88, 41, 115, 127, 228, 229, 168, 46, 142, 241, 211, 60, 155, 78, 219, 59, 171, 17, 4, 66, 130, 57]);
+    // prettier-ignore
     const key = new Uint8Array([15, 61, 178, 141, 34, 114, 210, 82, 206, 161, 179, 78, 187, 60, 132, 17, 255, 23, 66, 215, 138, 84, 215, 117, 169, 50, 70, 165, 78, 243, 39, 242]);
-    /* eslint-enable */
 
     const mac_key = new Proteus.derived.MacKey(key);
 

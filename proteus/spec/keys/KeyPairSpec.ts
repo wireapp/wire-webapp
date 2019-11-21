@@ -17,7 +17,7 @@
  *
  */
 
-const Proteus = require('@wireapp/proteus');
+import * as Proteus from '@wireapp/proteus';
 
 describe('KeyPair', () => {
   it('signs a message and verifies the signature', async () => {

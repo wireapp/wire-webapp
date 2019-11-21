@@ -17,7 +17,7 @@
  *
  */
 
-const Proteus = require('@wireapp/proteus');
+import * as Proteus from '@wireapp/proteus';
 
 describe('MemoryUtil', () => {
   describe('zeroize', () => {

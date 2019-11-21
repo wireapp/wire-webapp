@@ -17,19 +17,17 @@
  *
  */
 
-/* eslint no-magic-numbers: "off" */
-
-const Proteus = require('@wireapp/proteus');
-const CBOR = require('@wireapp/cbor');
+import * as CBOR from '@wireapp/cbor';
+import * as Proteus from '@wireapp/proteus';
 
 describe('Envelope', () => {
   const mac_key = new Proteus.derived.MacKey(new Uint8Array(32).fill(1));
 
   const session_tag = Proteus.message.SessionTag.new();
 
-  let identity_key;
-  let base_key;
-  let ratchet_key;
+  let identity_key: Proteus.keys.IdentityKey;
+  let base_key: Proteus.keys.PublicKey;
+  let ratchet_key: Proteus.keys.PublicKey;
 
   beforeAll(async () => {
     identity_key = Proteus.keys.IdentityKey.new((await Proteus.keys.KeyPair.new()).public_key);

@@ -17,9 +17,9 @@
  *
  */
 
-/* eslint no-magic-numbers: "off" */
+// tslint:disable:no-magic-numbers
 
-const Proteus = require('@wireapp/proteus');
+import * as Proteus from '@wireapp/proteus';
 
 describe('HMAC-based Key Derivation Function', () => {
   it('creates a new buffer from a given buffer', () => {
@@ -72,9 +72,8 @@ describe('assert_is_not_zeros', () => {
   });
 
   it('does not throw if an array consists of random numbers', () => {
-    // eslint-disable-next-line
+    // prettier-ignore
     const array = new Uint8Array([194, 3, 205, 50, 90, 113, 33, 56, 87, 189, 211, 4, 113, 152, 186, 107, 127, 199, 114, 23, 165, 171, 177, 128, 123, 65, 173, 129, 70, 132, 121, 193]);
-
     Proteus.util.ArrayUtil.assert_is_not_zeros(array);
   });
 });

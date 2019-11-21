@@ -17,15 +17,11 @@
  *
  */
 
-/* eslint no-magic-numbers: "off" */
-
-const Proteus = require('@wireapp/proteus');
-const _sodium = require('libsodium-wrappers-sumo');
-let sodium = _sodium;
+import * as Proteus from '@wireapp/proteus';
+import * as sodium from 'libsodium-wrappers-sumo';
 
 beforeAll(async () => {
-  await _sodium.ready;
-  sodium = _sodium;
+  await sodium.ready;
 });
 
 describe('PreKey', () => {
@@ -43,7 +39,7 @@ describe('PreKey', () => {
 
     it('rejects undefined IDs', async () => {
       try {
-        await Proteus.keys.PreKey.new(undefined);
+        await (Proteus as any).keys.PreKey.new(undefined);
         fail();
       } catch (error) {
         expect(error instanceof Proteus.errors.InputError.TypeError).toBe(true);
@@ -53,7 +49,7 @@ describe('PreKey', () => {
 
     it('rejects string IDs', async () => {
       try {
-        await Proteus.keys.PreKey.new('foo');
+        await (Proteus as any).keys.PreKey.new('foo');
         fail();
       } catch (error) {
         expect(error instanceof Proteus.errors.InputError.TypeError).toBe(true);
@@ -135,7 +131,7 @@ describe('PreKey', () => {
       expect(prekeys[9].key_id).toBe(4);
 
       prekeys = await Proteus.keys.PreKey.generate_prekeys(Proteus.keys.PreKey.MAX_PREKEY_ID, 1);
-      expect(prekeys.length, 1);
+      expect(prekeys.length).toBe(1);
       expect(prekeys[0].key_id).toBe(0);
     });
   });

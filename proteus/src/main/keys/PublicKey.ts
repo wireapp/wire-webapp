@@ -48,7 +48,7 @@ export class PublicKey {
    * @param message The message from which the signature was computed.
    * @returns `true` if the signature is valid, `false` otherwise.
    */
-  verify(signature: Uint8Array, message: Uint8Array): boolean {
+  verify(signature: Uint8Array, message: Uint8Array | string): boolean {
     return sodium.crypto_sign_verify_detached(signature, message, this.pub_edward);
   }
 

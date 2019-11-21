@@ -17,13 +17,11 @@
  *
  */
 
-const Proteus = require('@wireapp/proteus');
-const _sodium = require('libsodium-wrappers-sumo');
-let sodium = _sodium;
+import * as Proteus from '@wireapp/proteus';
+import * as sodium from 'libsodium-wrappers-sumo';
 
 beforeAll(async () => {
-  await _sodium.ready;
-  sodium = _sodium;
+  await sodium.ready;
 });
 
 describe('PreKeyBundle', () => {
@@ -71,7 +69,7 @@ describe('PreKeyBundle', () => {
     expect(pkb_copy.prekey_id).toBe(bundle.prekey_id);
     expect(pkb_copy.public_key.fingerprint()).toBe(bundle.public_key.fingerprint());
     expect(pkb_copy.identity_key.fingerprint()).toBe(bundle.identity_key.fingerprint());
-    expect(sodium.to_hex(pkb_copy.signature)).toBe(sodium.to_hex(bundle.signature));
+    expect(sodium.to_hex(pkb_copy.signature!)).toBe(sodium.to_hex(bundle.signature!));
     expect(sodium.to_hex(new Uint8Array(pkb_bytes))).toBe(sodium.to_hex(new Uint8Array(pkb_copy.serialise())));
   });
 

@@ -17,24 +17,23 @@
  *
  */
 
-/* eslint no-magic-numbers: "off" */
+// tslint:disable:no-magic-numbers
 
-const Proteus = require('@wireapp/proteus');
-const _sodium = require('libsodium-wrappers-sumo');
-let sodium = _sodium;
+import * as Proteus from '@wireapp/proteus';
+import * as sodium from 'libsodium-wrappers-sumo';
 
 beforeAll(async () => {
-  await _sodium.ready;
-  sodium = _sodium;
+  await sodium.ready;
 });
 
 describe('Key Derivation Function (KDF)', () => {
   it('generates Cipher Key and Mac Key', () => {
-    /* eslint-disable */
+    // prettier-ignore
     const input = new Uint8Array([80, 126, 195, 116, 121, 19, 181, 29, 146, 68, 194, 215, 190, 132, 202, 217, 199, 26, 91, 4, 184, 156, 73, 204, 158, 76, 129, 220, 126, 178, 210, 92]);
+    // prettier-ignore
     const expected_cipher_key = new Uint8Array([22, 57, 15, 160, 231, 231, 169, 183, 205, 22, 179, 228, 53, 51, 14, 24, 160, 45, 247, 19, 106, 21, 78, 92, 110, 56, 24, 84, 156, 117, 177, 176]);
+    // prettier-ignore
     const expected_mac_key = new Uint8Array([186, 163, 142, 225, 211, 131, 100, 164, 80, 51, 180, 42, 177, 132, 72, 250, 246, 241, 41, 108, 146, 140, 247, 197, 205, 242, 32, 150, 186, 122, 45, 57]);
-    /* eslint-enable */
     const info = 'hash_ratchet';
 
     const derived_secret = Proteus.derived.DerivedSecrets.kdf_without_salt(input, info);

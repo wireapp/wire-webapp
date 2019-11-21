@@ -17,17 +17,21 @@
  *
  */
 
-const Proteus = require('@wireapp/proteus');
-const _sodium = require('libsodium-wrappers-sumo');
-let sodium = _sodium;
+import * as Proteus from '@wireapp/proteus';
+import * as sodium from 'libsodium-wrappers-sumo';
+
+interface Vector {
+  key: string;
+  message: string;
+  nonce: string;
+}
 
 beforeAll(async () => {
-  await _sodium.ready;
-  sodium = _sodium;
+  await sodium.ready;
 });
 
 describe('CipherKey sanity checks (IETF ChaCha20 test vectors)', () => {
-  const ietf_vectors = [
+  const ietf_vectors: Vector[] = [
     {
       key: '0000000000000000000000000000000000000000000000000000000000000000',
       message:
@@ -61,7 +65,7 @@ describe('CipherKey sanity checks (IETF ChaCha20 test vectors)', () => {
   ];
 
   it('encrypts plaintext to ciphertext', () => {
-    const encrypt_plain_text = vector => {
+    const encrypt_plain_text = (vector: Vector) => {
       const plaintext = new Uint8Array(vector.message.length >> 1);
       const nonce = sodium.from_hex(vector.nonce);
 
@@ -78,7 +82,7 @@ describe('CipherKey sanity checks (IETF ChaCha20 test vectors)', () => {
   });
 
   it('decrypts ciphertext to plaintext', () => {
-    const decrypt_cipher_text = vector => {
+    const decrypt_cipher_text = (vector: Vector) => {
       const plaintext = new Uint8Array(vector.message.length >> 1);
       const nonce = sodium.from_hex(vector.nonce);
       const key = Proteus.derived.CipherKey.new(sodium.from_hex(vector.key));

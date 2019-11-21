@@ -17,30 +17,12 @@
  *
  */
 
-const Proteus = require('@wireapp/proteus');
-const _sodium = require('libsodium-wrappers-sumo');
-let sodium = _sodium;
+import * as Proteus from '@wireapp/proteus';
+import * as sodium from 'libsodium-wrappers-sumo';
 
 beforeAll(async () => {
-  await _sodium.ready;
-  sodium = _sodium;
+  await sodium.ready;
 });
-
-const convert_arg_type = type => {
-  if (!type) {
-    return new Uint8Array(0);
-  }
-
-  if (typeof type === 'string') {
-    return sodium.from_hex(type);
-  }
-
-  if (type instanceof Array) {
-    return new Uint8Array(type);
-  }
-
-  return type;
-};
 
 describe('HMAC RFC 5869 Test Vectors', () => {
   it('works with SHA-256 (Test Case 1 from RFC 5869)', () => {
@@ -52,11 +34,16 @@ describe('HMAC RFC 5869 Test Vectors', () => {
       salt: '000102030405060708090a0b0c',
     };
 
-    const vector_array = [vector.salt, vector.ikm, vector.info].map(convert_arg_type);
-    const result = sodium.to_hex(Proteus.util.KeyDerivationUtil.hkdf(...vector_array, vector.length));
+    const salt = sodium.from_hex(vector.salt);
+    const input = sodium.from_hex(vector.ikm);
+    const info = sodium.from_hex(vector.info);
+    const length = vector.length;
 
-    expect(result).toBe(vector.okm);
-    expect(result.length).toBe(vector.length + vector.length);
+    const hkdfResult = Proteus.util.KeyDerivationUtil.hkdf(salt, input, info, length);
+    const hexResult = sodium.to_hex(hkdfResult);
+
+    expect(hexResult).toBe(vector.okm);
+    expect(hexResult.length).toBe(vector.length * 2);
   });
 
   it('works with long key material', () => {
@@ -72,11 +59,16 @@ describe('HMAC RFC 5869 Test Vectors', () => {
         '606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8a9aaabacadaeaf',
     };
 
-    const vector_array = [vector.salt, vector.ikm, vector.info].map(convert_arg_type);
-    const result = sodium.to_hex(Proteus.util.KeyDerivationUtil.hkdf(...vector_array, vector.length));
+    const salt = sodium.from_hex(vector.salt);
+    const input = sodium.from_hex(vector.ikm);
+    const info = sodium.from_hex(vector.info);
+    const length = vector.length;
 
-    expect(result).toBe(vector.okm);
-    expect(result.length).toBe(vector.length + vector.length);
+    const hkdfResult = Proteus.util.KeyDerivationUtil.hkdf(salt, input, info, length);
+    const hexResult = sodium.to_hex(hkdfResult);
+
+    expect(hexResult).toBe(vector.okm);
+    expect(hexResult.length).toBe(vector.length * 2);
   });
 
   it('works without salt', () => {
@@ -88,11 +80,16 @@ describe('HMAC RFC 5869 Test Vectors', () => {
       salt: undefined,
     };
 
-    const vector_array = [vector.salt, vector.ikm, vector.info].map(convert_arg_type);
-    const result = sodium.to_hex(Proteus.util.KeyDerivationUtil.hkdf(...vector_array, vector.length));
+    const salt = new Uint8Array(0);
+    const input = sodium.from_hex(vector.ikm);
+    const info = new Uint8Array(0);
+    const length = vector.length;
 
-    expect(result).toBe(vector.okm);
-    expect(result.length).toBe(vector.length + vector.length);
+    const hkdfResult = Proteus.util.KeyDerivationUtil.hkdf(salt, input, info, length);
+    const hexResult = sodium.to_hex(hkdfResult);
+
+    expect(hexResult).toBe(vector.okm);
+    expect(hexResult.length).toBe(vector.length * 2);
   });
 });
 
@@ -107,10 +104,15 @@ describe('HMAC Real World Scenarios', () => {
       salt: undefined,
     };
 
-    const vector_array = [vector.salt, vector.ikm, vector.info].map(convert_arg_type);
-    const result = sodium.to_hex(Proteus.util.KeyDerivationUtil.hkdf(...vector_array, vector.length));
+    const salt = new Uint8Array(0);
+    const input = sodium.from_hex(vector.ikm);
+    const info = sodium.from_hex(vector.info);
+    const length = vector.length;
 
-    expect(result).toBe(vector.okm);
-    expect(result.length).toBe(vector.length + vector.length);
+    const hkdfResult = Proteus.util.KeyDerivationUtil.hkdf(salt, input, info, length);
+    const hexResult = sodium.to_hex(hkdfResult);
+
+    expect(hexResult).toBe(vector.okm);
+    expect(hexResult.length).toBe(vector.length + vector.length);
   });
 });

@@ -17,13 +17,15 @@
  *
  */
 
-/* eslint no-magic-numbers: "off" */
+// tslint:disable:no-magic-numbers
 
-const Proteus = require('@wireapp/proteus');
-const _sodium = require('libsodium-wrappers-sumo');
-let sodium = _sodium;
+import * as Proteus from '@wireapp/proteus';
+import * as sodium from 'libsodium-wrappers-sumo';
 
-const assert_serialise_deserialise = (local_identity, session) => {
+const assert_serialise_deserialise = (
+  local_identity: Proteus.keys.IdentityKeyPair,
+  session: Proteus.session.Session,
+) => {
   const bytes = session.serialise();
 
   const deser = Proteus.session.Session.deserialise(local_identity, bytes);
@@ -32,23 +34,34 @@ const assert_serialise_deserialise = (local_identity, session) => {
   expect(sodium.to_hex(new Uint8Array(bytes))).toEqual(sodium.to_hex(new Uint8Array(deser_bytes)));
 };
 
-const assert_init_from_message = async (ident, store, msg, expected) => {
-  const [session, message] = await Proteus.session.Session.init_from_message(ident, store, msg);
+const assert_init_from_message = async (
+  identity: Proteus.keys.IdentityKeyPair,
+  store: Proteus.session.PreKeyStore,
+  envelope: Proteus.message.Envelope,
+  expected: string,
+) => {
+  const [session, message] = await Proteus.session.Session.init_from_message(identity, store, envelope);
   expect(sodium.to_string(message)).toBe(expected);
   return session;
 };
 
 class TestStore extends Proteus.session.PreKeyStore {
-  constructor(prekeys) {
+  private readonly prekeys: Proteus.keys.PreKey[];
+
+  constructor(prekeys: Proteus.keys.PreKey[]) {
     super();
     this.prekeys = prekeys;
   }
 
-  async load_prekey(prekey_id) {
-    return this.prekeys.find(prekey => prekey.key_id === prekey_id);
+  async load_prekey(prekey_id: number): Promise<Proteus.keys.PreKey> {
+    return this.prekeys.find(prekey => prekey.key_id === prekey_id)!;
   }
 
-  async delete_prekey(prekey_id) {
+  async load_prekeys(): Promise<Proteus.keys.PreKey[]> {
+    return this.prekeys;
+  }
+
+  async delete_prekey(prekey_id: number): Promise<number> {
     const matches = this.prekeys.filter(prekey => prekey.key_id === prekey_id);
     delete matches[0];
     return prekey_id;
@@ -56,8 +69,7 @@ class TestStore extends Proteus.session.PreKeyStore {
 }
 
 beforeAll(async () => {
-  await _sodium.ready;
-  sodium = _sodium;
+  await sodium.ready;
 });
 
 describe('Session', () => {
@@ -98,7 +110,7 @@ describe('Session', () => {
 
       const alice = await Proteus.session.Session.init_from_prekey(alice_ident, bob_bundle);
       expect(alice.session_states[alice.session_tag.toString()].state.recv_chains.length).toEqual(1);
-      expect(alice.pending_prekey.length).toBe(2);
+      expect(alice.pending_prekey!.length).toBe(2);
 
       assert_serialise_deserialise(alice_ident, alice);
     });
@@ -129,7 +141,7 @@ describe('Session', () => {
 
       const hello_alice = await bob.encrypt('Hello Alice!');
 
-      expect(alice.pending_prekey.length).toBe(2);
+      expect(alice.pending_prekey!.length).toBe(2);
 
       expect(sodium.to_string(await alice.decrypt(alice_store, hello_alice))).toBe('Hello Alice!');
 
@@ -464,7 +476,7 @@ describe('Session', () => {
       const hello_alice0_plaintext = 'Hello0';
       const hello_alice0_encrypted = await bob.encrypt(hello_alice0_plaintext);
 
-      bob.encrypt('Hello1'); // unused result
+      await bob.encrypt('Hello1'); // unused result
 
       const hello_alice2_plaintext = 'Hello2';
       const hello_alice2_encrypted = await bob.encrypt(hello_alice2_plaintext);
@@ -607,9 +619,10 @@ describe('Session', () => {
       const bob_ident = await Proteus.keys.IdentityKeyPair.new();
 
       const bob_store = new TestStore(await Proteus.keys.PreKey.generate_prekeys(0, num_alices));
+      const bob_prekeys = await bob_store.load_prekeys();
 
       const alices = await Promise.all(
-        bob_store.prekeys.map(pk => {
+        bob_prekeys.map(pk => {
           const bundle = Proteus.keys.PreKeyBundle.new(bob_ident.public_key, pk);
           return Proteus.session.Session.init_from_prekey(alice_ident, bundle);
         }),

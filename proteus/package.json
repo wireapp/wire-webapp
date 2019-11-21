@@ -9,10 +9,12 @@
   },
   "description": "Axolotl protocol implementation for JavaScript.",
   "devDependencies": {
+    "@types/jasmine": "3.4.6",
     "@types/libsodium-wrappers-sumo": "0.7.3",
     "bower": "1.8.8",
     "chai": "4.2.0",
     "jasmine": "3.5.0",
+    "nyc": "14.1.1",
     "rimraf": "3.0.0",
     "typescript": "3.6.4",
     "webpack": "4.41.2",
@@ -33,7 +35,7 @@
     "start": "node dist/index.js",
     "test": "yarn test:node",
     "test:project": "yarn dist && yarn test",
-    "test:node": "jasmine"
+    "test:node": "nyc jasmine --config=jasmine.json"
   },
   "version": "9.4.20"
 }

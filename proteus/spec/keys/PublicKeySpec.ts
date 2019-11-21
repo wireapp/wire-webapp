@@ -17,7 +17,7 @@
  *
  */
 
-const Proteus = require('@wireapp/proteus');
+import * as Proteus from '@wireapp/proteus';
 
 describe('Public Key', () => {
   it('rejects shared secrets at the point of infinity', async () => {

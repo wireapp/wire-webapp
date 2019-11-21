@@ -49,7 +49,7 @@ export class SecretKey {
    * @param message Message to be signed
    * @returns A message signature
    */
-  sign(message: Uint8Array): Uint8Array {
+  sign(message: Uint8Array | string): Uint8Array {
     return sodium.crypto_sign_detached(message, this.sec_edward);
   }
 
