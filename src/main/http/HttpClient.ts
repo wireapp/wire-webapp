@@ -18,7 +18,7 @@
  */
 
 import {TimeUtil} from '@wireapp/commons';
-import {PriorityQueue} from '@wireapp/priority-queue';
+import {Priority, PriorityQueue} from '@wireapp/priority-queue';
 import axios, {AxiosError, AxiosRequestConfig, AxiosResponse} from 'axios';
 import EventEmitter from 'events';
 import logdown from 'logdown';
@@ -182,8 +182,12 @@ export class HttpClient extends EventEmitter {
     return response.data;
   }
 
-  public async sendRequest<T>(config: AxiosRequestConfig, tokenAsParam: boolean = false): Promise<AxiosResponse<T>> {
-    return this.requestQueue.add(() => this._sendRequest<T>(config, tokenAsParam));
+  public async sendRequest<T>(
+    config: AxiosRequestConfig,
+    tokenAsParam: boolean = false,
+    priority = Priority.MEDIUM,
+  ): Promise<AxiosResponse<T>> {
+    return this.requestQueue.add(() => this._sendRequest<T>(config, tokenAsParam), priority);
   }
 
   public sendJSON<T>(config: AxiosRequestConfig): Promise<AxiosResponse<T>> {

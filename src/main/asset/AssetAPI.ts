@@ -17,6 +17,7 @@
  *
  */
 
+import {Priority} from '@wireapp/priority-queue';
 import {AxiosRequestConfig} from 'axios';
 import {HttpClient} from '../http/';
 import {base64MD5FromBuffer, concatToBuffer} from '../shims/node/buffer';
@@ -50,7 +51,7 @@ export class AssetAPI {
       config.params.asset_token = token;
     }
 
-    const response = await this.client.sendRequest<ArrayBuffer>(config, true);
+    const response = await this.client.sendRequest<ArrayBuffer>(config, true, Priority.LOW);
     return response.data;
   }
 

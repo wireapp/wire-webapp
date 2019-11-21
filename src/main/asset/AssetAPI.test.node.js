@@ -18,6 +18,7 @@
  */
 
 const {APIClient} = require('@wireapp/api-client');
+const {Priority} = require('@wireapp/priority-queue');
 
 describe('"AssetAPI"', () => {
   const apiClient = new APIClient();
@@ -37,6 +38,7 @@ describe('"AssetAPI"', () => {
         url: jasmine.stringMatching(new RegExp(assetId)),
       }),
       true,
+      Priority.LOW,
     );
   });
 
@@ -52,6 +54,7 @@ describe('"AssetAPI"', () => {
         url: jasmine.stringMatching(new RegExp(assetId)),
       }),
       true,
+      Priority.LOW,
     );
   });
 });
