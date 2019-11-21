@@ -54,6 +54,14 @@ interface RequestConfig {
   withCredentials?: boolean;
 }
 
+type WireRequestType = JQueryXHR & {
+  wireRequest: {
+    originalRequestOptions?: JQuery.AjaxSettings;
+    requestDate?: Date;
+    requestId?: number;
+  };
+};
+
 export class BackendClient {
   private connectivityTimeout: number;
   private queueTimeout: number;
@@ -141,21 +149,13 @@ export class BackendClient {
     } as any);
 
     // http://stackoverflow.com/a/18996758/451634
-    $.ajaxPrefilter(
-      (
-        options,
-        originalOptions,
-        jqXHR: JQueryXHR & {
-          wireRequest: {originalRequestOptions: JQuery.AjaxSettings; requestDate: Date; requestId: number};
-        },
-      ) => {
-        jqXHR.wireRequest = {
-          originalRequestOptions: originalOptions,
-          requestDate: new Date(),
-          requestId: this.numberOfRequests(),
-        };
-      },
-    );
+    $.ajaxPrefilter((options, originalOptions, jqXHR: WireRequestType) => {
+      jqXHR.wireRequest = {
+        originalRequestOptions: originalOptions,
+        requestDate: new Date(),
+        requestId: this.numberOfRequests(),
+      };
+    });
   }
 
   setSettings(settings: Settings): void {
@@ -176,7 +176,7 @@ export class BackendClient {
   /**
    * Request backend status.
    */
-  status(): JQuery.jqXHR<any> {
+  status(): JQuery.jqXHR {
     return $.ajax({
       headers: {
         Authorization: `${this.accessTokenType} ${window.decodeURIComponent(this.accessToken)}`,
@@ -329,7 +329,7 @@ export class BackendClient {
     return new Promise((resolve, reject) => {
       $.ajax(ajaxConfig)
         .done(responseData => resolve(responseData))
-        .fail(({responseJSON: response, status: statusCode, wireRequest}: any) => {
+        .fail(({responseJSON: response, status: statusCode, wireRequest}: WireRequestType) => {
           switch (statusCode) {
             case BackendClientError.STATUS_CODE.CONNECTIVITY_PROBLEM: {
               this.queueState(QUEUE_STATE.CONNECTIVITY_PROBLEM);
