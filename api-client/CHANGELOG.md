@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.0.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.0.2...@wireapp/api-client@9.0.3) (2019-11-21)
+
+
+### Bug Fixes
+
+* **api-client:** Set asset request priority to low ([#2576](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2576)) ([23c64c5](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/23c64c54eaa6b5424023bb7df7c04708f40a7dd8))
+
+
+
+
+
 ## [9.0.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.0.1...@wireapp/api-client@9.0.2) (2019-11-21)
 
 **Note:** Version bump only for package @wireapp/api-client
