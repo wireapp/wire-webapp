@@ -17,12 +17,12 @@
  *
  */
 
-/* eslint no-magic-numbers: "off" */
+// tslint:disable:no-magic-numbers
 
-const CBOR = require('../../');
+import * as CBOR from '@wireapp/cbor';
 
 describe('CBOR.Encoder', () => {
-  const to_hex = bytes => {
+  const to_hex = (bytes: Uint8Array): string => {
     let str = '';
 
     for (const byte of Array.from(bytes)) {
@@ -36,7 +36,7 @@ describe('CBOR.Encoder', () => {
     return str;
   };
 
-  const createTestBuffer = byteLength => {
+  const createTestBuffer = (byteLength: number): ArrayBuffer => {
     const placeholderText = Array(byteLength + 1).join('A');
     const buffer = new ArrayBuffer(placeholderText.length);
     const bufferView = new Uint8Array(buffer);
@@ -46,13 +46,13 @@ describe('CBOR.Encoder', () => {
     return buffer;
   };
 
-  const encoded = (expected, closure) => {
+  const encoded = (expected: string, closure: (encoder: CBOR.Encoder) => void) => {
     const encoder = new CBOR.Encoder();
     closure(encoder);
     return to_hex(new Uint8Array(encoder.get_buffer())) === expected;
   };
 
-  const assertBeginning = (expected, closure) => {
+  const assertBeginning = (expected: string, closure: (encoder: CBOR.Encoder) => void) => {
     const encoder = new CBOR.Encoder();
     closure(encoder);
     const hexValue = to_hex(new Uint8Array(encoder.get_buffer()));
@@ -424,9 +424,9 @@ describe('CBOR.Encoder', () => {
       const encoder = new CBOR.Encoder();
 
       const typedArray = new Uint8Array([159, 1, 130, 2, 3, 159, 4, 5, 255]);
-      encoder.buffer = typedArray;
+      encoder['buffer'] = typedArray;
 
-      const newLength = encoder._new_buffer_length(1);
+      const newLength = encoder['_new_buffer_length'](1);
       expect(newLength).toBe(13);
     });
   });

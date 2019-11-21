@@ -17,9 +17,9 @@
  *
  */
 
-/* eslint no-magic-numbers: "off" */
+// tslint:disable:no-magic-numbers
 
-const CBOR = require('../../');
+import * as CBOR from '@wireapp/cbor';
 
 describe('CBOR.Type', () => {
   describe('"major"', () => {

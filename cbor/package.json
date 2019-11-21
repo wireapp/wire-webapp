@@ -1,10 +1,17 @@
 {
   "description": "Implementation of Concise Binary Object Representation (CBOR) data format (RFC7049).",
   "devDependencies": {
+    "@types/jasmine": "3.4.6",
+    "@types/karma": "3.0.4",
     "@types/node": "~12",
     "cross-env": "6.0.3",
     "istanbul": "1.1.0-alpha.1",
     "jasmine": "3.5.0",
+    "karma": "4.4.1",
+    "karma-chrome-launcher": "3.1.0",
+    "karma-jasmine": "2.0.1",
+    "karma-typescript": "4.1.1",
+    "nyc": "14.1.1",
     "rimraf": "3.0.0",
     "webpack": "4.41.2",
     "webpack-cli": "3.3.10"
@@ -20,17 +27,13 @@
     "build:browser": "webpack --progress",
     "build:node": "tsc",
     "build": "yarn build:node && yarn build:browser",
-    "clean": "rimraf dist",
-    "clean:coverage": "rimraf coverage",
-    "coverage": "yarn clean:coverage && yarn coverage:node && yarn coverage:browser",
-    "coverage:browser": "exit 0",
-    "coverage:node": "cross-env JASMINE_CONFIG_PATH=jasmine.json istanbul cover --report html --dir ./coverage/node ../../node_modules/jasmine/bin/jasmine.js",
+    "clean": "rimraf dist .nyc_output coverage",
+    "coverage": "cross-env JASMINE_CONFIG_PATH=jasmine.json istanbul cover --report html ../../node_modules/jasmine/bin/jasmine.js",
     "dist": "yarn clean && yarn build",
-    "test": "yarn test:node && yarn test:browser && yarn test:coverage",
-    "test:coverage": "yarn coverage && istanbul check-coverage --branches 80 --functions 90 --lines 90 --statements 90",
+    "test": "yarn test:node && yarn test:browser",
     "test:project": "yarn dist && yarn test",
-    "test:browser": "exit 0",
-    "test:node": "jasmine --config=jasmine.json"
+    "test:browser": "karma start",
+    "test:node": "nyc jasmine --config=jasmine.json"
   },
   "version": "4.3.23"
 }

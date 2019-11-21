@@ -17,14 +17,14 @@
  *
  */
 
-/* eslint no-magic-numbers: "off" */
+// tslint:disable:no-magic-numbers
 
-const CBOR = require('../../');
+import * as CBOR from '@wireapp/cbor';
 
 describe('CBOR.Decoder', () => {
-  const is_hex = str => typeof str === 'string' && /^[0-9a-f]+$/i.test(str) && str.length % 2 === 0;
+  const is_hex = (str: string): boolean => typeof str === 'string' && /^[0-9a-f]+$/i.test(str) && str.length % 2 === 0;
 
-  const from_hex = str => {
+  const from_hex = (str: string): Uint8Array => {
     if (!is_hex(str)) {
       throw new TypeError("The provided string doesn't look like hex data");
     }
@@ -40,7 +40,7 @@ describe('CBOR.Decoder', () => {
     return result;
   };
 
-  const decoder = hex_str => new CBOR.Decoder(from_hex(hex_str).buffer);
+  const decoder = (hex_str: string): CBOR.Decoder => new CBOR.Decoder(from_hex(hex_str).buffer);
 
   it('decodes unsigned integers', () => {
     expect(0).toBe(decoder('00').u8());
@@ -155,10 +155,12 @@ describe('CBOR.Decoder', () => {
       expect(error.message).toEqual(CBOR.DecodeError.UNEXPECTED_TYPE);
 
       let decoded = decoder('f6');
-      expect(null).toBe(decoded.optional(() => decoded.u8()));
+      const nullResult = decoded.optional(() => decoded.u8());
+      expect(nullResult).toBeNull();
 
       decoded = decoder('01');
-      expect(1).toBe(decoded.optional(() => decoded.u8()));
+      const numberResult = decoded.optional(() => decoded.u8());
+      expect(numberResult).toBe(1);
     }
   });
 
@@ -174,7 +176,7 @@ describe('CBOR.Decoder', () => {
     const decoded = decoder('a3616101616202616303');
     expect(3).toBe(decoded.object());
 
-    const obj = {};
+    const obj: Record<string, number> = {};
     for (let index = 0; index <= 2; index++) {
       obj[decoded.text()] = decoded.u8();
     }
@@ -224,6 +226,7 @@ describe('CBOR.Decoder', () => {
 
   it('decodes undefined values', () => {
     const decoded = decoder('f7');
-    expect(undefined).toBe(decoded.optional(() => decoded.u8()));
+    const result = decoded.optional(() => decoded.u8());
+    expect(result).toBeUndefined();
   });
 });
