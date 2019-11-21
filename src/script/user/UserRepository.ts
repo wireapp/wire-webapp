@@ -90,6 +90,7 @@ export class UserRepository {
   private readonly propertyRepository: PropertiesRepository;
   private readonly selfService: SelfService;
   private readonly teamMembers: ko.ObservableArray<User>;
+  /** Note: this does not include the self user */
   private readonly teamUsers: ko.ObservableArray<User>;
   private readonly user_mapper: UserMapper;
   private readonly user_service: UserService;
