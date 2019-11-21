@@ -24,7 +24,6 @@ const nock = require('nock');
 const {APIClient} = require('@wireapp/api-client');
 const {AUTH_TABLE_NAME, AuthAPI} = require('@wireapp/api-client/dist/commonjs/auth/');
 const {UserAPI} = require('@wireapp/api-client/dist/commonjs/user/');
-const {MemoryEngine} = require('@wireapp/store-engine');
 
 describe('APIClient', () => {
   const baseUrl = APIClient.BACKEND.PRODUCTION.rest;
@@ -51,22 +50,9 @@ describe('APIClient', () => {
     });
 
     it('constructs URLs when only the StoreEngine is provided', () => {
-      const client = new APIClient({store: new MemoryEngine()});
+      const client = new APIClient();
       expect(client.transport.http.baseUrl).toBe(APIClient.BACKEND.PRODUCTION.rest);
       expect(client.transport.ws.baseUrl).toBe(APIClient.BACKEND.PRODUCTION.ws);
-    });
-
-    it('constructs schema callback when provided', () => {
-      const schemaCallback = db => {
-        db.version(1).stores({
-          [AUTH_TABLE_NAME]: '',
-        });
-      };
-      const client = new APIClient({
-        schemaCallback,
-        store: new MemoryEngine(),
-      });
-      expect(client.config.schemaCallback).toBe(schemaCallback);
     });
   });
 
@@ -196,13 +182,11 @@ describe('APIClient', () => {
     it('can logout a user', async () => {
       const client = new APIClient();
 
-      const context = client.createContext(
+      client.context = client.createContext(
         '3721e5d3-558d-45ac-b476-b4a64a8f74c1',
         'temporary',
         'dce3d529-51e6-40c2-9147-e091eef48e73',
       );
-
-      await client.initEngine(context);
 
       await client.logout();
     });

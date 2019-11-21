@@ -17,13 +17,22 @@
  *
  */
 
-import {CRUDEngine, MemoryEngine} from '@wireapp/store-engine';
 import EventEmitter from 'events';
 import logdown from 'logdown';
 
 import {AccountAPI} from './account/AccountAPI';
 import {AssetAPI} from './asset/';
-import {AccessTokenStore, AuthAPI, Context, InvalidTokenError, LoginData, RegisterData} from './auth/';
+import {
+  AccessTokenData,
+  AccessTokenStore,
+  AuthAPI,
+  Context,
+  Cookie,
+  InvalidTokenError,
+  LoginData,
+  RegisterData,
+} from './auth/';
+import {CookieStore} from './auth/CookieStore';
 import {BroadcastAPI} from './broadcast/';
 import {ClientAPI, ClientType} from './client/';
 import {Config} from './Config';
@@ -35,7 +44,6 @@ import {HttpClient} from './http/';
 import {NotificationAPI} from './notification/';
 import * as ObfuscationUtil from './obfuscation/';
 import {SelfAPI} from './self/';
-import {retrieveCookie} from './shims/node/cookie';
 import {WebSocketClient} from './tcp/';
 import {
   FeatureAPI,
@@ -52,21 +60,23 @@ import {UserAPI} from './user/';
 const {version}: {version: string} = require('../../package.json');
 
 enum TOPIC {
+  ACCESS_TOKEN_REFRESH = 'APIClient.TOPIC.ACCESS_TOKEN_REFRESH',
+  COOKIE_REFRESH = 'APIClient.TOPIC.COOKIE_REFRESH',
   ON_LOGOUT = 'APIClient.TOPIC.ON_LOGOUT',
 }
 
 const defaultConfig: Config = {
-  store: new MemoryEngine(),
   urls: Backend.PRODUCTION,
 };
 
 export declare interface APIClient {
   on(event: TOPIC.ON_LOGOUT, listener: (error: InvalidTokenError) => void): this;
+  on(event: TOPIC.COOKIE_REFRESH, listener: (cookie?: Cookie) => void): this;
+  on(event: TOPIC.ACCESS_TOKEN_REFRESH, listener: (accessToken: AccessTokenData) => void): this;
 }
 
 export class APIClient extends EventEmitter {
   private readonly logger: logdown.Logger;
-  private readonly STORE_NAME_PREFIX = 'wire';
 
   // APIs
   public account: {api: AccountAPI};
@@ -98,21 +108,30 @@ export class APIClient extends EventEmitter {
   public config: Config;
 
   public static BACKEND = Backend;
+
   public static get TOPIC(): typeof TOPIC {
     return TOPIC;
   }
+
   public static VERSION = version;
 
   constructor(config?: Config) {
     super();
     this.config = {...defaultConfig, ...config};
     this.accessTokenStore = new AccessTokenStore();
+    this.accessTokenStore.on(AccessTokenStore.TOPIC.ACCESS_TOKEN_REFRESH, (accessToken: AccessTokenData) =>
+      this.emit(APIClient.TOPIC.ACCESS_TOKEN_REFRESH, accessToken),
+    );
+    CookieStore.emitter.on(CookieStore.TOPIC.COOKIE_REFRESH, (cookie?: Cookie) =>
+      this.emit(APIClient.TOPIC.COOKIE_REFRESH, cookie),
+    );
+
     this.logger = logdown('@wireapp/api-client/Client', {
       logger: console,
       markdown: false,
     });
 
-    const httpClient = new HttpClient(this.config.urls.rest, this.accessTokenStore, this.config.store);
+    const httpClient = new HttpClient(this.config.urls.rest, this.accessTokenStore);
     const webSocket = new WebSocketClient(this.config.urls.ws, httpClient);
 
     webSocket.on(WebSocketClient.TOPIC.ON_INVALID_TOKEN, async error => {
@@ -133,7 +152,7 @@ export class APIClient extends EventEmitter {
       api: new AssetAPI(this.transport.http),
     };
     this.auth = {
-      api: new AuthAPI(this.transport.http, this.config.store),
+      api: new AuthAPI(this.transport.http),
     };
     this.broadcast = {
       api: new BroadcastAPI(this.transport.http),
@@ -189,11 +208,12 @@ export class APIClient extends EventEmitter {
     };
   }
 
-  public async init(clientType: ClientType = ClientType.NONE): Promise<Context> {
+  public async init(clientType: ClientType = ClientType.NONE, cookie?: Cookie): Promise<Context> {
+    CookieStore.setCookie(cookie);
+
     const initialAccessToken = await this.transport.http.refreshAccessToken();
     const context = this.createContext(initialAccessToken.user, clientType);
 
-    await this.initEngine(context);
     await this.accessTokenStore.updateToken(initialAccessToken);
 
     return context;
@@ -204,21 +224,16 @@ export class APIClient extends EventEmitter {
       await this.logout({ignoreError: true});
     }
 
-    const cookieResponse = await this.auth.api.postLogin(loginData);
-    const accessToken = cookieResponse.data;
+    const accessToken = await this.auth.api.postLogin(loginData);
 
     this.logger.info(
       `Saved initial access token. It will expire in "${accessToken.expires_in}" seconds.`,
       ObfuscationUtil.obfuscateAccessToken(accessToken),
     );
 
-    const context = this.createContext(accessToken.user, loginData.clientType);
-
-    await this.initEngine(context);
-    await retrieveCookie(cookieResponse, this.config.store);
     await this.accessTokenStore.updateToken(accessToken);
 
-    return context;
+    return this.createContext(accessToken.user, loginData.clientType);
   }
 
   public async register(userAccount: RegisterData, clientType: ClientType = ClientType.PERMANENT): Promise<Context> {
@@ -228,15 +243,9 @@ export class APIClient extends EventEmitter {
 
     const user = await this.auth.api.postRegister(userAccount);
 
-    /**
-     * Note:
-     * It's necessary to initialize the context (Client.createContext()) and the store (Client.initEngine())
-     * for saving the retrieved cookie from POST /access (Client.init()) in a Node environment.
-     */
-    const context = await this.createContext(user.id, clientType);
+    await this.createContext(user.id, clientType);
 
-    await this.initEngine(context);
-    return this.init(clientType);
+    return this.init(clientType, CookieStore.getCookie());
   }
 
   public async logout(options = {ignoreError: false}): Promise<void> {
@@ -248,6 +257,8 @@ export class APIClient extends EventEmitter {
       } else {
         throw error;
       }
+    } finally {
+      CookieStore.deleteCookie();
     }
 
     this.disconnect('Closed by client logout');
@@ -266,30 +277,6 @@ export class APIClient extends EventEmitter {
 
   public disconnect(reason?: string): void {
     this.transport.ws.disconnect(reason);
-  }
-
-  private async initEngine(context: Context): Promise<CRUDEngine> {
-    const clientType = context.clientType === ClientType.NONE ? '' : `@${context.clientType}`;
-    const dbName = `${this.STORE_NAME_PREFIX}@${this.config.urls.name}@${context.userId}${clientType}`;
-    this.logger.log(`Initialising store with name "${dbName}"`);
-    try {
-      const db = await this.config.store.init(dbName);
-      const isDexieStore = db && db.constructor.name === 'Dexie';
-      if (isDexieStore) {
-        if (this.config.schemaCallback) {
-          this.config.schemaCallback(db);
-        } else {
-          const message = `Could not initialize store "${dbName}". Missing schema definition.`;
-          throw new Error(message);
-        }
-        // In case the database got purged, db.close() is called automatically and we have to reopen it.
-        await db.open();
-      }
-    } catch (error) {
-      this.logger.error(`Could not initialize store "${dbName}": ${error.message}`);
-      throw error;
-    }
-    return this.config.store;
   }
 
   public get clientId(): string | undefined {

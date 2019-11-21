@@ -17,6 +17,7 @@
  *
  */
 
+import Dexie from 'dexie';
 const UUID = require('pure-uuid');
 const {Account} = require('@wireapp/core');
 const {IndexedDBEngine} = require('@wireapp/store-engine-dexie');
@@ -31,25 +32,27 @@ describe('Account', () => {
     afterEach(done => {
       if (storeName) {
         const deleteRequest = window.indexedDB.deleteDatabase(storeName);
-
         deleteRequest.onerror = done.fail;
         deleteRequest.onsuccess = done;
+      } else {
+        done();
       }
     });
 
     it('creates a client if there is none', async () => {
+      storeName = new UUID(UUIDVersion).format();
+      const db = new Dexie(storeName);
+      db.version(1).stores({
+        amplify: '',
+        clients: ', meta.primary_key',
+        keys: '',
+        prekeys: '',
+        sessions: '',
+      });
       const engine = new IndexedDBEngine();
+      await engine.initWithDb(db);
+
       const apiClient = new APIClient({
-        schemaCallback: db => {
-          db.version(1).stores({
-            amplify: '',
-            clients: ', meta.primary_key',
-            keys: '',
-            prekeys: '',
-            sessions: '',
-          });
-        },
-        store: engine,
         urls: APIClient.BACKEND.STAGING,
       });
 
@@ -58,34 +61,28 @@ describe('Account', () => {
         userId: new UUID(UUIDVersion),
       };
 
-      const account = new Account(apiClient);
-
-      await account.init();
+      const account = new Account(apiClient, () => Promise.resolve(engine));
+      await account.init(engine);
       spyOn(account.service.client, 'register').and.callThrough();
       account.service.client.synchronizeClients = () => Promise.resolve();
       account.service.notification.backend.getLastNotification = () => Promise.resolve({id: 'notification-id'});
       account.apiClient.context = {};
       account.apiClient.client.api.postClient = () => Promise.resolve({id: context.clientId});
-      await apiClient.initEngine(context);
-      storeName = engine.storeName;
       await account.initClient(context);
 
       expect(account.service.client.register).toHaveBeenCalledTimes(1);
     });
   });
 
-  describe('"loadAndValidateLocalClient"', () => {
+  describe('loadAndValidateLocalClient', () => {
     it('synchronizes the client ID', async () => {
       const engine = new IndexedDBEngine();
       const apiClient = new APIClient({
-        schemaCallback: db => {},
-        store: engine,
         urls: APIClient.BACKEND.STAGING,
       });
       const clientId = new UUID(UUIDVersion).toString();
-      const account = new Account(apiClient);
-
-      await account.init();
+      const account = new Account(apiClient, () => Promise.resolve(engine));
+      await account.init(engine);
       spyOn(account.service.cryptography, 'initCryptobox').and.returnValue(Promise.resolve());
       spyOn(account.service.client, 'getLocalClient').and.returnValue(Promise.resolve({id: clientId}));
       spyOn(account.apiClient.client.api, 'getClient').and.returnValue(Promise.resolve({id: clientId}));
@@ -97,18 +94,15 @@ describe('Account', () => {
     });
   });
 
-  describe('"registerClient"', () => {
+  describe('registerClient', () => {
     it('synchronizes the client ID', async () => {
       const engine = new IndexedDBEngine();
       const apiClient = new APIClient({
-        schemaCallback: db => {},
-        store: engine,
         urls: APIClient.BACKEND.STAGING,
       });
       const clientId = new UUID(UUIDVersion).toString();
-      const account = new Account(apiClient);
-
-      await account.init();
+      const account = new Account(apiClient, () => Promise.resolve(engine));
+      await account.init(engine);
       spyOn(account.service.client, 'register').and.returnValue(Promise.resolve({id: clientId}));
       spyOn(account.service.client, 'synchronizeClients').and.returnValue(Promise.resolve());
       spyOn(account.service.notification, 'initializeNotificationStream').and.returnValue(Promise.resolve());

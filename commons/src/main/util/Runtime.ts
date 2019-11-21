@@ -128,6 +128,10 @@ export class Runtime {
     return Runtime.getBrowserName() === BROWSER.ELECTRON;
   }
 
+  public static isNode(): boolean {
+    return typeof process === 'object';
+  }
+
   public static isDesktopApp(): boolean {
     return Runtime.isElectron() && Runtime.getUserAgent().includes('wire');
   }

@@ -18,6 +18,12 @@
  */
 
 const logdown = require('logdown');
+const {APIClient} = require('@wireapp/api-client');
+const path = require('path');
+const {FileEngine} = require('@wireapp/store-engine-fs');
+const {Cookie} = require('@wireapp/api-client/dist/commonjs/auth/');
+const {WebSocketClient} = require('@wireapp/api-client/dist/commonjs/tcp/');
+const {ClientType} = require('@wireapp/api-client/dist/commonjs/client/');
 
 // Try with: node demo.js -c "conversation-id" -e "mail@wire.com" -p "secret"
 const argv = require('optimist')
@@ -26,14 +32,8 @@ const argv = require('optimist')
   .alias('h', 'handle')
   .alias('p', 'password').argv;
 
-const logger = logdown('@wireapp/api-client/index.js');
+const logger = logdown('Demo');
 logger.state.isEnabled = true;
-
-const {APIClient} = require('@wireapp/api-client');
-const path = require('path');
-const {FileEngine} = require('@wireapp/store-engine-fs');
-const {WebSocketClient} = require('@wireapp/api-client/dist/commonjs/tcp/');
-const {ClientType} = require('@wireapp/api-client/dist/commonjs/client/');
 
 const login = {
   clientType: ClientType.PERMANENT,
@@ -44,28 +44,48 @@ const login = {
 
 const storagePath = path.join(process.cwd(), '.tmp', login.email);
 
-const config = {
-  store: new FileEngine(storagePath),
-};
-
-const apiClient = new APIClient(config);
-
 (async () => {
+  const storeOptions = {fileExtension: '.json'};
+  const storeEngine = new FileEngine(storagePath, storeOptions);
+  await storeEngine.init(storagePath, storeOptions);
+
+  const config = {
+    store: storeEngine,
+    urls: APIClient.BACKEND.STAGING,
+  };
+
+  const AUTH_TABLE_NAME = 'authentication';
+  const AUTH_COOKIE_KEY = 'cookie';
+
+  const apiClient = new APIClient(config);
+  apiClient.on(APIClient.TOPIC.COOKIE_REFRESH, async cookie => {
+    const entity = {expiration: cookie.expiration, zuid: cookie.zuid};
+    await storeEngine.delete(AUTH_TABLE_NAME, AUTH_COOKIE_KEY);
+    await storeEngine.create(AUTH_TABLE_NAME, AUTH_COOKIE_KEY, entity);
+  });
+
   let context;
 
   try {
     // Trying to login (works only if there is already a valid cookie stored in the FileEngine)
-    context = await apiClient.init();
+    const {expiration, zuid} = await storeEngine.read(AUTH_TABLE_NAME, AUTH_COOKIE_KEY);
+    const cookie = new Cookie(zuid, expiration);
+    context = await apiClient.init(ClientType.NONE, cookie);
+    logger.log(`Logged in with EXISTING cookie.`);
   } catch (error) {
-    logger.log(`Authentication via existing authenticator (Session Cookie or Access Token) failed: ${error.message}`);
+    logger.log('Failed to find existing cookie.', error);
     context = await apiClient.login(login);
+    logger.log(`Logged in with NEW cookie.`);
   }
 
   try {
     logger.log(`Got self user with ID "${context.userId}".`);
-    const userData = await apiClient.user.api.getUsers({handles: ['webappbot']});
 
-    logger.log(`Found user with name "${userData[0].name}" by handle "${userData[0].handle}".`);
+    const conversation = await apiClient.conversation.api.getConversation(argv.conversation);
+    const otherParticipant = conversation.members.others[0];
+    const userData = await apiClient.user.api.getUser(otherParticipant.id);
+    logger.log(`Found user with name "${userData.name}" by handle "${userData.handle}".`);
+
     const webSocketClient = await apiClient.connect();
 
     webSocketClient.on(WebSocketClient.TOPIC.ON_MESSAGE, notification => {

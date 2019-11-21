@@ -21,7 +21,7 @@
   "main": "./dist/LocalStorageEngine.js",
   "name": "@wireapp/store-engine-web-storage",
   "peerDependencies": {
-    "@wireapp/store-engine": "3.x.x"
+    "@wireapp/store-engine": "4.x.x"
   },
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-web-storage",
   "scripts": {

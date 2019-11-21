@@ -58,7 +58,7 @@ const storeEngine = new FileEngine(directory);
 storeEngine
   .init('', {fileExtension: '.json'})
   .then(() => {
-    const apiClient = new APIClient({store: storeEngine, urls: APIClient.BACKEND.PRODUCTION});
+    const apiClient = new APIClient({urls: APIClient.BACKEND.PRODUCTION});
 
     const account = new Account(apiClient);
 

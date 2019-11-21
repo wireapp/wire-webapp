@@ -25,7 +25,7 @@
   "main": "./dist/index.js",
   "name": "@wireapp/store-engine-bro-fs",
   "peerDependencies": {
-    "@wireapp/store-engine": "3.x.x"
+    "@wireapp/store-engine": "4.x.x"
   },
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-bro-fs",
   "scripts": {

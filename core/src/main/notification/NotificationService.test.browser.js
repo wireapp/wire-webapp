@@ -17,10 +17,11 @@
  *
  */
 
-const UUID = require('pure-uuid');
-const {NotificationService} = require('@wireapp/core/dist/notification/');
-const {IndexedDBEngine} = require('@wireapp/store-engine-dexie');
-const {APIClient} = require('@wireapp/api-client');
+import {APIClient} from '@wireapp/api-client';
+import {NotificationService} from '@wireapp/core/dist/notification/';
+import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
+import Dexie from 'dexie';
+import UUID from 'pure-uuid';
 
 const UUIDVersion = 4;
 
@@ -30,32 +31,31 @@ describe('NotificationService', () => {
     afterEach(done => {
       if (storeName) {
         const deleteRequest = window.indexedDB.deleteDatabase(storeName);
-
         deleteRequest.onerror = done.fail;
         deleteRequest.onsuccess = done;
+      } else {
+        done();
       }
     });
 
     it('initializes last event date if database entry is not present', async () => {
+      storeName = new UUID(UUIDVersion).format();
+      const db = new Dexie(storeName);
+      db.version(1).stores({
+        amplify: '',
+      });
       const engine = new IndexedDBEngine();
+      await engine.initWithDb(db);
+
       const apiClient = new APIClient({
-        schemaCallback: db => {
-          db.version(1).stores({
-            amplify: '',
-          });
-        },
-        store: engine,
         urls: APIClient.BACKEND.STAGING,
       });
 
-      const notificationService = new NotificationService(apiClient);
+      const notificationService = new NotificationService(apiClient, {}, engine);
       spyOn(notificationService.database, 'getLastEventDate').and.callThrough();
       spyOn(engine, 'read').and.callThrough();
       spyOn(engine, 'update').and.callThrough();
       spyOn(engine, 'create').and.callThrough();
-
-      await apiClient.initEngine({userId: new UUID(UUIDVersion)});
-      storeName = engine.storeName;
 
       const returnValue = await notificationService.setLastEventDate(new Date(0));
       expect(returnValue).toEqual(new Date(0));
@@ -66,22 +66,20 @@ describe('NotificationService', () => {
       expect(engine.create).toHaveBeenCalledTimes(1);
     });
 
-    it('updates last event date if lesser database entry exists', async () => {
+    it('updates last event date if an older database record exists', async () => {
+      storeName = storeName = new UUID(UUIDVersion).format();
+      const db = new Dexie(storeName);
+      db.version(1).stores({
+        amplify: '',
+      });
       const engine = new IndexedDBEngine();
+      await engine.initWithDb(db);
+
       const apiClient = new APIClient({
-        schemaCallback: db => {
-          db.version(1).stores({
-            amplify: '',
-          });
-        },
-        store: engine,
         urls: APIClient.BACKEND.STAGING,
       });
 
-      const notificationService = new NotificationService(apiClient);
-
-      await apiClient.initEngine({userId: new UUID(UUIDVersion)});
-      storeName = engine.storeName;
+      const notificationService = new NotificationService(apiClient, {}, engine);
       await notificationService.setLastEventDate(new Date(0));
 
       spyOn(notificationService.database, 'getLastEventDate').and.callThrough();
@@ -99,24 +97,23 @@ describe('NotificationService', () => {
     });
   });
 
-  it('ignores last event date update if greater database entry exists', async () => {
+  it('ignores last event date update if newer database entry exists', async () => {
+    storeName = new UUID(UUIDVersion).format();
+    const db = new Dexie(storeName);
+    db.version(1).stores({
+      amplify: '',
+    });
     const engine = new IndexedDBEngine();
+    await engine.initWithDb(db);
+
     const apiClient = new APIClient({
-      schemaCallback: db => {
-        db.version(1).stores({
-          amplify: '',
-        });
-      },
-      store: engine,
       urls: APIClient.BACKEND.STAGING,
     });
 
-    const notificationService = new NotificationService(apiClient);
+    const notificationService = new NotificationService(apiClient, {}, engine);
     const greaterDate = new Date(1);
     const lesserDate = new Date(0);
 
-    await apiClient.initEngine({userId: new UUID(UUIDVersion)});
-    storeName = engine.storeName;
     await notificationService.setLastEventDate(greaterDate);
 
     spyOn(notificationService.database, 'getLastEventDate').and.callThrough();
@@ -135,47 +132,42 @@ describe('NotificationService', () => {
   });
 
   it('initializes last notification ID if database entry is not present', async () => {
+    storeName = new UUID(UUIDVersion).format();
+    const db = new Dexie(storeName);
+    db.version(1).stores({
+      amplify: '',
+    });
     const engine = new IndexedDBEngine();
+    await engine.initWithDb(db);
+
     const apiClient = new APIClient({
-      schemaCallback: db => {
-        db.version(1).stores({
-          amplify: '',
-        });
-      },
-      store: engine,
       urls: APIClient.BACKEND.STAGING,
     });
 
-    const notificationService = new NotificationService(apiClient);
+    const notificationService = new NotificationService(apiClient, {}, engine);
     spyOn(notificationService.database, 'getLastNotificationId').and.callThrough();
     spyOn(engine, 'read').and.callThrough();
     spyOn(engine, 'update').and.callThrough();
     spyOn(engine, 'create').and.callThrough();
-
-    await apiClient.initEngine({userId: new UUID(UUIDVersion)});
-    storeName = engine.storeName;
 
     const lastNotificationId = await notificationService.setLastNotificationId({id: '12'});
     expect(lastNotificationId).toEqual('12');
   });
 
   it('updates last notification ID if database entry exists', async () => {
+    storeName = new UUID(UUIDVersion).format();
+    const db = new Dexie(storeName);
+    db.version(1).stores({
+      amplify: '',
+    });
     const engine = new IndexedDBEngine();
+    await engine.initWithDb(db);
+
     const apiClient = new APIClient({
-      schemaCallback: db => {
-        db.version(1).stores({
-          amplify: '',
-        });
-      },
-      store: engine,
       urls: APIClient.BACKEND.STAGING,
     });
 
-    const notificationService = new NotificationService(apiClient);
-
-    await apiClient.initEngine({userId: new UUID(UUIDVersion)});
-    storeName = engine.storeName;
-
+    const notificationService = new NotificationService(apiClient, {}, engine);
     await notificationService.setLastNotificationId({id: '12'});
 
     spyOn(notificationService.database, 'getLastNotificationId').and.callThrough();

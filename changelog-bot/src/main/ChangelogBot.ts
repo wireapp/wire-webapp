@@ -55,9 +55,9 @@ export class ChangelogBot {
 
     const backendUrls = this.loginData.backend === 'staging' ? APIClient.BACKEND.STAGING : APIClient.BACKEND.PRODUCTION;
 
-    const client = new APIClient({store: engine, urls: backendUrls});
+    const client = new APIClient({urls: backendUrls});
 
-    const account = new Account(client);
+    const account = new Account(client, () => Promise.resolve(engine));
     try {
       await account.login(this.loginData);
     } catch (error) {
