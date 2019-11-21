@@ -84,7 +84,7 @@ ko.components.register('user-list', {
   template: `
     <!-- ko if: showRoles() -->
       <!-- ko if: adminUsers().length > 0 || showEmptyAdmin -->
-        <div class="user-list__header" data-bind="text: t('searchListAdmins')" data-uie-name="label-conversation-admins"></div>
+        <div class="user-list__header" data-bind="text: t('searchListAdmins', adminCount())" data-uie-name="label-conversation-admins"></div>
         <!-- ko if: adminUsers().length > 0 -->
           ${listTemplate('adminUsers().slice(0, maxShownUsers())', 'list-admins')}
         <!-- /ko -->
@@ -93,7 +93,7 @@ ko.components.register('user-list', {
         <!-- /ko -->
       <!-- /ko -->
       <!-- ko if: memberUsers().length > 0 && maxShownUsers() > adminUsers().length -->
-        <div class="user-list__header" data-bind="text: t('searchListMembers')" data-uie-name="label-conversation-members"></div>
+        <div class="user-list__header" data-bind="text: t('searchListMembers', memberCount())" data-uie-name="label-conversation-members"></div>
         ${listTemplate('memberUsers().slice(0, maxShownUsers() - adminUsers().length)', 'list-members')}
       <!-- /ko -->
     <!-- /ko -->
@@ -153,6 +153,8 @@ ko.components.register('user-list', {
     this.noSelfInteraction = noSelfInteraction;
     this.maxShownUsers = ko.observable(USER_CHUNK_SIZE);
     this.lazyTriggerElement = null;
+    this.adminCount = ko.observable(0);
+    this.memberCount = ko.observable(0);
 
     const isCompactMode = mode === UserlistMode.COMPACT;
 
@@ -248,6 +250,8 @@ ko.components.register('user-list', {
             members.push(userEntity);
           }
         });
+        this.adminCount(admins.length);
+        this.memberCount(members.length);
 
         if (truncate && admins.length + members.length > maxVisibleUsers) {
           this.adminUsers(admins.slice(0, reducedUserCount));
