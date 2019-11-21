@@ -183,7 +183,7 @@ describe('AuthAction', () => {
     expect(store.getActions()).toEqual([AuthActionCreator.startLogout(), AuthActionCreator.failedLogout(backendError)]);
   });
 
-  it('authenticates a user successfully', async () => {
+  it('requests phone login code', async () => {
     const phoneNumber = '+08723568';
     const expiresIn = 60;
     const mockedApiClient = {
@@ -202,5 +202,111 @@ describe('AuthAction', () => {
       AuthActionCreator.startSendPhoneLoginCode(),
       AuthActionCreator.successfulSendPhoneLoginCode(expiresIn),
     ]);
+  });
+
+  it('handles failed request for phone login code', async () => {
+    const error = new Error('testerror');
+    const phoneNumber = '+08723568';
+    const mockedApiClient = {
+      auth: {
+        api: {
+          postLoginSend: () => Promise.reject(error),
+        },
+      },
+    };
+
+    const store = mockStoreFactory({
+      apiClient: mockedApiClient,
+    })({});
+    try {
+      await store.dispatch(actionRoot.authAction.doSendPhoneLoginCode({phone: phoneNumber}));
+    } catch (backendError) {
+      expect(store.getActions()).toEqual([
+        AuthActionCreator.startSendPhoneLoginCode(),
+        AuthActionCreator.failedSendPhoneLoginCode(error),
+      ]);
+    }
+  });
+
+  it('validates SSO code', async () => {
+    const ssoCode = 'wire-uuid';
+    const mockedApiClient = {
+      auth: {
+        api: {
+          headInitiateLogin: () => Promise.resolve(),
+        },
+      },
+    };
+
+    const store = mockStoreFactory({
+      apiClient: mockedApiClient,
+    })({});
+    await store.dispatch(actionRoot.authAction.validateSSOCode(ssoCode));
+  });
+
+  it('handles failed request for phone login code (not found)', async () => {
+    const error = {response: {status: 404}};
+    const expectedNotFoundError = new BackendError({code: 404, label: BackendError.SSO_ERRORS.SSO_NOT_FOUND});
+    const ssoCode = 'wire-uuid';
+    const mockedApiClient = {
+      auth: {
+        api: {
+          headInitiateLogin: () => Promise.reject(error),
+        },
+      },
+    };
+
+    const store = mockStoreFactory({
+      apiClient: mockedApiClient,
+    })({});
+    try {
+      await store.dispatch(actionRoot.authAction.validateSSOCode(ssoCode));
+    } catch (backendError) {
+      expect(store.getActions()).toEqual([AuthActionCreator.failedLogin(expectedNotFoundError)]);
+    }
+  });
+
+  it('handles failed request for phone login code (server error)', async () => {
+    const error = {response: {status: 500}};
+    const expectedServerError = new BackendError({code: 500, label: BackendError.SSO_ERRORS.SSO_SERVER_ERROR});
+    const ssoCode = 'wire-uuid';
+    const mockedApiClient = {
+      auth: {
+        api: {
+          headInitiateLogin: () => Promise.reject(error),
+        },
+      },
+    };
+
+    const store = mockStoreFactory({
+      apiClient: mockedApiClient,
+    })({});
+    try {
+      await store.dispatch(actionRoot.authAction.validateSSOCode(ssoCode));
+    } catch (backendError) {
+      expect(store.getActions()).toEqual([AuthActionCreator.failedLogin(expectedServerError)]);
+    }
+  });
+
+  it('handles failed request for phone login code (generic error)', async () => {
+    const error = {response: {status: 403}};
+    const expectedGenericError = new BackendError({code: 500, label: BackendError.SSO_ERRORS.SSO_GENERIC_ERROR});
+    const ssoCode = 'wire-uuid';
+    const mockedApiClient = {
+      auth: {
+        api: {
+          headInitiateLogin: () => Promise.reject(error),
+        },
+      },
+    };
+
+    const store = mockStoreFactory({
+      apiClient: mockedApiClient,
+    })({});
+    try {
+      await store.dispatch(actionRoot.authAction.validateSSOCode(ssoCode));
+    } catch (backendError) {
+      expect(store.getActions()).toEqual([AuthActionCreator.failedLogin(expectedGenericError)]);
+    }
   });
 });
