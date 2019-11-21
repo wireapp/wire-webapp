@@ -4,6 +4,6 @@
     "outDir": "dist/commonjs",
     "rootDir": "src/main"
   },
-  "exclude": ["dist", "node_modules"],
+  "exclude": ["dist", "node_modules", "demo.ts"],
   "extends": "../../tsconfig.json"
 }
