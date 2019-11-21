@@ -19,6 +19,7 @@
 
 import {amplify} from 'amplify';
 import ko from 'knockout';
+
 import {Logger, getLogger} from 'Util/Logger';
 import {PromiseQueue} from 'Util/PromiseQueue';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
