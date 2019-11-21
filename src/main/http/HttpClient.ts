@@ -19,7 +19,6 @@
 
 import {TimeUtil} from '@wireapp/commons';
 import {PriorityQueue} from '@wireapp/priority-queue';
-import {CRUDEngine} from '@wireapp/store-engine';
 import axios, {AxiosError, AxiosRequestConfig, AxiosResponse} from 'axios';
 import EventEmitter from 'events';
 import logdown from 'logdown';
@@ -45,11 +44,7 @@ export class HttpClient extends EventEmitter {
     return TOPIC;
   }
 
-  constructor(
-    private readonly baseUrl: string,
-    public accessTokenStore: AccessTokenStore,
-    private readonly engine: CRUDEngine,
-  ) {
+  constructor(private readonly baseUrl: string, public accessTokenStore: AccessTokenStore) {
     super();
 
     this.connectionState = ConnectionState.UNDEFINED;
@@ -183,7 +178,7 @@ export class HttpClient extends EventEmitter {
       )}`;
     }
 
-    const response = await sendRequestWithCookie<AccessTokenData>(this, config, this.engine);
+    const response = await sendRequestWithCookie<AccessTokenData>(this, config);
     return response.data;
   }
 

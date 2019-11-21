@@ -28,6 +28,7 @@ export * from './AuthenticationError';
 export * from './ClientPreKey';
 export * from './Context';
 export * from './Cookie';
+export * from './CookieStore';
 export * from './LoginCodeResponse';
 export * from './LoginData';
 export * from './PreKey';

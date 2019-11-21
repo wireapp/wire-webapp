@@ -17,13 +17,8 @@
  *
  */
 
-import {CRUDEngine} from '@wireapp/store-engine';
 import {BackendData} from './env/';
 
-export type SchemaCallbackFunction = (db: any) => void;
-
 export interface Config {
-  store: CRUDEngine;
   urls: BackendData;
-  schemaCallback?: SchemaCallbackFunction;
 }

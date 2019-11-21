@@ -17,64 +17,24 @@
  *
  */
 
-import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
 import {AxiosRequestConfig, AxiosResponse} from 'axios';
 import logdown from 'logdown';
 import {Cookie as ToughCookie} from 'tough-cookie';
-import {AUTH_COOKIE_KEY, AUTH_TABLE_NAME, AccessTokenData, Cookie} from '../../auth/';
+import {Cookie} from '../../auth/';
+import {CookieStore} from '../../auth/CookieStore';
 import {HttpClient} from '../../http/';
 import * as ObfuscationUtil from '../../obfuscation/';
-
-interface PersistedCookie {
-  expiration: string;
-  zuid: string;
-}
 
 const logger = logdown('@wireapp/api-client/shims/node/cookie', {
   logger: console,
   markdown: false,
 });
 
-const loadExistingCookie = async (engine: CRUDEngine): Promise<Cookie> => {
-  try {
-    const {expiration, zuid} = await engine.read<PersistedCookie>(AUTH_TABLE_NAME, AUTH_COOKIE_KEY);
-    return new Cookie(zuid, expiration);
-  } catch (error) {
-    const notFound =
-      error instanceof StoreEngineError.RecordNotFoundError ||
-      error.constructor.name === StoreEngineError.RecordNotFoundError.name;
-
-    if (notFound) {
-      return new Cookie('', '0');
-    }
-
-    throw error;
-  }
-};
-
-const setInternalCookie = async (cookie: Cookie, engine: CRUDEngine): Promise<string> => {
-  const entity: PersistedCookie = {expiration: cookie.expiration, zuid: cookie.zuid};
-
-  try {
-    const primaryKey = await engine.create(AUTH_TABLE_NAME, AUTH_COOKIE_KEY, entity);
-    return primaryKey;
-  } catch (error) {
-    if (
-      error instanceof StoreEngineError.RecordAlreadyExistsError ||
-      error.constructor.name === StoreEngineError.RecordAlreadyExistsError.name
-    ) {
-      return engine.update(AUTH_TABLE_NAME, AUTH_COOKIE_KEY, entity);
-    } else {
-      throw error;
-    }
-  }
-};
-
-export const retrieveCookie = async (response: AxiosResponse, engine: CRUDEngine): Promise<AccessTokenData> => {
+export const retrieveCookie = async <T>(response: AxiosResponse<T>): Promise<T> => {
   if (response.headers && response.headers['set-cookie']) {
     const cookies = response.headers['set-cookie'].map(ToughCookie.parse);
     for (const cookie of cookies) {
-      await setInternalCookie(new Cookie(cookie.value, cookie.expires), engine);
+      CookieStore.setCookie(new Cookie(cookie.value, cookie.expires));
       logger.info(
         `Saved internal cookie. It will expire on "${cookie.expires}".`,
         ObfuscationUtil.obfuscateCookie(cookie),
@@ -89,10 +49,9 @@ export const retrieveCookie = async (response: AxiosResponse, engine: CRUDEngine
 export const sendRequestWithCookie = async <T>(
   client: HttpClient,
   config: AxiosRequestConfig,
-  engine: CRUDEngine,
 ): Promise<AxiosResponse<T>> => {
-  const cookie = await loadExistingCookie(engine);
-  if (!cookie.isExpired) {
+  const cookie = CookieStore.getCookie();
+  if (cookie && !cookie.isExpired) {
     config.headers = config.headers || {};
     config.headers['Cookie'] = `zuid=${cookie.zuid}`;
     config.withCredentials = true;

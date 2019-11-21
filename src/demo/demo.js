@@ -18,18 +18,16 @@
  */
 
 import {APIClient} from '@wireapp/api-client';
-import {AccessTokenStore} from '@wireapp/api-client/dist/commonjs/auth/';
 import {WebSocketClient} from '@wireapp/api-client/dist/commonjs/tcp/';
 import {Button, Form, Input} from '@wireapp/react-ui-kit/Form';
 import {COLOR, Logo} from '@wireapp/react-ui-kit/Identity';
 import {ContainerXS, Content, Header, StyledApp} from '@wireapp/react-ui-kit/Layout';
 import {H1, Link, Text} from '@wireapp/react-ui-kit/Text';
-import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 import logdown from 'logdown';
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 
-const logger = logdown('@wireapp/api-client/demo/demo.js');
+const logger = logdown('Demo');
 logger.state.isEnabled = true;
 
 const BACKEND_ENV = APIClient.BACKEND.STAGING;
@@ -39,6 +37,7 @@ class Auth extends Component {
     super(props);
     this.state = {
       authenticated: false,
+      authenticationError: undefined,
       login: {
         email: '',
         password: '',
@@ -61,14 +60,17 @@ class Auth extends Component {
 
   doAuth(event) {
     event.preventDefault();
-    this.setState({authenticated: false});
+    this.setState({authenticated: false, authenticationError: undefined});
     return window.wire.client
       .init()
       .catch(() => window.wire.client.login(this.state.login))
       .then(context => {
         logger.log('Login successful', context);
-        this.setState({authenticated: true});
+        this.setState({authenticated: true, authenticationError: undefined});
         return window.wire.client.connect();
+      })
+      .catch(error => {
+        this.setState({authenticated: false, authenticationError: error});
       });
   }
 
@@ -101,13 +103,12 @@ class Auth extends Component {
             >
               <Input onChange={this.onEmailChange} placeholder="Email" name="username" />
               <Input onChange={this.onPasswordChange} type="password" placeholder="Password" name="password" />
-              <Button type="submit" backgroundColor={COLOR.GREEN} block>
+              <Button type="submit" backgroundColor={this.state.authenticationError ? COLOR.RED : COLOR.GREEN} block>
                 {this.state.authenticated ? '😊' : 'Login'}
               </Button>
               <Text center>
                 Backend: <Link href={BACKEND_ENV.rest}>{BACKEND_ENV.rest}</Link>
               </Text>
-              <Text center>Version: {window.wire.client.VERSION}</Text>
             </Form>
           </ContainerXS>
         </Content>
@@ -118,17 +119,13 @@ class Auth extends Component {
 
 window.onload = function() {
   const config = {
-    schemaCallback: db => {
-      db.version(1).stores({});
-    },
-    store: new IndexedDBEngine(),
     urls: BACKEND_ENV,
   };
   const client = new APIClient(config);
   client.transport.ws.on(WebSocketClient.TOPIC.ON_MESSAGE, notification => {
     logger.log('Received notification via WebSocket', notification);
   });
-  client.accessTokenStore.on(AccessTokenStore.TOPIC.ACCESS_TOKEN_REFRESH, accessToken => {
+  client.on(APIClient.TOPIC.ACCESS_TOKEN_REFRESH, accessToken => {
     logger.log('Acquired AccessToken', accessToken);
   });
   window.wire = Object.assign({}, {client});
