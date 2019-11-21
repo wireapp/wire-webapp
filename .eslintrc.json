@@ -2,7 +2,7 @@
   "env": {
     "jasmine": true
   },
-  "extends": ["@wireapp/eslint-config", "plugin:jasmine/recommended"],
+  "extends": ["@wireapp/eslint-config"],
   "globals": {
     "$": true,
     "_": true,
@@ -49,6 +49,7 @@
   "rules": {
     "id-length": "off",
     "jasmine/no-expect-in-setup-teardown": "off",
+    "jasmine/no-focused-tests": "off",
     "jasmine/no-spec-dupes": "off",
     "jasmine/no-suite-dupes": "off",
     "jasmine/prefer-toHaveBeenCalledWith": "off",
