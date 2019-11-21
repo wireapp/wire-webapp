@@ -17,7 +17,6 @@
  *
  */
 
-import {amplify} from 'amplify';
 import {GenericMessage, LegalHoldStatus, Text} from '@wireapp/protocol-messaging';
 import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 

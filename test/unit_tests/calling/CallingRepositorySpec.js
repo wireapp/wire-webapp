@@ -17,7 +17,6 @@
  *
  */
 
-import {amplify} from 'amplify';
 import UUID from 'uuidjs';
 import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {EventRepository} from 'src/script/event/EventRepository';
