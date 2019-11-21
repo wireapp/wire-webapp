@@ -37,10 +37,10 @@ describe('NotificationService', () => {
       const storeEngine = new MemoryEngine();
       await storeEngine.init('NotificationService.test');
 
-      const apiClient = new APIClient({store: storeEngine, urls: MOCK_BACKEND});
+      const apiClient = new APIClient({urls: MOCK_BACKEND});
 
       const cryptographyService = ({} as unknown) as CryptographyService;
-      const notificationService = new NotificationService(apiClient, cryptographyService);
+      const notificationService = new NotificationService(apiClient, cryptographyService, storeEngine);
 
       spyOn<any>(notificationService, 'handleEvent').and.throwError('Test error');
 
@@ -62,8 +62,12 @@ describe('NotificationService', () => {
       const storeEngine = new MemoryEngine();
       await storeEngine.init('NotificationService.test');
 
-      const apiClient = new APIClient({store: storeEngine, urls: MOCK_BACKEND});
-      const notificationService = new NotificationService(apiClient, ({} as unknown) as CryptographyService);
+      const apiClient = new APIClient({urls: MOCK_BACKEND});
+      const notificationService = new NotificationService(
+        apiClient,
+        ({} as unknown) as CryptographyService,
+        storeEngine,
+      );
 
       spyOn<any>(notificationService, 'handleEvent').and.returnValue({});
       const spySetLastNotificationId = spyOn<any>(notificationService, 'setLastNotificationId').and.returnValue({});
@@ -82,8 +86,12 @@ describe('NotificationService', () => {
       const storeEngine = new MemoryEngine();
       await storeEngine.init('NotificationService.test');
 
-      const apiClient = new APIClient({store: storeEngine, urls: MOCK_BACKEND});
-      const notificationService = new NotificationService(apiClient, ({} as unknown) as CryptographyService);
+      const apiClient = new APIClient({urls: MOCK_BACKEND});
+      const notificationService = new NotificationService(
+        apiClient,
+        ({} as unknown) as CryptographyService,
+        storeEngine,
+      );
 
       spyOn<any>(notificationService, 'handleEvent').and.returnValue({});
       const spySetLastNotificationId = spyOn<any>(notificationService, 'setLastNotificationId').and.returnValue({});
@@ -102,8 +110,12 @@ describe('NotificationService', () => {
       const storeEngine = new MemoryEngine();
       await storeEngine.init('NotificationService.test');
 
-      const apiClient = new APIClient({store: storeEngine, urls: MOCK_BACKEND});
-      const notificationService = new NotificationService(apiClient, ({} as unknown) as CryptographyService);
+      const apiClient = new APIClient({urls: MOCK_BACKEND});
+      const notificationService = new NotificationService(
+        apiClient,
+        ({} as unknown) as CryptographyService,
+        storeEngine,
+      );
       notificationService.on(NotificationService.TOPIC.NOTIFICATION_ERROR, notificationError => {
         expect(notificationError.error.message).toBe('Test error');
         expect(spySetLastNotificationId.calls.count()).toBe(0);

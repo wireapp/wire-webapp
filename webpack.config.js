@@ -1,5 +1,4 @@
 const pkg = require('./package.json');
-const TerserJSPlugin = require('terser-webpack-plugin');
 const webpack = require('webpack');
 
 const projectName = pkg.name.replace('@wireapp/', '');
@@ -17,26 +16,6 @@ module.exports = {
   node: {
     fs: 'empty',
     path: 'empty',
-  },
-  optimization: {
-    minimizer: [
-      new TerserJSPlugin({
-        /* Dexie has issues with Terser */
-        exclude: /dexie/g,
-        sourceMap: true,
-      }),
-    ],
-    splitChunks: {
-      cacheGroups: {
-        dexie: {
-          chunks: 'initial',
-          enforce: true,
-          name: 'dexie',
-          priority: 2,
-          test: /dexie/,
-        },
-      },
-    },
   },
   output: {
     filename: '[name].bundle.js',

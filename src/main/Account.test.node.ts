@@ -25,8 +25,8 @@ import {BackendErrorLabel, StatusCode} from '@wireapp/api-client/dist/commonjs/h
 import {Notification, NotificationAPI} from '@wireapp/api-client/dist/commonjs/notification';
 import {ValidationUtil} from '@wireapp/commons';
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
-import {MemoryEngine} from '@wireapp/store-engine';
 
+import {MemoryEngine} from '@wireapp/store-engine';
 import nock = require('nock');
 import {Account} from './Account';
 import {PayloadBundleSource, PayloadBundleType} from './conversation';
@@ -39,11 +39,10 @@ const MOCK_BACKEND = {
 };
 
 async function createAccount(storageName = `test-${Date.now()}`): Promise<Account> {
-  const storeEngine = new MemoryEngine();
-  await storeEngine.init(storageName);
-
-  const apiClient = new APIClient({store: storeEngine, urls: MOCK_BACKEND});
-  return new Account(apiClient);
+  const apiClient = new APIClient({urls: MOCK_BACKEND});
+  const account = new Account(apiClient);
+  await account.init(new MemoryEngine());
+  return account;
 }
 
 describe('Account', () => {
@@ -116,9 +115,6 @@ describe('Account', () => {
   describe('"createText"', () => {
     it('creates a text payload', async () => {
       const account = await createAccount();
-      expect(account['apiClient'].context).toBeUndefined();
-
-      await account.init();
 
       await account.login({
         clientType: ClientType.TEMPORARY,
@@ -139,7 +135,7 @@ describe('Account', () => {
     it('initializes the Protocol buffers', async () => {
       const account = new Account();
 
-      await account.init();
+      await account.init(new MemoryEngine());
 
       expect(account.service!.conversation).toBeDefined();
       expect(account.service!.cryptography).toBeDefined();
@@ -155,13 +151,10 @@ describe('Account', () => {
 
   describe('"login"', () => {
     it('logs in with correct credentials', async () => {
-      const storeEngine = new MemoryEngine();
-      await storeEngine.init('account.test');
-
-      const apiClient = new APIClient({store: storeEngine, urls: MOCK_BACKEND});
+      const apiClient = new APIClient({urls: MOCK_BACKEND});
       const account = new Account(apiClient);
 
-      await account.init();
+      await account.init(new MemoryEngine());
       const {clientId, clientType, userId} = (await account.login({
         clientType: ClientType.TEMPORARY,
         email: 'hello@example.com',
@@ -174,13 +167,10 @@ describe('Account', () => {
     });
 
     it('does not log in with incorrect credentials', async () => {
-      const storeEngine = new MemoryEngine();
-      await storeEngine.init('account.test');
-
-      const apiClient = new APIClient({store: storeEngine, urls: MOCK_BACKEND});
+      const apiClient = new APIClient({urls: MOCK_BACKEND});
       const account = new Account(apiClient);
 
-      await account.init();
+      await account.init(new MemoryEngine());
 
       try {
         await account.login({
@@ -199,12 +189,13 @@ describe('Account', () => {
 
   it('emits text messages', async done => {
     const account = await createAccount();
-    await account.init();
+
     await account.login({
       clientType: ClientType.TEMPORARY,
       email: 'hello@example.com',
       password: 'my-secret',
     });
+
     await account.listen();
 
     spyOn<any>(account.service!.notification, 'handleEvent').and.returnValue({type: PayloadBundleType.TEXT});
