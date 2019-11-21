@@ -219,15 +219,21 @@ export class UserRepository {
     if (this.isTeam()) {
       const users = await this.user_service.loadUserFromDb();
 
-      if (users.length && users.length <= UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST) {
-        this.logger.log(`Loaded state of '${users.length}' users from database`, users);
+      if (users.length) {
+        if (users.length >= UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST) {
+          this.logger.warn(
+            `Availability not displayed since the team size is larger than "${UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST}".`,
+          );
+        } else {
+          this.logger.log(`Loaded state of '${users.length}' users from database`, users);
 
-        const mappingPromises = users.map(async user => {
-          const userEntity = await this.get_user_by_id(user.id);
-          userEntity.availability(user.availability);
-        });
+          const mappingPromises = users.map(async user => {
+            const userEntity = await this.get_user_by_id(user.id);
+            userEntity.availability(user.availability);
+          });
 
-        await Promise.all(mappingPromises);
+          await Promise.all(mappingPromises);
+        }
       }
 
       this.users().forEach(userEntity => userEntity.subscribeToChanges());
@@ -268,12 +274,16 @@ export class UserRepository {
    * Event to update availability of a user.
    */
   onUserAvailability(event: {data: {availability: Availability.Type}; from: string}): void {
-    if (this.isTeam() && this.teamUsers().length <= UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST) {
-      const {
-        from: userId,
-        data: {availability},
-      } = event;
-      this.get_user_by_id(userId).then(userEntity => userEntity.availability(availability));
+    if (this.isTeam()) {
+      if (this.teamUsers().length >= UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST) {
+        this.logger.warn(
+          `Availability not updated since the team size is larger than "${UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST}".`,
+        );
+      } else {
+        // prettier-ignore
+        const {from: userId, data: {availability}} = event;
+        this.get_user_by_id(userId).then(userEntity => userEntity.availability(availability));
+      }
     }
   }
 
@@ -399,7 +409,7 @@ export class UserRepository {
       this.logger.log(`Availability was again set to '${newAvailabilityValue}'`);
     }
 
-    if (teamUsers.length > UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST) {
+    if (teamUsers.length >= UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST) {
       this.logger.warn(
         `Availability update not sent since the team size is larger than "${UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST}".`,
       );
