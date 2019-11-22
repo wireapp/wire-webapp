@@ -66,7 +66,11 @@ window.testEventServiceClass = (testedServiceName, className) => {
 
       it('throws an error if parameters are missing', () => {
         const eventService = TestFactory[testedServiceName];
-        const params = [[undefined, undefined], ['conv-id', undefined], [undefined, 'event-id']];
+        const params = [
+          [undefined, undefined],
+          ['conv-id', undefined],
+          [undefined, 'event-id'],
+        ];
         const promises = params.map(args => {
           return eventService
             .loadEvent(...args)

@@ -146,7 +146,10 @@ export class EmojiInputViewModel {
         continue;
       }
 
-      const icon = String.fromCodePoint.apply(null, details.code.split('-').map(char => `0x${char}`));
+      const icon = String.fromCodePoint.apply(
+        null,
+        details.code.split('-').map(char => `0x${char}`),
+      );
       const alphaCodes = [details.name, ...details.aliases];
       alphaCodes.forEach(alphaCode => {
         if (alphaCode) {

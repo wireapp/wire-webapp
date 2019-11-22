@@ -90,9 +90,9 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
    *
    * @param {Message} messageEntity - Message to check
    * @param {number} timeOffset - Approximate time different to backend in milliseconds
-   * @returns {undefined} No return value
+   * @returns {Promise<void>} No return value
    */
-  checkMessageTimer(messageEntity, timeOffset) {
+  async checkMessageTimer(messageEntity, timeOffset) {
     const hasHitBackend = messageEntity.status() > StatusType.SENDING;
     if (!hasHitBackend) {
       return;
@@ -100,7 +100,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
 
     switch (messageEntity.ephemeral_status()) {
       case EphemeralStatusType.TIMED_OUT: {
-        this._timeoutEphemeralMessage(messageEntity);
+        await this._timeoutEphemeralMessage(messageEntity);
         break;
       }
 
@@ -123,13 +123,13 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
     }
   }
 
-  validateMessage(messageEntity) {
+  async validateMessage(messageEntity) {
     const isEphemeralMessage = messageEntity.ephemeral_status() !== EphemeralStatusType.NONE;
     if (!isEphemeralMessage) {
       return messageEntity;
     }
 
-    const isExpired = !!this._updateTimedMessage(messageEntity);
+    const isExpired = !!(await this._updateTimedMessage(messageEntity));
     if (!isExpired) {
       const {id, conversation_id: conversationId} = messageEntity;
       const matchingMessageEntity = this.timedMessages().find(timedMessageEntity => {
@@ -147,10 +147,11 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
     }
   }
 
-  validateMessages(messageEntities) {
-    return messageEntities
-      .map(messageEntity => this.validateMessage(messageEntity))
-      .filter(messageEntity => messageEntity);
+  async validateMessages(messageEntities) {
+    const validatedMessages = await Promise.all(
+      messageEntities.map(messageEntity => this.validateMessage(messageEntity)),
+    );
+    return validatedMessages.filter(messageEntity => !!messageEntity);
   }
 
   _obfuscateAssetMessage(messageEntity) {
@@ -188,9 +189,9 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
     this.logger.info(`Obfuscated image message '${messageEntity.id}'`);
   }
 
-  _obfuscateMessage(messageEntity) {
+  async _obfuscateMessage(messageEntity) {
     if (messageEntity.has_asset_text()) {
-      this._obfuscateTextMessage(messageEntity);
+      await this._obfuscateTextMessage(messageEntity);
     } else if (messageEntity.has_asset()) {
       this._obfuscateAssetMessage(messageEntity);
     } else if (messageEntity.has_asset_image()) {
@@ -200,23 +201,25 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
     }
   }
 
-  _obfuscateTextMessage(messageEntity) {
+  async _obfuscateTextMessage(messageEntity) {
     messageEntity.ephemeral_expires(true);
 
     const assetEntity = messageEntity.get_first_asset();
     const obfuscatedAsset = new Text(messageEntity.id);
-    const obfuscatedPreviews = assetEntity.previews().map(linkPreview => {
-      linkPreview.obfuscate();
-      const protoArticle = new Article({permanentUrl: linkPreview.url, title: linkPreview.title}); // deprecated format
-      const linkPreviewProto = new LinkPreview({
-        article: protoArticle,
-        permanentUrl: linkPreview.url,
-        title: linkPreview.title,
-        url: linkPreview.url,
-        urlOffset: 0,
-      });
-      return arrayToBase64(LinkPreview.encode(linkPreviewProto).finish());
-    });
+    const obfuscatedPreviews = await Promise.all(
+      assetEntity.previews().map(linkPreview => {
+        linkPreview.obfuscate();
+        const protoArticle = new Article({permanentUrl: linkPreview.url, title: linkPreview.title}); // deprecated format
+        const linkPreviewProto = new LinkPreview({
+          article: protoArticle,
+          permanentUrl: linkPreview.url,
+          title: linkPreview.title,
+          url: linkPreview.url,
+          urlOffset: 0,
+        });
+        return arrayToBase64(LinkPreview.encode(linkPreviewProto).finish());
+      }),
+    );
 
     obfuscatedAsset.text = obfuscate(assetEntity.text);
     obfuscatedAsset.previews(assetEntity.previews());
@@ -234,10 +237,10 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
     this.logger.info(`Obfuscated text message '${messageEntity.id}'`);
   }
 
-  _timeoutEphemeralMessage(messageEntity) {
+  async _timeoutEphemeralMessage(messageEntity) {
     if (!messageEntity.is_expired()) {
       if (messageEntity.user().is_me) {
-        this._obfuscateMessage(messageEntity);
+        await this._obfuscateMessage(messageEntity);
       }
 
       this.eventListeners.onMessageTimeout(messageEntity);
@@ -258,23 +261,24 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
     return Promise.resolve(conversationEntity);
   }
 
-  _updateTimedMessage(messageEntity) {
+  async _updateTimedMessage(messageEntity) {
     if (typeof messageEntity.ephemeral_expires() === 'string') {
       const remainingTime = Math.max(0, messageEntity.ephemeral_expires() - Date.now());
       messageEntity.ephemeral_remaining(remainingTime);
 
       const isExpired = remainingTime === 0;
       if (isExpired) {
-        this._timeoutEphemeralMessage(messageEntity);
+        await this._timeoutEphemeralMessage(messageEntity);
         return messageEntity;
       }
     }
   }
 
-  _updateTimedMessages() {
-    const expiredMessages = this.timedMessages()
-      .map(messageEntity => this._updateTimedMessage(messageEntity))
-      .filter(messageEntity => messageEntity);
+  async _updateTimedMessages() {
+    const updatedMessages = await Promise.all(
+      this.timedMessages().map(messageEntity => this._updateTimedMessage(messageEntity)),
+    );
+    const expiredMessages = updatedMessages.filter(messageEntity => !!messageEntity);
 
     if (expiredMessages.length) {
       this.timedMessages.remove(messageEntity => {

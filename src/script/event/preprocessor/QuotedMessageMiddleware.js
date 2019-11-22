@@ -94,69 +94,69 @@ export class QuotedMessageMiddleware {
     });
   }
 
-  _handleAddEvent(event) {
+  async _handleAddEvent(event) {
     const rawQuote = event.data && event.data.quote;
 
     if (!rawQuote) {
-      return Promise.resolve(event);
+      return event;
     }
 
-    const quote = Quote.decode(base64ToArray(rawQuote));
+    const encodedQuote = await base64ToArray(rawQuote);
+    const quote = Quote.decode(encodedQuote);
     this.logger.info('Found quoted message', quote);
 
     const messageId = quote.quotedMessageId;
 
-    return this.eventService.loadEvent(event.conversation, messageId).then(quotedMessage => {
-      if (!quotedMessage) {
-        this.logger.warn(`Quoted message with ID "${messageId}" not found.`);
-        const quoteData = {
-          error: {
-            type: QuoteEntity.ERROR.MESSAGE_NOT_FOUND,
-          },
-        };
+    const quotedMessage = await this.eventService.loadEvent(event.conversation, messageId);
+    if (!quotedMessage) {
+      this.logger.warn(`Quoted message with ID "${messageId}" not found.`);
+      const quoteData = {
+        error: {
+          type: QuoteEntity.ERROR.MESSAGE_NOT_FOUND,
+        },
+      };
 
-        const decoratedData = Object.assign({}, event.data, {quote: quoteData});
-        return Promise.resolve(Object.assign({}, event, {data: decoratedData}));
-      }
+      const decoratedData = {...event.data, quote: quoteData};
+      return {...event, data: decoratedData};
+    }
 
-      const quotedMessageHash = new Uint8Array(quote.quotedMessageSha256).buffer;
+    const quotedMessageHash = new Uint8Array(quote.quotedMessageSha256).buffer;
 
-      return MessageHasher.validateHash(quotedMessage, quotedMessageHash).then(isValid => {
-        let quoteData;
+    const isValid = await MessageHasher.validateHash(quotedMessage, quotedMessageHash);
+    let quoteData;
 
-        if (!isValid) {
-          this.logger.warn(`Quoted message hash for message ID "${messageId}" does not match.`);
-          quoteData = {
-            error: {
-              type: QuoteEntity.ERROR.INVALID_HASH,
-            },
-          };
-        } else {
-          quoteData = {
-            message_id: messageId,
-            user_id: quotedMessage.from,
-          };
-        }
+    if (!isValid) {
+      this.logger.warn(`Quoted message hash for message ID "${messageId}" does not match.`);
+      quoteData = {
+        error: {
+          type: QuoteEntity.ERROR.INVALID_HASH,
+        },
+      };
+    } else {
+      quoteData = {
+        message_id: messageId,
+        user_id: quotedMessage.from,
+      };
+    }
 
-        const decoratedData = Object.assign({}, event.data, {quote: quoteData});
-        return Promise.resolve(Object.assign({}, event, {data: decoratedData}));
-      });
-    });
+    const decoratedData = {...event.data, quote: quoteData};
+    return {...event, data: decoratedData};
   }
 
-  _findRepliesToMessage(conversationId, messageId) {
-    return this.eventService.loadEvent(conversationId, messageId).then(originalEvent => {
-      if (!originalEvent) {
-        return {
-          replies: [],
-        };
-      }
-      return this.eventService
-        .loadEventsReplyingToMessage(conversationId, messageId, originalEvent.time)
-        .then(replies => ({
-          originalEvent,
-          replies,
-        }));
-    });
+  async _findRepliesToMessage(conversationId, messageId) {
+    const originalEvent = await this.eventService.loadEvent(conversationId, messageId);
+
+    if (!originalEvent) {
+      return {
+        replies: [],
+      };
+    }
+
+    const replies = await this.eventService.loadEventsReplyingToMessage(conversationId, messageId, originalEvent.time);
+
+    return {
+      originalEvent,
+      replies,
+    };
   }
 }

@@ -164,7 +164,7 @@ export class AssetService {
     return isEternal ? AssetRetentionPolicy.ETERNAL : AssetRetentionPolicy.PERSISTENT;
   }
 
-  postAsset(
+  async postAsset(
     assetData: Uint8Array,
     options: AssetUploadOptions,
     xhrAccessorFunction?: Function,
@@ -179,6 +179,8 @@ export class AssetService {
 
     const optionsString = JSON.stringify(options);
 
+    const md5Base64Hash = await arrayToMd5Base64(assetData);
+
     const body = [
       `--${BOUNDARY}`,
       'Content-Type: application/json; charset=utf-8',
@@ -188,7 +190,7 @@ export class AssetService {
       `--${BOUNDARY}`,
       'Content-Type: application/octet-stream',
       `Content-length: ${assetData.length}`,
-      `Content-MD5: ${arrayToMd5Base64(assetData)}`,
+      `Content-MD5: ${md5Base64Hash}`,
       '',
       '',
     ].join('\r\n');
@@ -203,7 +205,7 @@ export class AssetService {
     xhr.setRequestHeader('Authorization', `${this.backendClient.accessTokenType} ${this.backendClient.accessToken}`);
     xhr.send(new Blob([body, assetData, footer]));
 
-    return new Promise((resolve, reject) => {
+    return new Promise<UploadAssetResponse>((resolve, reject) => {
       xhr.onload = function(event): void {
         return this.status === 201 ? resolve(JSON.parse(this.response)) : reject(event);
       };

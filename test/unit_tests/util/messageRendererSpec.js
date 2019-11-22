@@ -208,7 +208,10 @@ describe('renderMessage', () => {
       {
         expected:
           'bonjour <span class="message-mention" data-uie-name="label-other-mention" data-user-id="user-id"><span class="mention-at-sign">@</span>felix</span>, tu vas bien <span class="message-mention" data-uie-name="label-other-mention" data-user-id="user-id"><span class="mention-at-sign">@</span>felix</span>?',
-        mentions: [{length: 6, startIndex: 8, userId: 'user-id'}, {length: 6, startIndex: 28, userId: 'user-id'}],
+        mentions: [
+          {length: 6, startIndex: 8, userId: 'user-id'},
+          {length: 6, startIndex: 28, userId: 'user-id'},
+        ],
         testCase: 'replaces two mentions to same user in simple text',
         text: 'bonjour @felix, tu vas bien @felix?',
       },
@@ -229,7 +232,10 @@ describe('renderMessage', () => {
       {
         expected:
           '<strong>salut</strong> <span class="message-mention self-mention" data-uie-name="label-self-mention"><span class="mention-at-sign">@</span>you</span> and <span class="message-mention" data-uie-name="label-other-mention" data-user-id="toi-id"><span class="mention-at-sign">@</span>toi</span>',
-        mentions: [{length: 4, startIndex: 10, userId: 'self-id'}, {length: 4, startIndex: 19, userId: 'toi-id'}],
+        mentions: [
+          {length: 4, startIndex: 10, userId: 'self-id'},
+          {length: 4, startIndex: 19, userId: 'toi-id'},
+        ],
         testCase: 'displays self mentions differently',
         text: '**salut** @you and @toi',
       },

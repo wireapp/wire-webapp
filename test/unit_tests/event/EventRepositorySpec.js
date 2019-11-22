@@ -105,7 +105,10 @@ describe('EventRepository', () => {
           window.setTimeout(() => {
             resolve({
               has_more: false,
-              notifications: [{id: createRandomUuid(), payload: []}, {id: latestNotificationId, payload: []}],
+              notifications: [
+                {id: createRandomUuid(), payload: []},
+                {id: latestNotificationId, payload: []},
+              ],
             });
           }, 10);
         });
@@ -331,7 +334,7 @@ describe('EventRepository', () => {
   });
 
   describe('processEvent', () => {
-    it('processes OTR events', () => {
+    it('processes OTR events', async () => {
       const text = 'Hello, this is a test!';
       const ownClientId = 'f180a823bf0d1204';
       const client = new ClientEntity();
@@ -340,28 +343,24 @@ describe('EventRepository', () => {
       TestFactory.client_repository.currentClient(client);
       TestFactory.cryptography_repository.createCryptobox.and.callThrough();
 
-      return Promise.resolve()
-        .then(() => TestFactory.cryptography_repository.createCryptobox(TestFactory.storage_service.db))
-        .then(() => TestFactory.cryptography_repository.cryptobox.get_prekey())
-        .then(async preKeyBundle => {
-          const ciphertext = await createEncodedCiphertext(preKeyBundle, text);
-          const event = {
-            conversation: 'fdc6cf1a-4e37-424e-a106-ab3d2cc5c8e0',
-            data: {
-              recipient: ownClientId,
-              sender: '4c28652a6dd21938',
-              text: ciphertext,
-            },
-            from: '6f88716b-1383-44da-9d57-45b51cc64d90',
-            time: '2018-07-10T14:54:21.621Z',
-            type: 'conversation.otr-message-add',
-          };
-          const source = EventRepository.SOURCE.STREAM;
-          return TestFactory.event_repository.processEvent(event, source);
-        })
-        .then(messagePayload => {
-          expect(messagePayload.data.content).toBe(text);
-        });
+      await TestFactory.cryptography_repository.createCryptobox(TestFactory.storage_service.db);
+      const preKeyBundle = await TestFactory.cryptography_repository.cryptobox.get_prekey();
+      const ciphertext = await createEncodedCiphertext(preKeyBundle, text);
+      const event = {
+        conversation: 'fdc6cf1a-4e37-424e-a106-ab3d2cc5c8e0',
+        data: {
+          recipient: ownClientId,
+          sender: '4c28652a6dd21938',
+          text: ciphertext,
+        },
+        from: '6f88716b-1383-44da-9d57-45b51cc64d90',
+        time: '2018-07-10T14:54:21.621Z',
+        type: 'conversation.otr-message-add',
+      };
+      const source = EventRepository.SOURCE.STREAM;
+      const messagePayload = await TestFactory.event_repository.processEvent(event, source);
+
+      expect(messagePayload.data.content).toBe(text);
     });
   });
 

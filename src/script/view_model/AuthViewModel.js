@@ -34,7 +34,7 @@ import {isValidPhoneNumber, isValidEmail} from 'Util/ValidationUtil';
 import {forwardParameter, getParameter} from 'Util/UrlUtil';
 
 import {URLParameter} from '../auth/URLParameter';
-import {Config} from '../auth/config';
+import {Config} from '../Config';
 import {ValidationError} from '../auth/ValidationError';
 
 import {App} from '../main/app';
@@ -70,6 +70,8 @@ import {FORWARDED_QUERY_KEYS} from '../auth/route';
 import {SelfService} from '../self/SelfService';
 import {UserService} from '../user/UserService';
 import {AudioRepository} from '../audio/AudioRepository';
+import {AuthRepository} from '../auth/AuthRepository';
+import {AuthService} from '../auth/AuthService';
 
 class AuthViewModel {
   static get CONFIG() {
@@ -88,7 +90,7 @@ class AuthViewModel {
 
     this.logger = getLogger('z.viewModel.AuthViewModel');
 
-    this.authRepository = resolveDependency(graph.AuthRepository);
+    this.authRepository = new AuthRepository(new AuthService(resolveDependency(graph.BackendClient)));
     this.audio_repository = new AudioRepository();
 
     // Cryptography
@@ -240,6 +242,8 @@ class AuthViewModel {
         asset: new AssetService(backendClient),
       },
     };
+
+    this.Config = Config;
 
     const elementSelector = '.auth-page';
     ko.applyBindings(this, document.querySelector(elementSelector));
@@ -454,7 +458,7 @@ class AuthViewModel {
         if (response.expires_in) {
           this.code_expiration_timestamp(getUnixTimestamp() + response.expires_in);
         } else if (!response.label) {
-          this.code_expiration_timestamp(getUnixTimestamp() + z.config.LOGIN_CODE_EXPIRATION);
+          this.code_expiration_timestamp(getUnixTimestamp() + Config.LOGIN_CODE_EXPIRATION);
         }
         this._set_hash(AuthView.MODE.VERIFY_CODE);
         this.pending_server_request(false);

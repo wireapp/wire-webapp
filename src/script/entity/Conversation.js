@@ -27,7 +27,7 @@ import {t} from 'Util/LocalizerUtil';
 import {koArrayPushAll, koArrayUnshiftAll} from 'Util/util';
 import {truncate} from 'Util/StringUtil';
 
-import {Config} from '../auth/config';
+import {Config} from '../Config';
 
 import {ReceiptMode} from '../conversation/ReceiptMode';
 import {ACCESS_STATE} from '../conversation/AccessState';
@@ -288,7 +288,7 @@ export class Conversation {
     });
 
     this.hasUnread = () => {
-      const lastMessage = [...this.messages()].reverse().find(message => message.isIncoming());
+      const lastMessage = [...this.messages()].reverse().find(message => message.visible() && message.isIncoming());
       return !!lastMessage && lastMessage.timestamp() > this.last_read_timestamp();
     };
 

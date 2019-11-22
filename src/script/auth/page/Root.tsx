@@ -24,7 +24,7 @@ import {IntlProvider} from 'react-intl';
 import {connect} from 'react-redux';
 import {HashRouter as Router, Redirect, Route, Switch} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
-import {Config} from '../config';
+import {Config} from '../../Config';
 import {mapLanguage, normalizeLanguage} from '../localeConfig';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {RootState, bindActionCreators} from '../module/reducer';
@@ -128,7 +128,4 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(Root);
+export default connect(mapStateToProps, mapDispatchToProps)(Root);

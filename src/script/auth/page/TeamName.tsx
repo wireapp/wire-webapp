@@ -41,6 +41,7 @@ import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 import useReactRouter from 'use-react-router';
 import {getLogger} from 'Util/Logger';
+import {addLocaleToUrl} from '../../externalRoute';
 import {teamNameStrings} from '../../strings';
 import RouterLink from '../component/RouterLink';
 import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
@@ -162,7 +163,11 @@ const TeamName = ({
                 </Form>
               </div>
               <div>
-                <Link href={EXTERNAL_ROUTE.WIRE_TEAM_FEATURES} target="_blank" data-uie-name="go-what-is">
+                <Link
+                  href={addLocaleToUrl(EXTERNAL_ROUTE.WIRE_TEAM_FEATURES)}
+                  target="_blank"
+                  data-uie-name="go-what-is"
+                >
                   {_(teamNameStrings.whatIsWireTeamsLink)}
                 </Link>
               </div>
@@ -192,7 +197,4 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(TeamName);
+export default connect(mapStateToProps, mapDispatchToProps)(TeamName);

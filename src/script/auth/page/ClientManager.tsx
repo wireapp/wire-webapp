@@ -23,9 +23,9 @@ import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 import useReactRouter from 'use-react-router';
+import {Config} from '../../Config';
 import {clientManagerStrings} from '../../strings';
 import ClientList from '../component/ClientList';
-import {Config} from '../config';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {RootState, bindActionCreators} from '../module/reducer';
 import {ROUTE} from '../route';
@@ -80,7 +80,4 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(ClientManager);
+export default connect(mapStateToProps, mapDispatchToProps)(ClientManager);

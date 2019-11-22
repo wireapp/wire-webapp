@@ -100,7 +100,7 @@ const hashEvent = event => {
  *
  * @param {Event} event - The event to match against the hash
  * @param {ArrayBuffer} hash - The hash
- * @returns {boolean} isValid - `true` if the event hash is equal to the given hash
+ * @returns {Promise<boolean>} isValid - `true` if the event hash is equal to the given hash
  */
 const validateHash = (event, hash) => {
   return hashEvent(event).then(generatedHash => {

@@ -18,26 +18,28 @@
  */
 
 import {resolve, graph, backendConfig} from './../../api/testResolver';
+import {GiphyRepository} from 'src/script/extension/GiphyRepository';
+import {GiphyService} from 'src/script/extension/GiphyService';
 
 describe('Giphy Repository', () => {
   let server = null;
   const urls = backendConfig;
 
-  let giphy_repository = null;
-  let giphy_service = null;
+  let giphyRepository = null;
+  let giphyService = null;
 
   beforeEach(() => {
     server = sinon.fakeServer.create();
 
-    giphy_repository = resolve(graph.GiphyRepository);
-    giphy_service = giphy_repository.giphyService;
+    giphyRepository = new GiphyRepository(new GiphyService(resolve(graph.BackendClient)));
+    giphyService = giphyRepository.giphyService;
 
-    spyOn(giphy_service, 'getRandom').and.callThrough();
-    spyOn(giphy_service, 'getById').and.callThrough();
+    spyOn(giphyService, 'getRandom').and.callThrough();
+    spyOn(giphyService, 'getById').and.callThrough();
 
-    const random_foo_gif = `${urls.restUrl}/proxy/giphy/v1/gifs/random?tag=foo`;
+    const randomFooGif = `${urls.restUrl}/proxy/giphy/v1/gifs/random?tag=foo`;
     /* eslint-disable comma-spacing, key-spacing, no-useless-escape, sort-keys, quotes */
-    server.respondWith('GET', random_foo_gif, [
+    server.respondWith('GET', randomFooGif, [
       200,
       {'Content-Type': 'application/json'},
       JSON.stringify({
@@ -71,9 +73,9 @@ describe('Giphy Repository', () => {
     ]);
     /* eslint-enable comma-spacing, key-spacing, no-useless-escape, sort-keys, quotes */
 
-    const random_foo_gif_data = `${urls.restUrl}/proxy/giphy/v1/gifs/GKLmFicoabZrW`;
+    const randomFooGifData = `${urls.restUrl}/proxy/giphy/v1/gifs/GKLmFicoabZrW`;
     /* eslint-disable comma-spacing, key-spacing, no-useless-escape, sort-keys, quotes */
-    server.respondWith('GET', random_foo_gif_data, [
+    server.respondWith('GET', randomFooGifData, [
       200,
       {'Content-Type': 'application/json'},
       JSON.stringify({
@@ -210,11 +212,11 @@ describe('Giphy Repository', () => {
 
   describe('getRandomGif', () => {
     it('can receive a random gif', done => {
-      giphy_repository
+      giphyRepository
         .getRandomGif({tag: 'foo'})
         .then(() => {
-          expect(giphy_service.getRandom).toHaveBeenCalled();
-          expect(giphy_service.getById).toHaveBeenCalled();
+          expect(giphyService.getRandom).toHaveBeenCalled();
+          expect(giphyService.getById).toHaveBeenCalled();
           done();
         })
         .catch(done.fail);

@@ -23,8 +23,9 @@ import React from 'react';
 import {FormattedHTMLMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
+import {Config} from '../../Config';
+import {addLocaleToUrl} from '../../externalRoute';
 import {accountFormStrings} from '../../strings';
-import {Config} from '../config';
 import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {BackendError} from '../module/action/BackendError';
@@ -81,7 +82,7 @@ const AccountForm = ({account, ...props}: Props & ConnectedProps & DispatchProps
   }, [account.name]);
 
   const createURLForToU = () =>
-    `${EXTERNAL_ROUTE.WIRE_WEBSITE}/legal/terms/${props.isPersonalFlow ? 'personal' : 'teams'}/`;
+    addLocaleToUrl(`${EXTERNAL_ROUTE.WIRE_WEBSITE}/legal/terms/${props.isPersonalFlow ? 'personal' : 'teams'}/`);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -286,7 +287,4 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(AccountForm);
+export default connect(mapStateToProps, mapDispatchToProps)(AccountForm);

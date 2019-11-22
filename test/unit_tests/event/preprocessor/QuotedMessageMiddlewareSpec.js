@@ -51,7 +51,7 @@ describe('QuotedMessageMiddleware', () => {
       });
     });
 
-    it('adds an error if quoted message is not found', () => {
+    it('adds an error if quoted message is not found', async () => {
       spyOn(quotedMessageMiddleware.eventService, 'loadEvent').and.returnValue(Promise.resolve(undefined));
 
       const expectedError = {
@@ -63,22 +63,24 @@ describe('QuotedMessageMiddleware', () => {
         quotedMessageSha256: '',
       });
 
+      const base64Quote = await arrayToBase64(Quote.encode(quote).finish());
+
       const event = {
         conversation: 'c3dfbc39-4e61-42e3-ab31-62800a0faeeb',
         data: {
           content: 'salut',
-          quote: arrayToBase64(Quote.encode(quote).finish()),
+          quote: base64Quote,
         },
         type: ClientEvent.CONVERSATION.MESSAGE_ADD,
       };
 
-      return quotedMessageMiddleware.processEvent(event).then(parsedEvent => {
-        expect(parsedEvent.data.quote.quotedMessageId).toBeUndefined();
-        expect(parsedEvent.data.quote.error).toEqual(expectedError);
-      });
+      const parsedEvent = await quotedMessageMiddleware.processEvent(event);
+
+      expect(parsedEvent.data.quote.quotedMessageId).toBeUndefined();
+      expect(parsedEvent.data.quote.error).toEqual(expectedError);
     });
 
-    it('adds an error if hashes do not match', () => {
+    it('adds an error if hashes do not match', async () => {
       const expectedError = {
         type: QuoteEntity.ERROR.INVALID_HASH,
       };
@@ -98,23 +100,25 @@ describe('QuotedMessageMiddleware', () => {
         quotedMessageSha256: '7fec6710751f67587b6f6109782257cd7c56b5d29570824132e8543e18242f1b',
       });
 
+      const base64Quote = await arrayToBase64(Quote.encode(quote).finish());
+
       const event = {
         conversation: 'conversation-uuid',
         data: {
           content: 'salut',
-          quote: arrayToBase64(Quote.encode(quote).finish()),
+          quote: base64Quote,
         },
         time: 100,
         type: ClientEvent.CONVERSATION.MESSAGE_ADD,
       };
 
-      return quotedMessageMiddleware.processEvent(event).then(parsedEvent => {
-        expect(parsedEvent.data.quote.message_id).toBeUndefined();
-        expect(parsedEvent.data.quote.error).toEqual(expectedError);
-      });
+      const parsedEvent = await quotedMessageMiddleware.processEvent(event);
+
+      expect(parsedEvent.data.quote.message_id).toBeUndefined();
+      expect(parsedEvent.data.quote.error).toEqual(expectedError);
     });
 
-    it('decorates event with the quote metadata if validation is successful', () => {
+    it('decorates event with the quote metadata if validation is successful', async () => {
       const quotedMessage = {
         data: {
           content: 'salut',
@@ -131,20 +135,22 @@ describe('QuotedMessageMiddleware', () => {
         quotedMessageSha256: '7fec6710751f67587b6f6109782257cd7c56b5d29570824132e8543e18242f1b',
       });
 
+      const base64Quote = await arrayToBase64(Quote.encode(quote).finish());
+
       const event = {
         conversation: 'conversation-uuid',
         data: {
           content: 'salut',
-          quote: arrayToBase64(Quote.encode(quote).finish()),
+          quote: base64Quote,
         },
         time: 100,
         type: ClientEvent.CONVERSATION.MESSAGE_ADD,
       };
 
-      return quotedMessageMiddleware.processEvent(event).then(parsedEvent => {
-        expect(parsedEvent.data.quote.message_id).toEqual('message-uuid');
-        expect(parsedEvent.data.quote.user_id).toEqual('user-id');
-      });
+      const parsedEvent = await quotedMessageMiddleware.processEvent(event);
+
+      expect(parsedEvent.data.quote.message_id).toEqual('message-uuid');
+      expect(parsedEvent.data.quote.user_id).toEqual('user-id');
     });
 
     it('updates quotes in DB when a message is edited', () => {

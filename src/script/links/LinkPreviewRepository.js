@@ -163,10 +163,9 @@ class LinkPreviewRepository {
    * @param {string} dataUri - image data as base64 encoded data URI
    * @returns {Promise} Resolves with the uploaded asset
    */
-  _uploadPreviewImage(dataUri) {
-    return Promise.resolve(base64ToBlob(dataUri)).then(blob =>
-      this.assetService.uploadImageAsset(blob, {public: true}),
-    );
+  async _uploadPreviewImage(dataUri) {
+    const blob = await base64ToBlob(dataUri);
+    return this.assetService.uploadImageAsset(blob, {public: true});
   }
 }
 
