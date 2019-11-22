@@ -25,7 +25,7 @@ enum TOPIC {
   ACCESS_TOKEN_REFRESH = 'AccessTokenStore.TOPIC.ACCESS_TOKEN_REFRESH',
 }
 
-export declare interface AccessTokenStore {
+export interface AccessTokenStore {
   on(event: TOPIC.ACCESS_TOKEN_REFRESH, listener: (accessToken: AccessTokenData) => void): this;
 }
 

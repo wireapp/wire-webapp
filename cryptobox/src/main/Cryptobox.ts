@@ -39,7 +39,7 @@ enum TOPIC {
   NEW_SESSION = 'new-session',
 }
 
-export declare interface Cryptobox {
+export interface Cryptobox {
   on(event: TOPIC.NEW_PREKEYS, listener: (prekeys: ProteusKeys.PreKey[]) => void): this;
   on(event: TOPIC.NEW_SESSION, listener: (session: string) => void): this;
 }

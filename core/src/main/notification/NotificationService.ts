@@ -40,7 +40,7 @@ enum TOPIC {
 
 export type NotificationHandler = (notification: Notification, source: PayloadBundleSource) => Promise<void>;
 
-export declare interface NotificationService {
+export interface NotificationService {
   on(event: PayloadBundleType.ASSET, listener: (payload: OtrMessage.FileAssetMessage) => void): this;
   on(event: PayloadBundleType.ASSET_ABORT, listener: (payload: OtrMessage.FileAssetAbortMessage) => void): this;
   on(event: PayloadBundleType.ASSET_IMAGE, listener: (payload: OtrMessage.ImageAssetMessage) => void): this;

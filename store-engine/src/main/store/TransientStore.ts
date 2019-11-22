@@ -27,7 +27,7 @@ enum TOPIC {
   EXPIRED = 'expired',
 }
 
-export declare interface TransientStore {
+export interface TransientStore {
   on(event: TOPIC.EXPIRED, listener: (bundle: ExpiredBundle) => void): this;
 }
 

@@ -69,7 +69,7 @@ const defaultConfig: Config = {
   urls: Backend.PRODUCTION,
 };
 
-export declare interface APIClient {
+export interface APIClient {
   on(event: TOPIC.ON_LOGOUT, listener: (error: InvalidTokenError) => void): this;
   on(event: TOPIC.COOKIE_REFRESH, listener: (cookie?: Cookie) => void): this;
   on(event: TOPIC.ACCESS_TOKEN_REFRESH, listener: (accessToken: AccessTokenData) => void): this;

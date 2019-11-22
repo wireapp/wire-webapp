@@ -33,7 +33,7 @@ enum TOPIC {
   ON_STATE_CHANGE = 'WebSocketClient.TOPIC.ON_STATE_CHANGE',
 }
 
-export declare interface WebSocketClient {
+export interface WebSocketClient {
   on(event: TOPIC.ON_ERROR, listener: (error: Error | ErrorEvent) => void): this;
   on(event: TOPIC.ON_INVALID_TOKEN, listener: (error: InvalidTokenError) => void): this;
   on(event: TOPIC.ON_MESSAGE, listener: (notification: Notification) => void): this;
