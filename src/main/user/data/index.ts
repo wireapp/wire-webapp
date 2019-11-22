@@ -19,7 +19,7 @@
 
 export * from './UserActivateData';
 export * from './UserClientAddData';
-export * from './UserClientLegalHoldRequestData';
+export * from './UserLegalHoldRequestData';
 export * from './UserClientRemoveData';
 export * from './UserConnectionData';
 export * from './UserDeleteData';

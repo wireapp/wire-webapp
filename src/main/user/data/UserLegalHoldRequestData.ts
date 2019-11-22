@@ -19,9 +19,9 @@
 
 import {PreKey} from '../../auth';
 
-export interface UserClientLegalHoldRequestData {
-  client_id: string;
+export interface UserLegalHoldRequestData {
+  client: string;
   last_prekey: PreKey;
-  requester: string;
-  target_user: string;
+  /** The ID of the user that is targeted (formally `target_user`) */
+  id: string;
 }
