@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [15.0.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@15.0.3...@wireapp/core@15.0.4) (2019-11-22)
+
+
+### Bug Fixes
+
+* **api-client:** Legal hold request event ([#2578](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/2578)) ([f900ab1](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/f900ab1a7804594bd16dd1068a47ee753f1e6af2))
+
+
+
+
+
 ## [15.0.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@15.0.2...@wireapp/core@15.0.3) (2019-11-21)
 
 **Note:** Version bump only for package @wireapp/core
