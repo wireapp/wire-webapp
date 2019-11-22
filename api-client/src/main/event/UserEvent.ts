@@ -20,12 +20,12 @@
 import {
   UserActivateData,
   UserClientAddData,
-  UserClientLegalHoldRequestData,
   UserClientRemoveData,
   UserConnectionData,
   UserDeleteData,
   UserLegalHoldDisableData,
   UserLegalHoldEnableData,
+  UserLegalHoldRequestData,
   UserPropertiesSetData,
   UserPushRemoveData,
   UserUpdateData,
@@ -34,12 +34,12 @@ import {
 export enum USER_EVENT {
   ACTIVATE = 'user.activate',
   CLIENT_ADD = 'user.client-add',
-  CLIENT_LEGAL_HOLD_REQUEST = 'user.client-legal-hold-request',
   CLIENT_REMOVE = 'user.client-remove',
   CONNECTION = 'user.connection',
   DELETE = 'user.delete',
   LEGAL_HOLD_DISABLE = 'user.legalhold-disable',
   LEGAL_HOLD_ENABLE = 'user.legalhold-enable',
+  LEGAL_HOLD_REQUEST = 'user.legalhold-request',
   PROPERTIES_SET = 'user.properties-set',
   PUSH_REMOVE = 'user.push-remove',
   UPDATE = 'user.update',
@@ -48,7 +48,7 @@ export enum USER_EVENT {
 export type UserEventData =
   | UserActivateData
   | UserClientAddData
-  | UserClientLegalHoldRequestData
+  | UserLegalHoldRequestData
   | UserLegalHoldEnableData
   | UserLegalHoldDisableData
   | UserClientRemoveData
@@ -62,7 +62,7 @@ export type UserEventData =
 export type UserEvent =
   | UserActivateEvent
   | UserClientAddEvent
-  | UserClientLegalHoldRequestEvent
+  | UserLegalHoldRequestEvent
   | UserLegalHoldEnableEvent
   | UserLegalHoldDisableEvent
   | UserClientRemoveEvent
@@ -84,8 +84,8 @@ export interface UserClientAddEvent extends BaseUserEvent, UserClientAddData {
   type: USER_EVENT.CLIENT_ADD;
 }
 
-export interface UserClientLegalHoldRequestEvent extends BaseUserEvent, UserClientLegalHoldRequestData {
-  type: USER_EVENT.CLIENT_LEGAL_HOLD_REQUEST;
+export interface UserLegalHoldRequestEvent extends BaseUserEvent, UserLegalHoldRequestData {
+  type: USER_EVENT.LEGAL_HOLD_REQUEST;
 }
 
 export interface UserLegalHoldEnableEvent extends BaseUserEvent, UserLegalHoldEnableData {
