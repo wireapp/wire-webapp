@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.0.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.0.3...@wireapp/api-client@9.0.4) (2019-11-22)
+
+
+### Bug Fixes
+
+* **api-client:** Legal hold request event ([#2578](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2578)) ([f900ab1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/f900ab1a7804594bd16dd1068a47ee753f1e6af2))
+
+
+
+
+
 ## [9.0.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.0.2...@wireapp/api-client@9.0.3) (2019-11-21)
 
 
