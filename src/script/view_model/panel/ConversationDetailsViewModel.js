@@ -87,15 +87,15 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
             users.push(userEntity);
           });
 
-        const userCount = users.length;
-        const exceedsMaxUserCount = userCount > ConversationDetailsViewModel.CONFIG.MAX_USERS_VISIBLE;
-
-        this.showAllUsersCount(exceedsMaxUserCount ? userCount : 0);
         this.serviceParticipants(services);
         if (!this.activeConversation().removed_from_conversation()) {
           users.push(this.activeConversation().selfUser());
-          this.userParticipants(users.sort((userA, userB) => sortByPriority(userA.first_name(), userB.first_name())));
+          users.sort((userA, userB) => sortByPriority(userA.first_name(), userB.first_name()));
         }
+
+        const userCount = users.length;
+        const exceedsMaxUserCount = userCount > ConversationDetailsViewModel.CONFIG.MAX_USERS_VISIBLE;
+        this.showAllUsersCount(exceedsMaxUserCount ? userCount : 0);
         this.userParticipants(users);
       }
     });
