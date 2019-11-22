@@ -1,7 +1,7 @@
 {
   "browser": {
-    "./dist/commonjs/shims/node/buffer": "./dist/commonjs/shims/browser/buffer.js",
-    "./dist/commonjs/shims/node/cookie": "./dist/commonjs/shims/browser/cookie.js"
+    "./dist/shims/node/buffer": "./dist/shims/browser/buffer.js",
+    "./dist/shims/node/cookie": "./dist/shims/browser/cookie.js"
   },
   "dependencies": {
     "@types/node": "~12",
@@ -55,11 +55,11 @@
   },
   "description": "Wire API Client to send and receive data.",
   "files": [
-    "dist/commonjs",
-    "src/main"
+    "dist",
+    "src"
   ],
   "license": "GPL-3.0",
-  "main": "./dist/commonjs/APIClient.js",
+  "main": "./dist/APIClient.js",
   "name": "@wireapp/api-client",
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client",
   "scripts": {
@@ -77,6 +77,5 @@
     "test:node": "cross-env NODE_DEBUG=@wireapp/api-client* jasmine --config=jasmine.json",
     "watch": "webpack-dev-server --config webpack.config.js"
   },
-  "types": "./dist/commonjs/APIClient.d.ts",
   "version": "9.0.4"
 }

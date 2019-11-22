@@ -17,7 +17,7 @@
  *
  */
 
-const {HttpClient, StatusCode} = require('@wireapp/api-client/dist/commonjs/http/');
+const {HttpClient, StatusCode} = require('@wireapp/api-client/dist/http/');
 const axios = require('axios');
 
 describe('HttpClient', () => {

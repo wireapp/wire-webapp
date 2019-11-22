@@ -17,8 +17,8 @@
  *
  */
 
-import {AccessTokenData} from '@wireapp/api-client/src/main/auth/';
 import {Cookie as ToughCookie} from 'tough-cookie';
+import {AccessTokenData} from '../auth';
 
 const obfuscationLengthLimit = 20;
 

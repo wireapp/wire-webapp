@@ -17,9 +17,9 @@
  *
  */
 
-const {BackendErrorMapper} = require('@wireapp/api-client/dist/commonjs/http/');
-const {ConversationIsUnknownError} = require('@wireapp/api-client/dist/commonjs/conversation/');
-const {UserIsUnknownError} = require('@wireapp/api-client/dist/commonjs/user/');
+const {BackendErrorMapper} = require('@wireapp/api-client/dist/http/');
+const {ConversationIsUnknownError} = require('@wireapp/api-client/dist/conversation/');
+const {UserIsUnknownError} = require('@wireapp/api-client/dist/user/');
 
 describe('BackendErrorMapper', () => {
   describe('"map"', () => {

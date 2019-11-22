@@ -19,7 +19,7 @@
 
 /* eslint-disable no-magic-numbers */
 
-const {base64MD5FromBuffer, bufferToString} = require('@wireapp/api-client/dist/commonjs/shims/node/buffer');
+const {base64MD5FromBuffer, bufferToString} = require('@wireapp/api-client/dist/shims/node/buffer');
 
 describe('"base64MD5FromBuffer"', () => {
   it('can generate base64 encoded md5 hash from buffer', () => {
