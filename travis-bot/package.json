@@ -30,5 +30,5 @@
     "test": "exit 0",
     "test:project": "yarn dist && yarn test"
   },
-  "version": "6.0.5"
+  "version": "6.0.6"
 }
