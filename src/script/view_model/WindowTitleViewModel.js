@@ -58,23 +58,7 @@ export class WindowTitleViewModel {
 
         const unreadConversations = this.conversationRepository
           .conversations_unarchived()
-          .filter(conversationEntity => {
-            const {
-              allMessages: unreadMessages,
-              selfMentions: unreadSelfMentions,
-              selfReplies: unreadSelfReplies,
-            } = conversationEntity.unreadState();
-
-            const isIgnored = conversationEntity.isRequest() || conversationEntity.showNotificationsNothing();
-
-            if (isIgnored) {
-              return false;
-            }
-
-            return conversationEntity.showNotificationsMentionsAndReplies()
-              ? unreadSelfMentions.length || unreadSelfReplies.length
-              : unreadMessages.length > 0;
-          }).length;
+          .filter(conversationEntity => conversationEntity.hasUnread()).length;
 
         const unreadCount = connectionRequests + unreadConversations;
 

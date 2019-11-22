@@ -138,16 +138,17 @@ export class Conversation {
       if (!this.selfUser()) {
         return NOTIFICATION_STATE.NOTHING;
       }
+      const mutedState = this.mutedState();
 
       const knownNotificationStates = Object.values(NOTIFICATION_STATE);
-      if (knownNotificationStates.includes(this.mutedState())) {
-        const isStateMentionsAndReplies = this.mutedState() === NOTIFICATION_STATE.MENTIONS_AND_REPLIES;
+      if (knownNotificationStates.includes(mutedState)) {
+        const isStateMentionsAndReplies = mutedState === NOTIFICATION_STATE.MENTIONS_AND_REPLIES;
         const isInvalidState = isStateMentionsAndReplies && !this.selfUser().inTeam();
 
-        return isInvalidState ? NOTIFICATION_STATE.NOTHING : this.mutedState();
+        return isInvalidState ? NOTIFICATION_STATE.NOTHING : mutedState;
       }
 
-      if (typeof this.mutedState() === 'boolean') {
+      if (typeof mutedState === 'boolean') {
         const migratedMutedState = this.selfUser().inTeam()
           ? NOTIFICATION_STATE.MENTIONS_AND_REPLIES
           : NOTIFICATION_STATE.NOTHING;
@@ -287,18 +288,21 @@ export class Conversation {
       return unreadState;
     });
 
-    this.hasUnread = () => {
-      const lastMessage = [...this.messages()].reverse().find(message => message.visible() && message.isIncoming());
-      return !!lastMessage && lastMessage.timestamp() > this.last_read_timestamp();
-    };
+    this.hasUnread = ko.pureComputed(() => {
+      const isIgnored = this.isRequest() || this.showNotificationsNothing();
+      if (isIgnored) {
+        return false;
+      }
+      const {
+        allMessages: unreadMessages,
+        selfMentions: unreadSelfMentions,
+        selfReplies: unreadSelfReplies,
+      } = this.unreadState();
 
-    this.hasUnreadTargeted = () => {
-      const selfId = this.selfUser().id;
-      const lastMessage = [...this.messages()]
-        .reverse()
-        .find(message => !message.user().is_me && message.is_content() && message.isUserTargeted(selfId));
-      return !!lastMessage && lastMessage.timestamp() > this.last_read_timestamp();
-    };
+      return this.showNotificationsMentionsAndReplies()
+        ? unreadSelfMentions.length > 0 || unreadSelfReplies.length > 0
+        : unreadMessages.length > 0;
+    });
 
     /**
      * Display name strategy:
