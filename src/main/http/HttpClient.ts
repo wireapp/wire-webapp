@@ -31,7 +31,7 @@ enum TOPIC {
   ON_CONNECTION_STATE_CHANGE = 'HttpClient.TOPIC.ON_CONNECTION_STATE_CHANGE',
 }
 
-export declare interface HttpClient {
+export interface HttpClient {
   on(event: TOPIC.ON_CONNECTION_STATE_CHANGE, listener: (state: ConnectionState) => void): this;
 }
 
