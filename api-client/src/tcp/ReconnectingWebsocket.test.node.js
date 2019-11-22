@@ -20,7 +20,7 @@
 /* eslint-disable no-magic-numbers */
 
 const {TimeUtil} = require('@wireapp/commons');
-const {ReconnectingWebsocket} = require('@wireapp/api-client/dist/commonjs/tcp/ReconnectingWebsocket');
+const {ReconnectingWebsocket} = require('@wireapp/api-client/dist/tcp/ReconnectingWebsocket');
 const {Server: WebSocketServer} = require('ws');
 
 const reservedPorts = [];

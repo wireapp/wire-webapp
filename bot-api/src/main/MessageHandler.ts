@@ -17,9 +17,9 @@
  *
  */
 
-import {CONVERSATION_TYPING} from '@wireapp/api-client/dist/commonjs/conversation/data';
-import {ConversationEvent, TeamEvent, UserEvent} from '@wireapp/api-client/dist/commonjs/event';
-import {User} from '@wireapp/api-client/dist/commonjs/user/';
+import {CONVERSATION_TYPING} from '@wireapp/api-client/dist/conversation/data';
+import {ConversationEvent, TeamEvent, UserEvent} from '@wireapp/api-client/dist/event';
+import {User} from '@wireapp/api-client/dist/user/';
 import {Account} from '@wireapp/core';
 import {PayloadBundle, ReactionType} from '@wireapp/core/dist/conversation/';
 import {

@@ -17,8 +17,8 @@
  *
  */
 
-const {WebSocketClient} = require('@wireapp/api-client/dist/commonjs/tcp/WebSocketClient');
-const {InvalidTokenError} = require('@wireapp/api-client/dist/commonjs/auth/');
+const {WebSocketClient} = require('@wireapp/api-client/dist/tcp/WebSocketClient');
+const {InvalidTokenError} = require('@wireapp/api-client/dist/auth/');
 
 const accessTokenPayload = {
   access_token:

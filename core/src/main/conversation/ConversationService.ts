@@ -25,11 +25,11 @@ import {
   NewOTRMessage,
   OTRRecipients,
   UserClients,
-} from '@wireapp/api-client/dist/commonjs/conversation/';
-import {CONVERSATION_TYPING, ConversationMemberUpdateData} from '@wireapp/api-client/dist/commonjs/conversation/data/';
-import {ConversationMemberLeaveEvent} from '@wireapp/api-client/dist/commonjs/event/';
-import {StatusCode} from '@wireapp/api-client/dist/commonjs/http/';
-import {UserPreKeyBundleMap} from '@wireapp/api-client/dist/commonjs/user/';
+} from '@wireapp/api-client/dist/conversation/';
+import {CONVERSATION_TYPING, ConversationMemberUpdateData} from '@wireapp/api-client/dist/conversation/data/';
+import {ConversationMemberLeaveEvent} from '@wireapp/api-client/dist/event/';
+import {StatusCode} from '@wireapp/api-client/dist/http/';
+import {UserPreKeyBundleMap} from '@wireapp/api-client/dist/user/';
 import {AxiosError} from 'axios';
 import {Encoder} from 'bazinga64';
 import {

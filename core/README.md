@@ -21,8 +21,8 @@ yarn add @wireapp/core
 ```ts
 import {Account} from '@wireapp/core';
 import {APIClient} from '@wireapp/api-client';
-import {ClientType} from '@wireapp/api-client/dist/commonjs/client';
-import {LoginData} from '@wireapp/api-client/dist/commonjs/auth/';
+import {ClientType} from '@wireapp/api-client/dist/client';
+import {LoginData} from '@wireapp/api-client/dist/auth/';
 import {MemoryEngine} from '@wireapp/store-engine';
 
 const client = new APIClient({store: new MemoryEngine(), urls: APIClient.BACKEND.PRODUCTION});

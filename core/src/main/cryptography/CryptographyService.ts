@@ -18,11 +18,11 @@
  */
 
 import {APIClient} from '@wireapp/api-client';
-import {PreKey as SerializedPreKey} from '@wireapp/api-client/dist/commonjs/auth/';
-import {RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/';
-import {OTRRecipients} from '@wireapp/api-client/dist/commonjs/conversation/';
-import {ConversationOtrMessageAddEvent} from '@wireapp/api-client/dist/commonjs/event';
-import {UserPreKeyBundleMap} from '@wireapp/api-client/dist/commonjs/user/';
+import {PreKey as SerializedPreKey} from '@wireapp/api-client/dist/auth/';
+import {RegisteredClient} from '@wireapp/api-client/dist/client/';
+import {OTRRecipients} from '@wireapp/api-client/dist/conversation/';
+import {ConversationOtrMessageAddEvent} from '@wireapp/api-client/dist/event';
+import {UserPreKeyBundleMap} from '@wireapp/api-client/dist/user/';
 import {Cryptobox} from '@wireapp/cryptobox';
 import {keys as ProteusKeys} from '@wireapp/proteus';
 import {GenericMessage} from '@wireapp/protocol-messaging';

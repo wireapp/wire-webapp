@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "esModuleInterop": true,
-    "outDir": "dist/commonjs",
-    "rootDir": "src/main"
+    "outDir": "dist",
+    "rootDir": "src"
   },
   "exclude": ["dist", "node_modules", "demo.ts"],
   "extends": "../../tsconfig.json"

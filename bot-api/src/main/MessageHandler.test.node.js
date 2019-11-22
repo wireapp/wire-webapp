@@ -20,7 +20,7 @@
 const {MemoryEngine} = require('@wireapp/store-engine');
 const {MessageHandler} = require('@wireapp/bot-api');
 const {Account} = require('@wireapp/core');
-const {CONVERSATION_TYPING} = require('@wireapp/api-client/dist/commonjs/conversation/data/');
+const {CONVERSATION_TYPING} = require('@wireapp/api-client/dist/conversation/data/');
 
 const UUID = require('pure-uuid');
 const UUID_VERSION = 4;

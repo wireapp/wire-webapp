@@ -22,8 +22,8 @@
 const nock = require('nock');
 
 const {APIClient} = require('@wireapp/api-client');
-const {AUTH_TABLE_NAME, AuthAPI} = require('@wireapp/api-client/dist/commonjs/auth/');
-const {UserAPI} = require('@wireapp/api-client/dist/commonjs/user/');
+const {AUTH_TABLE_NAME, AuthAPI} = require('@wireapp/api-client/dist/auth/');
+const {UserAPI} = require('@wireapp/api-client/dist/user/');
 
 describe('APIClient', () => {
   const baseUrl = APIClient.BACKEND.PRODUCTION.rest;

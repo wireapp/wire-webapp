@@ -17,7 +17,7 @@
  *
  */
 
-import {ClientType} from '@wireapp/api-client/dist/commonjs/client/';
+import {ClientType} from '@wireapp/api-client/dist/client/';
 import logdown from 'logdown';
 
 import {ChangelogBot} from './ChangelogBot';

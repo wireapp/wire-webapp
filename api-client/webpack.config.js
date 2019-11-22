@@ -35,8 +35,8 @@ module.exports = {
   devtool: 'source-map',
   entry: {
     [projectName]: `${__dirname}/${pkg.main}`,
-    [`${projectName}.demo`]: `${__dirname}/src/demo/demo.js`,
-    [`${projectName}.test`]: `${__dirname}/src/main/index.test.browser.js`,
+    [`${projectName}.demo`]: `${__dirname}/demo/demo.js`,
+    [`${projectName}.test`]: `${__dirname}/src/index.test.browser.js`,
   },
   externals: {
     'fs-extra': '{}',

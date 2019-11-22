@@ -17,7 +17,7 @@
  *
  */
 
-import {RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/';
+import {RegisteredClient} from '@wireapp/api-client/dist/client/';
 import {CRUDEngine} from '@wireapp/store-engine';
 import {CryptographyService} from '../cryptography/';
 import {MetaClient} from './ClientService';

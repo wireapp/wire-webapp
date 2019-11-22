@@ -17,8 +17,8 @@
  *
  */
 
-import {BackendEvent} from '@wireapp/api-client/dist/commonjs/event';
-import {Notification} from '@wireapp/api-client/dist/commonjs/notification/';
+import {BackendEvent} from '@wireapp/api-client/dist/event';
+import {Notification} from '@wireapp/api-client/dist/notification/';
 import {CRUDEngine} from '@wireapp/store-engine';
 import {CryptographyDatabaseRepository} from '../cryptography/CryptographyDatabaseRepository';
 

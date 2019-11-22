@@ -57,7 +57,7 @@ import {
 } from './team/';
 import {UserAPI} from './user/';
 
-const {version}: {version: string} = require('../../package.json');
+const {version}: {version: string} = require('../package.json');
 
 enum TOPIC {
   ACCESS_TOKEN_REFRESH = 'APIClient.TOPIC.ACCESS_TOKEN_REFRESH',

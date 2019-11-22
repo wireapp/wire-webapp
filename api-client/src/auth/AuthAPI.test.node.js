@@ -18,7 +18,7 @@
  */
 
 const {APIClient} = require('@wireapp/api-client');
-const {ClientType} = require('@wireapp/api-client/dist/commonjs/client/');
+const {ClientType} = require('@wireapp/api-client/dist/client/');
 
 describe('AuthAPI', () => {
   const apiClient = new APIClient();

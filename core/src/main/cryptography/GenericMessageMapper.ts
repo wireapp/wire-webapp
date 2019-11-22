@@ -19,7 +19,7 @@
 
 import logdown from 'logdown';
 
-import {ConversationOtrMessageAddEvent} from '@wireapp/api-client/dist/commonjs/event/';
+import {ConversationOtrMessageAddEvent} from '@wireapp/api-client/dist/event/';
 import {
   GenericMessageType,
   PayloadBundle,

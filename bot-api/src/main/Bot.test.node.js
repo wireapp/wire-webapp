@@ -18,7 +18,7 @@
  */
 
 const {Bot} = require('@wireapp/bot-api');
-const {ClientType} = require('@wireapp/api-client/dist/commonjs/client/');
+const {ClientType} = require('@wireapp/api-client/dist/client/');
 
 describe('Bot', () => {
   let bot;

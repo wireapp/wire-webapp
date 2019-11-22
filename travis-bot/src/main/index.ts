@@ -18,7 +18,7 @@
  */
 
 import {APIClient} from '@wireapp/api-client';
-import {LoginData} from '@wireapp/api-client/dist/commonjs/auth/';
+import {LoginData} from '@wireapp/api-client/dist/auth/';
 import {Account} from '@wireapp/core';
 import {exec} from 'child_process';
 import {promisify} from 'util';
