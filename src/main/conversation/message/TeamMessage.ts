@@ -23,7 +23,7 @@ import {
   TeamMemberJoinData,
   TeamMemberLeaveData,
   TeamUpdateData,
-} from '@wireapp/api-client/dist/commonjs/team/data';
+} from '@wireapp/api-client/dist/team/data';
 import {BasePayloadBundle, PayloadBundleType} from './PayloadBundle';
 
 export interface TeamConversationCreateMessage extends BasePayloadBundle {

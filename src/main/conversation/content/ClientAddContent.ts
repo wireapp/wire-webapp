@@ -17,7 +17,7 @@
  *
  */
 
-import {RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/';
+import {RegisteredClient} from '@wireapp/api-client/dist/client/';
 
 export interface ClientAddContent {
   client: RegisteredClient;

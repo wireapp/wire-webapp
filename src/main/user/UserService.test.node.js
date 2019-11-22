@@ -20,13 +20,13 @@
 const nock = require('nock');
 
 const {Account} = require('@wireapp/core');
-const {UserAPI} = require('@wireapp/api-client/dist/commonjs/user/');
-const {MemberAPI} = require('@wireapp/api-client/dist/commonjs/team/member/');
-const {TeamAPI} = require('@wireapp/api-client/dist/commonjs/team/team/');
-const {BroadcastAPI} = require('@wireapp/api-client/dist/commonjs/broadcast/');
-const {StatusCode} = require('@wireapp/api-client/dist/commonjs/http/');
-const {Backend} = require('@wireapp/api-client/dist/commonjs/env/');
-const {Permissions} = require('@wireapp/api-client/dist/commonjs/team/member/');
+const {UserAPI} = require('@wireapp/api-client/dist/user/');
+const {MemberAPI} = require('@wireapp/api-client/dist/team/member/');
+const {TeamAPI} = require('@wireapp/api-client/dist/team/team/');
+const {BroadcastAPI} = require('@wireapp/api-client/dist/broadcast/');
+const {StatusCode} = require('@wireapp/api-client/dist/http/');
+const {Backend} = require('@wireapp/api-client/dist/env/');
+const {Permissions} = require('@wireapp/api-client/dist/team/member/');
 
 const PayloadHelper = require('../test/PayloadHelper');
 

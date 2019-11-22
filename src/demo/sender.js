@@ -47,7 +47,7 @@ logger.state.isEnabled = true;
 
 const {Account} = require('@wireapp/core');
 const {APIClient} = require('@wireapp/api-client');
-const {ClientType} = require('@wireapp/api-client/dist/commonjs/client/');
+const {ClientType} = require('@wireapp/api-client/dist/client/');
 const {FileEngine} = require('@wireapp/store-engine-fs');
 
 (async () => {

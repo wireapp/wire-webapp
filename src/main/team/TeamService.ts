@@ -25,7 +25,7 @@ import {
   TeamChunkData,
   TeamData,
   UpdateTeamData,
-} from '@wireapp/api-client/dist/commonjs/team/';
+} from '@wireapp/api-client/dist/team/';
 
 export class TeamService {
   constructor(private readonly apiClient: APIClient) {}

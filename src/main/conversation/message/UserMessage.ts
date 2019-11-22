@@ -28,7 +28,7 @@ import {
   UserLegalHoldRequestData,
   UserPropertiesSetData,
   UserUpdateData,
-} from '@wireapp/api-client/dist/commonjs/user/data';
+} from '@wireapp/api-client/dist/user/data';
 import {BasePayloadBundle, PayloadBundleType} from './PayloadBundle';
 
 export interface UserActivateMessage extends BasePayloadBundle {

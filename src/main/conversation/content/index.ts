@@ -18,7 +18,7 @@
  */
 
 export {LegalHoldStatus} from '@wireapp/protocol-messaging';
-export {Connection as ConnectionContent} from '@wireapp/api-client/dist/commonjs/connection/';
+export {Connection as ConnectionContent} from '@wireapp/api-client/dist/connection/';
 
 import * as ContentType from './ContentType';
 export {ContentType};

@@ -25,11 +25,11 @@ import {
   Cookie,
   CookieStore,
   LoginData,
-} from '@wireapp/api-client/dist/commonjs/auth/';
-import {ClientType, RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/';
-import * as Events from '@wireapp/api-client/dist/commonjs/event';
-import {StatusCode} from '@wireapp/api-client/dist/commonjs/http/';
-import {WebSocketClient} from '@wireapp/api-client/dist/commonjs/tcp/';
+} from '@wireapp/api-client/dist/auth/';
+import {ClientType, RegisteredClient} from '@wireapp/api-client/dist/client/';
+import * as Events from '@wireapp/api-client/dist/event';
+import {StatusCode} from '@wireapp/api-client/dist/http/';
+import {WebSocketClient} from '@wireapp/api-client/dist/tcp/';
 import * as cryptobox from '@wireapp/cryptobox';
 import {CRUDEngine, MemoryEngine, error as StoreEngineError} from '@wireapp/store-engine';
 import EventEmitter from 'events';
