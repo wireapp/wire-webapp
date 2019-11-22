@@ -19,10 +19,17 @@
 
 import {Availability} from '@wireapp/protocol-messaging';
 
-import {nameFromType} from '../../user/AvailabilityMapper';
 import {ParticipantAvatar} from 'Components/participantAvatar';
+import {User} from '../../entity/User';
+import {nameFromType} from '../../user/AvailabilityMapper';
 
 import 'Components/availabilityState';
+
+interface UserDetailsProps {
+  participant: User;
+  isVerified?: boolean;
+  badge?: string;
+}
 
 ko.components.register('panel-user-details', {
   template: `
@@ -39,10 +46,13 @@ ko.components.register('panel-user-details', {
         <div class="panel-participant__user-name" data-bind="text: participant().username()" data-uie-name="status-username"></div>
       <!-- /ko -->
 
-      <participant-avatar params="participant: participant, size: ParticipantAvatar.SIZE.X_LARGE" data-uie-name="status-profile-picture"></participant-avatar>
+      <participant-avatar params="participant: participant, size: ${ParticipantAvatar.SIZE.X_LARGE}" data-uie-name="status-profile-picture"></participant-avatar>
 
       <!-- ko if: badge -->
-        <div class="panel-participant__role-label" data-bind="text: badge" data-uie-name="status-partner"></div>
+        <div class="panel-participant__role-label" data-uie-name="status-partner">
+          <partner-icon></partner-icon>
+          <span data-bind="text: badge"></span>
+        </div>
       <!-- /ko -->
 
       <!-- ko if: participant().isGuest() -->
@@ -65,19 +75,16 @@ ko.components.register('panel-user-details', {
       <!-- /ko -->
     </div>
   `,
-  viewModel: class {
-    constructor(params) {
-      this.participant = params.participant;
-      this.isVerified = params.hasOwnProperty('isVerified') ? params.isVerified : this.participant().is_verified;
-      this.badge = params.badge;
-      this.ParticipantAvatar = ParticipantAvatar;
+  viewModel: function(params: UserDetailsProps): void {
+    this.participant = params.participant;
+    this.isVerified = params.hasOwnProperty('isVerified') ? params.isVerified : this.participant().is_verified;
+    this.badge = params.badge;
 
-      this.availabilityLabel = ko.pureComputed(() => {
-        const availabilitySetToNone = this.participant().availability() === Availability.Type.NONE;
-        if (!availabilitySetToNone) {
-          return nameFromType(this.participant().availability());
-        }
-      });
-    }
+    this.availabilityLabel = ko.pureComputed(() => {
+      const availabilitySetToNone = this.participant().availability() === Availability.Type.NONE;
+      if (!availabilitySetToNone) {
+        return nameFromType(this.participant().availability());
+      }
+    });
   },
 });
