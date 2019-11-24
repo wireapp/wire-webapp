@@ -11975,12 +11975,11 @@ stylehacks@^4.0.0:
     postcss "^7.0.0"
     postcss-selector-parser "^3.0.0"
 
-stylelint-config-idiomatic-order@8.0.0:
-  version "8.0.0"
-  resolved "https://registry.yarnpkg.com/stylelint-config-idiomatic-order/-/stylelint-config-idiomatic-order-8.0.0.tgz#568808a66c543ba52b33a868667cf7e02c643dd7"
-  integrity sha512-gUphUZCXnZvM48B1wUw8WnoZsmzG+U9KvTmMD2Luwd73rxq6ulOreROu65IQbJwURN9egz4H5h2G4UGfLEy5Eg==
+stylelint-config-idiomatic-order@8.1.0:
+  version "8.1.0"
+  resolved "https://registry.yarnpkg.com/stylelint-config-idiomatic-order/-/stylelint-config-idiomatic-order-8.1.0.tgz#7ca7fa92eb79369948dd4977499466c844ace21d"
+  integrity sha512-iTPY6JjbkIdzy+21x3a1xi/tG33zKhLJb6lZl1xg6jZrXjgIYelnRZ5xVtbcEP9rElxZq/Zu1eGthfvI+ri+YQ==
   dependencies:
-    stylelint "^11.1.1"
     stylelint-order "^3.1.1"
 
 stylelint-config-prettier@6.0.0:
@@ -11997,7 +11996,7 @@ stylelint-order@^3.1.1:
     postcss "^7.0.17"
     postcss-sorting "^5.0.1"
 
-stylelint@11.1.1, stylelint@^11.1.1:
+stylelint@11.1.1:
   version "11.1.1"
   resolved "https://registry.yarnpkg.com/stylelint/-/stylelint-11.1.1.tgz#6dbbb348036576ac6b033ddfedba72a877c1d6bb"
   integrity sha512-Vx6TAJsxG6qksiFvxQTKriQhp1CqUWdpTDITEkAjTR+l+8Af7qNlvrUDXfpuFJgXh/ayF8xdMSKE+SstcsPmMA==
