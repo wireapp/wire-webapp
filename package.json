@@ -85,7 +85,7 @@
     "@wireapp/eslint-config": "1.2.1",
     "@wireapp/prettier-config": "0.3.0",
     "@wireapp/tslint-config": "1.4.1",
-    "autoprefixer": "9.7.1",
+    "autoprefixer": "9.7.2",
     "babel-eslint": "10.0.3",
     "babel-loader": "8.0.6",
     "babel-plugin-react-intl": "5.1.2",
