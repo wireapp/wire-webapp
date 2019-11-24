@@ -52,7 +52,7 @@
     "@babel/plugin-syntax-dynamic-import": "7.2.0",
     "@babel/preset-env": "7.7.1",
     "@babel/preset-react": "7.7.0",
-    "@babel/preset-typescript": "7.7.2",
+    "@babel/preset-typescript": "7.7.4",
     "@emotion/babel-preset-css-prop": "10.0.23",
     "@hot-loader/react-dom": "16.11.0",
     "@types/enzyme": "3.10.3",
