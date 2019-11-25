@@ -84,10 +84,6 @@ export class HttpClient extends EventEmitter {
     }
   }
 
-  public createUrl(url: string): string {
-    return `${this.baseUrl}${url}`;
-  }
-
   public async _sendRequest<T>(
     config: AxiosRequestConfig,
     tokenAsParam = false,
