@@ -18,6 +18,7 @@
  */
 
 import {AxiosRequestConfig} from 'axios';
+
 import {NewOTRMessage, UserClients} from '../conversation/';
 import {HttpClient} from '../http/';
 import {ValidationError} from '../validation/';

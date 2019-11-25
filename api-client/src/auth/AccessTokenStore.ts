@@ -19,6 +19,7 @@
 
 import EventEmitter from 'events';
 import logdown from 'logdown';
+
 import {AccessTokenData} from '../auth/';
 
 enum TOPIC {

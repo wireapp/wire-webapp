@@ -18,6 +18,7 @@
  */
 
 import {AxiosRequestConfig} from 'axios';
+
 import {HttpClient} from '../http';
 import {CallConfigData} from './CallConfigData';
 
