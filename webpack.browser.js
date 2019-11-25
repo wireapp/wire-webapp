@@ -29,7 +29,6 @@ module.exports = {
     [projectName]: `${__dirname}/${pkg.main}`,
   },
   externals: {
-    dexie: 'Dexie',
     'fs-extra': '{}',
   },
   mode: 'production',

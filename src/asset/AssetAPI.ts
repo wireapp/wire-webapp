@@ -18,6 +18,7 @@
  */
 
 import {AxiosRequestConfig} from 'axios';
+
 import {HttpClient} from '../http/';
 import {base64MD5FromBuffer, concatToBuffer} from '../shims/node/buffer';
 import {unsafeAlphanumeric} from '../shims/node/random';
