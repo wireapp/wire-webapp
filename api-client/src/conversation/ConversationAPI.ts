@@ -385,8 +385,8 @@ export class ConversationAPI {
 
     const response =
       typeof messageData.recipients === 'object'
-        ? await this.client.sendJSON<ClientMismatch>(config)
-        : await this.client.sendProtocolBuffer<ClientMismatch>(config);
+        ? await this.client.sendJSON<ClientMismatch>(config, true)
+        : await this.client.sendProtocolBuffer<ClientMismatch>(config, true);
     return response.data;
   }
 
