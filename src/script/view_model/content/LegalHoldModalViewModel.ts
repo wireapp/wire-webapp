@@ -17,7 +17,7 @@
  *
  */
 
-import {LegalHoldMemberStatus} from '@wireapp/api-client/dist/commonjs/team/legalhold';
+import {LegalHoldMemberStatus} from '@wireapp/api-client/dist/team/legalhold';
 import {amplify} from 'amplify';
 import {UserDevicesHistory, UserDevicesState, makeUserDevicesHistory} from 'Components/userDevices';
 import ko from 'knockout';

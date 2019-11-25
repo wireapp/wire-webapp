@@ -17,8 +17,8 @@
  *
  */
 
-import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/commonjs/event';
-import {Notification, NotificationList} from '@wireapp/api-client/dist/commonjs/notification';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
+import {Notification, NotificationList} from '@wireapp/api-client/dist/notification';
 import {DatabaseKeys} from '@wireapp/core/dist/notification/NotificationDatabaseRepository';
 import {Logger, getLogger} from 'Util/Logger';
 import {EventRecord, StorageSchemata, StorageService} from '../storage/';

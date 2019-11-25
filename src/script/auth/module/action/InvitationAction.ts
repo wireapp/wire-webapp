@@ -17,8 +17,8 @@
  *
  */
 
-import {NewTeamInvitation} from '@wireapp/api-client/dist/commonjs/team';
-import {Role} from '@wireapp/api-client/dist/commonjs/team/member';
+import {NewTeamInvitation} from '@wireapp/api-client/dist/team';
+import {Role} from '@wireapp/api-client/dist/team/member';
 import {ThunkAction} from '../reducer';
 import * as InviteSelector from '../selector/InviteSelector';
 import * as languageSelector from '../selector/LanguageSelector';

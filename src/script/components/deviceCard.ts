@@ -17,7 +17,7 @@
  *
  */
 
-import {ClientClassification} from '@wireapp/api-client/dist/commonjs/client';
+import {ClientClassification} from '@wireapp/api-client/dist/client';
 import {formatTimestamp} from 'Util/TimeUtil';
 import {ClientEntity} from '../client/ClientEntity';
 

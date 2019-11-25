@@ -17,12 +17,7 @@
  *
  */
 
-import {
-  ClientClassification,
-  NewClient,
-  PublicClient,
-  RegisteredClient,
-} from '@wireapp/api-client/dist/commonjs/client/';
+import {ClientClassification, NewClient, PublicClient, RegisteredClient} from '@wireapp/api-client/dist/client/';
 import {amplify} from 'amplify';
 import platform from 'platform';
 
@@ -44,8 +39,8 @@ import {ClientMapper} from './ClientMapper';
 import {ClientService} from './ClientService';
 import {ClientType} from './ClientType';
 
-import {PreKey} from '@wireapp/api-client/dist/commonjs/auth/PreKey';
-import {UserClientAddEvent, UserClientRemoveEvent} from '@wireapp/api-client/dist/commonjs/event';
+import {PreKey} from '@wireapp/api-client/dist/auth/PreKey';
+import {UserClientAddEvent, UserClientRemoveEvent} from '@wireapp/api-client/dist/event';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {User} from '../entity/User';
 import {BackendClientError} from '../error/BackendClientError';

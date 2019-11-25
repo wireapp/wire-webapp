@@ -17,7 +17,7 @@
  *
  */
 
-import {PublicClient} from '@wireapp/api-client/dist/commonjs/client';
+import {PublicClient} from '@wireapp/api-client/dist/client';
 import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
 import {amplify} from 'amplify';
 import ko from 'knockout';

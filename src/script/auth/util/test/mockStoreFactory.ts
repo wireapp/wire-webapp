@@ -21,7 +21,6 @@ const {createLogger} = require('redux-logger');
 import {APIClient} from '@wireapp/api-client';
 import {TypeUtil} from '@wireapp/commons';
 import {Account} from '@wireapp/core';
-import * as StoreEngine from '@wireapp/store-engine';
 import Cookies, {CookiesStatic} from 'js-cookie';
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
@@ -38,7 +37,7 @@ export interface MockStoreParameters {
 }
 
 const defaultActions = actionRoot;
-const defaultClient = new APIClient({store: new StoreEngine.MemoryEngine(), urls: APIClient.BACKEND.STAGING});
+const defaultClient = new APIClient({urls: APIClient.BACKEND.STAGING});
 const defaultCore = new Account(defaultClient);
 const defaultLocalStorage = window.localStorage;
 const defaultCookieStore = Cookies;

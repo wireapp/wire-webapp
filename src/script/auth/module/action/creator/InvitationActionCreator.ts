@@ -17,7 +17,7 @@
  *
  */
 
-import {TeamInvitation} from '@wireapp/api-client/dist/commonjs/team';
+import {TeamInvitation} from '@wireapp/api-client/dist/team';
 
 export enum INVITATION_ACTION {
   INVITE_ADD_START = 'INVITE_ADD_START',
