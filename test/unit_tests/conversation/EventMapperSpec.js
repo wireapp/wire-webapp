@@ -50,7 +50,7 @@ describe('Event Mapper', () => {
 
   describe('mapJsonEvent', () => {
     it('maps text messages without link previews', () => {
-      const event_id = createRandomUuid;
+      const event_id = createRandomUuid();
 
       const event = {
         conversation: conversation_et.id,
@@ -70,8 +70,8 @@ describe('Event Mapper', () => {
       });
     });
 
-    it('maps text messages with deprecated link preview format', () => {
-      const event_id = createRandomUuid;
+    it('maps text messages with deprecated link preview format', async () => {
+      const event_id = createRandomUuid();
 
       const article = new Article({
         permanentUrl: 'test.com',
@@ -84,12 +84,14 @@ describe('Event Mapper', () => {
         urlOffset: 0,
       });
 
+      const base64LinkPreview = await arrayToBase64(LinkPreview.encode(link_preview).finish());
+
       const event = {
         conversation: conversation_et.id,
         data: {
           content: 'test.com',
           nonce: event_id,
-          previews: [arrayToBase64(LinkPreview.encode(link_preview).finish())],
+          previews: [base64LinkPreview],
         },
         from: createRandomUuid,
         id: event_id,
@@ -97,16 +99,16 @@ describe('Event Mapper', () => {
         type: ClientEvent.CONVERSATION.MESSAGE_ADD,
       };
 
-      return event_mapper.mapJsonEvent(event, conversation_et).then(messageEntity => {
-        expect(messageEntity.get_first_asset().text).toBe(event.data.content);
-        expect(messageEntity.get_first_asset().previews().length).toBe(1);
-        expect(messageEntity.get_first_asset().previews()[0].url).toBe('test.com');
-        expect(messageEntity).toBeDefined();
-      });
+      const messageEntity = await event_mapper.mapJsonEvent(event, conversation_et);
+
+      expect(messageEntity.get_first_asset().text).toBe(event.data.content);
+      expect(messageEntity.get_first_asset().previews().length).toBe(1);
+      expect(messageEntity.get_first_asset().previews()[0].url).toBe('test.com');
+      expect(messageEntity).toBeDefined();
     });
 
-    it('maps text messages with link preview', () => {
-      const event_id = createRandomUuid;
+    it('maps text messages with link preview', async () => {
+      const event_id = createRandomUuid();
 
       const link_preview = new LinkPreview({
         article: null,
@@ -117,12 +119,14 @@ describe('Event Mapper', () => {
         urlOffset: 0,
       });
 
+      const base64Preview = await arrayToBase64(LinkPreview.encode(link_preview).finish());
+
       const event = {
         conversation: conversation_et.id,
         data: {
           content: 'test.com',
           nonce: event_id,
-          previews: [arrayToBase64(LinkPreview.encode(link_preview).finish())],
+          previews: [base64Preview],
         },
         from: createRandomUuid,
         id: event_id,
@@ -130,12 +134,12 @@ describe('Event Mapper', () => {
         type: ClientEvent.CONVERSATION.MESSAGE_ADD,
       };
 
-      return event_mapper.mapJsonEvent(event, conversation_et).then(messageEntity => {
-        expect(messageEntity.get_first_asset().text).toBe(event.data.content);
-        expect(messageEntity.get_first_asset().previews().length).toBe(1);
-        expect(messageEntity.get_first_asset().previews()[0].url).toBe(link_preview.url);
-        expect(messageEntity).toBeDefined();
-      });
+      const messageEntity = await event_mapper.mapJsonEvent(event, conversation_et);
+
+      expect(messageEntity.get_first_asset().text).toBe(event.data.content);
+      expect(messageEntity.get_first_asset().previews().length).toBe(1);
+      expect(messageEntity.get_first_asset().previews()[0].url).toBe(link_preview.url);
+      expect(messageEntity).toBeDefined();
     });
 
     it('maps v3 image asset', () => {
@@ -169,7 +173,7 @@ describe('Event Mapper', () => {
       });
     });
 
-    it('filters mentions that are out of range', () => {
+    it('filters mentions that are out of range', async () => {
       const mandy = '@Mandy';
       const randy = '@Randy';
       const text = `Hi ${mandy} and ${randy}.`;
@@ -179,15 +183,17 @@ describe('Event Mapper', () => {
 
       const conversationEntity = new Conversation(createRandomUuid());
 
+      const mentionArrays = await Promise.all([
+        arrayToBase64(Mention.encode(validMention.toProto()).finish()),
+        arrayToBase64(Mention.encode(outOfRangeMention.toProto()).finish()),
+      ]);
+
       const event = {
         category: 16,
         conversation: conversationEntity.id,
         data: {
           content: text,
-          mentions: [
-            arrayToBase64(Mention.encode(validMention.toProto()).finish()),
-            arrayToBase64(Mention.encode(outOfRangeMention.toProto()).finish()),
-          ],
+          mentions: mentionArrays,
           previews: [],
         },
         from: createRandomUuid(),
@@ -197,14 +203,13 @@ describe('Event Mapper', () => {
         type: 'conversation.message-add',
       };
 
-      event_mapper.mapJsonEvent(event, conversationEntity).then(messageEntity => {
-        const mentions = messageEntity.get_first_asset().mentions();
+      const messageEntity = await event_mapper.mapJsonEvent(event, conversationEntity);
+      const mentions = messageEntity.get_first_asset().mentions();
 
-        expect(mentions.length).toBe(1);
-      });
+      expect(mentions.length).toBe(1);
     });
 
-    it('filters mentions that are overlapping', () => {
+    it('filters mentions that are overlapping', async () => {
       const mandy = '@Mandy';
       const randy = '@Randy';
       const sandy = '@Sandy';
@@ -220,16 +225,18 @@ describe('Event Mapper', () => {
 
       const conversationEntity = new Conversation(createRandomUuid());
 
+      const mentionArrays = await Promise.all([
+        arrayToBase64(Mention.encode(validMention1.toProto()).finish()),
+        arrayToBase64(Mention.encode(overlappingMention.toProto()).finish()),
+        arrayToBase64(Mention.encode(validMention2.toProto()).finish()),
+      ]);
+
       const event = {
         category: 16,
         conversation: conversationEntity.id,
         data: {
           content: text,
-          mentions: [
-            arrayToBase64(Mention.encode(validMention1.toProto()).finish()),
-            arrayToBase64(Mention.encode(overlappingMention.toProto()).finish()),
-            arrayToBase64(Mention.encode(validMention2.toProto()).finish()),
-          ],
+          mentions: mentionArrays,
           previews: [],
         },
         from: createRandomUuid(),
@@ -239,11 +246,10 @@ describe('Event Mapper', () => {
         type: 'conversation.message-add',
       };
 
-      event_mapper.mapJsonEvent(event, conversationEntity).then(messageEntity => {
-        const mentions = messageEntity.get_first_asset().mentions();
+      const messageEntity = await event_mapper.mapJsonEvent(event, conversationEntity);
+      const mentions = messageEntity.get_first_asset().mentions();
 
-        expect(mentions.length).toBe(2);
-      });
+      expect(mentions.length).toBe(2);
     });
   });
 

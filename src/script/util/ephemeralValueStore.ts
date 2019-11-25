@@ -17,7 +17,7 @@
  *
  */
 
-import {Config} from '../auth/config';
+import {Config} from '../Config';
 
 /**
  * The value store util allows storing a single value across page navigation.

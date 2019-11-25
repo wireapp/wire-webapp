@@ -22,7 +22,7 @@ import ko from 'knockout';
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 
-import {Config} from '../auth/config';
+import {Config} from '../Config';
 import {WebAppEvents} from '../event/WebApp';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {ContentViewModel} from './ContentViewModel';
@@ -58,23 +58,7 @@ export class WindowTitleViewModel {
 
         const unreadConversations = this.conversationRepository
           .conversations_unarchived()
-          .filter(conversationEntity => {
-            const {
-              allMessages: unreadMessages,
-              selfMentions: unreadSelfMentions,
-              selfReplies: unreadSelfReplies,
-            } = conversationEntity.unreadState();
-
-            const isIgnored = conversationEntity.isRequest() || conversationEntity.showNotificationsNothing();
-
-            if (isIgnored) {
-              return false;
-            }
-
-            return conversationEntity.showNotificationsMentionsAndReplies()
-              ? unreadSelfMentions.length || unreadSelfReplies.length
-              : unreadMessages.length > 0;
-          }).length;
+          .filter(conversationEntity => conversationEntity.hasUnread()).length;
 
         const unreadCount = connectionRequests + unreadConversations;
 

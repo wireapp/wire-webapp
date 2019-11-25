@@ -25,7 +25,7 @@ import {deArrayify} from 'Util/ArrayUtil';
 import {truncate} from 'Util/StringUtil';
 import {isTweetUrl} from 'Util/ValidationUtil';
 
-import {config} from '../config';
+import {Config} from '../Config';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 
 /**
@@ -49,8 +49,8 @@ export const buildFromOpenGraphData = (data: OpenGraphData, link: string, offset
 
   const {description = '', site_name, title = '', url: dataUrl} = data;
 
-  const truncatedDescription = truncate(deArrayify(description), config.MAXIMUM_LINK_PREVIEW_CHARS);
-  const truncatedTitle = truncate(deArrayify(title), config.MAXIMUM_LINK_PREVIEW_CHARS);
+  const truncatedDescription = truncate(deArrayify(description), Config.MAXIMUM_LINK_PREVIEW_CHARS);
+  const truncatedTitle = truncate(deArrayify(title), Config.MAXIMUM_LINK_PREVIEW_CHARS);
 
   const protoArticle = new Article({
     permanentUrl: deArrayify(dataUrl),

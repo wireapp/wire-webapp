@@ -35,7 +35,7 @@ import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 import {modals, ModalsViewModel} from '../ModalsViewModel';
 import {User} from '../../entity/User';
 
-import {Config} from '../../auth/config';
+import {Config} from '../../Config';
 import {ConsentValue} from '../../user/ConsentValue';
 import {validateCharacter, validateHandle} from '../../user/UserHandleGenerator';
 import {UserRepository} from '../../user/UserRepository';
@@ -134,7 +134,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.createTeamUrl = getCreateTeamUrl('client');
 
     this.isTemporaryAndNonPersistent = isTemporaryClientAndNonPersistent;
-    this.isConsentCheckEnabled = () => z.config.FEATURE.CHECK_CONSENT;
+    this.isConsentCheckEnabled = () => Config.FEATURE.CHECK_CONSENT;
     this.canEditProfile = user => user.managedBy() === User.CONFIG.MANAGED_BY.WIRE;
 
     this.updateProperties(this.propertiesRepository.properties);
@@ -341,9 +341,9 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   setPicture(newUserPicture) {
-    const isTooLarge = newUserPicture.size > z.config.MAXIMUM_IMAGE_FILE_SIZE;
+    const isTooLarge = newUserPicture.size > Config.MAXIMUM_IMAGE_FILE_SIZE;
     if (isTooLarge) {
-      const maximumSizeInMB = z.config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024;
+      const maximumSizeInMB = Config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024;
       const messageString = t('modalPictureTooLargeMessage', maximumSizeInMB);
       const titleString = t('modalPictureTooLargeHeadline');
 

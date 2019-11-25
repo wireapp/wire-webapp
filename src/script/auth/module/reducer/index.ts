@@ -22,7 +22,7 @@ import {Account} from '@wireapp/core';
 import {CookiesStatic} from 'js-cookie';
 import {ActionCreatorsMapObject, AnyAction, Dispatch, bindActionCreators as bindActionCreatorsRedux} from 'redux';
 import {ThunkAction as ReduxThunkAction, ThunkDispatch as ReduxThunkDispatch} from 'redux-thunk';
-import {Config} from '../../config';
+import {Config} from '../../../Config';
 import {ActionRoot} from '../action';
 import {AuthState, authReducer, initialState as initialAuthState} from './authReducer';
 import {ClientState, clientReducer, initialState as initialClientState} from './clientReducer';

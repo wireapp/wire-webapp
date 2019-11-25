@@ -25,7 +25,7 @@ import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {clamp} from 'Util/NumberUtil';
 import {compareTransliteration, startsWith, getFirstChar} from 'Util/StringUtil';
 
-import {ACCENT_ID} from '../config';
+import {ACCENT_ID} from '../Config';
 import {ROLE as TEAM_ROLE} from '../user/UserPermission';
 import {WebAppEvents} from '../event/WebApp';
 import {ConnectionEntity} from '../connection/ConnectionEntity';

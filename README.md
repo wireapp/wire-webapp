@@ -92,6 +92,7 @@ The command to run is:
 **Example**
 
 ```
+git fetch origin
 git checkout 90fda951916f0d60a5bffce69a7267830e313391
 git tag 2019-04-23-staging.0
 git push origin --tags

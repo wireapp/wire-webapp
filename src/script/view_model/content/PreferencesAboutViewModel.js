@@ -18,7 +18,7 @@
  */
 
 import {getLogger} from 'Util/Logger';
-import {Config} from '../../auth/config';
+import {Config} from '../../Config';
 
 import {
   getPrivacyPolicyUrl,

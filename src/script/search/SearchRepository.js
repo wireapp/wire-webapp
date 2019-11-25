@@ -19,7 +19,7 @@
 
 import {getLogger} from 'Util/Logger';
 import {EMOJI_RANGES} from 'Util/EmojiUtil';
-import {compareTransliteration, startsWith, computeTransliteration, sortByPriority} from 'Util/StringUtil';
+import {startsWith, computeTransliteration, sortByPriority, transliterationIndex} from 'Util/StringUtil';
 
 import {SearchService} from './SearchService';
 import {validateHandle} from '../user/UserHandleGenerator';
@@ -79,15 +79,26 @@ export class SearchRepository {
     if (term === '') {
       return userEntities;
     }
+    const excludedEmojis = Array.from(term).reduce((emojis, char) => {
+      const isEmoji = EMOJI_RANGES.includes(char);
+      if (isEmoji) {
+        emojis[char] = char;
+      }
+      return emojis;
+    }, {});
+    const termSlug = computeTransliteration(term, excludedEmojis);
     const weightedResults = userEntities.reduce((results, userEntity) => {
-      const matchWeight = properties
+      const values = properties
         .slice()
         .reverse()
-        .reduce((weight, property, index) => {
-          const propertyWeight = 10 * index + 1;
-          const propertyMatchWeight = this._matches(term, property, userEntity);
-          return weight + propertyMatchWeight * propertyWeight;
-        }, 0);
+        .map(property => (typeof userEntity[property] === 'function' ? userEntity[property]() : userEntity[property]));
+
+      const uniqueValues = Array.from(new Set(values));
+      const matchWeight = uniqueValues.reduce((weight, value, index) => {
+        const propertyWeight = 10 * index + 1;
+        const propertyMatchWeight = this._matches(term, termSlug, excludedEmojis, value);
+        return weight + propertyMatchWeight * propertyWeight;
+      }, 0);
 
       return matchWeight === 0 ? results : results.concat({user: userEntity, weight: matchWeight});
     }, []);
@@ -102,38 +113,34 @@ export class SearchRepository {
       .map(result => result.user);
   }
 
-  _matches(term, property, userEntity) {
-    const excludedEmojis = Array.from(term).reduce((emojis, char) => {
-      const isEmoji = EMOJI_RANGES.includes(char);
-      return isEmoji ? Object.assign({}, emojis, {[char]: char}) : emojis;
-    }, {});
-    const value = typeof userEntity[property] === 'function' ? userEntity[property]() : userEntity[property];
-
+  _matches(term, termSlug, excludedChars, value) {
     const isStrictMatch = (value || '').toLowerCase().startsWith(term.toLowerCase());
     if (isStrictMatch) {
       // if the pattern matches the raw text, give the maximum value to the match
       return 100;
     }
-    const isStrictTransliteratedMatch = compareTransliteration(value, term, excludedEmojis, true);
+    const nameSlug = computeTransliteration(value, excludedChars);
+    const nameIndex = transliterationIndex(nameSlug, termSlug);
+    const isStrictTransliteratedMatch = nameIndex === 0;
     if (isStrictTransliteratedMatch) {
       // give a little less points if the pattern strictly matches the transliterated string
       return 50;
     }
-    const isLoosyMatch = compareTransliteration(value, term, excludedEmojis, false);
-    if (!isLoosyMatch) {
-      // if the pattern doesn't match loosely, then it's not a match at all
+    const noMatch = nameIndex < 0;
+    if (noMatch) {
       return 0;
     }
 
-    const tokens = computeTransliteration(value).split(/-/g);
+    const tokens = nameSlug.split(/-/g);
     // computing the match value by testing all components of the property
     return tokens.reverse().reduce((weight, token, index) => {
       const indexWeight = index + 1;
       let tokenWeight = 0;
+      const tokenIndex = transliterationIndex(token, termSlug);
 
-      if (compareTransliteration(token, term, excludedEmojis, true)) {
+      if (tokenIndex === 0) {
         tokenWeight = indexWeight * 10;
-      } else if (compareTransliteration(token, term, excludedEmojis, false)) {
+      } else if (tokenIndex > 0) {
         tokenWeight = indexWeight;
       }
 
