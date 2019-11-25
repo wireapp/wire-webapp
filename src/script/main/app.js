@@ -214,13 +214,13 @@ class App {
       repositories.cryptography,
       repositories.event,
       repositories.giphy,
-      new LinkPreviewRepository(new AssetService(resolve(graph.BackendClient)), repositories.properties),
+      new LinkPreviewRepository(this.service.asset, repositories.properties),
       sendingMessageQueue,
       serverTimeHandler,
       repositories.team,
       repositories.user,
       repositories.properties,
-      new AssetUploader(new AssetService(resolve(graph.BackendClient))),
+      new AssetUploader(this.service.asset),
     );
 
     const serviceMiddleware = new ServiceMiddleware(repositories.conversation, repositories.user);

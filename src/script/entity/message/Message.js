@@ -284,16 +284,6 @@ export class Message {
    */
   is_expired = () => this.ephemeral_expires() === true;
 
-  isIncoming = () => {
-    if (this.user().is_me) {
-      return false;
-    }
-    const isMissedCall = this.is_call() && !this.was_completed();
-    const isPing = this.is_ping();
-    const isMessage = this.is_content();
-    return isMissedCall || isPing || isMessage;
-  };
-
   /**
    * Check if message has an unavailable (uploading or failed) asset.
    * @returns {boolean} True, if an asset is unavailable.
