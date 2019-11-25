@@ -18,7 +18,7 @@
  */
 
 import {TimeUtil} from '@wireapp/commons';
-import {Priority, PriorityQueue} from '@wireapp/priority-queue';
+import {PriorityQueue} from '@wireapp/priority-queue';
 import axios, {AxiosError, AxiosRequestConfig, AxiosResponse} from 'axios';
 import EventEmitter from 'events';
 import logdown from 'logdown';
@@ -185,29 +185,34 @@ export class HttpClient extends EventEmitter {
   public async sendRequest<T>(
     config: AxiosRequestConfig,
     tokenAsParam: boolean = false,
-    priority = Priority.MEDIUM,
+    isSynchronousRequest: boolean = false,
   ): Promise<AxiosResponse<T>> {
-    return this.requestQueue.add(() => this._sendRequest<T>(config, tokenAsParam), priority);
+    return isSynchronousRequest
+      ? this.requestQueue.add(() => this._sendRequest<T>(config, tokenAsParam))
+      : this._sendRequest<T>(config, tokenAsParam);
   }
 
-  public sendJSON<T>(config: AxiosRequestConfig): Promise<AxiosResponse<T>> {
+  public sendJSON<T>(config: AxiosRequestConfig, isSynchronousRequest: boolean = false): Promise<AxiosResponse<T>> {
     config.headers = {
       ...config.headers,
       'Content-Type': ContentType.APPLICATION_JSON,
     };
-    return this.sendRequest<T>(config);
+    return this.sendRequest<T>(config, isSynchronousRequest);
   }
 
-  public sendXML<T>(config: AxiosRequestConfig): Promise<AxiosResponse<T>> {
+  public sendXML<T>(config: AxiosRequestConfig, isSynchronousRequest: boolean = false): Promise<AxiosResponse<T>> {
     config.headers = {
       ...config.headers,
       'Content-Type': ContentType.APPLICATION_XML,
     };
-    return this.sendRequest<T>(config);
+    return this.sendRequest<T>(config, isSynchronousRequest);
   }
 
-  public sendProtocolBuffer<T>(config: AxiosRequestConfig): Promise<AxiosResponse<T>> {
+  public sendProtocolBuffer<T>(
+    config: AxiosRequestConfig,
+    isSynchronousRequest: boolean = false,
+  ): Promise<AxiosResponse<T>> {
     config.headers['Content-Type'] = ContentType.APPLICATION_PROTOBUF;
-    return this.sendRequest<T>(config);
+    return this.sendRequest<T>(config, isSynchronousRequest);
   }
 }

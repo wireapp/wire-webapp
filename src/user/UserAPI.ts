@@ -257,7 +257,7 @@ export class UserAPI {
       url: `${UserAPI.URL.USERS}/${userId}/${UserAPI.URL.PRE_KEYS}`,
     };
 
-    const response = await this.client.sendJSON<PreKeyBundle>(config);
+    const response = await this.client.sendJSON<PreKeyBundle>(config, true);
     return response.data;
   }
 
@@ -398,7 +398,7 @@ export class UserAPI {
       url: `${UserAPI.URL.USERS}/${UserAPI.URL.PRE_KEYS}`,
     };
 
-    const response = await this.client.sendJSON<UserPreKeyBundleMap>(config);
+    const response = await this.client.sendJSON<UserPreKeyBundleMap>(config, true);
     return response.data;
   }
 

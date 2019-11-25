@@ -79,7 +79,7 @@ export class ClientAPI {
       url: `${ClientAPI.URL.CLIENTS}/${clientId}/prekeys`,
     };
 
-    const response = await this.client.sendJSON<PreKeyBundle>(config);
+    const response = await this.client.sendJSON<PreKeyBundle>(config, true);
     return response.data;
   }
 }
