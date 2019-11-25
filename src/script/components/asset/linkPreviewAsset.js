@@ -71,7 +71,7 @@ ko.components.register('link-preview-asset', {
         <!-- ko if: !preview || !preview.image_resource() -->
           <div class="link-preview-image-placeholder icon-link"></div>
         <!-- /ko -->
-        <!-- ko if: preview.image_resource() -->
+        <!-- ko if: preview && preview.image_resource() -->
           <image-component class="link-preview-image" params="asset: preview.image_resource" data-uie-name="link-preview-image"></image-component>
         <!-- /ko -->
       </div>
