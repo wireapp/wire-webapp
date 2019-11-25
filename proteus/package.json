@@ -9,7 +9,7 @@
   },
   "description": "Axolotl protocol implementation for JavaScript.",
   "devDependencies": {
-    "@types/jasmine": "3.4.6",
+    "@types/jasmine": "3.5.0",
     "@types/libsodium-wrappers-sumo": "0.7.3",
     "bower": "1.8.8",
     "chai": "4.2.0",
