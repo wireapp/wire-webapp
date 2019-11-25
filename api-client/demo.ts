@@ -17,12 +17,21 @@
  *
  */
 
+import {CRUDEngine} from '@wireapp/store-engine';
 import {FileEngine} from '@wireapp/store-engine-fs';
 import logdown from 'logdown';
 import path from 'path';
 
 import {APIClient} from './src/APIClient';
-import {AUTH_ACCESS_TOKEN_KEY, AUTH_COOKIE_KEY, AUTH_TABLE_NAME, AccessTokenData, Cookie} from './src/auth';
+import {
+  AUTH_ACCESS_TOKEN_KEY,
+  AUTH_COOKIE_KEY,
+  AUTH_TABLE_NAME,
+  AccessTokenData,
+  Context,
+  Cookie,
+  LoginData,
+} from './src/auth';
 import {ClientType} from './src/client';
 import {WebSocketClient} from './src/tcp';
 
@@ -38,6 +47,20 @@ logger.state.isEnabled = true;
 logger.log(`Using "process.env.WIRE_EMAIL": ${WIRE_EMAIL}`);
 logger.log(`Using "process.env.WIRE_PASSWORD": ${WIRE_PASSWORD}`);
 logger.log(`Using "process.env.WIRE_CONVERSATION_ID": ${WIRE_CONVERSATION_ID}`);
+
+async function createContext(storeEngine: CRUDEngine, apiClient: APIClient, loginData: LoginData): Promise<Context> {
+  try {
+    const {expiration, zuid} = await storeEngine.read(AUTH_TABLE_NAME, AUTH_COOKIE_KEY);
+    const cookie = new Cookie(zuid, expiration);
+    logger.log(`Found cookie "${zuid}".`);
+    logger.log('Logging in with EXISTING cookie.');
+    return apiClient.init(loginData.clientType, cookie);
+  } catch (error) {
+    logger.log(`Failed to find existing cookie.`, error);
+    logger.log(`Logging in with NEW cookie: ${error.message}`);
+    return apiClient.login(loginData);
+  }
+}
 
 if (WIRE_EMAIL && WIRE_PASSWORD && WIRE_CONVERSATION_ID) {
   const login = {
@@ -74,20 +97,7 @@ if (WIRE_EMAIL && WIRE_PASSWORD && WIRE_CONVERSATION_ID) {
       }
     });
 
-    let context;
-
-    try {
-      // Trying to login (works only if there is already a valid cookie stored in the FileEngine)
-      const {expiration, zuid} = await storeEngine.read(AUTH_TABLE_NAME, AUTH_COOKIE_KEY);
-      const cookie = new Cookie(zuid, expiration);
-      context = await apiClient.init(ClientType.NONE, cookie);
-      logger.log(`Logged in with EXISTING cookie.`);
-    } catch (error) {
-      logger.log('Failed to find existing cookie.', error);
-      context = await apiClient.login(login);
-      logger.log(`Logged in with NEW cookie.`);
-    }
-
+    const context = await createContext(storeEngine, apiClient, login);
     logger.log(`Got self user with ID "${context.userId}".`);
 
     try {
