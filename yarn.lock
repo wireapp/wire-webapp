@@ -1892,10 +1892,10 @@
     logdown "3.2.8"
     rimraf "3.0.0"
 
-"@wireapp/core@15.1.0":
-  version "15.1.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-15.1.0.tgz#f80b923f2d36edee1dbd63be98d46963ca90c33c"
-  integrity sha512-D6WTI2qpfGF3qWTHwK1u3y7MAfzROhYHxUH8FO3cO7nW4iOIaI3DJDd+RUJA1TxFISZ/D7bl+wBuY2KuU/0HEQ==
+"@wireapp/core@15.1.1":
+  version "15.1.1"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-15.1.1.tgz#bd019ca81f5e45527223ebd09a443b9317201777"
+  integrity sha512-DGkaCeq73FCul8NLLxqqZTGdtRz8YdCNXNDnbvR60FT8nL9e/uUnz7xLKN7HmtXuzXFBfmiW0eFG6LfStgwZOw==
   dependencies:
     "@types/long" "4.0.0"
     "@types/node" "~12"
