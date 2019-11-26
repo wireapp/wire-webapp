@@ -28,10 +28,11 @@ import {arrayToBase64, base64ToArray, isTemporaryClientAndNonPersistent, zeroPad
 
 import {CryptographyMapper} from './CryptographyMapper';
 import {CryptographyService} from './CryptographyService';
+
+import {Config} from '../Config';
 import {WebAppEvents} from '../event/WebApp';
 import {EventName} from '../tracking/EventName';
 import {ClientEntity} from '../client/ClientEntity';
-
 import {BackendClientError} from '../error/BackendClientError';
 
 export class CryptographyRepository {
@@ -311,9 +312,9 @@ export class CryptographyRepository {
     }
 
     // Check the length of the message
-    const genericMessageIsTooBig = eventData.text.length > z.config.MAXIMUM_MESSAGE_LENGTH_RECEIVING;
+    const genericMessageIsTooBig = eventData.text.length > Config.MAXIMUM_MESSAGE_LENGTH_RECEIVING;
     const isExternal = typeof eventData.data === 'string';
-    const externalMessageIsTooBig = isExternal && eventData.data.length > z.config.MAXIMUM_MESSAGE_LENGTH_RECEIVING;
+    const externalMessageIsTooBig = isExternal && eventData.data.length > Config.MAXIMUM_MESSAGE_LENGTH_RECEIVING;
     if (genericMessageIsTooBig || externalMessageIsTooBig) {
       const error = new ProteusErrors.DecryptError.InvalidMessage('The received message was too big.', 300);
       const errorEvent = z.conversation.EventBuilder.buildIncomingMessageTooBig(event, error, error.code);

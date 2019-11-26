@@ -19,7 +19,6 @@
 
 import ko from 'knockout';
 import {ConversationLabel} from '../../conversation/ConversationLabelRepository';
-import {NOTIFICATION_STATE} from '../../conversation/NotificationSetting';
 
 interface GroupedConversationHeaderParams {
   conversationLabel: ConversationLabel;
@@ -40,21 +39,7 @@ ko.components.register('grouped-conversation-header', {
     this.label = conversationLabel;
     this.isOpen = isOpen;
     this.badge = ko.pureComputed(
-      () =>
-        conversationLabel.conversations().filter(conversation => {
-          const mutedState = conversation.mutedState();
-          if (typeof mutedState === 'boolean') {
-            const isMuted = mutedState === true;
-            return isMuted ? false : conversation.hasUnread();
-          }
-          if (mutedState === NOTIFICATION_STATE.NOTHING) {
-            return false;
-          }
-          if (mutedState === NOTIFICATION_STATE.MENTIONS_AND_REPLIES) {
-            return conversation.hasUnreadTargeted();
-          }
-          return conversation.hasUnread();
-        }).length,
+      () => conversationLabel.conversations().filter(conversation => conversation.hasUnread()).length,
     );
   },
 });

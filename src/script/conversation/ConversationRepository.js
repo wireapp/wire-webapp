@@ -96,7 +96,7 @@ import {StatusType} from '../message/StatusType';
 import {SuperType} from '../message/SuperType';
 import {MessageCategory} from '../message/MessageCategory';
 import {ReactionType} from '../message/ReactionType';
-import {Config} from '../auth/config';
+import {Config} from '../Config';
 
 import {BaseError} from '../error/BaseError';
 import {BackendClientError} from '../error/BackendClientError';
@@ -577,7 +577,7 @@ export class ConversationRepository {
       : new Date(conversationEntity.get_latest_timestamp(this.serverTimeHandler.toServerTimestamp()) + 1);
 
     return this.eventService
-      .loadPrecedingEvents(conversationEntity.id, new Date(0), upperBound, z.config.MESSAGES_FETCH_LIMIT)
+      .loadPrecedingEvents(conversationEntity.id, new Date(0), upperBound, Config.MESSAGES_FETCH_LIMIT)
       .then(events => this._addPrecedingEventsToConversation(events, conversationEntity))
       .then(mappedMessageEntities => {
         conversationEntity.is_pending(false);
@@ -586,7 +586,7 @@ export class ConversationRepository {
   }
 
   _addPrecedingEventsToConversation(events, conversationEntity) {
-    const hasAdditionalMessages = events.length === z.config.MESSAGES_FETCH_LIMIT;
+    const hasAdditionalMessages = events.length === Config.MESSAGES_FETCH_LIMIT;
 
     return this._addEventsToConversation(events, conversationEntity).then(mappedMessageEntities => {
       conversationEntity.hasAdditionalMessages(hasAdditionalMessages);
@@ -676,7 +676,7 @@ export class ConversationRepository {
     conversationEntity.is_pending(true);
 
     return this.eventService
-      .loadFollowingEvents(conversationEntity.id, messageDate, z.config.MESSAGES_FETCH_LIMIT, includeMessage)
+      .loadFollowingEvents(conversationEntity.id, messageDate, Config.MESSAGES_FETCH_LIMIT, includeMessage)
       .then(events => this._addEventsToConversation(events, conversationEntity))
       .then(mappedNessageEntities => {
         conversationEntity.is_pending(false);

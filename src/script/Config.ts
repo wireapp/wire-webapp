@@ -17,7 +17,8 @@
  *
  */
 
-window.z = window.z || {};
+import {ValidationUtil} from '@wireapp/commons';
+import * as UUID from 'uuid/v4';
 
 const env = window.wire.env;
 
@@ -31,54 +32,61 @@ export const ACCENT_ID = {
   YELLOW: 3,
 };
 
-// TODO: Deprecated. Should be replaced with "src/script/auth/config.ts".
-export const config = {
-  FEATURE: {
-    APPLOCK_SCHEDULED_TIMEOUT: env.FEATURE && env.FEATURE.APPLOCK_SCHEDULED_TIMEOUT,
-    APPLOCK_UNFOCUS_TIMEOUT: env.FEATURE && env.FEATURE.APPLOCK_UNFOCUS_TIMEOUT,
-    CHECK_CONSENT: env.FEATURE && env.FEATURE.CHECK_CONSENT,
-    DEFAULT_LOGIN_TEMPORARY_CLIENT: env.FEATURE && env.FEATURE.DEFAULT_LOGIN_TEMPORARY_CLIENT,
-    ENABLE_ACCOUNT_REGISTRATION: env.FEATURE && env.FEATURE.ENABLE_ACCOUNT_REGISTRATION,
-    ENABLE_DEBUG: env.FEATURE && env.FEATURE.ENABLE_DEBUG,
-    ENABLE_PHONE_LOGIN: env.FEATURE && env.FEATURE.ENABLE_PHONE_LOGIN,
-    ENABLE_SSO: env.FEATURE && env.FEATURE.ENABLE_SSO,
-    SHOW_LOADING_INFORMATION: env.FEATURE && env.FEATURE.SHOW_LOADING_INFORMATION,
-  },
+export class Configuration {
+  readonly APP_BASE = env.APP_BASE || 'https://app.wire.com';
+  readonly APP_NAME = env.APP_NAME || 'Webapp';
+  readonly APP_INSTANCE_ID = UUID();
+  readonly BACKEND_REST = env.BACKEND_REST || 'https://prod-nginz-https.wire.com';
+  readonly BACKEND_WS = env.BACKEND_WS || 'wss://prod-nginz-ssl.wire.com';
+  readonly BRAND_NAME = env.BRAND_NAME || 'Wire';
+  readonly ENVIRONMENT = env.ENVIRONMENT || 'production';
+  readonly FEATURE = env.FEATURE;
+  readonly MAX_GROUP_PARTICIPANTS = env.MAX_GROUP_PARTICIPANTS || 500;
+  readonly MAX_VIDEO_PARTICIPANTS = env.MAX_VIDEO_PARTICIPANTS || 4;
+  readonly NEW_PASSWORD_MINIMUM_LENGTH = env.NEW_PASSWORD_MINIMUM_LENGTH || ValidationUtil.DEFAULT_PASSWORD_MIN_LENGTH;
+  readonly URL = env.URL || {
+    ACCOUNT_BASE: 'https://account.wire.com',
+    MOBILE_BASE: '',
+    SUPPORT_BASE: 'https://support.wire.com',
+    TEAMS_BASE: 'https://teams.wire.com',
+    WEBSITE_BASE: 'https://wire.com',
+  };
+  readonly VERSION = env.VERSION || '0.0.0';
 
   // 10 seconds until phone code expires
-  LOGIN_CODE_EXPIRATION: 10 * 60,
+  readonly LOGIN_CODE_EXPIRATION = 10 * 60;
 
   // 25 megabyte upload limit for personal use (private users & guests)
-  MAXIMUM_ASSET_FILE_SIZE_PERSONAL: 25 * 1024 * 1024,
+  readonly MAXIMUM_ASSET_FILE_SIZE_PERSONAL = 25 * 1024 * 1024;
 
   // 100 megabyte upload limit for organizations (team members)
-  MAXIMUM_ASSET_FILE_SIZE_TEAM: 100 * 1024 * 1024,
+  readonly MAXIMUM_ASSET_FILE_SIZE_TEAM = 100 * 1024 * 1024;
 
   // 15 megabyte image upload limit
-  MAXIMUM_IMAGE_FILE_SIZE: 15 * 1024 * 1024,
+  readonly MAXIMUM_IMAGE_FILE_SIZE = 15 * 1024 * 1024;
 
   // maximum chars for link preview titles and descriptions
-  MAXIMUM_LINK_PREVIEW_CHARS: 200,
+  readonly MAXIMUM_LINK_PREVIEW_CHARS = 200;
 
   // Maximum characters per sent message
-  MAXIMUM_MESSAGE_LENGTH: 8000,
+  readonly MAXIMUM_MESSAGE_LENGTH = 8000;
 
   // Maximum characters per received message
   // Encryption is approx. +40% of the original payload so let's round it at +50%
-  MAXIMUM_MESSAGE_LENGTH_RECEIVING: 12000 * 1.5,
+  readonly MAXIMUM_MESSAGE_LENGTH_RECEIVING = 12000 * 1.5;
 
   // bigger requests will be split in chunks with a maximum size as defined
-  MAXIMUM_USERS_PER_REQUEST: 200,
+  readonly MAXIMUM_USERS_PER_REQUEST = 200;
 
   // number of messages that will be pulled
-  MESSAGES_FETCH_LIMIT: 30,
+  readonly MESSAGES_FETCH_LIMIT = 30;
 
-  MINIMUM_PASSWORD_LENGTH: 8,
+  readonly MINIMUM_PASSWORD_LENGTH = 8;
 
   // measured in pixel
-  SCROLL_TO_LAST_MESSAGE_THRESHOLD: 100,
+  readonly SCROLL_TO_LAST_MESSAGE_THRESHOLD = 100;
 
-  SUPPORT: {
+  readonly SUPPORT = {
     FORM: {
       BUG: 'new?ticket_form_id=101615',
       CONTACT: 'new',
@@ -92,7 +100,9 @@ export const config = {
       MICROPHONE_ACCESS_DENIED: 202590081,
       SCREEN_ACCESS_DENIED: 202935412,
     },
-  },
-};
+  };
+}
 
-window.z.config = config;
+const Config = new Configuration();
+
+export {Config};

@@ -63,7 +63,7 @@ import {AssetService} from '../assets/AssetService';
 import {ClientEntity} from '../client/ClientEntity';
 import {ClientMapper} from '../client/ClientMapper';
 import {ClientRepository} from '../client/ClientRepository';
-import {ACCENT_ID, config} from '../config';
+import {ACCENT_ID, Config} from '../Config';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
 import {AssetPayload} from '../entity/message/Asset';
 import {BackendClientError} from '../error/BackendClientError';
@@ -90,6 +90,7 @@ export class UserRepository {
   private readonly propertyRepository: PropertiesRepository;
   private readonly selfService: SelfService;
   private readonly teamMembers: ko.ObservableArray<User>;
+  /** Note: this does not include the self user */
   private readonly teamUsers: ko.ObservableArray<User>;
   private readonly user_mapper: UserMapper;
   private readonly user_service: UserService;
@@ -217,17 +218,23 @@ export class UserRepository {
 
   async loadUsers(): Promise<void> {
     if (this.isTeam()) {
+      if (this.isTeamTooLargeForBroadcast()) {
+        this.logger.warn(
+          `Availability not displayed since the team size is larger or equal to "${UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST}".`,
+        );
+        return;
+      }
+
       const users = await this.user_service.loadUserFromDb();
 
-      if (users.length && users.length <= UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST) {
+      if (users.length) {
         this.logger.log(`Loaded state of '${users.length}' users from database`, users);
 
-        const mappingPromises = users.map(async user => {
-          const userEntity = await this.get_user_by_id(user.id);
-          userEntity.availability(user.availability);
-        });
-
-        await Promise.all(mappingPromises);
+        await Promise.all(
+          users.map(user =>
+            this.get_user_by_id(user.id).then(userEntity => userEntity.availability(user.availability)),
+          ),
+        );
       }
 
       this.users().forEach(userEntity => userEntity.subscribeToChanges());
@@ -268,12 +275,16 @@ export class UserRepository {
    * Event to update availability of a user.
    */
   onUserAvailability(event: {data: {availability: Availability.Type}; from: string}): void {
-    if (this.isTeam() && this.teamUsers().length <= UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST) {
-      const {
-        from: userId,
-        data: {availability},
-      } = event;
-      this.get_user_by_id(userId).then(userEntity => userEntity.availability(availability));
+    if (this.isTeam()) {
+      if (this.isTeamTooLargeForBroadcast()) {
+        this.logger.warn(
+          `Availability not updated since the team size is larger or equal to "${UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST}".`,
+        );
+      } else {
+        // prettier-ignore
+        const {from: userId, data: {availability}} = event;
+        this.get_user_by_id(userId).then(userEntity => userEntity.availability(availability));
+      }
     }
   }
 
@@ -330,6 +341,11 @@ export class UserRepository {
         return userEntities;
       });
     });
+  }
+
+  private isTeamTooLargeForBroadcast(): boolean {
+    const teamSizeIncludingSelf = this.teamUsers().length + 1;
+    return teamSizeIncludingSelf >= UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST;
   }
 
   /**
@@ -399,9 +415,9 @@ export class UserRepository {
       this.logger.log(`Availability was again set to '${newAvailabilityValue}'`);
     }
 
-    if (teamUsers.length > UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST) {
+    if (this.isTeamTooLargeForBroadcast()) {
       this.logger.warn(
-        `Availability update not sent since the team size is larger than "${UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST}".`,
+        `Availability update not sent since the team size is larger or equal to "${UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST}".`,
       );
       return;
     }
@@ -503,7 +519,7 @@ export class UserRepository {
         });
     };
 
-    const chunksOfUserIds = chunk(userIds, config.MAXIMUM_USERS_PER_REQUEST) as string[][];
+    const chunksOfUserIds = chunk(userIds, Config.MAXIMUM_USERS_PER_REQUEST) as string[][];
     return Promise.all(chunksOfUserIds.map(chunkOfUserIds => _getUsers(chunkOfUserIds)))
       .then(resolveArray => {
         const newUserEntities = flatten(resolveArray);
@@ -843,7 +859,7 @@ export class UserRepository {
   }
 
   initMarketingConsent(): Promise<void> {
-    if (!config.FEATURE.CHECK_CONSENT) {
+    if (!Config.FEATURE.CHECK_CONSENT) {
       this.logger.warn(
         `Consent check feature is disabled. Defaulting to '${this.propertyRepository.marketingConsent()}'`,
       );
