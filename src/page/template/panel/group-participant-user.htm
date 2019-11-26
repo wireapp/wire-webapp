@@ -6,13 +6,23 @@
     </div>
     <div class="panel__content" data-bind="fadingscrollbar">
       <!-- ko if: selectedParticipant() -->
-        <panel-user-details params="participant: selectedParticipant, badge: teamRepository.getRoleBadge(selectedParticipant().id)"></panel-user-details>
+        <panel-user-details params="participant: selectedParticipant, badge: teamRepository.getRoleBadge(selectedParticipant().id), isGroupAdmin: isAdmin"></panel-user-details>
       <!-- /ko -->
       <!-- ko if: showActionDevices(selectedParticipant()) -->
         <div class="panel__action-item conversation-details__devices" data-bind="click: clickOnDevices" data-uie-name="go-devices">
           <devices-icon class="panel__action-item__icon"></devices-icon>
           <div class="panel__action-item__text" data-bind="text: t('conversationDetailsActionDevices')"></div>
           <disclose-icon></disclose-icon>
+        </div>
+      <!-- /ko -->
+      <!-- ko if: isSelfGroupAdmin() -->
+        <div class="panel__action-item conversation-details__admin" data-bind="click: console.log" data-uie-name="toggle-admin">
+          <group-admin-icon class="panel__action-item__icon"></group-admin-icon>
+          <div class="panel__action-item__text" data-bind="text: t('conversationDetailsGroupAdmin')"></div>
+          <div class="slider">
+            <input class="slider-input" type="checkbox" name="toggle" id="toggle" data-bind="checked: isAdmin">
+            <label class="button-label" for="toggle" data-bind="click: onToggleAdmin, attr: {'data-uie-value': isAdmin() ? 'checked': 'unchecked'}" data-uie-name="do-toggle-admin" ></label>
+          </div>
         </div>
       <!-- /ko -->
       <enriched-fields params="user: selectedParticipant"></enriched-fields>

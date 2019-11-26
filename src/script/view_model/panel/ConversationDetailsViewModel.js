@@ -138,7 +138,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
 
     this.showTopActions = ko.pureComputed(() => this.isActiveGroupParticipant() || this.showSectionOptions());
 
-    this.showActionAddParticipants = this.isActiveGroupParticipant;
+    this.showActionAddParticipants = ko.pureComputed(() => this.isActiveGroupParticipant() && this.isSelfGroupAdmin());
 
     this.showActionMute = ko.pureComputed(() => {
       return this.activeConversation() && this.activeConversation().isMutable() && !this.isTeam();
@@ -208,6 +208,10 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     this.addPeopleTooltip = ko.pureComputed(() => {
       return t('tooltipConversationDetailsAddPeople', addPeopleShortcut);
     });
+
+    this.isSelfGroupAdmin = ko.pureComputed(() =>
+      this.conversationRepository.isSelfGroupAdmin(this.activeConversation()),
+    );
 
     this.isServiceMode.subscribe(isService => {
       if (isService) {
@@ -287,7 +291,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
         },
       },
       {
-        condition: () => !isSingleUserMode && this.isTeam() && conversationEntity.isCreatedBySelf(),
+        condition: () => !isSingleUserMode && this.isTeam() && this.isSelfGroupAdmin(),
         item: {
           click: () => this.clickToDelete(),
           icon: 'delete-icon',

@@ -813,6 +813,15 @@ export class ConversationRepository {
       .then(() => conversationEntities.forEach(conversationEntity => this._fetch_users_and_events(conversationEntity)));
   }
 
+  isUserGroupAdmin(conversationEntity, userEntity) {
+    // TODO: once we have the roles from the backend, use these
+    return conversationEntity.creator === userEntity.id;
+  }
+
+  isSelfGroupAdmin(conversationEntity) {
+    return this.isUserGroupAdmin(conversationEntity, this.selfUser());
+  }
+
   //##############################################################################
   // Repository interactions
   //##############################################################################

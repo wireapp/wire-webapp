@@ -40,6 +40,18 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
     this.selectedParticipant = ko.observable(undefined);
 
     this.onUserAction = this.onUserAction.bind(this);
+
+    this.isSelfGroupAdmin = ko.pureComputed(() =>
+      repositories.conversation.isSelfGroupAdmin(this.activeConversation()),
+    );
+
+    this.isAdmin = ko.pureComputed(() =>
+      repositories.conversation.isUserGroupAdmin(this.activeConversation(), this.selectedParticipant()),
+    );
+  }
+
+  onToggleAdmin() {
+    this.isAdmin(!this.isAdmin());
   }
 
   showActionDevices(userEntity) {

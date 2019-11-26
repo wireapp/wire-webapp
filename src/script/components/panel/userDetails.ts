@@ -29,34 +29,43 @@ interface UserDetailsProps {
   participant: User;
   isVerified?: boolean;
   badge?: string;
+  isGroupAdmin: boolean;
 }
 
 ko.components.register('panel-user-details', {
   template: `
     <div class="panel-participant">
+      <div class="panel-participant__head">
+        <!-- ko if: participant().inTeam() -->
+          <availability-state class="panel-participant__head__name"
+            data-uie-name="status-name"
+            params="availability: participant().availability, label: participant().name()"></availability-state>
+        <!-- /ko -->
 
-      <!-- ko if: isVerified() -->
-        <verified-icon class="panel-participant__verified-icon" data-uie-name="status-verified-participant"></verified-icon>
-      <!-- /ko -->
+        <!-- ko ifnot: participant().inTeam() -->
+          <div class="panel-participant__head__name" data-bind="text: participant().name()" data-uie-name="status-name"></div>
+        <!-- /ko -->
 
-      <div class="panel-participant__name" data-bind="text: participant().name()" data-uie-name="status-name"></div>
-
+        <!-- ko if: isVerified() -->
+          <verified-icon class="panel-participant__head__verified-icon" data-uie-name="status-verified-participant"></verified-icon>
+        <!-- /ko -->
+      </div>
 
       <!-- ko if: participant().username() -->
         <div class="panel-participant__user-name" data-bind="text: participant().username()" data-uie-name="status-username"></div>
       <!-- /ko -->
 
-      <participant-avatar params="participant: participant, size: ${ParticipantAvatar.SIZE.X_LARGE}" data-uie-name="status-profile-picture"></participant-avatar>
+      <participant-avatar params="participant: participant, size: '${ParticipantAvatar.SIZE.X_LARGE}'" data-uie-name="status-profile-picture"></participant-avatar>
 
       <!-- ko if: badge -->
-        <div class="panel-participant__role-label" data-uie-name="status-partner">
+        <div class="panel-participant__label" data-uie-name="status-partner">
           <partner-icon></partner-icon>
           <span data-bind="text: badge"></span>
         </div>
       <!-- /ko -->
 
       <!-- ko if: participant().isGuest() -->
-        <div class="panel-participant__guest-label" data-uie-name="status-guest">
+        <div class="panel-participant__label" data-uie-name="status-guest">
           <guest-icon></guest-icon>
           <span data-bind="text: t('conversationGuestIndicator')"></span>
         </div>
@@ -66,12 +75,11 @@ ko.components.register('panel-user-details', {
         <div class="panel-participant__guest-expiration" data-bind="text: participant().expirationText" data-uie-name="status-expiration-text"></div>
       <!-- /ko -->
 
-      <!-- ko if: participant().inTeam() -->
-        <availability-state
-          class="panel-participant__availability"
-          data-uie-name="status-availability"
-          params="availability: participant().availability(), label: availabilityLabel()">
-        </availability-state>
+      <!-- ko if: isGroupAdmin -->
+        <div class="panel-participant__label" data-uie-name="status-guest">
+          <group-admin-icon></group-admin-icon>
+          <span data-bind="text: t('conversationDetailsGroupAdmin')"></span>
+        </div>
       <!-- /ko -->
     </div>
   `,
@@ -79,6 +87,7 @@ ko.components.register('panel-user-details', {
     this.participant = params.participant;
     this.isVerified = params.hasOwnProperty('isVerified') ? params.isVerified : this.participant().is_verified;
     this.badge = params.badge;
+    this.isGroupAdmin = params.isGroupAdmin;
 
     this.availabilityLabel = ko.pureComputed(() => {
       const availabilitySetToNone = this.participant().availability() === Availability.Type.NONE;
