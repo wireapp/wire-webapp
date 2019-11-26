@@ -58,7 +58,7 @@ ko.components.register('panel-user-details', {
       <participant-avatar params="participant: participant, size: '${ParticipantAvatar.SIZE.X_LARGE}'" data-uie-name="status-profile-picture"></participant-avatar>
 
       <!-- ko if: badge -->
-        <div class="panel-participant__label" data-uie-name="status-partner">
+        <div class="panel-participant__label" data-uie-name="status-external">
           <partner-icon></partner-icon>
           <span data-bind="text: badge"></span>
         </div>
@@ -76,7 +76,7 @@ ko.components.register('panel-user-details', {
       <!-- /ko -->
 
       <!-- ko if: isGroupAdmin -->
-        <div class="panel-participant__label" data-uie-name="status-guest">
+        <div class="panel-participant__label" data-uie-name="status-admin">
           <group-admin-icon></group-admin-icon>
           <span data-bind="text: t('conversationDetailsGroupAdmin')"></span>
         </div>
