@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@7.0.9...@wireapp/bot-api@7.1.0) (2019-11-26)
+
+
+### Features
+
+* **core:** Expose "init" and "register" calls from API client ([#2590](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/issues/2590)) ([d1ff7ec](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/commit/d1ff7ec4b56708fb7f398e988ea0b93eeade1a70))
+
+
+
+
+
 ## [7.0.9](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@7.0.8...@wireapp/bot-api@7.0.9) (2019-11-25)
 
 **Note:** Version bump only for package @wireapp/bot-api
