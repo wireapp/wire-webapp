@@ -398,3 +398,5 @@ export class BackendClient {
     });
   }
 }
+
+export const backendClient = new BackendClient();

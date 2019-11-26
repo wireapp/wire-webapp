@@ -20,14 +20,14 @@ import ko from 'knockout';
 import {amplify} from 'amplify';
 
 import {AssetTransferState} from '../../assets/AssetTransferState';
-import {resolve, graph} from '../../config/appResolver';
 import {WebAppEvents} from '../../event/WebApp';
 import {AssetUploader} from '../../assets/AssetUploader';
 import {AssetService} from '../../assets/AssetService';
+import {backendClient} from '../../service/BackendClient';
 
 export class AbstractAssetTransferStateTracker {
   constructor(message = {}) {
-    this.assetUploader = new AssetUploader(new AssetService(resolve(graph.BackendClient)));
+    this.assetUploader = new AssetUploader(new AssetService(backendClient));
     this.uploadProgress = this.assetUploader.getUploadProgress(message.id);
     this.AssetTransferState = AssetTransferState;
 

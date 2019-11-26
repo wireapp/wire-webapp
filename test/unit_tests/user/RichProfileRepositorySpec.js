@@ -17,15 +17,15 @@
  *
  */
 
-import {resolve, graph} from './../../api/testResolver';
 import UUID from 'uuidjs';
 import {RichProfileRepository} from 'src/script/user/RichProfileRepository';
+import {backendClient} from 'src/script/service/BackendClient';
 
 describe('RichProfileRepository', () => {
   let richProfileRepository;
 
   beforeEach(() => {
-    richProfileRepository = new RichProfileRepository(resolve(graph.BackendClient));
+    richProfileRepository = new RichProfileRepository(backendClient);
   });
 
   describe('getUserRichProfile', () => {

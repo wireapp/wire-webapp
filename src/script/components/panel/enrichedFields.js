@@ -22,8 +22,8 @@ import ko from 'knockout';
 import {t} from 'Util/LocalizerUtil';
 import {noop} from 'Util/util';
 
-import {resolve, graph} from '../../config/appResolver';
 import {RichProfileRepository} from '../../user/RichProfileRepository';
+import {backendClient} from '../../service/BackendClient';
 
 ko.components.register('enriched-fields', {
   template: `
@@ -40,7 +40,7 @@ ko.components.register('enriched-fields', {
   `,
   viewModel: {
     createViewModel: function(
-      {user, onFieldsLoaded = noop, richProfileRepository = new RichProfileRepository(resolve(graph.BackendClient))},
+      {user, onFieldsLoaded = noop, richProfileRepository = new RichProfileRepository(backendClient)},
       {element},
     ) {
       this.richProfileRepository = richProfileRepository;

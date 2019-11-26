@@ -22,15 +22,14 @@ import $ from 'jquery';
 import {enableLogging} from 'Util/LoggerUtil';
 
 import {AuthViewModel} from '../view_model/AuthViewModel';
-import {resolve, graph} from '../config/appResolver';
 import {Config} from '../Config';
 import {exposeWrapperGlobals} from 'Util/wrapper';
+import {backendClient} from '../service/BackendClient';
 
 $(() => {
   enableLogging(Config.FEATURE.ENABLE_DEBUG);
   exposeWrapperGlobals();
   if ($('.auth-page').length) {
-    const backendClient = resolve(graph.BackendClient);
     backendClient.setSettings({
       restUrl: Config.BACKEND_REST,
       webSocketUrl: Config.BACKEND_WS,

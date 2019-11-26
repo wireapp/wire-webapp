@@ -17,11 +17,10 @@
  *
  */
 
-import {resolve, graph} from '../../api/testResolver';
 import {SelfService} from 'src/script/self/SelfService';
+import {backendClient} from 'src/script/service/BackendClient';
 
 describe('SelfService', () => {
-  const backendClient = resolve(graph.BackendClient);
   const selfService = new SelfService(backendClient);
 
   beforeEach(() => {

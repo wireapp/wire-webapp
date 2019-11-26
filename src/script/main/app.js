@@ -62,7 +62,7 @@ import {ServiceMiddleware} from '../event/preprocessor/ServiceMiddleware';
 import {WebSocketService} from '../event/WebSocketService';
 import {ConversationService} from '../conversation/ConversationService';
 
-import {BackendClient} from '../service/BackendClient';
+import {BackendClient, backendClient} from '../service/BackendClient';
 import {SingleInstanceHandler} from './SingleInstanceHandler';
 
 import {AppInitStatisticsValue} from '../telemetry/app_init/AppInitStatisticsValue';
@@ -82,7 +82,6 @@ import {ReceiptsMiddleware} from '../event/preprocessor/ReceiptsMiddleware';
 
 import {getWebsiteUrl} from '../externalRoute';
 
-import {resolve, graph} from '../config/appResolver';
 import {modals} from '../view_model/ModalsViewModel';
 import {showInitialModal} from '../user/AvailabilityModal';
 import {WebAppEvents} from '../event/WebApp';
@@ -133,11 +132,9 @@ class App {
 
   /**
    * Construct a new app.
-   * @param {BackendClient} backendClient - Configured backend client
    * @param {Element} appContainer - DOM element that will hold the app
    */
-  constructor(backendClient, appContainer) {
-    this.backendClient = backendClient;
+  constructor(appContainer) {
     this.logger = getLogger('App');
     this.appContainer = appContainer;
 
@@ -172,28 +169,28 @@ class App {
    */
   _setupRepositories() {
     const repositories = {};
-    const selfService = new SelfService(this.backendClient);
+    const selfService = new SelfService(backendClient);
     const sendingMessageQueue = new MessageSender();
 
     repositories.audio = new AudioRepository();
-    repositories.auth = new AuthRepository(new AuthService(resolve(graph.BackendClient)));
-    repositories.giphy = new GiphyRepository(new GiphyService(resolve(graph.BackendClient)));
-    repositories.properties = new PropertiesRepository(new PropertiesService(this.backendClient), selfService);
+    repositories.auth = new AuthRepository(new AuthService(backendClient));
+    repositories.giphy = new GiphyRepository(new GiphyService(backendClient));
+    repositories.properties = new PropertiesRepository(new PropertiesService(backendClient), selfService);
     repositories.serverTime = serverTimeHandler;
     repositories.storage = new StorageRepository(this.service.storage);
 
-    repositories.cryptography = new CryptographyRepository(this.backendClient, repositories.storage);
-    repositories.client = new ClientRepository(this.backendClient, this.service.storage, repositories.cryptography);
+    repositories.cryptography = new CryptographyRepository(backendClient, repositories.storage);
+    repositories.client = new ClientRepository(backendClient, this.service.storage, repositories.cryptography);
     repositories.media = new MediaRepository(new PermissionRepository());
     repositories.user = new UserRepository(
-      new UserService(this.backendClient, this.service.storage),
+      new UserService(backendClient, this.service.storage),
       this.service.asset,
       selfService,
       repositories.client,
       serverTimeHandler,
       repositories.properties,
     );
-    repositories.connection = new ConnectionRepository(this.backendClient, repositories.user);
+    repositories.connection = new ConnectionRepository(backendClient, repositories.user);
     repositories.event = new EventRepository(
       this.service.event,
       this.service.notification,
@@ -202,8 +199,8 @@ class App {
       serverTimeHandler,
       repositories.user,
     );
-    repositories.search = new SearchRepository(resolve(graph.BackendClient), repositories.user);
-    repositories.team = new TeamRepository(resolve(graph.BackendClient), repositories.user);
+    repositories.search = new SearchRepository(backendClient, repositories.user);
+    repositories.team = new TeamRepository(backendClient, repositories.user);
     repositories.eventTracker = new EventTrackingRepository(repositories.team, repositories.user);
 
     repositories.conversation = new ConversationRepository(
@@ -245,7 +242,7 @@ class App {
       repositories.user,
     );
     repositories.broadcast = new BroadcastRepository(
-      new BroadcastService(resolve(graph.BackendClient)),
+      new BroadcastService(backendClient),
       repositories.client,
       repositories.conversation,
       repositories.cryptography,
@@ -253,7 +250,7 @@ class App {
       repositories.user,
     );
     repositories.calling = new CallingRepository(
-      resolve(graph.BackendClient),
+      backendClient,
       repositories.conversation,
       repositories.event,
       repositories.media.streamHandler,
@@ -287,13 +284,13 @@ class App {
       : new EventService(storageService);
 
     return {
-      asset: new AssetService(resolve(graph.BackendClient)),
-      conversation: new ConversationService(this.backendClient, eventService, storageService),
+      asset: new AssetService(backendClient),
+      conversation: new ConversationService(backendClient, eventService, storageService),
       event: eventService,
-      integration: new IntegrationService(this.backendClient),
-      notification: new NotificationService(this.backendClient, storageService),
+      integration: new IntegrationService(backendClient),
+      notification: new NotificationService(backendClient, storageService),
       storage: storageService,
-      webSocket: new WebSocketService(this.backendClient),
+      webSocket: new WebSocketService(backendClient),
     };
   }
 
@@ -447,7 +444,7 @@ class App {
    */
   onInternetConnectionGained() {
     this.logger.info('Internet connection regained. Re-establishing WebSocket connection...');
-    this.backendClient.executeOnConnectivity(BackendClient.CONNECTIVITY_CHECK_TRIGGER.CONNECTION_REGAINED).then(() => {
+    backendClient.executeOnConnectivity(BackendClient.CONNECTIVITY_CHECK_TRIGGER.CONNECTION_REGAINED).then(() => {
       amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.NO_INTERNET);
       amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
       this.repository.event.reconnectWebSocket(WebSocketService.CHANGE_TRIGGER.ONLINE);
@@ -505,7 +502,7 @@ class App {
         const triggerSource = isAccessTokenError
           ? BackendClient.CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_RETRIEVAL
           : BackendClient.CONNECTIVITY_CHECK_TRIGGER.APP_INIT_RELOAD;
-        return this.backendClient.executeOnConnectivity(triggerSource).then(() => window.location.reload());
+        return backendClient.executeOnConnectivity(triggerSource).then(() => window.location.reload());
       }
     }
 
@@ -849,7 +846,7 @@ class App {
    */
   _redirectToLogin(signOutReason) {
     this.logger.info(`Redirecting to login after connectivity verification. Reason: ${signOutReason}`);
-    this.backendClient.executeOnConnectivity(BackendClient.CONNECTIVITY_CHECK_TRIGGER.LOGIN_REDIRECT).then(() => {
+    backendClient.executeOnConnectivity(BackendClient.CONNECTIVITY_CHECK_TRIGGER.LOGIN_REDIRECT).then(() => {
       const isTemporaryGuestReason = App.CONFIG.SIGN_OUT_REASONS.TEMPORARY_GUEST.includes(signOutReason);
       const isLeavingGuestRoom = isTemporaryGuestReason && this.repository.user.isTemporaryGuest();
       if (isLeavingGuestRoom) {
@@ -920,12 +917,11 @@ $(() => {
   enableLogging(Config.FEATURE.ENABLE_DEBUG);
   const appContainer = document.getElementById('wire-main');
   if (appContainer) {
-    const backendClient = resolve(graph.BackendClient);
     backendClient.setSettings({
       restUrl: Config.BACKEND_REST,
       webSocketUrl: Config.BACKEND_WS,
     });
-    wire.app = new App(backendClient, appContainer);
+    wire.app = new App(appContainer);
   }
 });
 

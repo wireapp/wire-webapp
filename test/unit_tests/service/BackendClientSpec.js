@@ -18,20 +18,11 @@
  */
 
 import {amplify} from 'amplify';
-import {resolve, graph} from './../../api/testResolver';
 import {WebAppEvents} from 'src/script/event/WebApp';
+import {backendClient} from 'src/script/service/BackendClient';
 
 describe('BackendClient', () => {
-  let backendClient = null;
   let server = null;
-
-  beforeEach(() => {
-    backendClient = resolve(graph.BackendClient);
-  });
-
-  afterEach(() => {
-    backendClient = null;
-  });
 
   describe('executeOnConnectivity', () => {
     beforeEach(() => {
