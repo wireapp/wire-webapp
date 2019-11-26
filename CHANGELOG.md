@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [15.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@15.0.8...@wireapp/core@15.1.0) (2019-11-26)
+
+
+### Features
+
+* **core:** Expose "init" and "register" calls from API client ([#2590](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/2590)) ([d1ff7ec](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/d1ff7ec4b56708fb7f398e988ea0b93eeade1a70))
+
+
+
+
+
 ## [15.0.8](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@15.0.7...@wireapp/core@15.0.8) (2019-11-25)
 
 **Note:** Version bump only for package @wireapp/core
