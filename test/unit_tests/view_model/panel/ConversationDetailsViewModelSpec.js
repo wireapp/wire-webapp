@@ -89,6 +89,7 @@ describe('ConversationDetailsViewModel', () => {
       spyOn(conversation, 'firstUserEntity').and.returnValue({isConnected: () => true});
       spyOn(conversation, 'is_cleared').and.returnValue(false);
       spyOn(conversation, 'isCreatedBySelf').and.returnValue(true);
+      spyOn(conversationDetailsViewModel, 'isSelfGroupAdmin').and.returnValue(true);
       spyOn(conversationDetailsViewModel, 'isTeam').and.returnValue(true);
 
       const tests = [
