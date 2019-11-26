@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [15.1.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@15.1.0...@wireapp/core@15.1.1) (2019-11-26)
+
+
+### Bug Fixes
+
+* **core:** Assign store engine when initializing it ([#2595](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/2595)) ([b610925](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/b61092538b1dd7a01930e081af1fc68130c76fab))
+
+
+
+
+
 # [15.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@15.0.8...@wireapp/core@15.1.0) (2019-11-26)
 
 
