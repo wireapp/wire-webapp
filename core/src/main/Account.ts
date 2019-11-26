@@ -97,7 +97,7 @@ export type StoreEngineProvider = (storeName: string) => Promise<CRUDEngine>;
 
 export class Account extends EventEmitter {
   private readonly logger: logdown.Logger;
-  private readonly storeEngine?: CRUDEngine;
+  private storeEngine?: CRUDEngine;
   private readonly storeEngineProvider: StoreEngineProvider;
   private readonly apiClient: APIClient;
   public service?: {
@@ -356,11 +356,11 @@ export class Account extends EventEmitter {
     const clientType = context.clientType === ClientType.NONE ? '' : `@${context.clientType}`;
     const dbName = `wire@${this.apiClient.config.urls.name}@${context.userId}${clientType}`;
     this.logger.log(`Initialising store with name "${dbName}"...`);
-    const storeEngine = await this.storeEngineProvider(dbName);
+    this.storeEngine = await this.storeEngineProvider(dbName);
     const cookie = CookieStore.getCookie();
     if (cookie) {
-      await this.persistCookie(storeEngine, cookie);
+      await this.persistCookie(this.storeEngine, cookie);
     }
-    return storeEngine;
+    return this.storeEngine;
   }
 }
