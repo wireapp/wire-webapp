@@ -19,7 +19,7 @@
 
 import {getLogger} from 'Util/Logger';
 import {Environment} from 'Util/Environment';
-import {Config} from '../../auth/config';
+import {Config} from '../../Config';
 import {MediaType} from '../../media/MediaType';
 import {MediaError} from '../../error/MediaError';
 
@@ -51,6 +51,7 @@ export class PreferencesAVViewModel {
     this.availableDevices = this.devicesHandler.availableDevices;
     this.currentDeviceId = this.devicesHandler.currentDeviceId;
     this.deviceSupport = this.devicesHandler.deviceSupport;
+    this.Config = Config;
 
     const updateStream = mediaType => {
       this._releaseAudioMeter();

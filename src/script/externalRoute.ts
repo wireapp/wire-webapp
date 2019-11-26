@@ -18,7 +18,7 @@
  */
 
 import {currentLanguage} from './auth/localeConfig';
-import {Config} from './auth/config';
+import {Config} from './Config';
 
 const env = window.wire.env;
 
@@ -52,44 +52,45 @@ export const URL_PATH = {
   SUPPORT_USERNAME: '/support/username/',
 };
 
-const getTeamSettingsUrl = (path = '', utmSource) => {
+const getTeamSettingsUrl = (path: string = '', utmSource?: string): string => {
   const query = utmSource ? `?utm_source=${utmSource}&utm_term=desktop` : '';
   const teamSettingsUrl = `${URL.TEAM_SETTINGS}${path}${query}`;
   return URL.TEAM_SETTINGS ? teamSettingsUrl : undefined;
 };
 
-export const getWebsiteUrl = (path = '', pkCampaign) => {
+export const getWebsiteUrl = (path: string = '', pkCampaign?: string): string => {
   const query = pkCampaign ? `?pk_campaign=${pkCampaign}&pk_kwd=desktop` : '';
   const websiteUrl = `${URL.WEBSITE}${path}${query}`;
   return addLocaleToUrl(URL.WEBSITE ? websiteUrl : undefined);
 };
 
-export const getAccountPagesUrl = (path = '') => {
+export const getAccountPagesUrl = (path: string = ''): string => {
   const accountPagesUrl = `${URL.ACCOUNT}${path}`;
   return URL.ACCOUNT ? accountPagesUrl : undefined;
 };
 
-export const getSupportUrl = (path = '') => {
+export const getSupportUrl = (path: string = ''): string => {
   const supportUrl = `${URL.SUPPORT}${path}`;
   return URL.SUPPORT ? supportUrl : undefined;
 };
 
-export const getPrivacyPolicyUrl = () => addLocaleToUrl(URL.PRIVACY_POLICY || undefined);
-export const getTermsOfUsePersonalUrl = () => addLocaleToUrl(URL.TERMS_OF_USE_PERSONAL || undefined);
-export const getTermsOfUseTeamUrl = () => addLocaleToUrl(URL.TERMS_OF_USE_TEAMS || undefined);
+export const getPrivacyPolicyUrl = (): string => addLocaleToUrl(URL.PRIVACY_POLICY || undefined);
+export const getTermsOfUsePersonalUrl = (): string => addLocaleToUrl(URL.TERMS_OF_USE_PERSONAL || undefined);
+export const getTermsOfUseTeamUrl = (): string => addLocaleToUrl(URL.TERMS_OF_USE_TEAMS || undefined);
 
-export const getManageServicesUrl = utmSource => getTeamSettingsUrl(URL_PATH.MANAGE_SERVICES, utmSource);
-export const getManageTeamUrl = utmSource => getTeamSettingsUrl(URL_PATH.MANAGE_TEAM, utmSource);
+export const getManageServicesUrl = (utmSource?: string): string =>
+  getTeamSettingsUrl(URL_PATH.MANAGE_SERVICES, utmSource);
+export const getManageTeamUrl = (utmSource?: string): string => getTeamSettingsUrl(URL_PATH.MANAGE_TEAM, utmSource);
 
-export const getCreateTeamUrl = pkCampaign =>
-  z.config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && getWebsiteUrl(URL_PATH.CREATE_TEAM, pkCampaign);
-export const getPrivacyHowUrl = () => getWebsiteUrl(URL_PATH.PRIVACY_HOW);
-export const getPrivacyWhyUrl = () => getWebsiteUrl(URL_PATH.PRIVACY_WHY);
-export const getSupportUsernameUrl = () => getWebsiteUrl(URL_PATH.SUPPORT_USERNAME);
+export const getCreateTeamUrl = (pkCampaign?: string): string =>
+  Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && getWebsiteUrl(URL_PATH.CREATE_TEAM, pkCampaign);
+export const getPrivacyHowUrl = (): string => getWebsiteUrl(URL_PATH.PRIVACY_HOW);
+export const getPrivacyWhyUrl = (): string => getWebsiteUrl(URL_PATH.PRIVACY_WHY);
+export const getSupportUsernameUrl = (): string => getWebsiteUrl(URL_PATH.SUPPORT_USERNAME);
 
-export const getSupportContactUrl = () => getSupportUrl(URL_PATH.SUPPORT_CONTACT);
+export const getSupportContactUrl = (): string => getSupportUrl(URL_PATH.SUPPORT_CONTACT);
 
-export const addLocaleToUrl = url => {
+export const addLocaleToUrl = (url?: string): string => {
   if (!url) {
     return undefined;
   }

@@ -30,7 +30,7 @@ import {exposeWrapperGlobals} from 'Util/wrapper';
 import {includesString} from 'Util/StringUtil';
 import {appendParameter} from 'Util/UrlUtil';
 
-import {Config} from '../auth/config';
+import {Config} from '../Config';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {LoadingViewModel} from '../view_model/LoadingViewModel';
 import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
@@ -214,13 +214,13 @@ class App {
       repositories.cryptography,
       repositories.event,
       repositories.giphy,
-      new LinkPreviewRepository(new AssetService(resolve(graph.BackendClient)), repositories.properties),
+      new LinkPreviewRepository(this.service.asset, repositories.properties),
       sendingMessageQueue,
       serverTimeHandler,
       repositories.team,
       repositories.user,
       repositories.properties,
-      new AssetUploader(new AssetService(resolve(graph.BackendClient))),
+      new AssetUploader(this.service.asset),
     );
 
     const serviceMiddleware = new ServiceMiddleware(repositories.conversation, repositories.user);
@@ -882,7 +882,7 @@ class App {
    * @returns {undefined} No return value
    */
   disableDebugging() {
-    z.config.LOGGER.OPTIONS.domains['app.wire.com'] = () => 0;
+    Config.LOGGER.OPTIONS.domains['app.wire.com'] = () => 0;
     this.repository.properties.savePreference(PROPERTIES_TYPE.ENABLE_DEBUGGING, false);
   }
 
@@ -891,7 +891,7 @@ class App {
    * @returns {undefined} No return value
    */
   enableDebugging() {
-    z.config.LOGGER.OPTIONS.domains['app.wire.com'] = () => 300;
+    Config.LOGGER.OPTIONS.domains['app.wire.com'] = () => 300;
     this.repository.properties.savePreference(PROPERTIES_TYPE.ENABLE_DEBUGGING, true);
   }
 

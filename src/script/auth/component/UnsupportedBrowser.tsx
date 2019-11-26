@@ -21,8 +21,8 @@ import {COLOR, Container, ContainerXS, H1, H2, H3, Loading, Logo, Text} from '@w
 import React from 'react';
 import {FormattedHTMLMessage, FormattedMessage, MessageDescriptor} from 'react-intl';
 import {connect} from 'react-redux';
+import {Config} from '../../Config';
 import {unsupportedJoinStrings, unsupportedStrings} from '../../strings';
-import {Config} from '../config';
 import {RootState} from '../module/reducer';
 import * as RuntimeSelector from '../module/selector/RuntimeSelector';
 import {isMobileOs} from '../Runtime';

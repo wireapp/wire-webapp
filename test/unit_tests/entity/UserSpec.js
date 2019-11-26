@@ -18,7 +18,7 @@
  */
 
 import {User} from 'src/script/entity/User';
-import {ACCENT_ID} from 'src/script/config';
+import {ACCENT_ID} from 'src/script/Config';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 
 describe('User', () => {

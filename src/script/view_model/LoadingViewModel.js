@@ -21,6 +21,7 @@ import ko from 'knockout';
 
 import {t} from 'Util/LocalizerUtil';
 
+import {Config} from '../Config';
 import {WebAppEvents} from '../event/WebApp';
 
 import 'Components/loadingBar';
@@ -53,7 +54,7 @@ export class LoadingViewModel {
       switch (message) {
         case t('initDecryption'):
         case t('initEvents'): {
-          if (!z.config.FEATURE.SHOW_LOADING_INFORMATION) {
+          if (!Config.FEATURE.SHOW_LOADING_INFORMATION) {
             updatedLoadingMessage = message;
             break;
           }

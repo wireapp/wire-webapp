@@ -18,7 +18,7 @@
  */
 
 import {BackendClient} from '../service/BackendClient';
-import {Logger} from '../util/Logger';
+import {Logger, getLogger} from '../util/Logger';
 
 export class RichProfileRepository {
   readonly logger: Logger;
@@ -31,9 +31,9 @@ export class RichProfileRepository {
     };
   }
 
-  constructor(backendClient: BackendClient, logger: Logger) {
+  constructor(backendClient: BackendClient) {
     this.backendClient = backendClient;
-    this.logger = logger;
+    this.logger = getLogger('RichProfileRepository');
   }
 
   getUserRichProfile(userId: string): Promise<any> {

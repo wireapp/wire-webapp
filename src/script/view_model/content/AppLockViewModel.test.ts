@@ -18,9 +18,9 @@
  */
 
 import ko from 'knockout';
-import {Config} from '../../auth/config';
 import {ClientRepository} from '../../client/ClientRepository';
 import {ClientService} from '../../client/ClientService';
+import {Config} from '../../Config';
 import {User} from '../../entity/User';
 import {APPLOCK_STATE, AppLockViewModel} from './AppLockViewModel';
 

@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "@wireapp/antiscroll-2": "1.0.2",
-    "@wireapp/avs": "5.3.29",
+    "@wireapp/avs": "5.1.40",
     "@wireapp/commons": "2.2.23",
     "@wireapp/core": "14.4.2",
     "@wireapp/protocol-messaging": "1.24.2",
@@ -48,7 +48,7 @@
   },
   "devDependencies": {
     "@babel/core": "7.7.2",
-    "@babel/plugin-proposal-class-properties": "7.7.0",
+    "@babel/plugin-proposal-class-properties": "7.7.4",
     "@babel/plugin-syntax-dynamic-import": "7.2.0",
     "@babel/preset-env": "7.7.1",
     "@babel/preset-react": "7.7.0",

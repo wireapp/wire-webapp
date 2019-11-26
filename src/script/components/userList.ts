@@ -41,6 +41,7 @@ interface UserListParams {
   filter: ko.Observable<string>;
   selected: ko.ObservableArray<User>;
   searchRepository: SearchRepository;
+  skipSearch: boolean;
   teamRepository: TeamRepository;
   conversationRepository: ConversationRepository;
   user: ko.Observable<User[]>;
@@ -76,6 +77,7 @@ ko.components.register('user-list', {
   viewModel: function({
     click,
     filter = ko.observable(''),
+    skipSearch = false,
     selected: selectedUsers,
     searchRepository,
     teamRepository,
@@ -123,12 +125,14 @@ ko.components.register('user-list', {
       let resultUsers: User[] = userEntities();
       const normalizedQuery = SearchRepository.normalizeQuery(filter());
       if (normalizedQuery) {
-        const SEARCHABLE_FIELDS = SearchRepository.CONFIG.SEARCHABLE_FIELDS;
-        const trimmedQuery = filter().trim();
-        const isHandle = trimmedQuery.startsWith('@') && validateHandle(normalizedQuery);
-        const properties = isHandle ? [SEARCHABLE_FIELDS.USERNAME] : undefined;
-        const searchResults = searchRepository.searchUserInSet(normalizedQuery, userEntities(), properties);
-        resultUsers = searchResults.filter(
+        if (!skipSearch) {
+          const SEARCHABLE_FIELDS = SearchRepository.CONFIG.SEARCHABLE_FIELDS;
+          const trimmedQuery = filter().trim();
+          const isHandle = trimmedQuery.startsWith('@') && validateHandle(normalizedQuery);
+          const properties = isHandle ? [SEARCHABLE_FIELDS.USERNAME] : undefined;
+          resultUsers = searchRepository.searchUserInSet(normalizedQuery, userEntities(), properties);
+        }
+        resultUsers = resultUsers.filter(
           user =>
             connectedUsers.includes(user) ||
             teamRepository.isSelfConnectedTo(user.id) ||
