@@ -20,10 +20,10 @@
 import {LoginData, RegisterData, SendLoginCode} from '@wireapp/api-client/dist/auth';
 import {ClientType} from '@wireapp/api-client/dist/client/index';
 import {Account} from '@wireapp/core';
-import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 import {LowDiskSpaceError} from '@wireapp/store-engine/dist/commonjs/engine/error/';
 import {isTemporaryClientAndNonPersistent, noop} from 'Util/util';
 import {currentCurrency, currentLanguage} from '../../localeConfig';
+import {provideTemporaryAndNonPersistentEngine} from '../../StoreEngineProvider';
 import {Api, RootState, ThunkAction, ThunkDispatch} from '../reducer';
 import {RegistrationDataState} from '../reducer/authReducer';
 import {COOKIE_NAME_APP_OPENED} from '../selector/CookieSelector';
@@ -72,8 +72,7 @@ export class AuthAction {
       try {
         onBeforeLogin(dispatch, getState, global);
         if (isTemporaryClientAndNonPersistent(loginData.clientType === ClientType.PERMANENT)) {
-          // apiClient.config.store = await this.initEncryptedDatabase();
-          // TODO: Use different engine provider
+          (core as any).storeEngineProvider = provideTemporaryAndNonPersistentEngine;
         }
         await core.login(loginData, false, clientAction.generateClientPayload(loginData.clientType));
         await this.persistAuthData(loginData.clientType, core, dispatch, localStorageAction);
@@ -113,15 +112,14 @@ export class AuthAction {
     return async (
       dispatch,
       getState,
-      {apiClient, config, core, actions: {cookieAction, clientAction, selfAction, localStorageAction}},
+      {config, core, actions: {cookieAction, clientAction, selfAction, localStorageAction}},
     ) => {
       dispatch(AuthActionCreator.startLogin());
       try {
         if (isTemporaryClientAndNonPersistent(clientType === ClientType.PERMANENT)) {
-          // apiClient.config.store = await this.initEncryptedDatabase();
+          (core as any).storeEngineProvider = provideTemporaryAndNonPersistentEngine;
         }
-        await apiClient.init(clientType);
-        await core.init(new IndexedDBEngine());
+        await core.init(clientType);
         await this.persistAuthData(clientType, core, dispatch, localStorageAction);
         await dispatch(selfAction.fetchSelf());
         await dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: config.APP_INSTANCE_ID}));
@@ -195,7 +193,7 @@ export class AuthAction {
     return async (
       dispatch,
       getState,
-      {apiClient, config, core, actions: {cookieAction, clientAction, selfAction, localStorageAction}},
+      {config, core, actions: {cookieAction, clientAction, selfAction, localStorageAction}},
     ) => {
       const clientType = ClientType.PERMANENT;
       registration.locale = currentLanguage();
@@ -209,8 +207,7 @@ export class AuthAction {
       dispatch(AuthActionCreator.startRegisterTeam());
       try {
         await dispatch(this.doSilentLogout());
-        await apiClient.register(registration, clientType);
-        await core.init(new IndexedDBEngine());
+        await core.register(registration, clientType);
         await this.persistAuthData(clientType, core, dispatch, localStorageAction);
         await dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: config.APP_INSTANCE_ID}));
         await dispatch(selfAction.fetchSelf());
@@ -227,7 +224,7 @@ export class AuthAction {
     return async (
       dispatch,
       getState,
-      {apiClient, config, core, actions: {authAction, clientAction, cookieAction, selfAction, localStorageAction}},
+      {config, core, actions: {authAction, clientAction, cookieAction, selfAction, localStorageAction}},
     ) => {
       const clientType = ClientType.PERMANENT;
       registration.locale = currentLanguage();
@@ -237,8 +234,7 @@ export class AuthAction {
       dispatch(AuthActionCreator.startRegisterPersonal());
       try {
         await dispatch(authAction.doSilentLogout());
-        await apiClient.register(registration, clientType);
-        await core.init(new IndexedDBEngine());
+        await core.register(registration, clientType);
         await this.persistAuthData(clientType, core, dispatch, localStorageAction);
         await dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: config.APP_INSTANCE_ID}));
         await dispatch(selfAction.fetchSelf());
@@ -255,7 +251,7 @@ export class AuthAction {
     return async (
       dispatch,
       getState,
-      {apiClient, config, core, actions: {authAction, cookieAction, clientAction, selfAction, localStorageAction}},
+      {config, core, actions: {authAction, cookieAction, clientAction, selfAction, localStorageAction}},
     ) => {
       const clientType = options.shouldInitializeClient ? ClientType.TEMPORARY : ClientType.NONE;
       registrationData.locale = currentLanguage();
@@ -264,8 +260,7 @@ export class AuthAction {
       dispatch(AuthActionCreator.startRegisterWireless());
       try {
         await dispatch(authAction.doSilentLogout());
-        await apiClient.register(registrationData, clientType);
-        await core.init(new IndexedDBEngine());
+        await core.register(registrationData, clientType);
         await this.persistAuthData(clientType, core, dispatch, localStorageAction);
         await dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: config.APP_INSTANCE_ID}));
         await dispatch(selfAction.fetchSelf());
@@ -279,7 +274,7 @@ export class AuthAction {
   };
 
   doInit = (options = {isImmediateLogin: false, shouldValidateLocalClient: false}): ThunkAction => {
-    return async (dispatch, getState, {apiClient, core, actions: {authAction, selfAction, localStorageAction}}) => {
+    return async (dispatch, getState, {core, actions: {authAction, selfAction, localStorageAction}}) => {
       dispatch(AuthActionCreator.startRefresh());
       try {
         if (options.isImmediateLogin) {
@@ -292,10 +287,9 @@ export class AuthAction {
         }
         const clientType = persist ? ClientType.PERMANENT : ClientType.TEMPORARY;
         if (isTemporaryClientAndNonPersistent(clientType === ClientType.PERMANENT)) {
-          // apiClient.config.store = await this.initEncryptedDatabase();
+          (core as any).storeEngineProvider = provideTemporaryAndNonPersistentEngine;
         }
-        await apiClient.init(clientType);
-        await core.init(new IndexedDBEngine());
+        await core.init(clientType);
         await this.persistAuthData(clientType, core, dispatch, localStorageAction);
 
         if (options.shouldValidateLocalClient) {
