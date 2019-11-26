@@ -41,7 +41,7 @@ const MOCK_BACKEND = {
 async function createAccount(storageName = `test-${Date.now()}`): Promise<Account> {
   const apiClient = new APIClient({urls: MOCK_BACKEND});
   const account = new Account(apiClient);
-  await account.init(new MemoryEngine());
+  await account.initServices(new MemoryEngine());
   return account;
 }
 
@@ -135,7 +135,7 @@ describe('Account', () => {
     it('initializes the Protocol buffers', async () => {
       const account = new Account();
 
-      await account.init(new MemoryEngine());
+      await account.initServices(new MemoryEngine());
 
       expect(account.service!.conversation).toBeDefined();
       expect(account.service!.cryptography).toBeDefined();
@@ -154,7 +154,7 @@ describe('Account', () => {
       const apiClient = new APIClient({urls: MOCK_BACKEND});
       const account = new Account(apiClient);
 
-      await account.init(new MemoryEngine());
+      await account.initServices(new MemoryEngine());
       const {clientId, clientType, userId} = (await account.login({
         clientType: ClientType.TEMPORARY,
         email: 'hello@example.com',
@@ -170,7 +170,7 @@ describe('Account', () => {
       const apiClient = new APIClient({urls: MOCK_BACKEND});
       const account = new Account(apiClient);
 
-      await account.init(new MemoryEngine());
+      await account.initServices(new MemoryEngine());
 
       try {
         await account.login({

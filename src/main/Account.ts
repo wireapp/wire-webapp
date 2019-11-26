@@ -18,6 +18,7 @@
  */
 
 import {APIClient} from '@wireapp/api-client';
+import {RegisterData} from '@wireapp/api-client/dist/auth';
 import {
   AUTH_COOKIE_KEY,
   AUTH_TABLE_NAME,
@@ -159,7 +160,21 @@ export class Account extends EventEmitter {
     return this.apiClient.validatedUserId;
   }
 
-  public async init(storeEngine: CRUDEngine): Promise<void> {
+  public async register(registration: RegisterData, clientType: ClientType): Promise<Context> {
+    const context = await this.apiClient.register(registration, clientType);
+    const storeEngine = await this.initEngine(context);
+    await this.initServices(storeEngine);
+    return context;
+  }
+
+  public async init(clientType: ClientType): Promise<Context> {
+    const context = await this.apiClient.init(clientType);
+    const storeEngine = await this.initEngine(context);
+    await this.initServices(storeEngine);
+    return context;
+  }
+
+  public async initServices(storeEngine: CRUDEngine): Promise<void> {
     const assetService = new AssetService(this.apiClient);
     const cryptographyService = new CryptographyService(this.apiClient, storeEngine);
 
@@ -195,7 +210,7 @@ export class Account extends EventEmitter {
 
     const context = await this.apiClient.login(loginData);
     const storeEngine = await this.initEngine(context);
-    await this.init(storeEngine);
+    await this.initServices(storeEngine);
 
     if (initClient) {
       await this.initClient(loginData, clientInfo);
