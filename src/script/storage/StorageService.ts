@@ -116,6 +116,7 @@ export class StorageService {
     }
   }
 
+  /** @deprecated Use `provideTemporaryAndNonPersistentEngine` instead */
   static initEncryptedDatabase(encryptionKey: string): SQLeetEngine {
     return new SQLeetEngine(
       '/worker/sqleet-worker.js',
