@@ -62,7 +62,7 @@ describe('Account', () => {
       };
 
       const account = new Account(apiClient, () => Promise.resolve(engine));
-      await account.init(engine);
+      await account.initServices(engine);
       spyOn(account.service.client, 'register').and.callThrough();
       account.service.client.synchronizeClients = () => Promise.resolve();
       account.service.notification.backend.getLastNotification = () => Promise.resolve({id: 'notification-id'});
@@ -82,7 +82,7 @@ describe('Account', () => {
       });
       const clientId = new UUID(UUIDVersion).toString();
       const account = new Account(apiClient, () => Promise.resolve(engine));
-      await account.init(engine);
+      await account.initServices(engine);
       spyOn(account.service.cryptography, 'initCryptobox').and.returnValue(Promise.resolve());
       spyOn(account.service.client, 'getLocalClient').and.returnValue(Promise.resolve({id: clientId}));
       spyOn(account.apiClient.client.api, 'getClient').and.returnValue(Promise.resolve({id: clientId}));
@@ -102,7 +102,7 @@ describe('Account', () => {
       });
       const clientId = new UUID(UUIDVersion).toString();
       const account = new Account(apiClient, () => Promise.resolve(engine));
-      await account.init(engine);
+      await account.initServices(engine);
       spyOn(account.service.client, 'register').and.returnValue(Promise.resolve({id: clientId}));
       spyOn(account.service.client, 'synchronizeClients').and.returnValue(Promise.resolve());
       spyOn(account.service.notification, 'initializeNotificationStream').and.returnValue(Promise.resolve());

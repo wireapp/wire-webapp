@@ -38,7 +38,7 @@ describe('MessageHandler', () => {
   beforeEach(async () => {
     mainHandler = new MainHandler();
     mainHandler.account = new Account();
-    await mainHandler.account.init(new MemoryEngine());
+    await mainHandler.account.initServices(new MemoryEngine());
     mainHandler.account.apiClient.createContext('', '');
 
     spyOn(mainHandler.account.service.conversation, 'send').and.returnValue(Promise.resolve());
