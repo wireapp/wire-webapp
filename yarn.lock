@@ -1799,7 +1799,7 @@
     tough-cookie "3.0.1"
     ws "7.2.0"
 
-"@wireapp/avs@5.1.44":
+"@wireapp/avs@5.3.44":
   version "5.3.44"
   resolved "https://registry.yarnpkg.com/@wireapp/avs/-/avs-5.3.44.tgz#ac933ac0a2a9ffc4f3681a5a74768dc3da2833fc"
   integrity sha512-swkiBz8/s0wVeFxxsKqqW9mVodju4WBqrAoF+3DkMrl8n5EKYbs0HocXV5enVajUiJj8lbo1/oeJIWQFZfKpAw==
