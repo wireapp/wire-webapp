@@ -105,7 +105,6 @@ import {AudioRepository} from '../audio/AudioRepository';
 import {MessageSender} from '../message/MessageSender';
 import {StorageService} from '../storage';
 import {BackupService} from '../backup/BackupService';
-import {getEphemeralValue} from 'Util/ephemeralValueStore';
 import {AuthRepository} from '../auth/AuthRepository';
 import {MediaRepository} from '../media/MediaRepository';
 import {AuthService} from '../auth/AuthService';
@@ -929,8 +928,8 @@ $(async () => {
       webSocketUrl: Config.BACKEND_WS,
     });
     if (isTemporaryClientAndNonPersistent()) {
-      const encryptionKey = await getEphemeralValue();
-      const engine = StorageService.initEncryptedDatabase(encryptionKey);
+      const engine = await StorageService.getUnitializedEngine();
+      window.addEventListener('beforeunload', () => Dexie.delete('/sqleet'));
       wire.app = new App(backendClient, appContainer, engine);
     } else {
       wire.app = new App(backendClient, appContainer);

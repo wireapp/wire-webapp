@@ -45,11 +45,7 @@ export const providePermanentEngine = async (storeName: string): Promise<CRUDEng
 export const provideTemporaryAndNonPersistentEngine = async (storeName: string): Promise<CRUDEngine> => {
   await Dexie.delete('/sqleet');
   const encryptionKey = await saveRandomEncryptionKey();
-  const engine = new SQLeetEngine(
-    '/worker/sqleet-worker.js',
-    SQLeetSchemata.SCHEMATA[SQLeetSchemata.SCHEMATA.length - 1].schema,
-    encryptionKey,
-  );
+  const engine = new SQLeetEngine('/worker/sqleet-worker.js', SQLeetSchemata.getLatest(), encryptionKey);
   await engine.init(storeName);
   return engine;
 };

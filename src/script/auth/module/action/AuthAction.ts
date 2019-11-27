@@ -20,6 +20,7 @@
 import {LoginData, RegisterData, SendLoginCode} from '@wireapp/api-client/dist/auth';
 import {ClientType} from '@wireapp/api-client/dist/client/index';
 import {Account} from '@wireapp/core';
+import {CRUDEngine} from '@wireapp/store-engine';
 import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
 import {LowDiskSpaceError} from '@wireapp/store-engine/dist/commonjs/engine/error/';
 import {isTemporaryClientAndNonPersistent, noop} from 'Util/util';
@@ -38,7 +39,8 @@ type LoginLifecycleFunction = (dispatch: ThunkDispatch, getState: () => RootStat
 export class AuthAction {
   doFlushDatabase = (): ThunkAction => {
     return async (dispatch, getState, {core}) => {
-      if ((core as any).storeEngine instanceof SQLeetEngine) {
+      const storeEngine: CRUDEngine = (core as any).storeEngine;
+      if (storeEngine instanceof SQLeetEngine) {
         await (core as any).storeEngine.save();
       }
     };

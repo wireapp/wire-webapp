@@ -26,7 +26,6 @@ import {resolve, graph} from '../config/appResolver';
 import {Config} from '../Config';
 import {exposeWrapperGlobals} from 'Util/wrapper';
 import {isTemporaryClientAndNonPersistent} from 'Util/util';
-import {getEphemeralValue} from 'Util/ephemeralValueStore';
 import {StorageService} from '../storage';
 
 $(async () => {
@@ -39,8 +38,7 @@ $(async () => {
       webSocketUrl: Config.BACKEND_WS,
     });
     if (isTemporaryClientAndNonPersistent()) {
-      const encryptionKey = await getEphemeralValue();
-      const engine = StorageService.initEncryptedDatabase(encryptionKey);
+      const engine = await StorageService.getUnitializedEngine();
       new AuthViewModel(backendClient, engine);
     } else {
       new AuthViewModel(backendClient);

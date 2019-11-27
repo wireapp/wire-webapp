@@ -2956,7 +2956,8 @@ export class ConversationRepository {
     let messageId;
     try {
       const uploadStarted = Date.now();
-      messageId = (await this.send_asset_metadata(conversationEntity, file, asImage)).id;
+      const injectedEvent = await this.send_asset_metadata(conversationEntity, file, asImage);
+      messageId = injectedEvent.id;
       if (isVideo(file)) {
         await this.sendAssetPreview(conversationEntity, file, messageId);
       }

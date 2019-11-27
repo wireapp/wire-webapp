@@ -23,6 +23,7 @@ import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
 import {MemoryStore} from '@wireapp/store-engine/dist/commonjs/engine';
 import Dexie from 'dexie';
+import {getEphemeralValue} from 'Util/ephemeralValueStore';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {loadValue, storeValue} from 'Util/StorageUtil';
@@ -116,13 +117,9 @@ export class StorageService {
     }
   }
 
-  /** @deprecated Use `provideTemporaryAndNonPersistentEngine` instead */
-  static initEncryptedDatabase(encryptionKey: string): SQLeetEngine {
-    return new SQLeetEngine(
-      '/worker/sqleet-worker.js',
-      SQLeetSchemata.SCHEMATA[SQLeetSchemata.SCHEMATA.length - 1].schema,
-      encryptionKey,
-    );
+  static async getUnitializedEngine(): Promise<SQLeetEngine> {
+    const encryptionKey = await getEphemeralValue();
+    return new SQLeetEngine('/worker/sqleet-worker.js', SQLeetSchemata.getLatest(), encryptionKey);
   }
 
   _initCrudHooks(): void {

@@ -26,6 +26,10 @@ interface SQLeetSchema {
 }
 
 export class SQLeetSchemata {
+  static getLatest(): SQLiteProvidedSchema<string> {
+    return SQLeetSchemata.SCHEMATA[SQLeetSchemata.SCHEMATA.length - 1].schema;
+  }
+
   static get SCHEMATA(): SQLeetSchema[] {
     return [
       {

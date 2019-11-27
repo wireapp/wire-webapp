@@ -34,7 +34,6 @@ import {WebAppEvents} from '../event/WebApp';
 import {EventName} from '../tracking/EventName';
 import {ClientEntity} from '../client/ClientEntity';
 import {BackendClientError} from '../error/BackendClientError';
-import {getEphemeralValue} from 'Util/ephemeralValueStore';
 import {StorageService} from '../storage/StorageService';
 
 export class CryptographyRepository {
@@ -111,8 +110,7 @@ export class CryptographyRepository {
 
     if (isTemporaryClientAndNonPersistent()) {
       this.logger.info(`Initializing Cryptobox with encrypted database '${databaseName}'...`);
-      const encryptionKey = await getEphemeralValue();
-      storeEngine = await StorageService.initEncryptedDatabase(encryptionKey);
+      storeEngine = await StorageService.getUnitializedEngine();
     } else {
       this.logger.info(`Initializing Cryptobox with database '${databaseName}'...`);
       storeEngine = new IndexedDBEngine();
