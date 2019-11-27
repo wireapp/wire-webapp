@@ -35,5 +35,5 @@ wire-cli -e "$WIRE_LOGIN_EMAIL" -p "$WIRE_LOGIN_PASSWORD" -c "$WIRE_CONVERSATION
 #### Node.js
 
 ```bash
-tsc && node dist/commonjs/index.js -e "yourname@email.com" -p "secret" -c "594f0908-b9b7-40f9-a06a-45612145e64e"
+npx tsc && node dist/index.js -e "yourname@email.com" -p "secret" -c "594f0908-b9b7-40f9-a06a-45612145e64e"
 ```
