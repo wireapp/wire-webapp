@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.0.13](https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client/compare/@wireapp/cli-client@8.0.12...@wireapp/cli-client@8.0.13) (2019-11-27)
+
+
+### Bug Fixes
+
+* **cli-client:** Correct bin entry ([3d4a1aa](https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client/commit/3d4a1aa75c0a426e163b4b8969e7f44bc66101ed))
+
+
+
+
+
 ## [8.0.12](https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client/compare/@wireapp/cli-client@8.0.11...@wireapp/cli-client@8.0.12) (2019-11-27)
 
 **Note:** Version bump only for package @wireapp/cli-client
