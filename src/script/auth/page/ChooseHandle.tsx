@@ -96,6 +96,10 @@ const ChooseHandle = ({
     }
   };
 
+  if (hasSelfHandle) {
+    return null;
+  }
+
   return (
     <Page>
       <ContainerXS centerText verticalCenter style={{display: 'flex', flexDirection: 'column', minHeight: 428}}>
