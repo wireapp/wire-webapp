@@ -43,7 +43,7 @@ export class TextContentBuilder {
   }
 
   public withLinkPreviews(linkPreviews?: LinkPreviewUploadedContent[]): TextContentBuilder {
-    if (linkPreviews && linkPreviews.length) {
+    if (linkPreviews?.length) {
       this.content.linkPreviews = linkPreviews;
     }
 
@@ -51,7 +51,7 @@ export class TextContentBuilder {
   }
 
   public withMentions(mentions?: MentionContent[]): TextContentBuilder {
-    if (mentions && mentions.length) {
+    if (mentions?.length) {
       this.content.mentions = mentions;
     }
 

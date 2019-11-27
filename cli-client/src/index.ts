@@ -72,8 +72,8 @@ storeEngine
       .login(loginData)
       .then(() => account.listen())
       .catch((error: AxiosError) => {
-        const data = error.response && error.response.data;
-        const errorLabel = data && data.label;
+        const data = error.response?.data;
+        const errorLabel = data?.label;
         // TODO: The following is just a quick hack to continue if too many clients are registered!
         // We should expose this fail-safe method as an emergency function
         if (errorLabel === BackendErrorLabel.TOO_MANY_CLIENTS) {

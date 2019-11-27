@@ -267,7 +267,7 @@ export class APIClient extends EventEmitter {
   }
 
   public connect(onBeforeConnect?: () => Promise<void>): Promise<WebSocketClient> {
-    return this.transport.ws.connect(this.context && this.context.clientId, onBeforeConnect);
+    return this.transport.ws.connect(this.context?.clientId, onBeforeConnect);
   }
 
   private createContext(userId: string, clientType: ClientType, clientId?: string): Context {
@@ -280,17 +280,11 @@ export class APIClient extends EventEmitter {
   }
 
   public get clientId(): string | undefined {
-    if (this.context && this.context.clientId) {
-      return this.context.clientId;
-    }
-    return undefined;
+    return this.context?.clientId || undefined;
   }
 
   public get userId(): string | undefined {
-    if (this.context && this.context.userId) {
-      return this.context.userId;
-    }
-    return undefined;
+    return this.context?.userId || undefined;
   }
 
   /** Should be used in cases where the user ID is MANDATORY. */

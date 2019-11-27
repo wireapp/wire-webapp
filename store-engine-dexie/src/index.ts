@@ -95,7 +95,7 @@ export class IndexedDBEngine implements CRUDEngine {
   }
 
   public async isStoragePersisted(): Promise<boolean> {
-    if (navigator.storage && navigator.storage.persisted) {
+    if (navigator.storage?.persisted) {
       const isPersisted = await navigator.storage.persisted();
       return isPersisted;
     }
@@ -122,7 +122,7 @@ export class IndexedDBEngine implements CRUDEngine {
     const isAlreadyExisting = error instanceof Dexie.ConstraintError;
     /** @see https://github.com/dfahlander/Dexie.js/issues/776 */
     const hasNotEnoughDiskSpace =
-      error.name === Dexie.errnames.QuotaExceeded || (error.inner && error.inner.name === Dexie.errnames.QuotaExceeded);
+      error.name === Dexie.errnames.QuotaExceeded || error.inner?.name === Dexie.errnames.QuotaExceeded;
 
     if (isAlreadyExisting) {
       const message = `Record "${primaryKey}" already exists in "${tableName}". You need to delete the record first if you want to overwrite it.`;

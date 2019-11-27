@@ -70,7 +70,7 @@ export class Bot {
   }
 
   public async sendText(conversationId: string, message: string): Promise<void> {
-    if (this.account && this.account.service) {
+    if (this.account?.service) {
       const textPayload = await this.account.service.conversation.messageBuilder
         .createText(conversationId, message)
         .build();

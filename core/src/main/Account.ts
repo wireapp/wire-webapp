@@ -237,7 +237,7 @@ export class Account extends EventEmitter {
         error.constructor.name === 'CryptoboxError' ||
         error instanceof StoreEngineError.RecordNotFoundError ||
         error.constructor.name === StoreEngineError.RecordNotFoundError.constructor.name;
-      const notFoundOnBackend = error.response && error.response.status === StatusCode.NOT_FOUND;
+      const notFoundOnBackend = error.response?.status === StatusCode.NOT_FOUND;
 
       if (notFoundInDatabase) {
         this.logger.log('Could not find valid client in database');

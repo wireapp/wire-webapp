@@ -128,13 +128,13 @@ export class HttpClient extends EventEmitter {
 
       if (response) {
         const {data: errorData, status: errorStatus} = response;
-        const isBackendError = errorData && errorData.code && errorData.label && errorData.message;
+        const isBackendError = errorData?.code && errorData?.label && errorData?.message;
 
         if (isBackendError) {
           error = BackendErrorMapper.map(errorData);
         } else {
           const isUnauthorized = errorStatus === StatusCode.UNAUTHORIZED;
-          const hasAccessToken = this.accessTokenStore && this.accessTokenStore.accessToken;
+          const hasAccessToken = !!this.accessTokenStore?.accessToken;
           if (isUnauthorized && hasAccessToken && firstTry) {
             await this.refreshAccessToken();
             return this._sendRequest<T>(config, tokenAsParam, false);
@@ -148,7 +148,7 @@ export class HttpClient extends EventEmitter {
 
   public async refreshAccessToken(): Promise<AccessTokenData> {
     let expiredAccessToken: AccessTokenData | undefined;
-    if (this.accessTokenStore.accessToken && this.accessTokenStore.accessToken.access_token) {
+    if (this.accessTokenStore.accessToken?.access_token) {
       expiredAccessToken = this.accessTokenStore.accessToken;
     }
 
@@ -168,7 +168,7 @@ export class HttpClient extends EventEmitter {
       withCredentials: true,
     };
 
-    if (expiredAccessToken && expiredAccessToken.access_token) {
+    if (expiredAccessToken?.access_token) {
       config.headers['Authorization'] = `${expiredAccessToken.token_type} ${decodeURIComponent(
         expiredAccessToken.access_token,
       )}`;

@@ -63,11 +63,11 @@ export class GenericMessageMapper {
 
         const content: TextContent = {expectsReadConfirmation, legalHoldStatus, text};
 
-        if (linkPreviews && linkPreviews.length) {
+        if (linkPreviews?.length) {
           content.linkPreviews = linkPreviews;
         }
 
-        if (mentions && mentions.length) {
+        if (mentions?.length) {
           content.mentions = mentions;
         }
 
@@ -178,11 +178,11 @@ export class GenericMessageMapper {
           text: editedText,
         };
 
-        if (editedLinkPreviews && editedLinkPreviews.length) {
+        if (editedLinkPreviews?.length) {
           content.linkPreviews = editedLinkPreviews;
         }
 
-        if (editedMentions && editedMentions.length) {
+        if (editedMentions?.length) {
           content.mentions = editedMentions;
         }
 
@@ -278,7 +278,7 @@ export class GenericMessageMapper {
           status,
           uploaded,
         } = genericMessage[GenericMessageType.ASSET];
-        const isImage = !!uploaded && !!uploaded.assetId && !!original && !!original.image;
+        const isImage = !!uploaded?.assetId && !!original?.image;
 
         const content: AssetContent = {
           abortReason: notUploaded,

@@ -52,7 +52,7 @@ export class RecvChain {
   }
 
   try_message_keys(envelope: Envelope, msg: CipherMessage): Uint8Array {
-    if (this.message_keys[0] && this.message_keys[0].counter > msg.counter) {
+    if (this.message_keys[0]?.counter > msg.counter) {
       const message = `Message too old. Counter for oldest staged chain key is '${this.message_keys[0].counter}' while message counter is '${msg.counter}'.`;
       throw new DecryptError.OutdatedMessage(message, DecryptError.CODE.CASE_208);
     }

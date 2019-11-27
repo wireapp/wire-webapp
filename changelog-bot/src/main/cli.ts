@@ -48,8 +48,7 @@ program
   .option('-x, --exclude-commit-types <type,...>', 'Commit types to exclude (e.g. chore,build,...)')
   .parse(process.argv);
 
-let excludeCommitTypes =
-  typeof program.excludeCommitTypes !== 'undefined' ? program.excludeCommitTypes : process.env.EXCLUDE_COMMIT_TYPES;
+let excludeCommitTypes = program.excludeCommitTypes ?? process.env.EXCLUDE_COMMIT_TYPES;
 
 if (typeof excludeCommitTypes !== 'undefined') {
   excludeCommitTypes = excludeCommitTypes.includes(',') ? excludeCommitTypes.split(',') : [excludeCommitTypes];

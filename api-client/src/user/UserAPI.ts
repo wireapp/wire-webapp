@@ -275,14 +275,14 @@ export class UserAPI {
   ): Promise<User[]> {
     const {handles, ids} = parameters;
 
-    if (handles && handles.length) {
+    if (handles?.length) {
       const uniqueHandles = ArrayUtil.removeDuplicates(handles);
       const handleChunks = ArrayUtil.chunk(uniqueHandles, limit);
       const resolvedTasks = await Promise.all(handleChunks.map(handleChunk => this._getUsers({handles: handleChunk})));
       return ArrayUtil.flatten(resolvedTasks);
     }
 
-    if (ids && ids.length) {
+    if (ids?.length) {
       const uniqueIds = ArrayUtil.removeDuplicates(ids);
       const idChunks = ArrayUtil.chunk(uniqueIds, limit);
       const resolvedTasks = await Promise.all(idChunks.map(idChunk => this._getUsers({ids: idChunk})));

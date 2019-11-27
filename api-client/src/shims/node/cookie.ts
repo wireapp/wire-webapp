@@ -31,7 +31,7 @@ const logger = logdown('@wireapp/api-client/shims/node/cookie', {
 });
 
 export const retrieveCookie = async <T>(response: AxiosResponse<T>): Promise<T> => {
-  if (response.headers && response.headers['set-cookie']) {
+  if (response.headers?.['set-cookie']) {
     const cookies = response.headers['set-cookie'].map(ToughCookie.parse);
     for (const cookie of cookies) {
       CookieStore.setCookie(new Cookie(cookie.value, cookie.expires));

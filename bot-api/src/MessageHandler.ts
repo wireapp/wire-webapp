@@ -39,7 +39,7 @@ export abstract class MessageHandler {
   abstract handleEvent(payload: PayloadBundle | ConversationEvent | UserEvent | TeamEvent): void;
 
   public async addUser(conversationId: string, userId: string): Promise<void> {
-    if (this.account && this.account.service) {
+    if (this.account?.service) {
       await this.account.service.conversation.addUser(conversationId, userId);
     }
   }
@@ -53,19 +53,19 @@ export abstract class MessageHandler {
   }
 
   async clearConversation(conversationId: string): Promise<void> {
-    if (this.account && this.account.service) {
+    if (this.account?.service) {
       await this.account.service.conversation.clearConversation(conversationId);
     }
   }
 
   public async removeUser(conversationId: string, userId: string): Promise<void> {
-    if (this.account && this.account.service) {
+    if (this.account?.service) {
       await this.account.service.conversation.removeUser(conversationId, userId);
     }
   }
 
   public async sendConfirmation(conversationId: string, firstMessageId: string): Promise<void> {
-    if (this.account && this.account.service) {
+    if (this.account?.service) {
       const confirmationPayload = this.account.service.conversation.messageBuilder.createConfirmation(
         conversationId,
         firstMessageId,
@@ -76,13 +76,13 @@ export abstract class MessageHandler {
   }
 
   public async sendConnectionRequest(userId: string): Promise<void> {
-    if (this.account && this.account.service) {
+    if (this.account?.service) {
       await this.account.service.connection.createConnection(userId);
     }
   }
 
   public async sendConnectionResponse(userId: string, accept: boolean): Promise<void> {
-    if (this.account && this.account.service) {
+    if (this.account?.service) {
       if (accept) {
         await this.account.service.connection.acceptConnection(userId);
       } else {
@@ -99,7 +99,7 @@ export abstract class MessageHandler {
     newLinkPreview?: LinkPreviewContent,
     userIds?: string[],
   ): Promise<void> {
-    if (this.account && this.account.service) {
+    if (this.account?.service) {
       const editedPayload = this.account.service.conversation.messageBuilder
         .createEditedText(conversationId, newMessageText, originalMessageId)
         .withMentions(newMentions)
@@ -123,7 +123,7 @@ export abstract class MessageHandler {
   }
 
   public async sendFile(conversationId: string, file: FileContent, metadata: FileMetaDataContent): Promise<void> {
-    if (this.account && this.account.service) {
+    if (this.account?.service) {
       const metadataPayload = this.account.service.conversation.messageBuilder.createFileMetadata(
         conversationId,
         metadata,
@@ -149,28 +149,28 @@ export abstract class MessageHandler {
   }
 
   public async sendImage(conversationId: string, image: ImageContent): Promise<void> {
-    if (this.account && this.account.service) {
+    if (this.account?.service) {
       const imagePayload = await this.account.service.conversation.messageBuilder.createImage(conversationId, image);
       await this.account.service.conversation.send(imagePayload);
     }
   }
 
   public async sendLocation(conversationId: string, location: LocationContent): Promise<void> {
-    if (this.account && this.account.service) {
+    if (this.account?.service) {
       const locationPayload = this.account.service.conversation.messageBuilder.createLocation(conversationId, location);
       await this.account.service.conversation.send(locationPayload);
     }
   }
 
   public async sendPing(conversationId: string): Promise<void> {
-    if (this.account && this.account.service) {
+    if (this.account?.service) {
       const pingPayload = this.account.service.conversation.messageBuilder.createPing(conversationId);
       await this.account.service.conversation.send(pingPayload);
     }
   }
 
   public async sendReaction(conversationId: string, originalMessageId: string, type: ReactionType): Promise<void> {
-    if (this.account && this.account.service) {
+    if (this.account?.service) {
       const reactionPayload = this.account.service.conversation.messageBuilder.createReaction(conversationId, {
         originalMessageId,
         type,
@@ -180,7 +180,7 @@ export abstract class MessageHandler {
   }
 
   public async sendCall(conversationId: string, content: CallingContent): Promise<void> {
-    if (this.account && this.account.service) {
+    if (this.account?.service) {
       const callPayload = this.account.service.conversation.messageBuilder.createCall(conversationId, content);
       await this.account.service.conversation.send(callPayload);
     }
@@ -193,7 +193,7 @@ export abstract class MessageHandler {
     linkPreview?: LinkPreviewContent,
     userIds?: string[],
   ): Promise<void> {
-    if (this.account && this.account.service) {
+    if (this.account?.service) {
       const payload = await this.account.service.conversation.messageBuilder
         .createText(conversationId, text)
         .withMentions(mentions)
@@ -216,7 +216,7 @@ export abstract class MessageHandler {
   }
 
   public async sendTyping(conversationId: string, status: CONVERSATION_TYPING): Promise<void> {
-    if (this.account && this.account.service) {
+    if (this.account?.service) {
       if (status === CONVERSATION_TYPING.STARTED) {
         await this.account.service.conversation.sendTypingStart(conversationId);
       } else {
