@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [15.1.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@15.1.1...@wireapp/core@15.1.2) (2019-11-27)
+
+
+### Bug Fixes
+
+* **core:** Update @wireapp/store-engine-dexie to latest version ([117da14](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/117da142198bc6e87b7a12bd5bb2782f841c9326))
+
+
+
+
+
 ## [15.1.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@15.1.0...@wireapp/core@15.1.1) (2019-11-26)
 
 
