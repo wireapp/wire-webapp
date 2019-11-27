@@ -19,7 +19,7 @@
     "@types/faker": "4.1.7",
     "@types/jasmine": "3.5.0",
     "@wireapp/commons": "3.0.1",
-    "@wireapp/store-engine-dexie": "0.7.0",
+    "@wireapp/store-engine-dexie": "1.0.2",
     "commander": "4.0.1",
     "cross-env": "6.0.3",
     "dotenv": "8.2.0",
