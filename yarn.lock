@@ -2446,17 +2446,17 @@ babel-plugin-macros@^2.0.0:
     cosmiconfig "^5.2.0"
     resolve "^1.10.0"
 
-babel-plugin-react-intl@5.1.5:
-  version "5.1.5"
-  resolved "https://registry.yarnpkg.com/babel-plugin-react-intl/-/babel-plugin-react-intl-5.1.5.tgz#0fffeea14beabd9dfcfe141f14e661cf9f2e205c"
-  integrity sha512-ce8Nw+NJMiJwb+TH6dJ50ardAo04sdVPX6nRzT3fnnB1TfwBj/Ankr0rgnV9gquy1XGRau/GDdSZpW6zLOduUw==
+babel-plugin-react-intl@5.1.8:
+  version "5.1.8"
+  resolved "https://registry.yarnpkg.com/babel-plugin-react-intl/-/babel-plugin-react-intl-5.1.8.tgz#1eeee69f9b05a752dcda00d04795be2a7cae7b58"
+  integrity sha512-v5SIQlM1Yu22DmVy1GpkV187QdprXWtdY5iOG+t1t7/zw9FKfadO/dNXXjUt+gHZHUjrrkqG/ma9ZokqoVGyhg==
   dependencies:
     "@babel/core" "^7.7.2"
     "@babel/helper-plugin-utils" "^7.0.0"
     "@types/babel__core" "^7.1.3"
     "@types/schema-utils" "^1.0.0"
     fs-extra "^8.0.1"
-    intl-messageformat-parser "^3.2.5"
+    intl-messageformat-parser "^3.3.1"
     schema-utils "^2.2.0"
 
 babel-plugin-syntax-jsx@^6.18.0:
@@ -6514,10 +6514,10 @@ intl-locales-supported@^1.6.0:
   resolved "https://registry.yarnpkg.com/intl-locales-supported/-/intl-locales-supported-1.6.0.tgz#6f66501ef23a58c87f242021cfadb1b012770808"
   integrity sha512-n8J5v2oBjaOu065/HXeDFU3huv76Ehwj6YovPI7IJ3DCf0EvvwL1lncRj/qobmlyDh0LumwxpU+pVhFR34xjEA==
 
-intl-messageformat-parser@^3.2.2, intl-messageformat-parser@^3.2.5:
-  version "3.2.5"
-  resolved "https://registry.yarnpkg.com/intl-messageformat-parser/-/intl-messageformat-parser-3.2.5.tgz#9d6a2c1aa13b3d247edea40a2847e374f86589b6"
-  integrity sha512-cn2HgNCF1q9HCJxzpmFIWWADQWS/fG/UtAE7H8SVT79NOfNFiQnEQHokzA0UpvWv73jowFavMCvToPFRCf6zaQ==
+intl-messageformat-parser@^3.2.2, intl-messageformat-parser@^3.3.1:
+  version "3.3.1"
+  resolved "https://registry.yarnpkg.com/intl-messageformat-parser/-/intl-messageformat-parser-3.3.1.tgz#2140b2072149ae8639645823a3a895d515d251a4"
+  integrity sha512-H+t27dpxi8r51GD9km0huyy5UJET3YF3AT2mvXRc0PRioKPFNexxhMUSagPNrMqGhb+/7p7RPcmsv7tcgCdWWQ==
 
 intl-messageformat@^7.5.1:
   version "7.5.2"
