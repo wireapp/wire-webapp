@@ -931,7 +931,6 @@ $(async () => {
     if (isTemporaryClientAndNonPersistent()) {
       const encryptionKey = await getEphemeralValue();
       const engine = StorageService.initEncryptedDatabase(encryptionKey);
-      window.addEventListener('beforeunload', () => engine.purge());
       wire.app = new App(backendClient, appContainer, engine);
     } else {
       wire.app = new App(backendClient, appContainer);
