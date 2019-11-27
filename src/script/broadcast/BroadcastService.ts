@@ -17,7 +17,7 @@
  *
  */
 
-import {UserClients} from '@wireapp/api-client/dist/commonjs/conversation';
+import {UserClients} from '@wireapp/api-client/dist/conversation';
 import {BackendClient} from '../service/BackendClient';
 
 // Broadcast service for all broadcast calls to the backend REST API.

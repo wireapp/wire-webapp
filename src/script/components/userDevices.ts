@@ -34,7 +34,7 @@ import {WebAppEvents} from '../event/WebApp';
 import {getPrivacyHowUrl, getPrivacyWhyUrl} from '../externalRoute';
 import {MotionDuration} from '../motion/MotionDuration';
 
-import {ClientClassification} from '@wireapp/api-client/dist/commonjs/client';
+import {ClientClassification} from '@wireapp/api-client/dist/client';
 import 'Components/deviceCard';
 
 export interface UserDevicesHistory {

@@ -17,7 +17,7 @@
  *
  */
 
-import {TeamInvitation} from '@wireapp/api-client/dist/commonjs/team';
+import {TeamInvitation} from '@wireapp/api-client/dist/team';
 import {INVITATION_ACTION, InvitationActions} from '../action/creator/';
 
 export interface InvitationState {

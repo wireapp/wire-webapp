@@ -17,7 +17,7 @@
  *
  */
 
-import {RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
+import {RegisteredClient} from '@wireapp/api-client/dist/client/index';
 import {AUTH_ACTION, AppActions, CLIENT_ACTION, NOTIFICATION_ACTION} from '../action/creator/';
 
 export interface ClientState {

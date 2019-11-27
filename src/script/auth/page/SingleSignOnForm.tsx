@@ -17,7 +17,7 @@
  *
  */
 
-import {ClientType} from '@wireapp/api-client/dist/commonjs/client/index';
+import {ClientType} from '@wireapp/api-client/dist/client/index';
 import {
   Button,
   Checkbox,

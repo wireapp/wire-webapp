@@ -25,7 +25,11 @@ function keepAlive() {
 (global => {
   let storeValue = undefined;
   const actions = {
-    get: () => storeValue,
+    get: () => {
+      const cachedValue = storeValue;
+      storeValue = undefined;
+      return cachedValue;
+    },
     save: value => {
       storeValue = value;
     },
@@ -44,7 +48,7 @@ function keepAlive() {
       console.error(`Action '${event.data.action}' doesn't exist in value store service worker`);
       return;
     }
-    const value = action(event.data.params);
+    const value = action(event.data.value);
     client.postMessage(value);
   });
 })(self);

@@ -17,8 +17,8 @@
  *
  */
 
-import {TeamData} from '@wireapp/api-client/dist/commonjs/team';
-import {UserAsset} from '@wireapp/api-client/dist/commonjs/user';
+import {TeamData} from '@wireapp/api-client/dist/team';
+import {UserAsset} from '@wireapp/api-client/dist/user';
 import {AUTH_ACTION, AppActions, USER_ACTION} from '../action/creator/';
 import {REGISTER_FLOW} from '../selector/AuthSelector';
 

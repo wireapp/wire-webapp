@@ -33,11 +33,11 @@ import {Config} from '../Config';
 import {Conversation} from '../entity/Conversation';
 import {StorageKey} from '../storage/StorageKey';
 
-export const isTemporaryClientAndNonPersistent = (): boolean => {
+export const isTemporaryClientAndNonPersistent = (persist: boolean = false): boolean => {
   const enableTransientTemporaryClients =
     URLUtil.getURLParameter(QUERY_KEY.PERSIST_TEMPORARY_CLIENTS) === 'false' ||
     (Config.FEATURE && Config.FEATURE.PERSIST_TEMPORARY_CLIENTS === false);
-  return loadValue(StorageKey.AUTH.PERSIST) === false && enableTransientTemporaryClients;
+  return (persist === false || loadValue(StorageKey.AUTH.PERSIST) === false) && enableTransientTemporaryClients;
 };
 
 export const checkIndexedDb = (): Promise<void> => {
