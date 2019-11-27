@@ -19,9 +19,9 @@
 
 import {TimeUtil} from '@wireapp/commons';
 import logdown from 'logdown';
+import RWS, {CloseEvent, ErrorEvent, Event, Options} from 'reconnecting-websocket';
 import NodeWebSocket = require('ws');
 
-import RWS, {CloseEvent, ErrorEvent, Event, Options} from 'reconnecting-websocket';
 import * as buffer from '../shims/node/buffer';
 
 export enum CloseEventCode {

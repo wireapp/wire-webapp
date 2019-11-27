@@ -13,7 +13,7 @@
   },
   "devDependencies": {
     "rimraf": "3.0.0",
-    "typescript": "3.6.4"
+    "typescript": "3.7.2"
   },
   "description": "Command-line interface for Wire's secure messaging platform.",
   "files": [
