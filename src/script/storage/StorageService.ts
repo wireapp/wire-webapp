@@ -331,6 +331,11 @@ export class StorageService {
   async load<T = Object>(storeName: string, primaryKey: string): Promise<T | undefined> {
     try {
       const record = await this.engine.read<T>(storeName, primaryKey);
+      if (typeof (record as any).data === 'string') {
+        try {
+          (record as any).data = JSON.parse((record as any).data);
+        } catch (error) {}
+      }
       return record;
     } catch (error) {
       if (error instanceof StoreEngineError.RecordNotFoundError) {
