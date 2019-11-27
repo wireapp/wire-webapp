@@ -18,6 +18,7 @@
  */
 
 import {EventService} from './EventService';
+import {StorageSchemata} from '../storage/StorageSchemata';
 
 // TODO: This function can be removed once Microsoft Edge's IndexedDB supports compound indices:
 // - https://developer.microsoft.com/en-us/microsoft-edge/platform/status/indexeddbarraysandmultientrysupport/
@@ -38,12 +39,12 @@ export class EventServiceNoCompound extends EventService {
 
     if (this.storageService.db) {
       events = await this.storageService.db
-        .table(this.EVENT_STORE_NAME)
+        .table(StorageSchemata.OBJECT_STORE.EVENTS)
         .where('conversation')
         .equals(conversationId)
         .sortBy('time');
     } else {
-      const records = await this.storageService.getAll(this.EVENT_STORE_NAME);
+      const records = await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS);
       events = records.filter(record => record.conversation === conversationId).sort((a, b) => a.time - b.time);
     }
 
@@ -72,7 +73,7 @@ export class EventServiceNoCompound extends EventService {
 
     if (this.storageService.db) {
       return this.storageService.db
-        .table(this.EVENT_STORE_NAME)
+        .table(StorageSchemata.OBJECT_STORE.EVENTS)
         .where('conversation')
         .equals(conversationId)
         .and(record => {
@@ -82,7 +83,7 @@ export class EventServiceNoCompound extends EventService {
         .limit(limit);
     }
 
-    const records = await this.storageService.getAll(this.EVENT_STORE_NAME);
+    const records = await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS);
     return records
       .filter(record => {
         const timestamp = new Date(record.time).getTime();
