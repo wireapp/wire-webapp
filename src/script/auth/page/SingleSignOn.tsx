@@ -77,11 +77,10 @@ const SingleSignOn = ({}: Props & ConnectedProps & DispatchProps) => {
       };
 
       onReceiveChildWindowMessage = (event: MessageEvent) => {
-        onChildWindowClose();
-        ssoWindowRef.current.close();
-
         const isExpectedOrigin = event.origin === Config.BACKEND_REST;
         if (!isExpectedOrigin) {
+          onChildWindowClose();
+          ssoWindowRef.current.close();
           return reject(
             new BackendError({
               code: 500,
@@ -96,9 +95,13 @@ const SingleSignOn = ({}: Props & ConnectedProps & DispatchProps) => {
         const eventType = event.data && event.data.type;
         switch (eventType) {
           case 'AUTH_SUCCESS': {
+            onChildWindowClose();
+            ssoWindowRef.current.close();
             return resolve();
           }
           case 'AUTH_ERROR': {
+            onChildWindowClose();
+            ssoWindowRef.current.close();
             return reject(
               new BackendError({
                 code: 401,
