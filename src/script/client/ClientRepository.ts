@@ -481,21 +481,21 @@ export class ClientRepository {
       if (this.isTemporaryClient()) {
         await this.deleteTemporaryClient();
         amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, true);
-      }
-
-      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.OPTION, {
-        preventClose: true,
-        primaryAction: {
-          action: (clearData: boolean) => {
-            return amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, clearData);
+      } else {
+        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.OPTION, {
+          preventClose: true,
+          primaryAction: {
+            action: (clearData: boolean) => {
+              return amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, clearData);
+            },
+            text: t('modalAccountLogoutAction'),
           },
-          text: t('modalAccountLogoutAction'),
-        },
-        text: {
-          option: t('modalAccountLogoutOption'),
-          title: t('modalAccountLogoutHeadline'),
-        },
-      });
+          text: {
+            option: t('modalAccountLogoutOption'),
+            title: t('modalAccountLogoutHeadline'),
+          },
+        });
+      }
     }
   }
 
