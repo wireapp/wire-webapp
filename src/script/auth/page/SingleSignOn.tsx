@@ -37,6 +37,8 @@ import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 import useReactRouter from 'use-react-router';
+import {getLogger} from 'Util/Logger';
+
 import {Config} from '../../Config';
 import {ssoLoginStrings} from '../../strings';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
@@ -48,6 +50,8 @@ import Page from './Page';
 import SingleSignOnForm from './SingleSignOnForm';
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {}
+
+const logger = getLogger('SingleSignOn');
 
 const SingleSignOn = ({}: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
@@ -73,10 +77,11 @@ const SingleSignOn = ({}: Props & ConnectedProps & DispatchProps) => {
       };
 
       onReceiveChildWindowMessage = (event: MessageEvent) => {
+        onChildWindowClose();
+        ssoWindowRef.current.close();
+
         const isExpectedOrigin = event.origin === Config.BACKEND_REST;
         if (!isExpectedOrigin) {
-          onChildWindowClose();
-          ssoWindowRef.current.close();
           return reject(
             new BackendError({
               code: 500,
@@ -91,13 +96,9 @@ const SingleSignOn = ({}: Props & ConnectedProps & DispatchProps) => {
         const eventType = event.data && event.data.type;
         switch (eventType) {
           case 'AUTH_SUCCESS': {
-            onChildWindowClose();
-            ssoWindowRef.current.close();
             return resolve();
           }
           case 'AUTH_ERROR': {
-            onChildWindowClose();
-            ssoWindowRef.current.close();
             return reject(
               new BackendError({
                 code: 401,
@@ -107,19 +108,11 @@ const SingleSignOn = ({}: Props & ConnectedProps & DispatchProps) => {
             );
           }
           default: {
-            onChildWindowClose();
-            ssoWindowRef.current.close();
-            return reject(
-              new BackendError({
-                code: 500,
-                label: BackendError.LABEL.SSO_GENERIC_ERROR,
-                message: `Unmatched event type: "${JSON.stringify(event)}"`,
-              }),
-            );
+            logger.warn(`Received unmatched event type: "${JSON.stringify(event)}"`);
           }
         }
       };
-      window.addEventListener('message', onReceiveChildWindowMessage, {once: true});
+      window.addEventListener('message', onReceiveChildWindowMessage, {once: false});
 
       const childPosition = calculateChildPosition(POPUP_HEIGHT, POPUP_WIDTH);
 
