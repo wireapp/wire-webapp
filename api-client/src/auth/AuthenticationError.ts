@@ -17,10 +17,10 @@
  *
  */
 
-import {BackendError, BackendErrorLabel, StatusCode} from '../http/';
+import {BackendError, BackendErrorLabel, StatusCode, SyntheticErrorLabel} from '../http/';
 
 export class AuthenticationError extends BackendError {
-  constructor(message: string, label: BackendErrorLabel, code: StatusCode) {
+  constructor(message: string, label: BackendErrorLabel | SyntheticErrorLabel, code: StatusCode) {
     super(message, label, code);
     Object.setPrototypeOf(this, AuthenticationError.prototype);
     this.name = 'AuthenticationError';
@@ -84,7 +84,7 @@ export class MissingCookieError extends AuthenticationError {
 }
 
 export class InvalidPhoneNumberError extends AuthenticationError {
-  constructor(message: string, label = BackendErrorLabel.BAD_REQUEST, code = StatusCode.BAD_REQUEST) {
+  constructor(message: string, label = SyntheticErrorLabel.INVALID_PHONE_NUMBER, code = StatusCode.BAD_REQUEST) {
     super(message, label, code);
     Object.setPrototypeOf(this, InvalidPhoneNumberError.prototype);
     this.name = 'InvalidPhoneNumberError';
@@ -92,7 +92,7 @@ export class InvalidPhoneNumberError extends AuthenticationError {
 }
 
 export class ForbiddenPhoneNumberError extends AuthenticationError {
-  constructor(message: string, label = BackendErrorLabel.UNAUTHORIZED, code = StatusCode.FORBIDDEN) {
+  constructor(message: string, label = SyntheticErrorLabel.FORBIDDEN_PHONE_NUMBER, code = StatusCode.FORBIDDEN) {
     super(message, label, code);
     Object.setPrototypeOf(this, ForbiddenPhoneNumberError.prototype);
     this.name = 'ForbiddenPhoneNumberError';

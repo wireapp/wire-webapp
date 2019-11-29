@@ -34,7 +34,6 @@ export enum BackendErrorLabel {
   OPERATION_DENIED = 'operation-denied',
   QUEUE_FULL = 'queue-full',
   UNAUTHORIZED = 'unauthorized',
-  UNKNOWN = 'unknown-error', // defined by web team
   // Authentication errors
   BLACKLISTED_EMAIL = 'blacklisted-email',
   BLACKLISTED_PHONE = 'blacklisted-phone',
@@ -75,6 +74,16 @@ export enum BackendErrorLabel {
   NO_ADD_TO_MANAGED = 'no-add-to-managed',
   // Payment errors
   EXPIRED_CARD = 'expired_card',
-  // Service errors
-  SERVICE_NOT_FOUND = 'service-not-found', // defined by web team
+}
+
+export enum SyntheticErrorLabel {
+  ALREADY_INVITED = 'already-invited',
+  FORBIDDEN_PHONE_NUMBER = 'forbidden-phone-number',
+  HANDLE_TOO_SHORT = 'handle-too-short',
+  INVALID_PHONE_NUMBER = 'invalid-phone-number',
+  SERVICE_NOT_FOUND = 'service-not-found',
+  SSO_GENERIC_ERROR = 'generic-sso-error',
+  SSO_NO_SSO_CODE = 'no-sso-code-found',
+  SSO_USER_CANCELLED_ERROR = 'user-cancelled-sso-error',
+  UNKNOWN = 'unknown-error',
 }
