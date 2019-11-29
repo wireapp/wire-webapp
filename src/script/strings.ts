@@ -17,6 +17,7 @@
  *
  */
 
+import {SyntheticErrorLabel} from '@wireapp/api-client/dist/http';
 import {defineMessages} from 'react-intl';
 import {BackendError} from './auth/module/action/BackendError';
 import {LabeledError} from './auth/module/action/LabeledError';
@@ -391,6 +392,14 @@ export const conversationJoinStrings = defineMessages({
 });
 
 export const errorHandlerStrings = defineMessages({
+  [SyntheticErrorLabel.INVALID_PHONE_NUMBER]: {
+    defaultMessage: 'Invalid Phone Number',
+    id: 'authErrorPhoneNumberInvalid',
+  },
+  [SyntheticErrorLabel.FORBIDDEN_PHONE_NUMBER]: {
+    defaultMessage: 'Sorry. This phone number is forbidden.',
+    id: 'authErrorPhoneNumberForbidden',
+  },
   [BackendError.LABEL.CONVERSATION_CODE_NOT_FOUND]: {
     defaultMessage: 'This link is no longer valid. Ask the person who invited you how to join.',
     id: 'BackendError.LABEL.CONVERSATION_CODE_NOT_FOUND',
@@ -426,10 +435,6 @@ export const errorHandlerStrings = defineMessages({
   [BackendError.LABEL.INVALID_EMAIL]: {
     defaultMessage: 'This email address is invalid',
     id: 'BackendError.LABEL.INVALID_EMAIL',
-  },
-  [BackendError.LABEL.INVALID_PHONE]: {
-    defaultMessage: 'This phone number is invalid',
-    id: 'BackendError.LABEL.INVALID_PHONE',
   },
   [BackendError.LABEL.KEY_EXISTS]: {
     defaultMessage:

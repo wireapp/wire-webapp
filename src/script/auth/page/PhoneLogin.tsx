@@ -17,7 +17,12 @@
  *
  */
 
-import {LoginData} from '@wireapp/api-client/dist/auth';
+import {
+  ForbiddenPhoneNumberError,
+  InvalidPhoneNumberError,
+  LoginData,
+  PasswordExistsError,
+} from '@wireapp/api-client/dist/auth';
 import {ClientType} from '@wireapp/api-client/dist/client/index';
 import {
   ArrowIcon,
@@ -43,7 +48,6 @@ import {loginStrings, phoneLoginStrings} from '../../strings';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import PhoneLoginForm from '../component/PhoneLoginForm';
 import {actionRoot} from '../module/action';
-import {BackendError} from '../module/action/BackendError';
 import {ValidationError} from '../module/action/ValidationError';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
@@ -74,25 +78,20 @@ const PhoneLogin = ({
       await doSendPhoneLoginCode({phone: formLoginData.phone});
       return history.push(ROUTE.VERIFY_PHONE_CODE);
     } catch (error) {
-      if (error instanceof ValidationError) {
-        setError(error);
-      } else if (error.hasOwnProperty('label')) {
-        switch (error.label) {
-          case BackendError.LABEL.PASSWORD_EXISTS: {
-            return history.push(ROUTE.CHECK_PASSWORD);
-          }
-          case BackendError.LABEL.UNAUTHORIZED:
-          case BackendError.LABEL.BAD_REQUEST: {
-            setError(error);
-            break;
-          }
-          default: {
-            setError(error);
-            throw error;
-          }
+      switch (true) {
+        case error instanceof PasswordExistsError: {
+          return history.push(ROUTE.CHECK_PASSWORD);
         }
-      } else {
-        throw error;
+        case error instanceof ValidationError:
+        case error instanceof InvalidPhoneNumberError:
+        case error instanceof ForbiddenPhoneNumberError: {
+          setError(error);
+          break;
+        }
+        default: {
+          setError(error);
+          throw error;
+        }
       }
     }
   };
