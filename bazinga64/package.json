@@ -18,7 +18,7 @@
     "libsodium-wrappers-sumo": "0.7.6",
     "nyc": "14.1.1",
     "rimraf": "3.0.0",
-    "ts-node": "8.5.2",
+    "ts-node": "8.5.4",
     "typescript": "3.7.2",
     "webpack": "4.41.2"
   },
