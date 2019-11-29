@@ -17,10 +17,10 @@
  *
  */
 
-import {BackendError, BackendErrorLabel, StatusCode} from '../http/';
+import {BackendError, BackendErrorLabel, StatusCode, SyntheticErrorLabel} from '../http/';
 
 export class TeamError extends BackendError {
-  constructor(message: string, label: BackendErrorLabel, code: StatusCode) {
+  constructor(message: string, label: BackendErrorLabel | SyntheticErrorLabel, code: StatusCode) {
     super(message, label, code);
     Object.setPrototypeOf(this, TeamError.prototype);
     this.name = 'ConversationError';
@@ -54,7 +54,7 @@ export class InvalidInvitationCodeError extends TeamError {
 export class ServiceNotFoundError extends TeamError {
   constructor(
     message: string,
-    label: BackendErrorLabel = BackendErrorLabel.SERVICE_NOT_FOUND,
+    label: BackendErrorLabel | SyntheticErrorLabel = SyntheticErrorLabel.SERVICE_NOT_FOUND,
     code: StatusCode = StatusCode.NOT_FOUND,
   ) {
     super(message, label, code);
