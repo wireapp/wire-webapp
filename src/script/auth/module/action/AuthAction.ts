@@ -82,7 +82,12 @@ export class AuthAction {
         await dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: global.config.APP_INSTANCE_ID}));
         await dispatch(selfAction.fetchSelf());
         onAfterLogin(dispatch, getState, global);
-        await dispatch(clientAction.doInitializeClient(loginData.clientType, String(loginData.password)));
+        await dispatch(
+          clientAction.doInitializeClient(
+            loginData.clientType,
+            loginData.password ? String(loginData.password) : undefined,
+          ),
+        );
         dispatch(AuthActionCreator.successfulLogin());
       } catch (error) {
         if (error.label === BackendError.LABEL.TOO_MANY_CLIENTS) {

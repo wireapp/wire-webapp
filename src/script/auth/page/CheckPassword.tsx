@@ -18,6 +18,7 @@
  */
 
 import {LoginData} from '@wireapp/api-client/dist/auth';
+import {BackendErrorLabel} from '@wireapp/api-client/dist/http';
 import {
   ContainerXS,
   ErrorMessage,
@@ -38,7 +39,6 @@ import useReactRouter from 'use-react-router';
 import {loginStrings, phoneLoginStrings} from '../../strings';
 import {EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot} from '../module/action';
-import {BackendError} from '../module/action/BackendError';
 import {LabeledError} from '../module/action/LabeledError';
 import {ValidationError} from '../module/action/ValidationError';
 import {RootState, bindActionCreators} from '../module/reducer';
@@ -86,23 +86,24 @@ const CheckPassword = ({loginData, doLogin, resetAuthError, isFetching}: Props &
     } catch (error) {
       if (error instanceof ValidationError) {
         setError(error);
-      } else if (error.hasOwnProperty('label')) {
-        switch (error.label) {
-          case BackendError.LABEL.TOO_MANY_CLIENTS: {
-            resetAuthError();
-            history.push(ROUTE.CLIENTS);
-            break;
-          }
-          case BackendError.LABEL.INVALID_CREDENTIALS:
-          case LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE:
-          case BackendError.LABEL.BAD_REQUEST:
-          default: {
-            setError(error);
-            throw error;
-          }
+        return;
+      }
+      switch (error.label) {
+        case BackendErrorLabel.TOO_MANY_CLIENTS: {
+          resetAuthError();
+          history.push(ROUTE.CLIENTS);
+          break;
         }
-      } else {
-        throw error;
+        case BackendErrorLabel.INVALID_CREDENTIALS:
+        case LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE:
+        case BackendErrorLabel.BAD_REQUEST: {
+          setError(error);
+          return;
+        }
+        default: {
+          setError(error);
+          throw error;
+        }
       }
     }
   };

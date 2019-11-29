@@ -83,23 +83,24 @@ const VerifyPhoneCode = ({
     } catch (error) {
       if (error instanceof ValidationError) {
         setError(error);
-      } else if (error.hasOwnProperty('label')) {
-        switch (error.label) {
-          case BackendError.LABEL.TOO_MANY_CLIENTS: {
-            resetAuthError();
-            return history.push(ROUTE.CLIENTS);
-            break;
-          }
-          case BackendError.LABEL.INVALID_CREDENTIALS:
-          case LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE:
-          case BackendError.LABEL.BAD_REQUEST:
-          default: {
-            setError(error);
-            throw error;
-          }
+        return;
+      }
+
+      switch (error.label) {
+        case BackendError.LABEL.TOO_MANY_CLIENTS: {
+          resetAuthError();
+          return history.push(ROUTE.CLIENTS);
         }
-      } else {
-        throw error;
+        case BackendError.LABEL.INVALID_CREDENTIALS:
+        case LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE:
+        case BackendError.LABEL.BAD_REQUEST: {
+          setError(error);
+          return;
+        }
+        default: {
+          setError(error);
+          throw error;
+        }
       }
     }
   };
