@@ -32,7 +32,7 @@ export interface AvatarProps<T = HTMLDivElement> extends IsInViewportProps<T> {
   fetchImage?: () => void;
   forceInitials?: boolean;
   isAvatarGridItem?: boolean;
-  name: string;
+  name?: string;
   size?: number;
 }
 
@@ -84,7 +84,7 @@ const filteredAvatarProps = (props: AvatarProps) =>
 
 export const Avatar = (props: AvatarProps) => {
   const {base64Image, forceInitials, name, fetchImage, isAvatarGridItem} = props;
-  const getInitials = (name: string) =>
+  const getInitials = (name: string = '') =>
     name
       .split(' ')
       .map(([initial]) => initial && initial.toUpperCase())
