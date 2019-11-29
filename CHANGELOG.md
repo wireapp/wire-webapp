@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.23.28](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.23.27...@wireapp/react-ui-kit@7.23.28) (2019-11-29)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Default name value in Avatar components getInitials ([#2607](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/2607)) ([7ce873c](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/7ce873c7632e02d696b6adf09c0c9b458d9b5ed5))
+
+
+
+
+
 ## [7.23.27](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.23.26...@wireapp/react-ui-kit@7.23.27) (2019-11-27)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
