@@ -189,7 +189,7 @@ describe('AuthAction', () => {
     const mockedApiClient = {
       auth: {
         api: {
-          postLoginSend: () => Promise.resolve({data: {expires_in: expiresIn}}),
+          postLoginSend: () => Promise.resolve({expires_in: expiresIn}),
         },
       },
     };
