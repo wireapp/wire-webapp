@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.1.6...@wireapp/api-client@9.2.0) (2019-11-29)
+
+
+### Features
+
+* **api-client:** Map forbidden and invalid phone number errors ([#2609](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2609)) ([a3df784](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/a3df784034fecdaebdc6a82616b779deaef4087b))
+
+
+
+
+
 ## [9.1.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.1.5...@wireapp/api-client@9.1.6) (2019-11-29)
 
 **Note:** Version bump only for package @wireapp/api-client
