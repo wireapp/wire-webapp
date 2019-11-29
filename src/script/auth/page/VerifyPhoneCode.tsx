@@ -17,7 +17,7 @@
  *
  */
 
-import {LoginData} from '@wireapp/api-client/dist/commonjs/auth';
+import {LoginData} from '@wireapp/api-client/dist/auth';
 import {CodeInput, Column, Columns, ContainerXS, ErrorMessage, H1, Link} from '@wireapp/react-ui-kit';
 import React, {useEffect, useState} from 'react';
 import {useIntl} from 'react-intl';
@@ -150,7 +150,4 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(VerifyPhoneCode);
+export default connect(mapStateToProps, mapDispatchToProps)(VerifyPhoneCode);

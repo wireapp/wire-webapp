@@ -17,9 +17,9 @@
  *
  */
 
-import * as Events from '@wireapp/api-client/dist/commonjs/event';
-import {ConnectionState, HttpClient} from '@wireapp/api-client/dist/commonjs/http';
-import {Notification} from '@wireapp/api-client/dist/commonjs/notification';
+import * as Events from '@wireapp/api-client/dist/event';
+import {ConnectionState, HttpClient} from '@wireapp/api-client/dist/http';
+import {Notification} from '@wireapp/api-client/dist/notification';
 import {PayloadBundle, PayloadBundleSource, PayloadBundleType} from '@wireapp/core/dist/conversation/';
 import {UserUpdateMessage} from '@wireapp/core/dist/conversation/message/UserMessage';
 import {UserMapper} from '@wireapp/core/dist/user/UserMapper';

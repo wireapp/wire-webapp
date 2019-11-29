@@ -17,7 +17,7 @@
  *
  */
 
-import {ConversationEvent} from '@wireapp/api-client/dist/commonjs/event';
+import {ConversationEvent} from '@wireapp/api-client/dist/event';
 import {actionRoot} from '.';
 import {mockStoreFactory} from '../../util/test/mockStoreFactory';
 import {ConversationActionCreator} from './creator';

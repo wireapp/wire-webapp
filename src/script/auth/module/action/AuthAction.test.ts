@@ -18,7 +18,7 @@
  */
 
 import {APIClient} from '@wireapp/api-client';
-import {ClientType} from '@wireapp/api-client/dist/commonjs/client';
+import {ClientType} from '@wireapp/api-client/dist/client';
 import {TypeUtil} from '@wireapp/commons';
 import {mockStoreFactory} from '../../util/test/mockStoreFactory';
 import {actionRoot} from './';

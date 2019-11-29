@@ -17,7 +17,7 @@
  *
  */
 
-import {Self} from '@wireapp/api-client/dist/commonjs/self';
+import {Self} from '@wireapp/api-client/dist/self';
 import {actionRoot} from '.';
 import {mockStoreFactory} from '../../util/test/mockStoreFactory';
 import {SelfActionCreator} from './creator/';
