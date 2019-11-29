@@ -105,6 +105,7 @@ module.exports = function(config) {
     webpack: {
       externals: {
         'fs-extra': '{}',
+        worker_threads: '{}',
       },
       mode: 'development',
       module: {

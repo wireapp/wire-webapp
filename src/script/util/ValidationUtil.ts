@@ -17,8 +17,8 @@
  *
  */
 
-import {Config} from '..//Config';
 import {AssetRetentionPolicy} from '../assets/AssetRetentionPolicy';
+import {Config} from '../Config';
 
 export class ValidationUtilError extends Error {
   constructor(message = 'Unknown ValidationUtilError') {

@@ -17,7 +17,7 @@
  *
  */
 
-import {LoginData, RegisterData} from '@wireapp/api-client/dist/commonjs/auth';
+import {LoginData, RegisterData} from '@wireapp/api-client/dist/auth';
 import {AppAction} from '.';
 import {RegistrationDataState} from '../../reducer/authReducer';
 

@@ -17,7 +17,7 @@
  *
  */
 
-import {ConsentType} from '@wireapp/api-client/dist/commonjs/self/index';
+import {ConsentType} from '@wireapp/api-client/dist/self/index';
 import {
   ContainerXS,
   ErrorMessage,
@@ -95,6 +95,10 @@ const SetHandle = ({
       setError(error);
     }
   };
+
+  if (hasSelfHandle) {
+    return null;
+  }
 
   return (
     <Page>

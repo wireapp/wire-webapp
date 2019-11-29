@@ -17,7 +17,7 @@
  *
  */
 
-import {ChangePassword, ConsentType, Self} from '@wireapp/api-client/dist/commonjs/self';
+import {ChangePassword, ConsentType, Self} from '@wireapp/api-client/dist/self';
 
 import {Environment} from 'Util/Environment';
 import {getLogger} from 'Util/Logger';

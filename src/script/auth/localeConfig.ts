@@ -17,7 +17,7 @@
  *
  */
 
-import {SupportedCurrency} from '@wireapp/api-client/dist/commonjs/team/payment';
+import {SupportedCurrency} from '@wireapp/api-client/dist/team/payment';
 import {QUERY_KEY} from './route';
 import {supportedLocales as Locales} from './supportedLocales';
 import {getURLParameter} from './util/urlUtil';

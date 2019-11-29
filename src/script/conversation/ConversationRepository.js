@@ -96,7 +96,7 @@ import {StatusType} from '../message/StatusType';
 import {SuperType} from '../message/SuperType';
 import {MessageCategory} from '../message/MessageCategory';
 import {ReactionType} from '../message/ReactionType';
-import {Config} from '..//Config';
+import {Config} from '../Config';
 
 import {BaseError} from '../error/BaseError';
 import {BackendClientError} from '../error/BackendClientError';
@@ -2956,7 +2956,8 @@ export class ConversationRepository {
     let messageId;
     try {
       const uploadStarted = Date.now();
-      messageId = (await this.send_asset_metadata(conversationEntity, file, asImage)).id;
+      const injectedEvent = await this.send_asset_metadata(conversationEntity, file, asImage);
+      messageId = injectedEvent.id;
       if (isVideo(file)) {
         await this.sendAssetPreview(conversationEntity, file, messageId);
       }

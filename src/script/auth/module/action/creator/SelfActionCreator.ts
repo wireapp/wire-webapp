@@ -17,7 +17,7 @@
  *
  */
 
-import {Consent, Self} from '@wireapp/api-client/dist/commonjs/self';
+import {Consent, Self} from '@wireapp/api-client/dist/self';
 import {AppAction} from '.';
 
 export enum SELF_ACTION {

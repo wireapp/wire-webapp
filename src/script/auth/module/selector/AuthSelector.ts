@@ -17,7 +17,7 @@
  *
  */
 
-import {TeamData} from '@wireapp/api-client/dist/commonjs/team';
+import {TeamData} from '@wireapp/api-client/dist/team';
 import {RootState} from '../reducer';
 import {RegistrationDataState} from '../reducer/authReducer';
 

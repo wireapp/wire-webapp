@@ -34,6 +34,7 @@ module.exports = {
   },
   externals: {
     'fs-extra': '{}',
+    worker_threads: '{}',
   },
   mode: 'production',
   module: {

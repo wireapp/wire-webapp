@@ -19,7 +19,7 @@
 
 import {Logger, getLogger} from 'Util/Logger';
 
-import {NewClient, PublicClient, RegisteredClient} from '@wireapp/api-client/dist/commonjs/client';
+import {NewClient, PublicClient, RegisteredClient} from '@wireapp/api-client/dist/client';
 import {BackendClient} from '../service/BackendClient';
 import {StorageService} from '../storage';
 import {StorageSchemata} from '../storage/StorageSchemata';

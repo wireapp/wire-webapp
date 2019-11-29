@@ -257,10 +257,10 @@
   dependencies:
     "@types/express" "*"
 
-"@types/jasmine@3.4.6":
-  version "3.4.6"
-  resolved "https://registry.yarnpkg.com/@types/jasmine/-/jasmine-3.4.6.tgz#afcb210af0fa751b85a96b2034eedada65390be1"
-  integrity sha512-hpQHs+lmZ0uuCrGyqypdI1Ho7jRFolOBT6OkNdZPFziLSSEKvWu+VxWU6bGdNEA/hoV4jV8pdDeNx8EWlmfNAw==
+"@types/jasmine@3.5.0":
+  version "3.5.0"
+  resolved "https://registry.yarnpkg.com/@types/jasmine/-/jasmine-3.5.0.tgz#2ad2006c8a937d20df20a8fee86071d0f730ef99"
+  integrity sha512-kGCRI9oiCxFS6soGKlyzhMzDydfcPix9PpTkr7h11huxOxhWwP37Tg7DYBaQ18eQTNreZEuLkhpbGSqVNZPnnw==
 
 "@types/mime@*":
   version "2.0.1"
@@ -300,10 +300,10 @@
     "@types/express-serve-static-core" "*"
     "@types/mime" "*"
 
-"@wireapp/commons@2.2.23":
-  version "2.2.23"
-  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-2.2.23.tgz#2beaa6ea0673d0d87719a3fc2ae37346f7963440"
-  integrity sha512-yVhEMEJ9+a1IcBVl6GHJ/f7ke8AbL1p+MPND1aCh7bOhnf7oGh5phYJj3Z8iqjyDt6kCxLKyBMSJxdJnNMHj3g==
+"@wireapp/commons@3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-3.0.0.tgz#0344b162796242ef5ff65ddeb4f2f217db4b800a"
+  integrity sha512-enbffcroZX3iScwNfUOAmcc2/WL//+WR59H4shue7yBchlr0q6e6r1LJn0PzZ6gpSFQN5Kuz7FzXk1bPCF/XSQ==
   dependencies:
     "@types/ansi-regex" "5.0.0"
     "@types/fs-extra" "8.0.1"

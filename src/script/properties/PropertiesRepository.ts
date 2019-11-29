@@ -21,7 +21,7 @@ import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
 
-import {AudioPreference, NotificationPreference, WebappProperties} from '@wireapp/api-client/dist/commonjs/user/data';
+import {AudioPreference, NotificationPreference, WebappProperties} from '@wireapp/api-client/dist/user/data';
 import {amplify} from 'amplify';
 import {Config} from '../Config';
 import {ReceiptMode} from '../conversation/ReceiptMode';
