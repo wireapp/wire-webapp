@@ -365,7 +365,7 @@
   dependencies:
     "@babel/helper-plugin-utils" "^7.0.0"
 
-"@babel/plugin-syntax-object-rest-spread@^7.7.4":
+"@babel/plugin-syntax-object-rest-spread@^7.2.0", "@babel/plugin-syntax-object-rest-spread@^7.7.4":
   version "7.7.4"
   resolved "https://registry.yarnpkg.com/@babel/plugin-syntax-object-rest-spread/-/plugin-syntax-object-rest-spread-7.7.4.tgz#47cf220d19d6d0d7b154304701f468fc1cc6ff46"
   integrity sha512-mObR+r+KZq0XhRVS2BrBKBpr5jqrqzlPvS9C9vuOf5ilSwzloAl7RPWLrgKdWS6IreaVrjHxTjtyqFiOisaCwg==
@@ -1822,10 +1822,10 @@
     emotion-theming "10.0.17"
     react-transition-group "4.3.0"
 
-"@wireapp/store-engine-dexie@1.0.2":
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/@wireapp/store-engine-dexie/-/store-engine-dexie-1.0.2.tgz#392ed4b061d656555988499c1092e92e1490bfca"
-  integrity sha512-7d3eq1lfSVCqRSDFZUvDGzU+DHcw/ZUTeKfoSNJJEEi28Ngs9cHLDvm2rgE/zE1Jcpop6XltEIF9de2Z6Ui5OA==
+"@wireapp/store-engine-dexie@1.0.5":
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine-dexie/-/store-engine-dexie-1.0.5.tgz#64ad011ea4a341ed6b2c081e8a8a70d14523e6c3"
+  integrity sha512-oIgXSNr/2CukuV+fjPxNBmBLaZUE9Sffl2tgqEEMOxM/M1mI8IwlEyvyqNR9X6FLJHqP3hIC+c3MOMwIEyyNKQ==
   dependencies:
     dexie "2.0.4"
 
