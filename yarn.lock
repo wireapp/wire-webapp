@@ -365,7 +365,7 @@
   dependencies:
     "@babel/helper-plugin-utils" "^7.0.0"
 
-"@babel/plugin-syntax-object-rest-spread@^7.7.4":
+"@babel/plugin-syntax-object-rest-spread@^7.2.0", "@babel/plugin-syntax-object-rest-spread@^7.7.4":
   version "7.7.4"
   resolved "https://registry.yarnpkg.com/@babel/plugin-syntax-object-rest-spread/-/plugin-syntax-object-rest-spread-7.7.4.tgz#47cf220d19d6d0d7b154304701f468fc1cc6ff46"
   integrity sha512-mObR+r+KZq0XhRVS2BrBKBpr5jqrqzlPvS9C9vuOf5ilSwzloAl7RPWLrgKdWS6IreaVrjHxTjtyqFiOisaCwg==
@@ -1681,10 +1681,10 @@
     tough-cookie "3.0.1"
     ws "7.2.0"
 
-"@wireapp/avs@5.1.40":
-  version "5.1.40"
-  resolved "https://registry.yarnpkg.com/@wireapp/avs/-/avs-5.1.40.tgz#4e0d2eb48388891ec600af433b573bb0ec6cdfc8"
-  integrity sha512-z1PHXzv3x/KMrZ7SwSosT/UQNYARSpdfU3zWnQdh1ZofSjtuDDHcWFZ7+LxuBtfrgNFXh7M29LACscvgICs7gg==
+"@wireapp/avs@5.4.1":
+  version "5.4.1"
+  resolved "https://registry.yarnpkg.com/@wireapp/avs/-/avs-5.4.1.tgz#2fa4ec2cf54b87dfce069b44f288a143672c20bf"
+  integrity sha512-76BksFekSiLn7IY2pY1+46dUgrBUOqgShusbg+hxHgpEpxO/CmhB+Jf4+/DhFHrbRKpffkiaktOUD+00OA8N+g==
 
 "@wireapp/cbor@4.3.25":
   version "4.3.25"
