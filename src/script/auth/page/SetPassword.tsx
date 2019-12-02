@@ -18,14 +18,14 @@
  */
 
 import {ValidationUtil} from '@wireapp/commons';
-import {Button, ContainerXS, ErrorMessage, Form, H1, Input} from '@wireapp/react-ui-kit';
+import {Button, ContainerXS, ErrorMessage, Form, H1, Input, Small} from '@wireapp/react-ui-kit';
 import React, {useRef, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 import useReactRouter from 'use-react-router';
 import {Config} from '../../Config';
-import {setPasswordStrings} from '../../strings';
+import {accountFormStrings, setPasswordStrings} from '../../strings';
 import {actionRoot} from '../module/action';
 import {ValidationError} from '../module/action/ValidationError';
 import {RootState, bindActionCreators} from '../module/reducer';
@@ -104,6 +104,15 @@ const SetPassword = ({
             pattern={ValidationUtil.getNewPasswordPattern(Config.NEW_PASSWORD_MINIMUM_LENGTH)}
             data-uie-name="enter-password"
           />
+          <Small
+            style={{
+              display: error ? 'none' : 'block',
+              padding: '0 16px',
+            }}
+            data-uie-name="element-password-help"
+          >
+            {_(accountFormStrings.passwordHelp, {minPasswordLength: Config.NEW_PASSWORD_MINIMUM_LENGTH})}
+          </Small>
           <ErrorMessage data-uie-name="error-message">
             {!error ? <>&nbsp;</> : isValidationError(error) ? parseValidationErrors(error) : parseError(error)}
           </ErrorMessage>
