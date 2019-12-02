@@ -17,12 +17,12 @@
  *
  */
 
+import {PasswordExistsError} from '@wireapp/api-client/dist/auth';
 import {ReactWrapper} from 'enzyme';
 import {createMemoryHistory} from 'history';
 import React from 'react';
 import waitForExpect from 'wait-for-expect';
 import {actionRoot} from '../module/action';
-import {BackendError} from '../module/action/BackendError';
 import {initialRootState} from '../module/reducer';
 import {ROUTE} from '../route';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
@@ -139,8 +139,7 @@ describe('"PhoneLogin"', () => {
     const history = createMemoryHistory();
     const historyPushSpy = spyOn(history, 'push');
 
-    const error: any = new Error('test error') as any;
-    error['label'] = BackendError.LABEL.PASSWORD_EXISTS;
+    const error: any = new PasswordExistsError('test error') as any;
     spyOn(actionRoot.authAction, 'doSendPhoneLoginCode').and.returnValue(() => Promise.reject(error));
 
     wrapper = mountComponent(
