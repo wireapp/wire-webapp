@@ -75,7 +75,7 @@ describe('AuthAction', () => {
     expect(spies.doInitializeClient.calls.count()).toEqual(1);
   });
 
-  it('authentication is successful with too many clients error', async () => {
+  it('successful authenticates with too many clients error', async () => {
     const email = 'test@example.com';
     const password = 'password';
     const accessToken =
