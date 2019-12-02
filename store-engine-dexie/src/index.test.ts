@@ -59,12 +59,13 @@ describe('IndexedDBEngine', () => {
     engine = await initEngine();
   });
 
-  afterEach(done => {
+  afterEach(async () => {
+    let storeName = STORE_NAME;
     if (engine && engine['db']) {
+      storeName = engine['db'].name;
       engine['db'].close();
     }
-    const deleteRequest = window.indexedDB.deleteDatabase(STORE_NAME);
-    deleteRequest.onsuccess = () => done();
+    await Dexie.delete(storeName);
   });
 
   describe('init', () => {
@@ -76,10 +77,8 @@ describe('IndexedDBEngine', () => {
   });
 
   describe('create', () => {
-    describe('create', () => {
-      Object.entries(createSpec).map(([description, testFunction]) => {
-        it(description, () => testFunction(engine));
-      });
+    Object.entries(createSpec).map(([description, testFunction]) => {
+      it(description, () => testFunction(engine));
     });
 
     it('writes into an existing database.', async () => {
@@ -141,6 +140,32 @@ describe('IndexedDBEngine', () => {
   describe('read', () => {
     Object.entries(readSpec).map(([description, testFunction]) => {
       it(description, () => testFunction(engine));
+    });
+
+    it('works with typed arrays such as Uint8Array', async () => {
+      const tableName = 'events';
+      const primaryKey = 'test';
+      const testMessage = 'Test';
+      const entity = {
+        conversation: '123',
+        data: {
+          content: Uint8Array.from(Array.from(testMessage).map(char => char.charCodeAt(0))),
+        },
+      };
+
+      const storeName = new Date().toISOString();
+      await Dexie.delete(storeName);
+      const db = new Dexie(storeName);
+      db.version(1).stores({
+        [tableName]: ', conversation',
+      });
+      engine = new IndexedDBEngine();
+      await engine.initWithDb(db);
+
+      await engine.create(tableName, primaryKey, entity);
+      const record = await engine.read<typeof entity>(tableName, primaryKey);
+      const actualText = new TextDecoder('utf-8').decode(record.data.content);
+      expect(actualText).toBe(testMessage);
     });
   });
 
