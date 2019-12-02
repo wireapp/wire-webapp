@@ -58,7 +58,7 @@ export class WebSocketAction {
 
           try {
             switch (event.type) {
-              case Events.USER_EVENT.CLIENT_REMOVE: {
+              case Events.USER_EVENT.UPDATE: {
                 data = UserMapper.mapUserEvent(event, apiClient.context!.userId, source);
               }
               // Note: We do not want to update the last message timestamp
