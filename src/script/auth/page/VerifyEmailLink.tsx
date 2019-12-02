@@ -51,14 +51,18 @@ const VerifyEmailLink = ({hasSelfEmail}: Props & ConnectedProps) => {
         style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
       >
         <div>
-          <H1 center>{_(setEmailStrings.verifyHeadline)}</H1>
-          <H3 center block>
+          <H1 center data-uie-name="verify-email-headline">
+            {_(setEmailStrings.verifyHeadline)}
+          </H1>
+          <H3 center block data-uie-name="verify-email-subhead">
             {_(setEmailStrings.verifySubhead)}
           </H3>
-          <Muted center block style={{marginTop: 64}}>
+          <Muted center block style={{marginTop: 64}} data-uie-name="verify-email-no-mail">
             {_(setEmailStrings.noMailHeadline)}
           </Muted>
-          <Link onClick={() => history.push(ROUTE.SET_EMAIL)}>{_(setEmailStrings.tryAgain)}</Link>
+          <Link onClick={() => history.push(ROUTE.SET_EMAIL)} data-uie-name="go-set-email">
+            {_(setEmailStrings.tryAgain)}
+          </Link>
         </div>
       </ContainerXS>
     </Page>
