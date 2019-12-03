@@ -250,6 +250,7 @@ export class APIClient extends EventEmitter {
 
   public async logout(options = {ignoreError: false}): Promise<void> {
     try {
+      this.disconnect('Closed by client logout');
       await this.auth.api.postLogout();
     } catch (error) {
       if (options.ignoreError) {
@@ -261,7 +262,6 @@ export class APIClient extends EventEmitter {
       CookieStore.deleteCookie();
     }
 
-    this.disconnect('Closed by client logout');
     await this.accessTokenStore.delete();
     delete this.context;
   }
