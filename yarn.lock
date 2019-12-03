@@ -1822,10 +1822,10 @@
     emotion-theming "10.0.17"
     react-transition-group "4.3.0"
 
-"@wireapp/store-engine-dexie@1.0.2":
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/@wireapp/store-engine-dexie/-/store-engine-dexie-1.0.2.tgz#392ed4b061d656555988499c1092e92e1490bfca"
-  integrity sha512-7d3eq1lfSVCqRSDFZUvDGzU+DHcw/ZUTeKfoSNJJEEi28Ngs9cHLDvm2rgE/zE1Jcpop6XltEIF9de2Z6Ui5OA==
+"@wireapp/store-engine-dexie@1.0.6":
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine-dexie/-/store-engine-dexie-1.0.6.tgz#789fca2d22aaca8fe3b1e1ea4e57ebdcd244569a"
+  integrity sha512-hAM+Sdv7AnCBbwpznJYBH1obW2WuT/DIShhN83CNvQG3KnAY1Y7c6NbKnBqqAAz8TfPaUwTqLJlpXbJ7GLXKog==
   dependencies:
     dexie "2.0.4"
 
@@ -10677,8 +10677,9 @@ rechoir@^0.6.2:
   dependencies:
     resolve "^1.1.6"
 
-"reconnecting-websocket@github:wireapp/reconnecting-websocket#96ac796ae8c7a7d9d857f46ed39dbedd7b9ad378":
+reconnecting-websocket@wireapp/reconnecting-websocket#96ac796ae8c7a7d9d857f46ed39dbedd7b9ad378:
   version "4.2.0"
+  uid "96ac796ae8c7a7d9d857f46ed39dbedd7b9ad378"
   resolved "https://codeload.github.com/wireapp/reconnecting-websocket/tar.gz/96ac796ae8c7a7d9d857f46ed39dbedd7b9ad378"
 
 redent@^1.0.0:
