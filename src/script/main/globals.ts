@@ -21,9 +21,8 @@ import {amplify} from 'amplify';
 import jQuery from 'jquery';
 import Cookies from 'js-cookie';
 import ko from 'knockout';
-import '../../../node_modules/raygun4js/dist/raygun.vanilla.js';
+import 'raygun4js/dist/raygun.vanilla';
 
-import 'Util/LocalizerUtil';
 import {AssetService} from '../assets/AssetService';
 
 // Needed for the wrapper
@@ -58,6 +57,9 @@ import 'Components/panel/userDetails';
 import 'Components/serviceList';
 import 'Components/topPeople';
 import 'Components/userInput';
+
+import 'Util/LocalizerUtil';
+
 import '../backup/Error';
 import '../conversation/EventBuilder';
 import '../error/AccessTokenError';
