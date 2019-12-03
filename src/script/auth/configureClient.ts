@@ -18,26 +18,10 @@
  */
 
 import {APIClient} from '@wireapp/api-client';
-import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
-import {Dexie} from 'dexie';
-import {StorageSchemata} from '../storage/StorageSchemata';
-import {Config} from './config';
+import {Config} from '../Config';
 
 const configureClient = () => {
   return new APIClient({
-    schemaCallback: (db: Dexie) => {
-      const databaseSchemata = StorageSchemata.SCHEMATA;
-      databaseSchemata.forEach(({schema, upgrade, version}) => {
-        if (upgrade) {
-          return db
-            .version(version)
-            .stores(schema)
-            .upgrade((transaction: Dexie.Transaction) => upgrade(transaction, db));
-        }
-        return db.version(version).stores(schema);
-      });
-    },
-    store: new IndexedDBEngine(),
     urls: {
       name: Config.ENVIRONMENT,
       rest: Config.BACKEND_REST,

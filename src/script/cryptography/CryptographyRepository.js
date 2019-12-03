@@ -17,7 +17,7 @@
  *
  */
 
-import {error as StoreEngineError, MemoryEngine} from '@wireapp/store-engine';
+import {error as StoreEngineError} from '@wireapp/store-engine';
 import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 import {Cryptobox, version as cryptoboxVersion} from '@wireapp/cryptobox';
 import {errors as ProteusErrors} from '@wireapp/proteus';
@@ -28,11 +28,13 @@ import {arrayToBase64, base64ToArray, isTemporaryClientAndNonPersistent, zeroPad
 
 import {CryptographyMapper} from './CryptographyMapper';
 import {CryptographyService} from './CryptographyService';
+
+import {Config} from '../Config';
 import {WebAppEvents} from '../event/WebApp';
 import {EventName} from '../tracking/EventName';
 import {ClientEntity} from '../client/ClientEntity';
-
 import {BackendClientError} from '../error/BackendClientError';
+import {StorageService} from '../storage/StorageService';
 
 export class CryptographyRepository {
   static get CONFIG() {
@@ -107,9 +109,8 @@ export class CryptographyRepository {
     let storeEngine;
 
     if (isTemporaryClientAndNonPersistent()) {
-      this.logger.info(`Initializing Cryptobox with in-memory database '${databaseName}'...`);
-      storeEngine = new MemoryEngine();
-      await storeEngine.initWithObject(databaseName, database);
+      this.logger.info(`Initializing Cryptobox with encrypted database '${databaseName}'...`);
+      storeEngine = await StorageService.getUnitializedEngine();
     } else {
       this.logger.info(`Initializing Cryptobox with database '${databaseName}'...`);
       storeEngine = new IndexedDBEngine();
@@ -311,9 +312,9 @@ export class CryptographyRepository {
     }
 
     // Check the length of the message
-    const genericMessageIsTooBig = eventData.text.length > z.config.MAXIMUM_MESSAGE_LENGTH_RECEIVING;
+    const genericMessageIsTooBig = eventData.text.length > Config.MAXIMUM_MESSAGE_LENGTH_RECEIVING;
     const isExternal = typeof eventData.data === 'string';
-    const externalMessageIsTooBig = isExternal && eventData.data.length > z.config.MAXIMUM_MESSAGE_LENGTH_RECEIVING;
+    const externalMessageIsTooBig = isExternal && eventData.data.length > Config.MAXIMUM_MESSAGE_LENGTH_RECEIVING;
     if (genericMessageIsTooBig || externalMessageIsTooBig) {
       const error = new ProteusErrors.DecryptError.InvalidMessage('The received message was too big.', 300);
       const errorEvent = z.conversation.EventBuilder.buildIncomingMessageTooBig(event, error, error.code);

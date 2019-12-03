@@ -25,6 +25,7 @@ import {t} from 'Util/LocalizerUtil';
 import {buildSupportUrl} from 'Util/UrlUtil';
 import {noop, afterRender} from 'Util/util';
 
+import {Config} from '../Config';
 import {WebAppEvents} from '../event/WebApp';
 
 const defaultContent = {
@@ -197,7 +198,7 @@ export class ModalsViewModel {
       case Types.SESSION_RESET: {
         content.titleText = t('modalSessionResetHeadline');
         content.primaryAction = {...primaryAction, text: t('modalAcknowledgeAction')};
-        const supportLink = buildSupportUrl(z.config.SUPPORT.FORM.BUG);
+        const supportLink = buildSupportUrl(Config.SUPPORT.FORM.BUG);
         content.messageHtml = t(
           'modalSessionResetMessage',
           {},

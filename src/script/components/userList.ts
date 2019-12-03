@@ -23,6 +23,7 @@ import {ConversationRepository} from '../conversation/ConversationRepository';
 import {User} from '../entity/User';
 import {SearchRepository} from '../search/SearchRepository';
 import {TeamRepository} from '../team/TeamRepository';
+import {viewportObserver} from '../ui/viewportObserver';
 import {validateHandle} from '../user/UserHandleGenerator';
 
 import 'Components/list/participantItem';
@@ -33,11 +34,14 @@ export enum UserlistMode {
   OTHERS = 'UserlistMode.OTHERS',
 }
 
+const USER_CHUNK_SIZE = 64;
+
 interface UserListParams {
   click: (userEntity: User, event: MouseEvent) => void;
   filter: ko.Observable<string>;
   selected: ko.ObservableArray<User>;
   searchRepository: SearchRepository;
+  skipSearch: boolean;
   teamRepository: TeamRepository;
   conversationRepository: ConversationRepository;
   user: ko.Observable<User[]>;
@@ -50,12 +54,15 @@ interface UserListParams {
 
 ko.components.register('user-list', {
   template: `
-    <div class="search-list" data-bind="css: cssClasses(), foreach: {data: filteredUserEntities(), as: 'user', noChildContext: true }">
+    <div class="search-list" data-bind="css: cssClasses(), foreach: {data: filteredUserEntities().slice(0, maxShownUsers()), as: 'user', noChildContext: true }">
       <participant-item
         params="participant: user, customInfo: infos && infos()[user.id], canSelect: isSelectEnabled, isSelected: isSelected(user), mode: mode, badge: teamRepository.getRoleBadge(user.id), selfInTeam: selfInTeam"
         data-bind="click: (viewmodel, event) => onUserClick(user, event), css: {'no-underline': noUnderline, 'show-arrow': arrow, 'highlighted': highlightedUserIds.includes(user.id)}">
       </participant-item>
     </div>
+    <!-- ko if: filteredUserEntities().length > maxShownUsers() -->
+      <div data-bind="template: {afterRender: attachLazyTrigger}"><div style="height: 100px"></div></div>
+    <!-- /ko -->
 
     <!-- ko if: typeof filter === 'function' -->
       <!-- ko if: userEntities().length === 0 -->
@@ -70,6 +77,7 @@ ko.components.register('user-list', {
   viewModel: function({
     click,
     filter = ko.observable(''),
+    skipSearch = false,
     selected: selectedUsers,
     searchRepository,
     teamRepository,
@@ -91,6 +99,8 @@ ko.components.register('user-list', {
     this.noUnderline = noUnderline;
     this.arrow = arrow;
     this.selfInTeam = teamRepository.selfUser().inTeam();
+    this.maxShownUsers = ko.observable(USER_CHUNK_SIZE);
+    this.lazyTriggerElement = null;
 
     const isCompactMode = mode === UserlistMode.COMPACT;
 
@@ -115,12 +125,14 @@ ko.components.register('user-list', {
       let resultUsers: User[] = userEntities();
       const normalizedQuery = SearchRepository.normalizeQuery(filter());
       if (normalizedQuery) {
-        const SEARCHABLE_FIELDS = SearchRepository.CONFIG.SEARCHABLE_FIELDS;
-        const trimmedQuery = filter().trim();
-        const isHandle = trimmedQuery.startsWith('@') && validateHandle(normalizedQuery);
-        const properties = isHandle ? [SEARCHABLE_FIELDS.USERNAME] : undefined;
-        const searchResults = searchRepository.searchUserInSet(normalizedQuery, userEntities(), properties);
-        resultUsers = searchResults.filter(
+        if (!skipSearch) {
+          const SEARCHABLE_FIELDS = SearchRepository.CONFIG.SEARCHABLE_FIELDS;
+          const trimmedQuery = filter().trim();
+          const isHandle = trimmedQuery.startsWith('@') && validateHandle(normalizedQuery);
+          const properties = isHandle ? [SEARCHABLE_FIELDS.USERNAME] : undefined;
+          resultUsers = searchRepository.searchUserInSet(normalizedQuery, userEntities(), properties);
+        }
+        resultUsers = resultUsers.filter(
           user =>
             connectedUsers.includes(user) ||
             teamRepository.isSelfConnectedTo(user.id) ||
@@ -137,11 +149,26 @@ ko.components.register('user-list', {
       return selfUser.concat(otherUsers);
     });
 
-    this.isSelected = (userEntity: User) => {
-      if (this.isSelectEnabled) {
-        return selectedUsers().includes(userEntity);
+    this.isSelected = (userEntity: User): boolean => this.isSelectEnabled && selectedUsers().includes(userEntity);
+
+    this.attachLazyTrigger = ([element]: [HTMLElement]): void => {
+      viewportObserver.trackElement(
+        element,
+        (isInViewport: boolean) => {
+          if (isInViewport) {
+            this.maxShownUsers(this.maxShownUsers() + USER_CHUNK_SIZE);
+          }
+        },
+        false,
+        undefined,
+      );
+      this.lazyTriggerElement = element;
+    };
+
+    this.dispose = () => {
+      if (this.lazyTriggerElement) {
+        viewportObserver.removeElement(this.lazyTriggerElement);
       }
-      return false;
     };
   },
 });

@@ -102,7 +102,7 @@
                 <!-- ko ifnot: isTeam() -->
                   <span class="start-ui-list-header start-ui-list-header-connections" data-bind="text: t('searchConnections')"></span>
                 <!-- /ko -->
-                <user-list class="search-list-theme-black" params="user: searchResults.contacts, filter: searchInput, click: clickOnContact, searchRepository: searchRepository, teamRepository: teamRepository, conversationRepository: conversationRepository"></user-list>
+                <user-list class="search-list-theme-black" params="user: searchResults.contacts, filter: searchInput, skipSearch: true, click: clickOnContact, searchRepository: searchRepository, teamRepository: teamRepository, conversationRepository: conversationRepository"></user-list>
               </div>
               <div class="start-ui-groups" data-bind="visible: searchResults.groups().length > 0">
                 <!-- ko if: isTeam() -->

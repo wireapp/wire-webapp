@@ -27,7 +27,7 @@ import useReactRouter from 'use-react-router';
 import {getLogger} from 'Util/Logger';
 import {verifyStrings} from '../../strings';
 import RouterLink from '../component/RouterLink';
-import {actionRoot as ROOT_ACTIONS} from '../module/action/';
+import {actionRoot as ROOT_ACTIONS} from '../module/action';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
@@ -42,7 +42,7 @@ const changeEmailRedirect = {
   [AuthSelector.REGISTER_FLOW.TEAM]: ROUTE.CREATE_TEAM_ACCOUNT,
 };
 
-const Verify = ({
+const VerifyEmailCode = ({
   account,
   authError,
   currentFlow,
@@ -59,7 +59,7 @@ const Verify = ({
       case AuthSelector.REGISTER_FLOW.TEAM: {
         try {
           await doRegisterTeam({...account, email_code});
-          history.push(ROUTE.CHOOSE_HANDLE);
+          history.push(ROUTE.SET_HANDLE);
         } catch (error) {
           logger.error('Failed to create team account', error);
         }
@@ -70,7 +70,7 @@ const Verify = ({
       case AuthSelector.REGISTER_FLOW.GENERIC_INVITATION: {
         try {
           await doRegisterPersonal({...account, email_code});
-          history.push(ROUTE.CHOOSE_HANDLE);
+          history.push(ROUTE.SET_HANDLE);
         } catch (error) {
           logger.error('Failed to create personal account', error);
         }
@@ -132,4 +132,4 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default connect(mapStateToProps, mapDispatchToProps)(Verify);
+export default connect(mapStateToProps, mapDispatchToProps)(VerifyEmailCode);

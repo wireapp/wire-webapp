@@ -21,10 +21,9 @@ import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
 
-import {AudioPreference, NotificationPreference, WebappProperties} from '@wireapp/api-client/dist/commonjs/user/data';
+import {AudioPreference, NotificationPreference, WebappProperties} from '@wireapp/api-client/dist/user/data';
 import {amplify} from 'amplify';
-import {Config} from '../auth/config';
-import {config} from '../config';
+import {Config} from '../Config';
 import {ReceiptMode} from '../conversation/ReceiptMode';
 import {User} from '../entity/User';
 import {WebAppEvents} from '../event/WebApp';
@@ -107,7 +106,7 @@ export class PropertiesRepository {
   }
 
   checkPrivacyPermission(): Promise<void> {
-    const isCheckConsentDisabled = !config.FEATURE.CHECK_CONSENT;
+    const isCheckConsentDisabled = !Config.FEATURE.CHECK_CONSENT;
     const isPrivacyPreferenceSet = this.getPreference(PROPERTIES_TYPE.PRIVACY) !== undefined;
 
     return isCheckConsentDisabled || isPrivacyPreferenceSet

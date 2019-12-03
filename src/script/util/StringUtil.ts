@@ -71,6 +71,8 @@ export const compareTransliteration = (
   return fromStart ? nameSlug.startsWith(querySlug) : includesString(nameSlug, querySlug);
 };
 
+export const transliterationIndex = (nameSlug: string, querySlug: string): number => nameSlug.indexOf(querySlug);
+
 export const truncate = (string: string, outputLength: number, wordBoundary = true): string => {
   if (string.length > outputLength) {
     let truncateIndex = outputLength - 1;

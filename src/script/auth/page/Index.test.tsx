@@ -17,15 +17,22 @@
  *
  */
 
+import {TypeUtil} from '@wireapp/commons';
 import {ReactWrapper} from 'enzyme';
 import React from 'react';
-import {Config as ReadOnlyConfig} from '../config';
+import {Config as ReadOnlyConfig} from '../../Config';
 import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
 import Index from './Index';
 
-const Config = ReadOnlyConfig as any;
+type Writable<T> = {
+  -readonly [K in keyof T]: T[K];
+};
+
+type WriteableConfig = TypeUtil.RecursivePartial<Writable<typeof ReadOnlyConfig>>;
+
+const Config: WriteableConfig = ReadOnlyConfig;
 
 describe('when visiting the index page', () => {
   let wrapper: ReactWrapper;

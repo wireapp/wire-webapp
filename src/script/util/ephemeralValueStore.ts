@@ -17,7 +17,7 @@
  *
  */
 
-import {Config} from '../auth/config';
+import {Config} from '../Config';
 
 /**
  * The value store util allows storing a single value across page navigation.
@@ -27,33 +27,45 @@ import {Config} from '../auth/config';
  */
 let worker: ServiceWorker;
 
-export async function get(): Promise<any> {
-  const worker = await getWorker();
-  return sendMessage(worker, {action: 'get'});
+enum ValueStoreActionType {
+  GET = 'get',
+  SAVE = 'save',
 }
 
-export async function save<T>(value: T): Promise<T> {
-  const worker = await getWorker();
-  return sendMessage(worker, {action: 'save', params: value});
+interface ValueStoreAction {
+  action: ValueStoreActionType;
+  value?: string;
 }
 
-async function getWorker(): Promise<ServiceWorker | undefined> {
-  if (!navigator.serviceWorker) {
-    return undefined;
-  }
-  if (worker) {
-    return worker;
-  }
+export async function getEphemeralValue(): Promise<any> {
+  const worker = await getWorker();
+  return sendMessage(worker, {action: ValueStoreActionType.GET});
+}
 
+export async function saveRandomEncryptionKey(): Promise<string> {
+  const secretKey = new Uint32Array(64);
+  window.crypto.getRandomValues(secretKey);
+  const hexKey: string[] = [];
+  for (const x of secretKey) {
+    hexKey.push(`00${x.toString(16)}`.slice(-2));
+  }
+  const encryptionKey = hexKey.join('');
+  await saveEphemeralValue(encryptionKey);
+  return encryptionKey;
+}
+
+export async function saveEphemeralValue(value: string): Promise<string> {
+  const worker = await getWorker();
+  return sendMessage(worker, {action: ValueStoreActionType.SAVE, value});
+}
+
+async function getWorker(): Promise<ServiceWorker> {
   const registration = await navigator.serviceWorker.register(`/worker/sw-value-store.js?${Config.VERSION}`);
   worker = registration.installing || registration.waiting || registration.active;
   return worker;
 }
 
-function sendMessage(worker: ServiceWorker | undefined, action: any): Promise<any> {
-  if (!worker) {
-    return Promise.resolve(undefined);
-  }
+function sendMessage(worker: ServiceWorker, action: ValueStoreAction): Promise<string> {
   const messageChannel = new MessageChannel();
   return new Promise((resolve, reject) => {
     messageChannel.port1.onmessage = event => {

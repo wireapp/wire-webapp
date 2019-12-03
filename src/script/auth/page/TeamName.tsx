@@ -44,7 +44,7 @@ import {getLogger} from 'Util/Logger';
 import {addLocaleToUrl} from '../../externalRoute';
 import {teamNameStrings} from '../../strings';
 import RouterLink from '../component/RouterLink';
-import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
+import {EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {ValidationError} from '../module/action/ValidationError';
 import {RootState, bindActionCreators} from '../module/reducer';

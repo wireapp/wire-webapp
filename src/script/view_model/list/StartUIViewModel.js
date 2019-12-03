@@ -25,7 +25,7 @@ import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {UserlistMode} from 'Components/userList';
 
 import {getManageTeamUrl, getManageServicesUrl} from '../../externalRoute';
-import {Config} from '../../auth/config';
+import {Config} from '../../Config';
 import {User} from '../../entity/User';
 import {generatePermissionHelpers} from '../../user/UserPermission';
 import {validateHandle} from '../../user/UserHandleGenerator';

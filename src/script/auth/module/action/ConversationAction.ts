@@ -17,7 +17,7 @@
  *
  */
 
-import {ConversationEvent} from '@wireapp/api-client/dist/commonjs/event';
+import {ConversationEvent} from '@wireapp/api-client/dist/event';
 import {ThunkAction} from '../reducer';
 import {ConversationActionCreator} from './creator/';
 

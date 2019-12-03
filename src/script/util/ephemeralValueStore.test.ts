@@ -17,7 +17,7 @@
  *
  */
 
-import {get, save} from './ephemeralValueStore';
+import {getEphemeralValue, saveEphemeralValue} from './ephemeralValueStore';
 
 describe('ephemeralValueStore', () => {
   describe('ServiceWorker is not available', () => {
@@ -29,15 +29,10 @@ describe('ephemeralValueStore', () => {
     afterEach(() => {
       (window.navigator as any).__defineGetter__('serviceWorker', (): ServiceWorkerContainer => originalServiceWorker);
     });
-
-    it('does not crash if serviceWorker is not available', async () => {
-      const notSavedValue = await save('value');
-      expect(notSavedValue).not.toBeDefined();
-    });
   });
 
   it('is initialized with an empty value', async () => {
-    const storedValue = await get();
+    const storedValue = await getEphemeralValue();
     expect(storedValue).not.toBeDefined();
   });
 
@@ -45,12 +40,23 @@ describe('ephemeralValueStore', () => {
     const value1 = 'first value';
     const value2 = 'second value';
 
-    await save(value1);
-    const storedValue1 = await get();
+    await saveEphemeralValue(value1);
+    const storedValue1 = await getEphemeralValue();
     expect(storedValue1).toBe(value1);
 
-    await save(value2);
-    const storedValue2 = await get();
+    await saveEphemeralValue(value2);
+    const storedValue2 = await getEphemeralValue();
     expect(storedValue2).toBe(value2);
+  });
+
+  it('deletes the value after it is read for the very first time', async () => {
+    const value = 'first value';
+    await saveEphemeralValue(value);
+
+    const firstRead = await getEphemeralValue();
+    expect(firstRead).toBe(value);
+
+    const secondRead = await getEphemeralValue();
+    expect(secondRead).toBeUndefined();
   });
 });

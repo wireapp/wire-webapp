@@ -18,7 +18,6 @@
  */
 
 import {BackendClient} from '../service/BackendClient';
-import {RichProfileRepository} from '../user/RichProfileRepository';
 
 /**
  * Dependencies is a Map that will contain all the dependencies of the app
@@ -27,6 +26,5 @@ import {RichProfileRepository} from '../user/RichProfileRepository';
 const dependencies = new WeakMap();
 
 dependencies.set(BackendClient, {dependencies: [], name: 'BackendClient'});
-dependencies.set(RichProfileRepository, {dependencies: [BackendClient], name: 'RichProfileRepository'});
 
-export {dependencies, BackendClient, RichProfileRepository};
+export {dependencies, BackendClient};

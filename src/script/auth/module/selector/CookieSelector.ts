@@ -17,7 +17,7 @@
  *
  */
 
-import {Config} from '../../config';
+import {Config} from '../../../Config';
 import {RootState} from '../reducer';
 
 export const COOKIE_NAME_APP_OPENED = 'app_opened';

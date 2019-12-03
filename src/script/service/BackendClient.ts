@@ -17,17 +17,65 @@
  *
  */
 
+import {amplify} from 'amplify';
+import ko from 'knockout';
+
+import {Logger, getLogger} from 'Util/Logger';
 import {PromiseQueue} from 'Util/PromiseQueue';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {isValidApiPath} from 'Util/ValidationUtil';
-
 import {AuthRepository} from '../auth/AuthRepository';
-import {QUEUE_STATE} from '../service/QueueState';
-import {WebAppEvents} from '../event/WebApp';
-
 import {BackendClientError} from '../error/BackendClientError';
+import {WebAppEvents} from '../event/WebApp';
+import {QUEUE_STATE} from './QueueState';
+
+/**
+ * Settings for different backend environments
+ */
+interface Settings {
+  restUrl: string;
+  webSocketUrl: string;
+}
+
+/**
+ * AJAX request configuration
+ */
+interface RequestConfig {
+  cache?: boolean;
+  contentType?: string;
+  crossDomain?: boolean;
+  data?: JQuery.PlainObject<any>;
+  headers?: JQuery.PlainObject<string>;
+  processData?: boolean;
+  skipRetry?: boolean;
+  timeout?: number;
+  type?: string;
+  url?: string;
+  withCredentials?: boolean;
+}
+
+type WireRequestType = JQueryXHR & {
+  wireRequest: {
+    originalRequestOptions?: JQuery.AjaxSettings;
+    requestDate?: Date;
+    requestId?: number;
+  };
+};
 
 export class BackendClient {
+  private connectivityTimeout: number;
+  private queueTimeout: number;
+  private readonly accessTokenType: string;
+  private readonly connectivityQueue: PromiseQueue;
+  private readonly logger: Logger;
+  private readonly numberOfRequests: ko.Observable<number>;
+  private readonly queueState: ko.Observable<string>;
+  private readonly requestQueue: PromiseQueue;
+  public accessToken: string;
+  public restUrl: string;
+  public webSocketUrl: string;
+
+  // tslint:disable-next-line:typedef
   static get CONFIG() {
     return {
       CONNECTIVITY_CHECK: {
@@ -39,6 +87,7 @@ export class BackendClient {
     };
   }
 
+  // tslint:disable-next-line:typedef
   static get CONNECTIVITY_CHECK_TRIGGER() {
     return {
       ACCESS_TOKEN_REFRESH: 'BackendClient.CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_REFRESH',
@@ -51,6 +100,7 @@ export class BackendClient {
     };
   }
 
+  // tslint:disable-next-line:typedef
   static get IGNORED_BACKEND_ERRORS() {
     return [
       BackendClientError.STATUS_CODE.BAD_GATEWAY,
@@ -65,6 +115,7 @@ export class BackendClient {
     ];
   }
 
+  // tslint:disable-next-line:typedef
   static get IGNORED_BACKEND_LABELS() {
     return [
       BackendClientError.LABEL.INVALID_CREDENTIALS,
@@ -75,12 +126,8 @@ export class BackendClient {
     ];
   }
 
-  /**
-   * Construct a new client.
-   * @param {Logger} logger - app logger
-   */
-  constructor(logger) {
-    this.logger = logger;
+  constructor() {
+    this.logger = getLogger('BackendClient');
 
     this.connectivityTimeout = undefined;
     this.connectivityQueue = new PromiseQueue({name: 'BackendClient.Connectivity'});
@@ -99,10 +146,10 @@ export class BackendClient {
     $.ajaxSetup({
       contents: {javascript: false},
       dataType: 'json',
-    });
+    } as any);
 
     // http://stackoverflow.com/a/18996758/451634
-    $.ajaxPrefilter((options, originalOptions, jqXHR) => {
+    $.ajaxPrefilter((options, originalOptions, jqXHR: WireRequestType) => {
       jqXHR.wireRequest = {
         originalRequestOptions: originalOptions,
         requestDate: new Date(),
@@ -111,14 +158,7 @@ export class BackendClient {
     });
   }
 
-  /**
-   *
-   * @param {Object} settings - Settings for different backend environments
-   * @param {string} settings.restUrl - Backend REST URL
-   * @param {string} settings.webSocketUrl - Backend WebSocket URL
-   * @returns {void}
-   */
-  setSettings(settings) {
+  setSettings(settings: Settings): void {
     this.restUrl = settings.restUrl;
     this.webSocketUrl = settings.webSocketUrl;
   }
@@ -128,16 +168,15 @@ export class BackendClient {
    * @param {string} path - API endpoint path to be suffixed to REST API environment
    * @returns {string} REST API endpoint URL
    */
-  createUrl(path) {
+  createUrl(path: string): string {
     isValidApiPath(path);
     return `${this.restUrl}${path}`;
   }
 
   /**
    * Request backend status.
-   * @returns {$.Promise} jQuery AJAX promise
    */
-  status() {
+  status(): JQuery.jqXHR {
     return $.ajax({
       headers: {
         Authorization: `${this.accessTokenType} ${window.decodeURIComponent(this.accessToken)}`,
@@ -153,7 +192,7 @@ export class BackendClient {
    * @param {BackendClient.CONNECTIVITY_CHECK_TRIGGER} [source=BackendClient.CONNECTIVITY_CHECK_TRIGGER.UNKNOWN] - Trigger that requested connectivity check
    * @returns {Promise} Resolves once the connectivity is verified
    */
-  executeOnConnectivity(source = BackendClient.CONNECTIVITY_CHECK_TRIGGER.UNKNOWN) {
+  executeOnConnectivity(source = BackendClient.CONNECTIVITY_CHECK_TRIGGER.UNKNOWN): Promise<any> {
     this.logger.info(`Connectivity check requested by '${source}'`);
     const {INITIAL_TIMEOUT, RECHECK_TIMEOUT} = BackendClient.CONFIG.CONNECTIVITY_CHECK;
 
@@ -196,7 +235,7 @@ export class BackendClient {
    * Execute queued requests.
    * @returns {undefined} No return value
    */
-  executeRequestQueue() {
+  executeRequestQueue(): void {
     this.queueState(QUEUE_STATE.READY);
     if (this.accessToken && this.requestQueue.getLength()) {
       this.logger.info(`Executing '${this.requestQueue.getLength()}' queued requests`);
@@ -204,14 +243,14 @@ export class BackendClient {
     }
   }
 
-  clearQueueUnblockTimeout() {
+  clearQueueUnblockTimeout(): void {
     if (this.queueTimeout) {
       window.clearTimeout(this.queueTimeout);
       this.queueTimeout = undefined;
     }
   }
 
-  scheduleQueueUnblock() {
+  scheduleQueueUnblock(): void {
     this.clearQueueUnblockTimeout();
     this.queueTimeout = window.setTimeout(() => {
       const isRefreshingToken = this.queueState() === QUEUE_STATE.ACCESS_TOKEN_REFRESH;
@@ -231,7 +270,7 @@ export class BackendClient {
    * @param {Object} config - AJAX request configuration
    * @returns {Promise} Resolves when the request has been executed
    */
-  sendJson(config) {
+  sendJson(config: RequestConfig): Promise<any> {
     const jsonConfig = {
       contentType: 'application/json; charset=utf-8',
       data: config.data ? JSON.stringify(config.data) : undefined,
@@ -246,7 +285,7 @@ export class BackendClient {
    * @param {Object} config - AJAX request configuration
    * @returns {Promise} Resolves when the request has been executed
    */
-  sendRequest(config) {
+  sendRequest(config: RequestConfig): Promise<any> {
     if (this.queueState() !== QUEUE_STATE.READY) {
       const logMessage = `Adding '${config.type}' request to '${config.url}' to queue due to '${this.queueState()}'`;
       this.logger.info(logMessage, config);
@@ -255,7 +294,7 @@ export class BackendClient {
     return this.requestQueue.push(() => this._sendRequest(config));
   }
 
-  _prependRequestQueue(config, resolveFn, rejectFn) {
+  _prependRequestQueue(config: RequestConfig, resolveFn: (value: any) => any, rejectFn: (value: any) => any): void {
     this.requestQueue.pause().unshift(() => {
       return this._sendRequest(config)
         .then(resolveFn)
@@ -267,27 +306,14 @@ export class BackendClient {
    * Send jQuery AJAX request.
    *
    * @see http://api.jquery.com/jquery.ajax/#jQuery-ajax-settings
-   *
-   * @private
-   * @param {Object} config - Request configuration
-   * @param {string} config.contentType - Request content type
-   * @param {boolean} config.crossDomain - Cross domain request
-   * @param {Object} config.data - Request data payload
-   * @param {Object} config.headers - Request headers
-   * @param {boolean} config.processData - Process data before sending
-   * @param {number} config.timeout - Request timeout
-   * @param {string} config.type - Request type
-   * @param {string} config.url - Request URL
-   * @param {boolean} config.withCredentials - Request send with credentials
-   * @returns {Promise} Resolves when the request has been executed
    */
-  _sendRequest(config) {
+  _sendRequest(config: RequestConfig): Promise<any> {
     const {cache, contentType, crossDomain, data, headers, processData, timeout, type, url, withCredentials} = config;
-    const ajaxConfig = {cache, contentType, crossDomain, data, headers, processData, timeout, type};
+    const ajaxConfig: JQueryAjaxSettings = {cache, contentType, crossDomain, data, headers, processData, timeout, type};
 
     if (this.accessToken) {
       const authorizationHeader = `${this.accessTokenType} ${window.decodeURIComponent(this.accessToken)}`;
-      ajaxConfig.headers = Object.assign({}, headers, {Authorization: authorizationHeader});
+      ajaxConfig.headers = {...headers, Authorization: authorizationHeader};
     }
 
     if (url) {
@@ -303,7 +329,7 @@ export class BackendClient {
     return new Promise((resolve, reject) => {
       $.ajax(ajaxConfig)
         .done(responseData => resolve(responseData))
-        .fail(({responseJSON: response, status: statusCode, wireRequest}) => {
+        .fail(({responseJSON: response, status: statusCode, wireRequest}: WireRequestType) => {
           switch (statusCode) {
             case BackendClientError.STATUS_CODE.CONNECTIVITY_PROBLEM: {
               this.queueState(QUEUE_STATE.CONNECTIVITY_PROBLEM);
@@ -327,7 +353,7 @@ export class BackendClient {
                     requestId,
                   };
 
-                  Raygun.send(new Error(errorMessage), customData);
+                  window.Raygun.send(new Error(errorMessage), customData);
                 }
               }
               break;
@@ -362,7 +388,7 @@ export class BackendClient {
                   requestId,
                 };
 
-                Raygun.send(new Error(`Server request failed: ${statusCode}`), customData);
+                window.Raygun.send(new Error(`Server request failed: ${statusCode}`), customData);
               }
             }
           }

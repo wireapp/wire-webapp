@@ -20,10 +20,10 @@
 import {Button, COLOR, Column, Columns, Container, H3, Link, Modal, Text} from '@wireapp/react-ui-kit';
 import React from 'react';
 import {FormattedHTMLMessage, useIntl} from 'react-intl';
+import {Config} from '../../Config';
 import {addLocaleToUrl} from '../../externalRoute';
 import {acceptNewsModalStrings} from '../../strings';
-import {Config} from '../config';
-import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
+import {EXTERNAL_ROUTE} from '../externalRoute';
 
 export interface Props extends React.HTMLProps<HTMLDivElement> {
   onConfirm: (event: React.MouseEvent<HTMLButtonElement>) => void;

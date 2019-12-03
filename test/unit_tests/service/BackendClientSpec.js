@@ -17,26 +17,27 @@
  *
  */
 
+import {amplify} from 'amplify';
 import {resolve, graph} from './../../api/testResolver';
 import {WebAppEvents} from 'src/script/event/WebApp';
 
 describe('BackendClient', () => {
-  let backend_client = null;
+  let backendClient = null;
   let server = null;
 
   beforeEach(() => {
-    backend_client = resolve(graph.BackendClient);
+    backendClient = resolve(graph.BackendClient);
   });
 
   afterEach(() => {
-    backend_client = null;
+    backendClient = null;
   });
 
   describe('executeOnConnectivity', () => {
     beforeEach(() => {
       jasmine.clock().install();
       server = sinon.fakeServer.create();
-      spyOn(backend_client, 'status').and.callThrough();
+      spyOn(backendClient, 'status').and.callThrough();
     });
 
     afterEach(() => {
@@ -45,11 +46,11 @@ describe('BackendClient', () => {
     });
 
     it('executes callback when backend status is ok', done => {
-      backend_client
+      backendClient
         .executeOnConnectivity()
         .then(() => {
-          expect(backend_client.status).toHaveBeenCalled();
-          expect(backend_client.status).toHaveBeenCalledTimes(1);
+          expect(backendClient.status).toHaveBeenCalled();
+          expect(backendClient.status).toHaveBeenCalledTimes(1);
           done();
         })
         .catch(done.fail);
@@ -59,11 +60,11 @@ describe('BackendClient', () => {
     });
 
     it('executes callback when backend status return an error', done => {
-      backend_client
+      backendClient
         .executeOnConnectivity()
         .then(() => {
-          expect(backend_client.status).toHaveBeenCalled();
-          expect(backend_client.status).toHaveBeenCalledTimes(1);
+          expect(backendClient.status).toHaveBeenCalled();
+          expect(backendClient.status).toHaveBeenCalledTimes(1);
           done();
         })
         .catch(done.fail);
@@ -73,52 +74,52 @@ describe('BackendClient', () => {
     });
 
     it('does not execute callback when request times out', done => {
-      backend_client
+      backendClient
         .executeOnConnectivity()
         .then(response => done.fail(response))
         .catch(done.fail);
 
       jasmine.clock().tick(250);
 
-      expect(backend_client.status).toHaveBeenCalled();
-      expect(backend_client.status).toHaveBeenCalledTimes(1);
+      expect(backendClient.status).toHaveBeenCalled();
+      expect(backendClient.status).toHaveBeenCalledTimes(1);
       jasmine.clock().tick(2500);
 
-      expect(backend_client.status).toHaveBeenCalledTimes(2);
+      expect(backendClient.status).toHaveBeenCalledTimes(2);
       done();
     });
 
     it('executes callback when it retries after failure', done => {
-      backend_client
+      backendClient
         .executeOnConnectivity()
         .then(() => {
-          expect(backend_client.status).toHaveBeenCalledTimes(2);
+          expect(backendClient.status).toHaveBeenCalledTimes(2);
           done();
         })
         .catch(done.fail);
 
       jasmine.clock().tick(500);
 
-      expect(backend_client.status).toHaveBeenCalled();
-      expect(backend_client.status).toHaveBeenCalledTimes(1);
+      expect(backendClient.status).toHaveBeenCalled();
+      expect(backendClient.status).toHaveBeenCalledTimes(1);
       jasmine.clock().tick(2100);
 
-      expect(backend_client.status).toHaveBeenCalledTimes(2);
+      expect(backendClient.status).toHaveBeenCalledTimes(2);
       server.requests[1].respond(401);
     });
 
     it('does not execute the callback when it retries after failure and fails again', done => {
-      backend_client
+      backendClient
         .executeOnConnectivity()
         .then(response => done.fail(response))
         .catch(done.fail);
 
       jasmine.clock().tick(750);
 
-      expect(backend_client.status).toHaveBeenCalled();
+      expect(backendClient.status).toHaveBeenCalled();
       jasmine.clock().tick(2500);
 
-      expect(backend_client.status).toHaveBeenCalledTimes(2);
+      expect(backendClient.status).toHaveBeenCalledTimes(2);
       done();
     });
   });
@@ -135,7 +136,7 @@ describe('BackendClient', () => {
     });
 
     beforeEach(() => {
-      backend_client.requestQueue.pause();
+      backendClient.requestQueue.pause();
       jasmine.clock().install();
       server = sinon.fakeServer.create();
     });
@@ -146,7 +147,7 @@ describe('BackendClient', () => {
     });
 
     it('should resolve with the request payload', done => {
-      backend_client
+      backendClient
         ._sendRequest(config)
         .then(done)
         .catch(done.fail);
@@ -154,34 +155,31 @@ describe('BackendClient', () => {
     });
 
     it('should cache the request if it was unauthorized', done => {
-      const token_refresh = jasmine.createSpy('token_refresh');
-      amplify.subscribe(WebAppEvents.CONNECTION.ACCESS_TOKEN.RENEW, token_refresh);
+      const tokenRefresh = () => {
+        expect(backendClient.requestQueue.getLength()).toBe(1);
+        done();
+      };
+      amplify.subscribe(WebAppEvents.CONNECTION.ACCESS_TOKEN.RENEW, tokenRefresh);
 
-      backend_client
+      backendClient
         ._sendRequest(config)
         .then(response => done.fail(response))
         .catch(done.fail);
       server.requests[0].respond(401);
-
-      jasmine.clock().tick(750);
-
-      expect(backend_client.requestQueue.getLength()).toBe(1);
-      expect(token_refresh).toHaveBeenCalled();
-      done();
     });
 
     it('should cache the request if it timed out', done => {
-      spyOn(backend_client, 'executeOnConnectivity').and.returnValue(Promise.resolve());
+      spyOn(backendClient, 'executeOnConnectivity').and.returnValue(Promise.resolve());
 
-      backend_client
+      backendClient
         ._sendRequest(config)
         .then(response => done.fail(response))
         .catch(done.fail);
 
       jasmine.clock().tick(150);
 
-      expect(backend_client.requestQueue.getLength()).toBe(1);
-      expect(backend_client.executeOnConnectivity).toHaveBeenCalled();
+      expect(backendClient.requestQueue.getLength()).toBe(1);
+      expect(backendClient.executeOnConnectivity).toHaveBeenCalled();
       done();
     });
   });
@@ -204,7 +202,7 @@ describe('BackendClient', () => {
     });
 
     it('passes all params to sendRequest', done => {
-      spyOn(backend_client, 'sendRequest').and.callFake(config => {
+      spyOn(backendClient, 'sendRequest').and.callFake(config => {
         expect(config.callback).toBe(original_config.callback);
         expect(config.contentType).toBe('application/json; charset=utf-8');
         expect(config.headers['X-TEST-HEADER']).toBe(original_config.headers['X-TEST-HEADER']);
@@ -217,7 +215,7 @@ describe('BackendClient', () => {
         done();
       });
 
-      backend_client.sendJson(original_config);
+      backendClient.sendJson(original_config);
     });
   });
 });

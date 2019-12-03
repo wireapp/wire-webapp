@@ -19,12 +19,13 @@
 
 import {resolve, graph} from './../../api/testResolver';
 import UUID from 'uuidjs';
+import {RichProfileRepository} from 'src/script/user/RichProfileRepository';
 
 describe('RichProfileRepository', () => {
   let richProfileRepository;
 
   beforeEach(() => {
-    richProfileRepository = resolve(graph.RichProfileRepository);
+    richProfileRepository = new RichProfileRepository(resolve(graph.BackendClient));
   });
 
   describe('getUserRichProfile', () => {

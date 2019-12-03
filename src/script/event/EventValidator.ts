@@ -17,7 +17,7 @@
  *
  */
 
-import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/dist/commonjs/event';
+import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/dist/event';
 
 import {EventSource} from './EventSource';
 import {EventValidation} from './EventValidation';

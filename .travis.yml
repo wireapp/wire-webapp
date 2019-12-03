@@ -50,7 +50,8 @@ script:
     fi
 
 after_script:
-  - 'bash <(curl -s https://codecov.io/bash) -f ./docs/coverage/lcov.info'
+  - cat ./docs/coverage/lcov.info ./docs/auth-coverage/lcov.info > ./docs/lcov.info
+  - 'bash <(curl -s https://codecov.io/bash) -f ./docs/lcov.info'
 
 notifications:
   email: false
