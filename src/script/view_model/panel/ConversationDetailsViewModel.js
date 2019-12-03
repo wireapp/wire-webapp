@@ -291,7 +291,8 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
         },
       },
       {
-        condition: () => !isSingleUserMode && this.isTeam() && this.isSelfGroupAdmin(),
+        condition: () =>
+          !isSingleUserMode && this.isTeam() && this.isSelfGroupAdmin() && conversationEntity.isCreatedBySelf(),
         item: {
           click: () => this.clickToDelete(),
           icon: 'delete-icon',
