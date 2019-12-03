@@ -1681,10 +1681,10 @@
     tough-cookie "3.0.1"
     ws "7.2.0"
 
-"@wireapp/avs@5.1.40":
-  version "5.1.40"
-  resolved "https://registry.yarnpkg.com/@wireapp/avs/-/avs-5.1.40.tgz#4e0d2eb48388891ec600af433b573bb0ec6cdfc8"
-  integrity sha512-z1PHXzv3x/KMrZ7SwSosT/UQNYARSpdfU3zWnQdh1ZofSjtuDDHcWFZ7+LxuBtfrgNFXh7M29LACscvgICs7gg==
+"@wireapp/avs@5.4.2":
+  version "5.4.2"
+  resolved "https://registry.yarnpkg.com/@wireapp/avs/-/avs-5.4.2.tgz#a057fadf9580ef3439810905253678030eae51f1"
+  integrity sha512-KEBujPMxEtBFelQMrHcge1TxGN2QZwsv4KmwOqfV/1I/rcdHaohPTns/fghOkg+z2hN4VE88M4H/pVtYgX/9Yg==
 
 "@wireapp/cbor@4.3.25":
   version "4.3.25"
@@ -10677,8 +10677,9 @@ rechoir@^0.6.2:
   dependencies:
     resolve "^1.1.6"
 
-"reconnecting-websocket@github:wireapp/reconnecting-websocket#96ac796ae8c7a7d9d857f46ed39dbedd7b9ad378":
+reconnecting-websocket@wireapp/reconnecting-websocket#96ac796ae8c7a7d9d857f46ed39dbedd7b9ad378:
   version "4.2.0"
+  uid "96ac796ae8c7a7d9d857f46ed39dbedd7b9ad378"
   resolved "https://codeload.github.com/wireapp/reconnecting-websocket/tar.gz/96ac796ae8c7a7d9d857f46ed39dbedd7b9ad378"
 
 redent@^1.0.0:
