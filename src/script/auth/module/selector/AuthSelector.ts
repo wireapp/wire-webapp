@@ -17,7 +17,7 @@
  *
  */
 
-import {TeamData} from '@wireapp/api-client/dist/commonjs/team';
+import {TeamData} from '@wireapp/api-client/dist/team';
 import {RootState} from '../reducer';
 import {RegistrationDataState} from '../reducer/authReducer';
 
@@ -54,6 +54,7 @@ const unsetTeam: TeamData = {
 export const isAuthenticated = (state: RootState) => state.authState.isAuthenticated;
 export const isFetching = (state: RootState) => state.authState.fetching;
 export const getError = (state: RootState) => state.authState.error;
+export const getLoginData = (state: RootState) => state.authState.loginData;
 export const getCurrentFlow = (state: RootState) => state.authState.currentFlow;
 export const getAccount = (state: RootState): RegistrationDataState => state.authState.account || unsetRegistrationData;
 export const getAccountTeam = (state: RootState) => getAccount(state).team || unsetTeam;

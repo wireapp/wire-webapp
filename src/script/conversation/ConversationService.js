@@ -43,9 +43,6 @@ export class ConversationService {
     this.eventService = eventService;
     this.storageService = storageService;
     this.logger = getLogger('ConversationService');
-
-    this.CONVERSATION_STORE_NAME = StorageSchemata.OBJECT_STORE.CONVERSATIONS;
-    this.EVENT_STORE_NAME = StorageSchemata.OBJECT_STORE.EVENTS;
   }
 
   //##############################################################################
@@ -410,14 +407,14 @@ export class ConversationService {
    * @returns {Promise} Resolves when the entity was deleted
    */
   delete_conversation_from_db(conversation_id) {
-    return this.storageService.delete(this.CONVERSATION_STORE_NAME, conversation_id).then(primary_key => {
+    return this.storageService.delete(StorageSchemata.OBJECT_STORE.CONVERSATIONS, conversation_id).then(primary_key => {
       this.logger.info(`State of conversation '${primary_key}' was deleted`);
       return primary_key;
     });
   }
 
   loadConversation(conversationId) {
-    return this.storageService.load(this.CONVERSATION_STORE_NAME, conversationId);
+    return this.storageService.load(StorageSchemata.OBJECT_STORE.CONVERSATIONS, conversationId);
   }
 
   /**
@@ -432,12 +429,12 @@ export class ConversationService {
 
     if (this.storageService.db) {
       events = await this.storageService.db
-        .table(this.EVENT_STORE_NAME)
+        .table(StorageSchemata.OBJECT_STORE.EVENTS)
         .where('time')
         .aboveOrEqual(min_date.toISOString())
         .toArray();
     } else {
-      const records = await this.storageService.getAll(this.EVENT_STORE_NAME);
+      const records = await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS);
       events = records.filter(record => record.time >= min_date.toISOString()).sort((a, b) => a.time - b.time);
     }
 
@@ -459,7 +456,7 @@ export class ConversationService {
    * @returns {Promise} Resolves with all the stored conversation states
    */
   load_conversation_states_from_db() {
-    return this.storageService.getAll(this.CONVERSATION_STORE_NAME);
+    return this.storageService.getAll(StorageSchemata.OBJECT_STORE.CONVERSATIONS);
   }
 
   /**
@@ -470,10 +467,10 @@ export class ConversationService {
   async save_conversations_in_db(conversations) {
     if (this.storageService.db) {
       const keys = conversations.map(conversation => conversation.id);
-      await this.storageService.db.table(this.CONVERSATION_STORE_NAME).bulkPut(conversations, keys);
+      await this.storageService.db.table(StorageSchemata.OBJECT_STORE.CONVERSATIONS).bulkPut(conversations, keys);
     } else {
       for (const conversation of conversations) {
-        await this.storageService.save(this.CONVERSATION_STORE_NAME, conversation.id, conversation);
+        await this.storageService.save(StorageSchemata.OBJECT_STORE.CONVERSATIONS, conversation.id, conversation);
       }
     }
 
@@ -489,7 +486,7 @@ export class ConversationService {
     const conversationData = conversation_et.serialize();
 
     return this.storageService
-      .save(this.CONVERSATION_STORE_NAME, conversation_et.id, conversationData)
+      .save(StorageSchemata.OBJECT_STORE.CONVERSATIONS, conversation_et.id, conversationData)
       .then(primary_key => {
         this.logger.info(`State of conversation '${primary_key}' was stored`, conversationData);
         return conversation_et;

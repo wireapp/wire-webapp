@@ -26,7 +26,7 @@ import {AnyAction, Dispatch} from 'redux';
 import {Config} from '../../Config';
 import {addLocaleToUrl} from '../../externalRoute';
 import {accountFormStrings} from '../../strings';
-import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
+import {EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {BackendError} from '../module/action/BackendError';
 import {ValidationError} from '../module/action/ValidationError';

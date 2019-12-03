@@ -17,7 +17,7 @@
  *
  */
 
-import {ConsentType} from '@wireapp/api-client/dist/commonjs/self/index';
+import {ConsentType} from '@wireapp/api-client/dist/self/index';
 import {
   ContainerXS,
   ErrorMessage,
@@ -37,7 +37,7 @@ import {AnyAction, Dispatch} from 'redux';
 import useReactRouter from 'use-react-router';
 import {chooseHandleStrings} from '../../strings';
 import AcceptNewsModal from '../component/AcceptNewsModal';
-import {actionRoot as ROOT_ACTIONS} from '../module/action/';
+import {actionRoot as ROOT_ACTIONS} from '../module/action';
 import {BackendError} from '../module/action/BackendError';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as SelfSelector from '../module/selector/SelfSelector';
@@ -48,7 +48,7 @@ import Page from './Page';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
-const ChooseHandle = ({
+const SetHandle = ({
   doGetConsents,
   doSetConsent,
   doSetHandle,
@@ -87,7 +87,7 @@ const ChooseHandle = ({
   const onSetHandle = async (event: React.FormEvent): Promise<void> => {
     event.preventDefault();
     try {
-      await doSetHandle(handle);
+      await doSetHandle(handle.trim());
     } catch (error) {
       if (error.label === BackendError.HANDLE_ERRORS.INVALID_HANDLE && handle.trim().length < 2) {
         error.label = BackendError.HANDLE_ERRORS.HANDLE_TOO_SHORT;
@@ -95,6 +95,10 @@ const ChooseHandle = ({
       setError(error);
     }
   };
+
+  if (hasSelfHandle) {
+    return null;
+  }
 
   return (
     <Page>
@@ -112,7 +116,7 @@ const ChooseHandle = ({
               type="text"
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                 setError(null);
-                setHandle(event.currentTarget.value);
+                setHandle(event.target.value);
               }}
               value={handle}
               autoFocus
@@ -159,4 +163,4 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default connect(mapStateToProps, mapDispatchToProps)(ChooseHandle);
+export default connect(mapStateToProps, mapDispatchToProps)(SetHandle);

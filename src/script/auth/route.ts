@@ -50,7 +50,7 @@ export const LOGOUT_REASON = {
 };
 
 export const ROUTE = {
-  CHOOSE_HANDLE: '/choosehandle',
+  CHECK_PASSWORD: '/checkpassword',
   CLIENTS: '/clients',
   CONVERSATION_JOIN: '/join-conversation',
   CONVERSATION_JOIN_INVALID: '/join-conversation-invalid',
@@ -61,6 +61,12 @@ export const ROUTE = {
   INDEX: '/',
   INITIAL_INVITE: '/teaminvite',
   LOGIN: '/login',
+  LOGIN_PHONE: '/phonelogin',
+  SET_EMAIL: '/setemail',
+  SET_HANDLE: '/sethandle',
+  SET_PASSWORD: '/setpassword',
   SSO: '/sso/:code?',
-  VERIFY: '/verify',
+  VERIFY_EMAIL_CODE: '/verifyemailcode',
+  VERIFY_EMAIL_LINK: '/verifyemaillink',
+  VERIFY_PHONE_CODE: '/verifyphonecode',
 };

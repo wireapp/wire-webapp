@@ -17,7 +17,7 @@
  *
  */
 
-import {Consent} from '@wireapp/api-client/dist/commonjs/self';
+import {Consent} from '@wireapp/api-client/dist/self';
 import {BackendClient} from '../service/BackendClient';
 
 export class SelfService {

@@ -23,7 +23,7 @@ import {FormattedHTMLMessage, useIntl} from 'react-intl';
 import {Config} from '../../Config';
 import {addLocaleToUrl} from '../../externalRoute';
 import {acceptNewsModalStrings} from '../../strings';
-import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
+import {EXTERNAL_ROUTE} from '../externalRoute';
 
 export interface Props extends React.HTMLProps<HTMLDivElement> {
   onConfirm: (event: React.MouseEvent<HTMLButtonElement>) => void;

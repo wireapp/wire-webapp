@@ -17,7 +17,7 @@
  *
  */
 
-import {WebappProperties} from '@wireapp/api-client/dist/commonjs/user/data';
+import {WebappProperties} from '@wireapp/api-client/dist/user/data';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {Logger} from 'logdown';

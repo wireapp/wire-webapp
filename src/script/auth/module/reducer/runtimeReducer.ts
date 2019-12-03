@@ -27,7 +27,7 @@ export interface RuntimeState {
   isSupportedBrowser: boolean;
 }
 
-export const initialState: RuntimeState = {
+export const initialRuntimeState: RuntimeState = {
   hasCookieSupport: false,
   hasIndexedDbSupport: false,
   isCheckingCookie: false,
@@ -35,7 +35,7 @@ export const initialState: RuntimeState = {
   isSupportedBrowser: false,
 };
 
-export function runtimeReducer(state: RuntimeState = initialState, action: AppActions): RuntimeState {
+export function runtimeReducer(state: RuntimeState = initialRuntimeState, action: AppActions): RuntimeState {
   switch (action.type) {
     case RUNTIME_ACTION.RUNTIME_CHECK_INDEXEDDB_START:
       return {
