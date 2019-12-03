@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.2.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.2.1...@wireapp/api-client@9.2.2) (2019-12-03)
+
+
+### Bug Fixes
+
+* **api-client:** Disconnect WebSocket before logout ([#2617](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2617)) ([ccc138c](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/ccc138c9c6b9d0fc324d6286aef0beb27c9ace97))
+
+
+
+
+
 ## [9.2.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.2.0...@wireapp/api-client@9.2.1) (2019-11-29)
 
 
