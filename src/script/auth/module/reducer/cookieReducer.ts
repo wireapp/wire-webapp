@@ -27,7 +27,7 @@ export interface CookieState {
   fetching: boolean;
 }
 
-export const initialState: CookieState = {
+export const initialCookieState: CookieState = {
   cookieTimer: {},
   cookies: {},
   error: null,
@@ -35,7 +35,7 @@ export const initialState: CookieState = {
   fetching: false,
 };
 
-export function cookieReducer(state: CookieState = initialState, action: AppActions): CookieState {
+export function cookieReducer(state: CookieState = initialCookieState, action: AppActions): CookieState {
   switch (action.type) {
     case COOKIE_ACTION.COOKIE_POLLING_START: {
       const {name, timerId} = action.payload;

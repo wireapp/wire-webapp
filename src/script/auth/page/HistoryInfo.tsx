@@ -25,7 +25,7 @@ import {connect} from 'react-redux';
 import useReactRouter from 'use-react-router';
 import {Config} from '../../Config';
 import {historyInfoStrings} from '../../strings';
-import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
+import {EXTERNAL_ROUTE} from '../externalRoute';
 import {RootState} from '../module/reducer';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import {ROUTE} from '../route';
@@ -38,7 +38,7 @@ const HistoryInfo = ({hasHistory, clients, currentSelfClient, isNewCurrentSelfCl
   const {history} = useReactRouter();
 
   const onContinue = () => {
-    return history.push(ROUTE.CHOOSE_HANDLE);
+    return history.push(ROUTE.SET_EMAIL);
   };
   const headline = hasHistory ? historyInfoStrings.hasHistoryHeadline : historyInfoStrings.noHistoryHeadline;
   const infoText = hasHistory ? historyInfoStrings.hasHistoryInfo : historyInfoStrings.noHistoryInfo;
@@ -54,7 +54,7 @@ const HistoryInfo = ({hasHistory, clients, currentSelfClient, isNewCurrentSelfCl
     (hasHistory || clients.length > 1 || (currentSelfClient && currentSelfClient.type === ClientType.TEMPORARY));
 
   if (!shouldShowHistoryInfo) {
-    history.push(ROUTE.CHOOSE_HANDLE);
+    history.push(ROUTE.SET_EMAIL);
     return null;
   }
 

@@ -44,7 +44,7 @@ import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import RouterLink from '../component/RouterLink';
 import UnsupportedBrowser from '../component/UnsupportedBrowser';
 import WirelessContainer from '../component/WirelessContainer';
-import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
+import {EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {BackendError} from '../module/action/BackendError';
 import {ValidationError} from '../module/action/ValidationError';

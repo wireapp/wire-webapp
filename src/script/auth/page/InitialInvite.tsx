@@ -38,7 +38,7 @@ import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 import {inviteStrings} from '../../strings';
-import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
+import {EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {BackendError} from '../module/action/BackendError';
 import {ValidationError} from '../module/action/ValidationError';

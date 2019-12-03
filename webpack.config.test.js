@@ -35,6 +35,21 @@ module.exports = Object.assign({}, prodConfig, {
     'react/lib/ReactContext': true,
   }),
   mode: 'development',
+  module: {
+    rules: [
+      ...prodConfig.module.rules,
+      {
+        enforce: 'post',
+        exclude: [/node_modules/, /\.test\.[tj]sx?/],
+        include: [path.resolve('src/script/auth')],
+        test: /\.[tj]sx?$/,
+        use: {
+          loader: 'istanbul-instrumenter-loader',
+          options: {esModules: true},
+        },
+      },
+    ],
+  },
   plugins: [
     ...commonConfig.plugins,
     new webpack.DefinePlugin({
