@@ -28,7 +28,7 @@ import {AssetService} from '../assets/AssetService';
 // Needed for the wrapper
 import '../event/WebApp';
 
-import '../config';
+import '../Config';
 
 import 'Components/accentColorPicker';
 import 'Components/asset/assetHeader';
