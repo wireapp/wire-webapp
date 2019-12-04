@@ -67,7 +67,9 @@ export class StorageService {
     this.dbName = undefined;
     this.userId = undefined;
 
-    this.isTemporaryAndNonPersistent = isTemporaryClientAndNonPersistent();
+    this.isTemporaryAndNonPersistent = encryptedEngine
+      ? isTemporaryClientAndNonPersistent(false)
+      : isTemporaryClientAndNonPersistent(true);
 
     this.engine = encryptedEngine || new IndexedDBEngine();
     this.hasHookSupport = this.engine instanceof IndexedDBEngine;

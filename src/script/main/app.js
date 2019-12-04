@@ -113,6 +113,7 @@ import {GiphyRepository} from '../extension/GiphyRepository';
 import {AssetUploader} from '../assets/AssetUploader';
 import {GiphyService} from '../extension/GiphyService';
 import {PermissionRepository} from '../permission/PermissionRepository';
+import {loadValue} from 'Util/StorageUtil';
 
 class App {
   static get CONFIG() {
@@ -702,7 +703,7 @@ class App {
       this.repository.calling.destroy();
 
       if (this.repository.user.isActivatedAccount()) {
-        if (isTemporaryClientAndNonPersistent()) {
+        if (isTemporaryClientAndNonPersistent(loadValue(StorageKey.AUTH.PERSIST))) {
           this.logout(SIGN_OUT_REASON.CLIENT_REMOVED, true);
         } else {
           this.repository.storage.terminate('window.onunload');
@@ -928,7 +929,7 @@ $(async () => {
       restUrl: Config.BACKEND_REST,
       webSocketUrl: Config.BACKEND_WS,
     });
-    if (isTemporaryClientAndNonPersistent()) {
+    if (isTemporaryClientAndNonPersistent(loadValue(StorageKey.AUTH.PERSIST))) {
       const engine = await StorageService.getUnitializedEngine();
       window.addEventListener('beforeunload', () => Dexie.delete('/sqleet'));
       wire.app = new App(backendClient, appContainer, engine);
