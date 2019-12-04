@@ -485,9 +485,7 @@ export class ConversationRepository {
         const data = this.conversationMapper.mergeConversation(localConversations, remoteConversations);
         return this.conversation_service.save_conversations_in_db(data);
       })
-      .then(conversationsData => {
-        return this.mapConversations(conversationsData);
-      })
+      .then(conversationsData => this.mapConversations(conversationsData))
       .then(conversationEntities => {
         this.save_conversations(conversationEntities);
         return this.conversations();
