@@ -360,20 +360,14 @@ export class ConversationMapper {
       };
 
       // Add roles for self
-      if (selfState.conversation_role) {
-        if (!(selfState.conversation_role in updates.roles)) {
-          updates.roles[selfState.conversation_role] = [];
-        }
-        updates.roles[selfState.conversation_role].push(selfState.id);
+      if (selfState.conversation_role && !(selfState.id in updates.roles)) {
+        updates.roles[selfState.id] = selfState.conversation_role;
       }
 
       // Add roles for others
       othersStates.map(other => {
-        if (other.conversation_role) {
-          if (!(other.conversation_role in updates.roles)) {
-            updates.roles[other.conversation_role] = [];
-          }
-          updates.roles[other.conversation_role].push(other.id);
+        if (other.conversation_role && !(other.conversation_role in updates.roles)) {
+          updates.roles[other.id] = other.conversation_role;
         }
       });
 

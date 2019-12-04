@@ -61,22 +61,14 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
       this.conversationRepository
         .updateMember(this.activeConversation(), this.selectedParticipant().id, ConversationRole.WIRE_ADMIN)
         .then(() => {
-          // this.activeConversation().roles[ConversationRole.WIRE_ADMIN].push(this.selectedParticipant().id);
-          // this.activeConversation().roles[ConversationRole.WIRE_MEMBER].splice(
-          //   this.activeConversation().roles[ConversationRole.WIRE_MEMBER].indexOf(this.selectedParticipant().id),
-          //   1,
-          // );
+          this.activeConversation().roles[this.selectedParticipant().id] = ConversationRole.WIRE_ADMIN;
         })
         .then(() => this.isAdmin(isAdmin));
     } else {
       this.conversationRepository
         .updateMember(this.activeConversation(), this.selectedParticipant().id, ConversationRole.WIRE_MEMBER)
         .then(() => {
-          // this.activeConversation().roles[ConversationRole.WIRE_MEMBER].push(this.selectedParticipant().id);
-          // this.activeConversation().roles[ConversationRole.WIRE_ADMIN].splice(
-          //   this.activeConversation().roles[ConversationRole.WIRE_ADMIN].indexOf(this.selectedParticipant().id),
-          //   1,
-          // );
+          this.activeConversation().roles[this.selectedParticipant().id] = ConversationRole.WIRE_MEMBER;
         })
         .then(() => this.isAdmin(isAdmin));
     }

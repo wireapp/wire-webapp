@@ -103,6 +103,7 @@ import {BackendClientError} from '../error/BackendClientError';
 import {showLegalHoldWarning} from '../legal-hold/LegalHoldWarning';
 import * as LegalHoldEvaluator from '../legal-hold/LegalHoldEvaluator';
 import {DeleteConversationMessage} from '../entity/message/DeleteConversationMessage';
+import {ConversationRole} from './ConversationRole';
 
 // Conversation repository for all conversation interactions with the conversation service
 export class ConversationRepository {
@@ -814,7 +815,7 @@ export class ConversationRepository {
   }
 
   isUserGroupAdmin(conversationEntity, userEntity) {
-    return conversationEntity.roles.wire_admin.includes(userEntity.id);
+    return conversationEntity.roles[userEntity.id] == ConversationRole.WIRE_ADMIN;
   }
 
   isSelfGroupAdmin(conversationEntity) {
