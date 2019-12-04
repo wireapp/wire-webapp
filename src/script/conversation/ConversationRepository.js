@@ -814,8 +814,7 @@ export class ConversationRepository {
   }
 
   isUserGroupAdmin(conversationEntity, userEntity) {
-    // TODO: once we have the roles from the backend, use these
-    return conversationEntity.creator === userEntity.id;
+    return conversationEntity.roles.wire_admin.includes(userEntity.id);
   }
 
   isSelfGroupAdmin(conversationEntity) {
@@ -1182,7 +1181,6 @@ export class ConversationRepository {
    */
   mapConversations(payload, initialTimestamp = this.getLatestEventTimestamp()) {
     const conversationsData = payload.length ? payload : [payload];
-
     const entitites = this.conversationMapper.mapConversations(conversationsData, initialTimestamp);
     entitites.forEach(conversationEntity => {
       this._mapGuestStatusSelf(conversationEntity);
