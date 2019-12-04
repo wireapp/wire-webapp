@@ -34,6 +34,7 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
     this.userRepository = repositories.user;
     this.actionsViewModel = mainViewModel.actions;
     this.teamRepository = repositories.team;
+    this.conversationRepository = repositories.conversation;
 
     this.logger = getLogger('GroupParticipantUserViewModel');
 
@@ -42,40 +43,43 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
     this.onUserAction = this.onUserAction.bind(this);
 
     this.isSelfGroupAdmin = ko.pureComputed(() =>
-      repositories.conversation.isSelfGroupAdmin(this.activeConversation()),
+      this.conversationRepository.isSelfGroupAdmin(this.activeConversation()),
     );
 
-    this.isAdmin = ko.pureComputed({
-      read: () => repositories.conversation.isUserGroupAdmin(this.activeConversation(), this.selectedParticipant()),
-      write: async isAdmin => {
-        if (isAdmin) {
-          repositories.conversation
-            .updateMember(this.activeConversation(), this.selectedParticipant().id, ConversationRole.WIRE_ADMIN)
-            .then(() => {
-              this.activeConversation().roles[ConversationRole.WIRE_ADMIN].push(this.selectedParticipant().id);
-              this.activeConversation().roles[ConversationRole.WIRE_MEMBER].splice(
-                this.activeConversation().roles[ConversationRole.WIRE_MEMBER].indexOf(this.selectedParticipant().id),
-                1,
-              );
-            });
-        } else {
-          repositories.conversation
-            .updateMember(this.activeConversation(), this.selectedParticipant().id, ConversationRole.WIRE_MEMBER)
-            .then(() => {
-              this.activeConversation().roles[ConversationRole.WIRE_MEMBER].push(this.selectedParticipant().id);
-              this.activeConversation().roles[ConversationRole.WIRE_ADMIN].splice(
-                this.activeConversation().roles[ConversationRole.WIRE_ADMIN].indexOf(this.selectedParticipant().id),
-                1,
-              );
-            });
-        }
-        return repositories.conversation.isUserGroupAdmin(this.activeConversation(), this.selectedParticipant());
-      },
-    });
+    if (this.activeConversation()) {
+      this.isAdmin = ko.observable(
+        this.conversationRepository.isUserGroupAdmin(this.activeConversation(), this.selectedParticipant()),
+      );
+    } else {
+      this.isAdmin = ko.observable(false);
+    }
   }
 
   onToggleAdmin() {
-    this.isAdmin(!this.isAdmin());
+    const isAdmin = !this.isAdmin();
+    if (isAdmin) {
+      this.conversationRepository
+        .updateMember(this.activeConversation(), this.selectedParticipant().id, ConversationRole.WIRE_ADMIN)
+        .then(() => {
+          // this.activeConversation().roles[ConversationRole.WIRE_ADMIN].push(this.selectedParticipant().id);
+          // this.activeConversation().roles[ConversationRole.WIRE_MEMBER].splice(
+          //   this.activeConversation().roles[ConversationRole.WIRE_MEMBER].indexOf(this.selectedParticipant().id),
+          //   1,
+          // );
+        })
+        .then(() => this.isAdmin(isAdmin));
+    } else {
+      this.conversationRepository
+        .updateMember(this.activeConversation(), this.selectedParticipant().id, ConversationRole.WIRE_MEMBER)
+        .then(() => {
+          // this.activeConversation().roles[ConversationRole.WIRE_MEMBER].push(this.selectedParticipant().id);
+          // this.activeConversation().roles[ConversationRole.WIRE_ADMIN].splice(
+          //   this.activeConversation().roles[ConversationRole.WIRE_ADMIN].indexOf(this.selectedParticipant().id),
+          //   1,
+          // );
+        })
+        .then(() => this.isAdmin(isAdmin));
+    }
   }
 
   showActionDevices(userEntity) {
