@@ -362,7 +362,6 @@ export class ConversationMapper {
       // Add roles for self
       if (selfState.conversation_role && !(selfState.conversation_role in updates.roles)) {
           updates.roles[selfState.conversation_role] = [];
-        }
       }
       updates.roles[selfState.conversation_role].push(selfState.id);
 
