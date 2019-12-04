@@ -1479,6 +1479,12 @@ export class ConversationRepository {
     });
   }
 
+  updateMember(conversationEntity, userId, conversationRole) {
+    return this.conversation_service.putMembers(conversationEntity.id, userId, {
+      conversation_role: conversationRole,
+    });
+  }
+
   /**
    * Remove service from conversation.
    *

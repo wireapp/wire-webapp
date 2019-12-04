@@ -314,6 +314,14 @@ export class ConversationService {
     });
   }
 
+  putMembers(conversationId, userId, data) {
+    return this.backendClient.sendJson({
+      data,
+      type: 'PUT',
+      url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/members/${userId}`,
+    });
+  }
+
   deleteConversation(teamId, conversationId) {
     return this.backendClient.sendRequest({
       type: 'DELETE',

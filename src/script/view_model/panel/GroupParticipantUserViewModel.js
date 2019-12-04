@@ -22,7 +22,7 @@ import {getLogger} from 'Util/Logger';
 import {Actions} from 'Components/panel/userActions';
 import 'Components/panel/enrichedFields';
 import 'Components/panel/userDetails';
-
+import {ConversationRole} from '../../conversation/ConversationRole';
 import {BasePanelViewModel} from './BasePanelViewModel';
 
 export class GroupParticipantUserViewModel extends BasePanelViewModel {
@@ -45,9 +45,25 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
       repositories.conversation.isSelfGroupAdmin(this.activeConversation()),
     );
 
-    this.isAdmin = ko.pureComputed(() =>
-      repositories.conversation.isUserGroupAdmin(this.activeConversation(), this.selectedParticipant()),
-    );
+    this.isAdmin = ko.pureComputed({
+      read: () => repositories.conversation.isUserGroupAdmin(this.activeConversation(), this.selectedParticipant()),
+      write: async isAdmin => {
+        if (isAdmin) {
+          await repositories.conversation.updateMember(
+            this.activeConversation(),
+            this.selectedParticipant().id,
+            ConversationRole.WIRE_ADMIN,
+          );
+        } else {
+          await repositories.conversation.updateMember(
+            this.activeConversation(),
+            this.selectedParticipant().id,
+            ConversationRole.WIRE_MEMBER,
+          );
+        }
+        return repositories.conversation.isUserGroupAdmin(this.activeConversation(), this.selectedParticipant());
+      },
+    });
   }
 
   onToggleAdmin() {
