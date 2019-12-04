@@ -49,17 +49,25 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
       read: () => repositories.conversation.isUserGroupAdmin(this.activeConversation(), this.selectedParticipant()),
       write: async isAdmin => {
         if (isAdmin) {
-          await repositories.conversation.updateMember(
-            this.activeConversation(),
-            this.selectedParticipant().id,
-            ConversationRole.WIRE_ADMIN,
-          );
+          repositories.conversation
+            .updateMember(this.activeConversation(), this.selectedParticipant().id, ConversationRole.WIRE_ADMIN)
+            .then(() => {
+              this.activeConversation().roles[ConversationRole.WIRE_ADMIN].push(this.selectedParticipant().id);
+              this.activeConversation().roles[ConversationRole.WIRE_MEMBER].splice(
+                this.activeConversation().roles[ConversationRole.WIRE_MEMBER].indexOf(this.selectedParticipant().id),
+                1,
+              );
+            });
         } else {
-          await repositories.conversation.updateMember(
-            this.activeConversation(),
-            this.selectedParticipant().id,
-            ConversationRole.WIRE_MEMBER,
-          );
+          repositories.conversation
+            .updateMember(this.activeConversation(), this.selectedParticipant().id, ConversationRole.WIRE_MEMBER)
+            .then(() => {
+              this.activeConversation().roles[ConversationRole.WIRE_MEMBER].push(this.selectedParticipant().id);
+              this.activeConversation().roles[ConversationRole.WIRE_ADMIN].splice(
+                this.activeConversation().roles[ConversationRole.WIRE_ADMIN].indexOf(this.selectedParticipant().id),
+                1,
+              );
+            });
         }
         return repositories.conversation.isUserGroupAdmin(this.activeConversation(), this.selectedParticipant());
       },
