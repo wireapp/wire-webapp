@@ -262,6 +262,7 @@ export class ConversationMapper {
 
     const {creator, id, members, name, others, type} = conversationData;
     let conversationEntity = new Conversation(id);
+    conversationEntity.roles = conversationData.roles;
 
     conversationEntity.creator = creator;
     conversationEntity.type(type);
@@ -352,10 +353,29 @@ export class ConversationMapper {
         message_timer,
         name,
         receipt_mode,
+        roles: {},
         status: selfState.status,
         team_id: team,
         type,
       };
+
+      // Add roles for self
+      if (selfState.conversation_role) {
+        if (!(selfState.conversation_role in updates.roles)) {
+          updates.roles[selfState.conversation_role] = [];
+        }
+      }
+      updates.roles[selfState.conversation_role].push(selfState.id);
+
+      // Add roles for others
+      othersStates.map(other => {
+        if (other.conversation_role) {
+          if (!(other.conversation_role in updates.roles)) {
+            updates.roles[other.conversation_role] = [];
+          }
+        }
+        updates.roles[other.conversation_role].push(other.id);
+      });
 
       if (typeof localConversationData.receipt_mode === 'number') {
         updates.receipt_mode = localConversationData.receipt_mode;

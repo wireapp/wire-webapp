@@ -76,6 +76,7 @@ export class Conversation {
     this.participating_user_ets = ko.observableArray([]); // Does not include self user
     this.participating_user_ids = ko.observableArray([]); // Does not include self user
     this.selfUser = ko.observable();
+    this.roles = {wire_admin: [], wire_member: []};
 
     this.hasCreationMessage = false;
 
