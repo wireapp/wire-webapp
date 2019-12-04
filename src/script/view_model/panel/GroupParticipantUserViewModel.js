@@ -45,14 +45,9 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
     this.isSelfGroupAdmin = ko.pureComputed(() =>
       this.conversationRepository.isSelfGroupAdmin(this.activeConversation()),
     );
-
-    if (this.activeConversation()) {
-      this.isAdmin = ko.observable(
-        this.conversationRepository.isUserGroupAdmin(this.activeConversation(), this.selectedParticipant()),
-      );
-    } else {
-      this.isAdmin = ko.observable(false);
-    }
+    this.isAdmin = ko.pureComputed(() =>
+      repositories.conversation.isUserGroupAdmin(this.activeConversation(), this.selectedParticipant()),
+    );
   }
 
   onToggleAdmin() {
@@ -63,14 +58,14 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
         .then(() => {
           this.activeConversation().roles[this.selectedParticipant().id] = ConversationRole.WIRE_ADMIN;
         })
-        .then(() => this.isAdmin(isAdmin));
+        .then(() => this.selectedParticipant.valueHasMutated());
     } else {
       this.conversationRepository
         .updateMember(this.activeConversation(), this.selectedParticipant().id, ConversationRole.WIRE_MEMBER)
         .then(() => {
           this.activeConversation().roles[this.selectedParticipant().id] = ConversationRole.WIRE_MEMBER;
         })
-        .then(() => this.isAdmin(isAdmin));
+        .then(() => this.selectedParticipant.valueHasMutated());
     }
   }
 

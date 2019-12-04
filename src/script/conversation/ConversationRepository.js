@@ -1470,6 +1470,7 @@ export class ConversationRepository {
    */
   removeMember(conversationEntity, userId) {
     return this.conversation_service.deleteMembers(conversationEntity.id, userId).then(response => {
+      delete conversationEntity.roles[userId];
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
       const event = !!response
         ? response
