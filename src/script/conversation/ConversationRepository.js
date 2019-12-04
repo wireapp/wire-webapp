@@ -814,7 +814,6 @@ export class ConversationRepository {
   }
 
   isUserGroupAdmin(conversationEntity, userEntity) {
-    // TODO: once we have the roles from the backend, use these
     return conversationEntity.roles.wire_admin.includes(userEntity.id);
   }
 
