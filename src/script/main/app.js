@@ -873,6 +873,7 @@ class App {
         url = `${url}#login`;
       }
 
+      Dexie.delete('/sqleet');
       window.location.replace(url);
     });
   }
@@ -931,7 +932,6 @@ $(async () => {
     });
     if (isTemporaryClientAndNonPersistent(loadValue(StorageKey.AUTH.PERSIST))) {
       const engine = await StorageService.getUnitializedEngine();
-      window.addEventListener('beforeunload', () => Dexie.delete('/sqleet'));
       wire.app = new App(backendClient, appContainer, engine);
     } else {
       wire.app = new App(backendClient, appContainer);
