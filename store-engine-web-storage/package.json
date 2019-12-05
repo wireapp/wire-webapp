@@ -11,7 +11,7 @@
     "karma-typescript": "4.1.1",
     "rimraf": "3.0.0",
     "ts-node": "8.5.4",
-    "typescript": "3.7.2"
+    "typescript": "3.7.3"
   },
   "description": "Store Engine wrapper for the browser's Web Storage API.",
   "files": [

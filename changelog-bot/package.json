@@ -14,7 +14,7 @@
   "devDependencies": {
     "logdown": "3.2.8",
     "rimraf": "3.0.0",
-    "typescript": "3.7.2"
+    "typescript": "3.7.3"
   },
   "files": [
     "dist"
