@@ -36,6 +36,7 @@ export class SQLeetSchemata {
         schema: {
           [StorageSchemata.OBJECT_STORE.AMPLIFY]: SQLiteType.JSON_OR_TEXT,
           [StorageSchemata.OBJECT_STORE.CLIENTS]: {
+            address: SQLiteType.TEXT,
             class: SQLiteType.TEXT,
             id: SQLiteType.TEXT,
             label: SQLiteType.TEXT,
@@ -74,9 +75,11 @@ export class SQLeetSchemata {
             from_client_id: SQLiteType.TEXT,
             id: SQLiteType.TEXT,
             primary_key: SQLiteType.INTEGER,
+            reactions: SQLiteType.JSON,
             status: SQLiteType.INTEGER,
             time: SQLiteType.TEXT,
             type: SQLiteType.TEXT,
+            version: SQLiteType.INTEGER,
           },
           [StorageSchemata.OBJECT_STORE.KEYS]: {
             created: SQLiteType.INTEGER,
