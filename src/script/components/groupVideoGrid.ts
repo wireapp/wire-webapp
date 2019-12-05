@@ -184,7 +184,7 @@ ko.components.register('group-video-grid', {
           </div>
         <!-- /ko -->
       </div>
-      <!-- ko if: grid().thumbnail?.videoStream() -->
+      <!-- ko if: grid().thumbnail && grid().thumbnail.videoStream() -->
         <div class="group-video__thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized}">
           <video class="mirror group-video__thumbnail-video" autoplay playsinline data-uie-name="self-video-thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized, 'mirror': grid().thumbnail.hasActiveVideo()}, sourceStream: grid().thumbnail.videoStream()">
           </video>
