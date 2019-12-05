@@ -80,7 +80,7 @@ export class IntegrationRepository {
   addProviderNameToParticipant(entity: ServiceEntity): Promise<ServiceEntity>;
   addProviderNameToParticipant(entity: User): Promise<User>;
   addProviderNameToParticipant(entity: ServiceEntity | User): Promise<ServiceEntity | User> {
-    const shouldUpdateProviderName = !!entity.providerName() && !entity.providerName().trim();
+    const shouldUpdateProviderName = !!entity.providerName()?.trim();
 
     return shouldUpdateProviderName
       ? this.getProviderById(entity.providerId).then(providerEntity => {

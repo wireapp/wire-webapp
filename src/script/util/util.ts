@@ -35,7 +35,7 @@ import {StorageKey} from '../storage/StorageKey';
 
 export const isTemporaryClientAndNonPersistent = (persist: boolean = false): boolean => {
   const isNonPersistentByUrl = URLUtil.getURLParameter(QUERY_KEY.PERSIST_TEMPORARY_CLIENTS) === 'false';
-  const isNonPersistentByServerConfig = Config.FEATURE && Config.FEATURE.PERSIST_TEMPORARY_CLIENTS === false;
+  const isNonPersistentByServerConfig = Config.FEATURE?.PERSIST_TEMPORARY_CLIENTS === false;
   const isNonPersistent = isNonPersistentByUrl || isNonPersistentByServerConfig;
 
   const isTemporaryByLocalStorage = loadValue(StorageKey.AUTH.PERSIST) === false;

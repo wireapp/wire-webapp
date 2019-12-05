@@ -181,7 +181,7 @@ export class AudioRepository {
 
   stop(audioId: AudioType): void {
     const audioElement = this.getSoundById(audioId);
-    if (audioElement && !audioElement.paused) {
+    if (!audioElement?.paused) {
       this.logger.info(`Stopping sound '${audioId}'`);
       audioElement.pause();
     }

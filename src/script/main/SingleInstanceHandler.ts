@@ -78,7 +78,7 @@ export class SingleInstanceHandler {
   deregisterInstance(forceRemoval = false): void {
     const singleInstanceCookie = Cookies.getJSON(CONFIG.COOKIE_NAME);
 
-    const isOwnInstanceId = singleInstanceCookie && singleInstanceCookie.appInstanceId === this.instanceId;
+    const isOwnInstanceId = singleInstanceCookie?.appInstanceId === this.instanceId;
     if (forceRemoval || isOwnInstanceId) {
       Cookies.remove(CONFIG.COOKIE_NAME);
       this._stopSingleInstanceCheck();
@@ -106,7 +106,7 @@ export class SingleInstanceHandler {
     }
     const singleInstanceCookie = Cookies.getJSON(CONFIG.COOKIE_NAME);
 
-    return singleInstanceCookie && singleInstanceCookie.appInstanceId === this.instanceId;
+    return singleInstanceCookie?.appInstanceId === this.instanceId;
   }
 
   private _checkSingleInstance(): void {
