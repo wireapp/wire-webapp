@@ -200,7 +200,7 @@ export class WebSocketService {
    * @param reconnect Re-establish the WebSocket connection
    */
   reset(trigger: CHANGE_TRIGGER, reconnect: boolean = false): void {
-    if (this.socket && this.socket.onclose) {
+    if (this.socket?.onclose) {
       this.logger.info(`WebSocket reset triggered by '${trigger}'`);
       this.socket.onerror = undefined;
       this.socket.onclose = undefined;

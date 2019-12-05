@@ -58,7 +58,7 @@ markdownit.renderer.rules.paragraph_open = (tokens, idx) => {
   const previousWithMap = tokens
     .slice(0, idx)
     .reverse()
-    .find(({map}) => map && map.length);
+    .find(({map}) => map?.length);
   const previousPosition = previousWithMap ? previousWithMap.map[1] - 1 : 0;
   const count = position - previousPosition;
   return '<br>'.repeat(count);
@@ -145,7 +145,7 @@ export const renderMessage = (message: string, selfId: string, mentionEntities: 
     const isEmail = href.startsWith('mailto:');
     const isWireDeepLink = href.toLowerCase().startsWith('wire://');
     const nextToken = tokens[idx + 1];
-    const text = nextToken && nextToken.type === 'text' ? nextToken.content : '';
+    const text = nextToken?.type === 'text' ? nextToken.content : '';
 
     if (!href || !text.trim()) {
       nextToken.content = '';
@@ -166,7 +166,7 @@ export const renderMessage = (message: string, selfId: string, mentionEntities: 
         link.attrSet('title', cleanString(title));
       }
       link.attrSet('href', cleanString(href));
-      if (nextToken && nextToken.type === 'text') {
+      if (nextToken?.type === 'text') {
         nextToken.content = text;
       }
       link.attrPush(['data-md-link', 'true']);

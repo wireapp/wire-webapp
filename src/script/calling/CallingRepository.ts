@@ -202,7 +202,7 @@ export class CallingRepository {
 
   private findParticipant(conversationId: ConversationId, userId: UserId): Participant | undefined {
     const call = this.findCall(conversationId);
-    return call && call.participants().find(participant => participant.userId === userId);
+    return call?.participants().find(participant => participant.userId === userId);
   }
 
   private storeCall(call: Call): void {
@@ -282,7 +282,7 @@ export class CallingRepository {
         const isAnotherSelfClient = userId === this.selfUser.id && clientId !== this.selfClientId;
         if (isAnotherSelfClient) {
           const call = this.findCall(conversationId);
-          if (call && call.state() === CALL_STATE.INCOMING) {
+          if (call?.state() === CALL_STATE.INCOMING) {
             // If the group leave was sent from the self user from another device,
             // we reset the reason so that the call is not shown in the UI.
             // If the call is already accepted, we keep the call UI.
@@ -459,7 +459,7 @@ export class CallingRepository {
     if (call && !validStateWithoutCamera.includes(call.state())) {
       this.leaveCall(call.conversationId);
     }
-    if (call && call.state() !== CALL_STATE.ANSWERED) {
+    if (call?.state() !== CALL_STATE.ANSWERED) {
       if (requestedStreams.camera) {
         this.showNoCameraModal();
       }
@@ -549,7 +549,7 @@ export class CallingRepository {
       messageId: createRandomUuid(),
     });
     const call = this.findCall(conversationId);
-    if (call && call.blockMessages) {
+    if (call?.blockMessages) {
       return 0;
     }
 

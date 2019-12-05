@@ -147,7 +147,7 @@ export class AuthAction {
   validateSSOCode = (code: string): ThunkAction => {
     return async (dispatch, getState, {apiClient}) => {
       const mapError = (error: any) => {
-        const statusCode = error && error.response && error.response.status;
+        const statusCode = error?.response?.status;
         if (statusCode === 404) {
           return new BackendError({code: 404, label: BackendError.SSO_ERRORS.SSO_NOT_FOUND});
         }

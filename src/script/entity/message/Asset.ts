@@ -56,7 +56,7 @@ export class Asset {
   }
 
   is_video(): boolean {
-    const is_video_asset = this.type === AssetType.FILE && this.file_type && this.file_type.startsWith('video');
+    const is_video_asset = this.type === AssetType.FILE && this.file_type?.startsWith('video');
     if (is_video_asset) {
       const can_play = document.createElement('video').canPlayType(this.file_type);
       if (can_play !== '') {
@@ -67,7 +67,7 @@ export class Asset {
   }
 
   is_audio(): boolean {
-    const is_audio_asset = this.type === AssetType.FILE && this.file_type && this.file_type.startsWith('audio');
+    const is_audio_asset = this.type === AssetType.FILE && this.file_type?.startsWith('audio');
     if (is_audio_asset) {
       const can_play = document.createElement('audio').canPlayType(this.file_type);
       if (can_play !== '') {

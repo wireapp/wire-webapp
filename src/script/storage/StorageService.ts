@@ -257,7 +257,7 @@ export class StorageService {
 
       for (const primaryKey of primaryKeys) {
         const record = await this.load<{conversation: string; id: string; time: number}>(storeName, primaryKey);
-        if (record && record.id === eventId && record.conversation === conversationId) {
+        if (record?.id === eventId && record.conversation === conversationId) {
           await this.delete(storeName, primaryKey);
           deletedRecords++;
         }
@@ -281,7 +281,7 @@ export class StorageService {
 
       for (const primaryKey of primaryKeys) {
         const record = await this.load<{conversation: string; time: string}>(storeName, primaryKey);
-        if (record && record.conversation === conversationId && (!isoDate || isoDate >= record.time)) {
+        if (record?.conversation === conversationId && (!isoDate || isoDate >= record.time)) {
           await this.delete(storeName, primaryKey);
           deletedRecords++;
         }
