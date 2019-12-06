@@ -27,7 +27,6 @@ import {getEphemeralValue} from 'Util/ephemeralValueStore';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {loadValue, storeValue} from 'Util/StorageUtil';
-import {isTemporaryClientAndNonPersistent} from 'Util/util';
 import {ClientType} from '../client/ClientType';
 import {Config} from '../Config';
 import {SQLeetSchemata} from './SQLeetSchemata';
@@ -67,9 +66,7 @@ export class StorageService {
     this.dbName = undefined;
     this.userId = undefined;
 
-    this.isTemporaryAndNonPersistent = encryptedEngine
-      ? isTemporaryClientAndNonPersistent(false)
-      : isTemporaryClientAndNonPersistent(true);
+    this.isTemporaryAndNonPersistent = !!encryptedEngine;
 
     this.engine = encryptedEngine || new IndexedDBEngine();
     this.hasHookSupport = this.engine instanceof IndexedDBEngine;
@@ -97,7 +94,7 @@ export class StorageService {
 
     try {
       if (this.isTemporaryAndNonPersistent) {
-        this.logger.info(`Storage Service initialized with encrypted database '${this.dbName}'`);
+        this.logger.info(`Initializing Storage Service with encrypted database '${this.dbName}'`);
         await this.engine.init(this.dbName);
       } else {
         this.db = new Dexie(this.dbName);
