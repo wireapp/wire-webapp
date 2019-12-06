@@ -24,6 +24,7 @@
     "@types/express-sitemap-xml": "1.0.3",
     "@types/express-useragent": "1.0.0",
     "@types/fs-extra": "8.0.1",
+    "@types/geolite2": "2.0.0",
     "@types/hbs": "4.0.1",
     "@types/helmet": "0.0.45",
     "@types/jasmine": "3.5.0",

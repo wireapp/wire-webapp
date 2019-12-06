@@ -18,9 +18,10 @@
  */
 
 import {Request, Router} from 'express';
+import * as geolite2 from 'geolite2';
+
 import {ServerConfig} from '../ServerConfig';
 
-const geolite2 = require('geolite2');
 const maxmind = require('maxmind');
 
 async function addGeoIP(req: Request) {
