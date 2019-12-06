@@ -26,7 +26,8 @@ import {resolve, graph} from '../config/appResolver';
 import {Config} from '../Config';
 import {exposeWrapperGlobals} from 'Util/wrapper';
 import {isTemporaryClientAndNonPersistent} from 'Util/util';
-import {StorageService} from '../storage';
+import {StorageKey, StorageService} from '../storage';
+import {loadValue} from 'Util/StorageUtil';
 
 $(async () => {
   enableLogging(Config.FEATURE.ENABLE_DEBUG);
@@ -37,7 +38,7 @@ $(async () => {
       restUrl: Config.BACKEND_REST,
       webSocketUrl: Config.BACKEND_WS,
     });
-    if (isTemporaryClientAndNonPersistent()) {
+    if (isTemporaryClientAndNonPersistent(loadValue(StorageKey.AUTH.PERSIST))) {
       const engine = await StorageService.getUnitializedEngine();
       new AuthViewModel(backendClient, engine);
     } else {
