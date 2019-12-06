@@ -6,7 +6,7 @@
     "@types/jasmine": "3.5.0",
     "@types/karma": "3.0.4",
     "@types/node": "~12",
-    "@wireapp/store-engine": "4.1.6",
+    "@wireapp/store-engine": "4.1.7",
     "jasmine": "3.5.0",
     "karma": "4.4.1",
     "karma-chrome-launcher": "3.1.0",
@@ -36,5 +36,5 @@
     "test": "karma start",
     "test:project": "yarn dist && yarn test"
   },
-  "version": "1.0.6"
+  "version": "1.0.7"
 }

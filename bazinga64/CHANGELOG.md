@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.5.34](https://github.com/wireapp/wire-web-packages/tree/master/packages/bazinga64/compare/bazinga64@5.5.33...bazinga64@5.5.34) (2019-12-06)
+
+**Note:** Version bump only for package bazinga64
+
+
+
+
+
 ## [5.5.33](https://github.com/wireapp/wire-web-packages/tree/master/packages/bazinga64/compare/bazinga64@5.5.32...bazinga64@5.5.33) (2019-11-29)
 
 **Note:** Version bump only for package bazinga64
