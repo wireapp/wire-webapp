@@ -36,7 +36,7 @@ export class SelfAction {
         await dispatch(selfAction.doCheckPasswordState());
         const {teams} = await apiClient.teams.team.api.getTeams();
         const [boundTeam] = teams.filter(team => team.binding);
-        selfUser.team = boundTeam && boundTeam.id;
+        selfUser.team = boundTeam?.id;
         dispatch(SelfActionCreator.successfulFetchSelf(selfUser));
         return selfUser;
       } catch (error) {
@@ -133,7 +133,7 @@ export class SelfAction {
         dispatch(SelfActionCreator.successfulSetPasswordState({hasPassword: true}));
         return true;
       } catch (error) {
-        if (error.response && error.response.status === 404) {
+        if (error.response?.status === 404) {
           dispatch(SelfActionCreator.successfulSetPasswordState({hasPassword: false}));
           return false;
         }

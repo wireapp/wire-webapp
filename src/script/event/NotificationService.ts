@@ -117,7 +117,7 @@ export class NotificationService {
         throw new z.error.EventError(z.error.EventError.TYPE.DATABASE_FAILURE);
       })
       .then(record => {
-        if (record && record.value) {
+        if (record?.value) {
           return record.value;
         }
         throw new z.error.EventError(z.error.EventError.TYPE.NO_LAST_DATE);
@@ -136,7 +136,7 @@ export class NotificationService {
         throw new z.error.EventError(z.error.EventError.TYPE.DATABASE_FAILURE);
       })
       .then(record => {
-        if (record && record.value) {
+        if (record?.value) {
           return record.value;
         }
         throw new z.error.EventError(z.error.EventError.TYPE.NO_LAST_ID);
@@ -151,7 +151,7 @@ export class NotificationService {
     return this.storageService
       .load<{value: string}>(this.AMPLIFY_STORE_NAME, NotificationService.CONFIG.PRIMARY_KEY_MISSED)
       .then(record => {
-        if (record && record.value) {
+        if (record?.value) {
           return record.value;
         }
         return undefined;

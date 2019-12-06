@@ -27,7 +27,6 @@ import {getEphemeralValue} from 'Util/ephemeralValueStore';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {loadValue, storeValue} from 'Util/StorageUtil';
-import {isTemporaryClientAndNonPersistent} from 'Util/util';
 import {ClientType} from '../client/ClientType';
 import {Config} from '../Config';
 import {SQLeetSchemata} from './SQLeetSchemata';
@@ -67,7 +66,7 @@ export class StorageService {
     this.dbName = undefined;
     this.userId = undefined;
 
-    this.isTemporaryAndNonPersistent = isTemporaryClientAndNonPersistent();
+    this.isTemporaryAndNonPersistent = !!encryptedEngine;
 
     this.engine = encryptedEngine || new IndexedDBEngine();
     this.hasHookSupport = this.engine instanceof IndexedDBEngine;
@@ -95,7 +94,7 @@ export class StorageService {
 
     try {
       if (this.isTemporaryAndNonPersistent) {
-        this.logger.info(`Storage Service initialized with encrypted database '${this.dbName}'`);
+        this.logger.info(`Initializing Storage Service with encrypted database '${this.dbName}'`);
         await this.engine.init(this.dbName);
       } else {
         this.db = new Dexie(this.dbName);
@@ -255,7 +254,7 @@ export class StorageService {
 
       for (const primaryKey of primaryKeys) {
         const record = await this.load<{conversation: string; id: string; time: number}>(storeName, primaryKey);
-        if (record && record.id === eventId && record.conversation === conversationId) {
+        if (record?.id === eventId && record.conversation === conversationId) {
           await this.delete(storeName, primaryKey);
           deletedRecords++;
         }
@@ -279,7 +278,7 @@ export class StorageService {
 
       for (const primaryKey of primaryKeys) {
         const record = await this.load<{conversation: string; time: string}>(storeName, primaryKey);
-        if (record && record.conversation === conversationId && (!isoDate || isoDate >= record.time)) {
+        if (record?.conversation === conversationId && (!isoDate || isoDate >= record.time)) {
           await this.delete(storeName, primaryKey);
           deletedRecords++;
         }
