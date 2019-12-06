@@ -244,7 +244,7 @@ ko.components.register('user-list', {
           if (userEntity.isService) {
             return;
           }
-          if (conversationRepository.isUserGroupAdmin(conversation(), userEntity)) {
+          if (conversationRepository.conversationRoleRepository.isUserGroupAdmin(conversation(), userEntity)) {
             admins.push(userEntity);
           } else {
             members.push(userEntity);

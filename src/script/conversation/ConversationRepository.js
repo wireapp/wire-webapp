@@ -103,7 +103,7 @@ import {BackendClientError} from '../error/BackendClientError';
 import {showLegalHoldWarning} from '../legal-hold/LegalHoldWarning';
 import * as LegalHoldEvaluator from '../legal-hold/LegalHoldEvaluator';
 import {DeleteConversationMessage} from '../entity/message/DeleteConversationMessage';
-import {ConversationRole} from './ConversationRole';
+import {ConversationRoleRepository} from './ConversationRoleRepository';
 
 // Conversation repository for all conversation interactions with the conversation service
 export class ConversationRepository {
@@ -277,6 +277,8 @@ export class ConversationRepository {
       this.conversations_unarchived,
       propertyRepository.propertiesService,
     );
+
+    this.conversationRoleRepository = new ConversationRoleRepository(this);
   }
 
   checkMessageTimer(messageEntity) {
@@ -812,14 +814,6 @@ export class ConversationRepository {
     return this.user_repository
       .get_users_by_id(userIds)
       .then(() => conversationEntities.forEach(conversationEntity => this._fetch_users_and_events(conversationEntity)));
-  }
-
-  isUserGroupAdmin(conversationEntity, userEntity) {
-    return conversationEntity.roles[userEntity.id] == ConversationRole.WIRE_ADMIN;
-  }
-
-  isSelfGroupAdmin(conversationEntity) {
-    return this.isUserGroupAdmin(conversationEntity, this.selfUser());
   }
 
   //##############################################################################

@@ -17,7 +17,7 @@
  *
  */
 
-export enum ConversationRole {
+export enum DefaultRole {
   WIRE_ADMIN = 'wire_admin',
   WIRE_MEMBER = 'wire_member',
 }

@@ -42,7 +42,6 @@ import {ClientRepository} from '../client/ClientRepository';
 import {StatusType} from '../message/StatusType';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
 import {HIDE_LEGAL_HOLD_MODAL} from '../view_model/content/LegalHoldModalViewModel';
-import {ConversationRole} from '../conversation/ConversationRole';
 
 export class Conversation {
   static get TIMESTAMP_TYPE() {
@@ -77,7 +76,8 @@ export class Conversation {
     this.participating_user_ets = ko.observableArray([]); // Does not include self user
     this.participating_user_ids = ko.observableArray([]); // Does not include self user
     this.selfUser = ko.observable();
-    this.roles = {[ConversationRole.WIRE_ADMIN]: [], [ConversationRole.WIRE_MEMBER]: []};
+    /** @type {Record<string, string>} */
+    this.roles = {};
 
     this.hasCreationMessage = false;
 

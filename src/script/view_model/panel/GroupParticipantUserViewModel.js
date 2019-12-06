@@ -22,7 +22,7 @@ import {getLogger} from 'Util/Logger';
 import {Actions} from 'Components/panel/userActions';
 import 'Components/panel/enrichedFields';
 import 'Components/panel/userDetails';
-import {ConversationRole} from '../../conversation/ConversationRole';
+import {DefaultRole} from '../../conversation/DefaultRole';
 import {BasePanelViewModel} from './BasePanelViewModel';
 
 export class GroupParticipantUserViewModel extends BasePanelViewModel {
@@ -35,6 +35,7 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
     this.actionsViewModel = mainViewModel.actions;
     this.teamRepository = repositories.team;
     this.conversationRepository = repositories.conversation;
+    const {conversationRoleRepository} = repositories.conversation;
 
     this.logger = getLogger('GroupParticipantUserViewModel');
 
@@ -43,10 +44,11 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
     this.onUserAction = this.onUserAction.bind(this);
 
     this.isSelfGroupAdmin = ko.pureComputed(() =>
-      this.conversationRepository.isSelfGroupAdmin(this.activeConversation()),
+      conversationRoleRepository.isSelfGroupAdmin(this.activeConversation()),
     );
+
     this.isAdmin = ko.pureComputed(() =>
-      repositories.conversation.isUserGroupAdmin(this.activeConversation(), this.selectedParticipant()),
+      conversationRoleRepository.isUserGroupAdmin(this.activeConversation(), this.selectedParticipant()),
     );
   }
 
@@ -54,16 +56,16 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
     const isAdmin = !this.isAdmin();
     if (isAdmin) {
       this.conversationRepository
-        .updateMember(this.activeConversation(), this.selectedParticipant().id, ConversationRole.WIRE_ADMIN)
+        .updateMember(this.activeConversation(), this.selectedParticipant().id, DefaultRole.WIRE_ADMIN)
         .then(() => {
-          this.activeConversation().roles[this.selectedParticipant().id] = ConversationRole.WIRE_ADMIN;
+          this.activeConversation().roles[this.selectedParticipant().id] = DefaultRole.WIRE_ADMIN;
         })
         .then(() => this.selectedParticipant.valueHasMutated());
     } else {
       this.conversationRepository
-        .updateMember(this.activeConversation(), this.selectedParticipant().id, ConversationRole.WIRE_MEMBER)
+        .updateMember(this.activeConversation(), this.selectedParticipant().id, DefaultRole.WIRE_MEMBER)
         .then(() => {
-          this.activeConversation().roles[this.selectedParticipant().id] = ConversationRole.WIRE_MEMBER;
+          this.activeConversation().roles[this.selectedParticipant().id] = DefaultRole.WIRE_MEMBER;
         })
         .then(() => this.selectedParticipant.valueHasMutated());
     }

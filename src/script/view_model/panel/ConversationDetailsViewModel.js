@@ -210,7 +210,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     });
 
     this.isSelfGroupAdmin = ko.pureComputed(() =>
-      this.conversationRepository.isSelfGroupAdmin(this.activeConversation()),
+      this.conversationRepository.conversationRoleRepository.isSelfGroupAdmin(this.activeConversation()),
     );
 
     this.isServiceMode.subscribe(isService => {
@@ -228,6 +228,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     if (!conversationEntity) {
       return [];
     }
+    const roleRepository = this.conversationRepository.conversationRoleRepository;
 
     const is1to1 = conversationEntity.is1to1();
     const isSingleUserMode = this.isSingleUserMode(conversationEntity);
@@ -292,7 +293,10 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
       },
       {
         condition: () =>
-          !isSingleUserMode && this.isTeam() && this.isSelfGroupAdmin() && conversationEntity.isCreatedBySelf(),
+          !isSingleUserMode &&
+          this.isTeam() &&
+          roleRepository.canDeleteGroup(conversationEntity) &&
+          conversationEntity.isCreatedBySelf(),
         item: {
           click: () => this.clickToDelete(),
           icon: 'delete-icon',
