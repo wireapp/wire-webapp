@@ -20,15 +20,17 @@
 import {Calling, GenericMessage} from '@wireapp/protocol-messaging';
 import {amplify} from 'amplify';
 import ko from 'knockout';
-import {t} from 'Util/LocalizerUtil';
-import {Logger, getLogger} from 'Util/Logger';
 import 'webrtc-adapter';
+
 import {Config} from '../Config';
-import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 
 import {Environment} from 'Util/Environment';
+import {t} from 'Util/LocalizerUtil';
+import {Logger, getLogger} from 'Util/Logger';
 import {createRandomUuid} from 'Util/util';
+
 import {EventBuilder} from '../conversation/EventBuilder';
+import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 import {MediaStreamHandler} from '../media/MediaStreamHandler';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 
