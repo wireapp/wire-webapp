@@ -55,6 +55,7 @@ export * from './ProfileIcon';
 export * from './RecordIcon';
 export * from './RecordPendingIcon';
 export * from './ScreenshareIcon';
+export * from './SearchIcon';
 export * from './ServicesIcon';
 export * from './SettingsIcon';
 export * from './SpeakerIcon';
