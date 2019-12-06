@@ -26,14 +26,14 @@ import {ConversationRepository} from './ConversationRepository';
 import {DefaultRole} from './DefaultRole';
 
 export enum Permissions {
-  renameGroup = 'modify_conversation_name',
-  addParticipant = 'add_conversation_member',
-  removeParticipant = 'remove_conversation_member',
-  modifyOtherParticipants = 'modify_other_conversation_member',
-  toggleTimeout = 'modify_conversation_message_timer',
-  toggleGuest = 'modify_conversation_access',
+  renameConversation = 'modify_conversation_name',
+  addParticipants = 'add_conversation_member',
+  removeParticipants = 'remove_conversation_member',
+  changeParticipantRoles = 'modify_other_conversation_member',
+  toggleEphemeralTimer = 'modify_conversation_message_timer',
+  toggleGuestsAndServices = 'modify_conversation_access',
   toggleReadReceipts = 'modify_conversation_receipt_mode',
-  deleteGroup = 'delete_conversation',
+  deleteConversation = 'delete_conversation',
 }
 
 export interface ConversationRole {
@@ -46,28 +46,28 @@ export type ConversationRoles = ConversationRole[];
 const defaultAdmin: ConversationRole = {
   name: DefaultRole.WIRE_ADMIN,
   permissions: {
-    [Permissions.renameGroup]: true,
-    [Permissions.addParticipant]: true,
-    [Permissions.removeParticipant]: true,
-    [Permissions.modifyOtherParticipants]: true,
-    [Permissions.toggleTimeout]: true,
-    [Permissions.toggleGuest]: true,
+    [Permissions.renameConversation]: true,
+    [Permissions.addParticipants]: true,
+    [Permissions.removeParticipants]: true,
+    [Permissions.changeParticipantRoles]: true,
+    [Permissions.toggleEphemeralTimer]: true,
+    [Permissions.toggleGuestsAndServices]: true,
     [Permissions.toggleReadReceipts]: true,
-    [Permissions.deleteGroup]: true,
+    [Permissions.deleteConversation]: true,
   },
 };
 
 const defaultMember: ConversationRole = {
   name: DefaultRole.WIRE_MEMBER,
   permissions: {
-    [Permissions.renameGroup]: false,
-    [Permissions.addParticipant]: false,
-    [Permissions.removeParticipant]: false,
-    [Permissions.modifyOtherParticipants]: true,
-    [Permissions.toggleTimeout]: false,
-    [Permissions.toggleGuest]: false,
+    [Permissions.renameConversation]: false,
+    [Permissions.addParticipants]: false,
+    [Permissions.removeParticipants]: false,
+    [Permissions.changeParticipantRoles]: true,
+    [Permissions.toggleEphemeralTimer]: false,
+    [Permissions.toggleGuestsAndServices]: false,
     [Permissions.toggleReadReceipts]: false,
-    [Permissions.deleteGroup]: false,
+    [Permissions.deleteConversation]: false,
   },
 };
 
@@ -120,26 +120,26 @@ export class ConversationRoleRepository {
   };
 
   canRenameGroup = (conversation: Conversation, user: User = this.selfUser()) =>
-    this.hasPermission(conversation, user, Permissions.renameGroup);
+    this.hasPermission(conversation, user, Permissions.renameConversation);
 
   canAddParticipant = (conversation: Conversation, user: User = this.selfUser()) =>
-    this.hasPermission(conversation, user, Permissions.addParticipant);
+    this.hasPermission(conversation, user, Permissions.addParticipants);
 
   canRemoveParticipant = (conversation: Conversation, user: User = this.selfUser()) =>
-    this.hasPermission(conversation, user, Permissions.removeParticipant);
+    this.hasPermission(conversation, user, Permissions.removeParticipants);
 
   canLeaveGroup = (conversation: Conversation, user: User = this.selfUser()) =>
-    this.hasPermission(conversation, user, Permissions.modifyOtherParticipants);
+    this.hasPermission(conversation, user, Permissions.changeParticipantRoles);
 
   canToggleTimeout = (conversation: Conversation, user: User = this.selfUser()) =>
-    this.hasPermission(conversation, user, Permissions.renameGroup);
+    this.hasPermission(conversation, user, Permissions.renameConversation);
 
   canToggleGuest = (conversation: Conversation, user: User = this.selfUser()) =>
-    this.hasPermission(conversation, user, Permissions.toggleGuest);
+    this.hasPermission(conversation, user, Permissions.toggleGuestsAndServices);
 
   canToggleReadReceipts = (conversation: Conversation, user: User = this.selfUser()) =>
     this.hasPermission(conversation, user, Permissions.toggleReadReceipts);
 
   canDeleteGroup = (conversation: Conversation, user: User = this.selfUser()) =>
-    this.hasPermission(conversation, user, Permissions.deleteGroup);
+    this.hasPermission(conversation, user, Permissions.deleteConversation);
 }
