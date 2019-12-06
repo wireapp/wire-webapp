@@ -91,6 +91,10 @@ describe('ConversationDetailsViewModel', () => {
       spyOn(conversation, 'isCreatedBySelf').and.returnValue(true);
       spyOn(conversationDetailsViewModel, 'isSelfGroupAdmin').and.returnValue(true);
       spyOn(conversationDetailsViewModel, 'isTeam').and.returnValue(true);
+      spyOn(
+        conversationDetailsViewModel.conversationRepository.conversationRoleRepository,
+        'canDeleteGroup',
+      ).and.returnValue(true);
 
       const tests = [
         {

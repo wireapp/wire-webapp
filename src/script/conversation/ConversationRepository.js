@@ -3101,7 +3101,7 @@ export class ConversationRepository {
     }
 
     const {conversation, data: eventData, type} = eventJson;
-    const conversationId = eventData?.conversationId ?? conversation;
+    const conversationId = eventData?.conversationId || conversation;
     this.logger.info(`Handling event '${type}' in conversation '${conversationId}' (Source: ${eventSource})`);
 
     const inSelfConversation = conversationId === this.self_conversation() && this.self_conversation().id;
