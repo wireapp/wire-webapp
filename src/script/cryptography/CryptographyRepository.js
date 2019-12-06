@@ -22,10 +22,9 @@ import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 import {Cryptobox, version as cryptoboxVersion} from '@wireapp/cryptobox';
 import {errors as ProteusErrors} from '@wireapp/proteus';
 import {GenericMessage} from '@wireapp/protocol-messaging';
-
+import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
 import {getLogger} from 'Util/Logger';
-import {loadValue} from 'Util/StorageUtil';
-import {arrayToBase64, base64ToArray, isTemporaryClientAndNonPersistent, zeroPadding} from 'Util/util';
+import {arrayToBase64, base64ToArray, zeroPadding} from 'Util/util';
 
 import {CryptographyMapper} from './CryptographyMapper';
 import {CryptographyService} from './CryptographyService';
@@ -35,7 +34,6 @@ import {WebAppEvents} from '../event/WebApp';
 import {EventName} from '../tracking/EventName';
 import {ClientEntity} from '../client/ClientEntity';
 import {BackendClientError} from '../error/BackendClientError';
-import {StorageKey} from '../storage/StorageKey';
 import {StorageService} from '../storage/StorageService';
 
 export class CryptographyRepository {
@@ -66,7 +64,7 @@ export class CryptographyRepository {
 
   /**
    * Initializes the repository by loading an existing Cryptobox.
-   * @param {Dexie | MemoryStore} database - Dexie or MemoryStore
+   * @param {Dexie | SQLeetEngine} database - Database instance
    * @param {string} [databaseName] - The database name
    * @returns {Promise} Resolves after initialization
    */
@@ -103,14 +101,14 @@ export class CryptographyRepository {
    * Initialize the repository.
    *
    * @private
-   * @param {Dexie | MemoryStore} database - Dexie instance or MemoryStore
+   * @param {Dexie | SQLeetEngine} database - Database instance
    * @param {string} [databaseName] - The database name
    * @returns {Promise} Resolves after initialization
    */
   async _init(database, databaseName = database.name) {
     let storeEngine;
 
-    if (isTemporaryClientAndNonPersistent(loadValue(StorageKey.AUTH.PERSIST))) {
+    if (database instanceof SQLeetEngine) {
       this.logger.info(`Initializing Cryptobox with encrypted database '${databaseName}'...`);
       storeEngine = await StorageService.getUnitializedEngine();
     } else {
