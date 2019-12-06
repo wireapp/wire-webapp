@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.24.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.23.30...@wireapp/react-ui-kit@7.24.0) (2019-12-06)
+
+
+### Features
+
+* **react-ui-kit:** Add SearchIcon ([#2631](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/2631)) ([f647c15](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/f647c15ee91a039df0e41e3209d45bfe4bca2a5d))
+
+
+
+
+
 ## [7.23.30](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.23.29...@wireapp/react-ui-kit@7.23.30) (2019-12-03)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
