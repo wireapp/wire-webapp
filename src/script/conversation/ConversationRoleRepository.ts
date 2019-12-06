@@ -26,14 +26,14 @@ import {ConversationRepository} from './ConversationRepository';
 import {DefaultRole} from './DefaultRole';
 
 export enum Permissions {
-  renameGroup = 'renameGroup',
-  addParticipant = 'addParticipant',
-  removeParticipant = 'removeParticipant',
-  leaveGroup = 'leaveGroup',
-  toggleTimeout = 'toggleTimeout',
-  toggleGuest = 'toggleGuest',
-  toggleReadReceipts = 'toggleReadReceipts',
-  deleteGroup = 'deleteGroup',
+  renameGroup = 'modify_conversation_name',
+  addParticipant = 'add_conversation_member',
+  removeParticipant = 'remove_conversation_member',
+  modifyOtherParticipants = 'modify_other_conversation_member',
+  toggleTimeout = 'modify_conversation_message_timer',
+  toggleGuest = 'modify_conversation_access',
+  toggleReadReceipts = 'modify_conversation_receipt_mode',
+  deleteGroup = 'delete_conversation',
 }
 
 export interface ConversationRole {
@@ -49,7 +49,7 @@ const defaultAdmin: ConversationRole = {
     [Permissions.renameGroup]: true,
     [Permissions.addParticipant]: true,
     [Permissions.removeParticipant]: true,
-    [Permissions.leaveGroup]: true,
+    [Permissions.modifyOtherParticipants]: true,
     [Permissions.toggleTimeout]: true,
     [Permissions.toggleGuest]: true,
     [Permissions.toggleReadReceipts]: true,
@@ -63,7 +63,7 @@ const defaultMember: ConversationRole = {
     [Permissions.renameGroup]: false,
     [Permissions.addParticipant]: false,
     [Permissions.removeParticipant]: false,
-    [Permissions.leaveGroup]: true,
+    [Permissions.modifyOtherParticipants]: true,
     [Permissions.toggleTimeout]: false,
     [Permissions.toggleGuest]: false,
     [Permissions.toggleReadReceipts]: false,
@@ -129,7 +129,7 @@ export class ConversationRoleRepository {
     this.hasPermission(conversation, user, Permissions.removeParticipant);
 
   canLeaveGroup = (conversation: Conversation, user: User = this.selfUser()) =>
-    this.hasPermission(conversation, user, Permissions.leaveGroup);
+    this.hasPermission(conversation, user, Permissions.modifyOtherParticipants);
 
   canToggleTimeout = (conversation: Conversation, user: User = this.selfUser()) =>
     this.hasPermission(conversation, user, Permissions.renameGroup);
