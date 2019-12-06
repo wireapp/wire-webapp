@@ -24,6 +24,7 @@ import {errors as ProteusErrors} from '@wireapp/proteus';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {getLogger} from 'Util/Logger';
+import {loadValue} from 'Util/StorageUtil';
 import {arrayToBase64, base64ToArray, isTemporaryClientAndNonPersistent, zeroPadding} from 'Util/util';
 
 import {CryptographyMapper} from './CryptographyMapper';
@@ -34,6 +35,7 @@ import {WebAppEvents} from '../event/WebApp';
 import {EventName} from '../tracking/EventName';
 import {ClientEntity} from '../client/ClientEntity';
 import {BackendClientError} from '../error/BackendClientError';
+import {StorageKey} from '../storage/StorageKey';
 import {StorageService} from '../storage/StorageService';
 
 export class CryptographyRepository {
@@ -108,7 +110,7 @@ export class CryptographyRepository {
   async _init(database, databaseName = database.name) {
     let storeEngine;
 
-    if (isTemporaryClientAndNonPersistent()) {
+    if (isTemporaryClientAndNonPersistent(loadValue(StorageKey.AUTH.PERSIST))) {
       this.logger.info(`Initializing Cryptobox with encrypted database '${databaseName}'...`);
       storeEngine = await StorageService.getUnitializedEngine();
     } else {
