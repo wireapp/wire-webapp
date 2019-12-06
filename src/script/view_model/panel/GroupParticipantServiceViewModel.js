@@ -37,7 +37,7 @@ export class GroupParticipantServiceViewModel extends BasePanelViewModel {
 
     this.isAddMode = ko.observable(false);
 
-    this.conversationInTeam = ko.pureComputed(() => this.activeConversation() && this.activeConversation().inTeam());
+    this.conversationInTeam = ko.pureComputed(() => this.activeConversation()?.inTeam());
 
     this.selectedInConversation = ko.pureComputed(() => {
       if (this.isVisible() && this.activeConversation()) {

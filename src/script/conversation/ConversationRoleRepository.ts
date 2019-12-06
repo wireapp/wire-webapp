@@ -102,7 +102,7 @@ export class ConversationRoleRepository {
   isSelfGroupAdmin = (conversationEntity: Conversation) => this.isUserGroupAdmin(conversationEntity, this.selfUser());
 
   getConversationRoles = (conversation: Conversation): ConversationRoles => {
-    if (this.isTeam() && this.team() && this.team().id === conversation.id) {
+    if (this.isTeam() && this.team()?.id === conversation.team_id) {
       return this.teamRoles;
     }
     return this.conversationRoles[conversation.id];
@@ -111,7 +111,7 @@ export class ConversationRoleRepository {
   getUserPermissions = (conversation: Conversation, user: User) => {
     const conversationRoles = this.getConversationRoles(conversation);
     const userRole: string = this.getUserRole(conversation, user);
-    return conversationRoles.find(({name}) => name === userRole) || defaultMember;
+    return conversationRoles?.find(({name}) => name === userRole) || defaultMember;
   };
 
   hasPermission = (conversation: Conversation, user: User, permissionName: Permissions) => {

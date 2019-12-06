@@ -66,7 +66,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
     this.isTeam = this.teamRepository.isTeam;
 
-    this.isTeamOnly = ko.pureComputed(() => this.activeConversation() && this.activeConversation().isTeamOnly());
+    this.isTeamOnly = ko.pureComputed(() => this.activeConversation()?.isTeamOnly());
 
     this.serviceParticipants = ko.observableArray();
     this.userParticipants = ko.observableArray();
@@ -100,9 +100,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
       }
     });
 
-    this.firstParticipant = ko.pureComputed(() => {
-      return this.activeConversation() && this.activeConversation().firstUserEntity();
-    });
+    this.firstParticipant = ko.pureComputed(() => this.activeConversation()?.firstUserEntity());
 
     this.isSingleUserMode = conversationEntity => {
       return conversationEntity && (conversationEntity.is1to1() || conversationEntity.isRequest());
@@ -130,19 +128,15 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
       $('.conversation-details__name').css('height', `${name.height()}px`);
     });
 
-    this.isServiceMode = ko.pureComputed(() => {
-      return (
-        this.isSingleUserMode(this.activeConversation()) && this.firstParticipant() && this.firstParticipant().isService
-      );
-    });
+    this.isServiceMode = ko.pureComputed(
+      () => this.isSingleUserMode(this.activeConversation()) && this.firstParticipant()?.isService,
+    );
 
     this.showTopActions = ko.pureComputed(() => this.isActiveGroupParticipant() || this.showSectionOptions());
 
     this.showActionAddParticipants = ko.pureComputed(() => this.isActiveGroupParticipant() && this.isSelfGroupAdmin());
 
-    this.showActionMute = ko.pureComputed(() => {
-      return this.activeConversation() && this.activeConversation().isMutable() && !this.isTeam();
-    });
+    this.showActionMute = ko.pureComputed(() => this.activeConversation()?.isMutable() && !this.isTeam());
 
     this.showOptionGuests = ko.pureComputed(() => {
       return this.isActiveGroupParticipant() && this.activeConversation().inTeam();
@@ -154,9 +148,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
       return this.conversationRepository.expectReadReceipt(this.activeConversation());
     });
 
-    this.hasAdvancedNotifications = ko.pureComputed(() => {
-      return this.activeConversation() && this.activeConversation().isMutable() && this.isTeam();
-    });
+    this.hasAdvancedNotifications = ko.pureComputed(() => this.activeConversation()?.isMutable() && this.isTeam());
 
     this.showOptionNotificationsGroup = ko.pureComputed(() => {
       return this.hasAdvancedNotifications() && this.activeConversation().isGroup();
