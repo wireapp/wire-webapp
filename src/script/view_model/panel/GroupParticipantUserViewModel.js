@@ -43,8 +43,8 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
 
     this.onUserAction = this.onUserAction.bind(this);
 
-    this.isSelfGroupAdmin = ko.pureComputed(() =>
-      conversationRoleRepository.isSelfGroupAdmin(this.activeConversation()),
+    this.canChangeRole = ko.pureComputed(() =>
+      conversationRoleRepository.canChangeParticipantRoles(this.activeConversation()),
     );
 
     this.isAdmin = ko.pureComputed(() =>
@@ -52,24 +52,16 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
     );
   }
 
-  onToggleAdmin() {
-    const isAdmin = !this.isAdmin();
-    if (isAdmin) {
-      this.conversationRepository
-        .updateMember(this.activeConversation(), this.selectedParticipant().id, DefaultRole.WIRE_ADMIN)
-        .then(() => {
-          this.activeConversation().roles[this.selectedParticipant().id] = DefaultRole.WIRE_ADMIN;
-        })
-        .then(() => this.selectedParticipant.valueHasMutated());
-    } else {
-      this.conversationRepository
-        .updateMember(this.activeConversation(), this.selectedParticipant().id, DefaultRole.WIRE_MEMBER)
-        .then(() => {
-          this.activeConversation().roles[this.selectedParticipant().id] = DefaultRole.WIRE_MEMBER;
-        })
-        .then(() => this.selectedParticipant.valueHasMutated());
-    }
-  }
+  onToggleAdmin = async () => {
+    const newRole = this.isAdmin() ? DefaultRole.WIRE_MEMBER : DefaultRole.WIRE_ADMIN;
+    await this.conversationRepository.conversationRoleRepository.setMemberConversationRole(
+      this.activeConversation(),
+      this.selectedParticipant().id,
+      newRole,
+    );
+    this.activeConversation().roles[this.selectedParticipant().id] = newRole;
+    this.selectedParticipant.valueHasMutated();
+  };
 
   showActionDevices(userEntity) {
     return !userEntity.is_me;

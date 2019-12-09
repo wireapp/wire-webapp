@@ -15,7 +15,7 @@
           <disclose-icon></disclose-icon>
         </div>
       <!-- /ko -->
-      <!-- ko if: isSelfGroupAdmin() -->
+      <!-- ko if: canChangeRole() -->
         <div class="panel__action-item conversation-details__admin" data-bind="click: console.log" data-uie-name="toggle-admin">
           <group-admin-icon class="panel__action-item__icon"></group-admin-icon>
           <div class="panel__action-item__text" data-bind="text: t('conversationDetailsGroupAdmin')"></div>

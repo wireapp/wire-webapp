@@ -23,6 +23,7 @@ import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 import {TeamEntity} from '../team/TeamEntity';
 import {ConversationRepository} from './ConversationRepository';
+import {ConversationService} from './ConversationService';
 import {DefaultRole} from './DefaultRole';
 
 export enum Permissions {
@@ -34,6 +35,7 @@ export enum Permissions {
   toggleGuestsAndServices = 'modify_conversation_access',
   toggleReadReceipts = 'modify_conversation_receipt_mode',
   deleteConversation = 'delete_conversation',
+  leaveConversation = 'leave_conversation',
 }
 
 export interface ConversationRole {
@@ -54,6 +56,7 @@ const defaultAdmin: ConversationRole = {
     [Permissions.toggleGuestsAndServices]: true,
     [Permissions.toggleReadReceipts]: true,
     [Permissions.deleteConversation]: true,
+    [Permissions.leaveConversation]: true,
   },
 };
 
@@ -63,11 +66,12 @@ const defaultMember: ConversationRole = {
     [Permissions.renameConversation]: false,
     [Permissions.addParticipants]: false,
     [Permissions.removeParticipants]: false,
-    [Permissions.changeParticipantRoles]: true,
+    [Permissions.changeParticipantRoles]: false,
     [Permissions.toggleEphemeralTimer]: false,
     [Permissions.toggleGuestsAndServices]: false,
     [Permissions.toggleReadReceipts]: false,
     [Permissions.deleteConversation]: false,
+    [Permissions.leaveConversation]: true,
   },
 };
 
@@ -77,6 +81,7 @@ export class ConversationRoleRepository {
   isTeam: ko.Observable<boolean>;
   team: ko.Observable<TeamEntity>;
   selfUser: ko.Observable<User>;
+  conversationService: ConversationService;
 
   constructor(conversationRepository: ConversationRepository) {
     this.conversationRoles = {};
@@ -84,6 +89,7 @@ export class ConversationRoleRepository {
     this.isTeam = conversationRepository.isTeam;
     this.team = conversationRepository.team;
     this.selfUser = conversationRepository.selfUser;
+    this.conversationService = conversationRepository.conversation_service;
   }
 
   setTeamRoles = (newRoles: ConversationRoles) => {
@@ -92,6 +98,12 @@ export class ConversationRoleRepository {
 
   setConversationRoles = (conversation: Conversation, newRoles: ConversationRoles) => {
     this.conversationRoles[conversation.id] = newRoles;
+  };
+
+  setMemberConversationRole = (conversationEntity: Conversation, userId: string, conversationRole: string) => {
+    return this.conversationService.putMembers(conversationEntity.id, userId, {
+      conversation_role: conversationRole,
+    });
   };
 
   getUserRole = (conversationEntity: Conversation, userEntity: User) => conversationEntity.roles[userEntity.id];
@@ -128,7 +140,7 @@ export class ConversationRoleRepository {
   canRemoveParticipant = (conversation: Conversation, user: User = this.selfUser()) =>
     this.hasPermission(conversation, user, Permissions.removeParticipants);
 
-  canLeaveGroup = (conversation: Conversation, user: User = this.selfUser()) =>
+  canChangeParticipantRoles = (conversation: Conversation, user: User = this.selfUser()) =>
     this.hasPermission(conversation, user, Permissions.changeParticipantRoles);
 
   canToggleTimeout = (conversation: Conversation, user: User = this.selfUser()) =>
@@ -142,4 +154,7 @@ export class ConversationRoleRepository {
 
   canDeleteGroup = (conversation: Conversation, user: User = this.selfUser()) =>
     this.hasPermission(conversation, user, Permissions.deleteConversation);
+
+  canLeaveGroup = (conversation: Conversation, user: User = this.selfUser()) =>
+    this.hasPermission(conversation, user, Permissions.leaveConversation);
 }
