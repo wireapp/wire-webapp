@@ -428,7 +428,7 @@ class MessageListViewModel {
    * @returns {undefined} No return value
    */
   show_detail(message_et, event) {
-    if (message_et.is_expired() || $(event.currentTarget).hasClass('image-loading')) {
+    if (message_et.is_expired() || $(event.currentTarget).hasClass('image-asset--no-image')) {
       return;
     }
 
