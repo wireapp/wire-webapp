@@ -195,7 +195,8 @@ export class NotificationService {
     let message: EventRecord;
 
     if (this.storageService.isTemporaryAndNonPersistent) {
-      message = Object.values(this.storageService.objectDb.events).filter(event => event.id === messageId)[0];
+      const events = await this.storageService.getAll<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS);
+      message = Object.values(events).filter(event => event.id === messageId)[0];
     } else {
       message = await this.storageService.db
         .table(StorageSchemata.OBJECT_STORE.EVENTS)
