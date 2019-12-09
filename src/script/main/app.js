@@ -115,22 +115,6 @@ import {GiphyService} from '../extension/GiphyService';
 import {PermissionRepository} from '../permission/PermissionRepository';
 import {loadValue} from 'Util/StorageUtil';
 
-function doRedirect(signOutReason) {
-  let url = `/auth/${location.search}`;
-  const isImmediateSignOutReason = App.CONFIG.SIGN_OUT_REASONS.IMMEDIATE.includes(signOutReason);
-  if (isImmediateSignOutReason) {
-    url = appendParameter(url, `${URLParameter.REASON}=${signOutReason}`);
-  }
-
-  const redirectToLogin = signOutReason !== SIGN_OUT_REASON.NOT_SIGNED_IN;
-  if (redirectToLogin) {
-    url = `${url}#login`;
-  }
-
-  Dexie.delete('/sqleet');
-  window.location.replace(url);
-}
-
 class App {
   static get CONFIG() {
     return {
@@ -875,7 +859,19 @@ class App {
         return window.location.replace(url);
       }
 
-      doRedirect(signOutReason);
+      let url = `/auth/${location.search}`;
+      const isImmediateSignOutReason = App.CONFIG.SIGN_OUT_REASONS.IMMEDIATE.includes(signOutReason);
+      if (isImmediateSignOutReason) {
+        url = appendParameter(url, `${URLParameter.REASON}=${signOutReason}`);
+      }
+
+      const redirectToLogin = signOutReason !== SIGN_OUT_REASON.NOT_SIGNED_IN;
+      if (redirectToLogin) {
+        url = `${url}#login`;
+      }
+
+      Dexie.delete('/sqleet');
+      window.location.replace(url);
     });
   }
 
@@ -931,8 +927,7 @@ $(async () => {
       restUrl: Config.BACKEND_REST,
       webSocketUrl: Config.BACKEND_WS,
     });
-    const clientType = loadValue(StorageKey.AUTH.PERSIST);
-    if (clientType && isTemporaryClientAndNonPersistent(clientType)) {
+    if (isTemporaryClientAndNonPersistent(loadValue(StorageKey.AUTH.PERSIST))) {
       const engine = await StorageService.getUnitializedEngine();
       wire.app = new App(backendClient, appContainer, engine);
     } else {
