@@ -861,7 +861,7 @@ class App {
 
   /**
    * Redirect to the login page after internet connectivity has been verified.
-   * @param {SIGN_OUT_REASON} signOutReason - Redirect triggered by session expiration_redirectToLogin
+   * @param {SIGN_OUT_REASON} signOutReason - Redirect triggered by session expiration
    * @returns {undefined} No return value
    */
   _redirectToLogin(signOutReason) {
