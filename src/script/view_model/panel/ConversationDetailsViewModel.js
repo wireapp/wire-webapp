@@ -73,6 +73,8 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     this.showAllUsersCount = ko.observable(0);
     this.selectedService = ko.observable();
 
+    const roleRepository = this.conversationRepository.conversationRoleRepository;
+
     ko.computed(() => {
       if (this.activeConversation()) {
         const users = [];
@@ -107,15 +109,11 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     };
 
     this.isActiveGroupParticipant = ko.pureComputed(() => {
-      return this.activeConversation()
-        ? this.activeConversation().isGroup() && this.activeConversation().isActiveParticipant()
-        : false;
+      return !!(this.activeConversation()?.isGroup() && !this.activeConversation().removed_from_conversation());
     });
 
     this.isVerified = ko.pureComputed(() => {
-      return this.activeConversation()
-        ? this.activeConversation().verification_state() === ConversationVerificationState.VERIFIED
-        : false;
+      return this.activeConversation()?.verification_state() === ConversationVerificationState.VERIFIED;
     });
 
     this.isEditingName = ko.observable(false);
@@ -134,15 +132,23 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
 
     this.showTopActions = ko.pureComputed(() => this.isActiveGroupParticipant() || this.showSectionOptions());
 
-    this.showActionAddParticipants = ko.pureComputed(() => this.isActiveGroupParticipant() && this.isSelfGroupAdmin());
+    this.showActionAddParticipants = ko.pureComputed(
+      () => this.isActiveGroupParticipant() && roleRepository.canAddParticipants(this.activeConversation()),
+    );
 
     this.showActionMute = ko.pureComputed(() => this.activeConversation()?.isMutable() && !this.isTeam());
 
     this.showOptionGuests = ko.pureComputed(() => {
-      return this.isActiveGroupParticipant() && this.activeConversation().inTeam();
+      return (
+        this.isActiveGroupParticipant() &&
+        this.activeConversation().team_id &&
+        roleRepository.canToggleGuests(this.activeConversation())
+      );
     });
 
-    this.showOptionReadReceipts = ko.pureComputed(() => this.activeConversation().inTeam());
+    this.showOptionReadReceipts = ko.pureComputed(
+      () => this.activeConversation().inTeam() && roleRepository.canToggleReadReceipts(this.activeConversation()),
+    );
 
     this.hasReceiptsEnabled = ko.pureComputed(() => {
       return this.conversationRepository.expectReadReceipt(this.activeConversation());
@@ -158,11 +164,15 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
       return this.hasAdvancedNotifications() && !this.activeConversation().isGroup();
     });
 
-    this.showOptionTimedMessages = this.isActiveGroupParticipant;
+    this.showOptionTimedMessages = ko.pureComputed(
+      () => this.isActiveGroupParticipant() && roleRepository.canToggleTimeout(this.activeConversation()),
+    );
 
     this.showSectionOptions = ko.pureComputed(() => {
       return this.showOptionGuests() || this.showOptionNotificationsGroup() || this.showOptionTimedMessages();
     });
+
+    this.canRenameGroup = ko.pureComputed(() => roleRepository.canRenameGroup(this.activeConversation()));
 
     this.participantsUserText = ko.pureComputed(() => {
       const hasMultipleParticipants = this.userParticipants().length > 1;
@@ -275,7 +285,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
         },
       },
       {
-        condition: () => conversationEntity.isLeavable(),
+        condition: () => conversationEntity.isLeavable() && roleRepository.canLeaveGroup(conversationEntity),
         item: {
           click: () => this.clickToLeave(),
           icon: 'leave-icon',

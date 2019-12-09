@@ -35,7 +35,7 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
     this.actionsViewModel = mainViewModel.actions;
     this.teamRepository = repositories.team;
     this.conversationRepository = repositories.conversation;
-    const {conversationRoleRepository} = repositories.conversation;
+    this.conversationRoleRepository = repositories.conversation.conversationRoleRepository;
 
     this.logger = getLogger('GroupParticipantUserViewModel');
 
@@ -43,18 +43,20 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
 
     this.onUserAction = this.onUserAction.bind(this);
 
-    this.canChangeRole = ko.pureComputed(() =>
-      conversationRoleRepository.canChangeParticipantRoles(this.activeConversation()),
+    this.canChangeRole = ko.pureComputed(
+      () =>
+        this.conversationRoleRepository.canChangeParticipantRoles(this.activeConversation()) &&
+        !this.selectedParticipant()?.is_me,
     );
 
     this.isAdmin = ko.pureComputed(() =>
-      conversationRoleRepository.isUserGroupAdmin(this.activeConversation(), this.selectedParticipant()),
+      this.conversationRoleRepository.isUserGroupAdmin(this.activeConversation(), this.selectedParticipant()),
     );
   }
 
   onToggleAdmin = async () => {
     const newRole = this.isAdmin() ? DefaultRole.WIRE_MEMBER : DefaultRole.WIRE_ADMIN;
-    await this.conversationRepository.conversationRoleRepository.setMemberConversationRole(
+    await this.conversationRoleRepository.setMemberConversationRole(
       this.activeConversation(),
       this.selectedParticipant().id,
       newRole,

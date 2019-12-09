@@ -45,14 +45,14 @@
           <!-- ko if: isActiveGroupParticipant() -->
             <div
               class="conversation-details__name"
-              data-bind="visible: !isEditingName(), click: z.userPermission().canUpdateConversationSettings() ? clickToEditGroupName: undefined, attr: {title: t('tooltipConversationDetailsRename')}"
+              data-bind="visible: !isEditingName(), click: canRenameGroup() ? clickToEditGroupName: undefined, attr: {title: t('tooltipConversationDetailsRename')}"
               data-uie-name="status-name"
             >
               <div
                 class="conversation-details__name"
                 data-bind="text: activeConversation() && activeConversation().display_name()"
               ></div>
-              <!-- ko if: z.userPermission().canUpdateConversationSettings() -->
+              <!-- ko if: canRenameGroup() -->
                 <edit-icon class="conversation-details__name__edit-icon"></edit-icon>
               <!-- /ko -->
             </div>
@@ -109,7 +109,7 @@
           <!-- /ko -->
         </div>
         <!-- ko if: showTopActions() -->
-          <!-- ko if: z.userPermission().canUpdateGroupParticipants() && showActionAddParticipants() -->
+          <!-- ko if: showActionAddParticipants() -->
             <div class="conversation-details__participant-options">
               <div
                 class="panel__action-item"
@@ -166,46 +166,44 @@
               </div>
             </div>
           <!-- /ko -->
-          <!-- ko if: z.userPermission().canUpdateConversationSettings() -->
-            <!-- ko if: showOptionTimedMessages() -->
-              <div class="conversation-details__timed-messages">
-                <div class="panel__action-item" data-bind="click: clickOnTimedMessages" data-uie-name="go-timed-messages">
-                  <timer-icon class="panel__action-item__icon"></timer-icon>
-                  <div class="panel__action-item__summary">
-                    <div class="panel__action-item__text" data-bind="text: t('conversationDetailsActionTimedMessages')"></div>
-                    <div
-                      class="panel__action-item__status"
-                      data-bind="text: timedMessagesText"
-                      data-uie-name="status-timed-messages"
-                    ></div>
-                  </div>
-                  <disclose-icon></disclose-icon>
+          <!-- ko if: showOptionTimedMessages() -->
+            <div class="conversation-details__timed-messages">
+              <div class="panel__action-item" data-bind="click: clickOnTimedMessages" data-uie-name="go-timed-messages">
+                <timer-icon class="panel__action-item__icon"></timer-icon>
+                <div class="panel__action-item__summary">
+                  <div class="panel__action-item__text" data-bind="text: t('conversationDetailsActionTimedMessages')"></div>
+                  <div
+                    class="panel__action-item__status"
+                    data-bind="text: timedMessagesText"
+                    data-uie-name="status-timed-messages"
+                  ></div>
                 </div>
+                <disclose-icon></disclose-icon>
               </div>
-            <!-- /ko -->
-            <!-- ko if: showOptionGuests() -->
-              <div class="conversation-details__guest-options">
-                <div class="panel__action-item" data-bind="click: clickOnGuestOptions" data-uie-name="go-guest-options">
-                  <guest-icon class="panel__action-item__icon"></guest-icon>
-                  <div class="panel__action-item__summary">
-                    <div class="panel__action-item__text" data-bind="text: t('conversationDetailsActionGuestOptions')"></div>
-                    <div
-                      class="panel__action-item__status"
-                      data-bind="text: guestOptionsText"
-                      data-uie-name="status-allow-guests"
-                    ></div>
-                  </div>
-                  <disclose-icon></disclose-icon>
+            </div>
+          <!-- /ko -->
+          <!-- ko if: showOptionGuests() -->
+            <div class="conversation-details__guest-options">
+              <div class="panel__action-item" data-bind="click: clickOnGuestOptions" data-uie-name="go-guest-options">
+                <guest-icon class="panel__action-item__icon"></guest-icon>
+                <div class="panel__action-item__summary">
+                  <div class="panel__action-item__text" data-bind="text: t('conversationDetailsActionGuestOptions')"></div>
+                  <div
+                    class="panel__action-item__status"
+                    data-bind="text: guestOptionsText"
+                    data-uie-name="status-allow-guests"
+                  ></div>
                 </div>
+                <disclose-icon></disclose-icon>
               </div>
-            <!-- /ko -->
-            <!-- ko if: showOptionReadReceipts() -->
-              <div class="conversation-details__read-receipts">
-                <read-receipt-toggle
-                  params="conversation: activeConversation, onReceiptModeChanged: updateConversationReceiptMode"
-                ></read-receipt-toggle>
-              </div>
-            <!-- /ko -->
+            </div>
+          <!-- /ko -->
+          <!-- ko if: showOptionReadReceipts() -->
+            <div class="conversation-details__read-receipts">
+              <read-receipt-toggle
+                params="conversation: activeConversation, onReceiptModeChanged: updateConversationReceiptMode"
+              ></read-receipt-toggle>
+            </div>
           <!-- /ko -->
         <!-- /ko -->
       <!-- /ko -->

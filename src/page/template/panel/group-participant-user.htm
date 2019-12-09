@@ -26,7 +26,7 @@
         </div>
       <!-- /ko -->
       <enriched-fields params="user: selectedParticipant"></enriched-fields>
-      <user-actions params="user: selectedParticipant, conversation: activeConversation, actionsViewModel: actionsViewModel, onAction: onUserAction, isSelfActivated: userRepository.isActivatedAccount()"></user-actions>
+      <user-actions params="user: selectedParticipant, conversation: activeConversation, actionsViewModel: actionsViewModel, onAction: onUserAction, isSelfActivated: userRepository.isActivatedAccount(), conversationRoleRepository: conversationRoleRepository"></user-actions>
     </div>
   <!-- /ko -->
 </div>

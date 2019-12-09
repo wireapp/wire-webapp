@@ -117,7 +117,7 @@ export class ConversationRoleRepository {
     if (this.isTeam() && this.team()?.id === conversation.team_id) {
       return this.teamRoles;
     }
-    return this.conversationRoles[conversation.id];
+    return this.conversationRoles[conversation.id] || this.teamRoles;
   };
 
   getUserPermissions = (conversation: Conversation, user: User) => {
@@ -134,19 +134,19 @@ export class ConversationRoleRepository {
   canRenameGroup = (conversation: Conversation, user: User = this.selfUser()) =>
     this.hasPermission(conversation, user, Permissions.renameConversation);
 
-  canAddParticipant = (conversation: Conversation, user: User = this.selfUser()) =>
+  canAddParticipants = (conversation: Conversation, user: User = this.selfUser()) =>
     this.hasPermission(conversation, user, Permissions.addParticipants);
 
-  canRemoveParticipant = (conversation: Conversation, user: User = this.selfUser()) =>
+  canRemoveParticipants = (conversation: Conversation, user: User = this.selfUser()) =>
     this.hasPermission(conversation, user, Permissions.removeParticipants);
 
   canChangeParticipantRoles = (conversation: Conversation, user: User = this.selfUser()) =>
     this.hasPermission(conversation, user, Permissions.changeParticipantRoles);
 
   canToggleTimeout = (conversation: Conversation, user: User = this.selfUser()) =>
-    this.hasPermission(conversation, user, Permissions.renameConversation);
+    this.hasPermission(conversation, user, Permissions.toggleEphemeralTimer);
 
-  canToggleGuest = (conversation: Conversation, user: User = this.selfUser()) =>
+  canToggleGuests = (conversation: Conversation, user: User = this.selfUser()) =>
     this.hasPermission(conversation, user, Permissions.toggleGuestsAndServices);
 
   canToggleReadReceipts = (conversation: Conversation, user: User = this.selfUser()) =>
