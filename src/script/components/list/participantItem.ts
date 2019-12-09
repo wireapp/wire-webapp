@@ -78,7 +78,7 @@ class ParticipantItem {
       (this.participant as User).is_me
         ? `${(this.participant as User).name()} (${capitalizeFirstChar(t('conversationYouNominative'))})`
         : this.participant.name;
-    this.isService = this.participant instanceof ServiceEntity || this.participant?.isService;
+    this.isService = this.participant instanceof ServiceEntity || this.participant.isService;
     this.isUser = this.participant instanceof User && !this.participant.isService;
     this.selfInTeam = selfInTeam;
     this.badge = badge;
