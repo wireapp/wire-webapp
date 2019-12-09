@@ -17,12 +17,12 @@
  *
  */
 
+import Dexie from 'dexie';
 import {error as StoreEngineError} from '@wireapp/store-engine';
 import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 import {Cryptobox, version as cryptoboxVersion} from '@wireapp/cryptobox';
 import {errors as ProteusErrors} from '@wireapp/proteus';
 import {GenericMessage} from '@wireapp/protocol-messaging';
-import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
 import {getLogger} from 'Util/Logger';
 import {arrayToBase64, base64ToArray, zeroPadding} from 'Util/util';
 
@@ -64,22 +64,20 @@ export class CryptographyRepository {
 
   /**
    * Initializes the repository by loading an existing Cryptobox.
-   * @param {Dexie | SQLeetEngine} database - Database instance
-   * @param {string} [databaseName] - The database name
+   * @param {Dexie} [database] - Database instance
    * @returns {Promise} Resolves after initialization
    */
-  createCryptobox(database, databaseName = database.name) {
-    return this._init(database, databaseName).then(() => this.cryptobox.create());
+  createCryptobox(database) {
+    return this._init(database).then(() => this.cryptobox.create());
   }
 
   /**
    * Initializes the repository by creating a new Cryptobox.
-   * @param {Dexie | MemoryStore} database - Dexie or MemoryStore
-   * @param {string} [databaseName] - The database name
+   * @param {Dexie} [database] - Dexie instance
    * @returns {Promise} Resolves after initialization
    */
-  loadCryptobox(database, databaseName = database.name) {
-    return this._init(database, databaseName).then(() => this.cryptobox.load());
+  loadCryptobox(database) {
+    return this._init(database).then(() => this.cryptobox.load());
   }
 
   resetCryptobox(clientEntity) {
@@ -101,24 +99,23 @@ export class CryptographyRepository {
    * Initialize the repository.
    *
    * @private
-   * @param {Dexie | SQLeetEngine} database - Database instance
-   * @param {string} [databaseName] - The database name
+   * @param {Dexie} [database] - Dexie instance
    * @returns {Promise} Resolves after initialization
    */
-  async _init(database, databaseName = database.name) {
+  async _init(database) {
     let storeEngine;
 
-    if (database instanceof SQLeetEngine) {
-      this.logger.info(`Initializing Cryptobox with encrypted database '${databaseName}'...`);
-      storeEngine = await StorageService.getUnitializedEngine();
-    } else {
-      this.logger.info(`Initializing Cryptobox with database '${databaseName}'...`);
+    if (database instanceof Dexie) {
+      this.logger.info(`Initializing Cryptobox with IndexedDB '${database.name}'...`);
       storeEngine = new IndexedDBEngine();
       try {
         await storeEngine.initWithDb(database, true);
       } catch (error) {
         await storeEngine.initWithDb(database, false);
       }
+    } else {
+      this.logger.info(`Initializing Cryptobox with encrypted database...`);
+      storeEngine = await StorageService.getUnitializedEngine();
     }
     this.cryptobox = new Cryptobox(storeEngine, 10);
 
