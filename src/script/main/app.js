@@ -932,7 +932,7 @@ $(async () => {
       webSocketUrl: Config.BACKEND_WS,
     });
     const clientType = loadValue(StorageKey.AUTH.PERSIST);
-    if (isTemporaryClientAndNonPersistent(clientType)) {
+    if (clientType && isTemporaryClientAndNonPersistent(clientType)) {
       const engine = await StorageService.getUnitializedEngine();
       wire.app = new App(backendClient, appContainer, engine);
     } else {
