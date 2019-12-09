@@ -49,6 +49,8 @@ import {ContentViewModel} from '../ContentViewModel';
 
 import 'Components/availabilityState';
 import {isAppLockEnabled} from './AppLockViewModel';
+import {loadValue} from 'Util/StorageUtil';
+import {StorageKey} from '../../storage';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -133,7 +135,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.manageTeamUrl = getManageTeamUrl('client_settings');
     this.createTeamUrl = getCreateTeamUrl('client');
 
-    this.isTemporaryAndNonPersistent = isTemporaryClientAndNonPersistent;
+    this.isTemporaryAndNonPersistent = isTemporaryClientAndNonPersistent(loadValue(StorageKey.AUTH.PERSIST));
     this.isConsentCheckEnabled = () => Config.FEATURE.CHECK_CONSENT;
     this.canEditProfile = user => user.managedBy() === User.CONFIG.MANAGED_BY.WIRE;
 

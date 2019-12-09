@@ -24,28 +24,30 @@ import sodium from 'libsodium-wrappers-sumo';
 import {formatE164} from 'phoneformat.js';
 import UUID from 'uuidjs';
 
-import {Environment} from './Environment';
-import {loadValue} from './StorageUtil';
-
 import {QUERY_KEY} from '../auth/route';
 import * as URLUtil from '../auth/util/urlUtil';
 import {Config} from '../Config';
 import {Conversation} from '../entity/Conversation';
 import {StorageKey} from '../storage/StorageKey';
 
-export const isTemporaryClientAndNonPersistent = (persist: boolean = false): boolean => {
+import {Environment} from './Environment';
+import {loadValue} from './StorageUtil';
+
+export const isTemporaryClientAndNonPersistent = (persist: boolean): boolean => {
+  if (persist === undefined) {
+    throw new Error('Type of client is unspecified.');
+  }
+
   const isNonPersistentByUrl = URLUtil.getURLParameter(QUERY_KEY.PERSIST_TEMPORARY_CLIENTS) === 'false';
   const isNonPersistentByServerConfig = Config.FEATURE?.PERSIST_TEMPORARY_CLIENTS === false;
   const isNonPersistent = isNonPersistentByUrl || isNonPersistentByServerConfig;
 
-  const isTemporaryByLocalStorage = loadValue(StorageKey.AUTH.PERSIST) === false;
-  const isTemporaryByClientSelection = persist === false;
-  const isTemporary = isTemporaryByLocalStorage || isTemporaryByClientSelection;
+  const isTemporary = persist === false;
   return isTemporary && isNonPersistent;
 };
 
 export const checkIndexedDb = (): Promise<void> => {
-  if (isTemporaryClientAndNonPersistent()) {
+  if (isTemporaryClientAndNonPersistent(loadValue(StorageKey.AUTH.PERSIST))) {
     return Promise.resolve();
   }
 

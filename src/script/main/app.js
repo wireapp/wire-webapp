@@ -115,6 +115,22 @@ import {GiphyService} from '../extension/GiphyService';
 import {PermissionRepository} from '../permission/PermissionRepository';
 import {loadValue} from 'Util/StorageUtil';
 
+function doRedirect(signOutReason) {
+  let url = `/auth/${location.search}`;
+  const isImmediateSignOutReason = App.CONFIG.SIGN_OUT_REASONS.IMMEDIATE.includes(signOutReason);
+  if (isImmediateSignOutReason) {
+    url = appendParameter(url, `${URLParameter.REASON}=${signOutReason}`);
+  }
+
+  const redirectToLogin = signOutReason !== SIGN_OUT_REASON.NOT_SIGNED_IN;
+  if (redirectToLogin) {
+    url = `${url}#login`;
+  }
+
+  Dexie.delete('/sqleet');
+  window.location.replace(url);
+}
+
 class App {
   static get CONFIG() {
     return {
@@ -355,10 +371,7 @@ class App {
         telemetry.time_step(AppInitTimingsStep.VALIDATED_CLIENT);
         telemetry.add_statistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity.type);
 
-        return this.repository.cryptography.loadCryptobox(
-          this.service.storage.db || this.service.storage.objectDb,
-          this.service.storage.dbName,
-        );
+        return this.repository.cryptography.loadCryptobox(this.service.storage.db);
       })
       .then(() => {
         loadingView.updateProgress(10);
@@ -862,19 +875,7 @@ class App {
         return window.location.replace(url);
       }
 
-      let url = `/auth/${location.search}`;
-      const isImmediateSignOutReason = App.CONFIG.SIGN_OUT_REASONS.IMMEDIATE.includes(signOutReason);
-      if (isImmediateSignOutReason) {
-        url = appendParameter(url, `${URLParameter.REASON}=${signOutReason}`);
-      }
-
-      const redirectToLogin = signOutReason !== SIGN_OUT_REASON.NOT_SIGNED_IN;
-      if (redirectToLogin) {
-        url = `${url}#login`;
-      }
-
-      Dexie.delete('/sqleet');
-      window.location.replace(url);
+      doRedirect(signOutReason);
     });
   }
 
@@ -930,7 +931,10 @@ $(async () => {
       restUrl: Config.BACKEND_REST,
       webSocketUrl: Config.BACKEND_WS,
     });
-    if (isTemporaryClientAndNonPersistent(loadValue(StorageKey.AUTH.PERSIST))) {
+    const clientType = loadValue(StorageKey.AUTH.PERSIST);
+    if (clientType === undefined) {
+      doRedirect(SIGN_OUT_REASON.USER_REQUESTED);
+    } else if (isTemporaryClientAndNonPersistent(clientType)) {
       const engine = await StorageService.getUnitializedEngine();
       wire.app = new App(backendClient, appContainer, engine);
     } else {
