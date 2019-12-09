@@ -26,17 +26,22 @@ import {Account} from '@wireapp/core';
 import {PayloadBundleType} from '@wireapp/core/dist/conversation/';
 import {FileEngine} from '@wireapp/store-engine-fs';
 import {AxiosError} from 'axios';
-import * as program from 'commander';
-import * as dotenv from 'dotenv';
-import * as fs from 'fs-extra';
-import * as os from 'os';
-import * as path from 'path';
+import program from 'commander';
+import dotenv from 'dotenv';
+import fs from 'fs-extra';
+import os from 'os';
+import path from 'path';
 
 dotenv.config();
 
-const {description, version}: {description: string; version: string} = require('../package.json');
+const {
+  bin,
+  description,
+  version,
+}: {bin: Record<string, string>; description: string; version: string} = require('../package.json');
 
 program
+  .name(Object.keys(bin)[0])
   .version(version)
   .description(description)
   .option('-e, --email <address>', 'Your email address')
@@ -50,67 +55,72 @@ const loginData = {
   password: program.password || process.env.WIRE_LOGIN_PASSWORD,
 };
 
+if (!loginData.email || !loginData.password) {
+  console.error('Email and password both need to be set');
+  program.help();
+}
+
 const conversationID = program.conversation || process.env.WIRE_CONVERSATION_ID;
 
 const directory = path.join(os.homedir(), '.wire-cli', loginData.email);
-const storeEngine = new FileEngine(directory);
 
-storeEngine
-  .init('', {fileExtension: '.json'})
-  .then(() => {
-    const apiClient = new APIClient({urls: APIClient.BACKEND.PRODUCTION});
+const storeEngineProvider = async (storeName: string) => {
+  const engine = new FileEngine(directory);
+  await engine.init(storeName, {fileExtension: '.json'});
+  return engine;
+};
 
-    const account = new Account(apiClient);
+const apiClient = new APIClient({urls: APIClient.BACKEND.PRODUCTION});
+const account = new Account(apiClient, storeEngineProvider);
 
-    account.on(PayloadBundleType.TEXT, textMessage => {
-      console.log(
-        `Received message from user ID "${textMessage.from}" in conversation ID "${textMessage.conversation}": ${textMessage.content}`,
+account.on(PayloadBundleType.TEXT, textMessage => {
+  console.log(
+    `Received message from user ID "${textMessage.from}" in conversation ID "${textMessage.conversation}": ${textMessage.content}`,
+  );
+});
+
+account
+  .login(loginData)
+  .then(() => account.listen())
+  .catch((error: AxiosError) => {
+    const data = error.response?.data;
+    const errorLabel = data?.label;
+    // TODO: The following is just a quick hack to continue if too many clients are registered!
+    // We should expose this fail-safe method as an emergency function
+    if (errorLabel === BackendErrorLabel.TOO_MANY_CLIENTS) {
+      return (
+        apiClient.client.api
+          .getClients()
+          .then((clients: RegisteredClient[]) => {
+            const client: RegisteredClient = clients[0];
+            return apiClient.client.api.deleteClient(client.id, loginData.password);
+          })
+          .then(() => account.logout())
+          // TODO: Completely removing the Wire Cryptobox directoy isn't a good idea! The "logout" method should
+          // handle already the cleanup of artifacts. Unfortunately "logout" sometimes has issues (we need to solve
+          // these!)
+          .then(() => fs.remove(directory))
+          .then(() => account.login(loginData))
+          .then(() => account.listen())
       );
+    } else {
+      throw error;
+    }
+  })
+  .then(() => {
+    const {clientId, userId} = apiClient.context!;
+    console.log(`Connected to Wire — User ID "${userId}" — Client ID "${clientId}"`);
+  })
+  .then(() => {
+    const stdin = process.openStdin();
+    stdin.addListener('data', data => {
+      const message = data.toString().trim();
+      if (account.service) {
+        const payload = account.service.conversation.messageBuilder.createText(conversationID, message).build();
+        return account.service.conversation.send(payload);
+      }
+      return;
     });
-
-    return account
-      .login(loginData)
-      .then(() => account.listen())
-      .catch((error: AxiosError) => {
-        const data = error.response?.data;
-        const errorLabel = data?.label;
-        // TODO: The following is just a quick hack to continue if too many clients are registered!
-        // We should expose this fail-safe method as an emergency function
-        if (errorLabel === BackendErrorLabel.TOO_MANY_CLIENTS) {
-          return (
-            apiClient.client.api
-              .getClients()
-              .then((clients: RegisteredClient[]) => {
-                const client: RegisteredClient = clients[0];
-                return apiClient.client.api.deleteClient(client.id, loginData.password);
-              })
-              .then(() => account.logout())
-              // TODO: Completely removing the Wire Cryptobox directoy isn't a good idea! The "logout" method should
-              // handle already the cleanup of artifacts. Unfortunately "logout" sometimes has issues (we need to solve
-              // these!)
-              .then(() => fs.remove(directory))
-              .then(() => account.login(loginData))
-              .then(() => account.listen())
-          );
-        } else {
-          throw error;
-        }
-      })
-      .then(() => {
-        const {clientId, userId} = apiClient.context!;
-        console.log(`Connected to Wire — User ID "${userId}" — Client ID "${clientId}"`);
-      })
-      .then(() => {
-        const stdin = process.openStdin();
-        stdin.addListener('data', data => {
-          const message = data.toString().trim();
-          if (account.service) {
-            const payload = account.service.conversation.messageBuilder.createText(conversationID, message).build();
-            return account.service.conversation.send(payload);
-          }
-          return;
-        });
-      });
   })
   .catch((error: Error) => {
     console.error(error.message, error);

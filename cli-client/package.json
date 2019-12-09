@@ -13,6 +13,7 @@
   },
   "devDependencies": {
     "rimraf": "3.0.0",
+    "ts-node": "8.5.4",
     "typescript": "3.7.3"
   },
   "description": "Command-line interface for Wire's secure messaging platform.",
@@ -28,10 +29,10 @@
     "build:node": "tsc",
     "clean": "rimraf dist",
     "dist": "yarn clean && yarn build",
+    "start": "ts-node src/index.ts",
     "test": "yarn test:node",
     "test:project": "yarn dist && yarn test",
-    "test:node": "exit 0",
-    "prepare": "yarn build"
+    "test:node": "exit 0"
   },
   "version": "8.0.19"
 }
