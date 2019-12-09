@@ -73,7 +73,7 @@ export class CryptographyRepository {
 
   /**
    * Initializes the repository by creating a new Cryptobox.
-   * @param {Dexie} [database] - Dexie instance
+   * @param {Dexie} [database] - Database instance
    * @returns {Promise} Resolves after initialization
    */
   loadCryptobox(database) {
