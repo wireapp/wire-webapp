@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.0.20](https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client/compare/@wireapp/cli-client@8.0.19...@wireapp/cli-client@8.0.20) (2019-12-09)
+
+
+### Bug Fixes
+
+* **cli-client:** Use new storeEngineProvider ([#2626](https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client/issues/2626)) ([f5e2f96](https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client/commit/f5e2f969ddf160979877b360f702d2ab417f9ed6))
+
+
+
+
+
 ## [8.0.19](https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client/compare/@wireapp/cli-client@8.0.18...@wireapp/cli-client@8.0.19) (2019-12-09)
 
 **Note:** Version bump only for package @wireapp/cli-client
