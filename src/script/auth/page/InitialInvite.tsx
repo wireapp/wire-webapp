@@ -25,11 +25,11 @@ import {
   ErrorMessage,
   Form,
   H1,
-  ICON_NAME,
   Input,
   InputSubmitCombo,
   Link,
   Muted,
+  PlaneIcon,
   RoundIconButton,
   Text,
 } from '@wireapp/react-ui-kit';
@@ -165,10 +165,11 @@ const InitialInvite = ({
               <RoundIconButton
                 disabled={isFetching || !enteredEmail}
                 type="submit"
-                icon={ICON_NAME.PLANE}
                 data-uie-name="do-send-invite"
                 formNoValidate
-              />
+              >
+                <PlaneIcon />
+              </RoundIconButton>
             </InputSubmitCombo>
           </Form>
           <ErrorMessage data-uie-name="error-message">

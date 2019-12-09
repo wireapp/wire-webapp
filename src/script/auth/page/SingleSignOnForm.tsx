@@ -24,10 +24,10 @@ import {
   CheckboxLabel,
   ErrorMessage,
   Form,
-  ICON_NAME,
   Input,
   InputSubmitCombo,
   RoundIconButton,
+  ArrowIcon,
 } from '@wireapp/react-ui-kit';
 import React, {useEffect, useRef, useState} from 'react';
 import {useIntl} from 'react-intl';
@@ -212,14 +212,9 @@ const SingleSignOnForm = ({
           required
           data-uie-name="enter-code"
         />
-        <RoundIconButton
-          tabIndex={2}
-          disabled={!code}
-          type="submit"
-          formNoValidate
-          icon={ICON_NAME.ARROW}
-          data-uie-name="do-sso-sign-in"
-        />
+        <RoundIconButton tabIndex={2} disabled={!code} type="submit" formNoValidate data-uie-name="do-sso-sign-in">
+          <ArrowIcon />
+        </RoundIconButton>
       </InputSubmitCombo>
       {validationError ? (
         parseValidationErrors([validationError])

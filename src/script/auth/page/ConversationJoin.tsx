@@ -18,13 +18,13 @@
  */
 
 import {
+  ArrowIcon,
   Button,
   COLOR,
   ContainerXS,
   ErrorMessage,
   Form,
   H2,
-  ICON_NAME,
   Input,
   InputSubmitCombo,
   Link,
@@ -238,10 +238,11 @@ const ConversationJoin = ({
                   disabled={!enteredName || !isValidName}
                   type="submit"
                   formNoValidate
-                  icon={ICON_NAME.ARROW}
                   onClick={handleSubmit}
                   data-uie-name="do-next"
-                />
+                >
+                  <ArrowIcon />
+                </RoundIconButton>
               </InputSubmitCombo>
               <ErrorMessage data-uie-name="error-message">
                 {error ? parseValidationErrors(error) : parseError(conversationError)}
