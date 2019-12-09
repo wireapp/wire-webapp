@@ -77,17 +77,15 @@ export class IntegrationRepository {
    * Get provider name for entity.
    * @param entity Service or user to add provider name to
    */
-  addProviderNameToParticipant(entity: ServiceEntity): Promise<ServiceEntity>;
-  addProviderNameToParticipant(entity: User): Promise<User>;
-  addProviderNameToParticipant(entity: ServiceEntity | User): Promise<ServiceEntity | User> {
-    const shouldUpdateProviderName = !!entity.providerName()?.trim();
+  async addProviderNameToParticipant<T extends ServiceEntity | User>(entity: T): Promise<T> {
+    const hasProviderName = !!entity.providerName()?.trim();
 
-    return shouldUpdateProviderName
-      ? this.getProviderById(entity.providerId).then(providerEntity => {
-          entity.providerName(providerEntity.name);
-          return entity;
-        })
-      : Promise.resolve(entity);
+    if (!hasProviderName) {
+      const providerEntity = await this.getProviderById(entity.providerId);
+      entity.providerName(providerEntity.name);
+    }
+
+    return entity;
   }
 
   /**
