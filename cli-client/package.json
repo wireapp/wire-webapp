@@ -3,8 +3,6 @@
     "wire-cli": "dist/index.js"
   },
   "dependencies": {
-    "@types/fs-extra": "8.0.1",
-    "@types/long": "4.0.0",
     "@wireapp/core": "15.1.9",
     "@wireapp/store-engine-fs": "2.0.6",
     "commander": "4.0.1",
@@ -12,6 +10,8 @@
     "fs-extra": "8.1.0"
   },
   "devDependencies": {
+    "@types/fs-extra": "8.0.1",
+    "@types/long": "4.0.0",
     "rimraf": "3.0.0",
     "ts-node": "8.5.4",
     "typescript": "3.7.3"
