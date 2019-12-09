@@ -57,7 +57,7 @@ class ConversationListCallingCell {
         this.conversation() &&
         this.conversation()
           .participating_user_ets()
-          .concat(this.conversation().selfUser()),
+          .concat([this.conversation().selfUser()]),
     );
 
     const isState = state => () => call.state() === state;
