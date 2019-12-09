@@ -17,7 +17,7 @@
  *
  */
 
-const uint32 = require('uint32');
+import * as uint32 from 'uint32';
 
 export const SQLeetEnginePrimaryKeyName: string = '`key`';
 export const RESERVED_COLUMN: string = '__single_column_value';
@@ -46,9 +46,8 @@ export function createTableIfNotExists<T extends string | number | symbol>(
   tableName: string,
   columns: SQLiteTableDefinition<T>,
 ): string {
-  const statements = ['`key` varchar(255) PRIMARY KEY'].concat(
-    Object.entries(columns).map(([key, type]) => `${escape(key)} ${type}`),
-  );
+  const escapedColumns = Object.entries(columns).map(([key, type]) => `${escape(key)} ${type}`);
+  const statements = ['`key` varchar(255) PRIMARY KEY', ...escapedColumns];
   return `CREATE TABLE IF NOT EXISTS ${escape(tableName)} (${statements.join(',')});`;
 }
 
@@ -56,18 +55,22 @@ export function getFormattedColumnsFromTableName(
   tableNameColumns: SQLiteTableDefinition<string>,
   withKey: boolean = false,
 ): string {
-  return `${withKey ? `${SQLeetEnginePrimaryKeyName},` : ''}${Object.keys(tableNameColumns)
+  const prefix = withKey ? `${SQLeetEnginePrimaryKeyName},` : '';
+  const escapedTableNameColumns = Object.keys(tableNameColumns)
     .map(column => escape(column))
-    .join(',')}`;
+    .join(',');
+  return `${prefix}${escapedTableNameColumns}`;
 }
 
 export function getFormattedColumnsFromColumns(
   tableNameColumns: Record<string, string>,
   withKey: boolean = false,
 ): string {
-  return `${withKey ? `${SQLeetEnginePrimaryKeyName},` : ''}${Object.values(tableNameColumns)
+  const prefix = withKey ? `${SQLeetEnginePrimaryKeyName},` : '';
+  const escapedTableNameColumns = Object.values(tableNameColumns)
     .map(column => escape(column))
-    .join(',')}`;
+    .join(',');
+  return `${prefix}${escapedTableNameColumns}`;
 }
 
 export function getProtectedColumnReferences(columns: Record<string, string>): string {
