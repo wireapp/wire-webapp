@@ -162,6 +162,11 @@ export class IndexedDBEngine implements CRUDEngine {
     return true;
   }
 
+  public async clearTables(): Promise<void> {
+    const tableNames = this.db.tables.map(table => table.name);
+    await Promise.all(tableNames.map(tableName => this.deleteAll(tableName)));
+  }
+
   public async read<EntityType = Object, PrimaryKey = string>(
     tableName: string,
     primaryKey: PrimaryKey,

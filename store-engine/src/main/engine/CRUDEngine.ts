@@ -35,6 +35,12 @@ export interface CRUDEngine {
   ): Promise<PrimaryKey>;
 
   /**
+   * Clears all tables without deleting them.
+   * @returns Resolves when all tables are cleared.
+   */
+  clearTables(): Promise<void>;
+
+  /**
    * Deletes a record by its primary key within a table.
    * @param tableName - Table name
    * @param primaryKey - Primary key to be used to delete the record

@@ -83,6 +83,12 @@ export class FileEngine implements CRUDEngine {
     return fs.remove(this.storeName);
   }
 
+  public async clearTables(): Promise<void> {
+    const files = await fs.readdir(this.storeName);
+    const tableNames = files.map(file => FileEngine.path.basename(file, FileEngine.path.extname(file)));
+    await Promise.all(tableNames.map(tableName => this.deleteAll(tableName)));
+  }
+
   public async create<EntityType = Object, PrimaryKey = string>(
     tableName: string,
     primaryKey: PrimaryKey,
@@ -141,7 +147,7 @@ export class FileEngine implements CRUDEngine {
     tableName: string,
     primaryKey: PrimaryKey,
   ): Promise<EntityType> {
-    const file = await this.resolvePath(tableName, primaryKey);
+    const file = this.resolvePath(tableName, primaryKey);
     let data: any;
 
     try {

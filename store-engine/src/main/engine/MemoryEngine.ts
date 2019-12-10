@@ -57,6 +57,11 @@ export class MemoryEngine implements CRUDEngine {
     return Promise.reject(new RecordTypeError(message));
   }
 
+  public async clearTables(): Promise<void> {
+    const tableNames = Object.keys(this.stores);
+    await Promise.all(tableNames.map(tableName => this.deleteAll(tableName)));
+  }
+
   public async delete<PrimaryKey = string>(tableName: string, primaryKey: PrimaryKey): Promise<PrimaryKey> {
     this.prepareTable(tableName);
     delete this.stores[this.storeName][tableName][primaryKey];

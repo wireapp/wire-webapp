@@ -19,6 +19,7 @@
 
 import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
 import * as fs from 'bro-fs';
+import * as path from 'path';
 
 export interface FileSystemEngineOptions {
   fileExtension: string;
@@ -54,6 +55,12 @@ export class FileSystemEngine implements CRUDEngine {
     const fileSystem: FileSystem = await fs.init({type: this.config.type, bytes: this.config.size});
     await fs.mkdir(this.storeName);
     return fileSystem;
+  }
+
+  public async clearTables(): Promise<void> {
+    const files = await fs.readdir(this.storeName);
+    const tableNames = files.map(file => path.join(this.storeName, file.name));
+    await Promise.all(tableNames.map(tableName => this.deleteAll(tableName)));
   }
 
   private createDirectoryPath(tableName: string): string {
@@ -107,11 +114,7 @@ export class FileSystemEngine implements CRUDEngine {
 
   async deleteAll(tableName: string): Promise<boolean> {
     const primaryKeys = await this.readAllPrimaryKeys(tableName);
-    const promises: Promise<string>[] = [];
-
-    for (const primaryKey of primaryKeys) {
-      promises.push(this.delete(tableName, primaryKey));
-    }
+    const promises = primaryKeys.map(primaryKey => this.delete(tableName, primaryKey));
 
     try {
       await Promise.all(promises);

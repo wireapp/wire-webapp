@@ -63,6 +63,10 @@ export class WebStorageEngine implements CRUDEngine {
     return returnKey as PrimaryKey;
   }
 
+  public async clearTables(): Promise<void> {
+    this.webStorage.clear();
+  }
+
   public async delete<PrimaryKey = string>(tableName: string, primaryKey: PrimaryKey): Promise<PrimaryKey> {
     const key = this.createKey<PrimaryKey>(tableName, primaryKey);
     this.webStorage.removeItem(`${key}`);

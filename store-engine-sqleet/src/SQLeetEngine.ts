@@ -88,8 +88,13 @@ export class SQLeetEngine implements CRUDEngine {
     return this.db;
   }
 
+  async clearTables(): Promise<void> {
+    const tableNames = Object.keys(this.schema);
+    await Promise.all(tableNames.map(tableName => this.deleteAll(tableName)));
+  }
+
   async export(): Promise<string> {
-    return this.db.export('utf8') as any;
+    return this.db.export('utf8');
   }
 
   async purge(): Promise<void> {
@@ -297,7 +302,7 @@ export class SQLeetEngine implements CRUDEngine {
     await this.db.close();
     const workerInstance = await this.db._getWorkerInstance();
     if (workerInstance.terminate && typeof workerInstance.terminate == 'function') {
-      await workerInstance.terminate();
+      workerInstance.terminate();
     }
   }
 
