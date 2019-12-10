@@ -23,30 +23,31 @@ import {User} from '../entity/User';
 import {getSelfName} from './SanitizationUtil';
 import {sortByPriority} from './StringUtil';
 
-type Substitute = Record<string, string> | string | number;
+type Substitutes = Record<string, string> | string | number;
 
 export const DEFAULT_LOCALE = 'en';
 
 let locale = DEFAULT_LOCALE;
 let strings: Record<string, Record<string, string>> = {};
 
-const isStringOrNumber = (toTest: any): toTest is string => typeof toTest === 'string' || typeof toTest === 'number';
+const isStringOrNumber = (toTest: any): toTest is string | number =>
+  typeof toTest === 'string' || typeof toTest === 'number';
 
-const replaceSubstituteEscaped = (string: string, regex: RegExp | string, substitute: Substitute) => {
-  if (isStringOrNumber(substitute)) {
-    return string.replace(regex, escape(substitute.toString()));
+const replaceSubstituteEscaped = (string: string, regex: RegExp | string, substitutes: Substitutes): string => {
+  if (isStringOrNumber(substitutes)) {
+    return string.replace(regex, escape(substitutes.toString()));
   }
-  return string.replace(regex, (found: string, content: string) =>
-    substitute.hasOwnProperty(content) ? escape((substitute as Record<string, string>)[content]) : found,
+  return string.replace(regex, (found: string, content: string): string =>
+    substitutes.hasOwnProperty(content) ? escape(substitutes[content]) : found,
   );
 };
 
-const replaceSubstitute = (string: string, regex: RegExp | string, substitute: Substitute) => {
-  if (isStringOrNumber(substitute)) {
-    return substitute;
+const replaceSubstitute = (string: string, regex: RegExp | string, substitutes: Substitutes): string => {
+  if (isStringOrNumber(substitutes)) {
+    return string.replace(regex, substitutes.toString());
   }
-  return string.replace(regex, (found: string, content: string) =>
-    substitute.hasOwnProperty(content) ? (substitute as Record<string, string>)[content] : found,
+  return string.replace(regex, (found: string, content: string): string =>
+    substitutes.hasOwnProperty(content) ? substitutes[content] : found,
   );
 };
 
@@ -85,10 +86,10 @@ export const LocalizerUtil = {
 
   translate: (
     identifier: string,
-    substitution: Substitute = {},
+    substitutions: Substitutes = {},
     dangerousSubstitutions: Record<string, string> = {},
     skipEscape: boolean = false,
-  ) => {
+  ): string => {
     const localeValue = strings[locale] && strings[locale][identifier];
     const defaultValue =
       strings[DEFAULT_LOCALE] && strings[DEFAULT_LOCALE].hasOwnProperty(identifier)
@@ -105,11 +106,10 @@ export const LocalizerUtil = {
     };
 
     const substitutedEscaped = skipEscape
-      ? replaceSubstitute(value, /{{(.+?)}}/g, substitution)
-      : replaceSubstituteEscaped(value, /{{(.+?)}}/g, substitution);
-    const substituted = replaceSubstitute(substitutedEscaped, /\[(.+?)\]/g, replaceDangerously);
+      ? replaceSubstitute(value, /{{(.+?)}}/g, substitutions)
+      : replaceSubstituteEscaped(value, /{{(.+?)}}/g, substitutions);
 
-    return substituted;
+    return replaceSubstitute(substitutedEscaped, /\[(.+?)\]/g, replaceDangerously);
   },
 };
 
@@ -123,17 +123,17 @@ export const setLocale = (newLocale: string): void => {
   locale = newLocale;
 };
 
-export const setStrings = (newStrings: Record<string, Record<string, string>>): void => {
+export const setStrings = (newStrings: typeof strings): void => {
   strings = newStrings;
 };
 
 export function t(
   identifier: string,
-  substitution?: Substitute,
+  substitutions?: Substitutes,
   dangerousSubstitutions?: Record<string, string>,
   skipEscape: boolean = false,
 ): string {
-  return LocalizerUtil.translate(identifier, substitution, dangerousSubstitutions, skipEscape);
+  return LocalizerUtil.translate(identifier, substitutions, dangerousSubstitutions, skipEscape);
 }
 
 export const joinNames = LocalizerUtil.joinNames;

@@ -78,7 +78,7 @@ describe('LocalizerUtil', () => {
       expect(noStringResult).toBe(identifier);
     });
 
-    it('should not escape the source string', () => {
+    it(`doesn't escape the source string`, () => {
       setStrings({
         en: {
           test1: '<script>alert("fail")</script>',
@@ -127,7 +127,7 @@ describe('LocalizerUtil', () => {
       expect(result3).toBe('Hello Rick, you are &lt;script&gt;a pickle&lt;/script&gt;');
     });
 
-    it("doesn't escape substitutions when it should skip the escaping", () => {
+    it(`doesn't escape substitutions when it should skip the escaping`, () => {
       setStrings({
         en: {
           test: 'Hello {{user}}',
@@ -138,11 +138,10 @@ describe('LocalizerUtil', () => {
       const result2 = t('test', {user: 'Huey, Dewey, & Louie'}, {}, true);
 
       expect(result1).toBe('Hello Huey, Dewey, & Louie');
-
-      expect(result2).toBe('Hello Huey, Dewey, & Louie');
+      expect(result2).toBe(result1);
     });
 
-    it("doesn't escape substitutions acknowledged as dangerous", () => {
+    it(`doesn't escape substitutions acknowledged as dangerous`, () => {
       setStrings({
         en: {
           test1: '[user]Felix[/user]',
