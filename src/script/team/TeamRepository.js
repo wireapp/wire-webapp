@@ -90,24 +90,19 @@ export class TeamRepository {
     amplify.subscribe(WebAppEvents.TEAM.UPDATE_INFO, this.sendAccountInfo.bind(this));
   }
 
-  getTeam() {
-    const teamPromise = this.selfUser().teamId ? this._getTeamById() : this._getBindingTeam();
-    return teamPromise
-      .then(teamData => {
-        if (teamData) {
-          const teamEntity = this.teamMapper.mapTeamFromObject(teamData);
-          this.team(teamEntity);
-          return this.updateTeamMembers(teamEntity);
-        }
+  getTeam = async () => {
+    const teamData = this.selfUser().teamId ? await this._getTeamById() : await this._getBindingTeam();
 
-        this.team(new TeamEntity());
-      })
-      .then(() => {
-        // doesn't need to be awaited because it publishes the account info over amplify.
-        this.sendAccountInfo();
-        return this.team();
-      });
-  }
+    if (teamData) {
+      const teamEntity = this.teamMapper.mapTeamFromObject(teamData);
+      this.team(teamEntity);
+      await this.updateTeamMembers(teamEntity);
+    } else {
+      this.team(new TeamEntity());
+    }
+    this.sendAccountInfo();
+    return this.team();
+  };
 
   getTeamMember(teamId, userId) {
     return this.teamService
