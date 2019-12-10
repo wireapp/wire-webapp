@@ -17,29 +17,31 @@
  *
  */
 
+import {amplify} from 'amplify';
+
 import {t} from 'Util/LocalizerUtil';
 
-import {ModalsViewModel} from '../view_model/ModalsViewModel';
+import {BackendClientError} from '../error/BackendClientError';
 import {BackendEvent} from '../event/Backend';
 import {WebAppEvents} from '../event/WebApp';
+import {EventName} from '../tracking/EventName';
+import {ModalsViewModel} from '../view_model/ModalsViewModel';
 
+import {Conversation} from '../entity/Conversation';
+import {AbstractConversationEventHandler, EventHandlingConfig} from './AbstractConversationEventHandler';
 import {ACCESS_MODE} from './AccessMode';
 import {ACCESS_ROLE} from './AccessRole';
 import {ACCESS_STATE} from './AccessState';
-import {AbstractConversationEventHandler} from './AbstractConversationEventHandler';
-
-import {EventName} from '../tracking/EventName';
-
-import {BackendClientError} from '../error/BackendClientError';
+import {ConversationMapper} from './ConversationMapper';
+import {ConversationService} from './ConversationService';
 
 export class ConversationStateHandler extends AbstractConversationEventHandler {
-  /**
-   * @param {ConversationService} conversationService - Service for conversation related backend interactions
-   * @param {ConversationRepository} conversationMapper - Repository for conversation interactions
-   */
-  constructor(conversationService, conversationMapper) {
+  private readonly conversationMapper: ConversationMapper;
+  private readonly conversationService: ConversationService;
+
+  constructor(conversationService: ConversationService, conversationMapper: ConversationMapper) {
     super();
-    const eventHandlingConfig = {
+    const eventHandlingConfig: EventHandlingConfig = {
       [BackendEvent.CONVERSATION.ACCESS_UPDATE]: this._mapConversationAccessState.bind(this),
       [BackendEvent.CONVERSATION.CODE_DELETE]: this._resetConversationAccessCode.bind(this),
       [BackendEvent.CONVERSATION.CODE_UPDATE]: this._updateConversationAccessCode.bind(this),
@@ -49,7 +51,7 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
     this.conversationService = conversationService;
   }
 
-  changeAccessState(conversationEntity, accessState) {
+  changeAccessState(conversationEntity: Conversation, accessState: string): Promise<void> {
     const isConversationInTeam = conversationEntity && conversationEntity.inTeam();
     if (isConversationInTeam) {
       const isStateChange = conversationEntity.accessState() !== accessState;
@@ -96,7 +98,7 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
     return Promise.resolve();
   }
 
-  getAccessCode(conversationEntity) {
+  getAccessCode(conversationEntity: Conversation): Promise<void> {
     return this.conversationService
       .getConversationCode(conversationEntity.id)
       .then(response => this.conversationMapper.mapAccessCode(conversationEntity, response))
@@ -108,7 +110,7 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
       });
   }
 
-  requestAccessCode(conversationEntity) {
+  requestAccessCode(conversationEntity: Conversation): Promise<void> {
     return this.conversationService
       .postConversationCode(conversationEntity.id)
       .then(response => {
@@ -121,7 +123,7 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
       .catch(() => this._showModal(t('modalConversationGuestOptionsRequestCodeMessage')));
   }
 
-  revokeAccessCode(conversationEntity) {
+  revokeAccessCode(conversationEntity: Conversation): Promise<void> {
     return this.conversationService
       .deleteConversationCode(conversationEntity.id)
       .then(() => {
@@ -131,20 +133,20 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
       .catch(() => this._showModal(t('modalConversationGuestOptionsRevokeCodeMessage')));
   }
 
-  _mapConversationAccessState(conversationEntity, eventJson) {
+  _mapConversationAccessState(conversationEntity: Conversation, eventJson: any): void {
     const {access: accessModes, access_role: accessRole} = eventJson.data;
     this.conversationMapper.mapAccessState(conversationEntity, accessModes, accessRole);
   }
 
-  _resetConversationAccessCode(conversationEntity) {
+  _resetConversationAccessCode(conversationEntity: Conversation): void {
     conversationEntity.accessCode(undefined);
   }
 
-  _updateConversationAccessCode(conversationEntity, eventJson) {
+  _updateConversationAccessCode(conversationEntity: Conversation, eventJson: any): void {
     this.conversationMapper.mapAccessCode(conversationEntity, eventJson.data);
   }
 
-  _showModal(message) {
+  _showModal(message: string): void {
     const modalOptions = {text: {message}};
     amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
   }
