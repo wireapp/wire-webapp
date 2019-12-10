@@ -306,14 +306,6 @@
     "@babel/helper-plugin-utils" "^7.0.0"
     "@babel/plugin-syntax-optional-catch-binding" "^7.7.4"
 
-"@babel/plugin-proposal-optional-chaining@7.7.4":
-  version "7.7.4"
-  resolved "https://registry.yarnpkg.com/@babel/plugin-proposal-optional-chaining/-/plugin-proposal-optional-chaining-7.7.4.tgz#3f04c2de1a942cbd3008324df8144b9cbc0ca0ba"
-  integrity sha512-JmgaS+ygAWDR/STPe3/7y0lNlHgS+19qZ9aC06nYLwQ/XB7c0q5Xs+ksFU3EDnp9EiEsO0dnRAOKeyLHTZuW3A==
-  dependencies:
-    "@babel/helper-plugin-utils" "^7.0.0"
-    "@babel/plugin-syntax-optional-chaining" "^7.7.4"
-
 "@babel/plugin-proposal-optional-chaining@7.7.5":
   version "7.7.5"
   resolved "https://registry.yarnpkg.com/@babel/plugin-proposal-optional-chaining/-/plugin-proposal-optional-chaining-7.7.5.tgz#f0835f044cef85b31071a924010a2a390add11d4"
@@ -1311,10 +1303,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-12.11.5.tgz#6c3c8dc84988aff11fd2a63d7b5fbf39eaaab7b1"
   integrity sha512-LC8ALj/24PhByn39nr5jnTvpE7MujK8y7LQmV74kHYF5iQ0odCPkMH4IZNZw+cobKfSXqaC8GgegcbIsQpffdA==
 
-"@types/node@12.7.1":
-  version "12.7.1"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-12.7.1.tgz#3b5c3a26393c19b400844ac422bd0f631a94d69d"
-  integrity sha512-aK9jxMypeSrhiYofWWBf/T7O+KwaiAHzM4sveCdWPn71lzUSMimRnKzhXDKfKwV1kWoBo2P1aGgaIYGLf9/ljw==
+"@types/node@12.12.14":
+  version "12.12.14"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-12.12.14.tgz#1c1d6e3c75dba466e0326948d56e8bd72a1903d2"
+  integrity sha512-u/SJDyXwuihpwjXy7hOOghagLEV1KdAST6syfnOk6QZAMzZuWZqXy5aYYZbh8Jdpd4escVFP0MvftHNDb9pruA==
 
 "@types/node@^10.1.0":
   version "10.14.22"
@@ -1435,10 +1427,10 @@
     "@types/express-serve-static-core" "*"
     "@types/mime" "*"
 
-"@types/sharedworker@0.0.28":
-  version "0.0.28"
-  resolved "https://registry.yarnpkg.com/@types/sharedworker/-/sharedworker-0.0.28.tgz#8690549388cdb67ec76c31aafa99caafcb06530c"
-  integrity sha512-7E7NdJh+6dV6aT5yvSyyCmDWIS3/TWcXeOlYe1xLTe5+dU9vZazT+6E+/bUiGU+ull6KwWcxEXMXdBix6VML0g==
+"@types/sharedworker@0.0.29":
+  version "0.0.29"
+  resolved "https://registry.yarnpkg.com/@types/sharedworker/-/sharedworker-0.0.29.tgz#69ce70764a0380f4c27ae036f6f9c4e2c75dbdac"
+  integrity sha512-vdlrZJKGrAedfcMt4Tn8gIa3tJxRhrTtwfEu9jmVtaCZHgbensRMEbpkZ+dY/6WpE12a8K00KaQnJV0lH9ZmdA==
 
 "@types/sizzle@*":
   version "2.3.2"
@@ -1820,17 +1812,17 @@
   dependencies:
     dexie "2.0.4"
 
-"@wireapp/store-engine-sqleet@1.0.7":
-  version "1.0.7"
-  resolved "https://registry.yarnpkg.com/@wireapp/store-engine-sqleet/-/store-engine-sqleet-1.0.7.tgz#ec1c3ccb74a8f695a83f790ddc0e972c18ffa70d"
-  integrity sha512-NrJwj2eYVCz5NRwQn69iD3RrPGfQdmRqErRFaEmECi6Nir/e/zVd1oFBIIGNd8hrXqWxuuR4eqtYzD3Jf6nMbw==
+"@wireapp/store-engine-sqleet@1.0.9":
+  version "1.0.9"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine-sqleet/-/store-engine-sqleet-1.0.9.tgz#d7fc6a3e06cc61860d781df503dcde136edf9ee5"
+  integrity sha512-lpwIcNQunb379oJUhuZ2wPZeMSTBT8ncWPg37KN2hhrYKWG3ZxFhN7jR+SRlPJ2RSOfBvI8Da5MBO9DnO2ef1A==
   dependencies:
     "@babel/core" "7.7.4"
     "@babel/plugin-proposal-class-properties" "7.7.4"
     "@babel/plugin-proposal-object-rest-spread" "7.7.4"
-    "@babel/plugin-proposal-optional-chaining" "7.7.4"
+    "@babel/plugin-proposal-optional-chaining" "7.7.5"
     "@babel/preset-typescript" "7.7.4"
-    "@wireapp/websql" "0.0.10"
+    "@wireapp/websql" "0.0.14"
     uint32 "0.2.1"
 
 "@wireapp/store-engine@4.1.6":
@@ -1845,17 +1837,17 @@
   resolved "https://registry.yarnpkg.com/@wireapp/tslint-config/-/tslint-config-1.4.1.tgz#2089af720f65279d696293cbc3ca13063529139a"
   integrity sha512-hPoEUTlnjJ38r/NDHMhfCgWQAue4Q3Zf8iWQeLKn/aOxUVQTEY1/oALplooKwoX/ei5KulBQveEu/foBQ2TYsw==
 
-"@wireapp/websql@0.0.10":
-  version "0.0.10"
-  resolved "https://registry.yarnpkg.com/@wireapp/websql/-/websql-0.0.10.tgz#bbdeebc7d7376f0a518d8cada94d95ae6d8bbff0"
-  integrity sha512-rHYDVylw9wzmYro69bhuNCCsLBXt8D/d01Rsic8WLeEDCus3RYz440FOMp04p1GKTnBZhK6MAhq0GQRE5EXg+Q==
+"@wireapp/websql@0.0.14":
+  version "0.0.14"
+  resolved "https://registry.yarnpkg.com/@wireapp/websql/-/websql-0.0.14.tgz#81796faf15ea6f4f6a441d767f3cbc1f339ac663"
+  integrity sha512-iYvcLNmZ6E7cyymfYiiOfkjck17mYyexivRTWsX8NgeuSVG+suWyg7VqxQc/xn6f7XDPmMa9f7QsqERF90zzqg==
   dependencies:
     "@types/emscripten" "1.38.0"
-    "@types/node" "12.7.1"
-    "@types/sharedworker" "0.0.28"
+    "@types/node" "12.12.14"
+    "@types/sharedworker" "0.0.29"
     cpr "3.0.1"
     pseudo-worker "1.3.0"
-    webpack "4.39.2"
+    webpack "4.41.2"
 
 "@xtuc/ieee754@^1.2.0":
   version "1.2.0"
@@ -13170,35 +13162,6 @@ webpack-sources@^1.4.0, webpack-sources@^1.4.1, webpack-sources@^1.4.3:
   dependencies:
     source-list-map "^2.0.0"
     source-map "~0.6.1"
-
-webpack@4.39.2:
-  version "4.39.2"
-  resolved "https://registry.yarnpkg.com/webpack/-/webpack-4.39.2.tgz#c9aa5c1776d7c309d1b3911764f0288c8c2816aa"
-  integrity sha512-AKgTfz3xPSsEibH00JfZ9sHXGUwIQ6eZ9tLN8+VLzachk1Cw2LVmy+4R7ZiwTa9cZZ15tzySjeMui/UnSCAZhA==
-  dependencies:
-    "@webassemblyjs/ast" "1.8.5"
-    "@webassemblyjs/helper-module-context" "1.8.5"
-    "@webassemblyjs/wasm-edit" "1.8.5"
-    "@webassemblyjs/wasm-parser" "1.8.5"
-    acorn "^6.2.1"
-    ajv "^6.10.2"
-    ajv-keywords "^3.4.1"
-    chrome-trace-event "^1.0.2"
-    enhanced-resolve "^4.1.0"
-    eslint-scope "^4.0.3"
-    json-parse-better-errors "^1.0.2"
-    loader-runner "^2.4.0"
-    loader-utils "^1.2.3"
-    memory-fs "^0.4.1"
-    micromatch "^3.1.10"
-    mkdirp "^0.5.1"
-    neo-async "^2.6.1"
-    node-libs-browser "^2.2.1"
-    schema-utils "^1.0.0"
-    tapable "^1.1.3"
-    terser-webpack-plugin "^1.4.1"
-    watchpack "^1.6.0"
-    webpack-sources "^1.4.1"
 
 webpack@4.41.2:
   version "4.41.2"
