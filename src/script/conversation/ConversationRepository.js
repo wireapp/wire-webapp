@@ -104,7 +104,7 @@ import {showLegalHoldWarning} from '../legal-hold/LegalHoldWarning';
 import * as LegalHoldEvaluator from '../legal-hold/LegalHoldEvaluator';
 import {DeleteConversationMessage} from '../entity/message/DeleteConversationMessage';
 import {ConversationRoleRepository} from './ConversationRoleRepository';
-import {DefaultRole} from './DefaultRole';
+import {DefaultRole} from './ConversationRoleRepository';
 
 // Conversation repository for all conversation interactions with the conversation service
 export class ConversationRepository {
@@ -140,7 +140,7 @@ export class ConversationRepository {
    * @param {LinkPreviewRepository} link_repository - Repository for link previews
    * @param {MessageSender} messageSender - Message sending queue handler
    * @param {serverTimeHandler} serverTimeHandler - Handles time shift between server and client
-   * @param {TeamRepository} team_repository - Repository for teams
+   * @param {TeamRepository} teamRepository - Repository for teams
    * @param {UserRepository} user_repository - Repository for all user interactions
    * @param {PropertiesRepository} propertyRepository - Repository that stores all account preferences
    * @param {AssetUploader} assetUploader - Manages uploading assets and keeping track of current uploads
@@ -156,7 +156,7 @@ export class ConversationRepository {
     link_repository,
     messageSender,
     serverTimeHandler,
-    team_repository,
+    teamRepository,
     user_repository,
     propertyRepository,
     assetUploader,
@@ -171,7 +171,7 @@ export class ConversationRepository {
     this.giphy_repository = giphy_repository;
     this.link_repository = link_repository;
     this.serverTimeHandler = serverTimeHandler;
-    this.team_repository = team_repository;
+    this.teamRepository = teamRepository;
     this.user_repository = user_repository;
     this.propertyRepository = propertyRepository;
     this.assetUploader = assetUploader;
@@ -195,10 +195,10 @@ export class ConversationRepository {
     this.active_conversation = ko.observable();
     this.conversations = ko.observableArray([]);
 
-    this.isTeam = this.team_repository.isTeam;
+    this.isTeam = this.teamRepository.isTeam;
     this.isTeam.subscribe(() => this.map_guest_status_self());
-    this.team = this.team_repository.team;
-    this.teamMembers = this.team_repository.teamMembers;
+    this.team = this.teamRepository.team;
+    this.teamMembers = this.teamRepository.teamMembers;
 
     this.selfUser = this.user_repository.self;
 
@@ -258,7 +258,7 @@ export class ConversationRepository {
     });
 
     this.connectedUsers = ko.pureComputed(() => {
-      const inviterId = this.team_repository.memberInviters()[this.selfUser().id];
+      const inviterId = this.teamRepository.memberInviters()[this.selfUser().id];
       const inviter = inviterId ? this.user_repository.users().find(({id}) => id === inviterId) : null;
       const connectedUsers = inviter ? [inviter] : [];
       for (const conversation of this.conversations()) {
@@ -875,7 +875,7 @@ export class ConversationRepository {
    */
   find_conversation_by_id(conversation_id) {
     // we prevent access to local conversation if the team is deleted
-    return this.team_repository.isTeamDeleted()
+    return this.teamRepository.isTeamDeleted()
       ? undefined
       : this.conversations().find(conversation => conversation.id === conversation_id);
   }
@@ -3503,28 +3503,32 @@ export class ConversationRepository {
     }
   }
 
-  _onGroupCreation(conversationEntity, eventJson) {
-    return this.event_mapper
-      .mapJsonEvent(eventJson, conversationEntity)
-      .then(messageEntity => {
-        const creatorId = conversationEntity.creator;
-        const createdByParticipant = !!conversationEntity.participating_user_ids().find(userId => userId === creatorId);
-        const createdBySelfUser = conversationEntity.isCreatedBySelf();
+  async _onGroupCreation(conversationEntity, eventJson) {
+    const messageEntity = await this.event_mapper.mapJsonEvent(eventJson, conversationEntity);
+    const creatorId = conversationEntity.creator;
+    const createdByParticipant = !!conversationEntity.participating_user_ids().find(userId => userId === creatorId);
+    const createdBySelfUser = conversationEntity.isCreatedBySelf();
 
-        const creatorIsParticipant = createdByParticipant || createdBySelfUser;
-        if (!creatorIsParticipant) {
-          messageEntity.memberMessageType = SystemMessageType.CONVERSATION_RESUME;
-        }
+    const creatorIsParticipant = createdByParticipant || createdBySelfUser;
 
-        return this._updateMessageUserEntities(messageEntity);
-      })
-      .then(messageEntity => {
-        if (conversationEntity && messageEntity) {
-          conversationEntity.add_message(messageEntity);
-        }
+    const data = await this.conversation_service.get_conversation_by_id(conversationEntity.id);
+    const allMembers = [...data.members.others, data.members.self];
+    const conversationRoles = allMembers.reduce(
+      (roles, {id, conversation_role}) => Object.assign(roles, {[id]: conversation_role}),
+      {},
+    );
+    conversationEntity.roles = conversationRoles;
 
-        return {conversationEntity, messageEntity};
-      });
+    if (!creatorIsParticipant) {
+      messageEntity.memberMessageType = SystemMessageType.CONVERSATION_RESUME;
+    }
+
+    const updatedMessageEntity = await this._updateMessageUserEntities(messageEntity);
+    if (conversationEntity && updatedMessageEntity) {
+      conversationEntity.add_message(updatedMessageEntity);
+    }
+
+    return {conversationEntity, updatedMessageEntity};
   }
 
   /**

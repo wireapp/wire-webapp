@@ -23,7 +23,7 @@ import {StorageSchemata} from '../storage/StorageSchemata';
 import {MessageCategory} from '../message/MessageCategory';
 import {search as fullTextSearch} from '../search/FullTextSearch';
 import {TeamService} from '../team/TeamService';
-import {DefaultRole} from './DefaultRole';
+import {DefaultRole} from './ConversationRoleRepository';
 
 // Conversation service for all conversation calls to the backend REST API.
 export class ConversationService {

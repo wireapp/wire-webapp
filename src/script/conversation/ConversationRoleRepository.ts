@@ -19,12 +19,18 @@
 
 import ko from 'knockout';
 
+import {Logger, getLogger} from 'Util/Logger';
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 import {TeamEntity} from '../team/TeamEntity';
+import {TeamService} from '../team/TeamService';
 import {ConversationRepository} from './ConversationRepository';
 import {ConversationService} from './ConversationService';
-import {DefaultRole} from './DefaultRole';
+
+export enum DefaultRole {
+  WIRE_ADMIN = 'wire_admin',
+  WIRE_MEMBER = 'wire_member',
+}
 
 export enum Permissions {
   renameConversation = 'modify_conversation_name',
@@ -39,40 +45,30 @@ export enum Permissions {
 }
 
 export interface ConversationRole {
-  name: string;
-  permissions: Record<Permissions, boolean>;
+  conversation_role: string;
+  actions: Permissions[];
 }
 
 export type ConversationRoles = ConversationRole[];
 
 const defaultAdmin: ConversationRole = {
-  name: DefaultRole.WIRE_ADMIN,
-  permissions: {
-    [Permissions.renameConversation]: true,
-    [Permissions.addParticipants]: true,
-    [Permissions.removeParticipants]: true,
-    [Permissions.changeParticipantRoles]: true,
-    [Permissions.toggleEphemeralTimer]: true,
-    [Permissions.toggleGuestsAndServices]: true,
-    [Permissions.toggleReadReceipts]: true,
-    [Permissions.deleteConversation]: true,
-    [Permissions.leaveConversation]: true,
-  },
+  actions: [
+    Permissions.renameConversation,
+    Permissions.addParticipants,
+    Permissions.removeParticipants,
+    Permissions.changeParticipantRoles,
+    Permissions.toggleEphemeralTimer,
+    Permissions.toggleGuestsAndServices,
+    Permissions.toggleReadReceipts,
+    Permissions.deleteConversation,
+    Permissions.leaveConversation,
+  ],
+  conversation_role: DefaultRole.WIRE_ADMIN,
 };
 
 const defaultMember: ConversationRole = {
-  name: DefaultRole.WIRE_MEMBER,
-  permissions: {
-    [Permissions.renameConversation]: false,
-    [Permissions.addParticipants]: false,
-    [Permissions.removeParticipants]: false,
-    [Permissions.changeParticipantRoles]: false,
-    [Permissions.toggleEphemeralTimer]: false,
-    [Permissions.toggleGuestsAndServices]: false,
-    [Permissions.toggleReadReceipts]: false,
-    [Permissions.deleteConversation]: false,
-    [Permissions.leaveConversation]: true,
-  },
+  actions: [Permissions.leaveConversation],
+  conversation_role: DefaultRole.WIRE_MEMBER,
 };
 
 export class ConversationRoleRepository {
@@ -82,6 +78,8 @@ export class ConversationRoleRepository {
   team: ko.Observable<TeamEntity>;
   selfUser: ko.Observable<User>;
   conversationService: ConversationService;
+  teamService: TeamService;
+  logger: Logger;
 
   constructor(conversationRepository: ConversationRepository) {
     this.conversationRoles = {};
@@ -90,10 +88,20 @@ export class ConversationRoleRepository {
     this.team = conversationRepository.team;
     this.selfUser = conversationRepository.selfUser;
     this.conversationService = conversationRepository.conversation_service;
+    this.teamService = conversationRepository.teamRepository.teamService;
+    this.logger = getLogger('ConversationRepository');
   }
 
-  setTeamRoles = (newRoles: ConversationRoles) => {
-    this.teamRoles = newRoles;
+  loadTeamRoles = async () => {
+    if (this.isTeam()) {
+      try {
+        const response = await this.teamService.getTeamConversationRoles(this.team().id);
+        this.teamRoles = response.conversation_roles;
+      } catch (error) {
+        this.logger.warn('Could not load team conversation roles', error);
+      }
+    }
+    return;
   };
 
   setConversationRoles = (conversation: Conversation, newRoles: ConversationRoles) => {
@@ -123,12 +131,12 @@ export class ConversationRoleRepository {
   getUserPermissions = (conversation: Conversation, user: User) => {
     const conversationRoles = this.getConversationRoles(conversation);
     const userRole: string = this.getUserRole(conversation, user);
-    return conversationRoles?.find(({name}) => name === userRole) || defaultMember;
+    return conversationRoles?.find(({conversation_role}) => conversation_role === userRole) || defaultMember;
   };
 
   hasPermission = (conversation: Conversation, user: User, permissionName: Permissions) => {
     const userRole = this.getUserPermissions(conversation, user);
-    return userRole.permissions[permissionName];
+    return userRole.actions.includes(permissionName);
   };
 
   canRenameGroup = (conversation: Conversation, user: User = this.selfUser()) =>

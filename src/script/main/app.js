@@ -394,9 +394,7 @@ class App {
 
       await teamRepository.getTeam();
 
-      if (teamRepository.isTeam()) {
-        //  conversationRepository.conversationRoleRepository.
-      }
+      await conversationRepository.conversationRoleRepository.loadTeamRoles();
 
       await userRepository.loadUsers();
       const notificationsCount = await eventRepository.initializeFromStream();

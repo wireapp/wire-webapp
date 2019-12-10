@@ -22,7 +22,7 @@ import {getLogger} from 'Util/Logger';
 import {Actions} from 'Components/panel/userActions';
 import 'Components/panel/enrichedFields';
 import 'Components/panel/userDetails';
-import {DefaultRole} from '../../conversation/DefaultRole';
+import {DefaultRole} from '../../conversation/ConversationRoleRepository';
 import {BasePanelViewModel} from './BasePanelViewModel';
 
 export class GroupParticipantUserViewModel extends BasePanelViewModel {
