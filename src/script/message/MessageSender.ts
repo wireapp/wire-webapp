@@ -26,8 +26,8 @@ export class MessageSender {
     this.sendingQueue = new PromiseQueue({name: 'MessageSender', paused: true});
   }
 
-  async queueMessage<T>(sendingFunction: PromiseFn<T>): Promise<void> {
-    await this.sendingQueue.push(sendingFunction);
+  queueMessage<T>(sendingFunction: PromiseFn<T>): Promise<T> {
+    return this.sendingQueue.push(sendingFunction);
   }
 
   pauseQueue(pauseState = true): void {

@@ -17,7 +17,7 @@
  *
  */
 
-import {Message} from '../entity/message/Message';
+import {ContentMessage} from '../entity/message/ContentMessage';
 import {MentionEntity} from '../message/MentionEntity';
 
 /**
@@ -27,10 +27,10 @@ import {MentionEntity} from '../message/MentionEntity';
  * @param updatedMentions Updated mentions
  * @returns Are the mentions different from each other
  */
-export function areMentionsDifferent(originalMessageEntity: Message, updatedMentions: MentionEntity[]): boolean {
+export function areMentionsDifferent(originalMessageEntity: ContentMessage, updatedMentions: MentionEntity[]): boolean {
   const flattenToUserId = (mentions: MentionEntity[]): string[] => mentions.map(mention => mention.userId).sort();
 
-  const existingMentions = flattenToUserId((originalMessageEntity as any).get_first_asset().mentions());
+  const existingMentions = flattenToUserId(originalMessageEntity.get_first_asset().mentions());
   const userIds = flattenToUserId(updatedMentions);
 
   const hasDifferentAmount = existingMentions.length !== userIds.length;
@@ -46,6 +46,6 @@ export function areMentionsDifferent(originalMessageEntity: Message, updatedMent
  * @param textMessage Message to compare with
  * @returns Are message and text the same
  */
-export function isTextDifferent(originalMessageEntity: Message, textMessage: string): boolean {
-  return textMessage !== (originalMessageEntity as any).get_first_asset().text;
+export function isTextDifferent(originalMessageEntity: ContentMessage, textMessage: string): boolean {
+  return textMessage !== originalMessageEntity.get_first_asset().text;
 }
