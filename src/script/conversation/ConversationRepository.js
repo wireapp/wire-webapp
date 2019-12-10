@@ -104,6 +104,7 @@ import {showLegalHoldWarning} from '../legal-hold/LegalHoldWarning';
 import * as LegalHoldEvaluator from '../legal-hold/LegalHoldEvaluator';
 import {DeleteConversationMessage} from '../entity/message/DeleteConversationMessage';
 import {ConversationRoleRepository} from './ConversationRoleRepository';
+import {DefaultRole} from './DefaultRole';
 
 // Conversation repository for all conversation interactions with the conversation service
 export class ConversationRepository {
@@ -379,6 +380,7 @@ export class ConversationRepository {
     const payload = Object.assign(
       {},
       {
+        conversation_role: DefaultRole.WIRE_MEMBER,
         name: groupName,
         users: userIds,
       },
