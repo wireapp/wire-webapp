@@ -9,26 +9,6 @@
   dependencies:
     "@babel/highlight" "^7.0.0"
 
-"@babel/core@7.7.4":
-  version "7.7.4"
-  resolved "https://registry.yarnpkg.com/@babel/core/-/core-7.7.4.tgz#37e864532200cb6b50ee9a4045f5f817840166ab"
-  integrity sha512-+bYbx56j4nYBmpsWtnPUsKW3NdnYxbqyfrP2w9wILBuHzdfIKz9prieZK0DFPyIzkjYVUe4QkusGL07r5pXznQ==
-  dependencies:
-    "@babel/code-frame" "^7.5.5"
-    "@babel/generator" "^7.7.4"
-    "@babel/helpers" "^7.7.4"
-    "@babel/parser" "^7.7.4"
-    "@babel/template" "^7.7.4"
-    "@babel/traverse" "^7.7.4"
-    "@babel/types" "^7.7.4"
-    convert-source-map "^1.7.0"
-    debug "^4.1.0"
-    json5 "^2.1.0"
-    lodash "^4.17.13"
-    resolve "^1.3.2"
-    semver "^5.4.1"
-    source-map "^0.5.0"
-
 "@babel/core@7.7.5", "@babel/core@>=7.2.2", "@babel/core@^7.7.2":
   version "7.7.5"
   resolved "https://registry.yarnpkg.com/@babel/core/-/core-7.7.5.tgz#ae1323cd035b5160293307f50647e83f8ba62f7e"
@@ -1667,10 +1647,10 @@
   resolved "https://registry.yarnpkg.com/@wireapp/antiscroll-2/-/antiscroll-2-1.0.2.tgz#71a78d294ee0c88f42d50477ab61fa39272f5bca"
   integrity sha512-9KeB3yh9k01PjpuuRQsve4yY3+OVS2/hp9j+N13Is5wYCZRkUzZVCs8w9CyA/C6J5o9ukH0EzT7uurysWuhn/A==
 
-"@wireapp/api-client@9.2.4":
-  version "9.2.4"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-9.2.4.tgz#a383aef43382d39802e24034900caa9d322e23e5"
-  integrity sha512-X//QjLDzrLGGyZIWClu099E09mWqJl95O/VOlBWkomgl+G9EyVLMxSVNxLlu4Tv5ay7poqyL/CEIRV84rYHoWg==
+"@wireapp/api-client@9.2.5":
+  version "9.2.5"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-9.2.5.tgz#0dd8a02fc59188eef22d2f6349c83ef18bd8424d"
+  integrity sha512-Ado0EC8MP0AW9tIGXFcpB2cf7vsAq89HzrT1iZAuRipCX5UMnbUuo1rZ1ECbl6T3mAdhn2jRK/HjKoxi4rcMpg==
   dependencies:
     "@types/node" "~12"
     "@types/spark-md5" "3.0.2"
@@ -1679,7 +1659,7 @@
     "@wireapp/priority-queue" "1.3.7"
     axios "0.19.0"
     logdown "3.2.8"
-    reconnecting-websocket "github:wireapp/reconnecting-websocket#96ac796ae8c7a7d9d857f46ed39dbedd7b9ad378"
+    reconnecting-websocket wireapp/reconnecting-websocket#96ac796ae8c7a7d9d857f46ed39dbedd7b9ad378
     spark-md5 "3.0.0"
     tough-cookie "3.0.1"
     ws "7.2.0"
@@ -1723,33 +1703,33 @@
     logdown "3.2.8"
     rimraf "3.0.0"
 
-"@wireapp/core@15.1.9":
-  version "15.1.9"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-15.1.9.tgz#b3155ea77f036461d2382561c8297f40fb49c39e"
-  integrity sha512-xks35NQ8kvNK/145zW1dgFmLZ/TEV2OMG5M/Gws+wU6Gd9pYHRM4Sq77H+LQnDuwF6bcckyI5z3Glbo7Bz28cQ==
+"@wireapp/core@15.1.11":
+  version "15.1.11"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-15.1.11.tgz#6594bc0639bcee203cca43b1f746774bea5f1701"
+  integrity sha512-yBolW2lUeh9CtcqSZFD6PefpEkSLuza4Na4rQHjwY2YonnyxMc9T1ICp5d6T7HqqbihzPIk2O0T0Vno5ciZyZw==
   dependencies:
     "@types/long" "4.0.0"
     "@types/node" "~12"
-    "@wireapp/api-client" "9.2.4"
-    "@wireapp/cryptobox" "12.0.12"
+    "@wireapp/api-client" "9.2.5"
+    "@wireapp/cryptobox" "12.0.13"
     "@wireapp/protocol-messaging" "1.24.2"
-    "@wireapp/store-engine" "4.1.7"
+    "@wireapp/store-engine" "4.2.0"
     bazinga64 "5.5.34"
     hash.js "1.1.7"
     logdown "3.2.8"
     protobufjs "6.8.8"
     pure-uuid "1.5.7"
 
-"@wireapp/cryptobox@12.0.12":
-  version "12.0.12"
-  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-12.0.12.tgz#0a5e4cfebfa0e550d47e3ac4862702978943c031"
-  integrity sha512-YuN3whpMRQkAK5JeSfZ/l9APuvIkfODjhkyyYdlqvXUcCGvyxtfOXtjqt8pBlMAOG7wEuvezIaJYJ+AiR0fW9A==
+"@wireapp/cryptobox@12.0.13":
+  version "12.0.13"
+  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-12.0.13.tgz#09e49827bb54bcc010591023b44ae078f8b5ef77"
+  integrity sha512-SQJhsEO2oSFd7SnBeNqURlK2EpslfzajiXNIP18CG4mq6ExrHxxuE4WC/b0c8HEZ7Rwy5Gbyg/o9Rn94YCh0pA==
   dependencies:
     "@types/node" "~12"
     "@wireapp/lru-cache" "3.3.30"
     "@wireapp/priority-queue" "1.3.7"
     "@wireapp/proteus" "9.4.26"
-    "@wireapp/store-engine" "4.1.7"
+    "@wireapp/store-engine" "4.2.0"
     bazinga64 "5.5.34"
     logdown "3.2.8"
 
@@ -1796,10 +1776,10 @@
   dependencies:
     protobufjs "6.8.8"
 
-"@wireapp/react-ui-kit@7.24.0":
-  version "7.24.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-7.24.0.tgz#b061a222a140361905712d291d59c862135eb3a3"
-  integrity sha512-wP5HXtb0FFtkcx5kO48jIs9TV9Wsv4FAex5J1qL4vrgQu5cxOzRMmFAH7a4fSvpn4XS9HdMJZwhwvQQJOo70Kg==
+"@wireapp/react-ui-kit@7.24.2":
+  version "7.24.2"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-7.24.2.tgz#e6b40bceffd6b0a95afae2ecbfdfa61b9689e22c"
+  integrity sha512-CCvm/Fu0NcJJ+wiKS2R/Zhg7FOkZHTDwnh5PudXF1/W6HtKL58t1A/HH3/Z+3wd7MdfgkZRiRUn1o2ayajqIQg==
   dependencies:
     "@emotion/core" "10.0.22"
     "@types/color" "3.0.0"
@@ -1809,30 +1789,30 @@
     emotion-theming "10.0.19"
     react-transition-group "4.3.0"
 
-"@wireapp/store-engine-dexie@1.0.7":
-  version "1.0.7"
-  resolved "https://registry.yarnpkg.com/@wireapp/store-engine-dexie/-/store-engine-dexie-1.0.7.tgz#bab57be190d283dc11e9f6ced863398b2a60970a"
-  integrity sha512-Rmt1CGeWCuwVA2Bz5P+mx/rJ0HnhGHkbjir9m1EVnYYwpL8wvbFannwf3Gi+3jUrb65TmDcRoeO6JIXQa3X+cA==
+"@wireapp/store-engine-dexie@1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine-dexie/-/store-engine-dexie-1.1.0.tgz#c103c2c494979e0eed516b508b38ae232843013a"
+  integrity sha512-QKClGyqBLEjNHLwS58MQ3kyrcjPGnuLLefyqcfv/hKRISN0sgifIpeV0pBbPjRqANqN/g/PvxM/zjK9KveWrSQ==
   dependencies:
     dexie "2.0.4"
 
-"@wireapp/store-engine-sqleet@1.0.9":
-  version "1.0.9"
-  resolved "https://registry.yarnpkg.com/@wireapp/store-engine-sqleet/-/store-engine-sqleet-1.0.9.tgz#d7fc6a3e06cc61860d781df503dcde136edf9ee5"
-  integrity sha512-lpwIcNQunb379oJUhuZ2wPZeMSTBT8ncWPg37KN2hhrYKWG3ZxFhN7jR+SRlPJ2RSOfBvI8Da5MBO9DnO2ef1A==
+"@wireapp/store-engine-sqleet@1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine-sqleet/-/store-engine-sqleet-1.1.0.tgz#ed43a404ea6079b94faad9abee0ab92bb270e9a5"
+  integrity sha512-ulqT+N3Csn09faHXN5rLyHg7bxyD3wwxQ1lgE7ZrWTkhy+yKzcXmO39V6lGt0O28zlGmrW8BOc03M5E260LM7g==
   dependencies:
-    "@babel/core" "7.7.4"
+    "@babel/core" "7.7.5"
     "@babel/plugin-proposal-class-properties" "7.7.4"
     "@babel/plugin-proposal-object-rest-spread" "7.7.4"
     "@babel/plugin-proposal-optional-chaining" "7.7.5"
     "@babel/preset-typescript" "7.7.4"
-    "@wireapp/websql" "0.0.14"
+    "@wireapp/websql" "0.0.15"
     uint32 "0.2.1"
 
-"@wireapp/store-engine@4.1.7":
-  version "4.1.7"
-  resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-4.1.7.tgz#0a91fd6c163e16f81e7cb416b26c2600ced2cad0"
-  integrity sha512-EyIjCjfrWkBrIO2LfvlC7c1vSwQEoJxO0cdIe22DktGLNcNrC2peTzhoS6jCvWxx/NLW5UFWBO5YPqM2sOATgw==
+"@wireapp/store-engine@4.2.0":
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-4.2.0.tgz#5a8f7b89f2560e7072eef14d471408434731045e"
+  integrity sha512-y4wBSLZ7YlTQFOnwtbAF1erfPrU7Jt3Lb5KHgP7/DMYAcyKEtEVRRxr9DgQiVyH5lfpj0xmZGPnr0dH3II4xpA==
   dependencies:
     "@types/node" "~12"
 
@@ -1841,17 +1821,16 @@
   resolved "https://registry.yarnpkg.com/@wireapp/tslint-config/-/tslint-config-1.4.1.tgz#2089af720f65279d696293cbc3ca13063529139a"
   integrity sha512-hPoEUTlnjJ38r/NDHMhfCgWQAue4Q3Zf8iWQeLKn/aOxUVQTEY1/oALplooKwoX/ei5KulBQveEu/foBQ2TYsw==
 
-"@wireapp/websql@0.0.14":
-  version "0.0.14"
-  resolved "https://registry.yarnpkg.com/@wireapp/websql/-/websql-0.0.14.tgz#81796faf15ea6f4f6a441d767f3cbc1f339ac663"
-  integrity sha512-iYvcLNmZ6E7cyymfYiiOfkjck17mYyexivRTWsX8NgeuSVG+suWyg7VqxQc/xn6f7XDPmMa9f7QsqERF90zzqg==
+"@wireapp/websql@0.0.15":
+  version "0.0.15"
+  resolved "https://registry.yarnpkg.com/@wireapp/websql/-/websql-0.0.15.tgz#0bf3f284379db5019a950bafcc1e409039cd8bbf"
+  integrity sha512-2UPKGgTa8ieCJC1sYx4hEpxT07XuX3Ke2d+M74HD7VxSMfstXvcmEvk6Vf6iOoMxT3AL6Kmbk0XQAEYXW0FE7g==
   dependencies:
     "@types/emscripten" "1.38.0"
     "@types/node" "12.12.14"
     "@types/sharedworker" "0.0.29"
     cpr "3.0.1"
     pseudo-worker "1.3.0"
-    webpack "4.41.2"
 
 "@xtuc/ieee754@^1.2.0":
   version "1.2.0"
@@ -10692,7 +10671,6 @@ rechoir@^0.6.2:
 
 "reconnecting-websocket@github:wireapp/reconnecting-websocket#96ac796ae8c7a7d9d857f46ed39dbedd7b9ad378":
   version "4.2.0"
-  uid "96ac796ae8c7a7d9d857f46ed39dbedd7b9ad378"
   resolved "https://codeload.github.com/wireapp/reconnecting-websocket/tar.gz/96ac796ae8c7a7d9d857f46ed39dbedd7b9ad378"
 
 redent@^1.0.0:
