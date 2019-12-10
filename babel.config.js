@@ -11,7 +11,7 @@ const presetEnvConfig = {
 module.exports = {
   env: {
     test: {
-      plugins: ['@babel/plugin-proposal-class-properties'],
+      plugins: ['@babel/plugin-proposal-class-properties', '@babel/plugin-proposal-nullish-coalescing-operator'],
       presets: [
         '@babel/preset-react',
         '@babel/preset-typescript',
@@ -22,6 +22,7 @@ module.exports = {
   },
   plugins: [
     '@babel/plugin-proposal-class-properties',
+    '@babel/plugin-proposal-nullish-coalescing-operator',
     [
       'react-intl',
       {
