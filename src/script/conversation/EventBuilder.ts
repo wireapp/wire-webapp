@@ -17,7 +17,7 @@
  *
  */
 
-import {LegalHoldStatus} from '@wireapp/api-client/dist/commonjs/team/legalhold';
+import {LegalHoldStatus} from '@wireapp/api-client/dist/team/legalhold';
 import {REASON as AVS_REASON} from '@wireapp/avs';
 
 import {createRandomUuid} from 'Util/util';
