@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-web-storage/compare/@wireapp/store-engine-web-storage@1.0.6...@wireapp/store-engine-web-storage@1.1.0) (2019-12-10)
+
+
+### Features
+
+* **store-engine:** Add functionality to clear all tables ([#2642](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-web-storage/issues/2642)) ([ee5618c](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-web-storage/commit/ee5618c2505db9134d09d46791fcf7b6dd5740fe))
+
+
+
+
+
 ## [1.0.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-web-storage/compare/@wireapp/store-engine-web-storage@1.0.5...@wireapp/store-engine-web-storage@1.0.6) (2019-12-06)
 
 **Note:** Version bump only for package @wireapp/store-engine-web-storage

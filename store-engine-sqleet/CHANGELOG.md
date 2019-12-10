@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/compare/@wireapp/store-engine-sqleet@1.0.9...@wireapp/store-engine-sqleet@1.1.0) (2019-12-10)
+
+
+### Features
+
+* **store-engine:** Add functionality to clear all tables ([#2642](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/issues/2642)) ([ee5618c](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/commit/ee5618c2505db9134d09d46791fcf7b6dd5740fe))
+
+
+
+
+
 ## [1.0.9](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/compare/@wireapp/store-engine-sqleet@1.0.8...@wireapp/store-engine-sqleet@1.0.9) (2019-12-09)
 
 **Note:** Version bump only for package @wireapp/store-engine-sqleet

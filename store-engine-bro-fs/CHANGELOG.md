@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-bro-fs/compare/@wireapp/store-engine-bro-fs@1.0.6...@wireapp/store-engine-bro-fs@1.1.0) (2019-12-10)
+
+
+### Features
+
+* **store-engine:** Add functionality to clear all tables ([#2642](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-bro-fs/issues/2642)) ([ee5618c](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-bro-fs/commit/ee5618c2505db9134d09d46791fcf7b6dd5740fe))
+
+
+
+
+
 ## [1.0.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-bro-fs/compare/@wireapp/store-engine-bro-fs@1.0.5...@wireapp/store-engine-bro-fs@1.0.6) (2019-12-06)
 
 **Note:** Version bump only for package @wireapp/store-engine-bro-fs
