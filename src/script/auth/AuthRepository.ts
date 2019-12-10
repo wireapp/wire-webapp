@@ -17,7 +17,7 @@
  *
  */
 
-import {AccessTokenData, LoginData} from '@wireapp/api-client/dist/commonjs/auth';
+import {AccessTokenData, LoginData} from '@wireapp/api-client/dist/auth';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {Logger} from 'logdown';

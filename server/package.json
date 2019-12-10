@@ -4,7 +4,7 @@
   "main": "dist/index.js",
   "license": "GPL-3.0",
   "dependencies": {
-    "@wireapp/commons": "3.0.0",
+    "@wireapp/commons": "3.0.3",
     "dotenv": "8.2.0",
     "dotenv-extended": "2.5.0",
     "express": "4.17.1",
@@ -17,7 +17,7 @@
     "logdown": "3.2.8",
     "maxmind": "4.0.0",
     "opn": "6.0.0",
-    "pm2": "4.1.2"
+    "pm2": "4.2.0"
   },
   "devDependencies": {
     "@types/express": "4.17.1",
@@ -26,17 +26,17 @@
     "@types/fs-extra": "8.0.1",
     "@types/hbs": "4.0.1",
     "@types/helmet": "0.0.45",
-    "@types/jasmine": "3.4.6",
+    "@types/jasmine": "3.5.0",
     "@types/node": "~10",
     "jasmine": "3.5.0",
     "nyc": "14.1.1",
     "rimraf": "3.0.0",
-    "ts-node": "8.5.2",
+    "ts-node": "8.5.4",
     "tslint": "5.20.1",
     "tslint-config-prettier": "1.18.0",
     "tslint-eslint-rules": "5.4.0",
     "tslint-plugin-prettier": "2.0.1",
-    "typescript": "3.6.4"
+    "typescript": "3.7.3"
   },
   "scripts": {
     "build": "yarn clean && tsc -P tsconfig.json && node ./bin/copy_server_assets.js && node ./bin/create_commit_sha_file.js",

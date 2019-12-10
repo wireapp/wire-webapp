@@ -17,7 +17,7 @@
  *
  */
 
-import {PublicClient} from '@wireapp/api-client/dist/commonjs/client';
+import {PublicClient} from '@wireapp/api-client/dist/client';
 import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
 import {amplify} from 'amplify';
 import ko from 'knockout';
@@ -150,8 +150,8 @@ export class UserRepository {
       })
       .extend({rateLimit: TIME_IN_MILLIS.SECOND});
 
-    this.isActivatedAccount = ko.pureComputed(() => this.self() && !this.self().isTemporaryGuest());
-    this.isTemporaryGuest = ko.pureComputed(() => this.self() && this.self().isTemporaryGuest());
+    this.isActivatedAccount = ko.pureComputed(() => !this.self()?.isTemporaryGuest());
+    this.isTemporaryGuest = ko.pureComputed(() => this.self()?.isTemporaryGuest());
 
     this.isTeam = ko.observable();
     this.teamMembers = undefined;

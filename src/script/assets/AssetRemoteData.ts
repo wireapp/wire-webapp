@@ -167,12 +167,18 @@ export class AssetRemoteData {
         type = mimeType;
         this.loadPromise = undefined;
         const isEncryptedAsset = this.otrKey && this.sha256;
-        return isEncryptedAsset ? decryptAesAsset(buffer, this.otrKey.buffer, this.sha256.buffer) : buffer;
+
+        if (isEncryptedAsset) {
+          const otrKey = this.otrKey instanceof Uint8Array ? this.otrKey : Uint8Array.from(Object.values(this.otrKey));
+          const sha256 = this.sha256 instanceof Uint8Array ? this.sha256 : Uint8Array.from(Object.values(this.sha256));
+          return decryptAesAsset(buffer, otrKey.buffer, sha256.buffer);
+        }
+        return buffer;
       })
       .then(plaintext => new Blob([new Uint8Array(plaintext)], {type}))
       .catch(error => {
         this.loadPromise = undefined;
-        const errorMessage = (error && error.message) || '';
+        const errorMessage = error?.message || '';
         const isAssetNotFound = errorMessage.endsWith(BackendClientError.STATUS_CODE.NOT_FOUND);
         const isServerError = errorMessage.endsWith(BackendClientError.STATUS_CODE.INTERNAL_SERVER_ERROR);
 

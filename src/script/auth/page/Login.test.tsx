@@ -30,15 +30,6 @@ const Config = ReadOnlyConfig as any;
 describe('"Login"', () => {
   let wrapper: ReactWrapper;
 
-  beforeAll(() => {
-    Config.FEATURE = {
-      DEFAULT_LOGIN_TEMPORARY_CLIENT: false,
-      ENABLE_ACCOUNT_REGISTRATION: true,
-    };
-  });
-
-  afterAll(() => (Config.FEATURE = {}));
-
   const backButton = () => wrapper.find('[data-uie-name="go-index"]').first();
   const emailInput = () => wrapper.find('[data-uie-name="enter-email"]').first();
   const passwordInput = () => wrapper.find('[data-uie-name="enter-password"]').first();

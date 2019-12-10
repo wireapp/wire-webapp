@@ -37,7 +37,6 @@ export class EventService {
   constructor(storageService) {
     this.storageService = storageService;
     this.logger = getLogger('z.conversation.EventService');
-    this.EVENT_STORE_NAME = StorageSchemata.OBJECT_STORE.EVENTS;
   }
 
   /**
@@ -56,7 +55,7 @@ export class EventService {
     try {
       if (this.storageService.db) {
         const events = await this.storageService.db
-          .table(this.EVENT_STORE_NAME)
+          .table(StorageSchemata.OBJECT_STORE.EVENTS)
           .where('id')
           .anyOf(eventIds)
           .filter(record => record.conversation === conversationId)
@@ -64,7 +63,7 @@ export class EventService {
         return events;
       }
 
-      const records = await this.storageService.getAll(this.EVENT_STORE_NAME);
+      const records = await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS);
       return records
         .filter(record => record.conversation === conversationId && eventIds.includes(record.id))
         .sort((a, b) => a.id - b.id);
@@ -93,7 +92,7 @@ export class EventService {
     try {
       if (this.storageService.db) {
         const entry = await this.storageService.db
-          .table(this.EVENT_STORE_NAME)
+          .table(StorageSchemata.OBJECT_STORE.EVENTS)
           .where('id')
           .equals(eventId)
           .filter(record => record.conversation === conversationId)
@@ -101,7 +100,7 @@ export class EventService {
         return entry;
       }
 
-      const records = await this.storageService.getAll(this.EVENT_STORE_NAME);
+      const records = await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS);
       return records
         .filter(record => record.id === eventId && record.conversation === conversationId)
         .sort((a, b) => a.id - b.id)
@@ -124,14 +123,14 @@ export class EventService {
   async loadEventsWithCategory(conversationId, categoryMin, categoryMax = MessageCategory.LIKED) {
     if (this.storageService.db) {
       const events = await this.storageService.db
-        .table(this.EVENT_STORE_NAME)
+        .table(StorageSchemata.OBJECT_STORE.EVENTS)
         .where('[conversation+category]')
         .between([conversationId, categoryMin], [conversationId, categoryMax], true, true)
         .sortBy('time');
       return events;
     }
 
-    const records = await this.storageService.getAll(this.EVENT_STORE_NAME);
+    const records = await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS);
     return records
       .filter(
         record =>
@@ -143,7 +142,7 @@ export class EventService {
   async loadEventsReplyingToMessage(conversationId, quotedMessageId, quotedMessageTime) {
     if (this.storageService.db) {
       const events = await this.storageService.db
-        .table(this.EVENT_STORE_NAME)
+        .table(StorageSchemata.OBJECT_STORE.EVENTS)
         .where(['conversation', 'time'])
         .between([conversationId, quotedMessageTime], [conversationId, new Date().toISOString()], true, true)
         .filter(event => event.data && event.data.quote && event.data.quote.message_id === quotedMessageId)
@@ -151,7 +150,7 @@ export class EventService {
       return events;
     }
 
-    const records = await this.storageService.getAll(this.EVENT_STORE_NAME);
+    const records = await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS);
     return records
       .filter(record => {
         return (
@@ -243,7 +242,7 @@ export class EventService {
 
     if (this.storageService.db) {
       const events = await this.storageService.db
-        .table(this.EVENT_STORE_NAME)
+        .table(StorageSchemata.OBJECT_STORE.EVENTS)
         .where('[conversation+time]')
         .between(
           [conversationId, fromDate.toISOString()],
@@ -255,7 +254,7 @@ export class EventService {
       return events;
     }
 
-    const records = await this.storageService.getAll(this.EVENT_STORE_NAME);
+    const records = await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS);
     return records
       .filter(
         record =>
@@ -276,7 +275,7 @@ export class EventService {
    */
   async saveEvent(event) {
     event.category = categoryFromEvent(event);
-    event.primary_key = await this.storageService.save(this.EVENT_STORE_NAME, undefined, event);
+    event.primary_key = await this.storageService.save(StorageSchemata.OBJECT_STORE.EVENTS, undefined, event);
     return event;
   }
 
@@ -287,15 +286,15 @@ export class EventService {
    * @returns {Promise<Event>} Resolves with the updated record
    */
   replaceEvent(event) {
-    return this.storageService.update(this.EVENT_STORE_NAME, event.primary_key, event).then(() => event);
+    return this.storageService.update(StorageSchemata.OBJECT_STORE.EVENTS, event.primary_key, event).then(() => event);
   }
 
   addEventUpdatedListener(callback) {
-    this.storageService.addUpdatedListener(this.EVENT_STORE_NAME, callback);
+    this.storageService.addUpdatedListener(StorageSchemata.OBJECT_STORE.EVENTS, callback);
   }
 
   addEventDeletedListener(callback) {
-    this.storageService.addDeletedListener(this.EVENT_STORE_NAME, callback);
+    this.storageService.addDeletedListener(StorageSchemata.OBJECT_STORE.EVENTS, callback);
   }
 
   /**
@@ -306,7 +305,7 @@ export class EventService {
    * @returns {Promise} Resolves when the message was updated in database
    */
   updateEventAsUploadSucceeded(primaryKey, event) {
-    return this.storageService.load(this.EVENT_STORE_NAME, primaryKey).then(record => {
+    return this.storageService.load(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey).then(record => {
       if (!record) {
         return this.logger.warn('Did not find message to update asset (uploaded)', primaryKey);
       }
@@ -332,7 +331,7 @@ export class EventService {
    * @returns {Promise} Resolves when the message was updated in database
    */
   updateEventAsUploadFailed(primaryKey, reason) {
-    return this.storageService.load(this.EVENT_STORE_NAME, primaryKey).then(record => {
+    return this.storageService.load(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey).then(record => {
       if (!record) {
         return this.logger.warn('Did not find message to update asset (failed)', primaryKey);
       }
@@ -389,8 +388,8 @@ export class EventService {
 
       if (this.storageService.db) {
         // Create a DB transaction to avoid concurrent sequential update.
-        return this.storageService.db.transaction('rw', this.EVENT_STORE_NAME, () => {
-          return this.storageService.load(this.EVENT_STORE_NAME, primaryKey).then(record => {
+        return this.storageService.db.transaction('rw', StorageSchemata.OBJECT_STORE.EVENTS, () => {
+          return this.storageService.load(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey).then(record => {
             if (!record) {
               throw new z.error.StorageError(z.error.StorageError.TYPE.NOT_FOUND);
             }
@@ -399,7 +398,7 @@ export class EventService {
 
             const isSequentialUpdate = changes.version === databaseVersion + 1;
             if (isSequentialUpdate) {
-              return this.storageService.update(this.EVENT_STORE_NAME, primaryKey, changes);
+              return this.storageService.update(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey, changes);
             }
 
             const logMessage = 'Failed sequential database update';
@@ -415,7 +414,7 @@ export class EventService {
           });
         });
       }
-      return this.storageService.update(this.EVENT_STORE_NAME, primaryKey, changes);
+      return this.storageService.update(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey, changes);
     });
   }
 
@@ -427,7 +426,7 @@ export class EventService {
    * @returns {Promise} Resolves with the number of deleted records
    */
   async deleteEvent(conversationId, eventId) {
-    return this.storageService.deleteEventInConversation(this.EVENT_STORE_NAME, conversationId, eventId);
+    return this.storageService.deleteEventInConversation(StorageSchemata.OBJECT_STORE.EVENTS, conversationId, eventId);
   }
 
   /**
@@ -437,7 +436,7 @@ export class EventService {
    * @returns {Promise} Resolves with the number of deleted records
    */
   deleteEventByKey(primaryKey) {
-    return this.storageService.delete(this.EVENT_STORE_NAME, primaryKey);
+    return this.storageService.delete(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey);
   }
 
   /**
@@ -448,6 +447,6 @@ export class EventService {
    * @returns {Promise} Resolves when the events was deleted
    */
   async deleteEvents(conversationId, isoDate) {
-    return this.storageService.deleteEventsByDate(this.EVENT_STORE_NAME, conversationId, isoDate);
+    return this.storageService.deleteEventsByDate(StorageSchemata.OBJECT_STORE.EVENTS, conversationId, isoDate);
   }
 }

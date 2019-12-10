@@ -17,7 +17,7 @@
  *
  */
 
-import {RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
+import {RegisteredClient} from '@wireapp/api-client/dist/client/index';
 import {AUTH_ACTION, AppActions, CLIENT_ACTION, NOTIFICATION_ACTION} from '../action/creator/';
 
 export interface ClientState {
@@ -29,7 +29,7 @@ export interface ClientState {
   isNewClient: boolean;
 }
 
-export const initialState: ClientState = {
+export const initialClientState: ClientState = {
   clients: [],
   currentClient: null,
   error: null,
@@ -38,7 +38,7 @@ export const initialState: ClientState = {
   isNewClient: null,
 };
 
-export function clientReducer(state: ClientState = initialState, action: AppActions): ClientState {
+export function clientReducer(state: ClientState = initialClientState, action: AppActions): ClientState {
   switch (action.type) {
     case CLIENT_ACTION.CLIENT_INIT_SUCCESS: {
       return {
@@ -93,13 +93,13 @@ export function clientReducer(state: ClientState = initialState, action: AppActi
       return {...state, hasHistory: action.payload};
     }
     case NOTIFICATION_ACTION.NOTIFICATION_CHECK_HISTORY_RESET: {
-      return {...state, hasHistory: initialState.hasHistory};
+      return {...state, hasHistory: initialClientState.hasHistory};
     }
     case CLIENT_ACTION.CLIENT_RESET_ERROR: {
       return {...state, error: null};
     }
     case AUTH_ACTION.LOGOUT_SUCCESS: {
-      return {...initialState};
+      return {...initialClientState};
     }
     default:
       return state;

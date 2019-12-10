@@ -58,7 +58,7 @@ export class MediaStreamHandler {
     this.screensharingMethod = ScreensharingMethods.NONE;
     if (window.desktopCapturer) {
       this.screensharingMethod = ScreensharingMethods.DESKTOP_CAPTURER;
-    } else if (!!navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
+    } else if (!!navigator.mediaDevices?.getDisplayMedia) {
       this.screensharingMethod = ScreensharingMethods.DISPLAY_MEDIA;
     } else if (Environment.browser.firefox) {
       this.screensharingMethod = ScreensharingMethods.USER_MEDIA;
