@@ -24,11 +24,12 @@ import {Call} from 'src/script/calling/Call';
 import {Participant} from 'src/script/calling/Participant';
 import {Conversation} from 'src/script/entity/Conversation';
 import 'src/script/components/list/conversationListCallingCell';
+import {User} from 'src/script/entity/User';
 
 function createCall(state) {
   const call = new Call();
   call.state(state);
-  call.selfParticipant = new Participant();
+  call.selfParticipant = new Participant('selfId');
   return call;
 }
 
@@ -84,6 +85,9 @@ describe('conversationListCallingCell', () => {
   it('displays the running time of an ongoing call', () => {
     const conversation = new Conversation();
     spyOn(conversation, 'supportsVideoCall').and.returnValue(true);
+    const selfUserEntity = new User('selfId');
+    selfUserEntity.is_me = true;
+    conversation.selfUser(selfUserEntity);
     const call = createCall(CALL_STATE.MEDIA_ESTAB);
     const params = Object.assign({}, defaultParams, {call, conversation: () => conversation});
     return instantiateComponent('conversation-list-calling-cell', params).then(domContainer => {

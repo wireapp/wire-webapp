@@ -53,7 +53,11 @@ class ConversationListCallingCell {
 
     this.videoGrid = videoGrid;
     this.conversationParticipants = ko.pureComputed(
-      () => this.conversation() && this.conversation().participating_user_ets(),
+      () =>
+        this.conversation() &&
+        this.conversation()
+          .participating_user_ets()
+          .concat([this.conversation().selfUser()]),
     );
 
     const isState = state => () => call.state() === state;
