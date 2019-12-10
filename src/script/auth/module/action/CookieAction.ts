@@ -73,7 +73,7 @@ export class CookieAction {
     return async (dispatch, getState, {cookieStore}) => {
       try {
         const cookie = cookieStore.get(name);
-        if (cookie && cookie.includes(value)) {
+        if (cookie?.includes(value)) {
           cookieStore.remove(name);
           dispatch(CookieActionCreator.successfulRemoveCookie({name}));
         }

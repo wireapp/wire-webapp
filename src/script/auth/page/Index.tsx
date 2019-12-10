@@ -23,18 +23,19 @@ import {
   Column,
   Columns,
   ContainerXS,
-  ICON_NAME,
   Link,
   Logo,
+  ProfileIcon,
   RoundIconButton,
+  TeamIcon,
   Text,
 } from '@wireapp/react-ui-kit';
 import React from 'react';
 import {useIntl} from 'react-intl';
 import {Redirect} from 'react-router';
 import useReactRouter from 'use-react-router';
+import {Config} from '../../Config';
 import {indexStrings} from '../../strings';
-import {Config} from '../config';
 import {ROUTE} from '../route';
 import {isDesktopApp, isMacOS} from '../Runtime';
 import {pathWithParams} from '../util/urlUtil';
@@ -56,14 +57,9 @@ const Index = ({}: Props) => {
         <Columns style={{margin: '70px auto'}}>
           <Column style={{marginLeft: isMacOsWrapper ? 0 : 16}}>
             <Link onClick={() => history.push(ROUTE.CREATE_ACCOUNT)} data-uie-name="go-register-personal">
-              <RoundIconButton
-                icon={ICON_NAME.PROFILE}
-                backgroundColor={COLOR.GREEN}
-                style={{marginBottom: 12}}
-                size={72}
-                iconHeight={31}
-                iconWidth={31}
-              />
+              <RoundIconButton backgroundColor={COLOR.GREEN} style={{marginBottom: 12}} size={72}>
+                <ProfileIcon height={31} width={31} />
+              </RoundIconButton>
               <Bold fontSize="24px" color={COLOR.LINK}>
                 {_(indexStrings.createAccountForPersonalUse)}
               </Bold>
@@ -85,13 +81,9 @@ const Index = ({}: Props) => {
           {!isMacOsWrapper && (
             <Column>
               <Link onClick={() => history.push(ROUTE.CREATE_TEAM)} data-uie-name="go-register-team">
-                <RoundIconButton
-                  style={{marginBottom: 12}}
-                  size={72}
-                  icon={ICON_NAME.TEAM}
-                  iconHeight={31}
-                  iconWidth={31}
-                />
+                <RoundIconButton style={{marginBottom: 12}} size={72}>
+                  <TeamIcon height={31} width={31} />
+                </RoundIconButton>
                 <Bold fontSize="24px" color={COLOR.LINK}>
                   {_(indexStrings.createAccountForOrganizations)}
                 </Bold>

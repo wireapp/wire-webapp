@@ -24,9 +24,9 @@ import {capitalizeFirstChar} from 'Util/StringUtil';
 import {amplify} from 'amplify';
 import Dexie from 'dexie';
 import ko from 'knockout';
-import {Config} from '../auth/config';
 import {ClientEntity} from '../client/ClientEntity';
 import {ClientRepository} from '../client/ClientRepository';
+import {Config} from '../Config';
 import {ConversationRepository} from '../conversation/ConversationRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {User} from '../entity/User';
@@ -34,7 +34,7 @@ import {WebAppEvents} from '../event/WebApp';
 import {getPrivacyHowUrl, getPrivacyWhyUrl} from '../externalRoute';
 import {MotionDuration} from '../motion/MotionDuration';
 
-import {ClientClassification} from '@wireapp/api-client/dist/commonjs/client';
+import {ClientClassification} from '@wireapp/api-client/dist/client';
 import 'Components/deviceCard';
 
 export interface UserDevicesHistory {

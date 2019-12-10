@@ -151,7 +151,7 @@ function isSupportedBrowser(userAgent: string): boolean {
   }
   const browserName = parsedUserAgent.browser.name.toLowerCase();
   const supportedBrowserVersionObject = CommonConfig.WEBAPP_SUPPORTED_BROWSERS[browserName];
-  const supportedBrowserVersion = supportedBrowserVersionObject && supportedBrowserVersionObject.major;
+  const supportedBrowserVersion = supportedBrowserVersionObject?.major;
 
   try {
     const browserVersionString = (parsedUserAgent.browser.version.split('.') || [])[0];

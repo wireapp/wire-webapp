@@ -43,7 +43,7 @@ const CreatePersonalAccount = ({isPersonalFlow, enterPersonalCreationFlow}: Prop
   }, []);
 
   const handleSubmit = (): void => {
-    history.push(ROUTE.VERIFY);
+    history.push(ROUTE.VERIFY_EMAIL_CODE);
   };
 
   const pageContent = (

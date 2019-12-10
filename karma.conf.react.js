@@ -17,11 +17,12 @@
  *
  */
 
+const path = require('path');
+
 const dist = 'server/dist/static/min';
 const test = 'test';
 
 const preprocessors = {};
-preprocessors[`${dist}/script.js`] = ['coverage'];
 preprocessors['**/*.js'] = ['sourcemap'];
 
 module.exports = function(config) {
@@ -35,9 +36,22 @@ module.exports = function(config) {
     },
     colors: true,
     concurrency: Infinity,
-    coverageReporter: {
-      dir: 'docs/auth-coverage',
-      type: 'html',
+    coverageIstanbulReporter: {
+      dir: path.resolve('docs/auth-coverage/'),
+      fixWebpackSourcePaths: true,
+      'report-config': {
+        html: {subdir: 'html'},
+      },
+      reports: ['html', 'lcovonly'],
+      thresholds: {
+        emitWarning: false,
+        global: {
+          branches: 35,
+          functions: 39,
+          lines: 44,
+          statements: 44,
+        },
+      },
     },
     customLaunchers: {
       ChromeNoSandbox: {
@@ -57,7 +71,7 @@ module.exports = function(config) {
     logLevel: config.LOG_INFO,
     port: 9876,
     preprocessors,
-    reporters: ['progress', 'coverage'],
+    reporters: ['progress', 'coverage-istanbul'],
     singleRun: true,
   });
 };

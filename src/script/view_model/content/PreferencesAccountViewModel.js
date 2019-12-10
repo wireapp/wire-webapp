@@ -35,7 +35,7 @@ import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 import {modals, ModalsViewModel} from '../ModalsViewModel';
 import {User} from '../../entity/User';
 
-import {Config} from '../../auth/config';
+import {Config} from '../../Config';
 import {ConsentValue} from '../../user/ConsentValue';
 import {validateCharacter, validateHandle} from '../../user/UserHandleGenerator';
 import {UserRepository} from '../../user/UserRepository';
@@ -49,6 +49,8 @@ import {ContentViewModel} from '../ContentViewModel';
 
 import 'Components/availabilityState';
 import {isAppLockEnabled} from './AppLockViewModel';
+import {loadValue} from 'Util/StorageUtil';
+import {StorageKey} from '../../storage';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -133,8 +135,8 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.manageTeamUrl = getManageTeamUrl('client_settings');
     this.createTeamUrl = getCreateTeamUrl('client');
 
-    this.isTemporaryAndNonPersistent = isTemporaryClientAndNonPersistent;
-    this.isConsentCheckEnabled = () => z.config.FEATURE.CHECK_CONSENT;
+    this.isTemporaryAndNonPersistent = isTemporaryClientAndNonPersistent(loadValue(StorageKey.AUTH.PERSIST));
+    this.isConsentCheckEnabled = () => Config.FEATURE.CHECK_CONSENT;
     this.canEditProfile = user => user.managedBy() === User.CONFIG.MANAGED_BY.WIRE;
 
     this.updateProperties(this.propertiesRepository.properties);
@@ -341,9 +343,9 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   setPicture(newUserPicture) {
-    const isTooLarge = newUserPicture.size > z.config.MAXIMUM_IMAGE_FILE_SIZE;
+    const isTooLarge = newUserPicture.size > Config.MAXIMUM_IMAGE_FILE_SIZE;
     if (isTooLarge) {
-      const maximumSizeInMB = z.config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024;
+      const maximumSizeInMB = Config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024;
       const messageString = t('modalPictureTooLargeMessage', maximumSizeInMB);
       const titleString = t('modalPictureTooLargeHeadline');
 

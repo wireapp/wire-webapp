@@ -17,9 +17,9 @@
  *
  */
 
-import {Config} from './config';
+import {Config} from '../Config';
 
-export const externalRoute = {
+export const EXTERNAL_ROUTE = {
   PHONE_LOGIN: `/login/`,
   PWA: Config.URL.MOBILE_BASE,
   PWA_LOGIN: `${Config.URL.MOBILE_BASE}/login/`,

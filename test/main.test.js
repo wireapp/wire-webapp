@@ -17,6 +17,14 @@
  *
  */
 
+// Configure default test config
+window.wire = {};
+window.wire.env = {
+  FEATURE: {
+    DEFAULT_LOGIN_TEMPORARY_CLIENT: false,
+  },
+};
+
 // create initial div element with ID 'main' for react
 const main = document.createElement('div');
 main.id = 'main';

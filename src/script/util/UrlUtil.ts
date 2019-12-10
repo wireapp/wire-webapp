@@ -87,7 +87,7 @@ export const getLinksFromHtml = (html: string) => {
   const anchorTags = new RegExp(/<a[\s]+([^>]+)>((?:.(?!\<\/a\>))*.)<\/a>/, 'g');
   const links = html.match(anchorTags);
 
-  const hasLinks = links && links.length;
+  const hasLinks = links?.length;
   return hasLinks ? links.map(element => $(element)[0]) : [];
 };
 

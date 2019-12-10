@@ -17,7 +17,7 @@
  *
  */
 
-import {Consent, Self} from '@wireapp/api-client/dist/commonjs/self';
+import {Consent, Self} from '@wireapp/api-client/dist/self';
 import {AppAction} from '.';
 
 export enum SELF_ACTION {
@@ -41,6 +41,10 @@ export enum SELF_ACTION {
   SELF_SET_PASSWORD_SUCCESS = 'SELF_SET_PASSWORD_SUCCESS',
   SELF_SET_PASSWORD_FAILED = 'SELF_SET_PASSWORD_FAILED',
 
+  SELF_SET_PASSWORD_STATE_START = 'SELF_SET_PASSWORD_STATE_START',
+  SELF_SET_PASSWORD_STATE_SUCCESS = 'SELF_SET_PASSWORD_STATE_SUCCESS',
+  SELF_SET_PASSWORD_STATE_FAILED = 'SELF_SET_PASSWORD_STATE_FAILED',
+
   SELF_SET_EMAIL_START = 'SELF_SET_EMAIL_START',
   SELF_SET_EMAIL_SUCCESS = 'SELF_SET_EMAIL_SUCCESS',
   SELF_SET_EMAIL_FAILED = 'SELF_SET_EMAIL_FAILED',
@@ -53,6 +57,9 @@ export type SelfActions =
   | SetHandleStartAction
   | SetHandleSuccessAction
   | SetHandleFailedAction
+  | SetPasswordStateStartAction
+  | SetPasswordStateSuccessAction
+  | SetPasswordStateFailedAction
   | GetConsentsStartAction
   | GetConsentsSuccessAction
   | GetConsentsFailedAction
@@ -75,6 +82,18 @@ export interface SetHandleSuccessAction extends AppAction {
 }
 export interface SetHandleFailedAction extends AppAction {
   readonly type: SELF_ACTION.HANDLE_SET_FAILED;
+  readonly error: Error;
+}
+
+export interface SetPasswordStateStartAction extends AppAction {
+  readonly type: SELF_ACTION.SELF_SET_PASSWORD_STATE_START;
+}
+export interface SetPasswordStateSuccessAction extends AppAction {
+  readonly payload: boolean;
+  readonly type: SELF_ACTION.SELF_SET_PASSWORD_STATE_SUCCESS;
+}
+export interface SetPasswordStateFailedAction extends AppAction {
+  readonly type: SELF_ACTION.SELF_SET_PASSWORD_STATE_FAILED;
   readonly error: Error;
 }
 
@@ -118,6 +137,7 @@ export interface SetSelfEmailStartAction extends AppAction {
   readonly type: SELF_ACTION.SELF_SET_EMAIL_START;
 }
 export interface SetSelfEmailSuccessAction extends AppAction {
+  payload: string;
   readonly type: SELF_ACTION.SELF_SET_EMAIL_SUCCESS;
 }
 export interface SetSelfEmailFailedAction extends AppAction {
@@ -147,6 +167,18 @@ export class SelfActionCreator {
   static failedSetHandle = (error: Error): SetHandleFailedAction => ({
     error,
     type: SELF_ACTION.HANDLE_SET_FAILED,
+  });
+
+  static startSetPasswordState = (): SetPasswordStateStartAction => ({
+    type: SELF_ACTION.SELF_SET_PASSWORD_STATE_START,
+  });
+  static successfulSetPasswordState = ({hasPassword}: {hasPassword: boolean}): SetPasswordStateSuccessAction => ({
+    payload: hasPassword,
+    type: SELF_ACTION.SELF_SET_PASSWORD_STATE_SUCCESS,
+  });
+  static failedSetPasswordState = (error: Error): SetPasswordStateFailedAction => ({
+    error,
+    type: SELF_ACTION.SELF_SET_PASSWORD_STATE_FAILED,
   });
 
   static startFetchSelf = (): FetchSelfStartAction => ({
@@ -188,7 +220,8 @@ export class SelfActionCreator {
   static startSetSelfEmail = (): SetSelfEmailStartAction => ({
     type: SELF_ACTION.SELF_SET_EMAIL_START,
   });
-  static successfulSetSelfEmail = (): SetSelfEmailSuccessAction => ({
+  static successfulSetSelfEmail = (email: string): SetSelfEmailSuccessAction => ({
+    payload: email,
     type: SELF_ACTION.SELF_SET_EMAIL_SUCCESS,
   });
   static failedSetSelfEmail = (error: Error): SetSelfEmailFailedAction => ({

@@ -59,7 +59,7 @@ export class UserMapper {
    * @returns Mapped user entities
    */
   mapUsersFromJson(usersData: Object[]): (void | User)[] {
-    if (usersData && usersData.length) {
+    if (usersData?.length) {
       return usersData.filter(userData => userData).map(userData => this.mapUserFromJson(userData));
     }
     this.logger.warn('We got no user data from the backend');
@@ -108,8 +108,8 @@ export class UserMapper {
       userEntity.accent_id(accentId);
     }
 
-    const hasAsset = assets && assets.length;
-    const hasPicture = picture && picture.length;
+    const hasAsset = assets?.length;
+    const hasPicture = picture?.length;
     let mappedAssets;
     if (hasAsset) {
       mappedAssets = mapProfileAssets(userEntity.id, userData.assets);

@@ -65,7 +65,7 @@ export class StorageRepository {
 
   getValue(primaryKey: string): Promise<string | AmplifyRecord> {
     return this.storageService.load<AmplifyRecord>(this.AMPLIFY_STORE_NAME, primaryKey).then(record => {
-      if (record && record.value) {
+      if (record?.value) {
         return record.value;
       }
       throw new z.error.StorageError(z.error.StorageError.TYPE.NOT_FOUND);

@@ -29,8 +29,9 @@ import {Environment} from 'Util/Environment';
 import {exposeWrapperGlobals} from 'Util/wrapper';
 import {includesString} from 'Util/StringUtil';
 import {appendParameter} from 'Util/UrlUtil';
+import Dexie from 'dexie';
 
-import {Config} from '../auth/config';
+import {Config} from '../Config';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {LoadingViewModel} from '../view_model/LoadingViewModel';
 import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
@@ -105,13 +106,30 @@ import {AudioRepository} from '../audio/AudioRepository';
 import {MessageSender} from '../message/MessageSender';
 import {StorageService} from '../storage';
 import {BackupService} from '../backup/BackupService';
-import {MediaRepository} from '../media/MediaRepository';
-import {PermissionRepository} from '../permission/PermissionRepository';
-import {AssetUploader} from '../assets/AssetUploader';
 import {AuthRepository} from '../auth/AuthRepository';
+import {MediaRepository} from '../media/MediaRepository';
 import {AuthService} from '../auth/AuthService';
 import {GiphyRepository} from '../extension/GiphyRepository';
+import {AssetUploader} from '../assets/AssetUploader';
 import {GiphyService} from '../extension/GiphyService';
+import {PermissionRepository} from '../permission/PermissionRepository';
+import {loadValue} from 'Util/StorageUtil';
+
+function doRedirect(signOutReason) {
+  let url = `/auth/${location.search}`;
+  const isImmediateSignOutReason = App.CONFIG.SIGN_OUT_REASONS.IMMEDIATE.includes(signOutReason);
+  if (isImmediateSignOutReason) {
+    url = appendParameter(url, `${URLParameter.REASON}=${signOutReason}`);
+  }
+
+  const redirectToLogin = signOutReason !== SIGN_OUT_REASON.NOT_SIGNED_IN;
+  if (redirectToLogin) {
+    url = `${url}#login`;
+  }
+
+  Dexie.delete('/sqleet');
+  window.location.replace(url);
+}
 
 class App {
   static get CONFIG() {
@@ -135,15 +153,16 @@ class App {
    * Construct a new app.
    * @param {BackendClient} backendClient - Configured backend client
    * @param {Element} appContainer - DOM element that will hold the app
+   * @param {SQLeetEngine} [encryptedEngine] - Encrypted database handler
    */
-  constructor(backendClient, appContainer) {
+  constructor(backendClient, appContainer, encryptedEngine) {
     this.backendClient = backendClient;
     this.logger = getLogger('App');
     this.appContainer = appContainer;
 
     new WindowHandler();
 
-    this.service = this._setupServices();
+    this.service = this._setupServices(encryptedEngine);
     this.repository = this._setupRepositories();
     if (Config.FEATURE.ENABLE_DEBUG) {
       import('Util/DebugUtil').then(({DebugUtil}) => {
@@ -214,13 +233,13 @@ class App {
       repositories.cryptography,
       repositories.event,
       repositories.giphy,
-      new LinkPreviewRepository(new AssetService(resolve(graph.BackendClient)), repositories.properties),
+      new LinkPreviewRepository(this.service.asset, repositories.properties),
       sendingMessageQueue,
       serverTimeHandler,
       repositories.team,
       repositories.user,
       repositories.properties,
-      new AssetUploader(new AssetService(resolve(graph.BackendClient))),
+      new AssetUploader(this.service.asset),
     );
 
     const serviceMiddleware = new ServiceMiddleware(repositories.conversation, repositories.user);
@@ -278,10 +297,11 @@ class App {
 
   /**
    * Create all app services.
+   * @param {SQLeetEngine} [encryptedEngine] - Encrypted database handler
    * @returns {Object} All services
    */
-  _setupServices() {
-    const storageService = new StorageService();
+  _setupServices(encryptedEngine) {
+    const storageService = new StorageService(encryptedEngine);
     const eventService = Environment.browser.edge
       ? new EventServiceNoCompound(storageService)
       : new EventService(storageService);
@@ -351,10 +371,7 @@ class App {
         telemetry.time_step(AppInitTimingsStep.VALIDATED_CLIENT);
         telemetry.add_statistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity.type);
 
-        return this.repository.cryptography.loadCryptobox(
-          this.service.storage.db || this.service.storage.objectDb,
-          this.service.storage.dbName,
-        );
+        return this.repository.cryptography.loadCryptobox(this.service.storage.db);
       })
       .then(() => {
         loadingView.updateProgress(10);
@@ -699,7 +716,7 @@ class App {
       this.repository.calling.destroy();
 
       if (this.repository.user.isActivatedAccount()) {
-        if (isTemporaryClientAndNonPersistent()) {
+        if (isTemporaryClientAndNonPersistent(loadValue(StorageKey.AUTH.PERSIST))) {
           this.logout(SIGN_OUT_REASON.CLIENT_REMOVED, true);
         } else {
           this.repository.storage.terminate('window.onunload');
@@ -858,18 +875,7 @@ class App {
         return window.location.replace(url);
       }
 
-      let url = `/auth/${location.search}`;
-      const isImmediateSignOutReason = App.CONFIG.SIGN_OUT_REASONS.IMMEDIATE.includes(signOutReason);
-      if (isImmediateSignOutReason) {
-        url = appendParameter(url, `${URLParameter.REASON}=${signOutReason}`);
-      }
-
-      const redirectToLogin = signOutReason !== SIGN_OUT_REASON.NOT_SIGNED_IN;
-      if (redirectToLogin) {
-        url = `${url}#login`;
-      }
-
-      window.location.replace(url);
+      doRedirect(signOutReason);
     });
   }
 
@@ -882,7 +888,7 @@ class App {
    * @returns {undefined} No return value
    */
   disableDebugging() {
-    z.config.LOGGER.OPTIONS.domains['app.wire.com'] = () => 0;
+    Config.LOGGER.OPTIONS.domains['app.wire.com'] = () => 0;
     this.repository.properties.savePreference(PROPERTIES_TYPE.ENABLE_DEBUGGING, false);
   }
 
@@ -891,7 +897,7 @@ class App {
    * @returns {undefined} No return value
    */
   enableDebugging() {
-    z.config.LOGGER.OPTIONS.domains['app.wire.com'] = () => 300;
+    Config.LOGGER.OPTIONS.domains['app.wire.com'] = () => 300;
     this.repository.properties.savePreference(PROPERTIES_TYPE.ENABLE_DEBUGGING, true);
   }
 
@@ -916,7 +922,7 @@ class App {
 // Setting up the App
 //##############################################################################
 
-$(() => {
+$(async () => {
   enableLogging(Config.FEATURE.ENABLE_DEBUG);
   const appContainer = document.getElementById('wire-main');
   if (appContainer) {
@@ -925,7 +931,15 @@ $(() => {
       restUrl: Config.BACKEND_REST,
       webSocketUrl: Config.BACKEND_WS,
     });
-    wire.app = new App(backendClient, appContainer);
+    const persist = loadValue(StorageKey.AUTH.PERSIST);
+    if (persist === undefined) {
+      doRedirect(SIGN_OUT_REASON.NOT_SIGNED_IN);
+    } else if (isTemporaryClientAndNonPersistent(persist)) {
+      const engine = await StorageService.getUnitializedEngine();
+      wire.app = new App(backendClient, appContainer, engine);
+    } else {
+      wire.app = new App(backendClient, appContainer);
+    }
   }
 });
 

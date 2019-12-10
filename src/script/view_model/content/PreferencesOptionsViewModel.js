@@ -26,7 +26,7 @@ import {downloadBlob} from 'Util/util';
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 import {WebAppEvents} from '../../event/WebApp';
 
-import {Config} from '../../auth/config';
+import {Config} from '../../Config';
 import {THEMES as ThemeViewModelThemes} from '../ThemeViewModel';
 import {ModalsViewModel} from '../ModalsViewModel';
 import {AudioPreference} from '../../audio/AudioPreference';

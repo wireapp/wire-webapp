@@ -21,7 +21,6 @@ const {createLogger} = require('redux-logger');
 import {APIClient} from '@wireapp/api-client';
 import {TypeUtil} from '@wireapp/commons';
 import {Account} from '@wireapp/core';
-import * as StoreEngine from '@wireapp/store-engine';
 import Cookies, {CookiesStatic} from 'js-cookie';
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
@@ -38,24 +37,39 @@ export interface MockStoreParameters {
 }
 
 const defaultActions = actionRoot;
-const defaultClient = new APIClient({store: new StoreEngine.MemoryEngine(), urls: APIClient.BACKEND.STAGING});
+const defaultClient = new APIClient({urls: APIClient.BACKEND.STAGING});
 const defaultCore = new Account(defaultClient);
 const defaultLocalStorage = window.localStorage;
 const defaultCookieStore = Cookies;
+const defaultConfig = {
+  APP_INSTANCE_ID: 'app-id',
+  FEATURE: {
+    CHECK_CONSENT: true,
+    DEFAULT_LOGIN_TEMPORARY_CLIENT: false,
+    ENABLE_ACCOUNT_REGISTRATION: true,
+    ENABLE_DEBUG: true,
+    ENABLE_PHONE_LOGIN: true,
+    ENABLE_SSO: true,
+    PERSIST_TEMPORARY_CLIENTS: true,
+  },
+};
 
 export const mockStoreFactory = (
   parameters: MockStoreParameters = {
     actions: defaultActions,
     apiClient: defaultClient,
+    config: defaultConfig,
     cookieStore: defaultCookieStore,
     core: defaultCore,
     localStorage: defaultLocalStorage,
   },
 ) => {
-  const {actions, apiClient, cookieStore, core, localStorage} = parameters;
-  (core as any).apiClient = apiClient;
+  const {actions, apiClient, cookieStore, core, config, localStorage} = parameters;
+  if (core) {
+    (core as any).apiClient = apiClient;
+  }
   return configureStore<TypeUtil.RecursivePartial<RootState>, ThunkDispatch>([
-    thunk.withExtraArgument({actions, apiClient, cookieStore, core, localStorage}),
+    thunk.withExtraArgument({actions, apiClient, cookieStore, core, config: config || defaultConfig, localStorage}),
     createLogger({
       actionTransformer(action: any): string {
         return JSON.stringify(action);

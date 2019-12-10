@@ -22,7 +22,7 @@ import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {BackendClientError} from '../error/BackendClientError';
 
-import {AccessTokenData, LoginData} from '@wireapp/api-client/dist/commonjs/auth';
+import {AccessTokenData, LoginData} from '@wireapp/api-client/dist/auth';
 import {BackendClient} from '../service/BackendClient';
 import {QUEUE_STATE} from '../service/QueueState';
 

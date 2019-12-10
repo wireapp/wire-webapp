@@ -22,16 +22,16 @@ import {Account} from '@wireapp/core';
 import {CookiesStatic} from 'js-cookie';
 import {ActionCreatorsMapObject, AnyAction, Dispatch, bindActionCreators as bindActionCreatorsRedux} from 'redux';
 import {ThunkAction as ReduxThunkAction, ThunkDispatch as ReduxThunkDispatch} from 'redux-thunk';
-import {Config} from '../../config';
+import {Config} from '../../../Config';
 import {ActionRoot} from '../action';
-import {AuthState, authReducer, initialState as initialAuthState} from './authReducer';
-import {ClientState, clientReducer, initialState as initialClientState} from './clientReducer';
-import {ConversationState, conversationReducer, initialState as initialConversationState} from './conversationReducer';
-import {CookieState, cookieReducer, initialState as initialCookieState} from './cookieReducer';
-import {InvitationState, initialState as initialInvitationState, invitationReducer} from './inviteReducer';
-import {LanguageState, initialState as initialLanguageState, languageReducer} from './languageReducer';
-import {RuntimeState, initialState as initialRuntimeState, runtimeReducer} from './runtimeReducer';
-import {SelfState, initialState as initialSelfState, selfReducer} from './selfReducer';
+import {AuthState, authReducer, initialAuthState} from './authReducer';
+import {ClientState, clientReducer, initialClientState} from './clientReducer';
+import {ConversationState, conversationReducer, initialConversationState} from './conversationReducer';
+import {CookieState, cookieReducer, initialCookieState} from './cookieReducer';
+import {InvitationState, initialInvitationState, invitationReducer} from './inviteReducer';
+import {LanguageState, initialLanguageState, languageReducer} from './languageReducer';
+import {RuntimeState, initialRuntimeState, runtimeReducer} from './runtimeReducer';
+import {SelfState, initialSelfState, selfReducer} from './selfReducer';
 
 export type Api = {
   actions: ActionRoot;

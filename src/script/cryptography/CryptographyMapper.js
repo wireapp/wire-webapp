@@ -52,17 +52,19 @@ export class CryptographyMapper {
    * @param {Object} event - Event of BackendEvent.CONVERSATION.OTR-ASSET-ADD or BackendEvent.CONVERSATION.OTR-MESSAGE-ADD
    * @returns {Promise} Resolves with the mapped event
    */
-  mapGenericMessage(genericMessage, event) {
+  async mapGenericMessage(genericMessage, event) {
     if (!genericMessage) {
-      return Promise.reject(new z.error.CryptographyError(z.error.CryptographyError.TYPE.NO_GENERIC_MESSAGE));
+      throw new z.error.CryptographyError(z.error.CryptographyError.TYPE.NO_GENERIC_MESSAGE);
     }
 
-    return Promise.resolve()
-      .then(() => (genericMessage.external ? this._unwrapExternal(genericMessage.external, event) : genericMessage))
-      .then(unwrappedGenericMessage => this._mapGenericMessage(unwrappedGenericMessage, event));
+    if (genericMessage.external) {
+      genericMessage = await this._unwrapExternal(genericMessage.external, event);
+    }
+
+    return this._mapGenericMessage(genericMessage, event);
   }
 
-  _mapGenericMessage(genericMessage, event) {
+  async _mapGenericMessage(genericMessage, event) {
     let specificContent;
 
     switch (genericMessage.content) {
@@ -97,12 +99,12 @@ export class CryptographyMapper {
       }
 
       case GENERIC_MESSAGE_TYPE.EDITED: {
-        specificContent = this._mapEdited(genericMessage.edited, genericMessage.messageId);
+        specificContent = await this._mapEdited(genericMessage.edited, genericMessage.messageId);
         break;
       }
 
       case GENERIC_MESSAGE_TYPE.EPHEMERAL: {
-        specificContent = this._mapEphemeral(genericMessage, event);
+        specificContent = await this._mapEphemeral(genericMessage, event);
         break;
       }
 
@@ -137,7 +139,8 @@ export class CryptographyMapper {
       }
 
       case GENERIC_MESSAGE_TYPE.TEXT: {
-        specificContent = addMetadata(this._mapText(genericMessage.text), genericMessage.text);
+        const mappedText = await this._mapText(genericMessage.text);
+        specificContent = addMetadata(mappedText, genericMessage.text);
         break;
       }
 
@@ -297,17 +300,17 @@ export class CryptographyMapper {
     };
   }
 
-  _mapEdited(edited, eventId) {
-    const mappedMessage = this._mapText(edited.text, eventId);
+  async _mapEdited(edited, eventId) {
+    const mappedMessage = await this._mapText(edited.text, eventId);
     mappedMessage.data.replacing_message_id = edited.replacingMessageId;
     return mappedMessage;
   }
 
-  _mapEphemeral(genericMessage, event) {
+  async _mapEphemeral(genericMessage, event) {
     const messageTimer = genericMessage.ephemeral[PROTO_MESSAGE_TYPE.EPHEMERAL_EXPIRATION];
     genericMessage.ephemeral.messageId = genericMessage.messageId;
 
-    const embeddedMessage = this._mapGenericMessage(genericMessage.ephemeral, event);
+    const embeddedMessage = await this._mapGenericMessage(genericMessage.ephemeral, event);
     embeddedMessage.ephemeral_expires = ConversationEphemeralHandler.validateTimer(messageTimer);
 
     return embeddedMessage;
@@ -321,26 +324,23 @@ export class CryptographyMapper {
    * @param {JSON} event - Backend event of type 'conversation.otr-message-add'
    * @returns {Promise} Resolves with generic message
    */
-  _unwrapExternal(external, event) {
-    return Promise.resolve(external)
-      .then(({otrKey, sha256}) => {
-        const eventData = event.data;
-
-        if (!eventData.data || !otrKey || !sha256) {
-          throw new Error('Not all expected properties defined');
-        }
-
-        const cipherText = base64ToArray(eventData.data).buffer;
-        const keyBytes = new Uint8Array(otrKey).buffer;
-        const referenceSha256 = new Uint8Array(sha256).buffer;
-
-        return decryptAesAsset(cipherText, keyBytes, referenceSha256);
-      })
-      .then(externalMessageBuffer => GenericMessage.decode(new Uint8Array(externalMessageBuffer)))
-      .catch(error => {
-        this.logger.error(`Failed to unwrap external message: ${error.message}`, error);
-        throw new z.error.CryptographyError(z.error.CryptographyError.TYPE.BROKEN_EXTERNAL);
-      });
+  async _unwrapExternal(external, event) {
+    const {otrKey, sha256} = external;
+    try {
+      const eventData = event.data;
+      if (!eventData.data || !otrKey || !sha256) {
+        throw new Error('Not all expected properties defined');
+      }
+      const cipherTextArray = await base64ToArray(eventData.data);
+      const cipherText = cipherTextArray.buffer;
+      const keyBytes = new Uint8Array(otrKey).buffer;
+      const referenceSha256 = new Uint8Array(sha256).buffer;
+      const externalMessageBuffer = await decryptAesAsset(cipherText, keyBytes, referenceSha256);
+      return GenericMessage.decode(new Uint8Array(externalMessageBuffer));
+    } catch (error) {
+      this.logger.error(`Failed to unwrap external message: ${error.message}`, error);
+      throw new z.error.CryptographyError(z.error.CryptographyError.TYPE.BROKEN_EXTERNAL);
+    }
   }
 
   _mapHidden(hidden) {
@@ -425,7 +425,7 @@ export class CryptographyMapper {
     };
   }
 
-  _mapText(text) {
+  async _mapText(text) {
     const {mentions: protoMentions, quote: protoQuote} = text;
 
     const protoLinkPreviews = text[PROTO_MESSAGE_TYPE.LINK_PREVIEWS];
@@ -435,17 +435,28 @@ export class CryptographyMapper {
       protoMentions.length = CryptographyMapper.CONFIG.MAX_MENTIONS_PER_MESSAGE;
     }
 
-    return {
+    const mentions = await Promise.all(
+      protoMentions.map(protoMention => arrayToBase64(Mention.encode(protoMention).finish())),
+    );
+    const previews = await Promise.all(
+      protoLinkPreviews.map(protoLinkPreview => arrayToBase64(LinkPreview.encode(protoLinkPreview).finish())),
+    );
+
+    const mappedText = {
       data: {
         content: `${text.content}`,
-        mentions: protoMentions.map(protoMention => arrayToBase64(Mention.encode(protoMention).finish())),
-        previews: protoLinkPreviews.map(protoLinkPreview =>
-          arrayToBase64(LinkPreview.encode(protoLinkPreview).finish()),
-        ),
-        quote: protoQuote && arrayToBase64(Quote.encode(protoQuote).finish()),
+        mentions,
+        previews,
       },
       type: ClientEvent.CONVERSATION.MESSAGE_ADD,
     };
+
+    if (protoQuote) {
+      const quote = await arrayToBase64(Quote.encode(protoQuote).finish());
+      mappedText.data.quote = quote;
+    }
+
+    return mappedText;
   }
 }
 

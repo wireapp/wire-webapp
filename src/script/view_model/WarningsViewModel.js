@@ -24,7 +24,7 @@ import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {buildSupportUrl} from 'Util/UrlUtil';
 import {afterRender} from 'Util/util';
 
-import {Config} from '../auth/config';
+import {Config} from '../Config';
 import {ModalsViewModel} from './ModalsViewModel';
 import {PermissionState} from '../notification/PermissionState';
 import {WebAppEvents} from '../event/WebApp';
@@ -75,6 +75,7 @@ export class WarningsViewModel {
     this.visibleWarning = ko.pureComputed(() => this.warnings()[this.warnings().length - 1]);
     this.Environment = Environment;
     this.TYPE = WarningsViewModel.TYPE;
+    this.Config = Config;
 
     this.warnings.subscribe(warnings => {
       let topMargin;
@@ -130,7 +131,7 @@ export class WarningsViewModel {
         amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
           primaryAction: {
             action: () => {
-              const url = buildSupportUrl(z.config.SUPPORT.ID.MICROPHONE_ACCESS_DENIED);
+              const url = buildSupportUrl(Config.SUPPORT.ID.MICROPHONE_ACCESS_DENIED);
               safeWindowOpen(url);
             },
             text: t('modalCallNoMicrophoneAction'),

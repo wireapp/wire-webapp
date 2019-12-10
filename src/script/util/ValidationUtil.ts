@@ -18,7 +18,7 @@
  */
 
 import {AssetRetentionPolicy} from '../assets/AssetRetentionPolicy';
-import {config} from '../config';
+import {Config} from '../Config';
 
 export class ValidationUtilError extends Error {
   constructor(message = 'Unknown ValidationUtilError') {
@@ -44,7 +44,7 @@ export const isValidUsername = (username: string) => /^@?[a-z_0-9]{2,21}$/.test(
  * @returns True, if the input a phone number
  */
 export const isValidPhoneNumber = (phoneNumber: string) => {
-  const allowDebugPhoneNumbers = config.FEATURE.ENABLE_DEBUG;
+  const allowDebugPhoneNumbers = Config.FEATURE.ENABLE_DEBUG;
   const regularExpression = allowDebugPhoneNumbers ? /^\+[0-9]\d{1,14}$/ : /^\+[1-9]\d{1,14}$/;
 
   return regularExpression.test(phoneNumber);

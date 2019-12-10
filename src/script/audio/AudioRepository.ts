@@ -17,7 +17,7 @@
  *
  */
 
-import {WebappProperties} from '@wireapp/api-client/dist/commonjs/user/data';
+import {WebappProperties} from '@wireapp/api-client/dist/user/data';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {Logger} from 'logdown';
@@ -181,7 +181,7 @@ export class AudioRepository {
 
   stop(audioId: AudioType): void {
     const audioElement = this.getSoundById(audioId);
-    if (audioElement && !audioElement.paused) {
+    if (!audioElement?.paused) {
       this.logger.info(`Stopping sound '${audioId}'`);
       audioElement.pause();
     }

@@ -41,7 +41,7 @@ interface ParticipantItemParams {
   selfInTeam: boolean;
 }
 
-class ParticipanItem {
+class ParticipantItem {
   avatarSize: string;
   participant: User | ServiceEntity;
   participantName: () => string | ko.Observable<string>;
@@ -81,7 +81,6 @@ class ParticipanItem {
     this.isService = this.participant instanceof ServiceEntity || this.participant.isService;
     this.isUser = this.participant instanceof User && !this.participant.isService;
     this.selfInTeam = selfInTeam;
-    const isTemporaryGuest = this.isUser && (this.participant as User).isTemporaryGuest();
     this.badge = badge;
 
     this.isDefaultMode = mode === UserlistMode.DEFAULT;
@@ -92,6 +91,7 @@ class ParticipanItem {
     this.showCamera = showCamera;
     const hasCustomInfo = !!customInfo;
 
+    const isTemporaryGuest = this.isUser && (this.participant as User).isTemporaryGuest();
     this.hasUsernameInfo = this.isUser && !hideInfo && !hasCustomInfo && !isTemporaryGuest;
 
     if (hasCustomInfo) {
@@ -171,6 +171,6 @@ ko.components.register('participant-item', {
   `,
   viewModel: {
     createViewModel: (props: ParticipantItemParams, componentInfo: any) =>
-      new ParticipanItem(props, componentInfo.element),
+      new ParticipantItem(props, componentInfo.element),
   },
 });

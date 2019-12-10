@@ -17,7 +17,7 @@
  *
  */
 
-import {TeamInvitation} from '@wireapp/api-client/dist/commonjs/team';
+import {TeamInvitation} from '@wireapp/api-client/dist/team';
 import {INVITATION_ACTION, InvitationActions} from '../action/creator/';
 
 export interface InvitationState {
@@ -26,13 +26,16 @@ export interface InvitationState {
   invites: TeamInvitation[];
 }
 
-export const initialState: InvitationState = {
+export const initialInvitationState: InvitationState = {
   error: null,
   fetching: false,
   invites: [],
 };
 
-export function invitationReducer(state: InvitationState = initialState, action: InvitationActions): InvitationState {
+export function invitationReducer(
+  state: InvitationState = initialInvitationState,
+  action: InvitationActions,
+): InvitationState {
   switch (action.type) {
     case INVITATION_ACTION.INVITE_ADD_START: {
       return {

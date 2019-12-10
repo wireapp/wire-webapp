@@ -17,8 +17,8 @@
  *
  */
 
-import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/commonjs/event';
-import {Notification, NotificationList} from '@wireapp/api-client/dist/commonjs/notification';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
+import {Notification, NotificationList} from '@wireapp/api-client/dist/notification';
 import {DatabaseKeys} from '@wireapp/core/dist/notification/NotificationDatabaseRepository';
 import {Logger, getLogger} from 'Util/Logger';
 import {EventRecord, StorageSchemata, StorageService} from '../storage/';
@@ -117,7 +117,7 @@ export class NotificationService {
         throw new z.error.EventError(z.error.EventError.TYPE.DATABASE_FAILURE);
       })
       .then(record => {
-        if (record && record.value) {
+        if (record?.value) {
           return record.value;
         }
         throw new z.error.EventError(z.error.EventError.TYPE.NO_LAST_DATE);
@@ -136,7 +136,7 @@ export class NotificationService {
         throw new z.error.EventError(z.error.EventError.TYPE.DATABASE_FAILURE);
       })
       .then(record => {
-        if (record && record.value) {
+        if (record?.value) {
           return record.value;
         }
         throw new z.error.EventError(z.error.EventError.TYPE.NO_LAST_ID);
@@ -151,7 +151,7 @@ export class NotificationService {
     return this.storageService
       .load<{value: string}>(this.AMPLIFY_STORE_NAME, NotificationService.CONFIG.PRIMARY_KEY_MISSED)
       .then(record => {
-        if (record && record.value) {
+        if (record?.value) {
           return record.value;
         }
         return undefined;
@@ -195,7 +195,8 @@ export class NotificationService {
     let message: EventRecord;
 
     if (this.storageService.isTemporaryAndNonPersistent) {
-      message = Object.values(this.storageService.objectDb.events).filter(event => event.id === messageId)[0];
+      const events = await this.storageService.getAll<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS);
+      message = Object.values(events).filter(event => event.id === messageId)[0];
     } else {
       message = await this.storageService.db
         .table(StorageSchemata.OBJECT_STORE.EVENTS)

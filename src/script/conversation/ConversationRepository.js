@@ -97,7 +97,7 @@ import {StatusType} from '../message/StatusType';
 import {SuperType} from '../message/SuperType';
 import {MessageCategory} from '../message/MessageCategory';
 import {ReactionType} from '../message/ReactionType';
-import {Config} from '../auth/config';
+import {Config} from '../Config';
 
 import {BaseError} from '../error/BaseError';
 import {BackendClientError} from '../error/BackendClientError';
@@ -321,13 +321,16 @@ export class ConversationRepository {
     this.eventService.addEventDeletedListener(this._deleteLocalMessageEntity.bind(this));
   }
 
-  _updateLocalMessageEntity({obj: updatedEvent, oldObj: oldEvent}) {
+  async _updateLocalMessageEntity({obj: updatedEvent, oldObj: oldEvent}) {
     const conversationEntity = this.find_conversation_by_id(updatedEvent.conversation);
-    const replacedMessageEntity = this._replaceMessageInConversation(conversationEntity, oldEvent.id, updatedEvent);
+    const replacedMessageEntity = await this._replaceMessageInConversation(
+      conversationEntity,
+      oldEvent.id,
+      updatedEvent,
+    );
     if (replacedMessageEntity) {
-      this._updateMessageUserEntities(replacedMessageEntity).then(messageEntity => {
-        amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.UPDATED, oldEvent.id, messageEntity);
-      });
+      const messageEntity = await this._updateMessageUserEntities(replacedMessageEntity);
+      amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.UPDATED, oldEvent.id, messageEntity);
     }
   }
 
@@ -575,7 +578,7 @@ export class ConversationRepository {
       : new Date(conversationEntity.get_latest_timestamp(this.serverTimeHandler.toServerTimestamp()) + 1);
 
     return this.eventService
-      .loadPrecedingEvents(conversationEntity.id, new Date(0), upperBound, z.config.MESSAGES_FETCH_LIMIT)
+      .loadPrecedingEvents(conversationEntity.id, new Date(0), upperBound, Config.MESSAGES_FETCH_LIMIT)
       .then(events => this._addPrecedingEventsToConversation(events, conversationEntity))
       .then(mappedMessageEntities => {
         conversationEntity.is_pending(false);
@@ -584,7 +587,7 @@ export class ConversationRepository {
   }
 
   _addPrecedingEventsToConversation(events, conversationEntity) {
-    const hasAdditionalMessages = events.length === z.config.MESSAGES_FETCH_LIMIT;
+    const hasAdditionalMessages = events.length === Config.MESSAGES_FETCH_LIMIT;
 
     return this._addEventsToConversation(events, conversationEntity).then(mappedMessageEntities => {
       conversationEntity.hasAdditionalMessages(hasAdditionalMessages);
@@ -674,7 +677,7 @@ export class ConversationRepository {
     conversationEntity.is_pending(true);
 
     return this.eventService
-      .loadFollowingEvents(conversationEntity.id, messageDate, z.config.MESSAGES_FETCH_LIMIT, includeMessage)
+      .loadFollowingEvents(conversationEntity.id, messageDate, Config.MESSAGES_FETCH_LIMIT, includeMessage)
       .then(events => this._addEventsToConversation(events, conversationEntity))
       .then(mappedNessageEntities => {
         conversationEntity.is_pending(false);
@@ -2497,33 +2500,29 @@ export class ConversationRepository {
    * @param {string} isoDate - If defined it will update event timestamp
    * @returns {Promise} Resolves when sent status was updated
    */
-  _updateMessageAsSent(conversationEntity, eventJson, isoDate) {
-    return this.get_message_in_conversation_by_id(conversationEntity, eventJson.id)
-      .then(messageEntity => {
-        messageEntity.status(StatusType.SENT);
-
-        const changes = {status: StatusType.SENT};
-        if (isoDate) {
-          changes.time = isoDate;
-
-          const timestamp = new Date(isoDate).getTime();
-          if (!isNaN(timestamp)) {
-            messageEntity.timestamp(timestamp);
-            conversationEntity.update_timestamp_server(timestamp, true);
-            conversationEntity.update_timestamps(messageEntity);
-          }
+  async _updateMessageAsSent(conversationEntity, eventJson, isoDate) {
+    try {
+      const messageEntity = await this.get_message_in_conversation_by_id(conversationEntity, eventJson.id);
+      messageEntity.status(StatusType.SENT);
+      const changes = {status: StatusType.SENT};
+      if (isoDate) {
+        changes.time = isoDate;
+        const timestamp = new Date(isoDate).getTime();
+        if (!isNaN(timestamp)) {
+          messageEntity.timestamp(timestamp);
+          conversationEntity.update_timestamp_server(timestamp, true);
+          conversationEntity.update_timestamps(messageEntity);
         }
-
-        this.checkMessageTimer(messageEntity);
-        if (EventTypeHandling.STORE.includes(messageEntity.type) || messageEntity.has_asset_image()) {
-          return this.eventService.updateEvent(messageEntity.primary_key, changes);
-        }
-      })
-      .catch(error => {
-        if (error.type !== z.error.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
-          throw error;
-        }
-      });
+      }
+      this.checkMessageTimer(messageEntity);
+      if (EventTypeHandling.STORE.includes(messageEntity.type) || messageEntity.has_asset_image()) {
+        return this.eventService.updateEvent(messageEntity.primary_key, changes);
+      }
+    } catch (error) {
+      if (error.type !== z.error.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
+        throw error;
+      }
+    }
   }
 
   /**
@@ -2533,35 +2532,34 @@ export class ConversationRepository {
    * @param {EventInfoEntity} eventInfoEntity - Event to be send
    * @returns {Promise} Resolves after sending the external message
    */
-  _sendExternalGenericMessage(eventInfoEntity) {
+  async _sendExternalGenericMessage(eventInfoEntity) {
     const {genericMessage, options} = eventInfoEntity;
     const messageType = eventInfoEntity.getType();
     this.logger.info(`Sending external message of type '${messageType}'`, genericMessage);
 
-    return encryptAesAsset(GenericMessage.encode(genericMessage).finish())
-      .then(({cipherText, keyBytes, sha256}) => {
-        keyBytes = new Uint8Array(keyBytes);
-        sha256 = new Uint8Array(sha256);
+    try {
+      const encryptedAsset = await encryptAesAsset(GenericMessage.encode(genericMessage).finish());
+      const keyBytes = new Uint8Array(encryptedAsset.keyBytes);
+      const sha256 = new Uint8Array(encryptedAsset.sha256);
 
-        const externalMessage = new External({otrKey: keyBytes, sha256});
+      const externalMessage = new External({otrKey: keyBytes, sha256});
 
-        const genericMessageExternal = new GenericMessage({
-          [GENERIC_MESSAGE_TYPE.EXTERNAL]: externalMessage,
-          messageId: createRandomUuid(),
-        });
-
-        return this.cryptography_repository
-          .encryptGenericMessage(options.recipients, genericMessageExternal)
-          .then(payload => {
-            payload.data = arrayToBase64(cipherText);
-            payload.native_push = options.nativePush;
-            return this._sendEncryptedMessage(eventInfoEntity, payload);
-          });
-      })
-      .catch(error => {
-        this.logger.info('Failed sending external message', error);
-        throw error;
+      const genericMessageExternal = new GenericMessage({
+        [GENERIC_MESSAGE_TYPE.EXTERNAL]: externalMessage,
+        messageId: createRandomUuid(),
       });
+
+      const payload = await this.cryptography_repository.encryptGenericMessage(
+        options.recipients,
+        genericMessageExternal,
+      );
+      payload.data = await arrayToBase64(encryptedAsset.cipherText);
+      payload.native_push = options.nativePush;
+      return this._sendEncryptedMessage(eventInfoEntity, payload);
+    } catch (error) {
+      this.logger.info('Failed sending external message', error);
+      throw error;
+    }
   }
 
   /**
@@ -2959,7 +2957,8 @@ export class ConversationRepository {
     let messageId;
     try {
       const uploadStarted = Date.now();
-      messageId = (await this.send_asset_metadata(conversationEntity, file, asImage)).id;
+      const injectedEvent = await this.send_asset_metadata(conversationEntity, file, asImage);
+      messageId = injectedEvent.id;
       if (isVideo(file)) {
         await this.sendAssetPreview(conversationEntity, file, messageId);
       }
@@ -3861,13 +3860,13 @@ export class ConversationRepository {
       .then(messageEntity => this._updateMessageUserEntities(messageEntity));
   }
 
-  _replaceMessageInConversation(conversationEntity, eventId, newData) {
+  async _replaceMessageInConversation(conversationEntity, eventId, newData) {
     const originalMessage = conversationEntity.getMessage(eventId);
     if (!originalMessage) {
       return undefined;
     }
-    const replacedMessageEntity = this.event_mapper.updateMessageEvent(originalMessage, newData);
-    this.ephemeralHandler.validateMessage(replacedMessageEntity);
+    const replacedMessageEntity = await this.event_mapper.updateMessageEvent(originalMessage, newData);
+    await this.ephemeralHandler.validateMessage(replacedMessageEntity);
     return replacedMessageEntity;
   }
 
@@ -3879,16 +3878,15 @@ export class ConversationRepository {
    * @param {Object} eventJson - Event data
    * @returns {Promise} Promise that resolves with the message entity for the event
    */
-  _addEventToConversation(conversationEntity, eventJson) {
-    return this._initMessageEntity(conversationEntity, eventJson).then(messageEntity => {
-      if (conversationEntity && messageEntity) {
-        const wasAdded = conversationEntity.add_message(messageEntity);
-        if (wasAdded) {
-          this.ephemeralHandler.validateMessage(messageEntity);
-        }
+  async _addEventToConversation(conversationEntity, eventJson) {
+    const messageEntity = await this._initMessageEntity(conversationEntity, eventJson);
+    if (conversationEntity && messageEntity) {
+      const wasAdded = conversationEntity.add_message(messageEntity);
+      if (wasAdded) {
+        await this.ephemeralHandler.validateMessage(messageEntity);
       }
-      return {conversationEntity, messageEntity};
-    });
+    }
+    return {conversationEntity, messageEntity};
   }
 
   /**
@@ -3900,19 +3898,16 @@ export class ConversationRepository {
    * @param {boolean} [prepend=true] - Should existing messages be prepended
    * @returns {Promise} Resolves with an array of mapped messages
    */
-  _addEventsToConversation(events, conversationEntity, prepend = true) {
-    return this.event_mapper
-      .mapJsonEvents(events, conversationEntity, true)
-      .then(messageEntities => this._updateMessagesUserEntities(messageEntities))
-      .then(messageEntities => this.ephemeralHandler.validateMessages(messageEntities))
-      .then(messageEntities => {
-        if (prepend && conversationEntity.messages().length) {
-          conversationEntity.prepend_messages(messageEntities);
-        } else {
-          conversationEntity.add_messages(messageEntities);
-        }
-        return messageEntities;
-      });
+  async _addEventsToConversation(events, conversationEntity, prepend = true) {
+    const mappedEvents = await this.event_mapper.mapJsonEvents(events, conversationEntity, true);
+    const updatedEvents = await this._updateMessagesUserEntities(mappedEvents);
+    const validatedMessages = await this.ephemeralHandler.validateMessages(updatedEvents);
+    if (prepend && conversationEntity.messages().length) {
+      conversationEntity.prepend_messages(validatedMessages);
+    } else {
+      conversationEntity.add_messages(validatedMessages);
+    }
+    return validatedMessages;
   }
 
   /**

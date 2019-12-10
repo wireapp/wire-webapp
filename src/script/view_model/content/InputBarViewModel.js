@@ -28,7 +28,6 @@ import {renderMessage} from 'Util/messageRenderer';
 
 import {KEY, isFunctionKey, insertAtCaret} from 'Util/KeyboardUtil';
 import {escapeString} from 'Util/SanitizationUtil';
-import {trimEnd, trimStart} from 'Util/StringUtil';
 
 import {resolve, graph} from '../../config/appResolver';
 import {ModalsViewModel} from '../ModalsViewModel';
@@ -43,7 +42,7 @@ import {MentionEntity} from '../../message/MentionEntity';
 
 import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
-import {Config} from '../../auth/config';
+import {Config} from '../../Config';
 import {AssetUploader} from '../../assets/AssetUploader';
 import {AssetService} from '../../assets/AssetService';
 
@@ -529,19 +528,19 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     }
 
     const beforeLength = this.input().length;
-    const messageTrimmedStart = trimStart(this.input());
+    const messageTrimmedStart = this.input().trimLeft();
     const afterLength = messageTrimmedStart.length;
 
     const updatedMentions = this.updateMentionRanges(this.currentMentions(), 0, 0, afterLength - beforeLength);
     this.currentMentions(updatedMentions);
 
-    const messageText = trimEnd(messageTrimmedStart);
+    const messageText = messageTrimmedStart.trimRight();
 
-    const isMessageTextTooLong = messageText.length > z.config.MAXIMUM_MESSAGE_LENGTH;
+    const isMessageTextTooLong = messageText.length > Config.MAXIMUM_MESSAGE_LENGTH;
     if (isMessageTextTooLong) {
       return amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
         text: {
-          message: t('modalConversationMessageTooLongMessage', z.config.MAXIMUM_MESSAGE_LENGTH),
+          message: t('modalConversationMessageTooLongMessage', Config.MAXIMUM_MESSAGE_LENGTH),
           title: t('modalConversationMessageTooLongHeadline'),
         },
       });
@@ -808,7 +807,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   uploadImages(images) {
     if (!this._isHittingUploadLimit(images)) {
       for (const image of Array.from(images)) {
-        const isTooLarge = image.size > z.config.MAXIMUM_IMAGE_FILE_SIZE;
+        const isTooLarge = image.size > Config.MAXIMUM_IMAGE_FILE_SIZE;
         if (isTooLarge) {
           return this._showUploadWarning(image);
         }
@@ -849,8 +848,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     }
 
     const uploadLimit = this.selfUser().inTeam()
-      ? z.config.MAXIMUM_ASSET_FILE_SIZE_TEAM
-      : z.config.MAXIMUM_ASSET_FILE_SIZE_PERSONAL;
+      ? Config.MAXIMUM_ASSET_FILE_SIZE_TEAM
+      : Config.MAXIMUM_ASSET_FILE_SIZE_PERSONAL;
     if (!this._isHittingUploadLimit(files)) {
       for (const file of fileArray) {
         const isTooLarge = file.size > uploadLimit;
@@ -902,7 +901,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
   _showUploadWarning(image) {
     const isGif = image.type === 'image/gif';
-    const maxSize = z.config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024;
+    const maxSize = Config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024;
     const message = isGif ? t('modalGifTooLargeMessage', maxSize) : t('modalPictureTooLargeMessage', maxSize);
     const title = isGif ? t('modalGifTooLargeHeadline') : t('modalPictureTooLargeHeadline');
 

@@ -48,7 +48,7 @@
                   <div class="input-group" data-bind="css: {'input-error': failed_validation_phone}">
                     <input class="input phone" id="wire-login-country-code" type="tel" autocomplete="off" maxlength="5" spellcheck="false"
                            data-bind="event: {change: changed_country_code, input: clear_error}, attr: {title: t('authAccountCountryCode')}, textInput: country_code"
-                           data-uie-name="enter-county-code">
+                           data-uie-name="enter-country-code">
                     <input class="input phone" id="wire-login-phone" type="tel" autocomplete="off" maxlength="15" spellcheck="false"
                            data-bind="event: {change: changed_phone_number, input: clear_error}, attr: {title: t('authPlaceholderPhone'), placeholder: t('authPlaceholderPhone')}, textInput: phone_number"
                            data-uie-name="enter-phone">
@@ -211,7 +211,7 @@
               <div class="button-group">
                 <!-- ko ifnot: deviceReused -->
                   <a class="button button-outline" rel="nofollow noopener noreferrer" target="_blank"
-                     data-bind="supportLink: z.config.SUPPORT.ID.HISTORY, text: t('warningLearnMore')"
+                     data-bind="supportLink: Config.SUPPORT.ID.HISTORY, text: t('warningLearnMore')"
                      data-uie-name="do-history-learn-more"></a>
                 <!-- /ko -->
                 <span class="button button-white"

@@ -19,7 +19,7 @@
 
 import {ReactWrapper} from 'enzyme';
 import React from 'react';
-import {Config as ReadOnlyConfig} from '../config';
+import {Config as ReadOnlyConfig} from '../../Config';
 import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
@@ -29,15 +29,6 @@ const Config = ReadOnlyConfig as any;
 
 describe('"Login"', () => {
   let wrapper: ReactWrapper;
-
-  beforeAll(() => {
-    Config.FEATURE = {
-      DEFAULT_LOGIN_TEMPORARY_CLIENT: false,
-      ENABLE_ACCOUNT_REGISTRATION: true,
-    };
-  });
-
-  afterAll(() => (Config.FEATURE = {}));
 
   const backButton = () => wrapper.find('[data-uie-name="go-index"]').first();
   const emailInput = () => wrapper.find('[data-uie-name="enter-email"]').first();

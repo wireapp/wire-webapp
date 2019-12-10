@@ -17,7 +17,7 @@
  *
  */
 
-import {ClientClassification} from '@wireapp/api-client/dist/commonjs/client/';
+import {ClientClassification} from '@wireapp/api-client/dist/client/';
 import ko from 'knockout';
 
 import {zeroPadding} from 'Util/util';

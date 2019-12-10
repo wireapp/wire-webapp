@@ -18,10 +18,10 @@
  */
 
 import {Request, Router} from 'express';
-import {ServerConfig} from '../ServerConfig';
+import * as geolite2 from 'geolite2';
+import maxmind, {CountryResponse} from 'maxmind';
 
-const geolite2 = require('geolite2');
-const maxmind = require('maxmind');
+import {ServerConfig} from '../ServerConfig';
 
 async function addGeoIP(req: Request) {
   let countryCode = '';
@@ -29,9 +29,9 @@ async function addGeoIP(req: Request) {
   try {
     const ip = req.header('X-Forwarded-For') || req.ip;
     // https://github.com/runk/node-maxmind/releases/tag/v3.0.0
-    const lookup = await maxmind.open(geolite2.paths.country);
+    const lookup = await maxmind.open<CountryResponse>(geolite2.paths.country);
     const result = lookup.get(ip);
-    if (result) {
+    if (result && result.country) {
       countryCode = result.country.iso_code;
     }
   } catch (error) {

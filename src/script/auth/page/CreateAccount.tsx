@@ -56,7 +56,7 @@ const CreateAccount = ({}: Props) => {
             >
               <H1 center>{_(createAccountStrings.headLine)}</H1>
               <AccountForm
-                onSubmit={() => history.push(ROUTE.VERIFY)}
+                onSubmit={() => history.push(ROUTE.VERIFY_EMAIL_CODE)}
                 submitText={_(createAccountStrings.submitButton)}
               />
             </ContainerXS>
