@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [15.1.11](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@15.1.10...@wireapp/core@15.1.11) (2019-12-10)
+
+
+### Bug Fixes
+
+* **core:** Clear tables without deleting them ([#2643](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/2643)) ([70b95d4](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/70b95d43ce5b4ad7861b6e04f84f5aff76ed0470))
+
+
+
+
+
 ## [15.1.10](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@15.1.9...@wireapp/core@15.1.10) (2019-12-10)
 
 **Note:** Version bump only for package @wireapp/core
