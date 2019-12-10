@@ -931,10 +931,10 @@ $(async () => {
       restUrl: Config.BACKEND_REST,
       webSocketUrl: Config.BACKEND_WS,
     });
-    const clientType = loadValue(StorageKey.AUTH.PERSIST);
-    if (clientType === undefined) {
-      doRedirect(SIGN_OUT_REASON.USER_REQUESTED);
-    } else if (isTemporaryClientAndNonPersistent(clientType)) {
+    const persist = loadValue(StorageKey.AUTH.PERSIST);
+    if (persist === undefined) {
+      doRedirect(SIGN_OUT_REASON.NOT_SIGNED_IN);
+    } else if (isTemporaryClientAndNonPersistent(persist)) {
       const engine = await StorageService.getUnitializedEngine();
       wire.app = new App(backendClient, appContainer, engine);
     } else {
