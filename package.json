@@ -57,7 +57,7 @@
     "@babel/preset-typescript": "7.7.4",
     "@emotion/babel-preset-css-prop": "10.0.23",
     "@hot-loader/react-dom": "16.11.0",
-    "@types/enzyme": "3.10.3",
+    "@types/enzyme": "3.10.4",
     "@types/faker": "4.1.8",
     "@types/helmet": "0.0.45",
     "@types/highlightjs": "9.12.0",
