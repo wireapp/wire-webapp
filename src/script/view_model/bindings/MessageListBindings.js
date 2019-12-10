@@ -141,7 +141,6 @@ ko.bindingHandlers.background_image = {
       assetLoader
         .load()
         .then(blob => {
-          $(element).removeClass('image-loading');
           objectUrl = window.URL.createObjectURL(blob);
           imageElement[0].src = objectUrl;
         })

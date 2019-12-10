@@ -26,7 +26,7 @@ export const DEFAULT_CURRENCY = SupportedCurrency.EUR;
 export const DEFAULT_LANGUAGE = 'en-US';
 
 function getLocale(): string {
-  return mapLanguage(navigator.languages && navigator.languages.length ? navigator.languages[0] : navigator.language);
+  return mapLanguage(navigator.languages?.length ? navigator.languages[0] : navigator.language);
 }
 
 export function currentLanguage(): string {

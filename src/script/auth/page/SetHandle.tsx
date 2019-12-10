@@ -19,11 +19,11 @@
 
 import {ConsentType} from '@wireapp/api-client/dist/self/index';
 import {
+  ArrowIcon,
   ContainerXS,
   ErrorMessage,
   Form,
   H1,
-  ICON_NAME,
   Input,
   InputSubmitCombo,
   Muted,
@@ -125,10 +125,11 @@ const SetHandle = ({
             <RoundIconButton
               disabled={!handle || isFetching}
               type="submit"
-              icon={ICON_NAME.ARROW}
               data-uie-name="do-send-handle"
               formNoValidate
-            />
+            >
+              <ArrowIcon />
+            </RoundIconButton>
           </InputSubmitCombo>
         </Form>
         <ErrorMessage data-uie-name="error-message">{error && parseError(error)}</ErrorMessage>

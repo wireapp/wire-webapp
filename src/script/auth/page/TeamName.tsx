@@ -27,7 +27,6 @@ import {
   ErrorMessage,
   Form,
   H1,
-  ICON_NAME,
   Input,
   InputSubmitCombo,
   IsMobile,
@@ -152,10 +151,11 @@ const TeamName = ({
                       disabled={!enteredTeamName || !isValidTeamName}
                       type="submit"
                       formNoValidate
-                      icon={ICON_NAME.ARROW}
                       onClick={handleSubmit}
                       data-uie-name="do-next"
-                    />
+                    >
+                      <ArrowIcon />
+                    </RoundIconButton>
                   </InputSubmitCombo>
                   <ErrorMessage data-uie-name="error-message">
                     {error ? parseValidationErrors(error) : parseError(authError)}

@@ -178,7 +178,7 @@ export class AssetRemoteData {
       .then(plaintext => new Blob([new Uint8Array(plaintext)], {type}))
       .catch(error => {
         this.loadPromise = undefined;
-        const errorMessage = (error && error.message) || '';
+        const errorMessage = error?.message || '';
         const isAssetNotFound = errorMessage.endsWith(BackendClientError.STATUS_CODE.NOT_FOUND);
         const isServerError = errorMessage.endsWith(BackendClientError.STATUS_CODE.INTERNAL_SERVER_ERROR);
 

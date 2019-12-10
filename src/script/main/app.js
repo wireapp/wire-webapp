@@ -113,6 +113,23 @@ import {GiphyRepository} from '../extension/GiphyRepository';
 import {AssetUploader} from '../assets/AssetUploader';
 import {GiphyService} from '../extension/GiphyService';
 import {PermissionRepository} from '../permission/PermissionRepository';
+import {loadValue} from 'Util/StorageUtil';
+
+function doRedirect(signOutReason) {
+  let url = `/auth/${location.search}`;
+  const isImmediateSignOutReason = App.CONFIG.SIGN_OUT_REASONS.IMMEDIATE.includes(signOutReason);
+  if (isImmediateSignOutReason) {
+    url = appendParameter(url, `${URLParameter.REASON}=${signOutReason}`);
+  }
+
+  const redirectToLogin = signOutReason !== SIGN_OUT_REASON.NOT_SIGNED_IN;
+  if (redirectToLogin) {
+    url = `${url}#login`;
+  }
+
+  Dexie.delete('/sqleet');
+  window.location.replace(url);
+}
 
 class App {
   static get CONFIG() {
@@ -354,10 +371,7 @@ class App {
         telemetry.time_step(AppInitTimingsStep.VALIDATED_CLIENT);
         telemetry.add_statistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity.type);
 
-        return this.repository.cryptography.loadCryptobox(
-          this.service.storage.db || this.service.storage.objectDb,
-          this.service.storage.dbName,
-        );
+        return this.repository.cryptography.loadCryptobox(this.service.storage.db);
       })
       .then(() => {
         loadingView.updateProgress(10);
@@ -702,7 +716,7 @@ class App {
       this.repository.calling.destroy();
 
       if (this.repository.user.isActivatedAccount()) {
-        if (isTemporaryClientAndNonPersistent()) {
+        if (isTemporaryClientAndNonPersistent(loadValue(StorageKey.AUTH.PERSIST))) {
           this.logout(SIGN_OUT_REASON.CLIENT_REMOVED, true);
         } else {
           this.repository.storage.terminate('window.onunload');
@@ -861,18 +875,7 @@ class App {
         return window.location.replace(url);
       }
 
-      let url = `/auth/${location.search}`;
-      const isImmediateSignOutReason = App.CONFIG.SIGN_OUT_REASONS.IMMEDIATE.includes(signOutReason);
-      if (isImmediateSignOutReason) {
-        url = appendParameter(url, `${URLParameter.REASON}=${signOutReason}`);
-      }
-
-      const redirectToLogin = signOutReason !== SIGN_OUT_REASON.NOT_SIGNED_IN;
-      if (redirectToLogin) {
-        url = `${url}#login`;
-      }
-
-      window.location.replace(url);
+      doRedirect(signOutReason);
     });
   }
 
@@ -928,9 +931,11 @@ $(async () => {
       restUrl: Config.BACKEND_REST,
       webSocketUrl: Config.BACKEND_WS,
     });
-    if (isTemporaryClientAndNonPersistent()) {
+    const persist = loadValue(StorageKey.AUTH.PERSIST);
+    if (persist === undefined) {
+      doRedirect(SIGN_OUT_REASON.NOT_SIGNED_IN);
+    } else if (isTemporaryClientAndNonPersistent(persist)) {
       const engine = await StorageService.getUnitializedEngine();
-      window.addEventListener('beforeunload', () => Dexie.delete('/sqleet'));
       wire.app = new App(backendClient, appContainer, engine);
     } else {
       wire.app = new App(backendClient, appContainer);

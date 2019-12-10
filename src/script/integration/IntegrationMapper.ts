@@ -58,7 +58,7 @@ export const IntegrationMapper = {
         serviceEntity.id = id;
       }
 
-      if (assets && assets.length) {
+      if (assets?.length) {
         const mappedAssets = mapProfileAssets(serviceEntity.id, assets);
         updateUserEntityAssets(serviceEntity, mappedAssets);
       }
