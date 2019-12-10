@@ -84,7 +84,8 @@ export class PromiseQueue {
     if (queueEntry) {
       this.clearInterval();
 
-      this.current = this.current + 1;
+      this.current++;
+
       if (this.current >= this.concurrent) {
         this.blocked = true;
       }
@@ -110,7 +111,8 @@ export class PromiseQueue {
 
           this.clearInterval();
 
-          this.current = this.current - 1;
+          this.current--;
+
           if (this.current < this.concurrent) {
             this.blocked = false;
           }
@@ -133,6 +135,7 @@ export class PromiseQueue {
    */
   pause(shouldPause: boolean = true): PromiseQueue {
     this.paused = shouldPause;
+
     if (!this.paused) {
       this.execute();
     }
