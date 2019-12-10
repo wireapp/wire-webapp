@@ -20,11 +20,11 @@
 import {LoginData} from '@wireapp/api-client/dist/auth';
 import {BackendErrorLabel} from '@wireapp/api-client/dist/http';
 import {
+  ArrowIcon,
   ContainerXS,
   ErrorMessage,
   Form,
   H1,
-  ICON_NAME,
   Input,
   InputSubmitCombo,
   Link,
@@ -141,12 +141,13 @@ const CheckPassword = ({loginData, doLogin, resetAuthError, isFetching}: Props &
                 tabIndex={2}
                 type="submit"
                 formNoValidate
-                icon={ICON_NAME.ARROW}
                 onClick={handleLogin}
                 disabled={isFetching || !password}
                 showLoading={isFetching}
                 data-uie-name="do-sign-in"
-              />
+              >
+                <ArrowIcon />
+              </RoundIconButton>
             )}
           </InputSubmitCombo>
           <ErrorMessage data-uie-name="error-message">

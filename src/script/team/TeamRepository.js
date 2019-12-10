@@ -50,7 +50,7 @@ export class TeamRepository {
 
     this.team = ko.observable();
 
-    this.isTeam = ko.pureComputed(() => (this.team() ? !!this.team().id : false));
+    this.isTeam = ko.pureComputed(() => !!this.team()?.id);
     this.isTeamDeleted = ko.observable(false);
 
     /** Note: this does not include the self user */

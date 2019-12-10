@@ -19,12 +19,12 @@
 
 import {ClientType} from '@wireapp/api-client/dist/client/index';
 import {
+  ArrowIcon,
   Button,
   Checkbox,
   CheckboxLabel,
   ErrorMessage,
   Form,
-  ICON_NAME,
   Input,
   InputSubmitCombo,
   RoundIconButton,
@@ -212,14 +212,9 @@ const SingleSignOnForm = ({
           required
           data-uie-name="enter-code"
         />
-        <RoundIconButton
-          tabIndex={2}
-          disabled={!code}
-          type="submit"
-          formNoValidate
-          icon={ICON_NAME.ARROW}
-          data-uie-name="do-sso-sign-in"
-        />
+        <RoundIconButton tabIndex={2} disabled={!code} type="submit" formNoValidate data-uie-name="do-sso-sign-in">
+          <ArrowIcon />
+        </RoundIconButton>
       </InputSubmitCombo>
       {validationError ? (
         parseValidationErrors([validationError])

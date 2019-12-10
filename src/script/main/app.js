@@ -115,6 +115,22 @@ import {GiphyService} from '../extension/GiphyService';
 import {PermissionRepository} from '../permission/PermissionRepository';
 import {loadValue} from 'Util/StorageUtil';
 
+function doRedirect(signOutReason) {
+  let url = `/auth/${location.search}`;
+  const isImmediateSignOutReason = App.CONFIG.SIGN_OUT_REASONS.IMMEDIATE.includes(signOutReason);
+  if (isImmediateSignOutReason) {
+    url = appendParameter(url, `${URLParameter.REASON}=${signOutReason}`);
+  }
+
+  const redirectToLogin = signOutReason !== SIGN_OUT_REASON.NOT_SIGNED_IN;
+  if (redirectToLogin) {
+    url = `${url}#login`;
+  }
+
+  Dexie.delete('/sqleet');
+  window.location.replace(url);
+}
+
 class App {
   static get CONFIG() {
     return {
@@ -332,82 +348,96 @@ class App {
     const telemetry = new AppInitTelemetry();
     exposeWrapperGlobals();
     try {
+      const {
+        audio: audioRepository,
+        calling: callingRepository,
+        client: clientRepository,
+        connection: connectionRepository,
+        conversation: conversationRepository,
+        cryptography: cryptographyRepository,
+        event: eventRepository,
+        eventTracker: eventTrackerRepository,
+        properties: propertiesRepository,
+        team: teamRepository,
+        user: userRepository,
+      } = this.repository;
       await checkIndexedDb();
       await this._registerSingleInstance();
       await this._loadAccessToken();
       loadingView.updateProgress(2.5);
       telemetry.time_step(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
       await this._initiateSelfUser();
-      loadingView.updateProgress(5, t('initReceivedSelfUser', this.repository.user.self().first_name()));
+      loadingView.updateProgress(5, t('initReceivedSelfUser', userRepository.self().first_name()));
       telemetry.time_step(AppInitTimingsStep.RECEIVED_SELF_USER);
       const clientEntity = await this._initiateSelfUserClients();
-      const selfUser = this.repository.user.self();
-      this.repository.calling.initAvs(selfUser, clientEntity.id);
+      const selfUser = userRepository.self();
+      callingRepository.initAvs(selfUser, clientEntity.id);
       loadingView.updateProgress(7.5, t('initValidatedClient'));
       telemetry.time_step(AppInitTimingsStep.VALIDATED_CLIENT);
       telemetry.add_statistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity.type);
 
-      await this.repository.cryptography.loadCryptobox(
-        this.service.storage.db || this.service.storage.objectDb,
-        this.service.storage.dbName,
-      );
+      await cryptographyRepository.loadCryptobox(this.service.storage.db);
       loadingView.updateProgress(10);
       telemetry.time_step(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
-      this.repository.event.connectWebSocket();
-      const conversationEntities = await this.repository.conversation.getConversations();
-      const connectionEntities = await this.repository.connection.getConnections();
+      eventRepository.connectWebSocket();
+      const conversationEntities = await conversationRepository.getConversations();
+      const connectionEntities = await connectionRepository.getConnections();
       loadingView.updateProgress(25, t('initReceivedUserData'));
 
       telemetry.time_step(AppInitTimingsStep.RECEIVED_USER_DATA);
       telemetry.add_statistic(AppInitStatisticsValue.CONVERSATIONS, conversationEntities.length, 50);
       telemetry.add_statistic(AppInitStatisticsValue.CONNECTIONS, connectionEntities.length, 50);
 
-      this.repository.conversation.map_connections(this.repository.connection.connectionEntities());
+      conversationRepository.map_connections(connectionRepository.connectionEntities());
       this._subscribeToUnloadEvents();
 
-      await this.repository.team.getTeam();
+      await teamRepository.getTeam();
 
-      await this.repository.user.loadUsers();
-      const notificationsCount = await this.repository.event.initializeFromStream();
+      if (teamRepository.isTeam()) {
+        //  conversationRepository.conversationRoleRepository.
+      }
+
+      await userRepository.loadUsers();
+      const notificationsCount = await eventRepository.initializeFromStream();
 
       telemetry.time_step(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
       telemetry.add_statistic(AppInitStatisticsValue.NOTIFICATIONS, notificationsCount, 100);
 
-      this.repository.eventTracker.init(this.repository.properties.properties.settings.privacy.improve_wire);
-      await this.repository.conversation.initialize_conversations();
+      eventTrackerRepository.init(propertiesRepository.properties.settings.privacy.improve_wire);
+      await conversationRepository.initialize_conversations();
       loadingView.updateProgress(97.5, t('initUpdatedFromNotifications', Config.BRAND_NAME));
 
       this._watchOnlineStatus();
-      const clientEntities = await this.repository.client.updateClientsForSelf();
+      const clientEntities = await clientRepository.updateClientsForSelf();
 
       loadingView.updateProgress(99);
 
       telemetry.add_statistic(AppInitStatisticsValue.CLIENTS, clientEntities.length);
       telemetry.time_step(AppInitTimingsStep.APP_PRE_LOADED);
 
-      this.repository.user.self().devices(clientEntities);
+      userRepository.self().devices(clientEntities);
       this.logger.info('App pre-loading completed');
       await this._handleUrlParams();
-      await this.repository.conversation.updateConversationsOnAppInit();
-      await this.repository.conversation.conversationLabelRepository.loadLabels();
+      await conversationRepository.updateConversationsOnAppInit();
+      await conversationRepository.conversationLabelRepository.loadLabels();
       telemetry.time_step(AppInitTimingsStep.APP_LOADED);
       this._showInterface();
-      this.applock = new AppLockViewModel(this.repository.client, this.repository.user.self);
+      this.applock = new AppLockViewModel(clientRepository, userRepository.self);
 
       loadingView.removeFromView();
       telemetry.report();
       amplify.publish(WebAppEvents.LIFECYCLE.LOADED);
       modals.ready();
-      showInitialModal(this.repository.user.self().availability());
+      showInitialModal(userRepository.self().availability());
       telemetry.time_step(AppInitTimingsStep.UPDATED_CONVERSATIONS);
-      if (this.repository.user.isActivatedAccount()) {
+      if (userRepository.isActivatedAccount()) {
         // start regularly polling the server to check if there is a new version of Wire
         startNewVersionPolling(Environment.version(false, true), this.update.bind(this));
       }
-      this.repository.audio.init(true);
-      this.repository.conversation.cleanup_conversations();
-      this.repository.calling.setReady();
+      audioRepository.init(true);
+      conversationRepository.cleanup_conversations();
+      callingRepository.setReady();
       this.logger.info('App fully loaded');
     } catch (error) {
       this._appInitFailure(error, isReload);
@@ -843,19 +873,7 @@ class App {
         return window.location.replace(url);
       }
 
-      let url = `/auth/${location.search}`;
-      const isImmediateSignOutReason = App.CONFIG.SIGN_OUT_REASONS.IMMEDIATE.includes(signOutReason);
-      if (isImmediateSignOutReason) {
-        url = appendParameter(url, `${URLParameter.REASON}=${signOutReason}`);
-      }
-
-      const redirectToLogin = signOutReason !== SIGN_OUT_REASON.NOT_SIGNED_IN;
-      if (redirectToLogin) {
-        url = `${url}#login`;
-      }
-
-      Dexie.delete('/sqleet');
-      window.location.replace(url);
+      doRedirect(signOutReason);
     });
   }
 
@@ -911,7 +929,10 @@ $(async () => {
       restUrl: Config.BACKEND_REST,
       webSocketUrl: Config.BACKEND_WS,
     });
-    if (isTemporaryClientAndNonPersistent(loadValue(StorageKey.AUTH.PERSIST))) {
+    const persist = loadValue(StorageKey.AUTH.PERSIST);
+    if (persist === undefined) {
+      doRedirect(SIGN_OUT_REASON.NOT_SIGNED_IN);
+    } else if (isTemporaryClientAndNonPersistent(persist)) {
       const engine = await StorageService.getUnitializedEngine();
       wire.app = new App(backendClient, appContainer, engine);
     } else {
