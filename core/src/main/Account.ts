@@ -252,7 +252,7 @@ export class Account extends EventEmitter {
           this.logger.log('Last client was temporary - Deleting database');
 
           if (this.storeEngine) {
-            await this.storeEngine.purge();
+            await this.storeEngine.clearTables();
           }
           const context = await this.apiClient.init(loginData.clientType);
           await this.initEngine(context);
