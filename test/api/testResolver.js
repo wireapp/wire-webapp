@@ -17,28 +17,8 @@
  *
  */
 
-import {resolver as dependenciesResolver} from 'Util/dependenciesResolver';
-
-import * as graph from 'src/script/config/dependenciesGraph';
-import {BackendClient} from 'src/script/service/BackendClient';
-
 export const backendConfig = {
   environment: 'test',
   restUrl: 'http://localhost',
   websocket_url: 'wss://localhost',
 };
-
-dependenciesResolver.init(graph.dependencies);
-
-beforeEach(() => {
-  // revoke cache to avoid having stateful entities between tests
-  dependenciesResolver.resolve.cache = {};
-
-  // always re-init the backend client with the test config
-  const backendClient = dependenciesResolver.resolve(BackendClient);
-  backendClient.setSettings(backendConfig);
-});
-
-const resolve = dependenciesResolver.resolve;
-
-export {resolve, graph};
