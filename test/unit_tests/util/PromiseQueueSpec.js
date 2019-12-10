@@ -21,7 +21,7 @@ import {PromiseQueue} from 'Util/PromiseQueue';
 
 describe('PromiseQueue', () => {
   describe('push', () => {
-    it('processes promises', () => {
+    it('processes promises', async () => {
       let counter = 0;
       const result = [];
 
@@ -30,12 +30,13 @@ describe('PromiseQueue', () => {
         return Promise.resolve();
       };
 
-      const queue = new PromiseQueue();
+      const queue = new PromiseQueue({name: 'TestQueue'});
       queue.push(promiseFn);
       queue.push(promiseFn);
-      return queue.push(promiseFn).then(() => {
-        expect(result).toEqual([0, 1, 2]);
-      });
+
+      await queue.push(promiseFn);
+
+      expect(result).toEqual([0, 1, 2]);
     });
 
     it('processes promises that are added during execution', done => {

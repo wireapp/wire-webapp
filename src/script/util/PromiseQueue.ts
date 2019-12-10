@@ -59,19 +59,17 @@ export class PromiseQueue {
     return CONFIG;
   }
 
-  constructor(options: PromiseQueueOptions) {
-    const {concurrent = 1, name, paused = false, timeout = PromiseQueue.CONFIG.UNBLOCK_INTERVAL} = options;
-
+  constructor(options?: PromiseQueueOptions) {
     const loggerName = `PromiseQueue${name ? ` (${name})` : ''}`;
     this.logger = getLogger(loggerName);
 
     this.blocked = false;
-    this.concurrent = concurrent;
+    this.concurrent = options.concurrent ?? 1;
     this.current = 0;
     this.interval = undefined;
-    this.paused = paused;
+    this.paused = options.paused ?? false;
     this.queue = [];
-    this.timeout = timeout;
+    this.timeout = options.timeout ?? PromiseQueue.CONFIG.UNBLOCK_INTERVAL;
   }
 
   /**
