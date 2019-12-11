@@ -17,15 +17,16 @@
  *
  */
 
-/**
- * @typedef {Object} EventHandlingConfig - Object representing conversation event handlers
- * @property {() => void} [eventId: string] - an event handler function
- */
+import {Conversation} from '../entity/Conversation';
 
+export type EventHandlingConfig = {[eventId: string]: (conversationEntity: Conversation) => void | Promise<void>};
+
+/**
+ * Abstract class that represents an entity that can react to a conversation event.
+ */
 export class AbstractConversationEventHandler {
-  /**
-   * Abstract class that represents an entity that can react to a conversation event.
-   */
+  private eventHandlingConfig: EventHandlingConfig;
+
   constructor() {
     this.eventHandlingConfig = {};
   }
@@ -33,21 +34,19 @@ export class AbstractConversationEventHandler {
   /**
    * Adds an event handling config to the current instance.
    *
-   * @param {EventHandlingConfig} eventHandlingConfig - Config containing events name and the associated callback
-   * @returns {void} No return value
+   * @param eventHandlingConfig - Config containing events name and the associated callback
    */
-  setEventHandlingConfig(eventHandlingConfig) {
+  setEventHandlingConfig(eventHandlingConfig: EventHandlingConfig): void {
     this.eventHandlingConfig = eventHandlingConfig;
   }
 
   /**
    * Handles a conversation event.
    *
-   * @param {Conversation} conversationEntity - the conversation the event relates to
-   * @param {Object} eventJson - JSON data for event
-   * @returns {Promise} Resolves when event was handled
+   * @param conversationEntity - the conversation the event relates to
+   * @param eventJson - JSON data for the event
    */
-  handleConversationEvent(conversationEntity, eventJson) {
+  handleConversationEvent(conversationEntity: Conversation, eventJson: any): Promise<void> {
     const handler = this.eventHandlingConfig[eventJson.type] || (() => Promise.resolve());
     return handler.bind(this)(conversationEntity, eventJson);
   }
