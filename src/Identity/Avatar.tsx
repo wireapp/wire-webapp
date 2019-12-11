@@ -19,9 +19,11 @@
 
 /** @jsx jsx */
 import {ObjectInterpolation, jsx} from '@emotion/core';
+import {useEffect, useState} from 'react';
 import {IsInViewport, IsInViewportProps} from '../Misc/';
 import {filterProps} from '../util';
 import {COLOR} from './colors';
+import {DURATION, EASE} from './motions';
 
 export const DEFAULT_AVATAR_SIZE = 28;
 
@@ -39,7 +41,6 @@ export interface AvatarProps<T = HTMLDivElement> extends IsInViewportProps<T> {
 const avatarStyle: <T>(props: AvatarProps<T>) => ObjectInterpolation<undefined> = ({
   color = COLOR.WHITE,
   base64Image,
-  forceInitials,
   borderColor,
   backgroundColor = COLOR.GRAY,
   size = DEFAULT_AVATAR_SIZE,
@@ -53,9 +54,6 @@ const avatarStyle: <T>(props: AvatarProps<T>) => ObjectInterpolation<undefined> 
   return {
     alignItems: 'center',
     backgroundColor: backgroundColor,
-    backgroundImage: forceInitials ? undefined : base64Image && `url(data:image/png;base64,${base64Image})`,
-    backgroundPosition: 'center',
-    backgroundSize: 'cover',
     borderRadius: isAvatarGridItem ? '0' : '50%',
     boxShadow: isAvatarGridItem ? 'none' : `inset 0 0 0 ${borderWidth}px ${borderColor}`,
     color,
@@ -66,6 +64,7 @@ const avatarStyle: <T>(props: AvatarProps<T>) => ObjectInterpolation<undefined> 
     justifyContent: 'center',
     minHeight: `${size}px`,
     minWidth: `${size}px`,
+    overflow: 'hidden',
     width: `${size}px`,
   };
 };
@@ -84,6 +83,12 @@ const filteredAvatarProps = (props: AvatarProps) =>
 
 export const Avatar = (props: AvatarProps) => {
   const {base64Image, forceInitials, name, fetchImage, isAvatarGridItem} = props;
+  const [scale, setScale] = useState(0);
+  useEffect(() => {
+    setTimeout(() => {
+      setScale(1);
+    });
+  }, [base64Image]);
   const getInitials = (name: string = '') =>
     name
       .split(' ')
@@ -100,7 +105,23 @@ export const Avatar = (props: AvatarProps) => {
       data-uie-name={!forceInitials && base64Image ? 'element-avatar-image' : 'element-avatar-initials'}
       {...filteredAvatarProps(props)}
     >
-      {(forceInitials || !base64Image) && getInitials(name)}
+      {forceInitials || !base64Image ? (
+        getInitials(name)
+      ) : (
+        <div
+          css={{
+            backgroundImage: base64Image && `url(data:image/png;base64,${base64Image})`,
+            backgroundPosition: 'center',
+            backgroundSize: 'cover',
+            minHeight: '100%',
+            minWidth: '100%',
+            opacity: scale,
+            transform: `scale(${scale})`,
+            transition: `all ${DURATION.DEFAULT}ms ${EASE.QUART}`,
+            width: '100%',
+          }}
+        />
+      )}
     </IsInViewport>
   );
 };
