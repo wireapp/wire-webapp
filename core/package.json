@@ -16,6 +16,7 @@
     "pure-uuid": "1.5.7"
   },
   "devDependencies": {
+    "@types/karma": "3.0.4",
     "@types/faker": "4.1.8",
     "@types/jasmine": "3.5.0",
     "@wireapp/commons": "3.0.3",

@@ -16,17 +16,16 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+import {Config} from 'karma';
+const pkg = require('./package.json');
 
 const dist = 'dist/';
+const projectName = pkg.name.replace('@wireapp/', '');
 
-const preprocessors = {};
-preprocessors['**/*.js'] = ['sourcemap'];
-
-module.exports = function(config) {
+module.exports = (config: Config): void => {
   config.set({
     autoWatch: false,
     basePath: '',
-    browserNoActivityTimeout: 10000,
     browsers: ['ChromeNoSandbox'],
     client: {
       useIframe: false,
@@ -39,15 +38,14 @@ module.exports = function(config) {
         flags: ['--no-sandbox'],
       },
     },
-    files: [`${dist}priority-queue.test.bundle.js`],
+    files: [`${dist}dexie.bundle.js`, `${dist}${projectName}.test.bundle.js`],
     frameworks: ['jasmine'],
     logLevel: config.LOG_INFO,
     port: 9876,
-    preprocessors,
+    preprocessors: {
+      '**/*.js': ['sourcemap'],
+    },
     reporters: ['jasmine-diff', 'spec'],
     singleRun: true,
-    specReporter: {
-      showSpecTiming: true,
-    },
   });
 };

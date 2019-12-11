@@ -4,6 +4,6 @@
     "outDir": "dist",
     "rootDir": "src/main"
   },
-  "exclude": ["dist", "node_modules"],
+  "exclude": ["dist", "karma.conf.ts", "node_modules"],
   "extends": "../../tsconfig.json"
 }

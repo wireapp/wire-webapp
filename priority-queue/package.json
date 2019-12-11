@@ -5,6 +5,7 @@
     "pure-uuid": "1.5.7"
   },
   "devDependencies": {
+    "@types/karma": "3.0.4",
     "cross-env": "6.0.3",
     "jasmine": "3.5.0",
     "karma": "4.4.1",

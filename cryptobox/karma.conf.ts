@@ -16,8 +16,9 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+import {Config} from 'karma';
 
-module.exports = function(config) {
+module.exports = (config: Config): void => {
   config.set({
     autoWatch: false,
     basePath: '',
@@ -41,8 +42,5 @@ module.exports = function(config) {
     },
     reporters: ['jasmine-diff', 'spec'],
     singleRun: true,
-    specReporter: {
-      showSpecTiming: true,
-    },
   });
 };

@@ -4,6 +4,6 @@
     "outDir": "dist/commonjs",
     "rootDir": "src/main"
   },
-  "exclude": ["bower_components", "dist", "node_modules"],
+  "exclude": ["bower_components", "dist", "karma.conf.ts", "node_modules"],
   "extends": "../../tsconfig.json"
 }

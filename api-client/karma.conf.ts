@@ -17,12 +17,17 @@
  *
  */
 
+import {Config} from 'karma';
 const pkg = require('./package.json');
 
 const dist = 'dist/';
 const projectName = pkg.name.replace('@wireapp/', '');
 
-module.exports = function(config) {
+const preprocessors = {
+  '**/*.js': ['sourcemap'],
+};
+
+module.exports = (config: Config): void => {
   config.set({
     autoWatch: false,
     basePath: '',
@@ -38,17 +43,12 @@ module.exports = function(config) {
         flags: ['--no-sandbox'],
       },
     },
-    files: [`${dist}dexie.bundle.js`, `${dist}${projectName}.test.bundle.js`],
+    files: [`${dist}${projectName}.test.bundle.js`],
     frameworks: ['jasmine'],
     logLevel: config.LOG_INFO,
     port: 9876,
-    preprocessors: {
-      '**/*.js': ['sourcemap'],
-    },
+    preprocessors,
     reporters: ['jasmine-diff', 'spec'],
     singleRun: true,
-    specReporter: {
-      showSpecTiming: true,
-    },
   });
 };

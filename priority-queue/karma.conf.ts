@@ -17,18 +17,18 @@
  *
  */
 
-const pkg = require('./package.json');
-
+import {Config} from 'karma';
 const dist = 'dist/';
-const projectName = pkg.name.replace('@wireapp/', '');
 
-const preprocessors = {};
-preprocessors['**/*.js'] = ['sourcemap'];
+const preprocessors = {
+  '**/*.js': ['sourcemap'],
+};
 
-module.exports = function(config) {
+module.exports = (config: Config): void => {
   config.set({
     autoWatch: false,
     basePath: '',
+    browserNoActivityTimeout: 10000,
     browsers: ['ChromeNoSandbox'],
     client: {
       useIframe: false,
@@ -41,15 +41,12 @@ module.exports = function(config) {
         flags: ['--no-sandbox'],
       },
     },
-    files: [`${dist}${projectName}.test.bundle.js`],
+    files: [`${dist}priority-queue.test.bundle.js`],
     frameworks: ['jasmine'],
     logLevel: config.LOG_INFO,
     port: 9876,
     preprocessors,
     reporters: ['jasmine-diff', 'spec'],
     singleRun: true,
-    specReporter: {
-      showSpecTiming: true,
-    },
   });
 };
