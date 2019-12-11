@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@types/chai": "4.2.6",
+    "@types/chai": "4.2.7",
     "@types/ed2curve": "0.2.2",
     "@types/node": "~12",
     "@wireapp/cbor": "4.3.25",
