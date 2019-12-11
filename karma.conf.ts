@@ -16,13 +16,13 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-
+import {Config} from 'karma';
 const pkg = require('./package.json');
 
 const dist = 'dist/';
 const projectName = pkg.name.replace('@wireapp/', '');
 
-module.exports = function(config) {
+module.exports = (config: Config): void => {
   config.set({
     autoWatch: false,
     basePath: '',
@@ -47,8 +47,5 @@ module.exports = function(config) {
     },
     reporters: ['jasmine-diff', 'spec'],
     singleRun: true,
-    specReporter: {
-      showSpecTiming: true,
-    },
   });
 };
