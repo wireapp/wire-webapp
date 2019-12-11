@@ -5,8 +5,8 @@
   "dependencies": {
     "@types/long": "4.0.0",
     "@types/node": "~12",
-    "@wireapp/api-client": "9.2.6",
-    "@wireapp/cryptobox": "12.0.13",
+    "@wireapp/api-client": "9.2.7",
+    "@wireapp/cryptobox": "12.0.14",
     "@wireapp/protocol-messaging": "1.24.2",
     "@wireapp/store-engine": "4.2.0",
     "bazinga64": "5.5.34",
@@ -16,9 +16,9 @@
     "pure-uuid": "1.5.7"
   },
   "devDependencies": {
-    "@types/karma": "3.0.4",
     "@types/faker": "4.1.8",
     "@types/jasmine": "3.5.0",
+    "@types/karma": "3.0.4",
     "@wireapp/commons": "3.0.3",
     "@wireapp/store-engine-dexie": "1.1.0",
     "commander": "4.0.1",
@@ -66,5 +66,5 @@
     "test:node": "nyc jasmine --config=jasmine.json"
   },
   "types": "./dist/Account.d.ts",
-  "version": "15.1.12"
+  "version": "15.1.13"
 }
