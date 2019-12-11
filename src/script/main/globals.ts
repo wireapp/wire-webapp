@@ -21,6 +21,7 @@ import {amplify} from 'amplify';
 import jQuery from 'jquery';
 import Cookies from 'js-cookie';
 import ko from 'knockout';
+import {RaygunStatic} from 'raygun4js';
 import 'raygun4js/dist/raygun.vanilla';
 
 import {AssetService} from '../assets/AssetService';
@@ -111,7 +112,7 @@ declare global {
     ko: typeof ko;
     jQuery: any;
     platform: any;
-    Raygun: any;
+    Raygun: RaygunStatic;
     wire: {
       app: {
         service: {
@@ -119,6 +120,7 @@ declare global {
         };
       };
       env: {
+        ANALYTICS_API_KEY: string;
         APP_BASE: string;
         APP_NAME: string;
         BACKEND_REST: string;
@@ -141,6 +143,7 @@ declare global {
         MAX_GROUP_PARTICIPANTS: number;
         MAX_VIDEO_PARTICIPANTS: number;
         NEW_PASSWORD_MINIMUM_LENGTH: number;
+        RAYGUN_API_KEY: string;
         URL: {
           ACCOUNT_BASE: string;
           MOBILE_BASE: string;
