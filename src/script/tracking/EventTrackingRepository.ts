@@ -17,20 +17,34 @@
  *
  */
 
-import {getLogger} from 'Util/Logger';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {amplify} from 'amplify';
+
 import {Environment} from 'Util/Environment';
+import {Logger, getLogger} from 'Util/Logger';
 import {includesString} from 'Util/StringUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {getParameter} from 'Util/UrlUtil';
 
-import {WebAppEvents} from '../event/WebApp';
 import {URLParameter} from '../auth/URLParameter';
+import {WebAppEvents} from '../event/WebApp';
 
-import * as trackingHelpers from './Helpers';
+import {TeamRepository} from '../team/TeamRepository';
+import {UserRepository} from '../user/UserRepository';
 import {EventName} from './EventName';
+import * as trackingHelpers from './Helpers';
 import {SuperProperty} from './SuperProperty';
 
 export class EventTrackingRepository {
+  private isUserAnalyticsActivated: boolean;
+  private lastReportTimestamp?: number;
+  private privacyPreference?: boolean;
+  private providerAPI?: boolean;
+  private readonly logger: Logger;
+  private readonly teamRepository: TeamRepository;
+  private readonly userRepository: UserRepository;
+  isErrorReportingActivated: boolean;
+
+  // tslint:disable-next-line:typedef
   static get CONFIG() {
     return {
       ERROR_REPORTING: {
@@ -46,16 +60,7 @@ export class EventTrackingRepository {
     };
   }
 
-  /**
-   * Construct a new repository for user actions and errors reporting.
-   *
-   * @param {TeamRepository} teamRepository - Repository that handles teams
-   * @param {UserRepository} userRepository - Repository that handles users
-   * @returns {EventTrackingRepository} The new repository for user actions
-   */
-  constructor(teamRepository, userRepository) {
-    this.updatePrivacyPreference = this.updatePrivacyPreference.bind(this);
-
+  constructor(teamRepository: TeamRepository, userRepository: UserRepository) {
     this.logger = getLogger('EventTrackingRepository');
 
     this.teamRepository = teamRepository;
@@ -70,41 +75,40 @@ export class EventTrackingRepository {
   }
 
   /**
-   * Init the repository.
-   * @param {boolean} privacyPreference - Privacy preference
-   * @returns {Promise} Resolves after initialization
+   * @param privacyPreference Privacy preference
+   * @returns Resolves after initialization
    */
-  init(privacyPreference) {
+  async init(privacyPreference: boolean): Promise<void> {
     this.privacyPreference = privacyPreference;
     this.logger.info(`Initialize analytics and error reporting: ${this.privacyPreference}`);
 
-    const privacyPromise = this.privacyPreference ? this._enableServices(false) : Promise.resolve();
-    return privacyPromise.then(() => {
-      amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.PRIVACY, this.updatePrivacyPreference);
-    });
+    if (this.privacyPreference) {
+      this._enableServices(false);
+    }
+
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.PRIVACY, this.updatePrivacyPreference);
   }
 
-  updatePrivacyPreference(privacyPreference) {
+  private readonly updatePrivacyPreference = async (privacyPreference: boolean): Promise<void> => {
     const hasPreferenceChanged = privacyPreference !== this.privacyPreference;
     if (hasPreferenceChanged) {
       this.privacyPreference = privacyPreference;
 
       return this.privacyPreference ? this._enableServices(true) : this._disableServices();
     }
-  }
+  };
 
-  _enableServices(isOptIn = false) {
+  private async _enableServices(isOptIn = false): Promise<void> {
     this._enableErrorReporting();
-    return this._isDomainAllowedForAnalytics()
-      ? this._enableAnalytics().then(() => {
-          if (isOptIn) {
-            this._trackEvent(EventName.SETTINGS.OPTED_IN_TRACKING);
-          }
-        })
-      : Promise.resolve();
+    if (this._isDomainAllowedForAnalytics()) {
+      await this._enableAnalytics();
+      if (isOptIn) {
+        this._trackEvent(EventName.SETTINGS.OPTED_IN_TRACKING);
+      }
+    }
   }
 
-  _disableServices() {
+  private _disableServices(): void {
     this._disableErrorReporting();
     this._trackEvent(EventName.SETTINGS.OPTED_OUT_TRACKING);
     this._disableAnalytics();
@@ -114,7 +118,7 @@ export class EventTrackingRepository {
   // Analytics
   //##############################################################################
 
-  _disableAnalytics() {
+  private _disableAnalytics(): void {
     this.logger.debug('Analytics was disabled due to user preferences');
     this.isUserAnalyticsActivated = false;
 
@@ -126,7 +130,7 @@ export class EventTrackingRepository {
     }
   }
 
-  _enableAnalytics() {
+  private _enableAnalytics(): Promise<void> {
     this.isUserAnalyticsActivated = true;
 
     // Check if provider API is available and reuse if possible
@@ -139,12 +143,12 @@ export class EventTrackingRepository {
     });
   }
 
-  _initAnalytics() {
+  private _initAnalytics(): Promise<boolean | undefined> {
     // Initialize provider API
     return Promise.resolve(this.providerAPI);
   }
 
-  _isDomainAllowedForAnalytics() {
+  private _isDomainAllowedForAnalytics(): boolean {
     const trackingParameter = getParameter(URLParameter.TRACKING);
     return typeof trackingParameter === 'boolean'
       ? trackingParameter
@@ -153,32 +157,33 @@ export class EventTrackingRepository {
             this.logger.debug(`Analytics is disabled for domain '${window.location.hostname}'`);
             return true;
           }
+          return false;
         });
   }
 
-  _resetSuperProperties() {
+  private _resetSuperProperties(): void {
     if (this.providerAPI) {
       // Reset super properties on provider API and forget distinct ids
     }
   }
 
-  _subscribeToAnalyticsEvents() {
-    amplify.subscribe(WebAppEvents.ANALYTICS.SUPER_PROPERTY, this, (...args) => {
+  private _subscribeToAnalyticsEvents(): void {
+    amplify.subscribe(WebAppEvents.ANALYTICS.SUPER_PROPERTY, this, (superPropertyName: string, value: any) => {
       if (this.isUserAnalyticsActivated) {
-        this._setSuperProperty(...args);
+        this._setSuperProperty(superPropertyName, value);
       }
     });
 
-    amplify.subscribe(WebAppEvents.ANALYTICS.EVENT, this, (...args) => {
+    amplify.subscribe(WebAppEvents.ANALYTICS.EVENT, this, (eventName: string, attributes?: any) => {
       if (this.isUserAnalyticsActivated) {
-        this._trackEvent(...args);
+        this._trackEvent(eventName, attributes);
       }
     });
 
     amplify.subscribe(WebAppEvents.LIFECYCLE.SIGNED_OUT, this._resetSuperProperties.bind(this));
   }
 
-  _setSuperProperties() {
+  private _setSuperProperties(): void {
     this._setSuperProperty(SuperProperty.APP, EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE);
     this._setSuperProperty(SuperProperty.APP_VERSION, Environment.version(false));
     this._setSuperProperty(SuperProperty.DESKTOP_APP, trackingHelpers.getPlatform());
@@ -193,12 +198,12 @@ export class EventTrackingRepository {
     }
   }
 
-  _setSuperProperty(superPropertyName, value) {
+  private _setSuperProperty(superPropertyName: string, value: any): void {
     // Set property on provider API
     this.logger.info(`Set super property '${superPropertyName}' to value '${value}'`);
   }
 
-  _trackEvent(eventName, attributes) {
+  private _trackEvent(eventName: string, attributes?: any): void {
     const isDisabledEvent = EventTrackingRepository.CONFIG.USER_ANALYTICS.DISABLED_EVENTS.includes(eventName);
     if (isDisabledEvent) {
       this.logger.info(`Skipped sending disabled event of type '${eventName}'`);
@@ -210,7 +215,7 @@ export class EventTrackingRepository {
     }
   }
 
-  _unsubscribeFromAnalyticsEvents() {
+  private _unsubscribeFromAnalyticsEvents(): void {
     amplify.unsubscribeAll(WebAppEvents.ANALYTICS.SUPER_PROPERTY);
     amplify.unsubscribeAll(WebAppEvents.ANALYTICS.EVENT);
   }
@@ -223,10 +228,10 @@ export class EventTrackingRepository {
    * Checks if a Raygun payload should be reported.
    *
    * @see https://github.com/MindscapeHQ/raygun4js#onbeforesend
-   * @param {JSON} raygunPayload - Error payload about to be send
-   * @returns {JSON|boolean} Payload if error will be reported, otherwise "false"
+   * @param raygunPayload Error payload about to be send
+   * @returns Payload if error will be reported, otherwise `false`
    */
-  _checkErrorPayload(raygunPayload) {
+  private _checkErrorPayload<T extends object>(raygunPayload: T): T | false {
     if (!this.lastReportTimestamp) {
       this.lastReportTimestamp = Date.now();
       return raygunPayload;
@@ -241,18 +246,19 @@ export class EventTrackingRepository {
     return false;
   }
 
-  _disableErrorReporting() {
+  private _disableErrorReporting(): void {
     this.logger.debug('Disabling Raygun error reporting');
     this.isErrorReportingActivated = false;
-    Raygun.detach();
-    Raygun.init(EventTrackingRepository.CONFIG.ERROR_REPORTING.API_KEY, {disableErrorTracking: true});
+    window.Raygun.detach();
+    window.Raygun.init(EventTrackingRepository.CONFIG.ERROR_REPORTING.API_KEY, {disableErrorTracking: true});
   }
 
-  _enableErrorReporting() {
+  private _enableErrorReporting(): void {
     this.logger.debug('Enabling Raygun error reporting');
     this.isErrorReportingActivated = true;
 
     const options = {
+      debugMode: !Environment.frontend.isProduction(),
       disableErrorTracking: false,
       excludedHostnames: ['localhost', 'wire.ms'],
       ignore3rdPartyErrors: true,
@@ -260,22 +266,20 @@ export class EventTrackingRepository {
       ignoreAjaxError: true,
     };
 
-    options.debugMode = !Environment.frontend.isProduction();
-
-    Raygun.init(EventTrackingRepository.CONFIG.ERROR_REPORTING.API_KEY, options).attach();
-    Raygun.disableAutoBreadcrumbs();
+    window.Raygun.init(EventTrackingRepository.CONFIG.ERROR_REPORTING.API_KEY, options).attach();
+    window.Raygun.disableAutoBreadcrumbs();
 
     /*
-    Adding a version to the Raygun reports to identify which version of the Wire ran into the issue.
-    @note We cannot use our own version string as it has to be in a certain format
-    @see https://github.com/MindscapeHQ/raygun4js#version-filtering
-    */
+     * Adding a version to the Raygun reports to identify which version of the WebApp ran into the issue.
+     * @note We cannot use our own version string as it has to be in a certain format
+     * @see https://github.com/MindscapeHQ/raygun4js#version-filtering
+     */
     if (!Environment.frontend.isLocalhost()) {
-      Raygun.setVersion(Environment.version(false));
+      window.Raygun.setVersion(Environment.version(false));
     }
     if (Environment.desktop) {
-      Raygun.withCustomData({electron_version: Environment.version(true)});
+      window.Raygun.withCustomData({electron_version: Environment.version(true)});
     }
-    Raygun.onBeforeSend(this._checkErrorPayload.bind(this));
+    window.Raygun.onBeforeSend(this._checkErrorPayload.bind(this));
   }
 }
