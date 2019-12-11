@@ -716,7 +716,8 @@ class App {
       this.repository.calling.destroy();
 
       if (this.repository.user.isActivatedAccount()) {
-        if (isTemporaryClientAndNonPersistent(loadValue(StorageKey.AUTH.PERSIST))) {
+        const shouldPersist = loadValue(StorageKey.AUTH.PERSIST);
+        if (shouldPersist && isTemporaryClientAndNonPersistent(shouldPersist)) {
           this.logout(SIGN_OUT_REASON.CLIENT_REMOVED, true);
         } else {
           this.repository.storage.terminate('window.onunload');
@@ -931,10 +932,10 @@ $(async () => {
       restUrl: Config.BACKEND_REST,
       webSocketUrl: Config.BACKEND_WS,
     });
-    const persist = loadValue(StorageKey.AUTH.PERSIST);
-    if (persist === undefined) {
+    const shouldPersist = loadValue(StorageKey.AUTH.PERSIST);
+    if (shouldPersist === undefined) {
       doRedirect(SIGN_OUT_REASON.NOT_SIGNED_IN);
-    } else if (isTemporaryClientAndNonPersistent(persist)) {
+    } else if (isTemporaryClientAndNonPersistent(shouldPersist)) {
       const engine = await StorageService.getUnitializedEngine();
       wire.app = new App(backendClient, appContainer, engine);
     } else {
