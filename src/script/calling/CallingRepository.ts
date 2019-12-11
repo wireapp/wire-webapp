@@ -35,7 +35,6 @@ import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 
 import {ConversationRepository} from '../conversation/ConversationRepository';
-import {EventBuilder} from '../conversation/EventBuilder';
 import {EventInfoEntity} from '../conversation/EventInfoEntity';
 import {EventRepository} from '../event/EventRepository';
 import {WebAppEvents} from '../event/WebApp';
@@ -513,7 +512,12 @@ export class CallingRepository {
   //##############################################################################
 
   private injectActivateEvent(conversationId: ConversationId, userId: UserId, time: string, source: string): void {
-    const event = EventBuilder.buildVoiceChannelActivate(conversationId, userId, time, this.avsVersion);
+    const event = window.z.conversation.EventBuilder.buildVoiceChannelActivate(
+      conversationId,
+      userId,
+      time,
+      this.avsVersion,
+    );
     this.eventRepository.injectEvent(event, source);
   }
 
@@ -525,7 +529,7 @@ export class CallingRepository {
     time: string,
     source: string,
   ): void {
-    const event = EventBuilder.buildVoiceChannelDeactivate(
+    const event = window.z.conversation.EventBuilder.buildVoiceChannelDeactivate(
       conversationId,
       userId,
       duration,

@@ -347,3 +347,7 @@ export const EventBuilder = {
     };
   },
 };
+
+window.z = window.z || {};
+window.z.conversation = window.z.conversation || {};
+window.z.conversation.EventBuilder = EventBuilder;

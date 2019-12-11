@@ -36,7 +36,6 @@ import {EventRepository} from 'src/script/event/EventRepository';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 
 import {EventInfoEntity} from 'src/script/conversation/EventInfoEntity';
-import {EventBuilder} from 'src/script/conversation/EventBuilder';
 import {ConversationType} from 'src/script/conversation/ConversationType';
 import {ConversationStatus} from 'src/script/conversation/ConversationStatus';
 import {ACCESS_ROLE} from 'src/script/conversation/AccessRole';
@@ -1472,7 +1471,7 @@ describe('ConversationRepository', () => {
       const conversationId = createRandomUuid();
       const event = {conversation: conversationId, from: 'unknown-user-id'};
       spyOn(TestFactory.conversation_repository, 'get_conversation_by_id').and.returnValue(Promise.resolve({}));
-      spyOn(EventBuilder, 'buildMemberJoin').and.returnValue(event);
+      spyOn(z.conversation.EventBuilder, 'buildMemberJoin').and.returnValue(event);
 
       return TestFactory.conversation_repository.addMissingMember(conversationId, ['unknown-user-id']).then(() => {
         expect(TestFactory.event_repository.injectEvent).toHaveBeenCalledWith(event, EventRepository.SOURCE.INJECTED);
