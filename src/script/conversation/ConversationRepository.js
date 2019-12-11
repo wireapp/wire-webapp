@@ -1466,7 +1466,9 @@ export class ConversationRepository {
    */
   removeMember(conversationEntity, userId) {
     return this.conversation_service.deleteMembers(conversationEntity.id, userId).then(response => {
-      delete conversationEntity.roles[userId];
+      const roles = conversationEntity.roles();
+      delete roles[userId];
+      conversationEntity.roles(roles);
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
       const event = !!response
         ? response
@@ -3517,7 +3519,7 @@ export class ConversationRepository {
       (roles, {id, conversation_role}) => Object.assign(roles, {[id]: conversation_role}),
       {},
     );
-    conversationEntity.roles = conversationRoles;
+    conversationEntity.roles(conversationRoles);
 
     if (!creatorIsParticipant) {
       messageEntity.memberMessageType = SystemMessageType.CONVERSATION_RESUME;
@@ -3634,6 +3636,18 @@ export class ConversationRepository {
    */
   _onMemberUpdate(conversationEntity, eventJson) {
     const {conversation: conversationId, data: eventData, from} = eventJson;
+
+    const isConversationRoleUpdate = !!eventData.conversation_role;
+    if (isConversationRoleUpdate) {
+      const {id: userId, conversation_role} = eventData;
+      const conversation = this.conversations().find(({id}) => id === conversationId);
+      if (conversation) {
+        const roles = conversation.roles();
+        roles[userId] = conversation_role;
+        conversation.roles(roles);
+      }
+      return;
+    }
 
     const isBackendEvent = eventData.otr_archived_ref || eventData.otr_muted_ref;
     const inSelfConversation = !this.self_conversation() || conversationId === this.self_conversation().id;

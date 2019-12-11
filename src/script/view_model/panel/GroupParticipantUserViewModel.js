@@ -61,8 +61,9 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
       this.selectedParticipant().id,
       newRole,
     );
-    this.activeConversation().roles[this.selectedParticipant().id] = newRole;
-    this.selectedParticipant.valueHasMutated();
+    const roles = this.activeConversation().roles();
+    roles[this.selectedParticipant().id] = newRole;
+    this.activeConversation().roles(roles);
   };
 
   showActionDevices(userEntity) {

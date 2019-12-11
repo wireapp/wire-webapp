@@ -262,7 +262,7 @@ export class ConversationMapper {
 
     const {creator, id, members, name, others, type} = conversationData;
     let conversationEntity = new Conversation(id);
-    conversationEntity.roles = conversationData.roles || {};
+    conversationEntity.roles(conversationData.roles || {});
 
     conversationEntity.creator = creator;
     conversationEntity.type(type);

@@ -114,7 +114,7 @@ export class ConversationRoleRepository {
     });
   };
 
-  getUserRole = (conversationEntity: Conversation, userEntity: User) => conversationEntity.roles[userEntity.id];
+  getUserRole = (conversationEntity: Conversation, userEntity: User) => conversationEntity.roles()[userEntity.id];
 
   isUserGroupAdmin = (conversationEntity: Conversation, userEntity: User) =>
     this.getUserRole(conversationEntity, userEntity) === DefaultRole.WIRE_ADMIN;

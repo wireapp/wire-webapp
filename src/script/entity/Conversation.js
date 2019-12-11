@@ -76,8 +76,8 @@ export class Conversation {
     this.participating_user_ets = ko.observableArray([]); // Does not include self user
     this.participating_user_ids = ko.observableArray([]); // Does not include self user
     this.selfUser = ko.observable();
-    /** @type {Record<string, string>} */
-    this.roles = {};
+    /** @type {ko.Observable<Record<string, string>>} */
+    this.roles = ko.observable({});
 
     this.hasCreationMessage = false;
 
