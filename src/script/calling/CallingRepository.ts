@@ -17,6 +17,17 @@
  *
  */
 
+import {
+  CALL_TYPE,
+  CONV_TYPE,
+  ENV as AVS_ENV,
+  LOG_LEVEL,
+  REASON,
+  STATE as CALL_STATE,
+  VIDEO_STATE,
+  Wcall,
+  getAvsInstance,
+} from '@wireapp/avs';
 import {Calling, GenericMessage} from '@wireapp/protocol-messaging';
 import {amplify} from 'amplify';
 import ko from 'knockout';
@@ -35,6 +46,7 @@ import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 
 import {ConversationRepository} from '../conversation/ConversationRepository';
+import {EventBuilder} from '../conversation/EventBuilder';
 import {EventInfoEntity} from '../conversation/EventInfoEntity';
 import {EventRepository} from '../event/EventRepository';
 import {WebAppEvents} from '../event/WebApp';
@@ -50,18 +62,6 @@ interface MediaStreamQuery {
   camera?: boolean;
   screen?: boolean;
 }
-
-import {
-  CALL_TYPE,
-  CONV_TYPE,
-  ENV as AVS_ENV,
-  LOG_LEVEL,
-  REASON,
-  STATE as CALL_STATE,
-  VIDEO_STATE,
-  Wcall,
-  getAvsInstance,
-} from '@wireapp/avs';
 
 export class CallingRepository {
   private readonly backendClient: any;
@@ -512,12 +512,7 @@ export class CallingRepository {
   //##############################################################################
 
   private injectActivateEvent(conversationId: ConversationId, userId: UserId, time: string, source: string): void {
-    const event = window.z.conversation.EventBuilder.buildVoiceChannelActivate(
-      conversationId,
-      userId,
-      time,
-      this.avsVersion,
-    );
+    const event = EventBuilder.buildVoiceChannelActivate(conversationId, userId, time, this.avsVersion);
     this.eventRepository.injectEvent(event, source);
   }
 
@@ -529,7 +524,7 @@ export class CallingRepository {
     time: string,
     source: string,
   ): void {
-    const event = window.z.conversation.EventBuilder.buildVoiceChannelDeactivate(
+    const event = EventBuilder.buildVoiceChannelDeactivate(
       conversationId,
       userId,
       duration,
