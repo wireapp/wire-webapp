@@ -716,8 +716,7 @@ class App {
       this.repository.calling.destroy();
 
       if (this.repository.user.isActivatedAccount()) {
-        const shouldPersist = loadValue(StorageKey.AUTH.PERSIST);
-        if (shouldPersist && isTemporaryClientAndNonPersistent(shouldPersist)) {
+        if (this.service.storage.isTemporaryAndNonPersistent) {
           this.logout(SIGN_OUT_REASON.CLIENT_REMOVED, true);
         } else {
           this.repository.storage.terminate('window.onunload');
