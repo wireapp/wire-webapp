@@ -23,7 +23,7 @@ import {Logger, getLogger} from 'Util/Logger';
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 import {TeamEntity} from '../team/TeamEntity';
-import {TeamService} from '../team/TeamService';
+import {TeamRepository} from '../team/TeamRepository';
 import {ConversationRepository} from './ConversationRepository';
 import {ConversationService} from './ConversationService';
 
@@ -78,7 +78,7 @@ export class ConversationRoleRepository {
   team: ko.Observable<TeamEntity>;
   selfUser: ko.Observable<User>;
   conversationService: ConversationService;
-  teamService: TeamService;
+  teamRepository: TeamRepository;
   logger: Logger;
 
   constructor(conversationRepository: ConversationRepository) {
@@ -88,14 +88,14 @@ export class ConversationRoleRepository {
     this.team = conversationRepository.team;
     this.selfUser = conversationRepository.selfUser;
     this.conversationService = conversationRepository.conversation_service;
-    this.teamService = conversationRepository.teamRepository.teamService;
+    this.teamRepository = conversationRepository.teamRepository;
     this.logger = getLogger('ConversationRepository');
   }
 
   loadTeamRoles = async () => {
     if (this.isTeam()) {
       try {
-        const response = await this.teamService.getTeamConversationRoles(this.team().id);
+        const response = await this.teamRepository.getTeamConversationRoles();
         this.teamRoles = response.conversation_roles;
       } catch (error) {
         this.logger.warn('Could not load team conversation roles', error);
