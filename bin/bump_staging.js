@@ -27,6 +27,7 @@ const logdown = require('logdown');
 const firstArgument = process.argv[2];
 const filename = path.basename(__filename);
 const usageText = `Usage: "${filename} <commitId>"`;
+const currentDate = moment().format('YYYY-MM-DD');
 
 const logger = logdown(filename, {
   logger: console,
@@ -62,7 +63,7 @@ logger.log(`Fetching base "${origin}" ...`);
 exec(`git fetch ${origin}`);
 
 const createTagName = (index = 0) => {
-  const newTagName = `${moment().format('YYYY-MM-DD')}-staging.${index}`;
+  const newTagName = `${currentDate}-staging.${index}`;
   const tagExists = exec(`git tag -l ${newTagName}`);
   return tagExists ? createTagName(++index) : newTagName;
 };
