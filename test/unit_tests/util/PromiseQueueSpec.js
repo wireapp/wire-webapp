@@ -21,7 +21,7 @@ import {PromiseQueue} from 'Util/PromiseQueue';
 
 describe('PromiseQueue', () => {
   describe('push', () => {
-    it('should process promises', () => {
+    it('processes promises', async () => {
       let counter = 0;
       const result = [];
 
@@ -30,15 +30,16 @@ describe('PromiseQueue', () => {
         return Promise.resolve();
       };
 
-      const queue = new PromiseQueue();
+      const queue = new PromiseQueue({name: 'TestQueue'});
       queue.push(promiseFn);
       queue.push(promiseFn);
-      return queue.push(promiseFn).then(() => {
-        expect(result).toEqual([0, 1, 2]);
-      });
+
+      await queue.push(promiseFn);
+
+      expect(result).toEqual([0, 1, 2]);
     });
 
-    it('should process promises that are added during execution', done => {
+    it('processes promises that are added during execution', done => {
       let counter = 0;
       const result = [];
 
@@ -55,7 +56,7 @@ describe('PromiseQueue', () => {
 
       spyOn(promise, 'fn').and.callThrough();
 
-      const queue = new PromiseQueue();
+      const queue = new PromiseQueue({name: 'TestQueue'});
       queue.push(promise.fn);
 
       window.setTimeout(() => {
@@ -70,17 +71,17 @@ describe('PromiseQueue', () => {
       }, 25);
     });
 
-    it('should process promises even when one of them rejects', () => {
+    it('processes promises even when one of them rejects', () => {
       const resolvingPromise = () => Promise.resolve();
 
       const rejectingPromise = () => Promise.reject(new Error('Unit test error'));
 
-      const queue = new PromiseQueue();
+      const queue = new PromiseQueue({name: 'TestQueue'});
       queue.push(rejectingPromise);
       return queue.push(resolvingPromise);
     });
 
-    it('should process promises even when one of them times out (with retries)', () => {
+    it('processes promises even when one of them times out (with retries)', () => {
       let counter = 0;
 
       const resolvingPromise = () => Promise.resolve(counter++);
@@ -93,7 +94,7 @@ describe('PromiseQueue', () => {
         });
       };
 
-      const queue = new PromiseQueue({timeout: 100});
+      const queue = new PromiseQueue({name: 'TestQueue', timeout: 100});
       queue.push(timeout_promise);
       return queue.push(resolvingPromise);
     });

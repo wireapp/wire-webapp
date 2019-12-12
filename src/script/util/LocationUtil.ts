@@ -20,13 +20,13 @@
 /**
  * Return link to Google Maps.
  *
- * @param {number} latitude - Latitude of location
- * @param {number} longitude - Longitude of location
- * @param {string} name - Name of location
- * @param {string} zoom - Map zoom level
- * @returns {string} URL to location in Google Maps
+ * @param latitude Latitude of location
+ * @param longitude Longitude of location
+ * @param name Name of location
+ * @param zoom Map zoom level
+ * @returns URL to location in Google Maps
  */
-export function getMapsUrl(latitude, longitude, name, zoom) {
+export function getMapsUrl(latitude: number, longitude: number, name: string, zoom: string): string {
   const baseUrl = 'https://google.com/maps/';
 
   const nameParam = name ? `place/${name}/` : '';

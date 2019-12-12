@@ -19,7 +19,7 @@
 
 import 'url-search-params-polyfill';
 
-function enableLogging(force = false, search = window.location.search) {
+export function enableLogging(force = false, search = window.location.search): void {
   let localStorage;
 
   try {
@@ -45,5 +45,3 @@ function enableLogging(force = false, search = window.location.search) {
     localStorage.removeItem('debug');
   }
 }
-
-export {enableLogging};

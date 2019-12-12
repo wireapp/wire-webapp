@@ -17,21 +17,24 @@
  *
  */
 
+import {ContentMessage} from '../entity/message/ContentMessage';
+import {MentionEntity} from '../message/MentionEntity';
+
 /**
  * Checks if two arrays with mentions contain different values.
  *
- * @param {Message} originalMessageEntity - Message entity
- * @param {Array<MentionEntity>} [updatedMentions] - Updated mentions
- * @returns {boolean} Are the mentions different from each other
+ * @param originalMessageEntity - Message entity
+ * @param updatedMentions Updated mentions
+ * @returns Are the mentions different from each other
  */
-export function areMentionsDifferent(originalMessageEntity, updatedMentions) {
-  const flattenToUserId = mentions => mentions.map(mention => mention.userId).sort();
+export function areMentionsDifferent(originalMessageEntity: ContentMessage, updatedMentions: MentionEntity[]): boolean {
+  const flattenToUserId = (mentions: MentionEntity[]): string[] => mentions.map(mention => mention.userId).sort();
 
   const existingMentions = flattenToUserId(originalMessageEntity.get_first_asset().mentions());
-  updatedMentions = flattenToUserId(updatedMentions);
+  const userIds = flattenToUserId(updatedMentions);
 
-  const hasDifferentAmount = existingMentions.length !== updatedMentions.length;
-  const hasDifferentUserIDs = existingMentions.some((userId, index) => userId !== updatedMentions[index]);
+  const hasDifferentAmount = existingMentions.length !== userIds.length;
+  const hasDifferentUserIDs = existingMentions.some((userId, index) => userId !== userIds[index]);
 
   return hasDifferentAmount || hasDifferentUserIDs;
 }
@@ -39,10 +42,10 @@ export function areMentionsDifferent(originalMessageEntity, updatedMentions) {
 /**
  * Checks if a given text is different from an already existing text on the message entity.
  *
- * @param {Message} originalMessageEntity - Message entity
- * @param {string} textMessage - Message to compare with
- * @returns {boolean} Are text the same
+ * @param originalMessageEntity Message entity
+ * @param textMessage Message to compare with
+ * @returns Are message and text the same
  */
-export function isTextDifferent(originalMessageEntity, textMessage) {
+export function isTextDifferent(originalMessageEntity: ContentMessage, textMessage: string): boolean {
   return textMessage !== originalMessageEntity.get_first_asset().text;
 }

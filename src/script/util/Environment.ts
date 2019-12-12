@@ -40,47 +40,47 @@ const PLATFORM_NAME = {
   WINDOWS: 'Win',
 };
 
-const _getAppVersion = () => {
+const _getAppVersion = (): string => {
   const versionElement = document.head.querySelector("[property='wire:version']");
   const hasVersion = versionElement && versionElement.hasAttribute('version');
   return hasVersion ? versionElement.getAttribute('version').trim() : '';
 };
 
-const _getElectronVersion = userAgent => {
+const _getElectronVersion = (userAgent: string): string => {
   // [match, app, version]
   const [, , electronVersion] = /(Wire|WireInternal)\/(\S+)/.exec(userAgent) || [];
   return electronVersion;
 };
 
-const _getFormattedAppVersion = () => {
+const _getFormattedAppVersion = (): string => {
   const [year, month, day, hour, minute] = _getAppVersion().split('-');
   return `${year}.${month}.${day}.${hour}${minute}`;
 };
 
-const _getVersion = () => {
+const _getVersion = (): number => {
   const browserVersion = platform.version || '';
   const [majorVersion] = browserVersion.split('.');
   return window.parseInt(majorVersion, 10);
 };
 
-const _isChrome = () => platform.name === BROWSER_NAME.CHROME || _isElectron();
-const _isDesktop = () => _isElectron() && platform.ua.includes(BROWSER_NAME.WIRE);
-const _isEdge = () => platform.name === BROWSER_NAME.EDGE;
-const _isElectron = () => platform.name === BROWSER_NAME.ELECTRON;
-const _isFirefox = () => platform.name === BROWSER_NAME.FIREFOX;
-const _isOpera = () => platform.name === BROWSER_NAME.OPERA;
+const _isChrome = (): boolean => platform.name === BROWSER_NAME.CHROME || _isElectron();
+const _isDesktop = (): boolean => _isElectron() && platform.ua.includes(BROWSER_NAME.WIRE);
+const _isEdge = (): boolean => platform.name === BROWSER_NAME.EDGE;
+const _isElectron = (): boolean => platform.name === BROWSER_NAME.ELECTRON;
+const _isFirefox = (): boolean => platform.name === BROWSER_NAME.FIREFOX;
+const _isOpera = (): boolean => platform.name === BROWSER_NAME.OPERA;
 
-const _isMac = () => platform.ua.includes(PLATFORM_NAME.MACINTOSH);
-const _isWindows = () => platform.os.family && platform.os.family.includes(PLATFORM_NAME.WINDOWS);
+const _isMac = (): boolean => platform.ua.includes(PLATFORM_NAME.MACINTOSH);
+const _isWindows = (): boolean => platform.os.family && platform.os.family.includes(PLATFORM_NAME.WINDOWS);
 
-const isLocalhost = () => [APP_ENV.LOCALHOST, APP_ENV.VIRTUAL_HOST].includes(window.location.hostname);
-const isProduction = () => {
+const isLocalhost = (): boolean => [APP_ENV.LOCALHOST, APP_ENV.VIRTUAL_HOST].includes(window.location.hostname);
+const isProduction = (): boolean => {
   const isProductionHost = window.wire.env.ENVIRONMENT === BackendEnvironment.PRODUCTION;
   return isProductionHost;
 };
 
-const _supportsAudioOutputSelection = () => _isChrome();
-const _supportsCalling = () => {
+const _supportsAudioOutputSelection = (): boolean => _isChrome();
+const _supportsCalling = (): boolean => {
   if (!_supportsMediaDevices()) {
     return false;
   }
@@ -92,19 +92,19 @@ const _supportsCalling = () => {
   return _isEdge() ? false : _isChrome() || _isFirefox() || _isOpera();
 };
 
-const _supportsClipboard = () => !!navigator.clipboard;
-const _supportsIndexedDb = () => {
+const _supportsClipboard = (): boolean => !!navigator.clipboard;
+const _supportsIndexedDb = (): boolean => {
   try {
     return !!window.indexedDB;
   } catch (error) {
     return false;
   }
 };
-const _supportsMediaDevices = () => !!navigator.mediaDevices && !!navigator.mediaDevices.getUserMedia;
+const _supportsMediaDevices = (): boolean => !!navigator.mediaDevices && !!navigator.mediaDevices.getUserMedia;
 
-const _supportsPermissions = () => !!navigator.permissions;
+const _supportsPermissions = (): boolean => !!navigator.permissions;
 
-const _supportsNotifications = () => {
+const _supportsNotifications = (): boolean => {
   const notificationNotSupported = window.Notification === undefined;
   if (notificationNotSupported) {
     return false;
@@ -113,7 +113,7 @@ const _supportsNotifications = () => {
   const requestPermissionNotSupported = window.Notification.requestPermission === undefined;
   return requestPermissionNotSupported ? false : document.visibilityState !== undefined;
 };
-const _supportsScreenSharing = () => {
+const _supportsScreenSharing = (): boolean => {
   const hasScreenCaptureAPI =
     window.desktopCapturer || (_supportsMediaDevices() && navigator.mediaDevices.getDisplayMedia);
   return hasScreenCaptureAPI || _isFirefox();
@@ -126,7 +126,7 @@ document.body.classList.add(_osCssClass, _platformCssClass);
 
 export const Environment = {
   backend: {
-    current: undefined,
+    current: undefined as any,
   },
 
   browser: {
@@ -161,7 +161,7 @@ export const Environment = {
     win: _isWindows(),
   },
 
-  version: (showWrapperVersion = true, doNotFormat = false) => {
+  version: (showWrapperVersion = true, doNotFormat = false): string => {
     if (Environment.frontend.isLocalhost()) {
       return 'dev';
     }

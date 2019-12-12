@@ -234,9 +234,3 @@ export const WebAppEvents = {
     SHOW: 'wire.webapp.warning.show',
   },
 };
-
-// Needed for the wrapper
-
-window.z = window.z || {};
-window.z.event = window.z.event || {};
-window.z.event.WebApp = WebAppEvents;

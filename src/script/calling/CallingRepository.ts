@@ -28,8 +28,8 @@ import {Logger, getLogger} from 'Util/Logger';
 import {createRandomUuid} from 'Util/util';
 
 import {Config} from '../Config';
-import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 
+import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
