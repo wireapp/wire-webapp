@@ -19,15 +19,18 @@
  *
  */
 
+//@ts-check
+
 const {execSync} = require('child_process');
 const logdown = require('logdown');
 const moment = require('moment');
 const path = require('path');
 
 const currentDate = moment().format('YYYY-MM-DD');
+const filename = path.basename(__filename);
 const firstArgument = process.argv[2];
 const commitId = process.argv[3];
-const filename = path.basename(__filename);
+const usageText = `Usage: ${filename} [-h|--help] <staging|production> <commitId>`;
 let target = '';
 
 const logger = logdown(filename, {
@@ -36,19 +39,19 @@ const logger = logdown(filename, {
 });
 logger.state.isEnabled = true;
 
+/**
+ * @param {string} command - The command to execute
+ * @returns {string} The standard output
+ */
 const exec = command =>
   execSync(command, {stdio: 'pipe'})
     .toString()
     .trim();
 
-const displayUsage = () => {
-  logger.info(`Usage: ${filename} [-h|--help] <staging|production> <commitId>`);
-};
-
 switch (firstArgument) {
   case '--help':
   case '-h': {
-    displayUsage();
+    logger.info(usageText);
     process.exit();
   }
   case 'production':
@@ -58,14 +61,14 @@ switch (firstArgument) {
   }
   default: {
     logger.error(`No or invalid target specified. Valid targets are: staging, production`);
-    displayUsage();
+    logger.info(usageText);
     process.exit(1);
   }
 }
 
 if (!commitId) {
   logger.error(`No commit ID specified`);
-  displayUsage();
+  logger.info(usageText);
   process.exit(1);
 }
 
@@ -81,6 +84,10 @@ const origin = exec('git remote');
 logger.log(`Fetching base "${origin}" ...`);
 exec(`git fetch ${origin}`);
 
+/**
+ * @param {number} index - The tag name index
+ * @returns {string} The new tag name
+ */
 const createTagName = (index = 0) => {
   const newTagName = `${currentDate}-${target}.${index}`;
   const tagExists = !!exec(`git tag -l ${newTagName}`);
