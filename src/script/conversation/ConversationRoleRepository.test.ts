@@ -17,17 +17,18 @@
  *
  */
 
+import {createRandomUuid} from 'Util/util';
+import {TeamEntity} from '../team/TeamEntity';
+import {ConversationRoleRepository} from './ConversationRoleRepository';
+
 declare global {
   interface Window {
     TestFactory: any;
   }
 }
 
-import {TestFactory} from '../../../test/api/TestFactory';
-import {ConversationRoleRepository} from './ConversationRoleRepository';
-
 describe('ConversationRoleRepository', () => {
-  const testFactory = new TestFactory();
+  const testFactory = new window.TestFactory();
   let roleRepository: ConversationRoleRepository;
 
   beforeEach(async () => {
@@ -38,21 +39,20 @@ describe('ConversationRoleRepository', () => {
   describe('constructor', () => {
     it('knows if you are in a team', () => {
       expect(roleRepository.isTeam()).toBe(false);
+      window.TestFactory.team_repository.team(new TeamEntity(createRandomUuid()));
+      expect(roleRepository.isTeam()).toBe(true);
     });
   });
 
   describe('loadTeamRoles', () => {
     it('initializes all team members with their roles', async () => {
-      spyOn(window.TestFactory.team_repository.teamService, 'getTeamConversationRoles').and.returnValue(
+      spyOn(window.TestFactory.team_repository, 'getTeamConversationRoles').and.returnValue(
         Promise.resolve({
-          conversation_roles: ['test'],
+          conversation_roles: ['my-custom-role'],
         }),
       );
 
-      window.TestFactory.team_repository.team({
-        id: '1337',
-        members: ko.observable({}),
-      });
+      window.TestFactory.team_repository.team(new TeamEntity(createRandomUuid()));
       await roleRepository.loadTeamRoles();
       expect(roleRepository.teamRoles.length).toBe(1);
     });

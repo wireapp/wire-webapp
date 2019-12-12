@@ -118,6 +118,10 @@ export class TeamRepository {
     });
   }
 
+  getTeamConversationRoles() {
+    return this.teamService.getTeamConversationRoles(this.team().id);
+  }
+
   getWhitelistedServices(teamId, size, prefix) {
     return this.teamService.getWhitelistedServices(teamId, size, prefix).then(({services: servicesData}) => {
       return IntegrationMapper.mapServicesFromArray(servicesData);
