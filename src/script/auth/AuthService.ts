@@ -30,15 +30,8 @@ export class AuthService {
   public readonly backendClient: any;
   private readonly logger: Logger;
 
-  static get CONFIG(): {
-    POST_ACCESS_RETRY: {
-      LIMIT: number;
-      TIMEOUT: number;
-    };
-    URL_ACCESS: string;
-    URL_COOKIES: string;
-    URL_LOGIN: string;
-  } {
+  // tslint:disable-next-line:typedef
+  static get CONFIG() {
     return {
       POST_ACCESS_RETRY: {
         LIMIT: 10,

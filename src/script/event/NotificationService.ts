@@ -29,11 +29,8 @@ export class NotificationService {
   private readonly storageService: StorageService;
   private readonly AMPLIFY_STORE_NAME: string;
 
-  static get CONFIG(): {
-    PRIMARY_KEY_MISSED: string;
-    URL_NOTIFICATIONS: string;
-    URL_NOTIFICATIONS_LAST: string;
-  } {
+  // tslint:disable-next-line:typedef
+  static get CONFIG() {
     return {
       PRIMARY_KEY_MISSED: 'z.storage.StorageKey.NOTIFICATION.MISSED',
       URL_NOTIFICATIONS: '/notifications',

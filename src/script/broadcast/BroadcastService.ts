@@ -24,7 +24,8 @@ import {BackendClient} from '../service/BackendClient';
 export class BroadcastService {
   private readonly backendClient: BackendClient;
 
-  static get CONFIG(): {URL_BROADCAST: string} {
+  // tslint:disable-next-line:typedef
+  static get CONFIG() {
     return {
       URL_BROADCAST: '/broadcast',
     };

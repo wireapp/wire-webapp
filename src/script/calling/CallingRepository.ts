@@ -89,7 +89,8 @@ export class CallingRepository {
   private readonly logger: Logger;
   private readonly callLog: string[];
 
-  static get CONFIG(): any {
+  // tslint:disable-next-line:typedef
+  static get CONFIG() {
     return {
       DEFAULT_CONFIG_TTL: 60 * 60, // 60 minutes in seconds
       MAX_FIREFOX_TURN_COUNT: 3,

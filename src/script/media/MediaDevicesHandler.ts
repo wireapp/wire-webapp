@@ -60,10 +60,6 @@ export interface ElectronDesktopCapturerSource {
   name: string;
 }
 
-interface Config {
-  DEFAULT_DEVICE: Record<DeviceTypes, string>;
-}
-
 export class MediaDevicesHandler {
   private readonly logger: Logger;
   public availableDevices: Devices;
@@ -71,7 +67,8 @@ export class MediaDevicesHandler {
   public currentAvailableDeviceId: CurrentAvailableDeviceId;
   public deviceSupport: DeviceSupport;
 
-  static get CONFIG(): Config {
+  // tslint:disable-next-line:typedef
+  static get CONFIG() {
     return {
       DEFAULT_DEVICE: {
         audioInput: 'default',
