@@ -74,7 +74,7 @@ const defaultMember: ConversationRole = {
 export class ConversationRoleRepository {
   conversationRoles: Record<string, ConversationRoles>;
   teamRoles: ConversationRoles;
-  isTeam: ko.Observable<boolean>;
+  isTeam: ko.PureComputed<boolean>;
   team: ko.Observable<TeamEntity>;
   selfUser: ko.Observable<User>;
   conversationService: ConversationService;

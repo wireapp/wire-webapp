@@ -17,6 +17,12 @@
  *
  */
 
+declare global {
+  interface Window {
+    TestFactory: any;
+  }
+}
+
 import {TestFactory} from '../../../test/api/TestFactory';
 import {ConversationRoleRepository} from './ConversationRoleRepository';
 
@@ -25,13 +31,30 @@ describe('ConversationRoleRepository', () => {
   let roleRepository: ConversationRoleRepository;
 
   beforeEach(async () => {
-    const conversationRepository = await testFactory.exposeConversationActors();
-    roleRepository = new ConversationRoleRepository(conversationRepository);
+    await testFactory.exposeConversationActors();
+    roleRepository = new ConversationRoleRepository(window.TestFactory.conversation_repository);
   });
 
   describe('constructor', () => {
     it('knows if you are in a team', () => {
-      expect(roleRepository).toBeDefined();
+      expect(roleRepository.isTeam()).toBe(false);
+    });
+  });
+
+  describe('loadTeamRoles', () => {
+    it('initializes all team members with their roles', async () => {
+      spyOn(window.TestFactory.team_repository.teamService, 'getTeamConversationRoles').and.returnValue(
+        Promise.resolve({
+          conversation_roles: ['test'],
+        }),
+      );
+
+      window.TestFactory.team_repository.team({
+        id: '1337',
+        members: ko.observable({}),
+      });
+      await roleRepository.loadTeamRoles();
+      expect(roleRepository.teamRoles.length).toBe(1);
     });
   });
 });
