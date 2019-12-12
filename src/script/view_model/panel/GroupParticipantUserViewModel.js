@@ -49,8 +49,10 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
         !this.selectedParticipant()?.is_me,
     );
 
-    this.isAdmin = ko.pureComputed(() =>
-      this.conversationRoleRepository.isUserGroupAdmin(this.activeConversation(), this.selectedParticipant()),
+    this.isAdmin = ko.pureComputed(
+      () =>
+        this.activeConversation().isGroup() &&
+        this.conversationRoleRepository.isUserGroupAdmin(this.activeConversation(), this.selectedParticipant()),
     );
   }
 

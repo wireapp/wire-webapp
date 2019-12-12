@@ -3639,7 +3639,7 @@ export class ConversationRepository {
 
     const isConversationRoleUpdate = !!eventData.conversation_role;
     if (isConversationRoleUpdate) {
-      const {id: userId, conversation_role} = eventData;
+      const {target: userId, conversation_role} = eventData;
       const conversation = this.conversations().find(({id}) => id === conversationId);
       if (conversation) {
         const roles = conversation.roles();
