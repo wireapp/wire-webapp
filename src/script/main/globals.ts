@@ -29,6 +29,8 @@ import {AssetService} from '../assets/AssetService';
 // Needed for the wrapper
 import '../event/WebApp';
 
+import '../Config';
+
 import 'Components/accentColorPicker';
 import 'Components/asset/assetHeader';
 import 'Components/asset/controls/audioSeekBar';
@@ -109,10 +111,11 @@ declare global {
     $: any;
     amplify: amplify.Static;
     bazinga64: any;
-    ko: typeof ko;
     jQuery: any;
+    ko: typeof ko;
     platform: any;
     Raygun: RaygunStatic;
+    t: any;
     wire: {
       app: {
         service: {

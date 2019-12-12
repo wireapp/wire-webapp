@@ -16,6 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+
 import ko from 'knockout';
 
 import {getFileExtension, trimFileExtension, formatBytes} from 'Util/util';

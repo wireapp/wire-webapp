@@ -33,47 +33,50 @@ export const KEY = {
   TAB: 'Tab',
 };
 
-export const isOneOfKeys = (keyboardEvent, expectedKeys = []) => {
+export const isOneOfKeys = (keyboardEvent: KeyboardEvent, expectedKeys: string[] = []) => {
   expectedKeys = expectedKeys.map(key => key.toLowerCase());
   const eventKey = keyboardEvent.key ? keyboardEvent.key.toLowerCase() : '';
   return !!expectedKeys.find(key => key === eventKey);
 };
 
-export const isArrowKey = keyboardEvent =>
+export const isArrowKey = (keyboardEvent: KeyboardEvent): boolean =>
   isOneOfKeys(keyboardEvent, [KEY.ARROW_DOWN, KEY.ARROW_LEFT, KEY.ARROW_RIGHT, KEY.ARROW_UP]);
 
-export const isKey = (keyboardEvent = {}, expectedKey = '') => {
-  const eventKey = keyboardEvent.key ? keyboardEvent.key.toLowerCase() : '';
+export const isKey = (keyboardEvent?: KeyboardEvent, expectedKey = '') => {
+  const eventKey = keyboardEvent?.key.toLowerCase() || '';
   return eventKey === expectedKey.toLowerCase();
 };
 
-export const isEnterKey = keyboardEvent => isKey(keyboardEvent, KEY.ENTER);
+export const isEnterKey = (keyboardEvent: KeyboardEvent): boolean => isKey(keyboardEvent, KEY.ENTER);
 
-export const isEscapeKey = keyboardEvent => isKey(keyboardEvent, KEY.ESC);
+export const isEscapeKey = (keyboardEvent: KeyboardEvent): boolean => isKey(keyboardEvent, KEY.ESC);
 
-export const isFunctionKey = keyboardEvent =>
+export const isFunctionKey = (keyboardEvent: KeyboardEvent): boolean =>
   keyboardEvent.altKey || keyboardEvent.ctrlKey || keyboardEvent.metaKey || keyboardEvent.shiftKey;
 
-export const isMetaKey = keyboardEvent => keyboardEvent.metaKey || keyboardEvent.ctrlKey;
+export const isMetaKey = (keyboardEvent: KeyboardEvent): boolean => keyboardEvent.metaKey || keyboardEvent.ctrlKey;
 
-export const isPasteAction = keyboardEvent => isMetaKey(keyboardEvent) && isKey(keyboardEvent, KEY.KEY_V);
+export const isPasteAction = (keyboardEvent: KeyboardEvent): boolean =>
+  isMetaKey(keyboardEvent) && isKey(keyboardEvent, KEY.KEY_V);
 
-export const isRemovalAction = keyboardEvent => isOneOfKeys(keyboardEvent, [KEY.BACKSPACE, KEY.DELETE]);
+export const isRemovalAction = (keyboardEvent: KeyboardEvent): boolean =>
+  isOneOfKeys(keyboardEvent, [KEY.BACKSPACE, KEY.DELETE]);
 
-export const insertAtCaret = (areaId, text) => {
+export const insertAtCaret = (areaId: string, text: string) => {
   // http://stackoverflow.com/a/1064139
-  const textArea = document.getElementById(areaId);
+  const textArea = document.getElementById(areaId) as HTMLTextAreaElement;
   if (!textArea) {
     return;
   }
 
   const scrollPos = textArea.scrollTop;
   let strPos = 0;
-  const br = textArea.selectionStart || textArea.selectionStart === '0' ? 'ff' : document.selection ? 'ie' : false;
+  const br =
+    textArea.selectionStart || textArea.selectionStart === 0 ? 'ff' : (document as any).selection ? 'ie' : false;
 
   if (br === 'ie') {
     textArea.focus();
-    const range = document.selection.createRange();
+    const range = (document as any).selection.createRange();
     range.moveStart('character', -textArea.value.length);
     strPos = range.text.length;
   } else if (br === 'ff') {
@@ -88,7 +91,7 @@ export const insertAtCaret = (areaId, text) => {
 
   if (br === 'ie') {
     textArea.focus();
-    const ieRange = document.selection.createRange();
+    const ieRange = (document as any).selection.createRange();
     ieRange.moveStart('character', -textArea.value.length);
     ieRange.moveStart('character', strPos);
     ieRange.moveEnd('character', 0);
@@ -102,7 +105,9 @@ export const insertAtCaret = (areaId, text) => {
   textArea.scrollTop = scrollPos;
 };
 
-const escKeyHandlers = [];
+type KeyboardHandler = (event: KeyboardEvent) => void;
+
+const escKeyHandlers: KeyboardHandler[] = [];
 
 document.addEventListener('keydown', event => {
   if (event.key === 'Escape') {
@@ -110,9 +115,9 @@ document.addEventListener('keydown', event => {
   }
 });
 
-export const onEscKey = handler => escKeyHandlers.push(handler);
+export const onEscKey = (handler: KeyboardHandler) => escKeyHandlers.push(handler);
 
-export const offEscKey = handler => {
+export const offEscKey = (handler: KeyboardHandler) => {
   const index = escKeyHandlers.indexOf(handler);
   if (index >= 0) {
     escKeyHandlers.splice(index, 1);

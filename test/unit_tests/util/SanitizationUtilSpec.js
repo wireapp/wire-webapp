@@ -21,7 +21,7 @@ import {LocalizerUtil, Declension} from 'Util/LocalizerUtil';
 
 import 'src/script/localization/Localizer';
 
-import {escapeString, escapeRegex, getFirstName, getSelfName, safeWindowOpen} from 'src/script/util/SanitizationUtil';
+import {escapeRegex, getFirstName, getSelfName, safeWindowOpen} from 'src/script/util/SanitizationUtil';
 import {User} from 'src/script/entity/User';
 
 describe('SanitizationUtil', () => {
@@ -30,14 +30,6 @@ describe('SanitizationUtil', () => {
       const escapedRegex = escapeRegex(':)');
 
       expect(escapedRegex).toEqual(':\\)');
-    });
-  });
-
-  describe('escapeString', () => {
-    it('will return escaped strings', () => {
-      const escapedString = escapeString(`<script>alert('Unsanitzed');</script>`);
-
-      expect(escapedString).toEqual('&lt;script&gt;alert(&#x27;Unsanitzed&#x27;);&lt;/script&gt;');
     });
   });
 

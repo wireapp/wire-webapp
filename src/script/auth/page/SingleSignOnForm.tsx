@@ -19,6 +19,7 @@
 
 import {ClientType} from '@wireapp/api-client/dist/client/index';
 import {
+  ArrowIcon,
   Button,
   Checkbox,
   CheckboxLabel,
@@ -27,7 +28,6 @@ import {
   Input,
   InputSubmitCombo,
   RoundIconButton,
-  ArrowIcon,
 } from '@wireapp/react-ui-kit';
 import React, {useEffect, useRef, useState} from 'react';
 import {useIntl} from 'react-intl';
