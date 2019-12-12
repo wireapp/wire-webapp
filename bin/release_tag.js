@@ -26,8 +26,9 @@ const path = require('path');
 
 const currentDate = moment().format('YYYY-MM-DD');
 const firstArgument = process.argv[2];
+const commitId = process.argv[3];
 const filename = path.basename(__filename);
-const usageText = `Usage: "${filename} <commitId>"`;
+let target = '';
 
 const logger = logdown(filename, {
   logger: console,
@@ -40,18 +41,36 @@ const exec = command =>
     .toString()
     .trim();
 
-if (!firstArgument) {
-  logger.error(`No commit ID specified. ${usageText}`);
+const displayUsage = () => {
+  logger.info(`Usage: ${filename} [-h|--help] <staging|production> <commitId>`);
+};
+
+switch (firstArgument) {
+  case '--help':
+  case '-h': {
+    displayUsage();
+    process.exit();
+  }
+  case 'production':
+  case 'staging': {
+    target = firstArgument;
+    break;
+  }
+  default: {
+    logger.error(`No or invalid target specified. Valid targets are: staging, production`);
+    displayUsage();
+    process.exit(1);
+  }
+}
+
+if (!commitId) {
+  logger.error(`No commit ID specified`);
+  displayUsage();
   process.exit(1);
 }
 
-if (firstArgument === '--help' || firstArgument === '-h') {
-  logger.info(usageText);
-  process.exit();
-}
-
 try {
-  exec(`git show ${firstArgument}`);
+  exec(`git show ${commitId}`);
 } catch (error) {
   logger.error(error.message);
   process.exit(1);
@@ -63,7 +82,7 @@ logger.log(`Fetching base "${origin}" ...`);
 exec(`git fetch ${origin}`);
 
 const createTagName = (index = 0) => {
-  const newTagName = `${currentDate}-staging.${index}`;
+  const newTagName = `${currentDate}-${target}.${index}`;
   const tagExists = !!exec(`git tag -l ${newTagName}`);
   return tagExists ? createTagName(++index) : newTagName;
 };
@@ -71,7 +90,7 @@ const createTagName = (index = 0) => {
 const tagName = createTagName();
 
 logger.log(`Creating tag "${tagName}" ...`);
-exec(`git tag ${tagName} ${firstArgument}`);
+exec(`git tag ${tagName} ${commitId}`);
 
 logger.log(`Pushing "${tagName}" to "${origin}" ...`);
 exec(`git push ${origin} ${tagName}`);
