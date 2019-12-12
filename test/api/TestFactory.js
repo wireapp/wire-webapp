@@ -66,7 +66,7 @@ window.testConfig = {
   connection: backendConfig,
 };
 
-window.TestFactory = class TestFactory {
+export class TestFactory {
   /**
    * @returns {Promise<AuthRepository>} The authentication repository.
    */
@@ -374,7 +374,9 @@ window.TestFactory = class TestFactory {
     );
     return TestFactory.lifecycle_repository;
   }
-};
+}
+
+window.TestFactory = TestFactory;
 
 const actorsCache = new Map();
 
