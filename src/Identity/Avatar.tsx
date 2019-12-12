@@ -85,9 +85,9 @@ export const Avatar = (props: AvatarProps) => {
   const {base64Image, forceInitials, name, fetchImage, isAvatarGridItem} = props;
   const [scale, setScale] = useState(0);
   useEffect(() => {
-    setTimeout(() => {
-      setScale(1);
-    });
+    if (base64Image) {
+      requestAnimationFrame(() => setScale(1));
+    }
   }, [base64Image]);
   const getInitials = (name: string = '') =>
     name
@@ -113,6 +113,7 @@ export const Avatar = (props: AvatarProps) => {
             backgroundImage: base64Image && `url(data:image/png;base64,${base64Image})`,
             backgroundPosition: 'center',
             backgroundSize: 'cover',
+            borderRadius: isAvatarGridItem ? '0' : '50%',
             minHeight: '100%',
             minWidth: '100%',
             opacity: scale,
