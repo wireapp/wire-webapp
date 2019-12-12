@@ -85,18 +85,12 @@ The command to run is:
 
 **Actions**
 
-1. Checkout commit ID which has been approved by QA team
-1. Create a Git tag with the following format: `YYYY-MM-DD-staging.X`
-1. Push the newly created tag
-
-**Example**
-
-```
-git fetch origin
-git checkout 90fda951916f0d60a5bffce69a7267830e313391
-git tag 2019-04-23-staging.0
-git push origin --tags
-```
+1. Get commit ID which has been approved by QA team
+1. run `yarn release:staging <commitId>`.
+1. Example:
+   ```
+   yarn release:staging 90fda951916f0d60a5bffce69a7267830e313391
+   ```
 
 If everything is done right, you will see a Travis CI job in the [build pipeline](https://travis-ci.org/wireapp/wire-webapp/builds) based on the new tag:
 
@@ -108,7 +102,13 @@ Before RC testing we create a merge commit (**don't squash!**) from "dev" to "ma
 
 #### Production Release
 
-Similar to "Staging Bumps" with the exception that tags are made from "master" branch and contain "production" in the tag name instead of "staging". Example: `2019-07-01-production.0`
+Similar to "Staging Bumps" with the exception that you need to run `yarn release:production <commitId>`.
+
+Example:
+
+```
+yarn release:production 90fda951916f0d60a5bffce69a7267830e313391
+```
 
 ##### Release notes
 
