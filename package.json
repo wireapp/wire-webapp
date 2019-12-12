@@ -210,6 +210,7 @@
     "build:prod": "yarn build:server && grunt build_prod",
     "build:server": "cd server && yarn build",
     "build:style": "node ./bin/less.js",
+    "bump:staging": "node bin/bump_staging.js",
     "bundle:dev": "webpack --config webpack.config.dev.js --progress",
     "bundle:prod": "webpack --config webpack.config.js",
     "bundle:test": "webpack --config webpack.config.test.js",
