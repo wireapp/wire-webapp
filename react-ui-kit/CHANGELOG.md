@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.25.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.25.0...@wireapp/react-ui-kit@7.25.1) (2019-12-12)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Initial Avatar animation & image cropping ([#2651](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/2651)) ([e069734](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/e069734157a113619ad01ea833bca7707ab9ec94))
+
+
+
+
+
 # [7.25.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.24.2...@wireapp/react-ui-kit@7.25.0) (2019-12-11)
 
 
