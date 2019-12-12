@@ -17,16 +17,21 @@
  *
  */
 
-import {TestFactory} from '../../../test/api/TestFactory';
 import {ConversationRoleRepository} from './ConversationRoleRepository';
 
+declare global {
+  interface Window {
+    TestFactory: any;
+  }
+}
+
 describe('ConversationRoleRepository', () => {
-  const testFactory = new TestFactory();
+  const testFactory = new window.TestFactory();
   let roleRepository: ConversationRoleRepository;
 
   beforeEach(async () => {
-    const conversationRepository = await testFactory.exposeConversationActors();
-    roleRepository = new ConversationRoleRepository(conversationRepository);
+    await testFactory.exposeConversationActors();
+    roleRepository = new ConversationRoleRepository(window.TestFactory.conversation_repository);
   });
 
   describe('constructor', () => {
