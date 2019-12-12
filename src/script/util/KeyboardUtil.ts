@@ -43,7 +43,7 @@ export const isArrowKey = (keyboardEvent: KeyboardEvent): boolean =>
   isOneOfKeys(keyboardEvent, [KEY.ARROW_DOWN, KEY.ARROW_LEFT, KEY.ARROW_RIGHT, KEY.ARROW_UP]);
 
 export const isKey = (keyboardEvent?: KeyboardEvent, expectedKey = '') => {
-  const eventKey = keyboardEvent && keyboardEvent.key ? keyboardEvent.key.toLowerCase() : '';
+  const eventKey = keyboardEvent?.key.toLowerCase() || '';
   return eventKey === expectedKey.toLowerCase();
 };
 
