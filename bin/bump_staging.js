@@ -20,14 +20,14 @@
  */
 
 const {execSync} = require('child_process');
+const logdown = require('logdown');
 const moment = require('moment');
 const path = require('path');
-const logdown = require('logdown');
 
+const currentDate = moment().format('YYYY-MM-DD');
 const firstArgument = process.argv[2];
 const filename = path.basename(__filename);
 const usageText = `Usage: "${filename} <commitId>"`;
-const currentDate = moment().format('YYYY-MM-DD');
 
 const logger = logdown(filename, {
   logger: console,
@@ -64,7 +64,7 @@ exec(`git fetch ${origin}`);
 
 const createTagName = (index = 0) => {
   const newTagName = `${currentDate}-staging.${index}`;
-  const tagExists = exec(`git tag -l ${newTagName}`);
+  const tagExists = !!exec(`git tag -l ${newTagName}`);
   return tagExists ? createTagName(++index) : newTagName;
 };
 
