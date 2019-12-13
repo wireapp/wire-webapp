@@ -18,7 +18,11 @@
  */
 
 import ko from 'knockout';
+import Dexie from 'dexie';
 import platform from 'platform';
+
+import 'Components/mentionSuggestions';
+import './globals';
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
@@ -27,9 +31,9 @@ import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {enableLogging} from 'Util/LoggerUtil';
 import {Environment} from 'Util/Environment';
 import {exposeWrapperGlobals} from 'Util/wrapper';
+import {loadValue} from 'Util/StorageUtil';
 import {includesString} from 'Util/StringUtil';
 import {appendParameter} from 'Util/UrlUtil';
-import Dexie from 'dexie';
 
 import {Config} from '../Config';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
@@ -69,15 +73,13 @@ import {SingleInstanceHandler} from './SingleInstanceHandler';
 import {AppInitStatisticsValue} from '../telemetry/app_init/AppInitStatisticsValue';
 import {AppInitTimingsStep} from '../telemetry/app_init/AppInitTimingsStep';
 import {AppInitTelemetry} from '../telemetry/app_init/AppInitTelemetry';
+import {AuthError, ClientError, AccessTokenError} from '../error/';
 import {MainViewModel} from '../view_model/MainViewModel';
 import {ThemeViewModel} from '../view_model/ThemeViewModel';
 import {WindowHandler} from '../ui/WindowHandler';
 
 import {Router} from '../router/Router';
 import {initRouterBindings} from '../router/routerBindings';
-
-import 'Components/mentionSuggestions.js';
-import './globals';
 
 import {ReceiptsMiddleware} from '../event/preprocessor/ReceiptsMiddleware';
 
@@ -113,7 +115,6 @@ import {GiphyRepository} from '../extension/GiphyRepository';
 import {AssetUploader} from '../assets/AssetUploader';
 import {GiphyService} from '../extension/GiphyService';
 import {PermissionRepository} from '../permission/PermissionRepository';
-import {loadValue} from 'Util/StorageUtil';
 
 function doRedirect(signOutReason) {
   let url = `/auth/${location.search}`;
@@ -489,9 +490,9 @@ class App {
     this.logger.warn(`${logMessage}: ${error.message}`, {error});
 
     const {message, type} = error;
-    const isAuthError = error instanceof z.error.AuthError;
+    const isAuthError = error instanceof AuthError;
     if (isAuthError) {
-      const isTypeMultipleTabs = type === z.error.AuthError.TYPE.MULTIPLE_TABS;
+      const isTypeMultipleTabs = type === AuthError.TYPE.MULTIPLE_TABS;
       const signOutReason = isTypeMultipleTabs ? SIGN_OUT_REASON.MULTIPLE_TABS : SIGN_OUT_REASON.INDEXED_DB;
       return this._redirectToLogin(signOutReason);
     }
@@ -500,18 +501,15 @@ class App {
       `App reload: '${isReload}', Document referrer: '${document.referrer}', Location: '${window.location.href}'`,
     );
     if (isReload) {
-      const isSessionExpired = [
-        z.error.AccessTokenError.TYPE.REQUEST_FORBIDDEN,
-        z.error.AccessTokenError.TYPE.NOT_FOUND_IN_CACHE,
-      ];
+      const isSessionExpired = [AccessTokenError.TYPE.REQUEST_FORBIDDEN, AccessTokenError.TYPE.NOT_FOUND_IN_CACHE];
 
       if (isSessionExpired.includes(type)) {
         this.logger.warn(`Session expired on page reload: ${message}`, error);
         return this._redirectToLogin(SIGN_OUT_REASON.SESSION_EXPIRED);
       }
 
-      const isAccessTokenError = error instanceof z.error.AccessTokenError;
-      const isInvalidClient = type === z.error.ClientError.TYPE.NO_VALID_CLIENT;
+      const isAccessTokenError = error instanceof AccessTokenError;
+      const isInvalidClient = type === ClientError.TYPE.NO_VALID_CLIENT;
 
       if (isInvalidClient) {
         return this._redirectToLogin(SIGN_OUT_REASON.SESSION_EXPIRED);
@@ -528,9 +526,9 @@ class App {
 
     if (navigator.onLine) {
       switch (type) {
-        case z.error.AccessTokenError.TYPE.NOT_FOUND_IN_CACHE:
-        case z.error.AccessTokenError.TYPE.RETRIES_EXCEEDED:
-        case z.error.AccessTokenError.TYPE.REQUEST_FORBIDDEN: {
+        case AccessTokenError.TYPE.NOT_FOUND_IN_CACHE:
+        case AccessTokenError.TYPE.RETRIES_EXCEEDED:
+        case AccessTokenError.TYPE.REQUEST_FORBIDDEN: {
           this.logger.warn(`Redirecting to login: ${error.message}`, error);
           return this._redirectToLogin(SIGN_OUT_REASON.NOT_SIGNED_IN);
         }
@@ -538,7 +536,7 @@ class App {
         default: {
           this.logger.error(`Caused by: ${(error ? error.message : undefined) || error}`, error);
 
-          const isAccessTokenError = error instanceof z.error.AccessTokenError;
+          const isAccessTokenError = error instanceof AccessTokenError;
           if (isAccessTokenError) {
             this.logger.error(`Could not get access token: ${error.message}. Logging out user.`, error);
           } else {
@@ -658,7 +656,7 @@ class App {
     if (this.singleInstanceHandler.registerInstance(instanceId)) {
       return this._registerSingleInstanceCleaning();
     }
-    throw new z.error.AuthError(z.error.AuthError.TYPE.MULTIPLE_TABS);
+    throw new AuthError(AuthError.TYPE.MULTIPLE_TABS);
   }
 
   _registerSingleInstanceCleaning() {
@@ -769,7 +767,7 @@ class App {
       try {
         keepPermanentDatabase = this.repository.client.isCurrentClientPermanent() && !clearData;
       } catch (error) {
-        if (error.type === z.error.ClientError.TYPE.CLIENT_NOT_SET) {
+        if (error.type === ClientError.TYPE.CLIENT_NOT_SET) {
           keepPermanentDatabase = false;
         }
       }

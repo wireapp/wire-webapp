@@ -17,21 +17,23 @@
  *
  */
 
-import {BaseError} from './BaseError';
+export enum TeamErrorType {
+  NO_PERMISSIONS = 'NO_PERMISSIONS',
+}
 
-window.z = window.z || {};
-window.z.error = z.error || {};
+export class TeamError extends Error {
+  static readonly TYPE = TeamErrorType;
+  static readonly MESSAGE: Record<TeamErrorType, string> = {
+    NO_PERMISSIONS: 'No permissions provided',
+  };
+  readonly type: TeamErrorType;
 
-z.error.ConnectionError = class ConnectionError extends BaseError {
-  constructor(type, message) {
-    super('ConnectionError', type, message);
+  constructor(type: TeamErrorType, message?: string) {
+    super();
+
+    this.name = this.constructor.name;
+    this.stack = new Error().stack;
+    this.type = type;
+    this.message = message || TeamError.MESSAGE[type];
   }
-
-  static get MESSAGE() {
-    return {};
-  }
-
-  static get TYPE() {
-    return {};
-  }
-};
+}

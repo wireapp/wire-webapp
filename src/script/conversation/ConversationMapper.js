@@ -27,7 +27,7 @@ import {NOTIFICATION_STATE} from './NotificationSetting';
 import {ConversationType} from './ConversationType';
 import {ConversationStatus} from './ConversationStatus';
 import {Conversation} from '../entity/Conversation';
-import {BaseError} from '../error/BaseError';
+import {BaseError, ConversationError} from '../error/';
 
 /**
  * @typedef {object} ConversationBackendData
@@ -103,10 +103,10 @@ export class ConversationMapper {
    */
   mapConversations(conversationsData, timestamp = 1) {
     if (conversationsData === undefined) {
-      throw new z.error.ConversationError(BaseError.TYPE.MISSING_PARAMETER);
+      throw new ConversationError(BaseError.TYPE.MISSING_PARAMETER);
     }
     if (!Array.isArray(conversationsData) || !conversationsData.length) {
-      throw new z.error.ConversationError(BaseError.TYPE.INVALID_PARAMETER);
+      throw new ConversationError(BaseError.TYPE.INVALID_PARAMETER);
     }
     return conversationsData.map((conversationData, index) => {
       return this._createConversationEntity(conversationData, timestamp + index);
@@ -254,10 +254,10 @@ export class ConversationMapper {
    */
   _createConversationEntity(conversationData, initialTimestamp) {
     if (conversationData === undefined) {
-      throw new z.error.ConversationError(BaseError.TYPE.MISSING_PARAMETER);
+      throw new ConversationError(BaseError.TYPE.MISSING_PARAMETER);
     }
     if (!isObject(conversationData) || !Object.keys(conversationData).length) {
-      throw new z.error.ConversationError(BaseError.TYPE.INVALID_PARAMETER);
+      throw new ConversationError(BaseError.TYPE.INVALID_PARAMETER);
     }
 
     const {creator, id, members, name, others, type} = conversationData;

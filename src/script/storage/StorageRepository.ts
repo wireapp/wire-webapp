@@ -68,7 +68,7 @@ export class StorageRepository {
       if (record?.value) {
         return record.value;
       }
-      throw new z.error.StorageError(z.error.StorageError.TYPE.NOT_FOUND);
+      throw new StorageError(StorageError.TYPE.NOT_FOUND);
     });
   }
 

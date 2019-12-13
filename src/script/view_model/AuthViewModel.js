@@ -48,6 +48,7 @@ import {StorageSchemata} from '../storage/StorageSchemata';
 
 import '../auth/AuthView';
 import '../auth/ValidationError';
+import {AuthError, BackendClientError, ClientError, UserError} from '../error/';
 import {AuthView} from '../auth/AuthView';
 import {SingleInstanceHandler} from '../main/SingleInstanceHandler';
 
@@ -65,7 +66,6 @@ import {ClientRepository} from '../client/ClientRepository';
 import {ClientType} from '../client/ClientType';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 
-import {BackendClientError} from '../error/BackendClientError';
 import {FORWARDED_QUERY_KEYS} from '../auth/route';
 import {SelfService} from '../self/SelfService';
 import {UserService} from '../user/UserService';
@@ -282,7 +282,7 @@ class AuthViewModel {
         this._init_url_hash();
       })
       .catch(error => {
-        if (!(error instanceof z.error.AuthError)) {
+        if (!(error instanceof AuthError)) {
           throw error;
         }
       });
@@ -338,7 +338,7 @@ class AuthViewModel {
     const cookies_disabled = () => {
       if (current_hash !== AuthView.MODE.BLOCKED_COOKIES) {
         this._set_hash(AuthView.MODE.BLOCKED_COOKIES);
-        throw new z.error.AuthError(z.error.AuthError.TYPE.COOKIES_DISABLED);
+        throw new AuthError(AuthError.TYPE.COOKIES_DISABLED);
       }
     };
 
@@ -402,7 +402,7 @@ class AuthViewModel {
           }
         }
 
-        return Promise.reject(new z.error.AuthError(z.error.AuthError.TYPE.MULTIPLE_TABS));
+        return Promise.reject(new AuthError(AuthError.TYPE.MULTIPLE_TABS));
       }
     }
 
@@ -434,7 +434,7 @@ class AuthViewModel {
           }
         })
         .catch(error => {
-          const isMultipleTabs = error.type === z.error.AuthError.TYPE.MULTIPLE_TABS;
+          const isMultipleTabs = error.type === AuthError.TYPE.MULTIPLE_TABS;
           if (!isMultipleTabs) {
             throw error;
           }
@@ -1520,12 +1520,12 @@ class AuthViewModel {
       .then(() => this.cryptography_repository.loadCryptobox(this.storageService.db || this.storageService))
       .then(() => this.client_repository.getValidLocalClient())
       .catch(error => {
-        const user_missing_email = error.type === z.error.UserError.TYPE.USER_MISSING_EMAIL;
+        const user_missing_email = error.type === UserError.TYPE.USER_MISSING_EMAIL;
         if (user_missing_email) {
           throw error;
         }
 
-        const client_not_validated = error.type === z.error.ClientError.TYPE.NO_VALID_CLIENT;
+        const client_not_validated = error.type === ClientError.TYPE.NO_VALID_CLIENT;
         if (client_not_validated) {
           const client_et = this.client_repository.currentClient();
           this.client_repository.currentClient(undefined);
@@ -1547,7 +1547,7 @@ class AuthViewModel {
         this._register_client(auto_login);
       })
       .catch(error => {
-        if (error.type !== z.error.UserError.TYPE.USER_MISSING_EMAIL) {
+        if (error.type !== UserError.TYPE.USER_MISSING_EMAIL) {
           this.logger.error(`Login failed: ${error.message}`, error);
           this._add_error(t('authErrorMisc'));
           this._has_errors();
@@ -1574,7 +1574,7 @@ class AuthViewModel {
         const isIncompletePhoneUser = hasPhoneNumber && !hasEmailAddress;
         if (isIncompletePhoneUser) {
           this._set_hash(AuthView.MODE.VERIFY_ACCOUNT);
-          throw new z.error.UserError(z.error.UserError.TYPE.USER_MISSING_EMAIL);
+          throw new UserError(UserError.TYPE.USER_MISSING_EMAIL);
         }
 
         return this.storageService.init(this.self_user().id);
@@ -1642,7 +1642,7 @@ class AuthViewModel {
         });
       })
       .catch(error => {
-        const isTooManyClients = error.type === z.error.ClientError.TYPE.TOO_MANY_CLIENTS;
+        const isTooManyClients = error.type === ClientError.TYPE.TOO_MANY_CLIENTS;
         if (isTooManyClients) {
           this.logger.warn('User has already registered the maximum number of clients', error);
           return (window.location.hash = AuthView.MODE.LIMIT);

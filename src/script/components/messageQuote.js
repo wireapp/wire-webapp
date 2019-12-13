@@ -22,6 +22,7 @@ import moment from 'moment';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
 
 import {WebAppEvents} from '../event/WebApp';
+import {ConversationError} from '../error/';
 import {QuoteEntity} from '../message/QuoteEntity';
 
 class MessageQuote {
@@ -79,7 +80,7 @@ class MessageQuote {
           this.quotedMessageId(message.id);
         })
         .catch(error => {
-          if (error.type === z.error.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
+          if (error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND) {
             return this.error(QuoteEntity.ERROR.MESSAGE_NOT_FOUND);
           }
           throw error;

@@ -29,7 +29,7 @@ import {User} from 'src/script/entity/User';
 import {TeamRepository} from 'src/script/team/TeamRepository';
 import {UserRepository} from 'src/script/user/UserRepository';
 import {t} from 'Util/LocalizerUtil';
-import {BackendClientError} from '../../error/BackendClientError';
+import {BackendClientError} from '../../error/';
 import {WebAppEvents} from '../../event/WebApp';
 
 export const SHOW_REQUEST_MODAL = 'LegalHold.showRequestModal';

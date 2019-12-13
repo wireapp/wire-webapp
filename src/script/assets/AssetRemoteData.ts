@@ -24,7 +24,7 @@ import {ValidationUtilError} from 'Util/ValidationUtil';
 import {decryptAesAsset} from './AssetCrypto';
 import {getAssetUrl, setAssetUrl} from './AssetURLCache';
 
-import {BackendClientError} from '../error/BackendClientError';
+import {BackendClientError} from '../error/';
 
 export type AssetUrlData = AssetUrlDataVersion1 | AssetUrlDataVersion2 | AssetUrlDataVersion3;
 

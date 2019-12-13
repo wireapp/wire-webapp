@@ -26,6 +26,7 @@ import {arrayToBase64, createRandomUuid} from 'Util/util';
 
 import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 import {ClientEvent} from 'src/script/event/Client';
+import {CryptographyError} from 'src/script/error/';
 
 describe('CryptographyRepository', () => {
   const test_factory = new TestFactory();
@@ -166,7 +167,7 @@ describe('CryptographyRepository', () => {
       try {
         await TestFactory.cryptography_repository.handleEncryptedEvent(mockedEvent);
       } catch (error) {
-        expect(error.type).toBe(z.error.CryptographyError.TYPE.UNHANDLED_TYPE);
+        expect(error.type).toBe(CryptographyError.TYPE.UNHANDLED_TYPE);
       }
     });
 

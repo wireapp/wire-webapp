@@ -17,26 +17,27 @@
  *
  */
 
-import {BaseError} from './BaseError';
+export enum ConnectErrorType {
+  NOT_SUPPORTED = 'NOT_SUPPORTED',
+  NO_CONTACTS = 'NO_CONTACTS',
+  UPLOAD = 'UPLOAD',
+}
 
-export class PermissionError extends BaseError {
-  constructor(type, message) {
-    super('PermissionError', type, message);
-  }
+export class ConnectError extends Error {
+  static readonly TYPE = ConnectErrorType;
+  static readonly MESSAGE: Record<ConnectErrorType, string> = {
+    NOT_SUPPORTED: 'Source not supported',
+    NO_CONTACTS: 'No contacts found for matching',
+    UPLOAD: 'Address book upload failed',
+  };
+  readonly type: ConnectErrorType;
 
-  static get MESSAGE() {
-    return {
-      DENIED: 'Permission was denied',
-      UNSUPPORTED: 'Permissions API is not supported',
-      UNSUPPORTED_TYPE: 'Permissions API does not support requested type',
-    };
-  }
+  constructor(type: ConnectErrorType, message?: string) {
+    super();
 
-  static get TYPE() {
-    return {
-      DENIED: 'DENIED',
-      UNSUPPORTED: 'UNSUPPORTED',
-      UNSUPPORTED_TYPE: 'UNSUPPORTED_TYPE',
-    };
+    this.name = this.constructor.name;
+    this.stack = new Error().stack;
+    this.type = type;
+    this.message = message || ConnectError.MESSAGE[type];
   }
 }

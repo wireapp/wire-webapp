@@ -48,6 +48,7 @@ import {ReceiptMode} from 'src/script/conversation/ReceiptMode';
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 import {StorageSchemata} from 'src/script/storage/StorageSchemata';
 import {File} from 'src/script/entity/message/File';
+import {ConversationError} from 'src/script/error/';
 
 import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
 import {ConnectionStatus} from 'src/script/connection/ConnectionStatus';
@@ -360,8 +361,8 @@ describe('ConversationRepository', () => {
         .deleteMessageForEveryone(conversation_et, message_to_delete_et)
         .then(done.fail)
         .catch(error => {
-          expect(error).toEqual(jasmine.any(z.error.ConversationError));
-          expect(error.type).toBe(z.error.ConversationError.TYPE.WRONG_USER);
+          expect(error).toEqual(jasmine.any(ConversationError));
+          expect(error.type).toBe(ConversationError.TYPE.WRONG_USER);
           done();
         });
     });
@@ -1058,8 +1059,8 @@ describe('ConversationRepository', () => {
           ._handleConversationEvent(message_delete_event)
           .then(done.fail)
           .catch(error => {
-            expect(error).toEqual(jasmine.any(z.error.ConversationError));
-            expect(error.type).toBe(z.error.ConversationError.TYPE.WRONG_USER);
+            expect(error).toEqual(jasmine.any(ConversationError));
+            expect(error.type).toBe(ConversationError.TYPE.WRONG_USER);
             expect(TestFactory.conversation_repository._onMessageDeleted).toHaveBeenCalled();
             expect(conversation_et.getMessage(message_et.id)).toBeDefined();
             expect(TestFactory.conversation_repository._addDeleteMessage).not.toHaveBeenCalled();
@@ -1172,8 +1173,8 @@ describe('ConversationRepository', () => {
           ._handleConversationEvent(messageHiddenEvent)
           .then(done.fail)
           .catch(error => {
-            expect(error).toEqual(jasmine.any(z.error.ConversationError));
-            expect(error.type).toBe(z.error.ConversationError.TYPE.WRONG_USER);
+            expect(error).toEqual(jasmine.any(ConversationError));
+            expect(error.type).toBe(ConversationError.TYPE.WRONG_USER);
             expect(TestFactory.conversation_repository._onMessageHidden).toHaveBeenCalled();
             expect(conversation_et.getMessage(messageId)).toBeDefined();
             done();

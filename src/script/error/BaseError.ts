@@ -17,38 +17,33 @@
  *
  */
 
+export enum BaseErrorType {
+  INVALID_PARAMETER = 'INVALID_PARAMETER',
+  MISSING_PARAMETER = 'MISSING_PARAMETER',
+  UNKNOWN = 'UNKNOWN',
+}
+
 export class BaseError extends Error {
-  constructor(name, type, message) {
+  static readonly TYPE = BaseErrorType;
+  static readonly MESSAGE: Record<BaseErrorType, string> = {
+    INVALID_PARAMETER: 'Invalid parameter passed',
+    MISSING_PARAMETER: 'Required parameter is not defined',
+    UNKNOWN: 'Unknown',
+  };
+  readonly type: BaseErrorType;
+
+  constructor() {
     super();
 
     this.name = this.constructor.name;
     this.stack = new Error().stack;
-
-    const ErrorInstanceClass = z.error[name];
-    const knownTypes = Object.assign({}, BaseError.TYPE, ErrorInstanceClass.TYPE);
-    const isValidType = Object.values(knownTypes).includes(type);
-
-    this.type = isValidType ? type : BaseError.TYPE.UNKNOWN;
-
-    this.message = message || ErrorInstanceClass.MESSAGE[this.type] || BaseError.MESSAGE[this.type];
-    if (!this.message) {
-      this.message = `${BaseError.MESSAGE.UNKNOWN} ${name}`;
-    }
   }
 
-  static get MESSAGE() {
-    return {
-      INVALID_PARAMETER: 'Invalid parameter passed',
-      MISSING_PARAMETER: 'Required parameter is not defined',
-      UNKNOWN: 'Unknown',
-    };
+  protected getType<T = BaseErrorType>(type: keyof T, knownTypes: T): T[keyof T] | BaseErrorType.UNKNOWN {
+    return knownTypes[type] || BaseErrorType.UNKNOWN;
   }
 
-  static get TYPE() {
-    return {
-      INVALID_PARAMETER: 'INVALID_PARAMETER',
-      MISSING_PARAMETER: 'MISSING_PARAMETER',
-      UNKNOWN: 'UNKNOWN',
-    };
+  protected getMessage<T>(name: string, knownMessages: T, type?: keyof T): string {
+    return type.toString() || knownMessages[type]?.toString() || `${BaseError.MESSAGE.UNKNOWN} ${name}`;
   }
 }

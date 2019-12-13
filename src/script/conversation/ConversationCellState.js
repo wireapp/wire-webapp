@@ -21,6 +21,7 @@ import {t} from 'Util/LocalizerUtil';
 
 import {ConversationStatusIcon} from './ConversationStatusIcon';
 import {AssetTransferState} from '../assets/AssetTransferState';
+import {ConversationError} from '../error/';
 
 const ACTIVITY_TYPE = {
   CALL: 'ConversationCellState.ACTIVITY_TYPE.CALL',
@@ -123,7 +124,7 @@ const _generateSummaryDescription = activities => {
           }
 
           default:
-            throw new z.error.ConversationError();
+            throw new ConversationError();
         }
       }
     })

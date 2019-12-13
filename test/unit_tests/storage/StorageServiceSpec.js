@@ -18,6 +18,7 @@
  */
 
 import {StorageSchemata, StorageService} from 'src/script/storage/';
+import {StorageError} from 'src/script/error/';
 
 describe('StorageRepository', () => {
   describe('save', () => {
@@ -27,7 +28,7 @@ describe('StorageRepository', () => {
         .save(StorageSchemata.OBJECT_STORE.AMPLIFY, 'primary_key', null)
         .then(fail)
         .catch(error => {
-          expect(error.type).toEqual(z.error.StorageError.TYPE.NO_DATA);
+          expect(error.type).toEqual(StorageError.TYPE.NO_DATA);
         });
     });
   });

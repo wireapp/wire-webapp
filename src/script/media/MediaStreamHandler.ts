@@ -21,8 +21,7 @@ import {amplify} from 'amplify';
 import {Environment} from 'Util/Environment';
 import {Logger, getLogger} from 'Util/Logger';
 
-import {MediaError} from '../error/MediaError';
-import {PermissionError} from '../error/PermissionError';
+import {MediaError, PermissionError} from '../error/';
 import {WebAppEvents} from '../event/WebApp';
 import {PermissionRepository} from '../permission/PermissionRepository';
 import {PermissionStatusState} from '../permission/PermissionStatusState';

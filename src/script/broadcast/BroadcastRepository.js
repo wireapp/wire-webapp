@@ -22,7 +22,7 @@ import {getLogger} from 'Util/Logger';
 import {EventInfoEntity} from '../conversation/EventInfoEntity';
 import {WebAppEvents} from '../event/WebApp';
 
-import {BackendClientError} from '../error/BackendClientError';
+import {BackendClientError} from '../error/';
 
 // Broadcast repository for all broadcast interactions with the broadcast service
 class BroadcastRepository {

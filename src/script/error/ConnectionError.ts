@@ -17,25 +17,19 @@
  *
  */
 
-import {BaseError} from './BaseError';
+import {BaseErrorType} from './BaseError';
 
-window.z = window.z || {};
-window.z.error = z.error || {};
+export class ConnectionError extends Error {
+  static readonly MESSAGE = {};
+  static readonly TYPE = {};
+  readonly type: {};
 
-z.error.TeamError = class TeamError extends BaseError {
-  constructor(type, message) {
-    super('TeamError', type, message);
+  constructor(type: {}, message?: string) {
+    super();
+
+    this.name = this.constructor.name;
+    this.stack = new Error().stack;
+    this.type = type;
+    this.message = message || BaseErrorType.UNKNOWN;
   }
-
-  static get MESSAGE() {
-    return {
-      NO_PERMISSIONS: 'No permissions provided',
-    };
-  }
-
-  static get TYPE() {
-    return {
-      NO_PERMISSIONS: 'NO_PERMISSIONS',
-    };
-  }
-};
+}

@@ -21,7 +21,7 @@ import {amplify} from 'amplify';
 
 import {t} from 'Util/LocalizerUtil';
 
-import {BackendClientError} from '../error/BackendClientError';
+import {BackendClientError} from '../error/';
 import {BackendEvent} from '../event/Backend';
 import {WebAppEvents} from '../event/WebApp';
 import {EventName} from '../tracking/EventName';

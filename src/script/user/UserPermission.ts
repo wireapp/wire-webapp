@@ -18,6 +18,7 @@
  */
 
 import {capitalizeFirstChar} from 'Util/StringUtil';
+import {TeamError} from '../error';
 
 // tslint:disable:object-literal-sort-keys
 /**
@@ -150,7 +151,7 @@ export enum ROLE {
 
 export function roleFromTeamPermissions(permissions: {self: number}): ROLE {
   if (!permissions) {
-    throw new z.error.TeamError(z.error.TeamError.TYPE.NO_PERMISSIONS);
+    throw new TeamError(TeamError.TYPE.NO_PERMISSIONS);
   }
 
   const invalidRoles = [ROLE.INVALID, ROLE.NONE];

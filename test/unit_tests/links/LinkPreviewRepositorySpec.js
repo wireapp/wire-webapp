@@ -17,12 +17,14 @@
  *
  */
 
-import {AssetService} from 'src/script/assets/AssetService';
 import {graph, resolve as resolveDependency} from '../../api/testResolver';
+
+import {AssetService} from 'src/script/assets/AssetService';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {PropertiesService} from 'src/script/properties/PropertiesService';
 import {SelfService} from 'src/script/self/SelfService';
 import {LinkPreviewRepository} from 'src/script/links/LinkPreviewRepository';
+import {LinkPreviewError} from 'src/script/error/';
 
 describe('LinkPreviewRepository', () => {
   let link_preview_repository = null;
@@ -46,7 +48,7 @@ describe('LinkPreviewRepository', () => {
         ._getLinkPreview('https://app.wire.com/')
         .then(done.fail)
         .catch(error => {
-          expect(error.type).toBe(z.error.LinkPreviewError.TYPE.NO_DATA_AVAILABLE);
+          expect(error.type).toBe(LinkPreviewError.TYPE.NO_DATA_AVAILABLE);
           done();
         });
     });
@@ -58,7 +60,7 @@ describe('LinkPreviewRepository', () => {
         ._getLinkPreview('https://www.youtube.com/watch?v=t4gjl-uwUHc')
         .then(done.fail)
         .catch(error => {
-          expect(error.type).toBe(z.error.LinkPreviewError.TYPE.BLACKLISTED);
+          expect(error.type).toBe(LinkPreviewError.TYPE.BLACKLISTED);
           done();
         });
     });
@@ -71,7 +73,7 @@ describe('LinkPreviewRepository', () => {
         ._getLinkPreview(invalidUrl)
         .then(done.fail)
         .catch(error => {
-          expect(error.type).toBe(z.error.LinkPreviewError.TYPE.UNSUPPORTED_TYPE);
+          expect(error.type).toBe(LinkPreviewError.TYPE.UNSUPPORTED_TYPE);
           done();
         });
     });

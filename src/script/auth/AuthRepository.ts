@@ -26,6 +26,7 @@ import {Environment} from 'Util/Environment';
 import {getLogger} from 'Util/Logger';
 import {loadValue, resetStoreValue, storeValue} from 'Util/StorageUtil';
 import {TIME_IN_MILLIS, formatTimestamp} from 'Util/TimeUtil';
+import {AccessTokenError} from '../error/';
 import {WebAppEvents} from '../event/WebApp';
 import {QUEUE_STATE} from '../service/QueueState';
 import {StorageKey} from '../storage/StorageKey';
@@ -108,7 +109,7 @@ export class AuthRepository {
         })
         .catch(error => {
           const {message, type} = error;
-          const isRequestForbidden = type === z.error.AccessTokenError.TYPE.REQUEST_FORBIDDEN;
+          const isRequestForbidden = type === AccessTokenError.TYPE.REQUEST_FORBIDDEN;
           if (isRequestForbidden || Environment.frontend.isLocalhost()) {
             this.logger.warn(`Session expired on access token refresh: ${message}`, error);
             window.Raygun.send(error);
@@ -141,7 +142,7 @@ export class AuthRepository {
         return resolve();
       }
 
-      return reject(new z.error.AccessTokenError(z.error.AccessTokenError.TYPE.NOT_FOUND_IN_CACHE));
+      return reject(new AccessTokenError(AccessTokenError.TYPE.NOT_FOUND_IN_CACHE));
     });
   }
 

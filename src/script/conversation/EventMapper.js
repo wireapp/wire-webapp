@@ -32,6 +32,7 @@ import {RenameMessage} from '../entity/message/RenameMessage';
 import {Location} from '../entity/message/Location';
 import {DeleteMessage} from '../entity/message/DeleteMessage';
 import {MemberMessage} from '../entity/message/MemberMessage';
+import {ConversationError} from '../error/';
 import {DecryptErrorMessage} from '../entity/message/DecryptErrorMessage';
 import {ContentMessage} from '../entity/message/ContentMessage';
 import {MissedMessage} from '../entity/message/MissedMessage';
@@ -98,7 +99,7 @@ export class EventMapper {
     return Promise.resolve()
       .then(() => this._mapJsonEvent(event, conversationEntity))
       .catch(error => {
-        const isMessageNotFound = error.type === z.error.ConversationError.TYPE.MESSAGE_NOT_FOUND;
+        const isMessageNotFound = error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
         if (isMessageNotFound) {
           throw error;
         }
@@ -108,7 +109,7 @@ export class EventMapper {
         const customData = {eventTime: new Date(event.time).toISOString(), eventType: event.type};
         Raygun.send(new Error(errorMessage), customData);
 
-        throw new z.error.ConversationError(z.error.ConversationError.TYPE.MESSAGE_NOT_FOUND);
+        throw new ConversationError(ConversationError.TYPE.MESSAGE_NOT_FOUND);
       });
   }
 
@@ -283,7 +284,7 @@ export class EventMapper {
 
       default: {
         this.logger.warn(`Ignored unhandled '${event.type}' event ${event.id ? `'${event.id}' ` : ''}`, event);
-        throw new z.error.ConversationError(z.error.ConversationError.TYPE.MESSAGE_NOT_FOUND);
+        throw new ConversationError(ConversationError.TYPE.MESSAGE_NOT_FOUND);
       }
     }
 

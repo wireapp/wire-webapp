@@ -17,12 +17,12 @@
  *
  */
 
+import {AccessTokenData, LoginData} from '@wireapp/api-client/dist/auth';
+
 import {Logger, getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
-import {BackendClientError} from '../error/BackendClientError';
-
-import {AccessTokenData, LoginData} from '@wireapp/api-client/dist/auth';
+import {AccessTokenError, BackendClientError} from '../error/';
 import {BackendClient} from '../service/BackendClient';
 import {QUEUE_STATE} from '../service/QueueState';
 
@@ -98,14 +98,14 @@ export class AuthService {
         const isRequestForbidden = jqXHR.status === BackendClientError.STATUS_CODE.FORBIDDEN;
         if (isRequestForbidden) {
           this.logger.warn(`Request for access token forbidden (Attempt '${retryAttempt}'): ${errorThrown}`, jqXHR);
-          return reject(new z.error.AccessTokenError(z.error.AccessTokenError.TYPE.REQUEST_FORBIDDEN));
+          return reject(new AccessTokenError(AccessTokenError.TYPE.REQUEST_FORBIDDEN));
         }
 
         const exceededRetries = retryAttempt > AuthService.CONFIG.POST_ACCESS_RETRY.LIMIT;
         if (exceededRetries) {
           this.saveAccessTokenInClient();
           this.logger.warn(`Exceeded limit of attempts to refresh access token': ${errorThrown}`, jqXHR);
-          return reject(new z.error.AccessTokenError(z.error.AccessTokenError.TYPE.RETRIES_EXCEEDED));
+          return reject(new AccessTokenError(AccessTokenError.TYPE.RETRIES_EXCEEDED));
         }
 
         retryAttempt++;

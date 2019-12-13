@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,29 +17,20 @@
  *
  */
 
-import {BaseError} from './BaseError';
-
-window.z = window.z || {};
-window.z.error = z.error || {};
-
-z.error.ConnectError = class ConnectError extends BaseError {
-  constructor(type, message) {
-    super('ConnectError', type, message);
-  }
-
-  static get MESSAGE() {
-    return {
-      NO_CONTACTS: 'No contacts found for matching',
-      NOT_SUPPORTED: 'Source not supported',
-      UPLOAD: 'Address book upload failed',
-    };
-  }
-
-  static get TYPE() {
-    return {
-      NO_CONTACTS: 'NO_CONTACTS',
-      NOT_SUPPORTED: 'NOT_SUPPORTED',
-      UPLOAD: 'UPLOAD',
-    };
-  }
-};
+export * from './AccessTokenError';
+export * from './AuthError';
+export * from './BackendClientError';
+export * from './BaseError';
+export * from './CallError';
+export * from './ClientError';
+export * from './ConnectError';
+export * from './ConnectionError';
+export * from './ConversationError';
+export * from './CryptographyError';
+export * from './EventError';
+export * from './LinkPreviewError';
+export * from './MediaError';
+export * from './PermissionError';
+export * from './StorageError';
+export * from './TeamError';
+export * from './UserError';

@@ -23,7 +23,7 @@ import {t} from 'Util/LocalizerUtil';
 import {ModalsViewModel} from './ModalsViewModel';
 import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
 import {WebAppEvents} from '../event/WebApp';
-import {BackendClientError} from '../error/BackendClientError';
+import {BackendClientError} from '../error/';
 
 export class ActionsViewModel {
   constructor(mainViewModel, repositories) {

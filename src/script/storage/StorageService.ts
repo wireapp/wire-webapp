@@ -28,6 +28,7 @@ import {Logger, getLogger} from 'Util/Logger';
 import {loadValue, storeValue} from 'Util/StorageUtil';
 import {ClientType} from '../client/ClientType';
 import {Config} from '../Config';
+import {StorageError} from '../error';
 import {SQLeetSchemata} from './SQLeetSchemata';
 import {StorageKey} from './StorageKey';
 import {StorageSchemata} from './StorageSchemata';
@@ -110,7 +111,7 @@ export class StorageService {
     } catch (error) {
       const logMessage = `Failed to initialize database '${this.dbName}': ${error.message || error}`;
       this.logger.error(logMessage, {error});
-      throw new z.error.StorageError(z.error.StorageError.TYPE.FAILED_TO_OPEN);
+      throw new StorageError(StorageError.TYPE.FAILED_TO_OPEN);
     }
   }
 
@@ -365,7 +366,7 @@ export class StorageService {
    */
   async save<T = Object>(storeName: string, primaryKey: string, entity: T): Promise<string> {
     if (!entity) {
-      throw new z.error.StorageError(z.error.StorageError.TYPE.NO_DATA);
+      throw new StorageError(StorageError.TYPE.NO_DATA);
     }
 
     if (this.isTemporaryAndNonPersistent) {

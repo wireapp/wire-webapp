@@ -30,7 +30,7 @@ import {ConnectionStatus} from './ConnectionStatus';
 import {ConnectionMapper} from './ConnectionMapper';
 import {ConnectionService} from './ConnectionService';
 
-import {BaseError} from '../error/BaseError';
+import {BaseError, ConnectionError} from '../error';
 
 export class ConnectionRepository {
   static get CONFIG() {
@@ -83,7 +83,7 @@ export class ConnectionRepository {
    */
   onUserConnection(eventJson, source, showConversation) {
     if (!eventJson) {
-      throw new z.error.ConnectionError(BaseError.TYPE.MISSING_PARAMETER);
+      throw new ConnectionError(BaseError.TYPE.MISSING_PARAMETER);
     }
 
     const connectionData = eventJson.connection;
@@ -250,7 +250,7 @@ export class ConnectionRepository {
     return Promise.resolve()
       .then(() => {
         if (!connectionEntity) {
-          throw z.error.ConnectionError(BaseError.TYPE.MISSING_PARAMETER);
+          throw ConnectionError(BaseError.TYPE.MISSING_PARAMETER);
         }
 
         this.connectionEntities.push(connectionEntity);
@@ -268,7 +268,7 @@ export class ConnectionRepository {
     return Promise.resolve()
       .then(() => {
         if (!connectionEntities.length) {
-          throw z.error.ConnectionError(BaseError.TYPE.INVALID_PARAMETER);
+          throw ConnectionError(BaseError.TYPE.INVALID_PARAMETER);
         }
 
         koArrayPushAll(this.connectionEntities, connectionEntities);
@@ -289,13 +289,13 @@ export class ConnectionRepository {
   _updateStatus(userEntity, connectionStatus, showConversation = false) {
     if (!userEntity || !connectionStatus) {
       this.logger.error('Missing parameter to update connection');
-      return Promise.reject(new z.error.ConnectionError(BaseError.TYPE.MISSING_PARAMETER));
+      return Promise.reject(new ConnectionError(BaseError.TYPE.MISSING_PARAMETER));
     }
 
     const currentStatus = userEntity.connection().status();
     if (currentStatus === connectionStatus) {
       this.logger.error(`Connection status change to '${connectionStatus}' for '${userEntity.id}' is no change`);
-      return Promise.reject(new z.error.ConnectionError(BaseError.TYPE.INVALID_PARAMETER));
+      return Promise.reject(new ConnectionError(BaseError.TYPE.INVALID_PARAMETER));
     }
 
     return this.connectionService
