@@ -135,7 +135,10 @@ export class ConversationVerificationStateHandler {
   private checkChangeToVerified(conversationEntity: Conversation): boolean {
     if (this.willChangeToVerified(conversationEntity)) {
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-      const allVerifiedEvent = z.conversation.EventBuilder.buildAllVerified(conversationEntity, currentTimestamp);
+      const allVerifiedEvent = window.z.conversation.EventBuilder.buildAllVerified(
+        conversationEntity,
+        currentTimestamp,
+      );
       this.eventRepository.injectEvent(allVerifiedEvent);
       return true;
     }
@@ -175,7 +178,12 @@ export class ConversationVerificationStateHandler {
       }
 
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-      const event = z.conversation.EventBuilder.buildDegraded(conversationEntity, userIds, type, currentTimestamp);
+      const event = window.z.conversation.EventBuilder.buildDegraded(
+        conversationEntity,
+        userIds,
+        type,
+        currentTimestamp,
+      );
       this.eventRepository.injectEvent(event);
 
       return true;

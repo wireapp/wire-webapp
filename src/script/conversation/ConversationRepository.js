@@ -38,9 +38,6 @@ import {
 } from '@wireapp/protocol-messaging';
 import {flatten} from 'underscore';
 
-import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
-import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
-
 import {getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {PromiseQueue} from 'Util/PromiseQueue';
@@ -52,6 +49,9 @@ import {capitalizeFirstChar, compareTransliteration, sortByPriority, startsWith}
 
 import {AssetUploadFailedReason} from '../assets/AssetUploadFailedReason';
 import {encryptAesAsset} from '../assets/AssetCrypto';
+
+import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
+import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 
 import {ClientEvent} from '../event/Client';
 import {EventTypeHandling} from '../event/EventTypeHandling';

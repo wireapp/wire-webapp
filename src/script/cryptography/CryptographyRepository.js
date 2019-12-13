@@ -23,6 +23,7 @@ import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 import {Cryptobox, version as cryptoboxVersion} from '@wireapp/cryptobox';
 import {errors as ProteusErrors} from '@wireapp/proteus';
 import {GenericMessage} from '@wireapp/protocol-messaging';
+
 import {getLogger} from 'Util/Logger';
 import {arrayToBase64, base64ToArray, zeroPadding} from 'Util/util';
 
@@ -315,7 +316,7 @@ export class CryptographyRepository {
     if (genericMessageIsTooBig || externalMessageIsTooBig) {
       const error = new ProteusErrors.DecryptError.InvalidMessage('The received message was too big.', 300);
       const errorEvent = z.conversation.EventBuilder.buildIncomingMessageTooBig(event, error, error.code);
-      return errorEvent;
+      return Promise.resolve(errorEvent);
     }
 
     const failedEncryption = eventData.text === CryptographyRepository.REMOTE_ENCRYPTION_FAILURE;
