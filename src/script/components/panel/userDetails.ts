@@ -17,11 +17,8 @@
  *
  */
 
-import {Availability} from '@wireapp/protocol-messaging';
-
 import {ParticipantAvatar} from 'Components/participantAvatar';
 import {User} from '../../entity/User';
-import {nameFromType} from '../../user/AvailabilityMapper';
 
 import 'Components/availabilityState';
 
@@ -88,12 +85,5 @@ ko.components.register('panel-user-details', {
     this.isVerified = params.hasOwnProperty('isVerified') ? params.isVerified : this.participant().is_verified;
     this.badge = params.badge;
     this.isGroupAdmin = params.isGroupAdmin;
-
-    this.availabilityLabel = ko.pureComputed(() => {
-      const availabilitySetToNone = this.participant().availability() === Availability.Type.NONE;
-      if (!availabilitySetToNone) {
-        return nameFromType(this.participant().availability());
-      }
-    });
   },
 });
