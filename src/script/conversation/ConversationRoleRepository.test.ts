@@ -18,8 +18,11 @@
  */
 
 import {createRandomUuid} from 'Util/util';
+
+import {Conversation} from '../entity/Conversation';
+import {User} from '../entity/User';
 import {TeamEntity} from '../team/TeamEntity';
-import {ConversationRoleRepository} from './ConversationRoleRepository';
+import {ConversationRoleRepository, ConversationRoles, DefaultRole, Permissions} from './ConversationRoleRepository';
 
 declare global {
   interface Window {
@@ -40,7 +43,7 @@ describe('ConversationRoleRepository', () => {
     it('knows if you are in a team', () => {
       expect(roleRepository.isTeam()).toBe(false);
       window.TestFactory.team_repository.team(new TeamEntity(createRandomUuid()));
-      expect(roleRepository.isTeam()).toBe(true);
+      expect(roleRepository.isTeam()).toBeTrue();
     });
   });
 
@@ -55,6 +58,41 @@ describe('ConversationRoleRepository', () => {
       window.TestFactory.team_repository.team(new TeamEntity(createRandomUuid()));
       await roleRepository.loadTeamRoles();
       expect(roleRepository.teamRoles.length).toBe(1);
+    });
+  });
+
+  describe('setConversationRoles', () => {
+    it('sets conversation roles', async () => {
+      const newRoles: ConversationRoles = [
+        {
+          actions: [Permissions.leaveConversation],
+          conversation_role: DefaultRole.WIRE_MEMBER,
+        },
+      ];
+
+      const conversationEntity = new Conversation();
+      roleRepository.setConversationRoles(conversationEntity, newRoles);
+
+      const realRoles = roleRepository.getConversationRoles(conversationEntity);
+      expect(realRoles.length).toBe(1);
+    });
+  });
+
+  describe('canAddParticipants', () => {
+    it('checks if a user can add participants to a group', async () => {
+      const conversationEntity = new Conversation(createRandomUuid());
+      const userEntity = new User(createRandomUuid());
+      conversationEntity.participating_user_ets.push(userEntity);
+
+      let canAddParticipants = roleRepository.canAddParticipants(conversationEntity, userEntity);
+      expect(canAddParticipants).toBeFalse();
+
+      conversationEntity.roles({
+        [userEntity.id]: DefaultRole.WIRE_ADMIN,
+      });
+
+      canAddParticipants = roleRepository.canAddParticipants(conversationEntity, userEntity);
+      expect(canAddParticipants).toBeTrue();
     });
   });
 });
