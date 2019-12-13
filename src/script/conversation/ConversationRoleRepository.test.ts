@@ -17,6 +17,8 @@
  *
  */
 
+import {createRandomUuid} from 'Util/util';
+import {TeamEntity} from '../team/TeamEntity';
 import {ConversationRoleRepository} from './ConversationRoleRepository';
 
 declare global {
@@ -36,7 +38,23 @@ describe('ConversationRoleRepository', () => {
 
   describe('constructor', () => {
     it('knows if you are in a team', () => {
-      expect(roleRepository).toBeDefined();
+      expect(roleRepository.isTeam()).toBe(false);
+      window.TestFactory.team_repository.team(new TeamEntity(createRandomUuid()));
+      expect(roleRepository.isTeam()).toBe(true);
+    });
+  });
+
+  describe('loadTeamRoles', () => {
+    it('initializes all team roles', async () => {
+      spyOn(window.TestFactory.team_repository, 'getTeamConversationRoles').and.returnValue(
+        Promise.resolve({
+          conversation_roles: ['my-custom-role'],
+        }),
+      );
+
+      window.TestFactory.team_repository.team(new TeamEntity(createRandomUuid()));
+      await roleRepository.loadTeamRoles();
+      expect(roleRepository.teamRoles.length).toBe(1);
     });
   });
 });
