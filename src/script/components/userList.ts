@@ -66,7 +66,7 @@ ko.components.register('user-list', {
 
     <!-- ko if: typeof filter === 'function' -->
       <!-- ko if: userEntities().length === 0 -->
-        <div class="no-results" data-bind="text: t('searchListEveryoneParticipates')"></div>
+        <div class="no-results" data-bind="text: t('searchListEveryoneParticipates')" data-uie-name="status-all-added"></div>
       <!-- /ko -->
 
       <!-- ko if: userEntities().length > 0 && filteredUserEntities().length === 0 -->
