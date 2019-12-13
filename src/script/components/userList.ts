@@ -112,7 +112,7 @@ ko.components.register('user-list', {
       <!-- /ko -->
 
       <!-- ko if: userEntities().length > 0 && filteredUserEntities().length === 0 -->
-        <div class="usert-list__no-results" data-bind="text: t('searchListNoMatches')" data-uie-name="status-no-matches"></div>
+        <div class="user-list__no-results" data-bind="text: t('searchListNoMatches')" data-uie-name="status-no-matches"></div>
       <!-- /ko -->
     <!-- /ko -->
   `,
