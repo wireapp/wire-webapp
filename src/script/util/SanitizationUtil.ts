@@ -19,13 +19,12 @@
 
 import {escape} from 'underscore';
 
-import {t, Declension} from 'Util/LocalizerUtil';
-import {isValidEmail} from 'Util/ValidationUtil';
+import {Declension, t} from 'Util/LocalizerUtil';
 import {prependProtocol} from 'Util/UrlUtil';
+import {isValidEmail} from 'Util/ValidationUtil';
+import {User} from '../entity/User';
 
-export const escapeRegex = string => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
-export const escapeString = string => escape(string);
+export const escapeRegex = (string: string): string => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 export const getSelfName = (declension = Declension.NOMINATIVE, bypassSanitization = false) => {
   const selfNameDeclensions = {
@@ -34,24 +33,24 @@ export const getSelfName = (declension = Declension.NOMINATIVE, bypassSanitizati
     [Declension.ACCUSATIVE]: t('conversationYouAccusative'),
   };
   const selfName = selfNameDeclensions[declension];
-  return bypassSanitization ? selfName : escapeString(selfName);
+  return bypassSanitization ? selfName : escape(selfName);
 };
 
-export const getFirstName = (userEntity, declension, bypassSanitization = false) => {
+export const getFirstName = (userEntity: User, declension: string, bypassSanitization: boolean = false): string => {
   if (userEntity.is_me) {
     return getSelfName(declension, bypassSanitization);
   }
-  return bypassSanitization ? userEntity.first_name() : escapeString(userEntity.first_name());
+  return bypassSanitization ? userEntity.first_name() : escape(userEntity.first_name());
 };
 
 /**
  * Opens a new browser tab (target="_blank") with a given URL in a safe environment.
  * @see https://mathiasbynens.github.io/rel-noopener/
- * @param {string} url - URL you want to open in a new browser tab
- * @param {boolean} focus - True, if the new windows should get browser focus
- * @returns {Object} New window handle
+ * @param url URL you want to open in a new browser tab
+ * @param focus `true`, if the new windows should get browser focus
+ * @returns New window handle
  */
-export const safeWindowOpen = (url, focus = true) => {
+export const safeWindowOpen = (url: string, focus: boolean = true): Window => {
   const newWindow = window.open(prependProtocol(url));
 
   if (newWindow) {
@@ -64,7 +63,7 @@ export const safeWindowOpen = (url, focus = true) => {
   return newWindow;
 };
 
-export const safeMailOpen = email => {
+export const safeMailOpen = (email: string): void => {
   const pureEmail = email.replace(/^(mailto:)?/i, '');
 
   if (!isValidEmail(pureEmail)) {

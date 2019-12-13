@@ -17,11 +17,11 @@
  *
  */
 
-import {getMapsUrl} from 'src/script/util/locationUtil';
+import {getMapsUrl} from 'Util/LocationUtil';
 
-describe('locationUtil', () => {
+describe('LocationUtil', () => {
   describe('getMapsUrl', () => {
-    it('should return the proper urls', () => {
+    it('returns the proper URLs', () => {
       expect(getMapsUrl(52, 13)).toBe('https://google.com/maps/@52,13');
       expect(getMapsUrl(52, 13, null, 14)).toBe('https://google.com/maps/@52,13,14z');
       expect(getMapsUrl(52, 13, 'Berlin')).toBe('https://google.com/maps/place/Berlin/@52,13');

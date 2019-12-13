@@ -17,39 +17,6 @@
  *
  */
 
-import {Calling, GenericMessage} from '@wireapp/protocol-messaging';
-import {amplify} from 'amplify';
-import ko from 'knockout';
-import {t} from 'Util/LocalizerUtil';
-import {Logger, getLogger} from 'Util/Logger';
-import 'webrtc-adapter';
-import {Config} from '../Config';
-import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
-
-import {Environment} from 'Util/Environment';
-import {createRandomUuid} from 'Util/util';
-import {EventBuilder} from '../conversation/EventBuilder';
-import {MediaStreamHandler} from '../media/MediaStreamHandler';
-import {ModalsViewModel} from '../view_model/ModalsViewModel';
-
-import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
-
-import {ConversationRepository} from '../conversation/ConversationRepository';
-import {EventInfoEntity} from '../conversation/EventInfoEntity';
-import {EventRepository} from '../event/EventRepository';
-import {MediaType} from '../media/MediaType';
-
-import {Call, ConversationId} from './Call';
-import {DeviceId, Participant, UserId} from './Participant';
-
-import {WebAppEvents} from '../event/WebApp';
-
-interface MediaStreamQuery {
-  audio?: boolean;
-  camera?: boolean;
-  screen?: boolean;
-}
-
 import {
   CALL_TYPE,
   CONV_TYPE,
@@ -61,6 +28,40 @@ import {
   Wcall,
   getAvsInstance,
 } from '@wireapp/avs';
+import {Calling, GenericMessage} from '@wireapp/protocol-messaging';
+import {amplify} from 'amplify';
+import ko from 'knockout';
+import 'webrtc-adapter';
+
+import {Environment} from 'Util/Environment';
+import {t} from 'Util/LocalizerUtil';
+import {Logger, getLogger} from 'Util/Logger';
+import {createRandomUuid} from 'Util/util';
+
+import {Config} from '../Config';
+
+import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
+import {ModalsViewModel} from '../view_model/ModalsViewModel';
+
+import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
+
+import {ConversationRepository} from '../conversation/ConversationRepository';
+import {EventBuilder} from '../conversation/EventBuilder';
+import {EventInfoEntity} from '../conversation/EventInfoEntity';
+import {EventRepository} from '../event/EventRepository';
+import {WebAppEvents} from '../event/WebApp';
+
+import {MediaStreamHandler} from '../media/MediaStreamHandler';
+import {MediaType} from '../media/MediaType';
+
+import {Call, ConversationId} from './Call';
+import {DeviceId, Participant, UserId} from './Participant';
+
+interface MediaStreamQuery {
+  audio?: boolean;
+  camera?: boolean;
+  screen?: boolean;
+}
 
 export class CallingRepository {
   private readonly backendClient: any;
@@ -329,7 +330,7 @@ export class CallingRepository {
     type: string,
     conversationId: ConversationId,
     userId: UserId,
-    time: number,
+    time: string,
     source: string,
   ): void {
     // save event if needed
@@ -510,7 +511,7 @@ export class CallingRepository {
   // Notifications
   //##############################################################################
 
-  private injectActivateEvent(conversationId: ConversationId, userId: UserId, time: number, source: string): void {
+  private injectActivateEvent(conversationId: ConversationId, userId: UserId, time: string, source: string): void {
     const event = EventBuilder.buildVoiceChannelActivate(conversationId, userId, time, this.avsVersion);
     this.eventRepository.injectEvent(event, source);
   }

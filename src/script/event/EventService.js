@@ -36,7 +36,7 @@ export class EventService {
    */
   constructor(storageService) {
     this.storageService = storageService;
-    this.logger = getLogger('z.conversation.EventService');
+    this.logger = getLogger('EventService');
   }
 
   /**

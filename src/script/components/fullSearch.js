@@ -18,11 +18,10 @@
  */
 
 import moment from 'moment';
-import {debounce} from 'underscore';
+import {debounce, escape} from 'underscore';
 
 import {isScrolledBottom} from 'Util/scroll-helpers';
 import {koArrayPushAll} from 'Util/util';
-import {escapeString} from 'Util/SanitizationUtil';
 
 import {ParticipantAvatar} from 'Components/participantAvatar';
 import {getSearchRegex} from '../search/FullTextSearch';
@@ -94,8 +93,8 @@ class FullSearch {
   }
 
   htmlFormatResult(messageEntity) {
-    const text = escapeString(messageEntity.get_first_asset().text);
-    const input = escapeString(this.input());
+    const text = escape(messageEntity.get_first_asset().text);
+    const input = escape(this.input());
 
     messageEntity.matchesCount = 0;
 

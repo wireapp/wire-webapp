@@ -17,16 +17,30 @@
  *
  */
 
+import {amplify} from 'amplify';
 import {intersection} from 'underscore';
 
-import {getLogger} from 'Util/Logger';
+import {Logger, getLogger} from 'Util/Logger';
 
-import {ConversationVerificationState} from './ConversationVerificationState';
+import {Conversation} from '../entity/Conversation';
+import {EventRepository} from '../event/EventRepository';
 import {WebAppEvents} from '../event/WebApp';
 import {VerificationMessageType} from '../message/VerificationMessageType';
+import {ServerTimeHandler} from '../time/serverTimeHandler';
+import {ConversationRepository} from './ConversationRepository';
+import {ConversationVerificationState} from './ConversationVerificationState';
 
 export class ConversationVerificationStateHandler {
-  constructor(conversationRepository, eventRepository, serverTimeHandler) {
+  conversationRepository: ConversationRepository;
+  eventRepository: EventRepository;
+  serverTimeHandler: ServerTimeHandler;
+  logger: Logger;
+
+  constructor(
+    conversationRepository: ConversationRepository,
+    eventRepository: EventRepository,
+    serverTimeHandler: ServerTimeHandler,
+  ) {
     this.conversationRepository = conversationRepository;
     this.eventRepository = eventRepository;
     this.serverTimeHandler = serverTimeHandler;
@@ -38,121 +52,116 @@ export class ConversationVerificationStateHandler {
     amplify.subscribe(WebAppEvents.CLIENT.VERIFICATION_STATE_CHANGED, this.onClientVerificationChanged.bind(this));
   }
 
-  /**
-   * Handle client verification state change.
-   * @param {string} userId - Self user ID
-   * @returns {undefined} No return value
-   */
-  onClientVerificationChanged(userId) {
-    this._getActiveConversationsWithUsers([userId]).forEach(({conversationEntity, userIds}) => {
-      const isStateChange = this._checkChangeToVerified(conversationEntity);
+  onClientVerificationChanged(userId: string): void {
+    this.getActiveConversationsWithUsers([userId]).forEach(({conversationEntity, userIds}) => {
+      const isStateChange = this.checkChangeToVerified(conversationEntity);
       if (!isStateChange) {
-        this._checkChangeToDegraded(conversationEntity, userIds, VerificationMessageType.UNVERIFIED);
+        this.checkChangeToDegraded(conversationEntity, userIds, VerificationMessageType.UNVERIFIED);
       }
     });
   }
 
   /**
    * Self user or other participant added clients.
-   * @param {string} userId - ID of user that added client (can be self user ID)
-   * @returns {undefined} No return value
+   * @param userId ID of user that added client (can be self user ID)
    */
-  onClientAdded(userId) {
+  onClientAdded(userId: string): void {
     this.onClientsAdded([userId]);
   }
 
   /**
    * Multiple participants added clients.
-   * @param {Array<string>} userIds - Multiple user IDs (can include self user ID)
-   * @returns {undefined} No return value
+   * @param userIds Multiple user IDs (can include self user ID)
    */
-  onClientsAdded(userIds) {
-    this._getActiveConversationsWithUsers(userIds).forEach(({conversationEntity, userIds: matchingUserIds}) => {
-      this._checkChangeToDegraded(conversationEntity, matchingUserIds, VerificationMessageType.NEW_DEVICE);
+  onClientsAdded(userIds: string[]): void {
+    this.getActiveConversationsWithUsers(userIds).forEach(({conversationEntity, userIds: matchingUserIds}) => {
+      this.checkChangeToDegraded(conversationEntity, matchingUserIds, VerificationMessageType.NEW_DEVICE);
     });
   }
 
   /**
    * Self user removed a client or other participants deleted clients.
-   * @param {string} userId - ID of user that added client (can be self user ID)
-   * @returns {undefined} No return value
+   * @param userId ID of user that added client (can be self user ID)
    */
-  onClientRemoved(userId) {
-    this._getActiveConversationsWithUsers([userId]).forEach(({conversationEntity}) => {
-      this._checkChangeToVerified(conversationEntity);
+  onClientRemoved(userId: string): void {
+    this.getActiveConversationsWithUsers([userId]).forEach(({conversationEntity}) => {
+      this.checkChangeToVerified(conversationEntity);
     });
   }
 
   /**
    * A new conversation was created.
-   * @param {Conversation} conversationEntity - New conversation entity
-   * @returns {undefined} No return value
+   * @param conversationEntity New conversation entity
    */
-  onConversationCreate(conversationEntity) {
-    this._checkChangeToVerified(conversationEntity);
+  onConversationCreate(conversationEntity: Conversation): void {
+    this.checkChangeToVerified(conversationEntity);
   }
 
   /**
    * Clients of a user were updated.
-   * @param {string} userId - User ID
-   * @returns {undefined} No return value
    */
-  onClientsUpdated(userId) {
-    this._getActiveConversationsWithUsers([userId]).forEach(({conversationEntity, userIds}) => {
-      const isStateChange = this._checkChangeToVerified(conversationEntity);
+  onClientsUpdated(userId: string): void {
+    this.getActiveConversationsWithUsers([userId]).forEach(({conversationEntity, userIds}) => {
+      const isStateChange = this.checkChangeToVerified(conversationEntity);
       if (!isStateChange) {
-        this._checkChangeToDegraded(conversationEntity, userIds, VerificationMessageType.NEW_DEVICE);
+        this.checkChangeToDegraded(conversationEntity, userIds, VerificationMessageType.NEW_DEVICE);
       }
     });
   }
 
   /**
    * New member(s) joined the conversation.
-   * @param {Conversation} conversationEntity - Changed conversation entity
-   * @param {Array<string>} userIds - IDs of added members
-   * @returns {undefined} No return value
+   * @param conversationEntity Changed conversation entity
+   * @param userIds IDs of added members
    */
-  onMemberJoined(conversationEntity, userIds) {
-    this._checkChangeToDegraded(conversationEntity, userIds, VerificationMessageType.NEW_MEMBER);
+  onMemberJoined(conversationEntity: Conversation, userIds: string[]): void {
+    this.checkChangeToDegraded(conversationEntity, userIds, VerificationMessageType.NEW_MEMBER);
   }
 
   /**
    * Member(s) left the conversation.
-   * @param {Conversation} conversationEntity - Changed conversation entity
-   * @returns {undefined} No return value
+   * @param conversationEntity Changed conversation entity
    */
-  onMemberLeft(conversationEntity) {
-    this._checkChangeToVerified(conversationEntity);
+  onMemberLeft(conversationEntity: Conversation): void {
+    this.checkChangeToVerified(conversationEntity);
   }
 
   /**
    * Change that could verify conversation.
    *
-   * @private
-   * @param {Conversation} conversationEntity - Changed conversation entity
-   * @returns {boolean} `true` if state changed
+   * @param conversationEntity Changed conversation entity
+   * @returns `true` if state changed
    */
-  _checkChangeToVerified(conversationEntity) {
-    if (this._willChangeToVerified(conversationEntity)) {
+  private checkChangeToVerified(conversationEntity: Conversation): boolean {
+    if (this.willChangeToVerified(conversationEntity)) {
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-      const allVerifiedEvent = z.conversation.EventBuilder.buildAllVerified(conversationEntity, currentTimestamp);
+      const allVerifiedEvent = window.z.conversation.EventBuilder.buildAllVerified(
+        conversationEntity,
+        currentTimestamp,
+      );
       this.eventRepository.injectEvent(allVerifiedEvent);
       return true;
     }
+
+    return false;
   }
 
   /**
    * Change that could degrade conversation.
    *
-   * @private
-   * @param {Conversation} conversationEntity - Changed conversation entity
-   * @param {Array<string>} userIds - IDs of affected users
-   * @param {VerificationMessageType} type - Type of degradation
-   * @returns {boolean} `true` if state changed
+   * @param conversationEntity Changed conversation entity
+   * @param userIds IDs of affected users
+   * @param type Type of degradation
+   * @returns `true` if state changed
    */
-  _checkChangeToDegraded(conversationEntity, userIds, type) {
+  private checkChangeToDegraded(
+    conversationEntity: Conversation,
+    userIds: string[],
+    type: VerificationMessageType,
+  ): boolean {
     const shouldShowDegradationWarning = type !== VerificationMessageType.UNVERIFIED;
-    const isConversationDegraded = this._willChangeToDegraded(conversationEntity, shouldShowDegradationWarning);
+    const isConversationDegraded = this.willChangeToDegraded(conversationEntity, shouldShowDegradationWarning);
+
     if (isConversationDegraded) {
       /**
        * TEMPORARY DEBUGGING FIX:
@@ -169,24 +178,30 @@ export class ConversationVerificationStateHandler {
       }
 
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-      const event = z.conversation.EventBuilder.buildDegraded(conversationEntity, userIds, type, currentTimestamp);
+      const event = window.z.conversation.EventBuilder.buildDegraded(
+        conversationEntity,
+        userIds,
+        type,
+        currentTimestamp,
+      );
       this.eventRepository.injectEvent(event);
 
       return true;
     }
+
+    return false;
   }
 
   /**
    * Get all conversation where self user and the given users are active.
    *
-   * @private
-   * @param {Array<string>} userIds - Multiple user IDs (can include self user ID)
-   * @returns {Array<Object>} Array of objects containing the conversation entities and matching user IDs
+   * @param userIds Multiple user IDs (can include self user ID)
+   * @returns Array of objects containing the conversation entities and matching user IDs
    */
-  _getActiveConversationsWithUsers(userIds) {
+  private getActiveConversationsWithUsers(userIds: string[]): {conversationEntity: Conversation; userIds: string[]}[] {
     return this.conversationRepository
       .filtered_conversations()
-      .map(conversationEntity => {
+      .map((conversationEntity: Conversation) => {
         if (!conversationEntity.removed_from_conversation()) {
           const selfUserId = this.conversationRepository.selfUser().id;
           const userIdsInConversation = conversationEntity.participating_user_ids().concat(selfUserId);
@@ -196,6 +211,7 @@ export class ConversationVerificationStateHandler {
             return {conversationEntity, userIds: matchingUserIds};
           }
         }
+        return undefined;
       })
       .filter(activeConversationInfo => !!activeConversationInfo);
   }
@@ -203,14 +219,14 @@ export class ConversationVerificationStateHandler {
   /**
    * Check whether to degrade conversation and set corresponding state.
    *
-   * @private
-   * @param {Conversation} conversationEntity - Conversation entity to evaluate
-   * @param {boolean} shouldShowDegradationWarning - Should a modal warn about the degradation?
-   * @returns {boolean} Conversation changing to degraded
+   * @param conversationEntity Conversation entity to evaluate
+   * @param shouldShowDegradationWarning Should a modal warn about the degradation?
+   * @returns `true` if conversation state changed to degraded
    */
-  _willChangeToDegraded(conversationEntity, shouldShowDegradationWarning = true) {
+  private willChangeToDegraded(conversationEntity: Conversation, shouldShowDegradationWarning = true): boolean {
     const state = conversationEntity.verification_state();
     const isDegraded = state === ConversationVerificationState.DEGRADED;
+
     if (isDegraded) {
       return false;
     }
@@ -234,11 +250,10 @@ export class ConversationVerificationStateHandler {
   /**
    * Check whether to verify conversation and set corresponding state
    *
-   * @private
-   * @param {Conversation} conversationEntity - Conversation entity to evaluate
-   * @returns {boolean} Conversation changing to verified
+   * @param {Conversation} conversationEntity Conversation entity to evaluate
+   * @returns `true` if conversation state changed to verified
    */
-  _willChangeToVerified(conversationEntity) {
+  private willChangeToVerified(conversationEntity: Conversation): boolean {
     const state = conversationEntity.verification_state();
     const isStateVerified = state === ConversationVerificationState.VERIFIED;
     if (isStateVerified) {

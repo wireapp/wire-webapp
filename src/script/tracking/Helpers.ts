@@ -20,24 +20,27 @@
 import {Environment} from 'Util/Environment';
 
 import {Conversation} from '../entity/Conversation';
-import {ConversationType, UserType, PlatformType} from './attribute';
+import {User} from '../entity/User';
+import {ConversationType, PlatformType, UserType} from './attribute';
 
 /**
  * Get corresponding tracking attribute for conversation type.
- * @param {Conversation} conversationEntity - Conversation to map type of
- * @returns {ConversationType} Mapped conversation type
+ * @param conversationEntity Conversation to map type of
+ * @returns Mapped conversation type
  */
-function getConversationType(conversationEntity) {
+export function getConversationType(conversationEntity: Conversation): ConversationType;
+export function getConversationType(conversationEntity: any): void;
+export function getConversationType(conversationEntity: any): ConversationType | void {
   if (conversationEntity instanceof Conversation) {
     return conversationEntity.is1to1() ? ConversationType.ONE_TO_ONE : ConversationType.GROUP;
   }
 }
 
-function getGuestAttributes(conversationEntity) {
+export function getGuestAttributes(conversationEntity: Conversation): {is_allow_guests: boolean; user_type: UserType} {
   const isTeamConversation = !!conversationEntity.team_id;
   if (isTeamConversation) {
     const isAllowGuests = !conversationEntity.isTeamOnly();
-    const _getUserType = _conversationEntity => {
+    const _getUserType = (_conversationEntity: Conversation) => {
       if (_conversationEntity.selfUser().isTemporaryGuest()) {
         return UserType.TEMPORARY_GUEST;
       }
@@ -57,7 +60,7 @@ function getGuestAttributes(conversationEntity) {
   };
 }
 
-function getParticipantTypes(userEntities, countSelf) {
+export function getParticipantTypes(userEntities: User[], countSelf?: boolean): {guests: number; users: number} {
   const initialValue = {guests: 0, temporaryGuests: 0, users: countSelf ? 1 : 0};
   return userEntities.reduce((accumulator, userEntity) => {
     if (userEntity.isTemporaryGuest()) {
@@ -74,9 +77,9 @@ function getParticipantTypes(userEntities, countSelf) {
 
 /**
  * Get the platform identifier.
- * @returns {PlatformType} Mapped platform type
+ * @returns Mapped platform type
  */
-function getPlatform() {
+export function getPlatform(): PlatformType {
   if (!Environment.desktop) {
     return PlatformType.BROWSER_APP;
   }
@@ -86,5 +89,3 @@ function getPlatform() {
   }
   return Environment.os.mac ? PlatformType.DESKTOP_MACOS : PlatformType.DESKTOP_LINUX;
 }
-
-export {getConversationType, getGuestAttributes, getParticipantTypes, getPlatform};

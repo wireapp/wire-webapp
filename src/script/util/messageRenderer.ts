@@ -16,11 +16,12 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+
 import hljs from 'highlightjs';
 import MarkdownIt from 'markdown-it';
 import Token from 'markdown-it/lib/token';
+import {escape} from 'underscore';
 
-import {escapeString} from './SanitizationUtil';
 import {replaceInRange} from './StringUtil';
 
 import {MentionEntity} from '../message/MentionEntity';
@@ -96,7 +97,7 @@ export const renderMessage = (message: string, selfId: string, mentionEntities: 
       : ` data-uie-name="label-other-mention" data-user-id="${mentionData.userId}"`;
 
     const mentionText = mentionData.text.replace(/^@/, '');
-    const content = `<span class="mention-at-sign">@</span>${escapeString(mentionText)}`;
+    const content = `<span class="mention-at-sign">@</span>${escape(mentionText)}`;
     return `<span class="message-mention${elementClasses}"${elementAttributes}>${content}</span>`;
   };
 
@@ -134,7 +135,7 @@ export const renderMessage = (message: string, selfId: string, mentionEntities: 
 
   markdownit.renderer.rules.link_open = (tokens, idx, options, env, self) => {
     const cleanString = (hashedString: string) =>
-      escapeString(
+      escape(
         Object.entries(mentionTexts).reduce(
           (text, [mentionHash, mention]) => text.replace(mentionHash, mention.text),
           hashedString,
