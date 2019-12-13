@@ -8,7 +8,7 @@
     "cosmiconfig": "6.0.0",
     "fs-extra": "8.1.0",
     "jszip": "3.2.2",
-    "logdown": "3.2.8",
+    "logdown": "3.3.0",
     "rimraf": "3.0.0"
   },
   "description": "Wire's internal configuration copy tool",
