@@ -48,6 +48,7 @@ import {DeleteConversationMessage} from '../entity/message/DeleteConversationMes
 import {MemberMessage} from '../entity/message/MemberMessage';
 import {Message} from '../entity/message/Message';
 import {MessageTimerUpdateMessage} from '../entity/message/MessageTimerUpdateMessage';
+import {RenameMessage} from '../entity/message/RenameMessage';
 import {SystemMessage} from '../entity/message/SystemMessage';
 import {User} from '../entity/User';
 import {SuperType} from '../message/SuperType';
@@ -466,7 +467,7 @@ export class NotificationRepository {
     };
 
     const createBodyRename = () => {
-      const substitutions = {name: (messageEntity as MemberMessage).name(), user: messageEntity.user().first_name()};
+      const substitutions = {name: (messageEntity as RenameMessage).name, user: messageEntity.user().first_name()};
       return t('notificationConversationRename', substitutions, {}, true);
     };
 
