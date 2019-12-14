@@ -23,7 +23,8 @@ import {BackendClient} from '../service/BackendClient';
 export class SelfService {
   private readonly backendClient: BackendClient;
 
-  static get URL(): {SELF: string} {
+  // tslint:disable-next-line:typedef
+  static get URL() {
     return {
       SELF: '/self',
     };
@@ -52,7 +53,9 @@ export class SelfService {
 
   getSelfConsent(): Promise<Consent[]> {
     return this.backendClient
-      .sendRequest({
+      .sendRequest<{
+        results: Consent[];
+      }>({
         type: 'GET',
         url: `${SelfService.URL.SELF}/consent`,
       })
