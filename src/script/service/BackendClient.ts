@@ -270,7 +270,7 @@ export class BackendClient {
    * @param {Object} config - AJAX request configuration
    * @returns {Promise} Resolves when the request has been executed
    */
-  sendJson(config: RequestConfig): Promise<any> {
+  sendJson<T>(config: RequestConfig): Promise<T> {
     const jsonConfig = {
       contentType: 'application/json; charset=utf-8',
       data: config.data ? JSON.stringify(config.data) : undefined,
@@ -285,7 +285,7 @@ export class BackendClient {
    * @param {Object} config - AJAX request configuration
    * @returns {Promise} Resolves when the request has been executed
    */
-  sendRequest(config: RequestConfig): Promise<any> {
+  sendRequest<T>(config: RequestConfig): Promise<T> {
     if (this.queueState() !== QUEUE_STATE.READY) {
       const logMessage = `Adding '${config.type}' request to '${config.url}' to queue due to '${this.queueState()}'`;
       this.logger.info(logMessage, config);
