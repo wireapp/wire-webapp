@@ -32,6 +32,44 @@ interface ComponentParams {
   richProfileRepository: RichProfileRepository;
 }
 
+class EnrichedFields {
+  readonly fields: ko.Observable<RichField[]>;
+  readonly richProfileRepository: RichProfileRepository;
+
+  constructor(params: ComponentParams, element: Node) {
+    const {
+      user,
+      onFieldsLoaded = noop,
+      richProfileRepository = new RichProfileRepository(resolve(graph.BackendClient)),
+    } = params;
+    this.richProfileRepository = richProfileRepository;
+    this.fields = ko.observable([]);
+    ko.computed(
+      () => {
+        if (user()) {
+          const fields: RichField[] = user().email() ? [{type: t('userProfileEmail'), value: user().email()}] : [];
+          this.richProfileRepository
+            .getUserRichProfile(ko.unwrap(user).id)
+            .then(richProfile => {
+              if (richProfile.fields) {
+                fields.push(...richProfile.fields);
+              }
+            })
+            .catch(noop)
+            .finally(() => {
+              this.fields(fields);
+              onFieldsLoaded(this.fields());
+            });
+        } else {
+          this.fields([]);
+        }
+      },
+      this,
+      {disposeWhenNodeIsRemoved: element},
+    );
+  }
+}
+
 ko.components.register('enriched-fields', {
   template: `
     <!-- ko if: fields() -->
@@ -46,43 +84,7 @@ ko.components.register('enriched-fields', {
     <!-- /ko -->
   `,
   viewModel: {
-    createViewModel: class {
-      readonly fields: ko.Observable<RichField[]>;
-      readonly richProfileRepository: RichProfileRepository;
-
-      constructor(params: ComponentParams, componentInfo: {element: Node}) {
-        const {
-          user,
-          onFieldsLoaded = noop,
-          richProfileRepository = new RichProfileRepository(resolve(graph.BackendClient)),
-        } = params;
-        const {element} = componentInfo;
-        this.richProfileRepository = richProfileRepository;
-        this.fields = ko.observable([]);
-        ko.computed(
-          () => {
-            if (user()) {
-              const fields: RichField[] = user().email() ? [{type: t('userProfileEmail'), value: user().email()}] : [];
-              this.richProfileRepository
-                .getUserRichProfile(ko.unwrap(user).id)
-                .then(richProfile => {
-                  if (richProfile.fields) {
-                    fields.push(...richProfile.fields);
-                  }
-                })
-                .catch(noop)
-                .finally(() => {
-                  this.fields(fields);
-                  onFieldsLoaded(this.fields());
-                });
-            } else {
-              this.fields([]);
-            }
-          },
-          this,
-          {disposeWhenNodeIsRemoved: element},
-        );
-      }
-    },
+    createViewModel: (params: ComponentParams, componentInfo: {element: Node}) =>
+      new EnrichedFields(params, componentInfo.element),
   },
 });
