@@ -30,15 +30,15 @@ export interface ServiceData {
 }
 
 export class ServiceEntity {
-  description: string;
-  id: string;
-  name: string;
-  providerId: string;
-  providerName: ko.Observable<string>;
-  summary: string;
-  tags: string[];
-  mediumPictureResource: ko.Observable<string>;
-  previewPictureResource: ko.Observable<string>;
+  readonly description: string;
+  readonly id: string;
+  readonly mediumPictureResource: ko.Observable<string>;
+  readonly name: string;
+  readonly previewPictureResource: ko.Observable<string>;
+  readonly providerId: string;
+  readonly providerName: ko.Observable<string>;
+  readonly summary: string;
+  readonly tags: string[];
 
   constructor(serviceData: ServiceData = {}) {
     const {description = '', id = '', name = '', provider: providerId = '', summary = '', tags = []} = serviceData;
