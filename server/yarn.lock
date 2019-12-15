@@ -862,10 +862,10 @@ dont-sniff-mimetype@1.1.0:
   resolved "https://registry.yarnpkg.com/dont-sniff-mimetype/-/dont-sniff-mimetype-1.1.0.tgz#c7d0427f8bcb095762751252af59d148b0a623b2"
   integrity sha512-ZjI4zqTaxveH2/tTlzS1wFp+7ncxNZaIEWYg3lzZRHkKf5zPT/MnEG6WL0BhHMJUabkh8GeU5NL5j+rEUCb7Ug==
 
-dotenv-extended@2.5.0:
-  version "2.5.0"
-  resolved "https://registry.yarnpkg.com/dotenv-extended/-/dotenv-extended-2.5.0.tgz#2ba3b42004269a7cecc0da116a2811af9e48eaa9"
-  integrity sha512-aKpPeUHkE8sxGq2AQWresyXNXfM/KdoMOdDXN60V72YJUr+TnhZTVVZ4PHCBAX0NFLy0ZmnJIpFaNaafT/EG5g==
+dotenv-extended@2.6.0:
+  version "2.6.0"
+  resolved "https://registry.yarnpkg.com/dotenv-extended/-/dotenv-extended-2.6.0.tgz#6aee60c0c4acee0483e1b08841e9321161ecdc79"
+  integrity sha512-/M8bIb4wJadQ2WGjEQmBiwQtwDhEA3NJM2aPWaXj5Q8i+K8YtxoPpb//QlE6Uft+cCxHlb1KwZYt3Si4Sne8Xw==
   dependencies:
     "@types/dotenv" "^6.1.1"
     auto-parse "^1.3.0"
