@@ -25,8 +25,8 @@
     "@types/react-dom": "16.9.4",
     "@types/ws": "6.0.4",
     "@wireapp/react-ui-kit": "7.25.1",
-    "@wireapp/store-engine": "4.2.0",
-    "@wireapp/store-engine-fs": "2.1.0",
+    "@wireapp/store-engine": "4.2.1",
+    "@wireapp/store-engine-fs": "2.1.1",
     "babel-loader": "8.0.6",
     "browser-sync": "2.26.7",
     "concurrently": "5.0.1",
@@ -78,5 +78,5 @@
     "test:node": "cross-env NODE_DEBUG=@wireapp/api-client* jasmine --config=jasmine.json",
     "watch": "webpack-dev-server --config webpack.config.js"
   },
-  "version": "9.3.0"
+  "version": "9.3.1"
 }
