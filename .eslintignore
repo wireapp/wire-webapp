@@ -2,9 +2,8 @@
 docs/
 node_modules/
 resource/
-server/
+server/bin/
 server/dist/
 server/node_modules/
-src/
 src/ext/
 src/script/localization/**/webapp*.js
