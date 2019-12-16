@@ -157,7 +157,7 @@ export class MediaConstraintsHandler {
     mediaDeviceId: string,
     mode: VIDEO_QUALITY_MODE = VIDEO_QUALITY_MODE.MOBILE,
   ): MediaTrackConstraints {
-    const streamConstraints = MediaConstraintsHandler.CONFIG.CONSTRAINTS.VIDEO[mode];
+    const streamConstraints = {...MediaConstraintsHandler.CONFIG.CONSTRAINTS.VIDEO[mode]};
 
     if (typeof mediaDeviceId === 'string' && mediaDeviceId !== MediaConstraintsHandler.CONFIG.DEFAULT_DEVICE_ID) {
       streamConstraints.deviceId = {exact: mediaDeviceId};
