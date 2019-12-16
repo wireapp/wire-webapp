@@ -6,7 +6,7 @@
   "dependencies": {
     "@wireapp/commons": "3.0.3",
     "dotenv": "8.2.0",
-    "dotenv-extended": "2.5.0",
+    "dotenv-extended": "2.6.0",
     "express": "4.17.1",
     "express-sitemap-xml": "1.1.0",
     "express-useragent": "1.0.13",
