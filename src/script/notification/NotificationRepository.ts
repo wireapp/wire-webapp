@@ -18,28 +18,61 @@
  */
 
 import {Availability} from '@wireapp/protocol-messaging';
+import {amplify} from 'amplify';
+import ko from 'knockout';
 
-import {getLogger} from 'Util/Logger';
-import {t, Declension} from 'Util/LocalizerUtil';
-import {getFirstName} from 'Util/SanitizationUtil';
-import {TIME_IN_MILLIS, formatDuration} from 'Util/TimeUtil';
 import {Environment} from 'Util/Environment';
+import {Declension, t} from 'Util/LocalizerUtil';
+import {Logger, getLogger} from 'Util/Logger';
+import {getFirstName} from 'Util/SanitizationUtil';
 import {truncate} from 'Util/StringUtil';
+import {TIME_IN_MILLIS, formatDuration} from 'Util/TimeUtil';
 import {ValidationUtilError} from 'Util/ValidationUtil';
 
+import {AudioType} from '../audio/AudioType';
 import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
-import {PermissionState} from './PermissionState';
+import {WebAppEvents} from '../event/WebApp';
 import {PermissionStatusState} from '../permission/PermissionStatusState';
 import {PermissionType} from '../permission/PermissionType';
 import {NotificationPreference} from './NotificationPreference';
-import {WebAppEvents} from '../event/WebApp';
-import {AudioType} from '../audio/AudioType';
+import {PermissionState} from './PermissionState';
 
-import {SystemMessageType} from '../message/SystemMessageType';
-import {SuperType} from '../message/SuperType';
+import {CallingRepository} from '../calling/CallingRepository';
+import {ConnectionEntity} from '../connection/ConnectionEntity';
 import {ConversationEphemeralHandler} from '../conversation/ConversationEphemeralHandler';
-import {WarningsViewModel} from '../view_model/WarningsViewModel';
+import {ConversationRepository} from '../conversation/ConversationRepository';
+import {Conversation} from '../entity/Conversation';
+import {CallMessage} from '../entity/message/CallMessage';
+import {ContentMessage} from '../entity/message/ContentMessage';
+import {DeleteConversationMessage} from '../entity/message/DeleteConversationMessage';
+import {MemberMessage} from '../entity/message/MemberMessage';
+import {Message} from '../entity/message/Message';
+import {MessageTimerUpdateMessage} from '../entity/message/MessageTimerUpdateMessage';
+import {RenameMessage} from '../entity/message/RenameMessage';
+import {SystemMessage} from '../entity/message/SystemMessage';
+import {User} from '../entity/User';
+import {SuperType} from '../message/SuperType';
+import {SystemMessageType} from '../message/SystemMessageType';
+import {PermissionRepository} from '../permission/PermissionRepository';
+import {UserRepository} from '../user/UserRepository';
 import {ContentViewModel} from '../view_model/ContentViewModel';
+import {WarningsViewModel} from '../view_model/WarningsViewModel';
+
+interface ContentViewModelState {
+  multitasking: {isMinimized: ko.Observable<boolean> | (() => false)};
+  state: () => string | false;
+}
+
+interface NotificationContent {
+  /** Notification options */
+  options: {data: {conversationId: string; messageId: string; messageType: string}};
+  /** Function to be triggered on click */
+  trigger: Function;
+  /** Notification title */
+  title: string;
+  /** Timeout for notification */
+  timeout: number;
+}
 
 /**
  * Notification repository to trigger browser and audio notifications.
@@ -48,6 +81,18 @@ import {ContentViewModel} from '../view_model/ContentViewModel';
  * @see http://www.w3.org/TR/notifications
  */
 export class NotificationRepository {
+  private contentViewModelState: ContentViewModelState;
+  private readonly callingRepository: CallingRepository;
+  private readonly conversationRepository: ConversationRepository;
+  private readonly logger: Logger;
+  private readonly notifications: any[];
+  private readonly notificationsPreference: ko.Observable<NotificationPreference>;
+  private readonly permissionRepository: PermissionRepository;
+  private readonly permissionState: ko.Observable<string>;
+  private readonly selfUser: ko.Observable<User>;
+  private readonly userRepository: UserRepository;
+
+  // tslint:disable-next-line:typedef
   static get CONFIG() {
     return {
       BODY_LENGTH: 80,
@@ -57,18 +102,23 @@ export class NotificationRepository {
     };
   }
 
-  static get EVENTS_TO_NOTIFY() {
+  static get EVENTS_TO_NOTIFY(): SuperType[] {
     return [SuperType.CALL, SuperType.CONTENT, SuperType.MEMBER, SuperType.PING, SuperType.REACTION, SuperType.SYSTEM];
   }
 
   /**
    * Construct a new Notification Repository.
-   * @param {CallingRepository} callingRepository - Repository for all call interactions
-   * @param {ConversationRepository} conversationRepository - Repository for all conversation interactions
-   * @param {PermissionRepository} permissionRepository - Repository for all permission interactions
-   * @param {UserRepository} userRepository - Repository for users
+   * @param callingRepository Repository for all call interactions
+   * @param conversationRepository Repository for all conversation interactions
+   * @param permissionRepository Repository for all permission interactions
+   * @param userRepository Repository for users
    */
-  constructor(callingRepository, conversationRepository, permissionRepository, userRepository) {
+  constructor(
+    callingRepository: CallingRepository,
+    conversationRepository: ConversationRepository,
+    permissionRepository: PermissionRepository,
+    userRepository: UserRepository,
+  ) {
     this.callingRepository = callingRepository;
     this.conversationRepository = conversationRepository;
     this.permissionRepository = permissionRepository;
@@ -92,15 +142,15 @@ export class NotificationRepository {
     this.selfUser = this.userRepository.self;
   }
 
-  __test__assignEnvironment(data) {
+  __test__assignEnvironment(data: any): void {
     Object.assign(Environment, data);
   }
 
-  setContentViewModelStates(state, multitasking) {
+  setContentViewModelStates(state: () => string, multitasking: {isMinimized: () => false}): void {
     this.contentViewModelState = {multitasking, state};
   }
 
-  subscribeToEvents() {
+  subscribeToEvents(): void {
     amplify.subscribe(WebAppEvents.NOTIFICATION.NOTIFY, this.notify.bind(this));
     amplify.subscribe(WebAppEvents.NOTIFICATION.PERMISSION_STATE, this.updatePermissionState.bind(this));
     amplify.subscribe(WebAppEvents.NOTIFICATION.REMOVE_READ, this.removeReadNotifications.bind(this));
@@ -110,35 +160,34 @@ export class NotificationRepository {
 
   /**
    * Check for browser permission if we have not yet asked.
-   * @returns {Promise} Promise that resolves with the permission state
+   * @returns Promise that resolves with the permission state
    */
-  checkPermission() {
-    return this._checkPermissionState().then(isPermitted => {
-      if (typeof isPermitted === 'boolean') {
-        return isPermitted;
-      }
+  async checkPermission(): Promise<boolean | void> {
+    const isPermitted = await this.checkPermissionState();
 
-      if (!Environment.browser.supports.notifications) {
-        return this.updatePermissionState(PermissionState.UNSUPPORTED);
-      }
+    if (typeof isPermitted === 'boolean') {
+      return isPermitted;
+    }
 
-      if (Environment.browser.supports.permissions) {
-        const notificationState = this.permissionRepository.getPermissionState(PermissionType.NOTIFICATIONS);
-        const shouldRequestPermission = notificationState === PermissionStatusState.PROMPT;
-        return shouldRequestPermission ? this._requestPermission() : this._checkPermissionState();
-      }
+    if (!Environment.browser.supports.notifications) {
+      return this.updatePermissionState(PermissionState.UNSUPPORTED);
+    }
 
-      const currentPermission = window.Notification.permission;
-      const shouldRequestPermission = currentPermission === PermissionState.DEFAULT;
-      return shouldRequestPermission ? this._requestPermission() : this.updatePermissionState(currentPermission);
-    });
+    if (Environment.browser.supports.permissions) {
+      const notificationState = this.permissionRepository.getPermissionState(PermissionType.NOTIFICATIONS);
+      const shouldRequestPermission = notificationState === PermissionStatusState.PROMPT;
+      return shouldRequestPermission ? this._requestPermission() : this.checkPermissionState();
+    }
+
+    const currentPermission = window.Notification.permission;
+    const shouldRequestPermission = currentPermission === PermissionState.DEFAULT;
+    return shouldRequestPermission ? this._requestPermission() : this.updatePermissionState(currentPermission);
   }
 
   /**
    * Close all notifications.
-   * @returns {undefined} No return value
    */
-  clearNotifications() {
+  clearNotifications(): void {
     this.notifications.forEach(notification => {
       notification.close();
       if (notification.data) {
@@ -150,12 +199,13 @@ export class NotificationRepository {
 
   /**
    * Display browser notification and play sound notification.
-   * @param {Message} messageEntity - Message entity
-   * @param {ConnectionEntity} [connectionEntity] - Connection entity
-   * @param {Conversation} [conversationEntity] - Conversation entity
-   * @returns {Promise} Resolves when notification has been handled
+   * @returns Resolves when notification has been handled
    */
-  notify(messageEntity, connectionEntity, conversationEntity) {
+  notify(
+    messageEntity: ContentMessage,
+    connectionEntity: ConnectionEntity,
+    conversationEntity: Conversation,
+  ): Promise<void> {
     const isUserAway = this.selfUser().availability() === Availability.Type.AWAY;
 
     if (isUserAway) {
@@ -175,14 +225,15 @@ export class NotificationRepository {
       : true;
 
     if (notifyInConversation) {
-      this._notifySound(messageEntity);
-      return this._notifyBanner(messageEntity, connectionEntity, conversationEntity);
+      this.notifySound(messageEntity);
+      return this.notifyBanner(messageEntity, connectionEntity, conversationEntity);
     }
+
     return Promise.resolve();
   }
 
   // Remove notifications from the queue that are no longer unread
-  removeReadNotifications() {
+  removeReadNotifications(): void {
     this.notifications.forEach(notification => {
       const {conversationId, messageId, messageType} = notification.data || {};
 
@@ -200,32 +251,29 @@ export class NotificationRepository {
     });
   }
 
-  updatedProperties(properties) {
+  updatedProperties(properties: any): void {
     const notificationPreference = properties.settings.notifications;
     return this.notificationsPreference(notificationPreference);
   }
 
-  updatedNotificationsProperty(notificationPreference) {
+  updatedNotificationsProperty(notificationPreference: NotificationPreference): void {
     return this.notificationsPreference(notificationPreference);
   }
 
   /**
    * Set the permission state.
-   * @param {PermissionStatusState} permissionState - State of browser permission
-   * @returns {Promise} Resolves with `true` if notifications are enabled
+   * @param permissionState State of browser permission
+   * @returns Resolves with `true` if notifications are enabled
    */
-  updatePermissionState(permissionState) {
+  updatePermissionState(permissionState: string): Promise<boolean> {
     this.permissionState(permissionState);
-    return this._checkPermissionState();
+    return this.checkPermissionState();
   }
 
   /**
    * Creates the notification body for calls.
-   * @private
-   * @param {Message} messageEntity - Message entity
-   * @returns {string} Notification message body
    */
-  _createBodyCall(messageEntity) {
+  private createBodyCall(messageEntity: CallMessage): string | void {
     if (messageEntity.is_activation()) {
       return t('notificationVoiceChannelActivate');
     }
@@ -238,11 +286,10 @@ export class NotificationRepository {
   /**
    * Creates the notification body for text messages and pictures.
    *
-   * @private
-   * @param {ContentMessage} messageEntity - Normal message entity
-   * @returns {string} Notification message body
+   * @param messageEntity Normal message entity
+   * @returns Notification message body
    */
-  _createBodyContent(messageEntity) {
+  private createBodyContent(messageEntity: ContentMessage): string | void {
     if (messageEntity.has_asset_text()) {
       for (const assetEntity of messageEntity.assets()) {
         if (assetEntity.is_text()) {
@@ -289,11 +336,10 @@ export class NotificationRepository {
   /**
    * Creates the notification body for people being added to a group conversation.
    *
-   * @private
-   * @param {MemberMessage} messageEntity - Member message entity
-   * @returns {string} Notification message body
+   * @param messageEntity Member message entity
+   * @param Notification message body
    */
-  _createBodyMemberJoin(messageEntity) {
+  private createBodyMemberJoin(messageEntity: MemberMessage): string {
     const updatedOneParticipant = messageEntity.userEntities().length === 1;
     if (updatedOneParticipant) {
       const [otherUserEntity] = messageEntity.userEntities();
@@ -310,7 +356,7 @@ export class NotificationRepository {
       return t('notificationMemberJoinOne', substitutions, {}, true);
     }
 
-    const substitutions = {number: messageEntity.userIds().length, user: messageEntity.user().first_name()};
+    const substitutions = {number: messageEntity.userIds().length.toString(), user: messageEntity.user().first_name()};
     return t('notificationMemberJoinMany', substitutions, {}, true);
   }
 
@@ -318,11 +364,10 @@ export class NotificationRepository {
    * Creates the notification body for people being removed from or leaving a group conversation.
    * @note Only show a notification if self user was removed
    *
-   * @private
-   * @param {MemberMessage} messageEntity - Member message entity
-   * @returns {string} Notification message body
+   * @param messageEntity Member message entity
+   * @param Notification message body
    */
-  _createBodyMemberLeave(messageEntity) {
+  private createBodyMemberLeave(messageEntity: MemberMessage): string | void {
     const updatedOneParticipant = messageEntity.userEntities().length === 1;
     if (updatedOneParticipant && !messageEntity.remoteUserEntities().length) {
       return t('notificationMemberLeaveRemovedYou', messageEntity.user().first_name(), {}, true);
@@ -332,23 +377,20 @@ export class NotificationRepository {
   /**
    * Selects the type of system message that the notification body needs to be created for.
    *
-   * @private
-   * @param {MemberMessage} messageEntity - Member message entity
-   * @param {ConnectionEntity} [connectionEntity] - Connection entity
-   * @param {Conversation} [conversationEntity] - Conversation entity
-   * @returns {string} Notification message body
+   * @param messageEntity Member message entity
+   * @param conversationEntity Conversation entity
    */
-  _createBodyMemberUpdate(messageEntity, connectionEntity, conversationEntity) {
+  private createBodyMemberUpdate(messageEntity?: MemberMessage, conversationEntity?: Conversation): string | void {
     const isGroup = conversationEntity && conversationEntity.isGroup();
 
     switch (messageEntity.memberMessageType) {
       case SystemMessageType.NORMAL:
         if (isGroup) {
           if (messageEntity.isMemberJoin()) {
-            return this._createBodyMemberJoin(messageEntity);
+            return this.createBodyMemberJoin(messageEntity);
           }
           if (messageEntity.isMemberLeave()) {
-            return this._createBodyMemberLeave(messageEntity);
+            return this.createBodyMemberLeave(messageEntity);
           }
         }
         break;
@@ -366,11 +408,10 @@ export class NotificationRepository {
   /**
    * Creates the notification body for obfuscated messages.
    *
-   * @private
-   * @param {Message} messageEntity - Message to obfuscate body for
-   * @returns {string} Notification message body
+   * @param messageEntity Message to obfuscate body for
+   * @returns Notification message body
    */
-  _createBodyObfuscated(messageEntity) {
+  private createBodyObfuscated(messageEntity: ContentMessage): string {
     if (messageEntity.is_content()) {
       const isSelfMentioned = messageEntity.isUserMentioned(this.selfUser().id);
 
@@ -390,33 +431,32 @@ export class NotificationRepository {
 
   /**
    * Creates the notification body for ping.
-   * @private
-   * @returns {string} Notification message body
+   * @returns Notification message body
    */
-  _createBodyPing() {
+  private createBodyPing(): string {
     return t('notificationPing');
   }
 
   /**
    * Creates the notification body for reaction.
-   * @private
-   * @param {Message} messageEntity - Fake reaction message entity
-   * @returns {string} Notification message body
+   * @param messageEntity Fake reaction message entity
+   * @returns Notification message body
    */
-  _createBodyReaction(messageEntity) {
+  private createBodyReaction(messageEntity: any): string {
     return t('notificationReaction', messageEntity.reaction);
   }
 
   /**
    * Selects the type of system message that the notification body needs to be created for.
    *
-   * @private
-   * @param {MemberMessage} messageEntity - Member message entity
-   * @returns {string} Notification message body
+   * @param messageEntity Member message entity
+   * @returns Notification message body
    */
-  _createBodySystem(messageEntity) {
+  private createBodySystem(messageEntity: Message): string | void {
     const createBodyMessageTimerUpdate = () => {
-      const messageTimer = ConversationEphemeralHandler.validateTimer(messageEntity.message_timer);
+      const messageTimer = ConversationEphemeralHandler.validateTimer(
+        (messageEntity as MessageTimerUpdateMessage).message_timer,
+      );
 
       if (messageTimer) {
         const timeString = formatDuration(messageTimer).text;
@@ -427,20 +467,19 @@ export class NotificationRepository {
     };
 
     const createBodyRename = () => {
-      const substitutions = {name: messageEntity.name, user: messageEntity.user().first_name()};
+      const substitutions = {name: (messageEntity as RenameMessage).name, user: messageEntity.user().first_name()};
       return t('notificationConversationRename', substitutions, {}, true);
     };
 
-    switch (messageEntity.system_message_type) {
+    switch ((messageEntity as SystemMessage).system_message_type) {
       case SystemMessageType.CONVERSATION_RENAME: {
         return createBodyRename();
       }
-
       case SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE: {
-        return createBodyMessageTimerUpdate(messageEntity);
+        return createBodyMessageTimerUpdate();
       }
       case SystemMessageType.CONVERSATION_DELETE: {
-        return messageEntity.caption;
+        return (messageEntity as DeleteConversationMessage).caption;
       }
     }
   }
@@ -448,33 +487,33 @@ export class NotificationRepository {
   /**
    * Create notification content.
    *
-   * @private
-   * @param {Message} messageEntity - Message entity
-   * @param {ConnectionEntity} [connectionEntity] - Connection entity
-   * @param {Conversation} [conversationEntity] - Conversation entity
-   * @returns {Promise} Resolves with the notification content
+   * @returns Resolves with the notification content
    */
-  _createNotificationContent(messageEntity, connectionEntity, conversationEntity) {
-    const body = this._createOptionsBody(messageEntity, connectionEntity, conversationEntity);
+  private createNotificationContent(
+    messageEntity: ContentMessage,
+    connectionEntity: ConnectionEntity,
+    conversationEntity: Conversation,
+  ): Promise<any> {
+    const body = this.createOptionsBody(messageEntity, conversationEntity);
     if (!body) {
       return Promise.resolve();
     }
-    const shouldObfuscateSender = this._shouldObfuscateNotificationSender(messageEntity);
-    return this._createOptionsIcon(shouldObfuscateSender, messageEntity.user()).then(iconUrl => {
-      const shouldObfuscateMessage = this._shouldObfuscateNotificationMessage(messageEntity);
+    const shouldObfuscateSender = this.shouldObfuscateNotificationSender(messageEntity);
+    return this.createOptionsIcon(shouldObfuscateSender, messageEntity.user()).then(iconUrl => {
+      const shouldObfuscateMessage = this.shouldObfuscateNotificationMessage(messageEntity);
       return {
         options: {
-          body: shouldObfuscateMessage ? this._createBodyObfuscated(messageEntity) : body,
-          data: this._createOptionsData(messageEntity, connectionEntity, conversationEntity),
+          body: shouldObfuscateMessage ? this.createBodyObfuscated(messageEntity) : body,
+          data: this.createOptionsData(messageEntity, connectionEntity, conversationEntity),
           icon: iconUrl,
           silent: true, // @note When Firefox supports this we can remove the fix for WEBAPP-731
-          tag: this._createOptionsTag(connectionEntity, conversationEntity),
+          tag: this.createOptionsTag(connectionEntity, conversationEntity),
         },
         timeout: NotificationRepository.CONFIG.TIMEOUT,
         title: shouldObfuscateSender
-          ? this._createTitleObfuscated()
-          : this._createTitle(messageEntity, conversationEntity),
-        trigger: this._createTrigger(messageEntity, connectionEntity, conversationEntity),
+          ? this.createTitleObfuscated()
+          : this.createTitle(messageEntity, conversationEntity),
+        trigger: this.createTrigger(messageEntity, connectionEntity, conversationEntity),
       };
     });
   }
@@ -482,43 +521,42 @@ export class NotificationRepository {
   /**
    * Selects the type of message that the notification body needs to be created for.
    *
-   * @private
-   * @param {Message} messageEntity - Message entity
-   * @param {ConnectionEntity} connectionEntity - Connection entity
-   * @param {Conversation} conversationEntity - Conversation entity
-   * @returns {string|undefined} The notification message body
+   * @returns The notification message body
    */
-  _createOptionsBody(messageEntity, connectionEntity, conversationEntity) {
+  private createOptionsBody(
+    messageEntity: Message | CallMessage | ContentMessage | MemberMessage,
+    conversationEntity: Conversation,
+  ): string | void {
     switch (messageEntity.super_type) {
       case SuperType.CALL:
-        return this._createBodyCall(messageEntity);
+        return this.createBodyCall(messageEntity as CallMessage);
       case SuperType.CONTENT:
-        return this._createBodyContent(messageEntity);
+        return this.createBodyContent(messageEntity as ContentMessage);
       case SuperType.MEMBER:
-        return this._createBodyMemberUpdate(messageEntity, connectionEntity, conversationEntity);
+        return this.createBodyMemberUpdate(messageEntity as MemberMessage, conversationEntity);
       case SuperType.PING:
-        return this._createBodyPing();
+        return this.createBodyPing();
       case SuperType.REACTION:
-        return this._createBodyReaction(messageEntity);
+        return this.createBodyReaction(messageEntity);
       case SuperType.SYSTEM:
-        return this._createBodySystem(messageEntity);
+        return this.createBodySystem(messageEntity as MemberMessage);
     }
   }
 
   /**
    * Creates the notification data to help check its content.
    *
-   * @private
-   * @param {Message} messageEntity - Message entity
-   * @param {ConnectionEntity} [connectionEntity] - Connection entity
-   * @param {Conversation} [conversationEntity] - Conversation entity
-   * @returns {Object} Notification message data
+   * @returns Notification message data
    */
-  _createOptionsData(messageEntity, connectionEntity, conversationEntity) {
+  private createOptionsData(
+    messageEntity: Message,
+    connectionEntity: ConnectionEntity,
+    conversationEntity: Conversation,
+  ): {conversationId: string; messageId: string | undefined; messageType: string} {
     const {id: messageId, type: messageType} = messageEntity;
 
     return {
-      conversationId: this._getConversationId(connectionEntity, conversationEntity),
+      conversationId: this.getConversationId(connectionEntity, conversationEntity),
       messageId: messageId === '0' ? undefined : messageId,
       messageType: messageType,
     };
@@ -527,18 +565,17 @@ export class NotificationRepository {
   /**
    * Creates the notification icon.
    *
-   * @private
-   * @param {boolean} shouldObfuscateSender - Sender visible in notification
-   * @param {User} userEntity - Sender of message
-   * @returns {Promise} Resolves with the icon URL
+   * @param shouldObfuscateSender Sender visible in notification
+   * @param userEntity Sender of message
+   * @returns Resolves with the icon URL
    */
-  _createOptionsIcon(shouldObfuscateSender, userEntity) {
+  private createOptionsIcon(shouldObfuscateSender: boolean, userEntity: User): Promise<string> {
     const canShowUserImage = userEntity.previewPictureResource() && !shouldObfuscateSender;
     if (canShowUserImage) {
       return userEntity
         .previewPictureResource()
         .generateUrl()
-        .catch(error => {
+        .catch((error: Error) => {
           if (error instanceof ValidationUtilError) {
             this.logger.error(`Failed to validate an asset URL: ${error.message}`);
           }
@@ -553,24 +590,19 @@ export class NotificationRepository {
   /**
    * Creates the notification tag.
    *
-   * @private
-   * @param {ConnectionEntity} [connectionEntity] - Connection entity
-   * @param {Conversation} [conversationEntity] - Conversation entity
-   * @returns {string} Notification message tag
+   * @param connectionEntity Connection entity
+   * @param conversationEntity Conversation entity
    */
-  _createOptionsTag(connectionEntity, conversationEntity) {
-    return this._getConversationId(connectionEntity, conversationEntity);
+  private createOptionsTag(connectionEntity?: ConnectionEntity, conversationEntity?: Conversation): string {
+    return this.getConversationId(connectionEntity, conversationEntity);
   }
 
   /**
    * Creates the notification title.
    *
-   * @private
-   * @param {Message} messageEntity - Message entity
-   * @param {Conversation} [conversationEntity] - Conversation entity
-   * @returns {string} Notification message title
+   * @param Notification message title
    */
-  _createTitle(messageEntity, conversationEntity) {
+  private createTitle(messageEntity: Message, conversationEntity?: Conversation): string {
     const conversationName = conversationEntity && conversationEntity.display_name();
     const userEntity = messageEntity.user();
 
@@ -586,10 +618,10 @@ export class NotificationRepository {
 
   /**
    * Create obfuscated title.
-   * @private
-   * @returns {string} Obfuscated notification message title
+   *
+   * @returns Obfuscated notification message title
    */
-  _createTitleObfuscated() {
+  private createTitleObfuscated(): string {
     const obfuscatedTitle = t('notificationObfuscatedTitle');
     return truncate(obfuscatedTitle, NotificationRepository.CONFIG.TITLE_LENGTH, false);
   }
@@ -597,22 +629,23 @@ export class NotificationRepository {
   /**
    * Creates the notification trigger.
    *
-   * @private
-   * @param {Message} messageEntity - Message entity
-   * @param {ConnectionEntity} [connectionEntity] - Connection entity
-   * @param {Conversation} [conversationEntity] - Conversation entity
-   * @returns {Function} Function to be called when notification is clicked
+   * @returns Function to be called when notification is clicked
    */
-  _createTrigger(messageEntity, connectionEntity, conversationEntity) {
-    const conversationId = this._getConversationId(connectionEntity, conversationEntity);
+  private createTrigger(
+    messageEntity: ContentMessage | MemberMessage,
+    connectionEntity?: ConnectionEntity,
+    conversationEntity?: Conversation,
+  ): () => void {
+    const conversationId = this.getConversationId(connectionEntity, conversationEntity);
 
-    const containsSelfMention = messageEntity.is_content() && messageEntity.isUserMentioned(this.selfUser().id);
+    const containsSelfMention =
+      messageEntity.is_content() && (messageEntity as ContentMessage).isUserMentioned(this.selfUser().id);
     if (containsSelfMention) {
       const showOptions = {exposeMessage: messageEntity, openFirstSelfMention: true};
       return () => amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, showOptions);
     }
 
-    const isConnectionRequest = messageEntity.is_member() && messageEntity.isConnectionRequest();
+    const isConnectionRequest = messageEntity.is_member() && (messageEntity as MemberMessage).isConnectionRequest();
     if (isConnectionRequest) {
       return () => {
         amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.CONNECTION_REQUESTS);
@@ -625,12 +658,11 @@ export class NotificationRepository {
   /**
    * Retrieve conversation ID from either conversation or connection.
    *
-   * @private
-   * @param {ConnectionEntity} [connectionEntity] - Connection entity
-   * @param {Conversation} [conversationEntity] - Conversation entity
-   * @returns {string} ID of conversation
+   * @param connectionEntity Connection entity
+   * @param conversationEntity Conversation entity
+   * @returns ID of conversation
    */
-  _getConversationId(connectionEntity, conversationEntity) {
+  private getConversationId(connectionEntity?: ConnectionEntity, conversationEntity?: Conversation): string {
     if (connectionEntity) {
       return connectionEntity.conversationId;
     }
@@ -639,10 +671,9 @@ export class NotificationRepository {
 
   /**
    * Evaluates the current permission state.
-   * @private
-   * @returns {Promise} Resolves with `true` if notifications are permitted
+   * @returns Resolves with `true` if notifications are permitted
    */
-  _checkPermissionState() {
+  private checkPermissionState(): Promise<boolean | undefined> {
     switch (this.permissionState()) {
       case PermissionStatusState.GRANTED: {
         return Promise.resolve(true);
@@ -663,35 +694,37 @@ export class NotificationRepository {
   /**
    * Creates the browser notification and sends it.
    *
-   * @private
    * @see https://developer.mozilla.org/en/docs/Web/API/notification#Parameters
-   * @param {Message} messageEntity - Message entity
-   * @param {ConnectionEntity} [connectionEntity] - Connection entity
-   * @param {Conversation} [conversationEntity] - Conversation entity
-   * @returns {Promise} Resolves when notification was handled
+   * @returns Resolves when notification was handled
    */
-  _notifyBanner(messageEntity, connectionEntity, conversationEntity) {
-    if (!this._shouldShowNotification(messageEntity, conversationEntity)) {
-      return Promise.resolve();
+  private async notifyBanner(
+    messageEntity: ContentMessage,
+    connectionEntity: ConnectionEntity,
+    conversationEntity: Conversation,
+  ): Promise<void> {
+    if (!this.shouldShowNotification(messageEntity, conversationEntity)) {
+      return;
     }
-    return this._createNotificationContent(messageEntity, connectionEntity, conversationEntity).then(
-      notificationContent => {
-        if (notificationContent) {
-          return this.checkPermission().then(isPermitted => {
-            return isPermitted ? this._showNotification(notificationContent) : undefined;
-          });
-        }
-      },
+    const notificationContent = await this.createNotificationContent(
+      messageEntity,
+      connectionEntity,
+      conversationEntity,
     );
+    if (notificationContent) {
+      const isPermitted = await this.checkPermission();
+      if (isPermitted) {
+        this.showNotification(notificationContent);
+      }
+    }
   }
 
   /**
    * Plays the sound from the audio repository.
-   * @private
-   * @param {Message} messageEntity - Message entity
-   * @returns {undefined} No return value
+   *
+   * @param messageEntity Message entity
+   * @param No return value
    */
-  _notifySound(messageEntity) {
+  private notifySound(messageEntity: Message): void {
     const muteSound = !document.hasFocus() && Environment.browser.firefox && Environment.os.mac;
     const isFromSelf = messageEntity.user().is_me;
     const shouldPlaySound = !muteSound && !isFromSelf;
@@ -712,51 +745,46 @@ export class NotificationRepository {
   }
 
   // Request browser permission for notifications.
-  _requestPermission() {
-    return new Promise(resolve => {
-      amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.REQUEST_NOTIFICATION);
-      // Note: The callback will be only triggered in Chrome.
-      // If you ignore a permission request on Firefox, then the callback will not be triggered.
-      if (window.Notification.requestPermission) {
-        window.Notification.requestPermission(permissionState => {
-          amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.REQUEST_NOTIFICATION);
-          this.updatePermissionState(permissionState).then(resolve);
-        });
-      }
-    });
+  private async _requestPermission(): Promise<void> {
+    amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.REQUEST_NOTIFICATION);
+    // Note: The callback will be only triggered in Chrome.
+    // If you ignore a permission request on Firefox, then the callback will not be triggered.
+    if (window.Notification.requestPermission) {
+      const permissionState = await window.Notification.requestPermission();
+      amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.REQUEST_NOTIFICATION);
+      await this.updatePermissionState(permissionState);
+    }
   }
 
   /**
-   * Should message in a notification be obfuscated.
-   * @private
-   * @param {Message} messageEntity - Message entity
-   * @returns {boolean} Obfuscate message in notification
+   * Should message in a notification be obfuscated?
+   *
+   * @param messageEntity Message entity
+   * @param Obfuscate message in notification
    */
-  _shouldObfuscateNotificationMessage(messageEntity) {
+  private shouldObfuscateNotificationMessage(messageEntity: Message): boolean {
     const preferencesToObfuscateMessage = [NotificationPreference.OBFUSCATE, NotificationPreference.OBFUSCATE_MESSAGE];
 
     return preferencesToObfuscateMessage.includes(this.notificationsPreference()) || messageEntity.is_ephemeral();
   }
 
   /**
-   * Should sender in a notification be obfuscated.
-   * @private
-   * @param {Message} messageEntity - Message entity
-   * @returns {boolean} Obfuscate sender in notification
+   * Should sender in a notification be obfuscated?
+   *
+   * @param messageEntity Message entity
+   * @returns Obfuscate sender in notification
    */
-  _shouldObfuscateNotificationSender(messageEntity) {
+  private shouldObfuscateNotificationSender(messageEntity: Message): boolean {
     const isSetToObfuscate = this.notificationsPreference() === NotificationPreference.OBFUSCATE;
     return isSetToObfuscate || messageEntity.is_ephemeral();
   }
 
   /**
-   * Should hide notification.
-   * @private
-   * @param {Message} messageEntity - Message entity
-   * @param {Conversation} [conversationEntity] - Conversation entity
-   * @returns {Promise} Resolves if the notification should be shown
+   * @param messageEntity Message entity
+   * @param conversationEntity Conversation entity
+   * @returns Returns `true` if the notification should be shown, `false` otherwise
    */
-  _shouldShowNotification(messageEntity, conversationEntity) {
+  private shouldShowNotification(messageEntity: Message, conversationEntity?: Conversation): boolean {
     const inActiveConversation = conversationEntity
       ? this.conversationRepository.is_active_conversation(conversationEntity)
       : false;
@@ -779,38 +807,37 @@ export class NotificationRepository {
   /**
    * Sending the notification.
    *
-   * @param {Object} notificationContent - Content of notification
-   * @param {string} notificationContent.title - Title of notification
-   * @param {Object} notificationContent.options - Notification options
-   * @param {Function} notificationContent.trigger - Function to be called on notificiation click
-   * @param {Integer} notificationContent.timeout - Timeout after which notification is closed
-   * @returns {undefined} No return value
+   * @param notificationContent Content of notification
+   * @param notificationContent.title - Title of notification
+   * @param notificationContent.options - Notification options
+   * @param notificationContent.trigger - Function to be called on notificiation click
+   * @param notificationContent.timeout - Timeout after which notification is closed
+   * @returns No return value
    */
-  _showNotification(notificationContent) {
+  private showNotification(notificationContent: NotificationContent): void {
     amplify.publish(WebAppEvents.NOTIFICATION.SHOW, notificationContent);
-    this._showNotificationInBrowser(notificationContent);
+    this.showNotificationInBrowser(notificationContent);
   }
 
   /**
    * Sending the browser notification.
    *
-   * @private
-   * @param {Object} notificationContent - Content of notification
-   * @param {string} notificationContent.title - Notification title
-   * @param {Object} notificationContent.options - Notification options
-   * @param {Function} notificationContent.trigger - Function to be triggered on click [Function] trigger
-   * @param {number} notificationContent.timeout - Timeout for notification
-   * @returns {undefined} No return value
+   * @param notificationContent Content of notification
+   * @param notificationContent.title - Notification title
+   * @param notificationContent.options - Notification options
+   * @param notificationContent.trigger - Function to be triggered on click [Function] trigger
+   * @param notificationContent.timeout - Timeout for notification
+   * @param No return value
    */
-  _showNotificationInBrowser(notificationContent) {
+  private showNotificationInBrowser(notificationContent: NotificationContent): void {
     /*
-    @note Notification.data is only supported on Chrome
-    @see https://developer.mozilla.org/en-US/docs/Web/API/Notification/data
-    */
+     * @note Notification.data is only supported on Chrome
+     * @see https://developer.mozilla.org/en-US/docs/Web/API/Notification/data
+     */
     this.removeReadNotifications();
     const notification = new window.Notification(notificationContent.title, notificationContent.options);
     const {conversationId, messageId, messageType} = notificationContent.options.data;
-    let timeoutTriggerId = undefined;
+    let timeoutTriggerId: number;
 
     const messageInfo = messageId ? `message '${messageId}' of type '${messageType}'` : `'${messageType}' message`;
     notification.onclick = () => {
@@ -848,12 +875,16 @@ export class NotificationRepository {
   /**
    * Check whether conversation is in state to trigger notitication.
    *
-   * @param {Conversation} conversationEntity - Conversation to notify in.
-   * @param {Message} messageEntity - The message to filter from.
-   * @param {string} userId - The user id to check mentions for.
-   * @returns {boolean} `true` if the conversation should show notification.
+   * @param conversationEntity Conversation to notify in
+   * @param messageEntity The message to filter from
+   * @param userId The user id to check mentions for
+   * @returns `true` if the conversation should show notification
    */
-  static shouldNotifyInConversation(conversationEntity, messageEntity, userId) {
+  static shouldNotifyInConversation(
+    conversationEntity: Conversation,
+    messageEntity: ContentMessage,
+    userId: string,
+  ): boolean {
     if (conversationEntity.showNotificationsNothing()) {
       return false;
     }

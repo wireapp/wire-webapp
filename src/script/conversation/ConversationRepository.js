@@ -2052,10 +2052,9 @@ export class ConversationRepository {
    *
    * @param {EventInfoEntity} eventInfoEntity - Event info to be send
    * @param {string} conversationId - id of the conversation to send call message to
-   * @param {CallMessageEntity} callMessageEntity - Content for call message
    * @returns {Promise} Resolves when the confirmation was sent
    */
-  sendCallingMessage(eventInfoEntity, conversationId, callMessageEntity) {
+  sendCallingMessage(eventInfoEntity, conversationId) {
     return this.messageSender.queueMessage(() => {
       const options = eventInfoEntity.options;
       const recipientsPromise = options.recipients

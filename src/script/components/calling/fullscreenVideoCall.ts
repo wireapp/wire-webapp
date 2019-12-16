@@ -71,7 +71,8 @@ export class FullscreenVideoCalling {
   public HIDE_CONTROLS_TIMEOUT: number;
   public dispose: () => void;
 
-  static get CONFIG(): any {
+  // tslint:disable-next-line:typedef
+  static get CONFIG() {
     return {
       AUTO_MINIMIZE_TIMEOUT: TIME_IN_MILLIS.SECOND * 4,
       HIDE_CONTROLS_TIMEOUT: TIME_IN_MILLIS.SECOND * 4,

@@ -19,6 +19,17 @@
 
 import ko from 'knockout';
 
+interface ComponentParams {
+  items?: ko.Observable<MenuItem[]>;
+}
+
+export interface MenuItem {
+  click: () => void;
+  icon: string;
+  identifier: string;
+  label: string;
+}
+
 ko.components.register('panel-actions', {
   template: `
     <!-- ko foreach: items -->
@@ -28,7 +39,11 @@ ko.components.register('panel-actions', {
       </div>
     <!-- /ko -->
   `,
-  viewModel: function({items = ko.observable([])}) {
-    this.items = items;
+  viewModel: class {
+    readonly items: ko.Observable<MenuItem[]>;
+
+    constructor(params: ComponentParams) {
+      this.items = params.items || ko.observable([]);
+    }
   },
 });

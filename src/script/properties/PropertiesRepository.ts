@@ -36,17 +36,8 @@ import {PROPERTIES_TYPE} from './PropertiesType';
 
 export class PropertiesRepository {
   // Value names are specified by the protocol but key names can be changed.
-  static get CONFIG(): {
-    WEBAPP_ACCOUNT_SETTINGS: string;
-    WIRE_MARKETING_CONSENT: {
-      defaultValue: ConsentValue;
-      key: string;
-    };
-    WIRE_RECEIPT_MODE: {
-      defaultValue: ReceiptMode;
-      key: string;
-    };
-  } {
+  // tslint:disable-next-line:typedef
+  static get CONFIG() {
     return {
       WEBAPP_ACCOUNT_SETTINGS: 'webapp',
       WIRE_MARKETING_CONSENT: {
