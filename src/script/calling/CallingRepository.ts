@@ -88,12 +88,10 @@ export class CallingRepository {
   private readonly logger: Logger;
   private readonly callLog: string[];
 
-  static get CONFIG(): any {
-    return {
-      DEFAULT_CONFIG_TTL: 60 * 60, // 60 minutes in seconds
-      MAX_FIREFOX_TURN_COUNT: 3,
-    };
-  }
+  public static readonly CONFIG = {
+    DEFAULT_CONFIG_TTL: 60 * 60, // 60 minutes in seconds
+    MAX_FIREFOX_TURN_COUNT: 3,
+  };
 
   constructor(
     backendClient: any,

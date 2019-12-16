@@ -31,13 +31,10 @@ export class UserService {
   private readonly storageService: StorageService;
   private readonly USER_STORE_NAME: string;
 
-  // tslint:disable-next-line:typedef
-  static get URL() {
-    return {
-      PASSWORD_RESET: '/password-reset',
-      USERS: '/users',
-    };
-  }
+  public static readonly URL = {
+    PASSWORD_RESET: '/password-reset',
+    USERS: '/users',
+  };
 
   constructor(backendClient: BackendClient, storageService: StorageService) {
     this.backendClient = backendClient;

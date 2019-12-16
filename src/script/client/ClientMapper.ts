@@ -20,13 +20,10 @@
 import {ClientEntity} from './ClientEntity';
 
 export class ClientMapper {
-  // tslint:disable-next-line:typedef
-  static get CONFIG() {
-    return {
-      CLIENT_PAYLOAD: ['class', 'id'],
-      SELF_CLIENT_PAYLOAD: ['address', 'cookie', 'label', 'location', 'model', 'time', 'type'],
-    };
-  }
+  public static readonly CONFIG = {
+    CLIENT_PAYLOAD: ['class', 'id'],
+    SELF_CLIENT_PAYLOAD: ['address', 'cookie', 'label', 'location', 'model', 'time', 'type'],
+  };
 
   /**
    * Maps a JSON into a Client entity.

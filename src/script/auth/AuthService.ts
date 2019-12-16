@@ -30,25 +30,15 @@ export class AuthService {
   public readonly backendClient: any;
   private readonly logger: Logger;
 
-  static get CONFIG(): {
+  public static readonly CONFIG = {
     POST_ACCESS_RETRY: {
-      LIMIT: number;
-      TIMEOUT: number;
-    };
-    URL_ACCESS: string;
-    URL_COOKIES: string;
-    URL_LOGIN: string;
-  } {
-    return {
-      POST_ACCESS_RETRY: {
-        LIMIT: 10,
-        TIMEOUT: TIME_IN_MILLIS.SECOND * 0.5,
-      },
-      URL_ACCESS: '/access',
-      URL_COOKIES: '/cookies',
-      URL_LOGIN: '/login',
-    };
-  }
+      LIMIT: 10,
+      TIMEOUT: TIME_IN_MILLIS.SECOND * 0.5,
+    },
+    URL_ACCESS: '/access',
+    URL_COOKIES: '/cookies',
+    URL_LOGIN: '/login',
+  };
 
   constructor(backendClient: any) {
     this.backendClient = backendClient;

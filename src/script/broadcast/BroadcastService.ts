@@ -24,11 +24,9 @@ import {BackendClient} from '../service/BackendClient';
 export class BroadcastService {
   private readonly backendClient: BackendClient;
 
-  static get CONFIG(): {URL_BROADCAST: string} {
-    return {
-      URL_BROADCAST: '/broadcast',
-    };
-  }
+  public static readonly CONFIG = {
+    URL_BROADCAST: '/broadcast',
+  };
 
   constructor(backendClient: BackendClient) {
     this.backendClient = backendClient;

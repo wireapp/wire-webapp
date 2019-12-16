@@ -69,14 +69,12 @@ export class FullscreenVideoCalling {
   public callDuration: ko.Observable<string>;
 
   public HIDE_CONTROLS_TIMEOUT: number;
-  public dispose: () => void;
+  public readonly dispose: () => void;
 
-  static get CONFIG(): any {
-    return {
-      AUTO_MINIMIZE_TIMEOUT: TIME_IN_MILLIS.SECOND * 4,
-      HIDE_CONTROLS_TIMEOUT: TIME_IN_MILLIS.SECOND * 4,
-    };
-  }
+  public static readonly CONFIG = {
+    AUTO_MINIMIZE_TIMEOUT: TIME_IN_MILLIS.SECOND * 4,
+    HIDE_CONTROLS_TIMEOUT: TIME_IN_MILLIS.SECOND * 4,
+  };
 
   constructor({
     videoGrid,

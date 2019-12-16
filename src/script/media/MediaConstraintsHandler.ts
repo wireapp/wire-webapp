@@ -47,56 +47,54 @@ export class MediaConstraintsHandler {
   private readonly logger: Logger;
   private readonly currentDeviceId: CurrentAvailableDeviceId;
 
-  static get CONFIG(): Config {
-    return {
-      CONSTRAINTS: {
-        SCREEN: {
-          DESKTOP_CAPTURER: {
-            mandatory: {
-              chromeMediaSource: 'desktop',
-              maxHeight: 1080,
-              minHeight: 1080,
-            },
-          },
-          DISPLAY_MEDIA: {
-            height: {
-              ideal: 1080,
-              max: 1080,
-            },
-          },
-          USER_MEDIA: {
-            frameRate: 30,
-            height: {exact: 720},
-            mediaSource: 'screen',
+  public static readonly CONFIG: Config = {
+    CONSTRAINTS: {
+      SCREEN: {
+        DESKTOP_CAPTURER: {
+          mandatory: {
+            chromeMediaSource: 'desktop',
+            maxHeight: 1080,
+            minHeight: 1080,
           },
         },
-        VIDEO: {
-          [VIDEO_QUALITY_MODE.FULL_HD]: {
-            frameRate: 30,
-            height: 1080,
-            width: 1920,
+        DISPLAY_MEDIA: {
+          height: {
+            ideal: 1080,
+            max: 1080,
           },
-          [VIDEO_QUALITY_MODE.GROUP]: {
-            frameRate: 30,
-            height: 240,
-            width: 320,
-          },
-          [VIDEO_QUALITY_MODE.HD]: {
-            frameRate: 30,
-            height: 720,
-            width: 1280,
-          },
-          [VIDEO_QUALITY_MODE.MOBILE]: {
-            frameRate: 30,
-            height: 480,
-            width: 640,
-          },
-          PREFERRED_FACING_MODE: 'user',
+        },
+        USER_MEDIA: {
+          frameRate: 30,
+          height: {exact: 720},
+          mediaSource: 'screen',
         },
       },
-      DEFAULT_DEVICE_ID: 'default',
-    };
-  }
+      VIDEO: {
+        [VIDEO_QUALITY_MODE.FULL_HD]: {
+          frameRate: 30,
+          height: 1080,
+          width: 1920,
+        },
+        [VIDEO_QUALITY_MODE.GROUP]: {
+          frameRate: 30,
+          height: 240,
+          width: 320,
+        },
+        [VIDEO_QUALITY_MODE.HD]: {
+          frameRate: 30,
+          height: 720,
+          width: 1280,
+        },
+        [VIDEO_QUALITY_MODE.MOBILE]: {
+          frameRate: 30,
+          height: 480,
+          width: 640,
+        },
+        PREFERRED_FACING_MODE: 'user',
+      },
+    },
+    DEFAULT_DEVICE_ID: 'default',
+  };
 
   constructor(currentDeviceId: CurrentAvailableDeviceId) {
     this.logger = getLogger('MediaConstraintsHandler');

@@ -22,12 +22,9 @@ import {BackendClient} from '../service/BackendClient';
 
 export class SelfService {
   private readonly backendClient: BackendClient;
-
-  static get URL(): {SELF: string} {
-    return {
-      SELF: '/self',
-    };
-  }
+  public static readonly URL = {
+    SELF: '/self',
+  };
 
   constructor(backendClient: BackendClient) {
     this.backendClient = backendClient;

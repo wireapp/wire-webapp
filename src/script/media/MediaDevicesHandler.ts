@@ -71,16 +71,14 @@ export class MediaDevicesHandler {
   public currentAvailableDeviceId: CurrentAvailableDeviceId;
   public deviceSupport: DeviceSupport;
 
-  static get CONFIG(): Config {
-    return {
-      DEFAULT_DEVICE: {
-        audioInput: 'default',
-        audioOutput: 'default',
-        screenInput: 'screen',
-        videoInput: 'default',
-      },
-    };
-  }
+  public static readonly CONFIG: Config = {
+    DEFAULT_DEVICE: {
+      audioInput: 'default',
+      audioOutput: 'default',
+      screenInput: 'screen',
+      videoInput: 'default',
+    },
+  };
 
   /**
    * Construct a new MediaDevices handler.

@@ -34,31 +34,31 @@ import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {PropertiesService} from './PropertiesService';
 import {PROPERTIES_TYPE} from './PropertiesType';
 
+interface Config {
+  WEBAPP_ACCOUNT_SETTINGS: string;
+  WIRE_MARKETING_CONSENT: {
+    defaultValue: ConsentValue;
+    key: string;
+  };
+  WIRE_RECEIPT_MODE: {
+    defaultValue: ReceiptMode;
+    key: string;
+  };
+}
+
 export class PropertiesRepository {
   // Value names are specified by the protocol but key names can be changed.
-  static get CONFIG(): {
-    WEBAPP_ACCOUNT_SETTINGS: string;
+  public static readonly CONFIG: Config = {
+    WEBAPP_ACCOUNT_SETTINGS: 'webapp',
     WIRE_MARKETING_CONSENT: {
-      defaultValue: ConsentValue;
-      key: string;
-    };
+      defaultValue: ConsentValue.NOT_GIVEN,
+      key: 'WIRE_MARKETING_CONSENT',
+    },
     WIRE_RECEIPT_MODE: {
-      defaultValue: ReceiptMode;
-      key: string;
-    };
-  } {
-    return {
-      WEBAPP_ACCOUNT_SETTINGS: 'webapp',
-      WIRE_MARKETING_CONSENT: {
-        defaultValue: ConsentValue.NOT_GIVEN,
-        key: 'WIRE_MARKETING_CONSENT',
-      },
-      WIRE_RECEIPT_MODE: {
-        defaultValue: ReceiptMode.DELIVERY,
-        key: 'WIRE_RECEIPT_MODE',
-      },
-    };
-  }
+      defaultValue: ReceiptMode.DELIVERY,
+      key: 'WIRE_RECEIPT_MODE',
+    },
+  };
 
   private readonly logger: Logger;
   private readonly propertiesService: PropertiesService;

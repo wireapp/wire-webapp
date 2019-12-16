@@ -42,23 +42,20 @@ export class EventTrackingRepository {
   private readonly logger: Logger;
   private readonly teamRepository: TeamRepository;
   private readonly userRepository: UserRepository;
-  isErrorReportingActivated: boolean;
+  public isErrorReportingActivated: boolean;
 
-  // tslint:disable-next-line:typedef
-  static get CONFIG() {
-    return {
-      ERROR_REPORTING: {
-        API_KEY: window.wire.env.RAYGUN_API_KEY,
-        REPORTING_THRESHOLD: TIME_IN_MILLIS.MINUTE,
-      },
-      USER_ANALYTICS: {
-        API_KEY: window.wire.env.ANALYTICS_API_KEY,
-        CLIENT_TYPE: 'desktop',
-        DISABLED_DOMAINS: ['localhost', 'zinfra.io'],
-        DISABLED_EVENTS: [EventName.TELEMETRY.APP_INITIALIZATION],
-      },
-    };
-  }
+  public static readonly CONFIG = {
+    ERROR_REPORTING: {
+      API_KEY: window.wire.env.RAYGUN_API_KEY,
+      REPORTING_THRESHOLD: TIME_IN_MILLIS.MINUTE,
+    },
+    USER_ANALYTICS: {
+      API_KEY: window.wire.env.ANALYTICS_API_KEY,
+      CLIENT_TYPE: 'desktop',
+      DISABLED_DOMAINS: ['localhost', 'zinfra.io'],
+      DISABLED_EVENTS: [EventName.TELEMETRY.APP_INITIALIZATION],
+    },
+  };
 
   constructor(teamRepository: TeamRepository, userRepository: UserRepository) {
     this.logger = getLogger('EventTrackingRepository');

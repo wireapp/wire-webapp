@@ -95,24 +95,21 @@ export class UserRepository {
   private readonly user_service: UserService;
   private readonly users: ko.ObservableArray<User>;
   private should_set_username: boolean;
-  readonly connect_requests: ko.PureComputed<User[]>;
-  readonly isActivatedAccount: ko.PureComputed<boolean>;
-  readonly isTemporaryGuest: ko.PureComputed<boolean>;
-  readonly number_of_contacts: ko.PureComputed<number>;
-  readonly self: ko.Observable<User>;
+  public readonly connect_requests: ko.PureComputed<User[]>;
+  public readonly isActivatedAccount: ko.PureComputed<boolean>;
+  public readonly isTemporaryGuest: ko.PureComputed<boolean>;
+  public readonly number_of_contacts: ko.PureComputed<number>;
+  public readonly self: ko.Observable<User>;
 
-  // tslint:disable-next-line:typedef
-  static get CONFIG() {
-    return {
-      MAXIMUM_TEAM_SIZE_BROADCAST: 400,
-      MINIMUM_NAME_LENGTH: 2,
-      MINIMUM_PICTURE_SIZE: {
-        HEIGHT: 320,
-        WIDTH: 320,
-      },
-      MINIMUM_USERNAME_LENGTH: 2,
-    };
-  }
+  public static readonly CONFIG = {
+    MAXIMUM_TEAM_SIZE_BROADCAST: 400,
+    MINIMUM_NAME_LENGTH: 2,
+    MINIMUM_PICTURE_SIZE: {
+      HEIGHT: 320,
+      WIDTH: 320,
+    },
+    MINIMUM_USERNAME_LENGTH: 2,
+  };
 
   constructor(
     user_service: UserService,

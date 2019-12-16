@@ -39,12 +39,10 @@ class GroupVideoGrid {
 
   public readonly dispose: () => void;
 
-  static get CONFIG(): any {
-    return {
-      CONTAIN_CLASS: 'group-video-grid__element-video--contain',
-      RATIO_THRESHOLD: 0.4,
-    };
-  }
+  public static readonly CONFIG = {
+    CONTAIN_CLASS: 'group-video-grid__element-video--contain',
+    RATIO_THRESHOLD: 0.4,
+  };
 
   constructor(
     {

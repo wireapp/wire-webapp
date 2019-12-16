@@ -58,16 +58,11 @@ export class WebSocketService {
   private reconnectTimeoutId?: number;
   private socket: WebSocket;
 
-  static get CHANGE_TRIGGER(): typeof CHANGE_TRIGGER {
-    return CHANGE_TRIGGER;
-  }
-
-  static get CONFIG(): {PING_INTERVAL: number; RECONNECT_INTERVAL: number} {
-    return {
-      PING_INTERVAL: TIME_IN_MILLIS.SECOND * 5,
-      RECONNECT_INTERVAL: TIME_IN_MILLIS.SECOND * 15,
-    };
-  }
+  public static readonly CHANGE_TRIGGER = CHANGE_TRIGGER;
+  public static readonly CONFIG = {
+    PING_INTERVAL: TIME_IN_MILLIS.SECOND * 5,
+    RECONNECT_INTERVAL: TIME_IN_MILLIS.SECOND * 15,
+  };
 
   constructor(backendClient: BackendClient) {
     this.backendClient = backendClient;

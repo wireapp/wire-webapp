@@ -39,13 +39,9 @@ export class AuthRepository {
   private readonly logger: Logger;
   private readonly queueState: ko.Observable<QUEUE_STATE>;
 
-  static get CONFIG(): {
-    REFRESH_THRESHOLD: TIME_IN_MILLIS;
-  } {
-    return {
-      REFRESH_THRESHOLD: TIME_IN_MILLIS.MINUTE,
-    };
-  }
+  public static readonly CONFIG = {
+    REFRESH_THRESHOLD: TIME_IN_MILLIS.MINUTE,
+  };
 
   static get ACCESS_TOKEN_TRIGGER(): {
     IMMEDIATE: string;

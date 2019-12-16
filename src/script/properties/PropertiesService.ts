@@ -21,12 +21,9 @@ import {BackendClient} from '../service/BackendClient';
 
 class PropertiesService {
   private readonly backendClient: BackendClient;
-
-  static get CONFIG(): {URL_PROPERTIES: string} {
-    return {
-      URL_PROPERTIES: '/properties',
-    };
-  }
+  public static readonly CONFIG = {
+    URL_PROPERTIES: '/properties',
+  };
 
   /**
    * Construct a new Properties Service.

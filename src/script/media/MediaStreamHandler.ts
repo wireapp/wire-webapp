@@ -40,9 +40,9 @@ declare global {
 }
 
 export class MediaStreamHandler {
-  static get CONFIG(): any {
-    return {PERMISSION_HINT_DELAY: 200};
-  }
+  public static readonly CONFIG = {
+    PERMISSION_HINT_DELAY: 200,
+  };
 
   private readonly logger: Logger;
   private requestHintTimeout: number | undefined;

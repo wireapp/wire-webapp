@@ -62,6 +62,16 @@ type WireRequestType = JQueryXHR & {
   };
 };
 
+enum CONNECTIVITY_CHECK_TRIGGER {
+  ACCESS_TOKEN_REFRESH = 'BackendClient.CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_REFRESH',
+  ACCESS_TOKEN_RETRIEVAL = 'BackendClient.CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_RETRIEVAL',
+  APP_INIT_RELOAD = '.BackendClient.CONNECTIVITY_CHECK_TRIGGER.APP_INIT_RELOAD',
+  CONNECTION_REGAINED = 'BackendClient.CONNECTIVITY_CHECK_TRIGGER.CONNECTION_REGAINED',
+  LOGIN_REDIRECT = 'BackendClient.CONNECTIVITY_CHECK_TRIGGER.LOGIN_REDIRECT',
+  REQUEST_FAILURE = 'BackendClient.CONNECTIVITY_CHECK_TRIGGER.REQUEST_FAILURE',
+  UNKNOWN = 'BackendClient.CONNECTIVITY_CHECK_TRIGGER.UNKNOWN',
+}
+
 export class BackendClient {
   private connectivityTimeout: number;
   private queueTimeout: number;
@@ -75,56 +85,36 @@ export class BackendClient {
   public restUrl: string;
   public webSocketUrl: string;
 
-  // tslint:disable-next-line:typedef
-  static get CONFIG() {
-    return {
-      CONNECTIVITY_CHECK: {
-        INITIAL_TIMEOUT: 0,
-        RECHECK_TIMEOUT: TIME_IN_MILLIS.SECOND * 2,
-        REQUEST_TIMEOUT: TIME_IN_MILLIS.SECOND * 0.5,
-      },
-      QUEUE_CHECK_TIMEOUT: TIME_IN_MILLIS.MINUTE,
-    };
-  }
+  public static readonly CONFIG = {
+    CONNECTIVITY_CHECK: {
+      INITIAL_TIMEOUT: 0,
+      RECHECK_TIMEOUT: TIME_IN_MILLIS.SECOND * 2,
+      REQUEST_TIMEOUT: TIME_IN_MILLIS.SECOND * 0.5,
+    },
+    QUEUE_CHECK_TIMEOUT: TIME_IN_MILLIS.MINUTE,
+  };
 
-  // tslint:disable-next-line:typedef
-  static get CONNECTIVITY_CHECK_TRIGGER() {
-    return {
-      ACCESS_TOKEN_REFRESH: 'BackendClient.CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_REFRESH',
-      ACCESS_TOKEN_RETRIEVAL: 'BackendClient.CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_RETRIEVAL',
-      APP_INIT_RELOAD: '.BackendClient.CONNECTIVITY_CHECK_TRIGGER.APP_INIT_RELOAD',
-      CONNECTION_REGAINED: 'BackendClient.CONNECTIVITY_CHECK_TRIGGER.CONNECTION_REGAINED',
-      LOGIN_REDIRECT: 'BackendClient.CONNECTIVITY_CHECK_TRIGGER.LOGIN_REDIRECT',
-      REQUEST_FAILURE: 'BackendClient.CONNECTIVITY_CHECK_TRIGGER.REQUEST_FAILURE',
-      UNKNOWN: 'BackendClient.CONNECTIVITY_CHECK_TRIGGER.UNKNOWN',
-    };
-  }
+  public static readonly CONNECTIVITY_CHECK_TRIGGER = CONNECTIVITY_CHECK_TRIGGER;
 
-  // tslint:disable-next-line:typedef
-  static get IGNORED_BACKEND_ERRORS() {
-    return [
-      BackendClientError.STATUS_CODE.BAD_GATEWAY,
-      BackendClientError.STATUS_CODE.CONFLICT,
-      BackendClientError.STATUS_CODE.CONNECTIVITY_PROBLEM,
-      BackendClientError.STATUS_CODE.INTERNAL_SERVER_ERROR,
-      BackendClientError.STATUS_CODE.NOT_FOUND,
-      BackendClientError.STATUS_CODE.PRECONDITION_FAILED,
-      BackendClientError.STATUS_CODE.REQUEST_TIMEOUT,
-      BackendClientError.STATUS_CODE.REQUEST_TOO_LARGE,
-      BackendClientError.STATUS_CODE.TOO_MANY_REQUESTS,
-    ];
-  }
+  public static readonly IGNORED_BACKEND_ERRORS = [
+    BackendClientError.STATUS_CODE.BAD_GATEWAY,
+    BackendClientError.STATUS_CODE.CONFLICT,
+    BackendClientError.STATUS_CODE.CONNECTIVITY_PROBLEM,
+    BackendClientError.STATUS_CODE.INTERNAL_SERVER_ERROR,
+    BackendClientError.STATUS_CODE.NOT_FOUND,
+    BackendClientError.STATUS_CODE.PRECONDITION_FAILED,
+    BackendClientError.STATUS_CODE.REQUEST_TIMEOUT,
+    BackendClientError.STATUS_CODE.REQUEST_TOO_LARGE,
+    BackendClientError.STATUS_CODE.TOO_MANY_REQUESTS,
+  ];
 
-  // tslint:disable-next-line:typedef
-  static get IGNORED_BACKEND_LABELS() {
-    return [
-      BackendClientError.LABEL.INVALID_CREDENTIALS,
-      BackendClientError.LABEL.PASSWORD_EXISTS,
-      BackendClientError.LABEL.TOO_MANY_CLIENTS,
-      BackendClientError.LABEL.TOO_MANY_MEMBERS,
-      BackendClientError.LABEL.UNKNOWN_CLIENT,
-    ];
-  }
+  public static readonly IGNORED_BACKEND_LABELS = [
+    BackendClientError.LABEL.INVALID_CREDENTIALS,
+    BackendClientError.LABEL.PASSWORD_EXISTS,
+    BackendClientError.LABEL.TOO_MANY_CLIENTS,
+    BackendClientError.LABEL.TOO_MANY_MEMBERS,
+    BackendClientError.LABEL.UNKNOWN_CLIENT,
+  ];
 
   constructor() {
     this.logger = getLogger('BackendClient');

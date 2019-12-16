@@ -29,18 +29,15 @@ export class StorageRepository {
   private readonly logger: Logger;
   private readonly storageService: StorageService;
 
-  // tslint:disable-next-line:typedef
-  static get CONFIG() {
-    return {
-      CRYPTOGRAPHY_TABLES: [
-        StorageSchemata.OBJECT_STORE.AMPLIFY,
-        StorageSchemata.OBJECT_STORE.CLIENTS,
-        StorageSchemata.OBJECT_STORE.KEYS,
-        StorageSchemata.OBJECT_STORE.SESSIONS,
-        StorageSchemata.OBJECT_STORE.PRE_KEYS,
-      ],
-    };
-  }
+  public static readonly CONFIG = {
+    CRYPTOGRAPHY_TABLES: [
+      StorageSchemata.OBJECT_STORE.AMPLIFY,
+      StorageSchemata.OBJECT_STORE.CLIENTS,
+      StorageSchemata.OBJECT_STORE.KEYS,
+      StorageSchemata.OBJECT_STORE.SESSIONS,
+      StorageSchemata.OBJECT_STORE.PRE_KEYS,
+    ],
+  };
 
   constructor(storageService: StorageService) {
     this.storageService = storageService;

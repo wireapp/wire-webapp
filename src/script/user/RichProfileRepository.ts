@@ -24,12 +24,9 @@ export class RichProfileRepository {
   readonly logger: Logger;
   private readonly backendClient: BackendClient;
 
-  // tslint:disable-next-line:typedef
-  static get URL() {
-    return {
-      RICH_INFO: '/users/:id/rich-info',
-    };
-  }
+  public static readonly URL = {
+    RICH_INFO: '/users/:id/rich-info',
+  };
 
   constructor(backendClient: BackendClient) {
     this.backendClient = backendClient;
