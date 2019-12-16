@@ -113,7 +113,7 @@ export class EventService {
   }
 
   /**
-   * Load all events that match a minimun category from database.
+   * Load all events matching a minimum category from the database.
    *
    * @param {string} conversationId - ID of conversation to add users to
    * @param {MessageCategory} categoryMin - Minimum message category
