@@ -25,7 +25,7 @@ import {CallConfigData} from './CallConfigData';
 export class AccountAPI {
   constructor(private readonly client: HttpClient) {}
 
-  static URL = {
+  public static readonly URL = {
     ACTIVATE: '/activate',
     CALLS: '/calls',
     CALLS_CONFIG: 'config',

@@ -52,9 +52,7 @@ export class WebSocketClient extends EventEmitter {
   private bufferedMessages: string[];
   private onBeforeConnect: () => Promise<void> = () => Promise.resolve();
 
-  public static get TOPIC(): typeof TOPIC {
-    return TOPIC;
-  }
+  public static readonly TOPIC = TOPIC;
 
   constructor(baseUrl: string, client: HttpClient) {
     super();

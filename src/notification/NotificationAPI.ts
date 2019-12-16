@@ -26,7 +26,7 @@ export const NOTIFICATION_SIZE_MAXIMUM = 10_000;
 export class NotificationAPI {
   constructor(private readonly client: HttpClient) {}
 
-  static URL = {
+  public static readonly URL = {
     LAST: 'last',
     NOTIFICATION: '/notifications',
   };

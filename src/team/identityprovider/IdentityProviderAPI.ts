@@ -26,7 +26,7 @@ import {IdentityProviders} from './IdentityProviders';
 export class IdentityProviderAPI {
   constructor(private readonly client: HttpClient) {}
 
-  static URL = {
+  public static readonly URL = {
     METADATA: 'metadata',
     PROVIDER: '/identity-providers',
     SSO: '/sso',

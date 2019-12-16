@@ -25,7 +25,7 @@ import {HttpClient} from '../http/';
 export class ConnectionAPI {
   constructor(private readonly client: HttpClient) {}
 
-  static readonly URL = {
+  public static readonly URL = {
     CONNECTIONS: '/connections',
   };
 

@@ -32,7 +32,7 @@ import {RegisterData} from './RegisterData';
 export class AuthAPI {
   constructor(private readonly client: HttpClient) {}
 
-  static URL = {
+  public static readonly URL = {
     ACCESS: '/access',
     COOKIES: '/cookies',
     INITIATE_BIND: '/sso-initiate-bind',

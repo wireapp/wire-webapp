@@ -25,7 +25,7 @@ import {HttpClient} from '../http/';
 export class GiphyAPI {
   constructor(private readonly client: HttpClient) {}
 
-  static URL = {
+  public static readonly URL = {
     GIPHY: 'giphy/v1/gifs',
     PROXY: '/proxy',
     RANDOM: 'random',

@@ -25,7 +25,7 @@ import {Provider, Service, ServiceWhitelistData, Services} from './';
 export class ServiceAPI {
   constructor(private readonly client: HttpClient) {}
 
-  static URL = {
+  public static readonly URL = {
     PROVIDERS: '/providers',
     SERVICES: 'services',
     TEAMS: '/teams',

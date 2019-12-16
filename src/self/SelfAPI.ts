@@ -27,7 +27,7 @@ import {Consent} from './Consent';
 export class SelfAPI {
   constructor(private readonly client: HttpClient) {}
 
-  static URL = {
+  public static readonly URL = {
     CONSENT: 'consent',
     EMAIL: 'email',
     HANDLE: 'handle',

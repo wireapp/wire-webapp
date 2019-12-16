@@ -26,7 +26,7 @@ import {HttpClient} from '../http/';
 export class ClientAPI {
   constructor(private readonly client: HttpClient) {}
 
-  static URL = {
+  public static readonly URL = {
     CLIENTS: '/clients',
   };
 
