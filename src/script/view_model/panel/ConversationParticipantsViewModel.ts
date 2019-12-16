@@ -21,17 +21,20 @@ import ko from 'knockout';
 
 import {sortByPriority} from 'Util/StringUtil';
 
+import {ConversationRepository} from '../../conversation/ConversationRepository';
 import {User} from '../../entity/User';
 import {MotionDuration} from '../../motion/MotionDuration';
+import {SearchRepository} from '../../search/SearchRepository';
+import {TeamRepository} from '../../team/TeamRepository';
 import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
 
 export class ConversationParticipantsViewModel extends BasePanelViewModel {
-  searchRepository: any;
-  teamRepository: any;
-  conversationRepository: any;
-  participants: any;
-  highlightedUsers: any;
-  searchInput: any;
+  searchRepository: SearchRepository;
+  teamRepository: TeamRepository;
+  conversationRepository: ConversationRepository;
+  participants: ko.PureComputed<User[]>;
+  highlightedUsers: ko.Observable<User[]>;
+  searchInput: ko.Observable<string>;
   MotionDuration: typeof MotionDuration;
   constructor(params: PanelViewModelProps) {
     super(params);
