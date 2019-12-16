@@ -433,9 +433,9 @@ export class StorageService {
         this.logger.info(logMessage, changes);
         return numberOfUpdates;
       } else {
-        const oldRecord = await this.engine.read<unknown>(storeName, primaryKey);
+        const oldRecord = await this.load<unknown>(storeName, primaryKey);
         await this.engine.update(storeName, primaryKey, changes);
-        const newRecord = await this.engine.read<unknown>(storeName, primaryKey);
+        const newRecord = await this.load<unknown>(storeName, primaryKey);
 
         this.notifyListeners(storeName, DEXIE_CRUD_EVENT.UPDATING, oldRecord, newRecord);
 
