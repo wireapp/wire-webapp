@@ -21,7 +21,6 @@ import {BackendClient} from '../service/BackendClient';
 import {Logger, getLogger} from '../util/Logger';
 
 export interface RichInfo {
-  /** List of fields */
   fields: RichField[];
   /** Format version (the current version is 0) */
   version: number;
