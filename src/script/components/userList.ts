@@ -237,7 +237,7 @@ ko.components.register('user-list', {
 
     const filteredUsersSubscription = ko.computed(() => {
       const users = this.filteredUserEntities();
-      if (conversation && conversation()) {
+      if (conversation?.()) {
         const members: User[] = [];
         const admins: User[] = [];
         users.forEach((userEntity: User) => {
