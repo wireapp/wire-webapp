@@ -83,9 +83,7 @@ export class NotificationService extends EventEmitter {
     logger: console,
     markdown: false,
   });
-  public static get TOPIC(): typeof TOPIC {
-    return TOPIC;
-  }
+  public static readonly TOPIC = TOPIC;
 
   constructor(apiClient: APIClient, cryptographyService: CryptographyService, storeEngine: CRUDEngine) {
     super();
