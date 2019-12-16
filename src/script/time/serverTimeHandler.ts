@@ -17,7 +17,7 @@
  *
  */
 
-/* eslint-disable sort-keys */
+/* eslint-disable sort-keys-fix/sort-keys-fix */
 import ko from 'knockout';
 
 import {Logger, getLogger} from 'Util/Logger';
