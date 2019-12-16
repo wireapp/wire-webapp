@@ -18,6 +18,7 @@
  */
 
 import ko from 'knockout';
+
 import {ConversationRepository} from '../../conversation/ConversationRepository';
 import {Conversation} from '../../entity/Conversation';
 import {User} from '../../entity/User';
