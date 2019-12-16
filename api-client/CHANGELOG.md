@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.2.8...@wireapp/api-client@9.3.0) (2019-12-16)
+
+
+### Features
+
+* **api-client:** Add putClient ([#2654](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2654)) ([86fc586](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/86fc586cb2e5f365da2523dafbe73c7dcbb9fd6e))
+
+
+
+
+
 ## [9.2.8](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.2.7...@wireapp/api-client@9.2.8) (2019-12-12)
 
 **Note:** Version bump only for package @wireapp/api-client
