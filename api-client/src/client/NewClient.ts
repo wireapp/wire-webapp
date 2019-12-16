@@ -20,14 +20,19 @@
 import {PreKey} from '../auth/';
 import {ClientClassification, ClientType, Location} from '../client/';
 
-export interface NewClient {
+interface SharedClientModel {
+  lastkey: PreKey;
+  prekeys: PreKey[];
+  label?: string;
+}
+
+export interface NewClient extends SharedClientModel {
   class: ClientClassification.DESKTOP | ClientClassification.PHONE | ClientClassification.TABLET;
   cookie: string;
-  label?: string;
-  lastkey: PreKey;
   model?: string;
   location?: Location;
   password?: string;
-  prekeys: PreKey[];
   type: ClientType.PERMANENT | ClientType.TEMPORARY;
 }
+
+export type UpdatedClient = Partial<SharedClientModel>;

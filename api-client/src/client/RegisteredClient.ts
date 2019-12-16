@@ -20,7 +20,7 @@
 import {ClientType} from './ClientType';
 import {PublicClient} from './PublicClient';
 
-export interface UpdatedClient extends PublicClient {
+export interface AddedClient extends PublicClient {
   /** The IP address from which the client was registered */
   address?: string;
   label?: string;
@@ -31,7 +31,7 @@ export interface UpdatedClient extends PublicClient {
   type: ClientType.PERMANENT | ClientType.TEMPORARY;
 }
 
-export type RegisteredClient = UpdatedClient & {
+export interface RegisteredClient extends AddedClient {
   /** The cookie label */
   cookie: string;
-};
+}

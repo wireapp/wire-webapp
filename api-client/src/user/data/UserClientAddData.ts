@@ -17,8 +17,8 @@
  *
  */
 
-import {UpdatedClient} from '../../client';
+import {AddedClient} from '../../client';
 
 export interface UserClientAddData {
-  client: UpdatedClient;
+  client: AddedClient;
 }
