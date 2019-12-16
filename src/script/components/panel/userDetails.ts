@@ -23,7 +23,7 @@ import {User} from '../../entity/User';
 import 'Components/availabilityState';
 
 interface UserDetailsProps {
-  participant: User;
+  participant: ko.observable<User>;
   isVerified?: boolean;
   badge?: string;
   isGroupAdmin: boolean;
