@@ -39,6 +39,7 @@ interface ParticipantItemParams {
   customInfo: string;
   hideInfo: boolean;
   selfInTeam: boolean;
+  external: boolean;
 }
 
 class ParticipantItem {
@@ -51,6 +52,7 @@ class ParticipantItem {
   badge: boolean;
   isDefaultMode: boolean;
   isOthersMode: boolean;
+  external: boolean;
   canSelect: boolean;
   isSelected: boolean;
   showCamera: boolean;
@@ -69,6 +71,7 @@ class ParticipantItem {
       customInfo,
       hideInfo,
       selfInTeam,
+      external,
     }: ParticipantItemParams,
     element: HTMLElement,
   ) {
@@ -89,6 +92,7 @@ class ParticipantItem {
     this.canSelect = canSelect;
     this.isSelected = isSelected;
     this.showCamera = showCamera;
+    this.external = external;
     const hasCustomInfo = !!customInfo;
 
     const isTemporaryGuest = this.isUser && (this.participant as User).isTemporaryGuest();
@@ -155,6 +159,10 @@ ko.components.register('participant-item', {
 
         <!-- ko if: isUser && !isOthersMode && participant.isGuest() -->
           <guest-icon class="participant-item-guest-indicator" data-uie-name="status-guest"></guest-icon>
+        <!-- /ko -->
+
+        <!-- ko if: external -->
+          <partner-icon data-uie-name="status-external"></partner-icon>
         <!-- /ko -->
 
         <!-- ko if: showCamera -->

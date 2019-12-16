@@ -23,6 +23,7 @@ import {StorageSchemata} from '../storage/StorageSchemata';
 import {MessageCategory} from '../message/MessageCategory';
 import {search as fullTextSearch} from '../search/FullTextSearch';
 import {TeamService} from '../team/TeamService';
+import {DefaultRole} from './ConversationRoleRepository';
 
 // Conversation service for all conversation calls to the backend REST API.
 export class ConversationService {
@@ -314,6 +315,14 @@ export class ConversationService {
     });
   }
 
+  putMembers(conversationId, userId, data) {
+    return this.backendClient.sendJson({
+      data,
+      type: 'PUT',
+      url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/members/${userId}`,
+    });
+  }
+
   deleteConversation(teamId, conversationId) {
     return this.backendClient.sendRequest({
       type: 'DELETE',
@@ -390,6 +399,7 @@ export class ConversationService {
   postMembers(conversationId, userIds) {
     return this.backendClient.sendJson({
       data: {
+        conversation_role: DefaultRole.WIRE_MEMBER,
         users: userIds,
       },
       type: 'POST',

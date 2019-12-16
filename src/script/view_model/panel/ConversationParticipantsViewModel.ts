@@ -17,11 +17,26 @@
  *
  */
 
-import {BasePanelViewModel} from './BasePanelViewModel';
+import ko from 'knockout';
+
+import {sortByPriority} from 'Util/StringUtil';
+
+import {ConversationRepository} from '../../conversation/ConversationRepository';
+import {User} from '../../entity/User';
 import {MotionDuration} from '../../motion/MotionDuration';
+import {SearchRepository} from '../../search/SearchRepository';
+import {TeamRepository} from '../../team/TeamRepository';
+import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
 
 export class ConversationParticipantsViewModel extends BasePanelViewModel {
-  constructor(params) {
+  searchRepository: SearchRepository;
+  teamRepository: TeamRepository;
+  conversationRepository: ConversationRepository;
+  participants: ko.PureComputed<User[]>;
+  highlightedUsers: ko.Observable<User[]>;
+  searchInput: ko.Observable<string>;
+  MotionDuration: typeof MotionDuration;
+  constructor(params: PanelViewModelProps) {
     super(params);
     this.clickOnShowUser = this.clickOnShowUser.bind(this);
 
@@ -32,9 +47,14 @@ export class ConversationParticipantsViewModel extends BasePanelViewModel {
 
     this.participants = ko.pureComputed(() => {
       if (this.activeConversation()) {
-        return this.activeConversation()
+        const users = this.activeConversation()
           .participating_user_ets()
-          .filter(userEntity => !userEntity.isService);
+          .filter((userEntity: User) => !userEntity.isService);
+        if (!this.activeConversation().removed_from_conversation()) {
+          users.push(this.activeConversation().selfUser());
+          return users.sort((userA, userB) => sortByPriority(userA.first_name(), userB.first_name()));
+        }
+        return users;
       }
       return [];
     });
@@ -45,15 +65,15 @@ export class ConversationParticipantsViewModel extends BasePanelViewModel {
     this.MotionDuration = MotionDuration;
   }
 
-  getElementId() {
+  getElementId(): string {
     return 'conversation-participants';
   }
 
-  clickOnShowUser(userEntity) {
+  clickOnShowUser(userEntity: User): void {
     this.navigateTo(z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_USER, {entity: userEntity});
   }
 
-  initView(highlightedUsers = []) {
+  initView(highlightedUsers: User[] = []): void {
     this.searchInput('');
     this.highlightedUsers(highlightedUsers);
   }

@@ -37,7 +37,13 @@ describe('user-actions', () => {
 
           const conversation = new Conversation();
           conversation.isGroup = () => true;
-          return {conversation: () => conversation, isSelfActivated: true, user: () => user};
+          const conversationRoleRepository = {canLeaveGroup: () => true};
+          return {
+            conversation: () => conversation,
+            conversationRoleRepository,
+            isSelfActivated: true,
+            user: () => user,
+          };
         },
         testName: 'generates actions for self user profile',
       },

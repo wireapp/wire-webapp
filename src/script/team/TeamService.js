@@ -34,6 +34,13 @@ export class TeamService {
     this.logger = getLogger('TeamService');
   }
 
+  getTeamConversationRoles(teamId) {
+    return this.backendClient.sendRequest({
+      type: 'GET',
+      url: `${TeamService.URL.TEAMS}/${teamId}/conversations/roles`,
+    });
+  }
+
   getTeamById(teamId) {
     return this.backendClient.sendRequest({
       type: 'GET',

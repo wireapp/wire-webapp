@@ -34,18 +34,22 @@ participant-item {
 
   verified-icon,
   guest-icon,
-  disclose-icon {
+  disclose-icon,
+  partner-icon {
     display: flex;
     margin-left: 12px;
   }
 
   verified-icon + guest-icon,
   verified-icon + camera-icon,
+  verified-icon + partner-icon,
+  partner-icon + camera-icon,
   guest-icon + camera-icon {
     margin-left: 16px;
   }
 
-  guest-icon {
+  guest-icon,
+  partner-icon {
     fill: currentColor;
     opacity: 0.48;
   }
@@ -144,6 +148,10 @@ participant-item {
         content: '\00b7';
       }
     }
+  }
+
+  &.no-interaction .participant-item {
+    cursor: default;
   }
 }
 
