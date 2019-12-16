@@ -19,10 +19,17 @@
 
 import {Availability} from '@wireapp/protocol-messaging';
 
-import {nameFromType} from '../../user/AvailabilityMapper';
+import 'Components/availabilityState';
 import {ParticipantAvatar} from 'Components/participantAvatar';
 
-import 'Components/availabilityState';
+import {User} from '../../entity/User';
+import {nameFromType} from '../../user/AvailabilityMapper';
+
+interface ComponentParams {
+  participant: ko.Observable<User>;
+  isVerified?: ko.PureComputed<boolean>;
+  badge?: string;
+}
 
 ko.components.register('panel-user-details', {
   template: `
@@ -66,7 +73,13 @@ ko.components.register('panel-user-details', {
     </div>
   `,
   viewModel: class {
-    constructor(params) {
+    readonly availabilityLabel: ko.PureComputed<string>;
+    readonly badge?: string;
+    readonly isVerified: ko.PureComputed<boolean>;
+    readonly participant: ko.Observable<User>;
+    readonly ParticipantAvatar: typeof ParticipantAvatar;
+
+    constructor(params: ComponentParams) {
       this.participant = params.participant;
       this.isVerified = params.hasOwnProperty('isVerified') ? params.isVerified : this.participant().is_verified;
       this.badge = params.badge;
@@ -74,9 +87,7 @@ ko.components.register('panel-user-details', {
 
       this.availabilityLabel = ko.pureComputed(() => {
         const availabilitySetToNone = this.participant().availability() === Availability.Type.NONE;
-        if (!availabilitySetToNone) {
-          return nameFromType(this.participant().availability());
-        }
+        return availabilitySetToNone ? '' : nameFromType(this.participant().availability());
       });
     }
   },

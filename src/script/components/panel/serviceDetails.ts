@@ -18,6 +18,12 @@
  */
 
 import {ParticipantAvatar} from 'Components/participantAvatar';
+import {ServiceEntity} from '../../integration/ServiceEntity';
+
+interface ComponentParams {
+  service: ServiceEntity;
+  participantAvatar: ParticipantAvatar;
+}
 
 ko.components.register('panel-service-details', {
   template: `
@@ -29,7 +35,10 @@ ko.components.register('panel-service-details', {
     </div>
   `,
   viewModel: class {
-    constructor(params) {
+    readonly service: ServiceEntity;
+    readonly ParticipantAvatar: typeof ParticipantAvatar;
+
+    constructor(params: ComponentParams) {
       this.service = params.service;
       this.ParticipantAvatar = ParticipantAvatar;
     }

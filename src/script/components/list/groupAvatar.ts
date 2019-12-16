@@ -17,10 +17,10 @@
  *
  */
 
-class GroupAvatar {
-  constructor({users}) {
-    this.users = ko.pureComputed(() => users().slice(0, 4));
-  }
+import {User} from '../../entity/User';
+
+interface ComponentParams {
+  users: ko.PureComputed<User[]>;
 }
 
 ko.components.register('group-avatar', {
@@ -29,5 +29,11 @@ ko.components.register('group-avatar', {
       <div class="group-avatar-box" data-bind="text: Array.from($data.initials())[0], style: {color: $data.accent_color()}"></div>
     </div>
   `,
-  viewModel: GroupAvatar,
+  viewModel: class {
+    readonly users: ko.PureComputed<User[]>;
+
+    constructor(params: ComponentParams) {
+      this.users = ko.pureComputed(() => params.users().slice(0, 4));
+    }
+  },
 });
