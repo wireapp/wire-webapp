@@ -32,9 +32,7 @@ export interface TransientStore {
 }
 
 export class TransientStore extends EventEmitter {
-  public static get TOPIC(): typeof TOPIC {
-    return TOPIC;
-  }
+  public static readonly TOPIC = TOPIC;
   private readonly bundles: Record<string, TransientBundle> = {};
   private tableName = '';
 

@@ -26,7 +26,7 @@ import {TeamAPI} from '../team/TeamAPI';
 export class MemberAPI {
   constructor(private readonly client: HttpClient) {}
 
-  static URL = {
+  public static readonly URL = {
     MEMBERS: 'members',
   };
 

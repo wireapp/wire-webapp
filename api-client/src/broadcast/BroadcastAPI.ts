@@ -26,7 +26,7 @@ import {ValidationError} from '../validation/';
 export class BroadcastAPI {
   constructor(private readonly client: HttpClient) {}
 
-  static readonly URL = {
+  public static readonly URL = {
     BROADCAST: '/broadcast/otr/messages',
   };
 

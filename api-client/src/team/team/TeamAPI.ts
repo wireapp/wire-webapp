@@ -26,7 +26,7 @@ import {UpdateTeamData} from './UpdateTeamData';
 export class TeamAPI {
   constructor(private readonly client: HttpClient) {}
 
-  static URL = {
+  public static readonly URL = {
     TEAMS: '/teams',
   };
 

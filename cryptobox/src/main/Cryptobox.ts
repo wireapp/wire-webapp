@@ -45,19 +45,16 @@ export interface Cryptobox {
 }
 
 export class Cryptobox extends EventEmitter {
-  public static get TOPIC(): typeof TOPIC {
-    return TOPIC;
-  }
-
   private cachedSessions: LRUCache<CryptoboxSession>;
+  private queues = new LRUCache<PriorityQueue>(DEFAULT_CAPACITY);
   private readonly logger: logdown.Logger;
   private readonly minimumAmountOfPreKeys: number;
-  private queues = new LRUCache<PriorityQueue>(DEFAULT_CAPACITY);
   private readonly store: CryptoboxCRUDStore;
 
+  public static VERSION = version;
+  public static readonly TOPIC = TOPIC;
   public lastResortPreKey: ProteusKeys.PreKey | undefined;
   public identity: ProteusKeys.IdentityKeyPair | undefined;
-  public static VERSION = version;
 
   constructor(engine: CRUDEngine, minimumAmountOfPreKeys: number = 1) {
     super();

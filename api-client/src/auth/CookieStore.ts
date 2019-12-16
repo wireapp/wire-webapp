@@ -29,9 +29,7 @@ export class CookieStore {
   private static cookie?: Cookie;
   public static emitter = new EventEmitter();
 
-  static get TOPIC(): typeof TOPIC {
-    return TOPIC;
-  }
+  public static readonly TOPIC = TOPIC;
 
   static getCookie(): Cookie | undefined {
     return CookieStore.cookie;

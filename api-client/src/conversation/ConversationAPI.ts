@@ -36,8 +36,8 @@ import {ValidationError} from '../validation/';
 import {ConversationMemberUpdateData, ConversationMessageTimerUpdateData, ConversationTypingData} from './data';
 
 export class ConversationAPI {
-  static readonly MAX_CHUNK_SIZE = 500;
-  static readonly URL = {
+  public static readonly MAX_CHUNK_SIZE = 500;
+  public static readonly URL = {
     BOTS: 'bots',
     CLIENTS: '/clients',
     CODE_CHECK: '/code-check',

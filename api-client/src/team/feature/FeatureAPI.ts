@@ -25,7 +25,7 @@ import {IdentityProviderStatus} from './IdentityProviderStatus';
 export class FeatureAPI {
   constructor(private readonly client: HttpClient) {}
 
-  static URL = {
+  public static readonly URL = {
     FEATURES: 'features',
     SSO: 'sso',
     TEAMS: '/teams',

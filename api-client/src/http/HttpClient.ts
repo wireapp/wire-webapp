@@ -39,10 +39,7 @@ export class HttpClient extends EventEmitter {
   private readonly logger: logdown.Logger;
   private connectionState: ConnectionState;
   private readonly requestQueue: PriorityQueue;
-
-  public static get TOPIC(): typeof TOPIC {
-    return TOPIC;
-  }
+  public static readonly TOPIC = TOPIC;
 
   constructor(private readonly baseUrl: string, public accessTokenStore: AccessTokenStore) {
     super();

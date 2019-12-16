@@ -28,7 +28,7 @@ import {NewLegalHoldData} from './NewLegalHoldData';
 export class LegalHoldAPI {
   constructor(private readonly client: HttpClient) {}
 
-  static URL = {
+  public static readonly URL = {
     APPROVE_LEGAL_HOLD: 'approve',
     LEGAL_HOLD: 'legalhold',
     SETTINGS_LEGAL_HOLD: 'settings',

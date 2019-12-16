@@ -33,6 +33,9 @@ export interface AccessTokenStore {
 export class AccessTokenStore extends EventEmitter {
   private readonly logger: logdown.Logger;
 
+  public static readonly TOPIC = TOPIC;
+  public accessToken?: AccessTokenData;
+
   constructor() {
     super();
 
@@ -41,12 +44,6 @@ export class AccessTokenStore extends EventEmitter {
       markdown: false,
     });
   }
-
-  public static get TOPIC(): typeof TOPIC {
-    return TOPIC;
-  }
-
-  public accessToken: AccessTokenData | undefined;
 
   public async delete(): Promise<void> {
     this.logger.log('Deleting local access token');

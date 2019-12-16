@@ -31,10 +31,10 @@ import {
 } from './';
 
 export class PaymentAPI {
-  static readonly DEFAULT_INVOICES_CHUNK_SIZE = 10;
+  public static readonly DEFAULT_INVOICES_CHUNK_SIZE = 10;
   constructor(private readonly client: HttpClient) {}
 
-  static URL = {
+  public static readonly URL = {
     BILLING: 'billing',
     CHARGES: 'charges',
     CURRENCIES: 'currencies',

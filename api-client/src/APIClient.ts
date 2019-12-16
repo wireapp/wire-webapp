@@ -109,9 +109,7 @@ export class APIClient extends EventEmitter {
 
   public static BACKEND = Backend;
 
-  public static get TOPIC(): typeof TOPIC {
-    return TOPIC;
-  }
+  public static readonly TOPIC = TOPIC;
 
   public static VERSION = version;
 
