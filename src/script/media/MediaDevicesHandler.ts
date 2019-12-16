@@ -67,7 +67,7 @@ export class MediaDevicesHandler {
   public currentAvailableDeviceId: CurrentAvailableDeviceId;
   public deviceSupport: DeviceSupport;
 
-  public static readonly CONFIG: Config = {
+  public static readonly CONFIG = {
     DEFAULT_DEVICE: {
       audioInput: 'default',
       audioOutput: 'default',
