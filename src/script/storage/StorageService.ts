@@ -186,6 +186,7 @@ export class StorageService {
 
   /**
    * Clear all stores.
+   *
    * @returns Resolves when all stores have been cleared
    */
   async clearStores(): Promise<void[]> {
@@ -237,6 +238,7 @@ export class StorageService {
 
   /**
    * Delete multiple database stores.
+   *
    * @param storeNames - Names of database stores to delete
    * @returns Resolves when the stores have been deleted
    */
@@ -302,7 +304,14 @@ export class StorageService {
   async getAll<T = Object>(storeName: string): Promise<T[]> {
     try {
       const resultArray = await this.engine.readAll<T>(storeName);
-      return resultArray.filter(Boolean);
+      return resultArray.filter(Boolean).map(record => {
+        if (typeof (record as any).data === 'string') {
+          try {
+            (record as any).data = JSON.parse((record as any).data);
+          } catch (error) {}
+        }
+        return record;
+      });
     } catch (error) {
       this.logger.error(`Failed to load objects from store '${storeName}'`, error);
       throw error;
