@@ -43,11 +43,11 @@ export class BroadcastRepository {
   private readonly messageSender: MessageSender;
 
   /**
-   * @param {BroadcastService} broadcastService - Backend REST API broadcast service implementation
-   * @param {ClientRepository} clientRepository - Repository for client interactions
-   * @param {ConversationRepository} conversationRepository - Repository for conversation interactions
-   * @param {CryptographyRepository} cryptographyRepository - Repository for all cryptography interactions
-   * @param {MessageSender} messageSender - Responsible for queueing and sending messages
+   * @param broadcastService Backend REST API broadcast service implementation
+   * @param clientRepository Repository for client interactions
+   * @param conversationRepository Repository for conversation interactions
+   * @param cryptographyRepository Repository for all cryptography interactions
+   * @param messageSender Responsible for queueing and sending messages
    */
   constructor(
     broadcastService: BroadcastService,

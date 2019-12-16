@@ -17,12 +17,11 @@
  *
  */
 
-import {UserClients} from '@wireapp/api-client/dist/conversation';
+import {OTRRecipients, UserClients} from '@wireapp/api-client/dist/conversation';
 import {BackendClient} from '../service/BackendClient';
 
 export interface BroadcastPayload {
-  /** Map with per-recipient data */
-  recipients: {};
+  recipients: OTRRecipients;
   /** Client ID of the sender */
   sender: string;
 }
