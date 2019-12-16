@@ -23,15 +23,22 @@ import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 export interface MessageSendingOptions {
   /** Send native push notification for message. Default is `true`. */
   nativePush?: string[] | boolean;
-  /** Level that backend checks for missing clients. Default is `false` */
+  /**
+   * Level that backend checks for missing clients. Default is `false`.
+   *
+   * Options for the precondition check on missing clients are:
+   *  * `false`: all clients
+   *  * `Array<string>`: only clients of listed users
+   *  * `true`: force sending
+   */
   precondition?: string[] | boolean;
   /** Message recipients */
   recipients?: Object;
 }
 
 export class EventInfoEntity {
+  options: MessageSendingOptions;
   private readonly genericMessage: GenericMessage;
-  private options: MessageSendingOptions;
   private type?: GENERIC_MESSAGE_TYPE;
   public readonly conversationId: string;
   public timestamp?: number;
