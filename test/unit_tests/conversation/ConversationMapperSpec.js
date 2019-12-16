@@ -423,13 +423,13 @@ describe('Conversation Mapper', () => {
       const tests = [
         {
           expected: {message_timer: 10000},
-          local: Object.assign({}, baseConversation, {message_timer: undefined}),
-          remote: Object.assign({}, baseConversation, {message_timer: 10000}),
+          local: {...baseConversation, message_timer: undefined},
+          remote: {...baseConversation, message_timer: 10000},
         },
         {
           expected: {message_timer: 0},
-          local: Object.assign({}, baseConversation, {message_timer: 1000}),
-          remote: Object.assign({}, baseConversation, {message_timer: 0}),
+          local: {...baseConversation, message_timer: 1000},
+          remote: {...baseConversation, message_timer: 0},
         },
       ];
 

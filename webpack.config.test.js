@@ -22,7 +22,8 @@ const path = require('path');
 const prodConfig = require('./webpack.config');
 const commonConfig = require('./webpack.config.common');
 
-module.exports = Object.assign({}, prodConfig, {
+module.exports = {
+  ...prodConfig,
   devtool: 'inline-source-map',
   entry: Object.assign(prodConfig.entry, {
     test: path.resolve(__dirname, 'test', 'index.test.js'),
@@ -58,4 +59,4 @@ module.exports = Object.assign({}, prodConfig, {
       },
     }),
   ],
-});
+};

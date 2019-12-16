@@ -38,7 +38,7 @@ describe('z.viewModel.FaviconViewModel', () => {
     let dispatcher;
 
     beforeEach(() => {
-      dispatcher = Object.assign({}, window.amplify);
+      dispatcher = {...window.amplify};
       faviconViewModel = new z.viewModel.FaviconViewModel(dispatcher);
     });
 

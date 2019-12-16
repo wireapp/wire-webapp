@@ -316,9 +316,7 @@ describe('NotificationRepository', () => {
 
     it('filters all notifications if user is "away"', () => {
       spyOn(TestFactory.notification_repository, 'selfUser').and.callFake(() => {
-        return Object.assign({}, TestFactory.user_repository.self(), {
-          availability: () => Availability.Type.AWAY,
-        });
+        return {...TestFactory.user_repository.self(), availability: () => Availability.Type.AWAY};
       });
       TestFactory.notification_repository.permissionState(PermissionStatusState.GRANTED);
 
@@ -333,9 +331,7 @@ describe('NotificationRepository', () => {
 
     it('filters content and ping messages when user is "busy"', () => {
       spyOn(TestFactory.notification_repository, 'selfUser').and.callFake(() => {
-        return Object.assign({}, TestFactory.user_repository.self(), {
-          availability: () => Availability.Type.BUSY,
-        });
+        return {...TestFactory.user_repository.self(), availability: () => Availability.Type.BUSY};
       });
       TestFactory.notification_repository.permissionState(PermissionStatusState.GRANTED);
 
@@ -354,9 +350,7 @@ describe('NotificationRepository', () => {
 
     it('it allows mentions and calls when user is "busy"', () => {
       spyOn(TestFactory.notification_repository, 'selfUser').and.callFake(() => {
-        return Object.assign({}, TestFactory.user_repository.self(), {
-          availability: () => Availability.Type.BUSY,
-        });
+        return {...TestFactory.user_repository.self(), availability: () => Availability.Type.BUSY};
       });
       TestFactory.notification_repository.permissionState(PermissionStatusState.GRANTED);
 

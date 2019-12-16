@@ -31,6 +31,6 @@ const normalizedAuthTranslations = authTranslations.reduce(
   {},
 );
 
-const mergedTranslations = Object.assign({}, webappTranslations, normalizedAuthTranslations);
+const mergedTranslations = {...webappTranslations, ...normalizedAuthTranslations};
 
 fs.outputJson('resource/translation/en-US.json', mergedTranslations, {spaces: 2}).catch(err => console.error(err));
