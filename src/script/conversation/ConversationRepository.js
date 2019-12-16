@@ -3515,10 +3515,10 @@ export class ConversationRepository {
 
     const data = await this.conversation_service.get_conversation_by_id(conversationEntity.id);
     const allMembers = [...data.members.others, data.members.self];
-    const conversationRoles = allMembers.reduce(
-      (roles, {id, conversation_role}) => Object.assign(roles, {[id]: conversation_role}),
-      {},
-    );
+    const conversationRoles = allMembers.reduce((roles, member) => {
+      roles[member.id] = member.conversation_role;
+      return roles;
+    }, {});
     conversationEntity.roles(conversationRoles);
 
     if (!creatorIsParticipant) {
@@ -3534,7 +3534,7 @@ export class ConversationRepository {
   }
 
   /**
-   * User were added to a group conversation.
+   * Users were added to a group conversation.
    *
    * @private
    * @param {Conversation} conversationEntity - Conversation to add users to
