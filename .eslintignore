@@ -1,1 +1,10 @@
+.git/
+docs/
+node_modules/
+resource/
+server/
+server/dist/
+server/node_modules/
+src/
+src/ext/
 src/script/localization/**/webapp*.js

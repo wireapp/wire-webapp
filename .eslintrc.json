@@ -45,6 +45,9 @@
     "z": true,
     "zeta": true
   },
+  "parserOptions": {
+    "project": ["./tsconfig.json", "./server/tsconfig.json"]
+  },
   "plugins": ["jasmine"],
   "rules": {
     "id-length": "off",

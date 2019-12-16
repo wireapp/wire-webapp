@@ -84,10 +84,11 @@
     "@types/underscore": "1.9.4",
     "@types/uuid": "3.4.6",
     "@types/webpack-env": "1.14.1",
+    "@typescript-eslint/eslint-plugin": "2.11.0",
+    "@typescript-eslint/parser": "2.11.0",
     "@wireapp/copy-config": "1.0.0",
-    "@wireapp/eslint-config": "1.2.1",
+    "@wireapp/eslint-config": "1.3.0-beta.21",
     "@wireapp/prettier-config": "0.3.0",
-    "@wireapp/tslint-config": "1.4.1",
     "autoprefixer": "9.7.3",
     "babel-eslint": "10.0.3",
     "babel-loader": "8.0.6",
@@ -105,8 +106,10 @@
     "eslint-plugin-jasmine": "4.1.0",
     "eslint-plugin-jsdoc": "18.4.3",
     "eslint-plugin-no-unsanitized": "3.0.2",
-    "eslint-plugin-prettier": "3.1.1",
+    "eslint-plugin-prettier": "3.1.2",
     "eslint-plugin-react": "7.17.0",
+    "eslint-plugin-react-hooks": "2.3.0",
+    "eslint-plugin-sort-keys-fix": "1.1.0",
     "faker": "4.1.0",
     "generate-changelog": "1.8.0",
     "grunt": "1.0.4",
@@ -156,12 +159,6 @@
     "stylelint-config-prettier": "8.0.0",
     "svg-inline-loader": "0.8.0",
     "terser-webpack-plugin": "2.3.0",
-    "tslint": "5.20.1",
-    "tslint-config-prettier": "1.18.0",
-    "tslint-eslint-rules": "5.4.0",
-    "tslint-plugin-prettier": "2.0.1",
-    "tslint-react": "4.1.0",
-    "tslint-react-hooks": "2.2.1",
     "typescript": "3.7.3",
     "wait-for-expect": "3.0.1",
     "webpack": "4.41.2",
@@ -179,24 +176,12 @@
       "stylelint --fix",
       "git add"
     ],
-    "*.{js,jsx}": [
+    "*.{js,ts,tsx}": [
       "eslint --fix",
       "git add"
     ],
     "*.{json,md}": [
       "prettier --write",
-      "git add"
-    ],
-    "server/**/*.ts": [
-      "tslint --config server/tslint.json",
-      "git add"
-    ],
-    "src/script/**/*.ts": [
-      "tslint --config tslint.json --project tsconfig.json --fix",
-      "git add"
-    ],
-    "src/script/**/*.tsx": [
-      "tslint --config tslint.react.json --project tsconfig.json --fix",
       "git add"
     ]
   },
@@ -219,20 +204,12 @@
     "deploy": "yarn && yarn build:prod && eb deploy",
     "dist": "grunt build",
     "docker": "node ./bin/push_docker.js",
-    "fix": "yarn fix:assets && yarn fix:js && yarn fix:ts",
-    "fix:assets": "yarn prettier --write && yarn stylelint --fix",
-    "fix:js": "yarn lint:js --fix",
-    "fix:ts": "yarn fix:ts:app && yarn fix:ts:react && yarn fix:ts:server",
-    "fix:ts:app": "yarn lint:ts:app --fix",
-    "fix:ts:react": "yarn lint:ts:react --fix",
-    "fix:ts:server": "cd server && yarn fix",
-    "lint": "yarn lint:assets && yarn lint:js && yarn lint:ts:app",
-    "lint:assets": "yarn prettier --list-different && yarn stylelint",
-    "lint:js": "eslint -c .eslintrc.json --ignore-path .gitignore --ignore-path .eslintignore --ext .js src/script/ test/ bin/ grunt/",
-    "lint:ts": "yarn lint:ts:app && yarn lint:ts:react && yarn lint:ts:server",
-    "lint:ts:app": "tslint --config tslint.json --project tsconfig.json \"src/script/**/*.ts\"",
-    "lint:ts:react": "tslint --config tslint.react.json --project tsconfig.json \"src/script/**/*.tsx\"",
-    "lint:ts:server": "cd server && yarn lint",
+    "fix": "yarn fix:other && yarn fix:code",
+    "fix:other": "yarn prettier --write && yarn stylelint --fix",
+    "fix:code": "yarn lint:code --fix",
+    "lint": "yarn lint:other && yarn lint:code",
+    "lint:other": "yarn prettier --list-different && yarn stylelint",
+    "lint:code": "eslint -c .eslintrc.json --ext .js .",
     "postinstall": "yarn configure && cd server && yarn",
     "prettier": "prettier --ignore-path .gitignore \"**/*.{json,md}\"",
     "release:staging": "node ./bin/release_tag.js staging",
