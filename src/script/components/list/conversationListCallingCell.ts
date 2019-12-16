@@ -17,29 +17,78 @@
  *
  */
 
+import {CALL_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
+
+import {t} from 'Util/LocalizerUtil';
 import {formatSeconds} from 'Util/TimeUtil';
 import {afterRender} from 'Util/util';
-import {t} from 'Util/LocalizerUtil';
 
-import {generateConversationUrl} from '../../router/routeGenerator';
 import {ParticipantAvatar} from 'Components/participantAvatar';
-import {STATE as CALL_STATE, REASON as CALL_REASON, CALL_TYPE} from '@wireapp/avs';
+import {generateConversationUrl} from '../../router/routeGenerator';
 
-import 'Components/list/participantItem';
 import 'Components/calling/fullscreenVideoCall';
 import 'Components/groupVideoGrid';
+import 'Components/list/participantItem';
+import {Call} from '../../calling/Call';
+import {CallingRepository} from '../../calling/CallingRepository';
+import {Grid} from '../../calling/videoGridHandler';
+import {Conversation} from '../../entity/Conversation';
+import {User} from '../../entity/User';
+import {CallActions} from '../../view_model/CallingViewModel';
+
+interface ComponentParams {
+  call: Call;
+  conversation: ko.PureComputed<Conversation>;
+  videoGrid: ko.PureComputed<Grid>;
+  callingRepository: CallingRepository;
+  temporaryUserStyle?: boolean;
+  multitasking: any;
+  callActions: CallActions;
+  hasAccessToCamera: ko.Observable<boolean>;
+}
 
 class ConversationListCallingCell {
-  constructor({
-    call,
-    conversation,
-    videoGrid,
-    callingRepository,
-    temporaryUserStyle = false,
-    multitasking,
-    callActions,
-    hasAccessToCamera,
-  }) {
+  readonly call: Call;
+  readonly callActions: CallActions;
+  readonly callDuration: ko.Observable<string>;
+  readonly callingRepository: CallingRepository;
+  readonly conversation: ko.PureComputed<Conversation>;
+  readonly conversationParticipants: ko.PureComputed<User[]>;
+  readonly conversationUrl: string;
+  readonly disableScreenButton: boolean;
+  readonly disableVideoButton: ko.PureComputed<boolean>;
+  readonly dispose: () => void;
+  readonly isConnecting: ko.PureComputed<boolean>;
+  readonly isDeclined: ko.PureComputed<boolean>;
+  readonly isIdle: ko.PureComputed<boolean>;
+  readonly isIncoming: ko.PureComputed<boolean>;
+  readonly isMuted: ko.Observable<boolean>;
+  readonly isOngoing: ko.PureComputed<boolean>;
+  readonly isOutgoing: ko.PureComputed<boolean>;
+  readonly multitasking: any;
+  readonly ParticipantAvatar: typeof ParticipantAvatar;
+  readonly participantsButtonLabel: ko.PureComputed<string>;
+  readonly showMaximize: ko.PureComputed<boolean>;
+  readonly showNoCameraPreview: ko.Computed<boolean>;
+  readonly showParticipants: ko.Observable<boolean>;
+  readonly showParticipantsButton: ko.PureComputed<boolean>;
+  readonly showVideoButton: ko.PureComputed<boolean>;
+  readonly showVideoGrid: ko.PureComputed<boolean>;
+  readonly temporaryUserStyle: boolean;
+  readonly videoGrid: ko.PureComputed<Grid>;
+
+  constructor(params: ComponentParams) {
+    const {
+      call,
+      conversation,
+      videoGrid,
+      callingRepository,
+      temporaryUserStyle = false,
+      multitasking,
+      callActions,
+      hasAccessToCamera,
+    } = params;
+
     this.call = call;
     this.conversation = conversation;
     this.callingRepository = callingRepository;
@@ -60,7 +109,7 @@ class ConversationListCallingCell {
           .concat([this.conversation().selfUser()]),
     );
 
-    const isState = state => () => call.state() === state;
+    const isState = (state: CALL_STATE) => () => call.state() === state;
     this.isIdle = ko.pureComputed(isState(CALL_STATE.NONE));
     this.isOutgoing = ko.pureComputed(isState(CALL_STATE.OUTGOING));
     this.isConnecting = ko.pureComputed(isState(CALL_STATE.ANSWERED));
@@ -74,7 +123,7 @@ class ConversationListCallingCell {
     this.isMuted = callingRepository.isMuted;
 
     this.callDuration = ko.observable();
-    let callDurationUpdateInterval;
+    let callDurationUpdateInterval: number;
     const startedAtSubscription = call.startedAt.subscribe(startedAt => {
       if (startedAt) {
         const updateTimer = () => {
@@ -120,16 +169,16 @@ class ConversationListCallingCell {
     };
   }
 
-  endCall(call) {
+  endCall(call: Call): void {
     return this.isIncoming() ? this.callActions.reject(call) : this.callActions.leave(call);
   }
 
-  showFullscreenVideoGrid() {
+  showFullscreenVideoGrid(): void {
     this.multitasking.autoMinimize(false);
     this.multitasking.isMinimized(false);
   }
 
-  toggleShowParticipants() {
+  toggleShowParticipants(): void {
     this.showParticipants(!this.showParticipants());
 
     // TODO: this is a very hacky way to get antiscroll to recalculate the height of the conversationlist.
@@ -137,7 +186,7 @@ class ConversationListCallingCell {
     afterRender(() => window.dispatchEvent(new Event('resize')));
   }
 
-  findUser(userId) {
+  findUser(userId: string): User {
     return this.conversationParticipants().find(user => user.id === userId);
   }
 }

@@ -32,13 +32,13 @@ export interface ServiceData {
 export class ServiceEntity {
   description: string;
   id: string;
+  mediumPictureResource: ko.Observable<string>;
   name: string;
+  previewPictureResource: ko.Observable<string>;
   providerId: string;
   providerName: ko.Observable<string>;
   summary: string;
   tags: string[];
-  mediumPictureResource: ko.Observable<string>;
-  previewPictureResource: ko.Observable<string>;
 
   constructor(serviceData: ServiceData = {}) {
     const {description = '', id = '', name = '', provider: providerId = '', summary = '', tags = []} = serviceData;

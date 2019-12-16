@@ -17,10 +17,15 @@
  *
  */
 
-import {UserClients} from '@wireapp/api-client/dist/conversation';
+import {OTRRecipients, UserClients} from '@wireapp/api-client/dist/conversation';
 import {BackendClient} from '../service/BackendClient';
 
-// Broadcast service for all broadcast calls to the backend REST API.
+export interface BroadcastPayload {
+  recipients: OTRRecipients;
+  /** Client ID of the sender */
+  sender: string;
+}
+
 export class BroadcastService {
   private readonly backendClient: BackendClient;
 
@@ -37,11 +42,9 @@ export class BroadcastService {
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/postOtrBroadcast
    *
-   * @param {Object} payload - Payload to be posted
-   * @param {Object} payload.recipients - Map with per-recipient data
-   * @param {string} payload.sender - Client ID of the sender
-   * @param {Array<string>|boolean} preconditionOption - Level that backend checks for missing clients
-   * @returns {Promise} Promise that resolves when the message was sent
+   * @param payload Payload to be posted
+   * @param preconditionOption Level that backend checks for missing clients
+   * @returnsPromise that resolves when the message was sent
    */
   postBroadcastMessage(
     payload: {recipients: {}; sender: string},

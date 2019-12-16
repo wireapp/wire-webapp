@@ -54,6 +54,9 @@ import {WebAppEvents} from '../event/WebApp';
 import {MediaStreamHandler} from '../media/MediaStreamHandler';
 import {MediaType} from '../media/MediaType';
 
+import {User} from '../entity/User';
+import {BackendClient} from '../service/BackendClient';
+import {ServerTimeHandler} from '../time/serverTimeHandler';
 import {Call, ConversationId} from './Call';
 import {DeviceId, Participant, UserId} from './Participant';
 
@@ -64,21 +67,21 @@ interface MediaStreamQuery {
 }
 
 export class CallingRepository {
-  private readonly backendClient: any;
-  private readonly conversationRepository: any;
-  private readonly eventRepository: any;
+  private readonly backendClient: BackendClient;
+  private readonly conversationRepository: ConversationRepository;
+  private readonly eventRepository: EventRepository;
   private readonly mediaStreamHandler: MediaStreamHandler;
-  private readonly serverTimeHandler: any;
+  private readonly serverTimeHandler: ServerTimeHandler;
 
-  private selfUser: any;
-  private selfClientId: DeviceId;
-  private isReady: boolean = false;
-  private wUser?: number;
-  private wCall?: Wcall;
   private avsVersion: number;
-  public readonly activeCalls: ko.ObservableArray<Call>;
-  private readonly isMuted: ko.Observable<boolean>;
   private incomingCallCallback: (call: Call) => void;
+  private isReady: boolean = false;
+  private selfClientId: DeviceId;
+  private selfUser: User;
+  private wCall?: Wcall;
+  private wUser?: number;
+  readonly activeCalls: ko.ObservableArray<Call>;
+  readonly isMuted: ko.Observable<boolean>;
 
   // will cache the query to media stream (in order to avoid asking the system for streams multiple times when we have multiple peers)
   private mediaStreamQuery?: Promise<MediaStream>;
@@ -94,11 +97,11 @@ export class CallingRepository {
   };
 
   constructor(
-    backendClient: any,
-    conversationRepository: any,
-    eventRepository: any,
+    backendClient: BackendClient,
+    conversationRepository: ConversationRepository,
+    eventRepository: EventRepository,
     mediaStreamHandler: MediaStreamHandler,
-    serverTimeHandler: any,
+    serverTimeHandler: ServerTimeHandler,
   ) {
     this.activeCalls = ko.observableArray();
     this.isMuted = ko.observable(false);
@@ -511,7 +514,7 @@ export class CallingRepository {
 
   private injectActivateEvent(conversationId: ConversationId, userId: UserId, time: string, source: string): void {
     const event = EventBuilder.buildVoiceChannelActivate(conversationId, userId, time, this.avsVersion);
-    this.eventRepository.injectEvent(event, source);
+    this.eventRepository.injectEvent(event, source as any);
   }
 
   private injectDeactivateEvent(
@@ -530,7 +533,7 @@ export class CallingRepository {
       time,
       this.avsVersion,
     );
-    this.eventRepository.injectEvent(event, source);
+    this.eventRepository.injectEvent(event, source as any);
   }
 
   private readonly sendMessage = (

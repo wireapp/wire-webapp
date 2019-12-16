@@ -60,10 +60,6 @@ export interface ElectronDesktopCapturerSource {
   name: string;
 }
 
-interface Config {
-  DEFAULT_DEVICE: Record<DeviceTypes, string>;
-}
-
 export class MediaDevicesHandler {
   private readonly logger: Logger;
   public availableDevices: Devices;

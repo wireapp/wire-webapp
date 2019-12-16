@@ -49,7 +49,9 @@ export class SelfService {
 
   getSelfConsent(): Promise<Consent[]> {
     return this.backendClient
-      .sendRequest({
+      .sendRequest<{
+        results: Consent[];
+      }>({
         type: 'GET',
         url: `${SelfService.URL.SELF}/consent`,
       })
