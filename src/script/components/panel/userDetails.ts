@@ -17,14 +17,16 @@
  *
  */
 
+import ko from 'knockout';
+
 import {ParticipantAvatar} from 'Components/participantAvatar';
 import {User} from '../../entity/User';
 
 import 'Components/availabilityState';
 
 interface UserDetailsProps {
-  participant: ko.observable<User>;
-  isVerified?: boolean;
+  participant: ko.Observable<User>;
+  isVerified?: ko.PureComputed<boolean>;
   badge?: string;
   isGroupAdmin: boolean;
 }

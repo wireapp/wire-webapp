@@ -100,6 +100,7 @@ export class TeamRepository {
     } else {
       this.team(new TeamEntity());
     }
+    // doesn't need to be awaited because it publishes the account info over amplify.
     this.sendAccountInfo();
     return this.team();
   };
