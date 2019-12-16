@@ -41,9 +41,7 @@ describe('image-asset', () => {
     const image = new MediumImage();
     image.height = 10;
     image.width = 100;
-    const params = Object.assign({}, defaultParams, {
-      asset: image,
-    });
+    const params = {...defaultParams, asset: image};
     return instantiateComponent('image-asset', params).then(domContainer => {
       const img = domContainer.querySelector('img');
 
@@ -56,9 +54,7 @@ describe('image-asset', () => {
   it('displays the image url when resource is loaded', () => {
     const image = new MediumImage();
     image.resource({load: () => Promise.resolve(new Blob())});
-    const params = Object.assign({}, defaultParams, {
-      asset: image,
-    });
+    const params = {...defaultParams, asset: image};
 
     spyOn(window.URL, 'createObjectURL').and.returnValue('/image-url');
 

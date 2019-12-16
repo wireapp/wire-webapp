@@ -19,7 +19,7 @@ module.exports = {
       presets: [
         '@babel/preset-react',
         '@babel/preset-typescript',
-        ['@babel/preset-env', {...presetEnvConfig, ...{modules: 'commonjs'}}],
+        ['@babel/preset-env', {...presetEnvConfig, modules: 'commonjs'}],
         '@emotion/babel-preset-css-prop',
       ],
     },

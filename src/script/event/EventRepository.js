@@ -747,9 +747,9 @@ export class EventRepository {
       ? this._getUpdatesForLinkPreview(originalEvent, newEvent)
       : this._getUpdatesForEditMessage(originalEvent, newEvent);
 
-    const updates = Object.assign({}, specificUpdates, commonUpdates);
+    const updates = {...specificUpdates, ...commonUpdates};
 
-    const identifiedUpdates = Object.assign({}, primaryKeyUpdate, updates);
+    const identifiedUpdates = {...primaryKeyUpdate, ...updates};
     return this.eventService.replaceEvent(identifiedUpdates);
   }
 
@@ -776,8 +776,8 @@ export class EventRepository {
     switch (status) {
       case ASSET_PREVIEW:
       case AssetTransferState.UPLOADED: {
-        const updatedData = Object.assign({}, originalEvent.data, newEventData);
-        const updatedEvent = Object.assign({}, originalEvent, {data: updatedData});
+        const updatedData = {...originalEvent.data, ...newEventData};
+        const updatedEvent = {...originalEvent, data: updatedData};
         return this.eventService.replaceEvent(updatedEvent);
       }
 
@@ -825,25 +825,22 @@ export class EventRepository {
     }
 
     const updates = this._getUpdatesForLinkPreview(originalEvent, newEvent);
-    const identifiedUpdates = Object.assign({}, {primary_key: originalEvent.primary_key}, updates);
+    const identifiedUpdates = {primary_key: originalEvent.primary_key, ...updates};
     return this.eventService.replaceEvent(identifiedUpdates);
   }
 
   _getCommonMessageUpdates(originalEvent, newEvent) {
-    return Object.assign({}, newEvent, {
-      data: Object.assign({}, newEvent.data, {
-        expects_read_confirmation: originalEvent.data.expects_read_confirmation,
-      }),
+    return {
+      ...newEvent,
+      data: {...newEvent.data, expects_read_confirmation: originalEvent.data.expects_read_confirmation},
       edited_time: newEvent.time,
       time: originalEvent.time,
       version: 1,
-    });
+    };
   }
 
   _getUpdatesForEditMessage(originalEvent, newEvent) {
-    return Object.assign({}, newEvent, {
-      reactions: [],
-    });
+    return {...newEvent, reactions: []};
   }
 
   _getUpdatesForLinkPreview(originalEvent, newEvent) {
@@ -861,7 +858,8 @@ export class EventRepository {
       this._throwValidationError(newEvent, errorMessage, logMessage);
     }
 
-    return Object.assign({}, newEvent, {
+    return {
+      ...newEvent,
       category: categoryFromEvent(newEvent),
       ephemeral_expires: originalEvent.ephemeral_expires,
       ephemeral_started: originalEvent.ephemeral_started,
@@ -869,7 +867,7 @@ export class EventRepository {
       server_time: newEvent.time,
       time: originalEvent.time,
       version: originalEvent.version,
-    });
+    };
   }
 
   _throwValidationError(event, errorMessage, logMessage) {

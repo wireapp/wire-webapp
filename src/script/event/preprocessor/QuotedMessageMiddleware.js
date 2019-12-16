@@ -89,8 +89,8 @@ export class QuotedMessageMiddleware {
         setTimeout(() => this.eventService.replaceEvent(reply));
       });
 
-      const decoratedData = Object.assign({}, event.data, {quote: originalEvent.data.quote});
-      return Object.assign({}, event, {data: decoratedData});
+      const decoratedData = {...event.data, quote: originalEvent.data.quote};
+      return {...event, data: decoratedData};
     });
   }
 

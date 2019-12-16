@@ -25,7 +25,7 @@ export class Router {
       // do nothing if url was not matched
       '*': null,
     };
-    const routes = Object.assign({}, defaultRoute, routeDefinitions);
+    const routes = {...defaultRoute, ...routeDefinitions};
 
     this.parseRoute = () => {
       const currentPath = window.location.hash.replace('#', '') || '/';

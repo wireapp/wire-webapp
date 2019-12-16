@@ -699,7 +699,7 @@ export class CallingRepository {
       screen: selfParticipant.videoStream(),
     };
     const missingStreams: MediaStreamQuery = Object.entries(cache).reduce((missings, [type, isCached]) => {
-      if (isCached || !(query as any)[type]) {
+      if (isCached || !query[type as keyof typeof query]) {
         return missings;
       }
       return {...missings, [type]: true};
