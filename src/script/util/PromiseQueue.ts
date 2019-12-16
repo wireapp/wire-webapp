@@ -41,10 +41,6 @@ export interface QueueEntry<T> {
   rejectFn: PromiseRejectFn;
 }
 
-enum CONFIG {
-  UNBLOCK_INTERVAL = TIME_IN_MILLIS.MINUTE,
-}
-
 export class PromiseQueue {
   private blocked: boolean;
   private current: number;
@@ -55,8 +51,11 @@ export class PromiseQueue {
   private readonly queue: QueueEntry<any>[];
   private readonly timeout: number;
 
-  static get CONFIG(): typeof CONFIG {
-    return CONFIG;
+  // tslint:disable-next-line:typedef
+  static get CONFIG() {
+    return {
+      UNBLOCK_INTERVAL: TIME_IN_MILLIS.MINUTE,
+    };
   }
 
   constructor(options?: PromiseQueueOptions) {

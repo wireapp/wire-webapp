@@ -39,9 +39,8 @@ export class AuthRepository {
   private readonly logger: Logger;
   private readonly queueState: ko.Observable<QUEUE_STATE>;
 
-  static get CONFIG(): {
-    REFRESH_THRESHOLD: TIME_IN_MILLIS;
-  } {
+  // tslint:disable-next-line:typedef
+  static get CONFIG() {
     return {
       REFRESH_THRESHOLD: TIME_IN_MILLIS.MINUTE,
     };

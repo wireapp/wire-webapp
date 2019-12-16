@@ -39,7 +39,8 @@ class GroupVideoGrid {
 
   public readonly dispose: () => void;
 
-  static get CONFIG(): any {
+  // tslint:disable-next-line:typedef
+  static get CONFIG() {
     return {
       CONTAIN_CLASS: 'group-video-grid__element-video--contain',
       RATIO_THRESHOLD: 0.4,

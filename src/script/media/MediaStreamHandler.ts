@@ -40,7 +40,8 @@ declare global {
 }
 
 export class MediaStreamHandler {
-  static get CONFIG(): any {
+  // tslint:disable-next-line:typedef
+  static get CONFIG() {
     return {PERMISSION_HINT_DELAY: 200};
   }
 
