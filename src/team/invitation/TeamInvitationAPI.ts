@@ -50,8 +50,8 @@ export class TeamInvitationAPI {
     while (invitationChunk.has_more) {
       const invitations = invitationChunk.invitations;
       const lastInvitation = invitations[invitations.length - 1] || {};
-      const lastChunkEmail = lastInvitation.email;
-      invitationChunk = await this.getInvitations(teamId, lastChunkEmail);
+      const lastChunkId = lastInvitation.id;
+      invitationChunk = await this.getInvitations(teamId, lastChunkId);
       allInvitations = allInvitations.concat(invitations);
     }
 
@@ -60,14 +60,14 @@ export class TeamInvitationAPI {
 
   public async getInvitations(
     teamId: string,
-    startEmail?: string,
+    startId?: string,
     limit = TeamInvitationAPI.MAX_CHUNK_SIZE,
   ): Promise<TeamInvitationChunk> {
     const config: AxiosRequestConfig = {
       method: 'get',
       params: {
         size: limit,
-        start: startEmail,
+        start: startId,
       },
       url: `${TeamAPI.URL.TEAMS}/${teamId}/${TeamInvitationAPI.URL.INVITATIONS}`,
     };
