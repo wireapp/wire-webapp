@@ -9,6 +9,7 @@
     "forceConsistentCasingInFileNames": true,
     "jsx": "react",
     "lib": ["dom", "es2017"],
+    "module": "esnext",
     "moduleResolution": "node",
     "noEmitOnError": true,
     "noImplicitAny": true,

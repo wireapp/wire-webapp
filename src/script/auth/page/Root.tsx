@@ -18,8 +18,8 @@
  */
 
 import {pathWithParams} from '@wireapp/commons/dist/commonjs/util/UrlUtil';
-import {StyledApp} from '@wireapp/react-ui-kit';
-import React, {useEffect} from 'react';
+import {Loading, StyledApp} from '@wireapp/react-ui-kit';
+import React, {Suspense, lazy, useEffect} from 'react';
 import {IntlProvider} from 'react-intl';
 import {connect} from 'react-redux';
 import {HashRouter as Router, Redirect, Route, Switch} from 'react-router-dom';
@@ -32,25 +32,7 @@ import * as AuthSelector from '../module/selector/AuthSelector';
 import * as CookieSelector from '../module/selector/CookieSelector';
 import * as LanguageSelector from '../module/selector/LanguageSelector';
 import {ROUTE} from '../route';
-import CheckPassword from './CheckPassword';
-import ClientManager from './ClientManager';
-import ConversationJoin from './ConversationJoin';
-import ConversationJoinInvalid from './ConversationJoinInvalid';
-import CreateAccount from './CreateAccount';
-import CreatePersonalAccount from './CreatePersonalAccount';
-import HistoryInfo from './HistoryInfo';
 import Index from './Index';
-import InitialInvite from './InitialInvite';
-import Login from './Login';
-import PhoneLogin from './PhoneLogin';
-import SetEmail from './SetEmail';
-import SetHandle from './SetHandle';
-import SetPassword from './SetPassword';
-import SingleSignOn from './SingleSignOn';
-import TeamName from './TeamName';
-import VerifyEmailCode from './VerifyEmailCode';
-import VerifyEmailLink from './VerifyEmailLink';
-import VerifyPhoneCode from './VerifyPhoneCode';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
@@ -80,50 +62,71 @@ const Root = ({
 
   const isAuthenticatedCheck = (page: any): any => (page ? (isAuthenticated ? page : navigate('/auth#login')) : null);
 
-  const ProtectedHistoryInfo = () => isAuthenticatedCheck(<HistoryInfo />);
-  const ProtectedInitialInvite = () => isAuthenticatedCheck(<InitialInvite />);
-  const ProtectedClientManager = () => isAuthenticatedCheck(<ClientManager />);
+  const LazyClientManager = lazy(() => import('./ClientManager'));
+  const LazyHistoryInfo = lazy(() => import('./HistoryInfo'));
+  const LazyInitialInvite = lazy(() => import('./InitialInvite'));
+  const LazySetHandle = lazy(() => import('./SetHandle'));
+  const LazySetEmail = lazy(() => import('./SetEmail'));
+  const LazySetPassword = lazy(() => import('./SetPassword'));
+  const LazyCheckPassword = lazy(() => import('./CheckPassword'));
+  const LazyConversationJoinInvalid = lazy(() => import('./ConversationJoinInvalid'));
+  const LazyConversationJoin = lazy(() => import('./ConversationJoin'));
+  const LazyTeamName = lazy(() => import('./TeamName'));
+  const LazyLogin = lazy(() => import('./Login'));
+  const LazyPhoneLogin = lazy(() => import('./PhoneLogin'));
+  const LazySingleSignOn = lazy(() => import('./SingleSignOn'));
+  const LazyVerifyEmailLink = lazy(() => import('./VerifyEmailLink'));
+  const LazyVerifyPhoneCode = lazy(() => import('./VerifyPhoneCode'));
+  const LazyVerifyEmailCode = lazy(() => import('./VerifyEmailCode'));
+  const LazyCreatePersonalAccount = lazy(() => import('./CreatePersonalAccount'));
+  const LazyCreateAccount = lazy(() => import('./CreateAccount'));
 
-  const ProtectedSetHandle = () => isAuthenticatedCheck(<SetHandle />);
-  const ProtectedSetEmail = () => isAuthenticatedCheck(<SetEmail />);
-  const ProtectedSetPassword = () => isAuthenticatedCheck(<SetPassword />);
+  const ProtectedHistoryInfo = () => isAuthenticatedCheck(<LazyHistoryInfo />);
+  const ProtectedInitialInvite = () => isAuthenticatedCheck(<LazyInitialInvite />);
+  const ProtectedClientManager = () => isAuthenticatedCheck(<LazyClientManager />);
+
+  const ProtectedSetHandle = () => isAuthenticatedCheck(<LazySetHandle />);
+  const ProtectedSetEmail = () => isAuthenticatedCheck(<LazySetEmail />);
+  const ProtectedSetPassword = () => isAuthenticatedCheck(<LazySetPassword />);
 
   return (
     <IntlProvider locale={normalizeLanguage(language)} messages={loadLanguage(language)}>
       <StyledApp style={{display: 'flex', height: '100%', minHeight: '100vh'}}>
-        <Router hashType="noslash">
-          <Switch>
-            <Route exact path={ROUTE.INDEX} component={Index} />
-            <Route path={ROUTE.CHECK_PASSWORD} component={CheckPassword} />
-            <Route path={ROUTE.CLIENTS} component={ProtectedClientManager} />
-            <Route path={ROUTE.CONVERSATION_JOIN_INVALID} component={ConversationJoinInvalid} />
-            <Route path={ROUTE.CONVERSATION_JOIN} component={ConversationJoin} />
-            <Route path={ROUTE.CREATE_TEAM} component={Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && TeamName} />
-            <Route path={ROUTE.HISTORY_INFO} component={ProtectedHistoryInfo} />
-            <Route path={ROUTE.INITIAL_INVITE} component={ProtectedInitialInvite} />
-            <Route path={ROUTE.LOGIN} component={Login} />
-            <Route path={ROUTE.LOGIN_PHONE} component={PhoneLogin} />
-            <Route path={ROUTE.SET_EMAIL} component={ProtectedSetEmail} />
-            <Route path={ROUTE.SET_HANDLE} component={ProtectedSetHandle} />
-            <Route path={ROUTE.SET_PASSWORD} component={ProtectedSetPassword} />
-            <Route path={ROUTE.SSO} component={SingleSignOn} />
-            <Route path={ROUTE.VERIFY_EMAIL_LINK} component={VerifyEmailLink} />
-            <Route path={ROUTE.VERIFY_PHONE_CODE} component={VerifyPhoneCode} />
-            <Route
-              path={ROUTE.VERIFY_EMAIL_CODE}
-              component={Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && VerifyEmailCode}
-            />
-            <Route
-              path={ROUTE.CREATE_ACCOUNT}
-              component={Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && CreatePersonalAccount}
-            />
-            <Route
-              path={ROUTE.CREATE_TEAM_ACCOUNT}
-              component={Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && CreateAccount}
-            />
-            <Redirect to={ROUTE.INDEX} />
-          </Switch>
-        </Router>
+        <Suspense fallback={<Loading style={{margin: 'auto'}} />}>
+          <Router hashType="noslash">
+            <Switch>
+              <Route exact path={ROUTE.INDEX} component={Index} />
+              <Route path={ROUTE.CHECK_PASSWORD} component={LazyCheckPassword} />
+              <Route path={ROUTE.CLIENTS} component={ProtectedClientManager} />
+              <Route path={ROUTE.CONVERSATION_JOIN_INVALID} component={LazyConversationJoinInvalid} />
+              <Route path={ROUTE.CONVERSATION_JOIN} component={LazyConversationJoin} />
+              <Route path={ROUTE.CREATE_TEAM} component={Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && LazyTeamName} />
+              <Route path={ROUTE.HISTORY_INFO} component={ProtectedHistoryInfo} />
+              <Route path={ROUTE.INITIAL_INVITE} component={ProtectedInitialInvite} />
+              <Route path={ROUTE.LOGIN} component={LazyLogin} />
+              <Route path={ROUTE.LOGIN_PHONE} component={LazyPhoneLogin} />
+              <Route path={ROUTE.SET_EMAIL} component={ProtectedSetEmail} />
+              <Route path={ROUTE.SET_HANDLE} component={ProtectedSetHandle} />
+              <Route path={ROUTE.SET_PASSWORD} component={ProtectedSetPassword} />
+              <Route path={ROUTE.SSO} component={LazySingleSignOn} />
+              <Route path={ROUTE.VERIFY_EMAIL_LINK} component={LazyVerifyEmailLink} />
+              <Route path={ROUTE.VERIFY_PHONE_CODE} component={LazyVerifyPhoneCode} />
+              <Route
+                path={ROUTE.VERIFY_EMAIL_CODE}
+                component={Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && LazyVerifyEmailCode}
+              />
+              <Route
+                path={ROUTE.CREATE_ACCOUNT}
+                component={Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && LazyCreatePersonalAccount}
+              />
+              <Route
+                path={ROUTE.CREATE_TEAM_ACCOUNT}
+                component={Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && LazyCreateAccount}
+              />
+              <Redirect to={ROUTE.INDEX} />
+            </Switch>
+          </Router>
+        </Suspense>
       </StyledApp>
     </IntlProvider>
   );
