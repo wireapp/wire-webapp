@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.3.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.3.2...@wireapp/api-client@9.3.3) (2019-12-17)
+
+
+### Bug Fixes
+
+* **api-client:** Use Invite ID when fetching chunked invitations ([#2661](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2661)) ([7d3f7b8](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/7d3f7b8b880b8152bf8e04356394683429e79ca4))
+
+
+
+
+
 ## [9.3.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.3.1...@wireapp/api-client@9.3.2) (2019-12-17)
 
 **Note:** Version bump only for package @wireapp/api-client
