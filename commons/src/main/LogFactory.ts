@@ -20,7 +20,6 @@
 import ansiRegex = require('ansi-regex');
 import * as fs from 'fs-extra';
 import * as logdown from 'logdown';
-import * as moment from 'moment';
 import * as os from 'os';
 import * as path from 'path';
 
@@ -64,7 +63,11 @@ export class LogFactory {
   }
 
   static addTimestamp(logTransport: logdown.TransportOptions): void {
-    logTransport.args.unshift(`[${moment().format('YYYY-MM-DD HH:mm:ss')}]`);
+    const formattedDate = new Date()
+      .toISOString()
+      .split('.')[0]
+      .replace('T', ' ');
+    logTransport.args.unshift(`[${formattedDate}]`);
   }
 
   static async writeTransport(logTransport: logdown.TransportOptions): Promise<void> {
