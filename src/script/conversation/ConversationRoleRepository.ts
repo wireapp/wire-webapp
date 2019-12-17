@@ -114,6 +114,9 @@ export class ConversationRoleRepository {
   };
 
   getUserRole = (conversation: Conversation, userEntity: User): string => {
+    if (userEntity.isTemporaryGuest()) {
+      return DefaultRole.WIRE_MEMBER;
+    }
     return conversation.roles()[userEntity.id];
   };
 
