@@ -22,7 +22,7 @@ const commonConfig = require('./webpack.config.common');
 const TerserJSPlugin = require('terser-webpack-plugin');
 
 module.exports = Object.assign({}, commonConfig, {
-  mode: 'development',
+  mode: 'production',
   optimization: {
     ...commonConfig.optimization,
     minimizer: [
