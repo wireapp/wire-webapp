@@ -147,7 +147,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     });
 
     this.showOptionReadReceipts = ko.pureComputed(
-      () => this.activeConversation().inTeam() && roleRepository.canToggleReadReceipts(this.activeConversation()),
+      () => !!this.activeConversation().team_id && roleRepository.canToggleReadReceipts(this.activeConversation()),
     );
 
     this.hasReceiptsEnabled = ko.pureComputed(() => {
