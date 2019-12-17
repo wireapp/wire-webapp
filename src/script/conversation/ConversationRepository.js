@@ -3529,7 +3529,7 @@ export class ConversationRepository {
       conversationEntity.add_message(updatedMessageEntity);
     }
 
-    return {conversationEntity, updatedMessageEntity};
+    return {conversationEntity, messageEntity: updatedMessageEntity};
   }
 
   /**
