@@ -13,7 +13,7 @@
     "karma-typescript": "4.1.1",
     "nyc": "14.1.1",
     "rimraf": "3.0.0",
-    "webpack": "4.41.2",
+    "webpack": "4.41.3",
     "webpack-cli": "3.3.10"
   },
   "files": [
