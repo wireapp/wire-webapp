@@ -29,6 +29,7 @@ import {Environment} from 'Util/Environment';
 import {exposeWrapperGlobals} from 'Util/wrapper';
 import {includesString} from 'Util/StringUtil';
 import {appendParameter} from 'Util/UrlUtil';
+import Dexie from 'dexie';
 
 import {Config} from '../Config';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
@@ -105,13 +106,30 @@ import {AudioRepository} from '../audio/AudioRepository';
 import {MessageSender} from '../message/MessageSender';
 import {StorageService} from '../storage';
 import {BackupService} from '../backup/BackupService';
-import {MediaRepository} from '../media/MediaRepository';
-import {PermissionRepository} from '../permission/PermissionRepository';
-import {AssetUploader} from '../assets/AssetUploader';
 import {AuthRepository} from '../auth/AuthRepository';
+import {MediaRepository} from '../media/MediaRepository';
 import {AuthService} from '../auth/AuthService';
 import {GiphyRepository} from '../extension/GiphyRepository';
+import {AssetUploader} from '../assets/AssetUploader';
 import {GiphyService} from '../extension/GiphyService';
+import {PermissionRepository} from '../permission/PermissionRepository';
+import {loadValue} from 'Util/StorageUtil';
+
+function doRedirect(signOutReason) {
+  let url = `/auth/${location.search}`;
+  const isImmediateSignOutReason = App.CONFIG.SIGN_OUT_REASONS.IMMEDIATE.includes(signOutReason);
+  if (isImmediateSignOutReason) {
+    url = appendParameter(url, `${URLParameter.REASON}=${signOutReason}`);
+  }
+
+  const redirectToLogin = signOutReason !== SIGN_OUT_REASON.NOT_SIGNED_IN;
+  if (redirectToLogin) {
+    url = `${url}#login`;
+  }
+
+  Dexie.delete('/sqleet');
+  window.location.replace(url);
+}
 
 class App {
   static get CONFIG() {
@@ -135,15 +153,16 @@ class App {
    * Construct a new app.
    * @param {BackendClient} backendClient - Configured backend client
    * @param {Element} appContainer - DOM element that will hold the app
+   * @param {SQLeetEngine} [encryptedEngine] - Encrypted database handler
    */
-  constructor(backendClient, appContainer) {
+  constructor(backendClient, appContainer, encryptedEngine) {
     this.backendClient = backendClient;
     this.logger = getLogger('App');
     this.appContainer = appContainer;
 
     new WindowHandler();
 
-    this.service = this._setupServices();
+    this.service = this._setupServices(encryptedEngine);
     this.repository = this._setupRepositories();
     if (Config.FEATURE.ENABLE_DEBUG) {
       import('Util/DebugUtil').then(({DebugUtil}) => {
@@ -278,10 +297,11 @@ class App {
 
   /**
    * Create all app services.
+   * @param {SQLeetEngine} [encryptedEngine] - Encrypted database handler
    * @returns {Object} All services
    */
-  _setupServices() {
-    const storageService = new StorageService();
+  _setupServices(encryptedEngine) {
+    const storageService = new StorageService(encryptedEngine);
     const eventService = Environment.browser.edge
       ? new EventServiceNoCompound(storageService)
       : new EventService(storageService);
@@ -320,113 +340,106 @@ class App {
    * @param {boolean} [isReload=_isReload()] - App init after page reload
    * @returns {undefined} No return value
    */
-  initApp() {
+  async initApp() {
     const isReload = this._isReload();
     this.logger.debug(`App init starts (isReload: '${isReload}')`);
     new ThemeViewModel(this.repository.properties);
     const loadingView = new LoadingViewModel();
     const telemetry = new AppInitTelemetry();
     exposeWrapperGlobals();
+    try {
+      const {
+        audio: audioRepository,
+        calling: callingRepository,
+        client: clientRepository,
+        connection: connectionRepository,
+        conversation: conversationRepository,
+        cryptography: cryptographyRepository,
+        event: eventRepository,
+        eventTracker: eventTrackerRepository,
+        properties: propertiesRepository,
+        team: teamRepository,
+        user: userRepository,
+      } = this.repository;
+      await checkIndexedDb();
+      await this._registerSingleInstance();
+      await this._loadAccessToken();
+      loadingView.updateProgress(2.5);
+      telemetry.time_step(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
+      await this._initiateSelfUser();
+      loadingView.updateProgress(5, t('initReceivedSelfUser', userRepository.self().first_name()));
+      telemetry.time_step(AppInitTimingsStep.RECEIVED_SELF_USER);
+      const clientEntity = await this._initiateSelfUserClients();
+      const selfUser = userRepository.self();
+      callingRepository.initAvs(selfUser, clientEntity.id);
+      loadingView.updateProgress(7.5, t('initValidatedClient'));
+      telemetry.time_step(AppInitTimingsStep.VALIDATED_CLIENT);
+      telemetry.add_statistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity.type);
 
-    checkIndexedDb()
-      .then(() => this._registerSingleInstance())
-      .then(() => this._loadAccessToken())
-      .then(() => {
-        loadingView.updateProgress(2.5);
-        telemetry.time_step(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
-        return this._initiateSelfUser();
-      })
-      .then(() => {
-        loadingView.updateProgress(5, t('initReceivedSelfUser', this.repository.user.self().first_name()));
-        telemetry.time_step(AppInitTimingsStep.RECEIVED_SELF_USER);
-        return this._initiateSelfUserClients();
-      })
-      .then(clientEntity => {
-        const selfUser = this.repository.user.self();
-        this.repository.calling.initAvs(selfUser, clientEntity.id);
-        return clientEntity;
-      })
-      .then(clientEntity => {
-        loadingView.updateProgress(7.5, t('initValidatedClient'));
-        telemetry.time_step(AppInitTimingsStep.VALIDATED_CLIENT);
-        telemetry.add_statistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity.type);
+      await cryptographyRepository.loadCryptobox(this.service.storage.db);
+      loadingView.updateProgress(10);
+      telemetry.time_step(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
-        return this.repository.cryptography.loadCryptobox(
-          this.service.storage.db || this.service.storage.objectDb,
-          this.service.storage.dbName,
-        );
-      })
-      .then(() => {
-        loadingView.updateProgress(10);
-        telemetry.time_step(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
+      eventRepository.connectWebSocket();
+      const conversationEntities = await conversationRepository.getConversations();
+      const connectionEntities = await connectionRepository.getConnections();
+      loadingView.updateProgress(25, t('initReceivedUserData'));
 
-        this.repository.event.connectWebSocket();
+      telemetry.time_step(AppInitTimingsStep.RECEIVED_USER_DATA);
+      telemetry.add_statistic(AppInitStatisticsValue.CONVERSATIONS, conversationEntities.length, 50);
+      telemetry.add_statistic(AppInitStatisticsValue.CONNECTIONS, connectionEntities.length, 50);
 
-        const promises = [this.repository.conversation.getConversations(), this.repository.connection.getConnections()];
-        return Promise.all(promises);
-      })
-      .then(([conversationEntities, connectionEntities]) => {
-        loadingView.updateProgress(25, t('initReceivedUserData'));
+      conversationRepository.map_connections(connectionRepository.connectionEntities());
+      this._subscribeToUnloadEvents();
 
-        telemetry.time_step(AppInitTimingsStep.RECEIVED_USER_DATA);
-        telemetry.add_statistic(AppInitStatisticsValue.CONVERSATIONS, conversationEntities.length, 50);
-        telemetry.add_statistic(AppInitStatisticsValue.CONNECTIONS, connectionEntities.length, 50);
+      await teamRepository.getTeam();
 
-        this.repository.conversation.map_connections(this.repository.connection.connectionEntities());
-        this._subscribeToUnloadEvents();
+      await conversationRepository.conversationRoleRepository.loadTeamRoles();
 
-        return this.repository.team.getTeam();
-      })
-      .then(() => this.repository.user.loadUsers())
-      .then(() => this.repository.event.initializeFromStream())
-      .then(notificationsCount => {
-        telemetry.time_step(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
-        telemetry.add_statistic(AppInitStatisticsValue.NOTIFICATIONS, notificationsCount, 100);
+      await userRepository.loadUsers();
+      const notificationsCount = await eventRepository.initializeFromStream();
 
-        this.repository.eventTracker.init(this.repository.properties.properties.settings.privacy.improve_wire);
-        return this.repository.conversation.initialize_conversations();
-      })
-      .then(() => {
-        loadingView.updateProgress(97.5, t('initUpdatedFromNotifications', Config.BRAND_NAME));
+      telemetry.time_step(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
+      telemetry.add_statistic(AppInitStatisticsValue.NOTIFICATIONS, notificationsCount, 100);
 
-        this._watchOnlineStatus();
-        return this.repository.client.updateClientsForSelf();
-      })
-      .then(clientEntities => {
-        loadingView.updateProgress(99);
+      eventTrackerRepository.init(propertiesRepository.properties.settings.privacy.improve_wire);
+      await conversationRepository.initialize_conversations();
+      loadingView.updateProgress(97.5, t('initUpdatedFromNotifications', Config.BRAND_NAME));
 
-        telemetry.add_statistic(AppInitStatisticsValue.CLIENTS, clientEntities.length);
-        telemetry.time_step(AppInitTimingsStep.APP_PRE_LOADED);
+      this._watchOnlineStatus();
+      const clientEntities = await clientRepository.updateClientsForSelf();
 
-        this.repository.user.self().devices(clientEntities);
-        this.logger.info('App pre-loading completed');
-        return this._handleUrlParams();
-      })
-      .then(() => this.repository.conversation.updateConversationsOnAppInit())
-      .then(() => this.repository.conversation.conversationLabelRepository.loadLabels())
-      .then(() => {
-        telemetry.time_step(AppInitTimingsStep.APP_LOADED);
-        this._showInterface();
-        this.applock = new AppLockViewModel(this.repository.client, this.repository.user.self);
+      loadingView.updateProgress(99);
 
-        loadingView.removeFromView();
-        telemetry.report();
-        amplify.publish(WebAppEvents.LIFECYCLE.LOADED);
-        modals.ready();
-        showInitialModal(this.repository.user.self().availability());
-      })
-      .then(() => {
-        telemetry.time_step(AppInitTimingsStep.UPDATED_CONVERSATIONS);
-        if (this.repository.user.isActivatedAccount()) {
-          // start regularly polling the server to check if there is a new version of Wire
-          startNewVersionPolling(Environment.version(false, true), this.update.bind(this));
-        }
-        this.repository.audio.init(true);
-        this.repository.conversation.cleanup_conversations();
-        this.repository.calling.setReady();
-        this.logger.info('App fully loaded');
-      })
-      .catch(error => this._appInitFailure(error, isReload));
+      telemetry.add_statistic(AppInitStatisticsValue.CLIENTS, clientEntities.length);
+      telemetry.time_step(AppInitTimingsStep.APP_PRE_LOADED);
+
+      userRepository.self().devices(clientEntities);
+      this.logger.info('App pre-loading completed');
+      await this._handleUrlParams();
+      await conversationRepository.updateConversationsOnAppInit();
+      await conversationRepository.conversationLabelRepository.loadLabels();
+      telemetry.time_step(AppInitTimingsStep.APP_LOADED);
+      this._showInterface();
+      this.applock = new AppLockViewModel(clientRepository, userRepository.self);
+
+      loadingView.removeFromView();
+      telemetry.report();
+      amplify.publish(WebAppEvents.LIFECYCLE.LOADED);
+      modals.ready();
+      showInitialModal(userRepository.self().availability());
+      telemetry.time_step(AppInitTimingsStep.UPDATED_CONVERSATIONS);
+      if (userRepository.isActivatedAccount()) {
+        // start regularly polling the server to check if there is a new version of Wire
+        startNewVersionPolling(Environment.version(false, true), this.update.bind(this));
+      }
+      audioRepository.init(true);
+      conversationRepository.cleanup_conversations();
+      callingRepository.setReady();
+      this.logger.info('App fully loaded');
+    } catch (error) {
+      this._appInitFailure(error, isReload);
+    }
   }
 
   /**
@@ -699,7 +712,7 @@ class App {
       this.repository.calling.destroy();
 
       if (this.repository.user.isActivatedAccount()) {
-        if (isTemporaryClientAndNonPersistent()) {
+        if (this.service.storage.isTemporaryAndNonPersistent) {
           this.logout(SIGN_OUT_REASON.CLIENT_REMOVED, true);
         } else {
           this.repository.storage.terminate('window.onunload');
@@ -858,18 +871,7 @@ class App {
         return window.location.replace(url);
       }
 
-      let url = `/auth/${location.search}`;
-      const isImmediateSignOutReason = App.CONFIG.SIGN_OUT_REASONS.IMMEDIATE.includes(signOutReason);
-      if (isImmediateSignOutReason) {
-        url = appendParameter(url, `${URLParameter.REASON}=${signOutReason}`);
-      }
-
-      const redirectToLogin = signOutReason !== SIGN_OUT_REASON.NOT_SIGNED_IN;
-      if (redirectToLogin) {
-        url = `${url}#login`;
-      }
-
-      window.location.replace(url);
+      doRedirect(signOutReason);
     });
   }
 
@@ -916,7 +918,7 @@ class App {
 // Setting up the App
 //##############################################################################
 
-$(() => {
+$(async () => {
   enableLogging(Config.FEATURE.ENABLE_DEBUG);
   const appContainer = document.getElementById('wire-main');
   if (appContainer) {
@@ -925,7 +927,15 @@ $(() => {
       restUrl: Config.BACKEND_REST,
       webSocketUrl: Config.BACKEND_WS,
     });
-    wire.app = new App(backendClient, appContainer);
+    const shouldPersist = loadValue(StorageKey.AUTH.PERSIST);
+    if (shouldPersist === undefined) {
+      doRedirect(SIGN_OUT_REASON.NOT_SIGNED_IN);
+    } else if (isTemporaryClientAndNonPersistent(shouldPersist)) {
+      const engine = await StorageService.getUnitializedEngine();
+      wire.app = new App(backendClient, appContainer, engine);
+    } else {
+      wire.app = new App(backendClient, appContainer);
+    }
   }
 });
 

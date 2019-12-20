@@ -30,9 +30,25 @@ import {Grid, getGrid} from '../calling/videoGridHandler';
 import {User} from '../entity/User';
 import {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import {MediaStreamHandler} from '../media/MediaStreamHandler';
-import {PermissionState} from '../notification/PermissionState';
 
 import 'Components/calling/chooseScreen';
+import {AudioRepository} from '../audio/AudioRepository';
+import {ConversationRepository} from '../conversation/ConversationRepository';
+import {Conversation} from '../entity/Conversation';
+import {PermissionRepository} from '../permission/PermissionRepository';
+import {PermissionStatusState} from '../permission/PermissionStatusState';
+
+export interface CallActions {
+  answer: (call: Call) => void;
+  leave: (call: Call) => void;
+  reject: (call: Call) => void;
+  startAudio: (conversationEntity: Conversation) => void;
+  startVideo: (conversationEntity: Conversation) => void;
+  switchCameraInput: (call: Call, deviceId: string) => void;
+  toggleCamera: (call: Call) => void;
+  toggleMute: (call: Call, muteState: boolean) => void;
+  toggleScreenshare: (call: Call) => void;
+}
 
 declare global {
   interface HTMLAudioElement {
@@ -41,28 +57,29 @@ declare global {
 }
 
 export class CallingViewModel {
-  public readonly audioRepository: any;
-  public readonly callingRepository: CallingRepository;
-  public readonly conversationRepository: any;
-  public readonly mediaDevicesHandler: MediaDevicesHandler;
-  public readonly mediaStreamHandler: MediaStreamHandler;
-  public readonly permissionRepository: any;
-  public readonly activeCalls: ko.PureComputed<Call[]>;
-  public readonly multitasking: any;
-  public readonly callActions: any;
-  public readonly selectableScreens: ko.Observable<ElectronDesktopCapturerSource[]>;
-  public readonly isChoosingScreen: ko.PureComputed<boolean>;
   private onChooseScreen: (deviceId: string) => void;
   private readonly logger: Logger;
   private readonly selfUser: ko.Observable<User>;
 
+  readonly activeCalls: ko.PureComputed<Call[]>;
+  readonly audioRepository: AudioRepository;
+  readonly callActions: CallActions;
+  readonly callingRepository: CallingRepository;
+  readonly conversationRepository: ConversationRepository;
+  readonly isChoosingScreen: ko.PureComputed<boolean>;
+  readonly mediaDevicesHandler: MediaDevicesHandler;
+  readonly mediaStreamHandler: MediaStreamHandler;
+  readonly multitasking: any;
+  readonly permissionRepository: PermissionRepository;
+  readonly selectableScreens: ko.Observable<ElectronDesktopCapturerSource[]>;
+
   constructor(
     callingRepository: CallingRepository,
-    conversationRepository: any,
-    audioRepository: any,
+    conversationRepository: ConversationRepository,
+    audioRepository: AudioRepository,
     mediaDevicesHandler: MediaDevicesHandler,
     mediaStreamHandler: MediaStreamHandler,
-    permissionRepository: any,
+    permissionRepository: PermissionRepository,
     selfUser: ko.Observable<User>,
     multitasking: any,
   ) {
@@ -233,7 +250,8 @@ export class CallingViewModel {
       }
       currentCallSubscription = ko.computed(() => {
         if (call.state() === CALL_STATE.TERM_LOCAL) {
-          return audioRepository.play(AudioType.TALK_LATER);
+          audioRepository.play(AudioType.TALK_LATER);
+          return;
         }
         if (call.state() !== CALL_STATE.MEDIA_ESTAB) {
           return;
@@ -279,12 +297,12 @@ export class CallingViewModel {
     return call.state() === CALL_STATE.MEDIA_ESTAB;
   }
 
-  getConversationById(conversationId: string): ko.Observable<any> {
+  getConversationById(conversationId: string): Conversation {
     return this.conversationRepository.find_conversation_by_id(conversationId);
   }
 
   hasAccessToCamera(): boolean {
-    return this.permissionRepository.permissionState.camera() === PermissionState.GRANTED;
+    return this.permissionRepository.permissionState.camera() === PermissionStatusState.GRANTED;
   }
 
   onCancelScreenSelection = () => {

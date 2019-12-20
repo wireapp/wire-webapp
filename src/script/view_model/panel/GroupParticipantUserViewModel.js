@@ -22,7 +22,7 @@ import {getLogger} from 'Util/Logger';
 import {Actions} from 'Components/panel/userActions';
 import 'Components/panel/enrichedFields';
 import 'Components/panel/userDetails';
-
+import {DefaultRole} from '../../conversation/ConversationRoleRepository';
 import {BasePanelViewModel} from './BasePanelViewModel';
 
 export class GroupParticipantUserViewModel extends BasePanelViewModel {
@@ -34,13 +34,41 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
     this.userRepository = repositories.user;
     this.actionsViewModel = mainViewModel.actions;
     this.teamRepository = repositories.team;
+    this.conversationRepository = repositories.conversation;
+    this.conversationRoleRepository = repositories.conversation.conversationRoleRepository;
 
     this.logger = getLogger('GroupParticipantUserViewModel');
 
     this.selectedParticipant = ko.observable(undefined);
 
     this.onUserAction = this.onUserAction.bind(this);
+
+    this.canChangeRole = ko.pureComputed(
+      () =>
+        this.conversationRoleRepository.canChangeParticipantRoles(this.activeConversation()) &&
+        !!this.selectedParticipant() &&
+        !this.selectedParticipant().is_me &&
+        !this.selectedParticipant().isTemporaryGuest(),
+    );
+
+    this.isAdmin = ko.pureComputed(
+      () =>
+        this.activeConversation().isGroup() &&
+        this.conversationRoleRepository.isUserGroupAdmin(this.activeConversation(), this.selectedParticipant()),
+    );
   }
+
+  onToggleAdmin = async () => {
+    const newRole = this.isAdmin() ? DefaultRole.WIRE_MEMBER : DefaultRole.WIRE_ADMIN;
+    await this.conversationRoleRepository.setMemberConversationRole(
+      this.activeConversation(),
+      this.selectedParticipant().id,
+      newRole,
+    );
+    const roles = this.activeConversation().roles();
+    roles[this.selectedParticipant().id] = newRole;
+    this.activeConversation().roles(roles);
+  };
 
   showActionDevices(userEntity) {
     return !userEntity.is_me;

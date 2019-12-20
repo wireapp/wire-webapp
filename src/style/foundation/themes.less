@@ -68,6 +68,8 @@ body.theme-default {
   device-toggle-button {
     .applyTheme();
   }
+
+  @import (less) '../../node_modules/highlightjs/styles/solarized_light.css';
 }
 
 body.theme-dark {
@@ -113,4 +115,6 @@ body.theme-dark {
   @group-creation-modal-teamname-input-bg: fade(@foreground, 10%);
 
   .applyTheme();
+
+  @import (less) '../../node_modules/highlightjs/styles/solarized_dark.css';
 }

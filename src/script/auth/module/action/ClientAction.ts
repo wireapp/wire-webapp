@@ -17,7 +17,7 @@
  *
  */
 
-import {ClientClassification, ClientType, RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
+import {ClientClassification, ClientType, RegisteredClient} from '@wireapp/api-client/dist/client/index';
 import {ClientInfo} from '@wireapp/core/dist/client/';
 import * as Runtime from '../../Runtime';
 import * as StringUtil from '../../util/stringUtil';
@@ -53,7 +53,7 @@ export class ClientAction {
   };
 
   doInitializeClient = (clientType: ClientType, password?: string): ThunkAction => {
-    return async (dispatch, getState, {core, actions: {clientAction}}) => {
+    return async (dispatch, getState, {core, actions: {clientAction, webSocketAction}}) => {
       dispatch(ClientActionCreator.startInitializeClient());
       try {
         const creationStatus = await core.initClient(
@@ -61,6 +61,7 @@ export class ClientAction {
           clientAction.generateClientPayload(clientType),
         );
         await dispatch(clientAction.doGetAllClients());
+        await dispatch(webSocketAction.listen());
         dispatch(ClientActionCreator.successfulInitializeClient(creationStatus));
       } catch (error) {
         dispatch(ClientActionCreator.failedInitializeClient(error));
@@ -69,7 +70,7 @@ export class ClientAction {
     };
   };
 
-  generateClientPayload = (clientType: ClientType): ClientInfo => {
+  generateClientPayload = (clientType: ClientType): ClientInfo | undefined => {
     if (clientType === ClientType.NONE) {
       return undefined;
     }

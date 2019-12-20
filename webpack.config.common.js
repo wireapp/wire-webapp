@@ -34,6 +34,7 @@ module.exports = {
   },
   externals: {
     'fs-extra': '{}',
+    worker_threads: '{}',
   },
   mode: 'production',
   module: {
@@ -54,7 +55,6 @@ module.exports = {
     fs: 'empty',
     path: 'empty',
   },
-
   optimization: {
     runtimeChunk: 'single',
     splitChunks: {

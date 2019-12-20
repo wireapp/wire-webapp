@@ -19,7 +19,7 @@
 
 import {Logger, getLogger} from 'Util/Logger';
 
-import {NewClient, PublicClient, RegisteredClient} from '@wireapp/api-client/dist/commonjs/client';
+import {NewClient, PublicClient, RegisteredClient} from '@wireapp/api-client/dist/client';
 import {BackendClient} from '../service/BackendClient';
 import {StorageService} from '../storage';
 import {StorageSchemata} from '../storage/StorageSchemata';
@@ -30,13 +30,11 @@ export class ClientService {
   private readonly logger: Logger;
   private readonly CLIENT_STORE_NAME: string;
 
-  // tslint:disable-next-line:typedef
-  static get URL_CLIENTS() {
+  static get URL_CLIENTS(): string {
     return '/clients';
   }
 
-  // tslint:disable-next-line:typedef
-  static get URL_USERS() {
+  static get URL_USERS(): string {
     return '/users';
   }
 

@@ -17,7 +17,7 @@
  *
  */
 
-import {getMapsUrl} from 'Util/locationUtil';
+import {getMapsUrl} from 'Util/LocationUtil';
 
 ko.components.register('location-asset', {
   template: `

@@ -22,7 +22,7 @@ import React from 'react';
 import {FormattedHTMLMessage, useIntl} from 'react-intl';
 import {addLocaleToUrl} from '../../externalRoute';
 import {cookiePolicyStrings, footerStrings} from '../../strings';
-import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
+import {EXTERNAL_ROUTE} from '../externalRoute';
 
 export interface Props extends React.HTMLAttributes<HTMLDivElement> {
   showCookiePolicyBanner?: boolean;

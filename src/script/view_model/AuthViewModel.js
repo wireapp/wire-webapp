@@ -84,8 +84,9 @@ class AuthViewModel {
   /**
    * View model for the auth page.
    * @param {BackendClient} backendClient - Configured backend client
+   * @param {SQLeetEngine} [encryptedEngine] - Encrypted database handler
    */
-  constructor(backendClient) {
+  constructor(backendClient, encryptedEngine) {
     this.click_on_remove_device_submit = this.click_on_remove_device_submit.bind(this);
 
     this.logger = getLogger('z.viewModel.AuthViewModel');
@@ -96,7 +97,7 @@ class AuthViewModel {
     // Cryptography
     this.asset_service = new AssetService(backendClient);
     // @todo Don't operate with the service directly. Get a repository!
-    this.storageService = new StorageService();
+    this.storageService = new StorageService(encryptedEngine);
     this.storage_repository = new StorageRepository(this.storageService);
 
     this.cryptography_repository = new CryptographyRepository(backendClient, this.storage_repository);
@@ -1516,7 +1517,7 @@ class AuthViewModel {
     this.logger.info('Logging in');
 
     this._get_self_user()
-      .then(() => this.cryptography_repository.loadCryptobox(this.storageService.db || this.storageService.dbObject))
+      .then(() => this.cryptography_repository.loadCryptobox(this.storageService.db || this.storageService))
       .then(() => this.client_repository.getValidLocalClient())
       .catch(error => {
         const user_missing_email = error.type === z.error.UserError.TYPE.USER_MISSING_EMAIL;
@@ -1606,7 +1607,7 @@ class AuthViewModel {
 
   _register_client(autoLogin) {
     return this.cryptography_repository
-      .createCryptobox(this.storageService.db || this.storageService.objectDb, this.storageService.dbName)
+      .createCryptobox(this.storageService.db)
       .then(() => this.client_repository.registerClient(autoLogin ? undefined : this.password()))
       .then(clientObservable => {
         this.event_repository.currentClient = clientObservable;

@@ -17,7 +17,7 @@
  *
  */
 
-import {AccessTokenData, LoginData} from '@wireapp/api-client/dist/commonjs/auth';
+import {AccessTokenData, LoginData} from '@wireapp/api-client/dist/auth';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {Logger} from 'logdown';
@@ -39,9 +39,8 @@ export class AuthRepository {
   private readonly logger: Logger;
   private readonly queueState: ko.Observable<QUEUE_STATE>;
 
-  static get CONFIG(): {
-    REFRESH_THRESHOLD: TIME_IN_MILLIS;
-  } {
+  // tslint:disable-next-line:typedef
+  static get CONFIG() {
     return {
       REFRESH_THRESHOLD: TIME_IN_MILLIS.MINUTE,
     };

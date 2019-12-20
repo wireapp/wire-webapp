@@ -76,11 +76,13 @@ export class Conversation {
     this.participating_user_ets = ko.observableArray([]); // Does not include self user
     this.participating_user_ids = ko.observableArray([]); // Does not include self user
     this.selfUser = ko.observable();
+    /** @type {ko.Observable<Record<string, string>>} */
+    this.roles = ko.observable({});
 
     this.hasCreationMessage = false;
 
     this.firstUserEntity = ko.pureComputed(() => this.participating_user_ets()[0]);
-    this.availabilityOfUser = ko.pureComputed(() => this.firstUserEntity() && this.firstUserEntity().availability());
+    this.availabilityOfUser = ko.pureComputed(() => this.firstUserEntity()?.availability());
 
     this.isGuest = ko.observable(false);
     this.isManaged = false;
@@ -108,14 +110,14 @@ export class Conversation {
 
     this.hasGuest = ko.pureComputed(() => {
       const hasGuestUser = this.participating_user_ets().some(userEntity => userEntity.isGuest());
-      return hasGuestUser && this.isGroup() && this.selfUser() && this.selfUser().inTeam();
+      return hasGuestUser && this.isGroup() && this.selfUser()?.inTeam();
     });
     this.hasService = ko.pureComputed(() => this.participating_user_ets().some(userEntity => userEntity.isService));
 
     // in case this is a one2one conversation this is the connection to that user
     this.connection = ko.observable(new ConnectionEntity());
     this.connection.subscribe(connectionEntity => {
-      const connectedUserId = connectionEntity && connectionEntity.userId;
+      const connectedUserId = connectionEntity?.userId;
       if (connectedUserId && !this.participating_user_ids().includes(connectedUserId)) {
         this.participating_user_ids.push(connectedUserId);
       }
@@ -324,7 +326,7 @@ export class Conversation {
     this.display_name = ko.pureComputed(() => {
       if (this.isRequest() || this.is1to1()) {
         const [userEntity] = this.participating_user_ets();
-        const userName = userEntity && userEntity.name();
+        const userName = userEntity?.name();
         return userName ? userName : '…';
       }
 
@@ -482,7 +484,7 @@ export class Conversation {
     // we found a message from self user
     for (let counter = message_ets.length - 1; counter >= 0; counter--) {
       const message_et = message_ets[counter];
-      if (message_et.user() && message_et.user().is_me) {
+      if (message_et.user()?.is_me) {
         this.update_timestamps(message_et);
         break;
       }
@@ -655,7 +657,7 @@ export class Conversation {
         if (message_et.timestamp_affects_order()) {
           this.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.LAST_EVENT);
 
-          const from_self = message_et.user() && message_et.user().is_me;
+          const from_self = message_et.user()?.is_me;
           if (from_self) {
             this.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.LAST_READ);
           }

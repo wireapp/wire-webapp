@@ -21,11 +21,21 @@ user-list,
 service-list {
   display: block;
 
-  .no-results {
-    .text-center;
+  .user-list {
+    &__no-results {
+      .text-center;
 
-    margin: 106px 18px;
-    line-height: 24px;
-    white-space: pre;
+      margin: 106px 18px;
+      line-height: 24px;
+      white-space: pre;
+    }
+    &__header {
+      .panel-header;
+    }
+    &__no-admin {
+      margin: 8px 16px;
+      color: #c0c0c0;
+      font-size: 11px;
+    }
   }
 }

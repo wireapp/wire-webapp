@@ -17,14 +17,12 @@
  *
  */
 
-import moment from 'moment';
+import moment, {Moment, MomentInput} from 'moment';
 
-export const isToday = (momentDate: moment.Moment) => momentDate.isSame(new Date(), 'd');
-export const isCurrentYear = (momentDate: moment.Moment) => momentDate.isSame(new Date(), 'y');
-export const isSameDay = (momentDate: moment.Moment, otherDate: moment.MomentInput) =>
-  momentDate.isSame(otherDate, 'd');
-export const isSameMonth = (momentDate: moment.Moment, otherDate: moment.MomentInput) =>
-  momentDate.isSame(otherDate, 'M');
+export const isToday = (momentDate: Moment): boolean => momentDate.isSame(new Date(), 'd');
+export const isCurrentYear = (momentDate: Moment): boolean => momentDate.isSame(new Date(), 'y');
+export const isSameDay = (momentDate: Moment, otherDate: MomentInput): boolean => momentDate.isSame(otherDate, 'd');
+export const isSameMonth = (momentDate: Moment, otherDate: MomentInput): boolean => momentDate.isSame(otherDate, 'M');
 
 // https://stackoverflow.com/questions/27360102/locale-and-specific-date-format-with-moment-js/29641375#29641375
 export const LLDM = moment

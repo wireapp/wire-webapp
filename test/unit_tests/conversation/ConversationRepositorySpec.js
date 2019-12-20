@@ -1259,12 +1259,12 @@ describe('ConversationRepository', () => {
     });
 
     it('does not return any conversation if team is marked for deletion', () => {
-      spyOn(conversationRepository.team_repository, 'isTeamDeleted').and.returnValue(false);
+      spyOn(conversationRepository.teamRepository, 'isTeamDeleted').and.returnValue(false);
       conversationIds.forEach(conversationId => {
         expect(conversationRepository.find_conversation_by_id(conversationId)).toBeDefined();
       });
 
-      conversationRepository.team_repository.isTeamDeleted.and.returnValue(true);
+      conversationRepository.teamRepository.isTeamDeleted.and.returnValue(true);
       conversationIds.forEach(conversationId => {
         expect(conversationRepository.find_conversation_by_id(conversationId)).not.toBeDefined();
       });

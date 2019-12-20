@@ -34,7 +34,7 @@ import {WebAppEvents} from '../event/WebApp';
 import {getPrivacyHowUrl, getPrivacyWhyUrl} from '../externalRoute';
 import {MotionDuration} from '../motion/MotionDuration';
 
-import {ClientClassification} from '@wireapp/api-client/dist/commonjs/client';
+import {ClientClassification} from '@wireapp/api-client/dist/client';
 import 'Components/deviceCard';
 
 export interface UserDevicesHistory {
@@ -102,7 +102,7 @@ ko.components.register('user-devices', {
     <div>
       <!-- ko if: showDevicesFound() -->
         <div class="participant-devices__header" data-bind="css: {'participant-devices__header--padding': !noPadding}">
-          <div class="participant-devices__text-block panel__info-text" data-bind="text: devicesHeadlineText"></div>
+          <div class="participant-devices__text-block panel__info-text" data-bind="text: devicesHeadlineText" data-uie-name="status-devices-headline"></div>
           <a class="participant-devices__link" data-bind="attr: {href: privacyWhyUrl}, text: t('participantDevicesWhyVerify')" rel="nofollow noopener noreferrer" target="_blank" class="accent-text"></a>
         </div>
 
@@ -115,7 +115,7 @@ ko.components.register('user-devices', {
 
       <!-- ko if: showDevicesNotFound() -->
         <div class="participant-devices__header" data-bind="css: {'participant-devices__header--padding': !noPadding}">
-          <div class="participant-devices__text-block panel__info-text" data-bind="text: noDevicesHeadlineText"></div>
+          <div class="participant-devices__text-block panel__info-text" data-bind="text: noDevicesHeadlineText" data-uie-name="status-devices-headline"></div>
           <a class="participant-devices__link" data-bind="text: t('participantDevicesLearnMore'), attr: {href: Config.URL.PRIVACY_POLICY}" rel="nofollow noopener noreferrer" target="_blank" class="accent-text"></a>
         </div>
       <!-- /ko -->

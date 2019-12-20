@@ -35,10 +35,8 @@ interface PermissionStateResult {
  */
 export class PermissionRepository {
   private readonly logger: Logger;
-  private readonly permissionState: Record<PermissionType, ko.Observable<PermissionStatusState>>;
-  /**
-   * Construct a new Permission Repository.
-   */
+  readonly permissionState: Record<PermissionType, ko.Observable<PermissionStatusState>>;
+
   constructor() {
     this.logger = getLogger('PermissionRepository');
 

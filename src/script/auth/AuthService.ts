@@ -22,7 +22,7 @@ import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {BackendClientError} from '../error/BackendClientError';
 
-import {AccessTokenData, LoginData} from '@wireapp/api-client/dist/commonjs/auth';
+import {AccessTokenData, LoginData} from '@wireapp/api-client/dist/auth';
 import {BackendClient} from '../service/BackendClient';
 import {QUEUE_STATE} from '../service/QueueState';
 
@@ -30,15 +30,8 @@ export class AuthService {
   public readonly backendClient: any;
   private readonly logger: Logger;
 
-  static get CONFIG(): {
-    POST_ACCESS_RETRY: {
-      LIMIT: number;
-      TIMEOUT: number;
-    };
-    URL_ACCESS: string;
-    URL_COOKIES: string;
-    URL_LOGIN: string;
-  } {
+  // tslint:disable-next-line:typedef
+  static get CONFIG() {
     return {
       POST_ACCESS_RETRY: {
         LIMIT: 10,

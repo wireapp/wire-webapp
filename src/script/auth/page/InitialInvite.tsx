@@ -25,11 +25,11 @@ import {
   ErrorMessage,
   Form,
   H1,
-  ICON_NAME,
   Input,
   InputSubmitCombo,
   Link,
   Muted,
+  PlaneIcon,
   RoundIconButton,
   Text,
 } from '@wireapp/react-ui-kit';
@@ -38,7 +38,7 @@ import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 import {inviteStrings} from '../../strings';
-import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
+import {EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {BackendError} from '../module/action/BackendError';
 import {ValidationError} from '../module/action/ValidationError';
@@ -59,13 +59,17 @@ const InitialInvite = ({
   resetInviteErrors,
   invite,
   isTeamFlow,
+  doFlushDatabase,
 }: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
   const emailInput = React.useRef<HTMLInputElement>();
   const [enteredEmail, setEnteredEmail] = useState('');
   const [error, setError] = useState(null);
 
-  const onInviteDone = (): void => window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP));
+  const onInviteDone = async () => {
+    await doFlushDatabase();
+    window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP));
+  };
 
   const renderEmail = (email: string): JSX.Element => (
     <div
@@ -161,10 +165,11 @@ const InitialInvite = ({
               <RoundIconButton
                 disabled={isFetching || !enteredEmail}
                 type="submit"
-                icon={ICON_NAME.PLANE}
                 data-uie-name="do-send-invite"
                 formNoValidate
-              />
+              >
+                <PlaneIcon />
+              </RoundIconButton>
             </InputSubmitCombo>
           </Form>
           <ErrorMessage data-uie-name="error-message">
@@ -200,6 +205,7 @@ type DispatchProps = ReturnType<typeof mapDispatchToProps>;
 const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
   bindActionCreators(
     {
+      doFlushDatabase: ROOT_ACTIONS.authAction.doFlushDatabase,
       invite: ROOT_ACTIONS.invitationAction.invite,
       resetInviteErrors: ROOT_ACTIONS.invitationAction.resetInviteErrors,
     },

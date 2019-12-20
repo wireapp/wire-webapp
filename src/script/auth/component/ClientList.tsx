@@ -17,7 +17,7 @@
  *
  */
 
-import {ClientType} from '@wireapp/api-client/dist/commonjs/client/index';
+import {ClientType} from '@wireapp/api-client/dist/client/index';
 import {ContainerXS, Loading} from '@wireapp/react-ui-kit';
 import React from 'react';
 import {connect} from 'react-redux';

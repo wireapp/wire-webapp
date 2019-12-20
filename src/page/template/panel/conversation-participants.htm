@@ -8,7 +8,7 @@
     <div class="panel__content conversation-participants__content">
       <user-input class="user-list-light" params="input: searchInput, placeholder: t('conversationParticipantsSearchPlaceholder'), focusDelay: MotionDuration.LONG" spellcheck="false"></user-input>
       <div class="conversation-participants__list panel__content" data-bind="fadingscrollbar">
-        <user-list class="user-list-light" params="user: participants, click: clickOnShowUser, filter: searchInput, noUnderline: true, arrow: true, highlightedUsers: highlightedUsers, searchRepository: searchRepository, teamRepository: teamRepository, conversationRepository: conversationRepository" data-uie-name="list-conversation-participants"></user-list>
+        <user-list class="user-list-light" params="user: participants, click: clickOnShowUser, filter: searchInput, noUnderline: true, arrow: true, highlightedUsers: highlightedUsers, searchRepository: searchRepository, teamRepository: teamRepository, conversationRepository: conversationRepository, conversation: activeConversation, selfFirst: false, noSelfInteraction: true" data-uie-name="list-conversation-participants"></user-list>
       </div>
     </div>
   <!-- /ko -->

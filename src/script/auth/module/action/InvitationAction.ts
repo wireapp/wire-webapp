@@ -17,8 +17,8 @@
  *
  */
 
-import {NewTeamInvitation} from '@wireapp/api-client/dist/commonjs/team';
-import {Role} from '@wireapp/api-client/dist/commonjs/team/member';
+import {NewTeamInvitation} from '@wireapp/api-client/dist/team';
+import {Role} from '@wireapp/api-client/dist/team/member';
 import {ThunkAction} from '../reducer';
 import * as InviteSelector from '../selector/InviteSelector';
 import * as languageSelector from '../selector/LanguageSelector';
@@ -32,7 +32,7 @@ export class InvitationAction {
       dispatch(InvitationActionCreator.startAddInvite());
       const state = getState();
       const inviteList = InviteSelector.getInvites(state);
-      const invitationEmail = invitation.email && invitation.email.toLowerCase();
+      const invitationEmail = invitation.email?.toLowerCase();
       const alreadyInvited = inviteList.find(inviteItem => inviteItem.email.toLowerCase() === invitationEmail);
       if (alreadyInvited) {
         const error = new BackendError({

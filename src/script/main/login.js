@@ -25,8 +25,11 @@ import {AuthViewModel} from '../view_model/AuthViewModel';
 import {resolve, graph} from '../config/appResolver';
 import {Config} from '../Config';
 import {exposeWrapperGlobals} from 'Util/wrapper';
+import {isTemporaryClientAndNonPersistent} from 'Util/util';
+import {StorageKey, StorageService} from '../storage';
+import {loadValue} from 'Util/StorageUtil';
 
-$(() => {
+$(async () => {
   enableLogging(Config.FEATURE.ENABLE_DEBUG);
   exposeWrapperGlobals();
   if ($('.auth-page').length) {
@@ -35,6 +38,11 @@ $(() => {
       restUrl: Config.BACKEND_REST,
       webSocketUrl: Config.BACKEND_WS,
     });
-    new AuthViewModel(backendClient);
+    if (isTemporaryClientAndNonPersistent(loadValue(StorageKey.AUTH.PERSIST))) {
+      const engine = await StorageService.getUnitializedEngine();
+      new AuthViewModel(backendClient, engine);
+    } else {
+      new AuthViewModel(backendClient);
+    }
   }
 });

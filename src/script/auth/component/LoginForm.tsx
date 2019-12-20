@@ -17,8 +17,8 @@
  *
  */
 
-import {LoginData} from '@wireapp/api-client/dist/commonjs/auth';
-import {ICON_NAME, Input, InputBlock, InputSubmitCombo, Loading, RoundIconButton} from '@wireapp/react-ui-kit';
+import {LoginData} from '@wireapp/api-client/dist/auth';
+import {ArrowIcon, Input, InputBlock, InputSubmitCombo, Loading, RoundIconButton} from '@wireapp/react-ui-kit';
 import React, {useRef, useState} from 'react';
 import {useIntl} from 'react-intl';
 
@@ -120,10 +120,11 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
             disabled={!email || !password}
             type="submit"
             formNoValidate
-            icon={ICON_NAME.ARROW}
             onClick={handleSubmit}
             data-uie-name="do-sign-in"
-          />
+          >
+            <ArrowIcon />
+          </RoundIconButton>
         )}
       </InputSubmitCombo>
     </InputBlock>

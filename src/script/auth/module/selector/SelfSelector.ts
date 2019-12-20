@@ -17,7 +17,7 @@
  *
  */
 
-import {Self} from '@wireapp/api-client/dist/commonjs/self';
+import {Self} from '@wireapp/api-client/dist/self';
 import {Config} from '../../../Config';
 import {RootState} from '../reducer';
 
@@ -37,9 +37,12 @@ export const getConsents = (state: RootState) => state.selfState.consents || {};
 export const getSelf = (state: RootState) => state.selfState.self || unsetSelf;
 export const getSelfError = (state: RootState) => state.selfState.error;
 export const getSelfHandle = (state: RootState) => getSelf(state).handle;
+export const getSelfEmail = (state: RootState) => getSelf(state).email;
 export const getSelfName = (state: RootState) => getSelf(state).name;
 export const getSelfTeamId = (state: RootState) => getSelf(state).team;
 export const hasSelfHandle = (state: RootState) => !!getSelfHandle(state);
+export const hasSelfEmail = (state: RootState) => !!getSelfEmail(state);
+export const hasSelfPassword = (state: RootState) => !!state.selfState.hasPassword;
 export const isFetching = (state: RootState) => state.selfState.fetching;
 export const isSSOUser = (state: RootState) => !!getSelf(state).sso_id;
 export const isTemporaryGuest = (state: RootState) => !!getSelf(state).expires_at;

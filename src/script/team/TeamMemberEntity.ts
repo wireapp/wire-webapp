@@ -17,7 +17,7 @@
  *
  */
 
-import {Permissions} from '@wireapp/api-client/dist/commonjs/team/member/Permissions';
+import {Permissions} from '@wireapp/api-client/dist/team/member/Permissions';
 
 export class TeamMemberEntity {
   permissions?: Permissions;

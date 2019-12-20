@@ -17,8 +17,8 @@
  *
  */
 
-import {LoginData} from '@wireapp/api-client/dist/commonjs/auth';
-import {ClientType} from '@wireapp/api-client/dist/commonjs/client/index';
+import {LoginData} from '@wireapp/api-client/dist/auth';
+import {ClientType} from '@wireapp/api-client/dist/client/index';
 import {
   ArrowIcon,
   COLOR,
@@ -42,15 +42,14 @@ import {connect} from 'react-redux';
 import {Redirect} from 'react-router';
 import {AnyAction, Dispatch} from 'redux';
 import useReactRouter from 'use-react-router';
-import {save} from 'Util/ephemeralValueStore';
 import {getLogger} from 'Util/Logger';
 import {Config} from '../../Config';
 import {loginStrings, logoutReasonStrings} from '../../strings';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import LoginForm from '../component/LoginForm';
 import RouterLink from '../component/RouterLink';
-import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
-import {actionRoot as ROOT_ACTIONS} from '../module/action/';
+import {EXTERNAL_ROUTE} from '../externalRoute';
+import {actionRoot} from '../module/action/';
 import {BackendError} from '../module/action/BackendError';
 import {LabeledError} from '../module/action/LabeledError';
 import {ValidationError} from '../module/action/ValidationError';
@@ -73,6 +72,8 @@ const Login = ({
   doLoginAndJoin,
   doLogin,
   isFetching,
+  pushLoginData,
+  loginData,
 }: Props & ConnectedProps & DispatchProps) => {
   const logger = getLogger('Login');
   const {formatMessage: _} = useIntl();
@@ -83,7 +84,6 @@ const Login = ({
 
   const [isValidLink, setIsValidLink] = useState(true);
   const [logoutReason, setLogoutReason] = useState();
-  const [persist, setPersist] = useState(!Config.FEATURE.DEFAULT_LOGIN_TEMPORARY_CLIENT);
   const [validationErrors, setValidationErrors] = useState([]);
 
   useEffect(() => {
@@ -130,13 +130,13 @@ const Login = ({
 
   const forgotPassword = () => URLUtil.openTab(EXTERNAL_ROUTE.WIRE_ACCOUNT_PASSWORD_RESET);
 
-  const handleSubmit = async (loginData: Partial<LoginData>, validationErrors: Error[]) => {
+  const handleSubmit = async (formLoginData: Partial<LoginData>, validationErrors: Error[]) => {
     setValidationErrors(validationErrors);
     try {
       if (validationErrors.length) {
         throw validationErrors[0];
       }
-      const login: LoginData = {...loginData, clientType: persist ? ClientType.PERMANENT : ClientType.TEMPORARY};
+      const login: LoginData = {...formLoginData, clientType: loginData.clientType};
 
       const hasKeyAndCode = conversationKey && conversationCode;
       if (hasKeyAndCode) {
@@ -144,11 +144,6 @@ const Login = ({
       } else {
         await doLogin(login);
       }
-
-      // Save encrypted database key
-      const secretKey = new Uint32Array(64);
-      self.crypto.getRandomValues(secretKey);
-      await save(secretKey);
 
       return history.push(ROUTE.HISTORY_INFO);
     } catch (error) {
@@ -225,8 +220,10 @@ const Login = ({
                   {!isDesktopApp() && (
                     <Checkbox
                       tabIndex={3}
-                      onChange={(event: React.ChangeEvent<HTMLInputElement>) => setPersist(!event.target.checked)}
-                      checked={!persist}
+                      onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        pushLoginData({clientType: event.target.checked ? ClientType.TEMPORARY : ClientType.PERMANENT});
+                      }}
+                      checked={loginData.clientType === ClientType.TEMPORARY}
                       data-uie-name="enter-public-computer-sign-in"
                       style={{justifyContent: 'center', marginTop: '12px'}}
                     >
@@ -248,10 +245,7 @@ const Login = ({
                     </Column>
                     {Config.FEATURE.ENABLE_PHONE_LOGIN && (
                       <Column>
-                        <Link
-                          href={URLUtil.pathWithParams(EXTERNAL_ROUTE.PHONE_LOGIN)}
-                          data-uie-name="go-sign-in-phone"
-                        >
+                        <Link onClick={() => history.push(ROUTE.LOGIN_PHONE)} data-uie-name="go-sign-in-phone">
                           {_(loginStrings.phoneLogin)}
                         </Link>
                       </Column>
@@ -267,7 +261,7 @@ const Login = ({
                   </Column>
                   {Config.FEATURE.ENABLE_PHONE_LOGIN && (
                     <Column>
-                      <Link href={URLUtil.pathWithParams(EXTERNAL_ROUTE.PHONE_LOGIN)} data-uie-name="go-sign-in-phone">
+                      <Link onClick={() => history.push(ROUTE.LOGIN_PHONE)} data-uie-name="go-sign-in-phone">
                         {_(loginStrings.phoneLogin)}
                       </Link>
                     </Column>
@@ -286,6 +280,7 @@ const Login = ({
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
   isFetching: AuthSelector.isFetching(state),
+  loginData: AuthSelector.getLoginData(state),
   loginError: AuthSelector.getError(state),
 });
 
@@ -293,12 +288,13 @@ type DispatchProps = ReturnType<typeof mapDispatchToProps>;
 const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
   bindActionCreators(
     {
-      doCheckConversationCode: ROOT_ACTIONS.conversationAction.doCheckConversationCode,
-      doInit: ROOT_ACTIONS.authAction.doInit,
-      doInitializeClient: ROOT_ACTIONS.clientAction.doInitializeClient,
-      doLogin: ROOT_ACTIONS.authAction.doLogin,
-      doLoginAndJoin: ROOT_ACTIONS.authAction.doLoginAndJoin,
-      resetAuthError: ROOT_ACTIONS.authAction.resetAuthError,
+      doCheckConversationCode: actionRoot.conversationAction.doCheckConversationCode,
+      doInit: actionRoot.authAction.doInit,
+      doInitializeClient: actionRoot.clientAction.doInitializeClient,
+      doLogin: actionRoot.authAction.doLogin,
+      doLoginAndJoin: actionRoot.authAction.doLoginAndJoin,
+      pushLoginData: actionRoot.authAction.pushLoginData,
+      resetAuthError: actionRoot.authAction.resetAuthError,
     },
     dispatch,
   );

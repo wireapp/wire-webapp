@@ -146,7 +146,7 @@ export const formatDurationCaption = (duration: number): string => {
       break;
     }
     const nextUnit = mappedUnits[index + 1];
-    if (validUnitStrings.length > 0 && nextUnit && nextUnit.value === 0) {
+    if (validUnitStrings.length > 0 && nextUnit?.value === 0) {
       break;
     }
   }

@@ -40,6 +40,7 @@ export class BackendError extends Error {
     INVALID_PHONE: 'invalid-phone',
     KEY_EXISTS: 'key-exists',
     MISSING_AUTH: 'missing-auth',
+    PASSWORD_EXISTS: 'password-exists',
     PENDING_ACTIVATION: 'pending-activation',
     PENDING_LOGIN: 'pending-login',
     SUSPENDED: 'suspended',

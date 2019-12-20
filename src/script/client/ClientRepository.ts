@@ -17,12 +17,7 @@
  *
  */
 
-import {
-  ClientClassification,
-  NewClient,
-  PublicClient,
-  RegisteredClient,
-} from '@wireapp/api-client/dist/commonjs/client/';
+import {ClientClassification, NewClient, PublicClient, RegisteredClient} from '@wireapp/api-client/dist/client/';
 import {amplify} from 'amplify';
 import platform from 'platform';
 
@@ -44,8 +39,8 @@ import {ClientMapper} from './ClientMapper';
 import {ClientService} from './ClientService';
 import {ClientType} from './ClientType';
 
-import {PreKey} from '@wireapp/api-client/dist/commonjs/auth/PreKey';
-import {UserClientAddEvent, UserClientRemoveEvent} from '@wireapp/api-client/dist/commonjs/event';
+import {PreKey} from '@wireapp/api-client/dist/auth/PreKey';
+import {UserClientAddEvent, UserClientRemoveEvent} from '@wireapp/api-client/dist/event';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {User} from '../entity/User';
 import {BackendClientError} from '../error/BackendClientError';
@@ -86,7 +81,7 @@ export class ClientRepository {
     this.clients = ko.pureComputed(() => (this.selfUser() ? this.selfUser().devices() : []));
     this.currentClient = ko.observable();
 
-    this.isTemporaryClient = ko.pureComputed(() => this.currentClient() && this.currentClient().isTemporary());
+    this.isTemporaryClient = ko.pureComputed(() => this.currentClient()?.isTemporary());
 
     amplify.subscribe(WebAppEvents.LIFECYCLE.ASK_TO_CLEAR_DATA, this.logoutClient.bind(this));
     amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent.bind(this));
@@ -486,21 +481,21 @@ export class ClientRepository {
       if (this.isTemporaryClient()) {
         await this.deleteTemporaryClient();
         amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, true);
-      }
-
-      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.OPTION, {
-        preventClose: true,
-        primaryAction: {
-          action: (clearData: boolean) => {
-            return amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, clearData);
+      } else {
+        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.OPTION, {
+          preventClose: true,
+          primaryAction: {
+            action: (clearData: boolean) => {
+              return amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, clearData);
+            },
+            text: t('modalAccountLogoutAction'),
           },
-          text: t('modalAccountLogoutAction'),
-        },
-        text: {
-          option: t('modalAccountLogoutOption'),
-          title: t('modalAccountLogoutHeadline'),
-        },
-      });
+          text: {
+            option: t('modalAccountLogoutOption'),
+            title: t('modalAccountLogoutHeadline'),
+          },
+        });
+      }
     }
   }
 
@@ -737,7 +732,7 @@ export class ClientRepository {
     }
     const localClients = await this.getClientsForSelf();
     const removedClient = localClients.find(client => client.id === clientId);
-    if (removedClient && removedClient.isLegalHold()) {
+    if (removedClient?.isLegalHold()) {
       amplify.publish(
         WebAppEvents.WARNING.MODAL,
         ModalsViewModel.TYPE.ACKNOWLEDGE,
