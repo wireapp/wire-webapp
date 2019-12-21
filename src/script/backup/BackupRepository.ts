@@ -86,7 +86,7 @@ export class BackupRepository {
     this.canceled = false;
   }
 
-  cancelAction(): void {
+  public cancelAction(): void {
     this.isCanceled = true;
   }
 
@@ -98,7 +98,7 @@ export class BackupRepository {
     this.canceled = isCanceled;
   }
 
-  createMetaData(): Metadata {
+  public createMetaData(): Metadata {
     return {
       client_id: this.clientRepository.currentClient().id,
       creation_time: new Date().toISOString(),
@@ -116,7 +116,7 @@ export class BackupRepository {
    * @param progressCallback called on every step of the export
    * @returns The promise that contains all the exported tables
    */
-  generateHistory(progressCallback: (tableRows: number) => void): Promise<JSZip> {
+  public generateHistory(progressCallback: (tableRows: number) => void): Promise<JSZip> {
     this.isCanceled = false;
 
     return Promise.resolve()
@@ -216,11 +216,11 @@ export class BackupRepository {
     return zip;
   }
 
-  getBackupInitData(): Promise<number> {
+  public getBackupInitData(): Promise<number> {
     return this.backupService.getHistoryCount();
   }
 
-  importHistory(
+  public importHistory(
     archive: JSZip,
     initCallback: (numberOfRecords: number) => void,
     progressCallback: (numberProcessed: number) => void,
@@ -321,7 +321,7 @@ export class BackupRepository {
     });
   }
 
-  mapEntityDataType(entity: any): any {
+  public mapEntityDataType(entity: any): any {
     if (entity.data) {
       BackupRepository.CONFIG.UINT8ARRAY_FIELDS.forEach(field => {
         const dataField = entity.data[field];
@@ -333,7 +333,7 @@ export class BackupRepository {
     return entity;
   }
 
-  verifyMetadata(files: Record<string, JSZipObject>): Promise<void> {
+  public verifyMetadata(files: Record<string, JSZipObject>): Promise<void> {
     return files[BackupRepository.CONFIG.FILENAME.METADATA]
       .async('string')
       .then(rawData => JSON.parse(rawData))
