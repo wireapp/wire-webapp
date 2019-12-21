@@ -59,14 +59,14 @@ const getTimestampBytes = (event: any): number[] => {
   return Long.fromInt(timestampSeconds).toBytesBE();
 };
 
-const getTextBytes = (event: any) => utf8ToUtf16BE(event.data.content);
+const getTextBytes = (event: any): number[] => utf8ToUtf16BE(event.data.content);
 
 /**
  * Creates a hash of the given event.
  *
  * @returns buffer containing the bytes of the hash
  */
-const hashEvent = async (event: any): Promise<ArrayBuffer> => {
+const hashEvent = (event: any): Promise<ArrayBuffer> => {
   let specificBytes: number[];
 
   switch (event.type) {
@@ -98,20 +98,19 @@ const hashEvent = async (event: any): Promise<ArrayBuffer> => {
  *
  * @returns `true` if the event hash is equal to the given hash
  */
-const validateHash = (event: Event, hash: ArrayBuffer): Promise<boolean> => {
-  return hashEvent(event).then(generatedHash => {
-    if (hash.byteLength !== generatedHash.byteLength) {
+const validateHash = async (event: Event, hash: ArrayBuffer): Promise<boolean> => {
+  const generatedHash = await hashEvent(event);
+  if (hash.byteLength !== generatedHash.byteLength) {
+    return false;
+  }
+  const generatedHashBytes = new Uint8Array(generatedHash);
+  const hashBytes = new Uint8Array(hash);
+  for (let i = 0; i !== generatedHash.byteLength; i++) {
+    if (generatedHashBytes[i] !== hashBytes[i]) {
       return false;
     }
-    const generatedHashBytes = new Uint8Array(generatedHash);
-    const hashBytes = new Uint8Array(hash);
-    for (let i = 0; i !== generatedHash.byteLength; i++) {
-      if (generatedHashBytes[i] !== hashBytes[i]) {
-        return false;
-      }
-    }
-    return true;
-  });
+  }
+  return true;
 };
 
 export const MessageHasher = {
