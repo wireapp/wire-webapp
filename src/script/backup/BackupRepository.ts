@@ -17,17 +17,46 @@
  *
  */
 
-import JSZip from 'jszip';
+import Dexie from 'dexie';
+import JSZip, {JSZipObject} from 'jszip';
 
-import {getLogger} from 'Util/Logger';
 import {chunk} from 'Util/ArrayUtil';
+import {Logger, getLogger} from 'Util/Logger';
 
-import {StorageSchemata} from '../storage/StorageSchemata';
+import {ClientRepository} from '../client/ClientRepository';
+import {ConnectionRepository} from '../connection/ConnectionRepository';
+import {ConversationRepository} from '../conversation/ConversationRepository';
+import {Conversation} from '../entity/Conversation';
 import {ClientEvent} from '../event/Client';
-
+import {StorageSchemata} from '../storage/StorageSchemata';
+import {UserRepository} from '../user/UserRepository';
 import {BackupService} from './BackupService';
 
-class BackupRepository {
+export interface Metadata {
+  client_id: string;
+  creation_time: string;
+  platform: 'Web';
+  user_handle: string;
+  user_id: string;
+  user_name: string;
+  version: number;
+}
+
+export interface FileDescriptor {
+  content: string;
+  filename: string;
+}
+
+export class BackupRepository {
+  private readonly backupService: BackupService;
+  private readonly clientRepository: ClientRepository;
+  private readonly connectionRepository: ConnectionRepository;
+  private readonly conversationRepository: ConversationRepository;
+  private readonly logger: Logger;
+  private readonly userRepository: UserRepository;
+  private canceled: boolean;
+
+  // tslint:disable-next-line:typedef
   static get CONFIG() {
     return {
       FILENAME: {
@@ -39,15 +68,13 @@ class BackupRepository {
     };
   }
 
-  /**
-   * Construct a new Backup repository.
-   * @param {BackupService} backupService - Backup service implementation
-   * @param {ClientRepository} clientRepository - Repository for all client interactions
-   * @param {ConnectionRepository} connectionRepository - Repository for all connection interactions
-   * @param {ConversationRepository} conversationRepository - Repository for all conversation interactions
-   * @param {UserRepository} userRepository - Repository for all user interactions
-   */
-  constructor(backupService, clientRepository, connectionRepository, conversationRepository, userRepository) {
+  constructor(
+    backupService: BackupService,
+    clientRepository: ClientRepository,
+    connectionRepository: ConnectionRepository,
+    conversationRepository: ConversationRepository,
+    userRepository: UserRepository,
+  ) {
     this.logger = getLogger('BackupRepository');
 
     this.backupService = backupService;
@@ -57,16 +84,13 @@ class BackupRepository {
     this.userRepository = userRepository;
 
     this.canceled = false;
-
-    this.CONVERSATIONS_STORE_NAME = StorageSchemata.OBJECT_STORE.CONVERSATIONS;
-    this.EVENTS_STORE_NAME = StorageSchemata.OBJECT_STORE.EVENTS;
   }
 
-  cancelAction() {
+  cancelAction(): void {
     this.isCanceled = true;
   }
 
-  get isCanceled() {
+  get isCanceled(): boolean {
     return this.canceled;
   }
 
@@ -74,7 +98,7 @@ class BackupRepository {
     this.canceled = isCanceled;
   }
 
-  createMetaData() {
+  createMetaData(): Metadata {
     return {
       client_id: this.clientRepository.currentClient().id,
       creation_time: new Date().toISOString(),
@@ -89,10 +113,10 @@ class BackupRepository {
   /**
    * Gather needed data for the export and generates the history
    *
-   * @param {function} progressCallback - called on every step of the export
-   * @returns {Promise<JSZip>} The promise that contains all the exported tables
+   * @param progressCallback called on every step of the export
+   * @returns The promise that contains all the exported tables
    */
-  generateHistory(progressCallback) {
+  generateHistory(progressCallback: (tableRows: number) => void): Promise<JSZip> {
     this.isCanceled = false;
 
     return Promise.resolve()
@@ -106,25 +130,27 @@ class BackupRepository {
       });
   }
 
-  _exportHistory(progressCallback) {
+  private _exportHistory(progressCallback: (tableRows: number) => void): Dexie.Promise<Record<string, any[]>> {
     const tables = this.backupService.getTables();
-    const tableData = {};
+    const tableData: Record<string, any[]> = {};
 
-    return Promise.resolve()
-      .then(() => this._exportHistoryConversations(tables, progressCallback))
+    return this._exportHistoryConversations(tables, progressCallback)
       .then(conversationsData => {
-        tableData[this.CONVERSATIONS_STORE_NAME] = conversationsData;
+        tableData[StorageSchemata.OBJECT_STORE.CONVERSATIONS] = conversationsData;
         return this._exportHistoryEvents(tables, progressCallback);
       })
       .then(eventsData => {
-        tableData[this.EVENTS_STORE_NAME] = eventsData;
+        tableData[StorageSchemata.OBJECT_STORE.EVENTS] = eventsData;
         return tableData;
       });
   }
 
-  _exportHistoryConversations(tables, progressCallback) {
-    const conversationsTable = tables.find(table => table.name === this.CONVERSATIONS_STORE_NAME);
-    const onProgress = (tableRows, exportedEntitiesCount) => {
+  private _exportHistoryConversations(
+    tables: Dexie.Table<any, string>[],
+    progressCallback: (chunkLength: number) => void,
+  ): Dexie.Promise<any[]> {
+    const conversationsTable = tables.find(table => table.name === StorageSchemata.OBJECT_STORE.CONVERSATIONS);
+    const onProgress = (tableRows: any[], exportedEntitiesCount: number) => {
       progressCallback(tableRows.length);
       this.logger.log(`Exported '${exportedEntitiesCount}' conversation states from history`);
 
@@ -134,9 +160,12 @@ class BackupRepository {
     return this._exportHistoryFromTable(conversationsTable, onProgress);
   }
 
-  _exportHistoryEvents(tables, progressCallback) {
-    const eventsTable = tables.find(table => table.name === this.EVENTS_STORE_NAME);
-    const onProgress = (tableRows, exportedEntitiesCount) => {
+  private _exportHistoryEvents(
+    tables: Dexie.Table<any, string>[],
+    progressCallback: (chunkLength: number) => void,
+  ): Dexie.Promise<any[]> {
+    const eventsTable = tables.find(table => table.name === StorageSchemata.OBJECT_STORE.EVENTS);
+    const onProgress = (tableRows: any[], exportedEntitiesCount: number) => {
       progressCallback(tableRows.length);
       this.logger.log(`Exported '${exportedEntitiesCount}' events from history`);
 
@@ -152,8 +181,11 @@ class BackupRepository {
     return this._exportHistoryFromTable(eventsTable, onProgress);
   }
 
-  _exportHistoryFromTable(table, onProgress) {
-    const tableData = [];
+  private _exportHistoryFromTable(
+    table: Dexie.Table<any, string>,
+    onProgress: (tableRows: any[], exportedEntitiesCount: number) => void,
+  ): Dexie.Promise<any[]> {
+    const tableData: any[] = [];
     let exportedEntitiesCount = 0;
 
     return this.backupService
@@ -166,10 +198,10 @@ class BackupRepository {
         onProgress(tableRows, exportedEntitiesCount);
         tableData.push(tableRows);
       })
-      .then(() => [].concat(...tableData));
+      .then(() => [...tableData]);
   }
 
-  _compressHistoryFiles(exportedData) {
+  private _compressHistoryFiles(exportedData: Record<string, any>): JSZip {
     const metaData = this.createMetaData();
     const zip = new JSZip();
 
@@ -184,11 +216,15 @@ class BackupRepository {
     return zip;
   }
 
-  getBackupInitData() {
+  getBackupInitData(): Promise<number> {
     return this.backupService.getHistoryCount();
   }
 
-  importHistory(archive, initCallback, progressCallback) {
+  importHistory(
+    archive: JSZip,
+    initCallback: (numberOfRecords: number) => void,
+    progressCallback: (numberProcessed: number) => void,
+  ): Promise<void> {
     this.isCanceled = false;
     const files = archive.files;
     if (!files[BackupRepository.CONFIG.FILENAME.METADATA]) {
@@ -204,7 +240,11 @@ class BackupRepository {
       });
   }
 
-  _importHistoryData(fileDescriptors, initCallback, progressCallback) {
+  private async _importHistoryData(
+    fileDescriptors: FileDescriptor[],
+    initCallback: (numberOfRecords: number) => void,
+    progressCallback: (numberProcessed: number) => void,
+  ): Promise<void> {
     const conversationFileDescriptor = fileDescriptors.find(fileDescriptor => {
       return fileDescriptor.filename === BackupRepository.CONFIG.FILENAME.CONVERSATIONS;
     });
@@ -218,22 +258,23 @@ class BackupRepository {
     const entityCount = conversationEntities.length + eventEntities.length;
     initCallback(entityCount);
 
-    return this._importHistoryConversations(conversationEntities, progressCallback)
-      .then(importedEntities => this._importHistoryEvents(eventEntities, progressCallback).then(() => importedEntities))
-      .then(importedEntities => {
-        this.conversationRepository.updateConversations(importedEntities);
-        this.conversationRepository.map_connections(this.connectionRepository.connectionEntities());
-        this.conversationRepository.checkForDeletedConversations();
-      });
+    const importedEntities = await this._importHistoryConversations(conversationEntities, progressCallback);
+    await this._importHistoryEvents(eventEntities, progressCallback);
+    this.conversationRepository.updateConversations(importedEntities);
+    this.conversationRepository.map_connections(this.connectionRepository.connectionEntities());
+    await this.conversationRepository.checkForDeletedConversations();
   }
 
-  _importHistoryConversations(conversationEntities, progressCallback) {
+  private _importHistoryConversations(
+    conversationEntities: Conversation[],
+    progressCallback: (chunkLength: number) => void,
+  ): Promise<any[]> {
     const entityCount = conversationEntities.length;
-    let importedEntities = [];
+    let importedEntities: any[] = [];
 
     const entityChunks = chunk(conversationEntities, BackupService.CONFIG.BATCH_SIZE);
 
-    const importConversationChunk = conversationChunk =>
+    const importConversationChunk = (conversationChunk: any[]): Promise<void> =>
       this.conversationRepository.updateConversationStates(conversationChunk).then(importedConversationEntities => {
         importedEntities = importedEntities.concat(importedConversationEntities);
         this.logger.log(`Imported '${importedEntities.length}' of '${entityCount}' conversation states from backup`);
@@ -243,15 +284,15 @@ class BackupRepository {
     return this._chunkImport(importConversationChunk, entityChunks).then(() => importedEntities);
   }
 
-  _importHistoryEvents(eventEntities, progressCallback) {
+  private _importHistoryEvents(eventEntities: any[], progressCallback: (chunkLength: number) => void): Promise<void> {
     const entityCount = eventEntities.length;
     let importedEntities = 0;
 
     const entities = eventEntities.map(entity => this.mapEntityDataType(entity));
     const entityChunks = chunk(entities, BackupService.CONFIG.BATCH_SIZE);
 
-    const importEventChunk = eventChunk =>
-      this.backupService.importEntities(this.EVENTS_STORE_NAME, eventChunk).then(() => {
+    const importEventChunk = (eventChunk: any[]): Promise<void> =>
+      this.backupService.importEntities(StorageSchemata.OBJECT_STORE.EVENTS, eventChunk).then(() => {
         importedEntities += eventChunk.length;
         this.logger.log(`Imported '${importedEntities}' of '${entityCount}' events from backup`);
         progressCallback(eventChunk.length);
@@ -260,18 +301,16 @@ class BackupRepository {
     return this._chunkImport(importEventChunk, entityChunks);
   }
 
-  _chunkImport(importFunction, importChunks) {
-    return importChunks.reduce((promise, importChunk) => {
-      return promise.then(() => {
-        if (this.isCanceled) {
-          return Promise.reject(new z.backup.CancelError());
-        }
-        return importFunction(importChunk);
-      });
-    }, Promise.resolve());
+  private async _chunkImport(importFunction: (eventChunk: any[]) => Promise<void>, importChunks: any[]): Promise<void> {
+    for (const importChunk of importChunks) {
+      await importFunction(importChunk);
+      if (this.isCanceled) {
+        throw new z.backup.CancelError();
+      }
+    }
   }
 
-  _extractHistoryFiles(files) {
+  private _extractHistoryFiles(files: Record<string, JSZipObject>): Promise<FileDescriptor[]> {
     const unzipPromises = Object.values(files)
       .filter(zippedFile => zippedFile.name !== BackupRepository.CONFIG.FILENAME.METADATA)
       .map(zippedFile => zippedFile.async('string').then(value => ({content: value, filename: zippedFile.name})));
@@ -282,7 +321,7 @@ class BackupRepository {
     });
   }
 
-  mapEntityDataType(entity) {
+  mapEntityDataType(entity: any): any {
     if (entity.data) {
       BackupRepository.CONFIG.UINT8ARRAY_FIELDS.forEach(field => {
         const dataField = entity.data[field];
@@ -294,15 +333,15 @@ class BackupRepository {
     return entity;
   }
 
-  verifyMetadata(files) {
+  verifyMetadata(files: Record<string, JSZipObject>): Promise<void> {
     return files[BackupRepository.CONFIG.FILENAME.METADATA]
       .async('string')
-      .then(JSON.parse)
+      .then(rawData => JSON.parse(rawData))
       .then(metadata => this._verifyMetadata(metadata))
       .then(() => this.logger.log('Validated metadata during history import', files));
   }
 
-  _verifyMetadata(archiveMetadata) {
+  private _verifyMetadata(archiveMetadata: Metadata): void {
     const localMetadata = this.createMetaData();
     const isExpectedUserId = archiveMetadata.user_id === localMetadata.user_id;
     if (!isExpectedUserId) {
@@ -332,5 +371,3 @@ class BackupRepository {
     }
   }
 }
-
-export {BackupRepository};
