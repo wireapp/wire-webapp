@@ -198,7 +198,7 @@ export class BackupRepository {
         onProgress(tableRows, exportedEntitiesCount);
         tableData.push(tableRows);
       })
-      .then(() => [...tableData]);
+      .then(() => [].concat(...tableData));
   }
 
   private _compressHistoryFiles(exportedData: Record<string, any>): JSZip {
