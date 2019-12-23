@@ -1693,22 +1693,22 @@
   resolved "https://registry.yarnpkg.com/@wireapp/antiscroll-2/-/antiscroll-2-1.0.2.tgz#71a78d294ee0c88f42d50477ab61fa39272f5bca"
   integrity sha512-9KeB3yh9k01PjpuuRQsve4yY3+OVS2/hp9j+N13Is5wYCZRkUzZVCs8w9CyA/C6J5o9ukH0EzT7uurysWuhn/A==
 
-"@wireapp/api-client@9.2.8":
-  version "9.2.8"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-9.2.8.tgz#014dac69bd5b84a095f24836cb62173085eb0125"
-  integrity sha512-l4a5cyr9yJ1Lb6p5yp+CK99T4nIlUSyMhhbKzS6rBkBA3iuGKdqnfbNDmAaLKNlXnfeXAnzug2jdxL5nH2jTCQ==
+"@wireapp/api-client@9.3.3":
+  version "9.3.3"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-9.3.3.tgz#372d3981d1e83ea42dc0be3c6fa50f4e9068edb1"
+  integrity sha512-PyfY42xd9pQusVDXa3P7vrbQAr7rZt7lOxquY51y68xOQIHUnFfaCYOm2va1VDTTeaYgD9pp5+60lhSCuLBRfQ==
   dependencies:
     "@types/node" "~12"
     "@types/spark-md5" "3.0.2"
     "@types/tough-cookie" "2.3.6"
-    "@wireapp/commons" "3.0.3"
-    "@wireapp/priority-queue" "1.3.8"
+    "@wireapp/commons" "3.0.5"
+    "@wireapp/priority-queue" "1.3.9"
     axios "0.19.0"
-    logdown "3.2.8"
+    logdown "3.3.0"
     reconnecting-websocket "github:wireapp/reconnecting-websocket#96ac796ae8c7a7d9d857f46ed39dbedd7b9ad378"
     spark-md5 "3.0.0"
     tough-cookie "3.0.1"
-    ws "7.2.0"
+    ws "7.2.1"
 
 "@wireapp/avs@5.4.11":
   version "5.4.11"
@@ -1719,22 +1719,6 @@
   version "4.3.25"
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-4.3.25.tgz#50b6aca0b7512620bf36c3a1183286b6162e9958"
   integrity sha512-qyLiRgPTxfiV6ykI8+lCT9gRe77zgJe8wAsTooDI10uv70/jXjW0hrmTE0dY3eLUhtxTONOLBHy9eXtTnKA4LQ==
-
-"@wireapp/commons@3.0.3":
-  version "3.0.3"
-  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-3.0.3.tgz#b0c38f897b8d5e2873840ba31e8e437f5494f733"
-  integrity sha512-xYz4ZD34w6tkPgniY6VbxkXFRsiFVNdrbydj44q5fkNd7nwUD87BUdZxVNhgKiyF4jV6z2CqprWVE/4jFcTNog==
-  dependencies:
-    "@types/ansi-regex" "5.0.0"
-    "@types/fs-extra" "8.0.1"
-    "@types/node" "~12"
-    "@types/platform" "1.3.2"
-    ansi-regex "5.0.0"
-    fs-extra "8.1.0"
-    logdown "3.2.8"
-    moment "2.24.0"
-    platform "1.3.5"
-    url-search-params-polyfill "7.0.0"
 
 "@wireapp/commons@3.0.5":
   version "3.0.5"
@@ -1764,35 +1748,35 @@
     logdown "3.3.0"
     rimraf "3.0.0"
 
-"@wireapp/core@15.1.14":
-  version "15.1.14"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-15.1.14.tgz#965a25319a83782227c31d9493632a083137abf9"
-  integrity sha512-XP9nEbu5GbbKqJqY/kbrcGqH3FOY+hXlusp8CRYPvNCKwUT4lwFTFGa3uj9MiwH2kxibQVykQ65f9Uq2WuxB4Q==
+"@wireapp/core@15.1.18":
+  version "15.1.18"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-15.1.18.tgz#d63f6c450cfec59ef59286afd7d56af0a7953641"
+  integrity sha512-0+HiMtyYqFrPRL63MAS9OTAol/MrRdnd+iRMMkvHlZLWuRdIchPhCExupN9t/B5AhvyycJi9foO5FmeKSqUmSA==
   dependencies:
     "@types/long" "4.0.0"
     "@types/node" "~12"
-    "@wireapp/api-client" "9.2.8"
-    "@wireapp/cryptobox" "12.0.14"
+    "@wireapp/api-client" "9.3.3"
+    "@wireapp/cryptobox" "12.0.16"
     "@wireapp/protocol-messaging" "1.24.2"
-    "@wireapp/store-engine" "4.2.0"
+    "@wireapp/store-engine" "4.2.1"
     bazinga64 "5.5.34"
     hash.js "1.1.7"
-    logdown "3.2.8"
+    logdown "3.3.0"
     protobufjs "6.8.8"
     pure-uuid "1.5.7"
 
-"@wireapp/cryptobox@12.0.14":
-  version "12.0.14"
-  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-12.0.14.tgz#a5b8a34d6fa7aa85d50ee538d380e895a521a222"
-  integrity sha512-3V26e1i0BdWe0obMYww7o9EV6G5137THvZ0q6RB9vU3b51Jt1cm93ArITUxAvZM6KBf4jcqjK918Kr1QhH66sw==
+"@wireapp/cryptobox@12.0.16":
+  version "12.0.16"
+  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-12.0.16.tgz#6149717ecb51e0eb56f7226b7a4cddb2dbb9626e"
+  integrity sha512-6cuaarwiyETv9P4lzSyqQAtf/4vA1PUeVxz3q4wb25ZVtFTVfOWFb+09Z5ypfIgtcwAziR8K19pcQq2vw8LmZg==
   dependencies:
     "@types/node" "~12"
     "@wireapp/lru-cache" "3.3.30"
-    "@wireapp/priority-queue" "1.3.8"
+    "@wireapp/priority-queue" "1.3.9"
     "@wireapp/proteus" "9.4.27"
-    "@wireapp/store-engine" "4.2.0"
+    "@wireapp/store-engine" "4.2.1"
     bazinga64 "5.5.34"
-    logdown "3.2.8"
+    logdown "3.3.0"
 
 "@wireapp/eslint-config@1.2.1":
   version "1.2.1"
@@ -1809,13 +1793,13 @@
   resolved "https://registry.yarnpkg.com/@wireapp/prettier-config/-/prettier-config-0.3.0.tgz#e8129b31021c81d90d564d9c4ff0f7f7b514e943"
   integrity sha512-BFokvX4NZlkhWq5/OoJUCS8Iels+MeRgzpd5V9QR3hj5swwCFGxJOAL7soPXkSNWo91gI1qwiTp8szB1O9aCfQ==
 
-"@wireapp/priority-queue@1.3.8":
-  version "1.3.8"
-  resolved "https://registry.yarnpkg.com/@wireapp/priority-queue/-/priority-queue-1.3.8.tgz#2637ea289708b2605a623a84f2282ecc0558f6af"
-  integrity sha512-Sn/8jlpIB6g/pLA+UenRrGr9tNG/kzZTHOtI5JYV7fkI4rOQhJBfFKXp6AzkviVvmmG7aqcnFKqGVKWUyiSUYg==
+"@wireapp/priority-queue@1.3.9":
+  version "1.3.9"
+  resolved "https://registry.yarnpkg.com/@wireapp/priority-queue/-/priority-queue-1.3.9.tgz#96f2905d14369034e655372d70e5c7e99f3ecc28"
+  integrity sha512-dkZYJhXwRiPWR7iMw1M2vKyjDB3u/4Vp5z7QIJiONFme69EdcW3nhODINobB6Zvobz/GWA4yY9TIfNPDb4wkIw==
   dependencies:
     "@types/node" "~12"
-    logdown "3.2.8"
+    logdown "3.3.0"
     pure-uuid "1.5.7"
 
 "@wireapp/proteus@9.4.27":
@@ -1870,10 +1854,10 @@
     "@wireapp/websql" "0.0.15"
     uint32 "0.2.1"
 
-"@wireapp/store-engine@4.2.0":
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-4.2.0.tgz#5a8f7b89f2560e7072eef14d471408434731045e"
-  integrity sha512-y4wBSLZ7YlTQFOnwtbAF1erfPrU7Jt3Lb5KHgP7/DMYAcyKEtEVRRxr9DgQiVyH5lfpj0xmZGPnr0dH3II4xpA==
+"@wireapp/store-engine@4.2.1":
+  version "4.2.1"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-4.2.1.tgz#116e7ee855c2543ad57bc82e428d0afc70760740"
+  integrity sha512-Xat1iP6scchi8pFdFw254+YeHq8aWK3q1g4pDNZI2fnfaQegVqkmA176cVkEfKPh7+BeGZdzTs5iKo14HhZxXw==
   dependencies:
     "@types/node" "~12"
 
@@ -2403,7 +2387,7 @@ async-foreach@^0.1.3:
   resolved "https://registry.yarnpkg.com/async-foreach/-/async-foreach-0.1.3.tgz#36121f845c0578172de419a97dbeb1d16ec34542"
   integrity sha1-NhIfhFwFeBct5Bmpfb6x0W7DRUI=
 
-async-limiter@^1.0.0, async-limiter@~1.0.0:
+async-limiter@~1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/async-limiter/-/async-limiter-1.0.1.tgz#dd379e94f0db8310b08291f9d64c3209766617fd"
   integrity sha512-csOlWGAcRFJaI6m+F2WKdnMKr4HhdhFVBk0H/QbJFMCr+uO2kwohwXQPxw/9OCxp05r5ghVBFSyioixx3gfkNQ==
@@ -8027,13 +8011,6 @@ logdown@3.2.3:
   dependencies:
     chalk "^2.3.0"
 
-logdown@3.2.8:
-  version "3.2.8"
-  resolved "https://registry.yarnpkg.com/logdown/-/logdown-3.2.8.tgz#0bfff0c260a4a55f289f6b4420daefec30479843"
-  integrity sha512-ia/AslkwnxwWzaReeADifBwfh2xtUd/T/qdsnkrPlQbefKt4LkUWGSn/xWuhEwY3p2zSIhAZYcWCEGGIy9Lr2w==
-  dependencies:
-    chalk "^2.3.0"
-
 logdown@3.3.0:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/logdown/-/logdown-3.3.0.tgz#639dd2d3becaf0d9657ab63e812fa0e0f0b19fe7"
@@ -13011,11 +12988,6 @@ urix@^0.1.0:
   resolved "https://registry.yarnpkg.com/urix/-/urix-0.1.0.tgz#da937f7a62e21fec1fd18d49b35c2935067a6c72"
   integrity sha1-2pN/emLiH+wf0Y1Js1wpNQZ6bHI=
 
-url-search-params-polyfill@7.0.0:
-  version "7.0.0"
-  resolved "https://registry.yarnpkg.com/url-search-params-polyfill/-/url-search-params-polyfill-7.0.0.tgz#98b56ed29e67710588fdc3c361083b0f78303d95"
-  integrity sha512-0SEH3s+wCNbxEE/rWUalN004ICNi23Q74Ksc0gS2kG8EXnbayxGOrV97JdwnIVPKZ75Xk0hvKXvtIC4xReLMgg==
-
 url-search-params-polyfill@7.0.1:
   version "7.0.1"
   resolved "https://registry.yarnpkg.com/url-search-params-polyfill/-/url-search-params-polyfill-7.0.1.tgz#b900cd9a0d9d2ff757d500135256f2344879cbff"
@@ -13468,12 +13440,10 @@ write@1.0.3:
   dependencies:
     mkdirp "^0.5.1"
 
-ws@7.2.0:
-  version "7.2.0"
-  resolved "https://registry.yarnpkg.com/ws/-/ws-7.2.0.tgz#422eda8c02a4b5dba7744ba66eebbd84bcef0ec7"
-  integrity sha512-+SqNqFbwTm/0DC18KYzIsMTnEWpLwJsiasW/O17la4iDRRIO9uaHbvKiAS3AHgTiuuWerK/brj4O6MYZkei9xg==
-  dependencies:
-    async-limiter "^1.0.0"
+ws@7.2.1:
+  version "7.2.1"
+  resolved "https://registry.yarnpkg.com/ws/-/ws-7.2.1.tgz#03ed52423cd744084b2cf42ed197c8b65a936b8e"
+  integrity sha512-sucePNSafamSKoOqoNfBd8V0StlkzJKL2ZAhGQinCfNQ+oacw+Pk7lcdAElecBF2VkLNZRiIb5Oi1Q5lVUVt2A==
 
 ws@~3.3.1:
   version "3.3.3"
