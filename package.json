@@ -95,7 +95,7 @@
     "concurrently": "5.0.2",
     "cross-env": "6.0.3",
     "cssnano": "4.1.10",
-    "enzyme": "3.10.0",
+    "enzyme": "3.11.0",
     "enzyme-adapter-react-16": "1.15.1",
     "enzyme-to-json": "3.4.3",
     "eslint": "6.7.2",
