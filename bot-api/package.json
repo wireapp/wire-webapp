@@ -2,7 +2,7 @@
   "dependencies": {
     "@types/long": "4.0.0",
     "@wireapp/core": "15.1.18",
-    "pure-uuid": "1.5.7"
+    "pure-uuid": "1.5.8"
   },
   "devDependencies": {
     "cross-env": "6.0.3",
