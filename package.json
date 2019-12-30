@@ -17,7 +17,7 @@
     "ws": "7.2.1"
   },
   "devDependencies": {
-    "@babel/core": "7.7.5",
+    "@babel/core": "7.7.7",
     "@babel/preset-react": "7.7.4",
     "@types/jasmine": "3.5.0",
     "@types/karma": "3.0.5",
