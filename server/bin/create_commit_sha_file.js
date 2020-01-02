@@ -24,5 +24,7 @@ const path = require('path');
 const {execSync} = require('child_process');
 
 const distFolder = 'dist';
-const commitSha = execSync('git rev-parse HEAD').toString();
+const commitSha = execSync('git rev-parse HEAD')
+  .toString()
+  .trim();
 fs.outputFileSync(path.resolve(distFolder, 'commit'), commitSha);
