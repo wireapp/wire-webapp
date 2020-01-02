@@ -18,11 +18,12 @@
  */
 
 import ko from 'knockout';
+import {Router} from './Router';
 
-export function initRouterBindings(routerInstance) {
+export function initRouterBindings(routerInstance: Router): void {
   ko.bindingHandlers.link_to = {
-    init(element, valueAccessor) {
-      const navigate = event => {
+    init(element: Node, valueAccessor): void {
+      const navigate = (event: Event) => {
         routerInstance.navigate(valueAccessor());
         event.preventDefault();
       };
