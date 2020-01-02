@@ -110,10 +110,10 @@ export class ContentMessage extends Message {
       return false;
     }
 
-    let newReactions = {...this.reactions()};
+    const newReactions = {...this.reactions()};
 
     if (shouldAdd) {
-      newReactions = {...newReactions, [from]: reaction};
+      newReactions[from] = reaction;
     } else {
       delete newReactions[from];
     }
