@@ -17,18 +17,40 @@
  *
  */
 
-import {t, Declension, joinNames} from 'Util/LocalizerUtil';
+import ko from 'knockout';
+
+import {Declension, joinNames, t} from 'Util/LocalizerUtil';
 import {getFirstName} from 'Util/SanitizationUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 
-import {User} from '../User';
-import {ClientEvent} from '../../event/Client';
 import {BackendEvent} from '../../event/Backend';
-import {SystemMessageType} from '../../message/SystemMessageType';
-import {SystemMessage} from './SystemMessage';
+import {ClientEvent} from '../../event/Client';
 import {SuperType} from '../../message/SuperType';
+import {SystemMessageType} from '../../message/SystemMessageType';
+import {User} from '../User';
+import {SystemMessage} from './SystemMessage';
 
 export class MemberMessage extends SystemMessage {
+  private readonly allTeamMembers: User[];
+  private readonly exceedsMaxVisibleUsers: ko.PureComputed<boolean>;
+  private readonly hasUsers: ko.PureComputed<boolean>;
+  private readonly hiddenUserCount: ko.PureComputed<number>;
+  private readonly joinedUserEntities: ko.PureComputed<User[]>;
+  private readonly name: ko.Observable<string>;
+  private readonly otherUser: ko.PureComputed<User>;
+  private readonly senderName: ko.PureComputed<string>;
+  private readonly showNamedCreation: ko.PureComputed<boolean>;
+  private readonly visibleUsers: ko.Observable<User[]>;
+  public readonly highlightedUsers: ko.PureComputed<User[]>;
+  public readonly htmlCaption: ko.PureComputed<string>;
+  public readonly htmlGroupCreationHeader: ko.PureComputed<string>;
+  public readonly memberMessageType: SystemMessageType;
+  public readonly remoteUserEntities: ko.PureComputed<User[]>;
+  public readonly showServicesWarning: boolean;
+  public readonly userEntities: ko.ObservableArray<User>;
+  public readonly userIds: ko.ObservableArray<string>;
+
+  // tslint:disable-next-line:typedef
   static get CONFIG() {
     return {
       MAX_USERS_VISIBLE: 17,
@@ -56,15 +78,13 @@ export class MemberMessage extends SystemMessage {
       return this.type === BackendEvent.CONVERSATION.MEMBER_JOIN ? this.joinedUserEntities() : [];
     });
 
-    this.hasUsers = ko.pureComputed(() => this.userEntities().length);
+    this.hasUsers = ko.pureComputed(() => !!this.userEntities().length);
     this.allTeamMembers = undefined;
     this.showServicesWarning = false;
 
     // Users joined the conversation without sender
     this.joinedUserEntities = ko.pureComputed(() => {
-      return this.userEntities()
-        .filter(userEntity => !this.user() || this.user().id !== userEntity.id)
-        .map(userEntity => userEntity);
+      return this.userEntities().filter(userEntity => !this.user() || this.user().id !== userEntity.id);
     });
 
     this.joinedUserEntities.subscribe(joinedUserEntities => {
@@ -92,7 +112,7 @@ export class MemberMessage extends SystemMessage {
       return isTeamMemberLeave ? this.name() : getFirstName(this.user(), Declension.NOMINATIVE, true);
     });
 
-    this.showNamedCreation = ko.pureComputed(() => this.isConversationCreate() && this.name().length);
+    this.showNamedCreation = ko.pureComputed(() => this.isConversationCreate() && !!this.name().length);
 
     this.otherUser = ko.pureComputed(() => (this.hasUsers() ? this.userEntities()[0] : new User()));
 
@@ -107,8 +127,8 @@ export class MemberMessage extends SystemMessage {
       };
 
       const count = this.hiddenUserCount();
-      const dativeUsers = this._generateNameString(this.exceedsMaxVisibleUsers(), Declension.DATIVE);
-      const accusativeUsers = this._generateNameString(this.exceedsMaxVisibleUsers(), Declension.ACCUSATIVE);
+      const dativeUsers = this.generateNameString(this.exceedsMaxVisibleUsers(), Declension.DATIVE);
+      const accusativeUsers = this.generateNameString(this.exceedsMaxVisibleUsers(), Declension.ACCUSATIVE);
       const name = this.senderName();
 
       switch (this.memberMessageType) {
@@ -143,23 +163,23 @@ export class MemberMessage extends SystemMessage {
             }
 
             return this.exceedsMaxVisibleUsers()
-              ? t('conversationCreateWithMore', {count, users: dativeUsers}, replaceShowMore)
+              ? t('conversationCreateWithMore', {count: count.toString(), users: dativeUsers}, replaceShowMore)
               : t('conversationCreateWith', dativeUsers);
           }
 
           if (this.user().is_me) {
             return this.exceedsMaxVisibleUsers()
-              ? t('conversationCreatedYouMore', {count, users: dativeUsers}, replaceShowMore)
+              ? t('conversationCreatedYouMore', {count: count.toString(), users: dativeUsers}, replaceShowMore)
               : t('conversationCreatedYou', dativeUsers);
           }
 
           return this.exceedsMaxVisibleUsers()
-            ? t('conversationCreatedMore', {count, name, users: dativeUsers}, replaceShowMore)
+            ? t('conversationCreatedMore', {count: count.toString(), name, users: dativeUsers}, replaceShowMore)
             : t('conversationCreated', {name, users: dativeUsers});
         }
 
         case SystemMessageType.CONVERSATION_RESUME: {
-          return t('conversationResume', this._generateNameString(false, Declension.DATIVE));
+          return t('conversationResume', this.generateNameString(false, Declension.DATIVE));
         }
 
         default:
@@ -177,11 +197,15 @@ export class MemberMessage extends SystemMessage {
 
           if (this.user().is_me) {
             return this.exceedsMaxVisibleUsers()
-              ? t('conversationMemberJoinedYouMore', {count, users: accusativeUsers}, replaceShowMore)
+              ? t('conversationMemberJoinedYouMore', {count: count.toString(), users: accusativeUsers}, replaceShowMore)
               : t('conversationMemberJoinedYou', accusativeUsers, replaceShowMore);
           }
           return this.exceedsMaxVisibleUsers()
-            ? t('conversationMemberJoinedMore', {count, name, users: accusativeUsers}, replaceShowMore)
+            ? t(
+                'conversationMemberJoinedMore',
+                {count: count.toString(), name, users: accusativeUsers},
+                replaceShowMore,
+              )
             : t('conversationMemberJoined', {name, users: accusativeUsers}, replaceShowMore);
         }
 
@@ -196,7 +220,7 @@ export class MemberMessage extends SystemMessage {
             return this.user().is_me ? t('conversationMemberLeftYou') : t('conversationMemberLeft', name);
           }
 
-          const allUsers = this._generateNameString();
+          const allUsers = this.generateNameString();
           return this.user().is_me
             ? t('conversationMemberRemovedYou', allUsers)
             : t('conversationMemberRemoved', {name, users: allUsers});
@@ -225,28 +249,27 @@ export class MemberMessage extends SystemMessage {
       }
       return '';
     });
-
-    this.showLargeAvatar = () => {
-      const largeAvatarTypes = [SystemMessageType.CONNECTION_ACCEPTED, SystemMessageType.CONNECTION_REQUEST];
-      return largeAvatarTypes.includes(this.memberMessageType);
-    };
   }
 
-  _generateNameString(skipAnd = false, declension = Declension.ACCUSATIVE) {
+  showLargeAvatar = (): boolean => {
+    const largeAvatarTypes = [SystemMessageType.CONNECTION_ACCEPTED, SystemMessageType.CONNECTION_REQUEST];
+    return largeAvatarTypes.includes(this.memberMessageType);
+  };
+
+  private generateNameString(skipAnd = false, declension = Declension.ACCUSATIVE): string {
     return joinNames(this.visibleUsers(), declension, skipAnd, true);
   }
 
-  isConnection() {
+  isConnection(): boolean {
     const connectionMessageTypes = [SystemMessageType.CONNECTION_ACCEPTED, SystemMessageType.CONNECTION_REQUEST];
-
     return connectionMessageTypes.includes(this.memberMessageType);
   }
 
-  isConnectionRequest() {
+  isConnectionRequest(): boolean {
     return this.memberMessageType === SystemMessageType.CONNECTION_REQUEST;
   }
 
-  isCreation() {
+  isCreation(): boolean {
     return [
       SystemMessageType.CONNECTION_ACCEPTED,
       SystemMessageType.CONNECTION_REQUEST,
@@ -255,43 +278,43 @@ export class MemberMessage extends SystemMessage {
     ].includes(this.memberMessageType);
   }
 
-  isConversationCreate() {
+  isConversationCreate(): boolean {
     return this.memberMessageType === SystemMessageType.CONVERSATION_CREATE;
   }
 
-  isConversationResume() {
+  isConversationResume(): boolean {
     return this.memberMessageType === SystemMessageType.CONVERSATION_RESUME;
   }
 
-  isGroupCreation() {
+  isGroupCreation(): boolean {
     return this.isConversationCreate() || this.isConversationResume();
   }
 
-  isMemberChange() {
+  isMemberChange(): boolean {
     return this.isMemberJoin() || this.isMemberLeave() || this.isTeamMemberLeave();
   }
 
-  isMemberJoin() {
+  isMemberJoin(): boolean {
     return this.type === BackendEvent.CONVERSATION.MEMBER_JOIN;
   }
 
-  isMemberLeave() {
+  isMemberLeave(): boolean {
     return this.type === BackendEvent.CONVERSATION.MEMBER_LEAVE;
   }
 
-  isTeamMemberLeave() {
+  isTeamMemberLeave(): boolean {
     return this.type === ClientEvent.CONVERSATION.TEAM_MEMBER_LEAVE;
   }
 
-  isMemberRemoval() {
+  isMemberRemoval(): boolean {
     return this.isMemberLeave() || this.isTeamMemberLeave();
   }
 
-  isUserAffected(userId) {
+  isUserAffected(userId: string): boolean {
     return this.userIds().includes(userId);
   }
 
-  guestCount() {
+  guestCount(): number {
     return this.joinedUserEntities().filter(user => user.isGuest()).length;
   }
 }

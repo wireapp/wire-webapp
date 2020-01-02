@@ -21,23 +21,28 @@ import ko from 'knockout';
 
 import {renderMessage} from 'Util/messageRenderer';
 
-import {Asset} from './Asset';
 import {AssetType} from '../../assets/AssetType';
 import {containsOnlyLink} from '../../links/LinkPreviewHelpers';
 import {mediaParser} from '../../media/MediaParser';
+import {MentionEntity} from '../../message/MentionEntity';
+import {Asset} from './Asset';
+import {LinkPreview} from './LinkPreview';
 
 export class Text extends Asset {
-  constructor(id, text = '') {
+  /** Array of MentionEntity instances */
+  public readonly mentions: ko.ObservableArray<MentionEntity>;
+  /** Array of LinkPreview instances */
+  public readonly previews: ko.ObservableArray<LinkPreview>;
+  public readonly should_render_text: ko.PureComputed<boolean>;
+  /** Raw message text */
+  public readonly text: string;
+
+  constructor(id?: string, text: string = '') {
     super(id);
     this.type = AssetType.TEXT;
 
-    // Raw message text
     this.text = text;
-
-    // Array of MentionEntity instances
     this.mentions = ko.observableArray();
-
-    // Array of LinkPreview instances
     this.previews = ko.observableArray();
 
     this.should_render_text = ko.pureComputed(() => {
@@ -50,12 +55,12 @@ export class Text extends Asset {
   }
 
   // Process text before rendering it
-  render(selfId, themeColor) {
+  render(selfId: string, themeColor: string): string {
     const message = renderMessage(this.text, selfId, this.mentions());
     return !this.previews().length ? mediaParser.renderMediaEmbeds(message, themeColor) : message;
   }
 
-  isUserMentioned(userId) {
+  isUserMentioned(userId: string): boolean {
     return this.mentions().some(mentionEntity => mentionEntity.targetsUser(userId));
   }
 }

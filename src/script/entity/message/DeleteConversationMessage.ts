@@ -18,12 +18,17 @@
  */
 
 import {t} from 'Util/LocalizerUtil';
+
 import {BackendEvent} from '../../event/Backend';
 import {SystemMessageType} from '../../message/SystemMessageType';
+import {Conversation} from '../Conversation';
 import {SystemMessage} from './SystemMessage';
 
 export class DeleteConversationMessage extends SystemMessage {
-  constructor(conversationEntity) {
+  public readonly system_message_type: SystemMessageType;
+  public readonly caption: string;
+
+  constructor(conversationEntity: Conversation) {
     super();
 
     this.type = BackendEvent.TEAM.DELETE;
