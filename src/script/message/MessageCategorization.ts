@@ -22,7 +22,7 @@ import {isObject} from 'underscore';
 import {ClientEvent} from '../event/Client';
 import {MessageCategory} from './MessageCategory';
 
-const _checkAsset = event => {
+const _checkAsset = (event: any): MessageCategory | void => {
   const {data: eventData, type: eventType} = event;
 
   const isAssetAdd = eventType === ClientEvent.CONVERSATION.ASSET_ADD;
@@ -41,21 +41,21 @@ const _checkAsset = event => {
   }
 };
 
-const _checkLocation = event => {
+const _checkLocation = (event: any): MessageCategory | void => {
   const isLocation = event.type === ClientEvent.CONVERSATION.LOCATION;
   if (isLocation) {
     return MessageCategory.LOCATION;
   }
 };
 
-const _checkPing = event => {
+const _checkPing = (event: any): MessageCategory | void => {
   const isPing = event.type === ClientEvent.CONVERSATION.KNOCK;
   if (isPing) {
     return MessageCategory.KNOCK;
   }
 };
 
-const _checkText = event => {
+const _checkText = (event: any): MessageCategory | void => {
   const {data: eventData, type: eventType} = event;
 
   const isMessageAdd = eventType === ClientEvent.CONVERSATION.MESSAGE_ADD;
@@ -71,7 +71,7 @@ const _checkText = event => {
   }
 };
 
-export const categoryFromEvent = event => {
+export const categoryFromEvent = (event: any): MessageCategory | void => {
   try {
     const eventReactions = event.reactions;
     let category = MessageCategory.NONE;

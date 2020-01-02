@@ -23,7 +23,7 @@ const TerserJSPlugin = require('terser-webpack-plugin');
 
 module.exports = {
   ...commonConfig,
-  mode: 'development',
+  mode: 'production',
   optimization: {
     ...commonConfig.optimization,
     minimizer: [

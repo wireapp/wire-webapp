@@ -46,7 +46,9 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
     this.canChangeRole = ko.pureComputed(
       () =>
         this.conversationRoleRepository.canChangeParticipantRoles(this.activeConversation()) &&
-        !this.selectedParticipant()?.is_me,
+        !!this.selectedParticipant() &&
+        !this.selectedParticipant().is_me &&
+        !this.selectedParticipant().isTemporaryGuest(),
     );
 
     this.isAdmin = ko.pureComputed(
