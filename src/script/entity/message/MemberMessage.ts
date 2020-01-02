@@ -102,9 +102,7 @@ export class MemberMessage extends SystemMessage {
 
     // Users joined the conversation without self
     this.remoteUserEntities = ko.pureComputed(() => {
-      return this.userEntities()
-        .filter(userEntity => !userEntity.is_me)
-        .map(userEntity => userEntity);
+      return this.userEntities().filter(userEntity => !userEntity.is_me);
     });
 
     this.senderName = ko.pureComputed(() => {
