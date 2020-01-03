@@ -17,11 +17,11 @@
  *
  */
 
+import {ConnectionStatus} from '@wireapp/api-client/dist/connection';
 import {instantiateComponent} from '../../../helper/knockoutHelpers';
 
 import {User} from 'src/script/entity/User';
 import {Conversation} from 'src/script/entity/Conversation';
-import {ConnectionStatus} from 'src/script/connection/ConnectionStatus';
 
 import 'src/script/components/icons';
 import 'src/script/components/panel/userActions';

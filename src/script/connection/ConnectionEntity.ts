@@ -17,8 +17,8 @@
  *
  */
 
+import {ConnectionStatus} from '@wireapp/api-client/dist/connection';
 import ko from 'knockout';
-import {ConnectionStatus} from './ConnectionStatus';
 
 export class ConnectionEntity {
   conversationId: string;

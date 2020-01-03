@@ -37,6 +37,7 @@ import {
   Text,
 } from '@wireapp/protocol-messaging';
 import {flatten} from 'underscore';
+import {ConnectionStatus} from '@wireapp/api-client/dist/connection';
 
 import {getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -81,7 +82,6 @@ import {ConversationEphemeralHandler} from './ConversationEphemeralHandler';
 import {ClientMismatchHandler} from './ClientMismatchHandler';
 import {ConversationLabelRepository} from './ConversationLabelRepository';
 
-import {ConnectionStatus} from '../connection/ConnectionStatus';
 import {buildMetadata, isVideo, isImage, isAudio} from '../assets/AssetMetaDataBuilder';
 import {AssetTransferState} from '../assets/AssetTransferState';
 import {AssetRemoteData} from '../assets/AssetRemoteData';

@@ -17,6 +17,8 @@
  *
  */
 
+import {ConnectionStatus} from '@wireapp/api-client/dist/connection';
+
 import {createRandomUuid} from 'Util/util';
 
 import {backendConfig} from '../../api/testResolver';
@@ -24,9 +26,7 @@ import {backendConfig} from '../../api/testResolver';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {WebAppEvents} from 'src/script/event/WebApp';
-
 import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
-import {ConnectionStatus} from 'src/script/connection/ConnectionStatus';
 
 describe('ConnectionRepository', () => {
   let server = undefined;
