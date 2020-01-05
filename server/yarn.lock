@@ -1775,12 +1775,12 @@ map-age-cleaner@^0.1.1, map-age-cleaner@^0.1.3:
   dependencies:
     p-defer "^1.0.0"
 
-maxmind@4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/maxmind/-/maxmind-4.0.0.tgz#d288a61e3c8539547541041288d55391abe2bf5b"
-  integrity sha512-8pAhn0SfqOYzaQSBHkeBb7W7yYMwOHaEVkHPulSZ1cgbFqSZk6sZcYoJ+TxVswcnqlqtkwkVCXqTEUOJaz8+DA==
+maxmind@4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/maxmind/-/maxmind-4.1.0.tgz#d42c10f74ff9e27c338ea5f7001e0e080557a04c"
+  integrity sha512-rcJ9EDNDFttuD8zrJSrcBwladOfrGbm37kF8OpgUn7N2ZtgyBQzxtg81Chqkmq2pFyCClBhQ8Nv2zBvoeIuqiQ==
   dependencies:
-    tiny-lru "6.0.1"
+    tiny-lru "7.0.2"
 
 media-typer@0.3.0:
   version "0.3.0"
@@ -2790,10 +2790,10 @@ thunkify@^2.1.2:
   resolved "https://registry.yarnpkg.com/thunkify/-/thunkify-2.1.2.tgz#faa0e9d230c51acc95ca13a361ac05ca7e04553d"
   integrity sha1-+qDp0jDFGsyVyhOjYawFyn4EVT0=
 
-tiny-lru@6.0.1:
-  version "6.0.1"
-  resolved "https://registry.yarnpkg.com/tiny-lru/-/tiny-lru-6.0.1.tgz#558bd6b7232b8b9dfa482147539676fdd75a3a07"
-  integrity sha512-k/vdHz+bFALjmik0URLWBYNuO0hCABTL5dullbZBXvFDdlL8RrKaeLR6YuHfX+6ZXOLkHw+HpNLCUA7DtLMQmg==
+tiny-lru@7.0.2:
+  version "7.0.2"
+  resolved "https://registry.yarnpkg.com/tiny-lru/-/tiny-lru-7.0.2.tgz#6a8853deb1e355f4c8863bf1289337e3e3a7e973"
+  integrity sha512-cmc9OOwmnAJtyFBYaznKR3abypEhWecarFrvS5db6qwSgoaDUWV0JX+mdh6B9wN60Wux3+gE1vjzxkoqxFBjqw==
 
 to-fast-properties@^2.0.0:
   version "2.0.0"
