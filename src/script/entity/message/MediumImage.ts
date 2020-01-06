@@ -24,11 +24,11 @@ import {AssetRemoteData} from '../../assets/AssetRemoteData';
 import {AssetType} from '../../assets/AssetType';
 import {File} from './File';
 
-export class MediumImage extends File {
-  private readonly resource: ko.Observable<AssetRemoteData>;
-  public readonly correlation_id: string;
-  public readonly height: string;
-  public readonly width: string;
+class MediumImage extends File {
+  correlation_id: string;
+  height: string;
+  resource: ko.Observable<AssetRemoteData>;
+  width: string;
 
   constructor(id: string) {
     super(id);
@@ -58,3 +58,5 @@ export class MediumImage extends File {
       .catch(error => this.logger.error('Failed to download image', error));
   }
 }
+
+export {MediumImage};

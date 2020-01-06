@@ -17,24 +17,18 @@
  *
  */
 
-import moment from 'moment';
-
-import {t} from 'Util/LocalizerUtil';
-
-import {SuperType} from '../../message/SuperType';
 import {Message} from './Message';
+import {SystemMessageType} from '../../message/SystemMessageType';
+import {SuperType} from '../../message/SuperType';
 
-export class DeleteMessage extends Message {
-  public deleted_timestamp: null | number;
-
+export class SystemMessage extends Message {
   constructor() {
     super();
-
-    this.super_type = SuperType.DELETE;
-    this.deleted_timestamp = null;
+    this.super_type = SuperType.SYSTEM;
+    this.system_message_type = SystemMessageType.NORMAL;
   }
 
-  display_deleted_timestamp = () => {
-    return t('conversationDeleteTimestamp', moment(this.deleted_timestamp).format('LT'));
-  };
+  is_conversation_rename() {
+    return this.system_message_type === SystemMessageType.CONVERSATION_RENAME;
+  }
 }

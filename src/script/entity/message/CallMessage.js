@@ -17,21 +17,14 @@
  *
  */
 
-import ko from 'knockout';
 import {t} from 'Util/LocalizerUtil';
 
-import {TERMINATION_REASON} from '../../calling/enum/TerminationReason';
+import {Message} from './Message';
 import {CALL_MESSAGE_TYPE} from '../../message/CallMessageType';
 import {SuperType} from '../../message/SuperType';
-import {Message} from './Message';
 
 export class CallMessage extends Message {
-  private readonly call_message_type: CALL_MESSAGE_TYPE;
-  private readonly duration: number;
-  public readonly caption?: ko.PureComputed<string>;
-  public readonly finished_reason: TERMINATION_REASON;
-
-  constructor(type: CALL_MESSAGE_TYPE, reason?: TERMINATION_REASON, duration: number = 0) {
+  constructor(type, reason = undefined, duration = 0) {
     super();
     this.super_type = SuperType.CALL;
     this.call_message_type = type;
@@ -43,15 +36,15 @@ export class CallMessage extends Message {
     );
   }
 
-  is_activation(): boolean {
+  is_activation() {
     return this.call_message_type === CALL_MESSAGE_TYPE.ACTIVATED;
   }
 
-  is_deactivation(): boolean {
+  is_deactivation() {
     return this.call_message_type === CALL_MESSAGE_TYPE.DEACTIVATED;
   }
 
-  was_completed(): boolean {
+  was_completed() {
     return this.duration > 0;
   }
 }

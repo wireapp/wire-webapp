@@ -17,35 +17,17 @@
  *
  */
 
-import ko from 'knockout';
 import moment from 'moment';
+import ko from 'knockout';
 
 import {copyText} from 'Util/ClipboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import {QuoteEntity} from '../../message/QuoteEntity';
-import {SuperType} from '../../message/SuperType';
-import {User} from '../User';
-import {Asset} from './Asset';
-import {File as FileAsset} from './File';
 import {Message} from './Message';
-import {Text as TextAsset} from './Text';
+import {SuperType} from '../../message/SuperType';
 
 export class ContentMessage extends Message {
-  private readonly edited_timestamp: ko.Observable<number>;
-  private readonly is_liked_provisional: ko.Observable<boolean>;
-  private readonly quote: ko.Observable<QuoteEntity>;
-  private readonly reactions_user_ets: ko.ObservableArray<User>;
-  private readonly reactions: ko.Observable<Record<string, string>>;
-  public readonly assets: ko.ObservableArray<Asset>;
-  public readonly is_liked: ko.PureComputed<boolean>;
-  public readonly like_caption: ko.PureComputed<string>;
-  public readonly other_likes: ko.PureComputed<User[]>;
-  public readonly reactions_user_ids: ko.PureComputed<void>;
-  public readonly was_edited: ko.PureComputed<boolean>;
-  public replacing_message_id: null | string;
-
-  constructor(id: string) {
+  constructor(id) {
     super(id);
 
     this.assets = ko.observableArray([]);
@@ -65,6 +47,10 @@ export class ContentMessage extends Message {
 
     this.quote = ko.observable();
     this.readReceipts = ko.observableArray([]);
+
+    this.display_edited_timestamp = () => {
+      return t('conversationEditTimestamp', moment(this.edited_timestamp()).format('LT'));
+    };
 
     this.is_liked_provisional = ko.observable();
     this.is_liked = ko.pureComputed({
@@ -93,37 +79,28 @@ export class ContentMessage extends Message {
     });
   }
 
-  display_edited_timestamp = () => {
-    return t('conversationEditTimestamp', moment(this.edited_timestamp()).format('LT'));
-  };
-
   /**
    * Add another content asset to the message.
-   * @param asset_et New content asset
+   * @param {Asset} asset_et - New content asset
+   * @returns {undefined} No return value
    */
-  add_asset(asset_et: Asset): void {
+  add_asset(asset_et) {
     this.assets.push(asset_et);
   }
 
-  copy(): void {
-    copyText((this.get_first_asset() as TextAsset).text);
+  copy() {
+    copyText(this.get_first_asset().text);
   }
 
   /**
    * Get the first asset attached to the message.
-   * @returns The first asset attached to the message
+   * @returns {Asset} The first asset attached to the message
    */
-  get_first_asset(): Asset {
+  get_first_asset() {
     return this.assets()[0];
   }
 
-  getUpdatedReactions({
-    data: event_data,
-    from,
-  }: {
-    data: {reaction: string};
-    from: string;
-  }): false | {reactions: Record<string, string>; version: number} {
+  getUpdatedReactions({data: event_data, from}) {
     const reaction = event_data && event_data.reaction;
     const hasUser = this.reactions()[from];
     const shouldAdd = reaction && !hasUser;
@@ -133,7 +110,7 @@ export class ContentMessage extends Message {
       return false;
     }
 
-    const newReactions = {...this.reactions()};
+    const newReactions = Object.assign({}, this.reactions());
 
     if (shouldAdd) {
       Object.assign(newReactions, {[from]: reaction});
@@ -145,45 +122,47 @@ export class ContentMessage extends Message {
   }
 
   /**
-   * @param userId The user id to check
-   * @returns `true` if the message mentions the user, `false` otherwise.
+   * @param {string} userId - The user id to check
+   * @returns {boolean} `true` if the message mentions the user.
    */
-  isUserMentioned(userId: string): boolean {
+  isUserMentioned(userId) {
     return this.has_asset_text()
       ? this.assets().some(assetEntity => assetEntity.is_text() && assetEntity.isUserMentioned(userId))
       : false;
   }
 
   /**
-   * @param userId The user id to check
-   * @returns `true` if the message quotes the user, `false` otherwise.
+   * @param {string} userId - The user id to check
+   * @returns {boolean} `true` if the message quotes the user.
    */
-  isUserQuoted(userId: string): boolean {
+  isUserQuoted(userId) {
     return this.quote() ? this.quote().isQuoteFromUser(userId) : false;
   }
 
   /**
-   * @param userId The user id to check
-   * @returns `true` if the user was mentioned or quoted, `false` otherwise.
+   * @param {string} userId - The user id to check
+   * @returns {boolean} `true` if the user was mentioned or quoted.
    */
-  isUserTargeted(userId: string): boolean {
+  isUserTargeted(userId) {
     return this.isUserMentioned(userId) || this.isUserQuoted(userId);
   }
 
   /**
    * Download message content.
+   * @returns {undefined} No return value
    */
-  download(): void {
-    const asset_et = this.get_first_asset() as FileAsset;
-    asset_et.download();
+  download() {
+    const asset_et = this.get_first_asset();
+    const file_name = this.get_content_name();
+    asset_et.download(file_name);
   }
 
   /**
    * Get content name.
-   * @returns The content/file name.
+   * @returns {string} The content/file name.
    */
-  get_content_name(): string {
-    const asset_et = this.get_first_asset() as FileAsset;
+  get_content_name() {
+    const asset_et = this.get_first_asset();
     let {file_name} = asset_et;
 
     if (!file_name) {

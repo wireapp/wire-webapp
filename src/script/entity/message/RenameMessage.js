@@ -17,22 +17,20 @@
  *
  */
 
-import {AssetType} from '../../assets/AssetType';
-import {Asset} from './Asset';
+import {t} from 'Util/LocalizerUtil';
 
-export class Location extends Asset {
-  readonly latitude: string;
-  readonly longitude: string;
-  readonly name: string;
-  readonly zoom: string;
+import {BackendEvent} from '../../event/Backend';
+import {SystemMessageType} from '../../message/SystemMessageType';
+import {SystemMessage} from './SystemMessage';
 
+export class RenameMessage extends SystemMessage {
   constructor() {
     super();
 
-    this.latitude = '';
-    this.longitude = '';
+    this.type = BackendEvent.CONVERSATION.RENAME;
+    this.system_message_type = SystemMessageType.CONVERSATION_RENAME;
     this.name = '';
-    this.type = AssetType.LOCATION;
-    this.zoom = '';
+
+    this.caption = ko.pureComputed(() => (this.user().is_me ? t('conversationRenameYou') : t('conversationRename')));
   }
 }
