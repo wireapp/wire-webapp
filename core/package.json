@@ -34,7 +34,7 @@
     "karma-sourcemap-loader": "0.3.7",
     "karma-spec-reporter": "0.0.32",
     "mock-socket": "9.0.2",
-    "nock": "11.7.0",
+    "nock": "11.7.1",
     "nyc": "15.0.0",
     "rimraf": "3.0.0",
     "ts-node": "8.5.4",
