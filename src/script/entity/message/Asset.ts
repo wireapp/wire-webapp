@@ -18,10 +18,6 @@
  */
 
 import {AssetType} from '../../assets/AssetType';
-import {File as FileAsset} from './File';
-import {Location as LocationAsset} from './Location';
-import {MediumImage as MediumImageAsset} from './MediumImage';
-import {Text as TextAsset} from './Text';
 
 export interface AssetPayload {
   id: string;
@@ -31,31 +27,31 @@ export interface AssetPayload {
 }
 
 export class Asset {
-  public file_type?: string;
-  public id?: string;
+  public file_type: string;
+  public id: string;
   public key: string;
   public size: string;
   public type: string;
 
-  constructor(id?: string) {
+  constructor(id: string) {
     this.id = id;
     this.key = '';
     this.type = '';
   }
 
-  is_image(): this is MediumImageAsset {
+  is_image(): boolean {
     return this.type === AssetType.IMAGE;
   }
 
-  is_text(): this is TextAsset {
+  is_text(): boolean {
     return this.type === AssetType.TEXT;
   }
 
-  is_file(): this is FileAsset {
+  is_file(): boolean {
     return this.type === AssetType.FILE && !this.is_video() && !this.is_audio();
   }
 
-  is_location(): this is LocationAsset {
+  is_location(): boolean {
     return this.type === AssetType.LOCATION;
   }
 

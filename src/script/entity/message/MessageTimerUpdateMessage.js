@@ -17,25 +17,32 @@
  *
  */
 
-import ko from 'knockout';
 import {t} from 'Util/LocalizerUtil';
+import {formatDuration} from 'Util/TimeUtil';
 
 import {BackendEvent} from '../../event/Backend';
 import {SystemMessageType} from '../../message/SystemMessageType';
 import {SystemMessage} from './SystemMessage';
+import {ConversationEphemeralHandler} from '../../conversation/ConversationEphemeralHandler';
 
-export class RenameMessage extends SystemMessage {
-  public readonly system_message_type: SystemMessageType;
-  public readonly name: string;
-  public readonly caption: ko.PureComputed<string>;
-
-  constructor() {
+export class MessageTimerUpdateMessage extends SystemMessage {
+  constructor(messageTimer) {
     super();
 
-    this.type = BackendEvent.CONVERSATION.RENAME;
-    this.system_message_type = SystemMessageType.CONVERSATION_RENAME;
-    this.name = '';
+    this.type = BackendEvent.CONVERSATION.MESSAGE_TIMER_UPDATE;
+    this.system_message_type = SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE;
 
-    this.caption = ko.pureComputed(() => (this.user().is_me ? t('conversationRenameYou') : t('conversationRename')));
+    this.message_timer = ConversationEphemeralHandler.validateTimer(messageTimer);
+
+    this.caption = ko.pureComputed(() => {
+      if (this.message_timer) {
+        const timeString = formatDuration(this.message_timer).text;
+        return this.user().is_me
+          ? t('conversationUpdatedTimerYou', timeString)
+          : t('conversationUpdatedTimer', timeString);
+      }
+
+      return this.user().is_me ? t('conversationResetTimerYou') : t('conversationResetTimer');
+    });
   }
 }

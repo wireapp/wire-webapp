@@ -17,16 +17,12 @@
  *
  */
 
-import ko from 'knockout';
 import {t} from 'Util/LocalizerUtil';
 
 import {SuperType} from '../../message/SuperType';
 import {Message} from './Message';
 
 export class PingMessage extends Message {
-  public readonly caption: ko.PureComputed<string>;
-  public readonly get_icon_classes: ko.PureComputed<string>;
-
   constructor() {
     super();
     this.super_type = SuperType.PING;

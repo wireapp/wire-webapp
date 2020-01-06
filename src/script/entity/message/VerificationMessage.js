@@ -17,32 +17,15 @@
  *
  */
 
-import {amplify} from 'amplify';
-import ko from 'knockout';
-
-import {Declension, joinNames, t} from 'Util/LocalizerUtil';
+import {t, Declension, joinNames} from 'Util/LocalizerUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 
 import {WebAppEvents} from '../../event/WebApp';
-import {SuperType} from '../../message/SuperType';
 import {VerificationMessageType} from '../../message/VerificationMessageType';
-import {User} from '../User';
+import {SuperType} from '../../message/SuperType';
 import {Message} from './Message';
 
 export class VerificationMessage extends Message {
-  private readonly isSelfClient: ko.PureComputed<boolean>;
-  private readonly userEntities: ko.ObservableArray<User>;
-  private readonly userIds: ko.ObservableArray<string>;
-  private readonly verificationMessageType: ko.Observable<VerificationMessageType>;
-  public readonly captionNewDevice: ko.PureComputed<string>;
-  public readonly captionStartedUsing: ko.PureComputed<string>;
-  public readonly captionUnverifiedDevice: ko.PureComputed<string>;
-  public readonly captionUser: ko.PureComputed<string>;
-  public readonly isTypeNewDevice: ko.PureComputed<boolean>;
-  public readonly isTypeNewMember: ko.PureComputed<boolean>;
-  public readonly isTypeUnverified: ko.PureComputed<boolean>;
-  public readonly isTypeVerified: ko.PureComputed<boolean>;
-
   constructor() {
     super();
 
@@ -53,13 +36,22 @@ export class VerificationMessage extends Message {
     this.userEntities = ko.observableArray();
     this.userIds = ko.observableArray();
 
-    this.isSelfClient = ko.pureComputed(() => this.userIds().length === 1 && this.userIds()[0] === this.user().id);
-    this.isTypeNewDevice = ko.pureComputed(() => this.verificationMessageType() === VerificationMessageType.NEW_DEVICE);
-    this.isTypeNewMember = ko.pureComputed(() => this.verificationMessageType() === VerificationMessageType.NEW_MEMBER);
-    this.isTypeUnverified = ko.pureComputed(
-      () => this.verificationMessageType() === VerificationMessageType.UNVERIFIED,
-    );
-    this.isTypeVerified = ko.pureComputed(() => this.verificationMessageType() === VerificationMessageType.VERIFIED);
+    this.isSelfClient = ko.pureComputed(() => {
+      return this.userIds().length === 1 && this.userIds()[0] === this.user().id;
+    });
+
+    this.isTypeNewDevice = ko.pureComputed(() => {
+      return this.verificationMessageType() === VerificationMessageType.NEW_DEVICE;
+    });
+    this.isTypeNewMember = ko.pureComputed(() => {
+      return this.verificationMessageType() === VerificationMessageType.NEW_MEMBER;
+    });
+    this.isTypeUnverified = ko.pureComputed(() => {
+      return this.verificationMessageType() === VerificationMessageType.UNVERIFIED;
+    });
+    this.isTypeVerified = ko.pureComputed(() => {
+      return this.verificationMessageType() === VerificationMessageType.VERIFIED;
+    });
 
     this.captionUser = ko.pureComputed(() => {
       const namesString = joinNames(this.userEntities(), Declension.NOMINATIVE);
@@ -84,7 +76,7 @@ export class VerificationMessage extends Message {
     });
   }
 
-  clickOnDevice(): void {
+  clickOnDevice() {
     const topic = this.isSelfClient() ? WebAppEvents.PREFERENCES.MANAGE_DEVICES : WebAppEvents.SHORTCUT.PEOPLE;
     amplify.publish(topic);
   }
