@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.4.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.3.3...@wireapp/api-client@9.4.0) (2020-01-06)
+
+
+### Features
+
+* **api-client:** Add Receipt Mode Update Event ([#2701](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2701)) ([d5440ff](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/d5440ff7a9bfdc74608dd9288910584f16b067c0))
+
+
+
+
+
 ## [9.3.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.3.2...@wireapp/api-client@9.3.3) (2019-12-17)
 
 
