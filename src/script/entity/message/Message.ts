@@ -20,27 +20,62 @@
 import ko from 'knockout';
 import moment from 'moment';
 
-import {TIME_IN_MILLIS, formatDurationCaption} from 'Util/TimeUtil';
 import {getFirstName} from 'Util/SanitizationUtil';
+import {TIME_IN_MILLIS, formatDurationCaption} from 'Util/TimeUtil';
 
+import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {AssetTransferState} from '../../assets/AssetTransferState';
 import {AssetType} from '../../assets/AssetType';
 import {EphemeralStatusType} from '../../message/EphemeralStatusType';
+import {MessageCategory} from '../../message/MessageCategory';
 import {StatusType} from '../../message/StatusType';
 import {SuperType} from '../../message/SuperType';
 import {User} from '../User';
+import {CallMessage} from './CallMessage';
+import {ContentMessage} from './ContentMessage';
+import {File as FileAsset} from './File';
 
 export class Message {
+  private readonly ephemeral_expires: ko.Observable<boolean | number>;
+  private readonly ephemeral_remaining: ko.Observable<number>;
+  private readonly ephemeral_started: ko.Observable<string>;
+  private readonly ephemeral_status: ko.Computed<EphemeralStatusType>;
+  private readonly status: ko.Observable<StatusType>;
+  private readonly visible: ko.Observable<boolean>;
+  private messageTimerStarted: boolean;
+  protected readonly affect_order: ko.Observable<boolean>;
+  public readonly accent_color: ko.PureComputed<string>;
+  public readonly category?: MessageCategory;
+  public readonly conversation_id: string;
+  public readonly ephemeral_caption: ko.PureComputed<string>;
+  public readonly ephemeral_duration: ko.Observable<number>;
+  public readonly expectsReadConfirmation: boolean;
+  public readonly from: string;
+  public readonly fromClientId: string;
+  public readonly headerSenderName: ko.PureComputed<string>;
+  public readonly id: string;
+  public readonly isObfuscated: ko.PureComputed<boolean>;
+  public readonly legalHoldStatus?: LegalHoldStatus;
+  public readonly primary_key?: string;
+  public readonly timestamp: ko.Observable<number>;
+  public readonly timestamp_affects_order: ko.PureComputed<boolean>;
+  public readonly unsafeSenderName: ko.PureComputed<string>;
+  public readonly user: ko.Observable<User>;
+  public readonly version: number;
+  public readReceipts: ko.ObservableArray<{time: string; userId: string}>;
+  public super_type: SuperType;
+  public type: string;
+
   /**
    * Sort messages by timestamp
-   * @param {Array<Message>} message_ets - Message entities
-   * @returns {boolean} Sorted message entities
+   * @param message_ets Message entities
+   * @returns Sorted message entities
    */
-  static sort_by_timestamp(message_ets) {
-    return message_ets.sort((m1, m2) => m1.timestamp() > m2.timestamp());
+  static sort_by_timestamp(message_ets: Message[]): Message[] {
+    return message_ets.sort((m1, m2) => m1.timestamp() - m2.timestamp());
   }
 
-  constructor(id = '0', super_type = '') {
+  constructor(id: string = '0', super_type?: SuperType) {
     this.id = id;
     this.super_type = super_type;
     this.ephemeral_caption = ko.pureComputed(() => {
@@ -96,11 +131,6 @@ export class Message {
     // MessageCategory
     this.category = undefined;
 
-    this.display_timestamp_short = () => {
-      const date = moment.unix(this.timestamp() / TIME_IN_MILLIS.SECOND);
-      return date.local().format('LT');
-    };
-
     this.unsafeSenderName = ko.pureComputed(() => getFirstName(this.user(), undefined, true));
     this.headerSenderName = ko.pureComputed(() => {
       return this.user().isService ? this.user().name() : this.user().first_name();
@@ -109,77 +139,82 @@ export class Message {
     this.accent_color = ko.pureComputed(() => `accent-color-${this.user().accent_id()}`);
   }
 
-  equals = messageEntity => (messageEntity && this.id ? this.id === messageEntity.id : false);
+  display_timestamp_short = (): string => {
+    const date = moment.unix(this.timestamp() / TIME_IN_MILLIS.SECOND);
+    return date.local().format('LT');
+  };
+
+  equals = (messageEntity?: Message) => (messageEntity && this.id ? this.id === messageEntity.id : false);
 
   /**
    * Check if message contains an asset of type file.
-   * @returns {boolean} Message contains any file type asset
+   * @returns Message contains any file type asset
    */
-  has_asset() {
+  has_asset(): boolean {
     return this.is_content() ? this.assets().some(assetEntity => assetEntity.type === AssetType.FILE) : false;
   }
 
   /**
    * Check if message contains a file asset.
-   * @returns {boolean} Message contains a file
+   * @returns Message contains a file
    */
-  has_asset_file() {
+  has_asset_file(): boolean {
     return this.is_content() ? this.assets().some(assetEntity => assetEntity.is_file()) : false;
   }
 
   /**
    * Check if message contains any image asset.
-   * @returns {boolean} Message contains any image
+   * @returns Message contains any image
    */
-  has_asset_image() {
+  has_asset_image(): boolean {
     return this.is_content() ? this.assets().some(assetEntity => assetEntity.is_image()) : false;
   }
 
   /**
    * Check if message contains a location asset.
-   * @returns {boolean} Message contains a location
+   * @returns Message contains a location
    */
-  has_asset_location() {
+  has_asset_location(): boolean {
     return this.is_content() ? this.assets().some(assetEntity => assetEntity.is_location()) : false;
   }
 
   /**
    * Check if message contains a text asset.
-   * @returns {boolean} Message contains text
+   * @returns Message contains text
    */
-  has_asset_text() {
+  has_asset_text(): boolean {
     return this.is_content() ? this.assets().some(assetEntity => assetEntity.is_text()) : false;
   }
 
   /**
    * Check if message is a call message.
-   * @returns {boolean} Is message of type call
+   * @returns Is message of type call
    */
-  is_call() {
+  is_call(): this is CallMessage {
     return this.super_type === SuperType.CALL;
   }
 
   /**
    * Check if message is a content message.
-   * @returns {boolean} Is message of type content
+   * @returns Is message of type content
    */
-  is_content() {
+  is_content(): this is ContentMessage {
     return this.super_type === SuperType.CONTENT;
   }
 
   /**
    * Check if message can be deleted.
-   * @returns {boolean} True, if message is deletable.
+   * @returns `true`, if message is deletable, `false` otherwise.
    */
-  is_deletable() {
+  is_deletable(): boolean {
     return this.status() !== StatusType.SENDING;
   }
 
   /**
    * Check if the message content can be downloaded.
-   * @returns {boolean} True, if the message has downloadable content.
+   * @returns `true`, if the message has downloadable content, `false` otherwise.
    */
-  is_downloadable() {
+  is_downloadable(): boolean {
     const isExpiredEphemeral = this.ephemeral_status() === EphemeralStatusType.TIMED_OUT;
     if (isExpiredEphemeral) {
       return false;
@@ -192,111 +227,115 @@ export class Message {
     if (this.is_content()) {
       const assetEntity = this.get_first_asset();
 
-      if (assetEntity && typeof assetEntity.download === 'function') {
+      if (assetEntity && typeof (assetEntity as FileAsset).download === 'function') {
         return true;
       }
     }
+
     return false;
   }
 
-  isEdited() {
+  isEdited(): boolean {
     return this.is_content() && this.was_edited();
   }
 
-  isLinkPreview() {
+  isLinkPreview(): boolean {
     return (
-      this.has_asset_text() && this.assets().some(assetEntity => assetEntity.is_text() && assetEntity.previews().length)
+      this.has_asset_text() &&
+      ((this as unknown) as ContentMessage)
+        .assets()
+        .some(assetEntity => assetEntity.is_text() && assetEntity.previews().length)
     );
   }
 
   /**
    * Check if message is a member message.
-   * @returns {boolean} Is message of type member
+   * @returns Is message of type member
    */
-  is_member() {
+  is_member(): boolean {
     return this.super_type === SuperType.MEMBER;
   }
 
   /**
    * Check if message is a ping message.
-   * @returns {boolean} Is message of type ping
+   * @returns Is message of type ping
    */
-  is_ping() {
+  is_ping(): boolean {
     return this.super_type === SuperType.PING;
   }
 
   /**
    * Check if message is a system message.
-   * @returns {boolean} Is message of type system
+   * @returns Is message of type system
    */
-  is_system() {
+  is_system(): boolean {
     return this.super_type === SuperType.SYSTEM;
   }
 
   /**
-   * Check if message is a e2ee message.
-   * @returns {boolean} Is message of type system
+   * Check if message is an undecryptable message.
+   * @returns Is message unable to decrypt
    */
-  is_unable_to_decrypt() {
+  is_unable_to_decrypt(): boolean {
     return this.super_type === SuperType.UNABLE_TO_DECRYPT;
   }
 
   /**
-   * Check if message is a e2ee message.
-   * @returns {boolean} Is message of type system
+   * Check if message is a verification message.
+   * @returns Is message of type verification
    */
-  is_verification() {
+  is_verification(): boolean {
     return this.super_type === SuperType.VERIFICATION;
   }
 
-  isLegalHold() {
+  isLegalHold(): boolean {
     return this.super_type === SuperType.LEGALHOLD;
   }
 
   /**
    * Check if message can be copied.
-   * @returns {boolean} True, if message can be copied.
+   * @returns `true`, if message can be copied, `false` otherwise.
    */
 
-  isCopyable() {
+  isCopyable(): boolean {
     return this.has_asset_text();
   }
 
   /**
    * Check if message can be edited.
-   * @returns {boolean} True, if message can be edited.
+   * @returns `true`, if message can be edited, `false` otherwise.
    */
-  is_editable() {
+  is_editable(): boolean {
     return this.has_asset_text() && this.user().is_me && !this.is_ephemeral();
   }
 
   /**
    * Check if message is ephemeral.
-   * @returns {boolean} True, if message is ephemeral.
+   * @returns `true`, if message is ephemeral, `false` otherwise.
    */
-  is_ephemeral() {
+  is_ephemeral(): boolean {
     return this.ephemeral_expires() !== false;
   }
 
   /**
    * Check if ephemeral message is expired.
-   * @returns {boolean} True, if message expired.
+   * @returns `true`, if message expired, `false` otherwise.
    */
-  is_expired = () => this.ephemeral_expires() === true;
+  is_expired = (): boolean => this.ephemeral_expires() === true;
 
   /**
    * Check if message has an unavailable (uploading or failed) asset.
-   * @returns {boolean} True, if an asset is unavailable.
+   * @returns `true`, if an asset is unavailable, `false` otherwise.
    */
-  hasUnavailableAsset() {
+  hasUnavailableAsset(): boolean {
     if (this.has_asset()) {
-      return this.assets().some(asset => {
+      return ((this as unknown) as ContentMessage).assets().some(asset => {
         const unavailableStatus = [
           AssetTransferState.UPLOAD_PENDING,
           AssetTransferState.UPLOADING,
           AssetTransferState.UPLOAD_FAILED,
         ];
-        const assetStatus = asset.status();
+        const assetStatus = (asset as FileAsset).status();
         return unavailableStatus.includes(assetStatus);
       });
     }
@@ -305,9 +344,9 @@ export class Message {
 
   /**
    * Check if message can be reacted to.
-   * @returns {boolean} True, if message type supports reactions.
+   * @returns `true`, if message type supports reactions, `false` otherwise.
    */
-  isReactable() {
+  isReactable(): boolean {
     return (
       this.is_content() && !this.is_ephemeral() && this.status() !== StatusType.SENDING && !this.hasUnavailableAsset()
     );
@@ -315,38 +354,38 @@ export class Message {
 
   /**
    * Check if message can be replied to.
-   * @returns {boolean} True, if message type supports replies.
+   * @returns `true`, if message type supports replies, `false` otherwise.
    */
-  isReplyable() {
+  isReplyable(): boolean {
     return (
       this.is_content() && !this.is_ephemeral() && this.status() !== StatusType.SENDING && !this.hasUnavailableAsset()
     );
   }
 
   // Start the ephemeral timer for the message.
-  startMessageTimer = timeOffset => {
+  startMessageTimer = (timeOffset: number): void => {
     if (this.messageTimerStarted) {
       return;
     }
 
     if (this.ephemeral_status() === EphemeralStatusType.INACTIVE) {
       const startingTimestamp = this.user().is_me ? Math.min(this.timestamp() + timeOffset, Date.now()) : Date.now();
-      const expirationTimestamp = `${startingTimestamp + this.ephemeral_expires()}`;
+      const expirationTimestamp = startingTimestamp + ((this.ephemeral_expires() || 0) as number);
       this.ephemeral_expires(expirationTimestamp);
       this.ephemeral_started(`${startingTimestamp}`);
     }
 
-    const remainingTime = this.ephemeral_expires() - this.ephemeral_started();
+    const remainingTime = ((this.ephemeral_expires() || 0) as number) - parseInt(this.ephemeral_started(), 10);
     this.ephemeral_remaining(remainingTime);
     this.messageTimerStarted = true;
   };
 
   /**
    * Update the status of a message.
-   * @param {StatusType} updated_status - New status of message
-   * @returns {StatusType|boolean} Returns the new status on a successful update, otherwise "false"
+   * @param updated_status New status of message
+   * @returns Returns the new status on a successful update, otherwise "false"
    */
-  update_status(updated_status) {
+  update_status(updated_status: StatusType): StatusType | false {
     if (this.status() >= StatusType.SENT) {
       if (updated_status > this.status()) {
         return this.status(updated_status);

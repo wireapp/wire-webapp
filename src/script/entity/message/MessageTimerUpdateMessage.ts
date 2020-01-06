@@ -18,26 +18,36 @@
  */
 
 import ko from 'knockout';
-import {t} from 'Util/LocalizerUtil';
 
+import {t} from 'Util/LocalizerUtil';
+import {formatDuration} from 'Util/TimeUtil';
+
+import {ConversationEphemeralHandler} from '../../conversation/ConversationEphemeralHandler';
 import {BackendEvent} from '../../event/Backend';
 import {SystemMessageType} from '../../message/SystemMessageType';
 import {SystemMessage} from './SystemMessage';
 
-export class ReceiptModeUpdateMessage extends SystemMessage {
-  public caption: ko.PureComputed<string>;
+export class MessageTimerUpdateMessage extends SystemMessage {
+  public readonly message_timer: number;
+  public readonly caption: ko.PureComputed<string>;
 
-  constructor(isReceiptEnabled: boolean) {
+  constructor(messageTimer: number) {
     super();
 
-    this.type = BackendEvent.CONVERSATION.RECEIPT_MODE_UPDATE;
-    this.system_message_type = SystemMessageType.CONVERSATION_RECEIPT_MODE_UPDATE;
+    this.type = BackendEvent.CONVERSATION.MESSAGE_TIMER_UPDATE;
+    this.system_message_type = SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE;
+
+    this.message_timer = ConversationEphemeralHandler.validateTimer(messageTimer);
 
     this.caption = ko.pureComputed(() => {
-      if (isReceiptEnabled) {
-        return this.user().is_me ? t('conversationReceiptsOnYou') : t('conversationReceiptsOn');
+      if (this.message_timer) {
+        const timeString = formatDuration(this.message_timer).text;
+        return this.user().is_me
+          ? t('conversationUpdatedTimerYou', timeString)
+          : t('conversationUpdatedTimer', timeString);
       }
-      return this.user().is_me ? t('conversationReceiptsOffYou') : t('conversationReceiptsOff');
+
+      return this.user().is_me ? t('conversationResetTimerYou') : t('conversationResetTimer');
     });
   }
 }
