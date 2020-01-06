@@ -27,6 +27,7 @@ import {
   ConversationMemberUpdateData,
   ConversationMessageTimerUpdateData,
   ConversationOtrMessageAddData,
+  ConversationReceiptModeUpdateData,
   ConversationRenameData,
   ConversationTypingData,
 } from '../conversation/data/';
@@ -43,6 +44,7 @@ export enum CONVERSATION_EVENT {
   MEMBER_UPDATE = 'conversation.member-update',
   MESSAGE_TIMER_UPDATE = 'conversation.message-timer-update',
   OTR_MESSAGE_ADD = 'conversation.otr-message-add',
+  RECEIPT_MODE_UPDATE = 'conversation.receipt-mode-update',
   RENAME = 'conversation.rename',
   TYPING = 'conversation.typing',
 }
@@ -57,6 +59,7 @@ export type ConversationEventData =
   | ConversationMemberUpdateData
   | ConversationMessageTimerUpdateData
   | ConversationOtrMessageAddData
+  | ConversationReceiptModeUpdateData
   | ConversationRenameData
   | ConversationTypingData
   | null;
@@ -72,6 +75,7 @@ export type ConversationEvent =
   | ConversationMemberUpdateEvent
   | ConversationMessageTimerUpdateEvent
   | ConversationOtrMessageAddEvent
+  | ConversationReceiptModeUpdateEvent
   | ConversationRenameEvent
   | ConversationTypingEvent;
 
@@ -136,6 +140,11 @@ export interface ConversationMessageTimerUpdateEvent extends BaseConversationEve
 export interface ConversationOtrMessageAddEvent extends BaseConversationEvent {
   data: ConversationOtrMessageAddData;
   type: CONVERSATION_EVENT.OTR_MESSAGE_ADD;
+}
+
+export interface ConversationReceiptModeUpdateEvent extends BaseConversationEvent {
+  data: ConversationReceiptModeUpdateData;
+  type: CONVERSATION_EVENT.RECEIPT_MODE_UPDATE;
 }
 
 export interface ConversationRenameEvent extends BaseConversationEvent {

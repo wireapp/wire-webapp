@@ -17,8 +17,6 @@
  *
  */
 
-export interface ConversationCodeUpdateData {
-  code: string;
-  key: string;
-  uri: string;
-}
+import {ConversationCode} from '../ConversationCode';
+
+export type ConversationCodeUpdateData = Required<ConversationCode>;
