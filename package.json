@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "@emotion/core": "10.0.27",
-    "@types/color": "3.0.0",
+    "@types/color": "3.0.1",
     "bazinga64": "5.5.34",
     "color": "3.1.2",
     "emotion-normalize": "10.1.0",
