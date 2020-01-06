@@ -165,7 +165,7 @@ ko.components.register('user-actions', {
         condition: () => {
           return (
             isNotMe() &&
-            conversation()?.isActiveParticipant() &&
+            !conversation()?.removed_from_conversation() &&
             conversation()
               .participating_user_ids()
               .some(id => user().id === id) &&
