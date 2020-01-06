@@ -26,5 +26,6 @@ export * from './ConversationMemberLeaveData';
 export * from './ConversationMemberUpdateData';
 export * from './ConversationMessageTimerUpdateData';
 export * from './ConversationOtrMessageAddData';
+export * from './ConversationReceiptModeUpdateData';
 export * from './ConversationRenameData';
 export * from './ConversationTypingData';

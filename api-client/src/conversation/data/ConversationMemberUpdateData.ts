@@ -17,7 +17,7 @@
  *
  */
 
-import {MutedStatus} from '..';
+import {MutedStatus} from '../MutedStatus';
 
 export interface ConversationMemberUpdateData {
   hidden_ref?: string;
