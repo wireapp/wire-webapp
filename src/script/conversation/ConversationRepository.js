@@ -377,15 +377,12 @@ export class ConversationRepository {
    */
   createGroupConversation(userEntities, groupName, accessState, options) {
     const userIds = userEntities.map(userEntity => userEntity.id);
-    const payload = Object.assign(
-      {},
-      {
-        conversation_role: DefaultRole.WIRE_MEMBER,
-        name: groupName,
-        users: userIds,
-      },
-      options,
-    );
+    const payload = {
+      conversation_role: DefaultRole.WIRE_MEMBER,
+      name: groupName,
+      users: userIds,
+      ...options,
+    };
 
     if (this.team().id) {
       payload.team = {
@@ -3529,7 +3526,7 @@ export class ConversationRepository {
       conversationEntity.add_message(updatedMessageEntity);
     }
 
-    return {conversationEntity, updatedMessageEntity};
+    return {conversationEntity, messageEntity: updatedMessageEntity};
   }
 
   /**

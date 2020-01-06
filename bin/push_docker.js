@@ -24,7 +24,7 @@ const appConfigPkg = require('../app-config/package.json');
 const pkg = require('../package.json');
 const {execSync} = require('child_process');
 
-const currentBranch = execSync('git rev-parse --abbrev-ref HEAD')
+const currentBranch = execSync('git rev-parse HEAD')
   .toString()
   .trim();
 

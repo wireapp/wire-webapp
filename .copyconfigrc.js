@@ -19,9 +19,12 @@ const selectConfiguration = () => {
     console.log(`Selecting configuration "${distribution}" (reason: custom distribution)`);
     return distribution;
   }
-  const currentBranch = execSync('git rev-parse --abbrev-ref HEAD')
-    .toString()
-    .trim();
+  let currentBranch = '';
+  try {
+    currentBranch = execSync('git rev-parse --abbrev-ref HEAD')
+      .toString()
+      .trim();
+  } catch (error) {}
   switch (currentBranch) {
     case 'master':
     case 'staging': {
@@ -33,9 +36,12 @@ const selectConfiguration = () => {
       return 'staging';
     }
     default: {
-      const isTaggedCommit = !!execSync('git tag -l --points-at HEAD')
-        .toString()
-        .trim();
+      let isTaggedCommit = false;
+      try {
+        isTaggedCommit = !!execSync('git tag -l --points-at HEAD')
+          .toString()
+          .trim();
+      } catch (error) {}
       if (isTaggedCommit) {
         console.log('Selecting configuration "master" (reason: tagged commit)');
         return 'master';
