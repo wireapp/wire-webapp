@@ -29,9 +29,7 @@ import {Asset} from './Asset';
 import {LinkPreview} from './LinkPreview';
 
 export class Text extends Asset {
-  /** Array of MentionEntity instances */
   public readonly mentions: ko.ObservableArray<MentionEntity>;
-  /** Array of LinkPreview instances */
   public readonly previews: ko.ObservableArray<LinkPreview>;
   public readonly should_render_text: ko.PureComputed<boolean>;
   /** Raw message text */
