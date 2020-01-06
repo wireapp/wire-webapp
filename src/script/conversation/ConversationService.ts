@@ -17,29 +17,53 @@
  *
  */
 
-import {getLogger} from 'Util/Logger';
+import {
+  ClientMismatch,
+  Conversation as BackendConversation,
+  ConversationCode,
+  Conversations as BackendConversations,
+  NewConversation,
+  NewOTRMessage,
+} from '@wireapp/api-client/dist/conversation';
+import {ConversationMemberUpdateData} from '@wireapp/api-client/dist/conversation/data';
+import {
+  ConversationCodeUpdateEvent,
+  ConversationEvent,
+  ConversationMemberJoinEvent,
+  ConversationMessageTimerUpdateEvent,
+  ConversationRenameEvent,
+} from '@wireapp/api-client/dist/event';
 
-import {StorageSchemata} from '../storage/StorageSchemata';
+import {Logger, getLogger} from 'Util/Logger';
+
+import {Conversation as ConversationEntity} from '../entity/Conversation';
+import {EventService} from '../event/EventService';
 import {MessageCategory} from '../message/MessageCategory';
 import {search as fullTextSearch} from '../search/FullTextSearch';
+import {BackendClient} from '../service/BackendClient';
+import {StorageService} from '../storage';
+import {StorageSchemata} from '../storage/StorageSchemata';
 import {TeamService} from '../team/TeamService';
+import {ACCESS_MODE} from './AccessMode';
+import {ACCESS_ROLE} from './AccessRole';
 import {DefaultRole} from './ConversationRoleRepository';
+import {ReceiptMode} from './ReceiptMode';
 
 // Conversation service for all conversation calls to the backend REST API.
 export class ConversationService {
+  private readonly backendClient: BackendClient;
+  private readonly eventService: EventService;
+  private readonly logger: Logger;
+  private readonly storageService: StorageService;
+
+  // tslint:disable-next-line:typedef
   static get CONFIG() {
     return {
       URL_CONVERSATIONS: '/conversations',
     };
   }
 
-  /**
-   * Construct a new Conversation Service.
-   * @param {BackendClient} backendClient - Client for the API calls
-   * @param {EventService} eventService - Service that handles events
-   * @param {StorageService} storageService - Service for all storage interactions
-   */
-  constructor(backendClient, eventService, storageService) {
+  constructor(backendClient: BackendClient, eventService: EventService, storageService: StorageService) {
     this.backendClient = backendClient;
     this.eventService = eventService;
     this.storageService = storageService;
@@ -56,10 +80,10 @@ export class ConversationService {
    * @note Do not include yourself as the requestor
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/createGroupConversation
    *
-   * @param {Object} payload - Payload object for group creation
-   * @returns {Promise} Resolves when the conversation was created
+   * @param payload Payload object for group creation
+   * @returns Resolves when the conversation was created
    */
-  postConversations(payload) {
+  postConversations(payload: NewConversation): Promise<BackendConversation> {
     return this.backendClient.sendJson({
       data: payload,
       type: 'POST',
@@ -76,11 +100,11 @@ export class ConversationService {
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/conversations
    *
-   * @param {number} [limit=100] - Number of results to return (default 100, max 500)
-   * @param {string} conversation_id - Conversation ID to start from
-   * @returns {Promise} Resolves with the conversation information
+   * @param limit Number of results to return (default 100, max 500)
+   * @param conversation_id Conversation ID to start from
+   * @returns Resolves with the conversation information
    */
-  getConversations(limit = 100, conversation_id) {
+  getConversations(limit: number = 100, conversation_id?: string): Promise<BackendConversations> {
     return this.backendClient.sendRequest({
       data: {
         size: limit,
@@ -93,13 +117,13 @@ export class ConversationService {
 
   /**
    * Retrieves all the conversations of a user.
-   * @param {number} [limit=500] - Number of results to return (default 500, max 500)
-   * @returns {Promise} Resolves with the conversation information
+   * @param limit Number of results to return (default 500, max 500)
+   * @returns Resolves with the conversation information
    */
-  getAllConversations(limit = 500) {
-    let allConversations = [];
+  getAllConversations(limit = 500): Promise<BackendConversation[]> {
+    let allConversations: BackendConversation[] = [];
 
-    const _getConversations = conversationId => {
+    const _getConversations = (conversationId?: string): Promise<BackendConversation[]> => {
       return this.getConversations(limit, conversationId).then(({conversations, has_more: hasMore}) => {
         if (conversations.length) {
           allConversations = allConversations.concat(conversations);
@@ -117,10 +141,10 @@ export class ConversationService {
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/conversation
    *
-   * @param {string} conversation_id - ID of conversation to get
-   * @returns {Promise} Resolves with the server response
+   * @param conversation_id ID of conversation to get
+   * @returns Resolves with the server response
    */
-  get_conversation_by_id(conversation_id) {
+  get_conversation_by_id(conversation_id: string): Promise<BackendConversation> {
     return this.backendClient.sendRequest({
       type: 'GET',
       url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversation_id}`,
@@ -132,11 +156,11 @@ export class ConversationService {
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/updateConversation
    *
-   * @param {string} conversationId - ID of conversation to rename
-   * @param {string} name - new name of the conversation
-   * @returns {Promise} Resolves with the server response
+   * @param conversationId ID of conversation to rename
+   * @param name new name of the conversation
+   * @returns Resolves with the server response
    */
-  updateConversationName(conversationId, name) {
+  updateConversationName(conversationId: string, name: string): Promise<ConversationRenameEvent> {
     return this.backendClient.sendJson({
       data: {name},
       type: 'PUT',
@@ -149,11 +173,14 @@ export class ConversationService {
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/updateConversationMessageTimer
    *
-   * @param {string} conversationId - ID of conversation to rename
-   * @param {number} messageTimer - new message timer of the conversation
-   * @returns {Promise} Resolves with the server response
+   * @param conversationId ID of conversation to rename
+   * @param messageTimer new message timer of the conversation
+   * @returns Resolves with the server response
    */
-  updateConversationMessageTimer(conversationId, messageTimer) {
+  updateConversationMessageTimer(
+    conversationId: string,
+    messageTimer: number,
+  ): Promise<ConversationMessageTimerUpdateEvent> {
     return this.backendClient.sendJson({
       data: {message_timer: messageTimer},
       type: 'PUT',
@@ -166,11 +193,11 @@ export class ConversationService {
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/updateConversationMessageTimer
    *
-   * @param {string} conversationId - ID of conversation to rename
-   * @param {number} receiptMode - new receipt mode
-   * @returns {Promise} Resolves with the server response
+   * @param conversationId ID of conversation to rename
+   * @param receiptMode new receipt mode
+   * @returns Resolves with the server response
    */
-  updateConversationReceiptMode(conversationId, receiptMode) {
+  updateConversationReceiptMode(conversationId: string, receiptMode: ReceiptMode): Promise<any> {
     return this.backendClient.sendJson({
       data: {receipt_mode: receiptMode},
       type: 'PUT',
@@ -183,11 +210,11 @@ export class ConversationService {
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/updateSelf
    *
-   * @param {string} conversation_id - ID of conversation to update
-   * @param {Object} payload - Updated properties
-   * @returns {Promise} Resolves with the server response
+   * @param conversation_id ID of conversation to update
+   * @param payload Updated properties
+   * @returns Resolves with the server response
    */
-  update_member_properties(conversation_id, payload) {
+  update_member_properties(conversation_id: string, payload: ConversationMemberUpdateData): Promise<void> {
     return this.backendClient.sendJson({
       data: payload,
       type: 'PUT',
@@ -203,10 +230,10 @@ export class ConversationService {
    * Delete the conversation access code.
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/deleteConversationCode
-   * @param {string} conversationId - ID of conversation to delete access code for
-   * @returns {Promise} Resolves with the server response
+   * @param conversationId ID of conversation to delete access code for
+   * @returns Resolves with the server response
    */
-  deleteConversationCode(conversationId) {
+  deleteConversationCode(conversationId: string): Promise<BackendConversation> {
     return this.backendClient.sendRequest({
       type: 'DELETE',
       url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/code`,
@@ -217,10 +244,10 @@ export class ConversationService {
    * Get the conversation access code.
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/getConversationCode
-   * @param {string} conversationId - ID of conversation to get access code for
-   * @returns {Promise} Resolves with the server response
+   * @param conversationId ID of conversation to get access code for
+   * @returns Resolves with the server response
    */
-  getConversationCode(conversationId) {
+  getConversationCode(conversationId: string): Promise<ConversationCode> {
     return this.backendClient.sendRequest({
       type: 'GET',
       url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/code`,
@@ -231,10 +258,10 @@ export class ConversationService {
    * Request a conversation access code.
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/createConversationCode
-   * @param {string} conversationId - ID of conversation to request access code for
-   * @returns {Promise} Resolves with the server response
+   * @param conversationId ID of conversation to request access code for
+   * @returns Resolves with the server response
    */
-  postConversationCode(conversationId) {
+  postConversationCode(conversationId: string): Promise<ConversationCodeUpdateEvent> {
     return this.backendClient.sendRequest({
       type: 'POST',
       url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/code`,
@@ -245,15 +272,15 @@ export class ConversationService {
    * Join a conversation using a code.
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/joinConversationByCode
-   * @param {string} key - Conversation identifier
-   * @param {string} code - Conversation access code
-   * @returns {Promise} Resolves with the server response
+   * @param key Conversation identifier
+   * @param code Conversation access code
+   * @returns Resolves with the server response
    */
-  postConversationJoin(key, code) {
+  postConversationJoin(key: string, code: string): Promise<ConversationMemberJoinEvent> {
     return this.backendClient.sendJson({
       data: {
-        code: code,
-        key: key,
+        code,
+        key,
       },
       type: 'POST',
       url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/join`,
@@ -265,12 +292,16 @@ export class ConversationService {
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/updateConversationAccess
    *
-   * @param {string} conversationId - ID of conversation
-   * @param {ACCESS_MODE[]} accessModes - Conversation access mode
-   * @param {ACCESS_ROLE} accessRole - Conversation access role
-   * @returns {Promise} Resolves with the server response
+   * @param conversationId ID of conversation
+   * @param accessModes Conversation access mode
+   * @param accessRole Conversation access role
+   * @returns Resolves with the server response
    */
-  putConversationAccess(conversationId, accessModes, accessRole) {
+  putConversationAccess(
+    conversationId: string,
+    accessModes: ACCESS_MODE[],
+    accessRole: ACCESS_ROLE,
+  ): Promise<ConversationEvent> {
     return this.backendClient.sendJson({
       data: {
         access: accessModes,
@@ -288,11 +319,11 @@ export class ConversationService {
   /**
    * Remove service from conversation.
    *
-   * @param {string} conversationId - ID of conversation to remove service from
-   * @param {string} userId - ID of service to be removed from the the conversation
-   * @returns {Promise} Resolves with the server response
+   * @param conversationId ID of conversation to remove service from
+   * @param userId ID of service to be removed from the the conversation
+   * @returns Resolves with the server response
    */
-  deleteBots(conversationId, userId) {
+  deleteBots(conversationId: string, userId: string): Promise<void> {
     return this.backendClient.sendRequest({
       type: 'DELETE',
       url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/bots/${userId}`,
@@ -304,18 +335,18 @@ export class ConversationService {
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/removeMember
    *
-   * @param {string} conversationId - ID of conversation to remove member from
-   * @param {string} userId - ID of member to be removed from the the conversation
-   * @returns {Promise} Resolves with the server response
+   * @param conversationId ID of conversation to remove member from
+   * @param userId ID of member to be removed from the the conversation
+   * @returns Resolves with the server response
    */
-  deleteMembers(conversationId, userId) {
+  deleteMembers(conversationId: string, userId: string): Promise<void> {
     return this.backendClient.sendRequest({
       type: 'DELETE',
       url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/members/${userId}`,
     });
   }
 
-  putMembers(conversationId, userId, data) {
+  putMembers(conversationId: string, userId: string, data: {conversation_role: string}): Promise<void> {
     return this.backendClient.sendJson({
       data,
       type: 'PUT',
@@ -323,7 +354,7 @@ export class ConversationService {
     });
   }
 
-  deleteConversation(teamId, conversationId) {
+  deleteConversation(teamId: string, conversationId: string): Promise<void> {
     return this.backendClient.sendRequest({
       type: 'DELETE',
       url: `${TeamService.URL.TEAMS}/${teamId}/conversations/${conversationId}`,
@@ -333,12 +364,12 @@ export class ConversationService {
   /**
    * Add a service to an existing conversation.
    *
-   * @param {string} conversationId - ID of conversation to add users to
-   * @param {string} providerId - ID of service provider
-   * @param {string} serviceId - ID of service
-   * @returns {Promise} Resolves with the server response
+   * @param conversationId ID of conversation to add users to
+   * @param providerId ID of service provider
+   * @param serviceId ID of service
+   * @returns Resolves with the server response
    */
-  postBots(conversationId, providerId, serviceId) {
+  postBots(conversationId: string, providerId: string, serviceId: string): Promise<void> {
     return this.backendClient.sendJson({
       data: {
         provider: providerId,
@@ -364,14 +395,18 @@ export class ConversationService {
    *   }
    * }
    *
-   * @param {string} conversation_id - ID of conversation to send message in
-   * @param {Object} payload - Payload to be posted
-   * @param {Object} payload.recipients - Map with per-recipient data
-   * @param {string} payload.sender - Client ID of the sender
-   * @param {Array<string>|boolean} precondition_option - Level that backend checks for missing clients
-   * @returns {Promise} Promise that resolves when the message was sent
+   * @param conversation_id ID of conversation to send message in
+   * @param payload Payload to be posted
+   * @param payload.recipients - Map with per-recipient data
+   * @param payload.sender - Client ID of the sender
+   * @param precondition_option Level that backend checks for missing clients
+   * @returns Promise that resolves when the message was sent
    */
-  post_encrypted_message(conversation_id, payload, precondition_option) {
+  post_encrypted_message(
+    conversation_id: string,
+    payload: NewOTRMessage,
+    precondition_option: true | string[],
+  ): Promise<ClientMismatch> {
     let url = `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversation_id}/otr/messages`;
 
     if (Array.isArray(precondition_option)) {
@@ -392,11 +427,11 @@ export class ConversationService {
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/addMembers
    *
-   * @param {string} conversationId - ID of conversation to add users to
-   * @param {Array<string>} userIds - IDs of users to be added to the conversation
-   * @returns {Promise} Resolves with the server response
+   * @param conversationId ID of conversation to add users to
+   * @param userIds IDs of users to be added to the conversation
+   * @returns Resolves with the server response
    */
-  postMembers(conversationId, userIds) {
+  postMembers(conversationId: string, userIds: string[]): Promise<ConversationMemberJoinEvent> {
     return this.backendClient.sendJson({
       data: {
         conversation_role: DefaultRole.WIRE_MEMBER,
@@ -413,25 +448,25 @@ export class ConversationService {
 
   /**
    * Deletes a conversation entity from the local database.
-   * @param {string} conversation_id - ID of conversation to be deleted
-   * @returns {Promise} Resolves when the entity was deleted
+   * @param conversation_id ID of conversation to be deleted
+   * @returns Resolves when the entity was deleted
    */
-  delete_conversation_from_db(conversation_id) {
+  delete_conversation_from_db(conversation_id: string): Promise<string> {
     return this.storageService.delete(StorageSchemata.OBJECT_STORE.CONVERSATIONS, conversation_id).then(primary_key => {
       this.logger.info(`State of conversation '${primary_key}' was deleted`);
       return primary_key;
     });
   }
 
-  loadConversation(conversationId) {
+  loadConversation<T>(conversationId: string): Promise<T> {
     return this.storageService.load(StorageSchemata.OBJECT_STORE.CONVERSATIONS, conversationId);
   }
 
   /**
    * Get active conversations from database.
-   * @returns {Promise} Resolves with active conversations
+   * @returns Resolves with active conversations
    */
-  async get_active_conversations_from_db() {
+  async get_active_conversations_from_db(): Promise<string[]> {
     const min_date = new Date();
     min_date.setDate(min_date.getDate() - 30);
 
@@ -444,17 +479,14 @@ export class ConversationService {
         .aboveOrEqual(min_date.toISOString())
         .toArray();
     } else {
-      const records = await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS);
-      events = records.filter(record => record.time >= min_date.toISOString()).sort((a, b) => a.time - b.time);
+      const records = await this.storageService.getAll<{time: number}>(StorageSchemata.OBJECT_STORE.EVENTS);
+      events = records
+        .filter(record => record.time.toString() >= min_date.toISOString())
+        .sort((a, b) => a.time - b.time);
     }
 
     const conversations = events.reduce((accumulated, event) => {
-      if (accumulated[event.conversation]) {
-        accumulated[event.conversation] = accumulated[event.conversation] + 1;
-      } else {
-        accumulated[event.conversation] = 1;
-      }
-
+      accumulated[event.conversation] = (accumulated[event.conversation] || 0) + 1;
       return accumulated;
     }, {});
 
@@ -463,18 +495,18 @@ export class ConversationService {
 
   /**
    * Loads conversation states from the local database.
-   * @returns {Promise} Resolves with all the stored conversation states
+   * @returns Resolves with all the stored conversation states
    */
-  load_conversation_states_from_db() {
+  load_conversation_states_from_db<T>(): Promise<T[]> {
     return this.storageService.getAll(StorageSchemata.OBJECT_STORE.CONVERSATIONS);
   }
 
   /**
    * Saves a list of conversation records in the local database.
-   * @param {Array<Conversation>} conversations - Conversation entity
-   * @returns {Promise<Array>} Resolves with a list of conversation records
+   * @param conversations Conversation entity
+   * @returns Resolves with a list of conversation records
    */
-  async save_conversations_in_db(conversations) {
+  async save_conversations_in_db(conversations: ConversationEntity[]): Promise<ConversationEntity[]> {
     if (this.storageService.db) {
       const keys = conversations.map(conversation => conversation.id);
       await this.storageService.db.table(StorageSchemata.OBJECT_STORE.CONVERSATIONS).bulkPut(conversations, keys);
@@ -489,10 +521,10 @@ export class ConversationService {
 
   /**
    * Saves a conversation entity in the local database.
-   * @param {Conversation} conversation_et - Conversation entity
-   * @returns {Promise} Resolves with the conversation entity
+   * @param conversation_et Conversation entity
+   * @returns Resolves with the conversation entity
    */
-  save_conversation_state_in_db(conversation_et) {
+  save_conversation_state_in_db(conversation_et: ConversationEntity): Promise<ConversationEntity> {
     const conversationData = conversation_et.serialize();
 
     return this.storageService
@@ -506,16 +538,16 @@ export class ConversationService {
   /**
    * Search for text in given conversation.
    *
-   * @param {string} conversation_id - ID of conversation to add users to
-   * @param {string} query - will be checked in against all text messages
-   * @returns {Promise} Resolves with the matching events
+   * @param conversation_id ID of conversation to add users to
+   * @param query will be checked in against all text messages
+   * @returns Resolves with the matching events
    */
-  search_in_conversation(conversation_id, query) {
+  search_in_conversation(conversation_id: string, query: string): Promise<any> {
     const category_min = MessageCategory.TEXT;
     const category_max = MessageCategory.TEXT | MessageCategory.LINK | MessageCategory.LINK_PREVIEW;
 
     return this.eventService.loadEventsWithCategory(conversation_id, category_min, category_max).then(events => {
-      return events.filter(({data: event_data}) => fullTextSearch(event_data.content, query));
+      return events.filter(({data: event_data}: any) => fullTextSearch(event_data.content, query));
     });
   }
 }
