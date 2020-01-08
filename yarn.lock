@@ -1360,10 +1360,10 @@
   resolved "https://registry.yarnpkg.com/@types/js-md5/-/js-md5-0.4.2.tgz#95b39911e2081bf2915436e61cc345e12459e5bb"
   integrity sha512-FUPoQkpQTzA5wz9ebrdVRjsjQsFehr+cW1CVhLcI2UwD/SO/4NHPO1esrXPPbx7ux762U0POmWFSrUjQq2ophw==
 
-"@types/jszip@3.1.6":
-  version "3.1.6"
-  resolved "https://registry.yarnpkg.com/@types/jszip/-/jszip-3.1.6.tgz#0512574a2b35f3194b41769c56e4b35065e67000"
-  integrity sha512-m8uFcI+O2EupCfbEVQWsBM/4nhbegjOHL7cQgBpM95FeF98kdFJXzy9/8yhx4b3lCRl/gMBhcvyh30Qt3X+XPQ==
+"@types/jszip@3.1.7":
+  version "3.1.7"
+  resolved "https://registry.yarnpkg.com/@types/jszip/-/jszip-3.1.7.tgz#c45bd72b448b3fb002125282c57c36190247cb34"
+  integrity sha512-+XQKNI5zpxutK05hO67huUTw/2imXCuJWjnFdU63tRES/xXSX1yVR9cv/QAdO6Rii2y2tTHbzjQ4i2apLfuK0Q==
   dependencies:
     "@types/node" "*"
 
@@ -10813,7 +10813,7 @@ rechoir@^0.6.2:
   dependencies:
     resolve "^1.1.6"
 
-"reconnecting-websocket@github:wireapp/reconnecting-websocket#96ac796ae8c7a7d9d857f46ed39dbedd7b9ad378":
+reconnecting-websocket@wireapp/reconnecting-websocket#96ac796ae8c7a7d9d857f46ed39dbedd7b9ad378:
   version "4.2.0"
   resolved "https://codeload.github.com/wireapp/reconnecting-websocket/tar.gz/96ac796ae8c7a7d9d857f46ed39dbedd7b9ad378"
 
