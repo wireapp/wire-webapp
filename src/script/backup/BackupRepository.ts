@@ -262,7 +262,8 @@ export class BackupRepository {
     await this._importHistoryEvents(eventEntities, progressCallback);
     this.conversationRepository.updateConversations(importedEntities);
     this.conversationRepository.map_connections(this.connectionRepository.connectionEntities());
-    await this.conversationRepository.checkForDeletedConversations();
+    // doesn't need to be awaited
+    this.conversationRepository.checkForDeletedConversations();
   }
 
   private _importHistoryConversations(
