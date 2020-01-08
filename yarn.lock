@@ -1164,6 +1164,13 @@
   dependencies:
     "@types/node" "*"
 
+"@types/dexie-batch@0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@types/dexie-batch/-/dexie-batch-0.4.0.tgz#9a25fa378f23baf9007b5052fe17d43a0442426d"
+  integrity sha512-gYWGxfFK25ykXia0uhJA/Xeius87qK+maLP7lxpYZ/RZMC8rwpjReXkUbiRhp9jVAn3e9A6j8nGQxKv7hLNRJA==
+  dependencies:
+    dexie "^2.0.0"
+
 "@types/ed2curve@0.2.2":
   version "0.2.2"
   resolved "https://registry.yarnpkg.com/@types/ed2curve/-/ed2curve-0.2.2.tgz#8f8bc7e2c9a5895a941c63a4f7acd7a6a62a5b15"
@@ -1285,6 +1292,13 @@
   version "0.4.2"
   resolved "https://registry.yarnpkg.com/@types/js-md5/-/js-md5-0.4.2.tgz#95b39911e2081bf2915436e61cc345e12459e5bb"
   integrity sha512-FUPoQkpQTzA5wz9ebrdVRjsjQsFehr+cW1CVhLcI2UwD/SO/4NHPO1esrXPPbx7ux762U0POmWFSrUjQq2ophw==
+
+"@types/jszip@3.1.7":
+  version "3.1.7"
+  resolved "https://registry.yarnpkg.com/@types/jszip/-/jszip-3.1.7.tgz#c45bd72b448b3fb002125282c57c36190247cb34"
+  integrity sha512-+XQKNI5zpxutK05hO67huUTw/2imXCuJWjnFdU63tRES/xXSX1yVR9cv/QAdO6Rii2y2tTHbzjQ4i2apLfuK0Q==
+  dependencies:
+    "@types/node" "*"
 
 "@types/libsodium-wrappers-sumo@0.7.3":
   version "0.7.3"
@@ -4206,7 +4220,7 @@ dexie-batch@0.4.2:
   resolved "https://registry.yarnpkg.com/dexie-batch/-/dexie-batch-0.4.2.tgz#8e457d7eb3da933802eae561e9f0141c9d84b2f9"
   integrity sha512-tDEVCArDddWtSq8EnRovbxw4CBQaBxABMFzahbI8+C6oWMG4yu0DZjMhC3kzdDjz39PIlz75/wuBHk5lgrDiTw==
 
-dexie@2.0.4:
+dexie@2.0.4, dexie@^2.0.0:
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/dexie/-/dexie-2.0.4.tgz#6027a5e05879424e8f9979d8c14e7420f27e3a11"
   integrity sha512-aQ/s1U2wHxwBKRrt2Z/mwFNHMQWhESerFsMYzE+5P5OsIe5o1kgpFMWkzKTtkvkyyEni6mWr/T4HUJuY9xIHLA==

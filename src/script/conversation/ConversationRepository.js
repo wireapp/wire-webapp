@@ -1142,7 +1142,10 @@ export class ConversationRepository {
       });
   }
 
-  async checkForDeletedConversations() {
+  /**
+   * @returns {Promise<void[]>} resolves when deleted conversations are locally deleted, too.
+   */
+  checkForDeletedConversations() {
     return Promise.all(
       this.conversations().map(async conversation => {
         try {
