@@ -48,7 +48,7 @@ describe('audio-seek-bar', () => {
     const audioElement = document.createElement('audio');
     Object.defineProperty(audioElement, 'duration', {get: () => 1000});
     audioElement.currentTime = 500;
-    const params = Object.assign({}, defaultParams, {src: audioElement});
+    const params = {...defaultParams, src: audioElement};
 
     const audioSeekBar = await instantiateComponent('audio-seek-bar', params);
     const levels = Array.from(audioSeekBar.children[0].children);
@@ -68,7 +68,7 @@ describe('audio-seek-bar', () => {
     const audioElement = document.createElement('audio');
     Object.defineProperty(audioElement, 'duration', {get: () => 1000});
     audioElement.currentTime = 0;
-    const params = Object.assign({}, defaultParams, {src: audioElement});
+    const params = {...defaultParams, src: audioElement};
 
     const audioSeekBar = await instantiateComponent('audio-seek-bar', params);
     const clickPositionX = Math.floor(audioSeekBar.offsetWidth / 2);

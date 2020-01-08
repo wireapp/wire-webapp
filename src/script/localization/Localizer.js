@@ -117,7 +117,7 @@ setStrings(strings);
 
   moment.locale([locale, DEFAULT_LOCALE]);
 
-  if (z.string[locale]) {
-    Object.assign(z.string, z.string[DEFAULT_LOCALE], z.string[locale]);
+  if (window.z.string[locale]) {
+    window.z.string = {...window.z.string, ...window.z.string[DEFAULT_LOCALE], ...window.z.string[locale]};
   }
 })();

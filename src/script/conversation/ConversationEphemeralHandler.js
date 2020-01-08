@@ -53,7 +53,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
     super();
 
     const defaultEventListeners = {onMessageTimeout: noop};
-    this.eventListeners = Object.assign({}, defaultEventListeners, eventListeners);
+    this.eventListeners = {...defaultEventListeners, ...eventListeners};
     this.eventService = eventService;
 
     this.setEventHandlingConfig({
