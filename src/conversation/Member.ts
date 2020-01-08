@@ -20,6 +20,7 @@
 import {MutedStatus, ServiceRef} from '../conversation/';
 
 export interface Member {
+  conversation_role?: string;
   hidden?: boolean;
   hidden_ref: string | null;
   id: string;
