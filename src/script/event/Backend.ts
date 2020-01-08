@@ -58,10 +58,8 @@ enum USER {
   UPDATE = 'user.update',
 }
 
-const BackendEvent = {
+export const BackendEvent = {
   CONVERSATION,
   TEAM,
   USER,
 };
-
-export {BackendEvent};
