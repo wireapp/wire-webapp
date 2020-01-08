@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.8.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.7.0...@wireapp/api-client@9.8.0) (2020-01-08)
+
+
+### Features
+
+* **api-client:** Add putConversationReceiptMode ([#2716](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2716)) ([96bb812](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/96bb8122c0d92ad12f77c6879edd902afca2dbfa))
+
+
+
+
+
 # [9.7.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.6.1...@wireapp/api-client@9.7.0) (2020-01-08)
 
 
