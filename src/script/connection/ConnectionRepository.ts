@@ -46,7 +46,7 @@ export class ConnectionRepository {
   private readonly userRepository: UserRepository;
   private readonly logger: Logger;
   private readonly connectionMapper: ConnectionMapper;
-  private readonly connectionEntities: ko.ObservableArray<ConnectionEntity>;
+  public readonly connectionEntities: ko.ObservableArray<ConnectionEntity>;
 
   // tslint:disable-next-line:typedef
   static get CONFIG(): Record<string, BackendEventType[]> {

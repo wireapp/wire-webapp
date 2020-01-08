@@ -121,12 +121,12 @@ export class BackupRepository {
 
     return Promise.resolve()
       .then(() => this._exportHistory(progressCallback))
-      .then(exportedData => this._compressHistoryFiles(exportedData))
+      .then(exportedData => this.compressHistoryFiles(exportedData))
       .catch(error => {
         this.logger.error(`Could not export history: ${error.message}`, error);
 
-        const isCancelError = error instanceof z.backup.CancelError;
-        throw isCancelError ? error : new z.backup.ExportError();
+        const isCancelError = error instanceof window.z.backup.CancelError;
+        throw isCancelError ? error : new window.z.backup.ExportError();
       });
   }
 
@@ -191,7 +191,7 @@ export class BackupRepository {
     return this.backupService
       .exportTable(table, tableRows => {
         if (this.isCanceled) {
-          throw new z.backup.CancelError();
+          throw new window.z.backup.CancelError();
         }
         exportedEntitiesCount += tableRows.length;
 
@@ -201,7 +201,7 @@ export class BackupRepository {
       .then(() => [].concat(...tableData));
   }
 
-  private _compressHistoryFiles(exportedData: Record<string, any>): JSZip {
+  private compressHistoryFiles(exportedData: Record<string, any>): JSZip {
     const metaData = this.createMetaData();
     const zip = new JSZip();
 
@@ -228,7 +228,7 @@ export class BackupRepository {
     this.isCanceled = false;
     const files = archive.files;
     if (!files[BackupRepository.CONFIG.FILENAME.METADATA]) {
-      throw new z.backup.InvalidMetaDataError();
+      throw new window.z.backup.InvalidMetaDataError();
     }
 
     return this.verifyMetadata(files)
@@ -305,7 +305,7 @@ export class BackupRepository {
     for (const importChunk of importChunks) {
       await importFunction(importChunk);
       if (this.isCanceled) {
-        throw new z.backup.CancelError();
+        throw new window.z.backup.CancelError();
       }
     }
   }
@@ -348,13 +348,13 @@ export class BackupRepository {
       const fromUserId = archiveMetadata.user_id;
       const toUserId = localMetadata.user_id;
       const message = `History from user "${fromUserId}" cannot be restored for user "${toUserId}".`;
-      throw new z.backup.DifferentAccountError(message);
+      throw new window.z.backup.DifferentAccountError(message);
     }
 
     const isExpectedPlatform = archiveMetadata.platform === localMetadata.platform;
     if (!isExpectedPlatform) {
       const message = `History created from "${archiveMetadata.platform}" device cannot be imported`;
-      throw new z.backup.IncompatiblePlatformError(message);
+      throw new window.z.backup.IncompatiblePlatformError(message);
     }
 
     const lowestDbVersion = Math.min(archiveMetadata.version, localMetadata.version);
@@ -367,7 +367,7 @@ export class BackupRepository {
 
     if (involvesDatabaseMigration) {
       const message = `History cannot be restored: Database version mismatch`;
-      throw new z.backup.IncompatibleBackupError(message);
+      throw new window.z.backup.IncompatibleBackupError(message);
     }
   }
 }

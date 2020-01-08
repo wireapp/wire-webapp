@@ -187,7 +187,7 @@ describe('BackupRepository', () => {
       return Promise.all(promises);
     });
 
-    it('successfully import backup', () => {
+    it('successfully imports a backup', () => {
       const metadataArray = [backupRepository.createMetaData(), {...backupRepository.createMetaData(), version: 15}];
 
       const archives = metadataArray.map(metadata => {
