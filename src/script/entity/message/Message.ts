@@ -36,9 +36,9 @@ import {ContentMessage} from './ContentMessage';
 import {File as FileAsset} from './File';
 
 export class Message {
-  private readonly ephemeral_expires: ko.Observable<boolean | number>;
+  private readonly ephemeral_expires: ko.Observable<boolean | number | string>;
   private readonly ephemeral_remaining: ko.Observable<number>;
-  private readonly ephemeral_started: ko.Observable<string>;
+  private readonly ephemeral_started: ko.Observable<number>;
   private readonly ephemeral_status: ko.Computed<EphemeralStatusType>;
   private readonly status: ko.Observable<StatusType>;
   private readonly visible: ko.Observable<boolean>;
@@ -85,7 +85,7 @@ export class Message {
     this.ephemeral_duration = ko.observable(0);
     this.ephemeral_remaining = ko.observable(0);
     this.ephemeral_expires = ko.observable(false);
-    this.ephemeral_started = ko.observable('0');
+    this.ephemeral_started = ko.observable(0);
     this.ephemeral_status = ko.computed(() => {
       const isExpired = this.ephemeral_expires() === true;
       if (isExpired) {
@@ -370,12 +370,12 @@ export class Message {
 
     if (this.ephemeral_status() === EphemeralStatusType.INACTIVE) {
       const startingTimestamp = this.user().is_me ? Math.min(this.timestamp() + timeOffset, Date.now()) : Date.now();
-      const expirationTimestamp = startingTimestamp + ((this.ephemeral_expires() || 0) as number);
+      const expirationTimestamp = `${startingTimestamp + Number(this.ephemeral_expires())}`;
       this.ephemeral_expires(expirationTimestamp);
-      this.ephemeral_started(`${startingTimestamp}`);
+      this.ephemeral_started(startingTimestamp);
     }
 
-    const remainingTime = ((this.ephemeral_expires() || 0) as number) - parseInt(this.ephemeral_started(), 10);
+    const remainingTime = Number(this.ephemeral_expires()) - this.ephemeral_started();
     this.ephemeral_remaining(remainingTime);
     this.messageTimerStarted = true;
   };
