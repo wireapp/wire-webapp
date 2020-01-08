@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.6.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.6.0...@wireapp/api-client@9.6.1) (2020-01-08)
+
+
+### Bug Fixes
+
+* **api-client:** Narrow conversation event return types ([#2714](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2714)) ([467f498](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/467f49872f418bbd55dbdd15509601dcac80018c))
+
+
+
+
+
 # [9.6.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.5.0...@wireapp/api-client@9.6.0) (2020-01-08)
 
 
