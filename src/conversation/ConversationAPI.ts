@@ -30,7 +30,13 @@ import {
   NewConversation,
   NewOTRMessage,
 } from '../conversation/';
-import {ConversationEvent, ConversationMemberJoinEvent, ConversationMemberLeaveEvent} from '../event/';
+import {
+  ConversationEvent,
+  ConversationMemberJoinEvent,
+  ConversationMemberLeaveEvent,
+  ConversationMessageTimerUpdateEvent,
+  ConversationRenameEvent,
+} from '../event/';
 import {HttpClient} from '../http/';
 import {ValidationError} from '../validation/';
 import {ConversationMemberUpdateData, ConversationMessageTimerUpdateData, ConversationTypingData} from './data';
@@ -321,14 +327,14 @@ export class ConversationAPI {
    * @param conversationCode The conversation code
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/joinConversationByCode
    */
-  public async postJoinByCode(conversationCode: ConversationCode): Promise<ConversationEvent> {
+  public async postJoinByCode(conversationCode: ConversationCode): Promise<ConversationMemberJoinEvent> {
     const config: AxiosRequestConfig = {
       data: conversationCode,
       method: 'post',
       url: `${ConversationAPI.URL.CONVERSATIONS}${ConversationAPI.URL.JOIN}`,
     };
 
-    const response = await this.client.sendJSON<ConversationEvent>(config);
+    const response = await this.client.sendJSON<ConversationMemberJoinEvent>(config);
     return response.data;
   }
 
@@ -429,14 +435,14 @@ export class ConversationAPI {
   public async putConversation(
     conversationId: string,
     conversationData: ConversationUpdate,
-  ): Promise<ConversationEvent> {
+  ): Promise<ConversationRenameEvent> {
     const config: AxiosRequestConfig = {
       data: conversationData,
       method: 'put',
       url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}`,
     };
 
-    const response = await this.client.sendJSON<ConversationEvent>(config);
+    const response = await this.client.sendJSON<ConversationRenameEvent>(config);
     return response.data;
   }
 
@@ -449,14 +455,14 @@ export class ConversationAPI {
   public async putConversationMessageTimer(
     conversationId: string,
     messageTimerData: ConversationMessageTimerUpdateData,
-  ): Promise<ConversationEvent> {
+  ): Promise<ConversationMessageTimerUpdateEvent> {
     const config: AxiosRequestConfig = {
       data: messageTimerData,
       method: 'put',
       url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/message-timer`,
     };
 
-    const response = await this.client.sendJSON<ConversationEvent>(config);
+    const response = await this.client.sendJSON<ConversationMessageTimerUpdateEvent>(config);
     return response.data;
   }
 
