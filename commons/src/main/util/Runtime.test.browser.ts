@@ -17,8 +17,6 @@
  *
  */
 
-/* tslint:disable:no-object-literal-type-assertion */
-
 import * as platform from 'platform';
 import {OS, Runtime} from './Runtime';
 

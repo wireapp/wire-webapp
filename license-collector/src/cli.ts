@@ -45,9 +45,9 @@ new LicenseCollector({devDependencies: false, filter, repositories})
   .then(async licenses => {
     if (licenses.length) {
       await fs.writeJSON(outputFile, licenses, {spaces: 2});
-      console.log(`Saved licenses to "${outputFile}".`);
+      console.info(`Saved licenses to "${outputFile}".`);
     } else {
-      console.log('No licenses collected.');
+      console.info('No licenses collected.');
     }
   })
   .catch(console.error);

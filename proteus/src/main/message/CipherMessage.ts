@@ -109,8 +109,7 @@ export class CipherMessage extends Message {
 
     if (session_tag && !isNaN(counter) && !isNaN(prev_counter) && ratchet_key && cipher_text) {
       return CipherMessage.new(session_tag, counter, prev_counter, ratchet_key, cipher_text);
-    } else {
-      throw new InputError.TypeError(`Given CipherMessage doesn't match expected signature.`, InputError.CODE.CASE_405);
     }
+    throw new InputError.TypeError(`Given CipherMessage doesn't match expected signature.`, InputError.CODE.CASE_405);
   }
 }

@@ -60,7 +60,7 @@ const tabBarItemStyle: <T>(theme: Theme, props: TabBarItemProps<T>) => ObjectInt
   },
 ) => {
   return {
-    ...textStyle(theme, {bold, block, color, center, fontSize, textTransform, ...props}),
+    ...textStyle(theme, {block, bold, center, color, fontSize, textTransform, ...props}),
     borderBottom: active ? `1px solid ${COLOR.GRAY_DARKEN_48}` : `1px solid ${COLOR.GRAY_LIGHTEN_40}`,
     cursor: 'pointer',
     display: 'flex',

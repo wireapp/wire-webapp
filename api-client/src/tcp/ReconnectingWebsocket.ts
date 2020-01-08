@@ -97,10 +97,8 @@ export class ReconnectingWebsocket {
     if (data === PingMessage.PONG) {
       this.logger.debug('Received pong from WebSocket');
       this.hasUnansweredPing = false;
-    } else {
-      if (this.onMessage) {
-        this.onMessage(data);
-      }
+    } else if (this.onMessage) {
+      this.onMessage(data);
     }
   };
 

@@ -121,7 +121,7 @@ export class Encoder {
 
     this._ensure(nbytes);
 
-    new Uint8Array(this.buffer, this.view.byteOffset).set(<Uint8Array>value);
+    new Uint8Array(this.buffer, this.view.byteOffset).set(value as Uint8Array);
 
     return this._advance(nbytes);
   }

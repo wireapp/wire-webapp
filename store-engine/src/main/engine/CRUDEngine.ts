@@ -23,9 +23,9 @@ export interface CRUDEngine {
 
   /**
    * Creates a record by its primary key within a table.
-   * @param tableName - Table name
-   * @param primaryKey - Primary key to be used to store the record
-   * @param entity - Any kind of object that should be stored
+   * @param tableName Table name
+   * @param primaryKey Primary key to be used to store the record
+   * @param entity Any kind of object that should be stored
    * @returns Resolves with the primary key of the stored record.
    */
   create<EntityType = Object, PrimaryKey = string>(
@@ -42,23 +42,23 @@ export interface CRUDEngine {
 
   /**
    * Deletes a record by its primary key within a table.
-   * @param tableName - Table name
-   * @param primaryKey - Primary key to be used to delete the record
+   * @param tableName Table name
+   * @param primaryKey Primary key to be used to delete the record
    * @returns Resolves with the primary key of the deleted record.
    */
   delete<PrimaryKey = string>(tableName: string, primaryKey: PrimaryKey): Promise<PrimaryKey>;
 
   /**
    * Deletes all records within a table.
-   * @param tableName - Table name
+   * @param tableName Table name
    * @returns Resolves with `true`, if all records have been removed.
    */
   deleteAll(tableName: string): Promise<boolean>;
 
   /**
    * Initializes the store engine. This needs to be done prior to operating with it.
-   * @param storeName - Name of the store
-   * @param settings - Database-specific settings
+   * @param storeName Name of the store
+   * @param settings Database-specific settings
    * @returns Resolves with the underlying (unwrapped) instance of a database.
    * @throws {UnsupportedError} Error when feature is not available on targeted platform.
    */
@@ -78,8 +78,8 @@ export interface CRUDEngine {
 
   /**
    * Finds a record by its primary key within a table.
-   * @param tableName - Table name
-   * @param primaryKey - Primary key to query the record
+   * @param tableName Table name
+   * @param primaryKey Primary key to query the record
    * @throws {RecordNotFoundError} Will be thrown, if the record could not be found.
    * @returns Resolves with the record.
    */
@@ -87,23 +87,23 @@ export interface CRUDEngine {
 
   /**
    * Reads all records from a table.
-   * @param tableName - Table name
+   * @param tableName Table name
    * @returns Resolves with an array of records from a table.
    */
   readAll<EntityType>(tableName: string): Promise<EntityType[]>;
 
   /**
    * Returns all primary keys of records that are stored in a table.
-   * @param tableName - Table name
+   * @param tableName Table name
    * @returns Returns an array of primary keys.
    */
   readAllPrimaryKeys(tableName: string): Promise<string[]>;
 
   /**
    * Updates a record with a set of properties.
-   * @param tableName - Table name
-   * @param primaryKey - Primary key of record which should get updated
-   * @param changes - Updated properties that should be saved for the record
+   * @param tableName Table name
+   * @param primaryKey Primary key of record which should get updated
+   * @param changes Updated properties that should be saved for the record
    * @returns Resolves with the primary key of the updated record.
    */
   update<PrimaryKey = string, ChangesType = Object>(
@@ -115,9 +115,9 @@ export interface CRUDEngine {
   /**
    * Updates a record with a set of properties.
    * If the record doesn't exist, The record will be created automatically.
-   * @param tableName - Table name
-   * @param primaryKey - Primary key of record which should get updated
-   * @param changes - Updated properties that should be saved for the record
+   * @param tableName Table name
+   * @param primaryKey Primary key of record which should get updated
+   * @param changes Updated properties that should be saved for the record
    * @returns Resolves with the primary key of the updated record.
    */
   updateOrCreate<PrimaryKey = string, ChangesType = Object>(

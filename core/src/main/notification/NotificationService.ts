@@ -233,7 +233,7 @@ export class NotificationService extends EventEmitter {
       case Events.CONVERSATION_EVENT.RENAME:
       case Events.CONVERSATION_EVENT.TYPING: {
         const {conversation, from} = event;
-        const metaEvent = {...event, from, conversation};
+        const metaEvent = {...event, conversation, from};
         return ConversationMapper.mapConversationEvent(metaEvent, source);
       }
       // User events

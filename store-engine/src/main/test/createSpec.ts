@@ -17,8 +17,6 @@
  *
  */
 
-// tslint:disable:object-literal-sort-keys
-
 import {CRUDEngine} from '../engine';
 import {RecordAlreadyExistsError, RecordTypeError} from '../engine/error';
 
@@ -49,10 +47,12 @@ export const createSpec = {
       expect(error).toEqual(jasmine.any(RecordTypeError));
     }
   },
-  'saves strings.': async (engine: CRUDEngine) => {
+  'saves objects.': async (engine: CRUDEngine) => {
     const PRIMARY_KEY = 'primary-key';
 
-    const entity = 'value';
+    const entity = {
+      some: 'value',
+    };
 
     const primaryKey = await engine.create(TABLE_NAME, PRIMARY_KEY, entity);
     expect(primaryKey).toEqual(PRIMARY_KEY);
@@ -69,12 +69,10 @@ export const createSpec = {
     const secondRecord = await engine.read(TABLE_NAME, 'primary-key-2');
     expect(secondRecord).toEqual({hello: 'world'});
   },
-  'saves objects.': async (engine: CRUDEngine) => {
+  'saves strings.': async (engine: CRUDEngine) => {
     const PRIMARY_KEY = 'primary-key';
 
-    const entity = {
-      some: 'value',
-    };
+    const entity = 'value';
 
     const primaryKey = await engine.create(TABLE_NAME, PRIMARY_KEY, entity);
     expect(primaryKey).toEqual(PRIMARY_KEY);

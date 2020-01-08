@@ -28,7 +28,5 @@ export function zeroize(object: Uint8Array | ArrayBuffer | Record<string, any> |
     Object.keys(object)
       .map(key => object[key])
       .forEach(val => zeroize(val));
-  } else {
-    return;
   }
 }

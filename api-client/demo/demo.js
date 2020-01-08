@@ -128,7 +128,7 @@ window.onload = function() {
   client.on(APIClient.TOPIC.ACCESS_TOKEN_REFRESH, accessToken => {
     logger.log('Acquired AccessToken', accessToken);
   });
-  window.wire = Object.assign({}, {client});
+  window.wire = {client};
 
   ReactDOM.render(<Auth />, document.getElementById('app'));
 };

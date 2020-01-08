@@ -16,13 +16,14 @@ For licensing information, see the attached LICENSE file and the list of third-p
 
 ```bash
 yarn add --dev @wireapp/eslint-config \
+               @typescript-eslint/eslint-plugin \
+               @typescript-eslint/parser \
                eslint-config-prettier \
-               eslint-plugin-import \
                eslint-plugin-jsdoc \
                eslint-plugin-no-unsanitized \
                eslint-plugin-prettier \
                eslint-plugin-react \
-               eslint-plugin-simple-import-sort \
+               eslint-plugin-react-hooks \
                eslint-plugin-sort-keys-fix \
                prettier \
                eslint
@@ -32,13 +33,14 @@ yarn add --dev @wireapp/eslint-config \
 
 ```powershell
 yarn add --dev @wireapp/eslint-config ^
+               @typescript-eslint/eslint-plugin ^
+               @typescript-eslint/parser ^
                eslint-config-prettier ^
-               eslint-plugin-import ^
                eslint-plugin-jsdoc ^
                eslint-plugin-no-unsanitized ^
                eslint-plugin-prettier ^
                eslint-plugin-react ^
-               eslint-plugin-simple-import-sort ^
+               eslint-plugin-react-hooks ^
                eslint-plugin-sort-keys-fix ^
                prettier ^
                eslint

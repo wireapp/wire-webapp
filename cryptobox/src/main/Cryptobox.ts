@@ -310,7 +310,7 @@ export class Cryptobox extends EventEmitter {
       return ProteusSession.Session.init_from_message(this.identity, this.store, env).then(tuple => {
         const [session, decrypted] = tuple;
         const cryptoBoxSession = new CryptoboxSession(session_id, session);
-        return <[CryptoboxSession, Uint8Array]>[cryptoBoxSession, decrypted];
+        return [cryptoBoxSession, decrypted] as [CryptoboxSession, Uint8Array];
       });
     }
 

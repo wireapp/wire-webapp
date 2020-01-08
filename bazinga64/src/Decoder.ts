@@ -51,9 +51,8 @@ export class Decoder {
       }
 
       return arrayBufferView;
-    } else {
-      const buffer = Buffer.from(encoded, 'base64');
-      return Converter.numberArrayToArrayBufferView(buffer);
     }
+    const buffer = Buffer.from(encoded, 'base64');
+    return Converter.numberArrayToArrayBufferView(buffer);
   }
 }

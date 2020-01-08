@@ -193,8 +193,8 @@ describe('SQLeetEngine', () => {
       });
 
       const RECORDS_COUNT = 100;
-      for (let i = 0; i < RECORDS_COUNT; i++) {
-        await engine.create<DBRecord>('users', i.toString(), {name: 'Lion'});
+      for (let index = 0; index < RECORDS_COUNT; index++) {
+        await engine.create<DBRecord>('users', index.toString(), {name: 'Lion'});
       }
       const results = await engine.readAll<DBRecord>('users');
       expect(results.length).toBe(RECORDS_COUNT);
@@ -265,10 +265,10 @@ describe('SQLeetEngine', () => {
           name: SQLiteType.TEXT,
         },
       });
-      await engine.create<DBRecord>('users', '1', {name: 'Otto', age: 1});
+      await engine.create<DBRecord>('users', '1', {age: 1, name: 'Otto'});
       const result = await engine.read<DBRecord>('users', '1');
       expect(result.name).toBe('Otto');
-      await engine.update('users', '1', {name: 'Hans', age: 2});
+      await engine.update('users', '1', {age: 2, name: 'Hans'});
       const changedResult = await engine.read<DBRecord>('users', '1');
       expect(changedResult.age).toBe(2);
       expect(changedResult.name).toBe('Hans');

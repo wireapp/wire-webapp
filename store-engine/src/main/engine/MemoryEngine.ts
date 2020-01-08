@@ -102,10 +102,9 @@ export class MemoryEngine implements CRUDEngine {
     this.prepareTable(tableName);
     if (this.stores[this.storeName][tableName].hasOwnProperty(primaryKey)) {
       return Promise.resolve(this.stores[this.storeName][tableName][primaryKey]);
-    } else {
-      const message = `Record "${primaryKey}" in "${tableName}" could not be found.`;
-      return Promise.reject(new RecordNotFoundError(message));
     }
+    const message = `Record "${primaryKey}" in "${tableName}" could not be found.`;
+    return Promise.reject(new RecordNotFoundError(message));
   }
 
   public readAll<T>(tableName: string): Promise<T[]> {

@@ -63,7 +63,7 @@ export class PriorityQueue {
 
       if (!this.isRunning) {
         this.isRunning = true;
-        /* tslint:disable-next-line:no-floating-promises */
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
         this.processList();
       }
     });
@@ -103,13 +103,13 @@ export class PriorityQueue {
     try {
       queueObject.resolve(await queueObject.fn());
       this.queue.shift();
-      /* tslint:disable-next-line:no-floating-promises */
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       this.processList();
     } catch (error) {
       if (queueObject.retry >= this.config.maxRetries) {
         this.queue.shift();
         queueObject.reject(error);
-        /* tslint:disable-next-line:no-floating-promises */
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
         this.processList();
       } else {
         this.logger.log(`Retrying item "${queueObject}"`);

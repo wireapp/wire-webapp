@@ -43,7 +43,7 @@ export function hkdf(
   };
 
   salt = convert_type(salt);
-  input = convert_type(<Uint8Array | string>input);
+  input = convert_type(input as Uint8Array | string);
   info = convert_type(info);
 
   const HASH_LEN = 32;

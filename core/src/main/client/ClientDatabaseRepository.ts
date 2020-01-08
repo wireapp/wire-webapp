@@ -105,14 +105,14 @@ export class ClientDatabaseRepository {
   private transformClient(userId: string, client: RegisteredClient, verified: boolean = false): MetaClient {
     return {
       ...client,
-      meta: {primary_key: CryptographyService.constructSessionId(userId, client.id), is_verified: verified},
+      meta: {is_verified: verified, primary_key: CryptographyService.constructSessionId(userId, client.id)},
     };
   }
 
   private transformLocalClient(client: RegisteredClient, verified: boolean = true): MetaClient {
     return {
       ...client,
-      meta: {primary_key: ClientDatabaseRepository.KEYS.LOCAL_IDENTITY, is_verified: verified},
+      meta: {is_verified: verified, primary_key: ClientDatabaseRepository.KEYS.LOCAL_IDENTITY},
     };
   }
 }

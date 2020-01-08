@@ -24,7 +24,7 @@ import {SVGIcon, SVGIconProps} from './SVGIcon';
 export const RecordPendingIcon = (props: SVGIconProps) => (
   <SVGIcon realWidth={16} realHeight={16} {...props}>
     <g fill="#FB0807">
-      <circle fill-opacity=".24" cx="8" cy="8" r="8" />
+      <circle fillOpacity=".24" cx="8" cy="8" r="8" />
       <path d="M8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 1a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm-.5-4.5H10v1H7.5v-1zm0-2h1v3h-1v-3z" />
     </g>
   </SVGIcon>

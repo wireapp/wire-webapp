@@ -58,7 +58,7 @@ export class CryptoboxCRUDStore implements ProteusSession.PreKeyStore {
 
   /**
    * Deletes a specified PreKey.
-   * @return Promise<string> Resolves with the "ID" from the record, which has been deleted.
+   * @returns Promise<string> Resolves with the "ID" from the record, which has been deleted.
    */
   public delete_prekey(prekey_id: number): Promise<number> {
     return this.engine.delete(CryptoboxCRUDStore.STORES.PRE_KEYS, prekey_id.toString()).then(() => prekey_id);
@@ -66,7 +66,7 @@ export class CryptoboxCRUDStore implements ProteusSession.PreKeyStore {
 
   /**
    * Loads the local identity.
-   * @return Promise<ProteusKeys.IdentityKeyPair> Resolves with the "key pair" from the local identity.
+   * @returns Promise<ProteusKeys.IdentityKeyPair> Resolves with the "key pair" from the local identity.
    */
   public load_identity(): Promise<ProteusKeys.IdentityKeyPair | undefined> {
     return this.engine
@@ -86,7 +86,7 @@ export class CryptoboxCRUDStore implements ProteusSession.PreKeyStore {
 
   /**
    * Loads and deserializes a specified PreKey.
-   * @return Promise<ProteusKeys.PreKey> Resolves with the the specified "PreKey".
+   * @returns Promise<ProteusKeys.PreKey> Resolves with the the specified "PreKey".
    */
   public load_prekey(prekey_id: number): Promise<ProteusKeys.PreKey | undefined> {
     return this.engine
@@ -122,7 +122,7 @@ export class CryptoboxCRUDStore implements ProteusSession.PreKeyStore {
 
   /**
    * Saves the local identity.
-   * @return Promise<string> Resolves with the "fingerprint" from the saved local identity.
+   * @returns Promise<string> Resolves with the "fingerprint" from the saved local identity.
    */
   public save_identity(identity: ProteusKeys.IdentityKeyPair): Promise<ProteusKeys.IdentityKeyPair> {
     const serialised = this.to_store(identity.serialise());
@@ -132,7 +132,7 @@ export class CryptoboxCRUDStore implements ProteusSession.PreKeyStore {
 
   /**
    * Saves the serialised format of a specified PreKey.
-   * @return Promise<string> Resolves with the "ID" from the saved PreKey record.
+   * @returns Promise<string> Resolves with the "ID" from the saved PreKey record.
    */
   public save_prekey(pre_key: ProteusKeys.PreKey): Promise<ProteusKeys.PreKey> {
     const serialised = this.to_store(pre_key.serialise());
@@ -150,7 +150,7 @@ export class CryptoboxCRUDStore implements ProteusSession.PreKeyStore {
 
   /**
    * Saves a specified session.
-   * @return Promise<ProteusSession.Session> Resolves with the saved session.
+   * @returns Promise<ProteusSession.Session> Resolves with the saved session.
    */
   public create_session(session_id: string, session: ProteusSession.Session): Promise<ProteusSession.Session> {
     const serialised = this.to_store(session.serialise());
@@ -160,7 +160,7 @@ export class CryptoboxCRUDStore implements ProteusSession.PreKeyStore {
 
   /**
    * Loads a specified session.
-   * @return Promise<ProteusSession.Session> Resolves with the the specified "session".
+   * @returns Promise<ProteusSession.Session> Resolves with the the specified "session".
    */
   public read_session(identity: ProteusKeys.IdentityKeyPair, session_id: string): Promise<ProteusSession.Session> {
     return this.engine.read<PersistedRecord>(CryptoboxCRUDStore.STORES.SESSIONS, session_id).then(record => {
@@ -190,7 +190,7 @@ export class CryptoboxCRUDStore implements ProteusSession.PreKeyStore {
 
   /**
    * Deletes a specified session.
-   * @return Promise<string> Resolves with the "ID" from the record, which has been deleted.
+   * @returns Promise<string> Resolves with the "ID" from the record, which has been deleted.
    */
   public delete_session(session_id: string): Promise<string> {
     return this.engine

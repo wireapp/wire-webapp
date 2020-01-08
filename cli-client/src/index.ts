@@ -72,7 +72,7 @@ const apiClient = new APIClient({urls: APIClient.BACKEND.PRODUCTION});
 const account = new Account(apiClient, storeEngineProvider);
 
 account.on(PayloadBundleType.TEXT, textMessage => {
-  console.log(
+  console.info(
     `Received message from user ID "${textMessage.from}" in conversation ID "${textMessage.conversation}": ${textMessage.content}`,
   );
 });
@@ -101,13 +101,12 @@ account
           .then(() => account.login(loginData))
           .then(() => account.listen())
       );
-    } else {
-      throw error;
     }
+    throw error;
   })
   .then(() => {
     const {clientId, userId} = apiClient.context!;
-    console.log(`Connected to Wire — User ID "${userId}" — Client ID "${clientId}"`);
+    console.info(`Connected to Wire — User ID "${userId}" — Client ID "${clientId}"`);
   })
   .then(() => {
     const stdin = process.openStdin();
@@ -117,7 +116,7 @@ account
         const payload = account.service.conversation.messageBuilder.createText(conversationID, message).build();
         return account.service.conversation.send(payload);
       }
-      return;
+      return undefined;
     });
   })
   .catch((error: Error) => {

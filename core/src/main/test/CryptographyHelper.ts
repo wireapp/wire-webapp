@@ -51,7 +51,5 @@ export async function getPlainText(
   try {
     const decryptedMessage = await cryptographyService.decrypt(sessionId, encodedPreKeyMessage);
     return Buffer.from(decryptedMessage).toString('utf8');
-  } catch (error) {
-    return;
-  }
+  } catch (error) {}
 }

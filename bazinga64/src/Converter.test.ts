@@ -50,7 +50,7 @@ describe('arrayBufferViewToStringUTF8', () => {
 
 describe('jsonToArrayBufferView', () => {
   it('maps a JSON object to an array buffer', () => {
-    /* tslint:disable:object-literal-sort-keys */
+    /* eslint-disable sort-keys-fix/sort-keys-fix */
     const json = {
       '0': 163,
       '1': 0,
@@ -168,7 +168,7 @@ describe('jsonToArrayBufferView', () => {
       '113': 101,
       '114': 37,
     };
-    /* tslint:enable:object-literal-sort-keys */
+    /* eslint-enable sort-keys-fix/sort-keys-fix */
     const arrayBufferView = bazinga64.Converter.jsonToArrayBufferView(json);
     const expectedLength = Object.keys(json).length;
     expect(arrayBufferView.length).toBe(expectedLength);
@@ -246,7 +246,7 @@ describe('toArrayBufferView', () => {
 
   it('throws an error on unexpected inputs', () => {
     const test = () => {
-      bazinga64.Converter.toArrayBufferView(<any>new Error());
+      bazinga64.Converter.toArrayBufferView(new Error() as any);
     };
 
     expect(test).toThrowError(bazinga64.UnsupportedInputError);
@@ -282,7 +282,7 @@ describe('toString', () => {
 
   it('throws an error on unexpected inputs', () => {
     const test = () => {
-      bazinga64.Converter.toArrayBufferView(<any>new Error());
+      bazinga64.Converter.toArrayBufferView(new Error() as any);
     };
 
     expect(test).toThrowError(bazinga64.UnsupportedInputError);

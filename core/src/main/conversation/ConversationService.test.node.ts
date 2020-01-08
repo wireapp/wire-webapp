@@ -100,6 +100,7 @@ describe('ConversationService', () => {
         (sendingClientId, conversationId, message) =>
           new Promise((resolve, reject) => {
             if (message!.recipients[aliceId] && !message!.recipients[aliceId][aliceClientId]) {
+              // eslint-disable-next-line prefer-promise-reject-errors
               reject({
                 response: {
                   data: {
@@ -162,6 +163,7 @@ describe('ConversationService', () => {
         (sendingClientId, conversationId, message) =>
           new Promise((resolve, reject) => {
             if (message!.recipients[aliceId] && message!.recipients[aliceId][aliceClientId]) {
+              // eslint-disable-next-line prefer-promise-reject-errors
               reject({
                 response: {
                   data: {

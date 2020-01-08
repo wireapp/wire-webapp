@@ -127,30 +127,29 @@ export class LRUCache<T> {
       this.remove(matchedNode);
       this.setHead(matchedNode);
       return removedValue;
-    } else {
-      const created: Node<T> = {
-        key,
-        next: null,
-        previous: null,
-        value,
-      };
+    }
+    const created: Node<T> = {
+      key,
+      next: null,
+      previous: null,
+      value,
+    };
 
-      const isOverCapacity = this.size() >= this.capacity;
-      if (isOverCapacity) {
-        if (this.end) {
-          delete this.map[this.end.key];
-          removedNode = this.remove(this.end);
-        }
+    const isOverCapacity = this.size() >= this.capacity;
+    if (isOverCapacity) {
+      if (this.end) {
+        delete this.map[this.end.key];
+        removedNode = this.remove(this.end);
       }
+    }
 
-      if (this.capacity > 0) {
-        this.setHead(created);
-        this.map[key] = created;
-      }
+    if (this.capacity > 0) {
+      this.setHead(created);
+      this.map[key] = created;
+    }
 
-      if (removedNode) {
-        return removedNode.value;
-      }
+    if (removedNode) {
+      return removedNode.value;
     }
 
     return undefined;
@@ -161,9 +160,8 @@ export class LRUCache<T> {
 
     if (matchedNode) {
       return undefined;
-    } else {
-      return this.set(key, value);
     }
+    return this.set(key, value);
   }
 
   private setHead(node: Node<T>): void {

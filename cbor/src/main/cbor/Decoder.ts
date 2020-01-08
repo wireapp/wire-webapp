@@ -140,33 +140,31 @@ export class Decoder {
       case 0: {
         if (0 <= minor && minor <= 24) {
           return [Type.UINT8, minor];
-        } else {
-          switch (minor) {
-            case 25:
-              return [Type.UINT16, minor];
-            case 26:
-              return [Type.UINT32, minor];
-            case 27:
-              return [Type.UINT64, minor];
-            default:
-              throw new DecodeError(DecodeError.INVALID_TYPE);
-          }
+        }
+        switch (minor) {
+          case 25:
+            return [Type.UINT16, minor];
+          case 26:
+            return [Type.UINT32, minor];
+          case 27:
+            return [Type.UINT64, minor];
+          default:
+            throw new DecodeError(DecodeError.INVALID_TYPE);
         }
       }
       case 1: {
         if (0 <= minor && minor <= 24) {
           return [Type.INT8, minor];
-        } else {
-          switch (minor) {
-            case 25:
-              return [Type.INT16, minor];
-            case 26:
-              return [Type.INT32, minor];
-            case 27:
-              return [Type.INT64, minor];
-            default:
-              throw new DecodeError(DecodeError.INVALID_TYPE);
-          }
+        }
+        switch (minor) {
+          case 25:
+            return [Type.INT16, minor];
+          case 26:
+            return [Type.INT32, minor];
+          case 27:
+            return [Type.INT64, minor];
+          default:
+            throw new DecodeError(DecodeError.INVALID_TYPE);
         }
       }
       case 2:

@@ -17,7 +17,7 @@
  *
  */
 
-// tslint:disable:no-magic-numbers
+/* eslint-disable no-magic-numbers */
 
 import * as CBOR from '@wireapp/cbor';
 

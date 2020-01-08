@@ -320,9 +320,9 @@ export class Session {
     if (this.pending_prekey) {
       encoder.object(2);
       encoder.u8(0);
-      encoder.u16(<number>this.pending_prekey[0]);
+      encoder.u16(this.pending_prekey[0] as number);
       encoder.u8(1);
-      (<PublicKey>this.pending_prekey[1]).encode(encoder);
+      (this.pending_prekey[1] as PublicKey).encode(encoder);
     } else {
       encoder.null();
     }

@@ -38,7 +38,7 @@ module.exports = (config: Config): void => {
         flags: ['--no-sandbox'],
       },
     },
-    files: ['**/*.ts', {pattern: '**/*.js', watched: true, served: true, included: false}],
+    files: ['**/*.ts', {included: false, pattern: '**/*.js', served: true, watched: true}],
     frameworks: ['jasmine'],
     logLevel: config.LOG_INFO,
     port: 9876,

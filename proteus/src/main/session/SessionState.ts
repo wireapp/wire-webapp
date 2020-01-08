@@ -164,7 +164,12 @@ export class SessionState {
     );
 
     if (pending) {
-      message = PreKeyMessage.new(<number>pending[0], <PublicKey>pending[1], identity_key, <CipherMessage>message);
+      message = PreKeyMessage.new(
+        pending[0] as number,
+        pending[1] as PublicKey,
+        identity_key,
+        message as CipherMessage,
+      );
     }
 
     const env = Envelope.new(msgkeys.mac_key, message);
@@ -197,23 +202,22 @@ export class SessionState {
       const plain = mks.decrypt(msg.cipher_text);
       rc.chain_key = rc.chain_key.next();
       return plain;
-    } else {
-      const [chk, mk, mks] = rc.stage_message_keys(msg);
-
-      if (!envelope.verify(mk.mac_key)) {
-        throw new DecryptError.InvalidSignature(
-          `Envelope verification failed for message with counter ahead. Message index is '${msg.counter}' while receive chain index is '${rc.chain_key.idx}'.`,
-          DecryptError.CODE.CASE_207,
-        );
-      }
-
-      const plain = mk.decrypt(msg.cipher_text);
-
-      rc.chain_key = chk.next();
-      rc.commit_message_keys(mks);
-
-      return plain;
     }
+    const [chk, mk, mks] = rc.stage_message_keys(msg);
+
+    if (!envelope.verify(mk.mac_key)) {
+      throw new DecryptError.InvalidSignature(
+        `Envelope verification failed for message with counter ahead. Message index is '${msg.counter}' while receive chain index is '${rc.chain_key.idx}'.`,
+        DecryptError.CODE.CASE_207,
+      );
+    }
+
+    const plain = mk.decrypt(msg.cipher_text);
+
+    rc.chain_key = chk.next();
+    rc.commit_message_keys(mks);
+
+    return plain;
   }
 
   serialise(): ArrayBuffer {

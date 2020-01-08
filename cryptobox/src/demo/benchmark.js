@@ -66,7 +66,7 @@ async function encryptBeforeDecrypt({alice, bob}, messageCount) {
   process.stdout.write(`Measuring decryption time for "${messageCount}" messages ... `);
   startTime = process.hrtime();
   await Promise.all(
-    encryptedMessages.map(async encryptedMessage => await bob.decrypt(createSessionId(alice), encryptedMessage)),
+    encryptedMessages.map(async encryptedMessage => bob.decrypt(createSessionId(alice), encryptedMessage)),
   );
   stopTime = getTimeInSeconds(startTime);
   process.stdout.write('Done.\n');

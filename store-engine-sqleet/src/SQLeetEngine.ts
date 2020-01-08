@@ -115,7 +115,6 @@ export class SQLeetEngine implements CRUDEngine {
     }
 
     // If the table contains the single magic column then convert it
-    // tslint:disable-next-line: no-object-literal-type-assertion
     const entities = isSingleColumnTable(table)
       ? (({[RESERVED_COLUMN]: providedEntities} as any) as EntityType)
       : (providedEntities as EntityType);
@@ -290,9 +289,8 @@ export class SQLeetEngine implements CRUDEngine {
       const isRecordNotFound = error instanceof StoreEngineError.RecordNotFoundError;
       if (isRecordNotFound) {
         return this.create(tableName, primaryKey, changes);
-      } else {
-        throw error;
       }
+      throw error;
     }
     return primaryKey;
   }

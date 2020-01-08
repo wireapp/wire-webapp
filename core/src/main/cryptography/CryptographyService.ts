@@ -134,7 +134,7 @@ export class CryptographyService {
       encryptedPayload = '💣';
     }
 
-    return {sessionId, encryptedPayload};
+    return {encryptedPayload, sessionId};
   }
 
   public async initCryptobox(): Promise<void> {

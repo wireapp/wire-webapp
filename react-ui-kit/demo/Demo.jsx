@@ -319,5 +319,4 @@ const Demo = () => {
 
 Demo.displayName = 'Demo';
 
-// eslint-disable-next-line import/no-default-export
 export default Demo;

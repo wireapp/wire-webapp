@@ -23,9 +23,8 @@ export const random_bytes = (length: number): Uint8Array => {
     const buffer = new ArrayBuffer(length);
     const buffer_view = new Uint8Array(buffer);
     return window.crypto.getRandomValues(buffer_view);
-  } else {
-    // node
-    const crypto = require('crypto');
-    return new Uint8Array(crypto.randomBytes(length));
   }
+  // node
+  const crypto = require('crypto');
+  return new Uint8Array(crypto.randomBytes(length));
 };

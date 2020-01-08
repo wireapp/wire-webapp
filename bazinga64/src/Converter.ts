@@ -80,16 +80,16 @@ export class Converter {
   public static toArrayBufferView(data: number | string | number[] | Buffer | ArrayBuffer | Uint8Array): Uint8Array {
     switch (data.constructor.name) {
       case 'ArrayBuffer':
-        return new Uint8Array(<ArrayBuffer>data);
+        return new Uint8Array(data as ArrayBuffer);
       case 'Array':
       case 'Buffer':
-        return this.numberArrayToArrayBufferView(<number[] | Buffer>data);
+        return this.numberArrayToArrayBufferView(data as number[] | Buffer);
       case 'Number':
         return this.stringToArrayBufferViewUTF8(data.toString());
       case 'String':
-        return this.stringToArrayBufferViewUTF8(<string>data);
+        return this.stringToArrayBufferViewUTF8(data as string);
       case 'Uint8Array':
-        return <Uint8Array>data;
+        return data as Uint8Array;
       default:
         throw new UnsupportedInputError(
           `${data.constructor.name} is unsupported.` +
@@ -101,14 +101,14 @@ export class Converter {
   public static toString(data: number[] | number | string | Uint8Array): string {
     switch (data.constructor.name) {
       case 'Array':
-        const arrayBufferView = this.numberArrayToArrayBufferView(<number[]>data);
+        const arrayBufferView = this.numberArrayToArrayBufferView(data as number[]);
         return this.arrayBufferViewToStringUTF8(arrayBufferView);
       case 'Number':
         return data.toString();
       case 'String':
-        return <string>data;
+        return data as string;
       case 'Uint8Array':
-        return this.arrayBufferViewToStringUTF8(<Uint8Array>data);
+        return this.arrayBufferViewToStringUTF8(data as Uint8Array);
       default:
         throw new UnsupportedInputError(
           `${data.constructor.name} is unsupported.` + ` Please provide a 'String', 'Uint8Array' or 'Array'.`,
