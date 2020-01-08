@@ -25,6 +25,7 @@ export * from './ConversationMemberJoinData';
 export * from './ConversationMemberLeaveData';
 export * from './ConversationMemberUpdateData';
 export * from './ConversationMessageTimerUpdateData';
+export * from './ConversationNameUpdateData';
 export * from './ConversationOtrMessageAddData';
 export * from './ConversationReceiptModeUpdateData';
 export * from './ConversationRenameData';

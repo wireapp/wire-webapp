@@ -17,6 +17,6 @@
  *
  */
 
-export interface ConversationUpdate {
+export interface ConversationNameUpdateData {
   name: string;
 }
