@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.4.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/compare/@wireapp/priority-queue@1.3.10...@wireapp/priority-queue@1.4.0) (2020-01-08)
+
+
+### Features
+
+* **eslint-config:** Add support for TypeScript files in ESLint… ([#2648](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/issues/2648)) ([e55d69e](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/commit/e55d69e300cff8eeb7596e6231c6e832d1219e8d))
+
+
+
+
+
 ## [1.3.10](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/compare/@wireapp/priority-queue@1.3.9...@wireapp/priority-queue@1.3.10) (2020-01-06)
 
 **Note:** Version bump only for package @wireapp/priority-queue

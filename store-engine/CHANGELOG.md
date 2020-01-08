@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@4.2.2...@wireapp/store-engine@4.3.0) (2020-01-08)
+
+
+### Features
+
+* **eslint-config:** Add support for TypeScript files in ESLint… ([#2648](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/issues/2648)) ([e55d69e](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/commit/e55d69e300cff8eeb7596e6231c6e832d1219e8d))
+
+
+
+
+
 ## [4.2.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@4.2.1...@wireapp/store-engine@4.2.2) (2020-01-06)
 
 **Note:** Version bump only for package @wireapp/store-engine

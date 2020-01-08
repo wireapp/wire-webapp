@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@12.0.17...@wireapp/cryptobox@12.1.0) (2020-01-08)
+
+
+### Features
+
+* **eslint-config:** Add support for TypeScript files in ESLint… ([#2648](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/issues/2648)) ([e55d69e](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/commit/e55d69e300cff8eeb7596e6231c6e832d1219e8d))
+
+
+
+
+
 ## [12.0.17](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@12.0.16...@wireapp/cryptobox@12.0.17) (2020-01-06)
 
 **Note:** Version bump only for package @wireapp/cryptobox
