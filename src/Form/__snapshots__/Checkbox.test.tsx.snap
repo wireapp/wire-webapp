@@ -138,7 +138,7 @@ input:focus + .emotion-1::before {
       className="emotion-1"
       htmlFor="1"
     >
-      &gt;Checkbox
+      Checkbox
     </label>
   </div>
 </div>

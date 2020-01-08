@@ -30,16 +30,16 @@ export const InputSubmitCombo = (props: InputSubmitComboProps) => (
     className={INPUT_SUBMIT_COMBO_CLASSNAME}
     css={theme => ({
       ...inputStyle(theme, props),
-      alignItems: 'center',
-      display: 'flex',
-      justifyContent: 'space-between',
-      marginBottom: '4px',
-      paddingLeft: 0,
       [INPUT_CLASSNAME]: {
         flexGrow: 1,
         margin: '0 8px 0 0',
         padding: '0 0 0 16px',
       },
+      alignItems: 'center',
+      display: 'flex',
+      justifyContent: 'space-between',
+      marginBottom: '4px',
+      paddingLeft: 0,
     })}
     {...props}
   />

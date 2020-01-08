@@ -29,7 +29,7 @@ const titleStyle: <T>(theme: Theme, props: TitleProps<T>) => ObjectInterpolation
   theme,
   {block = true, center = true, fontSize = '32px', color = COLOR.GRAY, bold = true, ...props},
 ) => ({
-  ...textStyle(theme, {bold, block, color, center, fontSize, ...props}),
+  ...textStyle(theme, {block, bold, center, color, fontSize, ...props}),
   marginBottom: '8px',
 });
 

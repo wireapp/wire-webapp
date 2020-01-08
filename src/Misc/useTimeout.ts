@@ -45,7 +45,7 @@ const useTimeout = (onTimeoutStop: () => void, duration: number) => {
     };
   }, [duration, onTimeoutStop]);
 
-  return {startTimeout: start, removeTimeout};
+  return {removeTimeout, startTimeout: start};
 };
 
 export {useTimeout};

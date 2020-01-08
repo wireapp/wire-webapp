@@ -98,13 +98,13 @@ export const HeaderSubMenu: React.SFC<HeaderSubMenuProps> = ({caption, isOpen, c
   return (
     <MenuSubLink
       {...props}
-      style={{textAlign: 'center', display: 'inline-block', position: 'relative', cursor: 'pointer'}}
+      style={{cursor: 'pointer', display: 'inline-block', position: 'relative', textAlign: 'center'}}
     >
       <span>{caption}</span>
       <Opacity
         in={isOpen && isDesktop}
         timeout={DURATION.DEFAULT}
-        style={{display: 'inline-block', position: 'absolute', left: -18, zIndex: 1, paddingTop: 20, marginTop: 10}}
+        style={{display: 'inline-block', left: -18, marginTop: 10, paddingTop: 20, position: 'absolute', zIndex: 1}}
         mountOnEnter={false}
         unmountOnExit={false}
       >
@@ -125,7 +125,7 @@ export const HeaderSubMenu: React.SFC<HeaderSubMenuProps> = ({caption, isOpen, c
         timeout={DURATION.DEFAULT}
         mountOnEnter={false}
         unmountOnExit={false}
-        style={{position: 'relative', display: 'block'}}
+        style={{display: 'block', position: 'relative'}}
       >
         <Slide
           in={isOpen && !isDesktop}

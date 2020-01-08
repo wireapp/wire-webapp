@@ -17,7 +17,8 @@
  *
  */
 
-/* tslint:disable:object-literal-sort-keys */
+/* eslint-disable sort-keys-fix/sort-keys-fix */
+
 export const WIDTH = {
   TINY: 320,
   MOBILE: 480,
