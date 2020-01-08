@@ -3540,7 +3540,7 @@ export class ConversationRepository {
    * @param {Object} eventJson - JSON data of 'conversation.member-join' event
    * @returns {Promise} Resolves when the event was handled
    */
-  _onMemberJoin(conversationEntity, eventJson) {
+  async _onMemberJoin(conversationEntity, eventJson) {
     // Ignore if we join a 1to1 conversation (accept a connection request)
     const connectionEntity = this.connectionRepository.getConnectionByConversationId(conversationEntity.id);
     const isPendingConnection = connectionEntity && connectionEntity.isIncomingRequest();
@@ -3562,6 +3562,7 @@ export class ConversationRepository {
     const selfUserRejoins = eventData.user_ids.includes(this.selfUser().id);
     if (selfUserRejoins) {
       conversationEntity.status(ConversationStatus.CURRENT_MEMBER);
+      await this.conversationRoleRepository.updateConversationRoles(conversationEntity);
     }
 
     const updateSequence = selfUserRejoins ? this.updateConversationFromBackend(conversationEntity) : Promise.resolve();
