@@ -71,11 +71,10 @@ export function selfReducer(state: SelfState = initialSelfState, action: AppActi
     case SELF_ACTION.CONSENT_GET_SUCCESS: {
       return {
         ...state,
-        consents: action.payload.reduce(
-          (consentAccumulator, consent) => ({...consentAccumulator, [consent.type]: consent.value}),
-          {},
-        ),
-
+        consents: action.payload.reduce((consentAccumulator: Record<number, number>, consent) => {
+          consentAccumulator[consent.type] = consent.value;
+          return consentAccumulator;
+        }, {}),
         error: null,
         fetched: true,
         fetching: false,

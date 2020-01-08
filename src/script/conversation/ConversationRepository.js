@@ -377,15 +377,12 @@ export class ConversationRepository {
    */
   createGroupConversation(userEntities, groupName, accessState, options) {
     const userIds = userEntities.map(userEntity => userEntity.id);
-    const payload = Object.assign(
-      {},
-      {
-        conversation_role: DefaultRole.WIRE_MEMBER,
-        name: groupName,
-        users: userIds,
-      },
-      options,
-    );
+    let payload = {
+      conversation_role: DefaultRole.WIRE_MEMBER,
+      name: groupName,
+      users: userIds,
+      ...options,
+    };
 
     if (this.team().id) {
       payload.team = {
@@ -414,7 +411,7 @@ export class ConversationRepository {
         }
 
         if (accessPayload) {
-          Object.assign(payload, accessPayload);
+          payload = {...payload, ...accessPayload};
         }
       }
     }
@@ -4197,7 +4194,7 @@ export class ConversationRepository {
     }
 
     if (actionType) {
-      const attributes = {
+      let attributes = {
         action: actionType,
         conversation_type: trackingHelpers.getConversationType(conversationEntity),
         ephemeral_time: isEphemeral ? messageTimer : undefined,
@@ -4209,7 +4206,7 @@ export class ConversationRepository {
 
       const isTeamConversation = !!conversationEntity.team_id;
       if (isTeamConversation) {
-        Object.assign(attributes, trackingHelpers.getGuestAttributes(conversationEntity));
+        attributes = {...attributes, ...trackingHelpers.getGuestAttributes(conversationEntity)};
       }
 
       amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CONTRIBUTED, attributes);

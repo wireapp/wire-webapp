@@ -59,7 +59,7 @@ describe('conversationListCallingCell', () => {
 
   it('displays an incoming ringing call', () => {
     const call = createCall(CALL_STATE.INCOMING);
-    const params = Object.assign({}, defaultParams, {call});
+    const params = {...defaultParams, call};
     return instantiateComponent('conversation-list-calling-cell', params).then(domContainer => {
       expect(domContainer.querySelector('[data-uie-name=do-call-controls-call-accept]')).not.toBe(null);
       expect(domContainer.querySelector('[data-uie-name=do-call-controls-call-decline]')).not.toBe(null);
@@ -68,7 +68,7 @@ describe('conversationListCallingCell', () => {
 
   it('displays an outgoing ringing call', () => {
     const call = createCall(CALL_STATE.OUTGOING);
-    const params = Object.assign({}, defaultParams, {call});
+    const params = {...defaultParams, call};
     return instantiateComponent('conversation-list-calling-cell', params).then(domContainer => {
       expect(domContainer.querySelector('[data-uie-name=call-label-outgoing]')).not.toBe(null);
     });
@@ -76,7 +76,7 @@ describe('conversationListCallingCell', () => {
 
   it('displays a call that is connecting', () => {
     const call = createCall(CALL_STATE.ANSWERED);
-    const params = Object.assign({}, defaultParams, {call});
+    const params = {...defaultParams, call};
     return instantiateComponent('conversation-list-calling-cell', params).then(domContainer => {
       expect(domContainer.querySelector('[data-uie-name=call-label-connecting]')).not.toBe(null);
     });
@@ -89,7 +89,7 @@ describe('conversationListCallingCell', () => {
     selfUserEntity.is_me = true;
     conversation.selfUser(selfUserEntity);
     const call = createCall(CALL_STATE.MEDIA_ESTAB);
-    const params = Object.assign({}, defaultParams, {call, conversation: () => conversation});
+    const params = {...defaultParams, call, conversation: () => conversation};
     return instantiateComponent('conversation-list-calling-cell', params).then(domContainer => {
       call.startedAt(Date.now());
       const callDurationElement = domContainer.querySelector('[data-uie-name=call-duration]');

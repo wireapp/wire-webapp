@@ -160,7 +160,7 @@ export class CryptographyMapper {
       time: event.time,
     };
 
-    return Object.assign(genericContent, specificContent);
+    return {...genericContent, ...specificContent};
   }
 
   _mapAsset(asset) {
@@ -187,12 +187,13 @@ export class CryptographyMapper {
     if (preview) {
       const remote = preview.remote;
 
-      data = Object.assign(data, {
+      data = {
+        ...data,
         preview_key: remote.assetId,
         preview_otr_key: new Uint8Array(remote.otrKey),
         preview_sha256: new Uint8Array(remote.sha256),
         preview_token: remote.assetToken,
-      });
+      };
     }
 
     const isImage = original && original.image;
@@ -201,18 +202,16 @@ export class CryptographyMapper {
     }
 
     if (asset.hasOwnProperty('uploaded') && uploaded !== null) {
-      data = Object.assign(data, {
+      data = {
+        ...data,
         key: uploaded.assetId,
         otr_key: new Uint8Array(uploaded.otrKey),
         sha256: new Uint8Array(uploaded.sha256),
         status: AssetTransferState.UPLOADED,
         token: uploaded.assetToken,
-      });
+      };
     } else if (asset.hasOwnProperty('notUploaded') && notUploaded !== null) {
-      data = Object.assign(data, {
-        reason: notUploaded,
-        status: AssetTransferState.UPLOAD_FAILED,
-      });
+      data = {...data, reason: notUploaded, status: AssetTransferState.UPLOAD_FAILED};
     }
 
     return {data, type: ClientEvent.CONVERSATION.ASSET_ADD};
@@ -461,9 +460,10 @@ export class CryptographyMapper {
 }
 
 function addMetadata(mappedEvent, rawEvent) {
-  mappedEvent.data = Object.assign({}, mappedEvent.data, {
+  mappedEvent.data = {
+    ...mappedEvent.data,
     expects_read_confirmation: rawEvent.expectsReadConfirmation,
     legal_hold_status: rawEvent.legalHoldStatus,
-  });
+  };
   return mappedEvent;
 }
