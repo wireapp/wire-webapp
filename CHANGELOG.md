@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.10.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.9.0...@wireapp/api-client@9.10.0) (2020-01-08)
+
+
+### Features
+
+* **api-client:** Add putAccess ([#2721](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2721)) ([2dae7c4](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/2dae7c43fa1b10006c79292201e873567ef581fd))
+
+
+
+
+
 # [9.9.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.8.0...@wireapp/api-client@9.9.0) (2020-01-08)
 
 
