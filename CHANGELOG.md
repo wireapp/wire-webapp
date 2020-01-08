@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.7.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.6.1...@wireapp/api-client@9.7.0) (2020-01-08)
+
+
+### Bug Fixes
+
+* **api-client:** Use new endpoint to update a conversation's name ([#2718](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2718)) ([6cdd1b1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/6cdd1b16022e9c41a67ae09f2a37bb491b3da401))
+
+
+### Features
+
+* **api-client:** Add conversation role to conversation members ([#2719](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2719)) ([fec3203](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/fec32032a99cbe832150383cc31d85ad3308bad8))
+
+
+
+
+
 ## [9.6.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.6.0...@wireapp/api-client@9.6.1) (2020-01-08)
 
 
