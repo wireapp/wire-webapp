@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.5.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.4.0...@wireapp/api-client@9.5.0) (2020-01-08)
+
+
+### Features
+
+* **eslint-config:** Add support for TypeScript files in ESLint… ([#2648](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2648)) ([e55d69e](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/e55d69e300cff8eeb7596e6231c6e832d1219e8d))
+
+
+
+
+
 # [9.4.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.3.3...@wireapp/api-client@9.4.0) (2020-01-06)
 
 
