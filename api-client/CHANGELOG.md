@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.9.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.8.0...@wireapp/api-client@9.9.0) (2020-01-08)
+
+
+### Features
+
+* **api-client:** Add conversation code endpoints ([#2717](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2717)) ([2b59843](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/2b598431ff19e81004544e4c728a46f5d42b9e55))
+
+
+
+
+
 # [9.8.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.7.0...@wireapp/api-client@9.8.0) (2020-01-08)
 
 
