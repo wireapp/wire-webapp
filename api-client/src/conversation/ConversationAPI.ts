@@ -23,7 +23,6 @@ import {
   Conversation,
   ConversationCode,
   ConversationIds,
-  ConversationUpdate,
   Conversations,
   Invite,
   Member,
@@ -39,7 +38,12 @@ import {
 } from '../event/';
 import {HttpClient} from '../http/';
 import {ValidationError} from '../validation/';
-import {ConversationMemberUpdateData, ConversationMessageTimerUpdateData, ConversationTypingData} from './data';
+import {
+  ConversationMemberUpdateData,
+  ConversationMessageTimerUpdateData,
+  ConversationNameUpdateData,
+  ConversationTypingData,
+} from './data';
 
 export class ConversationAPI {
   public static readonly MAX_CHUNK_SIZE = 500;
@@ -51,6 +55,7 @@ export class ConversationAPI {
     JOIN: '/join',
     MEMBERS: 'members',
     MESSAGES: 'messages',
+    NAME: 'name',
     OTR: 'otr',
     SELF: 'self',
     TYPING: 'typing',
@@ -429,17 +434,17 @@ export class ConversationAPI {
   /**
    * Update conversation properties.
    * @param conversationId The conversation ID
-   * @param conversationData The new conversation
+   * @param conversationNameData The new conversation name
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/updateConversation
    */
   public async putConversation(
     conversationId: string,
-    conversationData: ConversationUpdate,
+    conversationNameData: ConversationNameUpdateData,
   ): Promise<ConversationRenameEvent> {
     const config: AxiosRequestConfig = {
-      data: conversationData,
+      data: conversationNameData,
       method: 'put',
-      url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}`,
+      url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.NAME}`,
     };
 
     const response = await this.client.sendJSON<ConversationRenameEvent>(config);
