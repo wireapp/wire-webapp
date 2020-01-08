@@ -71,7 +71,7 @@ if (WIRE_EMAIL && WIRE_PASSWORD && WIRE_CONVERSATION_ID) {
 
   const storagePath = path.join(process.cwd(), '.tmp', login.email);
 
-  /* tslint:disable-next-line:no-floating-promises */
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
   (async () => {
     const storeOptions = {fileExtension: '.json'};
     const storeEngine = new FileEngine(storagePath, storeOptions);

@@ -19,4 +19,5 @@
 
 export type NodeWebSocket = WebSocket;
 
+// eslint-disable-next-line no-undef
 export {NodeWebSocket as WebSocket};

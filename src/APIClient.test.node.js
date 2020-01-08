@@ -139,7 +139,7 @@ describe('APIClient', () => {
     it('can login after a logout', async () => {
       const client = new APIClient();
       await client.login(loginData);
-      return await client.logout();
+      return client.logout();
     });
 
     it('refreshes an access token when it becomes invalid', async () => {
