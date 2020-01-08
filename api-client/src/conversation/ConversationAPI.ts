@@ -35,6 +35,8 @@ import {
   ConversationMemberLeaveEvent,
   ConversationMessageTimerUpdateEvent,
   ConversationRenameEvent,
+  ConversationCodeUpdateEvent,
+  ConversationCodeDeleteEvent,
   ConversationReceiptModeUpdateEvent,
 } from '../event/';
 import {HttpClient} from '../http/';
@@ -52,6 +54,7 @@ export class ConversationAPI {
   public static readonly URL = {
     BOTS: 'bots',
     CLIENTS: '/clients',
+    CODE: 'code',
     CODE_CHECK: '/code-check',
     CONVERSATIONS: '/conversations',
     JOIN: '/join',
@@ -66,6 +69,21 @@ export class ConversationAPI {
   };
 
   constructor(private readonly client: HttpClient) {}
+
+  /**
+   * Delete a conversation code.
+   * @param conversationId ID of conversation to delete the code for
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/deleteConversationCode
+   */
+  public async deleteConversationCode(conversationId: string): Promise<ConversationCodeDeleteEvent> {
+    const config: AxiosRequestConfig = {
+      method: 'delete',
+      url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.CODE}`,
+    };
+
+    const response = await this.client.sendJSON<ConversationCodeDeleteEvent>(config);
+    return response.data;
+  }
 
   /**
    * Remove bot from conversation.
@@ -121,6 +139,21 @@ export class ConversationAPI {
     };
 
     return getConversationChunks();
+  }
+
+  /**
+   * Get a conversation code.
+   * @param conversationId ID of conversation to get the code for
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/getConversationCode
+   */
+  public async getConversationCode(conversationId: string): Promise<ConversationCode> {
+    const config: AxiosRequestConfig = {
+      method: 'GET',
+      url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.CODE}`,
+    };
+
+    const response = await this.client.sendJSON<ConversationCode>(config);
+    return response.data;
   }
 
   /**
@@ -317,7 +350,22 @@ export class ConversationAPI {
   }
 
   /**
-   * Validates conversation code
+   * Create or recreate a conversation code.
+   * @param conversationId ID of conversation to request the code for
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/createConversationCode
+   */
+  public async postConversationCodeRequest(conversationId: string): Promise<ConversationCodeUpdateEvent> {
+    const config: AxiosRequestConfig = {
+      method: 'post',
+      url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.CODE}`,
+    };
+
+    const response = await this.client.sendJSON<ConversationCodeUpdateEvent>(config);
+    return response.data;
+  }
+
+  /**
+   * Validate a conversation code.
    * @param conversationCode The conversation code
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/checkConversationCode
    */
