@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.6.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.5.0...@wireapp/api-client@9.6.0) (2020-01-08)
+
+
+### Features
+
+* **api-client:** Add start and tags parameter to getServices e… ([#2713](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2713)) ([6feb8e2](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/6feb8e24f9df1c4be4086e354e6ca41a3f89551c))
+
+
+
+
+
 # [9.5.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.4.0...@wireapp/api-client@9.5.0) (2020-01-08)
 
 
