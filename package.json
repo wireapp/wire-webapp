@@ -5,7 +5,7 @@
   "dependencies": {
     "@types/long": "4.0.0",
     "@types/node": "~12",
-    "@wireapp/api-client": "9.9.0",
+    "@wireapp/api-client": "9.10.0",
     "@wireapp/cryptobox": "12.1.0",
     "@wireapp/protocol-messaging": "1.24.2",
     "@wireapp/store-engine": "4.3.0",
@@ -66,5 +66,5 @@
     "test:node": "nyc jasmine --config=jasmine.json"
   },
   "types": "./dist/Account.d.ts",
-  "version": "15.2.5"
+  "version": "15.2.6"
 }
