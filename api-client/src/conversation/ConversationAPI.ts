@@ -38,6 +38,7 @@ import {
   ConversationCodeUpdateEvent,
   ConversationCodeDeleteEvent,
   ConversationReceiptModeUpdateEvent,
+  ConversationAccessUpdateEvent,
 } from '../event/';
 import {HttpClient} from '../http/';
 import {ValidationError} from '../validation/';
@@ -47,11 +48,13 @@ import {
   ConversationNameUpdateData,
   ConversationReceiptModeUpdateData,
   ConversationTypingData,
+  ConversationAccessUpdateData,
 } from './data';
 
 export class ConversationAPI {
   public static readonly MAX_CHUNK_SIZE = 500;
   public static readonly URL = {
+    ACCESS: 'access',
     BOTS: 'bots',
     CLIENTS: '/clients',
     CODE: 'code',
@@ -469,7 +472,7 @@ export class ConversationAPI {
 
   /**
    * Send typing notifications.
-   * @param conversationId The Conversation ID
+   * @param conversationId The Conversation ID to send notifications in
    * @param typingData The typing status
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/isTyping
    */
@@ -484,8 +487,28 @@ export class ConversationAPI {
   }
 
   /**
+   * Update access modes for a conversation.
+   * @param conversationId The conversation ID to update the access mode of
+   * @param accessData The new access data
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/updateConversationAccess
+   */
+  public async putAccess(
+    conversationId: string,
+    accessData: ConversationAccessUpdateData,
+  ): Promise<ConversationAccessUpdateEvent> {
+    const config: AxiosRequestConfig = {
+      data: accessData,
+      method: 'put',
+      url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.NAME}`,
+    };
+
+    const response = await this.client.sendJSON<ConversationAccessUpdateEvent>(config);
+    return response.data;
+  }
+
+  /**
    * Update conversation properties.
-   * @param conversationId The conversation ID
+   * @param conversationId The conversation ID to update properties of
    * @param conversationNameData The new conversation name
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/updateConversation
    */
