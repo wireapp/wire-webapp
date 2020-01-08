@@ -17,10 +17,9 @@
  *
  */
 
-//@ts-check
+import {ConnectionStatus} from '@wireapp/api-client/dist/connection';
 
 import {ConnectionMapper} from 'src/script/connection/ConnectionMapper';
-import {ConnectionStatus} from 'src/script/connection/ConnectionStatus';
 
 describe('ConnectionMapper', () => {
   /** @type {ConnectionMapper} */

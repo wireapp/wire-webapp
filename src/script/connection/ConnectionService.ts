@@ -17,22 +17,22 @@
  *
  */
 
-import {getLogger} from 'Util/Logger';
+import {Connection, ConnectionStatus, UserConnectionList} from '@wireapp/api-client/dist/connection';
+
+import {BackendClient} from '../service/BackendClient';
 
 export class ConnectionService {
+  private readonly backendClient: BackendClient;
+
+  // tslint:disable-next-line:typedef
   static get URL() {
     return {
       CONNECTIONS: '/connections',
     };
   }
 
-  /**
-   * Construct a new Connection Service.
-   * @param {BackendClient} backendClient - Client for the API calls
-   */
-  constructor(backendClient) {
+  constructor(backendClient: BackendClient) {
     this.backendClient = backendClient;
-    this.logger = getLogger('ConnectionService');
   }
 
   /**
@@ -43,11 +43,11 @@ export class ConnectionService {
    * of the last connection item from the received list.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/tab.html#!//connections
    *
-   * @param {number} limit - Number of results to return (default 100, max 500)
-   * @param {string} userId - User ID to start from
-   * @returns {Promise} Promise that resolves with user connections
+   * @param limit Number of results to return (default 100, max 500)
+   * @param userId User ID to start from
+   * @returns Promise that resolves with user connections
    */
-  getConnections(limit = 500, userId) {
+  getConnections(limit: number = 500, userId?: string): Promise<UserConnectionList> {
     return this.backendClient.sendRequest({
       data: {
         size: limit,
@@ -63,11 +63,11 @@ export class ConnectionService {
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/tab.html#!//createConnection
    *
-   * @param {string} userId - User ID of the user to request a connection with
-   * @param {string} name - Name of the conversation being initiated (1 - 256 characters)
-   * @returns {Promise} Promise that resolves when the connection request was created
+   * @param userId User ID of the user to request a connection with
+   * @param name Name of the conversation being initiated (1 - 256 characters)
+   * @returns Promise that resolves when the connection request was created
    */
-  postConnections(userId, name) {
+  postConnections(userId: string, name: string): Promise<Connection> {
     return this.backendClient.sendJson({
       data: {
         message: ' ',
@@ -85,11 +85,11 @@ export class ConnectionService {
    * @example status: ['accepted', 'blocked', 'pending', 'ignored', 'sent' or 'cancelled']
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/tab.html#!//updateConnection
    *
-   * @param {string} userId - User ID of the other user
-   * @param {ConnectionStatus} connectionStatus - New relation status
-   * @returns {Promise} Promise that resolves when the status was updated
+   * @param userId User ID of the other user
+   * @param connectionStatus New relation status
+   * @returns Promise that resolves when the status was updated
    */
-  putConnections(userId, connectionStatus) {
+  putConnections(userId: string, connectionStatus: ConnectionStatus): Promise<Connection> {
     return this.backendClient.sendJson({
       data: {
         status: connectionStatus,
