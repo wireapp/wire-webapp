@@ -163,7 +163,7 @@ export class StorageSchemata {
               delete event.mapped;
               delete event.raw;
               delete event.meta;
-              Object.assign(event, mappedEvent);
+              event = {...event, ...mappedEvent};
             });
         },
         version: 7,

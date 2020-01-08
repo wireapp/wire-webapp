@@ -107,7 +107,7 @@ export class ConversationRoleRepository {
     this.conversationRoles[conversation.id] = newRoles;
   };
 
-  setMemberConversationRole = (conversation: Conversation, userId: string, conversationRole: string): void => {
+  setMemberConversationRole = (conversation: Conversation, userId: string, conversationRole: string): Promise<void> => {
     return this.conversationService.putMembers(conversation.id, userId, {
       conversation_role: conversationRole,
     });

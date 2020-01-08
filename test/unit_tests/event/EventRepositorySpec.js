@@ -519,12 +519,8 @@ describe('EventRepository', () => {
 
     it('updates edited messages when link preview arrives', () => {
       const replacingId = 'old-replaced-message-id';
-      const storedEvent = Object.assign({}, event, {
-        data: Object.assign({}, event.data, {
-          replacing_message_id: replacingId,
-        }),
-      });
-      const linkPreviewEvent = Object.assign({}, event);
+      const storedEvent = {...event, data: {...event.data, replacing_message_id: replacingId}};
+      const linkPreviewEvent = {...event};
       spyOn(TestFactory.event_service, 'loadEvent').and.callFake((conversationId, messageId) => {
         return messageId === replacingId ? Promise.resolve() : Promise.resolve(storedEvent);
       });
@@ -566,12 +562,8 @@ describe('EventRepository', () => {
 
     it('updates link preview when edited', () => {
       const replacingId = 'replaced-message-id';
-      const storedEvent = Object.assign({}, event, {
-        data: Object.assign({}, event.data, {
-          previews: ['preview'],
-        }),
-      });
-      const editEvent = Object.assign({}, event);
+      const storedEvent = {...event, data: {...event.data, previews: ['preview']}};
+      const editEvent = {...event};
       spyOn(TestFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(storedEvent));
       spyOn(TestFactory.event_service, 'replaceEvent').and.callFake(ev => ev);
 
@@ -585,9 +577,7 @@ describe('EventRepository', () => {
     });
 
     it('saves a conversation.asset-add event', () => {
-      const assetAddEvent = Object.assign({}, event, {
-        type: ClientEvent.CONVERSATION.ASSET_ADD,
-      });
+      const assetAddEvent = {...event, type: ClientEvent.CONVERSATION.ASSET_ADD};
 
       spyOn(TestFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve());
 
@@ -608,14 +598,12 @@ describe('EventRepository', () => {
       const loadEventSpy = spyOn(TestFactory.event_service, 'loadEvent');
       const deleteEventSpy = spyOn(TestFactory.event_service, 'deleteEvent');
       const testPromises = froms.map(from => {
-        const assetAddEvent = Object.assign({}, event, {
-          from,
-          type: ClientEvent.CONVERSATION.ASSET_ADD,
-        });
-        const assetCancelEvent = Object.assign({}, assetAddEvent, {
+        const assetAddEvent = {...event, from, type: ClientEvent.CONVERSATION.ASSET_ADD};
+        const assetCancelEvent = {
+          ...assetAddEvent,
           data: {reason: AssetUploadFailedReason.CANCELLED, status: AssetTransferState.UPLOAD_FAILED},
           time: '2017-09-06T09:43:36.528Z',
-        });
+        };
 
         loadEventSpy.and.returnValue(Promise.resolve(assetAddEvent));
         deleteEventSpy.and.returnValue(Promise.resolve());
@@ -630,13 +618,12 @@ describe('EventRepository', () => {
     });
 
     it('deletes other user failed upload for conversation.asset-add event', () => {
-      const assetAddEvent = Object.assign({}, event, {
-        type: ClientEvent.CONVERSATION.ASSET_ADD,
-      });
-      const assetUploadFailedEvent = Object.assign({}, assetAddEvent, {
+      const assetAddEvent = {...event, type: ClientEvent.CONVERSATION.ASSET_ADD};
+      const assetUploadFailedEvent = {
+        ...assetAddEvent,
         data: {reason: AssetUploadFailedReason.FAILED, status: AssetTransferState.UPLOAD_FAILED},
         time: '2017-09-06T09:43:36.528Z',
-      });
+      };
 
       spyOn(TestFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(assetAddEvent));
       spyOn(TestFactory.event_service, 'deleteEvent').and.returnValue(Promise.resolve());
@@ -648,13 +635,12 @@ describe('EventRepository', () => {
     });
 
     it('updates self failed upload for conversation.asset-add event', () => {
-      const assetAddEvent = Object.assign({}, event, {
-        type: ClientEvent.CONVERSATION.ASSET_ADD,
-      });
-      const assetUploadFailedEvent = Object.assign({}, assetAddEvent, {
+      const assetAddEvent = {...event, type: ClientEvent.CONVERSATION.ASSET_ADD};
+      const assetUploadFailedEvent = {
+        ...assetAddEvent,
         data: {reason: AssetUploadFailedReason.FAILED, status: AssetTransferState.UPLOAD_FAILED},
         time: '2017-09-06T09:43:36.528Z',
-      });
+      };
 
       spyOn(TestFactory.user_repository, 'self').and.returnValue({id: assetAddEvent.from});
       spyOn(TestFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(assetAddEvent));
@@ -669,14 +655,13 @@ describe('EventRepository', () => {
     });
 
     it('handles conversation.asset-add state update event', () => {
-      const initialAssetEvent = Object.assign({}, event, {
-        type: ClientEvent.CONVERSATION.ASSET_ADD,
-      });
+      const initialAssetEvent = {...event, type: ClientEvent.CONVERSATION.ASSET_ADD};
 
-      const updateStatusEvent = Object.assign({}, initialAssetEvent, {
+      const updateStatusEvent = {
+        ...initialAssetEvent,
         data: {status: AssetTransferState.UPLOADED},
         time: '2017-09-06T09:43:36.528Z',
-      });
+      };
 
       spyOn(TestFactory.event_service, 'replaceEvent').and.callFake(eventToUpdate => Promise.resolve(eventToUpdate));
       spyOn(TestFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(initialAssetEvent));
@@ -689,14 +674,13 @@ describe('EventRepository', () => {
     });
 
     it('updates video when preview is received', () => {
-      const initialAssetEvent = Object.assign({}, event, {
-        type: ClientEvent.CONVERSATION.ASSET_ADD,
-      });
+      const initialAssetEvent = {...event, type: ClientEvent.CONVERSATION.ASSET_ADD};
 
-      const AssetPreviewEvent = Object.assign({}, initialAssetEvent, {
+      const AssetPreviewEvent = {
+        ...initialAssetEvent,
         data: {status: AssetTransferState.UPLOADED},
         time: '2017-09-06T09:43:36.528Z',
-      });
+      };
 
       spyOn(TestFactory.event_service, 'replaceEvent').and.callFake(eventToUpdate => Promise.resolve(eventToUpdate));
       spyOn(TestFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(initialAssetEvent));
