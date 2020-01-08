@@ -41,7 +41,7 @@ export enum CONVERSATION_ACCESS {
 }
 
 export interface Conversation {
-  access: CONVERSATION_ACCESS;
+  access: CONVERSATION_ACCESS[];
   access_role: CONVERSATION_ACCESS_ROLE;
   creator: string;
   id: string;

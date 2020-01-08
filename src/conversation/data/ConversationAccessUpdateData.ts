@@ -20,6 +20,6 @@
 import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE} from '../Conversation';
 
 export interface ConversationAccessUpdateData {
-  access: CONVERSATION_ACCESS;
+  access: CONVERSATION_ACCESS[];
   access_role: CONVERSATION_ACCESS_ROLE;
 }
