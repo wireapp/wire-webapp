@@ -44,11 +44,11 @@ export class MemberMessage extends SystemMessage {
   public readonly highlightedUsers: ko.PureComputed<User[]>;
   public readonly htmlCaption: ko.PureComputed<string>;
   public readonly htmlGroupCreationHeader: ko.PureComputed<string>;
-  public readonly memberMessageType: SystemMessageType;
   public readonly remoteUserEntities: ko.PureComputed<User[]>;
   public readonly showServicesWarning: boolean;
   public readonly userEntities: ko.ObservableArray<User>;
   public readonly userIds: ko.ObservableArray<string>;
+  public memberMessageType: SystemMessageType;
 
   // tslint:disable-next-line:typedef
   static get CONFIG() {
