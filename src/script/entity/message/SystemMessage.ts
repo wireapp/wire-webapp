@@ -17,17 +17,20 @@
  *
  */
 
-import {Asset} from './Asset';
-import {AssetType} from '../../assets/AssetType';
+import {SuperType} from '../../message/SuperType';
+import {SystemMessageType} from '../../message/SystemMessageType';
+import {Message} from './Message';
 
-export class Location extends Asset {
+export class SystemMessage extends Message {
+  public system_message_type: SystemMessageType;
+
   constructor() {
     super();
+    this.super_type = SuperType.SYSTEM;
+    this.system_message_type = SystemMessageType.NORMAL;
+  }
 
-    this.latitude = '';
-    this.longitude = '';
-    this.name = '';
-    this.type = AssetType.LOCATION;
-    this.zoom = '';
+  is_conversation_rename(): boolean {
+    return this.system_message_type === SystemMessageType.CONVERSATION_RENAME;
   }
 }
