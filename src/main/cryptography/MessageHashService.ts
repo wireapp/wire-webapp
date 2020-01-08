@@ -62,9 +62,8 @@ export class MessageHashService {
     if (content.uploaded) {
       const assetId = content.uploaded.assetId;
       return this.convertToUtf16BE(assetId);
-    } else {
-      return Buffer.from([]);
     }
+    return Buffer.from([]);
   }
 
   private getTimestampBuffer(timestamp: number): Buffer {
