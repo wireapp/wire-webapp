@@ -21,6 +21,11 @@ import {AccentColor} from '@wireapp/commons';
 import {Picture, SSOSignature} from '../self/';
 import {UserAsset} from '../user/';
 
+export enum ManagedSource {
+  WIRE = 'wire',
+  SCIM = 'scim',
+}
+
 export interface Self {
   accent_id?: AccentColor.AccentColorID;
   assets: UserAsset[];
@@ -30,6 +35,11 @@ export interface Self {
   handle?: string;
   id: string;
   locale: string;
+  /**
+   * What is the source of truth for this user; if it's SCIM
+   * then the profile can't be edited via normal means.
+   */
+  managed_by?: ManagedSource;
   name: string;
   phone?: string;
   picture?: Picture[];
