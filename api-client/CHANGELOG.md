@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.12.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.11.0...@wireapp/api-client@9.12.0) (2020-01-09)
+
+
+### Features
+
+* **api-client:** Add conversation roles and TeamConversationAPI ([#2720](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2720)) ([408fc9b](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/408fc9b9c79cbc33006d548a8b521a27ff93e1ce))
+
+
+
+
+
 # [9.11.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.10.0...@wireapp/api-client@9.11.0) (2020-01-09)
 
 
