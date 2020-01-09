@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.11.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.10.0...@wireapp/api-client@9.11.0) (2020-01-09)
+
+
+### Features
+
+* **api-client:** Add getGiphyById endpoint ([#2715](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2715)) ([71692dd](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/71692ddff489a43e2931c78954a9c19909132b7a))
+
+
+
+
+
 # [9.10.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.9.0...@wireapp/api-client@9.10.0) (2020-01-08)
 
 
