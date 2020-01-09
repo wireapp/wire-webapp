@@ -17,6 +17,26 @@
  *
  */
 
+export interface ImageDimensions {
+  height: string;
+  width: string;
+}
+
+export interface ImageMP4Meta {
+  mp4: string;
+  mp4_size: string;
+}
+
+export interface ImageGifMeta {
+  size: string;
+  url: string;
+}
+
+export interface ImageWebPMeta {
+  webp_size: string;
+  webp: string;
+}
+
 export interface GiphyImage {
   caption: string;
   fixed_height_downsampled_height: string;
@@ -40,6 +60,31 @@ export interface GiphyImage {
   image_original_url: string;
   image_url: string;
   image_width: string;
+  images: {
+    downsized: ImageDimensions & ImageGifMeta;
+    downsized_large: ImageDimensions & ImageGifMeta;
+    downsized_medium: ImageDimensions & ImageGifMeta;
+    downsized_small: ImageDimensions & ImageMP4Meta;
+    downsized_still: ImageDimensions & ImageGifMeta;
+    fixed_height: ImageDimensions & ImageWebPMeta & ImageGifMeta & ImageMP4Meta;
+    fixed_height_downsampled: ImageDimensions & ImageWebPMeta & ImageGifMeta;
+    fixed_height_small: ImageDimensions & ImageWebPMeta & ImageGifMeta & ImageMP4Meta;
+    fixed_height_small_still: ImageDimensions & ImageGifMeta;
+    fixed_height_still: ImageDimensions & ImageGifMeta;
+    fixed_width: ImageDimensions & ImageWebPMeta & ImageGifMeta & ImageMP4Meta;
+    fixed_width_downsampled: ImageDimensions & ImageWebPMeta & ImageGifMeta;
+    fixed_width_small: ImageDimensions & ImageWebPMeta & ImageGifMeta & ImageMP4Meta;
+    fixed_width_small_still: ImageDimensions & ImageGifMeta;
+    fixed_width_still: ImageDimensions & ImageGifMeta;
+    hd: ImageDimensions & ImageMP4Meta;
+    looping: ImageMP4Meta;
+    original: {frames: string; hash: string} & ImageDimensions & ImageWebPMeta & ImageGifMeta & ImageMP4Meta;
+    original_mp4: ImageDimensions & ImageMP4Meta;
+    original_still: ImageDimensions & ImageGifMeta;
+    preview: ImageDimensions & ImageMP4Meta;
+    preview_gif: ImageDimensions & ImageGifMeta;
+    preview_webp: ImageDimensions & ImageGifMeta;
+  };
   type: string;
   url: string;
   username: string;
