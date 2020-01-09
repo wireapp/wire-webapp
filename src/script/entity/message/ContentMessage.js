@@ -110,10 +110,10 @@ export class ContentMessage extends Message {
       return false;
     }
 
-    const newReactions = Object.assign({}, this.reactions());
+    const newReactions = {...this.reactions()};
 
     if (shouldAdd) {
-      Object.assign(newReactions, {[from]: reaction});
+      newReactions[from] = reaction;
     } else {
       delete newReactions[from];
     }

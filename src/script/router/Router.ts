@@ -19,13 +19,17 @@
 
 import switchPath from 'switch-path';
 
+export type Routes = Record<string, (() => void) | null>;
+
 export class Router {
-  constructor(routeDefinitions) {
-    const defaultRoute = {
+  private readonly parseRoute: () => any;
+
+  constructor(routeDefinitions: Routes) {
+    const defaultRoute: Routes = {
       // do nothing if url was not matched
       '*': null,
     };
-    const routes = Object.assign({}, defaultRoute, routeDefinitions);
+    const routes = {...defaultRoute, ...routeDefinitions};
 
     this.parseRoute = () => {
       const currentPath = window.location.hash.replace('#', '') || '/';
@@ -40,7 +44,7 @@ export class Router {
     this.parseRoute();
   }
 
-  navigate(path) {
+  navigate(path: string): Router {
     window.history.replaceState(null, null, `#${path}`);
     this.parseRoute();
     return this;

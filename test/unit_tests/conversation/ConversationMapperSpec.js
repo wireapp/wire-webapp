@@ -423,13 +423,13 @@ describe('Conversation Mapper', () => {
       const tests = [
         {
           expected: {message_timer: 10000},
-          local: Object.assign({}, baseConversation, {message_timer: undefined}),
-          remote: Object.assign({}, baseConversation, {message_timer: 10000}),
+          local: {...baseConversation, message_timer: undefined},
+          remote: {...baseConversation, message_timer: 10000},
         },
         {
           expected: {message_timer: 0},
-          local: Object.assign({}, baseConversation, {message_timer: 1000}),
-          remote: Object.assign({}, baseConversation, {message_timer: 0}),
+          local: {...baseConversation, message_timer: 1000},
+          remote: {...baseConversation, message_timer: 0},
         },
       ];
 
@@ -453,7 +453,7 @@ describe('Conversation Mapper', () => {
         otr_muted_ref: '2017-02-16T10:06:41.118Z',
       };
 
-      remote_data.members.self = Object.assign(remote_data.members.self, self_update);
+      remote_data.members.self = {...remote_data.members.self, ...self_update};
 
       const [merged_conversation] = conversation_mapper.mergeConversation([local_data], [remote_data], true);
 

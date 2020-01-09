@@ -387,7 +387,9 @@ export class DebugUtil {
       const color = (constraints.deviceId || {}).exact || cameras[0].deviceId;
       const width = 300;
       const height = 240;
-      const canvas = Object.assign(document.createElement('canvas'), {height, width});
+      const canvas = document.createElement('canvas');
+      canvas.height = height;
+      canvas.width = width;
       const ctx = canvas.getContext('2d');
       setInterval(() => {
         ctx.fillStyle = `#${color}`;
@@ -410,7 +412,8 @@ export class DebugUtil {
       document.body.removeChild(containerElement);
       return;
     }
-    const statsDomElement = Object.assign(document.createElement('div'), {id: containerId});
+    const statsDomElement = document.createElement('div');
+    statsDomElement.id = containerId;
     document.body.appendChild(statsDomElement);
     const patch = snabbdomInit([style]);
     let vdom = createElement('div');

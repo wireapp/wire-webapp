@@ -91,9 +91,7 @@ describe('ConversationCellState', () => {
           description: t('conversationsSecondaryLineSummaryMissedCalls'),
           icon: ConversationStatusIcon.MISSED_CALL,
         },
-        unreadState: Object.assign({}, defaultUnreadState, {
-          calls: [{}, {}],
-        }),
+        unreadState: {...defaultUnreadState, calls: [{}, {}]},
       },
       {
         description: "returns unread message's text if there is only a single text message",
@@ -101,16 +99,12 @@ describe('ConversationCellState', () => {
           group: {description: 'Felix: Hello there', icon: ConversationStatusIcon.UNREAD_MESSAGES},
           one2one: {description: 'Hello there', icon: ConversationStatusIcon.UNREAD_MESSAGES},
         },
-        unreadState: Object.assign({}, defaultUnreadState, {
-          allMessages: [contentMessage],
-        }),
+        unreadState: {...defaultUnreadState, allMessages: [contentMessage]},
       },
       {
         description: 'returns the number of pings',
         expected: {description: t('conversationsSecondaryLineSummaryPings'), icon: ConversationStatusIcon.UNREAD_PING},
-        unreadState: Object.assign({}, defaultUnreadState, {
-          pings: [pingMessage, pingMessage],
-        }),
+        unreadState: {...defaultUnreadState, pings: [pingMessage, pingMessage]},
       },
       {
         description: 'returns the number of mentions',
@@ -118,9 +112,7 @@ describe('ConversationCellState', () => {
           description: t('conversationsSecondaryLineSummaryMentions'),
           icon: ConversationStatusIcon.UNREAD_MENTION,
         },
-        unreadState: Object.assign({}, defaultUnreadState, {
-          selfMentions: [1, 2],
-        }),
+        unreadState: {...defaultUnreadState, selfMentions: [1, 2]},
       },
       {
         description: 'prioritizes mentions, calls, pings and messages',
@@ -130,12 +122,7 @@ describe('ConversationCellState', () => {
           )}, ${t('conversationsSecondaryLineSummaryPings')}, ${t('conversationsSecondaryLineSummaryMessages')}`,
           icon: ConversationStatusIcon.UNREAD_MENTION,
         },
-        unreadState: Object.assign({}, defaultUnreadState, {
-          calls: [1, 2],
-          otherMessages: [1, 2],
-          pings: [1, 2],
-          selfMentions: [1, 2],
-        }),
+        unreadState: {...defaultUnreadState, calls: [1, 2], otherMessages: [1, 2], pings: [1, 2], selfMentions: [1, 2]},
       },
     ];
 

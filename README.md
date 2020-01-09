@@ -86,11 +86,12 @@ The command to run is:
 **Actions**
 
 1. Get commit ID which has been approved by QA team
-1. run `yarn release:staging <commitId>`.
+1. run `yarn release:staging <commitId>` (if the commit ID is omitted, the latest commit from `dev` will be used).
 1. Example:
    ```
    yarn release:staging 90fda951916f0d60a5bffce69a7267830e313391
    ```
+1. Enter "yes"
 
 If everything is done right, you will see a Travis CI job in the [build pipeline](https://travis-ci.org/wireapp/wire-webapp/builds) based on the new tag:
 
@@ -102,7 +103,7 @@ Before RC testing we create a merge commit (**don't squash!**) from "dev" to "ma
 
 #### Production Release
 
-Similar to "Staging Bumps" with the exception that you need to run `yarn release:production <commitId>`.
+Similar to "Staging Bumps" with the exception that you need to run `yarn release:production <commitId>` (if the commit ID is omitted, the latest commit from `master` will be used).
 
 Example:
 

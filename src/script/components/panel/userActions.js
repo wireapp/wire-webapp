@@ -162,16 +162,14 @@ ko.components.register('user-actions', {
       },
       {
         // remove user from conversation
-        condition: () => {
-          return (
-            isNotMe() &&
-            conversation()?.isActiveParticipant() &&
-            conversation()
-              .participating_user_ids()
-              .some(id => user().id === id) &&
-            conversationRoleRepository.canRemoveParticipants(conversation())
-          );
-        },
+        condition: () =>
+          isNotMe() &&
+          conversation() &&
+          !conversation().removed_from_conversation() &&
+          conversation()
+            .participating_user_ids()
+            .some(id => user().id === id) &&
+          conversationRoleRepository.canRemoveParticipants(conversation()),
         item: {
           click: () =>
             actionsViewModel.removeFromConversation(conversation(), user()).then(() => onAction(Actions.REMOVE)),

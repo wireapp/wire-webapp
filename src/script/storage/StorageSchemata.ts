@@ -29,7 +29,8 @@ interface DexieSchema {
 }
 
 export class StorageSchemata {
-  static get OBJECT_STORE(): Record<string, string> {
+  // tslint:disable-next-line:typedef
+  static get OBJECT_STORE() {
     return {
       AMPLIFY: 'amplify',
       CLIENTS: 'clients',
@@ -162,7 +163,7 @@ export class StorageSchemata {
               delete event.mapped;
               delete event.raw;
               delete event.meta;
-              Object.assign(event, mappedEvent);
+              event = {...event, ...mappedEvent};
             });
         },
         version: 7,
