@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.14.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.14.0...@wireapp/api-client@9.14.1) (2020-01-09)
+
+
+### Bug Fixes
+
+* **api-client:** Add default conversation role when adding memb… ([#2728](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2728)) ([6978e82](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/6978e82887f672f347fb8ca4edccfaf7f5c36be0))
+
+
+
+
+
 # [9.14.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.13.1...@wireapp/api-client@9.14.0) (2020-01-09)
 
 
