@@ -17,57 +17,21 @@
  *
  */
 
-const pkg = require('./package.json');
-const path = require('path');
-const webpack = require('webpack');
-
-const projectName = pkg.name.replace('@wireapp/', '');
-
 module.exports = {
-  devServer: {
-    hot: true,
-    open: true,
-    overlay: true,
-    stats: {
-      chunks: false,
-    },
-  },
-  devtool: 'source-map',
-  entry: {
-    [projectName]: `${__dirname}/${pkg.main}`,
-    [`${projectName}.demo`]: `${__dirname}/demo/demo.js`,
-    [`${projectName}.test`]: `${__dirname}/src/index.test.browser.js`,
-  },
   externals: {
     'fs-extra': '{}',
   },
-  mode: 'production',
+  mode: 'development',
   module: {
     rules: [
       {
         exclude: /node_modules/,
-        test: /\.jsx?$/,
-        use: [
-          {
-            loader: 'babel-loader',
-            options: {
-              presets: ['@babel/preset-react'],
-            },
-          },
-        ],
+        loader: 'babel-loader',
+        test: /\.[tj]s$/,
       },
     ],
   },
-  output: {
-    filename: `[name].bundle.js`,
-    path: `${__dirname}/dist`,
-    publicPath: '/',
-  },
-  plugins: [new webpack.HotModuleReplacementPlugin()],
   resolve: {
-    alias: {
-      '@wireapp/react-ui-kit': path.resolve(__dirname, '..', 'react-ui-kit', 'dist'),
-    },
-    extensions: ['.js', '.jsx'],
+    extensions: ['.js', '.ts'],
   },
 };

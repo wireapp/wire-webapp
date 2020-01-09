@@ -17,17 +17,18 @@
  *
  */
 
-import {Config} from 'karma';
 const pkg = require('./package.json');
+const webpackConfig = require('./webpack.config.js');
 
 const dist = 'dist/';
 const projectName = pkg.name.replace('@wireapp/', '');
+const testCode = 'src/**/*test?(.browser).ts';
 
 const preprocessors = {
-  '**/*.js': ['sourcemap'],
+  [testCode]: ['webpack'],
 };
 
-module.exports = (config: Config): void => {
+module.exports = (config: any): void => {
   config.set({
     autoWatch: false,
     basePath: '',
@@ -43,12 +44,14 @@ module.exports = (config: Config): void => {
         flags: ['--no-sandbox'],
       },
     },
-    files: [`${dist}${projectName}.test.bundle.js`],
+    exclude: [],
+    files: [{pattern: testCode, watched: false}],
     frameworks: ['jasmine'],
     logLevel: config.LOG_INFO,
     port: 9876,
     preprocessors,
     reporters: ['jasmine-diff', 'spec'],
     singleRun: true,
+    webpack: webpackConfig,
   });
 };

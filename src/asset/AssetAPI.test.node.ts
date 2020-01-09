@@ -17,13 +17,21 @@
  *
  */
 
-const {APIClient} = require('@wireapp/api-client');
+import {APIClient} from '../APIClient';
 
 describe('"AssetAPI"', () => {
   const apiClient = new APIClient();
 
   it('adds token parameters', async () => {
-    spyOn(apiClient.transport.http, 'sendRequest').and.returnValue(Promise.resolve({data: ''}));
+    spyOn(apiClient.transport.http, 'sendRequest').and.returnValue(
+      Promise.resolve({
+        config: {},
+        data: '',
+        headers: {},
+        status: 200,
+        statusText: 'OK',
+      }),
+    );
     const assetId = 'my-asset-id';
     const assetToken = 'my-asset-token';
 
@@ -41,7 +49,15 @@ describe('"AssetAPI"', () => {
   });
 
   it('removes token parameters', async () => {
-    spyOn(apiClient.transport.http, 'sendRequest').and.returnValue(Promise.resolve({data: ''}));
+    spyOn(apiClient.transport.http, 'sendRequest').and.returnValue(
+      Promise.resolve({
+        config: {},
+        data: '',
+        headers: {},
+        status: 200,
+        statusText: 'OK',
+      }),
+    );
     const assetId = 'my-asset-id';
 
     await apiClient.asset.api.getAsset(assetId);

@@ -19,13 +19,15 @@
 
 /* eslint-disable no-magic-numbers */
 
-const {TimeUtil} = require('@wireapp/commons');
-const {ReconnectingWebsocket} = require('@wireapp/api-client/dist/tcp/ReconnectingWebsocket');
-const {Server: WebSocketServer} = require('ws');
+import {TimeUtil} from '@wireapp/commons';
+import {Server as WebSocketServer} from 'ws';
 
-const reservedPorts = [];
+import {AddressInfo} from 'net';
+import {ReconnectingWebsocket} from './ReconnectingWebsocket';
 
-function startEchoServer() {
+const reservedPorts: number[] = [];
+
+function startEchoServer(): WebSocketServer {
   const getWebsocketPort = () => {
     const WEBSOCKET_START_PORT = 8087;
     let currentPort = WEBSOCKET_START_PORT;
@@ -65,8 +67,14 @@ function startEchoServer() {
 }
 
 describe('ReconnectingWebsocket', () => {
-  let server;
-  const getServerAddress = () => `http://127.0.0.1:${server.address().port}`;
+  let server: WebSocketServer | undefined;
+  const getServerAddress = () => {
+    if (server) {
+      const address: AddressInfo = server.address() as AddressInfo;
+      return Promise.resolve(`http://127.0.0.1:${address.port}`);
+    }
+    throw new Error('Server is undefined');
+  };
 
   beforeEach(() => {
     server = startEchoServer();
@@ -125,7 +133,7 @@ describe('ReconnectingWebsocket', () => {
       reconnectCalls++;
       expect(onReconnect.calls.count()).toBe(reconnectCalls);
       if (reconnectCalls === 1) {
-        RWS.socket.reconnect();
+        RWS['socket']!.reconnect();
       } else {
         RWS.disconnect();
       }
@@ -141,7 +149,7 @@ describe('ReconnectingWebsocket', () => {
 
   it('sends ping messages', done => {
     const RWS = new ReconnectingWebsocket(() => getServerAddress(), {pingInterval: TimeUtil.TimeInMillis.SECOND});
-    RWS.setOnMessage(data => {
+    RWS.setOnMessage((data: string) => {
       expect(JSON.parse(data)).toEqual({fromServer: 'Echo: ping'});
       RWS.disconnect();
     });

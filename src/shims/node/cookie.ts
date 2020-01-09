@@ -23,7 +23,7 @@ import {Cookie as ToughCookie} from 'tough-cookie';
 import {Cookie} from '../../auth/';
 import {CookieStore} from '../../auth/CookieStore';
 import {HttpClient} from '../../http/';
-import * as ObfuscationUtil from '../../obfuscation/';
+import {ObfuscationUtil} from '../../obfuscation/';
 
 const logger = logdown('@wireapp/api-client/shims/node/cookie', {
   logger: console,

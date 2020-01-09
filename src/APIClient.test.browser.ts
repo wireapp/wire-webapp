@@ -17,13 +17,15 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client';
-import {Context} from '@wireapp/api-client/dist/auth/Context';
+/* eslint-disable dot-notation */
+
+import {APIClient} from './APIClient';
+import {ClientType} from './client';
 
 describe('Client', () => {
   describe('"connect"', () => {
     it('processes WebSocket messages when executed in a web browser.', async () => {
-      const apiClient = new APIClient(APIClient.BACKEND.STAGING);
+      const apiClient = new APIClient({urls: APIClient.BACKEND.STAGING});
       const accessTokenData = {
         access_token:
           'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ==.v=1.k=1.d=1498600993.t=a.l=.u=aaf9a833-ef30-4c22-86a0-9adc8a15b3b4.c=15037015562284012115',
@@ -31,17 +33,21 @@ describe('Client', () => {
         token_type: 'Bearer',
         user: 'aaf9a833-ef30-4c22-86a0-9adc8a15b3b4',
       };
-      const dataBuffer = new TextEncoder('utf-8').encode('{}').buffer;
+      const dataBuffer = new TextEncoder().encode('{}').buffer;
       const message = new MessageEvent('message', {data: dataBuffer});
-      apiClient.context = new Context('userId', undefined);
-      apiClient.accessTokenStore.accessToken = accessTokenData;
+      apiClient.context = {
+        clientId: undefined,
+        clientType: ClientType.TEMPORARY,
+        userId: 'userId',
+      };
+      apiClient['accessTokenStore'].accessToken = accessTokenData;
 
       const promise = apiClient.connect();
-      apiClient.transport.ws.socket.internalOnMessage(message);
+      apiClient.transport.ws['socket']['internalOnMessage'](message);
       const socket = await promise;
 
       expect(socket).toBeDefined();
-      apiClient.transport.ws.socket.internalOnMessage(message);
+      apiClient.transport.ws['socket']['internalOnMessage'](message);
     });
   });
 });

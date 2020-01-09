@@ -17,17 +17,19 @@
  *
  */
 
-const {BackendErrorMapper} = require('@wireapp/api-client/dist/http/');
-const {ConversationIsUnknownError} = require('@wireapp/api-client/dist/conversation/');
-const {UserIsUnknownError} = require('@wireapp/api-client/dist/user/');
+import {ConversationIsUnknownError} from '../conversation/ConversationError';
+import {UserIsUnknownError} from '../user/UserError';
+import {BackendErrorLabel} from './BackendErrorLabel';
+import {BackendErrorMapper} from './BackendErrorMapper';
 
 describe('BackendErrorMapper', () => {
   describe('"map"', () => {
     it('maps backend error payloads into error objects', () => {
       const userIdError = {
         code: 400,
-        label: 'client-error',
+        label: BackendErrorLabel.CLIENT_ERROR,
         message: "[path] 'usr' invalid: Failed reading: Invalid UUID",
+        name: '',
       };
 
       const userError = BackendErrorMapper.map(userIdError);
@@ -35,8 +37,9 @@ describe('BackendErrorMapper', () => {
 
       const conversationIdError = {
         code: 400,
-        label: 'client-error',
+        label: BackendErrorLabel.CLIENT_ERROR,
         message: "[path] 'cnv' invalid: Failed reading: Invalid UUID",
+        name: '',
       };
 
       const conversationError = BackendErrorMapper.map(conversationIdError);

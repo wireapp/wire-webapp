@@ -17,7 +17,7 @@
  *
  */
 
-const {isValidAssetId, isValidToken} = require('@wireapp/api-client/dist/asset/AssetUtil');
+import {isValidAssetId, isValidToken} from './AssetUtil';
 
 describe('"isValidToken"', () => {
   it('should return true if token is valid', () => {

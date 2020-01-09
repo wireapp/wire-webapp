@@ -19,6 +19,8 @@
 
 import {ClientType} from '../client/';
 
-export class Context {
-  constructor(public userId: string, public clientType: ClientType, public clientId?: string) {}
+export interface Context {
+  clientId?: string;
+  clientType: ClientType;
+  userId: string;
 }

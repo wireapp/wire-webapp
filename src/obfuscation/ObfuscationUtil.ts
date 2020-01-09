@@ -18,11 +18,12 @@
  */
 
 import {Cookie as ToughCookie} from 'tough-cookie';
+
 import {AccessTokenData} from '../auth';
 
 const obfuscationLengthLimit = 20;
 
-export const obfuscateAccessToken = (accessToken: AccessTokenData, enabled = true): AccessTokenData => {
+const obfuscateAccessToken = (accessToken: AccessTokenData, enabled = true): AccessTokenData => {
   if (enabled) {
     return {
       ...accessToken,
@@ -32,11 +33,16 @@ export const obfuscateAccessToken = (accessToken: AccessTokenData, enabled = tru
   return accessToken;
 };
 
-export const obfuscateCookie = (cookie: ToughCookie, enabled = true): ToughCookie => {
+const obfuscateCookie = (cookie: ToughCookie, enabled = true): ToughCookie => {
   if (enabled) {
     const obfuscatedCookie = cookie.clone();
     obfuscatedCookie.value = `${cookie.value.substr(0, obfuscationLengthLimit)}...`;
     return obfuscatedCookie;
   }
   return cookie;
+};
+
+export const ObfuscationUtil = {
+  obfuscateAccessToken,
+  obfuscateCookie,
 };

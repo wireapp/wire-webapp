@@ -42,7 +42,7 @@ import {Backend} from './env/';
 import {GiphyAPI} from './giphy/';
 import {HttpClient} from './http/';
 import {NotificationAPI} from './notification/';
-import * as ObfuscationUtil from './obfuscation/';
+import {ObfuscationUtil} from './obfuscation/';
 import {SelfAPI} from './self/';
 import {WebSocketClient} from './tcp/';
 import {
@@ -274,7 +274,7 @@ export class APIClient extends EventEmitter {
   }
 
   private createContext(userId: string, clientType: ClientType, clientId?: string): Context {
-    this.context = this.context ? {...this.context, clientId, clientType} : new Context(userId, clientType, clientId);
+    this.context = this.context ? {...this.context, clientId, clientType} : {clientId, clientType, userId};
     return this.context;
   }
 

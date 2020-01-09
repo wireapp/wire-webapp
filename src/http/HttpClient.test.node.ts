@@ -17,13 +17,15 @@
  *
  */
 
-const {HttpClient, StatusCode} = require('@wireapp/api-client/dist/http/');
-const axios = require('axios');
+import axios from 'axios';
+
+import {HttpClient} from './HttpClient';
+import {StatusCode} from './StatusCode';
 
 describe('HttpClient', () => {
   describe('"_sendRequest"', () => {
     it('retries on 401 unauthorized error', async () => {
-      const mockedAccessTokenStore = {
+      const mockedAccessTokenStore: any = {
         accessToken: {
           access_token:
             'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ==.v=1.k=1.d=1498600993.t=a.l=.u=aaf9a833-ef30-4c22-86a0-9adc8a15b3b4.c=15037015562284012115',
@@ -33,20 +35,20 @@ describe('HttpClient', () => {
         },
       };
 
-      const client = new HttpClient('https://test.zinfra.io', mockedAccessTokenStore, undefined);
+      const client = new HttpClient('https://test.zinfra.io', mockedAccessTokenStore);
       const requestSpy = spyOn(axios, 'request');
       // eslint-disable-next-line prefer-promise-reject-errors
       requestSpy.and.returnValue(Promise.reject({response: {status: StatusCode.UNAUTHORIZED}}));
       client.refreshAccessToken = () => {
         requestSpy.and.returnValue(Promise.resolve());
-        return Promise.resolve(mockedAccessTokenStore.access_token);
+        return Promise.resolve(mockedAccessTokenStore.accessToken.access_token);
       };
 
       await client._sendRequest({});
     });
 
     it('does not retry on 403 forbidden error', async () => {
-      const mockedAccessTokenStore = {
+      const mockedAccessTokenStore: any = {
         accessToken: {
           access_token:
             'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ==.v=1.k=1.d=1498600993.t=a.l=.u=aaf9a833-ef30-4c22-86a0-9adc8a15b3b4.c=15037015562284012115',
@@ -57,7 +59,7 @@ describe('HttpClient', () => {
       };
       const errorMessage = 'cookie invalid';
 
-      const client = new HttpClient('https://test.zinfra.io', mockedAccessTokenStore, undefined);
+      const client = new HttpClient('https://test.zinfra.io', mockedAccessTokenStore);
       spyOn(axios, 'request').and.returnValue(
         // eslint-disable-next-line prefer-promise-reject-errors
         Promise.reject({
