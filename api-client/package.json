@@ -18,7 +18,11 @@
   },
   "devDependencies": {
     "@babel/core": "7.7.7",
+    "@babel/plugin-proposal-class-properties": "7.7.4",
+    "@babel/plugin-proposal-object-rest-spread": "7.7.7",
+    "@babel/plugin-proposal-optional-chaining": "7.7.5",
     "@babel/preset-react": "7.7.4",
+    "@babel/preset-typescript": "7.7.7",
     "@types/jasmine": "3.5.0",
     "@types/karma": "3.0.5",
     "@types/react": "16.9.17",
@@ -40,6 +44,8 @@
     "karma-jasmine-diff-reporter": "2.0.0",
     "karma-sourcemap-loader": "0.3.7",
     "karma-spec-reporter": "0.0.32",
+    "karma-webpack": "4.0.2",
+    "nyc": "14.1.1",
     "nock": "11.7.2",
     "react": "16.12.0",
     "react-dom": "16.12.0",
@@ -74,9 +80,9 @@
     "start:node": "ts-node demo.ts",
     "test": "yarn test:node && yarn test:browser",
     "test:project": "yarn dist && yarn test",
-    "test:browser": "webpack && karma start",
-    "test:node": "cross-env NODE_DEBUG=@wireapp/api-client* jasmine --config=jasmine.json",
-    "watch": "webpack-dev-server --config webpack.config.js"
+    "test:browser": "karma start",
+    "test:node": "cross-env NODE_DEBUG=@wireapp/api-client* nyc jasmine --config=jasmine.json",
+    "watch": "webpack-dev-server --config webpack.browser.js"
   },
   "version": "9.13.0"
 }

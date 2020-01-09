@@ -17,6 +17,16 @@
  *
  */
 
-// traverse all test files for webpack dependency resolution
-const testsContext = require.context('./', true, /test\.browser\.js$/);
-testsContext.keys().forEach(testsContext);
+import {unsafeAlphanumeric} from './random';
+
+describe('"unsafeAlphanumeric"', () => {
+  it('should generate string of length 32 as default', () => {
+    const maxLength = 32;
+    expect(unsafeAlphanumeric(maxLength).length).toBe(maxLength);
+  });
+
+  it('should generate string for the given length', () => {
+    const maxLength = 10;
+    expect(unsafeAlphanumeric(maxLength).length).toBe(maxLength);
+  });
+});

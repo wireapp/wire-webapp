@@ -24,7 +24,7 @@ import EventEmitter from 'events';
 import logdown from 'logdown';
 import {AccessTokenData, AccessTokenStore, AuthAPI} from '../auth/';
 import {BackendErrorMapper, ConnectionState, ContentType, NetworkError, StatusCode} from '../http/';
-import * as ObfuscationUtil from '../obfuscation/';
+import {ObfuscationUtil} from '../obfuscation/';
 import {sendRequestWithCookie} from '../shims/node/cookie';
 
 enum TOPIC {

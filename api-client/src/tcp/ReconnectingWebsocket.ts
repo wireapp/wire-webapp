@@ -20,7 +20,7 @@
 import {TimeUtil} from '@wireapp/commons';
 import logdown from 'logdown';
 import RWS, {CloseEvent, ErrorEvent, Event, Options} from 'reconnecting-websocket';
-import NodeWebSocket = require('ws');
+const NodeWebSocket = require('ws');
 
 import * as buffer from '../shims/node/buffer';
 

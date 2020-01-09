@@ -17,13 +17,14 @@
  *
  */
 
-/* eslint-disable no-magic-numbers */
+/* eslint-disable no-magic-numbers, dot-notation */
 
-const nock = require('nock');
+import nock from 'nock';
 
-const {APIClient} = require('@wireapp/api-client');
-const {AUTH_TABLE_NAME, AuthAPI} = require('@wireapp/api-client/dist/auth/');
-const {UserAPI} = require('@wireapp/api-client/dist/user/');
+import {APIClient} from './APIClient';
+import {AuthAPI} from './auth/AuthAPI';
+import {ClientType} from './client';
+import {UserAPI} from './user/UserAPI';
 
 describe('APIClient', () => {
   const baseUrl = APIClient.BACKEND.PRODUCTION.rest;
@@ -39,20 +40,20 @@ describe('APIClient', () => {
   describe('"constructor"', () => {
     it('constructs a client with production backend and StoreEngine by default', () => {
       const client = new APIClient();
-      expect(client.transport.http.baseUrl).toBe(APIClient.BACKEND.PRODUCTION.rest);
-      expect(client.transport.ws.baseUrl).toBe(APIClient.BACKEND.PRODUCTION.ws);
+      expect(client.transport.http['baseUrl']).toBe(APIClient.BACKEND.PRODUCTION.rest);
+      expect(client.transport.ws['baseUrl']).toBe(APIClient.BACKEND.PRODUCTION.ws);
     });
 
     it('constructs StoreEngine when only the URLs is provided', () => {
       const client = new APIClient({urls: APIClient.BACKEND.PRODUCTION});
-      expect(client.transport.http.baseUrl).toBe(APIClient.BACKEND.PRODUCTION.rest);
-      expect(client.transport.ws.baseUrl).toBe(APIClient.BACKEND.PRODUCTION.ws);
+      expect(client.transport.http['baseUrl']).toBe(APIClient.BACKEND.PRODUCTION.rest);
+      expect(client.transport.ws['baseUrl']).toBe(APIClient.BACKEND.PRODUCTION.ws);
     });
 
     it('constructs URLs when only the StoreEngine is provided', () => {
       const client = new APIClient();
-      expect(client.transport.http.baseUrl).toBe(APIClient.BACKEND.PRODUCTION.rest);
-      expect(client.transport.ws.baseUrl).toBe(APIClient.BACKEND.PRODUCTION.ws);
+      expect(client.transport.http['baseUrl']).toBe(APIClient.BACKEND.PRODUCTION.rest);
+      expect(client.transport.ws['baseUrl']).toBe(APIClient.BACKEND.PRODUCTION.ws);
     });
   });
 
@@ -66,7 +67,7 @@ describe('APIClient', () => {
     };
 
     const loginData = {
-      clientType: 'temporary',
+      clientType: ClientType.TEMPORARY,
       email: 'me@mail.com',
       password: 'top-secret',
     };
@@ -133,7 +134,7 @@ describe('APIClient', () => {
       const client = new APIClient();
       const context = await client.login(loginData);
       expect(context.userId).toBe(accessTokenData.user);
-      expect(client.accessTokenStore.accessToken.access_token).toBe(accessTokenData.access_token);
+      expect(client['accessTokenStore'].accessToken?.access_token).toBe(accessTokenData.access_token);
     });
 
     it('can login after a logout', async () => {
@@ -165,10 +166,10 @@ describe('APIClient', () => {
       const context = await client.login(loginData);
       expect(context.userId).toBe(accessTokenData.user);
       // Make access token invalid
-      client.accessTokenStore.accessToken.access_token = undefined;
+      delete client['accessTokenStore'].accessToken?.access_token;
       const response = await client.user.api.getUsers({handles: [queriedHandle]});
-      expect(response.name).toBe(userData.name);
-      expect(client.accessTokenStore.accessToken.access_token).toBeDefined();
+      expect(response[0].name).toBe(userData[0].name);
+      expect(client['accessTokenStore'].accessToken?.access_token).toBeDefined();
     });
   });
 
@@ -182,9 +183,9 @@ describe('APIClient', () => {
     it('can logout a user', async () => {
       const client = new APIClient();
 
-      client.context = client.createContext(
+      client.context = client['createContext'](
         '3721e5d3-558d-45ac-b476-b4a64a8f74c1',
-        'temporary',
+        ClientType.TEMPORARY,
         'dce3d529-51e6-40c2-9147-e091eef48e73',
       );
 
@@ -197,11 +198,11 @@ describe('APIClient', () => {
 
       spyOn(client.auth.api, 'postLogout').and.returnValue(Promise.reject(testError));
       spyOn(client, 'disconnect').and.returnValue();
-      spyOn(client.accessTokenStore, 'delete').and.returnValue();
-      spyOn(client.logger, 'error').and.returnValue();
+      spyOn(client['accessTokenStore'], 'delete').and.returnValue(Promise.resolve(undefined));
+      spyOn(client['logger'], 'error').and.returnValue();
 
       await client.logout({ignoreError: true});
-      expect(client.logger.error).toHaveBeenCalledWith(testError);
+      expect(client['logger'].error).toHaveBeenCalledWith(testError);
     });
 
     it('stops at errors when told to', async () => {
@@ -209,14 +210,14 @@ describe('APIClient', () => {
       const testError = new Error('Test rejection');
 
       spyOn(client.auth.api, 'postLogout').and.returnValue(Promise.reject(testError));
-      spyOn(client.logger, 'error').and.returnValue();
+      spyOn(client['logger'], 'error').and.returnValue();
 
       try {
         await client.logout();
         fail('Did not throw error');
       } catch (error) {
         expect(error === testError);
-        expect(client.logger.error).toHaveBeenCalledTimes(0);
+        expect(client['logger'].error).toHaveBeenCalledTimes(0);
       }
     });
   });
@@ -243,17 +244,11 @@ describe('APIClient', () => {
     });
 
     it('automatically gets an access token after registration', async () => {
-      const client = new APIClient({
-        schemaCallback: db => {
-          db.version(1).stores({
-            [AUTH_TABLE_NAME]: '',
-          });
-        },
-      });
+      const client = new APIClient();
 
       const context = await client.register(registerData);
       expect(context.userId).toBe(registerData.id);
-      expect(client.accessTokenStore.accessToken.access_token).toBe(accessTokenData.access_token);
+      expect(client['accessTokenStore'].accessToken?.access_token).toBe(accessTokenData.access_token);
     });
   });
 });

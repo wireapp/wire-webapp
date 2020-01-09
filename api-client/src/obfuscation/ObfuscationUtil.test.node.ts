@@ -17,8 +17,9 @@
  *
  */
 
-const {Cookie: ToughCookie} = require('tough-cookie');
-const ObfuscationUtil = require('@wireapp/api-client/dist/obfuscation/');
+import {Cookie as ToughCookie} from 'tough-cookie';
+
+import {ObfuscationUtil} from './ObfuscationUtil';
 
 describe('"ObfuscationUtil"', () => {
   const accessTokenData = {
@@ -44,12 +45,16 @@ describe('"ObfuscationUtil"', () => {
   });
 
   it('obfuscates a cookie', () => {
-    const obfuscatedCookie = ObfuscationUtil.obfuscateCookie(cookie);
-    expect(cookie.value).not.toBe(obfuscatedCookie.value);
+    if (cookie) {
+      const obfuscatedCookie = ObfuscationUtil.obfuscateCookie(cookie);
+      expect(cookie.value).not.toBe(obfuscatedCookie.value);
+    }
   });
 
   it(`doesn't obfuscate a cookie when disabled`, () => {
-    const obfuscatedCookie = ObfuscationUtil.obfuscateCookie(cookie, false);
-    expect(cookie.value).toBe(obfuscatedCookie.value);
+    if (cookie) {
+      const obfuscatedCookie = ObfuscationUtil.obfuscateCookie(cookie, false);
+      expect(cookie.value).toBe(obfuscatedCookie.value);
+    }
   });
 });

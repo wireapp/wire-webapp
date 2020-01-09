@@ -17,8 +17,8 @@
  *
  */
 
-const {APIClient} = require('@wireapp/api-client');
-const {ClientType} = require('@wireapp/api-client/dist/client/');
+import {APIClient} from '../APIClient';
+import {ClientType} from '../client/ClientType';
 
 describe('AuthAPI', () => {
   const apiClient = new APIClient();
@@ -30,7 +30,15 @@ describe('AuthAPI', () => {
       password: 'email@example.com',
     };
 
-    spyOn(apiClient.transport.http, 'sendJSON').and.returnValue(Promise.resolve({data: ''}));
+    spyOn(apiClient.transport.http, 'sendJSON').and.returnValue(
+      Promise.resolve({
+        config: {},
+        data: '',
+        headers: {},
+        status: 200,
+        statusText: 'OK',
+      }),
+    );
 
     await apiClient.auth.api.postLogin(data);
 
@@ -55,7 +63,15 @@ describe('AuthAPI', () => {
       password: 'email@example.com',
     };
 
-    spyOn(apiClient.transport.http, 'sendJSON').and.returnValue(Promise.resolve({data: ''}));
+    spyOn(apiClient.transport.http, 'sendJSON').and.returnValue(
+      Promise.resolve({
+        config: {},
+        data: '',
+        headers: {},
+        status: 200,
+        statusText: 'OK',
+      }),
+    );
 
     await apiClient.auth.api.postLogin(data);
 
