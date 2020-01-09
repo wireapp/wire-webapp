@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.13.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.12.0...@wireapp/api-client@9.13.0) (2020-01-09)
+
+
+### Features
+
+* **api-client:** Add images data to GiphyImage ([#2727](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2727)) ([963a8c7](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/963a8c738ce50eff88acb8ebbb7b5ead5f03e6da))
+
+
+
+
+
 # [9.12.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.11.0...@wireapp/api-client@9.12.0) (2020-01-09)
 
 
