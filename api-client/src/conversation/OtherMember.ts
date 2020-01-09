@@ -17,10 +17,10 @@
  *
  */
 
-import {ServiceRef} from '../conversation/';
+import {ConversationOtherMemberUpdateData} from './data';
+import {ServiceRef} from './';
 
-export interface OtherMember {
-  conversation_role?: string;
+export interface OtherMember extends Partial<ConversationOtherMemberUpdateData> {
   id: string;
   service?: ServiceRef;
   status: number;

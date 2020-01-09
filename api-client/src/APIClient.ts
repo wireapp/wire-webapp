@@ -46,6 +46,7 @@ import * as ObfuscationUtil from './obfuscation/';
 import {SelfAPI} from './self/';
 import {WebSocketClient} from './tcp/';
 import {
+  TeamConversationAPI,
   FeatureAPI,
   IdentityProviderAPI,
   LegalHoldAPI,
@@ -90,6 +91,7 @@ export class APIClient extends EventEmitter {
   public notification: {api: NotificationAPI};
   public self: {api: SelfAPI};
   public teams: {
+    conversation: {api: TeamConversationAPI};
     feature: {api: FeatureAPI};
     identityProvider: {api: IdentityProviderAPI};
     invitation: {api: TeamInvitationAPI};
@@ -175,6 +177,9 @@ export class APIClient extends EventEmitter {
     };
 
     this.teams = {
+      conversation: {
+        api: new TeamConversationAPI(this.transport.http),
+      },
       feature: {
         api: new FeatureAPI(this.transport.http),
       },
