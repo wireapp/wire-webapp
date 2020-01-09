@@ -52,6 +52,7 @@ import {
   ConversationOtherMemberUpdateData,
   ConversationAccessUpdateData,
 } from './data';
+import {DefaultConversationRoleName} from './ConversationRole';
 
 export class ConversationAPI {
   public static readonly MAX_CHUNK_SIZE = 500;
@@ -593,6 +594,7 @@ export class ConversationAPI {
   public async postMembers(conversationId: string, userIds: string[]): Promise<ConversationMemberJoinEvent> {
     const config: AxiosRequestConfig = {
       data: {
+        conversation_role: DefaultConversationRoleName.WIRE_MEMBER,
         users: userIds,
       },
       method: 'post',
