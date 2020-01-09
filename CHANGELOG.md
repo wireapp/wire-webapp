@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.15.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.14.1...@wireapp/api-client@9.15.0) (2020-01-09)
+
+
+### Features
+
+* **api-client:** Add headHandle & getUserByHandle endpoints ([#2731](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2731)) ([e891dbc](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/e891dbc0ec8c3fe64b317c3ed9abb95877f7299e))
+
+
+
+
+
 ## [9.14.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.14.0...@wireapp/api-client@9.14.1) (2020-01-09)
 
 
