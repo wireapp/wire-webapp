@@ -27,3 +27,4 @@ export {TeamError, InviteEmailInUseError, InvalidInvitationCodeError, ServiceNot
 
 export * from './identityprovider/';
 export * from './feature/';
+export * from './conversation';

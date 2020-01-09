@@ -18,6 +18,7 @@
  */
 
 import {AccentColor} from '@wireapp/commons';
+
 import {ServiceRef} from '../conversation/';
 import {UserAsset} from '../user/';
 

@@ -17,7 +17,7 @@
  *
  */
 
-import {OTRClientMap} from '../conversation/';
+import {OTRClientMap} from './';
 
 export interface OTRRecipients {
   [userId: string]: OTRClientMap;

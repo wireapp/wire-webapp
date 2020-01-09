@@ -28,7 +28,8 @@ import {
   Member,
   NewConversation,
   NewOTRMessage,
-} from '../conversation/';
+  ConversationRolesList,
+} from './';
 import {
   ConversationEvent,
   ConversationMemberJoinEvent,
@@ -48,6 +49,7 @@ import {
   ConversationNameUpdateData,
   ConversationReceiptModeUpdateData,
   ConversationTypingData,
+  ConversationOtherMemberUpdateData,
   ConversationAccessUpdateData,
 } from './data';
 
@@ -67,6 +69,7 @@ export class ConversationAPI {
     NAME: 'name',
     OTR: 'otr',
     RECEIPT_MODE: 'receipt-mode',
+    ROLES: 'roles',
     SELF: 'self',
     TYPING: 'typing',
   };
@@ -271,8 +274,23 @@ export class ConversationAPI {
   }
 
   /**
+   * Get existing roles available for the given conversation.
+   * @param conversationId The Conversation ID to get roles for
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/getConversationsRoles
+   */
+  public async getRoles(conversationId: string): Promise<ConversationRolesList> {
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.ROLES}`,
+    };
+
+    const response = await this.client.sendJSON<ConversationRolesList>(config);
+    return response.data;
+  }
+
+  /**
    * Get self membership properties.
-   * @param conversationId The Conversation ID
+   * @param conversationId The Conversation ID to get properties for
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/getSelf
    */
   public async getMembershipProperties(conversationId: string): Promise<Member> {
@@ -583,6 +601,27 @@ export class ConversationAPI {
 
     const response = await this.client.sendJSON<ConversationMemberJoinEvent>(config);
     return response.data;
+  }
+
+  /**
+   * Update membership of the specified user in a certain conversation
+   * @param userId The user ID
+   * @param conversationId The conversation ID to change the user's membership in
+   * @param memberUpdateData The new member data
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/updateOtherMember
+   */
+  public async putOtherMember(
+    userId: string,
+    conversationId: string,
+    memberUpdateData: ConversationOtherMemberUpdateData,
+  ): Promise<void> {
+    const config: AxiosRequestConfig = {
+      data: memberUpdateData,
+      method: 'put',
+      url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.MEMBERS}/${userId}`,
+    };
+
+    await this.client.sendJSON<ConversationMemberJoinEvent>(config);
   }
 
   /**

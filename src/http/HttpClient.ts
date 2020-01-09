@@ -166,7 +166,7 @@ export class HttpClient extends EventEmitter {
     };
 
     if (expiredAccessToken?.access_token) {
-      config.headers['Authorization'] = `${expiredAccessToken.token_type} ${decodeURIComponent(
+      config.headers.Authorization = `${expiredAccessToken.token_type} ${decodeURIComponent(
         expiredAccessToken.access_token,
       )}`;
     }

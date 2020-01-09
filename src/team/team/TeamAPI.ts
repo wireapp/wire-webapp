@@ -38,7 +38,7 @@ export class TeamAPI {
     };
 
     const response = await this.client.sendJSON(config);
-    return response.headers['location'];
+    return response.headers.location;
   }
 
   public async putTeam(teamId: string, teamData: UpdateTeamData): Promise<void> {

@@ -17,7 +17,7 @@
  *
  */
 
-import {Member, OtherMember} from '../conversation/';
+import {Member, OtherMember} from './';
 
 export interface ConversationMembers {
   others: OtherMember[];
