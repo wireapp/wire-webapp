@@ -34,51 +34,53 @@ interface UserDetailsProps {
 ko.components.register('panel-user-details', {
   template: `
     <div class="panel-participant">
-      <div class="panel-participant__head">
-        <!-- ko if: participant().inTeam() -->
-          <availability-state class="panel-participant__head__name"
-            data-uie-name="status-name"
-            params="availability: participant().availability, label: participant().name()"></availability-state>
+      <!-- ko if: participant() -->
+        <div class="panel-participant__head">
+          <!-- ko if: participant().inTeam() -->
+            <availability-state class="panel-participant__head__name"
+              data-uie-name="status-name"
+              params="availability: participant().availability, label: participant().name()"></availability-state>
+          <!-- /ko -->
+
+          <!-- ko ifnot: participant().inTeam() -->
+            <div class="panel-participant__head__name" data-bind="text: participant().name()" data-uie-name="status-name"></div>
+          <!-- /ko -->
+
+          <!-- ko if: isVerified() -->
+            <verified-icon class="panel-participant__head__verified-icon" data-uie-name="status-verified-participant"></verified-icon>
+          <!-- /ko -->
+        </div>
+
+        <!-- ko if: participant().username() -->
+          <div class="panel-participant__user-name" data-bind="text: participant().username()" data-uie-name="status-username"></div>
         <!-- /ko -->
 
-        <!-- ko ifnot: participant().inTeam() -->
-          <div class="panel-participant__head__name" data-bind="text: participant().name()" data-uie-name="status-name"></div>
+        <participant-avatar params="participant: participant, size: '${ParticipantAvatar.SIZE.X_LARGE}'" data-uie-name="status-profile-picture"></participant-avatar>
+
+        <!-- ko if: badge -->
+          <div class="panel-participant__label" data-uie-name="status-external">
+            <partner-icon></partner-icon>
+            <span data-bind="text: badge"></span>
+          </div>
         <!-- /ko -->
 
-        <!-- ko if: isVerified() -->
-          <verified-icon class="panel-participant__head__verified-icon" data-uie-name="status-verified-participant"></verified-icon>
+        <!-- ko if: participant().isGuest() -->
+          <div class="panel-participant__label" data-uie-name="status-guest">
+            <guest-icon></guest-icon>
+            <span data-bind="text: t('conversationGuestIndicator')"></span>
+          </div>
         <!-- /ko -->
-      </div>
 
-      <!-- ko if: participant().username() -->
-        <div class="panel-participant__user-name" data-bind="text: participant().username()" data-uie-name="status-username"></div>
-      <!-- /ko -->
+        <!-- ko if: participant().isTemporaryGuest () -->
+          <div class="panel-participant__guest-expiration" data-bind="text: participant().expirationText" data-uie-name="status-expiration-text"></div>
+        <!-- /ko -->
 
-      <participant-avatar params="participant: participant, size: '${ParticipantAvatar.SIZE.X_LARGE}'" data-uie-name="status-profile-picture"></participant-avatar>
-
-      <!-- ko if: badge -->
-        <div class="panel-participant__label" data-uie-name="status-external">
-          <partner-icon></partner-icon>
-          <span data-bind="text: badge"></span>
-        </div>
-      <!-- /ko -->
-
-      <!-- ko if: participant().isGuest() -->
-        <div class="panel-participant__label" data-uie-name="status-guest">
-          <guest-icon></guest-icon>
-          <span data-bind="text: t('conversationGuestIndicator')"></span>
-        </div>
-      <!-- /ko -->
-
-      <!-- ko if: participant().isTemporaryGuest () -->
-        <div class="panel-participant__guest-expiration" data-bind="text: participant().expirationText" data-uie-name="status-expiration-text"></div>
-      <!-- /ko -->
-
-      <!-- ko if: isGroupAdmin -->
-        <div class="panel-participant__label" data-uie-name="status-admin">
-          <group-admin-icon></group-admin-icon>
-          <span data-bind="text: t('conversationDetailsGroupAdmin')"></span>
-        </div>
+        <!-- ko if: isGroupAdmin -->
+          <div class="panel-participant__label" data-uie-name="status-admin">
+            <group-admin-icon></group-admin-icon>
+            <span data-bind="text: t('conversationDetailsGroupAdmin')"></span>
+          </div>
+        <!-- /ko -->
       <!-- /ko -->
     </div>
   `,

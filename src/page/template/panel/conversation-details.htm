@@ -24,19 +24,21 @@
           <panel-service-details params="service: selectedService"></panel-service-details>
         <!-- /ko -->
         <!-- ko ifnot: isServiceMode() -->
-          <panel-user-details
-            params="participant: firstParticipant, isVerified: isVerified, badge: teamRepository.getRoleBadge(firstParticipant().id)"
-          ></panel-user-details>
-          <!-- ko if: firstParticipant().isConnected() || firstParticipant().inTeam() -->
-            <div class="conversation-details__devices">
-              <div class="panel__action-item" data-bind="click: clickOnDevices" data-uie-name="go-devices">
-                <devices-icon class="panel__action-item__icon"></devices-icon>
-                <div class="panel__action-item__text" data-bind="text: t('conversationDetailsActionDevices')"></div>
-                <disclose-icon></disclose-icon>
+          <!-- ko if: firstParticipant() -->
+            <panel-user-details
+              params="participant: firstParticipant, isVerified: isVerified, badge: teamRepository.getRoleBadge(firstParticipant().id)"
+            ></panel-user-details>
+            <!-- ko if: firstParticipant().isConnected() || firstParticipant().inTeam() -->
+              <div class="conversation-details__devices">
+                <div class="panel__action-item" data-bind="click: clickOnDevices" data-uie-name="go-devices">
+                  <devices-icon class="panel__action-item__icon"></devices-icon>
+                  <div class="panel__action-item__text" data-bind="text: t('conversationDetailsActionDevices')"></div>
+                  <disclose-icon></disclose-icon>
+                </div>
               </div>
-            </div>
+            <!-- /ko -->
+            <enriched-fields params="user: firstParticipant"></enriched-fields>
           <!-- /ko -->
-          <enriched-fields params="user: firstParticipant"></enriched-fields>
         <!-- /ko -->
       <!-- /ko -->
 
