@@ -17,28 +17,44 @@
  *
  */
 
-import {getLogger} from 'Util/Logger';
+import {ConnectionStatus} from '@wireapp/api-client/dist/connection';
+import {USER_EVENT, UserConnectionEvent} from '@wireapp/api-client/dist/event';
+import {BackendEventType} from '@wireapp/api-client/dist/event/BackendEvent';
+import {UserConnectionData} from '@wireapp/api-client/dist/user/data';
+import {amplify} from 'amplify';
+import ko from 'knockout';
+
+import {Logger, getLogger} from 'Util/Logger';
 import {koArrayPushAll} from 'Util/util';
 
-import {BackendEvent} from '../event/Backend';
-import {WebAppEvents} from '../event/WebApp';
-import {EventRepository} from '../event/EventRepository';
-import {SystemMessageType} from '../message/SystemMessageType';
+import {Conversation} from '../entity/Conversation';
 import {MemberMessage} from '../entity/message/MemberMessage';
-
-import {ConnectionStatus} from './ConnectionStatus';
-import {ConnectionMapper} from './ConnectionMapper';
-
+import {User} from '../entity/User';
 import {BaseError} from '../error/BaseError';
+import {EventRepository} from '../event/EventRepository';
+import {EventSource} from '../event/EventSource';
+import {WebAppEvents} from '../event/WebApp';
+import {SystemMessageType} from '../message/SystemMessageType';
+import {UserRepository} from '../user/UserRepository';
+import {ConnectionEntity} from './ConnectionEntity';
+import {ConnectionMapper} from './ConnectionMapper';
+import {ConnectionService} from './ConnectionService';
 
 export class ConnectionRepository {
-  static get CONFIG() {
+  private readonly connectionService: ConnectionService;
+  private readonly userRepository: UserRepository;
+  private readonly logger: Logger;
+  private readonly connectionMapper: ConnectionMapper;
+  public readonly connectionEntities: ko.ObservableArray<ConnectionEntity>;
+
+  // tslint:disable-next-line:typedef
+  static get CONFIG(): Record<string, BackendEventType[]> {
     return {
-      SUPPORTED_EVENTS: [BackendEvent.USER.CONNECTION],
+      SUPPORTED_EVENTS: [USER_EVENT.CONNECTION],
     };
   }
 
-  constructor(connectionService, userRepository) {
+  constructor(connectionService: ConnectionService, userRepository: UserRepository) {
     this.connectionService = connectionService;
     this.userRepository = userRepository;
 
@@ -53,11 +69,11 @@ export class ConnectionRepository {
   /**
    * Listener for incoming user events.
    *
-   * @param {Object} eventJson - JSON data for event
-   * @param {EventRepository.SOURCE} source - Source of event
-   * @returns {undefined} No return value
+   * @param eventJson JSON data for event
+   * @param source Source of event
+   * @returns No return value
    */
-  onUserEvent(eventJson, source) {
+  onUserEvent(eventJson: UserConnectionEvent, source: EventSource): void {
     const eventType = eventJson.type;
 
     const isSupportedType = ConnectionRepository.CONFIG.SUPPORTED_EVENTS.includes(eventType);
@@ -65,7 +81,7 @@ export class ConnectionRepository {
       const logObject = {eventJson: JSON.stringify(eventJson), eventObject: eventJson};
       this.logger.info(`»» User Event: '${eventType}' (Source: ${source})`, logObject);
 
-      const isUserConnection = eventType === BackendEvent.USER.CONNECTION;
+      const isUserConnection = eventType === USER_EVENT.CONNECTION;
       if (isUserConnection) {
         this.onUserConnection(eventJson, source);
       }
@@ -75,20 +91,20 @@ export class ConnectionRepository {
   /**
    * Convert a JSON event into an entity and get the matching conversation.
    *
-   * @param {Object} eventJson - JSON data of 'user.connection' event
-   * @param {EventRepository.SOURCE} source - Source of event
-   * @param {boolean} [showConversation] - Should the new conversation be opened?
-   * @returns {undefined} No return value
+   * @param eventJson JSON data of 'user.connection' event
+   * @param source Source of event
+   * @param showConversation Should the new conversation be opened?
+   * @returns No return value
    */
-  onUserConnection(eventJson, source, showConversation) {
+  onUserConnection(eventJson: UserConnectionData, source: EventSource, showConversation?: boolean): Promise<void> {
     if (!eventJson) {
-      throw new z.error.ConnectionError(BaseError.TYPE.MISSING_PARAMETER);
+      throw new window.z.error.ConnectionError(BaseError.TYPE.MISSING_PARAMETER);
     }
 
     const connectionData = eventJson.connection;
 
     let connectionEntity = this.getConnectionByUserId(connectionData.to);
-    let previousStatus = null;
+    let previousStatus: ConnectionStatus = null;
 
     if (connectionEntity) {
       previousStatus = connectionEntity.status();
@@ -109,23 +125,23 @@ export class ConnectionRepository {
 
   /**
    * Accept a connection request.
-   * @param {User} userEntity - User to update connection with
-   * @param {boolean} [showConversation=false] - Show new conversation on success
-   * @returns {Promise} Promise that resolves when the connection request was accepted
+   * @param userEntity User to update connection with
+   * @param showConversation Show new conversation on success
+   * @returns Promise that resolves when the connection request was accepted
    */
-  acceptRequest(userEntity, showConversation = false) {
+  acceptRequest(userEntity: User, showConversation: boolean = false): Promise<void> {
     return this._updateStatus(userEntity, ConnectionStatus.ACCEPTED, showConversation);
   }
 
   /**
    * Block a user.
    *
-   * @param {User} userEntity - User to block
-   * @param {boolean} [hideConversation=false] - Hide current conversation
-   * @param {Conversation} [nextConversationEntity] - Conversation to be switched to
-   * @returns {Promise} Promise that resolves when the user was blocked
+   * @param userEntity User to block
+   * @param hideConversation Hide current conversation
+   * @param nextConversationEntity Conversation to be switched to
+   * @returns Promise that resolves when the user was blocked
    */
-  blockUser(userEntity, hideConversation = false, nextConversationEntity) {
+  blockUser(userEntity: User, hideConversation: boolean = false, nextConversationEntity: Conversation): Promise<void> {
     return this._updateStatus(userEntity, ConnectionStatus.BLOCKED).then(() => {
       if (hideConversation) {
         amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversationEntity);
@@ -136,12 +152,16 @@ export class ConnectionRepository {
   /**
    * Cancel a connection request.
    *
-   * @param {User} userEntity - User to cancel the sent connection request
-   * @param {boolean} [hideConversation=false] - Hide current conversation
-   * @param {Conversation} [nextConversationEntity] - Conversation to be switched to
-   * @returns {Promise} Promise that resolves when an outgoing connection request was cancelled
+   * @param userEntity User to cancel the sent connection request
+   * @param hideConversation Hide current conversation
+   * @param nextConversationEntity Conversation to be switched to
+   * @returns Promise that resolves when an outgoing connection request was cancelled
    */
-  cancelRequest(userEntity, hideConversation = false, nextConversationEntity) {
+  cancelRequest(
+    userEntity: User,
+    hideConversation: boolean = false,
+    nextConversationEntity: Conversation,
+  ): Promise<void> {
     return this._updateStatus(userEntity, ConnectionStatus.CANCELLED).then(() => {
       if (hideConversation) {
         amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversationEntity);
@@ -152,15 +172,15 @@ export class ConnectionRepository {
   /**
    * Create a connection request.
    *
-   * @param {User} userEntity - User to connect to
-   * @param {boolean} [showConversation=false] - Should we open the new conversation
-   * @returns {Promise} Promise that resolves when the connection request was successfully created
+   * @param userEntity User to connect to
+   * @param showConversation Should we open the new conversation?
+   * @returns Promise that resolves when the connection request was successfully created
    */
-  createConnection(userEntity, showConversation = false) {
+  createConnection(userEntity: User, showConversation: boolean = false): Promise<void> {
     return this.connectionService
       .postConnections(userEntity.id, userEntity.name())
       .then(response => {
-        const connectionEvent = {connection: response};
+        const connectionEvent = {connection: response, user: {name: userEntity.name()}};
         return this.onUserConnection(connectionEvent, EventRepository.SOURCE.INJECTED, showConversation);
       })
       .catch(error => {
@@ -170,31 +190,28 @@ export class ConnectionRepository {
 
   /**
    * Get a connection for a user ID.
-   * @param {string} userId - User ID
-   * @returns {ConnectionEntity} User connection entity
    */
-  getConnectionByUserId(userId) {
+  getConnectionByUserId(userId: string): ConnectionEntity {
     return this.connectionEntities().find(connectionEntity => connectionEntity.userId === userId);
   }
 
   /**
    * Get a connection for a conversation ID.
-   * @param {string} conversationId - Conversation ID
-   * @returns {ConnectionEntity} User connection entity
+   * @param conversationId Conversation ID
+   * @returns User connection entity
    */
-  getConnectionByConversationId(conversationId) {
+  getConnectionByConversationId(conversationId: string): ConnectionEntity {
     return this.connectionEntities().find(connectionEntity => connectionEntity.conversationId === conversationId);
   }
 
   /**
    * Retrieve all connections from backend.
-   *.
+   *
    * @note Initially called by Wire for Web's app start to retrieve connections.
    *
-   * @param {Array<ConnectionEntity>} [connectionEntities=[]] - Unordered array of user connections
-   * @returns {Promise} Promise that resolves when all connections have been retrieved and mapped
+   * @returns Promise that resolves when all connections have been retrieved and mapped
    */
-  getConnections() {
+  getConnections(): Promise<any> {
     return this.connectionService
       .getConnections()
       .then(connectionData => {
@@ -211,34 +228,33 @@ export class ConnectionRepository {
 
   /**
    * Ignore connection request.
-   * @param {User} userEntity - User to ignore the connection request
-   * @returns {Promise} Promise that resolves when an incoming connection request was ignored
+   * @param userEntity User to ignore the connection request
+   * @returns Promise that resolves when an incoming connection request was ignored
    */
-  ignoreRequest(userEntity) {
+  ignoreRequest(userEntity: User): Promise<void> {
     return this._updateStatus(userEntity, ConnectionStatus.IGNORED);
   }
 
   /**
    * Unblock a user.
    *
-   * @param {User} userEntity - User to unblock
-   * @param {boolean} [showConversation=false] - Show new conversation on success
-   * @returns {Promise} Promise that resolves when a user was unblocked
+   * @param userEntity User to unblock
+   * @param showConversation Show new conversation on success
+   * @returns Promise that resolves when a user was unblocked
    */
-  unblockUser(userEntity, showConversation = true) {
+  unblockUser(userEntity: User, showConversation = true): Promise<void> {
     return this._updateStatus(userEntity, ConnectionStatus.ACCEPTED, showConversation);
   }
 
   /**
    * Update user matching a given connection.
-   * @param {ConnectionEntity} connectionEntity - Connection entity
-   * @returns {Promise} Promise that resolves when the connection have been updated
+   * @returns Promise that resolves when the connection have been updated
    */
-  updateConnection(connectionEntity) {
+  updateConnection(connectionEntity: ConnectionEntity): Promise<ConnectionEntity> {
     return Promise.resolve()
       .then(() => {
         if (!connectionEntity) {
-          throw z.error.ConnectionError(BaseError.TYPE.MISSING_PARAMETER);
+          throw new window.z.error.ConnectionError(BaseError.TYPE.MISSING_PARAMETER);
         }
 
         this.connectionEntities.push(connectionEntity);
@@ -249,14 +265,13 @@ export class ConnectionRepository {
 
   /**
    * Update users matching the given connections.
-   * @param {Array<ConnectionEntity>} connectionEntities - Connection entities
-   * @returns {Promise<Array<ConnectionEntity>>} Promise that resolves when all connections have been updated
+   * @returns Promise that resolves when all connections have been updated
    */
-  updateConnections(connectionEntities) {
+  updateConnections(connectionEntities: ConnectionEntity[]): Promise<ConnectionEntity[]> {
     return Promise.resolve()
       .then(() => {
         if (!connectionEntities.length) {
-          throw z.error.ConnectionError(BaseError.TYPE.INVALID_PARAMETER);
+          throw new window.z.error.ConnectionError(BaseError.TYPE.INVALID_PARAMETER);
         }
 
         koArrayPushAll(this.connectionEntities, connectionEntities);
@@ -269,12 +284,12 @@ export class ConnectionRepository {
   /**
    * Update the status of a connection.
    * @private
-   * @param {User} userEntity - User to update connection with
-   * @param {string} connectionStatus - Connection status
-   * @param {boolean} [showConversation=false] - Show conversation on success
-   * @returns {Promise} Promise that resolves when the connection status was updated
+   * @param userEntity User to update connection with
+   * @param connectionStatus Connection status
+   * @param showConversation Show conversation on success
+   * @returns Promise that resolves when the connection status was updated
    */
-  _updateStatus(userEntity, connectionStatus, showConversation = false) {
+  _updateStatus(userEntity: User, connectionStatus: ConnectionStatus, showConversation = false): Promise<void> {
     if (!userEntity || !connectionStatus) {
       this.logger.error('Missing parameter to update connection');
       return Promise.reject(new z.error.ConnectionError(BaseError.TYPE.MISSING_PARAMETER));
@@ -289,7 +304,7 @@ export class ConnectionRepository {
     return this.connectionService
       .putConnections(userEntity.id, connectionStatus)
       .then(response => {
-        const connectionEvent = {connection: response};
+        const connectionEvent = {connection: response, user: {name: userEntity.name()}};
         return this.onUserConnection(connectionEvent, EventRepository.SOURCE.INJECTED, showConversation);
       })
       .catch(error => {
@@ -302,19 +317,19 @@ export class ConnectionRepository {
           serverError: error,
         };
 
-        Raygun.send(new Error(logMessage), customData);
+        window.Raygun.send(new Error(logMessage), customData);
       });
   }
 
   /**
    * Send the user connection notification.
    *
-   * @param {ConnectionEntity} connectionEntity - Connection entity
-   * @param {EventRepository.SOURCE} source - Source of event
-   * @param {ConnectionStatus} previousStatus - Previous connection status
-   * @returns {undefined} No return value
+   * @param connectionEntity Connection entity
+   * @param source Source of event
+   * @param previousStatus Previous connection status
+   * @returns No return value
    */
-  _sendNotification(connectionEntity, source, previousStatus) {
+  _sendNotification(connectionEntity: ConnectionEntity, source: EventSource, previousStatus: ConnectionStatus): void {
     // We accepted the connection request or unblocked the user
     const expectedPreviousStatus = [ConnectionStatus.BLOCKED, ConnectionStatus.PENDING];
     const wasExpectedPreviousStatus = expectedPreviousStatus.includes(previousStatus);

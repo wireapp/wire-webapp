@@ -145,9 +145,7 @@ module.exports = function(config) {
         }),
       ],
       resolve: {
-        alias: Object.assign({}, rootWebpackConfig.resolve.alias, {
-          src: path.resolve(__dirname, 'src'),
-        }),
+        alias: {...rootWebpackConfig.resolve.alias, src: path.resolve(__dirname, 'src')},
         extensions: ['.js', '.jsx', '.ts', '.tsx', '.svg'],
       },
     },

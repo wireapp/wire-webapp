@@ -316,18 +316,15 @@ export class TeamRepository {
   _updateMemberRoles(memberEntities = []) {
     const memberArray = [].concat(memberEntities);
 
-    const memberRoles = memberArray.reduce(
-      (accumulator, member) => ({
-        ...accumulator,
-        [member.userId]: member.permissions ? roleFromTeamPermissions(member.permissions) : ROLE.INVALID,
-      }),
-      this.memberRoles(),
-    );
+    const memberRoles = memberArray.reduce((accumulator, member) => {
+      accumulator[member.userId] = member.permissions ? roleFromTeamPermissions(member.permissions) : ROLE.INVALID;
+      return accumulator;
+    }, this.memberRoles());
 
-    const memberInvites = memberArray.reduce(
-      (accumulator, member) => ({...accumulator, [member.userId]: member.invitedBy}),
-      this.memberInviters(),
-    );
+    const memberInvites = memberArray.reduce((accumulator, member) => {
+      accumulator[member.userId] = member.invitedBy;
+      return accumulator;
+    }, this.memberInviters());
 
     const supportsLegalHold = memberArray.some(member => member.hasOwnProperty('legalholdStatus'));
     this.supportsLegalHold(supportsLegalHold);

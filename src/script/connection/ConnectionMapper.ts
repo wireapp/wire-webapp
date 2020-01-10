@@ -17,18 +17,10 @@
  *
  */
 
+import {Connection as ConnectionData} from '@wireapp/api-client/dist/connection/';
+
 import {Logger, getLogger} from 'Util/Logger';
 import {ConnectionEntity} from './ConnectionEntity';
-import {ConnectionStatus} from './ConnectionStatus';
-
-export interface ConnectionData {
-  conversation: string;
-  from: string;
-  last_update: string;
-  message: string;
-  status: ConnectionStatus;
-  to: string;
-}
 
 /**
  * Connection mapper to convert all server side JSON connections into core connection entities.

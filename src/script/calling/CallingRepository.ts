@@ -693,22 +693,25 @@ export class CallingRepository {
       return Promise.reject();
     }
     const selfParticipant = call.selfParticipant;
-    const query = {audio, camera, screen};
+    const query: Required<MediaStreamQuery> = {audio, camera, screen};
     const cache = {
       audio: selfParticipant.audioStream(),
       camera: selfParticipant.videoStream(),
       screen: selfParticipant.videoStream(),
     };
-    const missingStreams: MediaStreamQuery = Object.entries(cache).reduce((missings, [type, isCached]) => {
-      if (isCached || !(query as any)[type]) {
+    const missingStreams = Object.entries(cache).reduce(
+      (missings: MediaStreamQuery, [type, isCached]: [keyof MediaStreamQuery, MediaStream]) => {
+        if (!isCached && !!query[type]) {
+          missings[type] = true;
+        }
         return missings;
-      }
-      return {...missings, [type]: true};
-    }, {});
+      },
+      {},
+    );
 
     const queryLog = Object.entries(query)
       .filter(([type, needed]) => needed)
-      .map(([type]) => ((missingStreams as any)[type] ? type : `${type} (from cache)`))
+      .map(([type]) => (missingStreams[type as keyof MediaStreamQuery] ? type : `${type} (from cache)`))
       .join(', ');
     this.logger.debug(`mediaStream requested: ${queryLog}`);
 

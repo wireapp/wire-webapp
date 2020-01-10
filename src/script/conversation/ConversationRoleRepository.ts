@@ -107,6 +107,25 @@ export class ConversationRoleRepository {
     this.conversationRoles[conversation.id] = newRoles;
   };
 
+  updateConversationRoles = async (conversation: Conversation): Promise<void> => {
+    const remoteConversationData = await this.conversationService.get_conversation_by_id(conversation.id);
+    const roleUpdates: Record<string, string> = {};
+
+    // Add role for self participant
+    if (remoteConversationData.members.self.conversation_role) {
+      roleUpdates[remoteConversationData.members.self.id] = remoteConversationData.members.self.conversation_role;
+    }
+
+    // Add roles for other participants
+    remoteConversationData.members.others.forEach(other => {
+      if (other.conversation_role) {
+        roleUpdates[other.id] = other.conversation_role;
+      }
+    });
+
+    conversation.roles(roleUpdates);
+  };
+
   setMemberConversationRole = (conversation: Conversation, userId: string, conversationRole: string): Promise<void> => {
     return this.conversationService.putMembers(conversation.id, userId, {
       conversation_role: conversationRole,

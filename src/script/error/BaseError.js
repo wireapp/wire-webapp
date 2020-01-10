@@ -25,7 +25,7 @@ export class BaseError extends Error {
     this.stack = new Error().stack;
 
     const ErrorInstanceClass = z.error[name];
-    const knownTypes = Object.assign({}, BaseError.TYPE, ErrorInstanceClass.TYPE);
+    const knownTypes = {...BaseError.TYPE, ...ErrorInstanceClass.TYPE};
     const isValidType = Object.values(knownTypes).includes(type);
 
     this.type = isValidType ? type : BaseError.TYPE.UNKNOWN;

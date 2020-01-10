@@ -37,6 +37,7 @@ import {
   Text,
 } from '@wireapp/protocol-messaging';
 import {flatten} from 'underscore';
+import {ConnectionStatus} from '@wireapp/api-client/dist/connection';
 
 import {getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -81,7 +82,6 @@ import {ConversationEphemeralHandler} from './ConversationEphemeralHandler';
 import {ClientMismatchHandler} from './ClientMismatchHandler';
 import {ConversationLabelRepository} from './ConversationLabelRepository';
 
-import {ConnectionStatus} from '../connection/ConnectionStatus';
 import {buildMetadata, isVideo, isImage, isAudio} from '../assets/AssetMetaDataBuilder';
 import {AssetTransferState} from '../assets/AssetTransferState';
 import {AssetRemoteData} from '../assets/AssetRemoteData';
@@ -376,15 +376,12 @@ export class ConversationRepository {
    */
   createGroupConversation(userEntities, groupName, accessState, options) {
     const userIds = userEntities.map(userEntity => userEntity.id);
-    const payload = Object.assign(
-      {},
-      {
-        conversation_role: DefaultRole.WIRE_MEMBER,
-        name: groupName,
-        users: userIds,
-      },
-      options,
-    );
+    let payload = {
+      conversation_role: DefaultRole.WIRE_MEMBER,
+      name: groupName,
+      users: userIds,
+      ...options,
+    };
 
     if (this.team().id) {
       payload.team = {
@@ -413,7 +410,7 @@ export class ConversationRepository {
         }
 
         if (accessPayload) {
-          Object.assign(payload, accessPayload);
+          payload = {...payload, ...accessPayload};
         }
       }
     }
@@ -1144,7 +1141,10 @@ export class ConversationRepository {
       });
   }
 
-  async checkForDeletedConversations() {
+  /**
+   * @returns {Promise<void[]>} resolves when deleted conversations are locally deleted, too.
+   */
+  checkForDeletedConversations() {
     return Promise.all(
       this.conversations().map(async conversation => {
         try {
@@ -3540,7 +3540,7 @@ export class ConversationRepository {
    * @param {Object} eventJson - JSON data of 'conversation.member-join' event
    * @returns {Promise} Resolves when the event was handled
    */
-  _onMemberJoin(conversationEntity, eventJson) {
+  async _onMemberJoin(conversationEntity, eventJson) {
     // Ignore if we join a 1to1 conversation (accept a connection request)
     const connectionEntity = this.connectionRepository.getConnectionByConversationId(conversationEntity.id);
     const isPendingConnection = connectionEntity && connectionEntity.isIncomingRequest();
@@ -3562,6 +3562,7 @@ export class ConversationRepository {
     const selfUserRejoins = eventData.user_ids.includes(this.selfUser().id);
     if (selfUserRejoins) {
       conversationEntity.status(ConversationStatus.CURRENT_MEMBER);
+      await this.conversationRoleRepository.updateConversationRoles(conversationEntity);
     }
 
     const updateSequence = selfUserRejoins ? this.updateConversationFromBackend(conversationEntity) : Promise.resolve();
@@ -4197,7 +4198,7 @@ export class ConversationRepository {
     }
 
     if (actionType) {
-      const attributes = {
+      let attributes = {
         action: actionType,
         conversation_type: trackingHelpers.getConversationType(conversationEntity),
         ephemeral_time: isEphemeral ? messageTimer : undefined,
@@ -4209,7 +4210,7 @@ export class ConversationRepository {
 
       const isTeamConversation = !!conversationEntity.team_id;
       if (isTeamConversation) {
-        Object.assign(attributes, trackingHelpers.getGuestAttributes(conversationEntity));
+        attributes = {...attributes, ...trackingHelpers.getGuestAttributes(conversationEntity)};
       }
 
       amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CONTRIBUTED, attributes);

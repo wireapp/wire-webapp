@@ -165,7 +165,7 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
     const userEntities = this.selectedContacts().slice();
 
     this.conversationRepository.addMembers(activeConversation, userEntities).then(() => {
-      const attributes = {
+      let attributes = {
         method: 'add',
         user_num: userEntities.length,
       };
@@ -174,12 +174,13 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
       if (isTeamConversation) {
         const participants = trackingHelpers.getParticipantTypes(userEntities, false);
 
-        Object.assign(attributes, {
+        attributes = {
+          ...attributes,
           guest_num: participants.guests,
           is_allow_guests: activeConversation.isGuestRoom(),
           temporary_guest_num: participants.temporaryGuests,
           user_num: participants.users,
-        });
+        };
       }
 
       amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CONVERSATION.ADD_PARTICIPANTS, attributes);

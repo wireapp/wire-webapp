@@ -98,7 +98,7 @@ describe('message', () => {
 
   it('warns the parent when the message is rendered as marked', done => {
     spyOn(defaultParams, 'onMessageMarked');
-    const params = Object.assign({}, defaultParams, {isMarked: () => true});
+    const params = {...defaultParams, isMarked: () => true};
     return instantiateComponent('message', params)
       .then(() => {
         setTimeout(() => {
