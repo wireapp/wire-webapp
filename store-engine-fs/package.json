@@ -10,7 +10,7 @@
     "jasmine": "3.5.0",
     "nyc": "15.0.0",
     "rimraf": "3.0.0",
-    "ts-node": "8.5.4",
+    "ts-node": "8.6.0",
     "typescript": "3.7.4"
   },
   "description": "Store Engine implementation for Node.js' File System.",
