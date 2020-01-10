@@ -211,19 +211,15 @@ export class ConnectionRepository {
    *
    * @returns Promise that resolves when all connections have been retrieved and mapped
    */
-  getConnections(): Promise<any> {
-    return this.connectionService
-      .getConnections()
-      .then(connectionData => {
-        const newConnectionEntities = this.connectionMapper.mapConnectionsFromJson(connectionData);
-        this.updateConnections(newConnectionEntities);
-
-        return this.connectionEntities();
-      })
-      .catch(error => {
-        this.logger.error(`Failed to retrieve connections from backend: ${error.message}`, error);
-        throw error;
-      });
+  async getConnections(): Promise<ConnectionEntity[]> {
+    try {
+      const connectionData = await this.connectionService.getConnections();
+      const newConnectionEntities = this.connectionMapper.mapConnectionsFromJson(connectionData);
+      return this.updateConnections(newConnectionEntities);
+    } catch (error) {
+      this.logger.error(`Failed to retrieve connections from backend: ${error.message}`, error);
+      throw error;
+    }
   }
 
   /**
