@@ -91,10 +91,6 @@ const origin = exec('git remote');
 logger.info(`Fetching base "${origin}" ...`);
 exec(`git fetch ${origin}`);
 
-/**
- * @param index The tag name index
- * @returns The new tag name
- */
 const createTagName = (index: number = 0): string => {
   const newTagName = `${currentDate}-${target}.${index}`;
   const tagExists = !!exec(`git tag -l ${newTagName}`);
