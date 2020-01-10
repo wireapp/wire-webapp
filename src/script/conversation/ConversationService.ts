@@ -269,11 +269,7 @@ export class ConversationService {
   }
 
   deleteConversation(teamId: string, conversationId: string): Promise<void> {
-    // return this.apiClient.sendRequest({
-    //   type: 'DELETE',
-    //   url: `${TeamService.URL.TEAMS}/${teamId}/conversations/${conversationId}`,
-    // });
-    return Promise.reject(new Error('TODO implement "deleteConversation" in APIClient'));
+    return this.apiClient.teams.conversation.api.deleteConversation(teamId, conversationId);
   }
 
   /**
