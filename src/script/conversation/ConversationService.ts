@@ -178,10 +178,6 @@ export class ConversationService {
    * @returns Resolves with the server response
    */
   deleteConversationCode(conversationId: string): Promise<ConversationCodeDeleteEvent> {
-    // return this.apiClient.sendRequest({
-    //   type: 'DELETE',
-    //   url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/code`,
-    // });
     return this.apiClient.conversation.api.deleteConversationCode(conversationId);
   }
 
