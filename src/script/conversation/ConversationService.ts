@@ -299,7 +299,6 @@ export class ConversationService {
    *   }
    * }
    *
-   * @param clientId ID of the senders client
    * @param conversationId ID of conversation to send message in
    * @param payload Payload to be posted
    * @param payload.recipients - Map with per-recipient data
