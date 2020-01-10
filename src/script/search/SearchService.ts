@@ -17,16 +17,17 @@
  *
  */
 
-import {getLogger} from 'Util/Logger';
+import {APIClient} from '@wireapp/api-client';
+import {SearchResult} from '@wireapp/api-client/dist/user';
 
 export class SearchService {
+  private readonly apiClient: APIClient;
   /**
    * Construct a new Search Service.
-   * @param {BackendClient} backendClient - Client for the API calls
+   * @param {APIClient} apiClient - Client for the API calls
    */
-  constructor(backendClient) {
-    this.backendClient = backendClient;
-    this.logger = getLogger('SearchService');
+  constructor(apiClient: APIClient) {
+    this.apiClient = apiClient;
   }
 
   /**
@@ -36,15 +37,7 @@ export class SearchService {
    * @param {number} size - Number of requested user
    * @returns {Promise} Resolves with the search results
    */
-  getContacts(query, size) {
-    return this.backendClient.sendRequest({
-      data: {
-        // eslint-disable-next-line id-length
-        q: query,
-        size,
-      },
-      type: 'GET',
-      url: '/search/contacts',
-    });
+  getContacts(query: string, size: number): Promise<SearchResult> {
+    return this.apiClient.user.api.getSearchContacts(query, size);
   }
 }

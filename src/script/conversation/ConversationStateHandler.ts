@@ -17,6 +17,7 @@
  *
  */
 
+import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE} from '@wireapp/api-client/dist/conversation';
 import {amplify} from 'amplify';
 
 import {t} from 'Util/LocalizerUtil';
@@ -29,8 +30,6 @@ import {ModalsViewModel} from '../view_model/ModalsViewModel';
 
 import {Conversation} from '../entity/Conversation';
 import {AbstractConversationEventHandler, EventHandlingConfig} from './AbstractConversationEventHandler';
-import {ACCESS_MODE} from './AccessMode';
-import {ACCESS_ROLE} from './AccessRole';
 import {ACCESS_STATE} from './AccessState';
 import {ConversationMapper} from './ConversationMapper';
 import {ConversationService} from './ConversationService';
@@ -63,11 +62,11 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
         const changeToGuestRoom = accessState === ACCESS_STATE.TEAM.GUEST_ROOM;
         const changeToTeamOnly = accessState === ACCESS_STATE.TEAM.TEAM_ONLY;
         if (changeToGuestRoom) {
-          accessModes = [ACCESS_MODE.INVITE, ACCESS_MODE.CODE];
-          accessRole = ACCESS_ROLE.NON_ACTIVATED;
+          accessModes = [CONVERSATION_ACCESS.INVITE, CONVERSATION_ACCESS.CODE];
+          accessRole = CONVERSATION_ACCESS_ROLE.NON_ACTIVATED;
         } else if (changeToTeamOnly) {
-          accessModes = [ACCESS_MODE.INVITE];
-          accessRole = ACCESS_ROLE.TEAM;
+          accessModes = [CONVERSATION_ACCESS.INVITE];
+          accessRole = CONVERSATION_ACCESS_ROLE.TEAM;
         }
 
         if (accessModes && accessRole) {

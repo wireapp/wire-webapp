@@ -86,10 +86,9 @@ describe('ClientRepository', () => {
 
     it('resolves with a valid client', () => {
       const clientService = TestFactory.client_repository.clientService;
-      const backendClient = clientService.backendClient;
 
       spyOn(clientService, 'loadClientFromDb').and.returnValue(Promise.resolve(clientPayloadDatabase));
-      spyOn(backendClient, 'sendRequest').and.returnValue(Promise.resolve(clientPayloadServer));
+      spyOn(clientService, 'getClientById').and.returnValue(Promise.resolve(clientPayloadServer));
 
       return TestFactory.client_repository.getValidLocalClient().then(clientObservable => {
         expect(clientObservable).toBeDefined();
@@ -99,13 +98,12 @@ describe('ClientRepository', () => {
 
     it('rejects with an error if no client found locally', () => {
       const clientService = TestFactory.client_repository.clientService;
-      const backendClient = clientService.backendClient;
       spyOn(clientService, 'loadClientFromDb').and.returnValue(
         Promise.resolve(ClientRepository.PRIMARY_KEY_CURRENT_CLIENT),
       );
       const backendError = new Error();
       backendError.code = 404;
-      spyOn(backendClient, 'sendRequest').and.returnValue(Promise.reject(backendError));
+      spyOn(clientService, 'getClientById').and.returnValue(Promise.reject(backendError));
 
       return TestFactory.client_repository
         .getValidLocalClient()
@@ -118,12 +116,11 @@ describe('ClientRepository', () => {
 
     it('rejects with an error if client removed on backend', () => {
       const clientService = TestFactory.client_repository.clientService;
-      const backendClient = clientService.backendClient;
       spyOn(clientService, 'loadClientFromDb').and.returnValue(Promise.resolve(clientPayloadDatabase));
       spyOn(TestFactory.storage_service, 'deleteDatabase').and.returnValue(Promise.resolve(true));
       const backendError = new Error();
       backendError.code = 404;
-      spyOn(backendClient, 'sendRequest').and.returnValue(Promise.reject(backendError));
+      spyOn(clientService, 'getClientById').and.returnValue(Promise.reject(backendError));
 
       return TestFactory.client_repository
         .getValidLocalClient()

@@ -24,7 +24,6 @@ import {loadDataUrl} from 'Util/util';
 import {sortByPriority} from 'Util/StringUtil';
 
 import {TeamMapper} from './TeamMapper';
-import {TeamService} from './TeamService';
 import {TeamEntity} from './TeamEntity';
 import {roleFromTeamPermissions, ROLE} from '../user/UserPermission';
 
@@ -36,14 +35,14 @@ import {SuperProperty} from '../tracking/SuperProperty';
 
 export class TeamRepository {
   /**
-   * @param {BackendClient} backendClient - Client for the API calls
+   * @param {TeamService} teamService - Client for the API calls
    * @param {UserRepository} userRepository - Repository for all user interactions
    */
-  constructor(backendClient, userRepository) {
+  constructor(teamService, userRepository) {
     this.logger = getLogger('TeamRepository');
 
     this.teamMapper = new TeamMapper();
-    this.teamService = new TeamService(backendClient);
+    this.teamService = teamService;
     this.userRepository = userRepository;
 
     this.selfUser = this.userRepository.self;

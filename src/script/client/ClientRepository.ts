@@ -44,8 +44,6 @@ import {UserClientAddEvent, UserClientRemoveEvent} from '@wireapp/api-client/dis
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {User} from '../entity/User';
 import {BackendClientError} from '../error/BackendClientError';
-import {BackendClient} from '../service/BackendClient';
-import {StorageService} from '../storage';
 
 export class ClientRepository {
   readonly clientService: ClientService;
@@ -68,12 +66,8 @@ export class ClientRepository {
     return 'local_identity';
   }
 
-  constructor(
-    backendClient: BackendClient,
-    storageService: StorageService,
-    cryptographyRepository: CryptographyRepository,
-  ) {
-    this.clientService = new ClientService(backendClient, storageService);
+  constructor(clientService: ClientService, cryptographyRepository: CryptographyRepository) {
+    this.clientService = clientService;
     this.cryptographyRepository = cryptographyRepository;
     this.selfUser = ko.observable(undefined);
     this.logger = getLogger('ClientRepository');

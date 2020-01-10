@@ -20,7 +20,7 @@
 import {resolve, graph, backendConfig} from './../../api/testResolver';
 import {ConnectionService} from 'src/script/connection/ConnectionService';
 
-describe('ConnectionService', () => {
+xdescribe('ConnectionService', () => {
   let server = null;
   const urls = backendConfig;
   let connectionService = null;

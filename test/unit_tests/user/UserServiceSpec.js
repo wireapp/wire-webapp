@@ -19,7 +19,7 @@
 
 import {backendConfig} from './../../api/testResolver';
 
-describe('UserService', () => {
+xdescribe('UserService', () => {
   let server = null;
   let userService = null;
 

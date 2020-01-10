@@ -61,6 +61,7 @@ describe('ConversationRepository', () => {
   let self_user_et = null;
   let server = null;
   let storage_service = null;
+  const messageSenderId = createRandomUuid();
 
   const _find_conversation = (conversation, conversations) => {
     return ko.utils.arrayFirst(conversations(), _conversation => _conversation.id === conversation.id);
@@ -99,6 +100,12 @@ describe('ConversationRepository', () => {
         201,
         {'Content-Type': 'application/json'},
         JSON.stringify(payload.conversations.knock.post),
+      ]);
+
+      server.respondWith('GET', `${backendConfig.restUrl}/users?ids=${messageSenderId}`, [
+        200,
+        {'Content-Type': 'application/json'},
+        '',
       ]);
 
       const mark_as_read_url = `${backendConfig.restUrl}/conversations/${conversation_et.id}/self`;
@@ -676,7 +683,7 @@ describe('ConversationRepository', () => {
       const conversationEntity = _generate_conversation(ConversationType.GROUP);
       const event = {
         conversation: conversationEntity.id,
-        from: createRandomUuid(),
+        from: messageSenderId,
         id: createRandomUuid(),
         time: '2017-09-06T09:43:36.528Z',
         data: {},

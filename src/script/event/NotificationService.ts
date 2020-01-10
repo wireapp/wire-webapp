@@ -17,14 +17,17 @@
  *
  */
 
+import {APIClient} from '@wireapp/api-client';
+import {NotificationList} from '@wireapp/api-client/dist/notification/';
+
 import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
-import {Notification, NotificationList} from '@wireapp/api-client/dist/notification';
+import {Notification} from '@wireapp/api-client/dist/notification';
 import {DatabaseKeys} from '@wireapp/core/dist/notification/NotificationDatabaseRepository';
 import {Logger, getLogger} from 'Util/Logger';
 import {EventRecord, StorageSchemata, StorageService} from '../storage/';
 
 export class NotificationService {
-  private readonly backendClient: any;
+  private readonly apiClient: APIClient;
   private readonly logger: Logger;
   private readonly storageService: StorageService;
   private readonly AMPLIFY_STORE_NAME: string;
@@ -38,8 +41,8 @@ export class NotificationService {
     };
   }
 
-  constructor(backendClient: any, storageService: StorageService) {
-    this.backendClient = backendClient;
+  constructor(apiClient: APIClient, storageService: StorageService) {
+    this.apiClient = apiClient;
     this.storageService = storageService;
     this.logger = getLogger('NotificationService');
     this.AMPLIFY_STORE_NAME = StorageSchemata.OBJECT_STORE.AMPLIFY;
@@ -54,37 +57,17 @@ export class NotificationService {
    * @returns Resolves with a pages list of notifications
    */
   getNotifications(clientId?: string, notificationId?: string, size: number = 10000): Promise<NotificationList> {
-    return this.backendClient.sendRequest({
-      data: {
-        client: clientId,
-        since: notificationId,
-        size: size,
-      },
-      type: 'GET',
-      url: NotificationService.CONFIG.URL_NOTIFICATIONS,
-    });
+    return this.apiClient.notification.api.getNotifications(clientId, size, notificationId);
   }
 
   async getServerTime(): Promise<string> {
     // Info: We use "100" as size limit because it's the minimum value accepted by the backend's notification stream
-    const notificationList = await this.getNotifications(undefined, undefined, 100);
+    const notificationList = await this.apiClient.notification.api.getNotifications(undefined, 100, undefined);
     return notificationList.time;
   }
 
   getAllNotificationsForClient(clientId: string, notificationId?: string): Promise<Notification[]> {
-    const notifications: Notification[] = [];
-
-    const collectNotifications = async (lastNotificationId?: string): Promise<Notification[]> => {
-      const notificationList = await this.getNotifications(clientId, lastNotificationId);
-      const newNotifications = notificationList.notifications;
-      if (newNotifications.length > 0) {
-        lastNotificationId = newNotifications[newNotifications.length - 1].id;
-        notifications.push(...newNotifications);
-      }
-      return notificationList.has_more ? collectNotifications(lastNotificationId) : notifications;
-    };
-
-    return collectNotifications(notificationId);
+    return this.apiClient.notification.api.getAllNotifications(clientId, notificationId);
   }
 
   /**
@@ -93,13 +76,7 @@ export class NotificationService {
    * @returns Resolves with the last known notification for given client
    */
   getNotificationsLast(clientId: string): Promise<Notification> {
-    return this.backendClient.sendRequest({
-      data: {
-        client: clientId,
-      },
-      type: 'GET',
-      url: NotificationService.CONFIG.URL_NOTIFICATIONS_LAST,
-    });
+    return this.apiClient.notification.api.getLastNotification(clientId);
   }
 
   /**
@@ -201,7 +178,7 @@ export class NotificationService {
         .first();
     }
 
-    const {notifications} = await this.getNotifications(clientId);
+    const {notifications} = await this.apiClient.notification.api.getNotifications(clientId);
 
     for (const notification of notifications) {
       const matchedEvent = notification.payload.find(event => {

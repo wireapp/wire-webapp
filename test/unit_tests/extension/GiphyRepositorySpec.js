@@ -17,13 +17,18 @@
  *
  */
 
-import {resolve, graph, backendConfig} from './../../api/testResolver';
+import {container} from 'tsyringe';
+
 import {GiphyRepository} from 'src/script/extension/GiphyRepository';
 import {GiphyService} from 'src/script/extension/GiphyService';
+import {APIClientSingleton} from 'src/script/service/APIClientSingleton';
+import {Config} from 'src/script/Config';
 
 describe('Giphy Repository', () => {
+  Config.BACKEND_REST = 'http://localhost';
+  Config.BACKEND_WS = 'wss://localhost';
+
   let server = null;
-  const urls = backendConfig;
 
   let giphyRepository = null;
   let giphyService = null;
@@ -31,13 +36,13 @@ describe('Giphy Repository', () => {
   beforeEach(() => {
     server = sinon.fakeServer.create();
 
-    giphyRepository = new GiphyRepository(new GiphyService(resolve(graph.BackendClient)));
-    giphyService = giphyRepository.giphyService;
+    giphyService = new GiphyService(container.resolve(APIClientSingleton).getClient());
+    giphyRepository = new GiphyRepository(giphyService);
 
     spyOn(giphyService, 'getRandom').and.callThrough();
     spyOn(giphyService, 'getById').and.callThrough();
 
-    const randomFooGif = `${urls.restUrl}/proxy/giphy/v1/gifs/random?tag=foo`;
+    const randomFooGif = `${Config.BACKEND_REST}/proxy/giphy/v1/gifs/random?tag=foo`;
     /* eslint-disable comma-spacing, key-spacing, no-useless-escape, sort-keys, quotes */
     server.respondWith('GET', randomFooGif, [
       200,
@@ -73,7 +78,7 @@ describe('Giphy Repository', () => {
     ]);
     /* eslint-enable comma-spacing, key-spacing, no-useless-escape, sort-keys, quotes */
 
-    const randomFooGifData = `${urls.restUrl}/proxy/giphy/v1/gifs/GKLmFicoabZrW`;
+    const randomFooGifData = `${Config.BACKEND_REST}/proxy/giphy/v1/gifs/GKLmFicoabZrW`;
     /* eslint-disable comma-spacing, key-spacing, no-useless-escape, sort-keys, quotes */
     server.respondWith('GET', randomFooGifData, [
       200,
@@ -204,6 +209,7 @@ describe('Giphy Repository', () => {
       }),
     ]);
     /* eslint-enable comma-spacing, key-spacing, no-useless-escape, sort-keys, quotes */
+    server.autoRespond = true;
   });
 
   afterEach(() => {
@@ -211,20 +217,11 @@ describe('Giphy Repository', () => {
   });
 
   describe('getRandomGif', () => {
-    it('can receive a random gif', done => {
-      giphyRepository
-        .getRandomGif({tag: 'foo'})
-        .then(() => {
-          expect(giphyService.getRandom).toHaveBeenCalled();
-          expect(giphyService.getById).toHaveBeenCalled();
-          done();
-        })
-        .catch(done.fail);
+    it('can receive a random gif', async () => {
+      await giphyRepository.getRandomGif({tag: 'foo'});
 
-      server.respond();
-      window.setTimeout(() => {
-        server.respond();
-      }, 10);
+      expect(giphyService.getRandom).toHaveBeenCalled();
+      expect(giphyService.getById).toHaveBeenCalled();
     });
   });
 });

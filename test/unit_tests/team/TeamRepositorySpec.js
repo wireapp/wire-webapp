@@ -61,7 +61,7 @@ describe('TeamRepository', () => {
     server = sinon.fakeServer.create();
     server.autoRespond = true;
 
-    server.respondWith('GET', `${backendConfig.restUrl}/teams?size=100`, [
+    server.respondWith('GET', `${backendConfig.restUrl}/teams`, [
       200,
       {'Content-Type': 'application/json'},
       JSON.stringify(teams_data),
@@ -72,6 +72,12 @@ describe('TeamRepository', () => {
       {'Content-Type': 'application/json'},
       JSON.stringify(team_members),
     ]);
+
+    server.respondWith(
+      'GET',
+      `${backendConfig.restUrl}/users?ids=${team_members.members.map(member => member.user).join(',')}`,
+      [200, {'Content-Type': 'application/json'}, ''],
+    );
   });
 
   afterEach(() => server.restore());

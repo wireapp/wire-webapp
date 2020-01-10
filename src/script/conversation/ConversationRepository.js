@@ -88,7 +88,6 @@ import {AssetRemoteData} from '../assets/AssetRemoteData';
 
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {AudioType} from '../audio/AudioType';
-import {QUEUE_STATE} from '../service/QueueState';
 import {EventName} from '../tracking/EventName';
 
 import {SystemMessageType} from '../message/SystemMessageType';
@@ -237,10 +236,10 @@ export class ConversationRepository {
     this.messageSender = messageSender;
 
     // @note Only use the client request queue as to unblock if not blocked by event handling or the cryptographic order of messages will be ruined and sessions might be deleted
-    this.conversation_service.backendClient.queueState.subscribe(queueState => {
-      const queueReady = queueState === QUEUE_STATE.READY;
-      this.messageSender.pauseQueue(!queueReady || this.block_event_handling());
-    });
+    // this.conversation_service.backendClient.queueState.subscribe(queueState => {
+    //   const queueReady = queueState === QUEUE_STATE.READY;
+    //   this.messageSender.pauseQueue(!queueReady || this.block_event_handling());
+    // });
 
     this.conversations_archived = ko.observableArray([]);
     this.conversations_cleared = ko.observableArray([]);
@@ -2638,7 +2637,8 @@ export class ConversationRepository {
         this.clientMismatchHandler.onClientMismatch(eventInfoEntity, response, payload);
         return response;
       })
-      .catch(error => {
+      .catch(axiosError => {
+        const error = axiosError.response?.data;
         const isUnknownClient = error.label === BackendClientError.LABEL.UNKNOWN_CLIENT;
         if (isUnknownClient) {
           return this.client_repository.removeLocalClient();
