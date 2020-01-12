@@ -923,22 +923,23 @@
   dependencies:
     "@formatjs/intl-utils" "^1.6.0"
 
-"@formatjs/intl-unified-numberformat@^3.0.1":
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/@formatjs/intl-unified-numberformat/-/intl-unified-numberformat-3.0.1.tgz#a0bf05760f20833aaa3dcf4d0f791c8c6eb758fc"
-  integrity sha512-2n2yMLctLE3AUhnlAqxPd9HLy8oXf+/hUomceS21svW2UmhsC3e7Rwq7sp9yAVENTo7d6OgEHwmWf9nNJvE0mQ==
+"@formatjs/intl-unified-numberformat@^3.0.4":
+  version "3.0.4"
+  resolved "https://registry.yarnpkg.com/@formatjs/intl-unified-numberformat/-/intl-unified-numberformat-3.0.4.tgz#da689bfdd72e4857ee5a02cccdfd4ddf2c401ab2"
+  integrity sha512-B49aviNgeF6ZelLpp7yDc03IN+JYjpHBS9XYq0iFkG064kwi2CfdGI8hQBdaOXyRY6iV3kBF3UEJ83zkTyqk5Q==
   dependencies:
-    "@formatjs/intl-utils" "^2.0.1"
+    "@formatjs/intl-utils" "^2.0.4"
+    unicode-12.1.0 "0.8"
 
 "@formatjs/intl-utils@^1.6.0":
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/@formatjs/intl-utils/-/intl-utils-1.6.0.tgz#43b094232b9ef98b57a270bcecee99168d329e9f"
   integrity sha512-5D0C4tQgNFJNaJ17BYum0GfAcKNK3oa1VWzgkv/AN7i52fg4r69ZLcpEGpf6tZiX9Qld8CDwTQOeFt6fuOqgVw==
 
-"@formatjs/intl-utils@^2.0.1":
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/@formatjs/intl-utils/-/intl-utils-2.0.1.tgz#6d310808e34b60184564cf3800526f012eb9d622"
-  integrity sha512-g5C+Pfka3lJyQhkB1dvC0g6g3y0uUNYxNyFKjFk7VhVt4m/+wXT1FLK1TDuOgpsrGWstZ/Pt4g5tpgPgTR4s6w==
+"@formatjs/intl-utils@^2.0.4":
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/@formatjs/intl-utils/-/intl-utils-2.0.4.tgz#936961b7eade01f6d331d31cc9fb512d1fb3981a"
+  integrity sha512-zd92HkqxeEprsyM3JLGr+jhhMkmY0NCYQ+Jyw/DC6qZHiFejdO19doYcH5/iMUUPEYLI2h/k7TETqAEez8Btog==
 
 "@formatjs/macro@0.2.6":
   version "0.2.6"
@@ -2546,17 +2547,17 @@ babel-plugin-macros@^2.0.0:
     cosmiconfig "^5.2.0"
     resolve "^1.10.0"
 
-babel-plugin-react-intl@5.1.13:
-  version "5.1.13"
-  resolved "https://registry.yarnpkg.com/babel-plugin-react-intl/-/babel-plugin-react-intl-5.1.13.tgz#bde0ab1006a813480bf15413e104aa5b14696639"
-  integrity sha512-xzdTMvMEqDAvPDqDNbGhYUDglL65f1q0mmLEpIKbIVuxa5gg01nmX+Y/8o6uIsLe6MJxCTw/9M6nzTXqtsk6JQ==
+babel-plugin-react-intl@5.1.16:
+  version "5.1.16"
+  resolved "https://registry.yarnpkg.com/babel-plugin-react-intl/-/babel-plugin-react-intl-5.1.16.tgz#cba4ae57846f172c41b89e994403c2eb83d13d76"
+  integrity sha512-+f3C+FQ/C1+62u399hVtFdFBD+TLfke6ynz1Q20hvYu8QoBVha468TDZmAvhhNiwQDm7EZNH1b8ZXQZ/V41ZsA==
   dependencies:
     "@babel/core" "^7.7.2"
     "@babel/helper-plugin-utils" "^7.0.0"
     "@types/babel__core" "^7.1.3"
     "@types/schema-utils" "^1.0.0"
-    fs-extra "^8.0.1"
-    intl-messageformat-parser "^3.5.3"
+    fs-extra "^8.1.0"
+    intl-messageformat-parser "^3.6.2"
     schema-utils "^2.2.0"
 
 babel-plugin-syntax-jsx@^6.18.0:
@@ -5524,7 +5525,7 @@ fs-exists-sync@^0.1.0:
   resolved "https://registry.yarnpkg.com/fs-exists-sync/-/fs-exists-sync-0.1.0.tgz#982d6893af918e72d08dec9e8673ff2b5a8d6add"
   integrity sha1-mC1ok6+RjnLQjeyehnP/K1qNat0=
 
-fs-extra@8.1.0, fs-extra@^8.0.1:
+fs-extra@8.1.0, fs-extra@^8.1.0:
   version "8.1.0"
   resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-8.1.0.tgz#49d43c45a88cd9677668cb7be1b46efdb8d2e1c0"
   integrity sha512-yhlQgA6mnOJUKOsRUFsgJdQCvkKhcz8tlZG5HBQfReYZy46OwLcY+Zia0mtdHsOo9y/hP+CxMN0TU9QxoOtG4g==
@@ -6680,12 +6681,12 @@ intl-messageformat-parser@3.5.1:
   dependencies:
     "@formatjs/intl-unified-numberformat" "^2.2.0"
 
-intl-messageformat-parser@^3.5.1, intl-messageformat-parser@^3.5.3:
-  version "3.5.3"
-  resolved "https://registry.yarnpkg.com/intl-messageformat-parser/-/intl-messageformat-parser-3.5.3.tgz#c9d9cba1ea75792dbb9d143b6f098b495becc6f0"
-  integrity sha512-iVev8//uFlQGTousbrnEDLpSujhlyXJUcgYFW7BCCxXaUY5u0irLxgzsC5dWJLBIdtzhXiDc6ms6LHy88vpRIQ==
+intl-messageformat-parser@^3.5.1, intl-messageformat-parser@^3.6.2:
+  version "3.6.2"
+  resolved "https://registry.yarnpkg.com/intl-messageformat-parser/-/intl-messageformat-parser-3.6.2.tgz#03138f6f11ea499268cc63384b7a752d20de44a2"
+  integrity sha512-+uQVyN+Ip71s9IzbKEZi3HDFhXKcjJhK1JnbaFNMrOh4YqNAuEoRhcqPP/e80vyTm6atNF424y7ga9K9dseG/g==
   dependencies:
-    "@formatjs/intl-unified-numberformat" "^3.0.1"
+    "@formatjs/intl-unified-numberformat" "^3.0.4"
 
 intl-messageformat@7.7.2:
   version "7.7.2"
@@ -10753,8 +10754,9 @@ rechoir@^0.6.2:
   dependencies:
     resolve "^1.1.6"
 
-"reconnecting-websocket@github:wireapp/reconnecting-websocket#96ac796ae8c7a7d9d857f46ed39dbedd7b9ad378":
+reconnecting-websocket@wireapp/reconnecting-websocket#96ac796ae8c7a7d9d857f46ed39dbedd7b9ad378:
   version "4.2.0"
+  uid "96ac796ae8c7a7d9d857f46ed39dbedd7b9ad378"
   resolved "https://codeload.github.com/wireapp/reconnecting-websocket/tar.gz/96ac796ae8c7a7d9d857f46ed39dbedd7b9ad378"
 
 redent@^1.0.0:
@@ -12823,6 +12825,11 @@ unherit@^1.0.4:
   dependencies:
     inherits "^2.0.1"
     xtend "^4.0.1"
+
+unicode-12.1.0@0.8:
+  version "0.8.0"
+  resolved "https://registry.yarnpkg.com/unicode-12.1.0/-/unicode-12.1.0-0.8.0.tgz#260f6dd899eefd42a8eae550bcbb62654c90c79d"
+  integrity sha512-OhxidkE3tKlMAouqWtdYtDP2RHVIo1lNdjEruNdVxLrACcbw79TaOcupYKxz6F7ldC1nx8CDygzN5kGmXAU60Q==
 
 unicode-canonical-property-names-ecmascript@^1.0.4:
   version "1.0.4"
