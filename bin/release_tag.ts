@@ -19,11 +19,16 @@
  *
  */
 
+import {APIClient} from '@wireapp/api-client';
+import {ClientType} from '@wireapp/api-client/dist/client';
+import {Account} from '@wireapp/core';
 import {execSync} from 'child_process';
 import logdown from 'logdown';
 import moment from 'moment';
 import path from 'path';
 import readline from 'readline';
+
+require('dotenv').config();
 
 const input = readline.createInterface(process.stdin, process.stdout);
 
@@ -109,15 +114,37 @@ const ask = (questionToAsk: string, callback: (answer: string) => void): void =>
   });
 };
 
+const announceRelease = async (tagName: string, commitId: string): Promise<void> => {
+  const {WIRE_EMAIL, WIRE_PASSWORD, WIRE_CONVERSATION} = process.env;
+  if (WIRE_EMAIL && WIRE_PASSWORD && WIRE_CONVERSATION) {
+    const apiClient = new APIClient({urls: APIClient.BACKEND.PRODUCTION});
+    const account = new Account(apiClient);
+    await account.login({
+      clientType: ClientType.TEMPORARY,
+      email: WIRE_EMAIL,
+      password: WIRE_PASSWORD,
+    });
+    const message = `Released tag "${tagName}" based on commit ID "${commitId}".`;
+    const payload = account.service.conversation.messageBuilder.createText(WIRE_CONVERSATION, message).build();
+    await account.service.conversation.send(payload);
+  }
+};
+
 ask(
   `ℹ️  The commit "${commitMessage}" will be released with tag "${tagName}". Continue? [yes/no] `,
-  (answer: string) => {
+  async (answer: string) => {
     if (answer === 'yes') {
       logger.info(`Creating tag "${tagName}" ...`);
       exec(`git tag ${tagName} ${commitId}`);
 
       logger.info(`Pushing "${tagName}" to "${origin}" ...`);
       exec(`git push ${origin} ${tagName}`);
+
+      try {
+        await announceRelease(tagName, commitId);
+      } catch (error) {
+        logger.error(error);
+      }
 
       logger.info('Done.');
     } else {

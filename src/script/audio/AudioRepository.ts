@@ -20,8 +20,7 @@
 import {WebappProperties} from '@wireapp/api-client/dist/user/data';
 import {amplify} from 'amplify';
 import ko from 'knockout';
-import {Logger} from 'logdown';
-import {getLogger} from 'Util/Logger';
+import {Logger, getLogger} from 'Util/Logger';
 
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {WebAppEvents} from '../event/WebApp';
