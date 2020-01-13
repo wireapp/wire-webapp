@@ -17,8 +17,7 @@
  *
  */
 
-import {LogFactory} from '@wireapp/commons';
-import {Logger} from 'logdown';
+import {LogFactory, Logger} from '@wireapp/commons';
 
 const LOGGER_NAMESPACE = '@wireapp/webapp';
 
