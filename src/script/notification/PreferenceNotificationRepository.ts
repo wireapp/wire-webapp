@@ -57,7 +57,7 @@ export class PreferenceNotificationRepository {
   }
 
   /**
-   * @param selfUserObservable an observable that contains the self user
+   * @param selfUserObservable - an observable that contains the self user
    */
   constructor(selfUserObservable: ko.Observable<User>) {
     const notificationsStorageKey = PreferenceNotificationRepository.CONFIG.STORAGE_KEY;

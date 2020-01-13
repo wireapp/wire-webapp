@@ -75,7 +75,7 @@ export class EventTrackingRepository {
   }
 
   /**
-   * @param privacyPreference Privacy preference
+   * @param privacyPreference - Privacy preference
    * @returns Resolves after initialization
    */
   async init(privacyPreference: boolean): Promise<void> {
@@ -228,7 +228,7 @@ export class EventTrackingRepository {
    * Checks if a Raygun payload should be reported.
    *
    * @see https://github.com/MindscapeHQ/raygun4js#onbeforesend
-   * @param raygunPayload Error payload about to be send
+   * @param raygunPayload - Error payload about to be send
    * @returns Payload if error will be reported, otherwise `false`
    */
   private _checkErrorPayload<T extends object>(raygunPayload: T): T | false {

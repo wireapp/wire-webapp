@@ -31,7 +31,7 @@ export class ClientMapper {
   /**
    * Maps a JSON into a Client entity.
    *
-   * @param isSelfClient Creating self client
+   * @param isSelfClient - Creating self client
    * @returns Mapped client entity
    */
   static mapClient(clientPayload: Record<string, any>, isSelfClient: boolean): ClientEntity {
@@ -59,8 +59,8 @@ export class ClientMapper {
   /**
    * Maps an object of client IDs with their payloads to client entities.
    *
-   * @param clientsPayload Clients data
-   * @param isSelfClient Creating self client
+   * @param clientsPayload - Clients data
+   * @param isSelfClient - Creating self client
    * @returns Mapped client entities
    */
   static mapClients(clientsPayload: any[], isSelfClient: boolean): ClientEntity[] {
@@ -70,8 +70,8 @@ export class ClientMapper {
   /**
    * Update a client entity or object from JSON.
    *
-   * @param clientData Client data as entity or object
-   * @param updatePayload JSON possibly containing updates
+   * @param clientData - Client data as entity or object
+   * @param updatePayload - JSON possibly containing updates
    * @returns Contains the client and whether there was a change
    */
   static updateClient<T extends Record<string, any>, U extends T>(

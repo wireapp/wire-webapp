@@ -35,6 +35,7 @@ describe('chooseScreen', () => {
 
     return instantiateComponent('choose-screen', params).then((domContainer: Element) => {
       const screenItems = domContainer.querySelectorAll('.choose-screen-list-item');
+
       expect(screenItems.length).toBe(screens.length);
     });
   });

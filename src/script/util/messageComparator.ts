@@ -24,7 +24,7 @@ import {MentionEntity} from '../message/MentionEntity';
  * Checks if two arrays with mentions contain different values.
  *
  * @param originalMessageEntity - Message entity
- * @param updatedMentions Updated mentions
+ * @param updatedMentions - Updated mentions
  * @returns Are the mentions different from each other
  */
 export function areMentionsDifferent(originalMessageEntity: ContentMessage, updatedMentions: MentionEntity[]): boolean {
@@ -42,8 +42,8 @@ export function areMentionsDifferent(originalMessageEntity: ContentMessage, upda
 /**
  * Checks if a given text is different from an already existing text on the message entity.
  *
- * @param originalMessageEntity Message entity
- * @param textMessage Message to compare with
+ * @param originalMessageEntity - Message entity
+ * @param textMessage - Message to compare with
  * @returns Are message and text the same
  */
 export function isTextDifferent(originalMessageEntity: ContentMessage, textMessage: string): boolean {

@@ -43,8 +43,8 @@ export class ConnectionService {
    * of the last connection item from the received list.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/tab.html#!//connections
    *
-   * @param limit Number of results to return (default 100, max 500)
-   * @param userId User ID to start from
+   * @param limit - Number of results to return (default 100, max 500)
+   * @param userId - User ID to start from
    * @returns Promise that resolves with user connections
    */
   getConnections(limit: number = 500, userId?: string): Promise<UserConnectionList> {
@@ -63,8 +63,8 @@ export class ConnectionService {
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/tab.html#!//createConnection
    *
-   * @param userId User ID of the user to request a connection with
-   * @param name Name of the conversation being initiated (1 - 256 characters)
+   * @param userId - User ID of the user to request a connection with
+   * @param name - Name of the conversation being initiated (1 - 256 characters)
    * @returns Promise that resolves when the connection request was created
    */
   postConnections(userId: string, name: string): Promise<Connection> {
@@ -85,8 +85,8 @@ export class ConnectionService {
    * @example status: ['accepted', 'blocked', 'pending', 'ignored', 'sent' or 'cancelled']
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/tab.html#!//updateConnection
    *
-   * @param userId User ID of the other user
-   * @param connectionStatus New relation status
+   * @param userId - User ID of the other user
+   * @param connectionStatus - New relation status
    * @returns Promise that resolves when the status was updated
    */
   putConnections(userId: string, connectionStatus: ConnectionStatus): Promise<Connection> {

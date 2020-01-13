@@ -50,7 +50,7 @@ const PhoneLoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
     <InputBlock>
       <Select
         tabIndex={1}
-        style={{marginBottom: 0, height: 57}}
+        style={{height: 57, marginBottom: 0}}
         value={country}
         onChange={(event: React.ChangeEvent<HTMLSelectElement>) => {
           const {value} = event.target;
@@ -73,7 +73,7 @@ const PhoneLoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
       <InputSubmitCombo style={{background: 'none', boxShadow: 'inset 16px 16px 0 #fff, inset -100px -16px 0 #fff'}}>
         <Input
           tabIndex={2}
-          style={{width: 80, marginRight: 1}}
+          style={{marginRight: 1, width: 80}}
           ref={countryCodeInput}
           value={`+${countryCode}`}
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {

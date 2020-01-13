@@ -65,7 +65,7 @@ export const forwardParameter = (url: string, parameterName: string, locationSea
 
 /**
  * Removes protocol, www and trailing slashes in the given url
- * @param url URL to be cleaned
+ * @param url - URL to be cleaned
  * @returns Plain URL
  */
 export const getDomainName = (url = '') => {
@@ -93,7 +93,7 @@ export const getLinksFromHtml = (html: string) => {
 
 /**
  * Prepends http to given url if protocol missing
- * @param url URL to be prepended
+ * @param url - URL to be prepended
  * @returns prepended URL
  */
 export const prependProtocol = (url: string) => (!url.match(/^http[s]?:\/\//i) ? `http://${url}` : url);

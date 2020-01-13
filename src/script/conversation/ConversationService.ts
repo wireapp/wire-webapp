@@ -80,7 +80,7 @@ export class ConversationService {
    * @note Do not include yourself as the requestor
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/createGroupConversation
    *
-   * @param payload Payload object for group creation
+   * @param payload - Payload object for group creation
    * @returns Resolves when the conversation was created
    */
   postConversations(payload: NewConversation): Promise<BackendConversation> {
@@ -100,8 +100,8 @@ export class ConversationService {
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/conversations
    *
-   * @param limit Number of results to return (default 100, max 500)
-   * @param conversation_id Conversation ID to start from
+   * @param limit - Number of results to return (default 100, max 500)
+   * @param conversation_id - Conversation ID to start from
    * @returns Resolves with the conversation information
    */
   getConversations(limit: number = 100, conversation_id?: string): Promise<BackendConversations> {
@@ -117,7 +117,7 @@ export class ConversationService {
 
   /**
    * Retrieves all the conversations of a user.
-   * @param limit Number of results to return (default 500, max 500)
+   * @param limit - Number of results to return (default 500, max 500)
    * @returns Resolves with the conversation information
    */
   getAllConversations(limit = 500): Promise<BackendConversation[]> {
@@ -141,7 +141,7 @@ export class ConversationService {
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/conversation
    *
-   * @param conversation_id ID of conversation to get
+   * @param conversation_id - ID of conversation to get
    * @returns Resolves with the server response
    */
   get_conversation_by_id(conversation_id: string): Promise<BackendConversation> {
@@ -156,8 +156,8 @@ export class ConversationService {
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/updateConversation
    *
-   * @param conversationId ID of conversation to rename
-   * @param name new name of the conversation
+   * @param conversationId - ID of conversation to rename
+   * @param name - new name of the conversation
    * @returns Resolves with the server response
    */
   updateConversationName(conversationId: string, name: string): Promise<ConversationRenameEvent> {
@@ -173,8 +173,8 @@ export class ConversationService {
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/updateConversationMessageTimer
    *
-   * @param conversationId ID of conversation to rename
-   * @param messageTimer new message timer of the conversation
+   * @param conversationId - ID of conversation to rename
+   * @param messageTimer - new message timer of the conversation
    * @returns Resolves with the server response
    */
   updateConversationMessageTimer(
@@ -193,8 +193,8 @@ export class ConversationService {
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/updateConversationMessageTimer
    *
-   * @param conversationId ID of conversation to rename
-   * @param receiptMode new receipt mode
+   * @param conversationId - ID of conversation to rename
+   * @param receiptMode - new receipt mode
    * @returns Resolves with the server response
    */
   updateConversationReceiptMode(conversationId: string, receiptMode: ReceiptMode): Promise<any> {
@@ -210,8 +210,8 @@ export class ConversationService {
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/updateSelf
    *
-   * @param conversation_id ID of conversation to update
-   * @param payload Updated properties
+   * @param conversation_id - ID of conversation to update
+   * @param payload - Updated properties
    * @returns Resolves with the server response
    */
   update_member_properties(conversation_id: string, payload: ConversationMemberUpdateData): Promise<void> {
@@ -230,7 +230,7 @@ export class ConversationService {
    * Delete the conversation access code.
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/deleteConversationCode
-   * @param conversationId ID of conversation to delete access code for
+   * @param conversationId - ID of conversation to delete access code for
    * @returns Resolves with the server response
    */
   deleteConversationCode(conversationId: string): Promise<BackendConversation> {
@@ -244,7 +244,7 @@ export class ConversationService {
    * Get the conversation access code.
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/getConversationCode
-   * @param conversationId ID of conversation to get access code for
+   * @param conversationId - ID of conversation to get access code for
    * @returns Resolves with the server response
    */
   getConversationCode(conversationId: string): Promise<ConversationCode> {
@@ -258,7 +258,7 @@ export class ConversationService {
    * Request a conversation access code.
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/createConversationCode
-   * @param conversationId ID of conversation to request access code for
+   * @param conversationId - ID of conversation to request access code for
    * @returns Resolves with the server response
    */
   postConversationCode(conversationId: string): Promise<ConversationCodeUpdateEvent> {
@@ -272,8 +272,8 @@ export class ConversationService {
    * Join a conversation using a code.
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/joinConversationByCode
-   * @param key Conversation identifier
-   * @param code Conversation access code
+   * @param key - Conversation identifier
+   * @param code - Conversation access code
    * @returns Resolves with the server response
    */
   postConversationJoin(key: string, code: string): Promise<ConversationMemberJoinEvent> {
@@ -292,9 +292,9 @@ export class ConversationService {
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/updateConversationAccess
    *
-   * @param conversationId ID of conversation
-   * @param accessModes Conversation access mode
-   * @param accessRole Conversation access role
+   * @param conversationId - ID of conversation
+   * @param accessModes - Conversation access mode
+   * @param accessRole - Conversation access role
    * @returns Resolves with the server response
    */
   putConversationAccess(
@@ -319,8 +319,8 @@ export class ConversationService {
   /**
    * Remove service from conversation.
    *
-   * @param conversationId ID of conversation to remove service from
-   * @param userId ID of service to be removed from the the conversation
+   * @param conversationId - ID of conversation to remove service from
+   * @param userId - ID of service to be removed from the the conversation
    * @returns Resolves with the server response
    */
   deleteBots(conversationId: string, userId: string): Promise<void> {
@@ -335,8 +335,8 @@ export class ConversationService {
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/removeMember
    *
-   * @param conversationId ID of conversation to remove member from
-   * @param userId ID of member to be removed from the the conversation
+   * @param conversationId - ID of conversation to remove member from
+   * @param userId - ID of member to be removed from the the conversation
    * @returns Resolves with the server response
    */
   deleteMembers(conversationId: string, userId: string): Promise<void> {
@@ -364,9 +364,9 @@ export class ConversationService {
   /**
    * Add a service to an existing conversation.
    *
-   * @param conversationId ID of conversation to add users to
-   * @param providerId ID of service provider
-   * @param serviceId ID of service
+   * @param conversationId - ID of conversation to add users to
+   * @param providerId - ID of service provider
+   * @param serviceId - ID of service
    * @returns Resolves with the server response
    */
   postBots(conversationId: string, providerId: string, serviceId: string): Promise<void> {
@@ -395,11 +395,11 @@ export class ConversationService {
    *   }
    * }
    *
-   * @param conversation_id ID of conversation to send message in
-   * @param payload Payload to be posted
+   * @param conversation_id - ID of conversation to send message in
+   * @param payload - Payload to be posted
    * @param payload.recipients - Map with per-recipient data
    * @param payload.sender - Client ID of the sender
-   * @param precondition_option Level that backend checks for missing clients
+   * @param precondition_option - Level that backend checks for missing clients
    * @returns Promise that resolves when the message was sent
    */
   post_encrypted_message(
@@ -427,8 +427,8 @@ export class ConversationService {
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/addMembers
    *
-   * @param conversationId ID of conversation to add users to
-   * @param userIds IDs of users to be added to the conversation
+   * @param conversationId - ID of conversation to add users to
+   * @param userIds - IDs of users to be added to the conversation
    * @returns Resolves with the server response
    */
   postMembers(conversationId: string, userIds: string[]): Promise<ConversationMemberJoinEvent> {
@@ -448,7 +448,7 @@ export class ConversationService {
 
   /**
    * Deletes a conversation entity from the local database.
-   * @param conversation_id ID of conversation to be deleted
+   * @param conversation_id - ID of conversation to be deleted
    * @returns Resolves when the entity was deleted
    */
   delete_conversation_from_db(conversation_id: string): Promise<string> {
@@ -503,7 +503,7 @@ export class ConversationService {
 
   /**
    * Saves a list of conversation records in the local database.
-   * @param conversations Conversation entity
+   * @param conversations - Conversation entity
    * @returns Resolves with a list of conversation records
    */
   async save_conversations_in_db(conversations: ConversationEntity[]): Promise<ConversationEntity[]> {
@@ -521,7 +521,7 @@ export class ConversationService {
 
   /**
    * Saves a conversation entity in the local database.
-   * @param conversation_et Conversation entity
+   * @param conversation_et - Conversation entity
    * @returns Resolves with the conversation entity
    */
   save_conversation_state_in_db(conversation_et: ConversationEntity): Promise<ConversationEntity> {
@@ -538,8 +538,8 @@ export class ConversationService {
   /**
    * Search for text in given conversation.
    *
-   * @param conversation_id ID of conversation to add users to
-   * @param query will be checked in against all text messages
+   * @param conversation_id - ID of conversation to add users to
+   * @param query - will be checked in against all text messages
    * @returns Resolves with the matching events
    */
   search_in_conversation(conversation_id: string, query: string): Promise<any> {

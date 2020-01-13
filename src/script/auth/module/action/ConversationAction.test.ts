@@ -38,6 +38,7 @@ describe('ConversationAction', () => {
       core: mockedCore,
     })({});
     await store.dispatch(actionRoot.conversationAction.doCheckConversationCode(key, code));
+
     expect(store.getActions()).toEqual([
       ConversationActionCreator.startConversationCodeCheck(),
       ConversationActionCreator.successfulConversationCodeCheck(),
@@ -86,6 +87,7 @@ describe('ConversationAction', () => {
       core: mockedCore,
     })({});
     await store.dispatch(actionRoot.conversationAction.doJoinConversationByCode(key, code));
+
     expect(store.getActions()).toEqual([
       ConversationActionCreator.startJoinConversationByCode(),
       ConversationActionCreator.successfulJoinConversationByCode(conversationEvent),

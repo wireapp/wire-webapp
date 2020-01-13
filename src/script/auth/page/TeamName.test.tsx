@@ -66,6 +66,7 @@ describe('when entering a team name', () => {
       expect(doNextButton().props().disabled).toBe(true);
 
       teamNameInput().simulate('change', {target: {value: expectedTeamName}});
+
       expect(doNextButton().props().disabled).toBe(false);
     });
 
@@ -87,12 +88,15 @@ describe('when entering a team name', () => {
       expect(doNextButton().props().disabled).toBe(true);
 
       teamNameInput().simulate('change', {target: {value: expectedTeamName}});
+
       expect(doNextButton().props().disabled).toBe(false);
 
       doNextButton().simulate('click');
+
       expect(doNextButton().props().disabled).toBe(true);
 
       teamNameInput().simulate('change', {target: {value: expectedValidTeamName}});
+
       expect(doNextButton().props().disabled).toBe(false);
     });
 
@@ -131,9 +135,11 @@ describe('when entering a team name', () => {
       const expectedErrorMessage = 'Enter a name with at least 2 characters';
 
       teamNameInput().simulate('change', {target: {value: expectedTeamName}});
+
       expect(teamNameInput().props().value).toBe(expectedTeamName);
 
       doNextButton().simulate('click');
+
       expect(errorMessage().text()).toBe(expectedErrorMessage);
     });
 
@@ -154,9 +160,11 @@ describe('when entering a team name', () => {
       const expectedErrorMessage = 'Enter a name with at least 2 characters';
 
       teamNameInput().simulate('change', {target: {value: actualTeamName}});
+
       expect(teamNameInput().props().value).toBe(expectedTeamName);
 
       doNextButton().simulate('click');
+
       expect(errorMessage().text()).toBe(expectedErrorMessage);
     });
   });

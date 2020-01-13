@@ -32,9 +32,9 @@ import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
  * Create Protocol Buffers message for link previews.
  * Open Graph data can be validated through: https://developers.facebook.com/tools/debug/
  *
- * @param data Open graph data
- * @param link Link entered by the user
- * @param offset Starting index of the link
+ * @param data - Open graph data
+ * @param link - Link entered by the user
+ * @param offset - Starting index of the link
  */
 export const buildFromOpenGraphData = (data: OpenGraphData, link: string, offset = 0): LinkPreview | void => {
   if (isEmpty(data)) {

@@ -47,7 +47,7 @@ export class IntegrationRepository {
 
   /**
    * Trim query string for search.
-   * @param query Service search string
+   * @param query - Service search string
    * @returns Normalized service search query
    */
   static normalizeQuery(query: string): string {
@@ -75,7 +75,7 @@ export class IntegrationRepository {
 
   /**
    * Get provider name for entity.
-   * @param entity Service or user to add provider name to
+   * @param entity - Service or user to add provider name to
    */
   addProviderNameToParticipant(entity: ServiceEntity): Promise<ServiceEntity>;
   addProviderNameToParticipant(entity: User): Promise<User>;
@@ -92,7 +92,7 @@ export class IntegrationRepository {
 
   /**
    * Get ServiceEntity for entity.
-   * @param entity Service or user to resolve to ServiceEntity
+   * @param entity - Service or user to resolve to ServiceEntity
    */
   getServiceFromUser(entity: ServiceEntity | User): Promise<ServiceEntity> {
     if (entity instanceof ServiceEntity) {
@@ -105,9 +105,9 @@ export class IntegrationRepository {
   /**
    * Add a service to an existing conversation.
    *
-   * @param conversationEntity Conversation to add service to
-   * @param serviceEntity Service to be added to conversation
-   * @param method Method used to add service
+   * @param conversationEntity - Conversation to add service to
+   * @param serviceEntity - Service to be added to conversation
+   * @param method - Method used to add service
    */
   addService(conversationEntity: Conversation, serviceEntity: ServiceEntity, method: string): Promise<any> {
     const {id: serviceId, name, providerId} = serviceEntity;
@@ -132,7 +132,7 @@ export class IntegrationRepository {
   /**
    * Add service to conversation.
    *
-   * @param serviceEntity Information about service to be added
+   * @param serviceEntity - Information about service to be added
    * @returns Resolves when conversation with the integration was created
    */
   create1to1ConversationWithService(serviceEntity: ServiceEntity): Promise<Conversation> {
@@ -158,7 +158,7 @@ export class IntegrationRepository {
 
   /**
    * Get conversation with a service.
-   * @param serviceEntity Service entity for whom to get the conversation
+   * @param serviceEntity - Service entity for whom to get the conversation
    * @returns Resolves with the conversation with requested service
    */
   get1To1ConversationWithService(serviceEntity: ServiceEntity): Promise<Conversation> {
@@ -231,8 +231,8 @@ export class IntegrationRepository {
   /**
    * Remove service from conversation.
    *
-   * @param conversationEntity Conversation to remove service from
-   * @param userEntity Service user to be removed from the conversation
+   * @param conversationEntity - Conversation to remove service from
+   * @param userEntity - Service user to be removed from the conversation
    */
   removeService(conversationEntity: Conversation, userEntity: User): Promise<any> {
     const {id: userId, serviceId} = userEntity;

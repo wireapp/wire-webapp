@@ -43,11 +43,11 @@ export class BroadcastRepository {
   private readonly messageSender: MessageSender;
 
   /**
-   * @param broadcastService Backend REST API broadcast service implementation
-   * @param clientRepository Repository for client interactions
-   * @param conversationRepository Repository for conversation interactions
-   * @param cryptographyRepository Repository for all cryptography interactions
-   * @param messageSender Responsible for queueing and sending messages
+   * @param broadcastService - Backend REST API broadcast service implementation
+   * @param clientRepository - Repository for client interactions
+   * @param conversationRepository - Repository for conversation interactions
+   * @param cryptographyRepository - Repository for all cryptography interactions
+   * @param messageSender - Responsible for queueing and sending messages
    */
   constructor(
     broadcastService: BroadcastService,
@@ -86,8 +86,8 @@ export class BroadcastRepository {
   }
 
   /**
-   * @param genericMessage Generic message that will be send
-   * @param userEntities Recipients of the message
+   * @param genericMessage - Generic message that will be send
+   * @param userEntities - Recipients of the message
    * @returns resolves when the message is sent
    */
   broadcastGenericMessage(genericMessage: GenericMessage, userEntities: User[]): Promise<any> {
@@ -102,7 +102,7 @@ export class BroadcastRepository {
 
   /**
    * Create a user client map for a broadcast message.
-   * @param userEntities Recipients of the message
+   * @param userEntities - Recipients of the message
    * @returns Resolves with a user client map
    */
   private createBroadcastRecipients(userEntities: User[]): Record<string, string[]> {
@@ -115,7 +115,7 @@ export class BroadcastRepository {
   /**
    * Broadcasts an OTR message / event.
    *
-   * @param eventInfoEntity Event to be broadcasted
+   * @param eventInfoEntity - Event to be broadcasted
    * @returns Promise that resolves after sending the encrypted message
    */
   private _sendEncryptedMessage(eventInfoEntity: EventInfoEntity, payload: any): Promise<any> {

@@ -85,8 +85,8 @@ const durationUnits = () => [
 /**
  * Calculate the discrete time units (years, weeks, days, hours, minutes, seconds) for a given duration
  * @note Implementation based on: https://gist.github.com/deanrobertcook/7168b38150c303a2b4196216913d34c1
- * @param duration duration in milliseconds
- * @param rounded should the units be rounded as opposed to floored
+ * @param duration - duration in milliseconds
+ * @param rounded - should the units be rounded as opposed to floored
  * @returns calculated time units
  */
 const mapUnits = (duration: number, rounded: boolean): DiscreteTimeUnit[] => {
@@ -109,7 +109,7 @@ const mapUnits = (duration: number, rounded: boolean): DiscreteTimeUnit[] => {
 
 /**
  * Format milliseconds into 15s, 2m.
- * @param duration Duration to format in milliseconds
+ * @param duration - Duration to format in milliseconds
  * @returns Unit, value and localized string
  */
 export const formatDuration = (duration: number): DurationUnit => {
@@ -124,7 +124,7 @@ export const formatDuration = (duration: number): DurationUnit => {
 
 /**
  * Generate a human readable string of the remaining time
- * @param duration the remaining time in milliseconds
+ * @param duration - the remaining time in milliseconds
  * @returns readable representation of the remaining time
  */
 export const formatDurationCaption = (duration: number): string => {
@@ -156,7 +156,7 @@ export const formatDurationCaption = (duration: number): string => {
 
 /**
  * Format seconds into hh:mm:ss.
- * @param duration duration to format in seconds
+ * @param duration - duration to format in seconds
  * @returns Formatted string
  */
 export const formatSeconds = (duration: number): string => {
@@ -182,8 +182,8 @@ export const formatSeconds = (duration: number): string => {
 /**
  * Human readable format of a timestamp.
  * @note: Not testable due to timezones :(
- * @param timestamp Timestamp
- * @param longFormat `true`, if output should have leading numbers
+ * @param timestamp - Timestamp
+ * @param longFormat - `true`, if output should have leading numbers
  * @returns Human readable format of a timestamp.
  */
 export const formatTimestamp = (timestamp: number | string, longFormat: boolean = true): string => {

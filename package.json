@@ -212,7 +212,7 @@
     "fix:code": "yarn lint:code --fix",
     "lint": "yarn lint:other && yarn lint:code",
     "lint:other": "yarn prettier --list-different && yarn stylelint",
-    "lint:code": "eslint -c .eslintrc.json --ext .js . --debug",
+    "lint:code": "eslint -c .eslintrc.json --ext .js,.ts,.tsx . --debug",
     "postinstall": "yarn configure && cd server && yarn",
     "prettier": "prettier --ignore-path .gitignore \"**/*.{json,md}\"",
     "release:staging": "ts-node ./bin/release_tag.ts staging",

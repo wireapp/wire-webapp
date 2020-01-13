@@ -441,15 +441,14 @@ export class StorageService {
         const logMessage = `Updated ${numberOfUpdates} record(s) with key '${primaryKey}' in store '${storeName}'`;
         this.logger.info(logMessage, changes);
         return numberOfUpdates;
-      } else {
-        const oldRecord = await this.load<unknown>(storeName, primaryKey);
-        await this.engine.update(storeName, primaryKey, changes);
-        const newRecord = await this.load<unknown>(storeName, primaryKey);
-
-        this.notifyListeners(storeName, DEXIE_CRUD_EVENT.UPDATING, oldRecord, newRecord);
-
-        return 1;
       }
+      const oldRecord = await this.load<unknown>(storeName, primaryKey);
+      await this.engine.update(storeName, primaryKey, changes);
+      const newRecord = await this.load<unknown>(storeName, primaryKey);
+
+      this.notifyListeners(storeName, DEXIE_CRUD_EVENT.UPDATING, oldRecord, newRecord);
+
+      return 1;
     } catch (error) {
       this.logger.error(`Failed to update '${primaryKey}' in store '${storeName}'`, error);
       throw error;

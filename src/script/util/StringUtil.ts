@@ -25,7 +25,7 @@ export const includesString = (string = '', query = ''): boolean => string.toLow
 export const getFirstChar = (string: string): string => [...string][0]; // the destructuring is needed to properly return unicode characters
 
 /**
- * @param bytes bytes to convert
+ * @param bytes - bytes to convert
  * @returns bytes as hex string
  */
 export const bytesToHex = (bytes: number[]): string => {
@@ -54,10 +54,10 @@ export const obfuscate = (text: string): string => {
 /**
  * Returns `true` if the string and the query match by applying transliteration first.
  *
- * @param string the string to compare the query against
- * @param query the query to compare to the string
- * @param excludedChars extra characters to ignore when creating a slug
- * @param fromStart should the query match the string from the beginning of the string
+ * @param string - the string to compare the query against
+ * @param query - the query to compare to the string
+ * @param excludedChars - extra characters to ignore when creating a slug
+ * @param fromStart - should the query match the string from the beginning of the string
  * @returns does the string match the query
  */
 export const compareTransliteration = (
@@ -88,8 +88,8 @@ export const truncate = (string: string, outputLength: number, wordBoundary = tr
  * Replaces designated places in the source string with the additional arguments
  * e.g. `formatString('{0} {1}!!!', 'Hello', 'World') => 'Hello World!!!'`
  *
- * @param string source string
- * @param args replacements for placeholders in source string
+ * @param string - source string
+ * @param args - replacements for placeholders in source string
  * @returns source string with replacements applied
  */
 export const formatString = (string: string, ...args: any[]): string => {
@@ -125,7 +125,7 @@ export const sortByPriority = (stringA: string = '', stringB: string = '', query
 };
 
 /**
- * @param str The string to convert
+ * @param str - The string to convert
  * @returns Converted string as byte array
  */
 export const utf8ToUtf16BE = (str = ''): number[] => {

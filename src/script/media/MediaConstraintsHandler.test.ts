@@ -40,6 +40,7 @@ describe('MediaConstraintsHandler', () => {
   describe('getMediaStreamConstraints', () => {
     it('returns devices id constraints if current devices are defined', () => {
       const constraints = constraintsHandler.getMediaStreamConstraints(true, true, false) as any;
+
       expect(constraints.audio.deviceId.exact).toBe(availableDevices.audioInput());
       expect(constraints.video.deviceId.exact).toBe(availableDevices.videoInput());
     });
@@ -49,6 +50,7 @@ describe('MediaConstraintsHandler', () => {
         observable(MediaConstraintsHandler.CONFIG.DEFAULT_DEVICE_ID);
       });
       const constraints = constraintsHandler.getMediaStreamConstraints(true, true, false) as any;
+
       expect(constraints.audio.deviceId).not.toBeDefined();
       expect(constraints.audio).toBe(true);
       expect(constraints.video.deviceId).not.toBeDefined();
@@ -65,6 +67,7 @@ describe('MediaConstraintsHandler', () => {
   describe('getScreenStreamConstraints', () => {
     it('returns constraints to get the screen stream if browser supports getDisplayMedia', () => {
       const constraints = constraintsHandler.getScreenStreamConstraints(ScreensharingMethods.DISPLAY_MEDIA) as any;
+
       expect(constraints.audio).toBe(false);
       expect(constraints.video.height).toEqual(
         jasmine.objectContaining({ideal: jasmine.any(Number), max: jasmine.any(Number)}),
@@ -73,6 +76,7 @@ describe('MediaConstraintsHandler', () => {
 
     it('returns constraints to get the screen stream if browser uses desktopCapturer', () => {
       const constraints = constraintsHandler.getScreenStreamConstraints(ScreensharingMethods.DESKTOP_CAPTURER) as any;
+
       expect(constraints.audio).toBe(false);
       expect(constraints.video.mandatory).toEqual(
         jasmine.objectContaining({maxHeight: jasmine.any(Number), minHeight: jasmine.any(Number)}),
@@ -81,6 +85,7 @@ describe('MediaConstraintsHandler', () => {
 
     it('returns constraints to get the screen stream if browser uses getUserMedia', () => {
       const constraints = constraintsHandler.getScreenStreamConstraints(ScreensharingMethods.USER_MEDIA) as any;
+
       expect(constraints.audio).toBe(false);
       expect(constraints.video).toEqual(
         jasmine.objectContaining({

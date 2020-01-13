@@ -43,7 +43,7 @@ const logger = logdown(filename, {
 logger.state.isEnabled = true;
 
 /**
- * @param command The command to execute
+ * @param command - The command to execute
  * @returns The standard output
  */
 const exec = (command: string): string =>
@@ -109,18 +109,21 @@ const ask = (questionToAsk: string, callback: (answer: string) => void): void =>
   });
 };
 
-ask(`ℹ️  The commit "${commitMessage}" will be released with tag "${tagName}". Continue? [yes/no] `, (answer: string) => {
-  if (answer === 'yes') {
-    logger.info(`Creating tag "${tagName}" ...`);
-    exec(`git tag ${tagName} ${commitId}`);
+ask(
+  `ℹ️  The commit "${commitMessage}" will be released with tag "${tagName}". Continue? [yes/no] `,
+  (answer: string) => {
+    if (answer === 'yes') {
+      logger.info(`Creating tag "${tagName}" ...`);
+      exec(`git tag ${tagName} ${commitId}`);
 
-    logger.info(`Pushing "${tagName}" to "${origin}" ...`);
-    exec(`git push ${origin} ${tagName}`);
+      logger.info(`Pushing "${tagName}" to "${origin}" ...`);
+      exec(`git push ${origin} ${tagName}`);
 
-    logger.info('Done.');
-  } else {
-    logger.info('Aborting.');
-  }
+      logger.info('Done.');
+    } else {
+      logger.info('Aborting.');
+    }
 
-  process.exit();
-});
+    process.exit();
+  },
+);

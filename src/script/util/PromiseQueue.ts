@@ -144,7 +144,7 @@ export class PromiseQueue {
 
   /**
    * Queued function is executed when queue is empty or previous functions are executed.
-   * @param fn Function to be executed in queue order
+   * @param fn - Function to be executed in queue order
    * @returns Resolves when function was executed
    */
   push<T>(fn: PromiseFn<T>): Promise<T> {
@@ -171,7 +171,7 @@ export class PromiseQueue {
 
   /**
    * Queued function is executed.
-   * @param fn Function to be executed in queue order
+   * @param fn - Function to be executed in queue order
    * @returns Resolves when function was executed
    */
   unshift<T>(fn: PromiseFn<T>): Promise<T> {

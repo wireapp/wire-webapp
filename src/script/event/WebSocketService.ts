@@ -93,7 +93,7 @@ export class WebSocketService {
 
   /**
    * Establish the WebSocket connection.
-   * @param onNotification Function to be called on incoming notifications
+   * @param onNotification - Function to be called on incoming notifications
    * @returns Resolves once the WebSocket connects
    */
   connect(onNotification: OnNotificationCallback): Promise<void> {
@@ -198,7 +198,7 @@ export class WebSocketService {
 
   /**
    * Reset the WebSocket connection.
-   * @param reconnect Re-establish the WebSocket connection
+   * @param reconnect - Re-establish the WebSocket connection
    */
   reset(trigger: CHANGE_TRIGGER, reconnect: boolean = false): void {
     if (this.socket?.onclose) {

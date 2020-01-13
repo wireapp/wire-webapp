@@ -46,7 +46,7 @@ const fetchLatestVersion = async (): Promise<string> => {
 /**
  * Check all the registered version listeners if the server version is newer than the version they registered.
  *
- * @param overrideCurrentVersion will ignore the version set for the listener and use this one instead
+ * @param overrideCurrentVersion - will ignore the version set for the listener and use this one instead
  * @returns Promise that resolves when the check has been done
  */
 export const checkVersion = async (overrideCurrentVersion: string): Promise<string | void> => {
@@ -67,8 +67,8 @@ export const checkVersion = async (overrideCurrentVersion: string): Promise<stri
  * Will register an interval that will poll the server for the latest version of the app.
  * If a new version is detected, will then call the given callback.
  *
- * @param currentVersion current version of the app
- * @param onNewVersionAvailable callback to be called when a new version is detected
+ * @param currentVersion - current version of the app
+ * @param onNewVersionAvailable - callback to be called when a new version is detected
  */
 export const startNewVersionPolling = (
   currentVersion: string,
