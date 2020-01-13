@@ -609,7 +609,7 @@ export class UserRepository {
       const {user: user_id} = await this.user_service.getUserByHandle(handle.toLowerCase());
       return user_id;
     } catch (axiosError) {
-      const error = axiosError.response;
+      const error = axiosError.response || axiosError;
       if (error.status !== BackendClientError.STATUS_CODE.NOT_FOUND) {
         throw error;
       }
