@@ -111,7 +111,7 @@ describe('AppLockViewModel', () => {
 
       expect(appLock.state()).toBe(APPLOCK_STATE.LOCKED);
       document.body.innerHTML += `<form id="unlock"><input value="${passphrase}"/></form>`;
-      const unlockForm = (document as HTMLFormElement).querySelector('#unlock');
+      const unlockForm: HTMLFormElement = window.document.querySelector('#unlock');
       await appLock.onUnlock(unlockForm);
 
       expect(appLock.state()).toBe(APPLOCK_STATE.NONE);

@@ -99,9 +99,8 @@ export class AppLockViewModel {
     ko.applyBindings(this, document.getElementById('applock'));
 
     this.isVisible.subscribe(isVisible => {
-      (document as HTMLDivElement)
-        .querySelector('#app')
-        .style.setProperty('filter', isVisible ? 'blur(100px)' : '', 'important');
+      const app: HTMLDivElement = window.document.querySelector('#app');
+      app.style.setProperty('filter', isVisible ? 'blur(100px)' : '', 'important');
     });
 
     this.unfocusTimeout = Config.FEATURE.APPLOCK_UNFOCUS_TIMEOUT * 1000;
