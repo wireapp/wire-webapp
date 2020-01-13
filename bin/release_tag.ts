@@ -140,7 +140,7 @@ ask(`ℹ️  The commit "${commitMessage}" will be released with tag "${tagName}
 
     try {
       await announceRelease(tagName, commitId);
-    } catch(error) {
+    } catch (error) {
       logger.error(error);
     }
 
