@@ -1,9 +1,0 @@
-.git/
-docs/
-node_modules/
-resource/
-server/bin/
-server/dist/
-server/node_modules/
-src/ext/
-src/script/localization/**/webapp*.js

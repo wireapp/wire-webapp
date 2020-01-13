@@ -45,6 +45,7 @@
     "z": true,
     "zeta": true
   },
+  "ignorePatterns": [".git/", "docs/", "node_modules/", "resource/", "server/bin/", "server/dist/", "server/node_modules/", "src/ext/", "src/script/localization/**/webapp*.js"],
   "parserOptions": {
     "project": ["./tsconfig.json", "./server/tsconfig.json"]
   },
