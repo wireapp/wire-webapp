@@ -126,7 +126,7 @@ const announceRelease = async (tagName: string, commitId: string): Promise<void>
     });
     const message = `Released tag "${tagName}" based on commit ID "${commitId}".`;
     const payload = account.service.conversation.messageBuilder.createText(WIRE_CONVERSATION, message).build();
-    account.service.conversation.send(payload);
+    await account.service.conversation.send(payload);
   }
 };
 
