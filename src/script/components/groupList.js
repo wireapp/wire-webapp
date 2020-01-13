@@ -23,9 +23,9 @@ class GroupListViewModel {
   /**
    * Construct a new group list view model.
    *
-   * @param {Object} params - Component parameters
-   * @param {ko.observableArray} params.groups - Data source
-   * @param {Function} params.click - Function called when a list item is clicked
+   * @param {Object} params Component parameters
+   * @param {ko.observableArray} params.groups Data source
+   * @param {Function} params.click Function called when a list item is clicked
    */
   constructor(params) {
     this.groups = params.groups;

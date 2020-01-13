@@ -61,7 +61,7 @@ export class GiphyRepository {
   };
 
   /**
-   * @param giphyService - Giphy REST API implementation
+   * @param giphyService Giphy REST API implementation
    */
   constructor(giphyService: GiphyService) {
     this.giphyService = giphyService;

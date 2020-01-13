@@ -24,9 +24,9 @@ export interface EncryptedAsset {
 }
 
 /**
- * @param cipherText - Encrypted plaintext
- * @param keyBytes - AES key used for encryption
- * @param referenceSha256 - SHA-256 checksum of the cipherText
+ * @param cipherText Encrypted plaintext
+ * @param keyBytes AES key used for encryption
+ * @param referenceSha256 SHA-256 checksum of the cipherText
  * @returns Resolves with the decrypted asset
  */
 export const decryptAesAsset = async (

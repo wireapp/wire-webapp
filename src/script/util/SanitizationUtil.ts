@@ -46,8 +46,8 @@ export const getFirstName = (userEntity: User, declension: string, bypassSanitiz
 /**
  * Opens a new browser tab (target="_blank") with a given URL in a safe environment.
  * @see https://mathiasbynens.github.io/rel-noopener/
- * @param url - URL you want to open in a new browser tab
- * @param focus - `true`, if the new windows should get browser focus
+ * @param url URL you want to open in a new browser tab
+ * @param focus `true`, if the new windows should get browser focus
  * @returns New window handle
  */
 export const safeWindowOpen = (url: string, focus: boolean = true): Window => {

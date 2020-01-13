@@ -31,7 +31,7 @@ export class IntegrationService {
 
   /**
    * Construct a new Integration Service.
-   * @param backendClient - Client for the API calls
+   * @param backendClient Client for the API calls
    */
   constructor(backendClient: BackendClient) {
     this.backendClient = backendClient;

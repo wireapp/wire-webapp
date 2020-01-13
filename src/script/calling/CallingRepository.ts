@@ -272,8 +272,8 @@ export class CallingRepository {
   /**
    * Handle incoming calling events from backend.
    *
-   * @param {Object} event - Event payload
-   * @param {EventRepository.SOURCE} source - Source of event
+   * @param {Object} event Event payload
+   * @param {EventRepository.SOURCE} source Source of event
    */
   onCallEvent(event: any, source: string): void {
     const {content, conversation: conversationId, from: userId, sender: clientId, time} = event;

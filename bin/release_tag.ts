@@ -43,7 +43,7 @@ const logger = logdown(filename, {
 logger.state.isEnabled = true;
 
 /**
- * @param command - The command to execute
+ * @param command The command to execute
  * @returns The standard output
  */
 const exec = (command: string): string =>

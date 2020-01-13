@@ -20,10 +20,10 @@
 /**
  * Return link to Google Maps.
  *
- * @param latitude - Latitude of location
- * @param longitude - Longitude of location
- * @param name - Name of location
- * @param zoom - Map zoom level
+ * @param latitude Latitude of location
+ * @param longitude Longitude of location
+ * @param name Name of location
+ * @param zoom Map zoom level
  * @returns URL to location in Google Maps
  */
 export function getMapsUrl(latitude: number, longitude: number, name: string, zoom: string): string {

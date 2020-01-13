@@ -27,9 +27,9 @@ class AudioAssetComponent extends AbstractAssetTransferStateTracker {
   /**
    * Construct a new audio asset.
    *
-   * @param {Object} params - Component parameters
-   * @param {Message} params.message - Message entity
-   * @param {Object} component_info - Component information
+   * @param {Object} params Component parameters
+   * @param {Message} params.message Message entity
+   * @param {Object} component_info Component information
    */
   constructor(params, component_info) {
     super(ko.unwrap(params.message));

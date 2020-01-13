@@ -27,9 +27,9 @@ class VideoAssetComponent extends AbstractAssetTransferStateTracker {
   /**
    * Construct a new video asset.
    *
-   * @param {Object} params - Component parameters
-   * @param {Message} params.message - Message entity
-   * @param {Object} componentInfo - Component information
+   * @param {Object} params Component parameters
+   * @param {Message} params.message Message entity
+   * @param {Object} componentInfo Component information
    */
   constructor(params, {element}) {
     super(ko.unwrap(params.message));

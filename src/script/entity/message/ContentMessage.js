@@ -81,7 +81,7 @@ export class ContentMessage extends Message {
 
   /**
    * Add another content asset to the message.
-   * @param {Asset} asset_et - New content asset
+   * @param {Asset} asset_et New content asset
    * @returns {undefined} No return value
    */
   add_asset(asset_et) {
@@ -122,7 +122,7 @@ export class ContentMessage extends Message {
   }
 
   /**
-   * @param {string} userId - The user id to check
+   * @param {string} userId The user id to check
    * @returns {boolean} `true` if the message mentions the user.
    */
   isUserMentioned(userId) {
@@ -132,7 +132,7 @@ export class ContentMessage extends Message {
   }
 
   /**
-   * @param {string} userId - The user id to check
+   * @param {string} userId The user id to check
    * @returns {boolean} `true` if the message quotes the user.
    */
   isUserQuoted(userId) {
@@ -140,7 +140,7 @@ export class ContentMessage extends Message {
   }
 
   /**
-   * @param {string} userId - The user id to check
+   * @param {string} userId The user id to check
    * @returns {boolean} `true` if the user was mentioned or quoted.
    */
   isUserTargeted(userId) {

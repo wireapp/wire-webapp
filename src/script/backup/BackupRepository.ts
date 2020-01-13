@@ -113,7 +113,7 @@ export class BackupRepository {
   /**
    * Gather needed data for the export and generates the history
    *
-   * @param progressCallback - called on every step of the export
+   * @param progressCallback called on every step of the export
    * @returns The promise that contains all the exported tables
    */
   public generateHistory(progressCallback: (tableRows: number) => void): Promise<JSZip> {

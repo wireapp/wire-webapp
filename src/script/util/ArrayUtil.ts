@@ -28,8 +28,8 @@ export const chunk = <T>(array: T[] | Float32Array, size: number) => {
 /**
  * Gets all the values that are in array2 which are not in array1.
  *
- * @param array1 - the base array
- * @param array2 - the array to compare with
+ * @param array1 the base array
+ * @param array2 the array to compare with
  * @returns the array containing values in array2 that are not in array1
  */
 export const getDifference = <T>(array1: T[] = [], array2: T[] = []): T[] =>
@@ -56,8 +56,8 @@ export const getNextItem = <T>(array: T[], currentItem: T) => {
 /**
  * Interpolates an array of numbers using linear interpolation
  *
- * @param array - source
- * @param length - new length
+ * @param array source
+ * @param length new length
  * @returns new array with interpolated values
  */
 export const interpolate = (array: number[], length: number) => {
@@ -105,15 +105,15 @@ export const iterateItem = <T>(array: T[], currentItem: T, reverse = false) => {
 
 /**
  * Returns random element
- * @param array - source
+ * @param array source
  * @returns random element
  */
 export const randomElement = <T>(array: T[] = []) => array[Math.floor(Math.random() * array.length)];
 
 /**
  * Remove given element from array
- * @param array - source
- * @param element - Element which should be removed
+ * @param array source
+ * @param element Element which should be removed
  * @returns containing the removed element
  */
 export const removeElement = <T>(array: T[] = [], element: T) => {

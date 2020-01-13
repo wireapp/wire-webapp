@@ -45,8 +45,8 @@ export class BroadcastService {
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/postOtrBroadcast
    *
-   * @param payload - Payload to be posted
-   * @param preconditionOption - Level that backend checks for missing clients
+   * @param payload Payload to be posted
+   * @param preconditionOption Level that backend checks for missing clients
    * @returnsPromise that resolves when the message was sent
    */
   postBroadcastMessage(

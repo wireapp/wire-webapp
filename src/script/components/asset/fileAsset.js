@@ -28,8 +28,8 @@ class FileAssetComponent extends AbstractAssetTransferStateTracker {
   /**
    * Construct a new file asset.
    *
-   * @param {Object} params - Component parameters
-   * @param {Message} params.message - Message entity
+   * @param {Object} params Component parameters
+   * @param {Message} params.message Message entity
    */
   constructor(params) {
     super(ko.unwrap(params.message));

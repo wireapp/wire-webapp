@@ -63,7 +63,7 @@ export class ConversationVerificationStateHandler {
 
   /**
    * Self user or other participant added clients.
-   * @param userId - ID of user that added client (can be self user ID)
+   * @param userId ID of user that added client (can be self user ID)
    */
   onClientAdded(userId: string): void {
     this.onClientsAdded([userId]);
@@ -71,7 +71,7 @@ export class ConversationVerificationStateHandler {
 
   /**
    * Multiple participants added clients.
-   * @param userIds - Multiple user IDs (can include self user ID)
+   * @param userIds Multiple user IDs (can include self user ID)
    */
   onClientsAdded(userIds: string[]): void {
     this.getActiveConversationsWithUsers(userIds).forEach(({conversationEntity, userIds: matchingUserIds}) => {
@@ -81,7 +81,7 @@ export class ConversationVerificationStateHandler {
 
   /**
    * Self user removed a client or other participants deleted clients.
-   * @param userId - ID of user that added client (can be self user ID)
+   * @param userId ID of user that added client (can be self user ID)
    */
   onClientRemoved(userId: string): void {
     this.getActiveConversationsWithUsers([userId]).forEach(({conversationEntity}) => {
@@ -91,7 +91,7 @@ export class ConversationVerificationStateHandler {
 
   /**
    * A new conversation was created.
-   * @param conversationEntity - New conversation entity
+   * @param conversationEntity New conversation entity
    */
   onConversationCreate(conversationEntity: Conversation): void {
     this.checkChangeToVerified(conversationEntity);
@@ -111,8 +111,8 @@ export class ConversationVerificationStateHandler {
 
   /**
    * New member(s) joined the conversation.
-   * @param conversationEntity - Changed conversation entity
-   * @param userIds - IDs of added members
+   * @param conversationEntity Changed conversation entity
+   * @param userIds IDs of added members
    */
   onMemberJoined(conversationEntity: Conversation, userIds: string[]): void {
     this.checkChangeToDegraded(conversationEntity, userIds, VerificationMessageType.NEW_MEMBER);
@@ -120,7 +120,7 @@ export class ConversationVerificationStateHandler {
 
   /**
    * Member(s) left the conversation.
-   * @param conversationEntity - Changed conversation entity
+   * @param conversationEntity Changed conversation entity
    */
   onMemberLeft(conversationEntity: Conversation): void {
     this.checkChangeToVerified(conversationEntity);
@@ -129,7 +129,7 @@ export class ConversationVerificationStateHandler {
   /**
    * Change that could verify conversation.
    *
-   * @param conversationEntity - Changed conversation entity
+   * @param conversationEntity Changed conversation entity
    * @returns `true` if state changed
    */
   private checkChangeToVerified(conversationEntity: Conversation): boolean {
@@ -149,9 +149,9 @@ export class ConversationVerificationStateHandler {
   /**
    * Change that could degrade conversation.
    *
-   * @param conversationEntity - Changed conversation entity
-   * @param userIds - IDs of affected users
-   * @param type - Type of degradation
+   * @param conversationEntity Changed conversation entity
+   * @param userIds IDs of affected users
+   * @param type Type of degradation
    * @returns `true` if state changed
    */
   private checkChangeToDegraded(
@@ -195,7 +195,7 @@ export class ConversationVerificationStateHandler {
   /**
    * Get all conversation where self user and the given users are active.
    *
-   * @param userIds - Multiple user IDs (can include self user ID)
+   * @param userIds Multiple user IDs (can include self user ID)
    * @returns Array of objects containing the conversation entities and matching user IDs
    */
   private getActiveConversationsWithUsers(userIds: string[]): {conversationEntity: Conversation; userIds: string[]}[] {
@@ -219,8 +219,8 @@ export class ConversationVerificationStateHandler {
   /**
    * Check whether to degrade conversation and set corresponding state.
    *
-   * @param conversationEntity - Conversation entity to evaluate
-   * @param shouldShowDegradationWarning - Should a modal warn about the degradation?
+   * @param conversationEntity Conversation entity to evaluate
+   * @param shouldShowDegradationWarning Should a modal warn about the degradation?
    * @returns `true` if conversation state changed to degraded
    */
   private willChangeToDegraded(conversationEntity: Conversation, shouldShowDegradationWarning = true): boolean {
@@ -250,7 +250,7 @@ export class ConversationVerificationStateHandler {
   /**
    * Check whether to verify conversation and set corresponding state
    *
-   * @param {Conversation} conversationEntity - Conversation entity to evaluate
+   * @param {Conversation} conversationEntity Conversation entity to evaluate
    * @returns `true` if conversation state changed to verified
    */
   private willChangeToVerified(conversationEntity: Conversation): boolean {

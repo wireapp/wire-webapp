@@ -113,12 +113,12 @@ export class ModalsViewModel {
   /**
    * Show modal
    *
-   * @param {ModalsViewModel.TYPE} type - Indicates which modal to show
-   * @param {Object} [options={}] - Information to configure modal
-   * @param {Object} options.data - Content needed for visualization on modal
-   * @param {Function} options.action - Called when action in modal is triggered
-   * @param {boolean} [options.preventClose] - Set to `true` to disable autoclose behavior
-   * @param {Function} options.secondary - Called when secondary action in modal is triggered
+   * @param {ModalsViewModel.TYPE} type Indicates which modal to show
+   * @param {Object} [options={}] Information to configure modal
+   * @param {Object} options.data Content needed for visualization on modal
+   * @param {Function} options.action Called when action in modal is triggered
+   * @param {boolean} [options.preventClose] Set to `true` to disable autoclose behavior
+   * @param {Function} options.secondary Called when secondary action in modal is triggered
    * @returns {undefined} No return value
    */
   _showModal = (type, options = {}) => {

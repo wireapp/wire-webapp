@@ -39,8 +39,8 @@ export class ClientService {
   }
 
   /**
-   * @param backendClient - Client for the API calls
-   * @param storageService - Service for all storage interactions
+   * @param backendClient Client for the API calls
+   * @param storageService Service for all storage interactions
    */
   constructor(backendClient: BackendClient, storageService: StorageService) {
     this.backendClient = backendClient;
@@ -58,8 +58,8 @@ export class ClientService {
    * Deletes a specific client from a user.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/deleteClient
    *
-   * @param clientId - ID of client to be deleted
-   * @param password - User password
+   * @param clientId ID of client to be deleted
+   * @param password User password
    * @returns Resolves once the deletion of the client is complete
    */
   deleteClient(clientId: string, password: string): Promise<void> {
@@ -74,7 +74,7 @@ export class ClientService {
 
   /**
    * Deletes the temporary client of a user.
-   * @param clientId - ID of the temporary client to be deleted
+   * @param clientId ID of the temporary client to be deleted
    * @returns Resolves once the deletion of the temporary client is complete
    */
   deleteTemporaryClient(clientId: string): Promise<void> {
@@ -89,7 +89,7 @@ export class ClientService {
    * Retrieves meta information about a specific client.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getClients
    *
-   * @param clientId - ID of client to be retrieved
+   * @param clientId ID of client to be retrieved
    * @returns Resolves with the requested client
    */
   getClientById(clientId: string): Promise<RegisteredClient> {
@@ -115,7 +115,7 @@ export class ClientService {
    * Retrieves meta information about all the clients of a specific user.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getClients
    *
-   * @param userId - ID of user to retrieve clients for
+   * @param userId ID of user to retrieve clients for
    * @returns Resolves with the clients of a user
    */
   getClientsByUserId(userId: string): Promise<PublicClient[]> {
@@ -127,7 +127,7 @@ export class ClientService {
 
   /**
    * Register a new client.
-   * @param newClient - Client payload
+   * @param newClient Client payload
    * @returns Resolves with the registered client information
    */
   postClients(newClient: NewClient): Promise<RegisteredClient> {
@@ -144,7 +144,7 @@ export class ClientService {
 
   /**
    * Removes a client from the database.
-   * @param primaryKey - Primary key used to find the client for deletion in the database
+   * @param primaryKey Primary key used to find the client for deletion in the database
    * @returns Resolves once the client is deleted
    */
   deleteClientFromDb(primaryKey: string): Promise<string> {
@@ -161,7 +161,7 @@ export class ClientService {
 
   /**
    * Loads a persisted client from the database.
-   * @param primaryKey - Primary key used to find a client in the database
+   * @param primaryKey Primary key used to find a client in the database
    * @returns Resolves with the client's payload or the primary key if not found
    */
   async loadClientFromDb(primaryKey: string): Promise<object | string> {
@@ -189,8 +189,8 @@ export class ClientService {
   /**
    * Persists a client.
    *
-   * @param primaryKey - Primary key used to find a client in the database
-   * @param clientPayload - Client payload
+   * @param primaryKey Primary key used to find a client in the database
+   * @param clientPayload Client payload
    * @returns Resolves with the client payload stored in database
    */
   saveClientInDb(primaryKey: string, clientPayload: any): Promise<any> {
@@ -209,8 +209,8 @@ export class ClientService {
   /**
    * Updates a persisted client in the database.
    *
-   * @param primaryKey - Primary key used to find a client in the database
-   * @param changes - Incremental update changes of the client JSON
+   * @param primaryKey Primary key used to find a client in the database
+   * @param changes Incremental update changes of the client JSON
    * @returns Number of updated records (1 if an object was updated, otherwise 0)
    */
   updateClientInDb(primaryKey: string, changes: object): Promise<number> {

@@ -25,7 +25,7 @@ import {ConversationType, PlatformType, UserType} from './attribute';
 
 /**
  * Get corresponding tracking attribute for conversation type.
- * @param conversationEntity - Conversation to map type of
+ * @param conversationEntity Conversation to map type of
  * @returns Mapped conversation type
  */
 export function getConversationType(conversationEntity: Conversation): ConversationType;

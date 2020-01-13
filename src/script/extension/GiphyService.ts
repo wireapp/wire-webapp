@@ -44,7 +44,7 @@ export class GiphyService {
   };
 
   /**
-   * @param backendClient - Client for the API calls
+   * @param backendClient Client for the API calls
    */
   constructor(backendClient: BackendClient) {
     this.backendClient = backendClient;
@@ -52,7 +52,7 @@ export class GiphyService {
 
   /**
    * Get GIFs for IDs.
-   * @param ids - A single id or comma separated list of IDs to fetch GIF size data
+   * @param ids A single id or comma separated list of IDs to fetch GIF size data
    * @returns Resolves with the size data
    */
   getById(ids: string | string[]): Promise<GiphyResult<GiphyGif>> {
@@ -66,7 +66,7 @@ export class GiphyService {
 
   /**
    * Search all Giphy GIFs for a word or phrase.
-   * @param tag - GIF tag to limit randomness by
+   * @param tag GIF tag to limit randomness by
    * @returns Resolves with random gifs for given tag
    */
   getRandom(tag: string): Promise<GiphyResult<GiphyGif>> {

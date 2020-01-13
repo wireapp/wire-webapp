@@ -39,7 +39,7 @@ export class ConnectionMapper {
 
   /**
    * Convert multiple JSON connections into connection entities.
-   * @param connectionsData - Connection data
+   * @param connectionsData Connection data
    */
   mapConnectionsFromJson(connectionsData: ConnectionData[]): ConnectionEntity[] {
     return connectionsData.filter(Boolean).map(connectionData => this.mapConnectionFromJson(connectionData));
@@ -47,7 +47,7 @@ export class ConnectionMapper {
 
   /**
    * Maps JSON connection into a blank connection entity or updates an existing one.
-   * @param connectionEntity - Connection entity that the info shall be mapped to
+   * @param connectionEntity Connection entity that the info shall be mapped to
    */
   updateConnectionFromJson(connectionEntity: ConnectionEntity, connectionData: ConnectionData): ConnectionEntity {
     const {conversation, from, last_update, message, status, to: remoteUserId} = connectionData;

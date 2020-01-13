@@ -27,9 +27,9 @@ class LinkPreviewAssetComponent {
   /**
    * Construct a new link preview asset.
    *
-   * @param {Object} params - Component parameters
-   * @param {Message} params.message - Message entity
-   * @param {Object} componentInfo - Component information
+   * @param {Object} params Component parameters
+   * @param {Message} params.message Message entity
+   * @param {Object} componentInfo Component information
    */
   constructor(params, componentInfo) {
     this.dispose = this.dispose.bind(this);

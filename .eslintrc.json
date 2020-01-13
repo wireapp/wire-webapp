@@ -72,7 +72,6 @@
     "jasmine/no-spec-dupes": "off",
     "jasmine/no-suite-dupes": "off",
     "jasmine/prefer-toHaveBeenCalledWith": "off",
-    "jsdoc/require-hyphen-before-param-description": "error",
     "no-magic-numbers": "off"
   }
 }

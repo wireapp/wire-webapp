@@ -33,7 +33,7 @@ import {User} from '../User';
 export class Message {
   /**
    * Sort messages by timestamp
-   * @param {Array<Message>} message_ets - Message entities
+   * @param {Array<Message>} message_ets Message entities
    * @returns {boolean} Sorted message entities
    */
   static sort_by_timestamp(message_ets) {
@@ -343,7 +343,7 @@ export class Message {
 
   /**
    * Update the status of a message.
-   * @param {StatusType} updated_status - New status of message
+   * @param {StatusType} updated_status New status of message
    * @returns {StatusType|boolean} Returns the new status on a successful update, otherwise "false"
    */
   update_status(updated_status) {

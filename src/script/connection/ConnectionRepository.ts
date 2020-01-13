@@ -70,8 +70,8 @@ export class ConnectionRepository {
   /**
    * Listener for incoming user events.
    *
-   * @param eventJson - JSON data for event
-   * @param source - Source of event
+   * @param eventJson JSON data for event
+   * @param source Source of event
    * @returns No return value
    */
   onUserEvent(eventJson: UserConnectionEvent, source: EventSource): void {
@@ -92,9 +92,9 @@ export class ConnectionRepository {
   /**
    * Convert a JSON event into an entity and get the matching conversation.
    *
-   * @param eventJson - JSON data of 'user.connection' event
-   * @param source - Source of event
-   * @param showConversation - Should the new conversation be opened?
+   * @param eventJson JSON data of 'user.connection' event
+   * @param source Source of event
+   * @param showConversation Should the new conversation be opened?
    * @returns No return value
    */
   onUserConnection(eventJson: UserConnectionData, source: EventSource, showConversation?: boolean): Promise<void> {
@@ -126,8 +126,8 @@ export class ConnectionRepository {
 
   /**
    * Accept a connection request.
-   * @param userEntity - User to update connection with
-   * @param showConversation - Show new conversation on success
+   * @param userEntity User to update connection with
+   * @param showConversation Show new conversation on success
    * @returns Promise that resolves when the connection request was accepted
    */
   acceptRequest(userEntity: User, showConversation: boolean = false): Promise<void> {
@@ -137,9 +137,9 @@ export class ConnectionRepository {
   /**
    * Block a user.
    *
-   * @param userEntity - User to block
-   * @param hideConversation - Hide current conversation
-   * @param nextConversationEntity - Conversation to be switched to
+   * @param userEntity User to block
+   * @param hideConversation Hide current conversation
+   * @param nextConversationEntity Conversation to be switched to
    * @returns Promise that resolves when the user was blocked
    */
   blockUser(userEntity: User, hideConversation: boolean = false, nextConversationEntity: Conversation): Promise<void> {
@@ -153,9 +153,9 @@ export class ConnectionRepository {
   /**
    * Cancel a connection request.
    *
-   * @param userEntity - User to cancel the sent connection request
-   * @param hideConversation - Hide current conversation
-   * @param nextConversationEntity - Conversation to be switched to
+   * @param userEntity User to cancel the sent connection request
+   * @param hideConversation Hide current conversation
+   * @param nextConversationEntity Conversation to be switched to
    * @returns Promise that resolves when an outgoing connection request was cancelled
    */
   cancelRequest(
@@ -173,8 +173,8 @@ export class ConnectionRepository {
   /**
    * Create a connection request.
    *
-   * @param userEntity - User to connect to
-   * @param showConversation - Should we open the new conversation?
+   * @param userEntity User to connect to
+   * @param showConversation Should we open the new conversation?
    * @returns Promise that resolves when the connection request was successfully created
    */
   createConnection(userEntity: User, showConversation: boolean = false): Promise<void> {
@@ -198,7 +198,7 @@ export class ConnectionRepository {
 
   /**
    * Get a connection for a conversation ID.
-   * @param conversationId - Conversation ID
+   * @param conversationId Conversation ID
    * @returns User connection entity
    */
   getConnectionByConversationId(conversationId: string): ConnectionEntity {
@@ -210,9 +210,9 @@ export class ConnectionRepository {
    *
    * @note Initially called by Wire for Web's app start to retrieve connections.
    *
-   * @param limit - Query limit for user connections
-   * @param userId - User ID of the latest connection
-   * @param connectionEntities - Unordered array of user connections
+   * @param limit Query limit for user connections
+   * @param userId User ID of the latest connection
+   * @param connectionEntities Unordered array of user connections
    * @returns Promise that resolves when all connections have been retrieved and mapped
    */
   getConnections(
@@ -245,7 +245,7 @@ export class ConnectionRepository {
 
   /**
    * Ignore connection request.
-   * @param userEntity - User to ignore the connection request
+   * @param userEntity User to ignore the connection request
    * @returns Promise that resolves when an incoming connection request was ignored
    */
   ignoreRequest(userEntity: User): Promise<void> {
@@ -255,8 +255,8 @@ export class ConnectionRepository {
   /**
    * Unblock a user.
    *
-   * @param userEntity - User to unblock
-   * @param showConversation - Show new conversation on success
+   * @param userEntity User to unblock
+   * @param showConversation Show new conversation on success
    * @returns Promise that resolves when a user was unblocked
    */
   unblockUser(userEntity: User, showConversation = true): Promise<void> {
@@ -301,9 +301,9 @@ export class ConnectionRepository {
   /**
    * Update the status of a connection.
    * @private
-   * @param userEntity - User to update connection with
-   * @param connectionStatus - Connection status
-   * @param showConversation - Show conversation on success
+   * @param userEntity User to update connection with
+   * @param connectionStatus Connection status
+   * @param showConversation Show conversation on success
    * @returns Promise that resolves when the connection status was updated
    */
   _updateStatus(userEntity: User, connectionStatus: ConnectionStatus, showConversation = false): Promise<void> {
@@ -341,9 +341,9 @@ export class ConnectionRepository {
   /**
    * Send the user connection notification.
    *
-   * @param connectionEntity - Connection entity
-   * @param source - Source of event
-   * @param previousStatus - Previous connection status
+   * @param connectionEntity Connection entity
+   * @param source Source of event
+   * @param previousStatus Previous connection status
    * @returns No return value
    */
   _sendNotification(connectionEntity: ConnectionEntity, source: EventSource, previousStatus: ConnectionStatus): void {

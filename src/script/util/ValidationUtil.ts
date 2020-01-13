@@ -40,7 +40,7 @@ export const isValidUsername = (username: string) => /^@?[a-z_0-9]{2,21}$/.test(
 /**
  * Checks if input has the format of an international phone number
  * @note Begins with + and contains only numbers
- * @param phoneNumber - Input
+ * @param phoneNumber Input
  * @returns `true`, if the input a phone number
  */
 export const isValidPhoneNumber = (phoneNumber: string): boolean => {

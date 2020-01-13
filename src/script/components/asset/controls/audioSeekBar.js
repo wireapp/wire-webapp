@@ -26,11 +26,11 @@ class AudioSeekBarComponent {
   /**
    * Construct a audio seek bar that renders audio levels.
    *
-   * @param {Object} params - Component parameters
-   * @param {HTMLElement} params.media_src - Media source
-   * @param {File} params.asset - Asset file
-   * @param {boolean} params.disabled - Disabled seek bar
-   * @param {Object} componentInfo - Component information
+   * @param {Object} params Component parameters
+   * @param {HTMLElement} params.media_src Media source
+   * @param {File} params.asset Asset file
+   * @param {boolean} params.disabled Disabled seek bar
+   * @param {Object} componentInfo Component information
    */
   constructor(params, componentInfo) {
     this.dispose = this.dispose.bind(this);

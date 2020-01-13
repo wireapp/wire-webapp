@@ -108,10 +108,10 @@ export class NotificationRepository {
 
   /**
    * Construct a new Notification Repository.
-   * @param callingRepository - Repository for all call interactions
-   * @param conversationRepository - Repository for all conversation interactions
-   * @param permissionRepository - Repository for all permission interactions
-   * @param userRepository - Repository for users
+   * @param callingRepository Repository for all call interactions
+   * @param conversationRepository Repository for all conversation interactions
+   * @param permissionRepository Repository for all permission interactions
+   * @param userRepository Repository for users
    */
   constructor(
     callingRepository: CallingRepository,
@@ -262,7 +262,7 @@ export class NotificationRepository {
 
   /**
    * Set the permission state.
-   * @param permissionState - State of browser permission
+   * @param permissionState State of browser permission
    * @returns Resolves with `true` if notifications are enabled
    */
   updatePermissionState(permissionState: string): Promise<boolean> {
@@ -286,7 +286,7 @@ export class NotificationRepository {
   /**
    * Creates the notification body for text messages and pictures.
    *
-   * @param messageEntity - Normal message entity
+   * @param messageEntity Normal message entity
    * @returns Notification message body
    */
   private createBodyContent(messageEntity: ContentMessage): string | void {
@@ -336,8 +336,8 @@ export class NotificationRepository {
   /**
    * Creates the notification body for people being added to a group conversation.
    *
-   * @param messageEntity - Member message entity
-   * @param Notification - message body
+   * @param messageEntity Member message entity
+   * @param Notification message body
    */
   private createBodyMemberJoin(messageEntity: MemberMessage): string {
     const updatedOneParticipant = messageEntity.userEntities().length === 1;
@@ -364,8 +364,8 @@ export class NotificationRepository {
    * Creates the notification body for people being removed from or leaving a group conversation.
    * @note Only show a notification if self user was removed
    *
-   * @param messageEntity - Member message entity
-   * @param Notification - message body
+   * @param messageEntity Member message entity
+   * @param Notification message body
    */
   private createBodyMemberLeave(messageEntity: MemberMessage): string | void {
     const updatedOneParticipant = messageEntity.userEntities().length === 1;
@@ -377,8 +377,8 @@ export class NotificationRepository {
   /**
    * Selects the type of system message that the notification body needs to be created for.
    *
-   * @param messageEntity - Member message entity
-   * @param conversationEntity - Conversation entity
+   * @param messageEntity Member message entity
+   * @param conversationEntity Conversation entity
    */
   private createBodyMemberUpdate(messageEntity?: MemberMessage, conversationEntity?: Conversation): string | void {
     const isGroup = conversationEntity && conversationEntity.isGroup();
@@ -408,7 +408,7 @@ export class NotificationRepository {
   /**
    * Creates the notification body for obfuscated messages.
    *
-   * @param messageEntity - Message to obfuscate body for
+   * @param messageEntity Message to obfuscate body for
    * @returns Notification message body
    */
   private createBodyObfuscated(messageEntity: ContentMessage): string {
@@ -439,7 +439,7 @@ export class NotificationRepository {
 
   /**
    * Creates the notification body for reaction.
-   * @param messageEntity - Fake reaction message entity
+   * @param messageEntity Fake reaction message entity
    * @returns Notification message body
    */
   private createBodyReaction(messageEntity: any): string {
@@ -449,7 +449,7 @@ export class NotificationRepository {
   /**
    * Selects the type of system message that the notification body needs to be created for.
    *
-   * @param messageEntity - Member message entity
+   * @param messageEntity Member message entity
    * @returns Notification message body
    */
   private createBodySystem(messageEntity: Message): string | void {
@@ -565,8 +565,8 @@ export class NotificationRepository {
   /**
    * Creates the notification icon.
    *
-   * @param shouldObfuscateSender - Sender visible in notification
-   * @param userEntity - Sender of message
+   * @param shouldObfuscateSender Sender visible in notification
+   * @param userEntity Sender of message
    * @returns Resolves with the icon URL
    */
   private createOptionsIcon(shouldObfuscateSender: boolean, userEntity: User): Promise<string> {
@@ -590,8 +590,8 @@ export class NotificationRepository {
   /**
    * Creates the notification tag.
    *
-   * @param connectionEntity - Connection entity
-   * @param conversationEntity - Conversation entity
+   * @param connectionEntity Connection entity
+   * @param conversationEntity Conversation entity
    */
   private createOptionsTag(connectionEntity?: ConnectionEntity, conversationEntity?: Conversation): string {
     return this.getConversationId(connectionEntity, conversationEntity);
@@ -600,7 +600,7 @@ export class NotificationRepository {
   /**
    * Creates the notification title.
    *
-   * @param Notification - message title
+   * @param Notification message title
    */
   private createTitle(messageEntity: Message, conversationEntity?: Conversation): string {
     const conversationName = conversationEntity && conversationEntity.display_name();
@@ -658,8 +658,8 @@ export class NotificationRepository {
   /**
    * Retrieve conversation ID from either conversation or connection.
    *
-   * @param connectionEntity - Connection entity
-   * @param conversationEntity - Conversation entity
+   * @param connectionEntity Connection entity
+   * @param conversationEntity Conversation entity
    * @returns ID of conversation
    */
   private getConversationId(connectionEntity?: ConnectionEntity, conversationEntity?: Conversation): string {
@@ -721,8 +721,8 @@ export class NotificationRepository {
   /**
    * Plays the sound from the audio repository.
    *
-   * @param messageEntity - Message entity
-   * @param No - return value
+   * @param messageEntity Message entity
+   * @param No return value
    */
   private notifySound(messageEntity: Message): void {
     const muteSound = !document.hasFocus() && Environment.browser.firefox && Environment.os.mac;
@@ -759,8 +759,8 @@ export class NotificationRepository {
   /**
    * Should message in a notification be obfuscated?
    *
-   * @param messageEntity - Message entity
-   * @param Obfuscate - message in notification
+   * @param messageEntity Message entity
+   * @param Obfuscate message in notification
    */
   private shouldObfuscateNotificationMessage(messageEntity: Message): boolean {
     const preferencesToObfuscateMessage = [NotificationPreference.OBFUSCATE, NotificationPreference.OBFUSCATE_MESSAGE];
@@ -771,7 +771,7 @@ export class NotificationRepository {
   /**
    * Should sender in a notification be obfuscated?
    *
-   * @param messageEntity - Message entity
+   * @param messageEntity Message entity
    * @returns Obfuscate sender in notification
    */
   private shouldObfuscateNotificationSender(messageEntity: Message): boolean {
@@ -780,8 +780,8 @@ export class NotificationRepository {
   }
 
   /**
-   * @param messageEntity - Message entity
-   * @param conversationEntity - Conversation entity
+   * @param messageEntity Message entity
+   * @param conversationEntity Conversation entity
    * @returns Returns `true` if the notification should be shown, `false` otherwise
    */
   private shouldShowNotification(messageEntity: Message, conversationEntity?: Conversation): boolean {
@@ -807,11 +807,11 @@ export class NotificationRepository {
   /**
    * Sending the notification.
    *
-   * @param notificationContent - Content of notification
-   * @param notificationContent.title - Title of notification
-   * @param notificationContent.options - Notification options
-   * @param notificationContent.trigger - Function to be called on notificiation click
-   * @param notificationContent.timeout - Timeout after which notification is closed
+   * @param notificationContent Content of notification
+   * @param notificationContent.title Title of notification
+   * @param notificationContent.options Notification options
+   * @param notificationContent.trigger Function to be called on notificiation click
+   * @param notificationContent.timeout Timeout after which notification is closed
    * @returns No return value
    */
   private showNotification(notificationContent: NotificationContent): void {
@@ -822,12 +822,12 @@ export class NotificationRepository {
   /**
    * Sending the browser notification.
    *
-   * @param notificationContent - Content of notification
-   * @param notificationContent.title - Notification title
-   * @param notificationContent.options - Notification options
-   * @param notificationContent.trigger - Function to be triggered on click [Function] trigger
-   * @param notificationContent.timeout - Timeout for notification
-   * @param No - return value
+   * @param notificationContent Content of notification
+   * @param notificationContent.title Notification title
+   * @param notificationContent.options Notification options
+   * @param notificationContent.trigger Function to be triggered on click [Function] trigger
+   * @param notificationContent.timeout Timeout for notification
+   * @param No return value
    */
   private showNotificationInBrowser(notificationContent: NotificationContent): void {
     /*
@@ -875,9 +875,9 @@ export class NotificationRepository {
   /**
    * Check whether conversation is in state to trigger notitication.
    *
-   * @param conversationEntity - Conversation to notify in
-   * @param messageEntity - The message to filter from
-   * @param userId - The user id to check mentions for
+   * @param conversationEntity Conversation to notify in
+   * @param messageEntity The message to filter from
+   * @param userId The user id to check mentions for
    * @returns `true` if the conversation should show notification
    */
   static shouldNotifyInConversation(

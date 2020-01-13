@@ -66,8 +66,8 @@ export class EventMapper {
   /**
    * Convert multiple JSON events into message entities.
    *
-   * @param {Array} events - Event data
-   * @param {Conversation} conversationEntity - Conversation entity the events belong to
+   * @param {Array} events Event data
+   * @param {Conversation} conversationEntity Conversation entity the events belong to
    * @returns {Promise<Array<Message>>} Resolves with the mapped message entities
    */
   async mapJsonEvents(events, conversationEntity) {
@@ -90,8 +90,8 @@ export class EventMapper {
   /**
    * Convert JSON event into a message entity.
    *
-   * @param {Object} event - Event data
-   * @param {Conversation} conversationEntity - Conversation entity the event belong to
+   * @param {Object} event Event data
+   * @param {Conversation} conversationEntity Conversation entity the event belong to
    * @returns {Promise} Resolves with the mapped message entity
    */
   mapJsonEvent(event, conversationEntity) {
@@ -116,8 +116,8 @@ export class EventMapper {
    * Will update the content of the originalEntity with the new data given.
    * Will try to do as little updates as possible to avoid to many observable emission.
    *
-   * @param {Message} originalEntity - the original message to update
-   * @param {Object} event - new json data to feed into the entity
+   * @param {Message} originalEntity the original message to update
+   * @param {Object} event new json data to feed into the entity
    * @returns {Promise<Message>} - the updated message entity
    */
   async updateMessageEvent(originalEntity, event) {
@@ -176,8 +176,8 @@ export class EventMapper {
   /**
    * Convert JSON event into a message entity.
    *
-   * @param {Object} event - Event data
-   * @param {Conversation} conversationEntity - Conversation entity the event belong to
+   * @param {Object} event Event data
+   * @param {Conversation} conversationEntity Conversation entity the event belong to
    * @returns {Promise<Message>} Mapped message entity
    */
   async _mapJsonEvent(event, conversationEntity) {
@@ -332,7 +332,7 @@ export class EventMapper {
    * Maps JSON data of conversation.one2one-creation message into message entity.
    *
    * @private
-   * @param {Object} eventData - Message data
+   * @param {Object} eventData Message data
    * @returns {ContentMessage} Member message entity
    */
   _mapEvent1to1Creation({data: eventData}) {
@@ -353,7 +353,7 @@ export class EventMapper {
    * Maps JSON data of conversation.asset_add message into message entity.
    *
    * @private
-   * @param {Object} event - Message data
+   * @param {Object} event Message data
    * @returns {ContentMessage} Content message entity
    */
   _mapEventAssetAdd(event) {
@@ -369,7 +369,7 @@ export class EventMapper {
    * Maps JSON data of delete everywhere event to message entity.
    *
    * @private
-   * @param {Object} eventData - Message data
+   * @param {Object} eventData Message data
    * @returns {DeleteMessage} Delete message entity
    */
   _mapEventDeleteEverywhere({data: eventData}) {
@@ -382,7 +382,7 @@ export class EventMapper {
    * Map JSON ata of group creation event to message entity.
    *
    * @private
-   * @param {Object} eventData - Message data
+   * @param {Object} eventData Message data
    * @returns {MemberMessage} Member message entity
    */
   _mapEventGroupCreation({data: eventData}) {
@@ -402,7 +402,7 @@ export class EventMapper {
    * Maps JSON data of conversation.location message into message entity.
    *
    * @private
-   * @param {Object} eventData - Message data
+   * @param {Object} eventData Message data
    * @returns {ContentMessage} Location message entity
    */
   _mapEventLocation({data: eventData}) {
@@ -424,8 +424,8 @@ export class EventMapper {
    * Maps JSON data of conversation.member_join message into message entity.
    *
    * @private
-   * @param {Object} event - Message data
-   * @param {Conversation} conversationEntity - Conversation entity the event belong to
+   * @param {Object} event Message data
+   * @param {Conversation} conversationEntity Conversation entity the event belong to
    * @returns {MemberMessage} Member message entity
    */
   _mapEventMemberJoin(event, conversationEntity) {
@@ -461,7 +461,7 @@ export class EventMapper {
    * Maps JSON data of conversation.member_leave message into message entity.
    *
    * @private
-   * @param {Object} eventData - Message data
+   * @param {Object} eventData Message data
    * @returns {MemberMessage} Member message entity
    */
   _mapEventMemberLeave({data: eventData}) {
@@ -474,7 +474,7 @@ export class EventMapper {
    * Maps JSON data of conversation.message_add message into message entity.
    *
    * @private
-   * @param {Object} event - Message data
+   * @param {Object} event Message data
    * @returns {Promise<ContentMessage>} Content message entity
    */
   async _mapEventMessageAdd(event) {
@@ -516,7 +516,7 @@ export class EventMapper {
    * Maps JSON data of conversation.rename message into message entity.
    *
    * @private
-   * @param {Object} eventData - Message data
+   * @param {Object} eventData Message data
    * @returns {RenameMessage} Rename message entity
    */
   _mapEventRename({data: eventData}) {
@@ -529,7 +529,7 @@ export class EventMapper {
    * Maps JSON data of conversation.receipt-mode-update message into message entity.
    *
    * @private
-   * @param {Object} eventData - Message data
+   * @param {Object} eventData Message data
    * @returns {ReceiptModeUpdateMessage} receipt mode update message entity
    */
   _mapEventReceiptModeUpdate({data: eventData}) {
@@ -540,7 +540,7 @@ export class EventMapper {
    * Maps JSON data of conversation.message-timer-update message into message entity.
    *
    * @private
-   * @param {Object} eventData - Message data
+   * @param {Object} eventData Message data
    * @returns {MessageTimerUpdateMessage} message timer update message entity
    */
   _mapEventMessageTimerUpdate({data: eventData}) {
@@ -551,7 +551,7 @@ export class EventMapper {
    * Maps JSON data of conversation.team_leave message into message entity.
    *
    * @private
-   * @param {Object} event - Message data
+   * @param {Object} event Message data
    * @returns {MemberMessage} Member message entity
    */
   _mapEventTeamMemberLeave(event) {
@@ -565,7 +565,7 @@ export class EventMapper {
    * Maps JSON data of local decrypt errors to message entity.
    *
    * @private
-   * @param {Object} error_code - Error data received as JSON
+   * @param {Object} error_code Error data received as JSON
    * @returns {DecryptErrorMessage} Decrypt error message entity
    */
   _mapEventUnableToDecrypt({error_code: errorCode}) {
@@ -584,7 +584,7 @@ export class EventMapper {
    * Maps JSON data of conversation.verification message into message entity.
    *
    * @private
-   * @param {Object} eventData - Message data
+   * @param {Object} eventData Message data
    * @returns {VerificationMessage} Verification message entity
    */
   _mapEventVerification({data: eventData}) {
@@ -612,7 +612,7 @@ export class EventMapper {
    * Maps JSON data of conversation.voice-channel-deactivate message into message entity.
    *
    * @private
-   * @param {Object} eventData - Message data
+   * @param {Object} eventData Message data
    * @returns {CallMessage} Call message entity
    */
   _mapEventVoiceChannelDeactivate({data: eventData}) {
@@ -644,7 +644,7 @@ export class EventMapper {
    * Maps JSON data of file asset into asset entity.
    *
    * @private
-   * @param {Object} event - Asset data received as JSON
+   * @param {Object} event Asset data received as JSON
    * @returns {File} File asset entity
    */
   _mapAssetFile(event) {
@@ -692,7 +692,7 @@ export class EventMapper {
    * Maps JSON data of medium image asset into asset entity.
    *
    * @private
-   * @param {Object} event - Asset data received as JSON
+   * @param {Object} event Asset data received as JSON
    * @returns {MediumImage} Medium image asset entity
    */
   _mapAssetImage(event) {
@@ -727,7 +727,7 @@ export class EventMapper {
    * Map link preview from proto message.
    *
    * @private
-   * @param {LinkPreview} linkPreview - Link preview proto message
+   * @param {LinkPreview} linkPreview Link preview proto message
    * @returns {LinkPreview} Mapped link preview
    */
   _mapAssetLinkPreview(linkPreview) {
@@ -763,7 +763,7 @@ export class EventMapper {
    * Map link previews from proto messages.
    *
    * @private
-   * @param {Array} linkPreviews - Link previews as base64 encoded proto messages
+   * @param {Array} linkPreviews Link previews as base64 encoded proto messages
    * @returns {Promise<LinkPreview[]>} Array of mapped link previews
    */
   async _mapAssetLinkPreviews(linkPreviews) {
@@ -778,8 +778,8 @@ export class EventMapper {
    * Map mentions from proto messages.
    *
    * @private
-   * @param {Array} mentions - Mentions as base64 encoded proto messages
-   * @param {string} messageText - Text of message
+   * @param {Array} mentions Mentions as base64 encoded proto messages
+   * @param {string} messageText Text of message
    * @returns {Promise<MentionEntity[]>} Array of mapped mentions
    */
   async _mapAssetMentions(mentions, messageText) {
@@ -805,7 +805,7 @@ export class EventMapper {
    * Maps JSON data of text asset into asset entity.
    *
    * @private
-   * @param {Object} eventData - Asset data received as JSON
+   * @param {Object} eventData Asset data received as JSON
    * @returns {Promise<Text>} Text asset entity
    */
   async _mapAssetText(eventData) {

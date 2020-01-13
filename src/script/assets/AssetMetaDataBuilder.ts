@@ -28,7 +28,7 @@ export type MetaData = Asset.AudioMetaData | Asset.VideoMetaData | Asset.ImageMe
 
 /**
  * Constructs corresponding asset meta data depending on the given file type.
- * @param file - the file to generate metadata for
+ * @param file the file to generate metadata for
  * @returns Resolves with ImageMetaData, VideoMetaData or AudioMetaData
  */
 const buildMetadata = (file: File | Blob): Promise<MetaData | void> => {

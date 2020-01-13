@@ -134,7 +134,7 @@ export class ClientRepository {
 
   /**
    * Retrieves meta information about specific client of the self user.
-   * @param clientId - ID of client to be retrieved
+   * @param clientId ID of client to be retrieved
    * @returns Resolves with the retrieved client information
    */
   getClientByIdFromBackend(clientId: string): Promise<RegisteredClient> {
@@ -175,8 +175,8 @@ export class ClientRepository {
   /**
    * Construct the primary key to store clients in database.
    *
-   * @param userId - User ID from the owner of the client
-   * @param clientId - ID of the client
+   * @param userId User ID from the owner of the client
+   * @param clientId ID of the client
    * @returns Primary key
    */
   private constructPrimaryKey(userId: string, clientId: string): string {
@@ -192,8 +192,8 @@ export class ClientRepository {
   /**
    * Save the a client into the database.
    *
-   * @param userId - ID of user client to be stored belongs to
-   * @param clientPayload - Client data to be stored in database
+   * @param userId ID of user client to be stored belongs to
+   * @param clientPayload Client data to be stored in database
    * @returns Resolves with the record stored in database
    */
   saveClientInDb(userId: string, clientPayload: any): Promise<any> {
@@ -205,9 +205,9 @@ export class ClientRepository {
    * Updates properties for a client record in database.
    *
    * @todo Merge "meta" property before updating it, Object.assign(payload.meta, changes.meta)
-   * @param userId - User ID of the client owner
-   * @param clientId - Client ID which needs to get updated
-   * @param changes - New values which should be updated on the client
+   * @param userId User ID of the client owner
+   * @param clientId Client ID which needs to get updated
+   * @param changes New values which should be updated on the client
    * @returns Number of updated records
    */
   updateClientInDb(userId: string, clientId: string, changes: Record<string, any>): Promise<number> {
@@ -220,9 +220,9 @@ export class ClientRepository {
   /**
    * Change verification state of client.
    *
-   * @param userId - User ID of the client owner
-   * @param clientEntity - Client which needs to get updated
-   * @param isVerified - New state to apply
+   * @param userId User ID of the client owner
+   * @param clientEntity Client which needs to get updated
+   * @param isVerified New state to apply
    * @returns Resolves when the verification state has been updated
    */
   verifyClient(userId: string, clientEntity: ClientEntity, isVerified: boolean): Promise<void> {
@@ -235,7 +235,7 @@ export class ClientRepository {
   /**
    * Save the local client into the database.
    *
-   * @param clientPayload - Client data to be stored in database
+   * @param clientPayload Client data to be stored in database
    * @returns Resolves with the record stored in database
    */
   private saveCurrentClientInDb(clientPayload: any): Promise<any> {
@@ -246,8 +246,8 @@ export class ClientRepository {
   /**
    * Updates a client payload if it does not fit the current database structure.
    *
-   * @param  userId - User ID of the client owner
-   * @param clientPayload - Client data to be stored in database
+   * @param  userId User ID of the client owner
+   * @param clientPayload Client data to be stored in database
    * @returns Resolves with the record stored in database
    */
   private updateClientSchemaInDb(userId: string, clientPayload: any): Promise<any> {
@@ -264,8 +264,8 @@ export class ClientRepository {
 
   /**
    * Constructs the value for a cookie label.
-   * @param login - Email or phone number of the user
-   * @param clientType - Temporary or permanent client type
+   * @param login Email or phone number of the user
+   * @param clientType Temporary or permanent client type
    * @returns Cookie label
    */
   constructCookieLabel(login: string, clientType = this.loadCurrentClientType()): string {
@@ -275,8 +275,8 @@ export class ClientRepository {
 
   /**
    * Constructs the key for a cookie label.
-   * @param login - Email or phone number of the user
-   * @param clientType - Temporary or permanent client type
+   * @param login Email or phone number of the user
+   * @param clientType Temporary or permanent client type
    * @returns Cookie label key
    */
   constructCookieLabelKey(login: string, clientType: ClientType = this.loadCurrentClientType()): string {
@@ -310,7 +310,7 @@ export class ClientRepository {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/registerClient
    *
    * @note Password is needed for the registration of a client once 1st client has been registered.
-   * @param password - User password for verification
+   * @param password User password for verification
    * @returns Resolves with the newly registered client
    */
   registerClient(password?: string): Promise<ko.Observable<ClientEntity>> {
@@ -354,9 +354,9 @@ export class ClientRepository {
   /**
    * Create payload for client registration.
    *
-   * @param clientType - Type of client to be registered
-   * @param password - User password
-   * @param keys - Last resort key, pre-keys and signaling keys
+   * @param clientType Type of client to be registered
+   * @param password User password
+   * @param keys Last resort key, pre-keys and signaling keys
    * @returns Payload to register client with backend
    */
   private createRegistrationPayload(
@@ -404,7 +404,7 @@ export class ClientRepository {
 
   /**
    * Gets the value for a cookie label.
-   * @param login - Email or phone number of the user
+   * @param login Email or phone number of the user
    * @returns Cookie label
    */
   private getCookieLabelValue(login: string): string {
@@ -414,8 +414,8 @@ export class ClientRepository {
   /**
    * Loads the cookie label value from the Local Storage and saves it into IndexedDB.
    *
-   * @param clientType - Temporary or permanent client type
-   * @param cookieLabel - Cookie label, something like "webapp@2153234453@temporary@145770538393"
+   * @param clientType Temporary or permanent client type
+   * @param cookieLabel Cookie label, something like "webapp@2153234453@temporary@145770538393"
    * @returns Resolves with the key of the stored cookie label
    */
   private transferCookieLabel(clientType: ClientType, cookieLabel: string): Promise<string> {
@@ -457,8 +457,8 @@ export class ClientRepository {
   /**
    * Delete client of a user on backend and removes it locally.
    *
-   * @param clientId - ID of the client that should be deleted
-   * @param password - Password entered by user
+   * @param clientId ID of the client that should be deleted
+   * @param password Password entered by user
    * @returns Resolves with the remaining user devices
    */
   async deleteClient(clientId: string, password: string): Promise<any> {
@@ -502,8 +502,8 @@ export class ClientRepository {
   /**
    * Removes a stored client and the session connected with it.
    *
-   * @param userId - ID of user
-   * @param clientId - ID of client to be deleted
+   * @param userId ID of user
+   * @param clientId ID of client to be deleted
    * @returns Resolves when a client and its session have been deleted
    */
   removeClient(userId: string, clientId: string): Promise<string> {
@@ -516,8 +516,8 @@ export class ClientRepository {
    * Retrieves meta information about all the clients of a given user.
    * @note If you want to get very detailed information about the devices from the own user, then use `getClients()`.
    *
-   * @param userId - User ID to retrieve client information for
-   * @param updateClients - Automatically update the clients
+   * @param userId User ID to retrieve client information for
+   * @param updateClients Automatically update the clients
    * @returns Resolves with an array of client entities
    */
   async getClientsByUserId(userId: string, updateClients: false): Promise<PublicClient[]>;
@@ -579,9 +579,9 @@ export class ClientRepository {
    * @note This function matches clients retrieved from the backend with the data stored in the local database.
    *   Clients will then be updated with the backend payload in the database and mapped into entities.
    *
-   * @param userId - ID of user whose clients are updated
-   * @param clientsData - Clients data from backend
-   * @param publish - Change clients using amplify
+   * @param userId ID of user whose clients are updated
+   * @param clientsData Clients data from backend
+   * @param publish Change clients using amplify
    * @returns Resolves with the entities once clients have been updated
    */
   private updateClientsOfUserById(
@@ -666,8 +666,8 @@ export class ClientRepository {
   /**
    * Check if client is current local client.
    *
-   * @param userId - User ID to be checked
-   * @param clientId - ID of client to be checked
+   * @param userId User ID to be checked
+   * @param clientId ID of client to be checked
    * @returnsIs the client the current local client
    */
   private isCurrentClient(userId: string, clientId: string): boolean {
@@ -690,7 +690,7 @@ export class ClientRepository {
   /**
    * Listener for incoming user events.
    *
-   * @param eventJson - JSON data for event
+   * @param eventJson JSON data for event
    */
   onUserEvent(eventJson: any): void {
     const type = eventJson.type;
@@ -708,7 +708,7 @@ export class ClientRepository {
 
   /**
    * A client was added by the self user.
-   * @param eventJson - JSON data of 'user.client-add' event
+   * @param eventJson JSON data of 'user.client-add' event
    */
   onClientAdd(eventJson: Partial<UserClientAddEvent>): void {
     this.logger.info('Client of self user added', eventJson);
@@ -717,7 +717,7 @@ export class ClientRepository {
 
   /**
    * A client was removed by the self user.
-   * @param JSON - data of 'user.client-remove' event
+   * @param JSON data of 'user.client-remove' event
    * @returns Resolves when the event has been handled
    */
   async onClientRemove(eventJson: UserClientRemoveEvent = {} as any): Promise<void> {
