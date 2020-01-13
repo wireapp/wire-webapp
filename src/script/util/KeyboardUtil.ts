@@ -44,7 +44,7 @@ export const isOneOfKeys = (keyboardEvent: KeyboardEvent, expectedKeys: string[]
 export const isArrowKey = (keyboardEvent: KeyboardEvent): boolean =>
   isOneOfKeys(keyboardEvent, [KEY.ARROW_DOWN, KEY.ARROW_LEFT, KEY.ARROW_RIGHT, KEY.ARROW_UP]);
 
-export const isPageUpDownKey = (keyboardEvent: KeyboardEvent): boolean => 
+export const isPageUpDownKey = (keyboardEvent: KeyboardEvent): boolean =>
   isOneOfKeys(keyboardEvent, [KEY.PAGE_UP, KEY.PAGE_DOWN]);
 
 export const isKey = (keyboardEvent?: KeyboardEvent, expectedKey = '') => {
