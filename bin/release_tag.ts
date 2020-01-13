@@ -138,7 +138,11 @@ ask(`ℹ️  The commit "${commitMessage}" will be released with tag "${tagName}
     logger.info(`Pushing "${tagName}" to "${origin}" ...`);
     exec(`git push ${origin} ${tagName}`);
 
-    await announceRelease(tagName, commitId);
+    try {
+      await announceRelease(tagName, commitId);
+    } catch(error) {
+      logger.error(error);
+    }
 
     logger.info('Done.');
   } else {
