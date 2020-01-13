@@ -233,13 +233,6 @@
   dependencies:
     debug "^4.1.1"
 
-"@types/ansi-regex@5.0.0":
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/@types/ansi-regex/-/ansi-regex-5.0.0.tgz#569a5189a92cc46d63fb2ad91e6b130f33d999c1"
-  integrity sha512-SQafVL3pXFh/5qq/nN6p5858g//zSVzcb8JzCLtoVxm8YNPggMQfEIm7aaTNysxpw1S+lFTaW8kv+aR0/CEhCA==
-  dependencies:
-    ansi-regex "*"
-
 "@types/body-parser@*":
   version "1.17.0"
   resolved "https://registry.yarnpkg.com/@types/body-parser/-/body-parser-1.17.0.tgz#9f5c9d9bd04bb54be32d5eb9fc0d8c974e6cf58c"
@@ -362,12 +355,11 @@
     "@types/express-serve-static-core" "*"
     "@types/mime" "*"
 
-"@wireapp/commons@3.0.5":
-  version "3.0.5"
-  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-3.0.5.tgz#4a63f83304a38c343e5b25f22d1dababde90bee8"
-  integrity sha512-DGXnPchZt6puTYDb7su3vIj/ODWe1ApPud/K5BAswtJYlsbsOu3Al/xXtmJuvpH/IBQt/+aHISx5L5g2AfNIiQ==
+"@wireapp/commons@3.2.0":
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-3.2.0.tgz#62477fdc3df00a50efe6b2a0d400872a9a199564"
+  integrity sha512-2Ot3pLSrfleJLQGyvgTmRruNq5wbSep+dvYqTPf3QBKC0nSrCBw21pkz2VjrH9wpbANmhO60U+gnnYiLl5iB5g==
   dependencies:
-    "@types/ansi-regex" "5.0.0"
     "@types/fs-extra" "8.0.1"
     "@types/node" "~12"
     "@types/platform" "1.3.2"
@@ -424,7 +416,7 @@ ansi-colors@^3.2.1:
   resolved "https://registry.yarnpkg.com/ansi-colors/-/ansi-colors-3.2.4.tgz#e3a3da4bfbae6c86a9c285625de124a234026fbf"
   integrity sha512-hHUXGagefjN2iRrID63xckIvotOXOojhQKWIPUZ4mNUZ9nLZW+7FMNoE1lOkEhNWYsx/7ysGIuJYCiMAA9FnrA==
 
-ansi-regex@*, ansi-regex@5.0.0, ansi-regex@^5.0.0:
+ansi-regex@5.0.0, ansi-regex@^5.0.0:
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/ansi-regex/-/ansi-regex-5.0.0.tgz#388539f55179bf39339c81af30a654d69f87cb75"
   integrity sha512-bY6fj56OUQ0hU1KjFNDQuJFezqKdrAyFdIevADiqrWHwSlbmBNMHp5ak2f40Pm8JTFyM2mqxkG6ngkHO11f/lg==
