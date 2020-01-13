@@ -25,16 +25,15 @@ const commonConfig = require('./webpack.config.common');
 module.exports = {
   ...prodConfig,
   devtool: 'inline-source-map',
-  entry: Object.assign(prodConfig.entry, {
-    test: path.resolve(__dirname, 'test', 'index.test.js'),
-  }),
-  externals: Object.assign(prodConfig.externals, {
+  entry: {...prodConfig.entry, test: path.resolve(__dirname, 'test', 'index.test.js')},
+  externals: {
+    ...prodConfig.externals,
     // These will help enable enzyme to work properly
     cheerio: 'window',
     'react/addons': true,
     'react/lib/ExecutionEnvironment': true,
     'react/lib/ReactContext': true,
-  }),
+  },
   mode: 'development',
   module: {
     rules: [

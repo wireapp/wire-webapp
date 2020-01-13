@@ -187,7 +187,14 @@ describe('BackupRepository', () => {
       return Promise.all(promises);
     });
 
-    it('successfully import backup', () => {
+    it('successfully imports a backup', () => {
+      function removePrimaryKey(message) {
+        return {
+          ...message,
+          primary_key: undefined,
+        };
+      }
+
       const metadataArray = [backupRepository.createMetaData(), {...backupRepository.createMetaData(), version: 15}];
 
       const archives = metadataArray.map(metadata => {
@@ -221,13 +228,6 @@ describe('BackupRepository', () => {
       });
 
       return Promise.all(importPromises);
-
-      function removePrimaryKey(message) {
-        return {
-          ...message,
-          primary_key: undefined,
-        };
-      }
     });
   });
 });

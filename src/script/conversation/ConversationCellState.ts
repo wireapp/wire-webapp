@@ -19,18 +19,19 @@
 
 import {t} from 'Util/LocalizerUtil';
 
-import {ConversationStatusIcon} from './ConversationStatusIcon';
 import {AssetTransferState} from '../assets/AssetTransferState';
+import {Conversation} from '../entity/Conversation';
+import {ConversationStatusIcon} from './ConversationStatusIcon';
 
-const ACTIVITY_TYPE = {
-  CALL: 'ConversationCellState.ACTIVITY_TYPE.CALL',
-  MENTION: 'ConversationCellState.ACTIVITY_TYPE.MENTION',
-  MESSAGE: 'ConversationCellState.ACTIVITY_TYPE.MESSAGE',
-  PING: 'ConversationCellState.ACTIVITY_TYPE.PING',
-  REPLY: 'ConversationCellState.ACTIVITY_TYPE.REPLY',
-};
+enum ACTIVITY_TYPE {
+  CALL = 'ConversationCellState.ACTIVITY_TYPE.CALL',
+  MENTION = 'ConversationCellState.ACTIVITY_TYPE.MENTION',
+  MESSAGE = 'ConversationCellState.ACTIVITY_TYPE.MESSAGE',
+  PING = 'ConversationCellState.ACTIVITY_TYPE.PING',
+  REPLY = 'ConversationCellState.ACTIVITY_TYPE.REPLY',
+}
 
-const _accumulateSummary = (conversationEntity, prioritizeMentionAndReply) => {
+const _accumulateSummary = (conversationEntity: Conversation, prioritizeMentionAndReply?: boolean): string => {
   const {
     calls: unreadCalls,
     otherMessages: unreadOtherMessages,
@@ -40,7 +41,7 @@ const _accumulateSummary = (conversationEntity, prioritizeMentionAndReply) => {
   } = conversationEntity.unreadState();
 
   // Sorted in order of alert type priority
-  const activities = {
+  const activities: Record<ACTIVITY_TYPE, number> = {
     [ACTIVITY_TYPE.MENTION]: unreadSelfMentions.length,
     [ACTIVITY_TYPE.REPLY]: unreadSelfReplies.length,
     [ACTIVITY_TYPE.CALL]: unreadCalls.length,
@@ -85,9 +86,9 @@ const _accumulateSummary = (conversationEntity, prioritizeMentionAndReply) => {
   return _generateSummaryDescription(activities);
 };
 
-const _generateSummaryDescription = activities => {
+const _generateSummaryDescription = (activities: Record<ACTIVITY_TYPE, number>): string => {
   return Object.entries(activities)
-    .map(([activity, activityCount]) => {
+    .map(([activity, activityCount]): string | void => {
       if (activityCount) {
         const activityCountIsOne = activityCount === 1;
 
@@ -132,8 +133,8 @@ const _generateSummaryDescription = activities => {
 };
 
 const _getStateAlert = {
-  description: conversationEntity => _accumulateSummary(conversationEntity, true),
-  icon: conversationEntity => {
+  description: (conversationEntity: Conversation) => _accumulateSummary(conversationEntity, true),
+  icon: (conversationEntity: Conversation): ConversationStatusIcon | void => {
     const {
       calls: unreadCalls,
       pings: unreadPings,
@@ -157,7 +158,7 @@ const _getStateAlert = {
       return ConversationStatusIcon.UNREAD_PING;
     }
   },
-  match: conversationEntity => {
+  match: (conversationEntity: Conversation) => {
     const {
       calls: unreadCalls,
       pings: unreadPings,
@@ -178,7 +179,7 @@ const _getStateDefault = {
 };
 
 const _getStateGroupActivity = {
-  description: conversationEntity => {
+  description: (conversationEntity: Conversation): string | void => {
     const lastMessageEntity = conversationEntity.getLastMessage();
 
     if (lastMessageEntity.is_member()) {
@@ -235,7 +236,7 @@ const _getStateGroupActivity = {
       return t('conversationsSecondaryLineRenamed', lastMessageEntity.user().name());
     }
   },
-  icon: conversationEntity => {
+  icon: (conversationEntity: Conversation): ConversationStatusIcon | void => {
     const lastMessageEntity = conversationEntity.getLastMessage();
     const isMemberRemoval = lastMessageEntity.is_member() && lastMessageEntity.isMemberRemoval();
 
@@ -245,7 +246,7 @@ const _getStateGroupActivity = {
         : ConversationStatusIcon.MUTED;
     }
   },
-  match: conversationEntity => {
+  match: (conversationEntity: Conversation) => {
     const lastMessageEntity = conversationEntity.getLastMessage();
     const isExpectedType = lastMessageEntity ? lastMessageEntity.is_member() || lastMessageEntity.is_system() : false;
     const unreadEvents = conversationEntity.unreadState().allEvents;
@@ -255,10 +256,10 @@ const _getStateGroupActivity = {
 };
 
 const _getStateMuted = {
-  description: conversationEntity => {
+  description: (conversationEntity: Conversation) => {
     return _accumulateSummary(conversationEntity, conversationEntity.showNotificationsMentionsAndReplies());
   },
-  icon: conversationEntity => {
+  icon: (conversationEntity: Conversation) => {
     const hasSelfMentions = conversationEntity.unreadState().selfMentions.length > 0;
     const hasSelfReplies = conversationEntity.unreadState().selfReplies.length > 0;
     const showMentionsIcon = hasSelfMentions && conversationEntity.showNotificationsMentionsAndReplies();
@@ -274,11 +275,11 @@ const _getStateMuted = {
 
     return ConversationStatusIcon.MUTED;
   },
-  match: conversationEntity => !conversationEntity.showNotificationsEverything(),
+  match: (conversationEntity: Conversation) => !conversationEntity.showNotificationsEverything(),
 };
 
 const _getStateRemoved = {
-  description: conversationEntity => {
+  description: (conversationEntity: Conversation) => {
     const lastMessageEntity = conversationEntity.getLastMessage();
     const selfUserId = conversationEntity.selfUser().id;
 
@@ -292,11 +293,11 @@ const _getStateRemoved = {
     return '';
   },
   icon: () => ConversationStatusIcon.NONE,
-  match: conversationEntity => conversationEntity.removed_from_conversation(),
+  match: (conversationEntity: Conversation) => conversationEntity.removed_from_conversation(),
 };
 
 const _getStateUnreadMessage = {
-  description: conversationEntity => {
+  description: (conversationEntity: Conversation): string | void => {
     const unreadMessages = conversationEntity.unreadState().allMessages;
 
     for (const messageEntity of unreadMessages) {
@@ -333,27 +334,27 @@ const _getStateUnreadMessage = {
         }
 
         const hasString = string && string !== true;
-        const stateText = hasString ? string : messageEntity.get_first_asset().text;
+        const stateText: string = hasString ? string : messageEntity.get_first_asset().text;
         return conversationEntity.isGroup() ? `${messageEntity.unsafeSenderName()}: ${stateText}` : stateText;
       }
     }
   },
   icon: () => ConversationStatusIcon.UNREAD_MESSAGES,
-  match: conversationEntity => conversationEntity.unreadState().allMessages.length > 0,
+  match: (conversationEntity: Conversation) => conversationEntity.unreadState().allMessages.length > 0,
 };
 
 const _getStateUserName = {
-  description: conversationEntity => {
+  description: (conversationEntity: Conversation): string => {
     const [userEntity] = conversationEntity.participating_user_ets();
     const hasUsername = userEntity && userEntity.username();
     return hasUsername ? `@${userEntity.username()}` : '';
   },
-  icon: conversationEntity => {
+  icon: (conversationEntity: Conversation): ConversationStatusIcon.PENDING_CONNECTION | void => {
     if (conversationEntity.isRequest()) {
       return ConversationStatusIcon.PENDING_CONNECTION;
     }
   },
-  match: conversationEntity => {
+  match: (conversationEntity: Conversation): boolean => {
     const lastMessageEntity = conversationEntity.getLastMessage();
     const isMemberJoin = lastMessageEntity && lastMessageEntity.is_member() && lastMessageEntity.isMemberJoin();
     const isEmpty1to1Conversation = conversationEntity.is1to1() && isMemberJoin;
@@ -362,7 +363,9 @@ const _getStateUserName = {
   },
 };
 
-export const generateCellState = conversationEntity => {
+export const generateCellState = (
+  conversationEntity: Conversation,
+): {description: string | void; icon: ConversationStatusIcon | void} => {
   const states = [
     _getStateRemoved,
     _getStateMuted,

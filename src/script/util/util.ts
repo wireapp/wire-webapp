@@ -428,6 +428,5 @@ export const afterRender = (callback: TimerHandler): number =>
 
 /**
  * No operation
- * @returns {void}
  */
 export const noop = (): void => {};

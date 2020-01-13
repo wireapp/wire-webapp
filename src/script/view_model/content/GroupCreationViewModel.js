@@ -230,7 +230,7 @@ export class GroupCreationViewModel {
   }
 
   _trackAddParticipants(conversationEntity) {
-    const attributes = {
+    let attributes = {
       method: 'create',
       user_num: conversationEntity.getNumberOfParticipants(),
     };
@@ -239,12 +239,13 @@ export class GroupCreationViewModel {
     if (isTeamConversation) {
       const participants = trackingHelpers.getParticipantTypes(conversationEntity.participating_user_ets(), true);
 
-      Object.assign(attributes, {
+      attributes = {
+        ...attributes,
         guest_num: participants.guests,
         is_allow_guests: conversationEntity.isGuestRoom(),
         temporary_guest_num: participants.temporaryGuests,
         user_num: participants.users,
-      });
+      };
     }
 
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CONVERSATION.ADD_PARTICIPANTS, attributes);

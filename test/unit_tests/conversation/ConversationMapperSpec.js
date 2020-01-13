@@ -453,7 +453,7 @@ describe('Conversation Mapper', () => {
         otr_muted_ref: '2017-02-16T10:06:41.118Z',
       };
 
-      remote_data.members.self = Object.assign(remote_data.members.self, self_update);
+      remote_data.members.self = {...remote_data.members.self, ...self_update};
 
       const [merged_conversation] = conversation_mapper.mergeConversation([local_data], [remote_data], true);
 

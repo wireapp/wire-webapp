@@ -17,12 +17,14 @@
  *
  */
 
+import {ConnectionStatus} from '@wireapp/api-client/dist/connection';
 import {GenericMessage, LegalHoldStatus, Text} from '@wireapp/protocol-messaging';
-import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 
 import {createRandomUuid} from 'Util/util';
 
 import {backendConfig} from '../../api/testResolver';
+
+import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {Message} from 'src/script/entity/message/Message';
@@ -50,7 +52,6 @@ import {StorageSchemata} from 'src/script/storage/StorageSchemata';
 import {File} from 'src/script/entity/message/File';
 
 import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
-import {ConnectionStatus} from 'src/script/connection/ConnectionStatus';
 import {MessageCategory} from 'src/script/message/MessageCategory';
 import {UserGenerator} from '../../helper/UserGenerator';
 

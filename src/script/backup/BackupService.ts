@@ -17,11 +17,18 @@
  *
  */
 
+import Dexie from 'dexie';
 import DexieBatch from 'dexie-batch';
-import {StorageSchemata} from '../storage/StorageSchemata';
-import {getLogger} from 'Util/Logger';
+
+import {Logger, getLogger} from 'Util/Logger';
+
+import {StorageSchemata, StorageService} from '../storage';
 
 export class BackupService {
+  private readonly logger: Logger;
+  private readonly storageService: StorageService;
+
+  // tslint:disable-next-line:typedef
   static get CONFIG() {
     return {
       BATCH_SIZE: 10000,
@@ -29,14 +36,12 @@ export class BackupService {
     };
   }
 
-  constructor(storageService) {
+  constructor(storageService: StorageService) {
     this.logger = getLogger('BackupService');
     this.storageService = storageService;
-
-    this.EVENTS_STORE_NAME = StorageSchemata.OBJECT_STORE.EVENTS;
   }
 
-  exportTable(table, onProgress) {
+  public exportTable(table: Dexie.Table<any, string>, onProgress: (batch: any[]) => void): Dexie.Promise<void> {
     const collection = table.toCollection();
     return table
       .count()
@@ -45,26 +50,26 @@ export class BackupService {
       .then(count => this.logger.log(`Exported store '${table.name}' in '${count}' batches`));
   }
 
-  getDatabaseVersion() {
+  public getDatabaseVersion(): number {
     if (this.storageService.db) {
       return this.storageService.db.verno;
     }
     return 1;
   }
 
-  getHistoryCount() {
+  public getHistoryCount(): Promise<number> {
     return Promise.all(this.getTables().map(table => table.count())).then(recordsPerTable => {
       return recordsPerTable.reduce((accumulator, recordCount) => accumulator + recordCount, 0);
     });
   }
 
-  getTables() {
+  public getTables(): Dexie.Table<any, string>[] {
     return this.storageService.getTables(BackupService.CONFIG.SUPPORTED_TABLES);
   }
 
-  async importEntities(tableName, entities) {
+  async importEntities(tableName: string, entities: any[]): Promise<void> {
     // We don't want to set the primaryKey for the events table
-    const isEventsTable = tableName === this.EVENTS_STORE_NAME;
+    const isEventsTable = tableName === StorageSchemata.OBJECT_STORE.EVENTS;
     const primaryKeys = isEventsTable ? undefined : entities.map(entity => entity.id);
     if (this.storageService.db) {
       await this.storageService.db.table(tableName).bulkPut(entities, primaryKeys);

@@ -375,7 +375,7 @@ export class ConversationMapper {
         updates.receipt_mode = localConversationData.receipt_mode;
       }
 
-      const mergedConversation = Object.assign({}, localConversationData, updates);
+      const mergedConversation = {...localConversationData, ...updates};
 
       const isGroup = type === ConversationType.GROUP;
       const noOthers = !mergedConversation.others || !mergedConversation.others.length;

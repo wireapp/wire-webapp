@@ -23,13 +23,10 @@ const fs = require('fs-extra');
 const authTranslations = require('../temp/i18n/src/script/strings');
 const webappTranslations = require('../resource/translation/en-US.json');
 
-const normalizedAuthTranslations = authTranslations.reduce(
-  (accumulator, object) => ({
-    ...accumulator,
-    [object.id]: object.defaultMessage,
-  }),
-  {},
-);
+const normalizedAuthTranslations = authTranslations.reduce((accumulator, object) => {
+  accumulator[object.id] = object.defaultMessage;
+  return accumulator;
+}, {});
 
 const mergedTranslations = {...webappTranslations, ...normalizedAuthTranslations};
 

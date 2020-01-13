@@ -19,19 +19,22 @@
  *
  */
 
-//@ts-check
+import {execSync} from 'child_process';
+import logdown from 'logdown';
+import moment from 'moment';
+import path from 'path';
+import readline from 'readline';
 
-const {execSync} = require('child_process');
-const logdown = require('logdown');
-const moment = require('moment');
-const path = require('path');
+const input = readline.createInterface(process.stdin, process.stdout);
 
 const currentDate = moment().format('YYYY-MM-DD');
 const filename = path.basename(__filename);
 const firstArgument = process.argv[2];
-const commitId = process.argv[3];
 const usageText = `Usage: ${filename} [-h|--help] <staging|production> <commitId>`;
+let commitId = process.argv[3];
 let target = '';
+let commitMessage = '';
+let branch = '';
 
 const logger = logdown(filename, {
   logger: console,
@@ -40,10 +43,10 @@ const logger = logdown(filename, {
 logger.state.isEnabled = true;
 
 /**
- * @param {string} command - The command to execute
- * @returns {string} The standard output
+ * @param command The command to execute
+ * @returns The standard output
  */
-const exec = command =>
+const exec = (command: string): string =>
   execSync(command, {stdio: 'pipe'})
     .toString()
     .trim();
@@ -54,26 +57,30 @@ switch (firstArgument) {
     logger.info(usageText);
     process.exit();
   }
-  case 'production':
+  case 'production': {
+    branch = 'master';
+    target = firstArgument;
+    break;
+  }
   case 'staging': {
+    branch = 'dev';
     target = firstArgument;
     break;
   }
   default: {
-    logger.error(`No or invalid target specified. Valid targets are: staging, production`);
+    logger.error('No or invalid target specified. Valid targets are: staging, production');
     logger.info(usageText);
     process.exit(1);
   }
 }
 
 if (!commitId) {
-  logger.error(`No commit ID specified`);
-  logger.info(usageText);
-  process.exit(1);
+  logger.info(`No commit ID specified. Will use latest commit from branch "${branch}".`);
+  commitId = exec(`git rev-parse ${branch}`);
 }
 
 try {
-  exec(`git show ${commitId}`);
+  commitMessage = exec(`git show -s --format=%s ${commitId}`);
 } catch (error) {
   logger.error(error.message);
   process.exit(1);
@@ -81,14 +88,10 @@ try {
 
 const origin = exec('git remote');
 
-logger.log(`Fetching base "${origin}" ...`);
+logger.info(`Fetching base "${origin}" ...`);
 exec(`git fetch ${origin}`);
 
-/**
- * @param {number} index - The tag name index
- * @returns {string} The new tag name
- */
-const createTagName = (index = 0) => {
+const createTagName = (index: number = 0): string => {
   const newTagName = `${currentDate}-${target}.${index}`;
   const tagExists = !!exec(`git tag -l ${newTagName}`);
   return tagExists ? createTagName(++index) : newTagName;
@@ -96,10 +99,28 @@ const createTagName = (index = 0) => {
 
 const tagName = createTagName();
 
-logger.log(`Creating tag "${tagName}" ...`);
-exec(`git tag ${tagName} ${commitId}`);
+const ask = (questionToAsk: string, callback: (answer: string) => void): void => {
+  input.question(questionToAsk, (answer: string) => {
+    if (/^(yes|no)$/.test(answer)) {
+      callback(answer);
+    } else {
+      ask('⚠️  Please enter yes or no: ', callback);
+    }
+  });
+};
 
-logger.log(`Pushing "${tagName}" to "${origin}" ...`);
-exec(`git push ${origin} ${tagName}`);
+ask(`ℹ️  The commit "${commitMessage}" will be released with tag "${tagName}". Continue? [yes/no] `, (answer: string) => {
+  if (answer === 'yes') {
+    logger.info(`Creating tag "${tagName}" ...`);
+    exec(`git tag ${tagName} ${commitId}`);
 
-logger.log('Done.');
+    logger.info(`Pushing "${tagName}" to "${origin}" ...`);
+    exec(`git push ${origin} ${tagName}`);
+
+    logger.info('Done.');
+  } else {
+    logger.info('Aborting.');
+  }
+
+  process.exit();
+});

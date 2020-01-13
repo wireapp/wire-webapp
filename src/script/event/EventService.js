@@ -367,7 +367,7 @@ export class EventService {
         throw error;
       }
 
-      const identifiedUpdates = Object.assign({}, updates, {primary_key: key});
+      const identifiedUpdates = {...updates, primary_key: key};
       return this.replaceEvent(identifiedUpdates);
     });
   }
