@@ -99,11 +99,9 @@ export class AppLockViewModel {
     ko.applyBindings(this, document.getElementById('applock'));
 
     this.isVisible.subscribe(isVisible => {
-      (<HTMLDivElement>document.querySelector('#app')).style.setProperty(
-        'filter',
-        isVisible ? 'blur(100px)' : '',
-        'important',
-      );
+      (document as HTMLDivElement)
+        .querySelector('#app')
+        .style.setProperty('filter', isVisible ? 'blur(100px)' : '', 'important');
     });
 
     this.unfocusTimeout = Config.FEATURE.APPLOCK_UNFOCUS_TIMEOUT * 1000;
@@ -233,7 +231,7 @@ export class AppLockViewModel {
   };
 
   onUnlock = async (form: HTMLFormElement) => {
-    const enteredCode = (<HTMLInputElement>form[0]).value;
+    const enteredCode = (form[0] as HTMLInputElement).value;
     const hashedCode = this.getStored();
     await sodium.ready;
     if (sodium.crypto_pwhash_str_verify(hashedCode, enteredCode)) {
@@ -266,7 +264,7 @@ export class AppLockViewModel {
 
   onWipeDatabase = async (form: HTMLFormElement) => {
     this.stopObserver();
-    const password = (<HTMLInputElement>form[0]).value;
+    const password = (form[0] as HTMLInputElement).value;
     try {
       this.isLoading(true);
       const currentClientId = this.clientRepository.currentClient().id;

@@ -54,13 +54,14 @@
         "project": ["./tsconfig.json", "./server/tsconfig.json"]
       },
       "rules": {
-        "@typescript-eslint/typedef": "off",
         "@typescript-eslint/no-floating-promises": "off",
-        "no-unsanitized/property": "off",
-        "valid-jsdoc": "off",
-        "no-unused-vars": "off",
+        "@typescript-eslint/typedef": "off",
         "no-dupe-class-members": "off",
-        "prefer-promise-reject-errors": "off"
+        "no-undef": "off",
+        "no-unsanitized/property": "off",
+        "no-unused-vars": "off",
+        "prefer-promise-reject-errors": "off",
+        "valid-jsdoc": "off"
       }
     }
   ],
