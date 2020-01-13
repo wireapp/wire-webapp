@@ -215,7 +215,7 @@ export class ConnectionRepository {
     try {
       const connectionData = await this.connectionService.getConnections();
       const newConnectionEntities = this.connectionMapper.mapConnectionsFromJson(connectionData);
-      return this.updateConnections(newConnectionEntities);
+      return newConnectionEntities.length ? this.updateConnections(newConnectionEntities) : this.connectionEntities();
     } catch (error) {
       this.logger.error(`Failed to retrieve connections from backend: ${error.message}`, error);
       throw error;
