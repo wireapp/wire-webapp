@@ -1684,10 +1684,10 @@
   resolved "https://registry.yarnpkg.com/@wireapp/antiscroll-2/-/antiscroll-2-1.0.2.tgz#71a78d294ee0c88f42d50477ab61fa39272f5bca"
   integrity sha512-9KeB3yh9k01PjpuuRQsve4yY3+OVS2/hp9j+N13Is5wYCZRkUzZVCs8w9CyA/C6J5o9ukH0EzT7uurysWuhn/A==
 
-"@wireapp/api-client@9.8.0":
-  version "9.8.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-9.8.0.tgz#61365f6f73d257a6688580d9530169dea180b9c8"
-  integrity sha512-the6SM0m9HoXhhgDFx4AKNVs8DRUBt41BAdpcVhwuJ0tDELWVWN8QcX7cq4lzMfbRVuBkujicvjppFMCa7uqYg==
+"@wireapp/api-client@9.15.0":
+  version "9.15.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-9.15.0.tgz#105f311de9fb1f77348ce56125618800c76aac14"
+  integrity sha512-VdgB/MAQmWwrTnrAxiFUK6GeAWYXDEY/Ql2K/1ZOFgW8RREq79fxHb2uAKHr1bmdzA4FPiQZXxGnYHQqcDNdFA==
   dependencies:
     "@types/node" "~12"
     "@types/spark-md5" "3.0.2"
@@ -1696,7 +1696,7 @@
     "@wireapp/priority-queue" "1.4.0"
     axios "0.19.1"
     logdown "3.3.0"
-    reconnecting-websocket wireapp/reconnecting-websocket#96ac796ae8c7a7d9d857f46ed39dbedd7b9ad378
+    reconnecting-websocket "github:wireapp/reconnecting-websocket#96ac796ae8c7a7d9d857f46ed39dbedd7b9ad378"
     spark-md5 "3.0.0"
     tough-cookie "3.0.1"
     ws "7.2.1"
@@ -1739,14 +1739,14 @@
     logdown "3.3.0"
     rimraf "3.0.0"
 
-"@wireapp/core@15.2.4":
-  version "15.2.4"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-15.2.4.tgz#4900d73b4ef002630b4d0df1a57a901237044a98"
-  integrity sha512-xJYt37KygqUl8h4mL4WhUJTb+NBz2sbu7hz1/B7NMekUITyDxfVLPqZGM1VDbL7+vHJy28woKf16otzYdgCfjA==
+"@wireapp/core@15.2.13":
+  version "15.2.13"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-15.2.13.tgz#5fe66e71c1c44dca0a38dd2d319d64922d521f15"
+  integrity sha512-kl7Z5bYl0wSNFQrjlyBMejq8R3ZhXt7kW2qqHOhXSWS7ZJCMb7/0/3QmMI9IQ+YNdgfOEPlzEkGoQd+VXuq49Q==
   dependencies:
     "@types/long" "4.0.0"
     "@types/node" "~12"
-    "@wireapp/api-client" "9.8.0"
+    "@wireapp/api-client" "9.15.0"
     "@wireapp/cryptobox" "12.1.0"
     "@wireapp/protocol-messaging" "1.24.2"
     "@wireapp/store-engine" "4.3.0"
