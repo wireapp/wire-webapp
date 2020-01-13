@@ -30,12 +30,12 @@ z.error.CallError = class CallError extends BaseError {
   static get MESSAGE() {
     return {
       MISTARGETED_MESSAGE: 'Message targeted at another client',
+      NOT_FOUND: 'No call for conversation ID found',
+      NOT_SUPPORTED: 'Calling is not supported',
       NO_CONVERSATION_ID: 'No conversation ID given',
       NO_DATA_CHANNEL: 'No established data channel for call',
       NO_REPLACEABLE_TRACK: 'No replaceable MediaStreamTrack found',
       NO_USER_ID: 'Missing user ID to target message',
-      NOT_FOUND: 'No call for conversation ID found',
-      NOT_SUPPORTED: 'Calling is not supported',
       RTP_SENDER_NOT_SUPPORTED: 'PeerConnection does not support RtcRtpSender extension',
       UNSUPPORTED_VERSION: 'Unsupported version of the call protocol',
       WRONG_CONVERSATION_TYPE: 'Wrong conversation type for call message',
@@ -48,12 +48,12 @@ z.error.CallError = class CallError extends BaseError {
   static get TYPE() {
     return {
       MISTARGETED_MESSAGE: 'MISTARGETED_MESSAGE',
+      NOT_FOUND: 'NOT_FOUND',
+      NOT_SUPPORTED: 'NOT_SUPPORTED',
       NO_CONVERSATION_ID: 'NO_CONVERSATION_ID',
       NO_DATA_CHANNEL: 'NO_DATA_CHANNEL',
       NO_REPLACEABLE_TRACK: 'NO_REPLACEABLE_TRACK',
       NO_USER_ID: 'NO_USER_ID',
-      NOT_FOUND: 'NOT_FOUND',
-      NOT_SUPPORTED: 'NOT_SUPPORTED',
       RTP_SENDER_NOT_SUPPORTED: 'RTP_SENDER_NOT_SUPPORTED',
       UNSUPPORTED_VERSION: 'UNSUPPORTED_VERSION',
       WRONG_CONVERSATION_TYPE: 'WRONG_CONVERSATION_TYPE',
