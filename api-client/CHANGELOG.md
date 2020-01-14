@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.15.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.15.1...@wireapp/api-client@9.15.2) (2020-01-14)
+
+
+### Bug Fixes
+
+* **api-client:** putAccess URL ([#2744](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2744)) ([3533f95](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/3533f95fb141450a04f81e5c281571722de9bc97))
+
+
+
+
+
 ## [9.15.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.15.0...@wireapp/api-client@9.15.1) (2020-01-12)
 
 **Note:** Version bump only for package @wireapp/api-client
