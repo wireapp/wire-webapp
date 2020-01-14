@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.16.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.15.2...@wireapp/api-client@9.16.0) (2020-01-14)
+
+
+### Features
+
+* **api-client:** Add getRichInfo endpoint ([#2745](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2745)) ([b71bdbc](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/b71bdbc33678fe45e775b426e7b859912038013a))
+
+
+
+
+
 ## [9.15.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.15.1...@wireapp/api-client@9.15.2) (2020-01-14)
 
 
