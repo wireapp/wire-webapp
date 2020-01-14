@@ -24,8 +24,8 @@ import {container} from 'tsyringe';
 import {t} from 'Util/LocalizerUtil';
 import {noop} from 'Util/util';
 
-import {APIClientSingleton} from 'src/script/service/APIClientSingleton';
 import {User} from '../../entity/User';
+import {APIClientSingleton} from '../../service/APIClientSingleton';
 import {RichProfileRepository} from '../../user/RichProfileRepository';
 
 interface ComponentParams {
