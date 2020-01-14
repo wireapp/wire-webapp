@@ -518,7 +518,7 @@ export class ConversationAPI {
     const config: AxiosRequestConfig = {
       data: accessData,
       method: 'put',
-      url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.NAME}`,
+      url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.ACCESS}`,
     };
 
     const response = await this.client.sendJSON<ConversationAccessUpdateEvent>(config);
