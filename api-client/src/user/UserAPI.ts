@@ -37,6 +37,7 @@ import {
   UserPreKeyBundleMap,
   VerifyDelete,
 } from '../user/';
+import {RichInfo} from './RichInfo';
 
 export class UserAPI {
   public static readonly DEFAULT_USERS_CHUNK_SIZE = 50;
@@ -50,6 +51,7 @@ export class UserAPI {
     PASSWORDRESET: '/password-reset',
     PRE_KEYS: 'prekeys',
     PROPERTIES: '/properties',
+    RICH_INFO: 'rich-info',
     SEARCH: '/search',
     SEND: 'send',
     USERS: '/users',
@@ -461,5 +463,20 @@ export class UserAPI {
     };
 
     await this.client.sendJSON(config);
+  }
+
+  /**
+   * Get rich info of a user
+   * @param userId The user ID
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getRichInfo
+   */
+  public async getRichInfo(userId: string): Promise<RichInfo> {
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      url: `${UserAPI.URL.USERS}/${userId}/${UserAPI.URL.RICH_INFO}`,
+    };
+
+    const response = await this.client.sendJSON<RichInfo>(config);
+    return response.data;
   }
 }
