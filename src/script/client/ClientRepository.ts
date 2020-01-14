@@ -132,7 +132,8 @@ export class ClientRepository {
    * @returns Resolves with the retrieved client information
    */
   getClientByIdFromBackend(clientId: string): Promise<RegisteredClient> {
-    return this.clientService.getClientById(clientId).catch(error => {
+    return this.clientService.getClientById(clientId).catch(axiosError => {
+      const error = axiosError.response?.data || axiosError;
       const clientNotFoundBackend = error.code === BackendClientError.STATUS_CODE.NOT_FOUND;
       if (clientNotFoundBackend) {
         this.logger.warn(`Local client '${clientId}' no longer exists on the backend`, error);
