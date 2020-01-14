@@ -19,13 +19,18 @@
  *
  */
 
-//@ts-check
+import {APIClient} from '@wireapp/api-client';
+import {ClientType} from '@wireapp/api-client/dist/client';
+import {Account} from '@wireapp/core';
+import {execSync} from 'child_process';
+import logdown from 'logdown';
+import moment from 'moment';
+import path from 'path';
+import readline from 'readline';
 
-const {execSync} = require('child_process');
-const logdown = require('logdown');
-const moment = require('moment');
-const path = require('path');
-const readline = require('readline').createInterface(process.stdin, process.stdout);
+require('dotenv').config();
+
+const input = readline.createInterface(process.stdin, process.stdout);
 
 const currentDate = moment().format('YYYY-MM-DD');
 const filename = path.basename(__filename);
@@ -43,10 +48,10 @@ const logger = logdown(filename, {
 logger.state.isEnabled = true;
 
 /**
- * @param {string} command - The command to execute
- * @returns {string} The standard output
+ * @param command The command to execute
+ * @returns The standard output
  */
-const exec = command =>
+const exec = (command: string): string =>
   execSync(command, {stdio: 'pipe'})
     .toString()
     .trim();
@@ -91,11 +96,7 @@ const origin = exec('git remote');
 logger.info(`Fetching base "${origin}" ...`);
 exec(`git fetch ${origin}`);
 
-/**
- * @param {number} index - The tag name index
- * @returns {string} The new tag name
- */
-const createTagName = (index = 0) => {
+const createTagName = (index: number = 0): string => {
   const newTagName = `${currentDate}-${target}.${index}`;
   const tagExists = !!exec(`git tag -l ${newTagName}`);
   return tagExists ? createTagName(++index) : newTagName;
@@ -103,20 +104,8 @@ const createTagName = (index = 0) => {
 
 const tagName = createTagName();
 
-/**
- * Callback for returning the answer.
- *
- * @callback AnswerCallback
- * @param {string} answer - The answer.
- */
-
-/**
- * @param {string} query - The question to ask
- * @param {AnswerCallback} callback - The callback to call
- * @returns {void} Nothing
- */
-const ask = (query, callback) => {
-  readline.question(query, answer => {
+const ask = (questionToAsk: string, callback: (answer: string) => void): void => {
+  input.question(questionToAsk, (answer: string) => {
     if (/^(yes|no)$/.test(answer)) {
       callback(answer);
     } else {
@@ -125,13 +114,35 @@ const ask = (query, callback) => {
   });
 };
 
-ask(`ℹ️  The commit "${commitMessage}" will be released with tag "${tagName}". Continue? [yes/no] `, answer => {
+const announceRelease = async (tagName: string, commitId: string): Promise<void> => {
+  const {WIRE_EMAIL, WIRE_PASSWORD, WIRE_CONVERSATION} = process.env;
+  if (WIRE_EMAIL && WIRE_PASSWORD && WIRE_CONVERSATION) {
+    const apiClient = new APIClient({urls: APIClient.BACKEND.PRODUCTION});
+    const account = new Account(apiClient);
+    await account.login({
+      clientType: ClientType.TEMPORARY,
+      email: WIRE_EMAIL,
+      password: WIRE_PASSWORD,
+    });
+    const message = `Released tag "${tagName}" based on commit ID "${commitId}".`;
+    const payload = account.service.conversation.messageBuilder.createText(WIRE_CONVERSATION, message).build();
+    await account.service.conversation.send(payload);
+  }
+};
+
+ask(`ℹ️  The commit "${commitMessage}" will be released with tag "${tagName}". Continue? [yes/no] `, async (answer: string) => {
   if (answer === 'yes') {
     logger.info(`Creating tag "${tagName}" ...`);
     exec(`git tag ${tagName} ${commitId}`);
 
     logger.info(`Pushing "${tagName}" to "${origin}" ...`);
     exec(`git push ${origin} ${tagName}`);
+
+    try {
+      await announceRelease(tagName, commitId);
+    } catch (error) {
+      logger.error(error);
+    }
 
     logger.info('Done.');
   } else {
