@@ -27,7 +27,7 @@ interface Params {
   disabled: ko.Subscribable<boolean>;
 
   // TODO: replace with proper Type once they are defined
-  asset: {meta: {loudness: number[]}};
+  asset: any;
 }
 
 class AudioSeekBarComponent {
