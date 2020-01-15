@@ -2674,7 +2674,8 @@ export class ConversationRepository {
     const sender = this.client_repository.currentClient().id;
     try {
       await this.conversation_service.post_encrypted_message(conversationEntity.id, {recipients: {}, sender});
-    } catch (error) {
+    } catch (axiosError) {
+      const error = axiosError.response?.data || axiosError;
       if (error.missing) {
         const remoteUserClients = error.missing;
         const localUserClients = await this.create_recipients(conversationEntity.id);
