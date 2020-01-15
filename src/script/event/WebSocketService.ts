@@ -62,7 +62,8 @@ export class WebSocketService {
     return CHANGE_TRIGGER;
   }
 
-  static get CONFIG(): {PING_INTERVAL: number; RECONNECT_INTERVAL: number} {
+  // tslint:disable-next-line:typedef
+  static get CONFIG() {
     return {
       PING_INTERVAL: TIME_IN_MILLIS.SECOND * 5,
       RECONNECT_INTERVAL: TIME_IN_MILLIS.SECOND * 15,
@@ -200,7 +201,7 @@ export class WebSocketService {
    * @param reconnect Re-establish the WebSocket connection
    */
   reset(trigger: CHANGE_TRIGGER, reconnect: boolean = false): void {
-    if (this.socket && this.socket.onclose) {
+    if (this.socket?.onclose) {
       this.logger.info(`WebSocket reset triggered by '${trigger}'`);
       this.socket.onerror = undefined;
       this.socket.onclose = undefined;

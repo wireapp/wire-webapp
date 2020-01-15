@@ -25,13 +25,16 @@ export interface ConversationState {
   fetching: boolean;
 }
 
-export const initialState: ConversationState = {
+export const initialConversationState: ConversationState = {
   error: null,
   fetched: false,
   fetching: false,
 };
 
-export function conversationReducer(state: ConversationState = initialState, action: AppActions): ConversationState {
+export function conversationReducer(
+  state: ConversationState = initialConversationState,
+  action: AppActions,
+): ConversationState {
   switch (action.type) {
     case CONVERSATION_ACTION.CONVERSATION_CODE_CHECK_START:
     case CONVERSATION_ACTION.CONVERSATION_CODE_JOIN_START: {

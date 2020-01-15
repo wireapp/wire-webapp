@@ -22,7 +22,8 @@ import {BackendClient} from '../service/BackendClient';
 class PropertiesService {
   private readonly backendClient: BackendClient;
 
-  static get CONFIG(): {URL_PROPERTIES: string} {
+  // tslint:disable-next-line:typedef
+  static get CONFIG() {
     return {
       URL_PROPERTIES: '/properties',
     };
@@ -69,7 +70,7 @@ class PropertiesService {
     });
   }
 
-  putPropertiesByKey(key: string, properties: {} | boolean): Promise<void> {
+  putPropertiesByKey<T extends Record<string, any>>(key: keyof T, properties: T): Promise<void> {
     return this.backendClient.sendJson({
       data: properties,
       type: 'PUT',

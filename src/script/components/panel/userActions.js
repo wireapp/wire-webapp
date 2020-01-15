@@ -41,9 +41,16 @@ export const Actions = {
 
 ko.components.register('user-actions', {
   template: '<panel-actions params="items: items()"></panel-actions>',
-  viewModel: function({user, conversation = () => false, actionsViewModel, onAction = noop, isSelfActivated}) {
+  viewModel: function({
+    user,
+    conversation = () => null,
+    actionsViewModel,
+    onAction = noop,
+    isSelfActivated,
+    conversationRoleRepository,
+  }) {
     isSelfActivated = ko.unwrap(isSelfActivated);
-    const isMe = ko.computed(() => user() && user().is_me);
+    const isMe = ko.computed(() => user()?.is_me);
     const isNotMe = ko.computed(() => !isMe() && isSelfActivated);
 
     const allItems = [
@@ -66,9 +73,9 @@ ko.components.register('user-actions', {
           return (
             isMe() &&
             isSelfActivated &&
-            conversation() &&
-            conversation().isGroup() &&
-            !conversation().removed_from_conversation()
+            conversation()?.isGroup() &&
+            !conversation().removed_from_conversation() &&
+            conversationRoleRepository.canLeaveGroup(conversation())
           );
         },
         item: {
@@ -155,17 +162,14 @@ ko.components.register('user-actions', {
       },
       {
         // remove user from conversation
-        condition: () => {
-          return (
-            isNotMe() &&
-            conversation() &&
-            conversation().isActiveParticipant() &&
-            conversation()
-              .participating_user_ids()
-              .some(id => user().id === id) &&
-            z.userPermission().canUpdateGroupParticipants()
-          );
-        },
+        condition: () =>
+          isNotMe() &&
+          conversation() &&
+          !conversation().removed_from_conversation() &&
+          conversation()
+            .participating_user_ids()
+            .some(id => user().id === id) &&
+          conversationRoleRepository.canRemoveParticipants(conversation()),
         item: {
           click: () =>
             actionsViewModel.removeFromConversation(conversation(), user()).then(() => onAction(Actions.REMOVE)),

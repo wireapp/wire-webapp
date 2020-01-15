@@ -37,9 +37,7 @@ import {
   Text,
 } from '@wireapp/protocol-messaging';
 import {flatten} from 'underscore';
-
-import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
-import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
+import {ConnectionStatus} from '@wireapp/api-client/dist/connection';
 
 import {getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -52,6 +50,9 @@ import {capitalizeFirstChar, compareTransliteration, sortByPriority, startsWith}
 
 import {AssetUploadFailedReason} from '../assets/AssetUploadFailedReason';
 import {encryptAesAsset} from '../assets/AssetCrypto';
+
+import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
+import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 
 import {ClientEvent} from '../event/Client';
 import {EventTypeHandling} from '../event/EventTypeHandling';
@@ -81,7 +82,6 @@ import {ConversationEphemeralHandler} from './ConversationEphemeralHandler';
 import {ClientMismatchHandler} from './ClientMismatchHandler';
 import {ConversationLabelRepository} from './ConversationLabelRepository';
 
-import {ConnectionStatus} from '../connection/ConnectionStatus';
 import {buildMetadata, isVideo, isImage, isAudio} from '../assets/AssetMetaDataBuilder';
 import {AssetTransferState} from '../assets/AssetTransferState';
 import {AssetRemoteData} from '../assets/AssetRemoteData';
@@ -103,6 +103,8 @@ import {BackendClientError} from '../error/BackendClientError';
 import {showLegalHoldWarning} from '../legal-hold/LegalHoldWarning';
 import * as LegalHoldEvaluator from '../legal-hold/LegalHoldEvaluator';
 import {DeleteConversationMessage} from '../entity/message/DeleteConversationMessage';
+import {ConversationRoleRepository} from './ConversationRoleRepository';
+import {DefaultRole} from './ConversationRoleRepository';
 
 // Conversation repository for all conversation interactions with the conversation service
 export class ConversationRepository {
@@ -138,7 +140,7 @@ export class ConversationRepository {
    * @param {LinkPreviewRepository} link_repository - Repository for link previews
    * @param {MessageSender} messageSender - Message sending queue handler
    * @param {serverTimeHandler} serverTimeHandler - Handles time shift between server and client
-   * @param {TeamRepository} team_repository - Repository for teams
+   * @param {TeamRepository} teamRepository - Repository for teams
    * @param {UserRepository} user_repository - Repository for all user interactions
    * @param {PropertiesRepository} propertyRepository - Repository that stores all account preferences
    * @param {AssetUploader} assetUploader - Manages uploading assets and keeping track of current uploads
@@ -154,7 +156,7 @@ export class ConversationRepository {
     link_repository,
     messageSender,
     serverTimeHandler,
-    team_repository,
+    teamRepository,
     user_repository,
     propertyRepository,
     assetUploader,
@@ -169,7 +171,7 @@ export class ConversationRepository {
     this.giphy_repository = giphy_repository;
     this.link_repository = link_repository;
     this.serverTimeHandler = serverTimeHandler;
-    this.team_repository = team_repository;
+    this.teamRepository = teamRepository;
     this.user_repository = user_repository;
     this.propertyRepository = propertyRepository;
     this.assetUploader = assetUploader;
@@ -193,10 +195,10 @@ export class ConversationRepository {
     this.active_conversation = ko.observable();
     this.conversations = ko.observableArray([]);
 
-    this.isTeam = this.team_repository.isTeam;
+    this.isTeam = this.teamRepository.isTeam;
     this.isTeam.subscribe(() => this.map_guest_status_self());
-    this.team = this.team_repository.team;
-    this.teamMembers = this.team_repository.teamMembers;
+    this.team = this.teamRepository.team;
+    this.teamMembers = this.teamRepository.teamMembers;
 
     this.selfUser = this.user_repository.self;
 
@@ -256,7 +258,7 @@ export class ConversationRepository {
     });
 
     this.connectedUsers = ko.pureComputed(() => {
-      const inviterId = this.team_repository.memberInviters()[this.selfUser().id];
+      const inviterId = this.teamRepository.memberInviters()[this.selfUser().id];
       const inviter = inviterId ? this.user_repository.users().find(({id}) => id === inviterId) : null;
       const connectedUsers = inviter ? [inviter] : [];
       for (const conversation of this.conversations()) {
@@ -276,6 +278,8 @@ export class ConversationRepository {
       this.conversations_unarchived,
       propertyRepository.propertiesService,
     );
+
+    this.conversationRoleRepository = new ConversationRoleRepository(this);
   }
 
   checkMessageTimer(messageEntity) {
@@ -373,14 +377,12 @@ export class ConversationRepository {
    */
   createGroupConversation(userEntities, groupName, accessState, options) {
     const userIds = userEntities.map(userEntity => userEntity.id);
-    const payload = Object.assign(
-      {},
-      {
-        name: groupName,
-        users: userIds,
-      },
-      options,
-    );
+    let payload = {
+      conversation_role: DefaultRole.WIRE_MEMBER,
+      name: groupName,
+      users: userIds,
+      ...options,
+    };
 
     if (this.team().id) {
       payload.team = {
@@ -409,7 +411,7 @@ export class ConversationRepository {
         }
 
         if (accessPayload) {
-          Object.assign(payload, accessPayload);
+          payload = {...payload, ...accessPayload};
         }
       }
     }
@@ -870,7 +872,7 @@ export class ConversationRepository {
    */
   find_conversation_by_id(conversation_id) {
     // we prevent access to local conversation if the team is deleted
-    return this.team_repository.isTeamDeleted()
+    return this.teamRepository.isTeamDeleted()
       ? undefined
       : this.conversations().find(conversation => conversation.id === conversation_id);
   }
@@ -1140,7 +1142,10 @@ export class ConversationRepository {
       });
   }
 
-  async checkForDeletedConversations() {
+  /**
+   * @returns {Promise<void[]>} resolves when deleted conversations are locally deleted, too.
+   */
+  checkForDeletedConversations() {
     return Promise.all(
       this.conversations().map(async conversation => {
         try {
@@ -1173,7 +1178,6 @@ export class ConversationRepository {
    */
   mapConversations(payload, initialTimestamp = this.getLatestEventTimestamp()) {
     const conversationsData = payload.length ? payload : [payload];
-
     const entitites = this.conversationMapper.mapConversations(conversationsData, initialTimestamp);
     entitites.forEach(conversationEntity => {
       this._mapGuestStatusSelf(conversationEntity);
@@ -1462,6 +1466,9 @@ export class ConversationRepository {
    */
   removeMember(conversationEntity, userId) {
     return this.conversation_service.deleteMembers(conversationEntity.id, userId).then(response => {
+      const roles = conversationEntity.roles();
+      delete roles[userId];
+      conversationEntity.roles(roles);
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
       const event = !!response
         ? response
@@ -2045,10 +2052,9 @@ export class ConversationRepository {
    *
    * @param {EventInfoEntity} eventInfoEntity - Event info to be send
    * @param {string} conversationId - id of the conversation to send call message to
-   * @param {CallMessageEntity} callMessageEntity - Content for call message
    * @returns {Promise} Resolves when the confirmation was sent
    */
-  sendCallingMessage(eventInfoEntity, conversationId, callMessageEntity) {
+  sendCallingMessage(eventInfoEntity, conversationId) {
     return this.messageSender.queueMessage(() => {
       const options = eventInfoEntity.options;
       const recipientsPromise = options.recipients
@@ -3092,7 +3098,7 @@ export class ConversationRepository {
     }
 
     const {conversation, data: eventData, type} = eventJson;
-    const conversationId = (eventData && eventData.conversationId) || conversation;
+    const conversationId = eventData?.conversationId || conversation;
     this.logger.info(`Handling event '${type}' in conversation '${conversationId}' (Source: ${eventSource})`);
 
     const inSelfConversation = conversationId === this.self_conversation() && this.self_conversation().id;
@@ -3498,39 +3504,43 @@ export class ConversationRepository {
     }
   }
 
-  _onGroupCreation(conversationEntity, eventJson) {
-    return this.event_mapper
-      .mapJsonEvent(eventJson, conversationEntity)
-      .then(messageEntity => {
-        const creatorId = conversationEntity.creator;
-        const createdByParticipant = !!conversationEntity.participating_user_ids().find(userId => userId === creatorId);
-        const createdBySelfUser = conversationEntity.isCreatedBySelf();
+  async _onGroupCreation(conversationEntity, eventJson) {
+    const messageEntity = await this.event_mapper.mapJsonEvent(eventJson, conversationEntity);
+    const creatorId = conversationEntity.creator;
+    const createdByParticipant = !!conversationEntity.participating_user_ids().find(userId => userId === creatorId);
+    const createdBySelfUser = conversationEntity.isCreatedBySelf();
 
-        const creatorIsParticipant = createdByParticipant || createdBySelfUser;
-        if (!creatorIsParticipant) {
-          messageEntity.memberMessageType = SystemMessageType.CONVERSATION_RESUME;
-        }
+    const creatorIsParticipant = createdByParticipant || createdBySelfUser;
 
-        return this._updateMessageUserEntities(messageEntity);
-      })
-      .then(messageEntity => {
-        if (conversationEntity && messageEntity) {
-          conversationEntity.add_message(messageEntity);
-        }
+    const data = await this.conversation_service.get_conversation_by_id(conversationEntity.id);
+    const allMembers = [...data.members.others, data.members.self];
+    const conversationRoles = allMembers.reduce((roles, member) => {
+      roles[member.id] = member.conversation_role;
+      return roles;
+    }, {});
+    conversationEntity.roles(conversationRoles);
 
-        return {conversationEntity, messageEntity};
-      });
+    if (!creatorIsParticipant) {
+      messageEntity.memberMessageType = SystemMessageType.CONVERSATION_RESUME;
+    }
+
+    const updatedMessageEntity = await this._updateMessageUserEntities(messageEntity);
+    if (conversationEntity && updatedMessageEntity) {
+      conversationEntity.add_message(updatedMessageEntity);
+    }
+
+    return {conversationEntity, messageEntity: updatedMessageEntity};
   }
 
   /**
-   * User were added to a group conversation.
+   * Users were added to a group conversation.
    *
    * @private
    * @param {Conversation} conversationEntity - Conversation to add users to
    * @param {Object} eventJson - JSON data of 'conversation.member-join' event
    * @returns {Promise} Resolves when the event was handled
    */
-  _onMemberJoin(conversationEntity, eventJson) {
+  async _onMemberJoin(conversationEntity, eventJson) {
     // Ignore if we join a 1to1 conversation (accept a connection request)
     const connectionEntity = this.connectionRepository.getConnectionByConversationId(conversationEntity.id);
     const isPendingConnection = connectionEntity && connectionEntity.isIncomingRequest();
@@ -3552,6 +3562,7 @@ export class ConversationRepository {
     const selfUserRejoins = eventData.user_ids.includes(this.selfUser().id);
     if (selfUserRejoins) {
       conversationEntity.status(ConversationStatus.CURRENT_MEMBER);
+      await this.conversationRoleRepository.updateConversationRoles(conversationEntity);
     }
 
     const updateSequence = selfUserRejoins ? this.updateConversationFromBackend(conversationEntity) : Promise.resolve();
@@ -3625,6 +3636,18 @@ export class ConversationRepository {
    */
   _onMemberUpdate(conversationEntity, eventJson) {
     const {conversation: conversationId, data: eventData, from} = eventJson;
+
+    const isConversationRoleUpdate = !!eventData.conversation_role;
+    if (isConversationRoleUpdate) {
+      const {target: userId, conversation_role} = eventData;
+      const conversation = this.conversations().find(({id}) => id === conversationId);
+      if (conversation) {
+        const roles = conversation.roles();
+        roles[userId] = conversation_role;
+        conversation.roles(roles);
+      }
+      return;
+    }
 
     const isBackendEvent = eventData.otr_archived_ref || eventData.otr_muted_ref;
     const inSelfConversation = !this.self_conversation() || conversationId === this.self_conversation().id;
@@ -4175,7 +4198,7 @@ export class ConversationRepository {
     }
 
     if (actionType) {
-      const attributes = {
+      let attributes = {
         action: actionType,
         conversation_type: trackingHelpers.getConversationType(conversationEntity),
         ephemeral_time: isEphemeral ? messageTimer : undefined,
@@ -4187,7 +4210,7 @@ export class ConversationRepository {
 
       const isTeamConversation = !!conversationEntity.team_id;
       if (isTeamConversation) {
-        Object.assign(attributes, trackingHelpers.getGuestAttributes(conversationEntity));
+        attributes = {...attributes, ...trackingHelpers.getGuestAttributes(conversationEntity)};
       }
 
       amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CONTRIBUTED, attributes);

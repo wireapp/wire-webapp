@@ -117,7 +117,7 @@ const convertEventToError = (event: any): MediaError => {
   let error = event;
 
   // Chrome v60
-  if (event.path && event.path[0]) {
+  if (event.path?.[0]) {
     error = event.path[0].error;
   }
 
@@ -130,15 +130,15 @@ const convertEventToError = (event: any): MediaError => {
 };
 
 const isAudio = (file: File | Blob): boolean => {
-  return file && file.type.startsWith('audio');
+  return file?.type.startsWith('audio');
 };
 
 const isImage = (file: File | Blob): boolean => {
-  return file && file.type.startsWith('image');
+  return file?.type.startsWith('image');
 };
 
 const isVideo = (file: File | Blob): boolean => {
-  return file && file.type.startsWith('video');
+  return file?.type.startsWith('video');
 };
 
 const normaliseLoudness = (audioBuffer: AudioBuffer): Uint8Array => {

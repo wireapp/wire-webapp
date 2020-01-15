@@ -86,7 +86,6 @@ export class UserRepository {
   private readonly connected_users: ko.PureComputed<User[]>;
   private readonly isTeam: ko.Observable<boolean>;
   private readonly logger: Logger;
-  private readonly number_of_contacts: ko.PureComputed<number>;
   private readonly propertyRepository: PropertiesRepository;
   private readonly selfService: SelfService;
   private readonly teamMembers: ko.ObservableArray<User>;
@@ -99,6 +98,7 @@ export class UserRepository {
   readonly connect_requests: ko.PureComputed<User[]>;
   readonly isActivatedAccount: ko.PureComputed<boolean>;
   readonly isTemporaryGuest: ko.PureComputed<boolean>;
+  readonly number_of_contacts: ko.PureComputed<number>;
   readonly self: ko.Observable<User>;
 
   // tslint:disable-next-line:typedef
@@ -150,8 +150,8 @@ export class UserRepository {
       })
       .extend({rateLimit: TIME_IN_MILLIS.SECOND});
 
-    this.isActivatedAccount = ko.pureComputed(() => this.self() && !this.self().isTemporaryGuest());
-    this.isTemporaryGuest = ko.pureComputed(() => this.self() && this.self().isTemporaryGuest());
+    this.isActivatedAccount = ko.pureComputed(() => !this.self()?.isTemporaryGuest());
+    this.isTemporaryGuest = ko.pureComputed(() => this.self()?.isTemporaryGuest());
 
     this.isTeam = ko.observable();
     this.teamMembers = undefined;

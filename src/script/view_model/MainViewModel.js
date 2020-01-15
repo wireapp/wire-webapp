@@ -104,6 +104,10 @@ export class MainViewModel {
         return `main-accent-color-${this.selfUser().accent_id()} show`;
       }
     });
+
+    // Prevent Chrome (and Electron) from pushing the content out of the
+    // viewport when using form elements (e.g. in the preferences)
+    document.addEventListener('scroll', () => window.scrollTo(0, 0));
   }
 
   openPanel() {

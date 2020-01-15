@@ -16,11 +16,12 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+
 import hljs from 'highlightjs';
 import MarkdownIt from 'markdown-it';
 import Token from 'markdown-it/lib/token';
+import {escape} from 'underscore';
 
-import {escapeString} from './SanitizationUtil';
 import {replaceInRange} from './StringUtil';
 
 import {MentionEntity} from '../message/MentionEntity';
@@ -58,7 +59,7 @@ markdownit.renderer.rules.paragraph_open = (tokens, idx) => {
   const previousWithMap = tokens
     .slice(0, idx)
     .reverse()
-    .find(({map}) => map && map.length);
+    .find(({map}) => map?.length);
   const previousPosition = previousWithMap ? previousWithMap.map[1] - 1 : 0;
   const count = position - previousPosition;
   return '<br>'.repeat(count);
@@ -96,7 +97,7 @@ export const renderMessage = (message: string, selfId: string, mentionEntities: 
       : ` data-uie-name="label-other-mention" data-user-id="${mentionData.userId}"`;
 
     const mentionText = mentionData.text.replace(/^@/, '');
-    const content = `<span class="mention-at-sign">@</span>${escapeString(mentionText)}`;
+    const content = `<span class="mention-at-sign">@</span>${escape(mentionText)}`;
     return `<span class="message-mention${elementClasses}"${elementAttributes}>${content}</span>`;
   };
 
@@ -134,7 +135,7 @@ export const renderMessage = (message: string, selfId: string, mentionEntities: 
 
   markdownit.renderer.rules.link_open = (tokens, idx, options, env, self) => {
     const cleanString = (hashedString: string) =>
-      escapeString(
+      escape(
         Object.entries(mentionTexts).reduce(
           (text, [mentionHash, mention]) => text.replace(mentionHash, mention.text),
           hashedString,
@@ -145,7 +146,7 @@ export const renderMessage = (message: string, selfId: string, mentionEntities: 
     const isEmail = href.startsWith('mailto:');
     const isWireDeepLink = href.toLowerCase().startsWith('wire://');
     const nextToken = tokens[idx + 1];
-    const text = nextToken && nextToken.type === 'text' ? nextToken.content : '';
+    const text = nextToken?.type === 'text' ? nextToken.content : '';
 
     if (!href || !text.trim()) {
       nextToken.content = '';
@@ -166,7 +167,7 @@ export const renderMessage = (message: string, selfId: string, mentionEntities: 
         link.attrSet('title', cleanString(title));
       }
       link.attrSet('href', cleanString(href));
-      if (nextToken && nextToken.type === 'text') {
+      if (nextToken?.type === 'text') {
         nextToken.content = text;
       }
       link.attrPush(['data-md-link', 'true']);

@@ -81,7 +81,7 @@ export class ClientRepository {
     this.clients = ko.pureComputed(() => (this.selfUser() ? this.selfUser().devices() : []));
     this.currentClient = ko.observable();
 
-    this.isTemporaryClient = ko.pureComputed(() => this.currentClient() && this.currentClient().isTemporary());
+    this.isTemporaryClient = ko.pureComputed(() => this.currentClient()?.isTemporary());
 
     amplify.subscribe(WebAppEvents.LIFECYCLE.ASK_TO_CLEAR_DATA, this.logoutClient.bind(this));
     amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent.bind(this));
@@ -732,7 +732,7 @@ export class ClientRepository {
     }
     const localClients = await this.getClientsForSelf();
     const removedClient = localClients.find(client => client.id === clientId);
-    if (removedClient && removedClient.isLegalHold()) {
+    if (removedClient?.isLegalHold()) {
       amplify.publish(
         WebAppEvents.WARNING.MODAL,
         ModalsViewModel.TYPE.ACKNOWLEDGE,

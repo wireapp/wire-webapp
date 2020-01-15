@@ -183,7 +183,6 @@ export class ContentViewModel {
    * Opens the specified conversation.
    *
    * @note If the conversation_et is not defined, it will open the incoming connection requests instead
-   *  Conversation_et can also just be the conversation ID
    *
    * @param {Conversation|string} conversation - Conversation entity or conversation ID
    * @param {Object} options - State to open conversation in

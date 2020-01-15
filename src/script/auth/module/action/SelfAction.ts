@@ -29,13 +29,14 @@ const logger = getLogger('SelfAction');
 
 export class SelfAction {
   fetchSelf = (): ThunkAction<Promise<Self>> => {
-    return async (dispatch, getState, {apiClient}) => {
+    return async (dispatch, getState, {actions: {selfAction}, apiClient}) => {
       dispatch(SelfActionCreator.startFetchSelf());
       try {
         const selfUser = await apiClient.self.api.getSelf();
+        await dispatch(selfAction.doCheckPasswordState());
         const {teams} = await apiClient.teams.team.api.getTeams();
         const [boundTeam] = teams.filter(team => team.binding);
-        selfUser.team = boundTeam && boundTeam.id;
+        selfUser.team = boundTeam?.id;
         dispatch(SelfActionCreator.successfulFetchSelf(selfUser));
         return selfUser;
       } catch (error) {
@@ -116,9 +117,27 @@ export class SelfAction {
       dispatch(SelfActionCreator.startSetSelfEmail());
       try {
         await apiClient.self.api.putEmail({email});
-        dispatch(SelfActionCreator.successfulSetSelfEmail());
+        dispatch(SelfActionCreator.successfulSetSelfEmail(email));
       } catch (error) {
         dispatch(SelfActionCreator.failedSetSelfEmail(error));
+        throw error;
+      }
+    };
+  };
+
+  doCheckPasswordState = (): ThunkAction<Promise<boolean>> => {
+    return async (dispatch, getState, {apiClient}) => {
+      dispatch(SelfActionCreator.startSetPasswordState());
+      try {
+        await apiClient.self.api.headPassword();
+        dispatch(SelfActionCreator.successfulSetPasswordState({hasPassword: true}));
+        return true;
+      } catch (error) {
+        if (error.response?.status === 404) {
+          dispatch(SelfActionCreator.successfulSetPasswordState({hasPassword: false}));
+          return false;
+        }
+        dispatch(SelfActionCreator.failedSetPasswordState(error));
         throw error;
       }
     };

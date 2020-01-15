@@ -29,6 +29,7 @@ export class RenameMessage extends SystemMessage {
 
     this.type = BackendEvent.CONVERSATION.RENAME;
     this.system_message_type = SystemMessageType.CONVERSATION_RENAME;
+    this.name = '';
 
     this.caption = ko.pureComputed(() => (this.user().is_me ? t('conversationRenameYou') : t('conversationRename')));
   }

@@ -20,6 +20,17 @@
 import {BackendClient} from '../service/BackendClient';
 import {Logger, getLogger} from '../util/Logger';
 
+export interface RichInfo {
+  fields: RichField[];
+  /** Format version (the current version is 0) */
+  version: number;
+}
+
+export interface RichField {
+  type: string;
+  value: string;
+}
+
 export class RichProfileRepository {
   readonly logger: Logger;
   private readonly backendClient: BackendClient;
@@ -36,7 +47,7 @@ export class RichProfileRepository {
     this.logger = getLogger('RichProfileRepository');
   }
 
-  getUserRichProfile(userId: string): Promise<any> {
+  getUserRichProfile(userId: string): Promise<RichInfo> {
     return this.backendClient.sendRequest({
       type: 'GET',
       url: RichProfileRepository.URL.RICH_INFO.replace(':id', userId),

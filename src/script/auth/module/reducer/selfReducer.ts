@@ -26,20 +26,23 @@ export interface SelfState {
   fetched: boolean;
   fetching: boolean;
   self: Self;
+  hasPassword: boolean;
 }
 
-export const initialState: SelfState = {
+export const initialSelfState: SelfState = {
   consents: {},
   error: null,
   fetched: false,
   fetching: false,
+  hasPassword: false,
   self: {assets: [], id: null, locale: null, name: null, team: null},
 };
 
-export function selfReducer(state: SelfState = initialState, action: AppActions): SelfState {
+export function selfReducer(state: SelfState = initialSelfState, action: AppActions): SelfState {
   switch (action.type) {
     case SELF_ACTION.CONSENT_GET_START:
     case SELF_ACTION.HANDLE_SET_START:
+    case SELF_ACTION.SELF_SET_PASSWORD_STATE_START:
     case SELF_ACTION.SELF_FETCH_START: {
       return {
         ...state,
@@ -68,14 +71,26 @@ export function selfReducer(state: SelfState = initialState, action: AppActions)
     case SELF_ACTION.CONSENT_GET_SUCCESS: {
       return {
         ...state,
-        consents: action.payload.reduce(
-          (consentAccumulator, consent) => ({...consentAccumulator, [consent.type]: consent.value}),
-          {},
-        ),
-
+        consents: action.payload.reduce((consentAccumulator: Record<number, number>, consent) => {
+          consentAccumulator[consent.type] = consent.value;
+          return consentAccumulator;
+        }, {}),
         error: null,
         fetched: true,
         fetching: false,
+      };
+    }
+    case SELF_ACTION.SELF_SET_PASSWORD_STATE_SUCCESS: {
+      return {
+        ...state,
+        hasPassword: action.payload,
+      };
+    }
+    case SELF_ACTION.SELF_SET_PASSWORD_STATE_FAILED: {
+      return {
+        ...state,
+        error: action.error,
+        hasPassword: false,
       };
     }
     case SELF_ACTION.CONSENT_SET_SUCCESS: {

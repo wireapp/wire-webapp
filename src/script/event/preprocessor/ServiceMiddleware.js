@@ -80,7 +80,7 @@ export class ServiceMiddleware {
   }
 
   _decorateWithHasServiceFlag(event) {
-    const updatedData = Object.assign({}, event.data, {has_service: true});
-    return Object.assign({}, event, {data: updatedData});
+    const updatedData = {...event.data, has_service: true};
+    return {...event, data: updatedData};
   }
 }

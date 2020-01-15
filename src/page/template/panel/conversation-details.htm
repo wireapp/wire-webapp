@@ -1,9 +1,21 @@
-<div id="conversation-details" class="panel__page conversation-details" data-bind="with: $root.subViews[z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS]">
+<div
+  id="conversation-details"
+  class="panel__page conversation-details"
+  data-bind="with: $root.subViews[z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS]"
+>
   <!-- ko if: isVisible() -->
     <div class="panel__header panel__header--reverse">
-      <close-icon class="right-panel-close icon-button" data-bind="clickOrDrag: onClose" data-uie-name="do-close"></close-icon>
+      <close-icon
+        class="right-panel-close icon-button"
+        data-bind="clickOrDrag: onClose"
+        data-uie-name="do-close"
+      ></close-icon>
       <!-- ko if: showActionMute() -->
-        <mute-icon class="right-panel-mute icon-button" data-bind="clickOrDrag: clickToToggleMute, css: {'right-panel-mute--active': activeConversation() && activeConversation().showNotificationsNothing()}" data-uie-name="do-mute"></mute-icon>
+        <mute-icon
+          class="right-panel-mute icon-button"
+          data-bind="clickOrDrag: clickToToggleMute, css: {'right-panel-mute--active': activeConversation() && activeConversation().showNotificationsNothing()}"
+          data-uie-name="do-mute"
+        ></mute-icon>
       <!-- /ko -->
     </div>
     <div class="panel__content" data-bind="fadingscrollbar">
@@ -12,40 +24,56 @@
           <panel-service-details params="service: selectedService"></panel-service-details>
         <!-- /ko -->
         <!-- ko ifnot: isServiceMode() -->
-          <panel-user-details params="participant: firstParticipant, isVerified: isVerified, badge: teamRepository.getRoleBadge(firstParticipant().id)"></panel-user-details>
-          <!-- ko if: firstParticipant().isConnected() || firstParticipant().inTeam() -->
-            <div class="conversation-details__devices">
-              <div class="panel__action-item" data-bind="click: clickOnDevices" data-uie-name="go-devices">
-                <devices-icon class="panel__action-item__icon"></devices-icon>
-                <div class="panel__action-item__text" data-bind="text: t('conversationDetailsActionDevices')"></div>
-                <disclose-icon></disclose-icon>
+          <!-- ko if: firstParticipant() -->
+            <panel-user-details
+              params="participant: firstParticipant, isVerified: isVerified, badge: teamRepository.getRoleBadge(firstParticipant().id)"
+            ></panel-user-details>
+            <!-- ko if: firstParticipant().isConnected() || firstParticipant().inTeam() -->
+              <div class="conversation-details__devices">
+                <div class="panel__action-item" data-bind="click: clickOnDevices" data-uie-name="go-devices">
+                  <devices-icon class="panel__action-item__icon"></devices-icon>
+                  <div class="panel__action-item__text" data-bind="text: t('conversationDetailsActionDevices')"></div>
+                  <disclose-icon></disclose-icon>
+                </div>
               </div>
-            </div>
+            <!-- /ko -->
+            <enriched-fields params="user: firstParticipant"></enriched-fields>
           <!-- /ko -->
-          <enriched-fields params="user: firstParticipant"></enriched-fields>
         <!-- /ko -->
       <!-- /ko -->
 
       <!-- ko ifnot: isSingleUserMode(activeConversation()) -->
         <div class="conversation-details__header">
           <!-- ko if: isActiveGroupParticipant() -->
-            <div class="conversation-details__name" data-bind="visible: !isEditingName(), click: z.userPermission().canUpdateConversationSettings() ? clickToEditGroupName: undefined, attr: {title: t('tooltipConversationDetailsRename')}" data-uie-name="status-name">
-              <div class="conversation-details__name" data-bind="text: activeConversation() && activeConversation().display_name()"></div>
-              <!-- ko if: z.userPermission().canUpdateConversationSettings() -->
+            <div
+              class="conversation-details__name"
+              data-bind="visible: !isEditingName(), click: canRenameGroup() ? clickToEditGroupName: undefined, attr: {title: t('tooltipConversationDetailsRename')}"
+              data-uie-name="status-name"
+            >
+              <div
+                class="conversation-details__name"
+                data-bind="text: activeConversation() && activeConversation().display_name()"
+              ></div>
+              <!-- ko if: canRenameGroup() -->
                 <edit-icon class="conversation-details__name__edit-icon"></edit-icon>
               <!-- /ko -->
             </div>
-            <textarea class="conversation-details__name conversation-details__name--input"
-                      dir="auto"
-                      spellcheck="false"
-                      data-bind="attr: {maxlength: ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH}, enter: renameConversation, resize, value: activeConversation() && activeConversation().display_name(), visible: isEditingName()"
-                      data-uie-name="enter-name">
+            <textarea
+              class="conversation-details__name conversation-details__name--input"
+              dir="auto"
+              spellcheck="false"
+              data-bind="attr: {maxlength: ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH}, enter: renameConversation, resize, value: activeConversation() && activeConversation().display_name(), visible: isEditingName()"
+              data-uie-name="enter-name"
+            >
             </textarea>
           <!-- /ko -->
           <!-- ko ifnot: isActiveGroupParticipant() -->
             <div class="conversation-details__name">
               <div class="conversation-details__flex-row">
-                <div data-bind="text: activeConversation() && activeConversation().display_name()" data-uie-name="status-name"></div>
+                <div
+                  data-bind="text: activeConversation() && activeConversation().display_name()"
+                  data-uie-name="status-name"
+                ></div>
               </div>
             </div>
           <!-- /ko -->
@@ -54,126 +82,179 @@
             <div class="conversation-details__participant_count">
               <!-- ko if: userParticipants().length -->
                 <span class="conversation-details__participant_count__user">
-                  <span class="conversation-details__participant_count__number" data-bind="text: showAllUsersCount() || userParticipants().length" data-uie-name="status-user-count"></span>
+                  <span
+                    class="conversation-details__participant_count__number"
+                    data-bind="text: showAllUsersCount() || userParticipants().length"
+                    data-uie-name="status-user-count"
+                  ></span>
                   <span class="conversation-details__participant_count__text" data-bind="text: participantsUserText"></span>
                 </span>
               <!-- /ko -->
               <!-- ko if: serviceParticipants().length -->
                 <span class="conversation-details__participant_count__service">
-                  <span class="conversation-details__participant_count__number" data-bind="text: serviceParticipants().length" data-uie-name="status-service-count"></span>
+                  <span
+                    class="conversation-details__participant_count__number"
+                    data-bind="text: serviceParticipants().length"
+                    data-uie-name="status-service-count"
+                  ></span>
                   <span class="conversation-details__participant_count__text" data-bind="text: participantsServiceText"></span>
                 </span>
               <!-- /ko -->
             </div>
             <!-- ko if: isTeam() -->
-              <div class="panel__info-text conversation-details__group-size-info" data-bind="text: t('groupSizeInfo', ConversationRepository.CONFIG.GROUP.MAX_SIZE)" data-uie-name="status-group-size-info-conversation-details"></div>
+              <div
+                class="panel__info-text conversation-details__group-size-info"
+                data-bind="text: t('groupSizeInfo', ConversationRepository.CONFIG.GROUP.MAX_SIZE)"
+                data-uie-name="status-group-size-info-conversation-details"
+              ></div>
             <!-- /ko -->
           <!-- /ko -->
         </div>
         <!-- ko if: showTopActions() -->
-          <div class="conversation-details-top-actions">
-            <!-- ko if: z.userPermission().canUpdateGroupParticipants() && showActionAddParticipants() -->
-              <div class="conversation-details__participant-options">
-                <div class="panel__action-item" data-bind="click: clickOnAddParticipants, attr:{'title': addPeopleTooltip}" data-uie-name="go-add-people">
-                  <plus-icon class="panel__action-item__icon"></plus-icon>
-                  <div class="panel__action-item__text" data-bind="text: t('conversationDetailsActionAddParticipants')"></div>
-                  <disclose-icon></disclose-icon>
-                </div>
+          <!-- ko if: showActionAddParticipants() -->
+            <div class="conversation-details__participant-options">
+              <div
+                class="panel__action-item"
+                data-bind="click: clickOnAddParticipants, attr:{'title': addPeopleTooltip}"
+                data-uie-name="go-add-people"
+              >
+                <plus-icon class="panel__action-item__icon"></plus-icon>
+                <div class="panel__action-item__text" data-bind="text: t('conversationDetailsActionAddParticipants')"></div>
+                <disclose-icon></disclose-icon>
               </div>
-            <!-- /ko -->
-            <!-- ko if: showSectionOptions() -->
-              <div class="conversation-details__list-head" data-bind="text: t('conversationDetailsOptions')"></div>
-              <!-- ko if: showOptionNotificationsGroup() -->
-                <div class="conversation-details__notifications">
-                  <div class="panel__action-item" data-bind="click: clickOnNotifications" data-uie-name="go-notifications">
-                    <notification-icon class="panel__action-item__icon"></notification-icon>
-                    <div class="panel__action-item__summary">
-                      <div class="panel__action-item__text" data-bind="text: t('conversationDetailsActionNotifications')"></div>
-                      <div class="panel__action-item__status" data-bind="text: notificationStatusText" data-uie-name="status-notifications"></div>
-                    </div>
-                    <disclose-icon></disclose-icon>
-                  </div>
-                </div>
-              <!-- /ko -->
-              <!-- ko if: z.userPermission().canUpdateConversationSettings() -->
-                <!-- ko if: showOptionTimedMessages() -->
-                  <div class="conversation-details__timed-messages">
-                    <div class="panel__action-item" data-bind="click: clickOnTimedMessages" data-uie-name="go-timed-messages">
-                      <timer-icon class="panel__action-item__icon"></timer-icon>
-                      <div class="panel__action-item__summary">
-                        <div class="panel__action-item__text" data-bind="text: t('conversationDetailsActionTimedMessages')"></div>
-                        <div class="panel__action-item__status" data-bind="text: timedMessagesText" data-uie-name="status-timed-messages"></div>
-                      </div>
-                      <disclose-icon></disclose-icon>
-                    </div>
-                  </div>
-                <!-- /ko -->
-                <!-- ko if: showOptionGuests() -->
-                  <div class="conversation-details__guest-options">
-                    <div class="panel__action-item" data-bind="click: clickOnGuestOptions" data-uie-name="go-guest-options">
-                      <guest-icon class="panel__action-item__icon"></guest-icon>
-                      <div class="panel__action-item__summary">
-                        <div class="panel__action-item__text" data-bind="text: t('conversationDetailsActionGuestOptions')"></div>
-                        <div class="panel__action-item__status" data-bind="text: guestOptionsText" data-uie-name="status-allow-guests"></div>
-                      </div>
-                      <disclose-icon></disclose-icon>
-                    </div>
-                  </div>
-                <!-- /ko -->
-                <!-- ko if: showOptionReadReceipts() -->
-                  <div class="conversation-details__read-receipts">
-                    <read-receipt-toggle params="conversation: activeConversation, onReceiptModeChanged: updateConversationReceiptMode"></read-receipt-toggle>
-                  </div>
-                <!-- /ko -->
-              <!-- /ko -->
-            <!-- /ko -->
-          </div>
+            </div>
+          <!-- /ko -->
         <!-- /ko -->
         <div class="conversation-details__participants">
           <!-- ko if: activeConversation() && activeConversation().isGroup() -->
-            <!-- ko if: userParticipants().length -->
-              <div class="conversation-details__list-head" data-bind="text: t('conversationDetailsPeople')"></div>
-              <user-list params="user: userParticipants, click: clickOnShowUser, noUnderline: true, arrow: true, searchRepository: searchRepository, teamRepository: teamRepository, conversationRepository: conversationRepository" data-uie-name="list-users"></user-list>
-              <!-- ko if: showAllUsersCount() > 0 -->
-                <div class="panel__action-item panel__action-item--no-border" data-bind="click: clickOnShowAll" data-uie-name="go-conversation-participants">
-                  <people-icon class="panel__action-item__icon"></people-icon>
-                  <div class="panel__action-item__text" data-bind="text: t('conversationDetailsActionConversationParticipants', showAllUsersCount())"></div>
-                  <disclose-icon></disclose-icon>
-                </div>
-              <!-- /ko -->
-            <!-- /ko -->
-
-            <!-- ko if: serviceParticipants().length -->
-              <div class="conversation-details__list-head" data-bind="text: t('conversationDetailsServices')"></div>
-              <service-list params="services: serviceParticipants, click: clickOnShowService, noUnderline: true, arrow: true" data-uie-name="list-services"></service-list>
+          <!-- ko if: userParticipants().length -->
+            <user-list
+              params="user: userParticipants, click: clickOnShowUser, noUnderline: true, arrow: true, searchRepository: searchRepository, teamRepository: teamRepository, conversationRepository: conversationRepository, conversation: activeConversation, truncate: true, showEmptyAdmin: true, selfFirst: false, noSelfInteraction: true"
+              data-uie-name="list-users"
+            ></user-list>
+            <!-- ko if: showAllUsersCount() > 0 -->
+              <div
+                class="panel__action-item panel__action-item--no-border"
+                data-bind="click: clickOnShowAll"
+                data-uie-name="go-conversation-participants"
+              >
+                <people-icon class="panel__action-item__icon"></people-icon>
+                <div
+                  class="panel__action-item__text"
+                  data-bind="text: t('conversationDetailsActionConversationParticipants', showAllUsersCount())"
+                ></div>
+                <disclose-icon></disclose-icon>
+              </div>
             <!-- /ko -->
           <!-- /ko -->
-        </div>
-      <!-- /ko -->
-      <!-- ko if: isActivatedAccount()-->
-        <div class="conversation-details__bottom-actions">
-          <!-- ko if: showOptionNotifications1To1() -->
+        <!-- /ko -->
+      </div>
+      <!-- ko if: showTopActions() -->
+        <!-- ko if: showSectionOptions() -->
+          <div class="conversation-details__list-head" data-bind="text: t('conversationDetailsOptions')"></div>
+          <!-- ko if: showOptionNotificationsGroup() -->
             <div class="conversation-details__notifications">
               <div class="panel__action-item" data-bind="click: clickOnNotifications" data-uie-name="go-notifications">
                 <notification-icon class="panel__action-item__icon"></notification-icon>
                 <div class="panel__action-item__summary">
                   <div class="panel__action-item__text" data-bind="text: t('conversationDetailsActionNotifications')"></div>
-                  <div class="panel__action-item__status" data-bind="text: notificationStatusText" data-uie-name="status-notifications"></div>
+                  <div
+                    class="panel__action-item__status"
+                    data-bind="text: notificationStatusText"
+                    data-uie-name="status-notifications"
+                  ></div>
                 </div>
                 <disclose-icon></disclose-icon>
               </div>
             </div>
           <!-- /ko -->
-
-          <!-- ko if: isSingleUserMode(activeConversation()) -->
-            <div class="conversation-details__read-receipts" data-uie-name="label-1to1-read-receipts">
-              <div class="panel__info-text panel__info-text--head panel__info-text--margin-bottom" data-bind="text: hasReceiptsEnabled() ? t('conversationDetails1to1ReceiptsHeadEnabled') : t('conversationDetails1to1ReceiptsHeadDisabled')"></div>
-              <div class="panel__info-text panel__info-text--margin-bottom" data-bind="text: t('conversationDetails1to1ReceiptsFirst')"></div>
-              <div class="panel__info-text panel__info-text--margin" data-bind="text: t('conversationDetails1to1ReceiptsSecond')"></div>
+          <!-- ko if: showOptionTimedMessages() -->
+            <div class="conversation-details__timed-messages">
+              <div class="panel__action-item" data-bind="click: clickOnTimedMessages" data-uie-name="go-timed-messages">
+                <timer-icon class="panel__action-item__icon"></timer-icon>
+                <div class="panel__action-item__summary">
+                  <div class="panel__action-item__text" data-bind="text: t('conversationDetailsActionTimedMessages')"></div>
+                  <div
+                    class="panel__action-item__status"
+                    data-bind="text: timedMessagesText"
+                    data-uie-name="status-timed-messages"
+                  ></div>
+                </div>
+                <disclose-icon></disclose-icon>
+              </div>
             </div>
           <!-- /ko -->
-          <panel-actions params="items: getConversationActions(activeConversation())"></panel-actions>
-        </div>
+          <!-- ko if: showOptionGuests() -->
+            <div class="conversation-details__guest-options">
+              <div class="panel__action-item" data-bind="click: clickOnGuestOptions" data-uie-name="go-guest-options">
+                <guest-icon class="panel__action-item__icon"></guest-icon>
+                <div class="panel__action-item__summary">
+                  <div class="panel__action-item__text" data-bind="text: t('conversationDetailsActionGuestOptions')"></div>
+                  <div
+                    class="panel__action-item__status"
+                    data-bind="text: guestOptionsText"
+                    data-uie-name="status-allow-guests"
+                  ></div>
+                </div>
+                <disclose-icon></disclose-icon>
+              </div>
+            </div>
+          <!-- /ko -->
+          <!-- ko if: showOptionReadReceipts() -->
+            <div class="conversation-details__read-receipts">
+              <read-receipt-toggle
+                params="conversation: activeConversation, onReceiptModeChanged: updateConversationReceiptMode"
+              ></read-receipt-toggle>
+            </div>
+          <!-- /ko -->
+        <!-- /ko -->
+      <!-- /ko -->
+      <div class="conversation-details__participants">
+        <!-- ko if: serviceParticipants().length -->
+          <div class="conversation-details__list-head" data-bind="text: t('conversationDetailsServices')"></div>
+          <service-list
+            params="services: serviceParticipants, click: clickOnShowService, noUnderline: true, arrow: true"
+            data-uie-name="list-services"
+          ></service-list>
+        <!-- /ko -->
+      </div>
+    <!-- /ko -->
+    <!-- ko if: isActivatedAccount()-->
+      <div class="conversation-details__bottom-actions">
+        <!-- ko if: showOptionNotifications1To1() -->
+          <div class="conversation-details__notifications">
+            <div class="panel__action-item" data-bind="click: clickOnNotifications" data-uie-name="go-notifications">
+              <notification-icon class="panel__action-item__icon"></notification-icon>
+              <div class="panel__action-item__summary">
+                <div class="panel__action-item__text" data-bind="text: t('conversationDetailsActionNotifications')"></div>
+                <div
+                  class="panel__action-item__status"
+                  data-bind="text: notificationStatusText"
+                  data-uie-name="status-notifications"
+                ></div>
+              </div>
+              <disclose-icon></disclose-icon>
+            </div>
+          </div>
+        <!-- /ko -->
+        <!-- ko if: isSingleUserMode(activeConversation()) -->
+          <div class="conversation-details__read-receipts" data-uie-name="label-1to1-read-receipts">
+            <div
+              class="panel__info-text panel__info-text--head panel__info-text--margin-bottom"
+              data-bind="text: hasReceiptsEnabled() ? t('conversationDetails1to1ReceiptsHeadEnabled') : t('conversationDetails1to1ReceiptsHeadDisabled')"
+            ></div>
+            <div
+              class="panel__info-text panel__info-text--margin-bottom"
+              data-bind="text: t('conversationDetails1to1ReceiptsFirst')"
+            ></div>
+            <div
+              class="panel__info-text panel__info-text--margin"
+              data-bind="text: t('conversationDetails1to1ReceiptsSecond')"
+            ></div>
+          </div>
+        <!-- /ko -->
+        <panel-actions params="items: getConversationActions(activeConversation())"></panel-actions>
+      </div>
       <!-- /ko -->
     </div>
   <!-- /ko -->

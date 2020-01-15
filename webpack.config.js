@@ -21,8 +21,9 @@ const webpack = require('webpack');
 const commonConfig = require('./webpack.config.common');
 const TerserJSPlugin = require('terser-webpack-plugin');
 
-module.exports = Object.assign({}, commonConfig, {
-  mode: 'development',
+module.exports = {
+  ...commonConfig,
+  mode: 'production',
   optimization: {
     ...commonConfig.optimization,
     minimizer: [
@@ -41,4 +42,4 @@ module.exports = Object.assign({}, commonConfig, {
       },
     }),
   ],
-});
+};

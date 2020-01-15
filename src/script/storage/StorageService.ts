@@ -21,13 +21,11 @@ import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
 import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 
 import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
-import {MemoryStore} from '@wireapp/store-engine/dist/commonjs/engine';
 import Dexie from 'dexie';
 import {getEphemeralValue} from 'Util/ephemeralValueStore';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {loadValue, storeValue} from 'Util/StorageUtil';
-import {isTemporaryClientAndNonPersistent} from 'Util/util';
 import {ClientType} from '../client/ClientType';
 import {Config} from '../Config';
 import {SQLeetSchemata} from './SQLeetSchemata';
@@ -52,7 +50,6 @@ enum DEXIE_CRUD_EVENT {
 
 export class StorageService {
   public db?: Dexie & DexieObservable;
-  public objectDb?: MemoryStore;
   private readonly hasHookSupport: boolean;
   private readonly dbListeners: DatabaseListener[];
   private readonly engine: CRUDEngine;
@@ -67,7 +64,7 @@ export class StorageService {
     this.dbName = undefined;
     this.userId = undefined;
 
-    this.isTemporaryAndNonPersistent = isTemporaryClientAndNonPersistent();
+    this.isTemporaryAndNonPersistent = !!encryptedEngine;
 
     this.engine = encryptedEngine || new IndexedDBEngine();
     this.hasHookSupport = this.engine instanceof IndexedDBEngine;
@@ -95,7 +92,7 @@ export class StorageService {
 
     try {
       if (this.isTemporaryAndNonPersistent) {
-        this.logger.info(`Storage Service initialized with encrypted database '${this.dbName}'`);
+        this.logger.info(`Initializing Storage Service with encrypted database '${this.dbName}'`);
         await this.engine.init(this.dbName);
       } else {
         this.db = new Dexie(this.dbName);
@@ -189,6 +186,7 @@ export class StorageService {
 
   /**
    * Clear all stores.
+   *
    * @returns Resolves when all stores have been cleared
    */
   async clearStores(): Promise<void[]> {
@@ -240,6 +238,7 @@ export class StorageService {
 
   /**
    * Delete multiple database stores.
+   *
    * @param storeNames - Names of database stores to delete
    * @returns Resolves when the stores have been deleted
    */
@@ -255,7 +254,7 @@ export class StorageService {
 
       for (const primaryKey of primaryKeys) {
         const record = await this.load<{conversation: string; id: string; time: number}>(storeName, primaryKey);
-        if (record && record.id === eventId && record.conversation === conversationId) {
+        if (record?.id === eventId && record.conversation === conversationId) {
           await this.delete(storeName, primaryKey);
           deletedRecords++;
         }
@@ -279,7 +278,7 @@ export class StorageService {
 
       for (const primaryKey of primaryKeys) {
         const record = await this.load<{conversation: string; time: string}>(storeName, primaryKey);
-        if (record && record.conversation === conversationId && (!isoDate || isoDate >= record.time)) {
+        if (record?.conversation === conversationId && (!isoDate || isoDate >= record.time)) {
           await this.delete(storeName, primaryKey);
           deletedRecords++;
         }
@@ -305,7 +304,14 @@ export class StorageService {
   async getAll<T = Object>(storeName: string): Promise<T[]> {
     try {
       const resultArray = await this.engine.readAll<T>(storeName);
-      return resultArray.filter(Boolean);
+      return resultArray.filter(Boolean).map(record => {
+        if (typeof (record as any).data === 'string') {
+          try {
+            (record as any).data = JSON.parse((record as any).data);
+          } catch (error) {}
+        }
+        return record;
+      });
     } catch (error) {
       this.logger.error(`Failed to load objects from store '${storeName}'`, error);
       throw error;
@@ -436,9 +442,9 @@ export class StorageService {
         this.logger.info(logMessage, changes);
         return numberOfUpdates;
       } else {
-        const oldRecord = await this.engine.read<unknown>(storeName, primaryKey);
+        const oldRecord = await this.load<unknown>(storeName, primaryKey);
         await this.engine.update(storeName, primaryKey, changes);
-        const newRecord = await this.engine.read<unknown>(storeName, primaryKey);
+        const newRecord = await this.load<unknown>(storeName, primaryKey);
 
         this.notifyListeners(storeName, DEXIE_CRUD_EVENT.UPDATING, oldRecord, newRecord);
 

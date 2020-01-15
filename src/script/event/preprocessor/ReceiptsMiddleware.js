@@ -105,7 +105,7 @@ export class ReceiptsMiddleware {
         ? {read_receipts: currentReceipts.concat([{time: confirmationEvent.time, userId: confirmationEvent.from}])}
         : {};
 
-    const updatedEvent = Object.assign({}, originalEvent, commonUpdates, readReceiptUpdate);
+    const updatedEvent = {...originalEvent, ...commonUpdates, ...readReceiptUpdate};
 
     return this.eventService.replaceEvent(updatedEvent);
   }

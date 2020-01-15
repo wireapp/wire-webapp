@@ -24,13 +24,13 @@ import {
   DeviceIcon,
   ErrorMessage,
   Form,
-  ICON_NAME,
   Input,
   InputSubmitCombo,
   Line,
   RoundIconButton,
   Small,
   Text,
+  TrashIcon,
 } from '@wireapp/react-ui-kit';
 import React, {useEffect, useState} from 'react';
 import {useIntl} from 'react-intl';
@@ -224,11 +224,12 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
                 color={COLOR.RED}
                 data-uie-name="do-remove-device"
                 formNoValidate
-                icon={ICON_NAME.TRASH}
                 onClick={handlePasswordlessClientDeletion}
                 style={{margin: 'auto'}}
                 type="submit"
-              />
+              >
+                <TrashIcon />
+              </RoundIconButton>
             )}
           </div>
           <Line color="rgba(51, 55, 58, .04)" style={{backgroundColor: 'transparent', margin: '4px 0 0 0'}} />
@@ -259,11 +260,12 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
                   data-uie-name="do-remove-device"
                   disabled={!password || !isValidPassword}
                   formNoValidate
-                  icon={ICON_NAME.TRASH}
                   onClick={handleSubmit}
                   style={{marginBottom: '-4px'}}
                   type="submit"
-                />
+                >
+                  <TrashIcon />
+                </RoundIconButton>
               </InputSubmitCombo>
             </Form>
           </ContainerXS>

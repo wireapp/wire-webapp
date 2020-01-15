@@ -17,8 +17,11 @@
  *
  */
 
+import {LoginData} from '@wireapp/api-client/dist/auth';
+import {ClientType} from '@wireapp/api-client/dist/client';
 import {TeamData} from '@wireapp/api-client/dist/team';
 import {UserAsset} from '@wireapp/api-client/dist/user';
+import {Config} from '../../../Config';
 import {AUTH_ACTION, AppActions, USER_ACTION} from '../action/creator/';
 import {REGISTER_FLOW} from '../selector/AuthSelector';
 
@@ -45,9 +48,10 @@ export type AuthState = {
   readonly fetched: boolean;
   readonly fetching: boolean;
   readonly isAuthenticated: boolean;
+  readonly loginData: Partial<LoginData>;
 };
 
-export const initialState: AuthState = {
+export const initialAuthState: AuthState = {
   account: {
     accent_id: null,
     assets: null,
@@ -68,9 +72,10 @@ export const initialState: AuthState = {
   fetched: false,
   fetching: false,
   isAuthenticated: false,
+  loginData: {clientType: Config.FEATURE.DEFAULT_LOGIN_TEMPORARY_CLIENT ? ClientType.TEMPORARY : ClientType.PERMANENT},
 };
 
-export function authReducer(state: AuthState = initialState, action: AppActions): AuthState {
+export function authReducer(state: AuthState = initialAuthState, action: AppActions): AuthState {
   switch (action.type) {
     case AUTH_ACTION.LOGIN_START:
     case AUTH_ACTION.REGISTER_JOIN_START:
@@ -117,7 +122,7 @@ export function authReducer(state: AuthState = initialState, action: AppActions)
     case AUTH_ACTION.REGISTER_TEAM_SUCCESS: {
       return {
         ...state,
-        account: {...initialState.account},
+        account: {...initialAuthState.account},
         error: null,
         fetched: true,
         fetching: false,
@@ -128,10 +133,16 @@ export function authReducer(state: AuthState = initialState, action: AppActions)
       return {...state, account: {...state.account, ...action.payload}, error: null};
     }
     case AUTH_ACTION.REGISTER_RESET_ACCOUNT_DATA: {
-      return {...state, account: {...initialState.account}, error: null};
+      return {...state, account: {...initialAuthState.account}, error: null};
+    }
+    case AUTH_ACTION.PUSH_LOGIN_DATA: {
+      return {...state, loginData: {...state.loginData, ...action.payload}, error: null};
+    }
+    case AUTH_ACTION.RESET_LOGIN_DATA: {
+      return {...state, loginData: {...initialAuthState.loginData}, error: null};
     }
     case AUTH_ACTION.LOGOUT_SUCCESS: {
-      return {...initialState};
+      return {...initialAuthState};
     }
     case AUTH_ACTION.SILENT_LOGOUT_SUCCESS: {
       return {

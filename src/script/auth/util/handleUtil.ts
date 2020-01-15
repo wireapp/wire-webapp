@@ -17,7 +17,7 @@
  *
  */
 
-import * as getSlug from 'speakingurl';
+import getSlug from 'speakingurl';
 import {randomArrayElement, randomInt} from './randomUtil';
 
 const MAX_HANDLE_LENGTH = 21;

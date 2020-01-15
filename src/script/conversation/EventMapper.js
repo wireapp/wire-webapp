@@ -154,7 +154,7 @@ export class EventMapper {
       }
     }
 
-    if (event.reactions !== undefined) {
+    if (event.reactions) {
       originalEntity.reactions(event.reactions);
       originalEntity.version = event.version;
     }

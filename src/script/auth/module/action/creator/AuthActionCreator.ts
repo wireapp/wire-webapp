@@ -17,7 +17,7 @@
  *
  */
 
-import {RegisterData} from '@wireapp/api-client/dist/auth';
+import {LoginData, RegisterData} from '@wireapp/api-client/dist/auth';
 import {AppAction} from '.';
 import {RegistrationDataState} from '../../reducer/authReducer';
 
@@ -32,6 +32,9 @@ export enum AUTH_ACTION {
 
   REGISTER_PUSH_ACCOUNT_DATA = 'REGISTER_PUSH_ACCOUNT_DATA',
   REGISTER_RESET_ACCOUNT_DATA = 'REGISTER_RESET_ACCOUNT_DATA',
+
+  PUSH_LOGIN_DATA = 'PUSH_LOGIN_DATA',
+  RESET_LOGIN_DATA = 'RESET_LOGIN_DATA',
 
   REGISTER_TEAM_START = 'REGISTER_TEAM_START',
   REGISTER_TEAM_SUCCESS = 'REGISTER_TEAM_SUCCESS',
@@ -108,6 +111,8 @@ export type AuthActions =
   | ResetAuthErrorsAction
   | ResetRegistrationDataAction
   | PushRegistrationDataAction
+  | ResetLoginDataAction
+  | PushLoginDataAction
   | EnterTeamCreationFlowAction
   | EnterPersonalCreationFlowAction
   | EnterGenericInvitationCreationFlowAction;
@@ -236,6 +241,14 @@ export interface ResetRegistrationDataAction extends AppAction {
 export interface PushRegistrationDataAction extends AppAction {
   readonly payload: Partial<RegistrationDataState>;
   readonly type: AUTH_ACTION.REGISTER_PUSH_ACCOUNT_DATA;
+}
+
+export interface ResetLoginDataAction extends AppAction {
+  readonly type: AUTH_ACTION.RESET_LOGIN_DATA;
+}
+export interface PushLoginDataAction extends AppAction {
+  readonly payload: Partial<LoginData>;
+  readonly type: AUTH_ACTION.PUSH_LOGIN_DATA;
 }
 
 export interface EnterTeamCreationFlowAction extends AppAction {
@@ -391,6 +404,15 @@ export class AuthActionCreator {
   static pushAccountRegistrationData = (accountData: Partial<RegistrationDataState>): PushRegistrationDataAction => ({
     payload: accountData,
     type: AUTH_ACTION.REGISTER_PUSH_ACCOUNT_DATA,
+  });
+
+  static pushLoginData = (loginData: Partial<LoginData>): PushLoginDataAction => ({
+    payload: loginData,
+    type: AUTH_ACTION.PUSH_LOGIN_DATA,
+  });
+
+  static resetLoginData = (): ResetLoginDataAction => ({
+    type: AUTH_ACTION.RESET_LOGIN_DATA,
   });
 
   static enterTeamCreationFlow = (): EnterTeamCreationFlowAction => ({

@@ -21,23 +21,33 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 32px 16px 16px;
+  padding: 16px;
 
-  &__verified-icon {
-    display: block;
-    margin-bottom: 8px;
-    text-align: center;
-  }
-
-  &__name {
-    min-height: 24px;
+  &__head {
+    display: flex;
+    width: 100%;
+    align-items: center;
     justify-content: center;
-    padding: 0;
-    border: none;
-    font-size: 20px;
-    font-weight: @font-weight-bold;
-    text-align: center;
-    word-break: break-word;
+
+    &__verified-icon {
+      display: block;
+      height: 16px;
+      margin-left: 8px;
+      text-align: center;
+    }
+
+    &__name {
+      overflow: hidden;
+      min-height: 24px;
+      flex-shrink: 1;
+      justify-content: center;
+      padding: 0;
+      border: none;
+      font-size: 20px;
+      font-weight: @font-weight-bold;
+      text-align: center;
+      word-break: break-word;
+    }
   }
 
   &__user-name,
@@ -57,17 +67,27 @@
     margin: 24px auto;
   }
 
-  &__guest-label {
+  &__label {
     display: flex;
     justify-content: center;
+    font-size: 11px;
+    font-weight: @font-weight-bold;
+    text-transform: uppercase;
+    &:not(:last-of-type) {
+      margin-bottom: 8px;
+    }
 
     path {
       fill: var(--background);
     }
 
+    svg {
+      max-width: 12px;
+      max-height: 12px;
+    }
+
     span {
-      margin-left: 8px;
-      font-size: 12px;
+      margin-left: 4px;
     }
   }
 

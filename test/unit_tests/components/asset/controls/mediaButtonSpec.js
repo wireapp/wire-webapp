@@ -37,9 +37,7 @@ describe('media-button', () => {
   };
 
   it('displays the media buttons if the media is uploaded', () => {
-    const params = Object.assign({}, defaultParams, {
-      transferState: ko.observable(AssetTransferState.UPLOADED),
-    });
+    const params = {...defaultParams, transferState: ko.observable(AssetTransferState.UPLOADED)};
     spyOn(params, 'play');
     spyOn(params, 'pause');
     return instantiateComponent('media-button', params).then(domContainer => {
@@ -75,9 +73,7 @@ describe('media-button', () => {
   });
 
   it('displays a loader if the media is being downloaded', () => {
-    const params = Object.assign({}, defaultParams, {
-      transferState: ko.observable(AssetTransferState.DOWNLOADING),
-    });
+    const params = {...defaultParams, transferState: ko.observable(AssetTransferState.DOWNLOADING)};
 
     return instantiateComponent('media-button', params).then(domContainer => {
       const playButton = domContainer.querySelector('[data-uie-name=do-play-media]');
@@ -96,9 +92,7 @@ describe('media-button', () => {
   });
 
   it('displays a loader if the media is being uploaded', () => {
-    const params = Object.assign({}, defaultParams, {
-      transferState: ko.observable(AssetTransferState.UPLOADING),
-    });
+    const params = {...defaultParams, transferState: ko.observable(AssetTransferState.UPLOADING)};
 
     spyOn(params, 'cancel');
 

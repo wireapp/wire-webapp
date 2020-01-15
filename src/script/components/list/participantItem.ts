@@ -39,9 +39,10 @@ interface ParticipantItemParams {
   customInfo: string;
   hideInfo: boolean;
   selfInTeam: boolean;
+  external: boolean;
 }
 
-class ParticipanItem {
+class ParticipantItem {
   avatarSize: string;
   participant: User | ServiceEntity;
   participantName: () => string | ko.Observable<string>;
@@ -51,6 +52,7 @@ class ParticipanItem {
   badge: boolean;
   isDefaultMode: boolean;
   isOthersMode: boolean;
+  external: boolean;
   canSelect: boolean;
   isSelected: boolean;
   showCamera: boolean;
@@ -69,6 +71,7 @@ class ParticipanItem {
       customInfo,
       hideInfo,
       selfInTeam,
+      external,
     }: ParticipantItemParams,
     element: HTMLElement,
   ) {
@@ -81,7 +84,6 @@ class ParticipanItem {
     this.isService = this.participant instanceof ServiceEntity || this.participant.isService;
     this.isUser = this.participant instanceof User && !this.participant.isService;
     this.selfInTeam = selfInTeam;
-    const isTemporaryGuest = this.isUser && (this.participant as User).isTemporaryGuest();
     this.badge = badge;
 
     this.isDefaultMode = mode === UserlistMode.DEFAULT;
@@ -90,8 +92,10 @@ class ParticipanItem {
     this.canSelect = canSelect;
     this.isSelected = isSelected;
     this.showCamera = showCamera;
+    this.external = external;
     const hasCustomInfo = !!customInfo;
 
+    const isTemporaryGuest = this.isUser && (this.participant as User).isTemporaryGuest();
     this.hasUsernameInfo = this.isUser && !hideInfo && !hasCustomInfo && !isTemporaryGuest;
 
     if (hasCustomInfo) {
@@ -157,6 +161,10 @@ ko.components.register('participant-item', {
           <guest-icon class="participant-item-guest-indicator" data-uie-name="status-guest"></guest-icon>
         <!-- /ko -->
 
+        <!-- ko if: external -->
+          <partner-icon data-uie-name="status-external"></partner-icon>
+        <!-- /ko -->
+
         <!-- ko if: showCamera -->
           <camera-icon data-uie-name="status-video"></camera-icon>
         <!-- /ko -->
@@ -171,6 +179,6 @@ ko.components.register('participant-item', {
   `,
   viewModel: {
     createViewModel: (props: ParticipantItemParams, componentInfo: any) =>
-      new ParticipanItem(props, componentInfo.element),
+      new ParticipantItem(props, componentInfo.element),
   },
 });

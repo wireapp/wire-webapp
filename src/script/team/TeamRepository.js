@@ -50,7 +50,7 @@ export class TeamRepository {
 
     this.team = ko.observable();
 
-    this.isTeam = ko.pureComputed(() => (this.team() ? !!this.team().id : false));
+    this.isTeam = ko.pureComputed(() => !!this.team()?.id);
     this.isTeamDeleted = ko.observable(false);
 
     /** Note: this does not include the self user */
@@ -62,13 +62,9 @@ export class TeamRepository {
       return this.memberRoles()[userId] !== ROLE.PARTNER || this.memberInviters()[userId] === this.selfUser().id;
     };
 
-    this.getRoleBadge = userId => {
-      const userRole = this.memberRoles()[userId];
-      if (userRole === ROLE.PARTNER) {
-        return t('rolePartner');
-      }
-      return '';
-    };
+    this.getRoleBadge = userId => (this.isExternal(userId) ? t('rolePartner') : '');
+
+    this.isExternal = userId => this.memberRoles()[userId] === ROLE.PARTNER;
 
     this.teamName = ko.pureComputed(() => (this.isTeam() ? this.team().name() : this.selfUser().name()));
     this.teamSize = ko.pureComputed(() => (this.isTeam() ? this.teamMembers().length + 1 : 0));
@@ -94,24 +90,20 @@ export class TeamRepository {
     amplify.subscribe(WebAppEvents.TEAM.UPDATE_INFO, this.sendAccountInfo.bind(this));
   }
 
-  getTeam() {
-    const teamPromise = this.selfUser().teamId ? this._getTeamById() : this._getBindingTeam();
-    return teamPromise
-      .then(teamData => {
-        if (teamData) {
-          const teamEntity = this.teamMapper.mapTeamFromObject(teamData);
-          this.team(teamEntity);
-          return this.updateTeamMembers(teamEntity);
-        }
+  getTeam = async () => {
+    const teamData = this.selfUser().teamId ? await this._getTeamById() : await this._getBindingTeam();
 
-        this.team(new TeamEntity());
-      })
-      .then(() => {
-        // doesn't need to be awaited because it publishes the account info over amplify.
-        this.sendAccountInfo();
-        return this.team();
-      });
-  }
+    if (teamData) {
+      const teamEntity = this.teamMapper.mapTeamFromObject(teamData);
+      this.team(teamEntity);
+      await this.updateTeamMembers(teamEntity);
+    } else {
+      this.team(new TeamEntity());
+    }
+    // doesn't need to be awaited because it publishes the account info over amplify.
+    this.sendAccountInfo();
+    return this.team();
+  };
 
   getTeamMember(teamId, userId) {
     return this.teamService
@@ -125,6 +117,10 @@ export class TeamRepository {
         return this.teamMapper.mapMemberFromArray(members);
       }
     });
+  }
+
+  getTeamConversationRoles() {
+    return this.teamService.getTeamConversationRoles(this.team().id);
   }
 
   getWhitelistedServices(teamId, size, prefix) {
@@ -321,18 +317,15 @@ export class TeamRepository {
   _updateMemberRoles(memberEntities = []) {
     const memberArray = [].concat(memberEntities);
 
-    const memberRoles = memberArray.reduce(
-      (accumulator, member) => ({
-        ...accumulator,
-        [member.userId]: member.permissions ? roleFromTeamPermissions(member.permissions) : ROLE.INVALID,
-      }),
-      this.memberRoles(),
-    );
+    const memberRoles = memberArray.reduce((accumulator, member) => {
+      accumulator[member.userId] = member.permissions ? roleFromTeamPermissions(member.permissions) : ROLE.INVALID;
+      return accumulator;
+    }, this.memberRoles());
 
-    const memberInvites = memberArray.reduce(
-      (accumulator, member) => ({...accumulator, [member.userId]: member.invitedBy}),
-      this.memberInviters(),
-    );
+    const memberInvites = memberArray.reduce((accumulator, member) => {
+      accumulator[member.userId] = member.invitedBy;
+      return accumulator;
+    }, this.memberInviters());
 
     const supportsLegalHold = memberArray.some(member => member.hasOwnProperty('legalholdStatus'));
     this.supportsLegalHold(supportsLegalHold);

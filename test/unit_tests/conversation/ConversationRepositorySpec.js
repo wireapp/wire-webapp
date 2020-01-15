@@ -17,12 +17,14 @@
  *
  */
 
+import {ConnectionStatus} from '@wireapp/api-client/dist/connection';
 import {GenericMessage, LegalHoldStatus, Text} from '@wireapp/protocol-messaging';
-import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 
 import {createRandomUuid} from 'Util/util';
 
 import {backendConfig} from '../../api/testResolver';
+
+import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {Message} from 'src/script/entity/message/Message';
@@ -50,7 +52,6 @@ import {StorageSchemata} from 'src/script/storage/StorageSchemata';
 import {File} from 'src/script/entity/message/File';
 
 import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
-import {ConnectionStatus} from 'src/script/connection/ConnectionStatus';
 import {MessageCategory} from 'src/script/message/MessageCategory';
 import {UserGenerator} from '../../helper/UserGenerator';
 
@@ -1259,12 +1260,12 @@ describe('ConversationRepository', () => {
     });
 
     it('does not return any conversation if team is marked for deletion', () => {
-      spyOn(conversationRepository.team_repository, 'isTeamDeleted').and.returnValue(false);
+      spyOn(conversationRepository.teamRepository, 'isTeamDeleted').and.returnValue(false);
       conversationIds.forEach(conversationId => {
         expect(conversationRepository.find_conversation_by_id(conversationId)).toBeDefined();
       });
 
-      conversationRepository.team_repository.isTeamDeleted.and.returnValue(true);
+      conversationRepository.teamRepository.isTeamDeleted.and.returnValue(true);
       conversationIds.forEach(conversationId => {
         expect(conversationRepository.find_conversation_by_id(conversationId)).not.toBeDefined();
       });

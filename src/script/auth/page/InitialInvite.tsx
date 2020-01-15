@@ -25,11 +25,11 @@ import {
   ErrorMessage,
   Form,
   H1,
-  ICON_NAME,
   Input,
   InputSubmitCombo,
   Link,
   Muted,
+  PlaneIcon,
   RoundIconButton,
   Text,
 } from '@wireapp/react-ui-kit';
@@ -38,7 +38,7 @@ import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 import {inviteStrings} from '../../strings';
-import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
+import {EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {BackendError} from '../module/action/BackendError';
 import {ValidationError} from '../module/action/ValidationError';
@@ -165,10 +165,11 @@ const InitialInvite = ({
               <RoundIconButton
                 disabled={isFetching || !enteredEmail}
                 type="submit"
-                icon={ICON_NAME.PLANE}
                 data-uie-name="do-send-invite"
                 formNoValidate
-              />
+              >
+                <PlaneIcon />
+              </RoundIconButton>
             </InputSubmitCombo>
           </Form>
           <ErrorMessage data-uie-name="error-message">

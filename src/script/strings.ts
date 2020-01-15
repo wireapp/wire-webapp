@@ -17,6 +17,7 @@
  *
  */
 
+import {SyntheticErrorLabel} from '@wireapp/api-client/dist/http';
 import {defineMessages} from 'react-intl';
 import {BackendError} from './auth/module/action/BackendError';
 import {LabeledError} from './auth/module/action/LabeledError';
@@ -198,6 +199,52 @@ export const chooseHandleStrings = defineMessages({
   },
 });
 
+export const setEmailStrings = defineMessages({
+  button: {
+    defaultMessage: 'Set email',
+    id: 'setEmail.button',
+  },
+  emailPlaceholder: {
+    defaultMessage: 'Email',
+    id: 'setEmail.emailPlaceholder',
+  },
+  headline: {
+    defaultMessage: 'Set email',
+    id: 'setEmail.headline',
+  },
+  noMailHeadline: {
+    defaultMessage: 'No email showing up?',
+    id: 'authPostedResendAction',
+  },
+  tryAgain: {
+    defaultMessage: 'Try again',
+    id: 'setEmail.tryAgain',
+  },
+  verifyHeadline: {
+    defaultMessage: 'You’ve got mail.',
+    id: 'authPostedResendHeadline',
+  },
+  verifySubhead: {
+    defaultMessage: 'Check your email inbox and follow the instructions.',
+    id: 'authPostedResendDetail',
+  },
+});
+
+export const setPasswordStrings = defineMessages({
+  button: {
+    defaultMessage: 'Set password',
+    id: 'setPassword.button',
+  },
+  headline: {
+    defaultMessage: 'Set password',
+    id: 'setPassword.headline',
+  },
+  passwordPlaceholder: {
+    defaultMessage: 'Password',
+    id: 'setPassword.passwordPlaceholder',
+  },
+});
+
 export const appAlreadyOpenStrings = defineMessages({
   continueButton: {
     defaultMessage: 'Continue',
@@ -345,6 +392,14 @@ export const conversationJoinStrings = defineMessages({
 });
 
 export const errorHandlerStrings = defineMessages({
+  [SyntheticErrorLabel.INVALID_PHONE_NUMBER]: {
+    defaultMessage: 'Invalid Phone Number',
+    id: 'authErrorPhoneNumberInvalid',
+  },
+  [SyntheticErrorLabel.FORBIDDEN_PHONE_NUMBER]: {
+    defaultMessage: 'Sorry. This phone number is forbidden.',
+    id: 'authErrorPhoneNumberForbidden',
+  },
   [BackendError.LABEL.CONVERSATION_CODE_NOT_FOUND]: {
     defaultMessage: 'This link is no longer valid. Ask the person who invited you how to join.',
     id: 'BackendError.LABEL.CONVERSATION_CODE_NOT_FOUND',
@@ -380,10 +435,6 @@ export const errorHandlerStrings = defineMessages({
   [BackendError.LABEL.INVALID_EMAIL]: {
     defaultMessage: 'This email address is invalid',
     id: 'BackendError.LABEL.INVALID_EMAIL',
-  },
-  [BackendError.LABEL.INVALID_PHONE]: {
-    defaultMessage: 'This phone number is invalid',
-    id: 'BackendError.LABEL.INVALID_PHONE',
   },
   [BackendError.LABEL.KEY_EXISTS]: {
     defaultMessage:
@@ -624,6 +675,37 @@ export const ssoLoginStrings = defineMessages({
   subhead: {
     defaultMessage: 'Enter the company SSO access code.',
     id: 'ssoLogin.subhead',
+  },
+});
+
+export const phoneLoginStrings = defineMessages({
+  accountCountryCode: {
+    defaultMessage: 'Country Code',
+    id: 'authAccountCountryCode',
+  },
+  errorCountryCodeInvalid: {
+    defaultMessage: 'Invalid Country Code',
+    id: 'authErrorCountryCodeInvalid',
+  },
+  loginHead: {
+    defaultMessage: 'Phone Log in',
+    id: 'authAccountSignInPhone',
+  },
+  verifyCodeChangePhone: {
+    defaultMessage: 'Change phone number',
+    id: 'authVerifyCodeChangePhone',
+  },
+  verifyCodeDescription: {
+    defaultMessage: 'Enter the verification code\nwe sent to {number}.',
+    id: 'authVerifyCodeDescription',
+  },
+  verifyCodeResend: {
+    defaultMessage: 'Resend',
+    id: 'authVerifyCodeResendDetail',
+  },
+  verifyPasswordHeadline: {
+    defaultMessage: 'Enter your password',
+    id: 'authVerifyPasswordHeadline',
   },
 });
 

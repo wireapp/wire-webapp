@@ -27,7 +27,6 @@ import {
   ErrorMessage,
   Form,
   H1,
-  ICON_NAME,
   Input,
   InputSubmitCombo,
   IsMobile,
@@ -44,7 +43,7 @@ import {getLogger} from 'Util/Logger';
 import {addLocaleToUrl} from '../../externalRoute';
 import {teamNameStrings} from '../../strings';
 import RouterLink from '../component/RouterLink';
-import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
+import {EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {ValidationError} from '../module/action/ValidationError';
 import {RootState, bindActionCreators} from '../module/reducer';
@@ -152,10 +151,11 @@ const TeamName = ({
                       disabled={!enteredTeamName || !isValidTeamName}
                       type="submit"
                       formNoValidate
-                      icon={ICON_NAME.ARROW}
                       onClick={handleSubmit}
                       data-uie-name="do-next"
-                    />
+                    >
+                      <ArrowIcon />
+                    </RoundIconButton>
                   </InputSubmitCombo>
                   <ErrorMessage data-uie-name="error-message">
                     {error ? parseValidationErrors(error) : parseError(authError)}

@@ -36,7 +36,7 @@ export class EventService {
    */
   constructor(storageService) {
     this.storageService = storageService;
-    this.logger = getLogger('z.conversation.EventService');
+    this.logger = getLogger('EventService');
   }
 
   /**
@@ -113,7 +113,7 @@ export class EventService {
   }
 
   /**
-   * Load all events that match a minimun category from database.
+   * Load all events matching a minimum category from the database.
    *
    * @param {string} conversationId - ID of conversation to add users to
    * @param {MessageCategory} categoryMin - Minimum message category
@@ -367,7 +367,7 @@ export class EventService {
         throw error;
       }
 
-      const identifiedUpdates = Object.assign({}, updates, {primary_key: key});
+      const identifiedUpdates = {...updates, primary_key: key};
       return this.replaceEvent(identifiedUpdates);
     });
   }

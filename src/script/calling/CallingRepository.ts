@@ -17,39 +17,6 @@
  *
  */
 
-import {Calling, GenericMessage} from '@wireapp/protocol-messaging';
-import {amplify} from 'amplify';
-import ko from 'knockout';
-import {t} from 'Util/LocalizerUtil';
-import {Logger, getLogger} from 'Util/Logger';
-import 'webrtc-adapter';
-import {Config} from '../Config';
-import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
-
-import {Environment} from 'Util/Environment';
-import {createRandomUuid} from 'Util/util';
-import {EventBuilder} from '../conversation/EventBuilder';
-import {MediaStreamHandler} from '../media/MediaStreamHandler';
-import {ModalsViewModel} from '../view_model/ModalsViewModel';
-
-import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
-
-import {ConversationRepository} from '../conversation/ConversationRepository';
-import {EventInfoEntity} from '../conversation/EventInfoEntity';
-import {EventRepository} from '../event/EventRepository';
-import {MediaType} from '../media/MediaType';
-
-import {Call, ConversationId} from './Call';
-import {DeviceId, Participant, UserId} from './Participant';
-
-import {WebAppEvents} from '../event/WebApp';
-
-interface MediaStreamQuery {
-  audio?: boolean;
-  camera?: boolean;
-  screen?: boolean;
-}
-
 import {
   CALL_TYPE,
   CONV_TYPE,
@@ -61,23 +28,60 @@ import {
   Wcall,
   getAvsInstance,
 } from '@wireapp/avs';
+import {Calling, GenericMessage} from '@wireapp/protocol-messaging';
+import {amplify} from 'amplify';
+import ko from 'knockout';
+import 'webrtc-adapter';
+
+import {Environment} from 'Util/Environment';
+import {t} from 'Util/LocalizerUtil';
+import {Logger, getLogger} from 'Util/Logger';
+import {createRandomUuid} from 'Util/util';
+
+import {Config} from '../Config';
+
+import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
+import {ModalsViewModel} from '../view_model/ModalsViewModel';
+
+import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
+
+import {ConversationRepository} from '../conversation/ConversationRepository';
+import {EventBuilder} from '../conversation/EventBuilder';
+import {EventInfoEntity} from '../conversation/EventInfoEntity';
+import {EventRepository} from '../event/EventRepository';
+import {WebAppEvents} from '../event/WebApp';
+
+import {MediaStreamHandler} from '../media/MediaStreamHandler';
+import {MediaType} from '../media/MediaType';
+
+import {User} from '../entity/User';
+import {BackendClient} from '../service/BackendClient';
+import {ServerTimeHandler} from '../time/serverTimeHandler';
+import {Call, ConversationId} from './Call';
+import {DeviceId, Participant, UserId} from './Participant';
+
+interface MediaStreamQuery {
+  audio?: boolean;
+  camera?: boolean;
+  screen?: boolean;
+}
 
 export class CallingRepository {
-  private readonly backendClient: any;
-  private readonly conversationRepository: any;
-  private readonly eventRepository: any;
+  private readonly backendClient: BackendClient;
+  private readonly conversationRepository: ConversationRepository;
+  private readonly eventRepository: EventRepository;
   private readonly mediaStreamHandler: MediaStreamHandler;
-  private readonly serverTimeHandler: any;
+  private readonly serverTimeHandler: ServerTimeHandler;
 
-  private selfUser: any;
-  private selfClientId: DeviceId;
-  private isReady: boolean = false;
-  private wUser?: number;
-  private wCall?: Wcall;
   private avsVersion: number;
-  public readonly activeCalls: ko.ObservableArray<Call>;
-  private readonly isMuted: ko.Observable<boolean>;
   private incomingCallCallback: (call: Call) => void;
+  private isReady: boolean = false;
+  private selfClientId: DeviceId;
+  private selfUser: User;
+  private wCall?: Wcall;
+  private wUser?: number;
+  readonly activeCalls: ko.ObservableArray<Call>;
+  readonly isMuted: ko.Observable<boolean>;
 
   // will cache the query to media stream (in order to avoid asking the system for streams multiple times when we have multiple peers)
   private mediaStreamQuery?: Promise<MediaStream>;
@@ -87,7 +91,8 @@ export class CallingRepository {
   private readonly logger: Logger;
   private readonly callLog: string[];
 
-  static get CONFIG(): any {
+  // tslint:disable-next-line:typedef
+  static get CONFIG() {
     return {
       DEFAULT_CONFIG_TTL: 60 * 60, // 60 minutes in seconds
       MAX_FIREFOX_TURN_COUNT: 3,
@@ -95,11 +100,11 @@ export class CallingRepository {
   }
 
   constructor(
-    backendClient: any,
-    conversationRepository: any,
-    eventRepository: any,
+    backendClient: BackendClient,
+    conversationRepository: ConversationRepository,
+    eventRepository: EventRepository,
     mediaStreamHandler: MediaStreamHandler,
-    serverTimeHandler: any,
+    serverTimeHandler: ServerTimeHandler,
   ) {
     this.activeCalls = ko.observableArray();
     this.isMuted = ko.observable(false);
@@ -202,7 +207,7 @@ export class CallingRepository {
 
   private findParticipant(conversationId: ConversationId, userId: UserId): Participant | undefined {
     const call = this.findCall(conversationId);
-    return call && call.participants().find(participant => participant.userId === userId);
+    return call?.participants().find(participant => participant.userId === userId);
   }
 
   private storeCall(call: Call): void {
@@ -282,7 +287,7 @@ export class CallingRepository {
         const isAnotherSelfClient = userId === this.selfUser.id && clientId !== this.selfClientId;
         if (isAnotherSelfClient) {
           const call = this.findCall(conversationId);
-          if (call && call.state() === CALL_STATE.INCOMING) {
+          if (call?.state() === CALL_STATE.INCOMING) {
             // If the group leave was sent from the self user from another device,
             // we reset the reason so that the call is not shown in the UI.
             // If the call is already accepted, we keep the call UI.
@@ -329,7 +334,7 @@ export class CallingRepository {
     type: string,
     conversationId: ConversationId,
     userId: UserId,
-    time: number,
+    time: string,
     source: string,
   ): void {
     // save event if needed
@@ -459,7 +464,7 @@ export class CallingRepository {
     if (call && !validStateWithoutCamera.includes(call.state())) {
       this.leaveCall(call.conversationId);
     }
-    if (call && call.state() !== CALL_STATE.ANSWERED) {
+    if (call?.state() !== CALL_STATE.ANSWERED) {
       if (requestedStreams.camera) {
         this.showNoCameraModal();
       }
@@ -510,9 +515,9 @@ export class CallingRepository {
   // Notifications
   //##############################################################################
 
-  private injectActivateEvent(conversationId: ConversationId, userId: UserId, time: number, source: string): void {
+  private injectActivateEvent(conversationId: ConversationId, userId: UserId, time: string, source: string): void {
     const event = EventBuilder.buildVoiceChannelActivate(conversationId, userId, time, this.avsVersion);
-    this.eventRepository.injectEvent(event, source);
+    this.eventRepository.injectEvent(event, source as any);
   }
 
   private injectDeactivateEvent(
@@ -531,7 +536,7 @@ export class CallingRepository {
       time,
       this.avsVersion,
     );
-    this.eventRepository.injectEvent(event, source);
+    this.eventRepository.injectEvent(event, source as any);
   }
 
   private readonly sendMessage = (
@@ -549,7 +554,7 @@ export class CallingRepository {
       messageId: createRandomUuid(),
     });
     const call = this.findCall(conversationId);
-    if (call && call.blockMessages) {
+    if (call?.blockMessages) {
       return 0;
     }
 
@@ -687,22 +692,25 @@ export class CallingRepository {
       return Promise.reject();
     }
     const selfParticipant = call.selfParticipant;
-    const query = {audio, camera, screen};
+    const query: Required<MediaStreamQuery> = {audio, camera, screen};
     const cache = {
       audio: selfParticipant.audioStream(),
       camera: selfParticipant.videoStream(),
       screen: selfParticipant.videoStream(),
     };
-    const missingStreams: MediaStreamQuery = Object.entries(cache).reduce((missings, [type, isCached]) => {
-      if (isCached || !(query as any)[type]) {
+    const missingStreams = Object.entries(cache).reduce(
+      (missings: MediaStreamQuery, [type, isCached]: [keyof MediaStreamQuery, MediaStream]) => {
+        if (!isCached && !!query[type]) {
+          missings[type] = true;
+        }
         return missings;
-      }
-      return {...missings, [type]: true};
-    }, {});
+      },
+      {},
+    );
 
     const queryLog = Object.entries(query)
       .filter(([type, needed]) => needed)
-      .map(([type]) => ((missingStreams as any)[type] ? type : `${type} (from cache)`))
+      .map(([type]) => (missingStreams[type as keyof MediaStreamQuery] ? type : `${type} (from cache)`))
       .join(', ');
     this.logger.debug(`mediaStream requested: ${queryLog}`);
 

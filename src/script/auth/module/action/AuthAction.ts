@@ -82,7 +82,12 @@ export class AuthAction {
         await dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: global.config.APP_INSTANCE_ID}));
         await dispatch(selfAction.fetchSelf());
         onAfterLogin(dispatch, getState, global);
-        await dispatch(clientAction.doInitializeClient(loginData.clientType, String(loginData.password)));
+        await dispatch(
+          clientAction.doInitializeClient(
+            loginData.clientType,
+            loginData.password ? String(loginData.password) : undefined,
+          ),
+        );
         dispatch(AuthActionCreator.successfulLogin());
       } catch (error) {
         if (error.label === BackendError.LABEL.TOO_MANY_CLIENTS) {
@@ -142,7 +147,7 @@ export class AuthAction {
   validateSSOCode = (code: string): ThunkAction => {
     return async (dispatch, getState, {apiClient}) => {
       const mapError = (error: any) => {
-        const statusCode = error && error.response && error.response.status;
+        const statusCode = error?.response?.status;
         if (statusCode === 404) {
           return new BackendError({code: 404, label: BackendError.SSO_ERRORS.SSO_NOT_FOUND});
         }
@@ -189,6 +194,12 @@ export class AuthAction {
   pushAccountRegistrationData = (registration: Partial<RegistrationDataState>): ThunkAction => {
     return async dispatch => {
       dispatch(AuthActionCreator.pushAccountRegistrationData(registration));
+    };
+  };
+
+  pushLoginData = (loginData: Partial<LoginData>): ThunkAction => {
+    return async dispatch => {
+      dispatch(AuthActionCreator.pushLoginData(loginData));
     };
   };
 

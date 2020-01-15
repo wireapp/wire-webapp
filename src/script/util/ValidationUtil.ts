@@ -41,28 +41,28 @@ export const isValidUsername = (username: string) => /^@?[a-z_0-9]{2,21}$/.test(
  * Checks if input has the format of an international phone number
  * @note Begins with + and contains only numbers
  * @param phoneNumber Input
- * @returns True, if the input a phone number
+ * @returns `true`, if the input a phone number
  */
-export const isValidPhoneNumber = (phoneNumber: string) => {
+export const isValidPhoneNumber = (phoneNumber: string): boolean => {
   const allowDebugPhoneNumbers = Config.FEATURE.ENABLE_DEBUG;
   const regularExpression = allowDebugPhoneNumbers ? /^\+[0-9]\d{1,14}$/ : /^\+[1-9]\d{1,14}$/;
 
   return regularExpression.test(phoneNumber);
 };
 
-export const isValidEmail = (email: string) => {
+export const isValidEmail = (email: string): boolean => {
   const regExp = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return regExp.test(email);
 };
 
 // Since some special chars are allowed, remember to always
 // encode Bearer tokens using encodeURIComponents afterwards!
-export const isBearerToken = (token: string) => /^[a-zA-Z0-9\-._~+/]+[=]{0,2}$/.test(token);
+export const isBearerToken = (token: string): boolean => /^[a-zA-Z0-9\-._~+/]+[=]{0,2}$/.test(token);
 
-export const isUUID = (string: string) =>
+export const isUUID = (string: string): boolean =>
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(string);
 
-export const isBase64 = (string: string) => {
+export const isBase64 = (string: string): boolean => {
   try {
     // Will raise a DOM exception if base64 string is invalid
     window.atob(string);
@@ -72,7 +72,7 @@ export const isBase64 = (string: string) => {
   return true;
 };
 
-export const isValidApiPath = (path: string) => {
+export const isValidApiPath = (path: string): boolean => {
   const [urlPath] = path.split('?');
   if (!/^\/[a-zA-Z0-9\-_/,]+$/.test(urlPath)) {
     throw new ValidationUtilError(`Non-compliant path creation attempt. Details: ${path}`);
@@ -80,12 +80,12 @@ export const isValidApiPath = (path: string) => {
   return true;
 };
 
-export const isTweetUrl = (url: string) => {
+export const isTweetUrl = (url: string): boolean => {
   const regex = /^http(?:s)?:\/\/(?:(?:www|mobile|0)\.)?twitter\.com\/(?:(?:\w{1,15})\/status(?:es|\/i)?|i\/moments)\/(?:\d{2,21})(?:(?:\?|\/).*)?$/;
   return regex.test(url);
 };
 
-export const legacyAsset = (assetId: string, conversationId: string) => {
+export const legacyAsset = (assetId: string, conversationId: string): true => {
   if (!isUUID(assetId) || !isUUID(conversationId)) {
     throw new ValidationUtilError('Invalid assetId / conversationId');
   }
@@ -93,10 +93,10 @@ export const legacyAsset = (assetId: string, conversationId: string) => {
 };
 
 // https://github.com/wireapp/wire-server/blob/dc3e9a8af5250c0d045e96a31aa23c255b4e01a3/libs/cargohold-types/src/CargoHold/Types/V3.hs#L156-L177
-export const assetRetentionPolicy = (policyId: number | string) =>
+export const assetRetentionPolicy = (policyId: number | string): boolean =>
   policyId > 0 && policyId < Object.keys(AssetRetentionPolicy).length + 1;
 
-export const assetV3 = (assetKey: string, assetToken?: string) => {
+export const assetV3 = (assetKey: string, assetToken?: string): true => {
   if (!assetKey) {
     throw new ValidationUtilError('Asset key not defined');
   }
