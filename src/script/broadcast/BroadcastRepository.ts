@@ -129,7 +129,8 @@ export class BroadcastRepository {
         this.clientMismatchHandler.onClientMismatch(eventInfoEntity, response, payload);
         return response;
       })
-      .catch(error => {
+      .catch(axiosError => {
+        const error = axiosError.response?.data || axiosError;
         const isUnknownClient = error.label === BackendClientError.LABEL.UNKNOWN_CLIENT;
         if (isUnknownClient) {
           this.clientRepository.removeLocalClient();
