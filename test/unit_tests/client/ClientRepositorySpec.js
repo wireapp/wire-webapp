@@ -118,7 +118,9 @@ describe('ClientRepository', () => {
       const clientService = TestFactory.client_repository.clientService;
       spyOn(clientService, 'loadClientFromDb').and.returnValue(Promise.resolve(clientPayloadDatabase));
       spyOn(TestFactory.storage_service, 'deleteDatabase').and.returnValue(Promise.resolve(true));
-      spyOn(clientService, 'getClientById').and.returnValue(Promise.reject(new Error({response: {status: 404}})));
+      const backendError = new Error();
+      backendError.response = {status: 404};
+      spyOn(clientService, 'getClientById').and.returnValue(Promise.reject(backendError));
 
       return TestFactory.client_repository
         .getValidLocalClient()
