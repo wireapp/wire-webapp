@@ -120,7 +120,7 @@ describe('ClientRepository', () => {
       spyOn(TestFactory.storage_service, 'deleteDatabase').and.returnValue(Promise.resolve(true));
       const backendError = new Error();
       backendError.status = 404;
-      spyOn(clientService, 'getClientById').and.returnValue(Promise.reject(backendError));
+      spyOn(clientService, 'getClientById').and.returnValue(Promise.reject(new Error({response: backendError})));
 
       return TestFactory.client_repository
         .getValidLocalClient()
