@@ -342,7 +342,11 @@ export class ConversationAPI {
    * @param providerId ID of the bot provider
    * @param serviceId ID of the service provider
    */
-  public async postBot(conversationId: string, providerId: string, serviceId: string): Promise<void> {
+  public async postBot(
+    conversationId: string,
+    providerId: string,
+    serviceId: string,
+  ): Promise<ConversationMemberJoinEvent> {
     const config: AxiosRequestConfig = {
       data: {
         provider: providerId,
@@ -352,7 +356,8 @@ export class ConversationAPI {
       url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.BOTS}`,
     };
 
-    await this.client.sendJSON(config);
+    const response = await this.client.sendJSON<ConversationMemberJoinEvent>(config);
+    return response.data;
   }
 
   /**
