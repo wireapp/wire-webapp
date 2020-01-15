@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.16.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.16.0...@wireapp/api-client@9.16.1) (2020-01-15)
+
+
+### Bug Fixes
+
+* **api-client:** postBot return type ([#2755](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2755)) ([0b4061a](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/0b4061a3e3b9b8a6dab023a2ae0e7cce06c7c5ef))
+
+
+
+
+
 # [9.16.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.15.2...@wireapp/api-client@9.16.0) (2020-01-14)
 
 
