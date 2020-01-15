@@ -280,7 +280,7 @@ export class ConversationService {
    * @param serviceId ID of service
    * @returns Resolves with the server response
    */
-  postBots(conversationId: string, providerId: string, serviceId: string): Promise<void> {
+  postBots(conversationId: string, providerId: string, serviceId: string): Promise<ConversationMemberJoinEvent> {
     return this.apiClient.conversation.api.postBot(conversationId, providerId, serviceId);
   }
 
