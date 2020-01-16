@@ -95,6 +95,7 @@ ko.bindingHandlers.paste_file = {
         .filter(item => item.kind === 'file')
         .map(item => new Blob([item.getAsFile()], {type: item.type}))
         .filter(item => item && item.size !== 4); // Pasted files result in 4 byte blob (OSX)
+
       if (files.length > 0) {
         valueAccessor()(files);
         return false;
