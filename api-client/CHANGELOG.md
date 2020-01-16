@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.16.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.16.1...@wireapp/api-client@9.16.2) (2020-01-16)
+
+
+### Bug Fixes
+
+* **core:** Giphy search return value ([#2763](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2763)) ([91756c3](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/91756c3566fec9a53cd8a2e2b04ec55ef4e60868))
+
+
+
+
+
 ## [9.16.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.16.0...@wireapp/api-client@9.16.1) (2020-01-15)
 
 

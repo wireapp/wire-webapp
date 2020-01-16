@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [15.3.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@15.3.0...@wireapp/core@15.3.1) (2020-01-16)
+
+
+### Bug Fixes
+
+* **core:** Giphy search return value ([#2763](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/2763)) ([91756c3](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/91756c3566fec9a53cd8a2e2b04ec55ef4e60868))
+
+
+
+
+
 # [15.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@15.2.18...@wireapp/core@15.3.0) (2020-01-16)
 
 
