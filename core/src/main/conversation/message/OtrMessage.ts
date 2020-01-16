@@ -135,3 +135,5 @@ export type OtrMessage =
   | ReactionMessage
   | ResetSessionMessage
   | TextMessage;
+
+export type QuotableMessage = EditedTextMessage | ImageAssetMessage | LocationMessage | TextMessage;

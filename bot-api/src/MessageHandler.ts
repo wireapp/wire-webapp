@@ -32,6 +32,7 @@ import {
   MentionContent,
 } from '@wireapp/core/dist/conversation/content/';
 import {Asset, Confirmation} from '@wireapp/protocol-messaging';
+import {QuotableMessage} from '@wireapp/core/dist/conversation/message/OtrMessage';
 
 export abstract class MessageHandler {
   public account: Account | undefined = undefined;
@@ -186,18 +187,18 @@ export abstract class MessageHandler {
     }
   }
 
-  public async sendQuote(conversationId: string, quotedMessageId: string, text: string): Promise<void> {
+  public async sendQuote(conversationId: string, quotedMessage: QuotableMessage, text: string): Promise<void> {
     if (this.account?.service) {
       const replyPayload = this.account.service.conversation.messageBuilder
         .createText(conversationId, text)
-        .withQuote({quotedMessageId})
+        .withQuote(quotedMessage)
         .build();
       await this.account.service.conversation.send(replyPayload);
     }
   }
 
-  public sendReply(conversationId: string, quotedMessageId: string, text: string): Promise<void> {
-    return this.sendQuote(conversationId, quotedMessageId, text);
+  public sendReply(conversationId: string, quotedMessage: QuotableMessage, text: string): Promise<void> {
+    return this.sendQuote(conversationId, quotedMessage, text);
   }
 
   public async sendText(
