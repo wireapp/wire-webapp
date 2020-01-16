@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [15.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@15.2.18...@wireapp/core@15.3.0) (2020-01-16)
+
+
+### Features
+
+* **bot-api:** Use message to send a quote ([#2762](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/2762)) ([d794eaf](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/d794eaff776d85e6c00c99379436d94fad77cdb2))
+
+
+
+
+
 ## [15.2.18](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@15.2.17...@wireapp/core@15.2.18) (2020-01-15)
 
 **Note:** Version bump only for package @wireapp/core
