@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@7.1.38...@wireapp/bot-api@7.2.0) (2020-01-16)
+
+
+### Features
+
+* **bot-api:** Add quote sending ([#2761](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/issues/2761)) ([fd59573](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/commit/fd595732016774f03a03da86db75babb4f346fb8))
+
+
+
+
+
 ## [7.1.38](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@7.1.37...@wireapp/bot-api@7.1.38) (2020-01-15)
 
 **Note:** Version bump only for package @wireapp/bot-api
