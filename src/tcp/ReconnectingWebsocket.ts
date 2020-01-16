@@ -103,7 +103,7 @@ export class ReconnectingWebsocket {
   };
 
   private readonly internalOnOpen = (event: Event) => {
-    this.logger.debug('WebSocket opened', event);
+    this.logger.debug('WebSocket opened');
     if (this.socket) {
       this.socket.binaryType = 'arraybuffer';
     }
@@ -121,7 +121,7 @@ export class ReconnectingWebsocket {
   };
 
   private readonly internalOnClose = (event: CloseEvent) => {
-    this.logger.debug('WebSocket closed', event);
+    this.logger.debug('WebSocket closed');
     this.stopPinging();
     if (this.onClose) {
       this.onClose(event);
