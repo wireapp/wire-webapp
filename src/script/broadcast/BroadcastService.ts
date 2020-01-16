@@ -41,7 +41,7 @@ export class BroadcastService {
     preconditionOption: string[] | boolean,
   ): Promise<UserClients> {
     return this.apiClient.broadcast.api.postBroadcastMessage(payload.sender, payload, {
-      ignore_missing: preconditionOption === true,
+      ignore_missing: preconditionOption === true ? true : undefined,
       report_missing: Array.isArray(preconditionOption) ? preconditionOption.join(',') : undefined,
     });
   }

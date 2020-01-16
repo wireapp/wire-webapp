@@ -312,7 +312,7 @@ export class ConversationService {
     precondition_option: true | string[],
   ): Promise<ClientMismatch> {
     return this.apiClient.conversation.api.postOTRMessage(payload.sender, conversationId, payload, {
-      ignore_missing: precondition_option === true,
+      ignore_missing: precondition_option === true ? true : undefined,
       report_missing: Array.isArray(precondition_option) ? precondition_option.join(',') : undefined,
     });
   }
