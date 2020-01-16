@@ -3,7 +3,7 @@
     "@types/node": "~12",
     "@wireapp/lru-cache": "3.4.1",
     "@wireapp/priority-queue": "1.4.0",
-    "@wireapp/proteus": "9.5.0",
+    "@wireapp/proteus": "9.6.0",
     "@wireapp/store-engine": "4.3.1",
     "bazinga64": "5.6.1",
     "logdown": "3.3.0"
@@ -45,5 +45,5 @@
     "test:project": "yarn dist && yarn test",
     "test:node": "cross-env NODE_DEBUG=@wireapp/cryptobox* jasmine --config=test/jasmine.node.json"
   },
-  "version": "12.1.2"
+  "version": "12.1.3"
 }

@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# 4.5.0 (2020-01-16)
+
+
+### Bug Fixes
+
+* **cbor:** Add missing dependency ([#2764](https://github.com/wireapp/wire-web-packages/tree/master/packages/cbor/issues/2764)) ([042206b](https://github.com/wireapp/wire-web-packages/tree/master/packages/cbor/commit/042206be91bfb6fa4a025f0d972317457b186a62))
+
+
+### Features
+
+* **api-client:** Add putConversationReceiptMode ([#2716](https://github.com/wireapp/wire-web-packages/tree/master/packages/cbor/issues/2716)) ([96bb812](https://github.com/wireapp/wire-web-packages/tree/master/packages/cbor/commit/96bb8122c0d92ad12f77c6879edd902afca2dbfa))
+
+
+
+
+
 # [4.4.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/cbor/compare/@wireapp/cbor@4.3.26...@wireapp/cbor@4.4.0) (2020-01-08)
 
 
