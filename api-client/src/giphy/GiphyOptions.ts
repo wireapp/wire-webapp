@@ -17,8 +17,13 @@
  *
  */
 
+export enum GiphySorting {
+  RECENT = 'recent',
+  RELEVANT = 'relevant',
+}
+
 export interface GiphyOptions {
   limit?: number;
   offset?: number;
-  sort?: 'relevant' | 'recent';
+  sort?: GiphySorting;
 }

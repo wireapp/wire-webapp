@@ -19,7 +19,7 @@
 
 import {AxiosRequestConfig} from 'axios';
 
-import {GiphyOptions, GiphyResult, GiphySearchResult} from '../giphy/';
+import {GiphyOptions, GiphyResult, GiphySearchResult, GiphySorting} from '../giphy/';
 import {HttpClient} from '../http/';
 
 export class GiphyAPI {
@@ -72,7 +72,7 @@ export class GiphyAPI {
     const defaultOptions: GiphyOptions = {
       limit: 25,
       offset: 0,
-      sort: 'relevant',
+      sort: GiphySorting.RELEVANT,
     };
     const config: AxiosRequestConfig = {
       method: 'get',
