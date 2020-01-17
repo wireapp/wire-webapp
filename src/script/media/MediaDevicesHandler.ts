@@ -185,30 +185,25 @@ export class MediaDevicesHandler {
         this._removeAllDevices();
 
         if (mediaDevices) {
-          const audioInputDevices: MediaDeviceInfo[] = [];
-          const audioOutputDevices: MediaDeviceInfo[] = [];
-          const videoInputDevices: MediaDeviceInfo[] = [];
-
-          mediaDevices.forEach(mediaDevice => {
-            switch (mediaDevice.kind) {
-              case MediaDeviceType.AUDIO_INPUT: {
-                audioInputDevices.push(mediaDevice);
-                break;
-              }
-
-              case MediaDeviceType.AUDIO_OUTPUT: {
-                audioOutputDevices.push(mediaDevice);
-                break;
-              }
-
-              case MediaDeviceType.VIDEO_INPUT: {
-                videoInputDevices.push(mediaDevice);
-                break;
-              }
+          const audioOutputDevices: MediaDeviceInfo[] = mediaDevices.filter(
+            device => device.kind === MediaDeviceType.AUDIO_OUTPUT,
+          );
+          const videoInputDevices: MediaDeviceInfo[] = mediaDevices.filter(
+            device => device.kind === MediaDeviceType.VIDEO_INPUT,
+          );
+          const microphones = mediaDevices.filter(device => device.kind === MediaDeviceType.AUDIO_INPUT);
+          /**
+           * On Windows the same microphone can be listed multiple times with different group ids ("default", "communications", etc.).
+           * In such a scenario, only the device listed as "communications" device works, so we filter its duplicates to prevent the user from selecting a non-working audio input.
+           */
+          const dedupedMicrophones = microphones.reduce((acc: Record<string, MediaDeviceInfo>, microphone) => {
+            if (!acc.hasOwnProperty(microphone.groupId) || microphone.deviceId === 'communications') {
+              acc[microphone.groupId] = microphone;
             }
-          });
+            return acc;
+          }, {});
 
-          koArrayPushAll(this.availableDevices.audioInput, audioInputDevices);
+          koArrayPushAll(this.availableDevices.audioInput, Object.values(dedupedMicrophones));
           koArrayPushAll(this.availableDevices.audioOutput, audioOutputDevices);
           koArrayPushAll(this.availableDevices.videoInput, videoInputDevices);
 
