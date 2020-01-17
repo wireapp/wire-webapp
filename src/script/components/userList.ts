@@ -67,13 +67,13 @@ const listTemplate = (data: string, uieName: string = ''): string => `
       ${uieName ? ` data-uie-name="${uieName}"` : ''}>
     <!-- ko if: noSelfInteraction && user.is_me -->
       <participant-item
-        params="participant: user, customInfo: infos && infos()[user.id], canSelect: isSelectEnabled, isSelected: isSelected(user), mode: mode, external: teamRepository.isExternal(user.id), selfInTeam: selfInTeam"
+        params="participant: user, customInfo: infos && infos()[user.id], canSelect: isSelectEnabled, isSelected: isSelected(user), mode: mode, external: teamRepository.isExternal(user.id), selfInTeam: selfInTeam, isSelfVerified: isSelfVerified"
         data-bind="css: {'no-underline': noUnderline, 'highlighted': highlightedUserIds.includes(user.id), 'no-interaction': true}">
       </participant-item>
     <!-- /ko -->
     <!-- ko ifnot: noSelfInteraction && user.is_me -->
       <participant-item
-        params="participant: user, customInfo: infos && infos()[user.id], canSelect: isSelectEnabled, isSelected: isSelected(user), mode: mode, external: teamRepository.isExternal(user.id), selfInTeam: selfInTeam"
+        params="participant: user, customInfo: infos && infos()[user.id], canSelect: isSelectEnabled, isSelected: isSelected(user), mode: mode, external: teamRepository.isExternal(user.id), selfInTeam: selfInTeam, isSelfVerified: isSelfVerified"
         data-bind="click: (viewmodel, event) => onUserClick(user, event), css: {'no-underline': noUnderline, 'show-arrow': arrow, 'highlighted': highlightedUserIds.includes(user.id)}">
       </participant-item>
     <!-- /ko -->
@@ -148,6 +148,7 @@ ko.components.register('user-list', {
     this.noUnderline = noUnderline;
     this.arrow = arrow;
     this.selfInTeam = teamRepository.selfUser().inTeam();
+    this.isSelfVerified = teamRepository.selfUser().is_verified;
     this.showRoles = ko.pureComputed(() => !!conversation);
     this.showEmptyAdmin = showEmptyAdmin;
     this.noSelfInteraction = noSelfInteraction;

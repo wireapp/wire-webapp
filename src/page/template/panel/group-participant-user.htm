@@ -6,7 +6,7 @@
     </div>
     <div class="panel__content" data-bind="fadingscrollbar">
       <!-- ko if: selectedParticipant() -->
-        <panel-user-details params="participant: selectedParticipant, badge: teamRepository.getRoleBadge(selectedParticipant().id), isGroupAdmin: isAdmin"></panel-user-details>
+        <panel-user-details params="participant: selectedParticipant, badge: teamRepository.getRoleBadge(selectedParticipant().id), isGroupAdmin: isAdmin, isSelfVerified: isSelfVerified"></panel-user-details>
       <!-- /ko -->
       <!-- ko if: showActionDevices(selectedParticipant()) -->
         <div class="panel__action-item conversation-details__devices" data-bind="click: clickOnDevices" data-uie-name="go-devices">
