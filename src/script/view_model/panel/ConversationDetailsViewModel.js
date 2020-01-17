@@ -72,6 +72,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     this.userParticipants = ko.observableArray();
     this.showAllUsersCount = ko.observable(0);
     this.selectedService = ko.observable();
+    this.isSelfVerified = ko.pureComputed(() => user.self()?.is_verified());
 
     const roleRepository = this.conversationRepository.conversationRoleRepository;
 

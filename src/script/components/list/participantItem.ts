@@ -40,6 +40,7 @@ interface ParticipantItemParams {
   hideInfo: boolean;
   selfInTeam: boolean;
   external: boolean;
+  isSelfVerified: ko.Subscribable<boolean>;
 }
 
 class ParticipantItem {
@@ -59,6 +60,7 @@ class ParticipantItem {
   hasUsernameInfo: boolean;
   contentInfo: string | ko.Observable<string>;
   isInViewport: ko.Observable<boolean>;
+  isSelfVerified: ko.Subscribable<boolean>;
 
   constructor(
     {
@@ -72,6 +74,7 @@ class ParticipantItem {
       hideInfo,
       selfInTeam,
       external,
+      isSelfVerified = ko.observable(false),
     }: ParticipantItemParams,
     element: HTMLElement,
   ) {
@@ -84,6 +87,7 @@ class ParticipantItem {
     this.isService = this.participant instanceof ServiceEntity || this.participant.isService;
     this.isUser = this.participant instanceof User && !this.participant.isService;
     this.selfInTeam = selfInTeam;
+    this.isSelfVerified = isSelfVerified;
     this.badge = badge;
 
     this.isDefaultMode = mode === UserlistMode.DEFAULT;
@@ -153,7 +157,7 @@ ko.components.register('participant-item', {
           </div>
         </div>
 
-        <!-- ko if: isUser && participant.is_verified() -->
+        <!-- ko if: isUser && isSelfVerified() && participant.is_verified() -->
           <verified-icon data-uie-name="status-verified"></verified-icon>
         <!-- /ko -->
 

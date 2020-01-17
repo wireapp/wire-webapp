@@ -43,6 +43,8 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
 
     this.onUserAction = this.onUserAction.bind(this);
 
+    this.isSelfVerified = ko.pureComputed(() => repositories.user.self()?.is_verified());
+
     this.canChangeRole = ko.pureComputed(
       () =>
         this.conversationRoleRepository.canChangeParticipantRoles(this.activeConversation()) &&

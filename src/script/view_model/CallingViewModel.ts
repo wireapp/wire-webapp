@@ -72,6 +72,7 @@ export class CallingViewModel {
   readonly multitasking: any;
   readonly permissionRepository: PermissionRepository;
   readonly selectableScreens: ko.Observable<ElectronDesktopCapturerSource[]>;
+  readonly isSelfVerified: ko.Computed<boolean>;
 
   constructor(
     callingRepository: CallingRepository,
@@ -90,6 +91,7 @@ export class CallingViewModel {
     this.mediaStreamHandler = mediaStreamHandler;
     this.permissionRepository = permissionRepository;
     this.selfUser = selfUser;
+    this.isSelfVerified = ko.pureComputed(() => selfUser().is_verified());
     this.activeCalls = ko.pureComputed(() =>
       callingRepository.activeCalls().filter(call => call.reason() !== CALL_REASON.ANSWERED_ELSEWHERE),
     );
