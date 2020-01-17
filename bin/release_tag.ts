@@ -169,8 +169,8 @@ const announceRelease = async (tagName: string, commitId: string): Promise<void>
     });
     const message = `Released tag "${tagName}" based on commit ID "${commitId}".`;
     const payload = account.service.conversation.messageBuilder.createText(WIRE_CONVERSATION, message).build();
-    await account.service.conversation.send(payload);
     await sendRandomGif(account, WIRE_CONVERSATION, 'in the oven');
+    await account.service.conversation.send(payload);
   }
 };
 
