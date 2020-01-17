@@ -22,7 +22,6 @@ import {MediaDeviceType} from 'src/script/media/MediaDeviceType';
 import {MediaDevicesHandler} from 'src/script/media/MediaDevicesHandler';
 
 describe('MediaDevicesHandler', () => {
-  const screens = [{id: 'screen1', name: 'Screen 1'}, {id: 'screen2', name: 'Screen 2'}];
   const cameras = [
     {deviceId: 'camera1', kind: MediaDeviceType.VIDEO_INPUT, label: 'Camera 1'},
     {deviceId: 'camera2', kind: MediaDeviceType.VIDEO_INPUT, label: 'Camera 2'},
@@ -46,20 +45,20 @@ describe('MediaDevicesHandler', () => {
     it('loads available devices and listens to input devices changes', done => {
       const devicesHandler = new MediaDevicesHandler();
       setTimeout(() => {
-        expect(navigator.mediaDevices.enumerateDevices).toHaveBeenCalledTimes(1);
-        expect(devicesHandler.availableDevices.videoInput()).toEqual(cameras);
-        expect(devicesHandler.availableDevices.audioInput()).toEqual(mics);
-        expect(devicesHandler.availableDevices.audioOutput()).toEqual(speakers);
+        expect(navigator.mediaDevices.enumerateDevices).withContext('Initial enumeration').toHaveBeenCalledTimes(1);
+        expect(devicesHandler.availableDevices.videoInput()).withContext('Initial cameras').toEqual(cameras);
+        expect(devicesHandler.availableDevices.audioInput()).withContext('Initial microphones').toEqual(mics);
+        expect(devicesHandler.availableDevices.audioOutput()).withContext('Initial speakers').toEqual(speakers);
 
         const newCameras = [{deviceId: 'newcamera', kind: MediaDeviceType.VIDEO_INPUT}];
         navigator.mediaDevices.enumerateDevices.and.returnValue(Promise.resolve(newCameras));
         navigator.mediaDevices.ondevicechange();
 
         setTimeout(() => {
-          expect(navigator.mediaDevices.enumerateDevices).toHaveBeenCalledTimes(2);
-          expect(devicesHandler.availableDevices.videoInput()).toEqual(newCameras);
-          expect(devicesHandler.availableDevices.audioInput()).toEqual([]);
-          expect(devicesHandler.availableDevices.audioOutput()).toEqual([]);
+          expect(navigator.mediaDevices.enumerateDevices).withContext('Updated enumeration').toHaveBeenCalledTimes(2);
+          expect(devicesHandler.availableDevices.videoInput()).withContext('Updated cameras').toEqual(newCameras);
+          expect(devicesHandler.availableDevices.audioInput()).withContext('Updated microphones').toEqual([]);
+          expect(devicesHandler.availableDevices.audioOutput()).withContext('Updated speakers').toEqual([]);
           done();
         });
       });
