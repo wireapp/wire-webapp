@@ -33,6 +33,7 @@ import {
 } from '@wireapp/core/dist/conversation/content/';
 import {Asset, Confirmation} from '@wireapp/protocol-messaging';
 import {QuotableMessage} from '@wireapp/core/dist/conversation/message/OtrMessage';
+import {Conversation} from '@wireapp/api-client/dist/conversation';
 
 export abstract class MessageHandler {
   public account: Account | undefined = undefined;
@@ -49,6 +50,14 @@ export abstract class MessageHandler {
     if (this.account?.service) {
       await this.account.service.conversation.clearConversation(conversationId);
     }
+  }
+
+  public getConversation(conversationId: string): Promise<Conversation> {
+    return this.account!.service!.conversation.getConversations(conversationId);
+  }
+
+  public getConversations(conversationIds?: string[]): Promise<Conversation[]> {
+    return this.account!.service!.conversation.getConversations(conversationIds);
   }
 
   public async getUser(userId: string): Promise<User> {
