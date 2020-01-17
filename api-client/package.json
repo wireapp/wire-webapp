@@ -27,7 +27,7 @@
     "@types/karma": "3.0.5",
     "@types/react": "16.9.17",
     "@types/react-dom": "16.9.4",
-    "@types/ws": "6.0.4",
+    "@types/ws": "7.2.0",
     "@wireapp/react-ui-kit": "7.26.2",
     "@wireapp/store-engine": "4.3.1",
     "@wireapp/store-engine-fs": "2.1.4",
