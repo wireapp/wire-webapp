@@ -16,41 +16,46 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-
+import ko from 'knockout';
 import {debounce} from 'underscore';
 
 import {interpolate} from 'Util/ArrayUtil';
 import {clamp} from 'Util/NumberUtil';
 
+interface Params {
+  src: HTMLAudioElement;
+  disabled: ko.Subscribable<boolean>;
+
+  // TODO: replace with proper Type once they are defined
+  asset: any;
+}
+
 class AudioSeekBarComponent {
-  /**
-   * Construct a audio seek bar that renders audio levels.
-   *
-   * @param {Object} params - Component parameters
-   * @param {HTMLElement} params.media_src - Media source
-   * @param {File} params.asset - Asset file
-   * @param {boolean} params.disabled - Disabled seek bar
-   * @param {Object} componentInfo - Component information
-   */
-  constructor(params, componentInfo) {
+  audioElement: HTMLAudioElement;
+  element: HTMLElement;
+  loudness: number[];
+  levels: HTMLSpanElement[];
+  _onResizeFired: () => void;
+
+  constructor(params: Params, {element}: ko.components.ComponentInfo) {
     this.dispose = this.dispose.bind(this);
     this.audioElement = params.src;
 
-    this.element = componentInfo.element;
+    this.element = element as HTMLElement;
     this.loudness = [];
     this.levels = [];
 
-    this.disabled = ko.computed(
+    ko.computed(
       () => {
         if (typeof params.disabled === 'function') {
           this.element.classList.toggle('element-disabled', params.disabled());
         }
       },
-      {disposeWhenNodeIsRemoved: componentInfo.element},
+      {disposeWhenNodeIsRemoved: element},
     );
 
     const assetMeta = params.asset.meta;
-    if (assetMeta !== null && assetMeta.loudness !== null) {
+    if (assetMeta?.loudness !== null) {
       this.loudness = this._normalizeLoudness(assetMeta.loudness, this.element.clientHeight);
     }
 
@@ -61,16 +66,13 @@ class AudioSeekBarComponent {
 
     this._renderLevels();
 
-    this._onLevelClick = this._onLevelClick.bind(this);
-    this._onTimeUpdate = this._onTimeUpdate.bind(this);
-    this._onAudioEnded = this._onAudioEnded.bind(this);
     this.audioElement.addEventListener('ended', this._onAudioEnded);
     this.audioElement.addEventListener('timeupdate', this._onTimeUpdate);
     this.element.addEventListener('click', this._onLevelClick);
     window.addEventListener('resize', this._onResizeFired);
   }
 
-  _renderLevels() {
+  _renderLevels(): void {
     const numberOfLevelsFitOnScreen = Math.floor(this.element.clientWidth / 3); // 2px + 1px
     const scaledLoudness = interpolate(this.loudness, numberOfLevelsFitOnScreen);
     this.element.innerHTML = '';
@@ -83,32 +85,29 @@ class AudioSeekBarComponent {
     });
   }
 
-  _normalizeLoudness(loudness, max) {
+  _normalizeLoudness(loudness: number[], max: number): number[] {
     const peak = Math.max(...loudness);
     const scale = max / peak;
     return peak > max ? loudness.map(level => level * scale) : loudness;
   }
 
-  _onLevelClick(event) {
+  _onLevelClick = (event: JQueryMouseEventObject): void => {
     const mouse_x = event.pageX - event.currentTarget.getBoundingClientRect().left;
     const calculatedTime = (this.audioElement.duration * mouse_x) / event.currentTarget.clientWidth;
     const currentTime = isNaN(calculatedTime) ? 0 : calculatedTime;
 
     this.audioElement.currentTime = clamp(currentTime, 0, this.audioElement.duration);
     this._onTimeUpdate();
-  }
+  };
 
-  _onTimeUpdate() {
+  _onTimeUpdate = (): void => {
     const index = Math.floor((this.audioElement.currentTime / this.audioElement.duration) * this.levels.length);
     this.levels.forEach((level, levelIndex) => level.classList.toggle('active', levelIndex <= index));
-  }
+  };
 
-  _onAudioEnded() {
-    this.levels.forEach(level => level.classList.remove('active'));
-  }
+  _onAudioEnded = (): void => this.levels.forEach(level => level.classList.remove('active'));
 
-  dispose() {
-    this.disabled.dispose();
+  dispose(): void {
     this.audioElement.removeEventListener('ended', this._onAudioEnded);
     this.audioElement.removeEventListener('timeupdate', this._onTimeUpdate);
     this.element.removeEventListener('click', this._onLevelClick);
@@ -119,7 +118,7 @@ class AudioSeekBarComponent {
 ko.components.register('audio-seek-bar', {
   template: '<!-- content is generated -->',
   viewModel: {
-    createViewModel(params, componentInfo) {
+    createViewModel(params: Params, componentInfo: ko.components.ComponentInfo): AudioSeekBarComponent {
       return new AudioSeekBarComponent(params, componentInfo);
     },
   },

@@ -83,6 +83,14 @@ ko.bindingHandlers.paste_file = {
       const clipboardData = event.originalEvent.clipboardData;
       const items = [].slice.call(clipboardData.items || clipboardData.files);
 
+      // Some application put various representations of the copied text into
+      // the clipboard, one of them being an image of the rendered text.
+      // (Looking at you MS Word 😒)
+      // We check if the first item in the clipboard is a text so we can ignore any images in there.
+      if (items[0]?.kind === 'string') {
+        return true;
+      }
+
       const files = items
         .filter(item => item.kind === 'file')
         .map(item => new Blob([item.getAsFile()], {type: item.type}))
