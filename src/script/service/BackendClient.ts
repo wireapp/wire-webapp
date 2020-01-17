@@ -182,14 +182,6 @@ export class BackendClient {
    * Request backend status.
    */
   async status(): Promise<void> {
-    // return $.ajax({
-    //   headers: {
-    //     Authorization: `${this.accessTokenType} ${window.decodeURIComponent(this.accessToken)}`,
-    //   },
-    //   timeout: BackendClient.CONFIG.CONNECTIVITY_CHECK.REQUEST_TIMEOUT,
-    //   type: 'GET',
-    //   url: this.createUrl('/self'),
-    // });
     await this.apiClient.self.api.getSelf();
   }
 

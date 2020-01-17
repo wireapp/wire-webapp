@@ -235,12 +235,6 @@ export class ConversationRepository {
     this.receiving_queue = new PromiseQueue({name: 'ConversationRepository.Receiving'});
     this.messageSender = messageSender;
 
-    // @note Only use the client request queue as to unblock if not blocked by event handling or the cryptographic order of messages will be ruined and sessions might be deleted
-    // this.conversation_service.backendClient.queueState.subscribe(queueState => {
-    //   const queueReady = queueState === QUEUE_STATE.READY;
-    //   this.messageSender.pauseQueue(!queueReady || this.block_event_handling());
-    // });
-
     this.conversations_archived = ko.observableArray([]);
     this.conversations_cleared = ko.observableArray([]);
     this.conversations_unarchived = ko.observableArray([]);
