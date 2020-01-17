@@ -87,7 +87,6 @@ import {ReceiptsMiddleware} from '../event/preprocessor/ReceiptsMiddleware';
 
 import {getWebsiteUrl} from '../externalRoute';
 
-import {resolve, graph} from '../config/appResolver';
 import {modals} from '../view_model/ModalsViewModel';
 import {showInitialModal} from '../user/AvailabilityModal';
 import {WebAppEvents} from '../event/WebApp';
@@ -931,7 +930,7 @@ $(async () => {
   const appContainer = document.getElementById('wire-main');
   if (appContainer) {
     const apiClient = container.resolve(APIClientSingleton);
-    const backendClient = resolve(graph.BackendClient);
+    const backendClient = container.resolve(BackendClient);
     backendClient.setSettings({
       restUrl: Config.BACKEND_REST,
       webSocketUrl: Config.BACKEND_WS,
