@@ -24,6 +24,7 @@ import {ClientType} from '@wireapp/api-client/dist/client';
 import {Account} from '@wireapp/core';
 import {execSync} from 'child_process';
 import logdown from 'logdown';
+import axios from 'axios';
 import moment from 'moment';
 import path from 'path';
 import readline from 'readline';
@@ -36,6 +37,7 @@ const currentDate = moment().format('YYYY-MM-DD');
 const filename = path.basename(__filename);
 const firstArgument = process.argv[2];
 const usageText = `Usage: ${filename} [-h|--help] <staging|production> <commitId>`;
+
 let commitId = process.argv[3];
 let target = '';
 let commitMessage = '';
@@ -47,10 +49,6 @@ const logger = logdown(filename, {
 });
 logger.state.isEnabled = true;
 
-/**
- * @param command The command to execute
- * @returns The standard output
- */
 const exec = (command: string): string =>
   execSync(command, {stdio: 'pipe'})
     .toString()
@@ -114,6 +112,51 @@ const ask = (questionToAsk: string, callback: (answer: string) => void): void =>
   });
 };
 
+const sendRandomGif = async (account: Account, conversationId: string, query: string): Promise<void> => {
+  const giphySearchResult = await account.service.giphy.searchGif(query);
+  if (!giphySearchResult.data.length) {
+    logger.warn(`No gifs found for search query "${query}" :(`);
+    return;
+  }
+
+  const {
+    id,
+    images: {
+      downsized_large: {url: imageURL, height: imageHeight, width: imageWidth},
+    },
+  } = giphySearchResult.data[0];
+  const {data: fileBuffer} = await axios.get<Buffer>(imageURL, {responseType: 'arraybuffer'});
+
+  const payload = account.service.conversation.messageBuilder
+    .createText(conversationId, `${query} • via giphy.com`)
+    .build();
+  await account.service.conversation.send(payload);
+
+  const fileMetaDataPayload = account.service.conversation.messageBuilder.createFileMetadata(conversationId, {
+    length: fileBuffer.length,
+    name: `${id}.gif`,
+    type: 'image/gif',
+  });
+  await account.service.conversation.send(fileMetaDataPayload);
+
+  try {
+    const filePayload = await account.service.conversation.messageBuilder.createImage(
+      conversationId,
+      {data: fileBuffer, height: Number(imageHeight), type: 'image/gif', width: Number(imageWidth)},
+      fileMetaDataPayload.id,
+    );
+    await account.service.conversation.send(filePayload);
+  } catch (error) {
+    logger.warn(`Error while sending asset: "${error.stack}"`);
+    const fileAbortPayload = await account.service.conversation.messageBuilder.createFileAbort(
+      conversationId,
+      0,
+      fileMetaDataPayload.id,
+    );
+    await account.service.conversation.send(fileAbortPayload);
+  }
+};
+
 const announceRelease = async (tagName: string, commitId: string): Promise<void> => {
   const {WIRE_EMAIL, WIRE_PASSWORD, WIRE_CONVERSATION} = process.env;
   if (WIRE_EMAIL && WIRE_PASSWORD && WIRE_CONVERSATION) {
@@ -127,27 +170,31 @@ const announceRelease = async (tagName: string, commitId: string): Promise<void>
     const message = `Released tag "${tagName}" based on commit ID "${commitId}".`;
     const payload = account.service.conversation.messageBuilder.createText(WIRE_CONVERSATION, message).build();
     await account.service.conversation.send(payload);
+    await sendRandomGif(account, WIRE_CONVERSATION, 'in the oven');
   }
 };
 
-ask(`ℹ️  The commit "${commitMessage}" will be released with tag "${tagName}". Continue? [yes/no] `, async (answer: string) => {
-  if (answer === 'yes') {
-    logger.info(`Creating tag "${tagName}" ...`);
-    exec(`git tag ${tagName} ${commitId}`);
+ask(
+  `ℹ️  The commit "${commitMessage}" will be released with tag "${tagName}". Continue? [yes/no] `,
+  async (answer: string) => {
+    if (answer === 'yes') {
+      logger.info(`Creating tag "${tagName}" ...`);
+      exec(`git tag ${tagName} ${commitId}`);
 
-    logger.info(`Pushing "${tagName}" to "${origin}" ...`);
-    exec(`git push ${origin} ${tagName}`);
+      logger.info(`Pushing "${tagName}" to "${origin}" ...`);
+      exec(`git push ${origin} ${tagName}`);
 
-    try {
-      await announceRelease(tagName, commitId);
-    } catch (error) {
-      logger.error(error);
+      try {
+        await announceRelease(tagName, commitId);
+      } catch (error) {
+        logger.error(error);
+      }
+
+      logger.info('Done.');
+    } else {
+      logger.info('Aborting.');
     }
 
-    logger.info('Done.');
-  } else {
-    logger.info('Aborting.');
-  }
-
-  process.exit();
-});
+    process.exit();
+  },
+);
