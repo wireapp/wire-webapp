@@ -192,7 +192,7 @@ export class MediaDevicesHandler {
             device => device.kind === MediaDeviceType.VIDEO_INPUT,
           );
           const microphones = mediaDevices.filter(device => device.kind === MediaDeviceType.AUDIO_INPUT);
-          /**
+          /*
            * On Windows the same microphone can be listed multiple times with different group ids ("default", "communications", etc.).
            * In such a scenario, only the device listed as "communications" device works, so we filter its duplicates to prevent the user from selecting a non-working audio input.
            */
