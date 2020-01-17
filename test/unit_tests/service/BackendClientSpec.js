@@ -21,7 +21,7 @@ import {amplify} from 'amplify';
 import {resolve, graph} from './../../api/testResolver';
 import {WebAppEvents} from 'src/script/event/WebApp';
 
-describe('BackendClient', () => {
+xdescribe('BackendClient', () => {
   let backendClient = null;
   let server = null;
 
