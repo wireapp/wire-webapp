@@ -54,7 +54,7 @@ describe('MediaDevicesHandler', () => {
 
   beforeEach(() => {
     spyOn(navigator.mediaDevices, 'enumerateDevices').and.returnValue(
-      Promise.resolve([...cameras, ...microphones, ...speakers])
+      Promise.resolve(cameras.concat(mics).concat(speakers))
     );
   });
 
