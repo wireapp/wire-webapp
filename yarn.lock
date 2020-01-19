@@ -6143,10 +6143,10 @@ growl@1.10.5:
   resolved "https://registry.yarnpkg.com/growl/-/growl-1.10.5.tgz#f2735dc2283674fa67478b10181059355c369e5e"
   integrity sha512-qBr4OuELkhPenW6goKVXiv47US3clb3/IbuWF9KNKEijAy9oeHxU9IgzjvJhHkUzhaj7rOUD7+YGWqUjLp5oSA==
 
-grunt-aws-s3@2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/grunt-aws-s3/-/grunt-aws-s3-2.0.1.tgz#d7156ea2cb128f6e26690f0de0050cb2cac2c432"
-  integrity sha512-V3US+iZjTfX15QFgtsHLntJi9Nmq43xLQ97pl9dLFo4RtvlNGMpyiFEB/wVfgct+cTg2wSciPwfTJOfxTV/8Ag==
+grunt-aws-s3@2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/grunt-aws-s3/-/grunt-aws-s3-2.0.2.tgz#1b211686a68cb7a0679c90ddc952319fa9858e33"
+  integrity sha512-11aWypcMpumhdKj9Ty6fTC2DFpNaDdi4A86wVR1H97XEH/bIsnZesCKfe0dpN6cXD4snRdfuIr9lhgsxXhFrvQ==
   dependencies:
     async "0.9.x"
     aws-sdk "2.0.x"
