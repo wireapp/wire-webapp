@@ -54,7 +54,7 @@ describe('MediaDevicesHandler', () => {
 
   beforeEach(() => {
     spyOn(navigator.mediaDevices, 'enumerateDevices').and.returnValue(
-      Promise.resolve(cameras.concat(microphones).concat(speakers))
+      Promise.resolve([...cameras, ...microphones, ...speakers])
     );
   });
 
@@ -62,8 +62,7 @@ describe('MediaDevicesHandler', () => {
     it('filters duplicate audio inputs (if any) and keeps the ones marked with "communications"', () => {
       const devicesHandler = new MediaDevicesHandler();
       setTimeout(() => {
-        expect(navigator.mediaDevices.enumerateDevices).withContext('Initial enumeration').toHaveBeenCalledTimes(1);
-        expect(devicesHandler.availableDevices.audioInput()).withContext('Available microphones').toEqual(1);
+        expect(devicesHandler.availableDevices.audioInput().length).withContext('Available microphones').toEqual(1);
       });
     });
 
