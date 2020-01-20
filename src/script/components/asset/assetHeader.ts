@@ -17,26 +17,24 @@
  *
  */
 
+import ko from 'knockout';
 import moment from 'moment';
 
 import {LDM} from 'Util/moment';
 
-class AssetHeader {
-  /**
-   * Construct a new asset header.
-   * @param {Object} params - Component parameters
-   * @param {Message} params.message - Message entity
-   */
-  constructor(params) {
-    this.message_et = params.message;
-    this.moment = moment;
-  }
+import {Message} from '../../entity/message/Message';
+
+interface Params {
+  message: Message;
 }
 
 ko.components.register('asset-header', {
   template: `
     <span class="asset-header-name" data-bind="text: message_et.user().first_name(), css: message_et.accent_color"></span>
-    <span class="asset-header-time" data-bind="text: moment(message_et.timestamp()).format('${LDM} LT')"></span>
+    <span class="asset-header-time" data-bind="text: timeText"></span>
   `,
-  viewModel: AssetHeader,
+  viewModel: function({message}: Params): void {
+    this.message_et = message;
+    this.timeText = ko.pureComputed(() => moment(message.timestamp()).format(`${LDM} LT`));
+  },
 });
