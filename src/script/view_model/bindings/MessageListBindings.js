@@ -24,7 +24,7 @@ import 'jquery-mousewheel';
 
 import {t} from 'Util/LocalizerUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {isArrowKey, isMetaKey, isPasteAction} from 'Util/KeyboardUtil';
+import {isArrowKey, isPageUpDownKey, isMetaKey, isPasteAction} from 'Util/KeyboardUtil';
 import {noop} from 'Util/util';
 import {LLDM} from 'Util/moment';
 
@@ -49,8 +49,11 @@ ko.bindingHandlers.focus_on_keydown = {
             const active_element_is_input =
               document.activeElement && ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName);
             const is_arrow_key = isArrowKey(keyboard_event);
+            const is_pageupdown_key = isPageUpDownKey(keyboard_event);
 
-            if (!active_element_is_input && !is_arrow_key) {
+            if (is_pageupdown_key) {
+              document.activeElement.blur();
+            } else if (!active_element_is_input && !is_arrow_key) {
               if (!isMetaKey(keyboard_event) || isPasteAction(keyboard_event)) {
                 element.focus();
               }
