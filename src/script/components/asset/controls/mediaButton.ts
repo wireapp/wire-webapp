@@ -21,21 +21,33 @@ import ko from 'knockout';
 
 import {noop} from 'Util/util';
 
+import {AssetTransferState} from '../../../assets/AssetTransferState';
+import {File as FileAsset} from '../../../entity/message/File';
 import {AbstractAssetTransferStateTracker} from '../AbstractAssetTransferStateTracker';
 
 import '../assetLoader';
 
+interface Params {
+  src: HTMLMediaElement;
+  large: boolean;
+  asset: FileAsset;
+  uploadProgress: ko.PureComputed<number>;
+  transferState: ko.PureComputed<AssetTransferState>;
+  play?: () => void;
+  pause?: () => void;
+  cancel?: () => void;
+}
+
 class MediaButtonComponent extends AbstractAssetTransferStateTracker {
-  /**
-   * Construct a media button.
-   *
-   * @param {Object} params - Component parameters
-   * @param {HTMLElement} params.src - Media source
-   * @param {boolean} params.large - Display large button
-   * @param {File} params.asset - Asset file
-   * @param {Object} componentInfo - Component information
-   */
-  constructor(params, componentInfo) {
+  mediaElement: HTMLMediaElement;
+  large: boolean;
+  asset: FileAsset;
+  isPlaying: ko.Observable<boolean>;
+  onClickPlay: () => void;
+  onClickPause: () => void;
+  onClickCancel: () => void;
+
+  constructor(params: Params, {element}: ko.components.ComponentInfo) {
     super();
     this.mediaElement = params.src;
     this.large = params.large;
@@ -43,12 +55,8 @@ class MediaButtonComponent extends AbstractAssetTransferStateTracker {
     this.uploadProgress = params.uploadProgress;
     this.transferState = params.transferState;
 
-    this.dispose = this.dispose.bind(this);
-    this.onPlay = this.onPlay.bind(this);
-    this.onPause = this.onPause.bind(this);
-
     if (this.large) {
-      componentInfo.element.classList.add('media-button-lg');
+      element.classList.add('media-button-lg');
     }
 
     this.isPlaying = ko.observable(false);
@@ -61,18 +69,18 @@ class MediaButtonComponent extends AbstractAssetTransferStateTracker {
     this.mediaElement.addEventListener('pause', this.onPause);
   }
 
-  onPlay() {
+  onPlay = () => {
     this.isPlaying(true);
-  }
+  };
 
-  onPause() {
+  onPause = () => {
     this.isPlaying(false);
-  }
+  };
 
-  dispose() {
+  dispose = () => {
     this.mediaElement.removeEventListener('playing', this.onPlay);
     this.mediaElement.removeEventListener('pause', this.onPause);
-  }
+  };
 }
 
 ko.components.register('media-button', {
@@ -89,7 +97,7 @@ ko.components.register('media-button', {
     <!-- /ko -->
 `,
   viewModel: {
-    createViewModel(params, componentInfo) {
+    createViewModel(params: Params, componentInfo: ko.components.ComponentInfo): MediaButtonComponent {
       return new MediaButtonComponent(params, componentInfo);
     },
   },
