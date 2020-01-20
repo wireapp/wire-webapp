@@ -56,7 +56,7 @@ class MediaButtonComponent extends AbstractAssetTransferStateTracker {
     this.transferState = params.transferState;
 
     if (this.large) {
-      element.classList.add('media-button-lg');
+      (element as HTMLElement).classList.add('media-button-lg');
     }
 
     this.isPlaying = ko.observable(false);
