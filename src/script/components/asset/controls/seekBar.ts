@@ -35,13 +35,7 @@ class SeekBarComponent {
   isSeekBarMouseOver: ko.Observable<boolean>;
   isSeekBarThumbDragged: ko.Observable<boolean>;
   showSeekBarThumb: ko.PureComputed<any>;
-  /**
-   * Construct a seek bar.
-   *
-   * @param {Object} params - Component parameters
-   * @param {HTMLElement} params.media_src - Media source
-   * @param {Object} component_info - Component information
-   */
+
   constructor(params: Params, {element}: ko.components.ComponentInfo) {
     this.mediaElement = params.src;
     this.darkMode = params.dark;
