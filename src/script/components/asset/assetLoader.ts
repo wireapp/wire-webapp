@@ -17,16 +17,12 @@
  *
  */
 
-class AssetLoader {
-  constructor(params) {
-    const elementScale = params.large ? 2 : 1;
+import ko from 'knockout';
 
-    this.progress = ko.pureComputed(() => `${params.loadProgress() * elementScale} ${100 * elementScale}`);
-
-    const viewBoxSize = 32 * elementScale;
-    this.viewBox = `0 0 ${viewBoxSize} ${viewBoxSize}`;
-    this.onCancel = params.onCancel;
-  }
+interface Params {
+  large: boolean;
+  loadProgress: ko.Subscribable<number>;
+  onCancel: () => void;
 }
 
 ko.components.register('asset-loader', {
@@ -38,5 +34,13 @@ ko.components.register('asset-loader', {
     <close-icon class="media-button__icon"></close-icon>
   </div>
   `,
-  viewModel: AssetLoader,
+  viewModel: function({large, loadProgress, onCancel}: Params): void {
+    const elementScale = large ? 2 : 1;
+
+    this.progress = ko.pureComputed(() => `${loadProgress() * elementScale} ${100 * elementScale}`);
+
+    const viewBoxSize = 32 * elementScale;
+    this.viewBox = `0 0 ${viewBoxSize} ${viewBoxSize}`;
+    this.onCancel = onCancel;
+  },
 });
