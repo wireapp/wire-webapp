@@ -16,40 +16,47 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-import ko from 'knockout';
 import {amplify} from 'amplify';
+import ko from 'knockout';
 
-import {AssetTransferState} from '../../assets/AssetTransferState';
-import {resolve, graph} from '../../config/appResolver';
-import {WebAppEvents} from '../../event/WebApp';
-import {AssetUploader} from '../../assets/AssetUploader';
 import {AssetService} from '../../assets/AssetService';
+import {AssetTransferState} from '../../assets/AssetTransferState';
+import {AssetUploader} from '../../assets/AssetUploader';
+import {graph, resolve} from '../../config/appResolver';
+import {ContentMessage} from '../../entity/message/ContentMessage';
+import {File as FileAsset} from '../../entity/message/File';
+import {WebAppEvents} from '../../event/WebApp';
 
 export class AbstractAssetTransferStateTracker {
-  constructor(message = {}) {
+  assetUploader: AssetUploader;
+  uploadProgress: ko.PureComputed<number>;
+  AssetTransferState: typeof AssetTransferState;
+  transferState: ko.PureComputed<AssetTransferState>;
+
+  constructor(message?: ContentMessage) {
     this.assetUploader = new AssetUploader(new AssetService(resolve(graph.BackendClient)));
-    this.uploadProgress = this.assetUploader.getUploadProgress(message.id);
+    this.uploadProgress = this.assetUploader.getUploadProgress(message?.id);
     this.AssetTransferState = AssetTransferState;
 
     this.transferState = ko.pureComputed(() => {
-      const asset = message.get_first_asset();
-      return this.uploadProgress() > -1 ? AssetTransferState.UPLOADING : asset.status();
+      const asset = message?.get_first_asset() as FileAsset;
+      return this.uploadProgress() > -1 ? AssetTransferState.UPLOADING : asset?.status();
     });
   }
 
-  isDownloading(transferState) {
+  isDownloading(transferState: AssetTransferState): boolean {
     return transferState === AssetTransferState.DOWNLOADING;
   }
 
-  isUploading(transferState) {
+  isUploading(transferState: AssetTransferState): boolean {
     return transferState === AssetTransferState.UPLOADING;
   }
 
-  isUploaded(transferState) {
+  isUploaded(transferState: AssetTransferState): boolean {
     return transferState === AssetTransferState.UPLOADED;
   }
 
-  cancelUpload(message) {
+  cancelUpload(message: ContentMessage): void {
     this.assetUploader.cancelUpload(message.id);
     amplify.publish(WebAppEvents.CONVERSATION.ASSET.CANCEL, message.id);
   }
