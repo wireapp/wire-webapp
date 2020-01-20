@@ -24,7 +24,7 @@ import {Config as ReadOnlyConfig} from '../../Config';
 import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
-import Index from './Index';
+import Index from './SetAccountType';
 
 type Writable<T> = {
   -readonly [K in keyof T]: T[K];
@@ -34,7 +34,7 @@ type WriteableConfig = TypeUtil.RecursivePartial<Writable<typeof ReadOnlyConfig>
 
 const Config: WriteableConfig = ReadOnlyConfig;
 
-describe('when visiting the index page', () => {
+describe('when visiting the set account type page', () => {
   let wrapper: ReactWrapper;
 
   describe('and the account registration is disabled', () => {

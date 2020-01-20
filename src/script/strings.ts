@@ -59,14 +59,6 @@ export const indexStrings = defineMessages({
     defaultMessage: 'create a team',
     id: 'index.createTeam',
   },
-  login: {
-    defaultMessage: 'Log in',
-    id: 'index.login',
-  },
-  loginInfo: {
-    defaultMessage: 'Already have an account?',
-    id: 'index.loginInfo',
-  },
 });
 
 export const teamNameStrings = defineMessages({

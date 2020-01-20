@@ -105,7 +105,7 @@ const TeamName = ({
   };
 
   const backArrow = (
-    <RouterLink to={ROUTE.INDEX} data-uie-name="go-register-team">
+    <RouterLink to={ROUTE.SET_ACCOUNT_TYPE} data-uie-name="go-register-team">
       <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
     </RouterLink>
   );

@@ -43,6 +43,7 @@ import Index from './Index';
 import InitialInvite from './InitialInvite';
 import Login from './Login';
 import PhoneLogin from './PhoneLogin';
+import SetAccountType from './SetAccountType';
 import SetEmail from './SetEmail';
 import SetHandle from './SetHandle';
 import SetPassword from './SetPassword';
@@ -103,6 +104,7 @@ const Root = ({
             <Route path={ROUTE.INITIAL_INVITE} component={ProtectedInitialInvite} />
             <Route path={ROUTE.LOGIN} component={Login} />
             <Route path={ROUTE.LOGIN_PHONE} component={PhoneLogin} />
+            <Route path={ROUTE.SET_ACCOUNT_TYPE} component={SetAccountType} />
             <Route path={ROUTE.SET_EMAIL} component={ProtectedSetEmail} />
             <Route path={ROUTE.SET_HANDLE} component={ProtectedSetHandle} />
             <Route path={ROUTE.SET_PASSWORD} component={ProtectedSetPassword} />
