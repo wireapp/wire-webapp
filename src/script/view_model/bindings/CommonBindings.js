@@ -83,11 +83,13 @@ ko.bindingHandlers.paste_file = {
       const clipboardData = event.originalEvent.clipboardData;
       const items = [].slice.call(clipboardData.items || clipboardData.files);
 
-      // Some application put various representations of the copied text into
-      // the clipboard, one of them being an image of the rendered text.
-      // (Looking at you MS Word 😒)
-      // We check if the first item in the clipboard is a text so we can ignore any images in there.
-      if (items[0]?.kind === 'string') {
+      // MS Word for Mac not only puts the copied text into the clipboard
+      // but also a rendered PNG representation of that text.
+      // This breaks our naïve file paste detection. So we identify a paste
+      // from Word and ignore that there is a file in there.
+      const msWordTypes = ['text/plain', 'text/html', 'text/rtf', 'image/png'];
+      const isMsWordPaste = msWordTypes.every((type, index) => items[index] && items[index].type === type);
+      if (isMsWordPaste) {
         return true;
       }
 
