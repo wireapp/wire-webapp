@@ -110,7 +110,7 @@ export class MemberMessage extends SystemMessage {
       return isTeamMemberLeave ? this.name() : getFirstName(this.user(), Declension.NOMINATIVE, true);
     });
 
-    this.showNamedCreation = ko.pureComputed(() => this.isConversationCreate() && !!this.name().length);
+    this.showNamedCreation = ko.pureComputed(() => this.isConversationCreate() && this.name().length > 0);
 
     this.otherUser = ko.pureComputed(() => (this.hasUsers() ? this.userEntities()[0] : new User()));
 
