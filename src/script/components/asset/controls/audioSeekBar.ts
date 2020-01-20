@@ -38,7 +38,6 @@ class AudioSeekBarComponent {
   _onResizeFired: () => void;
 
   constructor(params: Params, {element}: ko.components.ComponentInfo) {
-    this.dispose = this.dispose.bind(this);
     this.audioElement = params.src;
 
     this.element = element as HTMLElement;
@@ -107,12 +106,12 @@ class AudioSeekBarComponent {
 
   _onAudioEnded = (): void => this.levels.forEach(level => level.classList.remove('active'));
 
-  dispose(): void {
+  dispose = (): void => {
     this.audioElement.removeEventListener('ended', this._onAudioEnded);
     this.audioElement.removeEventListener('timeupdate', this._onTimeUpdate);
     this.element.removeEventListener('click', this._onLevelClick);
     window.removeEventListener('resize', this._onResizeFired);
-  }
+  };
 }
 
 ko.components.register('audio-seek-bar', {
