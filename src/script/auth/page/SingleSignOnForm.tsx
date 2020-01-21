@@ -41,12 +41,12 @@ import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import {ROUTE} from '../route';
-import {isDesktopApp, isSupportingClipboard} from '../Runtime';
+import {isDesktopApp} from '../Runtime';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {UUID_REGEX} from '../util/stringUtil';
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {
-  handleSSOWindow: (code: string) => Promise<void>;
+  doLogin: (code: string) => Promise<void>;
   initialCode?: string;
 }
 
@@ -58,13 +58,13 @@ const SingleSignOnForm = ({
   loginError,
   resetAuthError,
   validateSSOCode,
-  handleSSOWindow,
+  doLogin,
   doFinalizeSSOLogin,
 }: Props & ConnectedProps & DispatchProps) => {
   const codeInput = useRef<HTMLInputElement>();
   const [code, setCode] = useState('');
   const {formatMessage: _} = useIntl();
-  const {history} = useReactRouter<{code?: string}>();
+  const {history} = useReactRouter();
   const [persist, setPersist] = useState(true);
   const [ssoError, setSsoError] = useState(null);
   const [isCodeInputValid, setIsCodeInputValid] = useState(true);
@@ -105,7 +105,7 @@ const SingleSignOnForm = ({
       }
       const strippedCode = stripPrefix(code);
       await validateSSOCode(strippedCode);
-      await handleSSOWindow(strippedCode);
+      await doLogin(strippedCode);
       const clientType = persist ? ClientType.PERMANENT : ClientType.TEMPORARY;
       await doFinalizeSSOLogin({clientType});
       history.push(ROUTE.HISTORY_INFO);
@@ -154,7 +154,7 @@ const SingleSignOnForm = ({
           }}
           ref={codeInput}
           markInvalid={!isCodeInputValid}
-          placeholder={isSupportingClipboard() ? '' : _(ssoLoginStrings.codeInputPlaceholder)}
+          placeholder={_(ssoLoginStrings.codeInputPlaceholder)}
           value={code}
           autoComplete="section-login sso-code"
           maxLength={1024}
