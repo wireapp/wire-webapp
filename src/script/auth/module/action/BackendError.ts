@@ -99,7 +99,6 @@ export class BackendError extends Error {
     SSO_INVALID_USERNAME: 'bad-username',
     SSO_NOT_FOUND: 'not-found',
     SSO_NO_MATCHING_AUTH: 'no-matching-auth-req',
-    SSO_NO_SSO_CODE: 'no-sso-code-found', // Synthetic error label
     SSO_SERVER_ERROR: 'server-error',
     SSO_UNSUPPORTED_SAML: 'server-error-unsupported-saml',
     SSO_USER_CANCELLED_ERROR: 'user-cancelled-sso-error', // Synthetic error label

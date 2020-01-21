@@ -108,7 +108,7 @@ const Root = ({
             <Route path={ROUTE.SET_EMAIL} component={ProtectedSetEmail} />
             <Route path={ROUTE.SET_HANDLE} component={ProtectedSetHandle} />
             <Route path={ROUTE.SET_PASSWORD} component={ProtectedSetPassword} />
-            <Route path={ROUTE.SSO} component={SingleSignOn} />
+            <Route path={`${ROUTE.SSO}/:code?`} component={SingleSignOn} />
             <Route path={ROUTE.VERIFY_EMAIL_LINK} component={VerifyEmailLink} />
             <Route path={ROUTE.VERIFY_PHONE_CODE} component={VerifyPhoneCode} />
             <Route
