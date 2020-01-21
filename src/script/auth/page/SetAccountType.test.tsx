@@ -59,7 +59,7 @@ describe('when visiting the set account type page', () => {
         }),
       );
 
-      expect(wrapper.find('Redirect [data-uie-name="redirect-login"][to="/"]').exists())
+      expect(wrapper.find('[data-uie-name="redirect-login"][to="/"]').exists())
         .withContext('Redirect is rendered')
         .toBe(true);
     });
