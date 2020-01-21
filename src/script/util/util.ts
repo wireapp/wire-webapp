@@ -183,7 +183,7 @@ export const formatBytes = (bytes: number, decimals: number = 1): string => {
   }
 
   const kilobytes = 1024;
-  decimals +=1;
+  decimals += 1;
   const unit = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
   const index = Math.floor(Math.log(bytes) / Math.log(kilobytes));
   return parseFloat((bytes / Math.pow(kilobytes, index)).toFixed(decimals)) + unit[index];
