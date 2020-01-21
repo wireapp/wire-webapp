@@ -24,7 +24,7 @@ import {Config as ReadOnlyConfig} from '../../Config';
 import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
-import SetAccountType from './SetAccountType';
+import Index from './Index';
 
 type Writable<T> = {
   -readonly [K in keyof T]: T[K];
@@ -46,9 +46,9 @@ describe('when visiting the set account type page', () => {
 
     afterAll(() => (Config.FEATURE = {}));
 
-    it('redirects to the login page', () => {
+    it('does not show create account button', () => {
       wrapper = mountComponent(
-        <SetAccountType />,
+        <Index />,
         mockStoreFactory()({
           ...initialRootState,
           runtimeState: {
@@ -59,7 +59,7 @@ describe('when visiting the set account type page', () => {
         }),
       );
 
-      expect(wrapper.find('[data-uie-name="redirect-login"]').exists()).toBe(true);
+      expect(wrapper.find('Button [data-uie-name="go-set-account-type"]').exists()).toBe(false);
     });
   });
 
@@ -74,7 +74,7 @@ describe('when visiting the set account type page', () => {
 
     it('shows the Wire logo', () => {
       wrapper = mountComponent(
-        <SetAccountType />,
+        <Index />,
         mockStoreFactory()({
           ...initialRootState,
           runtimeState: {
@@ -88,9 +88,9 @@ describe('when visiting the set account type page', () => {
       expect(wrapper.find('[data-uie-name="ui-wire-logo"]').exists()).toBe(true);
     });
 
-    it('shows an option to create a private account', () => {
+    it('shows an option to create an account', () => {
       wrapper = mountComponent(
-        <SetAccountType />,
+        <Index />,
         mockStoreFactory()({
           ...initialRootState,
           runtimeState: {
@@ -101,12 +101,12 @@ describe('when visiting the set account type page', () => {
         }),
       );
 
-      expect(wrapper.find('[data-uie-name="go-register-personal"]').exists()).toBe(true);
+      expect(wrapper.find('Button [data-uie-name="go-set-account-type"]').exists()).toBe(true);
     });
 
-    it('shows an option to create a team', () => {
+    it('shows an option to login', () => {
       wrapper = mountComponent(
-        <SetAccountType />,
+        <Index />,
         mockStoreFactory()({
           ...initialRootState,
           runtimeState: {
@@ -117,7 +117,7 @@ describe('when visiting the set account type page', () => {
         }),
       );
 
-      expect(wrapper.find('[data-uie-name="go-register-team"]').exists()).toBe(true);
+      expect(wrapper.find('Button [data-uie-name="go-login"]').exists()).toBe(true);
     });
   });
 });

@@ -546,10 +546,6 @@ export const errorHandlerStrings = defineMessages({
     defaultMessage: 'Something went wrong. Please contact your team administrator for details (Error 9).',
     id: 'BackendError.LABEL.SSO_NO_MATCHING_AUTH',
   },
-  [BackendError.LABEL.SSO_NO_SSO_CODE]: {
-    defaultMessage: 'No SSO access code detected',
-    id: 'BackendError.LABEL.NO_SSO_CODE',
-  },
   [BackendError.LABEL.SSO_NOT_FOUND]: {
     defaultMessage: 'Something went wrong. Please contact your team administrator for details (Error 7).',
     id: 'BackendError.LABEL.SSO_NOT_FOUND',
