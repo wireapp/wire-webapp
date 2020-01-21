@@ -31,7 +31,10 @@ import {AssetTransferState} from '../../assets/AssetTransferState';
 import {AssetType} from '../../assets/AssetType';
 import {AssetUploadFailedReason} from '../../assets/AssetUploadFailedReason';
 
-type AssetMetaData = ProtobufAsset.IAudioMetaData | ProtobufAsset.IImageMetaData | ProtobufAsset.IVideoMetaData;
+type AssetMetaData = (ProtobufAsset.IAudioMetaData | ProtobufAsset.IImageMetaData | ProtobufAsset.IVideoMetaData) & {
+  loudness?: number[];
+  duration?: number;
+};
 
 export class File extends Asset {
   private readonly original_resource: ko.Observable<AssetRemoteData>;
