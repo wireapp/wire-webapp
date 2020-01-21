@@ -17,35 +17,50 @@
  *
  */
 
-import {getLogger} from 'Util/Logger';
+import ko from 'knockout';
+
+import {Logger, getLogger} from 'Util/Logger';
 import {formatSeconds} from 'Util/TimeUtil';
 
-import {AbstractAssetTransferStateTracker} from './AbstractAssetTransferStateTracker';
 import {AssetTransferState} from '../../assets/AssetTransferState';
+import {ContentMessage} from '../../entity/message/ContentMessage';
+import {File as FileAsset} from '../../entity/message/File';
+import {AbstractAssetTransferStateTracker} from './AbstractAssetTransferStateTracker';
+
+interface Params {
+  message: ContentMessage;
+  isQuote: boolean;
+}
 
 class VideoAssetComponent extends AbstractAssetTransferStateTracker {
-  /**
-   * Construct a new video asset.
-   *
-   * @param {Object} params - Component parameters
-   * @param {Message} params.message - Message entity
-   * @param {Object} componentInfo - Component information
-   */
-  constructor(params, {element}) {
-    super(ko.unwrap(params.message));
+  logger: Logger;
+  message: ContentMessage;
+  asset: FileAsset;
+  videoElement: HTMLVideoElement;
+  videoSrc: ko.Observable<string>;
+  videoTime: ko.Observable<number>;
+  videoPlaybackError: ko.Observable<boolean>;
+  showBottomControls: ko.Observable<boolean>;
+  videoTimeRest: ko.PureComputed<number>;
+  preview: ko.Observable<string>;
+  displaySmall: ko.Observable<boolean>;
+  formatSeconds: (duration: number) => string;
+
+  constructor({message, isQuote}: Params, element: HTMLElement) {
+    super(ko.unwrap(message));
     this.logger = getLogger('VideoAssetComponent');
 
-    this.message = ko.unwrap(params.message);
-    this.asset = this.message.get_first_asset();
+    this.message = ko.unwrap(message);
+    this.asset = this.message.get_first_asset() as FileAsset;
 
-    this.video_element = $(element).find('video')[0];
-    this.video_src = ko.observable();
-    this.video_time = ko.observable();
+    this.videoElement = element.querySelector('video');
+    this.videoSrc = ko.observable();
+    this.videoTime = ko.observable();
 
-    this.video_playback_error = ko.observable(false);
-    this.show_bottom_controls = ko.observable(false);
+    this.videoPlaybackError = ko.observable(false);
+    this.showBottomControls = ko.observable(false);
 
-    this.video_time_rest = ko.pureComputed(() => this.video_element.duration - this.video_time());
+    this.videoTimeRest = ko.pureComputed(() => this.videoElement.duration - this.videoTime());
 
     this.preview = ko.observable();
 
@@ -59,58 +74,58 @@ class VideoAssetComponent extends AbstractAssetTransferStateTracker {
     );
 
     this.onPlayButtonClicked = this.onPlayButtonClicked.bind(this);
-    this.on_pause_button_clicked = this.on_pause_button_clicked.bind(this);
-    this.displaySmall = ko.observable(!!params.isQuote);
+    this.onPauseButtonClicked = this.onPauseButtonClicked.bind(this);
+    this.displaySmall = ko.observable(!!isQuote);
 
     this.formatSeconds = formatSeconds;
     this.AssetTransferState = AssetTransferState;
   }
 
-  on_loadedmetadata() {
-    this.video_time(this.video_element.duration);
+  onLoadedmetadata(): void {
+    this.videoTime(this.videoElement.duration);
   }
 
-  on_timeupdate() {
-    this.video_time(this.video_element.currentTime);
+  onTimeupdate(): void {
+    this.videoTime(this.videoElement.currentTime);
   }
 
-  on_error(component, jquery_event) {
-    this.video_playback_error(true);
-    this.logger.error('Video cannot be played', jquery_event);
+  onError(_component: VideoAssetComponent, jqueryEvent: JQueryMouseEventObject): void {
+    this.videoPlaybackError(true);
+    this.logger.error('Video cannot be played', jqueryEvent);
   }
 
-  onPlayButtonClicked() {
+  onPlayButtonClicked(): void {
     this.displaySmall(false);
-    if (this.video_src()) {
-      if (this.video_element) {
-        this.video_element.play();
+    if (this.videoSrc()) {
+      if (this.videoElement) {
+        this.videoElement.play();
       }
     } else {
       this.asset
         .load()
         .then(blob => {
-          this.video_src(window.URL.createObjectURL(blob));
-          if (this.video_element) {
-            this.video_element.play();
+          this.videoSrc(window.URL.createObjectURL(blob));
+          if (this.videoElement) {
+            this.videoElement.play();
           }
-          this.show_bottom_controls(true);
+          this.showBottomControls(true);
         })
         .catch(error => this.logger.error('Failed to load video asset ', error));
     }
   }
 
-  on_pause_button_clicked() {
-    if (this.video_element) {
-      this.video_element.pause();
+  onPauseButtonClicked(): void {
+    if (this.videoElement) {
+      this.videoElement.pause();
     }
   }
 
-  on_video_playing() {
-    this.video_element.style.backgroundColor = '#000';
+  onVideoPlaying(): void {
+    this.videoElement.style.backgroundColor = '#000';
   }
 
-  dispose() {
-    window.URL.revokeObjectURL(this.video_src());
+  dispose(): void {
+    window.URL.revokeObjectURL(this.videoSrc());
     window.URL.revokeObjectURL(this.preview());
   }
 }
@@ -124,18 +139,18 @@ ko.components.register('video-asset', {
                    css: {'video-asset-container--small': displaySmall()}"
         data-uie-name="video-asset">
         <video playsinline
-               data-bind="attr: {src: video_src, poster: preview},
+               data-bind="attr: {src: videoSrc, poster: preview},
                           css: {hidden: transferState() === AssetTransferState.UPLOADING},
                           style: {backgroundColor: preview() ? '#000': ''},
-                          event: {loadedmetadata: on_loadedmetadata,
-                                  timeupdate: on_timeupdate,
-                                  error: on_error,
-                                  playing: on_video_playing}">
+                          event: {loadedmetadata: onLoadedmetadata,
+                                  timeupdate: onTimeupdate,
+                                  error: onError,
+                                  playing: onVideoPlaying}">
         </video>
-        <!-- ko if: video_playback_error -->
+        <!-- ko if: videoPlaybackError -->
           <div class="video-playback-error label-xs" data-bind="text: t('conversationPlaybackError')"></div>
         <!-- /ko -->
-        <!-- ko ifnot: video_playback_error -->
+        <!-- ko ifnot: videoPlaybackError -->
           <!-- ko if: transferState() === AssetTransferState.UPLOAD_PENDING -->
             <div class="asset-placeholder loading-dots">
             </div>
@@ -144,7 +159,7 @@ ko.components.register('video-asset', {
           <!-- ko if: transferState() !== AssetTransferState.UPLOAD_PENDING -->
             <div class="video-controls-center">
               <!-- ko if: displaySmall() -->
-                <media-button params="src: video_element,
+                <media-button params="src: videoElement,
                                       large: false,
                                       asset: asset,
                                       play: onPlayButtonClicked,
@@ -154,11 +169,11 @@ ko.components.register('video-asset', {
                 </media-button>
               <!-- /ko -->
               <!-- ko ifnot: displaySmall() -->
-                <media-button params="src: video_element,
+                <media-button params="src: videoElement,
                                       large: true,
                                       asset: asset,
                                       play: onPlayButtonClicked,
-                                      pause: on_pause_button_clicked,
+                                      pause: onPauseButtonClicked,
                                       cancel: () => cancelUpload(message),
                                       transferState: transferState,
                                       uploadProgress: uploadProgress
@@ -166,9 +181,9 @@ ko.components.register('video-asset', {
                 </media-button>
               <!-- /ko -->
             </div>
-            <div class='video-controls-bottom' data-bind='visible: show_bottom_controls()'>
-              <seek-bar data-ui-name="status-video-seekbar" class="video-controls-seekbar" params="src: video_element"></seek-bar>
-              <span class="video-controls-time label-xs" data-bind="text: formatSeconds(video_time_rest())" data-uie-name="status-video-time"></span>
+            <div class='video-controls-bottom' data-bind='visible: showBottomControls()'>
+              <seek-bar data-ui-name="status-video-seekbar" class="video-controls-seekbar" params="src: videoElement"></seek-bar>
+              <span class="video-controls-time label-xs" data-bind="text: formatSeconds(videoTimeRest())" data-uie-name="status-video-time"></span>
             </div>
           <!-- /ko -->
         <!-- /ko -->
@@ -177,8 +192,8 @@ ko.components.register('video-asset', {
     <!-- /ko -->
   `,
   viewModel: {
-    createViewModel(params, componentInfo) {
-      return new VideoAssetComponent(params, componentInfo);
+    createViewModel(params: Params, {element}: ko.components.ComponentInfo): VideoAssetComponent {
+      return new VideoAssetComponent(params, element as HTMLElement);
     },
   },
 });
