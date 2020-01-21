@@ -19,24 +19,32 @@
 
 import ko from 'knockout';
 
-import {getFileExtension, trimFileExtension, formatBytes} from 'Util/util';
+import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 
-import './assetLoader';
+import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+import {File as FileAsset} from '../../entity/message/File';
 import {AbstractAssetTransferStateTracker} from './AbstractAssetTransferStateTracker';
+import './assetLoader';
+
+interface Params {
+  message: ContentMessage | ko.Subscribable<ContentMessage>;
+  header: boolean;
+}
 
 class FileAssetComponent extends AbstractAssetTransferStateTracker {
-  /**
-   * Construct a new file asset.
-   *
-   * @param {Object} params - Component parameters
-   * @param {Message} params.message - Message entity
-   */
-  constructor(params) {
-    super(ko.unwrap(params.message));
-    this.message = ko.unwrap(params.message);
-    this.asset = this.message.get_first_asset();
-    this.header = params.header || false;
-    this.formattedFileSize = formatBytes(this.asset.file_size);
+  readonly message: ContentMessage | ko.Subscribable<ContentMessage>;
+  readonly asset: FileAsset;
+  readonly header: boolean;
+  readonly formattedFileSize: string;
+  readonly fileName: string;
+  readonly fileExtension: string;
+
+  constructor({message, header = false}: Params) {
+    super(ko.unwrap(message));
+    this.message = ko.unwrap(message);
+    this.asset = this.message.get_first_asset() as FileAsset;
+    this.header = header;
+    this.formattedFileSize = formatBytes(parseInt(this.asset.file_size, 10));
     this.fileName = trimFileExtension(this.asset.file_name);
     this.fileExtension = getFileExtension(this.asset.file_name);
   }
@@ -97,8 +105,8 @@ ko.components.register('file-asset', {
     <!-- /ko -->
   `,
   viewModel: {
-    createViewModel(params, componentInfo) {
-      return new FileAssetComponent(params, componentInfo);
+    createViewModel(params: Params): FileAssetComponent {
+      return new FileAssetComponent(params);
     },
   },
 });
