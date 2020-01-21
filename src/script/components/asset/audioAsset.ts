@@ -46,9 +46,8 @@ class AudioAssetComponent extends AbstractAssetTransferStateTracker {
   showLoudnessPreview: ko.PureComputed<boolean>;
   formatSeconds: (duration: number) => string;
 
-  constructor({message, header = false}: Params, {element}: ko.components.ComponentInfo) {
+  constructor({message, header = false}: Params, element: HTMLElement) {
     super(ko.unwrap(message));
-    const htmlElement = element as HTMLElement;
     this.dispose = this.dispose.bind(this);
     this.logger = getLogger('AudioAssetComponent');
 
@@ -57,7 +56,7 @@ class AudioAssetComponent extends AbstractAssetTransferStateTracker {
     this.header = header;
 
     this.audioSrc = ko.observable();
-    this.audioElement = htmlElement.querySelector('audio');
+    this.audioElement = element.querySelector('audio');
     this.audioTime = ko.observable(0);
     this.audioIsLoaded = ko.observable(false);
 
@@ -67,8 +66,8 @@ class AudioAssetComponent extends AbstractAssetTransferStateTracker {
       this.audioTime(this.asset.meta.duration);
     }
 
-    htmlElement.dataset.uieName = 'audio-asset';
-    htmlElement.dataset.uieValue = this.asset.file_name;
+    element.dataset.uieName = 'audio-asset';
+    element.dataset.uieValue = this.asset.file_name;
 
     this.formatSeconds = formatSeconds;
     this.AssetTransferState = AssetTransferState;
@@ -142,8 +141,8 @@ ko.components.register('audio-asset', {
     <!-- /ko -->
   `,
   viewModel: {
-    createViewModel(params: Params, componentInfo: ko.components.ComponentInfo): AudioAssetComponent {
-      return new AudioAssetComponent(params, componentInfo);
+    createViewModel(params: Params, {element}: ko.components.ComponentInfo): AudioAssetComponent {
+      return new AudioAssetComponent(params, element as HTMLElement);
     },
   },
 });
