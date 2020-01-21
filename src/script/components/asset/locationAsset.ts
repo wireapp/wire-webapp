@@ -17,17 +17,25 @@
  *
  */
 
+import ko from 'knockout';
+
 import {getMapsUrl} from 'Util/LocationUtil';
+
+import {Location} from '../../entity/message/Location';
+
+interface Params {
+  asset: Location;
+}
 
 ko.components.register('location-asset', {
   template: `
     <div class="location-asset-icon icon-location"></div>
     <div class="location-asset-title" data-bind="text: asset.name" data-uie-name="location-name"></div>
-    <a target="_blank" rel="nofollow noopener noreferrer" class="label-xs accent-text" data-bind="attr: {href: getMapsUrl(asset)}, text: t('conversationLocationLink')"></a>
+    <a target="_blank" rel="nofollow noopener noreferrer" class="label-xs accent-text" data-bind="attr: {href: mapsUrl}, text: t('conversationLocationLink')"></a>
   `,
-  viewModel: function({asset}) {
+  viewModel: function({asset}: Params): void {
     this.asset = asset;
-
-    this.getMapsUrl = ({latitude, longitude, name, zoom}) => getMapsUrl(latitude, longitude, name, zoom);
+    const {latitude, longitude, name, zoom} = asset;
+    this.mapsUrl = getMapsUrl(parseFloat(latitude), parseFloat(longitude), name, zoom);
   },
 });
