@@ -28,6 +28,8 @@ import './assetLoader';
 
 interface Params {
   message: ContentMessage | ko.Subscribable<ContentMessage>;
+
+  /** Does the asset have a visible header? */
   header: boolean;
 }
 
