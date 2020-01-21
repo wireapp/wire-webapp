@@ -29,6 +29,8 @@ import {AbstractAssetTransferStateTracker} from './AbstractAssetTransferStateTra
 
 interface Params {
   message: ContentMessage;
+
+  /** Does the asset have a visible header? */
   header: boolean;
 }
 
