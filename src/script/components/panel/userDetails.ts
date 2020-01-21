@@ -29,6 +29,7 @@ interface UserDetailsProps {
   isVerified?: ko.PureComputed<boolean>;
   badge?: string;
   isGroupAdmin: boolean;
+  isSelfVerified: ko.Subscribable<boolean>;
 }
 
 ko.components.register('panel-user-details', {
@@ -45,7 +46,7 @@ ko.components.register('panel-user-details', {
           <div class="panel-participant__head__name" data-bind="text: participant().name()" data-uie-name="status-name"></div>
         <!-- /ko -->
 
-        <!-- ko if: isVerified() -->
+        <!-- ko if: isSelfVerified() && isVerified() -->
           <verified-icon class="panel-participant__head__verified-icon" data-uie-name="status-verified-participant"></verified-icon>
         <!-- /ko -->
       </div>
@@ -82,10 +83,17 @@ ko.components.register('panel-user-details', {
       <!-- /ko -->
     </div>
   `,
-  viewModel: function(params: UserDetailsProps): void {
-    this.participant = params.participant;
-    this.isVerified = params.hasOwnProperty('isVerified') ? params.isVerified : this.participant().is_verified;
-    this.badge = params.badge;
-    this.isGroupAdmin = params.isGroupAdmin;
+  viewModel: function({
+    participant,
+    isVerified = participant().is_verified,
+    badge,
+    isGroupAdmin,
+    isSelfVerified = ko.observable(false),
+  }: UserDetailsProps): void {
+    this.participant = participant;
+    this.isVerified = isVerified;
+    this.badge = badge;
+    this.isGroupAdmin = isGroupAdmin;
+    this.isSelfVerified = isSelfVerified;
   },
 });

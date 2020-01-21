@@ -18,6 +18,7 @@
  */
 
 import {errors as ProteusErrors} from '@wireapp/proteus';
+import ko from 'knockout';
 
 import {t} from 'Util/LocalizerUtil';
 import {printDevicesId} from 'Util/util';
@@ -27,6 +28,17 @@ import {SuperType} from '../../message/SuperType';
 import {Message} from './Message';
 
 export class DecryptErrorMessage extends Message {
+  private readonly client_id: string;
+  private readonly error_code: string;
+  private readonly error_message: ko.PureComputed<string>;
+  private readonly is_remote_identity_changed: ko.PureComputed<boolean>;
+  public readonly htmlCaption: ko.PureComputed<string>;
+  public readonly htmlErrorMessage: ko.PureComputed<string>;
+  public readonly is_recoverable: ko.PureComputed<boolean>;
+  public readonly is_resetting_session: ko.Observable<boolean>;
+  public readonly link: ko.PureComputed<string>;
+
+  // tslint:disable-next-line:typedef
   static get REMOTE_IDENTITY_CHANGED_ERROR() {
     return ProteusErrors.DecryptError.CODE.CASE_204.toString();
   }
@@ -78,6 +90,8 @@ export class DecryptErrorMessage extends Message {
       if (parts.length) {
         return `(${parts.join('')})`;
       }
+
+      return '';
     });
 
     this.htmlErrorMessage = this.error_message;

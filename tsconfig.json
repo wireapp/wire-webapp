@@ -6,6 +6,7 @@
     "baseUrl": ".",
     "declaration": false,
     "downlevelIteration": true,
+    "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "jsx": "react",
     "lib": ["dom", "es2017"],

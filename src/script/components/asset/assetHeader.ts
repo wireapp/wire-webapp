@@ -17,17 +17,24 @@
  *
  */
 
-import {Asset} from './Asset';
-import {AssetType} from '../../assets/AssetType';
+import ko from 'knockout';
+import moment from 'moment';
 
-export class Location extends Asset {
-  constructor() {
-    super();
+import {LDM} from 'Util/moment';
 
-    this.latitude = '';
-    this.longitude = '';
-    this.name = '';
-    this.type = AssetType.LOCATION;
-    this.zoom = '';
-  }
+import {Message} from '../../entity/message/Message';
+
+interface Params {
+  message: Message;
 }
+
+ko.components.register('asset-header', {
+  template: `
+    <span class="asset-header-name" data-bind="text: message_et.user().first_name(), css: message_et.accent_color"></span>
+    <span class="asset-header-time" data-bind="text: timeText"></span>
+  `,
+  viewModel: function({message}: Params): void {
+    this.message_et = message;
+    this.timeText = ko.pureComputed(() => moment(message.timestamp()).format(`${LDM} LT`));
+  },
+});

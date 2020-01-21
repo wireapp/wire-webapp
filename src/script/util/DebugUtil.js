@@ -354,13 +354,13 @@ export class DebugUtil {
 
   enableFakeMediaDevices() {
     const cameras = [
-      {deviceId: 'ff0000', kind: 'videoinput', label: 'Red cam'},
-      {deviceId: '00ff00', kind: 'videoinput', label: 'Green cam'},
-      {deviceId: '0000ff', kind: 'videoinput', label: 'Blue cam'},
+      {deviceId: 'ff0000', groupId: 'fakeCamera1', kind: 'videoinput', label: 'Red cam'},
+      {deviceId: '00ff00', groupId: 'fakeCamera2', kind: 'videoinput', label: 'Green cam'},
+      {deviceId: '0000ff', groupId: 'fakeCamera3', kind: 'videoinput', label: 'Blue cam'},
     ];
     const microphones = [
-      {deviceId: '440', kind: 'audioinput', label: 'First mic'},
-      {deviceId: '100', kind: 'audioinput', label: 'Second mic'},
+      {deviceId: '440', groupId: 'fakeMic1', kind: 'audioinput', label: 'First mic'},
+      {deviceId: '100', groupId: 'fakeMic2', kind: 'audioinput', label: 'Second mic'},
     ];
     navigator.mediaDevices.enumerateDevices = () => Promise.resolve(cameras.concat(microphones));
 

@@ -17,26 +17,20 @@
  *
  */
 
-import moment from 'moment';
+import {SuperType} from '../../message/SuperType';
+import {SystemMessageType} from '../../message/SystemMessageType';
+import {Message} from './Message';
 
-import {LDM} from 'Util/moment';
+export class SystemMessage extends Message {
+  public system_message_type: SystemMessageType;
 
-class AssetHeader {
-  /**
-   * Construct a new asset header.
-   * @param {Object} params - Component parameters
-   * @param {Message} params.message - Message entity
-   */
-  constructor(params) {
-    this.message_et = params.message;
-    this.moment = moment;
+  constructor() {
+    super();
+    this.super_type = SuperType.SYSTEM;
+    this.system_message_type = SystemMessageType.NORMAL;
+  }
+
+  is_conversation_rename(): boolean {
+    return this.system_message_type === SystemMessageType.CONVERSATION_RENAME;
   }
 }
-
-ko.components.register('asset-header', {
-  template: `
-    <span class="asset-header-name" data-bind="text: message_et.user().first_name(), css: message_et.accent_color"></span>
-    <span class="asset-header-time" data-bind="text: moment(message_et.timestamp()).format('${LDM} LT')"></span>
-  `,
-  viewModel: AssetHeader,
-});

@@ -17,13 +17,30 @@
  *
  */
 
+import ko from 'knockout';
+
 import {noop} from 'Util/util';
 
-import {Config} from '../../Config';
 import {Actions} from 'Components/panel/userActions';
 
+import {Config} from '../../Config';
+import {User} from '../../entity/User';
+import {UserRepository} from '../../user/UserRepository';
+import {ActionsViewModel} from '../ActionsViewModel';
+
 export class UserModalViewModel {
-  constructor(userRepository, actionsViewModel) {
+  userRepository: UserRepository;
+  actionsViewModel: ActionsViewModel;
+  isVisible: ko.Observable<boolean>;
+  user: ko.Observable<User>;
+  userNotFound: ko.Observable<boolean>;
+  onClosedCallback: () => void;
+  onClosed: () => void;
+  hide: () => void;
+  brandName: string;
+  isSelfVerified: ko.PureComputed<boolean>;
+
+  constructor(userRepository: UserRepository, actionsViewModel: ActionsViewModel) {
     this.userRepository = userRepository;
     this.actionsViewModel = actionsViewModel;
 
@@ -38,9 +55,10 @@ export class UserModalViewModel {
     };
     this.hide = () => this.isVisible(false);
     this.brandName = Config.BRAND_NAME;
+    this.isSelfVerified = ko.pureComputed(() => userRepository.self()?.is_verified());
   }
 
-  onUserAction = userAction => {
+  onUserAction = (userAction: string): void => {
     switch (userAction) {
       case Actions.UNBLOCK:
       case Actions.SEND_REQUEST:
@@ -50,7 +68,7 @@ export class UserModalViewModel {
     this.hide();
   };
 
-  showUser(userId, onModalClosed = noop) {
+  showUser(userId: string, onModalClosed: () => void = noop): void {
     this.onClosedCallback = onModalClosed;
     this.user(null);
     this.userNotFound(false);

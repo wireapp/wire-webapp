@@ -24,11 +24,11 @@ import {AssetRemoteData} from '../../assets/AssetRemoteData';
 import {LinkPreviewMetaDataType} from '../../links/LinkPreviewMetaDataType';
 
 export class LinkPreview {
-  image_resource: ko.Observable<AssetRemoteData>;
-  meta_data_type?: LinkPreviewMetaDataType;
-  meta_data?: string;
-  title: string;
-  url: string;
+  private readonly image_resource: ko.Observable<AssetRemoteData>;
+  private title: string;
+  private url: string;
+  public meta_data_type?: LinkPreviewMetaDataType;
+  public meta_data?: string;
 
   constructor(title?: string, url?: string) {
     this.title = title || '';

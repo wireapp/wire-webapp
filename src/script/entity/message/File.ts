@@ -34,15 +34,15 @@ import {AssetUploadFailedReason} from '../../assets/AssetUploadFailedReason';
 type AssetMetaData = ProtobufAsset.IAudioMetaData | ProtobufAsset.IImageMetaData | ProtobufAsset.IVideoMetaData;
 
 export class File extends Asset {
-  downloadProgress: ko.PureComputed<number | undefined>;
-  file_name: string;
-  file_size: string;
-  logger: Logger;
-  meta: Partial<AssetMetaData>;
-  original_resource: ko.Observable<AssetRemoteData>;
-  preview_resource: ko.Observable<AssetRemoteData>;
-  status: ko.Observable<AssetTransferState>;
-  upload_failed_reason: ko.Observable<AssetUploadFailedReason>;
+  private readonly original_resource: ko.Observable<AssetRemoteData>;
+  private readonly preview_resource: ko.Observable<AssetRemoteData>;
+  protected logger: Logger;
+  public readonly downloadProgress: ko.PureComputed<number | undefined>;
+  public readonly file_name: string;
+  public readonly file_size: string;
+  public readonly meta: Partial<AssetMetaData>;
+  public readonly status: ko.Observable<AssetTransferState>;
+  public readonly upload_failed_reason: ko.Observable<AssetUploadFailedReason>;
 
   constructor(id?: string) {
     super(id);
