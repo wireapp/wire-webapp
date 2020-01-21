@@ -51,8 +51,8 @@ const observer = new IntersectionObserver(onIntersect, options);
  *
  * @param {HTMLElement} element - the element to observe
  * @param {Function} onVisible - the callback to call when the element appears
- * @param {boolean} fullyInView - should the element be fully in view
- * @param {HTMLElement} container - the element containing the element
+ * @param {boolean} [fullyInView] - should the element be fully in view
+ * @param {HTMLElement} [container] - the element containing the element
  * @returns {void} - nothing
  */
 const onElementInViewport = (element, onVisible, fullyInView, container) => {
