@@ -46,7 +46,7 @@ describe('when visiting the set account type page', () => {
 
     afterAll(() => (Config.FEATURE = {}));
 
-    it('redirects to the login page', () => {
+    it('redirects to the index page', () => {
       wrapper = mountComponent(
         <SetAccountType />,
         mockStoreFactory()({
@@ -59,7 +59,9 @@ describe('when visiting the set account type page', () => {
         }),
       );
 
-      expect(wrapper.find('[data-uie-name="redirect-login"]').exists()).toBe(true);
+      expect(wrapper.find('Redirect [data-uie-name="redirect-login"][to="/"]').exists())
+        .withContext('Redirect is rendered')
+        .toBe(true);
     });
   });
 
