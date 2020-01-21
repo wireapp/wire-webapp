@@ -25,7 +25,7 @@ import {AssetType} from '../../assets/AssetType';
 import {File} from './File';
 
 export class MediumImage extends File {
-  private readonly resource: ko.Observable<AssetRemoteData>;
+  public readonly resource: ko.Observable<AssetRemoteData>;
   public readonly correlation_id: string;
   public readonly height: string;
   public readonly width: string;
