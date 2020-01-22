@@ -28,7 +28,7 @@ import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
 import SingleSignOnForm from './SingleSignOnForm';
 
-describe('"SingleSignOnForm"', () => {
+describe('SingleSignOnForm', () => {
   let wrapper: ReactWrapper;
 
   it('successfully logs into account with initial code', async () => {
