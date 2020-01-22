@@ -36,7 +36,7 @@ describe('MediaDevicesHandler', () => {
    * - 2 cameras
    * - 4 speakers
    */
-  const complexTestSetup = [
+  const realWorldTestSetup = [
     {
       'deviceId': 'default',
       'groupId': '9d8426d64dd15ca6966cb3182371e259283b1dcef969e2b624d26a4552c0b4d3',
@@ -123,55 +123,65 @@ describe('MediaDevicesHandler', () => {
     },
   ];
 
-  const cameras = [
-    {deviceId: 'camera1', kind: MediaDeviceType.VIDEO_INPUT, label: 'Camera 1', groupId: '1'},
-    {deviceId: 'camera2', kind: MediaDeviceType.VIDEO_INPUT, label: 'Camera 2', groupId: '2'},
-  ];
-  const microphones = [
-    {
-      'deviceId': 'default',
-      'groupId': 'a7392890d1200b83c3c786d6a08f89b28908493694a2cf014d0cf74e62b4f404',
-      'kind': MediaDeviceType.AUDIO_INPUT,
-      'label': 'Default - Desktop Microphone (Microsoft® LifeCam Studio(TM)) (045e:0772)',
-    },
-    {
-      'deviceId': 'communications',
-      'groupId': 'a7392890d1200b83c3c786d6a08f89b28908493694a2cf014d0cf74e62b4f404',
-      'kind': MediaDeviceType.AUDIO_INPUT,
-      'label': 'Communications - Desktop Microphone (Microsoft® LifeCam Studio(TM)) (045e:0772)',
-    },
-    {
-      'deviceId': 'c2f7f56ce1d142a4fe13d5bb42e355b7a0ed7de88d1aa93e196ab0b011a183cd',
-      'groupId': 'a7392890d1200b83c3c786d6a08f89b28908493694a2cf014d0cf74e62b4f404',
-      'kind': MediaDeviceType.AUDIO_INPUT,
-      'label': 'Desktop Microphone (Microsoft® LifeCam Studio(TM)) (045e:0772)',
-    },
-  ];
-  const speakers = [
-    {deviceId: 'speaker1', kind: MediaDeviceType.AUDIO_OUTPUT, label: 'Speaker 1', groupId: '1'},
-    {deviceId: 'speaker2', kind: MediaDeviceType.AUDIO_OUTPUT, label: 'Speaker 2', groupId: '2'},
-  ];
+  const fakeWorldTestSetup = {
+    cameras: [
+      {deviceId: 'camera1', kind: MediaDeviceType.VIDEO_INPUT, label: 'Camera 1', groupId: '1'},
+      {deviceId: 'camera2', kind: MediaDeviceType.VIDEO_INPUT, label: 'Camera 2', groupId: '2'},
+    ],
+    speakers: [
+      {deviceId: 'speaker1', kind: MediaDeviceType.AUDIO_OUTPUT, label: 'Speaker 1', groupId: '1'},
+      {deviceId: 'speaker2', kind: MediaDeviceType.AUDIO_OUTPUT, label: 'Speaker 2', groupId: '2'},
+    ],
+    microphones: [
+      {deviceId: 'mic1', kind: MediaDeviceType.AUDIO_INPUT, label: 'Mic 1', groupId: '1'},
+      {deviceId: 'mic2', kind: MediaDeviceType.AUDIO_INPUT, label: 'Mic 2', groupId: '2'},
+    ],
+  };
 
-  beforeEach(() => {
-    spyOn(navigator.mediaDevices, 'enumerateDevices').and.returnValue(
-      Promise.resolve([...cameras, ...microphones, ...speakers]),
-    );
-  });
+  describe('refreshMediaDevices', () => {
+    it('filters duplicate microphones and keeps the ones marked with "communications"', () => {
+      spyOn(navigator.mediaDevices, 'enumerateDevices').and.returnValue(
+        Promise.resolve([
+          {
+            'deviceId': 'default',
+            'groupId': 'a7392890d1200b83c3c786d6a08f89b28908493694a2cf014d0cf74e62b4f404',
+            'kind': MediaDeviceType.AUDIO_INPUT,
+            'label': 'Default - Desktop Microphone (Microsoft® LifeCam Studio(TM)) (045e:0772)',
+          },
+          {
+            'deviceId': 'communications',
+            'groupId': 'a7392890d1200b83c3c786d6a08f89b28908493694a2cf014d0cf74e62b4f404',
+            'kind': MediaDeviceType.AUDIO_INPUT,
+            'label': 'Communications - Desktop Microphone (Microsoft® LifeCam Studio(TM)) (045e:0772)',
+          },
+          {
+            'deviceId': 'c2f7f56ce1d142a4fe13d5bb42e355b7a0ed7de88d1aa93e196ab0b011a183cd',
+            'groupId': 'a7392890d1200b83c3c786d6a08f89b28908493694a2cf014d0cf74e62b4f404',
+            'kind': MediaDeviceType.AUDIO_INPUT,
+            'label': 'Desktop Microphone (Microsoft® LifeCam Studio(TM)) (045e:0772)',
+          },
+        ]),
+      );
 
-  describe('constructor', () => {
-    it('filters duplicate audio inputs (if any) and keeps the ones marked with "communications"', () => {
       const devicesHandler = new MediaDevicesHandler();
+
       setTimeout(() => {
         expect(devicesHandler.availableDevices.audioInput().length).withContext('Available microphones').toEqual(1);
       });
     });
+  });
 
+  describe('constructor', () => {
     it('loads available devices and listens to input devices changes', done => {
+      spyOn(navigator.mediaDevices, 'enumerateDevices').and.returnValue(
+        Promise.resolve([...fakeWorldTestSetup.cameras, ...fakeWorldTestSetup.microphones, ...fakeWorldTestSetup.speakers]),
+      );
+
       const devicesHandler = new MediaDevicesHandler();
       setTimeout(() => {
         expect(navigator.mediaDevices.enumerateDevices).withContext('Initial enumeration').toHaveBeenCalledTimes(1);
-        expect(devicesHandler.availableDevices.videoInput()).withContext('Initial cameras').toEqual(cameras);
-        expect(devicesHandler.availableDevices.audioOutput()).withContext('Initial speakers').toEqual(speakers);
+        expect(devicesHandler.availableDevices.videoInput()).withContext('Initial cameras').toEqual(fakeWorldTestSetup.cameras);
+        expect(devicesHandler.availableDevices.audioOutput()).withContext('Initial speakers').toEqual(fakeWorldTestSetup.speakers);
 
         const newCameras = [{deviceId: 'newcamera', kind: MediaDeviceType.VIDEO_INPUT}];
         navigator.mediaDevices.enumerateDevices.and.returnValue(Promise.resolve(newCameras));
@@ -189,29 +199,33 @@ describe('MediaDevicesHandler', () => {
 
   describe('currentAvailableDeviceId', () => {
     it('only exposes available device', done => {
+      spyOn(navigator.mediaDevices, 'enumerateDevices').and.returnValue(
+        Promise.resolve([...fakeWorldTestSetup.cameras, ...fakeWorldTestSetup.microphones, ...fakeWorldTestSetup.speakers]),
+      );
+
       const devicesHandler = new MediaDevicesHandler();
       setTimeout(() => {
-        devicesHandler.currentDeviceId.videoInput(cameras[0].deviceId);
+        devicesHandler.currentDeviceId.videoInput(fakeWorldTestSetup.cameras[0].deviceId);
 
-        expect(devicesHandler.currentAvailableDeviceId.videoInput()).toBe(cameras[0].deviceId);
+        expect(devicesHandler.currentAvailableDeviceId.videoInput()).toBe(fakeWorldTestSetup.cameras[0].deviceId);
 
-        devicesHandler.currentDeviceId.videoInput('inexistant-id');
+        devicesHandler.currentDeviceId.videoInput('not-existing-id');
         expect(devicesHandler.currentAvailableDeviceId.videoInput()).toBe(
           MediaDevicesHandler.CONFIG.DEFAULT_DEVICE.videoInput,
         );
 
-        devicesHandler.currentDeviceId.audioInput(microphones[0].deviceId);
+        devicesHandler.currentDeviceId.audioInput(fakeWorldTestSetup.microphones[0].deviceId);
 
-        expect(devicesHandler.currentAvailableDeviceId.audioInput()).toBe(microphones[0].deviceId);
+        expect(devicesHandler.currentAvailableDeviceId.audioInput()).toBe(fakeWorldTestSetup.microphones[0].deviceId);
 
-        devicesHandler.currentDeviceId.audioInput('inexistant-id');
+        devicesHandler.currentDeviceId.audioInput('not-existing-id');
         expect(devicesHandler.currentAvailableDeviceId.audioInput()).toBe(
           MediaDevicesHandler.CONFIG.DEFAULT_DEVICE.audioInput,
         );
 
-        devicesHandler.currentDeviceId.audioOutput(speakers[0].deviceId);
+        devicesHandler.currentDeviceId.audioOutput(fakeWorldTestSetup.speakers[0].deviceId);
 
-        expect(devicesHandler.currentAvailableDeviceId.audioOutput()).toBe(speakers[0].deviceId);
+        expect(devicesHandler.currentAvailableDeviceId.audioOutput()).toBe(fakeWorldTestSetup.speakers[0].deviceId);
 
         devicesHandler.currentDeviceId.audioOutput('inexistant-id');
         expect(devicesHandler.currentAvailableDeviceId.audioOutput()).toBe(
