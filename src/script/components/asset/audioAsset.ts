@@ -113,7 +113,7 @@ ko.components.register('audio-asset', {
       <!-- /ko -->
       <!-- ko if: transferState() !== AssetTransferState.UPLOAD_PENDING -->
         <div class="audio-controls">
-          <media-button params="src: audio_element,
+          <media-button params="src: audioElement,
                                 asset: asset,
                                 play: onPlayButtonClicked,
                                 pause: onPauseButtonClicked,
@@ -129,11 +129,11 @@ ko.components.register('audio-asset', {
             </span>
             <!-- ko if: showLoudnessPreview -->
               <audio-seek-bar data-uie-name="status-audio-seekbar"
-                              params="src: audio_element, asset: asset, disabled: !audioSrc()"></audio-seek-bar>
+                              params="src: audioElement, asset: asset, disabled: !audioSrc()"></audio-seek-bar>
             <!-- /ko -->
             <!-- ko ifnot: showLoudnessPreview -->
               <seek-bar data-uie-name="status-audio-seekbar"
-                        params="src: audio_element, dark: true, disabled: !audioSrc()"></seek-bar>
+                        params="src: audioElement, dark: true, disabled: !audioSrc()"></seek-bar>
             <!-- /ko -->
           <!-- /ko -->
         </div>
