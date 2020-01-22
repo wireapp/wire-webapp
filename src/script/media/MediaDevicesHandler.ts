@@ -182,17 +182,15 @@ export class MediaDevicesHandler {
     cameras: MediaDeviceInfo[];
     speakers: MediaDeviceInfo[];
   } {
-    const audioOutputDevices: MediaDeviceInfo[] = mediaDevices.filter(
-      device => device.kind === MediaDeviceType.AUDIO_OUTPUT,
-    );
     const videoInputDevices: MediaDeviceInfo[] = mediaDevices.filter(
       device => device.kind === MediaDeviceType.VIDEO_INPUT,
     );
-    const microphones = mediaDevices.filter(device => device.kind === MediaDeviceType.AUDIO_INPUT);
+
     /*
-     * On Windows the same microphone can be listed multiple times with different group ids ("default", "communications", etc.).
-     * In such a scenario, only the device listed as "communications" device works, so we filter its duplicates to prevent the user from selecting a non-working audio input.
+     * On Windows the same device can be listed multiple times with different group ids ("default", "communications", etc.).
+     * In such a scenario, the device listed as "communications" device is preferred for conferencing calls, so we filter its duplicates.
      */
+    const microphones = mediaDevices.filter(device => device.kind === MediaDeviceType.AUDIO_INPUT);
     const dedupedMicrophones = microphones.reduce((microphoneList: Record<string, MediaDeviceInfo>, microphone) => {
       if (!microphoneList.hasOwnProperty(microphone.groupId) || microphone.deviceId === 'communications') {
         microphoneList[microphone.groupId] = microphone;
@@ -200,10 +198,18 @@ export class MediaDevicesHandler {
       return microphoneList;
     }, {});
 
+    const speakers = mediaDevices.filter(device => device.kind === MediaDeviceType.AUDIO_OUTPUT);
+    const dedupedSpeakers = speakers.reduce((speakerList: Record<string, MediaDeviceInfo>, speaker) => {
+      if (!speakerList.hasOwnProperty(speaker.groupId) || speaker.deviceId === 'communications') {
+        speakerList[speaker.groupId] = speaker;
+      }
+      return speakerList;
+    }, {});
+
     return {
       cameras: videoInputDevices,
       microphones: Object.values(dedupedMicrophones),
-      speakers: audioOutputDevices,
+      speakers: Object.values(dedupedSpeakers),
     };
   }
 

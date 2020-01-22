@@ -93,9 +93,9 @@ describe('MediaDevicesHandler', () => {
       },
       {
         'deviceId': 'communications',
-        'groupId': 'af428bcaa9e9900c935395d334818e98062dd4e49f3eec6443ba1f0a09461132',
+        'groupId': 'bf1ec0df3fe711fab2128c22b19d3b86e0963d302deee84b171f84c9e2417858',
         'kind': MediaDeviceType.AUDIO_OUTPUT,
-        'label': 'Communications - Headset (Bose QuietComfort Hands-Free) (Bluetooth)',
+        'label': 'Communications - Headset (Bose QuietComfort Stereo) (Bluetooth)',
       },
       {
         'deviceId': 'bb00aceb5a214799cca4d11f10827d60a3462069cd227f8c7874ef60c1401ef0',
@@ -105,9 +105,9 @@ describe('MediaDevicesHandler', () => {
       },
       {
         'deviceId': 'e6bc5cff184fcf11c10a1800c5079c24da038461facd73122e9bc9158afded26',
-        'groupId': 'af428bcaa9e9900c935395d334818e98062dd4e49f3eec6443ba1f0a09461132',
+        'groupId': 'bf1ec0df3fe711fab2128c22b19d3b86e0963d302deee84b171f84c9e2417858',
         'kind': MediaDeviceType.AUDIO_OUTPUT,
-        'label': 'Headset (Bose QuietComfort Hands-Free) (Bluetooth)',
+        'label': 'Headset (Bose QuietComfort Stereo) (Bluetooth)',
       },
       {
         'deviceId': 'af7da4f952304dfeec3aa5a77141decb309f3e8a1f8e94834e9ec746205bf049',
