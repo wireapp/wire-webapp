@@ -37,7 +37,7 @@ import {useIntl} from 'react-intl';
 import {Redirect} from 'react-router';
 import useReactRouter from 'use-react-router';
 import {Config} from '../../Config';
-import {indexStrings} from '../../strings';
+import {setAccountTypeStrings} from '../../strings';
 import RouterLink from '../component/RouterLink';
 import {ROUTE} from '../route';
 import {isDesktopApp, isMacOS} from '../Runtime';
@@ -80,7 +80,7 @@ const SetAccountType = ({}: Props) => {
                     <ProfileIcon height={31} width={31} />
                   </RoundIconButton>
                   <Bold fontSize="24px" color={COLOR.LINK}>
-                    {_(indexStrings.createAccountForPersonalUse)}
+                    {_(setAccountTypeStrings.createAccountForPersonalUse)}
                   </Bold>
                   <br />
                   <Text
@@ -93,7 +93,7 @@ const SetAccountType = ({}: Props) => {
                       marginTop: 8,
                     }}
                   >
-                    {_(indexStrings.createPersonalAccount)}
+                    {_(setAccountTypeStrings.createPersonalAccount)}
                   </Text>
                 </Link>
               </Column>
@@ -103,7 +103,7 @@ const SetAccountType = ({}: Props) => {
                     <TeamIcon height={31} width={31} />
                   </RoundIconButton>
                   <Bold fontSize="24px" color={COLOR.LINK}>
-                    {_(indexStrings.createAccountForOrganizations)}
+                    {_(setAccountTypeStrings.createAccountForOrganizations)}
                   </Bold>
                   <br />
                   <Text
@@ -116,7 +116,7 @@ const SetAccountType = ({}: Props) => {
                       marginTop: 8,
                     }}
                   >
-                    {_(indexStrings.createTeam)}
+                    {_(setAccountTypeStrings.createTeam)}
                   </Text>
                 </Link>
               </Column>

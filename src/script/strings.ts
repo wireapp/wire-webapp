@@ -43,6 +43,25 @@ export const cookiePolicyStrings = defineMessages({
 });
 
 export const indexStrings = defineMessages({
+  createAccount: {
+    defaultMessage: 'Create account',
+    id: 'index.createAccount',
+  },
+  enterprise: {
+    defaultMessage: 'Enterprise log in',
+    id: 'index.enterprise',
+  },
+  logIn: {
+    defaultMessage: 'Log in',
+    id: 'index.login',
+  },
+  welcome: {
+    defaultMessage: 'Welcome to {brandName}',
+    id: 'index.welcome',
+  },
+});
+
+export const setAccountTypeStrings = defineMessages({
   createAccountForOrganizations: {
     defaultMessage: 'Pro',
     id: 'index.createAccountForOrganizations',

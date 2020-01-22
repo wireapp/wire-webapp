@@ -19,21 +19,24 @@
 
 import {Button, COLOR, ContainerXS, Logo, Text} from '@wireapp/react-ui-kit';
 import React from 'react';
+import {useIntl} from 'react-intl';
 import useReactRouter from 'use-react-router';
 import {Config} from '../../Config';
+import {indexStrings} from '../../strings';
 import {ROUTE} from '../route';
 import Page from './Page';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
 const Index = ({}: Props) => {
+  const {formatMessage: _} = useIntl();
   const {history} = useReactRouter();
   return (
     <Page>
       <ContainerXS centerText verticalCenter style={{width: '380px'}}>
         <Logo scale={1.68} style={{marginBottom: '80px'}} data-uie-name="ui-wire-logo" />
         <Text block center style={{fontSize: '32px', fontWeight: 300, marginBottom: '48px'}}>
-          {'Welcome to Wire'}
+          {_(indexStrings.welcome, {brandName: Config.BRAND_NAME})}
         </Text>
         {Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
           <Button
@@ -42,7 +45,7 @@ const Index = ({}: Props) => {
             style={{fontSize: '13px'}}
             data-uie-name="go-set-account-type"
           >
-            {'Create account'}
+            {_(indexStrings.createAccount)}
           </Button>
         )}
         <Button
@@ -53,7 +56,7 @@ const Index = ({}: Props) => {
           style={{fontSize: '13px', border: `1px solid ${COLOR.BLUE}`, marginBottom: '120px'}}
           data-uie-name="go-login"
         >
-          {'Log in'}
+          {_(indexStrings.logIn)}
         </Button>
         <Button
           onClick={() => history.push(ROUTE.SSO)}
@@ -63,7 +66,7 @@ const Index = ({}: Props) => {
           style={{fontSize: '13px'}}
           data-uie-name="go-sso-login"
         >
-          {'Enterprise log in'}
+          {_(indexStrings.enterprise)}
         </Button>
       </ContainerXS>
     </Page>
