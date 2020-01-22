@@ -17,7 +17,7 @@
  *
  */
 
-import {Button, ContainerXS, Logo} from '@wireapp/react-ui-kit';
+import {Button, COLOR, ContainerXS, Logo, Text} from '@wireapp/react-ui-kit';
 import React from 'react';
 import useReactRouter from 'use-react-router';
 import {Config} from '../../Config';
@@ -30,18 +30,40 @@ const Index = ({}: Props) => {
   const {history} = useReactRouter();
   return (
     <Page>
-      <ContainerXS centerText verticalCenter>
-        <Logo scale={1.68} data-uie-name="ui-wire-logo" />
+      <ContainerXS centerText verticalCenter style={{width: '380px'}}>
+        <Logo scale={1.68} style={{marginBottom: '80px'}} data-uie-name="ui-wire-logo" />
+        <Text block center style={{fontSize: '32px', fontWeight: 300, marginBottom: '48px'}}>
+          {'Welcome to Wire'}
+        </Text>
         {Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
-          <Button onClick={() => history.push(ROUTE.SET_ACCOUNT_TYPE)} block data-uie-name="go-set-account-type">
+          <Button
+            onClick={() => history.push(ROUTE.SET_ACCOUNT_TYPE)}
+            block
+            style={{fontSize: '13px'}}
+            data-uie-name="go-set-account-type"
+          >
             {'Create account'}
           </Button>
         )}
-        <Button onClick={() => history.push(ROUTE.LOGIN)} block data-uie-name="go-login">
-          {'Login'}
+        <Button
+          onClick={() => history.push(ROUTE.LOGIN)}
+          block
+          backgroundColor={'transparent'}
+          color={COLOR.BLUE}
+          style={{fontSize: '13px', border: `1px solid ${COLOR.BLUE}`, marginBottom: '120px'}}
+          data-uie-name="go-login"
+        >
+          {'Log in'}
         </Button>
-        <Button onClick={() => history.push(ROUTE.SSO)} block data-uie-name="go-sso-login">
-          {'Enterprise login'}
+        <Button
+          onClick={() => history.push(ROUTE.SSO)}
+          block
+          color={COLOR.TEXT}
+          backgroundColor={COLOR.GRAY_LIGHTEN_64}
+          style={{fontSize: '13px'}}
+          data-uie-name="go-sso-login"
+        >
+          {'Enterprise log in'}
         </Button>
       </ContainerXS>
     </Page>
