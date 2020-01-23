@@ -1,6 +1,6 @@
 import fs from 'fs';
 import Changelog from 'generate-changelog';
-import * as pkg from './package.json';
+import * as pkg from '../package.json';
 
 const simpleGit = require('simple-git')();
 
@@ -15,5 +15,5 @@ simpleGit.pull().tags(options, async (error: Error, tags: {
     repoUrl: pkg.repository.url.replace('.git', ''),
     tag: `${latestProductionTag}...master`,
   });
-  fs.writeFileSync('./CHANGELOG.md', changelog);
+  fs.writeFileSync('../CHANGELOG.md', changelog);
 });
