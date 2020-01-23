@@ -24,12 +24,20 @@ import SimpleBar from 'simplebar';
 import {debounce, throttle} from 'underscore';
 import '@wireapp/antiscroll-2/dist/antiscroll-2';
 
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {
+  TIME_IN_MILLIS,
+  isYoungerThan2Minutes,
+  isYoungerThan1Hour,
+  isToday,
+  isYesterday,
+  isYoungerThan7Days,
+  fromUnixTime,
+} from 'Util/TimeUtil';
 import {t} from 'Util/LocalizerUtil';
 import {stripUrlWrapper} from 'Util/util';
 import {Environment} from 'Util/Environment';
 import {isEnterKey} from 'Util/KeyboardUtil';
-import {LLDM} from 'Util/moment';
+import {LLDM} from 'Util/TimeUtil';
 
 import {overlayedObserver} from '../../ui/overlayedObserver';
 import {viewportObserver} from '../../ui/viewportObserver';
@@ -521,29 +529,25 @@ ko.bindingHandlers.relative_timestamp = (function() {
   const calculate = function(element, timestamp) {
     timestamp = window.parseInt(timestamp);
     const date = moment.unix(timestamp / TIME_IN_MILLIS.SECOND);
+    const unixDate = fromUnixTime(timestamp / TIME_IN_MILLIS.SECOND);
 
-    const now = moment().local();
-    const today = now.format('YYMMDD');
-    const yesterday = now.subtract(1, 'days').format('YYMMDD');
-    const current_day = date.local().format('YYMMDD');
-
-    if (moment().diff(date, 'minutes') < 2) {
+    if (isYoungerThan2Minutes(unixDate)) {
       return $(element).text(t('conversationJustNow'));
     }
 
-    if (moment().diff(date, 'minutes') < 60) {
+    if (isYoungerThan1Hour(unixDate)) {
       return $(element).text(date.fromNow());
     }
 
-    if (current_day === today) {
+    if (isToday(unixDate)) {
       return $(element).text(date.local().format('LT'));
     }
 
-    if (current_day === yesterday) {
+    if (isYesterday(unixDate)) {
       return $(element).text(`${t('conversationYesterday')} ${date.local().format('LT')}`);
     }
 
-    if (moment().diff(date, 'days') < 7) {
+    if (isYoungerThan7Days(unixDate)) {
       return $(element).text(date.local().format('dddd LT'));
     }
 

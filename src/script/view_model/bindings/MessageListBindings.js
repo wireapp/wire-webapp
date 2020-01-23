@@ -26,7 +26,7 @@ import {t} from 'Util/LocalizerUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {isArrowKey, isPageUpDownKey, isMetaKey, isPasteAction} from 'Util/KeyboardUtil';
 import {noop} from 'Util/util';
-import {LLDM} from 'Util/moment';
+import {LLDM} from 'Util/TimeUtil';
 
 import {viewportObserver} from '../../ui/viewportObserver';
 

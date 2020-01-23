@@ -19,6 +19,7 @@
 
 import moment from 'moment';
 
+import {isBeforeToday} from 'Util/TimeUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
 
 import {WebAppEvents} from '../event/WebApp';
@@ -66,9 +67,7 @@ class MessageQuote {
       if (!this.quotedMessage()) {
         return false;
       }
-      const quoteDate = moment(this.quotedMessage().timestamp());
-      const today = moment().startOf('day');
-      return quoteDate.isBefore(today);
+      return isBeforeToday(this.quotedMessage().timestamp());
     });
 
     if (!this.error() && quote().messageId) {

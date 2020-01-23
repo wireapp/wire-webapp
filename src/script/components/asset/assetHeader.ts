@@ -20,7 +20,7 @@
 import ko from 'knockout';
 import moment from 'moment';
 
-import {LDM} from 'Util/moment';
+import {LDM} from 'Util/TimeUtil';
 
 import {Message} from '../../entity/message/Message';
 

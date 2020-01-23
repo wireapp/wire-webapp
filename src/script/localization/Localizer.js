@@ -22,6 +22,7 @@ import moment from 'moment';
 import {loadValue, storeValue} from 'Util/StorageUtil';
 import {getParameter} from 'Util/UrlUtil';
 import {DEFAULT_LOCALE, setLocale, setStrings} from 'Util/LocalizerUtil';
+import {setDateLocale} from 'Util/TimeUtil';
 
 import {URLParameter} from '../auth/URLParameter';
 import {StorageKey} from '../storage/StorageKey';
@@ -112,6 +113,7 @@ setStrings(strings);
 
   const locale = storedLocale || currentBrowserLocale || DEFAULT_LOCALE;
   setLocale(locale);
+  setDateLocale(locale);
 
   document.getElementsByTagName('html')[0].setAttribute('lang', locale);
 

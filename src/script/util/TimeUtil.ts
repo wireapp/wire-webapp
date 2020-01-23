@@ -17,10 +17,50 @@
  *
  */
 
-import moment from 'moment';
+import {
+  differenceInDays,
+  differenceInHours,
+  differenceInMinutes,
+  format,
+  fromUnixTime,
+  isBefore,
+  isSameDay,
+  isSameMonth,
+  isThisYear,
+  isToday,
+  isYesterday,
+  startOfToday,
+} from 'date-fns';
+import {
+  cs,
+  da,
+  de,
+  el,
+  enUS,
+  es,
+  et,
+  fi,
+  fr,
+  hr,
+  hu,
+  it,
+  lt,
+  nl,
+  pl,
+  pt,
+  ro,
+  ru,
+  sk,
+  sl,
+  tr,
+  uk,
+} from 'date-fns/locale';
 
+import moment, {Moment} from 'moment';
 import {t} from './LocalizerUtil';
 import {zeroPadding} from './util';
+
+type FnDate = number | Date;
 
 interface DiscreteTimeUnit {
   longUnit: string;
@@ -42,6 +82,13 @@ export enum TIME_IN_MILLIS {
   WEEK = DAY * 7,
   YEAR = DAY * 365,
 }
+const locales = {cs, da, de, el, es, et, fi, fr, hr, hu, it, lt, nl, pl, pt, ro, ru, sk, sl, tr, uk};
+const defaultLocale = enUS;
+let locale = defaultLocale;
+
+export const setDateLocale = (newLocale: keyof typeof locales) => (locale = locales[newLocale] || defaultLocale);
+
+export const formatDate = (date: FnDate, formatString: string) => format(date, formatString, {locale});
 
 const durationUnits = () => [
   {
@@ -187,16 +234,36 @@ export const formatSeconds = (duration: number): string => {
  * @returns Human readable format of a timestamp.
  */
 export const formatTimestamp = (timestamp: number | string, longFormat: boolean = true): string => {
-  const time = moment(timestamp);
+  const time = new Date(timestamp);
   let format = 'L (HH:mm:ss)';
 
   if (longFormat) {
-    format = moment().year() === time.year() ? 'ddd D MMM, HH:mm' : 'ddd D MMM YYYY, HH:mm';
+    format = isThisYear(new Date(timestamp)) ? 'ddd D MMM, HH:mm' : 'ddd D MMM YYYY, HH:mm';
   }
 
-  return time.format(format);
+  return moment(time).format(format);
 };
 
 export const getCurrentDate = () => new Date().toISOString().substring(0, 10);
-
 export const getUnixTimestamp = () => Math.floor(Date.now() / TIME_IN_MILLIS.SECOND);
+export const isCurrentYear = (momentDate: Moment): boolean => momentDate.isSame(new Date(), 'y');
+export const isBeforeToday = (date: FnDate): boolean => isBefore(date, startOfToday());
+export const isYoungerThan2Minutes = (date: FnDate): boolean => differenceInMinutes(new Date(), date) < 2;
+export const isYoungerThan1Hour = (date: FnDate) => differenceInHours(new Date(), date) < 1;
+export const isYoungerThan7Days = (date: FnDate) => differenceInDays(new Date(), date) < 7;
+
+// https://stackoverflow.com/questions/27360102/locale-and-specific-date-format-with-moment-js/29641375#29641375
+export const LLDM = moment
+  .localeData()
+  .longDateFormat('LL')
+  .replace(/Y/g, '')
+  .replace(/^\W|\W$|\W\W/, '');
+
+export const LDM = moment
+  .localeData()
+  .longDateFormat('L')
+  .replace(/Y/g, '')
+  // keep the trailing '.' if locale is 'de'
+  .replace(moment.locale() === 'de' ? /\W$|\W\W/ : /^\W|\W$|\W\W/, '');
+
+export {isToday, fromUnixTime, isYesterday, isSameDay, isSameMonth, isThisYear};

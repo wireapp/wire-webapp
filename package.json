@@ -10,6 +10,7 @@
     "@wireapp/store-engine-sqleet": "1.2.1",
     "amplify": "git+https://git@github.com/wireapp/amplify",
     "core-js": "2.6.10",
+    "date-fns": "2.9.0",
     "dexie-batch": "0.4.2",
     "highlightjs": "9.12.0",
     "jquery": "3.4.1",
