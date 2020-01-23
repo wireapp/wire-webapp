@@ -304,7 +304,7 @@ export const unsupportedStrings = defineMessages({
     id: 'unsupported.headlineCookies',
   },
   headlineIndexedDb: {
-    defaultMessage: 'You are in private mode',
+    defaultMessage: 'Your browser is in private mode',
     id: 'unsupported.headlineIndexedDb',
   },
   subheadBrowser: {

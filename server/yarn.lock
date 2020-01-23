@@ -312,10 +312,10 @@
   dependencies:
     "@types/express" "*"
 
-"@types/jasmine@3.5.0":
-  version "3.5.0"
-  resolved "https://registry.yarnpkg.com/@types/jasmine/-/jasmine-3.5.0.tgz#2ad2006c8a937d20df20a8fee86071d0f730ef99"
-  integrity sha512-kGCRI9oiCxFS6soGKlyzhMzDydfcPix9PpTkr7h11huxOxhWwP37Tg7DYBaQ18eQTNreZEuLkhpbGSqVNZPnnw==
+"@types/jasmine@3.5.1":
+  version "3.5.1"
+  resolved "https://registry.yarnpkg.com/@types/jasmine/-/jasmine-3.5.1.tgz#e417aa74738aa9e9285016abbfcae68d5be0f827"
+  integrity sha512-5ZxOWKc0AgTeMcYCnV4RxTZZAClWaHKPR6n14LvUj8ywKDhOfI+YgdtNLXiW4kQmtxS3i1HXVbfAot+pqpJE2A==
 
 "@types/mime@*":
   version "2.0.1"
@@ -1316,10 +1316,10 @@ graceful-fs@^4.1.15, graceful-fs@^4.1.6, graceful-fs@^4.2.0:
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.0.tgz#8d8fdc73977cb04104721cb53666c1ca64cd328b"
   integrity sha512-jpSvDPV4Cq/bgtpndIWbI5hmYxhQGHPC4d4cqBPb4DLniCfhJokdXhwhaDuLBGLQdvvRum/UiX6ECVIPvDXqdg==
 
-handlebars@4.3.5, handlebars@^4.1.0:
-  version "4.3.5"
-  resolved "https://registry.yarnpkg.com/handlebars/-/handlebars-4.3.5.tgz#d6c2d0a0f08b4479e3949f8321c0f3893bb691be"
-  integrity sha512-I16T/l8X9DV3sEkY9sK9lsPRgDsj82ayBY/4pAZyP2BcX5WeRM3O06bw9kIs2GLrHvFB/DNzWWJyFvof8wQGqw==
+handlebars@4.5.3, handlebars@^4.1.0:
+  version "4.5.3"
+  resolved "https://registry.yarnpkg.com/handlebars/-/handlebars-4.5.3.tgz#5cf75bd8714f7605713511a56be7c349becb0482"
+  integrity sha512-3yPecJoJHK/4c6aZhSvxOyG4vJKDshV36VHp0iVCDVh7o9w2vwi3NSnL2MMPj3YdduqaBcu7cGbggJQM0br9xA==
   dependencies:
     neo-async "^2.6.0"
     optimist "^0.6.1"
@@ -1352,12 +1352,12 @@ hasha@^5.0.0:
     is-stream "^2.0.0"
     type-fest "^0.8.0"
 
-hbs@4.0.6:
-  version "4.0.6"
-  resolved "https://registry.yarnpkg.com/hbs/-/hbs-4.0.6.tgz#3054144dbd399cc7d351a39c016b3a52c9e19f5d"
-  integrity sha512-KFt3Y4zOvVQOp84TmqVaFTpBTYO1sVenBoBY712MI3vPkKxVoO6AsuEyDayIRPRAHRYZHHWnmc4spFa8fhQpLw==
+hbs@4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/hbs/-/hbs-4.1.0.tgz#ddcf3d574a6be5f7abfbd8a350a3db62ef66a13c"
+  integrity sha512-YDrUBtLpwRl0H5uyCGLE2LGtGJl51VvJFBj/D+Cqyr6XMopCvwXA0ynRpd87u6aVIYCeGYZHESfZzPHbNMkOPA==
   dependencies:
-    handlebars "4.3.5"
+    handlebars "4.5.3"
     walk "2.3.14"
 
 helmet-crossdomain@0.4.0:
@@ -2711,16 +2711,16 @@ toidentifier@1.0.0:
   resolved "https://registry.yarnpkg.com/toidentifier/-/toidentifier-1.0.0.tgz#7e1be3470f1e77948bc43d94a3c8f4d7752ba553"
   integrity sha512-yaOH/Pk/VEhBWWTlhI+qXxDFXlejDGcQipMlyxda9nthulaxLZUNcUqFxokp0vcYnvteJln5FNQDRrxj3YcbVw==
 
-ts-node@8.6.1:
-  version "8.6.1"
-  resolved "https://registry.yarnpkg.com/ts-node/-/ts-node-8.6.1.tgz#a31838d93cb67bbe2c56026848ab6c9224564c4e"
-  integrity sha512-KqPbO7/UuOPE4ANAOV9geZjk6tet6rK2K+DFeEJq6kIXUi0nLkrOMksozGkIlFopOorkStlwar3DdWYrdl7zCw==
+ts-node@8.6.2:
+  version "8.6.2"
+  resolved "https://registry.yarnpkg.com/ts-node/-/ts-node-8.6.2.tgz#7419a01391a818fbafa6f826a33c1a13e9464e35"
+  integrity sha512-4mZEbofxGqLL2RImpe3zMJukvEvcO1XP8bj8ozBPySdCUXEcU5cIRwR0aM3R+VoZq7iXc8N86NC0FspGRqP4gg==
   dependencies:
     arg "^4.1.0"
     diff "^4.0.1"
     make-error "^1.1.1"
     source-map-support "^0.5.6"
-    yn "^4.0.0"
+    yn "3.1.1"
 
 tslib@1.9.0:
   version "1.9.0"
@@ -2825,10 +2825,10 @@ typedarray-to-buffer@^3.1.5:
   dependencies:
     is-typedarray "^1.0.0"
 
-typescript@3.7.4:
-  version "3.7.4"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.7.4.tgz#1743a5ec5fef6a1fa9f3e4708e33c81c73876c19"
-  integrity sha512-A25xv5XCtarLwXpcDNZzCGvW2D1S3/bACratYBx2sax8PefsFhlYmkQicKHvpYflFS8if4zne5zT5kpJ7pzuvw==
+typescript@3.7.5:
+  version "3.7.5"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.7.5.tgz#0692e21f65fd4108b9330238aac11dd2e177a1ae"
+  integrity sha512-/P5lkRXkWHNAbcJIiHPfRoKqyd7bsyCma1hZNUGfn20qm64T6ZBlrzprymeu918H+mB/0rIg2gGK/BXkhhYgBw==
 
 typpy@2.3.11:
   version "2.3.11"
@@ -3033,7 +3033,7 @@ yargs@^15.0.2:
     y18n "^4.0.0"
     yargs-parser "^16.1.0"
 
-yn@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/yn/-/yn-4.0.0.tgz#611480051ea43b510da1dfdbe177ed159f00a979"
-  integrity sha512-huWiiCS4TxKc4SfgmTwW1K7JmXPPAmuXWYy4j9qjQo4+27Kni8mGhAAi1cloRWmBe2EqcLgt3IGqQoRL/MtPgg==
+yn@3.1.1:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/yn/-/yn-3.1.1.tgz#1e87401a09d767c1d5eab26a6e4c185182d2eb50"
+  integrity sha512-Ux4ygGWsu2c7isFWe8Yu1YluJmqVhxqK2cLXNQA5AcC3QfbGNpM7fu0Y8b/z16pXLnFxZYvWhd3fhBY9DLmC6Q==

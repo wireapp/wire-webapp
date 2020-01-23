@@ -37,7 +37,7 @@ class SeekBarComponent {
   isSeekBarThumbDragged: ko.Observable<boolean>;
   showSeekBarThumb: ko.PureComputed<any>;
 
-  constructor(params: Params, {element}: ko.components.ComponentInfo) {
+  constructor(params: Params, element: HTMLElement) {
     this.mediaElement = params.src;
     this.darkMode = params.dark;
     this.disabled = ko.pureComputed(() => {
@@ -46,7 +46,7 @@ class SeekBarComponent {
       }
     });
 
-    this.seekBar = (element as HTMLElement).querySelector('input');
+    this.seekBar = element.querySelector('input');
     this.isSeekBarMouseOver = ko.observable(false);
     this.isSeekBarThumbDragged = ko.observable(false);
     this.showSeekBarThumb = ko.pureComputed(() => this.isSeekBarThumbDragged() || this.isSeekBarMouseOver());
@@ -122,8 +122,8 @@ ko.components.register('seek-bar', {
     <input type="range" value="0" max="100" data-bind="css: {'show-seek-bar-thumb': showSeekBarThumb, 'element-disabled': disabled, 'seek-bar--dark': darkMode}">
   `,
   viewModel: {
-    createViewModel(params: Params, componentInfo: ko.components.ComponentInfo): SeekBarComponent {
-      return new SeekBarComponent(params, componentInfo);
+    createViewModel(params: Params, {element}: ko.components.ComponentInfo): SeekBarComponent {
+      return new SeekBarComponent(params, element as HTMLElement);
     },
   },
 });

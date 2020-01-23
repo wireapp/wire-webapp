@@ -79,7 +79,7 @@ const Root = ({
     return null;
   };
 
-  const isAuthenticatedCheck = (page: any): any => (page ? (isAuthenticated ? page : navigate('/auth#login')) : null);
+  const isAuthenticatedCheck = (page: any): any => (page ? (isAuthenticated ? page : navigate('/auth')) : null);
 
   const ProtectedHistoryInfo = () => isAuthenticatedCheck(<HistoryInfo />);
   const ProtectedInitialInvite = () => isAuthenticatedCheck(<InitialInvite />);
