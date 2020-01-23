@@ -61,8 +61,8 @@ const SingleSignOnForm = ({
   doLogin,
   doFinalizeSSOLogin,
 }: Props & ConnectedProps & DispatchProps) => {
-  const codeInput = useRef<HTMLInputElement>();
-  const [code, setCode] = useState('');
+  const codeOrMailInput = useRef<HTMLInputElement>();
+  const [codeOrMail, setCodeOrMail] = useState('');
   const {formatMessage: _} = useIntl();
   const {history} = useReactRouter();
   const [persist, setPersist] = useState(true);
@@ -71,17 +71,17 @@ const SingleSignOnForm = ({
   const [validationError, setValidationError] = useState();
 
   useEffect(() => {
-    if (initialCode && initialCode !== code) {
-      setCode(initialCode);
+    if (initialCode && initialCode !== codeOrMail) {
+      setCodeOrMail(initialCode);
     }
   }, [initialCode]);
 
-  // Automatically submit if code is set via url
+  // Automatically submit if codeOrMail is set via url
   useEffect(() => {
-    if (initialCode === code) {
+    if (initialCode === codeOrMail) {
       handleSubmit();
     }
-  }, [code]);
+  }, [codeOrMail]);
 
   const handleSubmit = async (event?: React.FormEvent): Promise<void> => {
     if (event) {
@@ -91,19 +91,19 @@ const SingleSignOnForm = ({
     if (isFetching) {
       return;
     }
-    codeInput.current.value = codeInput.current.value.trim();
-    const currentValidationError = codeInput.current.checkValidity()
+    codeOrMailInput.current.value = codeOrMailInput.current.value.trim();
+    const currentValidationError = codeOrMailInput.current.checkValidity()
       ? null
-      : ValidationError.handleValidationState(codeInput.current.name, codeInput.current.validity);
+      : ValidationError.handleValidationState(codeOrMailInput.current.name, codeOrMailInput.current.validity);
 
     setValidationError(currentValidationError);
-    setIsCodeInputValid(codeInput.current.validity.valid);
+    setIsCodeInputValid(codeOrMailInput.current.validity.valid);
 
     try {
       if (currentValidationError) {
         throw currentValidationError;
       }
-      const strippedCode = stripPrefix(code);
+      const strippedCode = stripPrefix(codeOrMail);
       await validateSSOCode(strippedCode);
       await doLogin(strippedCode);
       const clientType = persist ? ClientType.PERMANENT : ClientType.TEMPORARY;
@@ -149,13 +149,13 @@ const SingleSignOnForm = ({
           name="sso-code"
           tabIndex={1}
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            setCode(event.target.value);
+            setCodeOrMail(event.target.value);
             setIsCodeInputValid(true);
           }}
-          ref={codeInput}
+          ref={codeOrMailInput}
           markInvalid={!isCodeInputValid}
-          placeholder={_(ssoLoginStrings.codeInputPlaceholder)}
-          value={code}
+          placeholder={_(ssoLoginStrings.codeOrMailInputPlaceholder)}
+          value={codeOrMail}
           autoComplete="section-login sso-code"
           maxLength={1024}
           pattern={`${SSO_CODE_PREFIX_REGEX}${UUID_REGEX}`}
@@ -164,7 +164,13 @@ const SingleSignOnForm = ({
           required
           data-uie-name="enter-code"
         />
-        <RoundIconButton tabIndex={2} disabled={!code} type="submit" formNoValidate data-uie-name="do-sso-sign-in">
+        <RoundIconButton
+          tabIndex={2}
+          disabled={!codeOrMail}
+          type="submit"
+          formNoValidate
+          data-uie-name="do-sso-sign-in"
+        >
           <ArrowIcon />
         </RoundIconButton>
       </InputSubmitCombo>

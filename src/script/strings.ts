@@ -659,9 +659,9 @@ export const loginStrings = defineMessages({
 });
 
 export const ssoLoginStrings = defineMessages({
-  codeInputPlaceholder: {
+  codeOrMailInputPlaceholder: {
     defaultMessage: 'SSO Code',
-    id: 'ssoLogin.codeInputPlaceholder',
+    id: 'ssoLogin.codeOrMailInputPlaceholder',
   },
   headline: {
     defaultMessage: 'Company log in',
