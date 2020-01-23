@@ -54,6 +54,7 @@ import {NotificationHandler, NotificationService} from './notification/';
 import {SelfService} from './self/';
 import {TeamService} from './team/';
 import {UserService} from './user/';
+import {AccountService} from './account/';
 
 enum TOPIC {
   ERROR = 'Account.TOPIC.ERROR',
@@ -103,6 +104,7 @@ export class Account extends EventEmitter {
 
   public static readonly TOPIC = TOPIC;
   public service?: {
+    account: AccountService;
     asset: AssetService;
     broadcast: BroadcastService;
     client: ClientService;
@@ -173,6 +175,7 @@ export class Account extends EventEmitter {
   }
 
   public async initServices(storeEngine: CRUDEngine): Promise<void> {
+    const accountService = new AccountService(this.apiClient);
     const assetService = new AssetService(this.apiClient);
     const cryptographyService = new CryptographyService(this.apiClient, storeEngine);
 
@@ -188,6 +191,7 @@ export class Account extends EventEmitter {
     const userService = new UserService(this.apiClient, broadcastService);
 
     this.service = {
+      account: accountService,
       asset: assetService,
       broadcast: broadcastService,
       client: clientService,
