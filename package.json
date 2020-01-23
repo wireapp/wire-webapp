@@ -219,7 +219,7 @@
     "bundle:dev": "webpack --config webpack.config.dev.js --progress",
     "bundle:prod": "webpack --config webpack.config.js",
     "bundle:test": "webpack --config webpack.config.test.js",
-    "changelog": "git checkout master && git pull && ts-node changelog.ts",
+    "changelog": "git checkout master && git pull && ts-node ./bin/changelog.ts",
     "configure": "copy-config",
     "deploy": "yarn && yarn build:prod && eb deploy",
     "dist": "grunt build",
