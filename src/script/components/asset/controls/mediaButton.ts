@@ -47,7 +47,7 @@ class MediaButtonComponent extends AbstractAssetTransferStateTracker {
   onClickPause: () => void;
   onClickCancel: () => void;
 
-  constructor(params: Params, {element}: ko.components.ComponentInfo) {
+  constructor(params: Params, element: HTMLElement) {
     super();
     this.mediaElement = params.src;
     this.large = params.large;
@@ -56,7 +56,7 @@ class MediaButtonComponent extends AbstractAssetTransferStateTracker {
     this.transferState = params.transferState;
 
     if (this.large) {
-      (element as HTMLElement).classList.add('media-button-lg');
+      element.classList.add('media-button-lg');
     }
 
     this.isPlaying = ko.observable(false);
@@ -97,8 +97,8 @@ ko.components.register('media-button', {
     <!-- /ko -->
 `,
   viewModel: {
-    createViewModel(params: Params, componentInfo: ko.components.ComponentInfo): MediaButtonComponent {
-      return new MediaButtonComponent(params, componentInfo);
+    createViewModel(params: Params, {element}: ko.components.ComponentInfo): MediaButtonComponent {
+      return new MediaButtonComponent(params, element as HTMLElement);
     },
   },
 });
