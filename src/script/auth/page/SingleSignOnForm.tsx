@@ -107,7 +107,7 @@ const SingleSignOnForm = ({
       if (isValidEmail(codeOrMail)) {
         // TODO fetch domain info - redirect to the current host for testing purposes
         const customWebappUrl = `${location.protocol}//${location.hostname}${location.port ? `:${location.port}` : ''}`;
-        if (!isDesktopApp()) {
+        if (isDesktopApp()) {
           doSendNavigationEvent(customWebappUrl);
         } else {
           window.location.assign(customWebappUrl);
