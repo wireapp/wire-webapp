@@ -108,7 +108,7 @@ const SingleSignOnForm = ({
         // TODO fetch domain info - redirect to the current host for testing purposes
         const customWebappUrl = `${location.protocol}//${location.hostname}${location.port ? `:${location.port}` : ''}`;
         if (isDesktopApp()) {
-          doSendNavigationEvent(customWebappUrl);
+          await doSendNavigationEvent(customWebappUrl);
         } else {
           window.location.assign(customWebappUrl);
         }
