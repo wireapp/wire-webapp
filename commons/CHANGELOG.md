@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@3.2.0...@wireapp/commons@3.3.0) (2020-01-23)
+
+
+### Features
+
+* **commons:** Export email pattern ([#2780](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/issues/2780)) ([9e5765a](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/commit/9e5765ae6af920f08fdc9bfdf81a6d5133bfaa0e))
+
+
+
+
+
 # [3.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@3.1.0...@wireapp/commons@3.2.0) (2020-01-12)
 
 
