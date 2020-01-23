@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [15.4.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@15.3.4...@wireapp/core@15.4.0) (2020-01-23)
+
+
+### Features
+
+* Add account service ([#2792](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/2792)) ([e36a557](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/e36a557f326031fc94836ba9ca0cfa3b80b0d623))
+
+
+
+
+
 ## [15.3.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@15.3.3...@wireapp/core@15.3.4) (2020-01-23)
 
 **Note:** Version bump only for package @wireapp/core
