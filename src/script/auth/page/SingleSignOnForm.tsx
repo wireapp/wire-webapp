@@ -18,6 +18,7 @@
  */
 
 import {ClientType} from '@wireapp/api-client/dist/client/index';
+import {PATTERN, isValidEmail} from '@wireapp/commons/dist/commonjs/util/ValidationUtil';
 import {
   ArrowIcon,
   Checkbox,
@@ -43,7 +44,6 @@ import * as ClientSelector from '../module/selector/ClientSelector';
 import {ROUTE} from '../route';
 import {isDesktopApp} from '../Runtime';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
-import {UUID_REGEX} from '../util/stringUtil';
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {
   doLogin: (code: string) => Promise<void>;
@@ -60,6 +60,7 @@ const SingleSignOnForm = ({
   validateSSOCode,
   doLogin,
   doFinalizeSSOLogin,
+  doSendNavigationEvent,
 }: Props & ConnectedProps & DispatchProps) => {
   const codeOrMailInput = useRef<HTMLInputElement>();
   const [codeOrMail, setCodeOrMail] = useState('');
@@ -67,7 +68,7 @@ const SingleSignOnForm = ({
   const {history} = useReactRouter();
   const [persist, setPersist] = useState(true);
   const [ssoError, setSsoError] = useState(null);
-  const [isCodeInputValid, setIsCodeInputValid] = useState(true);
+  const [isCodeOrMailInputValid, setIsCodeOrMailInputValid] = useState(true);
   const [validationError, setValidationError] = useState();
 
   useEffect(() => {
@@ -97,18 +98,28 @@ const SingleSignOnForm = ({
       : ValidationError.handleValidationState(codeOrMailInput.current.name, codeOrMailInput.current.validity);
 
     setValidationError(currentValidationError);
-    setIsCodeInputValid(codeOrMailInput.current.validity.valid);
+    setIsCodeOrMailInputValid(codeOrMailInput.current.validity.valid);
 
     try {
       if (currentValidationError) {
         throw currentValidationError;
       }
-      const strippedCode = stripPrefix(codeOrMail);
-      await validateSSOCode(strippedCode);
-      await doLogin(strippedCode);
-      const clientType = persist ? ClientType.PERMANENT : ClientType.TEMPORARY;
-      await doFinalizeSSOLogin({clientType});
-      history.push(ROUTE.HISTORY_INFO);
+      if (isValidEmail(codeOrMail)) {
+        // TODO fetch domain info - redirect to the current host for testing purposes
+        const customWebappUrl = `${location.protocol}//${location.hostname}${location.port ? `:${location.port}` : ''}`;
+        if (!isDesktopApp()) {
+          doSendNavigationEvent(customWebappUrl);
+        } else {
+          window.location.assign(customWebappUrl);
+        }
+      } else {
+        const strippedCode = stripPrefix(codeOrMail);
+        await validateSSOCode(strippedCode);
+        await doLogin(strippedCode);
+        const clientType = persist ? ClientType.PERMANENT : ClientType.TEMPORARY;
+        await doFinalizeSSOLogin({clientType});
+        history.push(ROUTE.HISTORY_INFO);
+      }
     } catch (error) {
       switch (error.label) {
         case BackendError.LABEL.TOO_MANY_CLIENTS: {
@@ -150,15 +161,15 @@ const SingleSignOnForm = ({
           tabIndex={1}
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
             setCodeOrMail(event.target.value);
-            setIsCodeInputValid(true);
+            setIsCodeOrMailInputValid(true);
           }}
           ref={codeOrMailInput}
-          markInvalid={!isCodeInputValid}
+          markInvalid={!isCodeOrMailInputValid}
           placeholder={_(ssoLoginStrings.codeOrMailInputPlaceholder)}
           value={codeOrMail}
           autoComplete="section-login sso-code"
           maxLength={1024}
-          pattern={`${SSO_CODE_PREFIX_REGEX}${UUID_REGEX}`}
+          pattern={`(${SSO_CODE_PREFIX_REGEX}${PATTERN.UUID_V4}|${PATTERN.EMAIL})`}
           autoFocus
           type="text"
           required
@@ -211,6 +222,7 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     {
       doFinalizeSSOLogin: ROOT_ACTIONS.authAction.doFinalizeSSOLogin,
       doGetAllClients: ROOT_ACTIONS.clientAction.doGetAllClients,
+      doSendNavigationEvent: ROOT_ACTIONS.wrapperEventAction.doSendNavigationEvent,
       resetAuthError: ROOT_ACTIONS.authAction.resetAuthError,
       validateSSOCode: ROOT_ACTIONS.authAction.validateSSOCode,
     },
