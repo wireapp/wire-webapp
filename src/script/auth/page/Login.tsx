@@ -238,11 +238,6 @@ const Login = ({
                     {_(loginStrings.forgotPassword)}
                   </Link>
                   <Columns style={{marginTop: '36px'}}>
-                    <Column>
-                      <RouterLink to="/sso" data-uie-name="go-sign-in-sso">
-                        {_(loginStrings.ssoLogin)}
-                      </RouterLink>
-                    </Column>
                     {Config.FEATURE.ENABLE_PHONE_LOGIN && (
                       <Column>
                         <Link onClick={() => history.push(ROUTE.LOGIN_PHONE)} data-uie-name="go-sign-in-phone">

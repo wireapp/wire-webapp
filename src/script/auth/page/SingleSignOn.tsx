@@ -173,7 +173,7 @@ const SingleSignOn = ({}: Props & ConnectedProps & DispatchProps) => {
   };
   const focusChildWindow = () => ssoWindowRef.current && ssoWindowRef.current.focus();
   const backArrow = (
-    <RouterLink to={ROUTE.LOGIN} data-uie-name="go-login">
+    <RouterLink to={ROUTE.INDEX} data-uie-name="go-login">
       <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
     </RouterLink>
   );
@@ -231,7 +231,7 @@ const SingleSignOn = ({}: Props & ConnectedProps & DispatchProps) => {
               <div>
                 <H1 center>{_(ssoLoginStrings.headline)}</H1>
                 <Muted>{_(ssoLoginStrings.subhead)}</Muted>
-                <SingleSignOnForm handleSSOWindow={handleSSOWindow} initialCode={match.params.code} />
+                <SingleSignOnForm doLogin={handleSSOWindow} initialCode={match.params.code} />
               </div>
             </ContainerXS>
           </Column>
