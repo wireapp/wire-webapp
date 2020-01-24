@@ -18,6 +18,7 @@
  */
 
 import {ClientType} from '@wireapp/api-client/dist/client/index';
+import {BackendErrorLabel} from '@wireapp/api-client/dist/http';
 import {PATTERN, isValidEmail} from '@wireapp/commons/dist/commonjs/util/ValidationUtil';
 import {
   ArrowIcon,
@@ -61,6 +62,7 @@ const SingleSignOnForm = ({
   doLogin,
   doFinalizeSSOLogin,
   doSendNavigationEvent,
+  doGetDomainInfo,
 }: Props & ConnectedProps & DispatchProps) => {
   const codeOrMailInput = useRef<HTMLInputElement>();
   const [codeOrMail, setCodeOrMail] = useState('');
@@ -105,12 +107,12 @@ const SingleSignOnForm = ({
         throw currentValidationError;
       }
       if (isValidEmail(codeOrMail)) {
-        // TODO fetch domain info - redirect to the current host for testing purposes
-        const customWebappUrl = `${location.protocol}//${location.hostname}${location.port ? `:${location.port}` : ''}`;
+        const domain = codeOrMail.split('@')[1];
+        const {webapp_welcome_url} = await doGetDomainInfo(domain);
         if (isDesktopApp()) {
-          await doSendNavigationEvent(customWebappUrl);
+          await doSendNavigationEvent(webapp_welcome_url);
         } else {
-          window.location.assign(customWebappUrl);
+          window.location.assign(webapp_welcome_url);
         }
       } else {
         const strippedCode = stripPrefix(codeOrMail);
@@ -125,6 +127,10 @@ const SingleSignOnForm = ({
         case BackendError.LABEL.TOO_MANY_CLIENTS: {
           resetAuthError();
           history.push(ROUTE.CLIENTS);
+          break;
+        }
+        case BackendErrorLabel.CUSTOM_BACKEND_NOT_FOUND: {
+          setSsoError(error);
           break;
         }
         case BackendError.LABEL.SSO_USER_CANCELLED_ERROR:
@@ -222,6 +228,7 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     {
       doFinalizeSSOLogin: ROOT_ACTIONS.authAction.doFinalizeSSOLogin,
       doGetAllClients: ROOT_ACTIONS.clientAction.doGetAllClients,
+      doGetDomainInfo: ROOT_ACTIONS.authAction.doGetDomainInfo,
       doSendNavigationEvent: ROOT_ACTIONS.wrapperEventAction.doSendNavigationEvent,
       resetAuthError: ROOT_ACTIONS.authAction.resetAuthError,
       validateSSOCode: ROOT_ACTIONS.authAction.validateSSOCode,

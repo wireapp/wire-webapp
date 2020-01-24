@@ -17,7 +17,7 @@
  *
  */
 
-import {SyntheticErrorLabel} from '@wireapp/api-client/dist/http';
+import {BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/dist/http';
 import {defineMessages} from 'react-intl';
 import {BackendError} from './auth/module/action/BackendError';
 import {LabeledError} from './auth/module/action/LabeledError';
@@ -584,6 +584,10 @@ export const errorHandlerStrings = defineMessages({
   [LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE]: {
     defaultMessage: 'Not enough disk space',
     id: 'LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE',
+  },
+  [BackendErrorLabel.CUSTOM_BACKEND_NOT_FOUND]: {
+    defaultMessage: 'Sorry, this domain is not registered as enterprise. Enter SSO access code to login.',
+    id: 'BackendErrorLabel.CUSTOM_BACKEND_NOT_FOUND',
   },
   unexpected: {
     defaultMessage: 'Unexpected error',
