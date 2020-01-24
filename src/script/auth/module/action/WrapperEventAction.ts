@@ -35,7 +35,10 @@ class WrapperNavigationEvent extends CustomEvent<{url: string}> {
 export class WrapperEventAction {
   doSendNavigationEvent = (url: string): ThunkAction => {
     return async () => {
-      window.dispatchEvent(new WrapperNavigationEvent(url));
+      const event = new WrapperNavigationEvent(url);
+      // tslint:disable-next-line:no-console
+      console.warn('Dispatching event', event);
+      window.dispatchEvent(event);
     };
   };
 }
