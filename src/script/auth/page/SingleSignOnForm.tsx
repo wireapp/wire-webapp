@@ -176,7 +176,6 @@ const SingleSignOnForm = ({
           autoComplete="section-login sso-code"
           maxLength={1024}
           pattern={`(${SSO_CODE_PREFIX_REGEX}${PATTERN.UUID_V4}|${PATTERN.EMAIL})`}
-          disabled={!!initialCode}
           autoFocus
           type="text"
           required
