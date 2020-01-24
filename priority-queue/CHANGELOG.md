@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# 1.5.0 (2020-01-24)
+
+
+### Features
+
+* **commons:** Re-export Logger type ([#2734](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/issues/2734)) ([6d374e5](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/commit/6d374e51a3f1ecc630742df8c923beafefaa61b2))
+
+
+
+
+
 # [1.4.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/compare/@wireapp/priority-queue@1.3.10...@wireapp/priority-queue@1.4.0) (2020-01-08)
 
 
