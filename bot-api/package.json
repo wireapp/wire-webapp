@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@types/long": "4.0.0",
+    "@types/long": "4.0.1",
     "@wireapp/core": "15.4.0",
     "pure-uuid": "1.5.8"
   },
