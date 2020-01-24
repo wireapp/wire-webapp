@@ -74,6 +74,8 @@ export enum BackendErrorLabel {
   NO_ADD_TO_MANAGED = 'no-add-to-managed',
   // Payment errors
   EXPIRED_CARD = 'expired_card',
+  // Domain errors
+  CUSTOM_BACKEND_NOT_FOUND = 'custom-backend-not-found',
 }
 
 export enum SyntheticErrorLabel {
