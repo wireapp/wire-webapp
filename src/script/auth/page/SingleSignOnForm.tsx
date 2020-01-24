@@ -107,9 +107,6 @@ const SingleSignOnForm = ({
       if (isValidEmail(codeOrMail)) {
         // TODO fetch domain info - redirect to the current host for testing purposes
         const customWebappUrl = `${location.protocol}//${location.hostname}${location.port ? `:${location.port}` : ''}`;
-        const isWrapper = isDesktopApp();
-        // tslint:disable-next-line:no-console
-        console.warn('icusWrapper', isWrapper);
         if (isDesktopApp()) {
           await doSendNavigationEvent(customWebappUrl);
         } else {

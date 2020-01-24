@@ -37,7 +37,7 @@ export class WrapperEventAction {
     return async () => {
       const event = new WrapperNavigationEvent(url);
       // tslint:disable-next-line:no-console
-      console.warn('Dispatching event', event);
+      console.log('Dispatching event', event);
       window.dispatchEvent(event);
     };
   };
