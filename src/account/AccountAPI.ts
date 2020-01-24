@@ -19,9 +19,10 @@
 
 import {AxiosRequestConfig} from 'axios';
 
-import {HttpClient} from '../http';
+import {HttpClient, BackendErrorLabel} from '../http';
 import {CallConfigData} from './CallConfigData';
 import {DomainData} from './DomainData';
+import {CustomBackendNotFoundError} from './AccountError';
 
 export class AccountAPI {
   constructor(private readonly client: HttpClient) {}
@@ -32,7 +33,7 @@ export class AccountAPI {
     CALLS: '/calls',
     CALLS_CONFIG: 'config',
     CALLS_CONFIG_V2: 'v2',
-    CUSTOM_INSTANCE: '/custom-backend',
+    CUSTOM_BACKEND: '/custom-backend',
     DELETE: '/delete',
     PASSWORD_RESET: '/password-reset',
     PASSWORD_RESET_COMPLETE: 'complete',
@@ -127,11 +128,20 @@ export class AccountAPI {
   public async getDomain(domain: string): Promise<DomainData> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${AccountAPI.URL.CUSTOM_INSTANCE}/${AccountAPI.URL.BY_DOMAIN}/${domain}`,
+      url: `${AccountAPI.URL.CUSTOM_BACKEND}/${AccountAPI.URL.BY_DOMAIN}/${domain}`,
     };
 
-    const response = await this.client.sendJSON<DomainData>(config);
-    return response.data;
+    try {
+      const response = await this.client.sendJSON<DomainData>(config);
+      return response.data;
+    } catch (error) {
+      switch (error.label) {
+        case BackendErrorLabel.CUSTOM_BACKEND_NOT_FOUND: {
+          throw new CustomBackendNotFoundError(error.message);
+        }
+      }
+      throw error;
+    }
   }
 
   /**
