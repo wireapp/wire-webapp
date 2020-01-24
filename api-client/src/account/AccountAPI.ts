@@ -21,15 +21,18 @@ import {AxiosRequestConfig} from 'axios';
 
 import {HttpClient} from '../http';
 import {CallConfigData} from './CallConfigData';
+import {DomainData} from './DomainData';
 
 export class AccountAPI {
   constructor(private readonly client: HttpClient) {}
 
   public static readonly URL = {
     ACTIVATE: '/activate',
+    BY_DOMAIN: 'by-domain',
     CALLS: '/calls',
     CALLS_CONFIG: 'config',
     CALLS_CONFIG_V2: 'v2',
+    CUSTOM_INSTANCE: '/custom-backend',
     DELETE: '/delete',
     PASSWORD_RESET: '/password-reset',
     PASSWORD_RESET_COMPLETE: 'complete',
@@ -119,6 +122,16 @@ export class AccountAPI {
     };
 
     await this.client.sendJSON(config);
+  }
+
+  public async getDomain(domain: string): Promise<DomainData> {
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      url: `${AccountAPI.URL.CUSTOM_INSTANCE}/${AccountAPI.URL.BY_DOMAIN}/${domain}`,
+    };
+
+    const response = await this.client.sendJSON<DomainData>(config);
+    return response.data;
   }
 
   /**
