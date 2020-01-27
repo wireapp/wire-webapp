@@ -246,7 +246,7 @@
     "start:server:dev": "cross-env NODE_ENV=development node ./server/dist/index.js",
     "stylelint": "prettier --ignore-path .gitignore --write \"**/*.less\" && stylelint --ignore-path .gitignore \"**/*.less\"",
     "test": "yarn test:types && yarn lint && yarn test:server && yarn test:auth && yarn test:app",
-    "test:app": "node --max-old-space-size=8192 ./node_modules/karma/bin/karma start karma.conf.js",
+    "test:app": "node --max-old-space-size=5120 ./node_modules/karma/bin/karma start karma.conf.js",
     "test:auth": "yarn bundle:test && karma start karma.conf.react.js",
     "test:server": "cd server && yarn test",
     "test:types": "tsc --noEmit",
