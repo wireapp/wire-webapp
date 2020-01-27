@@ -17,7 +17,6 @@
  *
  */
 
-import moment from 'moment';
 import $ from 'jquery';
 import {groupBy} from 'underscore';
 
@@ -25,6 +24,7 @@ import {getLogger} from 'Util/Logger';
 import {scrollEnd, scrollToBottom, scrollBy} from 'Util/scroll-helpers';
 import {t} from 'Util/LocalizerUtil';
 import {safeWindowOpen, safeMailOpen} from 'Util/SanitizationUtil';
+import {isSameDay, differenceInMinutes} from 'Util/TimeUtil';
 
 import {Config} from '../../Config';
 import {Conversation} from '../../entity/Conversation';
@@ -46,7 +46,6 @@ class MessageListViewModel {
     this.click_on_cancel_request = this.click_on_cancel_request.bind(this);
     this.click_on_like = this.click_on_like.bind(this);
     this.clickOnInvitePeople = this.clickOnInvitePeople.bind(this);
-    this.get_timestamp_class = this.get_timestamp_class.bind(this);
     this.handleClickOnMessage = this.handleClickOnMessage.bind(this);
     this.is_last_delivered_message = this.is_last_delivered_message.bind(this);
     this.on_session_reset_click = this.on_session_reset_click.bind(this);
@@ -442,7 +441,7 @@ class MessageListViewModel {
     });
   }
 
-  get_timestamp_class(messageEntity) {
+  get_timestamp_class = messageEntity => {
     const previousMessage = this.conversation().get_previous_message(messageEntity);
     if (!previousMessage || messageEntity.is_call()) {
       return '';
@@ -456,17 +455,17 @@ class MessageListViewModel {
       return 'message-timestamp-visible message-timestamp-unread';
     }
 
-    const last = moment(previousMessage.timestamp());
-    const current = moment(messageEntity.timestamp());
+    const last = previousMessage.timestamp();
+    const current = messageEntity.timestamp();
 
-    if (!last.isSame(current, 'day')) {
+    if (!isSameDay(last, current)) {
       return 'message-timestamp-visible message-timestamp-day';
     }
 
-    if (current.diff(last, 'minutes') > 60) {
+    if (differenceInMinutes(current, last) > 60) {
       return 'message-timestamp-visible';
     }
-  }
+  };
 
   /**
    * Checks its older neighbor in order to see if the avatar should be rendered or not

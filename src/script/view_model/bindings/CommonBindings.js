@@ -19,7 +19,6 @@
 
 import ko from 'knockout';
 import $ from 'jquery';
-import moment from 'moment';
 import SimpleBar from 'simplebar';
 import {debounce, throttle} from 'underscore';
 import '@wireapp/antiscroll-2/dist/antiscroll-2';
@@ -32,12 +31,15 @@ import {
   isYesterday,
   isYoungerThan7Days,
   fromUnixTime,
+  fromNowLocale,
+  formatTimeShort,
+  formatLocale,
+  formatDayMonth,
 } from 'Util/TimeUtil';
 import {t} from 'Util/LocalizerUtil';
 import {stripUrlWrapper} from 'Util/util';
 import {Environment} from 'Util/Environment';
 import {isEnterKey} from 'Util/KeyboardUtil';
-import {LLDM} from 'Util/TimeUtil';
 
 import {overlayedObserver} from '../../ui/overlayedObserver';
 import {viewportObserver} from '../../ui/viewportObserver';
@@ -528,30 +530,32 @@ ko.bindingHandlers.relative_timestamp = (function() {
 
   const calculate = function(element, timestamp) {
     timestamp = window.parseInt(timestamp);
-    const date = moment.unix(timestamp / TIME_IN_MILLIS.SECOND);
-    const unixDate = fromUnixTime(timestamp / TIME_IN_MILLIS.SECOND);
+    const date = fromUnixTime(timestamp / TIME_IN_MILLIS.SECOND);
 
-    if (isYoungerThan2Minutes(unixDate)) {
-      return $(element).text(t('conversationJustNow'));
+    if (isYoungerThan2Minutes(date)) {
+      return (element.textContent = t('conversationJustNow'));
     }
 
-    if (isYoungerThan1Hour(unixDate)) {
-      return $(element).text(date.fromNow());
+    if (isYoungerThan1Hour(date)) {
+      return (element.textContent = fromNowLocale(date));
     }
 
-    if (isToday(unixDate)) {
-      return $(element).text(date.local().format('LT'));
+    if (isToday(date)) {
+      return (element.textContent = formatTimeShort(date));
     }
 
-    if (isYesterday(unixDate)) {
-      return $(element).text(`${t('conversationYesterday')} ${date.local().format('LT')}`);
+    if (isYesterday(date)) {
+      return (element.textContent = `${t('conversationYesterday')} ${formatTimeShort(date)}`);
     }
 
-    if (isYoungerThan7Days(unixDate)) {
-      return $(element).text(date.local().format('dddd LT'));
+    if (isYoungerThan7Days(date)) {
+      return (element.textContent = formatLocale(date, 'EEEE p'));
     }
 
-    return $(element).text(date.local().format(`dddd, ${LLDM}, LT`));
+    const weekDay = formatLocale(date, 'EEEE');
+    const dayMonth = formatDayMonth(date);
+    const time = formatTimeShort(date);
+    return (element.textContent = `${weekDay}, ${dayMonth}, ${time}`);
   };
 
   return {

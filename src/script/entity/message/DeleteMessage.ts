@@ -17,9 +17,8 @@
  *
  */
 
-import moment from 'moment';
-
 import {t} from 'Util/LocalizerUtil';
+import {formatTimeShort} from 'Util/TimeUtil';
 
 import {SuperType} from '../../message/SuperType';
 import {Message} from './Message';
@@ -35,6 +34,6 @@ export class DeleteMessage extends Message {
   }
 
   display_deleted_timestamp = () => {
-    return t('conversationDeleteTimestamp', moment(this.deleted_timestamp).format('LT'));
+    return t('conversationDeleteTimestamp', formatTimeShort(this.deleted_timestamp));
   };
 }

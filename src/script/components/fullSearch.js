@@ -17,11 +17,11 @@
  *
  */
 
-import moment from 'moment';
 import {debounce, escape} from 'underscore';
 
 import {isScrolledBottom} from 'Util/scroll-helpers';
 import {koArrayPushAll} from 'Util/util';
+import {formatDateShort} from 'Util/TimeUtil';
 
 import {ParticipantAvatar} from 'Components/participantAvatar';
 import {getSearchRegex} from '../search/FullTextSearch';
@@ -131,7 +131,7 @@ class FullSearch {
   }
 
   resultTimestamp(messageEntity) {
-    return moment(messageEntity.timestamp()).format('LL');
+    return formatDateShort(messageEntity.timestamp());
   }
 
   clickOnDismiss() {

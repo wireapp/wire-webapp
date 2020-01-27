@@ -17,10 +17,8 @@
  *
  */
 
-import moment from 'moment';
-
 import {getLogger} from 'Util/Logger';
-import {isToday, isThisYear, isSameDay, isSameMonth} from 'Util/TimeUtil';
+import {isToday, isThisYear, isSameDay, isSameMonth, formatLocale} from 'Util/TimeUtil';
 import {t} from 'Util/LocalizerUtil';
 import {koPushDeferred} from 'Util/util';
 
@@ -149,10 +147,10 @@ z.viewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
   }
 
   getTitleForHeader(messageEntity) {
-    if (isToday(messageEntity.timestamp())) {
+    const messageDate = messageEntity.timestamp();
+    if (isToday(messageDate)) {
       return t('conversationToday');
     }
-    const messageDate = moment(messageEntity.timestamp());
-    return isThisYear(messageEntity.timestamp()) ? messageDate.format('MMMM') : messageDate.format('MMMM Y');
+    return isThisYear(messageDate) ? formatLocale(messageDate, 'MMMM') : formatLocale(messageDate, 'MMMM y');
   }
 };

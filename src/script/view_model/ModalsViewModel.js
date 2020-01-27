@@ -17,13 +17,13 @@
  *
  */
 
-import moment from 'moment';
 import {amplify} from 'amplify';
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {buildSupportUrl} from 'Util/UrlUtil';
 import {noop, afterRender} from 'Util/util';
+import {formatLocale} from 'Util/TimeUtil';
 
 import {Config} from '../Config';
 import {WebAppEvents} from '../event/WebApp';
@@ -161,7 +161,7 @@ export class ModalsViewModel {
         content.messageText = t('modalAccountNewDevicesMessage');
         const deviceList = data
           .map(device => {
-            const deviceTime = moment(device.time).format('LL, LT');
+            const deviceTime = formatLocale(device.time, 'PP, p');
             const deviceModel = `${t('modalAccountNewDevicesFrom')} ${device.model}`;
             return `<div>${deviceTime} - UTC</div><div>${deviceModel}</div>`;
           })

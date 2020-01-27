@@ -19,12 +19,11 @@
 
 import Cookies from 'js-cookie';
 import {formatNumberForMobileDialing} from 'phoneformat.js';
-import moment from 'moment';
 import {ValidationUtil} from '@wireapp/commons';
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
-import {TIME_IN_MILLIS, getUnixTimestamp} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS, getUnixTimestamp, fromUnixTime, fromNowLocale} from 'Util/TimeUtil';
 import {checkIndexedDb, alias} from 'Util/util';
 import {getCountryCode, getCountryByCode, COUNTRY_CODES} from 'Util/CountryCodes';
 import {Environment} from 'Util/Environment';
@@ -185,13 +184,13 @@ class AuthViewModel {
     this.code_expiration_timestamp = ko.observable(0);
     this.code_expiration_in = ko.observable('');
     this.code_expiration_timestamp.subscribe(timestamp => {
-      this.code_expiration_in(moment.unix(timestamp).fromNow());
+      this.code_expiration_in(fromNowLocale(fromUnixTime(timestamp)));
       this.code_interval_id = window.setInterval(() => {
         if (timestamp <= getUnixTimestamp()) {
           window.clearInterval(this.code_interval_id);
           return this.code_expiration_timestamp(0);
         }
-        this.code_expiration_in(moment.unix(timestamp).fromNow());
+        this.code_expiration_in(fromNowLocale(fromUnixTime(timestamp)));
       }, 20000);
     });
 

@@ -23,7 +23,19 @@ import moment from 'moment';
 import 'jquery-mousewheel';
 
 import {t} from 'Util/LocalizerUtil';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {
+  TIME_IN_MILLIS,
+  fromUnixTime,
+  isYoungerThan2Minutes,
+  isYoungerThan1Hour,
+  isToday,
+  isYesterday,
+  formatTimeShort,
+  isYoungerThan7Days,
+  fromNowLocale,
+  formatLocale,
+  formatDayMonth,
+} from 'Util/TimeUtil';
 import {isArrowKey, isPageUpDownKey, isMetaKey, isPasteAction} from 'Util/KeyboardUtil';
 import {noop} from 'Util/util';
 import {LLDM} from 'Util/TimeUtil';
@@ -198,32 +210,29 @@ ko.bindingHandlers.relative_timestamp = (function() {
   };
 
   const calculate_timestamp_day = function(date) {
-    const now = moment().local();
-    const today = now.format('YYMMDD');
-    const yesterday = now.subtract(1, 'days').format('YYMMDD');
-    const current_day = date.local().format('YYMMDD');
-
-    if (moment().diff(date, 'minutes') < 2) {
+    if (isYoungerThan2Minutes(date)) {
       return t('conversationJustNow');
     }
 
-    if (moment().diff(date, 'minutes') < 60) {
-      return date.fromNow();
+    if (isYoungerThan1Hour(date)) {
+      return fromNowLocale(date);
     }
 
-    if (current_day === today) {
-      return `${t('conversationToday')} ${date.local().format('LT')}`;
+    if (isToday(date)) {
+      return `${t('conversationToday')} ${formatTimeShort(date)}`;
     }
 
-    if (current_day === yesterday) {
-      return `${t('conversationYesterday')} ${date.local().format('LT')}`;
+    if (isYesterday(date)) {
+      return `${t('conversationYesterday')} ${formatTimeShort(date)}`;
+    }
+    if (isYoungerThan7Days(date)) {
+      return formatLocale(date, 'EEEE p');
     }
 
-    if (moment().diff(date, 'days') < 7) {
-      return date.local().format('dddd LT');
-    }
-
-    return date.local().format(`dddd, ${LLDM}, LT`);
+    const weekDay = formatLocale(date, 'EEEE');
+    const dayMonth = formatDayMonth(date);
+    const time = formatTimeShort(date);
+    return `${weekDay}, ${dayMonth}, ${time}`;
   };
 
   // should be fine to update every minute
@@ -232,12 +241,13 @@ ko.bindingHandlers.relative_timestamp = (function() {
   const calculate = function(element, timestamp, is_day) {
     timestamp = window.parseInt(timestamp);
     const date = moment.unix(timestamp / TIME_IN_MILLIS.SECOND);
+    const unixDate = fromUnixTime(timestamp / TIME_IN_MILLIS.SECOND);
 
     if (is_day) {
-      return $(element).text(calculate_timestamp_day(date));
+      return (element.textContent = calculate_timestamp_day(unixDate));
     }
 
-    return $(element).text(calculate_timestamp(date));
+    return (element.textContent = calculate_timestamp(date));
   };
 
   return {

@@ -22,6 +22,7 @@ import {
   differenceInHours,
   differenceInMinutes,
   format,
+  formatDistanceToNow,
   fromUnixTime,
   isBefore,
   isSameDay,
@@ -56,7 +57,7 @@ import {
   uk,
 } from 'date-fns/locale';
 
-import moment, {Moment} from 'moment';
+import moment from 'moment';
 import {t} from './LocalizerUtil';
 import {zeroPadding} from './util';
 
@@ -88,7 +89,33 @@ let locale = defaultLocale;
 
 export const setDateLocale = (newLocale: keyof typeof locales) => (locale = locales[newLocale] || defaultLocale);
 
-export const formatDate = (date: FnDate, formatString: string) => format(date, formatString, {locale});
+export const formatLocale = (date: FnDate, formatString: string) => format(new Date(date), formatString, {locale});
+
+/**
+ * Format the time as `12:00 AM`.
+ * This is equivalent to momentjs' `LT` formatting
+ */
+export const formatTimeShort = (date: FnDate) => formatLocale(date, 'p');
+
+/**
+ * Format the date as `May 29, 2020`.
+ * This is equivalent to momentjs' `LL` formatting
+ */
+export const formatDateShort = (date: FnDate) => formatLocale(date, 'PP');
+export const formatDayMonth = (date: FnDate) =>
+  formatDateShort(date)
+    .replace(/[0-9]{4}/g, '')
+    .replace(/^\W|\W$|\W\W/, '');
+
+/**
+ * Format the date as `05/29/2020`.
+ * This is equivalent to momentjs' `L` formatting
+ */
+export const formatDateNumeral = (date: FnDate) => formatLocale(date, 'P');
+export const formatDayMonthNumeral = (date: FnDate) =>
+  formatDateNumeral(date)
+    .replace(/[0-9]{4}/g, '')
+    .replace(locale === de ? /\W$|\W\W/ : /^\W|\W$|\W\W/, '');
 
 const durationUnits = () => [
   {
@@ -235,22 +262,23 @@ export const formatSeconds = (duration: number): string => {
  */
 export const formatTimestamp = (timestamp: number | string, longFormat: boolean = true): string => {
   const time = new Date(timestamp);
-  let format = 'L (HH:mm:ss)';
+  let format = 'P (HH:mm:ss)';
 
   if (longFormat) {
-    format = isThisYear(new Date(timestamp)) ? 'ddd D MMM, HH:mm' : 'ddd D MMM YYYY, HH:mm';
+    format = isThisYear(new Date(timestamp)) ? 'eee dd MMM, HH:mm' : 'eee dd MMM yyyy, HH:mm';
   }
 
-  return moment(time).format(format);
+  return formatLocale(time, format);
 };
 
 export const getCurrentDate = () => new Date().toISOString().substring(0, 10);
 export const getUnixTimestamp = () => Math.floor(Date.now() / TIME_IN_MILLIS.SECOND);
-export const isCurrentYear = (momentDate: Moment): boolean => momentDate.isSame(new Date(), 'y');
 export const isBeforeToday = (date: FnDate): boolean => isBefore(date, startOfToday());
 export const isYoungerThan2Minutes = (date: FnDate): boolean => differenceInMinutes(new Date(), date) < 2;
 export const isYoungerThan1Hour = (date: FnDate) => differenceInHours(new Date(), date) < 1;
 export const isYoungerThan7Days = (date: FnDate) => differenceInDays(new Date(), date) < 7;
+
+export const fromNowLocale = (date: FnDate) => formatDistanceToNow(date, {addSuffix: true, locale});
 
 // https://stackoverflow.com/questions/27360102/locale-and-specific-date-format-with-moment-js/29641375#29641375
 export const LLDM = moment
@@ -266,4 +294,4 @@ export const LDM = moment
   // keep the trailing '.' if locale is 'de'
   .replace(moment.locale() === 'de' ? /\W$|\W\W/ : /^\W|\W$|\W\W/, '');
 
-export {isToday, fromUnixTime, isYesterday, isSameDay, isSameMonth, isThisYear};
+export {isToday, fromUnixTime, isYesterday, isSameDay, isSameMonth, isThisYear, differenceInHours, differenceInMinutes};
