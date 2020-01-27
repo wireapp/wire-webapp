@@ -38,7 +38,7 @@ type AssetMetaData = (ProtobufAsset.IAudioMetaData | ProtobufAsset.IImageMetaDat
 
 export class File extends Asset {
   private readonly original_resource: ko.Observable<AssetRemoteData>;
-  private readonly preview_resource: ko.Observable<AssetRemoteData>;
+  public readonly preview_resource: ko.Observable<AssetRemoteData>;
   protected logger: Logger;
   public readonly downloadProgress: ko.PureComputed<number | undefined>;
   public readonly file_name: string;
