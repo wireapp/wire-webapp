@@ -11316,10 +11316,10 @@ scss-tokenizer@^0.2.3:
     js-base64 "^2.1.8"
     source-map "^0.4.2"
 
-sdp-transform@2.13.0:
-  version "2.13.0"
-  resolved "https://registry.yarnpkg.com/sdp-transform/-/sdp-transform-2.13.0.tgz#4d9432f8e327e15a310e570a11fa5a403b9da054"
-  integrity sha512-3zT7pcjR090E0WCV9eOtFX06iojoNKsyMXqXs7clOs8sy+RoegR0cebmCuCrTKdY2jw1XhT9jkraygJrqAUwzA==
+sdp-transform@2.14.0:
+  version "2.14.0"
+  resolved "https://registry.yarnpkg.com/sdp-transform/-/sdp-transform-2.14.0.tgz#222452e79e335f000fb9a9a2850021265d1da12d"
+  integrity sha512-8ZYOau/o9PzRhY0aMuRzvmiM6/YVQR8yjnBScvZHSdBnywK5oZzAJK+412ZKkDq29naBmR3bRw8MFu0C01Gehg==
 
 sdp@^2.6.0, sdp@^2.9.0:
   version "2.10.0"
