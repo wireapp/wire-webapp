@@ -66,6 +66,7 @@ const SingleSignOnForm = ({
 }: Props & ConnectedProps & DispatchProps) => {
   const codeOrMailInput = useRef<HTMLInputElement>();
   const [codeOrMail, setCodeOrMail] = useState('');
+  const [disableInput, setDisableInput] = useState(false);
   const {formatMessage: _} = useIntl();
   const {history} = useReactRouter();
   const [persist, setPersist] = useState(true);
@@ -76,6 +77,7 @@ const SingleSignOnForm = ({
   useEffect(() => {
     if (initialCode && initialCode !== codeOrMail) {
       setCodeOrMail(initialCode);
+      setDisableInput(true);
     }
   }, [initialCode]);
 
@@ -94,6 +96,10 @@ const SingleSignOnForm = ({
     if (isFetching) {
       return;
     }
+
+    const currentlyDisabled = codeOrMailInput.current.disabled;
+    codeOrMailInput.current.disabled = false;
+
     codeOrMailInput.current.value = codeOrMailInput.current.value.trim();
     const currentValidationError = codeOrMailInput.current.checkValidity()
       ? null
@@ -101,6 +107,8 @@ const SingleSignOnForm = ({
 
     setValidationError(currentValidationError);
     setIsCodeOrMailInputValid(codeOrMailInput.current.validity.valid);
+
+    codeOrMailInput.current.disabled = currentlyDisabled;
 
     try {
       if (currentValidationError) {
@@ -179,6 +187,7 @@ const SingleSignOnForm = ({
           autoFocus
           type="text"
           required
+          disabled={disableInput}
           data-uie-name="enter-code"
         />
         <RoundIconButton
