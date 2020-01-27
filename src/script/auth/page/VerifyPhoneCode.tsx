@@ -18,7 +18,7 @@
  */
 
 import {LoginData} from '@wireapp/api-client/dist/auth';
-import {CodeInput, Column, Columns, ContainerXS, ErrorMessage, H1, Link} from '@wireapp/react-ui-kit';
+import {CodeInput, Column, Columns, ContainerXS, H1, Link} from '@wireapp/react-ui-kit';
 import React, {useEffect, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
@@ -114,7 +114,7 @@ const VerifyPhoneCode = ({
         <div>
           <H1 center>{_(phoneLoginStrings.verifyCodeDescription, {number: loginData.phone})}</H1>
           <CodeInput autoFocus style={{marginTop: 10}} onCodeComplete={handleLogin} data-uie-name="enter-code" />
-          <ErrorMessage data-uie-name="error-message">{parseError(error)}</ErrorMessage>
+          {parseError(error)}
         </div>
         <Columns>
           <Column>

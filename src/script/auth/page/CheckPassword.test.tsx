@@ -34,7 +34,9 @@ describe('"CheckPassword"', () => {
 
   const passwordInput = () => wrapper.find('input[data-uie-name="enter-password"]').first();
   const loginButton = () => wrapper.find('button[data-uie-name="do-sign-in"]').first();
-  const errorMessage = () => wrapper.find('[data-uie-name="error-message"]').first();
+  // const errorMessage = () => wrapper.find('[data-uie-name="error-message"]');
+  const errorMessage = (errorLabel?: string) =>
+    wrapper.find(`[data-uie-name="error-message"]${errorLabel ? `[data-uie-value="${errorLabel}"]` : ''}`);
 
   it('has disabled submit button as long as there is no input', () => {
     wrapper = mountComponent(
@@ -128,10 +130,13 @@ describe('"CheckPassword"', () => {
     await waitForExpect(() => {
       expect(actionRoot.authAction.doLogin)
         .withContext('action was called')
-        .toHaveBeenCalled();
-      expect(errorMessage().text())
+        .toHaveBeenCalledTimes(1);
+    });
+    await waitForExpect(() => {
+      wrapper.update();
+      expect(errorMessage(BackendError.LABEL.INVALID_CREDENTIALS).exists())
         .withContext('Shows invalid credentials error')
-        .toEqual('Please verify your details and try again');
+        .toBe(true);
     });
   });
 

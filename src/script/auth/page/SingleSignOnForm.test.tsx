@@ -31,7 +31,12 @@ import SingleSignOnForm from './SingleSignOnForm';
 describe('SingleSignOnForm', () => {
   let wrapper: ReactWrapper;
 
-  it('successfully logs into account with initial code', async () => {
+  const codeOrEmailInput = () => wrapper.find('input[data-uie-name="enter-code"]').first();
+  const submitButton = () => wrapper.find('button[data-uie-name="do-sso-sign-in"]').first();
+  const errorMessage = (errorLabel?: string) =>
+    wrapper.find(`[data-uie-name="error-message"]${errorLabel ? `[data-uie-value="${errorLabel}"]` : ''}`);
+
+  it('successfully logs into account with initial SSO code', async () => {
     const history = createMemoryHistory();
     const historyPushSpy = spyOn(history, 'push');
     const doLogin = jasmine.createSpy().and.returnValue((code: string) => Promise.resolve());
@@ -39,8 +44,6 @@ describe('SingleSignOnForm', () => {
 
     spyOn(actionRoot.authAction, 'validateSSOCode').and.returnValue(() => Promise.resolve());
     spyOn(actionRoot.authAction, 'doFinalizeSSOLogin').and.returnValue(() => Promise.resolve());
-    spyOn(actionRoot.clientAction, 'doGetAllClients').and.returnValue(() => Promise.resolve([]));
-    spyOn(actionRoot.authAction, 'resetAuthError').and.returnValue(() => Promise.resolve());
 
     wrapper = mountComponent(
       <SingleSignOnForm doLogin={doLogin} initialCode={code} />,
@@ -55,10 +58,10 @@ describe('SingleSignOnForm', () => {
       history,
     );
 
-    expect(wrapper.find('input[data-uie-name="enter-code"]').exists())
+    expect(codeOrEmailInput().exists())
       .withContext('Code input exists')
       .toBe(true);
-    expect(wrapper.find('input[data-uie-name="enter-code"]').props().value)
+    expect(codeOrEmailInput().props().value)
       .withContext('Code input has initial code value')
       .toEqual(code);
 
@@ -79,5 +82,89 @@ describe('SingleSignOnForm', () => {
     expect(historyPushSpy)
       .withContext('navigation to history page was triggered')
       .toHaveBeenCalledWith(ROUTE.HISTORY_INFO as any);
+  });
+
+  it('shows invalid code or email error', async () => {
+    const code = 'invalid-code';
+
+    wrapper = mountComponent(
+      <SingleSignOnForm doLogin={() => Promise.reject()} />,
+      mockStoreFactory()({
+        ...initialRootState,
+        runtimeState: {
+          hasCookieSupport: true,
+          hasIndexedDbSupport: true,
+          isSupportedBrowser: true,
+        },
+      }),
+    );
+
+    expect(codeOrEmailInput().exists())
+      .withContext('Code input exists')
+      .toBe(true);
+
+    expect(submitButton().props().disabled)
+      .withContext('Submit button is disabled')
+      .toBe(true);
+
+    codeOrEmailInput().simulate('change', {target: {value: code}});
+
+    expect(submitButton().props().disabled)
+      .withContext('Submit button is enabled')
+      .toBe(false);
+
+    submitButton().simulate('submit');
+
+    expect(errorMessage('sso-code-patternMismatch').exists())
+      .withContext('Error "sso-code-patternMismatch" message exists')
+      .toBe(true);
+  });
+
+  it('successfully redirects with registered domain', async () => {
+    const email = 'mail@mail.com';
+    const expectedHost = 'http://localhost:8080';
+
+    spyOn(actionRoot.authAction, 'doGetDomainInfo').and.returnValue(() =>
+      Promise.resolve({config_json_url: '', webapp_welcome_url: expectedHost}),
+    );
+    spyOn(actionRoot.navigationAction, 'doNavigate').and.returnValue(() => {});
+
+    wrapper = mountComponent(
+      <SingleSignOnForm doLogin={() => Promise.reject()} />,
+      mockStoreFactory()({
+        ...initialRootState,
+        runtimeState: {
+          hasCookieSupport: true,
+          hasIndexedDbSupport: true,
+          isSupportedBrowser: true,
+        },
+      }),
+    );
+
+    expect(codeOrEmailInput().exists())
+      .withContext('Email input exists')
+      .toBe(true);
+
+    expect(submitButton().props().disabled)
+      .withContext('Submit button is disabled')
+      .toBe(true);
+
+    codeOrEmailInput().simulate('change', {target: {value: email}});
+
+    expect(submitButton().props().disabled)
+      .withContext('Submit button is enabled')
+      .toBe(false);
+
+    submitButton().simulate('submit');
+
+    expect(actionRoot.authAction.doGetDomainInfo)
+      .withContext('domain data got fetched')
+      .toHaveBeenCalledTimes(1);
+
+    await waitForExpect(() => {
+      expect(actionRoot.navigationAction.doNavigate)
+        .withContext('navigates to expected host')
+        .toHaveBeenCalledWith(expectedHost);
+    });
   });
 });

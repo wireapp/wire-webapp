@@ -18,7 +18,7 @@
  */
 
 import {ValidationUtil} from '@wireapp/commons';
-import {Button, Checkbox, CheckboxLabel, ErrorMessage, Form, Input, InputBlock, Small} from '@wireapp/react-ui-kit';
+import {Button, Checkbox, CheckboxLabel, Form, Input, InputBlock, Small} from '@wireapp/react-ui-kit';
 import React from 'react';
 import {FormattedHTMLMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
@@ -223,8 +223,8 @@ const AccountForm = ({account, ...props}: Props & ConnectedProps & DispatchProps
         >
           {_(accountFormStrings.passwordHelp, {minPasswordLength: Config.NEW_PASSWORD_MINIMUM_LENGTH})}
         </Small>
-        <ErrorMessage data-uie-name="error-message">{parseError(props.authError)}</ErrorMessage>
-        <div data-uie-name="error-message">{parseValidationErrors(validationErrors)}</div>
+        {parseError(props.authError)}
+        {parseValidationErrors(validationErrors)}
       </div>
       <Checkbox
         ref={inputs.terms}

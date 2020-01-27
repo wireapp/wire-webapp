@@ -23,6 +23,7 @@ import {ConversationAction, conversationAction} from './ConversationAction';
 import {CookieAction, cookieAction} from './CookieAction';
 import {InvitationAction, invitationAction} from './InvitationAction';
 import {LocalStorageAction, localStorageAction} from './LocalStorageAction';
+import {NavigationAction, navigationAction} from './NavigationAction';
 import {NotificationAction, notificationAction} from './NotificationAction';
 import {RuntimeAction, runtimeAction} from './RuntimeAction';
 import {SelfAction, selfAction} from './SelfAction';
@@ -43,6 +44,7 @@ export interface ActionRoot {
   userAction: UserAction;
   webSocketAction: WebSocketAction;
   wrapperEventAction: WrapperEventAction;
+  navigationAction: NavigationAction;
 }
 
 export const actionRoot: ActionRoot = {
@@ -52,6 +54,7 @@ export const actionRoot: ActionRoot = {
   cookieAction,
   invitationAction,
   localStorageAction,
+  navigationAction,
   notificationAction,
   runtimeAction,
   selfAction,

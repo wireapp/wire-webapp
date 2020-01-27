@@ -22,7 +22,6 @@ import {
   Button,
   COLOR,
   ContainerXS,
-  ErrorMessage,
   Form,
   H2,
   Input,
@@ -244,9 +243,7 @@ const ConversationJoin = ({
                   <ArrowIcon />
                 </RoundIconButton>
               </InputSubmitCombo>
-              <ErrorMessage data-uie-name="error-message">
-                {error ? parseValidationErrors(error) : parseError(conversationError)}
-              </ErrorMessage>
+              {error ? parseValidationErrors(error) : parseError(conversationError)}
             </Form>
             {!isPwaEnabled && (
               <Small block>
@@ -296,9 +293,7 @@ const ConversationJoin = ({
             >
               {_(conversationJoinStrings.existentAccountOpenButton, {brandName: Config.BRAND_NAME})}
             </Button>
-            <ErrorMessage data-uie-name="error-message">
-              {error ? parseValidationErrors(error) : parseError(conversationError)}
-            </ErrorMessage>
+            {error ? parseValidationErrors(error) : parseError(conversationError)}
             <Small block>
               <Link
                 onClick={() => setForceNewTemporaryGuestAccount(true)}

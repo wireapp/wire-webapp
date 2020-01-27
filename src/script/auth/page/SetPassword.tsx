@@ -18,7 +18,7 @@
  */
 
 import {ValidationUtil} from '@wireapp/commons';
-import {Button, ContainerXS, ErrorMessage, Form, H1, Input, Small} from '@wireapp/react-ui-kit';
+import {Button, ContainerXS, Form, H1, Input, Small} from '@wireapp/react-ui-kit';
 import React, {useRef, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
@@ -113,9 +113,7 @@ const SetPassword = ({
           >
             {_(accountFormStrings.passwordHelp, {minPasswordLength: Config.NEW_PASSWORD_MINIMUM_LENGTH})}
           </Small>
-          <ErrorMessage data-uie-name="error-message">
-            {!error ? <>&nbsp;</> : isValidationError(error) ? parseValidationErrors(error) : parseError(error)}
-          </ErrorMessage>
+          {!error ? <>&nbsp;</> : isValidationError(error) ? parseValidationErrors(error) : parseError(error)}
           <Button
             block
             showLoading={isFetching}

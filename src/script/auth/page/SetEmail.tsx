@@ -17,7 +17,7 @@
  *
  */
 
-import {Button, ContainerXS, ErrorMessage, Form, H1, Input} from '@wireapp/react-ui-kit';
+import {Button, ContainerXS, Form, H1, Input} from '@wireapp/react-ui-kit';
 import React, {useRef, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
@@ -97,9 +97,7 @@ const SetEmail = ({hasSelfEmail, isSelfSSOUser, doSetEmail, isFetching}: Props &
             required
             data-uie-name="enter-email"
           />
-          <ErrorMessage data-uie-name="error-message">
-            {!error ? <>&nbsp;</> : isValidationError(error) ? parseValidationErrors(error) : parseError(error)}
-          </ErrorMessage>
+          {!error ? <>&nbsp;</> : isValidationError(error) ? parseValidationErrors(error) : parseError(error)}
           <Button
             block
             showLoading={isFetching}
