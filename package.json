@@ -165,7 +165,7 @@
     "tslint-config-prettier": "1.18.0",
     "tslint-eslint-rules": "5.4.0",
     "tslint-plugin-prettier": "2.1.0",
-    "tslint-react": "4.1.0",
+    "tslint-react": "4.2.0",
     "tslint-react-hooks": "2.2.1",
     "typescript": "3.7.5",
     "wait-for-expect": "3.0.1",
