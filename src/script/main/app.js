@@ -117,14 +117,10 @@ import {loadValue} from 'Util/StorageUtil';
 
 function doRedirect(signOutReason) {
   let url = `/auth/${location.search}`;
+
   const isImmediateSignOutReason = App.CONFIG.SIGN_OUT_REASONS.IMMEDIATE.includes(signOutReason);
   if (isImmediateSignOutReason) {
     url = appendParameter(url, `${URLParameter.REASON}=${signOutReason}`);
-  }
-
-  const redirectToLogin = signOutReason !== SIGN_OUT_REASON.NOT_SIGNED_IN;
-  if (redirectToLogin) {
-    url = `${url}#login`;
   }
 
   Dexie.delete('/sqleet');

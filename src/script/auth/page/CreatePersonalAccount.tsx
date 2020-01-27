@@ -31,6 +31,7 @@ import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
+import {isDesktopApp, isMacOS} from '../Runtime';
 import Page from './Page';
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {}
@@ -38,13 +39,10 @@ interface Props extends React.HTMLAttributes<HTMLDivElement> {}
 const CreatePersonalAccount = ({isPersonalFlow, enterPersonalCreationFlow}: Props & ConnectedProps & DispatchProps) => {
   const {history} = useReactRouter();
   const {formatMessage: _} = useIntl();
+  const isMacOsWrapper = isDesktopApp() && isMacOS();
   React.useEffect(() => {
     enterPersonalCreationFlow();
   }, []);
-
-  const handleSubmit = (): void => {
-    history.push(ROUTE.VERIFY_EMAIL_CODE);
-  };
 
   const pageContent = (
     <ContainerXS
@@ -53,11 +51,14 @@ const CreatePersonalAccount = ({isPersonalFlow, enterPersonalCreationFlow}: Prop
       style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: 428}}
     >
       <H1 center>{_(createPersonalAccountStrings.headLine)}</H1>
-      <AccountForm onSubmit={handleSubmit} submitText={_(createPersonalAccountStrings.submitButton)} />
+      <AccountForm
+        onSubmit={() => history.push(ROUTE.VERIFY_EMAIL_CODE)}
+        submitText={_(createPersonalAccountStrings.submitButton)}
+      />
     </ContainerXS>
   );
   const backArrow = (
-    <RouterLink to={ROUTE.INDEX} data-uie-name="go-index">
+    <RouterLink to={isMacOsWrapper ? ROUTE.INDEX : ROUTE.SET_ACCOUNT_TYPE} data-uie-name="go-index">
       <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
     </RouterLink>
   );
