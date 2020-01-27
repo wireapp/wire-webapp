@@ -18,7 +18,7 @@
  */
 
 import {t} from 'Util/LocalizerUtil';
-import {formatLocale} from 'Util/LocalizerUtil';
+import {formatLocale} from 'Util/TimeUtil';
 
 import {BasePanelViewModel} from './BasePanelViewModel';
 import {WebAppEvents} from '../../event/WebApp';
