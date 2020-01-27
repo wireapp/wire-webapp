@@ -57,7 +57,6 @@ import {
   uk,
 } from 'date-fns/locale';
 
-import moment from 'moment';
 import {t} from './LocalizerUtil';
 import {zeroPadding} from './util';
 
@@ -279,19 +278,5 @@ export const isYoungerThan1Hour = (date: FnDate) => differenceInHours(new Date()
 export const isYoungerThan7Days = (date: FnDate) => differenceInDays(new Date(), date) < 7;
 
 export const fromNowLocale = (date: FnDate) => formatDistanceToNow(date, {addSuffix: true, locale});
-
-// https://stackoverflow.com/questions/27360102/locale-and-specific-date-format-with-moment-js/29641375#29641375
-export const LLDM = moment
-  .localeData()
-  .longDateFormat('LL')
-  .replace(/Y/g, '')
-  .replace(/^\W|\W$|\W\W/, '');
-
-export const LDM = moment
-  .localeData()
-  .longDateFormat('L')
-  .replace(/Y/g, '')
-  // keep the trailing '.' if locale is 'de'
-  .replace(moment.locale() === 'de' ? /\W$|\W\W/ : /^\W|\W$|\W\W/, '');
 
 export {isToday, fromUnixTime, isYesterday, isSameDay, isSameMonth, isThisYear, differenceInHours, differenceInMinutes};

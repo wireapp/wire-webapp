@@ -25,7 +25,6 @@ import {Account} from '@wireapp/core';
 import {execSync} from 'child_process';
 import logdown from 'logdown';
 import axios from 'axios';
-import moment from 'moment';
 import path from 'path';
 import readline from 'readline';
 
@@ -33,7 +32,7 @@ require('dotenv').config();
 
 const input = readline.createInterface(process.stdin, process.stdout);
 
-const currentDate = moment().format('YYYY-MM-DD');
+const currentDate = new Date().toISOString().substring(0, 10);
 const filename = path.basename(__filename);
 const firstArgument = process.argv[2];
 const usageText = `Usage: ${filename} [-h|--help] <staging|production> <commitId>`;

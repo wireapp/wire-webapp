@@ -23,20 +23,7 @@ import SimpleBar from 'simplebar';
 import {debounce, throttle} from 'underscore';
 import '@wireapp/antiscroll-2/dist/antiscroll-2';
 
-import {
-  TIME_IN_MILLIS,
-  isYoungerThan2Minutes,
-  isYoungerThan1Hour,
-  isToday,
-  isYesterday,
-  isYoungerThan7Days,
-  fromUnixTime,
-  fromNowLocale,
-  formatTimeShort,
-  formatLocale,
-  formatDayMonth,
-} from 'Util/TimeUtil';
-import {t} from 'Util/LocalizerUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {stripUrlWrapper} from 'Util/util';
 import {Environment} from 'Util/Environment';
 import {isEnterKey} from 'Util/KeyboardUtil';
@@ -519,56 +506,6 @@ ko.bindingHandlers.visibility = (function() {
   return {
     init: setVisibility,
     update: setVisibility,
-  };
-})();
-
-ko.bindingHandlers.relative_timestamp = (function() {
-  const timestamps = [];
-
-  // should be fine to fire all 60 sec
-  window.setInterval(() => timestamps.map(timestamp_func => timestamp_func()), TIME_IN_MILLIS.MINUTE);
-
-  const calculate = function(element, timestamp) {
-    timestamp = window.parseInt(timestamp);
-    const date = fromUnixTime(timestamp / TIME_IN_MILLIS.SECOND);
-
-    if (isYoungerThan2Minutes(date)) {
-      return (element.textContent = t('conversationJustNow'));
-    }
-
-    if (isYoungerThan1Hour(date)) {
-      return (element.textContent = fromNowLocale(date));
-    }
-
-    if (isToday(date)) {
-      return (element.textContent = formatTimeShort(date));
-    }
-
-    if (isYesterday(date)) {
-      return (element.textContent = `${t('conversationYesterday')} ${formatTimeShort(date)}`);
-    }
-
-    if (isYoungerThan7Days(date)) {
-      return (element.textContent = formatLocale(date, 'EEEE p'));
-    }
-
-    const weekDay = formatLocale(date, 'EEEE');
-    const dayMonth = formatDayMonth(date);
-    const time = formatTimeShort(date);
-    return (element.textContent = `${weekDay}, ${dayMonth}, ${time}`);
-  };
-
-  return {
-    init(element, valueAccessor) {
-      const timestamp_func = () => calculate(element, valueAccessor());
-      timestamp_func();
-      timestamps.push(timestamp_func);
-
-      ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
-        const timestamp_index = timestamps.indexOf(timestamp_func);
-        timestamps.splice(timestamp_index, 1);
-      });
-    },
   };
 })();
 
