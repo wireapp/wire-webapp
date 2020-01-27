@@ -35,7 +35,7 @@ function getSpecs(specList) {
 }
 
 /**
- * @param {boolean} noLegacy - Prevents loading global dependencies which slow down the load time
+ * @param {boolean} noLegacy Prevents loading global dependencies which slow down the load time
  * @returns {Array} - The files to load in Karma before running the tests
  */
 function getIncludedFiles(noLegacy) {

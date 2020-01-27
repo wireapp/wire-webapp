@@ -52,6 +52,7 @@ describe('"CheckPassword"', () => {
     expect(passwordInput().exists())
       .withContext('password input is present')
       .toBe(true);
+
     expect(loginButton().exists())
       .withContext('submit button is present')
       .toBe(true);
@@ -61,6 +62,7 @@ describe('"CheckPassword"', () => {
       .toBe(true);
 
     passwordInput().simulate('change', {target: {value: 'e'}});
+
     expect(loginButton().props().disabled)
       .withContext('submit button should be enabled')
       .toBe(false);
@@ -86,6 +88,7 @@ describe('"CheckPassword"', () => {
     );
 
     passwordInput().simulate('change', {target: {value: 'e'}});
+
     expect(loginButton().props().disabled)
       .withContext('submit button should be enabled')
       .toBe(false);
@@ -96,6 +99,7 @@ describe('"CheckPassword"', () => {
       expect(actionRoot.authAction.doLogin)
         .withContext('action was called')
         .toHaveBeenCalled();
+
       expect(historyPushSpy)
         .withContext('navigation to history page was triggered')
         .toHaveBeenCalledWith(ROUTE.HISTORY_INFO as any);
@@ -119,6 +123,7 @@ describe('"CheckPassword"', () => {
     );
 
     passwordInput().simulate('change', {target: {value: 'e'}});
+
     expect(loginButton().props().disabled)
       .withContext('submit button should be enabled')
       .toBe(false);
@@ -129,6 +134,7 @@ describe('"CheckPassword"', () => {
       expect(actionRoot.authAction.doLogin)
         .withContext('action was called')
         .toHaveBeenCalled();
+
       expect(errorMessage().text())
         .withContext('Shows invalid credentials error')
         .toEqual('Please verify your details and try again');
@@ -156,6 +162,7 @@ describe('"CheckPassword"', () => {
     );
 
     passwordInput().simulate('change', {target: {value: 'e'}});
+
     expect(loginButton().props().disabled)
       .withContext('submit button should be enabled')
       .toBe(false);
@@ -166,6 +173,7 @@ describe('"CheckPassword"', () => {
       expect(actionRoot.authAction.doLogin)
         .withContext('action was called')
         .toHaveBeenCalled();
+
       expect(historyPushSpy)
         .withContext('navigation to too many clients page was triggered')
         .toHaveBeenCalledWith(ROUTE.CLIENTS as any);

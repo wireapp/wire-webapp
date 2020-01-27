@@ -59,7 +59,6 @@ ko.components.register('legal-hold-dot', {
           return;
         }
         legalHoldModal.showUsers();
-        return;
       }
     };
   },

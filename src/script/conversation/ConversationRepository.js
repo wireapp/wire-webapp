@@ -130,20 +130,20 @@ export class ConversationRepository {
   /**
    * Construct a new Conversation Repository.
    *
-   * @param {ConversationService} conversation_service - Backend REST API conversation service implementation
-   * @param {AssetService} asset_service - Backend REST API asset service implementation
-   * @param {ClientRepository} client_repository - Repository for client interactions
-   * @param {ConnectionRepository} connectionRepository - Repository for all connnection interactions
-   * @param {CryptographyRepository} cryptography_repository - Repository for all cryptography interactions
-   * @param {EventRepository} eventRepository - Repository that handles events
-   * @param {GiphyRepository} giphy_repository - Repository for Giphy GIFs
-   * @param {LinkPreviewRepository} link_repository - Repository for link previews
-   * @param {MessageSender} messageSender - Message sending queue handler
-   * @param {serverTimeHandler} serverTimeHandler - Handles time shift between server and client
-   * @param {TeamRepository} teamRepository - Repository for teams
-   * @param {UserRepository} user_repository - Repository for all user interactions
-   * @param {PropertiesRepository} propertyRepository - Repository that stores all account preferences
-   * @param {AssetUploader} assetUploader - Manages uploading assets and keeping track of current uploads
+   * @param {ConversationService} conversation_service Backend REST API conversation service implementation
+   * @param {AssetService} asset_service Backend REST API asset service implementation
+   * @param {ClientRepository} client_repository Repository for client interactions
+   * @param {ConnectionRepository} connectionRepository Repository for all connnection interactions
+   * @param {CryptographyRepository} cryptography_repository Repository for all cryptography interactions
+   * @param {EventRepository} eventRepository Repository that handles events
+   * @param {GiphyRepository} giphy_repository Repository for Giphy GIFs
+   * @param {LinkPreviewRepository} link_repository Repository for link previews
+   * @param {MessageSender} messageSender Message sending queue handler
+   * @param {serverTimeHandler} serverTimeHandler Handles time shift between server and client
+   * @param {TeamRepository} teamRepository Repository for teams
+   * @param {UserRepository} user_repository Repository for all user interactions
+   * @param {PropertiesRepository} propertyRepository Repository that stores all account preferences
+   * @param {AssetUploader} assetUploader Manages uploading assets and keeping track of current uploads
    */
   constructor(
     conversation_service,
@@ -369,10 +369,10 @@ export class ConversationRepository {
    * Create a group conversation.
    * @note Do not include the requestor among the users
    *
-   * @param {Array<User>} userEntities - Users (excluding the creator) to be part of the conversation
-   * @param {string} [groupName] - Name for the conversation
-   * @param {string} [accessState] - State for conversation access
-   * @param {Object} [options] - Additional conversation creation options (like "receipt_mode")
+   * @param {Array<User>} userEntities Users (excluding the creator) to be part of the conversation
+   * @param {string} [groupName] Name for the conversation
+   * @param {string} [accessState] State for conversation access
+   * @param {Object} [options] Additional conversation creation options (like "receipt_mode")
    * @returns {Promise} Resolves when the conversation was created
    */
   createGroupConversation(userEntities, groupName, accessState, options) {
@@ -434,7 +434,7 @@ export class ConversationRepository {
 
   /**
    * Get a conversation from the backend.
-   * @param {string} conversationId - Conversation to be retrieved from the backend
+   * @param {string} conversationId Conversation to be retrieved from the backend
    * @returns {Promise} Resolve with the conversation entity
    */
   fetch_conversation_by_id(conversationId) {
@@ -529,10 +529,10 @@ export class ConversationRepository {
   /**
    * Get Message with given ID from the database.
    *
-   * @param {Conversation} conversationEntity - Conversation message belongs to
-   * @param {string} messageId - ID of message
-   * @param {boolean} skipConversationMessages - Don't use message entity from conversation
-   * @param {boolean} ensureUser - Make sure message entity has a valid user
+   * @param {Conversation} conversationEntity Conversation message belongs to
+   * @param {string} messageId ID of message
+   * @param {boolean} skipConversationMessages Don't use message entity from conversation
+   * @param {boolean} ensureUser Make sure message entity has a valid user
    * @returns {Promise} Resolves with the message
    */
   get_message_in_conversation_by_id(
@@ -567,7 +567,7 @@ export class ConversationRepository {
 
   /**
    * Get preceding messages starting with the given message.
-   * @param {Conversation} conversationEntity - Respective conversation
+   * @param {Conversation} conversationEntity Respective conversation
    * @returns {Promise} Resolves with the messages
    */
   getPrecedingMessages(conversationEntity) {
@@ -640,9 +640,9 @@ export class ConversationRepository {
   /**
    * Get specified message and load number preceding and subsequent messages defined by padding.
    *
-   * @param {Conversation} conversationEntity - Conversation entity
-   * @param {Message} messageEntity - Message entity
-   * @param {number} [padding=30] - Number of messages to load around the targeted message
+   * @param {Conversation} conversationEntity Conversation entity
+   * @param {Message} messageEntity Message entity
+   * @param {number} [padding=30] Number of messages to load around the targeted message
    * @returns {Promise} Resolves with the message
    */
   getMessagesWithOffset(conversationEntity, messageEntity, padding = 30) {
@@ -668,9 +668,9 @@ export class ConversationRepository {
   /**
    * Get subsequent messages starting with the given message.
    *
-   * @param {Conversation} conversationEntity - Conversation entity
-   * @param {Message} messageEntity - Message entity
-   * @param {boolean} includeMessage - Include given message in the results
+   * @param {Conversation} conversationEntity Conversation entity
+   * @param {Message} messageEntity Message entity
+   * @param {boolean} includeMessage Include given message in the results
    * @returns {Promise} Resolves with the messages
    */
   getSubsequentMessages(conversationEntity, messageEntity, includeMessage) {
@@ -689,8 +689,8 @@ export class ConversationRepository {
   /**
    * Get messages for given category. Category param acts as lower bound.
    *
-   * @param {Conversation} conversationEntity - Conversation entity
-   * @param {MessageCategory} [category=MessageCategory.NONE] - Message category
+   * @param {Conversation} conversationEntity Conversation entity
+   * @param {MessageCategory} [category=MessageCategory.NONE] Message category
    * @returns {Promise} Array of message entities
    */
   get_events_for_category(conversationEntity, category = MessageCategory.NONE) {
@@ -703,8 +703,8 @@ export class ConversationRepository {
   /**
    * Search for given text in conversation.
    *
-   * @param {Conversation} conversationEntity - Conversation entity
-   * @param {string} query - Query strings
+   * @param {Conversation} conversationEntity Conversation entity
+   * @param {string} query Query strings
    * @returns {Promise} Array of message entities
    */
   searchInConversation(conversationEntity, query) {
@@ -723,7 +723,7 @@ export class ConversationRepository {
    * Get conversation unread events.
    *
    * @private
-   * @param {Conversation} conversationEntity - Conversation to start from
+   * @param {Conversation} conversationEntity Conversation to start from
    * @returns {undefined} No return value
    */
   _get_unread_events(conversationEntity) {
@@ -752,7 +752,7 @@ export class ConversationRepository {
 
   /**
    * Update conversation with a user you just unblocked
-   * @param {User} user_et - User you unblocked
+   * @param {User} user_et User you unblocked
    * @returns {undefined} No return value
    */
   unblocked_user(user_et) {
@@ -803,7 +803,7 @@ export class ConversationRepository {
    * Get users and events for conversations.
    *
    * @note To reduce the number of backend calls we merge the user IDs of all conversations first.
-   * @param {Array<Conversation>} conversationEntities - Array of conversation entities to be updated
+   * @param {Array<Conversation>} conversationEntities Array of conversation entities to be updated
    * @returns {undefined} No return value
    */
   updateConversations(conversationEntities) {
@@ -821,7 +821,7 @@ export class ConversationRepository {
 
   /**
    * Deletes a conversation from the repository.
-   * @param {string} conversation_id - ID of conversation to be deleted from the repository
+   * @param {string} conversation_id ID of conversation to be deleted from the repository
    * @returns {undefined} No return value
    */
   deleteConversationFromRepository(conversation_id) {
@@ -867,7 +867,7 @@ export class ConversationRepository {
 
   /**
    * Find a local conversation by ID.
-   * @param {string} conversation_id - ID of conversation to get
+   * @param {string} conversation_id ID of conversation to get
    * @returns {Conversation | undefined} Conversation is locally available
    */
   find_conversation_by_id(conversation_id) {
@@ -885,7 +885,7 @@ export class ConversationRepository {
 
   /**
    * Check for conversation locally and fetch it from the server otherwise.
-   * @param {string} conversation_id - ID of conversation to get
+   * @param {string} conversation_id ID of conversation to get
    * @returns {Promise<ConversationEntity | undefined>} Resolves with the Conversation entity or `undefined` if not found
    */
   get_conversation_by_id(conversation_id) {
@@ -909,8 +909,8 @@ export class ConversationRepository {
   /**
    * Get group conversations by name.
    *
-   * @param {string} query - Query to be searched in group conversation names
-   * @param {boolean} isHandle - Query string is handle
+   * @param {string} query Query to be searched in group conversation names
+   * @param {boolean} isHandle Query string is handle
    * @returns {Array<Conversation>} Matching group conversations
    */
   getGroupsByName(query, isHandle) {
@@ -945,7 +945,7 @@ export class ConversationRepository {
 
   /**
    * Get the most recent event timestamp from any conversation.
-   * @param {boolean} [increment=false] - Increment by one for unique timestamp
+   * @param {boolean} [increment=false] Increment by one for unique timestamp
    * @returns {number} Timestamp value
    */
   getLatestEventTimestamp(increment = false) {
@@ -961,7 +961,7 @@ export class ConversationRepository {
   /**
    * Get the next unarchived conversation.
    *
-   * @param {Conversation} conversationEntity - Conversation to start from
+   * @param {Conversation} conversationEntity Conversation to start from
    * @returns {Conversation} Next conversation
    */
   get_next_conversation(conversationEntity) {
@@ -970,7 +970,7 @@ export class ConversationRepository {
 
   /**
    * Get unarchived conversation with the most recent event.
-   * @param {boolean} [allConversations=false] - Search all conversations
+   * @param {boolean} [allConversations=false] Search all conversations
    * @returns {Conversation} Most recent conversation
    */
   getMostRecentConversation(allConversations = false) {
@@ -992,7 +992,7 @@ export class ConversationRepository {
 
   /**
    * Get conversation with a user.
-   * @param {User} userEntity - User entity for whom to get the conversation
+   * @param {User} userEntity User entity for whom to get the conversation
    * @returns {Promise} Resolves with the conversation with requested user
    */
   get1To1Conversation(userEntity) {
@@ -1042,7 +1042,7 @@ export class ConversationRepository {
 
   /**
    * Check whether conversation is currently displayed.
-   * @param {Conversation} conversationEntity - Conversation to be saved
+   * @param {Conversation} conversationEntity Conversation to be saved
    * @returns {boolean} Is the conversation active
    */
   is_active_conversation(conversationEntity) {
@@ -1053,8 +1053,8 @@ export class ConversationRepository {
   /**
    * Check whether message has been read.
    *
-   * @param {string} conversation_id - Conversation ID
-   * @param {string} message_id - Message ID
+   * @param {string} conversation_id Conversation ID
+   * @param {string} message_id Message ID
    * @returns {Promise} Resolves with `true` if message is marked as read
    */
   is_message_read(conversation_id, message_id) {
@@ -1100,8 +1100,8 @@ export class ConversationRepository {
    * Maps user connection to the corresponding conversation.
    *
    * @note If there is no conversation it will request it from the backend
-   * @param {ConnectionEntity} connectionEntity - Connections
-   * @param {boolean} [show_conversation=false] - Open the new conversation
+   * @param {ConnectionEntity} connectionEntity Connections
+   * @param {boolean} [show_conversation=false] Open the new conversation
    * @returns {Promise} Resolves when connection was mapped return value
    */
   map_connection(connectionEntity, show_conversation = false) {
@@ -1161,7 +1161,7 @@ export class ConversationRepository {
 
   /**
    * Maps user connections to the corresponding conversations.
-   * @param {Array<ConnectionEntity>} connectionEntities - Connections entities
+   * @param {Array<ConnectionEntity>} connectionEntities Connections entities
    * @returns {undefined} No return value
    */
   map_connections(connectionEntities) {
@@ -1172,8 +1172,8 @@ export class ConversationRepository {
   /**
    * Map conversation payload.
    *
-   * @param {JSON} payload - Payload to map
-   * @param {number} [initialTimestamp=this.getLatestEventTimestamp()] - Initial server and event timestamp
+   * @param {JSON} payload Payload to map
+   * @param {number} [initialTimestamp=this.getLatestEventTimestamp()] Initial server and event timestamp
    * @returns {Conversation|Array<Conversation>} Mapped conversation/s
    */
   mapConversations(payload, initialTimestamp = this.getLatestEventTimestamp()) {
@@ -1208,7 +1208,7 @@ export class ConversationRepository {
    * Sends a message to backend that the conversation has been fully read.
    * The message will allow all the self clients to synchronize conversation read state.
    *
-   * @param {Conversation} conversationEntity - Conversation to be marked as read
+   * @param {Conversation} conversationEntity Conversation to be marked as read
    * @returns {undefined} No return value
    */
   markAsRead(conversationEntity) {
@@ -1238,7 +1238,7 @@ export class ConversationRepository {
 
   /**
    * Save a conversation in the repository.
-   * @param {Conversation} conversationEntity - Conversation to be saved in the repository
+   * @param {Conversation} conversationEntity Conversation to be saved in the repository
    * @returns {Promise} Resolves when conversation was saved
    */
   save_conversation(conversationEntity) {
@@ -1252,7 +1252,7 @@ export class ConversationRepository {
 
   /**
    * Persists a conversation state in the database.
-   * @param {Conversation} conversationEntity - Conversation of which the state should be persisted
+   * @param {Conversation} conversationEntity Conversation of which the state should be persisted
    * @returns {Promise} Resolves when conversation was saved
    */
   save_conversation_state_in_db(conversationEntity) {
@@ -1261,7 +1261,7 @@ export class ConversationRepository {
 
   /**
    * Save conversations in the repository.
-   * @param {Array<Conversation>} conversationEntities - Conversations to be saved in the repository
+   * @param {Array<Conversation>} conversationEntities Conversations to be saved in the repository
    * @returns {undefined} No return value
    */
   save_conversations(conversationEntities) {
@@ -1272,7 +1272,7 @@ export class ConversationRepository {
    * Set the notification handling state.
    *
    * @note Temporarily do not unarchive conversations when handling the notification stream
-   * @param {NOTIFICATION_HANDLING_STATE} handling_state - State of the notifications stream handling
+   * @param {NOTIFICATION_HANDLING_STATE} handling_state State of the notifications stream handling
    * @returns {undefined} No return value
    */
   set_notification_handling_state(handling_state) {
@@ -1288,9 +1288,9 @@ export class ConversationRepository {
   /**
    * Update participating users in a conversation.
    *
-   * @param {Conversation} conversationEntity - Conversation to be updated
-   * @param {boolean} [offline=false] - Should we only look for cached contacts
-   * @param {boolean} [updateGuests=false] - Update conversation guests
+   * @param {Conversation} conversationEntity Conversation to be updated
+   * @param {boolean} [offline=false] Should we only look for cached contacts
+   * @param {boolean} [updateGuests=false] Update conversation guests
    * @returns {Promise} Resolves when users have been updated
    */
   updateParticipatingUserEntities(conversationEntity, offline = false, updateGuests = false) {
@@ -1315,8 +1315,8 @@ export class ConversationRepository {
   /**
    * Add users to an existing conversation.
    *
-   * @param {Conversation} conversationEntity - Conversation to add users to
-   * @param {Array<User>} userEntities - Users to be added to the conversation
+   * @param {Conversation} conversationEntity Conversation to add users to
+   * @param {Array<User>} userEntities Users to be added to the conversation
    * @returns {Promise} Resolves when members were added
    */
   addMembers(conversationEntity, userEntities) {
@@ -1343,9 +1343,9 @@ export class ConversationRepository {
   /**
    * Add a service to an existing conversation.
    *
-   * @param {Conversation} conversationEntity - Conversation to add service to
-   * @param {string} providerId - ID of service provider
-   * @param {string} serviceId - ID of service
+   * @param {Conversation} conversationEntity Conversation to add service to
+   * @param {string} providerId ID of service provider
+   * @param {string} serviceId ID of service
    * @returns {Promise} Resolves when service was added
    */
   addService(conversationEntity, providerId, serviceId) {
@@ -1399,8 +1399,8 @@ export class ConversationRepository {
    * @note According to spec we archive a conversation when we clear it.
    * It will be unarchived once it is opened through search. We use the archive flag to distinguish states.
    *
-   * @param {Conversation} conversationEntity - Conversation to clear
-   * @param {boolean} [leaveConversation=false] - Should we leave the conversation before clearing the content?
+   * @param {Conversation} conversationEntity Conversation to clear
+   * @param {boolean} [leaveConversation=false] Should we leave the conversation before clearing the content?
    * @returns {undefined} No return value
    */
   clear_conversation(conversationEntity, leaveConversation = false) {
@@ -1427,7 +1427,7 @@ export class ConversationRepository {
    * Update cleared of conversation using timestamp.
    *
    * @private
-   * @param {Conversation} conversationEntity - Conversation to update
+   * @param {Conversation} conversationEntity Conversation to update
    * @returns {undefined} No return value
    */
   _updateClearedTimestamp(conversationEntity) {
@@ -1460,8 +1460,8 @@ export class ConversationRepository {
   /**
    * Remove member from conversation.
    *
-   * @param {Conversation} conversationEntity - Conversation to remove member from
-   * @param {string} userId - ID of member to be removed from the conversation
+   * @param {Conversation} conversationEntity Conversation to remove member from
+   * @param {string} userId ID of member to be removed from the conversation
    * @returns {Promise} Resolves when member was removed from the conversation
    */
   removeMember(conversationEntity, userId) {
@@ -1481,8 +1481,8 @@ export class ConversationRepository {
   /**
    * Remove service from conversation.
    *
-   * @param {Conversation} conversationEntity - Conversation to remove service from
-   * @param {User} userId - ID of service user to be removed from the conversation
+   * @param {Conversation} conversationEntity Conversation to remove service from
+   * @param {User} userId ID of service user to be removed from the conversation
    * @returns {Promise} Resolves when service was removed from the conversation
    */
   removeService(conversationEntity, userId) {
@@ -1501,8 +1501,8 @@ export class ConversationRepository {
   /**
    * Rename conversation.
    *
-   * @param {Conversation} conversationEntity - Conversation to rename
-   * @param {string} name - New conversation name
+   * @param {Conversation} conversationEntity Conversation to rename
+   * @param {string} name New conversation name
    * @returns {Promise} Resolves when conversation was renamed
    */
   renameConversation(conversationEntity, name) {
@@ -1517,8 +1517,8 @@ export class ConversationRepository {
   /**
    * Set the global message timer
    *
-   * @param {Conversation} conversationEntity - Conversation to update
-   * @param {number} messageTimer - New message timer value
+   * @param {Conversation} conversationEntity Conversation to update
+   * @param {number} messageTimer New message timer value
    * @returns {Promise} Resolves when conversation was updated on server side
    */
   updateConversationMessageTimer(conversationEntity, messageTimer) {
@@ -1569,10 +1569,10 @@ export class ConversationRepository {
   /**
    * Send a specific GIF to a conversation.
    *
-   * @param {Conversation} conversationEntity - Conversation to send message in
-   * @param {string} url - URL of giphy image
-   * @param {string} tag - tag tag used for gif search
-   * @param {QuoteEntity} [quoteEntity] - Quote as part of the message
+   * @param {Conversation} conversationEntity Conversation to send message in
+   * @param {string} url URL of giphy image
+   * @param {string} tag tag tag used for gif search
+   * @param {QuoteEntity} [quoteEntity] Quote as part of the message
    * @returns {Promise} Resolves when the gif was posted
    */
   sendGif(conversationEntity, url, tag, quoteEntity) {
@@ -1589,9 +1589,9 @@ export class ConversationRepository {
 
   /**
    * Team member was removed.
-   * @param {string} teamId - ID of team that member was removed from
-   * @param {string} userId - ID of leaving user
-   * @param {Date} isoDate - Date of member removal
+   * @param {string} teamId ID of team that member was removed from
+   * @param {string} userId ID of leaving user
+   * @param {Date} isoDate Date of member removal
    * @returns {undefined} No return value
    */
   teamMemberLeave(teamId, userId, isoDate) {
@@ -1612,8 +1612,8 @@ export class ConversationRepository {
   /**
    * Set the notification state of a conversation.
    *
-   * @param {Conversation} conversationEntity - Conversation to change notification state off
-   * @param {NotificationSetting} notificationState - New notification state
+   * @param {Conversation} conversationEntity Conversation to change notification state off
+   * @param {NotificationSetting} notificationState New notification state
    * @returns {Promise} Resolves when the notification stated was change
    */
   setNotificationState(conversationEntity, notificationState) {
@@ -1656,7 +1656,7 @@ export class ConversationRepository {
   /**
    * Archive a conversation.
    *
-   * @param {Conversation} conversationEntity - Conversation to rename
+   * @param {Conversation} conversationEntity Conversation to rename
    * @returns {Promise} Resolves when the conversation was archived
    */
   archiveConversation(conversationEntity) {
@@ -1668,9 +1668,9 @@ export class ConversationRepository {
   /**
    * Un-archive a conversation.
    *
-   * @param {Conversation} conversationEntity - Conversation to unarchive
-   * @param {boolean} [forceChange=false] - Force state change without new message
-   * @param {string} trigger - Trigger for unarchive
+   * @param {Conversation} conversationEntity Conversation to unarchive
+   * @param {boolean} [forceChange=false] Force state change without new message
+   * @param {string} trigger Trigger for unarchive
    * @returns {Promise} Resolves when the conversation was unarchived
    */
   unarchiveConversation(conversationEntity, forceChange = false, trigger = 'unknown') {
@@ -1739,8 +1739,8 @@ export class ConversationRepository {
    * Clears conversation content from view and the database.
    *
    * @private
-   * @param {Conversation} conversationEntity - Conversation entity to delete
-   * @param {number} [timestamp] - Optional timestamps for which messages to remove
+   * @param {Conversation} conversationEntity Conversation entity to delete
+   * @param {number} [timestamp] Optional timestamps for which messages to remove
    * @returns {undefined} No return value
    */
   _clear_conversation(conversationEntity, timestamp) {
@@ -1808,9 +1808,9 @@ export class ConversationRepository {
   /**
    * Send a read receipt for the last message in a conversation.
    *
-   * @param {Conversation} conversationEntity - Conversation to update
-   * @param {Message} messageEntity - Message to send a read receipt for
-   * @param {Array<Message>} [moreMessageEntities] - More messages to send a read receipt for
+   * @param {Conversation} conversationEntity Conversation to update
+   * @param {Message} messageEntity Message to send a read receipt for
+   * @param {Array<Message>} [moreMessageEntities] More messages to send a read receipt for
    * @returns {undefined} No return value
    */
   sendReadReceipt(conversationEntity, messageEntity, moreMessageEntities = []) {
@@ -1874,9 +1874,9 @@ export class ConversationRepository {
   /**
    * Send asset metadata message to specified conversation.
    *
-   * @param {Conversation} conversationEntity - Conversation that should receive the file
-   * @param {File} file - File to send
-   * @param {boolean} allowImageDetection - allow images to be treated as images (not files)
+   * @param {Conversation} conversationEntity Conversation that should receive the file
+   * @param {File} file File to send
+   * @param {boolean} allowImageDetection allow images to be treated as images (not files)
    * @returns {Promise} Resolves when the asset metadata was sent
    */
   send_asset_metadata(conversationEntity, file, allowImageDetection) {
@@ -1930,9 +1930,9 @@ export class ConversationRepository {
   /**
    * Send asset preview message to specified conversation.
    *
-   * @param {Conversation} conversationEntity - Conversation that should receive the preview
-   * @param {File} file - File to generate preview from
-   * @param {string} messageId - Message ID of the message to generate a preview for
+   * @param {Conversation} conversationEntity Conversation that should receive the preview
+   * @param {File} file File to generate preview from
+   * @param {string} messageId Message ID of the message to generate a preview for
    * @returns {Promise} Resolves when the asset preview was sent
    */
   sendAssetPreview(conversationEntity, file, messageId) {
@@ -1977,9 +1977,9 @@ export class ConversationRepository {
   /**
    * Send asset upload failed message to specified conversation.
    *
-   * @param {Conversation} conversationEntity - Conversation that should receive the file
-   * @param {string} messageId - ID of the metadata message
-   * @param {AssetUploadFailedReason} [reason=AssetUploadFailedReason.FAILED] - Cause for the failed upload (optional)
+   * @param {Conversation} conversationEntity Conversation that should receive the file
+   * @param {string} messageId ID of the metadata message
+   * @param {AssetUploadFailedReason} [reason=AssetUploadFailedReason.FAILED] Cause for the failed upload (optional)
    * @returns {Promise} Resolves when the asset failure was sent
    */
   send_asset_upload_failed(conversationEntity, messageId, reason = AssetUploadFailedReason.FAILED) {
@@ -2002,10 +2002,10 @@ export class ConversationRepository {
   /**
    * Send confirmation for a content message in specified conversation.
    *
-   * @param {Conversation} conversationEntity - Conversation that content message was received in
-   * @param {Message} messageEntity - Message for which to acknowledge receipt
-   * @param {Confirmation.Type} type - The type of confirmation to send
-   * @param {Array<Message>} [moreMessageEntities] - More messages to send a read receipt for
+   * @param {Conversation} conversationEntity Conversation that content message was received in
+   * @param {Message} messageEntity Message for which to acknowledge receipt
+   * @param {Confirmation.Type} type The type of confirmation to send
+   * @param {Array<Message>} [moreMessageEntities] More messages to send a read receipt for
    * @returns {undefined} No return value
    */
   _sendConfirmationStatus(conversationEntity, messageEntity, type, moreMessageEntities = []) {
@@ -2049,8 +2049,8 @@ export class ConversationRepository {
   /**
    * Send call message in specified conversation.
    *
-   * @param {EventInfoEntity} eventInfoEntity - Event info to be send
-   * @param {string} conversationId - id of the conversation to send call message to
+   * @param {EventInfoEntity} eventInfoEntity Event info to be send
+   * @param {string} conversationId id of the conversation to send call message to
    * @returns {Promise} Resolves when the confirmation was sent
    */
   sendCallingMessage(eventInfoEntity, conversationId) {
@@ -2068,7 +2068,7 @@ export class ConversationRepository {
 
   /**
    * Send knock in specified conversation.
-   * @param {Conversation} conversationEntity - Conversation to send knock in
+   * @param {Conversation} conversationEntity Conversation to send knock in
    * @returns {Promise} Resolves after sending the knock
    */
   sendKnock(conversationEntity) {
@@ -2098,11 +2098,11 @@ export class ConversationRepository {
   /**
    * Send link preview in specified conversation.
    *
-   * @param {Conversation} conversationEntity - Conversation that should receive the message
-   * @param {string} textMessage - Plain text message that possibly contains link
-   * @param {GenericMessage} genericMessage - GenericMessage of containing text or edited message
-   * @param {Array<MentionEntity>} [mentionEntities] - Mentions as part of message
-   * @param {QuoteEntity} quoteEntity - Link to a quoted message
+   * @param {Conversation} conversationEntity Conversation that should receive the message
+   * @param {string} textMessage Plain text message that possibly contains link
+   * @param {GenericMessage} genericMessage GenericMessage of containing text or edited message
+   * @param {Array<MentionEntity>} [mentionEntities] Mentions as part of message
+   * @param {QuoteEntity} quoteEntity Link to a quoted message
    * @returns {Promise} Resolves after sending the message
    */
   sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities, quoteEntity) {
@@ -2155,11 +2155,11 @@ export class ConversationRepository {
   /**
    * Send location message in specified conversation.
    *
-   * @param {Conversation} conversationEntity - Conversation that should receive the message
-   * @param {number} longitude - Longitude of the location
-   * @param {number} latitude - Latitude of the location
-   * @param {string} name - Name of the location
-   * @param {number} zoom - Zoom factor for the map (Google Maps)
+   * @param {Conversation} conversationEntity Conversation that should receive the message
+   * @param {number} longitude Longitude of the location
+   * @param {number} latitude Latitude of the location
+   * @param {string} name Name of the location
+   * @param {number} zoom Zoom factor for the map (Google Maps)
    * @returns {Promise} Resolves after sending the location
    */
   sendLocation(conversationEntity, longitude, latitude, name, zoom) {
@@ -2183,10 +2183,10 @@ export class ConversationRepository {
   /**
    * Send edited message in specified conversation.
    *
-   * @param {Conversation} conversationEntity - Conversation entity
-   * @param {string} textMessage - Edited plain text message
-   * @param {Message} originalMessageEntity - Original message entity
-   * @param {Array<MentionEntity>} [mentionEntities] - Mentions as part of the message
+   * @param {Conversation} conversationEntity Conversation entity
+   * @param {string} textMessage Edited plain text message
+   * @param {Message} originalMessageEntity Original message entity
+   * @param {Array<MentionEntity>} [mentionEntities] Mentions as part of the message
    * @returns {Promise} Resolves after sending the message
    */
   sendMessageEdit(conversationEntity, textMessage, originalMessageEntity, mentionEntities) {
@@ -2230,8 +2230,8 @@ export class ConversationRepository {
   /**
    * Toggle like status of message.
    *
-   * @param {Conversation} conversationEntity - Conversation entity
-   * @param {Message} message_et - Message to react to
+   * @param {Conversation} conversationEntity Conversation entity
+   * @param {Message} message_et Message to react to
    * @returns {undefined} No return value
    */
   toggle_like(conversationEntity, message_et) {
@@ -2245,9 +2245,9 @@ export class ConversationRepository {
 
   /**
    * Send reaction to a content message in specified conversation.
-   * @param {Conversation} conversationEntity - Conversation to send reaction in
-   * @param {Message} messageEntity - Message to react to
-   * @param {ReactionType} reaction - Reaction
+   * @param {Conversation} conversationEntity Conversation to send reaction in
+   * @param {Message} messageEntity Message to react to
+   * @param {ReactionType} reaction Reaction
    * @returns {Promise} Resolves after sending the reaction
    */
   sendReaction(conversationEntity, messageEntity, reaction) {
@@ -2267,9 +2267,9 @@ export class ConversationRepository {
    *  (which will not be rendered in the view) to the remote client. This message only needs to be sent to the affected
    *  remote client, therefore we force the message sending.
    *
-   * @param {string} userId - User ID
-   * @param {string} clientId - Client ID
-   * @param {string} conversationId - Conversation ID
+   * @param {string} userId User ID
+   * @param {string} clientId Client ID
+   * @param {string} conversationId Conversation ID
    * @returns {Promise} Resolves after sending the session reset
    */
   sendSessionReset(userId, clientId, conversationId) {
@@ -2298,10 +2298,10 @@ export class ConversationRepository {
   /**
    * Send text message in specified conversation.
    *
-   * @param {Conversation} conversationEntity - Conversation that should receive the message
-   * @param {string} textMessage - Plain text message
-   * @param {Array<MentionEntity>} [mentionEntities] - Mentions as part of the message
-   * @param {QuoteEntity} [quoteEntity] - Quote as part of the message
+   * @param {Conversation} conversationEntity Conversation that should receive the message
+   * @param {string} textMessage Plain text message
+   * @param {Array<MentionEntity>} [mentionEntities] Mentions as part of the message
+   * @param {QuoteEntity} [quoteEntity] Quote as part of the message
    * @returns {Promise} Resolves after sending the message
    */
   sendText(conversationEntity, textMessage, mentionEntities, quoteEntity) {
@@ -2331,10 +2331,10 @@ export class ConversationRepository {
   /**
    * Send text message with link preview in specified conversation.
    *
-   * @param {Conversation} conversationEntity - Conversation that should receive the message
-   * @param {string} textMessage - Plain text message
-   * @param {Array<MentionEntity>} [mentionEntities] - Mentions part of the message
-   * @param {QuoteEntity} [quoteEntity] - Quoted message
+   * @param {Conversation} conversationEntity Conversation that should receive the message
+   * @param {string} textMessage Plain text message
+   * @param {Array<MentionEntity>} [mentionEntities] Mentions part of the message
+   * @param {QuoteEntity} [quoteEntity] Quoted message
    * @returns {Promise} Resolves after sending the message
    */
   sendTextWithLinkPreview(conversationEntity, textMessage, mentionEntities, quoteEntity) {
@@ -2399,8 +2399,8 @@ export class ConversationRepository {
   /**
    * Wraps generic message in ephemeral message.
    *
-   * @param {GenericMessage} genericMessage - Message to be wrapped
-   * @param {number} millis - Expire time in milliseconds
+   * @param {GenericMessage} genericMessage Message to be wrapped
+   * @param {number} millis Expire time in milliseconds
    * @returns {Message} New proto message
    */
   _wrap_in_ephemeral_message(genericMessage, millis) {
@@ -2426,9 +2426,9 @@ export class ConversationRepository {
   /**
    * Create a user client map for a given conversation.
    *
-   * @param {string} conversation_id - Conversation ID
-   * @param {boolean} [skip_own_clients=false] - True, if other own clients should be skipped (to not sync messages on own clients)
-   * @param {Array<string>} user_ids - Optionally the intended recipient users
+   * @param {string} conversation_id Conversation ID
+   * @param {boolean} [skip_own_clients=false] True, if other own clients should be skipped (to not sync messages on own clients)
+   * @param {Array<string>} user_ids Optionally the intended recipient users
    * @returns {Promise} Resolves with a user client map
    */
   create_recipients(conversation_id, skip_own_clients = false, user_ids) {
@@ -2499,9 +2499,9 @@ export class ConversationRepository {
   /**
    * Update message as sent in db and view.
    *
-   * @param {Conversation} conversationEntity - Conversation entity
-   * @param {Object} eventJson - Event object
-   * @param {string} isoDate - If defined it will update event timestamp
+   * @param {Conversation} conversationEntity Conversation entity
+   * @param {Object} eventJson Event object
+   * @param {string} isoDate If defined it will update event timestamp
    * @returns {Promise} Resolves when sent status was updated
    */
   async _updateMessageAsSent(conversationEntity, eventJson, isoDate) {
@@ -2533,7 +2533,7 @@ export class ConversationRepository {
    * Send encrypted external message
    *
    * @private
-   * @param {EventInfoEntity} eventInfoEntity - Event to be send
+   * @param {EventInfoEntity} eventInfoEntity Event to be send
    * @returns {Promise} Resolves after sending the external message
    */
   async _sendExternalGenericMessage(eventInfoEntity) {
@@ -2570,7 +2570,7 @@ export class ConversationRepository {
    * Sends a generic message to a conversation.
    *
    * @private
-   * @param {EventInfoEntity} eventInfoEntity - Info about event
+   * @param {EventInfoEntity} eventInfoEntity Info about event
    * @returns {Promise} Resolves when the message was sent
    */
   _sendGenericMessage(eventInfoEntity) {
@@ -2604,8 +2604,8 @@ export class ConversationRepository {
    * @note Options for the precondition check on missing clients are:
    *   'false' - all clients, 'Array<String>' - only clients of listed users, 'true' - force sending
    *
-   * @param {EventInfoEntity} eventInfoEntity - Info about message to be sent
-   * @param {Object} payload - Payload
+   * @param {EventInfoEntity} eventInfoEntity Info about message to be sent
+   * @param {Object} payload Payload
    * @returns {Promise} Promise that resolves after sending the encrypted message
    */
   _sendEncryptedMessage(eventInfoEntity, payload) {
@@ -2909,7 +2909,7 @@ export class ConversationRepository {
    * Estimate whether message should be send as type external.
    *
    * @private
-   * @param {EventInfoEntity} eventInfoEntity - Info about event
+   * @param {EventInfoEntity} eventInfoEntity Info about event
    * @returns {boolean} Is payload likely to be too big so that we switch to type external?
    */
   _shouldSendAsExternal(eventInfoEntity) {
@@ -2926,8 +2926,8 @@ export class ConversationRepository {
   /**
    * Post images to a conversation.
    *
-   * @param {Conversation} conversationEntity - Conversation to post the images
-   * @param {Array|FileList} images - Images
+   * @param {Conversation} conversationEntity Conversation to post the images
+   * @param {Array|FileList} images Images
    * @returns {undefined} No return value
    */
   upload_images(conversationEntity, images) {
@@ -2937,9 +2937,9 @@ export class ConversationRepository {
   /**
    * Post files to a conversation.
    *
-   * @param {Conversation} conversationEntity - Conversation to post the files
-   * @param {Array|FileList} files - files
-   * @param {AssetType} [asImage=false] - whether or not the file should be treated as an image
+   * @param {Conversation} conversationEntity Conversation to post the files
+   * @param {Array|FileList} files files
+   * @param {AssetType} [asImage=false] whether or not the file should be treated as an image
    * @returns {undefined} No return value
    */
   upload_files(conversationEntity, files, asImage) {
@@ -2951,9 +2951,9 @@ export class ConversationRepository {
   /**
    * Post file to a conversation using v3
    *
-   * @param {Conversation} conversationEntity - Conversation to post the file
-   * @param {Object} file - File object
-   * @param {AssetType} [asImage=false] - whether or not the file should be treated as an image
+   * @param {Conversation} conversationEntity Conversation to post the file
+   * @param {Object} file File object
+   * @param {AssetType} [asImage=false] whether or not the file should be treated as an image
    * @returns {Promise} Resolves when file was uploaded
    */
 
@@ -2983,9 +2983,9 @@ export class ConversationRepository {
   /**
    * Delete message for everyone.
    *
-   * @param {Conversation} conversationEntity - Conversation to delete message from
-   * @param {Message} messageEntity - Message to delete
-   * @param {Array<string>|boolean} [precondition] - Optional level that backend checks for missing clients
+   * @param {Conversation} conversationEntity Conversation to delete message from
+   * @param {Message} messageEntity Message to delete
+   * @param {Array<string>|boolean} [precondition] Optional level that backend checks for missing clients
    * @returns {Promise} Resolves when message was deleted
    */
   deleteMessageForEveryone(conversationEntity, messageEntity, precondition) {
@@ -3031,8 +3031,8 @@ export class ConversationRepository {
   /**
    * Delete message on your own clients.
    *
-   * @param {Conversation} conversationEntity - Conversation to delete message from
-   * @param {Message} messageEntity - Message to delete
+   * @param {Conversation} conversationEntity Conversation to delete message from
+   * @param {Message} messageEntity Message to delete
    * @returns {Promise} Resolves when message was deleted
    */
   deleteMessage(conversationEntity, messageEntity) {
@@ -3065,7 +3065,7 @@ export class ConversationRepository {
 
   /**
    * Can user upload assets to conversation.
-   * @param {Conversation} conversationEntity - Conversation to check
+   * @param {Conversation} conversationEntity Conversation to check
    * @returns {boolean} Can assets be uploaded
    */
   _can_upload_assets_to_conversation(conversationEntity) {
@@ -3079,8 +3079,8 @@ export class ConversationRepository {
   /**
    * Listener for incoming events.
    *
-   * @param {Object} eventJson - JSON data for event
-   * @param {EventRepository.SOURCE} [eventSource=EventRepository.SOURCE.STREAM] - Source of event
+   * @param {Object} eventJson JSON data for event
+   * @param {EventRepository.SOURCE} [eventSource=EventRepository.SOURCE.STREAM] Source of event
    * @returns {Promise} Resolves when event was handled
    */
   onConversationEvent(eventJson, eventSource = EventRepository.SOURCE.STREAM) {
@@ -3150,9 +3150,9 @@ export class ConversationRepository {
    * Check that sender of received event is a known conversation participant.
    *
    * @private
-   * @param {Conversation} conversationEntity - Conversation targeted by the event
-   * @param {Object} eventJson - JSON data of the event
-   * @param {EventRepository.SOURCE} eventSource - Source of event
+   * @param {Conversation} conversationEntity Conversation targeted by the event
+   * @param {Object} eventJson JSON data of the event
+   * @param {EventRepository.SOURCE} eventSource Source of event
    * @returns {Promise} Resolves when the participant list has been checked
    */
   _checkConversationParticipants(conversationEntity, eventJson, eventSource) {
@@ -3243,9 +3243,9 @@ export class ConversationRepository {
    * Triggers the methods associated with a specific event.
    *
    * @private
-   * @param {Conversation} conversationEntity - Conversation targeted by the event
-   * @param {Object} eventJson - JSON data of the event
-   * @param {EventRepository.SOURCE} eventSource - Source of event
+   * @param {Conversation} conversationEntity Conversation targeted by the event
+   * @param {Object} eventJson JSON data of the event
+   * @param {EventRepository.SOURCE} eventSource Source of event
    * @returns {Promise<any>} Resolves when the event has been treated
    */
   _reactToConversationEvent(conversationEntity, eventJson, eventSource) {
@@ -3317,9 +3317,9 @@ export class ConversationRepository {
    * Calls the feature specific event handler on the current event being handled.
    *
    * @private
-   * @param {Conversation} conversationEntity - Conversation targeted by the event
-   * @param {Object} eventJson - JSON data of the event
-   * @param {EventRepository.SOURCE} eventSource - Source of event
+   * @param {Conversation} conversationEntity Conversation targeted by the event
+   * @param {Object} eventJson JSON data of the event
+   * @param {EventRepository.SOURCE} eventSource Source of event
    * @returns {Promise} Resolves when all the handlers have done their job
    */
   _triggerFeatureEventHandlers(conversationEntity, eventJson, eventSource) {
@@ -3334,9 +3334,9 @@ export class ConversationRepository {
    * Handles conversation update and notification message.
    *
    * @private
-   * @param {Object} entityObject - Object containing the conversation and the message that are targeted by the event
-   * @param {EventRepository.SOURCE} eventSource - Source of event
-   * @param {boolean} previouslyArchived - `true` if the previous state of the conversation was archived
+   * @param {Object} entityObject Object containing the conversation and the message that are targeted by the event
+   * @param {EventRepository.SOURCE} eventSource Source of event
+   * @param {boolean} previouslyArchived `true` if the previous state of the conversation was archived
    * @returns {Promise} Resolves when the conversation was updated
    */
   _handleConversationNotification(entityObject = {}, eventSource, previouslyArchived) {
@@ -3378,8 +3378,8 @@ export class ConversationRepository {
 
   /**
    * Push to receiving queue.
-   * @param {Object} eventJson - JSON data for event
-   * @param {EventRepository.SOURCE} source - Source of event
+   * @param {Object} eventJson JSON data for event
+   * @param {EventRepository.SOURCE} source Source of event
    * @returns {undefined} No return value
    */
   _pushToReceivingQueue(eventJson, source) {
@@ -3451,8 +3451,8 @@ export class ConversationRepository {
    * An asset was uploaded.
    *
    * @private
-   * @param {Conversation} conversationEntity - Conversation to add the event to
-   * @param {Object} event_json - JSON data of 'conversation.asset-upload-complete' event
+   * @param {Conversation} conversationEntity Conversation to add the event to
+   * @param {Object} event_json JSON data of 'conversation.asset-upload-complete' event
    * @returns {Promise} Resolves when the event was handled
    */
   _on_asset_upload_complete(conversationEntity, event_json) {
@@ -3471,8 +3471,8 @@ export class ConversationRepository {
    * A conversation was created.
    *
    * @private
-   * @param {Object} eventJson - JSON data of 'conversation.create' event
-   * @param {EventRepository.SOURCE} eventSource - Source of event
+   * @param {Object} eventJson JSON data of 'conversation.create' event
+   * @param {EventRepository.SOURCE} eventSource Source of event
    * @returns {Promise} Resolves when the event was handled
    */
   async _onCreate(eventJson, eventSource) {
@@ -3535,8 +3535,8 @@ export class ConversationRepository {
    * Users were added to a group conversation.
    *
    * @private
-   * @param {Conversation} conversationEntity - Conversation to add users to
-   * @param {Object} eventJson - JSON data of 'conversation.member-join' event
+   * @param {Conversation} conversationEntity Conversation to add users to
+   * @param {Object} eventJson JSON data of 'conversation.member-join' event
    * @returns {Promise} Resolves when the event was handled
    */
   async _onMemberJoin(conversationEntity, eventJson) {
@@ -3579,8 +3579,8 @@ export class ConversationRepository {
    * Members of a group conversation were removed or left.
    *
    * @private
-   * @param {Conversation} conversationEntity - Conversation to remove users from
-   * @param {Object} eventJson - JSON data of 'conversation.member-leave' event
+   * @param {Conversation} conversationEntity Conversation to remove users from
+   * @param {Object} eventJson JSON data of 'conversation.member-leave' event
    * @returns {Promise} Resolves when the event was handled
    */
   _onMemberLeave(conversationEntity, eventJson) {
@@ -3629,8 +3629,8 @@ export class ConversationRepository {
    * Membership properties for a conversation were updated.
    *
    * @private
-   * @param {Conversation} conversationEntity - Conversation entity that will be updated
-   * @param {Object} eventJson - JSON data of 'conversation.member-update' event
+   * @param {Conversation} conversationEntity Conversation entity that will be updated
+   * @param {Object} eventJson JSON data of 'conversation.member-update' event
    * @returns {Promise} Resolves when the event was handled
    */
   _onMemberUpdate(conversationEntity, eventJson) {
@@ -3683,8 +3683,8 @@ export class ConversationRepository {
    * An asset received in a conversation.
    *
    * @private
-   * @param {Conversation} conversationEntity - Conversation to add the event to
-   * @param {Object} event - JSON data of 'conversation.asset-add'
+   * @param {Conversation} conversationEntity Conversation to add the event to
+   * @param {Object} event JSON data of 'conversation.asset-add'
    * @returns {Promise} Resolves when the event was handled
    */
   _onAssetAdd(conversationEntity, event) {
@@ -3709,8 +3709,8 @@ export class ConversationRepository {
    * A hide message received in a conversation.
    *
    * @private
-   * @param {Conversation} conversationEntity - Conversation to add the event to
-   * @param {Object} eventJson - JSON data of 'conversation.message-delete'
+   * @param {Conversation} conversationEntity Conversation to add the event to
+   * @param {Object} eventJson JSON data of 'conversation.message-delete'
    * @returns {Promise} Resolves when the event was handled
    */
   _onMessageDeleted(conversationEntity, eventJson) {
@@ -3749,7 +3749,7 @@ export class ConversationRepository {
    * A hide message received in a conversation.
    *
    * @private
-   * @param {Object} eventJson - JSON data of 'conversation.message-hidden'
+   * @param {Object} eventJson JSON data of 'conversation.message-hidden'
    * @returns {Promise} Resolves when the event was handled
    */
   _onMessageHidden(eventJson) {
@@ -3786,8 +3786,8 @@ export class ConversationRepository {
    * Someone reacted to a message.
    *
    * @private
-   * @param {Conversation} conversationEntity - Conversation entity that a message was reacted upon in
-   * @param {Object} eventJson - JSON data of 'conversation.reaction' event
+   * @param {Conversation} conversationEntity Conversation entity that a message was reacted upon in
+   * @param {Object} eventJson JSON data of 'conversation.reaction' event
    * @returns {Promise} Resolves when the event was handled
    */
   _onReaction(conversationEntity, eventJson) {
@@ -3828,8 +3828,8 @@ export class ConversationRepository {
    * A conversation was renamed.
    *
    * @private
-   * @param {Conversation} conversationEntity - Conversation entity that will be renamed
-   * @param {Object} eventJson - JSON data of 'conversation.rename' event
+   * @param {Conversation} conversationEntity Conversation entity that will be renamed
+   * @param {Object} eventJson JSON data of 'conversation.rename' event
    * @returns {Promise} Resolves when the event was handled
    */
   _onRename(conversationEntity, eventJson) {
@@ -3843,8 +3843,8 @@ export class ConversationRepository {
    * A conversation receipt mode was changed
    *
    * @private
-   * @param {Conversation} conversationEntity - Conversation entity that will be renamed
-   * @param {Object} eventJson - JSON data of 'conversation.receipt-mode-update' event
+   * @param {Conversation} conversationEntity Conversation entity that will be renamed
+   * @param {Object} eventJson JSON data of 'conversation.receipt-mode-update' event
    * @returns {Promise<{conversationEntity, messageEntity}>} Resolves when the event was handled
    */
   _onReceiptModeChanged(conversationEntity, eventJson) {
@@ -3895,8 +3895,8 @@ export class ConversationRepository {
    * Convert a JSON event into an entity and add it to a given conversation.
    *
    * @private
-   * @param {Conversation} conversationEntity - Conversation entity the event will be added to
-   * @param {Object} eventJson - Event data
+   * @param {Conversation} conversationEntity Conversation entity the event will be added to
+   * @param {Object} eventJson Event data
    * @returns {Promise} Promise that resolves with the message entity for the event
    */
   async _addEventToConversation(conversationEntity, eventJson) {
@@ -3914,9 +3914,9 @@ export class ConversationRepository {
    * Convert multiple JSON events into entities and add them to a given conversation.
    *
    * @private
-   * @param {Array} events - Event data
-   * @param {Conversation} conversationEntity - Conversation entity the events will be added to
-   * @param {boolean} [prepend=true] - Should existing messages be prepended
+   * @param {Array} events Event data
+   * @param {Conversation} conversationEntity Conversation entity the events will be added to
+   * @param {boolean} [prepend=true] Should existing messages be prepended
    * @returns {Promise} Resolves with an array of mapped messages
    */
   async _addEventsToConversation(events, conversationEntity, prepend = true) {
@@ -3935,7 +3935,7 @@ export class ConversationRepository {
    * Fetch all unread events and users of a conversation.
    *
    * @private
-   * @param {Conversation} conversationEntity - Conversation fetch events and users for
+   * @param {Conversation} conversationEntity Conversation fetch events and users for
    * @returns {undefined} No return value
    */
   _fetch_users_and_events(conversationEntity) {
@@ -3949,8 +3949,8 @@ export class ConversationRepository {
    * Forward the reaction event to the Notification repository for browser and audio notifications.
    *
    * @private
-   * @param {Conversation} conversationEntity - Conversation that event was received in
-   * @param {Message} messageEntity - Message that has been reacted upon
+   * @param {Conversation} conversationEntity Conversation that event was received in
+   * @param {Message} messageEntity Message that has been reacted upon
    * @param {Object} eventJson -] JSON data of received reaction event
    * @returns {Promise} Resolves when the notification was prepared
    */
@@ -3978,7 +3978,7 @@ export class ConversationRepository {
    * Updates the user entities that are part of a message.
    *
    * @private
-   * @param {Message} messageEntity - Message to be updated
+   * @param {Message} messageEntity Message to be updated
    * @returns {Promise} Resolves when users have been update
    */
   _updateMessageUserEntities(messageEntity) {
@@ -4011,7 +4011,7 @@ export class ConversationRepository {
 
   /**
    * Cancel asset upload.
-   * @param {string} messageId - Id of the message which upload has been cancelled
+   * @param {string} messageId Id of the message which upload has been cancelled
    * @returns {undefined} No return value
    */
   cancel_asset_upload(messageId) {
@@ -4022,8 +4022,8 @@ export class ConversationRepository {
    * Delete message from UI and database. Primary key is used to delete message in database.
    *
    * @private
-   * @param {Conversation} conversationEntity - Conversation that contains the message
-   * @param {Message} message_et - Message to delete
+   * @param {Conversation} conversationEntity Conversation that contains the message
+   * @param {Message} message_et Message to delete
    * @returns {Promise} Resolves when message was deleted
    */
   _delete_message(conversationEntity, message_et) {
@@ -4034,8 +4034,8 @@ export class ConversationRepository {
    * Delete message from UI and database. Primary key is used to delete message in database.
    *
    * @private
-   * @param {Conversation} conversationEntity - Conversation that contains the message
-   * @param {string} message_id - ID of message to delete
+   * @param {Conversation} conversationEntity Conversation that contains the message
+   * @param {string} message_id ID of message to delete
    * @returns {Promise} Resolves when message was deleted
    */
   _delete_message_by_id(conversationEntity, message_id) {
@@ -4046,8 +4046,8 @@ export class ConversationRepository {
    * Delete messages from UI and database.
    *
    * @private
-   * @param {Conversation} conversationEntity - Conversation that contains the message
-   * @param {number} [timestamp] - Timestamp as upper bound which messages to remove
+   * @param {Conversation} conversationEntity Conversation that contains the message
+   * @param {number} [timestamp] Timestamp as upper bound which messages to remove
    * @returns {undefined} No return value
    */
   _deleteMessages(conversationEntity, timestamp) {
@@ -4061,10 +4061,10 @@ export class ConversationRepository {
    * Add delete message to conversation.
    *
    * @private
-   * @param {string} conversationId - ID of conversation
-   * @param {string} messageId - ID of message
-   * @param {string} time - ISO 8601 formatted time string
-   * @param {Message} messageEntity - Message to delete
+   * @param {string} conversationId ID of conversation
+   * @param {string} messageId ID of message
+   * @param {string} time ISO 8601 formatted time string
+   * @param {Message} messageEntity Message to delete
    * @returns {undefined} No return value
    */
   _addDeleteMessage(conversationId, messageId, time, messageEntity) {
@@ -4078,8 +4078,8 @@ export class ConversationRepository {
 
   /**
    * Update asset in UI and DB as failed
-   * @param {Message} message_et - Message to update
-   * @param {string} [reason=AssetTransferState.UPLOAD_FAILED] - Failure reason
+   * @param {Message} message_et Message to update
+   * @param {string} [reason=AssetTransferState.UPLOAD_FAILED] Failure reason
    * @returns {Promise} Resolve when message was updated
    */
   update_message_as_upload_failed(message_et, reason = AssetTransferState.UPLOAD_FAILED) {
@@ -4118,9 +4118,9 @@ export class ConversationRepository {
   /**
    * Update asset in UI and DB as completed.
    *
-   * @param {Conversation} conversationEntity - Conversation that contains the message
-   * @param {Message} message_et - Message to update
-   * @param {Object} event_json - Uploaded asset event information
+   * @param {Conversation} conversationEntity Conversation that contains the message
+   * @param {Message} message_et Message to update
+   * @param {Object} event_json Uploaded asset event information
    * @returns {Promise} Resolve when message was updated
    */
   update_message_as_upload_complete(conversationEntity, message_et, event_json) {
@@ -4146,9 +4146,9 @@ export class ConversationRepository {
    * Track generic messages for media actions.
    *
    * @private
-   * @param {Conversation} conversationEntity - Conversation entity
-   * @param {GenericMessage} genericMessage - Protobuf message
-   * @param {CallMessageEntity} callMessageEntity - Optional call message
+   * @param {Conversation} conversationEntity Conversation entity
+   * @param {GenericMessage} genericMessage Protobuf message
+   * @param {CallMessageEntity} callMessageEntity Optional call message
    * @returns {undefined} No return value
    */
   _trackContributed(conversationEntity, genericMessage, callMessageEntity) {

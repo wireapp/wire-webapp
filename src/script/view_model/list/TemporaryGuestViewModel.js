@@ -27,9 +27,9 @@ class TemporaryGuestViewModel {
   /**
    * View model for the temporary guest experience.
    *
-   * @param {MainViewModel} mainViewModel - Main view model
-   * @param {z.viewModel.ListViewModel} listViewModel - List view model
-   * @param {Object} repositories - Object containing all repositories
+   * @param {MainViewModel} mainViewModel Main view model
+   * @param {z.viewModel.ListViewModel} listViewModel List view model
+   * @param {Object} repositories Object containing all repositories
    */
   constructor(mainViewModel, listViewModel, repositories) {
     this.conversationRepository = repositories.conversation;

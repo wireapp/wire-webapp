@@ -29,7 +29,7 @@ export class CryptographyService {
 
   /**
    * Construct a new Cryptography Service.
-   * @param {BackendClient} backendClient - Client for the API calls
+   * @param {BackendClient} backendClient Client for the API calls
    */
   constructor(backendClient) {
     this.backendClient = backendClient;
@@ -40,8 +40,8 @@ export class CryptographyService {
    * Gets a pre-key for a client of a user.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getPrekey
    *
-   * @param {string} userId - User ID
-   * @param {string} clientId - Client ID
+   * @param {string} userId User ID
+   * @param {string} clientId Client ID
    * @returns {Promise} Resolves with a pre-key for given the client of the user
    */
   getUserPreKeyByIds(userId, clientId) {
@@ -55,7 +55,7 @@ export class CryptographyService {
    * Gets a pre-key for each client of a user client map.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getMultiPrekeyBundles
    *
-   * @param {Object} recipients - User client map to request pre-keys for
+   * @param {Object} recipients User client map to request pre-keys for
    * @returns {Promise} Resolves with a pre-key for each client of the given map
    */
   getUsersPreKeys(recipients) {
@@ -69,8 +69,8 @@ export class CryptographyService {
   /**
    * Put pre-keys for client to be used by remote clients for session initialization.
    *
-   * @param {string} clientId - Local client ID
-   * @param {Array<string>} serializedPreKeys - Additional pre-keys to be made available
+   * @param {string} clientId Local client ID
+   * @param {Array<string>} serializedPreKeys Additional pre-keys to be made available
    * @returns {Promise} Resolves once the pre-keys are accepted
    */
   putClientPreKeys(clientId, serializedPreKeys) {

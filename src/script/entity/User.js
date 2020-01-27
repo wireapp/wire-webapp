@@ -187,9 +187,9 @@ class User {
 
   /**
    * Check whether handle or name matches the given query
-   * @param {string} query - Query
-   * @param {boolean} is_handle - Query string is handle
-   * @param {array} excludedChars - list of chars to exclude from getSlug
+   * @param {string} query Query
+   * @param {boolean} is_handle Query string is handle
+   * @param {array} excludedChars list of chars to exclude from getSlug
    * @returns {undefined} No return value
    */
   matches(query, is_handle, excludedChars = []) {

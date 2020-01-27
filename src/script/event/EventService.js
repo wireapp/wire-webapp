@@ -32,7 +32,7 @@ import {BaseError} from '../error/BaseError';
 export class EventService {
   /**
    * Construct a new Event Service.
-   * @param {StorageService} storageService - Service for all storage interactions
+   * @param {StorageService} storageService Service for all storage interactions
    */
   constructor(storageService) {
     this.storageService = storageService;
@@ -42,8 +42,8 @@ export class EventService {
   /**
    * Load events from database.
    *
-   * @param {string} conversationId - ID of conversation
-   * @param {string[]} eventIds - ID of events to retrieve
+   * @param {string} conversationId ID of conversation
+   * @param {string[]} eventIds ID of events to retrieve
    * @returns {Promise<Object[]>} Resolves with the stored records
    */
   async loadEvents(conversationId, eventIds) {
@@ -79,8 +79,8 @@ export class EventService {
   /**
    * Load event from database.
    *
-   * @param {string} conversationId - ID of conversation
-   * @param {string} eventId - ID of event to retrieve
+   * @param {string} conversationId ID of conversation
+   * @param {string} eventId ID of event to retrieve
    * @returns {Promise} Resolves with the stored record
    */
   async loadEvent(conversationId, eventId) {
@@ -115,9 +115,9 @@ export class EventService {
   /**
    * Load all events matching a minimum category from the database.
    *
-   * @param {string} conversationId - ID of conversation to add users to
-   * @param {MessageCategory} categoryMin - Minimum message category
-   * @param {MessageCategory} [categoryMax=MessageCategory.LIKED] - Maximum message category
+   * @param {string} conversationId ID of conversation to add users to
+   * @param {MessageCategory} categoryMin Minimum message category
+   * @param {MessageCategory} [categoryMax=MessageCategory.LIKED] Maximum message category
    * @returns {Promise} Resolves with matching events
    */
   async loadEventsWithCategory(conversationId, categoryMin, categoryMax = MessageCategory.LIKED) {
@@ -166,10 +166,10 @@ export class EventService {
   /**
    * Load events starting from the fromDate going back in history until either limit or toDate is reached.
    *
-   * @param {string} conversationId - ID of conversation
-   * @param {Date} [fromDate=new Date(0)] - Load from this date (included)
-   * @param {Date} [toDate=new Date()] - Load until this date (excluded)
-   * @param {number} [limit=Number.MAX_SAFE_INTEGER] - Amount of events to load
+   * @param {string} conversationId ID of conversation
+   * @param {Date} [fromDate=new Date(0)] Load from this date (included)
+   * @param {Date} [toDate=new Date()] Load until this date (excluded)
+   * @param {number} [limit=Number.MAX_SAFE_INTEGER] Amount of events to load
    * @returns {Promise} Resolves with the retrieved records
    */
   async loadPrecedingEvents(
@@ -198,10 +198,10 @@ export class EventService {
   /**
    * Load events starting from the fromDate to the present until the limit is reached.
    *
-   * @param {string} conversationId - ID of conversation
-   * @param {Date} fromDate - Load until this date (excluded)
-   * @param {number} [limit=Number.MAX_SAFE_INTEGER] - Amount of events to load
-   * @param {number} [includeFrom=true] - Should upper bound be part of the messages
+   * @param {string} conversationId ID of conversation
+   * @param {Date} fromDate Load until this date (excluded)
+   * @param {number} [limit=Number.MAX_SAFE_INTEGER] Amount of events to load
+   * @param {number} [includeFrom=true] Should upper bound be part of the messages
    * @returns {Promise} Resolves with the retrieved records
    */
   async loadFollowingEvents(conversationId, fromDate, limit = Number.MAX_SAFE_INTEGER, includeFrom = true) {
@@ -221,11 +221,11 @@ export class EventService {
 
   /**
    *
-   * @param {string} conversationId - The conversation ID
-   * @param {Date} fromDate - The lower date bound
-   * @param {Date} toDate - The upper date bound
-   * @param {number} limit - The events limit
-   * @param {{includeFrom: boolean, includeTo: boolean}} includes - If from and to should be included
+   * @param {string} conversationId The conversation ID
+   * @param {Date} fromDate The lower date bound
+   * @param {Date} toDate The upper date bound
+   * @param {number} limit The events limit
+   * @param {{includeFrom: boolean, includeTo: boolean}} includes If from and to should be included
    * @returns {Promise<Object[]>} The found events
    */
   async _loadEventsInDateRange(conversationId, fromDate, toDate, limit, includes) {
@@ -270,7 +270,7 @@ export class EventService {
    * Save an unencrypted conversation event.
    * Will also recompute the category of the event to be stored.
    *
-   * @param {Object} event - JSON event to be stored
+   * @param {Object} event JSON event to be stored
    * @returns {Promise<Event>} Resolves with the stored record
    */
   async saveEvent(event) {
@@ -282,7 +282,7 @@ export class EventService {
   /**
    * Update an unencrypted event.
    *
-   * @param {Object} event - JSON event to be stored
+   * @param {Object} event JSON event to be stored
    * @returns {Promise<Event>} Resolves with the updated record
    */
   replaceEvent(event) {
@@ -300,8 +300,8 @@ export class EventService {
   /**
    * Update event as uploaded in database.
    *
-   * @param {string} primaryKey - Primary key used to find an event in the database
-   * @param {Object} event - Updated event asset data
+   * @param {string} primaryKey Primary key used to find an event in the database
+   * @param {Object} event Updated event asset data
    * @returns {Promise} Resolves when the message was updated in database
    */
   updateEventAsUploadSucceeded(primaryKey, event) {
@@ -326,8 +326,8 @@ export class EventService {
   /**
    * Update event as upload failed in database.
    *
-   * @param {string} primaryKey - Primary key used to find an event in the database
-   * @param {string} reason - Failure reason
+   * @param {string} primaryKey Primary key used to find an event in the database
+   * @param {string} reason Failure reason
    * @returns {Promise} Resolves when the message was updated in database
    */
   updateEventAsUploadFailed(primaryKey, reason) {
@@ -349,8 +349,8 @@ export class EventService {
    * Update an unencrypted event.
    * A valid update must not contain a 'version' property.
    *
-   * @param {number} primaryKey - event's primary key
-   * @param {Object<Event>} [updates={}] - Updates to perform on the message.
+   * @param {number} primaryKey event's primary key
+   * @param {Object<Event>} [updates={}] Updates to perform on the message.
    * @returns {Promise} Resolves when the message was updated in database.
    */
   updateEvent(primaryKey, updates) {
@@ -375,8 +375,8 @@ export class EventService {
   /**
    * Update an event in the database and checks that the update is sequential.
    *
-   * @param {number} primaryKey - Event primary key
-   * @param {Object} [changes={}] - Changes to update message with
+   * @param {number} primaryKey Event primary key
+   * @param {Object} [changes={}] Changes to update message with
    * @returns {Promise<Event>} Resolves when the message was updated in database
    */
   async updateEventSequentially(primaryKey, changes = {}) {
@@ -421,8 +421,8 @@ export class EventService {
   /**
    * Delete an event from a conversation. Duplicates are delete as well.
    *
-   * @param {string} conversationId - ID of conversation to remove message from
-   * @param {string} eventId - ID of the actual message
+   * @param {string} conversationId ID of conversation to remove message from
+   * @param {string} eventId ID of the actual message
    * @returns {Promise} Resolves with the number of deleted records
    */
   async deleteEvent(conversationId, eventId) {
@@ -432,7 +432,7 @@ export class EventService {
   /**
    * Delete an event from a conversation with the given primary.
    *
-   * @param {string} primaryKey - ID of the actual message
+   * @param {string} primaryKey ID of the actual message
    * @returns {Promise} Resolves with the number of deleted records
    */
   deleteEventByKey(primaryKey) {
@@ -442,8 +442,8 @@ export class EventService {
   /**
    * Delete all events of a conversation.
    *
-   * @param {string} conversationId - Delete events for this conversation
-   * @param {string} [isoDate] - Date in ISO string format as upper bound which events should be removed
+   * @param {string} conversationId Delete events for this conversation
+   * @param {string} [isoDate] Date in ISO string format as upper bound which events should be removed
    * @returns {Promise} Resolves when the events was deleted
    */
   async deleteEvents(conversationId, isoDate) {

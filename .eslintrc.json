@@ -45,6 +45,26 @@
     "z": true,
     "zeta": true
   },
+  "ignorePatterns": [".git/", "docs/", "node_modules/", "resource/", "server/bin/", "server/dist/", "server/node_modules/", "src/ext/", "src/script/localization/**/webapp*.js", "src/worker/"],
+  "overrides": [
+    {
+      "files": ["*.ts", "*.tsx"],
+      "parser": "@typescript-eslint/parser",
+      "parserOptions": {
+        "project": ["./tsconfig.json", "./server/tsconfig.json"]
+      },
+      "rules": {
+        "@typescript-eslint/no-floating-promises": "off",
+        "@typescript-eslint/typedef": "off",
+        "no-dupe-class-members": "off",
+        "no-undef": "off",
+        "no-unsanitized/property": "off",
+        "no-unused-vars": "off",
+        "prefer-promise-reject-errors": "off",
+        "valid-jsdoc": "off"
+      }
+    }
+  ],
   "plugins": ["jasmine"],
   "rules": {
     "id-length": "off",
@@ -52,8 +72,6 @@
     "jasmine/no-spec-dupes": "off",
     "jasmine/no-suite-dupes": "off",
     "jasmine/prefer-toHaveBeenCalledWith": "off",
-    "jsdoc/require-hyphen-before-param-description": "error",
-    "no-magic-numbers": "off",
-    "sort-imports": "off"
+    "no-magic-numbers": "off"
   }
 }

@@ -35,6 +35,7 @@ describe('ClientAction', () => {
       core: mockedCore,
     })({});
     await store.dispatch(actionRoot.clientAction.doGetAllClients());
+
     expect(store.getActions()).toEqual([
       ClientActionCreator.startGetAllClients(),
       ClientActionCreator.successfulGetAllClients([]),
@@ -87,6 +88,7 @@ describe('ClientAction', () => {
       core: mockedCore,
     })({});
     await store.dispatch(actionRoot.clientAction.doRemoveClient(clientId, password));
+
     expect(store.getActions()).toEqual([
       ClientActionCreator.startRemoveClient(),
       ClientActionCreator.successfulRemoveClient(clientId),

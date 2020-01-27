@@ -29,9 +29,9 @@ export class ReceiptsMiddleware {
    * This class is responsible for parsing incoming confirmation messages
    * It will update original messages when a confirmation is received
    *
-   * @param {EventService} eventService - Repository that handles events
-   * @param {UserRepository} userRepository - Repository that handles users
-   * @param {ConversationRepository} conversationRepository -  Repository for conversation interactions
+   * @param {EventService} eventService Repository that handles events
+   * @param {UserRepository} userRepository Repository that handles users
+   * @param {ConversationRepository} conversationRepository  Repository for conversation interactions
    */
   constructor(eventService, userRepository, conversationRepository) {
     this.eventService = eventService;
@@ -43,7 +43,7 @@ export class ReceiptsMiddleware {
   /**
    * Handles incoming (and injected outgoing) events.
    *
-   * @param {Object} event - event in the DB format
+   * @param {Object} event event in the DB format
    * @returns {Promise<Object>} event - the original event
    */
   processEvent(event) {

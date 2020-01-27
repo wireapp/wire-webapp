@@ -58,6 +58,7 @@ describe('SingleSignOnForm', () => {
     expect(wrapper.find('input[data-uie-name="enter-code"]').exists())
       .withContext('Code input exists')
       .toBe(true);
+
     expect(wrapper.find('input[data-uie-name="enter-code"]').props().value)
       .withContext('Code input has initial code value')
       .toEqual(code);

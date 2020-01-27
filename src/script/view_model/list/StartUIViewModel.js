@@ -43,9 +43,9 @@ class StartUIViewModel {
   }
 
   /**
-   * @param {MainViewModel} mainViewModel - Main view model
-   * @param {z.viewModel.ListViewModel} listViewModel - List view model
-   * @param {Object} repositories - Object containing all repositories
+   * @param {MainViewModel} mainViewModel Main view model
+   * @param {z.viewModel.ListViewModel} listViewModel List view model
+   * @param {Object} repositories Object containing all repositories
    */
   constructor(mainViewModel, listViewModel, repositories) {
     this.clickOnClose = this.clickOnClose.bind(this);

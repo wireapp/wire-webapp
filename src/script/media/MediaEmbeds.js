@@ -26,7 +26,7 @@ import {formatString} from 'Util/StringUtil';
 /**
  * Create and iframe.
  * @private
- * @param {Object} options - Settings to be used to create the iframe
+ * @param {Object} options Settings to be used to create the iframe
  * @returns {string} HTML string
  */
 const _createIframeContainer = options => {
@@ -75,9 +75,9 @@ const _regex = {
  * Appends an iFrame.
  *
  * @private
- * @param {HTMLAnchorElement} link - Link element
- * @param {string} message - Message containing the link
- * @param {string} iframe - HTML of iframe
+ * @param {HTMLAnchorElement} link Link element
+ * @param {string} message Message containing the link
+ * @param {string} iframe HTML of iframe
  * @returns {string} Message content
  */
 const _appendIframe = (link, message, iframe) => {
@@ -89,7 +89,7 @@ const _appendIframe = (link, message, iframe) => {
  * Find search parameters in a string
  *
  * @private
- * @param {string} params - String where we should find the parameters
+ * @param {string} params String where we should find the parameters
  * @returns {string} Parameters
  */
 const _getParameters = params => params.substr(params.indexOf('?'), params.length).replace(/^\?/, '');
@@ -98,7 +98,7 @@ const _getParameters = params => params.substr(params.indexOf('?'), params.lengt
  * Generate embed URL to use as src in iframes
  *
  * @private
- * @param {string} url - Given youtube url
+ * @param {string} url Given youtube url
  * @returns {string} Youtube embed URL
  */
 const _generateYouTubeEmbedUrl = url => {
@@ -143,7 +143,7 @@ const _generateYouTubeEmbedUrl = url => {
  * Converts youtube timestamp into seconds
  *
  * @private
- * @param {string} timestamp - Youtube timestamp (1h8m55s)
+ * @param {string} timestamp Youtube timestamp (1h8m55s)
  * @returns {number} Timestamp in seconds
  */
 const _convertYouTubeTimestampToSeconds = timestamp => {
@@ -170,8 +170,8 @@ export const MediaEmbeds = {
   /**
    * Appends SoundCloud iFrame if link is a valid SoundCloud source.
    *
-   * @param {HTMLAnchorElement} link - Link element
-   * @param {string} message - Message containing the link
+   * @param {HTMLAnchorElement} link Link element
+   * @param {string} message Message containing the link
    * @returns {string} Message with appended iFrame
    */
   soundcloud(link, message) {
@@ -215,8 +215,8 @@ export const MediaEmbeds = {
   /**
    * Appends Spotify iFrame if link is a valid Spotify source.
    *
-   * @param {HTMLAnchorElement} link - Link element
-   * @param {string} message - Message containing the link
+   * @param {HTMLAnchorElement} link Link element
+   * @param {string} message Message containing the link
    * @returns {string} Message with appended iFrame
    */
   spotify(link, message) {
@@ -247,9 +247,9 @@ export const MediaEmbeds = {
   /**
    * Appends Vimeo iFrame if link is a valid Vimeo source.
    *
-   * @param {HTMLAnchorElement} link - Link element
-   * @param {string} message - Message containing the link
-   * @param {string} themeColor - User color
+   * @param {HTMLAnchorElement} link Link element
+   * @param {string} message Message containing the link
+   * @param {string} themeColor User color
    * @returns {string} Message with appended iFrame
    */
   vimeo(link, message, themeColor) {
@@ -274,8 +274,8 @@ export const MediaEmbeds = {
   /**
    * Appends YouTube iFrame if link is a valid YouTube source.
    *
-   * @param {HTMLAnchorElement} link - Link element
-   * @param {string} message - Message containing the link
+   * @param {HTMLAnchorElement} link Link element
+   * @param {string} message Message containing the link
    * @returns {string} Message with appended iFrame
    */
   youtube(link, message) {

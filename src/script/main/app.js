@@ -147,9 +147,9 @@ class App {
 
   /**
    * Construct a new app.
-   * @param {BackendClient} backendClient - Configured backend client
-   * @param {Element} appContainer - DOM element that will hold the app
-   * @param {SQLeetEngine} [encryptedEngine] - Encrypted database handler
+   * @param {BackendClient} backendClient Configured backend client
+   * @param {Element} appContainer DOM element that will hold the app
+   * @param {SQLeetEngine} [encryptedEngine] Encrypted database handler
    */
   constructor(backendClient, appContainer, encryptedEngine) {
     this.backendClient = backendClient;
@@ -293,7 +293,7 @@ class App {
 
   /**
    * Create all app services.
-   * @param {SQLeetEngine} [encryptedEngine] - Encrypted database handler
+   * @param {SQLeetEngine} [encryptedEngine] Encrypted database handler
    * @returns {Object} All services
    */
   _setupServices(encryptedEngine) {
@@ -333,7 +333,7 @@ class App {
    *   Any failure in the Promise chain will result in a logout.
    * @todo Check if we really need to logout the user in all these error cases or how to recover from them
    *
-   * @param {boolean} [isReload=_isReload()] - App init after page reload
+   * @param {boolean} [isReload=_isReload()] App init after page reload
    * @returns {undefined} No return value
    */
   async initApp() {
@@ -548,7 +548,7 @@ class App {
 
   /**
    * Check whether we need to set different user information (picture, username).
-   * @param {User} userEntity - Self user entity
+   * @param {User} userEntity Self user entity
    * @returns {User} Checked user entity
    */
   _checkUserInformation(userEntity) {
@@ -739,8 +739,8 @@ class App {
   /**
    * Logs the user out on the backend and deletes cached data.
    *
-   * @param {SIGN_OUT_REASON} signOutReason - Cause for logout
-   * @param {boolean} clearData - Keep data in database
+   * @param {SIGN_OUT_REASON} signOutReason Cause for logout
+   * @param {boolean} clearData Keep data in database
    * @returns {undefined} No return value
    */
   logout(signOutReason, clearData = false) {
@@ -853,7 +853,7 @@ class App {
 
   /**
    * Redirect to the login page after internet connectivity has been verified.
-   * @param {SIGN_OUT_REASON} signOutReason - Redirect triggered by session expiration
+   * @param {SIGN_OUT_REASON} signOutReason Redirect triggered by session expiration
    * @returns {undefined} No return value
    */
   _redirectToLogin(signOutReason) {

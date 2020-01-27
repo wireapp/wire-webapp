@@ -25,10 +25,10 @@ import {ContentViewModel} from '../ContentViewModel';
 class PreferencesListViewModel {
   /**
    * View model for the preferences list.
-   * @param {ContentViewModel} contentViewModel - content view model
-   * @param {z.viewModel.ListViewModel} listViewModel - List view model
-   * @param {UserRepository} userRepository - Repository managing users
-   * @param {CallingRepository} callingRepository - Repository managing calls
+   * @param {ContentViewModel} contentViewModel content view model
+   * @param {z.viewModel.ListViewModel} listViewModel List view model
+   * @param {UserRepository} userRepository Repository managing users
+   * @param {CallingRepository} callingRepository Repository managing calls
    */
   constructor(contentViewModel, listViewModel, userRepository, callingRepository) {
     this.listViewModel = listViewModel;
