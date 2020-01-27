@@ -114,7 +114,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
 
         const changes = {
           ephemeral_expires: messageEntity.ephemeral_expires(),
-          ephemeral_started: messageEntity.ephemeral_started(),
+          ephemeral_started: Number(messageEntity.ephemeral_started()),
         };
 
         this.eventService.updateEvent(messageEntity.primary_key, changes);

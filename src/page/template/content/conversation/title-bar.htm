@@ -37,7 +37,7 @@
           </pickup-icon>
         <!-- /ko -->
       <!-- /ko -->
-      <info-icon class="conversation-title-bar-icon" data-bind="clickOrDrag: clickOnDetails, css: {'conversation-title-bar-icon--active': panelIsVisible()}" data-uie-name="do-open-info"></info-icon>
+      <info-icon class="conversation-title-bar-icon" data-bind="clickOrDrag: clickOnDetails, css: {'conversation-title-bar-icon--active': panelIsVisible()}, attr: {title: t('tooltipConversationInfo')}" data-uie-name="do-open-info"></info-icon>
     </div>
 
     <!-- ko if: badgeLabelCopy() -->

@@ -1470,9 +1470,8 @@ export class ConversationRepository {
       delete roles[userId];
       conversationEntity.roles(roles);
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-      const event = !!response
-        ? response
-        : z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
+      const event =
+        response || z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
 
       this.eventRepository.injectEvent(event, EventRepository.SOURCE.BACKEND_RESPONSE);
       return event;

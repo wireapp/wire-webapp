@@ -313,7 +313,7 @@ export class EventMapper {
 
     if (event.ephemeral_expires) {
       messageEntity.ephemeral_expires(event.ephemeral_expires);
-      messageEntity.ephemeral_started(event.ephemeral_started || '0');
+      messageEntity.ephemeral_started(Number(event.ephemeral_started) || 0);
     }
 
     if (isNaN(messageEntity.timestamp())) {

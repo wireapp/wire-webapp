@@ -266,7 +266,7 @@ export class ConversationMapper {
 
     conversationEntity.creator = creator;
     conversationEntity.type(type);
-    conversationEntity.name(name ? name : '');
+    conversationEntity.name(name || '');
 
     const selfState = members ? members.self : conversationData;
     conversationEntity = this.updateSelfStatus(conversationEntity, selfState);
@@ -277,7 +277,7 @@ export class ConversationMapper {
     }
 
     // Active participants from database or backend payload
-    const participatingUserIds = others ? others : members.others.map(other => other.id);
+    const participatingUserIds = others || members.others.map(other => other.id);
     conversationEntity.participating_user_ids(participatingUserIds);
 
     // Team ID from database or backend payload

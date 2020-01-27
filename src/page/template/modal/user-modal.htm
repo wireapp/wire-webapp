@@ -11,7 +11,7 @@
     </div>
     <div class="modal__body user-modal__wrapper" data-bind="css: {'user-modal__wrapper--max': !user() && !userNotFound() }">
       <!-- ko if: user() -->
-        <panel-user-details params="participant: user"></panel-user-details>
+        <panel-user-details params="participant: user, isSelfVerified: isSelfVerified"></panel-user-details>
         <enriched-fields params="user: user"></enriched-fields>
         <user-actions
           params="user: user, actionsViewModel: actionsViewModel, onAction: onUserAction, isSelfActivated: userRepository.isActivatedAccount()"

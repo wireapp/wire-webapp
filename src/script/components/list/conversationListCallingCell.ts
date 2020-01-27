@@ -17,6 +17,8 @@
  *
  */
 
+import ko from 'knockout';
+
 import {CALL_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 
 import {t} from 'Util/LocalizerUtil';
@@ -45,6 +47,7 @@ interface ComponentParams {
   multitasking: any;
   callActions: CallActions;
   hasAccessToCamera: ko.Observable<boolean>;
+  isSelfVerified: ko.Subscribable<boolean>;
 }
 
 class ConversationListCallingCell {
@@ -76,19 +79,19 @@ class ConversationListCallingCell {
   readonly showVideoGrid: ko.PureComputed<boolean>;
   readonly temporaryUserStyle: boolean;
   readonly videoGrid: ko.PureComputed<Grid>;
+  readonly isSelfVerified: ko.Subscribable<boolean>;
 
-  constructor(params: ComponentParams) {
-    const {
-      call,
-      conversation,
-      videoGrid,
-      callingRepository,
-      temporaryUserStyle = false,
-      multitasking,
-      callActions,
-      hasAccessToCamera,
-    } = params;
-
+  constructor({
+    call,
+    conversation,
+    videoGrid,
+    callingRepository,
+    temporaryUserStyle = false,
+    multitasking,
+    callActions,
+    hasAccessToCamera,
+    isSelfVerified = ko.observable(false),
+  }: ComponentParams) {
     this.call = call;
     this.conversation = conversation;
     this.callingRepository = callingRepository;
@@ -96,6 +99,7 @@ class ConversationListCallingCell {
     this.multitasking = multitasking;
     this.callActions = callActions;
     this.ParticipantAvatar = ParticipantAvatar;
+    this.isSelfVerified = isSelfVerified;
 
     this.conversationUrl = generateConversationUrl(conversation().id);
     this.multitasking.isMinimized(false); // reset multitasking default value, the call will be fullscreen if there are some remote videos
@@ -296,7 +300,7 @@ ko.components.register('conversation-list-calling-cell', {
 
       <div class="call-ui__participant-list__wrapper" data-bind="css: {'call-ui__participant-list__wrapper--active': showParticipants}">
         <div class="call-ui__participant-list" data-bind="foreach: {data: call.participants(), as: 'participant', noChildContext: true}, fadingscrollbar" data-uie-name="list-call-ui-participants">
-            <participant-item params="participant: findUser(participant.userId), hideInfo: true, showCamera: participant.hasActiveVideo(), selfInTeam: $parent.selfInTeam" data-bind="css: {'no-underline': true}"></participant-item>
+            <participant-item params="participant: findUser(participant.userId), hideInfo: true, showCamera: participant.hasActiveVideo(), selfInTeam: $parent.selfInTeam, isSelfVerified: isSelfVerified" data-bind="css: {'no-underline': true}"></participant-item>
         </div>
       </div>
 
