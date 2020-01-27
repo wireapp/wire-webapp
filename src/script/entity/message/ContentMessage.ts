@@ -28,6 +28,7 @@ import {SuperType} from '../../message/SuperType';
 import {User} from '../User';
 import {Asset} from './Asset';
 import {File as FileAsset} from './File';
+import {MediumImage} from './MediumImage';
 import {Message} from './Message';
 import {Text as TextAsset} from './Text';
 
@@ -174,8 +175,9 @@ export class ContentMessage extends Message {
    * Download message content.
    */
   download(): void {
-    const asset_et = this.get_first_asset() as FileAsset;
-    asset_et.download();
+    const asset_et = this.get_first_asset() as FileAsset | MediumImage;
+    const fileName = this.get_content_name();
+    asset_et.download(fileName);
   }
 
   /**
