@@ -17,10 +17,9 @@
  *
  */
 
-import moment from 'moment';
-
 import {iterateItem} from 'Util/ArrayUtil';
 import {KEY} from 'Util/KeyboardUtil';
+import {formatLocale} from 'Util/TimeUtil';
 
 import {WebAppEvents} from '../event/WebApp';
 import {Modal} from '../ui/Modal';
@@ -150,7 +149,7 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
   }
 
   formatTimestamp(timestamp) {
-    return moment(timestamp).format('L LT');
+    return formatLocale(timestamp, 'P p');
   }
 
   _loadImage() {

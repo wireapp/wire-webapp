@@ -17,9 +17,8 @@
  *
  */
 
-import moment from 'moment';
-
 import {t} from 'Util/LocalizerUtil';
+import {formatLocale} from 'Util/TimeUtil';
 
 import {BasePanelViewModel} from './BasePanelViewModel';
 import {WebAppEvents} from '../../event/WebApp';
@@ -52,7 +51,7 @@ export class MessageDetailsViewModel extends BasePanelViewModel {
       RECEIPTS_OFF: 'receipts-off',
     };
 
-    const formatTime = time => moment(time).format('L, LT');
+    const formatTime = time => formatLocale(time, 'P, p');
 
     this.message = ko.pureComputed(() => {
       if (!this.isVisible()) {

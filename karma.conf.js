@@ -53,7 +53,7 @@ module.exports = function(config) {
   config.set({
     autoWatch: false,
     basePath: './',
-    browserNoActivityTimeout: 120000,
+    browserNoActivityTimeout: 240000,
     browsers: ['ChromeNoSandbox'],
     client: {
       jasmine: {

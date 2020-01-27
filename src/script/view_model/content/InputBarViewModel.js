@@ -17,13 +17,12 @@
  *
  */
 
-import moment from 'moment';
 import {escape} from 'underscore';
 import {Availability} from '@wireapp/protocol-messaging';
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS, formatLocale} from 'Util/TimeUtil';
 import {afterRender, formatBytes} from 'Util/util';
 import {renderMessage} from 'Util/messageRenderer';
 import {KEY, isFunctionKey, insertAtCaret} from 'Util/KeyboardUtil';
@@ -272,7 +271,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
           this.pastedFilePreviewUrl(URL.createObjectURL(blob));
         }
 
-        const date = moment(blob.lastModifiedDate).format('LL, LTS');
+        const date = formatLocale(blob.lastModifiedDate, 'PP, pp');
         return this.pastedFileName(t('conversationSendPastedFile', date));
       }
 

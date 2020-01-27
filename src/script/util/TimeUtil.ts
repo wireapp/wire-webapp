@@ -17,10 +17,50 @@
  *
  */
 
-import moment from 'moment';
+import {
+  differenceInDays,
+  differenceInHours,
+  differenceInMinutes,
+  format,
+  formatDistanceToNow,
+  fromUnixTime,
+  isBefore,
+  isSameDay,
+  isSameMonth,
+  isThisYear,
+  isToday,
+  isYesterday,
+  startOfToday,
+} from 'date-fns';
+import {
+  cs,
+  da,
+  de,
+  el,
+  enUS,
+  es,
+  et,
+  fi,
+  fr,
+  hr,
+  hu,
+  it,
+  lt,
+  nl,
+  pl,
+  pt,
+  ro,
+  ru,
+  sk,
+  sl,
+  tr,
+  uk,
+} from 'date-fns/locale';
 
 import {t} from './LocalizerUtil';
 import {zeroPadding} from './util';
+
+type FnDate = number | Date;
 
 interface DiscreteTimeUnit {
   longUnit: string;
@@ -42,6 +82,39 @@ export enum TIME_IN_MILLIS {
   WEEK = DAY * 7,
   YEAR = DAY * 365,
 }
+const locales = {cs, da, de, el, es, et, fi, fr, hr, hu, it, lt, nl, pl, pt, ro, ru, sk, sl, tr, uk};
+const defaultLocale = enUS;
+let locale = defaultLocale;
+
+export const setDateLocale = (newLocale: keyof typeof locales) => (locale = locales[newLocale] || defaultLocale);
+
+export const formatLocale = (date: FnDate, formatString: string) => format(new Date(date), formatString, {locale});
+
+/**
+ * Format the time as `12:00 AM`.
+ * This is equivalent to momentjs' `LT` formatting
+ */
+export const formatTimeShort = (date: FnDate) => formatLocale(date, 'p');
+
+/**
+ * Format the date as `May 29, 2020`.
+ * This is equivalent to momentjs' `LL` formatting
+ */
+export const formatDateShort = (date: FnDate) => formatLocale(date, 'PP');
+export const formatDayMonth = (date: FnDate) =>
+  formatDateShort(date)
+    .replace(/[0-9]{4}/g, '')
+    .replace(/^\W|\W$|\W\W/, '');
+
+/**
+ * Format the date as `05/29/2020`.
+ * This is equivalent to momentjs' `L` formatting
+ */
+export const formatDateNumeral = (date: FnDate) => formatLocale(date, 'P');
+export const formatDayMonthNumeral = (date: FnDate) =>
+  formatDateNumeral(date)
+    .replace(/[0-9]{4}/g, '')
+    .replace(locale === de ? /\W$|\W\W/ : /^\W|\W$|\W\W/, '');
 
 const durationUnits = () => [
   {
@@ -187,16 +260,23 @@ export const formatSeconds = (duration: number): string => {
  * @returns Human readable format of a timestamp.
  */
 export const formatTimestamp = (timestamp: number | string, longFormat: boolean = true): string => {
-  const time = moment(timestamp);
-  let format = 'L (HH:mm:ss)';
+  const time = new Date(timestamp);
+  let format = 'P (HH:mm:ss)';
 
   if (longFormat) {
-    format = moment().year() === time.year() ? 'ddd D MMM, HH:mm' : 'ddd D MMM YYYY, HH:mm';
+    format = isThisYear(new Date(timestamp)) ? 'eee dd MMM, HH:mm' : 'eee dd MMM yyyy, HH:mm';
   }
 
-  return time.format(format);
+  return formatLocale(time, format);
 };
 
 export const getCurrentDate = () => new Date().toISOString().substring(0, 10);
-
 export const getUnixTimestamp = () => Math.floor(Date.now() / TIME_IN_MILLIS.SECOND);
+export const isBeforeToday = (date: FnDate): boolean => isBefore(date, startOfToday());
+export const isYoungerThan2Minutes = (date: FnDate): boolean => differenceInMinutes(new Date(), date) < 2;
+export const isYoungerThan1Hour = (date: FnDate) => differenceInHours(new Date(), date) < 1;
+export const isYoungerThan7Days = (date: FnDate) => differenceInDays(new Date(), date) < 7;
+
+export const fromNowLocale = (date: FnDate) => formatDistanceToNow(date, {addSuffix: true, locale});
+
+export {isToday, fromUnixTime, isYesterday, isSameDay, isSameMonth, isThisYear, differenceInHours, differenceInMinutes};
