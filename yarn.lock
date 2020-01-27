@@ -1210,6 +1210,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/generate-changelog@1.8.0":
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/@types/generate-changelog/-/generate-changelog-1.8.0.tgz#ed9d3f0b3255ab64c3ab022ec65792d7a5bf8c6f"
+  integrity sha512-JEpf0zZOuJHrHAiTOL8s9fP6uyvooJkxDoCUJFquWN9N9WyjU+14F1j0aDcn1Zc3PkdPwnQSUYlljv1UHgz8pQ==
+
 "@types/glob@^7.1.1":
   version "7.1.1"
   resolved "https://registry.yarnpkg.com/@types/glob/-/glob-7.1.1.tgz#aa59a1c6e3fbc421e07ccd31a944c30eba521575"
@@ -10714,7 +10719,6 @@ rechoir@^0.6.2:
 
 "reconnecting-websocket@github:wireapp/reconnecting-websocket#96ac796ae8c7a7d9d857f46ed39dbedd7b9ad378":
   version "4.2.0"
-  uid "96ac796ae8c7a7d9d857f46ed39dbedd7b9ad378"
   resolved "https://codeload.github.com/wireapp/reconnecting-websocket/tar.gz/96ac796ae8c7a7d9d857f46ed39dbedd7b9ad378"
 
 redent@^1.0.0:
