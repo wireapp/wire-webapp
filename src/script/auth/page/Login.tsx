@@ -34,17 +34,16 @@ import {
   IsMobile,
   Link,
   Muted,
-  Small,
 } from '@wireapp/react-ui-kit';
 import React, {useEffect, useState} from 'react';
-import {FormattedHTMLMessage, useIntl} from 'react-intl';
+import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {Redirect} from 'react-router';
 import {AnyAction, Dispatch} from 'redux';
 import useReactRouter from 'use-react-router';
 import {getLogger} from 'Util/Logger';
 import {Config} from '../../Config';
-import {loginStrings, logoutReasonStrings} from '../../strings';
+import {loginStrings} from '../../strings';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import LoginForm from '../component/LoginForm';
 import RouterLink from '../component/RouterLink';
@@ -83,15 +82,7 @@ const Login = ({
   const [conversationKey, setConversationKey] = useState();
 
   const [isValidLink, setIsValidLink] = useState(true);
-  const [logoutReason, setLogoutReason] = useState();
   const [validationErrors, setValidationErrors] = useState([]);
-
-  useEffect(() => {
-    const queryLogoutReason = URLUtil.getURLParameter(QUERY_KEY.LOGOUT_REASON) || null;
-    if (queryLogoutReason) {
-      setLogoutReason(queryLogoutReason);
-    }
-  }, []);
 
   useEffect(() => {
     const queryConversationCode = URLUtil.getURLParameter(QUERY_KEY.CONVERSATION_CODE) || null;
@@ -210,10 +201,6 @@ const Login = ({
                     parseValidationErrors(validationErrors)
                   ) : loginError ? (
                     <ErrorMessage data-uie-name="error-message">{parseError(loginError)}</ErrorMessage>
-                  ) : logoutReason ? (
-                    <Small center style={{marginBottom: '16px'}} data-uie-name="status-logout-reason">
-                      <FormattedHTMLMessage {...logoutReasonStrings[logoutReason]} />
-                    </Small>
                   ) : (
                     <div style={{marginTop: '4px'}}>&nbsp;</div>
                   )}

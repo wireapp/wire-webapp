@@ -19,29 +19,31 @@
 
 import {ClientType} from '@wireapp/api-client/dist/client/index';
 import {BackendErrorLabel} from '@wireapp/api-client/dist/http';
+import {UrlUtil} from '@wireapp/commons';
 import {PATTERN, isValidEmail} from '@wireapp/commons/dist/commonjs/util/ValidationUtil';
 import {
   ArrowIcon,
   Checkbox,
   CheckboxLabel,
+  ErrorMessage,
   Form,
   Input,
   InputSubmitCombo,
   RoundIconButton,
 } from '@wireapp/react-ui-kit';
 import React, {useEffect, useRef, useState} from 'react';
-import {useIntl} from 'react-intl';
+import {FormattedHTMLMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 import useReactRouter from 'use-react-router';
-import {loginStrings, ssoLoginStrings} from '../../strings';
+import {loginStrings, logoutReasonStrings, ssoLoginStrings} from '../../strings';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {BackendError} from '../module/action/BackendError';
 import {ValidationError} from '../module/action/ValidationError';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as ClientSelector from '../module/selector/ClientSelector';
-import {ROUTE} from '../route';
+import {QUERY_KEY, ROUTE} from '../route';
 import {isDesktopApp} from '../Runtime';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 
@@ -73,6 +75,14 @@ const SingleSignOnForm = ({
   const [ssoError, setSsoError] = useState(null);
   const [isCodeOrMailInputValid, setIsCodeOrMailInputValid] = useState(true);
   const [validationError, setValidationError] = useState();
+  const [logoutReason, setLogoutReason] = useState();
+
+  useEffect(() => {
+    const queryLogoutReason = UrlUtil.getURLParameter(QUERY_KEY.LOGOUT_REASON) || null;
+    if (queryLogoutReason) {
+      setLogoutReason(queryLogoutReason);
+    }
+  }, []);
 
   useEffect(() => {
     if (initialCode && initialCode !== codeOrMail) {
@@ -206,6 +216,10 @@ const SingleSignOnForm = ({
         parseError(loginError)
       ) : ssoError ? (
         parseError(ssoError)
+      ) : logoutReason ? (
+        <ErrorMessage center data-uie-name="status-logout-reason">
+          <FormattedHTMLMessage {...logoutReasonStrings[logoutReason]} />
+        </ErrorMessage>
       ) : (
         <span style={{marginBottom: '4px'}}>&nbsp;</span>
       )}

@@ -17,13 +17,14 @@
  *
  */
 
-import {Button, COLOR, ContainerXS, Logo, Text} from '@wireapp/react-ui-kit';
-import React from 'react';
-import {useIntl} from 'react-intl';
+import {UrlUtil} from '@wireapp/commons';
+import {Button, COLOR, ContainerXS, ErrorMessage, Logo, Text} from '@wireapp/react-ui-kit';
+import React, {useEffect, useState} from 'react';
+import {FormattedHTMLMessage, useIntl} from 'react-intl';
 import useReactRouter from 'use-react-router';
 import {Config} from '../../Config';
-import {indexStrings} from '../../strings';
-import {ROUTE} from '../route';
+import {indexStrings, logoutReasonStrings} from '../../strings';
+import {QUERY_KEY, ROUTE} from '../route';
 import Page from './Page';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
@@ -31,6 +32,14 @@ interface Props extends React.HTMLProps<HTMLDivElement> {}
 const Index = ({}: Props) => {
   const {formatMessage: _} = useIntl();
   const {history} = useReactRouter();
+  const [logoutReason, setLogoutReason] = useState();
+
+  useEffect(() => {
+    const queryLogoutReason = UrlUtil.getURLParameter(QUERY_KEY.LOGOUT_REASON) || null;
+    if (queryLogoutReason) {
+      setLogoutReason(queryLogoutReason);
+    }
+  }, []);
   return (
     <Page>
       <ContainerXS centerText verticalCenter style={{width: '380px'}}>
@@ -53,17 +62,22 @@ const Index = ({}: Props) => {
           block
           backgroundColor={'transparent'}
           color={COLOR.BLUE}
-          style={{fontSize: '13px', border: `1px solid ${COLOR.BLUE}`, marginBottom: '120px'}}
+          style={{fontSize: '13px', border: `1px solid ${COLOR.BLUE}`}}
           data-uie-name="go-login"
         >
           {_(indexStrings.logIn)}
         </Button>
+        {logoutReason && (
+          <ErrorMessage center data-uie-name="status-logout-reason">
+            <FormattedHTMLMessage {...logoutReasonStrings[logoutReason]} />
+          </ErrorMessage>
+        )}
         <Button
           onClick={() => history.push(ROUTE.SSO)}
           block
           color={COLOR.TEXT}
           backgroundColor={COLOR.GRAY_LIGHTEN_64}
-          style={{fontSize: '13px'}}
+          style={{fontSize: '13px', marginTop: '120px'}}
           data-uie-name="go-sso-login"
         >
           {_(indexStrings.enterprise)}
