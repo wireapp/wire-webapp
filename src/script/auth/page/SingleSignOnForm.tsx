@@ -57,7 +57,7 @@ interface Props extends React.HTMLAttributes<HTMLDivElement> {
 const SSO_CODE_PREFIX = 'wire-';
 const SSO_CODE_PREFIX_REGEX = '[wW][iI][rR][eE]-';
 const SingleSignOnForm = ({
-  initialClientType,
+  initialClientType = ClientType.PERMANENT,
   initialCode,
   isFetching,
   loginError,
