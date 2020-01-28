@@ -63,7 +63,7 @@ const SingleSignOn = ({}: Props & ConnectedProps & DispatchProps) => {
   const [clientType, setClientType] = useState(ClientType.PERMANENT);
 
   useEffect(() => {
-    const queryClientType = UrlUtil.getURLParameter(QUERY_KEY.CLIENT_TYPE) || null;
+    const queryClientType = UrlUtil.getURLParameter(QUERY_KEY.CLIENT_TYPE);
     if (queryClientType === ClientType.TEMPORARY) {
       setClientType(ClientType.TEMPORARY);
     }

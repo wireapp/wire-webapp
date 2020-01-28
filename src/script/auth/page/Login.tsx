@@ -86,7 +86,7 @@ const Login = ({
   const [validationErrors, setValidationErrors] = useState([]);
 
   useEffect(() => {
-    const queryClientType = UrlUtil.getURLParameter(QUERY_KEY.CLIENT_TYPE) || null;
+    const queryClientType = UrlUtil.getURLParameter(QUERY_KEY.CLIENT_TYPE);
     if (queryClientType === ClientType.TEMPORARY) {
       pushLoginData({clientType: ClientType.TEMPORARY});
     }
