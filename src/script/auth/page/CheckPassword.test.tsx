@@ -34,7 +34,6 @@ describe('"CheckPassword"', () => {
 
   const passwordInput = () => wrapper.find('input[data-uie-name="enter-password"]').first();
   const loginButton = () => wrapper.find('button[data-uie-name="do-sign-in"]').first();
-  // const errorMessage = () => wrapper.find('[data-uie-name="error-message"]');
   const errorMessage = (errorLabel?: string) =>
     wrapper.find(`[data-uie-name="error-message"]${errorLabel ? `[data-uie-value="${errorLabel}"]` : ''}`);
 

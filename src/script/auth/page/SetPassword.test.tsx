@@ -19,6 +19,8 @@
 
 import {ReactWrapper} from 'enzyme';
 import React from 'react';
+import waitForExpect from 'wait-for-expect';
+import {ValidationError} from '../module/action/ValidationError';
 import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
@@ -29,7 +31,8 @@ describe('"SetPassword"', () => {
 
   const passwordInput = () => wrapper.find('input[data-uie-name="enter-password"]').first();
   const setPasswordButton = () => wrapper.find('button[data-uie-name="do-set-password"]').first();
-  const errorMessage = () => wrapper.find('[data-uie-name="error-message"]').first();
+  const errorMessage = (errorLabel?: string) =>
+    wrapper.find(`[data-uie-name="error-message"]${errorLabel ? `[data-uie-value="${errorLabel}"]` : ''}`);
 
   it('has disabled submit button as long as there is no input', () => {
     wrapper = mountComponent(
@@ -60,7 +63,7 @@ describe('"SetPassword"', () => {
       .toBe(false);
   });
 
-  it('handles invalid password', () => {
+  it('handles invalid password', async () => {
     wrapper = mountComponent(
       <SetPassword />,
       mockStoreFactory()({
@@ -73,21 +76,18 @@ describe('"SetPassword"', () => {
       }),
     );
 
-    expect(
-      errorMessage()
-        .text()
-        .trim(),
-    )
-      .withContext('does not show error')
-      .toEqual('');
+    expect(errorMessage().exists())
+      .withContext('Shows no error')
+      .toBe(false);
 
     passwordInput().simulate('change', {target: {value: 'e'}});
     setPasswordButton().simulate('submit');
 
-    expect(errorMessage().text())
-      .withContext('shows invalid password error')
-      .toEqual(
-        'Use at least 8 characters, with one lowercase letter, one capital letter, a number, and a special character.',
-      );
+    await waitForExpect(() => {
+      wrapper.update();
+      expect(errorMessage(ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH).exists())
+        .withContext('Shows invalid password error')
+        .toBe(true);
+    });
   });
 });

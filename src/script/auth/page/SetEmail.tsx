@@ -24,12 +24,12 @@ import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 import useReactRouter from 'use-react-router';
 import {setEmailStrings} from '../../strings';
+import Exception from '../component/Exception';
 import {actionRoot} from '../module/action';
 import {ValidationError} from '../module/action/ValidationError';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as SelfSelector from '../module/selector/SelfSelector';
 import {ROUTE} from '../route';
-import {isValidationError, parseError, parseValidationErrors} from '../util/errorUtil';
 import Page from './Page';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
@@ -97,7 +97,7 @@ const SetEmail = ({hasSelfEmail, isSelfSSOUser, doSetEmail, isFetching}: Props &
             required
             data-uie-name="enter-email"
           />
-          {!error ? <>&nbsp;</> : isValidationError(error) ? parseValidationErrors(error) : parseError(error)}
+          {!error ? <>&nbsp;</> : <Exception errors={[error]} />}
           <Button
             block
             showLoading={isFetching}

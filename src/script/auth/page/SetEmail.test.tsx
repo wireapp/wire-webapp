@@ -19,7 +19,9 @@
 
 import {ReactWrapper} from 'enzyme';
 import React from 'react';
+import waitForExpect from 'wait-for-expect';
 import {actionRoot} from '../module/action';
+import {ValidationError} from '../module/action/ValidationError';
 import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
@@ -30,7 +32,8 @@ describe('"SetEmail"', () => {
 
   const emailInput = () => wrapper.find('input[data-uie-name="enter-email"]').first();
   const verifyEmailButton = () => wrapper.find('button[data-uie-name="do-verify-email"]').first();
-  const errorMessage = () => wrapper.find('[data-uie-name="error-message"]').first();
+  const errorMessage = (errorLabel?: string) =>
+    wrapper.find(`[data-uie-name="error-message"]${errorLabel ? `[data-uie-value="${errorLabel}"]` : ''}`);
 
   it('has disabled submit button as long as there is no input', () => {
     wrapper = mountComponent(
@@ -61,7 +64,7 @@ describe('"SetEmail"', () => {
       .toBe(false);
   });
 
-  it('handles invalid email', () => {
+  it('handles invalid email', async () => {
     wrapper = mountComponent(
       <SetEmail />,
       mockStoreFactory()({
@@ -74,20 +77,19 @@ describe('"SetEmail"', () => {
       }),
     );
 
-    expect(
-      errorMessage()
-        .text()
-        .trim(),
-    )
-      .withContext('Does not show error')
-      .toEqual('');
+    expect(errorMessage().exists())
+      .withContext('Shows no error')
+      .toBe(false);
 
     emailInput().simulate('change', {target: {value: 'e'}});
     verifyEmailButton().simulate('submit');
 
-    expect(errorMessage().text())
-      .withContext('Shows invalid email error')
-      .toEqual('Please enter a valid email address');
+    await waitForExpect(() => {
+      wrapper.update();
+      expect(errorMessage(ValidationError.FIELD.EMAIL.TYPE_MISMATCH).exists())
+        .withContext('Shows invalid email error')
+        .toBe(true);
+    });
   });
 
   it('trims the email', () => {
