@@ -20,12 +20,28 @@
 import {getLinksFromHtml} from 'Util/UrlUtil';
 
 import {MediaEmbeds} from './MediaEmbeds';
+import {resolve, graph} from '../config/appResolver';
+import {Config} from '../Config';
+import {SelfService} from '@wireapp/core/dist/self';
+import {PropertiesRepository} from '../properties/PropertiesRepository';
+import {PropertiesService} from '../properties/PropertiesService';
+import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 
 class MediaParser {
   constructor() {
     this.renderMediaEmbeds = this.renderMediaEmbeds.bind(this);
+    const backendClient = resolve(graph.BackendClient);
+    backendClient.setSettings({
+      restUrl: Config.BACKEND_REST,
+      webSocketUrl: Config.BACKEND_WS,
+    });
+    const selfService = new SelfService(this.backendClient);
+    const propertiesRepository = new PropertiesRepository(new PropertiesService(this.backendClient), selfService);
+    const showEmbed = propertiesRepository.getPreference(PROPERTIES_TYPE.PREVIEWS.SEND);
 
-    this.embeds = [MediaEmbeds.soundcloud, MediaEmbeds.spotify, MediaEmbeds.vimeo, MediaEmbeds.youtube];
+    this.embeds = showEmbed
+      ? [MediaEmbeds.soundcloud, MediaEmbeds.spotify, MediaEmbeds.vimeo, MediaEmbeds.youtube]
+      : [];
   }
 
   /**
