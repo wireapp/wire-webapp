@@ -50,7 +50,7 @@ import {parseError, parseValidationErrors} from '../util/errorUtil';
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {
   doLogin: (code: string) => Promise<void>;
-  initialClientType: ClientType;
+  initialClientType?: ClientType;
   initialCode?: string;
 }
 
