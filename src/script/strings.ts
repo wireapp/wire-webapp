@@ -617,9 +617,13 @@ export const validationErrorStrings = defineMessages({
     defaultMessage: 'Wrong password. Please try again.',
     id: 'ValidationError.FIELD.PASSWORD_LOGIN.PATTERN_MISMATCH',
   },
-  [ValidationError.FIELD.SSO_LOGIN.PATTERN_MISMATCH]: {
-    defaultMessage: 'Invalid input',
-    id: 'ValidationError.FIELD.SSO_LOGIN.PATTERN_MISMATCH',
+  [ValidationError.FIELD.SSO_CODE.PATTERN_MISMATCH]: {
+    defaultMessage: 'Please enter a valid SSO access code',
+    id: 'ValidationError.FIELD.SSO_CODE.PATTERN_MISMATCH',
+  },
+  [ValidationError.FIELD.SSO_EMAIL_CODE.PATTERN_MISMATCH]: {
+    defaultMessage: 'Please enter a valid email or SSO access code',
+    id: 'ValidationError.FIELD.SSO_EMAIL_CODE.PATTERN_MISMATCH',
   },
   [ValidationError.FIELD.EMAIL.TYPE_MISMATCH]: {
     defaultMessage: 'Please enter a valid email address',

@@ -186,7 +186,11 @@ const SingleSignOnForm = ({
     <Form style={{marginTop: 30}} data-uie-name="sso" onSubmit={handleSubmit}>
       <InputSubmitCombo>
         <Input
-          name="sso-code"
+          name={
+            Config.FEATURE.ENABLE_DOMAIN_DISCOVERY
+              ? ValidationError.FIELD.SSO_EMAIL_CODE.name
+              : ValidationError.FIELD.SSO_CODE.name
+          }
           tabIndex={1}
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
             setCodeOrMail(event.target.value);
