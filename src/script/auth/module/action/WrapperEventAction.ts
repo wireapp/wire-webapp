@@ -36,8 +36,6 @@ export class WrapperEventAction {
   doSendNavigationEvent = (url: string): ThunkAction => {
     return async () => {
       const event = new WrapperNavigationEvent(url);
-      // tslint:disable-next-line:no-console
-      console.log('Dispatching event', event);
       window.dispatchEvent(event);
     };
   };
