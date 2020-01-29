@@ -20,10 +20,20 @@
 import {getLinksFromHtml} from 'Util/UrlUtil';
 
 import {MediaEmbeds} from './MediaEmbeds';
+import {WebAppEvents} from '../event/WebApp';
+import {amplify} from 'amplify';
 
 class MediaParser {
   constructor() {
     this.renderMediaEmbeds = this.renderMediaEmbeds.bind(this);
+    this.showEmbed = true;
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, ({settings}) => {
+      this.showEmbed = settings.previews.send;
+    });
+
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.PREVIEWS.SEND, value => {
+      this.showEmbed = value;
+    });
 
     this.embeds = [MediaEmbeds.soundcloud, MediaEmbeds.spotify, MediaEmbeds.vimeo, MediaEmbeds.youtube];
   }
@@ -37,10 +47,11 @@ class MediaParser {
    * @returns {string} Message with rendered media embeds
    */
   renderMediaEmbeds(message, themeColor) {
-    getLinksFromHtml(message).forEach(link => {
-      this.embeds.forEach(embed => (message = embed(link, message, themeColor)));
-    });
-
+    if (this.showEmbed) {
+      getLinksFromHtml(message).forEach(link => {
+        this.embeds.forEach(embed => (message = embed(link, message, themeColor)));
+      });
+    }
     return message;
   }
 }
