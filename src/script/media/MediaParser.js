@@ -20,28 +20,22 @@
 import {getLinksFromHtml} from 'Util/UrlUtil';
 
 import {MediaEmbeds} from './MediaEmbeds';
-import {resolve, graph} from '../config/appResolver';
-import {Config} from '../Config';
-import {SelfService} from '@wireapp/core/dist/self';
-import {PropertiesRepository} from '../properties/PropertiesRepository';
-import {PropertiesService} from '../properties/PropertiesService';
-import {PROPERTIES_TYPE} from '../properties/PropertiesType';
+import {WebAppEvents} from '../event/WebApp';
+import {amplify} from 'amplify';
 
 class MediaParser {
   constructor() {
     this.renderMediaEmbeds = this.renderMediaEmbeds.bind(this);
-    const backendClient = resolve(graph.BackendClient);
-    backendClient.setSettings({
-      restUrl: Config.BACKEND_REST,
-      webSocketUrl: Config.BACKEND_WS,
+    this.showEmbed = true;
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, ({settings}) => {
+      this.showEmbed = settings.emoji.replace_inline;
     });
-    const selfService = new SelfService(this.backendClient);
-    const propertiesRepository = new PropertiesRepository(new PropertiesService(this.backendClient), selfService);
-    const showEmbed = propertiesRepository.getPreference(PROPERTIES_TYPE.PREVIEWS.SEND);
 
-    this.embeds = showEmbed
-      ? [MediaEmbeds.soundcloud, MediaEmbeds.spotify, MediaEmbeds.vimeo, MediaEmbeds.youtube]
-      : [];
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.PREVIEWS.SEND, value => {
+      this.showEmbed = value;
+    });
+
+    this.embeds = [MediaEmbeds.soundcloud, MediaEmbeds.spotify, MediaEmbeds.vimeo, MediaEmbeds.youtube];
   }
 
   /**
@@ -53,10 +47,11 @@ class MediaParser {
    * @returns {string} Message with rendered media embeds
    */
   renderMediaEmbeds(message, themeColor) {
-    getLinksFromHtml(message).forEach(link => {
-      this.embeds.forEach(embed => (message = embed(link, message, themeColor)));
-    });
-
+    if (this.showEmbed) {
+      getLinksFromHtml(message).forEach(link => {
+        this.embeds.forEach(embed => (message = embed(link, message, themeColor)));
+      });
+    }
     return message;
   }
 }
