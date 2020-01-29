@@ -62,6 +62,7 @@ describe('SingleSignOnForm', () => {
     expect(codeOrEmailInput().exists())
       .withContext('Code input exists')
       .toBe(true);
+
     expect(codeOrEmailInput().props().value)
       .withContext('Code input has initial code value')
       .toEqual(code);
@@ -169,6 +170,7 @@ describe('SingleSignOnForm', () => {
         .toHaveBeenCalledWith(expectedHost);
     });
   });
+
   it('successfully redirects with registered domain and temporary client', async () => {
     const email = 'mail@mail.com';
     const inputHost = 'http://localhost:8080?test=true';

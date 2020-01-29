@@ -614,7 +614,7 @@ export const validationErrorStrings = defineMessages({
     id: 'ValidationError.FIELD.PASSWORD_LOGIN.PATTERN_MISMATCH',
   },
   [ValidationError.FIELD.SSO_LOGIN.PATTERN_MISMATCH]: {
-    defaultMessage: 'Invalid code or email',
+    defaultMessage: 'Invalid input',
     id: 'ValidationError.FIELD.SSO_LOGIN.PATTERN_MISMATCH',
   },
   [ValidationError.FIELD.EMAIL.TYPE_MISMATCH]: {
