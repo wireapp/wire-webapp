@@ -30,8 +30,8 @@ z.error.LinkPreviewError = class LinkPreviewError extends BaseError {
   static get MESSAGE() {
     return {
       BLACKLISTED: 'Skipped preview for blacklisted link',
-      NO_DATA_AVAILABLE: 'Link does not provide Open Graph data.',
       NOT_SUPPORTED: 'Your client cannot render link previews using Open Graph data.',
+      NO_DATA_AVAILABLE: 'Link does not provide Open Graph data.',
       UNSUPPORTED_TYPE: 'Open Graph data from the given link does not provide necessary attributes.',
     };
   }
@@ -39,8 +39,8 @@ z.error.LinkPreviewError = class LinkPreviewError extends BaseError {
   static get TYPE() {
     return {
       BLACKLISTED: 'BLACKLISTED',
-      NO_DATA_AVAILABLE: 'NO_DATA_AVAILABLE',
       NOT_SUPPORTED: 'NOT_SUPPORTED',
+      NO_DATA_AVAILABLE: 'NO_DATA_AVAILABLE',
       UNSUPPORTED_TYPE: 'UNSUPPORTED_TYPE',
     };
   }

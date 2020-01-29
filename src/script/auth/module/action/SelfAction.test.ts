@@ -57,10 +57,12 @@ describe('SelfAction', () => {
       core: mockedCore,
     })({});
     await store.dispatch(actionRoot.selfAction.fetchSelf());
+
     expect(store.getActions()).toEqual([
       SelfActionCreator.startFetchSelf(),
       SelfActionCreator.successfulFetchSelf(expectedSelfUser),
     ]);
+
     expect(spies.doCheckPasswordState.calls.count()).toEqual(1);
   });
 
@@ -102,6 +104,7 @@ describe('SelfAction', () => {
       apiClient: mockedApiClient,
     })({});
     await store.dispatch(actionRoot.selfAction.doCheckPasswordState());
+
     expect(store.getActions()).toEqual([
       SelfActionCreator.startSetPasswordState(),
       SelfActionCreator.successfulSetPasswordState({hasPassword: true}),
@@ -117,6 +120,7 @@ describe('SelfAction', () => {
       apiClient: mockedApiClient,
     })({});
     await store.dispatch(actionRoot.selfAction.doCheckPasswordState());
+
     expect(store.getActions()).toEqual([
       SelfActionCreator.startSetPasswordState(),
       SelfActionCreator.successfulSetPasswordState({hasPassword: false}),
@@ -153,6 +157,7 @@ describe('SelfAction', () => {
       apiClient: mockedApiClient,
     })({});
     await store.dispatch(actionRoot.selfAction.doSetEmail(email));
+
     expect(store.getActions()).toEqual([
       SelfActionCreator.startSetSelfEmail(),
       SelfActionCreator.successfulSetSelfEmail(email),
@@ -190,6 +195,7 @@ describe('SelfAction', () => {
       apiClient: mockedApiClient,
     })({});
     await store.dispatch(actionRoot.selfAction.doSetPassword({new_password: password}));
+
     expect(store.getActions()).toEqual([
       SelfActionCreator.startSetSelfPassword(),
       SelfActionCreator.successfulSetSelfPassword(),

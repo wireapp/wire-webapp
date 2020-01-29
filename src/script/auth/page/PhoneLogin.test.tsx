@@ -53,9 +53,11 @@ describe('"PhoneLogin"', () => {
     expect(phoneInput().exists())
       .withContext('phone number input is present')
       .toBe(true);
+
     expect(countryCodeInput().exists())
       .withContext('country code input is present')
       .toBe(true);
+
     expect(loginButton().exists())
       .withContext('login button is present')
       .toBe(true);
@@ -129,6 +131,7 @@ describe('"PhoneLogin"', () => {
       expect(actionRoot.authAction.doSendPhoneLoginCode)
         .withContext('action for sending login code was called')
         .toHaveBeenCalled();
+
       expect(historyPushSpy)
         .withContext('Navigation to verify phone code page was triggered')
         .toHaveBeenCalledWith(ROUTE.VERIFY_PHONE_CODE as any);
@@ -167,6 +170,7 @@ describe('"PhoneLogin"', () => {
       expect(actionRoot.authAction.doSendPhoneLoginCode)
         .withContext('action was called')
         .toHaveBeenCalled();
+
       expect(historyPushSpy)
         .withContext('navigation to verify phone code page was triggered')
         .toHaveBeenCalledWith(ROUTE.CHECK_PASSWORD as any);

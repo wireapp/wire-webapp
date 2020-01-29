@@ -51,6 +51,7 @@ describe('"SetEmail"', () => {
     expect(emailInput().exists())
       .withContext('Email input should be present')
       .toBe(true);
+
     expect(verifyEmailButton().exists())
       .withContext('Submit button should be present')
       .toBe(true);
@@ -59,6 +60,7 @@ describe('"SetEmail"', () => {
       .withContext('Submit button should be disabled')
       .toBe(true);
     emailInput().simulate('change', {target: {value: 'e'}});
+
     expect(verifyEmailButton().props().disabled)
       .withContext('Submit button should be enabled')
       .toBe(false);
@@ -86,6 +88,7 @@ describe('"SetEmail"', () => {
 
     await waitForExpect(() => {
       wrapper.update();
+
       expect(errorMessage(ValidationError.FIELD.EMAIL.TYPE_MISMATCH).exists())
         .withContext('Shows invalid email error')
         .toBe(true);

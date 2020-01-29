@@ -61,8 +61,8 @@ z.viewModel.ListViewModel = class ListViewModel {
   }
   /**
    * View model for the list column.
-   * @param {MainViewModel} mainViewModel - Main view model
-   * @param {Object} repositories - Object containing all the repositories
+   * @param {MainViewModel} mainViewModel Main view model
+   * @param {Object} repositories Object containing all the repositories
    */
   constructor(mainViewModel, repositories) {
     this.changeNotificationSetting = this.changeNotificationSetting.bind(this);

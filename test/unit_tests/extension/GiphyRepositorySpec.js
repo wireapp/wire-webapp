@@ -38,7 +38,7 @@ describe('Giphy Repository', () => {
     spyOn(giphyService, 'getById').and.callThrough();
 
     const randomFooGif = `${urls.restUrl}/proxy/giphy/v1/gifs/random?tag=foo`;
-    /* eslint-disable comma-spacing, key-spacing, no-useless-escape, sort-keys, quotes */
+    /* eslint-disable comma-spacing, key-spacing, no-useless-escape, sort-keys-fix/sort-keys-fix, quotes */
     server.respondWith('GET', randomFooGif, [
       200,
       {'Content-Type': 'application/json'},
@@ -71,10 +71,10 @@ describe('Giphy Repository', () => {
         meta: {status: 200, msg: 'OK'},
       }),
     ]);
-    /* eslint-enable comma-spacing, key-spacing, no-useless-escape, sort-keys, quotes */
+    /* eslint-enable comma-spacing, key-spacing, no-useless-escape, sort-keys-fix/sort-keys-fix, quotes */
 
     const randomFooGifData = `${urls.restUrl}/proxy/giphy/v1/gifs/GKLmFicoabZrW`;
-    /* eslint-disable comma-spacing, key-spacing, no-useless-escape, sort-keys, quotes */
+    /* eslint-disable comma-spacing, key-spacing, no-useless-escape, sort-keys-fix/sort-keys-fix, quotes */
     server.respondWith('GET', randomFooGifData, [
       200,
       {'Content-Type': 'application/json'},
@@ -203,7 +203,7 @@ describe('Giphy Repository', () => {
         meta: {status: 200, msg: 'OK'},
       }),
     ]);
-    /* eslint-enable comma-spacing, key-spacing, no-useless-escape, sort-keys, quotes */
+    /* eslint-enable comma-spacing, key-spacing, no-useless-escape, sort-keys-fix/sort-keys-fix, quotes */
   });
 
   afterEach(() => {

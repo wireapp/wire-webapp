@@ -21,6 +21,7 @@
       "Resource/*": ["./resource/*"],
       "Util/*": ["./src/script/util/*"]
     },
+    "resolveJsonModule": true,
     "rootDirs": ["src/script"],
     "sourceMap": true,
     "target": "es6"

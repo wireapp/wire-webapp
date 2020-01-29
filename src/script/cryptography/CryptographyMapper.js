@@ -48,8 +48,8 @@ export class CryptographyMapper {
   /**
    * Maps a generic message into an event in JSON.
    *
-   * @param {GenericMessage} genericMessage - Received ProtoBuffer message
-   * @param {Object} event - Event of BackendEvent.CONVERSATION.OTR-ASSET-ADD or BackendEvent.CONVERSATION.OTR-MESSAGE-ADD
+   * @param {GenericMessage} genericMessage Received ProtoBuffer message
+   * @param {Object} event Event of BackendEvent.CONVERSATION.OTR-ASSET-ADD or BackendEvent.CONVERSATION.OTR-MESSAGE-ADD
    * @returns {Promise} Resolves with the mapped event
    */
   async mapGenericMessage(genericMessage, event) {
@@ -319,8 +319,8 @@ export class CryptographyMapper {
    * Unpacks a specific generic message which is wrapped inside an external generic message.
    *
    * @note Wrapped messages get the 'message_id' of their wrappers (external message)
-   * @param {External} external - Generic message of type 'external'
-   * @param {JSON} event - Backend event of type 'conversation.otr-message-add'
+   * @param {External} external Generic message of type 'external'
+   * @param {JSON} event Backend event of type 'conversation.otr-message-add'
    * @returns {Promise} Resolves with generic message
    */
   async _unwrapExternal(external, event) {

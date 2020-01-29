@@ -56,6 +56,7 @@ describe('"SetHandle"', () => {
     expect(handleInput().exists())
       .withContext('handle input should be present')
       .toBe(true);
+
     expect(setHandleButton().exists())
       .withContext('Submit button should be present')
       .toBe(true);
@@ -64,6 +65,7 @@ describe('"SetHandle"', () => {
       .withContext('Submit button should be disabled')
       .toBe(true);
     handleInput().simulate('change', {target: {value: 'e'}});
+
     expect(setHandleButton().props().disabled)
       .withContext('Submit button should be enabled')
       .toBe(false);

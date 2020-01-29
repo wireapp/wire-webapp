@@ -26,6 +26,7 @@ describe('ephemeralValueStore', () => {
       originalServiceWorker = window.navigator.serviceWorker;
       (window.navigator as any).__defineGetter__('serviceWorker', (): void => undefined);
     });
+
     afterEach(() => {
       (window.navigator as any).__defineGetter__('serviceWorker', (): ServiceWorkerContainer => originalServiceWorker);
     });
@@ -33,6 +34,7 @@ describe('ephemeralValueStore', () => {
 
   it('is initialized with an empty value', async () => {
     const storedValue = await getEphemeralValue();
+
     expect(storedValue).not.toBeDefined();
   });
 
@@ -42,10 +44,12 @@ describe('ephemeralValueStore', () => {
 
     await saveEphemeralValue(value1);
     const storedValue1 = await getEphemeralValue();
+
     expect(storedValue1).toBe(value1);
 
     await saveEphemeralValue(value2);
     const storedValue2 = await getEphemeralValue();
+
     expect(storedValue2).toBe(value2);
   });
 
@@ -54,9 +58,11 @@ describe('ephemeralValueStore', () => {
     await saveEphemeralValue(value);
 
     const firstRead = await getEphemeralValue();
+
     expect(firstRead).toBe(value);
 
     const secondRead = await getEphemeralValue();
+
     expect(secondRead).toBeUndefined();
   });
 });

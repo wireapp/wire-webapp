@@ -31,7 +31,7 @@ export class UserMapper {
 
   /**
    * Construct a new User Mapper.
-   * @param serverTimeHandler - Handles time shift between server and client
+   * @param serverTimeHandler Handles time shift between server and client
    */
   constructor(serverTimeHandler: ServerTimeHandler) {
     this.logger = getLogger('UserMapper');
@@ -69,7 +69,7 @@ export class UserMapper {
   /**
    * Maps JSON user into a blank user entity or updates an existing one.
    * @note Mapping of single properties to an existing user happens when the user changes his name or accent color.
-   * @param userEntity - User entity that the info shall be mapped to
+   * @param userEntity User entity that the info shall be mapped to
    * TODO: Pass in "serverTimeHandler", so that it can be removed from the "UserMapper" constructor
    */
   updateUserFromObject(userEntity: User, userData: any): User | undefined {

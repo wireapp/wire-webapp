@@ -26,7 +26,7 @@ const resolver = {
   /**
    * Will set the dependencies graph that will be used to resolve dependencies when `resolve` method is called
    *
-   * @param {Map} dependencies - The dependencies graph of the app
+   * @param {Map} dependencies The dependencies graph of the app
    * @returns {void}
    */
   init(dependencies) {
@@ -38,7 +38,7 @@ const resolver = {
    * Will only instantiate a class once.
    * If the instance already exists, will just return this instance
    *
-   * @param {class} dependencyClass - The class to instantiate
+   * @param {class} dependencyClass The class to instantiate
    * @returns {Object} instance - The instance of the class
    */
   resolve: memoize(dependencyClass => {

@@ -50,6 +50,7 @@ describe('"SetPassword"', () => {
     expect(passwordInput().exists())
       .withContext('password input should be present')
       .toBe(true);
+
     expect(setPasswordButton().exists())
       .withContext('submit button should be present')
       .toBe(true);
@@ -58,6 +59,7 @@ describe('"SetPassword"', () => {
       .withContext('submit button should be disabled')
       .toBe(true);
     passwordInput().simulate('change', {target: {value: 'e'}});
+
     expect(setPasswordButton().props().disabled)
       .withContext('submit button should be enabled')
       .toBe(false);
@@ -85,6 +87,7 @@ describe('"SetPassword"', () => {
 
     await waitForExpect(() => {
       wrapper.update();
+
       expect(errorMessage(ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH).exists())
         .withContext('Shows invalid password error')
         .toBe(true);

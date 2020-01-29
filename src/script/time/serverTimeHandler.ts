@@ -17,7 +17,7 @@
  *
  */
 
-/* eslint-disable sort-keys */
+/* eslint-disable sort-keys-fix/sort-keys-fix */
 import ko from 'knockout';
 
 import {Logger, getLogger} from 'Util/Logger';
@@ -51,7 +51,7 @@ export const serverTimeHandler: ServerTimeHandler = {
 
   /**
    * Converts a local timestamp to a server timestamp.
-   * @param localTimestamp - the local timestamp to convert
+   * @param localTimestamp the local timestamp to convert
    * @returns serverTimestamp - the timestamp adjusted with the client/server time shift
    */
   toServerTimestamp(localTimestamp = Date.now()): number {
@@ -60,7 +60,7 @@ export const serverTimeHandler: ServerTimeHandler = {
 
   /**
    * Converts a server timestamp to a local timestamp.
-   * @param serverTimestamp - the server timestamp to convert
+   * @param serverTimestamp the server timestamp to convert
    * @returns localTimestamp - the timestamp adjusted with the client/server time shift
    */
   toLocalTimestamp(serverTimestamp = Date.now()): number {

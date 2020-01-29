@@ -18,16 +18,17 @@
  */
 
 import ko from 'knockout';
-import moment from 'moment';
 
 import {copyText} from 'Util/ClipboardUtil';
 import {t} from 'Util/LocalizerUtil';
+import {formatLocale, formatTimeShort} from 'Util/TimeUtil';
 
 import {QuoteEntity} from '../../message/QuoteEntity';
 import {SuperType} from '../../message/SuperType';
 import {User} from '../User';
 import {Asset} from './Asset';
 import {File as FileAsset} from './File';
+import {MediumImage} from './MediumImage';
 import {Message} from './Message';
 import {Text as TextAsset} from './Text';
 
@@ -94,7 +95,7 @@ export class ContentMessage extends Message {
   }
 
   display_edited_timestamp = () => {
-    return t('conversationEditTimestamp', moment(this.edited_timestamp()).format('LT'));
+    return t('conversationEditTimestamp', formatTimeShort(this.edited_timestamp()));
   };
 
   /**
@@ -174,8 +175,9 @@ export class ContentMessage extends Message {
    * Download message content.
    */
   download(): void {
-    const asset_et = this.get_first_asset() as FileAsset;
-    asset_et.download();
+    const asset_et = this.get_first_asset() as FileAsset | MediumImage;
+    const fileName = this.get_content_name();
+    asset_et.download(fileName);
   }
 
   /**
@@ -187,8 +189,8 @@ export class ContentMessage extends Message {
     let {file_name} = asset_et;
 
     if (!file_name) {
-      const date = moment(this.timestamp());
-      file_name = `Wire ${date.format('YYYY-MM-DD')} at ${date.format('LT')}`;
+      const date = this.timestamp();
+      file_name = `Wire ${formatLocale(date, 'yyyy-MM-dd')} at ${formatTimeShort(date)}`;
     }
 
     if (asset_et.file_type) {

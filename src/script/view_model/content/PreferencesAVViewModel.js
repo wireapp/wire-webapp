@@ -146,7 +146,7 @@ export class PreferencesAVViewModel {
   /**
    * Get current MediaStream or initiate it.
    * @private
-   * @param {MediaType} requestedMediaType - MediaType to request the user
+   * @param {MediaType} requestedMediaType MediaType to request the user
    * @returns {Promise} Resolves with a MediaStream
    */
   _getMediaStream(requestedMediaType = MediaType.AUDIO_VIDEO) {
@@ -205,7 +205,7 @@ export class PreferencesAVViewModel {
    * Initiate audio meter.
    *
    * @private
-   * @param {MediaStream} mediaStream - MediaStream to measure audio levels on
+   * @param {MediaStream} mediaStream MediaStream to measure audio levels on
    * @returns {undefined} No return value
    */
   _initiateAudioMeter(mediaStream) {

@@ -77,7 +77,7 @@ const VerifyPhoneCode = ({
 
   const handleLogin = async (code: string) => {
     try {
-      const login: LoginData = {clientType: loginData.clientType, phone: loginData.phone, code};
+      const login: LoginData = {clientType: loginData.clientType, code, phone: loginData.phone};
       await doLogin(login);
       return history.push(ROUTE.HISTORY_INFO);
     } catch (error) {

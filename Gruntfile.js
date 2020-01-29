@@ -23,7 +23,7 @@ const {SRC_PATH, DIST_PATH} = require('./locations');
 module.exports = grunt => {
   require('load-grunt-tasks')(grunt);
 
-  /* eslint-disable sort-keys */
+  /* eslint-disable sort-keys-fix/sort-keys-fix */
   const dir = {
     src_: SRC_PATH,
     src: {
@@ -64,7 +64,7 @@ module.exports = grunt => {
     shell: require('./grunt/config/shell'),
     watch: require('./grunt/config/watch'),
   });
-  /* eslint-enable sort-keys */
+  /* eslint-enable sort-keys-fix/sort-keys-fix */
 
   grunt.registerTask('build', [
     'clean:dist',

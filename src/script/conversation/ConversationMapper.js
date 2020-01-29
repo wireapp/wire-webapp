@@ -97,8 +97,8 @@ export class ConversationMapper {
   /**
    * Converts JSON conversations into conversation entities.
    *
-   * @param {Array} conversationsData - Conversation data
-   * @param {number} [timestamp=1] - Initial timestamp for conversation
+   * @param {Array} conversationsData Conversation data
+   * @param {number} [timestamp=1] Initial timestamp for conversation
    * @returns {Array<Conversation>} Mapped conversation entities
    */
   mapConversations(conversationsData, timestamp = 1) {
@@ -119,8 +119,8 @@ export class ConversationMapper {
    * @example data: {"name":"ThisIsMyNewConversationName"}
    * @todo make utility?
    *
-   * @param {Conversation} conversationEntity - Conversation to be updated
-   * @param {ConversationBackendData} conversationData - Conversation data from backend
+   * @param {Conversation} conversationEntity Conversation to be updated
+   * @param {ConversationBackendData} conversationData Conversation data from backend
    * @returns {Conversation} Updated conversation entity
    */
   updateProperties(conversationEntity, conversationData) {
@@ -142,9 +142,9 @@ export class ConversationMapper {
   /**
    * Update the membership properties of a conversation.
    *
-   * @param {Conversation} conversationEntity - Conversation to be updated
-   * @param {SelfStatusUpdate} selfState - Conversation self data from the database
-   * @param {boolean} [disablePersistence=false] - Disable persistence of state changes during update
+   * @param {Conversation} conversationEntity Conversation to be updated
+   * @param {SelfStatusUpdate} selfState Conversation self data from the database
+   * @param {boolean} [disablePersistence=false] Disable persistence of state changes during update
    * @returns {Conversation} Updated conversation entity
    */
   updateSelfStatus(conversationEntity, selfState, disablePersistence = false) {
@@ -248,8 +248,8 @@ export class ConversationMapper {
    * Creates a conversation entity from backend JSON data.
    *
    * @private
-   * @param {Object} conversationData - Either locally stored or backend data
-   * @param {number} [initialTimestamp] - Initial timestamp for conversation in milliseconds
+   * @param {Object} conversationData Either locally stored or backend data
+   * @param {number} [initialTimestamp] Initial timestamp for conversation in milliseconds
    * @returns {Conversation} Mapped conversation entity
    */
   _createConversationEntity(conversationData, initialTimestamp) {
@@ -305,8 +305,8 @@ export class ConversationMapper {
   /**
    * Get the valid muted state.
    *
-   * @param {boolean} mutedState - Outdated muted state
-   * @param {NOTIFICATION_STATE} [notificationState] - Bit mask based notification setting
+   * @param {boolean} mutedState Outdated muted state
+   * @param {NOTIFICATION_STATE} [notificationState] Bit mask based notification setting
    * @returns {NOTIFICATION_STATE} validated notification setting
    */
   getMutedState(mutedState, notificationState) {
@@ -322,8 +322,8 @@ export class ConversationMapper {
   /**
    * Merge local database records with remote backend payload.
    *
-   * @param {Array<Object>} localConversations - Database records
-   * @param {Array<Object>} remoteConversations - Backend payload
+   * @param {Array<Object>} localConversations Database records
+   * @param {Array<Object>} remoteConversations Backend payload
    * @returns {Array<Object>} Merged conversation data
    */
   mergeConversation(localConversations, remoteConversations) {

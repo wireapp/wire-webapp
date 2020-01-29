@@ -56,7 +56,7 @@ export class Conversation {
   }
 
   /**
-   * @param {string} conversation_id - Conversation ID
+   * @param {string} conversation_id Conversation ID
    */
   constructor(conversation_id = '') {
     this.id = conversation_id;
@@ -417,9 +417,9 @@ export class Conversation {
   /**
    * Set the timestamp of a given type.
    * @note This will only increment timestamps
-   * @param {string|number} timestamp - Timestamp to be set
-   * @param {Conversation.TIMESTAMP_TYPE} type - Type of timestamp to be updated
-   * @param {boolean} forceUpdate - set the timestamp regardless of previous timestamp value (no checks)
+   * @param {string|number} timestamp Timestamp to be set
+   * @param {Conversation.TIMESTAMP_TYPE} type Type of timestamp to be updated
+   * @param {boolean} forceUpdate set the timestamp regardless of previous timestamp value (no checks)
    * @returns {boolean|number} Timestamp value which can be 'false' (boolean) if there is no timestamp
    */
   setTimestamp(timestamp, type, forceUpdate = false) {
@@ -442,8 +442,8 @@ export class Conversation {
 
   /**
    * Increment only on timestamp update
-   * @param {number} currentTimestamp - Current timestamp
-   * @param {number} updatedTimestamp - Timestamp from update
+   * @param {number} currentTimestamp Current timestamp
+   * @param {number} updatedTimestamp Timestamp from update
    * @returns {number|false} Updated timestamp or `false` if not increased
    */
   _incrementTimeOnly(currentTimestamp, updatedTimestamp) {
@@ -453,7 +453,7 @@ export class Conversation {
 
   /**
    * Adds a single message to the conversation.
-   * @param {Message} messageEntity - Message entity to be added to the conversation.
+   * @param {Message} messageEntity Message entity to be added to the conversation.
    * @returns {Message | undefined} replacedEntity - If a message was replaced in the conversation, returns the original message
    */
   add_message(messageEntity) {
@@ -474,7 +474,7 @@ export class Conversation {
 
   /**
    * Adds multiple messages to the conversation.
-   * @param {Array<Message>} message_ets - Array of message entities to be added to the conversation
+   * @param {Array<Message>} message_ets Array of message entities to be added to the conversation
    * @returns {undefined} No return value
    */
   add_messages(message_ets) {
@@ -542,7 +542,7 @@ export class Conversation {
 
   /**
    * Prepends messages with new batch of messages.
-   * @param {Array<Message>} message_ets - Array of messages to be added to conversation
+   * @param {Array<Message>} message_ets Array of messages to be added to conversation
    * @returns {undefined} No return value
    */
   prepend_messages(message_ets) {
@@ -553,7 +553,7 @@ export class Conversation {
 
   /**
    * Removes message from the conversation by message id.
-   * @param {string} message_id - ID of the message entity to be removed from the conversation
+   * @param {string} message_id ID of the message entity to be removed from the conversation
    * @returns {undefined} No return value
    */
   remove_message_by_id(message_id) {
@@ -562,7 +562,7 @@ export class Conversation {
 
   /**
    * Removes messages from the conversation.
-   * @param {number} [timestamp] - Optional timestamp which messages should be removed
+   * @param {number} [timestamp] Optional timestamp which messages should be removed
    * @returns {undefined} No return value
    */
   remove_messages(timestamp) {
@@ -607,7 +607,7 @@ export class Conversation {
    * Checks for message duplicates.
    *
    * @private
-   * @param {Message} messageEntity - Message entity to be added to the conversation
+   * @param {Message} messageEntity Message entity to be added to the conversation
    * @returns {Message|undefined} Message if it is not a duplicate
    */
   _checkForDuplicate(messageEntity) {
@@ -646,7 +646,7 @@ export class Conversation {
    * Update information about conversation activity from single message.
    *
    * @private
-   * @param {Message} message_et - Message to be added to conversation
+   * @param {Message} message_et Message to be added to conversation
    * @returns {undefined} No return value
    */
   update_timestamps(message_et) {
@@ -692,7 +692,7 @@ export class Conversation {
 
   /**
    * Get the message before a given message.
-   * @param {Message} message_et - Message to look up from
+   * @param {Message} message_et Message to look up from
    * @returns {Message | undefined} Previous message
    */
   get_previous_message(message_et) {
@@ -735,7 +735,7 @@ export class Conversation {
    * Get a message by it's unique ID.
    * Only lookup in the loaded message list which is a limited view of all the messages in DB.
    *
-   * @param {string} messageId - ID of message to be retrieved
+   * @param {string} messageId ID of message to be retrieved
    * @returns {Message|undefined} Message with ID or undefined
    */
   getMessage(messageId) {

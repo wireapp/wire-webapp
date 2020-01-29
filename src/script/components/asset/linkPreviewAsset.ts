@@ -17,32 +17,42 @@
  *
  */
 
-import {safeWindowOpen} from 'Util/SanitizationUtil';
-import {isTweetUrl} from 'Util/ValidationUtil';
-import {getDomainName} from 'Util/UrlUtil';
+import ko from 'knockout';
 
+import {safeWindowOpen} from 'Util/SanitizationUtil';
+import {getDomainName} from 'Util/UrlUtil';
+import {isTweetUrl} from 'Util/ValidationUtil';
+
+import {ContentMessage} from '../../entity/message/ContentMessage';
+import {LinkPreview} from '../../entity/message/LinkPreview';
 import {LinkPreviewMetaDataType} from '../../links/LinkPreviewMetaDataType';
+import {Text} from '../../entity/message/Text';
+
+interface Params {
+  message: ContentMessage | ko.Subscribable<ContentMessage>;
+
+  /** Does the asset have a visible header? */
+  header: boolean;
+}
 
 class LinkPreviewAssetComponent {
-  /**
-   * Construct a new link preview asset.
-   *
-   * @param {Object} params - Component parameters
-   * @param {Message} params.message - Message entity
-   * @param {Object} componentInfo - Component information
-   */
-  constructor(params, componentInfo) {
-    this.dispose = this.dispose.bind(this);
-    this.onClick = this.onClick.bind(this);
+  getDomainName: (url?: string) => string;
+  messageEntity: ContentMessage;
+  header: boolean;
+  preview: LinkPreview;
+  element: HTMLElement;
+  isTweet: boolean;
+  author: string;
 
+  constructor({message, header = false}: Params, element: HTMLElement) {
     this.getDomainName = getDomainName;
 
-    this.messageEntity = ko.unwrap(params.message);
-    this.header = params.header || false;
+    this.messageEntity = ko.unwrap(message);
+    this.header = header;
 
-    const [firstPreview] = this.messageEntity.get_first_asset().previews();
+    const [firstPreview] = (this.messageEntity.get_first_asset() as Text).previews();
     this.preview = firstPreview;
-    this.element = componentInfo.element;
+    this.element = element;
 
     const isTypeTweet = this.preview && this.preview.meta_data_type === LinkPreviewMetaDataType.TWEET;
     this.isTweet = isTypeTweet && isTweetUrl(this.preview.url);
@@ -53,15 +63,15 @@ class LinkPreviewAssetComponent {
     }
   }
 
-  onClick() {
+  onClick = () => {
     if (!this.messageEntity.is_expired()) {
       safeWindowOpen(this.preview.url);
     }
-  }
+  };
 
-  dispose() {
+  dispose = () => {
     this.element.removeEventListener('click', this.onClick);
-  }
+  };
 }
 
 ko.components.register('link-preview-asset', {
@@ -106,8 +116,8 @@ ko.components.register('link-preview-asset', {
     <!-- /ko -->
   `,
   viewModel: {
-    createViewModel(params, componentInfo) {
-      return new LinkPreviewAssetComponent(params, componentInfo);
+    createViewModel(params: Params, {element}: ko.components.ComponentInfo): LinkPreviewAssetComponent {
+      return new LinkPreviewAssetComponent(params, element as HTMLElement);
     },
   },
 });

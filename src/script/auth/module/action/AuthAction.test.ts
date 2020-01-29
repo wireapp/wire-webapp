@@ -66,7 +66,8 @@ describe('AuthAction', () => {
       apiClient: mockedApiClient as TypeUtil.RecursivePartial<APIClient>,
       core: mockedCore,
     })({});
-    await store.dispatch(actionRoot.authAction.doLoginPlain({email, password, clientType: ClientType.PERMANENT}));
+    await store.dispatch(actionRoot.authAction.doLoginPlain({clientType: ClientType.PERMANENT, email, password}));
+
     expect(store.getActions()).toEqual([AuthActionCreator.startLogin(), AuthActionCreator.successfulLogin()]);
     expect(spies.setLocalStorage.calls.count()).toEqual(5);
     expect(spies.setCookie.calls.count()).toEqual(1);
@@ -118,12 +119,13 @@ describe('AuthAction', () => {
       core: mockedCore,
     })({});
     try {
-      await store.dispatch(actionRoot.authAction.doLoginPlain({email, password, clientType: ClientType.PERMANENT}));
+      await store.dispatch(actionRoot.authAction.doLoginPlain({clientType: ClientType.PERMANENT, email, password}));
       fail('TOO_MANY_CLIENTS error was not thrown');
     } catch (error) {
       expect(error.label)
         .withContext('Error is of type TOO_MANY_CLIENTS')
         .toEqual(BackendError.LABEL.TOO_MANY_CLIENTS);
+
       expect(store.getActions()).toEqual([AuthActionCreator.startLogin(), AuthActionCreator.successfulLogin()]);
       expect(spies.doInitializeClient.calls.count()).toEqual(1);
     }
@@ -153,7 +155,7 @@ describe('AuthAction', () => {
     })();
     try {
       await store.dispatch(
-        actionRoot.authAction.doLoginPlain({email, password: 'password', clientType: ClientType.PERMANENT}),
+        actionRoot.authAction.doLoginPlain({clientType: ClientType.PERMANENT, email, password: 'password'}),
       );
       fail();
     } catch (expectedError) {
@@ -180,6 +182,7 @@ describe('AuthAction', () => {
       core: mockedCore,
     })({});
     await store.dispatch(actionRoot.authAction.doLogout());
+
     expect(store.getActions()).toEqual([AuthActionCreator.startLogout(), AuthActionCreator.failedLogout(backendError)]);
   });
 
@@ -198,6 +201,7 @@ describe('AuthAction', () => {
       apiClient: mockedApiClient,
     })({});
     await store.dispatch(actionRoot.authAction.doSendPhoneLoginCode({phone: phoneNumber}));
+
     expect(store.getActions()).toEqual([
       AuthActionCreator.startSendPhoneLoginCode(),
       AuthActionCreator.successfulSendPhoneLoginCode(expiresIn),

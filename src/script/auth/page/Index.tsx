@@ -62,7 +62,7 @@ const Index = ({}: Props) => {
           block
           backgroundColor={'transparent'}
           color={COLOR.BLUE}
-          style={{fontSize: '13px', border: `1px solid ${COLOR.BLUE}`}}
+          style={{border: `1px solid ${COLOR.BLUE}`, fontSize: '13px'}}
           data-uie-name="go-login"
         >
           {_(indexStrings.logIn)}

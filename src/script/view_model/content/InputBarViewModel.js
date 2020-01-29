@@ -17,13 +17,12 @@
  *
  */
 
-import moment from 'moment';
 import {escape} from 'underscore';
 import {Availability} from '@wireapp/protocol-messaging';
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS, formatLocale} from 'Util/TimeUtil';
 import {afterRender, formatBytes} from 'Util/util';
 import {renderMessage} from 'Util/messageRenderer';
 import {KEY, isFunctionKey, insertAtCaret} from 'Util/KeyboardUtil';
@@ -272,7 +271,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
           this.pastedFilePreviewUrl(URL.createObjectURL(blob));
         }
 
-        const date = moment(blob.lastModifiedDate).format('LL, LTS');
+        const date = formatLocale(blob.lastModifiedDate, 'PP, pp');
         return this.pastedFileName(t('conversationSendPastedFile', date));
       }
 
@@ -602,9 +601,9 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
    * Returns a term which is a mention match together with its starting position.
    * If nothing could be matched, it returns `undefined`.
    *
-   * @param {number} selectionStart - Current caret position or start of selection  (if text is marked)
-   * @param {number} selectionEnd - Current caret position or end of selection (if text is marked)
-   * @param {string} value - Text input
+   * @param {number} selectionStart Current caret position or start of selection  (if text is marked)
+   * @param {number} selectionEnd Current caret position or end of selection (if text is marked)
+   * @param {string} value Text input
    * @returns {undefined|{startIndex: number, term: string}} Matched mention info
    */
   getMentionCandidate(selectionStart, selectionEnd, value) {
@@ -785,7 +784,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
   /**
    * Post images to a conversation.
-   * @param {Array|FileList} images - Images
+   * @param {Array|FileList} images Images
    * @returns {undefined} No return value
    */
   uploadImages(images) {
@@ -803,7 +802,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
   /**
    * Post files to a conversation.
-   * @param {Array|FileList} files - Files
+   * @param {Array|FileList} files Files
    * @returns {undefined} No return value
    */
   uploadFiles(files) {

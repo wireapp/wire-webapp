@@ -310,7 +310,7 @@ export class ClientRepository {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/registerClient
    *
    * @note Password is needed for the registration of a client once 1st client has been registered.
-   * @param password - User password for verification
+   * @param password User password for verification
    * @returns Resolves with the newly registered client
    */
   registerClient(password?: string): Promise<ko.Observable<ClientEntity>> {
@@ -404,7 +404,7 @@ export class ClientRepository {
 
   /**
    * Gets the value for a cookie label.
-   * @param login - Email or phone number of the user
+   * @param login Email or phone number of the user
    * @returns Cookie label
    */
   private getCookieLabelValue(login: string): string {

@@ -32,12 +32,12 @@ z.error.StorageError = class StorageError extends BaseError {
       FAILED_TO_OPEN: 'Failed to open database',
       INVALID_TIME: 'Event time needs to be ISO 8601',
       INVALID_TIMESTAMP: 'Invalid timestamp',
+      NON_SEQUENTIAL_UPDATE: 'Update is non sequential',
+      NOT_FOUND: 'Record matching primary key was not found',
       NO_CONVERSATION_ID: 'Missing conversation ID',
       NO_DATA: 'Storage value is undefined or null',
       NO_SENDER_ID: 'Missing sender ID',
       NO_TIME: 'Missing time',
-      NON_SEQUENTIAL_UPDATE: 'Update is non sequential',
-      NOT_FOUND: 'Record matching primary key was not found',
     };
   }
 
@@ -46,12 +46,12 @@ z.error.StorageError = class StorageError extends BaseError {
       FAILED_TO_OPEN: 'FAILED_TO_OPEN',
       INVALID_TIME: 'INVALID_TIME',
       INVALID_TIMESTAMP: 'INVALID_TIMESTAMP',
+      NON_SEQUENTIAL_UPDATE: 'NON_SEQUENTIAL_UPDATE',
+      NOT_FOUND: 'NOT_FOUND',
       NO_CONVERSATION_ID: 'NO_CONVERSATION_ID',
       NO_DATA: 'NO_DATA',
       NO_SENDER_ID: 'NO_SENDER_ID',
       NO_TIME: 'NO_TIME',
-      NON_SEQUENTIAL_UPDATE: 'NON_SEQUENTIAL_UPDATE',
-      NOT_FOUND: 'NOT_FOUND',
     };
   }
 };

@@ -469,7 +469,7 @@ export class UserRepository {
   /**
    * Track availability action.
    *
-   * @param method - Method used for availability change
+   * @param method Method used for availability change
    */
   _trackAvailability(availability: Availability.Type, method: string): void {
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.SETTINGS.CHANGED_STATUS, {
@@ -616,7 +616,7 @@ export class UserRepository {
 
   /**
    * Check for users locally and fetch them from the server otherwise.
-   * @param offline - Should we only look for cached contacts
+   * @param offline Should we only look for cached contacts
    */
   get_users_by_id(user_ids: string[] = [], offline: boolean = false): Promise<User[]> {
     if (!user_ids.length) {
@@ -653,7 +653,7 @@ export class UserRepository {
 
   /**
    * Is the user the logged in user.
-   * @param is_me - `true` if self user
+   * @param is_me `true` if self user
    */
   save_user(user_et: User, is_me: boolean = false): User {
     const user = this.findUserById(user_et.id);
@@ -789,7 +789,7 @@ export class UserRepository {
 
   /**
    * Verify usernames against the backend.
-   * @param usernames - Username suggestions
+   * @param usernames Username suggestions
    * @returns A list with usernames that are not taken.
    */
   verify_usernames(usernames: string[]): Promise<string[]> {

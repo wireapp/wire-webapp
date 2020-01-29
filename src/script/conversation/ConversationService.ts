@@ -397,8 +397,8 @@ export class ConversationService {
    *
    * @param conversation_id ID of conversation to send message in
    * @param payload Payload to be posted
-   * @param payload.recipients - Map with per-recipient data
-   * @param payload.sender - Client ID of the sender
+   * @param payload.recipients Map with per-recipient data
+   * @param payload.sender Client ID of the sender
    * @param precondition_option Level that backend checks for missing clients
    * @returns Promise that resolves when the message was sent
    */

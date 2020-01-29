@@ -37,6 +37,7 @@ describe('EventValidator', () => {
 
       const source = EventSource.WEB_SOCKET;
       const result = validateEvent(event, source, undefined);
+
       expect(result).toBe(EventValidation.IGNORED_TYPE);
     });
   });

@@ -79,7 +79,7 @@ const CheckPassword = ({loginData, doLogin, resetAuthError, isFetching}: Props &
       if (validationError) {
         throw validationError;
       }
-      const login: LoginData = {clientType: loginData.clientType, phone: loginData.phone, password};
+      const login: LoginData = {clientType: loginData.clientType, password, phone: loginData.phone};
       await doLogin(login);
       return history.push(ROUTE.HISTORY_INFO);
     } catch (error) {
