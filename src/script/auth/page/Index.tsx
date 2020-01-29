@@ -47,41 +47,64 @@ const Index = ({}: Props) => {
         <Text block center style={{fontSize: '32px', fontWeight: 300, marginBottom: '48px'}}>
           {_(indexStrings.welcome, {brandName: Config.BRAND_NAME})}
         </Text>
-        {Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
-          <Button
-            onClick={() => history.push(ROUTE.SET_ACCOUNT_TYPE)}
-            block
-            style={{fontSize: '13px'}}
-            data-uie-name="go-set-account-type"
-          >
-            {_(indexStrings.createAccount)}
-          </Button>
+        {Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION ? (
+          <>
+            <Button
+              onClick={() => history.push(ROUTE.SET_ACCOUNT_TYPE)}
+              block
+              style={{fontSize: '13px'}}
+              data-uie-name="go-set-account-type"
+            >
+              {_(indexStrings.createAccount)}
+            </Button>
+            <Button
+              onClick={() => history.push(ROUTE.LOGIN)}
+              block
+              backgroundColor={'transparent'}
+              color={COLOR.BLUE}
+              style={{border: `1px solid ${COLOR.BLUE}`, fontSize: '13px'}}
+              data-uie-name="go-login"
+            >
+              {_(indexStrings.logIn)}
+            </Button>
+            {logoutReason && (
+              <ErrorMessage center data-uie-name="status-logout-reason">
+                <FormattedHTMLMessage {...logoutReasonStrings[logoutReason]} />
+              </ErrorMessage>
+            )}
+            <Button
+              onClick={() => history.push(ROUTE.SSO)}
+              block
+              color={COLOR.TEXT}
+              backgroundColor={COLOR.GRAY_LIGHTEN_64}
+              style={{fontSize: '13px', marginTop: '120px'}}
+              data-uie-name="go-sso-login"
+            >
+              {_(Config.FEATURE.ENABLE_DOMAIN_DISCOVERY ? indexStrings.enterprise : indexStrings.ssoLogin)}
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button onClick={() => history.push(ROUTE.LOGIN)} block style={{fontSize: '13px'}} data-uie-name="go-login">
+              {_(indexStrings.logIn)}
+            </Button>
+            <Button
+              onClick={() => history.push(ROUTE.SSO)}
+              block
+              backgroundColor={'transparent'}
+              color={COLOR.BLUE}
+              style={{border: `1px solid ${COLOR.BLUE}`, fontSize: '13px'}}
+              data-uie-name="go-sso-login"
+            >
+              {_(Config.FEATURE.ENABLE_DOMAIN_DISCOVERY ? indexStrings.enterprise : indexStrings.ssoLogin)}
+            </Button>
+            {logoutReason && (
+              <ErrorMessage center data-uie-name="status-logout-reason">
+                <FormattedHTMLMessage {...logoutReasonStrings[logoutReason]} />
+              </ErrorMessage>
+            )}
+          </>
         )}
-        <Button
-          onClick={() => history.push(ROUTE.LOGIN)}
-          block
-          backgroundColor={'transparent'}
-          color={COLOR.BLUE}
-          style={{border: `1px solid ${COLOR.BLUE}`, fontSize: '13px'}}
-          data-uie-name="go-login"
-        >
-          {_(indexStrings.logIn)}
-        </Button>
-        {logoutReason && (
-          <ErrorMessage center data-uie-name="status-logout-reason">
-            <FormattedHTMLMessage {...logoutReasonStrings[logoutReason]} />
-          </ErrorMessage>
-        )}
-        <Button
-          onClick={() => history.push(ROUTE.SSO)}
-          block
-          color={COLOR.TEXT}
-          backgroundColor={COLOR.GRAY_LIGHTEN_64}
-          style={{fontSize: '13px', marginTop: '120px'}}
-          data-uie-name="go-sso-login"
-        >
-          {_(indexStrings.enterprise)}
-        </Button>
       </ContainerXS>
     </Page>
   );

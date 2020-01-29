@@ -52,8 +52,12 @@ export const indexStrings = defineMessages({
     id: 'index.enterprise',
   },
   logIn: {
-    defaultMessage: 'Log in',
+    defaultMessage: 'Log in with email',
     id: 'index.login',
+  },
+  ssoLogin: {
+    defaultMessage: 'Log in with SSO',
+    id: 'index.ssoLogin',
   },
   welcome: {
     defaultMessage: 'Welcome to {brandName}',
