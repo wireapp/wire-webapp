@@ -230,7 +230,13 @@ const SingleSignOn = ({}: Props & ConnectedProps & DispatchProps) => {
             >
               <div>
                 <H1 center>{_(ssoLoginStrings.headline)}</H1>
-                <Muted>{_(ssoLoginStrings.subhead)}</Muted>
+                <Muted>
+                  {_(
+                    Config.FEATURE.ENABLE_DOMAIN_DISCOVERY
+                      ? ssoLoginStrings.subheadCodeOrEmail
+                      : ssoLoginStrings.subheadCode,
+                  )}
+                </Muted>
                 <SingleSignOnForm doLogin={handleSSOWindow} initialCode={match.params.code} />
               </div>
             </ContainerXS>

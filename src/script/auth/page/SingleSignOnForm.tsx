@@ -36,6 +36,7 @@ import {FormattedHTMLMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 import useReactRouter from 'use-react-router';
+import {Config} from '../../Config';
 import {loginStrings, logoutReasonStrings, ssoLoginStrings} from '../../strings';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {BackendError} from '../module/action/BackendError';
@@ -189,11 +190,19 @@ const SingleSignOnForm = ({
           }}
           ref={codeOrMailInput}
           markInvalid={!isCodeOrMailInputValid}
-          placeholder={_(ssoLoginStrings.codeOrMailInputPlaceholder)}
+          placeholder={_(
+            Config.FEATURE.ENABLE_DOMAIN_DISCOVERY
+              ? ssoLoginStrings.codeOrMailInputPlaceholder
+              : ssoLoginStrings.codeInputPlaceholder,
+          )}
           value={codeOrMail}
           autoComplete="section-login sso-code"
           maxLength={1024}
-          pattern={`(${SSO_CODE_PREFIX_REGEX}${PATTERN.UUID_V4}|${PATTERN.EMAIL})`}
+          pattern={
+            Config.FEATURE.ENABLE_DOMAIN_DISCOVERY
+              ? `(${SSO_CODE_PREFIX_REGEX}${PATTERN.UUID_V4}|${PATTERN.EMAIL})`
+              : `${SSO_CODE_PREFIX_REGEX}${PATTERN.UUID_V4}`
+          }
           autoFocus
           type="text"
           required

@@ -663,6 +663,10 @@ export const loginStrings = defineMessages({
 });
 
 export const ssoLoginStrings = defineMessages({
+  codeInputPlaceholder: {
+    defaultMessage: 'SSO access code',
+    id: 'ssoLogin.codeInputPlaceholder',
+  },
   codeOrMailInputPlaceholder: {
     defaultMessage: 'Email or SSO access code',
     id: 'ssoLogin.codeOrMailInputPlaceholder',
@@ -679,9 +683,13 @@ export const ssoLoginStrings = defineMessages({
     defaultMessage: 'Click to continue',
     id: 'ssoLogin.overlayFocusLink',
   },
-  subhead: {
+  subheadCode: {
+    defaultMessage: 'Enter your SSO access code here',
+    id: 'ssoLogin.subheadCode',
+  },
+  subheadCodeOrEmail: {
     defaultMessage: 'Enter your email or SSO access code here',
-    id: 'ssoLogin.subhead',
+    id: 'ssoLogin.subheadCodeOrEmail',
   },
 });
 

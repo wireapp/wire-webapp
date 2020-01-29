@@ -140,6 +140,7 @@ const config: ServerConfig = {
       DEFAULT_LOGIN_TEMPORARY_CLIENT: process.env.FEATURE_DEFAULT_LOGIN_TEMPORARY_CLIENT == 'true' ? true : false,
       ENABLE_ACCOUNT_REGISTRATION: process.env.FEATURE_ENABLE_ACCOUNT_REGISTRATION == 'false' ? false : true,
       ENABLE_DEBUG: process.env.FEATURE_ENABLE_DEBUG == 'true' ? true : false,
+      ENABLE_DOMAIN_DISCOVERY: process.env.FEATURE_ENABLE_DOMAIN_DISCOVERY == 'false' ? false : true,
       ENABLE_PHONE_LOGIN: process.env.FEATURE_ENABLE_PHONE_LOGIN == 'false' ? false : true,
       ENABLE_SSO: process.env.FEATURE_ENABLE_SSO == 'true' ? true : false,
       PERSIST_TEMPORARY_CLIENTS: process.env.FEATURE_PERSIST_TEMPORARY_CLIENTS == 'false' ? false : true,
