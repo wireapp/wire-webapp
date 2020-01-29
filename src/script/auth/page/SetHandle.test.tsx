@@ -19,14 +19,11 @@
 
 import {ReactWrapper} from 'enzyme';
 import React from 'react';
-import {Config as ReadOnlyConfig} from '../../Config';
 import {actionRoot} from '../module/action';
 import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
 import SetHandle from './SetHandle';
-
-const Config = ReadOnlyConfig as any;
 
 describe('"SetHandle"', () => {
   let wrapper: ReactWrapper;

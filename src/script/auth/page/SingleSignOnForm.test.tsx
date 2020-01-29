@@ -27,6 +27,9 @@ import {ROUTE} from '../route';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
 import SingleSignOnForm from './SingleSignOnForm';
+import {Config as ReadOnlyConfig} from '../../Config';
+
+const Config = ReadOnlyConfig as any;
 
 describe('SingleSignOnForm', () => {
   let wrapper: ReactWrapper;
@@ -123,6 +126,7 @@ describe('SingleSignOnForm', () => {
   });
 
   it('successfully redirects with registered domain and permanent client', async () => {
+    Config.FEATURE.ENABLE_DOMAIN_DISCOVERY = true;
     const email = 'mail@mail.com';
     const inputHost = 'http://localhost:8080?test=true';
     const expectedHost = 'http://localhost:8080?test=true&clienttype=permanent';
@@ -172,6 +176,7 @@ describe('SingleSignOnForm', () => {
   });
 
   it('successfully redirects with registered domain and temporary client', async () => {
+    Config.FEATURE.ENABLE_DOMAIN_DISCOVERY = true;
     const email = 'mail@mail.com';
     const inputHost = 'http://localhost:8080?test=true';
     const expectedHost = 'http://localhost:8080?test=true&clienttype=temporary';
