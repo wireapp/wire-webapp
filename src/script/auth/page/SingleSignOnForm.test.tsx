@@ -28,6 +28,7 @@ import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
 import SingleSignOnForm from './SingleSignOnForm';
 import {Config as ReadOnlyConfig} from '../../Config';
+import {ValidationError} from '../module/action/ValidationError';
 
 const Config = ReadOnlyConfig as any;
 
@@ -90,6 +91,7 @@ describe('SingleSignOnForm', () => {
   });
 
   it('shows invalid code or email error', async () => {
+    Config.FEATURE.ENABLE_DOMAIN_DISCOVERY = true;
     const code = 'invalid-code';
 
     wrapper = mountComponent(
@@ -120,8 +122,8 @@ describe('SingleSignOnForm', () => {
 
     submitButton().simulate('submit');
 
-    expect(errorMessage('sso-code-patternMismatch').exists())
-      .withContext('Error "sso-code-patternMismatch" message exists')
+    expect(errorMessage(ValidationError.FIELD.SSO_EMAIL_CODE.PATTERN_MISMATCH).exists())
+      .withContext(`Error "${ValidationError.FIELD.SSO_EMAIL_CODE.PATTERN_MISMATCH}" message exists`)
       .toBe(true);
   });
 
