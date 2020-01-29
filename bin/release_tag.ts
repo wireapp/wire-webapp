@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /*
  * Wire
  * Copyright (C) 2019 Wire Swiss GmbH
