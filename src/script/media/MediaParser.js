@@ -28,7 +28,7 @@ class MediaParser {
     this.renderMediaEmbeds = this.renderMediaEmbeds.bind(this);
     this.showEmbed = true;
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, ({settings}) => {
-      this.showEmbed = settings.emoji.replace_inline;
+      this.showEmbed = settings.previews.send;
     });
 
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.PREVIEWS.SEND, value => {
