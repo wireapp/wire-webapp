@@ -43,6 +43,7 @@ describe('ConversationRoleRepository', () => {
     it('knows if you are in a team', () => {
       expect(roleRepository.isTeam()).toBe(false);
       window.TestFactory.team_repository.team(new TeamEntity(createRandomUuid()));
+
       expect(roleRepository.isTeam()).toBeTrue();
     });
   });
@@ -57,6 +58,7 @@ describe('ConversationRoleRepository', () => {
 
       window.TestFactory.team_repository.team(new TeamEntity(createRandomUuid()));
       await roleRepository.loadTeamRoles();
+
       expect(roleRepository.teamRoles.length).toBe(1);
     });
   });
@@ -74,6 +76,7 @@ describe('ConversationRoleRepository', () => {
       roleRepository.setConversationRoles(conversationEntity, newRoles);
 
       const realRoles = roleRepository.getConversationRoles(conversationEntity);
+
       expect(realRoles.length).toBe(1);
     });
   });
@@ -85,6 +88,7 @@ describe('ConversationRoleRepository', () => {
       conversationEntity.participating_user_ets.push(userEntity);
 
       let canAddParticipants = roleRepository.canAddParticipants(conversationEntity, userEntity);
+
       expect(canAddParticipants).toBeFalse();
 
       conversationEntity.roles({
@@ -92,6 +96,7 @@ describe('ConversationRoleRepository', () => {
       });
 
       canAddParticipants = roleRepository.canAddParticipants(conversationEntity, userEntity);
+
       expect(canAddParticipants).toBeTrue();
     });
   });

@@ -47,10 +47,10 @@ export class NotificationService {
 
   /**
    * Get events from the notification stream.
-   * @param clientId - Only return notifications targeted at the given client
-   * @param notificationId - Only return notifications more recent than the given event ID (like
+   * @param clientId Only return notifications targeted at the given client
+   * @param notificationId Only return notifications more recent than the given event ID (like
    *   "7130304a-c839-11e5-8001-22000b0fe035")
-   * @param size - Maximum number of notifications to return
+   * @param size Maximum number of notifications to return
    * @returns Resolves with a pages list of notifications
    */
   getNotifications(clientId?: string, notificationId?: string, size: number = 10000): Promise<NotificationList> {
@@ -89,7 +89,7 @@ export class NotificationService {
 
   /**
    * Get the last notification for a given client.
-   * @param clientId - Only return notifications targeted at the given client
+   * @param clientId Only return notifications targeted at the given client
    * @returns Resolves with the last known notification for given client
    */
   getNotificationsLast(clientId: string): Promise<Notification> {
@@ -157,7 +157,7 @@ export class NotificationService {
 
   /**
    * Save last event date to persistent storage.
-   * @param eventDate - Event date (in ISO 8601) to be stored
+   * @param eventDate Event date (in ISO 8601) to be stored
    * @returns Resolves with the primary key of the stored record
    */
   saveLastEventDateToDb(eventDate: string): Promise<string> {
@@ -168,7 +168,7 @@ export class NotificationService {
 
   /**
    * Save last notification ID to persistent storage.
-   * @param notificationId - Notification ID to be stored
+   * @param notificationId Notification ID to be stored
    * @returns Resolves with the primary key of the stored record
    */
   saveLastNotificationIdToDb(notificationId: string): Promise<string> {
@@ -179,7 +179,7 @@ export class NotificationService {
 
   /**
    * Save missed notifications ID to persistent storage.
-   * @param notificationId - Notification ID to be stored
+   * @param notificationId Notification ID to be stored
    * @returns Resolves with the primary key of the stored record
    */
   saveMissedIdToDb(notificationId: string): Promise<string> {

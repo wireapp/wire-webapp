@@ -32,8 +32,8 @@ class MediaParser {
    * Render media embeds.
    * @note Checks message for valid media links and appends an iFrame right after the link
    *
-   * @param {string} message - Message text
-   * @param {string} themeColor - Accent color to be applied to the embed
+   * @param {string} message Message text
+   * @param {string} themeColor Accent color to be applied to the embed
    * @returns {string} Message with rendered media embeds
    */
   renderMediaEmbeds(message, themeColor) {

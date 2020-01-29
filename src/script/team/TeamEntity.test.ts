@@ -26,9 +26,11 @@ describe('TeamEntity', () => {
     expect(teamEntity.getIconResource()).not.toBeDefined();
 
     teamEntity.icon = 'invalid-icon';
+
     expect(teamEntity.getIconResource()).not.toBeDefined();
 
     teamEntity.icon = '3-1-e705c3f5-7b4b-4136-a09b-01614cb355a1';
+
     expect(teamEntity.getIconResource()).toBeDefined();
   });
 });

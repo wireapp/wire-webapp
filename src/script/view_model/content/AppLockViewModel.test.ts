@@ -48,6 +48,7 @@ describe('AppLockViewModel', () => {
     writeableConfig.FEATURE = {...writeableConfig.FEATURE};
     document.body.innerHTML = '<div id="app"></div><div id="applock"></div>';
   });
+
   afterEach(() => {
     document.body.innerHTML = '';
     writeableConfig.FEATURE = originalFeature;
@@ -56,6 +57,7 @@ describe('AppLockViewModel', () => {
   describe('constructor', () => {
     it('does not shows up if no valid timeout is set', () => {
       const appLock = getAppLock();
+
       expect(appLock.state()).toBe(APPLOCK_STATE.NONE);
     });
 
@@ -63,6 +65,7 @@ describe('AppLockViewModel', () => {
       writeableConfig.FEATURE = {...writeableConfig.FEATURE, APPLOCK_UNFOCUS_TIMEOUT: 10};
       spyOn(window.localStorage, 'getItem').and.returnValue('savedCode');
       const appLock = getAppLock();
+
       expect(appLock.state()).toBe(APPLOCK_STATE.LOCKED);
     });
 
@@ -70,6 +73,7 @@ describe('AppLockViewModel', () => {
       window.history.pushState({}, '', '?applock_unfocus_timeout=10');
       spyOn(window.localStorage, 'getItem').and.returnValue('savedCode');
       const appLock = getAppLock();
+
       expect(appLock.state()).toBe(APPLOCK_STATE.LOCKED);
       window.history.pushState({}, '', '');
     });
@@ -91,20 +95,25 @@ describe('AppLockViewModel', () => {
           appLock.onClosed();
         }
       });
+
       expect(appLock.state()).toBe(APPLOCK_STATE.SETUP);
       appLock.setupPassphrase(passphrase);
       appLock.setupPassphraseRepeat(passphrase);
       await appLock.onSetCode();
+
       expect(appLock.state()).toBe(APPLOCK_STATE.NONE);
       expect(storedCode).toBeDefined();
       window.dispatchEvent(new Event('blur'));
       jasmine.clock().tick(5000);
+
       expect(appLock.state()).toBe(APPLOCK_STATE.NONE);
       jasmine.clock().tick(6000);
+
       expect(appLock.state()).toBe(APPLOCK_STATE.LOCKED);
       document.body.innerHTML += `<form id="unlock"><input value="${passphrase}"/></form>`;
-      const unlockForm = <HTMLFormElement>document.querySelector('#unlock');
+      const unlockForm: HTMLFormElement = window.document.querySelector('#unlock');
       await appLock.onUnlock(unlockForm);
+
       expect(appLock.state()).toBe(APPLOCK_STATE.NONE);
       jasmine.clock().uninstall();
     });

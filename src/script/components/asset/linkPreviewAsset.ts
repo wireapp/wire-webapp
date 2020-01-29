@@ -26,6 +26,7 @@ import {isTweetUrl} from 'Util/ValidationUtil';
 import {ContentMessage} from '../../entity/message/ContentMessage';
 import {LinkPreview} from '../../entity/message/LinkPreview';
 import {LinkPreviewMetaDataType} from '../../links/LinkPreviewMetaDataType';
+import {Text} from '../../entity/message/Text';
 
 interface Params {
   message: ContentMessage | ko.Subscribable<ContentMessage>;
@@ -36,7 +37,7 @@ interface Params {
 
 class LinkPreviewAssetComponent {
   getDomainName: (url?: string) => string;
-  messageEntity: any;
+  messageEntity: ContentMessage;
   header: boolean;
   preview: LinkPreview;
   element: HTMLElement;
@@ -49,7 +50,7 @@ class LinkPreviewAssetComponent {
     this.messageEntity = ko.unwrap(message);
     this.header = header;
 
-    const [firstPreview] = this.messageEntity.get_first_asset().previews();
+    const [firstPreview] = (this.messageEntity.get_first_asset() as Text).previews();
     this.preview = firstPreview;
     this.element = element;
 

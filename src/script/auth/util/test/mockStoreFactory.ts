@@ -69,7 +69,7 @@ export const mockStoreFactory = (
     (core as any).apiClient = apiClient;
   }
   return configureStore<TypeUtil.RecursivePartial<RootState>, ThunkDispatch>([
-    thunk.withExtraArgument({actions, apiClient, cookieStore, core, config: config || defaultConfig, localStorage}),
+    thunk.withExtraArgument({actions, apiClient, config: config || defaultConfig, cookieStore, core, localStorage}),
     createLogger({
       actionTransformer(action: any): string {
         return JSON.stringify(action);

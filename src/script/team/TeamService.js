@@ -27,7 +27,7 @@ export class TeamService {
   }
 
   /**
-   * @param {BackendClient} backendClient - Client for the API calls
+   * @param {BackendClient} backendClient Client for the API calls
    */
   constructor(backendClient) {
     this.backendClient = backendClient;

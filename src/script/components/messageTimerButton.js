@@ -37,8 +37,8 @@ class MessageTimerButton {
 
   /**
    * Click on ephemeral button
-   * @param {Object} data - Object
-   * @param {DOMEvent} event - Triggered event
+   * @param {Object} data Object
+   * @param {DOMEvent} event Triggered event
    * @returns {undefined} No return value
    */
   onClick(data, event) {

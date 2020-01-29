@@ -20,7 +20,6 @@
 import {ClientType} from '@wireapp/api-client/dist/client/index';
 import {
   ArrowIcon,
-  Button,
   Checkbox,
   CheckboxLabel,
   ErrorMessage,
@@ -42,12 +41,12 @@ import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import {ROUTE} from '../route';
-import {isDesktopApp, isSupportingClipboard} from '../Runtime';
+import {isDesktopApp} from '../Runtime';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {UUID_REGEX} from '../util/stringUtil';
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {
-  handleSSOWindow: (code: string) => Promise<void>;
+  doLogin: (code: string) => Promise<void>;
   initialCode?: string;
 }
 
@@ -57,17 +56,15 @@ const SingleSignOnForm = ({
   initialCode,
   isFetching,
   loginError,
-  hasHistory,
   resetAuthError,
   validateSSOCode,
-  handleSSOWindow,
-  doGetAllClients,
+  doLogin,
   doFinalizeSSOLogin,
 }: Props & ConnectedProps & DispatchProps) => {
   const codeInput = useRef<HTMLInputElement>();
   const [code, setCode] = useState('');
   const {formatMessage: _} = useIntl();
-  const {history} = useReactRouter<{code?: string}>();
+  const {history} = useReactRouter();
   const [persist, setPersist] = useState(true);
   const [ssoError, setSsoError] = useState(null);
   const [isCodeInputValid, setIsCodeInputValid] = useState(true);
@@ -108,7 +105,7 @@ const SingleSignOnForm = ({
       }
       const strippedCode = stripPrefix(code);
       await validateSSOCode(strippedCode);
-      await handleSSOWindow(strippedCode);
+      await doLogin(strippedCode);
       const clientType = persist ? ClientType.PERMANENT : ClientType.TEMPORARY;
       await doFinalizeSSOLogin({clientType});
       history.push(ROUTE.HISTORY_INFO);
@@ -138,33 +135,6 @@ const SingleSignOnForm = ({
     }
   };
 
-  const extractSSOLink = (event: React.MouseEvent, shouldEmitError = true) => {
-    if (event) {
-      event.preventDefault();
-    }
-    if (isSupportingClipboard()) {
-      readFromClipboard()
-        .then(text => {
-          const isContainingValidSSOLink = containsSSOCode(text);
-          if (isContainingValidSSOLink) {
-            const code = extractCode(text);
-            setCode(code);
-          } else if (shouldEmitError) {
-            throw new BackendError({code: 400, label: BackendError.SSO_ERRORS.SSO_NO_SSO_CODE});
-          }
-        })
-        .catch(error => setSsoError(error));
-    }
-  };
-
-  const readFromClipboard = () => window.navigator.clipboard.readText();
-
-  const containsSSOCode = (text: string) => text && new RegExp(`${SSO_CODE_PREFIX}${UUID_REGEX}`, 'gm').test(text);
-
-  const extractCode = (text: string) => {
-    return containsSSOCode(text) ? text.match(new RegExp(`${SSO_CODE_PREFIX}${UUID_REGEX}`, 'gm'))[0] : '';
-  };
-
   const stripPrefix = (prefixedCode: string) =>
     prefixedCode &&
     prefixedCode
@@ -175,24 +145,6 @@ const SingleSignOnForm = ({
   return (
     <Form style={{marginTop: 30}} data-uie-name="sso" onSubmit={handleSubmit}>
       <InputSubmitCombo>
-        {isSupportingClipboard() && !code && (
-          <Button
-            style={{
-              borderRadius: '4px',
-              fontSize: '11px',
-              lineHeight: '16px',
-              margin: '0 0 0 12px',
-              maxHeight: '32px',
-              minWidth: '100px',
-              padding: '0 12px',
-            }}
-            type="button"
-            onClick={extractSSOLink}
-            data-uie-name="do-paste-sso-code"
-          >
-            {_(ssoLoginStrings.pasteButton)}
-          </Button>
-        )}
         <Input
           name="sso-code"
           tabIndex={1}
@@ -202,7 +154,7 @@ const SingleSignOnForm = ({
           }}
           ref={codeInput}
           markInvalid={!isCodeInputValid}
-          placeholder={isSupportingClipboard() ? '' : _(ssoLoginStrings.codeInputPlaceholder)}
+          placeholder={_(ssoLoginStrings.codeInputPlaceholder)}
           value={code}
           autoComplete="section-login sso-code"
           maxLength={1024}

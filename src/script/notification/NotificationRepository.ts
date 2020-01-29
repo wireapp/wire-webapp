@@ -808,10 +808,10 @@ export class NotificationRepository {
    * Sending the notification.
    *
    * @param notificationContent Content of notification
-   * @param notificationContent.title - Title of notification
-   * @param notificationContent.options - Notification options
-   * @param notificationContent.trigger - Function to be called on notificiation click
-   * @param notificationContent.timeout - Timeout after which notification is closed
+   * @param notificationContent.title Title of notification
+   * @param notificationContent.options Notification options
+   * @param notificationContent.trigger Function to be called on notificiation click
+   * @param notificationContent.timeout Timeout after which notification is closed
    * @returns No return value
    */
   private showNotification(notificationContent: NotificationContent): void {
@@ -823,10 +823,10 @@ export class NotificationRepository {
    * Sending the browser notification.
    *
    * @param notificationContent Content of notification
-   * @param notificationContent.title - Notification title
-   * @param notificationContent.options - Notification options
-   * @param notificationContent.trigger - Function to be triggered on click [Function] trigger
-   * @param notificationContent.timeout - Timeout for notification
+   * @param notificationContent.title Notification title
+   * @param notificationContent.options Notification options
+   * @param notificationContent.trigger Function to be triggered on click [Function] trigger
+   * @param notificationContent.timeout Timeout for notification
    * @param No return value
    */
   private showNotificationInBrowser(notificationContent: NotificationContent): void {

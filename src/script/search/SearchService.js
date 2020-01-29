@@ -22,7 +22,7 @@ import {getLogger} from 'Util/Logger';
 export class SearchService {
   /**
    * Construct a new Search Service.
-   * @param {BackendClient} backendClient - Client for the API calls
+   * @param {BackendClient} backendClient Client for the API calls
    */
   constructor(backendClient) {
     this.backendClient = backendClient;
@@ -32,8 +32,8 @@ export class SearchService {
   /**
    * Search for a user.
    *
-   * @param {string} query - Query string (case insensitive)
-   * @param {number} size - Number of requested user
+   * @param {string} query Query string (case insensitive)
+   * @param {number} size Number of requested user
    * @returns {Promise} Resolves with the search results
    */
   getContacts(query, size) {

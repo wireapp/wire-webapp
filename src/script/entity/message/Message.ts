@@ -18,10 +18,9 @@
  */
 
 import ko from 'knockout';
-import moment from 'moment';
 
 import {getFirstName} from 'Util/SanitizationUtil';
-import {TIME_IN_MILLIS, formatDurationCaption} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS, formatDurationCaption, formatTimeShort, fromUnixTime} from 'Util/TimeUtil';
 
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {AssetTransferState} from '../../assets/AssetTransferState';
@@ -140,8 +139,8 @@ export class Message {
   }
 
   display_timestamp_short = (): string => {
-    const date = moment.unix(this.timestamp() / TIME_IN_MILLIS.SECOND);
-    return date.local().format('LT');
+    const date = fromUnixTime(this.timestamp() / TIME_IN_MILLIS.SECOND);
+    return formatTimeShort(date);
   };
 
   equals = (messageEntity?: Message) => (messageEntity && this.id ? this.id === messageEntity.id : false);

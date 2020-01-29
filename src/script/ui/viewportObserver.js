@@ -49,11 +49,11 @@ const observer = new IntersectionObserver(onIntersect, options);
 /**
  * Will track an element and trigger the callback only once when the element appears in viewport.
  *
- * @param {HTMLElement} element - the element to observe
- * @param {Function} onVisible - the callback to call when the element appears
- * @param {boolean} fullyInView - should the element be fully in view
- * @param {HTMLElement} container - the element containing the element
- * @returns {void} - nothing
+ * @param {HTMLElement} element the element to observe
+ * @param {Function} onVisible the callback to call when the element appears
+ * @param {boolean} [fullyInView] should the element be fully in view
+ * @param {HTMLElement} [container] the element containing the element
+ * @returns {void} nothing
  */
 const onElementInViewport = (element, onVisible, fullyInView, container) => {
   observedElements.set(element, {container, fullyInView, onVisible});
@@ -63,10 +63,10 @@ const onElementInViewport = (element, onVisible, fullyInView, container) => {
 /**
  * Will track an element and trigger the callback whenever the intersecting state changes
  *
- * @param {HTMLElement} element - the element to observe
- * @param {Function} onChange - the callback to call when the element intersects or not
- * @param {boolean} fullyInView - should the element be fully in view
- * @param {HTMLElement} container - the element containing the element
+ * @param {HTMLElement} element the element to observe
+ * @param {Function} onChange the callback to call when the element intersects or not
+ * @param {boolean} fullyInView should the element be fully in view
+ * @param {HTMLElement} container the element containing the element
  * @returns {void} - nothing
  */
 const trackElement = (element, onChange, fullyInView, container) => {

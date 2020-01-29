@@ -38,7 +38,7 @@ export class SearchRepository {
 
   /**
    * Trim and remove @.
-   * @param {string} query - Search string
+   * @param {string} query Search string
    * @returns {string} Normalized search query
    */
   static normalizeQuery(query) {
@@ -52,8 +52,8 @@ export class SearchRepository {
   }
 
   /**
-   * @param {BackendClient} backendClient - Client for the API calls
-   * @param {UserRepository} userRepository - Repository for all user interactions
+   * @param {BackendClient} backendClient Client for the API calls
+   * @param {UserRepository} userRepository Repository for all user interactions
    */
   constructor(backendClient, userRepository) {
     this.searchService = new SearchService(backendClient);
@@ -65,9 +65,9 @@ export class SearchRepository {
    * Search for a user in the given user list and given a search term.
    * Doesn't sort the results and keep the initial order of the given user list.
    *
-   * @param {string} term - the search term
-   * @param {Array<User>} userEntities - entities to match the search term against
-   * @param {Array<SearchRepository.CONFIG.SEARCHABLE_FIELDS>} properties=[SearchRepository.CONFIG.SEARCHABLE_FIELDS.NAME, SearchRepository.CONFIG.SEARCHABLE_FIELDS.USERNAME] - list of properties that will be matched against the search term
+   * @param {string} term the search term
+   * @param {Array<User>} userEntities entities to match the search term against
+   * @param {Array<SearchRepository.CONFIG.SEARCHABLE_FIELDS>} properties=[SearchRepository.CONFIG.SEARCHABLE_FIELDS.NAME, SearchRepository.CONFIG.SEARCHABLE_FIELDS.USERNAME] list of properties that will be matched against the search term
    *    the order of the properties in the array indicates the priorities by which results will be sorted
    * @returns {Array<User>} the filtered list of users
    */
@@ -152,9 +152,9 @@ export class SearchRepository {
    * Search for users on the backend by name.
    * @note We skip a few results as connection changes need a while to reflect on the backend.
    *
-   * @param {string} name - Search query
-   * @param {boolean} isHandle - Is query a user handle
-   * @param {number} [maxResults=SearchRepository.CONFIG.MAX_SEARCH_RESULTS] - Maximum number of results
+   * @param {string} name Search query
+   * @param {boolean} isHandle Is query a user handle
+   * @param {number} [maxResults=SearchRepository.CONFIG.MAX_SEARCH_RESULTS] Maximum number of results
    * @returns {Promise} Resolves with the search results
    */
   search_by_name(name, isHandle, maxResults = SearchRepository.CONFIG.MAX_SEARCH_RESULTS) {

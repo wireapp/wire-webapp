@@ -18,9 +18,8 @@
  */
 
 import ko from 'knockout';
-import moment from 'moment';
 
-import {LDM} from 'Util/moment';
+import {formatDayMonthNumeral, formatTimeShort} from 'Util/TimeUtil';
 
 import {Message} from '../../entity/message/Message';
 
@@ -35,6 +34,11 @@ ko.components.register('asset-header', {
   `,
   viewModel: function({message}: Params): void {
     this.message_et = message;
-    this.timeText = ko.pureComputed(() => moment(message.timestamp()).format(`${LDM} LT`));
+    this.timeText = ko.pureComputed(() => {
+      const timeStamp = message.timestamp();
+      const dayMonth = formatDayMonthNumeral(timeStamp);
+      const time = formatTimeShort(timeStamp);
+      return `${dayMonth} ${time}`;
+    });
   },
 });

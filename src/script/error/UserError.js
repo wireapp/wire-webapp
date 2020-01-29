@@ -32,9 +32,9 @@ z.error.UserError = class UserError extends BaseError {
       INVALID_UPDATE: 'False input data for requested update',
       PRE_KEY_NOT_FOUND: 'Pre-key not found',
       REQUEST_FAILURE: 'User related backend request failure',
+      USERNAME_TAKEN: 'Username is already taken',
       USER_MISSING_EMAIL: 'Self user has not set email address',
       USER_NOT_FOUND: 'User not found',
-      USERNAME_TAKEN: 'Username is already taken',
     };
   }
 
@@ -43,9 +43,9 @@ z.error.UserError = class UserError extends BaseError {
       INVALID_UPDATE: 'INVALID_UPDATE',
       PRE_KEY_NOT_FOUND: 'PRE_KEY_NOT_FOUND',
       REQUEST_FAILURE: 'REQUEST_FAILURE',
+      USERNAME_TAKEN: 'USERNAME_TAKEN',
       USER_MISSING_EMAIL: 'USER_MISSING_EMAIL',
       USER_NOT_FOUND: 'USER_NOT_FOUND',
-      USERNAME_TAKEN: 'USERNAME_TAKEN',
     };
   }
 };

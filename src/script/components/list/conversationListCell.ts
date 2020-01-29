@@ -108,7 +108,7 @@ class ConversationListCell {
 
     this.users = this.conversation.participating_user_ets;
 
-    this.cell_state = ko.observable({icon: null, description: null});
+    this.cell_state = ko.observable({description: null, icon: null});
 
     this.ConversationStatusIcon = ConversationStatusIcon;
 

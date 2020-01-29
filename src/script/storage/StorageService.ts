@@ -79,8 +79,8 @@ export class StorageService {
   /**
    * Initialize the IndexedDB for a user.
    *
-   * @param userId - User ID
-   * @param requestPersistentStorage - if a persistent storage should be requested
+   * @param userId User ID
+   * @param requestPersistentStorage if a persistent storage should be requested
    * @returns Resolves with the database name
    */
   async init(userId: string = this.userId, requestPersistentStorage: boolean = false): Promise<string> {
@@ -202,8 +202,8 @@ export class StorageService {
   /**
    * Removes persisted data.
    *
-   * @param storeName - Name of the object store
-   * @param primaryKey - Primary key
+   * @param storeName Name of the object store
+   * @param primaryKey Primary key
    * @returns Resolves when the object is deleted
    */
   async delete(storeName: string, primaryKey: string): Promise<string> {
@@ -239,7 +239,7 @@ export class StorageService {
   /**
    * Delete multiple database stores.
    *
-   * @param storeNames - Names of database stores to delete
+   * @param storeNames Names of database stores to delete
    * @returns Resolves when the stores have been deleted
    */
   async deleteStores(storeNames: string[]): Promise<void> {
@@ -298,7 +298,7 @@ export class StorageService {
   /**
    * Returns an array of all records for a given object store.
    *
-   * @param storeName - Name of object store
+   * @param storeName Name of object store
    * @returns Resolves with the records from the object store
    */
   async getAll<T = Object>(storeName: string): Promise<T[]> {
@@ -319,7 +319,7 @@ export class StorageService {
   }
 
   /**
-   * @param tableNames - Names of tables to get
+   * @param tableNames Names of tables to get
    * @returns Resolves with matching tables
    */
   getTables(tableNames: string[]): Dexie.Table<any, any>[] {
@@ -330,8 +330,8 @@ export class StorageService {
    * Loads persisted data via a promise.
    * @note If a key cannot be found, it resolves and returns "undefined".
    *
-   * @param storeName - Name of object store
-   * @param primaryKey - Primary key of object to be retrieved
+   * @param storeName Name of object store
+   * @param primaryKey Primary key of object to be retrieved
    * @returns Resolves with the record matching the primary key
    */
   async load<T = Object>(storeName: string, primaryKey: string): Promise<T | undefined> {
@@ -367,9 +367,9 @@ export class StorageService {
   /**
    * Saves objects in the local database.
    *
-   * @param storeName - Name of object store where to save the object
-   * @param primaryKey - Primary key which should be used to store the object
-   * @param entity - Data to store in object store
+   * @param storeName Name of object store where to save the object
+   * @param primaryKey Primary key which should be used to store the object
+   * @param entity Data to store in object store
    * @returns Resolves with the primary key of the persisted object
    */
   async save<T = Object>(storeName: string, primaryKey: string, entity: T): Promise<string> {
@@ -411,7 +411,7 @@ export class StorageService {
   /**
    * Closes the database. This operation completes immediately and there is no returned Promise.
    * @see https://github.com/dfahlander/Dexie.js/wiki/Dexie.close()
-   * @param reason - Cause for the termination
+   * @param reason Cause for the termination
    */
   terminate(reason: string = 'unknown reason'): void {
     this.logger.info(`Closing database connection with '${this.dbName}' because of '${reason}'.`);
@@ -429,9 +429,9 @@ export class StorageService {
   /**
    * Update previously persisted data via a promise.
    *
-   * @param storeName - Name of object store
-   * @param primaryKey - Primary key of object to be updated
-   * @param changes - Object containing the key paths to each property you want to change
+   * @param storeName Name of object store
+   * @param primaryKey Primary key of object to be updated
+   * @param changes Object containing the key paths to each property you want to change
    * @returns Promise with the number of updated records (0 if no records were changed).
    */
   async update<T = Object>(storeName: string, primaryKey: string, changes: T): Promise<number> {
@@ -441,15 +441,14 @@ export class StorageService {
         const logMessage = `Updated ${numberOfUpdates} record(s) with key '${primaryKey}' in store '${storeName}'`;
         this.logger.info(logMessage, changes);
         return numberOfUpdates;
-      } else {
-        const oldRecord = await this.load<unknown>(storeName, primaryKey);
-        await this.engine.update(storeName, primaryKey, changes);
-        const newRecord = await this.load<unknown>(storeName, primaryKey);
-
-        this.notifyListeners(storeName, DEXIE_CRUD_EVENT.UPDATING, oldRecord, newRecord);
-
-        return 1;
       }
+      const oldRecord = await this.load<unknown>(storeName, primaryKey);
+      await this.engine.update(storeName, primaryKey, changes);
+      const newRecord = await this.load<unknown>(storeName, primaryKey);
+
+      this.notifyListeners(storeName, DEXIE_CRUD_EVENT.UPDATING, oldRecord, newRecord);
+
+      return 1;
     } catch (error) {
       this.logger.error(`Failed to update '${primaryKey}' in store '${storeName}'`, error);
       throw error;

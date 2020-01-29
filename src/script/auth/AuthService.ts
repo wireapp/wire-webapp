@@ -59,7 +59,7 @@ export class AuthService {
    * Get access token if a valid cookie is provided.
    * @note Don't use our client wrapper here, because to query "/access" we need to set "withCredentials" to "true" in order to send the cookie.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/tab.html#!//newAccessToken
-   * @param retryAttempt - Retry attempts when a request fails
+   * @param retryAttempt Retry attempts when a request fails
    * @returns Promise which resolves with access token data.
    */
   postAccess(retryAttempt: number = 1): Promise<AccessTokenData> {

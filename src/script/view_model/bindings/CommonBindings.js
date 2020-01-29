@@ -19,17 +19,14 @@
 
 import ko from 'knockout';
 import $ from 'jquery';
-import moment from 'moment';
 import SimpleBar from 'simplebar';
 import {debounce, throttle} from 'underscore';
 import '@wireapp/antiscroll-2/dist/antiscroll-2';
 
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {t} from 'Util/LocalizerUtil';
 import {stripUrlWrapper} from 'Util/util';
 import {Environment} from 'Util/Environment';
 import {isEnterKey} from 'Util/KeyboardUtil';
-import {LLDM} from 'Util/moment';
 
 import {overlayedObserver} from '../../ui/overlayedObserver';
 import {viewportObserver} from '../../ui/viewportObserver';
@@ -332,9 +329,9 @@ ko.bindingHandlers.load_image_on_hover = {
 
 /**
  * Will only fire once when the value has changed.
- * @param {*} handler - Handler
- * @param {ko.observable} owner - Subscription owner
- * @param {string} eventName - Event name
+ * @param {*} handler Handler
+ * @param {ko.observable} owner Subscription owner
+ * @param {string} eventName Event name
  * @returns {undefined} No return value
  */
 ko.subscribable.fn.subscribe_once = function(handler, owner, eventName) {
@@ -351,7 +348,7 @@ ko.subscribable.fn.subscribe_once = function(handler, owner, eventName) {
 /**
  * Subscribe to changes and receive the new and the old value
  * https://github.com/knockout/knockout/issues/914#issuecomment-66697321
- * @param {function} handler - Handler
+ * @param {function} handler Handler
  * @returns {ko.subscription} knockout subscription
  */
 ko.subscribable.fn.subscribeChanged = function(handler) {
@@ -509,58 +506,6 @@ ko.bindingHandlers.visibility = (function() {
   return {
     init: setVisibility,
     update: setVisibility,
-  };
-})();
-
-ko.bindingHandlers.relative_timestamp = (function() {
-  const timestamps = [];
-
-  // should be fine to fire all 60 sec
-  window.setInterval(() => timestamps.map(timestamp_func => timestamp_func()), TIME_IN_MILLIS.MINUTE);
-
-  const calculate = function(element, timestamp) {
-    timestamp = window.parseInt(timestamp);
-    const date = moment.unix(timestamp / TIME_IN_MILLIS.SECOND);
-
-    const now = moment().local();
-    const today = now.format('YYMMDD');
-    const yesterday = now.subtract(1, 'days').format('YYMMDD');
-    const current_day = date.local().format('YYMMDD');
-
-    if (moment().diff(date, 'minutes') < 2) {
-      return $(element).text(t('conversationJustNow'));
-    }
-
-    if (moment().diff(date, 'minutes') < 60) {
-      return $(element).text(date.fromNow());
-    }
-
-    if (current_day === today) {
-      return $(element).text(date.local().format('LT'));
-    }
-
-    if (current_day === yesterday) {
-      return $(element).text(`${t('conversationYesterday')} ${date.local().format('LT')}`);
-    }
-
-    if (moment().diff(date, 'days') < 7) {
-      return $(element).text(date.local().format('dddd LT'));
-    }
-
-    return $(element).text(date.local().format(`dddd, ${LLDM}, LT`));
-  };
-
-  return {
-    init(element, valueAccessor) {
-      const timestamp_func = () => calculate(element, valueAccessor());
-      timestamp_func();
-      timestamps.push(timestamp_func);
-
-      ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
-        const timestamp_index = timestamps.indexOf(timestamp_func);
-        timestamps.splice(timestamp_index, 1);
-      });
-    },
   };
 })();
 

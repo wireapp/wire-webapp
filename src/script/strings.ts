@@ -43,6 +43,25 @@ export const cookiePolicyStrings = defineMessages({
 });
 
 export const indexStrings = defineMessages({
+  createAccount: {
+    defaultMessage: 'Create account',
+    id: 'index.createAccount',
+  },
+  enterprise: {
+    defaultMessage: 'Enterprise log in',
+    id: 'index.enterprise',
+  },
+  logIn: {
+    defaultMessage: 'Log in',
+    id: 'index.login',
+  },
+  welcome: {
+    defaultMessage: 'Welcome to {brandName}',
+    id: 'index.welcome',
+  },
+});
+
+export const setAccountTypeStrings = defineMessages({
   createAccountForOrganizations: {
     defaultMessage: 'Pro',
     id: 'index.createAccountForOrganizations',
@@ -58,14 +77,6 @@ export const indexStrings = defineMessages({
   createTeam: {
     defaultMessage: 'create a team',
     id: 'index.createTeam',
-  },
-  login: {
-    defaultMessage: 'Log in',
-    id: 'index.login',
-  },
-  loginInfo: {
-    defaultMessage: 'Already have an account?',
-    id: 'index.loginInfo',
   },
 });
 
@@ -553,10 +564,6 @@ export const errorHandlerStrings = defineMessages({
   [BackendError.LABEL.SSO_NO_MATCHING_AUTH]: {
     defaultMessage: 'Something went wrong. Please contact your team administrator for details (Error 9).',
     id: 'BackendError.LABEL.SSO_NO_MATCHING_AUTH',
-  },
-  [BackendError.LABEL.SSO_NO_SSO_CODE]: {
-    defaultMessage: 'No SSO access code detected',
-    id: 'BackendError.LABEL.NO_SSO_CODE',
   },
   [BackendError.LABEL.SSO_NOT_FOUND]: {
     defaultMessage: 'Something went wrong. Please contact your team administrator for details (Error 7).',
