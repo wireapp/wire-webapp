@@ -18,6 +18,7 @@
  */
 
 import fs from 'fs-extra';
+// @ts-ignore
 import authTranslations from '../temp/i18n/src/script/strings.json';
 import webappTranslations from '../resource/translation/en-US.json';
 
