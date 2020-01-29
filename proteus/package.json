@@ -4,7 +4,7 @@
     "@types/ed2curve": "0.2.2",
     "@types/node": "~12",
     "@wireapp/cbor": "4.5.1",
-    "ed2curve": "0.2.1",
+    "ed2curve": "0.3.0",
     "libsodium-wrappers-sumo": "0.7.6"
   },
   "description": "Axolotl protocol implementation for JavaScript.",
