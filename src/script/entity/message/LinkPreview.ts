@@ -21,6 +21,7 @@ import ko from 'knockout';
 
 import {obfuscate} from 'Util/StringUtil';
 import {AssetRemoteData} from '../../assets/AssetRemoteData';
+import {ITweet} from '@wireapp/protocol-messaging';
 import {LinkPreviewMetaDataType} from '../../links/LinkPreviewMetaDataType';
 
 export class LinkPreview {
@@ -28,7 +29,7 @@ export class LinkPreview {
   private title: string;
   public url: string;
   public meta_data_type?: LinkPreviewMetaDataType;
-  public meta_data?: any;
+  public meta_data?: ITweet;
 
   constructor(title?: string, url?: string) {
     this.title = title || '';
