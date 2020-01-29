@@ -21,14 +21,15 @@ import ko from 'knockout';
 
 import {obfuscate} from 'Util/StringUtil';
 import {AssetRemoteData} from '../../assets/AssetRemoteData';
+import {ITweet} from '@wireapp/protocol-messaging';
 import {LinkPreviewMetaDataType} from '../../links/LinkPreviewMetaDataType';
 
 export class LinkPreview {
   private readonly image_resource: ko.Observable<AssetRemoteData>;
   private title: string;
-  private url: string;
+  public url: string;
   public meta_data_type?: LinkPreviewMetaDataType;
-  public meta_data?: string;
+  public meta_data?: ITweet;
 
   constructor(title?: string, url?: string) {
     this.title = title || '';
