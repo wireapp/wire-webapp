@@ -20,6 +20,7 @@
 import {ClientType} from '@wireapp/api-client/dist/client/index';
 import {BackendErrorLabel} from '@wireapp/api-client/dist/http';
 import {UrlUtil} from '@wireapp/commons';
+import {pathWithParams} from '@wireapp/commons/dist/commonjs/util/UrlUtil';
 import {PATTERN, isValidEmail} from '@wireapp/commons/dist/commonjs/util/ValidationUtil';
 import {
   ArrowIcon,
@@ -50,12 +51,14 @@ import {parseError, parseValidationErrors} from '../util/errorUtil';
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {
   doLogin: (code: string) => Promise<void>;
+  initialClientType?: ClientType;
   initialCode?: string;
 }
 
 const SSO_CODE_PREFIX = 'wire-';
 const SSO_CODE_PREFIX_REGEX = '[wW][iI][rR][eE]-';
 const SingleSignOnForm = ({
+  initialClientType = ClientType.PERMANENT,
   initialCode,
   isFetching,
   loginError,
@@ -72,7 +75,7 @@ const SingleSignOnForm = ({
   const [disableInput, setDisableInput] = useState(false);
   const {formatMessage: _} = useIntl();
   const {history} = useReactRouter();
-  const [persist, setPersist] = useState(true);
+  const [clientType, setClientType] = useState(initialClientType);
   const [ssoError, setSsoError] = useState(null);
   const [isCodeOrMailInputValid, setIsCodeOrMailInputValid] = useState(true);
   const [validationError, setValidationError] = useState();
@@ -128,16 +131,17 @@ const SingleSignOnForm = ({
       if (isValidEmail(codeOrMail)) {
         const domain = codeOrMail.split('@')[1];
         const {webapp_welcome_url} = await doGetDomainInfo(domain);
+        const [path, query = ''] = webapp_welcome_url.split('?');
+        const welcomeUrl = pathWithParams(path, {[QUERY_KEY.CLIENT_TYPE]: clientType}, null, query);
         if (isDesktopApp()) {
-          await doSendNavigationEvent(webapp_welcome_url);
+          await doSendNavigationEvent(welcomeUrl);
         } else {
-          doNavigate(webapp_welcome_url);
+          doNavigate(welcomeUrl);
         }
       } else {
         const strippedCode = stripPrefix(codeOrMail);
         await validateSSOCode(strippedCode);
         await doLogin(strippedCode);
-        const clientType = persist ? ClientType.PERMANENT : ClientType.TEMPORARY;
         await doFinalizeSSOLogin({clientType});
         history.push(ROUTE.HISTORY_INFO);
       }
@@ -235,8 +239,10 @@ const SingleSignOnForm = ({
       {!isDesktopApp() && (
         <Checkbox
           tabIndex={3}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => setPersist(!event.target.checked)}
-          checked={!persist}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+            setClientType(event.target.checked ? ClientType.TEMPORARY : ClientType.PERMANENT)
+          }
+          checked={clientType === ClientType.TEMPORARY}
           data-uie-name="enter-public-computer-sso-sign-in"
           style={{justifyContent: 'center', marginTop: '36px'}}
         >

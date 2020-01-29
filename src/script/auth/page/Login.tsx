@@ -19,6 +19,7 @@
 
 import {LoginData} from '@wireapp/api-client/dist/auth';
 import {ClientType} from '@wireapp/api-client/dist/client/index';
+import {UrlUtil} from '@wireapp/commons';
 import {
   ArrowIcon,
   COLOR,
@@ -83,6 +84,13 @@ const Login = ({
 
   const [isValidLink, setIsValidLink] = useState(true);
   const [validationErrors, setValidationErrors] = useState([]);
+
+  useEffect(() => {
+    const queryClientType = UrlUtil.getURLParameter(QUERY_KEY.CLIENT_TYPE);
+    if (queryClientType === ClientType.TEMPORARY) {
+      pushLoginData({clientType: ClientType.TEMPORARY});
+    }
+  }, []);
 
   useEffect(() => {
     const queryConversationCode = URLUtil.getURLParameter(QUERY_KEY.CONVERSATION_CODE) || null;
