@@ -62,14 +62,6 @@ describe('"Login"', () => {
   });
 
   describe('with account registration disabled', () => {
-    beforeAll(() => {
-      Config.FEATURE = {
-        ENABLE_ACCOUNT_REGISTRATION: false,
-      };
-    });
-
-    afterAll(() => (Config.FEATURE = {}));
-
     it('hides the back button', () => {
       Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION = false;
       wrapper = mountComponent(

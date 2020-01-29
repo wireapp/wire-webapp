@@ -17,6 +17,7 @@
  *
  */
 
+import {DomainData} from '@wireapp/api-client/dist/account/DomainData';
 import {LoginData, RegisterData, SendLoginCode} from '@wireapp/api-client/dist/auth';
 import {ClientType} from '@wireapp/api-client/dist/client/index';
 import {Account} from '@wireapp/core';
@@ -333,6 +334,12 @@ export class AuthAction {
         dispatch(AuthActionCreator.failedValidateLocalClient(error));
         throw error;
       }
+    };
+  };
+
+  doGetDomainInfo = (domain: string): ThunkAction<Promise<DomainData>> => {
+    return async (dispatch, getState, {apiClient}) => {
+      return apiClient.account.api.getDomain(domain);
     };
   };
 

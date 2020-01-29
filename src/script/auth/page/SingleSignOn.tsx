@@ -17,6 +17,8 @@
  *
  */
 
+import {ClientType} from '@wireapp/api-client/dist/client/index';
+import {UrlUtil} from '@wireapp/commons';
 import {
   ArrowIcon,
   COLOR,
@@ -32,7 +34,7 @@ import {
   Overlay,
   Text,
 } from '@wireapp/react-ui-kit';
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
@@ -45,7 +47,7 @@ import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import RouterLink from '../component/RouterLink';
 import {BackendError} from '../module/action/BackendError';
 import {RootState, bindActionCreators} from '../module/reducer';
-import {ROUTE} from '../route';
+import {QUERY_KEY, ROUTE} from '../route';
 import Page from './Page';
 import SingleSignOnForm from './SingleSignOnForm';
 
@@ -58,6 +60,14 @@ const SingleSignOn = ({}: Props & ConnectedProps & DispatchProps) => {
   const ssoWindowRef = useRef<Window>();
   const {match} = useReactRouter<{code?: string}>();
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
+  const [clientType, setClientType] = useState(ClientType.PERMANENT);
+
+  useEffect(() => {
+    const queryClientType = UrlUtil.getURLParameter(QUERY_KEY.CLIENT_TYPE);
+    if (queryClientType === ClientType.TEMPORARY) {
+      setClientType(ClientType.TEMPORARY);
+    }
+  }, []);
 
   const handleSSOWindow = (code: string): Promise<void> => {
     const POPUP_HEIGHT = 520;
@@ -230,8 +240,18 @@ const SingleSignOn = ({}: Props & ConnectedProps & DispatchProps) => {
             >
               <div>
                 <H1 center>{_(ssoLoginStrings.headline)}</H1>
-                <Muted>{_(ssoLoginStrings.subhead)}</Muted>
-                <SingleSignOnForm doLogin={handleSSOWindow} initialCode={match.params.code} />
+                <Muted>
+                  {_(
+                    Config.FEATURE.ENABLE_DOMAIN_DISCOVERY
+                      ? ssoLoginStrings.subheadCodeOrEmail
+                      : ssoLoginStrings.subheadCode,
+                  )}
+                </Muted>
+                <SingleSignOnForm
+                  doLogin={handleSSOWindow}
+                  initialCode={match.params.code}
+                  initialClientType={clientType}
+                />
               </div>
             </ContainerXS>
           </Column>

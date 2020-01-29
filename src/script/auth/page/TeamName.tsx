@@ -24,7 +24,6 @@ import {
   Columns,
   Container,
   ContainerXS,
-  ErrorMessage,
   Form,
   H1,
   Input,
@@ -157,9 +156,7 @@ const TeamName = ({
                       <ArrowIcon />
                     </RoundIconButton>
                   </InputSubmitCombo>
-                  <ErrorMessage data-uie-name="error-message">
-                    {error ? parseValidationErrors(error) : parseError(authError)}
-                  </ErrorMessage>
+                  {error ? parseValidationErrors(error) : parseError(authError)}
                 </Form>
               </div>
               <div>

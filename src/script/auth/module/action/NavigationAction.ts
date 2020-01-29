@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2020 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,17 +17,14 @@
  *
  */
 
-// Configure default test config
-window.wire = {};
-window.wire.env = {
-  FEATURE: {
-    CHECK_CONSENT: false,
-    DEFAULT_LOGIN_TEMPORARY_CLIENT: false,
-    ENABLE_DOMAIN_DISCOVERY: true,
-  },
-};
+import {ThunkAction} from '../reducer';
 
-// create initial div element with ID 'main' for react
-const main = document.createElement('div');
-main.id = 'main';
-document.body.appendChild(main);
+export class NavigationAction {
+  doNavigate = (url: string): ThunkAction<void> => {
+    return () => {
+      return window.location.assign(url);
+    };
+  };
+}
+
+export const navigationAction = new NavigationAction();

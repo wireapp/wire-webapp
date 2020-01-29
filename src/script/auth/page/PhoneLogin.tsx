@@ -33,7 +33,6 @@ import {
   Columns,
   Container,
   ContainerXS,
-  ErrorMessage,
   Form,
   H1,
   IsMobile,
@@ -128,15 +127,13 @@ const PhoneLogin = ({
                 <H1 center>{_(phoneLoginStrings.loginHead)}</H1>
                 <Form style={{marginTop: 30}} data-uie-name="login">
                   <PhoneLoginForm isFetching={isFetching} onSubmit={handleSubmit} />
-                  <ErrorMessage data-uie-name="error-message">
-                    {!error ? (
-                      <div style={{marginTop: '4px'}}>&nbsp;</div>
-                    ) : isValidationError(error) ? (
-                      parseValidationErrors(error)
-                    ) : (
-                      parseError(error)
-                    )}
-                  </ErrorMessage>
+                  {!error ? (
+                    <div style={{marginTop: '4px'}}>&nbsp;</div>
+                  ) : isValidationError(error) ? (
+                    parseValidationErrors(error)
+                  ) : (
+                    parseError(error)
+                  )}
                   {!isDesktopApp() && (
                     <Checkbox
                       tabIndex={4}
