@@ -33,6 +33,7 @@ describe('SingleSignOnForm', () => {
 
   const codeOrEmailInput = () => wrapper.find('input[data-uie-name="enter-code"]').first();
   const submitButton = () => wrapper.find('button[data-uie-name="do-sso-sign-in"]').first();
+  const temporaryCheckbox = () => wrapper.find('input[data-uie-name="enter-public-computer-sso-sign-in"]');
   const errorMessage = (errorLabel?: string) =>
     wrapper.find(`[data-uie-name="error-message"]${errorLabel ? `[data-uie-value="${errorLabel}"]` : ''}`);
 
@@ -120,12 +121,13 @@ describe('SingleSignOnForm', () => {
       .toBe(true);
   });
 
-  it('successfully redirects with registered domain', async () => {
+  it('successfully redirects with registered domain and permanent client', async () => {
     const email = 'mail@mail.com';
-    const expectedHost = 'http://localhost:8080';
+    const inputHost = 'http://localhost:8080?test=true';
+    const expectedHost = 'http://localhost:8080?test=true&clienttype=permanent';
 
     spyOn(actionRoot.authAction, 'doGetDomainInfo').and.returnValue(() =>
-      Promise.resolve({config_json_url: '', webapp_welcome_url: expectedHost}),
+      Promise.resolve({config_json_url: '', webapp_welcome_url: inputHost}),
     );
     spyOn(actionRoot.navigationAction, 'doNavigate').and.returnValue(() => {});
 
@@ -150,6 +152,55 @@ describe('SingleSignOnForm', () => {
       .toBe(true);
 
     codeOrEmailInput().simulate('change', {target: {value: email}});
+
+    expect(submitButton().props().disabled)
+      .withContext('Submit button is enabled')
+      .toBe(false);
+
+    submitButton().simulate('submit');
+
+    expect(actionRoot.authAction.doGetDomainInfo)
+      .withContext('domain data got fetched')
+      .toHaveBeenCalledTimes(1);
+
+    await waitForExpect(() => {
+      expect(actionRoot.navigationAction.doNavigate)
+        .withContext('navigates to expected host')
+        .toHaveBeenCalledWith(expectedHost);
+    });
+  });
+  it('successfully redirects with registered domain and temporary client', async () => {
+    const email = 'mail@mail.com';
+    const inputHost = 'http://localhost:8080?test=true';
+    const expectedHost = 'http://localhost:8080?test=true&clienttype=temporary';
+
+    spyOn(actionRoot.authAction, 'doGetDomainInfo').and.returnValue(() =>
+      Promise.resolve({config_json_url: '', webapp_welcome_url: inputHost}),
+    );
+    spyOn(actionRoot.navigationAction, 'doNavigate').and.returnValue(() => {});
+
+    wrapper = mountComponent(
+      <SingleSignOnForm doLogin={() => Promise.reject()} />,
+      mockStoreFactory()({
+        ...initialRootState,
+        runtimeState: {
+          hasCookieSupport: true,
+          hasIndexedDbSupport: true,
+          isSupportedBrowser: true,
+        },
+      }),
+    );
+
+    expect(codeOrEmailInput().exists())
+      .withContext('Email input exists')
+      .toBe(true);
+
+    expect(submitButton().props().disabled)
+      .withContext('Submit button is disabled')
+      .toBe(true);
+
+    codeOrEmailInput().simulate('change', {target: {value: email}});
+    temporaryCheckbox().simulate('change', {target: {checked: true}});
 
     expect(submitButton().props().disabled)
       .withContext('Submit button is enabled')

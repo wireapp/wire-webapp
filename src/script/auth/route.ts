@@ -20,6 +20,7 @@
 export const QUERY_KEY = {
   APPLOCK_SCHEDULED_TIMEOUT: 'applock_scheduled_timeout',
   APPLOCK_UNFOCUS_TIMEOUT: 'applock_unfocus_timeout',
+  CLIENT_TYPE: 'clienttype',
   CONVERSATION_CODE: 'join_code',
   CONVERSATION_KEY: 'join_key',
   CURRENCY: 'currency',
