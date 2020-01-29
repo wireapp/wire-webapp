@@ -34,12 +34,6 @@ describe('"SetHandle"', () => {
   const handleInput = () => wrapper.find('input[data-uie-name="enter-handle"]').first();
   const setHandleButton = () => wrapper.find('button[data-uie-name="do-send-handle"]').first();
 
-  beforeAll(() => {
-    Config.FEATURE = {
-      CHECK_CONSENT: false,
-    };
-  });
-
   it('has disabled submit button as long as there is no input', () => {
     wrapper = mountComponent(
       <SetHandle />,

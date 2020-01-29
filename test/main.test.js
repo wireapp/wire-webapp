@@ -21,6 +21,7 @@
 window.wire = {};
 window.wire.env = {
   FEATURE: {
+    CHECK_CONSENT: false,
     DEFAULT_LOGIN_TEMPORARY_CLIENT: false,
     ENABLE_DOMAIN_DISCOVERY: true,
   },
