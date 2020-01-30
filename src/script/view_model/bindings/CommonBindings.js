@@ -207,8 +207,14 @@ ko.bindingHandlers.heightSync = {
 
     // initial resize
     resizeTarget();
-    const valueSubscription = triggerValue.subscribe(() => window.requestAnimationFrame(resizeTarget));
-    ko.utils.domNodeDisposal.addDisposeCallback(element, () => valueSubscription.dispose());
+    const heightSync = () => window.requestAnimationFrame(resizeTarget);
+    const valueSubscription = triggerValue.subscribe(heightSync);
+    window.addEventListener('resize', heightSync);
+
+    ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
+      window.removeEventListener('resize', heightSync);
+      valueSubscription.dispose();
+    });
   },
 };
 
@@ -219,9 +225,14 @@ ko.bindingHandlers.scrollSync = {
   init(element, valueAccessor) {
     const selector = valueAccessor();
     const anchorElement = document.querySelector(selector);
+    const syncScroll = () => (element.scrollTop = anchorElement.scrollTop);
     if (anchorElement) {
-      anchorElement.addEventListener('scroll', () => {
-        element.scrollTop = anchorElement.scrollTop;
+      anchorElement.addEventListener('scroll', syncScroll);
+      window.addEventListener('resize', syncScroll);
+
+      ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
+        anchorElement.removeEventListener('scroll', syncScroll);
+        window.removeEventListener('resize', syncScroll);
       });
     }
   },
