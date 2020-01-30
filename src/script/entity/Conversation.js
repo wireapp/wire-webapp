@@ -235,6 +235,8 @@ export class Conversation {
       }),
     );
 
+    this.incomingMessages = ko.observableArray();
+
     this.hasAdditionalMessages = ko.observable(true);
 
     this.messages_visible = ko
@@ -252,9 +254,9 @@ export class Conversation {
         selfMentions: [],
         selfReplies: [],
       };
-
-      for (let index = this.messages().length - 1; index >= 0; index--) {
-        const messageEntity = this.messages()[index];
+      const messages = [...this.messages(), ...this.incomingMessages()];
+      for (let index = messages.length - 1; index >= 0; index--) {
+        const messageEntity = messages[index];
         if (messageEntity.visible()) {
           const isReadMessage = messageEntity.timestamp() <= this.last_read_timestamp() || messageEntity.user().is_me;
           if (isReadMessage) {
@@ -464,9 +466,13 @@ export class Conversation {
       if (alreadyAdded) {
         return false;
       }
-
-      this.update_timestamps(messageEntity);
-      this.messages_unordered.push(messageEntity);
+      if (this.isShowingLastReceivedMessage()) {
+        this.update_timestamps(messageEntity);
+        this.incomingMessages.remove(({id}) => messageEntity.id === id);
+        this.messages_unordered.push(messageEntity);
+      } else {
+        this.incomingMessages.push(messageEntity);
+      }
       amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.ADDED, messageEntity);
       return true;
     }
@@ -489,7 +495,8 @@ export class Conversation {
         break;
       }
     }
-
+    const messageIds = message_ets.map(({id}) => id);
+    this.incomingMessages.remove(({id}) => messageIds.includes(id));
     koArrayPushAll(this.messages_unordered, message_ets);
   }
 
@@ -782,6 +789,9 @@ export class Conversation {
 
     return true;
   }
+
+  isShowingLastReceivedMessage = () =>
+    this.getLastMessage() ? this.getLastMessage().timestamp() >= this.last_event_timestamp() : true;
 
   serialize() {
     return {
