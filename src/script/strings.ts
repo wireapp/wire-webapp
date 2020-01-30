@@ -48,7 +48,7 @@ export const indexStrings = defineMessages({
     id: 'index.createAccount',
   },
   enterprise: {
-    defaultMessage: 'Enterprise log in',
+    defaultMessage: 'Enterprise Login',
     id: 'index.enterprise',
   },
   logIn: {
@@ -590,7 +590,7 @@ export const errorHandlerStrings = defineMessages({
     id: 'LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE',
   },
   [BackendErrorLabel.CUSTOM_BACKEND_NOT_FOUND]: {
-    defaultMessage: 'Sorry, this domain is not registered as enterprise. Enter SSO access code to login.',
+    defaultMessage: 'This email cannot be used for enterprise login. Please enter the SSO code to proceed.',
     id: 'BackendErrorLabel.CUSTOM_BACKEND_NOT_FOUND',
   },
   unexpected: {
@@ -692,11 +692,11 @@ export const ssoLoginStrings = defineMessages({
     id: 'ssoLogin.overlayFocusLink',
   },
   subheadCode: {
-    defaultMessage: 'Enter your SSO access code here',
+    defaultMessage: 'Please enter your SSO code',
     id: 'ssoLogin.subheadCode',
   },
   subheadCodeOrEmail: {
-    defaultMessage: 'Enter your email or SSO access code here',
+    defaultMessage: 'Please enter your email or SSO code',
     id: 'ssoLogin.subheadCodeOrEmail',
   },
 });
