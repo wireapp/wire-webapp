@@ -45,7 +45,7 @@ const Index = ({}: Props) => {
       <ContainerXS centerText verticalCenter style={{width: '380px'}}>
         <Logo scale={1.68} style={{marginBottom: '80px'}} data-uie-name="ui-wire-logo" />
         <Text block center style={{fontSize: '32px', fontWeight: 300, marginBottom: '48px'}}>
-          {_(indexStrings.welcome, {brandName: Config.getConfig().BRAND_NAME})}
+          {_(indexStrings.welcome, {brandName: Config.getConfig().BACKEND_NAME})}
         </Text>
         {Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION ? (
           <>
