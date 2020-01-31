@@ -29,6 +29,9 @@ import {MockStoreEnhanced} from 'redux-mock-store';
 import {AnyAction} from 'redux';
 import {ThunkDispatch} from 'redux-thunk';
 import {History} from 'history';
+import {createMemoryHistory} from 'history';
+import waitForExpect from 'wait-for-expect';
+import {ROUTE} from '../route';
 
 class IndexPage {
   private readonly driver: ReactWrapper;
@@ -44,6 +47,10 @@ class IndexPage {
   getLoginButton = () => this.driver.find('button[data-uie-name="go-login"]');
   getSSOLoginButton = () => this.driver.find('button[data-uie-name="go-sso-login"]');
   getLogo = () => this.driver.find('[data-uie-name="ui-wire-logo"]');
+
+  clickCreateAccountButton = () => this.getCreateAccountButton().simulate('click');
+  clickLoginButton = () => this.getLoginButton().simulate('click');
+  clickSSOLoginButton = () => this.getSSOLoginButton().simulate('click');
 }
 
 describe('when visiting the set account type page', () => {
@@ -59,10 +66,15 @@ describe('when visiting the set account type page', () => {
       }),
     );
 
-    expect(indexPage.getLogo().exists()).toBe(true);
+    expect(indexPage.getLogo().exists())
+      .withContext('Logo is visible')
+      .toBe(true);
   });
 
-  it('shows an option to login', () => {
+  it('navigates to login page when clicking login button', async () => {
+    const history = createMemoryHistory();
+    const historyPushSpy = spyOn(history, 'push');
+
     const indexPage = new IndexPage(
       mockStoreFactory()({
         ...initialRootState,
@@ -72,12 +84,25 @@ describe('when visiting the set account type page', () => {
           isSupportedBrowser: true,
         },
       }),
+      history,
     );
 
-    expect(indexPage.getLoginButton().exists()).toBe(true);
+    expect(indexPage.getLoginButton().exists())
+      .withContext('login button is visible')
+      .toBe(true);
+    indexPage.clickLoginButton();
+
+    await waitForExpect(() => {
+      expect(historyPushSpy)
+        .withContext('Navigation to login page was triggered')
+        .toHaveBeenCalledWith(ROUTE.LOGIN as any);
+    });
   });
 
-  it('shows an option to login with SSO', () => {
+  it('navigates to SSO login page when clicking SSO login button', async () => {
+    const history = createMemoryHistory();
+    const historyPushSpy = spyOn(history, 'push');
+
     const indexPage = new IndexPage(
       mockStoreFactory()({
         ...initialRootState,
@@ -87,9 +112,19 @@ describe('when visiting the set account type page', () => {
           isSupportedBrowser: true,
         },
       }),
+      history,
     );
 
-    expect(indexPage.getSSOLoginButton().exists()).toBe(true);
+    expect(indexPage.getSSOLoginButton().exists())
+      .withContext('SSO login button is visible')
+      .toBe(true);
+    indexPage.clickSSOLoginButton();
+
+    await waitForExpect(() => {
+      expect(historyPushSpy)
+        .withContext('Navigation to SSO login page was triggered')
+        .toHaveBeenCalledWith(ROUTE.SSO as any);
+    });
   });
 
   describe('and the account registration is disabled', () => {
@@ -113,7 +148,9 @@ describe('when visiting the set account type page', () => {
         }),
       );
 
-      expect(indexPage.getCreateAccountButton().exists()).toBe(false);
+      expect(indexPage.getCreateAccountButton().exists())
+        .withContext('create account button is not visible')
+        .toBe(false);
     });
   });
 
@@ -126,7 +163,10 @@ describe('when visiting the set account type page', () => {
       });
     });
 
-    it('shows an option to create an account', () => {
+    it('show create account button and navigates to account type selection on click', async () => {
+      const history = createMemoryHistory();
+      const historyPushSpy = spyOn(history, 'push');
+
       const indexPage = new IndexPage(
         mockStoreFactory()({
           ...initialRootState,
@@ -136,9 +176,19 @@ describe('when visiting the set account type page', () => {
             isSupportedBrowser: true,
           },
         }),
+        history,
       );
 
-      expect(indexPage.getCreateAccountButton().exists()).toBe(true);
+      expect(indexPage.getCreateAccountButton().exists())
+        .withContext('create account button is visible')
+        .toBe(true);
+      indexPage.clickCreateAccountButton();
+
+      await waitForExpect(() => {
+        expect(historyPushSpy)
+          .withContext('Navigation to set account type page was triggered')
+          .toHaveBeenCalledWith(ROUTE.SET_ACCOUNT_TYPE as any);
+      });
     });
   });
 });
