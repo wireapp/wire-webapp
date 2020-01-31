@@ -30,7 +30,7 @@ import {ActionRoot, actionRoot} from '../../module/action/';
 export interface MockStoreParameters {
   actions?: TypeUtil.RecursivePartial<ActionRoot>;
   apiClient?: TypeUtil.RecursivePartial<APIClient>;
-  config?: any;
+  getConfig?: () => any;
   cookieStore?: CookiesStatic<object>;
   core?: TypeUtil.RecursivePartial<Account>;
   localStorage?: Storage;
@@ -41,7 +41,7 @@ const defaultClient = new APIClient({urls: APIClient.BACKEND.STAGING});
 const defaultCore = new Account(defaultClient);
 const defaultLocalStorage = window.localStorage;
 const defaultCookieStore = Cookies;
-const defaultConfig = {
+const defaultGetConfig = () => ({
   APP_INSTANCE_ID: 'app-id',
   FEATURE: {
     CHECK_CONSENT: true,
@@ -52,24 +52,31 @@ const defaultConfig = {
     ENABLE_SSO: true,
     PERSIST_TEMPORARY_CLIENTS: true,
   },
-};
+});
 
 export const mockStoreFactory = (
   parameters: MockStoreParameters = {
     actions: defaultActions,
     apiClient: defaultClient,
-    config: defaultConfig,
     cookieStore: defaultCookieStore,
     core: defaultCore,
+    getConfig: defaultGetConfig,
     localStorage: defaultLocalStorage,
   },
 ) => {
-  const {actions, apiClient, cookieStore, core, config, localStorage} = parameters;
+  const {actions, apiClient, cookieStore, core, getConfig, localStorage} = parameters;
   if (core) {
     (core as any).apiClient = apiClient;
   }
   return configureStore<TypeUtil.RecursivePartial<RootState>, ThunkDispatch>([
-    thunk.withExtraArgument({actions, apiClient, config: config || defaultConfig, cookieStore, core, localStorage}),
+    thunk.withExtraArgument({
+      actions,
+      apiClient,
+      cookieStore,
+      core,
+      getConfig: getConfig || defaultGetConfig,
+      localStorage,
+    }),
     createLogger({
       actionTransformer(action: any): string {
         return JSON.stringify(action);

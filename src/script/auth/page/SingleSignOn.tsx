@@ -77,7 +77,7 @@ const SingleSignOn = ({}: Props & ConnectedProps & DispatchProps) => {
       };
 
       onReceiveChildWindowMessage = (event: MessageEvent) => {
-        const isExpectedOrigin = event.origin === Config.BACKEND_REST;
+        const isExpectedOrigin = event.origin === Config.getConfig().BACKEND_REST;
         if (!isExpectedOrigin) {
           onChildWindowClose();
           ssoWindowRef.current.close();
@@ -86,7 +86,7 @@ const SingleSignOn = ({}: Props & ConnectedProps & DispatchProps) => {
               code: 500,
               label: BackendError.LABEL.SSO_GENERIC_ERROR,
               message: `Origin "${event.origin}" of event "${JSON.stringify(event)}" not matching "${
-                Config.BACKEND_REST
+                Config.getConfig().BACKEND_REST
               }"`,
             }),
           );
@@ -120,7 +120,7 @@ const SingleSignOn = ({}: Props & ConnectedProps & DispatchProps) => {
       const childPosition = calculateChildPosition(POPUP_HEIGHT, POPUP_WIDTH);
 
       ssoWindowRef.current = window.open(
-        `${Config.BACKEND_REST}/sso/initiate-login/${code}`,
+        `${Config.getConfig().BACKEND_REST}/sso/initiate-login/${code}`,
         'WIRE_SSO',
         `
           height=${POPUP_HEIGHT},
@@ -232,7 +232,7 @@ const SingleSignOn = ({}: Props & ConnectedProps & DispatchProps) => {
                 <H1 center>{_(ssoLoginStrings.headline)}</H1>
                 <Muted>
                   {_(
-                    Config.FEATURE.ENABLE_DOMAIN_DISCOVERY
+                    Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY
                       ? ssoLoginStrings.subheadCodeOrEmail
                       : ssoLoginStrings.subheadCode,
                   )}

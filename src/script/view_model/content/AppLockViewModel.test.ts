@@ -20,7 +20,7 @@
 import ko from 'knockout';
 import {ClientRepository} from '../../client/ClientRepository';
 import {ClientService} from '../../client/ClientService';
-import {Config} from '../../Config';
+import {Config, Configuration} from '../../Config';
 import {User} from '../../entity/User';
 import {APPLOCK_STATE, AppLockViewModel} from './AppLockViewModel';
 
@@ -28,9 +28,9 @@ type Writable<T> = {
   -readonly [K in keyof T]: T[K];
 };
 
-type WriteableConfig = Writable<typeof Config>;
+type WriteableConfig = Writable<Configuration>;
 
-const writeableConfig: WriteableConfig = Config;
+const writeableConfig: WriteableConfig = Config.getConfig();
 
 describe('AppLockViewModel', () => {
   const getAppLock = () =>

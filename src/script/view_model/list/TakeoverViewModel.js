@@ -43,7 +43,7 @@ class TakeoverViewModel {
     this.name = ko.pureComputed(() => (this.selfUser() ? this.selfUser().name() : ''));
     this.username = ko.pureComputed(() => (this.selfUser() ? this.selfUser().username() : ''));
     this.supportUsernameUrl = getSupportUsernameUrl();
-    this.brandName = Config.BRAND_NAME;
+    this.brandName = Config.getConfig().BRAND_NAME;
   }
 
   chooseUsername() {

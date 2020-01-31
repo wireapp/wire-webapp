@@ -50,9 +50,9 @@ try {
 const store = configureStore({
   actions: actionRoot,
   apiClient,
-  config: Config,
   cookieStore,
   core,
+  getConfig: Config.getConfig,
   localStorage,
 });
 
@@ -77,5 +77,5 @@ function runApp(): void {
   }
 }
 
-enableLogging(Config.FEATURE.ENABLE_DEBUG);
+enableLogging(Config.getConfig().FEATURE.ENABLE_DEBUG);
 runApp();

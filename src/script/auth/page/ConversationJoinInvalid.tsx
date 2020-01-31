@@ -39,7 +39,7 @@ const ConversationJoinInvalid = ({}: Props) => {
           >
             <FormattedHTMLMessage
               {...conversationJoinStrings.invalidHeadline}
-              values={{brandName: Config.BRAND_NAME}}
+              values={{brandName: Config.getConfig().BRAND_NAME}}
             />
           </H2>
           <Text style={{fontSize: '16px', marginTop: '10px'}} data-uie-name="status-invalid-text">

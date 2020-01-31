@@ -27,10 +27,9 @@ import {ROUTE} from '../route';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
 import SingleSignOnForm from './SingleSignOnForm';
-import {Config as ReadOnlyConfig} from '../../Config';
 import {ValidationError} from '../module/action/ValidationError';
-
-const Config = ReadOnlyConfig as any;
+import {TypeUtil} from '@wireapp/commons';
+import {Config, Configuration} from '../../Config';
 
 describe('SingleSignOnForm', () => {
   let wrapper: ReactWrapper;
@@ -91,7 +90,11 @@ describe('SingleSignOnForm', () => {
   });
 
   it('shows invalid code or email error', async () => {
-    Config.FEATURE.ENABLE_DOMAIN_DISCOVERY = true;
+    spyOn<{getConfig: () => TypeUtil.RecursivePartial<Configuration>}>(Config, 'getConfig').and.returnValue({
+      FEATURE: {
+        ENABLE_DOMAIN_DISCOVERY: true,
+      },
+    });
     const code = 'invalid-code';
 
     wrapper = mountComponent(
@@ -128,7 +131,11 @@ describe('SingleSignOnForm', () => {
   });
 
   it('successfully redirects with registered domain and permanent client', async () => {
-    Config.FEATURE.ENABLE_DOMAIN_DISCOVERY = true;
+    spyOn<{getConfig: () => TypeUtil.RecursivePartial<Configuration>}>(Config, 'getConfig').and.returnValue({
+      FEATURE: {
+        ENABLE_DOMAIN_DISCOVERY: true,
+      },
+    });
     const email = 'mail@mail.com';
     const inputHost = 'http://localhost:8080?test=true';
     const expectedHost = 'http://localhost:8080?test=true&clienttype=permanent';
@@ -178,7 +185,11 @@ describe('SingleSignOnForm', () => {
   });
 
   it('successfully redirects with registered domain and temporary client', async () => {
-    Config.FEATURE.ENABLE_DOMAIN_DISCOVERY = true;
+    spyOn<{getConfig: () => TypeUtil.RecursivePartial<Configuration>}>(Config, 'getConfig').and.returnValue({
+      FEATURE: {
+        ENABLE_DOMAIN_DISCOVERY: true,
+      },
+    });
     const email = 'mail@mail.com';
     const inputHost = 'http://localhost:8080?test=true';
     const expectedHost = 'http://localhost:8080?test=true&clienttype=temporary';

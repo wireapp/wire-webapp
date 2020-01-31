@@ -34,14 +34,14 @@ export class InviteModalViewModel {
 
   constructor(userRepository: UserRepository) {
     this.isVisible = ko.observable(false);
-    this.brandName = Config.BRAND_NAME;
+    this.brandName = Config.getConfig().BRAND_NAME;
 
     this.inviteMessage = ko.pureComputed(() => {
       if (userRepository.self()) {
         const username = userRepository.self().username();
         return username
-          ? t('inviteMessage', {brandName: Config.BRAND_NAME, username: `@${username}`})
-          : t('inviteMessageNoEmail', Config.BRAND_NAME);
+          ? t('inviteMessage', {brandName: Config.getConfig().BRAND_NAME, username: `@${username}`})
+          : t('inviteMessageNoEmail', Config.getConfig().BRAND_NAME);
       }
       return '';
     });

@@ -519,7 +519,7 @@ export class UserRepository {
         });
     };
 
-    const chunksOfUserIds = chunk(userIds, Config.MAXIMUM_USERS_PER_REQUEST) as string[][];
+    const chunksOfUserIds = chunk(userIds, Config.getConfig().MAXIMUM_USERS_PER_REQUEST) as string[][];
     return Promise.all(chunksOfUserIds.map(chunkOfUserIds => _getUsers(chunkOfUserIds)))
       .then(resolveArray => {
         const newUserEntities = flatten(resolveArray);
@@ -859,7 +859,7 @@ export class UserRepository {
   }
 
   initMarketingConsent(): Promise<void> {
-    if (!Config.FEATURE.CHECK_CONSENT) {
+    if (!Config.getConfig().FEATURE.CHECK_CONSENT) {
       this.logger.warn(
         `Consent check feature is disabled. Defaulting to '${this.propertyRepository.marketingConsent()}'`,
       );

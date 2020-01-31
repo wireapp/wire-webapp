@@ -118,7 +118,7 @@ export class WindowTitleViewModel {
         }
 
         const isTitleSet = specificTitle !== '' && !specificTitle.endsWith(' ');
-        window.document.title = `${specificTitle}${isTitleSet ? ' · ' : ''}${Config.BRAND_NAME}`;
+        window.document.title = `${specificTitle}${isTitleSet ? ' · ' : ''}${Config.getConfig().BRAND_NAME}`;
       }
     }).extend({rateLimit: WindowTitleViewModel.TITLE_DEBOUNCE});
   }

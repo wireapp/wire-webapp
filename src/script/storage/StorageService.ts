@@ -88,7 +88,7 @@ export class StorageService {
     const clientType = isPermanent ? ClientType.PERMANENT : ClientType.TEMPORARY;
 
     this.userId = userId;
-    this.dbName = `wire@${Config.ENVIRONMENT}@${userId}@${clientType}`;
+    this.dbName = `wire@${Config.getConfig().ENVIRONMENT}@${userId}@${clientType}`;
 
     try {
       if (this.isTemporaryAndNonPersistent) {

@@ -198,7 +198,7 @@ export class ModalsViewModel {
       case Types.SESSION_RESET: {
         content.titleText = t('modalSessionResetHeadline');
         content.primaryAction = {...primaryAction, text: t('modalAcknowledgeAction')};
-        const supportLink = buildSupportUrl(Config.SUPPORT.FORM.BUG);
+        const supportLink = buildSupportUrl(Config.getConfig().SUPPORT.FORM.BUG);
         content.messageHtml = t(
           'modalSessionResetMessage',
           {},

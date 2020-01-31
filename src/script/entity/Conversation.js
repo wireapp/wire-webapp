@@ -766,7 +766,7 @@ export class Conversation {
     }
 
     const participantCount = this.getNumberOfParticipants(true, false);
-    const passesParticipantLimit = participantCount <= Config.MAX_VIDEO_PARTICIPANTS;
+    const passesParticipantLimit = participantCount <= Config.getConfig().MAX_VIDEO_PARTICIPANTS;
 
     if (!passesParticipantLimit) {
       return false;
