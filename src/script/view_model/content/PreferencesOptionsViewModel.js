@@ -87,7 +87,7 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
     this.updateProperties(this.propertiesRepository.properties);
 
     this.AudioPreference = AudioPreference;
-    this.brandName = Config.BRAND_NAME;
+    this.brandName = Config.getConfig().BRAND_NAME;
   }
 
   saveCallLogs() {

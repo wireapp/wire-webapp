@@ -199,8 +199,8 @@ class AuthViewModel {
     this.failed_validation_password = ko.observable(false);
     this.failed_validation_code = ko.observable(false);
     this.failed_validation_phone = ko.observable(false);
-    this.minPasswordLength = Config.NEW_PASSWORD_MINIMUM_LENGTH;
-    this.brandName = Config.BRAND_NAME;
+    this.minPasswordLength = Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH;
+    this.brandName = Config.getConfig().BRAND_NAME;
 
     this.can_login_phone = ko.pureComputed(() => {
       return !this.disabled_by_animation() && this.country_code().length > 1 && this.phone_number().length;
@@ -243,7 +243,7 @@ class AuthViewModel {
       },
     };
 
-    this.Config = Config;
+    this.Config = Config.getConfig();
 
     const elementSelector = '.auth-page';
     ko.applyBindings(this, document.querySelector(elementSelector));
@@ -458,7 +458,7 @@ class AuthViewModel {
         if (response.expires_in) {
           this.code_expiration_timestamp(getUnixTimestamp() + response.expires_in);
         } else if (!response.label) {
-          this.code_expiration_timestamp(getUnixTimestamp() + Config.LOGIN_CODE_EXPIRATION);
+          this.code_expiration_timestamp(getUnixTimestamp() + Config.getConfig().LOGIN_CODE_EXPIRATION);
         }
         this._set_hash(AuthView.MODE.VERIFY_CODE);
         this.pending_server_request(false);

@@ -56,7 +56,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         CONCURRENT_UPLOAD_LIMIT: 10,
       },
       FILES: {
-        ALLOWED_FILE_UPLOAD_EXTENSIONS: Config.FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS,
+        ALLOWED_FILE_UPLOAD_EXTENSIONS: Config.getConfig().FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS,
       },
       GIPHY_TEXT_LENGTH: 256,
       IMAGE: {
@@ -534,11 +534,11 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     const messageText = messageTrimmedStart.trimRight();
 
-    const isMessageTextTooLong = messageText.length > Config.MAXIMUM_MESSAGE_LENGTH;
+    const isMessageTextTooLong = messageText.length > Config.getConfig().MAXIMUM_MESSAGE_LENGTH;
     if (isMessageTextTooLong) {
       return amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
         text: {
-          message: t('modalConversationMessageTooLongMessage', Config.MAXIMUM_MESSAGE_LENGTH),
+          message: t('modalConversationMessageTooLongMessage', Config.getConfig().MAXIMUM_MESSAGE_LENGTH),
           title: t('modalConversationMessageTooLongHeadline'),
         },
       });
@@ -790,7 +790,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   uploadImages(images) {
     if (!this._isHittingUploadLimit(images)) {
       for (const image of Array.from(images)) {
-        const isTooLarge = image.size > Config.MAXIMUM_IMAGE_FILE_SIZE;
+        const isTooLarge = image.size > Config.getConfig().MAXIMUM_IMAGE_FILE_SIZE;
         if (isTooLarge) {
           return this._showUploadWarning(image);
         }
@@ -831,8 +831,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     }
 
     const uploadLimit = this.selfUser().inTeam()
-      ? Config.MAXIMUM_ASSET_FILE_SIZE_TEAM
-      : Config.MAXIMUM_ASSET_FILE_SIZE_PERSONAL;
+      ? Config.getConfig().MAXIMUM_ASSET_FILE_SIZE_TEAM
+      : Config.getConfig().MAXIMUM_ASSET_FILE_SIZE_PERSONAL;
     if (!this._isHittingUploadLimit(files)) {
       for (const file of fileArray) {
         const isTooLarge = file.size > uploadLimit;
@@ -884,7 +884,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
   _showUploadWarning(image) {
     const isGif = image.type === 'image/gif';
-    const maxSize = Config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024;
+    const maxSize = Config.getConfig().MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024;
     const message = isGif ? t('modalGifTooLargeMessage', maxSize) : t('modalPictureTooLargeMessage', maxSize);
     const title = isGif ? t('modalGifTooLargeHeadline') : t('modalPictureTooLargeHeadline');
 

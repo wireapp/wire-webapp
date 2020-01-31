@@ -48,4 +48,4 @@ export const isSSOUser = (state: RootState) => !!getSelf(state).sso_id;
 export const isTemporaryGuest = (state: RootState) => !!getSelf(state).expires_at;
 const getConsent = (state: RootState, consentType: number) => getConsents(state)[consentType];
 export const hasUnsetConsent = (state: RootState, consentType: number) =>
-  !Config.FEATURE.CHECK_CONSENT ? false : getConsent(state, consentType) === undefined;
+  !Config.getConfig().FEATURE.CHECK_CONSENT ? false : getConsent(state, consentType) === undefined;

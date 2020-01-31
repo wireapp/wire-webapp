@@ -19,13 +19,12 @@
 
 import {ReactWrapper} from 'enzyme';
 import React from 'react';
-import {Config as ReadOnlyConfig} from '../../Config';
 import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
 import Login from './Login';
-
-const Config = ReadOnlyConfig as any;
+import {Config, Configuration} from '../../Config';
+import {TypeUtil} from '@wireapp/commons';
 
 describe('"Login"', () => {
   let wrapper: ReactWrapper;
@@ -63,7 +62,11 @@ describe('"Login"', () => {
 
   describe('with account registration disabled', () => {
     it('hides the back button', () => {
-      Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION = false;
+      spyOn<{getConfig: () => TypeUtil.RecursivePartial<Configuration>}>(Config, 'getConfig').and.returnValue({
+        FEATURE: {
+          ENABLE_ACCOUNT_REGISTRATION: false,
+        },
+      });
       wrapper = mountComponent(
         <Login />,
         mockStoreFactory()({
@@ -75,7 +78,6 @@ describe('"Login"', () => {
           },
         }),
       );
-      Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION = true;
 
       expect(backButton().exists()).toBe(false);
     });
@@ -83,7 +85,11 @@ describe('"Login"', () => {
 
   describe('with account registration enabled', () => {
     it('shows the back button', () => {
-      Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION = true;
+      spyOn<{getConfig: () => TypeUtil.RecursivePartial<Configuration>}>(Config, 'getConfig').and.returnValue({
+        FEATURE: {
+          ENABLE_ACCOUNT_REGISTRATION: true,
+        },
+      });
       wrapper = mountComponent(
         <Login />,
         mockStoreFactory()({

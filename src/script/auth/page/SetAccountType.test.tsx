@@ -20,31 +20,23 @@
 import {TypeUtil} from '@wireapp/commons';
 import {ReactWrapper} from 'enzyme';
 import React from 'react';
-import {Config as ReadOnlyConfig} from '../../Config';
 import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
 import SetAccountType from './SetAccountType';
-
-type Writable<T> = {
-  -readonly [K in keyof T]: T[K];
-};
-
-type WriteableConfig = TypeUtil.RecursivePartial<Writable<typeof ReadOnlyConfig>>;
-
-const Config: WriteableConfig = ReadOnlyConfig;
+import {Config, Configuration} from '../../Config';
 
 describe('when visiting the set account type page', () => {
   let wrapper: ReactWrapper;
 
   describe('and the account registration is disabled', () => {
     beforeAll(() => {
-      Config.FEATURE = {
-        ENABLE_ACCOUNT_REGISTRATION: false,
-      };
+      spyOn<{getConfig: () => TypeUtil.RecursivePartial<Configuration>}>(Config, 'getConfig').and.returnValue({
+        FEATURE: {
+          ENABLE_ACCOUNT_REGISTRATION: false,
+        },
+      });
     });
-
-    afterAll(() => (Config.FEATURE = {}));
 
     it('redirects to the index page', () => {
       wrapper = mountComponent(
@@ -67,12 +59,12 @@ describe('when visiting the set account type page', () => {
 
   describe('and the account registration is enabled', () => {
     beforeAll(() => {
-      Config.FEATURE = {
-        ENABLE_ACCOUNT_REGISTRATION: true,
-      };
+      spyOn<{getConfig: () => TypeUtil.RecursivePartial<Configuration>}>(Config, 'getConfig').and.returnValue({
+        FEATURE: {
+          ENABLE_ACCOUNT_REGISTRATION: true,
+        },
+      });
     });
-
-    afterAll(() => (Config.FEATURE = {}));
 
     it('shows the Wire logo', () => {
       wrapper = mountComponent(

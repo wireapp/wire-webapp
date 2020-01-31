@@ -39,7 +39,7 @@ export const isTemporaryClientAndNonPersistent = (persist: boolean): boolean => 
   }
 
   const isNonPersistentByUrl = URLUtil.getURLParameter(QUERY_KEY.PERSIST_TEMPORARY_CLIENTS) === 'false';
-  const isNonPersistentByServerConfig = Config.FEATURE?.PERSIST_TEMPORARY_CLIENTS === false;
+  const isNonPersistentByServerConfig = Config.getConfig().FEATURE?.PERSIST_TEMPORARY_CLIENTS === false;
   const isNonPersistent = isNonPersistentByUrl || isNonPersistentByServerConfig;
 
   const isTemporary = persist === false;

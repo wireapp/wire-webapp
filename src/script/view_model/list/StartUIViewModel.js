@@ -64,7 +64,7 @@ class StartUIViewModel {
     this.teamRepository = repositories.team;
     this.userRepository = repositories.user;
     this.logger = getLogger('z.viewModel.list.StartUIViewModel');
-    this.brandName = Config.BRAND_NAME;
+    this.brandName = Config.getConfig().BRAND_NAME;
     this.UserlistMode = UserlistMode;
     this.ParticipantAvatar = ParticipantAvatar;
 

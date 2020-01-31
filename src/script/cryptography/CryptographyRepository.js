@@ -310,9 +310,10 @@ export class CryptographyRepository {
     }
 
     // Check the length of the message
-    const genericMessageIsTooBig = eventData.text.length > Config.MAXIMUM_MESSAGE_LENGTH_RECEIVING;
+    const genericMessageIsTooBig = eventData.text.length > Config.getConfig().MAXIMUM_MESSAGE_LENGTH_RECEIVING;
     const isExternal = typeof eventData.data === 'string';
-    const externalMessageIsTooBig = isExternal && eventData.data.length > Config.MAXIMUM_MESSAGE_LENGTH_RECEIVING;
+    const externalMessageIsTooBig =
+      isExternal && eventData.data.length > Config.getConfig().MAXIMUM_MESSAGE_LENGTH_RECEIVING;
     if (genericMessageIsTooBig || externalMessageIsTooBig) {
       const error = new ProteusErrors.DecryptError.InvalidMessage('The received message was too big.', 300);
       const errorEvent = z.conversation.EventBuilder.buildIncomingMessageTooBig(event, error, error.code);

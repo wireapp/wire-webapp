@@ -931,7 +931,7 @@ export class CallingRepository {
   private showNoCameraModal(): void {
     const modalOptions = {
       text: {
-        htmlMessage: t('modalNoCameraMessage', Config.BRAND_NAME, {
+        htmlMessage: t('modalNoCameraMessage', Config.getConfig().BRAND_NAME, {
           '/faqLink': '</a>',
           br: '<br>',
           faqLink:

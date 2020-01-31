@@ -160,7 +160,7 @@ class App {
 
     this.service = this._setupServices(encryptedEngine);
     this.repository = this._setupRepositories();
-    if (Config.FEATURE.ENABLE_DEBUG) {
+    if (Config.getConfig().FEATURE.ENABLE_DEBUG) {
       import('Util/DebugUtil').then(({DebugUtil}) => {
         this.debug = new DebugUtil(this.repository);
         this.util = {debug: this.debug}; //Alias for QA
@@ -400,7 +400,7 @@ class App {
 
       eventTrackerRepository.init(propertiesRepository.properties.settings.privacy.improve_wire);
       await conversationRepository.initialize_conversations();
-      loadingView.updateProgress(97.5, t('initUpdatedFromNotifications', Config.BRAND_NAME));
+      loadingView.updateProgress(97.5, t('initUpdatedFromNotifications', Config.getConfig().BRAND_NAME));
 
       this._watchOnlineStatus();
       const clientEntities = await clientRepository.updateClientsForSelf();
@@ -880,7 +880,7 @@ class App {
    * @returns {undefined} No return value
    */
   disableDebugging() {
-    Config.LOGGER.OPTIONS.domains['app.wire.com'] = () => 0;
+    Config.getConfig().LOGGER.OPTIONS.domains['app.wire.com'] = () => 0;
     this.repository.properties.savePreference(PROPERTIES_TYPE.ENABLE_DEBUGGING, false);
   }
 
@@ -889,7 +889,7 @@ class App {
    * @returns {undefined} No return value
    */
   enableDebugging() {
-    Config.LOGGER.OPTIONS.domains['app.wire.com'] = () => 300;
+    Config.getConfig().LOGGER.OPTIONS.domains['app.wire.com'] = () => 300;
     this.repository.properties.savePreference(PROPERTIES_TYPE.ENABLE_DEBUGGING, true);
   }
 
@@ -915,13 +915,13 @@ class App {
 //##############################################################################
 
 $(async () => {
-  enableLogging(Config.FEATURE.ENABLE_DEBUG);
+  enableLogging(Config.getConfig().FEATURE.ENABLE_DEBUG);
   const appContainer = document.getElementById('wire-main');
   if (appContainer) {
     const backendClient = resolve(graph.BackendClient);
     backendClient.setSettings({
-      restUrl: Config.BACKEND_REST,
-      webSocketUrl: Config.BACKEND_WS,
+      restUrl: Config.getConfig().BACKEND_REST,
+      webSocketUrl: Config.getConfig().BACKEND_WS,
     });
     const shouldPersist = loadValue(StorageKey.AUTH.PERSIST);
     if (shouldPersist === undefined) {

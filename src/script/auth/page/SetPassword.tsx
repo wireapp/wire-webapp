@@ -101,7 +101,7 @@ const SetPassword = ({
             value={password}
             autoFocus
             required
-            pattern={ValidationUtil.getNewPasswordPattern(Config.NEW_PASSWORD_MINIMUM_LENGTH)}
+            pattern={ValidationUtil.getNewPasswordPattern(Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH)}
             data-uie-name="enter-password"
           />
           <Small
@@ -111,7 +111,7 @@ const SetPassword = ({
             }}
             data-uie-name="element-password-help"
           >
-            {_(accountFormStrings.passwordHelp, {minPasswordLength: Config.NEW_PASSWORD_MINIMUM_LENGTH})}
+            {_(accountFormStrings.passwordHelp, {minPasswordLength: Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH})}
           </Small>
           {!error ? <>&nbsp;</> : <Exception errors={[error]} />}
           <Button

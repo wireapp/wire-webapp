@@ -97,7 +97,7 @@ export class PropertiesRepository {
   }
 
   checkPrivacyPermission(): Promise<void> {
-    const isCheckConsentDisabled = !Config.FEATURE.CHECK_CONSENT;
+    const isCheckConsentDisabled = !Config.getConfig().FEATURE.CHECK_CONSENT;
     const isPrivacyPreferenceSet = this.getPreference(PROPERTIES_TYPE.PRIVACY) !== undefined;
 
     return isCheckConsentDisabled || isPrivacyPreferenceSet
@@ -121,8 +121,8 @@ export class PropertiesRepository {
               text: t('modalImproveWireSecondary'),
             },
             text: {
-              message: t('modalImproveWireMessage', Config.BRAND_NAME),
-              title: t('modalImproveWireHeadline', Config.BRAND_NAME),
+              message: t('modalImproveWireMessage', Config.getConfig().BRAND_NAME),
+              title: t('modalImproveWireHeadline', Config.getConfig().BRAND_NAME),
             },
           });
         });

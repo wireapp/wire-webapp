@@ -375,11 +375,11 @@ export class ClientRepository {
     if (Environment.desktop) {
       let modelString;
       if (Environment.os.mac) {
-        modelString = t('wireMacos', Config.BRAND_NAME);
+        modelString = t('wireMacos', Config.getConfig().BRAND_NAME);
       } else if (Environment.os.win) {
-        modelString = t('wireWindows', Config.BRAND_NAME);
+        modelString = t('wireWindows', Config.getConfig().BRAND_NAME);
       } else {
-        modelString = t('wireLinux', Config.BRAND_NAME);
+        modelString = t('wireLinux', Config.getConfig().BRAND_NAME);
       }
       deviceModel = modelString;
       if (!Environment.frontend.isProduction()) {

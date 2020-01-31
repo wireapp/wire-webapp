@@ -187,7 +187,7 @@ const SingleSignOnForm = ({
       <InputSubmitCombo>
         <Input
           name={
-            Config.FEATURE.ENABLE_DOMAIN_DISCOVERY
+            Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY
               ? ValidationError.FIELD.SSO_EMAIL_CODE.name
               : ValidationError.FIELD.SSO_CODE.name
           }
@@ -199,7 +199,7 @@ const SingleSignOnForm = ({
           ref={codeOrMailInput}
           markInvalid={!isCodeOrMailInputValid}
           placeholder={_(
-            Config.FEATURE.ENABLE_DOMAIN_DISCOVERY
+            Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY
               ? ssoLoginStrings.codeOrMailInputPlaceholder
               : ssoLoginStrings.codeInputPlaceholder,
           )}
@@ -207,7 +207,7 @@ const SingleSignOnForm = ({
           autoComplete="section-login sso-code"
           maxLength={1024}
           pattern={
-            Config.FEATURE.ENABLE_DOMAIN_DISCOVERY
+            Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY
               ? `(${SSO_CODE_PREFIX_REGEX}${PATTERN.UUID_V4}|${PATTERN.EMAIL})`
               : `${SSO_CODE_PREFIX_REGEX}${PATTERN.UUID_V4}`
           }

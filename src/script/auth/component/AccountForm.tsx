@@ -208,7 +208,7 @@ const AccountForm = ({account, ...props}: Props & ConnectedProps & DispatchProps
             autoComplete="section-create-team new-password"
             type="password"
             placeholder={_(accountFormStrings.passwordPlaceholder)}
-            pattern={ValidationUtil.getNewPasswordPattern(Config.NEW_PASSWORD_MINIMUM_LENGTH)}
+            pattern={ValidationUtil.getNewPasswordPattern(Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH)}
             required
             data-uie-name="enter-password"
           />
@@ -221,7 +221,7 @@ const AccountForm = ({account, ...props}: Props & ConnectedProps & DispatchProps
           }}
           data-uie-name="element-password-help"
         >
-          {_(accountFormStrings.passwordHelp, {minPasswordLength: Config.NEW_PASSWORD_MINIMUM_LENGTH})}
+          {_(accountFormStrings.passwordHelp, {minPasswordLength: Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH})}
         </Small>
         {parseError(props.authError)}
         {parseValidationErrors(validationErrors)}

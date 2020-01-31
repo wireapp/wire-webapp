@@ -65,6 +65,7 @@ describe('AuthAction', () => {
       actions: mockedActions,
       apiClient: mockedApiClient as TypeUtil.RecursivePartial<APIClient>,
       core: mockedCore,
+      getConfig: () => ({}),
     })({});
     await store.dispatch(actionRoot.authAction.doLoginPlain({clientType: ClientType.PERMANENT, email, password}));
 

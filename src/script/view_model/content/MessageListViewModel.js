@@ -138,7 +138,7 @@ class MessageListViewModel {
     const messagesContainer = this.getMessagesContainer();
     const scrollPosition = Math.ceil(messagesContainer.scrollTop);
     const scrollEndValue = Math.ceil(scrollEnd(messagesContainer));
-    return scrollPosition > scrollEndValue - Config.SCROLL_TO_LAST_MESSAGE_THRESHOLD;
+    return scrollPosition > scrollEndValue - Config.getConfig().SCROLL_TO_LAST_MESSAGE_THRESHOLD;
   }
 
   /**
