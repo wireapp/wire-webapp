@@ -21,13 +21,76 @@ import {TypeUtil} from '@wireapp/commons';
 import {ReactWrapper} from 'enzyme';
 import React from 'react';
 import {Config, Configuration} from '../../Config';
-import {initialRootState} from '../module/reducer';
+import {initialRootState, RootState, Api} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
 import Index from './Index';
+import {MockStoreEnhanced} from 'redux-mock-store';
+import {AnyAction} from 'redux';
+import {ThunkDispatch} from 'redux-thunk';
+import {History} from 'history';
+
+class IndexPage {
+  private readonly driver: ReactWrapper;
+
+  constructor(
+    store: MockStoreEnhanced<TypeUtil.RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
+    history?: History<any>,
+  ) {
+    this.driver = mountComponent(<Index />, store, history);
+  }
+
+  getCreateAccountButton = () => this.driver.find('button[data-uie-name="go-set-account-type"]');
+  getLoginButton = () => this.driver.find('button[data-uie-name="go-login"]');
+  getSSOLoginButton = () => this.driver.find('button[data-uie-name="go-sso-login"]');
+  getLogo = () => this.driver.find('[data-uie-name="ui-wire-logo"]');
+}
 
 describe('when visiting the set account type page', () => {
-  let wrapper: ReactWrapper;
+  it('shows the logo', () => {
+    const indexPage = new IndexPage(
+      mockStoreFactory()({
+        ...initialRootState,
+        runtimeState: {
+          hasCookieSupport: true,
+          hasIndexedDbSupport: true,
+          isSupportedBrowser: true,
+        },
+      }),
+    );
+
+    expect(indexPage.getLogo().exists()).toBe(true);
+  });
+
+  it('shows an option to login', () => {
+    const indexPage = new IndexPage(
+      mockStoreFactory()({
+        ...initialRootState,
+        runtimeState: {
+          hasCookieSupport: true,
+          hasIndexedDbSupport: true,
+          isSupportedBrowser: true,
+        },
+      }),
+    );
+
+    expect(indexPage.getLoginButton().exists()).toBe(true);
+  });
+
+  it('shows an option to login with SSO', () => {
+    const indexPage = new IndexPage(
+      mockStoreFactory()({
+        ...initialRootState,
+        runtimeState: {
+          hasCookieSupport: true,
+          hasIndexedDbSupport: true,
+          isSupportedBrowser: true,
+        },
+      }),
+    );
+
+    expect(indexPage.getSSOLoginButton().exists()).toBe(true);
+  });
 
   describe('and the account registration is disabled', () => {
     beforeAll(() => {
@@ -39,8 +102,7 @@ describe('when visiting the set account type page', () => {
     });
 
     it('does not show create account button', () => {
-      wrapper = mountComponent(
-        <Index />,
+      const indexPage = new IndexPage(
         mockStoreFactory()({
           ...initialRootState,
           runtimeState: {
@@ -51,7 +113,7 @@ describe('when visiting the set account type page', () => {
         }),
       );
 
-      expect(wrapper.find('Button [data-uie-name="go-set-account-type"]').exists()).toBe(false);
+      expect(indexPage.getCreateAccountButton().exists()).toBe(false);
     });
   });
 
@@ -64,25 +126,8 @@ describe('when visiting the set account type page', () => {
       });
     });
 
-    it('shows the Wire logo', () => {
-      wrapper = mountComponent(
-        <Index />,
-        mockStoreFactory()({
-          ...initialRootState,
-          runtimeState: {
-            hasCookieSupport: true,
-            hasIndexedDbSupport: true,
-            isSupportedBrowser: true,
-          },
-        }),
-      );
-
-      expect(wrapper.find('[data-uie-name="ui-wire-logo"]').exists()).toBe(true);
-    });
-
     it('shows an option to create an account', () => {
-      wrapper = mountComponent(
-        <Index />,
+      const indexPage = new IndexPage(
         mockStoreFactory()({
           ...initialRootState,
           runtimeState: {
@@ -93,23 +138,7 @@ describe('when visiting the set account type page', () => {
         }),
       );
 
-      expect(wrapper.find('Button [data-uie-name="go-set-account-type"]').exists()).toBe(true);
-    });
-
-    it('shows an option to login', () => {
-      wrapper = mountComponent(
-        <Index />,
-        mockStoreFactory()({
-          ...initialRootState,
-          runtimeState: {
-            hasCookieSupport: true,
-            hasIndexedDbSupport: true,
-            isSupportedBrowser: true,
-          },
-        }),
-      );
-
-      expect(wrapper.find('Button [data-uie-name="go-login"]').exists()).toBe(true);
+      expect(indexPage.getCreateAccountButton().exists()).toBe(true);
     });
   });
 });
