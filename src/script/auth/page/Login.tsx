@@ -181,7 +181,7 @@ const Login = ({
   const isSSOCapable = !isDesktopApp() || (isDesktopApp() && window.wSSOCapable === true);
   return (
     <Page>
-      {Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
+      {Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
         <IsMobile>
           <div style={{margin: 16}}>{backArrow}</div>
         </IsMobile>
@@ -192,7 +192,9 @@ const Login = ({
         <Columns>
           <IsMobile not>
             <Column style={{display: 'flex'}}>
-              {Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && <div style={{margin: 'auto'}}>{backArrow}</div>}
+              {Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
+                <div style={{margin: 'auto'}}>{backArrow}</div>
+              )}
             </Column>
           </IsMobile>
           <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
@@ -227,13 +229,13 @@ const Login = ({
                   )}
                 </Form>
               </div>
-              {Config.FEATURE.ENABLE_SSO && isSSOCapable ? (
+              {Config.getConfig().FEATURE.ENABLE_SSO && isSSOCapable ? (
                 <div style={{marginTop: '36px'}}>
                   <Link center onClick={forgotPassword} data-uie-name="go-forgot-password">
                     {_(loginStrings.forgotPassword)}
                   </Link>
                   <Columns style={{marginTop: '36px'}}>
-                    {Config.FEATURE.ENABLE_PHONE_LOGIN && (
+                    {Config.getConfig().FEATURE.ENABLE_PHONE_LOGIN && (
                       <Column>
                         <Link onClick={() => history.push(ROUTE.LOGIN_PHONE)} data-uie-name="go-sign-in-phone">
                           {_(loginStrings.phoneLogin)}
@@ -249,7 +251,7 @@ const Login = ({
                       {_(loginStrings.forgotPassword)}
                     </Link>
                   </Column>
-                  {Config.FEATURE.ENABLE_PHONE_LOGIN && (
+                  {Config.getConfig().FEATURE.ENABLE_PHONE_LOGIN && (
                     <Column>
                       <Link onClick={() => history.push(ROUTE.LOGIN_PHONE)} data-uie-name="go-sign-in-phone">
                         {_(loginStrings.phoneLogin)}

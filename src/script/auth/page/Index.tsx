@@ -45,9 +45,9 @@ const Index = ({}: Props) => {
       <ContainerXS centerText verticalCenter style={{width: '380px'}}>
         <Logo scale={1.68} style={{marginBottom: '80px'}} data-uie-name="ui-wire-logo" />
         <Text block center style={{fontSize: '32px', fontWeight: 300, marginBottom: '48px'}}>
-          {_(indexStrings.welcome, {brandName: Config.BRAND_NAME})}
+          {_(indexStrings.welcome, {brandName: Config.getConfig().BRAND_NAME})}
         </Text>
-        {Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION ? (
+        {Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION ? (
           <>
             <Button
               onClick={() => history.push(ROUTE.SET_ACCOUNT_TYPE)}
@@ -80,7 +80,7 @@ const Index = ({}: Props) => {
               style={{fontSize: '13px', marginTop: '120px'}}
               data-uie-name="go-sso-login"
             >
-              {_(Config.FEATURE.ENABLE_DOMAIN_DISCOVERY ? indexStrings.enterprise : indexStrings.ssoLogin)}
+              {_(Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ? indexStrings.enterprise : indexStrings.ssoLogin)}
             </Button>
           </>
         ) : (
@@ -96,7 +96,7 @@ const Index = ({}: Props) => {
               style={{border: `1px solid ${COLOR.BLUE}`, fontSize: '13px'}}
               data-uie-name="go-sso-login"
             >
-              {_(Config.FEATURE.ENABLE_DOMAIN_DISCOVERY ? indexStrings.enterprise : indexStrings.ssoLogin)}
+              {_(Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ? indexStrings.enterprise : indexStrings.ssoLogin)}
             </Button>
             {logoutReason && (
               <ErrorMessage center data-uie-name="status-logout-reason">

@@ -30,13 +30,13 @@ import {StorageKey, StorageService} from '../storage';
 import {loadValue} from 'Util/StorageUtil';
 
 $(async () => {
-  enableLogging(Config.FEATURE.ENABLE_DEBUG);
+  enableLogging(Config.getConfig().FEATURE.ENABLE_DEBUG);
   exposeWrapperGlobals();
   if ($('.auth-page').length) {
     const backendClient = resolve(graph.BackendClient);
     backendClient.setSettings({
-      restUrl: Config.BACKEND_REST,
-      webSocketUrl: Config.BACKEND_WS,
+      restUrl: Config.getConfig().BACKEND_REST,
+      webSocketUrl: Config.getConfig().BACKEND_WS,
     });
     if (isTemporaryClientAndNonPersistent(loadValue(StorageKey.AUTH.PERSIST))) {
       const engine = await StorageService.getUnitializedEngine();

@@ -36,7 +36,7 @@ const AcceptNewsModal = ({onConfirm, onDecline}: Props) => {
     <Modal>
       <Container style={{maxWidth: '400px'}} data-uie-name="modal-marketing-consent">
         <H3 style={{fontWeight: 500, marginTop: '10px'}} data-uie-name="modal-marketing-consent-title">
-          {_(acceptNewsModalStrings.headline, {brandName: Config.BRAND_NAME})}
+          {_(acceptNewsModalStrings.headline, {brandName: Config.getConfig().BRAND_NAME})}
         </H3>
         <div data-uie-name="modal-marketing-consent-description">
           <Text block>{_(acceptNewsModalStrings.unsubscribeDescription)}</Text>

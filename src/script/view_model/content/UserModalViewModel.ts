@@ -54,7 +54,7 @@ export class UserModalViewModel {
       this.onClosedCallback();
     };
     this.hide = () => this.isVisible(false);
-    this.brandName = Config.BRAND_NAME;
+    this.brandName = Config.getConfig().BRAND_NAME;
     this.isSelfVerified = ko.pureComputed(() => userRepository.self()?.is_verified());
   }
 

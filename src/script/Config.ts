@@ -102,6 +102,15 @@ export class Configuration {
   };
 }
 
-const Config = new Configuration();
+let instance: Configuration;
+
+const Config = {
+  getConfig: () => {
+    if (!instance) {
+      instance = new Configuration();
+    }
+    return instance;
+  },
+};
 
 export {Config};

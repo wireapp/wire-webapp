@@ -75,7 +75,7 @@ export class WarningsViewModel {
     this.visibleWarning = ko.pureComputed(() => this.warnings()[this.warnings().length - 1]);
     this.Environment = Environment;
     this.TYPE = WarningsViewModel.TYPE;
-    this.Config = Config;
+    this.Config = Config.getConfig();
 
     this.warnings.subscribe(warnings => {
       let topMargin;
@@ -114,7 +114,7 @@ export class WarningsViewModel {
     ko.applyBindings(this, document.getElementById(this.elementId));
 
     this.WebAppEvents = WebAppEvents;
-    this.brandName = Config.BRAND_NAME;
+    this.brandName = Config.getConfig().BRAND_NAME;
   }
 
   /**
@@ -131,7 +131,7 @@ export class WarningsViewModel {
         amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
           primaryAction: {
             action: () => {
-              const url = buildSupportUrl(Config.SUPPORT.ID.MICROPHONE_ACCESS_DENIED);
+              const url = buildSupportUrl(Config.getConfig().SUPPORT.ID.MICROPHONE_ACCESS_DENIED);
               safeWindowOpen(url);
             },
             text: t('modalCallNoMicrophoneAction'),

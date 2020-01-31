@@ -116,7 +116,7 @@ ko.components.register('user-devices', {
       <!-- ko if: showDevicesNotFound() -->
         <div class="participant-devices__header" data-bind="css: {'participant-devices__header--padding': !noPadding}">
           <div class="participant-devices__text-block panel__info-text" data-bind="text: noDevicesHeadlineText" data-uie-name="status-devices-headline"></div>
-          <a class="participant-devices__link" data-bind="text: t('participantDevicesLearnMore'), attr: {href: Config.URL.PRIVACY_POLICY}" rel="nofollow noopener noreferrer" target="_blank" class="accent-text"></a>
+          <a class="participant-devices__link" data-bind="text: t('participantDevicesLearnMore'), attr: {href: Config.getConfig().URL.PRIVACY_POLICY}" rel="nofollow noopener noreferrer" target="_blank" class="accent-text"></a>
         </div>
       <!-- /ko -->
 
@@ -169,7 +169,7 @@ ko.components.register('user-devices', {
   }: UserDevicesParams): void {
     this.selfClient = clientRepository.currentClient;
     this.clientEntities = ko.observableArray();
-    this.Config = Config;
+    this.Config = Config.getConfig();
     this.noPadding = noPadding;
 
     const logger = getLogger('UserDevices');
@@ -206,14 +206,14 @@ ko.components.register('user-devices', {
 
     this.devicesHeadlineText = ko.pureComputed(() => {
       return userEntity()
-        ? t('participantDevicesHeadline', {brandName: Config.BRAND_NAME, user: userEntity().first_name()})
+        ? t('participantDevicesHeadline', {brandName: Config.getConfig().BRAND_NAME, user: userEntity().first_name()})
         : '';
     });
 
     this.noDevicesHeadlineText = ko.pureComputed(() => {
       return userEntity()
         ? t('participantDevicesOutdatedClientMessage', {
-            brandName: Config.BRAND_NAME,
+            brandName: Config.getConfig().BRAND_NAME,
             user: userEntity().first_name(),
           })
         : '';

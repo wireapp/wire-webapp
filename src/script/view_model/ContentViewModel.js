@@ -265,7 +265,7 @@ export class ContentViewModel {
           this.mainViewModel.modals.showModal(ModalsViewModel.TYPE.ACKNOWLEDGE, {
             text: {
               message: t('conversationNotFoundMessage'),
-              title: t('conversationNotFoundTitle', Config.BRAND_NAME),
+              title: t('conversationNotFoundTitle', Config.getConfig().BRAND_NAME),
             },
           });
         } else {

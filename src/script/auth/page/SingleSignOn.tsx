@@ -17,8 +17,6 @@
  *
  */
 
-import {ClientType} from '@wireapp/api-client/dist/client/index';
-import {UrlUtil} from '@wireapp/commons';
 import {
   ArrowIcon,
   COLOR,
@@ -34,7 +32,7 @@ import {
   Overlay,
   Text,
 } from '@wireapp/react-ui-kit';
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
@@ -47,7 +45,7 @@ import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import RouterLink from '../component/RouterLink';
 import {BackendError} from '../module/action/BackendError';
 import {RootState, bindActionCreators} from '../module/reducer';
-import {QUERY_KEY, ROUTE} from '../route';
+import {ROUTE} from '../route';
 import Page from './Page';
 import SingleSignOnForm from './SingleSignOnForm';
 
@@ -60,14 +58,6 @@ const SingleSignOn = ({}: Props & ConnectedProps & DispatchProps) => {
   const ssoWindowRef = useRef<Window>();
   const {match} = useReactRouter<{code?: string}>();
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
-  const [clientType, setClientType] = useState(ClientType.PERMANENT);
-
-  useEffect(() => {
-    const queryClientType = UrlUtil.getURLParameter(QUERY_KEY.CLIENT_TYPE);
-    if (queryClientType === ClientType.TEMPORARY) {
-      setClientType(ClientType.TEMPORARY);
-    }
-  }, []);
 
   const handleSSOWindow = (code: string): Promise<void> => {
     const POPUP_HEIGHT = 520;
@@ -87,7 +77,7 @@ const SingleSignOn = ({}: Props & ConnectedProps & DispatchProps) => {
       };
 
       onReceiveChildWindowMessage = (event: MessageEvent) => {
-        const isExpectedOrigin = event.origin === Config.BACKEND_REST;
+        const isExpectedOrigin = event.origin === Config.getConfig().BACKEND_REST;
         if (!isExpectedOrigin) {
           onChildWindowClose();
           ssoWindowRef.current.close();
@@ -96,7 +86,7 @@ const SingleSignOn = ({}: Props & ConnectedProps & DispatchProps) => {
               code: 500,
               label: BackendError.LABEL.SSO_GENERIC_ERROR,
               message: `Origin "${event.origin}" of event "${JSON.stringify(event)}" not matching "${
-                Config.BACKEND_REST
+                Config.getConfig().BACKEND_REST
               }"`,
             }),
           );
@@ -130,7 +120,7 @@ const SingleSignOn = ({}: Props & ConnectedProps & DispatchProps) => {
       const childPosition = calculateChildPosition(POPUP_HEIGHT, POPUP_WIDTH);
 
       ssoWindowRef.current = window.open(
-        `${Config.BACKEND_REST}/sso/initiate-login/${code}`,
+        `${Config.getConfig().BACKEND_REST}/sso/initiate-login/${code}`,
         'WIRE_SSO',
         `
           height=${POPUP_HEIGHT},
@@ -242,16 +232,12 @@ const SingleSignOn = ({}: Props & ConnectedProps & DispatchProps) => {
                 <H1 center>{_(ssoLoginStrings.headline)}</H1>
                 <Muted>
                   {_(
-                    Config.FEATURE.ENABLE_DOMAIN_DISCOVERY
+                    Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY
                       ? ssoLoginStrings.subheadCodeOrEmail
                       : ssoLoginStrings.subheadCode,
                   )}
                 </Muted>
-                <SingleSignOnForm
-                  doLogin={handleSSOWindow}
-                  initialCode={match.params.code}
-                  initialClientType={clientType}
-                />
+                <SingleSignOnForm doLogin={handleSSOWindow} initialCode={match.params.code} />
               </div>
             </ContainerXS>
           </Column>
