@@ -47,6 +47,7 @@ class IndexPage {
   getLoginButton = () => this.driver.find('button[data-uie-name="go-login"]');
   getSSOLoginButton = () => this.driver.find('button[data-uie-name="go-sso-login"]');
   getLogo = () => this.driver.find('[data-uie-name="ui-wire-logo"]');
+  getWelcomeText = () => this.driver.find('span[data-uie-name="welcome-text"]');
 
   clickCreateAccountButton = () => this.getCreateAccountButton().simulate('click');
   clickLoginButton = () => this.getLoginButton().simulate('click');
@@ -69,6 +70,55 @@ describe('when visiting the set account type page', () => {
     expect(indexPage.getLogo().exists())
       .withContext('Logo is visible')
       .toBe(true);
+  });
+
+  it('shows the welcome text default backend name', () => {
+    const indexPage = new IndexPage(
+      mockStoreFactory()({
+        ...initialRootState,
+        runtimeState: {
+          hasCookieSupport: true,
+          hasIndexedDbSupport: true,
+          isSupportedBrowser: true,
+        },
+      }),
+    );
+
+    expect(indexPage.getWelcomeText().exists())
+      .withContext('Welcome text is visible')
+      .toBe(true);
+
+    expect(indexPage.getWelcomeText().text())
+      .withContext('Welcome text contains default backend name')
+      .toContain(Config.getConfig().BRAND_NAME);
+  });
+
+  it('shows the welcome text custom backend name', () => {
+    const customBackendName = 'Test';
+    spyOn<{getConfig: () => TypeUtil.RecursivePartial<Configuration>}>(Config, 'getConfig').and.returnValue({
+      BRAND_NAME: customBackendName,
+      FEATURE: {
+        ENABLE_ACCOUNT_REGISTRATION: true,
+      },
+    });
+    const indexPage = new IndexPage(
+      mockStoreFactory()({
+        ...initialRootState,
+        runtimeState: {
+          hasCookieSupport: true,
+          hasIndexedDbSupport: true,
+          isSupportedBrowser: true,
+        },
+      }),
+    );
+
+    expect(indexPage.getWelcomeText().exists())
+      .withContext('Welcome text is visible')
+      .toBe(true);
+
+    expect(indexPage.getWelcomeText().text())
+      .withContext('Welcome text contains custom backend name')
+      .toContain(customBackendName);
   });
 
   it('navigates to login page when clicking login button', async () => {
