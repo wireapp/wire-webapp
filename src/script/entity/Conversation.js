@@ -791,7 +791,7 @@ export class Conversation {
   }
 
   isShowingLastReceivedMessage = () =>
-    this.getLastMessage() ? this.getLastMessage().timestamp() >= this.last_event_timestamp() : true;
+    this.getLastMessage()?.timestamp() ? this.getLastMessage().timestamp() >= this.last_event_timestamp() : true;
 
   serialize() {
     return {
