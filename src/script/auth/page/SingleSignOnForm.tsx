@@ -51,14 +51,12 @@ import {parseError, parseValidationErrors} from '../util/errorUtil';
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {
   doLogin: (code: string) => Promise<void>;
-  initialClientType?: ClientType;
   initialCode?: string;
 }
 
 const SSO_CODE_PREFIX = 'wire-';
 const SSO_CODE_PREFIX_REGEX = '[wW][iI][rR][eE]-';
 const SingleSignOnForm = ({
-  initialClientType = ClientType.PERMANENT,
   initialCode,
   isFetching,
   loginError,
@@ -75,11 +73,18 @@ const SingleSignOnForm = ({
   const [disableInput, setDisableInput] = useState(false);
   const {formatMessage: _} = useIntl();
   const {history} = useReactRouter();
-  const [clientType, setClientType] = useState(initialClientType);
+  const [clientType, setClientType] = useState(ClientType.PERMANENT);
   const [ssoError, setSsoError] = useState(null);
   const [isCodeOrMailInputValid, setIsCodeOrMailInputValid] = useState(true);
   const [validationError, setValidationError] = useState();
   const [logoutReason, setLogoutReason] = useState();
+
+  useEffect(() => {
+    const queryClientType = UrlUtil.getURLParameter(QUERY_KEY.CLIENT_TYPE);
+    if (queryClientType === ClientType.TEMPORARY) {
+      setClientType(ClientType.TEMPORARY);
+    }
+  }, []);
 
   useEffect(() => {
     const queryLogoutReason = UrlUtil.getURLParameter(QUERY_KEY.LOGOUT_REASON) || null;
