@@ -66,7 +66,9 @@ describe('when visiting the set account type page', () => {
       }),
     );
 
-    expect(indexPage.getLogo().exists()).toBe(true);
+    expect(indexPage.getLogo().exists())
+      .withContext('Logo is visible')
+      .toBe(true);
   });
 
   it('navigates to login page when clicking login button', async () => {
@@ -85,7 +87,9 @@ describe('when visiting the set account type page', () => {
       history,
     );
 
-    expect(indexPage.getLoginButton().exists()).toBe(true);
+    expect(indexPage.getLoginButton().exists())
+      .withContext('login button is visible')
+      .toBe(true);
     indexPage.clickLoginButton();
 
     await waitForExpect(() => {
@@ -111,7 +115,9 @@ describe('when visiting the set account type page', () => {
       history,
     );
 
-    expect(indexPage.getSSOLoginButton().exists()).toBe(true);
+    expect(indexPage.getSSOLoginButton().exists())
+      .withContext('SSO login button is visible')
+      .toBe(true);
     indexPage.clickSSOLoginButton();
 
     await waitForExpect(() => {
@@ -142,7 +148,9 @@ describe('when visiting the set account type page', () => {
         }),
       );
 
-      expect(indexPage.getCreateAccountButton().exists()).toBe(false);
+      expect(indexPage.getCreateAccountButton().exists())
+        .withContext('create account button is not visible')
+        .toBe(false);
     });
   });
 
@@ -171,7 +179,9 @@ describe('when visiting the set account type page', () => {
         history,
       );
 
-      expect(indexPage.getCreateAccountButton().exists()).toBe(true);
+      expect(indexPage.getCreateAccountButton().exists())
+        .withContext('create account button is visible')
+        .toBe(true);
       indexPage.clickCreateAccountButton();
 
       await waitForExpect(() => {
