@@ -72,7 +72,7 @@ describe('when visiting the set account type page', () => {
       .toBe(true);
   });
 
-  it('shows the welcome text default backend name', () => {
+  it('shows the welcome text with default backend name', () => {
     const indexPage = new IndexPage(
       mockStoreFactory()({
         ...initialRootState,
@@ -93,7 +93,7 @@ describe('when visiting the set account type page', () => {
       .toContain(Config.getConfig().BRAND_NAME);
   });
 
-  it('shows the welcome text custom backend name', () => {
+  it('shows the welcome text with custom backend name', () => {
     const customBackendName = 'Test';
     spyOn<{getConfig: () => TypeUtil.RecursivePartial<Configuration>}>(Config, 'getConfig').and.returnValue({
       BRAND_NAME: customBackendName,
