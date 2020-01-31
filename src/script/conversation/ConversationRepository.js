@@ -679,7 +679,7 @@ export class ConversationRepository {
 
     return this.eventService
       .loadFollowingEvents(conversationEntity.id, messageDate, Config.getConfig().MESSAGES_FETCH_LIMIT, includeMessage)
-      .then(events => this._addEventsToConversation(events, conversationEntity))
+      .then(events => this._addEventsToConversation(events, conversationEntity, false))
       .then(mappedNessageEntities => {
         conversationEntity.is_pending(false);
         return mappedNessageEntities;
