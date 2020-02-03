@@ -31,7 +31,7 @@ import {ConversationRepository} from '../conversation/ConversationRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {User} from '../entity/User';
 import {WebAppEvents} from '../event/WebApp';
-import {getPrivacyHowUrl, getPrivacyWhyUrl} from '../externalRoute';
+import {getPrivacyHowUrl, getPrivacyWhyUrl, getPrivacyPolicyUrl} from '../externalRoute';
 import {MotionDuration} from '../motion/MotionDuration';
 
 import {ClientClassification} from '@wireapp/api-client/dist/client';
@@ -170,7 +170,6 @@ ko.components.register('user-devices', {
     this.selfClient = clientRepository.currentClient;
     this.clientEntities = ko.observableArray();
     this.brandName = Config.getConfig().BRAND_NAME;
-    this.privacyPolicyUrl = Config.getConfig().URL.PRIVACY_POLICY;
     this.noPadding = noPadding;
 
     const logger = getLogger('UserDevices');
@@ -180,6 +179,7 @@ ko.components.register('user-devices', {
     this.fingerprintRemote = ko.observableArray([]);
     this.deviceMode = ko.observable(FIND_MODE.REQUESTING);
     this.selectedClient = ko.observable();
+    this.privacyPolicyUrl = getPrivacyPolicyUrl();
     this.privacyHowUrl = getPrivacyHowUrl();
     this.privacyWhyUrl = getPrivacyWhyUrl();
 
