@@ -116,7 +116,7 @@ ko.components.register('user-devices', {
       <!-- ko if: showDevicesNotFound() -->
         <div class="participant-devices__header" data-bind="css: {'participant-devices__header--padding': !noPadding}">
           <div class="participant-devices__text-block panel__info-text" data-bind="text: noDevicesHeadlineText" data-uie-name="status-devices-headline"></div>
-          <a class="participant-devices__link" data-bind="text: t('participantDevicesLearnMore'), attr: {href: Config.getConfig().URL.PRIVACY_POLICY}" rel="nofollow noopener noreferrer" target="_blank" class="accent-text"></a>
+          <a class="participant-devices__link" data-bind="text: t('participantDevicesLearnMore'), attr: {href: privacyPolicyUrl}" rel="nofollow noopener noreferrer" target="_blank" class="accent-text"></a>
         </div>
       <!-- /ko -->
 
@@ -169,7 +169,8 @@ ko.components.register('user-devices', {
   }: UserDevicesParams): void {
     this.selfClient = clientRepository.currentClient;
     this.clientEntities = ko.observableArray();
-    this.Config = Config.getConfig();
+    this.brandName = Config.getConfig().BRAND_NAME;
+    this.privacyPolicyUrl = Config.getConfig().URL.PRIVACY_POLICY;
     this.noPadding = noPadding;
 
     const logger = getLogger('UserDevices');
