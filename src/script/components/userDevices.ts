@@ -207,14 +207,14 @@ ko.components.register('user-devices', {
 
     this.devicesHeadlineText = ko.pureComputed(() => {
       return userEntity()
-        ? t('participantDevicesHeadline', {brandName: Config.getConfig().BRAND_NAME, user: userEntity().first_name()})
+        ? t('participantDevicesHeadline', {brandName: this.brandName, user: userEntity().first_name()})
         : '';
     });
 
     this.noDevicesHeadlineText = ko.pureComputed(() => {
       return userEntity()
         ? t('participantDevicesOutdatedClientMessage', {
-            brandName: Config.getConfig().BRAND_NAME,
+            brandName: this.brandName,
             user: userEntity().first_name(),
           })
         : '';
