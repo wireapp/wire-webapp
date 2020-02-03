@@ -169,9 +169,9 @@ ko.components.register('user-devices', {
   }: UserDevicesParams): void {
     this.selfClient = clientRepository.currentClient;
     this.clientEntities = ko.observableArray();
-    this.brandName = Config.getConfig().BRAND_NAME;
     this.noPadding = noPadding;
 
+    const brandName = Config.getConfig().BRAND_NAME;
     const logger = getLogger('UserDevices');
 
     this.isResettingSession = ko.observable(false);
@@ -206,15 +206,13 @@ ko.components.register('user-devices', {
     });
 
     this.devicesHeadlineText = ko.pureComputed(() => {
-      return userEntity()
-        ? t('participantDevicesHeadline', {brandName: this.brandName, user: userEntity().first_name()})
-        : '';
+      return userEntity() ? t('participantDevicesHeadline', {brandName, user: userEntity().first_name()}) : '';
     });
 
     this.noDevicesHeadlineText = ko.pureComputed(() => {
       return userEntity()
         ? t('participantDevicesOutdatedClientMessage', {
-            brandName: this.brandName,
+            brandName,
             user: userEntity().first_name(),
           })
         : '';
