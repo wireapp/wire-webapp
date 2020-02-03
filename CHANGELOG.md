@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.19.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.18.0...@wireapp/api-client@9.19.0) (2020-02-03)
+
+
+### Features
+
+* **api-client:** Add /sso/settings endpoint ([#2808](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2808)) ([fd090bc](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/fd090bcc0ff96004db268af2f44dd22759c7e88b))
+
+
+
+
+
 # [9.18.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.17.0...@wireapp/api-client@9.18.0) (2020-01-24)
 
 
