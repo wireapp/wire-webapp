@@ -467,7 +467,7 @@ export class Conversation {
         return false;
       }
       if (this.isShowingLastReceivedMessage()) {
-        this.update_timestamps(messageEntity);
+        this.updateTimestamps(messageEntity);
         this.incomingMessages.remove(({id}) => messageEntity.id === id);
         this.messages_unordered.push(messageEntity);
       } else {
@@ -491,7 +491,7 @@ export class Conversation {
     for (let counter = message_ets.length - 1; counter >= 0; counter--) {
       const message_et = message_ets[counter];
       if (message_et.user()?.is_me) {
-        this.update_timestamps(message_et);
+        this.updateTimestamps(message_et);
         break;
       }
     }
@@ -654,15 +654,15 @@ export class Conversation {
    *
    * @private
    * @param {Message} message_et Message to be added to conversation
+   * @param {boolean} forceUpdate set the timestamp regardless of previous timestamp value (no checks)
    * @returns {undefined} No return value
    */
-  update_timestamps(message_et) {
+  updateTimestamps(message_et, forceUpdate = false) {
     if (message_et) {
       const timestamp = message_et.timestamp();
-
       if (timestamp <= this.last_server_timestamp()) {
         if (message_et.timestamp_affects_order()) {
-          this.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.LAST_EVENT);
+          this.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.LAST_EVENT, forceUpdate);
 
           const from_self = message_et.user()?.is_me;
           if (from_self) {
