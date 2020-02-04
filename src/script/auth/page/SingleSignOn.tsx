@@ -48,12 +48,13 @@ import {RootState, bindActionCreators} from '../module/reducer';
 import {ROUTE} from '../route';
 import Page from './Page';
 import SingleSignOnForm from './SingleSignOnForm';
+import * as AuthSelector from '../module/selector/AuthSelector';
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {}
 
 const logger = getLogger('SingleSignOn');
 
-const SingleSignOn = ({}: Props & ConnectedProps & DispatchProps) => {
+const SingleSignOn = ({hasDefaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
   const ssoWindowRef = useRef<Window>();
   const {match} = useReactRouter<{code?: string}>();
@@ -212,15 +213,17 @@ const SingleSignOn = ({}: Props & ConnectedProps & DispatchProps) => {
           </Container>
         </Overlay>
       )}
-      <IsMobile>
-        <div style={{margin: 16}}>{backArrow}</div>
-      </IsMobile>
+      {!hasDefaultSSOCode && (
+        <IsMobile>
+          <div style={{margin: 16}}>{backArrow}</div>
+        </IsMobile>
+      )}
       <Container centerText verticalCenter style={{width: '100%'}}>
         <AppAlreadyOpen />
         <Columns>
           <IsMobile not>
             <Column style={{display: 'flex'}}>
-              <div style={{margin: 'auto'}}>{backArrow}</div>
+              {!hasDefaultSSOCode && <div style={{margin: 'auto'}}>{backArrow}</div>}
             </Column>
           </IsMobile>
           <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
@@ -249,7 +252,9 @@ const SingleSignOn = ({}: Props & ConnectedProps & DispatchProps) => {
 };
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
-const mapStateToProps = (state: RootState) => ({});
+const mapStateToProps = (state: RootState) => ({
+  hasDefaultSSOCode: AuthSelector.hasDefaultSSOCode(state),
+});
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
 const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => bindActionCreators({}, dispatch);

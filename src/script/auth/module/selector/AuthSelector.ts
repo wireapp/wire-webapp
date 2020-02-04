@@ -55,6 +55,7 @@ export const isAuthenticated = (state: RootState) => state.authState.isAuthentic
 export const isFetching = (state: RootState) => state.authState.fetching;
 export const isFetchingSSOSettings = (state: RootState) => state.authState.fetchingSSOSettings;
 export const getDefaultSSOCode = (state: RootState) => state.authState.ssoSettings?.default_sso_code;
+export const hasDefaultSSOCode = (state: RootState) => !!state.authState.ssoSettings?.default_sso_code;
 export const getError = (state: RootState) => state.authState.error;
 export const getLoginData = (state: RootState) => state.authState.loginData;
 export const getCurrentFlow = (state: RootState) => state.authState.currentFlow;
