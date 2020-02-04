@@ -96,7 +96,7 @@ describe('when visiting the set account type page', () => {
   it('shows the welcome text with custom backend name', () => {
     const customBackendName = 'Test';
     spyOn<{getConfig: () => TypeUtil.RecursivePartial<Configuration>}>(Config, 'getConfig').and.returnValue({
-      BRAND_NAME: customBackendName,
+      BACKEND_NAME: customBackendName,
       FEATURE: {
         ENABLE_ACCOUNT_REGISTRATION: true,
       },
