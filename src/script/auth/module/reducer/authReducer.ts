@@ -79,7 +79,9 @@ export const initialAuthState: AuthState = {
   loginData: {
     clientType: Config.getConfig().FEATURE.DEFAULT_LOGIN_TEMPORARY_CLIENT ? ClientType.TEMPORARY : ClientType.PERMANENT,
   },
-  ssoSettings: undefined,
+  ssoSettings: {
+    default_sso_code: undefined,
+  },
 };
 
 export function authReducer(state: AuthState = initialAuthState, action: AppActions): AuthState {

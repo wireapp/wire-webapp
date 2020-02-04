@@ -349,7 +349,11 @@ export class AuthAction {
     return async (dispatch, getState, {apiClient}) => {
       dispatch(AuthActionCreator.startGetSSOSettings());
       try {
-        const ssoSettings = await apiClient.account.api.getSSOSettings();
+        // const ssoSettings = await apiClient.account.api.getSSOSettings();
+        // TODO remove mock data
+        const ssoSettings = {
+          default_sso_code: 'my-code',
+        };
         dispatch(AuthActionCreator.successfulGetSSOSettings(ssoSettings));
       } catch (error) {
         dispatch(AuthActionCreator.failedGetSSOSettings(error));

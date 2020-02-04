@@ -59,7 +59,6 @@ const Root = ({
   isAuthenticated,
   language,
   isFetchingSSOSettings,
-  ssoSettings,
   startPolling,
   safelyRemoveCookie,
   stopPolling,
@@ -152,7 +151,6 @@ const mapStateToProps = (state: RootState) => ({
   isAuthenticated: AuthSelector.isAuthenticated(state),
   isFetchingSSOSettings: AuthSelector.isFetchingSSOSettings(state),
   language: LanguageSelector.getLanguage(state),
-  ssoSettings: AuthSelector.getSSOSettings(state),
 });
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;

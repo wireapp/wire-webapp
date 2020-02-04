@@ -18,6 +18,7 @@
  */
 
 import {UrlUtil} from '@wireapp/commons';
+import * as AuthSelector from '../module/selector/AuthSelector';
 import {Button, COLOR, ContainerXS, ErrorMessage, Logo, Text} from '@wireapp/react-ui-kit';
 import React, {useEffect, useState} from 'react';
 import {FormattedHTMLMessage, useIntl} from 'react-intl';
@@ -26,13 +27,23 @@ import {Config} from '../../Config';
 import {indexStrings, logoutReasonStrings} from '../../strings';
 import {QUERY_KEY, ROUTE} from '../route';
 import Page from './Page';
+import {RootState, bindActionCreators} from '../module/reducer';
+import {AnyAction, Dispatch} from 'redux';
+import {connect} from 'react-redux';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
-const Index = ({}: Props) => {
+const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
   const {history} = useReactRouter();
   const [logoutReason, setLogoutReason] = useState();
+
+  useEffect(() => {
+    // Redirect to prefilled SSO login if default SSO code is set on backend
+    if (defaultSSOCode) {
+      history.push(`${ROUTE.SSO}/${defaultSSOCode}`);
+    }
+  }, [defaultSSOCode]);
 
   useEffect(() => {
     const queryLogoutReason = UrlUtil.getURLParameter(QUERY_KEY.LOGOUT_REASON) || null;
@@ -115,4 +126,12 @@ const Index = ({}: Props) => {
   );
 };
 
-export default Index;
+type ConnectedProps = ReturnType<typeof mapStateToProps>;
+const mapStateToProps = (state: RootState) => ({
+  defaultSSOCode: AuthSelector.getDefaultSSOCode(state),
+});
+
+type DispatchProps = ReturnType<typeof mapDispatchToProps>;
+const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => bindActionCreators({}, dispatch);
+
+export default connect(mapStateToProps, mapDispatchToProps)(Index);

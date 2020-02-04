@@ -74,6 +74,7 @@ const Login = ({
   isFetching,
   pushLoginData,
   loginData,
+  defaultSSOCode,
 }: Props & ConnectedProps & DispatchProps) => {
   const logger = getLogger('Login');
   const {formatMessage: _} = useIntl();
@@ -91,6 +92,13 @@ const Login = ({
       pushLoginData({clientType: ClientType.TEMPORARY});
     }
   }, []);
+
+  useEffect(() => {
+    // Redirect to prefilled SSO login if default SSO code is set on backend
+    if (defaultSSOCode) {
+      history.push(`${ROUTE.SSO}/${defaultSSOCode}`);
+    }
+  }, [defaultSSOCode]);
 
   useEffect(() => {
     const queryConversationCode = URLUtil.getURLParameter(QUERY_KEY.CONVERSATION_CODE) || null;
@@ -271,6 +279,7 @@ const Login = ({
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
+  defaultSSOCode: AuthSelector.getDefaultSSOCode(state),
   isFetching: AuthSelector.isFetching(state),
   loginData: AuthSelector.getLoginData(state),
   loginError: AuthSelector.getError(state),
