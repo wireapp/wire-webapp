@@ -53,6 +53,8 @@ const unsetTeam: TeamData = {
 
 export const isAuthenticated = (state: RootState) => state.authState.isAuthenticated;
 export const isFetching = (state: RootState) => state.authState.fetching;
+export const isFetchingSSOSettings = (state: RootState) => state.authState.fetchingSSOSettings;
+export const getSSOSettings = (state: RootState) => state.authState.ssoSettings;
 export const getError = (state: RootState) => state.authState.error;
 export const getLoginData = (state: RootState) => state.authState.loginData;
 export const getCurrentFlow = (state: RootState) => state.authState.currentFlow;
