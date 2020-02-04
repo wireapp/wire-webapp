@@ -4032,7 +4032,7 @@ export class ConversationRepository {
 
     const deleteCount = await this.eventService.deleteEvent(conversationEntity.id, message_id);
 
-    if (isLastDeleted) {
+    if (isLastDeleted && conversationEntity.getLastMessage()?.timestamp()) {
       conversationEntity.updateTimestamps(conversationEntity.getLastMessage(), true);
     }
 
