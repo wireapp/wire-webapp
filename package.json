@@ -96,7 +96,7 @@
     "babel-eslint": "10.0.3",
     "babel-loader": "8.0.6",
     "babel-plugin-react-intl": "5.1.18",
-    "concurrently": "5.0.2",
+    "concurrently": "5.1.0",
     "cross-env": "7.0.0",
     "cssnano": "4.1.10",
     "dotenv": "8.2.0",
