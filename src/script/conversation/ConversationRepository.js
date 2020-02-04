@@ -679,7 +679,7 @@ export class ConversationRepository {
 
     return this.eventService
       .loadFollowingEvents(conversationEntity.id, messageDate, Config.getConfig().MESSAGES_FETCH_LIMIT, includeMessage)
-      .then(events => this._addEventsToConversation(events, conversationEntity))
+      .then(events => this._addEventsToConversation(events, conversationEntity, false))
       .then(mappedNessageEntities => {
         conversationEntity.is_pending(false);
         return mappedNessageEntities;
@@ -2515,7 +2515,7 @@ export class ConversationRepository {
         if (!isNaN(timestamp)) {
           messageEntity.timestamp(timestamp);
           conversationEntity.update_timestamp_server(timestamp, true);
-          conversationEntity.update_timestamps(messageEntity);
+          conversationEntity.updateTimestamps(messageEntity);
         }
       }
       this.checkMessageTimer(messageEntity);
@@ -4023,23 +4023,20 @@ export class ConversationRepository {
    *
    * @private
    * @param {Conversation} conversationEntity Conversation that contains the message
-   * @param {Message} message_et Message to delete
-   * @returns {Promise} Resolves when message was deleted
-   */
-  _delete_message(conversationEntity, message_et) {
-    return this.eventService.deleteEventByKey(message_et.primary_key);
-  }
-
-  /**
-   * Delete message from UI and database. Primary key is used to delete message in database.
-   *
-   * @private
-   * @param {Conversation} conversationEntity Conversation that contains the message
    * @param {string} message_id ID of message to delete
    * @returns {Promise} Resolves when message was deleted
    */
-  _delete_message_by_id(conversationEntity, message_id) {
-    return this.eventService.deleteEvent(conversationEntity.id, message_id);
+  async _delete_message_by_id(conversationEntity, message_id) {
+    const isLastDeleted =
+      conversationEntity.isShowingLastReceivedMessage() && conversationEntity.getLastMessage()?.id === message_id;
+
+    const deleteCount = await this.eventService.deleteEvent(conversationEntity.id, message_id);
+
+    if (isLastDeleted) {
+      conversationEntity.updateTimestamps(conversationEntity.getLastMessage(), true);
+    }
+
+    return deleteCount;
   }
 
   /**

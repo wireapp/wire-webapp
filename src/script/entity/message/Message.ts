@@ -297,7 +297,7 @@ export class Message {
    */
 
   isCopyable(): boolean {
-    return this.has_asset_text();
+    return this.has_asset_text() && (!this.is_ephemeral() || this.user().is_me);
   }
 
   /**
