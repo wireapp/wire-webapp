@@ -22,7 +22,7 @@ import {ROLE} from '../user/UserPermission';
 import {Environment} from './Environment';
 
 export function exposeWrapperGlobals(): void {
-  if (Environment.desktop && Environment.electron) {
+  if (Environment.desktop) {
     window.z = window.z || {};
 
     window.z.event = window.z.event || {};
