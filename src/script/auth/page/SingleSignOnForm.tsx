@@ -170,13 +170,12 @@ const SingleSignOnForm = ({
         const strippedCode = stripPrefix(codeOrMail);
         await validateSSOCode(strippedCode);
         await doLogin(strippedCode);
-
+        await doFinalizeSSOLogin({clientType});
         const hasKeyAndCode = conversationKey && conversationCode;
         if (hasKeyAndCode) {
           await doJoinConversationByCode(conversationKey, conversationCode);
         }
 
-        await doFinalizeSSOLogin({clientType});
         history.push(ROUTE.HISTORY_INFO);
       }
     } catch (error) {
