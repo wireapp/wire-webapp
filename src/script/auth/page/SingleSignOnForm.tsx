@@ -156,8 +156,9 @@ const SingleSignOnForm = ({
       if (currentValidationError) {
         throw currentValidationError;
       }
-      if (isValidEmail(codeOrMail)) {
-        const domain = codeOrMail.split('@')[1];
+      const email = codeOrMail.trim();
+      if (isValidEmail(email)) {
+        const domain = email.split('@')[1];
         const {webapp_welcome_url} = await doGetDomainInfo(domain);
         const [path, query = ''] = webapp_welcome_url.split('?');
         const welcomeUrl = pathWithParams(path, {[QUERY_KEY.CLIENT_TYPE]: clientType}, null, query);
