@@ -136,7 +136,7 @@ describe('SingleSignOnForm', () => {
         ENABLE_DOMAIN_DISCOVERY: true,
       },
     });
-    const email = 'mail@mail.com';
+    const email = ' mail@mail.com ';
     const inputHost = 'http://localhost:8080?test=true';
     const expectedHost = 'http://localhost:8080?test=true&clienttype=permanent';
 
@@ -190,7 +190,7 @@ describe('SingleSignOnForm', () => {
         ENABLE_DOMAIN_DISCOVERY: true,
       },
     });
-    const email = 'mail@mail.com';
+    const email = ' mail@mail.com ';
     const inputHost = 'http://localhost:8080?test=true';
     const expectedHost = 'http://localhost:8080?test=true&clienttype=temporary';
 
