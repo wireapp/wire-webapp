@@ -18,7 +18,7 @@
   "devDependencies": {
     "@types/faker": "4.1.9",
     "@types/jasmine": "3.5.2",
-    "@types/karma": "3.0.5",
+    "@types/karma": "3.0.6",
     "@wireapp/commons": "3.3.2",
     "@wireapp/store-engine-dexie": "1.2.4",
     "commander": "4.1.0",
