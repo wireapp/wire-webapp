@@ -41,7 +41,7 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
   useEffect(() => {
     // Redirect to prefilled SSO login if default SSO code is set on backend
     if (defaultSSOCode) {
-      history.push(`${ROUTE.SSO}/${defaultSSOCode}`);
+      history.push(`${ROUTE.SSO}/wire-${defaultSSOCode}`);
     }
   }, [defaultSSOCode]);
 
