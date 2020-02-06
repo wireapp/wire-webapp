@@ -178,10 +178,11 @@ const Login = ({
       <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
     </RouterLink>
   );
-  const isSSOCapable = !isDesktopApp() || (isDesktopApp() && window.wSSOCapable === true);
   return (
     <Page>
-      {Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
+      {(Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ||
+        Config.getConfig().FEATURE.ENABLE_SSO ||
+        Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION) && (
         <IsMobile>
           <div style={{margin: 16}}>{backArrow}</div>
         </IsMobile>
@@ -192,7 +193,9 @@ const Login = ({
         <Columns>
           <IsMobile not>
             <Column style={{display: 'flex'}}>
-              {Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
+              {(Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ||
+                Config.getConfig().FEATURE.ENABLE_SSO ||
+                Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION) && (
                 <div style={{margin: 'auto'}}>{backArrow}</div>
               )}
             </Column>
@@ -229,37 +232,20 @@ const Login = ({
                   )}
                 </Form>
               </div>
-              {Config.getConfig().FEATURE.ENABLE_SSO && isSSOCapable ? (
-                <div style={{marginTop: '36px'}}>
-                  <Link center onClick={forgotPassword} data-uie-name="go-forgot-password">
+              <Columns>
+                <Column>
+                  <Link onClick={forgotPassword} data-uie-name="go-forgot-password">
                     {_(loginStrings.forgotPassword)}
                   </Link>
-                  <Columns style={{marginTop: '36px'}}>
-                    {Config.getConfig().FEATURE.ENABLE_PHONE_LOGIN && (
-                      <Column>
-                        <Link onClick={() => history.push(ROUTE.LOGIN_PHONE)} data-uie-name="go-sign-in-phone">
-                          {_(loginStrings.phoneLogin)}
-                        </Link>
-                      </Column>
-                    )}
-                  </Columns>
-                </div>
-              ) : (
-                <Columns>
+                </Column>
+                {Config.getConfig().FEATURE.ENABLE_PHONE_LOGIN && (
                   <Column>
-                    <Link onClick={forgotPassword} data-uie-name="go-forgot-password">
-                      {_(loginStrings.forgotPassword)}
+                    <Link onClick={() => history.push(ROUTE.LOGIN_PHONE)} data-uie-name="go-sign-in-phone">
+                      {_(loginStrings.phoneLogin)}
                     </Link>
                   </Column>
-                  {Config.getConfig().FEATURE.ENABLE_PHONE_LOGIN && (
-                    <Column>
-                      <Link onClick={() => history.push(ROUTE.LOGIN_PHONE)} data-uie-name="go-sign-in-phone">
-                        {_(loginStrings.phoneLogin)}
-                      </Link>
-                    </Column>
-                  )}
-                </Columns>
-              )}
+                )}
+              </Columns>
             </ContainerXS>
           </Column>
           <Column />
