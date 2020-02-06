@@ -342,7 +342,6 @@ class App {
     new ThemeViewModel(this.repository.properties);
     const loadingView = new LoadingViewModel();
     const telemetry = new AppInitTelemetry();
-    exposeWrapperGlobals();
     try {
       const {
         audio: audioRepository,
@@ -916,6 +915,7 @@ class App {
 
 $(async () => {
   enableLogging(Config.getConfig().FEATURE.ENABLE_DEBUG);
+  exposeWrapperGlobals();
   const appContainer = document.getElementById('wire-main');
   if (appContainer) {
     const backendClient = resolve(graph.BackendClient);
