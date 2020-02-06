@@ -60,11 +60,13 @@ describe('"Login"', () => {
     expect(loginButton().props().disabled).toBe(false);
   });
 
-  describe('with account registration disabled', () => {
+  describe('with account registration and SSO disabled', () => {
     it('hides the back button', () => {
       spyOn<{getConfig: () => TypeUtil.RecursivePartial<Configuration>}>(Config, 'getConfig').and.returnValue({
         FEATURE: {
           ENABLE_ACCOUNT_REGISTRATION: false,
+          ENABLE_DOMAIN_DISCOVERY: false,
+          ENABLE_SSO: false,
         },
       });
       wrapper = mountComponent(
