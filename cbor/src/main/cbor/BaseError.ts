@@ -20,9 +20,6 @@
 export class BaseError extends Error {
   constructor(public message: string) {
     super(message);
-    Object.setPrototypeOf(this, BaseError.prototype);
-
-    this.message = message;
-    this.name = this.constructor.name;
+    Object.setPrototypeOf(this, new.target.prototype);
   }
 }

@@ -20,7 +20,7 @@
 export class NetworkError extends Error {
   constructor(public message: string) {
     super(message);
-    Object.setPrototypeOf(this, NetworkError.prototype);
+    Object.setPrototypeOf(this, new.target.prototype);
     this.name = 'NetworkError';
     this.stack = new Error().stack;
   }

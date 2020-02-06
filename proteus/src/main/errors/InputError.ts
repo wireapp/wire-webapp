@@ -35,7 +35,7 @@ export class InputError extends ProteusError {
 
   constructor(message = 'Invalid input', code = 4) {
     super(message, code);
-    Object.setPrototypeOf(this, InputError.prototype);
+    Object.setPrototypeOf(this, new.target.prototype);
   }
 }
 
@@ -43,21 +43,21 @@ export namespace InputError {
   export class RangeError extends InputError {
     constructor(message = 'Invalid array length', code: number) {
       super(message, code);
-      Object.setPrototypeOf(this, RangeError.prototype);
+      Object.setPrototypeOf(this, new.target.prototype);
     }
   }
 
   export class TypeError extends InputError {
     constructor(message = 'Invalid type', code: number) {
       super(message, code);
-      Object.setPrototypeOf(this, TypeError.prototype);
+      Object.setPrototypeOf(this, new.target.prototype);
     }
   }
 
   export class ConversionError extends InputError {
     constructor(message = 'Conversion error', code: number) {
       super(message, code);
-      Object.setPrototypeOf(this, ConversionError.prototype);
+      Object.setPrototypeOf(this, new.target.prototype);
     }
   }
 }

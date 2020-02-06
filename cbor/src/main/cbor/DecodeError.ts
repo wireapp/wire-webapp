@@ -30,8 +30,6 @@ export class DecodeError extends BaseError {
 
   constructor(public message: string, public extra?: Type[]) {
     super(message);
-
-    Object.setPrototypeOf(this, DecodeError.prototype);
-    this.extra = extra;
+    Object.setPrototypeOf(this, new.target.prototype);
   }
 }

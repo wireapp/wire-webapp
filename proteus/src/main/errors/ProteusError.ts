@@ -28,10 +28,6 @@ export class ProteusError extends Error {
 
   constructor(public message: string, public code = 1) {
     super(message);
-    Object.setPrototypeOf(this, ProteusError.prototype);
-
-    this.code = code;
-    this.message = message;
-    this.name = this.constructor.name;
+    Object.setPrototypeOf(this, new.target.prototype);
   }
 }

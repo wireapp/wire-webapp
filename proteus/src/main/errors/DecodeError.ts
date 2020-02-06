@@ -29,7 +29,7 @@ export class DecodeError extends ProteusError {
 
   constructor(message = 'Unknown decoding error', code = 3) {
     super(message, code);
-    Object.setPrototypeOf(this, DecodeError.prototype);
+    Object.setPrototypeOf(this, new.target.prototype);
   }
 }
 
@@ -37,21 +37,21 @@ export namespace DecodeError {
   export class InvalidType extends DecodeError {
     constructor(message = 'Invalid type', code: number) {
       super(message, code);
-      Object.setPrototypeOf(this, InvalidType.prototype);
+      Object.setPrototypeOf(this, new.target.prototype);
     }
   }
 
   export class InvalidArrayLen extends DecodeError {
     constructor(message = 'Invalid array length', code: number) {
       super(message, code);
-      Object.setPrototypeOf(this, InvalidArrayLen.prototype);
+      Object.setPrototypeOf(this, new.target.prototype);
     }
   }
 
   export class LocalIdentityChanged extends DecodeError {
     constructor(message = 'Local identity changed', code: number) {
       super(message, code);
-      Object.setPrototypeOf(this, LocalIdentityChanged.prototype);
+      Object.setPrototypeOf(this, new.target.prototype);
     }
   }
 }

@@ -22,7 +22,7 @@ import {BackendError, BackendErrorLabel, StatusCode} from '../http/';
 export class ConversationError extends BackendError {
   constructor(message: string, label: BackendErrorLabel, code: StatusCode) {
     super(message, label, code);
-    Object.setPrototypeOf(this, ConversationError.prototype);
+    Object.setPrototypeOf(this, new.target.prototype);
     this.name = 'ConversationError';
   }
 }
@@ -34,7 +34,7 @@ export class ConversationIsUnknownError extends ConversationError {
     code: StatusCode = StatusCode.BAD_REQUEST,
   ) {
     super(message, label, code);
-    Object.setPrototypeOf(this, ConversationIsUnknownError.prototype);
+    Object.setPrototypeOf(this, new.target.prototype);
     this.name = 'ConversationIsUnknownError';
   }
 }
@@ -46,7 +46,7 @@ export class ConversationOperationError extends ConversationError {
     code: StatusCode = StatusCode.FORBIDDEN,
   ) {
     super(message, label, code);
-    Object.setPrototypeOf(this, ConversationOperationError.prototype);
+    Object.setPrototypeOf(this, new.target.prototype);
     this.name = 'ConversationOperationError';
   }
 }
