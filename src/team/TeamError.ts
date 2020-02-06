@@ -22,7 +22,7 @@ import {BackendError, BackendErrorLabel, StatusCode, SyntheticErrorLabel} from '
 export class TeamError extends BackendError {
   constructor(message: string, label: BackendErrorLabel | SyntheticErrorLabel, code: StatusCode) {
     super(message, label, code);
-    Object.setPrototypeOf(this, TeamError.prototype);
+    Object.setPrototypeOf(this, new.target.prototype);
     this.name = 'ConversationError';
   }
 }
@@ -34,7 +34,7 @@ export class InviteEmailInUseError extends TeamError {
     code: StatusCode = StatusCode.CONFLICT,
   ) {
     super(message, label, code);
-    Object.setPrototypeOf(this, InviteEmailInUseError.prototype);
+    Object.setPrototypeOf(this, new.target.prototype);
     this.name = 'InviteEmailInUseError';
   }
 }
@@ -46,7 +46,7 @@ export class InvalidInvitationCodeError extends TeamError {
     code: StatusCode = StatusCode.BAD_REQUEST,
   ) {
     super(message, label, code);
-    Object.setPrototypeOf(this, InvalidInvitationCodeError.prototype);
+    Object.setPrototypeOf(this, new.target.prototype);
     this.name = 'InvalidInvitationCodeError';
   }
 }
@@ -58,7 +58,7 @@ export class ServiceNotFoundError extends TeamError {
     code: StatusCode = StatusCode.NOT_FOUND,
   ) {
     super(message, label, code);
-    Object.setPrototypeOf(this, ServiceNotFoundError.prototype);
+    Object.setPrototypeOf(this, new.target.prototype);
     this.name = 'ServiceNotFoundError';
   }
 }

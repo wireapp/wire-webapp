@@ -22,7 +22,7 @@ import {BackendError, BackendErrorLabel, StatusCode} from '../http/';
 export class UserError extends BackendError {
   constructor(message: string, label: BackendErrorLabel, code: StatusCode) {
     super(message, label, code);
-    Object.setPrototypeOf(this, UserError.prototype);
+    Object.setPrototypeOf(this, new.target.prototype);
     this.name = 'UserError';
   }
 }
@@ -34,7 +34,7 @@ export class UserIsUnknownError extends UserError {
     code: StatusCode = StatusCode.BAD_REQUEST,
   ) {
     super(message, label, code);
-    Object.setPrototypeOf(this, UserIsUnknownError.prototype);
+    Object.setPrototypeOf(this, new.target.prototype);
     this.name = 'UserIsUnknownError';
   }
 }
@@ -46,7 +46,7 @@ export class UnconnectedUserError extends UserError {
     code: StatusCode = StatusCode.FORBIDDEN,
   ) {
     super(message, label, code);
-    Object.setPrototypeOf(this, UserIsUnknownError.prototype);
+    Object.setPrototypeOf(this, new.target.prototype);
     this.name = 'UnconnectedUserError';
   }
 }
