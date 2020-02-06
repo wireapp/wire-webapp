@@ -26,7 +26,6 @@ import {Config} from '../../Config';
 import {indexStrings, logoutReasonStrings} from '../../strings';
 import {QUERY_KEY, ROUTE} from '../route';
 import Page from './Page';
-import {Redirect} from 'react-router';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 

@@ -178,7 +178,6 @@ const Login = ({
       <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
     </RouterLink>
   );
-  const isSSOCapable = !isDesktopApp() || (isDesktopApp() && window.wSSOCapable === true);
   return (
     <Page>
       {(Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ||
