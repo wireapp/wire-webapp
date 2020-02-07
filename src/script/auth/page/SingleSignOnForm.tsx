@@ -50,7 +50,7 @@ import {isDesktopApp} from '../Runtime';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {Redirect} from 'react-router';
 
-interface Props extends React.HTMLAttributes<HTMLDivElement> {
+export interface SingleSignOnFormProps extends React.HTMLAttributes<HTMLDivElement> {
   doLogin: (code: string) => Promise<void>;
   initialCode?: string;
 }
@@ -70,7 +70,7 @@ const SingleSignOnForm = ({
   doNavigate,
   doCheckConversationCode,
   doJoinConversationByCode,
-}: Props & ConnectedProps & DispatchProps) => {
+}: SingleSignOnFormProps & ConnectedProps & DispatchProps) => {
   const codeOrMailInput = useRef<HTMLInputElement>();
   const [codeOrMail, setCodeOrMail] = useState('');
   const [disableInput, setDisableInput] = useState(false);
