@@ -89,12 +89,16 @@ describe('SingleSignOnForm', () => {
     );
 
     expect(singleSignOnFormPage.getCodeOrEmailInput().exists())
-      .withContext('Code input exists')
+      .withContext('code input exists')
       .toBe(true);
 
     expect(singleSignOnFormPage.getCodeOrEmailInput().props().value)
-      .withContext('Code input has initial code value')
+      .withContext('code input has initial code value')
       .toEqual(initialCode);
+
+    expect(singleSignOnFormPage.getCodeOrEmailInput().props().disabled)
+      .withContext('code input is disabled when prefilled')
+      .toBe(true);
 
     expect(actionRoot.authAction.validateSSOCode)
       .withContext('validateSSOCode function was called')
