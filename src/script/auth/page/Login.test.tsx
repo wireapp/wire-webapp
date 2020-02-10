@@ -29,6 +29,11 @@ import {MockStoreEnhanced} from 'redux-mock-store';
 import {ThunkDispatch} from 'redux-thunk';
 import {AnyAction} from 'redux';
 import {History} from 'history';
+import {actionRoot} from '../module/action';
+import waitForExpect from 'wait-for-expect';
+import {createMemoryHistory} from 'history';
+import {ROUTE} from '../route';
+import {ClientType} from '@wireapp/api-client/dist/client';
 
 class LoginPage {
   private readonly driver: ReactWrapper;
@@ -45,10 +50,88 @@ class LoginPage {
   getPasswordInput = () => this.driver.find('input[data-uie-name="enter-password"]');
   getLoginButton = () => this.driver.find('button[data-uie-name="do-sign-in"]');
 
+  enterEmail = (email: string) => this.getEmailInput().simulate('change', {target: {value: email}});
+  enterPassword = (password: string) => this.getPasswordInput().simulate('change', {target: {value: password}});
+
   clickLoginButton = () => this.getLoginButton().simulate('click');
+
+  update = () => this.driver.update();
 }
 
 describe('Login', () => {
+  it('successfully logs in with email', async () => {
+    const history = createMemoryHistory();
+    const historyPushSpy = spyOn(history, 'push');
+
+    const email = 'email@mail.com';
+    const password = 'password';
+
+    spyOn(actionRoot.authAction, 'doLogin').and.returnValue(() => Promise.resolve());
+
+    const loginPage = new LoginPage(
+      mockStoreFactory()({
+        ...initialRootState,
+        runtimeState: {
+          hasCookieSupport: true,
+          hasIndexedDbSupport: true,
+          isSupportedBrowser: true,
+        },
+      }),
+      history,
+    );
+
+    loginPage.enterEmail(email);
+    loginPage.enterPassword(password);
+    loginPage.clickLoginButton();
+
+    await waitForExpect(() => {
+      expect(actionRoot.authAction.doLogin)
+        .withContext('doLogin action was called')
+        .toHaveBeenCalledWith({clientType: ClientType.PERMANENT, email, password});
+    });
+
+    expect(historyPushSpy)
+      .withContext('navigation to history page was triggered')
+      .toHaveBeenCalledWith(ROUTE.HISTORY_INFO as any);
+  });
+
+  it('successfully logs in with handle', async () => {
+    const history = createMemoryHistory();
+    const historyPushSpy = spyOn(history, 'push');
+
+    const handle = 'handle';
+    const password = 'password';
+
+    spyOn(actionRoot.authAction, 'doLogin').and.returnValue(() => Promise.resolve());
+
+    const loginPage = new LoginPage(
+      mockStoreFactory()({
+        ...initialRootState,
+        runtimeState: {
+          hasCookieSupport: true,
+          hasIndexedDbSupport: true,
+          isSupportedBrowser: true,
+        },
+      }),
+      history,
+    );
+
+    loginPage.enterEmail(handle);
+    loginPage.enterPassword(password);
+
+    loginPage.clickLoginButton();
+
+    await waitForExpect(() => {
+      expect(actionRoot.authAction.doLogin)
+        .withContext('doLogin action was called')
+        .toHaveBeenCalledWith({clientType: ClientType.PERMANENT, handle, password});
+    });
+
+    expect(historyPushSpy)
+      .withContext('navigation to history page was triggered')
+      .toHaveBeenCalledWith(ROUTE.HISTORY_INFO as any);
+  });
+
   it('has disabled submit button as long as one input is empty', () => {
     const loginPage = new LoginPage(
       mockStoreFactory()({
@@ -66,10 +149,10 @@ describe('Login', () => {
     expect(loginPage.getLoginButton().exists()).toBe(true);
 
     expect(loginPage.getLoginButton().props().disabled).toBe(true);
-    loginPage.getEmailInput().simulate('change', {target: {value: 'e'}});
+    loginPage.enterEmail('e');
 
     expect(loginPage.getLoginButton().props().disabled).toBe(true);
-    loginPage.getPasswordInput().simulate('change', {target: {value: 'p'}});
+    loginPage.enterPassword('p');
 
     expect(loginPage.getLoginButton().props().disabled).toBe(false);
   });
