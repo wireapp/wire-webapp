@@ -28,6 +28,8 @@ import {TypeUtil} from '@wireapp/commons';
 import {ThunkDispatch} from 'redux-thunk';
 import {AnyAction} from 'redux';
 import {History} from 'history';
+import {initialAuthState} from '../module/reducer/authReducer';
+import {ValidationError} from '../module/action/ValidationError';
 
 class SetTeamNamePage {
   private readonly driver: ReactWrapper;
@@ -120,6 +122,14 @@ describe('when entering a team name', () => {
       const setTeamNamePage = new SetTeamNamePage(
         mockStoreFactory()({
           ...initialRootState,
+          authState: {
+            ...initialAuthState,
+            account: {
+              team: {
+                name: '',
+              },
+            },
+          },
           runtimeState: {
             hasCookieSupport: true,
             hasIndexedDbSupport: true,
@@ -127,9 +137,10 @@ describe('when entering a team name', () => {
           },
         }),
       );
-      wrapper.setProps({teamName: ''});
 
-      expect(setTeamNamePage.getNextButton().props().disabled).toBe(true);
+      expect(setTeamNamePage.getNextButton().props().disabled)
+        .withContext('Submit button is disabled')
+        .toBe(true);
     });
   });
 
@@ -146,14 +157,15 @@ describe('when entering a team name', () => {
         }),
       );
       const expectedTeamName = 'M';
-      const expectedErrorMessage = 'Enter a name with at least 2 characters';
 
       setTeamNamePage.enterTeamName(expectedTeamName);
 
       expect(setTeamNamePage.getTeamNameInput().props().value).toBe(expectedTeamName);
       setTeamNamePage.clickNextButton();
 
-      expect(setTeamNamePage.getErrorMessage().text()).toBe(expectedErrorMessage);
+      expect(setTeamNamePage.getErrorMessage(ValidationError.FIELD.NAME.PATTERN_MISMATCH).exists())
+        .withContext('pattern mismatch error is shown')
+        .toBe(true);
     });
 
     it('appears when input gets trimmed', () => {
@@ -169,14 +181,15 @@ describe('when entering a team name', () => {
       );
       const actualTeamName = '  ';
       const expectedTeamName = '  ';
-      const expectedErrorMessage = 'Enter a name with at least 2 characters';
 
       setTeamNamePage.enterTeamName(actualTeamName);
 
       expect(setTeamNamePage.getTeamNameInput().props().value).toBe(expectedTeamName);
       setTeamNamePage.clickNextButton();
 
-      expect(setTeamNamePage.getErrorMessage().text()).toBe(expectedErrorMessage);
+      expect(setTeamNamePage.getErrorMessage(ValidationError.FIELD.NAME.VALUE_MISSING).exists())
+        .withContext('value missing error is shown')
+        .toBe(true);
     });
   });
 });
