@@ -54,8 +54,6 @@ class SetTeamNamePage {
 }
 
 describe('when entering a team name', () => {
-  let wrapper: ReactWrapper;
-
   describe('the submit button', () => {
     it('is disabled if too few characters are entered', () => {
       const setTeamNamePage = new SetTeamNamePage(
