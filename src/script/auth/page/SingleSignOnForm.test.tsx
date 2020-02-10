@@ -61,6 +61,12 @@ class SingleSignOnFormPage {
 
 describe('SingleSignOnForm', () => {
   it('successfully logs into account with initial SSO code', async () => {
+    spyOn<{getConfig: () => TypeUtil.RecursivePartial<Configuration>}>(Config, 'getConfig').and.returnValue({
+      FEATURE: {
+        ENABLE_DOMAIN_DISCOVERY: false,
+      },
+    });
+
     const history = createMemoryHistory();
     const historyPushSpy = spyOn(history, 'push');
     const doLogin = jasmine.createSpy().and.returnValue((code: string) => Promise.resolve());
@@ -147,6 +153,47 @@ describe('SingleSignOnForm', () => {
 
     expect(singleSignOnFormPage.getErrorMessage(ValidationError.FIELD.SSO_EMAIL_CODE.PATTERN_MISMATCH).exists())
       .withContext(`Error "${ValidationError.FIELD.SSO_EMAIL_CODE.PATTERN_MISMATCH}" message exists`)
+      .toBe(true);
+  });
+
+  it('disallows email when domain discovery is disabled', async () => {
+    spyOn<{getConfig: () => TypeUtil.RecursivePartial<Configuration>}>(Config, 'getConfig').and.returnValue({
+      FEATURE: {
+        ENABLE_DOMAIN_DISCOVERY: false,
+      },
+    });
+    const email = 'email@mail.com';
+
+    const singleSignOnFormPage = new SingleSignOnFormPage(
+      mockStoreFactory()({
+        ...initialRootState,
+        runtimeState: {
+          hasCookieSupport: true,
+          hasIndexedDbSupport: true,
+          isSupportedBrowser: true,
+        },
+      }),
+      {doLogin: () => Promise.reject()},
+    );
+
+    expect(singleSignOnFormPage.getCodeOrEmailInput().exists())
+      .withContext('code/email input exists')
+      .toBe(true);
+
+    expect(singleSignOnFormPage.getSubmitButton().props().disabled)
+      .withContext('Submit button is disabled')
+      .toBe(true);
+
+    singleSignOnFormPage.enterCodeOrEmail(email);
+
+    expect(singleSignOnFormPage.getSubmitButton().props().disabled)
+      .withContext('Submit button is enabled')
+      .toBe(false);
+
+    singleSignOnFormPage.clickSubmitButton();
+
+    expect(singleSignOnFormPage.getErrorMessage(ValidationError.FIELD.SSO_CODE.PATTERN_MISMATCH).exists())
+      .withContext(`Error "${ValidationError.FIELD.SSO_CODE.PATTERN_MISMATCH}" message exists`)
       .toBe(true);
   });
 
