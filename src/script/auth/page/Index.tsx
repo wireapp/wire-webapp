@@ -51,6 +51,17 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
       setLogoutReason(queryLogoutReason);
     }
   }, []);
+
+  useEffect(() => {
+    // Navigate directly to email login because it's the only available option on the index page
+    if (
+      !Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY &&
+      !Config.getConfig().FEATURE.ENABLE_SSO &&
+      !Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION
+    ) {
+      history.push(ROUTE.LOGIN);
+    }
+  }, []);
   return (
     <Page>
       <ContainerXS centerText verticalCenter style={{width: '380px'}}>
@@ -88,32 +99,40 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
                 <FormattedHTMLMessage {...logoutReasonStrings[logoutReason]} />
               </ErrorMessage>
             )}
-            <Button
-              onClick={() => history.push(ROUTE.SSO)}
-              block
-              color={COLOR.TEXT}
-              backgroundColor={COLOR.GRAY_LIGHTEN_64}
-              style={{fontSize: '13px', marginTop: '120px'}}
-              data-uie-name="go-sso-login"
-            >
-              {_(Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ? indexStrings.enterprise : indexStrings.ssoLogin)}
-            </Button>
+            {(Config.getConfig().FEATURE.ENABLE_SSO || Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY) && (
+              <Button
+                onClick={() => history.push(ROUTE.SSO)}
+                block
+                color={COLOR.TEXT}
+                backgroundColor={COLOR.GRAY_LIGHTEN_64}
+                style={{fontSize: '13px', marginTop: '120px'}}
+                data-uie-name="go-sso-login"
+              >
+                {_(
+                  Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ? indexStrings.enterprise : indexStrings.ssoLogin,
+                )}
+              </Button>
+            )}
           </>
         ) : (
           <>
             <Button onClick={() => history.push(ROUTE.LOGIN)} block style={{fontSize: '13px'}} data-uie-name="go-login">
               {_(indexStrings.logIn)}
             </Button>
-            <Button
-              onClick={() => history.push(ROUTE.SSO)}
-              block
-              backgroundColor={'transparent'}
-              color={COLOR.BLUE}
-              style={{border: `1px solid ${COLOR.BLUE}`, fontSize: '13px'}}
-              data-uie-name="go-sso-login"
-            >
-              {_(Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ? indexStrings.enterprise : indexStrings.ssoLogin)}
-            </Button>
+            {(Config.getConfig().FEATURE.ENABLE_SSO || Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY) && (
+              <Button
+                onClick={() => history.push(ROUTE.SSO)}
+                block
+                backgroundColor={'transparent'}
+                color={COLOR.BLUE}
+                style={{border: `1px solid ${COLOR.BLUE}`, fontSize: '13px'}}
+                data-uie-name="go-sso-login"
+              >
+                {_(
+                  Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ? indexStrings.enterprise : indexStrings.ssoLogin,
+                )}
+              </Button>
+            )}
             {logoutReason && (
               <ErrorMessage center data-uie-name="status-logout-reason">
                 <FormattedHTMLMessage {...logoutReasonStrings[logoutReason]} />

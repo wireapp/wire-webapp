@@ -54,7 +54,7 @@ class IndexPage {
   clickSSOLoginButton = () => this.getSSOLoginButton().simulate('click');
 }
 
-describe('when visiting the set account type page', () => {
+describe('when visiting the index page', () => {
   it('shows the logo', () => {
     const indexPage = new IndexPage(
       mockStoreFactory()({
@@ -150,6 +150,12 @@ describe('when visiting the set account type page', () => {
   });
 
   it('navigates to SSO login page when clicking SSO login button', async () => {
+    spyOn<{getConfig: () => TypeUtil.RecursivePartial<Configuration>}>(Config, 'getConfig').and.returnValue({
+      FEATURE: {
+        ENABLE_DOMAIN_DISCOVERY: true,
+        ENABLE_SSO: true,
+      },
+    });
     const history = createMemoryHistory();
     const historyPushSpy = spyOn(history, 'push');
 
@@ -238,6 +244,68 @@ describe('when visiting the set account type page', () => {
         expect(historyPushSpy)
           .withContext('Navigation to set account type page was triggered')
           .toHaveBeenCalledWith(ROUTE.SET_ACCOUNT_TYPE as any);
+      });
+    });
+  });
+
+  describe('and SSO & domain discovery is disabled', () => {
+    beforeAll(() => {
+      spyOn<{getConfig: () => TypeUtil.RecursivePartial<Configuration>}>(Config, 'getConfig').and.returnValue({
+        FEATURE: {
+          ENABLE_DOMAIN_DISCOVERY: false,
+          ENABLE_SSO: false,
+        },
+      });
+    });
+
+    it('does not show SSO login button', () => {
+      const indexPage = new IndexPage(
+        mockStoreFactory()({
+          ...initialRootState,
+          runtimeState: {
+            hasCookieSupport: true,
+            hasIndexedDbSupport: true,
+            isSupportedBrowser: true,
+          },
+        }),
+      );
+
+      expect(indexPage.getSSOLoginButton().exists())
+        .withContext('SSO login button is not visible')
+        .toBe(false);
+    });
+  });
+
+  describe('and SSO, domain discovery & account registration is disabled', () => {
+    beforeAll(() => {
+      spyOn<{getConfig: () => TypeUtil.RecursivePartial<Configuration>}>(Config, 'getConfig').and.returnValue({
+        FEATURE: {
+          ENABLE_ACCOUNT_REGISTRATION: false,
+          ENABLE_DOMAIN_DISCOVERY: false,
+          ENABLE_SSO: false,
+        },
+      });
+    });
+
+    it('navigates directly to email login', async () => {
+      const history = createMemoryHistory();
+      const historyPushSpy = spyOn(history, 'push');
+      new IndexPage(
+        mockStoreFactory()({
+          ...initialRootState,
+          runtimeState: {
+            hasCookieSupport: true,
+            hasIndexedDbSupport: true,
+            isSupportedBrowser: true,
+          },
+        }),
+        history,
+      );
+
+      await waitForExpect(() => {
+        expect(historyPushSpy)
+          .withContext('Navigation to email login page was triggered')
+          .toHaveBeenCalledWith(ROUTE.LOGIN as any);
       });
     });
   });

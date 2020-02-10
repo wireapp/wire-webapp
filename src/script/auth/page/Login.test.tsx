@@ -19,24 +19,38 @@
 
 import {ReactWrapper} from 'enzyme';
 import React from 'react';
-import {initialRootState} from '../module/reducer';
+import {initialRootState, RootState, Api} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
 import Login from './Login';
 import {Config, Configuration} from '../../Config';
 import {TypeUtil} from '@wireapp/commons';
+import {MockStoreEnhanced} from 'redux-mock-store';
+import {ThunkDispatch} from 'redux-thunk';
+import {AnyAction} from 'redux';
+import {History} from 'history';
 
-describe('"Login"', () => {
-  let wrapper: ReactWrapper;
+class LoginPage {
+  private readonly driver: ReactWrapper;
 
-  const backButton = () => wrapper.find('[data-uie-name="go-index"]').first();
-  const emailInput = () => wrapper.find('[data-uie-name="enter-email"]').first();
-  const passwordInput = () => wrapper.find('[data-uie-name="enter-password"]').first();
-  const loginButton = () => wrapper.find('[data-uie-name="do-sign-in"]').first();
+  constructor(
+    store: MockStoreEnhanced<TypeUtil.RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
+    history?: History<any>,
+  ) {
+    this.driver = mountComponent(<Login />, store, history);
+  }
 
+  getBackButton = () => this.driver.find('[data-uie-name="go-index"]');
+  getEmailInput = () => this.driver.find('input[data-uie-name="enter-email"]');
+  getPasswordInput = () => this.driver.find('input[data-uie-name="enter-password"]');
+  getLoginButton = () => this.driver.find('button[data-uie-name="do-sign-in"]');
+
+  clickLoginButton = () => this.getLoginButton().simulate('click');
+}
+
+describe('Login', () => {
   it('has disabled submit button as long as one input is empty', () => {
-    wrapper = mountComponent(
-      <Login />,
+    const loginPage = new LoginPage(
       mockStoreFactory()({
         ...initialRootState,
         runtimeState: {
@@ -47,28 +61,29 @@ describe('"Login"', () => {
       }),
     );
 
-    expect(emailInput().exists()).toBe(true);
-    expect(passwordInput().exists()).toBe(true);
-    expect(loginButton().exists()).toBe(true);
+    expect(loginPage.getEmailInput().exists()).toBe(true);
+    expect(loginPage.getPasswordInput().exists()).toBe(true);
+    expect(loginPage.getLoginButton().exists()).toBe(true);
 
-    expect(loginButton().props().disabled).toBe(true);
-    emailInput().simulate('change', {target: {value: 'e'}});
+    expect(loginPage.getLoginButton().props().disabled).toBe(true);
+    loginPage.getEmailInput().simulate('change', {target: {value: 'e'}});
 
-    expect(loginButton().props().disabled).toBe(true);
-    passwordInput().simulate('change', {target: {value: 'p'}});
+    expect(loginPage.getLoginButton().props().disabled).toBe(true);
+    loginPage.getPasswordInput().simulate('change', {target: {value: 'p'}});
 
-    expect(loginButton().props().disabled).toBe(false);
+    expect(loginPage.getLoginButton().props().disabled).toBe(false);
   });
 
-  describe('with account registration disabled', () => {
+  describe('with account registration and SSO disabled', () => {
     it('hides the back button', () => {
       spyOn<{getConfig: () => TypeUtil.RecursivePartial<Configuration>}>(Config, 'getConfig').and.returnValue({
         FEATURE: {
           ENABLE_ACCOUNT_REGISTRATION: false,
+          ENABLE_DOMAIN_DISCOVERY: false,
+          ENABLE_SSO: false,
         },
       });
-      wrapper = mountComponent(
-        <Login />,
+      const loginPage = new LoginPage(
         mockStoreFactory()({
           ...initialRootState,
           runtimeState: {
@@ -79,7 +94,7 @@ describe('"Login"', () => {
         }),
       );
 
-      expect(backButton().exists()).toBe(false);
+      expect(loginPage.getBackButton().exists()).toBe(false);
     });
   });
 
@@ -90,8 +105,7 @@ describe('"Login"', () => {
           ENABLE_ACCOUNT_REGISTRATION: true,
         },
       });
-      wrapper = mountComponent(
-        <Login />,
+      const loginPage = new LoginPage(
         mockStoreFactory()({
           ...initialRootState,
           runtimeState: {
@@ -102,7 +116,7 @@ describe('"Login"', () => {
         }),
       );
 
-      expect(backButton().exists()).toBe(true);
+      expect(loginPage.getBackButton().exists()).toBe(true);
     });
   });
 });

@@ -22,35 +22,60 @@ import {createMemoryHistory} from 'history';
 import React from 'react';
 import waitForExpect from 'wait-for-expect';
 import {actionRoot} from '../module/action';
-import {initialRootState} from '../module/reducer';
+import {initialRootState, RootState, Api} from '../module/reducer';
 import {ROUTE} from '../route';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
-import SingleSignOnForm from './SingleSignOnForm';
+import SingleSignOnForm, {SingleSignOnFormProps} from './SingleSignOnForm';
 import {ValidationError} from '../module/action/ValidationError';
 import {TypeUtil} from '@wireapp/commons';
 import {Config, Configuration} from '../../Config';
+import {MockStoreEnhanced} from 'redux-mock-store';
+import {ThunkDispatch} from 'redux-thunk';
+import {AnyAction} from 'redux';
+import {History} from 'history';
+
+class SingleSignOnFormPage {
+  private readonly driver: ReactWrapper;
+
+  constructor(
+    store: MockStoreEnhanced<TypeUtil.RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
+    componentProps: SingleSignOnFormProps,
+    history?: History<any>,
+  ) {
+    this.driver = mountComponent(<SingleSignOnForm {...componentProps} />, store, history);
+  }
+
+  getCodeOrEmailInput = () => this.driver.find('input[data-uie-name="enter-code"]');
+  getSubmitButton = () => this.driver.find('button[data-uie-name="do-sso-sign-in"]');
+  getTemporaryCheckbox = () => this.driver.find('input[data-uie-name="enter-public-computer-sso-sign-in"]');
+  getErrorMessage = (errorLabel?: string) =>
+    this.driver.find(`[data-uie-name="error-message"]${errorLabel ? `[data-uie-value="${errorLabel}"]` : ''}`);
+
+  clickSubmitButton = () => this.getSubmitButton().simulate('submit');
+
+  enterCodeOrEmail = (value: string) => this.getCodeOrEmailInput().simulate('change', {target: {value}});
+
+  update = () => this.driver.update();
+}
 
 describe('SingleSignOnForm', () => {
-  let wrapper: ReactWrapper;
-
-  const codeOrEmailInput = () => wrapper.find('input[data-uie-name="enter-code"]').first();
-  const submitButton = () => wrapper.find('button[data-uie-name="do-sso-sign-in"]').first();
-  const temporaryCheckbox = () => wrapper.find('input[data-uie-name="enter-public-computer-sso-sign-in"]');
-  const errorMessage = (errorLabel?: string) =>
-    wrapper.find(`[data-uie-name="error-message"]${errorLabel ? `[data-uie-value="${errorLabel}"]` : ''}`);
-
   it('successfully logs into account with initial SSO code', async () => {
+    spyOn<{getConfig: () => TypeUtil.RecursivePartial<Configuration>}>(Config, 'getConfig').and.returnValue({
+      FEATURE: {
+        ENABLE_DOMAIN_DISCOVERY: false,
+      },
+    });
+
     const history = createMemoryHistory();
     const historyPushSpy = spyOn(history, 'push');
     const doLogin = jasmine.createSpy().and.returnValue((code: string) => Promise.resolve());
-    const code = 'wire-cb6e4dfc-a4b0-4c59-a31d-303a7f5eb5ab';
+    const initialCode = 'wire-cb6e4dfc-a4b0-4c59-a31d-303a7f5eb5ab';
 
     spyOn(actionRoot.authAction, 'validateSSOCode').and.returnValue(() => Promise.resolve());
     spyOn(actionRoot.authAction, 'doFinalizeSSOLogin').and.returnValue(() => Promise.resolve());
 
-    wrapper = mountComponent(
-      <SingleSignOnForm doLogin={doLogin} initialCode={code} />,
+    const singleSignOnFormPage = new SingleSignOnFormPage(
       mockStoreFactory()({
         ...initialRootState,
         runtimeState: {
@@ -59,16 +84,17 @@ describe('SingleSignOnForm', () => {
           isSupportedBrowser: true,
         },
       }),
+      {doLogin, initialCode},
       history,
     );
 
-    expect(codeOrEmailInput().exists())
+    expect(singleSignOnFormPage.getCodeOrEmailInput().exists())
       .withContext('Code input exists')
       .toBe(true);
 
-    expect(codeOrEmailInput().props().value)
+    expect(singleSignOnFormPage.getCodeOrEmailInput().props().value)
       .withContext('Code input has initial code value')
-      .toEqual(code);
+      .toEqual(initialCode);
 
     expect(actionRoot.authAction.validateSSOCode)
       .withContext('validateSSOCode function was called')
@@ -97,8 +123,7 @@ describe('SingleSignOnForm', () => {
     });
     const code = 'invalid-code';
 
-    wrapper = mountComponent(
-      <SingleSignOnForm doLogin={() => Promise.reject()} />,
+    const singleSignOnFormPage = new SingleSignOnFormPage(
       mockStoreFactory()({
         ...initialRootState,
         runtimeState: {
@@ -107,26 +132,68 @@ describe('SingleSignOnForm', () => {
           isSupportedBrowser: true,
         },
       }),
+      {doLogin: () => Promise.reject()},
     );
 
-    expect(codeOrEmailInput().exists())
+    expect(singleSignOnFormPage.getCodeOrEmailInput().exists())
       .withContext('Code input exists')
       .toBe(true);
 
-    expect(submitButton().props().disabled)
+    expect(singleSignOnFormPage.getSubmitButton().props().disabled)
       .withContext('Submit button is disabled')
       .toBe(true);
 
-    codeOrEmailInput().simulate('change', {target: {value: code}});
+    singleSignOnFormPage.enterCodeOrEmail(code);
 
-    expect(submitButton().props().disabled)
+    expect(singleSignOnFormPage.getSubmitButton().props().disabled)
       .withContext('Submit button is enabled')
       .toBe(false);
 
-    submitButton().simulate('submit');
+    singleSignOnFormPage.clickSubmitButton();
 
-    expect(errorMessage(ValidationError.FIELD.SSO_EMAIL_CODE.PATTERN_MISMATCH).exists())
+    expect(singleSignOnFormPage.getErrorMessage(ValidationError.FIELD.SSO_EMAIL_CODE.PATTERN_MISMATCH).exists())
       .withContext(`Error "${ValidationError.FIELD.SSO_EMAIL_CODE.PATTERN_MISMATCH}" message exists`)
+      .toBe(true);
+  });
+
+  it('disallows email when domain discovery is disabled', async () => {
+    spyOn<{getConfig: () => TypeUtil.RecursivePartial<Configuration>}>(Config, 'getConfig').and.returnValue({
+      FEATURE: {
+        ENABLE_DOMAIN_DISCOVERY: false,
+      },
+    });
+    const email = 'email@mail.com';
+
+    const singleSignOnFormPage = new SingleSignOnFormPage(
+      mockStoreFactory()({
+        ...initialRootState,
+        runtimeState: {
+          hasCookieSupport: true,
+          hasIndexedDbSupport: true,
+          isSupportedBrowser: true,
+        },
+      }),
+      {doLogin: () => Promise.reject()},
+    );
+
+    expect(singleSignOnFormPage.getCodeOrEmailInput().exists())
+      .withContext('code/email input exists')
+      .toBe(true);
+
+    expect(singleSignOnFormPage.getSubmitButton().props().disabled)
+      .withContext('Submit button is disabled')
+      .toBe(true);
+
+    singleSignOnFormPage.enterCodeOrEmail(email);
+
+    expect(singleSignOnFormPage.getSubmitButton().props().disabled)
+      .withContext('Submit button is enabled')
+      .toBe(false);
+
+    singleSignOnFormPage.clickSubmitButton();
+
+    expect(singleSignOnFormPage.getErrorMessage(ValidationError.FIELD.SSO_CODE.PATTERN_MISMATCH).exists())
+      .withContext(`Error "${ValidationError.FIELD.SSO_CODE.PATTERN_MISMATCH}" message exists`)
       .toBe(true);
   });
 
@@ -145,8 +212,7 @@ describe('SingleSignOnForm', () => {
     );
     spyOn(actionRoot.navigationAction, 'doNavigate').and.returnValue(() => {});
 
-    wrapper = mountComponent(
-      <SingleSignOnForm doLogin={() => Promise.reject()} />,
+    const singleSignOnFormPage = new SingleSignOnFormPage(
       mockStoreFactory()({
         ...initialRootState,
         runtimeState: {
@@ -155,23 +221,24 @@ describe('SingleSignOnForm', () => {
           isSupportedBrowser: true,
         },
       }),
+      {doLogin: () => Promise.reject()},
     );
 
-    expect(codeOrEmailInput().exists())
+    expect(singleSignOnFormPage.getCodeOrEmailInput().exists())
       .withContext('Email input exists')
       .toBe(true);
 
-    expect(submitButton().props().disabled)
+    expect(singleSignOnFormPage.getSubmitButton().props().disabled)
       .withContext('Submit button is disabled')
       .toBe(true);
 
-    codeOrEmailInput().simulate('change', {target: {value: email}});
+    singleSignOnFormPage.enterCodeOrEmail(email);
 
-    expect(submitButton().props().disabled)
+    expect(singleSignOnFormPage.getSubmitButton().props().disabled)
       .withContext('Submit button is enabled')
       .toBe(false);
 
-    submitButton().simulate('submit');
+    singleSignOnFormPage.clickSubmitButton();
 
     expect(actionRoot.authAction.doGetDomainInfo)
       .withContext('domain data got fetched')
@@ -199,8 +266,7 @@ describe('SingleSignOnForm', () => {
     );
     spyOn(actionRoot.navigationAction, 'doNavigate').and.returnValue(() => {});
 
-    wrapper = mountComponent(
-      <SingleSignOnForm doLogin={() => Promise.reject()} />,
+    const singleSignOnFormPage = new SingleSignOnFormPage(
       mockStoreFactory()({
         ...initialRootState,
         runtimeState: {
@@ -209,24 +275,25 @@ describe('SingleSignOnForm', () => {
           isSupportedBrowser: true,
         },
       }),
+      {doLogin: () => Promise.reject()},
     );
 
-    expect(codeOrEmailInput().exists())
+    expect(singleSignOnFormPage.getCodeOrEmailInput().exists())
       .withContext('Email input exists')
       .toBe(true);
 
-    expect(submitButton().props().disabled)
+    expect(singleSignOnFormPage.getSubmitButton().props().disabled)
       .withContext('Submit button is disabled')
       .toBe(true);
 
-    codeOrEmailInput().simulate('change', {target: {value: email}});
-    temporaryCheckbox().simulate('change', {target: {checked: true}});
+    singleSignOnFormPage.enterCodeOrEmail(email);
+    singleSignOnFormPage.getTemporaryCheckbox().simulate('change', {target: {checked: true}});
 
-    expect(submitButton().props().disabled)
+    expect(singleSignOnFormPage.getSubmitButton().props().disabled)
       .withContext('Submit button is enabled')
       .toBe(false);
 
-    submitButton().simulate('submit');
+    singleSignOnFormPage.clickSubmitButton();
 
     expect(actionRoot.authAction.doGetDomainInfo)
       .withContext('domain data got fetched')

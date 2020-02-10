@@ -19,22 +19,44 @@
 
 import {ReactWrapper} from 'enzyme';
 import React from 'react';
-import {initialRootState} from '../module/reducer';
+import {initialRootState, RootState, Api} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
 import TeamName from './TeamName';
+import {MockStoreEnhanced} from 'redux-mock-store';
+import {TypeUtil} from '@wireapp/commons';
+import {ThunkDispatch} from 'redux-thunk';
+import {AnyAction} from 'redux';
+import {History} from 'history';
+import {initialAuthState} from '../module/reducer/authReducer';
+import {ValidationError} from '../module/action/ValidationError';
+
+class SetTeamNamePage {
+  private readonly driver: ReactWrapper;
+
+  constructor(
+    store: MockStoreEnhanced<TypeUtil.RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
+    history?: History<any>,
+  ) {
+    this.driver = mountComponent(<TeamName />, store, history);
+  }
+
+  getTeamNameInput = () => this.driver.find('input[data-uie-name="enter-team-name"]');
+  getNextButton = () => this.driver.find('button[data-uie-name="do-next"]');
+  getErrorMessage = (errorLabel?: string) =>
+    this.driver.find(`[data-uie-name="error-message"]${errorLabel ? `[data-uie-value="${errorLabel}"]` : ''}`);
+
+  clickNextButton = () => this.getNextButton().simulate('click');
+
+  enterTeamName = (value: string) => this.getTeamNameInput().simulate('change', {target: {value}});
+
+  update = () => this.driver.update();
+}
 
 describe('when entering a team name', () => {
-  let wrapper: ReactWrapper;
-
-  const teamNameInput = () => wrapper.find('[data-uie-name="enter-team-name"]').first();
-  const doNextButton = () => wrapper.find('[data-uie-name="do-next"]').first();
-  const errorMessage = () => wrapper.find('[data-uie-name="error-message"]').first();
-
   describe('the submit button', () => {
     it('is disabled if too few characters are entered', () => {
-      wrapper = mountComponent(
-        <TeamName />,
+      const setTeamNamePage = new SetTeamNamePage(
         mockStoreFactory()({
           ...initialRootState,
           runtimeState: {
@@ -45,13 +67,12 @@ describe('when entering a team name', () => {
         }),
       );
 
-      expect(teamNameInput().props().required).toBe(true);
-      expect(doNextButton().props().disabled).toBe(true);
+      expect(setTeamNamePage.getTeamNameInput().props().required).toBe(true);
+      expect(setTeamNamePage.getNextButton().props().disabled).toBe(true);
     });
 
     it('is enabled when the minimum amount of characters is entered', () => {
-      wrapper = mountComponent(
-        <TeamName />,
+      const setTeamNamePage = new SetTeamNamePage(
         mockStoreFactory()({
           ...initialRootState,
           runtimeState: {
@@ -63,16 +84,14 @@ describe('when entering a team name', () => {
       );
       const expectedTeamName = 'M';
 
-      expect(doNextButton().props().disabled).toBe(true);
+      expect(setTeamNamePage.getNextButton().props().disabled).toBe(true);
+      setTeamNamePage.enterTeamName(expectedTeamName);
 
-      teamNameInput().simulate('change', {target: {value: expectedTeamName}});
-
-      expect(doNextButton().props().disabled).toBe(false);
+      expect(setTeamNamePage.getNextButton().props().disabled).toBe(false);
     });
 
     it('is disabled if previous submit with same value failed', () => {
-      wrapper = mountComponent(
-        <TeamName />,
+      const setTeamNamePage = new SetTeamNamePage(
         mockStoreFactory()({
           ...initialRootState,
           runtimeState: {
@@ -85,26 +104,30 @@ describe('when entering a team name', () => {
       const expectedTeamName = 'M';
       const expectedValidTeamName = 'My Team';
 
-      expect(doNextButton().props().disabled).toBe(true);
+      expect(setTeamNamePage.getNextButton().props().disabled).toBe(true);
+      setTeamNamePage.enterTeamName(expectedTeamName);
 
-      teamNameInput().simulate('change', {target: {value: expectedTeamName}});
+      expect(setTeamNamePage.getNextButton().props().disabled).toBe(false);
+      setTeamNamePage.clickNextButton();
 
-      expect(doNextButton().props().disabled).toBe(false);
+      expect(setTeamNamePage.getNextButton().props().disabled).toBe(true);
+      setTeamNamePage.enterTeamName(expectedValidTeamName);
 
-      doNextButton().simulate('click');
-
-      expect(doNextButton().props().disabled).toBe(true);
-
-      teamNameInput().simulate('change', {target: {value: expectedValidTeamName}});
-
-      expect(doNextButton().props().disabled).toBe(false);
+      expect(setTeamNamePage.getNextButton().props().disabled).toBe(false);
     });
 
     it('is disabled when prefilled with too few characters', () => {
-      wrapper = mountComponent(
-        <TeamName />,
+      const setTeamNamePage = new SetTeamNamePage(
         mockStoreFactory()({
           ...initialRootState,
+          authState: {
+            ...initialAuthState,
+            account: {
+              team: {
+                name: '',
+              },
+            },
+          },
           runtimeState: {
             hasCookieSupport: true,
             hasIndexedDbSupport: true,
@@ -112,16 +135,16 @@ describe('when entering a team name', () => {
           },
         }),
       );
-      wrapper.setProps({teamName: ''});
 
-      expect(doNextButton().props().disabled).toBe(true);
+      expect(setTeamNamePage.getNextButton().props().disabled)
+        .withContext('Submit button is disabled')
+        .toBe(true);
     });
   });
 
   describe('an error message', () => {
     it('appears if too few characters are entered', () => {
-      wrapper = mountComponent(
-        <TeamName />,
+      const setTeamNamePage = new SetTeamNamePage(
         mockStoreFactory()({
           ...initialRootState,
           runtimeState: {
@@ -132,20 +155,19 @@ describe('when entering a team name', () => {
         }),
       );
       const expectedTeamName = 'M';
-      const expectedErrorMessage = 'Enter a name with at least 2 characters';
 
-      teamNameInput().simulate('change', {target: {value: expectedTeamName}});
+      setTeamNamePage.enterTeamName(expectedTeamName);
 
-      expect(teamNameInput().props().value).toBe(expectedTeamName);
+      expect(setTeamNamePage.getTeamNameInput().props().value).toBe(expectedTeamName);
+      setTeamNamePage.clickNextButton();
 
-      doNextButton().simulate('click');
-
-      expect(errorMessage().text()).toBe(expectedErrorMessage);
+      expect(setTeamNamePage.getErrorMessage(ValidationError.FIELD.NAME.PATTERN_MISMATCH).exists())
+        .withContext('pattern mismatch error is shown')
+        .toBe(true);
     });
 
     it('appears when input gets trimmed', () => {
-      wrapper = mountComponent(
-        <TeamName />,
+      const setTeamNamePage = new SetTeamNamePage(
         mockStoreFactory()({
           ...initialRootState,
           runtimeState: {
@@ -157,15 +179,15 @@ describe('when entering a team name', () => {
       );
       const actualTeamName = '  ';
       const expectedTeamName = '  ';
-      const expectedErrorMessage = 'Enter a name with at least 2 characters';
 
-      teamNameInput().simulate('change', {target: {value: actualTeamName}});
+      setTeamNamePage.enterTeamName(actualTeamName);
 
-      expect(teamNameInput().props().value).toBe(expectedTeamName);
+      expect(setTeamNamePage.getTeamNameInput().props().value).toBe(expectedTeamName);
+      setTeamNamePage.clickNextButton();
 
-      doNextButton().simulate('click');
-
-      expect(errorMessage().text()).toBe(expectedErrorMessage);
+      expect(setTeamNamePage.getErrorMessage(ValidationError.FIELD.NAME.VALUE_MISSING).exists())
+        .withContext('value missing error is shown')
+        .toBe(true);
     });
   });
 });
