@@ -34,6 +34,7 @@ import waitForExpect from 'wait-for-expect';
 import {createMemoryHistory} from 'history';
 import {ROUTE} from '../route';
 import {ClientType} from '@wireapp/api-client/dist/client';
+import {BackendError} from '../module/action/BackendError';
 
 class LoginPage {
   private readonly driver: ReactWrapper;
@@ -93,6 +94,44 @@ describe('Login', () => {
     expect(historyPushSpy)
       .withContext('navigation to history page was triggered')
       .toHaveBeenCalledWith(ROUTE.HISTORY_INFO as any);
+  });
+
+  it('redirects to client deletion page if max devices is reached', async () => {
+    const history = createMemoryHistory();
+    const historyPushSpy = spyOn(history, 'push');
+
+    const email = 'email@mail.com';
+    const password = 'password';
+
+    spyOn(actionRoot.authAction, 'doLogin').and.returnValue(() =>
+      Promise.reject({label: BackendError.LABEL.TOO_MANY_CLIENTS}),
+    );
+
+    const loginPage = new LoginPage(
+      mockStoreFactory()({
+        ...initialRootState,
+        runtimeState: {
+          hasCookieSupport: true,
+          hasIndexedDbSupport: true,
+          isSupportedBrowser: true,
+        },
+      }),
+      history,
+    );
+
+    loginPage.enterEmail(email);
+    loginPage.enterPassword(password);
+    loginPage.clickLoginButton();
+
+    await waitForExpect(() => {
+      expect(actionRoot.authAction.doLogin)
+        .withContext('doLogin action was called')
+        .toHaveBeenCalledWith({clientType: ClientType.PERMANENT, email, password});
+    });
+
+    expect(historyPushSpy)
+      .withContext('navigation to max clients page was triggered')
+      .toHaveBeenCalledWith(ROUTE.CLIENTS as any);
   });
 
   it('successfully logs in with handle', async () => {
