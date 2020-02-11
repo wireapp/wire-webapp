@@ -22,7 +22,7 @@ import {backendConfig} from '../../api/testResolver';
 describe('TeamRepository', () => {
   const test_factory = new TestFactory();
 
-  /* eslint sort-keys: "off" */
+  /* eslint sort-keys-fix/sort-keys-fix: "off" */
   const teams_data = {
     teams: [
       {
@@ -50,7 +50,7 @@ describe('TeamRepository', () => {
       {user: '74fa64dc-8318-4426-9935-82590ff8aa3e', permissions: 8},
     ],
   };
-  /* eslint sort-keys: "off" */
+  /* eslint sort-keys-fix/sort-keys-fix: "off" */
 
   let server = undefined;
   let team_repository = undefined;

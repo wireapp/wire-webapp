@@ -242,7 +242,7 @@ describe('EventRepository', () => {
     });
 
     it('accepts "conversation.rename" events', () => {
-      /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
+      /* eslint-disable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
       const event = {
         conversation: '64dcb45f-bf8d-4eac-a263-649a60d69305',
         time: '2016-08-09T11:57:37.498Z',
@@ -251,7 +251,7 @@ describe('EventRepository', () => {
         id: '7.800122000b2f7cca',
         type: 'conversation.rename',
       };
-      /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
+      /* eslint-enable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
 
       return TestFactory.event_repository._handleEvent(event).then(() => {
         expect(TestFactory.event_service.saveEvent).toHaveBeenCalled();
@@ -260,7 +260,7 @@ describe('EventRepository', () => {
     });
 
     it('accepts "conversation.member-join" events', () => {
-      /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
+      /* eslint-disable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
       const event = {
         conversation: '64dcb45f-bf8d-4eac-a263-649a60d69305',
         time: '2016-08-09T12:01:14.688Z',
@@ -269,7 +269,7 @@ describe('EventRepository', () => {
         id: '8.800122000b2f7d20',
         type: 'conversation.member-join',
       };
-      /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
+      /* eslint-enable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
 
       return TestFactory.event_repository._handleEvent(event).then(() => {
         expect(TestFactory.event_service.saveEvent).toHaveBeenCalled();
@@ -278,7 +278,7 @@ describe('EventRepository', () => {
     });
 
     it('accepts "conversation.member-leave" events', () => {
-      /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
+      /* eslint-disable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
       const event = {
         conversation: '64dcb45f-bf8d-4eac-a263-649a60d69305',
         time: '2016-08-09T12:01:56.363Z',
@@ -287,7 +287,7 @@ describe('EventRepository', () => {
         id: '9.800122000b3d69bc',
         type: 'conversation.member-leave',
       };
-      /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
+      /* eslint-enable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
 
       return TestFactory.event_repository._handleEvent(event).then(() => {
         expect(TestFactory.event_service.saveEvent).toHaveBeenCalled();
@@ -296,7 +296,7 @@ describe('EventRepository', () => {
     });
 
     it('accepts "conversation.voice-channel-deactivate" (missed call) events', () => {
-      /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
+      /* eslint-disable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
       const event = {
         conversation: '64dcb45f-bf8d-4eac-a263-649a60d69305',
         time: '2016-08-09T12:09:28.294Z',
@@ -305,7 +305,7 @@ describe('EventRepository', () => {
         id: '16.800122000b3d4ade',
         type: 'conversation.voice-channel-deactivate',
       };
-      /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
+      /* eslint-enable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
 
       return TestFactory.event_repository._handleEvent(event).then(() => {
         expect(TestFactory.event_service.saveEvent).toHaveBeenCalled();
@@ -314,7 +314,7 @@ describe('EventRepository', () => {
     });
 
     it('accepts plain decryption error events', () => {
-      /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
+      /* eslint-disable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
       const event = {
         conversation: '7f0939c8-dbd9-48f5-839e-b0ebcfffec8c',
         id: 'f518d6ff-19d3-48a0-b0c1-cc71c6e81136',
@@ -324,7 +324,7 @@ describe('EventRepository', () => {
         error: 'Offset is outside the bounds of the DataView (17cd13b4b2a3a98)',
         errorCode: '1778 (17cd13b4b2a3a98)',
       };
-      /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
+      /* eslint-enable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
 
       return TestFactory.event_repository._handleEvent(event).then(() => {
         expect(TestFactory.event_service.saveEvent).toHaveBeenCalled();
@@ -519,7 +519,10 @@ describe('EventRepository', () => {
 
     it('updates edited messages when link preview arrives', () => {
       const replacingId = 'old-replaced-message-id';
-      const storedEvent = {...event, data: {...event.data, replacing_message_id: replacingId}};
+      const storedEvent = {
+        ...event,
+        data: {...event.data, replacing_message_id: replacingId},
+      };
       const linkPreviewEvent = {...event};
       spyOn(TestFactory.event_service, 'loadEvent').and.callFake((conversationId, messageId) => {
         return messageId === replacingId ? Promise.resolve() : Promise.resolve(storedEvent);
@@ -562,7 +565,10 @@ describe('EventRepository', () => {
 
     it('updates link preview when edited', () => {
       const replacingId = 'replaced-message-id';
-      const storedEvent = {...event, data: {...event.data, previews: ['preview']}};
+      const storedEvent = {
+        ...event,
+        data: {...event.data, previews: ['preview']},
+      };
       const editEvent = {...event};
       spyOn(TestFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(storedEvent));
       spyOn(TestFactory.event_service, 'replaceEvent').and.callFake(ev => ev);

@@ -83,7 +83,6 @@ module.exports = {
     publicPath: '/',
   },
   plugins: [
-    new webpack.IgnorePlugin(/^.\/locale$/, /moment$/),
     new webpack.ProvidePlugin({
       $: 'jquery',
       _: 'underscore',

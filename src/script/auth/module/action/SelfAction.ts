@@ -61,8 +61,8 @@ export class SelfAction {
   };
 
   doGetConsents = (): ThunkAction => {
-    return async (dispatch, getState, {apiClient, config}) => {
-      if (!config.FEATURE.CHECK_CONSENT) {
+    return async (dispatch, getState, {apiClient, getConfig}) => {
+      if (!getConfig().FEATURE.CHECK_CONSENT) {
         logger.warn('Consent check feature is disabled.');
         return Promise.resolve();
       }
@@ -78,14 +78,14 @@ export class SelfAction {
   };
 
   doSetConsent = (consentType: ConsentType, value: number): ThunkAction => {
-    return async (dispatch, getState, {apiClient, config}) => {
-      if (!config.FEATURE.CHECK_CONSENT) {
+    return async (dispatch, getState, {apiClient, getConfig}) => {
+      if (!getConfig().FEATURE.CHECK_CONSENT) {
         logger.warn('Consent check feature is disabled.');
         return Promise.resolve();
       }
       dispatch(SelfActionCreator.startSetConsent());
       const consent = {
-        source: `${config.APP_NAME} ${Environment.version(false)}`,
+        source: `${getConfig().APP_NAME} ${Environment.version(false)}`,
         type: consentType,
         value,
       };

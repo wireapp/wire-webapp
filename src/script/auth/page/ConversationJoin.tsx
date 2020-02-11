@@ -22,7 +22,6 @@ import {
   Button,
   COLOR,
   ContainerXS,
-  ErrorMessage,
   Form,
   H2,
   Input,
@@ -110,7 +109,8 @@ const ConversationJoin = ({
   }, []);
 
   useEffect(() => {
-    const isEnabled = Config.URL.MOBILE_BASE && hasURLParameter(QUERY_KEY.PWA_AWARE) && isPwaSupportedBrowser();
+    const isEnabled =
+      Config.getConfig().URL.MOBILE_BASE && hasURLParameter(QUERY_KEY.PWA_AWARE) && isPwaSupportedBrowser();
     setIsPwaEnabled(isEnabled);
     if (isEnabled) {
       setForceNewTemporaryGuestAccount(true);
@@ -199,7 +199,7 @@ const ConversationJoin = ({
             >
               <FormattedHTMLMessage
                 {...conversationJoinStrings.fullConversationHeadline}
-                values={{brandName: Config.BRAND_NAME}}
+                values={{brandName: Config.getConfig().BRAND_NAME}}
               />
             </H2>
             <Text style={{fontSize: '16px', marginTop: '10px'}} data-uie-name="status-full-text">
@@ -210,7 +210,10 @@ const ConversationJoin = ({
           <ContainerXS style={{margin: 'auto 0'}}>
             <AppAlreadyOpen fullscreen={isPwaEnabled} />
             <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} color={COLOR.GRAY}>
-              <FormattedHTMLMessage {...conversationJoinStrings.headline} values={{brandName: Config.BRAND_NAME}} />
+              <FormattedHTMLMessage
+                {...conversationJoinStrings.headline}
+                values={{brandName: Config.getConfig().BRAND_NAME}}
+              />
             </H2>
             <Text style={{fontSize: '16px', marginTop: '10px'}}>
               <FormattedHTMLMessage {...conversationJoinStrings.subhead} />
@@ -244,9 +247,7 @@ const ConversationJoin = ({
                   <ArrowIcon />
                 </RoundIconButton>
               </InputSubmitCombo>
-              <ErrorMessage data-uie-name="error-message">
-                {error ? parseValidationErrors(error) : parseError(conversationError)}
-              </ErrorMessage>
+              {error ? parseValidationErrors(error) : parseError(conversationError)}
             </Form>
             {!isPwaEnabled && (
               <Small block>
@@ -272,10 +273,13 @@ const ConversationJoin = ({
               {selfName ? (
                 <FormattedHTMLMessage
                   {...conversationJoinStrings.existentAccountHeadline}
-                  values={{brandName: Config.BRAND_NAME, name: StringUtil.capitalize(selfName)}}
+                  values={{brandName: Config.getConfig().BRAND_NAME, name: StringUtil.capitalize(selfName)}}
                 />
               ) : (
-                <FormattedHTMLMessage {...conversationJoinStrings.headline} values={{brandName: Config.BRAND_NAME}} />
+                <FormattedHTMLMessage
+                  {...conversationJoinStrings.headline}
+                  values={{brandName: Config.getConfig().BRAND_NAME}}
+                />
               )}
             </H2>
             <Text block style={{fontSize: '16px', marginTop: '10px'}}>
@@ -294,11 +298,9 @@ const ConversationJoin = ({
               }}
               data-uie-name="do-open"
             >
-              {_(conversationJoinStrings.existentAccountOpenButton, {brandName: Config.BRAND_NAME})}
+              {_(conversationJoinStrings.existentAccountOpenButton, {brandName: Config.getConfig().BRAND_NAME})}
             </Button>
-            <ErrorMessage data-uie-name="error-message">
-              {error ? parseValidationErrors(error) : parseError(conversationError)}
-            </ErrorMessage>
+            {error ? parseValidationErrors(error) : parseError(conversationError)}
             <Small block>
               <Link
                 onClick={() => setForceNewTemporaryGuestAccount(true)}

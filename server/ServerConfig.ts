@@ -16,6 +16,7 @@ export interface ServerConfig {
       DEFAULT_LOGIN_TEMPORARY_CLIENT: boolean;
       ENABLE_ACCOUNT_REGISTRATION: boolean;
       ENABLE_DEBUG: boolean;
+      ENABLE_DOMAIN_DISCOVERY: boolean;
       ENABLE_PHONE_LOGIN: boolean;
       ENABLE_SSO: boolean;
       PERSIST_TEMPORARY_CLIENTS: boolean;

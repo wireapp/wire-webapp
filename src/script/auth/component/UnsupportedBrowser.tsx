@@ -37,10 +37,10 @@ const UnsupportedMessage: React.SFC<UnsupportedProps> = ({headline, subhead}) =>
   <ContainerXS verticalCenter centerText>
     <Logo height={20} />
     <H1 center style={{marginBottom: '48px', marginTop: '24px'}}>
-      <FormattedMessage {...headline} values={{brandName: Config.BRAND_NAME}} />
+      <FormattedMessage {...headline} values={{brandName: Config.getConfig().BRAND_NAME}} />
     </H1>
     <Text center>
-      <FormattedMessage {...subhead} values={{brandName: Config.BRAND_NAME}} />
+      <FormattedMessage {...subhead} values={{brandName: Config.getConfig().BRAND_NAME}} />
     </Text>
   </ContainerXS>
 );
@@ -66,7 +66,7 @@ export const UnsupportedBrowser = ({
               {...(isTemporaryGuest
                 ? unsupportedJoinStrings.unsupportedJoinHeadline
                 : unsupportedStrings.headlineBrowser)}
-              values={{brandName: Config.BRAND_NAME}}
+              values={{brandName: Config.getConfig().BRAND_NAME}}
             />
           </H2>
           {isTemporaryGuest && isMobileOs() ? (

@@ -17,11 +17,11 @@
  *
  */
 
-import moment from 'moment';
 import {amplify} from 'amplify';
 
 import {t} from 'Util/LocalizerUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
+import {formatDateNumeral, formatTimeShort} from 'Util/TimeUtil';
 
 import {EphemeralStatusType} from '../message/EphemeralStatusType';
 import {WebAppEvents} from '../event/WebApp';
@@ -123,7 +123,7 @@ class Message {
       if (!receipts.length || !this.conversation().is1to1()) {
         return '';
       }
-      return moment(receipts[0].time).format('L');
+      return formatDateNumeral(receipts[0].time);
     });
 
     this.readReceiptText = ko.pureComputed(() => {
@@ -132,7 +132,7 @@ class Message {
         return '';
       }
       const is1to1 = this.conversation().is1to1();
-      return is1to1 ? moment(receipts[0].time).format('LT') : receipts.length.toString(10);
+      return is1to1 ? formatTimeShort(receipts[0].time) : receipts.length.toString(10);
     });
 
     this.dispose = () => {

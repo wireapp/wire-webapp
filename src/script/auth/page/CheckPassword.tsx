@@ -22,7 +22,6 @@ import {BackendErrorLabel} from '@wireapp/api-client/dist/http';
 import {
   ArrowIcon,
   ContainerXS,
-  ErrorMessage,
   Form,
   H1,
   Input,
@@ -37,6 +36,7 @@ import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 import useReactRouter from 'use-react-router';
 import {loginStrings, phoneLoginStrings} from '../../strings';
+import Exception from '../component/Exception';
 import {EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot} from '../module/action';
 import {LabeledError} from '../module/action/LabeledError';
@@ -44,7 +44,6 @@ import {ValidationError} from '../module/action/ValidationError';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
-import {isValidationError, parseError, parseValidationErrors} from '../util/errorUtil';
 import * as UrlUtil from '../util/urlUtil';
 import Page from './Page';
 
@@ -56,7 +55,7 @@ const CheckPassword = ({loginData, doLogin, resetAuthError, isFetching}: Props &
 
   const passwordInput = useRef<HTMLInputElement>();
 
-  const [error, setError] = useState();
+  const [error, setError] = useState(null);
   const [password, setPassword] = useState();
   const [validPasswordInput, setValidPasswordInput] = useState(true);
 
@@ -80,7 +79,7 @@ const CheckPassword = ({loginData, doLogin, resetAuthError, isFetching}: Props &
       if (validationError) {
         throw validationError;
       }
-      const login: LoginData = {clientType: loginData.clientType, phone: loginData.phone, password};
+      const login: LoginData = {clientType: loginData.clientType, password, phone: loginData.phone};
       await doLogin(login);
       return history.push(ROUTE.HISTORY_INFO);
     } catch (error) {
@@ -150,9 +149,7 @@ const CheckPassword = ({loginData, doLogin, resetAuthError, isFetching}: Props &
               </RoundIconButton>
             )}
           </InputSubmitCombo>
-          <ErrorMessage data-uie-name="error-message">
-            {!error ? null : isValidationError(error) ? parseValidationErrors(error) : parseError(error)}
-          </ErrorMessage>
+          <Exception errors={[error]} />
         </Form>
         <Link
           center

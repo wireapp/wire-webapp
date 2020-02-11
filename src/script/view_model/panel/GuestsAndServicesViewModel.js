@@ -60,7 +60,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
 
     this.activeConversation.subscribe(conversationEntity => this._updateCode(this.isVisible(), conversationEntity));
     this.isVisible.subscribe(isVisible => this._updateCode(isVisible, this.activeConversation()));
-    this.brandName = Config.BRAND_NAME;
+    this.brandName = Config.getConfig().BRAND_NAME;
   }
 
   getElementId() {

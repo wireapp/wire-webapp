@@ -30,7 +30,7 @@ z.viewModel.FaviconViewModel = class FaviconViewModel {
   /**
    * Construct a new FaviconViewModel.
    *
-   * @param {Dispatcher} dispatcher - event dispatcher
+   * @param {Dispatcher} dispatcher event dispatcher
    */
   constructor(dispatcher) {
     this.dispatcher = dispatcher;

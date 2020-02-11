@@ -19,18 +19,35 @@
 
 import ko from 'knockout';
 
-import {AbstractAssetTransferStateTracker} from './AbstractAssetTransferStateTracker';
+import {ContentMessage} from '../../entity/message/ContentMessage';
+import {MediumImage} from '../../entity/message/MediumImage';
 import {viewportObserver} from '../../ui/viewportObserver';
+import {AbstractAssetTransferStateTracker} from './AbstractAssetTransferStateTracker';
 
 import './assetLoader';
 
+interface Params {
+  asset: MediumImage;
+  message: ContentMessage;
+  onClick: (message: ContentMessage, event: MouseEvent) => void;
+}
+
 class ImageAssetComponent extends AbstractAssetTransferStateTracker {
-  constructor({asset, message, onClick}, {element}) {
+  asset: MediumImage;
+  message: ContentMessage;
+  isVisible: ko.Observable<boolean>;
+  onClick: (message: ContentMessage, event: MouseEvent) => void;
+  dummyImageUrl: string;
+  imageUrl: ko.Observable<string>;
+  isIdle: () => boolean;
+  container: HTMLElement;
+
+  constructor({asset, message, onClick}: Params, element: HTMLElement) {
     super(message);
     this.asset = asset;
     this.message = message;
     this.isVisible = ko.observable(false);
-    this.onClick = (data, event) => onClick(message, event);
+    this.onClick = (_data, event) => onClick(message, event);
 
     this.dummyImageUrl = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'
       viewBox='0 0 1 1' width='${asset.width}' height='${asset.height}'></svg>`;
@@ -57,7 +74,7 @@ class ImageAssetComponent extends AbstractAssetTransferStateTracker {
     viewportObserver.onElementInViewport(this.container, () => this.isVisible(true));
   }
 
-  dispose() {
+  dispose(): void {
     viewportObserver.removeElement(this.container);
   }
 }
@@ -78,8 +95,8 @@ ko.components.register('image-asset', {
       <img class="image-element" data-bind="attr: {src: imageUrl() || dummyImageUrl}, css: {'image-ephemeral': message.isObfuscated()}"/>
     </div>`,
   viewModel: {
-    createViewModel(params, componentInfo) {
-      return new ImageAssetComponent(params, componentInfo);
+    createViewModel(params: Params, {element}: ko.components.ComponentInfo): ImageAssetComponent {
+      return new ImageAssetComponent(params, element as HTMLElement);
     },
   },
 });

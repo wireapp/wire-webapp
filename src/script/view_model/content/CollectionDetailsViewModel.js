@@ -17,10 +17,8 @@
  *
  */
 
-import moment from 'moment';
-
 import {getLogger} from 'Util/Logger';
-import {isToday, isCurrentYear, isSameDay, isSameMonth} from 'Util/moment';
+import {isToday, isThisYear, isSameDay, isSameMonth, formatLocale} from 'Util/TimeUtil';
 import {t} from 'Util/LocalizerUtil';
 import {koPushDeferred} from 'Util/util';
 
@@ -133,15 +131,15 @@ z.viewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
     }
 
     // We passed today
-    const sameDay = isSameDay(moment(messageEntity.timestamp()), this.lastMessageTimestamp);
-    const wasToday = isToday(moment(this.lastMessageTimestamp));
+    const sameDay = isSameDay(messageEntity.timestamp(), this.lastMessageTimestamp);
+    const wasToday = isToday(this.lastMessageTimestamp);
     if (!sameDay && wasToday) {
       this.lastMessageTimestamp = messageEntity.timestamp();
       return true;
     }
 
     // We passed the month
-    const sameMonth = isSameMonth(moment(messageEntity.timestamp()), this.lastMessageTimestamp);
+    const sameMonth = isSameMonth(messageEntity.timestamp(), this.lastMessageTimestamp);
     if (!sameMonth) {
       this.lastMessageTimestamp = messageEntity.timestamp();
       return true;
@@ -149,11 +147,10 @@ z.viewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
   }
 
   getTitleForHeader(messageEntity) {
-    const messageDate = moment(messageEntity.timestamp());
+    const messageDate = messageEntity.timestamp();
     if (isToday(messageDate)) {
       return t('conversationToday');
     }
-
-    return isCurrentYear(messageDate) ? messageDate.format('MMMM') : messageDate.format('MMMM Y');
+    return isThisYear(messageDate) ? formatLocale(messageDate, 'MMMM') : formatLocale(messageDate, 'MMMM y');
   }
 };

@@ -451,7 +451,7 @@ describe('ConversationRepository', () => {
 
     it('finds an existing 1:1 conversation within a team', () => {
       // prettier-ignore
-      /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
+      /* eslint-disable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
       const team1to1Conversation = {
         'access': ['invite'],
         'creator': '109da9ca-a495-47a8-ac70-9ffbe924b2d0',
@@ -477,7 +477,7 @@ describe('ConversationRepository', () => {
         'last_event_time': '1970-01-01T00:00:00.000Z',
         'last_event': '0.0',
       };
-      /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
+      /* eslint-disable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
 
       const conversationMapper = TestFactory.conversation_repository.conversationMapper;
       const [newConversationEntity] = conversationMapper.mapConversations([team1to1Conversation]);
@@ -569,7 +569,7 @@ describe('ConversationRepository', () => {
 
       conversation_et = new Conversation(createRandomUuid());
       // prettier-ignore
-      /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
+      /* eslint-disable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
       const bad_message = {
         'conversation': `${conversation_et.id}`,
         'id': 'aeac8355-739b-4dfc-a119-891a52c6a8dc',
@@ -586,7 +586,7 @@ describe('ConversationRepository', () => {
         'data': {'content': 'Fifth message', 'nonce': '5a8cd79a-82bb-49ca-a59e-9a8e76df77fb', 'previews': []},
         'type': 'conversation.message-add',
       };
-      /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
+      /* eslint-enable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
 
       const bad_message_key = `${conversation_et.id}@${bad_message.from}@NaN`;
 
@@ -608,7 +608,7 @@ describe('ConversationRepository', () => {
       connectionEntity.conversationId = conversation_et.id;
 
       // prettier-ignore
-      /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
+      /* eslint-disable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
       const conversation_payload = {
         'creator': conversation_et.id,
         'members': {
@@ -629,7 +629,7 @@ describe('ConversationRepository', () => {
         'last_event_time': '2015-03-20T13:41:12.580Z',
         'last_event': '25.800122000a0b0bc9',
       };
-      /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
+      /* eslint-disable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
 
       spyOn(TestFactory.conversation_repository, 'fetch_conversation_by_id').and.callThrough();
       spyOn(TestFactory.conversation_service, 'get_conversation_by_id').and.returnValue(

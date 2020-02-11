@@ -18,7 +18,6 @@
  */
 
 import {ClientClassification} from '@wireapp/api-client/dist/client';
-import {formatTimestamp} from 'Util/TimeUtil';
 import {ClientEntity} from '../client/ClientEntity';
 
 interface DeviceCardParams {
@@ -95,8 +94,6 @@ ko.components.register('device-card', {
     this.clickable = !detailed && click;
 
     this.dataUieName = `device-card${current ? '-current' : ''}`;
-
-    this.timestamp = formatTimestamp(clientEntity.time);
     this.isVerified = meta.isVerified;
     this.showVerified = showVerified;
     this.showLegalHoldIcon = showIcon && deviceClass === ClientClassification.LEGAL_HOLD;

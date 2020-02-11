@@ -72,12 +72,12 @@ export class EventRepository {
   /**
    * Construct a new Event Repository.
    *
-   * @param {EventService} eventService - Service that handles interactions with events
-   * @param {NotificationService} notificationService - Service handling the notification stream
-   * @param {WebSocketService} webSocketService - Service that connects to WebSocket
-   * @param {CryptographyRepository} cryptographyRepository - Repository for all cryptography interactions
-   * @param {serverTimeHandler} serverTimeHandler - Handles time shift between server and client
-   * @param {UserRepository} userRepository - Repository for all user interactions
+   * @param {EventService} eventService Service that handles interactions with events
+   * @param {NotificationService} notificationService Service handling the notification stream
+   * @param {WebSocketService} webSocketService Service that connects to WebSocket
+   * @param {CryptographyRepository} cryptographyRepository Repository for all cryptography interactions
+   * @param {serverTimeHandler} serverTimeHandler Handles time shift between server and client
+   * @param {UserRepository} userRepository Repository for all user interactions
    */
   constructor(
     eventService,
@@ -172,7 +172,7 @@ export class EventRepository {
    * Will set a middleware to run before the EventRepository actually processes the event.
    * Middleware is just a function with the following signature (Event) => Promise<Event>.
    *
-   * @param {Array<Function>} middlewares - middlewares to run when a new event is about to be processed
+   * @param {Array<Function>} middlewares middlewares to run when a new event is about to be processed
    * @returns {void} - returns nothing
    */
   setEventProcessMiddlewares(middlewares) {
@@ -204,7 +204,7 @@ export class EventRepository {
 
   /**
    * Close the WebSocket connection.
-   * @param {WebSocketService.CHANGE_TRIGGER} trigger - Trigger of the disconnect
+   * @param {WebSocketService.CHANGE_TRIGGER} trigger Trigger of the disconnect
    * @returns {undefined} No return value
    */
   disconnectWebSocket(trigger) {
@@ -213,7 +213,7 @@ export class EventRepository {
 
   /**
    * Re-connect the WebSocket connection.
-   * @param {WebSocketService.CHANGE_TRIGGER} trigger - Trigger of the reconnect
+   * @param {WebSocketService.CHANGE_TRIGGER} trigger Trigger of the reconnect
    * @returns {undefined} No return value
    */
   reconnectWebSocket(trigger) {
@@ -223,7 +223,7 @@ export class EventRepository {
 
   /**
    * Buffer an incoming notification.
-   * @param {Object} notification - Notification data
+   * @param {Object} notification Notification data
    * @returns {undefined} No return value
    */
   _bufferWebSocketNotification(notification) {
@@ -249,8 +249,8 @@ export class EventRepository {
   /**
    * Get notifications for the current client from the stream.
    *
-   * @param {string} notificationId - Event ID to start from
-   * @param {number} [limit=EventRepository.CONFIG.NOTIFICATION_BATCHES.MAX] - Max. number of notifications to retrieve from backend at once
+   * @param {string} notificationId Event ID to start from
+   * @param {number} [limit=EventRepository.CONFIG.NOTIFICATION_BATCHES.MAX] Max. number of notifications to retrieve from backend at once
    * @returns {Promise} Resolves when all new notifications from the stream have been handled
    */
   getNotifications(notificationId, limit = EventRepository.CONFIG.NOTIFICATION_BATCHES.MAX) {
@@ -399,8 +399,8 @@ export class EventRepository {
   /**
    * Get the last notification ID and set event date for a given client.
    *
-   * @param {string} clientId - Client ID to retrieve last notification ID for
-   * @param {boolean} [isInitialization=false] - Set initial date to 0 if not found
+   * @param {string} clientId Client ID to retrieve last notification ID for
+   * @param {boolean} [isInitialization=false] Set initial date to 0 if not found
    * @returns {Promise} Resolves when stream state has been initialized
    */
   setStreamState(clientId, isInitialization = false) {
@@ -468,7 +468,7 @@ export class EventRepository {
    * Fetch all missed events from the notification stream since the given last notification ID.
    *
    * @private
-   * @param {string} lastNotificationId - Last known notification ID to start update from
+   * @param {string} lastNotificationId Last known notification ID to start update from
    * @returns {Promise} Resolves with the total number of notifications
    */
   _updateFromStream(lastNotificationId) {
@@ -499,7 +499,7 @@ export class EventRepository {
    * Persist updated last event timestamp.
    *
    * @private
-   * @param {string} eventDate - Updated last event date
+   * @param {string} eventDate Updated last event date
    * @returns {Promise} Resolves when the last event date was stored
    */
   _updateLastEventDate(eventDate) {
@@ -514,7 +514,7 @@ export class EventRepository {
    * Persist updated last notification ID.
    *
    * @private
-   * @param {string} notificationId - Updated last notification ID
+   * @param {string} notificationId Updated last notification ID
    * @returns {Promise} Resolves when the last notification ID was stored
    */
   _updateLastNotificationId(notificationId) {
@@ -544,8 +544,8 @@ export class EventRepository {
    * Inject event into a conversation.
    * @note Don't add unable to decrypt to self conversation
    *
-   * @param {Object} event - Event payload to be injected
-   * @param {EventRepository.SOURCE} [source=EventRepository.SOURCE.INJECTED] - Source of injection
+   * @param {Object} event Event payload to be injected
+   * @param {EventRepository.SOURCE} [source=EventRepository.SOURCE.INJECTED] Source of injection
    * @returns {Promise<Event>} Resolves when the event has been processed
    */
   injectEvent(event, source = EventRepository.SOURCE.INJECTED) {
@@ -571,8 +571,8 @@ export class EventRepository {
    * Distribute the given event.
    *
    * @private
-   * @param {Object} event - Mapped event to be distributed
-   * @param {EventRepository.SOURCE} source - Source of notification
+   * @param {Object} event Mapped event to be distributed
+   * @param {EventRepository.SOURCE} source Source of notification
    * @returns {undefined} No return value
    */
   _distributeEvent(event, source) {
@@ -607,8 +607,8 @@ export class EventRepository {
    * Handle a single event from the notification stream or WebSocket.
    *
    * @private
-   * @param {JSON} event - Event coming from backend
-   * @param {EventRepository.SOURCE} source - Source of event
+   * @param {JSON} event Event coming from backend
+   * @param {EventRepository.SOURCE} source Source of event
    * @returns {Promise} Resolves with the saved record or the plain event if the event was skipped
    */
   _handleEvent(event, source) {
@@ -634,8 +634,8 @@ export class EventRepository {
   /**
    * Decrypts, saves and distributes an event received from the backend.
    *
-   * @param {JSON} event - Backend event extracted from notification stream
-   * @param {EventRepository.SOURCE} source - Source of event
+   * @param {JSON} event Backend event extracted from notification stream
+   * @param {EventRepository.SOURCE} source Source of event
    * @returns {Promise} Resolves with the saved record or `true` if the event was skipped
    */
   async processEvent(event, source) {
@@ -660,8 +660,8 @@ export class EventRepository {
    * Handle a saved event and distribute it.
    *
    * @private
-   * @param {JSON} event - Backend event extracted from notification stream
-   * @param {EventRepository.SOURCE} source - Source of event
+   * @param {JSON} event Backend event extracted from notification stream
+   * @param {EventRepository.SOURCE} source Source of event
    * @returns {JSON} The distributed event
    */
   _handleEventDistribution(event, source) {
@@ -694,7 +694,7 @@ export class EventRepository {
    * Handle a mapped event, check for malicious ID use and save it.
    *
    * @private
-   * @param {JSON} event - Backend event extracted from notification stream
+   * @param {JSON} event Backend event extracted from notification stream
    * @returns {Promise} Resolves with the saved event
    */
   _handleEventSaving(event) {
@@ -881,9 +881,9 @@ export class EventRepository {
    * Handle all events from the payload of an incoming notification.
    *
    * @private
-   * @param {Array} events - Events contained in a notification
-   * @param {string} id - Notification ID
-   * @param {boolean} transient - Type of notification
+   * @param {Array} events Events contained in a notification
+   * @param {string} id Notification ID
+   * @param {boolean} transient Type of notification
    * @returns {Promise} Resolves with the ID of the handled notification
    */
   _handleNotification({payload: events, id, transient}) {
@@ -911,7 +911,7 @@ export class EventRepository {
    * Check if call event is handled within its valid lifespan.
    *
    * @private
-   * @param {Object} event - Event to validate
+   * @param {Object} event Event to validate
    * @returns {true} Returns `true` if event is handled within it's lifetime, otherwise throws error
    */
   _validateCallEventLifetime(event) {

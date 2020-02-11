@@ -26,9 +26,9 @@ import {RuntimeActionCreator} from './creator/';
 
 export class RuntimeAction {
   checkSupportedBrowser = (): ThunkAction<void> => {
-    return (dispatch, getState, {config}) => {
+    return (dispatch, getState, {getConfig}) => {
       const pwaAware = hasURLParameter(QUERY_KEY.PWA_AWARE);
-      const isPwaEnabled = config.URL.MOBILE_BASE && pwaAware && isPwaSupportedBrowser();
+      const isPwaEnabled = getConfig().URL.MOBILE_BASE && pwaAware && isPwaSupportedBrowser();
       if (isSupportedBrowser() || isPwaEnabled) {
         dispatch(RuntimeActionCreator.confirmSupportedBrowser());
       }
@@ -102,7 +102,7 @@ export class RuntimeAction {
       return new Promise((resolve, reject) => {
         const connectionTimeout = setTimeout(
           () => reject(new Error('Error opening IndexedDB (response timeout)')),
-          5000,
+          10000,
         );
         dbOpenRequest.onerror = event => {
           clearTimeout(connectionTimeout);

@@ -24,7 +24,6 @@ import {
   Columns,
   Container,
   ContainerXS,
-  ErrorMessage,
   Form,
   H1,
   Input,
@@ -105,7 +104,7 @@ const TeamName = ({
   };
 
   const backArrow = (
-    <RouterLink to={ROUTE.INDEX} data-uie-name="go-register-team">
+    <RouterLink to={ROUTE.SET_ACCOUNT_TYPE} data-uie-name="go-register-team">
       <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
     </RouterLink>
   );
@@ -157,9 +156,7 @@ const TeamName = ({
                       <ArrowIcon />
                     </RoundIconButton>
                   </InputSubmitCombo>
-                  <ErrorMessage data-uie-name="error-message">
-                    {error ? parseValidationErrors(error) : parseError(authError)}
-                  </ErrorMessage>
+                  {error ? parseValidationErrors(error) : parseError(authError)}
                 </Form>
               </div>
               <div>

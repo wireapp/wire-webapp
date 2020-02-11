@@ -60,7 +60,9 @@ export async function saveEphemeralValue(value: string): Promise<string> {
 }
 
 async function getWorker(): Promise<ServiceWorker> {
-  const registration = await navigator.serviceWorker.register(`/worker/sw-value-store.js?${Config.VERSION}`);
+  const registration = await navigator.serviceWorker.register(
+    `/worker/sw-value-store.js?${Config.getConfig().VERSION}`,
+  );
   worker = registration.installing || registration.waiting || registration.active;
   return worker;
 }

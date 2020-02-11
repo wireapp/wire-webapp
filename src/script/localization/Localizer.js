@@ -17,36 +17,13 @@
  *
  */
 
-import moment from 'moment';
-
 import {loadValue, storeValue} from 'Util/StorageUtil';
 import {getParameter} from 'Util/UrlUtil';
 import {DEFAULT_LOCALE, setLocale, setStrings} from 'Util/LocalizerUtil';
+import {setDateLocale} from 'Util/TimeUtil';
 
 import {URLParameter} from '../auth/URLParameter';
 import {StorageKey} from '../storage/StorageKey';
-
-import 'moment/locale/cs.js';
-import 'moment/locale/da.js';
-import 'moment/locale/de.js';
-import 'moment/locale/el.js';
-import 'moment/locale/es.js';
-import 'moment/locale/et.js';
-import 'moment/locale/fi.js';
-import 'moment/locale/fr.js';
-import 'moment/locale/hr.js';
-import 'moment/locale/hu.js';
-import 'moment/locale/it.js';
-import 'moment/locale/lt.js';
-import 'moment/locale/nl.js';
-import 'moment/locale/pl.js';
-import 'moment/locale/pt.js';
-import 'moment/locale/ro.js';
-import 'moment/locale/ru.js';
-import 'moment/locale/sk.js';
-import 'moment/locale/sl.js';
-import 'moment/locale/tr.js';
-import 'moment/locale/uk.js';
 
 import cs from 'Resource/translation/cs-CZ.json';
 import da from 'Resource/translation/da-DK.json';
@@ -112,10 +89,9 @@ setStrings(strings);
 
   const locale = storedLocale || currentBrowserLocale || DEFAULT_LOCALE;
   setLocale(locale);
+  setDateLocale(locale);
 
   document.getElementsByTagName('html')[0].setAttribute('lang', locale);
-
-  moment.locale([locale, DEFAULT_LOCALE]);
 
   if (window.z.string[locale]) {
     window.z.string = {...window.z.string, ...window.z.string[DEFAULT_LOCALE], ...window.z.string[locale]};

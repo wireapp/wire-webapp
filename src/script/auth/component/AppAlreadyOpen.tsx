@@ -41,7 +41,7 @@ const AppAlreadyOpen = ({isAppAlreadyOpen, fullscreen, removeCookie}: AppAlready
       <Modal fullscreen={fullscreen}>
         <Container style={{maxWidth: '320px'}} data-uie-name="modal-already-open">
           <H3 style={{fontWeight: 500, marginTop: '10px'}} data-uie-name="status-modal-title">
-            {_(appAlreadyOpenStrings.headline, {brandName: Config.BRAND_NAME})}
+            {_(appAlreadyOpenStrings.headline, {brandName: Config.getConfig().BRAND_NAME})}
           </H3>
           <Text data-uie-name="status-modal-text">{_(appAlreadyOpenStrings.text)}</Text>
           <Columns style={{marginTop: '20px'}}>

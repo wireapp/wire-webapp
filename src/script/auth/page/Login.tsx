@@ -19,6 +19,7 @@
 
 import {LoginData} from '@wireapp/api-client/dist/auth';
 import {ClientType} from '@wireapp/api-client/dist/client/index';
+import {UrlUtil} from '@wireapp/commons';
 import {
   ArrowIcon,
   COLOR,
@@ -34,17 +35,16 @@ import {
   IsMobile,
   Link,
   Muted,
-  Small,
 } from '@wireapp/react-ui-kit';
 import React, {useEffect, useState} from 'react';
-import {FormattedHTMLMessage, useIntl} from 'react-intl';
+import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {Redirect} from 'react-router';
 import {AnyAction, Dispatch} from 'redux';
 import useReactRouter from 'use-react-router';
 import {getLogger} from 'Util/Logger';
 import {Config} from '../../Config';
-import {loginStrings, logoutReasonStrings} from '../../strings';
+import {loginStrings} from '../../strings';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import LoginForm from '../component/LoginForm';
 import RouterLink from '../component/RouterLink';
@@ -83,13 +83,12 @@ const Login = ({
   const [conversationKey, setConversationKey] = useState();
 
   const [isValidLink, setIsValidLink] = useState(true);
-  const [logoutReason, setLogoutReason] = useState();
   const [validationErrors, setValidationErrors] = useState([]);
 
   useEffect(() => {
-    const queryLogoutReason = URLUtil.getURLParameter(QUERY_KEY.LOGOUT_REASON) || null;
-    if (queryLogoutReason) {
-      setLogoutReason(queryLogoutReason);
+    const queryClientType = UrlUtil.getURLParameter(QUERY_KEY.CLIENT_TYPE);
+    if (queryClientType === ClientType.TEMPORARY) {
+      pushLoginData({clientType: ClientType.TEMPORARY});
     }
   }, []);
 
@@ -179,10 +178,11 @@ const Login = ({
       <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
     </RouterLink>
   );
-  const isSSOCapable = !isDesktopApp() || (isDesktopApp() && window.wSSOCapable === true);
   return (
     <Page>
-      {Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
+      {(Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ||
+        Config.getConfig().FEATURE.ENABLE_SSO ||
+        Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION) && (
         <IsMobile>
           <div style={{margin: 16}}>{backArrow}</div>
         </IsMobile>
@@ -193,7 +193,11 @@ const Login = ({
         <Columns>
           <IsMobile not>
             <Column style={{display: 'flex'}}>
-              {Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && <div style={{margin: 'auto'}}>{backArrow}</div>}
+              {(Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ||
+                Config.getConfig().FEATURE.ENABLE_SSO ||
+                Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION) && (
+                <div style={{margin: 'auto'}}>{backArrow}</div>
+              )}
             </Column>
           </IsMobile>
           <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
@@ -210,10 +214,6 @@ const Login = ({
                     parseValidationErrors(validationErrors)
                   ) : loginError ? (
                     <ErrorMessage data-uie-name="error-message">{parseError(loginError)}</ErrorMessage>
-                  ) : logoutReason ? (
-                    <Small center style={{marginBottom: '16px'}} data-uie-name="status-logout-reason">
-                      <FormattedHTMLMessage {...logoutReasonStrings[logoutReason]} />
-                    </Small>
                   ) : (
                     <div style={{marginTop: '4px'}}>&nbsp;</div>
                   )}
@@ -232,42 +232,20 @@ const Login = ({
                   )}
                 </Form>
               </div>
-              {Config.FEATURE.ENABLE_SSO && isSSOCapable ? (
-                <div style={{marginTop: '36px'}}>
-                  <Link center onClick={forgotPassword} data-uie-name="go-forgot-password">
+              <Columns>
+                <Column>
+                  <Link onClick={forgotPassword} data-uie-name="go-forgot-password">
                     {_(loginStrings.forgotPassword)}
                   </Link>
-                  <Columns style={{marginTop: '36px'}}>
-                    <Column>
-                      <RouterLink to="/sso" data-uie-name="go-sign-in-sso">
-                        {_(loginStrings.ssoLogin)}
-                      </RouterLink>
-                    </Column>
-                    {Config.FEATURE.ENABLE_PHONE_LOGIN && (
-                      <Column>
-                        <Link onClick={() => history.push(ROUTE.LOGIN_PHONE)} data-uie-name="go-sign-in-phone">
-                          {_(loginStrings.phoneLogin)}
-                        </Link>
-                      </Column>
-                    )}
-                  </Columns>
-                </div>
-              ) : (
-                <Columns>
+                </Column>
+                {Config.getConfig().FEATURE.ENABLE_PHONE_LOGIN && (
                   <Column>
-                    <Link onClick={forgotPassword} data-uie-name="go-forgot-password">
-                      {_(loginStrings.forgotPassword)}
+                    <Link onClick={() => history.push(ROUTE.LOGIN_PHONE)} data-uie-name="go-sign-in-phone">
+                      {_(loginStrings.phoneLogin)}
                     </Link>
                   </Column>
-                  {Config.FEATURE.ENABLE_PHONE_LOGIN && (
-                    <Column>
-                      <Link onClick={() => history.push(ROUTE.LOGIN_PHONE)} data-uie-name="go-sign-in-phone">
-                        {_(loginStrings.phoneLogin)}
-                      </Link>
-                    </Column>
-                  )}
-                </Columns>
-              )}
+                )}
+              </Columns>
             </ContainerXS>
           </Column>
           <Column />

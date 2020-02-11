@@ -17,13 +17,12 @@
  *
  */
 
-import moment from 'moment';
 import {escape} from 'underscore';
 import {Availability} from '@wireapp/protocol-messaging';
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS, formatLocale} from 'Util/TimeUtil';
 import {afterRender, formatBytes} from 'Util/util';
 import {renderMessage} from 'Util/messageRenderer';
 import {KEY, isFunctionKey, insertAtCaret} from 'Util/KeyboardUtil';
@@ -57,7 +56,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         CONCURRENT_UPLOAD_LIMIT: 10,
       },
       FILES: {
-        ALLOWED_FILE_UPLOAD_EXTENSIONS: Config.FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS,
+        ALLOWED_FILE_UPLOAD_EXTENSIONS: Config.getConfig().FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS,
       },
       GIPHY_TEXT_LENGTH: 256,
       IMAGE: {
@@ -272,7 +271,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
           this.pastedFilePreviewUrl(URL.createObjectURL(blob));
         }
 
-        const date = moment(blob.lastModifiedDate).format('LL, LTS');
+        const date = formatLocale(blob.lastModifiedDate, 'PP, pp');
         return this.pastedFileName(t('conversationSendPastedFile', date));
       }
 
@@ -535,11 +534,11 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     const messageText = messageTrimmedStart.trimRight();
 
-    const isMessageTextTooLong = messageText.length > Config.MAXIMUM_MESSAGE_LENGTH;
+    const isMessageTextTooLong = messageText.length > Config.getConfig().MAXIMUM_MESSAGE_LENGTH;
     if (isMessageTextTooLong) {
       return amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
         text: {
-          message: t('modalConversationMessageTooLongMessage', Config.MAXIMUM_MESSAGE_LENGTH),
+          message: t('modalConversationMessageTooLongMessage', Config.getConfig().MAXIMUM_MESSAGE_LENGTH),
           title: t('modalConversationMessageTooLongHeadline'),
         },
       });
@@ -602,9 +601,9 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
    * Returns a term which is a mention match together with its starting position.
    * If nothing could be matched, it returns `undefined`.
    *
-   * @param {number} selectionStart - Current caret position or start of selection  (if text is marked)
-   * @param {number} selectionEnd - Current caret position or end of selection (if text is marked)
-   * @param {string} value - Text input
+   * @param {number} selectionStart Current caret position or start of selection  (if text is marked)
+   * @param {number} selectionEnd Current caret position or end of selection (if text is marked)
+   * @param {string} value Text input
    * @returns {undefined|{startIndex: number, term: string}} Matched mention info
    */
   getMentionCandidate(selectionStart, selectionEnd, value) {
@@ -785,13 +784,13 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
   /**
    * Post images to a conversation.
-   * @param {Array|FileList} images - Images
+   * @param {Array|FileList} images Images
    * @returns {undefined} No return value
    */
   uploadImages(images) {
     if (!this._isHittingUploadLimit(images)) {
       for (const image of Array.from(images)) {
-        const isTooLarge = image.size > Config.MAXIMUM_IMAGE_FILE_SIZE;
+        const isTooLarge = image.size > Config.getConfig().MAXIMUM_IMAGE_FILE_SIZE;
         if (isTooLarge) {
           return this._showUploadWarning(image);
         }
@@ -803,7 +802,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
   /**
    * Post files to a conversation.
-   * @param {Array|FileList} files - Files
+   * @param {Array|FileList} files Files
    * @returns {undefined} No return value
    */
   uploadFiles(files) {
@@ -832,8 +831,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     }
 
     const uploadLimit = this.selfUser().inTeam()
-      ? Config.MAXIMUM_ASSET_FILE_SIZE_TEAM
-      : Config.MAXIMUM_ASSET_FILE_SIZE_PERSONAL;
+      ? Config.getConfig().MAXIMUM_ASSET_FILE_SIZE_TEAM
+      : Config.getConfig().MAXIMUM_ASSET_FILE_SIZE_PERSONAL;
     if (!this._isHittingUploadLimit(files)) {
       for (const file of fileArray) {
         const isTooLarge = file.size > uploadLimit;
@@ -885,7 +884,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
   _showUploadWarning(image) {
     const isGif = image.type === 'image/gif';
-    const maxSize = Config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024;
+    const maxSize = Config.getConfig().MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024;
     const message = isGif ? t('modalGifTooLargeMessage', maxSize) : t('modalPictureTooLargeMessage', maxSize);
     const title = isGif ? t('modalGifTooLargeHeadline') : t('modalPictureTooLargeHeadline');
 

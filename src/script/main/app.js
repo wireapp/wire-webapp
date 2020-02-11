@@ -117,14 +117,10 @@ import {loadValue} from 'Util/StorageUtil';
 
 function doRedirect(signOutReason) {
   let url = `/auth/${location.search}`;
+
   const isImmediateSignOutReason = App.CONFIG.SIGN_OUT_REASONS.IMMEDIATE.includes(signOutReason);
   if (isImmediateSignOutReason) {
     url = appendParameter(url, `${URLParameter.REASON}=${signOutReason}`);
-  }
-
-  const redirectToLogin = signOutReason !== SIGN_OUT_REASON.NOT_SIGNED_IN;
-  if (redirectToLogin) {
-    url = `${url}#login`;
   }
 
   Dexie.delete('/sqleet');
@@ -151,9 +147,9 @@ class App {
 
   /**
    * Construct a new app.
-   * @param {BackendClient} backendClient - Configured backend client
-   * @param {Element} appContainer - DOM element that will hold the app
-   * @param {SQLeetEngine} [encryptedEngine] - Encrypted database handler
+   * @param {BackendClient} backendClient Configured backend client
+   * @param {Element} appContainer DOM element that will hold the app
+   * @param {SQLeetEngine} [encryptedEngine] Encrypted database handler
    */
   constructor(backendClient, appContainer, encryptedEngine) {
     this.backendClient = backendClient;
@@ -164,7 +160,7 @@ class App {
 
     this.service = this._setupServices(encryptedEngine);
     this.repository = this._setupRepositories();
-    if (Config.FEATURE.ENABLE_DEBUG) {
+    if (Config.getConfig().FEATURE.ENABLE_DEBUG) {
       import('Util/DebugUtil').then(({DebugUtil}) => {
         this.debug = new DebugUtil(this.repository);
         this.util = {debug: this.debug}; //Alias for QA
@@ -297,7 +293,7 @@ class App {
 
   /**
    * Create all app services.
-   * @param {SQLeetEngine} [encryptedEngine] - Encrypted database handler
+   * @param {SQLeetEngine} [encryptedEngine] Encrypted database handler
    * @returns {Object} All services
    */
   _setupServices(encryptedEngine) {
@@ -337,7 +333,7 @@ class App {
    *   Any failure in the Promise chain will result in a logout.
    * @todo Check if we really need to logout the user in all these error cases or how to recover from them
    *
-   * @param {boolean} [isReload=_isReload()] - App init after page reload
+   * @param {boolean} [isReload=_isReload()] App init after page reload
    * @returns {undefined} No return value
    */
   async initApp() {
@@ -346,7 +342,6 @@ class App {
     new ThemeViewModel(this.repository.properties);
     const loadingView = new LoadingViewModel();
     const telemetry = new AppInitTelemetry();
-    exposeWrapperGlobals();
     try {
       const {
         audio: audioRepository,
@@ -404,7 +399,7 @@ class App {
 
       eventTrackerRepository.init(propertiesRepository.properties.settings.privacy.improve_wire);
       await conversationRepository.initialize_conversations();
-      loadingView.updateProgress(97.5, t('initUpdatedFromNotifications', Config.BRAND_NAME));
+      loadingView.updateProgress(97.5, t('initUpdatedFromNotifications', Config.getConfig().BRAND_NAME));
 
       this._watchOnlineStatus();
       const clientEntities = await clientRepository.updateClientsForSelf();
@@ -552,7 +547,7 @@ class App {
 
   /**
    * Check whether we need to set different user information (picture, username).
-   * @param {User} userEntity - Self user entity
+   * @param {User} userEntity Self user entity
    * @returns {User} Checked user entity
    */
   _checkUserInformation(userEntity) {
@@ -743,8 +738,8 @@ class App {
   /**
    * Logs the user out on the backend and deletes cached data.
    *
-   * @param {SIGN_OUT_REASON} signOutReason - Cause for logout
-   * @param {boolean} clearData - Keep data in database
+   * @param {SIGN_OUT_REASON} signOutReason Cause for logout
+   * @param {boolean} clearData Keep data in database
    * @returns {undefined} No return value
    */
   logout(signOutReason, clearData = false) {
@@ -857,7 +852,7 @@ class App {
 
   /**
    * Redirect to the login page after internet connectivity has been verified.
-   * @param {SIGN_OUT_REASON} signOutReason - Redirect triggered by session expiration
+   * @param {SIGN_OUT_REASON} signOutReason Redirect triggered by session expiration
    * @returns {undefined} No return value
    */
   _redirectToLogin(signOutReason) {
@@ -884,7 +879,7 @@ class App {
    * @returns {undefined} No return value
    */
   disableDebugging() {
-    Config.LOGGER.OPTIONS.domains['app.wire.com'] = () => 0;
+    Config.getConfig().LOGGER.OPTIONS.domains['app.wire.com'] = () => 0;
     this.repository.properties.savePreference(PROPERTIES_TYPE.ENABLE_DEBUGGING, false);
   }
 
@@ -893,7 +888,7 @@ class App {
    * @returns {undefined} No return value
    */
   enableDebugging() {
-    Config.LOGGER.OPTIONS.domains['app.wire.com'] = () => 300;
+    Config.getConfig().LOGGER.OPTIONS.domains['app.wire.com'] = () => 300;
     this.repository.properties.savePreference(PROPERTIES_TYPE.ENABLE_DEBUGGING, true);
   }
 
@@ -919,13 +914,14 @@ class App {
 //##############################################################################
 
 $(async () => {
-  enableLogging(Config.FEATURE.ENABLE_DEBUG);
+  enableLogging(Config.getConfig().FEATURE.ENABLE_DEBUG);
+  exposeWrapperGlobals();
   const appContainer = document.getElementById('wire-main');
   if (appContainer) {
     const backendClient = resolve(graph.BackendClient);
     backendClient.setSettings({
-      restUrl: Config.BACKEND_REST,
-      webSocketUrl: Config.BACKEND_WS,
+      restUrl: Config.getConfig().BACKEND_REST,
+      webSocketUrl: Config.getConfig().BACKEND_WS,
     });
     const shouldPersist = loadValue(StorageKey.AUTH.PERSIST);
     if (shouldPersist === undefined) {

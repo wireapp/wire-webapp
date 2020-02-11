@@ -19,12 +19,11 @@
 
 import Cookies from 'js-cookie';
 import {formatNumberForMobileDialing} from 'phoneformat.js';
-import moment from 'moment';
 import {ValidationUtil} from '@wireapp/commons';
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
-import {TIME_IN_MILLIS, getUnixTimestamp} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS, getUnixTimestamp, fromUnixTime, fromNowLocale} from 'Util/TimeUtil';
 import {checkIndexedDb, alias} from 'Util/util';
 import {getCountryCode, getCountryByCode, COUNTRY_CODES} from 'Util/CountryCodes';
 import {Environment} from 'Util/Environment';
@@ -83,8 +82,8 @@ class AuthViewModel {
 
   /**
    * View model for the auth page.
-   * @param {BackendClient} backendClient - Configured backend client
-   * @param {SQLeetEngine} [encryptedEngine] - Encrypted database handler
+   * @param {BackendClient} backendClient Configured backend client
+   * @param {SQLeetEngine} [encryptedEngine] Encrypted database handler
    */
   constructor(backendClient, encryptedEngine) {
     this.click_on_remove_device_submit = this.click_on_remove_device_submit.bind(this);
@@ -185,13 +184,13 @@ class AuthViewModel {
     this.code_expiration_timestamp = ko.observable(0);
     this.code_expiration_in = ko.observable('');
     this.code_expiration_timestamp.subscribe(timestamp => {
-      this.code_expiration_in(moment.unix(timestamp).fromNow());
+      this.code_expiration_in(fromNowLocale(fromUnixTime(timestamp)));
       this.code_interval_id = window.setInterval(() => {
         if (timestamp <= getUnixTimestamp()) {
           window.clearInterval(this.code_interval_id);
           return this.code_expiration_timestamp(0);
         }
-        this.code_expiration_in(moment.unix(timestamp).fromNow());
+        this.code_expiration_in(fromNowLocale(fromUnixTime(timestamp)));
       }, 20000);
     });
 
@@ -200,8 +199,8 @@ class AuthViewModel {
     this.failed_validation_password = ko.observable(false);
     this.failed_validation_code = ko.observable(false);
     this.failed_validation_phone = ko.observable(false);
-    this.minPasswordLength = Config.NEW_PASSWORD_MINIMUM_LENGTH;
-    this.brandName = Config.BRAND_NAME;
+    this.minPasswordLength = Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH;
+    this.brandName = Config.getConfig().BRAND_NAME;
 
     this.can_login_phone = ko.pureComputed(() => {
       return !this.disabled_by_animation() && this.country_code().length > 1 && this.phone_number().length;
@@ -244,7 +243,7 @@ class AuthViewModel {
       },
     };
 
-    this.Config = Config;
+    this.Config = Config.getConfig();
 
     const elementSelector = '.auth-page';
     ko.applyBindings(this, document.querySelector(elementSelector));
@@ -322,7 +321,7 @@ class AuthViewModel {
 
   /**
    * Check cookies are enabled.
-   * @param {string} current_hash - Current page hash
+   * @param {string} current_hash Current page hash
    * @returns {Promise} Resolves when cookies are enabled
    */
   _check_cookies(current_hash) {
@@ -359,7 +358,7 @@ class AuthViewModel {
 
   /**
    * Check that we are not in unsupported private mode browser.
-   * @param {string} current_hash - Current page hash
+   * @param {string} current_hash Current page hash
    * @returns {Promise} Resolves when the database check has passed
    */
   _check_database(current_hash) {
@@ -459,7 +458,7 @@ class AuthViewModel {
         if (response.expires_in) {
           this.code_expiration_timestamp(getUnixTimestamp() + response.expires_in);
         } else if (!response.label) {
-          this.code_expiration_timestamp(getUnixTimestamp() + Config.LOGIN_CODE_EXPIRATION);
+          this.code_expiration_timestamp(getUnixTimestamp() + Config.getConfig().LOGIN_CODE_EXPIRATION);
         }
         this._set_hash(AuthView.MODE.VERIFY_CODE);
         this.pending_server_request(false);
@@ -615,7 +614,7 @@ class AuthViewModel {
    * Create the backend call payload.
    *
    * @private
-   * @param {AuthView.MODE} mode - View state of the authentication page
+   * @param {AuthView.MODE} mode View state of the authentication page
    * @returns {Object} Auth payload for specified mode
    */
   _create_payload(mode) {
@@ -1208,7 +1207,7 @@ class AuthViewModel {
    * Set location hash.
    *
    * @private
-   * @param {string} hash - URL hash value
+   * @param {string} hash URL hash value
    * @returns {undefined} No return value
    */
   _set_hash(hash = '') {
@@ -1295,8 +1294,8 @@ class AuthViewModel {
    * Add a validation error.
    *
    * @private
-   * @param {string} errorMessage - The error message
-   * @param {Array<string>|string} [types] - Input type(s) of validation error
+   * @param {string} errorMessage The error message
+   * @param {Array<string>|string} [types] Input type(s) of validation error
    * @returns {undefined} No return value
    */
   _add_error(errorMessage, types) {
@@ -1344,7 +1343,7 @@ class AuthViewModel {
    * Get the validation error by input type.
    *
    * @private
-   * @param {AuthView.TYPE} type - Input type to get error for
+   * @param {AuthView.TYPE} type Input type to get error for
    * @returns {ValidationError} Validation Error
    */
   _get_error_by_type(type) {
@@ -1368,7 +1367,7 @@ class AuthViewModel {
    * Remove a validation error.
    *
    * @private
-   * @param {string} type - Input type of validation error
+   * @param {string} type Input type of validation error
    * @returns {undefined} No return value
    */
   _remove_error(type) {
@@ -1428,7 +1427,7 @@ class AuthViewModel {
    * Validate the user input.
    *
    * @private
-   * @param {AuthView.MODE} mode - View state of the authentication page
+   * @param {AuthView.MODE} mode View state of the authentication page
    * @returns {boolean} User input has validation errors
    */
   _validate_input(mode) {
@@ -1458,7 +1457,7 @@ class AuthViewModel {
    * Validate password input.
    *
    * @private
-   * @param {string} password - Password to validate
+   * @param {string} password Password to validate
    * @returns {undefined} No return value
    */
   _validatePassword(password) {
@@ -1494,7 +1493,7 @@ class AuthViewModel {
 
   /**
    * Append parameter to URL if exists.
-   * @param {string} url - Previous URL string
+   * @param {string} url Previous URL string
    * @returns {string} Updated URL
    */
   _append_existing_parameters(url) {
@@ -1510,7 +1509,7 @@ class AuthViewModel {
    *
    * @note Gets the client and forwards the user to the login.
    * @private
-   * @param {boolean} [auto_login=false] - Redirected with auto login parameter
+   * @param {boolean} [auto_login=false] Redirected with auto login parameter
    * @returns {undefined} No return value
    */
   _authentication_successful(auto_login = false) {

@@ -165,7 +165,7 @@ export class BackendClient {
 
   /**
    * Create a request URL.
-   * @param {string} path - API endpoint path to be suffixed to REST API environment
+   * @param {string} path API endpoint path to be suffixed to REST API environment
    * @returns {string} REST API endpoint URL
    */
   createUrl(path: string): string {
@@ -189,7 +189,7 @@ export class BackendClient {
 
   /**
    * Delay a function call until backend connectivity is guaranteed.
-   * @param {BackendClient.CONNECTIVITY_CHECK_TRIGGER} [source=BackendClient.CONNECTIVITY_CHECK_TRIGGER.UNKNOWN] - Trigger that requested connectivity check
+   * @param {BackendClient.CONNECTIVITY_CHECK_TRIGGER} [source=BackendClient.CONNECTIVITY_CHECK_TRIGGER.UNKNOWN] Trigger that requested connectivity check
    * @returns {Promise} Resolves once the connectivity is verified
    */
   executeOnConnectivity(source = BackendClient.CONNECTIVITY_CHECK_TRIGGER.UNKNOWN): Promise<any> {
@@ -267,7 +267,7 @@ export class BackendClient {
    * @note ContentType will be overwritten with 'application/json; charset=utf-8'
    * @see sendRequest for valid parameters
    *
-   * @param {Object} config - AJAX request configuration
+   * @param {Object} config AJAX request configuration
    * @returns {Promise} Resolves when the request has been executed
    */
   sendJson<T>(config: RequestConfig): Promise<T> {
@@ -282,7 +282,7 @@ export class BackendClient {
 
   /**
    * Queue jQuery AJAX request.
-   * @param {Object} config - AJAX request configuration
+   * @param {Object} config AJAX request configuration
    * @returns {Promise} Resolves when the request has been executed
    */
   sendRequest<T>(config: RequestConfig): Promise<T> {

@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2020 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,28 +17,14 @@
  *
  */
 
-import {
-  Bold,
-  COLOR,
-  Column,
-  Columns,
-  ContainerXS,
-  Link,
-  Logo,
-  ProfileIcon,
-  RoundIconButton,
-  TeamIcon,
-  Text,
-} from '@wireapp/react-ui-kit';
-import React from 'react';
-import {useIntl} from 'react-intl';
-import {Redirect} from 'react-router';
+import {UrlUtil} from '@wireapp/commons';
+import {Button, COLOR, ContainerXS, ErrorMessage, Logo, Text} from '@wireapp/react-ui-kit';
+import React, {useEffect, useState} from 'react';
+import {FormattedHTMLMessage, useIntl} from 'react-intl';
 import useReactRouter from 'use-react-router';
 import {Config} from '../../Config';
-import {indexStrings} from '../../strings';
-import {ROUTE} from '../route';
-import {isDesktopApp, isMacOS} from '../Runtime';
-import {pathWithParams} from '../util/urlUtil';
+import {indexStrings, logoutReasonStrings} from '../../strings';
+import {QUERY_KEY, ROUTE} from '../route';
 import Page from './Page';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
@@ -46,69 +32,103 @@ interface Props extends React.HTMLProps<HTMLDivElement> {}
 const Index = ({}: Props) => {
   const {formatMessage: _} = useIntl();
   const {history} = useReactRouter();
-  const isMacOsWrapper = isDesktopApp() && isMacOS();
+  const [logoutReason, setLogoutReason] = useState();
+
+  useEffect(() => {
+    const queryLogoutReason = UrlUtil.getURLParameter(QUERY_KEY.LOGOUT_REASON) || null;
+    if (queryLogoutReason) {
+      setLogoutReason(queryLogoutReason);
+    }
+  }, []);
+
+  useEffect(() => {
+    // Navigate directly to email login because it's the only available option on the index page
+    if (
+      !Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY &&
+      !Config.getConfig().FEATURE.ENABLE_SSO &&
+      !Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION
+    ) {
+      history.push(ROUTE.LOGIN);
+    }
+  }, []);
   return (
     <Page>
-      {!Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
-        <Redirect to={pathWithParams(ROUTE.LOGIN)} data-uie-name="redirect-login" />
-      )}
-      <ContainerXS centerText verticalCenter>
-        <Logo scale={1.68} data-uie-name="ui-wire-logo" />
-        <Columns style={{margin: '70px auto'}}>
-          <Column style={{marginLeft: isMacOsWrapper ? 0 : 16}}>
-            <Link onClick={() => history.push(ROUTE.CREATE_ACCOUNT)} data-uie-name="go-register-personal">
-              <RoundIconButton backgroundColor={COLOR.GREEN} style={{marginBottom: 12}} size={72}>
-                <ProfileIcon height={31} width={31} />
-              </RoundIconButton>
-              <Bold fontSize="24px" color={COLOR.LINK}>
-                {_(indexStrings.createAccountForPersonalUse)}
-              </Bold>
-              <br />
-              <Text
+      <ContainerXS centerText verticalCenter style={{width: '380px'}}>
+        <Logo scale={1.68} style={{marginBottom: '80px'}} data-uie-name="ui-wire-logo" />
+        <Text
+          block
+          center
+          style={{fontSize: '32px', fontWeight: 300, marginBottom: '48px'}}
+          data-uie-name="welcome-text"
+        >
+          {_(indexStrings.welcome, {brandName: Config.getConfig().BRAND_NAME})}
+        </Text>
+        {Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION ? (
+          <>
+            <Button
+              onClick={() => history.push(ROUTE.SET_ACCOUNT_TYPE)}
+              block
+              style={{fontSize: '13px'}}
+              data-uie-name="go-set-account-type"
+            >
+              {_(indexStrings.createAccount)}
+            </Button>
+            <Button
+              onClick={() => history.push(ROUTE.LOGIN)}
+              block
+              backgroundColor={'transparent'}
+              color={COLOR.BLUE}
+              style={{border: `1px solid ${COLOR.BLUE}`, fontSize: '13px'}}
+              data-uie-name="go-login"
+            >
+              {_(indexStrings.logIn)}
+            </Button>
+            {logoutReason && (
+              <ErrorMessage center data-uie-name="status-logout-reason">
+                <FormattedHTMLMessage {...logoutReasonStrings[logoutReason]} />
+              </ErrorMessage>
+            )}
+            {(Config.getConfig().FEATURE.ENABLE_SSO || Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY) && (
+              <Button
+                onClick={() => history.push(ROUTE.SSO)}
                 block
-                center
-                light
-                fontSize="16px"
-                color={COLOR.LINK}
-                style={{
-                  marginTop: 8,
-                }}
+                color={COLOR.TEXT}
+                backgroundColor={COLOR.GRAY_LIGHTEN_64}
+                style={{fontSize: '13px', marginTop: '120px'}}
+                data-uie-name="go-sso-login"
               >
-                {_(indexStrings.createPersonalAccount)}
-              </Text>
-            </Link>
-          </Column>
-          {!isMacOsWrapper && (
-            <Column>
-              <Link onClick={() => history.push(ROUTE.CREATE_TEAM)} data-uie-name="go-register-team">
-                <RoundIconButton style={{marginBottom: 12}} size={72}>
-                  <TeamIcon height={31} width={31} />
-                </RoundIconButton>
-                <Bold fontSize="24px" color={COLOR.LINK}>
-                  {_(indexStrings.createAccountForOrganizations)}
-                </Bold>
-                <br />
-                <Text
-                  block
-                  center
-                  light
-                  fontSize="16px"
-                  color={COLOR.LINK}
-                  style={{
-                    marginTop: 8,
-                  }}
-                >
-                  {_(indexStrings.createTeam)}
-                </Text>
-              </Link>
-            </Column>
-          )}
-        </Columns>
-        <Text>{_(indexStrings.loginInfo)}</Text>
-        <br />
-        <Link fontSize="24px" textTransform="none" onClick={() => history.push(ROUTE.LOGIN)} data-uie-name="go-login">
-          {_(indexStrings.login)}
-        </Link>
+                {_(
+                  Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ? indexStrings.enterprise : indexStrings.ssoLogin,
+                )}
+              </Button>
+            )}
+          </>
+        ) : (
+          <>
+            <Button onClick={() => history.push(ROUTE.LOGIN)} block style={{fontSize: '13px'}} data-uie-name="go-login">
+              {_(indexStrings.logIn)}
+            </Button>
+            {(Config.getConfig().FEATURE.ENABLE_SSO || Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY) && (
+              <Button
+                onClick={() => history.push(ROUTE.SSO)}
+                block
+                backgroundColor={'transparent'}
+                color={COLOR.BLUE}
+                style={{border: `1px solid ${COLOR.BLUE}`, fontSize: '13px'}}
+                data-uie-name="go-sso-login"
+              >
+                {_(
+                  Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ? indexStrings.enterprise : indexStrings.ssoLogin,
+                )}
+              </Button>
+            )}
+            {logoutReason && (
+              <ErrorMessage center data-uie-name="status-logout-reason">
+                <FormattedHTMLMessage {...logoutReasonStrings[logoutReason]} />
+              </ErrorMessage>
+            )}
+          </>
+        )}
       </ContainerXS>
     </Page>
   );

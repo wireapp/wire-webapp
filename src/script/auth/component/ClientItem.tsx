@@ -86,10 +86,9 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
       if (step < CONFIG.animationSteps) {
         window.requestAnimationFrame(executeAnimateIn);
         return step + 1;
-      } else {
-        setIsAnimating(false);
-        return step;
       }
+      setIsAnimating(false);
+      return step;
     });
   };
 
@@ -98,10 +97,9 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
       if (step > 0) {
         window.requestAnimationFrame(executeAnimateOut);
         return step - 1;
-      } else {
-        setIsAnimating(false);
-        return step;
       }
+      setIsAnimating(false);
+      return step;
     });
   };
 

@@ -56,6 +56,7 @@ describe('LegalHoldEvaluator', () => {
       };
 
       const mappedEvent = await cryptographyMapper.mapGenericMessage(legalHoldFlagOn, event);
+
       expect(LegalHoldEvaluator.hasMessageLegalHoldFlag(mappedEvent)).toBe(true);
     });
 
@@ -82,6 +83,7 @@ describe('LegalHoldEvaluator', () => {
       };
 
       const mappedEvent = await cryptographyMapper.mapGenericMessage(legalHoldFlagOff, event);
+
       expect(LegalHoldEvaluator.hasMessageLegalHoldFlag(mappedEvent)).toBe(true);
     });
 
@@ -107,6 +109,7 @@ describe('LegalHoldEvaluator', () => {
       };
 
       const mappedEvent = await cryptographyMapper.mapGenericMessage(legalHoldFlagMissing, event);
+
       expect(LegalHoldEvaluator.hasMessageLegalHoldFlag(mappedEvent)).toBe(false);
     });
   });
@@ -137,6 +140,7 @@ describe('LegalHoldEvaluator', () => {
       expect(
         LegalHoldEvaluator.renderLegalHoldMessage({...mappedEvent, ...enabledOnMessage}, LegalHoldStatus.ENABLED),
       ).toBe(false);
+
       expect(
         LegalHoldEvaluator.renderLegalHoldMessage({...mappedEvent, ...enabledOnMessage}, LegalHoldStatus.DISABLED),
       ).toBe(true);
@@ -144,6 +148,7 @@ describe('LegalHoldEvaluator', () => {
       expect(
         LegalHoldEvaluator.renderLegalHoldMessage({...mappedEvent, ...disabledOnMessage}, LegalHoldStatus.ENABLED),
       ).toBe(true);
+
       expect(
         LegalHoldEvaluator.renderLegalHoldMessage({...mappedEvent, ...disabledOnMessage}, LegalHoldStatus.DISABLED),
       ).toBe(false);

@@ -37,10 +37,10 @@ class AudioSeekBarComponent {
   levels: HTMLSpanElement[];
   _onResizeFired: () => void;
 
-  constructor(params: Params, {element}: ko.components.ComponentInfo) {
+  constructor(params: Params, element: HTMLElement) {
     this.audioElement = params.src;
 
-    this.element = element as HTMLElement;
+    this.element = element;
     this.loudness = [];
     this.levels = [];
 
@@ -117,8 +117,8 @@ class AudioSeekBarComponent {
 ko.components.register('audio-seek-bar', {
   template: '<!-- content is generated -->',
   viewModel: {
-    createViewModel(params: Params, componentInfo: ko.components.ComponentInfo): AudioSeekBarComponent {
-      return new AudioSeekBarComponent(params, componentInfo);
+    createViewModel(params: Params, {element}: ko.components.ComponentInfo): AudioSeekBarComponent {
+      return new AudioSeekBarComponent(params, element as HTMLElement);
     },
   },
 });

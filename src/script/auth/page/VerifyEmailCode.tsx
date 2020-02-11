@@ -17,7 +17,7 @@
  *
  */
 
-import {CodeInput, ContainerXS, ErrorMessage, H1, Link, Muted} from '@wireapp/react-ui-kit';
+import {CodeInput, ContainerXS, H1, Link, Muted} from '@wireapp/react-ui-kit';
 import React from 'react';
 import {FormattedHTMLMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
@@ -99,7 +99,7 @@ const VerifyEmailCode = ({
             <FormattedHTMLMessage {...verifyStrings.subhead} values={{email: account.email}} />
           </Muted>
           <CodeInput autoFocus style={{marginTop: 10}} onCodeComplete={createAccount} data-uie-name="enter-code" />
-          <ErrorMessage data-uie-name="error-message">{parseError(authError)}</ErrorMessage>
+          {parseError(authError)}
         </div>
         <div>
           <Link onClick={resendCode} data-uie-name="do-resend-code">

@@ -17,13 +17,13 @@
  *
  */
 
-import moment from 'moment';
 import {amplify} from 'amplify';
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {buildSupportUrl} from 'Util/UrlUtil';
 import {noop, afterRender} from 'Util/util';
+import {formatLocale} from 'Util/TimeUtil';
 
 import {Config} from '../Config';
 import {WebAppEvents} from '../event/WebApp';
@@ -113,12 +113,12 @@ export class ModalsViewModel {
   /**
    * Show modal
    *
-   * @param {ModalsViewModel.TYPE} type - Indicates which modal to show
-   * @param {Object} [options={}] - Information to configure modal
-   * @param {Object} options.data - Content needed for visualization on modal
-   * @param {Function} options.action - Called when action in modal is triggered
-   * @param {boolean} [options.preventClose] - Set to `true` to disable autoclose behavior
-   * @param {Function} options.secondary - Called when secondary action in modal is triggered
+   * @param {ModalsViewModel.TYPE} type Indicates which modal to show
+   * @param {Object} [options={}] Information to configure modal
+   * @param {Object} options.data Content needed for visualization on modal
+   * @param {Function} options.action Called when action in modal is triggered
+   * @param {boolean} [options.preventClose] Set to `true` to disable autoclose behavior
+   * @param {Function} options.secondary Called when secondary action in modal is triggered
    * @returns {undefined} No return value
    */
   _showModal = (type, options = {}) => {
@@ -161,7 +161,7 @@ export class ModalsViewModel {
         content.messageText = t('modalAccountNewDevicesMessage');
         const deviceList = data
           .map(device => {
-            const deviceTime = moment(device.time).format('LL, LT');
+            const deviceTime = formatLocale(device.time, 'PP, p');
             const deviceModel = `${t('modalAccountNewDevicesFrom')} ${device.model}`;
             return `<div>${deviceTime} - UTC</div><div>${deviceModel}</div>`;
           })
@@ -198,7 +198,7 @@ export class ModalsViewModel {
       case Types.SESSION_RESET: {
         content.titleText = t('modalSessionResetHeadline');
         content.primaryAction = {...primaryAction, text: t('modalAcknowledgeAction')};
-        const supportLink = buildSupportUrl(Config.SUPPORT.FORM.BUG);
+        const supportLink = buildSupportUrl(Config.getConfig().SUPPORT.FORM.BUG);
         content.messageHtml = t(
           'modalSessionResetMessage',
           {},

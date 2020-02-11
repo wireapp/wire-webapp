@@ -24,7 +24,7 @@ import {MentionEntity} from '../message/MentionEntity';
 /**
  * Checks if two arrays with mentions contain different values.
  *
- * @param originalMessageEntity - Message entity
+ * @param originalMessageEntity Message entity
  * @param updatedMentions Updated mentions
  * @returns Are the mentions different from each other
  */

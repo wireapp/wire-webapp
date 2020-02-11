@@ -82,8 +82,8 @@ z.viewModel.PanelViewModel = class PanelViewModel {
 
   /**
    * View model for the details column.
-   * @param {MainViewModel} mainViewModel - Main view model
-   * @param {Object} repositories - Object containing all repositories
+   * @param {MainViewModel} mainViewModel Main view model
+   * @param {Object} repositories Object containing all repositories
    */
   constructor(mainViewModel, repositories) {
     this.elementId = 'right-column';
@@ -114,8 +114,8 @@ z.viewModel.PanelViewModel = class PanelViewModel {
    *
    * Note: panels that are toggled are not counted in the state history.
    *
-   * @param {string} state - the new state to navigate to.
-   * @param {Object} params - params to give to the new view.
+   * @param {string} state the new state to navigate to.
+   * @param {Object} params params to give to the new view.
    * @returns {void} nothing returned
    */
   togglePanel(state, params) {
@@ -150,8 +150,8 @@ z.viewModel.PanelViewModel = class PanelViewModel {
   /**
    * Will navigate from the current state to the new state.
    *
-   * @param {string} newState - the new state to navigate to.
-   * @param {Object} params - params to give to the new view.
+   * @param {string} newState the new state to navigate to.
+   * @param {Object} params params to give to the new view.
    * @returns {void} nothing returned.
    */
   _navigateTo(newState, params) {

@@ -45,8 +45,8 @@ export class ContentViewModel {
       PREFERENCES_ABOUT: 'ContentViewModel.STATE.PREFERENCES_ABOUT',
       PREFERENCES_ACCOUNT: 'ContentViewModel.STATE.PREFERENCES_ACCOUNT',
       PREFERENCES_AV: 'ContentViewModel.STATE.PREFERENCES_AV',
-      PREFERENCES_DEVICE_DETAILS: 'ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS',
       PREFERENCES_DEVICES: 'ContentViewModel.STATE.PREFERENCES_DEVICES',
+      PREFERENCES_DEVICE_DETAILS: 'ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS',
       PREFERENCES_OPTIONS: 'ContentViewModel.STATE.PREFERENCES_OPTIONS',
       WATERMARK: 'ContentViewModel.STATE.WATERMARK',
     };
@@ -162,7 +162,7 @@ export class ContentViewModel {
 
   /**
    * Slide in specified content.
-   * @param {string} contentSelector - DOM element to apply slide in animation
+   * @param {string} contentSelector DOM element to apply slide in animation
    * @returns {undefined} No return value
    */
   _shiftContent(contentSelector) {
@@ -184,11 +184,11 @@ export class ContentViewModel {
    *
    * @note If the conversation_et is not defined, it will open the incoming connection requests instead
    *
-   * @param {Conversation|string} conversation - Conversation entity or conversation ID
-   * @param {Object} options - State to open conversation in
-   * @param {Message} [options.exposeMessage] - Scroll to message and highlight it
-   * @param {boolean} [options.openFirstSelfMention=false] - Open first self mention instead of passed message
-   * @param {boolean} [options.openNotificationSettings=false] - Open notification settings of conversation
+   * @param {Conversation|string} conversation Conversation entity or conversation ID
+   * @param {Object} options State to open conversation in
+   * @param {Message} [options.exposeMessage] Scroll to message and highlight it
+   * @param {boolean} [options.openFirstSelfMention=false] Open first self mention instead of passed message
+   * @param {boolean} [options.openNotificationSettings=false] Open notification settings of conversation
    * @returns {undefined} No return value
    */
   showConversation = (conversation, options = {}) => {
@@ -265,7 +265,7 @@ export class ContentViewModel {
           this.mainViewModel.modals.showModal(ModalsViewModel.TYPE.ACKNOWLEDGE, {
             text: {
               message: t('conversationNotFoundMessage'),
-              title: t('conversationNotFoundTitle', Config.BRAND_NAME),
+              title: t('conversationNotFoundTitle', Config.getConfig().BRAND_NAME),
             },
           });
         } else {

@@ -88,7 +88,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.teamRepository = repositories.team;
     this.userRepository = repositories.user;
     this.Environment = Environment;
-    this.brandName = Config.BRAND_NAME;
+    this.brandName = Config.getConfig().BRAND_NAME;
 
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
     this.selfUser = this.userRepository.self;
@@ -136,7 +136,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.createTeamUrl = getCreateTeamUrl('client');
 
     this.isTemporaryAndNonPersistent = isTemporaryClientAndNonPersistent(loadValue(StorageKey.AUTH.PERSIST));
-    this.isConsentCheckEnabled = () => Config.FEATURE.CHECK_CONSENT;
+    this.isConsentCheckEnabled = () => Config.getConfig().FEATURE.CHECK_CONSENT;
     this.canEditProfile = user => user.managedBy() === User.CONFIG.MANAGED_BY.WIRE;
 
     this.updateProperties(this.propertiesRepository.properties);
@@ -343,9 +343,9 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   setPicture(newUserPicture) {
-    const isTooLarge = newUserPicture.size > Config.MAXIMUM_IMAGE_FILE_SIZE;
+    const isTooLarge = newUserPicture.size > Config.getConfig().MAXIMUM_IMAGE_FILE_SIZE;
     if (isTooLarge) {
-      const maximumSizeInMB = Config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024;
+      const maximumSizeInMB = Config.getConfig().MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024;
       const messageString = t('modalPictureTooLargeMessage', maximumSizeInMB);
       const titleString = t('modalPictureTooLargeHeadline');
 
