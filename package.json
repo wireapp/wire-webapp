@@ -21,7 +21,7 @@
     "@types/karma": "3.0.6",
     "@wireapp/commons": "3.3.3",
     "@wireapp/store-engine-dexie": "1.2.5",
-    "commander": "4.1.0",
+    "commander": "4.1.1",
     "cross-env": "7.0.0",
     "dotenv": "8.2.0",
     "faker": "4.1.0",
