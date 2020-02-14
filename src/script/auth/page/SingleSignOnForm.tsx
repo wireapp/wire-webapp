@@ -123,13 +123,6 @@ const SingleSignOnForm = ({
     }
   }, [initialCode]);
 
-  // Automatically submit if codeOrMail is set via url
-  useEffect(() => {
-    if (initialCode === codeOrMail) {
-      handleSubmit();
-    }
-  }, [codeOrMail]);
-
   const handleSubmit = async (event?: React.FormEvent): Promise<void> => {
     if (event) {
       event.preventDefault();
