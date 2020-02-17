@@ -166,7 +166,7 @@
     "terser-webpack-plugin": "2.3.5",
     "ts-node": "8.6.2",
     "typescript": "3.7.5",
-    "wait-for-expect": "3.0.1",
+    "wait-for-expect": "3.0.2",
     "webpack": "4.41.6",
     "webpack-cli": "3.3.10",
     "webpack-dev-middleware": "3.7.2",
