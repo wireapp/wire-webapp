@@ -1811,12 +1811,12 @@
     platform "1.3.5"
     url-search-params-polyfill "7.0.1"
 
-"@wireapp/copy-config@1.0.3":
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/@wireapp/copy-config/-/copy-config-1.0.3.tgz#62eac3f5483f3342eff1e0ac2a17047e8cfa9aac"
-  integrity sha512-qOBce/qks3pO+oA2W0+t43AJxPFQcNl20t8NncfrhuSCu8LrYZevAUT7kOCjbjX3w1iQlCriFknugYQvnJGh4A==
+"@wireapp/copy-config@1.0.4":
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@wireapp/copy-config/-/copy-config-1.0.4.tgz#0b566872bfccc5bb0f0c86b42b6199cde47b8487"
+  integrity sha512-oQQuVnMTKcZoOa7ioCnmcfebkXrrVIoavR3JjRKDM6txLU+XOanISqRVtJsi04WLQtKWZ8yqGASud3WeOJd8mQ==
   dependencies:
-    axios "0.19.1"
+    axios "0.19.2"
     copy "0.3.2"
     cosmiconfig "6.0.0"
     fs-extra "8.1.0"
@@ -2531,6 +2531,13 @@ axios@0.19.1:
   version "0.19.1"
   resolved "https://registry.yarnpkg.com/axios/-/axios-0.19.1.tgz#8a6a04eed23dfe72747e1dd43c604b8f1677b5aa"
   integrity sha512-Yl+7nfreYKaLRvAvjNPkvfjnQHJM1yLBY3zhqAwcJSwR/6ETkanUgylgtIvkvz0xJ+p/vZuNw8X7Hnb7Whsbpw==
+  dependencies:
+    follow-redirects "1.5.10"
+
+axios@0.19.2:
+  version "0.19.2"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-0.19.2.tgz#3ea36c5d8818d0d5f8a8a97a6d36b86cdc00cb27"
+  integrity sha512-fjgm5MvRHLhx+osE2xoekY70AhARk3a6hkN+3Io1jc00jtquGvxYlKlsFUhmUET0V5te6CcZI7lcv2Ym61mjHA==
   dependencies:
     follow-redirects "1.5.10"
 
