@@ -51,13 +51,14 @@ const dependencies = {
 const configVersion = dependencies[configurationEntry].split('#')[1];
 const dockerRegistryDomain = 'quay.io';
 const dockerImageTag = `${dockerRegistryDomain}/wire/webapp${suffix}:${buildCounter}-${pkg.version}-${commitShortSha}-${configVersion}${stage}`;
+const dockerImageStageTag = stageParam ? `-t ${dockerRegistryDomain}/wire/webapp${suffix}:${stageParam}` : '';
 
 child.execSync(
   `echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin ${dockerRegistryDomain}`,
   {stdio: 'inherit'},
 );
 child.execSync(
-  `docker build . -t ${dockerImageTag} &&
+  `docker build . -t ${dockerImageTag} ${dockerImageStageTag} &&
   docker push ${dockerImageTag} &&
   docker logout ${dockerRegistryDomain}`,
   {stdio: 'inherit'},
