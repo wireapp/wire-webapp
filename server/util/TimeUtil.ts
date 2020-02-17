@@ -17,10 +17,9 @@
  *
  */
 
-import * as moment from 'moment';
-
 function formatDate(): string {
-  return moment().format('YYYY-MM-DD HH:mm:ss');
+  const [date, time] = new Date().toISOString().split('T');
+  return `${date} ${time.substring(0, 8)}`;
 }
 
 export {formatDate};
