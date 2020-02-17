@@ -67,8 +67,6 @@ describe('SingleSignOnForm', () => {
       },
     });
 
-    const history = createMemoryHistory();
-    const historyPushSpy = spyOn(history, 'push');
     const doLogin = jasmine.createSpy().and.returnValue((code: string) => Promise.resolve());
     const initialCode = 'wire-cb6e4dfc-a4b0-4c59-a31d-303a7f5eb5ab';
 
@@ -85,7 +83,6 @@ describe('SingleSignOnForm', () => {
         },
       }),
       {doLogin, initialCode},
-      history,
     );
 
     expect(singleSignOnFormPage.getCodeOrEmailInput().exists())
