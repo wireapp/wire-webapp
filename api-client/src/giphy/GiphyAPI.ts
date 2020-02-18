@@ -19,7 +19,7 @@
 
 import {AxiosRequestConfig} from 'axios';
 
-import {GiphyOptions, GiphyResult, GiphySearchResult, GiphySorting} from '../giphy/';
+import {GiphySearch, GiphyResult, GiphySearchResult} from '../giphy/';
 import {HttpClient} from '../http/';
 
 export class GiphyAPI {
@@ -68,19 +68,10 @@ export class GiphyAPI {
    * Get GIF search results from Giphy.
    * @param options Search options
    */
-  public async getGiphySearch(query: string, options?: GiphyOptions): Promise<GiphySearchResult> {
-    const defaultOptions: GiphyOptions = {
-      limit: 25,
-      offset: 0,
-      sort: GiphySorting.RELEVANT,
-    };
+  public async getGiphySearch(options: GiphySearch): Promise<GiphySearchResult> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      params: {
-        ...defaultOptions,
-        ...options,
-        q: query,
-      },
+      params: options,
       url: `${GiphyAPI.URL.PROXY}/${GiphyAPI.URL.GIPHY}/${GiphyAPI.URL.SEARCH}`,
     };
 
