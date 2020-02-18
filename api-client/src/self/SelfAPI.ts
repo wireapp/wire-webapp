@@ -20,7 +20,7 @@
 import {AxiosRequestConfig, AxiosResponse} from 'axios';
 
 import {HttpClient} from '../http/';
-import {ChangePassword, Delete, SearchableStatus, Self} from '../self/';
+import {ChangePassword, Delete, Self} from '../self/';
 import {UserUpdate} from '../user/';
 import {Consent} from './Consent';
 
@@ -35,7 +35,6 @@ export class SelfAPI {
     NAME: 'name',
     PASSWORD: 'password',
     PHONE: 'phone',
-    SEARCHABLE: 'searchable',
     SELF: '/self',
   };
 
@@ -122,20 +121,6 @@ export class SelfAPI {
   }
 
   /**
-   * Determine whether you are discoverable via /search/contacts.
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getSearchableStatus
-   */
-  public async getSearchable(): Promise<SearchableStatus> {
-    const config: AxiosRequestConfig = {
-      method: 'get',
-      url: `${SelfAPI.URL.SELF}/${SelfAPI.URL.SEARCHABLE}`,
-    };
-
-    const response = await this.client.sendJSON<SearchableStatus>(config);
-    return response.data;
-  }
-
-  /**
    * Get your profile
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/self
    */
@@ -219,21 +204,6 @@ export class SelfAPI {
       data: phoneData,
       method: 'put',
       url: `${SelfAPI.URL.SELF}/${SelfAPI.URL.PHONE}`,
-    };
-
-    await this.client.sendJSON(config);
-  }
-
-  /**
-   * Opt in or out of being included in search results.
-   * @param statusData The new search status
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/updateSearchableStatus
-   */
-  public async putSearchable(statusData: SearchableStatus): Promise<void> {
-    const config: AxiosRequestConfig = {
-      data: statusData,
-      method: 'put',
-      url: `${SelfAPI.URL.SELF}/${SelfAPI.URL.SEARCHABLE}`,
     };
 
     await this.client.sendJSON(config);
