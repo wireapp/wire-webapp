@@ -19,21 +19,43 @@
 
 import {ReactWrapper} from 'enzyme';
 import React from 'react';
-import {initialRootState} from '../module/reducer';
+import waitForExpect from 'wait-for-expect';
+import {ValidationError} from '../module/action/ValidationError';
+import {initialRootState, RootState, Api} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
 import SetPassword from './SetPassword';
+import {MockStoreEnhanced} from 'redux-mock-store';
+import {TypeUtil} from '@wireapp/commons';
+import {ThunkDispatch} from 'redux-thunk';
+import {AnyAction} from 'redux';
+import {History} from 'history';
 
-describe('"SetPassword"', () => {
-  let wrapper: ReactWrapper;
+class SetPasswordPage {
+  private readonly driver: ReactWrapper;
 
-  const passwordInput = () => wrapper.find('input[data-uie-name="enter-password"]').first();
-  const setPasswordButton = () => wrapper.find('button[data-uie-name="do-set-password"]').first();
-  const errorMessage = () => wrapper.find('[data-uie-name="error-message"]').first();
+  constructor(
+    store: MockStoreEnhanced<TypeUtil.RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
+    history?: History<any>,
+  ) {
+    this.driver = mountComponent(<SetPassword />, store, history);
+  }
 
+  getPasswordInput = () => this.driver.find('input[data-uie-name="enter-password"]');
+  getSetPasswordButton = () => this.driver.find('button[data-uie-name="do-set-password"]');
+  getErrorMessage = (errorLabel?: string) =>
+    this.driver.find(`[data-uie-name="error-message"]${errorLabel ? `[data-uie-value="${errorLabel}"]` : ''}`);
+
+  clickSetPasswordButton = () => this.getSetPasswordButton().simulate('submit');
+
+  enterPassword = (value: string) => this.getPasswordInput().simulate('change', {target: {value}});
+
+  update = () => this.driver.update();
+}
+
+describe('SetPassword', () => {
   it('has disabled submit button as long as there is no input', () => {
-    wrapper = mountComponent(
-      <SetPassword />,
+    const setPasswordPage = new SetPasswordPage(
       mockStoreFactory()({
         ...initialRootState,
         runtimeState: {
@@ -44,27 +66,26 @@ describe('"SetPassword"', () => {
       }),
     );
 
-    expect(passwordInput().exists())
+    expect(setPasswordPage.getPasswordInput().exists())
       .withContext('password input should be present')
       .toBe(true);
 
-    expect(setPasswordButton().exists())
+    expect(setPasswordPage.getSetPasswordButton().exists())
       .withContext('submit button should be present')
       .toBe(true);
 
-    expect(setPasswordButton().props().disabled)
+    expect(setPasswordPage.getSetPasswordButton().props().disabled)
       .withContext('submit button should be disabled')
       .toBe(true);
-    passwordInput().simulate('change', {target: {value: 'e'}});
+    setPasswordPage.enterPassword('e');
 
-    expect(setPasswordButton().props().disabled)
+    expect(setPasswordPage.getSetPasswordButton().props().disabled)
       .withContext('submit button should be enabled')
       .toBe(false);
   });
 
-  it('handles invalid password', () => {
-    wrapper = mountComponent(
-      <SetPassword />,
+  it('handles invalid password', async () => {
+    const setPasswordPage = new SetPasswordPage(
       mockStoreFactory()({
         ...initialRootState,
         runtimeState: {
@@ -75,21 +96,19 @@ describe('"SetPassword"', () => {
       }),
     );
 
-    expect(
-      errorMessage()
-        .text()
-        .trim(),
-    )
-      .withContext('does not show error')
-      .toEqual('');
+    expect(setPasswordPage.getErrorMessage().exists())
+      .withContext('Shows no error')
+      .toBe(false);
 
-    passwordInput().simulate('change', {target: {value: 'e'}});
-    setPasswordButton().simulate('submit');
+    setPasswordPage.enterPassword('e');
+    setPasswordPage.clickSetPasswordButton();
 
-    expect(errorMessage().text())
-      .withContext('shows invalid password error')
-      .toEqual(
-        'Use at least 8 characters, with one lowercase letter, one capital letter, a number, and a special character.',
-      );
+    await waitForExpect(() => {
+      setPasswordPage.update();
+
+      expect(setPasswordPage.getErrorMessage(ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH).exists())
+        .withContext('Shows invalid password error')
+        .toBe(true);
+    });
   });
 });

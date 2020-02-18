@@ -20,35 +20,47 @@
 import {TypeUtil} from '@wireapp/commons';
 import {ReactWrapper} from 'enzyme';
 import React from 'react';
-import {Config as ReadOnlyConfig} from '../../Config';
-import {initialRootState} from '../module/reducer';
+import {initialRootState, RootState, Api} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
 import SetAccountType from './SetAccountType';
+import {Config, Configuration} from '../../Config';
+import {MockStoreEnhanced} from 'redux-mock-store';
+import {ThunkDispatch} from 'redux-thunk';
+import {AnyAction} from 'redux';
+import {History} from 'history';
 
-type Writable<T> = {
-  -readonly [K in keyof T]: T[K];
-};
+class SetAccountTypePage {
+  private readonly driver: ReactWrapper;
 
-type WriteableConfig = TypeUtil.RecursivePartial<Writable<typeof ReadOnlyConfig>>;
+  constructor(
+    store: MockStoreEnhanced<TypeUtil.RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
+    history?: History<any>,
+  ) {
+    this.driver = mountComponent(<SetAccountType />, store, history);
+  }
 
-const Config: WriteableConfig = ReadOnlyConfig;
+  getPersonalAccountButton = () => this.driver.find('a[data-uie-name="go-register-personal"]');
+  getTeamAccountButton = () => this.driver.find('a[data-uie-name="go-register-team"]');
+  getLogo = () => this.driver.find('[data-uie-name="ui-wire-logo"]');
+  getIndexRedirect = () => this.driver.find('[data-uie-name="redirect-login"][to="/"]');
+
+  clickPersonalAccountButton = () => this.getPersonalAccountButton().simulate('click');
+  clickTeamAccountButton = () => this.getTeamAccountButton().simulate('click');
+}
 
 describe('when visiting the set account type page', () => {
-  let wrapper: ReactWrapper;
-
   describe('and the account registration is disabled', () => {
     beforeAll(() => {
-      Config.FEATURE = {
-        ENABLE_ACCOUNT_REGISTRATION: false,
-      };
+      spyOn<{getConfig: () => TypeUtil.RecursivePartial<Configuration>}>(Config, 'getConfig').and.returnValue({
+        FEATURE: {
+          ENABLE_ACCOUNT_REGISTRATION: false,
+        },
+      });
     });
 
-    afterAll(() => (Config.FEATURE = {}));
-
     it('redirects to the index page', () => {
-      wrapper = mountComponent(
-        <SetAccountType />,
+      const accountTypePage = new SetAccountTypePage(
         mockStoreFactory()({
           ...initialRootState,
           runtimeState: {
@@ -59,7 +71,7 @@ describe('when visiting the set account type page', () => {
         }),
       );
 
-      expect(wrapper.find('[data-uie-name="redirect-login"][to="/"]').exists())
+      expect(accountTypePage.getIndexRedirect().exists())
         .withContext('Redirect is rendered')
         .toBe(true);
     });
@@ -67,16 +79,15 @@ describe('when visiting the set account type page', () => {
 
   describe('and the account registration is enabled', () => {
     beforeAll(() => {
-      Config.FEATURE = {
-        ENABLE_ACCOUNT_REGISTRATION: true,
-      };
+      spyOn<{getConfig: () => TypeUtil.RecursivePartial<Configuration>}>(Config, 'getConfig').and.returnValue({
+        FEATURE: {
+          ENABLE_ACCOUNT_REGISTRATION: true,
+        },
+      });
     });
 
-    afterAll(() => (Config.FEATURE = {}));
-
     it('shows the Wire logo', () => {
-      wrapper = mountComponent(
-        <SetAccountType />,
+      const accountTypePage = new SetAccountTypePage(
         mockStoreFactory()({
           ...initialRootState,
           runtimeState: {
@@ -87,12 +98,13 @@ describe('when visiting the set account type page', () => {
         }),
       );
 
-      expect(wrapper.find('[data-uie-name="ui-wire-logo"]').exists()).toBe(true);
+      expect(accountTypePage.getLogo().exists())
+        .withContext('logo is shown')
+        .toBe(true);
     });
 
     it('shows an option to create a private account', () => {
-      wrapper = mountComponent(
-        <SetAccountType />,
+      const accountTypePage = new SetAccountTypePage(
         mockStoreFactory()({
           ...initialRootState,
           runtimeState: {
@@ -103,12 +115,13 @@ describe('when visiting the set account type page', () => {
         }),
       );
 
-      expect(wrapper.find('[data-uie-name="go-register-personal"]').exists()).toBe(true);
+      expect(accountTypePage.getPersonalAccountButton().exists())
+        .withContext('personal account button is shown')
+        .toBe(true);
     });
 
     it('shows an option to create a team', () => {
-      wrapper = mountComponent(
-        <SetAccountType />,
+      const accountTypePage = new SetAccountTypePage(
         mockStoreFactory()({
           ...initialRootState,
           runtimeState: {
@@ -119,7 +132,9 @@ describe('when visiting the set account type page', () => {
         }),
       );
 
-      expect(wrapper.find('[data-uie-name="go-register-team"]').exists()).toBe(true);
+      expect(accountTypePage.clickTeamAccountButton().exists())
+        .withContext('team account button is shown')
+        .toBe(true);
     });
   });
 });

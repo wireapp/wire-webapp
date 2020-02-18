@@ -276,13 +276,16 @@ export class UserRepository {
    */
   onUserAvailability(event: {data: {availability: Availability.Type}; from: string}): void {
     if (this.isTeam()) {
-      if (this.isTeamTooLargeForBroadcast()) {
+      const {
+        from: userId,
+        data: {availability},
+      } = event;
+
+      if (userId !== this.self().id && this.isTeamTooLargeForBroadcast()) {
         this.logger.warn(
           `Availability not updated since the team size is larger or equal to "${UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST}".`,
         );
       } else {
-        // prettier-ignore
-        const {from: userId, data: {availability}} = event;
         this.get_user_by_id(userId).then(userEntity => userEntity.availability(availability));
       }
     }
@@ -415,21 +418,20 @@ export class UserRepository {
       this.logger.log(`Availability was again set to '${newAvailabilityValue}'`);
     }
 
-    if (this.isTeamTooLargeForBroadcast()) {
-      this.logger.warn(
-        `Availability update not sent since the team size is larger or equal to "${UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST}".`,
-      );
-      return;
-    }
-
     const protoAvailability = new Availability({type: protoFromType(availability)});
     const genericMessage = new GenericMessage({
       [GENERIC_MESSAGE_TYPE.AVAILABILITY]: protoAvailability,
       messageId: createRandomUuid(),
     });
 
-    const recipients = teamUsers.concat(this.self());
+    const recipients = this.isTeamTooLargeForBroadcast() ? [this.self()] : teamUsers.concat(this.self());
     amplify.publish(WebAppEvents.BROADCAST.SEND_MESSAGE, {genericMessage, recipients});
+
+    if (this.isTeamTooLargeForBroadcast()) {
+      this.logger.warn(
+        `Availability update only sent to own devices since the team size is larger or equal to "${UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST}".`,
+      );
+    }
   }
 
   onLegalHoldRequestCanceled(eventJson: any): void {
@@ -519,7 +521,7 @@ export class UserRepository {
         });
     };
 
-    const chunksOfUserIds = chunk(userIds, Config.MAXIMUM_USERS_PER_REQUEST) as string[][];
+    const chunksOfUserIds = chunk(userIds, Config.getConfig().MAXIMUM_USERS_PER_REQUEST) as string[][];
     return Promise.all(chunksOfUserIds.map(chunkOfUserIds => _getUsers(chunkOfUserIds)))
       .then(resolveArray => {
         const newUserEntities = flatten(resolveArray);
@@ -859,7 +861,7 @@ export class UserRepository {
   }
 
   initMarketingConsent(): Promise<void> {
-    if (!Config.FEATURE.CHECK_CONSENT) {
+    if (!Config.getConfig().FEATURE.CHECK_CONSENT) {
       this.logger.warn(
         `Consent check feature is disabled. Defaulting to '${this.propertyRepository.marketingConsent()}'`,
       );

@@ -46,8 +46,11 @@ export class Configuration {
   readonly URL = env.URL || {
     ACCOUNT_BASE: 'https://account.wire.com',
     MOBILE_BASE: '',
+    PRIVACY_POLICY: 'https://wire-website-staging.zinfra.io/security',
     SUPPORT_BASE: 'https://support.wire.com',
     TEAMS_BASE: 'https://teams.wire.com',
+    TERMS_OF_USE_PERSONAL: 'https://wire-website-staging.zinfra.io/legal/terms/personal',
+    TERMS_OF_USE_TEAMS: 'https://wire-website-staging.zinfra.io/legal/terms/teams',
     WEBSITE_BASE: 'https://wire.com',
   };
   readonly VERSION = env.VERSION || '0.0.0';
@@ -102,6 +105,15 @@ export class Configuration {
   };
 }
 
-const Config = new Configuration();
+let instance: Configuration;
+
+const Config = {
+  getConfig: () => {
+    if (!instance) {
+      instance = new Configuration();
+    }
+    return instance;
+  },
+};
 
 export {Config};

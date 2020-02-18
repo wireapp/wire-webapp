@@ -114,7 +114,7 @@ export class ConversationRepository {
       EXTERNAL_MESSAGE_THRESHOLD: 200 * 1024,
       GROUP: {
         MAX_NAME_LENGTH: 64,
-        MAX_SIZE: Config.MAX_GROUP_PARTICIPANTS,
+        MAX_SIZE: Config.getConfig().MAX_GROUP_PARTICIPANTS,
       },
     };
   }
@@ -579,7 +579,7 @@ export class ConversationRepository {
       : new Date(conversationEntity.get_latest_timestamp(this.serverTimeHandler.toServerTimestamp()) + 1);
 
     return this.eventService
-      .loadPrecedingEvents(conversationEntity.id, new Date(0), upperBound, Config.MESSAGES_FETCH_LIMIT)
+      .loadPrecedingEvents(conversationEntity.id, new Date(0), upperBound, Config.getConfig().MESSAGES_FETCH_LIMIT)
       .then(events => this._addPrecedingEventsToConversation(events, conversationEntity))
       .then(mappedMessageEntities => {
         conversationEntity.is_pending(false);
@@ -588,7 +588,7 @@ export class ConversationRepository {
   }
 
   _addPrecedingEventsToConversation(events, conversationEntity) {
-    const hasAdditionalMessages = events.length === Config.MESSAGES_FETCH_LIMIT;
+    const hasAdditionalMessages = events.length === Config.getConfig().MESSAGES_FETCH_LIMIT;
 
     return this._addEventsToConversation(events, conversationEntity).then(mappedMessageEntities => {
       conversationEntity.hasAdditionalMessages(hasAdditionalMessages);
@@ -678,8 +678,8 @@ export class ConversationRepository {
     conversationEntity.is_pending(true);
 
     return this.eventService
-      .loadFollowingEvents(conversationEntity.id, messageDate, Config.MESSAGES_FETCH_LIMIT, includeMessage)
-      .then(events => this._addEventsToConversation(events, conversationEntity))
+      .loadFollowingEvents(conversationEntity.id, messageDate, Config.getConfig().MESSAGES_FETCH_LIMIT, includeMessage)
+      .then(events => this._addEventsToConversation(events, conversationEntity, false))
       .then(mappedNessageEntities => {
         conversationEntity.is_pending(false);
         return mappedNessageEntities;
@@ -2515,7 +2515,7 @@ export class ConversationRepository {
         if (!isNaN(timestamp)) {
           messageEntity.timestamp(timestamp);
           conversationEntity.update_timestamp_server(timestamp, true);
-          conversationEntity.update_timestamps(messageEntity);
+          conversationEntity.updateTimestamps(messageEntity);
         }
       }
       this.checkMessageTimer(messageEntity);
@@ -4023,23 +4023,20 @@ export class ConversationRepository {
    *
    * @private
    * @param {Conversation} conversationEntity Conversation that contains the message
-   * @param {Message} message_et Message to delete
-   * @returns {Promise} Resolves when message was deleted
-   */
-  _delete_message(conversationEntity, message_et) {
-    return this.eventService.deleteEventByKey(message_et.primary_key);
-  }
-
-  /**
-   * Delete message from UI and database. Primary key is used to delete message in database.
-   *
-   * @private
-   * @param {Conversation} conversationEntity Conversation that contains the message
    * @param {string} message_id ID of message to delete
    * @returns {Promise} Resolves when message was deleted
    */
-  _delete_message_by_id(conversationEntity, message_id) {
-    return this.eventService.deleteEvent(conversationEntity.id, message_id);
+  async _delete_message_by_id(conversationEntity, message_id) {
+    const isLastDeleted =
+      conversationEntity.isShowingLastReceivedMessage() && conversationEntity.getLastMessage()?.id === message_id;
+
+    const deleteCount = await this.eventService.deleteEvent(conversationEntity.id, message_id);
+
+    if (isLastDeleted && conversationEntity.getLastMessage()?.timestamp()) {
+      conversationEntity.updateTimestamps(conversationEntity.getLastMessage(), true);
+    }
+
+    return deleteCount;
   }
 
   /**

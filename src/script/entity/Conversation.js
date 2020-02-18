@@ -235,6 +235,8 @@ export class Conversation {
       }),
     );
 
+    this.incomingMessages = ko.observableArray();
+
     this.hasAdditionalMessages = ko.observable(true);
 
     this.messages_visible = ko
@@ -252,9 +254,9 @@ export class Conversation {
         selfMentions: [],
         selfReplies: [],
       };
-
-      for (let index = this.messages().length - 1; index >= 0; index--) {
-        const messageEntity = this.messages()[index];
+      const messages = [...this.messages(), ...this.incomingMessages()];
+      for (let index = messages.length - 1; index >= 0; index--) {
+        const messageEntity = messages[index];
         if (messageEntity.visible()) {
           const isReadMessage = messageEntity.timestamp() <= this.last_read_timestamp() || messageEntity.user().is_me;
           if (isReadMessage) {
@@ -464,9 +466,13 @@ export class Conversation {
       if (alreadyAdded) {
         return false;
       }
-
-      this.update_timestamps(messageEntity);
-      this.messages_unordered.push(messageEntity);
+      if (this.isShowingLastReceivedMessage()) {
+        this.updateTimestamps(messageEntity);
+        this.incomingMessages.remove(({id}) => messageEntity.id === id);
+        this.messages_unordered.push(messageEntity);
+      } else {
+        this.incomingMessages.push(messageEntity);
+      }
       amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.ADDED, messageEntity);
       return true;
     }
@@ -485,11 +491,12 @@ export class Conversation {
     for (let counter = message_ets.length - 1; counter >= 0; counter--) {
       const message_et = message_ets[counter];
       if (message_et.user()?.is_me) {
-        this.update_timestamps(message_et);
+        this.updateTimestamps(message_et);
         break;
       }
     }
-
+    const messageIds = message_ets.map(({id}) => id);
+    this.incomingMessages.remove(({id}) => messageIds.includes(id));
     koArrayPushAll(this.messages_unordered, message_ets);
   }
 
@@ -647,15 +654,15 @@ export class Conversation {
    *
    * @private
    * @param {Message} message_et Message to be added to conversation
+   * @param {boolean} forceUpdate set the timestamp regardless of previous timestamp value (no checks)
    * @returns {undefined} No return value
    */
-  update_timestamps(message_et) {
+  updateTimestamps(message_et, forceUpdate = false) {
     if (message_et) {
       const timestamp = message_et.timestamp();
-
       if (timestamp <= this.last_server_timestamp()) {
         if (message_et.timestamp_affects_order()) {
-          this.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.LAST_EVENT);
+          this.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.LAST_EVENT, forceUpdate);
 
           const from_self = message_et.user()?.is_me;
           if (from_self) {
@@ -766,7 +773,7 @@ export class Conversation {
     }
 
     const participantCount = this.getNumberOfParticipants(true, false);
-    const passesParticipantLimit = participantCount <= Config.MAX_VIDEO_PARTICIPANTS;
+    const passesParticipantLimit = participantCount <= Config.getConfig().MAX_VIDEO_PARTICIPANTS;
 
     if (!passesParticipantLimit) {
       return false;
@@ -782,6 +789,9 @@ export class Conversation {
 
     return true;
   }
+
+  isShowingLastReceivedMessage = () =>
+    this.getLastMessage()?.timestamp() ? this.getLastMessage().timestamp() >= this.last_event_timestamp() : true;
 
   serialize() {
     return {

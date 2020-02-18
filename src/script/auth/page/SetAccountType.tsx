@@ -58,7 +58,7 @@ const SetAccountType = ({}: Props) => {
   );
   return (
     <Page>
-      {!Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
+      {!Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
         <Redirect to={pathWithParams(ROUTE.INDEX)} data-uie-name="redirect-login" />
       )}
       {isMacOsWrapper && (

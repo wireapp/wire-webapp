@@ -54,7 +54,7 @@ export class LoadingViewModel {
       switch (message) {
         case t('initDecryption'):
         case t('initEvents'): {
-          if (!Config.FEATURE.SHOW_LOADING_INFORMATION) {
+          if (!Config.getConfig().FEATURE.SHOW_LOADING_INFORMATION) {
             updatedLoadingMessage = message;
             break;
           }

@@ -52,7 +52,7 @@ z.viewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
     this.device = ko.observable();
     this.fingerprint = ko.observableArray([]);
     this.sessionResetState = ko.observable(PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET);
-    this.brandName = Config.BRAND_NAME;
+    this.brandName = Config.getConfig().BRAND_NAME;
 
     this.device.subscribe(clientEntity => {
       if (clientEntity) {

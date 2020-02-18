@@ -161,7 +161,7 @@ export class ModalsViewModel {
         content.messageText = t('modalAccountNewDevicesMessage');
         const deviceList = data
           .map(device => {
-            const deviceTime = formatLocale(device.time, 'PP, p');
+            const deviceTime = formatLocale(device.time || new Date(), 'PP, p');
             const deviceModel = `${t('modalAccountNewDevicesFrom')} ${device.model}`;
             return `<div>${deviceTime} - UTC</div><div>${deviceModel}</div>`;
           })
@@ -198,7 +198,7 @@ export class ModalsViewModel {
       case Types.SESSION_RESET: {
         content.titleText = t('modalSessionResetHeadline');
         content.primaryAction = {...primaryAction, text: t('modalAcknowledgeAction')};
-        const supportLink = buildSupportUrl(Config.SUPPORT.FORM.BUG);
+        const supportLink = buildSupportUrl(Config.getConfig().SUPPORT.FORM.BUG);
         content.messageHtml = t(
           'modalSessionResetMessage',
           {},

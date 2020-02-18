@@ -23,23 +23,38 @@ import {createMemoryHistory} from 'history';
 import React from 'react';
 import waitForExpect from 'wait-for-expect';
 import {actionRoot} from '../module/action';
-import {initialRootState} from '../module/reducer';
+import {initialRootState, RootState, Api} from '../module/reducer';
 import {ROUTE} from '../route';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
 import PhoneLogin from './PhoneLogin';
+import {MockStoreEnhanced} from 'redux-mock-store';
+import {TypeUtil} from '@wireapp/commons';
+import {ThunkDispatch} from 'redux-thunk';
+import {AnyAction} from 'redux';
+import {History} from 'history';
 
-describe('"PhoneLogin"', () => {
-  let wrapper: ReactWrapper;
+class PhoneLoginPage {
+  private readonly driver: ReactWrapper;
 
-  const backButton = () => wrapper.find('a[data-uie-name="go-login"]').first();
-  const phoneInput = () => wrapper.find('input[data-uie-name="enter-phone"]').first();
-  const countryCodeInput = () => wrapper.find('input[data-uie-name="enter-country-code"]').first();
-  const loginButton = () => wrapper.find('button[data-uie-name="do-sign-in-phone"]').first();
+  constructor(
+    store: MockStoreEnhanced<TypeUtil.RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
+    history?: History<any>,
+  ) {
+    this.driver = mountComponent(<PhoneLogin />, store, history);
+  }
 
+  getBackButton = () => this.driver.find('a[data-uie-name="go-login"]');
+  getPhoneInput = () => this.driver.find('input[data-uie-name="enter-phone"]');
+  getCountryCodeInput = () => this.driver.find('input[data-uie-name="enter-country-code"]');
+  getLoginButton = () => this.driver.find('button[data-uie-name="do-sign-in-phone"]');
+
+  clickLoginButton = () => this.getLoginButton().simulate('click');
+}
+
+describe('PhoneLogin', () => {
   it('has disabled submit button as long as one input is empty', () => {
-    wrapper = mountComponent(
-      <PhoneLogin />,
+    const phoneLoginPage = new PhoneLoginPage(
       mockStoreFactory()({
         ...initialRootState,
         runtimeState: {
@@ -50,24 +65,24 @@ describe('"PhoneLogin"', () => {
       }),
     );
 
-    expect(phoneInput().exists())
+    expect(phoneLoginPage.getPhoneInput().exists())
       .withContext('phone number input is present')
       .toBe(true);
 
-    expect(countryCodeInput().exists())
+    expect(phoneLoginPage.getCountryCodeInput().exists())
       .withContext('country code input is present')
       .toBe(true);
 
-    expect(loginButton().exists())
+    expect(phoneLoginPage.getLoginButton().exists())
       .withContext('login button is present')
       .toBe(true);
 
-    expect(loginButton().props().disabled)
+    expect(phoneLoginPage.getLoginButton().props().disabled)
       .withContext('login button is disabled')
       .toBe(true);
-    phoneInput().simulate('change', {target: {value: '1'}});
+    phoneLoginPage.getPhoneInput().simulate('change', {target: {value: '1'}});
 
-    expect(loginButton().props().disabled)
+    expect(phoneLoginPage.getLoginButton().props().disabled)
       .withContext('login button is not disabled')
       .toBe(false);
   });
@@ -75,8 +90,7 @@ describe('"PhoneLogin"', () => {
   it('has an option to navigate back', async () => {
     const history = createMemoryHistory();
     const historyPushSpy = spyOn(history, 'push');
-    wrapper = mountComponent(
-      <PhoneLogin />,
+    const phoneLoginPage = new PhoneLoginPage(
       mockStoreFactory()({
         ...initialRootState,
         runtimeState: {
@@ -88,10 +102,10 @@ describe('"PhoneLogin"', () => {
       history,
     );
 
-    expect(backButton().exists())
+    expect(phoneLoginPage.getBackButton().exists())
       .withContext('back button is present')
       .toBe(true);
-    backButton().simulate('click');
+    phoneLoginPage.getBackButton().simulate('click');
 
     await waitForExpect(() => {
       expect(historyPushSpy)
@@ -106,8 +120,7 @@ describe('"PhoneLogin"', () => {
 
     spyOn(actionRoot.authAction, 'doSendPhoneLoginCode').and.returnValue(() => Promise.resolve());
 
-    wrapper = mountComponent(
-      <PhoneLogin />,
+    const phoneLoginPage = new PhoneLoginPage(
       mockStoreFactory()({
         ...initialRootState,
         runtimeState: {
@@ -119,13 +132,13 @@ describe('"PhoneLogin"', () => {
       history,
     );
 
-    countryCodeInput().simulate('change', {target: {value: '+0'}});
-    phoneInput().simulate('change', {target: {value: '1111111'}});
+    phoneLoginPage.getCountryCodeInput().simulate('change', {target: {value: '+0'}});
+    phoneLoginPage.getPhoneInput().simulate('change', {target: {value: '1111111'}});
 
-    expect(loginButton().props().disabled)
+    expect(phoneLoginPage.getLoginButton().props().disabled)
       .withContext('login button is not disabled')
       .toBe(false);
-    loginButton().simulate('click');
+    phoneLoginPage.getLoginButton().simulate('click');
 
     await waitForExpect(() => {
       expect(actionRoot.authAction.doSendPhoneLoginCode)
@@ -145,8 +158,7 @@ describe('"PhoneLogin"', () => {
     const error: any = new PasswordExistsError('test error') as any;
     spyOn(actionRoot.authAction, 'doSendPhoneLoginCode').and.returnValue(() => Promise.reject(error));
 
-    wrapper = mountComponent(
-      <PhoneLogin />,
+    const phoneLoginPage = new PhoneLoginPage(
       mockStoreFactory()({
         ...initialRootState,
         runtimeState: {
@@ -158,13 +170,13 @@ describe('"PhoneLogin"', () => {
       history,
     );
 
-    countryCodeInput().simulate('change', {target: {value: '+0'}});
-    phoneInput().simulate('change', {target: {value: '1111111'}});
+    phoneLoginPage.getCountryCodeInput().simulate('change', {target: {value: '+0'}});
+    phoneLoginPage.getPhoneInput().simulate('change', {target: {value: '1111111'}});
 
-    expect(loginButton().props().disabled)
+    expect(phoneLoginPage.getLoginButton().props().disabled)
       .withContext('login button is not disabled')
       .toBe(false);
-    loginButton().simulate('click');
+    phoneLoginPage.getLoginButton().simulate('click');
 
     await waitForExpect(() => {
       expect(actionRoot.authAction.doSendPhoneLoginCode)

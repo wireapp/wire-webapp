@@ -51,7 +51,7 @@ export class PreferencesAVViewModel {
     this.availableDevices = this.devicesHandler.availableDevices;
     this.currentDeviceId = this.devicesHandler.currentDeviceId;
     this.deviceSupport = this.devicesHandler.deviceSupport;
-    this.Config = Config;
+    this.Config = Config.getConfig();
 
     const updateStream = mediaType => {
       this._releaseAudioMeter();
@@ -106,7 +106,7 @@ export class PreferencesAVViewModel {
     this.audioLevel = ko.observable(0);
     this.audioSource = undefined;
 
-    this.brandName = Config.BRAND_NAME;
+    this.brandName = Config.getConfig().BRAND_NAME;
 
     this.supportsAudioOutput = ko.pureComputed(() => {
       return this.deviceSupport.audioOutput() && Environment.browser.supports.audioOutputSelection;

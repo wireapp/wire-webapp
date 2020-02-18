@@ -72,7 +72,9 @@ export const initialAuthState: AuthState = {
   fetched: false,
   fetching: false,
   isAuthenticated: false,
-  loginData: {clientType: Config.FEATURE.DEFAULT_LOGIN_TEMPORARY_CLIENT ? ClientType.TEMPORARY : ClientType.PERMANENT},
+  loginData: {
+    clientType: Config.getConfig().FEATURE.DEFAULT_LOGIN_TEMPORARY_CLIENT ? ClientType.TEMPORARY : ClientType.PERMANENT,
+  },
 };
 
 export function authReducer(state: AuthState = initialAuthState, action: AppActions): AuthState {

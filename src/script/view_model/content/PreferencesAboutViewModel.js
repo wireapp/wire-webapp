@@ -39,7 +39,7 @@ z.viewModel.content.PreferencesAboutViewModel = class PreferencesAboutViewModel 
 
     this.userRepository = repositories.user;
     this.selfUser = this.userRepository.self;
-    this.brandName = Config.BRAND_NAME;
+    this.brandName = Config.getConfig().BRAND_NAME;
 
     this.supportUrl = getSupportUrl();
     this.supportContactUrl = getSupportContactUrl();

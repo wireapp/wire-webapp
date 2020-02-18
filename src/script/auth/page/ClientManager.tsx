@@ -56,7 +56,7 @@ const ClientManager = ({doGetAllClients, doLogout}: Props & ConnectedProps & Dis
           {_(clientManagerStrings.headline)}
         </H1>
         <Muted center style={{marginBottom: '42px'}} data-uie-name="status-device-limit-info">
-          {_(clientManagerStrings.subhead, {brandName: Config.BRAND_NAME})}
+          {_(clientManagerStrings.subhead, {brandName: Config.getConfig().BRAND_NAME})}
         </Muted>
         <ClientList />
         <Link onClick={logout} style={{alignSelf: 'center', margin: '48px 0 80px 0'}} data-uie-name="go-sign-out">

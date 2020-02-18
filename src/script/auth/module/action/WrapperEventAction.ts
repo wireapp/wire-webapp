@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2020 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,17 +17,25 @@
  *
  */
 
-// Configure default test config
-window.wire = {};
-window.wire.env = {
-  FEATURE: {
-    CHECK_CONSENT: false,
-    DEFAULT_LOGIN_TEMPORARY_CLIENT: false,
-    ENABLE_DOMAIN_DISCOVERY: true,
-  },
-};
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {ThunkAction} from '../reducer';
 
-// create initial div element with ID 'main' for react
-const main = document.createElement('div');
-main.id = 'main';
-document.body.appendChild(main);
+class WrapperChangeEnvironmentEvent extends CustomEvent<{url: string}> {
+  constructor(url: string, options?: EventInit) {
+    super(WebAppEvents.LIFECYCLE.CHANGE_ENVIRONMENT, {
+      ...options,
+      detail: {url},
+    });
+  }
+}
+
+export class WrapperEventAction {
+  doSendNavigationEvent = (url: string): ThunkAction => {
+    return async () => {
+      const event = new WrapperChangeEnvironmentEvent(url);
+      window.dispatchEvent(event);
+    };
+  };
+}
+
+export const wrapperEventAction = new WrapperEventAction();
