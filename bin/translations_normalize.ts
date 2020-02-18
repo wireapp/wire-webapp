@@ -22,8 +22,15 @@ import fs from 'fs-extra';
 import authTranslations from '../temp/i18n/src/script/strings.json';
 import webappTranslations from '../resource/translation/en-US.json';
 
+interface Translation {
+  id: string;
+  defaultMessage: string;
+}
+
+type Translations = Record<string, string>;
+
 const normalizedAuthTranslations = authTranslations.reduce(
-  (accumulator: any, object: {id: string; defaultMessage: string}): any => {
+  (accumulator: Translations, object: Translation): Translations => {
     accumulator[object.id] = object.defaultMessage;
     return accumulator;
   },
