@@ -3021,82 +3021,82 @@
   },
   "1f3cb": {
     "aliases": [":lifter:", ":weight_lifter:"],
-    "code": "1f3cb-fe0f",
+    "code": "1f3cb",
     "name": ":person_lifting_weights:"
   },
   "1f3cb-1f3fb": {
     "aliases": [":lifter_tone1:", ":weight_lifter_tone1:"],
-    "code": "1f3cb-fe0f-1f3fb",
+    "code": "1f3cb-1f3fb",
     "name": ":person_lifting_weights_tone1:"
   },
   "1f3cb-1f3fb-2640": {
     "aliases": [":woman_lifting_weights_light_skin_tone:"],
-    "code": "1f3cb-fe0f-1f3fb-200d-2640-fe0f",
+    "code": "1f3cb-1f3fb-200d-2640-fe0f",
     "name": ":woman_lifting_weights_tone1:"
   },
   "1f3cb-1f3fb-2642": {
     "aliases": [":man_lifting_weights_light_skin_tone:"],
-    "code": "1f3cb-fe0f-1f3fb-200d-2642-fe0f",
+    "code": "1f3cb-1f3fb-200d-2642-fe0f",
     "name": ":man_lifting_weights_tone1:"
   },
   "1f3cb-1f3fc": {
     "aliases": [":lifter_tone2:", ":weight_lifter_tone2:"],
-    "code": "1f3cb-fe0f-1f3fc",
+    "code": "1f3cb-1f3fc",
     "name": ":person_lifting_weights_tone2:"
   },
   "1f3cb-1f3fc-2640": {
     "aliases": [":woman_lifting_weights_medium_light_skin_tone:"],
-    "code": "1f3cb-fe0f-1f3fc-200d-2640-fe0f",
+    "code": "1f3cb-1f3fc-200d-2640-fe0f",
     "name": ":woman_lifting_weights_tone2:"
   },
   "1f3cb-1f3fc-2642": {
     "aliases": [":man_lifting_weights_medium_light_skin_tone:"],
-    "code": "1f3cb-fe0f-1f3fc-200d-2642-fe0f",
+    "code": "1f3cb-1f3fc-200d-2642-fe0f",
     "name": ":man_lifting_weights_tone2:"
   },
   "1f3cb-1f3fd": {
     "aliases": [":lifter_tone3:", ":weight_lifter_tone3:"],
-    "code": "1f3cb-fe0f-1f3fd",
+    "code": "1f3cb-1f3fd",
     "name": ":person_lifting_weights_tone3:"
   },
   "1f3cb-1f3fd-2640": {
     "aliases": [":woman_lifting_weights_medium_skin_tone:"],
-    "code": "1f3cb-fe0f-1f3fd-200d-2640-fe0f",
+    "code": "1f3cb-1f3fd-200d-2640-fe0f",
     "name": ":woman_lifting_weights_tone3:"
   },
   "1f3cb-1f3fd-2642": {
     "aliases": [":man_lifting_weights_medium_skin_tone:"],
-    "code": "1f3cb-fe0f-1f3fd-200d-2642-fe0f",
+    "code": "1f3cb-1f3fd-200d-2642-fe0f",
     "name": ":man_lifting_weights_tone3:"
   },
   "1f3cb-1f3fe": {
     "aliases": [":lifter_tone4:", ":weight_lifter_tone4:"],
-    "code": "1f3cb-fe0f-1f3fe",
+    "code": "1f3cb-1f3fe",
     "name": ":person_lifting_weights_tone4:"
   },
   "1f3cb-1f3fe-2640": {
     "aliases": [":woman_lifting_weights_medium_dark_skin_tone:"],
-    "code": "1f3cb-fe0f-1f3fe-200d-2640-fe0f",
+    "code": "1f3cb-1f3fe-200d-2640-fe0f",
     "name": ":woman_lifting_weights_tone4:"
   },
   "1f3cb-1f3fe-2642": {
     "aliases": [":man_lifting_weights_medium_dark_skin_tone:"],
-    "code": "1f3cb-fe0f-1f3fe-200d-2642-fe0f",
+    "code": "1f3cb-1f3fe-200d-2642-fe0f",
     "name": ":man_lifting_weights_tone4:"
   },
   "1f3cb-1f3ff": {
     "aliases": [":lifter_tone5:", ":weight_lifter_tone5:"],
-    "code": "1f3cb-fe0f-1f3ff",
+    "code": "1f3cb-1f3ff",
     "name": ":person_lifting_weights_tone5:"
   },
   "1f3cb-1f3ff-2640": {
     "aliases": [":woman_lifting_weights_dark_skin_tone:"],
-    "code": "1f3cb-fe0f-1f3ff-200d-2640-fe0f",
+    "code": "1f3cb-1f3ff-200d-2640-fe0f",
     "name": ":woman_lifting_weights_tone5:"
   },
   "1f3cb-1f3ff-2642": {
     "aliases": [":man_lifting_weights_dark_skin_tone:"],
-    "code": "1f3cb-fe0f-1f3ff-200d-2642-fe0f",
+    "code": "1f3cb-1f3ff-200d-2642-fe0f",
     "name": ":man_lifting_weights_tone5:"
   },
   "1f3cb-2640": {
@@ -3111,82 +3111,82 @@
   },
   "1f3cc": {
     "aliases": [":golfer:"],
-    "code": "1f3cc-fe0f",
+    "code": "1f3cc",
     "name": ":person_golfing:"
   },
   "1f3cc-1f3fb": {
     "aliases": [":person_golfing_light_skin_tone:"],
-    "code": "1f3cc-fe0f-1f3fb",
+    "code": "1f3cc-1f3fb",
     "name": ":person_golfing_tone1:"
   },
   "1f3cc-1f3fb-2640": {
     "aliases": [":woman_golfing_light_skin_tone:"],
-    "code": "1f3cc-fe0f-1f3fb-200d-2640-fe0f",
+    "code": "1f3cc-1f3fb-200d-2640-fe0f",
     "name": ":woman_golfing_tone1:"
   },
   "1f3cc-1f3fb-2642": {
     "aliases": [":man_golfing_light_skin_tone:"],
-    "code": "1f3cc-fe0f-1f3fb-200d-2642-fe0f",
+    "code": "1f3cc-1f3fb-200d-2642-fe0f",
     "name": ":man_golfing_tone1:"
   },
   "1f3cc-1f3fc": {
     "aliases": [":person_golfing_medium_light_skin_tone:"],
-    "code": "1f3cc-fe0f-1f3fc",
+    "code": "1f3cc-1f3fc",
     "name": ":person_golfing_tone2:"
   },
   "1f3cc-1f3fc-2640": {
     "aliases": [":woman_golfing_medium_light_skin_tone:"],
-    "code": "1f3cc-fe0f-1f3fc-200d-2640-fe0f",
+    "code": "1f3cc-1f3fc-200d-2640-fe0f",
     "name": ":woman_golfing_tone2:"
   },
   "1f3cc-1f3fc-2642": {
     "aliases": [":man_golfing_medium_light_skin_tone:"],
-    "code": "1f3cc-fe0f-1f3fc-200d-2642-fe0f",
+    "code": "1f3cc-1f3fc-200d-2642-fe0f",
     "name": ":man_golfing_tone2:"
   },
   "1f3cc-1f3fd": {
     "aliases": [":person_golfing_medium_skin_tone:"],
-    "code": "1f3cc-fe0f-1f3fd",
+    "code": "1f3cc-1f3fd",
     "name": ":person_golfing_tone3:"
   },
   "1f3cc-1f3fd-2640": {
     "aliases": [":woman_golfing_medium_skin_tone:"],
-    "code": "1f3cc-fe0f-1f3fd-200d-2640-fe0f",
+    "code": "1f3cc-1f3fd-200d-2640-fe0f",
     "name": ":woman_golfing_tone3:"
   },
   "1f3cc-1f3fd-2642": {
     "aliases": [":man_golfing_medium_skin_tone:"],
-    "code": "1f3cc-fe0f-1f3fd-200d-2642-fe0f",
+    "code": "1f3cc-1f3fd-200d-2642-fe0f",
     "name": ":man_golfing_tone3:"
   },
   "1f3cc-1f3fe": {
     "aliases": [":person_golfing_medium_dark_skin_tone:"],
-    "code": "1f3cc-fe0f-1f3fe",
+    "code": "1f3cc-1f3fe",
     "name": ":person_golfing_tone4:"
   },
   "1f3cc-1f3fe-2640": {
     "aliases": [":woman_golfing_medium_dark_skin_tone:"],
-    "code": "1f3cc-fe0f-1f3fe-200d-2640-fe0f",
+    "code": "1f3cc-1f3fe-200d-2640-fe0f",
     "name": ":woman_golfing_tone4:"
   },
   "1f3cc-1f3fe-2642": {
     "aliases": [":man_golfing_medium_dark_skin_tone:"],
-    "code": "1f3cc-fe0f-1f3fe-200d-2642-fe0f",
+    "code": "1f3cc-1f3fe-200d-2642-fe0f",
     "name": ":man_golfing_tone4:"
   },
   "1f3cc-1f3ff": {
     "aliases": [":person_golfing_dark_skin_tone:"],
-    "code": "1f3cc-fe0f-1f3ff",
+    "code": "1f3cc-1f3ff",
     "name": ":person_golfing_tone5:"
   },
   "1f3cc-1f3ff-2640": {
     "aliases": [":woman_golfing_dark_skin_tone:"],
-    "code": "1f3cc-fe0f-1f3ff-200d-2640-fe0f",
+    "code": "1f3cc-1f3ff-200d-2640-fe0f",
     "name": ":woman_golfing_tone5:"
   },
   "1f3cc-1f3ff-2642": {
     "aliases": [":man_golfing_dark_skin_tone:"],
-    "code": "1f3cc-fe0f-1f3ff-200d-2642-fe0f",
+    "code": "1f3cc-1f3ff-200d-2642-fe0f",
     "name": ":man_golfing_tone5:"
   },
   "1f3cc-2640": {
@@ -4479,6 +4479,26 @@
     "code": "1f468-1f3fb-200d-1f692",
     "name": ":man_firefighter_tone1:"
   },
+  "1f468-1f3fb-1f91d-1f468-1f3fc": {
+    "aliases": [":men_holding_hands_light_skin_tone_medium_light_skin_tone:"],
+    "code": "1f468-1f3fb-200d-1f91d-200d-1f468-1f3fc",
+    "name": ":men_holding_hands_tone1_tone2:"
+  },
+  "1f468-1f3fb-1f91d-1f468-1f3fd": {
+    "aliases": [":men_holding_hands_light_skin_tone_medium_skin_tone:"],
+    "code": "1f468-1f3fb-200d-1f91d-200d-1f468-1f3fd",
+    "name": ":men_holding_hands_tone1_tone3:"
+  },
+  "1f468-1f3fb-1f91d-1f468-1f3fe": {
+    "aliases": [":men_holding_hands_light_skin_tone_medium_dark_skin_tone:"],
+    "code": "1f468-1f3fb-200d-1f91d-200d-1f468-1f3fe",
+    "name": ":men_holding_hands_tone1_tone4:"
+  },
+  "1f468-1f3fb-1f91d-1f468-1f3ff": {
+    "aliases": [":men_holding_hands_light_skin_tone_dark_skin_tone:"],
+    "code": "1f468-1f3fb-200d-1f91d-200d-1f468-1f3ff",
+    "name": ":men_holding_hands_tone1_tone5:"
+  },
   "1f468-1f3fb-1f9af": {
     "aliases": [":man_with_probing_cane_light_skin_tone:"],
     "code": "1f468-1f3fb-200d-1f9af",
@@ -4603,6 +4623,21 @@
     "aliases": [":men_holding_hands_medium_light_skin_tone_light_skin_tone:"],
     "code": "1f468-1f3fc-200d-1f91d-200d-1f468-1f3fb",
     "name": ":men_holding_hands_tone2_tone1:"
+  },
+  "1f468-1f3fc-1f91d-1f468-1f3fd": {
+    "aliases": [":men_holding_hands_medium_light_skin_tone_medium_skin_tone:"],
+    "code": "1f468-1f3fc-200d-1f91d-200d-1f468-1f3fd",
+    "name": ":men_holding_hands_tone2_tone3:"
+  },
+  "1f468-1f3fc-1f91d-1f468-1f3fe": {
+    "aliases": [":men_holding_hands_medium_light_skin_tone_medium_dark_skin_tone:"],
+    "code": "1f468-1f3fc-200d-1f91d-200d-1f468-1f3fe",
+    "name": ":men_holding_hands_tone2_tone4:"
+  },
+  "1f468-1f3fc-1f91d-1f468-1f3ff": {
+    "aliases": [":men_holding_hands_medium_light_skin_tone_dark_skin_tone:"],
+    "code": "1f468-1f3fc-200d-1f91d-200d-1f468-1f3ff",
+    "name": ":men_holding_hands_tone2_tone5:"
   },
   "1f468-1f3fc-1f9af": {
     "aliases": [":man_with_probing_cane_medium_light_skin_tone:"],
@@ -4733,6 +4768,16 @@
     "aliases": [":men_holding_hands_medium_skin_tone_medium_light_skin_tone:"],
     "code": "1f468-1f3fd-200d-1f91d-200d-1f468-1f3fc",
     "name": ":men_holding_hands_tone3_tone2:"
+  },
+  "1f468-1f3fd-1f91d-1f468-1f3fe": {
+    "aliases": [":men_holding_hands_medium_skin_tone_medium_dark_skin_tone:"],
+    "code": "1f468-1f3fd-200d-1f91d-200d-1f468-1f3fe",
+    "name": ":men_holding_hands_tone3_tone4:"
+  },
+  "1f468-1f3fd-1f91d-1f468-1f3ff": {
+    "aliases": [":men_holding_hands_medium_skin_tone_dark_skin_tone:"],
+    "code": "1f468-1f3fd-200d-1f91d-200d-1f468-1f3ff",
+    "name": ":men_holding_hands_tone3_tone5:"
   },
   "1f468-1f3fd-1f9af": {
     "aliases": [":man_with_probing_cane_medium_skin_tone:"],
@@ -4868,6 +4913,11 @@
     "aliases": [":men_holding_hands_medium_dark_skin_tone_medium_skin_tone:"],
     "code": "1f468-1f3fe-200d-1f91d-200d-1f468-1f3fd",
     "name": ":men_holding_hands_tone4_tone3:"
+  },
+  "1f468-1f3fe-1f91d-1f468-1f3ff": {
+    "aliases": [":men_holding_hands_medium_dark_skin_tone_dark_skin_tone:"],
+    "code": "1f468-1f3fe-200d-1f91d-200d-1f468-1f3ff",
+    "name": ":men_holding_hands_tone4_tone5:"
   },
   "1f468-1f3fe-1f9af": {
     "aliases": [":man_with_probing_cane_medium_dark_skin_tone:"],
@@ -5221,7 +5271,7 @@
   },
   "1f468-2764-1f48b-1f468": {
     "aliases": [":couplekiss_mm:"],
-    "code": "1f468-200d-2764-fe0f-200d-1f48b-1f468",
+    "code": "1f468-200d-2764-fe0f-200d-1f48b-200d-1f468",
     "name": ":kiss_mm:"
   },
   "1f469": {
@@ -5353,6 +5403,26 @@
     "aliases": [":woman_and_man_holding_hands_light_skin_tone_dark_skin_tone:"],
     "code": "1f469-1f3fb-200d-1f91d-200d-1f468-1f3ff",
     "name": ":woman_and_man_holding_hands_tone1_tone5:"
+  },
+  "1f469-1f3fb-1f91d-1f469-1f3fc": {
+    "aliases": [":women_holding_hands_light_skin_tone_medium_light_skin_tone:"],
+    "code": "1f469-1f3fb-200d-1f91d-200d-1f469-1f3fc",
+    "name": ":women_holding_hands_tone1_tone2:"
+  },
+  "1f469-1f3fb-1f91d-1f469-1f3fd": {
+    "aliases": [":women_holding_hands_light_skin_tone_medium_skin_tone:"],
+    "code": "1f469-1f3fb-200d-1f91d-200d-1f469-1f3fd",
+    "name": ":women_holding_hands_tone1_tone3:"
+  },
+  "1f469-1f3fb-1f91d-1f469-1f3fe": {
+    "aliases": [":women_holding_hands_light_skin_tone_medium_dark_skin_tone:"],
+    "code": "1f469-1f3fb-200d-1f91d-200d-1f469-1f3fe",
+    "name": ":women_holding_hands_tone1_tone4:"
+  },
+  "1f469-1f3fb-1f91d-1f469-1f3ff": {
+    "aliases": [":women_holding_hands_light_skin_tone_dark_skin_tone:"],
+    "code": "1f469-1f3fb-200d-1f91d-200d-1f469-1f3ff",
+    "name": ":women_holding_hands_tone1_tone5:"
   },
   "1f469-1f3fb-1f9af": {
     "aliases": [":woman_with_probing_cane_light_skin_tone:"],
@@ -5498,6 +5568,21 @@
     "aliases": [":women_holding_hands_medium_light_skin_tone_light_skin_tone:"],
     "code": "1f469-1f3fc-200d-1f91d-200d-1f469-1f3fb",
     "name": ":women_holding_hands_tone2_tone1:"
+  },
+  "1f469-1f3fc-1f91d-1f469-1f3fd": {
+    "aliases": [":women_holding_hands_medium_light_skin_tone_medium_skin_tone:"],
+    "code": "1f469-1f3fc-200d-1f91d-200d-1f469-1f3fd",
+    "name": ":women_holding_hands_tone2_tone3:"
+  },
+  "1f469-1f3fc-1f91d-1f469-1f3fe": {
+    "aliases": [":women_holding_hands_medium_light_skin_tone_medium_dark_skin_tone:"],
+    "code": "1f469-1f3fc-200d-1f91d-200d-1f469-1f3fe",
+    "name": ":women_holding_hands_tone2_tone4:"
+  },
+  "1f469-1f3fc-1f91d-1f469-1f3ff": {
+    "aliases": [":women_holding_hands_medium_light_skin_tone_dark_skin_tone:"],
+    "code": "1f469-1f3fc-200d-1f91d-200d-1f469-1f3ff",
+    "name": ":women_holding_hands_tone2_tone5:"
   },
   "1f469-1f3fc-1f9af": {
     "aliases": [":woman_with_probing_cane_medium_light_skin_tone:"],
@@ -5648,6 +5733,16 @@
     "aliases": [":women_holding_hands_medium_skin_tone_medium_light_skin_tone:"],
     "code": "1f469-1f3fd-200d-1f91d-200d-1f469-1f3fc",
     "name": ":women_holding_hands_tone3_tone2:"
+  },
+  "1f469-1f3fd-1f91d-1f469-1f3fe": {
+    "aliases": [":women_holding_hands_medium_skin_tone_medium_dark_skin_tone:"],
+    "code": "1f469-1f3fd-200d-1f91d-200d-1f469-1f3fe",
+    "name": ":women_holding_hands_tone3_tone4:"
+  },
+  "1f469-1f3fd-1f91d-1f469-1f3ff": {
+    "aliases": [":women_holding_hands_medium_skin_tone_dark_skin_tone:"],
+    "code": "1f469-1f3fd-200d-1f91d-200d-1f469-1f3ff",
+    "name": ":women_holding_hands_tone3_tone5:"
   },
   "1f469-1f3fd-1f9af": {
     "aliases": [":woman_with_probing_cane_medium_skin_tone:"],
@@ -5803,6 +5898,11 @@
     "aliases": [":women_holding_hands_medium_dark_skin_tone_medium_skin_tone:"],
     "code": "1f469-1f3fe-200d-1f91d-200d-1f469-1f3fd",
     "name": ":women_holding_hands_tone4_tone3:"
+  },
+  "1f469-1f3fe-1f91d-1f469-1f3ff": {
+    "aliases": [":women_holding_hands_medium_dark_skin_tone_dark_skin_tone:"],
+    "code": "1f469-1f3fe-200d-1f91d-200d-1f469-1f3ff",
+    "name": ":women_holding_hands_tone4_tone5:"
   },
   "1f469-1f3fe-1f9af": {
     "aliases": [":woman_with_probing_cane_medium_dark_skin_tone:"],
@@ -6156,12 +6256,12 @@
   },
   "1f469-2764-1f48b-1f468": {
     "aliases": [],
-    "code": "1f469-200d-2764-fe0f-200d-1f48b-1f468",
+    "code": "1f469-200d-2764-fe0f-200d-1f48b-200d-1f468",
     "name": ":kiss_woman_man:"
   },
   "1f469-2764-1f48b-1f469": {
     "aliases": [":couplekiss_ww:"],
-    "code": "1f469-200d-2764-fe0f-200d-1f48b-1f469",
+    "code": "1f469-200d-2764-fe0f-200d-1f48b-200d-1f469",
     "name": ":kiss_ww:"
   },
   "1f46a": {
@@ -7857,7 +7957,7 @@
   "1f4f1": {
     "aliases": [],
     "code": "1f4f1",
-    "name": ":iphone:"
+    "name": ":mobile_phone:"
   },
   "1f4f2": {
     "aliases": [],
@@ -8406,107 +8506,107 @@
   },
   "1f574-1f3fb": {
     "aliases": [":man_in_business_suit_levitating_tone1:", ":man_in_business_suit_levitating_light_skin_tone:"],
-    "code": "1f574-fe0f-1f3fb",
+    "code": "1f574-1f3fb",
     "name": ":levitate_tone1:"
   },
   "1f574-1f3fc": {
     "aliases": [":man_in_business_suit_levitating_tone2:", ":man_in_business_suit_levitating_medium_light_skin_tone:"],
-    "code": "1f574-fe0f-1f3fc",
+    "code": "1f574-1f3fc",
     "name": ":levitate_tone2:"
   },
   "1f574-1f3fd": {
     "aliases": [":man_in_business_suit_levitating_tone3:", ":man_in_business_suit_levitating_medium_skin_tone:"],
-    "code": "1f574-fe0f-1f3fd",
+    "code": "1f574-1f3fd",
     "name": ":levitate_tone3:"
   },
   "1f574-1f3fe": {
     "aliases": [":man_in_business_suit_levitating_tone4:", ":man_in_business_suit_levitating_medium_dark_skin_tone:"],
-    "code": "1f574-fe0f-1f3fe",
+    "code": "1f574-1f3fe",
     "name": ":levitate_tone4:"
   },
   "1f574-1f3ff": {
     "aliases": [":man_in_business_suit_levitating_tone5:", ":man_in_business_suit_levitating_dark_skin_tone:"],
-    "code": "1f574-fe0f-1f3ff",
+    "code": "1f574-1f3ff",
     "name": ":levitate_tone5:"
   },
   "1f575": {
     "aliases": [":spy:", ":sleuth_or_spy:"],
-    "code": "1f575-fe0f",
+    "code": "1f575",
     "name": ":detective:"
   },
   "1f575-1f3fb": {
     "aliases": [":spy_tone1:", ":sleuth_or_spy_tone1:"],
-    "code": "1f575-fe0f-1f3fb",
+    "code": "1f575-1f3fb",
     "name": ":detective_tone1:"
   },
   "1f575-1f3fb-2640": {
     "aliases": [":woman_detective_light_skin_tone:"],
-    "code": "1f575-fe0f-1f3fb-200d-2640-fe0f",
+    "code": "1f575-1f3fb-200d-2640-fe0f",
     "name": ":woman_detective_tone1:"
   },
   "1f575-1f3fb-2642": {
     "aliases": [":man_detective_light_skin_tone:"],
-    "code": "1f575-fe0f-1f3fb-200d-2642-fe0f",
+    "code": "1f575-1f3fb-200d-2642-fe0f",
     "name": ":man_detective_tone1:"
   },
   "1f575-1f3fc": {
     "aliases": [":spy_tone2:", ":sleuth_or_spy_tone2:"],
-    "code": "1f575-fe0f-1f3fc",
+    "code": "1f575-1f3fc",
     "name": ":detective_tone2:"
   },
   "1f575-1f3fc-2640": {
     "aliases": [":woman_detective_medium_light_skin_tone:"],
-    "code": "1f575-fe0f-1f3fc-200d-2640-fe0f",
+    "code": "1f575-1f3fc-200d-2640-fe0f",
     "name": ":woman_detective_tone2:"
   },
   "1f575-1f3fc-2642": {
     "aliases": [":man_detective_medium_light_skin_tone:"],
-    "code": "1f575-fe0f-1f3fc-200d-2642-fe0f",
+    "code": "1f575-1f3fc-200d-2642-fe0f",
     "name": ":man_detective_tone2:"
   },
   "1f575-1f3fd": {
     "aliases": [":spy_tone3:", ":sleuth_or_spy_tone3:"],
-    "code": "1f575-fe0f-1f3fd",
+    "code": "1f575-1f3fd",
     "name": ":detective_tone3:"
   },
   "1f575-1f3fd-2640": {
     "aliases": [":woman_detective_medium_skin_tone:"],
-    "code": "1f575-fe0f-1f3fd-200d-2640-fe0f",
+    "code": "1f575-1f3fd-200d-2640-fe0f",
     "name": ":woman_detective_tone3:"
   },
   "1f575-1f3fd-2642": {
     "aliases": [":man_detective_medium_skin_tone:"],
-    "code": "1f575-fe0f-1f3fd-200d-2642-fe0f",
+    "code": "1f575-1f3fd-200d-2642-fe0f",
     "name": ":man_detective_tone3:"
   },
   "1f575-1f3fe": {
     "aliases": [":spy_tone4:", ":sleuth_or_spy_tone4:"],
-    "code": "1f575-fe0f-1f3fe",
+    "code": "1f575-1f3fe",
     "name": ":detective_tone4:"
   },
   "1f575-1f3fe-2640": {
     "aliases": [":woman_detective_medium_dark_skin_tone:"],
-    "code": "1f575-fe0f-1f3fe-200d-2640-fe0f",
+    "code": "1f575-1f3fe-200d-2640-fe0f",
     "name": ":woman_detective_tone4:"
   },
   "1f575-1f3fe-2642": {
     "aliases": [":man_detective_medium_dark_skin_tone:"],
-    "code": "1f575-fe0f-1f3fe-200d-2642-fe0f",
+    "code": "1f575-1f3fe-200d-2642-fe0f",
     "name": ":man_detective_tone4:"
   },
   "1f575-1f3ff": {
     "aliases": [":spy_tone5:", ":sleuth_or_spy_tone5:"],
-    "code": "1f575-fe0f-1f3ff",
+    "code": "1f575-1f3ff",
     "name": ":detective_tone5:"
   },
   "1f575-1f3ff-2640": {
     "aliases": [":woman_detective_dark_skin_tone:"],
-    "code": "1f575-fe0f-1f3ff-200d-2640-fe0f",
+    "code": "1f575-1f3ff-200d-2640-fe0f",
     "name": ":woman_detective_tone5:"
   },
   "1f575-1f3ff-2642": {
     "aliases": [":man_detective_dark_skin_tone:"],
-    "code": "1f575-fe0f-1f3ff-200d-2642-fe0f",
+    "code": "1f575-1f3ff-200d-2642-fe0f",
     "name": ":man_detective_tone5:"
   },
   "1f575-2640": {
@@ -8596,32 +8696,32 @@
   },
   "1f590": {
     "aliases": [":raised_hand_with_fingers_splayed:"],
-    "code": "1f590-fe0f",
+    "code": "1f590",
     "name": ":hand_splayed:"
   },
   "1f590-1f3fb": {
     "aliases": [":raised_hand_with_fingers_splayed_tone1:"],
-    "code": "1f590-fe0f-1f3fb",
+    "code": "1f590-1f3fb",
     "name": ":hand_splayed_tone1:"
   },
   "1f590-1f3fc": {
     "aliases": [":raised_hand_with_fingers_splayed_tone2:"],
-    "code": "1f590-fe0f-1f3fc",
+    "code": "1f590-1f3fc",
     "name": ":hand_splayed_tone2:"
   },
   "1f590-1f3fd": {
     "aliases": [":raised_hand_with_fingers_splayed_tone3:"],
-    "code": "1f590-fe0f-1f3fd",
+    "code": "1f590-1f3fd",
     "name": ":hand_splayed_tone3:"
   },
   "1f590-1f3fe": {
     "aliases": [":raised_hand_with_fingers_splayed_tone4:"],
-    "code": "1f590-fe0f-1f3fe",
+    "code": "1f590-1f3fe",
     "name": ":hand_splayed_tone4:"
   },
   "1f590-1f3ff": {
     "aliases": [":raised_hand_with_fingers_splayed_tone5:"],
-    "code": "1f590-fe0f-1f3ff",
+    "code": "1f590-1f3ff",
     "name": ":hand_splayed_tone5:"
   },
   "1f595": {
@@ -11661,12 +11761,12 @@
   },
   "1f93c-2640": {
     "aliases": [],
-    "code": "1f93c-2640-fe0f",
+    "code": "1f93c-200d-2640-fe0f",
     "name": ":women_wrestling:"
   },
   "1f93c-2642": {
     "aliases": [],
-    "code": "1f93c-2642-fe0f",
+    "code": "1f93c-200d-2642-fe0f",
     "name": ":men_wrestling:"
   },
   "1f93d": {
@@ -13024,20 +13124,255 @@
     "code": "1f9d1",
     "name": ":adult:"
   },
+  "1f9d1-1f33e": {
+    "aliases": [],
+    "code": "1f9d1-200d-1f33e",
+    "name": ":farmer:"
+  },
+  "1f9d1-1f373": {
+    "aliases": [],
+    "code": "1f9d1-200d-1f373",
+    "name": ":cook:"
+  },
+  "1f9d1-1f393": {
+    "aliases": [],
+    "code": "1f9d1-200d-1f393",
+    "name": ":student:"
+  },
+  "1f9d1-1f3a4": {
+    "aliases": [],
+    "code": "1f9d1-200d-1f3a4",
+    "name": ":singer:"
+  },
+  "1f9d1-1f3a8": {
+    "aliases": [],
+    "code": "1f9d1-200d-1f3a8",
+    "name": ":artist:"
+  },
+  "1f9d1-1f3eb": {
+    "aliases": [],
+    "code": "1f9d1-200d-1f3eb",
+    "name": ":teacher:"
+  },
+  "1f9d1-1f3ed": {
+    "aliases": [],
+    "code": "1f9d1-200d-1f3ed",
+    "name": ":factory_worker:"
+  },
   "1f9d1-1f3fb": {
     "aliases": [":adult_light_skin_tone:"],
     "code": "1f9d1-1f3fb",
     "name": ":adult_tone1:"
+  },
+  "1f9d1-1f3fb-1f33e": {
+    "aliases": [":farmer_light_skin_tone:"],
+    "code": "1f9d1-1f3fb-200d-1f33e",
+    "name": ":farmer_tone1:"
+  },
+  "1f9d1-1f3fb-1f373": {
+    "aliases": [":cook_light_skin_tone:"],
+    "code": "1f9d1-1f3fb-200d-1f373",
+    "name": ":cook_tone1:"
+  },
+  "1f9d1-1f3fb-1f393": {
+    "aliases": [":student_light_skin_tone:"],
+    "code": "1f9d1-1f3fb-200d-1f393",
+    "name": ":student_tone1:"
+  },
+  "1f9d1-1f3fb-1f3a4": {
+    "aliases": [":singer_light_skin_tone:"],
+    "code": "1f9d1-1f3fb-200d-1f3a4",
+    "name": ":singer_tone1:"
+  },
+  "1f9d1-1f3fb-1f3a8": {
+    "aliases": [":artist_light_skin_tone:"],
+    "code": "1f9d1-1f3fb-200d-1f3a8",
+    "name": ":artist_tone1:"
+  },
+  "1f9d1-1f3fb-1f3eb": {
+    "aliases": [":teacher_light_skin_tone:"],
+    "code": "1f9d1-1f3fb-200d-1f3eb",
+    "name": ":teacher_tone1:"
+  },
+  "1f9d1-1f3fb-1f3ed": {
+    "aliases": [":factory_worker_light_skin_tone:"],
+    "code": "1f9d1-1f3fb-200d-1f3ed",
+    "name": ":factory_worker_tone1:"
+  },
+  "1f9d1-1f3fb-1f4bb": {
+    "aliases": [":technologist_light_skin_tone:"],
+    "code": "1f9d1-1f3fb-200d-1f4bb",
+    "name": ":technologist_tone1:"
+  },
+  "1f9d1-1f3fb-1f4bc": {
+    "aliases": [":office_worker_light_skin_tone:"],
+    "code": "1f9d1-1f3fb-200d-1f4bc",
+    "name": ":office_worker_tone1:"
+  },
+  "1f9d1-1f3fb-1f527": {
+    "aliases": [":mechanic_light_skin_tone:"],
+    "code": "1f9d1-1f3fb-200d-1f527",
+    "name": ":mechanic_tone1:"
+  },
+  "1f9d1-1f3fb-1f52c": {
+    "aliases": [":scientist_light_skin_tone:"],
+    "code": "1f9d1-1f3fb-200d-1f52c",
+    "name": ":scientist_tone1:"
+  },
+  "1f9d1-1f3fb-1f680": {
+    "aliases": [":astronaut_light_skin_tone:"],
+    "code": "1f9d1-1f3fb-200d-1f680",
+    "name": ":astronaut_tone1:"
+  },
+  "1f9d1-1f3fb-1f692": {
+    "aliases": [":firefighter_light_skin_tone:"],
+    "code": "1f9d1-1f3fb-200d-1f692",
+    "name": ":firefighter_tone1:"
   },
   "1f9d1-1f3fb-1f91d-1f9d1-1f3fb": {
     "aliases": [":people_holding_hands_light_skin_tone:"],
     "code": "1f9d1-1f3fb-200d-1f91d-200d-1f9d1-1f3fb",
     "name": ":people_holding_hands_tone1:"
   },
+  "1f9d1-1f3fb-1f91d-1f9d1-1f3fc": {
+    "aliases": [":people_holding_hands_light_skin_tone_medium_light_skin_tone:"],
+    "code": "1f9d1-1f3fb-200d-1f91d-200d-1f9d1-1f3fc",
+    "name": ":people_holding_hands_tone1_tone2:"
+  },
+  "1f9d1-1f3fb-1f91d-1f9d1-1f3fd": {
+    "aliases": [":people_holding_hands_light_skin_tone_medium_skin_tone:"],
+    "code": "1f9d1-1f3fb-200d-1f91d-200d-1f9d1-1f3fd",
+    "name": ":people_holding_hands_tone1_tone3:"
+  },
+  "1f9d1-1f3fb-1f91d-1f9d1-1f3fe": {
+    "aliases": [":people_holding_hands_light_skin_tone_medium_dark_skin_tone:"],
+    "code": "1f9d1-1f3fb-200d-1f91d-200d-1f9d1-1f3fe",
+    "name": ":people_holding_hands_tone1_tone4:"
+  },
+  "1f9d1-1f3fb-1f91d-1f9d1-1f3ff": {
+    "aliases": [":people_holding_hands_light_skin_tone_dark_skin_tone:"],
+    "code": "1f9d1-1f3fb-200d-1f91d-200d-1f9d1-1f3ff",
+    "name": ":people_holding_hands_tone1_tone5:"
+  },
+  "1f9d1-1f3fb-1f9af": {
+    "aliases": [":person_with_probing_cane_light_skin_tone:"],
+    "code": "1f9d1-1f3fb-200d-1f9af",
+    "name": ":person_with_probing_cane_tone1:"
+  },
+  "1f9d1-1f3fb-1f9b0": {
+    "aliases": [":person_light_skin_tone_red_hair:"],
+    "code": "1f9d1-1f3fb-200d-1f9b0",
+    "name": ":person_tone1_red_hair:"
+  },
+  "1f9d1-1f3fb-1f9b1": {
+    "aliases": [":person_light_skin_tone_curly_hair:"],
+    "code": "1f9d1-1f3fb-200d-1f9b1",
+    "name": ":person_tone1_curly_hair:"
+  },
+  "1f9d1-1f3fb-1f9b2": {
+    "aliases": [":person_light_skin_tone_bald:"],
+    "code": "1f9d1-1f3fb-200d-1f9b2",
+    "name": ":person_tone1_bald:"
+  },
+  "1f9d1-1f3fb-1f9b3": {
+    "aliases": [":person_light_skin_tone_white_hair:"],
+    "code": "1f9d1-1f3fb-200d-1f9b3",
+    "name": ":person_tone1_white_hair:"
+  },
+  "1f9d1-1f3fb-1f9bc": {
+    "aliases": [":person_in_motorized_wheelchair_light_skin_tone:"],
+    "code": "1f9d1-1f3fb-200d-1f9bc",
+    "name": ":person_in_motorized_wheelchair_tone1:"
+  },
+  "1f9d1-1f3fb-1f9bd": {
+    "aliases": [":person_in_manual_wheelchair_light_skin_tone:"],
+    "code": "1f9d1-1f3fb-200d-1f9bd",
+    "name": ":person_in_manual_wheelchair_tone1:"
+  },
+  "1f9d1-1f3fb-2695": {
+    "aliases": [":health_worker_light_skin_tone:"],
+    "code": "1f9d1-1f3fb-200d-2695-fe0f",
+    "name": ":health_worker_tone1:"
+  },
+  "1f9d1-1f3fb-2696": {
+    "aliases": [":judge_light_skin_tone:"],
+    "code": "1f9d1-1f3fb-200d-2696-fe0f",
+    "name": ":judge_tone1:"
+  },
+  "1f9d1-1f3fb-2708": {
+    "aliases": [":pilot_light_skin_tone:"],
+    "code": "1f9d1-1f3fb-200d-2708-fe0f",
+    "name": ":pilot_tone1:"
+  },
   "1f9d1-1f3fc": {
     "aliases": [":adult_medium_light_skin_tone:"],
     "code": "1f9d1-1f3fc",
     "name": ":adult_tone2:"
+  },
+  "1f9d1-1f3fc-1f33e": {
+    "aliases": [":farmer_medium_light_skin_tone:"],
+    "code": "1f9d1-1f3fc-200d-1f33e",
+    "name": ":farmer_tone2:"
+  },
+  "1f9d1-1f3fc-1f373": {
+    "aliases": [":cook_medium_light_skin_tone:"],
+    "code": "1f9d1-1f3fc-200d-1f373",
+    "name": ":cook_tone2:"
+  },
+  "1f9d1-1f3fc-1f393": {
+    "aliases": [":student_medium_light_skin_tone:"],
+    "code": "1f9d1-1f3fc-200d-1f393",
+    "name": ":student_tone2:"
+  },
+  "1f9d1-1f3fc-1f3a4": {
+    "aliases": [":singer_medium_light_skin_tone:"],
+    "code": "1f9d1-1f3fc-200d-1f3a4",
+    "name": ":singer_tone2:"
+  },
+  "1f9d1-1f3fc-1f3a8": {
+    "aliases": [":artist_medium_light_skin_tone:"],
+    "code": "1f9d1-1f3fc-200d-1f3a8",
+    "name": ":artist_tone2:"
+  },
+  "1f9d1-1f3fc-1f3eb": {
+    "aliases": [":teacher_medium_light_skin_tone:"],
+    "code": "1f9d1-1f3fc-200d-1f3eb",
+    "name": ":teacher_tone2:"
+  },
+  "1f9d1-1f3fc-1f3ed": {
+    "aliases": [":factory_worker_medium_light_skin_tone:"],
+    "code": "1f9d1-1f3fc-200d-1f3ed",
+    "name": ":factory_worker_tone2:"
+  },
+  "1f9d1-1f3fc-1f4bb": {
+    "aliases": [":technologist_medium_light_skin_tone:"],
+    "code": "1f9d1-1f3fc-200d-1f4bb",
+    "name": ":technologist_tone2:"
+  },
+  "1f9d1-1f3fc-1f4bc": {
+    "aliases": [":office_worker_medium_light_skin_tone:"],
+    "code": "1f9d1-1f3fc-200d-1f4bc",
+    "name": ":office_worker_tone2:"
+  },
+  "1f9d1-1f3fc-1f527": {
+    "aliases": [":mechanic_medium_light_skin_tone:"],
+    "code": "1f9d1-1f3fc-200d-1f527",
+    "name": ":mechanic_tone2:"
+  },
+  "1f9d1-1f3fc-1f52c": {
+    "aliases": [":scientist_medium_light_skin_tone:"],
+    "code": "1f9d1-1f3fc-200d-1f52c",
+    "name": ":scientist_tone2:"
+  },
+  "1f9d1-1f3fc-1f680": {
+    "aliases": [":astronaut_medium_light_skin_tone:"],
+    "code": "1f9d1-1f3fc-200d-1f680",
+    "name": ":astronaut_tone2:"
+  },
+  "1f9d1-1f3fc-1f692": {
+    "aliases": [":firefighter_medium_light_skin_tone:"],
+    "code": "1f9d1-1f3fc-200d-1f692",
+    "name": ":firefighter_tone2:"
   },
   "1f9d1-1f3fc-1f91d-1f9d1-1f3fb": {
     "aliases": [":people_holding_hands_medium_light_skin_tone_light_skin_tone:"],
@@ -13049,10 +13384,140 @@
     "code": "1f9d1-1f3fc-200d-1f91d-200d-1f9d1-1f3fc",
     "name": ":people_holding_hands_tone2:"
   },
+  "1f9d1-1f3fc-1f91d-1f9d1-1f3fd": {
+    "aliases": [":people_holding_hands_medium_light_skin_tone_medium_skin_tone:"],
+    "code": "1f9d1-1f3fc-200d-1f91d-200d-1f9d1-1f3fd",
+    "name": ":people_holding_hands_tone2_tone3:"
+  },
+  "1f9d1-1f3fc-1f91d-1f9d1-1f3fe": {
+    "aliases": [":people_holding_hands_medium_light_skin_tone_medium_dark_skin_tone:"],
+    "code": "1f9d1-1f3fc-200d-1f91d-200d-1f9d1-1f3fe",
+    "name": ":people_holding_hands_tone2_tone4:"
+  },
+  "1f9d1-1f3fc-1f91d-1f9d1-1f3ff": {
+    "aliases": [":people_holding_hands_medium_light_skin_tone_dark_skin_tone:"],
+    "code": "1f9d1-1f3fc-200d-1f91d-200d-1f9d1-1f3ff",
+    "name": ":people_holding_hands_tone2_tone5:"
+  },
+  "1f9d1-1f3fc-1f9af": {
+    "aliases": [":person_with_probing_cane_medium_light_skin_tone:"],
+    "code": "1f9d1-1f3fc-200d-1f9af",
+    "name": ":person_with_probing_cane_tone2:"
+  },
+  "1f9d1-1f3fc-1f9b0": {
+    "aliases": [":person_medium_light_skin_tone_red_hair:"],
+    "code": "1f9d1-1f3fc-200d-1f9b0",
+    "name": ":person_tone2_red_hair:"
+  },
+  "1f9d1-1f3fc-1f9b1": {
+    "aliases": [":person_medium_light_skin_tone_curly_hair:"],
+    "code": "1f9d1-1f3fc-200d-1f9b1",
+    "name": ":person_tone2_curly_hair:"
+  },
+  "1f9d1-1f3fc-1f9b2": {
+    "aliases": [":person_medium_light_skin_tone_bald:"],
+    "code": "1f9d1-1f3fc-200d-1f9b2",
+    "name": ":person_tone2_bald:"
+  },
+  "1f9d1-1f3fc-1f9b3": {
+    "aliases": [":person_medium_light_skin_tone_white_hair:"],
+    "code": "1f9d1-1f3fc-200d-1f9b3",
+    "name": ":person_tone2_white_hair:"
+  },
+  "1f9d1-1f3fc-1f9bc": {
+    "aliases": [":person_in_motorized_wheelchair_medium_light_skin_tone:"],
+    "code": "1f9d1-1f3fc-200d-1f9bc",
+    "name": ":person_in_motorized_wheelchair_tone2:"
+  },
+  "1f9d1-1f3fc-1f9bd": {
+    "aliases": [":person_in_manual_wheelchair_medium_light_skin_tone:"],
+    "code": "1f9d1-1f3fc-200d-1f9bd",
+    "name": ":person_in_manual_wheelchair_tone2:"
+  },
+  "1f9d1-1f3fc-2695": {
+    "aliases": [":health_worker_medium_light_skin_tone:"],
+    "code": "1f9d1-1f3fc-200d-2695-fe0f",
+    "name": ":health_worker_tone2:"
+  },
+  "1f9d1-1f3fc-2696": {
+    "aliases": [":judge_medium_light_skin_tone:"],
+    "code": "1f9d1-1f3fc-200d-2696-fe0f",
+    "name": ":judge_tone2:"
+  },
+  "1f9d1-1f3fc-2708": {
+    "aliases": [":pilot_medium_light_skin_tone:"],
+    "code": "1f9d1-1f3fc-200d-2708-fe0f",
+    "name": ":pilot_tone2:"
+  },
   "1f9d1-1f3fd": {
     "aliases": [":adult_medium_skin_tone:"],
     "code": "1f9d1-1f3fd",
     "name": ":adult_tone3:"
+  },
+  "1f9d1-1f3fd-1f33e": {
+    "aliases": [":farmer_medium_skin_tone:"],
+    "code": "1f9d1-1f3fd-200d-1f33e",
+    "name": ":farmer_tone3:"
+  },
+  "1f9d1-1f3fd-1f373": {
+    "aliases": [":cook_medium_skin_tone:"],
+    "code": "1f9d1-1f3fd-200d-1f373",
+    "name": ":cook_tone3:"
+  },
+  "1f9d1-1f3fd-1f393": {
+    "aliases": [":student_medium_skin_tone:"],
+    "code": "1f9d1-1f3fd-200d-1f393",
+    "name": ":student_tone3:"
+  },
+  "1f9d1-1f3fd-1f3a4": {
+    "aliases": [":singer_medium_skin_tone:"],
+    "code": "1f9d1-1f3fd-200d-1f3a4",
+    "name": ":singer_tone3:"
+  },
+  "1f9d1-1f3fd-1f3a8": {
+    "aliases": [":artist_medium_skin_tone:"],
+    "code": "1f9d1-1f3fd-200d-1f3a8",
+    "name": ":artist_tone3:"
+  },
+  "1f9d1-1f3fd-1f3eb": {
+    "aliases": [":teacher_medium_skin_tone:"],
+    "code": "1f9d1-1f3fd-200d-1f3eb",
+    "name": ":teacher_tone3:"
+  },
+  "1f9d1-1f3fd-1f3ed": {
+    "aliases": [":factory_worker_medium_skin_tone:"],
+    "code": "1f9d1-1f3fd-200d-1f3ed",
+    "name": ":factory_worker_tone3:"
+  },
+  "1f9d1-1f3fd-1f4bb": {
+    "aliases": [":technologist_medium_skin_tone:"],
+    "code": "1f9d1-1f3fd-200d-1f4bb",
+    "name": ":technologist_tone3:"
+  },
+  "1f9d1-1f3fd-1f4bc": {
+    "aliases": [":office_worker_medium_skin_tone:"],
+    "code": "1f9d1-1f3fd-200d-1f4bc",
+    "name": ":office_worker_tone3:"
+  },
+  "1f9d1-1f3fd-1f527": {
+    "aliases": [":mechanic_medium_skin_tone:"],
+    "code": "1f9d1-1f3fd-200d-1f527",
+    "name": ":mechanic_tone3:"
+  },
+  "1f9d1-1f3fd-1f52c": {
+    "aliases": [":scientist_medium_skin_tone:"],
+    "code": "1f9d1-1f3fd-200d-1f52c",
+    "name": ":scientist_tone3:"
+  },
+  "1f9d1-1f3fd-1f680": {
+    "aliases": [":astronaut_medium_skin_tone:"],
+    "code": "1f9d1-1f3fd-200d-1f680",
+    "name": ":astronaut_tone3:"
+  },
+  "1f9d1-1f3fd-1f692": {
+    "aliases": [":firefighter_medium_skin_tone:"],
+    "code": "1f9d1-1f3fd-200d-1f692",
+    "name": ":firefighter_tone3:"
   },
   "1f9d1-1f3fd-1f91d-1f9d1-1f3fb": {
     "aliases": [":people_holding_hands_medium_skin_tone_light_skin_tone:"],
@@ -13069,10 +13534,135 @@
     "code": "1f9d1-1f3fd-200d-1f91d-200d-1f9d1-1f3fd",
     "name": ":people_holding_hands_tone3:"
   },
+  "1f9d1-1f3fd-1f91d-1f9d1-1f3fe": {
+    "aliases": [":people_holding_hands_medium_skin_tone_medium_dark_skin_tone:"],
+    "code": "1f9d1-1f3fd-200d-1f91d-200d-1f9d1-1f3fe",
+    "name": ":people_holding_hands_tone3_tone4:"
+  },
+  "1f9d1-1f3fd-1f91d-1f9d1-1f3ff": {
+    "aliases": [":people_holding_hands_medium_skin_tone_dark_skin_tone:"],
+    "code": "1f9d1-1f3fd-200d-1f91d-200d-1f9d1-1f3ff",
+    "name": ":people_holding_hands_tone3_tone5:"
+  },
+  "1f9d1-1f3fd-1f9af": {
+    "aliases": [":person_with_probing_cane_medium_skin_tone:"],
+    "code": "1f9d1-1f3fd-200d-1f9af",
+    "name": ":person_with_probing_cane_tone3:"
+  },
+  "1f9d1-1f3fd-1f9b0": {
+    "aliases": [":person_medium_skin_tone_red_hair:"],
+    "code": "1f9d1-1f3fd-200d-1f9b0",
+    "name": ":person_tone3_red_hair:"
+  },
+  "1f9d1-1f3fd-1f9b1": {
+    "aliases": [":person_medium_skin_tone_curly_hair:"],
+    "code": "1f9d1-1f3fd-200d-1f9b1",
+    "name": ":person_tone3_curly_hair:"
+  },
+  "1f9d1-1f3fd-1f9b2": {
+    "aliases": [":person_medium_skin_tone_bald:"],
+    "code": "1f9d1-1f3fd-200d-1f9b2",
+    "name": ":person_tone3_bald:"
+  },
+  "1f9d1-1f3fd-1f9b3": {
+    "aliases": [":person_medium_skin_tone_white_hair:"],
+    "code": "1f9d1-1f3fd-200d-1f9b3",
+    "name": ":person_tone3_white_hair:"
+  },
+  "1f9d1-1f3fd-1f9bc": {
+    "aliases": [":person_in_motorized_wheelchair_medium_skin_tone:"],
+    "code": "1f9d1-1f3fd-200d-1f9bc",
+    "name": ":person_in_motorized_wheelchair_tone3:"
+  },
+  "1f9d1-1f3fd-1f9bd": {
+    "aliases": [":person_in_manual_wheelchair_medium_skin_tone:"],
+    "code": "1f9d1-1f3fd-200d-1f9bd",
+    "name": ":person_in_manual_wheelchair_tone3:"
+  },
+  "1f9d1-1f3fd-2695": {
+    "aliases": [":health_worker_medium_skin_tone:"],
+    "code": "1f9d1-1f3fd-200d-2695-fe0f",
+    "name": ":health_worker_tone3:"
+  },
+  "1f9d1-1f3fd-2696": {
+    "aliases": [":judge_medium_skin_tone:"],
+    "code": "1f9d1-1f3fd-200d-2696-fe0f",
+    "name": ":judge_tone3:"
+  },
+  "1f9d1-1f3fd-2708": {
+    "aliases": [":pilot_medium_skin_tone:"],
+    "code": "1f9d1-1f3fd-200d-2708-fe0f",
+    "name": ":pilot_tone3:"
+  },
   "1f9d1-1f3fe": {
     "aliases": [":adult_medium_dark_skin_tone:"],
     "code": "1f9d1-1f3fe",
     "name": ":adult_tone4:"
+  },
+  "1f9d1-1f3fe-1f33e": {
+    "aliases": [":farmer_medium_dark_skin_tone:"],
+    "code": "1f9d1-1f3fe-200d-1f33e",
+    "name": ":farmer_tone4:"
+  },
+  "1f9d1-1f3fe-1f373": {
+    "aliases": [":cook_medium_dark_skin_tone:"],
+    "code": "1f9d1-1f3fe-200d-1f373",
+    "name": ":cook_tone4:"
+  },
+  "1f9d1-1f3fe-1f393": {
+    "aliases": [":student_medium_dark_skin_tone:"],
+    "code": "1f9d1-1f3fe-200d-1f393",
+    "name": ":student_tone4:"
+  },
+  "1f9d1-1f3fe-1f3a4": {
+    "aliases": [":singer_medium_dark_skin_tone:"],
+    "code": "1f9d1-1f3fe-200d-1f3a4",
+    "name": ":singer_tone4:"
+  },
+  "1f9d1-1f3fe-1f3a8": {
+    "aliases": [":artist_medium_dark_skin_tone:"],
+    "code": "1f9d1-1f3fe-200d-1f3a8",
+    "name": ":artist_tone4:"
+  },
+  "1f9d1-1f3fe-1f3eb": {
+    "aliases": [":teacher_medium_dark_skin_tone:"],
+    "code": "1f9d1-1f3fe-200d-1f3eb",
+    "name": ":teacher_tone4:"
+  },
+  "1f9d1-1f3fe-1f3ed": {
+    "aliases": [":factory_worker_medium_dark_skin_tone:"],
+    "code": "1f9d1-1f3fe-200d-1f3ed",
+    "name": ":factory_worker_tone4:"
+  },
+  "1f9d1-1f3fe-1f4bb": {
+    "aliases": [":technologist_medium_dark_skin_tone:"],
+    "code": "1f9d1-1f3fe-200d-1f4bb",
+    "name": ":technologist_tone4:"
+  },
+  "1f9d1-1f3fe-1f4bc": {
+    "aliases": [":office_worker_medium_dark_skin_tone:"],
+    "code": "1f9d1-1f3fe-200d-1f4bc",
+    "name": ":office_worker_tone4:"
+  },
+  "1f9d1-1f3fe-1f527": {
+    "aliases": [":mechanic_medium_dark_skin_tone:"],
+    "code": "1f9d1-1f3fe-200d-1f527",
+    "name": ":mechanic_tone4:"
+  },
+  "1f9d1-1f3fe-1f52c": {
+    "aliases": [":scientist_medium_dark_skin_tone:"],
+    "code": "1f9d1-1f3fe-200d-1f52c",
+    "name": ":scientist_tone4:"
+  },
+  "1f9d1-1f3fe-1f680": {
+    "aliases": [":astronaut_medium_dark_skin_tone:"],
+    "code": "1f9d1-1f3fe-200d-1f680",
+    "name": ":astronaut_tone4:"
+  },
+  "1f9d1-1f3fe-1f692": {
+    "aliases": [":firefighter_medium_dark_skin_tone:"],
+    "code": "1f9d1-1f3fe-200d-1f692",
+    "name": ":firefighter_tone4:"
   },
   "1f9d1-1f3fe-1f91d-1f9d1-1f3fb": {
     "aliases": [":people_holding_hands_medium_dark_skin_tone_light_skin_tone:"],
@@ -13094,10 +13684,130 @@
     "code": "1f9d1-1f3fe-200d-1f91d-200d-1f9d1-1f3fe",
     "name": ":people_holding_hands_tone4:"
   },
+  "1f9d1-1f3fe-1f91d-1f9d1-1f3ff": {
+    "aliases": [":people_holding_hands_medium_dark_skin_tone_dark_skin_tone:"],
+    "code": "1f9d1-1f3fe-200d-1f91d-200d-1f9d1-1f3ff",
+    "name": ":people_holding_hands_tone4_tone5:"
+  },
+  "1f9d1-1f3fe-1f9af": {
+    "aliases": [":person_with_probing_cane_medium_dark_skin_tone:"],
+    "code": "1f9d1-1f3fe-200d-1f9af",
+    "name": ":person_with_probing_cane_tone4:"
+  },
+  "1f9d1-1f3fe-1f9b0": {
+    "aliases": [":person_medium_dark_skin_tone_red_hair:"],
+    "code": "1f9d1-1f3fe-200d-1f9b0",
+    "name": ":person_tone4_red_hair:"
+  },
+  "1f9d1-1f3fe-1f9b1": {
+    "aliases": [":person_medium_dark_skin_tone_curly_hair:"],
+    "code": "1f9d1-1f3fe-200d-1f9b1",
+    "name": ":person_tone4_curly_hair:"
+  },
+  "1f9d1-1f3fe-1f9b2": {
+    "aliases": [":person_medium_dark_skin_tone_bald:"],
+    "code": "1f9d1-1f3fe-200d-1f9b2",
+    "name": ":person_tone4_bald:"
+  },
+  "1f9d1-1f3fe-1f9b3": {
+    "aliases": [":person_medium_dark_skin_tone_white_hair:"],
+    "code": "1f9d1-1f3fe-200d-1f9b3",
+    "name": ":person_tone4_white_hair:"
+  },
+  "1f9d1-1f3fe-1f9bc": {
+    "aliases": [":person_in_motorized_wheelchair_medium_dark_skin_tone:"],
+    "code": "1f9d1-1f3fe-200d-1f9bc",
+    "name": ":person_in_motorized_wheelchair_tone4:"
+  },
+  "1f9d1-1f3fe-1f9bd": {
+    "aliases": [":person_in_manual_wheelchair_medium_dark_skin_tone:"],
+    "code": "1f9d1-1f3fe-200d-1f9bd",
+    "name": ":person_in_manual_wheelchair_tone4:"
+  },
+  "1f9d1-1f3fe-2695": {
+    "aliases": [":health_worker_medium_dark_skin_tone:"],
+    "code": "1f9d1-1f3fe-200d-2695-fe0f",
+    "name": ":health_worker_tone4:"
+  },
+  "1f9d1-1f3fe-2696": {
+    "aliases": [":judge_medium_dark_skin_tone:"],
+    "code": "1f9d1-1f3fe-200d-2696-fe0f",
+    "name": ":judge_tone4:"
+  },
+  "1f9d1-1f3fe-2708": {
+    "aliases": [":pilot_medium_dark_skin_tone:"],
+    "code": "1f9d1-1f3fe-200d-2708-fe0f",
+    "name": ":pilot_tone4:"
+  },
   "1f9d1-1f3ff": {
     "aliases": [":adult_dark_skin_tone:"],
     "code": "1f9d1-1f3ff",
     "name": ":adult_tone5:"
+  },
+  "1f9d1-1f3ff-1f33e": {
+    "aliases": [":farmer_dark_skin_tone:"],
+    "code": "1f9d1-1f3ff-200d-1f33e",
+    "name": ":farmer_tone5:"
+  },
+  "1f9d1-1f3ff-1f373": {
+    "aliases": [":cook_dark_skin_tone:"],
+    "code": "1f9d1-1f3ff-200d-1f373",
+    "name": ":cook_tone5:"
+  },
+  "1f9d1-1f3ff-1f393": {
+    "aliases": [":student_dark_skin_tone:"],
+    "code": "1f9d1-1f3ff-200d-1f393",
+    "name": ":student_tone5:"
+  },
+  "1f9d1-1f3ff-1f3a4": {
+    "aliases": [":singer_dark_skin_tone:"],
+    "code": "1f9d1-1f3ff-200d-1f3a4",
+    "name": ":singer_tone5:"
+  },
+  "1f9d1-1f3ff-1f3a8": {
+    "aliases": [":artist_dark_skin_tone:"],
+    "code": "1f9d1-1f3ff-200d-1f3a8",
+    "name": ":artist_tone5:"
+  },
+  "1f9d1-1f3ff-1f3eb": {
+    "aliases": [":teacher_dark_skin_tone:"],
+    "code": "1f9d1-1f3ff-200d-1f3eb",
+    "name": ":teacher_tone5:"
+  },
+  "1f9d1-1f3ff-1f3ed": {
+    "aliases": [":factory_worker_dark_skin_tone:"],
+    "code": "1f9d1-1f3ff-200d-1f3ed",
+    "name": ":factory_worker_tone5:"
+  },
+  "1f9d1-1f3ff-1f4bb": {
+    "aliases": [":technologist_dark_skin_tone:"],
+    "code": "1f9d1-1f3ff-200d-1f4bb",
+    "name": ":technologist_tone5:"
+  },
+  "1f9d1-1f3ff-1f4bc": {
+    "aliases": [":office_worker_dark_skin_tone:"],
+    "code": "1f9d1-1f3ff-200d-1f4bc",
+    "name": ":office_worker_tone5:"
+  },
+  "1f9d1-1f3ff-1f527": {
+    "aliases": [":mechanic_dark_skin_tone:"],
+    "code": "1f9d1-1f3ff-200d-1f527",
+    "name": ":mechanic_tone5:"
+  },
+  "1f9d1-1f3ff-1f52c": {
+    "aliases": [":scientist_dark_skin_tone:"],
+    "code": "1f9d1-1f3ff-200d-1f52c",
+    "name": ":scientist_tone5:"
+  },
+  "1f9d1-1f3ff-1f680": {
+    "aliases": [":astronaut_dark_skin_tone:"],
+    "code": "1f9d1-1f3ff-200d-1f680",
+    "name": ":astronaut_tone5:"
+  },
+  "1f9d1-1f3ff-1f692": {
+    "aliases": [":firefighter_dark_skin_tone:"],
+    "code": "1f9d1-1f3ff-200d-1f692",
+    "name": ":firefighter_tone5:"
   },
   "1f9d1-1f3ff-1f91d-1f9d1-1f3fb": {
     "aliases": [":people_holding_hands_dark_skin_tone_light_skin_tone:"],
@@ -13124,10 +13834,140 @@
     "code": "1f9d1-1f3ff-200d-1f91d-200d-1f9d1-1f3ff",
     "name": ":people_holding_hands_tone5:"
   },
+  "1f9d1-1f3ff-1f9af": {
+    "aliases": [":person_with_probing_cane_dark_skin_tone:"],
+    "code": "1f9d1-1f3ff-200d-1f9af",
+    "name": ":person_with_probing_cane_tone5:"
+  },
+  "1f9d1-1f3ff-1f9b0": {
+    "aliases": [":person_dark_skin_tone_red_hair:"],
+    "code": "1f9d1-1f3ff-200d-1f9b0",
+    "name": ":person_tone5_red_hair:"
+  },
+  "1f9d1-1f3ff-1f9b1": {
+    "aliases": [":person_dark_skin_tone_curly_hair:"],
+    "code": "1f9d1-1f3ff-200d-1f9b1",
+    "name": ":person_tone5_curly_hair:"
+  },
+  "1f9d1-1f3ff-1f9b2": {
+    "aliases": [":person_dark_skin_tone_bald:"],
+    "code": "1f9d1-1f3ff-200d-1f9b2",
+    "name": ":person_tone5_bald:"
+  },
+  "1f9d1-1f3ff-1f9b3": {
+    "aliases": [":person_dark_skin_tone_white_hair:"],
+    "code": "1f9d1-1f3ff-200d-1f9b3",
+    "name": ":person_tone5_white_hair:"
+  },
+  "1f9d1-1f3ff-1f9bc": {
+    "aliases": [":person_in_motorized_wheelchair_dark_skin_tone:"],
+    "code": "1f9d1-1f3ff-200d-1f9bc",
+    "name": ":person_in_motorized_wheelchair_tone5:"
+  },
+  "1f9d1-1f3ff-1f9bd": {
+    "aliases": [":person_in_manual_wheelchair_dark_skin_tone:"],
+    "code": "1f9d1-1f3ff-200d-1f9bd",
+    "name": ":person_in_manual_wheelchair_tone5:"
+  },
+  "1f9d1-1f3ff-2695": {
+    "aliases": [":health_worker_dark_skin_tone:"],
+    "code": "1f9d1-1f3ff-200d-2695-fe0f",
+    "name": ":health_worker_tone5:"
+  },
+  "1f9d1-1f3ff-2696": {
+    "aliases": [":judge_dark_skin_tone:"],
+    "code": "1f9d1-1f3ff-200d-2696-fe0f",
+    "name": ":judge_tone5:"
+  },
+  "1f9d1-1f3ff-2708": {
+    "aliases": [":pilot_dark_skin_tone:"],
+    "code": "1f9d1-1f3ff-200d-2708-fe0f",
+    "name": ":pilot_tone5:"
+  },
+  "1f9d1-1f4bb": {
+    "aliases": [],
+    "code": "1f9d1-200d-1f4bb",
+    "name": ":technologist:"
+  },
+  "1f9d1-1f4bc": {
+    "aliases": [],
+    "code": "1f9d1-200d-1f4bc",
+    "name": ":office_worker:"
+  },
+  "1f9d1-1f527": {
+    "aliases": [],
+    "code": "1f9d1-200d-1f527",
+    "name": ":mechanic:"
+  },
+  "1f9d1-1f52c": {
+    "aliases": [],
+    "code": "1f9d1-200d-1f52c",
+    "name": ":scientist:"
+  },
+  "1f9d1-1f680": {
+    "aliases": [],
+    "code": "1f9d1-200d-1f680",
+    "name": ":astronaut:"
+  },
+  "1f9d1-1f692": {
+    "aliases": [],
+    "code": "1f9d1-200d-1f692",
+    "name": ":firefighter:"
+  },
   "1f9d1-1f91d-1f9d1": {
     "aliases": [],
     "code": "1f9d1-200d-1f91d-200d-1f9d1",
     "name": ":people_holding_hands:"
+  },
+  "1f9d1-1f9af": {
+    "aliases": [],
+    "code": "1f9d1-200d-1f9af",
+    "name": ":person_with_probing_cane:"
+  },
+  "1f9d1-1f9b0": {
+    "aliases": [],
+    "code": "1f9d1-200d-1f9b0",
+    "name": ":person_red_hair:"
+  },
+  "1f9d1-1f9b1": {
+    "aliases": [],
+    "code": "1f9d1-200d-1f9b1",
+    "name": ":person_curly_hair:"
+  },
+  "1f9d1-1f9b2": {
+    "aliases": [],
+    "code": "1f9d1-200d-1f9b2",
+    "name": ":person_bald:"
+  },
+  "1f9d1-1f9b3": {
+    "aliases": [],
+    "code": "1f9d1-200d-1f9b3",
+    "name": ":person_white_hair:"
+  },
+  "1f9d1-1f9bc": {
+    "aliases": [],
+    "code": "1f9d1-200d-1f9bc",
+    "name": ":person_in_motorized_wheelchair:"
+  },
+  "1f9d1-1f9bd": {
+    "aliases": [],
+    "code": "1f9d1-200d-1f9bd",
+    "name": ":person_in_manual_wheelchair:"
+  },
+  "1f9d1-2695": {
+    "aliases": [],
+    "code": "1f9d1-200d-2695-fe0f",
+    "name": ":health_worker:"
+  },
+  "1f9d1-2696": {
+    "aliases": [],
+    "code": "1f9d1-200d-2696-fe0f",
+    "name": ":judge:"
+  },
+  "1f9d1-2708": {
+    "aliases": [],
+    "code": "1f9d1-200d-2708-fe0f",
+    "name": ":pilot:"
   },
   "1f9d2": {
     "aliases": [],
@@ -14491,27 +15331,27 @@
   },
   "261d-1f3fb": {
     "aliases": [],
-    "code": "261d-fe0f-1f3fb",
+    "code": "261d-1f3fb",
     "name": ":point_up_tone1:"
   },
   "261d-1f3fc": {
     "aliases": [],
-    "code": "261d-fe0f-1f3fc",
+    "code": "261d-1f3fc",
     "name": ":point_up_tone2:"
   },
   "261d-1f3fd": {
     "aliases": [],
-    "code": "261d-fe0f-1f3fd",
+    "code": "261d-1f3fd",
     "name": ":point_up_tone3:"
   },
   "261d-1f3fe": {
     "aliases": [],
-    "code": "261d-fe0f-1f3fe",
+    "code": "261d-1f3fe",
     "name": ":point_up_tone4:"
   },
   "261d-1f3ff": {
     "aliases": [],
-    "code": "261d-fe0f-1f3ff",
+    "code": "261d-1f3ff",
     "name": ":point_up_tone5:"
   },
   "2620": {
@@ -14856,82 +15696,82 @@
   },
   "26f9": {
     "aliases": [":basketball_player:", ":person_with_ball:"],
-    "code": "26f9-fe0f",
+    "code": "26f9",
     "name": ":person_bouncing_ball:"
   },
   "26f9-1f3fb": {
     "aliases": [":basketball_player_tone1:", ":person_with_ball_tone1:"],
-    "code": "26f9-fe0f-1f3fb",
+    "code": "26f9-1f3fb",
     "name": ":person_bouncing_ball_tone1:"
   },
   "26f9-1f3fb-2640": {
     "aliases": [":woman_bouncing_ball_light_skin_tone:"],
-    "code": "26f9-fe0f-1f3fb-200d-2640-fe0f",
+    "code": "26f9-1f3fb-200d-2640-fe0f",
     "name": ":woman_bouncing_ball_tone1:"
   },
   "26f9-1f3fb-2642": {
     "aliases": [":man_bouncing_ball_light_skin_tone:"],
-    "code": "26f9-fe0f-1f3fb-200d-2642-fe0f",
+    "code": "26f9-1f3fb-200d-2642-fe0f",
     "name": ":man_bouncing_ball_tone1:"
   },
   "26f9-1f3fc": {
     "aliases": [":basketball_player_tone2:", ":person_with_ball_tone2:"],
-    "code": "26f9-fe0f-1f3fc",
+    "code": "26f9-1f3fc",
     "name": ":person_bouncing_ball_tone2:"
   },
   "26f9-1f3fc-2640": {
     "aliases": [":woman_bouncing_ball_medium_light_skin_tone:"],
-    "code": "26f9-fe0f-1f3fc-200d-2640-fe0f",
+    "code": "26f9-1f3fc-200d-2640-fe0f",
     "name": ":woman_bouncing_ball_tone2:"
   },
   "26f9-1f3fc-2642": {
     "aliases": [":man_bouncing_ball_medium_light_skin_tone:"],
-    "code": "26f9-fe0f-1f3fc-200d-2642-fe0f",
+    "code": "26f9-1f3fc-200d-2642-fe0f",
     "name": ":man_bouncing_ball_tone2:"
   },
   "26f9-1f3fd": {
     "aliases": [":basketball_player_tone3:", ":person_with_ball_tone3:"],
-    "code": "26f9-fe0f-1f3fd",
+    "code": "26f9-1f3fd",
     "name": ":person_bouncing_ball_tone3:"
   },
   "26f9-1f3fd-2640": {
     "aliases": [":woman_bouncing_ball_medium_skin_tone:"],
-    "code": "26f9-fe0f-1f3fd-200d-2640-fe0f",
+    "code": "26f9-1f3fd-200d-2640-fe0f",
     "name": ":woman_bouncing_ball_tone3:"
   },
   "26f9-1f3fd-2642": {
     "aliases": [":man_bouncing_ball_medium_skin_tone:"],
-    "code": "26f9-fe0f-1f3fd-200d-2642-fe0f",
+    "code": "26f9-1f3fd-200d-2642-fe0f",
     "name": ":man_bouncing_ball_tone3:"
   },
   "26f9-1f3fe": {
     "aliases": [":basketball_player_tone4:", ":person_with_ball_tone4:"],
-    "code": "26f9-fe0f-1f3fe",
+    "code": "26f9-1f3fe",
     "name": ":person_bouncing_ball_tone4:"
   },
   "26f9-1f3fe-2640": {
     "aliases": [":woman_bouncing_ball_medium_dark_skin_tone:"],
-    "code": "26f9-fe0f-1f3fe-200d-2640-fe0f",
+    "code": "26f9-1f3fe-200d-2640-fe0f",
     "name": ":woman_bouncing_ball_tone4:"
   },
   "26f9-1f3fe-2642": {
     "aliases": [":man_bouncing_ball_medium_dark_skin_tone:"],
-    "code": "26f9-fe0f-1f3fe-200d-2642-fe0f",
+    "code": "26f9-1f3fe-200d-2642-fe0f",
     "name": ":man_bouncing_ball_tone4:"
   },
   "26f9-1f3ff": {
     "aliases": [":basketball_player_tone5:", ":person_with_ball_tone5:"],
-    "code": "26f9-fe0f-1f3ff",
+    "code": "26f9-1f3ff",
     "name": ":person_bouncing_ball_tone5:"
   },
   "26f9-1f3ff-2640": {
     "aliases": [":woman_bouncing_ball_dark_skin_tone:"],
-    "code": "26f9-fe0f-1f3ff-200d-2640-fe0f",
+    "code": "26f9-1f3ff-200d-2640-fe0f",
     "name": ":woman_bouncing_ball_tone5:"
   },
   "26f9-1f3ff-2642": {
     "aliases": [":man_bouncing_ball_dark_skin_tone:"],
-    "code": "26f9-fe0f-1f3ff-200d-2642-fe0f",
+    "code": "26f9-1f3ff-200d-2642-fe0f",
     "name": ":man_bouncing_ball_tone5:"
   },
   "26f9-2640": {
@@ -15041,27 +15881,27 @@
   },
   "270c-1f3fb": {
     "aliases": [],
-    "code": "270c-fe0f-1f3fb",
+    "code": "270c-1f3fb",
     "name": ":v_tone1:"
   },
   "270c-1f3fc": {
     "aliases": [],
-    "code": "270c-fe0f-1f3fc",
+    "code": "270c-1f3fc",
     "name": ":v_tone2:"
   },
   "270c-1f3fd": {
     "aliases": [],
-    "code": "270c-fe0f-1f3fd",
+    "code": "270c-1f3fd",
     "name": ":v_tone3:"
   },
   "270c-1f3fe": {
     "aliases": [],
-    "code": "270c-fe0f-1f3fe",
+    "code": "270c-1f3fe",
     "name": ":v_tone4:"
   },
   "270c-1f3ff": {
     "aliases": [],
-    "code": "270c-fe0f-1f3ff",
+    "code": "270c-1f3ff",
     "name": ":v_tone5:"
   },
   "270d": {
@@ -15071,27 +15911,27 @@
   },
   "270d-1f3fb": {
     "aliases": [],
-    "code": "270d-fe0f-1f3fb",
+    "code": "270d-1f3fb",
     "name": ":writing_hand_tone1:"
   },
   "270d-1f3fc": {
     "aliases": [],
-    "code": "270d-fe0f-1f3fc",
+    "code": "270d-1f3fc",
     "name": ":writing_hand_tone2:"
   },
   "270d-1f3fd": {
     "aliases": [],
-    "code": "270d-fe0f-1f3fd",
+    "code": "270d-1f3fd",
     "name": ":writing_hand_tone3:"
   },
   "270d-1f3fe": {
     "aliases": [],
-    "code": "270d-fe0f-1f3fe",
+    "code": "270d-1f3fe",
     "name": ":writing_hand_tone4:"
   },
   "270d-1f3ff": {
     "aliases": [],
-    "code": "270d-fe0f-1f3ff",
+    "code": "270d-1f3ff",
     "name": ":writing_hand_tone5:"
   },
   "270f": {
