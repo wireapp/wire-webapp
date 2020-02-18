@@ -104,7 +104,7 @@ export const formatDateShort = (date: FnDate) => formatLocale(date, 'PP');
 export const formatDayMonth = (date: FnDate) =>
   formatDateShort(date)
     .replace(/[0-9]{4}/g, '')
-    .replace(/^\W|\W$|\W\W/, '');
+    .replace(locale === de ? /^\s*|\s*$/g : /^\W|\W$|\W\W/, '');
 
 /**
  * Format the date as `05/29/2020`.
@@ -114,7 +114,7 @@ export const formatDateNumeral = (date: FnDate) => formatLocale(date, 'P');
 export const formatDayMonthNumeral = (date: FnDate) =>
   formatDateNumeral(date)
     .replace(/[0-9]{4}/g, '')
-    .replace(locale === de ? /\W$|\W\W/ : /^\W|\W$|\W\W/, '');
+    .replace(locale === de ? /^\s*|\s*$/g : /^\W|\W$|\W\W/, '');
 
 const durationUnits = () => [
   {

@@ -19,6 +19,8 @@
 
 import {t} from 'Util/LocalizerUtil';
 import {
+  formatDayMonth,
+  formatDayMonthNumeral,
   formatDuration,
   formatDurationCaption,
   formatSeconds,
@@ -26,6 +28,7 @@ import {
   isSameMonth,
   isThisYear,
   isToday,
+  setDateLocale,
 } from 'Util/TimeUtil';
 
 describe('TimeUtil', () => {
@@ -367,6 +370,32 @@ describe('TimeUtil', () => {
 
     it('should return false if two dates are not from the same month', () => {
       expect(isSameMonth(new Date('2011-11-05T14:48:00.000'), new Date('2011-10-05T12:48:00.000'))).toBeFalsy();
+    });
+  });
+
+  describe('formatDayMonth', () => {
+    it('shows the correctly formatted day and month for the date in default language', () => {
+      expect(formatDayMonth(new Date('2011-11-05T14:48:00.000'))).toBe('Nov 5');
+    });
+
+    it('shows the correctly formatted day and month for the date in german', () => {
+      setDateLocale('de');
+
+      expect(formatDayMonth(new Date('2011-11-05T14:48:00.000'))).toBe('5. Nov.');
+      setDateLocale('en');
+    });
+  });
+
+  describe('formatDayMonthNumeral', () => {
+    it('shows the correctly formatted day and month numerals for the date in default language', () => {
+      expect(formatDayMonthNumeral(new Date('2011-11-05T14:48:00.000'))).toBe('11/05');
+    });
+
+    it('shows the correctly formatted day and month numerals for the date in german', () => {
+      setDateLocale('de');
+
+      expect(formatDayMonthNumeral(new Date('2011-11-05T14:48:00.000'))).toBe('05.11.');
+      setDateLocale('en');
     });
   });
 });
