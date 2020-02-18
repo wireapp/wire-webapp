@@ -17,7 +17,7 @@
  *
  */
 
-import hljs from 'highlightjs';
+import hljs from 'highlight.js';
 import MarkdownIt from 'markdown-it';
 import Token from 'markdown-it/lib/token';
 import {escape} from 'underscore';
