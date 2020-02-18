@@ -74,8 +74,8 @@ window.testConfig = {
   connection: backendConfig,
 };
 
-Config.BACKEND_REST = 'http://localhost';
-Config.BACKEND_WS = 'wss://localhost';
+Config.getConfig()['BACKEND_REST'] = backendConfig.restUrl;
+Config.getConfig()['BACKEND_WS'] = backendConfig.websocket_url;
 
 window.TestFactory = class TestFactory {
   /**
