@@ -28,7 +28,7 @@ import {WebAppEvents} from '../../event/WebApp';
 import {APIClientSingleton} from '../../service/APIClientSingleton';
 import {container} from 'tsyringe';
 
-export class AbstractAssetTransferStateTracker {
+export abstract class AbstractAssetTransferStateTracker {
   assetUploader: AssetUploader;
   uploadProgress: ko.PureComputed<number>;
   AssetTransferState: typeof AssetTransferState;

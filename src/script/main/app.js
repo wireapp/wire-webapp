@@ -173,7 +173,7 @@ class App {
     if (Config.getConfig().FEATURE.ENABLE_DEBUG) {
       import('Util/DebugUtil').then(({DebugUtil}) => {
         this.debug = new DebugUtil(this.repository);
-        this.util = {debug: this.debug}; //Alias for QA
+        this.util = {debug: this.debug}; // Alias for QA
       });
     }
 
