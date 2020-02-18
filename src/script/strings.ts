@@ -17,7 +17,7 @@
  *
  */
 
-import {SyntheticErrorLabel} from '@wireapp/api-client/dist/http';
+import {BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/dist/http';
 import {defineMessages} from 'react-intl';
 import {BackendError} from './auth/module/action/BackendError';
 import {LabeledError} from './auth/module/action/LabeledError';
@@ -43,6 +43,29 @@ export const cookiePolicyStrings = defineMessages({
 });
 
 export const indexStrings = defineMessages({
+  createAccount: {
+    defaultMessage: 'Create account',
+    id: 'index.createAccount',
+  },
+  enterprise: {
+    defaultMessage: 'Enterprise Login',
+    id: 'index.enterprise',
+  },
+  logIn: {
+    defaultMessage: 'Log in with email',
+    id: 'index.login',
+  },
+  ssoLogin: {
+    defaultMessage: 'Log in with SSO',
+    id: 'index.ssoLogin',
+  },
+  welcome: {
+    defaultMessage: 'Welcome to {brandName}',
+    id: 'index.welcome',
+  },
+});
+
+export const setAccountTypeStrings = defineMessages({
   createAccountForOrganizations: {
     defaultMessage: 'Pro',
     id: 'index.createAccountForOrganizations',
@@ -58,14 +81,6 @@ export const indexStrings = defineMessages({
   createTeam: {
     defaultMessage: 'create a team',
     id: 'index.createTeam',
-  },
-  login: {
-    defaultMessage: 'Log in',
-    id: 'index.login',
-  },
-  loginInfo: {
-    defaultMessage: 'Already have an account?',
-    id: 'index.loginInfo',
   },
 });
 
@@ -293,7 +308,7 @@ export const unsupportedStrings = defineMessages({
     id: 'unsupported.headlineCookies',
   },
   headlineIndexedDb: {
-    defaultMessage: 'You are in private mode',
+    defaultMessage: 'Your browser is in private mode',
     id: 'unsupported.headlineIndexedDb',
   },
   subheadBrowser: {
@@ -554,10 +569,6 @@ export const errorHandlerStrings = defineMessages({
     defaultMessage: 'Something went wrong. Please contact your team administrator for details (Error 9).',
     id: 'BackendError.LABEL.SSO_NO_MATCHING_AUTH',
   },
-  [BackendError.LABEL.SSO_NO_SSO_CODE]: {
-    defaultMessage: 'No SSO access code detected',
-    id: 'BackendError.LABEL.NO_SSO_CODE',
-  },
   [BackendError.LABEL.SSO_NOT_FOUND]: {
     defaultMessage: 'Something went wrong. Please contact your team administrator for details (Error 7).',
     id: 'BackendError.LABEL.SSO_NOT_FOUND',
@@ -577,6 +588,10 @@ export const errorHandlerStrings = defineMessages({
   [LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE]: {
     defaultMessage: 'Not enough disk space',
     id: 'LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE',
+  },
+  [BackendErrorLabel.CUSTOM_BACKEND_NOT_FOUND]: {
+    defaultMessage: 'This email cannot be used for enterprise login. Please enter the SSO code to proceed.',
+    id: 'BackendErrorLabel.CUSTOM_BACKEND_NOT_FOUND',
   },
   unexpected: {
     defaultMessage: 'Unexpected error',
@@ -602,9 +617,13 @@ export const validationErrorStrings = defineMessages({
     defaultMessage: 'Wrong password. Please try again.',
     id: 'ValidationError.FIELD.PASSWORD_LOGIN.PATTERN_MISMATCH',
   },
-  [ValidationError.FIELD.SSO_LOGIN.PATTERN_MISMATCH]: {
-    defaultMessage: 'Invalid code',
-    id: 'ValidationError.FIELD.SSO_LOGIN.PATTERN_MISMATCH',
+  [ValidationError.FIELD.SSO_CODE.PATTERN_MISMATCH]: {
+    defaultMessage: 'Please enter a valid SSO access code',
+    id: 'ValidationError.FIELD.SSO_CODE.PATTERN_MISMATCH',
+  },
+  [ValidationError.FIELD.SSO_EMAIL_CODE.PATTERN_MISMATCH]: {
+    defaultMessage: 'Please enter a valid email or SSO access code',
+    id: 'ValidationError.FIELD.SSO_EMAIL_CODE.PATTERN_MISMATCH',
   },
   [ValidationError.FIELD.EMAIL.TYPE_MISMATCH]: {
     defaultMessage: 'Please enter a valid email address',
@@ -653,8 +672,12 @@ export const loginStrings = defineMessages({
 
 export const ssoLoginStrings = defineMessages({
   codeInputPlaceholder: {
-    defaultMessage: 'SSO Code',
+    defaultMessage: 'SSO access code',
     id: 'ssoLogin.codeInputPlaceholder',
+  },
+  codeOrMailInputPlaceholder: {
+    defaultMessage: 'Email or SSO access code',
+    id: 'ssoLogin.codeOrMailInputPlaceholder',
   },
   headline: {
     defaultMessage: 'Company log in',
@@ -668,13 +691,13 @@ export const ssoLoginStrings = defineMessages({
     defaultMessage: 'Click to continue',
     id: 'ssoLogin.overlayFocusLink',
   },
-  pasteButton: {
-    defaultMessage: 'Paste code',
-    id: 'ssoLogin.pasteButton',
+  subheadCode: {
+    defaultMessage: 'Please enter your SSO code',
+    id: 'ssoLogin.subheadCode',
   },
-  subhead: {
-    defaultMessage: 'Enter the company SSO access code.',
-    id: 'ssoLogin.subhead',
+  subheadCodeOrEmail: {
+    defaultMessage: 'Please enter your email or SSO code',
+    id: 'ssoLogin.subheadCodeOrEmail',
   },
 });
 

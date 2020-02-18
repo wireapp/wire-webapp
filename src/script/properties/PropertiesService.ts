@@ -24,7 +24,7 @@ class PropertiesService {
 
   /**
    * Construct a new Properties Service.
-   * @param {APIClient} apiClient - Client for the API calls
+   * @param {APIClient} apiClient Client for the API calls
    */
   constructor(apiClient: APIClient) {
     this.apiClient = apiClient;

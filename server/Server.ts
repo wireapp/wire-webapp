@@ -42,7 +42,7 @@ class Server {
 
   constructor(private readonly config: ServerConfig) {
     if (this.config.SERVER.DEVELOPMENT) {
-      console.log(this.config);
+      console.info(this.config);
     }
     this.app = express();
     this.init();

@@ -44,6 +44,7 @@ describe('InvitationAction', () => {
       selfState: {...initialSelfState},
     });
     await store.dispatch(actionRoot.invitationAction.invite({email}));
+
     expect(store.getActions()).toEqual([
       InvitationActionCreator.startAddInvite(),
       InvitationActionCreator.successfulAddInvite(expectedInvitation),

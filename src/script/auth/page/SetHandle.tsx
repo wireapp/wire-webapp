@@ -21,7 +21,6 @@ import {ConsentType} from '@wireapp/api-client/dist/self/index';
 import {
   ArrowIcon,
   ContainerXS,
-  ErrorMessage,
   Form,
   H1,
   Input,
@@ -132,7 +131,7 @@ const SetHandle = ({
             </RoundIconButton>
           </InputSubmitCombo>
         </Form>
-        <ErrorMessage data-uie-name="error-message">{error && parseError(error)}</ErrorMessage>
+        {error && parseError(error)}
       </ContainerXS>
       {!isFetching && hasUnsetMarketingConsent && (
         <AcceptNewsModal

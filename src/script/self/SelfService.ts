@@ -45,7 +45,7 @@ export class SelfService {
   }
 
   putSelfConsent(type: number, value: number, source: string): Promise<void> {
-    return this.apiClient.self.api.putConsent({type, value, source});
+    return this.apiClient.self.api.putConsent({source, type, value});
   }
 
   putSelfEmail(email: string): Promise<void> {

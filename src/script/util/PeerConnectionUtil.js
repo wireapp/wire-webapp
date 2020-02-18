@@ -32,8 +32,8 @@ export function getIceCandidatesTypes(iceCandidates) {
 /**
  * Returns `true` if the number and types of ice candidates gathered are sufficient to start a call
  *
- * @param {RTCConfiguration} peerConnectionConfig - the configuration of the peerConnection that initiated the ICE candidate gathering
- * @param {Array<string>} iceCandidates - ICE candidate strings from SDP
+ * @param {RTCConfiguration} peerConnectionConfig the configuration of the peerConnection that initiated the ICE candidate gathering
+ * @param {Array<string>} iceCandidates ICE candidate strings from SDP
  * @returns {boolean} `true` if the candidates gathered are enough to send a SDP
  */
 export function isValidIceCandidatesGathering(peerConnectionConfig, iceCandidates) {

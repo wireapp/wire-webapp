@@ -171,7 +171,7 @@ describe('CryptographyRepository', () => {
     });
 
     it('detects a session reset request', () => {
-      /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
+      /* eslint-disable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
       const event = {
         conversation: 'f1d2d451-0fcb-4313-b0ba-313b971ab758',
         time: '2017-03-22T11:06:29.232Z',
@@ -179,7 +179,7 @@ describe('CryptographyRepository', () => {
         from: 'e3ff8dab-1407-4890-b9d3-e1aab49233e8',
         type: 'conversation.otr-message-add',
       };
-      /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
+      /* eslint-enable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
 
       return TestFactory.cryptography_repository.handleEncryptedEvent(event).then(mapped_event => {
         expect(mapped_event.type).toBe(ClientEvent.CONVERSATION.UNABLE_TO_DECRYPT);
@@ -188,7 +188,7 @@ describe('CryptographyRepository', () => {
 
     it('only accepts reasonable sized payloads (text key)', () => {
       // Length of this message is 1 320 024 while the maximum is 150% of 12 000 (18 000)
-      /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
+      /* eslint-disable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
       const text = window.btoa(`https://wir${'\u0000\u0001\u0000\u000D\u0000A'.repeat(165000)}e.com/`);
       const event = {
         conversation: '7bc4558b-18ce-446b-8e62-0c442b86ba56',
@@ -197,7 +197,7 @@ describe('CryptographyRepository', () => {
         from: '8549aada-07cc-4272-9fd4-c2ae040c539d',
         type: 'conversation.otr-message-add',
       };
-      /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
+      /* eslint-enable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
 
       return TestFactory.cryptography_repository.handleEncryptedEvent(event).then(mapped_event => {
         expect(mapped_event.type).toBe(ClientEvent.CONVERSATION.INCOMING_MESSAGE_TOO_BIG);
@@ -206,7 +206,7 @@ describe('CryptographyRepository', () => {
 
     it('only accepts reasonable sized payloads (data key)', () => {
       // Length of this message is 1 320 024 while the maximum is 150% of 12 000 (18 000)
-      /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
+      /* eslint-disable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
       const data = window.btoa(`https://wir${'\u0000\u0001\u0000\u000D\u0000A'.repeat(165000)}e.com/`);
       const event = {
         conversation: '7bc4558b-18ce-446b-8e62-0c442b86ba56',
@@ -215,7 +215,7 @@ describe('CryptographyRepository', () => {
         from: '8549aada-07cc-4272-9fd4-c2ae040c539d',
         type: 'conversation.otr-message-add',
       };
-      /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
+      /* eslint-enable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
 
       return TestFactory.cryptography_repository.handleEncryptedEvent(event).then(mapped_event => {
         expect(mapped_event.type).toBe(ClientEvent.CONVERSATION.INCOMING_MESSAGE_TOO_BIG);

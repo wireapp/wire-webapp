@@ -39,7 +39,7 @@ export const isTemporaryClientAndNonPersistent = (persist: boolean): boolean => 
   }
 
   const isNonPersistentByUrl = URLUtil.getURLParameter(QUERY_KEY.PERSIST_TEMPORARY_CLIENTS) === 'false';
-  const isNonPersistentByServerConfig = Config.FEATURE?.PERSIST_TEMPORARY_CLIENTS === false;
+  const isNonPersistentByServerConfig = Config.getConfig().FEATURE?.PERSIST_TEMPORARY_CLIENTS === false;
   const isNonPersistent = isNonPersistentByUrl || isNonPersistentByServerConfig;
 
   const isTemporary = persist === false;
@@ -177,13 +177,13 @@ export const trimFileExtension = (filename: string): string => {
   return '';
 };
 
-export const formatBytes = (bytes: number, decimals: number): string => {
+export const formatBytes = (bytes: number, decimals: number = 1): string => {
   if (bytes === 0) {
     return '0B';
   }
 
   const kilobytes = 1024;
-  decimals = decimals + 1 || 2;
+  decimals += 1;
   const unit = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
   const index = Math.floor(Math.log(bytes) / Math.log(kilobytes));
   return parseFloat((bytes / Math.pow(kilobytes, index)).toFixed(decimals)) + unit[index];

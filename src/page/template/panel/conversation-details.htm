@@ -26,7 +26,7 @@
         <!-- ko ifnot: isServiceMode() -->
           <!-- ko if: firstParticipant() -->
             <panel-user-details
-              params="participant: firstParticipant, isVerified: isVerified, badge: teamRepository.getRoleBadge(firstParticipant().id)"
+              params="participant: firstParticipant, isVerified: isVerified, badge: teamRepository.getRoleBadge(firstParticipant().id), isSelfVerified: isSelfVerified"
             ></panel-user-details>
             <!-- ko if: firstParticipant().isConnected() || firstParticipant().inTeam() -->
               <div class="conversation-details__devices">

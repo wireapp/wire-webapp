@@ -47,7 +47,7 @@ class LinkPreviewRepository {
    * Searches for url in given string and creates a link preview.
    *
    * @note This will already upload the associated image as asset
-   * @param {string} string - Input text to generate preview for
+   * @param {string} string Input text to generate preview for
    * @returns {Promise} Resolves with link preview proto message
    */
   getLinkPreviewFromString(string) {
@@ -71,8 +71,8 @@ class LinkPreviewRepository {
    * Creates link preview for given link. This will upload associated image as asset and will
    * resolve with a LinkPreview instance
    *
-   * @param {string} url - URL found to generate link preview from
-   * @param {number} [offset=0] - starting index of the link
+   * @param {string} url URL found to generate link preview from
+   * @param {number} [offset=0] starting index of the link
    * @returns {Promise} Resolves with a link preview if generated
    */
   _getLinkPreview(url, offset = 0) {
@@ -102,7 +102,7 @@ class LinkPreviewRepository {
 
   /**
    * Update the send link preview preference
-   * @param {boolean} sendPreviewsPreference - Updated preference
+   * @param {boolean} sendPreviewsPreference Updated preference
    * @returns {undefined} No return value
    */
   updatedSendPreference(sendPreviewsPreference) {
@@ -113,8 +113,8 @@ class LinkPreviewRepository {
    * Fetch and upload open graph images.
    *
    * @private
-   * @param {LinkPreview} linkPreview - Link preview proto message
-   * @param {Object} [openGraphImage={}] - Open graph image URL
+   * @param {LinkPreview} linkPreview Link preview proto message
+   * @param {Object} [openGraphImage={}] Open graph image URL
    * @returns {Promise} Resolves with the link preview proto message
    */
   _fetchPreviewImage(linkPreview, openGraphImage = {}) {
@@ -138,7 +138,7 @@ class LinkPreviewRepository {
    * Fetch open graph data.
    *
    * @private
-   * @param {string} link - Link to fetch open graph data from
+   * @param {string} link Link to fetch open graph data from
    * @returns {Promise<OpenGraphData | Error>} Resolves with the retrieved open graph data
    */
   async _fetchOpenGraphData(link) {
@@ -160,7 +160,7 @@ class LinkPreviewRepository {
    * Upload open graph image as asset
    *
    * @private
-   * @param {string} dataUri - image data as base64 encoded data URI
+   * @param {string} dataUri image data as base64 encoded data URI
    * @returns {Promise} Resolves with the uploaded asset
    */
   async _uploadPreviewImage(dataUri) {

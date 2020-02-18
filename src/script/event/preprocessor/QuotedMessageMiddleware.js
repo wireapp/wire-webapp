@@ -32,7 +32,7 @@ export class QuotedMessageMiddleware {
    * This class is reponsible for parsing incoming text messages that contains quoted messages.
    * It will handle validating the quote and adding metadata to the event.
    *
-   * @param {EventService} eventService - Repository that handles events
+   * @param {EventService} eventService Repository that handles events
    */
   constructor(eventService) {
     this.eventService = eventService;
@@ -43,7 +43,7 @@ export class QuotedMessageMiddleware {
    * Handles validation of the event if it contains a quote.
    * If the event does contain a quote, will also decorate the event with some metadata regarding the quoted message
    *
-   * @param {Object} event - event in the DB format
+   * @param {Object} event event in the DB format
    * @returns {Object} event - the original event if no quote is found (or does not validate). The decorated event if the quote is valid
    */
   processEvent(event) {

@@ -17,7 +17,6 @@
  *
  */
 
-import moment from 'moment';
 import $ from 'jquery';
 import {groupBy} from 'underscore';
 
@@ -25,6 +24,7 @@ import {getLogger} from 'Util/Logger';
 import {scrollEnd, scrollToBottom, scrollBy} from 'Util/scroll-helpers';
 import {t} from 'Util/LocalizerUtil';
 import {safeWindowOpen, safeMailOpen} from 'Util/SanitizationUtil';
+import {isSameDay, differenceInMinutes} from 'Util/TimeUtil';
 
 import {Config} from '../../Config';
 import {Conversation} from '../../entity/Conversation';
@@ -46,7 +46,6 @@ class MessageListViewModel {
     this.click_on_cancel_request = this.click_on_cancel_request.bind(this);
     this.click_on_like = this.click_on_like.bind(this);
     this.clickOnInvitePeople = this.clickOnInvitePeople.bind(this);
-    this.get_timestamp_class = this.get_timestamp_class.bind(this);
     this.handleClickOnMessage = this.handleClickOnMessage.bind(this);
     this.is_last_delivered_message = this.is_last_delivered_message.bind(this);
     this.on_session_reset_click = this.on_session_reset_click.bind(this);
@@ -118,7 +117,7 @@ class MessageListViewModel {
 
   /**
    * Remove all subscriptions and reset states.
-   * @param {Conversation} [conversation_et] - Conversation entity to change to
+   * @param {Conversation} [conversation_et] Conversation entity to change to
    * @returns {undefined} No return value
    */
   release_conversation(conversation_et) {
@@ -139,7 +138,7 @@ class MessageListViewModel {
     const messagesContainer = this.getMessagesContainer();
     const scrollPosition = Math.ceil(messagesContainer.scrollTop);
     const scrollEndValue = Math.ceil(scrollEnd(messagesContainer));
-    return scrollPosition > scrollEndValue - Config.SCROLL_TO_LAST_MESSAGE_THRESHOLD;
+    return scrollPosition > scrollEndValue - Config.getConfig().SCROLL_TO_LAST_MESSAGE_THRESHOLD;
   }
 
   /**
@@ -163,8 +162,8 @@ class MessageListViewModel {
   /**
    * Change conversation.
    *
-   * @param {Conversation} conversationEntity - Conversation entity to change to
-   * @param {Message} messageEntity - message to be focused
+   * @param {Conversation} conversationEntity Conversation entity to change to
+   * @param {Message} messageEntity message to be focused
    * @returns {Promise} Resolves when conversation was changed
    */
   changeConversation(conversationEntity, messageEntity) {
@@ -211,8 +210,8 @@ class MessageListViewModel {
 
   /**
    * Sets the conversation and waits for further processing until knockout has rendered the messages.
-   * @param {Conversation} conversationEntity - Conversation entity to set
-   * @param {Message} messageEntity - Message that should be in focus when the conversation loads
+   * @param {Conversation} conversationEntity Conversation entity to set
+   * @param {Message} messageEntity Message that should be in focus when the conversation loads
    * @returns {Promise} Resolves when conversation was rendered
    */
   _renderConversation(conversationEntity, messageEntity) {
@@ -271,8 +270,8 @@ class MessageListViewModel {
 
   /**
    * Checks how to scroll message list and if conversation should be marked as unread.
-   * @param {Array} changedMessages - List of the messages that were added or removed from the list
-   * @param {boolean} shouldStickToBottom - should the list stick to the bottom
+   * @param {Array} changedMessages List of the messages that were added or removed from the list
+   * @param {boolean} shouldStickToBottom should the list stick to the bottom
    * @returns {undefined} No return value
    */
   _scrollAddedMessagesIntoView(changedMessages, shouldStickToBottom) {
@@ -353,7 +352,7 @@ class MessageListViewModel {
    * Scroll to given message in the list.
    *
    * @note Ideally message is centered horizontally
-   * @param {string} messageId - Target message's id
+   * @param {string} messageId Target message's id
    * @returns {undefined} No return value
    */
   focusMessage(messageId) {
@@ -381,7 +380,7 @@ class MessageListViewModel {
 
   /**
    * Triggered when user clicks on an avatar in the message list.
-   * @param {User} userEntity - User entity of the selected user
+   * @param {User} userEntity User entity of the selected user
    * @returns {undefined} No return value
    */
   showUserDetails(userEntity) {
@@ -403,7 +402,7 @@ class MessageListViewModel {
 
   /**
    * Triggered when user clicks on the session reset link in a decrypt error message.
-   * @param {DecryptErrorMessage} message_et - Decrypt error message
+   * @param {DecryptErrorMessage} message_et Decrypt error message
    * @returns {undefined} No return value
    */
   on_session_reset_click(message_et) {
@@ -423,8 +422,8 @@ class MessageListViewModel {
   /**
    * Shows detail image view.
    *
-   * @param {Message} message_et - Message with asset to be displayed
-   * @param {UIEvent} event - Actual scroll event
+   * @param {Message} message_et Message with asset to be displayed
+   * @param {UIEvent} event Actual scroll event
    * @returns {undefined} No return value
    */
   show_detail(message_et, event) {
@@ -442,7 +441,7 @@ class MessageListViewModel {
     });
   }
 
-  get_timestamp_class(messageEntity) {
+  get_timestamp_class = messageEntity => {
     const previousMessage = this.conversation().get_previous_message(messageEntity);
     if (!previousMessage || messageEntity.is_call()) {
       return '';
@@ -456,21 +455,21 @@ class MessageListViewModel {
       return 'message-timestamp-visible message-timestamp-unread';
     }
 
-    const last = moment(previousMessage.timestamp());
-    const current = moment(messageEntity.timestamp());
+    const last = previousMessage.timestamp();
+    const current = messageEntity.timestamp();
 
-    if (!last.isSame(current, 'day')) {
+    if (!isSameDay(last, current)) {
       return 'message-timestamp-visible message-timestamp-day';
     }
 
-    if (current.diff(last, 'minutes') > 60) {
+    if (differenceInMinutes(current, last) > 60) {
       return 'message-timestamp-visible';
     }
-  }
+  };
 
   /**
    * Checks its older neighbor in order to see if the avatar should be rendered or not
-   * @param {Message} message_et - Message to check
+   * @param {Message} message_et Message to check
    * @returns {boolean} Should user avatar be hidden
    */
   should_hide_user_avatar(message_et) {
@@ -489,7 +488,7 @@ class MessageListViewModel {
 
   /**
    * Checks if the given message is the last delivered one
-   * @param {Message} message_et - Message to check
+   * @param {Message} message_et Message to check
    * @returns {boolean} Message is last delivered one
    */
   is_last_delivered_message(message_et) {
@@ -512,8 +511,8 @@ class MessageListViewModel {
 
   /**
    * Message appeared in viewport.
-   * @param {Conversation} conversationEntity - Conversation the message belongs to
-   * @param {Message} messageEntity - Message to check
+   * @param {Conversation} conversationEntity Conversation the message belongs to
+   * @param {Message} messageEntity Message to check
    * @returns {Function|null} Callback or null
    */
   getInViewportCallback(conversationEntity, messageEntity) {

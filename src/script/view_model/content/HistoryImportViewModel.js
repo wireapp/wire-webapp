@@ -90,7 +90,7 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
         this.errorSecondary(t('backupImportAccountErrorSecondary'));
       } else if (error instanceof z.backup.IncompatibleBackupError) {
         this.errorHeadline(t('backupImportVersionErrorHeadline'));
-        this.errorSecondary(t('backupImportVersionErrorSecondary', Config.BRAND_NAME));
+        this.errorSecondary(t('backupImportVersionErrorSecondary', Config.getConfig().BRAND_NAME));
       } else {
         this.errorHeadline(t('backupImportGenericErrorHeadline'));
         this.errorSecondary(t('backupImportGenericErrorSecondary'));

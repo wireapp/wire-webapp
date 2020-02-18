@@ -18,13 +18,11 @@
  */
 
 import ko from 'knockout';
-
 import {t} from 'Util/LocalizerUtil';
-
-import {SystemMessage} from './SystemMessage';
 
 import {BackendEvent} from '../../event/Backend';
 import {SystemMessageType} from '../../message/SystemMessageType';
+import {SystemMessage} from './SystemMessage';
 
 export class ReceiptModeUpdateMessage extends SystemMessage {
   public caption: ko.PureComputed<string>;

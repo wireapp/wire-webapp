@@ -56,7 +56,7 @@ export class Conversation {
   }
 
   /**
-   * @param {string} conversation_id - Conversation ID
+   * @param {string} conversation_id Conversation ID
    */
   constructor(conversation_id = '') {
     this.id = conversation_id;
@@ -235,6 +235,8 @@ export class Conversation {
       }),
     );
 
+    this.incomingMessages = ko.observableArray();
+
     this.hasAdditionalMessages = ko.observable(true);
 
     this.messages_visible = ko
@@ -252,9 +254,9 @@ export class Conversation {
         selfMentions: [],
         selfReplies: [],
       };
-
-      for (let index = this.messages().length - 1; index >= 0; index--) {
-        const messageEntity = this.messages()[index];
+      const messages = [...this.messages(), ...this.incomingMessages()];
+      for (let index = messages.length - 1; index >= 0; index--) {
+        const messageEntity = messages[index];
         if (messageEntity.visible()) {
           const isReadMessage = messageEntity.timestamp() <= this.last_read_timestamp() || messageEntity.user().is_me;
           if (isReadMessage) {
@@ -327,7 +329,7 @@ export class Conversation {
       if (this.isRequest() || this.is1to1()) {
         const [userEntity] = this.participating_user_ets();
         const userName = userEntity?.name();
-        return userName ? userName : '…';
+        return userName || '…';
       }
 
       if (this.isGroup()) {
@@ -417,9 +419,9 @@ export class Conversation {
   /**
    * Set the timestamp of a given type.
    * @note This will only increment timestamps
-   * @param {string|number} timestamp - Timestamp to be set
-   * @param {Conversation.TIMESTAMP_TYPE} type - Type of timestamp to be updated
-   * @param {boolean} forceUpdate - set the timestamp regardless of previous timestamp value (no checks)
+   * @param {string|number} timestamp Timestamp to be set
+   * @param {Conversation.TIMESTAMP_TYPE} type Type of timestamp to be updated
+   * @param {boolean} forceUpdate set the timestamp regardless of previous timestamp value (no checks)
    * @returns {boolean|number} Timestamp value which can be 'false' (boolean) if there is no timestamp
    */
   setTimestamp(timestamp, type, forceUpdate = false) {
@@ -442,8 +444,8 @@ export class Conversation {
 
   /**
    * Increment only on timestamp update
-   * @param {number} currentTimestamp - Current timestamp
-   * @param {number} updatedTimestamp - Timestamp from update
+   * @param {number} currentTimestamp Current timestamp
+   * @param {number} updatedTimestamp Timestamp from update
    * @returns {number|false} Updated timestamp or `false` if not increased
    */
   _incrementTimeOnly(currentTimestamp, updatedTimestamp) {
@@ -453,7 +455,7 @@ export class Conversation {
 
   /**
    * Adds a single message to the conversation.
-   * @param {Message} messageEntity - Message entity to be added to the conversation.
+   * @param {Message} messageEntity Message entity to be added to the conversation.
    * @returns {Message | undefined} replacedEntity - If a message was replaced in the conversation, returns the original message
    */
   add_message(messageEntity) {
@@ -464,9 +466,13 @@ export class Conversation {
       if (alreadyAdded) {
         return false;
       }
-
-      this.update_timestamps(messageEntity);
-      this.messages_unordered.push(messageEntity);
+      if (this.isShowingLastReceivedMessage()) {
+        this.updateTimestamps(messageEntity);
+        this.incomingMessages.remove(({id}) => messageEntity.id === id);
+        this.messages_unordered.push(messageEntity);
+      } else {
+        this.incomingMessages.push(messageEntity);
+      }
       amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.ADDED, messageEntity);
       return true;
     }
@@ -474,7 +480,7 @@ export class Conversation {
 
   /**
    * Adds multiple messages to the conversation.
-   * @param {Array<Message>} message_ets - Array of message entities to be added to the conversation
+   * @param {Array<Message>} message_ets Array of message entities to be added to the conversation
    * @returns {undefined} No return value
    */
   add_messages(message_ets) {
@@ -485,11 +491,12 @@ export class Conversation {
     for (let counter = message_ets.length - 1; counter >= 0; counter--) {
       const message_et = message_ets[counter];
       if (message_et.user()?.is_me) {
-        this.update_timestamps(message_et);
+        this.updateTimestamps(message_et);
         break;
       }
     }
-
+    const messageIds = message_ets.map(({id}) => id);
+    this.incomingMessages.remove(({id}) => messageIds.includes(id));
     koArrayPushAll(this.messages_unordered, message_ets);
   }
 
@@ -542,7 +549,7 @@ export class Conversation {
 
   /**
    * Prepends messages with new batch of messages.
-   * @param {Array<Message>} message_ets - Array of messages to be added to conversation
+   * @param {Array<Message>} message_ets Array of messages to be added to conversation
    * @returns {undefined} No return value
    */
   prepend_messages(message_ets) {
@@ -553,7 +560,7 @@ export class Conversation {
 
   /**
    * Removes message from the conversation by message id.
-   * @param {string} message_id - ID of the message entity to be removed from the conversation
+   * @param {string} message_id ID of the message entity to be removed from the conversation
    * @returns {undefined} No return value
    */
   remove_message_by_id(message_id) {
@@ -562,7 +569,7 @@ export class Conversation {
 
   /**
    * Removes messages from the conversation.
-   * @param {number} [timestamp] - Optional timestamp which messages should be removed
+   * @param {number} [timestamp] Optional timestamp which messages should be removed
    * @returns {undefined} No return value
    */
   remove_messages(timestamp) {
@@ -607,7 +614,7 @@ export class Conversation {
    * Checks for message duplicates.
    *
    * @private
-   * @param {Message} messageEntity - Message entity to be added to the conversation
+   * @param {Message} messageEntity Message entity to be added to the conversation
    * @returns {Message|undefined} Message if it is not a duplicate
    */
   _checkForDuplicate(messageEntity) {
@@ -646,16 +653,16 @@ export class Conversation {
    * Update information about conversation activity from single message.
    *
    * @private
-   * @param {Message} message_et - Message to be added to conversation
+   * @param {Message} message_et Message to be added to conversation
+   * @param {boolean} forceUpdate set the timestamp regardless of previous timestamp value (no checks)
    * @returns {undefined} No return value
    */
-  update_timestamps(message_et) {
+  updateTimestamps(message_et, forceUpdate = false) {
     if (message_et) {
       const timestamp = message_et.timestamp();
-
       if (timestamp <= this.last_server_timestamp()) {
         if (message_et.timestamp_affects_order()) {
-          this.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.LAST_EVENT);
+          this.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.LAST_EVENT, forceUpdate);
 
           const from_self = message_et.user()?.is_me;
           if (from_self) {
@@ -692,7 +699,7 @@ export class Conversation {
 
   /**
    * Get the message before a given message.
-   * @param {Message} message_et - Message to look up from
+   * @param {Message} message_et Message to look up from
    * @returns {Message | undefined} Previous message
    */
   get_previous_message(message_et) {
@@ -735,7 +742,7 @@ export class Conversation {
    * Get a message by it's unique ID.
    * Only lookup in the loaded message list which is a limited view of all the messages in DB.
    *
-   * @param {string} messageId - ID of message to be retrieved
+   * @param {string} messageId ID of message to be retrieved
    * @returns {Message|undefined} Message with ID or undefined
    */
   getMessage(messageId) {
@@ -766,7 +773,7 @@ export class Conversation {
     }
 
     const participantCount = this.getNumberOfParticipants(true, false);
-    const passesParticipantLimit = participantCount <= Config.MAX_VIDEO_PARTICIPANTS;
+    const passesParticipantLimit = participantCount <= Config.getConfig().MAX_VIDEO_PARTICIPANTS;
 
     if (!passesParticipantLimit) {
       return false;
@@ -782,6 +789,9 @@ export class Conversation {
 
     return true;
   }
+
+  isShowingLastReceivedMessage = () =>
+    this.getLastMessage()?.timestamp() ? this.getLastMessage().timestamp() >= this.last_event_timestamp() : true;
 
   serialize() {
     return {

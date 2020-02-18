@@ -17,8 +17,7 @@
  *
  */
 
-import moment from 'moment';
-
+import {isBeforeToday, formatDateNumeral, formatTimeShort} from 'Util/TimeUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
 
 import {WebAppEvents} from '../event/WebApp';
@@ -49,7 +48,8 @@ class MessageQuote {
     };
 
     this.selfId = selfId;
-    this.moment = moment;
+    this.formatDateNumeral = formatDateNumeral;
+    this.formatTimeShort = formatTimeShort;
 
     this.canShowMore = ko.observable(false);
     this.showFullText = ko.observable(false);
@@ -66,9 +66,7 @@ class MessageQuote {
       if (!this.quotedMessage()) {
         return false;
       }
-      const quoteDate = moment(this.quotedMessage().timestamp());
-      const today = moment().startOf('day');
-      return quoteDate.isBefore(today);
+      return isBeforeToday(this.quotedMessage().timestamp());
     });
 
     if (!this.error() && quote().messageId) {
@@ -180,8 +178,8 @@ ko.components.register('message-quote', {
         <!-- /ko -->
         <div class="message-quote__timestamp"
           data-bind="text: quotedMessageIsBeforeToday()
-            ? t('replyQuoteTimeStampDate', moment(quotedMessage().timestamp()).format('L'))
-            : t('replyQuoteTimeStampTime', moment(quotedMessage().timestamp()).format('LT')),
+            ? t('replyQuoteTimeStampDate', formatDateNumeral(quotedMessage().timestamp()))
+            : t('replyQuoteTimeStampTime', formatTimeShort(quotedMessage().timestamp())),
             click: focusMessage"
           data-uie-name="label-timestamp-quote">
         </div>

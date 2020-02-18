@@ -24,7 +24,7 @@ export class SearchService {
   private readonly apiClient: APIClient;
   /**
    * Construct a new Search Service.
-   * @param {APIClient} apiClient - Client for the API calls
+   * @param {APIClient} apiClient Client for the API calls
    */
   constructor(apiClient: APIClient) {
     this.apiClient = apiClient;
@@ -33,8 +33,8 @@ export class SearchService {
   /**
    * Search for a user.
    *
-   * @param {string} query - Query string (case insensitive)
-   * @param {number} size - Number of requested user
+   * @param {string} query Query string (case insensitive)
+   * @param {number} size Number of requested user
    * @returns {Promise} Resolves with the search results
    */
   getContacts(query: string, size: number): Promise<SearchResult> {

@@ -33,13 +33,27 @@ seek-bar {
   width: 100%;
 
   input {
+    --seek-bar-progress: 0%;
     width: 100%;
     height: 2px;
     appearance: none;
+    background-image: linear-gradient(
+      to right,
+      currentColor var(--seek-bar-progress),
+      rgba(255, 255, 255, 0.4) var(--seek-bar-progress)
+    );
     border-radius: 1px;
     color: var(--accent-color);
     cursor: pointer;
     outline: none;
+
+    &.seek-bar--dark {
+      background-image: linear-gradient(
+        to right,
+        currentColor var(--seek-bar-progress),
+        rgba(141, 152, 159, 0.24) var(--seek-bar-progress)
+      );
+    }
 
     &::-moz-range-thumb {
       .seekbar-thumb-style;

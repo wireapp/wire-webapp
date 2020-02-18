@@ -19,22 +19,44 @@
 
 import {ReactWrapper} from 'enzyme';
 import React from 'react';
+import waitForExpect from 'wait-for-expect';
 import {actionRoot} from '../module/action';
-import {initialRootState} from '../module/reducer';
+import {ValidationError} from '../module/action/ValidationError';
+import {initialRootState, RootState, Api} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
 import SetEmail from './SetEmail';
+import {MockStoreEnhanced} from 'redux-mock-store';
+import {TypeUtil} from '@wireapp/commons';
+import {ThunkDispatch} from 'redux-thunk';
+import {AnyAction} from 'redux';
+import {History} from 'history';
 
-describe('"SetEmail"', () => {
-  let wrapper: ReactWrapper;
+class SetEmailPage {
+  private readonly driver: ReactWrapper;
 
-  const emailInput = () => wrapper.find('input[data-uie-name="enter-email"]').first();
-  const verifyEmailButton = () => wrapper.find('button[data-uie-name="do-verify-email"]').first();
-  const errorMessage = () => wrapper.find('[data-uie-name="error-message"]').first();
+  constructor(
+    store: MockStoreEnhanced<TypeUtil.RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
+    history?: History<any>,
+  ) {
+    this.driver = mountComponent(<SetEmail />, store, history);
+  }
 
+  getEmailInput = () => this.driver.find('input[data-uie-name="enter-email"]');
+  getVerifyEmailButton = () => this.driver.find('button[data-uie-name="do-verify-email"]');
+  getErrorMessage = (errorLabel?: string) =>
+    this.driver.find(`[data-uie-name="error-message"]${errorLabel ? `[data-uie-value="${errorLabel}"]` : ''}`);
+
+  clickVerifyEmailButton = () => this.getVerifyEmailButton().simulate('submit');
+
+  enterEmail = (value: string) => this.getEmailInput().simulate('change', {target: {value}});
+
+  update = () => this.driver.update();
+}
+
+describe('SetEmail', () => {
   it('has disabled submit button as long as there is no input', () => {
-    wrapper = mountComponent(
-      <SetEmail />,
+    const setEmailPage = new SetEmailPage(
       mockStoreFactory()({
         ...initialRootState,
         runtimeState: {
@@ -45,25 +67,26 @@ describe('"SetEmail"', () => {
       }),
     );
 
-    expect(emailInput().exists())
+    expect(setEmailPage.getEmailInput().exists())
       .withContext('Email input should be present')
       .toBe(true);
-    expect(verifyEmailButton().exists())
+
+    expect(setEmailPage.getVerifyEmailButton().exists())
       .withContext('Submit button should be present')
       .toBe(true);
 
-    expect(verifyEmailButton().props().disabled)
+    expect(setEmailPage.getVerifyEmailButton().props().disabled)
       .withContext('Submit button should be disabled')
       .toBe(true);
-    emailInput().simulate('change', {target: {value: 'e'}});
-    expect(verifyEmailButton().props().disabled)
+    setEmailPage.enterEmail('e');
+
+    expect(setEmailPage.getVerifyEmailButton().props().disabled)
       .withContext('Submit button should be enabled')
       .toBe(false);
   });
 
-  it('handles invalid email', () => {
-    wrapper = mountComponent(
-      <SetEmail />,
+  it('handles invalid email', async () => {
+    const setEmailPage = new SetEmailPage(
       mockStoreFactory()({
         ...initialRootState,
         runtimeState: {
@@ -74,20 +97,20 @@ describe('"SetEmail"', () => {
       }),
     );
 
-    expect(
-      errorMessage()
-        .text()
-        .trim(),
-    )
-      .withContext('Does not show error')
-      .toEqual('');
+    expect(setEmailPage.getErrorMessage().exists())
+      .withContext('Shows no error')
+      .toBe(false);
 
-    emailInput().simulate('change', {target: {value: 'e'}});
-    verifyEmailButton().simulate('submit');
+    setEmailPage.enterEmail('e');
+    setEmailPage.clickVerifyEmailButton();
 
-    expect(errorMessage().text())
-      .withContext('Shows invalid email error')
-      .toEqual('Please enter a valid email address');
+    await waitForExpect(() => {
+      setEmailPage.update();
+
+      expect(setEmailPage.getErrorMessage(ValidationError.FIELD.EMAIL.TYPE_MISMATCH).exists())
+        .withContext('Shows invalid email error')
+        .toBe(true);
+    });
   });
 
   it('trims the email', () => {
@@ -95,8 +118,7 @@ describe('"SetEmail"', () => {
 
     const email = 'e@e.com';
 
-    wrapper = mountComponent(
-      <SetEmail />,
+    const setEmailPage = new SetEmailPage(
       mockStoreFactory()({
         ...initialRootState,
         runtimeState: {
@@ -107,8 +129,8 @@ describe('"SetEmail"', () => {
       }),
     );
 
-    emailInput().simulate('change', {target: {value: ` ${email} `}});
-    verifyEmailButton().simulate('submit');
+    setEmailPage.enterEmail(` ${email} `);
+    setEmailPage.clickVerifyEmailButton();
 
     expect(actionRoot.selfAction.doSetEmail)
       .withContext('action was called')

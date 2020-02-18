@@ -24,20 +24,20 @@ import {capitalizeFirstChar} from 'Util/StringUtil';
  * Enum for various team permissions.
  */
 const TEAM_FEATURES = {
-  NONE: 0,
+  ADD_CONVERSATION_MEMBER: 1 << 4,
+  ADD_TEAM_MEMBER: 1 << 2,
   CREATE_CONVERSATION: 1 << 0,
   DELETE_CONVERSATION: 1 << 1,
-  ADD_TEAM_MEMBER: 1 << 2,
-  REMOVE_TEAM_MEMBER: 1 << 3,
-  ADD_CONVERSATION_MEMBER: 1 << 4,
-  REMOVE_CONVERSATION_MEMBER: 1 << 5,
+  DELETE_TEAM: 1 << 11,
   GET_BILLING: 1 << 6,
-  SET_BILLING: 1 << 7,
-  SET_TEAM_DATA: 1 << 8,
   GET_MEMBER_PERMISSIONS: 1 << 9,
   GET_TEAM_CONVERSATIONS: 1 << 10,
-  DELETE_TEAM: 1 << 11,
+  NONE: 0,
+  REMOVE_CONVERSATION_MEMBER: 1 << 5,
+  REMOVE_TEAM_MEMBER: 1 << 3,
+  SET_BILLING: 1 << 7,
   SET_MEMBER_PERMISSIONS: 1 << 12,
+  SET_TEAM_DATA: 1 << 8,
 };
 
 /*
@@ -51,15 +51,15 @@ const TEAM_FEATURES = {
 let bitsCounter = Object.keys(TEAM_FEATURES).length - 1;
 
 const PUBLIC_FEATURES = {
+  CHAT_WITH_SERVICES: 1 << bitsCounter++,
   CREATE_GROUP_CONVERSATION: 1 << bitsCounter++,
   CREATE_GUEST_ROOM: 1 << bitsCounter++,
-  UPDATE_CONVERSATION_SETTINGS: 1 << bitsCounter++,
-  UPDATE_GROUP_PARTICIPANTS: 1 << bitsCounter++,
+  INVITE_TEAM_MEMBERS: 1 << bitsCounter++,
   MANAGE_SERVICES: 1 << bitsCounter++,
   MANAGE_TEAM: 1 << bitsCounter++,
-  INVITE_TEAM_MEMBERS: 1 << bitsCounter++,
-  CHAT_WITH_SERVICES: 1 << bitsCounter++,
   SEARCH_UNCONNECTED_USERS: 1 << bitsCounter++,
+  UPDATE_CONVERSATION_SETTINGS: 1 << bitsCounter++,
+  UPDATE_GROUP_PARTICIPANTS: 1 << bitsCounter++,
 };
 // tslint:enable:object-literal-sort-keys
 
@@ -168,7 +168,7 @@ export function roleFromTeamPermissions(permissions: {self: number}): ROLE {
  * The function generated will have the following format:
  *   `can<camel cased feature name>: () => boolean`
  *
- * @param boundRole - Default role that will be used by default in every helper. Can be overriden by passing a role when calling the helper
+ * @param boundRole Default role that will be used by default in every helper. Can be overriden by passing a role when calling the helper
  * @returns helpers
  */
 export function generatePermissionHelpers(boundRole = ROLE.NONE): Record<string, (role: ROLE) => boolean> {

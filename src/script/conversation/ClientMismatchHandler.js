@@ -37,9 +37,9 @@ export class ClientMismatchHandler {
    * Handle client mismatch response from backend.
    *
    * @note As part of 412 or general response when sending encrypted message
-   * @param {EventInfoEntity} eventInfoEntity - Info about message
-   * @param {Object} clientMismatch - Client mismatch object containing client user maps for deleted, missing and obsolete clients
-   * @param {Object} payload - Initial payload resulting in a 412
+   * @param {EventInfoEntity} eventInfoEntity Info about message
+   * @param {Object} clientMismatch Client mismatch object containing client user maps for deleted, missing and obsolete clients
+   * @param {Object} payload Initial payload resulting in a 412
    * @returns {Promise} Resolve when mismatch was handled
    */
   onClientMismatch(eventInfoEntity, clientMismatch, payload) {
@@ -57,8 +57,8 @@ export class ClientMismatchHandler {
    * @note Contains clients of which the backend is sure that they should not be recipient of a message and verified they no longer exist.
    * @private
    *
-   * @param {Object} recipients - User client map containing redundant clients
-   * @param {Object} payload - Payload of the request
+   * @param {Object} recipients User client map containing redundant clients
+   * @param {Object} payload Payload of the request
    * @returns {Promise} Resolves with the updated payload
    */
   _handleClientMismatchDeleted(recipients, payload) {
@@ -91,9 +91,9 @@ export class ClientMismatchHandler {
    * Handle the missing client mismatch.
    *
    * @private
-   * @param {Object} recipients - User client map containing redundant clients
-   * @param {Object} payload - Payload of the request
-   * @param {EventInfoEntity} eventInfoEntity - Info about event
+   * @param {Object} recipients User client map containing redundant clients
+   * @param {Object} payload Payload of the request
+   * @param {EventInfoEntity} eventInfoEntity Info about event
    * @returns {Promise} Resolves with the updated payload
    */
   _handleClientMismatchMissing(recipients, payload, eventInfoEntity) {
@@ -147,9 +147,9 @@ export class ClientMismatchHandler {
    *   Sometimes clients of the self user are listed. Thus we cannot remove the payload for all the clients of a user without checking.
    * @private
    *
-   * @param {Object} recipients - User client map containing redundant clients
-   * @param {Object} payload - Payload of the request
-   * @param {EventInfoEntity} eventInfoEntity - Info about event
+   * @param {Object} recipients User client map containing redundant clients
+   * @param {Object} payload Payload of the request
+   * @param {EventInfoEntity} eventInfoEntity Info about event
    * @returns {Promise} Resolves with the updated payload
    */
   _handleClientMismatchRedundant(recipients, payload, eventInfoEntity) {
@@ -205,9 +205,9 @@ export class ClientMismatchHandler {
    * Map a function to recipients.
    *
    * @private
-   * @param {Object} recipients - User client map
-   * @param {Function} clientFn - Function to be executed on clients first
-   * @param {Function} [userFn] - Function to be executed on users at the end
+   * @param {Object} recipients User client map
+   * @param {Function} clientFn Function to be executed on clients first
+   * @param {Function} [userFn] Function to be executed on users at the end
    * @returns {Array} Function array
    */
   _mapRecipients(recipients, clientFn, userFn) {

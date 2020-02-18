@@ -29,16 +29,16 @@ z.error.ConnectError = class ConnectError extends BaseError {
 
   static get MESSAGE() {
     return {
-      NO_CONTACTS: 'No contacts found for matching',
       NOT_SUPPORTED: 'Source not supported',
+      NO_CONTACTS: 'No contacts found for matching',
       UPLOAD: 'Address book upload failed',
     };
   }
 
   static get TYPE() {
     return {
-      NO_CONTACTS: 'NO_CONTACTS',
       NOT_SUPPORTED: 'NOT_SUPPORTED',
+      NO_CONTACTS: 'NO_CONTACTS',
       UPLOAD: 'UPLOAD',
     };
   }

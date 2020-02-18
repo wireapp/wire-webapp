@@ -43,6 +43,7 @@ import Index from './Index';
 import InitialInvite from './InitialInvite';
 import Login from './Login';
 import PhoneLogin from './PhoneLogin';
+import SetAccountType from './SetAccountType';
 import SetEmail from './SetEmail';
 import SetHandle from './SetHandle';
 import SetPassword from './SetPassword';
@@ -64,7 +65,7 @@ const Root = ({
   useEffect(() => {
     startPolling();
     window.onbeforeunload = () => {
-      safelyRemoveCookie(CookieSelector.COOKIE_NAME_APP_OPENED, Config.APP_INSTANCE_ID);
+      safelyRemoveCookie(CookieSelector.COOKIE_NAME_APP_OPENED, Config.getConfig().APP_INSTANCE_ID);
       stopPolling();
     };
   }, []);
@@ -78,7 +79,7 @@ const Root = ({
     return null;
   };
 
-  const isAuthenticatedCheck = (page: any): any => (page ? (isAuthenticated ? page : navigate('/auth#login')) : null);
+  const isAuthenticatedCheck = (page: any): any => (page ? (isAuthenticated ? page : navigate('/auth')) : null);
 
   const ProtectedHistoryInfo = () => isAuthenticatedCheck(<HistoryInfo />);
   const ProtectedInitialInvite = () => isAuthenticatedCheck(<InitialInvite />);
@@ -98,28 +99,32 @@ const Root = ({
             <Route path={ROUTE.CLIENTS} component={ProtectedClientManager} />
             <Route path={ROUTE.CONVERSATION_JOIN_INVALID} component={ConversationJoinInvalid} />
             <Route path={ROUTE.CONVERSATION_JOIN} component={ConversationJoin} />
-            <Route path={ROUTE.CREATE_TEAM} component={Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && TeamName} />
+            <Route
+              path={ROUTE.CREATE_TEAM}
+              component={Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && TeamName}
+            />
             <Route path={ROUTE.HISTORY_INFO} component={ProtectedHistoryInfo} />
             <Route path={ROUTE.INITIAL_INVITE} component={ProtectedInitialInvite} />
             <Route path={ROUTE.LOGIN} component={Login} />
             <Route path={ROUTE.LOGIN_PHONE} component={PhoneLogin} />
+            <Route path={ROUTE.SET_ACCOUNT_TYPE} component={SetAccountType} />
             <Route path={ROUTE.SET_EMAIL} component={ProtectedSetEmail} />
             <Route path={ROUTE.SET_HANDLE} component={ProtectedSetHandle} />
             <Route path={ROUTE.SET_PASSWORD} component={ProtectedSetPassword} />
-            <Route path={ROUTE.SSO} component={SingleSignOn} />
+            <Route path={`${ROUTE.SSO}/:code?`} component={SingleSignOn} />
             <Route path={ROUTE.VERIFY_EMAIL_LINK} component={VerifyEmailLink} />
             <Route path={ROUTE.VERIFY_PHONE_CODE} component={VerifyPhoneCode} />
             <Route
               path={ROUTE.VERIFY_EMAIL_CODE}
-              component={Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && VerifyEmailCode}
+              component={Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && VerifyEmailCode}
             />
             <Route
               path={ROUTE.CREATE_ACCOUNT}
-              component={Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && CreatePersonalAccount}
+              component={Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && CreatePersonalAccount}
             />
             <Route
               path={ROUTE.CREATE_TEAM_ACCOUNT}
-              component={Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && CreateAccount}
+              component={Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && CreateAccount}
             />
             <Redirect to={ROUTE.INDEX} />
           </Switch>

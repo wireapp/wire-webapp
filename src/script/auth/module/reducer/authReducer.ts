@@ -72,7 +72,9 @@ export const initialAuthState: AuthState = {
   fetched: false,
   fetching: false,
   isAuthenticated: false,
-  loginData: {clientType: Config.FEATURE.DEFAULT_LOGIN_TEMPORARY_CLIENT ? ClientType.TEMPORARY : ClientType.PERMANENT},
+  loginData: {
+    clientType: Config.getConfig().FEATURE.DEFAULT_LOGIN_TEMPORARY_CLIENT ? ClientType.TEMPORARY : ClientType.PERMANENT,
+  },
 };
 
 export function authReducer(state: AuthState = initialAuthState, action: AppActions): AuthState {
@@ -136,10 +138,10 @@ export function authReducer(state: AuthState = initialAuthState, action: AppActi
       return {...state, account: {...initialAuthState.account}, error: null};
     }
     case AUTH_ACTION.PUSH_LOGIN_DATA: {
-      return {...state, loginData: {...state.loginData, ...action.payload}, error: null};
+      return {...state, error: null, loginData: {...state.loginData, ...action.payload}};
     }
     case AUTH_ACTION.RESET_LOGIN_DATA: {
-      return {...state, loginData: {...initialAuthState.loginData}, error: null};
+      return {...state, error: null, loginData: {...initialAuthState.loginData}};
     }
     case AUTH_ACTION.LOGOUT_SUCCESS: {
       return {...initialAuthState};

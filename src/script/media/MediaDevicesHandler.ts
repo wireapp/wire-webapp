@@ -40,7 +40,12 @@ declare global {
 export type CurrentAvailableDeviceId = Record<DeviceTypes, ko.PureComputed<string>>;
 export type DeviceSupport = Record<DeviceTypes, ko.PureComputed<boolean>>;
 
-type DeviceTypes = 'audioInput' | 'audioOutput' | 'screenInput' | 'videoInput';
+enum DeviceTypes {
+  AUDIO_INPUT = 'audioInput',
+  AUDIO_OUTPUT = 'audioOutput',
+  SCREEN_INPUT = 'screenInput',
+  VIDEO_INPUT = 'videoInput',
+}
 type Devices = Record<DeviceTypes, ko.ObservableArray<ElectronDesktopCapturerSource | MediaDeviceInfo>>;
 type DeviceIds = Record<DeviceTypes, ko.Observable<string>>;
 type ElectronDesktopCapturerCallback = (error: Error | null, screenSources: ElectronDesktopCapturerSource[]) => void;
@@ -115,10 +120,10 @@ export class MediaDevicesHandler {
     };
 
     this.currentAvailableDeviceId = {
-      audioInput: ko.pureComputed(() => getCurrentAvailableDeviceId('audioInput')),
-      audioOutput: ko.pureComputed(() => getCurrentAvailableDeviceId('audioOutput')),
-      screenInput: ko.pureComputed(() => getCurrentAvailableDeviceId('screenInput')),
-      videoInput: ko.pureComputed(() => getCurrentAvailableDeviceId('videoInput')),
+      audioInput: ko.pureComputed(() => getCurrentAvailableDeviceId(DeviceTypes.AUDIO_INPUT)),
+      audioOutput: ko.pureComputed(() => getCurrentAvailableDeviceId(DeviceTypes.AUDIO_OUTPUT)),
+      screenInput: ko.pureComputed(() => getCurrentAvailableDeviceId(DeviceTypes.SCREEN_INPUT)),
+      videoInput: ko.pureComputed(() => getCurrentAvailableDeviceId(DeviceTypes.VIDEO_INPUT)),
     };
 
     this.deviceSupport = {
@@ -128,17 +133,17 @@ export class MediaDevicesHandler {
       videoInput: ko.pureComputed(() => !!this.availableDevices.videoInput().length),
     };
 
-    this._initializeMediaDevices();
+    this.initializeMediaDevices();
   }
 
   /**
    * Initialize the list of MediaDevices and subscriptions.
    */
-  _initializeMediaDevices(): void {
+  private initializeMediaDevices(): void {
     if (Environment.browser.supports.mediaDevices) {
       this.refreshMediaDevices().then(() => {
-        this._subscribeToObservables();
-        this._subscribeToDevices();
+        this.subscribeToObservables();
+        this.subscribeToDevices();
       });
     }
   }
@@ -146,7 +151,7 @@ export class MediaDevicesHandler {
   /**
    * Subscribe to MediaDevices updates if available.
    */
-  _subscribeToDevices(): void {
+  private subscribeToDevices(): void {
     navigator.mediaDevices.ondevicechange = () => {
       this.logger.info('List of available MediaDevices has changed');
       this.refreshMediaDevices();
@@ -156,7 +161,7 @@ export class MediaDevicesHandler {
   /**
    * Subscribe to Knockout observables.
    */
-  _subscribeToObservables(): void {
+  private subscribeToObservables(): void {
     this.currentDeviceId.audioInput.subscribe(mediaDeviceId => {
       storeValue(MediaDeviceType.AUDIO_INPUT, mediaDeviceId);
     });
@@ -168,6 +173,44 @@ export class MediaDevicesHandler {
     this.currentDeviceId.videoInput.subscribe(mediaDeviceId => {
       storeValue(MediaDeviceType.VIDEO_INPUT, mediaDeviceId);
     });
+  }
+
+  private filterMediaDevices(
+    mediaDevices: MediaDeviceInfo[],
+  ): {
+    microphones: MediaDeviceInfo[];
+    cameras: MediaDeviceInfo[];
+    speakers: MediaDeviceInfo[];
+  } {
+    const videoInputDevices: MediaDeviceInfo[] = mediaDevices.filter(
+      device => device.kind === MediaDeviceType.VIDEO_INPUT,
+    );
+
+    /*
+     * On Windows the same device can be listed multiple times with different group ids ("default", "communications", etc.).
+     * In such a scenario, the device listed as "communications" device is preferred for conferencing calls, so we filter its duplicates.
+     */
+    const microphones = mediaDevices.filter(device => device.kind === MediaDeviceType.AUDIO_INPUT);
+    const dedupedMicrophones = microphones.reduce((microphoneList: Record<string, MediaDeviceInfo>, microphone) => {
+      if (!microphoneList.hasOwnProperty(microphone.groupId) || microphone.deviceId === 'communications') {
+        microphoneList[microphone.groupId] = microphone;
+      }
+      return microphoneList;
+    }, {});
+
+    const speakers = mediaDevices.filter(device => device.kind === MediaDeviceType.AUDIO_OUTPUT);
+    const dedupedSpeakers = speakers.reduce((speakerList: Record<string, MediaDeviceInfo>, speaker) => {
+      if (!speakerList.hasOwnProperty(speaker.groupId) || speaker.deviceId === 'communications') {
+        speakerList[speaker.groupId] = speaker;
+      }
+      return speakerList;
+    }, {});
+
+    return {
+      cameras: videoInputDevices,
+      microphones: Object.values(dedupedMicrophones),
+      speakers: Object.values(dedupedSpeakers),
+    };
   }
 
   /**
@@ -182,35 +225,14 @@ export class MediaDevicesHandler {
         throw error;
       })
       .then(mediaDevices => {
-        this._removeAllDevices();
+        this.removeAllDevices();
 
         if (mediaDevices) {
-          const audioInputDevices: MediaDeviceInfo[] = [];
-          const audioOutputDevices: MediaDeviceInfo[] = [];
-          const videoInputDevices: MediaDeviceInfo[] = [];
+          const filteredDevices = this.filterMediaDevices(mediaDevices);
 
-          mediaDevices.forEach(mediaDevice => {
-            switch (mediaDevice.kind) {
-              case MediaDeviceType.AUDIO_INPUT: {
-                audioInputDevices.push(mediaDevice);
-                break;
-              }
-
-              case MediaDeviceType.AUDIO_OUTPUT: {
-                audioOutputDevices.push(mediaDevice);
-                break;
-              }
-
-              case MediaDeviceType.VIDEO_INPUT: {
-                videoInputDevices.push(mediaDevice);
-                break;
-              }
-            }
-          });
-
-          koArrayPushAll(this.availableDevices.audioInput, audioInputDevices);
-          koArrayPushAll(this.availableDevices.audioOutput, audioOutputDevices);
-          koArrayPushAll(this.availableDevices.videoInput, videoInputDevices);
+          koArrayPushAll(this.availableDevices.audioInput, filteredDevices.microphones);
+          koArrayPushAll(this.availableDevices.audioOutput, filteredDevices.speakers);
+          koArrayPushAll(this.availableDevices.videoInput, filteredDevices.cameras);
 
           this.logger.info('Updated MediaDevice list', mediaDevices);
           return mediaDevices;
@@ -257,7 +279,7 @@ export class MediaDevicesHandler {
    * Remove all known MediaDevices from the lists.
    * @private
    */
-  _removeAllDevices(): void {
+  private removeAllDevices(): void {
     this.availableDevices.audioInput.removeAll();
     this.availableDevices.audioOutput.removeAll();
     this.availableDevices.videoInput.removeAll();

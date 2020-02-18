@@ -42,7 +42,7 @@ describe('Member Message', () => {
       user_a.name('John');
       message_et.userEntities.push(user_a);
 
-      expect(message_et._generateNameString()).toBe('[bold]John[/bold]');
+      expect(message_et.generateNameString()).toBe('[bold]John[/bold]');
     });
 
     it('can return correct string for two users', () => {
@@ -52,7 +52,7 @@ describe('Member Message', () => {
       user_b.name('Jim');
       message_et.userEntities.push(user_a, user_b);
 
-      expect(message_et._generateNameString()).toBe('[bold]Jim[/bold] and [bold]John[/bold]');
+      expect(message_et.generateNameString()).toBe('[bold]Jim[/bold] and [bold]John[/bold]');
     });
 
     it('can return correct string for more than two users', () => {
@@ -64,7 +64,7 @@ describe('Member Message', () => {
       user_c.name('Jill');
       message_et.userEntities.push(user_a, user_b, user_c);
 
-      expect(message_et._generateNameString()).toBe('[bold]Jill[/bold], [bold]Jim[/bold], and [bold]John[/bold]');
+      expect(message_et.generateNameString()).toBe('[bold]Jill[/bold], [bold]Jim[/bold], and [bold]John[/bold]');
     });
 
     it('can return correct string for more than one user without sender', () => {
@@ -80,7 +80,7 @@ describe('Member Message', () => {
       user_c.name('Jill');
       message_et.userEntities.push(user_sender, user_a, user_b, user_c);
 
-      expect(message_et._generateNameString()).toBe('[bold]Jill[/bold], [bold]Jim[/bold], and [bold]John[/bold]');
+      expect(message_et.generateNameString()).toBe('[bold]Jill[/bold], [bold]Jim[/bold], and [bold]John[/bold]');
     });
   });
 

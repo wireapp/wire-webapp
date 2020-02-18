@@ -35,8 +35,8 @@ import {SuperProperty} from '../tracking/SuperProperty';
 
 export class TeamRepository {
   /**
-   * @param {TeamService} teamService - Client for the API calls
-   * @param {UserRepository} userRepository - Repository for all user interactions
+   * @param {TeamService} teamService Client for the API calls
+   * @param {UserRepository} userRepository Repository for all user interactions
    */
   constructor(teamService, userRepository) {
     this.logger = getLogger('TeamRepository');
@@ -131,8 +131,8 @@ export class TeamRepository {
   /**
    * Listener for incoming team events.
    *
-   * @param {Object} eventJson - JSON data for team event
-   * @param {EventRepository.SOURCE} source - Source of event
+   * @param {Object} eventJson JSON data for team event
+   * @param {EventRepository.SOURCE} source Source of event
    * @returns {Promise} Resolves when event was handled
    */
   onTeamEvent(eventJson, source) {

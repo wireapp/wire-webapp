@@ -48,8 +48,8 @@ export class CryptographyRepository {
   }
 
   /**
-   * @param {CryptographyService} cryptographyService - CryptographyService
-   * @param {StorageRepository} storageRepository - Repository for all storage interactions
+   * @param {CryptographyService} cryptographyService CryptographyService
+   * @param {StorageRepository} storageRepository Repository for all storage interactions
    */
   constructor(cryptographyService, storageRepository) {
     this.cryptographyService = cryptographyService;
@@ -64,7 +64,7 @@ export class CryptographyRepository {
 
   /**
    * Initializes the repository by loading an existing Cryptobox.
-   * @param {Dexie} [database] - Database instance
+   * @param {Dexie} [database] Database instance
    * @returns {Promise} Resolves after initialization
    */
   createCryptobox(database) {
@@ -73,7 +73,7 @@ export class CryptographyRepository {
 
   /**
    * Initializes the repository by creating a new Cryptobox.
-   * @param {Dexie} [database] - Database instance
+   * @param {Dexie} [database] Database instance
    * @returns {Promise} Resolves after initialization
    */
   loadCryptobox(database) {
@@ -99,7 +99,7 @@ export class CryptographyRepository {
    * Initialize the repository.
    *
    * @private
-   * @param {Dexie} [database] - Dexie instance
+   * @param {Dexie} [database] Dexie instance
    * @returns {Promise} Resolves after initialization
    */
   async _init(database) {
@@ -157,9 +157,9 @@ export class CryptographyRepository {
 
   /**
    * Get the fingerprint of a remote identity.
-   * @param {string} userId - ID of user
-   * @param {string} clientId - ID of client
-   * @param {PreKey} [preKey] - PreKey to initialize a session from
+   * @param {string} userId ID of user
+   * @param {string} clientId ID of client
+   * @param {PreKey} [preKey] PreKey to initialize a session from
    * @returns {Promise} Resolves with the remote fingerprint
    */
   async getRemoteFingerprint(userId, clientId, preKey) {
@@ -176,8 +176,8 @@ export class CryptographyRepository {
   /**
    * Get a pre-key for the given client of the user.
    *
-   * @param {string} userId - User ID
-   * @param {string} clientId - Client ID
+   * @param {string} userId User ID
+   * @param {string} clientId Client ID
    * @returns {Promise} Resolves with a map of pre-keys for the requested clients
    */
   getUserPreKeyByIds(userId, clientId) {
@@ -197,7 +197,7 @@ export class CryptographyRepository {
 
   /**
    * Get a pre-key for each client in the user client map.
-   * @param {Object} recipients - User client map to request pre-keys for
+   * @param {Object} recipients User client map to request pre-keys for
    * @returns {Promise} Resolves with a map of pre-keys for the requested clients
    */
   getUsersPreKeys(recipients) {
@@ -243,8 +243,8 @@ export class CryptographyRepository {
    *
    * @todo Make public
    * @private
-   * @param {string} userId - User ID for the remote participant
-   * @param {string} clientId - Client ID of the remote participant
+   * @param {string} userId User ID for the remote participant
+   * @param {string} clientId Client ID of the remote participant
    * @returns {string} Session ID
    */
   _constructSessionId(userId, clientId) {
@@ -259,9 +259,9 @@ export class CryptographyRepository {
   /**
    * Bundles and encrypts the generic message for all given clients.
    *
-   * @param {Object} recipients - Contains all users and their known clients
-   * @param {GenericMessage} genericMessage - Proto buffer message to be encrypted
-   * @param {Object} [payload={sender: string, recipients: {}, native_push: true}] - Object to contain encrypted message payload
+   * @param {Object} recipients Contains all users and their known clients
+   * @param {GenericMessage} genericMessage Proto buffer message to be encrypted
+   * @param {Object} [payload={sender: string, recipients: {}, native_push: true}] Object to contain encrypted message payload
    * @returns {Promise} Resolves with the encrypted payload
    */
   async encryptGenericMessage(recipients, genericMessage, payload = this._constructPayload(this.currentClient().id)) {
@@ -295,7 +295,7 @@ export class CryptographyRepository {
 
   /**
    * Handle an encrypted event.
-   * @param {Object} event - Backend event to decrypt
+   * @param {Object} event Backend event to decrypt
    * @returns {Promise} Resolves with decrypted and mapped message
    */
   async handleEncryptedEvent(event) {
@@ -309,9 +309,10 @@ export class CryptographyRepository {
     }
 
     // Check the length of the message
-    const genericMessageIsTooBig = eventData.text.length > Config.MAXIMUM_MESSAGE_LENGTH_RECEIVING;
+    const genericMessageIsTooBig = eventData.text.length > Config.getConfig().MAXIMUM_MESSAGE_LENGTH_RECEIVING;
     const isExternal = typeof eventData.data === 'string';
-    const externalMessageIsTooBig = isExternal && eventData.data.length > Config.MAXIMUM_MESSAGE_LENGTH_RECEIVING;
+    const externalMessageIsTooBig =
+      isExternal && eventData.data.length > Config.getConfig().MAXIMUM_MESSAGE_LENGTH_RECEIVING;
     if (genericMessageIsTooBig || externalMessageIsTooBig) {
       const error = new ProteusErrors.DecryptError.InvalidMessage('The received message was too big.', 300);
       const errorEvent = z.conversation.EventBuilder.buildIncomingMessageTooBig(event, error, error.code);
@@ -422,7 +423,7 @@ export class CryptographyRepository {
    * Construct the payload for an encrypted message.
    *
    * @private
-   * @param {string} sender - Client ID of message sender
+   * @param {string} sender Client ID of message sender
    * @returns {Object} Payload to send to backend
    */
   _constructPayload(sender) {
@@ -437,7 +438,7 @@ export class CryptographyRepository {
    * Decrypt an event.
    *
    * @private
-   * @param {Object} event - Backend event to decrypt
+   * @param {Object} event Backend event to decrypt
    * @returns {Promise} Resolves with the decrypted message in ProtocolBuffer format
    */
   async _decryptEvent(event) {
@@ -455,9 +456,9 @@ export class CryptographyRepository {
    * @note We created the convention that whenever we fail to encrypt for a specific client, we send a Bomb Emoji (no joke!)
    *
    * @private
-   * @param {string} sessionId - ID of session to encrypt for
-   * @param {GenericMessage} genericMessage - Protobuf message
-   * @param {Object} [preKeyBundle] - Pre-key bundle
+   * @param {string} sessionId ID of session to encrypt for
+   * @param {GenericMessage} genericMessage Protobuf message
+   * @param {Object} [preKeyBundle] Pre-key bundle
    * @returns {Object} Contains session ID and encrypted message as base64 encoded string
    */
   async _encryptPayloadForSession(sessionId, genericMessage, preKeyBundle) {
@@ -525,9 +526,9 @@ export class CryptographyRepository {
    * Report decryption error to Localytics and stack traces to Raygun.
    *
    * @private
-   * @param {Error} error - Error from event decryption
-   * @param {Object} eventData - Event data
-   * @param {string} eventData.type - Event type
+   * @param {Error} error Error from event decryption
+   * @param {Object} eventData Event data
+   * @param {string} eventData.type Event type
    * @returns {undefined} No return value
    */
   _reportDecryptionFailure(error, {type: eventType}) {

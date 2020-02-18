@@ -63,15 +63,13 @@
           </div>
         </div>
         <div class="preferences-detail preferences-detail-emoji" data-bind="html: t('preferencesOptionsEmojiReplaceDetail', {}, {'icon': '<span class=\'font-size-xs icon-emoji\'></span>'})"></div>
-        <!-- ko if: Environment.desktop -->
-          <div class="preferences-option preferences-options-multiple">
-            <div class="preferences-option-icon checkbox accent-text" data-bind="attr: {'data-uie-value': optionSendPreviews}" data-uie-name="status-preference-previews-send">
-              <input type="checkbox" id="send-preview-checkbox" data-bind="checked: optionSendPreviews">
-              <label class="preferences-options-checkbox-label" for="send-preview-checkbox" data-bind="text: t('preferencesOptionsPreviewsSendCheckbox')"></label>
-            </div>
+        <div class="preferences-option preferences-options-multiple">
+          <div class="preferences-option-icon checkbox accent-text" data-bind="attr: {'data-uie-value': optionSendPreviews}" data-uie-name="status-preference-previews-send">
+            <input type="checkbox" id="send-preview-checkbox" data-bind="checked: optionSendPreviews">
+            <label class="preferences-options-checkbox-label" for="send-preview-checkbox" data-bind="text: t('preferencesOptionsPreviewsSendCheckbox')"></label>
           </div>
-          <div class="preferences-detail" data-bind="text: t('preferencesOptionsPreviewsSendDetail')"></div>
-        <!-- /ko -->
+        </div>
+        <div class="preferences-detail" data-bind="text: t('preferencesOptionsPreviewsSendDetail')"></div>
       </section>
     <!-- /ko -->
 

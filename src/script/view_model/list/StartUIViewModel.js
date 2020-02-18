@@ -43,9 +43,9 @@ class StartUIViewModel {
   }
 
   /**
-   * @param {MainViewModel} mainViewModel - Main view model
-   * @param {z.viewModel.ListViewModel} listViewModel - List view model
-   * @param {Object} repositories - Object containing all repositories
+   * @param {MainViewModel} mainViewModel Main view model
+   * @param {z.viewModel.ListViewModel} listViewModel List view model
+   * @param {Object} repositories Object containing all repositories
    */
   constructor(mainViewModel, listViewModel, repositories) {
     this.clickOnClose = this.clickOnClose.bind(this);
@@ -64,7 +64,7 @@ class StartUIViewModel {
     this.teamRepository = repositories.team;
     this.userRepository = repositories.user;
     this.logger = getLogger('z.viewModel.list.StartUIViewModel');
-    this.brandName = Config.BRAND_NAME;
+    this.brandName = Config.getConfig().BRAND_NAME;
     this.UserlistMode = UserlistMode;
     this.ParticipantAvatar = ParticipantAvatar;
 

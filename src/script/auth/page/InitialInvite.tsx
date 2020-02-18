@@ -22,7 +22,6 @@ import {
   COLOR,
   CheckIcon,
   ContainerXS,
-  ErrorMessage,
   Form,
   H1,
   Input,
@@ -172,9 +171,7 @@ const InitialInvite = ({
               </RoundIconButton>
             </InputSubmitCombo>
           </Form>
-          <ErrorMessage data-uie-name="error-message">
-            {error ? parseValidationErrors(error) : parseError(inviteError)}
-          </ErrorMessage>
+          {error ? parseValidationErrors(error) : parseError(inviteError)}
         </div>
         <div>
           {invites.length ? (

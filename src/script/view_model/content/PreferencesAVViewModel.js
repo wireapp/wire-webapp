@@ -51,7 +51,7 @@ export class PreferencesAVViewModel {
     this.availableDevices = this.devicesHandler.availableDevices;
     this.currentDeviceId = this.devicesHandler.currentDeviceId;
     this.deviceSupport = this.devicesHandler.deviceSupport;
-    this.Config = Config;
+    this.Config = Config.getConfig();
 
     const updateStream = mediaType => {
       this._releaseAudioMeter();
@@ -106,7 +106,7 @@ export class PreferencesAVViewModel {
     this.audioLevel = ko.observable(0);
     this.audioSource = undefined;
 
-    this.brandName = Config.BRAND_NAME;
+    this.brandName = Config.getConfig().BRAND_NAME;
 
     this.supportsAudioOutput = ko.pureComputed(() => {
       return this.deviceSupport.audioOutput() && Environment.browser.supports.audioOutputSelection;
@@ -146,7 +146,7 @@ export class PreferencesAVViewModel {
   /**
    * Get current MediaStream or initiate it.
    * @private
-   * @param {MediaType} requestedMediaType - MediaType to request the user
+   * @param {MediaType} requestedMediaType MediaType to request the user
    * @returns {Promise} Resolves with a MediaStream
    */
   _getMediaStream(requestedMediaType = MediaType.AUDIO_VIDEO) {
@@ -205,7 +205,7 @@ export class PreferencesAVViewModel {
    * Initiate audio meter.
    *
    * @private
-   * @param {MediaStream} mediaStream - MediaStream to measure audio levels on
+   * @param {MediaStream} mediaStream MediaStream to measure audio levels on
    * @returns {undefined} No return value
    */
   _initiateAudioMeter(mediaStream) {

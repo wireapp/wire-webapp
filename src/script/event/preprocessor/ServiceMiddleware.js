@@ -26,8 +26,8 @@ export class ServiceMiddleware {
   /**
    * Construct a new ServiceMiddleware.
    *
-   * @param {ConverationRepository} conversationRepository - Repository to handle conversation related tasks
-   * @param {UserRepository} userRepository - Repository to handle user related tasks
+   * @param {ConverationRepository} conversationRepository Repository to handle conversation related tasks
+   * @param {UserRepository} userRepository Repository to handle user related tasks
    */
   constructor(conversationRepository, userRepository) {
     this.userRepository = userRepository;

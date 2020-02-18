@@ -41,7 +41,7 @@ function checkOverlayedElements() {
 /**
  * Returns `true` if an element is above the element being watched.
  *
- * @param {HTMLElement} domElement - the element we want to check.
+ * @param {HTMLElement} domElement the element we want to check.
  * @returns {boolean} Is the element overlayed.
  */
 const isOverlayed = domElement => {

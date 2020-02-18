@@ -28,9 +28,9 @@ class TakeoverViewModel {
   /**
    * View model for the username takeover screen.
    *
-   * @param {MainViewModel} mainViewModel - Main view model
-   * @param {z.viewModel.ListViewModel} listViewModel - List view model
-   * @param {Object} repositories - Object containing all repositories
+   * @param {MainViewModel} mainViewModel Main view model
+   * @param {z.viewModel.ListViewModel} listViewModel List view model
+   * @param {Object} repositories Object containing all repositories
    */
   constructor(mainViewModel, listViewModel, repositories) {
     this.listViewModel = listViewModel;
@@ -43,7 +43,7 @@ class TakeoverViewModel {
     this.name = ko.pureComputed(() => (this.selfUser() ? this.selfUser().name() : ''));
     this.username = ko.pureComputed(() => (this.selfUser() ? this.selfUser().username() : ''));
     this.supportUsernameUrl = getSupportUsernameUrl();
-    this.brandName = Config.BRAND_NAME;
+    this.brandName = Config.getConfig().BRAND_NAME;
   }
 
   chooseUsername() {

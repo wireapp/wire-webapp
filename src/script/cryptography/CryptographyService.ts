@@ -27,7 +27,7 @@ export class CryptographyService {
 
   /**
    * Construct a new Cryptography Service.
-   * @param {APIClient} apiClient - Client for the API calls
+   * @param {APIClient} apiClient Client for the API calls
    */
   constructor(apiClient: APIClient) {
     this.apiClient = apiClient;
@@ -37,8 +37,8 @@ export class CryptographyService {
    * Gets a pre-key for a client of a user.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getPrekey
    *
-   * @param {string} userId - User ID
-   * @param {string} clientId - Client ID
+   * @param {string} userId User ID
+   * @param {string} clientId Client ID
    * @returns {Promise} Resolves with a pre-key for given the client of the user
    */
   getUserPreKeyByIds(userId: string, clientId: string): Promise<ClientPreKey> {
@@ -49,7 +49,7 @@ export class CryptographyService {
    * Gets a pre-key for each client of a user client map.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getMultiPrekeyBundles
    *
-   * @param {Object} recipients - User client map to request pre-keys for
+   * @param {Object} recipients User client map to request pre-keys for
    * @returns {Promise} Resolves with a pre-key for each client of the given map
    */
   getUsersPreKeys(recipients: UserClients): Promise<UserPreKeyBundleMap> {
@@ -59,8 +59,8 @@ export class CryptographyService {
   /**
    * Put pre-keys for client to be used by remote clients for session initialization.
    *
-   * @param {string} clientId - Local client ID
-   * @param {Array<string>} serializedPreKeys - Additional pre-keys to be made available
+   * @param {string} clientId Local client ID
+   * @param {Array<string>} serializedPreKeys Additional pre-keys to be made available
    * @returns {Promise} Resolves once the pre-keys are accepted
    */
   putClientPreKeys(clientId: string, serializedPreKeys: PreKey[]): Promise<void> {

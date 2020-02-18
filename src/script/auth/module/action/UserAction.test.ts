@@ -34,6 +34,7 @@ describe('UserAction', () => {
       apiClient: mockedApiClient,
     })({});
     await store.dispatch(actionRoot.userAction.doSendActivationCode(email));
+
     expect(store.getActions()).toEqual([
       UserActionCreator.startSendActivationCode(),
       UserActionCreator.successfulSendActivationCode(),

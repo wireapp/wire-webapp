@@ -25,7 +25,7 @@ export class IntegrationService {
 
   /**
    * Construct a new Integration Service.
-   * @param apiClient - Client for the API calls
+   * @param apiClient Client for the API calls
    */
   constructor(apiClient: APIClient) {
     this.apiClient = apiClient;

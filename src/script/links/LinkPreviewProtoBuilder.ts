@@ -49,8 +49,8 @@ export const buildFromOpenGraphData = (data: OpenGraphData, link: string, offset
 
   const {description = '', site_name, title = '', url: dataUrl} = data;
 
-  const truncatedDescription = truncate(deArrayify(description), Config.MAXIMUM_LINK_PREVIEW_CHARS);
-  const truncatedTitle = truncate(deArrayify(title), Config.MAXIMUM_LINK_PREVIEW_CHARS);
+  const truncatedDescription = truncate(deArrayify(description), Config.getConfig().MAXIMUM_LINK_PREVIEW_CHARS);
+  const truncatedTitle = truncate(deArrayify(title), Config.getConfig().MAXIMUM_LINK_PREVIEW_CHARS);
 
   const protoArticle = new Article({
     permanentUrl: deArrayify(dataUrl),

@@ -88,8 +88,8 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
   /**
    * Check the remaining lifetime for a given ephemeral message.
    *
-   * @param {Message} messageEntity - Message to check
-   * @param {number} timeOffset - Approximate time different to backend in milliseconds
+   * @param {Message} messageEntity Message to check
+   * @param {number} timeOffset Approximate time different to backend in milliseconds
    * @returns {Promise<void>} No return value
    */
   async checkMessageTimer(messageEntity, timeOffset) {
@@ -114,7 +114,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
 
         const changes = {
           ephemeral_expires: messageEntity.ephemeral_expires(),
-          ephemeral_started: messageEntity.ephemeral_started(),
+          ephemeral_started: Number(messageEntity.ephemeral_started()),
         };
 
         this.eventService.updateEvent(messageEntity.primary_key, changes);
@@ -251,8 +251,8 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
    * Updates the ephemeral timer of a conversation when an timer-update message is received.
    *
    * @private
-   * @param {Conversation} conversationEntity - Conversation entity which message timer was changed
-   * @param {Object} eventJson - JSON data of 'conversation.message-timer-update' event
+   * @param {Conversation} conversationEntity Conversation entity which message timer was changed
+   * @param {Object} eventJson JSON data of 'conversation.message-timer-update' event
    * @returns {Promise} Resolves when the event was handled
    */
   _updateEphemeralTimer(conversationEntity, eventJson) {

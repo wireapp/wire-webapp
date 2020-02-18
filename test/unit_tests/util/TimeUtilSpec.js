@@ -18,7 +18,18 @@
  */
 
 import {t} from 'Util/LocalizerUtil';
-import {formatDuration, formatDurationCaption, formatSeconds} from 'Util/TimeUtil';
+import {
+  formatDayMonth,
+  formatDayMonthNumeral,
+  formatDuration,
+  formatDurationCaption,
+  formatSeconds,
+  isSameDay,
+  isSameMonth,
+  isThisYear,
+  isToday,
+  setDateLocale,
+} from 'Util/TimeUtil';
 
 describe('TimeUtil', () => {
   const ONE_SECOND_IN_MILLIS = 1000;
@@ -319,6 +330,72 @@ describe('TimeUtil', () => {
 
     it('formats undefined as 00:00', () => {
       expect(formatSeconds()).toBe('00:00');
+    });
+  });
+
+  describe('isToday', () => {
+    it('should return true if date is today', () => {
+      expect(isToday(new Date())).toBeTruthy();
+    });
+
+    it('should return false if date is not today', () => {
+      expect(isToday(new Date('2011-10-05T14:48:00.000'))).toBeFalsy();
+    });
+  });
+
+  describe('isThisYear', () => {
+    it('should return true if date is current year', () => {
+      expect(isThisYear(Date.now())).toBeTruthy();
+    });
+
+    it('should return false if date is current year', () => {
+      expect(isThisYear(new Date('2011-10-05T14:48:00.000'))).toBeFalsy();
+    });
+  });
+
+  describe('isSameDay', () => {
+    it('should return true if two dates are from the same day', () => {
+      expect(isSameDay(new Date('2011-10-05T14:48:00.000'), new Date('2011-10-05T12:48:00.000'))).toBeTruthy();
+    });
+
+    it('should return false if two dates are not from the same day', () => {
+      expect(isSameDay(new Date('2011-10-05T14:48:00.000'), new Date('2011-10-04T12:48:00.000'))).toBeFalsy();
+    });
+  });
+
+  describe('isSameMonth', () => {
+    it('should return true if two dates are from the same month', () => {
+      expect(isSameMonth(new Date('2011-10-06T14:48:00.000'), new Date('2011-10-05T12:48:00.000'))).toBeTruthy();
+    });
+
+    it('should return false if two dates are not from the same month', () => {
+      expect(isSameMonth(new Date('2011-11-05T14:48:00.000'), new Date('2011-10-05T12:48:00.000'))).toBeFalsy();
+    });
+  });
+
+  describe('formatDayMonth', () => {
+    it('shows the correctly formatted day and month for the date in default language', () => {
+      expect(formatDayMonth(new Date('2011-11-05T14:48:00.000'))).toBe('Nov 5');
+    });
+
+    it('shows the correctly formatted day and month for the date in german', () => {
+      setDateLocale('de');
+
+      expect(formatDayMonth(new Date('2011-11-05T14:48:00.000'))).toBe('5. Nov.');
+      setDateLocale('en');
+    });
+  });
+
+  describe('formatDayMonthNumeral', () => {
+    it('shows the correctly formatted day and month numerals for the date in default language', () => {
+      expect(formatDayMonthNumeral(new Date('2011-11-05T14:48:00.000'))).toBe('11/05');
+    });
+
+    it('shows the correctly formatted day and month numerals for the date in german', () => {
+      setDateLocale('de');
+
+      expect(formatDayMonthNumeral(new Date('2011-11-05T14:48:00.000'))).toBe('05.11.');
+      setDateLocale('en');
     });
   });
 });

@@ -148,9 +148,9 @@ const _build = (entries, defaultIdentifier) => {
 export const Context = {
   /**
    * Build and display custom context menu
-   * @param {Event} event - menu will appear at currentTarget position
-   * @param {Array} entries - configuration to build the menu {label: 'label', click: function() {}}
-   * @param {string} identifier - data-uie-name added to all entries
+   * @param {Event} event menu will appear at currentTarget position
+   * @param {Array} entries configuration to build the menu {label: 'label', click: function() {}}
+   * @param {string} identifier data-uie-name added to all entries
    * @returns {undefined} No return value
    */
   from: (event, entries, identifier) => {
