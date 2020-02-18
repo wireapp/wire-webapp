@@ -367,13 +367,13 @@ describe('Markdown for code snippets', () => {
     ).toEqual(expected);
   });
 
-  it('renders escaped CoffeeScript code blocks', () => {
+  it('renders escaped TypeScript code blocks', () => {
     const expected =
-      '<pre><code class="lang-coffeescript"><span class="hljs-comment"># <span class="hljs-doctag">TODO:</span> This is not a general utility:</span>\n<span class="hljs-comment"># It should be part of a view model as it\'s UI related.</span>\n  z.util.convert_timestamps = -&gt;\n    if <span class="hljs-variable">$(</span><span class="hljs-string">\'time\'</span>).length &gt; 0\n      recalculate = -&gt;\n</code></pre>';
+      '<pre><code class="lang-typescript"><span class="hljs-keyword">const</span> greetings = (name: <span class="hljs-built_in">string</span>): <span class="hljs-function"><span class="hljs-params">string</span> =&gt;</span> {\n  <span class="hljs-keyword">return</span> <span class="hljs-string">`Hello, <span class="hljs-subst">${name}</span>!`</span>;\n};\n<span class="hljs-built_in">console</span>.log(greetings(<span class="hljs-string">\'world\'</span>));\n</code></pre>';
 
     expect(
       renderMessage(
-        "```coffeescript\n# TODO: This is not a general utility:\n# It should be part of a view model as it's UI related.\n  z.util.convert_timestamps = ->\n    if $('time').length > 0\n      recalculate = ->\n```",
+        "```typescript\nconst greetings = (name: string): string => {\n  return `Hello, ${name}!`;\n};\nconsole.log(greetings('world'));\n```",
       ),
     ).toEqual(expected);
   });
