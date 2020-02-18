@@ -202,18 +202,18 @@ ko.components.register('user-devices', {
       });
 
     this.detailMessage = ko.pureComputed(() => {
-      return userEntity() ? t('participantDevicesDetailHeadline', {user: userEntity().first_name()}) : '';
+      return userEntity() ? t('participantDevicesDetailHeadline', {user: userEntity().name()}) : '';
     });
 
     this.devicesHeadlineText = ko.pureComputed(() => {
-      return userEntity() ? t('participantDevicesHeadline', {brandName, user: userEntity().first_name()}) : '';
+      return userEntity() ? t('participantDevicesHeadline', {brandName, user: userEntity().name()}) : '';
     });
 
     this.noDevicesHeadlineText = ko.pureComputed(() => {
       return userEntity()
         ? t('participantDevicesOutdatedClientMessage', {
             brandName,
-            user: userEntity().first_name(),
+            user: userEntity().name(),
           })
         : '';
     });

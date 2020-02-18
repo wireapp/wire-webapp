@@ -362,7 +362,7 @@ class App {
       loadingView.updateProgress(2.5);
       telemetry.time_step(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
       await this._initiateSelfUser();
-      loadingView.updateProgress(5, t('initReceivedSelfUser', userRepository.self().first_name()));
+      loadingView.updateProgress(5, t('initReceivedSelfUser', userRepository.self().name()));
       telemetry.time_step(AppInitTimingsStep.RECEIVED_SELF_USER);
       const clientEntity = await this._initiateSelfUserClients();
       const selfUser = userRepository.self();

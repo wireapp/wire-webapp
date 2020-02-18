@@ -20,7 +20,7 @@
 import ko from 'knockout';
 
 import {Declension, joinNames, t} from 'Util/LocalizerUtil';
-import {getFirstName} from 'Util/SanitizationUtil';
+import {getUserName} from 'Util/SanitizationUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 
 import {BackendEvent} from '../../event/Backend';
@@ -107,7 +107,7 @@ export class MemberMessage extends SystemMessage {
 
     this.senderName = ko.pureComputed(() => {
       const isTeamMemberLeave = this.type === ClientEvent.CONVERSATION.TEAM_MEMBER_LEAVE;
-      return isTeamMemberLeave ? this.name() : getFirstName(this.user(), Declension.NOMINATIVE, true);
+      return isTeamMemberLeave ? this.name() : getUserName(this.user(), Declension.NOMINATIVE, true);
     });
 
     this.showNamedCreation = ko.pureComputed(() => this.isConversationCreate() && this.name().length > 0);

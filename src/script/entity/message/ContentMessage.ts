@@ -60,7 +60,7 @@ export class ContentMessage extends Message {
     this.reactions_user_ets = ko.observableArray();
     this.reactions_user_ids = ko.pureComputed(() => {
       this.reactions_user_ets()
-        .map(user_et => user_et.first_name())
+        .map(user_et => user_et.name())
         .join(', ');
     });
 
@@ -87,7 +87,7 @@ export class ContentMessage extends Message {
     this.like_caption = ko.pureComputed(() => {
       if (this.reactions_user_ets().length <= 5) {
         return this.reactions_user_ets()
-          .map(user_et => user_et.first_name())
+          .map(user => user.name())
           .join(', ');
       }
       return t('conversationLikesCaption', this.reactions_user_ets().length);

@@ -20,7 +20,7 @@
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
-import {sortByPriority} from 'Util/StringUtil';
+import {sortUsersByPriority} from 'Util/StringUtil';
 
 import {BasePanelViewModel} from './BasePanelViewModel';
 import {getManageServicesUrl} from '../../externalRoute';
@@ -86,9 +86,7 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
       }
 
       if (this.isTeam()) {
-        userEntities = this.isTeamOnly()
-          ? this.teamMembers().sort((userA, userB) => sortByPriority(userA.first_name(), userB.first_name()))
-          : this.teamUsers();
+        userEntities = this.isTeamOnly() ? this.teamMembers().sort(sortUsersByPriority) : this.teamUsers();
       } else {
         userEntities = this.userRepository.connected_users();
       }

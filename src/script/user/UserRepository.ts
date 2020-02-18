@@ -26,7 +26,7 @@ import {flatten} from 'underscore';
 import {chunk} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
-import {sortByPriority} from 'Util/StringUtil';
+import {sortUsersByPriority} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {createRandomUuid, koArrayPushAll, loadUrlBlob} from 'Util/util';
 
@@ -146,7 +146,7 @@ export class UserRepository {
       .pureComputed(() => {
         return this.users()
           .filter(user_et => user_et.isConnected())
-          .sort((user_a, user_b) => sortByPriority(user_a.first_name(), user_b.first_name()));
+          .sort(sortUsersByPriority);
       })
       .extend({rateLimit: TIME_IN_MILLIS.SECOND});
 

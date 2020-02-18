@@ -214,7 +214,7 @@ ko.components.register('conversation-list-calling-cell', {
         <span class="conversation-list-cell-name" data-bind="link_to: conversationUrl, text: conversation().display_name()"></span>
         <!-- ko if: isIncoming() -->
           <!-- ko if: call.isGroup -->
-            <span class="conversation-list-cell-description" data-bind="text: t('callStateIncomingGroup', call.creatingUser.first_name())" data-uie-name="call-label-incoming"></span>
+            <span class="conversation-list-cell-description" data-bind="text: t('callStateIncomingGroup', call.creatingUser.name())" data-uie-name="call-label-incoming"></span>
           <!-- /ko -->
           <!-- ko ifnot: call.isGroup -->
             <span class="conversation-list-cell-description" data-bind="text: t('callStateIncoming')" data-uie-name="call-label-incoming"></span>
