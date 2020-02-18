@@ -226,8 +226,8 @@
     "test:server": "cd server && yarn test",
     "test:types": "tsc --noEmit",
     "translate:extract": "i18next-scanner 'src/{page,script}/**/*.{js,html,htm}'",
-    "translate:merge": "yarn bundle:prod && node ./bin/translations_normalize.js",
-    "translate:upload": "yarn translate:merge && node ./bin/translations_upload.js"
+    "translate:merge": "yarn bundle:prod && ts-node ./bin/translations_normalize.ts",
+    "translate:upload": "yarn translate:merge && ts-node ./bin/translations_upload.ts"
   },
   "version": "0.1.0"
 }
