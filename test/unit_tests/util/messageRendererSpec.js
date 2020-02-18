@@ -367,20 +367,20 @@ describe('Markdown for code snippets', () => {
     ).toEqual(expected);
   });
 
-  it('renders escaped CoffeeScript code blocks', () => {
+  it('renders escaped TypeScript code blocks', () => {
     const expected =
-      '<pre><code class="lang-coffeescript"><span class="hljs-comment"># <span class="hljs-doctag">TODO:</span> This is not a general utility:</span>\n<span class="hljs-comment"># It should be part of a view model as it\'s UI related.</span>\n  z.util.convert_timestamps = <span class="hljs-function">-&gt;</span>\n    <span class="hljs-keyword">if</span> $(<span class="hljs-string">\'time\'</span>).length &gt; <span class="hljs-number">0</span>\n<span class="hljs-function">      <span class="hljs-title">recalculate</span> = -&gt;</span>\n</code></pre>';
+      '<pre><code class="lang-typescript"><span class="hljs-keyword">const</span> greetings = (name: <span class="hljs-built_in">string</span>): <span class="hljs-function"><span class="hljs-params">string</span> =&gt;</span> {\n  <span class="hljs-keyword">return</span> <span class="hljs-string">`Hello, <span class="hljs-subst">${name}</span>!`</span>;\n};\n<span class="hljs-built_in">console</span>.log(greetings(<span class="hljs-string">\'world\'</span>));\n</code></pre>';
 
     expect(
       renderMessage(
-        "```coffeescript\n# TODO: This is not a general utility:\n# It should be part of a view model as it's UI related.\n  z.util.convert_timestamps = ->\n    if $('time').length > 0\n      recalculate = ->\n```",
+        "```typescript\nconst greetings = (name: string): string => {\n  return `Hello, ${name}!`;\n};\nconsole.log(greetings('world'));\n```",
       ),
     ).toEqual(expected);
   });
 
   it('renders escaped HTML code blocks', () => {
     const expected =
-      '<pre><code class="lang-html">&lt;<span class="hljs-selector-tag">a</span> href=<span class="hljs-string">"javascript:wire.app.logout()"</span>&gt;This is <span class="hljs-selector-tag">a</span> trick&lt;/a&gt;\n</code></pre>';
+      '<pre><code class="lang-html">&lt;<span class="hljs-keyword">a</span> href=<span class="hljs-string">"javascript:wire.app.logout()"</span>&gt;This is <span class="hljs-keyword">a</span> trick&lt;/<span class="hljs-keyword">a</span>&gt;\n</code></pre>';
 
     expect(renderMessage('```html\n<a href="javascript:wire.app.logout()">This is a trick</a>\n```')).toEqual(expected);
   });

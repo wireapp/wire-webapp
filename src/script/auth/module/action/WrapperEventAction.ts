@@ -17,15 +17,12 @@
  *
  */
 
+import {WebAppEvents} from '@wireapp/webapp-events';
 import {ThunkAction} from '../reducer';
 
-enum WrapperEvent {
-  NAVIGATION = 'NavigationEvent',
-}
-
-class WrapperNavigationEvent extends CustomEvent<{url: string}> {
+class WrapperChangeEnvironmentEvent extends CustomEvent<{url: string}> {
   constructor(url: string, options?: EventInit) {
-    super(WrapperEvent.NAVIGATION, {
+    super(WebAppEvents.LIFECYCLE.CHANGE_ENVIRONMENT, {
       ...options,
       detail: {url},
     });
@@ -35,7 +32,7 @@ class WrapperNavigationEvent extends CustomEvent<{url: string}> {
 export class WrapperEventAction {
   doSendNavigationEvent = (url: string): ThunkAction => {
     return async () => {
-      const event = new WrapperNavigationEvent(url);
+      const event = new WrapperChangeEnvironmentEvent(url);
       window.dispatchEvent(event);
     };
   };
