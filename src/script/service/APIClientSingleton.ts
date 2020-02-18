@@ -28,8 +28,8 @@ export class APIClientSingleton {
     this.apiClient = new APIClient({
       urls: {
         name: 'backend',
-        rest: Config.BACKEND_REST,
-        ws: Config.BACKEND_WS,
+        rest: Config.getConfig().BACKEND_REST,
+        ws: Config.getConfig().BACKEND_WS,
       },
     });
   }
