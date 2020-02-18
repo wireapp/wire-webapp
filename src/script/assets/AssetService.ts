@@ -26,8 +26,8 @@ import {WebWorker} from 'Util/worker';
 
 import {AssetRetentionPolicy} from '../assets/AssetRetentionPolicy';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
-import {BackendClientInterface} from '../service/BackendClientInterface';
 import {encryptAesAsset} from './AssetCrypto';
+import {BackendClient} from '../service/BackendClient';
 
 export interface UploadAssetResponse {
   key: string;
@@ -48,9 +48,9 @@ export interface AssetUploadOptions {
 
 export class AssetService {
   private readonly apiClient: APIClient;
-  private readonly backendClient: BackendClientInterface;
+  private readonly backendClient: BackendClient;
 
-  constructor(apiClient: APIClient, backendClient: BackendClientInterface) {
+  constructor(apiClient: APIClient, backendClient: BackendClient) {
     this.apiClient = apiClient;
     this.backendClient = backendClient;
   }
