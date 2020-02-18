@@ -378,7 +378,7 @@ describe('TimeUtil', () => {
       expect(formatDayMonth(new Date('2011-11-05T14:48:00.000'))).toBe('Nov 5');
     });
 
-    it('shows the correctly formated day and month for the date in german', () => {
+    it('shows the correctly formatted day and month for the date in german', () => {
       setDateLocale('de');
 
       expect(formatDayMonth(new Date('2011-11-05T14:48:00.000'))).toBe('5. Nov.');
@@ -387,11 +387,11 @@ describe('TimeUtil', () => {
   });
 
   describe('formatDayMonthNumeral', () => {
-    it('shows the correctly formated day and month numerals for the date in default language', () => {
+    it('shows the correctly formatted day and month numerals for the date in default language', () => {
       expect(formatDayMonthNumeral(new Date('2011-11-05T14:48:00.000'))).toBe('11/05');
     });
 
-    it('shows the correctly formated day and month numerals for the date in german', () => {
+    it('shows the correctly formatted day and month numerals for the date in german', () => {
       setDateLocale('de');
 
       expect(formatDayMonthNumeral(new Date('2011-11-05T14:48:00.000'))).toBe('05.11.');
