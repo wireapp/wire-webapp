@@ -18,17 +18,7 @@
  */
 
 import {APIClient} from '@wireapp/api-client';
-import {GiphyOptions, GiphyResult, GiphySearchResult} from '@wireapp/api-client/dist/giphy';
-
-export enum GiphySorting {
-  RECENT = 'recent',
-  RELEVANT = 'relevant',
-}
-
-export interface GiphySearchOptions extends GiphyOptions {
-  /** Search query term or phrase */
-  q: string;
-}
+import {GiphySearch, GiphyResult, GiphySearchResult} from '@wireapp/api-client/dist/giphy';
 
 export class GiphyService {
   private readonly apiClient: APIClient;
@@ -59,7 +49,7 @@ export class GiphyService {
    * Search GIFs for a word or phrase.
    * @returns Resolves with matches
    */
-  getSearch(options: GiphySearchOptions): Promise<GiphySearchResult> {
-    return this.apiClient.giphy.api.getGiphySearch(options.q, options);
+  getSearch(options: GiphySearch): Promise<GiphySearchResult> {
+    return this.apiClient.giphy.api.getGiphySearch(options);
   }
 }

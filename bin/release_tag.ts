@@ -16,7 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-
+import {GiphySorting} from '@wireapp/api-client/dist/giphy';
 import {APIClient} from '@wireapp/api-client';
 import {ClientType} from '@wireapp/api-client/dist/client';
 import {Account} from '@wireapp/core';
@@ -110,7 +110,12 @@ const ask = (questionToAsk: string, callback: (answer: string) => void): void =>
 };
 
 const sendRandomGif = async (account: Account, conversationId: string, query: string): Promise<void> => {
-  const giphySearchResult = await account.service.giphy.searchGif(query);
+  const giphySearchResult = await account.service.giphy.searchGif({
+    limit: 25,
+    offset: 0,
+    q: query,
+    sort: GiphySorting.RELEVANT,
+  });
   if (!giphySearchResult.data.length) {
     logger.warn(`No gifs found for search query "${query}" :(`);
     return;
