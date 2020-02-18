@@ -26,7 +26,6 @@ import ko from 'knockout';
 
 import 'src/script/main/globals';
 
-import {backendConfig} from './testResolver';
 import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 import {User} from 'src/script/entity/User';
@@ -68,14 +67,11 @@ import {ClientService} from 'src/script/client/ClientService';
 import {APIClientSingleton} from 'src/script/service/APIClientSingleton';
 import {TeamService} from 'src/script/team/TeamService';
 import {SearchService} from 'src/script/search/SearchService';
-import {Config} from 'src/script/Config';
 
-window.testConfig = {
-  connection: backendConfig,
+window.env = {
+  BACKEND_REST: 'http://localhost',
+  BACKEND_WS: 'wss://localhost',
 };
-
-Config.getConfig()['BACKEND_REST'] = backendConfig.restUrl;
-Config.getConfig()['BACKEND_WS'] = backendConfig.websocket_url;
 
 window.TestFactory = class TestFactory {
   /**
