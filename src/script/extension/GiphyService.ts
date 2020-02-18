@@ -33,9 +33,6 @@ export interface GiphySearchOptions extends GiphyOptions {
 export class GiphyService {
   private readonly apiClient: APIClient;
 
-  /**
-   * @param apiClient Client for the API calls
-   */
   constructor(apiClient: APIClient) {
     this.apiClient = apiClient;
   }

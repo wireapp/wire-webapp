@@ -22,7 +22,7 @@ import {singleton} from 'tsyringe';
 import {Config} from '../Config';
 
 @singleton()
-class APIClientSingleton {
+export class APIClientSingleton {
   private readonly apiClient: APIClient;
   constructor() {
     this.apiClient = new APIClient({
@@ -38,5 +38,3 @@ class APIClientSingleton {
     return this.apiClient;
   }
 }
-
-export {APIClientSingleton};

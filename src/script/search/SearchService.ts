@@ -22,22 +22,12 @@ import {SearchResult} from '@wireapp/api-client/dist/user';
 
 export class SearchService {
   private readonly apiClient: APIClient;
-  /**
-   * Construct a new Search Service.
-   * @param {APIClient} apiClient Client for the API calls
-   */
+
   constructor(apiClient: APIClient) {
     this.apiClient = apiClient;
   }
 
-  /**
-   * Search for a user.
-   *
-   * @param {string} query Query string (case insensitive)
-   * @param {number} size Number of requested user
-   * @returns {Promise} Resolves with the search results
-   */
-  getContacts(query: string, size: number): Promise<SearchResult> {
-    return this.apiClient.user.api.getSearchContacts(query, size);
+  getContacts(query: string, numberOfRequestedUser: number): Promise<SearchResult> {
+    return this.apiClient.user.api.getSearchContacts(query, numberOfRequestedUser);
   }
 }

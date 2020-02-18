@@ -18,10 +18,8 @@
  */
 
 import {AccessTokenData, Context, LoginData} from '@wireapp/api-client/dist/auth';
-import {Logger} from 'logdown';
-
+import {Logger, getLogger} from 'Util/Logger';
 import {APIClient} from '@wireapp/api-client';
-import {getLogger} from 'Util/Logger';
 import {loadValue, resetStoreValue, storeValue} from 'Util/StorageUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {ClientType} from '../client/ClientType';

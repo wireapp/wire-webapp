@@ -38,10 +38,6 @@ export class ClientService {
     return '/users';
   }
 
-  /**
-   * @param apiClient Client for the API calls
-   * @param storageService Service for all storage interactions
-   */
   constructor(apiClient: APIClient, storageService: StorageService) {
     this.apiClient = apiClient;
     this.storageService = storageService;

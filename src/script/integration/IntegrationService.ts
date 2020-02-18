@@ -23,10 +23,6 @@ import {Provider, Service} from '@wireapp/api-client/dist/team/service';
 export class IntegrationService {
   private readonly apiClient: APIClient;
 
-  /**
-   * Construct a new Integration Service.
-   * @param apiClient Client for the API calls
-   */
   constructor(apiClient: APIClient) {
     this.apiClient = apiClient;
   }

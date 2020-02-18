@@ -22,10 +22,7 @@ import {Connection, ConnectionStatus} from '@wireapp/api-client/dist/connection'
 
 export class ConnectionService {
   private readonly apiClient: APIClient;
-  /**
-   * Construct a new Connection Service.
-   * @param {APIClient} apiClient - Client for the API calls
-   */
+
   constructor(apiClient: APIClient) {
     this.apiClient = apiClient;
   }

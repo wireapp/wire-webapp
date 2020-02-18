@@ -25,10 +25,6 @@ import {UserPreKeyBundleMap} from '@wireapp/api-client/dist/user';
 export class CryptographyService {
   private readonly apiClient: APIClient;
 
-  /**
-   * Construct a new Cryptography Service.
-   * @param {APIClient} apiClient Client for the API calls
-   */
   constructor(apiClient: APIClient) {
     this.apiClient = apiClient;
   }

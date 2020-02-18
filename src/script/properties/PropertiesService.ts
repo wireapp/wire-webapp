@@ -22,10 +22,6 @@ import {APIClient} from '@wireapp/api-client';
 class PropertiesService {
   private readonly apiClient: APIClient;
 
-  /**
-   * Construct a new Properties Service.
-   * @param {APIClient} apiClient Client for the API calls
-   */
   constructor(apiClient: APIClient) {
     this.apiClient = apiClient;
   }

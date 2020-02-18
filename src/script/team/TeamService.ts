@@ -25,9 +25,7 @@ import {TeamChunkData, TeamData} from '@wireapp/api-client/dist/team/team/';
 
 export class TeamService {
   private readonly apiClient: APIClient;
-  /**
-   * @param {APIClient} apiClient - Client for the API calls
-   */
+
   constructor(apiClient: APIClient) {
     this.apiClient = apiClient;
   }
