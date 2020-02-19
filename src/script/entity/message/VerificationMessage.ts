@@ -80,7 +80,7 @@ export class VerificationMessage extends Message {
       const [firstUserEntity] = this.userEntities();
       return this.isSelfClient()
         ? t('conversationDeviceYourDevices')
-        : t('conversationDeviceUserDevices', firstUserEntity.first_name());
+        : t('conversationDeviceUserDevices', firstUserEntity.name());
     });
   }
 

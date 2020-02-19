@@ -19,7 +19,7 @@
 
 import ko from 'knockout';
 
-import {getFirstName} from 'Util/SanitizationUtil';
+import {getUserName} from 'Util/SanitizationUtil';
 import {TIME_IN_MILLIS, formatDurationCaption, formatTimeShort, fromUnixTime} from 'Util/TimeUtil';
 
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
@@ -130,9 +130,9 @@ export class Message {
     // MessageCategory
     this.category = undefined;
 
-    this.unsafeSenderName = ko.pureComputed(() => getFirstName(this.user(), undefined, true));
+    this.unsafeSenderName = ko.pureComputed(() => getUserName(this.user(), undefined, true));
     this.headerSenderName = ko.pureComputed(() => {
-      return this.user().isService ? this.user().name() : this.user().first_name();
+      return this.user().name();
     });
 
     this.accent_color = ko.pureComputed(() => `accent-color-${this.user().accent_id()}`);

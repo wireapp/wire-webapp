@@ -21,7 +21,7 @@ import {escape} from 'underscore';
 
 import {User} from '../entity/User';
 import {getSelfName} from './SanitizationUtil';
-import {sortByPriority} from './StringUtil';
+import {sortUsersByPriority} from './StringUtil';
 
 type Substitutes = Record<string, string> | string | number;
 
@@ -58,30 +58,28 @@ export const LocalizerUtil = {
       userEntities = userEntities.filter(userEntity => !userEntity.is_me);
     }
 
-    const firstNames = userEntities
-      .map(userEntity => {
-        const firstName = userEntity.first_name();
-        return boldNames ? `[bold]${firstName}[/bold]` : firstName;
-      })
-      .sort((userNameA, userNameB) => sortByPriority(userNameA, userNameB));
+    const userNames = userEntities.sort(sortUsersByPriority).map(userEntity => {
+      const userName = userEntity.name();
+      return boldNames ? `[bold]${userName}[/bold]` : userName;
+    });
 
     if (containsSelfUser) {
-      firstNames.push(getSelfName(declension));
+      userNames.push(getSelfName(declension));
     }
 
-    const numberOfNames = firstNames.length;
+    const numberOfNames = userNames.length;
     const joinByAnd = !skipAnd && numberOfNames >= 2;
     if (joinByAnd) {
-      const [secondLastName, lastName] = firstNames.splice(firstNames.length - 2, 2);
+      const [secondLastName, lastName] = userNames.splice(userNames.length - 2, 2);
 
       const exactlyTwoNames = numberOfNames === 2;
       const additionalNames = exactlyTwoNames
         ? `${secondLastName} ${t('and')} ${lastName}`
         : `${secondLastName}${t('enumerationAnd')}${lastName}`;
-      firstNames.push(additionalNames);
+      userNames.push(additionalNames);
     }
 
-    return firstNames.join(', ');
+    return userNames.join(', ');
   },
 
   translate: (

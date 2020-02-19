@@ -447,7 +447,7 @@ export class DebugUtil {
           const user = await this.userRepository.get_user_by_id(participantStats.userid);
 
           return createElement('div', [
-            createElement('div', [createElement('strong', user.first_name())]),
+            createElement('div', [createElement('strong', user.name())]),
             createElement('ul', groupedStats.sent.concat(groupedStats.received)),
           ]);
         }),

@@ -46,7 +46,13 @@ import {Declension, joinNames, t} from 'Util/LocalizerUtil';
 import {getDifference, getNextItem} from 'Util/ArrayUtil';
 import {arrayToBase64, createRandomUuid, koArrayPushAll, loadUrlBlob, sortGroupsByLastEvent} from 'Util/util';
 import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
-import {capitalizeFirstChar, compareTransliteration, sortByPriority, startsWith} from 'Util/StringUtil';
+import {
+  capitalizeFirstChar,
+  compareTransliteration,
+  sortByPriority,
+  startsWith,
+  sortUsersByPriority,
+} from 'Util/StringUtil';
 
 import {AssetUploadFailedReason} from '../assets/AssetUploadFailedReason';
 import {encryptAesAsset} from '../assets/AssetCrypto';
@@ -1290,7 +1296,7 @@ export class ConversationRepository {
     return this.user_repository
       .get_users_by_id(conversationEntity.participating_user_ids(), offline)
       .then(userEntities => {
-        userEntities.sort((userA, userB) => sortByPriority(userA.first_name(), userB.first_name()));
+        userEntities.sort(sortUsersByPriority);
         conversationEntity.participating_user_ets(userEntities);
 
         if (updateGuests) {
@@ -1772,7 +1778,7 @@ export class ConversationRepository {
     const userPromise = userIds.length === 1 ? this.user_repository.get_user_by_id(userID) : Promise.resolve();
 
     userPromise.then(userEntity => {
-      const username = userEntity ? userEntity.first_name() : undefined;
+      const username = userEntity ? userEntity.name() : undefined;
       const messageText = username
         ? t('modalConversationNotConnectedMessageOne', username)
         : t('modalConversationNotConnectedMessageMany');
@@ -3982,7 +3988,7 @@ export class ConversationRepository {
 
       if (messageEntity.is_member() || messageEntity.userEntities) {
         return this.user_repository.get_users_by_id(messageEntity.userIds()).then(userEntities => {
-          userEntities.sort((userA, userB) => sortByPriority(userA.first_name(), userB.first_name()));
+          userEntities.sort(sortUsersByPriority);
           messageEntity.userEntities(userEntities);
           return messageEntity;
         });

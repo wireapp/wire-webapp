@@ -24,7 +24,7 @@ import ko from 'knockout';
 import {Environment} from 'Util/Environment';
 import {Declension, t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
-import {getFirstName} from 'Util/SanitizationUtil';
+import {getUserName} from 'Util/SanitizationUtil';
 import {truncate} from 'Util/StringUtil';
 import {TIME_IN_MILLIS, formatDuration} from 'Util/TimeUtil';
 import {ValidationUtilError} from 'Util/ValidationUtil';
@@ -345,18 +345,18 @@ export class NotificationRepository {
       const [otherUserEntity] = messageEntity.userEntities();
 
       const declension = Declension.ACCUSATIVE;
-      const nameOfJoinedUser = getFirstName(otherUserEntity, declension);
+      const nameOfJoinedUser = getUserName(otherUserEntity, declension);
 
       const senderJoined = messageEntity.user().id === otherUserEntity.id;
       if (senderJoined) {
         return t('notificationMemberJoinSelf', nameOfJoinedUser, {}, true);
       }
 
-      const substitutions = {user1: messageEntity.user().first_name(), user2: nameOfJoinedUser};
+      const substitutions = {user1: messageEntity.user().name(), user2: nameOfJoinedUser};
       return t('notificationMemberJoinOne', substitutions, {}, true);
     }
 
-    const substitutions = {number: messageEntity.userIds().length.toString(), user: messageEntity.user().first_name()};
+    const substitutions = {number: messageEntity.userIds().length.toString(), user: messageEntity.user().name()};
     return t('notificationMemberJoinMany', substitutions, {}, true);
   }
 
@@ -370,7 +370,7 @@ export class NotificationRepository {
   private createBodyMemberLeave(messageEntity: MemberMessage): string | void {
     const updatedOneParticipant = messageEntity.userEntities().length === 1;
     if (updatedOneParticipant && !messageEntity.remoteUserEntities().length) {
-      return t('notificationMemberLeaveRemovedYou', messageEntity.user().first_name(), {}, true);
+      return t('notificationMemberLeaveRemovedYou', messageEntity.user().name(), {}, true);
     }
   }
 
@@ -401,7 +401,7 @@ export class NotificationRepository {
       case SystemMessageType.CONNECTION_REQUEST:
         return t('notificationConnectionRequest');
       case SystemMessageType.CONVERSATION_CREATE:
-        return t('notificationConversationCreate', messageEntity.user().first_name(), {}, true);
+        return t('notificationConversationCreate', messageEntity.user().name(), {}, true);
     }
   }
 
@@ -460,14 +460,14 @@ export class NotificationRepository {
 
       if (messageTimer) {
         const timeString = formatDuration(messageTimer).text;
-        const substitutions = {time: timeString, user: messageEntity.user().first_name()};
+        const substitutions = {time: timeString, user: messageEntity.user().name()};
         return t('notificationConversationMessageTimerUpdate', substitutions, {}, true);
       }
-      return t('notificationConversationMessageTimerReset', messageEntity.user().first_name(), {}, true);
+      return t('notificationConversationMessageTimerReset', messageEntity.user().name(), {}, true);
     };
 
     const createBodyRename = () => {
-      const substitutions = {name: (messageEntity as RenameMessage).name, user: messageEntity.user().first_name()};
+      const substitutions = {name: (messageEntity as RenameMessage).name, user: messageEntity.user().name()};
       return t('notificationConversationRename', substitutions, {}, true);
     };
 
@@ -609,7 +609,7 @@ export class NotificationRepository {
     let title;
     if (conversationName) {
       title = conversationEntity.isGroup()
-        ? t('notificationTitleGroup', {conversation: conversationName, user: userEntity.first_name()}, {}, true)
+        ? t('notificationTitleGroup', {conversation: conversationName, user: userEntity.name()}, {}, true)
         : conversationName;
     }
 
