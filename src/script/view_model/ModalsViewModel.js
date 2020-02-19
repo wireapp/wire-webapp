@@ -24,7 +24,7 @@ import {t} from 'Util/LocalizerUtil';
 import {buildSupportUrl} from 'Util/UrlUtil';
 import {noop, afterRender} from 'Util/util';
 import {formatLocale} from 'Util/TimeUtil';
-import {onEscKey, offEscKey, isEnterKey} from 'Util/KeyboardUtil';
+import {onEscKey, offEscKey, isEnterKey, isSpaceKey} from 'Util/KeyboardUtil';
 
 import {Config} from '../Config';
 import {WebAppEvents} from '../event/WebApp';
@@ -226,10 +226,17 @@ export class ModalsViewModel {
     }
     window.addEventListener('keydown', this.handleEnterKey);
     afterRender(() => this.inputFocus(true));
+    document.getElementById(this.elementId).focus();
   };
 
   handleEnterKey = event => {
-    if (isEnterKey(event)) {
+    if (event.target.tagName === 'BUTTON') {
+      if (isSpaceKey(event) || isEnterKey(event)) {
+        event.target.click();
+      }
+      event.stopPropagation();
+      event.preventDefault();
+    } else if (isEnterKey(event)) {
       this.doAction(this.confirm, this.content().closeOnConfirm);
     }
   };
