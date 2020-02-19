@@ -164,7 +164,7 @@ ko.components.register('full-search', {
         <div class="full-search-item-content">
           <div class="full-search-item-content-text ellipsis" data-bind="html: htmlFormatResult(messageEntity)" data-uie-name="full-search-item-text"></div>
           <div class="full-search-item-content-info">
-            <span class="font-weight-bold" data-bind="text: messageEntity.user().first_name()" data-uie-name="full-search-item-sender"></span>
+            <span class="font-weight-bold" data-bind="text: messageEntity.user().name()" data-uie-name="full-search-item-sender"></span>
             <span data-bind="text: resultTimestamp(messageEntity)" data-uie-name="full-search-item-timestamp"></span>
           </div>
         </div>

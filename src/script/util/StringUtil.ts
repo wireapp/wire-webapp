@@ -19,6 +19,7 @@
 
 import getSlug from 'speakingurl';
 import {randomElement} from 'Util/ArrayUtil';
+import {User} from '../entity/User';
 
 export const startsWith = (string = '', query: string): boolean => string.toLowerCase().startsWith(query.toLowerCase());
 export const includesString = (string = '', query = ''): boolean => string.toLowerCase().includes(query.toLowerCase());
@@ -123,6 +124,8 @@ export const sortByPriority = (stringA: string = '', stringB: string = '', query
 
   return stringA.localeCompare(stringB);
 };
+
+export const sortUsersByPriority = (userA: User, userB: User): number => sortByPriority(userA.name(), userB.name());
 
 /**
  * @param str The string to convert

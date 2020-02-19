@@ -221,7 +221,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.inputPlaceholder = ko.pureComputed(() => {
       if (this.showAvailabilityTooltip()) {
         const userEntity = this.conversationEntity().firstUserEntity();
-        const name = userEntity.first_name();
+        const name = userEntity.name();
         const availabilityStrings = {
           [Availability.Type.AVAILABLE]: t('tooltipConversationInputPlaceholderAvailable', name),
           [Availability.Type.AWAY]: t('tooltipConversationInputPlaceholderAway', name),

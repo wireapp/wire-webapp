@@ -36,11 +36,11 @@ export const getSelfName = (declension = Declension.NOMINATIVE, bypassSanitizati
   return bypassSanitization ? selfName : escape(selfName);
 };
 
-export const getFirstName = (userEntity: User, declension: string, bypassSanitization: boolean = false): string => {
+export const getUserName = (userEntity: User, declension: string, bypassSanitization: boolean = false): string => {
   if (userEntity.is_me) {
     return getSelfName(declension, bypassSanitization);
   }
-  return bypassSanitization ? userEntity.first_name() : escape(userEntity.first_name());
+  return bypassSanitization ? userEntity.name() : escape(userEntity.name());
 };
 
 /**
