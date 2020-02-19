@@ -58,12 +58,12 @@ notifications:
 
 # http://docs.travis-ci.com/user/deployment/
 after_success:
-  - if [[ "${TRAVIS_BRANCH}" =~ ^(edge|master|avs)$ ]] && [ "${TRAVIS_PULL_REQUEST}" == "false" ]; then yarn build:prod; fi
+  - if [[ "${TRAVIS_BRANCH}" =~ ^(avs)$ ]] && [ "${TRAVIS_PULL_REQUEST}" == "false" ]; then yarn build:prod; fi
   - |
-    if [[ "${TRAVIS_BRANCH}" =~ ^(dev)$ ]] && [ "${TRAVIS_PULL_REQUEST}" == "false" ]; then
+    if [[ "${TRAVIS_BRANCH}" =~ ^(edge|master|dev)$ ]] && [ "${TRAVIS_PULL_REQUEST}" == "false" ]; then
       yarn build:prod
       if [ "$DISTRIBUTION" == "wire" ]; then
-        yarn docker '' dev
+        yarn docker '' "$TRAVIS_BRANCH"
       fi
     fi
   - |
