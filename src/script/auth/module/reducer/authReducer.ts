@@ -170,7 +170,7 @@ export function authReducer(state: AuthState = initialAuthState, action: AppActi
       return {...state, error: null, loginData: {...initialAuthState.loginData}};
     }
     case AUTH_ACTION.LOGOUT_SUCCESS: {
-      return {...initialAuthState};
+      return {...initialAuthState, fetchingSSOSettings: false};
     }
     case AUTH_ACTION.SILENT_LOGOUT_SUCCESS: {
       return {
