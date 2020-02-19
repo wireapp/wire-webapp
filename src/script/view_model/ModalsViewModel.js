@@ -24,6 +24,7 @@ import {t} from 'Util/LocalizerUtil';
 import {buildSupportUrl} from 'Util/UrlUtil';
 import {noop, afterRender} from 'Util/util';
 import {formatLocale} from 'Util/TimeUtil';
+import {onEscKey, offEscKey} from 'Util/KeyboardUtil';
 
 import {Config} from '../Config';
 import {WebAppEvents} from '../event/WebApp';
@@ -220,6 +221,9 @@ export class ModalsViewModel {
     }
     this.content(content);
     this.state(States.OPEN);
+    if (!preventClose) {
+      onEscKey(this.hide);
+    }
     afterRender(() => this.inputFocus(true));
   };
 
@@ -257,6 +261,7 @@ export class ModalsViewModel {
   };
 
   hide = () => {
+    offEscKey(this.hide);
     this.inputFocus(false);
     this.state(States.CLOSING);
     this.content().closeFn();
