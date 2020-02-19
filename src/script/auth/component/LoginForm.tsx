@@ -91,6 +91,7 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
         maxLength={128}
         type="text"
         required
+        autoFocus
         data-uie-name="enter-email"
       />
       <InputSubmitCombo>
