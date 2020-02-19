@@ -24,7 +24,7 @@ import {t} from 'Util/LocalizerUtil';
 import {buildSupportUrl} from 'Util/UrlUtil';
 import {noop, afterRender} from 'Util/util';
 import {formatLocale} from 'Util/TimeUtil';
-import {onEscKey, offEscKey} from 'Util/KeyboardUtil';
+import {onEscKey, offEscKey, isEnterKey} from 'Util/KeyboardUtil';
 
 import {Config} from '../Config';
 import {WebAppEvents} from '../event/WebApp';
@@ -224,7 +224,14 @@ export class ModalsViewModel {
     if (!preventClose) {
       onEscKey(this.hide);
     }
+    window.addEventListener('keydown', this.handleEnterKey);
     afterRender(() => this.inputFocus(true));
+  };
+
+  handleEnterKey = event => {
+    if (isEnterKey(event)) {
+      this.doAction(this.confirm, this.content().closeOnConfirm);
+    }
   };
 
   hasPassword = () => this.content().currentType === Types.PASSWORD;
@@ -262,6 +269,7 @@ export class ModalsViewModel {
 
   hide = () => {
     offEscKey(this.hide);
+    window.removeEventListener('keydown', this.handleEnterKey);
     this.inputFocus(false);
     this.state(States.CLOSING);
     this.content().closeFn();
