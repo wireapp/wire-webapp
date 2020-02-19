@@ -122,6 +122,7 @@ const config: ServerConfig = {
   CLIENT: {
     ANALYTICS_API_KEY: process.env.ANALYTICS_API_KEY,
     APP_NAME: process.env.APP_NAME,
+    BACKEND_NAME: process.env.BACKEND_NAME,
     BACKEND_REST: process.env.BACKEND_REST,
     BACKEND_WS: process.env.BACKEND_WS,
     BRAND_NAME: process.env.BRAND_NAME,

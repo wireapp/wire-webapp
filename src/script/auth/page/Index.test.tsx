@@ -32,6 +32,7 @@ import {History} from 'history';
 import {createMemoryHistory} from 'history';
 import waitForExpect from 'wait-for-expect';
 import {ROUTE} from '../route';
+import {initialAuthState} from '../module/reducer/authReducer';
 
 class IndexPage {
   private readonly driver: ReactWrapper;
@@ -72,6 +73,37 @@ describe('when visiting the index page', () => {
       .toBe(true);
   });
 
+  it('redirects to SSO login if default SSO code is set', async () => {
+    const history = createMemoryHistory();
+    const historyPushSpy = spyOn(history, 'push');
+
+    const defaultSSOCode = 'defaultt-a4b0-4c59-a31d-303a7f5eb5ab';
+
+    new IndexPage(
+      mockStoreFactory()({
+        ...initialRootState,
+        authState: {
+          ...initialAuthState,
+          ssoSettings: {
+            default_sso_code: defaultSSOCode,
+          },
+        },
+        runtimeState: {
+          hasCookieSupport: true,
+          hasIndexedDbSupport: true,
+          isSupportedBrowser: true,
+        },
+      }),
+      history,
+    );
+
+    await waitForExpect(() => {
+      expect(historyPushSpy)
+        .withContext('Navigation to login page was triggered')
+        .toHaveBeenCalledWith(`${ROUTE.SSO}/wire-${defaultSSOCode}` as any);
+    });
+  });
+
   it('shows the welcome text with default backend name', () => {
     const indexPage = new IndexPage(
       mockStoreFactory()({
@@ -96,7 +128,7 @@ describe('when visiting the index page', () => {
   it('shows the welcome text with custom backend name', () => {
     const customBackendName = 'Test';
     spyOn<{getConfig: () => TypeUtil.RecursivePartial<Configuration>}>(Config, 'getConfig').and.returnValue({
-      BRAND_NAME: customBackendName,
+      BACKEND_NAME: customBackendName,
       FEATURE: {
         ENABLE_ACCOUNT_REGISTRATION: true,
       },
