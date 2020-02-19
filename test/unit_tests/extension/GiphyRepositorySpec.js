@@ -25,9 +25,6 @@ import {APIClientSingleton} from 'src/script/service/APIClientSingleton';
 import {Config} from 'src/script/Config';
 
 describe('Giphy Repository', () => {
-  Config.BACKEND_REST = 'http://localhost';
-  Config.BACKEND_WS = 'wss://localhost';
-
   let server = null;
 
   let giphyRepository = null;
@@ -42,7 +39,7 @@ describe('Giphy Repository', () => {
     spyOn(giphyService, 'getRandom').and.callThrough();
     spyOn(giphyService, 'getById').and.callThrough();
 
-    const randomFooGif = `${Config.BACKEND_REST}/proxy/giphy/v1/gifs/random?tag=foo`;
+    const randomFooGif = `${Config.getConfig().BACKEND_REST}/proxy/giphy/v1/gifs/random?tag=foo`;
     server.respondWith('GET', randomFooGif, [
       200,
       {'Content-Type': 'application/json'},
@@ -76,7 +73,7 @@ describe('Giphy Repository', () => {
       }),
     ]);
 
-    const randomFooGifData = `${Config.BACKEND_REST}/proxy/giphy/v1/gifs/GKLmFicoabZrW`;
+    const randomFooGifData = `${Config.getConfig().BACKEND_REST}/proxy/giphy/v1/gifs/GKLmFicoabZrW`;
     server.respondWith('GET', randomFooGifData, [
       200,
       {'Content-Type': 'application/json'},

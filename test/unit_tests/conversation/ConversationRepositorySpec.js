@@ -22,8 +22,6 @@ import {GenericMessage, LegalHoldStatus, Text} from '@wireapp/protocol-messaging
 
 import {createRandomUuid} from 'Util/util';
 
-import {backendConfig} from '../../api/testResolver';
-
 import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
@@ -54,6 +52,7 @@ import {File} from 'src/script/entity/message/File';
 import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
 import {MessageCategory} from 'src/script/message/MessageCategory';
 import {UserGenerator} from '../../helper/UserGenerator';
+import {Config} from 'src/script/Config';
 
 describe('ConversationRepository', () => {
   const test_factory = new TestFactory();
@@ -96,20 +95,20 @@ describe('ConversationRepository', () => {
       conversation_et = _generate_conversation(ConversationType.SELF);
       conversation_et.id = payload.conversations.knock.post.conversation;
 
-      const ping_url = `${backendConfig.restUrl}/conversations/${conversation_et.id}/knock`;
+      const ping_url = `${Config.getConfig().BACKEND_REST}/conversations/${conversation_et.id}/knock`;
       server.respondWith('POST', ping_url, [
         201,
         {'Content-Type': 'application/json'},
         JSON.stringify(payload.conversations.knock.post),
       ]);
 
-      server.respondWith('GET', `${backendConfig.restUrl}/users?ids=${messageSenderId}`, [
+      server.respondWith('GET', `${Config.getConfig().BACKEND_REST}/users?ids=${messageSenderId}`, [
         200,
         {'Content-Type': 'application/json'},
         '',
       ]);
 
-      const mark_as_read_url = `${backendConfig.restUrl}/conversations/${conversation_et.id}/self`;
+      const mark_as_read_url = `${Config.getConfig().BACKEND_REST}/conversations/${conversation_et.id}/self`;
       server.respondWith('PUT', mark_as_read_url, [200, {}, '']);
 
       return conversation_repository.save_conversation(conversation_et);
@@ -709,7 +708,7 @@ describe('ConversationRepository', () => {
 
     describe('conversation.asset-add', () => {
       beforeEach(() => {
-        const matchUsers = new RegExp(`${backendConfig.restUrl}/users\\?ids=([a-z0-9-,]+)`);
+        const matchUsers = new RegExp(`${Config.getConfig().BACKEND_REST}/users\\?ids=([a-z0-9-,]+)`);
         server.respondWith('GET', matchUsers, (xhr, ids) => {
           const users = [];
           for (const userId of ids.split(',')) {
@@ -759,7 +758,7 @@ describe('ConversationRepository', () => {
           xhr.respond(200, {'Content-Type': 'application/json'}, JSON.stringify(users));
         });
 
-        const matchConversations = new RegExp(`${backendConfig.restUrl}/conversations/([a-z0-9-]+)`);
+        const matchConversations = new RegExp(`${Config.getConfig().BACKEND_REST}/conversations/([a-z0-9-]+)`);
         server.respondWith('GET', matchConversations, (xhr, conversationId) => {
           const conversation = {
             access: ['private'],

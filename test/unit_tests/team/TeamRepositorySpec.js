@@ -17,7 +17,7 @@
  *
  */
 
-import {backendConfig} from '../../api/testResolver';
+import {Config} from 'src/script/Config';
 
 describe('TeamRepository', () => {
   const test_factory = new TestFactory();
@@ -61,13 +61,13 @@ describe('TeamRepository', () => {
     server = sinon.fakeServer.create();
     server.autoRespond = true;
 
-    server.respondWith('GET', `${backendConfig.restUrl}/teams`, [
+    server.respondWith('GET', `${Config.getConfig().BACKEND_REST}/teams`, [
       200,
       {'Content-Type': 'application/json'},
       JSON.stringify(teams_data),
     ]);
 
-    server.respondWith('GET', `${backendConfig.restUrl}/teams/${team_metadata.id}/members`, [
+    server.respondWith('GET', `${Config.getConfig().BACKEND_REST}/teams/${team_metadata.id}/members`, [
       200,
       {'Content-Type': 'application/json'},
       JSON.stringify(team_members),
@@ -75,7 +75,7 @@ describe('TeamRepository', () => {
 
     server.respondWith(
       'GET',
-      `${backendConfig.restUrl}/users?ids=${team_members.members.map(member => member.user).join(',')}`,
+      `${Config.getConfig().BACKEND_REST}/users?ids=${team_members.members.map(member => member.user).join(',')}`,
       [200, {'Content-Type': 'application/json'}, ''],
     );
   });
