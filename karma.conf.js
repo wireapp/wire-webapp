@@ -53,6 +53,8 @@ module.exports = function(config) {
   config.set({
     autoWatch: false,
     basePath: './',
+    browserDisconnectTimeout: 10000,
+    browserDisconnectTolerance: 3,
     browserNoActivityTimeout: 240000,
     browsers: ['ChromeNoSandbox'],
     client: {
