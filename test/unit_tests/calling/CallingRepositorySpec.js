@@ -29,6 +29,7 @@ import {CONV_TYPE, CALL_TYPE, STATE as CALL_STATE, REASON} from '@wireapp/avs';
 import {WebAppEvents} from 'src/script/event/WebApp';
 import {ModalsViewModel} from 'src/script/view_model/ModalsViewModel';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
+import {TestFactory} from '../../helper/TestFactory';
 
 describe('CallingRepository', () => {
   const testFactory = new TestFactory();

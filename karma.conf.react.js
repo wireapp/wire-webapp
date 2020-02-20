@@ -18,6 +18,7 @@
  */
 
 const path = require('path');
+const {SRC_PATH, ROOT_PATH} = require('./locations');
 
 const dist = 'server/dist/static/min';
 const test = 'test';
@@ -60,7 +61,11 @@ module.exports = function(config) {
       },
     },
     files: [
+      {included: false, nocache: false, pattern: path.resolve(ROOT_PATH, 'resource/audio/*.mp3'), served: true},
+      {included: false, nocache: true, pattern: path.resolve(SRC_PATH, 'worker/*.js'), served: true},
+      'node_modules/sinon/pkg/sinon.js',
       `${test}/api/environment.js`,
+      `${test}/api/payloads.js`,
       `${test}/main.test.js`,
       `${dist}/runtime.js`,
       `${dist}/dexie.js`,
@@ -71,6 +76,11 @@ module.exports = function(config) {
     logLevel: config.LOG_INFO,
     port: 9876,
     preprocessors,
+    proxies: {
+      '/audio/': '/base/audio/',
+      '/ext/js/': '/base/node_modules/',
+      '/worker/': '/base/src/worker/',
+    },
     reporters: ['progress', 'coverage-istanbul'],
     singleRun: true,
   });

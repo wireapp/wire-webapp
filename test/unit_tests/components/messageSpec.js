@@ -25,6 +25,7 @@ import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {LinkPreview} from 'src/script/entity/message/LinkPreview';
 import {Text} from 'src/script/entity/message/Text';
 import {User} from 'src/script/entity/User';
+import {TestFactory} from '../../helper/TestFactory';
 import 'src/script/components/message';
 
 describe('message', () => {

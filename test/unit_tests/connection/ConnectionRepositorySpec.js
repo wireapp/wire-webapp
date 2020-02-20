@@ -24,6 +24,7 @@ import {User} from 'src/script/entity/User';
 import {WebAppEvents} from 'src/script/event/WebApp';
 import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
 import {Config} from 'src/script/Config';
+import {TestFactory} from '../../helper/TestFactory';
 
 describe('ConnectionRepository', () => {
   let server = undefined;
@@ -33,7 +34,7 @@ describe('ConnectionRepository', () => {
   beforeAll(() => testFactory.exposeConnectionActors());
 
   beforeEach(() => {
-    connectionRepository = TestFactory.connection_repository;
+    connectionRepository = testFactory.connection_repository;
     server = sinon.fakeServer.create();
     server.autoRespond = true;
   });

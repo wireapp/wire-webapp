@@ -18,9 +18,10 @@
  */
 
 import {Config} from 'src/script/Config';
+import {TestFactory} from '../../helper/TestFactory';
 
 describe('TeamRepository', () => {
-  const test_factory = new TestFactory();
+  const testFactory = new TestFactory();
 
   /* eslint sort-keys-fix/sort-keys-fix: "off" */
   const teams_data = {
@@ -55,7 +56,7 @@ describe('TeamRepository', () => {
   let server = undefined;
   let team_repository = undefined;
 
-  beforeAll(() => test_factory.exposeTeamActors().then(repository => (team_repository = repository)));
+  beforeAll(() => testFactory.exposeTeamActors().then(repository => (team_repository = repository)));
 
   beforeEach(() => {
     server = sinon.fakeServer.create();

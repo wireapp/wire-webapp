@@ -68,49 +68,42 @@ import {APIClientSingleton} from 'src/script/service/APIClientSingleton';
 import {TeamService} from 'src/script/team/TeamService';
 import {SearchService} from 'src/script/search/SearchService';
 
-window.env = {
-  BACKEND_REST: 'http://localhost',
-  BACKEND_WS: 'wss://localhost',
-};
-
-window.TestFactory = class TestFactory {
+export class TestFactory {
   /**
    * @returns {Promise<AuthRepository>} The authentication repository.
    */
   async exposeAuthActors() {
-    TestFactory.auth_repository = new AuthRepository(
-      new AuthService(container.resolve(APIClientSingleton).getClient()),
-    );
-    return TestFactory.auth_repository;
+    this.auth_repository = new AuthRepository(new AuthService(container.resolve(APIClientSingleton).getClient()));
+    return this.auth_repository;
   }
 
   /**
    * @returns {Promise<StorageRepository>} The storage repository.
    */
   async exposeStorageActors() {
-    TestFactory.storage_service = new StorageService();
-    if (!TestFactory.storage_service.db) {
-      TestFactory.storage_service.init(entities.user.john_doe.id, false);
+    this.storage_service = new StorageService();
+    if (!this.storage_service.db) {
+      this.storage_service.init(entities.user.john_doe.id, false);
     }
-    TestFactory.storage_repository = singleton(StorageRepository, TestFactory.storage_service);
+    this.storage_repository = singleton(StorageRepository, this.storage_service);
 
-    return TestFactory.storage_repository;
+    return this.storage_repository;
   }
 
   async exposeBackupActors() {
     await this.exposeStorageActors();
     await this.exposeConversationActors();
-    TestFactory.backup_service = new BackupService(TestFactory.storage_service);
+    this.backup_service = new BackupService(this.storage_service);
 
-    TestFactory.backup_repository = new BackupRepository(
-      TestFactory.backup_service,
-      TestFactory.client_repository,
-      TestFactory.connection_repository,
-      TestFactory.conversation_repository,
-      TestFactory.user_repository,
+    this.backup_repository = new BackupRepository(
+      this.backup_service,
+      this.client_repository,
+      this.connection_repository,
+      this.conversation_repository,
+      this.user_repository,
     );
 
-    return TestFactory.backup_repository;
+    return this.backup_repository;
   }
 
   /**
@@ -121,21 +114,18 @@ window.TestFactory = class TestFactory {
     await this.exposeStorageActors();
     const currentClient = new ClientEntity(true);
     currentClient.id = entities.clients.john_doe.permanent.id;
-    TestFactory.cryptography_service = new CryptographyService(container.resolve(APIClientSingleton).getClient());
+    this.cryptography_service = new CryptographyService(container.resolve(APIClientSingleton).getClient());
 
-    TestFactory.cryptography_repository = new CryptographyRepository(
-      TestFactory.cryptography_service,
-      TestFactory.storage_repository,
-    );
-    TestFactory.cryptography_repository.currentClient = ko.observable(currentClient);
+    this.cryptography_repository = new CryptographyRepository(this.cryptography_service, this.storage_repository);
+    this.cryptography_repository.currentClient = ko.observable(currentClient);
 
     if (mockCryptobox) {
       // eslint-disable-next-line jasmine/no-unsafe-spy
-      spyOn(TestFactory.cryptography_repository, 'createCryptobox').and.returnValue(Promise.resolve());
+      spyOn(this.cryptography_repository, 'createCryptobox').and.returnValue(Promise.resolve());
     }
-    await TestFactory.cryptography_repository.createCryptobox(TestFactory.storage_service.db);
+    await this.cryptography_repository.createCryptobox(this.storage_service.db);
 
-    return TestFactory.cryptography_repository;
+    return this.cryptography_repository;
   }
 
   /**
@@ -156,15 +146,9 @@ window.TestFactory = class TestFactory {
     user.name(entities.user.john_doe.name);
     user.phone(entities.user.john_doe.phone);
 
-    TestFactory.client_service = new ClientService(
-      container.resolve(APIClientSingleton).getClient(),
-      TestFactory.storage_service,
-    );
-    TestFactory.client_repository = new ClientRepository(
-      TestFactory.client_service,
-      TestFactory.cryptography_repository,
-    );
-    TestFactory.client_repository.init(user);
+    this.client_service = new ClientService(container.resolve(APIClientSingleton).getClient(), this.storage_service);
+    this.client_repository = new ClientRepository(this.client_service, this.cryptography_repository);
+    this.client_repository.init(user);
 
     const currentClient = new ClientEntity();
     currentClient.address = '62.96.148.44';
@@ -178,9 +162,9 @@ window.TestFactory = class TestFactory {
     currentClient.time = '2016-10-07T16:01:42.133Z';
     currentClient.type = 'temporary';
 
-    TestFactory.client_repository.currentClient(currentClient);
+    this.client_repository.currentClient(currentClient);
 
-    return TestFactory.client_repository;
+    return this.client_repository;
   }
 
   /**
@@ -190,33 +174,33 @@ window.TestFactory = class TestFactory {
     await this.exposeCryptographyActors();
     await this.exposeUserActors();
 
-    TestFactory.web_socket_service = new WebSocketService(
+    this.web_socket_service = new WebSocketService(
       container.resolve(APIClientSingleton).getClient(),
-      TestFactory.storage_service,
+      this.storage_service,
     );
-    TestFactory.event_service = new EventService(TestFactory.storage_service);
-    TestFactory.event_service_no_compound = new EventServiceNoCompound(TestFactory.storage_service);
-    TestFactory.notification_service = new NotificationService(
+    this.event_service = new EventService(this.storage_service);
+    this.event_service_no_compound = new EventServiceNoCompound(this.storage_service);
+    this.notification_service = new NotificationService(
       container.resolve(APIClientSingleton).getClient(),
-      TestFactory.storage_service,
+      this.storage_service,
     );
-    TestFactory.conversation_service = new ConversationService(
+    this.conversation_service = new ConversationService(
       container.resolve(APIClientSingleton).getClient(),
-      TestFactory.event_service,
-      TestFactory.storage_service,
+      this.event_service,
+      this.storage_service,
     );
 
-    TestFactory.event_repository = new EventRepository(
-      TestFactory.event_service,
-      TestFactory.notification_service,
-      TestFactory.web_socket_service,
-      TestFactory.cryptography_repository,
+    this.event_repository = new EventRepository(
+      this.event_service,
+      this.notification_service,
+      this.web_socket_service,
+      this.cryptography_repository,
       serverTimeHandler,
-      TestFactory.user_repository,
+      this.user_repository,
     );
-    TestFactory.event_repository.currentClient = ko.observable(TestFactory.cryptography_repository.currentClient());
+    this.event_repository.currentClient = ko.observable(this.cryptography_repository.currentClient());
 
-    return TestFactory.event_repository;
+    return this.event_repository;
   }
 
   /**
@@ -224,28 +208,25 @@ window.TestFactory = class TestFactory {
    */
   async exposeUserActors() {
     await this.exposeClientActors();
-    TestFactory.asset_service = new AssetService(container.resolve(APIClientSingleton).getClient());
-    TestFactory.connection_service = new ConnectionService(container.resolve(APIClientSingleton).getClient());
-    TestFactory.user_service = new UserService(
-      container.resolve(APIClientSingleton).getClient(),
-      TestFactory.storage_service,
-    );
-    TestFactory.propertyRepository = TestFactory.propertyRepository = new PropertiesRepository(
+    this.asset_service = new AssetService(container.resolve(APIClientSingleton).getClient());
+    this.connection_service = new ConnectionService(container.resolve(APIClientSingleton).getClient());
+    this.user_service = new UserService(container.resolve(APIClientSingleton).getClient(), this.storage_service);
+    this.propertyRepository = this.propertyRepository = new PropertiesRepository(
       new PropertiesService(container.resolve(APIClientSingleton).getClient()),
       new SelfService(container.resolve(APIClientSingleton).getClient()),
     );
 
-    TestFactory.user_repository = new UserRepository(
-      TestFactory.user_service,
-      TestFactory.asset_service,
+    this.user_repository = new UserRepository(
+      this.user_service,
+      this.asset_service,
       new SelfService(container.resolve(APIClientSingleton).getClient()),
-      TestFactory.client_repository,
+      this.client_repository,
       serverTimeHandler,
-      TestFactory.propertyRepository,
+      this.propertyRepository,
     );
-    TestFactory.user_repository.save_user(TestFactory.client_repository.selfUser(), true);
+    this.user_repository.save_user(this.client_repository.selfUser(), true);
 
-    return TestFactory.user_repository;
+    return this.user_repository;
   }
 
   /**
@@ -253,14 +234,11 @@ window.TestFactory = class TestFactory {
    */
   async exposeConnectionActors() {
     await this.exposeUserActors();
-    TestFactory.connection_service = new ConnectionService(container.resolve(APIClientSingleton).getClient());
+    this.connection_service = new ConnectionService(container.resolve(APIClientSingleton).getClient());
 
-    TestFactory.connection_repository = new ConnectionRepository(
-      TestFactory.connection_service,
-      TestFactory.user_repository,
-    );
+    this.connection_repository = new ConnectionRepository(this.connection_service, this.user_repository);
 
-    return TestFactory.connection_repository;
+    return this.connection_repository;
   }
 
   /**
@@ -268,17 +246,17 @@ window.TestFactory = class TestFactory {
    */
   async exposeSearchActors() {
     await this.exposeUserActors();
-    TestFactory.search_service = new SearchService(container.resolve(APIClientSingleton).getClient());
-    TestFactory.search_repository = new SearchRepository(TestFactory.search_service, TestFactory.user_repository);
+    this.search_service = new SearchService(container.resolve(APIClientSingleton).getClient());
+    this.search_repository = new SearchRepository(this.search_service, this.user_repository);
 
-    return TestFactory.search_repository;
+    return this.search_repository;
   }
 
   async exposeTeamActors() {
     await this.exposeUserActors();
-    TestFactory.team_service = new TeamService(container.resolve(APIClientSingleton).getClient());
-    TestFactory.team_repository = new TeamRepository(TestFactory.team_service, TestFactory.user_repository);
-    return TestFactory.team_repository;
+    this.team_service = new TeamService(container.resolve(APIClientSingleton).getClient());
+    this.team_repository = new TeamRepository(this.team_service, this.user_repository);
+    return this.team_repository;
   }
 
   /**
@@ -289,10 +267,10 @@ window.TestFactory = class TestFactory {
     await this.exposeTeamActors();
     await this.exposeEventActors();
 
-    TestFactory.conversation_service = new ConversationService(
+    this.conversation_service = new ConversationService(
       container.resolve(APIClientSingleton).getClient(),
-      TestFactory.event_service,
-      TestFactory.storage_service,
+      this.event_service,
+      this.storage_service,
     );
 
     const propertiesRepository = new PropertiesRepository(
@@ -300,13 +278,13 @@ window.TestFactory = class TestFactory {
       new SelfService(container.resolve(APIClientSingleton).getClient()),
     );
 
-    TestFactory.conversation_repository = new ConversationRepository(
-      TestFactory.conversation_service,
-      TestFactory.asset_service,
-      TestFactory.client_repository,
-      TestFactory.connection_repository,
-      TestFactory.cryptography_repository,
-      TestFactory.event_repository,
+    this.conversation_repository = new ConversationRepository(
+      this.conversation_service,
+      this.asset_service,
+      this.client_repository,
+      this.connection_repository,
+      this.cryptography_repository,
+      this.event_repository,
       undefined,
       new LinkPreviewRepository(
         new AssetService(container.resolve(APIClientSingleton).getClient()),
@@ -314,12 +292,12 @@ window.TestFactory = class TestFactory {
       ),
       new MessageSender(),
       serverTimeHandler,
-      TestFactory.team_repository,
-      TestFactory.user_repository,
-      TestFactory.propertyRepository,
+      this.team_repository,
+      this.user_repository,
+      this.propertyRepository,
     );
 
-    return TestFactory.conversation_repository;
+    return this.conversation_repository;
   }
 
   /**
@@ -327,15 +305,15 @@ window.TestFactory = class TestFactory {
    */
   async exposeCallingActors() {
     await this.exposeConversationActors();
-    TestFactory.calling_repository = new CallingRepository(
+    this.calling_repository = new CallingRepository(
       container.resolve(APIClientSingleton).getClient(),
-      TestFactory.conversation_repository,
-      TestFactory.event_repository,
+      this.conversation_repository,
+      this.event_repository,
       new MediaRepository(new PermissionRepository()).streamHandler,
       serverTimeHandler,
     );
 
-    return TestFactory.calling_repository;
+    return this.calling_repository;
   }
 
   /**
@@ -345,14 +323,14 @@ window.TestFactory = class TestFactory {
     await this.exposeConversationActors();
     await this.exposeCallingActors();
 
-    TestFactory.notification_repository = new NotificationRepository(
-      TestFactory.calling_repository,
-      TestFactory.conversation_repository,
+    this.notification_repository = new NotificationRepository(
+      this.calling_repository,
+      this.conversation_repository,
       new PermissionRepository(),
-      TestFactory.user_repository,
+      this.user_repository,
     );
 
-    return TestFactory.notification_repository;
+    return this.notification_repository;
   }
 
   /**
@@ -360,12 +338,9 @@ window.TestFactory = class TestFactory {
    */
   async exposeTrackingActors() {
     await this.exposeTeamActors();
-    TestFactory.tracking_repository = new EventTrackingRepository(
-      TestFactory.team_repository,
-      TestFactory.user_repository,
-    );
+    this.tracking_repository = new EventTrackingRepository(this.team_repository, this.user_repository);
 
-    return TestFactory.tracking_repository;
+    return this.tracking_repository;
   }
 
   /**
@@ -373,15 +348,12 @@ window.TestFactory = class TestFactory {
    */
   async exposeLifecycleActors() {
     await this.exposeUserActors();
-    TestFactory.lifecycle_service = new z.lifecycle.LifecycleService();
+    this.lifecycle_service = new z.lifecycle.LifecycleService();
 
-    TestFactory.lifecycle_repository = new z.lifecycle.LifecycleRepository(
-      TestFactory.lifecycle_service,
-      TestFactory.user_repository,
-    );
-    return TestFactory.lifecycle_repository;
+    this.lifecycle_repository = new z.lifecycle.LifecycleRepository(this.lifecycle_service, this.user_repository);
+    return this.lifecycle_repository;
   }
-};
+}
 
 const actorsCache = new Map();
 

@@ -99,7 +99,7 @@ module.exports = function(config) {
     },
     proxies: {
       '/audio/': '/base/audio/',
-      '/ext/js': '/base/node_modules/',
+      '/ext/js/': '/base/node_modules/',
       '/worker/': '/base/src/worker/',
     },
     reporters: ['progress', 'coverage-istanbul'],
@@ -113,7 +113,7 @@ module.exports = function(config) {
       module: {
         rules: [
           {
-            exclude: /node_modules/,
+            exclude: /(node_modules|\.test\.[tj]sx?)/,
             include: [path.resolve('src/script/'), path.resolve('test/helper/')],
             loader: 'babel-loader',
             test: /\.[tj]sx?$/,

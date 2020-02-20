@@ -22,18 +22,19 @@ import $ from 'jquery';
 import {enableLogging} from 'Util/LoggerUtil';
 
 import {AuthViewModel} from '../view_model/AuthViewModel';
-import {resolve, graph} from '../config/appResolver';
 import {Config} from '../Config';
 import {exposeWrapperGlobals} from 'Util/wrapper';
 import {isTemporaryClientAndNonPersistent} from 'Util/util';
 import {StorageKey, StorageService} from '../storage';
 import {loadValue} from 'Util/StorageUtil';
+import {BackendClient} from '../service/BackendClient';
+import {container} from 'tsyringe';
 
 $(async () => {
   enableLogging(Config.getConfig().FEATURE.ENABLE_DEBUG);
   exposeWrapperGlobals();
   if ($('.auth-page').length) {
-    const backendClient = resolve(graph.BackendClient);
+    const backendClient = container.resolve(BackendClient);
     backendClient.setSettings({
       restUrl: Config.getConfig().BACKEND_REST,
       webSocketUrl: Config.getConfig().BACKEND_WS,

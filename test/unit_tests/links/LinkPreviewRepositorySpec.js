@@ -18,22 +18,24 @@
  */
 
 import {AssetService} from 'src/script/assets/AssetService';
-import {graph, resolve as resolveDependency} from '../../api/testResolver';
+import {container} from 'tsyringe';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {PropertiesService} from 'src/script/properties/PropertiesService';
 import {SelfService} from 'src/script/self/SelfService';
 import {LinkPreviewRepository} from 'src/script/links/LinkPreviewRepository';
+import {APIClientSingleton} from 'src/script/service/APIClientSingleton';
+import {BackendClient} from 'src/script/service/BackendClient';
 
 describe('LinkPreviewRepository', () => {
   let link_preview_repository = null;
 
   beforeEach(() => {
-    const backendClient = resolveDependency(graph.BackendClient);
-    const propertiesRepository = new PropertiesRepository(
-      new PropertiesService(backendClient),
-      new SelfService(backendClient),
+    const apiClient = container.resolve(APIClientSingleton).getClient();
+    const propertiesRepository = new PropertiesRepository(new PropertiesService(apiClient), new SelfService(apiClient));
+    link_preview_repository = new LinkPreviewRepository(
+      new AssetService(apiClient, container.resolve(BackendClient)),
+      propertiesRepository,
     );
-    link_preview_repository = new LinkPreviewRepository(new AssetService(backendClient), propertiesRepository);
   });
 
   afterEach(() => (window.openGraphAsync = undefined));

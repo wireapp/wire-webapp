@@ -20,6 +20,7 @@
 import {createRandomUuid} from 'Util/util';
 
 import {User} from 'src/script/entity/User';
+import {TestFactory} from '../../helper/TestFactory';
 
 describe('z.viewModel.content.InputBarViewModel', () => {
   const testFactory = new TestFactory();
@@ -32,9 +33,9 @@ describe('z.viewModel.content.InputBarViewModel', () => {
       undefined,
       {},
       {
-        conversation: TestFactory.conversation_repository,
-        search: TestFactory.search_repository,
-        user: TestFactory.user_repository,
+        conversation: testFactory.conversation_repository,
+        search: testFactory.search_repository,
+        user: testFactory.user_repository,
       },
     );
   });
