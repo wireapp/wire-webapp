@@ -40,7 +40,7 @@ module.exports = {
       ...prodConfig.module.rules,
       {
         exclude: /node_modules/,
-        include: [path.resolve('test/helper'), path.resolve('test/api')],
+        include: [path.resolve('test/helper')],
         loader: 'babel-loader',
         test: /\.[tj]sx?$/,
       },
