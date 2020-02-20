@@ -46,7 +46,7 @@ before_script:
 script:
   - |
     if [ "$DISTRIBUTION" == "wire" ]; then
-      travis_wait 20 yarn test
+      yarn test
     fi
 
 after_script:
