@@ -33,12 +33,15 @@ module.exports = function(config) {
     browserNoActivityTimeout: 20000,
     browsers: ['ChromeNoSandbox'],
     client: {
+      jasmine: {
+        random: false,
+      },
       useIframe: false,
     },
     colors: true,
     concurrency: Infinity,
     coverageIstanbulReporter: {
-      dir: path.resolve('docs/auth-coverage/'),
+      dir: path.resolve('docs/coverage/'),
       fixWebpackSourcePaths: true,
       'report-config': {
         html: {subdir: 'html'},
@@ -57,7 +60,7 @@ module.exports = function(config) {
     customLaunchers: {
       ChromeNoSandbox: {
         base: 'ChromeHeadless',
-        flags: ['--no-sandbox'],
+        flags: ['--no-sandbox', '--autoplay-policy=no-user-gesture-required'],
       },
     },
     files: [
@@ -84,4 +87,11 @@ module.exports = function(config) {
     reporters: ['progress', 'coverage-istanbul'],
     singleRun: true,
   });
+  if (process.env.TRAVIS) {
+    config.set({
+      port: 9877,
+      reporters: ['spec', 'coverage-istanbul'],
+      specReporter: {suppressPassed: true},
+    });
+  }
 };
