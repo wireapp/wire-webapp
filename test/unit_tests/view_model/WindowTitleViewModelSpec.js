@@ -19,7 +19,7 @@
 
 import ko from 'knockout';
 
-import {t} from 'Util/LocalizerUtil';
+import {t, setStrings} from 'Util/LocalizerUtil';
 import {createRandomUuid} from 'Util/util';
 
 import 'src/script/localization/Localizer';
@@ -41,6 +41,7 @@ describe('WindowTitleViewModel', () => {
   let title_view_model = undefined;
 
   beforeEach(() => {
+    setStrings({en: z.string});
     testFactory = new TestFactory();
 
     return testFactory.exposeConversationActors().then(conversationRepository => {
