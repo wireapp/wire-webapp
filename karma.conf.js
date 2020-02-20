@@ -151,10 +151,6 @@ module.exports = function(config) {
         extensions: ['.js', '.jsx', '.ts', '.tsx', '.svg'],
       },
     },
-    webpackMiddleware: {
-      logLevel: 'error',
-      stats: 'errors-only',
-    },
   });
 
   if (process.env.TRAVIS) {
