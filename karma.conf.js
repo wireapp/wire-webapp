@@ -150,6 +150,7 @@ module.exports = function(config) {
         alias: {...rootWebpackConfig.resolve.alias, src: path.resolve(__dirname, 'src')},
         extensions: ['.js', '.jsx', '.ts', '.tsx', '.svg'],
       },
+      stats: 'verbose',
     },
   });
 
