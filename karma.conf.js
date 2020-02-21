@@ -51,9 +51,9 @@ module.exports = function(config) {
         emitWarning: false,
         global: {
           branches: 35,
-          functions: 39,
-          lines: 44,
-          statements: 44,
+          functions: 40,
+          lines: 45,
+          statements: 45,
         },
       },
     },
@@ -76,7 +76,7 @@ module.exports = function(config) {
       `${dist}/test.js`,
     ],
     frameworks: ['jasmine'],
-    logLevel: config.LOG_INFO,
+    logLevel: config.LOG_ERROR,
     port: 9876,
     preprocessors,
     proxies: {
