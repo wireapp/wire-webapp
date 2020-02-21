@@ -222,10 +222,10 @@
     "start": "yarn build:server && grunt build && concurrently \"yarn start:server:dev\" \"grunt watch\"",
     "start:server:dev": "cross-env NODE_ENV=development node ./server/dist/index.js",
     "stylelint": "prettier --ignore-path .gitignore --write \"**/*.less\" && stylelint --ignore-path .gitignore \"**/*.less\"",
-    "test": "yarn test:types && yarn lint && yarn test:server && yarn test:app",
+    "test": "yarn lint && yarn test:server && yarn test:app",
     "test:app": "yarn bundle:test && karma start karma.conf.js",
     "test:server": "cd server && yarn test",
-    "test:types": "exit 0 && tsc --noEmit",
+    "test:types": "tsc --noEmit",
     "translate:extract": "i18next-scanner 'src/{page,script}/**/*.{js,html,htm}'",
     "translate:merge": "yarn bundle:prod && ts-node ./bin/translations_normalize.ts",
     "translate:upload": "yarn translate:merge && ts-node ./bin/translations_upload.ts"
