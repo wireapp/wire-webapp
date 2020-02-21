@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@formatjs/intl-unified-numberformat": "3.2.0",
     "@wireapp/antiscroll-2": "1.0.2",
     "@wireapp/avs": "5.5.6",
     "@wireapp/commons": "3.3.3",
