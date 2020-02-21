@@ -88,7 +88,7 @@ describe('ConversationCellState', () => {
       {
         description: 'returns the number of missed calls',
         expected: {
-          description: t('conversationsSecondaryLineSummaryMissedCalls'),
+          description: t('conversationsSecondaryLineSummaryMissedCalls', 2),
           icon: ConversationStatusIcon.MISSED_CALL,
         },
         unreadState: {...defaultUnreadState, calls: [{}, {}]},
@@ -103,13 +103,16 @@ describe('ConversationCellState', () => {
       },
       {
         description: 'returns the number of pings',
-        expected: {description: t('conversationsSecondaryLineSummaryPings'), icon: ConversationStatusIcon.UNREAD_PING},
+        expected: {
+          description: t('conversationsSecondaryLineSummaryPings', 2),
+          icon: ConversationStatusIcon.UNREAD_PING,
+        },
         unreadState: {...defaultUnreadState, pings: [pingMessage, pingMessage]},
       },
       {
         description: 'returns the number of mentions',
         expected: {
-          description: t('conversationsSecondaryLineSummaryMentions'),
+          description: t('conversationsSecondaryLineSummaryMentions', 2),
           icon: ConversationStatusIcon.UNREAD_MENTION,
         },
         unreadState: {...defaultUnreadState, selfMentions: [1, 2]},
@@ -117,9 +120,10 @@ describe('ConversationCellState', () => {
       {
         description: 'prioritizes mentions, calls, pings and messages',
         expected: {
-          description: `${t('conversationsSecondaryLineSummaryMentions')}, ${t(
+          description: `${t('conversationsSecondaryLineSummaryMentions', 2)}, ${t(
             'conversationsSecondaryLineSummaryMissedCalls',
-          )}, ${t('conversationsSecondaryLineSummaryPings')}, ${t('conversationsSecondaryLineSummaryMessages')}`,
+            2,
+          )}, ${t('conversationsSecondaryLineSummaryPings', 2)}, ${t('conversationsSecondaryLineSummaryMessages', 2)}`,
           icon: ConversationStatusIcon.UNREAD_MENTION,
         },
         unreadState: {...defaultUnreadState, calls: [1, 2], otherMessages: [1, 2], pings: [1, 2], selfMentions: [1, 2]},
