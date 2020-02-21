@@ -43,7 +43,7 @@ import {ShortcutType} from '../../ui/ShortcutType';
 import {Config} from '../../Config';
 import {AssetUploader} from '../../assets/AssetUploader';
 import {AssetService} from '../../assets/AssetService';
-import {BackendClient} from 'src/script/service/BackendClient';
+import {BackendClient} from '../../service/BackendClient';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
