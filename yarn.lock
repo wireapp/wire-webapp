@@ -1731,10 +1731,10 @@
     tough-cookie "3.0.1"
     ws "7.2.1"
 
-"@wireapp/avs@5.5.8":
-  version "5.5.8"
-  resolved "https://registry.yarnpkg.com/@wireapp/avs/-/avs-5.5.8.tgz#ff2a6378ff9d3a8e01f50a4c26e855035f348e05"
-  integrity sha512-x9z2dluFIVBN6JOEFaucUSETxhEjxmMM0kpruTnmt0Jgd6fJfcA9A9NkJMZnl9EUtKtRbO7AuyYH2urk9KDojg==
+"@wireapp/avs@5.6.3":
+  version "5.6.3"
+  resolved "https://registry.yarnpkg.com/@wireapp/avs/-/avs-5.6.3.tgz#4699f6a6c7ba62f59c0bb34f3061cb90371d95ed"
+  integrity sha512-sd0r9g7mRtKoTYwRmqGMkpNFU1Pwpc5nvpFw3RbPdw3vRXvPe8AqYG8G/h3YXipTVfeFZ2HiKmbWgI4pYCjRYg==
 
 "@wireapp/cbor@4.5.3":
   version "4.5.3"
