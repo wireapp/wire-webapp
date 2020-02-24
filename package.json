@@ -162,7 +162,7 @@
     "stylelint": "13.2.0",
     "stylelint-config-idiomatic-order": "8.1.0",
     "stylelint-config-prettier": "8.0.1",
-    "svg-inline-loader": "0.8.0",
+    "svg-inline-loader": "0.8.2",
     "terser-webpack-plugin": "2.3.5",
     "ts-node": "8.6.2",
     "typescript": "3.7.5",
