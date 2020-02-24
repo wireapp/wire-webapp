@@ -25,6 +25,7 @@ import {ClientEvent} from 'src/script/event/Client';
 import {QuotedMessageMiddleware} from 'src/script/event/preprocessor/QuotedMessageMiddleware';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
 import {MessageHasher} from 'src/script/message/MessageHasher';
+import {TestFactory} from '../../../helper/TestFactory';
 
 describe('QuotedMessageMiddleware', () => {
   const testFactory = new TestFactory();
@@ -32,7 +33,7 @@ describe('QuotedMessageMiddleware', () => {
 
   beforeEach(() => {
     return testFactory.exposeEventActors().then(() => {
-      quotedMessageMiddleware = new QuotedMessageMiddleware(TestFactory.event_service);
+      quotedMessageMiddleware = new QuotedMessageMiddleware(testFactory.event_service);
     });
   });
 

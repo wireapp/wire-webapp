@@ -27,17 +27,18 @@ import {EventMapper} from 'src/script/conversation/EventMapper';
 import {AssetType} from 'src/script/assets/AssetType';
 import {ClientEvent} from 'src/script/event/Client';
 import {MentionEntity} from 'src/script/message/MentionEntity';
+import {TestFactory} from '../../helper/TestFactory';
 
 describe('Event Mapper', () => {
-  const test_factory = new TestFactory();
+  const testFactory = new TestFactory();
   let conversation_et = null;
   let event_mapper = null;
 
   beforeAll(() => {
-    return test_factory.exposeUserActors().then(() => {
+    return testFactory.exposeUserActors().then(() => {
       wire.app = {
         service: {
-          asset: TestFactory.asset_service,
+          asset: testFactory.asset_service,
         },
       };
     });

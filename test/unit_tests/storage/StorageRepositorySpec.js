@@ -17,19 +17,21 @@
  *
  */
 
+import {TestFactory} from '../../helper/TestFactory';
+
 describe('StorageRepository', () => {
-  const test_factory = new TestFactory();
+  const testFactory = new TestFactory();
 
-  beforeAll(() => test_factory.exposeStorageActors());
+  beforeAll(() => testFactory.exposeStorageActors());
 
-  beforeEach(() => TestFactory.storage_repository.clearStores());
+  beforeEach(() => testFactory.storage_repository.clearStores());
 
   describe('saveValue', () => {
     it('persists primitive values in an object format', () => {
       const primary_key = 'test_key';
       const primitive_value = 'test_value';
 
-      return TestFactory.storage_repository.saveValue(primary_key, primitive_value).then(storage_key => {
+      return testFactory.storage_repository.saveValue(primary_key, primitive_value).then(storage_key => {
         expect(storage_key).toBe(primary_key);
       });
     });

@@ -197,37 +197,34 @@ class App {
    */
   _setupRepositories() {
     const repositories = {};
-    const selfService = new SelfService(this.apiClient.getClient());
+    const selfService = new SelfService(this.apiClient);
     const sendingMessageQueue = new MessageSender();
 
     repositories.audio = new AudioRepository();
-    repositories.auth = new AuthRepository(this.apiClient.getClient());
-    repositories.giphy = new GiphyRepository(new GiphyService(this.apiClient.getClient()));
-    repositories.properties = new PropertiesRepository(new PropertiesService(this.apiClient.getClient()), selfService);
+    repositories.auth = new AuthRepository(this.apiClient);
+    repositories.giphy = new GiphyRepository(new GiphyService(this.apiClient));
+    repositories.properties = new PropertiesRepository(new PropertiesService(this.apiClient), selfService);
     repositories.serverTime = serverTimeHandler;
     repositories.storage = new StorageRepository(this.service.storage);
 
     repositories.cryptography = new CryptographyRepository(
-      new CryptographyService(this.apiClient.getClient()),
+      new CryptographyService(this.apiClient),
       repositories.storage,
     );
     repositories.client = new ClientRepository(
-      new ClientService(this.apiClient.getClient(), this.service.storage),
+      new ClientService(this.apiClient, this.service.storage),
       repositories.cryptography,
     );
     repositories.media = new MediaRepository(new PermissionRepository());
     repositories.user = new UserRepository(
-      new UserService(this.apiClient.getClient(), this.service.storage),
+      new UserService(this.apiClient, this.service.storage),
       this.service.asset,
       selfService,
       repositories.client,
       serverTimeHandler,
       repositories.properties,
     );
-    repositories.connection = new ConnectionRepository(
-      new ConnectionService(this.apiClient.getClient()),
-      repositories.user,
-    );
+    repositories.connection = new ConnectionRepository(new ConnectionService(this.apiClient), repositories.user);
     repositories.event = new EventRepository(
       this.service.event,
       this.service.notification,
@@ -236,8 +233,8 @@ class App {
       serverTimeHandler,
       repositories.user,
     );
-    repositories.search = new SearchRepository(new SearchService(this.apiClient.getClient()), repositories.user);
-    repositories.team = new TeamRepository(new TeamService(this.apiClient.getClient()), repositories.user);
+    repositories.search = new SearchRepository(new SearchService(this.apiClient), repositories.user);
+    repositories.team = new TeamRepository(new TeamService(this.apiClient), repositories.user);
     repositories.eventTracker = new EventTrackingRepository(repositories.team, repositories.user);
 
     repositories.conversation = new ConversationRepository(
@@ -279,7 +276,7 @@ class App {
       repositories.user,
     );
     repositories.broadcast = new BroadcastRepository(
-      new BroadcastService(this.apiClient.getClient()),
+      new BroadcastService(this.apiClient),
       repositories.client,
       repositories.conversation,
       repositories.cryptography,
@@ -287,7 +284,7 @@ class App {
       repositories.user,
     );
     repositories.calling = new CallingRepository(
-      this.apiClient.getClient(),
+      this.apiClient,
       repositories.conversation,
       repositories.event,
       repositories.media.streamHandler,
@@ -322,13 +319,13 @@ class App {
       : new EventService(storageService);
 
     return {
-      asset: new AssetService(this.apiClient.getClient(), this.backendClient),
-      conversation: new ConversationService(this.apiClient.getClient(), eventService, storageService),
+      asset: new AssetService(this.apiClient, this.backendClient),
+      conversation: new ConversationService(this.apiClient, eventService, storageService),
       event: eventService,
-      integration: new IntegrationService(this.apiClient.getClient()),
-      notification: new NotificationService(this.apiClient.getClient(), storageService),
+      integration: new IntegrationService(this.apiClient),
+      notification: new NotificationService(this.apiClient, storageService),
       storage: storageService,
-      webSocket: new WebSocketService(this.apiClient.getClient(), this.backendClient),
+      webSocket: new WebSocketService(this.apiClient, this.backendClient),
     };
   }
 
@@ -925,7 +922,7 @@ $(async () => {
   exposeWrapperGlobals();
   const appContainer = document.getElementById('wire-main');
   if (appContainer) {
-    const apiClient = container.resolve(APIClientSingleton);
+    const apiClient = container.resolve(APIClientSingleton).getClient();
     const backendClient = container.resolve(BackendClient);
     backendClient.setSettings({
       restUrl: Config.getConfig().BACKEND_REST,

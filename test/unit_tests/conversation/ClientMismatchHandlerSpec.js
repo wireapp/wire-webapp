@@ -24,6 +24,7 @@ import {createRandomUuid} from 'Util/util';
 
 import {Conversation} from 'src/script/entity/Conversation';
 import {EventInfoEntity} from 'src/script/conversation/EventInfoEntity';
+import {TestFactory} from '../../helper/TestFactory';
 
 describe('ClientMismatchHandler', () => {
   const testFactory = new TestFactory();
@@ -37,7 +38,7 @@ describe('ClientMismatchHandler', () => {
     });
   });
 
-  afterEach(() => TestFactory.conversation_repository.conversations.removeAll());
+  afterEach(() => testFactory.conversation_repository.conversations.removeAll());
 
   describe('onClientMismatch', () => {
     let clientMismatch = undefined;
@@ -64,7 +65,7 @@ describe('ClientMismatchHandler', () => {
     });
 
     beforeEach(() => {
-      spyOn(TestFactory.user_repository, 'remove_client_from_user').and.returnValue(Promise.resolve());
+      spyOn(testFactory.user_repository, 'remove_client_from_user').and.returnValue(Promise.resolve());
 
       payload = {
         recipients: {
@@ -93,10 +94,10 @@ describe('ClientMismatchHandler', () => {
         time: '2016-04-29T10:38:23.002Z',
       };
 
-      spyOn(TestFactory.conversation_repository, 'addMissingMember').and.returnValue(Promise.resolve());
-      spyOn(TestFactory.cryptography_repository, 'encryptGenericMessage').and.returnValue(Promise.resolve(payload));
-      spyOn(TestFactory.user_repository, 'addClientToUser').and.returnValue(Promise.resolve());
-      spyOn(TestFactory.user_repository, 'getClientsByUserId').and.callFake(clientId => {
+      spyOn(testFactory.conversation_repository, 'addMissingMember').and.returnValue(Promise.resolve());
+      spyOn(testFactory.cryptography_repository, 'encryptGenericMessage').and.returnValue(Promise.resolve(payload));
+      spyOn(testFactory.user_repository, 'addClientToUser').and.returnValue(Promise.resolve());
+      spyOn(testFactory.user_repository, 'getClientsByUserId').and.callFake(clientId => {
         return Promise.resolve([
           {class: 'desktop', id: clientId},
           {class: 'phone', id: '809fd276d6709474'},
@@ -106,10 +107,10 @@ describe('ClientMismatchHandler', () => {
       const timestamp = new Date(clientMismatch.time).getTime();
       const eventInfoEntity = new EventInfoEntity(undefined, conversationId);
       eventInfoEntity.setTimestamp(timestamp);
-      return TestFactory.conversation_repository.clientMismatchHandler
+      return testFactory.conversation_repository.clientMismatchHandler
         .onClientMismatch(eventInfoEntity, clientMismatch, payload)
         .then(() => {
-          expect(TestFactory.conversation_repository.addMissingMember).toHaveBeenCalledWith(
+          expect(testFactory.conversation_repository.addMissingMember).toHaveBeenCalledWith(
             conversationId,
             [unknownUserId],
             timestamp - 1,
@@ -118,15 +119,15 @@ describe('ClientMismatchHandler', () => {
     });
 
     it('should add missing clients to the payload', () => {
-      spyOn(TestFactory.user_repository, 'getClientsByUserId').and.callFake(clientId => {
+      spyOn(testFactory.user_repository, 'getClientsByUserId').and.callFake(clientId => {
         return Promise.resolve([
           {class: 'desktop', id: clientId},
           {class: 'phone', id: '809fd276d6709474'},
         ]);
       });
-      spyOn(TestFactory.user_repository, 'addClientToUser').and.returnValue(Promise.resolve());
+      spyOn(testFactory.user_repository, 'addClientToUser').and.returnValue(Promise.resolve());
       // TODO: Make this fake method available as a utility function for testing
-      spyOn(TestFactory.cryptography_repository.cryptographyService, 'getUsersPreKeys').and.callFake(recipients => {
+      spyOn(testFactory.cryptography_repository.cryptographyService, 'getUsersPreKeys').and.callFake(recipients => {
         return Promise.resolve().then(() => {
           const preKeyMap = {};
 
@@ -158,12 +159,12 @@ describe('ClientMismatchHandler', () => {
         time: '2016-04-29T10:38:23.002Z',
       };
 
-      TestFactory.cryptography_repository.createCryptobox.and.callThrough();
+      testFactory.cryptography_repository.createCryptobox.and.callThrough();
 
-      return TestFactory.cryptography_repository.createCryptobox(TestFactory.storage_service.db).then(() => {
+      return testFactory.cryptography_repository.createCryptobox(testFactory.storage_service.db).then(() => {
         const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id);
         eventInfoEntity.setTimestamp(new Date(clientMismatch.time).getTime());
-        return TestFactory.conversation_repository.clientMismatchHandler
+        return testFactory.conversation_repository.clientMismatchHandler
           .onClientMismatch(eventInfoEntity, clientMismatch, payload)
           .then(updatedPayload => {
             expect(Object.keys(updatedPayload.recipients).length).toBe(2);
@@ -183,10 +184,10 @@ describe('ClientMismatchHandler', () => {
       };
 
       const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id);
-      return TestFactory.conversation_repository.clientMismatchHandler
+      return testFactory.conversation_repository.clientMismatchHandler
         .onClientMismatch(eventInfoEntity, clientMismatch, payload)
         .then(updatedPayload => {
-          expect(TestFactory.user_repository.remove_client_from_user).toHaveBeenCalled();
+          expect(testFactory.user_repository.remove_client_from_user).toHaveBeenCalled();
           expect(Object.keys(updatedPayload.recipients).length).toBe(0);
         });
     });
@@ -202,10 +203,10 @@ describe('ClientMismatchHandler', () => {
       };
 
       const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id);
-      return TestFactory.conversation_repository.clientMismatchHandler
+      return testFactory.conversation_repository.clientMismatchHandler
         .onClientMismatch(eventInfoEntity, clientMismatch, payload)
         .then(updated_payload => {
-          expect(TestFactory.user_repository.remove_client_from_user).not.toHaveBeenCalled();
+          expect(testFactory.user_repository.remove_client_from_user).not.toHaveBeenCalled();
           expect(Object.keys(updated_payload.recipients).length).toBe(0);
         });
     });
