@@ -399,8 +399,10 @@ const systemTemplate = `
       <span data-bind="component: getSystemMessageIconComponent(message)"></span>
     </div>
     <div class="message-header-label">
-      <span class="message-header-sender-name" data-bind='text: message.unsafeSenderName()'></span>
-      <span class="ellipsis" data-bind="text: message.caption()"></span>
+      <span class="message-header-label__multiline">
+        <span class="message-header-sender-name" data-bind='text: message.unsafeSenderName()'></span>
+        <span class="ellipsis" data-bind="text: message.caption()"></span>
+      </span>
       <hr class="message-header-line" />
     </div>
     <div class="message-body-actions">
@@ -416,8 +418,10 @@ const pingTemplate = `
       <div class="icon-ping" data-bind="css: message.get_icon_classes"></div>
     </div>
     <div class="message-header-label" data-bind="attr: {title: message.ephemeral_caption()}, css: {'ephemeral-message-obfuscated': message.isObfuscated()}">
-      <span class="message-header-sender-name" data-bind='text: message.unsafeSenderName()'></span>
-      <span class="ellipsis" data-bind="text: message.caption"></span>
+      <span class="message-header-label__multiline">
+        <span class="message-header-sender-name" data-bind='text: message.unsafeSenderName()'></span>
+        <span class="ellipsis" data-bind="text: message.caption"></span>
+      </span>
     </div>
     <div class="message-body-actions">
       <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}, showAllTimestamps"></time>

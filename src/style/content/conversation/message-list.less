@@ -205,6 +205,12 @@
       content: '\00b7';
     }
   }
+  &__multiline {
+    white-space: nowrap;
+    span {
+      white-space: normal;
+    }
+  }
 }
 
 .message-header-label-sender {
@@ -424,8 +430,16 @@ image-asset {
 
 .message-footer-label {
   display: flex;
+  overflow: hidden;
+  flex: 1;
   align-items: center;
   font-size: @font-size-xs;
+
+  & > span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: pre;
+  }
 
   > * + * {
     margin-left: 8px;
@@ -586,6 +600,8 @@ image-asset {
 .message-connected-header {
   font-size: @font-size-lg;
   line-height: 42px;
+  text-align: center;
+  word-break: break-all;
 }
 
 .message-connected-contacts,
