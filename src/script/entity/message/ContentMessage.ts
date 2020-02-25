@@ -85,7 +85,8 @@ export class ContentMessage extends Message {
     this.other_likes = ko.pureComputed(() => this.reactions_user_ets().filter(user_et => !user_et.is_me));
 
     this.like_caption = ko.pureComputed(() => {
-      if (this.reactions_user_ets().length <= 2) {
+      const maxShownNames = 2;
+      if (this.reactions_user_ets().length <= maxShownNames) {
         return this.reactions_user_ets()
           .map(user => user.name())
           .join(', ');
