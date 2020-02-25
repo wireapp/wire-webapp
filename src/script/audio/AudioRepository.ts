@@ -87,7 +87,7 @@ export class AudioRepository {
 
   private initSounds(preload: boolean): void {
     Object.values(AudioType).forEach(audioId => {
-      this.audioElements[audioId] = this.createAudioElement(`/audio/${audioId}.mp3`, preload);
+      this.audioElements[audioId] = this.createAudioElement(`./audio/${audioId}.mp3`, preload);
     });
 
     this.logger.info(`Sounds initialized (preload: '${preload}')`);

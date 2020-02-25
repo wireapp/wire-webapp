@@ -62,8 +62,8 @@ export class ActionsViewModel {
           },
 
           text: {
-            message: t('modalUserBlockMessage', userEntity.first_name()),
-            title: t('modalUserBlockHeadline', userEntity.first_name()),
+            message: t('modalUserBlockMessage', userEntity.name()),
+            title: t('modalUserBlockHeadline', userEntity.name()),
           },
         });
       });
@@ -85,7 +85,7 @@ export class ActionsViewModel {
             text: t('modalConnectCancelSecondary'),
           },
           text: {
-            message: t('modalConnectCancelMessage', userEntity.first_name()),
+            message: t('modalConnectCancelMessage', userEntity.name()),
             title: t('modalConnectCancelHeadline'),
           },
         });
@@ -293,7 +293,7 @@ export class ActionsViewModel {
             text: t('modalConversationRemoveAction'),
           },
           text: {
-            message: t('modalConversationRemoveMessage', userEntity.first_name()),
+            message: t('modalConversationRemoveMessage', userEntity.name()),
             title: t('modalConversationRemoveHeadline'),
           },
         });
@@ -333,7 +333,7 @@ export class ActionsViewModel {
             text: t('modalUserUnblockAction'),
           },
           text: {
-            message: t('modalUserUnblockMessage', userEntity.first_name()),
+            message: t('modalUserUnblockMessage', userEntity.name()),
             title: t('modalUserUnblockHeadline'),
           },
         });

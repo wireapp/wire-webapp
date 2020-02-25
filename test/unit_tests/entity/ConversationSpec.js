@@ -492,7 +492,7 @@ describe('Conversation', () => {
       conversation_et.type(ConversationType.GROUP);
       const expected_display_name = `${conversation_et
         .participating_user_ets()[0]
-        .first_name()}, ${conversation_et.participating_user_ets()[1].first_name()}`;
+        .name()}, ${conversation_et.participating_user_ets()[1].name()}`;
 
       expect(conversation_et.display_name()).toBe(expected_display_name);
     });

@@ -29,7 +29,7 @@ interface Params {
 
 ko.components.register('asset-header', {
   template: `
-    <span class="asset-header-name" data-bind="text: message_et.user().first_name(), css: message_et.accent_color"></span>
+    <span class="asset-header-name" data-bind="text: message_et.user().name(), css: message_et.accent_color"></span>
     <span class="asset-header-time" data-bind="text: timeText"></span>
   `,
   viewModel: function({message}: Params): void {

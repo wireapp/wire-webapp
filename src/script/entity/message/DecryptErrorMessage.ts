@@ -51,7 +51,7 @@ export class DecryptErrorMessage extends Message {
     this.client_id = '';
 
     this.htmlCaption = ko.pureComputed(() => {
-      const userName = this.user().first_name();
+      const userName = this.user().name();
       const replaceHighlight = {
         '/highlight': '</span>',
         highlight: '<span class="label-bold-xs">',

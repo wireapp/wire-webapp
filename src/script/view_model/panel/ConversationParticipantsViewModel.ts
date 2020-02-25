@@ -19,7 +19,7 @@
 
 import ko from 'knockout';
 
-import {sortByPriority} from 'Util/StringUtil';
+import {sortUsersByPriority} from 'Util/StringUtil';
 
 import {ConversationRepository} from '../../conversation/ConversationRepository';
 import {User} from '../../entity/User';
@@ -52,7 +52,7 @@ export class ConversationParticipantsViewModel extends BasePanelViewModel {
           .filter((userEntity: User) => !userEntity.isService);
         if (!this.activeConversation().removed_from_conversation()) {
           users.push(this.activeConversation().selfUser());
-          return users.sort((userA, userB) => sortByPriority(userA.first_name(), userB.first_name()));
+          return users.sort(sortUsersByPriority);
         }
         return users;
       }
