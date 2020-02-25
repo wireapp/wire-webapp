@@ -128,6 +128,9 @@ export class WebSocketService {
       this.socket.onerror = event => {
         this.logger.error('WebSocket connection error.', event);
         this.reset(CHANGE_TRIGGER.ERROR, true);
+        // We need to assume an invalid access token
+        // so we fetch any endpoint in order to get a new access token for the api-client.
+        this.apiClient.self.api.getSelf();
       };
 
       this.socket.onclose = event => {
