@@ -222,9 +222,9 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       if (this.showAvailabilityTooltip()) {
         const userEntity = this.conversationEntity().firstUserEntity();
         const availabilityStrings = {
-          [Availability.Type.AVAILABLE]: t('tooltipConversationInputPlaceholderAvailable'),
-          [Availability.Type.AWAY]: t('tooltipConversationInputPlaceholderAway'),
-          [Availability.Type.BUSY]: t('tooltipConversationInputPlaceholderBusy'),
+          [Availability.Type.AVAILABLE]: t('userAvailabilityAvailable'),
+          [Availability.Type.AWAY]: t('userAvailabilityAway'),
+          [Availability.Type.BUSY]: t('userAvailabilityBusy'),
         };
 
         return availabilityStrings[userEntity.availability()];
