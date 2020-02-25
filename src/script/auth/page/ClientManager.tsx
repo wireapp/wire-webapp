@@ -42,7 +42,7 @@ const ClientManager = ({doGetAllClients, doLogout}: Props & ConnectedProps & Dis
   const logout = async () => {
     try {
       await doLogout();
-      history.push(ROUTE.LOGIN);
+      history.push(ROUTE.INDEX);
     } catch (error) {}
   };
   return (

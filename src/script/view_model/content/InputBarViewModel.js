@@ -325,6 +325,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       const previousSessionData = await this._loadDraftState(conversationEntity);
       this.input(previousSessionData.text);
       this.currentMentions(previousSessionData.mentions);
+      this.updateSelectionState();
 
       if (previousSessionData.replyEntityPromise) {
         previousSessionData.replyEntityPromise.then(replyEntity => {
