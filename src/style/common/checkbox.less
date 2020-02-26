@@ -39,6 +39,12 @@
         content: '\e601';
       }
     }
+
+    &:focus + label {
+      &::after {
+        box-shadow: 0 0 1px 3px var(--background-fade-40);
+      }
+    }
   }
 
   label {

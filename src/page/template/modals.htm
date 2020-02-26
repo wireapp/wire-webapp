@@ -46,8 +46,9 @@
         <!-- ko foreach: {data: content().secondaryAction, as: 'secondary', noChildContext: true} -->
           <button data-bind="text: secondary.text, click: () => doAction(secondary.action, true, true), css: {'modal__button--full': hasMultipleSecondary()}, attr: {'data-uie-name': secondary.uieName}" class="modal__button modal__button--secondary"></button>
         <!-- /ko -->
+        <button class="modal__button modal__button--secondary">Test</button>
         <!-- ko if: content().primaryAction.text -->
-          <button data-bind="text: content().primaryAction.text, click: () => doAction(confirm, content().closeOnConfirm), css: {'modal__button--full': hasMultipleSecondary(), 'modal__button--disabled': !actionEnabled()}" class="modal__button modal__button--primary" data-uie-name="do-action"></button>
+          <button data-bind="text: content().primaryAction.text, click: () => doAction(confirm, content().closeOnConfirm), css: {'modal__button--full': hasMultipleSecondary()}, enable: actionEnabled()" class="modal__button modal__button--primary" data-uie-name="do-action"></button>
         <!-- /ko -->
       </div>
     </div>
