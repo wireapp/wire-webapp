@@ -226,7 +226,6 @@ export class ModalsViewModel {
     }
     window.addEventListener('keydown', this.handleEnterKey);
     afterRender(() => this.inputFocus(true));
-    document.getElementById(this.elementId).focus();
   };
 
   handleEnterKey = event => {
