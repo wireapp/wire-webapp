@@ -63,6 +63,10 @@
     border-color: var(--background);
     background-color: var(--app-bg-secondary);
   }
+
+  input[type='radio']:focus + label::before {
+    box-shadow: 0 0 1px 3px var(--background-fade-40);
+  }
 }
 
 .preferences-options-multiple {
