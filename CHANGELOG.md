@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.20.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.19.3...@wireapp/api-client@9.20.0) (2020-02-28)
+
+
+### Features
+
+* **api-client:** Complete bot password reset endpoint ([#2840](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2840)) ([81d242a](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/81d242a9e5148f02d30395bd24a67cb9cc7c8f02))
+
+
+
+
+
 ## [9.19.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.19.2...@wireapp/api-client@9.19.3) (2020-02-18)
 
 **Note:** Version bump only for package @wireapp/api-client
