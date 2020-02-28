@@ -60,15 +60,13 @@ class SingleSignOnFormPage {
 }
 
 describe('SingleSignOnForm', () => {
-  it('successfully logs into account with initial SSO code', async () => {
+  it('prefills code and disables input with initial SSO code', async () => {
     spyOn<{getConfig: () => TypeUtil.RecursivePartial<Configuration>}>(Config, 'getConfig').and.returnValue({
       FEATURE: {
         ENABLE_DOMAIN_DISCOVERY: false,
       },
     });
 
-    const history = createMemoryHistory();
-    const historyPushSpy = spyOn(history, 'push');
     const doLogin = jasmine.createSpy().and.returnValue((code: string) => Promise.resolve());
     const initialCode = 'wire-cb6e4dfc-a4b0-4c59-a31d-303a7f5eb5ab';
 
@@ -85,16 +83,59 @@ describe('SingleSignOnForm', () => {
         },
       }),
       {doLogin, initialCode},
+    );
+
+    expect(singleSignOnFormPage.getCodeOrEmailInput().exists())
+      .withContext('code input exists')
+      .toBe(true);
+
+    expect(singleSignOnFormPage.getCodeOrEmailInput().props().value)
+      .withContext('code input has initial code value')
+      .toEqual(initialCode);
+
+    expect(singleSignOnFormPage.getCodeOrEmailInput().props().disabled)
+      .withContext('code input is disabled when prefilled')
+      .toBe(true);
+
+    expect(singleSignOnFormPage.getSubmitButton().props().disabled)
+      .withContext('submit button is enabled')
+      .toEqual(false);
+  });
+
+  it('successfully logs into account with SSO code', async () => {
+    spyOn<{getConfig: () => TypeUtil.RecursivePartial<Configuration>}>(Config, 'getConfig').and.returnValue({
+      FEATURE: {
+        ENABLE_DOMAIN_DISCOVERY: false,
+      },
+    });
+
+    const history = createMemoryHistory();
+    const historyPushSpy = spyOn(history, 'push');
+    const doLogin = jasmine.createSpy().and.returnValue((code: string) => Promise.resolve());
+    const code = 'wire-cb6e4dfc-a4b0-4c59-a31d-303a7f5eb5ab';
+
+    spyOn(actionRoot.authAction, 'validateSSOCode').and.returnValue(() => Promise.resolve());
+    spyOn(actionRoot.authAction, 'doFinalizeSSOLogin').and.returnValue(() => Promise.resolve());
+
+    const singleSignOnFormPage = new SingleSignOnFormPage(
+      mockStoreFactory()({
+        ...initialRootState,
+        runtimeState: {
+          hasCookieSupport: true,
+          hasIndexedDbSupport: true,
+          isSupportedBrowser: true,
+        },
+      }),
+      {doLogin},
       history,
     );
 
     expect(singleSignOnFormPage.getCodeOrEmailInput().exists())
-      .withContext('Code input exists')
+      .withContext('code input exists')
       .toBe(true);
 
-    expect(singleSignOnFormPage.getCodeOrEmailInput().props().value)
-      .withContext('Code input has initial code value')
-      .toEqual(initialCode);
+    singleSignOnFormPage.enterCodeOrEmail(code);
+    singleSignOnFormPage.clickSubmitButton();
 
     expect(actionRoot.authAction.validateSSOCode)
       .withContext('validateSSOCode function was called')

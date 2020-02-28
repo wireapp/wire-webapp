@@ -78,30 +78,19 @@ class User {
     this.phone = ko.observable();
 
     this.name = ko.observable('');
-    this.first_name = ko.pureComputed(() => {
-      const [firstName] = this.name().split(' ');
-      return firstName || '';
-    });
 
     this.managedBy = ko.observable(User.CONFIG.MANAGED_BY.WIRE);
 
-    this.last_name = ko.pureComputed(() => {
-      const nameParts = this.name().split(' ');
-      if (nameParts.length > 1) {
-        return nameParts.pop();
-      }
-    });
-
     this.initials = ko.pureComputed(() => {
-      let initials = '';
-      if (this.first_name() && this.last_name()) {
-        const first = getFirstChar(this.first_name());
-        const last = getFirstChar(this.last_name());
-        initials = `${first}${last}`;
-      } else {
-        initials = this.first_name().slice(0, 2);
+      const nameParts = this.name()
+        .toUpperCase()
+        .split(' ');
+      if (nameParts.length > 1) {
+        const first = getFirstChar(nameParts[0]);
+        const last = getFirstChar(nameParts[nameParts.length - 1]);
+        return `${first}${last}`;
       }
-      return initials.toUpperCase();
+      return nameParts[0].slice(0, 2);
     });
 
     this.username = ko.observable('');

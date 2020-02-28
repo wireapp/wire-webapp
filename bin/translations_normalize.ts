@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /*
  * Wire
  * Copyright (C) 2019 Wire Swiss GmbH
@@ -19,14 +17,25 @@
  *
  */
 
-const fs = require('fs-extra');
-const authTranslations = require('../temp/i18n/src/script/strings');
-const webappTranslations = require('../resource/translation/en-US.json');
+import fs from 'fs-extra';
+// @ts-ignore
+import authTranslations from '../temp/i18n/src/script/strings.json';
+import webappTranslations from '../resource/translation/en-US.json';
 
-const normalizedAuthTranslations = authTranslations.reduce((accumulator, object) => {
-  accumulator[object.id] = object.defaultMessage;
-  return accumulator;
-}, {});
+interface Translation {
+  id: string;
+  defaultMessage: string;
+}
+
+type Translations = Record<string, string>;
+
+const normalizedAuthTranslations = authTranslations.reduce(
+  (accumulator: Translations, object: Translation): Translations => {
+    accumulator[object.id] = object.defaultMessage;
+    return accumulator;
+  },
+  {},
+);
 
 const mergedTranslations = {...webappTranslations, ...normalizedAuthTranslations};
 

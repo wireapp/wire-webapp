@@ -4,6 +4,7 @@ export interface ServerConfig {
   CLIENT: {
     ANALYTICS_API_KEY: string;
     APP_NAME: string;
+    BACKEND_NAME: string;
     BACKEND_REST: string;
     BACKEND_WS: string;
     BRAND_NAME: string;

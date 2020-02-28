@@ -58,12 +58,12 @@ notifications:
 
 # http://docs.travis-ci.com/user/deployment/
 after_success:
-  - if [[ "${TRAVIS_BRANCH}" =~ ^(edge|master|avs)$ ]] && [ "${TRAVIS_PULL_REQUEST}" == "false" ]; then yarn build:prod; fi
+  - if [[ "${TRAVIS_BRANCH}" =~ ^(avs)$ ]] && [ "${TRAVIS_PULL_REQUEST}" == "false" ]; then yarn build:prod; fi
   - |
-    if [[ "${TRAVIS_BRANCH}" =~ ^(dev)$ ]] && [ "${TRAVIS_PULL_REQUEST}" == "false" ]; then
+    if [[ "${TRAVIS_BRANCH}" =~ ^(edge|master|dev)$ ]] && [ "${TRAVIS_PULL_REQUEST}" == "false" ]; then
       yarn build:prod
       if [ "$DISTRIBUTION" == "wire" ]; then
-        yarn docker '' dev
+        yarn docker '' "$TRAVIS_BRANCH"
       fi
     fi
   - |
@@ -103,6 +103,7 @@ deploy:
       repo: wireapp/wire-webapp
       branch: avs
       condition: $DISTRIBUTION = wire
+
   # Stage 1: https://wire-webapp-edge.zinfra.io/
   - provider: elasticbeanstalk
     skip_cleanup: true
@@ -132,6 +133,22 @@ deploy:
     app: Webapp
     env: wire-webapp-dev
     bucket_name: wire-webapp-builds
+    on:
+      repo: wireapp/wire-webapp
+      branch: dev
+      condition: $DISTRIBUTION = wire
+
+  # http://wire-webapp-s3-test.s3-website.eu-central-1.amazonaws.com/
+  - provider: s3
+    acl: public_read
+    local_dir: 'server/dist/static'
+    skip_cleanup: true
+    bucket: 'wire-webapp-s3-test'
+    access-key-id:
+      secure: MpVUBkrtmIPqYLzrsYisYsE/UnOFU6q0ufgfWNBxHAFm/mDST9v+Kk1ZvhNKYskgMzJllQJBBqiRn05Fegam+DQ0oclbPr7Eg4mQrPbsrLIsc2qEpqw3fk8bqOssnHkKe1wlz7ihW3eQ78zOgsS/w95Zyd7wWiDzz8s7KvRPN8DLRGu2ksDdkPfM6RCbs9qsdSA5k8+DhZRXZCL/IHalE3plqOOJgCgTq9kzMRvxnFnVy0tLGzWQJvGOLYpjRwaAoqoLK7AX+WLfMSnBn+MuWCGmqPdk9Xto4cJnC5toASjNtu/bGYWuy4ShpzTivuwioJbxt5JGiq78j/MVu/5oBjzosJlSpNlY5++wrkLvfpkWMuJSC3/V40LkpLa+XF/MP18Bpbi44GmLTOCq4wJ/WRrYMAt4yQWURNJAv9tKqLyqgJ47HLBMEYABWUdr81apZm3ZKbqqmyu4GLclc7ivnVBjfmf5oDxMDUqp8owQO9YOsUX9t8Rw9XiPdasjx5EQ+EcvoAyBCPV6qlnFi7pj7wWnxu1DNhzxeW70BKhXizYwcBqSlvX88pbgCxc273Id0dAilrCgvD0/B2mvLPIVbJsscMyykjC7ZZOaznhfHQqeu/fXdfcVawVt+annovbFOWxjX5232ghbq12ux6qZ+2GNziW9vtEJeitPZ3XRPMc=
+    secret-access-key:
+      secure: aCiIP0To/YPm9E3G/q/JIHASRN0b69R23w8WYovmMsBFHddh0MBXnhh+Kf5Cuos+NdVatNs7mAqulLdmBF8TZhreEhLOd9PppEXPVXJrlvdDKejX3S6czUWD8tb4fSE4/qF9H8XYVa+Aznn/2Vlu3fFggAcAMv8lm7igTNb8rc2YZkaByNvwDjauoB1CwgvMsJiptDNy/m9EOJST9RqS/SDAFsPEFQLih0BRWbSYnEZ6yYtQ7T+ROOjjBxTefqf9E6s6PuXI9zrDzGtKE3mwibASts5lfVcKWBp/m1Droog7QxRgixUo9CoE4bK3tcSqpgBx/Mn1RL43C8pt2n2yxeXr6Rl1rdnpvVmz/7XbQqBtbX+atot63PKW4fuTlwCmnQfBWwsAqUZmnCHs0EgcFQR6VoO1D5FLKAWOFeo4RBCQ3mOr/kU3wTG0OrDVf3C1VpTD8W07AVIwcYm/jOSPJYgWwDk+OPz0f8UYbJTe8UO14LU/Wy6QT81cjEwjXJdCcv6IZS50iDNq9PxaACoOqAmfDZNwxuQBxN0kR1eWEobE+zucIfpa6OteA980X22xQIimPcVmmBcDjYce//o/12UNKZprUXeUqSPJsXWw8p3CIbJP8lI35aiTR3kjOG7XBG0QO1HyBHKudZHPGo3RU6dXVegu6POujy+oxbkQNyo=
+    region: eu-central-1
     on:
       repo: wireapp/wire-webapp
       branch: dev

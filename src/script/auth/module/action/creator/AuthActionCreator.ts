@@ -17,6 +17,7 @@
  *
  */
 
+import {SSOSettings} from '@wireapp/api-client/dist/account/SSOSettings';
 import {LoginData, RegisterData} from '@wireapp/api-client/dist/auth';
 import {AppAction} from '.';
 import {RegistrationDataState} from '../../reducer/authReducer';
@@ -66,6 +67,10 @@ export enum AUTH_ACTION {
   VALIDATE_LOCAL_CLIENT_SUCCESS = 'VALIDATE_LOCAL_CLIENT_SUCCESS',
   VALIDATE_LOCAL_CLIENT_FAILED = 'VALIDATE_LOCAL_CLIENT_FAILED',
 
+  GET_SSO_SETTINGS_START = 'GET_SSO_SETTINGS_START',
+  GET_SSO_SETTINGS_SUCCESS = 'GET_SSO_SETTINGS_SUCCESS',
+  GET_SSO_SETTINGS_FAILED = 'GET_SSO_SETTINGS_FAILED',
+
   GET_INVITATION_FROM_CODE_START = 'GET_INVITATION_FROM_CODE_START',
   GET_INVITATION_FROM_CODE_SUCCESS = 'GET_INVITATION_FROM_CODE_SUCCESS',
   GET_INVITATION_FROM_CODE_FAILED = 'GET_INVITATION_FROM_CODE_FAILED',
@@ -103,6 +108,9 @@ export type AuthActions =
   | ValidateClientStartAction
   | ValidateClientSuccessAction
   | ValidateClientFailedAction
+  | GetSSOSettingsStartAction
+  | GetSSOSettingsSuccessAction
+  | GetSSOSettingsFailedAction
   | LogoutStartAction
   | LogoutSuccessAction
   | LogoutFailedAction
@@ -209,6 +217,18 @@ export interface ValidateClientSuccessAction extends AppAction {
 }
 export interface ValidateClientFailedAction extends AppAction {
   readonly type: AUTH_ACTION.VALIDATE_LOCAL_CLIENT_FAILED;
+  readonly error: Error;
+}
+
+export interface GetSSOSettingsStartAction extends AppAction {
+  readonly type: AUTH_ACTION.GET_SSO_SETTINGS_START;
+}
+export interface GetSSOSettingsSuccessAction extends AppAction {
+  readonly payload: SSOSettings;
+  readonly type: AUTH_ACTION.GET_SSO_SETTINGS_SUCCESS;
+}
+export interface GetSSOSettingsFailedAction extends AppAction {
+  readonly type: AUTH_ACTION.GET_SSO_SETTINGS_FAILED;
   readonly error: Error;
 }
 
@@ -369,6 +389,20 @@ export class AuthActionCreator {
   static failedValidateLocalClient = (error: Error): ValidateClientFailedAction => ({
     error,
     type: AUTH_ACTION.VALIDATE_LOCAL_CLIENT_FAILED,
+  });
+
+  static startGetSSOSettings = (): GetSSOSettingsStartAction => ({
+    type: AUTH_ACTION.GET_SSO_SETTINGS_START,
+  });
+
+  static successfulGetSSOSettings = (ssoSettings: SSOSettings): GetSSOSettingsSuccessAction => ({
+    payload: ssoSettings,
+    type: AUTH_ACTION.GET_SSO_SETTINGS_SUCCESS,
+  });
+
+  static failedGetSSOSettings = (error: Error): GetSSOSettingsFailedAction => ({
+    error,
+    type: AUTH_ACTION.GET_SSO_SETTINGS_FAILED,
   });
 
   static startLogout = (): LogoutStartAction => ({

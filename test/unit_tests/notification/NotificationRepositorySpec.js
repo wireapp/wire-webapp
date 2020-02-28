@@ -70,7 +70,6 @@ describe('NotificationRepository', () => {
   let verify_notification_obfuscated;
   let verify_notification_system = undefined;
 
-  const [first_name] = entities.user.john_doe.name.split(' ');
   let notification_content = null;
   const contentViewModelState = {};
 
@@ -134,7 +133,7 @@ describe('NotificationRepository', () => {
 
           if (_conversation.isGroup()) {
             const titleLength = NotificationRepository.CONFIG.TITLE_LENGTH;
-            const titleText = `${_message.user().first_name()} in ${_conversation.display_name()}`;
+            const titleText = `${_message.user().name()} in ${_conversation.display_name()}`;
 
             notification_content.title = truncate(titleText, titleLength, false);
           } else {
@@ -173,7 +172,7 @@ describe('NotificationRepository', () => {
           const obfuscateMessage = _setting === NotificationPreference.OBFUSCATE_MESSAGE;
           if (obfuscateMessage) {
             const titleLength = NotificationRepository.CONFIG.TITLE_LENGTH;
-            const titleText = `${message_et.user().first_name()} in ${conversation_et.display_name()}`;
+            const titleText = `${message_et.user().name()} in ${conversation_et.display_name()}`;
 
             notification_content.options.body = z.string.notificationObfuscated;
             notification_content.title = truncate(titleText, titleLength, false);
@@ -527,7 +526,7 @@ describe('NotificationRepository', () => {
   describe('shows a well-formed group notification', () => {
     beforeEach(() => {
       const titleLength = NotificationRepository.CONFIG.TITLE_LENGTH;
-      const titleText = `${message_et.user().first_name()} in ${conversation_et.display_name()}`;
+      const titleText = `${message_et.user().name()} in ${conversation_et.display_name()}`;
 
       notification_content.title = truncate(titleText, titleLength, false);
     });
@@ -539,7 +538,7 @@ describe('NotificationRepository', () => {
       message_et.type = BackendEvent.CONVERSATION.CREATE;
       message_et.memberMessageType = SystemMessageType.CONVERSATION_CREATE;
 
-      const expected_body = `${first_name} started a conversation`;
+      const expected_body = `${user_et.name()} started a conversation`;
       return verify_notification_system(conversation_et, message_et, expected_body);
     });
 
@@ -548,7 +547,7 @@ describe('NotificationRepository', () => {
       message_et.user(user_et);
       message_et.name = 'Lorem Ipsum Conversation';
 
-      const expected_body = `${first_name} renamed the conversation to ${message_et.name}`;
+      const expected_body = `${user_et.name()} renamed the conversation to ${message_et.name}`;
       return verify_notification_system(conversation_et, message_et, expected_body);
     });
 
@@ -556,7 +555,7 @@ describe('NotificationRepository', () => {
       message_et = new MessageTimerUpdateMessage(5000);
       message_et.user(user_et);
 
-      const expectedBody = `${first_name} set the message timer to 5 ${t('ephemeralUnitsSeconds')}`;
+      const expectedBody = `${user_et.name()} set the message timer to 5 ${t('ephemeralUnitsSeconds')}`;
       return verify_notification_system(conversation_et, message_et, expectedBody);
     });
 
@@ -564,7 +563,7 @@ describe('NotificationRepository', () => {
       message_et = new MessageTimerUpdateMessage(null);
       message_et.user(user_et);
 
-      const expectedBody = `${first_name} turned off the message timer`;
+      const expectedBody = `${user_et.name()} turned off the message timer`;
       return verify_notification_system(conversation_et, message_et, expectedBody);
     });
   });
@@ -584,7 +583,7 @@ describe('NotificationRepository', () => {
         message_et.type = BackendEvent.CONVERSATION.MEMBER_JOIN;
 
         const titleLength = NotificationRepository.CONFIG.TITLE_LENGTH;
-        const titleText = `${message_et.user().first_name()} in ${conversation_et.display_name()}`;
+        const titleText = `${message_et.user().name()} in ${conversation_et.display_name()}`;
 
         notification_content.title = truncate(titleText, titleLength, false);
       });
@@ -592,8 +591,8 @@ describe('NotificationRepository', () => {
       it('with one user being added to the conversation', () => {
         message_et.userEntities([other_user_et]);
 
-        const [first_name_added] = entities.user.jane_roe.name.split(' ');
-        const expected_body = `${first_name} added ${first_name_added} to the conversation`;
+        const user_name_added = entities.user.jane_roe.name;
+        const expected_body = `${user_et.name()} added ${user_name_added} to the conversation`;
         return verify_notification_system(conversation_et, message_et, expected_body);
       });
 
@@ -601,7 +600,7 @@ describe('NotificationRepository', () => {
         other_user_et.is_me = true;
         message_et.userEntities([other_user_et]);
 
-        const expected_body = `${first_name} added you to the conversation`;
+        const expected_body = `${user_et.name()} added you to the conversation`;
         return verify_notification_system(conversation_et, message_et, expected_body);
       });
 
@@ -609,7 +608,7 @@ describe('NotificationRepository', () => {
         const user_ids = [entities.user.john_doe.id, entities.user.jane_roe.id];
         message_et.userIds(user_ids);
 
-        const expected_body = `${first_name} added 2 people to the conversation`;
+        const expected_body = `${user_et.name()} added 2 people to the conversation`;
         return verify_notification_system(conversation_et, message_et, expected_body);
       });
     });
@@ -618,7 +617,7 @@ describe('NotificationRepository', () => {
       beforeEach(() => {
         message_et.type = BackendEvent.CONVERSATION.MEMBER_LEAVE;
         const titleLength = NotificationRepository.CONFIG.TITLE_LENGTH;
-        const titleText = `${message_et.user().first_name()} in ${conversation_et.display_name()}`;
+        const titleText = `${message_et.user().name()} in ${conversation_et.display_name()}`;
 
         notification_content.title = truncate(titleText, titleLength, false);
       });
@@ -635,7 +634,7 @@ describe('NotificationRepository', () => {
         other_user_et.is_me = true;
         message_et.userEntities([other_user_et]);
 
-        const expected_body = `${first_name} removed you from the conversation`;
+        const expected_body = `${user_et.name()} removed you from the conversation`;
         return verify_notification_system(conversation_et, message_et, expected_body);
       });
 

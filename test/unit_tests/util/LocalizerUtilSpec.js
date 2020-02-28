@@ -166,12 +166,7 @@ describe('LocalizerUtil', () => {
   describe('joinNames', () => {
     it('can join first names of a list of users', () => {
       setStrings({en: {enumerationAnd: ', and '}});
-      const beatles = [
-        {first_name: () => 'John'},
-        {first_name: () => 'Paul'},
-        {first_name: () => 'George'},
-        {first_name: () => 'Ringo'},
-      ];
+      const beatles = [{name: () => 'John'}, {name: () => 'Paul'}, {name: () => 'George'}, {name: () => 'Ringo'}];
 
       expect(joinNames(beatles)).toBe('George, John, Paul, and Ringo');
     });
@@ -179,10 +174,10 @@ describe('LocalizerUtil', () => {
     it('can join first names of a list of users with me last', () => {
       setStrings({en: {conversationYouAccusative: 'you', enumerationAnd: ', and '}});
       const beatles = [
-        {first_name: () => 'John'},
-        {first_name: () => 'Paul'},
-        {first_name: () => 'George', is_me: true},
-        {first_name: () => 'Ringo'},
+        {name: () => 'John'},
+        {name: () => 'Paul'},
+        {is_me: true, name: () => 'George'},
+        {name: () => 'Ringo'},
       ];
 
       expect(joinNames(beatles)).toBe('John, Paul, Ringo, and you');

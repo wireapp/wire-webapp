@@ -345,6 +345,18 @@ export class AuthAction {
     };
   };
 
+  doGetSSOSettings = (): ThunkAction<Promise<void>> => {
+    return async (dispatch, getState, {apiClient}) => {
+      dispatch(AuthActionCreator.startGetSSOSettings());
+      try {
+        const ssoSettings = await apiClient.account.api.getSSOSettings();
+        dispatch(AuthActionCreator.successfulGetSSOSettings(ssoSettings));
+      } catch (error) {
+        dispatch(AuthActionCreator.failedGetSSOSettings(error));
+      }
+    };
+  };
+
   doLogout = (): ThunkAction => {
     return async (dispatch, getState, {getConfig, core, actions: {cookieAction, localStorageAction}}) => {
       dispatch(AuthActionCreator.startLogout());

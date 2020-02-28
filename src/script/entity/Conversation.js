@@ -342,7 +342,7 @@ export class Conversation {
           const isJustServices = this.participating_user_ets().every(userEntity => userEntity.isService);
           const joinedNames = this.participating_user_ets()
             .filter(userEntity => isJustServices || !userEntity.isService)
-            .map(userEntity => userEntity.first_name())
+            .map(userEntity => userEntity.name())
             .join(', ');
 
           const maxLength = ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;

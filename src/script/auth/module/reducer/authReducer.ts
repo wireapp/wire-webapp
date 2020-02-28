@@ -17,6 +17,7 @@
  *
  */
 
+import {SSOSettings} from '@wireapp/api-client/dist/account/SSOSettings';
 import {LoginData} from '@wireapp/api-client/dist/auth';
 import {ClientType} from '@wireapp/api-client/dist/client';
 import {TeamData} from '@wireapp/api-client/dist/team';
@@ -49,6 +50,8 @@ export type AuthState = {
   readonly fetching: boolean;
   readonly isAuthenticated: boolean;
   readonly loginData: Partial<LoginData>;
+  readonly ssoSettings?: SSOSettings;
+  readonly fetchingSSOSettings: boolean;
 };
 
 export const initialAuthState: AuthState = {
@@ -71,9 +74,13 @@ export const initialAuthState: AuthState = {
   error: null,
   fetched: false,
   fetching: false,
+  fetchingSSOSettings: true,
   isAuthenticated: false,
   loginData: {
     clientType: Config.getConfig().FEATURE.DEFAULT_LOGIN_TEMPORARY_CLIENT ? ClientType.TEMPORARY : ClientType.PERMANENT,
+  },
+  ssoSettings: {
+    default_sso_code: undefined,
   },
 };
 
@@ -131,6 +138,25 @@ export function authReducer(state: AuthState = initialAuthState, action: AppActi
         isAuthenticated: true,
       };
     }
+    case AUTH_ACTION.GET_SSO_SETTINGS_START: {
+      return {
+        ...state,
+        fetchingSSOSettings: true,
+      };
+    }
+    case AUTH_ACTION.GET_SSO_SETTINGS_SUCCESS: {
+      return {
+        ...state,
+        fetchingSSOSettings: false,
+        ssoSettings: action.payload,
+      };
+    }
+    case AUTH_ACTION.GET_SSO_SETTINGS_FAILED: {
+      return {
+        ...state,
+        fetchingSSOSettings: false,
+      };
+    }
     case AUTH_ACTION.REGISTER_PUSH_ACCOUNT_DATA: {
       return {...state, account: {...state.account, ...action.payload}, error: null};
     }
@@ -144,7 +170,7 @@ export function authReducer(state: AuthState = initialAuthState, action: AppActi
       return {...state, error: null, loginData: {...initialAuthState.loginData}};
     }
     case AUTH_ACTION.LOGOUT_SUCCESS: {
-      return {...initialAuthState};
+      return {...initialAuthState, fetchingSSOSettings: false};
     }
     case AUTH_ACTION.SILENT_LOGOUT_SUCCESS: {
       return {

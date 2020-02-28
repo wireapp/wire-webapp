@@ -22,38 +22,6 @@ import {ACCENT_ID} from 'src/script/Config';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 
 describe('User', () => {
-  describe('First Name', () => {
-    it('can generate first name', () => {
-      const user_et = new User();
-      user_et.name('John Doe');
-
-      expect(user_et.first_name()).toBe('John');
-    });
-  });
-
-  describe('Last Name', () => {
-    it('can generate last name', () => {
-      const user_et = new User();
-      user_et.name('John Doe');
-
-      expect(user_et.last_name()).toBe('Doe');
-    });
-
-    it('can generate last name', () => {
-      const user_et = new User();
-      user_et.name('John D. Doe');
-
-      expect(user_et.last_name()).toBe('Doe');
-    });
-
-    it('can ignore last name if user has only one name', () => {
-      const user_et = new User();
-      user_et.name('John');
-
-      expect(user_et.last_name()).toBeUndefined();
-    });
-  });
-
   describe('Initials', () => {
     it('returns correct initials for user with first name and last name', () => {
       const user_et = new User();

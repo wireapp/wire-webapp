@@ -20,7 +20,7 @@
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {formatDuration} from 'Util/TimeUtil';
-import {removeLineBreaks, sortByPriority} from 'Util/StringUtil';
+import {removeLineBreaks, sortUsersByPriority} from 'Util/StringUtil';
 
 import 'Components/receiptModeToggle';
 import {BasePanelViewModel} from './BasePanelViewModel';
@@ -93,7 +93,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
         this.serviceParticipants(services);
         if (!this.activeConversation().removed_from_conversation()) {
           users.push(this.activeConversation().selfUser());
-          users.sort((userA, userB) => sortByPriority(userA.first_name(), userB.first_name()));
+          users.sort(sortUsersByPriority);
         }
 
         const userCount = users.length;

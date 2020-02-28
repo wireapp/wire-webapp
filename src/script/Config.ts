@@ -35,6 +35,7 @@ export class Configuration {
   readonly APP_BASE = env.APP_BASE || 'https://app.wire.com';
   readonly APP_NAME = env.APP_NAME || 'Webapp';
   readonly APP_INSTANCE_ID = new UUID(4).format();
+  readonly BACKEND_NAME = env.BACKEND_NAME || 'Wire';
   readonly BACKEND_REST = env.BACKEND_REST || 'https://prod-nginz-https.wire.com';
   readonly BACKEND_WS = env.BACKEND_WS || 'wss://prod-nginz-ssl.wire.com';
   readonly BRAND_NAME = env.BRAND_NAME || 'Wire';
