@@ -37,6 +37,7 @@
     }
 
     &__name {
+      display: block;
       overflow: hidden;
       min-height: 24px;
       flex-shrink: 1;
@@ -47,6 +48,11 @@
       font-weight: @font-weight-bold;
       text-align: center;
       word-break: break-word;
+
+      .availability-state-icon,
+      .availability-state-label {
+        display: inline;
+      }
     }
   }
 
