@@ -142,7 +142,7 @@
     "karma-spec-reporter": "0.0.32",
     "karma-webpack": "4.0.2",
     "less": "3.11.1",
-    "lint-staged": "10.0.7",
+    "lint-staged": "10.0.8",
     "load-grunt-tasks": "5.1.0",
     "node-sass": "4.13.1",
     "postcss-cssnext": "3.1.0",
