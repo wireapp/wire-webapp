@@ -88,7 +88,7 @@
     "@types/underscore": "1.9.4",
     "@types/uuid": "3.4.7",
     "@types/webpack-env": "1.15.1",
-    "@typescript-eslint/eslint-plugin": "2.20.0",
+    "@typescript-eslint/eslint-plugin": "2.21.0",
     "@typescript-eslint/parser": "2.20.0",
     "@wireapp/copy-config": "1.0.4",
     "@wireapp/eslint-config": "1.4.0",
