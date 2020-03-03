@@ -30,7 +30,9 @@ import {AudioType} from './AudioType';
 
 declare global {
   interface Navigator {
-    mediaSession: any;
+    mediaSession: {
+      setActionHandler: Function;
+    };
   }
 }
 
