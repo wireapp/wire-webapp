@@ -1,11 +1,12 @@
-import fs from 'fs';
+import fs from 'fs-extra';
 import Changelog from 'generate-changelog';
+import path from 'path';
 import * as pkg from '../package.json';
 
 const simpleGit = require('simple-git')();
 
 const options: {} = {'--list': null};
-simpleGit.pull().tags(
+simpleGit.tags(
   options,
   async (
     error: Error,
@@ -13,6 +14,7 @@ simpleGit.pull().tags(
       all: string[];
     },
   ) => {
+    const outputPath = path.join(__dirname, '../CHANGELOG.md');
     const productionTags = tags.all.filter(tag => tag.includes('-production.'));
     const latestProductionTag = productionTags.sort().reverse()[0];
     const changelog = await Changelog.generate({
@@ -20,6 +22,8 @@ simpleGit.pull().tags(
       repoUrl: pkg.repository.url.replace('.git', ''),
       tag: `${latestProductionTag}...master`,
     });
-    fs.writeFileSync('../CHANGELOG.md', changelog);
+    console.info(`Changelog size: ${changelog.length}`);
+    fs.outputFileSync(outputPath, changelog, 'utf8');
+    console.info(`Wrote file to: ${outputPath}`);
   },
 );
