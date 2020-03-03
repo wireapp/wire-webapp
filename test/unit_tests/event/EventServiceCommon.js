@@ -22,16 +22,17 @@ import {createRandomUuid} from 'Util/util';
 import {MessageCategory} from 'src/script/message/MessageCategory';
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 import {StorageSchemata} from 'src/script/storage/StorageSchemata';
+import {TestFactory} from '../../helper/TestFactory';
 
-window.testEventServiceClass = (testedServiceName, className) => {
+const testEventServiceClass = (testedServiceName, className) => {
   describe(className, () => {
     const conversationId = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a';
     const senderId = '8b497692-7a38-4a5d-8287-e3d1006577d6';
 
-    const test_factory = new TestFactory();
+    const testFactory = new TestFactory();
     const eventStoreName = StorageSchemata.OBJECT_STORE.EVENTS;
 
-    beforeEach(() => test_factory.exposeEventActors());
+    beforeEach(() => testFactory.exposeEventActors());
 
     describe('loadEvent', () => {
       /* eslint-disable sort-keys-fix/sort-keys-fix, quotes */
@@ -57,15 +58,15 @@ window.testEventServiceClass = (testedServiceName, className) => {
 
       beforeEach(() => {
         // feed database before each test
-        return Promise.all(events.map(message => TestFactory.storage_service.save(eventStoreName, undefined, message)));
+        return Promise.all(events.map(message => testFactory.storage_service.save(eventStoreName, undefined, message)));
       });
 
       afterEach(() => {
-        TestFactory.storage_service.clearStores();
+        testFactory.storage_service.clearStores();
       });
 
       it('throws an error if parameters are missing', () => {
-        const eventService = TestFactory[testedServiceName];
+        const eventService = testFactory[testedServiceName];
         const params = [
           [undefined, undefined],
           ['conv-id', undefined],
@@ -81,13 +82,13 @@ window.testEventServiceClass = (testedServiceName, className) => {
       });
 
       it('returns mapped message entity if event with id is found', () => {
-        return TestFactory[testedServiceName].loadEvent(conversationId, events[1].id).then(messageEntity => {
+        return testFactory[testedServiceName].loadEvent(conversationId, events[1].id).then(messageEntity => {
           expect(messageEntity).toEqual(events[1]);
         });
       });
 
       it('returns undefined if no event with id is found', () => {
-        return TestFactory[testedServiceName].loadEvent(conversationId, createRandomUuid()).then(messageEntity => {
+        return testFactory[testedServiceName].loadEvent(conversationId, createRandomUuid()).then(messageEntity => {
           expect(messageEntity).not.toBeDefined();
         });
       });
@@ -104,16 +105,16 @@ window.testEventServiceClass = (testedServiceName, className) => {
         }));
 
         return Promise.all(
-          messages.map(message => TestFactory.storage_service.save(eventStoreName, undefined, message)),
+          messages.map(message => testFactory.storage_service.save(eventStoreName, undefined, message)),
         );
       });
 
       afterEach(() => {
-        TestFactory.storage_service.clearStores();
+        testFactory.storage_service.clearStores();
       });
 
       it("doesn't load events for invalid conversation id", () => {
-        return TestFactory[testedServiceName]
+        return testFactory[testedServiceName]
           .loadPrecedingEvents('invalid_id', new Date(30), new Date(1479903546808))
           .then(events => {
             expect(events.length).toBe(0);
@@ -121,7 +122,7 @@ window.testEventServiceClass = (testedServiceName, className) => {
       });
 
       it('loads all events', () => {
-        return TestFactory[testedServiceName].loadPrecedingEvents(conversationId).then(events => {
+        return testFactory[testedServiceName].loadPrecedingEvents(conversationId).then(events => {
           expect(events.length).toBe(10);
           expect(events[0].time).toBe('2016-11-23T12:19:06.808Z');
           expect(events[9].time).toBe('2016-11-23T12:19:06.799Z');
@@ -129,7 +130,7 @@ window.testEventServiceClass = (testedServiceName, className) => {
       });
 
       it('loads all events with limit', () => {
-        return TestFactory[testedServiceName]
+        return testFactory[testedServiceName]
           .loadPrecedingEvents(conversationId, undefined, undefined, 5)
           .then(events => {
             expect(events.length).toBe(5);
@@ -139,7 +140,7 @@ window.testEventServiceClass = (testedServiceName, className) => {
       });
 
       it('loads events with lower bound', () => {
-        return TestFactory[testedServiceName]
+        return testFactory[testedServiceName]
           .loadPrecedingEvents(conversationId, new Date(1479903546805))
           .then(events => {
             expect(events.length).toBe(4);
@@ -151,7 +152,7 @@ window.testEventServiceClass = (testedServiceName, className) => {
       });
 
       it('loads events with upper bound', () => {
-        return TestFactory[testedServiceName]
+        return testFactory[testedServiceName]
           .loadPrecedingEvents(conversationId, undefined, new Date(1479903546803))
           .then(events => {
             expect(events.length).toBe(4);
@@ -163,7 +164,7 @@ window.testEventServiceClass = (testedServiceName, className) => {
       });
 
       it('loads events with upper and lower bound', () => {
-        return TestFactory[testedServiceName]
+        return testFactory[testedServiceName]
           .loadPrecedingEvents(conversationId, new Date(1479903546806), new Date(1479903546807))
           .then(events => {
             expect(events.length).toBe(1);
@@ -172,7 +173,7 @@ window.testEventServiceClass = (testedServiceName, className) => {
       });
 
       it('loads events with upper and lower bound and a fetch limit', () => {
-        return TestFactory[testedServiceName]
+        return testFactory[testedServiceName]
           .loadPrecedingEvents(conversationId, new Date(1479903546800), new Date(1479903546807), 2)
           .then(events => {
             expect(events.length).toBe(2);
@@ -193,16 +194,16 @@ window.testEventServiceClass = (testedServiceName, className) => {
           time: new Date(timestamp + index).toISOString(),
         }));
 
-        return Promise.all(events.map(event => TestFactory.storage_service.save(eventStoreName, undefined, event)));
+        return Promise.all(events.map(event => testFactory.storage_service.save(eventStoreName, undefined, event)));
       });
 
       afterEach(() => {
-        TestFactory.storage_service.clearStores();
+        testFactory.storage_service.clearStores();
       });
 
       it('fails if the upperbound is not a Date', async () => {
         try {
-          await TestFactory[testedServiceName].loadFollowingEvents(conversationId, 'not a date', 2, false);
+          await testFactory[testedServiceName].loadFollowingEvents(conversationId, 'not a date', 2, false);
           fail('should have thrown');
         } catch (error) {
           expect(error.message).toContain("must be of type 'Date'");
@@ -211,7 +212,7 @@ window.testEventServiceClass = (testedServiceName, className) => {
 
       it('accepts timestamps in the future', () => {
         const futureTimestamp = Date.now() + 1000;
-        return TestFactory[testedServiceName].loadFollowingEvents(conversationId, new Date(futureTimestamp), 1);
+        return testFactory[testedServiceName].loadFollowingEvents(conversationId, new Date(futureTimestamp), 1);
       });
 
       it('loads all events matching parameters', () => {
@@ -230,7 +231,7 @@ window.testEventServiceClass = (testedServiceName, className) => {
         ];
 
         const testPromises = tests.map(({args, expectedEvents}) => {
-          return TestFactory[testedServiceName].loadFollowingEvents(...[conversationId].concat(args)).then(_events => {
+          return testFactory[testedServiceName].loadFollowingEvents(...[conversationId].concat(args)).then(_events => {
             expect(_events).toEqual(expectedEvents);
           });
         });
@@ -272,15 +273,15 @@ window.testEventServiceClass = (testedServiceName, className) => {
       /* eslint-enable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
 
       beforeEach(() => {
-        return Promise.all(events.map(event => TestFactory.storage_service.save(eventStoreName, undefined, event)));
+        return Promise.all(events.map(event => testFactory.storage_service.save(eventStoreName, undefined, event)));
       });
 
       afterEach(() => {
-        TestFactory.storage_service.clearStores();
+        testFactory.storage_service.clearStores();
       });
 
       it('should return no entry matches the given category', () => {
-        return TestFactory[testedServiceName]
+        return testFactory[testedServiceName]
           .loadEventsWithCategory(events[0].conversation, MessageCategory.VIDEO)
           .then(result => {
             expect(result.length).toBe(0);
@@ -288,7 +289,7 @@ window.testEventServiceClass = (testedServiceName, className) => {
       });
 
       it('should get images in the correct order', () => {
-        return TestFactory[testedServiceName]
+        return testFactory[testedServiceName]
           .loadEventsWithCategory(events[0].conversation, MessageCategory.IMAGE)
           .then(result => {
             expect(result.length).toBe(2);
@@ -310,11 +311,11 @@ window.testEventServiceClass = (testedServiceName, className) => {
       /* eslint-enable sort-keys-fix/sort-keys-fix*/
 
       it('save event in the database', () => {
-        spyOn(TestFactory.storage_service, 'save').and.callFake(event => Promise.resolve(event));
+        spyOn(testFactory.storage_service, 'save').and.callFake(event => Promise.resolve(event));
 
-        return TestFactory[testedServiceName].saveEvent(newEvent).then(event => {
+        return testFactory[testedServiceName].saveEvent(newEvent).then(event => {
           expect(event.category).toBeDefined();
-          expect(TestFactory.storage_service.save).toHaveBeenCalledWith(eventStoreName, undefined, newEvent);
+          expect(testFactory.storage_service.save).toHaveBeenCalledWith(eventStoreName, undefined, newEvent);
         });
       });
     });
@@ -333,10 +334,10 @@ window.testEventServiceClass = (testedServiceName, className) => {
       /* eslint-enable sort-keys-fix/sort-keys-fix*/
 
       it('update event in the database', () => {
-        spyOn(TestFactory.storage_service, 'update').and.callFake(event => Promise.resolve(event));
+        spyOn(testFactory.storage_service, 'update').and.callFake(event => Promise.resolve(event));
 
-        return TestFactory[testedServiceName].replaceEvent(updatedEvent).then(event => {
-          expect(TestFactory.storage_service.update).toHaveBeenCalledWith(eventStoreName, 12, event);
+        return testFactory[testedServiceName].replaceEvent(updatedEvent).then(event => {
+          expect(testFactory.storage_service.update).toHaveBeenCalledWith(eventStoreName, 12, event);
         });
       });
     });
@@ -344,10 +345,10 @@ window.testEventServiceClass = (testedServiceName, className) => {
     describe('updateEventAsUploadSucceeded', () => {
       /* eslint-disable sort-keys-fix/sort-keys-fix*/
       it("doesn't do anything if initial event is not found", () => {
-        spyOn(TestFactory.storage_service, 'load').and.returnValue(Promise.resolve(undefined));
-        spyOn(TestFactory.storage_service, 'update');
-        TestFactory.event_service.updateEventAsUploadSucceeded(12, {}).then(() => {
-          expect(TestFactory.storage_repository.update).not.toHaveBeenCalled();
+        spyOn(testFactory.storage_service, 'load').and.returnValue(Promise.resolve(undefined));
+        spyOn(testFactory.storage_service, 'update');
+        testFactory.event_service.updateEventAsUploadSucceeded(12, {}).then(() => {
+          expect(testFactory.storage_repository.update).not.toHaveBeenCalled();
         });
       });
 
@@ -366,14 +367,14 @@ window.testEventServiceClass = (testedServiceName, className) => {
           },
           time: '2016-08-04T13:27:58.993Z',
         };
-        spyOn(TestFactory.storage_service, 'load').and.returnValue(Promise.resolve(initialEvent));
-        spyOn(TestFactory.storage_service, 'update').and.callFake((storeName, primaryKey, updates) => {
+        spyOn(testFactory.storage_service, 'load').and.returnValue(Promise.resolve(initialEvent));
+        spyOn(testFactory.storage_service, 'update').and.callFake((storeName, primaryKey, updates) => {
           expect(updates.data).toEqual(jasmine.objectContaining(successEvent.data));
           expect(updates.data.content).toEqual(initialEvent.data.content);
           return Promise.resolve(undefined);
         });
-        return TestFactory.event_service.updateEventAsUploadSucceeded(12, successEvent).then(() => {
-          expect(TestFactory.storage_service.update).toHaveBeenCalled();
+        return testFactory.event_service.updateEventAsUploadSucceeded(12, successEvent).then(() => {
+          expect(testFactory.storage_service.update).toHaveBeenCalled();
         });
       });
     });
@@ -381,10 +382,10 @@ window.testEventServiceClass = (testedServiceName, className) => {
     describe('updateEventAsUploadFailed', () => {
       /* eslint-disable sort-keys-fix/sort-keys-fix*/
       it("doesn't do anything if initial event is not found", () => {
-        spyOn(TestFactory.storage_service, 'load').and.returnValue(Promise.resolve(undefined));
-        spyOn(TestFactory.storage_service, 'update');
-        TestFactory.event_service.updateEventAsUploadFailed(12, {}).then(() => {
-          expect(TestFactory.storage_repository.update).not.toHaveBeenCalled();
+        spyOn(testFactory.storage_service, 'load').and.returnValue(Promise.resolve(undefined));
+        spyOn(testFactory.storage_service, 'update');
+        testFactory.event_service.updateEventAsUploadFailed(12, {}).then(() => {
+          expect(testFactory.storage_repository.update).not.toHaveBeenCalled();
         });
       });
 
@@ -394,15 +395,15 @@ window.testEventServiceClass = (testedServiceName, className) => {
           data: {content: ''},
         };
         const reason = AssetTransferState.UPLOAD_FAILED;
-        spyOn(TestFactory.storage_service, 'load').and.returnValue(Promise.resolve(initialEvent));
-        spyOn(TestFactory.storage_service, 'update').and.callFake((storeName, primaryKey, updates) => {
+        spyOn(testFactory.storage_service, 'load').and.returnValue(Promise.resolve(initialEvent));
+        spyOn(testFactory.storage_service, 'update').and.callFake((storeName, primaryKey, updates) => {
           expect(updates.data.reason).toEqual(reason);
           expect(updates.data.status).toEqual(AssetTransferState.UPLOAD_FAILED);
           expect(updates.data.content).toEqual(initialEvent.data.content);
           return Promise.resolve(undefined);
         });
-        return TestFactory.event_service.updateEventAsUploadFailed(12, reason).then(() => {
-          expect(TestFactory.storage_service.update).toHaveBeenCalled();
+        return testFactory.event_service.updateEventAsUploadFailed(12, reason).then(() => {
+          expect(testFactory.storage_service.update).toHaveBeenCalled();
         });
       });
     });
@@ -410,7 +411,7 @@ window.testEventServiceClass = (testedServiceName, className) => {
     describe('updateEventSequentially', () => {
       it('fails if changes do not contain version property', () => {
         const updates = {reactions: ['user-id']};
-        return TestFactory[testedServiceName]
+        return testFactory[testedServiceName]
           .updateEventSequentially(12, updates)
           .then(fail)
           .catch(error => {
@@ -421,9 +422,9 @@ window.testEventServiceClass = (testedServiceName, className) => {
       it('fails if version is not sequential', () => {
         const updates = {reactions: ['user-id'], version: 1};
 
-        spyOn(TestFactory.storage_service, 'load').and.returnValue(Promise.resolve({version: 2}));
+        spyOn(testFactory.storage_service, 'load').and.returnValue(Promise.resolve({version: 2}));
 
-        return TestFactory[testedServiceName]
+        return testFactory[testedServiceName]
           .updateEventSequentially(12, updates)
           .then(fail)
           .catch(error => {
@@ -434,10 +435,10 @@ window.testEventServiceClass = (testedServiceName, className) => {
       it('fails if record is not found', () => {
         const updates = {reactions: ['user-id'], version: 2};
 
-        spyOn(TestFactory.storage_service, 'load').and.returnValue(Promise.resolve(undefined));
-        spyOn(TestFactory.storage_service, 'update').and.returnValue(Promise.resolve('ok'));
+        spyOn(testFactory.storage_service, 'load').and.returnValue(Promise.resolve(undefined));
+        spyOn(testFactory.storage_service, 'update').and.returnValue(Promise.resolve('ok'));
 
-        return TestFactory[testedServiceName]
+        return testFactory[testedServiceName]
           .updateEventSequentially(12, updates)
           .then(fail)
           .catch(error => {
@@ -448,13 +449,13 @@ window.testEventServiceClass = (testedServiceName, className) => {
       it('updates message in DB', () => {
         const updates = {reactions: ['user-id'], version: 2};
 
-        spyOn(TestFactory.storage_service, 'load').and.returnValue(Promise.resolve({version: 1}));
-        spyOn(TestFactory.storage_service, 'update').and.returnValue(Promise.resolve('ok'));
-        spyOn(TestFactory.storage_service.db, 'transaction').and.callThrough();
+        spyOn(testFactory.storage_service, 'load').and.returnValue(Promise.resolve({version: 1}));
+        spyOn(testFactory.storage_service, 'update').and.returnValue(Promise.resolve('ok'));
+        spyOn(testFactory.storage_service.db, 'transaction').and.callThrough();
 
-        return TestFactory[testedServiceName].updateEventSequentially(12, updates).then(() => {
-          expect(TestFactory.storage_service.update).toHaveBeenCalledWith(eventStoreName, 12, updates);
-          expect(TestFactory.storage_service.db.transaction).toHaveBeenCalled();
+        return testFactory[testedServiceName].updateEventSequentially(12, updates).then(() => {
+          expect(testFactory.storage_service.update).toHaveBeenCalledWith(eventStoreName, 12, updates);
+          expect(testFactory.storage_service.db.transaction).toHaveBeenCalled();
         });
       });
     });
@@ -474,15 +475,15 @@ window.testEventServiceClass = (testedServiceName, className) => {
       const events = mainConversationEvents.concat(otherConversationEvents);
 
       beforeEach(() => {
-        return Promise.all(events.map(event => TestFactory.storage_service.save(eventStoreName, undefined, event)));
+        return Promise.all(events.map(event => testFactory.storage_service.save(eventStoreName, undefined, event)));
       });
 
       afterEach(() => {
-        TestFactory.storage_service.clearStores();
+        testFactory.storage_service.clearStores();
       });
 
       it('deletes event with the given id in the given conversation', () => {
-        const eventService = TestFactory[testedServiceName];
+        const eventService = testFactory[testedServiceName];
 
         return eventService
           .deleteEvent(conversationId, events[0].id)
@@ -493,7 +494,7 @@ window.testEventServiceClass = (testedServiceName, className) => {
       });
 
       it("doesn't delete event with the same id in different conversations", () => {
-        const eventService = TestFactory[testedServiceName];
+        const eventService = testFactory[testedServiceName];
 
         return eventService
           .deleteEvent(conversationId, events[0].id)
@@ -517,15 +518,15 @@ window.testEventServiceClass = (testedServiceName, className) => {
       ];
 
       beforeEach(() => {
-        return Promise.all(events.map(event => TestFactory.storage_service.save(eventStoreName, undefined, event)));
+        return Promise.all(events.map(event => testFactory.storage_service.save(eventStoreName, undefined, event)));
       });
 
       afterEach(() => {
-        TestFactory.storage_service.clearStores();
+        testFactory.storage_service.clearStores();
       });
 
       it('deletes all events from a conversation if no timestamp is given', () => {
-        const eventService = TestFactory[testedServiceName];
+        const eventService = testFactory[testedServiceName];
 
         return eventService
           .deleteEvents(conversationId)
@@ -536,7 +537,7 @@ window.testEventServiceClass = (testedServiceName, className) => {
       });
 
       it('deletes events according to the given timestamp', () => {
-        const eventService = TestFactory[testedServiceName];
+        const eventService = testFactory[testedServiceName];
 
         return eventService
           .deleteEvents(conversationId, '2016-08-04T13:27:56.182Z')
@@ -561,19 +562,19 @@ window.testEventServiceClass = (testedServiceName, className) => {
 
       beforeEach(async () => {
         const ids = await Promise.all(
-          messages.map(message => TestFactory.storage_service.save(eventStoreName, undefined, message)),
+          messages.map(message => testFactory.storage_service.save(eventStoreName, undefined, message)),
         );
         primary_keys = ids;
       });
 
       afterEach(() => {
-        TestFactory.storage_service.clearStores();
+        testFactory.storage_service.clearStores();
       });
 
       it('deletes message with the given key', () => {
-        return TestFactory[testedServiceName]
+        return testFactory[testedServiceName]
           .deleteEventByKey(primary_keys[1])
-          .then(() => TestFactory[testedServiceName].loadPrecedingEvents(conversationId))
+          .then(() => testFactory[testedServiceName].loadPrecedingEvents(conversationId))
           .then(events => {
             expect(events.length).toBe(2);
             events.forEach(event => expect(event.primary_key).not.toBe(primary_keys[1]));
@@ -581,9 +582,9 @@ window.testEventServiceClass = (testedServiceName, className) => {
       });
 
       it('does not delete the event if key is wrong', () => {
-        return TestFactory[testedServiceName]
+        return testFactory[testedServiceName]
           .deleteEventByKey('wrongKey')
-          .then(() => TestFactory[testedServiceName].loadPrecedingEvents(conversationId))
+          .then(() => testFactory[testedServiceName].loadPrecedingEvents(conversationId))
           .then(events => {
             expect(events.length).toBe(3);
           });
@@ -603,19 +604,19 @@ window.testEventServiceClass = (testedServiceName, className) => {
       /* eslint-enable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
 
       it('updated event in the database', () => {
-        spyOn(TestFactory[testedServiceName], 'replaceEvent').and.returnValue(Promise.resolve());
+        spyOn(testFactory[testedServiceName], 'replaceEvent').and.returnValue(Promise.resolve());
 
         messageEntity.time = new Date().toISOString();
         messageEntity.primary_key = 1337;
-        return TestFactory[testedServiceName]
+        return testFactory[testedServiceName]
           .updateEvent(messageEntity.primary_key, {time: messageEntity.time})
           .then(() => {
-            expect(TestFactory[testedServiceName].replaceEvent).toHaveBeenCalled();
+            expect(testFactory[testedServiceName].replaceEvent).toHaveBeenCalled();
           });
       });
 
       it('fails if changes are not specified', () => {
-        return TestFactory[testedServiceName]
+        return testFactory[testedServiceName]
           .updateEvent(12, undefined)
           .then(() => fail('should have thrown'))
           .catch(error => {
@@ -626,3 +627,5 @@ window.testEventServiceClass = (testedServiceName, className) => {
     });
   });
 };
+
+export {testEventServiceClass};

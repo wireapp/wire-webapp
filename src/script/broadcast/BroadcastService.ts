@@ -17,27 +17,14 @@
  *
  */
 
-import {OTRRecipients, UserClients} from '@wireapp/api-client/dist/conversation';
-import {BackendClient} from '../service/BackendClient';
-
-export interface BroadcastPayload {
-  recipients: OTRRecipients;
-  /** Client ID of the sender */
-  sender: string;
-}
+import {APIClient} from '@wireapp/api-client';
+import {UserClients} from '@wireapp/api-client/dist/conversation';
 
 export class BroadcastService {
-  private readonly backendClient: BackendClient;
+  private readonly apiClient: APIClient;
 
-  // tslint:disable-next-line:typedef
-  static get CONFIG() {
-    return {
-      URL_BROADCAST: '/broadcast',
-    };
-  }
-
-  constructor(backendClient: BackendClient) {
-    this.backendClient = backendClient;
+  constructor(apiClient: APIClient) {
+    this.apiClient = apiClient;
   }
 
   /**
@@ -53,17 +40,9 @@ export class BroadcastService {
     payload: {recipients: {}; sender: string},
     preconditionOption: string[] | boolean,
   ): Promise<UserClients> {
-    let url = `${BroadcastService.CONFIG.URL_BROADCAST}/otr/messages`;
-    if (Array.isArray(preconditionOption)) {
-      url = `${url}?report_missing=${preconditionOption.join(',')}`;
-    } else if (preconditionOption) {
-      url = `${url}?ignore_missing=true`;
-    }
-
-    return this.backendClient.sendJson({
-      data: payload,
-      type: 'POST',
-      url: url,
+    return this.apiClient.broadcast.api.postBroadcastMessage(payload.sender, payload, {
+      ignore_missing: preconditionOption === true ? true : undefined,
+      report_missing: Array.isArray(preconditionOption) ? preconditionOption.join(',') : undefined,
     });
   }
 }

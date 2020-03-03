@@ -25,7 +25,9 @@ import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {LinkPreview} from 'src/script/entity/message/LinkPreview';
 import {Text} from 'src/script/entity/message/Text';
 import {User} from 'src/script/entity/User';
+import {TestFactory} from '../../helper/TestFactory';
 import 'src/script/components/message';
+import {t} from 'Util/LocalizerUtil';
 
 describe('message', () => {
   const testFactory = new TestFactory();
@@ -82,7 +84,7 @@ describe('message', () => {
       const menu = document.querySelector('.ctx-menu');
 
       expect(menu).toBeDefined();
-      menu.querySelector('[title=conversationContextMenuLike]').click();
+      menu.querySelector(`[title=${t('conversationContextMenuLike')}]`).click();
 
       expect(defaultParams.onLike).toHaveBeenCalled();
     });

@@ -24,6 +24,7 @@ import {ClientRepository} from 'src/script/client/ClientRepository';
 import {ClientType} from 'src/script/client/ClientType';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {ClientMapper} from 'src/script/client/ClientMapper';
+import {TestFactory} from '../../helper/TestFactory';
 
 describe('ClientRepository', () => {
   const testFactory = new TestFactory();
@@ -32,18 +33,18 @@ describe('ClientRepository', () => {
 
   beforeAll(() => {
     return testFactory.exposeClientActors().then(() => {
-      userId = TestFactory.client_repository.selfUser().id;
+      userId = testFactory.client_repository.selfUser().id;
     });
   });
 
-  beforeEach(() => TestFactory.storage_repository.clearStores());
+  beforeEach(() => testFactory.storage_repository.clearStores());
 
   describe('getClientsByUserId', () =>
     it('maps client entities from client payloads by the backend', () => {
       const client = new ClientEntity();
       client.id = clientId;
 
-      TestFactory.client_repository.currentClient(client);
+      testFactory.client_repository.currentClient(client);
 
       const allClients = [
         {class: 'desktop', id: '706f64373b1bcf79'},
@@ -52,11 +53,11 @@ describe('ClientRepository', () => {
         {class: 'tablet', id: 'c411f97b139c818b'},
         {class: 'desktop', id: 'cbf3ea49214702d8'},
       ];
-      spyOn(TestFactory.client_repository.clientService, 'getClientsByUserId').and.returnValue(
+      spyOn(testFactory.client_repository.clientService, 'getClientsByUserId').and.returnValue(
         Promise.resolve(allClients),
       );
 
-      return TestFactory.client_repository.getClientsByUserId(entities.user.john_doe.id).then(clientEntities => {
+      return testFactory.client_repository.getClientsByUserId(entities.user.john_doe.id).then(clientEntities => {
         expect(clientEntities.length).toBe(allClients.length);
       });
     }));
@@ -85,29 +86,27 @@ describe('ClientRepository', () => {
     };
 
     it('resolves with a valid client', () => {
-      const clientService = TestFactory.client_repository.clientService;
-      const backendClient = clientService.backendClient;
+      const clientService = testFactory.client_repository.clientService;
 
       spyOn(clientService, 'loadClientFromDb').and.returnValue(Promise.resolve(clientPayloadDatabase));
-      spyOn(backendClient, 'sendRequest').and.returnValue(Promise.resolve(clientPayloadServer));
+      spyOn(clientService, 'getClientById').and.returnValue(Promise.resolve(clientPayloadServer));
 
-      return TestFactory.client_repository.getValidLocalClient().then(clientObservable => {
+      return testFactory.client_repository.getValidLocalClient().then(clientObservable => {
         expect(clientObservable).toBeDefined();
         expect(clientObservable().id).toBe(clientId);
       });
     });
 
     it('rejects with an error if no client found locally', () => {
-      const clientService = TestFactory.client_repository.clientService;
-      const backendClient = clientService.backendClient;
+      const clientService = testFactory.client_repository.clientService;
       spyOn(clientService, 'loadClientFromDb').and.returnValue(
         Promise.resolve(ClientRepository.PRIMARY_KEY_CURRENT_CLIENT),
       );
       const backendError = new Error();
       backendError.code = 404;
-      spyOn(backendClient, 'sendRequest').and.returnValue(Promise.reject(backendError));
+      spyOn(clientService, 'getClientById').and.returnValue(Promise.reject(backendError));
 
-      return TestFactory.client_repository
+      return testFactory.client_repository
         .getValidLocalClient()
         .then(fail)
         .catch(error => {
@@ -117,15 +116,14 @@ describe('ClientRepository', () => {
     });
 
     it('rejects with an error if client removed on backend', () => {
-      const clientService = TestFactory.client_repository.clientService;
-      const backendClient = clientService.backendClient;
+      const clientService = testFactory.client_repository.clientService;
       spyOn(clientService, 'loadClientFromDb').and.returnValue(Promise.resolve(clientPayloadDatabase));
-      spyOn(TestFactory.storage_service, 'deleteDatabase').and.returnValue(Promise.resolve(true));
+      spyOn(testFactory.storage_service, 'deleteDatabase').and.returnValue(Promise.resolve(true));
       const backendError = new Error();
-      backendError.code = 404;
-      spyOn(backendClient, 'sendRequest').and.returnValue(Promise.reject(backendError));
+      backendError.response = {status: 404};
+      spyOn(clientService, 'getClientById').and.returnValue(Promise.reject(backendError));
 
-      return TestFactory.client_repository
+      return testFactory.client_repository
         .getValidLocalClient()
         .then(fail)
         .catch(error => {
@@ -135,11 +133,11 @@ describe('ClientRepository', () => {
     });
 
     it('rejects with an error if something else fails', done => {
-      spyOn(TestFactory.client_repository.clientService, 'loadClientFromDb').and.returnValue(
+      spyOn(testFactory.client_repository.clientService, 'loadClientFromDb').and.returnValue(
         Promise.reject(new Error('Expected unit test error')),
       );
 
-      TestFactory.client_repository
+      testFactory.client_repository
         .getValidLocalClient()
         .then(done.fail)
         .catch(error => {
@@ -152,20 +150,20 @@ describe('ClientRepository', () => {
 
   describe('constructPrimaryKey', () => {
     it('returns a proper primary key for a client', () => {
-      const actualPrimaryKey = TestFactory.client_repository.constructPrimaryKey(userId, clientId);
+      const actualPrimaryKey = testFactory.client_repository.constructPrimaryKey(userId, clientId);
       const expectedPrimaryKey = `${userId}@${clientId}`;
 
       expect(actualPrimaryKey).toEqual(expectedPrimaryKey);
     });
 
     it('throws an error if missing user ID', () => {
-      const functionCall = () => TestFactory.client_repository.constructPrimaryKey(undefined, clientId);
+      const functionCall = () => testFactory.client_repository.constructPrimaryKey(undefined, clientId);
 
       expect(functionCall).toThrowError(z.error.ClientError, z.error.ClientError.MESSAGE.NO_USER_ID);
     });
 
     it('throws and error if missing client ID', () => {
-      const functionCall = () => TestFactory.client_repository.constructPrimaryKey(userId, undefined);
+      const functionCall = () => testFactory.client_repository.constructPrimaryKey(userId, undefined);
 
       expect(functionCall).toThrowError(z.error.ClientError, z.error.ClientError.MESSAGE.NO_CLIENT_ID);
     });
@@ -174,17 +172,17 @@ describe('ClientRepository', () => {
   describe('isCurrentClientPermanent', () => {
     beforeEach(() => {
       Environment.electron = false;
-      TestFactory.client_repository.__test__assignEnvironment(Environment);
-      TestFactory.client_repository.currentClient(undefined);
+      testFactory.client_repository.__test__assignEnvironment(Environment);
+      testFactory.client_repository.currentClient(undefined);
     });
 
     it('returns true on Electron', () => {
       const clientPayload = {type: ClientType.PERMANENT};
       const clientEntity = ClientMapper.mapClient(clientPayload, true);
-      TestFactory.client_repository.currentClient(clientEntity);
+      testFactory.client_repository.currentClient(clientEntity);
       Environment.electron = true;
-      TestFactory.client_repository.__test__assignEnvironment(Environment);
-      const isPermanent = TestFactory.client_repository.isCurrentClientPermanent();
+      testFactory.client_repository.__test__assignEnvironment(Environment);
+      const isPermanent = testFactory.client_repository.isCurrentClientPermanent();
 
       expect(isPermanent).toBeTruthy();
     });
@@ -192,18 +190,18 @@ describe('ClientRepository', () => {
     it('returns true on Electron even if client is temporary', () => {
       const clientPayload = {type: ClientType.TEMPORARY};
       const clientEntity = ClientMapper.mapClient(clientPayload, true);
-      TestFactory.client_repository.currentClient(clientEntity);
+      testFactory.client_repository.currentClient(clientEntity);
       Environment.electron = true;
-      TestFactory.client_repository.__test__assignEnvironment(Environment);
-      const isPermanent = TestFactory.client_repository.isCurrentClientPermanent();
+      testFactory.client_repository.__test__assignEnvironment(Environment);
+      const isPermanent = testFactory.client_repository.isCurrentClientPermanent();
 
       expect(isPermanent).toBeTruthy();
     });
 
     it('throws an error on Electron if no current client', () => {
       Environment.electron = true;
-      TestFactory.client_repository.__test__assignEnvironment(Environment);
-      const functionCall = () => TestFactory.client_repository.isCurrentClientPermanent();
+      testFactory.client_repository.__test__assignEnvironment(Environment);
+      const functionCall = () => testFactory.client_repository.isCurrentClientPermanent();
 
       expect(functionCall).toThrowError(z.error.ClientError, z.error.ClientError.MESSAGE.CLIENT_NOT_SET);
     });
@@ -211,8 +209,8 @@ describe('ClientRepository', () => {
     it('returns true if current client is permanent', () => {
       const clientPayload = {type: ClientType.PERMANENT};
       const clientEntity = ClientMapper.mapClient(clientPayload, true);
-      TestFactory.client_repository.currentClient(clientEntity);
-      const isPermanent = TestFactory.client_repository.isCurrentClientPermanent();
+      testFactory.client_repository.currentClient(clientEntity);
+      const isPermanent = testFactory.client_repository.isCurrentClientPermanent();
 
       expect(isPermanent).toBeTruthy();
     });
@@ -220,28 +218,28 @@ describe('ClientRepository', () => {
     it('returns false if current client is temporary', () => {
       const clientPayload = {type: ClientType.TEMPORARY};
       const clientEntity = ClientMapper.mapClient(clientPayload, true);
-      TestFactory.client_repository.currentClient(clientEntity);
-      const isPermanent = TestFactory.client_repository.isCurrentClientPermanent();
+      testFactory.client_repository.currentClient(clientEntity);
+      const isPermanent = testFactory.client_repository.isCurrentClientPermanent();
 
       expect(isPermanent).toBeFalsy();
     });
 
     it('throws an error if no current client', () => {
-      const functionCall = () => TestFactory.client_repository.isCurrentClientPermanent();
+      const functionCall = () => testFactory.client_repository.isCurrentClientPermanent();
 
       expect(functionCall).toThrowError(z.error.ClientError, z.error.ClientError.MESSAGE.CLIENT_NOT_SET);
     });
   });
 
   describe('isCurrentClient', () => {
-    beforeEach(() => TestFactory.client_repository.currentClient(undefined));
+    beforeEach(() => testFactory.client_repository.currentClient(undefined));
 
     it('returns true if user ID and client ID match', () => {
       const clientEntity = new ClientEntity();
       clientEntity.id = clientId;
-      TestFactory.client_repository.currentClient(clientEntity);
-      TestFactory.client_repository.selfUser(new User(userId));
-      const result = TestFactory.client_repository.isCurrentClient(userId, clientId);
+      testFactory.client_repository.currentClient(clientEntity);
+      testFactory.client_repository.selfUser(new User(userId));
+      const result = testFactory.client_repository.isCurrentClient(userId, clientId);
 
       expect(result).toBeTruthy();
     });
@@ -249,8 +247,8 @@ describe('ClientRepository', () => {
     it('returns false if only the user ID matches', () => {
       const clientEntity = new ClientEntity();
       clientEntity.id = clientId;
-      TestFactory.client_repository.currentClient(clientEntity);
-      const result = TestFactory.client_repository.isCurrentClient(userId, 'ABCDE');
+      testFactory.client_repository.currentClient(clientEntity);
+      const result = testFactory.client_repository.isCurrentClient(userId, 'ABCDE');
 
       expect(result).toBeFalsy();
     });
@@ -258,28 +256,28 @@ describe('ClientRepository', () => {
     it('returns false if only the client ID matches', () => {
       const clientEntity = new ClientEntity();
       clientEntity.id = clientId;
-      TestFactory.client_repository.currentClient(clientEntity);
-      const result = TestFactory.client_repository.isCurrentClient('ABCDE', clientId);
+      testFactory.client_repository.currentClient(clientEntity);
+      const result = testFactory.client_repository.isCurrentClient('ABCDE', clientId);
 
       expect(result).toBeFalsy();
     });
 
     it('throws an error if current client is not set', () => {
-      const functionCall = () => TestFactory.client_repository.isCurrentClient(userId, clientId);
+      const functionCall = () => testFactory.client_repository.isCurrentClient(userId, clientId);
 
       expect(functionCall).toThrowError(z.error.ClientError, z.error.ClientError.MESSAGE.CLIENT_NOT_SET);
     });
 
     it('throws an error if client ID is not specified', () => {
-      TestFactory.client_repository.currentClient(new ClientEntity());
-      const functionCall = () => TestFactory.client_repository.isCurrentClient(userId);
+      testFactory.client_repository.currentClient(new ClientEntity());
+      const functionCall = () => testFactory.client_repository.isCurrentClient(userId);
 
       expect(functionCall).toThrowError(z.error.ClientError, z.error.ClientError.MESSAGE.NO_CLIENT_ID);
     });
 
     it('throws an error if user ID is not specified', () => {
-      TestFactory.client_repository.currentClient(new ClientEntity());
-      const functionCall = () => TestFactory.client_repository.isCurrentClient(undefined, clientId);
+      testFactory.client_repository.currentClient(new ClientEntity());
+      const functionCall = () => testFactory.client_repository.isCurrentClient(undefined, clientId);
 
       expect(functionCall).toThrowError(z.error.ClientError, z.error.ClientError.MESSAGE.NO_USER_ID);
     });

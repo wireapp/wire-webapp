@@ -17,37 +17,39 @@
  *
  */
 
+import {RichInfoField} from '@wireapp/api-client/dist/user/RichInfo';
 import ko from 'knockout';
+import {container} from 'tsyringe';
 
 import {t} from 'Util/LocalizerUtil';
 import {noop} from 'Util/util';
 
-import {graph, resolve} from '../../config/appResolver';
 import {User} from '../../entity/User';
-import {RichField, RichProfileRepository} from '../../user/RichProfileRepository';
+import {APIClientSingleton} from '../../service/APIClientSingleton';
+import {RichProfileRepository} from '../../user/RichProfileRepository';
 
 interface ComponentParams {
   user: ko.Observable<User>;
-  onFieldsLoaded: (richFields: RichField[]) => void;
+  onFieldsLoaded: (richFields: RichInfoField[]) => void;
   richProfileRepository: RichProfileRepository;
 }
 
 class EnrichedFields {
-  readonly fields: ko.Observable<RichField[]>;
+  readonly fields: ko.Observable<RichInfoField[]>;
   readonly richProfileRepository: RichProfileRepository;
 
   constructor(params: ComponentParams, element: Node) {
     const {
       user,
       onFieldsLoaded = noop,
-      richProfileRepository = new RichProfileRepository(resolve(graph.BackendClient)),
+      richProfileRepository = new RichProfileRepository(container.resolve(APIClientSingleton).getClient()),
     } = params;
     this.richProfileRepository = richProfileRepository;
     this.fields = ko.observable([]);
     ko.computed(
       () => {
         if (user()) {
-          const fields: RichField[] = user().email() ? [{type: t('userProfileEmail'), value: user().email()}] : [];
+          const fields: RichInfoField[] = user().email() ? [{type: t('userProfileEmail'), value: user().email()}] : [];
           this.richProfileRepository
             .getUserRichProfile(ko.unwrap(user).id)
             .then(richProfile => {

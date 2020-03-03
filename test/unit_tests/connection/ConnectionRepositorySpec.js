@@ -18,15 +18,13 @@
  */
 
 import {ConnectionStatus} from '@wireapp/api-client/dist/connection';
-
 import {createRandomUuid} from 'Util/util';
-
-import {backendConfig} from '../../api/testResolver';
-
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {WebAppEvents} from 'src/script/event/WebApp';
 import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
+import {Config} from 'src/script/Config';
+import {TestFactory} from '../../helper/TestFactory';
 
 describe('ConnectionRepository', () => {
   let server = undefined;
@@ -36,7 +34,7 @@ describe('ConnectionRepository', () => {
   beforeAll(() => testFactory.exposeConnectionActors());
 
   beforeEach(() => {
-    connectionRepository = TestFactory.connection_repository;
+    connectionRepository = testFactory.connection_repository;
     server = sinon.fakeServer.create();
     server.autoRespond = true;
   });
@@ -105,17 +103,17 @@ describe('ConnectionRepository', () => {
   describe('getConnections', () => {
     // [update 16/08/2018] flaky test reenabled (on probation). Could be removed if fails again
     it('should return the connected users', () => {
-      server.respondWith('GET', `${backendConfig.restUrl}/connections?size=500`, [
+      server.respondWith('GET', `${Config.getConfig().BACKEND_REST}/connections?size=500`, [
         200,
         {'Content-Type': 'application/json'},
         JSON.stringify(payload.connections.get),
       ]);
 
-      server.respondWith(
-        'GET',
-        `${backendConfig.restUrl}/users?ids=${entities.user.jane_roe.id}%2C${entities.user.jane_roe.id}`,
-        [200, {'Content-Type': 'application/json'}, JSON.stringify(payload.users.get.many)],
-      );
+      server.respondWith('GET', `${Config.getConfig().BACKEND_REST}/users?ids=${entities.user.jane_roe.id}`, [
+        200,
+        {'Content-Type': 'application/json'},
+        JSON.stringify(payload.users.get.many),
+      ]);
 
       return connectionRepository.getConnections().then(() => {
         expect(connectionRepository.connectionEntities().length).toBe(2);

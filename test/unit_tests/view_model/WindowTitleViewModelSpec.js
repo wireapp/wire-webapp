@@ -19,7 +19,7 @@
 
 import ko from 'knockout';
 
-import {t} from 'Util/LocalizerUtil';
+import {t, setStrings} from 'Util/LocalizerUtil';
 import {createRandomUuid} from 'Util/util';
 
 import 'src/script/localization/Localizer';
@@ -33,16 +33,18 @@ import {ConversationType} from 'src/script/conversation/ConversationType';
 import {WindowTitleViewModel} from 'src/script/view_model/WindowTitleViewModel';
 import {ContentViewModel} from 'src/script/view_model/ContentViewModel';
 import {WebAppEvents} from 'src/script/event/WebApp';
+import {TestFactory} from '../../helper/TestFactory';
 
 describe('WindowTitleViewModel', () => {
   const suffix = 'Wire';
-  let test_factory = undefined;
+  let testFactory = undefined;
   let title_view_model = undefined;
 
   beforeEach(() => {
-    test_factory = new TestFactory();
+    setStrings({en: z.string});
+    testFactory = new TestFactory();
 
-    return test_factory.exposeConversationActors().then(conversationRepository => {
+    return testFactory.exposeConversationActors().then(conversationRepository => {
       title_view_model = new WindowTitleViewModel(
         {
           content: {
@@ -51,7 +53,7 @@ describe('WindowTitleViewModel', () => {
         },
         {
           conversation: conversationRepository,
-          user: TestFactory.user_repository,
+          user: testFactory.user_repository,
         },
       );
     });

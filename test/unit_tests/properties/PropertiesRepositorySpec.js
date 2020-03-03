@@ -17,18 +17,19 @@
  *
  */
 
-import {resolve, graph} from './../../api/testResolver';
+import {container} from 'tsyringe';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {PropertiesService} from 'src/script/properties/PropertiesService';
 import {SelfService} from 'src/script/self/SelfService';
+import {APIClientSingleton} from 'src/script/service/APIClientSingleton';
 
 describe('PropertiesRepository', () => {
   let propertiesRepository = undefined;
-  const backendClient = resolve(graph.BackendClient);
 
   beforeEach(() => {
-    const propertiesService = new PropertiesService(backendClient);
-    const selfService = new SelfService(backendClient);
+    const apiClient = container.resolve(APIClientSingleton).getClient();
+    const propertiesService = new PropertiesService(apiClient);
+    const selfService = new SelfService(apiClient);
     propertiesRepository = new PropertiesRepository(propertiesService, selfService);
   });
 

@@ -17,20 +17,29 @@
  *
  */
 
+import {APIClient} from '@wireapp/api-client';
 import {
+  CONVERSATION_ACCESS,
+  CONVERSATION_ACCESS_ROLE,
   ClientMismatch,
   Conversation as BackendConversation,
   ConversationCode,
-  Conversations as BackendConversations,
   NewConversation,
   NewOTRMessage,
 } from '@wireapp/api-client/dist/conversation';
-import {ConversationMemberUpdateData} from '@wireapp/api-client/dist/conversation/data';
 import {
+  ConversationMemberUpdateData,
+  ConversationOtherMemberUpdateData,
+  ConversationReceiptModeUpdateData,
+} from '@wireapp/api-client/dist/conversation/data';
+import {
+  ConversationCodeDeleteEvent,
   ConversationCodeUpdateEvent,
   ConversationEvent,
   ConversationMemberJoinEvent,
+  ConversationMemberLeaveEvent,
   ConversationMessageTimerUpdateEvent,
+  ConversationReceiptModeUpdateEvent,
   ConversationRenameEvent,
 } from '@wireapp/api-client/dist/event';
 
@@ -40,31 +49,17 @@ import {Conversation as ConversationEntity} from '../entity/Conversation';
 import {EventService} from '../event/EventService';
 import {MessageCategory} from '../message/MessageCategory';
 import {search as fullTextSearch} from '../search/FullTextSearch';
-import {BackendClient} from '../service/BackendClient';
 import {StorageService} from '../storage';
 import {StorageSchemata} from '../storage/StorageSchemata';
-import {TeamService} from '../team/TeamService';
-import {ACCESS_MODE} from './AccessMode';
-import {ACCESS_ROLE} from './AccessRole';
-import {DefaultRole} from './ConversationRoleRepository';
-import {ReceiptMode} from './ReceiptMode';
 
-// Conversation service for all conversation calls to the backend REST API.
 export class ConversationService {
-  private readonly backendClient: BackendClient;
+  private readonly apiClient: APIClient;
   private readonly eventService: EventService;
   private readonly logger: Logger;
   private readonly storageService: StorageService;
 
-  // tslint:disable-next-line:typedef
-  static get CONFIG() {
-    return {
-      URL_CONVERSATIONS: '/conversations',
-    };
-  }
-
-  constructor(backendClient: BackendClient, eventService: EventService, storageService: StorageService) {
-    this.backendClient = backendClient;
+  constructor(apiClient: APIClient, eventService: EventService, storageService: StorageService) {
+    this.apiClient = apiClient;
     this.eventService = eventService;
     this.storageService = storageService;
     this.logger = getLogger('ConversationService');
@@ -84,11 +79,7 @@ export class ConversationService {
    * @returns Resolves when the conversation was created
    */
   postConversations(payload: NewConversation): Promise<BackendConversation> {
-    return this.backendClient.sendJson({
-      data: payload,
-      type: 'POST',
-      url: ConversationService.CONFIG.URL_CONVERSATIONS,
-    });
+    return this.apiClient.conversation.api.postConversation(payload);
   }
 
   //##############################################################################
@@ -96,44 +87,11 @@ export class ConversationService {
   //##############################################################################
 
   /**
-   * Retrieves paged meta information about the conversations of a user.
-   *
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/conversations
-   *
-   * @param limit Number of results to return (default 100, max 500)
-   * @param conversation_id Conversation ID to start from
-   * @returns Resolves with the conversation information
-   */
-  getConversations(limit: number = 100, conversation_id?: string): Promise<BackendConversations> {
-    return this.backendClient.sendRequest({
-      data: {
-        size: limit,
-        start: conversation_id,
-      },
-      type: 'GET',
-      url: ConversationService.CONFIG.URL_CONVERSATIONS,
-    });
-  }
-
-  /**
    * Retrieves all the conversations of a user.
-   * @param limit Number of results to return (default 500, max 500)
    * @returns Resolves with the conversation information
    */
-  getAllConversations(limit = 500): Promise<BackendConversation[]> {
-    let allConversations: BackendConversation[] = [];
-
-    const _getConversations = (conversationId?: string): Promise<BackendConversation[]> => {
-      return this.getConversations(limit, conversationId).then(({conversations, has_more: hasMore}) => {
-        if (conversations.length) {
-          allConversations = allConversations.concat(conversations);
-        }
-
-        return hasMore ? _getConversations(conversations.pop().id) : allConversations;
-      });
-    };
-
-    return _getConversations();
+  getAllConversations(): Promise<BackendConversation[]> {
+    return this.apiClient.conversation.api.getAllConversations();
   }
 
   /**
@@ -144,11 +102,8 @@ export class ConversationService {
    * @param conversation_id ID of conversation to get
    * @returns Resolves with the server response
    */
-  get_conversation_by_id(conversation_id: string): Promise<BackendConversation> {
-    return this.backendClient.sendRequest({
-      type: 'GET',
-      url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversation_id}`,
-    });
+  get_conversation_by_id(conversationId: string): Promise<BackendConversation> {
+    return this.apiClient.conversation.api.getConversation(conversationId);
   }
 
   /**
@@ -161,10 +116,8 @@ export class ConversationService {
    * @returns Resolves with the server response
    */
   updateConversationName(conversationId: string, name: string): Promise<ConversationRenameEvent> {
-    return this.backendClient.sendJson({
-      data: {name},
-      type: 'PUT',
-      url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}`,
+    return this.apiClient.conversation.api.putConversation(conversationId, {
+      name,
     });
   }
 
@@ -179,13 +132,9 @@ export class ConversationService {
    */
   updateConversationMessageTimer(
     conversationId: string,
-    messageTimer: number,
+    message_timer: number,
   ): Promise<ConversationMessageTimerUpdateEvent> {
-    return this.backendClient.sendJson({
-      data: {message_timer: messageTimer},
-      type: 'PUT',
-      url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/message-timer`,
-    });
+    return this.apiClient.conversation.api.putConversationMessageTimer(conversationId, {message_timer});
   }
 
   /**
@@ -197,12 +146,11 @@ export class ConversationService {
    * @param receiptMode new receipt mode
    * @returns Resolves with the server response
    */
-  updateConversationReceiptMode(conversationId: string, receiptMode: ReceiptMode): Promise<any> {
-    return this.backendClient.sendJson({
-      data: {receipt_mode: receiptMode},
-      type: 'PUT',
-      url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/receipt-mode`,
-    });
+  updateConversationReceiptMode(
+    conversationId: string,
+    receiptMode: ConversationReceiptModeUpdateData,
+  ): Promise<ConversationReceiptModeUpdateEvent> {
+    return this.apiClient.conversation.api.putConversationReceiptMode(conversationId, receiptMode);
   }
 
   /**
@@ -214,12 +162,8 @@ export class ConversationService {
    * @param payload Updated properties
    * @returns Resolves with the server response
    */
-  update_member_properties(conversation_id: string, payload: ConversationMemberUpdateData): Promise<void> {
-    return this.backendClient.sendJson({
-      data: payload,
-      type: 'PUT',
-      url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversation_id}/self`,
-    });
+  update_member_properties(conversationId: string, payload: ConversationMemberUpdateData): Promise<void> {
+    return this.apiClient.conversation.api.putMembershipProperties(conversationId, payload);
   }
 
   //##############################################################################
@@ -233,11 +177,8 @@ export class ConversationService {
    * @param conversationId ID of conversation to delete access code for
    * @returns Resolves with the server response
    */
-  deleteConversationCode(conversationId: string): Promise<BackendConversation> {
-    return this.backendClient.sendRequest({
-      type: 'DELETE',
-      url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/code`,
-    });
+  deleteConversationCode(conversationId: string): Promise<ConversationCodeDeleteEvent> {
+    return this.apiClient.conversation.api.deleteConversationCode(conversationId);
   }
 
   /**
@@ -248,10 +189,7 @@ export class ConversationService {
    * @returns Resolves with the server response
    */
   getConversationCode(conversationId: string): Promise<ConversationCode> {
-    return this.backendClient.sendRequest({
-      type: 'GET',
-      url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/code`,
-    });
+    return this.apiClient.conversation.api.getConversationCode(conversationId);
   }
 
   /**
@@ -262,10 +200,7 @@ export class ConversationService {
    * @returns Resolves with the server response
    */
   postConversationCode(conversationId: string): Promise<ConversationCodeUpdateEvent> {
-    return this.backendClient.sendRequest({
-      type: 'POST',
-      url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/code`,
-    });
+    return this.apiClient.conversation.api.postConversationCodeRequest(conversationId);
   }
 
   /**
@@ -277,14 +212,7 @@ export class ConversationService {
    * @returns Resolves with the server response
    */
   postConversationJoin(key: string, code: string): Promise<ConversationMemberJoinEvent> {
-    return this.backendClient.sendJson({
-      data: {
-        code,
-        key,
-      },
-      type: 'POST',
-      url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/join`,
-    });
+    return this.apiClient.conversation.api.postJoinByCode({code, key});
   }
 
   /**
@@ -299,16 +227,12 @@ export class ConversationService {
    */
   putConversationAccess(
     conversationId: string,
-    accessModes: ACCESS_MODE[],
-    accessRole: ACCESS_ROLE,
+    accessModes: CONVERSATION_ACCESS[],
+    accessRole: CONVERSATION_ACCESS_ROLE,
   ): Promise<ConversationEvent> {
-    return this.backendClient.sendJson({
-      data: {
-        access: accessModes,
-        access_role: accessRole,
-      },
-      type: 'PUT',
-      url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/access`,
+    return this.apiClient.conversation.api.putAccess(conversationId, {
+      access: accessModes,
+      access_role: accessRole,
     });
   }
 
@@ -324,10 +248,7 @@ export class ConversationService {
    * @returns Resolves with the server response
    */
   deleteBots(conversationId: string, userId: string): Promise<void> {
-    return this.backendClient.sendRequest({
-      type: 'DELETE',
-      url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/bots/${userId}`,
-    });
+    return this.apiClient.conversation.api.deleteBot(conversationId, userId);
   }
 
   /**
@@ -339,26 +260,16 @@ export class ConversationService {
    * @param userId ID of member to be removed from the the conversation
    * @returns Resolves with the server response
    */
-  deleteMembers(conversationId: string, userId: string): Promise<void> {
-    return this.backendClient.sendRequest({
-      type: 'DELETE',
-      url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/members/${userId}`,
-    });
+  deleteMembers(conversationId: string, userId: string): Promise<ConversationMemberLeaveEvent> {
+    return this.apiClient.conversation.api.deleteMember(conversationId, userId);
   }
 
-  putMembers(conversationId: string, userId: string, data: {conversation_role: string}): Promise<void> {
-    return this.backendClient.sendJson({
-      data,
-      type: 'PUT',
-      url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/members/${userId}`,
-    });
+  putMembers(conversationId: string, userId: string, data: ConversationOtherMemberUpdateData): Promise<void> {
+    return this.apiClient.conversation.api.putOtherMember(userId, conversationId, data);
   }
 
   deleteConversation(teamId: string, conversationId: string): Promise<void> {
-    return this.backendClient.sendRequest({
-      type: 'DELETE',
-      url: `${TeamService.URL.TEAMS}/${teamId}/conversations/${conversationId}`,
-    });
+    return this.apiClient.teams.conversation.api.deleteConversation(teamId, conversationId);
   }
 
   /**
@@ -369,15 +280,8 @@ export class ConversationService {
    * @param serviceId ID of service
    * @returns Resolves with the server response
    */
-  postBots(conversationId: string, providerId: string, serviceId: string): Promise<void> {
-    return this.backendClient.sendJson({
-      data: {
-        provider: providerId,
-        service: serviceId,
-      },
-      type: 'POST',
-      url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/bots`,
-    });
+  postBots(conversationId: string, providerId: string, serviceId: string): Promise<ConversationMemberJoinEvent> {
+    return this.apiClient.conversation.api.postBot(conversationId, providerId, serviceId);
   }
 
   /**
@@ -395,7 +299,7 @@ export class ConversationService {
    *   }
    * }
    *
-   * @param conversation_id ID of conversation to send message in
+   * @param conversationId ID of conversation to send message in
    * @param payload Payload to be posted
    * @param payload.recipients Map with per-recipient data
    * @param payload.sender Client ID of the sender
@@ -403,22 +307,13 @@ export class ConversationService {
    * @returns Promise that resolves when the message was sent
    */
   post_encrypted_message(
-    conversation_id: string,
+    conversationId: string,
     payload: NewOTRMessage,
     precondition_option: true | string[],
   ): Promise<ClientMismatch> {
-    let url = `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversation_id}/otr/messages`;
-
-    if (Array.isArray(precondition_option)) {
-      url = `${url}?report_missing=${precondition_option.join(',')}`;
-    } else if (precondition_option === true) {
-      url = `${url}?ignore_missing=true`;
-    }
-
-    return this.backendClient.sendJson({
-      data: payload,
-      type: 'POST',
-      url: url,
+    return this.apiClient.conversation.api.postOTRMessage(payload.sender, conversationId, payload, {
+      ignore_missing: precondition_option === true ? true : undefined,
+      report_missing: Array.isArray(precondition_option) ? precondition_option.join(',') : undefined,
     });
   }
 
@@ -432,14 +327,7 @@ export class ConversationService {
    * @returns Resolves with the server response
    */
   postMembers(conversationId: string, userIds: string[]): Promise<ConversationMemberJoinEvent> {
-    return this.backendClient.sendJson({
-      data: {
-        conversation_role: DefaultRole.WIRE_MEMBER,
-        users: userIds,
-      },
-      type: 'POST',
-      url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/members`,
-    });
+    return this.apiClient.conversation.api.postMembers(conversationId, userIds);
   }
 
   //##############################################################################

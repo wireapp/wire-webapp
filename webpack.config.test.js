@@ -39,9 +39,15 @@ module.exports = {
     rules: [
       ...prodConfig.module.rules,
       {
+        exclude: /node_modules/,
+        include: [path.resolve('test/helper')],
+        loader: 'babel-loader',
+        test: /\.[tj]sx?$/,
+      },
+      {
         enforce: 'post',
-        exclude: [/node_modules/, /\.test\.[tj]sx?/],
-        include: [path.resolve('src/script/auth')],
+        exclude: [/node_modules/, /\.test\.[tj]sx?/, path.resolve('src/script/view_model/')],
+        include: [path.resolve('src/script/')],
         test: /\.[tj]sx?$/,
         use: {
           loader: 'istanbul-instrumenter-loader',
@@ -58,4 +64,8 @@ module.exports = {
       },
     }),
   ],
+  resolve: {
+    ...prodConfig.resolve,
+    alias: {...prodConfig.resolve.alias, src: path.resolve(__dirname, 'src')},
+  },
 };

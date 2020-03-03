@@ -17,8 +17,12 @@
  *
  */
 
+// Polyfill for "tsyringe" dependency injection
+import 'core-js/es7/reflect';
+
 import ko from 'knockout';
 import platform from 'platform';
+import {container} from 'tsyringe';
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
@@ -83,7 +87,6 @@ import {ReceiptsMiddleware} from '../event/preprocessor/ReceiptsMiddleware';
 
 import {getWebsiteUrl} from '../externalRoute';
 
-import {resolve, graph} from '../config/appResolver';
 import {modals} from '../view_model/ModalsViewModel';
 import {showInitialModal} from '../user/AvailabilityModal';
 import {WebAppEvents} from '../event/WebApp';
@@ -108,12 +111,17 @@ import {StorageService} from '../storage';
 import {BackupService} from '../backup/BackupService';
 import {AuthRepository} from '../auth/AuthRepository';
 import {MediaRepository} from '../media/MediaRepository';
-import {AuthService} from '../auth/AuthService';
 import {GiphyRepository} from '../extension/GiphyRepository';
 import {AssetUploader} from '../assets/AssetUploader';
 import {GiphyService} from '../extension/GiphyService';
 import {PermissionRepository} from '../permission/PermissionRepository';
 import {loadValue} from 'Util/StorageUtil';
+import {APIClientSingleton} from '../service/APIClientSingleton';
+import {ClientService} from '../client/ClientService';
+import {ConnectionService} from '../connection/ConnectionService';
+import {TeamService} from '../team/TeamService';
+import {SearchService} from '../search/SearchService';
+import {CryptographyService} from '../cryptography/CryptographyService';
 
 function doRedirect(signOutReason) {
   let url = `/auth/${location.search}`;
@@ -147,11 +155,13 @@ class App {
 
   /**
    * Construct a new app.
+   * @param {APIClient} apiClient Configured backend client
    * @param {BackendClient} backendClient Configured backend client
    * @param {Element} appContainer DOM element that will hold the app
    * @param {SQLeetEngine} [encryptedEngine] Encrypted database handler
    */
-  constructor(backendClient, appContainer, encryptedEngine) {
+  constructor(apiClient, backendClient, appContainer, encryptedEngine) {
+    this.apiClient = apiClient;
     this.backendClient = backendClient;
     this.logger = getLogger('App');
     this.appContainer = appContainer;
@@ -163,7 +173,7 @@ class App {
     if (Config.getConfig().FEATURE.ENABLE_DEBUG) {
       import('Util/DebugUtil').then(({DebugUtil}) => {
         this.debug = new DebugUtil(this.repository);
-        this.util = {debug: this.debug}; //Alias for QA
+        this.util = {debug: this.debug}; // Alias for QA
       });
     }
 
@@ -187,28 +197,34 @@ class App {
    */
   _setupRepositories() {
     const repositories = {};
-    const selfService = new SelfService(this.backendClient);
+    const selfService = new SelfService(this.apiClient);
     const sendingMessageQueue = new MessageSender();
 
     repositories.audio = new AudioRepository();
-    repositories.auth = new AuthRepository(new AuthService(resolve(graph.BackendClient)));
-    repositories.giphy = new GiphyRepository(new GiphyService(resolve(graph.BackendClient)));
-    repositories.properties = new PropertiesRepository(new PropertiesService(this.backendClient), selfService);
+    repositories.auth = new AuthRepository(this.apiClient);
+    repositories.giphy = new GiphyRepository(new GiphyService(this.apiClient));
+    repositories.properties = new PropertiesRepository(new PropertiesService(this.apiClient), selfService);
     repositories.serverTime = serverTimeHandler;
     repositories.storage = new StorageRepository(this.service.storage);
 
-    repositories.cryptography = new CryptographyRepository(this.backendClient, repositories.storage);
-    repositories.client = new ClientRepository(this.backendClient, this.service.storage, repositories.cryptography);
+    repositories.cryptography = new CryptographyRepository(
+      new CryptographyService(this.apiClient),
+      repositories.storage,
+    );
+    repositories.client = new ClientRepository(
+      new ClientService(this.apiClient, this.service.storage),
+      repositories.cryptography,
+    );
     repositories.media = new MediaRepository(new PermissionRepository());
     repositories.user = new UserRepository(
-      new UserService(this.backendClient, this.service.storage),
+      new UserService(this.apiClient, this.service.storage),
       this.service.asset,
       selfService,
       repositories.client,
       serverTimeHandler,
       repositories.properties,
     );
-    repositories.connection = new ConnectionRepository(this.backendClient, repositories.user);
+    repositories.connection = new ConnectionRepository(new ConnectionService(this.apiClient), repositories.user);
     repositories.event = new EventRepository(
       this.service.event,
       this.service.notification,
@@ -217,8 +233,8 @@ class App {
       serverTimeHandler,
       repositories.user,
     );
-    repositories.search = new SearchRepository(resolve(graph.BackendClient), repositories.user);
-    repositories.team = new TeamRepository(resolve(graph.BackendClient), repositories.user);
+    repositories.search = new SearchRepository(new SearchService(this.apiClient), repositories.user);
+    repositories.team = new TeamRepository(new TeamService(this.apiClient), repositories.user);
     repositories.eventTracker = new EventTrackingRepository(repositories.team, repositories.user);
 
     repositories.conversation = new ConversationRepository(
@@ -260,7 +276,7 @@ class App {
       repositories.user,
     );
     repositories.broadcast = new BroadcastRepository(
-      new BroadcastService(resolve(graph.BackendClient)),
+      new BroadcastService(this.apiClient),
       repositories.client,
       repositories.conversation,
       repositories.cryptography,
@@ -268,7 +284,7 @@ class App {
       repositories.user,
     );
     repositories.calling = new CallingRepository(
-      resolve(graph.BackendClient),
+      this.apiClient,
       repositories.conversation,
       repositories.event,
       repositories.media.streamHandler,
@@ -303,13 +319,13 @@ class App {
       : new EventService(storageService);
 
     return {
-      asset: new AssetService(resolve(graph.BackendClient)),
-      conversation: new ConversationService(this.backendClient, eventService, storageService),
+      asset: new AssetService(this.apiClient, this.backendClient),
+      conversation: new ConversationService(this.apiClient, eventService, storageService),
       event: eventService,
-      integration: new IntegrationService(this.backendClient),
-      notification: new NotificationService(this.backendClient, storageService),
+      integration: new IntegrationService(this.apiClient),
+      notification: new NotificationService(this.apiClient, storageService),
       storage: storageService,
-      webSocket: new WebSocketService(this.backendClient),
+      webSocket: new WebSocketService(this.apiClient, this.backendClient),
     };
   }
 
@@ -344,6 +360,7 @@ class App {
     const telemetry = new AppInitTelemetry();
     try {
       const {
+        auth: authRepository,
         audio: audioRepository,
         calling: callingRepository,
         client: clientRepository,
@@ -358,9 +375,9 @@ class App {
       } = this.repository;
       await checkIndexedDb();
       await this._registerSingleInstance();
-      await this._loadAccessToken();
       loadingView.updateProgress(2.5);
       telemetry.time_step(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
+      await authRepository.init();
       await this._initiateSelfUser();
       loadingView.updateProgress(5, t('initReceivedSelfUser', userRepository.self().name()));
       telemetry.time_step(AppInitTimingsStep.RECEIVED_SELF_USER);
@@ -620,19 +637,6 @@ class App {
   _isReload() {
     const NAVIGATION_TYPE_RELOAD = 1;
     return window.performance.navigation.type === NAVIGATION_TYPE_RELOAD;
-  }
-
-  /**
-   * Load the access token from cache or get one from the backend.
-   * @returns {Promise} Resolves with the access token
-   */
-  _loadAccessToken() {
-    const isLocalhost = Environment.frontend.isLocalhost();
-    const referrer = document.referrer.toLowerCase();
-    const isLoginRedirect = referrer.includes('/auth') || referrer.includes('/login');
-    const getCachedToken = isLocalhost || isLoginRedirect;
-
-    return getCachedToken ? this.repository.auth.getCachedAccessToken() : this.repository.auth.getAccessToken();
   }
 
   //##############################################################################
@@ -918,7 +922,8 @@ $(async () => {
   exposeWrapperGlobals();
   const appContainer = document.getElementById('wire-main');
   if (appContainer) {
-    const backendClient = resolve(graph.BackendClient);
+    const apiClient = container.resolve(APIClientSingleton).getClient();
+    const backendClient = container.resolve(BackendClient);
     backendClient.setSettings({
       restUrl: Config.getConfig().BACKEND_REST,
       webSocketUrl: Config.getConfig().BACKEND_WS,
@@ -928,9 +933,9 @@ $(async () => {
       doRedirect(SIGN_OUT_REASON.NOT_SIGNED_IN);
     } else if (isTemporaryClientAndNonPersistent(shouldPersist)) {
       const engine = await StorageService.getUnitializedEngine();
-      wire.app = new App(backendClient, appContainer, engine);
+      wire.app = new App(apiClient, backendClient, appContainer, engine);
     } else {
-      wire.app = new App(backendClient, appContainer);
+      wire.app = new App(apiClient, backendClient, appContainer);
     }
   }
 });

@@ -17,25 +17,27 @@
  *
  */
 
-import {resolve, graph} from './../../api/testResolver';
+import {container} from 'tsyringe';
+
 import UUID from 'uuidjs';
 import {RichProfileRepository} from 'src/script/user/RichProfileRepository';
+import {APIClientSingleton} from 'src/script/service/APIClientSingleton';
 
 describe('RichProfileRepository', () => {
   let richProfileRepository;
 
   beforeEach(() => {
-    richProfileRepository = new RichProfileRepository(resolve(graph.BackendClient));
+    richProfileRepository = new RichProfileRepository(container.resolve(APIClientSingleton).getClient());
   });
 
   describe('getUserRichProfile', () => {
     it("fetches the user's rich profile if it is not already in cache", () => {
       const userId = UUID.genV4().hexString;
       const response = [];
-      spyOn(richProfileRepository.backendClient, 'sendRequest').and.returnValue(Promise.resolve(response));
+      spyOn(richProfileRepository.apiClient.user.api, 'getRichInfo').and.returnValue(Promise.resolve(response));
 
       return richProfileRepository.getUserRichProfile(userId).then(richProfile => {
-        expect(richProfileRepository.backendClient.sendRequest).toHaveBeenCalledTimes(1);
+        expect(richProfileRepository.apiClient.user.api.getRichInfo).toHaveBeenCalledTimes(1);
         expect(richProfile).toBe(response);
       });
     });

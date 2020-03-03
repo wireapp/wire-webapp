@@ -18,47 +18,25 @@
  */
 
 const path = require('path');
-const rootWebpackConfig = require('./webpack.config.common.js');
-const webpack = require('webpack');
-const {SRC_PATH} = require('./locations');
+const {SRC_PATH, ROOT_PATH} = require('./locations');
 
-const testCode = 'src/script/**/*.test.ts';
+const dist = 'server/dist/static/min';
+const test = 'test';
 
-function getSpecs(specList) {
-  if (specList) {
-    const list = specList.split(',');
-    const legacySpecs = list.map(specPath => `test/unit_tests/${specPath}Spec.js`);
-    const specs = list.map(specPath => `src/script/${specPath}.test.ts`);
-    return specs.concat(legacySpecs);
-  }
-  return ['test/unit_tests/**/*.js'].concat(testCode);
-}
-
-/**
- * @param {boolean} noLegacy Prevents loading global dependencies which slow down the load time
- * @returns {Array} - The files to load in Karma before running the tests
- */
-function getIncludedFiles(noLegacy) {
-  const commonFiles = [
-    {included: false, nocache: false, pattern: path.resolve(SRC_PATH, 'ext/audio/*.mp3'), served: true},
-    {included: false, nocache: true, pattern: path.resolve(SRC_PATH, 'worker/*.js'), served: true},
-    'node_modules/sinon/pkg/sinon.js',
-    'test/api/environment.js',
-    'test/api/payloads.js',
-  ];
-  return noLegacy ? commonFiles : commonFiles.concat('test/api/TestFactory.js');
-}
+const preprocessors = {};
+preprocessors['**/*.js'] = ['sourcemap'];
 
 module.exports = function(config) {
   config.set({
     autoWatch: false,
-    basePath: './',
-    browserNoActivityTimeout: 240000,
+    basePath: '',
+    browserNoActivityTimeout: 20000,
     browsers: ['ChromeNoSandbox'],
     client: {
       jasmine: {
         random: false,
       },
+      useIframe: false,
     },
     colors: true,
     concurrency: Infinity,
@@ -85,76 +63,30 @@ module.exports = function(config) {
         flags: ['--no-sandbox', '--autoplay-policy=no-user-gesture-required'],
       },
     },
-    exclude: [],
-    files: getIncludedFiles(config.nolegacy).concat(getSpecs(config.specs)),
+    files: [
+      {included: false, nocache: false, pattern: path.resolve(ROOT_PATH, 'resource/audio/*.mp3'), served: true},
+      {included: false, nocache: true, pattern: path.resolve(SRC_PATH, 'worker/*.js'), served: true},
+      'node_modules/sinon/pkg/sinon.js',
+      `${test}/api/environment.js`,
+      `${test}/api/payloads.js`,
+      `${test}/main.test.js`,
+      `${dist}/runtime.js`,
+      `${dist}/dexie.js`,
+      `${dist}/vendor.js`,
+      `${dist}/test.js`,
+    ],
     frameworks: ['jasmine'],
     logLevel: config.LOG_ERROR,
     port: 9876,
-    preprocessors: {
-      'test/api/TestFactory.js': ['webpack'],
-      'test/unit_tests/**/*.js': ['webpack'],
-      [testCode]: ['webpack'],
-    },
+    preprocessors,
     proxies: {
       '/audio/': '/base/audio/',
-      '/ext/js': '/base/node_modules/',
+      '/ext/js/': '/base/node_modules/',
       '/worker/': '/base/src/worker/',
     },
     reporters: ['progress', 'coverage-istanbul'],
     singleRun: true,
-    webpack: {
-      externals: {
-        'fs-extra': '{}',
-        worker_threads: '{}',
-      },
-      mode: 'development',
-      module: {
-        rules: [
-          {
-            exclude: /node_modules/,
-            include: [path.resolve('src/script/'), path.resolve('test/helper/')],
-            loader: 'babel-loader',
-            test: /\.[tj]sx?$/,
-          },
-          {
-            loader: 'svg-inline-loader?removeSVGTagAttrs=false',
-            test: /\.svg$/,
-          },
-          {
-            enforce: 'post',
-            exclude: [/node_modules|\.test\.[tj]sx?$/, path.resolve('src/script/view_model/')],
-            include: [path.resolve('src/script/')],
-            test: /\.[tj]s$/,
-            use: {
-              loader: 'istanbul-instrumenter-loader',
-              options: {esModules: true},
-            },
-          },
-        ],
-      },
-      node: {
-        fs: 'empty',
-        path: 'empty',
-      },
-      plugins: [
-        new webpack.ProvidePlugin({
-          $: 'jquery',
-          _: 'underscore',
-          jQuery: 'jquery',
-          ko: 'knockout',
-        }),
-      ],
-      resolve: {
-        alias: {...rootWebpackConfig.resolve.alias, src: path.resolve(__dirname, 'src')},
-        extensions: ['.js', '.jsx', '.ts', '.tsx', '.svg'],
-      },
-    },
-    webpackMiddleware: {
-      logLevel: 'error',
-      stats: 'errors-only',
-    },
   });
-
   if (process.env.TRAVIS) {
     config.set({
       port: 9877,

@@ -18,23 +18,26 @@
  */
 import {amplify} from 'amplify';
 import ko from 'knockout';
-
 import {AssetService} from '../../assets/AssetService';
 import {AssetTransferState} from '../../assets/AssetTransferState';
 import {AssetUploader} from '../../assets/AssetUploader';
-import {graph, resolve} from '../../config/appResolver';
 import {ContentMessage} from '../../entity/message/ContentMessage';
 import {File as FileAsset} from '../../entity/message/File';
 import {WebAppEvents} from '../../event/WebApp';
+import {APIClientSingleton} from '../../service/APIClientSingleton';
+import {container} from 'tsyringe';
+import {BackendClient} from '../../service/BackendClient';
 
-export class AbstractAssetTransferStateTracker {
+export abstract class AbstractAssetTransferStateTracker {
   assetUploader: AssetUploader;
   uploadProgress: ko.PureComputed<number>;
   AssetTransferState: typeof AssetTransferState;
   transferState: ko.PureComputed<AssetTransferState>;
 
   constructor(message?: ContentMessage) {
-    this.assetUploader = new AssetUploader(new AssetService(resolve(graph.BackendClient)));
+    this.assetUploader = new AssetUploader(
+      new AssetService(container.resolve(APIClientSingleton).getClient(), container.resolve(BackendClient)),
+    );
     this.uploadProgress = this.assetUploader.getUploadProgress(message?.id);
     this.AssetTransferState = AssetTransferState;
 
