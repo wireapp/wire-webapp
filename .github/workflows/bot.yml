@@ -12,5 +12,5 @@ jobs:
         uses: actions/setup-node@v1
       - name: Publish
         run: |
-          yarn global add @wireapp/changelog-bot
+          npm install -g @wireapp/changelog-bot
           wire-changelog-bot -e ${{secrets.WIRE_WEBAPP_BOT_EMAIL}} -p ${{secrets.WIRE_WEBAPP_BOT_PASSWORD}} -c ${{secrets.WIRE_WEBAPP_BOT_CONVERSATION}} -m "Hello, world."
