@@ -2,7 +2,7 @@
   "description": "Base64 encoding and decoding with ASCII string representation.",
   "devDependencies": {
     "@types/jasmine": "3.5.6",
-    "@types/karma": "3.0.6",
+    "@types/karma": "4.4.0",
     "@types/libsodium-wrappers-sumo": "0.7.3",
     "@types/node": "~12",
     "cross-env": "7.0.0",
