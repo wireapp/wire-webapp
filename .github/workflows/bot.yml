@@ -8,9 +8,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-      - name: Install node
-        uses: actions/setup-node@v1
       - name: Publish
         run: |
-          npm install -g @wireapp/changelog-bot
+          npm install -g @wireapp/changelog-bot@2.2.1
           wire-changelog-bot -e ${{secrets.WIRE_WEBAPP_BOT_EMAIL}} -p ${{secrets.WIRE_WEBAPP_BOT_PASSWORD}} -c ${{secrets.WIRE_WEBAPP_BOT_CONVERSATION}} -m "Hello, world."
