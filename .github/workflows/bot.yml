@@ -3,11 +3,13 @@ name: Post message
 on: push
 
 jobs:
-  build:
+  bot:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+      - name: Install node
+        uses: actions/setup-node@v1
       - name: Publish
         run: |
           yarn global add @wireapp/changelog-bot
