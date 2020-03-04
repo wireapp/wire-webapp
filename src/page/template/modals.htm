@@ -8,7 +8,7 @@
       <!-- ko if: content().showClose -->
         <close-icon class="modal__header__button" data-bind="click: hide" data-uie-name="do-close"></close-icon>
       <!-- /ko -->
-      
+
     </div>
     <div class="modal__body" data-bind="fadingscrollbar">
       <div class="modal__text" data-uie-name="status-modal-text">
@@ -44,10 +44,10 @@
       <!-- /ko -->
       <div class="modal__buttons" data-bind="css: {'modal__buttons--column': hasMultipleSecondary()}">
         <!-- ko foreach: {data: content().secondaryAction, as: 'secondary', noChildContext: true} -->
-          <div data-bind="text: secondary.text, click: () => doAction(secondary.action, true, true), css: {'modal__button--full': hasMultipleSecondary()}, attr: {'data-uie-name': secondary.uieName}" class="modal__button modal__button--secondary"></div>
+          <input type="button" data-bind="value: secondary.text, click: () => doAction(secondary.action, true, true), css: {'modal__button--full': hasMultipleSecondary()}, attr: {'data-uie-name': secondary.uieName}" class="modal__button modal__button--secondary"></button>
         <!-- /ko -->
         <!-- ko if: content().primaryAction.text -->
-          <div data-bind="text: content().primaryAction.text, click: () => doAction(confirm, content().closeOnConfirm), css: {'modal__button--full': hasMultipleSecondary(), 'modal__button--disabled': !actionEnabled()}" class="modal__button modal__button--primary" data-uie-name="do-action"></div>
+          <input type="button" data-bind="value: content().primaryAction.text, click: () => doAction(confirm, content().closeOnConfirm), css: {'modal__button--full': hasMultipleSecondary()}, enable: actionEnabled()" class="modal__button modal__button--primary" data-uie-name="do-action"></inpu>
         <!-- /ko -->
       </div>
     </div>
