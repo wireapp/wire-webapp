@@ -60,7 +60,7 @@
     "@babel/preset-react": "7.8.3",
     "@babel/preset-typescript": "7.8.3",
     "@emotion/babel-preset-css-prop": "10.0.27",
-    "@hot-loader/react-dom": "16.11.0",
+    "@hot-loader/react-dom": "16.12.0",
     "@types/dexie-batch": "0.4.0",
     "@types/enzyme": "3.10.5",
     "@types/faker": "4.1.9",
