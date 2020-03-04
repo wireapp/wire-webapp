@@ -63,7 +63,7 @@
     "@hot-loader/react-dom": "16.12.0",
     "@types/dexie-batch": "0.4.0",
     "@types/enzyme": "3.10.5",
-    "@types/faker": "4.1.9",
+    "@types/faker": "4.1.10",
     "@types/generate-changelog": "1.8.0",
     "@types/helmet": "0.0.45",
     "@types/highlight.js": "9.12.3",
