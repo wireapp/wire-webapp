@@ -17,22 +17,14 @@
  *
  */
 
-import {Connection, ConnectionStatus, UserConnectionList} from '@wireapp/api-client/dist/connection';
-
-import {BackendClient} from '../service/BackendClient';
+import {APIClient} from '@wireapp/api-client';
+import {Connection, ConnectionStatus} from '@wireapp/api-client/dist/connection';
 
 export class ConnectionService {
-  private readonly backendClient: BackendClient;
+  private readonly apiClient: APIClient;
 
-  // tslint:disable-next-line:typedef
-  static get URL() {
-    return {
-      CONNECTIONS: '/connections',
-    };
-  }
-
-  constructor(backendClient: BackendClient) {
-    this.backendClient = backendClient;
+  constructor(apiClient: APIClient) {
+    this.apiClient = apiClient;
   }
 
   /**
@@ -47,15 +39,8 @@ export class ConnectionService {
    * @param userId User ID to start from
    * @returns Promise that resolves with user connections
    */
-  getConnections(limit: number = 500, userId?: string): Promise<UserConnectionList> {
-    return this.backendClient.sendRequest({
-      data: {
-        size: limit,
-        start: userId,
-      },
-      type: 'GET',
-      url: ConnectionService.URL.CONNECTIONS,
-    });
+  getConnections(): Promise<Connection[]> {
+    return this.apiClient.connection.api.getAllConnections();
   }
 
   /**
@@ -68,14 +53,10 @@ export class ConnectionService {
    * @returns Promise that resolves when the connection request was created
    */
   postConnections(userId: string, name: string): Promise<Connection> {
-    return this.backendClient.sendJson({
-      data: {
-        message: ' ',
-        name: name,
-        user: userId,
-      },
-      type: 'POST',
-      url: ConnectionService.URL.CONNECTIONS,
+    return this.apiClient.connection.api.postConnection({
+      message: ' ',
+      name: name,
+      user: userId,
     });
   }
 
@@ -89,13 +70,9 @@ export class ConnectionService {
    * @param connectionStatus New relation status
    * @returns Promise that resolves when the status was updated
    */
-  putConnections(userId: string, connectionStatus: ConnectionStatus): Promise<Connection> {
-    return this.backendClient.sendJson({
-      data: {
-        status: connectionStatus,
-      },
-      type: 'PUT',
-      url: `${ConnectionService.URL.CONNECTIONS}/${userId}`,
+  putConnections(userId: string, status: ConnectionStatus): Promise<Connection> {
+    return this.apiClient.connection.api.putConnection(userId, {
+      status,
     });
   }
 }

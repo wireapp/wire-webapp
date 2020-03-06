@@ -54,6 +54,8 @@ export const isKey = (keyboardEvent?: KeyboardEvent, expectedKey = '') => {
 
 export const isEnterKey = (keyboardEvent: KeyboardEvent): boolean => isKey(keyboardEvent, KEY.ENTER);
 
+export const isSpaceKey = (keyboardEvent: KeyboardEvent): boolean => isKey(keyboardEvent, KEY.SPACE);
+
 export const isEscapeKey = (keyboardEvent: KeyboardEvent): boolean => isKey(keyboardEvent, KEY.ESC);
 
 export const isFunctionKey = (keyboardEvent: KeyboardEvent): boolean =>

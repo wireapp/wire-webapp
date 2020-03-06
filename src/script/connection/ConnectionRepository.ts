@@ -35,7 +35,6 @@ import {EventRepository} from '../event/EventRepository';
 import {EventSource} from '../event/EventSource';
 import {WebAppEvents} from '../event/WebApp';
 import {SystemMessageType} from '../message/SystemMessageType';
-import {BackendClient} from '../service/BackendClient';
 import {UserRepository} from '../user/UserRepository';
 import {ConnectionEntity} from './ConnectionEntity';
 import {ConnectionMapper} from './ConnectionMapper';
@@ -55,8 +54,8 @@ export class ConnectionRepository {
     };
   }
 
-  constructor(backendClient: BackendClient, userRepository: UserRepository) {
-    this.connectionService = new ConnectionService(backendClient);
+  constructor(connectionService: ConnectionService, userRepository: UserRepository) {
+    this.connectionService = connectionService;
     this.userRepository = userRepository;
 
     this.logger = getLogger('ConnectionRepository');
@@ -210,37 +209,17 @@ export class ConnectionRepository {
    *
    * @note Initially called by Wire for Web's app start to retrieve connections.
    *
-   * @param limit Query limit for user connections
-   * @param userId User ID of the latest connection
-   * @param connectionEntities Unordered array of user connections
    * @returns Promise that resolves when all connections have been retrieved and mapped
    */
-  getConnections(
-    limit: number = 500,
-    userId?: string,
-    connectionEntities: ConnectionEntity[] = [],
-  ): Promise<ConnectionEntity[]> {
-    return this.connectionService
-      .getConnections(limit, userId)
-      .then(response => {
-        const {connections: connectionData, has_more: hasMore} = response;
-
-        if (connectionData.length) {
-          const newConnectionEntities = this.connectionMapper.mapConnectionsFromJson(connectionData);
-          connectionEntities = connectionEntities.concat(newConnectionEntities);
-        }
-
-        if (hasMore) {
-          const lastConnectionEntity = connectionEntities[connectionEntities.length - 1];
-          return this.getConnections(limit, lastConnectionEntity.userId, connectionEntities);
-        }
-
-        return connectionEntities.length ? this.updateConnections(connectionEntities) : this.connectionEntities();
-      })
-      .catch(error => {
-        this.logger.error(`Failed to retrieve connections from backend: ${error.message}`, error);
-        throw error;
-      });
+  async getConnections(): Promise<ConnectionEntity[]> {
+    try {
+      const connectionData = await this.connectionService.getConnections();
+      const newConnectionEntities = this.connectionMapper.mapConnectionsFromJson(connectionData);
+      return newConnectionEntities.length ? this.updateConnections(newConnectionEntities) : this.connectionEntities();
+    } catch (error) {
+      this.logger.error(`Failed to retrieve connections from backend: ${error.message}`, error);
+      throw error;
+    }
   }
 
   /**

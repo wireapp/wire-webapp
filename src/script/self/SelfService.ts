@@ -17,119 +17,54 @@
  *
  */
 
-import {Consent} from '@wireapp/api-client/dist/self';
-import {BackendClient} from '../service/BackendClient';
+import {APIClient} from '@wireapp/api-client';
+import {Consent, Self} from '@wireapp/api-client/dist/self';
+import {UserUpdate} from '@wireapp/api-client/dist/user';
 
 export class SelfService {
-  private readonly backendClient: BackendClient;
+  private readonly apiClient: APIClient;
 
-  // tslint:disable-next-line:typedef
-  static get URL() {
-    return {
-      SELF: '/self',
-    };
-  }
-
-  constructor(backendClient: BackendClient) {
-    this.backendClient = backendClient;
+  constructor(apiClient: APIClient) {
+    this.apiClient = apiClient;
   }
 
   deleteSelf(password?: string): Promise<void> {
-    return this.backendClient.sendJson({
-      data: {
-        password: password,
-      },
-      type: 'DELETE',
-      url: SelfService.URL.SELF,
-    });
+    return this.apiClient.self.api.deleteSelf({password});
   }
 
-  getSelf(): Promise<any> {
-    return this.backendClient.sendRequest({
-      type: 'GET',
-      url: SelfService.URL.SELF,
-    });
+  getSelf(): Promise<Self> {
+    return this.apiClient.self.api.getSelf();
   }
 
-  getSelfConsent(): Promise<Consent[]> {
-    return this.backendClient
-      .sendRequest<{
-        results: Consent[];
-      }>({
-        type: 'GET',
-        url: `${SelfService.URL.SELF}/consent`,
-      })
-      .then(data => data.results);
+  async getSelfConsent(): Promise<Consent[]> {
+    return (await this.apiClient.self.api.getConsents()).results;
   }
 
-  putSelf(selfData: {}): Promise<void> {
-    return this.backendClient.sendJson({
-      data: selfData,
-      type: 'PUT',
-      url: SelfService.URL.SELF,
-    });
+  putSelf(selfData: UserUpdate): Promise<void> {
+    return this.apiClient.self.api.putSelf(selfData);
   }
 
-  putSelfConsent(consentType: number, value: number, source: string): Promise<void> {
-    return this.backendClient.sendJson({
-      data: {
-        source: source,
-        type: consentType,
-        value: value,
-      },
-      type: 'PUT',
-      url: `${SelfService.URL.SELF}/consent`,
-    });
+  putSelfConsent(type: number, value: number, source: string): Promise<void> {
+    return this.apiClient.self.api.putConsent({source, type, value});
   }
 
   putSelfEmail(email: string): Promise<void> {
-    return this.backendClient.sendJson({
-      data: {
-        email: email,
-      },
-      type: 'PUT',
-      url: `${SelfService.URL.SELF}/email`,
-    });
+    return this.apiClient.self.api.putEmail({email});
   }
 
-  putSelfHandle(username: string): Promise<void> {
-    return this.backendClient.sendJson({
-      data: {
-        handle: username,
-      },
-      type: 'PUT',
-      url: `${SelfService.URL.SELF}/handle`,
-    });
+  putSelfHandle(handle: string): Promise<void> {
+    return this.apiClient.self.api.putHandle({handle});
   }
 
-  putSelfLocale(newLocale: string): Promise<void> {
-    return this.backendClient.sendJson({
-      data: {
-        locale: newLocale,
-      },
-      type: 'PUT',
-      url: `${SelfService.URL.SELF}/locale`,
-    });
+  putSelfLocale(locale: string): Promise<void> {
+    return this.apiClient.self.api.putLocale({locale});
   }
 
   putSelfPassword(newPassword: string, oldPassword?: string): Promise<void> {
-    return this.backendClient.sendJson({
-      data: {
-        new_password: newPassword,
-        old_password: oldPassword,
-      },
-      type: 'PUT',
-      url: `${SelfService.URL.SELF}/password`,
-    });
+    return this.apiClient.self.api.putPassword({new_password: newPassword, old_password: oldPassword});
   }
 
-  putSelfPhone(phoneNumber: string): Promise<void> {
-    return this.backendClient.sendJson({
-      data: {
-        phone: phoneNumber,
-      },
-      type: 'PUT',
-      url: `${SelfService.URL.SELF}/phone`,
-    });
+  putSelfPhone(phone: string): Promise<void> {
+    return this.apiClient.self.api.putPhone({phone});
   }
 }

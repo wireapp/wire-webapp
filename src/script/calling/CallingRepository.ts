@@ -17,6 +17,8 @@
  *
  */
 
+import {APIClient} from '@wireapp/api-client';
+import {CallConfigData} from '@wireapp/api-client/dist/account/CallConfigData';
 import {
   CALL_TYPE,
   CONV_TYPE,
@@ -55,7 +57,6 @@ import {MediaStreamHandler} from '../media/MediaStreamHandler';
 import {MediaType} from '../media/MediaType';
 
 import {User} from '../entity/User';
-import {BackendClient} from '../service/BackendClient';
 import {ServerTimeHandler} from '../time/serverTimeHandler';
 import {Call, ConversationId} from './Call';
 import {DeviceId, Participant, UserId} from './Participant';
@@ -67,7 +68,7 @@ interface MediaStreamQuery {
 }
 
 export class CallingRepository {
-  private readonly backendClient: BackendClient;
+  private readonly apiClient: APIClient;
   private readonly conversationRepository: ConversationRepository;
   private readonly eventRepository: EventRepository;
   private readonly mediaStreamHandler: MediaStreamHandler;
@@ -100,7 +101,7 @@ export class CallingRepository {
   }
 
   constructor(
-    backendClient: BackendClient,
+    apiClient: APIClient,
     conversationRepository: ConversationRepository,
     eventRepository: EventRepository,
     mediaStreamHandler: MediaStreamHandler,
@@ -112,7 +113,7 @@ export class CallingRepository {
       return this.activeCalls().find(call => call.state() === CALL_STATE.MEDIA_ESTAB);
     });
 
-    this.backendClient = backendClient;
+    this.apiClient = apiClient;
     this.conversationRepository = conversationRepository;
     this.eventRepository = eventRepository;
     this.serverTimeHandler = serverTimeHandler;
@@ -863,13 +864,8 @@ export class CallingRepository {
   // Calling config
   //##############################################################################
 
-  fetchConfig(limit?: number): Promise<any> {
-    return this.backendClient.sendRequest({
-      cache: false,
-      data: {limit},
-      type: 'GET',
-      url: '/calls/config/v2',
-    });
+  fetchConfig(limit?: number): Promise<CallConfigData> {
+    return this.apiClient.account.api.getCallConfig(limit);
   }
 
   private checkConcurrentJoinedCall(conversationId: ConversationId, newCallState: CALL_STATE): Promise<void> {

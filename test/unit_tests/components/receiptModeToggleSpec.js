@@ -49,13 +49,13 @@ describe('read-receipt-toggle', () => {
 
       expect(toggle.checked).toBe(true);
       expect(viewModel.conversation.receiptMode()).toBe(1);
-      expect(viewModel.onReceiptModeChanged).toHaveBeenCalledWith(viewModel.conversation, 1);
+      expect(viewModel.onReceiptModeChanged).toHaveBeenCalledWith(viewModel.conversation, {receipt_mode: 1});
 
       toggle.click();
 
       expect(toggle.checked).toBe(false);
       expect(viewModel.conversation.receiptMode()).toBe(0);
-      expect(viewModel.onReceiptModeChanged).toHaveBeenCalledWith(viewModel.conversation, 0);
+      expect(viewModel.onReceiptModeChanged).toHaveBeenCalledWith(viewModel.conversation, {receipt_mode: 0});
     });
   });
 });

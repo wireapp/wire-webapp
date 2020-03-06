@@ -38,7 +38,9 @@ ko.components.register('read-receipt-toggle', {
     this.updateValue = (data, event) => {
       const intValue = event.target.checked ? 1 : 0;
       this.conversation.receiptMode(intValue);
-      params.onReceiptModeChanged(this.conversation, intValue);
+      params.onReceiptModeChanged(this.conversation, {
+        receipt_mode: intValue,
+      });
     };
   },
 });

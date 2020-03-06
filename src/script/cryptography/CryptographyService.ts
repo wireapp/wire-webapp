@@ -17,23 +17,16 @@
  *
  */
 
-import {getLogger} from 'Util/Logger';
+import {APIClient} from '@wireapp/api-client';
+import {ClientPreKey, PreKey} from '@wireapp/api-client/dist/auth';
+import {UserClients} from '@wireapp/api-client/dist/conversation';
+import {UserPreKeyBundleMap} from '@wireapp/api-client/dist/user';
 
 export class CryptographyService {
-  static get CONFIG() {
-    return {
-      URL_CLIENTS: '/clients',
-      URL_USERS: '/users',
-    };
-  }
+  private readonly apiClient: APIClient;
 
-  /**
-   * Construct a new Cryptography Service.
-   * @param {BackendClient} backendClient Client for the API calls
-   */
-  constructor(backendClient) {
-    this.backendClient = backendClient;
-    this.logger = getLogger('CryptographyService');
+  constructor(apiClient: APIClient) {
+    this.apiClient = apiClient;
   }
 
   /**
@@ -44,11 +37,8 @@ export class CryptographyService {
    * @param {string} clientId Client ID
    * @returns {Promise} Resolves with a pre-key for given the client of the user
    */
-  getUserPreKeyByIds(userId, clientId) {
-    return this.backendClient.sendJson({
-      type: 'GET',
-      url: `${CryptographyService.CONFIG.URL_USERS}/${userId}/prekeys/${clientId}`,
-    });
+  getUserPreKeyByIds(userId: string, clientId: string): Promise<ClientPreKey> {
+    return this.apiClient.user.api.getClientPreKey(userId, clientId);
   }
 
   /**
@@ -58,12 +48,8 @@ export class CryptographyService {
    * @param {Object} recipients User client map to request pre-keys for
    * @returns {Promise} Resolves with a pre-key for each client of the given map
    */
-  getUsersPreKeys(recipients) {
-    return this.backendClient.sendJson({
-      data: recipients,
-      type: 'POST',
-      url: `${CryptographyService.CONFIG.URL_USERS}/prekeys`,
-    });
+  getUsersPreKeys(recipients: UserClients): Promise<UserPreKeyBundleMap> {
+    return this.apiClient.user.api.postMultiPreKeyBundles(recipients);
   }
 
   /**
@@ -73,13 +59,7 @@ export class CryptographyService {
    * @param {Array<string>} serializedPreKeys Additional pre-keys to be made available
    * @returns {Promise} Resolves once the pre-keys are accepted
    */
-  putClientPreKeys(clientId, serializedPreKeys) {
-    return this.backendClient.sendJson({
-      data: {
-        prekeys: serializedPreKeys,
-      },
-      type: 'PUT',
-      url: `${CryptographyService.CONFIG.URL_CLIENTS}/${clientId}`,
-    });
+  putClientPreKeys(clientId: string, serializedPreKeys: PreKey[]): Promise<void> {
+    return this.apiClient.client.api.putClient(clientId, {prekeys: serializedPreKeys});
   }
 }

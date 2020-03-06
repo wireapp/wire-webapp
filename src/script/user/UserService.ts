@@ -16,31 +16,23 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+import {APIClient} from '@wireapp/api-client';
+import {User as APIClientUser} from '@wireapp/api-client/dist/user';
 
 import {Logger, getLogger} from 'Util/Logger';
 
-import {chunk, flatten, uniquify} from 'Util/ArrayUtil';
 import {User} from '../entity/User';
-import {BackendClient} from '../service/BackendClient';
 import {StorageSchemata} from '../storage/StorageSchemata';
 import {StorageService} from '../storage/StorageService';
 
 export class UserService {
-  private readonly backendClient: BackendClient;
+  private readonly apiClient: APIClient;
   private readonly logger: Logger;
   private readonly storageService: StorageService;
   private readonly USER_STORE_NAME: string;
 
-  // tslint:disable-next-line:typedef
-  static get URL() {
-    return {
-      PASSWORD_RESET: '/password-reset',
-      USERS: '/users',
-    };
-  }
-
-  constructor(backendClient: BackendClient, storageService: StorageService) {
-    this.backendClient = backendClient;
+  constructor(apiClient: APIClient, storageService: StorageService) {
+    this.apiClient = apiClient;
     this.logger = getLogger('UserService');
     this.storageService = storageService;
 
@@ -82,18 +74,12 @@ export class UserService {
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/checkUserHandle
    */
-  checkUserHandle(username: string): Promise<void> {
-    return this.backendClient.sendRequest({
-      type: 'HEAD',
-      url: `${UserService.URL.USERS}/handles/${username}`,
-    });
+  checkUserHandle(handle: string): Promise<void> {
+    return this.apiClient.user.api.headHandle(handle);
   }
 
-  getUserByHandle(username: string): Promise<{user: User}> {
-    return this.backendClient.sendRequest({
-      type: 'GET',
-      url: `${UserService.URL.USERS}/handles/${username}`,
-    });
+  getUserByHandle(handle: string): Promise<{user: string}> {
+    return this.apiClient.user.api.getHandle(handle);
   }
 
   /**
@@ -103,13 +89,9 @@ export class UserService {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/checkUserHandles
    */
   checkUserHandles(usernames: string[], amount: number = 1): Promise<string[]> {
-    return this.backendClient.sendJson({
-      data: {
-        handles: usernames,
-        return: amount,
-      },
-      type: 'POST',
-      url: `${UserService.URL.USERS}/handles`,
+    return this.apiClient.user.api.postHandles({
+      handles: usernames,
+      return: amount,
     });
   }
 
@@ -119,21 +101,8 @@ export class UserService {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/users
    * @example ['0bb84213-8cc2-4bb1-9e0b-b8dd522396d5', '15ede065-72b3-433a-9917-252f076ed031']
    */
-  getUsers(userIds: string[]): Promise<User[]> {
-    const chunkSize = 50;
-    const uniqueUserIds = uniquify(userIds);
-    const idChunks = chunk(uniqueUserIds, chunkSize);
-    const idLists = idChunks.map(idChunk => idChunk.join(','));
-    return Promise.all(
-      idLists.map(
-        ids =>
-          this.backendClient.sendRequest({
-            data: {ids},
-            type: 'GET',
-            url: UserService.URL.USERS,
-          }) as Promise<User[]>,
-      ),
-    ).then(flatten);
+  getUsers(userIds: string[]): Promise<APIClientUser[]> {
+    return this.apiClient.user.api.getUsers({ids: userIds});
   }
 
   /**
@@ -141,10 +110,7 @@ export class UserService {
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/user
    */
-  getUser(userId: string): Promise<User> {
-    return this.backendClient.sendRequest({
-      type: 'GET',
-      url: `${UserService.URL.USERS}/${userId}`,
-    });
+  getUser(userId: string): Promise<APIClientUser> {
+    return this.apiClient.user.api.getUser(userId);
   }
 }

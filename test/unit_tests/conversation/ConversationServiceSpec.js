@@ -19,20 +19,21 @@
 
 import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
 import {StorageSchemata} from 'src/script/storage/StorageSchemata';
+import {TestFactory} from '../../helper/TestFactory';
 
 describe('ConversationService', () => {
   let conversation_mapper = null;
   let conversation_service = null;
   let server = null;
   let storage_service = null;
-  const test_factory = new TestFactory();
+  const testFactory = new TestFactory();
   const eventStoreName = StorageSchemata.OBJECT_STORE.EVENTS;
 
   beforeAll(() => {
-    return test_factory.exposeConversationActors().then(() => {
-      conversation_service = TestFactory.conversation_service;
+    return testFactory.exposeConversationActors().then(() => {
+      conversation_service = testFactory.conversation_service;
       conversation_mapper = new ConversationMapper();
-      storage_service = TestFactory.storage_service;
+      storage_service = testFactory.storage_service;
       server = sinon.fakeServer.create();
     });
   });

@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2019 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,12 +17,17 @@
  *
  */
 
-import {resolver} from 'Util/dependenciesResolver';
+import {APIClient} from '@wireapp/api-client';
+import {SearchResult} from '@wireapp/api-client/dist/user';
 
-import * as graph from './dependenciesGraph';
+export class SearchService {
+  private readonly apiClient: APIClient;
 
-resolver.init(graph.dependencies);
+  constructor(apiClient: APIClient) {
+    this.apiClient = apiClient;
+  }
 
-const resolve = resolver.resolve;
-
-export {resolve, graph};
+  getContacts(query: string, numberOfRequestedUser: number): Promise<SearchResult> {
+    return this.apiClient.user.api.getSearchContacts(query, numberOfRequestedUser);
+  }
+}

@@ -28,6 +28,14 @@ import {AudioPlayingType} from './AudioPlayingType';
 import {AudioPreference} from './AudioPreference';
 import {AudioType} from './AudioType';
 
+declare global {
+  interface Navigator {
+    mediaSession: {
+      setActionHandler: Function;
+    };
+  }
+}
+
 enum AUDIO_PLAY_PERMISSION {
   ALLOWED = 0,
   DISALLOWED_BY_MUTE_STATE = 3,
@@ -106,6 +114,12 @@ export class AudioRepository {
     amplify.subscribe(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, this.setMutedState.bind(this));
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, this.updatedProperties.bind(this));
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.SOUND_ALERTS, this.setAudioPreference.bind(this));
+
+    if ('mediaSession' in navigator) {
+      const noop = () => {};
+      navigator.mediaSession.setActionHandler('play', noop);
+      navigator.mediaSession.setActionHandler('pause', noop);
+    }
   }
 
   init(preload: boolean = false): void {

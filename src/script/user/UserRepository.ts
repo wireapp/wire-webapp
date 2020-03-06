@@ -59,11 +59,12 @@ import {createSuggestions} from './UserHandleGenerator';
 import {UserMapper} from './UserMapper';
 import {UserService} from './UserService';
 
+import {AccentColor} from '@wireapp/commons';
 import {AssetService} from '../assets/AssetService';
 import {ClientEntity} from '../client/ClientEntity';
 import {ClientMapper} from '../client/ClientMapper';
 import {ClientRepository} from '../client/ClientRepository';
-import {ACCENT_ID, Config} from '../Config';
+import {Config} from '../Config';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
 import {AssetPayload} from '../entity/message/Asset';
 import {BackendClientError} from '../error/BackendClientError';
@@ -71,8 +72,8 @@ import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {SelfService} from '../self/SelfService';
 import {ServerTimeHandler} from '../time/serverTimeHandler';
 
-interface UserUpdate {
-  accent_id?: typeof ACCENT_ID;
+export interface UserUpdate {
+  accent_id?: AccentColor.AccentColorID;
   assets?: {key: string; size: string; type: string}[];
   handle?: string;
   id?: string;
@@ -556,7 +557,7 @@ export class UserRepository {
   getSelf(): Promise<User> {
     return this.selfService
       .getSelf()
-      .then(userData => this._upgradePictureAsset(userData))
+      .then(userData => this._upgradePictureAsset((userData as unknown) as UserUpdate))
       .then(response => this.user_mapper.mapSelfUserFromJson(response))
       .then(userEntity => {
         this.save_user(userEntity, true);
@@ -572,7 +573,7 @@ export class UserRepository {
    * Detects if the user has a profile picture that uses the outdated picture API.
    * Will migrate the picture to the newer assets API if so.
    */
-  _upgradePictureAsset(userData: UserUpdate): UserUpdate {
+  private _upgradePictureAsset(userData: UserUpdate): UserUpdate {
     const hasPicture = userData.picture.length;
     const hasAsset = userData.assets.length;
 
@@ -583,7 +584,7 @@ export class UserRepository {
         medium.load().then(imageBlob => this.change_picture(imageBlob as Blob));
       } else {
         // if an asset is already there, remove the pointer to the old picture
-        this.selfService.putSelf({picture: []});
+        this.selfService.putSelf({picture: []} as any);
       }
     }
     return userData;
@@ -605,15 +606,16 @@ export class UserRepository {
         });
   }
 
-  get_user_id_by_handle(handle: string): Promise<void | User> {
-    return this.user_service
-      .getUserByHandle(handle.toLowerCase())
-      .then(({user: user_id}) => user_id)
-      .catch(error => {
-        if (error.code !== BackendClientError.STATUS_CODE.NOT_FOUND) {
-          throw error;
-        }
-      });
+  async get_user_id_by_handle(handle: string): Promise<void | string> {
+    try {
+      const {user: user_id} = await this.user_service.getUserByHandle(handle.toLowerCase());
+      return user_id;
+    } catch (axiosError) {
+      const error = axiosError.response || axiosError;
+      if (error.status !== BackendClientError.STATUS_CODE.NOT_FOUND) {
+        throw error;
+      }
+    }
   }
 
   /**
@@ -719,8 +721,10 @@ export class UserRepository {
   /**
    * Change the accent color.
    */
-  change_accent_color(accent_id: typeof ACCENT_ID): Promise<User> {
-    return this.selfService.putSelf({accent_id}).then(() => this.user_update({user: {accent_id, id: this.self().id}}));
+  change_accent_color(accent_id: AccentColor.AccentColorID): Promise<User> {
+    return this.selfService
+      .putSelf({accent_id} as any)
+      .then(() => this.user_update({user: {accent_id, id: this.self().id}}));
   }
 
   /**
@@ -805,7 +809,8 @@ export class UserRepository {
   verify_username(username: string): Promise<string> {
     return this.user_service
       .checkUserHandle(username)
-      .catch(({code: error_code}) => {
+      .catch(error => {
+        const error_code = error.response?.status;
         if (error_code === BackendClientError.STATUS_CODE.NOT_FOUND) {
           return username;
         }
@@ -834,7 +839,7 @@ export class UserRepository {
           {key: mediumImageKey, size: 'complete', type: 'image'},
         ];
         return this.selfService
-          .putSelf({assets, picture: []})
+          .putSelf({assets, picture: []} as any)
           .then(() => this.user_update({user: {assets, id: this.self().id}}));
       })
       .catch(error => {

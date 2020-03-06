@@ -17,13 +17,15 @@
  *
  */
 
-import {resolve, graph, backendConfig} from './../../api/testResolver';
+import {container} from 'tsyringe';
+
 import {GiphyRepository} from 'src/script/extension/GiphyRepository';
 import {GiphyService} from 'src/script/extension/GiphyService';
+import {APIClientSingleton} from 'src/script/service/APIClientSingleton';
+import {Config} from 'src/script/Config';
 
 describe('Giphy Repository', () => {
   let server = null;
-  const urls = backendConfig;
 
   let giphyRepository = null;
   let giphyService = null;
@@ -31,179 +33,181 @@ describe('Giphy Repository', () => {
   beforeEach(() => {
     server = sinon.fakeServer.create();
 
-    giphyRepository = new GiphyRepository(new GiphyService(resolve(graph.BackendClient)));
-    giphyService = giphyRepository.giphyService;
+    giphyService = new GiphyService(container.resolve(APIClientSingleton).getClient());
+    giphyRepository = new GiphyRepository(giphyService);
 
     spyOn(giphyService, 'getRandom').and.callThrough();
     spyOn(giphyService, 'getById').and.callThrough();
 
-    const randomFooGif = `${urls.restUrl}/proxy/giphy/v1/gifs/random?tag=foo`;
-    /* eslint-disable comma-spacing, key-spacing, no-useless-escape, sort-keys-fix/sort-keys-fix, quotes */
+    const randomFooGif = `${Config.getConfig().BACKEND_REST}/proxy/giphy/v1/gifs/random?tag=foo`;
     server.respondWith('GET', randomFooGif, [
       200,
       {'Content-Type': 'application/json'},
       JSON.stringify({
         data: {
-          type: 'gif',
-          id: 'GKLmFicoabZrW',
-          url: 'http://giphy.com/gifs/big-thank-indulging-GKLmFicoabZrW',
-          image_original_url: 'http://s3.amazonaws.com/giphygifs/media/GKLmFicoabZrW/giphy.gif',
-          image_url: 'http://s3.amazonaws.com/giphygifs/media/GKLmFicoabZrW/giphy.gif',
-          image_mp4_url: 'http://s3.amazonaws.com/giphygifs/media/GKLmFicoabZrW/giphy.mp4',
-          image_frames: '10',
-          image_width: '320',
-          image_height: '244',
+          fixed_height_downsampled_height: '200',
           fixed_height_downsampled_url: 'http://s3.amazonaws.com/giphygifs/media/GKLmFicoabZrW/200_d.gif',
           fixed_height_downsampled_width: '262',
-          fixed_height_downsampled_height: '200',
+          fixed_height_small_height: '100',
+          fixed_height_small_still_url: 'http://s3.amazonaws.com/giphygifs/media/GKLmFicoabZrW/100_s.gif',
+          fixed_height_small_url: 'http://s3.amazonaws.com/giphygifs/media/GKLmFicoabZrW/100.gif',
+          fixed_height_small_width: '131',
+          fixed_width_downsampled_height: '153',
           fixed_width_downsampled_url: 'http://s3.amazonaws.com/giphygifs/media/GKLmFicoabZrW/200w_d.gif',
           fixed_width_downsampled_width: '200',
-          fixed_width_downsampled_height: '153',
-          fixed_height_small_url: 'http://s3.amazonaws.com/giphygifs/media/GKLmFicoabZrW/100.gif',
-          fixed_height_small_still_url: 'http://s3.amazonaws.com/giphygifs/media/GKLmFicoabZrW/100_s.gif',
-          fixed_height_small_width: '131',
-          fixed_height_small_height: '100',
-          fixed_width_small_url: 'http://s3.amazonaws.com/giphygifs/media/GKLmFicoabZrW/100w.gif',
-          fixed_width_small_still_url: 'http://s3.amazonaws.com/giphygifs/media/GKLmFicoabZrW/100w_s.gif',
-          fixed_width_small_width: '100',
           fixed_width_small_height: '76',
+          fixed_width_small_still_url: 'http://s3.amazonaws.com/giphygifs/media/GKLmFicoabZrW/100w_s.gif',
+          fixed_width_small_url: 'http://s3.amazonaws.com/giphygifs/media/GKLmFicoabZrW/100w.gif',
+          fixed_width_small_width: '100',
+          id: 'GKLmFicoabZrW',
+          image_frames: '10',
+          image_height: '244',
+          image_mp4_url: 'http://s3.amazonaws.com/giphygifs/media/GKLmFicoabZrW/giphy.mp4',
+          image_original_url: 'http://s3.amazonaws.com/giphygifs/media/GKLmFicoabZrW/giphy.gif',
+          image_url: 'http://s3.amazonaws.com/giphygifs/media/GKLmFicoabZrW/giphy.gif',
+          image_width: '320',
+          type: 'gif',
+          url: 'http://giphy.com/gifs/big-thank-indulging-GKLmFicoabZrW',
         },
-        meta: {status: 200, msg: 'OK'},
+        meta: {msg: 'OK', status: 200},
       }),
     ]);
-    /* eslint-enable comma-spacing, key-spacing, no-useless-escape, sort-keys-fix/sort-keys-fix, quotes */
 
-    const randomFooGifData = `${urls.restUrl}/proxy/giphy/v1/gifs/GKLmFicoabZrW`;
-    /* eslint-disable comma-spacing, key-spacing, no-useless-escape, sort-keys-fix/sort-keys-fix, quotes */
+    const randomFooGifData = `${Config.getConfig().BACKEND_REST}/proxy/giphy/v1/gifs/GKLmFicoabZrW`;
     server.respondWith('GET', randomFooGifData, [
       200,
       {'Content-Type': 'application/json'},
       JSON.stringify({
         data: {
-          type: 'gif',
-          id: 'GKLmFicoabZrW',
-          url: 'https://giphy.com/gifs/big-thank-indulging-GKLmFicoabZrW',
           bitly_gif_url: 'http://gph.is/1Q95Wje',
           bitly_url: 'http://gph.is/1Q95Wje',
-          embed_url: 'https://giphy.com/embed/GKLmFicoabZrW',
-          username: '',
-          source: 'http://jezebel.com/big-sean-is-indulging-in-some-me-time-thank-you-1701548048',
-          rating: 'pg',
           caption: '',
           content_url: '',
-          import_datetime: '2015-05-02 00:11:31',
-          trending_datetime: '2015-05-04 20:01:25',
+          embed_url: 'https://giphy.com/embed/GKLmFicoabZrW',
+          id: 'GKLmFicoabZrW',
           images: {
-            fixed_height: {
-              url: 'https://media4.giphy.com/media/GKLmFicoabZrW/200.gif',
-              width: '262',
-              height: '200',
-              size: '0',
-              mp4: 'https://media4.giphy.com/media/GKLmFicoabZrW/200.mp4',
-              mp4_size: '178927',
-              webp: 'https://media4.giphy.com/media/GKLmFicoabZrW/200.webp',
-              webp_size: '88838',
-            },
-            fixed_height_still: {
-              url: 'https://media4.giphy.com/media/GKLmFicoabZrW/200_s.gif',
-              width: '262',
-              height: '200',
-            },
-            fixed_height_downsampled: {
-              url: 'https://media4.giphy.com/media/GKLmFicoabZrW/200_d.gif',
-              width: '262',
-              height: '200',
-              size: '149525',
-              webp: 'https://media4.giphy.com/media/GKLmFicoabZrW/200_d.webp',
-              webp_size: '53016',
-            },
-            fixed_width: {
-              url: 'https://media4.giphy.com/media/GKLmFicoabZrW/200w.gif',
-              width: '200',
-              height: '153',
-              size: '0',
-              mp4: 'https://media4.giphy.com/media/GKLmFicoabZrW/200w.mp4',
-              mp4_size: '120356',
-              webp: 'https://media4.giphy.com/media/GKLmFicoabZrW/200w.webp',
-              webp_size: '57810',
-            },
-            fixed_width_still: {
-              url: 'https://media4.giphy.com/media/GKLmFicoabZrW/200w_s.gif',
-              width: '200',
-              height: '153',
-            },
-            fixed_width_downsampled: {
-              url: 'https://media4.giphy.com/media/GKLmFicoabZrW/200w_d.gif',
-              width: '200',
-              height: '153',
-              size: '227351',
-              webp: 'https://media4.giphy.com/media/GKLmFicoabZrW/200w_d.webp',
-              webp_size: '34448',
-            },
-            fixed_height_small: {
-              url: 'https://media4.giphy.com/media/GKLmFicoabZrW/100.gif',
-              width: '131',
-              height: '100',
-              size: '0',
-              mp4: 'https://media4.giphy.com/media/GKLmFicoabZrW/100.mp4',
-              mp4_size: '66464',
-              webp: 'https://media4.giphy.com/media/GKLmFicoabZrW/100.webp',
-              webp_size: '32982',
-            },
-            fixed_height_small_still: {
-              url: 'https://media4.giphy.com/media/GKLmFicoabZrW/100_s.gif',
-              width: '131',
-              height: '100',
-            },
-            fixed_width_small: {
-              url: 'https://media4.giphy.com/media/GKLmFicoabZrW/100w.gif',
-              width: '100',
-              height: '76',
-              size: '0',
-              mp4: 'https://media4.giphy.com/media/GKLmFicoabZrW/100w.mp4',
-              mp4_size: '46951',
-              webp: 'https://media4.giphy.com/media/GKLmFicoabZrW/100w.webp',
-              webp_size: '23174',
-            },
-            fixed_width_small_still: {
-              url: 'https://media4.giphy.com/media/GKLmFicoabZrW/100w_s.gif',
-              width: '100',
-              height: '76',
-            },
             downsized: {
-              url: 'https://media4.giphy.com/media/GKLmFicoabZrW/giphy.gif',
-              width: '320',
               height: '244',
               size: '514699',
+              url: 'https://media4.giphy.com/media/GKLmFicoabZrW/giphy.gif',
+              width: '320',
+            },
+            downsized_large: {
+              height: '0',
+              size: '0',
+              url: '',
+              width: '0',
             },
             downsized_still: {
+              height: '244',
               url: 'https://media4.giphy.com/media/GKLmFicoabZrW/giphy_s.gif',
               width: '320',
-              height: '244',
             },
-            downsized_large: {url: '', width: '0', height: '0', size: '0'},
+            fixed_height: {
+              height: '200',
+              mp4: 'https://media4.giphy.com/media/GKLmFicoabZrW/200.mp4',
+              mp4_size: '178927',
+              size: '0',
+              url: 'https://media4.giphy.com/media/GKLmFicoabZrW/200.gif',
+              webp: 'https://media4.giphy.com/media/GKLmFicoabZrW/200.webp',
+              webp_size: '88838',
+              width: '262',
+            },
+            fixed_height_downsampled: {
+              height: '200',
+              size: '149525',
+              url: 'https://media4.giphy.com/media/GKLmFicoabZrW/200_d.gif',
+              webp: 'https://media4.giphy.com/media/GKLmFicoabZrW/200_d.webp',
+              webp_size: '53016',
+              width: '262',
+            },
+            fixed_height_small: {
+              height: '100',
+              mp4: 'https://media4.giphy.com/media/GKLmFicoabZrW/100.mp4',
+              mp4_size: '66464',
+              size: '0',
+              url: 'https://media4.giphy.com/media/GKLmFicoabZrW/100.gif',
+              webp: 'https://media4.giphy.com/media/GKLmFicoabZrW/100.webp',
+              webp_size: '32982',
+              width: '131',
+            },
+            fixed_height_small_still: {
+              height: '100',
+              url: 'https://media4.giphy.com/media/GKLmFicoabZrW/100_s.gif',
+              width: '131',
+            },
+            fixed_height_still: {
+              height: '200',
+              url: 'https://media4.giphy.com/media/GKLmFicoabZrW/200_s.gif',
+              width: '262',
+            },
+            fixed_width: {
+              height: '153',
+              mp4: 'https://media4.giphy.com/media/GKLmFicoabZrW/200w.mp4',
+              mp4_size: '120356',
+              size: '0',
+              url: 'https://media4.giphy.com/media/GKLmFicoabZrW/200w.gif',
+              webp: 'https://media4.giphy.com/media/GKLmFicoabZrW/200w.webp',
+              webp_size: '57810',
+              width: '200',
+            },
+            fixed_width_downsampled: {
+              height: '153',
+              size: '227351',
+              url: 'https://media4.giphy.com/media/GKLmFicoabZrW/200w_d.gif',
+              webp: 'https://media4.giphy.com/media/GKLmFicoabZrW/200w_d.webp',
+              webp_size: '34448',
+              width: '200',
+            },
+            fixed_width_small: {
+              height: '76',
+              mp4: 'https://media4.giphy.com/media/GKLmFicoabZrW/100w.mp4',
+              mp4_size: '46951',
+              size: '0',
+              url: 'https://media4.giphy.com/media/GKLmFicoabZrW/100w.gif',
+              webp: 'https://media4.giphy.com/media/GKLmFicoabZrW/100w.webp',
+              webp_size: '23174',
+              width: '100',
+            },
+            fixed_width_small_still: {
+              height: '76',
+              url: 'https://media4.giphy.com/media/GKLmFicoabZrW/100w_s.gif',
+              width: '100',
+            },
+            fixed_width_still: {
+              height: '153',
+              url: 'https://media4.giphy.com/media/GKLmFicoabZrW/200w_s.gif',
+              width: '200',
+            },
             original: {
-              url: 'https://media4.giphy.com/media/GKLmFicoabZrW/giphy.gif',
-              width: '320',
-              height: '244',
-              size: '514699',
               frames: '10',
+              height: '244',
               mp4: 'https://media4.giphy.com/media/GKLmFicoabZrW/giphy.mp4',
               mp4_size: '710329',
+              size: '514699',
+              url: 'https://media4.giphy.com/media/GKLmFicoabZrW/giphy.gif',
               webp: 'https://media4.giphy.com/media/GKLmFicoabZrW/giphy.webp',
               webp_size: '116528',
+              width: '320',
             },
             original_still: {
+              height: '244',
               url: 'https://media4.giphy.com/media/GKLmFicoabZrW/giphy_s.gif',
               width: '320',
-              height: '244',
             },
           },
+          import_datetime: '2015-05-02 00:11:31',
+          rating: 'pg',
+          source: 'http://jezebel.com/big-sean-is-indulging-in-some-me-time-thank-you-1701548048',
+          trending_datetime: '2015-05-04 20:01:25',
+          type: 'gif',
+          url: 'https://giphy.com/gifs/big-thank-indulging-GKLmFicoabZrW',
+          username: '',
         },
-        meta: {status: 200, msg: 'OK'},
+        meta: {msg: 'OK', status: 200},
       }),
     ]);
-    /* eslint-enable comma-spacing, key-spacing, no-useless-escape, sort-keys-fix/sort-keys-fix, quotes */
+    server.autoRespond = true;
   });
 
   afterEach(() => {
@@ -211,20 +215,11 @@ describe('Giphy Repository', () => {
   });
 
   describe('getRandomGif', () => {
-    it('can receive a random gif', done => {
-      giphyRepository
-        .getRandomGif({tag: 'foo'})
-        .then(() => {
-          expect(giphyService.getRandom).toHaveBeenCalled();
-          expect(giphyService.getById).toHaveBeenCalled();
-          done();
-        })
-        .catch(done.fail);
+    it('can receive a random gif', async () => {
+      await giphyRepository.getRandomGif({tag: 'foo'});
 
-      server.respond();
-      window.setTimeout(() => {
-        server.respond();
-      }, 10);
+      expect(giphyService.getRandom).toHaveBeenCalled();
+      expect(giphyService.getById).toHaveBeenCalled();
     });
   });
 });

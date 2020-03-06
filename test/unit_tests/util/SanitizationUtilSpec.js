@@ -17,7 +17,7 @@
  *
  */
 
-import {LocalizerUtil, Declension} from 'Util/LocalizerUtil';
+import {LocalizerUtil, Declension, setStrings} from 'Util/LocalizerUtil';
 
 import 'src/script/localization/Localizer';
 
@@ -25,6 +25,10 @@ import {escapeRegex, getSelfName, getUserName, safeWindowOpen} from 'src/script/
 import {User} from 'src/script/entity/User';
 
 describe('SanitizationUtil', () => {
+  beforeEach(() => {
+    setStrings({en: z.string});
+  });
+
   describe('escapeRegex', () => {
     it('will return escaped regex strings', () => {
       const escapedRegex = escapeRegex(':)');

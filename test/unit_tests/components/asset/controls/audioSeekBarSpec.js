@@ -73,9 +73,8 @@ describe('audio-seek-bar', () => {
     const audioSeekBar = await instantiateComponent('audio-seek-bar', params);
     const clickPositionX = Math.floor(audioSeekBar.offsetWidth / 2);
     const expected = (1000 / audioSeekBar.offsetWidth) * clickPositionX;
-    const margin = 8;
     const element = audioSeekBar.querySelector('div');
-    element.dispatchEvent(new MouseEvent('click', {clientX: clickPositionX + margin}));
+    element.dispatchEvent(new MouseEvent('click', {clientX: clickPositionX}));
 
     expect(audioElement.currentTime).toBeCloseTo(expected);
   });

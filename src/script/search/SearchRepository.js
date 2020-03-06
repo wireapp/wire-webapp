@@ -21,7 +21,6 @@ import {getLogger} from 'Util/Logger';
 import {EMOJI_RANGES} from 'Util/EmojiUtil';
 import {startsWith, computeTransliteration, sortByPriority, transliterationIndex} from 'Util/StringUtil';
 
-import {SearchService} from './SearchService';
 import {validateHandle} from '../user/UserHandleGenerator';
 
 export class SearchRepository {
@@ -52,11 +51,11 @@ export class SearchRepository {
   }
 
   /**
-   * @param {BackendClient} backendClient Client for the API calls
+   * @param {SearchService} searchService SearchService
    * @param {UserRepository} userRepository Repository for all user interactions
    */
-  constructor(backendClient, userRepository) {
-    this.searchService = new SearchService(backendClient);
+  constructor(searchService, userRepository) {
+    this.searchService = searchService;
     this.userRepository = userRepository;
     this.logger = getLogger('SearchRepository');
   }

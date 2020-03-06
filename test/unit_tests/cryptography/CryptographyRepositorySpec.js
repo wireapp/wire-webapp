@@ -26,11 +26,12 @@ import {arrayToBase64, createRandomUuid} from 'Util/util';
 
 import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 import {ClientEvent} from 'src/script/event/Client';
+import {TestFactory} from '../../helper/TestFactory';
 
 describe('CryptographyRepository', () => {
-  const test_factory = new TestFactory();
+  const testFactory = new TestFactory();
 
-  beforeAll(() => test_factory.exposeCryptographyActors(false));
+  beforeAll(() => testFactory.exposeCryptographyActors(false));
 
   describe('encryptGenericMessage', () => {
     let jane_roe = undefined;
@@ -54,7 +55,7 @@ describe('CryptographyRepository', () => {
     });
 
     it('encrypts a generic message', () => {
-      spyOn(TestFactory.cryptography_repository.cryptographyService, 'getUsersPreKeys').and.callFake(
+      spyOn(testFactory.cryptography_repository.cryptographyService, 'getUsersPreKeys').and.callFake(
         recipients =>
           new Promise(resolve => {
             const prekey_map = {};
@@ -89,7 +90,7 @@ describe('CryptographyRepository', () => {
         [jane_roe.id]: [jane_roe.clients.phone_id],
       };
 
-      return TestFactory.cryptography_repository.encryptGenericMessage(recipients, generic_message).then(payload => {
+      return testFactory.cryptography_repository.encryptGenericMessage(recipients, generic_message).then(payload => {
         expect(payload.recipients).toBeTruthy();
         expect(Object.keys(payload.recipients).length).toBe(2);
         expect(Object.keys(payload.recipients[john_doe.id]).length).toBe(2);
@@ -101,8 +102,8 @@ describe('CryptographyRepository', () => {
 
   describe('getRemoteFingerprint', () => {
     it('generates the remote fingerprint based on a prekey', async () => {
-      const database = TestFactory.storage_service.db;
-      await TestFactory.cryptography_repository.createCryptobox(database);
+      const database = testFactory.storage_service.db;
+      await testFactory.cryptography_repository.createCryptobox(database);
       const userId = '6f656da7-0c52-44d1-959d-ddc9fbdca244';
       const clientId = '689ce2df236eb2be';
       const preKey = {
@@ -110,22 +111,55 @@ describe('CryptographyRepository', () => {
         key:
           'pQABAQMCoQBYIFycSfcOATSpOIkJz8ntEnFAZ+YWtzVaJ7RLeDAqGU+0A6EAoQBYIMEJnklbfFFvnFC41rmjDMqx6L0oVX5RMab3uGwBgbkaBPY=',
       };
-      const fingerprint = await TestFactory.cryptography_repository.getRemoteFingerprint(userId, clientId, preKey);
+      const fingerprint = await testFactory.cryptography_repository.getRemoteFingerprint(userId, clientId, preKey);
 
       // eslint-disable-next-line
-      expect(fingerprint).toEqual(['c1', '09', '9e', '49', '5b', '7c', '51', '6f', '9c', '50', 'b8', 'd6', 'b9', 'a3', '0c', 'ca', 'b1', 'e8', 'bd', '28', '55', '7e', '51', '31', 'a6', 'f7', 'b8', '6c', '01', '81', 'b9', '1a',]);
+      expect(fingerprint).toEqual([
+        'c1',
+        '09',
+        '9e',
+        '49',
+        '5b',
+        '7c',
+        '51',
+        '6f',
+        '9c',
+        '50',
+        'b8',
+        'd6',
+        'b9',
+        'a3',
+        '0c',
+        'ca',
+        'b1',
+        'e8',
+        'bd',
+        '28',
+        '55',
+        '7e',
+        '51',
+        '31',
+        'a6',
+        'f7',
+        'b8',
+        '6c',
+        '01',
+        '81',
+        'b9',
+        '1a',
+      ]);
     });
   });
 
   describe('handleEncryptedEvent', () => {
     afterEach(() => {
-      TestFactory.storage_repository.clearStores();
+      testFactory.storage_repository.clearStores();
     });
 
     it('detects duplicated messages', async () => {
-      const database = TestFactory.storage_service.db;
-      const preKeys = await TestFactory.cryptography_repository.createCryptobox(database);
-      const alice = TestFactory.cryptography_repository.cryptobox.identity;
+      const database = testFactory.storage_service.db;
+      const preKeys = await testFactory.cryptography_repository.createCryptobox(database);
+      const alice = testFactory.cryptography_repository.cryptobox.identity;
 
       expect(alice).toBeDefined();
 
@@ -159,12 +193,12 @@ describe('CryptographyRepository', () => {
         id: createRandomUuid(),
       };
 
-      const decrypted = await TestFactory.cryptography_repository.handleEncryptedEvent(mockedEvent);
+      const decrypted = await testFactory.cryptography_repository.handleEncryptedEvent(mockedEvent);
 
       expect(decrypted.data.content).toBe(plainText);
 
       try {
-        await TestFactory.cryptography_repository.handleEncryptedEvent(mockedEvent);
+        await testFactory.cryptography_repository.handleEncryptedEvent(mockedEvent);
       } catch (error) {
         expect(error.type).toBe(z.error.CryptographyError.TYPE.UNHANDLED_TYPE);
       }
@@ -181,7 +215,7 @@ describe('CryptographyRepository', () => {
       };
       /* eslint-enable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
 
-      return TestFactory.cryptography_repository.handleEncryptedEvent(event).then(mapped_event => {
+      return testFactory.cryptography_repository.handleEncryptedEvent(event).then(mapped_event => {
         expect(mapped_event.type).toBe(ClientEvent.CONVERSATION.UNABLE_TO_DECRYPT);
       });
     });
@@ -199,7 +233,7 @@ describe('CryptographyRepository', () => {
       };
       /* eslint-enable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
 
-      return TestFactory.cryptography_repository.handleEncryptedEvent(event).then(mapped_event => {
+      return testFactory.cryptography_repository.handleEncryptedEvent(event).then(mapped_event => {
         expect(mapped_event.type).toBe(ClientEvent.CONVERSATION.INCOMING_MESSAGE_TOO_BIG);
       });
     });
@@ -217,7 +251,7 @@ describe('CryptographyRepository', () => {
       };
       /* eslint-enable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
 
-      return TestFactory.cryptography_repository.handleEncryptedEvent(event).then(mapped_event => {
+      return testFactory.cryptography_repository.handleEncryptedEvent(event).then(mapped_event => {
         expect(mapped_event.type).toBe(ClientEvent.CONVERSATION.INCOMING_MESSAGE_TOO_BIG);
       });
     });
