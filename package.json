@@ -4,7 +4,7 @@
     "@wireapp/avs": "5.5.8",
     "@wireapp/commons": "3.3.4",
     "@wireapp/core": "15.4.4",
-    "@wireapp/protocol-messaging": "1.24.2",
+    "@wireapp/protocol-messaging": "1.25.2",
     "@wireapp/react-ui-kit": "7.26.8",
     "@wireapp/store-engine-dexie": "1.2.5",
     "@wireapp/store-engine-sqleet": "1.2.7",

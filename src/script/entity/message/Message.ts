@@ -33,6 +33,7 @@ import {User} from '../User';
 import {CallMessage} from './CallMessage';
 import {ContentMessage} from './ContentMessage';
 import {File as FileAsset} from './File';
+import {CompositeMessage} from './CompositeMessage';
 
 export class Message {
   private readonly ephemeral_expires: ko.Observable<boolean | number | string>;
@@ -199,6 +200,10 @@ export class Message {
    */
   is_content(): this is ContentMessage {
     return this.super_type === SuperType.CONTENT;
+  }
+
+  isComposite(): this is CompositeMessage {
+    return this.is_content() && this.hasOwnProperty('selectedButtonId');
   }
 
   /**

@@ -16,3 +16,17 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+
+import {AssetType} from '../../assets/AssetType';
+import {Asset} from './Asset';
+
+export class Button extends Asset {
+  public readonly text: string;
+
+  constructor(id?: string, text: string = '') {
+    super(id);
+    this.type = AssetType.BUTTON;
+
+    this.text = text;
+  }
+}

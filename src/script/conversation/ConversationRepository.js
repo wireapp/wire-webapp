@@ -20,6 +20,7 @@
 import poster from 'poster-image';
 import {
   Asset,
+  ButtonAction,
   Cleared,
   ClientAction,
   Confirmation,
@@ -541,12 +542,7 @@ export class ConversationRepository {
    * @param {boolean} ensureUser Make sure message entity has a valid user
    * @returns {Promise} Resolves with the message
    */
-  get_message_in_conversation_by_id(
-    conversationEntity,
-    messageId,
-    skipConversationMessages = false,
-    ensureUser = false,
-  ) {
+  getMessageInConversationById(conversationEntity, messageId, skipConversationMessages = false, ensureUser = false) {
     const messageEntity = !skipConversationMessages && conversationEntity.getMessage(messageId);
     const messagePromise = messageEntity
       ? Promise.resolve(messageEntity)
@@ -1070,7 +1066,7 @@ export class ConversationRepository {
 
     return this.get_conversation_by_id(conversation_id)
       .then(conversationEntity => {
-        return this.get_message_in_conversation_by_id(conversationEntity, message_id).then(
+        return this.getMessageInConversationById(conversationEntity, message_id).then(
           message_et => conversationEntity.last_read_timestamp() >= message_et.timestamp(),
         );
       })
@@ -1823,6 +1819,24 @@ export class ConversationRepository {
     this._sendConfirmationStatus(conversationEntity, messageEntity, Confirmation.Type.READ, moreMessageEntities);
   }
 
+  sendButtonAction(conversationEntity, messageEntity, buttonId) {
+    const protoButtonAction = new ButtonAction({
+      buttonId,
+      referenceMessageId: messageEntity.id,
+    });
+    const genericMessage = new GenericMessage({
+      [GENERIC_MESSAGE_TYPE.BUTTON_ACTION]: protoButtonAction,
+      messageId: createRandomUuid(),
+    });
+    this.messageSender.queueMessage(() => {
+      return this.create_recipients(conversationEntity.id, true, [messageEntity.from]).then(recipients => {
+        const options = {nativePush: false, precondition: [messageEntity.from], recipients};
+        const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id, options);
+        return this._sendGenericMessage(eventInfoEntity);
+      });
+    });
+  }
+
   //##############################################################################
   // Send encrypted events
   //##############################################################################
@@ -1830,7 +1844,7 @@ export class ConversationRepository {
   send_asset_remotedata(conversationEntity, file, messageId, asImage) {
     let genericMessage;
 
-    return this.get_message_in_conversation_by_id(conversationEntity, messageId)
+    return this.getMessageInConversationById(conversationEntity, messageId)
       .then(() => {
         const retention = this.asset_service.getAssetRetention(this.selfUser(), conversationEntity);
         const options = {
@@ -1955,7 +1969,7 @@ export class ConversationRepository {
           retention,
         };
 
-        const messageEntityPromise = this.get_message_in_conversation_by_id(conversationEntity, messageId);
+        const messageEntityPromise = this.getMessageInConversationById(conversationEntity, messageId);
         return messageEntityPromise.then(messageEntity => {
           return this.assetUploader.uploadAsset(messageEntity.id, imageBlob, options).then(uploadedImageAsset => {
             const assetPreview = new Asset.Preview(imageBlob.type, imageBlob.size, uploadedImageAsset.uploaded);
@@ -2130,7 +2144,7 @@ export class ConversationRepository {
           );
           genericMessage[GENERIC_MESSAGE_TYPE.TEXT] = protoText;
 
-          return this.get_message_in_conversation_by_id(conversationEntity, messageId);
+          return this.getMessageInConversationById(conversationEntity, messageId);
         }
 
         this.logger.debug(`No link preview for message '${messageId}' in conversation '${conversationId}' created`);
@@ -2512,7 +2526,7 @@ export class ConversationRepository {
    */
   async _updateMessageAsSent(conversationEntity, eventJson, isoDate) {
     try {
-      const messageEntity = await this.get_message_in_conversation_by_id(conversationEntity, eventJson.id);
+      const messageEntity = await this.getMessageInConversationById(conversationEntity, eventJson.id);
       messageEntity.status(StatusType.SENT);
       const changes = {status: StatusType.SENT};
       if (isoDate) {
@@ -2980,7 +2994,7 @@ export class ConversationRepository {
         throw error;
       }
       this.logger.error(`Failed to upload asset for conversation '${conversationEntity.id}': ${error.message}`, error);
-      const messageEntity = await this.get_message_in_conversation_by_id(conversationEntity, messageId);
+      const messageEntity = await this.getMessageInConversationById(conversationEntity, messageId);
       this.send_asset_upload_failed(conversationEntity, messageEntity.id);
       return this.update_message_as_upload_failed(messageEntity);
     }
@@ -3296,6 +3310,9 @@ export class ConversationRepository {
       case BackendEvent.CONVERSATION.RECEIPT_MODE_UPDATE:
         return this._onReceiptModeChanged(conversationEntity, eventJson);
 
+      case ClientEvent.CONVERSATION.BUTTON_ACTION_CONFIRMATION:
+        return this._onButtonActionConfirmation(conversationEntity, eventJson);
+
       case ClientEvent.CONVERSATION.MESSAGE_ADD:
         const isMessageEdit = !!eventJson.edited_time;
         if (isMessageEdit) {
@@ -3305,6 +3322,7 @@ export class ConversationRepository {
         return this._addEventToConversation(conversationEntity, eventJson);
 
       case BackendEvent.CONVERSATION.MESSAGE_TIMER_UPDATE:
+      case ClientEvent.CONVERSATION.COMPOSITE_MESSAGE_ADD:
       case ClientEvent.CONVERSATION.DELETE_EVERYWHERE:
       case ClientEvent.CONVERSATION.INCOMING_MESSAGE_TOO_BIG:
       case ClientEvent.CONVERSATION.KNOCK:
@@ -3462,7 +3480,7 @@ export class ConversationRepository {
    * @returns {Promise} Resolves when the event was handled
    */
   _on_asset_upload_complete(conversationEntity, event_json) {
-    return this.get_message_in_conversation_by_id(conversationEntity, event_json.id)
+    return this.getMessageInConversationById(conversationEntity, event_json.id)
       .then(message_et => this.update_message_as_upload_complete(conversationEntity, message_et, event_json))
       .catch(error => {
         if (error.type !== z.error.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
@@ -3722,7 +3740,7 @@ export class ConversationRepository {
   _onMessageDeleted(conversationEntity, eventJson) {
     const {data: eventData, from, id: eventId, time} = eventJson;
 
-    return this.get_message_in_conversation_by_id(conversationEntity, eventData.message_id)
+    return this.getMessageInConversationById(conversationEntity, eventData.message_id)
       .then(deletedMessageEntity => {
         if (deletedMessageEntity.ephemeral_expires()) {
           return;
@@ -3801,7 +3819,7 @@ export class ConversationRepository {
     const eventData = eventJson.data;
     const messageId = eventData.message_id;
 
-    return this.get_message_in_conversation_by_id(conversationEntity, messageId)
+    return this.getMessageInConversationById(conversationEntity, messageId)
       .then(messageEntity => {
         if (!messageEntity || !messageEntity.is_content()) {
           const type = messageEntity ? messageEntity.type : 'unknown';
@@ -3828,6 +3846,32 @@ export class ConversationRepository {
           throw error;
         }
       });
+  }
+
+  async _onButtonActionConfirmation(conversationEntity, eventJson) {
+    const {messageId, buttonId} = eventJson.data;
+    try {
+      const messageEntity = await this.getMessageInConversationById(conversationEntity, messageId);
+      if (!messageEntity || !messageEntity.isComposite()) {
+        const type = messageEntity ? messageEntity.type : 'unknown';
+
+        const log = `Cannot react to '${type}' message '${messageId}' in conversation '${conversationEntity.id}'`;
+        this.logger.error(log, messageEntity);
+        throw new z.error.ConversationError(z.error.ConversationError.TYPE.WRONG_TYPE);
+      }
+      const changes = messageEntity.getSelectionChange(buttonId);
+      if (changes) {
+        this.eventService.updateEventSequentially(messageEntity.primary_key, changes);
+      }
+      return;
+    } catch (error) {
+      const isNotFound = error.type === z.error.ConversationError.TYPE.MESSAGE_NOT_FOUND;
+      if (!isNotFound) {
+        const log = `Failed to handle reaction to message '${messageId}' in conversation '${conversationEntity.id}'`;
+        this.logger.error(log, {error, event: eventJson});
+        throw error;
+      }
+    }
   }
 
   /**

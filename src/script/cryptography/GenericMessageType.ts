@@ -20,9 +20,13 @@
 export enum GENERIC_MESSAGE_TYPE {
   ASSET = 'asset',
   AVAILABILITY = 'availability',
+  BUTTON_ACTION = 'buttonAction',
+  BUTTON_ACTION_CONFIRMATION = 'buttonActionConfirmation',
   CALLING = 'calling',
   CLEARED = 'cleared',
   CLIENT_ACTION = 'clientAction',
+  COMPOSITE_MESSAGE = 'compositeMessage',
+  COMPOSITE = 'composite',
   CONFIRMATION = 'confirmation',
   DELETED = 'deleted',
   EDITED = 'edited',

@@ -38,6 +38,7 @@ import {MissedMessage} from '../entity/message/MissedMessage';
 import {PingMessage} from '../entity/message/PingMessage';
 import {Text} from '../entity/message/Text';
 import {File} from '../entity/message/File';
+import {Button} from '../entity/message/Button';
 import {ReceiptModeUpdateMessage} from '../entity/message/ReceiptModeUpdateMessage';
 import {LinkPreview as LinkPreviewEntity} from '../entity/message/LinkPreview';
 
@@ -53,6 +54,7 @@ import {CALL_MESSAGE_TYPE} from '../message/CallMessageType';
 import {QuoteEntity} from '../message/QuoteEntity';
 import {MentionEntity} from '../message/MentionEntity';
 import {LegalHoldMessage} from '../entity/message/LegalHoldMessage';
+import {CompositeMessage} from '../entity/message/CompositeMessage';
 
 // Event Mapper to convert all server side JSON events into core entities.
 export class EventMapper {
@@ -214,6 +216,11 @@ export class EventMapper {
         break;
       }
 
+      case ClientEvent.CONVERSATION.COMPOSITE_MESSAGE_ADD: {
+        messageEntity = await this._mapEventCompositeMessageAdd(event);
+        break;
+      }
+
       case ClientEvent.CONVERSATION.DELETE_EVERYWHERE: {
         messageEntity = this._mapEventDeleteEverywhere(event);
         break;
@@ -307,6 +314,10 @@ export class EventMapper {
       messageEntity.status(event.status || StatusType.SENT);
     }
 
+    if (messageEntity.isComposite()) {
+      messageEntity.selectedButtonId(event.selected_button_id);
+      messageEntity.waitingButtonId(event.waiting_button_id);
+    }
     if (messageEntity.isReactable()) {
       messageEntity.reactions(event.reactions || {});
     }
@@ -491,6 +502,23 @@ export class EventMapper {
       messageEntity.quote(new QuoteEntity({error, messageId, userId}));
     }
 
+    return messageEntity;
+  }
+
+  async _mapEventCompositeMessageAdd(event) {
+    const {data: eventData} = event;
+    const messageEntity = new CompositeMessage();
+    const assets = await Promise.all(
+      eventData.items.map(async item => {
+        if (item.button) {
+          return new Button(item.button.id, item.button.text);
+        }
+        if (item.text) {
+          return this._mapAssetText(item.text);
+        }
+      }),
+    );
+    messageEntity.assets.push(...assets);
     return messageEntity;
   }
 

@@ -23,6 +23,7 @@ import {ClientEvent} from './Client';
 export const EventTypeHandling = {
   CONFIRM: [
     ClientEvent.CONVERSATION.ASSET_ADD,
+    ClientEvent.CONVERSATION.COMPOSITE_MESSAGE_ADD,
     ClientEvent.CONVERSATION.KNOCK,
     ClientEvent.CONVERSATION.LOCATION,
     ClientEvent.CONVERSATION.MESSAGE_ADD,
@@ -35,6 +36,7 @@ export const EventTypeHandling = {
     BackendEvent.CONVERSATION.RECEIPT_MODE_UPDATE,
     BackendEvent.CONVERSATION.RENAME,
     ClientEvent.CONVERSATION.ASSET_ADD,
+    ClientEvent.CONVERSATION.COMPOSITE_MESSAGE_ADD,
     ClientEvent.CONVERSATION.DELETE_EVERYWHERE,
     ClientEvent.CONVERSATION.GROUP_CREATION,
     ClientEvent.CONVERSATION.INCOMING_MESSAGE_TOO_BIG,

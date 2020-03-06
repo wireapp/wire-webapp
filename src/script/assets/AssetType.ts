@@ -18,6 +18,7 @@
  */
 
 export enum AssetType {
+  BUTTON = 'Button',
   FILE = 'File',
   IMAGE = 'Image',
   LOCATION = 'Location',

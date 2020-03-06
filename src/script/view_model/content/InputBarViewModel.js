@@ -367,7 +367,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     const replyMessageId = storageValue.reply ? storageValue.reply.messageId : undefined;
 
     if (replyMessageId) {
-      storageValue.replyEntityPromise = this.conversationRepository.get_message_in_conversation_by_id(
+      storageValue.replyEntityPromise = this.conversationRepository.getMessageInConversationById(
         conversationEntity,
         replyMessageId,
         false,
@@ -472,7 +472,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
       if (messageEntity.quote()) {
         this.conversationRepository
-          .get_message_in_conversation_by_id(this.conversationEntity(), messageEntity.quote().messageId)
+          .getMessageInConversationById(this.conversationEntity(), messageEntity.quote().messageId)
           .then(quotedMessage => this.replyMessageEntity(quotedMessage));
       }
 
