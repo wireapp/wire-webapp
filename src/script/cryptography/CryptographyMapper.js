@@ -149,8 +149,8 @@ export class CryptographyMapper {
       }
 
       case GENERIC_MESSAGE_TYPE.COMPOSITE_MESSAGE: {
-        const mappedComposite = await this._mapComposite(genericMessage.compositeMessage);
-        specificContent = addMetadata(mappedComposite, genericMessage.compositeMessage);
+        const mappedComposite = await this._mapComposite(genericMessage.composite);
+        specificContent = addMetadata(mappedComposite, genericMessage.composite);
         break;
       }
 
@@ -178,9 +178,9 @@ export class CryptographyMapper {
     return {...genericContent, ...specificContent};
   }
 
-  async _mapComposite(compositeMessage) {
+  async _mapComposite(composite) {
     const items = await Promise.all(
-      compositeMessage.items.map(async item => {
+      composite.items.map(async item => {
         if (item.content !== GENERIC_MESSAGE_TYPE.TEXT) {
           return item;
         }
