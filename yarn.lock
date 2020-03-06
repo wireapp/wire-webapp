@@ -1808,7 +1808,7 @@
     "@wireapp/priority-queue" "1.5.4"
     axios "0.19.2"
     logdown "3.3.0"
-    reconnecting-websocket "github:wireapp/reconnecting-websocket#96ac796ae8c7a7d9d857f46ed39dbedd7b9ad378"
+    reconnecting-websocket wireapp/reconnecting-websocket#96ac796ae8c7a7d9d857f46ed39dbedd7b9ad378
     spark-md5 "3.0.0"
     tough-cookie "3.0.1"
     ws "7.2.1"
@@ -1923,10 +1923,10 @@
   dependencies:
     protobufjs "6.8.8"
 
-"@wireapp/protocol-messaging@1.25.2":
-  version "1.25.2"
-  resolved "https://registry.yarnpkg.com/@wireapp/protocol-messaging/-/protocol-messaging-1.25.2.tgz#e5dca6c1ce10ac9ad7d87e13e0f02e9edf1e1654"
-  integrity sha512-Dhu+javMr+CIxPOKQUn/KCGIYpx+3bd8lMLDD0H9YjjZgyCgsC544UjlaWlQETfi+SmXmoXsh9zvkow37szLIg==
+"@wireapp/protocol-messaging@1.25.4":
+  version "1.25.4"
+  resolved "https://registry.yarnpkg.com/@wireapp/protocol-messaging/-/protocol-messaging-1.25.4.tgz#49a22683c19c628997f28e24f5eca909aab4e4b9"
+  integrity sha512-Z53Cw+u2rJhE/tlEAo1onYcD4FyuDEMjW2PQV9GTuGNA9iEv+rKnmha6YDI+m5NQxrlPc7Dsebqf+u04X7fB7g==
   dependencies:
     protobufjs "6.8.8"
 
@@ -10785,7 +10785,6 @@ rechoir@^0.6.2:
 
 "reconnecting-websocket@github:wireapp/reconnecting-websocket#96ac796ae8c7a7d9d857f46ed39dbedd7b9ad378":
   version "4.2.0"
-  uid "96ac796ae8c7a7d9d857f46ed39dbedd7b9ad378"
   resolved "https://codeload.github.com/wireapp/reconnecting-websocket/tar.gz/96ac796ae8c7a7d9d857f46ed39dbedd7b9ad378"
 
 redent@^1.0.0:

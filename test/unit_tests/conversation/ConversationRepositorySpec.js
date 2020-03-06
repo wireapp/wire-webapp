@@ -1356,9 +1356,7 @@ describe('ConversationRepository', () => {
         .map(val => val.toString())
         .concat(['1000', '1000', '31536000000', '31536000000']);
 
-      spyOn(conversationRepository, 'get_message_in_conversation_by_id').and.returnValue(
-        Promise.resolve(new Message()),
-      );
+      spyOn(conversationRepository, 'getMessageInConversationById').and.returnValue(Promise.resolve(new Message()));
       spyOn(conversationRepository.conversation_service, 'post_encrypted_message').and.returnValue(Promise.resolve({}));
       spyOn(conversationRepository.conversationMapper, 'mapConversations').and.returnValue(conversationPromise);
       spyOn(conversationRepository.cryptography_repository, 'encryptGenericMessage').and.callFake(
