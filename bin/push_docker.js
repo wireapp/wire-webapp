@@ -24,6 +24,8 @@ const appConfigPkg = require('../app-config/package.json');
 const pkg = require('../package.json');
 const {execSync} = require('child_process');
 
+require('dotenv').config();
+
 let currentBranch = '';
 
 try {
