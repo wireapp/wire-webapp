@@ -289,7 +289,9 @@ export class MessageBuilder {
 
   public createPing(
     conversationId: string,
-    ping: KnockContent = {},
+    ping: KnockContent = {
+      hotKnock: false,
+    },
     messageId = MessageBuilder.createId(),
   ): PingMessage {
     return {

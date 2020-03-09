@@ -25,6 +25,7 @@ import {
   ClientActionContent,
   ClientAddContent,
   ClientRemoveContent,
+  CompositeContent,
   ConfirmationContent,
   ConnectionContent,
   DeletedContent,
@@ -49,6 +50,7 @@ export type ConversationContent =
   | ClientActionType
   | ClientAddContent
   | ClientRemoveContent
+  | CompositeContent
   | ConfirmationContent
   | ConnectionContent
   | DeletedContent

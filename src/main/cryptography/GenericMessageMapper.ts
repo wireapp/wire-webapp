@@ -45,6 +45,7 @@ export class GenericMessageMapper {
     logger: console,
     markdown: false,
   });
+
   public static mapGenericMessage(
     genericMessage: any,
     event: ConversationOtrMessageAddEvent,
@@ -226,7 +227,7 @@ export class GenericMessageMapper {
       }
       case GenericMessageType.KNOCK: {
         const {expectsReadConfirmation, legalHoldStatus} = genericMessage[GenericMessageType.KNOCK];
-        const content: KnockContent = {expectsReadConfirmation, legalHoldStatus};
+        const content: KnockContent = {expectsReadConfirmation, hotKnock: false, legalHoldStatus};
 
         return {
           content,

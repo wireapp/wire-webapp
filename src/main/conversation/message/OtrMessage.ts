@@ -22,6 +22,7 @@ import {
   CallingContent,
   ClearedContent,
   ClientActionContent,
+  CompositeContent,
   ConfirmationContent,
   DeletedContent,
   EditedTextContent,
@@ -45,6 +46,11 @@ export interface TextMessage extends BasePayloadBundle {
 export interface CallMessage extends BasePayloadBundle {
   content: CallingContent;
   type: PayloadBundleType.CALL;
+}
+
+export interface CompositeMessage extends BasePayloadBundle {
+  content: CompositeContent;
+  type: PayloadBundleType.COMPOSITE;
 }
 
 export interface EditedTextMessage extends BasePayloadBundle {
@@ -121,6 +127,7 @@ export interface DeleteMessage extends BasePayloadBundle {
 export type OtrMessage =
   | CallMessage
   | ClearConversationMessage
+  | CompositeMessage
   | ConfirmationMessage
   | DeleteMessage
   | EditedTextMessage
