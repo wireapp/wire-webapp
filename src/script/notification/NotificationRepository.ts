@@ -28,6 +28,7 @@ import {getUserName} from 'Util/SanitizationUtil';
 import {truncate} from 'Util/StringUtil';
 import {TIME_IN_MILLIS, formatDuration} from 'Util/TimeUtil';
 import {ValidationUtilError} from 'Util/ValidationUtil';
+import {getRenderedTextContent} from 'Util/messageRenderer';
 
 import {AudioType} from '../audio/AudioType';
 import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
@@ -300,7 +301,7 @@ export class NotificationRepository {
           } else if (messageEntity.isUserQuoted(this.selfUser().id)) {
             notificationText = t('notificationReply', assetEntity.text, {}, true);
           } else {
-            notificationText = assetEntity.text;
+            notificationText = getRenderedTextContent(assetEntity.text);
           }
 
           return truncate(notificationText, NotificationRepository.CONFIG.BODY_LENGTH);

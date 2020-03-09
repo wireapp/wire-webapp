@@ -205,6 +205,12 @@ export const renderMessage = (message: string, selfId: string, mentionEntities: 
 
     return text.replace(mentionHash, mentionMarkup);
   }, mentionlessText);
-
   return parsedText;
+};
+
+export const getRenderedTextContent = (text: string): string => {
+  const renderedMessage = renderMessage(text, '');
+  const messageWithLinebreaks = renderedMessage.replace(/<br>/g, '\n');
+  const strippedMessage = messageWithLinebreaks.replace(/<.+?>/g, '');
+  return strippedMessage;
 };
