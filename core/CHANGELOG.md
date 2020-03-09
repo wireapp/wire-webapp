@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [15.5.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@15.4.7...@wireapp/core@15.5.0) (2020-03-09)
+
+
+### Features
+
+* **core:** Add generic support for composite messages ([#2850](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/2850)) ([1430e1e](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/1430e1eb1c5d3fd7c142b2074b4045f19f3b716f))
+
+
+
+
+
 ## [15.4.7](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@15.4.6...@wireapp/core@15.4.7) (2020-02-28)
 
 **Note:** Version bump only for package @wireapp/core
