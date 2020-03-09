@@ -8,7 +8,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-      - name: Publish
-        run: |
-          npm install -g @wireapp/changelog-bot@2.2.1
-          wire-changelog-bot -e ${{secrets.WIRE_WEBAPP_BOT_EMAIL}} -p ${{secrets.WIRE_WEBAPP_BOT_PASSWORD}} -c ${{secrets.WIRE_WEBAPP_BOT_CONVERSATION}} -m "Hello, world."
+      - name: Wire GitHub action bot
+        uses: wireapp/wire-github-action-bot@master
+        with:
+          email: ${{secrets.WIRE_BOT_EMAIL}}
+          password: ${{secrets.WIRE_BOT_PASSWORD}}
+          conversation: '6936f0a3-be49-4f81-b4a7-d734661beff2'
+          text: 'Hello, from WebApp!'
