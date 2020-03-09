@@ -795,7 +795,10 @@ export class NotificationRepository {
     const activeConversation = document.hasFocus() && inConversationView && inActiveConversation && !inMaximizedCall;
     const messageFromSelf = messageEntity.user().is_me;
     const permissionDenied = this.permissionState() === PermissionStatusState.DENIED;
-    const preferenceIsNone = this.notificationsPreference() === NotificationPreference.NONE;
+
+    // The in-app notification settings should be ignored for alerts (which are composite messages for now)
+    const preferenceIsNone =
+      this.notificationsPreference() === NotificationPreference.NONE && !messageEntity.isComposite();
     const supportsNotification = Environment.browser.supports.notifications;
 
     const hideNotification =
