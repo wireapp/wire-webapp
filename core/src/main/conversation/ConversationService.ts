@@ -18,8 +18,8 @@
  */
 
 import {
-  CONVERSATION_TYPE,
   Conversation,
+  CONVERSATION_TYPE,
   MutedStatus,
   NewConversation,
   NewOTRMessage,
@@ -48,6 +48,7 @@ import {
   Calling,
   Cleared,
   ClientAction,
+  Composite,
   Confirmation,
   Ephemeral,
   GenericMessage,
@@ -82,6 +83,7 @@ import {MessageBuilder} from './message/MessageBuilder';
 import {
   CallMessage,
   ClearConversationMessage,
+  CompositeMessage,
   ConfirmationMessage,
   DeleteMessage,
   EditedTextMessage,
@@ -268,17 +270,31 @@ export class ConversationService {
     throw error;
   }
 
-  private async sendConfirmation(payloadBundle: ConfirmationMessage, userIds?: string[]): Promise<ConfirmationMessage> {
-    const {firstMessageId, moreMessageIds, type} = payloadBundle.content;
-
-    const confirmationMessage = Confirmation.create({
-      firstMessageId,
-      moreMessageIds,
-      type,
+  private async sendComposite(payloadBundle: CompositeMessage, userIds?: string[]): Promise<CompositeMessage> {
+    const genericMessage = GenericMessage.create({
+      [GenericMessageType.COMPOSITE]: Composite.create(payloadBundle.content),
+      messageId: payloadBundle.id,
     });
 
+    await this.sendGenericMessage(
+      this.apiClient.validatedClientId,
+      payloadBundle.conversation,
+      genericMessage,
+      userIds,
+    );
+
+    return {
+      ...payloadBundle,
+      messageTimer: 0,
+      state: PayloadBundleState.OUTGOING_SENT,
+    };
+  }
+
+  private async sendConfirmation(payloadBundle: ConfirmationMessage, userIds?: string[]): Promise<ConfirmationMessage> {
+    const content = Confirmation.create(payloadBundle.content);
+
     const genericMessage = GenericMessage.create({
-      [GenericMessageType.CONFIRMATION]: confirmationMessage,
+      [GenericMessageType.CONFIRMATION]: content,
       messageId: payloadBundle.id,
     });
 
@@ -584,17 +600,11 @@ export class ConversationService {
     };
   }
 
-  private async sendPing(payloadBundle: PingMessage, userIds?: string[]): Promise<PingMessage> {
-    const {expectsReadConfirmation, hotKnock = false, legalHoldStatus} = payloadBundle.content;
-
-    const knockMessage = Knock.create({
-      expectsReadConfirmation,
-      hotKnock,
-      legalHoldStatus,
-    });
+  private async sendKnock(payloadBundle: PingMessage, userIds?: string[]): Promise<PingMessage> {
+    const content = Knock.create(payloadBundle.content);
 
     let genericMessage = GenericMessage.create({
-      [GenericMessageType.KNOCK]: knockMessage,
+      [GenericMessageType.KNOCK]: content,
       messageId: payloadBundle.id,
     });
 
@@ -1004,6 +1014,8 @@ export class ConversationService {
           `No send method implemented for "${payloadBundle.type}" and ClientAction "${payloadBundle.content}".`,
         );
       }
+      case PayloadBundleType.COMPOSITE:
+        return this.sendComposite(payloadBundle, userIds);
       case PayloadBundleType.CONFIRMATION:
         return this.sendConfirmation(payloadBundle, userIds);
       case PayloadBundleType.LOCATION:
@@ -1011,7 +1023,7 @@ export class ConversationService {
       case PayloadBundleType.MESSAGE_EDIT:
         return this.sendEditedText(payloadBundle, userIds);
       case PayloadBundleType.PING:
-        return this.sendPing(payloadBundle, userIds);
+        return this.sendKnock(payloadBundle, userIds);
       case PayloadBundleType.REACTION:
         return this.sendReaction(payloadBundle, userIds);
       case PayloadBundleType.TEXT:

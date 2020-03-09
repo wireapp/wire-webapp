@@ -17,10 +17,5 @@
  *
  */
 
-import {LegalHoldStatus} from './';
-
-export interface KnockContent {
-  hotKnock?: boolean;
-  expectsReadConfirmation?: boolean;
-  legalHoldStatus?: LegalHoldStatus;
-}
+import {IKnock} from '@wireapp/protocol-messaging';
+export {IKnock as KnockContent};
