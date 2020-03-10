@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "@types/node": "~12",
-    "logdown": "3.3.0",
+    "logdown": "3.3.1",
     "pure-uuid": "1.6.0"
   },
   "devDependencies": {

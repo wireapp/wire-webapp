@@ -6,7 +6,7 @@
     "@wireapp/proteus": "9.6.7",
     "@wireapp/store-engine": "4.3.9",
     "bazinga64": "5.6.8",
-    "logdown": "3.3.0"
+    "logdown": "3.3.1"
   },
   "description": "High-level API with persistent storage for Proteus.",
   "devDependencies": {
