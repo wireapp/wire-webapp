@@ -18,7 +18,7 @@
  */
 
 import {APIClient} from '@wireapp/api-client';
-import {ClientAction, Confirmation} from '@wireapp/protocol-messaging';
+import {Button, ClientAction, Composite, Confirmation, Text} from '@wireapp/protocol-messaging';
 import {AbortReason, PayloadBundleSource, PayloadBundleState, PayloadBundleType} from '..';
 import {AssetService} from '../AssetService';
 import {
@@ -40,9 +40,11 @@ import {
   LocationContent,
   ReactionContent,
   TextContent,
+  CompositeContent,
 } from '../content';
 import {
   CallMessage,
+  CompositeMessage,
   ConfirmationMessage,
   EditedTextMessage,
   FileAssetAbortMessage,
@@ -56,6 +58,7 @@ import {
   TextMessage,
 } from './OtrMessage';
 import {TextContentBuilder} from './TextContentBuilder';
+import Item = Composite.Item;
 
 const UUID = require('pure-uuid');
 
@@ -284,6 +287,30 @@ export class MessageBuilder {
       state: PayloadBundleState.OUTGOING_UNSENT,
       timestamp: Date.now(),
       type: PayloadBundleType.CONFIRMATION,
+    };
+  }
+
+  createPollMessage(
+    conversationId: string,
+    text: string,
+    buttons: string[],
+    messageId = MessageBuilder.createId(),
+  ): CompositeMessage {
+    const buttonProtos = buttons.map(buttonText => Button.create({id: MessageBuilder.createId(), text: buttonText}));
+
+    const content: CompositeContent = {
+      items: [Item.create({text: Text.create({content: text})}), ...buttonProtos.map(button => Item.create({button}))],
+    };
+
+    return {
+      content,
+      conversation: conversationId,
+      from: this.getSelfUserId(),
+      id: messageId,
+      source: PayloadBundleSource.LOCAL,
+      state: PayloadBundleState.OUTGOING_UNSENT,
+      timestamp: Date.now(),
+      type: PayloadBundleType.COMPOSITE,
     };
   }
 
