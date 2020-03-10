@@ -161,6 +161,10 @@ export class EventMapper {
       originalEntity.version = event.version;
     }
 
+    if (event.selected_button_id) {
+      originalEntity.version = event.version;
+    }
+
     originalEntity.id = id;
 
     if (originalEntity.is_content() || originalEntity.is_ping()) {
