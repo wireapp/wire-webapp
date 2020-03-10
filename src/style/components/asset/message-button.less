@@ -22,11 +22,11 @@ message-button {
     position: relative;
     overflow: hidden;
     width: 100%;
-    max-width: 300px;
+    max-width: 287px;
     padding: 16px;
     border: 1px solid @w-red;
     margin-top: 8px;
-    border-radius: 4px;
+    border-radius: 6px;
     color: @w-red;
     font-size: @font-size-xs;
     font-weight: @font-weight-bold;
@@ -48,10 +48,24 @@ message-button {
       align-items: center;
       justify-content: center;
       background-color: rgba(255, 255, 255, 0.9);
+      opacity: 0;
+      transform: translateX(100%);
+      transition: all 0.2s ease-in-out;
 
       loading-icon {
         fill: @w-red;
       }
+
+      &--visible {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+  }
+
+  & + & {
+    .message-button {
+      margin-top: 4px;
     }
   }
 }

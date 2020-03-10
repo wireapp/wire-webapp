@@ -35,11 +35,9 @@ ko.components.register('message-button', {
     <div>
       <button class="message-button" data-bind="css: {'message-button--selected': isSelected}, click: onClick, attr: {'data-uie-name': label, 'data-uie-selected': isSelected, 'data-uie-waiting': isWaiting}">
         <span data-bind="text: label"></span>
-        <!-- ko if: isWaiting -->
-          <div class="message-button__waiting-overlay">
-            <loading-icon></loading-icon>
-          </div>
-        <!-- /ko -->
+        <div class="message-button__waiting-overlay" data-bind="css: {'message-button__waiting-overlay--visible': isWaiting}">
+          <loading-icon></loading-icon>
+        </div>
       </button>
       <!--ko if: errorMessage -->
         <div class="message-button__error" data-bind="text: errorMessage"></div>
