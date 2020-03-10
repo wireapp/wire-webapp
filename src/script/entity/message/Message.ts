@@ -302,7 +302,7 @@ export class Message {
    */
 
   isCopyable(): boolean {
-    return this.has_asset_text() && (!this.is_ephemeral() || this.user().is_me);
+    return this.has_asset_text() && !this.isComposite() && (!this.is_ephemeral() || this.user().is_me);
   }
 
   /**
@@ -352,7 +352,11 @@ export class Message {
    */
   isReactable(): boolean {
     return (
-      this.is_content() && !this.is_ephemeral() && this.status() !== StatusType.SENDING && !this.hasUnavailableAsset()
+      this.is_content() &&
+      !this.isComposite() &&
+      !this.is_ephemeral() &&
+      this.status() !== StatusType.SENDING &&
+      !this.hasUnavailableAsset()
     );
   }
 
