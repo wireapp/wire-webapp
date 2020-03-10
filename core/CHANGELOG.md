@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [15.6.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@15.5.0...@wireapp/core@15.6.0) (2020-03-10)
+
+
+### Features
+
+* **core:** Expose sending poll messages ([#2866](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/2866)) ([a433471](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/a4334718d9596fbf9ebf0ea43ca6834df50784af))
+
+
+
+
+
 # [15.5.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@15.4.7...@wireapp/core@15.5.0) (2020-03-09)
 
 
