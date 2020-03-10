@@ -362,7 +362,11 @@ export class Message {
    */
   isReplyable(): boolean {
     return (
-      this.is_content() && !this.is_ephemeral() && this.status() !== StatusType.SENDING && !this.hasUnavailableAsset()
+      this.is_content() &&
+      !this.isComposite() &&
+      !this.is_ephemeral() &&
+      this.status() !== StatusType.SENDING &&
+      !this.hasUnavailableAsset()
     );
   }
 
