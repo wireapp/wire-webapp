@@ -1081,7 +1081,7 @@ export class ConversationService {
     userId: string,
     conversationRole: DefaultConversationRoleName | string,
   ): Promise<void> {
-    return this.apiClient.conversation.api.putOtherMember(conversationId, userId, {
+    return this.apiClient.conversation.api.putOtherMember(userId, conversationId, {
       conversation_role: conversationRole,
     });
   }
