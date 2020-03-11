@@ -19,6 +19,7 @@
 
 import {
   AssetContent,
+  ButtonActionContent,
   CallingContent,
   ClearedContent,
   ClientActionContent,
@@ -41,6 +42,11 @@ import {BasePayloadBundle, PayloadBundleType} from './PayloadBundle';
 export interface TextMessage extends BasePayloadBundle {
   content: TextContent;
   type: PayloadBundleType.TEXT;
+}
+
+export interface ButtonActionMessage extends BasePayloadBundle {
+  content: ButtonActionContent;
+  type: PayloadBundleType.BUTTON_ACTION;
 }
 
 export interface CallMessage extends BasePayloadBundle {
@@ -125,6 +131,7 @@ export interface DeleteMessage extends BasePayloadBundle {
 }
 
 export type OtrMessage =
+  | ButtonActionMessage
   | CallMessage
   | ClearConversationMessage
   | CompositeMessage

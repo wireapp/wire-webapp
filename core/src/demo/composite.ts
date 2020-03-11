@@ -2,6 +2,7 @@ import {APIClient} from '@wireapp/api-client';
 import {LoginData} from '@wireapp/api-client/dist/auth';
 import {ClientType} from '@wireapp/api-client/dist/client';
 import {Account} from '../main/Account';
+import {PayloadBundleType} from '../main/conversation';
 
 require('dotenv').config();
 
@@ -20,11 +21,20 @@ const login: LoginData = {
 };
 
 (async () => {
+  // Setup core
   const backend = process.env.WIRE_BACKEND === 'staging' ? APIClient.BACKEND.STAGING : APIClient.BACKEND.PRODUCTION;
   const apiClient = new APIClient({urls: backend});
   const account = new Account(apiClient);
+
+  // Login account
   const {clientId, userId} = await account.login(login);
   console.info(`Hello user "${userId}" with client "${clientId}" ...`);
+
+  // Connect to WebSocket
+  await account.listen();
+  account.on(PayloadBundleType.BUTTON_ACTION, data => console.info('Received button action', data));
+
+  // Send poll message
   if (account.service) {
     const message = account.service.conversation.messageBuilder.createPollMessage(conversationId, 'Are you a robot?', [
       'Yes',
