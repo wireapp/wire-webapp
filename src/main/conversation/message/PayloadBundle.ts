@@ -55,6 +55,7 @@ export enum PayloadBundleType {
   ASSET_ABORT = 'PayloadBundleType.ASSET_ABORT',
   ASSET_IMAGE = 'PayloadBundleType.ASSET_IMAGE',
   ASSET_META = 'PayloadBundleType.ASSET_META',
+  BUTTON_ACTION = 'PayloadBundleType.BUTTON_ACTION',
   CALL = 'PayloadBundleType.CALL',
   CLIENT_ACTION = 'PayloadBundleType.CLIENT_ACTION',
   CLIENT_ADD = 'PayloadBundleType.CLIENT_ADD',

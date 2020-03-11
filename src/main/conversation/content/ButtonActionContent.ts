@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2020 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,26 +17,5 @@
  *
  */
 
-export enum GenericMessageType {
-  ASSET = 'asset',
-  ASSET_ABORT = 'assetAbort',
-  ASSET_META = 'assetMeta',
-  AVAILABILITY = 'availability',
-  BUTTON_ACTION = 'buttonAction',
-  CALLING = 'calling',
-  CLEARED = 'cleared',
-  CLIENT_ACTION = 'clientAction',
-  COMPOSITE = 'composite',
-  CONFIRMATION = 'confirmation',
-  DELETED = 'deleted',
-  EDITED = 'edited',
-  EPHEMERAL = 'ephemeral',
-  EXTERNAL = 'external',
-  HIDDEN = 'hidden',
-  IMAGE = 'image',
-  KNOCK = 'knock',
-  LAST_READ = 'lastRead',
-  LOCATION = 'location',
-  REACTION = 'reaction',
-  TEXT = 'text',
-}
+import {IButtonAction} from '@wireapp/protocol-messaging';
+export {IButtonAction as ButtonActionContent};

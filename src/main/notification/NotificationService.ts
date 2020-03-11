@@ -171,6 +171,7 @@ export class NotificationService extends EventEmitter {
       if (data) {
         switch (data.type) {
           case PayloadBundleType.ASSET_IMAGE:
+          case PayloadBundleType.BUTTON_ACTION:
           case PayloadBundleType.CALL:
           case PayloadBundleType.CLIENT_ACTION:
           case PayloadBundleType.CLIENT_ADD:
