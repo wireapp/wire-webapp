@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [15.8.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@15.7.0...@wireapp/core@15.8.0) (2020-03-11)
+
+
+### Features
+
+* **core:** Update member permissions ([#2869](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/2869)) ([ff98c79](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/ff98c79c74b8b1d1d775385cf5d597e9bece1c4d))
+
+
+
+
+
 # [15.7.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@15.6.0...@wireapp/core@15.7.0) (2020-03-11)
 
 
