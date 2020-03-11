@@ -20,20 +20,19 @@
 import ko from 'knockout';
 
 import {noop} from 'Util/util';
+import {CompositeMessage} from '../../entity/message/CompositeMessage';
 
 interface MessageButtonProps {
   label: string;
   id: string | number;
   onClick?: () => void;
-  selectedButtonId?: ko.Observable<string | number>;
-  waitingButtonId?: ko.Observable<string | number>;
-  errorMessage?: string;
+  message: CompositeMessage;
 }
 
 ko.components.register('message-button', {
   template: `
     <div>
-      <button class="message-button" data-bind="css: {'message-button--selected': isSelected}, click: onClick, attr: {'data-uie-name': label, 'data-uie-uid': id,'data-uie-selected': isSelected, 'data-uie-waiting': isWaiting}">
+      <button class="message-button" data-bind="css: {'message-button--selected': isSelected}, click: onClick, attr: {'data-uie-name': label, 'data-uie-uid': id, 'data-uie-selected': isSelected, 'data-uie-waiting': isWaiting}">
         <span data-bind="text: label"></span>
         <div class="message-button__waiting-overlay" data-bind="css: {'message-button__waiting-overlay--visible': isWaiting}">
           <loading-icon></loading-icon>
@@ -47,14 +46,13 @@ ko.components.register('message-button', {
     label,
     id,
     onClick = noop,
-    selectedButtonId = ko.observable(),
-    waitingButtonId = ko.observable(),
-    errorMessage,
+    message: {selectedButtonId, waitingButtonId, errorButtonId, errorMessage},
   }: MessageButtonProps) {
+    this.id = id;
     this.label = label;
     this.onClick = onClick;
     this.isSelected = ko.pureComputed(() => selectedButtonId() === id);
     this.isWaiting = ko.pureComputed(() => waitingButtonId() === id);
-    this.errorMessage = errorMessage;
+    this.errorMessage = ko.pureComputed(() => (errorButtonId() === id ? errorMessage() : ''));
   },
 });

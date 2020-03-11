@@ -1813,6 +1813,19 @@ export class ConversationRepository {
   }
 
   sendButtonAction(conversationEntity, messageEntity, buttonId) {
+    const senderId = messageEntity.from;
+    const conversationHasUser = conversationEntity.participating_user_ids().includes(senderId);
+    const removedFromConversation = conversationEntity.removed_from_conversation();
+
+    if (removedFromConversation || !conversationHasUser) {
+      messageEntity.setButtonError(
+        buttonId,
+        removedFromConversation ? t('buttonErrorNotAllowed') : t('buttonErrorUserNotPresent'),
+      );
+      messageEntity.waitingButtonId(undefined);
+      return;
+    }
+
     const protoButtonAction = new ButtonAction({
       buttonId,
       referenceMessageId: messageEntity.id,
@@ -1821,12 +1834,26 @@ export class ConversationRepository {
       [GENERIC_MESSAGE_TYPE.BUTTON_ACTION]: protoButtonAction,
       messageId: createRandomUuid(),
     });
-    this.messageSender.queueMessage(() => {
-      return this.create_recipients(conversationEntity.id, true, [messageEntity.from]).then(recipients => {
+    this.messageSender.queueMessage(async () => {
+      try {
+        const recipients = await this.create_recipients(conversationEntity.id, true, [messageEntity.from]);
         const options = {nativePush: false, precondition: [messageEntity.from], recipients};
         const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id, options);
-        return this._sendGenericMessage(eventInfoEntity);
-      });
+        await this._sendGenericMessage(eventInfoEntity, true);
+      } catch (error) {
+        messageEntity.waitingButtonId(undefined);
+        switch (error?.code) {
+          case BackendClientError.STATUS_CODE.PRECONDITION_FAILED: {
+            return messageEntity.setButtonError(buttonId, t('buttonErrorUserNotPresent'));
+          }
+          case BackendClientError.STATUS_CODE.UNAUTHORIZED: {
+            return messageEntity.setButtonError(buttonId, t('buttonErrorNotAllowed'));
+          }
+          default: {
+            messageEntity.setButtonError(buttonId, t('buttonErrorTryAgain'));
+          }
+        }
+      }
     });
   }
 
@@ -2584,10 +2611,11 @@ export class ConversationRepository {
    *
    * @private
    * @param {EventInfoEntity} eventInfoEntity Info about event
+   * @param {boolean} skipLegalHold Skip the legal hold detection
    * @returns {Promise} Resolves when the message was sent
    */
-  _sendGenericMessage(eventInfoEntity) {
-    return this._grantOutgoingMessage(eventInfoEntity)
+  _sendGenericMessage(eventInfoEntity, skipLegalHold = false) {
+    return this._grantOutgoingMessage(eventInfoEntity, undefined, skipLegalHold)
       .then(() => this._shouldSendAsExternal(eventInfoEntity))
       .then(sendAsExternal => {
         if (sendAsExternal) {
@@ -2601,7 +2629,7 @@ export class ConversationRepository {
         });
       })
       .catch(error => {
-        const isRequestTooLarge = error.code === BackendClientError.STATUS_CODE.REQUEST_TOO_LARGE;
+        const isRequestTooLarge = error?.code === BackendClientError.STATUS_CODE.REQUEST_TOO_LARGE;
         if (isRequestTooLarge) {
           return this._sendExternalGenericMessage(eventInfoEntity);
         }
@@ -2652,12 +2680,12 @@ export class ConversationRepository {
       })
       .catch(axiosError => {
         const error = axiosError.response?.data;
-        const isUnknownClient = error.label === BackendClientError.LABEL.UNKNOWN_CLIENT;
+        const isUnknownClient = error?.label === BackendClientError.LABEL.UNKNOWN_CLIENT;
         if (isUnknownClient) {
           return this.client_repository.removeLocalClient();
         }
 
-        if (!error.missing) {
+        if (!error?.missing) {
           throw error;
         }
 
@@ -2675,6 +2703,7 @@ export class ConversationRepository {
               `Updated '${messageType}' message (${messageId}) for conversation '${conversationId}'. Will ignore missing receivers.`,
               updatedPayload,
             );
+
             return this.conversation_service.post_encrypted_message(conversationId, updatedPayload, true);
           });
       });
@@ -2761,7 +2790,7 @@ export class ConversationRepository {
     await this.eventRepository.injectEvent(legalHoldUpdateMessage);
   }
 
-  async _grantOutgoingMessage(eventInfoEntity, userIds) {
+  async _grantOutgoingMessage(eventInfoEntity, userIds, skipLegalHold = false) {
     const messageType = eventInfoEntity.getType();
     const allowedMessageTypes = ['cleared', 'clientAction', 'confirmation', 'deleted', 'lastRead'];
     if (allowedMessageTypes.includes(messageType)) {
@@ -2770,37 +2799,40 @@ export class ConversationRepository {
 
     const isMessageEdit = messageType === GENERIC_MESSAGE_TYPE.EDITED;
 
-    // Legal Hold
-    const conversationEntity = this.find_conversation_by_id(eventInfoEntity.conversationId);
-    const localLegalHoldStatus = conversationEntity.legalHoldStatus();
-    await this.updateAllClients(conversationEntity, !isMessageEdit);
-    const updatedLocalLegalHoldStatus = conversationEntity.legalHoldStatus();
-
-    const {genericMessage} = eventInfoEntity;
-    genericMessage[messageType][PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS] = updatedLocalLegalHoldStatus;
-
-    const haveNewClientsChangeLegalHoldStatus = localLegalHoldStatus !== updatedLocalLegalHoldStatus;
-
-    if (!isMessageEdit && haveNewClientsChangeLegalHoldStatus) {
-      const {conversationId, timestamp: numericTimestamp} = eventInfoEntity;
-      await this.injectLegalHoldMessage({
-        beforeTimestamp: true,
-        conversationId,
-        legalHoldStatus: updatedLocalLegalHoldStatus,
-        timestamp: numericTimestamp,
-        userId: this.selfUser().id,
-      });
-    }
-
-    const shouldShowLegalHoldWarning =
-      haveNewClientsChangeLegalHoldStatus && updatedLocalLegalHoldStatus === LegalHoldStatus.ENABLED;
-
     const isCallingMessage = messageType === GENERIC_MESSAGE_TYPE.CALLING;
     const consentType = isCallingMessage
       ? ConversationRepository.CONSENT_TYPE.OUTGOING_CALL
       : ConversationRepository.CONSENT_TYPE.MESSAGE;
 
-    return this.grantMessage(eventInfoEntity, consentType, userIds, shouldShowLegalHoldWarning);
+    // Legal Hold
+    if (!skipLegalHold) {
+      const conversationEntity = this.find_conversation_by_id(eventInfoEntity.conversationId);
+      const localLegalHoldStatus = conversationEntity.legalHoldStatus();
+      await this.updateAllClients(conversationEntity, !isMessageEdit);
+      const updatedLocalLegalHoldStatus = conversationEntity.legalHoldStatus();
+
+      const {genericMessage} = eventInfoEntity;
+      genericMessage[messageType][PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS] = updatedLocalLegalHoldStatus;
+
+      const haveNewClientsChangeLegalHoldStatus = localLegalHoldStatus !== updatedLocalLegalHoldStatus;
+
+      if (!isMessageEdit && haveNewClientsChangeLegalHoldStatus) {
+        const {conversationId, timestamp: numericTimestamp} = eventInfoEntity;
+        await this.injectLegalHoldMessage({
+          beforeTimestamp: true,
+          conversationId,
+          legalHoldStatus: updatedLocalLegalHoldStatus,
+          timestamp: numericTimestamp,
+          userId: this.selfUser().id,
+        });
+      }
+
+      const shouldShowLegalHoldWarning =
+        haveNewClientsChangeLegalHoldStatus && updatedLocalLegalHoldStatus === LegalHoldStatus.ENABLED;
+
+      return this.grantMessage(eventInfoEntity, consentType, userIds, shouldShowLegalHoldWarning);
+    }
+    return this.grantMessage(eventInfoEntity, consentType, userIds);
   }
 
   grantMessage(eventInfoEntity, consentType, userIds, shouldShowLegalHoldWarning = false) {

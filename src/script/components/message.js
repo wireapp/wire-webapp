@@ -144,9 +144,11 @@ class Message {
     };
   }
 
-  clickButton(message, buttonId) {
-    message.waitingButtonId(buttonId);
-    this.conversationRepository.sendButtonAction(this.conversation(), message, buttonId);
+  async clickButton(message, buttonId) {
+    if (message.selectedButtonId() !== buttonId && message.waitingButtonId() !== buttonId) {
+      message.waitingButtonId(buttonId);
+      this.conversationRepository.sendButtonAction(this.conversation(), message, buttonId);
+    }
   }
 
   getSystemMessageIconComponent(message) {
@@ -329,7 +331,7 @@ const normalTemplate = `
         <location-asset params="asset: asset"></location-asset>
       <!-- /ko -->
       <!-- ko if: asset.is_button() -->
-        <message-button params="onClick: () => clickButton(message, asset.id), label: asset.text, id: asset.id, selectedButtonId: message.selectedButtonId, waitingButtonId: message.waitingButtonId"></message-button>
+        <message-button params="onClick: () => clickButton(message, asset.id), label: asset.text, id: asset.id, message: message"></message-button>
       <!-- /ko -->
     <!-- /ko -->
 
