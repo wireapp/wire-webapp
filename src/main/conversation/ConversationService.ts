@@ -20,6 +20,7 @@
 import {
   Conversation,
   CONVERSATION_TYPE,
+  DefaultConversationRoleName,
   MutedStatus,
   NewConversation,
   NewOTRMessage,
@@ -1073,5 +1074,15 @@ export class ConversationService {
     };
 
     return this.apiClient.conversation.api.putMembershipProperties(conversationId, payload);
+  }
+
+  public setMemberConversationRole(
+    conversationId: string,
+    userId: string,
+    conversationRole: DefaultConversationRoleName | string,
+  ): Promise<void> {
+    return this.apiClient.conversation.api.putOtherMember(conversationId, userId, {
+      conversation_role: conversationRole,
+    });
   }
 }
