@@ -3,6 +3,7 @@ import {LoginData} from '@wireapp/api-client/dist/auth';
 import {ClientType} from '@wireapp/api-client/dist/client';
 import {Account} from '../main/Account';
 import {PayloadBundleType} from '../main/conversation';
+import {ButtonActionContent} from '../main/conversation/content';
 
 require('dotenv').config();
 
@@ -34,12 +35,26 @@ const login: LoginData = {
   await account.listen();
   account.on(PayloadBundleType.BUTTON_ACTION, data => console.info('Received button action', data));
 
-  // Send poll message
   if (account.service) {
-    const message = account.service.conversation.messageBuilder.createPollMessage(conversationId, 'Are you a robot?', [
-      'Yes',
-      'No',
-    ]);
-    await account.service.conversation.send(message);
+    // Send poll message
+    const pollMessage = account.service.conversation.messageBuilder.createPollMessage(
+      conversationId,
+      'Are you a robot?',
+      ['Yes', 'No'],
+    );
+    await account.service.conversation.send(pollMessage);
+
+    // Send button action message
+    const buttonItems = pollMessage.content.items!.filter(item => typeof item.button === 'object');
+    const lastButton = buttonItems[buttonItems.length - 1].button;
+    const buttonActionContent: ButtonActionContent = {
+      buttonId: lastButton!.id,
+      referenceMessageId: pollMessage.id,
+    };
+    const buttonActionMessage = account.service.conversation.messageBuilder.createButtonActionMessage(
+      conversationId,
+      buttonActionContent,
+    );
+    await account.service.conversation.send(buttonActionMessage);
   }
-})().catch(error => console.error(error.message));
+})().catch(error => console.error('Error', error.message));
