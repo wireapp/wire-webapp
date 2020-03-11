@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [15.8.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@15.8.0...@wireapp/core@15.8.1) (2020-03-11)
+
+
+### Bug Fixes
+
+* **core:** Fix parameter order for setMemberConversationRole ([#2870](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/2870)) ([da2810b](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/da2810b4300e4b6505cfb87df435118e6a646509))
+
+
+
+
+
 # [15.8.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@15.7.0...@wireapp/core@15.8.0) (2020-03-11)
 
 
