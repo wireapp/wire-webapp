@@ -17,6 +17,7 @@
  *
  */
 
+import {Conversation} from '@wireapp/api-client/dist/conversation';
 import {CONVERSATION_TYPING} from '@wireapp/api-client/dist/conversation/data';
 import {ConversationEvent, TeamEvent, UserEvent} from '@wireapp/api-client/dist/event';
 import {User} from '@wireapp/api-client/dist/user/';
@@ -31,9 +32,8 @@ import {
   LocationContent,
   MentionContent,
 } from '@wireapp/core/dist/conversation/content/';
-import {Asset, Confirmation} from '@wireapp/protocol-messaging';
 import {QuotableMessage} from '@wireapp/core/dist/conversation/message/OtrMessage';
-import {Conversation} from '@wireapp/api-client/dist/conversation';
+import {Asset, Confirmation} from '@wireapp/protocol-messaging';
 
 export abstract class MessageHandler {
   public account: Account | undefined = undefined;

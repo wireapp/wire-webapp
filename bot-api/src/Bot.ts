@@ -28,6 +28,7 @@ import UUID from 'pure-uuid';
 
 import {BotConfig, BotCredentials} from './Interfaces';
 import {MessageHandler} from './MessageHandler';
+import {DefaultConversationRoleName} from '@wireapp/api-client/dist/conversation';
 
 const defaultConfig: Required<BotConfig> = {
   backend: 'production',
@@ -76,6 +77,22 @@ export class Bot {
         .build();
       await this.account.service.conversation.send(textPayload);
     }
+  }
+
+  public async setAdminRole(conversationId: string, userId: string): Promise<void> {
+    return this.account!.service!.conversation.setMemberConversationRole(
+      conversationId,
+      userId,
+      DefaultConversationRoleName.WIRE_ADMIN,
+    );
+  }
+
+  public async setMemberRole(conversationId: string, userId: string): Promise<void> {
+    return this.account!.service!.conversation.setMemberConversationRole(
+      conversationId,
+      userId,
+      DefaultConversationRoleName.WIRE_MEMBER,
+    );
   }
 
   public async start(storeEngine?: CRUDEngine): Promise<void> {
