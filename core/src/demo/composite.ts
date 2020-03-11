@@ -3,7 +3,7 @@ import {LoginData} from '@wireapp/api-client/dist/auth';
 import {ClientType} from '@wireapp/api-client/dist/client';
 import {Account} from '../main/Account';
 import {PayloadBundleType} from '../main/conversation';
-import {ButtonActionContent} from '../main/conversation/content';
+import {ButtonActionContent, ButtonActionConfirmationContent} from '../main/conversation/content';
 
 require('dotenv').config();
 
@@ -33,7 +33,27 @@ const login: LoginData = {
 
   // Connect to WebSocket
   await account.listen();
-  account.on(PayloadBundleType.BUTTON_ACTION, data => console.info('Received button action', data));
+
+  account.on(PayloadBundleType.BUTTON_ACTION, async buttonActionMessage => {
+    const {conversation, from} = buttonActionMessage;
+    const {
+      content: {buttonId, referenceMessageId},
+    } = buttonActionMessage;
+
+    const buttonActionConfirmationContent: ButtonActionConfirmationContent = {
+      buttonId,
+      referenceMessageId,
+    };
+    const buttonActionConfirmationMessage = account.service!.conversation.messageBuilder.createButtonActionConfirmationMessage(
+      conversation,
+      buttonActionConfirmationContent,
+    );
+    await account.service!.conversation.send(buttonActionConfirmationMessage);
+
+    console.info(
+      `Confirmed button click on "${buttonId}" for poll "${referenceMessageId}" by user "${from}" in conversation "${conversation}".`,
+    );
+  });
 
   if (account.service) {
     // Send poll message
