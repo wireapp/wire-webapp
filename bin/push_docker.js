@@ -24,6 +24,8 @@ const appConfigPkg = require('../app-config/package.json');
 const pkg = require('../package.json');
 const {execSync} = require('child_process');
 
+require('dotenv').config();
+
 let currentBranch = '';
 
 try {
@@ -40,7 +42,9 @@ const buildCounter = process.env.TRAVIS_BUILD_NUMBER || 'BUILD_NUMBER';
 const commitSha = process.env.TRAVIS_COMMIT || 'COMMIT_ID';
 const commitShaLength = 7;
 const commitShortSha = commitSha.substring(0, commitShaLength - 1);
-const configurationEntry = `wire-web-config-default${suffix || currentBranch === 'prod' ? '-prod' : '-staging'}`;
+const configurationEntry = suffix
+  ? `wire-web-config-default${suffix}`
+  : `wire-web-config-default${currentBranch === 'master' ? '-master' : '-staging'}`;
 const dependencies = {
   ...appConfigPkg.dependencies,
   ...appConfigPkg.devDependencies,
