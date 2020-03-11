@@ -33,7 +33,7 @@ interface MessageButtonProps {
 ko.components.register('message-button', {
   template: `
     <div>
-      <button class="message-button" data-bind="css: {'message-button--selected': isSelected}, click: onClick, attr: {'data-uie-name': label, 'data-uie-selected': isSelected, 'data-uie-waiting': isWaiting}">
+      <button class="message-button" data-bind="css: {'message-button--selected': isSelected}, click: onClick, attr: {'data-uie-name': label, 'data-uie-uid': id,'data-uie-selected': isSelected, 'data-uie-waiting': isWaiting}">
         <span data-bind="text: label"></span>
         <div class="message-button__waiting-overlay" data-bind="css: {'message-button__waiting-overlay--visible': isWaiting}">
           <loading-icon></loading-icon>
