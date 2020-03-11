@@ -23,6 +23,7 @@ import {AbortReason, PayloadBundleSource, PayloadBundleState, PayloadBundleType}
 import {AssetService} from '../AssetService';
 import {
   ButtonActionContent,
+  ButtonActionConfirmationContent,
   CallingContent,
   ClientActionContent,
   ConfirmationContent,
@@ -45,6 +46,7 @@ import {
 } from '../content';
 import {
   ButtonActionMessage,
+  ButtonActionConfirmationMessage,
   CallMessage,
   CompositeMessage,
   ConfirmationMessage,
@@ -306,6 +308,23 @@ export class MessageBuilder {
       state: PayloadBundleState.OUTGOING_UNSENT,
       timestamp: Date.now(),
       type: PayloadBundleType.BUTTON_ACTION,
+    };
+  }
+
+  createButtonActionConfirmationMessage(
+    conversationId: string,
+    content: ButtonActionConfirmationContent,
+    messageId = MessageBuilder.createId(),
+  ): ButtonActionConfirmationMessage {
+    return {
+      content,
+      conversation: conversationId,
+      from: this.getSelfUserId(),
+      id: messageId,
+      source: PayloadBundleSource.LOCAL,
+      state: PayloadBundleState.OUTGOING_UNSENT,
+      timestamp: Date.now(),
+      type: PayloadBundleType.BUTTON_ACTION_CONFIRMATION,
     };
   }
 

@@ -36,6 +36,7 @@ import {
   Article,
   Asset,
   ButtonAction,
+  ButtonActionConfirmation,
   Calling,
   Cleared,
   ClientAction,
@@ -82,6 +83,7 @@ import * as AssetCryptography from '../cryptography/AssetCryptography.node';
 import {MessageBuilder} from './message/MessageBuilder';
 import {
   ButtonActionMessage,
+  ButtonActionConfirmationMessage,
   CallMessage,
   ClearConversationMessage,
   CompositeMessage,
@@ -274,6 +276,29 @@ export class ConversationService {
   private async sendButtonAction(payloadBundle: ButtonActionMessage, userIds?: string[]) {
     const genericMessage = GenericMessage.create({
       [GenericMessageType.BUTTON_ACTION]: ButtonAction.create(payloadBundle.content),
+      messageId: payloadBundle.id,
+    });
+
+    await this.sendGenericMessage(
+      this.apiClient.validatedClientId,
+      payloadBundle.conversation,
+      genericMessage,
+      userIds,
+    );
+
+    return {
+      ...payloadBundle,
+      messageTimer: 0,
+      state: PayloadBundleState.OUTGOING_SENT,
+    };
+  }
+
+  private async sendButtonActionConfirmation(
+    payloadBundle: ButtonActionConfirmationMessage,
+    userIds?: string[],
+  ): Promise<ButtonActionConfirmationMessage> {
+    const genericMessage = GenericMessage.create({
+      [GenericMessageType.BUTTON_ACTION_CONFIRMATION]: ButtonActionConfirmation.create(payloadBundle.content),
       messageId: payloadBundle.id,
     });
 
@@ -1027,6 +1052,8 @@ export class ConversationService {
         return this.sendImage(payloadBundle as ImageAssetMessageOutgoing, userIds);
       case PayloadBundleType.BUTTON_ACTION:
         return this.sendButtonAction(payloadBundle, userIds);
+      case PayloadBundleType.BUTTON_ACTION_CONFIRMATION:
+        return this.sendButtonActionConfirmation(payloadBundle, userIds);
       case PayloadBundleType.CALL:
         return this.sendCall(payloadBundle, userIds);
       case PayloadBundleType.CLIENT_ACTION: {

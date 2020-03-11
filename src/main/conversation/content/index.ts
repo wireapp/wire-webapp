@@ -25,6 +25,7 @@ export {ContentType};
 
 export * from './AssetContent';
 export * from './ButtonActionContent';
+export * from './ButtonActionConfirmationContent';
 export * from './CallingContent';
 export * from './ClearedContent';
 export * from './ClientActionContent';

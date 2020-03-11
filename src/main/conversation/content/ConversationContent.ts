@@ -21,6 +21,7 @@ import {ClientActionType} from '../';
 import {
   AssetContent,
   ButtonActionContent,
+  ButtonActionConfirmationContent,
   CallingContent,
   ClearedContent,
   ClientActionContent,
@@ -46,6 +47,7 @@ import {
 export type ConversationContent =
   | AssetContent
   | ButtonActionContent
+  | ButtonActionConfirmationContent
   | CallingContent
   | ClearedContent
   | ClientActionContent

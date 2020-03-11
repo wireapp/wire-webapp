@@ -17,12 +17,14 @@
  *
  */
 
+// Enum values come from "IGenericMessage" properties in "Protobuf.d.ts"
 export enum GenericMessageType {
   ASSET = 'asset',
   ASSET_ABORT = 'assetAbort',
   ASSET_META = 'assetMeta',
   AVAILABILITY = 'availability',
   BUTTON_ACTION = 'buttonAction',
+  BUTTON_ACTION_CONFIRMATION = 'buttonActionConfirmation',
   CALLING = 'calling',
   CLEARED = 'cleared',
   CLIENT_ACTION = 'clientAction',
