@@ -39,7 +39,7 @@ ko.components.register('message-button', {
         </div>
       </button>
       <!--ko if: errorMessage -->
-        <div class="message-button__error" data-bind="text: errorMessage"></div>
+        <div class="message-button__error" data-bind="text: errorMessage" data-uie-name="message-button-error"></div>
       <!-- /ko -->
     </div>`,
   viewModel: function({
