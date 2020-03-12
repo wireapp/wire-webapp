@@ -392,6 +392,15 @@ describe('Markdown for code snippets', () => {
   });
 });
 
+describe('Markdown for headings', () => {
+  it('renders all headings the same', () => {
+    expect(renderMessage('# heading')).toBe('<div class="md-heading">heading</div>');
+    expect(renderMessage('## heading')).toBe('<div class="md-heading">heading</div>');
+    expect(renderMessage('### heading')).toBe('<div class="md-heading">heading</div>');
+    expect(renderMessage('#### heading')).toBe('<div class="md-heading">heading</div>');
+  });
+});
+
 describe('Markdown with mixed markups', () => {
   it('renders font weights together with links', () => {
     const link_1 = '<a href="http://www.link.com" target="_blank" rel="nofollow noopener noreferrer">www.link.com</a>';
@@ -418,8 +427,7 @@ describe('Ignored Markdown syntax', () => {
     expect(renderMessage('***\nNo horizontal lines\n***')).toBe('***<br>No horizontal lines<br>***');
   });
 
-  it('does not render headers', () => {
-    expect(renderMessage('# no header')).toBe('# no header');
+  it('does not render underline headers', () => {
     expect(renderMessage('no h1\n===')).toBe('no h1<br>===');
     expect(renderMessage('no h2\n---')).toBe('no h2<br>---');
   });

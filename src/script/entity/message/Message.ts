@@ -211,7 +211,7 @@ export class Message {
    * @returns `true`, if message is deletable, `false` otherwise.
    */
   is_deletable(): boolean {
-    return this.status() !== StatusType.SENDING;
+    return !this.isComposite() && this.status() !== StatusType.SENDING;
   }
 
   /**

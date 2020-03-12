@@ -1813,15 +1813,15 @@ export class ConversationRepository {
   }
 
   sendButtonAction(conversationEntity, messageEntity, buttonId) {
+    if (conversationEntity.removed_from_conversation()) {
+      return;
+    }
+
     const senderId = messageEntity.from;
     const conversationHasUser = conversationEntity.participating_user_ids().includes(senderId);
-    const removedFromConversation = conversationEntity.removed_from_conversation();
 
-    if (removedFromConversation || !conversationHasUser) {
-      messageEntity.setButtonError(
-        buttonId,
-        removedFromConversation ? t('buttonErrorNotAllowed') : t('buttonErrorUserNotPresent'),
-      );
+    if (!conversationHasUser) {
+      messageEntity.setButtonError(buttonId, t('buttonErrorUserNotPresent'));
       messageEntity.waitingButtonId(undefined);
       return;
     }
