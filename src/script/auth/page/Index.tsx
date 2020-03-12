@@ -68,7 +68,7 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
     <Page>
       <ContainerXS centerText verticalCenter style={{width: '380px'}}>
         <SVGIcon scale={1.3} realWidth={78} realHeight={25} style={{marginBottom: '80px'}} data-uie-name="ui-wire-logo">
-          <g dangerouslySetInnerHTML={{__html: SVGProvider['logo-full-icon'].documentElement.innerHTML}} />
+          <g dangerouslySetInnerHTML={{__html: SVGProvider['logo-full-icon']?.documentElement?.innerHTML}} />
         </SVGIcon>
         <Text
           block
