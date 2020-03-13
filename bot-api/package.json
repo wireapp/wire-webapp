@@ -1,17 +1,21 @@
 {
   "dependencies": {
     "@types/long": "4.0.1",
+    "@types/node": "*",
     "@wireapp/core": "15.10.1",
     "pure-uuid": "1.6.0"
   },
   "devDependencies": {
     "cross-env": "7.0.0",
+    "dotenv-defaults": "1.1.1",
     "jasmine": "3.5.0",
     "rimraf": "3.0.0",
+    "ts-node": "8.6.2",
     "typescript": "3.8.3"
   },
   "files": [
-    "dist"
+    "dist",
+    "!dist/demo"
   ],
   "license": "GPL-3.0",
   "main": "dist/index.js",
@@ -22,6 +26,7 @@
     "build:browser": "exit 0",
     "build:node": "tsc",
     "clean": "rimraf dist",
+    "demo:admin": "ts-node src/demo/admin.ts",
     "dist": "yarn clean && yarn build",
     "test": "yarn test:node && yarn test:browser",
     "test:browser": "exit 0",
