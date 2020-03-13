@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.6.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@7.5.0...@wireapp/bot-api@7.6.0) (2020-03-13)
+
+
+### Features
+
+* **bot-api:** Add admin permission demo script ([#2875](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/issues/2875)) ([9870e87](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/commit/9870e8720a6105bed65b91cacbbae031705d7fb0))
+
+
+
+
+
 # [7.5.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@7.4.17...@wireapp/bot-api@7.5.0) (2020-03-11)
 
 
