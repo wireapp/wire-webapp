@@ -273,7 +273,7 @@ export class ConversationService {
     throw error;
   }
 
-  private async sendButtonAction(payloadBundle: ButtonActionMessage, userIds?: string[]) {
+  private async sendButtonAction(payloadBundle: ButtonActionMessage, userIds?: string[]): Promise<ButtonActionMessage> {
     const genericMessage = GenericMessage.create({
       [GenericMessageType.BUTTON_ACTION]: ButtonAction.create(payloadBundle.content),
       messageId: payloadBundle.id,

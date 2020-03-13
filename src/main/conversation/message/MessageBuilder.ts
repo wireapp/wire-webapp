@@ -334,7 +334,11 @@ export class MessageBuilder {
     buttons: string[],
     messageId = MessageBuilder.createId(),
   ): CompositeMessage {
-    const buttonProtos = buttons.map(buttonText => Button.create({id: MessageBuilder.createId(), text: buttonText}));
+    const buttonProtos = [];
+    for (let counter = 0; counter < buttons.length; counter++) {
+      const buttonText = buttons[counter];
+      buttonProtos.push(Button.create({id: counter.toString(10), text: buttonText}));
+    }
 
     const content: CompositeContent = {
       items: [Item.create({text: Text.create({content: text})}), ...buttonProtos.map(button => Item.create({button}))],
