@@ -19,12 +19,10 @@
 import ko from 'knockout';
 import {ContentMessage} from './ContentMessage';
 
-type ButtonId = string | number;
-
 export class CompositeMessage extends ContentMessage {
-  selectedButtonId: ko.Observable<ButtonId>;
-  waitingButtonId: ko.Observable<ButtonId>;
-  errorButtonId: ko.Observable<ButtonId>;
+  selectedButtonId: ko.Observable<string>;
+  waitingButtonId: ko.Observable<string>;
+  errorButtonId: ko.Observable<string>;
   errorMessage: ko.Observable<string>;
   constructor(id: string) {
     super(id);
@@ -34,7 +32,7 @@ export class CompositeMessage extends ContentMessage {
     this.errorMessage = ko.observable('');
   }
 
-  getSelectionChange(buttonId: ButtonId): false | {selected_button_id: ButtonId; version: number} {
+  getSelectionChange(buttonId: string): false | {selected_button_id: string; version: number} {
     this.waitingButtonId(undefined);
     if (this.selectedButtonId() === buttonId) {
       return false;
@@ -43,7 +41,7 @@ export class CompositeMessage extends ContentMessage {
     return {selected_button_id: buttonId, version: this.version + 1};
   }
 
-  setButtonError(buttonId: ButtonId, errorMessage: string): void {
+  setButtonError(buttonId: string, errorMessage: string): void {
     this.errorButtonId(buttonId);
     this.errorMessage(errorMessage);
   }

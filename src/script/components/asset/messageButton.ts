@@ -24,7 +24,7 @@ import {CompositeMessage} from '../../entity/message/CompositeMessage';
 
 interface MessageButtonProps {
   label: string;
-  id: string | number;
+  id: string;
   onClick?: () => void;
   message: CompositeMessage;
 }
