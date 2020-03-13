@@ -49,4 +49,4 @@ The following commits will help you getting started quickly with the code base:
 
 There are some executable examples of using the code. You can find them here:
 
-- [./src/demo](./src/demo)
+- [./src/demo/](./src/demo)
