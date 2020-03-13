@@ -3,15 +3,15 @@
 <!-- {{@config.VERSION}} -->
 <html id="wire-main-app">
   <head>
-    #include('meta.htm')
-    #include('graph.htm')
-    <title>Wire</title>
-    <style type="text/css">#include('../../../server/dist/static/style/default.css')</style>
+    #include('meta.htm') #include('graph.htm')
+    <title>{{@config.BRAND_NAME}}</title>
+    <style type="text/css">
+      #include('../../../server/dist/static/style/default.css')
+    </style>
   </head>
 
   <body>
-    #include('wire-main.htm')
-    #include('loading.htm')
+    #include('wire-main.htm') #include('loading.htm')
 
     <script src="./config.js?{{@config.VERSION}}"></script>
     <script src="./min/dexie.js?{{@config.VERSION}}"></script>
