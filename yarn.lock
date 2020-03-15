@@ -1837,17 +1837,17 @@
     platform "1.3.5"
     url-search-params-polyfill "8.0.0"
 
-"@wireapp/copy-config@1.0.4":
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/@wireapp/copy-config/-/copy-config-1.0.4.tgz#0b566872bfccc5bb0f0c86b42b6199cde47b8487"
-  integrity sha512-oQQuVnMTKcZoOa7ioCnmcfebkXrrVIoavR3JjRKDM6txLU+XOanISqRVtJsi04WLQtKWZ8yqGASud3WeOJd8mQ==
+"@wireapp/copy-config@1.0.6":
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/@wireapp/copy-config/-/copy-config-1.0.6.tgz#c802a7620abb73b3439fcc873298605168f16b10"
+  integrity sha512-LNA+6S0OOCE7+jXlPGL9Nky+Qh6nwWMpAeOZ+0HKj2X2lNePhCz926uggohO7BlxpUaTDJmdTiIU6J2rldhaWw==
   dependencies:
     axios "0.19.2"
     copy "0.3.2"
     cosmiconfig "6.0.0"
     fs-extra "8.1.0"
     jszip "3.2.2"
-    logdown "3.3.0"
+    logdown "3.3.1"
     rimraf "3.0.0"
 
 "@wireapp/core@15.4.7":
@@ -8059,6 +8059,13 @@ logdown@3.3.0:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/logdown/-/logdown-3.3.0.tgz#639dd2d3becaf0d9657ab63e812fa0e0f0b19fe7"
   integrity sha512-CECrThg4JtaVNJ8P7zlWDaFveHTg3VIrrUXvc8L2840VVuyZcLW3dDrdURgzHLSAxoKJt/F55RbKdQ0alI+Njg==
+  dependencies:
+    chalk "^2.3.0"
+
+logdown@3.3.1:
+  version "3.3.1"
+  resolved "https://registry.yarnpkg.com/logdown/-/logdown-3.3.1.tgz#836d5a195b5949c6db631ccc9fecce0492e01d10"
+  integrity sha512-pjX0vlIJsYQlgVzFba2amXI1wZZnhrEorL68MdLI7B0/sN1TNUozBNFaHfcPHMM3A+INZ0OXFDxtnoaEgOmGjQ==
   dependencies:
     chalk "^2.3.0"
 
