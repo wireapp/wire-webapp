@@ -27,6 +27,7 @@ import {EventName} from '../../tracking/EventName';
 import {ContentViewModel} from '../ContentViewModel';
 
 import 'Components/loadingBar';
+import {Config} from '../../Config';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -122,7 +123,8 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
   downloadArchiveFile() {
     const userName = this.userRepository.self().username();
     const fileExtension = HistoryExportViewModel.CONFIG.FILE_EXTENSION;
-    const filename = `Wire-${userName}-Backup_${getCurrentDate()}.${fileExtension}`;
+    const sanitizedBrandName = Config.getConfig().BRAND_NAME.replace(/[^A-Za-z0-9_]/g, '');
+    const filename = `${sanitizedBrandName}-${userName}-Backup_${getCurrentDate()}.${fileExtension}`;
 
     this.dismissExport();
     downloadBlob(this.archiveBlob(), filename, 'application/octet-stream');
