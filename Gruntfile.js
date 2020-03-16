@@ -79,11 +79,7 @@ module.exports = grunt => {
 
   grunt.registerTask('build_style', ['shell:less', 'postcss']);
 
-  grunt.registerTask('build_markup', [
-    'includereplace:prod_index',
-    'includereplace:prod_auth',
-    'includereplace:prod_login',
-  ]);
+  grunt.registerTask('build_markup', ['includereplace:prod_index', 'includereplace:prod_auth']);
 
   grunt.registerTask('build_prod', ['build', 'shell:dist_bundle', 'compress']);
 
