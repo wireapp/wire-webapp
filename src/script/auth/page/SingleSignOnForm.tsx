@@ -263,7 +263,12 @@ const SingleSignOnForm = ({
         parseError(ssoError)
       ) : logoutReason ? (
         <ErrorMessage center data-uie-name="status-logout-reason">
-          <FormattedMessage {...logoutReasonStrings[logoutReason]} />
+          <FormattedMessage
+            {...logoutReasonStrings[logoutReason]}
+            values={{
+              newline: <br />,
+            }}
+          />
         </ErrorMessage>
       ) : (
         <span style={{marginBottom: '4px'}}>&nbsp;</span>

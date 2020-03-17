@@ -62,7 +62,12 @@ const HistoryInfo = ({hasHistory, clients, currentSelfClient, isNewCurrentSelfCl
       <ContainerXS centerText verticalCenter style={{width: '100%'}}>
         <H1 center>{_(headline, {brandName: Config.getConfig().BRAND_NAME})}</H1>
         <Paragraph center style={{marginBottom: 56}}>
-          <FormattedMessage {...infoText} />
+          <FormattedMessage
+            {...infoText}
+            values={{
+              newline: <br />,
+            }}
+          />
         </Paragraph>
         {!hasHistory && (
           <Paragraph center style={{marginBottom: 40}}>

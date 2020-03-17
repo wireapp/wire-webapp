@@ -39,7 +39,13 @@ const ConversationJoinInvalid = ({}: Props) => {
           >
             <FormattedMessage
               {...conversationJoinStrings.invalidHeadline}
-              values={{brandName: Config.getConfig().BRAND_NAME}}
+              values={{
+                brandName: Config.getConfig().BRAND_NAME,
+                // eslint-disable-next-line react/display-name
+                newline: <br />,
+                // eslint-disable-next-line react/display-name
+                strong: (...chunks: any[]) => <strong style={{color: 'black'}}>{chunks}</strong>,
+              }}
             />
           </H2>
           <Text style={{fontSize: '16px', marginTop: '10px'}} data-uie-name="status-invalid-text">

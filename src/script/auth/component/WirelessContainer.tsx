@@ -59,7 +59,14 @@ export const WirelessContainer: React.SFC<Props> = ({showCookiePolicyBanner, onC
               bold={false}
               data-uie-name="go-privacy"
             >
-              <FormattedMessage {...cookiePolicyStrings.bannerText} />
+              <FormattedMessage
+                {...cookiePolicyStrings.bannerText}
+                values={{
+                  newline: <br />,
+                  // eslint-disable-next-line react/display-name
+                  strong: (...chunks: any[]) => <strong>{chunks}</strong>,
+                }}
+              />
             </Link>
           </div>
           <div

@@ -100,7 +100,12 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
             </Button>
             {logoutReason && (
               <ErrorMessage center data-uie-name="status-logout-reason">
-                <FormattedMessage {...logoutReasonStrings[logoutReason]} />
+                <FormattedMessage
+                  {...logoutReasonStrings[logoutReason]}
+                  values={{
+                    newline: <br />,
+                  }}
+                />
               </ErrorMessage>
             )}
             {(Config.getConfig().FEATURE.ENABLE_SSO || Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY) && (
@@ -139,7 +144,12 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
             )}
             {logoutReason && (
               <ErrorMessage center data-uie-name="status-logout-reason">
-                <FormattedMessage {...logoutReasonStrings[logoutReason]} />
+                <FormattedMessage
+                  {...logoutReasonStrings[logoutReason]}
+                  values={{
+                    newline: <br />,
+                  }}
+                />
               </ErrorMessage>
             )}
           </>

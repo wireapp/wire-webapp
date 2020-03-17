@@ -42,7 +42,13 @@ const AcceptNewsModal = ({onConfirm, onDecline}: Props) => {
           <Text block>{_(acceptNewsModalStrings.unsubscribeDescription)}</Text>
           <Link href={addLocaleToUrl(EXTERNAL_ROUTE.WIRE_PRIVACY_POLICY)} target="_blank" data-uie-name="go-privacy">
             <Text block>
-              <FormattedMessage {...acceptNewsModalStrings.privacyDescription} />
+              <FormattedMessage
+                {...acceptNewsModalStrings.privacyDescription}
+                values={{
+                  // eslint-disable-next-line react/display-name
+                  strong: (...chunks: any[]) => <strong>{chunks}</strong>,
+                }}
+              />
             </Text>
           </Link>
         </div>

@@ -96,7 +96,13 @@ const VerifyEmailCode = ({
         <div>
           <H1 center>{_(verifyStrings.headline)}</H1>
           <Muted data-uie-name="label-with-email">
-            <FormattedMessage {...verifyStrings.subhead} values={{email: account.email}} />
+            <FormattedMessage
+              {...verifyStrings.subhead}
+              values={{
+                email: account.email,
+                newline: <br />,
+              }}
+            />
           </Muted>
           <CodeInput autoFocus style={{marginTop: 10}} onCodeComplete={createAccount} data-uie-name="enter-code" />
           {parseError(authError)}

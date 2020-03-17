@@ -66,7 +66,13 @@ export const UnsupportedBrowser = ({
               {...(isTemporaryGuest
                 ? unsupportedJoinStrings.unsupportedJoinHeadline
                 : unsupportedStrings.headlineBrowser)}
-              values={{brandName: Config.getConfig().BRAND_NAME}}
+              values={{
+                brandName: Config.getConfig().BRAND_NAME,
+                // eslint-disable-next-line react/display-name
+                newline: <br />,
+                // eslint-disable-next-line react/display-name
+                strong: (...chunks: any[]) => <strong style={{color: 'black'}}>{chunks}</strong>,
+              }}
             />
           </H2>
           {isTemporaryGuest && isMobileOs() ? (
@@ -75,7 +81,13 @@ export const UnsupportedBrowser = ({
             </H3>
           ) : (
             <H3 style={{marginBottom: '10px'}}>
-              <FormattedMessage {...unsupportedStrings.subheadBrowser} />
+              <FormattedMessage
+                {...unsupportedStrings.subheadBrowser}
+                values={{
+                  // eslint-disable-next-line react/display-name
+                  strong: (...chunks: any[]) => <strong style={{fontWeight: 800}}>{chunks}</strong>,
+                }}
+              />
             </H3>
           )}
         </Container>

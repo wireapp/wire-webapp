@@ -199,7 +199,13 @@ const ConversationJoin = ({
             >
               <FormattedMessage
                 {...conversationJoinStrings.fullConversationHeadline}
-                values={{brandName: Config.getConfig().BRAND_NAME}}
+                values={{
+                  brandName: Config.getConfig().BRAND_NAME,
+                  // eslint-disable-next-line react/display-name
+                  newline: <br />,
+                  // eslint-disable-next-line react/display-name
+                  strong: (...chunks: any[]) => <strong style={{color: 'black'}}>{chunks}</strong>,
+                }}
               />
             </H2>
             <Text style={{fontSize: '16px', marginTop: '10px'}} data-uie-name="status-full-text">
@@ -212,11 +218,22 @@ const ConversationJoin = ({
             <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} color={COLOR.GRAY}>
               <FormattedMessage
                 {...conversationJoinStrings.headline}
-                values={{brandName: Config.getConfig().BRAND_NAME}}
+                values={{
+                  brandName: Config.getConfig().BRAND_NAME,
+                  // eslint-disable-next-line react/display-name
+                  newline: <br />,
+                  // eslint-disable-next-line react/display-name
+                  strong: (...chunks: any[]) => <strong style={{color: 'black'}}>{chunks}</strong>,
+                }}
               />
             </H2>
             <Text style={{fontSize: '16px', marginTop: '10px'}}>
-              <FormattedMessage {...conversationJoinStrings.subhead} />
+              <FormattedMessage
+                {...conversationJoinStrings.subhead}
+                values={{
+                  newline: <br />,
+                }}
+              />
             </Text>
             <Form style={{marginTop: 30}}>
               <InputSubmitCombo>
@@ -273,7 +290,13 @@ const ConversationJoin = ({
               {selfName ? (
                 <FormattedMessage
                   {...conversationJoinStrings.existentAccountHeadline}
-                  values={{brandName: Config.getConfig().BRAND_NAME, name: StringUtil.capitalize(selfName)}}
+                  values={{
+                    brandName: Config.getConfig().BRAND_NAME,
+                    name: StringUtil.capitalize(selfName),
+                    newline: <br />,
+                    // eslint-disable-next-line react/display-name
+                    strong: (...chunks: any[]) => <strong style={{color: 'black'}}>{chunks}</strong>,
+                  }}
                 />
               ) : (
                 <FormattedMessage
