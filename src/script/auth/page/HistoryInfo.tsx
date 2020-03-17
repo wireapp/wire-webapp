@@ -67,11 +67,7 @@ const HistoryInfo = ({hasHistory, clients, currentSelfClient, isNewCurrentSelfCl
         </Paragraph>
         {!hasHistory && (
           <Paragraph center style={{marginBottom: 40}}>
-            <Link
-              href={`${EXTERNAL_ROUTE.WIRE_SUPPORT}/hc/articles/207834645`}
-              target="_blank"
-              data-uie-name="do-history-learn-more"
-            >
+            <Link href={Config.getConfig().URL.SUPPORT.HISTORY} target="_blank" data-uie-name="do-history-learn-more">
               {_(historyInfoStrings.learnMore)}
             </Link>
           </Paragraph>
