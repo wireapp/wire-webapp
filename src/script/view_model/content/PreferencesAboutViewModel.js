@@ -48,6 +48,6 @@ z.viewModel.content.PreferencesAboutViewModel = class PreferencesAboutViewModel 
   }
 
   showSupportSection() {
-    return Config.URL.SUPPORT.INDEX || Config.URL.SUPPORT.CONTACT;
+    return this.Config.URL.SUPPORT.INDEX || this.Config.URL.SUPPORT.CONTACT;
   }
 };
