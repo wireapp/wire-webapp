@@ -33,7 +33,7 @@ import {
   RoundIconButton,
 } from '@wireapp/react-ui-kit';
 import React, {useEffect, useRef, useState} from 'react';
-import {FormattedHTMLMessage, useIntl} from 'react-intl';
+import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 import useReactRouter from 'use-react-router';
@@ -79,11 +79,11 @@ const SingleSignOnForm = ({
   const [clientType, setClientType] = useState(ClientType.PERMANENT);
   const [ssoError, setSsoError] = useState(null);
   const [isCodeOrMailInputValid, setIsCodeOrMailInputValid] = useState(true);
-  const [validationError, setValidationError] = useState();
-  const [logoutReason, setLogoutReason] = useState();
+  const [validationError, setValidationError] = useState<any>();
+  const [logoutReason, setLogoutReason] = useState<string>();
 
-  const [conversationCode, setConversationCode] = useState();
-  const [conversationKey, setConversationKey] = useState();
+  const [conversationCode, setConversationCode] = useState<string>();
+  const [conversationKey, setConversationKey] = useState<string>();
   const [isValidLink, setIsValidLink] = useState(true);
 
   useEffect(() => {
@@ -263,7 +263,12 @@ const SingleSignOnForm = ({
         parseError(ssoError)
       ) : logoutReason ? (
         <ErrorMessage center data-uie-name="status-logout-reason">
-          <FormattedHTMLMessage {...logoutReasonStrings[logoutReason]} />
+          <FormattedMessage
+            {...logoutReasonStrings[logoutReason]}
+            values={{
+              newline: <br />,
+            }}
+          />
         </ErrorMessage>
       ) : (
         <span style={{marginBottom: '4px'}}>&nbsp;</span>

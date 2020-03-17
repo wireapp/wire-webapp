@@ -55,6 +55,7 @@ export class Configuration {
       CONTACT: 'https://support.wire.com/new',
       DEVICE_ACCESS_DENIED: 'https://support.wire.com/hc/articles/213512545',
       DEVICE_NOT_FOUND: 'https://support.wire.com/hc/articles/202970662',
+      EMAIL_EXISTS: 'https://support.wire.com/hc/articles/115004082129',
       HISTORY: 'https://support.wire.com/hc/articles/207834645',
       INDEX: 'https://support.wire.com/',
       MICROPHONE_ACCESS_DENIED: 'https://support.wire.com/hc/articles/202590081',

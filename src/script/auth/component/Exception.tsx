@@ -21,8 +21,9 @@
 import {jsx} from '@emotion/core';
 import {ErrorMessage} from '@wireapp/react-ui-kit';
 import {Fragment} from 'react';
-import {FormattedHTMLMessage} from 'react-intl';
+import {FormattedMessage} from 'react-intl';
 import {errorHandlerStrings, validationErrorStrings} from '../../strings';
+import {Config} from '../../Config';
 
 interface ExceptionProps {
   errors: any[];
@@ -43,9 +44,19 @@ const Exception = ({errors = []}: ExceptionProps) => {
             key={error.label || 'unexpected-error'}
           >
             {translatedErrors.hasOwnProperty(error.label) ? (
-              <FormattedHTMLMessage {...translatedErrors[error.label]} />
+              <FormattedMessage
+                {...translatedErrors[error.label]}
+                values={{
+                  minPasswordLength: Config.getConfig().MINIMUM_PASSWORD_LENGTH,
+                  supportEmailExistsLink: (
+                    <a target="_blank" rel="noopener noreferrer" href={Config.getConfig().URL.SUPPORT.EMAIL_EXISTS}>
+                      <FormattedMessage {...errorHandlerStrings.learnMore} />
+                    </a>
+                  ),
+                }}
+              />
             ) : (
-              <FormattedHTMLMessage {...translatedErrors.unexpected} values={error} />
+              <FormattedMessage {...translatedErrors.unexpected} values={error} />
             )}
           </ErrorMessage>
         );

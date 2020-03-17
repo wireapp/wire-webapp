@@ -42,6 +42,7 @@ export interface ServerConfig {
         CONTACT: string;
         DEVICE_ACCESS_DENIED: string;
         DEVICE_NOT_FOUND: string;
+        EMAIL_EXISTS: string;
         HISTORY: string;
         INDEX: string;
         MICROPHONE_ACCESS_DENIED: string;
