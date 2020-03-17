@@ -1821,7 +1821,7 @@ export class ConversationRepository {
     const conversationHasUser = conversationEntity.participating_user_ids().includes(senderId);
 
     if (!conversationHasUser) {
-      messageEntity.setButtonError(buttonId, t('buttonErrorUserNotPresent'));
+      messageEntity.setButtonError(buttonId, t('buttonActionError'));
       messageEntity.waitingButtonId(undefined);
       return;
     }
@@ -1843,14 +1843,13 @@ export class ConversationRepository {
       } catch (error) {
         messageEntity.waitingButtonId(undefined);
         switch (error?.code) {
+          case BackendClientError.STATUS_CODE.UNAUTHORIZED:
           case BackendClientError.STATUS_CODE.PRECONDITION_FAILED: {
-            return messageEntity.setButtonError(buttonId, t('buttonErrorUserNotPresent'));
+            return messageEntity.setButtonError(buttonId, t('buttonActionError'));
           }
-          case BackendClientError.STATUS_CODE.UNAUTHORIZED: {
-            return messageEntity.setButtonError(buttonId, t('buttonErrorNotAllowed'));
-          }
+
           default: {
-            messageEntity.setButtonError(buttonId, t('buttonErrorTryAgain'));
+            messageEntity.setButtonError(buttonId, t('buttonActionErrorRetry'));
           }
         }
       }

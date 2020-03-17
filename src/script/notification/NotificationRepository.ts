@@ -208,8 +208,9 @@ export class NotificationRepository {
     conversationEntity: Conversation,
   ): Promise<void> {
     const isUserAway = this.selfUser().availability() === Availability.Type.AWAY;
+    const isComposite = messageEntity.isComposite();
 
-    if (isUserAway) {
+    if (isUserAway && !isComposite) {
       return Promise.resolve();
     }
 
@@ -217,7 +218,7 @@ export class NotificationRepository {
     const isSelfMentionOrReply = messageEntity.is_content() && messageEntity.isUserTargeted(this.selfUser().id);
     const isCallMessage = messageEntity.super_type === SuperType.CALL;
 
-    if (isUserBusy && !isSelfMentionOrReply && !isCallMessage) {
+    if (isUserBusy && !isSelfMentionOrReply && !isCallMessage && !isComposite) {
       return Promise.resolve();
     }
 
@@ -889,6 +890,10 @@ export class NotificationRepository {
     messageEntity: ContentMessage,
     userId: string,
   ): boolean {
+    if (messageEntity.isComposite()) {
+      return true;
+    }
+
     if (conversationEntity.showNotificationsNothing()) {
       return false;
     }
