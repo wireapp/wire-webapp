@@ -4,6 +4,7 @@ import {ClientType} from '@wireapp/api-client/dist/client';
 import {Account} from '../main/Account';
 import {PayloadBundleType} from '../main/conversation';
 import {ButtonActionContent, ButtonActionConfirmationContent} from '../main/conversation/content';
+import {Text} from '@wireapp/protocol-messaging';
 
 require('dotenv').config();
 
@@ -35,6 +36,7 @@ const login: LoginData = {
   await account.listen();
 
   account.on(PayloadBundleType.BUTTON_ACTION, async buttonActionMessage => {
+    // Send button action confirmation
     const {conversation, from} = buttonActionMessage;
     const {
       content: {buttonId, referenceMessageId},
@@ -48,7 +50,7 @@ const login: LoginData = {
       conversation,
       buttonActionConfirmationContent,
     );
-    await account.service!.conversation.send(buttonActionConfirmationMessage);
+    await account.service!.conversation.send(buttonActionConfirmationMessage, [from]);
 
     console.info(
       `Confirmed button click on "${buttonId}" for poll "${referenceMessageId}" by user "${from}" in conversation "${conversation}".`,
@@ -56,15 +58,15 @@ const login: LoginData = {
   });
 
   if (account.service) {
-    // Send poll message
+    // Send poll
     const pollMessage = account.service.conversation.messageBuilder.createPollMessage(
       conversationId,
-      'Are you a robot?',
+      Text.create({content: 'Are you a robot?'}),
       ['Yes', 'No'],
     );
     await account.service.conversation.send(pollMessage);
 
-    // Send button action message
+    // Send button action
     const buttonItems = pollMessage.content.items!.filter(item => typeof item.button === 'object');
     const lastButton = buttonItems[buttonItems.length - 1].button;
     const buttonActionContent: ButtonActionContent = {
