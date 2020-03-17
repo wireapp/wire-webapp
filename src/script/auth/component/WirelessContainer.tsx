@@ -19,7 +19,7 @@
 
 import {CloseIcon, Content, Footer, Header, Link, Logo, Small} from '@wireapp/react-ui-kit';
 import React from 'react';
-import {FormattedHTMLMessage, useIntl} from 'react-intl';
+import {FormattedMessage, useIntl} from 'react-intl';
 import {addLocaleToUrl} from '../../externalRoute';
 import {cookiePolicyStrings, footerStrings} from '../../strings';
 import {EXTERNAL_ROUTE} from '../externalRoute';
@@ -59,7 +59,7 @@ export const WirelessContainer: React.SFC<Props> = ({showCookiePolicyBanner, onC
               bold={false}
               data-uie-name="go-privacy"
             >
-              <FormattedHTMLMessage {...cookiePolicyStrings.bannerText} />
+              <FormattedMessage {...cookiePolicyStrings.bannerText} />
             </Link>
           </div>
           <div

@@ -20,7 +20,7 @@
 import {ClientType} from '@wireapp/api-client/dist/client';
 import {Button, ContainerXS, H1, Link, Paragraph} from '@wireapp/react-ui-kit';
 import React from 'react';
-import {FormattedHTMLMessage, useIntl} from 'react-intl';
+import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import useReactRouter from 'use-react-router';
 import {Config} from '../../Config';
@@ -62,7 +62,7 @@ const HistoryInfo = ({hasHistory, clients, currentSelfClient, isNewCurrentSelfCl
       <ContainerXS centerText verticalCenter style={{width: '100%'}}>
         <H1 center>{_(headline, {brandName: Config.getConfig().BRAND_NAME})}</H1>
         <Paragraph center style={{marginBottom: 56}}>
-          <FormattedHTMLMessage {...infoText} />
+          <FormattedMessage {...infoText} />
         </Paragraph>
         {!hasHistory && (
           <Paragraph center style={{marginBottom: 40}}>

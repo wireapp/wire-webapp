@@ -19,7 +19,7 @@
 
 import {Button, COLOR, Column, Columns, Container, H3, Link, Modal, Text} from '@wireapp/react-ui-kit';
 import React from 'react';
-import {FormattedHTMLMessage, useIntl} from 'react-intl';
+import {FormattedMessage, useIntl} from 'react-intl';
 import {Config} from '../../Config';
 import {addLocaleToUrl} from '../../externalRoute';
 import {acceptNewsModalStrings} from '../../strings';
@@ -42,7 +42,7 @@ const AcceptNewsModal = ({onConfirm, onDecline}: Props) => {
           <Text block>{_(acceptNewsModalStrings.unsubscribeDescription)}</Text>
           <Link href={addLocaleToUrl(EXTERNAL_ROUTE.WIRE_PRIVACY_POLICY)} target="_blank" data-uie-name="go-privacy">
             <Text block>
-              <FormattedHTMLMessage {...acceptNewsModalStrings.privacyDescription} />
+              <FormattedMessage {...acceptNewsModalStrings.privacyDescription} />
             </Text>
           </Link>
         </div>

@@ -18,7 +18,7 @@
  */
 import {COLOR, ContainerXS, H2, Text} from '@wireapp/react-ui-kit';
 import React from 'react';
-import {FormattedHTMLMessage, useIntl} from 'react-intl';
+import {FormattedMessage, useIntl} from 'react-intl';
 import {Config} from '../../Config';
 import {conversationJoinStrings} from '../../strings';
 import UnsupportedBrowser from '../component/UnsupportedBrowser';
@@ -37,7 +37,7 @@ const ConversationJoinInvalid = ({}: Props) => {
             color={COLOR.GRAY}
             data-uie-name="status-invalid-headline"
           >
-            <FormattedHTMLMessage
+            <FormattedMessage
               {...conversationJoinStrings.invalidHeadline}
               values={{brandName: Config.getConfig().BRAND_NAME}}
             />

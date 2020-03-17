@@ -20,7 +20,7 @@
 import {ValidationUtil} from '@wireapp/commons';
 import {Button, Checkbox, CheckboxLabel, Form, Input, InputBlock, Small} from '@wireapp/react-ui-kit';
 import React from 'react';
-import {FormattedHTMLMessage, useIntl} from 'react-intl';
+import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 import {Config} from '../../Config';
@@ -241,7 +241,7 @@ const AccountForm = ({account, ...props}: Props & ConnectedProps & DispatchProps
         style={{justifyContent: 'center'}}
       >
         <CheckboxLabel>
-          <FormattedHTMLMessage
+          <FormattedMessage
             {...accountFormStrings.terms}
             values={{
               linkParams: `target=_blank data-uie-name=go-terms href=${createURLForToU()}`,

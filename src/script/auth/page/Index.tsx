@@ -21,7 +21,7 @@ import {UrlUtil} from '@wireapp/commons';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {Button, COLOR, ContainerXS, ErrorMessage, Text} from '@wireapp/react-ui-kit';
 import React, {useEffect, useState} from 'react';
-import {FormattedHTMLMessage, useIntl} from 'react-intl';
+import {FormattedMessage, useIntl} from 'react-intl';
 import useReactRouter from 'use-react-router';
 import {Config} from '../../Config';
 import {indexStrings, logoutReasonStrings} from '../../strings';
@@ -38,7 +38,7 @@ interface Props extends React.HTMLProps<HTMLDivElement> {}
 const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
   const {history} = useReactRouter();
-  const [logoutReason, setLogoutReason] = useState();
+  const [logoutReason, setLogoutReason] = useState<string>();
 
   useEffect(() => {
     // Redirect to prefilled SSO login if default SSO code is set on backend
@@ -100,7 +100,7 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
             </Button>
             {logoutReason && (
               <ErrorMessage center data-uie-name="status-logout-reason">
-                <FormattedHTMLMessage {...logoutReasonStrings[logoutReason]} />
+                <FormattedMessage {...logoutReasonStrings[logoutReason]} />
               </ErrorMessage>
             )}
             {(Config.getConfig().FEATURE.ENABLE_SSO || Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY) && (
@@ -139,7 +139,7 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
             )}
             {logoutReason && (
               <ErrorMessage center data-uie-name="status-logout-reason">
-                <FormattedHTMLMessage {...logoutReasonStrings[logoutReason]} />
+                <FormattedMessage {...logoutReasonStrings[logoutReason]} />
               </ErrorMessage>
             )}
           </>

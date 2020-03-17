@@ -452,8 +452,7 @@ export const errorHandlerStrings = defineMessages({
     id: 'BackendError.LABEL.INVALID_EMAIL',
   },
   [BackendError.LABEL.KEY_EXISTS]: {
-    defaultMessage:
-      'This email address has already been registered. <a target="_blank" rel="noopener noreferrer" href="https://support.wire.com/hc/articles/115004082129">Learn more</a>',
+    defaultMessage: 'This email address has already been registered. {supportEmailExistsLink}',
     id: 'BackendError.LABEL.KEY_EXISTS',
   },
   [BackendError.LABEL.ALREADY_INVITED]: {
@@ -537,8 +536,7 @@ export const errorHandlerStrings = defineMessages({
     id: 'BackendError.LABEL.SUSPENDED',
   },
   [BackendError.LABEL.EMAIL_EXISTS]: {
-    defaultMessage:
-      'This email address is already in use. <a target="_blank" rel="noopener noreferrer" href="https://support.wire.com/hc/articles/115004082129">Learn more</a>',
+    defaultMessage: 'This email address is already in use. {supportEmailExistsLink}',
     id: 'BackendError.LABEL.EMAIL_EXISTS',
   },
   [BackendError.LABEL.SSO_FORBIDDEN]: {
@@ -593,6 +591,10 @@ export const errorHandlerStrings = defineMessages({
     defaultMessage: 'This email cannot be used for enterprise login. Please enter the SSO code to proceed.',
     id: 'BackendErrorLabel.CUSTOM_BACKEND_NOT_FOUND',
   },
+  learnMore: {
+    defaultMessage: 'Learn more',
+    id: 'BackendError.learnMore',
+  },
   unexpected: {
     defaultMessage: 'Unexpected error',
     id: 'BackendError.unexpected',
@@ -610,7 +612,7 @@ export const validationErrorStrings = defineMessages({
   },
   [ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH]: {
     defaultMessage:
-      'Use at least 8 characters, with one lowercase letter, one capital letter, a number, and a special character.',
+      'Use at least {minPasswordLength} characters, with one lowercase letter, one capital letter, a number, and a special character.',
     id: 'ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH',
   },
   [ValidationError.FIELD.PASSWORD_LOGIN.PATTERN_MISMATCH]: {
