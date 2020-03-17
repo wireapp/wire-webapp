@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [15.12.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@15.11.0...@wireapp/core@15.12.0) (2020-03-17)
+
+
+### Features
+
+* **core:** Accept rich content for poll messages ([#2889](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/2889)) ([d0270e8](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/d0270e8c03b158a931c1a8b97e3cada83b5e0f07))
+
+
+
+
+
 # [15.11.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@15.10.3...@wireapp/core@15.11.0) (2020-03-17)
 
 
