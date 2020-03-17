@@ -335,7 +335,9 @@ const _getStateUnreadMessage = {
         }
 
         const hasString = string && string !== true;
-        const stateText: string = hasString ? string : getRenderedTextContent(messageEntity.get_first_asset().text);
+        const stateText: string = hasString
+          ? (string as string)
+          : getRenderedTextContent(messageEntity.get_first_asset().text);
         return conversationEntity.isGroup() ? `${messageEntity.unsafeSenderName()}: ${stateText}` : stateText;
       }
     }
