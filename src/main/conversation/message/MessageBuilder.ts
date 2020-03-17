@@ -330,7 +330,7 @@ export class MessageBuilder {
 
   createPollMessage(
     conversationId: string,
-    text: string,
+    text: Text,
     buttons: string[],
     messageId = MessageBuilder.createId(),
   ): CompositeMessage {
@@ -341,7 +341,7 @@ export class MessageBuilder {
     }
 
     const content: CompositeContent = {
-      items: [Item.create({text: Text.create({content: text})}), ...buttonProtos.map(button => Item.create({button}))],
+      items: [Item.create({text}), ...buttonProtos.map(button => Item.create({button}))],
     };
 
     return {
