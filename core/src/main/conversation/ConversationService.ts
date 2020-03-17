@@ -170,7 +170,7 @@ export class ConversationService {
     const plainTextArray = GenericMessage.encode(genericMessage).finish();
     const recipients = await this.cryptographyService.encrypt(plainTextArray, preKeyBundles);
 
-    return this.sendOTRMessage(sendingClientId, conversationId, recipients, plainTextArray, base64CipherText);
+    return this.sendOTRMessage(sendingClientId, conversationId, recipients, base64CipherText);
   }
 
   private async sendGenericMessage(
@@ -194,7 +194,7 @@ export class ConversationService {
 
     const recipients = await this.cryptographyService.encrypt(plainTextArray, preKeyBundles);
 
-    return this.sendOTRMessage(sendingClientId, conversationId, recipients, plainTextArray);
+    return this.sendOTRMessage(sendingClientId, conversationId, recipients);
   }
 
   // TODO: Move this to a generic "message sending class".
@@ -202,7 +202,6 @@ export class ConversationService {
     sendingClientId: string,
     conversationId: string,
     recipients: OTRRecipients,
-    plainTextArray: Uint8Array,
     data?: any,
   ): Promise<void> {
     const message: NewOTRMessage = {
@@ -210,12 +209,15 @@ export class ConversationService {
       recipients,
       sender: sendingClientId,
     };
-    try {
-      await this.apiClient.conversation.api.postOTRMessage(sendingClientId, conversationId, message);
-    } catch (error) {
-      const reEncryptedMessage = await this.onClientMismatch(error, message, plainTextArray);
-      await this.apiClient.conversation.api.postOTRMessage(sendingClientId, conversationId, reEncryptedMessage);
-    }
+
+    /**
+     * When creating the PreKey bundles we already found out to which users we want to send a message, so we can ignore
+     * missing clients. We have to ignore missing clients because there can be the case that there are clients that
+     * don't provide PreKeys (clients from the Pre-E2EE era).
+     */
+    await this.apiClient.conversation.api.postOTRMessage(sendingClientId, conversationId, message, {
+      ignore_missing: true,
+    });
   }
 
   // TODO: Move this to a generic "message sending class" and make it private.
