@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [15.11.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@15.10.3...@wireapp/core@15.11.0) (2020-03-17)
+
+
+### Features
+
+* Expose protocol buffer message mapping ([#2888](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/2888)) ([7bae5ad](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/7bae5adad3aaf2b8623c0a9776be61ff1818b603))
+
+
+
+
+
 ## [15.10.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@15.10.2...@wireapp/core@15.10.3) (2020-03-13)
 
 **Note:** Version bump only for package @wireapp/core
