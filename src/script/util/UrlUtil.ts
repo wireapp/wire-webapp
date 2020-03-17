@@ -17,18 +17,12 @@
  *
  */
 
-import {t} from 'Util/LocalizerUtil';
 import {includesString} from 'Util/StringUtil';
 
 export const appendParameter = (url: string, parameter: string) => {
   const separator = includesString(url, '?') ? '&' : '?';
   return `${url}${separator}${parameter}`;
 };
-
-export const buildSupportUrl = (supportId: string) =>
-  typeof supportId === 'number'
-    ? `${window.wire.env.URL.SUPPORT_BASE}${t('urlSupportArticles')}${supportId}`
-    : `${window.wire.env.URL.SUPPORT_BASE}${t('urlSupportRequests')}`;
 
 export const getParameter = (parameterName: string, locationSearch = window.location.search) => {
   const searchParameters = locationSearch.substring(1).split('&');

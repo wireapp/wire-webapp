@@ -72,7 +72,6 @@ process.chdir(src);
 fs.mkdirpSync(dist);
 
 processLessFiles({
-  [`${dist}/auth.css`]: `${src}/auth/auth.less`,
   [`${dist}/default.css`]: `${src}/default.less`,
   [`${dist}/support.css`]: `${src}/support.less`,
 });

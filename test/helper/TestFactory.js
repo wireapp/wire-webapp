@@ -62,7 +62,6 @@ import {StorageService} from 'src/script/storage';
 import {MediaRepository} from 'src/script/media/MediaRepository';
 import {PermissionRepository} from 'src/script/permission/PermissionRepository';
 import {AuthRepository} from 'src/script/auth/AuthRepository';
-import {AuthService} from 'src/script/auth/AuthService';
 import {ClientService} from 'src/script/client/ClientService';
 import {APIClientSingleton} from 'src/script/service/APIClientSingleton';
 import {TeamService} from 'src/script/team/TeamService';
@@ -73,7 +72,7 @@ export class TestFactory {
    * @returns {Promise<AuthRepository>} The authentication repository.
    */
   async exposeAuthActors() {
-    this.auth_repository = new AuthRepository(new AuthService(container.resolve(APIClientSingleton).getClient()));
+    this.auth_repository = new AuthRepository(container.resolve(APIClientSingleton).getClient());
     return this.auth_repository;
   }
 

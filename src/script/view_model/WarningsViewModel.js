@@ -21,7 +21,6 @@ import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {Environment} from 'Util/Environment';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
-import {buildSupportUrl} from 'Util/UrlUtil';
 import {afterRender} from 'Util/util';
 
 import {Config} from '../Config';
@@ -131,8 +130,7 @@ export class WarningsViewModel {
         amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
           primaryAction: {
             action: () => {
-              const url = buildSupportUrl(Config.getConfig().SUPPORT.ID.MICROPHONE_ACCESS_DENIED);
-              safeWindowOpen(url);
+              safeWindowOpen(Config.getConfig().URL.SUPPORT.MICROPHONE_ACCESS_DENIED);
             },
             text: t('modalCallNoMicrophoneAction'),
           },

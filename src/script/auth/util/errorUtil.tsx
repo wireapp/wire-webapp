@@ -19,7 +19,7 @@
 
 import {ErrorMessage} from '@wireapp/react-ui-kit';
 import React from 'react';
-import {FormattedHTMLMessage} from 'react-intl';
+import {FormattedMessage} from 'react-intl';
 import {errorHandlerStrings, validationErrorStrings} from '../../strings';
 import {ValidationError} from '../module/action/ValidationError';
 
@@ -28,13 +28,13 @@ export function parseError(error: any): JSX.Element | null {
     if (errorHandlerStrings.hasOwnProperty(error.label)) {
       return (
         <ErrorMessage data-uie-name="error-message" data-uie-value={error.label}>
-          <FormattedHTMLMessage {...errorHandlerStrings[error.label]} />
+          <FormattedMessage {...errorHandlerStrings[error.label]} />
         </ErrorMessage>
       );
     }
     return (
       <ErrorMessage data-uie-name="error-message" data-uie-value={'unexpected-error'}>
-        <FormattedHTMLMessage {...errorHandlerStrings.unexpected} values={error} />
+        <FormattedMessage {...errorHandlerStrings.unexpected} values={error} />
       </ErrorMessage>
     );
   }
@@ -46,9 +46,9 @@ export function parseValidationErrors(errors: any | any[]): JSX.Element[] {
   return errorMessages.map(error => (
     <ErrorMessage data-uie-name="error-message" data-uie-value={error.label} key={error.label}>
       {validationErrorStrings.hasOwnProperty(error.label) ? (
-        <FormattedHTMLMessage {...validationErrorStrings[error.label]} />
+        <FormattedMessage {...validationErrorStrings[error.label]} />
       ) : (
-        <FormattedHTMLMessage {...validationErrorStrings.unexpected} values={error} />
+        <FormattedMessage {...validationErrorStrings.unexpected} values={error} />
       )}
     </ErrorMessage>
   ));

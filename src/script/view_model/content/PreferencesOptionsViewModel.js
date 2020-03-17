@@ -100,7 +100,8 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
 
       const selfUserId = this.userRepository.self().id;
       const truncatedId = selfUserId.substr(0, PreferencesOptionsViewModel.CONFIG.OBFUSCATION_TRUNCATE_TO);
-      const filename = `Wire-${truncatedId}-Calling_${getCurrentDate()}.log`;
+      const sanitizedBrandName = Config.getConfig().BRAND_NAME.replace(/[^A-Za-z0-9_]/g, '');
+      const filename = `${sanitizedBrandName}-${truncatedId}-Calling_${getCurrentDate()}.log`;
 
       return downloadBlob(blob, filename);
     }

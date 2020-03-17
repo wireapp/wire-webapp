@@ -17,24 +17,16 @@
  *
  */
 
-import {AccessTokenData, Context, LoginData} from '@wireapp/api-client/dist/auth';
+import {Context} from '@wireapp/api-client/dist/auth';
 import {Logger, getLogger} from 'Util/Logger';
 import {APIClient} from '@wireapp/api-client';
-import {loadValue, resetStoreValue, storeValue} from 'Util/StorageUtil';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {loadValue} from 'Util/StorageUtil';
 import {ClientType} from '../client/ClientType';
 import {StorageKey} from '../storage/StorageKey';
 
 export class AuthRepository {
   private readonly apiClient: APIClient;
   private readonly logger: Logger;
-
-  // tslint:disable-next-line:typedef
-  static get CONFIG() {
-    return {
-      REFRESH_THRESHOLD: TIME_IN_MILLIS.MINUTE,
-    };
-  }
 
   static get ACCESS_TOKEN_TRIGGER(): {
     IMMEDIATE: string;
@@ -57,33 +49,18 @@ export class AuthRepository {
     this.logger = getLogger('AuthRepository');
   }
 
-  login(login: LoginData, persist: boolean): Promise<AccessTokenData> {
-    return this.apiClient.auth.api
-      .postLogin({...login, clientType: persist ? ClientType.PERMANENT : ClientType.TEMPORARY})
-      .then(accessTokenResponse => {
-        storeValue(StorageKey.AUTH.PERSIST, persist);
-        storeValue(StorageKey.AUTH.SHOW_LOGIN, true);
-        return accessTokenResponse;
-      });
-  }
-
   init(): Promise<Context> {
     const persist = loadValue(StorageKey.AUTH.PERSIST);
     const clientType = persist ? ClientType.PERMANENT : ClientType.TEMPORARY;
     return this.apiClient.init(clientType);
   }
 
-  logout(): Promise<void> {
-    return this.apiClient.auth.api
-      .postLogout()
-      .then(() => this.logger.info('Log out on backend successful'))
-      .catch(error => this.logger.warn(`Log out on backend failed: ${error.message}`, error));
-  }
-
-  deleteAccessToken(): void {
-    resetStoreValue(StorageKey.AUTH.ACCESS_TOKEN.VALUE);
-    resetStoreValue(StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION);
-    resetStoreValue(StorageKey.AUTH.ACCESS_TOKEN.TTL);
-    resetStoreValue(StorageKey.AUTH.ACCESS_TOKEN.TYPE);
+  async logout(): Promise<void> {
+    try {
+      await this.apiClient.auth.api.postLogout();
+      return this.logger.info('Log out on backend successful');
+    } catch (error) {
+      return this.logger.warn(`Log out on backend failed: ${error.message}`, error);
+    }
   }
 }
