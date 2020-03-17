@@ -18,6 +18,7 @@
  */
 
 import {t} from 'Util/LocalizerUtil';
+import {getRenderedTextContent} from 'Util/messageRenderer';
 
 import {AssetTransferState} from '../assets/AssetTransferState';
 import {Conversation} from '../entity/Conversation';
@@ -334,7 +335,7 @@ const _getStateUnreadMessage = {
         }
 
         const hasString = string && string !== true;
-        const stateText: string = hasString ? string : messageEntity.get_first_asset().text;
+        const stateText: string = hasString ? string : getRenderedTextContent(messageEntity.get_first_asset().text);
         return conversationEntity.isGroup() ? `${messageEntity.unsafeSenderName()}: ${stateText}` : stateText;
       }
     }
