@@ -48,7 +48,18 @@ export class Configuration {
     ACCOUNT_BASE: 'https://account.wire.com',
     MOBILE_BASE: '',
     PRIVACY_POLICY: 'https://wire-website-staging.zinfra.io/security',
-    SUPPORT_BASE: 'https://support.wire.com',
+    SUPPORT: {
+      BUG_REPORT: 'https://support.wire.com/new?ticket_form_id=101615',
+      CALLING: 'https://support.wire.com/hc/articles/202969412',
+      CAMERA_ACCESS_DENIED: 'https://support.wire.com/hc/articles/202935412',
+      CONTACT: 'https://support.wire.com/new',
+      DEVICE_ACCESS_DENIED: 'https://support.wire.com/hc/articles/213512545',
+      DEVICE_NOT_FOUND: 'https://support.wire.com/hc/articles/202970662',
+      HISTORY: 'https://support.wire.com/hc/articles/207834645',
+      INDEX: 'https://support.wire.com/',
+      MICROPHONE_ACCESS_DENIED: 'https://support.wire.com/hc/articles/202590081',
+      SCREEN_ACCESS_DENIED: 'https://support.wire.com/hc/articles/202935412',
+    },
     TEAMS_BASE: 'https://teams.wire.com',
     TERMS_OF_USE_PERSONAL: 'https://wire-website-staging.zinfra.io/legal/terms/personal',
     TERMS_OF_USE_TEAMS: 'https://wire-website-staging.zinfra.io/legal/terms/teams',
@@ -88,22 +99,6 @@ export class Configuration {
 
   // measured in pixel
   readonly SCROLL_TO_LAST_MESSAGE_THRESHOLD = 100;
-
-  readonly SUPPORT = {
-    FORM: {
-      BUG: 'new?ticket_form_id=101615',
-      CONTACT: 'new',
-    },
-    ID: {
-      CALLING: 202969412,
-      CAMERA_ACCESS_DENIED: 202935412,
-      DEVICE_ACCESS_DENIED: 213512545,
-      DEVICE_NOT_FOUND: 202970662,
-      HISTORY: 207834645,
-      MICROPHONE_ACCESS_DENIED: 202590081,
-      SCREEN_ACCESS_DENIED: 202935412,
-    },
-  };
 }
 
 let instance: Configuration;

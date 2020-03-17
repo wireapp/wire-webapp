@@ -25,7 +25,6 @@ import {connect} from 'react-redux';
 import useReactRouter from 'use-react-router';
 import {Config} from '../../Config';
 import {historyInfoStrings} from '../../strings';
-import {EXTERNAL_ROUTE} from '../externalRoute';
 import {RootState} from '../module/reducer';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import {ROUTE} from '../route';
@@ -67,11 +66,7 @@ const HistoryInfo = ({hasHistory, clients, currentSelfClient, isNewCurrentSelfCl
         </Paragraph>
         {!hasHistory && (
           <Paragraph center style={{marginBottom: 40}}>
-            <Link
-              href={`${EXTERNAL_ROUTE.WIRE_SUPPORT}/hc/articles/207834645`}
-              target="_blank"
-              data-uie-name="do-history-learn-more"
-            >
+            <Link href={Config.getConfig().URL.SUPPORT.HISTORY} target="_blank" data-uie-name="do-history-learn-more">
               {_(historyInfoStrings.learnMore)}
             </Link>
           </Paragraph>

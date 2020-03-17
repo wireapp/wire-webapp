@@ -27,7 +27,6 @@ export const UNSPLASH_URL = 'https://source.unsplash.com/1200x1200/?landscape';
 export const URL = {
   ACCOUNT: env.URL?.ACCOUNT_BASE,
   PRIVACY_POLICY: env.URL?.PRIVACY_POLICY,
-  SUPPORT: env.URL?.SUPPORT_BASE,
   TEAM_SETTINGS: env.URL?.TEAMS_BASE,
   TERMS_OF_USE_PERSONAL: env.URL?.TERMS_OF_USE_PERSONAL,
   TERMS_OF_USE_TEAMS: env.URL?.TERMS_OF_USE_TEAMS,
@@ -48,7 +47,6 @@ export const URL_PATH = {
   PASSWORD_RESET: '/forgot/',
   PRIVACY_HOW: '/privacy/how/',
   PRIVACY_WHY: '/privacy/why/',
-  SUPPORT_CONTACT: '/hc/en-us/requests/new',
   SUPPORT_USERNAME: '/support/username/',
 };
 
@@ -69,11 +67,6 @@ export const getAccountPagesUrl = (path: string = ''): string => {
   return URL.ACCOUNT ? accountPagesUrl : undefined;
 };
 
-export const getSupportUrl = (path: string = ''): string => {
-  const supportUrl = `${URL.SUPPORT}${path}`;
-  return URL.SUPPORT ? supportUrl : undefined;
-};
-
 export const getPrivacyPolicyUrl = (): string => addLocaleToUrl(URL.PRIVACY_POLICY || undefined);
 export const getTermsOfUsePersonalUrl = (): string => addLocaleToUrl(URL.TERMS_OF_USE_PERSONAL || undefined);
 export const getTermsOfUseTeamUrl = (): string => addLocaleToUrl(URL.TERMS_OF_USE_TEAMS || undefined);
@@ -87,8 +80,6 @@ export const getCreateTeamUrl = (pkCampaign?: string): string =>
 export const getPrivacyHowUrl = (): string => getWebsiteUrl(URL_PATH.PRIVACY_HOW);
 export const getPrivacyWhyUrl = (): string => getWebsiteUrl(URL_PATH.PRIVACY_WHY);
 export const getSupportUsernameUrl = (): string => getWebsiteUrl(URL_PATH.SUPPORT_USERNAME);
-
-export const getSupportContactUrl = (): string => getSupportUrl(URL_PATH.SUPPORT_CONTACT);
 
 export const addLocaleToUrl = (url?: string): string => {
   if (!url) {
