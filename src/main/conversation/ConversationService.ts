@@ -33,7 +33,6 @@ import {ConversationMemberLeaveEvent} from '@wireapp/api-client/dist/event/';
 import {StatusCode} from '@wireapp/api-client/dist/http/';
 import {UserPreKeyBundleMap} from '@wireapp/api-client/dist/user/';
 import {
-  Article,
   Asset,
   ButtonAction,
   ButtonActionConfirmation,
@@ -45,16 +44,11 @@ import {
   Ephemeral,
   GenericMessage,
   Knock,
-  LinkPreview,
   Location,
-  Mention,
   MessageDelete,
   MessageEdit,
   MessageHide,
-  Quote,
   Reaction,
-  Text,
-  Tweet,
 } from '@wireapp/protocol-messaging';
 import {AxiosError} from 'axios';
 import {Encoder} from 'bazinga64';
@@ -68,22 +62,15 @@ import {
   PayloadBundleType,
 } from '../conversation/';
 
-import {
-  AssetContent,
-  ClearedContent,
-  DeletedContent,
-  HiddenContent,
-  LinkPreviewUploadedContent,
-  RemoteData,
-  TextContent,
-} from '../conversation/content/';
+import {AssetContent, ClearedContent, DeletedContent, HiddenContent, RemoteData} from '../conversation/content/';
 
 import {CryptographyService, EncryptedAsset} from '../cryptography/';
 import * as AssetCryptography from '../cryptography/AssetCryptography.node';
 import {MessageBuilder} from './message/MessageBuilder';
+import {MessageToProtoMapper} from './message/MessageToProtoMapper';
 import {
-  ButtonActionMessage,
   ButtonActionConfirmationMessage,
+  ButtonActionMessage,
   CallMessage,
   ClearConversationMessage,
   CompositeMessage,
@@ -359,40 +346,9 @@ export class ConversationService {
   }
 
   private async sendEditedText(payloadBundle: EditedTextMessage, userIds?: string[]): Promise<EditedTextMessage> {
-    const {
-      expectsReadConfirmation,
-      legalHoldStatus,
-      linkPreviews,
-      mentions,
-      originalMessageId,
-      quote,
-      text,
-    } = payloadBundle.content;
-
-    const textMessage = Text.create({
-      content: text,
-      expectsReadConfirmation,
-      legalHoldStatus,
-    });
-
-    if (linkPreviews?.length) {
-      textMessage.linkPreview = this.buildLinkPreviews(linkPreviews);
-    }
-
-    if (mentions?.length) {
-      textMessage.mentions = mentions.map(mention => Mention.create(mention));
-    }
-
-    if (quote) {
-      textMessage.quote = Quote.create({
-        quotedMessageId: quote.quotedMessageId,
-        quotedMessageSha256: quote.quotedMessageSha256,
-      });
-    }
-
     const editedMessage = MessageEdit.create({
-      replacingMessageId: originalMessageId,
-      text: textMessage,
+      replacingMessageId: payloadBundle.content.originalMessageId,
+      text: MessageToProtoMapper.mapText(payloadBundle),
     });
 
     const genericMessage = GenericMessage.create({
@@ -742,39 +698,9 @@ export class ConversationService {
   }
 
   private async sendText(payloadBundle: TextMessage, userIds?: string[]): Promise<TextMessage> {
-    const {
-      expectsReadConfirmation,
-      legalHoldStatus,
-      linkPreviews,
-      mentions,
-      quote,
-      text,
-    } = payloadBundle.content as TextContent;
-
-    const textMessage = Text.create({
-      content: text,
-      expectsReadConfirmation,
-      legalHoldStatus,
-    });
-
-    if (linkPreviews?.length) {
-      textMessage.linkPreview = this.buildLinkPreviews(linkPreviews);
-    }
-
-    if (mentions?.length) {
-      textMessage.mentions = mentions.map(mention => Mention.create(mention));
-    }
-
-    if (quote) {
-      textMessage.quote = Quote.create({
-        quotedMessageId: quote.quotedMessageId,
-        quotedMessageSha256: quote.quotedMessageSha256,
-      });
-    }
-
     let genericMessage = GenericMessage.create({
       messageId: payloadBundle.id,
-      [GenericMessageType.TEXT]: textMessage,
+      [GenericMessageType.TEXT]: MessageToProtoMapper.mapText(payloadBundle),
     });
 
     const expireAfterMillis = this.messageTimer.getMessageTimer(payloadBundle.conversation);
@@ -893,67 +819,6 @@ export class ConversationService {
       timestamp: Date.now(),
       type: PayloadBundleType.MESSAGE_DELETE,
     };
-  }
-
-  private buildLinkPreviews(linkPreviews: LinkPreviewUploadedContent[]): LinkPreview[] {
-    const builtLinkPreviews = [];
-
-    for (const linkPreview of linkPreviews) {
-      const linkPreviewMessage = LinkPreview.create({
-        permanentUrl: linkPreview.permanentUrl,
-        summary: linkPreview.summary,
-        title: linkPreview.title,
-        url: linkPreview.url,
-        urlOffset: linkPreview.urlOffset,
-      });
-
-      if (linkPreview.tweet) {
-        linkPreviewMessage.tweet = Tweet.create({
-          author: linkPreview.tweet.author,
-          username: linkPreview.tweet.username,
-        });
-      }
-
-      if (linkPreview.imageUploaded) {
-        const {asset, image} = linkPreview.imageUploaded;
-
-        const imageMetadata = Asset.ImageMetaData.create({
-          height: image.height,
-          width: image.width,
-        });
-
-        const original = Asset.Original.create({
-          [GenericMessageType.IMAGE]: imageMetadata,
-          mimeType: image.type,
-          size: image.data.length,
-        });
-
-        const remoteData = Asset.RemoteData.create({
-          assetId: asset.key,
-          assetToken: asset.token,
-          otrKey: asset.keyBytes,
-          sha256: asset.sha256,
-        });
-
-        const assetMessage = Asset.create({
-          original,
-          uploaded: remoteData,
-        });
-
-        linkPreviewMessage.image = assetMessage;
-      }
-
-      linkPreviewMessage.article = Article.create({
-        image: linkPreviewMessage.image,
-        permanentUrl: linkPreviewMessage.permanentUrl,
-        summary: linkPreviewMessage.summary,
-        title: linkPreviewMessage.title,
-      });
-
-      builtLinkPreviews.push(linkPreviewMessage);
-    }
-
-    return builtLinkPreviews;
   }
 
   private shouldSendAsExternal(plainText: Uint8Array, preKeyBundles: UserPreKeyBundleMap): boolean {
