@@ -52,7 +52,7 @@ export const indexStrings = defineMessages({
     id: 'index.enterprise',
   },
   logIn: {
-    defaultMessage: 'Log in with email',
+    defaultMessage: 'Log in',
     id: 'index.login',
   },
   ssoLogin: {
