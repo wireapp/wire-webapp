@@ -1842,16 +1842,7 @@ export class ConversationRepository {
         await this._sendGenericMessage(eventInfoEntity, true);
       } catch (error) {
         messageEntity.waitingButtonId(undefined);
-        switch (error?.code) {
-          case BackendClientError.STATUS_CODE.UNAUTHORIZED:
-          case BackendClientError.STATUS_CODE.PRECONDITION_FAILED: {
-            return messageEntity.setButtonError(buttonId, t('buttonActionError'));
-          }
-
-          default: {
-            messageEntity.setButtonError(buttonId, t('buttonActionErrorRetry'));
-          }
-        }
+        return messageEntity.setButtonError(buttonId, t('buttonActionError'));
       }
     });
   }
