@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [15.12.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@15.12.1...@wireapp/core@15.12.2) (2020-03-18)
+
+
+### Bug Fixes
+
+* **core:** Skip own clients when sending to a selection of users ([#2892](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/2892)) ([365170b](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/365170bac7c08c5a1a03ea650b558663b4a98c80))
+
+
+
+
+
 ## [15.12.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@15.12.0...@wireapp/core@15.12.1) (2020-03-17)
 
 
