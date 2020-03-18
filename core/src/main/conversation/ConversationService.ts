@@ -118,16 +118,16 @@ export class ConversationService {
     return genericMessage;
   }
 
-  private async getPreKeyBundle(
-    conversationId: string,
-    userIds?: string[],
-    skipOwnClients = false,
-  ): Promise<UserPreKeyBundleMap> {
+  private async getPreKeyBundle(conversationId: string, userIds?: string[]): Promise<UserPreKeyBundleMap> {
     const conversation = await this.apiClient.conversation.api.getConversation(conversationId);
     const members = userIds?.length ? userIds.map(id => ({id})) : conversation.members.others;
     const preKeys = await Promise.all(members.map(member => this.apiClient.user.api.getUserPreKeys(member.id)));
 
-    if (!skipOwnClients) {
+    /**
+     * If you are sending a message to a selection of users, you have to include yourself in the list of users if you
+     * want to sync a message also to your other clients.
+     */
+    if (!userIds) {
       const selfPreKey = await this.apiClient.user.api.getUserPreKeys(conversation.members.self.id);
       preKeys.push(selfPreKey);
     }
