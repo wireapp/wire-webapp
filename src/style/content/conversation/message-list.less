@@ -367,10 +367,14 @@
     left: 32px;
   }
   .md-heading {
-    margin-bottom: 8px;
+    margin: 4px 0 8px;
     font-size: @font-size-md;
     font-weight: @font-weight-bold;
     line-height: @line-height-lg;
+
+    & + br {
+      display: none;
+    }
   }
 }
 

@@ -26,10 +26,12 @@ message-button {
     padding: 16px;
     border: 1px solid @w-red;
     margin-top: 8px;
+    background-color: transparent;
     border-radius: 6px;
     color: @w-red;
     font-size: @font-size-xs;
     font-weight: @font-weight-bold;
+    line-height: 1.45;
     outline: none;
     text-align: start;
     text-transform: uppercase;
@@ -64,16 +66,10 @@ message-button {
     }
 
     &__error {
+      margin-top: 4px;
       color: @w-red;
       font-size: @font-size-xs;
       font-weight: @font-weight-light;
-      line-height: 16px;
-    }
-  }
-
-  & + & {
-    .message-button {
-      margin-top: 4px;
     }
   }
 }
