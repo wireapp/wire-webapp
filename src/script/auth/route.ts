@@ -18,6 +18,7 @@
  */
 
 export const QUERY_KEY = {
+  ACCOUNT_ID: 'id', // account ID passed from the wrapper to the webview
   APPLOCK_SCHEDULED_TIMEOUT: 'applock_scheduled_timeout',
   APPLOCK_UNFOCUS_TIMEOUT: 'applock_unfocus_timeout',
   CLIENT_TYPE: 'clienttype',
@@ -36,6 +37,7 @@ export const QUERY_KEY = {
 };
 
 export const FORWARDED_QUERY_KEYS = [
+  QUERY_KEY.ACCOUNT_ID,
   QUERY_KEY.APPLOCK_SCHEDULED_TIMEOUT,
   QUERY_KEY.APPLOCK_UNFOCUS_TIMEOUT,
   QUERY_KEY.ENVIRONMENT,
