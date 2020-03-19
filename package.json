@@ -2,7 +2,7 @@
   "dependencies": {
     "@wireapp/antiscroll-2": "1.0.2",
     "@wireapp/avs": "5.5.8",
-    "@wireapp/commons": "3.3.5",
+    "@wireapp/commons": "3.3.8",
     "@wireapp/core": "15.4.7",
     "@wireapp/protocol-messaging": "1.25.4",
     "@wireapp/react-ui-kit": "7.26.9",
