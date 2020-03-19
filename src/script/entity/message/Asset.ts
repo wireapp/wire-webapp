@@ -80,4 +80,8 @@ export class Asset {
     }
     return false;
   }
+
+  is_button(): boolean {
+    return this.type === AssetType.BUTTON;
+  }
 }

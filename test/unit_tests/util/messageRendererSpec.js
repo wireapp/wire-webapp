@@ -16,7 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-import {renderMessage} from 'Util/messageRenderer';
+import {renderMessage, getRenderedTextContent} from 'Util/messageRenderer';
 import {MentionEntity} from 'src/script/message/MentionEntity';
 
 const escapeLink = link => link.replace(/&/g, '&amp;');
@@ -392,6 +392,15 @@ describe('Markdown for code snippets', () => {
   });
 });
 
+describe('Markdown for headings', () => {
+  it('renders all headings the same', () => {
+    expect(renderMessage('# heading')).toBe('<div class="md-heading">heading</div>');
+    expect(renderMessage('## heading')).toBe('<div class="md-heading">heading</div>');
+    expect(renderMessage('### heading')).toBe('<div class="md-heading">heading</div>');
+    expect(renderMessage('#### heading')).toBe('<div class="md-heading">heading</div>');
+  });
+});
+
 describe('Markdown with mixed markups', () => {
   it('renders font weights together with links', () => {
     const link_1 = '<a href="http://www.link.com" target="_blank" rel="nofollow noopener noreferrer">www.link.com</a>';
@@ -418,8 +427,7 @@ describe('Ignored Markdown syntax', () => {
     expect(renderMessage('***\nNo horizontal lines\n***')).toBe('***<br>No horizontal lines<br>***');
   });
 
-  it('does not render headers', () => {
-    expect(renderMessage('# no header')).toBe('# no header');
+  it('does not render underline headers', () => {
     expect(renderMessage('no h1\n===')).toBe('no h1<br>===');
     expect(renderMessage('no h2\n---')).toBe('no h2<br>---');
   });
@@ -449,5 +457,14 @@ describe('Markdown exceptions', () => {
     const text = 'calling__voice_channel__fulltitle';
 
     expect(renderMessage(text)).toBe(text);
+  });
+});
+
+describe('getRenderedTextContent', () => {
+  it('strips all markdown notation from the message', () => {
+    const input = 'This is *italic* and\n**bold** and\n***bold-italic*** and [email](mailto:test@email.com)';
+    const expected = 'This is italic and\nbold and\nbold-italic and email';
+
+    expect(getRenderedTextContent(input)).toBe(expected);
   });
 });

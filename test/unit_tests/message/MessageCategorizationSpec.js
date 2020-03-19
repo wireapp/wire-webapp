@@ -108,5 +108,13 @@ describe('', () => {
 
       expect(category).toBe(MessageCategory.LOCATION);
     });
+
+    it('composite message should have category of type COMPOSITE', () => {
+      const event =
+        '{"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c0","from":"6f0778eb-fa36-4261-bd64-c965c3ef6946","from_client_id":"f56a3d2e97c98409","id":"58c08888-5d92-41fa-9559-cf7a8cf67c28","time":"2020-03-03T13:00:13.476Z","data":{"items":[{"text":{"content":"test","mentions":[]}},{"button":{"text":"one","id":"0"}},{"button":{"text":"two","id":"1"}}]},"type":"conversation.composite-message-add"}';
+      const category = categoryFromEvent(JSON.parse(event));
+
+      expect(category).toBe(MessageCategory.COMPOSITE);
+    });
   });
 });

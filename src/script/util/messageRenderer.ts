@@ -42,7 +42,7 @@ const markdownit = new MarkdownIt('zero', {
   html: false,
   langPrefix: 'lang-',
   linkify: true,
-}).enable(['autolink', 'backticks', 'code', 'emphasis', 'fence', 'link', 'linkify', 'newline']);
+}).enable(['autolink', 'backticks', 'code', 'emphasis', 'fence', 'link', 'linkify', 'newline', 'heading']);
 
 const originalFenceRule = markdownit.renderer.rules.fence;
 
@@ -51,6 +51,9 @@ markdownit.renderer.rules.fence = (tokens, idx, options, env, self) => {
   tokens[idx].map[1] += 1;
   return highlighted.replace(/\n$/, '');
 };
+
+markdownit.renderer.rules.heading_open = () => '<div class="md-heading">';
+markdownit.renderer.rules.heading_close = () => '</div>';
 
 markdownit.renderer.rules.softbreak = () => '<br>';
 markdownit.renderer.rules.hardbreak = () => '<br>';
@@ -205,6 +208,12 @@ export const renderMessage = (message: string, selfId: string, mentionEntities: 
 
     return text.replace(mentionHash, mentionMarkup);
   }, mentionlessText);
-
   return parsedText;
+};
+
+export const getRenderedTextContent = (text: string): string => {
+  const renderedMessage = renderMessage(text, '');
+  const messageWithLinebreaks = renderedMessage.replace(/<br>/g, '\n');
+  const strippedMessage = messageWithLinebreaks.replace(/<.+?>/g, '');
+  return strippedMessage;
 };

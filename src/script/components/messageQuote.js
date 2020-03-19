@@ -71,7 +71,7 @@ class MessageQuote {
 
     if (!this.error() && quote().messageId) {
       conversationRepository
-        .get_message_in_conversation_by_id(conversation(), quote().messageId, true, true)
+        .getMessageInConversationById(conversation(), quote().messageId, true, true)
         .then(message => {
           this.quotedMessage(message);
           this.quotedMessageId(message.id);
