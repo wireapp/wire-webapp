@@ -37,6 +37,7 @@ import './asset/imageAsset';
 import './asset/linkPreviewAsset';
 import './asset/locationAsset';
 import './asset/videoAsset';
+import './asset/messageButton';
 import {SHOW_LEGAL_HOLD_MODAL} from '../view_model/content/LegalHoldModalViewModel';
 
 class Message {
@@ -141,6 +142,13 @@ class Message {
         this.previewSubscription.dispose();
       }
     };
+  }
+
+  async clickButton(message, buttonId) {
+    if (message.selectedButtonId() !== buttonId && message.waitingButtonId() !== buttonId) {
+      message.waitingButtonId(buttonId);
+      this.conversationRepository.sendButtonAction(this.conversation(), message, buttonId);
+    }
   }
 
   getSystemMessageIconComponent(message) {
@@ -321,6 +329,9 @@ const normalTemplate = `
       <!-- /ko -->
       <!-- ko if: asset.is_location() -->
         <location-asset params="asset: asset"></location-asset>
+      <!-- /ko -->
+      <!-- ko if: asset.is_button() -->
+        <message-button params="onClick: () => clickButton(message, asset.id), label: asset.text, id: asset.id, message: message"></message-button>
       <!-- /ko -->
     <!-- /ko -->
 

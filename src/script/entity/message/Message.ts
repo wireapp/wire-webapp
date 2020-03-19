@@ -33,6 +33,7 @@ import {User} from '../User';
 import {CallMessage} from './CallMessage';
 import {ContentMessage} from './ContentMessage';
 import {File as FileAsset} from './File';
+import {CompositeMessage} from './CompositeMessage';
 
 export class Message {
   private readonly ephemeral_expires: ko.Observable<boolean | number | string>;
@@ -201,12 +202,16 @@ export class Message {
     return this.super_type === SuperType.CONTENT;
   }
 
+  isComposite(): this is CompositeMessage {
+    return this.is_content() && this.hasOwnProperty('selectedButtonId');
+  }
+
   /**
    * Check if message can be deleted.
    * @returns `true`, if message is deletable, `false` otherwise.
    */
   is_deletable(): boolean {
-    return this.status() !== StatusType.SENDING;
+    return !this.isComposite() && this.status() !== StatusType.SENDING;
   }
 
   /**
@@ -297,7 +302,7 @@ export class Message {
    */
 
   isCopyable(): boolean {
-    return this.has_asset_text() && (!this.is_ephemeral() || this.user().is_me);
+    return this.has_asset_text() && !this.isComposite() && (!this.is_ephemeral() || this.user().is_me);
   }
 
   /**
@@ -347,7 +352,11 @@ export class Message {
    */
   isReactable(): boolean {
     return (
-      this.is_content() && !this.is_ephemeral() && this.status() !== StatusType.SENDING && !this.hasUnavailableAsset()
+      this.is_content() &&
+      !this.isComposite() &&
+      !this.is_ephemeral() &&
+      this.status() !== StatusType.SENDING &&
+      !this.hasUnavailableAsset()
     );
   }
 
@@ -357,7 +366,11 @@ export class Message {
    */
   isReplyable(): boolean {
     return (
-      this.is_content() && !this.is_ephemeral() && this.status() !== StatusType.SENDING && !this.hasUnavailableAsset()
+      this.is_content() &&
+      !this.isComposite() &&
+      !this.is_ephemeral() &&
+      this.status() !== StatusType.SENDING &&
+      !this.hasUnavailableAsset()
     );
   }
 

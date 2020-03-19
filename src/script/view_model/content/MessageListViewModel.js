@@ -361,12 +361,10 @@ class MessageListViewModel {
 
     if (!messageIsLoaded) {
       const conversationEntity = this.conversation();
-      this.conversation_repository
-        .get_message_in_conversation_by_id(conversationEntity, messageId)
-        .then(messageEntity => {
-          conversationEntity.remove_messages();
-          return this.conversation_repository.getMessagesWithOffset(conversationEntity, messageEntity);
-        });
+      this.conversation_repository.getMessageInConversationById(conversationEntity, messageId).then(messageEntity => {
+        conversationEntity.remove_messages();
+        return this.conversation_repository.getMessagesWithOffset(conversationEntity, messageEntity);
+      });
     }
   }
 

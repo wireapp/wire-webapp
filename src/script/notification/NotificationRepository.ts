@@ -28,6 +28,7 @@ import {getUserName} from 'Util/SanitizationUtil';
 import {truncate} from 'Util/StringUtil';
 import {TIME_IN_MILLIS, formatDuration} from 'Util/TimeUtil';
 import {ValidationUtilError} from 'Util/ValidationUtil';
+import {getRenderedTextContent} from 'Util/messageRenderer';
 
 import {AudioType} from '../audio/AudioType';
 import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
@@ -207,8 +208,9 @@ export class NotificationRepository {
     conversationEntity: Conversation,
   ): Promise<void> {
     const isUserAway = this.selfUser().availability() === Availability.Type.AWAY;
+    const isComposite = messageEntity.isComposite();
 
-    if (isUserAway) {
+    if (isUserAway && !isComposite) {
       return Promise.resolve();
     }
 
@@ -216,7 +218,7 @@ export class NotificationRepository {
     const isSelfMentionOrReply = messageEntity.is_content() && messageEntity.isUserTargeted(this.selfUser().id);
     const isCallMessage = messageEntity.super_type === SuperType.CALL;
 
-    if (isUserBusy && !isSelfMentionOrReply && !isCallMessage) {
+    if (isUserBusy && !isSelfMentionOrReply && !isCallMessage && !isComposite) {
       return Promise.resolve();
     }
 
@@ -300,7 +302,7 @@ export class NotificationRepository {
           } else if (messageEntity.isUserQuoted(this.selfUser().id)) {
             notificationText = t('notificationReply', assetEntity.text, {}, true);
           } else {
-            notificationText = assetEntity.text;
+            notificationText = getRenderedTextContent(assetEntity.text);
           }
 
           return truncate(notificationText, NotificationRepository.CONFIG.BODY_LENGTH);
@@ -795,7 +797,10 @@ export class NotificationRepository {
     const activeConversation = document.hasFocus() && inConversationView && inActiveConversation && !inMaximizedCall;
     const messageFromSelf = messageEntity.user().is_me;
     const permissionDenied = this.permissionState() === PermissionStatusState.DENIED;
-    const preferenceIsNone = this.notificationsPreference() === NotificationPreference.NONE;
+
+    // The in-app notification settings should be ignored for alerts (which are composite messages for now)
+    const preferenceIsNone =
+      this.notificationsPreference() === NotificationPreference.NONE && !messageEntity.isComposite();
     const supportsNotification = Environment.browser.supports.notifications;
 
     const hideNotification =
@@ -885,6 +890,10 @@ export class NotificationRepository {
     messageEntity: ContentMessage,
     userId: string,
   ): boolean {
+    if (messageEntity.isComposite()) {
+      return true;
+    }
+
     if (conversationEntity.showNotificationsNothing()) {
       return false;
     }

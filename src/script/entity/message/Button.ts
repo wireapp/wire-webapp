@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2020 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,10 +17,16 @@
  *
  */
 
-export enum AssetType {
-  BUTTON = 'Button',
-  FILE = 'File',
-  IMAGE = 'Image',
-  LOCATION = 'Location',
-  TEXT = 'Text',
+import {AssetType} from '../../assets/AssetType';
+import {Asset} from './Asset';
+
+export class Button extends Asset {
+  public readonly text: string;
+
+  constructor(id?: string, text: string = '') {
+    super(id);
+    this.type = AssetType.BUTTON;
+
+    this.text = text;
+  }
 }

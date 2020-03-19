@@ -35,6 +35,7 @@ import {RenameMessage} from 'src/script/entity/message/RenameMessage';
 import {Location} from 'src/script/entity/message/Location';
 import {MemberMessage} from 'src/script/entity/message/MemberMessage';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
 import {Text} from 'src/script/entity/message/Text';
 import {PingMessage} from 'src/script/entity/message/PingMessage';
 
@@ -303,18 +304,21 @@ describe('NotificationRepository', () => {
 
       const textMessage = new ContentMessage(createRandomUuid());
       textMessage.add_asset(generateTextAsset());
+      const compositeMessage = new CompositeMessage(createRandomUuid());
+      compositeMessage.add_asset(generateTextAsset());
 
       const callMessage = new CallMessage();
       callMessage.call_message_type = CALL_MESSAGE_TYPE.ACTIVATED;
       allMessageTypes = {
         call: callMessage,
+        composite: compositeMessage,
         content: textMessage,
         mention: mentionMessage,
         ping: new PingMessage(),
       };
     });
 
-    it('filters all notifications if user is "away"', () => {
+    it('filters all notifications (but composite) if user is "away"', () => {
       spyOn(testFactory.notification_repository, 'selfUser').and.callFake(() => {
         return {...testFactory.user_repository.self(), availability: () => Availability.Type.AWAY};
       });
@@ -322,7 +326,11 @@ describe('NotificationRepository', () => {
 
       const testPromises = Object.values(allMessageTypes).map(messageEntity => {
         return testFactory.notification_repository.notify(messageEntity, undefined, conversation_et).then(() => {
-          expect(testFactory.notification_repository.showNotification).not.toHaveBeenCalled();
+          if (messageEntity.isComposite()) {
+            expect(testFactory.notification_repository.showNotification).toHaveBeenCalled();
+          } else {
+            expect(testFactory.notification_repository.showNotification).not.toHaveBeenCalled();
+          }
         });
       });
 
@@ -348,14 +356,14 @@ describe('NotificationRepository', () => {
       });
     });
 
-    it('it allows mentions and calls when user is "busy"', () => {
+    it('it allows mentions, calls and composite when user is "busy"', () => {
       spyOn(testFactory.notification_repository, 'selfUser').and.callFake(() => {
         return {...testFactory.user_repository.self(), availability: () => Availability.Type.BUSY};
       });
       testFactory.notification_repository.permissionState(PermissionStatusState.GRANTED);
 
       const notifiedMessages = Object.entries(allMessageTypes)
-        .filter(([type]) => ['mention', 'call'].includes(type))
+        .filter(([type]) => ['mention', 'call', 'composite'].includes(type))
         .map(([, message]) => message);
 
       const testPromises = notifiedMessages.map(messageEntity => {
@@ -718,6 +726,28 @@ describe('NotificationRepository', () => {
     it('as an ephemeral message', () => {
       message_et.ephemeral_expires(5000);
       return verify_notification_ephemeral(conversation_et, message_et);
+    });
+  });
+
+  describe('shows a well-formed composite notification', () => {
+    beforeEach(() => {
+      message_et = new CompositeMessage();
+      message_et.add_asset(new Text(createRandomUuid(), '## headline!'));
+    });
+
+    it('even if notifications are disabled in preferences', () => {
+      testFactory.notification_repository.notificationsPreference(NotificationPreference.NONE);
+
+      return testFactory.notification_repository.notify(message_et, undefined, conversation_et).then(() => {
+        expect(testFactory.notification_repository.showNotification).toHaveBeenCalled();
+      });
+    });
+
+    it('even if notifications are disabled in conversation settings', () => {
+      conversation_et.mutedState(NOTIFICATION_STATE.NOTHING);
+      return testFactory.notification_repository.notify(message_et, undefined, conversation_et).then(() => {
+        expect(testFactory.notification_repository.showNotification).toHaveBeenCalled();
+      });
     });
   });
 

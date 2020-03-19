@@ -55,6 +55,13 @@ const _checkPing = (event: any): MessageCategory | void => {
   }
 };
 
+const _checkComposite = (event: any): MessageCategory | void => {
+  const isComposite = event.type === ClientEvent.CONVERSATION.COMPOSITE_MESSAGE_ADD;
+  if (isComposite) {
+    return MessageCategory.COMPOSITE;
+  }
+};
+
 const _checkText = (event: any): MessageCategory | void => {
   const {data: eventData, type: eventType} = event;
 
@@ -76,7 +83,7 @@ export const categoryFromEvent = (event: any): MessageCategory | void => {
     const eventReactions = event.reactions;
     let category = MessageCategory.NONE;
 
-    const categoryChecks = [_checkText, _checkAsset, _checkPing, _checkLocation];
+    const categoryChecks = [_checkText, _checkAsset, _checkPing, _checkLocation, _checkComposite];
     for (const check of categoryChecks) {
       const matchedCategory = check(event);
       if (matchedCategory) {
