@@ -20,12 +20,11 @@
 import {ClientType} from '@wireapp/api-client/dist/client';
 import {Button, ContainerXS, H1, Link, Paragraph} from '@wireapp/react-ui-kit';
 import React from 'react';
-import {FormattedHTMLMessage, useIntl} from 'react-intl';
+import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import useReactRouter from 'use-react-router';
 import {Config} from '../../Config';
 import {historyInfoStrings} from '../../strings';
-import {EXTERNAL_ROUTE} from '../externalRoute';
 import {RootState} from '../module/reducer';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import {ROUTE} from '../route';
@@ -63,15 +62,16 @@ const HistoryInfo = ({hasHistory, clients, currentSelfClient, isNewCurrentSelfCl
       <ContainerXS centerText verticalCenter style={{width: '100%'}}>
         <H1 center>{_(headline, {brandName: Config.getConfig().BRAND_NAME})}</H1>
         <Paragraph center style={{marginBottom: 56}}>
-          <FormattedHTMLMessage {...infoText} />
+          <FormattedMessage
+            {...infoText}
+            values={{
+              newline: <br />,
+            }}
+          />
         </Paragraph>
         {!hasHistory && (
           <Paragraph center style={{marginBottom: 40}}>
-            <Link
-              href={`${EXTERNAL_ROUTE.WIRE_SUPPORT}/hc/articles/207834645`}
-              target="_blank"
-              data-uie-name="do-history-learn-more"
-            >
+            <Link href={Config.getConfig().URL.SUPPORT.HISTORY} target="_blank" data-uie-name="do-history-learn-more">
               {_(historyInfoStrings.learnMore)}
             </Link>
           </Paragraph>

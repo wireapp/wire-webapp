@@ -17,6 +17,7 @@
  *
  */
 
+import {APIClient} from '@wireapp/api-client';
 import {Asset, LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {arrayToMd5Base64, loadFileBuffer, loadImage} from 'Util/util';
@@ -25,8 +26,8 @@ import {WebWorker} from 'Util/worker';
 
 import {AssetRetentionPolicy} from '../assets/AssetRetentionPolicy';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
-import {BackendClientInterface} from '../service/BackendClientInterface';
 import {encryptAesAsset} from './AssetCrypto';
+import {BackendClient} from '../service/BackendClient';
 
 export interface UploadAssetResponse {
   key: string;
@@ -46,9 +47,11 @@ export interface AssetUploadOptions {
 }
 
 export class AssetService {
-  private readonly backendClient: BackendClientInterface;
+  private readonly apiClient: APIClient;
+  private readonly backendClient: BackendClient;
 
-  constructor(backendClient: BackendClientInterface) {
+  constructor(apiClient: APIClient, backendClient: BackendClient) {
+    this.apiClient = apiClient;
     this.backendClient = backendClient;
   }
 
@@ -76,7 +79,11 @@ export class AssetService {
       }));
   }
 
-  async _uploadAsset(bytes: ArrayBuffer, options: AssetUploadOptions, xhrAccessorFunction: Function): Promise<Asset> {
+  private async _uploadAsset(
+    bytes: ArrayBuffer,
+    options: AssetUploadOptions,
+    xhrAccessorFunction: Function,
+  ): Promise<Asset> {
     return encryptAesAsset(bytes).then(({cipherText, keyBytes, sha256}) => {
       return this.postAsset(new Uint8Array(cipherText), options, xhrAccessorFunction).then(({key, token}) => {
         const assetRemoteData = new Asset.RemoteData({
@@ -128,7 +135,7 @@ export class AssetService {
       const cachingParam = forceCaching ? '&forceCaching=true' : '';
       const conversationIdParam = `&conv_id=${encodeURIComponent(conversationId)}`;
 
-      return `${url}?access_token=${this.backendClient.accessToken}${conversationIdParam}${cachingParam}`;
+      return `${url}?access_token=${this.apiClient['accessTokenStore'].accessToken?.access_token}${conversationIdParam}${cachingParam}`;
     });
   }
 
@@ -138,7 +145,7 @@ export class AssetService {
       const url = this.backendClient.createUrl(`/conversations/${conversationId}/otr/assets/${assetId}`);
       const cachingParam = forceCaching ? '&forceCaching=true' : '';
 
-      return `${url}?access_token=${this.backendClient.accessToken}${cachingParam}`;
+      return `${url}?access_token=${this.apiClient['accessTokenStore'].accessToken?.access_token}${cachingParam}`;
     });
   }
 
@@ -149,7 +156,7 @@ export class AssetService {
       const assetTokenParam = assetToken ? `&asset_token=${encodeURIComponent(assetToken)}` : '';
       const cachingParam = forceCaching ? '&forceCaching=true' : '';
 
-      return `${url}?access_token=${this.backendClient.accessToken}${assetTokenParam}${cachingParam}`;
+      return `${url}?access_token=${this.apiClient['accessTokenStore'].accessToken?.access_token}${assetTokenParam}${cachingParam}`;
     });
   }
 
@@ -164,7 +171,7 @@ export class AssetService {
     return isEternal ? AssetRetentionPolicy.ETERNAL : AssetRetentionPolicy.PERSISTENT;
   }
 
-  async postAsset(
+  private async postAsset(
     assetData: Uint8Array,
     options: AssetUploadOptions,
     xhrAccessorFunction?: Function,
@@ -202,7 +209,10 @@ export class AssetService {
     }
     xhr.open('POST', this.backendClient.createUrl('/assets/v3'));
     xhr.setRequestHeader('Content-Type', `multipart/mixed; boundary=${BOUNDARY}`);
-    xhr.setRequestHeader('Authorization', `${this.backendClient.accessTokenType} ${this.backendClient.accessToken}`);
+    xhr.setRequestHeader(
+      'Authorization',
+      `${this.apiClient['accessTokenStore'].accessToken?.token_type} ${this.apiClient['accessTokenStore'].accessToken?.access_token}`,
+    );
     xhr.send(new Blob([body, assetData, footer]));
 
     return new Promise<UploadAssetResponse>((resolve, reject) => {
@@ -213,15 +223,19 @@ export class AssetService {
     });
   }
 
-  _compressImage(image: File | Blob): Promise<CompressedImage> {
+  private _compressImage(image: File | Blob): Promise<CompressedImage> {
     return this._compressImageWithWorker('worker/image-worker.js', image, () => image.type === 'image/gif');
   }
 
-  _compressProfileImage(image: File | Blob): Promise<CompressedImage> {
+  private _compressProfileImage(image: File | Blob): Promise<CompressedImage> {
     return this._compressImageWithWorker('worker/profile-image-worker.js', image);
   }
 
-  _compressImageWithWorker(pathToWorkerFile: string, image: File | Blob, filter?: Function): Promise<CompressedImage> {
+  private _compressImageWithWorker(
+    pathToWorkerFile: string,
+    image: File | Blob,
+    filter?: Function,
+  ): Promise<CompressedImage> {
     return loadFileBuffer(image)
       .then(buffer => {
         if (typeof filter === 'function' ? filter() : undefined) {

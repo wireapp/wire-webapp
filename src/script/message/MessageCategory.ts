@@ -20,6 +20,7 @@
 /** Enum for different message categories */
 export enum MessageCategory {
   AUDIO = 1 << 10,
+  COMPOSITE = 1 << 14,
   EXCLUDED = 1 << 1,
   FILE = 1 << 9,
   GIF = 1 << 8,

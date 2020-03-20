@@ -17,8 +17,10 @@
  *
  */
 
+import {APIClient} from '@wireapp/api-client';
 import {amplify} from 'amplify';
 import ko from 'knockout';
+import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {PromiseQueue} from 'Util/PromiseQueue';
@@ -27,6 +29,7 @@ import {isValidApiPath} from 'Util/ValidationUtil';
 import {AuthRepository} from '../auth/AuthRepository';
 import {BackendClientError} from '../error/BackendClientError';
 import {WebAppEvents} from '../event/WebApp';
+import {APIClientSingleton} from './APIClientSingleton';
 import {QUEUE_STATE} from './QueueState';
 
 /**
@@ -63,6 +66,7 @@ type WireRequestType = JQueryXHR & {
 };
 
 export class BackendClient {
+  private readonly apiClient: APIClient;
   private connectivityTimeout: number;
   private queueTimeout: number;
   private readonly accessTokenType: string;
@@ -127,6 +131,7 @@ export class BackendClient {
   }
 
   constructor() {
+    this.apiClient = container.resolve(APIClientSingleton).getClient();
     this.logger = getLogger('BackendClient');
 
     this.connectivityTimeout = undefined;
@@ -176,15 +181,8 @@ export class BackendClient {
   /**
    * Request backend status.
    */
-  status(): JQuery.jqXHR {
-    return $.ajax({
-      headers: {
-        Authorization: `${this.accessTokenType} ${window.decodeURIComponent(this.accessToken)}`,
-      },
-      timeout: BackendClient.CONFIG.CONNECTIVITY_CHECK.REQUEST_TIMEOUT,
-      type: 'GET',
-      url: this.createUrl('/self'),
-    });
+  async status(): Promise<void> {
+    await this.apiClient.self.api.getSelf();
   }
 
   /**
@@ -206,18 +204,20 @@ export class BackendClient {
 
     const _checkStatus = () => {
       return this.status()
-        .done(jqXHR => {
-          this.logger.info('Connectivity verified', jqXHR);
+        .then(() => {
+          this.logger.info('Connectivity verified');
           _resetQueue();
         })
-        .fail(jqXHR => {
-          if (jqXHR.readyState === 4) {
-            this.logger.info(`Connectivity verified by server error '${jqXHR.status}'`, jqXHR);
-            _resetQueue();
-          } else {
+        .catch(error => {
+          const {response, request} = error;
+          const isNetworkError = !response && request && !Object.keys(request).length;
+          if (isNetworkError) {
             this.logger.warn('Connectivity could not be verified... retrying');
             this.connectivityQueue.pause();
             this.connectivityTimeout = window.setTimeout(_checkStatus, RECHECK_TIMEOUT);
+          } else {
+            this.logger.info(`Connectivity verified by server error '${error.status}'`, error);
+            _resetQueue();
           }
         });
     };
@@ -235,7 +235,7 @@ export class BackendClient {
    * Execute queued requests.
    * @returns {undefined} No return value
    */
-  executeRequestQueue(): void {
+  private executeRequestQueue(): void {
     this.queueState(QUEUE_STATE.READY);
     if (this.accessToken && this.requestQueue.getLength()) {
       this.logger.info(`Executing '${this.requestQueue.getLength()}' queued requests`);
@@ -294,7 +294,11 @@ export class BackendClient {
     return this.requestQueue.push(() => this._sendRequest(config));
   }
 
-  _prependRequestQueue(config: RequestConfig, resolveFn: (value: any) => any, rejectFn: (value: any) => any): void {
+  private _prependRequestQueue(
+    config: RequestConfig,
+    resolveFn: (value: any) => any,
+    rejectFn: (value: any) => any,
+  ): void {
     this.requestQueue.pause().unshift(() => {
       return this._sendRequest(config)
         .then(resolveFn)
@@ -307,7 +311,7 @@ export class BackendClient {
    *
    * @see http://api.jquery.com/jquery.ajax/#jQuery-ajax-settings
    */
-  _sendRequest(config: RequestConfig): Promise<any> {
+  private _sendRequest(config: RequestConfig): Promise<any> {
     const {cache, contentType, crossDomain, data, headers, processData, timeout, type, url, withCredentials} = config;
     const ajaxConfig: JQueryAjaxSettings = {cache, contentType, crossDomain, data, headers, processData, timeout, type};
 

@@ -30,7 +30,8 @@
   margin: 0 0 0 -34px;
 
   input[type='radio'] {
-    display: none;
+    position: absolute;
+    opacity: 0;
   }
 
   label {
@@ -62,6 +63,10 @@
     border-width: 6px;
     border-color: var(--background);
     background-color: var(--app-bg-secondary);
+  }
+
+  input[type='radio']:focus + label::before {
+    box-shadow: 0 0 1px 3px var(--background-fade-40);
   }
 }
 

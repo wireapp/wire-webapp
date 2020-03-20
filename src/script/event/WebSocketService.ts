@@ -17,6 +17,7 @@
  *
  */
 
+import {APIClient} from '@wireapp/api-client';
 import {amplify} from 'amplify';
 
 import {Logger, getLogger} from 'Util/Logger';
@@ -46,6 +47,7 @@ enum CHANGE_TRIGGER {
 export type OnNotificationCallback = (data: string) => void;
 
 export class WebSocketService {
+  private readonly apiClient: APIClient;
   private readonly backendClient: BackendClient;
   private readonly clientId?: string;
   private readonly logger: Logger;
@@ -70,7 +72,8 @@ export class WebSocketService {
     };
   }
 
-  constructor(backendClient: BackendClient) {
+  constructor(apiClient: APIClient, backendClient: BackendClient) {
+    this.apiClient = apiClient;
     this.backendClient = backendClient;
     this.logger = getLogger('WebSocketService');
 
@@ -100,7 +103,7 @@ export class WebSocketService {
     this.onNotification = onNotification;
 
     return new Promise(resolve => {
-      this.connectionUrl = `${this.backendClient.webSocketUrl}/await?access_token=${this.backendClient.accessToken}`;
+      this.connectionUrl = `${this.backendClient.webSocketUrl}/await?access_token=${this.apiClient['accessTokenStore'].accessToken?.access_token}`;
       if (this.clientId) {
         this.connectionUrl = appendParameter(this.connectionUrl, `client=${this.clientId}`);
       }
@@ -125,6 +128,9 @@ export class WebSocketService {
       this.socket.onerror = event => {
         this.logger.error('WebSocket connection error.', event);
         this.reset(CHANGE_TRIGGER.ERROR, true);
+        // We need to assume an invalid access token
+        // so we fetch any endpoint in order to get a new access token for the api-client.
+        this.apiClient.self.api.getSelf();
       };
 
       this.socket.onclose = event => {

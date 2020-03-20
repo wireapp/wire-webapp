@@ -19,7 +19,7 @@
 
 import {COLOR, Container, ContainerXS, H1, H2, H3, Loading, Logo, Text} from '@wireapp/react-ui-kit';
 import React from 'react';
-import {FormattedHTMLMessage, FormattedMessage, MessageDescriptor} from 'react-intl';
+import {FormattedMessage, MessageDescriptor} from 'react-intl';
 import {connect} from 'react-redux';
 import {Config} from '../../Config';
 import {unsupportedJoinStrings, unsupportedStrings} from '../../strings';
@@ -62,20 +62,32 @@ export const UnsupportedBrowser = ({
       <WirelessContainer>
         <Container verticalCenter>
           <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} color={COLOR.GRAY}>
-            <FormattedHTMLMessage
+            <FormattedMessage
               {...(isTemporaryGuest
                 ? unsupportedJoinStrings.unsupportedJoinHeadline
                 : unsupportedStrings.headlineBrowser)}
-              values={{brandName: Config.getConfig().BRAND_NAME}}
+              values={{
+                brandName: Config.getConfig().BRAND_NAME,
+                // eslint-disable-next-line react/display-name
+                newline: <br />,
+                // eslint-disable-next-line react/display-name
+                strong: (...chunks: any[]) => <strong style={{color: 'black'}}>{chunks}</strong>,
+              }}
             />
           </H2>
           {isTemporaryGuest && isMobileOs() ? (
             <H3 style={{marginBottom: '10px'}}>
-              <FormattedHTMLMessage {...unsupportedJoinStrings.unsupportedJoinMobileSubhead} />
+              <FormattedMessage {...unsupportedJoinStrings.unsupportedJoinMobileSubhead} />
             </H3>
           ) : (
             <H3 style={{marginBottom: '10px'}}>
-              <FormattedHTMLMessage {...unsupportedStrings.subheadBrowser} />
+              <FormattedMessage
+                {...unsupportedStrings.subheadBrowser}
+                values={{
+                  // eslint-disable-next-line react/display-name
+                  strong: (...chunks: any[]) => <strong style={{fontWeight: 800}}>{chunks}</strong>,
+                }}
+              />
             </H3>
           )}
         </Container>

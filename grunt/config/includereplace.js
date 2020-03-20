@@ -67,21 +67,4 @@ module.exports = {
     },
     src: 'index.html',
   },
-
-  prod_login: {
-    cwd: '<%= dir.src.page %>',
-    dest: '<%= dir.dist.static %>/login',
-    expand: true,
-    options: {
-      globals: {
-        dest: '_prod',
-      },
-      includesDir: '<%= dir.src.page %>/template',
-      prefix: '#',
-    },
-    rename(dest) {
-      return `${dest}/index.html`;
-    },
-    src: 'login.html',
-  },
 };

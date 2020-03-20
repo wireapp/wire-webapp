@@ -17,6 +17,7 @@
  *
  */
 
+import {container} from 'tsyringe';
 import {escape} from 'underscore';
 import {Availability} from '@wireapp/protocol-messaging';
 
@@ -28,7 +29,6 @@ import {renderMessage} from 'Util/messageRenderer';
 import {KEY, isFunctionKey, insertAtCaret} from 'Util/KeyboardUtil';
 import {ParticipantAvatar} from 'Components/participantAvatar';
 
-import {resolve, graph} from '../../config/appResolver';
 import {ModalsViewModel} from '../ModalsViewModel';
 
 import {StorageKey} from '../../storage/StorageKey';
@@ -43,6 +43,7 @@ import {ShortcutType} from '../../ui/ShortcutType';
 import {Config} from '../../Config';
 import {AssetUploader} from '../../assets/AssetUploader';
 import {AssetService} from '../../assets/AssetService';
+import {BackendClient} from '../../service/BackendClient';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -76,7 +77,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.onWindowClick = this.onWindowClick.bind(this);
     this.setElements = this.setElements.bind(this);
     this.updateSelectionState = this.updateSelectionState.bind(this);
-    this.assetUploader = new AssetUploader(new AssetService(resolve(graph.BackendClient)));
+    this.assetUploader = new AssetUploader(new AssetService(container.resolve(BackendClient)));
 
     this.shadowInput = null;
     this.textarea = null;
@@ -367,7 +368,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     const replyMessageId = storageValue.reply ? storageValue.reply.messageId : undefined;
 
     if (replyMessageId) {
-      storageValue.replyEntityPromise = this.conversationRepository.get_message_in_conversation_by_id(
+      storageValue.replyEntityPromise = this.conversationRepository.getMessageInConversationById(
         conversationEntity,
         replyMessageId,
         false,
@@ -472,7 +473,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
       if (messageEntity.quote()) {
         this.conversationRepository
-          .get_message_in_conversation_by_id(this.conversationEntity(), messageEntity.quote().messageId)
+          .getMessageInConversationById(this.conversationEntity(), messageEntity.quote().messageId)
           .then(quotedMessage => this.replyMessageEntity(quotedMessage));
       }
 

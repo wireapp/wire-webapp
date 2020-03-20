@@ -20,6 +20,7 @@
 import poster from 'poster-image';
 import {
   Asset,
+  ButtonAction,
   Cleared,
   ClientAction,
   Confirmation,
@@ -94,7 +95,6 @@ import {AssetRemoteData} from '../assets/AssetRemoteData';
 
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {AudioType} from '../audio/AudioType';
-import {QUEUE_STATE} from '../service/QueueState';
 import {EventName} from '../tracking/EventName';
 
 import {SystemMessageType} from '../message/SystemMessageType';
@@ -241,12 +241,6 @@ export class ConversationRepository {
 
     this.receiving_queue = new PromiseQueue({name: 'ConversationRepository.Receiving'});
     this.messageSender = messageSender;
-
-    // @note Only use the client request queue as to unblock if not blocked by event handling or the cryptographic order of messages will be ruined and sessions might be deleted
-    this.conversation_service.backendClient.queueState.subscribe(queueState => {
-      const queueReady = queueState === QUEUE_STATE.READY;
-      this.messageSender.pauseQueue(!queueReady || this.block_event_handling());
-    });
 
     this.conversations_archived = ko.observableArray([]);
     this.conversations_cleared = ko.observableArray([]);
@@ -541,12 +535,7 @@ export class ConversationRepository {
    * @param {boolean} ensureUser Make sure message entity has a valid user
    * @returns {Promise} Resolves with the message
    */
-  get_message_in_conversation_by_id(
-    conversationEntity,
-    messageId,
-    skipConversationMessages = false,
-    ensureUser = false,
-  ) {
+  getMessageInConversationById(conversationEntity, messageId, skipConversationMessages = false, ensureUser = false) {
     const messageEntity = !skipConversationMessages && conversationEntity.getMessage(messageId);
     const messagePromise = messageEntity
       ? Promise.resolve(messageEntity)
@@ -1070,7 +1059,7 @@ export class ConversationRepository {
 
     return this.get_conversation_by_id(conversation_id)
       .then(conversationEntity => {
-        return this.get_message_in_conversation_by_id(conversationEntity, message_id).then(
+        return this.getMessageInConversationById(conversationEntity, message_id).then(
           message_et => conversationEntity.last_read_timestamp() >= message_et.timestamp(),
         );
       })
@@ -1823,6 +1812,41 @@ export class ConversationRepository {
     this._sendConfirmationStatus(conversationEntity, messageEntity, Confirmation.Type.READ, moreMessageEntities);
   }
 
+  sendButtonAction(conversationEntity, messageEntity, buttonId) {
+    if (conversationEntity.removed_from_conversation()) {
+      return;
+    }
+
+    const senderId = messageEntity.from;
+    const conversationHasUser = conversationEntity.participating_user_ids().includes(senderId);
+
+    if (!conversationHasUser) {
+      messageEntity.setButtonError(buttonId, t('buttonActionError'));
+      messageEntity.waitingButtonId(undefined);
+      return;
+    }
+
+    const protoButtonAction = new ButtonAction({
+      buttonId,
+      referenceMessageId: messageEntity.id,
+    });
+    const genericMessage = new GenericMessage({
+      [GENERIC_MESSAGE_TYPE.BUTTON_ACTION]: protoButtonAction,
+      messageId: createRandomUuid(),
+    });
+    this.messageSender.queueMessage(async () => {
+      try {
+        const recipients = await this.create_recipients(conversationEntity.id, true, [messageEntity.from]);
+        const options = {nativePush: false, precondition: [messageEntity.from], recipients};
+        const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id, options);
+        await this._sendGenericMessage(eventInfoEntity, true);
+      } catch (error) {
+        messageEntity.waitingButtonId(undefined);
+        return messageEntity.setButtonError(buttonId, t('buttonActionError'));
+      }
+    });
+  }
+
   //##############################################################################
   // Send encrypted events
   //##############################################################################
@@ -1830,7 +1854,7 @@ export class ConversationRepository {
   send_asset_remotedata(conversationEntity, file, messageId, asImage) {
     let genericMessage;
 
-    return this.get_message_in_conversation_by_id(conversationEntity, messageId)
+    return this.getMessageInConversationById(conversationEntity, messageId)
       .then(() => {
         const retention = this.asset_service.getAssetRetention(this.selfUser(), conversationEntity);
         const options = {
@@ -1955,7 +1979,7 @@ export class ConversationRepository {
           retention,
         };
 
-        const messageEntityPromise = this.get_message_in_conversation_by_id(conversationEntity, messageId);
+        const messageEntityPromise = this.getMessageInConversationById(conversationEntity, messageId);
         return messageEntityPromise.then(messageEntity => {
           return this.assetUploader.uploadAsset(messageEntity.id, imageBlob, options).then(uploadedImageAsset => {
             const assetPreview = new Asset.Preview(imageBlob.type, imageBlob.size, uploadedImageAsset.uploaded);
@@ -2130,7 +2154,7 @@ export class ConversationRepository {
           );
           genericMessage[GENERIC_MESSAGE_TYPE.TEXT] = protoText;
 
-          return this.get_message_in_conversation_by_id(conversationEntity, messageId);
+          return this.getMessageInConversationById(conversationEntity, messageId);
         }
 
         this.logger.debug(`No link preview for message '${messageId}' in conversation '${conversationId}' created`);
@@ -2512,7 +2536,7 @@ export class ConversationRepository {
    */
   async _updateMessageAsSent(conversationEntity, eventJson, isoDate) {
     try {
-      const messageEntity = await this.get_message_in_conversation_by_id(conversationEntity, eventJson.id);
+      const messageEntity = await this.getMessageInConversationById(conversationEntity, eventJson.id);
       messageEntity.status(StatusType.SENT);
       const changes = {status: StatusType.SENT};
       if (isoDate) {
@@ -2577,10 +2601,11 @@ export class ConversationRepository {
    *
    * @private
    * @param {EventInfoEntity} eventInfoEntity Info about event
+   * @param {boolean} skipLegalHold Skip the legal hold detection
    * @returns {Promise} Resolves when the message was sent
    */
-  _sendGenericMessage(eventInfoEntity) {
-    return this._grantOutgoingMessage(eventInfoEntity)
+  _sendGenericMessage(eventInfoEntity, skipLegalHold = false) {
+    return this._grantOutgoingMessage(eventInfoEntity, undefined, skipLegalHold)
       .then(() => this._shouldSendAsExternal(eventInfoEntity))
       .then(sendAsExternal => {
         if (sendAsExternal) {
@@ -2594,7 +2619,7 @@ export class ConversationRepository {
         });
       })
       .catch(error => {
-        const isRequestTooLarge = error.code === BackendClientError.STATUS_CODE.REQUEST_TOO_LARGE;
+        const isRequestTooLarge = error?.code === BackendClientError.STATUS_CODE.REQUEST_TOO_LARGE;
         if (isRequestTooLarge) {
           return this._sendExternalGenericMessage(eventInfoEntity);
         }
@@ -2643,13 +2668,14 @@ export class ConversationRepository {
         this.clientMismatchHandler.onClientMismatch(eventInfoEntity, response, payload);
         return response;
       })
-      .catch(error => {
-        const isUnknownClient = error.label === BackendClientError.LABEL.UNKNOWN_CLIENT;
+      .catch(axiosError => {
+        const error = axiosError.response?.data;
+        const isUnknownClient = error?.label === BackendClientError.LABEL.UNKNOWN_CLIENT;
         if (isUnknownClient) {
           return this.client_repository.removeLocalClient();
         }
 
-        if (!error.missing) {
+        if (!error?.missing) {
           throw error;
         }
 
@@ -2667,6 +2693,7 @@ export class ConversationRepository {
               `Updated '${messageType}' message (${messageId}) for conversation '${conversationId}'. Will ignore missing receivers.`,
               updatedPayload,
             );
+
             return this.conversation_service.post_encrypted_message(conversationId, updatedPayload, true);
           });
       });
@@ -2679,7 +2706,8 @@ export class ConversationRepository {
     const sender = this.client_repository.currentClient().id;
     try {
       await this.conversation_service.post_encrypted_message(conversationEntity.id, {recipients: {}, sender});
-    } catch (error) {
+    } catch (axiosError) {
+      const error = axiosError.response?.data || axiosError;
       if (error.missing) {
         const remoteUserClients = error.missing;
         const localUserClients = await this.create_recipients(conversationEntity.id);
@@ -2752,7 +2780,7 @@ export class ConversationRepository {
     await this.eventRepository.injectEvent(legalHoldUpdateMessage);
   }
 
-  async _grantOutgoingMessage(eventInfoEntity, userIds) {
+  async _grantOutgoingMessage(eventInfoEntity, userIds, skipLegalHold = false) {
     const messageType = eventInfoEntity.getType();
     const allowedMessageTypes = ['cleared', 'clientAction', 'confirmation', 'deleted', 'lastRead'];
     if (allowedMessageTypes.includes(messageType)) {
@@ -2761,37 +2789,40 @@ export class ConversationRepository {
 
     const isMessageEdit = messageType === GENERIC_MESSAGE_TYPE.EDITED;
 
-    // Legal Hold
-    const conversationEntity = this.find_conversation_by_id(eventInfoEntity.conversationId);
-    const localLegalHoldStatus = conversationEntity.legalHoldStatus();
-    await this.updateAllClients(conversationEntity, !isMessageEdit);
-    const updatedLocalLegalHoldStatus = conversationEntity.legalHoldStatus();
-
-    const {genericMessage} = eventInfoEntity;
-    genericMessage[messageType][PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS] = updatedLocalLegalHoldStatus;
-
-    const haveNewClientsChangeLegalHoldStatus = localLegalHoldStatus !== updatedLocalLegalHoldStatus;
-
-    if (!isMessageEdit && haveNewClientsChangeLegalHoldStatus) {
-      const {conversationId, timestamp: numericTimestamp} = eventInfoEntity;
-      await this.injectLegalHoldMessage({
-        beforeTimestamp: true,
-        conversationId,
-        legalHoldStatus: updatedLocalLegalHoldStatus,
-        timestamp: numericTimestamp,
-        userId: this.selfUser().id,
-      });
-    }
-
-    const shouldShowLegalHoldWarning =
-      haveNewClientsChangeLegalHoldStatus && updatedLocalLegalHoldStatus === LegalHoldStatus.ENABLED;
-
     const isCallingMessage = messageType === GENERIC_MESSAGE_TYPE.CALLING;
     const consentType = isCallingMessage
       ? ConversationRepository.CONSENT_TYPE.OUTGOING_CALL
       : ConversationRepository.CONSENT_TYPE.MESSAGE;
 
-    return this.grantMessage(eventInfoEntity, consentType, userIds, shouldShowLegalHoldWarning);
+    // Legal Hold
+    if (!skipLegalHold) {
+      const conversationEntity = this.find_conversation_by_id(eventInfoEntity.conversationId);
+      const localLegalHoldStatus = conversationEntity.legalHoldStatus();
+      await this.updateAllClients(conversationEntity, !isMessageEdit);
+      const updatedLocalLegalHoldStatus = conversationEntity.legalHoldStatus();
+
+      const {genericMessage} = eventInfoEntity;
+      genericMessage[messageType][PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS] = updatedLocalLegalHoldStatus;
+
+      const haveNewClientsChangeLegalHoldStatus = localLegalHoldStatus !== updatedLocalLegalHoldStatus;
+
+      if (!isMessageEdit && haveNewClientsChangeLegalHoldStatus) {
+        const {conversationId, timestamp: numericTimestamp} = eventInfoEntity;
+        await this.injectLegalHoldMessage({
+          beforeTimestamp: true,
+          conversationId,
+          legalHoldStatus: updatedLocalLegalHoldStatus,
+          timestamp: numericTimestamp,
+          userId: this.selfUser().id,
+        });
+      }
+
+      const shouldShowLegalHoldWarning =
+        haveNewClientsChangeLegalHoldStatus && updatedLocalLegalHoldStatus === LegalHoldStatus.ENABLED;
+
+      return this.grantMessage(eventInfoEntity, consentType, userIds, shouldShowLegalHoldWarning);
+    }
+    return this.grantMessage(eventInfoEntity, consentType, userIds);
   }
 
   grantMessage(eventInfoEntity, consentType, userIds, shouldShowLegalHoldWarning = false) {
@@ -2980,7 +3011,7 @@ export class ConversationRepository {
         throw error;
       }
       this.logger.error(`Failed to upload asset for conversation '${conversationEntity.id}': ${error.message}`, error);
-      const messageEntity = await this.get_message_in_conversation_by_id(conversationEntity, messageId);
+      const messageEntity = await this.getMessageInConversationById(conversationEntity, messageId);
       this.send_asset_upload_failed(conversationEntity, messageEntity.id);
       return this.update_message_as_upload_failed(messageEntity);
     }
@@ -3296,6 +3327,9 @@ export class ConversationRepository {
       case BackendEvent.CONVERSATION.RECEIPT_MODE_UPDATE:
         return this._onReceiptModeChanged(conversationEntity, eventJson);
 
+      case ClientEvent.CONVERSATION.BUTTON_ACTION_CONFIRMATION:
+        return this._onButtonActionConfirmation(conversationEntity, eventJson);
+
       case ClientEvent.CONVERSATION.MESSAGE_ADD:
         const isMessageEdit = !!eventJson.edited_time;
         if (isMessageEdit) {
@@ -3305,6 +3339,7 @@ export class ConversationRepository {
         return this._addEventToConversation(conversationEntity, eventJson);
 
       case BackendEvent.CONVERSATION.MESSAGE_TIMER_UPDATE:
+      case ClientEvent.CONVERSATION.COMPOSITE_MESSAGE_ADD:
       case ClientEvent.CONVERSATION.DELETE_EVERYWHERE:
       case ClientEvent.CONVERSATION.INCOMING_MESSAGE_TOO_BIG:
       case ClientEvent.CONVERSATION.KNOCK:
@@ -3462,7 +3497,7 @@ export class ConversationRepository {
    * @returns {Promise} Resolves when the event was handled
    */
   _on_asset_upload_complete(conversationEntity, event_json) {
-    return this.get_message_in_conversation_by_id(conversationEntity, event_json.id)
+    return this.getMessageInConversationById(conversationEntity, event_json.id)
       .then(message_et => this.update_message_as_upload_complete(conversationEntity, message_et, event_json))
       .catch(error => {
         if (error.type !== z.error.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
@@ -3722,7 +3757,7 @@ export class ConversationRepository {
   _onMessageDeleted(conversationEntity, eventJson) {
     const {data: eventData, from, id: eventId, time} = eventJson;
 
-    return this.get_message_in_conversation_by_id(conversationEntity, eventData.message_id)
+    return this.getMessageInConversationById(conversationEntity, eventData.message_id)
       .then(deletedMessageEntity => {
         if (deletedMessageEntity.ephemeral_expires()) {
           return;
@@ -3801,7 +3836,7 @@ export class ConversationRepository {
     const eventData = eventJson.data;
     const messageId = eventData.message_id;
 
-    return this.get_message_in_conversation_by_id(conversationEntity, messageId)
+    return this.getMessageInConversationById(conversationEntity, messageId)
       .then(messageEntity => {
         if (!messageEntity || !messageEntity.is_content()) {
           const type = messageEntity ? messageEntity.type : 'unknown';
@@ -3828,6 +3863,32 @@ export class ConversationRepository {
           throw error;
         }
       });
+  }
+
+  async _onButtonActionConfirmation(conversationEntity, eventJson) {
+    const {messageId, buttonId} = eventJson.data;
+    try {
+      const messageEntity = await this.getMessageInConversationById(conversationEntity, messageId);
+      if (!messageEntity || !messageEntity.isComposite()) {
+        const type = messageEntity ? messageEntity.type : 'unknown';
+
+        const log = `Cannot react to '${type}' message '${messageId}' in conversation '${conversationEntity.id}'`;
+        this.logger.error(log, messageEntity);
+        throw new z.error.ConversationError(z.error.ConversationError.TYPE.WRONG_TYPE);
+      }
+      const changes = messageEntity.getSelectionChange(buttonId);
+      if (changes) {
+        this.eventService.updateEventSequentially(messageEntity.primary_key, changes);
+      }
+      return;
+    } catch (error) {
+      const isNotFound = error.type === z.error.ConversationError.TYPE.MESSAGE_NOT_FOUND;
+      if (!isNotFound) {
+        const log = `Failed to handle reaction to message '${messageId}' in conversation '${conversationEntity.id}'`;
+        this.logger.error(log, {error, event: eventJson});
+        throw error;
+      }
+    }
   }
 
   /**

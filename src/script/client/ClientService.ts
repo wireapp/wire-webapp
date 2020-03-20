@@ -17,15 +17,15 @@
  *
  */
 
+import {APIClient} from '@wireapp/api-client';
 import {Logger, getLogger} from 'Util/Logger';
 
 import {NewClient, PublicClient, RegisteredClient} from '@wireapp/api-client/dist/client';
-import {BackendClient} from '../service/BackendClient';
 import {StorageService} from '../storage';
 import {StorageSchemata} from '../storage/StorageSchemata';
 
 export class ClientService {
-  private readonly backendClient: BackendClient;
+  private readonly apiClient: APIClient;
   private readonly storageService: StorageService;
   private readonly logger: Logger;
   private readonly CLIENT_STORE_NAME: string;
@@ -38,12 +38,8 @@ export class ClientService {
     return '/users';
   }
 
-  /**
-   * @param backendClient Client for the API calls
-   * @param storageService Service for all storage interactions
-   */
-  constructor(backendClient: BackendClient, storageService: StorageService) {
-    this.backendClient = backendClient;
+  constructor(apiClient: APIClient, storageService: StorageService) {
+    this.apiClient = apiClient;
     this.storageService = storageService;
     this.logger = getLogger('ClientService');
 
@@ -63,13 +59,7 @@ export class ClientService {
    * @returns Resolves once the deletion of the client is complete
    */
   deleteClient(clientId: string, password: string): Promise<void> {
-    return this.backendClient.sendJson({
-      data: {
-        password,
-      },
-      type: 'DELETE',
-      url: `${ClientService.URL_CLIENTS}/${clientId}`,
-    });
+    return this.apiClient.client.api.deleteClient(clientId, password);
   }
 
   /**
@@ -78,11 +68,7 @@ export class ClientService {
    * @returns Resolves once the deletion of the temporary client is complete
    */
   deleteTemporaryClient(clientId: string): Promise<void> {
-    return this.backendClient.sendJson({
-      data: {},
-      type: 'DELETE',
-      url: `${ClientService.URL_CLIENTS}/${clientId}`,
-    });
+    return this.apiClient.client.api.deleteClient(clientId);
   }
 
   /**
@@ -93,10 +79,7 @@ export class ClientService {
    * @returns Resolves with the requested client
    */
   getClientById(clientId: string): Promise<RegisteredClient> {
-    return this.backendClient.sendRequest({
-      type: 'GET',
-      url: `${ClientService.URL_CLIENTS}/${clientId}`,
-    });
+    return this.apiClient.client.api.getClient(clientId);
   }
 
   /**
@@ -105,10 +88,7 @@ export class ClientService {
    * @returns Resolves with the clients of the self user
    */
   getClients(): Promise<RegisteredClient[]> {
-    return this.backendClient.sendRequest({
-      type: 'GET',
-      url: ClientService.URL_CLIENTS,
-    });
+    return this.apiClient.client.api.getClients();
   }
 
   /**
@@ -119,10 +99,7 @@ export class ClientService {
    * @returns Resolves with the clients of a user
    */
   getClientsByUserId(userId: string): Promise<PublicClient[]> {
-    return this.backendClient.sendRequest({
-      type: 'GET',
-      url: `${ClientService.URL_USERS}/${userId}${ClientService.URL_CLIENTS}`,
-    });
+    return this.apiClient.user.api.getClients(userId);
   }
 
   /**
@@ -131,11 +108,7 @@ export class ClientService {
    * @returns Resolves with the registered client information
    */
   postClients(newClient: NewClient): Promise<RegisteredClient> {
-    return this.backendClient.sendJson({
-      data: newClient,
-      type: 'POST',
-      url: ClientService.URL_CLIENTS,
-    });
+    return this.apiClient.client.api.postClient(newClient);
   }
 
   //##############################################################################

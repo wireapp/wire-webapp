@@ -21,9 +21,9 @@ import {amplify} from 'amplify';
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
-import {buildSupportUrl} from 'Util/UrlUtil';
 import {noop, afterRender} from 'Util/util';
 import {formatLocale} from 'Util/TimeUtil';
+import {onEscKey, offEscKey, isEnterKey, isSpaceKey} from 'Util/KeyboardUtil';
 
 import {Config} from '../Config';
 import {WebAppEvents} from '../event/WebApp';
@@ -198,11 +198,15 @@ export class ModalsViewModel {
       case Types.SESSION_RESET: {
         content.titleText = t('modalSessionResetHeadline');
         content.primaryAction = {...primaryAction, text: t('modalAcknowledgeAction')};
-        const supportLink = buildSupportUrl(Config.getConfig().SUPPORT.FORM.BUG);
         content.messageHtml = t(
           'modalSessionResetMessage',
           {},
-          {'/link': '</a>', link: `<a href="${supportLink}"rel="nofollow noopener noreferrer" target="_blank">`},
+          {
+            '/link': '</a>',
+            link: `<a href="${
+              Config.getConfig().URL.SUPPORT.BUG_REPORT
+            }"rel="nofollow noopener noreferrer" target="_blank">`,
+          },
         );
         break;
       }
@@ -220,7 +224,23 @@ export class ModalsViewModel {
     }
     this.content(content);
     this.state(States.OPEN);
+    if (!preventClose) {
+      onEscKey(this.hide);
+    }
+    window.addEventListener('keydown', this.handleEnterKey);
     afterRender(() => this.inputFocus(true));
+  };
+
+  handleEnterKey = event => {
+    if (event.target.tagName === 'BUTTON') {
+      if (isSpaceKey(event) || isEnterKey(event)) {
+        event.target.click();
+      }
+      event.stopPropagation();
+      event.preventDefault();
+    } else if (isEnterKey(event)) {
+      this.doAction(this.confirm, this.content().closeOnConfirm);
+    }
   };
 
   hasPassword = () => this.content().currentType === Types.PASSWORD;
@@ -257,6 +277,8 @@ export class ModalsViewModel {
   };
 
   hide = () => {
+    offEscKey(this.hide);
+    window.removeEventListener('keydown', this.handleEnterKey);
     this.inputFocus(false);
     this.state(States.CLOSING);
     this.content().closeFn();

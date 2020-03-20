@@ -17,4 +17,6 @@
  *
  */
 
-window.testEventServiceClass('event_service', 'EventService');
+import {testEventServiceClass} from './EventServiceCommon';
+
+testEventServiceClass('event_service', 'EventService');

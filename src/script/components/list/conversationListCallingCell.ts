@@ -24,6 +24,7 @@ import {CALL_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/av
 import {t} from 'Util/LocalizerUtil';
 import {formatSeconds} from 'Util/TimeUtil';
 import {afterRender} from 'Util/util';
+import {sortUsersByPriority} from 'Util/StringUtil';
 
 import {ParticipantAvatar} from 'Components/participantAvatar';
 import {generateConversationUrl} from '../../router/routeGenerator';
@@ -80,6 +81,7 @@ class ConversationListCallingCell {
   readonly temporaryUserStyle: boolean;
   readonly videoGrid: ko.PureComputed<Grid>;
   readonly isSelfVerified: ko.Subscribable<boolean>;
+  readonly users: ko.PureComputed<User[]>;
 
   constructor({
     call,
@@ -142,7 +144,7 @@ class ConversationListCallingCell {
     this.showParticipants = ko.observable(false);
     this.showParticipantsButton = ko.pureComputed(() => this.isOngoing() && this.conversation().isGroup());
     this.participantsButtonLabel = ko.pureComputed(() => {
-      return t('callParticipants', this.call.participants().length);
+      return t('callParticipants', this.users().length);
     });
     this.showMaximize = ko.pureComputed(() => this.multitasking.isMinimized() && this.isOngoing());
 
@@ -165,6 +167,10 @@ class ConversationListCallingCell {
     this.showNoCameraPreview = ko.computed(() => {
       return !hasAccessToCamera() && call.initialType === CALL_TYPE.VIDEO && !this.showVideoGrid() && !this.isOngoing();
     });
+
+    this.users = ko.pureComputed(() =>
+      [call.selfParticipant, ...call.participants()].map(({userId}) => this.findUser(userId)).sort(sortUsersByPriority),
+    );
 
     this.dispose = () => {
       window.clearInterval(callDurationUpdateInterval);
@@ -192,6 +198,11 @@ class ConversationListCallingCell {
 
   findUser(userId: string): User {
     return this.conversationParticipants().find(user => user.id === userId);
+  }
+
+  userHasCamera(user: User): boolean {
+    const participant = this.call.participants().find(({userId}) => userId === user.id);
+    return participant?.hasActiveVideo() ?? false;
   }
 }
 
@@ -299,8 +310,8 @@ ko.components.register('conversation-list-calling-cell', {
       </div>
 
       <div class="call-ui__participant-list__wrapper" data-bind="css: {'call-ui__participant-list__wrapper--active': showParticipants}">
-        <div class="call-ui__participant-list" data-bind="foreach: {data: call.participants(), as: 'participant', noChildContext: true}, fadingscrollbar" data-uie-name="list-call-ui-participants">
-            <participant-item params="participant: findUser(participant.userId), hideInfo: true, showCamera: participant.hasActiveVideo(), selfInTeam: $parent.selfInTeam, isSelfVerified: isSelfVerified" data-bind="css: {'no-underline': true}"></participant-item>
+        <div class="call-ui__participant-list" data-bind="foreach: {data: users, as: 'user', noChildContext: true}, fadingscrollbar" data-uie-name="list-call-ui-participants">
+            <participant-item params="participant: user, hideInfo: true, showCamera: userHasCamera(user), selfInTeam: $parent.selfInTeam, isSelfVerified: isSelfVerified" data-bind="css: {'no-underline': true}"></participant-item>
         </div>
       </div>
 

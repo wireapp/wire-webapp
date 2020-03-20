@@ -20,7 +20,7 @@
 import {ValidationUtil} from '@wireapp/commons';
 import {Button, Checkbox, CheckboxLabel, Form, Input, InputBlock, Small} from '@wireapp/react-ui-kit';
 import React from 'react';
-import {FormattedHTMLMessage, useIntl} from 'react-intl';
+import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 import {Config} from '../../Config';
@@ -33,7 +33,7 @@ import {ValidationError} from '../module/action/ValidationError';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as AccentColor from '../util/AccentColor';
-import {parseError, parseValidationErrors} from '../util/errorUtil';
+import Exception from './Exception';
 
 interface Props extends React.HTMLProps<HTMLFormElement> {
   beforeSubmit?: () => Promise<void>;
@@ -223,8 +223,7 @@ const AccountForm = ({account, ...props}: Props & ConnectedProps & DispatchProps
         >
           {_(accountFormStrings.passwordHelp, {minPasswordLength: Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH})}
         </Small>
-        {parseError(props.authError)}
-        {parseValidationErrors(validationErrors)}
+        <Exception errors={[props.authError, ...validationErrors]} />
       </div>
       <Checkbox
         ref={inputs.terms}
@@ -241,10 +240,15 @@ const AccountForm = ({account, ...props}: Props & ConnectedProps & DispatchProps
         style={{justifyContent: 'center'}}
       >
         <CheckboxLabel>
-          <FormattedHTMLMessage
+          <FormattedMessage
             {...accountFormStrings.terms}
             values={{
-              linkParams: `target=_blank data-uie-name=go-terms href=${createURLForToU()}`,
+              // eslint-disable-next-line react/display-name
+              a: (...chunks: any[]) => (
+                <a target="_blank" rel="noopener noreferrer" data-uie-name="go-terms" href={createURLForToU()}>
+                  {chunks}
+                </a>
+              ),
             }}
           />
         </CheckboxLabel>

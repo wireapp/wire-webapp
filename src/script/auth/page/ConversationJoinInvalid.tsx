@@ -18,7 +18,7 @@
  */
 import {COLOR, ContainerXS, H2, Text} from '@wireapp/react-ui-kit';
 import React from 'react';
-import {FormattedHTMLMessage, useIntl} from 'react-intl';
+import {FormattedMessage, useIntl} from 'react-intl';
 import {Config} from '../../Config';
 import {conversationJoinStrings} from '../../strings';
 import UnsupportedBrowser from '../component/UnsupportedBrowser';
@@ -37,9 +37,15 @@ const ConversationJoinInvalid = ({}: Props) => {
             color={COLOR.GRAY}
             data-uie-name="status-invalid-headline"
           >
-            <FormattedHTMLMessage
+            <FormattedMessage
               {...conversationJoinStrings.invalidHeadline}
-              values={{brandName: Config.getConfig().BRAND_NAME}}
+              values={{
+                brandName: Config.getConfig().BRAND_NAME,
+                // eslint-disable-next-line react/display-name
+                newline: <br />,
+                // eslint-disable-next-line react/display-name
+                strong: (...chunks: any[]) => <strong style={{color: 'black'}}>{chunks}</strong>,
+              }}
             />
           </H2>
           <Text style={{fontSize: '16px', marginTop: '10px'}} data-uie-name="status-invalid-text">

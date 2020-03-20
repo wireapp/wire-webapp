@@ -4,13 +4,13 @@
     <!-- ko if: showSupportSection() -->
     <section class="preferences-section">
       <header class="preferences-header" data-bind="text: t('preferencesAboutSupport')"></header>
-      <a class="preferences-link" data-bind="attr: {href: supportUrl}, text: t('preferencesAboutSupportWebsite')" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-support"></a>
-      <a class="preferences-link" data-bind="attr: {href: supportContactUrl}, text: t('preferencesAboutSupportContact')" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-contact-support"></a>
+      <a class="preferences-link" data-bind="attr: {href: Config.URL.SUPPORT.INDEX}, text: t('preferencesAboutSupportWebsite')" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-support"></a>
+      <a class="preferences-link" data-bind="attr: {href: Config.URL.SUPPORT.CONTACT}, text: t('preferencesAboutSupportContact')" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-contact-support"></a>
     </section>
     <!-- /ko -->
     <!-- ko if: showWireSection() -->
       <section class="preferences-section">
-        <header class="preferences-header" data-bind="text: brandName"></header>
+        <header class="preferences-header" data-bind="text: Config.BRAND_NAME"></header>
         <!-- ko if: termsOfUseUrl() -->
           <a class="preferences-link" data-bind="attr: {href: termsOfUseUrl()}, text: t('preferencesAboutTermsOfUse')" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-legal"></a>
         <!-- /ko -->
@@ -18,7 +18,7 @@
           <a class="preferences-link" data-bind="attr: {href: privacyPolicyUrl}, text: t('preferencesAboutPrivacyPolicy')" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-privacy"></a>
         <!-- /ko -->
         <!-- ko if: websiteUrl -->
-          <a class="preferences-link" data-bind="attr: {href: websiteUrl}, text: t('preferencesAboutWebsite', brandName)" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-wire-dot-com"></a>
+          <a class="preferences-link" data-bind="attr: {href: websiteUrl}, text: t('preferencesAboutWebsite', Config.BRAND_NAME)" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-wire-dot-com"></a>
         <!-- /ko -->
       </section>
     <!-- /ko -->

@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2019 Wire Swiss GmbH
+ * Copyright (C) 2020 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,16 @@
  *
  */
 
-import {BackendClient} from '../service/BackendClient';
+import {AssetType} from '../../assets/AssetType';
+import {Asset} from './Asset';
 
-/**
- * Dependencies is a Map that will contain all the dependencies of the app
- * The keys of the map are the classes of services the app needs and the value are the name of the service and its dependencies
- */
-const dependencies = new WeakMap();
+export class Button extends Asset {
+  public readonly text: string;
 
-dependencies.set(BackendClient, {dependencies: [], name: 'BackendClient'});
+  constructor(id?: string, text: string = '') {
+    super(id);
+    this.type = AssetType.BUTTON;
 
-export {dependencies, BackendClient};
+    this.text = text;
+  }
+}

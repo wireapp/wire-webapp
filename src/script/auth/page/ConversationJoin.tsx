@@ -32,7 +32,7 @@ import {
   Text,
 } from '@wireapp/react-ui-kit';
 import React, {useEffect, useState} from 'react';
-import {FormattedHTMLMessage, useIntl} from 'react-intl';
+import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {Redirect} from 'react-router';
 import {AnyAction, Dispatch} from 'redux';
@@ -76,12 +76,12 @@ const ConversationJoin = ({
   const {formatMessage: _} = useIntl();
 
   const [accentColor] = useState(AccentColor.random());
-  const [isPwaEnabled, setIsPwaEnabled] = useState();
-  const [conversationCode, setConversationCode] = useState();
-  const [conversationKey, setConversationKey] = useState();
-  const [enteredName, setEnteredName] = useState();
-  const [error, setError] = useState();
-  const [expiresIn, setExpiresIn] = useState();
+  const [isPwaEnabled, setIsPwaEnabled] = useState<boolean>();
+  const [conversationCode, setConversationCode] = useState<string>();
+  const [conversationKey, setConversationKey] = useState<string>();
+  const [enteredName, setEnteredName] = useState<string>();
+  const [error, setError] = useState<any>();
+  const [expiresIn, setExpiresIn] = useState<number>();
   const [forceNewTemporaryGuestAccount, setForceNewTemporaryGuestAccount] = useState(false);
   const [isValidLink, setIsValidLink] = useState(true);
   const [isValidName, setIsValidName] = useState(true);
@@ -197,9 +197,15 @@ const ConversationJoin = ({
               color={COLOR.GRAY}
               data-uie-name="status-full-headline"
             >
-              <FormattedHTMLMessage
+              <FormattedMessage
                 {...conversationJoinStrings.fullConversationHeadline}
-                values={{brandName: Config.getConfig().BRAND_NAME}}
+                values={{
+                  brandName: Config.getConfig().BRAND_NAME,
+                  // eslint-disable-next-line react/display-name
+                  newline: <br />,
+                  // eslint-disable-next-line react/display-name
+                  strong: (...chunks: any[]) => <strong style={{color: 'black'}}>{chunks}</strong>,
+                }}
               />
             </H2>
             <Text style={{fontSize: '16px', marginTop: '10px'}} data-uie-name="status-full-text">
@@ -210,13 +216,24 @@ const ConversationJoin = ({
           <ContainerXS style={{margin: 'auto 0'}}>
             <AppAlreadyOpen fullscreen={isPwaEnabled} />
             <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} color={COLOR.GRAY}>
-              <FormattedHTMLMessage
+              <FormattedMessage
                 {...conversationJoinStrings.headline}
-                values={{brandName: Config.getConfig().BRAND_NAME}}
+                values={{
+                  brandName: Config.getConfig().BRAND_NAME,
+                  // eslint-disable-next-line react/display-name
+                  newline: <br />,
+                  // eslint-disable-next-line react/display-name
+                  strong: (...chunks: any[]) => <strong style={{color: 'black'}}>{chunks}</strong>,
+                }}
               />
             </H2>
             <Text style={{fontSize: '16px', marginTop: '10px'}}>
-              <FormattedHTMLMessage {...conversationJoinStrings.subhead} />
+              <FormattedMessage
+                {...conversationJoinStrings.subhead}
+                values={{
+                  newline: <br />,
+                }}
+              />
             </Text>
             <Form style={{marginTop: 30}}>
               <InputSubmitCombo>
@@ -271,12 +288,18 @@ const ConversationJoin = ({
               data-uie-name="status-join-headline"
             >
               {selfName ? (
-                <FormattedHTMLMessage
+                <FormattedMessage
                   {...conversationJoinStrings.existentAccountHeadline}
-                  values={{brandName: Config.getConfig().BRAND_NAME, name: StringUtil.capitalize(selfName)}}
+                  values={{
+                    brandName: Config.getConfig().BRAND_NAME,
+                    name: StringUtil.capitalize(selfName),
+                    newline: <br />,
+                    // eslint-disable-next-line react/display-name
+                    strong: (...chunks: any[]) => <strong style={{color: 'black'}}>{chunks}</strong>,
+                  }}
                 />
               ) : (
-                <FormattedHTMLMessage
+                <FormattedMessage
                   {...conversationJoinStrings.headline}
                   values={{brandName: Config.getConfig().BRAND_NAME}}
                 />

@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2020 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,11 +17,24 @@
  *
  */
 
-import {buildSupportUrl} from 'Util/UrlUtil';
+import {APIClient} from '@wireapp/api-client';
+import {singleton} from 'tsyringe';
+import {Config} from '../Config';
 
-ko.bindingHandlers.supportLink = {
-  update(element, valueAccessor) {
-    const supportId = valueAccessor();
-    element.setAttribute('href', buildSupportUrl(supportId));
-  },
-};
+@singleton()
+export class APIClientSingleton {
+  private readonly apiClient: APIClient;
+  constructor() {
+    this.apiClient = new APIClient({
+      urls: {
+        name: 'backend',
+        rest: Config.getConfig().BACKEND_REST,
+        ws: Config.getConfig().BACKEND_WS,
+      },
+    });
+  }
+
+  public getClient(): APIClient {
+    return this.apiClient;
+  }
+}

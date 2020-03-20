@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2019 Wire Swiss GmbH
+ * Copyright (C) 2020 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,12 +17,15 @@
  *
  */
 
-import {resolver} from 'Util/dependenciesResolver';
+const fileList = require.context('Resource/image/icon', true, /.+\.svg$/);
 
-import * as graph from './dependenciesGraph';
+const svgs: {[index: string]: Document} = {};
+const parser = new DOMParser();
+fileList.keys().forEach(iconFileName => {
+  const iconPath = iconFileName.replace(/^\.\//, '');
+  const iconName = iconFileName.substring(iconFileName.lastIndexOf('/') + 1).replace(/\.svg$/i, '');
+  const svgString = require(`Resource/image/icon/${iconPath}`);
+  svgs[iconName] = parser.parseFromString(svgString, 'image/svg+xml');
+});
 
-resolver.init(graph.dependencies);
-
-const resolve = resolver.resolve;
-
-export {resolve, graph};
+export default svgs;

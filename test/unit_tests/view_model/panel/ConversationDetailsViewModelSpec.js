@@ -22,9 +22,10 @@ import {noop} from 'Util/util';
 import {ConversationDetailsViewModel} from 'src/script/view_model/panel/ConversationDetailsViewModel';
 import {Conversation} from 'src/script/entity/Conversation';
 import {ConversationType} from 'src/script/conversation/ConversationType';
+import {TestFactory} from '../../../helper/TestFactory';
 
 describe('ConversationDetailsViewModel', () => {
-  const testFactory = new window.TestFactory();
+  const testFactory = new TestFactory();
   let conversationDetailsViewModel;
 
   beforeEach(() => {
@@ -38,8 +39,8 @@ describe('ConversationDetailsViewModel', () => {
         onGoToRoot: noop,
         repositories: {
           conversation: conversationRepository,
-          team: TestFactory.team_repository,
-          user: TestFactory.user_repository,
+          team: testFactory.team_repository,
+          user: testFactory.user_repository,
         },
       });
     });

@@ -20,14 +20,7 @@
 import {getLogger} from 'Util/Logger';
 import {Config} from '../../Config';
 
-import {
-  getPrivacyPolicyUrl,
-  getSupportContactUrl,
-  getSupportUrl,
-  getTermsOfUsePersonalUrl,
-  getTermsOfUseTeamUrl,
-  getWebsiteUrl,
-} from '../../externalRoute';
+import {getPrivacyPolicyUrl, getTermsOfUsePersonalUrl, getTermsOfUseTeamUrl, getWebsiteUrl} from '../../externalRoute';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -39,10 +32,8 @@ z.viewModel.content.PreferencesAboutViewModel = class PreferencesAboutViewModel 
 
     this.userRepository = repositories.user;
     this.selfUser = this.userRepository.self;
-    this.brandName = Config.getConfig().BRAND_NAME;
+    this.Config = Config.getConfig();
 
-    this.supportUrl = getSupportUrl();
-    this.supportContactUrl = getSupportContactUrl();
     this.websiteUrl = getWebsiteUrl();
     this.privacyPolicyUrl = getPrivacyPolicyUrl();
     this.termsOfUseUrl = ko.pureComputed(() => {
@@ -57,6 +48,6 @@ z.viewModel.content.PreferencesAboutViewModel = class PreferencesAboutViewModel 
   }
 
   showSupportSection() {
-    return this.supportUrl || this.supportContactUrl;
+    return this.Config.URL.SUPPORT.INDEX || this.Config.URL.SUPPORT.CONTACT;
   }
 };

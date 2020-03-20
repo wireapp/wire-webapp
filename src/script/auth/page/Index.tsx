@@ -19,9 +19,9 @@
 
 import {UrlUtil} from '@wireapp/commons';
 import * as AuthSelector from '../module/selector/AuthSelector';
-import {Button, COLOR, ContainerXS, ErrorMessage, Logo, Text} from '@wireapp/react-ui-kit';
+import {Button, COLOR, ContainerXS, ErrorMessage, Text} from '@wireapp/react-ui-kit';
 import React, {useEffect, useState} from 'react';
-import {FormattedHTMLMessage, useIntl} from 'react-intl';
+import {FormattedMessage, useIntl} from 'react-intl';
 import useReactRouter from 'use-react-router';
 import {Config} from '../../Config';
 import {indexStrings, logoutReasonStrings} from '../../strings';
@@ -30,13 +30,15 @@ import Page from './Page';
 import {RootState, bindActionCreators} from '../module/reducer';
 import {AnyAction, Dispatch} from 'redux';
 import {connect} from 'react-redux';
+import SVGProvider from '../util/SVGProvider';
+import {SVGIcon} from '@wireapp/react-ui-kit/dist/Icon/SVGIcon';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
 const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
   const {history} = useReactRouter();
-  const [logoutReason, setLogoutReason] = useState();
+  const [logoutReason, setLogoutReason] = useState<string>();
 
   useEffect(() => {
     // Redirect to prefilled SSO login if default SSO code is set on backend
@@ -65,7 +67,9 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
   return (
     <Page>
       <ContainerXS centerText verticalCenter style={{width: '380px'}}>
-        <Logo scale={1.68} style={{marginBottom: '80px'}} data-uie-name="ui-wire-logo" />
+        <SVGIcon scale={1.3} realWidth={78} realHeight={25} style={{marginBottom: '80px'}} data-uie-name="ui-wire-logo">
+          <g dangerouslySetInnerHTML={{__html: SVGProvider['logo-full-icon']?.documentElement?.innerHTML}} />
+        </SVGIcon>
         <Text
           block
           center
@@ -96,7 +100,12 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
             </Button>
             {logoutReason && (
               <ErrorMessage center data-uie-name="status-logout-reason">
-                <FormattedHTMLMessage {...logoutReasonStrings[logoutReason]} />
+                <FormattedMessage
+                  {...logoutReasonStrings[logoutReason]}
+                  values={{
+                    newline: <br />,
+                  }}
+                />
               </ErrorMessage>
             )}
             {(Config.getConfig().FEATURE.ENABLE_SSO || Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY) && (
@@ -135,7 +144,12 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
             )}
             {logoutReason && (
               <ErrorMessage center data-uie-name="status-logout-reason">
-                <FormattedHTMLMessage {...logoutReasonStrings[logoutReason]} />
+                <FormattedMessage
+                  {...logoutReasonStrings[logoutReason]}
+                  values={{
+                    newline: <br />,
+                  }}
+                />
               </ErrorMessage>
             )}
           </>

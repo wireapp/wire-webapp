@@ -17,12 +17,17 @@
  *
  */
 
-#section-blocked {
-  .form-blocked {
-    height: 256px;
+import {APIClient} from '@wireapp/api-client';
+import {SearchResult} from '@wireapp/api-client/dist/user';
+
+export class SearchService {
+  private readonly apiClient: APIClient;
+
+  constructor(apiClient: APIClient) {
+    this.apiClient = apiClient;
   }
 
-  .blocked-headline {
-    margin: 16px 8px 64px 0;
+  getContacts(query: string, numberOfRequestedUser: number): Promise<SearchResult> {
+    return this.apiClient.user.api.getSearchContacts(query, numberOfRequestedUser);
   }
 }

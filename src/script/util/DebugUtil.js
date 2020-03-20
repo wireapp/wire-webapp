@@ -144,7 +144,7 @@ export class DebugUtil {
     return this.conversationRepository
       .get_conversation_by_id(conversationId)
       .then(conversation => {
-        return this.conversationRepository.get_message_in_conversation_by_id(conversation, messageId);
+        return this.conversationRepository.getMessageInConversationById(conversation, messageId);
       })
       .then(message => {
         return this.eventRepository.notificationService

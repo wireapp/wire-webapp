@@ -28,7 +28,6 @@ import {getLogger} from 'Util/Logger';
 import {arrayToBase64, base64ToArray, zeroPadding} from 'Util/util';
 
 import {CryptographyMapper} from './CryptographyMapper';
-import {CryptographyService} from './CryptographyService';
 
 import {Config} from '../Config';
 import {WebAppEvents} from '../event/WebApp';
@@ -49,11 +48,11 @@ export class CryptographyRepository {
   }
 
   /**
-   * @param {BackendClient} backendClient Client for the API calls
+   * @param {CryptographyService} cryptographyService CryptographyService
    * @param {StorageRepository} storageRepository Repository for all storage interactions
    */
-  constructor(backendClient, storageRepository) {
-    this.cryptographyService = new CryptographyService(backendClient);
+  constructor(cryptographyService, storageRepository) {
+    this.cryptographyService = cryptographyService;
     this.storageRepository = storageRepository;
     this.logger = getLogger('CryptographyRepository');
 

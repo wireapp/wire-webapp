@@ -25,6 +25,7 @@ import {BackupRepository} from 'src/script/backup/BackupRepository';
 
 import {ClientEvent} from 'src/script/event/Client';
 import {StorageSchemata} from 'src/script/storage/StorageSchemata';
+import {TestFactory} from '../../helper/TestFactory';
 
 const conversationId = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a';
 // prettier-ignore
@@ -39,12 +40,12 @@ const messages = [
 /* eslint-enable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
 
 describe('BackupRepository', () => {
-  const test_factory = new TestFactory();
+  const testFactory = new TestFactory();
   let backupRepository = undefined;
 
   beforeEach(() => {
     jasmine.clock().install();
-    return test_factory.exposeBackupActors().then(() => (backupRepository = TestFactory.backup_repository));
+    return testFactory.exposeBackupActors().then(() => (backupRepository = testFactory.backup_repository));
   });
 
   afterEach(() => jasmine.clock().uninstall());
@@ -58,11 +59,11 @@ describe('BackupRepository', () => {
 
       const metaDescription = backupRepository.createMetaData();
 
-      expect(metaDescription.client_id).toBe(TestFactory.client_repository.currentClient().id);
+      expect(metaDescription.client_id).toBe(testFactory.client_repository.currentClient().id);
       expect(metaDescription.creation_time).toBe(freezedTime.toISOString());
       expect(metaDescription.platform).toBe('Web');
-      expect(metaDescription.user_id).toBe(TestFactory.user_repository.self().id);
-      expect(metaDescription.version).toBe(TestFactory.backup_service.getDatabaseVersion());
+      expect(metaDescription.user_id).toBe(testFactory.user_repository.self().id);
+      expect(metaDescription.version).toBe(testFactory.backup_service.getDatabaseVersion());
     });
   });
 
@@ -71,12 +72,12 @@ describe('BackupRepository', () => {
 
     beforeEach(() => {
       return Promise.all([
-        ...messages.map(message => TestFactory.storage_service.save(eventStoreName, undefined, message)),
-        TestFactory.storage_service.save('conversations', conversationId, conversation),
+        ...messages.map(message => testFactory.storage_service.save(eventStoreName, undefined, message)),
+        testFactory.storage_service.save('conversations', conversationId, conversation),
       ]);
     });
 
-    afterEach(() => TestFactory.storage_service.clearStores());
+    afterEach(() => testFactory.storage_service.clearStores());
 
     it('generates an archive of the database', () => {
       const filesToCheck = [BackupRepository.CONFIG.FILENAME.CONVERSATIONS, BackupRepository.CONFIG.FILENAME.EVENTS];
@@ -113,7 +114,7 @@ describe('BackupRepository', () => {
         type: ClientEvent.CONVERSATION.VERIFICATION,
       };
 
-      return TestFactory.storage_service
+      return testFactory.storage_service
         .save(StorageSchemata.OBJECT_STORE.EVENTS, undefined, verificationEvent)
         .then(() => {
           const archivePromise = backupRepository.generateHistory(noop);
@@ -208,7 +209,7 @@ describe('BackupRepository', () => {
 
       const importPromises = archives.map(archive => {
         return backupRepository.importHistory(archive, noop, noop).then(() => {
-          const conversationsTest = TestFactory.storage_service
+          const conversationsTest = testFactory.storage_service
             .getAll(StorageSchemata.OBJECT_STORE.CONVERSATIONS)
             .then(conversationsData => {
               expect(conversationsData.length).toEqual(1);
@@ -218,7 +219,7 @@ describe('BackupRepository', () => {
               expect(conversationData.id).toEqual(conversation.id);
             });
 
-          const eventsTest = TestFactory.storage_service.getAll(StorageSchemata.OBJECT_STORE.EVENTS).then(events => {
+          const eventsTest = testFactory.storage_service.getAll(StorageSchemata.OBJECT_STORE.EVENTS).then(events => {
             expect(events.length).toEqual(messages.length);
             expect(events.map(removePrimaryKey)).toEqual(messages.map(removePrimaryKey));
           });

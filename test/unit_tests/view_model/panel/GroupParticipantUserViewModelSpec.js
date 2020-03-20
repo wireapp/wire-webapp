@@ -23,9 +23,10 @@ import {noop} from 'Util/util';
 
 import {GroupParticipantUserViewModel} from 'src/script/view_model/panel/GroupParticipantUserViewModel';
 import {User} from 'src/script/entity/User';
+import {TestFactory} from '../../../helper/TestFactory';
 
 describe('GroupParticipantUserViewModel', () => {
-  const testFactory = new window.TestFactory();
+  const testFactory = new TestFactory();
   let groupParticipantUserViewModel;
 
   beforeEach(() => {
@@ -38,8 +39,8 @@ describe('GroupParticipantUserViewModel', () => {
         onGoBack: noop,
         onGoToRoot: noop,
         repositories: {
-          conversation: TestFactory.conversation_repository,
-          user: TestFactory.user_repository,
+          conversation: testFactory.conversation_repository,
+          user: testFactory.user_repository,
         },
       });
     });

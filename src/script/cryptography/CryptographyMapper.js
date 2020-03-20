@@ -69,7 +69,8 @@ export class CryptographyMapper {
 
     switch (genericMessage.content) {
       case GENERIC_MESSAGE_TYPE.ASSET: {
-        specificContent = addMetadata(this._mapAsset(genericMessage.asset), genericMessage.asset);
+        const mappedAsset = this._mapAsset(genericMessage.asset);
+        specificContent = addMetadata(mappedAsset, genericMessage.asset);
         break;
       }
 
@@ -114,12 +115,14 @@ export class CryptographyMapper {
       }
 
       case GENERIC_MESSAGE_TYPE.IMAGE: {
-        specificContent = addMetadata(this._mapImage(genericMessage.image, event.data.id), genericMessage.image);
+        const mappedImage = this._mapImage(genericMessage.image, event.data.id);
+        specificContent = addMetadata(mappedImage, genericMessage.image);
         break;
       }
 
       case GENERIC_MESSAGE_TYPE.KNOCK: {
-        specificContent = addMetadata(this._mapKnock(genericMessage.knock), genericMessage.knock);
+        const mappedKnock = this._mapKnock(genericMessage.knock);
+        specificContent = addMetadata(mappedKnock, genericMessage.knock);
         break;
       }
 
@@ -129,7 +132,8 @@ export class CryptographyMapper {
       }
 
       case GENERIC_MESSAGE_TYPE.LOCATION: {
-        specificContent = addMetadata(this._mapLocation(genericMessage.location), genericMessage.location);
+        const mappedLocation = this._mapLocation(genericMessage.location);
+        specificContent = addMetadata(mappedLocation, genericMessage.location);
         break;
       }
 
@@ -141,6 +145,17 @@ export class CryptographyMapper {
       case GENERIC_MESSAGE_TYPE.TEXT: {
         const mappedText = await this._mapText(genericMessage.text);
         specificContent = addMetadata(mappedText, genericMessage.text);
+        break;
+      }
+
+      case GENERIC_MESSAGE_TYPE.COMPOSITE_MESSAGE: {
+        const mappedComposite = await this._mapComposite(genericMessage.composite);
+        specificContent = addMetadata(mappedComposite, genericMessage.composite);
+        break;
+      }
+
+      case GENERIC_MESSAGE_TYPE.BUTTON_ACTION_CONFIRMATION: {
+        specificContent = this._mapButtonActionConfirmation(genericMessage.buttonActionConfirmation);
         break;
       }
 
@@ -161,6 +176,47 @@ export class CryptographyMapper {
     };
 
     return {...genericContent, ...specificContent};
+  }
+
+  async _mapComposite(composite) {
+    const items = await Promise.all(
+      composite.items.map(async item => {
+        if (item.content !== GENERIC_MESSAGE_TYPE.TEXT) {
+          return item;
+        }
+        const {mentions: protoMentions, content} = item.text;
+
+        if (protoMentions && protoMentions.length > CryptographyMapper.CONFIG.MAX_MENTIONS_PER_MESSAGE) {
+          this.logger.warn(`Message contains '${protoMentions.length}' mentions exceeding limit`, item.text);
+          protoMentions.length = CryptographyMapper.CONFIG.MAX_MENTIONS_PER_MESSAGE;
+        }
+
+        const mentions = await Promise.all(
+          protoMentions.map(protoMention => arrayToBase64(Mention.encode(protoMention).finish())),
+        );
+
+        return {
+          text: {
+            content,
+            mentions,
+          },
+        };
+      }),
+    );
+    return {
+      data: {items},
+      type: ClientEvent.CONVERSATION.COMPOSITE_MESSAGE_ADD,
+    };
+  }
+
+  _mapButtonActionConfirmation({buttonId, referenceMessageId}) {
+    return {
+      data: {
+        buttonId,
+        messageId: referenceMessageId,
+      },
+      type: ClientEvent.CONVERSATION.BUTTON_ACTION_CONFIRMATION,
+    };
   }
 
   _mapAsset(asset) {
