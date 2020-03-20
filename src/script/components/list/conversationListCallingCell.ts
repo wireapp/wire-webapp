@@ -199,6 +199,7 @@ class ConversationListCallingCell {
   findUser(userId: string): User {
     return this.conversationParticipants().find(user => user.id === userId);
   }
+
   userHasCamera(user: User): boolean {
     const participant = this.call.participants().find(({userId}) => userId === user.id);
     return participant?.hasActiveVideo() ?? false;
