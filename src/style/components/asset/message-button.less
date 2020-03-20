@@ -35,6 +35,7 @@ message-button {
     outline: none;
     text-align: start;
     text-transform: uppercase;
+    transition: all 0.1s linear;
 
     &--selected {
       background-color: @w-red;
@@ -50,18 +51,20 @@ message-button {
       width: 48px;
       align-items: center;
       justify-content: center;
-      background-color: rgba(255, 255, 255, 0.9);
+      background-color: transparent;
       opacity: 0;
       transform: translateX(50%);
-      transition: all 0.2s ease-in-out;
+      transition: background-color 0.05s, transform 0.2s ease-in-out, opacity 0.2s ease-in-out;
 
       loading-icon {
         fill: @w-red;
       }
 
       &--visible {
-        opacity: 1;
+        background-color: var(--app-bg);
+        opacity: 0.9;
         transform: translateX(0);
+        transition: all 0.2s ease-in-out;
       }
     }
 
