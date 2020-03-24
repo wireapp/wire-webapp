@@ -215,5 +215,5 @@ export const getRenderedTextContent = (text: string): string => {
   const renderedMessage = renderMessage(text, '');
   const messageWithLinebreaks = renderedMessage.replace(/<br>/g, '\n');
   const strippedMessage = messageWithLinebreaks.replace(/<.+?>/g, '');
-  return strippedMessage;
+  return markdownit.utils.unescapeAll(strippedMessage);
 };
