@@ -467,4 +467,10 @@ describe('getRenderedTextContent', () => {
 
     expect(getRenderedTextContent(input)).toBe(expected);
   });
+
+  it('keeps special characters as they are', () => {
+    const input = '17 % 5 == 2 && 3 < 4';
+
+    expect(getRenderedTextContent(input)).toBe(input);
+  });
 });
