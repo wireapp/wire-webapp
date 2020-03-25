@@ -196,6 +196,14 @@ describe('renderMessage', () => {
     );
   });
 
+  it('renders links without changing their appearance', () => {
+    const punyLink = 'https://xn--outfank-jdc.nl/';
+
+    expect(renderMessage(punyLink)).toBe(
+      `<a href="${punyLink}" target="_blank" rel="nofollow noopener noreferrer">${punyLink}</a>`,
+    );
+  });
+
   describe('Mentions', () => {
     const tests = [
       {
