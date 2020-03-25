@@ -46,9 +46,9 @@ interface ParticipantItemParams {
 class ParticipantItem {
   avatarSize: string;
   participant: User | ServiceEntity;
-  participantName: () => string | ko.Observable<string>;
   isService: boolean;
   isUser: boolean;
+  isSelf: boolean;
   selfInTeam: boolean;
   badge: boolean;
   isDefaultMode: boolean;
@@ -61,6 +61,7 @@ class ParticipantItem {
   contentInfo: string | ko.Observable<string>;
   isInViewport: ko.Observable<boolean>;
   isSelfVerified: ko.Subscribable<boolean>;
+  selfString: string;
 
   constructor(
     {
@@ -80,10 +81,8 @@ class ParticipantItem {
   ) {
     this.avatarSize = ParticipantAvatar.SIZE.SMALL;
     this.participant = ko.unwrap(participant);
-    this.participantName = () =>
-      (this.participant as User).is_me
-        ? `${(this.participant as User).name()} (${capitalizeFirstChar(t('conversationYouNominative'))})`
-        : this.participant.name;
+    this.isSelf = !!(this.participant as User).is_me;
+    this.selfString = `(${capitalizeFirstChar(t('conversationYouNominative'))})`;
     this.isService = this.participant instanceof ServiceEntity || this.participant.isService;
     this.isUser = this.participant instanceof User && !this.participant.isService;
     this.selfInTeam = selfInTeam;
@@ -133,25 +132,30 @@ ko.components.register('participant-item', {
   template: `
     <div class="participant-item" data-bind="attr: {'data-uie-name': isUser ? 'item-user' : 'item-service', 'data-uie-value': participant.name}">
       <!-- ko if: isInViewport() -->
-        <div class="participant-item-image">
+        <div class="participant-item__image">
           <participant-avatar params="participant: participant, size: avatarSize"></participant-avatar>
         </div>
 
-        <div class="participant-item-content">
-          <!-- ko if: isUser && selfInTeam -->
-            <availability-state class="participant-item-content-availability participant-item-content-name"
-              data-uie-name="status-name"
-              params="availability: participant.availability, label: participantName()"></availability-state>
-          <!-- /ko -->
+        <div class="participant-item__content">
+          <div class="participant-item__content__name-wrapper">
+            <!-- ko if: isUser && selfInTeam -->
+              <availability-state class="participant-item__content__availability participant-item__content__name"
+                data-uie-name="status-name"
+                params="availability: participant.availability, label: participant.name"></availability-state>
+            <!-- /ko -->
 
-          <!-- ko if: isService || !selfInTeam -->
-            <div class="participant-item-content-name" data-bind="text: participantName()" data-uie-name="status-name"></div>
-          <!-- /ko -->
-          <div class="participant-item-content-info">
+            <!-- ko if: isService || !selfInTeam -->
+              <div class="participant-item__content__name" data-bind="text: participant.name" data-uie-name="status-name"></div>
+            <!-- /ko -->
+            <!-- ko if: isSelf -->
+              <div data-bind="text: selfString"></div>
+            <!-- /ko -->
+          </div>
+          <div class="participant-item__content__info">
             <!-- ko if: contentInfo -->
-              <span class="participant-item-content-username label-username-notext" data-bind="text: contentInfo, css: {'label-username': hasUsernameInfo}" data-uie-name="status-username"></span>
+              <span class="participant-item__content__username label-username-notext" data-bind="text: contentInfo, css: {'label-username': hasUsernameInfo}" data-uie-name="status-username"></span>
               <!-- ko if: hasUsernameInfo && badge -->
-                <span class="participant-item-content-badge" data-uie-name="status-partner" data-bind="text: badge"></span>
+                <span class="participant-item__content__badge" data-uie-name="status-partner" data-bind="text: badge"></span>
               <!-- /ko -->
             <!-- /ko -->
           </div>
