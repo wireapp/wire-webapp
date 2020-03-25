@@ -102,8 +102,7 @@ describe('CryptographyRepository', () => {
 
   describe('getRemoteFingerprint', () => {
     it('generates the remote fingerprint based on a prekey', async () => {
-      const database = testFactory.storage_service.db;
-      await testFactory.cryptography_repository.createCryptobox(database);
+      await testFactory.cryptography_repository.initCryptobox(false);
       const userId = '6f656da7-0c52-44d1-959d-ddc9fbdca244';
       const clientId = '689ce2df236eb2be';
       const preKey = {
@@ -157,8 +156,7 @@ describe('CryptographyRepository', () => {
     });
 
     it('detects duplicated messages', async () => {
-      const database = testFactory.storage_service.db;
-      const preKeys = await testFactory.cryptography_repository.createCryptobox(database);
+      const preKeys = await testFactory.cryptography_repository.initCryptobox(false);
       const alice = testFactory.cryptography_repository.cryptobox.identity;
 
       expect(alice).toBeDefined();

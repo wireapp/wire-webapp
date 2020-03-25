@@ -118,11 +118,12 @@ export class TestFactory {
     this.cryptography_repository = new CryptographyRepository(this.cryptography_service, this.storage_repository);
     this.cryptography_repository.currentClient = ko.observable(currentClient);
 
-    if (mockCryptobox) {
+    if (mockCryptobox === true) {
       // eslint-disable-next-line jasmine/no-unsafe-spy
-      spyOn(this.cryptography_repository, 'createCryptobox').and.returnValue(Promise.resolve());
+      spyOn(this.cryptography_repository, 'initCryptobox').and.returnValue(Promise.resolve());
+    } else {
+      await this.cryptography_repository.initCryptobox(false);
     }
-    await this.cryptography_repository.createCryptobox(this.storage_service.db);
 
     return this.cryptography_repository;
   }
@@ -131,7 +132,7 @@ export class TestFactory {
    * @returns {Promise<ClientRepository>} The client repository.
    */
   async exposeClientActors() {
-    await this.exposeCryptographyActors();
+    await this.exposeCryptographyActors(true);
     const clientEntity = new ClientEntity();
     clientEntity.address = '192.168.0.1';
     clientEntity.class = 'desktop';
@@ -170,7 +171,7 @@ export class TestFactory {
    * @returns {Promise<EventRepository>} The event repository.
    */
   async exposeEventActors() {
-    await this.exposeCryptographyActors();
+    await this.exposeCryptographyActors(true);
     await this.exposeUserActors();
 
     this.web_socket_service = new WebSocketService(

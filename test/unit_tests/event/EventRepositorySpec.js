@@ -343,9 +343,9 @@ describe('EventRepository', () => {
       client.id = ownClientId;
 
       testFactory.client_repository.currentClient(client);
-      testFactory.cryptography_repository.createCryptobox.and.callThrough();
+      testFactory.cryptography_repository.initCryptobox.and.callThrough();
 
-      await testFactory.cryptography_repository.createCryptobox(testFactory.storage_service.db);
+      await testFactory.cryptography_repository.initCryptobox(testFactory.storage_service.db);
       const preKeyBundle = await testFactory.cryptography_repository.cryptobox.get_prekey();
       const ciphertext = await createEncodedCiphertext(preKeyBundle, text);
       const event = {
