@@ -102,7 +102,6 @@ describe('CryptographyRepository', () => {
 
   describe('getRemoteFingerprint', () => {
     it('generates the remote fingerprint based on a prekey', async () => {
-      await testFactory.cryptography_repository.initCryptobox(false);
       const userId = '6f656da7-0c52-44d1-959d-ddc9fbdca244';
       const clientId = '689ce2df236eb2be';
       const preKey = {
