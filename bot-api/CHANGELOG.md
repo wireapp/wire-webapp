@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.7.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@7.6.5...@wireapp/bot-api@7.7.0) (2020-03-25)
+
+
+### Features
+
+* **bot-api:** Add poll support ([#2899](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/issues/2899)) ([f2cce16](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/commit/f2cce16fa3c3ad0cb394d6b75c97d34d2ae27272))
+
+
+
+
+
 ## [7.6.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@7.6.4...@wireapp/bot-api@7.6.5) (2020-03-18)
 
 **Note:** Version bump only for package @wireapp/bot-api
