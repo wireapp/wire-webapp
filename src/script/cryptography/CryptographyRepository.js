@@ -58,10 +58,9 @@ export class CryptographyRepository {
 
   /**
    * Initializes the repository by creating a new Cryptobox.
-   * @param {boolean} [useExistingCryptobox] If true, it will try to load Cryptobox data from the storage engine. Otherwise it will create a completely new Cryptobox with a new identity.
    * @returns {Promise<ProteusKeys.PreKey[]>} Resolves with an array of PreKeys
    */
-  async initCryptobox(useExistingCryptobox = true) {
+  async initCryptobox() {
     const storeEngine = this.storageRepository.storageService.engine;
     this.cryptobox = new Cryptobox(storeEngine, 10);
 
@@ -78,10 +77,7 @@ export class CryptographyRepository {
       amplify.publish(WebAppEvents.CLIENT.ADD, userId, {id: clientId}, true);
     });
 
-    if (useExistingCryptobox === true) {
-      return this.cryptobox.load();
-    }
-    return this.cryptobox.create();
+    return this.cryptobox.load();
   }
 
   /**

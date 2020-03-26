@@ -36,7 +36,7 @@ import {StorageRepository} from 'src/script/storage/StorageRepository';
 import {ClientRepository} from 'src/script/client/ClientRepository';
 import {EventTrackingRepository} from 'src/script/tracking/EventTrackingRepository';
 import {ClientEntity} from 'src/script/client/ClientEntity';
-
+import {Cryptobox} from '@wireapp/cryptobox';
 import {EventRepository} from 'src/script/event/EventRepository';
 import {EventServiceNoCompound} from 'src/script/event/EventServiceNoCompound';
 import {EventService} from 'src/script/event/EventService';
@@ -110,7 +110,7 @@ export class TestFactory {
    * @returns {Promise<CryptographyRepository>} The cryptography repository.
    */
   async exposeCryptographyActors(mockCryptobox = true) {
-    await this.exposeStorageActors();
+    const storageRepository = await this.exposeStorageActors();
     const currentClient = new ClientEntity(true);
     currentClient.id = entities.clients.john_doe.permanent.id;
     this.cryptography_service = new CryptographyService(container.resolve(APIClientSingleton).getClient());
@@ -122,7 +122,9 @@ export class TestFactory {
       // eslint-disable-next-line jasmine/no-unsafe-spy
       spyOn(this.cryptography_repository, 'initCryptobox').and.returnValue(Promise.resolve());
     } else {
-      await this.cryptography_repository.initCryptobox(false);
+      const storeEngine = storageRepository.storageService.engine;
+      this.cryptography_repository.cryptobox = new Cryptobox(storeEngine, 10);
+      await this.cryptography_repository.cryptobox.create();
     }
 
     return this.cryptography_repository;
@@ -132,7 +134,7 @@ export class TestFactory {
    * @returns {Promise<ClientRepository>} The client repository.
    */
   async exposeClientActors() {
-    await this.exposeCryptographyActors(true);
+    await this.exposeCryptographyActors();
     const clientEntity = new ClientEntity();
     clientEntity.address = '192.168.0.1';
     clientEntity.class = 'desktop';
@@ -171,7 +173,7 @@ export class TestFactory {
    * @returns {Promise<EventRepository>} The event repository.
    */
   async exposeEventActors() {
-    await this.exposeCryptographyActors(true);
+    await this.exposeCryptographyActors();
     await this.exposeUserActors();
 
     this.web_socket_service = new WebSocketService(

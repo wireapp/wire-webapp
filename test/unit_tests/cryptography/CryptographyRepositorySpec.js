@@ -155,7 +155,7 @@ describe('CryptographyRepository', () => {
     });
 
     it('detects duplicated messages', async () => {
-      const preKeys = await testFactory.cryptography_repository.initCryptobox(false);
+      const preKeys = await testFactory.cryptography_repository.initCryptobox();
       const alice = testFactory.cryptography_repository.cryptobox.identity;
 
       expect(alice).toBeDefined();

@@ -338,16 +338,21 @@ describe('EventRepository', () => {
   describe('processEvent', () => {
     it('processes OTR events', async () => {
       const text = 'Hello, this is a test!';
+
+      // Create client for testing
       const ownClientId = 'f180a823bf0d1204';
       const client = new ClientEntity();
       client.id = ownClientId;
-
       testFactory.client_repository.currentClient(client);
-      testFactory.cryptography_repository.initCryptobox.and.callThrough();
 
-      await testFactory.cryptography_repository.initCryptobox(testFactory.storage_service.db);
-      const preKeyBundle = await testFactory.cryptography_repository.cryptobox.get_prekey();
-      const ciphertext = await createEncodedCiphertext(preKeyBundle, text);
+      // Create Cryptobox for testing
+      const someEngine = new MemoryEngine();
+      await someEngine.init('someEngine');
+      const cryptobox = new Cryptobox(someEngine, 10);
+      const preKeys = await cryptobox.create();
+      testFactory.cryptography_repository.cryptobox = cryptobox;
+
+      const ciphertext = await createEncodedCiphertext(preKeys[0], text, cryptobox.identity);
       const event = {
         conversation: 'fdc6cf1a-4e37-424e-a106-ab3d2cc5c8e0',
         data: {

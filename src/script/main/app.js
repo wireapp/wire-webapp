@@ -388,7 +388,7 @@ class App {
       telemetry.time_step(AppInitTimingsStep.VALIDATED_CLIENT);
       telemetry.add_statistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity.type);
 
-      await cryptographyRepository.initCryptobox(true);
+      await cryptographyRepository.initCryptobox();
       loadingView.updateProgress(10);
       telemetry.time_step(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
