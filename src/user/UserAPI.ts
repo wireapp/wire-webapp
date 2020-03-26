@@ -17,13 +17,13 @@
  *
  */
 
-import {AxiosRequestConfig} from 'axios';
+import Axios, {AxiosRequestConfig} from 'axios';
 
 import {ArrayUtil} from '@wireapp/commons';
 import {ClientPreKey, PreKeyBundle} from '../auth/';
 import {PublicClient} from '../client/';
 import {UserClients} from '../conversation/UserClients';
-import {HttpClient} from '../http/';
+import {HttpClient, RequestCancelable} from '../http/';
 import {
   Activate,
   ActivationResponse,
@@ -217,8 +217,10 @@ export class UserAPI {
    * @param limit Number of results to return
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/search
    */
-  public async getSearchContacts(query: string, limit?: number): Promise<SearchResult> {
+  public async getSearchContacts(query: string, limit?: number): Promise<RequestCancelable<SearchResult>> {
+    const cancelSource = Axios.CancelToken.source();
     const config: AxiosRequestConfig = {
+      cancelToken: cancelSource.token,
       method: 'get',
       params: {
         q: query,
@@ -230,8 +232,10 @@ export class UserAPI {
       config.params.size = limit;
     }
 
-    const response = await this.client.sendJSON<SearchResult>(config);
-    return response.data;
+    return {
+      cancel: cancelSource.cancel,
+      response: this.client.sendJSON<SearchResult>(config),
+    };
   }
 
   /**
