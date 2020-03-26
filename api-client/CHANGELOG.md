@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.21.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.20.4...@wireapp/api-client@9.21.0) (2020-03-26)
+
+
+### Features
+
+* **api-client:** Cancelable requests & progress handling ([#2900](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2900)) ([54af763](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/54af7631025babeedec0b11b82f1a2b99e348371))
+
+
+
+
+
 ## [9.20.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.20.3...@wireapp/api-client@9.20.4) (2020-03-18)
 
 **Note:** Version bump only for package @wireapp/api-client
