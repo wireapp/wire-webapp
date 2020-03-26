@@ -111,6 +111,7 @@ import * as LegalHoldEvaluator from '../legal-hold/LegalHoldEvaluator';
 import {DeleteConversationMessage} from '../entity/message/DeleteConversationMessage';
 import {ConversationRoleRepository} from './ConversationRoleRepository';
 import {DefaultRole} from './ConversationRoleRepository';
+import {isUUID} from 'Util/ValidationUtil';
 
 // Conversation repository for all conversation interactions with the conversation service
 export class ConversationRepository {
@@ -4049,7 +4050,7 @@ export class ConversationRepository {
    * @returns {Promise} Resolves when users have been update
    */
   _updateMessageUserEntities(messageEntity) {
-    return this.user_repository.get_user_by_id(messageEntity.from).then(userEntity => {
+    return this.user_repository.get_user_by_id(messageEntity.from).then(async userEntity => {
       messageEntity.user(userEntity);
 
       if (messageEntity.is_member() || messageEntity.userEntities) {
@@ -4062,13 +4063,12 @@ export class ConversationRepository {
 
       if (messageEntity.is_content()) {
         const userIds = Object.keys(messageEntity.reactions());
-
-        messageEntity.reactions_user_ets.removeAll();
-        if (userIds.length) {
-          return this.user_repository.get_users_by_id(userIds).then(userEntities => {
-            messageEntity.reactions_user_ets(userEntities);
-            return messageEntity;
-          });
+        const invalidUserIds = userIds.some(userId => !isUUID(userId));
+        if (!invalidUserIds && userIds.length) {
+          messageEntity.reactions_user_ets.removeAll();
+          const userEntities = await this.user_repository.get_users_by_id(userIds);
+          messageEntity.reactions_user_ets(userEntities);
+          return messageEntity;
         }
       }
 
