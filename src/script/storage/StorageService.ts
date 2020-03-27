@@ -304,12 +304,18 @@ export class StorageService {
   async getAll<T = Object>(storeName: string): Promise<T[]> {
     try {
       const resultArray = await this.engine.readAll<T>(storeName);
+
+      // TODO: Move normalization logic to "EventService"
+      const serializedProperties = ['data', 'reactions'];
+
       return resultArray.filter(Boolean).map(record => {
-        if (typeof (record as any).data === 'string') {
-          try {
-            (record as any).data = JSON.parse((record as any).data);
-          } catch (error) {}
-        }
+        serializedProperties.forEach(property => {
+          if (typeof (record as any)[property] === 'string') {
+            try {
+              (record as any)[property] = JSON.parse((record as any)[property]);
+            } catch (error) {}
+          }
+        });
         return record;
       });
     } catch (error) {

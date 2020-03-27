@@ -27,8 +27,8 @@ import {File} from './File';
 export class MediumImage extends File {
   public readonly resource: ko.Observable<AssetRemoteData>;
   public readonly correlation_id: string;
-  public readonly height: string;
-  public readonly width: string;
+  public height: string;
+  public width: string;
 
   constructor(id: string) {
     super(id);
