@@ -32,4 +32,5 @@ export interface User {
   id: string;
   name: string;
   service?: ServiceRef;
+  team?: string;
 }

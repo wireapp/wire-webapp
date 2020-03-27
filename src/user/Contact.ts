@@ -17,11 +17,6 @@
  *
  */
 
-import {AccentColor} from '@wireapp/commons';
+import {User} from './User';
 
-export interface Contact {
-  accent_id?: AccentColor.AccentColorID;
-  handle: string;
-  id: string;
-  name: string;
-}
+export type Contact = Pick<User, 'accent_id' | 'handle' | 'id' | 'name' | 'team'>;
