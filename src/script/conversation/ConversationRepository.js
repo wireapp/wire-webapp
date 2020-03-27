@@ -111,7 +111,6 @@ import * as LegalHoldEvaluator from '../legal-hold/LegalHoldEvaluator';
 import {DeleteConversationMessage} from '../entity/message/DeleteConversationMessage';
 import {ConversationRoleRepository} from './ConversationRoleRepository';
 import {DefaultRole} from './ConversationRoleRepository';
-import {isUUID} from 'Util/ValidationUtil';
 
 // Conversation repository for all conversation interactions with the conversation service
 export class ConversationRepository {
@@ -4063,8 +4062,7 @@ export class ConversationRepository {
 
       if (messageEntity.is_content()) {
         const userIds = Object.keys(messageEntity.reactions());
-        const invalidUserIds = userIds.some(userId => !isUUID(userId));
-        if (!invalidUserIds && userIds.length) {
+        if (userIds.length) {
           messageEntity.reactions_user_ets.removeAll();
           const userEntities = await this.user_repository.get_users_by_id(userIds);
           messageEntity.reactions_user_ets(userEntities);

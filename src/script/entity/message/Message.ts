@@ -45,7 +45,7 @@ export class Message {
   private messageTimerStarted: boolean;
   protected readonly affect_order: ko.Observable<boolean>;
   public readonly accent_color: ko.PureComputed<string>;
-  public readonly category?: MessageCategory;
+  public category?: MessageCategory;
   public readonly conversation_id: string;
   public readonly ephemeral_caption: ko.PureComputed<string>;
   public readonly ephemeral_duration: ko.Observable<number>;
@@ -53,7 +53,7 @@ export class Message {
   public readonly from: string;
   public readonly fromClientId: string;
   public readonly headerSenderName: ko.PureComputed<string>;
-  public readonly id: string;
+  public id: string;
   public readonly isObfuscated: ko.PureComputed<boolean>;
   public readonly legalHoldStatus?: LegalHoldStatus;
   public readonly primary_key?: string;
@@ -61,7 +61,7 @@ export class Message {
   public readonly timestamp_affects_order: ko.PureComputed<boolean>;
   public readonly unsafeSenderName: ko.PureComputed<string>;
   public readonly user: ko.Observable<User>;
-  public readonly version: number;
+  public version: number;
   public readReceipts: ko.ObservableArray<{time: string; userId: string}>;
   public super_type: SuperType;
   public type: string;

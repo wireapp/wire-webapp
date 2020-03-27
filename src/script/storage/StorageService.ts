@@ -310,6 +310,11 @@ export class StorageService {
             (record as any).data = JSON.parse((record as any).data);
           } catch (error) {}
         }
+        if (typeof (record as any).reactions === 'string') {
+          try {
+            (record as any).reactions = JSON.parse((record as any).reactions);
+          } catch (error) {}
+        }
         return record;
       });
     } catch (error) {
