@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.13](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/compare/@wireapp/store-engine-sqleet@1.2.12...@wireapp/store-engine-sqleet@1.2.13) (2020-03-27)
+
+
+### Bug Fixes
+
+* **store-engine-sqleet:** Don't persist null values ([#2903](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/issues/2903)) ([e17cae5](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/commit/e17cae5258accf3688c8cc6f2f7470eb0e046b10))
+
+
+
+
+
 ## [1.2.12](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/compare/@wireapp/store-engine-sqleet@1.2.11...@wireapp/store-engine-sqleet@1.2.12) (2020-03-25)
 
 **Note:** Version bump only for package @wireapp/store-engine-sqleet
