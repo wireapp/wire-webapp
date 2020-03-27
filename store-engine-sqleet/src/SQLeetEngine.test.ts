@@ -199,6 +199,37 @@ describe('SQLeetEngine', () => {
       const results = await engine.readAll<DBRecord>('users');
       expect(results.length).toBe(RECORDS_COUNT);
     });
+
+    it('reads missing properties as `null`', async () => {
+      const tableName = 'users';
+
+      const engine = await initEngine({
+        [tableName]: {
+          name: SQLiteType.TEXT,
+          visits: SQLiteType.JSON,
+        },
+      });
+
+      await engine.create(tableName, undefined, {
+        name: 'Alvin',
+        visits: null,
+      });
+
+      await engine.create(tableName, undefined, {
+        name: 'Bertha',
+      });
+
+      const allEntries = await engine.readAll(tableName);
+      expect(allEntries.length).toBe(2);
+
+      const [alvin, bertha] = allEntries;
+
+      expect(alvin.name).toBe('Alvin');
+      expect(alvin.visits).toBeNull();
+
+      expect(bertha.name).toBe('Bertha');
+      expect(bertha.visits).toBeNull();
+    });
   });
 
   describe('updateOrCreate', () => {

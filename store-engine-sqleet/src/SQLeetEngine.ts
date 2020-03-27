@@ -107,11 +107,19 @@ export class SQLeetEngine implements CRUDEngine {
 
   private buildValues<EntityType = Record<string, SQLiteType>>(
     tableName: string,
-    providedEntities: EntityType | SQLiteType,
+    providedEntities: EntityType,
   ): {columns: Record<string, string>; values: Record<string, any>} {
     const table = this.schema[tableName];
     if (!table) {
       throw new Error(`Table "${tableName}" does not exist.`);
+    }
+
+    if (providedEntities instanceof Object) {
+      for (const [key, property] of Object.entries(providedEntities)) {
+        if (property === null || property === undefined) {
+          delete (providedEntities as any)[key];
+        }
+      }
     }
 
     // If the table contains the single magic column then convert it
@@ -128,10 +136,7 @@ export class SQLeetEngine implements CRUDEngine {
       }
       let value: string | EntityType[Extract<keyof EntityType, string>] = entities[entity];
       // Stringify objects for the database
-      if (
-        table[entity] === SQLiteType.JSON ||
-        (table[entity] === SQLiteType.JSON_OR_TEXT && typeof value === 'object')
-      ) {
+      if (table[entity] === SQLiteType.JSON || (table[entity] === SQLiteType.JSON_OR_TEXT && value instanceof Object)) {
         value = JSON.stringify(value) as SQLiteType;
       }
       const reference = `@${hashColumnName(entity)}`;
