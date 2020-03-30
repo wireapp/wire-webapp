@@ -4049,7 +4049,7 @@ export class ConversationRepository {
    * @returns {Promise} Resolves when users have been update
    */
   _updateMessageUserEntities(messageEntity) {
-    return this.user_repository.get_user_by_id(messageEntity.from).then(async userEntity => {
+    return this.user_repository.get_user_by_id(messageEntity.from).then(userEntity => {
       messageEntity.user(userEntity);
 
       if (messageEntity.is_member() || messageEntity.userEntities) {
@@ -4062,11 +4062,13 @@ export class ConversationRepository {
 
       if (messageEntity.is_content()) {
         const userIds = Object.keys(messageEntity.reactions());
+
+        messageEntity.reactions_user_ets.removeAll();
         if (userIds.length) {
-          messageEntity.reactions_user_ets.removeAll();
-          const userEntities = await this.user_repository.get_users_by_id(userIds);
-          messageEntity.reactions_user_ets(userEntities);
-          return messageEntity;
+          return this.user_repository.get_users_by_id(userIds).then(userEntities => {
+            messageEntity.reactions_user_ets(userEntities);
+            return messageEntity;
+          });
         }
       }
 
