@@ -21,4 +21,5 @@ import {MemberData} from './MemberData';
 
 export interface Members {
   members: MemberData[];
+  hasMore: boolean;
 }

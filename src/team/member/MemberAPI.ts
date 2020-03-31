@@ -22,23 +22,15 @@ import {AxiosRequestConfig} from 'axios';
 import {HttpClient} from '../../http/';
 import {MemberData, Members} from '../member/';
 import {TeamAPI} from '../team/TeamAPI';
+import {ArrayUtil} from '@wireapp/commons';
 
 export class MemberAPI {
+  public static readonly DEFAULT_USERS_CHUNK_SIZE = 50;
   constructor(private readonly client: HttpClient) {}
 
   public static readonly URL = {
     MEMBERS: 'members',
   };
-
-  public async getMembers(teamId: string): Promise<Members> {
-    const config: AxiosRequestConfig = {
-      method: 'get',
-      url: `${TeamAPI.URL.TEAMS}/${teamId}/${MemberAPI.URL.MEMBERS}`,
-    };
-
-    const response = await this.client.sendJSON<Members>(config);
-    return response.data;
-  }
 
   public async getMember(teamId: string, userId: string): Promise<MemberData> {
     const config: AxiosRequestConfig = {
@@ -84,5 +76,52 @@ export class MemberAPI {
     };
 
     await this.client.sendJSON(config);
+  }
+
+  /**
+   * This endpoint returns all members of the a team unless it's a large team (>2000 team member).
+   * If the queried team is a large team the `hasMore` flag will switch to `true`.
+   */
+  public async getAllMembers(teamId: string): Promise<Members> {
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      url: `${TeamAPI.URL.TEAMS}/${teamId}/${MemberAPI.URL.MEMBERS}`,
+    };
+
+    const response = await this.client.sendJSON<Members>(config);
+    return response.data;
+  }
+
+  public async getMembers(
+    teamId: string,
+    parameters: {ids: string[]},
+    limit = MemberAPI.DEFAULT_USERS_CHUNK_SIZE,
+  ): Promise<MemberData[]> {
+    const {ids} = parameters;
+
+    if (ids.length) {
+      const uniqueIds = ArrayUtil.removeDuplicates(ids);
+      const idChunks = ArrayUtil.chunk(uniqueIds, limit);
+      const resolvedTasks = await Promise.all(
+        idChunks.map(async idChunk => {
+          const result = await this._getMembers(teamId, {ids: idChunk});
+          return result.members;
+        }),
+      );
+      return ArrayUtil.flatten(resolvedTasks);
+    }
+
+    return [];
+  }
+
+  private async _getMembers(teamId: string, parameters: {ids: string[]}): Promise<Members> {
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      params: {ids: parameters.ids.join(',')},
+      url: `${TeamAPI.URL.TEAMS}/${teamId}/${MemberAPI.URL.MEMBERS}`,
+    };
+
+    const response = await this.client.sendJSON<Members>(config);
+    return response.data;
   }
 }
