@@ -74,7 +74,7 @@ ko.components.register('device-card', {
       <!-- /ko -->
     </div>
   `,
-  viewModel: function({
+  viewModel: function ({
     click,
     device: wrappedDevice,
     detailed = false,

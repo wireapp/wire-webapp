@@ -172,10 +172,8 @@ export class ContentViewModel {
       .removeClass(incomingCssClass)
       .off(alias.animationend)
       .addClass(incomingCssClass)
-      .one(alias.animationend, function() {
-        $(this)
-          .removeClass(incomingCssClass)
-          .off(alias.animationend);
+      .one(alias.animationend, function () {
+        $(this).removeClass(incomingCssClass).off(alias.animationend);
       });
   }
 

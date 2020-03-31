@@ -46,10 +46,7 @@ const logger = logdown(filename, {
 });
 logger.state.isEnabled = true;
 
-const exec = (command: string): string =>
-  execSync(command, {stdio: 'pipe'})
-    .toString()
-    .trim();
+const exec = (command: string): string => execSync(command, {stdio: 'pipe'}).toString().trim();
 
 switch (firstArgument) {
   case '--help':

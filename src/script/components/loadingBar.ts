@@ -31,7 +31,7 @@ ko.components.register('loading-bar', {
       <div class="progress-bar"><div data-bind="style: {width: loadingPercentage}"></div></div>
     </div>
 `,
-  viewModel: function({progress, message}: LoadingBarParams): void {
+  viewModel: function ({progress, message}: LoadingBarParams): void {
     this.loadingMessage = message;
     this.loadingPercentage = ko.pureComputed(() => `${progress()}%`);
   },

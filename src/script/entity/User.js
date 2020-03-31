@@ -82,9 +82,7 @@ class User {
     this.managedBy = ko.observable(User.CONFIG.MANAGED_BY.WIRE);
 
     this.initials = ko.pureComputed(() => {
-      const nameParts = this.name()
-        .toUpperCase()
-        .split(' ');
+      const nameParts = this.name().toUpperCase().split(' ');
       if (nameParts.length > 1) {
         const first = getFirstChar(nameParts[0]);
         const last = getFirstChar(nameParts[nameParts.length - 1]);

@@ -216,7 +216,7 @@ export class AssetService {
     xhr.send(new Blob([body, assetData, footer]));
 
     return new Promise<UploadAssetResponse>((resolve, reject) => {
-      xhr.onload = function(event): void {
+      xhr.onload = function (event): void {
         return this.status === 201 ? resolve(JSON.parse(this.response)) : reject(event);
       };
       xhr.onerror = reject;

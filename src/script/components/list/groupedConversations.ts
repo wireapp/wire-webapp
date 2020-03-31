@@ -60,7 +60,7 @@ ko.components.register('grouped-conversations', {
       </div>
     <!-- /ko -->
   `,
-  viewModel: function({
+  viewModel: function ({
     conversationRepository,
     listViewModel,
     hasJoinableCall,

@@ -32,7 +32,7 @@ ko.components.register('read-receipt-toggle', {
   <div class="panel__info-text panel__info-text--margin" data-bind="text: t('receiptToggleInfo')" data-uie-name="status-info-toggle-receipt-mode"></div>
   `,
 
-  viewModel: function(params) {
+  viewModel: function (params) {
     this.conversation = ko.unwrap(params.conversation);
 
     this.updateValue = (data, event) => {

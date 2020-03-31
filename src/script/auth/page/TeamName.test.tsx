@@ -136,9 +136,7 @@ describe('when entering a team name', () => {
         }),
       );
 
-      expect(setTeamNamePage.getNextButton().props().disabled)
-        .withContext('Submit button is disabled')
-        .toBe(true);
+      expect(setTeamNamePage.getNextButton().props().disabled).withContext('Submit button is disabled').toBe(true);
     });
   });
 

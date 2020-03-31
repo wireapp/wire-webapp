@@ -30,7 +30,7 @@ describe('AudioRepository', () => {
 
   describe('init', () => {
     it('inits all the sounds without preload', () => {
-      spyOn(window, 'Audio').and.callFake(function() {
+      spyOn(window, 'Audio').and.callFake(function () {
         this.load = () => {};
         spyOn(this, 'load');
       });
@@ -43,7 +43,7 @@ describe('AudioRepository', () => {
     });
 
     it('inits all the sounds with preload', () => {
-      spyOn(window, 'Audio').and.callFake(function() {
+      spyOn(window, 'Audio').and.callFake(function () {
         this.load = () => {};
         spyOn(this, 'load');
       });
@@ -59,7 +59,7 @@ describe('AudioRepository', () => {
 
   describe('play', () => {
     beforeEach(() => {
-      spyOn(window, 'Audio').and.callFake(function() {
+      spyOn(window, 'Audio').and.callFake(function () {
         this.load = () => {};
         this.play = () => {};
         this.paused = true;

@@ -172,10 +172,7 @@ export class NotificationService {
       const events = await this.storageService.getAll<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS);
       message = Object.values(events).filter(event => event.id === messageId)[0];
     } else {
-      message = await this.storageService.db
-        .table(StorageSchemata.OBJECT_STORE.EVENTS)
-        .where({id: messageId})
-        .first();
+      message = await this.storageService.db.table(StorageSchemata.OBJECT_STORE.EVENTS).where({id: messageId}).first();
     }
 
     const {notifications} = await this.apiClient.notification.api.getNotifications(clientId);

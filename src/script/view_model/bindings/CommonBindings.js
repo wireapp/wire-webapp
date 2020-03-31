@@ -243,7 +243,7 @@ ko.bindingHandlers.scrollSync = {
  */
 ko.bindingHandlers.enter = {
   init(element, valueAccessor, allBindings, data, context) {
-    const wrapper = function(_data, jquery_event) {
+    const wrapper = function (_data, jquery_event) {
       const keyboard_event = jquery_event.originalEvent || jquery_event;
 
       if (isEnterKey(keyboard_event) && !keyboard_event.shiftKey && !keyboard_event.altKey) {
@@ -273,7 +273,7 @@ ko.bindingHandlers.enter = {
  */
 ko.bindingHandlers.file_select = {
   init(element, valueAccessor, allBindings, data, context) {
-    const wrapper = function(_data, event) {
+    const wrapper = function (_data, event) {
       if (event.target.files.length > 0) {
         valueAccessor().call(this, event.target.files);
 
@@ -324,13 +324,13 @@ ko.bindingHandlers.load_image_on_hover = {
     if (animated_gif) {
       let image = undefined;
       hoverable_item
-        .on('mouseover', function() {
+        .on('mouseover', function () {
           const item = $(this);
           image = new Image();
           image.onload = () => item.css({backgroundImage: `url(${animated_gif})`});
           image.src = animated_gif;
         })
-        .on('mouseout', function() {
+        .on('mouseout', function () {
           image.onload = undefined;
           $(this).css({backgroundImage: `url(${static_image})`});
         });
@@ -345,7 +345,7 @@ ko.bindingHandlers.load_image_on_hover = {
  * @param {string} eventName Event name
  * @returns {undefined} No return value
  */
-ko.subscribable.fn.subscribe_once = function(handler, owner, eventName) {
+ko.subscribable.fn.subscribe_once = function (handler, owner, eventName) {
   const subscription = this.subscribe(
     newValue => {
       subscription.dispose();
@@ -362,7 +362,7 @@ ko.subscribable.fn.subscribe_once = function(handler, owner, eventName) {
  * @param {function} handler Handler
  * @returns {ko.subscription} knockout subscription
  */
-ko.subscribable.fn.subscribeChanged = function(handler) {
+ko.subscribable.fn.subscribeChanged = function (handler) {
   let savedValue = this.peek();
   return this.subscribe(latestValue => {
     const oldValue = savedValue;
@@ -509,8 +509,8 @@ ko.bindingHandlers.electron_remove = {
   },
 };
 
-ko.bindingHandlers.visibility = (function() {
-  const setVisibility = function(element, valueAccessor) {
+ko.bindingHandlers.visibility = (function () {
+  const setVisibility = function (element, valueAccessor) {
     const hidden = ko.unwrap(valueAccessor());
     return $(element).css('visibility', hidden ? 'visible' : 'hidden');
   };
@@ -533,17 +533,17 @@ ko.bindingHandlers.hide_controls = {
       }, timeout);
     };
 
-    element.onmouseenter = function() {
+    element.onmouseenter = function () {
       element.classList.remove('hide-controls');
     };
 
-    element.onmouseleave = function() {
+    element.onmouseleave = function () {
       if (document.hasFocus()) {
         return element.classList.add('hide-controls');
       }
     };
 
-    element.onmousemove = function({target}) {
+    element.onmousemove = function ({target}) {
       window.clearTimeout(hide_timeout);
 
       element.classList.remove('hide-controls');

@@ -139,7 +139,7 @@ export class StorageService {
     listenableTables.forEach(table => {
       this.db
         .table(table)
-        .hook(DEXIE_CRUD_EVENT.UPDATING, function(
+        .hook(DEXIE_CRUD_EVENT.UPDATING, function (
           modifications: Object,
           primaryKey: string,
           obj: Object,
@@ -150,7 +150,7 @@ export class StorageService {
 
       this.db
         .table(table)
-        .hook(DEXIE_CRUD_EVENT.DELETING, function(
+        .hook(DEXIE_CRUD_EVENT.DELETING, function (
           primaryKey: string,
           obj: Object,
           transaction: Dexie.Transaction,
