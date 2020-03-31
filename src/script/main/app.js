@@ -374,7 +374,7 @@ class App {
         user: userRepository,
       } = this.repository;
       await checkIndexedDb();
-      await this._registerSingleInstance();
+      this._registerSingleInstance();
       loadingView.updateProgress(2.5);
       telemetry.time_step(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
       await authRepository.init();
