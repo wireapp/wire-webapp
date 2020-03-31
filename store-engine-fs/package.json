@@ -32,5 +32,5 @@
     "test": "nyc jasmine --config=jasmine.json",
     "test:project": "yarn dist && yarn test"
   },
-  "version": "2.1.14"
+  "version": "2.1.15"
 }

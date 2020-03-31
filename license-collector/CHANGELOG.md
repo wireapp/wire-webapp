@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# 0.6.0 (2020-03-31)
+
+
+### Features
+
+* **core:** Send button action messages ([#2871](https://github.com/wireapp/wire-web-packages/tree/master/packages/license-collector/issues/2871)) ([4213be1](https://github.com/wireapp/wire-web-packages/tree/master/packages/license-collector/commit/4213be150e8c2b396932bc7e12b43e525dd7726f))
+
+
+
+
+
 ## [0.5.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/license-collector/compare/@wireapp/license-collector@0.5.4...@wireapp/license-collector@0.5.5) (2020-03-10)
 
 **Note:** Version bump only for package @wireapp/license-collector
