@@ -42,8 +42,8 @@ export class TeamService {
     return this.apiClient.teams.team.api.deleteTeam(teamId, password);
   }
 
-  public getMembers(teamId: string): Promise<Members> {
-    return this.apiClient.teams.member.api.getMembers(teamId);
+  public getAllMembers(teamId: string): Promise<Members> {
+    return this.apiClient.teams.member.api.getAllMembers(teamId);
   }
 
   public getTeam(teamId: string): Promise<TeamData> {
