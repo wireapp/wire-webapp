@@ -143,11 +143,11 @@ export class MediaStreamHandler {
     isGroup: boolean,
     hasPermission: boolean,
   ): Promise<MediaStream> {
-    const mediaContraints = screen
+    const mediaConstraints = screen
       ? this.constraintsHandler.getScreenStreamConstraints(this.screensharingMethod)
       : this.constraintsHandler.getMediaStreamConstraints(audio, video, isGroup);
 
-    this.logger.info(`Requesting MediaStream`, mediaContraints);
+    this.logger.info(`Requesting MediaStream`, mediaConstraints);
 
     const willPromptForPermission = !hasPermission && !Environment.desktop;
     if (willPromptForPermission) {
@@ -160,7 +160,7 @@ export class MediaStreamHandler {
       : navigator.mediaDevices.getUserMedia;
 
     return mediaAPI
-      .call(navigator.mediaDevices, mediaContraints)
+      .call(navigator.mediaDevices, mediaConstraints)
       .then((mediaStream: MediaStream) => {
         this.clearPermissionRequestHint(audio, video, screen);
         return mediaStream;
