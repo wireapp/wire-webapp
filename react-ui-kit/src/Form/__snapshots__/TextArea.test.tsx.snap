@@ -17,7 +17,6 @@ exports[`"TextArea" renders 1`] = `
   font-weight: 300;
   line-height: 24px;
   margin: 0 0 16px;
-  opacity: 1;
   outline: none;
   padding: 16px 16px;
   resize: none;
@@ -66,7 +65,7 @@ exports[`"TextArea" renders as disabled 1`] = `
 }
 
 .emotion-0 {
-  background: #fff;
+  background: rgba(127,136,142,0.16000000000000003);
   border: none;
   border-radius: 4px;
   box-shadow: none;
@@ -75,7 +74,6 @@ exports[`"TextArea" renders as disabled 1`] = `
   font-weight: 300;
   line-height: 24px;
   margin: 0 0 16px;
-  opacity: 0.56;
   outline: none;
   padding: 16px 16px;
   resize: none;
@@ -134,7 +132,6 @@ exports[`"TextArea" renders as invalid 1`] = `
   font-weight: 300;
   line-height: 24px;
   margin: 0 0 16px;
-  opacity: 1;
   outline: none;
   padding: 16px 16px;
   resize: none;
@@ -188,7 +185,6 @@ exports[`"TextArea" renders with placeholderTextTransform 1`] = `
   font-weight: 300;
   line-height: 24px;
   margin: 0 0 16px;
-  opacity: 1;
   outline: none;
   padding: 16px 16px;
   resize: none;

@@ -32,6 +32,7 @@ export interface Theme {
   Input: {
     placeholderColor: string;
     backgroundColor: string;
+    backgroundColorDisabled: string;
   };
   general: {
     backgroundColor: string;
@@ -43,6 +44,7 @@ export const themes: {[themeId in THEME_ID]: Theme} = {
   [THEME_ID.LIGHT]: {
     Input: {
       backgroundColor: COLOR.WHITE,
+      backgroundColorDisabled: COLOR.DISABLED,
       placeholderColor: COLOR.GRAY_DARKEN_24,
     },
     general: {
@@ -53,6 +55,7 @@ export const themes: {[themeId in THEME_ID]: Theme} = {
   [THEME_ID.DARK]: {
     Input: {
       backgroundColor: COLOR.BLACK_LIGHTEN_24,
+      backgroundColorDisabled: COLOR.DISABLED,
       placeholderColor: COLOR.GRAY_LIGHTEN_88,
     },
     general: {

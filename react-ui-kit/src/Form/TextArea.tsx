@@ -57,7 +57,7 @@ export const textAreaStyle: <T>(theme: Theme, props: TextAreaProps<T>) => Object
           boxShadow: 'none',
         }
       : {},
-    background: theme.Input.backgroundColor,
+    background: disabled ? theme.Input.backgroundColorDisabled : theme.Input.backgroundColor,
     border: 'none',
     borderRadius: '4px',
     boxShadow: markInvalid ? `0 0 0 1px ${COLOR.RED}` : 'none',
@@ -66,7 +66,6 @@ export const textAreaStyle: <T>(theme: Theme, props: TextAreaProps<T>) => Object
     fontWeight: 300,
     lineHeight: '24px',
     margin: '0 0 16px',
-    opacity: disabled ? 0.56 : 1,
     outline: 'none',
     padding: '16px 16px',
     resize: 'none',

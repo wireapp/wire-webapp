@@ -18,7 +18,6 @@ exports[`"Select" renders 1`] = `
   height: 56px;
   line-height: 24px;
   margin: 0 0 16px;
-  opacity: 1;
   outline: none;
   padding: 0 16px;
   width: 100%;
@@ -85,7 +84,7 @@ exports[`"Select" renders as disabled 1`] = `
 }
 
 .emotion-0 {
-  background: #fff;
+  background: rgba(127,136,142,0.16000000000000003);
   border: none;
   border-radius: 4px;
   box-shadow: none;
@@ -95,7 +94,6 @@ exports[`"Select" renders as disabled 1`] = `
   height: 56px;
   line-height: 24px;
   margin: 0 0 16px;
-  opacity: 0.56;
   outline: none;
   padding: 0 16px;
   width: 100%;
@@ -173,7 +171,6 @@ exports[`"Select" renders as invalid 1`] = `
   height: 56px;
   line-height: 24px;
   margin: 0 0 16px;
-  opacity: 1;
   outline: none;
   padding: 0 16px;
   width: 100%;
