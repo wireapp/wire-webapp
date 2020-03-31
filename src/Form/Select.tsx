@@ -49,12 +49,11 @@ export const selectStyle: <T>(theme: Theme, props: SelectProps<T>) => ObjectInte
   },
   appearance: 'none',
   background: disabled
-    ? theme.Input.backgroundColor
+    ? theme.Input.backgroundColorDisabled
     : `${theme.Input.backgroundColor} center right 16px no-repeat url("${inlineSVG(ArrowDown(theme))}")`,
   boxShadow: markInvalid ? `0 0 0 1px ${COLOR.RED}` : 'none',
   cursor: disabled ? 'normal' : 'pointer',
   fontWeight: 300,
-  opacity: disabled ? 0.56 : 1,
   paddingRight: '30px',
 });
 
