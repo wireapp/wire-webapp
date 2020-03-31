@@ -53,88 +53,90 @@ const ContainerStyle = {
 };
 
 export const DemoLayouts = () => (
-  <Container>
-    <Line />
-    <H1>Layout</H1>
-    <Line />
+  <>
+    <Container>
+      <Line />
+      <H1>Layout</H1>
+      <Line />
 
-    <H2>MediaQuery</H2>
-    <Line />
-    <ContainerXS centerText>
-      <IsMobile>This is the mobile view</IsMobile>
-      <IsMobile not>This is not the mobile view</IsMobile>
-    </ContainerXS>
+      <H2>MediaQuery</H2>
+      <Line />
+      <ContainerXS centerText>
+        <IsMobile>This is the mobile view</IsMobile>
+        <IsMobile not>This is not the mobile view</IsMobile>
+      </ContainerXS>
 
-    <H2>Container</H2>
-    <Line />
-
+      <H2>Container</H2>
+      <Line />
+    </Container>
     <ContainerXS style={ContainerStyle}>ContainerXS</ContainerXS>
     <ContainerSM style={ContainerStyle}>ContainerSM</ContainerSM>
     <ContainerMD style={ContainerStyle}>ContainerMD</ContainerMD>
     <ContainerLG style={ContainerStyle}>ContainerLG</ContainerLG>
+    <Container>
+      <H2>Columns</H2>
+      <Line />
 
-    <H2>Columns</H2>
-    <Line />
+      <Columns style={ColumnsStyle}>
+        <Column style={ColumnStyle}>Column</Column>
+      </Columns>
 
-    <Columns style={ColumnsStyle}>
-      <Column style={ColumnStyle}>Column</Column>
-    </Columns>
+      <Columns style={ColumnsStyle}>
+        <Column style={ColumnStyle}>Column</Column>
+        <Column style={ColumnStyle}>Column</Column>
+      </Columns>
 
-    <Columns style={ColumnsStyle}>
-      <Column style={ColumnStyle}>Column</Column>
-      <Column style={ColumnStyle}>Column</Column>
-    </Columns>
+      <Columns style={ColumnsStyle}>
+        <Column style={ColumnStyle}>Column</Column>
+        <Column style={ColumnStyle}>Column</Column>
+        <Column style={ColumnStyle}>Column</Column>
+      </Columns>
 
-    <Columns style={ColumnsStyle}>
-      <Column style={ColumnStyle}>Column</Column>
-      <Column style={ColumnStyle}>Column</Column>
-      <Column style={ColumnStyle}>Column</Column>
-    </Columns>
+      <Columns style={ColumnsStyle}>
+        <Column style={ColumnStyle}>Column</Column>
+        <Column style={ColumnStyle}>Column</Column>
+        <Column style={ColumnStyle}>Column</Column>
+        <Column style={ColumnStyle}>Column</Column>
+      </Columns>
 
-    <Columns style={ColumnsStyle}>
-      <Column style={ColumnStyle}>Column</Column>
-      <Column style={ColumnStyle}>Column</Column>
-      <Column style={ColumnStyle}>Column</Column>
-      <Column style={ColumnStyle}>Column</Column>
-    </Columns>
+      <Columns style={ColumnsStyle}>
+        <Column style={ColumnStyle}>Column</Column>
+        <Column style={ColumnStyle}>Column</Column>
+        <Column style={ColumnStyle}>Column</Column>
+        <Column style={ColumnStyle}>Column</Column>
+        <Column style={ColumnStyle}>Column</Column>
+      </Columns>
 
-    <Columns style={ColumnsStyle}>
-      <Column style={ColumnStyle}>Column</Column>
-      <Column style={ColumnStyle}>Column</Column>
-      <Column style={ColumnStyle}>Column</Column>
-      <Column style={ColumnStyle}>Column</Column>
-      <Column style={ColumnStyle}>Column</Column>
-    </Columns>
+      <Columns style={ColumnsStyle}>
+        <Column style={ColumnStyle}>
+          <Columns>
+            <Column style={ColumnStyle}>Column</Column>
+            <Column style={ColumnStyle}>Column</Column>
+            <Column style={ColumnStyle}>Column</Column>
+          </Columns>
+        </Column>
+        <Column style={ColumnStyle}>
+          <Columns>
+            <Column style={ColumnStyle}>Column</Column>
+            <Column style={ColumnStyle}>Column</Column>
+            <Column style={ColumnStyle}>Column</Column>
+          </Columns>
+        </Column>
+        <Column style={ColumnStyle}>
+          <Columns>
+            <Column style={ColumnStyle}>Column</Column>
+            <Column style={ColumnStyle}>Column</Column>
+            <Column style={ColumnStyle}>Column</Column>
+          </Columns>
+        </Column>
+      </Columns>
+      <H2>Box</H2>
 
-    <Columns style={ColumnsStyle}>
-      <Column style={ColumnStyle}>
-        <Columns>
-          <Column style={ColumnStyle}>Column</Column>
-          <Column style={ColumnStyle}>Column</Column>
-          <Column style={ColumnStyle}>Column</Column>
-        </Columns>
-      </Column>
-      <Column style={ColumnStyle}>
-        <Columns>
-          <Column style={ColumnStyle}>Column</Column>
-          <Column style={ColumnStyle}>Column</Column>
-          <Column style={ColumnStyle}>Column</Column>
-        </Columns>
-      </Column>
-      <Column style={ColumnStyle}>
-        <Columns>
-          <Column style={ColumnStyle}>Column</Column>
-          <Column style={ColumnStyle}>Column</Column>
-          <Column style={ColumnStyle}>Column</Column>
-        </Columns>
-      </Column>
-    </Columns>
-    <H2>Box</H2>
-
-    <Box>
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce a mattis nibh, sed maximus leo. Fusce a lacinia
-      sem, vitae ornare dolor. Quisque rhoncus, magna non lacinia sagittis, erat augue fringilla metus, eu consectetur
-      leo velit non lacus. Phasellus ipsum turpis, dapibus ut purus in, lobortis consectetur mi.
-    </Box>
-  </Container>
+      <Box>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce a mattis nibh, sed maximus leo. Fusce a lacinia
+        sem, vitae ornare dolor. Quisque rhoncus, magna non lacinia sagittis, erat augue fringilla metus, eu consectetur
+        leo velit non lacus. Phasellus ipsum turpis, dapibus ut purus in, lobortis consectetur mi.
+      </Box>
+    </Container>
+  </>
 );
