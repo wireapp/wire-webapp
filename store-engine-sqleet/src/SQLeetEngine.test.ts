@@ -169,6 +169,33 @@ describe('SQLeetEngine', () => {
         await testFunction(engine);
       });
     });
+
+    it('parses JSON properties', async () => {
+      const tableName = 'users';
+
+      const engine = await initEngine({
+        [tableName]: {
+          name: SQLiteType.TEXT,
+          visits: SQLiteType.JSON,
+        },
+      });
+
+      const visits = {
+        anne: 2,
+        bertha: null,
+        peter: 1,
+      };
+
+      const primaryKey = await engine.create(tableName, undefined, {
+        name: 'Alva',
+        visits,
+      });
+
+      const alva = await engine.read(tableName, primaryKey);
+
+      expect(alva.name).toBe('Alva');
+      expect(alva.visits).toEqual(visits);
+    });
   });
 
   describe('readAll', () => {
@@ -229,6 +256,43 @@ describe('SQLeetEngine', () => {
 
       expect(bertha.name).toBe('Bertha');
       expect(bertha.visits).toBeNull();
+    });
+
+    it('parses JSON properties', async () => {
+      const tableName = 'users';
+
+      const engine = await initEngine({
+        [tableName]: {
+          name: SQLiteType.TEXT,
+          visits: SQLiteType.JSON,
+        },
+      });
+
+      const visits = {
+        anne: 2,
+        bertha: null,
+        peter: 1,
+      };
+
+      await engine.create(tableName, undefined, {
+        name: 'Alva',
+        visits,
+      });
+
+      await engine.create(tableName, undefined, {
+        name: 'Simon',
+      });
+
+      const allEntries = await engine.readAll(tableName);
+      expect(allEntries.length).toBe(2);
+
+      const [alva, simon] = allEntries;
+
+      expect(alva.name).toBe('Alva');
+      expect(alva.visits).toEqual(visits);
+
+      expect(simon.name).toBe('Simon');
+      expect(simon.visits).toBeNull();
     });
   });
 
