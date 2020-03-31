@@ -12,7 +12,7 @@
     "bazinga64": "5.6.10",
     "hash.js": "1.1.7",
     "logdown": "3.3.1",
-    "protobufjs": "6.8.8",
+    "protobufjs": "6.8.9",
     "pure-uuid": "1.6.0"
   },
   "devDependencies": {
