@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.0.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.21.2...@wireapp/api-client@10.0.0) (2020-03-31)
+
+
+### Features
+
+* **api-client:** Get Members by ID list (BREAKING) ([#2912](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2912)) ([15d354f](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/15d354f9d97b8aa5e9f43c019c571390455c6cb8))
+
+
+### BREAKING CHANGES
+
+* **api-client:** - Rename `getMembers` to `getAllMembers`
+
+
+
+
+
 ## [9.21.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@9.21.1...@wireapp/api-client@9.21.2) (2020-03-31)
 
 **Note:** Version bump only for package @wireapp/api-client
