@@ -174,11 +174,7 @@ export function roleFromTeamPermissions(permissions: {self: number}): ROLE {
 export function generatePermissionHelpers(boundRole = ROLE.NONE): Record<string, (role: ROLE) => boolean> {
   return Object.entries(FEATURES).reduce<Record<string, (role: ROLE) => boolean>>(
     (helpers, [featureKey, featureValue]: [string, number]) => {
-      const camelCasedFeature = featureKey
-        .toLowerCase()
-        .split('_')
-        .map(capitalizeFirstChar)
-        .join('');
+      const camelCasedFeature = featureKey.toLowerCase().split('_').map(capitalizeFirstChar).join('');
       helpers[`can${camelCasedFeature}`] = (role = boundRole) => hasAccessToFeature(featureValue, role);
       return helpers;
     },

@@ -223,10 +223,7 @@ const testEventServiceClass = (testedServiceName, className) => {
           {args: [new Date('2016-11-23T12:19:06.816Z'), 1000], expectedEvents: events.slice(8, 10)},
           {
             args: [new Date('2016-11-23T12:19:06.808Z'), 1000],
-            expectedEvents: events
-              .slice(0, 6)
-              .concat([events[7], events[6]])
-              .concat(events.slice(8)),
+            expectedEvents: events.slice(0, 6).concat([events[7], events[6]]).concat(events.slice(8)),
           },
         ];
 

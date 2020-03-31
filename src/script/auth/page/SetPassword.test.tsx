@@ -66,13 +66,9 @@ describe('SetPassword', () => {
       }),
     );
 
-    expect(setPasswordPage.getPasswordInput().exists())
-      .withContext('password input should be present')
-      .toBe(true);
+    expect(setPasswordPage.getPasswordInput().exists()).withContext('password input should be present').toBe(true);
 
-    expect(setPasswordPage.getSetPasswordButton().exists())
-      .withContext('submit button should be present')
-      .toBe(true);
+    expect(setPasswordPage.getSetPasswordButton().exists()).withContext('submit button should be present').toBe(true);
 
     expect(setPasswordPage.getSetPasswordButton().props().disabled)
       .withContext('submit button should be disabled')
@@ -96,9 +92,7 @@ describe('SetPassword', () => {
       }),
     );
 
-    expect(setPasswordPage.getErrorMessage().exists())
-      .withContext('Shows no error')
-      .toBe(false);
+    expect(setPasswordPage.getErrorMessage().exists()).withContext('Shows no error').toBe(false);
 
     setPasswordPage.enterPassword('e');
     setPasswordPage.clickSetPasswordButton();

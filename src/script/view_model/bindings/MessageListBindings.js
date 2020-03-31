@@ -174,7 +174,7 @@ ko.bindingHandlers.background_image = {
 /**
  * Generate message timestamp.
  */
-ko.bindingHandlers.relative_timestamp = (function() {
+ko.bindingHandlers.relative_timestamp = (function () {
   // timestamp that should be updated
   const timestamps = [];
 
@@ -208,7 +208,7 @@ ko.bindingHandlers.relative_timestamp = (function() {
   // should be fine to update every minute
   window.setInterval(() => timestamps.map(timestamp_func => timestamp_func()), TIME_IN_MILLIS.MINUTE);
 
-  const calculate = function(element, timestamp, isDay) {
+  const calculate = function (element, timestamp, isDay) {
     timestamp = window.parseInt(timestamp);
     const date = fromUnixTime(timestamp / TIME_IN_MILLIS.SECOND);
     return (element.textContent = calculate_timestamp(date, isDay));
@@ -216,7 +216,7 @@ ko.bindingHandlers.relative_timestamp = (function() {
 
   return {
     init(element, valueAccessor, allBindings) {
-      const timestamp_func = function() {
+      const timestamp_func = function () {
         calculate(element, valueAccessor(), allBindings.get('relative_timestamp_day'));
       };
 

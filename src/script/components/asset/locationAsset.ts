@@ -33,7 +33,7 @@ ko.components.register('location-asset', {
     <div class="location-asset-title" data-bind="text: asset.name" data-uie-name="location-name"></div>
     <a target="_blank" rel="nofollow noopener noreferrer" class="label-xs accent-text" data-bind="attr: {href: mapsUrl}, text: t('conversationLocationLink')"></a>
   `,
-  viewModel: function({asset}: Params): void {
+  viewModel: function ({asset}: Params): void {
     this.asset = asset;
     const {latitude, longitude, name, zoom} = asset;
     this.mapsUrl = getMapsUrl(parseFloat(latitude), parseFloat(longitude), name, zoom);

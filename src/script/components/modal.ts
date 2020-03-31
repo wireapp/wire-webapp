@@ -42,7 +42,7 @@ ko.components.register('modal', {
       <!-- /ko -->
     </div>
     `,
-  viewModel: function({
+  viewModel: function ({
     isShown,
     large,
     onBgClick = noop,

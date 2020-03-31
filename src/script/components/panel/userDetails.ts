@@ -83,7 +83,7 @@ ko.components.register('panel-user-details', {
       <!-- /ko -->
     </div>
   `,
-  viewModel: function({
+  viewModel: function ({
     participant,
     isVerified = participant().is_verified,
     badge,

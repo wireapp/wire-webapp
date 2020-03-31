@@ -153,10 +153,7 @@ export class EmojiInputViewModel {
       const alphaCodes = [details.name, ...details.aliases];
       alphaCodes.forEach(alphaCode => {
         if (alphaCode) {
-          const name = alphaCode
-            .slice(1, -1)
-            .replace(/_/g, ' ')
-            .toLowerCase();
+          const name = alphaCode.slice(1, -1).replace(/_/g, ' ').toLowerCase();
           this.emojiList.push({icon, name});
           this.emojiDict[name] = icon;
         }
@@ -379,10 +376,7 @@ export class EmojiInputViewModel {
 
     window.addEventListener('click', this.removeEmojiPopup);
     this.isVisible = true;
-    this.emojiDiv
-      .html(emojiMatched)
-      .appendTo('body')
-      .show();
+    this.emojiDiv.html(emojiMatched).appendTo('body').show();
     this.emojiDiv.find('.emoji:nth(0)').addClass('selected');
 
     const position = getCursorPixelPosition(input);
@@ -402,10 +396,7 @@ export class EmojiInputViewModel {
 
   _enterEmojiPopupLine(input, emojiLine) {
     const emojiIcon = emojiLine.find('.symbol').text();
-    const emojiName = emojiLine
-      .find('.name')
-      .text()
-      .toLowerCase();
+    const emojiName = emojiLine.find('.name').text().toLowerCase();
 
     this._enterEmoji(input, emojiIcon);
     this._increaseUsageCount(emojiName); // only emojis selected from the list should affect the count

@@ -68,9 +68,7 @@ describe('when visiting the index page', () => {
       }),
     );
 
-    expect(indexPage.getLogo().exists())
-      .withContext('Logo is visible')
-      .toBe(true);
+    expect(indexPage.getLogo().exists()).withContext('Logo is visible').toBe(true);
   });
 
   it('redirects to SSO login if default SSO code is set', async () => {
@@ -116,9 +114,7 @@ describe('when visiting the index page', () => {
       }),
     );
 
-    expect(indexPage.getWelcomeText().exists())
-      .withContext('Welcome text is visible')
-      .toBe(true);
+    expect(indexPage.getWelcomeText().exists()).withContext('Welcome text is visible').toBe(true);
 
     expect(indexPage.getWelcomeText().text())
       .withContext('Welcome text contains default backend name')
@@ -144,9 +140,7 @@ describe('when visiting the index page', () => {
       }),
     );
 
-    expect(indexPage.getWelcomeText().exists())
-      .withContext('Welcome text is visible')
-      .toBe(true);
+    expect(indexPage.getWelcomeText().exists()).withContext('Welcome text is visible').toBe(true);
 
     expect(indexPage.getWelcomeText().text())
       .withContext('Welcome text contains custom backend name')
@@ -169,9 +163,7 @@ describe('when visiting the index page', () => {
       history,
     );
 
-    expect(indexPage.getLoginButton().exists())
-      .withContext('login button is visible')
-      .toBe(true);
+    expect(indexPage.getLoginButton().exists()).withContext('login button is visible').toBe(true);
     indexPage.clickLoginButton();
 
     await waitForExpect(() => {
@@ -203,9 +195,7 @@ describe('when visiting the index page', () => {
       history,
     );
 
-    expect(indexPage.getSSOLoginButton().exists())
-      .withContext('SSO login button is visible')
-      .toBe(true);
+    expect(indexPage.getSSOLoginButton().exists()).withContext('SSO login button is visible').toBe(true);
     indexPage.clickSSOLoginButton();
 
     await waitForExpect(() => {
@@ -267,9 +257,7 @@ describe('when visiting the index page', () => {
         history,
       );
 
-      expect(indexPage.getCreateAccountButton().exists())
-        .withContext('create account button is visible')
-        .toBe(true);
+      expect(indexPage.getCreateAccountButton().exists()).withContext('create account button is visible').toBe(true);
       indexPage.clickCreateAccountButton();
 
       await waitForExpect(() => {
@@ -302,9 +290,7 @@ describe('when visiting the index page', () => {
         }),
       );
 
-      expect(indexPage.getSSOLoginButton().exists())
-        .withContext('SSO login button is not visible')
-        .toBe(false);
+      expect(indexPage.getSSOLoginButton().exists()).withContext('SSO login button is not visible').toBe(false);
     });
   });
 
