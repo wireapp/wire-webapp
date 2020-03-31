@@ -303,21 +303,8 @@ export class StorageService {
    */
   async getAll<T = Object>(storeName: string): Promise<T[]> {
     try {
-      const resultArray = await this.engine.readAll<T>(storeName);
-
-      // TODO: Move normalization logic to "EventService"
-      const serializedProperties = ['data', 'reactions'];
-
-      return resultArray.filter(Boolean).map(record => {
-        serializedProperties.forEach(property => {
-          if (typeof (record as any)[property] === 'string') {
-            try {
-              (record as any)[property] = JSON.parse((record as any)[property]);
-            } catch (error) {}
-          }
-        });
-        return record;
-      });
+      const records = await this.engine.readAll<T>(storeName);
+      return records.filter(Boolean);
     } catch (error) {
       this.logger.error(`Failed to load objects from store '${storeName}'`, error);
       throw error;
@@ -342,13 +329,7 @@ export class StorageService {
    */
   async load<T = Object>(storeName: string, primaryKey: string): Promise<T | undefined> {
     try {
-      const record = await this.engine.read<T>(storeName, primaryKey);
-      if (typeof (record as any).data === 'string') {
-        try {
-          (record as any).data = JSON.parse((record as any).data);
-        } catch (error) {}
-      }
-      return record;
+      return await this.engine.read<T>(storeName, primaryKey);
     } catch (error) {
       if (error instanceof StoreEngineError.RecordNotFoundError) {
         return undefined;

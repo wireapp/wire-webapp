@@ -367,7 +367,15 @@
     "@babel/helper-plugin-utils" "^7.8.3"
     "@babel/plugin-syntax-nullish-coalescing-operator" "^7.8.0"
 
-"@babel/plugin-proposal-object-rest-spread@7.8.3", "@babel/plugin-proposal-object-rest-spread@^7.8.3":
+"@babel/plugin-proposal-object-rest-spread@7.9.0":
+  version "7.9.0"
+  resolved "https://registry.yarnpkg.com/@babel/plugin-proposal-object-rest-spread/-/plugin-proposal-object-rest-spread-7.9.0.tgz#a28993699fc13df165995362693962ba6b061d6f"
+  integrity sha512-UgqBv6bjq4fDb8uku9f+wcm1J7YxJ5nT7WO/jBr0cl0PLKb7t1O6RNR1kZbjgx2LQtsDI9hwoQVmn0yhXeQyow==
+  dependencies:
+    "@babel/helper-plugin-utils" "^7.8.3"
+    "@babel/plugin-syntax-object-rest-spread" "^7.8.0"
+
+"@babel/plugin-proposal-object-rest-spread@^7.8.3":
   version "7.8.3"
   resolved "https://registry.yarnpkg.com/@babel/plugin-proposal-object-rest-spread/-/plugin-proposal-object-rest-spread-7.8.3.tgz#eb5ae366118ddca67bed583b53d7554cad9951bb"
   integrity sha512-8qvuPwU/xxUCt78HocNlv0mXXo0wdh9VT1R04WU8HGOfaOob26pF+9P5/lYjN/q7DHOX1bvX60hnhOvuQUJdbA==
@@ -1969,14 +1977,14 @@
   dependencies:
     dexie "2.0.4"
 
-"@wireapp/store-engine-sqleet@1.2.13":
-  version "1.2.13"
-  resolved "https://registry.yarnpkg.com/@wireapp/store-engine-sqleet/-/store-engine-sqleet-1.2.13.tgz#f72f7dcb998c94f2b6884bd4cadbc47c5ef35598"
-  integrity sha512-6xzlymrUZVb6SkA0bg75atwjNWtcK0LvxvmGCKxuew/aogZsSQoSiCjEFkFym1BRZvJ5iHzkGXXcr+AKMbtAwA==
+"@wireapp/store-engine-sqleet@1.2.15":
+  version "1.2.15"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine-sqleet/-/store-engine-sqleet-1.2.15.tgz#440bf96fab1120391708a32c864e7fb23811cb19"
+  integrity sha512-PGDMjx2XSgkSqyKe+/g75Ma/7qECZmJ8x6aUzFk9CyNEAVT/lKB+/bIcCjNdTmdCfXgUpE4qA5u6s8d63YGoCQ==
   dependencies:
     "@babel/core" "7.8.7"
     "@babel/plugin-proposal-class-properties" "7.8.3"
-    "@babel/plugin-proposal-object-rest-spread" "7.8.3"
+    "@babel/plugin-proposal-object-rest-spread" "7.9.0"
     "@babel/plugin-proposal-optional-chaining" "7.8.3"
     "@babel/preset-typescript" "7.8.3"
     "@wireapp/websql" "0.0.15"
