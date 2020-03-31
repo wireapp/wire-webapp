@@ -32,7 +32,7 @@ export class BroadcastService {
   ) {}
 
   private async getPreKeyBundle(teamId: string, skipOwnClients = false): Promise<UserPreKeyBundleMap> {
-    const {members: teamMembers} = await this.apiClient.teams.member.api.getMembers(teamId);
+    const {members: teamMembers} = await this.apiClient.teams.member.api.getAllMembers(teamId);
 
     let members = teamMembers.map(member => ({id: member.user}));
 
