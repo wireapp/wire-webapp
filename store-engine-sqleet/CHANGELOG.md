@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.15](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/compare/@wireapp/store-engine-sqleet@1.2.14...@wireapp/store-engine-sqleet@1.2.15) (2020-03-31)
+
+
+### Bug Fixes
+
+* **sqleet-engine:** Parse JSON in readAll (WEBAPP-6765) ([#2913](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/issues/2913)) ([36abbba](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/commit/36abbba3546af13045ac02bb9c4a0d81fedd3fdf))
+
+
+
+
+
 ## [1.2.14](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/compare/@wireapp/store-engine-sqleet@1.2.13...@wireapp/store-engine-sqleet@1.2.14) (2020-03-31)
 
 **Note:** Version bump only for package @wireapp/store-engine-sqleet
