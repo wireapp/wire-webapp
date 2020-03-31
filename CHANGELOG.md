@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.26.15](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.26.14...@wireapp/react-ui-kit@7.26.15) (2020-03-31)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Adjust disabled input colors ([#2914](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/2914)) ([523534d](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/523534d7faf0129d8f00347bfa4f781e8d158ca0))
+
+
+
+
+
 ## [7.26.14](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.26.13...@wireapp/react-ui-kit@7.26.14) (2020-03-31)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
