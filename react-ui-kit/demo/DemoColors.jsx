@@ -71,8 +71,10 @@ const ColorElement = ({name}) => {
 };
 
 export const DemoColors = () => {
-  const baseColors = ['BLUE', 'GRAY', 'GREEN', 'ORANGE', 'RED', 'YELLOW'];
-  const additionalColors = ['WHITE', 'BLACK', 'LINK', 'TEXT', 'ICON', 'DISABLED'];
+  const lightenableColors = ['BLACK', 'GRAY'];
+  const darkenableColors = ['WHITE', 'GRAY'];
+  const baseColors = ['BLACK', 'WHITE', 'GRAY', 'BLUE', 'GREEN', 'ORANGE', 'RED', 'YELLOW'];
+  const additionalColors = ['LINK', 'TEXT', 'ICON', 'DISABLED'];
   const allColors = [...baseColors, ...additionalColors];
   const steps = [];
   const percent = 100;
@@ -90,7 +92,7 @@ export const DemoColors = () => {
           <ColorElement name={color} key={color} />
         ))}
         <H2>Darken</H2>
-        {baseColors.map(color => (
+        {darkenableColors.map(color => (
           <Container key={color}>
             {steps.map(step => {
               const name = `${color}_DARKEN_${step}`;
@@ -99,7 +101,7 @@ export const DemoColors = () => {
           </Container>
         ))}
         <H2>Lighten</H2>
-        {baseColors.map(color => (
+        {lightenableColors.map(color => (
           <Container key={color}>
             {steps.map(step => {
               const name = `${color}_LIGHTEN_${step}`;
