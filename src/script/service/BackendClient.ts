@@ -300,9 +300,7 @@ export class BackendClient {
     rejectFn: (value: any) => any,
   ): void {
     this.requestQueue.pause().unshift(() => {
-      return this._sendRequest(config)
-        .then(resolveFn)
-        .catch(rejectFn);
+      return this._sendRequest(config).then(resolveFn).catch(rejectFn);
     });
   }
 

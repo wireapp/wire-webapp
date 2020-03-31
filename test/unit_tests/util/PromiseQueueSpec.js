@@ -25,7 +25,7 @@ describe('PromiseQueue', () => {
       let counter = 0;
       const result = [];
 
-      const promiseFn = function() {
+      const promiseFn = function () {
         result.push(counter++);
         return Promise.resolve();
       };
@@ -86,7 +86,7 @@ describe('PromiseQueue', () => {
 
       const resolvingPromise = () => Promise.resolve(counter++);
 
-      const timeout_promise = function() {
+      const timeout_promise = function () {
         return new Promise(resolve => {
           if (counter++ === 3) {
             resolve();

@@ -29,9 +29,7 @@ require('dotenv').config();
 let currentBranch = '';
 
 try {
-  currentBranch = execSync('git rev-parse HEAD')
-    .toString()
-    .trim();
+  currentBranch = execSync('git rev-parse HEAD').toString().trim();
 } catch (error) {}
 
 const distributionParam = process.argv[2];

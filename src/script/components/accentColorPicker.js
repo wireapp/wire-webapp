@@ -23,7 +23,7 @@ class AccentColorPicker {
 
     this.accentColorIds = [1, 2, 4, 5, 6, 7];
 
-    this.onSelect = function(id) {
+    this.onSelect = function (id) {
       selected(id);
       return true;
     };
