@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [16.0.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@15.12.6...@wireapp/core@16.0.0) (2020-03-31)
+
+
+### Features
+
+* **api-client:** Get Members by ID list (BREAKING) ([#2912](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/2912)) ([15d354f](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/15d354f9d97b8aa5e9f43c019c571390455c6cb8))
+
+
+### BREAKING CHANGES
+
+* **api-client:** - Rename `getMembers` to `getAllMembers`
+
+
+
+
+
 ## [15.12.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@15.12.5...@wireapp/core@15.12.6) (2020-03-31)
 
 **Note:** Version bump only for package @wireapp/core
