@@ -465,10 +465,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       this.editMessageEntity(messageEntity);
 
       this.input(messageEntity.get_first_asset().text);
-      const newMentions = messageEntity
-        .get_first_asset()
-        .mentions()
-        .slice();
+      const newMentions = messageEntity.get_first_asset().mentions().slice();
       this.currentMentions(newMentions);
 
       if (messageEntity.quote()) {

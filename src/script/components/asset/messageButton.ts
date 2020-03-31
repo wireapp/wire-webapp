@@ -42,7 +42,7 @@ ko.components.register('message-button', {
         <div class="message-button__error" data-bind="text: errorMessage" data-uie-name="message-button-error"></div>
       <!-- /ko -->
     </div>`,
-  viewModel: function({
+  viewModel: function ({
     label,
     id,
     onClick = noop,

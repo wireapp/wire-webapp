@@ -133,11 +133,11 @@ export const loadUrlBuffer = (
   });
 };
 
-export const loadImage = function(blob: Blob): Promise<GlobalEventHandlers> {
+export const loadImage = function (blob: Blob): Promise<GlobalEventHandlers> {
   return new Promise((resolve, reject) => {
     const object_url = window.URL.createObjectURL(blob);
     const img = new Image();
-    img.onload = function(): void {
+    img.onload = function (): void {
       resolve(this);
       window.URL.revokeObjectURL(object_url);
     };

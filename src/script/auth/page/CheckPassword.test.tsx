@@ -69,17 +69,11 @@ describe('CheckPassword', () => {
       }),
     );
 
-    expect(checkPasswordPage.getPasswordInput().exists())
-      .withContext('password input is present')
-      .toBe(true);
+    expect(checkPasswordPage.getPasswordInput().exists()).withContext('password input is present').toBe(true);
 
-    expect(checkPasswordPage.getLoginButton().exists())
-      .withContext('submit button is present')
-      .toBe(true);
+    expect(checkPasswordPage.getLoginButton().exists()).withContext('submit button is present').toBe(true);
 
-    expect(checkPasswordPage.getLoginButton().props().disabled)
-      .withContext('submit button is disabled')
-      .toBe(true);
+    expect(checkPasswordPage.getLoginButton().props().disabled).withContext('submit button is disabled').toBe(true);
 
     checkPasswordPage.enterPassword('e');
 
@@ -115,9 +109,7 @@ describe('CheckPassword', () => {
     checkPasswordPage.clickLoginButton();
 
     await waitForExpect(() => {
-      expect(actionRoot.authAction.doLogin)
-        .withContext('action was called')
-        .toHaveBeenCalled();
+      expect(actionRoot.authAction.doLogin).withContext('action was called').toHaveBeenCalled();
 
       expect(historyPushSpy)
         .withContext('navigation to history page was triggered')
@@ -149,9 +141,7 @@ describe('CheckPassword', () => {
     checkPasswordPage.clickLoginButton();
 
     await waitForExpect(() => {
-      expect(actionRoot.authAction.doLogin)
-        .withContext('action was called')
-        .toHaveBeenCalledTimes(1);
+      expect(actionRoot.authAction.doLogin).withContext('action was called').toHaveBeenCalledTimes(1);
     });
     await waitForExpect(() => {
       checkPasswordPage.update();
@@ -190,9 +180,7 @@ describe('CheckPassword', () => {
     checkPasswordPage.clickLoginButton();
 
     await waitForExpect(() => {
-      expect(actionRoot.authAction.doLogin)
-        .withContext('action was called')
-        .toHaveBeenCalled();
+      expect(actionRoot.authAction.doLogin).withContext('action was called').toHaveBeenCalled();
 
       expect(historyPushSpy)
         .withContext('navigation to too many clients page was triggered')

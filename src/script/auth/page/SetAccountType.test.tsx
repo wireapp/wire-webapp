@@ -71,9 +71,7 @@ describe('when visiting the set account type page', () => {
         }),
       );
 
-      expect(accountTypePage.getIndexRedirect().exists())
-        .withContext('Redirect is rendered')
-        .toBe(true);
+      expect(accountTypePage.getIndexRedirect().exists()).withContext('Redirect is rendered').toBe(true);
     });
   });
 
@@ -98,9 +96,7 @@ describe('when visiting the set account type page', () => {
         }),
       );
 
-      expect(accountTypePage.getLogo().exists())
-        .withContext('logo is shown')
-        .toBe(true);
+      expect(accountTypePage.getLogo().exists()).withContext('logo is shown').toBe(true);
     });
 
     it('shows an option to create a private account', () => {
@@ -132,9 +128,7 @@ describe('when visiting the set account type page', () => {
         }),
       );
 
-      expect(accountTypePage.clickTeamAccountButton().exists())
-        .withContext('team account button is shown')
-        .toBe(true);
+      expect(accountTypePage.clickTeamAccountButton().exists()).withContext('team account button is shown').toBe(true);
     });
   });
 });

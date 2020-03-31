@@ -203,11 +203,7 @@ const SingleSignOnForm = ({
   };
 
   const stripPrefix = (prefixedCode: string) =>
-    prefixedCode &&
-    prefixedCode
-      .trim()
-      .toLowerCase()
-      .replace(SSO_CODE_PREFIX, '');
+    prefixedCode && prefixedCode.trim().toLowerCase().replace(SSO_CODE_PREFIX, '');
 
   return (
     <Form style={{marginTop: 30}} data-uie-name="sso" onSubmit={handleSubmit}>

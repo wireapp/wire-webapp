@@ -44,10 +44,7 @@ export class SearchRepository {
     if (typeof query !== 'string') {
       return '';
     }
-    return query
-      .trim()
-      .replace(/^[@]/, '')
-      .toLowerCase();
+    return query.trim().replace(/^[@]/, '').toLowerCase();
   }
 
   /**

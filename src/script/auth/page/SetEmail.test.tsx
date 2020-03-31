@@ -67,13 +67,9 @@ describe('SetEmail', () => {
       }),
     );
 
-    expect(setEmailPage.getEmailInput().exists())
-      .withContext('Email input should be present')
-      .toBe(true);
+    expect(setEmailPage.getEmailInput().exists()).withContext('Email input should be present').toBe(true);
 
-    expect(setEmailPage.getVerifyEmailButton().exists())
-      .withContext('Submit button should be present')
-      .toBe(true);
+    expect(setEmailPage.getVerifyEmailButton().exists()).withContext('Submit button should be present').toBe(true);
 
     expect(setEmailPage.getVerifyEmailButton().props().disabled)
       .withContext('Submit button should be disabled')
@@ -97,9 +93,7 @@ describe('SetEmail', () => {
       }),
     );
 
-    expect(setEmailPage.getErrorMessage().exists())
-      .withContext('Shows no error')
-      .toBe(false);
+    expect(setEmailPage.getErrorMessage().exists()).withContext('Shows no error').toBe(false);
 
     setEmailPage.enterEmail('e');
     setEmailPage.clickVerifyEmailButton();
@@ -132,8 +126,6 @@ describe('SetEmail', () => {
     setEmailPage.enterEmail(` ${email} `);
     setEmailPage.clickVerifyEmailButton();
 
-    expect(actionRoot.selfAction.doSetEmail)
-      .withContext('action was called')
-      .toHaveBeenCalledWith(email);
+    expect(actionRoot.selfAction.doSetEmail).withContext('action was called').toHaveBeenCalledWith(email);
   });
 });

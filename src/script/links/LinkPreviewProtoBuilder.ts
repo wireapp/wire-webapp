@@ -68,9 +68,7 @@ export const buildFromOpenGraphData = (data: OpenGraphData, link: string, offset
   });
 
   if (deArrayify(site_name) === 'Twitter' && isTweetUrl(deArrayify(dataUrl))) {
-    const author = deArrayify(title)
-      .replace('on Twitter', '')
-      .trim();
+    const author = deArrayify(title).replace('on Twitter', '').trim();
     const username = deArrayify(dataUrl).match(/com\/([^/]*)\//)[1];
     const protoTweet = new Tweet({author, username});
 

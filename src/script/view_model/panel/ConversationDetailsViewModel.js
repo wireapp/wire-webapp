@@ -398,9 +398,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
 
   renameConversation(data, event) {
     if (this.activeConversation()) {
-      const currentConversationName = this.activeConversation()
-        .display_name()
-        .trim();
+      const currentConversationName = this.activeConversation().display_name().trim();
 
       const newConversationName = removeLineBreaks(event.target.value.trim());
 
