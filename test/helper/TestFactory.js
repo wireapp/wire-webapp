@@ -36,7 +36,7 @@ import {StorageRepository} from 'src/script/storage/StorageRepository';
 import {ClientRepository} from 'src/script/client/ClientRepository';
 import {EventTrackingRepository} from 'src/script/tracking/EventTrackingRepository';
 import {ClientEntity} from 'src/script/client/ClientEntity';
-
+import {Cryptobox} from '@wireapp/cryptobox';
 import {EventRepository} from 'src/script/event/EventRepository';
 import {EventServiceNoCompound} from 'src/script/event/EventServiceNoCompound';
 import {EventService} from 'src/script/event/EventService';
@@ -110,7 +110,7 @@ export class TestFactory {
    * @returns {Promise<CryptographyRepository>} The cryptography repository.
    */
   async exposeCryptographyActors(mockCryptobox = true) {
-    await this.exposeStorageActors();
+    const storageRepository = await this.exposeStorageActors();
     const currentClient = new ClientEntity(true);
     currentClient.id = entities.clients.john_doe.permanent.id;
     this.cryptography_service = new CryptographyService(container.resolve(APIClientSingleton).getClient());
@@ -118,11 +118,14 @@ export class TestFactory {
     this.cryptography_repository = new CryptographyRepository(this.cryptography_service, this.storage_repository);
     this.cryptography_repository.currentClient = ko.observable(currentClient);
 
-    if (mockCryptobox) {
+    if (mockCryptobox === true) {
       // eslint-disable-next-line jasmine/no-unsafe-spy
-      spyOn(this.cryptography_repository, 'createCryptobox').and.returnValue(Promise.resolve());
+      spyOn(this.cryptography_repository, 'initCryptobox').and.returnValue(Promise.resolve());
+    } else {
+      const storeEngine = storageRepository.storageService.engine;
+      this.cryptography_repository.cryptobox = new Cryptobox(storeEngine, 10);
+      await this.cryptography_repository.cryptobox.create();
     }
-    await this.cryptography_repository.createCryptobox(this.storage_service.db);
 
     return this.cryptography_repository;
   }

@@ -37,7 +37,7 @@ export class ContentMessage extends Message {
   private readonly is_liked_provisional: ko.Observable<boolean>;
   private readonly quote: ko.Observable<QuoteEntity>;
   private readonly reactions_user_ets: ko.ObservableArray<User>;
-  private readonly reactions: ko.Observable<Record<string, string>>;
+  private readonly reactions: ko.Observable<{[userId: string]: string}>;
   public readonly assets: ko.ObservableArray<Asset>;
   public readonly is_liked: ko.PureComputed<boolean>;
   public readonly like_caption: ko.PureComputed<string>;

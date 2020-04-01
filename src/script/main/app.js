@@ -374,7 +374,7 @@ class App {
         user: userRepository,
       } = this.repository;
       await checkIndexedDb();
-      await this._registerSingleInstance();
+      this._registerSingleInstance();
       loadingView.updateProgress(2.5);
       telemetry.time_step(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
       await authRepository.init();
@@ -388,7 +388,7 @@ class App {
       telemetry.time_step(AppInitTimingsStep.VALIDATED_CLIENT);
       telemetry.add_statistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity.type);
 
-      await cryptographyRepository.loadCryptobox(this.service.storage.db);
+      await cryptographyRepository.initCryptobox();
       loadingView.updateProgress(10);
       telemetry.time_step(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
@@ -404,7 +404,7 @@ class App {
       conversationRepository.map_connections(connectionRepository.connectionEntities());
       this._subscribeToUnloadEvents();
 
-      await teamRepository.getTeam();
+      await teamRepository.scheduleFetchTeamInfo();
 
       await conversationRepository.conversationRoleRepository.loadTeamRoles();
 

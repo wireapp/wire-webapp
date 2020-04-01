@@ -91,6 +91,8 @@ function modifyMarkdownLinks(markdown: string): string {
   return result.join('');
 }
 
+markdownit.normalizeLinkText = text => text;
+
 export const renderMessage = (message: string, selfId: string, mentionEntities: MentionEntity[] = []) => {
   const createMentionHash = (mention: MentionEntity) => `@@${window.btoa(JSON.stringify(mention)).replace(/=/g, '')}`;
   const renderMention = (mentionData: MentionText) => {
@@ -215,5 +217,5 @@ export const getRenderedTextContent = (text: string): string => {
   const renderedMessage = renderMessage(text, '');
   const messageWithLinebreaks = renderedMessage.replace(/<br>/g, '\n');
   const strippedMessage = messageWithLinebreaks.replace(/<.+?>/g, '');
-  return strippedMessage;
+  return markdownit.utils.unescapeAll(strippedMessage);
 };

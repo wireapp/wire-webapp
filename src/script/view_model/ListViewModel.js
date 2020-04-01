@@ -212,7 +212,9 @@ z.viewModel.ListViewModel = class ListViewModel {
     }
   }
 
-  openPreferencesAccount() {
+  async openPreferencesAccount() {
+    await this.teamRepository.getTeam();
+
     if (this.isActivatedAccount()) {
       this.dismissModal();
     }

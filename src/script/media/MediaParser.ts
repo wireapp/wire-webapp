@@ -24,14 +24,17 @@ import {WebAppEvents} from '../event/WebApp';
 import {amplify} from 'amplify';
 
 class MediaParser {
+  showEmbed: boolean;
+  embeds: ((link: HTMLAnchorElement, message: string, themeColor: string) => string)[];
+
   constructor() {
     this.renderMediaEmbeds = this.renderMediaEmbeds.bind(this);
     this.showEmbed = true;
-    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, ({settings}) => {
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, ({settings}: any) => {
       this.showEmbed = settings.previews.send;
     });
 
-    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.PREVIEWS.SEND, value => {
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.PREVIEWS.SEND, (value: boolean) => {
       this.showEmbed = value;
     });
 
@@ -42,13 +45,13 @@ class MediaParser {
    * Render media embeds.
    * @note Checks message for valid media links and appends an iFrame right after the link
    *
-   * @param {string} message Message text
-   * @param {string} themeColor Accent color to be applied to the embed
-   * @returns {string} Message with rendered media embeds
+   * @param message Message text
+   * @param themeColor Accent color to be applied to the embed
+   * @returns Message with rendered media embeds
    */
-  renderMediaEmbeds(message, themeColor) {
+  renderMediaEmbeds(message: string, themeColor: string): string {
     if (this.showEmbed) {
-      getLinksFromHtml(message).forEach(link => {
+      getLinksFromHtml<HTMLAnchorElement>(message).forEach(link => {
         this.embeds.forEach(embed => (message = embed(link, message, themeColor)));
       });
     }

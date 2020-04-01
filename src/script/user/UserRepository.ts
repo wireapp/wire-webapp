@@ -601,6 +601,7 @@ export class UserRepository {
 
   /**
    * Check for users locally and fetch them from the server otherwise.
+   * @param user_ids List of user ID
    * @param offline Should we only look for cached contacts
    */
   getUsersById(user_ids: string[] = [], offline: boolean = false): Promise<User[]> {
@@ -608,7 +609,7 @@ export class UserRepository {
       return Promise.resolve([]);
     }
 
-    const _find_user = (user_id: string) => {
+    const _find_user = (user_id: string): string | User => {
       return this.findUserById(user_id) || user_id;
     };
 

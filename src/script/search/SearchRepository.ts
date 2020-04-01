@@ -17,13 +17,20 @@
  *
  */
 
-import {getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 import {EMOJI_RANGES} from 'Util/EmojiUtil';
 import {startsWith, computeTransliteration, sortByPriority, transliterationIndex} from 'Util/StringUtil';
 
 import {validateHandle} from '../user/UserHandleGenerator';
+import {SearchService} from './SearchService';
+import {UserRepository} from '../user/UserRepository';
+import {User} from '../entity/User';
 
 export class SearchRepository {
+  logger: Logger;
+  private readonly searchService: SearchService;
+  private readonly userRepository: UserRepository;
+
   static get CONFIG() {
     return {
       MAX_DIRECTORY_RESULTS: 30,
@@ -37,10 +44,10 @@ export class SearchRepository {
 
   /**
    * Trim and remove @.
-   * @param {string} query Search string
-   * @returns {string} Normalized search query
+   * @param query Search string
+   * @returns Normalized search query
    */
-  static normalizeQuery(query) {
+  static normalizeQuery(query: string): string {
     if (typeof query !== 'string') {
       return '';
     }
@@ -51,10 +58,10 @@ export class SearchRepository {
   }
 
   /**
-   * @param {SearchService} searchService SearchService
-   * @param {UserRepository} userRepository Repository for all user interactions
+   * @param searchService SearchService
+   * @param userRepository Repository for all user interactions
    */
-  constructor(searchService, userRepository) {
+  constructor(searchService: SearchService, userRepository: UserRepository) {
     this.searchService = searchService;
     this.userRepository = userRepository;
     this.logger = getLogger('SearchRepository');
@@ -64,21 +71,21 @@ export class SearchRepository {
    * Search for a user in the given user list and given a search term.
    * Doesn't sort the results and keep the initial order of the given user list.
    *
-   * @param {string} term the search term
-   * @param {Array<User>} userEntities entities to match the search term against
-   * @param {Array<SearchRepository.CONFIG.SEARCHABLE_FIELDS>} properties=[SearchRepository.CONFIG.SEARCHABLE_FIELDS.NAME, SearchRepository.CONFIG.SEARCHABLE_FIELDS.USERNAME] list of properties that will be matched against the search term
+   * @param term the search term
+   * @param userEntities entities to match the search term against
+   * @param properties list of properties that will be matched against the search term
    *    the order of the properties in the array indicates the priorities by which results will be sorted
-   * @returns {Array<User>} the filtered list of users
+   * @returns the filtered list of users
    */
   searchUserInSet(
-    term,
-    userEntities,
+    term: string,
+    userEntities: User[],
     properties = [SearchRepository.CONFIG.SEARCHABLE_FIELDS.NAME, SearchRepository.CONFIG.SEARCHABLE_FIELDS.USERNAME],
-  ) {
+  ): User[] {
     if (term === '') {
       return userEntities;
     }
-    const excludedEmojis = Array.from(term).reduce((emojis, char) => {
+    const excludedEmojis = Array.from(term).reduce((emojis: Record<string, string>, char) => {
       const isEmoji = EMOJI_RANGES.includes(char);
       if (isEmoji) {
         emojis[char] = char;
@@ -90,7 +97,11 @@ export class SearchRepository {
       const values = properties
         .slice()
         .reverse()
-        .map(property => (typeof userEntity[property] === 'function' ? userEntity[property]() : userEntity[property]));
+        .map(property =>
+          typeof (userEntity as any)[property] === 'function'
+            ? (userEntity as any)[property]()
+            : (userEntity as any)[property],
+        );
 
       const uniqueValues = Array.from(new Set(values));
       const matchWeight = uniqueValues.reduce((weight, value, index) => {
@@ -112,7 +123,7 @@ export class SearchRepository {
       .map(result => result.user);
   }
 
-  _matches(term, termSlug, excludedChars, value) {
+  _matches(term: string, termSlug: string, excludedChars?: Record<string, string>, value?: string): number {
     const isStrictMatch = (value || '').toLowerCase().startsWith(term.toLowerCase());
     if (isStrictMatch) {
       // if the pattern matches the raw text, give the maximum value to the match
@@ -151,17 +162,21 @@ export class SearchRepository {
    * Search for users on the backend by name.
    * @note We skip a few results as connection changes need a while to reflect on the backend.
    *
-   * @param {string} name Search query
-   * @param {boolean} isHandle Is query a user handle
-   * @param {number} [maxResults=SearchRepository.CONFIG.MAX_SEARCH_RESULTS] Maximum number of results
-   * @returns {Promise} Resolves with the search results
+   * @param name Search query
+   * @param isHandle Is query a user handle
+   * @param maxResults Maximum number of results
+   * @returns Resolves with the search results
    */
-  search_by_name(name, isHandle, maxResults = SearchRepository.CONFIG.MAX_SEARCH_RESULTS) {
+  search_by_name(
+    name: string,
+    isHandle?: string,
+    maxResults = SearchRepository.CONFIG.MAX_SEARCH_RESULTS,
+  ): Promise<User[]> {
     const directorySearch = this.searchService
       .getContacts(name, SearchRepository.CONFIG.MAX_DIRECTORY_RESULTS)
       .then(({documents}) => documents.map(match => match.id));
 
-    const searchPromises = [directorySearch];
+    const searchPromises: Promise<any>[] = [directorySearch];
 
     if (validateHandle(name)) {
       searchPromises.push(this.userRepository.getUserIdByHandle(name));

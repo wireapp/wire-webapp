@@ -77,19 +77,15 @@ export class WarningsViewModel {
     this.Config = Config.getConfig();
 
     this.warnings.subscribe(warnings => {
-      let topMargin;
-
       const visibleWarning = warnings[warnings.length - 1];
       const isConnectivityRecovery = visibleWarning === WarningsViewModel.TYPE.CONNECTIVITY_RECOVERY;
-      const noMargin = !warnings.length || isConnectivityRecovery;
-      if (noMargin) {
-        topMargin = '0';
-      } else {
-        const isMiniMode = WarningsViewModel.CONFIG.MINI_MODES.includes(visibleWarning);
-        topMargin = isMiniMode ? '32px' : '64px';
-      }
+      const hasOffset = warnings.length > 0 && !isConnectivityRecovery;
+      const isMiniMode = WarningsViewModel.CONFIG.MINI_MODES.includes(visibleWarning);
 
-      document.querySelector('#app').style.top = topMargin;
+      const app = document.querySelector('#app');
+      app.classList.toggle('app--small-offset', hasOffset && isMiniMode);
+      app.classList.toggle('app--large-offset', hasOffset && !isMiniMode);
+
       afterRender(() => window.dispatchEvent(new Event('resize')));
     });
 

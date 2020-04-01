@@ -24,6 +24,7 @@ import {CALL_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/av
 import {t} from 'Util/LocalizerUtil';
 import {formatSeconds} from 'Util/TimeUtil';
 import {afterRender} from 'Util/util';
+import {sortUsersByPriority} from 'Util/StringUtil';
 
 import {ParticipantAvatar} from 'Components/participantAvatar';
 import {generateConversationUrl} from '../../router/routeGenerator';
@@ -80,6 +81,7 @@ class ConversationListCallingCell {
   readonly temporaryUserStyle: boolean;
   readonly videoGrid: ko.PureComputed<Grid>;
   readonly isSelfVerified: ko.Subscribable<boolean>;
+  readonly users: ko.PureComputed<User[]>;
 
   constructor({
     call,
@@ -142,7 +144,7 @@ class ConversationListCallingCell {
     this.showParticipants = ko.observable(false);
     this.showParticipantsButton = ko.pureComputed(() => this.isOngoing() && this.conversation().isGroup());
     this.participantsButtonLabel = ko.pureComputed(() => {
-      return t('callParticipants', this.call.participants().length);
+      return t('callParticipants', this.users().length);
     });
     this.showMaximize = ko.pureComputed(() => this.multitasking.isMinimized() && this.isOngoing());
 
@@ -165,6 +167,10 @@ class ConversationListCallingCell {
     this.showNoCameraPreview = ko.computed(() => {
       return !hasAccessToCamera() && call.initialType === CALL_TYPE.VIDEO && !this.showVideoGrid() && !this.isOngoing();
     });
+
+    this.users = ko.pureComputed(() =>
+      [call.selfParticipant, ...call.participants()].map(({userId}) => this.findUser(userId)).sort(sortUsersByPriority),
+    );
 
     this.dispose = () => {
       window.clearInterval(callDurationUpdateInterval);
@@ -192,6 +198,11 @@ class ConversationListCallingCell {
 
   findUser(userId: string): User {
     return this.conversationParticipants().find(user => user.id === userId);
+  }
+
+  userHasCamera(user: User): boolean {
+    const participant = this.call.participants().find(({userId}) => userId === user.id);
+    return participant?.hasActiveVideo() ?? false;
   }
 }
 
@@ -233,7 +244,7 @@ ko.components.register('conversation-list-calling-cell', {
 
       <div class="conversation-list-cell-right">
         <!-- ko if: isConnecting() || isOngoing() -->
-          <div class="call-ui__button call-ui__button--red" data-bind="click: () => callActions.leave(call)" data-uie-name="do-call-controls-call-leave">
+          <div class="call-ui__button call-ui__button--red" data-bind="click: () => callActions.leave(call), attr: {'title': t('videoCallOverlayHangUp')}" data-uie-name="do-call-controls-call-leave">
             <hangup-icon class="small-icon"></hangup-icon>
           </div>
         <!-- /ko -->
@@ -258,11 +269,11 @@ ko.components.register('conversation-list-calling-cell', {
     <!-- ko if: !isDeclined() -->
       <div class="conversation-list-calling-cell-controls">
         <div class="conversation-list-calling-cell-controls-left">
-          <div class="call-ui__button" data-bind="click: () => callActions.toggleMute(call, !isMuted()), css: {'call-ui__button--active': isMuted()}, attr: {'data-uie-value': !isMuted() ? 'inactive' : 'active'}" data-uie-name="do-toggle-mute">
+          <div class="call-ui__button" data-bind="click: () => callActions.toggleMute(call, !isMuted()), css: {'call-ui__button--active': isMuted()}, attr: {'data-uie-value': !isMuted() ? 'inactive' : 'active', 'title': t('videoCallOverlayMute')}" data-uie-name="do-toggle-mute">
             <micoff-icon class="small-icon"></micoff-icon>
           </div>
           <!-- ko if: showVideoButton() -->
-            <button class="call-ui__button" data-bind="click: () => callActions.toggleCamera(call), css: {'call-ui__button--active': call.selfParticipant.sharesCamera()}, disable: disableVideoButton(), attr: {'data-uie-value': call.selfParticipant.sharesCamera() ? 'active' : 'inactive'}" data-uie-name="do-toggle-video">
+            <button class="call-ui__button" data-bind="click: () => callActions.toggleCamera(call), css: {'call-ui__button--active': call.selfParticipant.sharesCamera()}, disable: disableVideoButton(), attr: {'data-uie-value': call.selfParticipant.sharesCamera() ? 'active' : 'inactive', 'title': t('videoCallOverlayVideo')}" data-uie-name="do-toggle-video">
               <camera-icon class="small-icon"></camera-icon>
             </button>
           <!-- /ko -->
@@ -272,7 +283,7 @@ ko.components.register('conversation-list-calling-cell', {
                 disabled: !disableScreenButton, position: 'bottom'},
                 click: () => callActions.toggleScreenshare(call),
                 css: {'call-ui__button--active': call.selfParticipant.sharesScreen(), 'call-ui__button--disabled': disableScreenButton},
-                attr: {'data-uie-value': call.selfParticipant.sharesScreen() ? 'active' : 'inactive', 'data-uie-enabled': disableScreenButton ? 'false' : 'true'}"
+                attr: {'data-uie-value': call.selfParticipant.sharesScreen() ? 'active' : 'inactive', 'data-uie-enabled': disableScreenButton ? 'false' : 'true', title: t('videoCallOverlayShareScreen')}"
               data-uie-name="do-call-controls-toggle-screenshare">
               <screenshare-icon class="small-icon"></screenshare-icon>
             </div>
@@ -286,7 +297,7 @@ ko.components.register('conversation-list-calling-cell', {
             </div>
           <!-- /ko -->
           <!-- ko if: isIncoming() || isOutgoing() -->
-            <div class="call-ui__button call-ui__button--red call-ui__button--large" data-bind="click: () => endCall(call)" data-uie-name="do-call-controls-call-decline">
+            <div class="call-ui__button call-ui__button--red call-ui__button--large" data-bind="click: () => endCall(call), attr: {'title': t('videoCallOverlayHangUp')}" data-uie-name="do-call-controls-call-decline">
               <hangup-icon class="small-icon"></hangup-icon>
             </div>
           <!-- /ko -->
@@ -299,8 +310,8 @@ ko.components.register('conversation-list-calling-cell', {
       </div>
 
       <div class="call-ui__participant-list__wrapper" data-bind="css: {'call-ui__participant-list__wrapper--active': showParticipants}">
-        <div class="call-ui__participant-list" data-bind="foreach: {data: call.participants(), as: 'participant', noChildContext: true}, fadingscrollbar" data-uie-name="list-call-ui-participants">
-            <participant-item params="participant: findUser(participant.userId), hideInfo: true, showCamera: participant.hasActiveVideo(), selfInTeam: $parent.selfInTeam, isSelfVerified: isSelfVerified" data-bind="css: {'no-underline': true}"></participant-item>
+        <div class="call-ui__participant-list" data-bind="foreach: {data: users, as: 'user', noChildContext: true}, fadingscrollbar" data-uie-name="list-call-ui-participants">
+            <participant-item params="participant: user, hideInfo: true, showCamera: userHasCamera(user), selfInTeam: $parent.selfInTeam, isSelfVerified: isSelfVerified" data-bind="css: {'no-underline': true}"></participant-item>
         </div>
       </div>
 

@@ -21,6 +21,7 @@ import {getLogger} from 'Util/Logger';
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
 import {loadDataUrl} from 'Util/util';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
 import {TeamMapper} from './TeamMapper';
@@ -88,6 +89,11 @@ export class TeamRepository {
     amplify.subscribe(WebAppEvents.TEAM.EVENT_FROM_BACKEND, this.onTeamEvent.bind(this));
     amplify.subscribe(WebAppEvents.TEAM.UPDATE_INFO, this.sendAccountInfo.bind(this));
   }
+
+  scheduleFetchTeamInfo = () => {
+    this.getTeam();
+    setTimeout(this.scheduleFetchTeamInfo, TIME_IN_MILLIS.DAY);
+  };
 
   getTeam = async () => {
     const teamData = this.selfUser().teamId ? await this._getTeamById() : await this._getBindingTeam();

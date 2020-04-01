@@ -276,6 +276,15 @@ export class EventService {
   async saveEvent(event) {
     event.category = categoryFromEvent(event);
     event.primary_key = await this.storageService.save(StorageSchemata.OBJECT_STORE.EVENTS, undefined, event);
+    if (this.storageService.isTemporaryAndNonPersistent) {
+      /**
+       * Dexie supports auto-incrementing primary keys and saves those keys to a predefined column.
+       * The SQLeetEngine also supports auto-incrementing primary keys but it does not save them to a predefined column, so we have to do that manually:
+       */
+      await this.storageService.update(StorageSchemata.OBJECT_STORE.EVENTS, event.primary_key, {
+        primary_key: event.primary_key,
+      });
+    }
     return event;
   }
 

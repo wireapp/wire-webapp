@@ -277,11 +277,15 @@ export class AuthAction {
       dispatch(AuthActionCreator.startRegisterWireless());
       try {
         await dispatch(authAction.doSilentLogout());
+        if (isTemporaryClientAndNonPersistent(false)) {
+          (core as any).storeEngineProvider = provideTemporaryAndNonPersistentEngine;
+        }
         await core.register(registrationData, clientType);
         await this.persistAuthData(clientType, core, dispatch, localStorageAction);
         await dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: getConfig().APP_INSTANCE_ID}));
         await dispatch(selfAction.fetchSelf());
         await (clientType !== ClientType.NONE && dispatch(clientAction.doInitializeClient(clientType)));
+        await dispatch(authAction.doFlushDatabase());
         dispatch(AuthActionCreator.successfulRegisterWireless(registrationData));
       } catch (error) {
         dispatch(AuthActionCreator.failedRegisterWireless(error));

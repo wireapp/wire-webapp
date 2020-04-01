@@ -57,9 +57,12 @@ const getTeamSettingsUrl = (path: string = '', utmSource?: string): string => {
 };
 
 export const getWebsiteUrl = (path: string = '', pkCampaign?: string): string => {
-  const query = pkCampaign ? `?pk_campaign=${pkCampaign}&pk_kwd=desktop` : '';
-  const websiteUrl = `${URL.WEBSITE}${path}${query}`;
-  return addLocaleToUrl(URL.WEBSITE ? websiteUrl : undefined);
+  if (URL.WEBSITE) {
+    const query = pkCampaign ? `?pk_campaign=${pkCampaign}&pk_kwd=desktop` : '';
+    const websiteUrl = `${URL.WEBSITE}${path}${query}`;
+    return addLocaleToUrl(URL.WEBSITE ? websiteUrl : undefined);
+  }
+  return undefined;
 };
 
 export const getAccountPagesUrl = (path: string = ''): string => {
