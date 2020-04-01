@@ -404,7 +404,7 @@ class App {
       conversationRepository.map_connections(connectionRepository.connectionEntities());
       this._subscribeToUnloadEvents();
 
-      await teamRepository.getTeam();
+      await teamRepository._scheduleFetchTeamInfo();
 
       await conversationRepository.conversationRoleRepository.loadTeamRoles();
 
