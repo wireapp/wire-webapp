@@ -73,14 +73,6 @@ const _createIFrameContainer = (options?: Partial<IFrameOptions>): string => {
   );
 };
 
-const _regex = {
-  // example: http://regexr.com/3ase5
-  soundcloud: /(https?:\/\/(?:www\.|m\.)?)?soundcloud\.com(\/[\w-]+){2,3}/g,
-  spotify: /https?:\/\/(?:play\.|open\.)*spotify\.com\/([^?]+)/g,
-  vimeo: /https?:\/\/(?:(?:player\.)?vimeo\.com\/)(?:channels(?:\/[^/]+)?\/|video\/)?([0-9]+)/g,
-  youtube: /(?:youtube(?:-nocookie)?\.com\/\S*(?:(?:\/e(?:mbed))?\/|watch\/?\?(?:\S*?&?v=))|youtu\.be\/)([a-zA-Z0-9_-]{6,11})/g,
-};
-
 /**
  * Appends an iFrame.
  *
@@ -110,7 +102,7 @@ const _getParameters = (params: string): string => params.substr(params.indexOf(
  * @returns YouTube embed URL
  */
 const generateYouTubeEmbedUrl = (url: string): string | void => {
-  if (url.match(_regex.youtube)) {
+  if (url.match(MediaEmbeds.regex.youtube)) {
     const videoId = url.match(/(?:embed\/|v=|v\/|be\/)([a-zA-Z0-9_-]{11})/);
     if (!videoId) {
       return;
@@ -173,7 +165,13 @@ const convertYouTubeTimestampToSeconds = (timestamp: string): number => {
 export const MediaEmbeds = {
   convertYouTubeTimestampToSeconds,
   generateYouTubeEmbedUrl,
-  regex: _regex,
+  regex: {
+    // example: http://regexr.com/3ase5
+    soundcloud: /(https?:\/\/(?:www\.|m\.)?)?soundcloud\.com(\/[\w-]+){2,3}/g,
+    spotify: /https?:\/\/(?:play\.|open\.)*spotify\.com\/([^?]+)/g,
+    vimeo: /https?:\/\/(?:(?:player\.)?vimeo\.com\/)(?:channels(?:\/[^/]+)?\/|video\/)?([0-9]+)/g,
+    youtube: /(?:youtube(?:-nocookie)?\.com\/\S*(?:(?:\/e(?:mbed))?\/|watch\/?\?(?:\S*?&?v=))|youtu\.be\/)([a-zA-Z0-9_-]{6,11})/g,
+  },
 
   /**
    * Appends SoundCloud iFrame if link is a valid SoundCloud source.
@@ -185,7 +183,7 @@ export const MediaEmbeds = {
   soundcloud(link: HTMLAnchorElement, message: string): string {
     let linkSrc = link.href;
 
-    if (linkSrc.match(_regex.soundcloud)) {
+    if (linkSrc.match(MediaEmbeds.regex.soundcloud)) {
       linkSrc = linkSrc.replace(/(m\.)/, '');
       let linkPathName = link.pathname;
 
@@ -230,7 +228,7 @@ export const MediaEmbeds = {
   spotify(link: HTMLAnchorElement, message: string): string {
     const linkSrc = link.href;
 
-    if (linkSrc.match(_regex.spotify)) {
+    if (linkSrc.match(MediaEmbeds.regex.spotify)) {
       const iFrame = _createIFrameContainer({
         height: '80px',
         src: 'https://embed.spotify.com/?uri=spotify$1',
@@ -240,7 +238,7 @@ export const MediaEmbeds = {
 
       // convert spotify uri: album/23... -> album:23... -> album%3A23...
       let embed = '';
-      linkSrc.replace(_regex.spotify, (match, group1) => {
+      linkSrc.replace(MediaEmbeds.regex.spotify, (match, group1) => {
         const replaceSlashes = group1.replace(/\//g, ':');
         const encodedParams = encodeURIComponent(`:${replaceSlashes}`);
         return (embed = iFrame.replace('$1', encodedParams));
@@ -264,14 +262,14 @@ export const MediaEmbeds = {
     const linkSrc = link.href;
     const vimeoColor = themeColor ? themeColor.replace('#', '') : undefined;
 
-    if (linkSrc.match(_regex.vimeo)) {
+    if (linkSrc.match(MediaEmbeds.regex.vimeo)) {
       const iFrame = _createIFrameContainer({
         src: `https://player.vimeo.com/video/$1?portrait=0&color=${vimeoColor}&badge=0`,
         type: 'vimeo',
       });
 
       let embed = '';
-      linkSrc.replace(_regex.vimeo, (match, group1) => (embed = iFrame.replace('$1', group1)));
+      linkSrc.replace(MediaEmbeds.regex.vimeo, (match, group1) => (embed = iFrame.replace('$1', group1)));
 
       message = _appendIFrame(link, message, embed);
     }
