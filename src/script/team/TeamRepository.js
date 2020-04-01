@@ -91,9 +91,9 @@ export class TeamRepository {
     amplify.subscribe(WebAppEvents.TEAM.UPDATE_INFO, this.sendAccountInfo.bind(this));
   }
 
-  _scheduleFetchTeamInfo = () => {
+  scheduleFetchTeamInfo = () => {
     this.getTeam();
-    setTimeout(this._scheduleFetchTeamInfo, TIME_IN_MILLIS.DAY);
+    setTimeout(this.scheduleFetchTeamInfo, TIME_IN_MILLIS.DAY);
   };
 
   getTeam = async () => {
