@@ -148,7 +148,7 @@ ko.components.register('participant-item', {
               <div class="participant-item__content__name" data-bind="text: participant.name" data-uie-name="status-name"></div>
             <!-- /ko -->
             <!-- ko if: isSelf -->
-              <div data-bind="text: selfString"></div>
+              <div class="participant-item__content__self-indicator" data-bind="text: selfString"></div>
             <!-- /ko -->
           </div>
           <div class="participant-item__content__info">
