@@ -17,19 +17,29 @@
  *
  */
 
-import {extend} from 'underscore';
 import 'url-search-params-polyfill';
 
 import {Environment} from 'Util/Environment';
 import {formatString} from 'Util/StringUtil';
 
+interface IFrameOptions {
+  allowfullscreen: string;
+  class: string;
+  frameborder: string;
+  height: string;
+  src?: string;
+  type: string;
+  video: boolean;
+  width: string;
+}
+
 /**
- * Create and iframe.
+ * Create an iFrame.
  * @private
- * @param {Object} options Settings to be used to create the iframe
- * @returns {string} HTML string
+ * @param options Settings to be used to create the iFrame
+ * @returns HTML string
  */
-const _createIframeContainer = options => {
+const _createIFrameContainer = (options?: Partial<IFrameOptions>): string => {
   const defaults = {
     allowfullscreen: ' allowfullscreen',
     class: 'iframe-container iframe-container-video',
@@ -40,8 +50,8 @@ const _createIframeContainer = options => {
     width: '100%',
   };
 
-  options = extend(defaults, options);
-  const iframeContainer = `<div class="{0}"><iframe class="${options.type}" width="{1}" height="{2}" src="{3}" frameborder="{4}"{5}></iframe></div>`;
+  options = {...defaults, ...options};
+  const iFrameContainer = `<div class="{0}"><iframe class="${options.type}" width="{1}" height="{2}" src="{3}" frameborder="{4}"{5}></iframe></div>`;
 
   if (!options.video) {
     options.allowfullscreen = '';
@@ -53,7 +63,7 @@ const _createIframeContainer = options => {
   }
 
   return formatString(
-    iframeContainer,
+    iFrameContainer,
     options.class,
     options.width,
     options.height,
@@ -75,33 +85,31 @@ const _regex = {
  * Appends an iFrame.
  *
  * @private
- * @param {HTMLAnchorElement} link Link element
- * @param {string} message Message containing the link
- * @param {string} iframe HTML of iframe
- * @returns {string} Message content
+ * @param link Link element
+ * @param message Message containing the link
+ * @param iFrame HTML text of the iFrame
+ * @returns Message content
  */
-const _appendIframe = (link, message, iframe) => {
+const _appendIFrame = (link: HTMLAnchorElement, message: string, iFrame: string): string => {
   const linkString = link.outerHTML.replace(/&amp;/g, '&');
-  return message.replace(/&amp;/g, '&').replace(linkString, `${linkString}${iframe}`);
+  return message.replace(/&amp;/g, '&').replace(linkString, `${linkString}${iFrame}`);
 };
 
 /**
  * Find search parameters in a string
  *
  * @private
- * @param {string} params String where we should find the parameters
- * @returns {string} Parameters
+ * @param params String where we should find the parameters
  */
-const _getParameters = params => params.substr(params.indexOf('?'), params.length).replace(/^\?/, '');
+const _getParameters = (params: string): string => params.substr(params.indexOf('?'), params.length).replace(/^\?/, '');
 
 /**
- * Generate embed URL to use as src in iframes
+ * Generate embedded YouTube URL to use as source in iFrames
  *
- * @private
- * @param {string} url Given youtube url
- * @returns {string} Youtube embed URL
+ * @param url Given YouTube URL
+ * @returns YouTube embed URL
  */
-const _generateYouTubeEmbedUrl = url => {
+const generateYouTubeEmbedUrl = (url: string): string | void => {
   if (url.match(_regex.youtube)) {
     const videoId = url.match(/(?:embed\/|v=|v\/|be\/)([a-zA-Z0-9_-]{11})/);
     if (!videoId) {
@@ -115,17 +123,17 @@ const _generateYouTubeEmbedUrl = url => {
 
     // Append HTML5 parameter to YouTube src to force HTML5 mode
     // This fixes the issue that FF displays black box in some cases
-    searchParams.set('html5', 1);
+    searchParams.set('html5', '1');
 
-    searchParams.set('enablejsapi', 0);
-    searchParams.set('modestbranding', 1);
+    searchParams.set('enablejsapi', '0');
+    searchParams.set('modestbranding', '1');
 
     // Do not get related videos at the end
-    searchParams.set('rel', 0);
+    searchParams.set('rel', '0');
 
     // Convert the timestamp into an embed friendly format (start=seconds)
     if (searchParams.has('t')) {
-      searchParams.set('start', _convertYouTubeTimestampToSeconds(searchParams.get('t')));
+      searchParams.set('start', convertYouTubeTimestampToSeconds(searchParams.get('t')).toString());
       searchParams.delete('t');
     }
 
@@ -140,20 +148,20 @@ const _generateYouTubeEmbedUrl = url => {
 };
 
 /**
- * Converts youtube timestamp into seconds
+ * Converts YouTube timestamp into seconds
  *
- * @private
- * @param {string} timestamp Youtube timestamp (1h8m55s)
- * @returns {number} Timestamp in seconds
+ * @param timestamp YouTube timestamp (e.g. "1h8m55s")
+ * @returns Timestamp in seconds
  */
-const _convertYouTubeTimestampToSeconds = timestamp => {
+const convertYouTubeTimestampToSeconds = (timestamp: string): number => {
   if (timestamp) {
     if (/^[0-9]*$/.test(timestamp)) {
-      return window.parseInt(timestamp, 10);
+      return parseInt(timestamp, 10);
     }
 
-    const _extractUnit = unit => {
-      return window.parseInt((timestamp.match(new RegExp(`([0-9]+)(?=${unit})`)) || [0])[0], 10);
+    const _extractUnit = (unit: 'h' | 'm' | 's'): number => {
+      const extracted = (timestamp.match(new RegExp(`([0-9]+)(?=${unit})`)) || ['0'])[0];
+      return parseInt(extracted, 10);
     };
 
     return _extractUnit('h') * 3600 + _extractUnit('m') * 60 + _extractUnit('s');
@@ -163,18 +171,18 @@ const _convertYouTubeTimestampToSeconds = timestamp => {
 
 // Make public for testability.
 export const MediaEmbeds = {
-  convertYouTubeTimestampToSeconds: _convertYouTubeTimestampToSeconds,
-  generateYouTubeEmbedUrl: _generateYouTubeEmbedUrl,
+  convertYouTubeTimestampToSeconds,
+  generateYouTubeEmbedUrl,
   regex: _regex,
 
   /**
    * Appends SoundCloud iFrame if link is a valid SoundCloud source.
    *
-   * @param {HTMLAnchorElement} link Link element
-   * @param {string} message Message containing the link
-   * @returns {string} Message with appended iFrame
+   * @param link Link element
+   * @param message Message containing the link
+   * @returns Message with appended iFrame
    */
-  soundcloud(link, message) {
+  soundcloud(link: HTMLAnchorElement, message: string): string {
     let linkSrc = link.href;
 
     if (linkSrc.match(_regex.soundcloud)) {
@@ -197,16 +205,16 @@ export const MediaEmbeds = {
 
       const height = isSingleTrack ? 164 : 465;
 
-      const iframe = _createIframeContainer({
-        height: height,
+      const iFrame = _createIFrameContainer({
+        height: height.toString(),
         src:
           'https://w.soundcloud.com/player/?url={1}&visual=false&show_comments=false&buying=false&show_playcount=false&liking=false&sharing=false&hide_related=true',
         type: 'soundcloud',
         video: false,
       });
 
-      const embed = formatString(iframe, height, linkSrc);
-      message = _appendIframe(link, message, embed);
+      const embed = formatString(iFrame, height, linkSrc);
+      message = _appendIFrame(link, message, embed);
     }
 
     return message;
@@ -215,15 +223,15 @@ export const MediaEmbeds = {
   /**
    * Appends Spotify iFrame if link is a valid Spotify source.
    *
-   * @param {HTMLAnchorElement} link Link element
-   * @param {string} message Message containing the link
-   * @returns {string} Message with appended iFrame
+   * @param link Link element
+   * @param message Message containing the link
+   * @returns Message with appended iFrame
    */
-  spotify(link, message) {
+  spotify(link: HTMLAnchorElement, message: string): string {
     const linkSrc = link.href;
 
     if (linkSrc.match(_regex.spotify)) {
-      const iframe = _createIframeContainer({
+      const iFrame = _createIFrameContainer({
         height: '80px',
         src: 'https://embed.spotify.com/?uri=spotify$1',
         type: 'spotify',
@@ -234,11 +242,11 @@ export const MediaEmbeds = {
       let embed = '';
       linkSrc.replace(_regex.spotify, (match, group1) => {
         const replaceSlashes = group1.replace(/\//g, ':');
-        const encodedParams = window.encodeURIComponent(`:${replaceSlashes}`);
-        return (embed = iframe.replace('$1', encodedParams));
+        const encodedParams = encodeURIComponent(`:${replaceSlashes}`);
+        return (embed = iFrame.replace('$1', encodedParams));
       });
 
-      message = _appendIframe(link, message, embed);
+      message = _appendIFrame(link, message, embed);
     }
 
     return message;
@@ -247,25 +255,25 @@ export const MediaEmbeds = {
   /**
    * Appends Vimeo iFrame if link is a valid Vimeo source.
    *
-   * @param {HTMLAnchorElement} link Link element
-   * @param {string} message Message containing the link
-   * @param {string} themeColor User color
-   * @returns {string} Message with appended iFrame
+   * @param link Link element
+   * @param message Message containing the link
+   * @param themeColor User color
+   * @returns Message with appended iFrame
    */
-  vimeo(link, message, themeColor) {
+  vimeo(link: HTMLAnchorElement, message: string, themeColor: string): string {
     const linkSrc = link.href;
     const vimeoColor = themeColor ? themeColor.replace('#', '') : undefined;
 
     if (linkSrc.match(_regex.vimeo)) {
-      const iframe = _createIframeContainer({
+      const iFrame = _createIFrameContainer({
         src: `https://player.vimeo.com/video/$1?portrait=0&color=${vimeoColor}&badge=0`,
         type: 'vimeo',
       });
 
       let embed = '';
-      linkSrc.replace(_regex.vimeo, (match, group1) => (embed = iframe.replace('$1', group1)));
+      linkSrc.replace(_regex.vimeo, (match, group1) => (embed = iFrame.replace('$1', group1)));
 
-      message = _appendIframe(link, message, embed);
+      message = _appendIFrame(link, message, embed);
     }
 
     return message;
@@ -274,20 +282,20 @@ export const MediaEmbeds = {
   /**
    * Appends YouTube iFrame if link is a valid YouTube source.
    *
-   * @param {HTMLAnchorElement} link Link element
-   * @param {string} message Message containing the link
-   * @returns {string} Message with appended iFrame
+   * @param link Link element
+   * @param message Message containing the link
+   * @returns Message with appended iFrame
    */
-  youtube(link, message) {
-    const embedUrl = _generateYouTubeEmbedUrl(link.href);
+  youtube(link: HTMLAnchorElement, message: string): string {
+    const embedUrl = generateYouTubeEmbedUrl(link.href);
 
     if (embedUrl) {
-      const iframe = _createIframeContainer({
+      const iFrame = _createIFrameContainer({
         src: embedUrl,
         type: 'youtube',
       });
 
-      message = _appendIframe(link, message, iframe);
+      message = _appendIFrame(link, message, iFrame);
       return message;
     }
 
