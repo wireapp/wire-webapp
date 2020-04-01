@@ -31,6 +31,7 @@ import {BackendEvent} from '../event/Backend';
 import {WebAppEvents} from '../event/WebApp';
 import {IntegrationMapper} from '../integration/IntegrationMapper';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {SuperProperty} from '../tracking/SuperProperty';
 
 export class TeamRepository {
@@ -84,10 +85,20 @@ export class TeamRepository {
     this.userRepository.isTeam = this.isTeam;
     this.userRepository.teamMembers = this.teamMembers;
     this.userRepository.teamUsers = this.teamUsers;
+    this.teamInfoTimerSet = false;
 
     amplify.subscribe(WebAppEvents.TEAM.EVENT_FROM_BACKEND, this.onTeamEvent.bind(this));
     amplify.subscribe(WebAppEvents.TEAM.UPDATE_INFO, this.sendAccountInfo.bind(this));
+
+    this._scheduleFetchTeamInfo(true);
   }
+
+  _scheduleFetchTeamInfo = (initial = false) => {
+    if (!initial) {
+      this.getTeam();
+    }
+    setTimeout(this._scheduleFetchTeamInfo, TIME_IN_MILLIS.DAY);
+  };
 
   getTeam = async () => {
     const teamData = this.selfUser().teamId ? await this._getTeamById() : await this._getBindingTeam();
