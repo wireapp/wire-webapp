@@ -106,7 +106,7 @@ export class UserRepository {
   // tslint:disable-next-line:typedef
   static get CONFIG() {
     return {
-      MAXIMUM_TEAM_SIZE_BROADCAST: 400,
+      MAXIMUM_TEAM_SIZE_BROADCAST: 500,
       MINIMUM_NAME_LENGTH: 2,
       MINIMUM_PICTURE_SIZE: {
         HEIGHT: 320,
@@ -221,13 +221,6 @@ export class UserRepository {
 
   async loadUsers(): Promise<void> {
     if (this.isTeam()) {
-      if (this.isTeamTooLargeForBroadcast()) {
-        this.logger.warn(
-          `Availability not displayed since the team size is larger or equal to "${UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST}".`,
-        );
-        return;
-      }
-
       const users = await this.userService.loadUserFromDb();
 
       if (users.length) {
@@ -281,14 +274,7 @@ export class UserRepository {
         from: userId,
         data: {availability},
       } = event;
-
-      if (userId !== this.self().id && this.isTeamTooLargeForBroadcast()) {
-        this.logger.warn(
-          `Availability not updated since the team size is larger or equal to "${UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST}".`,
-        );
-      } else {
-        this.getUserById(userId).then(userEntity => userEntity.availability(availability));
-      }
+      this.getUserById(userId).then(userEntity => userEntity.availability(availability));
     }
   }
 
@@ -347,11 +333,6 @@ export class UserRepository {
     });
   }
 
-  private isTeamTooLargeForBroadcast(): boolean {
-    const teamSizeIncludingSelf = this.teamUsers().length + 1;
-    return teamSizeIncludingSelf >= UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST;
-  }
-
   /**
    * Saves a new client for the first time to the database and adds it to a user's entity.
    *
@@ -405,7 +386,6 @@ export class UserRepository {
   }
 
   setAvailability(availability: Availability.Type, method: string): void {
-    const maxStatusRecipients = 500;
     const hasAvailabilityChanged = availability !== this.self().availability();
     const newAvailabilityValue = valueFromType(availability);
     if (hasAvailabilityChanged) {
@@ -431,7 +411,7 @@ export class UserRepository {
       ([members, users], user) => (user.isTeamMember() ? [[...members, user], users] : [members, [...users, user]]),
       [[], []],
     );
-    const recipients = [this.self(), ...members, ...other].slice(0, maxStatusRecipients);
+    const recipients = [this.self(), ...members, ...other].slice(0, UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST);
 
     amplify.publish(WebAppEvents.BROADCAST.SEND_MESSAGE, {genericMessage, recipients});
   }
