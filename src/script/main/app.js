@@ -428,7 +428,7 @@ class App {
 
       userRepository.self().devices(clientEntities);
       this.logger.info('App pre-loading completed');
-      await this._handleUrlParams();
+      this._handleUrlParams();
       await conversationRepository.updateConversationsOnAppInit();
       await conversationRepository.conversationLabelRepository.loadLabels();
       telemetry.time_step(AppInitTimingsStep.APP_LOADED);

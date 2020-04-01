@@ -134,6 +134,11 @@ export class TeamRepository {
     });
   }
 
+  get isLargeTeam() {
+    // currently no-op
+    return false;
+  }
+
   /**
    * Listener for incoming team events.
    *
@@ -207,28 +212,34 @@ export class TeamRepository {
     }
   }
 
-  updateTeamMembers(teamEntity) {
-    return this.getTeamMembers(teamEntity.id)
-      .then(teamMembers => {
-        this.memberRoles({});
-        this.memberInviters({});
-        this._updateMemberRoles(teamMembers);
+  getSelfMember() {
+    // currently no-op
+  }
 
-        const memberIds = teamMembers
-          .filter(memberEntity => {
-            const isSelfUser = memberEntity.userId === this.selfUser().id;
+  async updateTeamMembers(teamEntity) {
+    if (this.isLargeTeam) {
+      const selfMember = this.getSelfMember();
+      this.teamMapper.mapRole(this.selfUser(), selfMember.permissions);
+    } else {
+      const teamMembers = await this.getTeamMembers(teamEntity.id);
+      this.memberRoles({});
+      this.memberInviters({});
+      this._updateMemberRoles(teamMembers);
+      const memberIds = teamMembers
+        .filter(memberEntity => {
+          const isSelfUser = memberEntity.userId === this.selfUser().id;
 
-            if (isSelfUser) {
-              this.teamMapper.mapRole(this.selfUser(), memberEntity.permissions);
-            }
+          if (isSelfUser) {
+            this.teamMapper.mapRole(this.selfUser(), memberEntity.permissions);
+          }
 
-            return !isSelfUser;
-          })
-          .map(memberEntity => memberEntity.userId);
+          return !isSelfUser;
+        })
+        .map(memberEntity => memberEntity.userId);
 
-        return this.userRepository.get_users_by_id(memberIds);
-      })
-      .then(userEntities => teamEntity.members(userEntities));
+      const userEntities = await this.userRepository.get_users_by_id(memberIds);
+      teamEntity.members(userEntities);
+    }
   }
 
   _addUserToTeam(userEntity) {
