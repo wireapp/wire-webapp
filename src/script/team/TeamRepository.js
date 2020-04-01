@@ -85,7 +85,6 @@ export class TeamRepository {
     this.userRepository.isTeam = this.isTeam;
     this.userRepository.teamMembers = this.teamMembers;
     this.userRepository.teamUsers = this.teamUsers;
-    this.teamInfoTimerSet = false;
 
     amplify.subscribe(WebAppEvents.TEAM.EVENT_FROM_BACKEND, this.onTeamEvent.bind(this));
     amplify.subscribe(WebAppEvents.TEAM.UPDATE_INFO, this.sendAccountInfo.bind(this));
