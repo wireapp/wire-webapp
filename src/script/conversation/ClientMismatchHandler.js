@@ -69,7 +69,7 @@ export class ClientMismatchHandler {
 
     const _removeDeletedClient = (userId, clientId) => {
       delete payload.recipients[userId][clientId];
-      return this.userRepository.remove_client_from_user(userId, clientId);
+      return this.userRepository.removeClientFromUser(userId, clientId);
     };
 
     const _removeDeletedUser = userId => {

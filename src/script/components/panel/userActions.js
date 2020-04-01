@@ -50,7 +50,7 @@ ko.components.register('user-actions', {
     conversationRoleRepository,
   }) {
     isSelfActivated = ko.unwrap(isSelfActivated);
-    const isMe = ko.computed(() => user()?.is_me);
+    const isMe = ko.computed(() => user()?.isMe);
     const isNotMe = ko.computed(() => !isMe() && isSelfActivated);
 
     const allItems = [

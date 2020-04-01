@@ -543,7 +543,7 @@ export class ClientRepository {
     return this.getClientByUserIdFromDb(this.selfUser().id)
       .then(clientsData => ClientMapper.mapClients(clientsData, true))
       .then(clientEntities => {
-        clientEntities.forEach(clientEntity => this.selfUser().add_client(clientEntity));
+        clientEntities.forEach(clientEntity => this.selfUser().addClient(clientEntity));
         return this.selfUser().devices();
       });
   }

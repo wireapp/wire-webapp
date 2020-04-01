@@ -75,14 +75,14 @@ export class ContentMessage extends Message {
           this.is_liked_provisional(null);
           return is_liked_provisional;
         }
-        const likes = this.reactions_user_ets().filter(user_et => user_et.is_me);
+        const likes = this.reactions_user_ets().filter(user_et => user_et.isMe);
         return likes.length === 1;
       },
       write: value => {
         return this.is_liked_provisional(value);
       },
     });
-    this.other_likes = ko.pureComputed(() => this.reactions_user_ets().filter(user_et => !user_et.is_me));
+    this.other_likes = ko.pureComputed(() => this.reactions_user_ets().filter(user_et => !user_et.isMe));
 
     this.like_caption = ko.pureComputed(() => {
       const maxShownNames = 2;

@@ -65,13 +65,13 @@ const listTemplate = (data: string, uieName: string = ''): string => `
       css: cssClasses(),
       foreach: {data: ${data}, as: 'user', noChildContext: true }"
       ${uieName ? ` data-uie-name="${uieName}"` : ''}>
-    <!-- ko if: noSelfInteraction && user.is_me -->
+    <!-- ko if: noSelfInteraction && user.isMe -->
       <participant-item
         params="participant: user, customInfo: infos && infos()[user.id], canSelect: isSelectEnabled, isSelected: isSelected(user), mode: mode, external: teamRepository.isExternal(user.id), selfInTeam: selfInTeam, isSelfVerified: isSelfVerified"
         data-bind="css: {'no-underline': noUnderline, 'highlighted': highlightedUserIds.includes(user.id), 'no-interaction': true}">
       </participant-item>
     <!-- /ko -->
-    <!-- ko ifnot: noSelfInteraction && user.is_me -->
+    <!-- ko ifnot: noSelfInteraction && user.isMe -->
       <participant-item
         params="participant: user, customInfo: infos && infos()[user.id], canSelect: isSelectEnabled, isSelected: isSelected(user), mode: mode, external: teamRepository.isExternal(user.id), selfInTeam: selfInTeam, isSelfVerified: isSelfVerified"
         data-bind="click: (viewmodel, event) => onUserClick(user, event), css: {'no-underline': noUnderline, 'show-arrow': arrow, 'highlighted': highlightedUserIds.includes(user.id)}">
@@ -189,14 +189,14 @@ ko.components.register('user-list', {
         }
         resultUsers = resultUsers.filter(
           user =>
-            user.is_me ||
+            user.isMe ||
             connectedUsers.includes(user) ||
             teamRepository.isSelfConnectedTo(user.id) ||
             user.username() === normalizedQuery,
         );
       } else {
         resultUsers = userEntities().filter(
-          user => user.is_me || connectedUsers.includes(user) || teamRepository.isSelfConnectedTo(user.id),
+          user => user.isMe || connectedUsers.includes(user) || teamRepository.isSelfConnectedTo(user.id),
         );
       }
 
@@ -205,8 +205,8 @@ ko.components.register('user-list', {
       }
 
       // make sure the self user is the first one in the list
-      const selfUser = resultUsers.filter(user => user.is_me);
-      const otherUsers = resultUsers.filter(user => !user.is_me);
+      const selfUser = resultUsers.filter(user => user.isMe);
+      const otherUsers = resultUsers.filter(user => !user.isMe);
       return selfUser.concat(otherUsers);
     });
 

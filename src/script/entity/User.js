@@ -60,7 +60,7 @@ class User {
 
   constructor(id = '') {
     this.id = id;
-    this.is_me = false;
+    this.isMe = false;
     this.isService = false;
     this.isSingleSignOn = false;
     this.isDeleted = false;
@@ -119,7 +119,7 @@ class User {
 
     this.devices = ko.observableArray(); // does not include current client/device
     this.is_verified = ko.pureComputed(() => {
-      if (this.devices().length === 0 && !this.is_me) {
+      if (this.devices().length === 0 && !this.isMe) {
         return false;
       }
       return this.devices().every(client_et => client_et.meta.isVerified());
@@ -131,7 +131,7 @@ class User {
     const _hasPendingLegalHold = ko.observable(false);
     this.hasPendingLegalHold = ko.pureComputed({
       owner: this,
-      read: () => this.is_me && !this.isOnLegalHold() && _hasPendingLegalHold(),
+      read: () => this.isMe && !this.isOnLegalHold() && _hasPendingLegalHold(),
       write: value => _hasPendingLegalHold(value),
     });
 
@@ -150,7 +150,7 @@ class User {
     this.availability.subscribe(() => amplify.publish(WebAppEvents.USER.PERSIST, this));
   }
 
-  add_client(new_client_et) {
+  addClient(new_client_et) {
     for (const client_et of this.devices()) {
       if (client_et.id === new_client_et.id) {
         return false;
@@ -159,7 +159,7 @@ class User {
 
     this.devices.push(new_client_et);
 
-    if (this.is_me) {
+    if (this.isMe) {
       this.devices.sort((client_a, client_b) => new Date(client_b.time) - new Date(client_a.time));
     }
 

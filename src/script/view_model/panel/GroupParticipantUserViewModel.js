@@ -49,7 +49,7 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
       () =>
         this.conversationRoleRepository.canChangeParticipantRoles(this.activeConversation()) &&
         !!this.selectedParticipant() &&
-        !this.selectedParticipant().is_me &&
+        !this.selectedParticipant().isMe &&
         !this.selectedParticipant().isTemporaryGuest(),
     );
 
@@ -73,7 +73,7 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
   };
 
   showActionDevices(userEntity) {
-    return !userEntity.is_me;
+    return !userEntity.isMe;
   }
 
   onUserAction(action) {

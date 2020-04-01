@@ -318,7 +318,7 @@ class StartUIViewModel {
           .slice(0, 6)
           .map(conversationEntity => conversationEntity.participating_user_ids()[0]);
       })
-      .then(userIds => this.userRepository.get_users_by_id(userIds))
+      .then(userIds => this.userRepository.getUsersById(userIds))
       .then(userEntities => userEntities.filter(userEntity => !userEntity.isBlocked()));
   }
 

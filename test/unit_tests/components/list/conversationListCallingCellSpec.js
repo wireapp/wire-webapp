@@ -86,7 +86,7 @@ describe('conversationListCallingCell', () => {
     const conversation = new Conversation();
     spyOn(conversation, 'supportsVideoCall').and.returnValue(true);
     const selfUserEntity = new User('selfId');
-    selfUserEntity.is_me = true;
+    selfUserEntity.isMe = true;
     conversation.selfUser(selfUserEntity);
     const call = createCall(CALL_STATE.MEDIA_ESTAB);
     const params = {...defaultParams, call, conversation: () => conversation};

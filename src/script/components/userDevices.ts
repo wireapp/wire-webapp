@@ -230,7 +230,7 @@ ko.components.register('user-devices', {
 
     this.clickOnDevice = (clientEntity: ClientEntity) => {
       this.selectedClient(clientEntity);
-      const headline = userEntity().is_me
+      const headline = userEntity().isMe
         ? this.selectedClient().label || this.selectedClient().model
         : capitalizeFirstChar(this.selectedClient().class);
       history.goTo(UserDevicesState.DEVICE_DETAILS, headline);
@@ -240,7 +240,7 @@ ko.components.register('user-devices', {
 
     this.clickToResetSession = () => {
       const _resetProgress = () => window.setTimeout(() => this.isResettingSession(false), MotionDuration.LONG);
-      const conversationId = userEntity().is_me
+      const conversationId = userEntity().isMe
         ? conversationRepository.self_conversation().id
         : conversationRepository.active_conversation().id;
       this.isResettingSession(true);
