@@ -21,6 +21,7 @@ import {getLogger} from 'Util/Logger';
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
 import {loadDataUrl} from 'Util/util';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
 import {TeamMapper} from './TeamMapper';
@@ -31,7 +32,6 @@ import {BackendEvent} from '../event/Backend';
 import {WebAppEvents} from '../event/WebApp';
 import {IntegrationMapper} from '../integration/IntegrationMapper';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {SuperProperty} from '../tracking/SuperProperty';
 
 export class TeamRepository {
