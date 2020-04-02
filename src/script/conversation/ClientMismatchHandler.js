@@ -72,23 +72,8 @@ export class ClientMismatchHandler {
       this.userRepository.remove_client_from_user(userId, clientId);
     };
 
-    const removeDeletedUser = userId => {
-      const clientIdsOfUser = Object.keys(payload.recipients[userId]);
-      const noRemainingClients = !clientIdsOfUser.length;
+    this._remove(recipients, removeDeletedClient, conversationEntity, payload);
 
-      if (noRemainingClients) {
-        const isGroupConversation = conversationEntity.isGroup();
-        if (isGroupConversation) {
-          const timestamp = this.serverTimeHandler.toServerTimestamp();
-          const event = EventBuilder.buildMemberLeave(conversationEntity, userId, false, timestamp);
-          this.eventRepository.injectEvent(event);
-        }
-
-        delete payload.recipients[userId];
-      }
-    };
-
-    this._remove(recipients, removeDeletedClient, removeDeletedUser);
     return payload;
   }
 
@@ -157,7 +142,27 @@ export class ClientMismatchHandler {
 
     const removeRedundantClient = (userId, clientId) => delete payload.recipients[userId][clientId];
 
-    const removeRedundantUser = userId => {
+    this._remove(recipients, removeRedundantClient, conversationEntity, payload);
+
+    this.conversationRepository.updateParticipatingUserEntities(conversationEntity);
+
+    return payload;
+  }
+
+  /**
+   * Starts removal functions.
+   *
+   * @private
+   * @param {UserClients} recipients User client map
+   * @param {Function} clientFn Function to remove clients
+   * @param {Conversation} conversationEntity Conversation entity
+   * @param {NewOTRMessage} payload Initial payload resulting in a 412
+   * @returns {Array} Function array
+   */
+  _remove(recipients, clientFn, conversationEntity, payload) {
+    const result = [];
+
+    const removeDeletedUser = userId => {
       const clientIdsOfUser = Object.keys(payload.recipients[userId]);
       const noRemainingClients = !clientIdsOfUser.length;
 
@@ -173,28 +178,9 @@ export class ClientMismatchHandler {
       }
     };
 
-    this._remove(recipients, removeRedundantClient, removeRedundantUser);
-
-    this.conversationRepository.updateParticipatingUserEntities(conversationEntity);
-
-    return payload;
-  }
-
-  /**
-   * Starts removal functions.
-   *
-   * @private
-   * @param {UserClients} recipients User client map
-   * @param {Function} clientFn Function to remove clients
-   * @param {Function} userFn Function to remove users
-   * @returns {Array} Function array
-   */
-  _remove(recipients, clientFn, userFn) {
-    const result = [];
-
     Object.entries(recipients).forEach(([userId, clientIds = []]) => {
       clientIds.forEach(clientId => result.push(clientFn(userId, clientId)));
-      result.push(userFn(userId));
+      result.push(removeDeletedUser(userId));
     });
 
     return result;
