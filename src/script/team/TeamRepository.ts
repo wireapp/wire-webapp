@@ -55,21 +55,21 @@ export interface AccountInfo {
 }
 
 export class TeamRepository {
-  readonly isTeam: ko.PureComputed<boolean>;
   private readonly isTeamDeleted: ko.Observable<boolean>;
   private readonly logger: Logger;
   private readonly memberInviters: ko.Observable<any>;
   private readonly memberRoles: ko.Observable<any>;
-  readonly selfUser: ko.Observable<User>;
   private readonly supportsLegalHold: ko.Observable<boolean>;
-  readonly team: ko.Observable<TeamEntity>;
   private readonly teamMapper: TeamMapper;
   private readonly teamMembers: ko.PureComputed<User[]>;
   private readonly teamName: ko.PureComputed<string>;
-  readonly teamService: TeamService;
-  readonly teamSize: ko.PureComputed<number>;
   private readonly teamUsers: ko.PureComputed<User[]>;
   private readonly userRepository: UserRepository;
+  readonly isTeam: ko.PureComputed<boolean>;
+  readonly selfUser: ko.Observable<User>;
+  readonly team: ko.Observable<TeamEntity>;
+  readonly teamService: TeamService;
+  readonly teamSize: ko.PureComputed<number>;
 
   constructor(teamService: TeamService, userRepository: UserRepository) {
     this.logger = getLogger('TeamRepository');
