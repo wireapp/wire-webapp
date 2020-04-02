@@ -149,51 +149,45 @@ export class ClientMismatchHandler {
    * @param {EventInfoEntity} conversationId Conversation ID
    * @returns {Promise} Resolves with the updated payload
    */
-  _handleRedundant(recipients, payload, conversationId) {
+  async _handleRedundant(recipients, payload, conversationId) {
     if (Object.entries(recipients).length === 0) {
       return Promise.resolve(payload);
     }
 
     this.logger.debug(`Message contains redundant clients of '${Object.keys(recipients).length}' users`, recipients);
 
-    let conversationPromise = Promise.resolve();
+    const conversationEntity = await this.conversationRepository.get_conversation_by_id(conversationId).catch(error => {
+      const isConversationNotFound = error.type === z.error.ConversationError.TYPE.CONVERSATION_NOT_FOUND;
+      if (!isConversationNotFound) {
+        throw error;
+      }
+    });
 
-    if (conversationId) {
-      conversationPromise = this.conversationRepository.get_conversation_by_id(conversationId).catch(error => {
-        const isConversationNotFound = error.type === z.error.ConversationError.TYPE.CONVERSATION_NOT_FOUND;
-        if (!isConversationNotFound) {
-          throw error;
-        }
-      });
-    }
+    const removeRedundantClient = (userId, clientId) => delete payload.recipients[userId][clientId];
 
-    return conversationPromise.then(conversationEntity => {
-      const _removeRedundantClient = (userId, clientId) => delete payload.recipients[userId][clientId];
+    const removeRedundantUser = userId => {
+      const clientIdsOfUser = Object.keys(payload.recipients[userId]);
+      const noRemainingClients = !clientIdsOfUser.length;
 
-      const _removeRedundantUser = userId => {
-        const clientIdsOfUser = Object.keys(payload.recipients[userId]);
-        const noRemainingClients = !clientIdsOfUser.length;
+      if (noRemainingClients) {
+        const isGroupConversation = conversationEntity && conversationEntity.isGroup();
+        if (isGroupConversation) {
+          const timestamp = this.serverTimeHandler.toServerTimestamp();
+          const event = z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, false, timestamp);
 
-        if (noRemainingClients) {
-          const isGroupConversation = conversationEntity && conversationEntity.isGroup();
-          if (isGroupConversation) {
-            const timestamp = this.serverTimeHandler.toServerTimestamp();
-            const event = z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, false, timestamp);
-
-            this.eventRepository.injectEvent(event);
-          }
-
-          delete payload.recipients[userId];
-        }
-      };
-
-      return Promise.all(this._remove(recipients, _removeRedundantClient, _removeRedundantUser)).then(() => {
-        if (conversationEntity) {
-          this.conversationRepository.updateParticipatingUserEntities(conversationEntity);
+          this.eventRepository.injectEvent(event);
         }
 
-        return payload;
-      });
+        delete payload.recipients[userId];
+      }
+    };
+
+    return Promise.all(this._remove(recipients, removeRedundantClient, removeRedundantUser)).then(() => {
+      if (conversationEntity) {
+        this.conversationRepository.updateParticipatingUserEntities(conversationEntity);
+      }
+
+      return payload;
     });
   }
 
