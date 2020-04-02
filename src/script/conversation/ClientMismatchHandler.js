@@ -57,7 +57,7 @@ export class ClientMismatchHandler {
    *
    * @param {UserClients} recipients User client map containing redundant clients
    * @param {NewOTRMessage} payload Payload of the request
-   * @returns {Promise<NewOTRMessage>} Resolves with the updated payload
+   * @returns {NewOTRMessage} Resolves with the updated payload
    */
   _handleDeleted(recipients, payload) {
     if (Object.entries(recipients).length === 0) {
@@ -176,10 +176,10 @@ export class ClientMismatchHandler {
       }
     };
 
-    return Promise.all(this._remove(recipients, removeRedundantClient, removeRedundantUser)).then(() => {
-      this.conversationRepository.updateParticipatingUserEntities(conversationEntity);
-      return payload;
-    });
+    this._remove(recipients, removeRedundantClient, removeRedundantUser);
+
+    this.conversationRepository.updateParticipatingUserEntities(conversationEntity);
+    return payload;
   }
 
   /**
