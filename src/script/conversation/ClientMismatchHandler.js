@@ -46,7 +46,7 @@ export class ClientMismatchHandler {
     const conversationEntity = await this.conversationRepository.get_conversation_by_id(eventInfoEntity.conversationId);
     this._handleRedundant(redundant, payload, conversationEntity);
     this._handleDeleted(deleted, payload, conversationEntity);
-    await this._handleMissing(missing, payload, eventInfoEntity, conversationEntity);
+    await this._handleMissing(missing, payload, conversationEntity, eventInfoEntity);
     return payload;
   }
 
@@ -98,11 +98,11 @@ export class ClientMismatchHandler {
    * @private
    * @param {UserClients} recipients User client map containing redundant clients
    * @param {NewOTRMessage} payload Payload of the request
-   * @param {EventInfoEntity} eventInfoEntity Info about event
    * @param {Conversation} conversationEntity Conversation entity
+   * @param {EventInfoEntity} eventInfoEntity Info about event
    * @returns {Promise<NewOTRMessage>} Resolves with the updated payload
    */
-  async _handleMissing(recipients, payload, eventInfoEntity, conversationEntity) {
+  async _handleMissing(recipients, payload, conversationEntity, eventInfoEntity) {
     const missingUserIds = Object.keys(recipients);
 
     if (!missingUserIds.length) {
