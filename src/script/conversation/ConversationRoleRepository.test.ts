@@ -45,7 +45,7 @@ describe('ConversationRoleRepository', () => {
 
   describe('loadTeamRoles', () => {
     it('initializes all team roles', async () => {
-      spyOn(testFactory.team_repository, 'getTeamConversationRoles').and.returnValue(
+      spyOn<any>(testFactory.team_repository, 'getTeamConversationRoles').and.returnValue(
         Promise.resolve({
           conversation_roles: ['my-custom-role'],
         }),

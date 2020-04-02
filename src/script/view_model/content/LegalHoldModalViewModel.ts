@@ -122,7 +122,7 @@ export class LegalHoldModalViewModel {
       if (response.status === LegalHoldMemberStatus.PENDING) {
         fingerprint = await this.cryptographyRepository.getRemoteFingerprint(
           selfUser.id,
-          response.client.id,
+          response.client_id,
           response.last_prekey,
         );
         selfUser.hasPendingLegalHold(true);

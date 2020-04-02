@@ -17,22 +17,30 @@
  *
  */
 
-import {getLogger} from 'Util/Logger';
+import {MemberData, TeamData} from '@wireapp/api-client/dist/team/';
+import {PermissionsData} from '@wireapp/api-client/dist/team/member/PermissionsData';
 
-import {roleFromTeamPermissions} from './../user/UserPermission';
+import {getLogger, Logger} from 'Util/Logger';
+
+import {roleFromTeamPermissions} from '../user/UserPermission';
 import {TeamEntity} from './TeamEntity';
 import {TeamMemberEntity} from './TeamMemberEntity';
+import {User} from '../entity/User';
 
 export class TeamMapper {
+  private readonly logger: Logger;
+
   constructor() {
     this.logger = getLogger('TeamMapper');
   }
 
-  mapTeamFromObject(data) {
+  mapTeamFromObject(data: TeamData) {
     return this.updateTeamFromObject(data);
   }
 
-  updateTeamFromObject(teamData, teamEntity = new TeamEntity()) {
+  updateTeamFromObject(): void;
+  updateTeamFromObject(teamData: TeamData, teamEntity?: TeamEntity): TeamEntity;
+  updateTeamFromObject(teamData?: TeamData, teamEntity = new TeamEntity()): TeamEntity | void {
     if (teamData) {
       const {creator, icon, icon_key: iconKey, id, name} = teamData;
 
@@ -60,15 +68,15 @@ export class TeamMapper {
     }
   }
 
-  mapMemberFromArray(membersData) {
+  mapMemberFromArray(membersData: MemberData[]): TeamMemberEntity[] {
     return membersData.map(data => this.updateMemberFromObject(data));
   }
 
-  mapMemberFromObject(data) {
+  mapMemberFromObject(data: MemberData): TeamMemberEntity {
     return this.updateMemberFromObject(data);
   }
 
-  mapRole(userEntity, permissions) {
+  mapRole(userEntity: User, permissions?: PermissionsData): void {
     if (permissions) {
       const teamRole = roleFromTeamPermissions(permissions);
       this.logger.info(`Identified user '${userEntity.id}' as '${teamRole}'`, permissions);
@@ -76,7 +84,9 @@ export class TeamMapper {
     }
   }
 
-  updateMemberFromObject(memberData, memberEntity = new TeamMemberEntity()) {
+  updateMemberFromObject(): void;
+  updateMemberFromObject(memberData: MemberData, memberEntity?: TeamMemberEntity): TeamMemberEntity;
+  updateMemberFromObject(memberData?: MemberData, memberEntity = new TeamMemberEntity()): TeamMemberEntity | void {
     if (memberData) {
       const {created_by, permissions, user, legalhold_status} = memberData;
       if (created_by) {

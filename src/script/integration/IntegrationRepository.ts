@@ -250,7 +250,7 @@ export class IntegrationRepository {
     const normalizedQuery = IntegrationRepository.normalizeQuery(query);
 
     return this.teamRepository
-      .getWhitelistedServices(this.teamRepository.team().id, 20)
+      .getWhitelistedServices(this.teamRepository.team().id)
       .then((serviceEntities: ServiceEntity[]) => {
         const isCurrentQuery = normalizedQuery === IntegrationRepository.normalizeQuery(queryObservable());
         if (isCurrentQuery) {

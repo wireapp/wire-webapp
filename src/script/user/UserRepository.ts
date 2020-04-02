@@ -84,14 +84,14 @@ export interface UserUpdate {
 export class UserRepository {
   private readonly asset_service: AssetService;
   private readonly client_repository: ClientRepository;
-  private readonly connected_users: ko.PureComputed<User[]>;
-  private readonly isTeam: ko.Observable<boolean>;
+  readonly connected_users: ko.PureComputed<User[]>;
+  isTeam: ko.Observable<boolean> | ko.PureComputed<boolean>;
   private readonly logger: Logger;
   private readonly propertyRepository: PropertiesRepository;
   private readonly selfService: SelfService;
-  private readonly teamMembers: ko.ObservableArray<User>;
+  teamMembers: ko.ObservableArray<User> | ko.PureComputed<User[]>;
   /** Note: this does not include the self user */
-  private readonly teamUsers: ko.ObservableArray<User>;
+  teamUsers: ko.ObservableArray<User> | ko.PureComputed<User[]>;
   private readonly user_mapper: UserMapper;
   private readonly user_service: UserService;
   private readonly users: ko.ObservableArray<User>;

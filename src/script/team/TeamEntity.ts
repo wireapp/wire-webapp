@@ -21,7 +21,7 @@ import ko from 'knockout';
 
 import {AssetRemoteData} from '../assets/AssetRemoteData';
 import {assetV3} from '../util/ValidationUtil';
-import {TeamMemberEntity} from './TeamMemberEntity';
+import {User} from '../entity/User';
 
 export class TeamEntity {
   creator?: string;
@@ -30,7 +30,7 @@ export class TeamEntity {
   /** Team icon (asset key) */
   iconKey?: string;
   id?: string;
-  members: ko.ObservableArray<TeamMemberEntity>;
+  members: ko.ObservableArray<User>;
   name: ko.Observable<string>;
 
   constructor(id?: string) {

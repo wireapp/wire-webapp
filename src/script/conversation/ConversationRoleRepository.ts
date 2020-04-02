@@ -18,6 +18,7 @@
  */
 
 import ko from 'knockout';
+import {ConversationRole} from '@wireapp/api-client/dist/conversation/ConversationRole';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {Conversation} from '../entity/Conversation';
@@ -42,11 +43,6 @@ export enum Permissions {
   toggleReadReceipts = 'modify_conversation_receipt_mode',
   deleteConversation = 'delete_conversation',
   leaveConversation = 'leave_conversation',
-}
-
-export interface ConversationRole {
-  actions: Permissions[];
-  conversation_role: string;
 }
 
 export type ConversationRoles = ConversationRole[];
@@ -79,7 +75,7 @@ export class ConversationRoleRepository {
   readonly selfUser: ko.Observable<User>;
   readonly team: ko.Observable<TeamEntity>;
   readonly teamRepository: TeamRepository;
-  teamRoles: ConversationRoles;
+  teamRoles: ConversationRole[];
 
   constructor(conversationRepository: ConversationRepository) {
     this.conversationRoles = {};

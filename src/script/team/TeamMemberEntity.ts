@@ -17,14 +17,19 @@
  *
  */
 
-import {Permissions} from '@wireapp/api-client/dist/team/member/Permissions';
+import {PermissionsData} from '@wireapp/api-client/dist/team/member/PermissionsData';
+import {LegalHoldMemberStatus} from '@wireapp/api-client/dist/team/legalhold/LegalHoldMemberStatus';
 
 export class TeamMemberEntity {
-  permissions?: Permissions;
+  permissions?: PermissionsData;
   userId?: string;
+  invitedBy?: string;
+  legalholdStatus?: LegalHoldMemberStatus;
 
   constructor() {
     this.permissions = undefined;
     this.userId = undefined;
+    this.invitedBy = undefined;
+    this.legalholdStatus = undefined;
   }
 }

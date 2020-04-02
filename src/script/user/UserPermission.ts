@@ -17,9 +17,9 @@
  *
  */
 
+import {PermissionsData} from '@wireapp/api-client/dist/team/member/PermissionsData';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 
-// tslint:disable:object-literal-sort-keys
 /**
  * Enum for various team permissions.
  */
@@ -148,7 +148,7 @@ export enum ROLE {
 }
 // tslint:enable:object-literal-sort-keys
 
-export function roleFromTeamPermissions(permissions: {self: number}): ROLE {
+export function roleFromTeamPermissions(permissions: PermissionsData): ROLE {
   if (!permissions) {
     throw new z.error.TeamError(z.error.TeamError.TYPE.NO_PERMISSIONS);
   }

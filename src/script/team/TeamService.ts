@@ -21,6 +21,7 @@ import {APIClient} from '@wireapp/api-client';
 import {LegalHoldMemberData} from '@wireapp/api-client/dist/team/legalhold/';
 import {MemberData, Members} from '@wireapp/api-client/dist/team/member/';
 import {Services} from '@wireapp/api-client/dist/team/service/';
+import {ConversationRolesList} from '@wireapp/api-client/dist/conversation/ConversationRole';
 import {TeamChunkData, TeamData} from '@wireapp/api-client/dist/team/team/';
 
 export class TeamService {
@@ -30,7 +31,7 @@ export class TeamService {
     this.apiClient = apiClient;
   }
 
-  getTeamConversationRoles(teamId: string): Promise<any> {
+  getTeamConversationRoles(teamId: string): Promise<ConversationRolesList> {
     return this.apiClient.teams.conversation.api.getRoles(teamId);
   }
 
