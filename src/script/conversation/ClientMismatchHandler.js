@@ -43,9 +43,10 @@ export class ClientMismatchHandler {
    */
   async onClientMismatch(eventInfoEntity, clientMismatch, payload) {
     const {deleted, missing, redundant} = clientMismatch;
-    await this._handleRedundant(redundant, payload, eventInfoEntity.conversationId);
-    this._handleDeleted(deleted, payload);
-    await this._handleMissing(missing, payload, eventInfoEntity);
+    const conversationEntity = await this.conversationRepository.get_conversation_by_id(eventInfoEntity.conversationId);
+    this._handleRedundant(redundant, payload, conversationEntity);
+    this._handleDeleted(deleted, payload, conversationEntity);
+    await this._handleMissing(missing, payload, eventInfoEntity, conversationEntity);
     return payload;
   }
 
@@ -57,9 +58,10 @@ export class ClientMismatchHandler {
    *
    * @param {UserClients} recipients User client map containing redundant clients
    * @param {NewOTRMessage} payload Payload of the request
+   * @param {Conversation} conversationEntity Conversation entity
    * @returns {NewOTRMessage} Resolves with the updated payload
    */
-  _handleDeleted(recipients, payload) {
+  async _handleDeleted(recipients, payload, conversationEntity) {
     if (Object.entries(recipients).length === 0) {
       return payload;
     }
@@ -75,6 +77,13 @@ export class ClientMismatchHandler {
       const noRemainingClients = !clientIdsOfUser.length;
 
       if (noRemainingClients) {
+        const isGroupConversation = conversationEntity.isGroup();
+        if (isGroupConversation) {
+          const timestamp = this.serverTimeHandler.toServerTimestamp();
+          const event = EventBuilder.buildMemberLeave(conversationEntity, userId, false, timestamp);
+          this.eventRepository.injectEvent(event);
+        }
+
         delete payload.recipients[userId];
       }
     };
@@ -90,9 +99,10 @@ export class ClientMismatchHandler {
    * @param {UserClients} recipients User client map containing redundant clients
    * @param {NewOTRMessage} payload Payload of the request
    * @param {EventInfoEntity} eventInfoEntity Info about event
+   * @param {Conversation} conversationEntity Conversation entity
    * @returns {Promise<NewOTRMessage>} Resolves with the updated payload
    */
-  async _handleMissing(recipients, payload, eventInfoEntity) {
+  async _handleMissing(recipients, payload, eventInfoEntity, conversationEntity) {
     const missingUserIds = Object.keys(recipients);
 
     if (!missingUserIds.length) {
@@ -100,9 +110,8 @@ export class ClientMismatchHandler {
     }
 
     this.logger.debug(`Message is missing clients of '${missingUserIds.length}' users`, recipients);
-    const {conversationId, genericMessage, timestamp} = eventInfoEntity;
 
-    const conversationEntity = await this.conversationRepository.get_conversation_by_id(conversationId);
+    const {conversationId, genericMessage, timestamp} = eventInfoEntity;
     const knownUserIds = conversationEntity.participating_user_ids();
     const unknownUserIds = getDifference(knownUserIds, missingUserIds);
 
@@ -136,17 +145,15 @@ export class ClientMismatchHandler {
    *
    * @param {UserClients} recipients User client map containing redundant clients
    * @param {NewOTRMessage} payload Payload of the request
-   * @param {string} conversationId Conversation ID
+   * @param {Conversation} conversationEntity Conversation entity
    * @returns {Promise<NewOTRMessage>} Resolves with the updated payload
    */
-  async _handleRedundant(recipients, payload, conversationId) {
+  _handleRedundant(recipients, payload, conversationEntity) {
     if (Object.entries(recipients).length === 0) {
       return Promise.resolve(payload);
     }
 
     this.logger.debug(`Message contains redundant clients of '${Object.keys(recipients).length}' users`, recipients);
-
-    const conversationEntity = await this.conversationRepository.get_conversation_by_id(conversationId);
 
     const removeRedundantClient = (userId, clientId) => delete payload.recipients[userId][clientId];
 
