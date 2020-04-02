@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [10.0.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@10.0.1...@wireapp/api-client@10.0.2) (2020-04-02)
+
+
+### Bug Fixes
+
+* **api-client:** Change response type for broadcast OTR messages ([#2915](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2915)) ([bed22e9](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/bed22e92e04af55c67dc4fb34398cbdfe01ba5c0))
+
+
+
+
+
 ## [10.0.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@10.0.0...@wireapp/api-client@10.0.1) (2020-03-31)
 
 **Note:** Version bump only for package @wireapp/api-client
