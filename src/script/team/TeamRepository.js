@@ -116,6 +116,10 @@ export class TeamRepository {
       .then(memberResponse => this.teamMapper.mapMemberFromObject(memberResponse));
   }
 
+  getSelfMember(teamId) {
+    return this.getTeamMember(teamId, this.selfUser().id);
+  }
+
   getTeamMembers(teamId) {
     return this.teamService.getTeamMembers(teamId).then(({members}) => {
       if (members.length) {
@@ -210,10 +214,6 @@ export class TeamRepository {
           return accountInfo;
         });
     }
-  }
-
-  getSelfMember() {
-    // currently no-op
   }
 
   async updateTeamMembers(teamEntity) {
