@@ -36,9 +36,9 @@ export class ClientMismatchHandler {
    *
    * @note As part of 412 or general response when sending encrypted message
    * @param {EventInfoEntity} eventInfoEntity Info about message
-   * @param {Object} clientMismatch Client mismatch object containing client user maps for deleted, missing and obsolete clients
-   * @param {Object} payload Initial payload resulting in a 412
-   * @returns {Promise} Resolve when mismatch was handled
+   * @param {ClientMismatch} clientMismatch Client mismatch object containing client user maps for deleted, missing and obsolete clients
+   * @param {NewOTRMessage} payload Initial payload resulting in a 412
+   * @returns {Promise<NewOTRMessage>} Resolve when mismatch was handled
    */
   async onClientMismatch(eventInfoEntity, clientMismatch, payload) {
     const {deleted, missing, redundant} = clientMismatch;
@@ -54,9 +54,9 @@ export class ClientMismatchHandler {
    * @note Contains clients of which the backend is sure that they should not be recipient of a message and verified they no longer exist.
    * @private
    *
-   * @param {Object} recipients User client map containing redundant clients
-   * @param {Object} payload Payload of the request
-   * @returns {NewOtrMessage} Resolves with the updated payload
+   * @param {UserClients} recipients User client map containing redundant clients
+   * @param {NewOTRMessage} payload Payload of the request
+   * @returns {Promise<NewOTRMessage>} Resolves with the updated payload
    */
   _handleDeleted(recipients, payload) {
     if (Object.entries(recipients).length === 0) {
@@ -86,10 +86,10 @@ export class ClientMismatchHandler {
    * Handle the missing client mismatch.
    *
    * @private
-   * @param {Object} recipients User client map containing redundant clients
-   * @param {Object} payload Payload of the request
+   * @param {UserClients} recipients User client map containing redundant clients
+   * @param {NewOTRMessage} payload Payload of the request
    * @param {EventInfoEntity} eventInfoEntity Info about event
-   * @returns {Promise} Resolves with the updated payload
+   * @returns {Promise<NewOTRMessage>} Resolves with the updated payload
    */
   _handleMissing(recipients, payload, eventInfoEntity) {
     const missingUserIds = Object.keys(recipients);
@@ -142,10 +142,10 @@ export class ClientMismatchHandler {
    *   Sometimes clients of the self user are listed. Thus we cannot remove the payload for all the clients of a user without checking.
    * @private
    *
-   * @param {Object} recipients User client map containing redundant clients
-   * @param {Object} payload Payload of the request
-   * @param {EventInfoEntity} conversationId Conversation ID
-   * @returns {Promise} Resolves with the updated payload
+   * @param {UserClients} recipients User client map containing redundant clients
+   * @param {NewOTRMessage} payload Payload of the request
+   * @param {string} conversationId Conversation ID
+   * @returns {Promise<NewOTRMessage>} Resolves with the updated payload
    */
   async _handleRedundant(recipients, payload, conversationId) {
     if (Object.entries(recipients).length === 0) {
@@ -193,9 +193,9 @@ export class ClientMismatchHandler {
    * Starts removal functions.
    *
    * @private
-   * @param {Object} recipients User client map
+   * @param {UserClients} recipients User client map
    * @param {Function} clientFn Function to remove clients
-   * @param {Function} [userFn] Function to remove users
+   * @param {Function} userFn Function to remove users
    * @returns {Array} Function array
    */
   _remove(recipients, clientFn, userFn) {
