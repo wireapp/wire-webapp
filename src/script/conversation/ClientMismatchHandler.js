@@ -19,6 +19,7 @@
 
 import {getLogger} from 'Util/Logger';
 import {getDifference} from 'Util/ArrayUtil';
+import {EventBuilder} from './EventBuilder';
 
 export class ClientMismatchHandler {
   constructor(conversationRepository, cryptographyRepository, eventRepository, serverTimeHandler, userRepository) {
@@ -101,20 +102,16 @@ export class ClientMismatchHandler {
     this.logger.debug(`Message is missing clients of '${missingUserIds.length}' users`, recipients);
     const {conversationId, genericMessage, timestamp} = eventInfoEntity;
 
-    let participantsCheckPromise = Promise.resolve();
+    const participantsCheckPromise = this.conversationRepository
+      .get_conversation_by_id(conversationId)
+      .then(conversationEntity => {
+        const knownUserIds = conversationEntity.participating_user_ids();
+        const unknownUserIds = getDifference(knownUserIds, missingUserIds);
 
-    if (conversationId) {
-      participantsCheckPromise = this.conversationRepository
-        .get_conversation_by_id(conversationId)
-        .then(conversationEntity => {
-          const knownUserIds = conversationEntity.participating_user_ids();
-          const unknownUserIds = getDifference(knownUserIds, missingUserIds);
-
-          if (unknownUserIds.length) {
-            return this.conversationRepository.addMissingMember(conversationId, unknownUserIds, timestamp - 1);
-          }
-        });
-    }
+        if (unknownUserIds.length) {
+          return this.conversationRepository.addMissingMember(conversationId, unknownUserIds, timestamp - 1);
+        }
+      });
 
     return participantsCheckPromise
       .then(() => this.cryptographyRepository.encryptGenericMessage(recipients, genericMessage, payload))
@@ -171,8 +168,7 @@ export class ClientMismatchHandler {
         const isGroupConversation = conversationEntity && conversationEntity.isGroup();
         if (isGroupConversation) {
           const timestamp = this.serverTimeHandler.toServerTimestamp();
-          const event = z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, false, timestamp);
-
+          const event = EventBuilder.buildMemberLeave(conversationEntity, userId, false, timestamp);
           this.eventRepository.injectEvent(event);
         }
 
@@ -181,10 +177,7 @@ export class ClientMismatchHandler {
     };
 
     return Promise.all(this._remove(recipients, removeRedundantClient, removeRedundantUser)).then(() => {
-      if (conversationEntity) {
-        this.conversationRepository.updateParticipatingUserEntities(conversationEntity);
-      }
-
+      this.conversationRepository.updateParticipatingUserEntities(conversationEntity);
       return payload;
     });
   }
