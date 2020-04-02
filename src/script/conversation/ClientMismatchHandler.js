@@ -17,8 +17,6 @@
  *
  */
 
-import {isEmpty} from 'underscore';
-
 import {getLogger} from 'Util/Logger';
 import {getDifference} from 'Util/ArrayUtil';
 
@@ -44,9 +42,10 @@ export class ClientMismatchHandler {
    */
   async onClientMismatch(eventInfoEntity, clientMismatch, payload) {
     const {deleted, missing, redundant} = clientMismatch;
-    let updatedPayload = await this._handleRedundant(redundant, payload, eventInfoEntity.conversationId);
-    updatedPayload = await this._handleDeleted(deleted, updatedPayload);
-    return this._handleMissing(missing, updatedPayload, eventInfoEntity);
+    await this._handleRedundant(redundant, payload, eventInfoEntity.conversationId);
+    await this._handleDeleted(deleted, payload);
+    await this._handleMissing(missing, payload, eventInfoEntity);
+    return payload;
   }
 
   /**
@@ -60,7 +59,7 @@ export class ClientMismatchHandler {
    * @returns {Promise} Resolves with the updated payload
    */
   _handleDeleted(recipients, payload) {
-    if (isEmpty(recipients)) {
+    if (Object.entries(recipients).length === 0) {
       return Promise.resolve(payload);
     }
     this.logger.debug(`Message contains deleted clients of '${Object.keys(recipients).length}' users`, recipients);
@@ -151,7 +150,7 @@ export class ClientMismatchHandler {
    * @returns {Promise} Resolves with the updated payload
    */
   _handleRedundant(recipients, payload, conversationId) {
-    if (isEmpty(recipients)) {
+    if (Object.entries(recipients).length === 0) {
       return Promise.resolve(payload);
     }
 
