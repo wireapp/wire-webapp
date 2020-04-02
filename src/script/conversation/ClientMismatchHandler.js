@@ -92,7 +92,7 @@ export class ClientMismatchHandler {
    * @param {EventInfoEntity} eventInfoEntity Info about event
    * @returns {Promise<NewOTRMessage>} Resolves with the updated payload
    */
-  _handleMissing(recipients, payload, eventInfoEntity) {
+  async _handleMissing(recipients, payload, eventInfoEntity) {
     const missingUserIds = Object.keys(recipients);
 
     if (!missingUserIds.length) {
@@ -102,18 +102,15 @@ export class ClientMismatchHandler {
     this.logger.debug(`Message is missing clients of '${missingUserIds.length}' users`, recipients);
     const {conversationId, genericMessage, timestamp} = eventInfoEntity;
 
-    const participantsCheckPromise = this.conversationRepository
-      .get_conversation_by_id(conversationId)
-      .then(conversationEntity => {
-        const knownUserIds = conversationEntity.participating_user_ids();
-        const unknownUserIds = getDifference(knownUserIds, missingUserIds);
+    const conversationEntity = await this.conversationRepository.get_conversation_by_id(conversationId);
+    const knownUserIds = conversationEntity.participating_user_ids();
+    const unknownUserIds = getDifference(knownUserIds, missingUserIds);
 
-        if (unknownUserIds.length) {
-          return this.conversationRepository.addMissingMember(conversationId, unknownUserIds, timestamp - 1);
-        }
-      });
+    if (unknownUserIds.length > 0) {
+      await this.conversationRepository.addMissingMember(conversationId, unknownUserIds, timestamp - 1);
+    }
 
-    return participantsCheckPromise
+    return Promise.resolve()
       .then(() => this.cryptographyRepository.encryptGenericMessage(recipients, genericMessage, payload))
       .then(updatedPayload => {
         payload = updatedPayload;
