@@ -66,14 +66,11 @@ export class ClientMismatchHandler {
       return payload;
     }
     this.logger.debug(`Message contains deleted clients of '${Object.keys(recipients).length}' users`, recipients);
-
     const removeDeletedClient = (userId, clientId) => {
       delete payload.recipients[userId][clientId];
       this.userRepository.remove_client_from_user(userId, clientId);
     };
-
     this._remove(recipients, removeDeletedClient, conversationEntity, payload);
-
     return payload;
   }
 
@@ -137,15 +134,9 @@ export class ClientMismatchHandler {
     if (Object.entries(recipients).length === 0) {
       return Promise.resolve(payload);
     }
-
     this.logger.debug(`Message contains redundant clients of '${Object.keys(recipients).length}' users`, recipients);
-
     const removeRedundantClient = (userId, clientId) => delete payload.recipients[userId][clientId];
-
     this._remove(recipients, removeRedundantClient, conversationEntity, payload);
-
-    this.conversationRepository.updateParticipatingUserEntities(conversationEntity);
-
     return payload;
   }
 
