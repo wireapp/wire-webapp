@@ -34,7 +34,7 @@ ko.components.register('asset-loader', {
     <close-icon class="media-button__icon"></close-icon>
   </div>
   `,
-  viewModel: function({large, loadProgress, onCancel}: Params): void {
+  viewModel: function ({large, loadProgress, onCancel}: Params): void {
     const elementScale = large ? 2 : 1;
 
     this.progress = ko.pureComputed(() => `${loadProgress() * elementScale} ${100 * elementScale}`);

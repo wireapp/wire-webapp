@@ -44,7 +44,7 @@ ko.components.register('choose-screen', {
            data-bind="click: onCancel"></div>
     </div>
   `,
-  viewModel: function({cancel, choose, screens}: Params): void {
+  viewModel: function ({cancel, choose, screens}: Params): void {
     this.onCancel = cancel;
     this.onChoose = choose;
     this.screens = screens || [];

@@ -85,9 +85,7 @@ describe('SingleSignOnForm', () => {
       {doLogin, initialCode},
     );
 
-    expect(singleSignOnFormPage.getCodeOrEmailInput().exists())
-      .withContext('code input exists')
-      .toBe(true);
+    expect(singleSignOnFormPage.getCodeOrEmailInput().exists()).withContext('code input exists').toBe(true);
 
     expect(singleSignOnFormPage.getCodeOrEmailInput().props().value)
       .withContext('code input has initial code value')
@@ -130,9 +128,7 @@ describe('SingleSignOnForm', () => {
       history,
     );
 
-    expect(singleSignOnFormPage.getCodeOrEmailInput().exists())
-      .withContext('code input exists')
-      .toBe(true);
+    expect(singleSignOnFormPage.getCodeOrEmailInput().exists()).withContext('code input exists').toBe(true);
 
     singleSignOnFormPage.enterCodeOrEmail(code);
     singleSignOnFormPage.clickSubmitButton();
@@ -142,9 +138,7 @@ describe('SingleSignOnForm', () => {
       .toHaveBeenCalledTimes(1);
 
     await waitForExpect(() => {
-      expect(doLogin)
-        .withContext('external login function was called')
-        .toHaveBeenCalledTimes(1);
+      expect(doLogin).withContext('external login function was called').toHaveBeenCalledTimes(1);
     });
 
     expect(actionRoot.authAction.doFinalizeSSOLogin)
@@ -176,19 +170,13 @@ describe('SingleSignOnForm', () => {
       {doLogin: () => Promise.reject()},
     );
 
-    expect(singleSignOnFormPage.getCodeOrEmailInput().exists())
-      .withContext('Code input exists')
-      .toBe(true);
+    expect(singleSignOnFormPage.getCodeOrEmailInput().exists()).withContext('Code input exists').toBe(true);
 
-    expect(singleSignOnFormPage.getSubmitButton().props().disabled)
-      .withContext('Submit button is disabled')
-      .toBe(true);
+    expect(singleSignOnFormPage.getSubmitButton().props().disabled).withContext('Submit button is disabled').toBe(true);
 
     singleSignOnFormPage.enterCodeOrEmail(code);
 
-    expect(singleSignOnFormPage.getSubmitButton().props().disabled)
-      .withContext('Submit button is enabled')
-      .toBe(false);
+    expect(singleSignOnFormPage.getSubmitButton().props().disabled).withContext('Submit button is enabled').toBe(false);
 
     singleSignOnFormPage.clickSubmitButton();
 
@@ -217,19 +205,13 @@ describe('SingleSignOnForm', () => {
       {doLogin: () => Promise.reject()},
     );
 
-    expect(singleSignOnFormPage.getCodeOrEmailInput().exists())
-      .withContext('code/email input exists')
-      .toBe(true);
+    expect(singleSignOnFormPage.getCodeOrEmailInput().exists()).withContext('code/email input exists').toBe(true);
 
-    expect(singleSignOnFormPage.getSubmitButton().props().disabled)
-      .withContext('Submit button is disabled')
-      .toBe(true);
+    expect(singleSignOnFormPage.getSubmitButton().props().disabled).withContext('Submit button is disabled').toBe(true);
 
     singleSignOnFormPage.enterCodeOrEmail(email);
 
-    expect(singleSignOnFormPage.getSubmitButton().props().disabled)
-      .withContext('Submit button is enabled')
-      .toBe(false);
+    expect(singleSignOnFormPage.getSubmitButton().props().disabled).withContext('Submit button is enabled').toBe(false);
 
     singleSignOnFormPage.clickSubmitButton();
 
@@ -265,25 +247,17 @@ describe('SingleSignOnForm', () => {
       {doLogin: () => Promise.reject()},
     );
 
-    expect(singleSignOnFormPage.getCodeOrEmailInput().exists())
-      .withContext('Email input exists')
-      .toBe(true);
+    expect(singleSignOnFormPage.getCodeOrEmailInput().exists()).withContext('Email input exists').toBe(true);
 
-    expect(singleSignOnFormPage.getSubmitButton().props().disabled)
-      .withContext('Submit button is disabled')
-      .toBe(true);
+    expect(singleSignOnFormPage.getSubmitButton().props().disabled).withContext('Submit button is disabled').toBe(true);
 
     singleSignOnFormPage.enterCodeOrEmail(email);
 
-    expect(singleSignOnFormPage.getSubmitButton().props().disabled)
-      .withContext('Submit button is enabled')
-      .toBe(false);
+    expect(singleSignOnFormPage.getSubmitButton().props().disabled).withContext('Submit button is enabled').toBe(false);
 
     singleSignOnFormPage.clickSubmitButton();
 
-    expect(actionRoot.authAction.doGetDomainInfo)
-      .withContext('domain data got fetched')
-      .toHaveBeenCalledTimes(1);
+    expect(actionRoot.authAction.doGetDomainInfo).withContext('domain data got fetched').toHaveBeenCalledTimes(1);
 
     await waitForExpect(() => {
       expect(actionRoot.navigationAction.doNavigate)
@@ -319,26 +293,18 @@ describe('SingleSignOnForm', () => {
       {doLogin: () => Promise.reject()},
     );
 
-    expect(singleSignOnFormPage.getCodeOrEmailInput().exists())
-      .withContext('Email input exists')
-      .toBe(true);
+    expect(singleSignOnFormPage.getCodeOrEmailInput().exists()).withContext('Email input exists').toBe(true);
 
-    expect(singleSignOnFormPage.getSubmitButton().props().disabled)
-      .withContext('Submit button is disabled')
-      .toBe(true);
+    expect(singleSignOnFormPage.getSubmitButton().props().disabled).withContext('Submit button is disabled').toBe(true);
 
     singleSignOnFormPage.enterCodeOrEmail(email);
     singleSignOnFormPage.getTemporaryCheckbox().simulate('change', {target: {checked: true}});
 
-    expect(singleSignOnFormPage.getSubmitButton().props().disabled)
-      .withContext('Submit button is enabled')
-      .toBe(false);
+    expect(singleSignOnFormPage.getSubmitButton().props().disabled).withContext('Submit button is enabled').toBe(false);
 
     singleSignOnFormPage.clickSubmitButton();
 
-    expect(actionRoot.authAction.doGetDomainInfo)
-      .withContext('domain data got fetched')
-      .toHaveBeenCalledTimes(1);
+    expect(actionRoot.authAction.doGetDomainInfo).withContext('domain data got fetched').toHaveBeenCalledTimes(1);
 
     await waitForExpect(() => {
       expect(actionRoot.navigationAction.doNavigate)

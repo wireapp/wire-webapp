@@ -501,9 +501,7 @@ export class Conversation {
   }
 
   getFirstUnreadSelfMention() {
-    return this.unreadState()
-      .selfMentions.slice()
-      .pop();
+    return this.unreadState().selfMentions.slice().pop();
   }
 
   get_last_known_timestamp(currentTimestamp) {

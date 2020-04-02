@@ -124,7 +124,7 @@ export const renderMessage = (message: string, selfId: string, mentionEntities: 
     }, message);
 
   markdownit.set({
-    highlight: function(code): string {
+    highlight: function (code): string {
       const containsMentions = mentionEntities.some(mention => {
         const hash = createMentionHash(mention);
         return code.includes(hash);

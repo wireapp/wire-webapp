@@ -159,7 +159,7 @@ ko.components.register('user-devices', {
       <!-- /ko -->
     </div>
   `,
-  viewModel: function({
+  viewModel: function ({
     clientRepository,
     conversationRepository,
     cryptographyRepository,

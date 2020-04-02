@@ -116,7 +116,7 @@ ko.components.register('user-list', {
       <!-- /ko -->
     <!-- /ko -->
   `,
-  viewModel: function({
+  viewModel: function ({
     click,
     filter = ko.observable(''),
     skipSearch = false,

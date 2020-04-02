@@ -41,7 +41,7 @@ export const Actions = {
 
 ko.components.register('user-actions', {
   template: '<panel-actions params="items: items()"></panel-actions>',
-  viewModel: function({
+  viewModel: function ({
     user,
     conversation = () => null,
     actionsViewModel,

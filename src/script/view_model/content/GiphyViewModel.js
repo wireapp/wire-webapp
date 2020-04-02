@@ -103,11 +103,11 @@ z.viewModel.content.GiphyViewModel = class GiphyViewModel {
       const gifItem = $(event.currentTarget);
       const gifItems = gifItem.parent().children();
 
-      const remove_unselected = function() {
+      const remove_unselected = function () {
         $(this).removeClass('gif-container-item-unselected');
       };
 
-      const add_unselected = function() {
+      const add_unselected = function () {
         $(this).addClass('gif-container-item-unselected');
       };
 
