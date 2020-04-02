@@ -218,7 +218,7 @@ export class TeamRepository {
 
   async updateTeamMembers(teamEntity) {
     if (this.isLargeTeam) {
-      const selfMember = this.getSelfMember();
+      const selfMember = this.getSelfMember(teamEntity.id);
       this.teamMapper.mapRole(this.selfUser(), selfMember.permissions);
     } else {
       const teamMembers = await this.getTeamMembers(teamEntity.id);
