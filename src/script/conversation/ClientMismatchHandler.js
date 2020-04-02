@@ -110,22 +110,19 @@ export class ClientMismatchHandler {
       await this.conversationRepository.addMissingMember(conversationId, unknownUserIds, timestamp - 1);
     }
 
-    return Promise.resolve()
-      .then(() => this.cryptographyRepository.encryptGenericMessage(recipients, genericMessage, payload))
-      .then(updatedPayload => {
-        payload = updatedPayload;
-        return Promise.all(
-          missingUserIds.map(userId => {
-            return this.userRepository.getClientsByUserId(userId, false).then(clients => {
-              return Promise.all(clients.map(client => this.userRepository.addClientToUser(userId, client)));
-            });
-          }),
-        );
-      })
-      .then(() => {
-        this.conversationRepository.verificationStateHandler.onClientsAdded(missingUserIds);
-        return payload;
-      });
+    const newPayload = await this.cryptographyRepository.encryptGenericMessage(recipients, genericMessage, payload);
+    payload = newPayload;
+
+    await Promise.all(
+      missingUserIds.map(userId => {
+        return this.userRepository.getClientsByUserId(userId, false).then(clients => {
+          return Promise.all(clients.map(client => this.userRepository.addClientToUser(userId, client)));
+        });
+      }),
+    );
+
+    this.conversationRepository.verificationStateHandler.onClientsAdded(missingUserIds);
+    return payload;
   }
 
   /**
