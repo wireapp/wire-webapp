@@ -111,12 +111,12 @@ export class ClientMismatchHandler {
 
     this.logger.debug(`Message is missing clients of '${missingUserIds.length}' users`, recipients);
 
-    const {conversationId, genericMessage, timestamp} = eventInfoEntity;
+    const {genericMessage, timestamp} = eventInfoEntity;
     const knownUserIds = conversationEntity.participating_user_ids();
     const unknownUserIds = getDifference(knownUserIds, missingUserIds);
 
     if (unknownUserIds.length > 0) {
-      await this.conversationRepository.addMissingMember(conversationId, unknownUserIds, timestamp - 1);
+      this.conversationRepository.addMissingMember(conversationEntity, unknownUserIds, timestamp - 1);
     }
 
     const newPayload = await this.cryptographyRepository.encryptGenericMessage(recipients, genericMessage, payload);
