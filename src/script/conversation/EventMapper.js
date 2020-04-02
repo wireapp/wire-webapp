@@ -221,7 +221,8 @@ export class EventMapper {
       }
 
       case ClientEvent.CONVERSATION.COMPOSITE_MESSAGE_ADD: {
-        messageEntity = await this._mapEventCompositeMessageAdd(event);
+        const addMessage = await this._mapEventCompositeMessageAdd(event);
+        messageEntity = addMetadata(addMessage, event);
         break;
       }
 
