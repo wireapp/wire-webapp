@@ -23,9 +23,9 @@ import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {AppInitTimingsStep} from './AppInitTimingsStep';
 
 export class AppInitTimings {
-  private timings: Record<AppInitTimingsStep, number>;
-  private readonly logger: Logger;
+  private readonly timings: Record<AppInitTimingsStep, number>;
   private readonly init: number;
+  private readonly logger: Logger;
 
   static get CONFIG() {
     return {
@@ -41,7 +41,7 @@ export class AppInitTimings {
   }
 
   get(): Record<AppInitTimingsStep, number> {
-    return this.timings;
+    return {...this.timings};
   }
 
   get_app_load(): number {

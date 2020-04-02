@@ -25,7 +25,7 @@ import {WebAppEvents} from '../../event/WebApp';
 
 export class AppInitStatistics {
   private readonly logger: Logger;
-  private statistics: Record<AppInitStatisticsValue, string | number>;
+  private readonly statistics: Record<AppInitStatisticsValue, string | number>;
 
   static get CONFIG() {
     return {
@@ -39,7 +39,7 @@ export class AppInitStatistics {
     amplify.subscribe(WebAppEvents.TELEMETRY.BACKEND_REQUESTS, this.update_backend_requests.bind(this));
   }
 
-  add(statistic: AppInitStatisticsValue, value: string | number, bucket_size: number): void {
+  add(statistic: AppInitStatisticsValue, value: string | number, bucket_size?: number): void {
     if (bucket_size && typeof value === 'number') {
       const buckets = Math.floor(value / bucket_size) + (value % bucket_size ? 1 : 0);
 
@@ -50,14 +50,14 @@ export class AppInitStatistics {
   }
 
   get(): Record<AppInitStatisticsValue, string | number> {
-    return this.statistics;
+    return {...this.statistics};
   }
 
   log(): void {
     this.logger.debug('App initialization statistics', this.statistics);
   }
 
-  update_backend_requests(number_of_requests: number) {
+  update_backend_requests(number_of_requests: number): void {
     this.statistics[AppInitStatisticsValue.BACKEND_REQUESTS] = number_of_requests;
   }
 }
