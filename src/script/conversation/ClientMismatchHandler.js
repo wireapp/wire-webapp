@@ -122,6 +122,7 @@ export class ClientMismatchHandler {
     );
 
     this.conversationRepository.verificationStateHandler.onClientsAdded(missingUserIds);
+
     return payload;
   }
 
@@ -145,12 +146,7 @@ export class ClientMismatchHandler {
 
     this.logger.debug(`Message contains redundant clients of '${Object.keys(recipients).length}' users`, recipients);
 
-    const conversationEntity = await this.conversationRepository.get_conversation_by_id(conversationId).catch(error => {
-      const isConversationNotFound = error.type === z.error.ConversationError.TYPE.CONVERSATION_NOT_FOUND;
-      if (!isConversationNotFound) {
-        throw error;
-      }
-    });
+    const conversationEntity = await this.conversationRepository.get_conversation_by_id(conversationId);
 
     const removeRedundantClient = (userId, clientId) => delete payload.recipients[userId][clientId];
 
@@ -159,7 +155,7 @@ export class ClientMismatchHandler {
       const noRemainingClients = !clientIdsOfUser.length;
 
       if (noRemainingClients) {
-        const isGroupConversation = conversationEntity && conversationEntity.isGroup();
+        const isGroupConversation = conversationEntity.isGroup();
         if (isGroupConversation) {
           const timestamp = this.serverTimeHandler.toServerTimestamp();
           const event = EventBuilder.buildMemberLeave(conversationEntity, userId, false, timestamp);
@@ -173,6 +169,7 @@ export class ClientMismatchHandler {
     this._remove(recipients, removeRedundantClient, removeRedundantUser);
 
     this.conversationRepository.updateParticipatingUserEntities(conversationEntity);
+
     return payload;
   }
 
