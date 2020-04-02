@@ -42,13 +42,11 @@ export class ClientMismatchHandler {
    * @param {Object} payload Initial payload resulting in a 412
    * @returns {Promise} Resolve when mismatch was handled
    */
-  onClientMismatch(eventInfoEntity, clientMismatch, payload) {
-    const {deleted: deletedClients, missing: missingClients, redundant: redundantClients} = clientMismatch;
-
-    return Promise.resolve()
-      .then(() => this._handleClientMismatchRedundant(redundantClients, payload, eventInfoEntity))
-      .then(updatedPayload => this._handleClientMismatchDeleted(deletedClients, updatedPayload))
-      .then(updatedPayload => this._handleClientMismatchMissing(missingClients, updatedPayload, eventInfoEntity));
+  async onClientMismatch(eventInfoEntity, clientMismatch, payload) {
+    const {deleted, missing, redundant} = clientMismatch;
+    let updatedPayload = await this._handleRedundant(redundant, payload, eventInfoEntity.conversationId);
+    updatedPayload = await this._handleDeleted(deleted, updatedPayload);
+    return this._handleMissing(missing, updatedPayload, eventInfoEntity);
   }
 
   /**
@@ -61,7 +59,7 @@ export class ClientMismatchHandler {
    * @param {Object} payload Payload of the request
    * @returns {Promise} Resolves with the updated payload
    */
-  _handleClientMismatchDeleted(recipients, payload) {
+  _handleDeleted(recipients, payload) {
     if (isEmpty(recipients)) {
       return Promise.resolve(payload);
     }
@@ -69,7 +67,7 @@ export class ClientMismatchHandler {
 
     const _removeDeletedClient = (userId, clientId) => {
       delete payload.recipients[userId][clientId];
-      return this.userRepository.remove_client_from_user(userId, clientId);
+      this.userRepository.remove_client_from_user(userId, clientId);
     };
 
     const _removeDeletedUser = userId => {
@@ -81,7 +79,7 @@ export class ClientMismatchHandler {
       }
     };
 
-    return Promise.all(this._mapRecipients(recipients, _removeDeletedClient, _removeDeletedUser)).then(() => {
+    return Promise.all(this._remove(recipients, _removeDeletedClient, _removeDeletedUser)).then(() => {
       this.conversationRepository.verificationStateHandler.onClientRemoved();
       return payload;
     });
@@ -96,7 +94,7 @@ export class ClientMismatchHandler {
    * @param {EventInfoEntity} eventInfoEntity Info about event
    * @returns {Promise} Resolves with the updated payload
    */
-  _handleClientMismatchMissing(recipients, payload, eventInfoEntity) {
+  _handleMissing(recipients, payload, eventInfoEntity) {
     const missingUserIds = Object.keys(recipients);
 
     if (!missingUserIds.length) {
@@ -149,16 +147,15 @@ export class ClientMismatchHandler {
    *
    * @param {Object} recipients User client map containing redundant clients
    * @param {Object} payload Payload of the request
-   * @param {EventInfoEntity} eventInfoEntity Info about event
+   * @param {EventInfoEntity} conversationId Conversation ID
    * @returns {Promise} Resolves with the updated payload
    */
-  _handleClientMismatchRedundant(recipients, payload, eventInfoEntity) {
+  _handleRedundant(recipients, payload, conversationId) {
     if (isEmpty(recipients)) {
       return Promise.resolve(payload);
     }
 
     this.logger.debug(`Message contains redundant clients of '${Object.keys(recipients).length}' users`, recipients);
-    const conversationId = eventInfoEntity.conversationId;
 
     let conversationPromise = Promise.resolve();
 
@@ -191,7 +188,7 @@ export class ClientMismatchHandler {
         }
       };
 
-      return Promise.all(this._mapRecipients(recipients, _removeRedundantClient, _removeRedundantUser)).then(() => {
+      return Promise.all(this._remove(recipients, _removeRedundantClient, _removeRedundantUser)).then(() => {
         if (conversationEntity) {
           this.conversationRepository.updateParticipatingUserEntities(conversationEntity);
         }
@@ -202,25 +199,20 @@ export class ClientMismatchHandler {
   }
 
   /**
-   * Map a function to recipients.
+   * Starts removal functions.
    *
    * @private
    * @param {Object} recipients User client map
-   * @param {Function} clientFn Function to be executed on clients first
-   * @param {Function} [userFn] Function to be executed on users at the end
+   * @param {Function} clientFn Function to remove clients
+   * @param {Function} [userFn] Function to remove users
    * @returns {Array} Function array
    */
-  _mapRecipients(recipients, clientFn, userFn) {
+  _remove(recipients, clientFn, userFn) {
     const result = [];
 
     Object.entries(recipients).forEach(([userId, clientIds = []]) => {
-      if (typeof clientFn === 'function') {
-        clientIds.forEach(clientId => result.push(clientFn(userId, clientId)));
-      }
-
-      if (typeof userFn === 'function') {
-        result.push(userFn(userId));
-      }
+      clientIds.forEach(clientId => result.push(clientFn(userId, clientId)));
+      result.push(userFn(userId));
     });
 
     return result;
