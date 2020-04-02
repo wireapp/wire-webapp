@@ -17,42 +17,50 @@
  *
  */
 
-import {getLogger} from 'Util/Logger';
+import {amplify} from 'amplify';
+
+import {getLogger, Logger} from 'Util/Logger';
 import {Environment} from 'Util/Environment';
 
 import {AppInitStatistics} from './AppInitStatistics';
 import {AppInitTimings} from './AppInitTimings';
 import {WebAppEvents} from '../../event/WebApp';
 import {EventName} from '../../tracking/EventName';
+import {AppInitStatisticsValue} from './AppInitStatisticsValue';
+import {AppInitTimingsStep} from './AppInitTimingsStep';
 
 export class AppInitTelemetry {
+  private readonly logger: Logger;
+  private readonly timings: AppInitTimings;
+  private readonly statistics: AppInitStatistics;
+
   constructor() {
     this.logger = getLogger('AppInitTelemetry');
     this.timings = new AppInitTimings();
     this.statistics = new AppInitStatistics();
   }
 
-  add_statistic(statistic, value, bucket_size) {
-    return this.statistics.add(statistic, value, bucket_size);
+  add_statistic(statistic: AppInitStatisticsValue, value: string | number, bucket_size: number): void {
+    this.statistics.add(statistic, value, bucket_size);
   }
 
-  get_statistics() {
+  get_statistics(): Record<AppInitStatisticsValue, string | number> {
     return this.statistics.get();
   }
 
-  get_timings() {
+  get_timings(): Record<AppInitTimingsStep, number> {
     return this.timings.get();
   }
 
-  log_statistics() {
-    return this.statistics.log();
+  log_statistics(): void {
+    this.statistics.log();
   }
 
-  log_timings() {
-    return this.timings.log();
+  log_timings(): void {
+    this.timings.log();
   }
 
-  report() {
+  report(): void {
     const statistics = this.get_statistics();
 
     statistics.loading_time = this.timings.get_app_load();
@@ -64,7 +72,7 @@ export class AppInitTelemetry {
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.TELEMETRY.APP_INITIALIZATION, statistics);
   }
 
-  time_step(step) {
+  time_step(step: AppInitTimingsStep): void {
     return this.timings.time_step(step);
   }
 }

@@ -17,12 +17,16 @@
  *
  */
 
-import {getLogger} from 'Util/Logger';
+import {amplify} from 'amplify';
+import {getLogger, Logger} from 'Util/Logger';
 
 import {AppInitStatisticsValue} from './AppInitStatisticsValue';
 import {WebAppEvents} from '../../event/WebApp';
 
 export class AppInitStatistics {
+  private readonly logger: Logger;
+  private statistics: Record<AppInitStatisticsValue, string | number>;
+
   static get CONFIG() {
     return {
       LOG_LENGTH_KEY: 17,
@@ -32,43 +36,28 @@ export class AppInitStatistics {
 
   constructor() {
     this.logger = getLogger('AppInitStatistics');
-
     amplify.subscribe(WebAppEvents.TELEMETRY.BACKEND_REQUESTS, this.update_backend_requests.bind(this));
   }
 
-  add(statistic, value, bucket_size) {
+  add(statistic: AppInitStatisticsValue, value: string | number, bucket_size: number): void {
     if (bucket_size && typeof value === 'number') {
       const buckets = Math.floor(value / bucket_size) + (value % bucket_size ? 1 : 0);
 
-      return (this[statistic] = value === 0 ? 0 : bucket_size * buckets);
+      this.statistics[statistic] = value === 0 ? 0 : bucket_size * buckets;
+    } else {
+      this.statistics[statistic] = value;
     }
-
-    return (this[statistic] = value);
   }
 
-  get() {
-    const statistics = {};
-
-    Object.entries(this).forEach(([key, value]) => {
-      if (typeof value === 'number' || typeof value === 'string') {
-        statistics[key] = value;
-      }
-    });
-
-    return statistics;
+  get(): Record<AppInitStatisticsValue, string | number> {
+    return this.statistics;
   }
 
-  log() {
-    const statsData = Object.entries(this).reduce((stats, [key, value]) => {
-      if (typeof value === 'number' || typeof value === 'string') {
-        stats[key] = value;
-      }
-      return stats;
-    }, {});
-    this.logger.debug('App initialization statistics', statsData);
+  log(): void {
+    this.logger.debug('App initialization statistics', this.statistics);
   }
 
-  update_backend_requests(number_of_requests) {
-    this[AppInitStatisticsValue.BACKEND_REQUESTS] = number_of_requests;
+  update_backend_requests(number_of_requests: number) {
+    this.statistics[AppInitStatisticsValue.BACKEND_REQUESTS] = number_of_requests;
   }
 }

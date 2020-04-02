@@ -18,11 +18,13 @@
  */
 
 export enum AppInitStatisticsValue {
+  APP_VERSION = 'app_version',
   BACKEND_REQUESTS = 'backend_requests',
   CLIENT_TYPE = 'client_type',
   CLIENTS = 'clients',
   CONNECTIONS = 'connections',
   CONVERSATIONS = 'conversations',
+  LOADING_TIME = 'loading_time',
   NOTIFICATIONS = 'notifications',
   SESSIONS = 'sessions',
 }
