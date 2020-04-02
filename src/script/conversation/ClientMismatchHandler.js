@@ -28,7 +28,6 @@ export class ClientMismatchHandler {
     this.eventRepository = eventRepository;
     this.serverTimeHandler = serverTimeHandler;
     this.userRepository = userRepository;
-
     this.logger = getLogger('ClientMismatchHandler');
   }
 
@@ -39,15 +38,14 @@ export class ClientMismatchHandler {
    * @param {EventInfoEntity} eventInfoEntity Info about message
    * @param {ClientMismatch} clientMismatch Client mismatch object containing client user maps for deleted, missing and obsolete clients
    * @param {NewOTRMessage} payload Initial payload resulting in a 412
-   * @returns {Promise<NewOTRMessage>} Resolve when mismatch was handled
+   * @returns {Promise<NewOTRMessage>} Resolves when mismatch was handled with updated OTR message
    */
   async onClientMismatch(eventInfoEntity, clientMismatch, payload) {
     const {deleted, missing, redundant} = clientMismatch;
     const conversationEntity = await this.conversationRepository.get_conversation_by_id(eventInfoEntity.conversationId);
     this._handleRedundant(redundant, payload, conversationEntity);
     this._handleDeleted(deleted, payload, conversationEntity);
-    await this._handleMissing(missing, payload, conversationEntity, eventInfoEntity);
-    return payload;
+    return this._handleMissing(missing, payload, conversationEntity, eventInfoEntity);
   }
 
   /**
@@ -59,11 +57,11 @@ export class ClientMismatchHandler {
    * @param {UserClients} recipients User client map containing redundant clients
    * @param {NewOTRMessage} payload Payload of the request
    * @param {Conversation} conversationEntity Conversation entity
-   * @returns {NewOTRMessage} Resolves with the updated payload
+   * @returns {void} Resolves when the payload got updated
    */
   async _handleDeleted(recipients, payload, conversationEntity) {
     if (Object.entries(recipients).length === 0) {
-      return payload;
+      return;
     }
     this.logger.debug(`Message contains deleted clients of '${Object.keys(recipients).length}' users`, recipients);
     const removeDeletedClient = (userId, clientId) => {
@@ -71,7 +69,6 @@ export class ClientMismatchHandler {
       this.userRepository.remove_client_from_user(userId, clientId);
     };
     this._remove(recipients, removeDeletedClient, conversationEntity, payload);
-    return payload;
   }
 
   /**
@@ -128,16 +125,15 @@ export class ClientMismatchHandler {
    * @param {UserClients} recipients User client map containing redundant clients
    * @param {NewOTRMessage} payload Payload of the request
    * @param {Conversation} conversationEntity Conversation entity
-   * @returns {Promise<NewOTRMessage>} Resolves with the updated payload
+   * @returns {void} Resolves when the payload got updated
    */
   _handleRedundant(recipients, payload, conversationEntity) {
     if (Object.entries(recipients).length === 0) {
-      return Promise.resolve(payload);
+      return;
     }
     this.logger.debug(`Message contains redundant clients of '${Object.keys(recipients).length}' users`, recipients);
     const removeRedundantClient = (userId, clientId) => delete payload.recipients[userId][clientId];
     this._remove(recipients, removeRedundantClient, conversationEntity, payload);
-    return payload;
   }
 
   /**
