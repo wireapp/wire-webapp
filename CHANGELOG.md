@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@10.1.1...@wireapp/api-client@10.2.0) (2020-04-03)
+
+
+### Features
+
+* **api-client:** Add team owner deletion error labels ([#2920](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2920)) ([4efb3cd](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/4efb3cd826ee6016f8ea22293406801d0e742f79))
+
+
+
+
+
 ## [10.1.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@10.1.0...@wireapp/api-client@10.1.1) (2020-04-03)
 
 
