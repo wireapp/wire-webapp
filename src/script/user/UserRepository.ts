@@ -23,7 +23,7 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import {flatten} from 'underscore';
 
-import {chunk} from 'Util/ArrayUtil';
+import {chunk, partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
 import {sortUsersByPriority} from 'Util/StringUtil';
@@ -407,10 +407,7 @@ export class UserRepository {
     const sortedUsers = this.directlyConnectedUsers().sort(({id: idA}, {id: idB}) =>
       idA.localeCompare(idB, undefined, {sensitivity: 'base'}),
     );
-    const [members, other] = sortedUsers.reduce(
-      ([members, users], user) => (user.isTeamMember() ? [[...members, user], users] : [members, [...users, user]]),
-      [[], []],
-    );
+    const [members, other] = partition(sortedUsers, user => user.isTeamMember());
     const recipients = [this.self(), ...members, ...other].slice(0, UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST);
 
     amplify.publish(WebAppEvents.BROADCAST.SEND_MESSAGE, {genericMessage, recipients});
