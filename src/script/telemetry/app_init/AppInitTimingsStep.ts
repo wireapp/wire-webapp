@@ -17,7 +17,6 @@
  *
  */
 
-/* tslint:disable:object-literal-sort-keys */
 export enum AppInitTimingsStep {
   RECEIVED_ACCESS_TOKEN = 'received_access_token',
   RECEIVED_SELF_USER = 'received_self_user',

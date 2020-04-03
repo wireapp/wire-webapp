@@ -17,12 +17,16 @@
  *
  */
 
-import {getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {AppInitTimingsStep} from './AppInitTimingsStep';
 
 export class AppInitTimings {
+  private readonly timings: Record<AppInitTimingsStep, number>;
+  private readonly init: number;
+  private readonly logger: Logger;
+
   static get CONFIG() {
     return {
       BUCKET_SIZE: 10,
@@ -36,39 +40,24 @@ export class AppInitTimings {
     this.init = window.performance.now();
   }
 
-  get() {
-    const timings = {};
-
-    Object.entries(this).forEach(([key, value]) => {
-      if (key.toString() !== 'init' && typeof value === 'number') {
-        timings[key] = value;
-      }
-    });
-
-    return timings;
+  get(): Record<AppInitTimingsStep, number> {
+    return {...this.timings};
   }
 
-  get_app_load() {
-    const CONFIG = AppInitTimings.CONFIG;
-    const appLoaded = this[AppInitTimingsStep.APP_LOADED];
+  get_app_load(): number {
+    const appLoaded = this.timings[AppInitTimingsStep.APP_LOADED];
     const appLoadedInSeconds = appLoaded / TIME_IN_MILLIS.SECOND;
 
-    return (Math.floor(appLoadedInSeconds / CONFIG.BUCKET_SIZE) + 1) * CONFIG.BUCKET_SIZE;
+    return (Math.floor(appLoadedInSeconds / AppInitTimings.CONFIG.BUCKET_SIZE) + 1) * AppInitTimings.CONFIG.BUCKET_SIZE;
   }
 
   log() {
-    const statsData = Object.entries(this).reduce((stats, [key, value]) => {
-      if (typeof value === 'number' || typeof value === 'string') {
-        stats[key] = value;
-      }
-      return stats;
-    }, {});
-    this.logger.debug('App initialization step durations', statsData);
+    this.logger.debug('App initialization step durations', this.timings);
   }
 
-  time_step(step) {
-    if (!this[step]) {
-      return (this[step] = window.parseInt(window.performance.now() - this.init));
+  time_step(step: AppInitTimingsStep): void {
+    if (!this.timings[step]) {
+      this.timings[step] = window.performance.now() - this.init;
     }
   }
 }
