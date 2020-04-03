@@ -61,7 +61,6 @@ const PUBLIC_FEATURES = {
   UPDATE_CONVERSATION_SETTINGS: 1 << bitsCounter++,
   UPDATE_GROUP_PARTICIPANTS: 1 << bitsCounter++,
 };
-// tslint:enable:object-literal-sort-keys
 
 export const FEATURES = {...TEAM_FEATURES, ...PUBLIC_FEATURES};
 
@@ -133,7 +132,6 @@ function publicPermissionsForRole(role: ROLE): number {
   }
 }
 
-// tslint:disable:object-literal-sort-keys
 /**
  * Object describing all the roles of a team member
  * This object needs to be sorted from the highest priority to the lowest
@@ -146,7 +144,6 @@ export enum ROLE {
   NONE = 'z.team.TeamRole.ROLE.NONE',
   INVALID = 'z.team.TeamRole.ROLE.INVALID',
 }
-// tslint:enable:object-literal-sort-keys
 
 export function roleFromTeamPermissions(permissions: PermissionsData): ROLE {
   if (!permissions) {
