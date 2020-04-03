@@ -23,8 +23,11 @@ window.z = window.z || {};
 window.z.error = z.error || {};
 
 z.error.ConversationError = class ConversationError extends BaseError {
-  constructor(type, message) {
+  constructor(type, message, error) {
     super('ConversationError', type, message);
+    if (error) {
+      this.stack = `${this.stack}\n${error.stack}`;
+    }
   }
 
   static get MESSAGE() {

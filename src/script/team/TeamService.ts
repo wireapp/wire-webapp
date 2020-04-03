@@ -52,7 +52,7 @@ export class TeamService {
   }
 
   getTeamMembers(teamId: string): Promise<Members> {
-    return this.apiClient.teams.member.api.getMembers(teamId);
+    return this.apiClient.teams.member.api.getAllMembers(teamId);
   }
 
   getTeams(): Promise<TeamChunkData> {
