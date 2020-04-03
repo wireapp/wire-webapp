@@ -183,7 +183,7 @@ export class ClientMismatchHandler {
     clientFn: Function,
     conversationEntity: Conversation = undefined,
     payload: NewOTRMessage,
-  ) {
+  ): void[] {
     const result: void[] = [];
 
     const removeDeletedUser = (userId: string) => {
