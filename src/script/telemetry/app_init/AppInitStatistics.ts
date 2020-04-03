@@ -23,11 +23,11 @@ import {getLogger, Logger} from 'Util/Logger';
 import {AppInitStatisticsValue} from './AppInitStatisticsValue';
 import {WebAppEvents} from '../../event/WebApp';
 
-type Statistics = Partial<Record<AppInitStatisticsValue, string | number>>;
+export type AppStatistics = Partial<Record<AppInitStatisticsValue, string | number>>;
 
 export class AppInitStatistics {
   private readonly logger: Logger;
-  private readonly statistics: Statistics;
+  private readonly statistics: AppStatistics;
 
   static get CONFIG() {
     return {
@@ -52,7 +52,7 @@ export class AppInitStatistics {
     }
   }
 
-  get(): Statistics {
+  get(): AppStatistics {
     return {...this.statistics};
   }
 

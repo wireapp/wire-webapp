@@ -22,10 +22,10 @@ import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {AppInitTimingsStep} from './AppInitTimingsStep';
 
-type Timings = Partial<Record<AppInitTimingsStep, number>>;
+export type AppTimings = Partial<Record<AppInitTimingsStep, number>>;
 
 export class AppInitTimings {
-  private readonly timings: Timings;
+  private readonly timings: AppTimings;
   private readonly init: number;
   private readonly logger: Logger;
 
@@ -43,7 +43,7 @@ export class AppInitTimings {
     this.timings = {};
   }
 
-  get(): Timings {
+  get(): AppTimings {
     return {...this.timings};
   }
 
