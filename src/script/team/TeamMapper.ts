@@ -18,6 +18,7 @@
  */
 
 import {MemberData, TeamData} from '@wireapp/api-client/dist/team/';
+import {TeamUpdateData} from '@wireapp/api-client/dist/team/data';
 import {PermissionsData} from '@wireapp/api-client/dist/team/member/PermissionsData';
 
 import {getLogger, Logger} from 'Util/Logger';
@@ -39,13 +40,13 @@ export class TeamMapper {
   }
 
   updateTeamFromObject(): void;
-  updateTeamFromObject(teamData: TeamData, teamEntity?: TeamEntity): TeamEntity;
-  updateTeamFromObject(teamData?: TeamData, teamEntity = new TeamEntity()): TeamEntity | void {
+  updateTeamFromObject(teamData: TeamData | TeamUpdateData, teamEntity?: TeamEntity): TeamEntity;
+  updateTeamFromObject(teamData?: TeamData | TeamUpdateData, teamEntity = new TeamEntity()): TeamEntity | void {
     if (teamData) {
-      const {creator, icon, icon_key: iconKey, id, name} = teamData;
+      const {icon, icon_key: iconKey, name} = teamData;
 
-      if (creator) {
-        teamEntity.creator = creator;
+      if ('creator' in teamData) {
+        teamEntity.creator = teamData.creator;
       }
 
       if (icon) {
@@ -56,8 +57,8 @@ export class TeamMapper {
         teamEntity.iconKey = iconKey;
       }
 
-      if (id) {
-        teamEntity.id = id;
+      if ('id' in teamData) {
+        teamEntity.id = teamData.id;
       }
 
       if (name) {

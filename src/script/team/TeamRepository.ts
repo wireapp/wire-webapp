@@ -21,6 +21,15 @@ import ko from 'knockout';
 import {amplify} from 'amplify';
 import {ConversationRolesList} from '@wireapp/api-client/dist/conversation/ConversationRole';
 import {TeamData} from '@wireapp/api-client/dist/team/team/TeamData';
+import {TEAM_EVENT} from '@wireapp/api-client/dist/event/TeamEvent';
+import {
+  TeamConversationDeleteEvent,
+  TeamDeleteEvent,
+  TeamEvent,
+  TeamMemberJoinEvent,
+  TeamMemberLeaveEvent,
+  TeamUpdateEvent,
+} from '@wireapp/api-client/dist/event';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {Environment} from 'Util/Environment';
@@ -33,7 +42,6 @@ import {TeamMapper} from './TeamMapper';
 import {TeamEntity} from './TeamEntity';
 import {roleFromTeamPermissions, ROLE} from '../user/UserPermission';
 
-import {BackendEvent} from '../event/Backend';
 import {WebAppEvents} from '../event/WebApp';
 import {IntegrationMapper} from '../integration/IntegrationMapper';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
@@ -181,31 +189,31 @@ export class TeamRepository {
     this.logger.info(`»» Team Event: '${type}' (Source: ${source})`, logObject);
 
     switch (type) {
-      case BackendEvent.TEAM.CONVERSATION_DELETE: {
+      case TEAM_EVENT.CONVERSATION_DELETE: {
         this.onDeleteConversation(eventJson);
         break;
       }
-      case BackendEvent.TEAM.DELETE: {
+      case TEAM_EVENT.DELETE: {
         this.onDelete(eventJson);
         break;
       }
-      case BackendEvent.TEAM.MEMBER_JOIN: {
+      case TEAM_EVENT.MEMBER_JOIN: {
         this._onMemberJoin(eventJson);
         break;
       }
-      case BackendEvent.TEAM.MEMBER_LEAVE: {
+      case TEAM_EVENT.MEMBER_LEAVE: {
         this.onMemberLeave(eventJson);
         break;
       }
-      case BackendEvent.TEAM.MEMBER_UPDATE: {
+      case TEAM_EVENT.MEMBER_UPDATE: {
         this.onMemberUpdate(eventJson);
         break;
       }
-      case BackendEvent.TEAM.UPDATE: {
+      case TEAM_EVENT.UPDATE: {
         this.onUpdate(eventJson);
         break;
       }
-      case BackendEvent.TEAM.CONVERSATION_CREATE:
+      case TEAM_EVENT.CONVERSATION_CREATE:
       default: {
         this.onUnhandled(eventJson);
       }
@@ -285,7 +293,8 @@ export class TeamRepository {
     });
   }
 
-  private onDelete({team: teamId}: {team: string}): void {
+  private onDelete(eventJson: TeamDeleteEvent | TeamMemberLeaveEvent): void {
+    const {team: teamId} = eventJson;
     if (this.isTeam() && this.team().id === teamId) {
       this.isTeamDeleted(true);
       window.setTimeout(() => {
@@ -294,11 +303,14 @@ export class TeamRepository {
     }
   }
 
-  private onDeleteConversation({data: {conv: conversationId}}: {data: {conv: string}}) {
+  private onDeleteConversation(eventJson: TeamConversationDeleteEvent) {
+    const {
+      data: {conv: conversationId},
+    } = eventJson;
     amplify.publish(WebAppEvents.CONVERSATION.DELETE, conversationId);
   }
 
-  private _onMemberJoin(eventJson: any): void {
+  private _onMemberJoin(eventJson: TeamMemberJoinEvent): void {
     const {
       data: {user: userId},
       team: teamId,
@@ -312,7 +324,7 @@ export class TeamRepository {
     }
   }
 
-  private onMemberLeave(eventJson: any): void {
+  private onMemberLeave(eventJson: TeamMemberLeaveEvent): void {
     const {
       data: {user: userId},
       team: teamId,
@@ -331,7 +343,7 @@ export class TeamRepository {
     }
   }
 
-  private async onMemberUpdate(eventJson: any): Promise<void> {
+  private async onMemberUpdate(eventJson: any /*TODO*/): Promise<void> {
     const {
       data: {user: userId},
       permissions,
@@ -369,11 +381,11 @@ export class TeamRepository {
     this.memberInviters(memberInvites);
   }
 
-  private onUnhandled(eventJson: any): void {
+  private onUnhandled(eventJson: TeamEvent): void {
     this.logger.log(`Received '${eventJson.type}' event from backend which is not yet handled`, eventJson);
   }
 
-  private onUpdate(eventJson: any): void {
+  private onUpdate(eventJson: TeamUpdateEvent): void {
     const {data: teamData, team: teamId} = eventJson;
 
     if (this.team().id === teamId) {
