@@ -28,6 +28,7 @@ import {
   TeamEvent,
   TeamMemberJoinEvent,
   TeamMemberLeaveEvent,
+  TeamMemberUpdateEvent,
   TeamUpdateEvent,
 } from '@wireapp/api-client/dist/event';
 
@@ -345,11 +346,9 @@ export class TeamRepository {
     }
   }
 
-  // TODO: use `TeamMemberUpdateEvent` as type once @wireapp/core >= 16.0.3 is used
-  private async onMemberUpdate(eventJson: any): Promise<void> {
+  private async onMemberUpdate(eventJson: TeamMemberUpdateEvent): Promise<void> {
     const {
-      data: {user: userId},
-      permissions,
+      data: {permissions, user: userId},
       team: teamId,
     } = eventJson;
     const isLocalTeam = this.team().id === teamId;
