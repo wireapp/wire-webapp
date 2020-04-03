@@ -42,7 +42,7 @@ export class ClientMismatchHandler {
    */
   async onClientMismatch(eventInfoEntity, clientMismatch, payload) {
     const {deleted, missing, redundant} = clientMismatch;
-    // Note: Broadcast messages don't have a conversation ID in the event info
+    // Note: Broadcast messages have an empty conversation ID
     const conversationEntity =
       eventInfoEntity.conversationId !== ''
         ? await this.conversationRepository.get_conversation_by_id(eventInfoEntity.conversationId)
