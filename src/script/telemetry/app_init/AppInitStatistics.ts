@@ -23,9 +23,11 @@ import {getLogger, Logger} from 'Util/Logger';
 import {AppInitStatisticsValue} from './AppInitStatisticsValue';
 import {WebAppEvents} from '../../event/WebApp';
 
+type Statistics = Partial<Record<AppInitStatisticsValue, string | number>>;
+
 export class AppInitStatistics {
   private readonly logger: Logger;
-  private readonly statistics: Record<AppInitStatisticsValue, string | number>;
+  private readonly statistics: Statistics;
 
   static get CONFIG() {
     return {
@@ -36,6 +38,7 @@ export class AppInitStatistics {
 
   constructor() {
     this.logger = getLogger('AppInitStatistics');
+    this.statistics = {};
     amplify.subscribe(WebAppEvents.TELEMETRY.BACKEND_REQUESTS, this.update_backend_requests.bind(this));
   }
 
@@ -49,7 +52,7 @@ export class AppInitStatistics {
     }
   }
 
-  get(): Record<AppInitStatisticsValue, string | number> {
+  get(): Statistics {
     return {...this.statistics};
   }
 

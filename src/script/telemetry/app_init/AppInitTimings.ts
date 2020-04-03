@@ -22,8 +22,10 @@ import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {AppInitTimingsStep} from './AppInitTimingsStep';
 
+type Timings = Partial<Record<AppInitTimingsStep, number>>;
+
 export class AppInitTimings {
-  private readonly timings: Record<AppInitTimingsStep, number>;
+  private readonly timings: Timings;
   private readonly init: number;
   private readonly logger: Logger;
 
@@ -38,9 +40,10 @@ export class AppInitTimings {
   constructor() {
     this.logger = getLogger('AppInitTimings');
     this.init = window.performance.now();
+    this.timings = {};
   }
 
-  get(): Record<AppInitTimingsStep, number> {
+  get(): Timings {
     return {...this.timings};
   }
 
