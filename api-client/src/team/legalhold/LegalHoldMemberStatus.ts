@@ -26,7 +26,9 @@ export enum LegalHoldMemberStatus {
 }
 
 export interface LegalHoldEnabledMemberData {
-  client_id: string;
+  client: {
+    id: string;
+  };
   last_prekey: PreKey;
   status: LegalHoldMemberStatus.ENABLED | LegalHoldMemberStatus.PENDING;
 }
