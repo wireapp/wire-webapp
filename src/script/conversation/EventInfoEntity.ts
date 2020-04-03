@@ -38,7 +38,7 @@ export interface MessageSendingOptions {
 
 export class EventInfoEntity {
   options: MessageSendingOptions;
-  private readonly genericMessage: GenericMessage;
+  public readonly genericMessage: GenericMessage;
   private type?: GENERIC_MESSAGE_TYPE;
   public readonly conversationId: string;
   public timestamp?: number;

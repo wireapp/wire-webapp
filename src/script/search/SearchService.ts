@@ -27,7 +27,8 @@ export class SearchService {
     this.apiClient = apiClient;
   }
 
-  getContacts(query: string, numberOfRequestedUser: number): Promise<SearchResult> {
-    return this.apiClient.user.api.getSearchContacts(query, numberOfRequestedUser);
+  async getContacts(query: string, numberOfRequestedUser: number): Promise<SearchResult> {
+    const request = await this.apiClient.user.api.getSearchContacts(query, numberOfRequestedUser);
+    return (await request.response).data;
   }
 }
