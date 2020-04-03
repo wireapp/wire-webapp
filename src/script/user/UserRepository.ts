@@ -89,9 +89,9 @@ export class UserRepository {
   private readonly logger: Logger;
   private readonly propertyRepository: PropertiesRepository;
   private readonly selfService: SelfService;
-  teamMembers: ko.ObservableArray<User> | ko.PureComputed<User[]>;
+  teamMembers: ko.PureComputed<User[]>;
   /** Note: this does not include the self user */
-  teamUsers: ko.ObservableArray<User> | ko.PureComputed<User[]>;
+  teamUsers: ko.PureComputed<User[]>;
   private readonly user_mapper: UserMapper;
   private readonly user_service: UserService;
   private readonly users: ko.ObservableArray<User>;
@@ -155,8 +155,8 @@ export class UserRepository {
     this.isTemporaryGuest = ko.pureComputed(() => this.self()?.isTemporaryGuest());
 
     this.isTeam = ko.observable();
-    this.teamMembers = undefined;
-    this.teamUsers = undefined;
+    this.teamMembers = ko.pureComputed((): User[] => []);
+    this.teamUsers = ko.pureComputed((): User[] => []);
 
     this.number_of_contacts = ko.pureComputed(() => {
       const contacts = this.isTeam() ? this.teamUsers() : this.connected_users();
