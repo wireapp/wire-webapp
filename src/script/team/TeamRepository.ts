@@ -52,6 +52,7 @@ import {ROLE as TEAM_ROLE} from '../user/UserPermission';
 import {UserRepository} from '../user/UserRepository';
 import {EventRepository} from '../event/EventRepository';
 import {TeamMemberEntity} from './TeamMemberEntity';
+import {ServiceEntity} from '../integration/ServiceEntity';
 
 export interface AccountInfo {
   accentID: number;
@@ -126,23 +127,24 @@ export class TeamRepository {
     amplify.subscribe(WebAppEvents.TEAM.UPDATE_INFO, this.sendAccountInfo.bind(this));
   }
 
-  getRoleBadge = (userId: string) => {
+  getRoleBadge = (userId: string): string => {
     return this.isExternal(userId) ? t('rolePartner') : '';
   };
-  isExternal = (userId: string) => {
+
+  isExternal = (userId: string): boolean => {
     return this.memberRoles()[userId] === ROLE.PARTNER;
   };
 
-  isSelfConnectedTo = (userId: string) => {
+  isSelfConnectedTo = (userId: string): boolean => {
     return this.memberRoles()[userId] !== ROLE.PARTNER || this.memberInviters()[userId] === this.selfUser().id;
   };
 
-  scheduleFetchTeamInfo = () => {
+  scheduleFetchTeamInfo = (): void => {
     this.getTeam();
     setTimeout(this.scheduleFetchTeamInfo, TIME_IN_MILLIS.DAY);
   };
 
-  getTeam = async () => {
+  getTeam = async (): Promise<TeamEntity> => {
     const teamData = this.selfUser().teamId ? await this.getTeamById() : await this.getBindingTeam();
 
     if (teamData) {
@@ -176,7 +178,7 @@ export class TeamRepository {
     return this.teamService.getTeamConversationRoles(this.team().id);
   }
 
-  getWhitelistedServices(teamId: string) {
+  getWhitelistedServices(teamId: string): Promise<ServiceEntity[]> {
     return this.teamService.getWhitelistedServices(teamId).then(({services: servicesData}) => {
       return IntegrationMapper.mapServicesFromArray(servicesData);
     });
