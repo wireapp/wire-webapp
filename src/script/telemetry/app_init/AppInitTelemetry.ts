@@ -22,8 +22,8 @@ import {amplify} from 'amplify';
 import {getLogger, Logger} from 'Util/Logger';
 import {Environment} from 'Util/Environment';
 
-import {AppInitStatistics} from './AppInitStatistics';
-import {AppInitTimings} from './AppInitTimings';
+import {AppInitStatistics, AppStatistics} from './AppInitStatistics';
+import {AppInitTimings, AppTimings} from './AppInitTimings';
 import {WebAppEvents} from '../../event/WebApp';
 import {EventName} from '../../tracking/EventName';
 import {AppInitStatisticsValue} from './AppInitStatisticsValue';
@@ -44,11 +44,11 @@ export class AppInitTelemetry {
     this.statistics.add(statistic, value, bucket_size);
   }
 
-  get_statistics(): Record<AppInitStatisticsValue, string | number> {
+  get_statistics(): AppStatistics {
     return this.statistics.get();
   }
 
-  get_timings(): Record<AppInitTimingsStep, number> {
+  get_timings(): AppTimings {
     return this.timings.get();
   }
 
