@@ -46,9 +46,14 @@ describe('ConversationRoleRepository', () => {
 
   describe('loadTeamRoles', () => {
     it('initializes all team roles', async () => {
-      spyOn<any>(testFactory.team_repository, 'getTeamConversationRoles').and.returnValue(
+      spyOn(testFactory.team_repository, 'getTeamConversationRoles').and.returnValue(
         Promise.resolve({
-          conversation_roles: ['my-custom-role'],
+          conversation_roles: [
+            {
+              actions: [Permissions.leaveConversation],
+              conversation_role: DefaultRole.WIRE_MEMBER,
+            },
+          ],
         }),
       );
 
