@@ -45,8 +45,6 @@ export enum Permissions {
   leaveConversation = 'leave_conversation',
 }
 
-export type ConversationRoles = ConversationRole[];
-
 const defaultAdminRole: ConversationRole = {
   actions: [
     Permissions.renameConversation,
@@ -68,7 +66,7 @@ const defaultMemberRole: ConversationRole = {
 };
 
 export class ConversationRoleRepository {
-  readonly conversationRoles: Record<string, ConversationRoles>;
+  readonly conversationRoles: Record<string, ConversationRole[]>;
   readonly conversationService: ConversationService;
   readonly isTeam: ko.PureComputed<boolean>;
   readonly logger: Logger;
@@ -99,7 +97,7 @@ export class ConversationRoleRepository {
     }
   };
 
-  setConversationRoles = (conversation: Conversation, newRoles: ConversationRoles): void => {
+  setConversationRoles = (conversation: Conversation, newRoles: ConversationRole[]): void => {
     this.conversationRoles[conversation.id] = newRoles;
   };
 
@@ -140,7 +138,7 @@ export class ConversationRoleRepository {
     return this.isUserGroupAdmin(conversation, this.selfUser());
   };
 
-  getConversationRoles = (conversation: Conversation): ConversationRoles => {
+  getConversationRoles = (conversation: Conversation): ConversationRole[] => {
     if (this.isTeam() && this.team()?.id === conversation.team_id) {
       return this.teamRoles;
     }
