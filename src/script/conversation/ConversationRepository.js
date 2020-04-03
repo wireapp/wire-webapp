@@ -459,12 +459,15 @@ export class ConversationRepository {
 
         return conversationEntity;
       })
-      .catch(({code}) => {
-        if (code === BackendClientError.STATUS_CODE.NOT_FOUND) {
+      .catch(originalError => {
+        if (originalError.code === BackendClientError.STATUS_CODE.NOT_FOUND) {
           this.deleteConversationLocally(conversationId);
         }
-        const error = new z.error.ConversationError(z.error.ConversationError.TYPE.CONVERSATION_NOT_FOUND);
-
+        const error = new z.error.ConversationError(
+          z.error.ConversationError.TYPE.CONVERSATION_NOT_FOUND,
+          z.error.ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
+          originalError,
+        );
         this.fetching_conversations[conversationId].forEach(({reject_fn}) => reject_fn(error));
         delete this.fetching_conversations[conversationId];
 
