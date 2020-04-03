@@ -42,7 +42,11 @@ export class ClientMismatchHandler {
    */
   async onClientMismatch(eventInfoEntity, clientMismatch, payload) {
     const {deleted, missing, redundant} = clientMismatch;
-    const conversationEntity = await this.conversationRepository.get_conversation_by_id(eventInfoEntity.conversationId);
+    // Note: Broadcast messages don't have a conversation ID in the event info
+    const conversationEntity =
+      eventInfoEntity.conversationId !== ''
+        ? await this.conversationRepository.get_conversation_by_id(eventInfoEntity.conversationId)
+        : undefined;
     this._handleRedundant(redundant, payload, conversationEntity);
     this._handleDeleted(deleted, payload, conversationEntity);
     return this._handleMissing(missing, payload, conversationEntity, eventInfoEntity);
@@ -56,7 +60,7 @@ export class ClientMismatchHandler {
    *
    * @param {UserClients} recipients User client map containing redundant clients
    * @param {NewOTRMessage} payload Payload of the request
-   * @param {Conversation} conversationEntity Conversation entity
+   * @param {Conversation} [conversationEntity] Conversation entity
    * @returns {void} Resolves when the payload got updated
    */
   async _handleDeleted(recipients, payload, conversationEntity) {
@@ -77,7 +81,7 @@ export class ClientMismatchHandler {
    * @private
    * @param {UserClients} recipients User client map containing redundant clients
    * @param {NewOTRMessage} payload Payload of the request
-   * @param {Conversation} conversationEntity Conversation entity
+   * @param {Conversation} [conversationEntity] Conversation entity
    * @param {EventInfoEntity} eventInfoEntity Info about event
    * @returns {Promise<NewOTRMessage>} Resolves with the updated payload
    */
@@ -91,11 +95,14 @@ export class ClientMismatchHandler {
     this.logger.debug(`Message is missing clients of '${missingUserIds.length}' users`, recipients);
 
     const {genericMessage, timestamp} = eventInfoEntity;
-    const knownUserIds = conversationEntity.participating_user_ids();
-    const unknownUserIds = getDifference(knownUserIds, missingUserIds);
 
-    if (unknownUserIds.length > 0) {
-      this.conversationRepository.addMissingMember(conversationEntity, unknownUserIds, timestamp - 1);
+    if (conversationEntity !== undefined) {
+      const knownUserIds = conversationEntity.participating_user_ids();
+      const unknownUserIds = getDifference(knownUserIds, missingUserIds);
+
+      if (unknownUserIds.length > 0) {
+        this.conversationRepository.addMissingMember(conversationEntity, unknownUserIds, timestamp - 1);
+      }
     }
 
     const newPayload = await this.cryptographyRepository.encryptGenericMessage(recipients, genericMessage, payload);
@@ -124,7 +131,7 @@ export class ClientMismatchHandler {
    *
    * @param {UserClients} recipients User client map containing redundant clients
    * @param {NewOTRMessage} payload Payload of the request
-   * @param {Conversation} conversationEntity Conversation entity
+   * @param {Conversation} [conversationEntity] Conversation entity
    * @returns {void} Resolves when the payload got updated
    */
   _handleRedundant(recipients, payload, conversationEntity) {
@@ -142,7 +149,7 @@ export class ClientMismatchHandler {
    * @private
    * @param {UserClients} recipients User client map
    * @param {Function} clientFn Function to remove clients
-   * @param {Conversation} conversationEntity Conversation entity
+   * @param {Conversation} [conversationEntity] Conversation entity
    * @param {NewOTRMessage} payload Initial payload resulting in a 412
    * @returns {Array} Function array
    */
@@ -154,11 +161,13 @@ export class ClientMismatchHandler {
       const noRemainingClients = !clientIdsOfUser.length;
 
       if (noRemainingClients) {
-        const isGroupConversation = conversationEntity.isGroup();
-        if (isGroupConversation) {
-          const timestamp = this.serverTimeHandler.toServerTimestamp();
-          const event = EventBuilder.buildMemberLeave(conversationEntity, userId, false, timestamp);
-          this.eventRepository.injectEvent(event);
+        if (conversationEntity !== undefined) {
+          const isGroupConversation = conversationEntity.isGroup();
+          if (isGroupConversation) {
+            const timestamp = this.serverTimeHandler.toServerTimestamp();
+            const event = EventBuilder.buildMemberLeave(conversationEntity, userId, false, timestamp);
+            this.eventRepository.injectEvent(event);
+          }
         }
 
         delete payload.recipients[userId];
