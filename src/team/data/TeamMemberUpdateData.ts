@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2019 Wire Swiss GmbH
+ * Copyright (C) 2020 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,9 +17,9 @@
  *
  */
 
-export * from './TeamConversationCreateData';
-export * from './TeamConversationDeleteData';
-export * from './TeamMemberJoinData';
-export * from './TeamMemberLeaveData';
-export * from './TeamMemberUpdateData';
-export * from './TeamUpdateData';
+import {PermissionsData} from '../member/PermissionsData';
+
+export interface TeamMemberUpdateData {
+  permissions: PermissionsData;
+  user: string;
+}
