@@ -17,13 +17,14 @@
  *
  */
 
+import {ConversationRole} from '@wireapp/api-client/dist/conversation/ConversationRole';
 import {createRandomUuid} from 'Util/util';
 
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 import {TeamEntity} from '../team/TeamEntity';
 import {TestFactory} from '../../../test/helper/TestFactory';
-import {ConversationRoleRepository, ConversationRoles, DefaultRole, Permissions} from './ConversationRoleRepository';
+import {ConversationRoleRepository, DefaultRole, Permissions} from './ConversationRoleRepository';
 
 describe('ConversationRoleRepository', () => {
   const testFactory = new TestFactory();
@@ -47,7 +48,12 @@ describe('ConversationRoleRepository', () => {
     it('initializes all team roles', async () => {
       spyOn(testFactory.team_repository, 'getTeamConversationRoles').and.returnValue(
         Promise.resolve({
-          conversation_roles: ['my-custom-role'],
+          conversation_roles: [
+            {
+              actions: [Permissions.leaveConversation],
+              conversation_role: DefaultRole.WIRE_MEMBER,
+            },
+          ],
         }),
       );
 
@@ -60,7 +66,7 @@ describe('ConversationRoleRepository', () => {
 
   describe('setConversationRoles', () => {
     it('sets conversation roles', async () => {
-      const newRoles: ConversationRoles = [
+      const newRoles: ConversationRole[] = [
         {
           actions: [Permissions.leaveConversation],
           conversation_role: DefaultRole.WIRE_MEMBER,
