@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [10.1.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@10.1.0...@wireapp/api-client@10.1.1) (2020-04-03)
+
+
+### Bug Fixes
+
+* **api-client:** Fix Legal Hold status ([#2919](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2919)) ([90e1c4f](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/90e1c4ff006794830fc2af2fb923c9f3228689b3))
+
+
+
+
+
 # [10.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@10.0.2...@wireapp/api-client@10.1.0) (2020-04-03)
 
 
