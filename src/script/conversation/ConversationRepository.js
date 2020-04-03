@@ -1327,12 +1327,10 @@ export class ConversationRepository {
       .catch(error => this._handleAddToConversationError(error, conversationEntity, userIds));
   }
 
-  addMissingMember(conversationId, userIds, timestamp) {
-    return this.get_conversation_by_id(conversationId).then(conversationEntity => {
-      const [sender] = userIds;
-      const event = z.conversation.EventBuilder.buildMemberJoin(conversationEntity, sender, userIds, timestamp);
-      return this.eventRepository.injectEvent(event, EventRepository.SOURCE.INJECTED);
-    });
+  addMissingMember(conversationEntity, userIds, timestamp) {
+    const [sender] = userIds;
+    const event = z.conversation.EventBuilder.buildMemberJoin(conversationEntity, sender, userIds, timestamp);
+    return this.eventRepository.injectEvent(event, EventRepository.SOURCE.INJECTED);
   }
 
   /**
@@ -3224,7 +3222,7 @@ export class ConversationRepository {
         this.logger.warn(message, eventJson);
 
         const timestamp = new Date(time).getTime() - 1;
-        return this.addMissingMember(conversationEntity.id, [sender], timestamp).then(() => conversationEntity);
+        return this.addMissingMember(conversationEntity, [sender], timestamp).then(() => conversationEntity);
       }
     }
 

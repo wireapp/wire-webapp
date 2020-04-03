@@ -112,7 +112,7 @@ describe('ClientMismatchHandler', () => {
         .onClientMismatch(eventInfoEntity, clientMismatch, payload)
         .then(() => {
           expect(testFactory.conversation_repository.addMissingMember).toHaveBeenCalledWith(
-            conversationId,
+            conversationEntity,
             [unknownUserId],
             timestamp - 1,
           );
