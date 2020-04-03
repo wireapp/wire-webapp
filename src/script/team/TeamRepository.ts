@@ -343,7 +343,8 @@ export class TeamRepository {
     }
   }
 
-  private async onMemberUpdate(eventJson: any /*TODO*/): Promise<void> {
+  // TODO: add type once https://github.com/wireapp/wire-web-packages/pull/2917 is merged
+  private async onMemberUpdate(eventJson: any): Promise<void> {
     const {
       data: {user: userId},
       permissions,
