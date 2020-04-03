@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@10.0.2...@wireapp/api-client@10.1.0) (2020-04-03)
+
+
+### Features
+
+* **api-client:** Add TeamMemberUpdateData ([#2917](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2917)) ([66b8475](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/66b8475ae2278e2d4c2b99040a0ee529603d4743))
+
+
+
+
+
 ## [10.0.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@10.0.1...@wireapp/api-client@10.0.2) (2020-04-02)
 
 
