@@ -122,7 +122,8 @@ export class LegalHoldModalViewModel {
       if (response.status === LegalHoldMemberStatus.PENDING) {
         fingerprint = await this.cryptographyRepository.getRemoteFingerprint(
           selfUser.id,
-          response.client_id,
+          // TODO: remove `any` once @wireapp/core >= 16.0.4 is used
+          (response as any).client.id,
           response.last_prekey,
         );
         selfUser.hasPendingLegalHold(true);
