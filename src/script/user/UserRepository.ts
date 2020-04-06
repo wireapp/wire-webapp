@@ -28,7 +28,7 @@ import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
 import {sortUsersByPriority} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {createRandomUuid, koArrayPushAll, loadUrlBlob} from 'Util/util';
+import {createRandomUuid, loadUrlBlob} from 'Util/util';
 
 import {UNSPLASH_URL} from '../externalRoute';
 
