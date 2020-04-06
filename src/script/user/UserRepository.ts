@@ -678,7 +678,7 @@ export class UserRepository {
    */
   save_users(user_ets: User[]): User[] {
     const newUsers = user_ets.filter(user_et => !this.findUserById(user_et.id));
-    koArrayPushAll(this.users, newUsers);
+    this.users.push(...newUsers);
     return user_ets;
   }
 
