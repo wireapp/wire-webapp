@@ -24,7 +24,6 @@ import {debounce} from 'underscore';
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
-import {koArrayPushAll, koArrayUnshiftAll} from 'Util/util';
 import {truncate} from 'Util/StringUtil';
 
 import {Config} from '../Config';
@@ -497,7 +496,7 @@ export class Conversation {
     }
     const messageIds = message_ets.map(({id}) => id);
     this.incomingMessages.remove(({id}) => messageIds.includes(id));
-    koArrayPushAll(this.messages_unordered, message_ets);
+    this.messages_unordered.push(...message_ets);
   }
 
   getFirstUnreadSelfMention() {
@@ -553,7 +552,7 @@ export class Conversation {
   prepend_messages(message_ets) {
     message_ets = message_ets.map(message_et => this._checkForDuplicate(message_et)).filter(message_et => message_et);
 
-    koArrayUnshiftAll(this.messages_unordered, message_ets);
+    this.messages_unordered.unshift(...message_ets);
   }
 
   /**

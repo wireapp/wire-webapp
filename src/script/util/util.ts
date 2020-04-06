@@ -283,30 +283,13 @@ export const alias = {
   animationend: 'transitionend animationend oAnimationEnd MSAnimationEnd mozAnimationEnd webkitAnimationEnd',
 };
 
-export const koArrayPushAll = (koArray: ObservableArray, valuesToPush: any[]) => {
-  // append array to knockout observableArray
-  // https://github.com/knockout/knockout/issues/416
-  const underlyingArray = koArray();
-  koArray.valueWillMutate();
-  ko.utils.arrayPushAll(underlyingArray, valuesToPush);
-  koArray.valueHasMutated();
-};
-
-export const koArrayUnshiftAll = (koArray: ObservableArray, valuesToShift: any[]) => {
-  // prepend array to knockout observableArray
-  const underlyingArray = koArray();
-  koArray.valueWillMutate();
-  Array.prototype.unshift.apply(underlyingArray, valuesToShift);
-  koArray.valueHasMutated();
-};
-
 export const koPushDeferred = (target: ObservableArray, src: any[], number = 100, delay = 300) => {
   // push array deferred to knockout observableArray
   let interval: number;
 
   return (interval = window.setInterval(() => {
     const chunk = src.splice(0, number);
-    koArrayPushAll(target, chunk);
+    target.push(...chunk);
 
     if (src.length === 0) {
       return window.clearInterval(interval);

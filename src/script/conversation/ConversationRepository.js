@@ -45,7 +45,7 @@ import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {PromiseQueue} from 'Util/PromiseQueue';
 import {Declension, joinNames, t} from 'Util/LocalizerUtil';
 import {getDifference, getNextItem} from 'Util/ArrayUtil';
-import {arrayToBase64, createRandomUuid, koArrayPushAll, loadUrlBlob, sortGroupsByLastEvent} from 'Util/util';
+import {arrayToBase64, createRandomUuid, loadUrlBlob, sortGroupsByLastEvent} from 'Util/util';
 import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
 import {
   capitalizeFirstChar,
@@ -1263,7 +1263,7 @@ export class ConversationRepository {
    * @returns {undefined} No return value
    */
   save_conversations(conversationEntities) {
-    koArrayPushAll(this.conversations, conversationEntities);
+    this.conversations.push(...conversationEntities);
   }
 
   /**

@@ -25,7 +25,6 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 
 import {Logger, getLogger} from 'Util/Logger';
-import {koArrayPushAll} from 'Util/util';
 
 import {Conversation} from '../entity/Conversation';
 import {MemberMessage} from '../entity/message/MemberMessage';
@@ -270,7 +269,7 @@ export class ConnectionRepository {
           throw new window.z.error.ConnectionError(BaseError.TYPE.INVALID_PARAMETER);
         }
 
-        koArrayPushAll(this.connectionEntities, connectionEntities);
+        this.connectionEntities.push(...connectionEntities);
 
         return this.userRepository.updateUsersFromConnections(connectionEntities);
       })
