@@ -409,6 +409,7 @@ class App {
       await conversationRepository.conversationRoleRepository.loadTeamRoles();
 
       await userRepository.loadUsers();
+      // load member data for connected users
       const notificationsCount = await eventRepository.initializeFromStream();
 
       telemetry.time_step(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
