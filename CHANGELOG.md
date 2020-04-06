@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.0.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@10.2.0...@wireapp/api-client@11.0.0) (2020-04-06)
+
+
+### Code Refactoring
+
+* **api-client:** Improved search cancellation (BREAKING) ([#2928](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2928)) ([1796271](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/17962715497d34b8bf3309a7171c07609d0ca2f4))
+
+
+### BREAKING CHANGES
+
+* **api-client:** Hide search cancel request error handling and throw `RequestCancellationError` & return `SearchResult` directly
+
+
+
+
+
 # [10.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@10.1.1...@wireapp/api-client@10.2.0) (2020-04-03)
 
 
