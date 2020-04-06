@@ -23,7 +23,7 @@ import {ArrayUtil} from '@wireapp/commons';
 import {ClientPreKey, PreKeyBundle} from '../auth/';
 import {PublicClient} from '../client/';
 import {UserClients} from '../conversation/UserClients';
-import {HttpClient, RequestCancelable} from '../http/';
+import {HttpClient, RequestCancelable, SyntheticErrorLabel} from '../http/';
 import {
   Activate,
   ActivationResponse,
@@ -38,6 +38,7 @@ import {
   VerifyDelete,
 } from '../user/';
 import {RichInfo} from './RichInfo';
+import {RequestCancellationError} from './UserError';
 
 export class UserAPI {
   public static readonly DEFAULT_USERS_CHUNK_SIZE = 50;
@@ -232,9 +233,21 @@ export class UserAPI {
       config.params.size = limit;
     }
 
+    const handleRequest = async () => {
+      try {
+        const response = await this.client.sendJSON<SearchResult>(config);
+        return response.data;
+      } catch (error) {
+        if (error.message === SyntheticErrorLabel.REQUEST_CANCELLED) {
+          throw new RequestCancellationError('Search request got cancelled');
+        }
+        throw error;
+      }
+    };
+
     return {
-      cancel: cancelSource.cancel,
-      response: this.client.sendJSON<SearchResult>(config),
+      cancel: () => cancelSource.cancel(SyntheticErrorLabel.REQUEST_CANCELLED),
+      response: handleRequest(),
     };
   }
 
