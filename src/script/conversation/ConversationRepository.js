@@ -459,12 +459,15 @@ export class ConversationRepository {
 
         return conversationEntity;
       })
-      .catch(({code}) => {
-        if (code === BackendClientError.STATUS_CODE.NOT_FOUND) {
+      .catch(originalError => {
+        if (originalError.code === BackendClientError.STATUS_CODE.NOT_FOUND) {
           this.deleteConversationLocally(conversationId);
         }
-        const error = new z.error.ConversationError(z.error.ConversationError.TYPE.CONVERSATION_NOT_FOUND);
-
+        const error = new z.error.ConversationError(
+          z.error.ConversationError.TYPE.CONVERSATION_NOT_FOUND,
+          z.error.ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
+          originalError,
+        );
         this.fetching_conversations[conversationId].forEach(({reject_fn}) => reject_fn(error));
         delete this.fetching_conversations[conversationId];
 
@@ -1327,12 +1330,10 @@ export class ConversationRepository {
       .catch(error => this._handleAddToConversationError(error, conversationEntity, userIds));
   }
 
-  addMissingMember(conversationId, userIds, timestamp) {
-    return this.get_conversation_by_id(conversationId).then(conversationEntity => {
-      const [sender] = userIds;
-      const event = z.conversation.EventBuilder.buildMemberJoin(conversationEntity, sender, userIds, timestamp);
-      return this.eventRepository.injectEvent(event, EventRepository.SOURCE.INJECTED);
-    });
+  addMissingMember(conversationEntity, userIds, timestamp) {
+    const [sender] = userIds;
+    const event = z.conversation.EventBuilder.buildMemberJoin(conversationEntity, sender, userIds, timestamp);
+    return this.eventRepository.injectEvent(event, EventRepository.SOURCE.INJECTED);
   }
 
   /**
@@ -3224,7 +3225,7 @@ export class ConversationRepository {
         this.logger.warn(message, eventJson);
 
         const timestamp = new Date(time).getTime() - 1;
-        return this.addMissingMember(conversationEntity.id, [sender], timestamp).then(() => conversationEntity);
+        return this.addMissingMember(conversationEntity, [sender], timestamp).then(() => conversationEntity);
       }
     }
 

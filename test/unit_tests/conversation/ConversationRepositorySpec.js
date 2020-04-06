@@ -700,7 +700,7 @@ describe('ConversationRepository', () => {
 
       return testFactory.conversation_repository._handleConversationEvent(event).then(() => {
         expect(testFactory.conversation_repository.addMissingMember).toHaveBeenCalledWith(
-          event.conversation,
+          conversationEntity,
           [event.from],
           new Date(event.time).getTime() - 1,
         );
@@ -1479,9 +1479,11 @@ describe('ConversationRepository', () => {
       spyOn(testFactory.conversation_repository, 'get_conversation_by_id').and.returnValue(Promise.resolve({}));
       spyOn(z.conversation.EventBuilder, 'buildMemberJoin').and.returnValue(event);
 
-      return testFactory.conversation_repository.addMissingMember(conversationId, ['unknown-user-id']).then(() => {
-        expect(testFactory.event_repository.injectEvent).toHaveBeenCalledWith(event, EventRepository.SOURCE.INJECTED);
-      });
+      return testFactory.conversation_repository
+        .addMissingMember({id: conversationId}, ['unknown-user-id'])
+        .then(() => {
+          expect(testFactory.event_repository.injectEvent).toHaveBeenCalledWith(event, EventRepository.SOURCE.INJECTED);
+        });
     });
   });
 

@@ -18,7 +18,7 @@
  */
 
 import {APIClient} from '@wireapp/api-client';
-import {UserClients} from '@wireapp/api-client/dist/conversation';
+import {ClientMismatch, NewOTRMessage} from '@wireapp/api-client/dist/conversation';
 
 export class BroadcastService {
   private readonly apiClient: APIClient;
@@ -34,12 +34,9 @@ export class BroadcastService {
    *
    * @param payload Payload to be posted
    * @param preconditionOption Level that backend checks for missing clients
-   * @returnsPromise that resolves when the message was sent
+   * @returns Promise that resolves when the message was sent
    */
-  postBroadcastMessage(
-    payload: {recipients: {}; sender: string},
-    preconditionOption: string[] | boolean,
-  ): Promise<UserClients> {
+  postBroadcastMessage(payload: NewOTRMessage, preconditionOption: string[] | boolean): Promise<ClientMismatch> {
     return this.apiClient.broadcast.api.postBroadcastMessage(payload.sender, payload, {
       ignore_missing: preconditionOption === true ? true : undefined,
       report_missing: Array.isArray(preconditionOption) ? preconditionOption.join(',') : undefined,

@@ -35,7 +35,7 @@ export const chunk = <T>(array: T[] | Float32Array, size: number) => {
 export const getDifference = <T>(array1: T[] = [], array2: T[] = []): T[] =>
   array2.filter(element => !array1.includes(element));
 
-export const getNextItem = <T>(array: T[], currentItem: T) => {
+export const getNextItem = <T>(array: T[], currentItem: T): T | undefined => {
   const currentIndex = array.indexOf(currentItem);
 
   // couldn't find the item

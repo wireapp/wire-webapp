@@ -18,6 +18,7 @@
  */
 
 import ko from 'knockout';
+import {ConversationRole} from '@wireapp/api-client/dist/conversation/ConversationRole';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {Conversation} from '../entity/Conversation';
@@ -44,13 +45,6 @@ export enum Permissions {
   leaveConversation = 'leave_conversation',
 }
 
-export interface ConversationRole {
-  actions: Permissions[];
-  conversation_role: string;
-}
-
-export type ConversationRoles = ConversationRole[];
-
 const defaultAdminRole: ConversationRole = {
   actions: [
     Permissions.renameConversation,
@@ -72,14 +66,14 @@ const defaultMemberRole: ConversationRole = {
 };
 
 export class ConversationRoleRepository {
-  readonly conversationRoles: Record<string, ConversationRoles>;
+  readonly conversationRoles: Record<string, ConversationRole[]>;
   readonly conversationService: ConversationService;
   readonly isTeam: ko.PureComputed<boolean>;
   readonly logger: Logger;
   readonly selfUser: ko.Observable<User>;
   readonly team: ko.Observable<TeamEntity>;
   readonly teamRepository: TeamRepository;
-  teamRoles: ConversationRoles;
+  teamRoles: ConversationRole[];
 
   constructor(conversationRepository: ConversationRepository) {
     this.conversationRoles = {};
@@ -103,7 +97,7 @@ export class ConversationRoleRepository {
     }
   };
 
-  setConversationRoles = (conversation: Conversation, newRoles: ConversationRoles): void => {
+  setConversationRoles = (conversation: Conversation, newRoles: ConversationRole[]): void => {
     this.conversationRoles[conversation.id] = newRoles;
   };
 
@@ -144,7 +138,7 @@ export class ConversationRoleRepository {
     return this.isUserGroupAdmin(conversation, this.selfUser());
   };
 
-  getConversationRoles = (conversation: Conversation): ConversationRoles => {
+  getConversationRoles = (conversation: Conversation): ConversationRole[] => {
     if (this.isTeam() && this.team()?.id === conversation.team_id) {
       return this.teamRoles;
     }
