@@ -122,6 +122,7 @@ import {ConnectionService} from '../connection/ConnectionService';
 import {TeamService} from '../team/TeamService';
 import {SearchService} from '../search/SearchService';
 import {CryptographyService} from '../cryptography/CryptographyService';
+import {AccessTokenError} from '../error/AccessTokenError';
 
 function doRedirect(signOutReason) {
   let url = `/auth/${location.search}`;
@@ -508,17 +509,14 @@ class App {
       `App reload: '${isReload}', Document referrer: '${document.referrer}', Location: '${window.location.href}'`,
     );
     if (isReload) {
-      const isSessionExpired = [
-        z.error.AccessTokenError.TYPE.REQUEST_FORBIDDEN,
-        z.error.AccessTokenError.TYPE.NOT_FOUND_IN_CACHE,
-      ];
+      const isSessionExpired = [AccessTokenError.TYPE.REQUEST_FORBIDDEN, AccessTokenError.TYPE.NOT_FOUND_IN_CACHE];
 
       if (isSessionExpired.includes(type)) {
         this.logger.warn(`Session expired on page reload: ${message}`, error);
         return this._redirectToLogin(SIGN_OUT_REASON.SESSION_EXPIRED);
       }
 
-      const isAccessTokenError = error instanceof z.error.AccessTokenError;
+      const isAccessTokenError = error instanceof AccessTokenError;
       const isInvalidClient = type === z.error.ClientError.TYPE.NO_VALID_CLIENT;
 
       if (isInvalidClient) {
@@ -536,9 +534,9 @@ class App {
 
     if (navigator.onLine) {
       switch (type) {
-        case z.error.AccessTokenError.TYPE.NOT_FOUND_IN_CACHE:
-        case z.error.AccessTokenError.TYPE.RETRIES_EXCEEDED:
-        case z.error.AccessTokenError.TYPE.REQUEST_FORBIDDEN: {
+        case AccessTokenError.TYPE.NOT_FOUND_IN_CACHE:
+        case AccessTokenError.TYPE.RETRIES_EXCEEDED:
+        case AccessTokenError.TYPE.REQUEST_FORBIDDEN: {
           this.logger.warn(`Redirecting to login: ${error.message}`, error);
           return this._redirectToLogin(SIGN_OUT_REASON.NOT_SIGNED_IN);
         }
@@ -546,7 +544,7 @@ class App {
         default: {
           this.logger.error(`Caused by: ${(error ? error.message : undefined) || error}`, error);
 
-          const isAccessTokenError = error instanceof z.error.AccessTokenError;
+          const isAccessTokenError = error instanceof AccessTokenError;
           if (isAccessTokenError) {
             this.logger.error(`Could not get access token: ${error.message}. Logging out user.`, error);
           } else {

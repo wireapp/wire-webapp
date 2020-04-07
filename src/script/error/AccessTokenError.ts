@@ -19,15 +19,20 @@
 
 import {BaseError} from './BaseError';
 
-window.z = window.z || {};
-window.z.error = z.error || {};
+enum ACCESS_TOKEN_ERROR_TYPE {
+  NOT_FOUND_IN_CACHE = 'NOT_FOUND_IN_CACHE',
+  REQUEST_FAILED = 'REQUEST_FAILED',
+  REQUEST_FORBIDDEN = 'REQUEST_FORBIDDEN',
+  RETRIES_EXCEEDED = 'RETRIES_EXCEEDED',
+}
 
-z.error.AccessTokenError = class AccessTokenError extends BaseError {
-  constructor(type, message) {
+export class AccessTokenError extends BaseError {
+  constructor(type: ACCESS_TOKEN_ERROR_TYPE, message: string) {
+    message = message || AccessTokenError.MESSAGE[type];
     super('AccessTokenError', type, message);
   }
 
-  static get MESSAGE() {
+  static get MESSAGE(): Record<ACCESS_TOKEN_ERROR_TYPE, string> {
     return {
       NOT_FOUND_IN_CACHE: 'No cached access token found in Local Storage',
       REQUEST_FAILED: 'Exceeded allowed number of retries to get Access Token',
@@ -36,12 +41,12 @@ z.error.AccessTokenError = class AccessTokenError extends BaseError {
     };
   }
 
-  static get TYPE() {
+  static get TYPE(): Record<ACCESS_TOKEN_ERROR_TYPE, ACCESS_TOKEN_ERROR_TYPE> {
     return {
-      NOT_FOUND_IN_CACHE: 'NOT_FOUND_IN_CACHE',
-      REQUEST_FAILED: 'REQUEST_FAILED',
-      REQUEST_FORBIDDEN: 'REQUEST_FORBIDDEN',
-      RETRIES_EXCEEDED: 'RETRIES_EXCEEDED',
+      NOT_FOUND_IN_CACHE: ACCESS_TOKEN_ERROR_TYPE.NOT_FOUND_IN_CACHE,
+      REQUEST_FAILED: ACCESS_TOKEN_ERROR_TYPE.REQUEST_FAILED,
+      REQUEST_FORBIDDEN: ACCESS_TOKEN_ERROR_TYPE.REQUEST_FORBIDDEN,
+      RETRIES_EXCEEDED: ACCESS_TOKEN_ERROR_TYPE.RETRIES_EXCEEDED,
     };
   }
-};
+}
