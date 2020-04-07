@@ -5,7 +5,7 @@
     "@wireapp/commons": "3.3.9",
     "@wireapp/core": "16.0.5",
     "@wireapp/protocol-messaging": "1.25.4",
-    "@wireapp/react-ui-kit": "7.26.9",
+    "@wireapp/react-ui-kit": "7.26.15",
     "@wireapp/store-engine-dexie": "1.2.11",
     "@wireapp/store-engine-sqleet": "1.2.15",
     "@wireapp/webapp-events": "0.1.1",
