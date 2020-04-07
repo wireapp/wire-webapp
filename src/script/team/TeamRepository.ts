@@ -142,7 +142,13 @@ export class TeamRepository {
 
   scheduleFetchTeamInfo = async (): Promise<void> => {
     await this.getTeam();
-    setTimeout(this.scheduleFetchTeamInfo, TIME_IN_MILLIS.DAY);
+    window.setTimeout(async () => {
+      try {
+        await this.scheduleFetchTeamInfo();
+      } catch (error) {
+        this.logger.error(error);
+      }
+    }, TIME_IN_MILLIS.DAY);
   };
 
   getTeam = async (): Promise<TeamEntity> => {
