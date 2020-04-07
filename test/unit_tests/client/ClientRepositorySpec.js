@@ -24,6 +24,7 @@ import {ClientRepository} from 'src/script/client/ClientRepository';
 import {ClientType} from 'src/script/client/ClientType';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {ClientMapper} from 'src/script/client/ClientMapper';
+import {ClientError} from 'src/script/error/ClientError.js';
 import {TestFactory} from '../../helper/TestFactory';
 
 describe('ClientRepository', () => {
@@ -110,8 +111,8 @@ describe('ClientRepository', () => {
         .getValidLocalClient()
         .then(fail)
         .catch(error => {
-          expect(error).toEqual(jasmine.any(z.error.ClientError));
-          expect(error.type).toBe(z.error.ClientError.TYPE.NO_VALID_CLIENT);
+          expect(error).toEqual(jasmine.any(ClientError));
+          expect(error.type).toBe(ClientError.TYPE.NO_VALID_CLIENT);
         });
     });
 
@@ -127,8 +128,8 @@ describe('ClientRepository', () => {
         .getValidLocalClient()
         .then(fail)
         .catch(error => {
-          expect(error).toEqual(jasmine.any(z.error.ClientError));
-          expect(error.type).toBe(z.error.ClientError.TYPE.NO_VALID_CLIENT);
+          expect(error).toEqual(jasmine.any(ClientError));
+          expect(error.type).toBe(ClientError.TYPE.NO_VALID_CLIENT);
         });
     });
 
@@ -142,7 +143,7 @@ describe('ClientRepository', () => {
         .then(done.fail)
         .catch(error => {
           expect(error).toEqual(jasmine.any(Error));
-          expect(error.type).toBe(z.error.ClientError.TYPE.DATABASE_FAILURE);
+          expect(error.type).toBe(ClientError.TYPE.DATABASE_FAILURE);
           done();
         });
     });
@@ -159,13 +160,13 @@ describe('ClientRepository', () => {
     it('throws an error if missing user ID', () => {
       const functionCall = () => testFactory.client_repository.constructPrimaryKey(undefined, clientId);
 
-      expect(functionCall).toThrowError(z.error.ClientError, z.error.ClientError.MESSAGE.NO_USER_ID);
+      expect(functionCall).toThrowError(ClientError, ClientError.MESSAGE.NO_USER_ID);
     });
 
-    it('throws and error if missing client ID', () => {
+    it('throws an error if missing client ID', () => {
       const functionCall = () => testFactory.client_repository.constructPrimaryKey(userId, undefined);
 
-      expect(functionCall).toThrowError(z.error.ClientError, z.error.ClientError.MESSAGE.NO_CLIENT_ID);
+      expect(functionCall).toThrowError(ClientError, ClientError.MESSAGE.NO_CLIENT_ID);
     });
   });
 
@@ -203,7 +204,7 @@ describe('ClientRepository', () => {
       testFactory.client_repository.__test__assignEnvironment(Environment);
       const functionCall = () => testFactory.client_repository.isCurrentClientPermanent();
 
-      expect(functionCall).toThrowError(z.error.ClientError, z.error.ClientError.MESSAGE.CLIENT_NOT_SET);
+      expect(functionCall).toThrowError(ClientError, ClientError.MESSAGE.CLIENT_NOT_SET);
     });
 
     it('returns true if current client is permanent', () => {
@@ -227,7 +228,7 @@ describe('ClientRepository', () => {
     it('throws an error if no current client', () => {
       const functionCall = () => testFactory.client_repository.isCurrentClientPermanent();
 
-      expect(functionCall).toThrowError(z.error.ClientError, z.error.ClientError.MESSAGE.CLIENT_NOT_SET);
+      expect(functionCall).toThrowError(ClientError, ClientError.MESSAGE.CLIENT_NOT_SET);
     });
   });
 
@@ -265,21 +266,21 @@ describe('ClientRepository', () => {
     it('throws an error if current client is not set', () => {
       const functionCall = () => testFactory.client_repository.isCurrentClient(userId, clientId);
 
-      expect(functionCall).toThrowError(z.error.ClientError, z.error.ClientError.MESSAGE.CLIENT_NOT_SET);
+      expect(functionCall).toThrowError(ClientError, ClientError.MESSAGE.CLIENT_NOT_SET);
     });
 
     it('throws an error if client ID is not specified', () => {
       testFactory.client_repository.currentClient(new ClientEntity());
       const functionCall = () => testFactory.client_repository.isCurrentClient(userId);
 
-      expect(functionCall).toThrowError(z.error.ClientError, z.error.ClientError.MESSAGE.NO_CLIENT_ID);
+      expect(functionCall).toThrowError(ClientError, ClientError.MESSAGE.NO_CLIENT_ID);
     });
 
     it('throws an error if user ID is not specified', () => {
       testFactory.client_repository.currentClient(new ClientEntity());
       const functionCall = () => testFactory.client_repository.isCurrentClient(undefined, clientId);
 
-      expect(functionCall).toThrowError(z.error.ClientError, z.error.ClientError.MESSAGE.NO_USER_ID);
+      expect(functionCall).toThrowError(ClientError, ClientError.MESSAGE.NO_USER_ID);
     });
   });
 });

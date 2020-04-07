@@ -123,6 +123,7 @@ import {TeamService} from '../team/TeamService';
 import {SearchService} from '../search/SearchService';
 import {CryptographyService} from '../cryptography/CryptographyService';
 import {AccessTokenError} from '../error/AccessTokenError';
+import {ClientError} from '../error/ClientError';
 
 function doRedirect(signOutReason) {
   let url = `/auth/${location.search}`;
@@ -517,7 +518,7 @@ class App {
       }
 
       const isAccessTokenError = error instanceof AccessTokenError;
-      const isInvalidClient = type === z.error.ClientError.TYPE.NO_VALID_CLIENT;
+      const isInvalidClient = type === ClientError.TYPE.NO_VALID_CLIENT;
 
       if (isInvalidClient) {
         return this._redirectToLogin(SIGN_OUT_REASON.SESSION_EXPIRED);
@@ -762,7 +763,7 @@ class App {
       try {
         keepPermanentDatabase = this.repository.client.isCurrentClientPermanent() && !clearData;
       } catch (error) {
-        if (error.type === z.error.ClientError.TYPE.CLIENT_NOT_SET) {
+        if (error.type === ClientError.TYPE.CLIENT_NOT_SET) {
           keepPermanentDatabase = false;
         }
       }

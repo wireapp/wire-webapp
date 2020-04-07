@@ -44,6 +44,7 @@ import {UserClientAddEvent, UserClientRemoveEvent} from '@wireapp/api-client/dis
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {User} from '../entity/User';
 import {BackendClientError} from '../error/BackendClientError';
+import {ClientError} from '../error/ClientError';
 
 export class ClientRepository {
   readonly clientService: ClientService;
@@ -137,7 +138,7 @@ export class ClientRepository {
       const clientNotFoundBackend = status === BackendClientError.STATUS_CODE.NOT_FOUND;
       if (clientNotFoundBackend) {
         this.logger.warn(`Local client '${clientId}' no longer exists on the backend`, error);
-        throw new z.error.ClientError(z.error.ClientError.TYPE.NO_VALID_CLIENT);
+        throw new ClientError(ClientError.TYPE.NO_VALID_CLIENT);
       }
 
       throw error;
@@ -152,12 +153,12 @@ export class ClientRepository {
     return this.clientService
       .loadClientFromDb(ClientRepository.PRIMARY_KEY_CURRENT_CLIENT)
       .catch(() => {
-        throw new z.error.ClientError(z.error.ClientError.TYPE.DATABASE_FAILURE);
+        throw new ClientError(ClientError.TYPE.DATABASE_FAILURE);
       })
       .then(clientPayload => {
         if (typeof clientPayload === 'string') {
           this.logger.info('No local client found in database');
-          throw new z.error.ClientError(z.error.ClientError.TYPE.NO_VALID_CLIENT);
+          throw new ClientError(ClientError.TYPE.NO_VALID_CLIENT);
         }
 
         const currentClient = ClientMapper.mapClient(clientPayload, true);
@@ -176,10 +177,10 @@ export class ClientRepository {
    */
   private constructPrimaryKey(userId: string, clientId: string): string {
     if (!userId) {
-      throw new z.error.ClientError(z.error.ClientError.TYPE.NO_USER_ID);
+      throw new ClientError(ClientError.TYPE.NO_USER_ID);
     }
     if (!clientId) {
-      throw new z.error.ClientError(z.error.ClientError.TYPE.NO_CLIENT_ID);
+      throw new ClientError(ClientError.TYPE.NO_CLIENT_ID);
     }
     return `${userId}@${clientId}`;
   }
@@ -291,7 +292,7 @@ export class ClientRepository {
         return this.currentClient;
       })
       .catch(error => {
-        const clientNotValidated = error.type === z.error.ClientError.TYPE.NO_VALID_CLIENT;
+        const clientNotValidated = error.type === ClientError.TYPE.NO_VALID_CLIENT;
         if (!clientNotValidated) {
           this.logger.error(`Getting valid local client failed: ${error.code || error.message}`, error);
         }
@@ -317,10 +318,10 @@ export class ClientRepository {
       .catch(error => {
         const tooManyClients = error.label === BackendClientError.LABEL.TOO_MANY_CLIENTS;
         if (tooManyClients) {
-          throw new z.error.ClientError(z.error.ClientError.TYPE.TOO_MANY_CLIENTS);
+          throw new ClientError(ClientError.TYPE.TOO_MANY_CLIENTS);
         }
         this.logger.error(`Client registration request failed: ${error.message}`, error);
-        throw new z.error.ClientError(z.error.ClientError.TYPE.REQUEST_FAILURE);
+        throw new ClientError(ClientError.TYPE.REQUEST_FAILURE);
       })
       .then(response => {
         const {cookie, id, type} = response;
@@ -330,13 +331,13 @@ export class ClientRepository {
         return this.saveCurrentClientInDb(response);
       })
       .catch(error => {
-        const handledErrors = [z.error.ClientError.TYPE.REQUEST_FAILURE, z.error.ClientError.TYPE.TOO_MANY_CLIENTS];
+        const handledErrors = [ClientError.TYPE.REQUEST_FAILURE, ClientError.TYPE.TOO_MANY_CLIENTS];
 
         if (handledErrors.includes(error.type)) {
           throw error;
         }
         this.logger.error(`Failed to save client: ${error.message}`, error);
-        throw new z.error.ClientError(z.error.ClientError.TYPE.DATABASE_FAILURE);
+        throw new ClientError(ClientError.TYPE.DATABASE_FAILURE);
       })
       .then(clientPayload => this.transferCookieLabel(clientType, clientPayload.cookie))
       .then(() => this.currentClient)
@@ -554,7 +555,7 @@ export class ClientRepository {
    */
   isCurrentClientPermanent(): boolean {
     if (!this.currentClient()) {
-      throw new z.error.ClientError(z.error.ClientError.TYPE.CLIENT_NOT_SET);
+      throw new ClientError(ClientError.TYPE.CLIENT_NOT_SET);
     }
     return Environment.electron || this.currentClient().isPermanent();
   }
@@ -667,13 +668,13 @@ export class ClientRepository {
    */
   private isCurrentClient(userId: string, clientId: string): boolean {
     if (!this.currentClient()) {
-      throw new z.error.ClientError(z.error.ClientError.TYPE.CLIENT_NOT_SET);
+      throw new ClientError(ClientError.TYPE.CLIENT_NOT_SET);
     }
     if (!userId) {
-      throw new z.error.ClientError(z.error.ClientError.TYPE.NO_USER_ID);
+      throw new ClientError(ClientError.TYPE.NO_USER_ID);
     }
     if (!clientId) {
-      throw new z.error.ClientError(z.error.ClientError.TYPE.NO_CLIENT_ID);
+      throw new ClientError(ClientError.TYPE.NO_CLIENT_ID);
     }
     return userId === this.selfUser().id && clientId === this.currentClient().id;
   }
