@@ -21,6 +21,7 @@ import {debounce} from 'underscore';
 
 import {getLogger} from 'Util/Logger';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
+import {partition} from 'Util/ArrayUtil';
 
 import {UserlistMode} from 'Components/userList';
 
@@ -335,7 +336,7 @@ class StartUIViewModel {
     this.services.removeAll();
   }
 
-  _searchPeople(query) {
+  async _searchPeople(query) {
     const normalizedQuery = SearchRepository.normalizeQuery(query);
     if (normalizedQuery) {
       this.showMatches(false);
@@ -343,17 +344,6 @@ class StartUIViewModel {
       // Contacts, groups and others
       const trimmedQuery = query.trim();
       const isHandle = trimmedQuery.startsWith('@') && validateHandle(normalizedQuery);
-      if (!this.showOnlyConnectedUsers()) {
-        this.searchRepository
-          .search_by_name(normalizedQuery, isHandle)
-          .then(userEntities => {
-            const isCurrentQuery = normalizedQuery === SearchRepository.normalizeQuery(this.searchInput());
-            if (isCurrentQuery) {
-              this.searchResults.others(userEntities);
-            }
-          })
-          .catch(error => this.logger.error(`Error searching for contacts: ${error.message}`, error));
-      }
 
       const allLocalUsers = this.isTeam() ? this.teamRepository.teamUsers() : this.userRepository.connected_users();
 
@@ -377,6 +367,28 @@ class StartUIViewModel {
       this.searchResults.contacts(filteredResults);
 
       this.searchResults.groups(this.conversationRepository.getGroupsByName(normalizedQuery, isHandle));
+
+      if (!this.showOnlyConnectedUsers()) {
+        try {
+          const userEntities = await this.searchRepository.search_by_name(normalizedQuery, isHandle);
+
+          const isCurrentQuery = normalizedQuery === SearchRepository.normalizeQuery(this.searchInput());
+          if (isCurrentQuery) {
+            if (this.selfUser().inTeam()) {
+              const selfTeamId = this.selfUser().teamId;
+              const [contacts, others] = partition(userEntities, user => user.teamId === selfTeamId);
+              const knownContactIds = this.searchResults.contacts().map(({id}) => id);
+              const newContacts = contacts.filter(({id}) => !knownContactIds.includes(id));
+              this.searchResults.contacts.push(...newContacts);
+              this.searchResults.others(others);
+            } else {
+              this.searchResults.others(userEntities);
+            }
+          }
+        } catch (error) {
+          this.logger.error(`Error searching for contacts: ${error.message}`, error);
+        }
+      }
     }
   }
 

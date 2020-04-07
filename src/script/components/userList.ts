@@ -19,6 +19,8 @@
 
 import ko from 'knockout';
 
+import {partition} from 'Util/ArrayUtil';
+
 import {ConversationRepository} from '../conversation/ConversationRepository';
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
@@ -175,7 +177,7 @@ ko.components.register('user-list', {
     };
 
     // Filter all list items if a filter is provided
-    this.filteredUserEntities = ko.pureComputed(() => {
+    this.filteredUserEntities = ko.pureComputed(async () => {
       const connectedUsers = conversationRepository.connectedUsers();
       let resultUsers: User[] = userEntities();
       const normalizedQuery = SearchRepository.normalizeQuery(filter());
@@ -205,8 +207,7 @@ ko.components.register('user-list', {
       }
 
       // make sure the self user is the first one in the list
-      const selfUser = resultUsers.filter(user => user.isMe);
-      const otherUsers = resultUsers.filter(user => !user.isMe);
+      const [selfUser, otherUsers] = partition(resultUsers, user => user.isMe);
       return selfUser.concat(otherUsers);
     });
 
