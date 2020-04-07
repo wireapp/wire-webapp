@@ -149,7 +149,7 @@ describe('ArrayUtil', () => {
   });
 
   describe('partition', () => {
-    it('returns a correctly partioned array', () => {
+    it('returns a correctly partitioned array', () => {
       const array = [3, 6, 5, 1, 2, 4];
       const isOdd = input => input % 2 === 1;
       const isLessThanTen = input => input < 10;
