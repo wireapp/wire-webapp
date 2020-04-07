@@ -35,39 +35,13 @@ To login with your existing Wire account use: http://localhost:8080/auth/?env=pr
 
 ### Testing
 
-To launch the full test suite (types check + linting + server tests + app tests), simply run
+To launch the full test suite (types check + linting + server tests + app tests), simply run:
 
 `yarn test`
 
-Alternatively, you can run specific parts of the app:
+Alternatively, you can test specific parts of the app:
 
-`yarn test:(server|types|auth|app)`
-
-Since the test suite for the app is the biggest test suite, you might want to run a single test file, in which case, you can use the `--specs` option:
-
-`yarn test:app --specs spec1[,spec2...]`
-
-where `specN` is the path to the spec to run relative to `test/unit_tests` and without `Spec.js`.
-
-#### Speed up testing for files fully migrated to the module system
-
-When a file (and all its dependencies) does not rely on **any** global dependency (i.e. `window.z.util`), then you can use the `--nolegacy` flag to run the tests on that single file:
-
-`yarn test:app --specs spec1 --nolegacy`
-
-The test should start very quickly (webpack won't have to resolve all the global dependencies).
-
-If the test doesn't run with the `nolegacy` option (but runs without), it means it's depending on at least one dependency from the global `window` namespace.
-
-**Example**
-
-If you want to run the tests for the `ConversationRepository`, the file containing the test is:
-
-`test/unit_tests/conversation/ConversationRepositorySpec.js`
-
-The command to run is:
-
-`yarn test:app --specs conversation/ConversationRepository`
+`yarn test:(server|types|app)`
 
 ### Deployment
 
