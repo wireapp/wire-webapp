@@ -17,8 +17,6 @@
  *
  */
 
-import ko from 'knockout';
-
 import {
   createRandomUuid,
   arrayToMd5Base64,
@@ -27,8 +25,6 @@ import {
   formatBytes,
   getFileExtension,
   trimFileExtension,
-  koArrayPushAll,
-  koArrayUnshiftAll,
   base64ToArray,
   stripDataUri,
   phoneNumberToE164,
@@ -139,24 +135,6 @@ describe('trimFileExtension', () => {
 
   it('returns an empty string for an object', () => {
     expect(trimFileExtension({})).toEqual('');
-  });
-});
-
-describe('koArrayPushAll', () => {
-  it('appends multiple items', () => {
-    const actual = ko.observableArray([1, 2]);
-    koArrayPushAll(actual, [3, 4]);
-
-    expect(actual()).toEqual([1, 2, 3, 4]);
-  });
-});
-
-describe('koArrayUnshiftAll', () => {
-  it('prepends multiple items', () => {
-    const actual = ko.observableArray([3, 4]);
-    koArrayUnshiftAll(actual, [1, 2]);
-
-    expect(actual()).toEqual([1, 2, 3, 4]);
   });
 });
 

@@ -20,7 +20,6 @@
 import {getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {t} from 'Util/LocalizerUtil';
-import {koArrayPushAll} from 'Util/util';
 
 import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
 import {AssetUploadFailedReason} from '../assets/AssetUploadFailedReason';
@@ -237,7 +236,7 @@ export class EventRepository {
   _handleBufferedNotifications() {
     this.logger.info(`Received '${this.webSocketBuffer.length}' notifications via WebSocket while handling stream`);
     if (this.webSocketBuffer.length) {
-      koArrayPushAll(this.notificationsQueue, this.webSocketBuffer);
+      this.notificationsQueue.push(...this.webSocketBuffer);
       this.webSocketBuffer.length = 0;
     }
   }
@@ -264,7 +263,7 @@ export class EventRepository {
           notificationId = notifications[notifications.length - 1].id;
 
           this.logger.info(`Added '${notifications.length}' notifications to the queue`);
-          koArrayPushAll(this.notificationsQueue, notifications);
+          this.notificationsQueue.push(...notifications);
 
           if (!this.notificationsPromises) {
             this.notificationsPromises = [resolve, reject];
