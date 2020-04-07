@@ -1057,7 +1057,7 @@ export class ConversationRepository {
    * @param {string} message_id Message ID
    * @returns {Promise} Resolves with `true` if message is marked as read
    */
-  isMessage_read(conversation_id, message_id) {
+  isMessageRead(conversation_id, message_id) {
     if (!conversation_id || !message_id) {
       return Promise.resolve(false);
     }

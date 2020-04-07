@@ -240,7 +240,7 @@ export class NotificationRepository {
       const {conversationId, messageId, messageType} = notification.data || {};
 
       if (messageId) {
-        this.conversationRepository.isMessage_read(conversationId, messageId).then(isRead => {
+        this.conversationRepository.isMessageRead(conversationId, messageId).then(isRead => {
           if (isRead) {
             notification.close();
             const messageInfo = messageId
