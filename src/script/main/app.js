@@ -405,7 +405,7 @@ class App {
       this._subscribeToUnloadEvents();
 
       await this.getTeam();
-      await teamRepository.scheduleFetchTeamInfo();
+      teamRepository.scheduleFetchTeamInfo();
 
       await conversationRepository.conversationRoleRepository.loadTeamRoles();
 
