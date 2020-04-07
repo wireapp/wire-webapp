@@ -19,15 +19,20 @@
 
 import {BaseError} from './BaseError';
 
-window.z = window.z || {};
-window.z.error = z.error || {};
+enum AUTH_ERROR_TYPE {
+  COOKIES_DISABLED = 'COOKIES_DISABLED',
+  INDEXED_DB_UNSUPPORTED = 'INDEXED_DB_UNSUPPORTED',
+  MULTIPLE_TABS = 'MULTIPLE_TABS',
+  PRIVATE_MODE = 'PRIVATE_MODE',
+}
 
-z.error.AuthError = class AuthError extends BaseError {
-  constructor(type, message) {
+export class AuthError extends BaseError {
+  constructor(type: AUTH_ERROR_TYPE, message?: string) {
+    message = message || AuthError.MESSAGE[type];
     super('AuthError', type, message);
   }
 
-  static get MESSAGE() {
+  static get MESSAGE(): Record<AUTH_ERROR_TYPE, string> {
     return {
       COOKIES_DISABLED: 'Cookies are disabled',
       INDEXED_DB_UNSUPPORTED: 'IndexedDB is not supported',
@@ -36,12 +41,12 @@ z.error.AuthError = class AuthError extends BaseError {
     };
   }
 
-  static get TYPE() {
+  static get TYPE(): Record<AUTH_ERROR_TYPE, AUTH_ERROR_TYPE> {
     return {
-      COOKIES_DISABLED: 'COOKIES_DISABLED',
-      INDEXED_DB_UNSUPPORTED: 'INDEXED_DB_UNSUPPORTED',
-      MULTIPLE_TABS: 'MULTIPLE_TABS',
-      PRIVATE_MODE: 'PRIVATE_MODE',
+      COOKIES_DISABLED: AUTH_ERROR_TYPE.COOKIES_DISABLED,
+      INDEXED_DB_UNSUPPORTED: AUTH_ERROR_TYPE.INDEXED_DB_UNSUPPORTED,
+      MULTIPLE_TABS: AUTH_ERROR_TYPE.MULTIPLE_TABS,
+      PRIVATE_MODE: AUTH_ERROR_TYPE.PRIVATE_MODE,
     };
   }
-};
+}

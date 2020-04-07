@@ -124,6 +124,7 @@ import {SearchService} from '../search/SearchService';
 import {CryptographyService} from '../cryptography/CryptographyService';
 import {AccessTokenError} from '../error/AccessTokenError';
 import {ClientError} from '../error/ClientError';
+import {AuthError} from '../error/AuthError';
 
 function doRedirect(signOutReason) {
   let url = `/auth/${location.search}`;
@@ -499,9 +500,9 @@ class App {
     this.logger.warn(`${logMessage}: ${error.message}`, {error});
 
     const {message, type} = error;
-    const isAuthError = error instanceof z.error.AuthError;
+    const isAuthError = error instanceof AuthError;
     if (isAuthError) {
-      const isTypeMultipleTabs = type === z.error.AuthError.TYPE.MULTIPLE_TABS;
+      const isTypeMultipleTabs = type === AuthError.TYPE.MULTIPLE_TABS;
       const signOutReason = isTypeMultipleTabs ? SIGN_OUT_REASON.MULTIPLE_TABS : SIGN_OUT_REASON.INDEXED_DB;
       return this._redirectToLogin(signOutReason);
     }
@@ -652,7 +653,7 @@ class App {
     if (this.singleInstanceHandler.registerInstance(instanceId)) {
       return this._registerSingleInstanceCleaning();
     }
-    throw new z.error.AuthError(z.error.AuthError.TYPE.MULTIPLE_TABS);
+    throw new AuthError(AuthError.TYPE.MULTIPLE_TABS);
   }
 
   _registerSingleInstanceCleaning() {
