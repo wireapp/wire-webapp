@@ -19,15 +19,19 @@
 
 import {BaseError} from './BaseError';
 
-window.z = window.z || {};
-window.z.error = z.error || {};
+enum CONNECT_ERROR_TYPE {
+  NOT_SUPPORTED = 'NOT_SUPPORTED',
+  NO_CONTACTS = 'NO_CONTACTS',
+  UPLOAD = 'UPLOAD',
+}
 
-z.error.ConnectError = class ConnectError extends BaseError {
-  constructor(type, message) {
+export class ConnectError extends BaseError {
+  constructor(type: CONNECT_ERROR_TYPE, message?: string) {
+    message = message || ConnectError.MESSAGE[type];
     super('ConnectError', type, message);
   }
 
-  static get MESSAGE() {
+  static get MESSAGE(): Record<CONNECT_ERROR_TYPE, string> {
     return {
       NOT_SUPPORTED: 'Source not supported',
       NO_CONTACTS: 'No contacts found for matching',
@@ -35,11 +39,11 @@ z.error.ConnectError = class ConnectError extends BaseError {
     };
   }
 
-  static get TYPE() {
+  static get TYPE(): Record<CONNECT_ERROR_TYPE, CONNECT_ERROR_TYPE> {
     return {
-      NOT_SUPPORTED: 'NOT_SUPPORTED',
-      NO_CONTACTS: 'NO_CONTACTS',
-      UPLOAD: 'UPLOAD',
+      NOT_SUPPORTED: CONNECT_ERROR_TYPE.NOT_SUPPORTED,
+      NO_CONTACTS: CONNECT_ERROR_TYPE.NO_CONTACTS,
+      UPLOAD: CONNECT_ERROR_TYPE.UPLOAD,
     };
   }
-};
+}
