@@ -13213,10 +13213,10 @@ uuid@^3.3.2:
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.3.3.tgz#4568f0216e78760ee1dbf3a4d2cf53e224112866"
   integrity sha512-pW0No1RGHgzlpHJO1nsVrHKpOEIxkGg1xB+v0ZmdNH5OAeAwzAVrCnI2/6Mtx+Uys6iaylxa+D3g4j63IKKjSQ==
 
-uuidjs@4.2.4:
-  version "4.2.4"
-  resolved "https://registry.yarnpkg.com/uuidjs/-/uuidjs-4.2.4.tgz#b91edb0a25d44cd0a5c62a87b6f544eac7dd2463"
-  integrity sha512-K+9HBgqJ9wI8bZ3ESKR9kc1ePfNjtlq1t1C6c3EOBPK2TQ39Uw5oF4RnkePHlbFVpo+rKJPXrA42L26rfRNuhQ==
+uuidjs@4.2.5:
+  version "4.2.5"
+  resolved "https://registry.yarnpkg.com/uuidjs/-/uuidjs-4.2.5.tgz#a80439ece05dfe6ed875a5d62de0820046055713"
+  integrity sha512-0utbJ3L/C/AUv8cRAfFnUC7XhvRvaQaGNPbrroBeXF26BWfYT6aD8/n5UQ4ic3bpkJfVd2W15yQS+YCwvQxtXA==
 
 v8-compile-cache@2.0.3:
   version "2.0.3"
