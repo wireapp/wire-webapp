@@ -180,9 +180,6 @@
   },
   "license": "GPL-3.0",
   "lint-staged": {
-    "src/script/**/*.{js,ts,tsx}": [
-      "cspell"
-    ],
     "*.less": [
       "prettier --write",
       "stylelint --fix"
