@@ -117,7 +117,7 @@ class Auth extends Component {
   }
 }
 
-window.onload = function() {
+window.onload = function () {
   const config = {
     urls: BACKEND_ENV,
   };
