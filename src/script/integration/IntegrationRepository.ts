@@ -36,6 +36,7 @@ import {IntegrationMapper} from './IntegrationMapper';
 import {IntegrationService} from './IntegrationService';
 import {ServiceEntity} from './ServiceEntity';
 import {ServiceTag} from './ServiceTag';
+import {ConversationError} from '../error/ConversationError';
 
 export class IntegrationRepository {
   private readonly conversationRepository: ConversationRepository;
@@ -143,7 +144,7 @@ export class IntegrationRepository {
           return this.addService(conversationEntity, serviceEntity, 'start_ui').then(() => conversationEntity);
         }
 
-        throw new z.error.ConversationError(z.error.ConversationError.TYPE.CONVERSATION_NOT_FOUND);
+        throw new ConversationError(ConversationError.TYPE.CONVERSATION_NOT_FOUND);
       })
       .catch(error => {
         amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
