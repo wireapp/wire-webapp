@@ -55,7 +55,7 @@ const selectConfiguration = () => {
 const configurationEntry = `wire-web-config-default-${selectConfiguration()}`;
 const repositoryUrl = appConfigPkg.dependencies[configurationEntry];
 
-console.log('repo url', repositoryUrl);
+console.log('Repo URL', repositoryUrl);
 
 module.exports = {
   files: {

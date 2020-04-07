@@ -101,6 +101,8 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
       const noStatusSet = this.availability() === Availability.Type.NONE;
       if (noStatusSet) {
+        // TODO: fix typo in translation string
+        /* cspell:disable-next-line */
         label = t('preferencesAccountAvaibilityUnset');
       }
 

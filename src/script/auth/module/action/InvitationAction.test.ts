@@ -52,7 +52,7 @@ describe('InvitationAction', () => {
   });
 
   it('handles failed invite by email', async () => {
-    const error = new Error('testerror');
+    const error = new Error('test error');
     const email = 'mail@mail.com';
     const mockedActions = {};
     const mockedApiClient = {

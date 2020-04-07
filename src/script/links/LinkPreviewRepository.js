@@ -44,7 +44,7 @@ class LinkPreviewRepository {
   }
 
   /**
-   * Searches for url in given string and creates a link preview.
+   * Searches for URL in given string and creates a link preview.
    *
    * @note This will already upload the associated image as asset
    * @param {string} string Input text to generate preview for

@@ -60,7 +60,7 @@ const buildMetadataAudio = (audioFile: File | Blob): Promise<Asset.AudioMetaData
     })
     .then(audioBuffer => {
       const durationInMillis = audioBuffer.duration * TIME_IN_MILLIS.SECOND;
-      const normalizedLoudness = normaliseLoudness(audioBuffer);
+      const normalizedLoudness = normalizeLoudness(audioBuffer);
       return new Asset.AudioMetaData({durationInMillis, normalizedLoudness});
     });
 };
@@ -141,7 +141,7 @@ const isVideo = (file: File | Blob): boolean => {
   return file?.type.startsWith('video');
 };
 
-const normaliseLoudness = (audioBuffer: AudioBuffer): Uint8Array => {
+const normalizeLoudness = (audioBuffer: AudioBuffer): Uint8Array => {
   const MAX_SAMPLES = 200;
   const AMPLIFIER = 700; // in favour of iterating all samples before we interpolate them
   const channel = audioBuffer.getChannelData(0);

@@ -29,7 +29,7 @@ import {MessageHasher} from '../../message/MessageHasher';
 export class QuotedMessageMiddleware {
   /**
    * Construct a new QuotedMessageMiddleware.
-   * This class is reponsible for parsing incoming text messages that contains quoted messages.
+   * This class is responsible for parsing incoming text messages that contains quoted messages.
    * It will handle validating the quote and adding metadata to the event.
    *
    * @param {EventService} eventService Repository that handles events

@@ -71,7 +71,7 @@ export class BroadcastRepository {
      * But this will create a cyclic dependency that we need to resolve first.
      * As of now, the cyclic dependency would go like this:
      *   - ConversationRepo needs UserRepository
-     *   - UserRepostory needs BroadcastRepository
+     *   - UserRepository needs BroadcastRepository
      *   - BroadcastRepository needs ConversationRepository
      *
      * Needing the ConversationRepository in the BroadcastRepository doesn't make sense. We need to get rid of that dependency

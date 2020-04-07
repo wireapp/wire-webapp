@@ -767,7 +767,7 @@ export class EventRepository {
 
   _handleAssetUpdate(originalEvent, newEvent) {
     const newEventData = newEvent.data;
-    // the preview status is not sent by the client so we fake a 'preview' status in order to cleany handle it in the switch statement
+    // the preview status is not sent by the client so we fake a 'preview' status in order to cleanly handle it in the switch statement
     const ASSET_PREVIEW = 'preview';
     const isPreviewEvent = !newEventData.status && newEventData.preview_key;
     const status = isPreviewEvent ? ASSET_PREVIEW : newEventData.status;
