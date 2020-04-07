@@ -137,12 +137,7 @@ export const CodeInput = ({
     const pastedValue = event.clipboardData.getData('Text');
     const cleanedPaste = pastedValue.replace(/[^0-9]/g, '');
     if (/^[0-9]+$/.test(cleanedPaste)) {
-      setValues(
-        values
-          .slice(0, fieldIndex)
-          .concat(cleanedPaste.split(''))
-          .slice(0, digits),
-      );
+      setValues(values.slice(0, fieldIndex).concat(cleanedPaste.split('')).slice(0, digits));
     }
   };
 

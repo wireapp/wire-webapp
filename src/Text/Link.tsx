@@ -33,9 +33,7 @@ export const linkStyle: <T>(theme: Theme, props: LinkProps<T>) => ObjectInterpol
   {bold = true, color = theme.general.color, fontSize = '11px', textTransform = 'uppercase', ...props},
 ) => {
   const darker = 0.16;
-  const hoverColor = Color(color)
-    .mix(Color(COLOR.BLACK), darker)
-    .toString();
+  const hoverColor = Color(color).mix(Color(COLOR.BLACK), darker).toString();
   return {
     ...textStyle(theme, {bold, color, fontSize, textTransform, ...props}),
     '&:hover': {
