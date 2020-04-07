@@ -49,11 +49,11 @@ Alternatively, you can test specific parts of the app:
 
 | Stage | Branch | Action | Environment | Backend |
 | :-: | :-: | :-: | :-: | :-- |
-| 1 (Feature development) | edge | commit | wire-webapp-edge | Staging |
-| 2 (Nightly test automation) | dev | commit or squash merge from edge | wire-webapp-dev | Staging |
-| 3 (Internal release) | dev | tag (format: YYYY-MM-DD-staging.X) | wire-webapp-staging | Production |
-| 4 (RC testing) | master | merge (don't squash) from "dev"; afterwards [generate release notes](#release-notes) | wire-webapp-master | Staging |
-| 5 (Production release) | master | tag (format: YYYY-MM-DD-production.X) | wire-webapp-prod | Production |
+| 1 (Feature development) | edge | commit | [wire-webapp-edge](https://wire-webapp-edge.zinfra.io/) | Staging |
+| 2 (Nightly test automation) | dev | commit or squash merge from edge | [wire-webapp-dev](https://wire-webapp-dev.zinfra.io/) | Staging |
+| 3 (Internal release) | dev | tag (format: YYYY-MM-DD-staging.X) | [wire-webapp-staging](https://wire-webapp-staging.wire.com/) | Production |
+| 4 (RC testing) | master | merge (don't squash) from "dev"; afterwards [generate release notes](#release-notes) | [wire-webapp-master](https://wire-webapp-master.zinfra.io/) | Staging |
+| 5 (Production release) | master | tag (format: YYYY-MM-DD-production.X) | [wire-webapp-prod](https://app.wire.com/) | Production |
 
 #### Staging Bumps for internal releases
 
