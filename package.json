@@ -13,7 +13,7 @@
     "logdown": "3.3.1",
     "reconnecting-websocket": "4.4.0",
     "spark-md5": "3.0.1",
-    "tough-cookie": "3.0.1",
+    "tough-cookie": "4.0.0",
     "ws": "7.2.3"
   },
   "devDependencies": {
