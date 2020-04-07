@@ -19,15 +19,20 @@
 
 import {BaseError} from './BaseError';
 
-window.z = window.z || {};
-window.z.error = z.error || {};
+enum LINK_PREVIEW_ERROR_TYPE {
+  BLACKLISTED = 'BLACKLISTED',
+  NOT_SUPPORTED = 'NOT_SUPPORTED',
+  NO_DATA_AVAILABLE = 'NO_DATA_AVAILABLE',
+  UNSUPPORTED_TYPE = 'UNSUPPORTED_TYPE',
+}
 
-z.error.LinkPreviewError = class LinkPreviewError extends BaseError {
-  constructor(type, message) {
+export class LinkPreviewError extends BaseError {
+  constructor(type: LINK_PREVIEW_ERROR_TYPE, message?: string) {
+    message = message || LinkPreviewError.MESSAGE[type];
     super('LinkPreviewError', type, message);
   }
 
-  static get MESSAGE() {
+  static get MESSAGE(): Record<LINK_PREVIEW_ERROR_TYPE, string> {
     return {
       BLACKLISTED: 'Skipped preview for blacklisted link',
       NOT_SUPPORTED: 'Your client cannot render link previews using Open Graph data.',
@@ -36,12 +41,12 @@ z.error.LinkPreviewError = class LinkPreviewError extends BaseError {
     };
   }
 
-  static get TYPE() {
+  static get TYPE(): Record<LINK_PREVIEW_ERROR_TYPE, LINK_PREVIEW_ERROR_TYPE> {
     return {
-      BLACKLISTED: 'BLACKLISTED',
-      NOT_SUPPORTED: 'NOT_SUPPORTED',
-      NO_DATA_AVAILABLE: 'NO_DATA_AVAILABLE',
-      UNSUPPORTED_TYPE: 'UNSUPPORTED_TYPE',
+      BLACKLISTED: LINK_PREVIEW_ERROR_TYPE.BLACKLISTED,
+      NOT_SUPPORTED: LINK_PREVIEW_ERROR_TYPE.NOT_SUPPORTED,
+      NO_DATA_AVAILABLE: LINK_PREVIEW_ERROR_TYPE.NO_DATA_AVAILABLE,
+      UNSUPPORTED_TYPE: LINK_PREVIEW_ERROR_TYPE.UNSUPPORTED_TYPE,
     };
   }
-};
+}
