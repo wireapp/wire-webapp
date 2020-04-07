@@ -17,21 +17,18 @@
  *
  */
 
-import {isObject} from 'underscore';
-
 import {BaseError} from './BaseError';
 
 export class BackendClientError extends BaseError {
-  constructor(params) {
-    const message = params.message || `${params}`;
+  code: number;
+
+  constructor(code?: number) {
+    const message = `Api error status code: ${code}`;
 
     super('BackendClientError', BackendClientError.TYPE.GENERIC, message);
 
-    if (isObject(params)) {
-      this.code = params.code;
-      this.label = params.label;
-    } else if (typeof params === 'number') {
-      this.code = params;
+    if (code) {
+      this.code = code;
     }
   }
 
@@ -94,7 +91,3 @@ export class BackendClientError extends BaseError {
     };
   }
 }
-
-window.z = window.z || {};
-window.z.error = z.error || {};
-z.error.BackendClientError = BackendClientError;
