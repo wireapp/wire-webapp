@@ -38,16 +38,17 @@ import {EventSource} from './EventSource';
 import {EventValidation} from './EventValidation';
 import {validateEvent} from './EventValidator';
 import {ConversationError} from '../error/ConversationError';
+import {CryptographyError} from '../error/CryptographyError';
 
 export class EventRepository {
   static get CONFIG() {
     return {
       E_CALL_EVENT_LIFETIME: TIME_IN_MILLIS.SECOND * 30,
       IGNORED_ERRORS: [
-        z.error.CryptographyError.TYPE.IGNORED_ASSET,
-        z.error.CryptographyError.TYPE.IGNORED_PREVIEW,
-        z.error.CryptographyError.TYPE.PREVIOUSLY_STORED,
-        z.error.CryptographyError.TYPE.UNHANDLED_TYPE,
+        CryptographyError.TYPE.IGNORED_ASSET,
+        CryptographyError.TYPE.IGNORED_PREVIEW,
+        CryptographyError.TYPE.PREVIOUSLY_STORED,
+        CryptographyError.TYPE.UNHANDLED_TYPE,
         z.error.EventError.TYPE.OUTDATED_E_CALL_EVENT,
         z.error.EventError.TYPE.VALIDATION_FAILED,
       ],

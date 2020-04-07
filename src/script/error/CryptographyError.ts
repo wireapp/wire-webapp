@@ -19,15 +19,23 @@
 
 import {BaseError} from './BaseError';
 
-window.z = window.z || {};
-window.z.error = z.error || {};
+enum CRYPTOGRAPHY_ERROR_TYPE {
+  BROKEN_EXTERNAL = 'BROKEN_EXTERNAL',
+  IGNORED_ASSET = 'IGNORED_ASSET',
+  IGNORED_PREVIEW = 'IGNORED_PREVIEW',
+  NO_DATA_CONTENT = 'NO_DATA_CONTENT',
+  NO_GENERIC_MESSAGE = 'NO_GENERIC_MESSAGE',
+  PREVIOUSLY_STORED = 'PREVIOUSLY_STORED',
+  UNHANDLED_TYPE = 'UNHANDLED_TYPE',
+}
 
-z.error.CryptographyError = class CryptographyError extends BaseError {
-  constructor(type, message) {
+export class CryptographyError extends BaseError {
+  constructor(type: CRYPTOGRAPHY_ERROR_TYPE, message?: string) {
+    message = message || CryptographyError.MESSAGE[type];
     super('CryptographyError', type, message);
   }
 
-  static get MESSAGE() {
+  static get MESSAGE(): Record<CRYPTOGRAPHY_ERROR_TYPE, string> {
     return {
       BROKEN_EXTERNAL: 'Failed to map external message',
       IGNORED_ASSET: 'Ignored asset preview',
@@ -39,15 +47,15 @@ z.error.CryptographyError = class CryptographyError extends BaseError {
     };
   }
 
-  static get TYPE() {
+  static get TYPE(): Record<CRYPTOGRAPHY_ERROR_TYPE, CRYPTOGRAPHY_ERROR_TYPE> {
     return {
-      BROKEN_EXTERNAL: 'BROKEN_EXTERNAL',
-      IGNORED_ASSET: 'IGNORED_ASSET',
-      IGNORED_PREVIEW: 'IGNORED_PREVIEW',
-      NO_DATA_CONTENT: 'NO_DATA_CONTENT',
-      NO_GENERIC_MESSAGE: 'NO_GENERIC_MESSAGE',
-      PREVIOUSLY_STORED: 'PREVIOUSLY_STORED',
-      UNHANDLED_TYPE: 'UNHANDLED_TYPE',
+      BROKEN_EXTERNAL: CRYPTOGRAPHY_ERROR_TYPE.BROKEN_EXTERNAL,
+      IGNORED_ASSET: CRYPTOGRAPHY_ERROR_TYPE.IGNORED_ASSET,
+      IGNORED_PREVIEW: CRYPTOGRAPHY_ERROR_TYPE.IGNORED_PREVIEW,
+      NO_DATA_CONTENT: CRYPTOGRAPHY_ERROR_TYPE.NO_DATA_CONTENT,
+      NO_GENERIC_MESSAGE: CRYPTOGRAPHY_ERROR_TYPE.NO_GENERIC_MESSAGE,
+      PREVIOUSLY_STORED: CRYPTOGRAPHY_ERROR_TYPE.PREVIOUSLY_STORED,
+      UNHANDLED_TYPE: CRYPTOGRAPHY_ERROR_TYPE.UNHANDLED_TYPE,
     };
   }
-};
+}
