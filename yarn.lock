@@ -1359,10 +1359,10 @@
   resolved "https://registry.yarnpkg.com/@types/invariant/-/invariant-2.2.31.tgz#4444c03004f215289dbca3856538434317dd28b2"
   integrity sha512-jMlgg9pIURvy9jgBHCjQp/CyBjYHUwj91etVcDdXkFl2CwTFiQlB+8tcsMeXpXf2PFE5X2pjk4Gm43hQSMHAdA==
 
-"@types/jasmine@3.5.7":
-  version "3.5.7"
-  resolved "https://registry.yarnpkg.com/@types/jasmine/-/jasmine-3.5.7.tgz#c4237935a4b0db31ada6b0de10e2b0658e7b2643"
-  integrity sha512-HoPp5ZafWFXr36yRUOJNuRbvFNklxvN+I9JXfAaZTHBiEw4ZkN4FBnjbV4YHRNNG433ypHP2K+lOeQyRdyuGxQ==
+"@types/jasmine@3.5.10":
+  version "3.5.10"
+  resolved "https://registry.yarnpkg.com/@types/jasmine/-/jasmine-3.5.10.tgz#a1a41012012b5da9d4b205ba9eba58f6cce2ab7b"
+  integrity sha512-3F8qpwBAiVc5+HPJeXJpbrl+XjawGmciN5LgiO7Gv1pl1RHtjoMNqZpqEksaPJW05ViKe8snYInRs6xB25Xdew==
 
 "@types/jquery@3.3.14":
   version "3.3.14"
