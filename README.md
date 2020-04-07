@@ -22,16 +22,15 @@ No license is granted to the Wire trademark and its associated logos, all of whi
 
 ### Installation
 
-1.  Install [Node.js](https://nodejs.org/)
-1.  Install [Yarn](https://yarnpkg.com): `npm install -g yarn`
-1.  Run `yarn`
-1.  Rename `.env.localhost` to `.env` in order to run the app in a local environment
+1. Install [Node.js](https://nodejs.org/)
+1. Install [Yarn](https://yarnpkg.com)
+1. Run `yarn`
+1. Rename `.env.localhost` to `.env` in order to run the app in a local environment
+1. Use a browser with disabled web security (`−−disasble−web−security` in Chrome) to circumvent CORS issues when connecting to our backend from localhost
 
 ### Execution
 
-Run `yarn start` and Wire's web app will be available at: http://localhost:8080/auth/#login
-
-To login with your existing Wire account use: http://localhost:8080/auth/?env=prod#login
+Run `yarn start` and Wire's web app will be available at: http://localhost:8081/auth/#login
 
 ### Testing
 
