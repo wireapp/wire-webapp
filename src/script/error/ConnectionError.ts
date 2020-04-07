@@ -19,19 +19,21 @@
 
 import {BaseError} from './BaseError';
 
-window.z = window.z || {};
-window.z.error = z.error || {};
+enum CONNECTION_ERROR_TYPE {
+  '' = '',
+}
 
-z.error.ConnectionError = class ConnectionError extends BaseError {
-  constructor(type, message) {
+export class ConnectionError extends BaseError {
+  constructor(type: CONNECTION_ERROR_TYPE | string, message?: string) {
+    message = message || ConnectionError.MESSAGE[type];
     super('ConnectionError', type, message);
   }
 
-  static get MESSAGE() {
+  static get MESSAGE(): Record<string, string> {
     return {};
   }
 
-  static get TYPE() {
+  static get TYPE(): Record<string, string> {
     return {};
   }
-};
+}
