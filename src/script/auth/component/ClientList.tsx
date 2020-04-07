@@ -47,7 +47,7 @@ const ClientList = ({
 }: Props & ConnectedProps & DispatchProps) => {
   const {history} = useReactRouter();
   const [showLoading, setShowLoading] = React.useState(false);
-  const [currentlySelectedClient, setCurrentlySelectedClient] = React.useState();
+  const [currentlySelectedClient, setCurrentlySelectedClient] = React.useState<string | null>(null);
 
   const setSelectedClient = (clientId: string) => {
     const isSelectedClient = currentlySelectedClient === clientId;
