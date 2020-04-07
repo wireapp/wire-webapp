@@ -30,11 +30,7 @@ const payload: Uint8Array = new Uint8Array([255, 18, 15, 34, 210, 168, 165, 188,
 
 // Encoding
 const encoder: CBOR.Encoder = new CBOR.Encoder();
-const encoded: ArrayBuffer = encoder
-  .object(1)
-  .u8(0)
-  .bytes(payload)
-  .get_buffer();
+const encoded: ArrayBuffer = encoder.object(1).u8(0).bytes(payload).get_buffer();
 
 // Decoding
 let decoded: Uint8Array;

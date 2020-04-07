@@ -35,10 +35,7 @@ export class MessageHashService {
   }
 
   private createSha256Hash(buffer: Buffer): Buffer {
-    const hashArray = hash
-      .sha256()
-      .update(buffer)
-      .digest();
+    const hashArray = hash.sha256().update(buffer).digest();
     return Buffer.from(hashArray);
   }
 

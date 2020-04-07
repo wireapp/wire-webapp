@@ -24,18 +24,12 @@ import * as path from 'path';
 
 import {LicenseCollector} from './LicenseCollector';
 
-const repositories = fs
-  .readFileSync('repositories.txt', 'utf8')
-  .split('\n')
-  .filter(Boolean);
+const repositories = fs.readFileSync('repositories.txt', 'utf8').split('\n').filter(Boolean);
 
 let filter: string[] = [];
 
 try {
-  filter = fs
-    .readFileSync('filter.txt', 'utf8')
-    .split('\n')
-    .filter(Boolean);
+  filter = fs.readFileSync('filter.txt', 'utf8').split('\n').filter(Boolean);
 } catch (error) {}
 
 const outputFile = path.resolve('licenses.json');

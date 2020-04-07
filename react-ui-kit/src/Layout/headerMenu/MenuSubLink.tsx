@@ -34,9 +34,7 @@ export const menuSubLinkStyle: <T>(theme: Theme, props: MenuSubLinkProps<T>) => 
 ) => ({
   ...textStyle(theme, props),
   '&:hover': {
-    color: Color(theme.general.color)
-      .mix(Color(COLOR.BLACK), 0.16)
-      .toString(),
+    color: Color(theme.general.color).mix(Color(COLOR.BLACK), 0.16).toString(),
   },
   color: theme.general.color,
   cursor: 'pointer',

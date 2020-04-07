@@ -138,10 +138,7 @@ export class Converter {
     const binaryString = Converter.arrayBufferViewToBaselineString(arrayBufferView);
 
     const escapedString = binaryString.replace(/(.)/g, (match: string) => {
-      const code = match
-        .charCodeAt(0)
-        .toString(16)
-        .toUpperCase();
+      const code = match.charCodeAt(0).toString(16).toUpperCase();
 
       if (code.length < 2) {
         return `0${code}`;

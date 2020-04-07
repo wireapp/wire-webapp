@@ -186,15 +186,9 @@ describe('PriorityQueue', () => {
     it('delay is growing exponentially', () => {
       queue = new PriorityQueue({maxRetries: 3, retryDelay: 1000, retryGrowthFactor: 1.3});
 
-      expect(queue.getGrowingDelay(0))
-        .withContext('first try')
-        .toBe(1000);
-      expect(queue.getGrowingDelay(1))
-        .withContext('one try left')
-        .toBe(1300);
-      expect(queue.getGrowingDelay(2))
-        .withContext('last try')
-        .toBe(2600);
+      expect(queue.getGrowingDelay(0)).withContext('first try').toBe(1000);
+      expect(queue.getGrowingDelay(1)).withContext('one try left').toBe(1300);
+      expect(queue.getGrowingDelay(2)).withContext('last try').toBe(2600);
     });
 
     it('does not exceed maxRetryDelay', () => {

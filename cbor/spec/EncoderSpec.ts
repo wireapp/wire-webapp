@@ -297,15 +297,7 @@ describe('CBOR.Encoder', () => {
 
       expect(
         encoded('8301820203820405', encoder => {
-          encoder
-            .array(3)
-            .u8(1)
-            .array(2)
-            .u8(2)
-            .u8(3)
-            .array(2)
-            .u8(4)
-            .u8(5);
+          encoder.array(3).u8(1).array(2).u8(2).u8(3).array(2).u8(4).u8(5);
         }),
       ).toBe(true);
     });
@@ -313,62 +305,25 @@ describe('CBOR.Encoder', () => {
     it('handles indefinite arrays', () => {
       expect(
         encoded('9f018202039f0405ffff', encoder => {
-          encoder
-            .array_begin()
-            .u8(1)
-            .array(2)
-            .u8(2)
-            .u8(3)
-            .array_begin()
-            .u8(4)
-            .u8(5)
-            .array_end()
-            .array_end();
+          encoder.array_begin().u8(1).array(2).u8(2).u8(3).array_begin().u8(4).u8(5).array_end().array_end();
         }),
       ).toBe(true);
 
       expect(
         encoded('9f01820203820405ff', encoder => {
-          encoder
-            .array_begin()
-            .u8(1)
-            .array(2)
-            .u8(2)
-            .u8(3)
-            .array(2)
-            .u8(4)
-            .u8(5)
-            .array_end();
+          encoder.array_begin().u8(1).array(2).u8(2).u8(3).array(2).u8(4).u8(5).array_end();
         }),
       ).toBe(true);
 
       expect(
         encoded('83018202039f0405ff', encoder => {
-          encoder
-            .array(3)
-            .u8(1)
-            .array(2)
-            .u8(2)
-            .u8(3)
-            .array_begin()
-            .u8(4)
-            .u8(5)
-            .array_end();
+          encoder.array(3).u8(1).array(2).u8(2).u8(3).array_begin().u8(4).u8(5).array_end();
         }),
       ).toBe(true);
 
       expect(
         encoded('83019f0203ff820405', encoder => {
-          encoder
-            .array(3)
-            .u8(1)
-            .array_begin()
-            .u8(2)
-            .u8(3)
-            .array_end()
-            .array(2)
-            .u8(4)
-            .u8(5);
+          encoder.array(3).u8(1).array_begin().u8(2).u8(3).array_end().array(2).u8(4).u8(5);
         }),
       ).toBe(true);
     });
@@ -377,14 +332,7 @@ describe('CBOR.Encoder', () => {
   it('encodes objects', () => {
     expect(
       encoded('a26161016162820203', encoder => {
-        encoder
-          .object(2)
-          .text('a')
-          .u8(1)
-          .text('b')
-          .array(2)
-          .u8(2)
-          .u8(3);
+        encoder.object(2).text('a').u8(1).text('b').array(2).u8(2).u8(3);
       }),
     ).toBe(true);
   });
@@ -393,13 +341,7 @@ describe('CBOR.Encoder', () => {
     it('handles indefinite objects', () => {
       expect(
         encoded('bf6346756ef563416d7421ff', encoder => {
-          encoder
-            .object_begin()
-            .text('Fun')
-            .bool(true)
-            .text('Amt')
-            .i8(-2)
-            .object_end();
+          encoder.object_begin().text('Fun').bool(true).text('Amt').i8(-2).object_end();
         }),
       ).toBe(true);
     });
@@ -407,13 +349,7 @@ describe('CBOR.Encoder', () => {
     it('handles indefinite objects', () => {
       expect(
         encoded('bf6346756ef563416d7421ff', encoder => {
-          encoder
-            .object_begin()
-            .text('Fun')
-            .bool(true)
-            .text('Amt')
-            .i8(-2)
-            .object_end();
+          encoder.object_begin().text('Fun').bool(true).text('Amt').i8(-2).object_end();
         }),
       ).toBe(true);
     });

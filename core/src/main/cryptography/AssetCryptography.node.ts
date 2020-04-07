@@ -35,10 +35,7 @@ export const decryptAsset = async ({
   keyBytes,
   sha256: referenceSha256,
 }: EncryptedAsset): Promise<Buffer> => {
-  const computedSha256 = crypto
-    .createHash('SHA256')
-    .update(cipherText)
-    .digest();
+  const computedSha256 = crypto.createHash('SHA256').update(cipherText).digest();
 
   if (!isEqual(computedSha256, referenceSha256)) {
     throw new Error('Encrypted asset does not match its SHA-256 hash');
@@ -68,10 +65,7 @@ export const encryptAsset = async (plainText: Uint8Array): Promise<EncryptedAsse
   ivCipherText.set(initializationVector, 0);
   ivCipherText.set(cipherText, initializationVector.byteLength);
 
-  const computedSha256 = crypto
-    .createHash('SHA256')
-    .update(Buffer.from(ivCipherText.buffer))
-    .digest();
+  const computedSha256 = crypto.createHash('SHA256').update(Buffer.from(ivCipherText.buffer)).digest();
 
   return {
     cipherText: Buffer.from(ivCipherText.buffer),

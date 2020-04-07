@@ -53,9 +53,7 @@ export class LogFactory {
     LogFactory.COLOR_CODE.G = (LogFactory.COLOR_CODE.G + LogFactory.COLOR_STEP.G) % 256;
     LogFactory.COLOR_CODE.B = (LogFactory.COLOR_CODE.B + LogFactory.COLOR_STEP.B) % 256;
 
-    const rHex = Number(LogFactory.COLOR_CODE.R)
-      .toString(16)
-      .padStart(2, '0');
+    const rHex = Number(LogFactory.COLOR_CODE.R).toString(16).padStart(2, '0');
     const gHex = LogFactory.COLOR_CODE.G.toString(16).padStart(2, '0');
     const bHex = LogFactory.COLOR_CODE.B.toString(16).padStart(2, '0');
 
@@ -63,10 +61,7 @@ export class LogFactory {
   }
 
   static addTimestamp(logTransport: logdown.TransportOptions): void {
-    const formattedDate = new Date()
-      .toISOString()
-      .split('.')[0]
-      .replace('T', ' ');
+    const formattedDate = new Date().toISOString().split('.')[0].replace('T', ' ');
     logTransport.args.unshift(`[${formattedDate}]`);
   }
 

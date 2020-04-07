@@ -125,9 +125,7 @@ describe('APIClient', () => {
         .query({persist: loginData.clientType === 'permanent'})
         .reply(200, accessTokenData);
 
-      nock(baseUrl)
-        .post(`${AuthAPI.URL.ACCESS}/${AuthAPI.URL.LOGOUT}`)
-        .reply(200, undefined);
+      nock(baseUrl).post(`${AuthAPI.URL.ACCESS}/${AuthAPI.URL.LOGOUT}`).reply(200, undefined);
     });
 
     it('creates a context from a successful login', async () => {
@@ -146,21 +144,11 @@ describe('APIClient', () => {
     it('refreshes an access token when it becomes invalid', async () => {
       const queriedHandle = 'webappbot';
 
-      nock(baseUrl)
-        .get(UserAPI.URL.USERS)
-        .query({handles: queriedHandle})
-        .once()
-        .reply(401);
+      nock(baseUrl).get(UserAPI.URL.USERS).query({handles: queriedHandle}).once().reply(401);
 
-      nock(baseUrl)
-        .get(UserAPI.URL.USERS)
-        .query({handles: queriedHandle})
-        .twice()
-        .reply(200, userData);
+      nock(baseUrl).get(UserAPI.URL.USERS).query({handles: queriedHandle}).twice().reply(200, userData);
 
-      nock(baseUrl)
-        .post(AuthAPI.URL.ACCESS)
-        .reply(200, accessTokenData);
+      nock(baseUrl).post(AuthAPI.URL.ACCESS).reply(200, accessTokenData);
 
       const client = new APIClient();
       const context = await client.login(loginData);
@@ -175,9 +163,7 @@ describe('APIClient', () => {
 
   describe('"logout"', () => {
     beforeEach(() => {
-      nock(baseUrl)
-        .post(`${AuthAPI.URL.ACCESS}/${AuthAPI.URL.LOGOUT}`)
-        .reply(200);
+      nock(baseUrl).post(`${AuthAPI.URL.ACCESS}/${AuthAPI.URL.LOGOUT}`).reply(200);
     });
 
     it('can logout a user', async () => {
@@ -234,13 +220,9 @@ describe('APIClient', () => {
     };
 
     beforeEach(() => {
-      nock(baseUrl)
-        .post(AuthAPI.URL.REGISTER, registerData)
-        .reply(200, registerData);
+      nock(baseUrl).post(AuthAPI.URL.REGISTER, registerData).reply(200, registerData);
 
-      nock(baseUrl)
-        .post(AuthAPI.URL.ACCESS)
-        .reply(200, accessTokenData);
+      nock(baseUrl).post(AuthAPI.URL.ACCESS).reply(200, accessTokenData);
     });
 
     it('automatically gets an access token after registration', async () => {
