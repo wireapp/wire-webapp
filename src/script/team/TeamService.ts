@@ -55,7 +55,7 @@ export class TeamService {
     return this.apiClient.teams.member.api.getAllMembers(teamId);
   }
 
-  getTeamMembers(teamId: string, userIds: string[]): Promise<MemberData[]> {
+  getTeamMembersByIds(teamId: string, userIds: string[]): Promise<MemberData[]> {
     return this.apiClient.teams.member.api.getMembers(teamId, {ids: userIds});
   }
 

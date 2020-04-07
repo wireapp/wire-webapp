@@ -168,7 +168,7 @@ export class TeamRepository {
   }
 
   async getTeamMembers(teamId: string, userIds: string[]): Promise<TeamMemberEntity[] | void> {
-    const members = await this.teamService.getTeamMembers(teamId, userIds);
+    const members = await this.teamService.getTeamMembersByIds(teamId, userIds);
     if (members.length) {
       return this.teamMapper.mapMemberFromArray(members);
     }
@@ -246,6 +246,24 @@ export class TeamRepository {
       amplify.publish(WebAppEvents.TEAM.INFO, accountInfo);
       return accountInfo;
     }
+  }
+
+  async updateTeamMembersByIds(teamEntity: TeamEntity, memberIds: string[] = []): Promise<void> {
+    const members = await this.teamService.getTeamMembersByIds(teamEntity.id, memberIds);
+    this.memberRoles({});
+    this.memberInviters({});
+    this.updateMemberRoles(members);
+
+    const selfId = this.selfUser().id;
+    const includesSelfId = memberIds.includes(selfId);
+    if (includesSelfId) {
+      memberIds = memberIds.filter(id => id !== selfId);
+      const selfMember = members.find(({user: userId}) => userId === selfId);
+      this.teamMapper.mapRole(this.selfUser(), selfMember.permissions);
+    }
+
+    const userEntities = await this.userRepository.getUsersById(memberIds);
+    teamEntity.members(userEntities);
   }
 
   async updateTeamMembers(teamEntity: TeamEntity, userIds: string[]): Promise<void> {
