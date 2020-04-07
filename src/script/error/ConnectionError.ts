@@ -19,12 +19,8 @@
 
 import {BaseError} from './BaseError';
 
-enum CONNECTION_ERROR_TYPE {
-  '' = '',
-}
-
 export class ConnectionError extends BaseError {
-  constructor(type: CONNECTION_ERROR_TYPE | string, message?: string) {
+  constructor(type: string, message?: string) {
     message = message || ConnectionError.MESSAGE[type];
     super('ConnectionError', type, message);
   }
