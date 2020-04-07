@@ -24,7 +24,7 @@ import {ClientRepository} from 'src/script/client/ClientRepository';
 import {ClientType} from 'src/script/client/ClientType';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {ClientMapper} from 'src/script/client/ClientMapper';
-import {ClientError} from 'src/script/error/ClientError.js';
+import {ClientError} from 'src/script/error/ClientError';
 import {TestFactory} from '../../helper/TestFactory';
 
 describe('ClientRepository', () => {
