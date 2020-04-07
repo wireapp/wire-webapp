@@ -28,7 +28,7 @@ import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
 import {sortUsersByPriority} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {createRandomUuid, koArrayPushAll, loadUrlBlob} from 'Util/util';
+import {createRandomUuid, loadUrlBlob} from 'Util/util';
 
 import {UNSPLASH_URL} from '../externalRoute';
 
@@ -84,15 +84,15 @@ export interface UserUpdate {
 export class UserRepository {
   private readonly asset_service: AssetService;
   private readonly clientRepository: ClientRepository;
-  private readonly connected_users: ko.PureComputed<User[]>;
-  private readonly isTeam: ko.Observable<boolean>;
+  readonly connected_users: ko.PureComputed<User[]>;
+  isTeam: ko.Observable<boolean> | ko.PureComputed<boolean>;
   private readonly logger: Logger;
   private readonly propertyRepository: PropertiesRepository;
   private readonly selfService: SelfService;
-  private readonly teamMembers: ko.ObservableArray<User>;
+  teamMembers: ko.PureComputed<User[]>;
   /** Note: this does not include the self user */
-  private readonly teamUsers: ko.ObservableArray<User>;
-  private readonly directlyConnectedUsers: ko.ObservableArray<User>;
+  teamUsers: ko.PureComputed<User[]>;
+  private readonly directlyConnectedUsers: ko.PureComputed<User[]>;
   private readonly userMapper: UserMapper;
   private readonly userService: UserService;
   private readonly users: ko.ObservableArray<User>;
@@ -156,9 +156,9 @@ export class UserRepository {
     this.isTemporaryGuest = ko.pureComputed(() => this.self()?.isTemporaryGuest());
 
     this.isTeam = ko.observable();
-    this.teamMembers = undefined;
-    this.teamUsers = undefined;
-    this.directlyConnectedUsers = undefined;
+    this.teamMembers = ko.pureComputed((): User[] => []);
+    this.teamUsers = ko.pureComputed((): User[] => []);
+    this.directlyConnectedUsers = ko.pureComputed((): User[] => []);
 
     this.number_of_contacts = ko.pureComputed(() => {
       const contacts = this.isTeam() ? this.teamUsers() : this.connected_users();
@@ -656,7 +656,7 @@ export class UserRepository {
    */
   saveUsers(user_ets: User[]): User[] {
     const newUsers = user_ets.filter(user_et => !this.findUserById(user_et.id));
-    koArrayPushAll(this.users, newUsers);
+    this.users.push(...newUsers);
     return user_ets;
   }
 

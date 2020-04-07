@@ -34,17 +34,6 @@ enum CONVERSATION {
   TYPING = 'conversation.typing',
 }
 
-enum TEAM {
-  CONVERSATION_CREATE = 'team.conversation-create',
-  CONVERSATION_DELETE = 'team.conversation-delete',
-  CREATE = 'team.create',
-  DELETE = 'team.delete',
-  MEMBER_JOIN = 'team.member-join',
-  MEMBER_LEAVE = 'team.member-leave',
-  MEMBER_UPDATE = 'team.member-update',
-  UPDATE = 'team.update',
-}
-
 enum USER {
   ACTIVATE = 'user.activate',
   CLIENT_ADD = 'user.client-add',
@@ -60,6 +49,5 @@ enum USER {
 
 export const BackendEvent = {
   CONVERSATION,
-  TEAM,
   USER,
 };

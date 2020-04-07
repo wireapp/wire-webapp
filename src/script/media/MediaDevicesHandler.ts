@@ -22,7 +22,6 @@ import ko from 'knockout';
 import {Environment} from 'Util/Environment';
 import {Logger, getLogger} from 'Util/Logger';
 import {loadValue, storeValue} from 'Util/StorageUtil';
-import {koArrayPushAll} from 'Util/util';
 
 import {MediaDeviceType} from './MediaDeviceType';
 
@@ -230,9 +229,9 @@ export class MediaDevicesHandler {
         if (mediaDevices) {
           const filteredDevices = this.filterMediaDevices(mediaDevices);
 
-          koArrayPushAll(this.availableDevices.audioInput, filteredDevices.microphones);
-          koArrayPushAll(this.availableDevices.audioOutput, filteredDevices.speakers);
-          koArrayPushAll(this.availableDevices.videoInput, filteredDevices.cameras);
+          this.availableDevices.audioInput.push(...filteredDevices.microphones);
+          this.availableDevices.audioOutput.push(...filteredDevices.speakers);
+          this.availableDevices.videoInput.push(...filteredDevices.cameras);
 
           this.logger.info('Updated MediaDevice list', mediaDevices);
           return mediaDevices;

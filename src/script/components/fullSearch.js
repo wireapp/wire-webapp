@@ -20,7 +20,6 @@
 import {debounce, escape} from 'underscore';
 
 import {isScrolledBottom} from 'Util/scroll-helpers';
-import {koArrayPushAll} from 'Util/util';
 import {formatDateShort} from 'Util/TimeUtil';
 
 import {ParticipantAvatar} from 'Components/participantAvatar';
@@ -87,7 +86,7 @@ class FullSearch {
       const showAdditionalMessages = isScrolledBottom(event.currentTarget) && this.messageEntities.length;
       if (showAdditionalMessages) {
         const additionalMessageEntities = this.messageEntities.splice(0, FullSearch.CONFIG.MAX_VISIBLE_MESSAGES);
-        koArrayPushAll(this.visibleMessageEntities, additionalMessageEntities);
+        this.visibleMessageEntities.push(...additionalMessageEntities);
       }
     });
   }
