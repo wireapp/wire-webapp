@@ -19,23 +19,25 @@
 
 import {BaseError} from './BaseError';
 
-window.z = window.z || {};
-window.z.error = z.error || {};
+enum TEAM_ERROR_TYPE {
+  NO_PERMISSIONS = 'NO_PERMISSIONS',
+}
 
-z.error.TeamError = class TeamError extends BaseError {
-  constructor(type, message) {
+export class TeamError extends BaseError {
+  constructor(type: TEAM_ERROR_TYPE, message?: string) {
+    message = message || TeamError.MESSAGE[type];
     super('TeamError', type, message);
   }
 
-  static get MESSAGE() {
+  static get MESSAGE(): Record<TEAM_ERROR_TYPE, string> {
     return {
       NO_PERMISSIONS: 'No permissions provided',
     };
   }
 
-  static get TYPE() {
+  static get TYPE(): Record<TEAM_ERROR_TYPE, TEAM_ERROR_TYPE> {
     return {
-      NO_PERMISSIONS: 'NO_PERMISSIONS',
+      NO_PERMISSIONS: TEAM_ERROR_TYPE.NO_PERMISSIONS,
     };
   }
-};
+}
