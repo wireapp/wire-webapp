@@ -30,6 +30,7 @@ import {EventName} from '../tracking/EventName';
 import {ClientEntity} from '../client/ClientEntity';
 import {BackendClientError} from '../error/BackendClientError';
 import {CryptographyError} from '../error/CryptographyError';
+import {UserError} from '../error/UserError';
 
 export class CryptographyRepository {
   static get CONFIG() {
@@ -135,11 +136,11 @@ export class CryptographyRepository {
       .catch(error => {
         const isNotFound = error.code === BackendClientError.STATUS_CODE.NOT_FOUND;
         if (isNotFound) {
-          throw new z.error.UserError(z.error.UserError.TYPE.PRE_KEY_NOT_FOUND);
+          throw new UserError(UserError.TYPE.PRE_KEY_NOT_FOUND);
         }
 
         this.logger.error(`Failed to get pre-key from backend: ${error.message}`);
-        throw new z.error.UserError(z.error.UserError.TYPE.REQUEST_FAILURE);
+        throw new UserError(UserError.TYPE.REQUEST_FAILURE);
       });
   }
 
@@ -152,11 +153,11 @@ export class CryptographyRepository {
     return this.cryptographyService.getUsersPreKeys(recipients).catch(error => {
       const isNotFound = error.code === BackendClientError.STATUS_CODE.NOT_FOUND;
       if (isNotFound) {
-        throw new z.error.UserError(z.error.UserError.TYPE.PRE_KEY_NOT_FOUND);
+        throw new UserError(UserError.TYPE.PRE_KEY_NOT_FOUND);
       }
 
       this.logger.error(`Failed to get pre-key from backend: ${error.message}`);
-      throw new z.error.UserError(z.error.UserError.TYPE.REQUEST_FAILURE);
+      throw new UserError(UserError.TYPE.REQUEST_FAILURE);
     });
   }
 

@@ -24,9 +24,9 @@ enum BASE_ERROR_TYPE {
 }
 
 export class BaseError extends Error {
-  type: string;
+  type: BASE_ERROR_TYPE | string;
 
-  constructor(name: string, type: string, message: string) {
+  constructor(name: string, type: BASE_ERROR_TYPE | string, message: string) {
     super();
 
     this.stack = new Error().stack;

@@ -51,6 +51,7 @@ import 'Components/availabilityState';
 import {isAppLockEnabled} from './AppLockViewModel';
 import {loadValue} from 'Util/StorageUtil';
 import {StorageKey} from '../../storage';
+import {UserError} from 'src/script/error/UserError';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -202,7 +203,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
         }
       })
       .catch(error => {
-        const isUsernameTaken = error.type === z.error.UserError.TYPE.USERNAME_TAKEN;
+        const isUsernameTaken = error.type === UserError.TYPE.USERNAME_TAKEN;
         const isCurrentRequest = this.enteredUsername() === this.submittedUsername();
         if (isUsernameTaken && isCurrentRequest) {
           this.usernameState(PreferencesAccountViewModel.USERNAME_STATE.TAKEN);
@@ -255,7 +256,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     const [newUserPicture] = Array.from(files);
 
     this.setPicture(newUserPicture).catch(error => {
-      const isInvalidUpdate = error.type === z.error.UserError.TYPE.INVALID_UPDATE;
+      const isInvalidUpdate = error.type === UserError.TYPE.INVALID_UPDATE;
       if (!isInvalidUpdate) {
         throw error;
       }
@@ -399,7 +400,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
           }
         })
         .catch(error => {
-          const isUsernameTaken = error.type === z.error.UserError.TYPE.USERNAME_TAKEN;
+          const isUsernameTaken = error.type === UserError.TYPE.USERNAME_TAKEN;
           const isCurrentRequest = this.enteredUsername() === enteredUsername;
           if (isUsernameTaken && isCurrentRequest) {
             this.usernameState(PreferencesAccountViewModel.USERNAME_STATE.TAKEN);
@@ -412,7 +413,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     const modalOptions = {text: {message, title}};
     modals.showModal(ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
 
-    return Promise.reject(new z.error.UserError(z.error.UserError.TYPE.INVALID_UPDATE));
+    return Promise.reject(new UserError(UserError.TYPE.INVALID_UPDATE));
   }
 
   _resetUsernameInput() {

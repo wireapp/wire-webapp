@@ -35,7 +35,7 @@ enum CONVERSATION_ERROR_TYPE {
 }
 
 export class ConversationError extends BaseError {
-  constructor(type: CONVERSATION_ERROR_TYPE, message: string = '', error: Error) {
+  constructor(type: CONVERSATION_ERROR_TYPE | string, message: string = '', error: Error) {
     message = message || ConversationError.MESSAGE[type];
     super('ConversationError', type, message);
     if (error) {
@@ -43,7 +43,7 @@ export class ConversationError extends BaseError {
     }
   }
 
-  static get MESSAGE(): Record<CONVERSATION_ERROR_TYPE, string> {
+  static get MESSAGE(): Record<CONVERSATION_ERROR_TYPE | string, string> {
     return {
       CONVERSATION_NOT_FOUND: 'Conversation not found',
       DEGRADED_CONVERSATION_CANCELLATION: 'Sending to degraded conversation was canceled by user',
