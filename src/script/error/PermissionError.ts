@@ -19,12 +19,19 @@
 
 import {BaseError} from './BaseError';
 
+enum PERMISSION_ERROR_TYPE {
+  DENIED = 'DENIED',
+  UNSUPPORTED = 'UNSUPPORTED',
+  UNSUPPORTED_TYPE = 'UNSUPPORTED_TYPE',
+}
+
 export class PermissionError extends BaseError {
-  constructor(type, message) {
+  constructor(type: PERMISSION_ERROR_TYPE, message?: string) {
+    message = message || PermissionError.MESSAGE[type];
     super('PermissionError', type, message);
   }
 
-  static get MESSAGE() {
+  static get MESSAGE(): Record<PERMISSION_ERROR_TYPE, string> {
     return {
       DENIED: 'Permission was denied',
       UNSUPPORTED: 'Permissions API is not supported',
@@ -32,11 +39,11 @@ export class PermissionError extends BaseError {
     };
   }
 
-  static get TYPE() {
+  static get TYPE(): Record<PERMISSION_ERROR_TYPE, PERMISSION_ERROR_TYPE> {
     return {
-      DENIED: 'DENIED',
-      UNSUPPORTED: 'UNSUPPORTED',
-      UNSUPPORTED_TYPE: 'UNSUPPORTED_TYPE',
+      DENIED: PERMISSION_ERROR_TYPE.DENIED,
+      UNSUPPORTED: PERMISSION_ERROR_TYPE.UNSUPPORTED,
+      UNSUPPORTED_TYPE: PERMISSION_ERROR_TYPE.UNSUPPORTED_TYPE,
     };
   }
 }
