@@ -180,7 +180,7 @@
   },
   "license": "GPL-3.0",
   "lint-staged": {
-    "src/**/*.{js,ts,tsx}": [
+    "src/script/**/*.{js,ts,tsx}": [
       "cspell"
     ],
     "*.less": [
@@ -219,6 +219,7 @@
     "lint": "yarn lint:other && yarn lint:code",
     "lint:other": "yarn prettier --list-different && yarn stylelint",
     "lint:code": "eslint -c .eslintrc.json --ext .js,.ts,.tsx .",
+    "lint:spelling": "cspell -c .cspell.json 'src/script/**/*.{js,.ts,.tsx}'",
     "postinstall": "yarn configure && cd server && yarn",
     "prettier": "prettier --ignore-path .gitignore \"**/*.{json,md}\"",
     "release:staging": "ts-node ./bin/release_tag.ts staging",
