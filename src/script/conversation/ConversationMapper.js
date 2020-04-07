@@ -310,8 +310,8 @@ export class ConversationMapper {
    * @returns {NOTIFICATION_STATE} validated notification setting
    */
   getMutedState(mutedState, notificationState) {
-    const validNotifcationStates = Object.values(NOTIFICATION_STATE);
-    if (validNotifcationStates.includes(notificationState)) {
+    const validNotificationStates = Object.values(NOTIFICATION_STATE);
+    if (validNotificationStates.includes(notificationState)) {
       // Ensure bit at offset 0 to be 1 for backwards compatibility of deprecated boolean based state is true
       return mutedState ? notificationState | 0b1 : NOTIFICATION_STATE.EVERYTHING;
     }
@@ -416,7 +416,7 @@ export class ConversationMapper {
       const isRemoteMutedTimestampNewer = isRemoteTimestampNewer(mutedTimestamp, remoteMutedTimestamp);
 
       if (isRemoteMutedTimestampNewer || mutedState === undefined) {
-        const remoteMutedState = this.getMutedState(selfState.otr_muted, selfState.otr_muted_statu);
+        const remoteMutedState = this.getMutedState(selfState.otr_muted, selfState.otr_muted_status);
         mergedConversation.muted_state = remoteMutedState;
         mergedConversation.muted_timestamp = remoteMutedTimestamp;
       }

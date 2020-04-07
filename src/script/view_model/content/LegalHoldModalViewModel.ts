@@ -133,9 +133,9 @@ export class LegalHoldModalViewModel {
     }
     this.isVisible(true);
     this.isLoading(false);
-    const formatedFingerprint = fingerprint.map(part => `<span>${part} </span>`).join('');
+    const formattedFingerprint = fingerprint.map(part => `<span>${part} </span>`).join('');
     this.requestFingerprint(
-      `<span class="legal-hold-modal__fingerprint" data-uie-name="status-modal-fingerprint">${formatedFingerprint}</span>`,
+      `<span class="legal-hold-modal__fingerprint" data-uie-name="status-modal-fingerprint">${formattedFingerprint}</span>`,
     );
   };
 

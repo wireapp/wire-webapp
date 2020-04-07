@@ -110,7 +110,7 @@ export const renderMessage = (message: string, selfId: string, mentionEntities: 
 
   let mentionlessText = mentionEntities
     .slice()
-    // sort mentions to start with the latest mention first (in order not to have to recompute the index everytime we modify the original text)
+    // sort mentions to start with the latest mention first (in order not to have to recompute the index every time we modify the original text)
     .sort((mention1, mention2) => mention2.startIndex - mention1.startIndex)
     .reduce((strippedText, mention) => {
       const mentionText = message.slice(mention.startIndex, mention.startIndex + mention.length);
