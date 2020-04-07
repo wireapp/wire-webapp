@@ -177,7 +177,7 @@ ko.components.register('user-list', {
     };
 
     // Filter all list items if a filter is provided
-    this.filteredUserEntities = ko.pureComputed(async () => {
+    this.filteredUserEntities = ko.pureComputed(() => {
       const connectedUsers = conversationRepository.connectedUsers();
       let resultUsers: User[] = userEntities();
       const normalizedQuery = SearchRepository.normalizeQuery(filter());
