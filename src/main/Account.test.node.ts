@@ -74,17 +74,11 @@ describe('Account', () => {
         return [StatusCode.OK, JSON.stringify(accessTokenData)];
       });
 
-    nock(MOCK_BACKEND.rest)
-      .post(`${AuthAPI.URL.ACCESS}/${AuthAPI.URL.LOGOUT}`)
-      .reply(StatusCode.OK, undefined);
+    nock(MOCK_BACKEND.rest).post(`${AuthAPI.URL.ACCESS}/${AuthAPI.URL.LOGOUT}`).reply(StatusCode.OK, undefined);
 
-    nock(MOCK_BACKEND.rest)
-      .post(AuthAPI.URL.ACCESS)
-      .reply(StatusCode.OK, accessTokenData);
+    nock(MOCK_BACKEND.rest).post(AuthAPI.URL.ACCESS).reply(StatusCode.OK, accessTokenData);
 
-    nock(MOCK_BACKEND.rest)
-      .post(ClientAPI.URL.CLIENTS)
-      .reply(StatusCode.OK, {id: CLIENT_ID});
+    nock(MOCK_BACKEND.rest).post(ClientAPI.URL.CLIENTS).reply(StatusCode.OK, {id: CLIENT_ID});
 
     nock(MOCK_BACKEND.rest)
       .post(

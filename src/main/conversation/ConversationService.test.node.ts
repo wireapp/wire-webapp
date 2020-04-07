@@ -238,10 +238,7 @@ describe('ConversationService', () => {
         quotedMessageId: quoteId,
       };
 
-      const replyMessage = account
-        .service!.conversation.messageBuilder.createText('', text)
-        .withQuote(quote)
-        .build();
+      const replyMessage = account.service!.conversation.messageBuilder.createText('', text).withQuote(quote).build();
 
       expect(replyMessage.content.text).toEqual(text);
       expect(replyMessage.content.quote).toEqual(jasmine.objectContaining({quotedMessageId: quoteId}));

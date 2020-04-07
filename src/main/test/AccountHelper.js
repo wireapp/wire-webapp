@@ -4,7 +4,7 @@ const {APIClient} = require('@wireapp/api-client');
 const {ClientType} = require('@wireapp/api-client/dist/client/');
 
 module.exports = {
-  getAccount: async function(email, password) {
+  getAccount: async function (email, password) {
     const login = {
       clientType: ClientType.TEMPORARY,
       email,
