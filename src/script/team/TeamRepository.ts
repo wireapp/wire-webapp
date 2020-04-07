@@ -140,8 +140,8 @@ export class TeamRepository {
     return this.memberRoles()[userId] !== ROLE.PARTNER || this.memberInviters()[userId] === this.selfUser().id;
   };
 
-  scheduleFetchTeamInfo = (): void => {
-    this.getTeam();
+  scheduleFetchTeamInfo = async (): Promise<void> => {
+    await this.getTeam();
     setTimeout(this.scheduleFetchTeamInfo, TIME_IN_MILLIS.DAY);
   };
 
