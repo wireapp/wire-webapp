@@ -17,7 +17,7 @@
  *
  */
 
-import {BaseError} from './BaseError';
+import {BaseError, BASE_ERROR_TYPE} from './BaseError';
 
 enum CLIENT_ERROR_TYPE {
   CLIENT_NOT_SET = 'CLIENT_NOT_SET',
@@ -31,7 +31,7 @@ enum CLIENT_ERROR_TYPE {
 }
 
 export class ClientError extends BaseError {
-  constructor(type: CLIENT_ERROR_TYPE, message: string) {
+  constructor(type: CLIENT_ERROR_TYPE | BASE_ERROR_TYPE, message: string) {
     super('ClientError', type, message);
   }
 

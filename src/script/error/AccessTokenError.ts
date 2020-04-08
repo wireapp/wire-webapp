@@ -17,7 +17,7 @@
  *
  */
 
-import {BaseError} from './BaseError';
+import {BaseError, BASE_ERROR_TYPE} from './BaseError';
 
 enum ACCESS_TOKEN_ERROR_TYPE {
   NOT_FOUND_IN_CACHE = 'NOT_FOUND_IN_CACHE',
@@ -27,7 +27,7 @@ enum ACCESS_TOKEN_ERROR_TYPE {
 }
 
 export class AccessTokenError extends BaseError {
-  constructor(type: ACCESS_TOKEN_ERROR_TYPE, message: string) {
+  constructor(type: ACCESS_TOKEN_ERROR_TYPE | BASE_ERROR_TYPE, message: string) {
     super('AccessTokenError', type, message);
   }
 

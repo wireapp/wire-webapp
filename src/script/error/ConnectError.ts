@@ -17,7 +17,7 @@
  *
  */
 
-import {BaseError} from './BaseError';
+import {BaseError, BASE_ERROR_TYPE} from './BaseError';
 
 enum CONNECT_ERROR_TYPE {
   NOT_SUPPORTED = 'NOT_SUPPORTED',
@@ -26,7 +26,7 @@ enum CONNECT_ERROR_TYPE {
 }
 
 export class ConnectError extends BaseError {
-  constructor(type: CONNECT_ERROR_TYPE, message: string) {
+  constructor(type: CONNECT_ERROR_TYPE | BASE_ERROR_TYPE, message: string) {
     super('ConnectError', type, message);
   }
 

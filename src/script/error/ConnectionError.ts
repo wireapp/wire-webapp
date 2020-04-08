@@ -17,11 +17,10 @@
  *
  */
 
-import {BaseError} from './BaseError';
+import {BaseError, BASE_ERROR_TYPE} from './BaseError';
 
 export class ConnectionError extends BaseError {
-  constructor(type: string, message?: string) {
-    message = message || ConnectionError.MESSAGE[type];
+  constructor(type: BASE_ERROR_TYPE | string, message: string) {
     super('ConnectionError', type, message);
   }
 

@@ -17,7 +17,7 @@
  *
  */
 
-import {BaseError} from './BaseError';
+import {BaseError, BASE_ERROR_TYPE} from './BaseError';
 
 enum AUTH_ERROR_TYPE {
   COOKIES_DISABLED = 'COOKIES_DISABLED',
@@ -27,7 +27,7 @@ enum AUTH_ERROR_TYPE {
 }
 
 export class AuthError extends BaseError {
-  constructor(type: AUTH_ERROR_TYPE, message: string) {
+  constructor(type: AUTH_ERROR_TYPE | BASE_ERROR_TYPE, message: string) {
     super('AuthError', type, message);
   }
 

@@ -17,7 +17,7 @@
  *
  */
 
-import {BaseError} from './BaseError';
+import {BaseError, BASE_ERROR_TYPE} from './BaseError';
 
 enum CALL_ERROR_TYPE {
   MISTARGETED_MESSAGE = 'MISTARGETED_MESSAGE',
@@ -36,7 +36,7 @@ enum CALL_ERROR_TYPE {
 }
 
 export class CallError extends BaseError {
-  constructor(type: CALL_ERROR_TYPE, message: string) {
+  constructor(type: CALL_ERROR_TYPE | BASE_ERROR_TYPE, message: string) {
     super('CallError', type, message);
   }
 
