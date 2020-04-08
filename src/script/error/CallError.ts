@@ -36,8 +36,7 @@ enum CALL_ERROR_TYPE {
 }
 
 export class CallError extends BaseError {
-  constructor(type: CALL_ERROR_TYPE, message?: string) {
-    message = message || CallError.MESSAGE[type];
+  constructor(type: CALL_ERROR_TYPE, message: string) {
     super('CallError', type, message);
   }
 
