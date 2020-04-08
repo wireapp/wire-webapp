@@ -148,7 +148,7 @@ export enum ROLE {
 
 export function roleFromTeamPermissions(permissions: PermissionsData): ROLE {
   if (!permissions) {
-    throw new TeamError(TeamError.TYPE.NO_PERMISSIONS);
+    throw new TeamError(TeamError.TYPE.NO_PERMISSIONS, TeamError.MESSAGE.NO_PERMISSIONS);
   }
 
   const invalidRoles = [ROLE.INVALID, ROLE.NONE];
