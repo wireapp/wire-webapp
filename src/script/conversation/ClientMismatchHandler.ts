@@ -91,7 +91,7 @@ export class ClientMismatchHandler {
     if (Object.entries(recipients).length === 0) {
       return;
     }
-    this.logger.debug(`Message contains deleted clients of '${Object.keys(recipients).length}' users`, recipients);
+    this.logger.debug(`Message contains deleted clients of user ids: ${Object.keys(recipients).join(',')}`, recipients);
     const removeDeletedClient = (userId: string, clientId: string) => {
       delete payload.recipients[userId][clientId];
       this.userRepository.remove_client_from_user(userId, clientId);
@@ -120,7 +120,7 @@ export class ClientMismatchHandler {
       return Promise.resolve(payload);
     }
 
-    this.logger.debug(`Message is missing clients of '${missingUserIds.length}' users`, recipients);
+    this.logger.debug(`Message is missing clients for user ids: ${missingUserIds.join(',')}`, recipients);
 
     const {genericMessage, timestamp} = eventInfoEntity;
 
@@ -164,7 +164,10 @@ export class ClientMismatchHandler {
     if (Object.entries(recipients).length === 0) {
       return;
     }
-    this.logger.debug(`Message contains redundant clients of '${Object.keys(recipients).length}' users`, recipients);
+    this.logger.debug(
+      `Message contains redundant clients of user ids: ${Object.keys(recipients).join(',')}`,
+      recipients,
+    );
     const removeRedundantClient = (userId: string, clientId: string) => delete payload.recipients[userId][clientId];
     this.remove(recipients, removeRedundantClient, conversationEntity, payload);
   }

@@ -557,7 +557,7 @@ export class EventRepository {
       source = EventRepository.SOURCE.INJECTED;
     }
 
-    const {conversation: conversationId, id = 'ID not specified', type} = event;
+    const {conversation: conversationId, id, type} = event;
     const inSelfConversation = conversationId === this.userRepository.self().id;
     if (!inSelfConversation) {
       this.logger.info(`Injected event ID '${id}' of type '${type}' with source '${source}'`, event);
