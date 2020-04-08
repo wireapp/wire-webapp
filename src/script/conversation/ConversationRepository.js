@@ -3178,6 +3178,15 @@ export class ConversationRepository {
           z.error.ConversationError.TYPE.CONVERSATION_NOT_FOUND,
         ];
 
+        const isConversationNotFound = error.label === BackendClientError.LABEL.ACCESS_DENIED;
+        if (isConversationNotFound) {
+          const messageText = t('conversationNotFoundMessage');
+          const titleText = t('conversationNotFoundTitle', Config.getConfig().BRAND_NAME);
+
+          this._showModal(messageText, titleText);
+          return;
+        }
+
         if (!ignoredErrorTypes.includes(error.type)) {
           throw error;
         }
