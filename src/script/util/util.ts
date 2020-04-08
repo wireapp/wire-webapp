@@ -54,7 +54,10 @@ export const checkIndexedDb = (): Promise<void> => {
 
   if (!Environment.browser.supports.indexedDb) {
     const errorType = Environment.browser.edge ? AuthError.TYPE.PRIVATE_MODE : AuthError.TYPE.INDEXED_DB_UNSUPPORTED;
-    return Promise.reject(new AuthError(errorType));
+    const errorMessage = Environment.browser.edge
+      ? AuthError.MESSAGE.PRIVATE_MODE
+      : AuthError.MESSAGE.INDEXED_DB_UNSUPPORTED;
+    return Promise.reject(new AuthError(errorType, errorMessage));
   }
 
   if (Environment.browser.firefox) {
@@ -65,12 +68,12 @@ export const checkIndexedDb = (): Promise<void> => {
       dbOpenRequest.onerror = event => {
         if (dbOpenRequest.error) {
           event.preventDefault();
-          return Promise.reject(new AuthError(AuthError.TYPE.PRIVATE_MODE));
+          return Promise.reject(new AuthError(AuthError.TYPE.PRIVATE_MODE, AuthError.MESSAGE.PRIVATE_MODE));
         }
         return undefined;
       };
     } catch (error) {
-      return Promise.reject(new AuthError(AuthError.TYPE.PRIVATE_MODE));
+      return Promise.reject(new AuthError(AuthError.TYPE.PRIVATE_MODE, AuthError.MESSAGE.PRIVATE_MODE));
     }
 
     return new Promise((resolve, reject) => {
@@ -83,7 +86,7 @@ export const checkIndexedDb = (): Promise<void> => {
 
         if (dbOpenRequest.readyState === 'done' && !dbOpenRequest.result) {
           window.clearInterval(interval_id);
-          return reject(new AuthError(AuthError.TYPE.PRIVATE_MODE));
+          return reject(new AuthError(AuthError.TYPE.PRIVATE_MODE, AuthError.MESSAGE.PRIVATE_MODE));
         }
 
         const tooManyAttempts = currentAttempt >= maxRetry;

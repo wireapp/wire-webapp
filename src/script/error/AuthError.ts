@@ -27,8 +27,7 @@ enum AUTH_ERROR_TYPE {
 }
 
 export class AuthError extends BaseError {
-  constructor(type: AUTH_ERROR_TYPE, message?: string) {
-    message = message || AuthError.MESSAGE[type];
+  constructor(type: AUTH_ERROR_TYPE, message: string) {
     super('AuthError', type, message);
   }
 

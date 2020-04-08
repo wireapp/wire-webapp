@@ -654,7 +654,7 @@ class App {
     if (this.singleInstanceHandler.registerInstance(instanceId)) {
       return this._registerSingleInstanceCleaning();
     }
-    throw new AuthError(AuthError.TYPE.MULTIPLE_TABS);
+    throw new AuthError(AuthError.TYPE.MULTIPLE_TABS, AuthError.MESSAGE.MULTIPLE_TABS);
   }
 
   _registerSingleInstanceCleaning() {
