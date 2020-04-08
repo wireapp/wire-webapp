@@ -395,7 +395,9 @@ export class BackendClient {
             }
           }
 
-          reject(response || new BackendClientError(statusCode));
+          reject(
+            response || new BackendClientError({code: statusCode, message: `Api error status code: "${statusCode}"`}),
+          );
         });
     });
   }

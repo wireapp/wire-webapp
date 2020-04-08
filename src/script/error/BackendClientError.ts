@@ -21,15 +21,12 @@ import {BaseError} from './BaseError';
 
 export class BackendClientError extends BaseError {
   code: number;
+  label: string;
 
-  constructor(code?: number) {
-    const message = `Api error status code: ${code}`;
-
-    super('BackendClientError', BackendClientError.TYPE.GENERIC, message);
-
-    if (code) {
-      this.code = code;
-    }
+  constructor(params: {code: number; label?: string; message: string}) {
+    super('BackendClientError', BackendClientError.TYPE.GENERIC, params.message);
+    this.code = params.code;
+    this.label = params.label;
   }
 
   static get LABEL() {
