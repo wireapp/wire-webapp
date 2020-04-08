@@ -96,7 +96,7 @@ export class ClientMismatchHandler {
       delete payload.recipients[userId][clientId];
       this.userRepository.remove_client_from_user(userId, clientId);
     };
-    this.remove(recipients, removeDeletedClient, conversationEntity, payload);
+    this.removePayload(recipients, removeDeletedClient, conversationEntity, payload);
   }
 
   /**
@@ -166,7 +166,7 @@ export class ClientMismatchHandler {
     }
     this.logger.debug(`Message contains redundant clients of '${Object.keys(recipients).length}' users`, recipients);
     const removeRedundantClient = (userId: string, clientId: string) => delete payload.recipients[userId][clientId];
-    this.remove(recipients, removeRedundantClient, conversationEntity, payload);
+    this.removePayload(recipients, removeRedundantClient, conversationEntity, payload);
   }
 
   /**
@@ -178,7 +178,7 @@ export class ClientMismatchHandler {
    * @param payload Initial payload resulting in a 412
    * @returns Function array
    */
-  remove(
+  removePayload(
     recipients: UserClients,
     clientFn: Function,
     conversationEntity: Conversation = undefined,
