@@ -29,9 +29,7 @@ enum USER_ERROR_TYPE {
 }
 
 export class UserError extends BaseError {
-  constructor(type: USER_ERROR_TYPE | string, message?: string) {
-    message = message || UserError.MESSAGE[type];
-
+  constructor(type: USER_ERROR_TYPE | string, message: string) {
     super('UserError', type, message);
   }
 

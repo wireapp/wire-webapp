@@ -136,11 +136,11 @@ export class CryptographyRepository {
       .catch(error => {
         const isNotFound = error.code === BackendClientError.STATUS_CODE.NOT_FOUND;
         if (isNotFound) {
-          throw new UserError(UserError.TYPE.PRE_KEY_NOT_FOUND);
+          throw new UserError(UserError.TYPE.PRE_KEY_NOT_FOUND, UserError.MESSAGE.PRE_KEY_NOT_FOUND);
         }
 
         this.logger.error(`Failed to get pre-key from backend: ${error.message}`);
-        throw new UserError(UserError.TYPE.REQUEST_FAILURE);
+        throw new UserError(UserError.TYPE.REQUEST_FAILURE, UserError.MESSAGE.REQUEST_FAILURE);
       });
   }
 
@@ -153,11 +153,11 @@ export class CryptographyRepository {
     return this.cryptographyService.getUsersPreKeys(recipients).catch(error => {
       const isNotFound = error.code === BackendClientError.STATUS_CODE.NOT_FOUND;
       if (isNotFound) {
-        throw new UserError(UserError.TYPE.PRE_KEY_NOT_FOUND);
+        throw new UserError(UserError.TYPE.PRE_KEY_NOT_FOUND, UserError.MESSAGE.PRE_KEY_NOT_FOUND);
       }
 
       this.logger.error(`Failed to get pre-key from backend: ${error.message}`);
-      throw new UserError(UserError.TYPE.REQUEST_FAILURE);
+      throw new UserError(UserError.TYPE.REQUEST_FAILURE, UserError.MESSAGE.REQUEST_FAILURE);
     });
   }
 

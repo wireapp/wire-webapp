@@ -737,7 +737,7 @@ export class UserRepository {
       return this.selfService.putSelf({name}).then(() => this.user_update({user: {id: this.self().id, name}}));
     }
 
-    return Promise.reject(new UserError((z as any).error.UserError.TYPE.INVALID_UPDATE));
+    return Promise.reject(new UserError(UserError.TYPE.INVALID_UPDATE, UserError.MESSAGE.INVALID_UPDATE));
   }
 
   /**
@@ -786,13 +786,13 @@ export class UserRepository {
           if (
             [BackendClientError.STATUS_CODE.CONFLICT, BackendClientError.STATUS_CODE.BAD_REQUEST].includes(error_code)
           ) {
-            throw new UserError(UserError.TYPE.USERNAME_TAKEN);
+            throw new UserError(UserError.TYPE.USERNAME_TAKEN, UserError.MESSAGE.USERNAME_TAKEN);
           }
-          throw new UserError(UserError.TYPE.REQUEST_FAILURE);
+          throw new UserError(UserError.TYPE.REQUEST_FAILURE, UserError.MESSAGE.REQUEST_FAILURE);
         });
     }
 
-    return Promise.reject(new UserError((z as any).error.UserError.TYPE.INVALID_UPDATE));
+    return Promise.reject(new UserError(UserError.TYPE.INVALID_UPDATE, UserError.MESSAGE.INVALID_UPDATE));
   }
 
   /**
@@ -817,15 +817,15 @@ export class UserRepository {
           return username;
         }
         if (error_code === BackendClientError.STATUS_CODE.BAD_REQUEST) {
-          throw new UserError(UserError.TYPE.USERNAME_TAKEN);
+          throw new UserError(UserError.TYPE.USERNAME_TAKEN, UserError.MESSAGE.USERNAME_TAKEN);
         }
-        throw new UserError(UserError.TYPE.REQUEST_FAILURE);
+        throw new UserError(UserError.TYPE.REQUEST_FAILURE, UserError.MESSAGE.REQUEST_FAILURE);
       })
       .then(verified_username => {
         if (verified_username) {
           return verified_username;
         }
-        throw new UserError(UserError.TYPE.USERNAME_TAKEN);
+        throw new UserError(UserError.TYPE.USERNAME_TAKEN, UserError.MESSAGE.USERNAME_TAKEN);
       });
   }
 

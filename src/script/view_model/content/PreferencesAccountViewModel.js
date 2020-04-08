@@ -413,7 +413,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     const modalOptions = {text: {message, title}};
     modals.showModal(ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
 
-    return Promise.reject(new UserError(UserError.TYPE.INVALID_UPDATE));
+    return Promise.reject(new UserError(UserError.TYPE.INVALID_UPDATE, UserError.MESSAGE.INVALID_UPDATE));
   }
 
   _resetUsernameInput() {

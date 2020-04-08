@@ -43,7 +43,7 @@ export const valueFromType = (availabilityType: Availability.Type): string => {
   if (value) {
     return value;
   }
-  throw new UserError(BaseError.TYPE.INVALID_PARAMETER);
+  throw new UserError(BaseError.TYPE.INVALID_PARAMETER, BaseError.MESSAGE.INVALID_PARAMETER);
 };
 
 export const nameFromType = (availabilityType: Availability.Type) => {
@@ -58,7 +58,7 @@ export const nameFromType = (availabilityType: Availability.Type) => {
   if (string) {
     return string;
   }
-  throw new UserError(BaseError.TYPE.INVALID_PARAMETER);
+  throw new UserError(BaseError.TYPE.INVALID_PARAMETER, BaseError.MESSAGE.INVALID_PARAMETER);
 };
 
 export const protoFromType = (availabilityType: Availability.Type) => {
