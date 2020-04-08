@@ -124,7 +124,7 @@ describe('EventRepository', () => {
       spyOn(testFactory.notification_service, 'getLastNotificationIdFromDb').and.callFake(() => {
         return last_notification_id
           ? Promise.resolve(last_notification_id)
-          : Promise.reject(new EventError(EventError.TYPE.NO_LAST_ID));
+          : Promise.reject(new EventError(EventError.TYPE.NO_LAST_ID, EventError.MESSAGE.NO_LAST_ID));
       });
 
       spyOn(testFactory.notification_service, 'saveLastNotificationIdToDb').and.returnValue(

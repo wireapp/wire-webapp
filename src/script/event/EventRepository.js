@@ -191,7 +191,7 @@ export class EventRepository {
    */
   connectWebSocket() {
     if (!this.currentClient().id) {
-      throw new EventError(EventError.TYPE.NO_CLIENT_ID);
+      throw new EventError(EventError.TYPE.NO_CLIENT_ID, EventError.MESSAGE.NO_CLIENT_ID);
     }
 
     this.webSocketService.clientId = this.currentClient().id;
@@ -284,7 +284,7 @@ export class EventRepository {
           return notificationId;
         }
         this.logger.info(`No notifications found since '${notificationId}'`);
-        return reject(new EventError(EventError.TYPE.NO_NOTIFICATIONS));
+        return reject(new EventError(EventError.TYPE.NO_NOTIFICATIONS, EventError.MESSAGE.NO_NOTIFICATIONS));
       };
 
       try {
@@ -306,11 +306,11 @@ export class EventRepository {
         const isNotFound = errorResponse.response?.status === BackendClientError.STATUS_CODE.NOT_FOUND;
         if (isNotFound) {
           this.logger.info(`No notifications found since '${notificationId}'`, errorResponse);
-          return reject(new EventError(EventError.TYPE.NO_NOTIFICATIONS));
+          return reject(new EventError(EventError.TYPE.NO_NOTIFICATIONS, EventError.MESSAGE.NO_NOTIFICATIONS));
         }
 
         this.logger.error(`Failed to get notifications: ${errorResponse.message}`, errorResponse);
-        return reject(new EventError(EventError.TYPE.REQUEST_FAILURE));
+        return reject(new EventError(EventError.TYPE.REQUEST_FAILURE, EventError.MESSAGE.REQUEST_FAILURE));
       }
     });
   }
@@ -552,7 +552,7 @@ export class EventRepository {
    */
   injectEvent(event, source = EventRepository.SOURCE.INJECTED) {
     if (!event) {
-      throw new EventError(EventError.TYPE.NO_EVENT);
+      throw new EventError(EventError.TYPE.NO_EVENT, EventError.MESSAGE.NO_EVENT);
     }
 
     const isHandlingWebSocket = this.notificationHandlingState() === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
@@ -941,6 +941,6 @@ export class EventRepository {
       localTime: new Date(correctedTimestamp).toISOString(),
     };
     this.logger.info(logMessage, logObject);
-    throw new EventError(EventError.TYPE.OUTDATED_E_CALL_EVENT);
+    throw new EventError(EventError.TYPE.OUTDATED_E_CALL_EVENT, EventError.MESSAGE.OUTDATED_E_CALL_EVENT);
   }
 }
