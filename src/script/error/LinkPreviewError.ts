@@ -28,7 +28,7 @@ enum LINK_PREVIEW_ERROR_TYPE {
 
 export class LinkPreviewError extends BaseError {
   constructor(type: LINK_PREVIEW_ERROR_TYPE, message: string) {
-    super('LinkPreviewError', type, message);
+    super(type, message);
   }
 
   static get MESSAGE(): Record<LINK_PREVIEW_ERROR_TYPE, string> {

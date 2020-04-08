@@ -26,17 +26,13 @@ export enum BASE_ERROR_TYPE {
 export class BaseError extends Error {
   type: BASE_ERROR_TYPE | string;
 
-  constructor(name: string, type: BASE_ERROR_TYPE | string, message: string) {
+  constructor(type: BASE_ERROR_TYPE | string, message: string) {
     super();
 
+    this.type = type;
+    this.message = message;
     this.stack = new Error().stack;
     this.name = this.constructor.name;
-    this.message = message || BaseError.MESSAGE[type];
-    this.type = type ? type : BaseError.TYPE.UNKNOWN;
-
-    if (!this.message) {
-      this.message = `${BaseError.MESSAGE.UNKNOWN} ${name}`;
-    }
   }
 
   static get MESSAGE(): Record<string, string> {

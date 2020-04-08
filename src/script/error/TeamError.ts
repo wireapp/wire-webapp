@@ -25,7 +25,7 @@ enum TEAM_ERROR_TYPE {
 
 export class TeamError extends BaseError {
   constructor(type: TEAM_ERROR_TYPE, message: string) {
-    super('TeamError', type, message);
+    super(type, message);
   }
 
   static get MESSAGE(): Record<TEAM_ERROR_TYPE, string> {

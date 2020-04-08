@@ -24,7 +24,7 @@ export class BackendClientError extends BaseError {
   label: string;
 
   constructor(params: {code: number; label?: string; message: string}) {
-    super('BackendClientError', BackendClientError.TYPE.GENERIC, params.message);
+    super(BackendClientError.TYPE.GENERIC, params.message);
     this.code = params.code;
     this.label = params.label;
   }

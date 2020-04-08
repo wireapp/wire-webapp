@@ -27,7 +27,7 @@ enum PERMISSION_ERROR_TYPE {
 
 export class PermissionError extends BaseError {
   constructor(type: PERMISSION_ERROR_TYPE, message: string) {
-    super('PermissionError', type, message);
+    super(type, message);
   }
 
   static get MESSAGE(): Record<PERMISSION_ERROR_TYPE, string> {

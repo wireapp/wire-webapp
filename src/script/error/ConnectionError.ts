@@ -21,7 +21,7 @@ import {BaseError, BASE_ERROR_TYPE} from './BaseError';
 
 export class ConnectionError extends BaseError {
   constructor(type: BASE_ERROR_TYPE | string, message: string) {
-    super('ConnectionError', type, message);
+    super(type, message);
   }
 
   static get MESSAGE(): Record<string, string> {

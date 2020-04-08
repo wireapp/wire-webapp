@@ -31,7 +31,7 @@ enum CRYPTOGRAPHY_ERROR_TYPE {
 
 export class CryptographyError extends BaseError {
   constructor(type: CRYPTOGRAPHY_ERROR_TYPE, message: string) {
-    super('CryptographyError', type, message);
+    super(type, message);
   }
 
   static get MESSAGE(): Record<CRYPTOGRAPHY_ERROR_TYPE, string> {

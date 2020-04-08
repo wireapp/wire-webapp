@@ -34,7 +34,7 @@ enum EVENT_ERROR_TYPE {
 
 export class EventError extends BaseError {
   constructor(type: EVENT_ERROR_TYPE, message: string) {
-    super('EventError', type, message);
+    super(type, message);
   }
 
   static get MESSAGE(): Record<EVENT_ERROR_TYPE, string> {

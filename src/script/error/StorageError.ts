@@ -33,7 +33,7 @@ enum STORAGE_ERROR_TYPE {
 
 export class StorageError extends BaseError {
   constructor(type: STORAGE_ERROR_TYPE, message: string) {
-    super('StorageError', type, message);
+    super(type, message);
   }
 
   static get MESSAGE(): Record<STORAGE_ERROR_TYPE, string> {

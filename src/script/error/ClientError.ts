@@ -32,7 +32,7 @@ enum CLIENT_ERROR_TYPE {
 
 export class ClientError extends BaseError {
   constructor(type: CLIENT_ERROR_TYPE | BASE_ERROR_TYPE, message: string) {
-    super('ClientError', type, message);
+    super(type, message);
   }
 
   static get MESSAGE(): Record<CLIENT_ERROR_TYPE, string> {
