@@ -28,7 +28,6 @@ enum ACCESS_TOKEN_ERROR_TYPE {
 
 export class AccessTokenError extends BaseError {
   constructor(type: ACCESS_TOKEN_ERROR_TYPE, message: string) {
-    message = message || AccessTokenError.MESSAGE[type];
     super('AccessTokenError', type, message);
   }
 
