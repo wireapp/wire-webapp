@@ -81,7 +81,7 @@ class LinkPreviewRepository {
 
     return new Promise(resolve => {
       if (isBlacklisted(url)) {
-        throw new LinkPreviewError(LinkPreviewError.TYPE.BLACKLISTED);
+        throw new LinkPreviewError(LinkPreviewError.TYPE.BLACKLISTED, LinkPreviewError.MESSAGE.BLACKLISTED);
       }
 
       resolve(this._fetchOpenGraphData(url));
@@ -91,13 +91,13 @@ class LinkPreviewRepository {
           openGraphData = fetchedData;
           return buildFromOpenGraphData(openGraphData, url, offset);
         }
-        throw new LinkPreviewError(LinkPreviewError.TYPE.NO_DATA_AVAILABLE);
+        throw new LinkPreviewError(LinkPreviewError.TYPE.NO_DATA_AVAILABLE, LinkPreviewError.MESSAGE.NO_DATA_AVAILABLE);
       })
       .then(linkPreview => {
         if (linkPreview) {
           return this._fetchPreviewImage(linkPreview, openGraphData.image);
         }
-        throw new LinkPreviewError(LinkPreviewError.TYPE.UNSUPPORTED_TYPE);
+        throw new LinkPreviewError(LinkPreviewError.TYPE.UNSUPPORTED_TYPE, LinkPreviewError.MESSAGE.UNSUPPORTED_TYPE);
       });
   }
 
