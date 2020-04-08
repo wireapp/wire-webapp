@@ -190,13 +190,7 @@ export class ConversationRepository {
       this.eventRepository,
       this.serverTimeHandler,
     );
-    this.clientMismatchHandler = new ClientMismatchHandler(
-      this,
-      this.cryptography_repository,
-      this.eventRepository,
-      this.serverTimeHandler,
-      this.user_repository,
-    );
+    this.clientMismatchHandler = new ClientMismatchHandler(this, this.cryptography_repository, this.user_repository);
 
     this.active_conversation = ko.observable();
     this.conversations = ko.observableArray([]);

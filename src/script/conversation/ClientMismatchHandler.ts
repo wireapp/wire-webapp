@@ -19,36 +19,26 @@
 
 import {getLogger, Logger} from 'Util/Logger';
 import {getDifference} from 'Util/ArrayUtil';
-import {ClientMismatch, UserClients} from '@wireapp/api-client/dist/conversation';
-import {EventBuilder} from './EventBuilder';
+import {ClientMismatch, NewOTRMessage, UserClients} from '@wireapp/api-client/dist/conversation';
 import {ConversationRepository} from './ConversationRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
-import {EventRepository} from '../event/EventRepository';
-import {ServerTimeHandler} from '../time/serverTimeHandler';
 import {UserRepository} from '../user/UserRepository';
 import {EventInfoEntity} from './EventInfoEntity';
-import {NewOTRMessage} from '@wireapp/api-client/dist/conversation';
 import {Conversation} from '../entity/Conversation';
 
 export class ClientMismatchHandler {
   private readonly conversationRepository: ConversationRepository;
   private readonly cryptographyRepository: CryptographyRepository;
-  private readonly eventRepository: EventRepository;
-  private readonly serverTimeHandler: ServerTimeHandler;
   private readonly userRepository: UserRepository;
   private readonly logger: Logger;
 
   constructor(
     conversationRepository: ConversationRepository,
     cryptographyRepository: CryptographyRepository,
-    eventRepository: EventRepository,
-    serverTimeHandler: ServerTimeHandler,
     userRepository: UserRepository,
   ) {
     this.conversationRepository = conversationRepository;
     this.cryptographyRepository = cryptographyRepository;
-    this.eventRepository = eventRepository;
-    this.serverTimeHandler = serverTimeHandler;
     this.userRepository = userRepository;
     this.logger = getLogger('ClientMismatchHandler');
   }
