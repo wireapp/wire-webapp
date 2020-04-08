@@ -51,7 +51,7 @@ import 'Components/availabilityState';
 import {isAppLockEnabled} from './AppLockViewModel';
 import {loadValue} from 'Util/StorageUtil';
 import {StorageKey} from '../../storage';
-import {UserError} from 'src/script/error/UserError';
+import {UserError} from '../../error/UserError';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};

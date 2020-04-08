@@ -32,7 +32,7 @@ import {ModalsViewModel} from '../ModalsViewModel';
 import {WebAppEvents} from '../../event/WebApp';
 import {MessageCategory} from '../../message/MessageCategory';
 import {MotionDuration} from '../../motion/MotionDuration';
-import {UserError} from 'src/script/error/UserError';
+import {UserError} from '../../error/UserError';
 
 /*
  * Message list rendering view model.

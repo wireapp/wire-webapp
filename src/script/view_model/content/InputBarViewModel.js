@@ -44,7 +44,7 @@ import {Config} from '../../Config';
 import {AssetUploader} from '../../assets/AssetUploader';
 import {AssetService} from '../../assets/AssetService';
 import {BackendClient} from '../../service/BackendClient';
-import {ConversationError} from 'src/script/error/ConversationError';
+import {ConversationError} from '../../error/ConversationError';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
