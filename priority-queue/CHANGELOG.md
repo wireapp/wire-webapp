@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 1.5.7 (2020-04-08)
+
+
+### Bug Fixes
+
+* **core:** Send messages only to selected clients ([#2891](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/issues/2891)) ([90de697](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/commit/90de697dd2f215c2bea8cc1708baf1125fcf41ba))
+
+
+
+
+
 ## [1.5.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/compare/@wireapp/priority-queue@1.5.5...@wireapp/priority-queue@1.5.6) (2020-03-10)
 
 **Note:** Version bump only for package @wireapp/priority-queue
