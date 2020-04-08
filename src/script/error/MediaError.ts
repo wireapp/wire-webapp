@@ -30,7 +30,7 @@ enum MEDIA_ERROR_TYPE {
 export class MediaError extends Error {
   type: MEDIA_ERROR_TYPE;
 
-  constructor(type: MEDIA_ERROR_TYPE, message?: string) {
+  constructor(type: MEDIA_ERROR_TYPE, message: string) {
     super(message);
     this.type = type;
   }
