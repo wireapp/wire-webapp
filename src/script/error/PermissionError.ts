@@ -26,8 +26,7 @@ enum PERMISSION_ERROR_TYPE {
 }
 
 export class PermissionError extends BaseError {
-  constructor(type: PERMISSION_ERROR_TYPE, message?: string) {
-    message = message || PermissionError.MESSAGE[type];
+  constructor(type: PERMISSION_ERROR_TYPE, message: string) {
     super('PermissionError', type, message);
   }
 
