@@ -37,6 +37,7 @@ export class BackendClientError extends BaseError {
 
   static get LABEL() {
     return {
+      ACCESS_DENIED: 'access-denied',
       BAD_GATEWAY: 'bad-gateway',
       BAD_REQUEST: 'bad-request',
       BLACKLISTED_EMAIL: 'blacklisted-email',
