@@ -26,8 +26,7 @@ enum CONNECT_ERROR_TYPE {
 }
 
 export class ConnectError extends BaseError {
-  constructor(type: CONNECT_ERROR_TYPE, message?: string) {
-    message = message || ConnectError.MESSAGE[type];
+  constructor(type: CONNECT_ERROR_TYPE, message: string) {
     super('ConnectError', type, message);
   }
 
