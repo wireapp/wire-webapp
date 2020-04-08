@@ -22,6 +22,7 @@ import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {flatten} from 'underscore';
+import type {AxiosError} from 'axios';
 
 import {chunk} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -513,8 +514,8 @@ export class UserRepository {
       return this.user_service
         .getUsers(chunkOfUserIds)
         .then(response => (response ? this.user_mapper.mapUsersFromJson(response) : []))
-        .catch(error => {
-          const isNotFound = error.code === BackendClientError.STATUS_CODE.NOT_FOUND;
+        .catch((error: AxiosError) => {
+          const isNotFound = error.response?.status === BackendClientError.STATUS_CODE.NOT_FOUND;
           if (isNotFound) {
             return [];
           }

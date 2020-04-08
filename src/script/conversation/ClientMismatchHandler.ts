@@ -96,7 +96,7 @@ export class ClientMismatchHandler {
       delete payload.recipients[userId][clientId];
       this.userRepository.remove_client_from_user(userId, clientId);
     };
-    this.remove(recipients, removeDeletedClient, conversationEntity, payload);
+    this.removeFromPayload(recipients, removeDeletedClient, conversationEntity, payload);
   }
 
   /**
@@ -169,7 +169,7 @@ export class ClientMismatchHandler {
       recipients,
     );
     const removeRedundantClient = (userId: string, clientId: string) => delete payload.recipients[userId][clientId];
-    this.remove(recipients, removeRedundantClient, conversationEntity, payload);
+    this.removeFromPayload(recipients, removeRedundantClient, conversationEntity, payload);
   }
 
   /**
@@ -181,7 +181,7 @@ export class ClientMismatchHandler {
    * @param payload Initial payload resulting in a 412
    * @returns Function array
    */
-  remove(
+  removeFromPayload(
     recipients: UserClients,
     clientFn: Function,
     conversationEntity: Conversation = undefined,
@@ -189,27 +189,8 @@ export class ClientMismatchHandler {
   ): void[] {
     const result: void[] = [];
 
-    const removeDeletedUser = (userId: string) => {
-      const clientIdsOfUser = Object.keys(payload.recipients[userId]);
-      const noRemainingClients = !clientIdsOfUser.length;
-
-      if (noRemainingClients) {
-        if (conversationEntity !== undefined) {
-          const isGroupConversation = conversationEntity.isGroup();
-          if (isGroupConversation) {
-            const timestamp = this.serverTimeHandler.toServerTimestamp();
-            const event = EventBuilder.buildMemberLeave(conversationEntity, userId, false, timestamp);
-            this.eventRepository.injectEvent(event);
-          }
-        }
-
-        delete payload.recipients[userId];
-      }
-    };
-
     Object.entries(recipients).forEach(([userId, clientIds = []]) => {
       clientIds.forEach(clientId => result.push(clientFn(userId, clientId)));
-      result.push(removeDeletedUser(userId));
     });
 
     return result;
