@@ -25,20 +25,29 @@ import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {UserRepository} from '../user/UserRepository';
 import {EventInfoEntity} from './EventInfoEntity';
 import {Conversation} from '../entity/Conversation';
+import {EventRepository} from '../event/EventRepository';
+import {ServerTimeHandler} from '../time/serverTimeHandler';
+import {EventBuilder} from './EventBuilder';
 
 export class ClientMismatchHandler {
   private readonly conversationRepository: ConversationRepository;
   private readonly cryptographyRepository: CryptographyRepository;
+  private readonly eventRepository: EventRepository;
+  private readonly serverTimeHandler: ServerTimeHandler;
   private readonly userRepository: UserRepository;
   private readonly logger: Logger;
 
   constructor(
     conversationRepository: ConversationRepository,
     cryptographyRepository: CryptographyRepository,
+    eventRepository: EventRepository,
+    serverTimeHandler: ServerTimeHandler,
     userRepository: UserRepository,
   ) {
     this.conversationRepository = conversationRepository;
     this.cryptographyRepository = cryptographyRepository;
+    this.eventRepository = eventRepository;
+    this.serverTimeHandler = serverTimeHandler;
     this.userRepository = userRepository;
     this.logger = getLogger('ClientMismatchHandler');
   }
