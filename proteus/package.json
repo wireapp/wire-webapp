@@ -33,9 +33,10 @@
     "clean": "rimraf dist",
     "dist": "yarn clean && yarn build:node && yarn build:browser",
     "start": "node dist/index.js",
-    "test": "yarn test:node",
+    "test": "yarn test:types && yarn test:node",
+    "test:node": "nyc jasmine --config=jasmine.json",
     "test:project": "yarn dist && yarn test",
-    "test:node": "nyc jasmine --config=jasmine.json"
+    "test:types": "tsc --noEmit"
   },
   "version": "9.6.10"
 }
