@@ -55,7 +55,10 @@ export class CryptographyMapper {
    */
   async mapGenericMessage(genericMessage, event) {
     if (!genericMessage) {
-      throw new CryptographyError(CryptographyError.TYPE.NO_GENERIC_MESSAGE);
+      throw new CryptographyError(
+        CryptographyError.TYPE.NO_GENERIC_MESSAGE,
+        CryptographyError.MESSAGE.NO_GENERIC_MESSAGE,
+      );
     }
 
     if (genericMessage.external) {
@@ -395,7 +398,7 @@ export class CryptographyMapper {
       return GenericMessage.decode(new Uint8Array(externalMessageBuffer));
     } catch (error) {
       this.logger.error(`Failed to unwrap external message: ${error.message}`, error);
-      throw new CryptographyError(CryptographyError.TYPE.BROKEN_EXTERNAL);
+      throw new CryptographyError(CryptographyError.TYPE.BROKEN_EXTERNAL, CryptographyError.MESSAGE.BROKEN_EXTERNAL);
     }
   }
 
@@ -416,7 +419,7 @@ export class CryptographyMapper {
     }
 
     this.logger.info(`Skipped event '${eventId}': ${CryptographyError.MESSAGE.IGNORED_PREVIEW}`);
-    throw new CryptographyError(CryptographyError.TYPE.IGNORED_PREVIEW);
+    throw new CryptographyError(CryptographyError.TYPE.IGNORED_PREVIEW, CryptographyError.MESSAGE.IGNORED_PREVIEW);
   }
 
   _mapImageMedium(image, eventId) {

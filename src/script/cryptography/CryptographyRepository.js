@@ -254,7 +254,7 @@ export class CryptographyRepository {
       const logMessage = `Encrypted event with ID '${id}' from user '${userId}' does not have a 'data' property.`;
       this.logger.error(logMessage, event);
 
-      throw new CryptographyError(CryptographyError.TYPE.NO_DATA_CONTENT);
+      throw new CryptographyError(CryptographyError.TYPE.NO_DATA_CONTENT, CryptographyError.MESSAGE.NO_DATA_CONTENT);
     }
 
     // Check the length of the message
