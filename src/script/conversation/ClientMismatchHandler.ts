@@ -179,8 +179,27 @@ export class ClientMismatchHandler {
   ): void[] {
     const result: void[] = [];
 
+    const removeDeletedUser = (userId: string) => {
+      const clientIdsOfUser = Object.keys(payload.recipients[userId]);
+      const noRemainingClients = !clientIdsOfUser.length;
+
+      if (noRemainingClients) {
+        if (conversationEntity !== undefined) {
+          const isGroupConversation = conversationEntity.isGroup();
+          if (isGroupConversation) {
+            const timestamp = this.serverTimeHandler.toServerTimestamp();
+            const event = EventBuilder.buildMemberLeave(conversationEntity, userId, false, timestamp);
+            this.eventRepository.injectEvent(event);
+          }
+        }
+
+        delete payload.recipients[userId];
+      }
+    };
+
     Object.entries(recipients).forEach(([userId, clientIds = []]) => {
       clientIds.forEach(clientId => result.push(clientFn(userId, clientId)));
+      result.push(removeDeletedUser(userId));
     });
 
     return result;
