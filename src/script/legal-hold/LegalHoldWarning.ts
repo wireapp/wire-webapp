@@ -43,8 +43,12 @@ export const showLegalHoldWarning = (conversationEntity: Conversation, verifyDev
     }
     amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.MULTI_ACTIONS, {
       close: () => {
-        const errorType = ConversationError.TYPE.LEGAL_HOLD_CONVERSATION_CANCELLATION;
-        reject(new ConversationError(errorType));
+        reject(
+          new ConversationError(
+            ConversationError.TYPE.LEGAL_HOLD_CONVERSATION_CANCELLATION,
+            ConversationError.MESSAGE.LEGAL_HOLD_CONVERSATION_CANCELLATION,
+          ),
+        );
       },
       preventClose: true,
       primaryAction: {

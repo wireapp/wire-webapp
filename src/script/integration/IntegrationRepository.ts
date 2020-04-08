@@ -144,7 +144,10 @@ export class IntegrationRepository {
           return this.addService(conversationEntity, serviceEntity, 'start_ui').then(() => conversationEntity);
         }
 
-        throw new ConversationError(ConversationError.TYPE.CONVERSATION_NOT_FOUND);
+        throw new ConversationError(
+          ConversationError.TYPE.CONVERSATION_NOT_FOUND,
+          ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
+        );
       })
       .catch(error => {
         amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {

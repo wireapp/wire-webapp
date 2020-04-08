@@ -104,10 +104,10 @@ export class ConversationMapper {
    */
   mapConversations(conversationsData, timestamp = 1) {
     if (conversationsData === undefined) {
-      throw new ConversationError(BaseError.TYPE.MISSING_PARAMETER);
+      throw new ConversationError(BaseError.TYPE.MISSING_PARAMETER, BaseError.MESSAGE.MISSING_PARAMETER);
     }
     if (!Array.isArray(conversationsData) || !conversationsData.length) {
-      throw new ConversationError(BaseError.TYPE.INVALID_PARAMETER);
+      throw new ConversationError(BaseError.TYPE.INVALID_PARAMETER, BaseError.MESSAGE.INVALID_PARAMETER);
     }
     return conversationsData.map((conversationData, index) => {
       return this._createConversationEntity(conversationData, timestamp + index);
@@ -255,10 +255,10 @@ export class ConversationMapper {
    */
   _createConversationEntity(conversationData, initialTimestamp) {
     if (conversationData === undefined) {
-      throw new ConversationError(BaseError.TYPE.MISSING_PARAMETER);
+      throw new ConversationError(BaseError.TYPE.MISSING_PARAMETER, BaseError.MESSAGE.MISSING_PARAMETER);
     }
     if (!isObject(conversationData) || !Object.keys(conversationData).length) {
-      throw new ConversationError(BaseError.TYPE.INVALID_PARAMETER);
+      throw new ConversationError(BaseError.TYPE.INVALID_PARAMETER, BaseError.MESSAGE.INVALID_PARAMETER);
     }
 
     const {creator, id, members, name, others, type} = conversationData;

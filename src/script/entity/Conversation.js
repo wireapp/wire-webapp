@@ -431,7 +431,10 @@ export class Conversation {
 
     const entityTimestamp = this[type];
     if (!entityTimestamp) {
-      throw new ConversationError(ConversationError.TYPE.INVALID_PARAMETER);
+      throw new ConversationError(
+        ConversationError.TYPE.INVALID_PARAMETER,
+        ConversationError.MESSAGE.INVALID_PARAMETER,
+      );
     }
 
     const updatedTimestamp = forceUpdate ? timestamp : this._incrementTimeOnly(entityTimestamp(), timestamp);

@@ -111,7 +111,10 @@ export class EventMapper {
         const customData = {eventTime: new Date(event.time).toISOString(), eventType: event.type};
         Raygun.send(new Error(errorMessage), customData);
 
-        throw new ConversationError(ConversationError.TYPE.MESSAGE_NOT_FOUND);
+        throw new ConversationError(
+          ConversationError.TYPE.MESSAGE_NOT_FOUND,
+          ConversationError.MESSAGE.MESSAGE_NOT_FOUND,
+        );
       });
   }
 
@@ -296,7 +299,10 @@ export class EventMapper {
 
       default: {
         this.logger.warn(`Ignored unhandled '${event.type}' event ${event.id ? `'${event.id}' ` : ''}`, event);
-        throw new ConversationError(ConversationError.TYPE.MESSAGE_NOT_FOUND);
+        throw new ConversationError(
+          ConversationError.TYPE.MESSAGE_NOT_FOUND,
+          ConversationError.MESSAGE.MESSAGE_NOT_FOUND,
+        );
       }
     }
 

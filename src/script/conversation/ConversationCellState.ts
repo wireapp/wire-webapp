@@ -126,7 +126,7 @@ const _generateSummaryDescription = (activities: Record<ACTIVITY_TYPE, number>):
           }
 
           default:
-            throw new ConversationError();
+            throw new ConversationError(ConversationError.TYPE.UNKNOWN_ACTIVITY, `Unknown activity "${activity}"`);
         }
       }
     })

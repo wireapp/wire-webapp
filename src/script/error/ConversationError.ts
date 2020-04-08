@@ -17,7 +17,7 @@
  *
  */
 
-import {BaseError} from './BaseError';
+import {BaseError, BASE_ERROR_TYPE} from './BaseError';
 
 enum CONVERSATION_ERROR_TYPE {
   CONVERSATION_NOT_FOUND = 'CONVERSATION_NOT_FOUND',
@@ -32,11 +32,11 @@ enum CONVERSATION_ERROR_TYPE {
   WRONG_CONVERSATION = 'WRONG_CONVERSATION',
   WRONG_TYPE = 'WRONG_TYPE',
   WRONG_USER = 'WRONG_USER',
+  UNKNOWN_ACTIVITY = 'UNKNOWN_ACTIVITY',
 }
 
 export class ConversationError extends BaseError {
-  constructor(type?: CONVERSATION_ERROR_TYPE | string, message?: string, error?: Error) {
-    message = message || ConversationError.MESSAGE[type];
+  constructor(type: CONVERSATION_ERROR_TYPE | BASE_ERROR_TYPE, message: string, error?: Error) {
     super('ConversationError', type, message);
     if (error) {
       this.stack = `${this.stack}\n${error.stack}`;
@@ -53,6 +53,7 @@ export class ConversationError extends BaseError {
       NO_CONVERSATION_ID: 'Conversation ID is not defined',
       NO_MESSAGE_CHANGES: 'Edited message equals original message',
       REQUEST_FAILURE: 'Conversation related backend request failed',
+      UNKNOWN_ACTIVITY: 'Unknown activity',
       WRONG_CHANGE: 'Attempted unsupported change on conversation',
       WRONG_CONVERSATION: 'Message was sent in the wrong conversation',
       WRONG_TYPE: 'Wrong message to for action',
@@ -70,6 +71,7 @@ export class ConversationError extends BaseError {
       NO_CONVERSATION_ID: CONVERSATION_ERROR_TYPE.NO_CONVERSATION_ID,
       NO_MESSAGE_CHANGES: CONVERSATION_ERROR_TYPE.NO_MESSAGE_CHANGES,
       REQUEST_FAILURE: CONVERSATION_ERROR_TYPE.REQUEST_FAILURE,
+      UNKNOWN_ACTIVITY: CONVERSATION_ERROR_TYPE.UNKNOWN_ACTIVITY,
       WRONG_CHANGE: CONVERSATION_ERROR_TYPE.WRONG_CHANGE,
       WRONG_CONVERSATION: CONVERSATION_ERROR_TYPE.WRONG_CONVERSATION,
       WRONG_TYPE: CONVERSATION_ERROR_TYPE.WRONG_TYPE,

@@ -214,7 +214,10 @@ export class ContentViewModel {
     conversationPromise
       .then(conversationEntity => {
         if (!conversationEntity) {
-          throw new ConversationError(ConversationError.TYPE.CONVERSATION_NOT_FOUND);
+          throw new ConversationError(
+            ConversationError.TYPE.CONVERSATION_NOT_FOUND,
+            ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
+          );
         }
         const isActiveConversation = this.conversationRepository.is_active_conversation(conversationEntity);
         const isConversationState = this.state() === ContentViewModel.STATE.CONVERSATION;

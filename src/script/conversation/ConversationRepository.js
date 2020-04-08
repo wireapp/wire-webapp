@@ -547,7 +547,10 @@ export class ConversationRepository {
           if (event) {
             return this.event_mapper.mapJsonEvent(event, conversationEntity);
           }
-          throw new ConversationError(ConversationError.TYPE.MESSAGE_NOT_FOUND);
+          throw new ConversationError(
+            ConversationError.TYPE.MESSAGE_NOT_FOUND,
+            ConversationError.MESSAGE.MESSAGE_NOT_FOUND,
+          );
         });
 
     if (ensureUser) {
@@ -889,7 +892,9 @@ export class ConversationRepository {
    */
   get_conversation_by_id(conversation_id) {
     if (typeof conversation_id !== 'string') {
-      return Promise.reject(new ConversationError(ConversationError.TYPE.NO_CONVERSATION_ID));
+      return Promise.reject(
+        new ConversationError(ConversationError.TYPE.NO_CONVERSATION_ID, ConversationError.MESSAGE.NO_CONVERSATION_ID),
+      );
     }
     const conversationEntity = this.find_conversation_by_id(conversation_id);
     if (conversationEntity) {
@@ -1615,12 +1620,16 @@ export class ConversationRepository {
    */
   setNotificationState(conversationEntity, notificationState) {
     if (!conversationEntity || notificationState === undefined) {
-      return Promise.reject(new ConversationError(BaseError.TYPE.MISSING_PARAMETER));
+      return Promise.reject(
+        new ConversationError(BaseError.TYPE.MISSING_PARAMETER, BaseError.MESSAGE.MISSING_PARAMETER),
+      );
     }
 
     const validNotificationStates = Object.values(NOTIFICATION_STATE);
     if (!validNotificationStates.includes(notificationState)) {
-      return Promise.reject(new ConversationError(BaseError.TYPE.INVALID_PARAMETER));
+      return Promise.reject(
+        new ConversationError(BaseError.TYPE.INVALID_PARAMETER, BaseError.MESSAGE.INVALID_PARAMETER),
+      );
     }
 
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
@@ -1678,7 +1687,10 @@ export class ConversationRepository {
 
   _toggleArchiveConversation(conversationEntity, newState, forceChange) {
     if (!conversationEntity) {
-      const error = new ConversationError(ConversationError.TYPE.CONVERSATION_NOT_FOUND);
+      const error = new ConversationError(
+        ConversationError.TYPE.CONVERSATION_NOT_FOUND,
+        ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
+      );
       return Promise.reject(error);
     }
 
@@ -1690,7 +1702,9 @@ export class ConversationRepository {
     const skipChange = sameTimestamp && !forceChange;
 
     if (!stateChange && skipChange) {
-      return Promise.reject(new ConversationError(ConversationError.TYPE.NO_CHANGES));
+      return Promise.reject(
+        new ConversationError(ConversationError.TYPE.NO_CHANGES, ConversationError.MESSAGE.NO_CHANGES),
+      );
     }
 
     const payload = {
@@ -2227,7 +2241,9 @@ export class ConversationRepository {
     const wasEdited = hasDifferentText || hasDifferentMentions;
 
     if (!wasEdited) {
-      return Promise.reject(new ConversationError(ConversationError.TYPE.NO_MESSAGE_CHANGES));
+      return Promise.reject(
+        new ConversationError(ConversationError.TYPE.NO_MESSAGE_CHANGES, ConversationError.MESSAGE.NO_MESSAGE_CHANGES),
+      );
     }
 
     const messageId = createRandomUuid();
@@ -2921,8 +2937,12 @@ export class ConversationRepository {
             amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
               close: () => {
                 if (!sendAnyway) {
-                  const errorType = ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION;
-                  reject(new ConversationError(errorType));
+                  reject(
+                    new ConversationError(
+                      ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION,
+                      ConversationError.MESSAGE.DEGRADED_CONVERSATION_CANCELLATION,
+                    ),
+                  );
                 }
               },
               primaryAction: {
@@ -3034,7 +3054,7 @@ export class ConversationRepository {
     return Promise.resolve()
       .then(() => {
         if (!messageEntity.user().is_me && !messageEntity.ephemeral_expires()) {
-          throw new ConversationError(ConversationError.TYPE.WRONG_USER);
+          throw new ConversationError(ConversationError.TYPE.WRONG_USER, ConversationError.MESSAGE.WRONG_USER);
         }
 
         const protoMessageDelete = new MessageDelete({messageId});
@@ -3148,7 +3168,12 @@ export class ConversationRepository {
 
       const isExpectedType = typesInSelfConversation.includes(type);
       if (!isExpectedType) {
-        return Promise.reject(new ConversationError(ConversationError.TYPE.WRONG_CONVERSATION));
+        return Promise.reject(
+          new ConversationError(
+            ConversationError.TYPE.WRONG_CONVERSATION,
+            ConversationError.MESSAGE.WRONG_CONVERSATION,
+          ),
+        );
       }
     }
 
@@ -3525,7 +3550,7 @@ export class ConversationRepository {
     try {
       const existingConversationEntity = this.find_conversation_by_id(conversationId);
       if (existingConversationEntity) {
-        throw new ConversationError(ConversationError.TYPE.NO_CHANGES);
+        throw new ConversationError(ConversationError.TYPE.NO_CHANGES, ConversationError.MESSAGE.NO_CHANGES);
       }
 
       const conversationEntity = this.mapConversations(eventData, initialTimestamp);
@@ -3694,12 +3719,15 @@ export class ConversationRepository {
     const isBackendEvent = eventData.otr_archived_ref || eventData.otr_muted_ref;
     const inSelfConversation = !this.self_conversation() || conversationId === this.self_conversation().id;
     if (!inSelfConversation && conversationId && !isBackendEvent) {
-      throw new ConversationError(ConversationError.TYPE.WRONG_CONVERSATION);
+      throw new ConversationError(
+        ConversationError.TYPE.WRONG_CONVERSATION,
+        ConversationError.MESSAGE.WRONG_CONVERSATION,
+      );
     }
 
     const isFromSelf = !this.selfUser() || from === this.selfUser().id;
     if (!isFromSelf) {
-      throw new ConversationError(ConversationError.TYPE.WRONG_USER);
+      throw new ConversationError(ConversationError.TYPE.WRONG_USER, ConversationError.MESSAGE.WRONG_USER);
     }
 
     const isActiveConversation = this.is_active_conversation(conversationEntity);
@@ -3767,7 +3795,7 @@ export class ConversationRepository {
 
         const isSameSender = from === deletedMessageEntity.from;
         if (!isSameSender) {
-          throw new ConversationError(ConversationError.TYPE.WRONG_USER);
+          throw new ConversationError(ConversationError.TYPE.WRONG_USER, ConversationError.MESSAGE.WRONG_USER);
         }
 
         const isFromSelf = from === this.selfUser().id;
@@ -3802,12 +3830,15 @@ export class ConversationRepository {
       .then(() => {
         const inSelfConversation = !this.self_conversation() || conversationId === this.self_conversation().id;
         if (!inSelfConversation) {
-          throw new ConversationError(ConversationError.TYPE.WRONG_CONVERSATION);
+          throw new ConversationError(
+            ConversationError.TYPE.WRONG_CONVERSATION,
+            ConversationError.MESSAGE.WRONG_CONVERSATION,
+          );
         }
 
         const isFromSelf = !this.selfUser() || from === this.selfUser().id;
         if (!isFromSelf) {
-          throw new ConversationError(ConversationError.TYPE.WRONG_USER);
+          throw new ConversationError(ConversationError.TYPE.WRONG_USER, ConversationError.MESSAGE.WRONG_USER);
         }
 
         return this.get_conversation_by_id(eventData.conversation_id);
@@ -3845,7 +3876,7 @@ export class ConversationRepository {
 
           const log = `Cannot react to '${type}' message '${messageId}' in conversation '${conversationId}'`;
           this.logger.error(log, messageEntity);
-          throw new ConversationError(ConversationError.TYPE.WRONG_TYPE);
+          throw new ConversationError(ConversationError.TYPE.WRONG_TYPE, ConversationError.MESSAGE.WRONG_TYPE);
         }
 
         const changes = messageEntity.getUpdatedReactions(eventJson);
@@ -3876,7 +3907,7 @@ export class ConversationRepository {
 
         const log = `Cannot react to '${type}' message '${messageId}' in conversation '${conversationEntity.id}'`;
         this.logger.error(log, messageEntity);
-        throw new ConversationError(ConversationError.TYPE.WRONG_TYPE);
+        throw new ConversationError(ConversationError.TYPE.WRONG_TYPE, ConversationError.MESSAGE.WRONG_TYPE);
       }
       const changes = messageEntity.getSelectionChange(buttonId);
       if (changes) {
