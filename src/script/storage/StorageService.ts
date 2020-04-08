@@ -111,7 +111,7 @@ export class StorageService {
     } catch (error) {
       const logMessage = `Failed to initialize database '${this.dbName}': ${error.message || error}`;
       this.logger.error(logMessage, {error});
-      throw new StorageError(StorageError.TYPE.FAILED_TO_OPEN);
+      throw new StorageError(StorageError.TYPE.FAILED_TO_OPEN, StorageError.MESSAGE.FAILED_TO_OPEN);
     }
   }
 
@@ -362,7 +362,7 @@ export class StorageService {
    */
   async save<T = Object>(storeName: string, primaryKey: string, entity: T): Promise<string> {
     if (!entity) {
-      throw new StorageError(StorageError.TYPE.NO_DATA);
+      throw new StorageError(StorageError.TYPE.NO_DATA, StorageError.MESSAGE.NO_DATA);
     }
 
     if (this.isTemporaryAndNonPersistent) {

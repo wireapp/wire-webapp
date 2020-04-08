@@ -32,8 +32,7 @@ enum STORAGE_ERROR_TYPE {
 }
 
 export class StorageError extends BaseError {
-  constructor(type: STORAGE_ERROR_TYPE, message?: string) {
-    message = message || StorageError.MESSAGE[type];
+  constructor(type: STORAGE_ERROR_TYPE, message: string) {
     super('StorageError', type, message);
   }
 

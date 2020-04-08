@@ -69,7 +69,7 @@ export class StorageRepository {
       if (record?.value) {
         return record.value;
       }
-      throw new StorageError(StorageError.TYPE.NOT_FOUND);
+      throw new StorageError(StorageError.TYPE.NOT_FOUND, StorageError.MESSAGE.NOT_FOUND);
     });
   }
 

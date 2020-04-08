@@ -405,7 +405,7 @@ export class EventService {
         return this.storageService.db.transaction('rw', StorageSchemata.OBJECT_STORE.EVENTS, () => {
           return this.storageService.load(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey).then(record => {
             if (!record) {
-              throw new StorageError(StorageError.TYPE.NOT_FOUND);
+              throw new StorageError(StorageError.TYPE.NOT_FOUND, StorageError.MESSAGE.NOT_FOUND);
             }
 
             const databaseVersion = record.version || 1;
@@ -424,7 +424,7 @@ export class EventService {
             this.logger.error(logMessage, logObject);
 
             Raygun.send(new Error(logMessage), logObject);
-            throw new StorageError(StorageError.TYPE.NON_SEQUENTIAL_UPDATE);
+            throw new StorageError(StorageError.TYPE.NON_SEQUENTIAL_UPDATE, StorageError.MESSAGE.NON_SEQUENTIAL_UPDATE);
           });
         });
       }
