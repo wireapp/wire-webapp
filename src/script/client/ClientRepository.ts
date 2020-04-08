@@ -138,7 +138,7 @@ export class ClientRepository {
       const clientNotFoundBackend = status === BackendClientError.STATUS_CODE.NOT_FOUND;
       if (clientNotFoundBackend) {
         this.logger.warn(`Local client '${clientId}' no longer exists on the backend`, error);
-        throw new ClientError(ClientError.TYPE.NO_VALID_CLIENT);
+        throw new ClientError(ClientError.TYPE.NO_VALID_CLIENT, ClientError.MESSAGE.NO_VALID_CLIENT);
       }
 
       throw error;
@@ -153,12 +153,12 @@ export class ClientRepository {
     return this.clientService
       .loadClientFromDb(ClientRepository.PRIMARY_KEY_CURRENT_CLIENT)
       .catch(() => {
-        throw new ClientError(ClientError.TYPE.DATABASE_FAILURE);
+        throw new ClientError(ClientError.TYPE.DATABASE_FAILURE, ClientError.MESSAGE.DATABASE_FAILURE);
       })
       .then(clientPayload => {
         if (typeof clientPayload === 'string') {
           this.logger.info('No local client found in database');
-          throw new ClientError(ClientError.TYPE.NO_VALID_CLIENT);
+          throw new ClientError(ClientError.TYPE.NO_VALID_CLIENT, ClientError.MESSAGE.NO_VALID_CLIENT);
         }
 
         const currentClient = ClientMapper.mapClient(clientPayload, true);
@@ -177,10 +177,10 @@ export class ClientRepository {
    */
   private constructPrimaryKey(userId: string, clientId: string): string {
     if (!userId) {
-      throw new ClientError(ClientError.TYPE.NO_USER_ID);
+      throw new ClientError(ClientError.TYPE.NO_USER_ID, ClientError.MESSAGE.NO_USER_ID);
     }
     if (!clientId) {
-      throw new ClientError(ClientError.TYPE.NO_CLIENT_ID);
+      throw new ClientError(ClientError.TYPE.NO_CLIENT_ID, ClientError.MESSAGE.NO_CLIENT_ID);
     }
     return `${userId}@${clientId}`;
   }
@@ -318,10 +318,10 @@ export class ClientRepository {
       .catch(error => {
         const tooManyClients = error.label === BackendClientError.LABEL.TOO_MANY_CLIENTS;
         if (tooManyClients) {
-          throw new ClientError(ClientError.TYPE.TOO_MANY_CLIENTS);
+          throw new ClientError(ClientError.TYPE.TOO_MANY_CLIENTS, ClientError.MESSAGE.TOO_MANY_CLIENTS);
         }
         this.logger.error(`Client registration request failed: ${error.message}`, error);
-        throw new ClientError(ClientError.TYPE.REQUEST_FAILURE);
+        throw new ClientError(ClientError.TYPE.REQUEST_FAILURE, ClientError.MESSAGE.REQUEST_FAILURE);
       })
       .then(response => {
         const {cookie, id, type} = response;
@@ -337,7 +337,7 @@ export class ClientRepository {
           throw error;
         }
         this.logger.error(`Failed to save client: ${error.message}`, error);
-        throw new ClientError(ClientError.TYPE.DATABASE_FAILURE);
+        throw new ClientError(ClientError.TYPE.DATABASE_FAILURE, ClientError.MESSAGE.DATABASE_FAILURE);
       })
       .then(clientPayload => this.transferCookieLabel(clientType, clientPayload.cookie))
       .then(() => this.currentClient)
@@ -555,7 +555,7 @@ export class ClientRepository {
    */
   isCurrentClientPermanent(): boolean {
     if (!this.currentClient()) {
-      throw new ClientError(ClientError.TYPE.CLIENT_NOT_SET);
+      throw new ClientError(ClientError.TYPE.CLIENT_NOT_SET, ClientError.MESSAGE.CLIENT_NOT_SET);
     }
     return Environment.electron || this.currentClient().isPermanent();
   }
@@ -668,13 +668,13 @@ export class ClientRepository {
    */
   private isCurrentClient(userId: string, clientId: string): boolean {
     if (!this.currentClient()) {
-      throw new ClientError(ClientError.TYPE.CLIENT_NOT_SET);
+      throw new ClientError(ClientError.TYPE.CLIENT_NOT_SET, ClientError.MESSAGE.CLIENT_NOT_SET);
     }
     if (!userId) {
-      throw new ClientError(ClientError.TYPE.NO_USER_ID);
+      throw new ClientError(ClientError.TYPE.NO_USER_ID, ClientError.MESSAGE.NO_USER_ID);
     }
     if (!clientId) {
-      throw new ClientError(ClientError.TYPE.NO_CLIENT_ID);
+      throw new ClientError(ClientError.TYPE.NO_CLIENT_ID, ClientError.MESSAGE.NO_CLIENT_ID);
     }
     return userId === this.selfUser().id && clientId === this.currentClient().id;
   }

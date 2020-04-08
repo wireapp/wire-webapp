@@ -31,8 +31,7 @@ enum CLIENT_ERROR_TYPE {
 }
 
 export class ClientError extends BaseError {
-  constructor(type: CLIENT_ERROR_TYPE, message?: string) {
-    message = message || ClientError.MESSAGE[type];
+  constructor(type: CLIENT_ERROR_TYPE, message: string) {
     super('ClientError', type, message);
   }
 
