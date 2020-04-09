@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.0.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.0.2...@wireapp/api-client@11.0.3) (2020-04-09)
+
+
+### Bug Fixes
+
+* **api-client:** New error for owner deletion ([#2934](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2934)) ([87a3a81](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/87a3a813f670bfdbcb1d0a93f226d780614d6159))
+
+
+
+
+
 ## [11.0.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.0.1...@wireapp/api-client@11.0.2) (2020-04-09)
 
 **Note:** Version bump only for package @wireapp/api-client
