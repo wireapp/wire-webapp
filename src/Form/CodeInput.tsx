@@ -69,6 +69,7 @@ export const CodeInput = ({
   autoFocus = false,
   markInvalid,
   onCodeComplete = noop,
+  disabled,
 }: CodeInputProps) => {
   const [values, setValues] = useState(Array(digits).fill(''));
   const inputs = Array(digits);
@@ -165,6 +166,7 @@ export const CodeInput = ({
           type="text"
           value={values[index]}
           onChange={() => {}}
+          disabled={disabled}
         />
       ))}
     </CodeInputWrapper>
