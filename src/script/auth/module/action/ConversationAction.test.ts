@@ -46,7 +46,7 @@ describe('ConversationAction', () => {
   });
 
   it('handles failed join conversation code check', async () => {
-    const error = new Error('testerror');
+    const error = new Error('test error');
     const key = 'key';
     const code = 'code';
     const mockedActions = {};
@@ -95,7 +95,7 @@ describe('ConversationAction', () => {
   });
 
   it('handles failed join conversation by code', async () => {
-    const error = new Error('testerror');
+    const error = new Error('test error');
     const key = 'key';
     const code = 'code';
     const mockedActions = {};

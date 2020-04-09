@@ -172,7 +172,7 @@ export class ConversationListViewModel {
      *  We need this as we use an IntersectionObserver to improve rendering performance
      *  and only render cells as they become visible.
      *  If we would set them to be invisible initially on every render, we would get a
-     *  lot of flickering everytime the list updates.
+     *  lot of flickering every time the list updates.
      */
     this.getIsVisibleFunc = () => {
       const conversationList = document.querySelector('.conversation-list');

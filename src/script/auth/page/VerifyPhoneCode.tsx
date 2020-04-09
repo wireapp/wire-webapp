@@ -44,7 +44,7 @@ const VerifyPhoneCode = ({
   doSendPhoneLoginCode,
 }: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
-  const [error, setError] = useState();
+  const [error, setError] = useState<ValidationError | null>(null);
   const {history} = useReactRouter();
 
   useEffect(() => {

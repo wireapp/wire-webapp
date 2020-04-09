@@ -33,8 +33,8 @@ export class ConnectionMapper {
   }
 
   mapConnectionFromJson(connectionData: ConnectionData): ConnectionEntity {
-    const connectionEntitiy = new ConnectionEntity();
-    return this.updateConnectionFromJson(connectionEntitiy, connectionData);
+    const connectionEntity = new ConnectionEntity();
+    return this.updateConnectionFromJson(connectionEntity, connectionData);
   }
 
   /**

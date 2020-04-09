@@ -118,7 +118,7 @@ export class MainViewModel {
     return this.togglePanel(MainViewModel.PANEL_STATE.CLOSED);
   }
 
-  closePanelImmediatly() {
+  closePanelImmediately() {
     document.querySelector('#app').classList.remove('app--panel-open');
     this.isPanelOpen(false);
   }

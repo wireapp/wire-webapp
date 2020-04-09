@@ -140,7 +140,7 @@ export class ConversationRepository {
    * @param {ConversationService} conversation_service Backend REST API conversation service implementation
    * @param {AssetService} asset_service Backend REST API asset service implementation
    * @param {ClientRepository} client_repository Repository for client interactions
-   * @param {ConnectionRepository} connectionRepository Repository for all connnection interactions
+   * @param {ConnectionRepository} connectionRepository Repository for all connection interactions
    * @param {CryptographyRepository} cryptography_repository Repository for all cryptography interactions
    * @param {EventRepository} eventRepository Repository that handles events
    * @param {GiphyRepository} giphy_repository Repository for Giphy GIFs
@@ -682,9 +682,9 @@ export class ConversationRepository {
     return this.eventService
       .loadFollowingEvents(conversationEntity.id, messageDate, Config.getConfig().MESSAGES_FETCH_LIMIT, includeMessage)
       .then(events => this._addEventsToConversation(events, conversationEntity, false))
-      .then(mappedNessageEntities => {
+      .then(mappedMessageEntities => {
         conversationEntity.is_pending(false);
-        return mappedNessageEntities;
+        return mappedMessageEntities;
       });
   }
 
@@ -1017,7 +1017,7 @@ export class ConversationRepository {
 
         const isActiveConversation = !conversationEntity.removed_from_conversation();
         if (!isActiveConversation) {
-          // Disregard coversations that self is no longer part of
+          // Disregard conversations that self is no longer part of
           return false;
         }
 
@@ -1182,14 +1182,14 @@ export class ConversationRepository {
    */
   mapConversations(payload, initialTimestamp = this.getLatestEventTimestamp()) {
     const conversationsData = payload.length ? payload : [payload];
-    const entitites = this.conversationMapper.mapConversations(conversationsData, initialTimestamp);
-    entitites.forEach(conversationEntity => {
+    const entities = this.conversationMapper.mapConversations(conversationsData, initialTimestamp);
+    entities.forEach(conversationEntity => {
       this._mapGuestStatusSelf(conversationEntity);
       conversationEntity.selfUser(this.selfUser());
       conversationEntity.setStateChangePersistence(true);
     });
 
-    return payload.length ? entitites : entitites[0];
+    return payload.length ? entities : entities[0];
   }
 
   map_guest_status_self() {
@@ -3203,6 +3203,15 @@ export class ConversationRepository {
           ConversationError.TYPE.MESSAGE_NOT_FOUND,
           ConversationError.TYPE.CONVERSATION_NOT_FOUND,
         ];
+
+        const isRemovedFromConversation = error.label === BackendClientError.LABEL.ACCESS_DENIED;
+        if (isRemovedFromConversation) {
+          const messageText = t('conversationNotFoundMessage');
+          const titleText = t('conversationNotFoundTitle', Config.getConfig().BRAND_NAME);
+
+          this._showModal(messageText, titleText);
+          return;
+        }
 
         if (!ignoredErrorTypes.includes(error.type)) {
           throw error;

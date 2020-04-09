@@ -169,7 +169,7 @@ export class ConversationVerificationStateHandler {
        * Previously the code would hide this fact, not create a system message and then fail when it tried to prompt
        * the user to grant subsequent message sending - essentially blocking the conversation.
        *
-       * As we are unsure of the trigger of the degradation we temporarly throw an error to get to the bottom of this.
+       * As we are unsure of the trigger of the degradation we temporarily throw an error to get to the bottom of this.
        * The conversation is also reset to the verified state to ensure we can continue to send messages.
        */
       if (!userIds.length) {

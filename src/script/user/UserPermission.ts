@@ -166,7 +166,7 @@ export function roleFromTeamPermissions(permissions: PermissionsData): ROLE {
  * The function generated will have the following format:
  *   `can<camel cased feature name>: () => boolean`
  *
- * @param boundRole Default role that will be used by default in every helper. Can be overriden by passing a role when calling the helper
+ * @param boundRole Default role that will be used by default in every helper. Can be overridden by passing a role when calling the helper
  * @returns helpers
  */
 export function generatePermissionHelpers(boundRole = ROLE.NONE): Record<string, (role: ROLE) => boolean> {

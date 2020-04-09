@@ -933,7 +933,7 @@ $(async () => {
     if (shouldPersist === undefined) {
       doRedirect(SIGN_OUT_REASON.NOT_SIGNED_IN);
     } else if (isTemporaryClientAndNonPersistent(shouldPersist)) {
-      const engine = await StorageService.getUnitializedEngine();
+      const engine = await StorageService.getUninitializedEngine();
       wire.app = new App(apiClient, backendClient, appContainer, engine);
     } else {
       wire.app = new App(apiClient, backendClient, appContainer);

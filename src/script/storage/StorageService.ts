@@ -115,7 +115,7 @@ export class StorageService {
     }
   }
 
-  static async getUnitializedEngine(): Promise<SQLeetEngine> {
+  static async getUninitializedEngine(): Promise<SQLeetEngine> {
     const encryptionKey = await getEphemeralValue();
     return new SQLeetEngine('/worker/sqleet-worker.js', SQLeetSchemata.getLatest(), encryptionKey);
   }

@@ -58,12 +58,12 @@ const getTimeout = (queryName: string, configName: 'APPLOCK_SCHEDULED_TIMEOUT' |
   return Math.min(queryTimeout, configTimeout);
 };
 
-const getUnfocusAppLockTimeoutinMillis = () => getTimeout(QUERY_KEY.APPLOCK_UNFOCUS_TIMEOUT, 'APPLOCK_UNFOCUS_TIMEOUT');
-const getScheduledAppLockTimeoutinMillis = () =>
+const getUnfocusAppLockTimeoutInMillis = () => getTimeout(QUERY_KEY.APPLOCK_UNFOCUS_TIMEOUT, 'APPLOCK_UNFOCUS_TIMEOUT');
+const getScheduledAppLockTimeoutInMillis = () =>
   getTimeout(QUERY_KEY.APPLOCK_SCHEDULED_TIMEOUT, 'APPLOCK_SCHEDULED_TIMEOUT');
 
-const isUnfocusAppLockEnabled = () => getUnfocusAppLockTimeoutinMillis() !== null;
-const isScheduledAppLockEnabled = () => getScheduledAppLockTimeoutinMillis() !== null;
+const isUnfocusAppLockEnabled = () => getUnfocusAppLockTimeoutInMillis() !== null;
+const isScheduledAppLockEnabled = () => getScheduledAppLockTimeoutInMillis() !== null;
 
 export const isAppLockEnabled = () => isUnfocusAppLockEnabled() || isScheduledAppLockEnabled();
 
@@ -213,13 +213,13 @@ export class AppLockViewModel {
   };
 
   startAppLockTimeout = () => {
-    this.unfocusTimeoutId = window.setTimeout(this.showAppLock, getUnfocusAppLockTimeoutinMillis() * 1000);
+    this.unfocusTimeoutId = window.setTimeout(this.showAppLock, getUnfocusAppLockTimeoutInMillis() * 1000);
   };
 
   startScheduledTimeout = () => {
     if (isScheduledAppLockEnabled()) {
       window.clearTimeout(this.scheduledTimeoutId);
-      this.scheduledTimeoutId = window.setTimeout(this.showAppLock, getScheduledAppLockTimeoutinMillis() * 1000);
+      this.scheduledTimeoutId = window.setTimeout(this.showAppLock, getScheduledAppLockTimeoutInMillis() * 1000);
     }
   };
 

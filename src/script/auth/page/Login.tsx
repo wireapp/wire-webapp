@@ -80,8 +80,8 @@ const Login = ({
   const {formatMessage: _} = useIntl();
   const {history} = useReactRouter();
 
-  const [conversationCode, setConversationCode] = useState();
-  const [conversationKey, setConversationKey] = useState();
+  const [conversationCode, setConversationCode] = useState<string | null>(null);
+  const [conversationKey, setConversationKey] = useState<string | null>(null);
 
   const [isValidLink, setIsValidLink] = useState(true);
   const [validationErrors, setValidationErrors] = useState([]);

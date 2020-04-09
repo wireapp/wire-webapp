@@ -29,7 +29,7 @@ import {Logger, getLogger} from 'Util/Logger';
 import {sortUsersByPriority} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {createRandomUuid, loadUrlBlob} from 'Util/util';
-
+import type {AxiosError} from 'axios';
 import {UNSPLASH_URL} from '../externalRoute';
 
 import {mapProfileAssetsV1} from '../assets/AssetMapper';
@@ -514,8 +514,8 @@ export class UserRepository {
       return this.user_service
         .getUsers(chunkOfUserIds)
         .then(response => (response ? this.user_mapper.mapUsersFromJson(response) : []))
-        .catch(error => {
-          const isNotFound = error.code === BackendClientError.STATUS_CODE.NOT_FOUND;
+        .catch((error: AxiosError) => {
+          const isNotFound = error.response?.status === BackendClientError.STATUS_CODE.NOT_FOUND;
           if (isNotFound) {
             return [];
           }

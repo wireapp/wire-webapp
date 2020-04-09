@@ -96,7 +96,7 @@ export class ClientMismatchHandler {
       delete payload.recipients[userId][clientId];
       this.userRepository.remove_client_from_user(userId, clientId);
     };
-    this.remove(recipients, removeDeletedClient, conversationEntity, payload);
+    this.removePayload(recipients, removeDeletedClient, conversationEntity, payload, false);
   }
 
   /**
@@ -166,7 +166,7 @@ export class ClientMismatchHandler {
     }
     this.logger.debug(`Message contains redundant clients of '${Object.keys(recipients).length}' users`, recipients);
     const removeRedundantClient = (userId: string, clientId: string) => delete payload.recipients[userId][clientId];
-    this.remove(recipients, removeRedundantClient, conversationEntity, payload);
+    this.removePayload(recipients, removeRedundantClient, conversationEntity, payload, true);
   }
 
   /**
@@ -176,13 +176,15 @@ export class ClientMismatchHandler {
    * @param clientFn Function to remove clients
    * @param conversationEntity Conversation entity
    * @param payload Initial payload resulting in a 412
+   * @param verifyDeletedUsers Verifies if users still exist on the backend by checking their active clients
    * @returns Function array
    */
-  remove(
+  removePayload(
     recipients: UserClients,
     clientFn: Function,
     conversationEntity: Conversation = undefined,
     payload: NewOTRMessage,
+    verifyDeletedUsers: boolean,
   ): void[] {
     const result: void[] = [];
 
@@ -192,8 +194,7 @@ export class ClientMismatchHandler {
 
       if (noRemainingClients) {
         if (conversationEntity !== undefined) {
-          const isGroupConversation = conversationEntity.isGroup();
-          if (isGroupConversation) {
+          if (conversationEntity.isGroup() && verifyDeletedUsers) {
             const timestamp = this.serverTimeHandler.toServerTimestamp();
             const event = EventBuilder.buildMemberLeave(conversationEntity, userId, false, timestamp);
             this.eventRepository.injectEvent(event);
