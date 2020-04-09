@@ -353,6 +353,31 @@ export const DemoInputs = () => {
         <ErrorMessage>Submit form for shake effect</ErrorMessage>
         <CodeInput markInvalid onCodeComplete={code => console.info(code)} />
       </ContainerXS>
+      <H2>Tooltips</H2>
+      <Line />
+      <ContainerXS>
+        <ShakeBox ref={shakeBox}>
+          <Form
+            onSubmit={event => {
+              event.preventDefault();
+              shakeBox.current.shake();
+            }}
+          >
+            <Tooltip text="This is a tooltip on top">
+              <Input placeholder="Tooltip on top" />
+            </Tooltip>
+            <Tooltip text="This is a tooltip on right" right>
+              <Input placeholder="Tooltip on right" />
+            </Tooltip>
+            <Tooltip text="This is a tooltip on left" left>
+              <Input placeholder="Tooltip on left" />
+            </Tooltip>
+            <Tooltip text="This is a tooltip on bottom" bottom>
+              <Input placeholder="Tooltip on bottom" />
+            </Tooltip>
+          </Form>
+        </ShakeBox>
+      </ContainerXS>
     </Container>
   );
 };
