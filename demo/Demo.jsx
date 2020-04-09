@@ -41,7 +41,6 @@ import {
   Small,
   StyledApp,
   THEME_ID,
-  Tooltip,
 } from '@wireapp/react-ui-kit';
 import React, {useCallback, useState} from 'react';
 import Helmet from 'react-helmet';
@@ -147,18 +146,10 @@ const Demo = () => {
           <Button onClick={useCallback(toggleTheme)}>{'Toggle Theme'}</Button>
         </div>
         <Container style={{alignItems: 'center', display: 'flex', justifyContent: 'space-around'}}>
-          <Tooltip light right text="This is our logo with a whole bunch of text in here">
-            <Logo scale={3} color={COLOR.BLUE} />
-          </Tooltip>
-          <Tooltip left text="This is our logo with a whole bunch of text in here">
-            <Loading />
-          </Tooltip>
-          <Tooltip bottom text="This is our logo with a whole bunch of text in here">
-            <Loading progress={0.33} />
-          </Tooltip>
-          <Tooltip text="This is our logo with a whole bunch of text in here">
-            <Loading progress={0.66} size={100} />
-          </Tooltip>
+          <Logo scale={3} color={COLOR.BLUE} />
+          <Loading />
+          <Loading progress={0.33} />
+          <Loading progress={0.66} size={100} />
         </Container>
         <Container>
           <H1>Pagination</H1>
