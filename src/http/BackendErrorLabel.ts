@@ -65,14 +65,9 @@ export enum BackendErrorLabel {
    */
   NO_OTHER_OWNER = 'no-other-owner',
   /**
-   * This error is thrown when a user deletes or downgrades owners
-   * but is not an owner or doesn't have an email.
-   */
-  MUST_BE_OWNER_WITH_EMAIL = 'must-be-owner-with-email',
-  /**
    * This error is thrown when an owner tries to delete hisself
    */
-  MUST_NOT_BE_OWNER_WITH_EMAIL = 'must-not-be-owner-with-email',
+  NO_SELF_DELETE_FOR_TEAM_OWNER = 'no-self-delete-for-team-owner',
   NO_TEAM = 'no-team',
   NO_TEAM_MEMBER = 'no-team-member',
   TOO_MANY_TEAM_MEMBERS = 'too-many-team-members',
