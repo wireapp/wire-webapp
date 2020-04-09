@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.26.18](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.26.17...@wireapp/react-ui-kit@7.26.18) (2020-04-09)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** fix position style for tooltip ([#2936](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/2936)) ([9449599](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/94495998e9a148e90e07822fda15aa9133a4fa2a))
+
+
+
+
+
 ## [7.26.17](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.26.16...@wireapp/react-ui-kit@7.26.17) (2020-04-09)
 
 
