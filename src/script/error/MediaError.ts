@@ -30,12 +30,12 @@ enum MEDIA_ERROR_TYPE {
 export class MediaError extends Error {
   type: MEDIA_ERROR_TYPE;
 
-  constructor(type: MEDIA_ERROR_TYPE, message?: string) {
+  constructor(type: MEDIA_ERROR_TYPE, message: string) {
     super(message);
     this.type = type;
   }
 
-  static get MESSAGE(): Record<string, string> {
+  static get MESSAGE(): Record<MEDIA_ERROR_TYPE, string> {
     return {
       MEDIA_STREAM_DEVICE: 'Device related failure when getting MediaStream',
       MEDIA_STREAM_MISC: 'Other failure when getting MediaStream',
@@ -47,7 +47,7 @@ export class MediaError extends Error {
     };
   }
 
-  static get TYPE(): Record<string, MEDIA_ERROR_TYPE> {
+  static get TYPE(): Record<MEDIA_ERROR_TYPE, MEDIA_ERROR_TYPE> {
     return {
       MEDIA_STREAM_DEVICE: MEDIA_ERROR_TYPE.MEDIA_STREAM_DEVICE,
       MEDIA_STREAM_MISC: MEDIA_ERROR_TYPE.MEDIA_STREAM_MISC,

@@ -26,6 +26,7 @@ import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {isBlacklisted} from './LinkPreviewBlackList';
 import {buildFromOpenGraphData} from './LinkPreviewProtoBuilder';
 import {getLogger} from 'Util/Logger';
+import {LinkPreviewError} from '../error/LinkPreviewError';
 
 class LinkPreviewRepository {
   constructor(assetService, propertiesRepository) {
@@ -60,7 +61,7 @@ class LinkPreviewRepository {
     }
 
     return this._getLinkPreview(linkData.url, linkData.offset).catch(error => {
-      const isLinkPreviewError = error instanceof z.error.LinkPreviewError;
+      const isLinkPreviewError = error instanceof LinkPreviewError;
       if (!isLinkPreviewError) {
         throw error;
       }
@@ -80,7 +81,7 @@ class LinkPreviewRepository {
 
     return new Promise(resolve => {
       if (isBlacklisted(url)) {
-        throw new z.error.LinkPreviewError(z.error.LinkPreviewError.TYPE.BLACKLISTED);
+        throw new LinkPreviewError(LinkPreviewError.TYPE.BLACKLISTED, LinkPreviewError.MESSAGE.BLACKLISTED);
       }
 
       resolve(this._fetchOpenGraphData(url));
@@ -90,13 +91,13 @@ class LinkPreviewRepository {
           openGraphData = fetchedData;
           return buildFromOpenGraphData(openGraphData, url, offset);
         }
-        throw new z.error.LinkPreviewError(z.error.LinkPreviewError.TYPE.NO_DATA_AVAILABLE);
+        throw new LinkPreviewError(LinkPreviewError.TYPE.NO_DATA_AVAILABLE, LinkPreviewError.MESSAGE.NO_DATA_AVAILABLE);
       })
       .then(linkPreview => {
         if (linkPreview) {
           return this._fetchPreviewImage(linkPreview, openGraphData.image);
         }
-        throw new z.error.LinkPreviewError(z.error.LinkPreviewError.TYPE.UNSUPPORTED_TYPE);
+        throw new LinkPreviewError(LinkPreviewError.TYPE.UNSUPPORTED_TYPE, LinkPreviewError.MESSAGE.UNSUPPORTED_TYPE);
       });
   }
 
