@@ -20,16 +20,17 @@
 import * as CBOR from '@wireapp/cbor';
 import * as ed2curve from 'ed2curve';
 import * as _sodium from 'libsodium-wrappers-sumo';
+import {DecodeError} from '../errors';
 import {InputError} from '../errors/InputError';
 import {PublicKey} from './PublicKey';
 import {SecretKey} from './SecretKey';
 
 /** Construct an ephemeral key pair. */
 export class KeyPair {
-  public_key: PublicKey;
-  secret_key: SecretKey;
+  readonly public_key: PublicKey;
+  readonly secret_key: SecretKey;
 
-  constructor(public_key: PublicKey = new PublicKey(), secret_key: SecretKey = new SecretKey()) {
+  constructor(public_key: PublicKey, secret_key: SecretKey) {
     this.public_key = public_key;
     this.secret_key = secret_key;
   }
@@ -79,26 +80,24 @@ export class KeyPair {
     this.secret_key.encode(encoder);
 
     encoder.u8(1);
-    return this.public_key.encode(encoder);
+    this.public_key.encode(encoder);
+
+    return encoder;
   }
 
   static decode(decoder: CBOR.Decoder): KeyPair {
-    const self = new KeyPair();
-
     const properties = decoder.object();
-    for (let index = 0; index <= properties - 1; index++) {
-      switch (decoder.u8()) {
-        case 0:
-          self.secret_key = SecretKey.decode(decoder);
-          break;
-        case 1:
-          self.public_key = PublicKey.decode(decoder);
-          break;
-        default:
-          decoder.skip();
-      }
+
+    if (properties === 2) {
+      decoder.u8();
+      const secretKey = SecretKey.decode(decoder);
+
+      decoder.u8();
+      const publicKey = PublicKey.decode(decoder);
+
+      return new KeyPair(publicKey, secretKey);
     }
 
-    return self;
+    throw new DecodeError(`Unexpected number of properties: "${properties}"`);
   }
 }

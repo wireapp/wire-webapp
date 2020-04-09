@@ -24,6 +24,8 @@ import * as ClassUtil from '../util/ClassUtil';
 import {InputError} from '../errors/InputError';
 
 import {KeyPair} from './KeyPair';
+import {PublicKey} from './PublicKey';
+import {SecretKey} from './SecretKey';
 
 /**
  * Pre-generated (and regularly refreshed) pre-keys.
@@ -37,7 +39,7 @@ export class PreKey {
 
   constructor() {
     this.key_id = -1;
-    this.key_pair = new KeyPair();
+    this.key_pair = new KeyPair(new PublicKey(), new SecretKey());
     this.version = -1;
   }
 

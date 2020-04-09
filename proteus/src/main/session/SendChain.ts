@@ -18,7 +18,7 @@
  */
 
 import * as CBOR from '@wireapp/cbor';
-
+import {PublicKey, SecretKey} from '../keys';
 import {KeyPair} from '../keys/KeyPair';
 import * as ClassUtil from '../util/ClassUtil';
 import {ChainKey} from './ChainKey';
@@ -29,7 +29,7 @@ export class SendChain {
 
   constructor() {
     this.chain_key = new ChainKey();
-    this.ratchet_key = new KeyPair();
+    this.ratchet_key = new KeyPair(new PublicKey(), new SecretKey());
   }
 
   static new(chain_key: ChainKey, keypair: KeyPair): SendChain {
