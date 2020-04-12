@@ -32,7 +32,6 @@ import {StorageKey} from '../storage/StorageKey';
 
 import {Environment} from './Environment';
 import {loadValue} from './StorageUtil';
-import {AuthError} from '../error/AuthError';
 
 export const isTemporaryClientAndNonPersistent = (persist: boolean): boolean => {
   if (persist === undefined) {
@@ -53,11 +52,10 @@ export const checkIndexedDb = (): Promise<void> => {
   }
 
   if (!Environment.browser.supports.indexedDb) {
-    const errorType = Environment.browser.edge ? AuthError.TYPE.PRIVATE_MODE : AuthError.TYPE.INDEXED_DB_UNSUPPORTED;
-    const errorMessage = Environment.browser.edge
-      ? AuthError.MESSAGE.PRIVATE_MODE
-      : AuthError.MESSAGE.INDEXED_DB_UNSUPPORTED;
-    return Promise.reject(new AuthError(errorType, errorMessage));
+    const errorType = Environment.browser.edge
+      ? z.error.AuthError.TYPE.PRIVATE_MODE
+      : z.error.AuthError.TYPE.INDEXED_DB_UNSUPPORTED;
+    return Promise.reject(new z.error.AuthError(errorType));
   }
 
   if (Environment.browser.firefox) {
@@ -68,12 +66,12 @@ export const checkIndexedDb = (): Promise<void> => {
       dbOpenRequest.onerror = event => {
         if (dbOpenRequest.error) {
           event.preventDefault();
-          return Promise.reject(new AuthError(AuthError.TYPE.PRIVATE_MODE, AuthError.MESSAGE.PRIVATE_MODE));
+          return Promise.reject(new z.error.AuthError(z.error.AuthError.TYPE.PRIVATE_MODE));
         }
         return undefined;
       };
     } catch (error) {
-      return Promise.reject(new AuthError(AuthError.TYPE.PRIVATE_MODE, AuthError.MESSAGE.PRIVATE_MODE));
+      return Promise.reject(new z.error.AuthError(z.error.AuthError.TYPE.PRIVATE_MODE));
     }
 
     return new Promise((resolve, reject) => {
@@ -86,7 +84,7 @@ export const checkIndexedDb = (): Promise<void> => {
 
         if (dbOpenRequest.readyState === 'done' && !dbOpenRequest.result) {
           window.clearInterval(interval_id);
-          return reject(new AuthError(AuthError.TYPE.PRIVATE_MODE, AuthError.MESSAGE.PRIVATE_MODE));
+          return reject(new z.error.AuthError(z.error.AuthError.TYPE.PRIVATE_MODE));
         }
 
         const tooManyAttempts = currentAttempt >= maxRetry;

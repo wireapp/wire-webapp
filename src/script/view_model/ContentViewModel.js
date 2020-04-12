@@ -32,7 +32,6 @@ import {WebAppEvents} from '../event/WebApp';
 import {PreferencesAVViewModel} from './content/PreferencesAVViewModel.js';
 import {ServiceModalViewModel} from './content/ServiceModalViewModel';
 import {InviteModalViewModel} from './content/InviteModalViewModel';
-import {ConversationError} from '../error/ConversationError';
 
 export class ContentViewModel {
   static get STATE() {
@@ -214,10 +213,7 @@ export class ContentViewModel {
     conversationPromise
       .then(conversationEntity => {
         if (!conversationEntity) {
-          throw new ConversationError(
-            ConversationError.TYPE.CONVERSATION_NOT_FOUND,
-            ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
-          );
+          throw new z.error.ConversationError(z.error.ConversationError.TYPE.CONVERSATION_NOT_FOUND);
         }
         const isActiveConversation = this.conversationRepository.is_active_conversation(conversationEntity);
         const isConversationState = this.state() === ContentViewModel.STATE.CONVERSATION;
@@ -262,7 +258,7 @@ export class ContentViewModel {
         });
       })
       .catch(error => {
-        const isConversationNotFound = error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
+        const isConversationNotFound = error.type === z.error.ConversationError.TYPE.CONVERSATION_NOT_FOUND;
         if (isConversationNotFound) {
           this.mainViewModel.modals.showModal(ModalsViewModel.TYPE.ACKNOWLEDGE, {
             text: {

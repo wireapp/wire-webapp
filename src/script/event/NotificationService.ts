@@ -25,7 +25,6 @@ import {Notification} from '@wireapp/api-client/dist/notification';
 import {DatabaseKeys} from '@wireapp/core/dist/notification/NotificationDatabaseRepository';
 import {Logger, getLogger} from 'Util/Logger';
 import {EventRecord, StorageSchemata, StorageService} from '../storage/';
-import {EventError} from '../error/EventError';
 
 export class NotificationService {
   private readonly apiClient: APIClient;
@@ -89,13 +88,13 @@ export class NotificationService {
       .load<{value: string}>(this.AMPLIFY_STORE_NAME, DatabaseKeys.PRIMARY_KEY_LAST_EVENT)
       .catch(error => {
         this.logger.error(`Failed to get last event timestamp from storage: ${error.message}`, error);
-        throw new EventError(EventError.TYPE.DATABASE_FAILURE, EventError.MESSAGE.DATABASE_FAILURE);
+        throw new z.error.EventError(z.error.EventError.TYPE.DATABASE_FAILURE);
       })
       .then(record => {
         if (record?.value) {
           return record.value;
         }
-        throw new EventError(EventError.TYPE.NO_LAST_DATE, EventError.MESSAGE.NO_LAST_DATE);
+        throw new z.error.EventError(z.error.EventError.TYPE.NO_LAST_DATE);
       });
   }
 
@@ -108,13 +107,13 @@ export class NotificationService {
       .load<{value: string}>(this.AMPLIFY_STORE_NAME, DatabaseKeys.PRIMARY_KEY_LAST_NOTIFICATION)
       .catch(error => {
         this.logger.error(`Failed to get last notification ID from storage: ${error.message}`, error);
-        throw new EventError(EventError.TYPE.DATABASE_FAILURE, EventError.MESSAGE.DATABASE_FAILURE);
+        throw new z.error.EventError(z.error.EventError.TYPE.DATABASE_FAILURE);
       })
       .then(record => {
         if (record?.value) {
           return record.value;
         }
-        throw new EventError(EventError.TYPE.NO_LAST_ID, EventError.MESSAGE.NO_LAST_ID);
+        throw new z.error.EventError(z.error.EventError.TYPE.NO_LAST_ID);
       });
   }
 

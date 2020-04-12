@@ -22,7 +22,6 @@ import {includesOnlyEmojis} from 'Util/EmojiUtil';
 
 import {WebAppEvents} from '../event/WebApp';
 import {QuoteEntity} from '../message/QuoteEntity';
-import {ConversationError} from '../error/ConversationError';
 
 class MessageQuote {
   constructor({
@@ -78,7 +77,7 @@ class MessageQuote {
           this.quotedMessageId(message.id);
         })
         .catch(error => {
-          if (error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND) {
+          if (error.type === z.error.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
             return this.error(QuoteEntity.ERROR.MESSAGE_NOT_FOUND);
           }
           throw error;

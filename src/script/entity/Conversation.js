@@ -41,7 +41,6 @@ import {ClientRepository} from '../client/ClientRepository';
 import {StatusType} from '../message/StatusType';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
 import {HIDE_LEGAL_HOLD_MODAL} from '../view_model/content/LegalHoldModalViewModel';
-import {ConversationError} from '../error/ConversationError';
 
 export class Conversation {
   static get TIMESTAMP_TYPE() {
@@ -431,10 +430,7 @@ export class Conversation {
 
     const entityTimestamp = this[type];
     if (!entityTimestamp) {
-      throw new ConversationError(
-        ConversationError.TYPE.INVALID_PARAMETER,
-        ConversationError.MESSAGE.INVALID_PARAMETER,
-      );
+      throw new z.error.ConversationError(z.error.ConversationError.TYPE.INVALID_PARAMETER);
     }
 
     const updatedTimestamp = forceUpdate ? timestamp : this._incrementTimeOnly(entityTimestamp(), timestamp);

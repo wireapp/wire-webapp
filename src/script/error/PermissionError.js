@@ -17,18 +17,26 @@
  *
  */
 
-import {BaseError, BASE_ERROR_TYPE} from './BaseError';
+import {BaseError} from './BaseError';
 
-export class ConnectionError extends BaseError {
-  constructor(type: BASE_ERROR_TYPE | string, message: string) {
-    super(type, message);
+export class PermissionError extends BaseError {
+  constructor(type, message) {
+    super('PermissionError', type, message);
   }
 
-  static get MESSAGE(): Record<string, string> {
-    return {};
+  static get MESSAGE() {
+    return {
+      DENIED: 'Permission was denied',
+      UNSUPPORTED: 'Permissions API is not supported',
+      UNSUPPORTED_TYPE: 'Permissions API does not support requested type',
+    };
   }
 
-  static get TYPE(): Record<string, string> {
-    return {};
+  static get TYPE() {
+    return {
+      DENIED: 'DENIED',
+      UNSUPPORTED: 'UNSUPPORTED',
+      UNSUPPORTED_TYPE: 'UNSUPPORTED_TYPE',
+    };
   }
 }

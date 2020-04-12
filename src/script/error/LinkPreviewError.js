@@ -19,24 +19,29 @@
 
 import {BaseError} from './BaseError';
 
-enum TEAM_ERROR_TYPE {
-  NO_PERMISSIONS = 'NO_PERMISSIONS',
-}
+window.z = window.z || {};
+window.z.error = z.error || {};
 
-export class TeamError extends BaseError {
-  constructor(type: TEAM_ERROR_TYPE, message: string) {
-    super(type, message);
+z.error.LinkPreviewError = class LinkPreviewError extends BaseError {
+  constructor(type, message) {
+    super('LinkPreviewError', type, message);
   }
 
-  static get MESSAGE(): Record<TEAM_ERROR_TYPE, string> {
+  static get MESSAGE() {
     return {
-      NO_PERMISSIONS: 'No permissions provided',
+      BLACKLISTED: 'Skipped preview for blacklisted link',
+      NOT_SUPPORTED: 'Your client cannot render link previews using Open Graph data.',
+      NO_DATA_AVAILABLE: 'Link does not provide Open Graph data.',
+      UNSUPPORTED_TYPE: 'Open Graph data from the given link does not provide necessary attributes.',
     };
   }
 
-  static get TYPE(): Record<TEAM_ERROR_TYPE, TEAM_ERROR_TYPE> {
+  static get TYPE() {
     return {
-      NO_PERMISSIONS: TEAM_ERROR_TYPE.NO_PERMISSIONS,
+      BLACKLISTED: 'BLACKLISTED',
+      NOT_SUPPORTED: 'NOT_SUPPORTED',
+      NO_DATA_AVAILABLE: 'NO_DATA_AVAILABLE',
+      UNSUPPORTED_TYPE: 'UNSUPPORTED_TYPE',
     };
   }
-}
+};

@@ -21,7 +21,6 @@ import {Logger, getLogger} from 'Util/Logger';
 
 import {StorageSchemata} from '../storage/StorageSchemata';
 import {StorageService} from './StorageService';
-import {StorageError} from '../error/StorageError';
 
 type AmplifyRecord = {key: string; value: string};
 
@@ -69,7 +68,7 @@ export class StorageRepository {
       if (record?.value) {
         return record.value;
       }
-      throw new StorageError(StorageError.TYPE.NOT_FOUND, StorageError.MESSAGE.NOT_FOUND);
+      throw new z.error.StorageError(z.error.StorageError.TYPE.NOT_FOUND);
     });
   }
 

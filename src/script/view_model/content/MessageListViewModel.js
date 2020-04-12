@@ -32,7 +32,6 @@ import {ModalsViewModel} from '../ModalsViewModel';
 import {WebAppEvents} from '../../event/WebApp';
 import {MessageCategory} from '../../message/MessageCategory';
 import {MotionDuration} from '../../motion/MotionDuration';
-import {UserError} from '../../error/UserError';
 
 /*
  * Message list rendering view model.
@@ -620,7 +619,7 @@ class MessageListViewModel {
         .get_user_by_id(userId)
         .then(userEntity => this.showUserDetails(userEntity))
         .catch(error => {
-          if (error.type !== UserError.TYPE.USER_NOT_FOUND) {
+          if (error.type !== z.error.UserError.TYPE.USER_NOT_FOUND) {
             throw error;
           }
         });

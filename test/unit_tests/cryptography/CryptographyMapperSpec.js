@@ -44,7 +44,6 @@ import {ClientEvent} from 'src/script/event/Client';
 import {BackendEvent} from 'src/script/event/Backend';
 import {ReactionType} from 'src/script/message/ReactionType';
 import {PROTO_MESSAGE_TYPE} from '../../../src/script/cryptography/ProtoMessageType';
-import {CryptographyError} from 'src/script/error/CryptographyError';
 
 describe('CryptographyMapper', () => {
   const mapper = new CryptographyMapper();
@@ -470,8 +469,8 @@ describe('CryptographyMapper', () => {
         .mapGenericMessage(generic_message, event)
         .then(done.fail)
         .catch(error => {
-          expect(error instanceof CryptographyError).toBeTruthy();
-          expect(error.type).toBe(CryptographyError.TYPE.IGNORED_PREVIEW);
+          expect(error instanceof z.error.CryptographyError).toBeTruthy();
+          expect(error.type).toBe(z.error.CryptographyError.TYPE.IGNORED_PREVIEW);
           done();
         });
     });
@@ -588,8 +587,8 @@ describe('CryptographyMapper', () => {
         .mapGenericMessage(undefined, {id: 'ABC'})
         .then(done.fail)
         .catch(error => {
-          expect(error instanceof CryptographyError).toBeTruthy();
-          expect(error.type).toBe(CryptographyError.TYPE.NO_GENERIC_MESSAGE);
+          expect(error instanceof z.error.CryptographyError).toBeTruthy();
+          expect(error.type).toBe(z.error.CryptographyError.TYPE.NO_GENERIC_MESSAGE);
           done();
         });
     });
