@@ -70,9 +70,7 @@ export class MediaStreamHandler {
     const hasPermission = this.hasPermissionToAccess(audio, video);
     return this.getMediaStream(audio, video, screen, isGroup, hasPermission).catch(error => {
       const isPermissionDenied = error.type === PermissionError.TYPE.DENIED;
-      throw isPermissionDenied
-        ? new MediaError(MediaError.TYPE.MEDIA_STREAM_PERMISSION, MediaError.MESSAGE.MEDIA_STREAM_PERMISSION)
-        : error;
+      throw isPermissionDenied ? new MediaError(MediaError.TYPE.MEDIA_STREAM_PERMISSION) : error;
     });
   }
 
@@ -177,15 +175,15 @@ export class MediaStreamHandler {
         this.clearPermissionRequestHint(audio, video, screen);
 
         if (MEDIA_STREAM_ERROR_TYPES.DEVICE.includes(name)) {
-          throw new MediaError(MediaError.TYPE.MEDIA_STREAM_DEVICE, MediaError.MESSAGE.MEDIA_STREAM_DEVICE);
+          throw new MediaError(MediaError.TYPE.MEDIA_STREAM_DEVICE);
         }
 
         if (MEDIA_STREAM_ERROR_TYPES.MISC.includes(name)) {
-          throw new MediaError(MediaError.TYPE.MEDIA_STREAM_MISC, MediaError.MESSAGE.MEDIA_STREAM_MISC);
+          throw new MediaError(MediaError.TYPE.MEDIA_STREAM_MISC);
         }
 
         if (MEDIA_STREAM_ERROR_TYPES.PERMISSION.includes(name)) {
-          throw new MediaError(MediaError.TYPE.MEDIA_STREAM_PERMISSION, MediaError.MESSAGE.MEDIA_STREAM_PERMISSION);
+          throw new MediaError(MediaError.TYPE.MEDIA_STREAM_PERMISSION);
         }
 
         throw error;
@@ -194,7 +192,7 @@ export class MediaStreamHandler {
 
   private getMediaTracks(mediaStream: MediaStream, mediaType: MediaType = MediaType.AUDIO_VIDEO): MediaStreamTrack[] {
     if (!mediaStream) {
-      throw new MediaError(MediaError.TYPE.STREAM_NOT_FOUND, MediaError.MESSAGE.STREAM_NOT_FOUND);
+      throw new MediaError(MediaError.TYPE.STREAM_NOT_FOUND);
     }
 
     switch (mediaType) {
@@ -212,7 +210,7 @@ export class MediaStreamHandler {
       }
 
       default: {
-        throw new MediaError(MediaError.TYPE.UNHANDLED_MEDIA_TYPE, MediaError.MESSAGE.UNHANDLED_MEDIA_TYPE);
+        throw new MediaError(MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
       }
     }
   }

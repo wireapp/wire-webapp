@@ -71,7 +71,6 @@ import {BackendClientError} from '../error/BackendClientError';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {SelfService} from '../self/SelfService';
 import {ServerTimeHandler} from '../time/serverTimeHandler';
-import {UserError} from '../error/UserError';
 
 export interface UserUpdate {
   accent_id?: AccentColor.AccentColorID;
@@ -599,7 +598,7 @@ export class UserRepository {
     return user
       ? Promise.resolve(user)
       : this._fetchUserById(user_id).catch(error => {
-          const isNotFound = error.type === UserError.TYPE.USER_NOT_FOUND;
+          const isNotFound = error.type === z.error.UserError.TYPE.USER_NOT_FOUND;
           if (!isNotFound) {
             this.logger.warn(`Failed to find user with ID '${user_id}': ${error.message}`, error);
           }
@@ -737,7 +736,7 @@ export class UserRepository {
       return this.selfService.putSelf({name}).then(() => this.user_update({user: {id: this.self().id, name}}));
     }
 
-    return Promise.reject(new UserError(UserError.TYPE.INVALID_UPDATE, UserError.MESSAGE.INVALID_UPDATE));
+    return Promise.reject(new z.error.UserError((z as any).error.UserError.TYPE.INVALID_UPDATE));
   }
 
   /**
@@ -786,13 +785,13 @@ export class UserRepository {
           if (
             [BackendClientError.STATUS_CODE.CONFLICT, BackendClientError.STATUS_CODE.BAD_REQUEST].includes(error_code)
           ) {
-            throw new UserError(UserError.TYPE.USERNAME_TAKEN, UserError.MESSAGE.USERNAME_TAKEN);
+            throw new z.error.UserError(z.error.UserError.TYPE.USERNAME_TAKEN);
           }
-          throw new UserError(UserError.TYPE.REQUEST_FAILURE, UserError.MESSAGE.REQUEST_FAILURE);
+          throw new z.error.UserError(z.error.UserError.TYPE.REQUEST_FAILURE);
         });
     }
 
-    return Promise.reject(new UserError(UserError.TYPE.INVALID_UPDATE, UserError.MESSAGE.INVALID_UPDATE));
+    return Promise.reject(new z.error.UserError((z as any).error.UserError.TYPE.INVALID_UPDATE));
   }
 
   /**
@@ -817,15 +816,15 @@ export class UserRepository {
           return username;
         }
         if (error_code === BackendClientError.STATUS_CODE.BAD_REQUEST) {
-          throw new UserError(UserError.TYPE.USERNAME_TAKEN, UserError.MESSAGE.USERNAME_TAKEN);
+          throw new z.error.UserError(z.error.UserError.TYPE.USERNAME_TAKEN);
         }
-        throw new UserError(UserError.TYPE.REQUEST_FAILURE, UserError.MESSAGE.REQUEST_FAILURE);
+        throw new z.error.UserError(z.error.UserError.TYPE.REQUEST_FAILURE);
       })
       .then(verified_username => {
         if (verified_username) {
           return verified_username;
         }
-        throw new UserError(UserError.TYPE.USERNAME_TAKEN, UserError.MESSAGE.USERNAME_TAKEN);
+        throw new z.error.UserError(z.error.UserError.TYPE.USERNAME_TAKEN);
       });
   }
 

@@ -55,7 +55,6 @@ import {QuoteEntity} from '../message/QuoteEntity';
 import {MentionEntity} from '../message/MentionEntity';
 import {LegalHoldMessage} from '../entity/message/LegalHoldMessage';
 import {CompositeMessage} from '../entity/message/CompositeMessage';
-import {ConversationError} from '../error/ConversationError';
 
 // Event Mapper to convert all server side JSON events into core entities.
 export class EventMapper {
@@ -101,7 +100,7 @@ export class EventMapper {
     return Promise.resolve()
       .then(() => this._mapJsonEvent(event, conversationEntity))
       .catch(error => {
-        const isMessageNotFound = error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
+        const isMessageNotFound = error.type === z.error.ConversationError.TYPE.MESSAGE_NOT_FOUND;
         if (isMessageNotFound) {
           throw error;
         }
@@ -111,10 +110,7 @@ export class EventMapper {
         const customData = {eventTime: new Date(event.time).toISOString(), eventType: event.type};
         Raygun.send(new Error(errorMessage), customData);
 
-        throw new ConversationError(
-          ConversationError.TYPE.MESSAGE_NOT_FOUND,
-          ConversationError.MESSAGE.MESSAGE_NOT_FOUND,
-        );
+        throw new z.error.ConversationError(z.error.ConversationError.TYPE.MESSAGE_NOT_FOUND);
       });
   }
 
@@ -299,10 +295,7 @@ export class EventMapper {
 
       default: {
         this.logger.warn(`Ignored unhandled '${event.type}' event ${event.id ? `'${event.id}' ` : ''}`, event);
-        throw new ConversationError(
-          ConversationError.TYPE.MESSAGE_NOT_FOUND,
-          ConversationError.MESSAGE.MESSAGE_NOT_FOUND,
-        );
+        throw new z.error.ConversationError(z.error.ConversationError.TYPE.MESSAGE_NOT_FOUND);
       }
     }
 

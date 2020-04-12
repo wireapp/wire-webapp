@@ -17,18 +17,21 @@
  *
  */
 
-import {StorageSchemata, StorageService} from 'src/script/storage/';
+import {BaseError} from './BaseError';
 
-describe('StorageRepository', () => {
-  describe('save', () => {
-    it('does not save "null" values', () => {
-      const storageService = new StorageService();
-      return storageService
-        .save(StorageSchemata.OBJECT_STORE.AMPLIFY, 'primary_key', null)
-        .then(fail)
-        .catch(error => {
-          expect(error.type).toEqual(z.error.StorageError.TYPE.NO_DATA);
-        });
-    });
-  });
-});
+window.z = window.z || {};
+window.z.error = z.error || {};
+
+z.error.ConnectionError = class ConnectionError extends BaseError {
+  constructor(type, message) {
+    super('ConnectionError', type, message);
+  }
+
+  static get MESSAGE() {
+    return {};
+  }
+
+  static get TYPE() {
+    return {};
+  }
+};

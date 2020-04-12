@@ -19,30 +19,27 @@
 
 import {BaseError} from './BaseError';
 
-enum PERMISSION_ERROR_TYPE {
-  DENIED = 'DENIED',
-  UNSUPPORTED = 'UNSUPPORTED',
-  UNSUPPORTED_TYPE = 'UNSUPPORTED_TYPE',
-}
+window.z = window.z || {};
+window.z.error = z.error || {};
 
-export class PermissionError extends BaseError {
-  constructor(type: PERMISSION_ERROR_TYPE, message: string) {
-    super(type, message);
+z.error.ConnectError = class ConnectError extends BaseError {
+  constructor(type, message) {
+    super('ConnectError', type, message);
   }
 
-  static get MESSAGE(): Record<PERMISSION_ERROR_TYPE, string> {
+  static get MESSAGE() {
     return {
-      DENIED: 'Permission was denied',
-      UNSUPPORTED: 'Permissions API is not supported',
-      UNSUPPORTED_TYPE: 'Permissions API does not support requested type',
+      NOT_SUPPORTED: 'Source not supported',
+      NO_CONTACTS: 'No contacts found for matching',
+      UPLOAD: 'Address book upload failed',
     };
   }
 
-  static get TYPE(): Record<PERMISSION_ERROR_TYPE, PERMISSION_ERROR_TYPE> {
+  static get TYPE() {
     return {
-      DENIED: PERMISSION_ERROR_TYPE.DENIED,
-      UNSUPPORTED: PERMISSION_ERROR_TYPE.UNSUPPORTED,
-      UNSUPPORTED_TYPE: PERMISSION_ERROR_TYPE.UNSUPPORTED_TYPE,
+      NOT_SUPPORTED: 'NOT_SUPPORTED',
+      NO_CONTACTS: 'NO_CONTACTS',
+      UPLOAD: 'UPLOAD',
     };
   }
-}
+};

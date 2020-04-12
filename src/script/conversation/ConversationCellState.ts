@@ -23,7 +23,6 @@ import {getRenderedTextContent} from 'Util/messageRenderer';
 import {AssetTransferState} from '../assets/AssetTransferState';
 import {Conversation} from '../entity/Conversation';
 import {ConversationStatusIcon} from './ConversationStatusIcon';
-import {ConversationError} from '../error/ConversationError';
 
 enum ACTIVITY_TYPE {
   CALL = 'ConversationCellState.ACTIVITY_TYPE.CALL',
@@ -126,7 +125,7 @@ const _generateSummaryDescription = (activities: Record<ACTIVITY_TYPE, number>):
           }
 
           default:
-            throw new ConversationError(ConversationError.TYPE.UNKNOWN_ACTIVITY, `Unknown activity "${activity}"`);
+            throw new z.error.ConversationError();
         }
       }
     })

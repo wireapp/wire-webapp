@@ -19,25 +19,15 @@
 
 import {BaseError} from './BaseError';
 
-enum EVENT_ERROR_TYPE {
-  DATABASE_FAILURE = 'DATABASE_FAILURE',
-  DEPRECATED_SCHEMA = 'DEPRECATED_SCHEMA',
-  NO_CLIENT_ID = 'NO_CLIENT_ID',
-  NO_EVENT = 'NO_EVENT',
-  NO_LAST_DATE = 'NO_LAST_DATE',
-  NO_LAST_ID = 'NO_LAST_ID',
-  NO_NOTIFICATIONS = 'NO_NOTIFICATIONS',
-  OUTDATED_E_CALL_EVENT = 'OUTDATED_E_CALL_EVENT',
-  REQUEST_FAILURE = 'REQUEST_FAILURE',
-  VALIDATION_FAILED = 'VALIDATION_FAILED',
-}
+window.z = window.z || {};
+window.z.error = z.error || {};
 
-export class EventError extends BaseError {
-  constructor(type: EVENT_ERROR_TYPE, message: string) {
-    super(type, message);
+z.error.EventError = class EventError extends BaseError {
+  constructor(type, message) {
+    super('EventError', type, message);
   }
 
-  static get MESSAGE(): Record<EVENT_ERROR_TYPE, string> {
+  static get MESSAGE() {
     return {
       DATABASE_FAILURE: 'Event related database transaction failure',
       DEPRECATED_SCHEMA: 'Event type is deprecated',
@@ -52,18 +42,18 @@ export class EventError extends BaseError {
     };
   }
 
-  static get TYPE(): Record<EVENT_ERROR_TYPE, EVENT_ERROR_TYPE> {
+  static get TYPE() {
     return {
-      DATABASE_FAILURE: EVENT_ERROR_TYPE.DATABASE_FAILURE,
-      DEPRECATED_SCHEMA: EVENT_ERROR_TYPE.DEPRECATED_SCHEMA,
-      NO_CLIENT_ID: EVENT_ERROR_TYPE.NO_CLIENT_ID,
-      NO_EVENT: EVENT_ERROR_TYPE.NO_EVENT,
-      NO_LAST_DATE: EVENT_ERROR_TYPE.NO_LAST_DATE,
-      NO_LAST_ID: EVENT_ERROR_TYPE.NO_LAST_ID,
-      NO_NOTIFICATIONS: EVENT_ERROR_TYPE.NO_NOTIFICATIONS,
-      OUTDATED_E_CALL_EVENT: EVENT_ERROR_TYPE.OUTDATED_E_CALL_EVENT,
-      REQUEST_FAILURE: EVENT_ERROR_TYPE.REQUEST_FAILURE,
-      VALIDATION_FAILED: EVENT_ERROR_TYPE.VALIDATION_FAILED,
+      DATABASE_FAILURE: 'DATABASE_FAILURE',
+      DEPRECATED_SCHEMA: 'DEPRECATED_SCHEMA',
+      NO_CLIENT_ID: 'NO_CLIENT_ID',
+      NO_EVENT: 'NO_EVENT',
+      NO_LAST_DATE: 'NO_LAST_DATE',
+      NO_LAST_ID: 'NO_LAST_ID',
+      NO_NOTIFICATIONS: 'NO_NOTIFICATIONS',
+      OUTDATED_E_CALL_EVENT: 'EventError.OUTDATED_E_CALL_EVENT',
+      REQUEST_FAILURE: 'REQUEST_FAILURE',
+      VALIDATION_FAILED: 'VALIDATION_FAILED',
     };
   }
-}
+};
