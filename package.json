@@ -14,7 +14,7 @@
     "date-fns": "2.11.1",
     "dexie-batch": "0.4.2",
     "highlight.js": "9.18.1",
-    "jquery": "3.4.1",
+    "jquery": "3.5.0",
     "jquery-mousewheel": "3.1.13",
     "js-cookie": "2.2.1",
     "js-md5": "0.7.3",
