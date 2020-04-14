@@ -63,6 +63,7 @@ import {
 } from './OtrMessage';
 import {TextContentBuilder} from './TextContentBuilder';
 import Item = Composite.Item;
+import {CompositeContentBuilder} from './CompositeContentBuilder';
 
 const UUID = require('pure-uuid');
 
@@ -354,6 +355,22 @@ export class MessageBuilder {
       timestamp: Date.now(),
       type: PayloadBundleType.COMPOSITE,
     };
+  }
+
+  createComposite(conversationId: string, messageId = MessageBuilder.createId()): CompositeContentBuilder {
+    const content: CompositeContent = {};
+
+    const payloadBundle: CompositeMessage = {
+      content,
+      conversation: conversationId,
+      from: this.getSelfUserId(),
+      id: messageId,
+      source: PayloadBundleSource.LOCAL,
+      state: PayloadBundleState.OUTGOING_UNSENT,
+      timestamp: Date.now(),
+      type: PayloadBundleType.COMPOSITE,
+    };
+    return new CompositeContentBuilder(payloadBundle);
   }
 
   public createPing(
