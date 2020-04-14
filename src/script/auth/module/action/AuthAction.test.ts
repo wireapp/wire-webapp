@@ -207,7 +207,7 @@ describe('AuthAction', () => {
   });
 
   it('handles failed request for phone login code', async () => {
-    const error = new Error('testerror');
+    const error = new Error('test error');
     const phoneNumber = '+08723568';
     const mockedApiClient = {
       auth: {

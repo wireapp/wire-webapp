@@ -22,52 +22,25 @@ No license is granted to the Wire trademark and its associated logos, all of whi
 
 ### Installation
 
-1.  Install [Node.js](https://nodejs.org/)
-1.  Install [Yarn](https://yarnpkg.com): `npm install -g yarn`
-1.  Run `yarn`
-1.  Rename `.env.localhost` to `.env` in order to run the app in a local environment
+1. Install [Node.js](https://nodejs.org/)
+1. Install [Yarn](https://yarnpkg.com)
+1. Run `yarn`
+1. Rename `.env.localhost` to `.env` in order to run the app in a local environment
+1. Use a browser with disabled web security (`−−disasble−web−security` in Chrome) to circumvent CORS issues when connecting to our backend from localhost
 
 ### Execution
 
-Run `yarn start` and Wire's web app will be available at: http://localhost:8080/auth/#login
-
-To login with your existing Wire account use: http://localhost:8080/auth/?env=prod#login
+Run `yarn start` and Wire's web app will be available at: http://localhost:8081/auth/#login
 
 ### Testing
 
-To launch the full test suite (types check + linting + server tests + app tests), simply run
+To launch the full test suite (types check + linting + server tests + app tests), simply run:
 
 `yarn test`
 
-Alternatively, you can run specific parts of the app:
+Alternatively, you can test specific parts of the app:
 
-`yarn test:(server|types|auth|app)`
-
-Since the test suite for the app is the biggest test suite, you might want to run a single test file, in which case, you can use the `--specs` option:
-
-`yarn test:app --specs spec1[,spec2...]`
-
-where `specN` is the path to the spec to run relative to `test/unit_tests` and without `Spec.js`.
-
-#### Speed up testing for files fully migrated to the module system
-
-When a file (and all its dependencies) does not rely on **any** global dependency (i.e. `window.z.util`), then you can use the `--nolegacy` flag to run the tests on that single file:
-
-`yarn test:app --specs spec1 --nolegacy`
-
-The test should start very quickly (webpack won't have to resolve all the global dependencies).
-
-If the test doesn't run with the `nolegacy` option (but runs without), it means it's depending on at least one dependency from the global `window` namespace.
-
-**Example**
-
-If you want to run the tests for the `ConversationRepository`, the file containing the test is:
-
-`test/unit_tests/conversation/ConversationRepositorySpec.js`
-
-The command to run is:
-
-`yarn test:app --specs conversation/ConversationRepository`
+`yarn test:(server|types|app)`
 
 ### Deployment
 
@@ -75,11 +48,11 @@ The command to run is:
 
 | Stage | Branch | Action | Environment | Backend |
 | :-: | :-: | :-: | :-: | :-- |
-| 1 (Feature development) | edge | commit | wire-webapp-edge | Staging |
-| 2 (Nightly test automation) | dev | commit or squash merge from edge | wire-webapp-dev | Staging |
-| 3 (Internal release) | dev | tag (format: YYYY-MM-DD-staging.X) | wire-webapp-staging | Production |
-| 4 (RC testing) | master | merge (don't squash) from "dev"; afterwards [generate release notes](#release-notes) | wire-webapp-master | Staging |
-| 5 (Production release) | master | tag (format: YYYY-MM-DD-production.X) | wire-webapp-prod | Production |
+| 1 (Feature development) | edge | commit | [wire-webapp-edge](https://wire-webapp-edge.zinfra.io/) | Staging |
+| 2 (Nightly test automation) | dev | commit or squash merge from edge | [wire-webapp-dev](https://wire-webapp-dev.zinfra.io/) | Staging |
+| 3 (Internal release) | dev | tag (format: YYYY-MM-DD-staging.X) | [wire-webapp-staging](https://wire-webapp-staging.wire.com/) | Production |
+| 4 (RC testing) | master | merge (don't squash) from "dev"; afterwards [generate release notes](#release-notes) | [wire-webapp-master](https://wire-webapp-master.zinfra.io/) | Staging |
+| 5 (Production release) | master | tag (format: YYYY-MM-DD-production.X) | [wire-webapp-prod](https://app.wire.com/) | Production |
 
 #### Staging Bumps for internal releases
 

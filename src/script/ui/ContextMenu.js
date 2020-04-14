@@ -65,8 +65,8 @@ const _rotateItem = key => {
     }
 
     const direction = key === KEY.ARROW_UP ? -1 : 1;
-    const nextIndext = (entries.indexOf(entry) + direction + entries.length) % entries.length;
-    const nextEntry = entries[nextIndext];
+    const nextIndex = (entries.indexOf(entry) + direction + entries.length) % entries.length;
+    const nextEntry = entries[nextIndex];
 
     nextEntry.classList.add('selected');
     entry.classList.remove('selected');

@@ -18,6 +18,7 @@
  */
 
 import {getLogger} from 'Util/Logger';
+import {ConversationError} from '../error/ConversationError';
 
 export class WindowHandler {
   constructor() {
@@ -31,14 +32,14 @@ export class WindowHandler {
       const promiseRejectionEvent = event.originalEvent;
       const error = promiseRejectionEvent.reason || {};
 
-      const isDegraded = error.type === z.error.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION;
+      const isDegraded = error.type === ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION;
       if (isDegraded) {
         this.logger.log('User has canceled sending a message to a degraded conversation.');
         promiseRejectionEvent.preventDefault();
         promiseRejectionEvent.stopPropagation();
         return false;
       }
-      const isLegalHoldReject = error.type === z.error.ConversationError.TYPE.LEGAL_HOLD_CONVERSATION_CANCELLATION;
+      const isLegalHoldReject = error.type === ConversationError.TYPE.LEGAL_HOLD_CONVERSATION_CANCELLATION;
       if (isLegalHoldReject) {
         this.logger.log('User has canceled sending a message to a conversation under legal hold.');
         promiseRejectionEvent.preventDefault();

@@ -67,7 +67,7 @@ describe('SelfAction', () => {
   });
 
   it('handles failed self user fetch', async () => {
-    const error = new Error('testerror');
+    const error = new Error('test error');
 
     const mockedActions = {
       selfAction: {},
@@ -166,7 +166,7 @@ describe('SelfAction', () => {
 
   it('handles failed attempt to set self email', async () => {
     const email = 'myemail@mail.com';
-    const error = new Error('testerror');
+    const error = new Error('test error');
     const mockedApiClient = {
       self: {api: {putEmail: () => Promise.reject(error)}},
     };
@@ -204,7 +204,7 @@ describe('SelfAction', () => {
 
   it('handles failed attempt to set self password', async () => {
     const password = 'password';
-    const error = new Error('testerror');
+    const error = new Error('test error');
     const mockedApiClient = {
       self: {api: {putPassword: () => Promise.reject(error)}},
     };

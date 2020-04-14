@@ -141,8 +141,13 @@ export class TeamRepository {
   };
 
   scheduleFetchTeamInfo = (): void => {
-    this.getTeam();
-    setTimeout(this.scheduleFetchTeamInfo, TIME_IN_MILLIS.DAY);
+    window.setInterval(async () => {
+      try {
+        await this.getTeam();
+      } catch (error) {
+        this.logger.error(error);
+      }
+    }, TIME_IN_MILLIS.DAY);
   };
 
   getTeam = async (): Promise<TeamEntity> => {

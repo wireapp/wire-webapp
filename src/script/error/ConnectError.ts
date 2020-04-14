@@ -17,25 +17,32 @@
  *
  */
 
-import {BaseError} from './BaseError';
+import {BaseError, BASE_ERROR_TYPE} from './BaseError';
 
-window.z = window.z || {};
-window.z.error = z.error || {};
+enum CONNECT_ERROR_TYPE {
+  NOT_SUPPORTED = 'NOT_SUPPORTED',
+  NO_CONTACTS = 'NO_CONTACTS',
+  UPLOAD = 'UPLOAD',
+}
 
-z.error.TeamError = class TeamError extends BaseError {
-  constructor(type, message) {
-    super('TeamError', type, message);
+export class ConnectError extends BaseError {
+  constructor(type: CONNECT_ERROR_TYPE | BASE_ERROR_TYPE, message: string) {
+    super(type, message);
   }
 
-  static get MESSAGE() {
+  static get MESSAGE(): Record<CONNECT_ERROR_TYPE, string> {
     return {
-      NO_PERMISSIONS: 'No permissions provided',
+      NOT_SUPPORTED: 'Source not supported',
+      NO_CONTACTS: 'No contacts found for matching',
+      UPLOAD: 'Address book upload failed',
     };
   }
 
-  static get TYPE() {
+  static get TYPE(): Record<CONNECT_ERROR_TYPE, CONNECT_ERROR_TYPE> {
     return {
-      NO_PERMISSIONS: 'NO_PERMISSIONS',
+      NOT_SUPPORTED: CONNECT_ERROR_TYPE.NOT_SUPPORTED,
+      NO_CONTACTS: CONNECT_ERROR_TYPE.NO_CONTACTS,
+      UPLOAD: CONNECT_ERROR_TYPE.UPLOAD,
     };
   }
-};
+}

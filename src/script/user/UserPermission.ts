@@ -19,6 +19,7 @@
 
 import {PermissionsData} from '@wireapp/api-client/dist/team/member/PermissionsData';
 import {capitalizeFirstChar} from 'Util/StringUtil';
+import {TeamError} from '../error/TeamError';
 
 /**
  * Enum for various team permissions.
@@ -147,7 +148,7 @@ export enum ROLE {
 
 export function roleFromTeamPermissions(permissions: PermissionsData): ROLE {
   if (!permissions) {
-    throw new z.error.TeamError(z.error.TeamError.TYPE.NO_PERMISSIONS);
+    throw new TeamError(TeamError.TYPE.NO_PERMISSIONS, TeamError.MESSAGE.NO_PERMISSIONS);
   }
 
   const invalidRoles = [ROLE.INVALID, ROLE.NONE];
@@ -165,7 +166,7 @@ export function roleFromTeamPermissions(permissions: PermissionsData): ROLE {
  * The function generated will have the following format:
  *   `can<camel cased feature name>: () => boolean`
  *
- * @param boundRole Default role that will be used by default in every helper. Can be overriden by passing a role when calling the helper
+ * @param boundRole Default role that will be used by default in every helper. Can be overridden by passing a role when calling the helper
  * @returns helpers
  */
 export function generatePermissionHelpers(boundRole = ROLE.NONE): Record<string, (role: ROLE) => boolean> {

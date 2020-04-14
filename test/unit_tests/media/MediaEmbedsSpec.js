@@ -140,14 +140,14 @@ describe('MediaEmbeds', () => {
     });
 
     describe('YouTube', () => {
-      it('does not render a youtube link without video id', () => {
+      it('does not render a YouTube link without video id', () => {
         const link = 'youtube-nocookie.com';
         const message = build_message_with_anchor(link);
 
         expect(mediaParser.renderMediaEmbeds(message)).toBe(message);
       });
 
-      it('does not render a malicious youtube link', () => {
+      it('does not render a malicious YouTube link', () => {
         const link = 'https://xn--yutube-wqf.com/#youtu0be/v/fKopy74weus';
         const message = build_message_with_anchor(link);
 

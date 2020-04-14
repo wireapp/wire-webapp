@@ -260,15 +260,15 @@ describe('sortGroupsByLastEvent', () => {
 });
 
 describe('stripUrlWrapper', () => {
-  it('return the string without url wrapper (single quotes)', () => {
+  it('return the string without URL wrapper (single quotes)', () => {
     expect(stripUrlWrapper('url("/path/to/image/image.png")')).toBe('/path/to/image/image.png');
   });
 
-  it('return the string without url wrapper (quotes)', () => {
+  it('return the string without URL wrapper (quotes)', () => {
     expect(stripUrlWrapper('url("/path/to/image/image.png")')).toBe('/path/to/image/image.png');
   });
 
-  it('return the string without url wrapper (without quotes)', () => {
+  it('return the string without URL wrapper (without quotes)', () => {
     expect(stripUrlWrapper('url(/path/to/image/image.png)')).toBe('/path/to/image/image.png');
   });
 });
