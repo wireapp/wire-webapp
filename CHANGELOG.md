@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [16.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@16.0.11...@wireapp/core@16.1.0) (2020-04-14)
+
+
+### Features
+
+* **core,bot-api:** Add CompositeContentBuilder ([#2948](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/2948)) ([d838a9b](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/d838a9b4d111804c0bdc8f915c48719c6ce2c75e))
+
+
+
+
+
 ## [16.0.11](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@16.0.10...@wireapp/core@16.0.11) (2020-04-09)
 
 **Note:** Version bump only for package @wireapp/core
