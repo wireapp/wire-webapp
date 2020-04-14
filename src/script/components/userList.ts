@@ -101,10 +101,10 @@ ko.components.register('user-list', {
     <!-- /ko -->
 
     <!-- ko ifnot: showRoles() -->
-    ${listTemplate('filteredUserEntities().slice(0, maxShownUsers())')}
+    ${listTemplate('foundUserEntities().slice(0, maxShownUsers())')}
     <!-- /ko -->
 
-    <!-- ko if: filteredUserEntities().length > maxShownUsers() -->
+    <!-- ko if: foundUserEntities().length > maxShownUsers() -->
       <div data-bind="template: {afterRender: attachLazyTrigger}"><div style="height: 100px"></div></div>
     <!-- /ko -->
 
@@ -113,7 +113,7 @@ ko.components.register('user-list', {
         <div class="user-list__no-results" data-bind="text: t('searchListEveryoneParticipates')" data-uie-name="status-all-added"></div>
       <!-- /ko -->
 
-      <!-- ko if: userEntities().length > 0 && filteredUserEntities().length === 0 -->
+      <!-- ko if: userEntities().length > 0 && foundUserEntities().length === 0 -->
         <div class="user-list__no-results" data-bind="text: t('searchListNoMatches')" data-uie-name="status-no-matches"></div>
       <!-- /ko -->
     <!-- /ko -->
@@ -176,16 +176,27 @@ ko.components.register('user-list', {
       }
     };
 
+    const remoteTeamMembers = ko.observable();
+
+    async function fetchMembers(query: string, isHandle: boolean, ignoreMembers: User[]) {
+      const resultUsers: User[] = await this.searchRepository.search_by_name(query, isHandle);
+      const selfTeamId = teamRepository.selfUser().teamId;
+      const foundMembers = resultUsers.filter(user => user.teamId === selfTeamId);
+      const ignoreIds = ignoreMembers.map(member => member.id);
+      const uniqueMembers = foundMembers.filter(member => !ignoreIds.includes(member.id));
+      remoteTeamMembers(uniqueMembers);
+    }
+
     // Filter all list items if a filter is provided
-    this.filteredUserEntities = ko.pureComputed(() => {
+    const filteredUserEntities = ko.pureComputed(() => {
       const connectedUsers = conversationRepository.connectedUsers();
       let resultUsers: User[] = userEntities();
       const normalizedQuery = SearchRepository.normalizeQuery(filter());
       if (normalizedQuery) {
+        const trimmedQuery = filter().trim();
+        const isHandle = trimmedQuery.startsWith('@') && validateHandle(normalizedQuery);
         if (!skipSearch) {
           const SEARCHABLE_FIELDS = SearchRepository.CONFIG.SEARCHABLE_FIELDS;
-          const trimmedQuery = filter().trim();
-          const isHandle = trimmedQuery.startsWith('@') && validateHandle(normalizedQuery);
           const properties = isHandle ? [SEARCHABLE_FIELDS.USERNAME] : undefined;
           resultUsers = searchRepository.searchUserInSet(normalizedQuery, userEntities(), properties);
         }
@@ -196,6 +207,9 @@ ko.components.register('user-list', {
             teamRepository.isSelfConnectedTo(user.id) ||
             user.username() === normalizedQuery,
         );
+        if (!skipSearch) {
+          fetchMembers(trimmedQuery, isHandle, resultUsers);
+        }
       } else {
         resultUsers = userEntities().filter(
           user => user.isMe || connectedUsers.includes(user) || teamRepository.isSelfConnectedTo(user.id),
@@ -210,6 +224,8 @@ ko.components.register('user-list', {
       const [selfUser, otherUsers] = partition(resultUsers, user => user.isMe);
       return selfUser.concat(otherUsers);
     });
+
+    this.foundUserEntities = ko.pureComputed(() => [...filteredUserEntities(), ...remoteTeamMembers()]);
 
     this.isSelected = (userEntity: User): boolean => this.isSelectEnabled && selectedUsers().includes(userEntity);
 
