@@ -19,15 +19,24 @@
 
 import {BaseError} from './BaseError';
 
-window.z = window.z || {};
-window.z.error = z.error || {};
+enum STORAGE_ERROR_TYPE {
+  FAILED_TO_OPEN = 'FAILED_TO_OPEN',
+  INVALID_TIME = 'INVALID_TIME',
+  INVALID_TIMESTAMP = 'INVALID_TIMESTAMP',
+  NON_SEQUENTIAL_UPDATE = 'NON_SEQUENTIAL_UPDATE',
+  NOT_FOUND = 'NOT_FOUND',
+  NO_CONVERSATION_ID = 'NO_CONVERSATION_ID',
+  NO_DATA = 'NO_DATA',
+  NO_SENDER_ID = 'NO_SENDER_ID',
+  NO_TIME = 'NO_TIME',
+}
 
-z.error.StorageError = class StorageError extends BaseError {
-  constructor(type, message) {
-    super('StorageError', type, message);
+export class StorageError extends BaseError {
+  constructor(type: STORAGE_ERROR_TYPE, message: string) {
+    super(type, message);
   }
 
-  static get MESSAGE() {
+  static get MESSAGE(): Record<STORAGE_ERROR_TYPE, string> {
     return {
       FAILED_TO_OPEN: 'Failed to open database',
       INVALID_TIME: 'Event time needs to be ISO 8601',
@@ -41,17 +50,17 @@ z.error.StorageError = class StorageError extends BaseError {
     };
   }
 
-  static get TYPE() {
+  static get TYPE(): Record<STORAGE_ERROR_TYPE, STORAGE_ERROR_TYPE> {
     return {
-      FAILED_TO_OPEN: 'FAILED_TO_OPEN',
-      INVALID_TIME: 'INVALID_TIME',
-      INVALID_TIMESTAMP: 'INVALID_TIMESTAMP',
-      NON_SEQUENTIAL_UPDATE: 'NON_SEQUENTIAL_UPDATE',
-      NOT_FOUND: 'NOT_FOUND',
-      NO_CONVERSATION_ID: 'NO_CONVERSATION_ID',
-      NO_DATA: 'NO_DATA',
-      NO_SENDER_ID: 'NO_SENDER_ID',
-      NO_TIME: 'NO_TIME',
+      FAILED_TO_OPEN: STORAGE_ERROR_TYPE.FAILED_TO_OPEN,
+      INVALID_TIME: STORAGE_ERROR_TYPE.INVALID_TIME,
+      INVALID_TIMESTAMP: STORAGE_ERROR_TYPE.INVALID_TIMESTAMP,
+      NON_SEQUENTIAL_UPDATE: STORAGE_ERROR_TYPE.NON_SEQUENTIAL_UPDATE,
+      NOT_FOUND: STORAGE_ERROR_TYPE.NOT_FOUND,
+      NO_CONVERSATION_ID: STORAGE_ERROR_TYPE.NO_CONVERSATION_ID,
+      NO_DATA: STORAGE_ERROR_TYPE.NO_DATA,
+      NO_SENDER_ID: STORAGE_ERROR_TYPE.NO_SENDER_ID,
+      NO_TIME: STORAGE_ERROR_TYPE.NO_TIME,
     };
   }
-};
+}

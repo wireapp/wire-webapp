@@ -17,22 +17,16 @@
  *
  */
 
-import {isObject} from 'underscore';
-
 import {BaseError} from './BaseError';
 
 export class BackendClientError extends BaseError {
-  constructor(params) {
-    const message = params.message || `${params}`;
+  code: number;
+  label: string;
 
-    super('BackendClientError', BackendClientError.TYPE.GENERIC, message);
-
-    if (isObject(params)) {
-      this.code = params.code;
-      this.label = params.label;
-    } else if (typeof params === 'number') {
-      this.code = params;
-    }
+  constructor(params: {code: number; label?: string; message: string}) {
+    super(BackendClientError.TYPE.GENERIC, params.message);
+    this.code = params.code;
+    this.label = params.label;
   }
 
   static get LABEL() {
@@ -95,7 +89,3 @@ export class BackendClientError extends BaseError {
     };
   }
 }
-
-window.z = window.z || {};
-window.z.error = z.error || {};
-z.error.BackendClientError = BackendClientError;

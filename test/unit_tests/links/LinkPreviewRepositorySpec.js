@@ -25,6 +25,7 @@ import {SelfService} from 'src/script/self/SelfService';
 import {LinkPreviewRepository} from 'src/script/links/LinkPreviewRepository';
 import {APIClientSingleton} from 'src/script/service/APIClientSingleton';
 import {BackendClient} from 'src/script/service/BackendClient';
+import {LinkPreviewError} from 'src/script/error/LinkPreviewError';
 
 describe('LinkPreviewRepository', () => {
   let link_preview_repository = null;
@@ -48,7 +49,7 @@ describe('LinkPreviewRepository', () => {
         ._getLinkPreview('https://app.wire.com/')
         .then(done.fail)
         .catch(error => {
-          expect(error.type).toBe(z.error.LinkPreviewError.TYPE.NO_DATA_AVAILABLE);
+          expect(error.type).toBe(LinkPreviewError.TYPE.NO_DATA_AVAILABLE);
           done();
         });
     });
@@ -60,7 +61,7 @@ describe('LinkPreviewRepository', () => {
         ._getLinkPreview('https://www.youtube.com/watch?v=t4gjl-uwUHc')
         .then(done.fail)
         .catch(error => {
-          expect(error.type).toBe(z.error.LinkPreviewError.TYPE.BLACKLISTED);
+          expect(error.type).toBe(LinkPreviewError.TYPE.BLACKLISTED);
           done();
         });
     });
@@ -73,7 +74,7 @@ describe('LinkPreviewRepository', () => {
         ._getLinkPreview(invalidUrl)
         .then(done.fail)
         .catch(error => {
-          expect(error.type).toBe(z.error.LinkPreviewError.TYPE.UNSUPPORTED_TYPE);
+          expect(error.type).toBe(LinkPreviewError.TYPE.UNSUPPORTED_TYPE);
           done();
         });
     });

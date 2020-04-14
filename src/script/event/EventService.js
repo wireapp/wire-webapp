@@ -27,6 +27,8 @@ import {AssetTransferState} from '../assets/AssetTransferState';
 import {StorageSchemata} from '../storage/StorageSchemata';
 
 import {BaseError} from '../error/BaseError';
+import {ConversationError} from '../error/ConversationError';
+import {StorageError} from '../error/StorageError';
 
 /** Handles all databases interactions related to events */
 export class EventService {
@@ -49,7 +51,7 @@ export class EventService {
   async loadEvents(conversationId, eventIds) {
     if (!conversationId || !eventIds) {
       this.logger.error(`Cannot get events '${eventIds}' in conversation '${conversationId}' without IDs`);
-      throw new z.error.ConversationError(BaseError.TYPE.MISSING_PARAMETER);
+      throw new ConversationError(BaseError.TYPE.MISSING_PARAMETER, BaseError.MESSAGE.MISSING_PARAMETER);
     }
 
     try {
@@ -86,7 +88,7 @@ export class EventService {
   async loadEvent(conversationId, eventId) {
     if (!conversationId || !eventId) {
       this.logger.error(`Cannot get event '${eventId}' in conversation '${conversationId}' without IDs`);
-      throw new z.error.ConversationError(BaseError.TYPE.MISSING_PARAMETER);
+      throw new ConversationError(BaseError.TYPE.MISSING_PARAMETER, BaseError.MESSAGE.MISSING_PARAMETER);
     }
 
     try {
@@ -366,12 +368,15 @@ export class EventService {
     return Promise.resolve(primaryKey).then(key => {
       const hasChanges = updates && !!Object.keys(updates).length;
       if (!hasChanges) {
-        throw new z.error.ConversationError(z.error.ConversationError.TYPE.NO_CHANGES);
+        throw new ConversationError(ConversationError.TYPE.NO_CHANGES, ConversationError.MESSAGE.NO_CHANGES);
       }
 
       const hasVersionedUpdates = !!updates.version;
       if (hasVersionedUpdates) {
-        const error = new z.error.ConversationError(z.error.ConversationError.TYPE.WRONG_CHANGE);
+        const error = new ConversationError(
+          ConversationError.TYPE.WRONG_CHANGE,
+          ConversationError.MESSAGE.WRONG_CHANGE,
+        );
         error.message += ' Use the `updateEventSequentially` method to perform a versioned update of an event';
         throw error;
       }
@@ -392,7 +397,7 @@ export class EventService {
     return Promise.resolve().then(() => {
       const hasVersionedChanges = !!changes.version;
       if (!hasVersionedChanges) {
-        throw new z.error.ConversationError(z.error.ConversationError.TYPE.WRONG_CHANGE);
+        throw new ConversationError(ConversationError.TYPE.WRONG_CHANGE, ConversationError.MESSAGE.WRONG_CHANGE);
       }
 
       if (this.storageService.db) {
@@ -400,7 +405,7 @@ export class EventService {
         return this.storageService.db.transaction('rw', StorageSchemata.OBJECT_STORE.EVENTS, () => {
           return this.storageService.load(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey).then(record => {
             if (!record) {
-              throw new z.error.StorageError(z.error.StorageError.TYPE.NOT_FOUND);
+              throw new StorageError(StorageError.TYPE.NOT_FOUND, StorageError.MESSAGE.NOT_FOUND);
             }
 
             const databaseVersion = record.version || 1;
@@ -419,7 +424,7 @@ export class EventService {
             this.logger.error(logMessage, logObject);
 
             Raygun.send(new Error(logMessage), logObject);
-            throw new z.error.StorageError(z.error.StorageError.TYPE.NON_SEQUENTIAL_UPDATE);
+            throw new StorageError(StorageError.TYPE.NON_SEQUENTIAL_UPDATE, StorageError.MESSAGE.NON_SEQUENTIAL_UPDATE);
           });
         });
       }

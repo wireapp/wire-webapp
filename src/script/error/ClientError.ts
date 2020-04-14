@@ -17,17 +17,25 @@
  *
  */
 
-import {BaseError} from './BaseError';
+import {BaseError, BASE_ERROR_TYPE} from './BaseError';
 
-window.z = window.z || {};
-window.z.error = z.error || {};
+enum CLIENT_ERROR_TYPE {
+  CLIENT_NOT_SET = 'CLIENT_NOT_SET',
+  DATABASE_FAILURE = 'DATABASE_FAILURE',
+  NO_CLIENT_ID = 'NO_CLIENT_ID',
+  NO_USER_ID = 'NO_USER_ID',
+  NO_VALID_CLIENT = 'NO_VALID_CLIENT',
+  REQUEST_FAILURE = 'REQUEST_FAILURE',
+  REQUEST_FORBIDDEN = 'REQUEST_FORBIDDEN',
+  TOO_MANY_CLIENTS = 'TOO_MANY_CLIENTS',
+}
 
-z.error.ClientError = class ClientError extends BaseError {
-  constructor(type, message) {
-    super('ClientError', type, message);
+export class ClientError extends BaseError {
+  constructor(type: CLIENT_ERROR_TYPE | BASE_ERROR_TYPE, message: string) {
+    super(type, message);
   }
 
-  static get MESSAGE() {
+  static get MESSAGE(): Record<CLIENT_ERROR_TYPE, string> {
     return {
       CLIENT_NOT_SET: 'Local client is not yet set',
       DATABASE_FAILURE: 'Client related database transaction failed',
@@ -40,16 +48,16 @@ z.error.ClientError = class ClientError extends BaseError {
     };
   }
 
-  static get TYPE() {
+  static get TYPE(): Record<CLIENT_ERROR_TYPE, CLIENT_ERROR_TYPE> {
     return {
-      CLIENT_NOT_SET: 'CLIENT_NOT_SET',
-      DATABASE_FAILURE: 'DATABASE_FAILURE',
-      NO_CLIENT_ID: 'NO_CLIENT_ID',
-      NO_USER_ID: 'NO_USER_ID',
-      NO_VALID_CLIENT: 'NO_VALID_CLIENT',
-      REQUEST_FAILURE: 'REQUEST_FAILURE',
-      REQUEST_FORBIDDEN: 'REQUEST_FORBIDDEN',
-      TOO_MANY_CLIENTS: 'TOO_MANY_CLIENTS',
+      CLIENT_NOT_SET: CLIENT_ERROR_TYPE.CLIENT_NOT_SET,
+      DATABASE_FAILURE: CLIENT_ERROR_TYPE.DATABASE_FAILURE,
+      NO_CLIENT_ID: CLIENT_ERROR_TYPE.NO_CLIENT_ID,
+      NO_USER_ID: CLIENT_ERROR_TYPE.NO_USER_ID,
+      NO_VALID_CLIENT: CLIENT_ERROR_TYPE.NO_VALID_CLIENT,
+      REQUEST_FAILURE: CLIENT_ERROR_TYPE.REQUEST_FAILURE,
+      REQUEST_FORBIDDEN: CLIENT_ERROR_TYPE.REQUEST_FORBIDDEN,
+      TOO_MANY_CLIENTS: CLIENT_ERROR_TYPE.TOO_MANY_CLIENTS,
     };
   }
-};
+}
