@@ -379,7 +379,8 @@ class StartUIViewModel {
               const [contacts, others] = partition(userEntities, user => user.teamId === selfTeamId);
               const knownContactIds = this.searchResults.contacts().map(({id}) => id);
               const newContacts = contacts.filter(({id}) => !knownContactIds.includes(id));
-              this.searchResults.contacts.push(...newContacts);
+              const nonExternalContacts = await this.teamRepository.filterExternals(newContacts);
+              this.searchResults.contacts.push(...nonExternalContacts);
               this.searchResults.others(others);
             } else {
               this.searchResults.others(userEntities);
