@@ -30,12 +30,12 @@ export class TextContentBuilder {
     this.content = this.payloadBundle.content as TextContent;
   }
 
-  public build(): TextMessage | EditedTextMessage {
+  build(): TextMessage | EditedTextMessage {
     this.payloadBundle.content = this.content;
     return this.payloadBundle;
   }
 
-  public withLinkPreviews(linkPreviews?: LinkPreviewUploadedContent[]): TextContentBuilder {
+  withLinkPreviews(linkPreviews?: LinkPreviewUploadedContent[]): TextContentBuilder {
     if (linkPreviews?.length) {
       this.content.linkPreviews = linkPreviews;
     }
@@ -43,7 +43,7 @@ export class TextContentBuilder {
     return this;
   }
 
-  public withMentions(mentions?: MentionContent[]): TextContentBuilder {
+  withMentions(mentions?: MentionContent[]): TextContentBuilder {
     if (mentions?.length) {
       this.content.mentions = mentions;
     }
@@ -51,7 +51,7 @@ export class TextContentBuilder {
     return this;
   }
 
-  public withQuote(quote?: QuotableMessage | QuoteContent): TextContentBuilder {
+  withQuote(quote?: QuotableMessage | QuoteContent): TextContentBuilder {
     if (quote) {
       if ((quote as QuoteContent).quotedMessageId) {
         this.content.quote = quote as QuoteContent;
@@ -72,14 +72,14 @@ export class TextContentBuilder {
     return this;
   }
 
-  public withReadConfirmation(expectsReadConfirmation = false): TextContentBuilder {
+  withReadConfirmation(expectsReadConfirmation = false): TextContentBuilder {
     if (typeof expectsReadConfirmation !== 'undefined') {
       this.content.expectsReadConfirmation = expectsReadConfirmation;
     }
     return this;
   }
 
-  public withLegalHoldStatus(legalHoldStatus = LegalHoldStatus.UNKNOWN): TextContentBuilder {
+  withLegalHoldStatus(legalHoldStatus = LegalHoldStatus.UNKNOWN): TextContentBuilder {
     if (typeof legalHoldStatus !== 'undefined') {
       this.content.legalHoldStatus = legalHoldStatus;
     }

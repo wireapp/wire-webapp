@@ -59,11 +59,13 @@ const login: LoginData = {
 
   if (account.service) {
     // Send poll
-    const pollMessage = account.service.conversation.messageBuilder.createPollMessage(
-      conversationId,
-      Text.create({content: 'Are you a robot?'}),
-      ['Yes', 'No'],
-    );
+    const pollMessage = account.service.conversation.messageBuilder
+      .createComposite(conversationId)
+      .addText(Text.create({content: 'Are you a robot?'}))
+      .addButton('Yes')
+      .addButton('No')
+      .build();
+
     await account.service.conversation.send(pollMessage);
 
     // Send button action
