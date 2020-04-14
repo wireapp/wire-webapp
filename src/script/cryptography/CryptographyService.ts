@@ -21,12 +21,17 @@ import {APIClient} from '@wireapp/api-client';
 import {ClientPreKey, PreKey} from '@wireapp/api-client/dist/auth';
 import {UserClients} from '@wireapp/api-client/dist/conversation';
 import {UserPreKeyBundleMap} from '@wireapp/api-client/dist/user';
+import {PublicClient} from '@wireapp/api-client/dist/client';
 
 export class CryptographyService {
   private readonly apiClient: APIClient;
 
   constructor(apiClient: APIClient) {
     this.apiClient = apiClient;
+  }
+
+  getUserClients(userId: string): Promise<PublicClient[]> {
+    return this.apiClient.user.api.getClients(userId);
   }
 
   /**
