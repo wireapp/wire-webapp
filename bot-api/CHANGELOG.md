@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.8.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@7.7.15...@wireapp/bot-api@7.8.0) (2020-04-14)
+
+
+### Features
+
+* **core,bot-api:** Add CompositeContentBuilder ([#2948](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/issues/2948)) ([d838a9b](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/commit/d838a9b4d111804c0bdc8f915c48719c6ce2c75e))
+
+
+
+
+
 ## [7.7.15](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@7.7.14...@wireapp/bot-api@7.7.15) (2020-04-09)
 
 **Note:** Version bump only for package @wireapp/bot-api
