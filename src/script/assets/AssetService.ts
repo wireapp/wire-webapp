@@ -28,6 +28,7 @@ import {AssetRetentionPolicy} from '../assets/AssetRetentionPolicy';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {encryptAesAsset} from './AssetCrypto';
 import {BackendClient} from '../service/BackendClient';
+import {Conversation} from '../entity/Conversation';
 
 export interface UploadAssetResponse {
   key: string;
@@ -35,8 +36,8 @@ export interface UploadAssetResponse {
 }
 
 export interface CompressedImage {
-  compressedBytes: any;
-  compressedImage: any;
+  compressedBytes: Uint8Array;
+  compressedImage: HTMLImageElement;
 }
 
 export interface AssetUploadOptions {
@@ -55,28 +56,29 @@ export class AssetService {
     this.backendClient = backendClient;
   }
 
-  uploadProfileImage(
+  async uploadProfileImage(
     image: Blob | File,
   ): Promise<{
     mediumImageKey: string;
     previewImageKey: string;
   }> {
-    return Promise.all([this._compressProfileImage(image), this._compressImage(image)])
-      .then(([{compressedBytes: previewImageBytes}, {compressedBytes: mediumImageBytes}]) => {
-        const assetUploadOptions = {
-          expectsReadConfirmation: false,
-          public: true,
-          retention: AssetRetentionPolicy.ETERNAL,
-        };
-        return Promise.all([
-          this.postAsset(previewImageBytes, assetUploadOptions),
-          this.postAsset(mediumImageBytes, assetUploadOptions),
-        ]);
-      })
-      .then(([previewCredentials, mediumCredentials]) => ({
-        mediumImageKey: mediumCredentials.key,
-        previewImageKey: previewCredentials.key,
-      }));
+    const [{compressedBytes: previewImageBytes}, {compressedBytes: mediumImageBytes}] = await Promise.all([
+      this._compressProfileImage(image),
+      this._compressImage(image),
+    ]);
+    const assetUploadOptions = {
+      expectsReadConfirmation: false,
+      public: true,
+      retention: AssetRetentionPolicy.ETERNAL,
+    };
+    const [previewCredentials, mediumCredentials] = await Promise.all([
+      this.postAsset(previewImageBytes, assetUploadOptions),
+      this.postAsset(mediumImageBytes, assetUploadOptions),
+    ]);
+    return {
+      mediumImageKey: mediumCredentials.key,
+      previewImageKey: previewCredentials.key,
+    };
   }
 
   private async _uploadAsset(
@@ -84,83 +86,71 @@ export class AssetService {
     options: AssetUploadOptions,
     xhrAccessorFunction: Function,
   ): Promise<Asset> {
-    return encryptAesAsset(bytes).then(({cipherText, keyBytes, sha256}) => {
-      return this.postAsset(new Uint8Array(cipherText), options, xhrAccessorFunction).then(({key, token}) => {
-        const assetRemoteData = new Asset.RemoteData({
-          assetId: key,
-          assetToken: token,
-          otrKey: new Uint8Array(keyBytes),
-          sha256: new Uint8Array(sha256),
-        });
-
-        const protoAsset = new Asset({
-          [PROTO_MESSAGE_TYPE.ASSET_UPLOADED]: assetRemoteData,
-          [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: options.expectsReadConfirmation,
-          [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: options.legalHoldStatus,
-        });
-
-        return protoAsset;
-      });
+    const {cipherText, keyBytes, sha256} = await encryptAesAsset(bytes);
+    const {key, token} = await this.postAsset(new Uint8Array(cipherText), options, xhrAccessorFunction);
+    const assetRemoteData = new Asset.RemoteData({
+      assetId: key,
+      assetToken: token,
+      otrKey: new Uint8Array(keyBytes),
+      sha256: new Uint8Array(sha256),
     });
-  }
-
-  uploadAsset(file: Blob | File, options: AssetUploadOptions, xhrAccessorFunction: Function): Promise<Asset> {
-    return loadFileBuffer(file).then(buffer => this._uploadAsset(buffer as ArrayBuffer, options, xhrAccessorFunction));
-  }
-
-  uploadImageAsset(image: Blob | File, options: AssetUploadOptions, xhrAccessorFunction: Function): Promise<Asset> {
-    return this._compressImage(image).then(({compressedBytes, compressedImage}) => {
-      return this._uploadAsset(compressedBytes, options, xhrAccessorFunction).then(protoAsset => {
-        const assetImageMetadata = new Asset.ImageMetaData({
-          height: compressedImage.height,
-          width: compressedImage.width,
-        });
-
-        const assetOriginal = new Asset.Original({
-          image: assetImageMetadata,
-          mimeType: image.type,
-          size: compressedBytes.length,
-        });
-
-        protoAsset[PROTO_MESSAGE_TYPE.ASSET_ORIGINAL] = assetOriginal;
-        return protoAsset;
-      });
+    const protoAsset = new Asset({
+      [PROTO_MESSAGE_TYPE.ASSET_UPLOADED]: assetRemoteData,
+      [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: options.expectsReadConfirmation,
+      [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: options.legalHoldStatus,
     });
+    return protoAsset;
   }
 
-  generateAssetUrl(assetId: string, conversationId: string, forceCaching: boolean): Promise<string> {
-    return Promise.resolve().then(() => {
-      legacyAsset(assetId, conversationId);
-      const url = this.backendClient.createUrl(`/assets/${assetId}`);
-      const cachingParam = forceCaching ? '&forceCaching=true' : '';
-      const conversationIdParam = `&conv_id=${encodeURIComponent(conversationId)}`;
+  async uploadAsset(file: Blob | File, options: AssetUploadOptions, xhrAccessorFunction: Function): Promise<Asset> {
+    const buffer = await loadFileBuffer(file);
+    return this._uploadAsset(buffer as ArrayBuffer, options, xhrAccessorFunction);
+  }
 
-      return `${url}?access_token=${this.apiClient['accessTokenStore'].accessToken?.access_token}${conversationIdParam}${cachingParam}`;
+  async uploadImageAsset(
+    image: Blob | File,
+    options: AssetUploadOptions,
+    xhrAccessorFunction: Function,
+  ): Promise<Asset> {
+    const {compressedBytes, compressedImage} = await this._compressImage(image);
+    const protoAsset = await this._uploadAsset(compressedBytes, options, xhrAccessorFunction);
+    const assetImageMetadata = new Asset.ImageMetaData({
+      height: compressedImage.height,
+      width: compressedImage.width,
     });
-  }
-
-  generateAssetUrlV2(assetId: string, conversationId: string, forceCaching: boolean): Promise<string> {
-    return Promise.resolve().then(() => {
-      legacyAsset(assetId, conversationId);
-      const url = this.backendClient.createUrl(`/conversations/${conversationId}/otr/assets/${assetId}`);
-      const cachingParam = forceCaching ? '&forceCaching=true' : '';
-
-      return `${url}?access_token=${this.apiClient['accessTokenStore'].accessToken?.access_token}${cachingParam}`;
+    const assetOriginal = new Asset.Original({
+      image: assetImageMetadata,
+      mimeType: image.type,
+      size: compressedBytes.length,
     });
+    protoAsset[PROTO_MESSAGE_TYPE.ASSET_ORIGINAL] = assetOriginal;
+    return protoAsset;
   }
 
-  generateAssetUrlV3(assetKey: string, assetToken: string, forceCaching: boolean): Promise<string> {
-    return Promise.resolve().then(() => {
-      assetV3(assetKey, assetToken);
-      const url = `${this.backendClient.createUrl(`/assets/v3/${assetKey}`)}`;
-      const assetTokenParam = assetToken ? `&asset_token=${encodeURIComponent(assetToken)}` : '';
-      const cachingParam = forceCaching ? '&forceCaching=true' : '';
-
-      return `${url}?access_token=${this.apiClient['accessTokenStore'].accessToken?.access_token}${assetTokenParam}${cachingParam}`;
-    });
+  async generateAssetUrl(assetId: string, conversationId: string, forceCaching: boolean): Promise<string> {
+    legacyAsset(assetId, conversationId);
+    const url = this.backendClient.createUrl(`/assets/${assetId}`);
+    const cachingParam = forceCaching ? '&forceCaching=true' : '';
+    const conversationIdParam = `&conv_id=${encodeURIComponent(conversationId)}`;
+    return `${url}?access_token=${this.apiClient['accessTokenStore'].accessToken?.access_token}${conversationIdParam}${cachingParam}`;
   }
 
-  getAssetRetention(userEntity: any, conversationEntity: any): AssetRetentionPolicy {
+  async generateAssetUrlV2(assetId: string, conversationId: string, forceCaching: boolean): Promise<string> {
+    legacyAsset(assetId, conversationId);
+    const url = this.backendClient.createUrl(`/conversations/${conversationId}/otr/assets/${assetId}`);
+    const cachingParam = forceCaching ? '&forceCaching=true' : '';
+    return `${url}?access_token=${this.apiClient['accessTokenStore'].accessToken?.access_token}${cachingParam}`;
+  }
+
+  async generateAssetUrlV3(assetKey: string, assetToken: string, forceCaching: boolean): Promise<string> {
+    assetV3(assetKey, assetToken);
+    const url = `${this.backendClient.createUrl(`/assets/v3/${assetKey}`)}`;
+    const assetTokenParam = assetToken ? `&asset_token=${encodeURIComponent(assetToken)}` : '';
+    const cachingParam = forceCaching ? '&forceCaching=true' : '';
+    return `${url}?access_token=${this.apiClient['accessTokenStore'].accessToken?.access_token}${assetTokenParam}${cachingParam}`;
+  }
+
+  getAssetRetention(userEntity: any, conversationEntity: Conversation): AssetRetentionPolicy {
     const isTeamMember = userEntity.inTeam();
     const isTeamConversation = conversationEntity.inTeam();
     const isTeamUserInConversation = conversationEntity
@@ -231,23 +221,21 @@ export class AssetService {
     return this._compressImageWithWorker('worker/profile-image-worker.js', image);
   }
 
-  private _compressImageWithWorker(
+  private async _compressImageWithWorker(
     pathToWorkerFile: string,
     image: File | Blob,
     filter?: Function,
   ): Promise<CompressedImage> {
-    return loadFileBuffer(image)
-      .then(buffer => {
-        if (typeof filter === 'function' ? filter() : undefined) {
-          return new Uint8Array(buffer as ArrayBuffer);
-        }
-        return new WebWorker(pathToWorkerFile).post(buffer);
-      })
-      .then(compressedBytes => {
-        return loadImage(new Blob([compressedBytes], {type: image.type})).then(compressedImage => ({
-          compressedBytes,
-          compressedImage,
-        }));
-      });
+    const buffer = await loadFileBuffer(image);
+    if (typeof filter === 'function' ? filter() : undefined) {
+      new Uint8Array(buffer as ArrayBuffer);
+    }
+    const worker = new WebWorker(pathToWorkerFile);
+    const compressedBytes = await worker.post(buffer);
+    const compressedImage = await loadImage(new Blob([compressedBytes], {type: image.type}));
+    return {
+      compressedBytes: new Uint8Array(compressedBytes),
+      compressedImage,
+    };
   }
 }
