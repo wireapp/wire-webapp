@@ -218,17 +218,7 @@ export class CryptographyRepository {
     const encryptLogMessage = `Encrypting message of type '${genericMessage.content}' for '${receivingUsers}' users...`;
     this.logger.log(encryptLogMessage, recipients);
 
-    const usersWithMissingClients = Object.entries(recipients)
-      .filter(([userId, clientIds]) => clientIds.length === 0)
-      .map(([userId]) => userId);
     let {messagePayload, missingRecipients} = await this._encryptGenericMessage(recipients, genericMessage, payload);
-
-    for (let index = 0; index < usersWithMissingClients.length; index++) {
-      const userId = usersWithMissingClients[index];
-      const clients = await this.cryptographyService.getUserClients(userId);
-      const clientIds = clients.map(client => client.id);
-      missingRecipients[userId] = clientIds;
-    }
 
     if (Object.keys(missingRecipients).length) {
       const reEncryptedMessage = await this._encryptGenericMessageForMissingRecipients(
@@ -368,7 +358,6 @@ export class CryptographyRepository {
       const {userId, clientId} = ClientEntity.dismantleUserClientId(sessionId);
 
       if (cipherText) {
-        messagePayload.recipients[userId] = missingRecipients[userId] || {};
         messagePayload.recipients[userId][clientId] = cipherText;
       } else {
         missingRecipients[userId] = missingRecipients[userId] || [];

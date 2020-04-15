@@ -125,7 +125,7 @@ export class BroadcastRepository {
     this.logger.info(`Sending '${messageType}' broadcast message to '${receivingUsers.length}' users`, payload);
 
     return this.broadcastService
-      .postBroadcastMessage(payload, true)
+      .postBroadcastMessage(payload, eventInfoEntity.options.precondition)
       .then(response => {
         this.clientMismatchHandler.onClientMismatch(eventInfoEntity, response, payload);
         return response;
