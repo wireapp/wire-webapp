@@ -184,7 +184,8 @@ ko.components.register('user-list', {
       const foundMembers = resultUsers.filter(user => user.teamId === selfTeamId);
       const ignoreIds = ignoreMembers.map(member => member.id);
       const uniqueMembers = foundMembers.filter(member => !ignoreIds.includes(member.id));
-      remoteTeamMembers(uniqueMembers);
+      const nonExternalMembers = await teamRepository.filterExternals(uniqueMembers);
+      remoteTeamMembers(nonExternalMembers);
     }
 
     // Filter all list items if a filter is provided

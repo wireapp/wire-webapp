@@ -180,6 +180,14 @@ export class TeamRepository {
     });
   }
 
+  async filterExternals(users: User[]): Promise<User[]> {
+    const userIds = users.map(({id}) => id);
+    const members = await this.teamService.getTeamMembersByIds(this.team()?.id, userIds);
+    return members
+      .filter(member => roleFromTeamPermissions(member.permissions) !== ROLE.PARTNER)
+      .map(({user}) => users.find(({id}) => id === user));
+  }
+
   getTeamConversationRoles(): Promise<ConversationRolesList> {
     return this.teamService.getTeamConversationRoles(this.team().id);
   }
