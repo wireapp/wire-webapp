@@ -214,21 +214,18 @@ export class AssetService {
   }
 
   private _compressImage(image: File | Blob): Promise<CompressedImage> {
-    return this._compressImageWithWorker('worker/image-worker.js', image, () => image.type === 'image/gif');
+    return this._compressImageWithWorker('worker/image-worker.js', image);
   }
 
   private _compressProfileImage(image: File | Blob): Promise<CompressedImage> {
     return this._compressImageWithWorker('worker/profile-image-worker.js', image);
   }
 
-  private async _compressImageWithWorker(
-    pathToWorkerFile: string,
-    image: File | Blob,
-    filter?: Function,
-  ): Promise<CompressedImage> {
+  private async _compressImageWithWorker(pathToWorkerFile: string, image: File | Blob): Promise<CompressedImage> {
+    const skipCompression = image.type === 'image/gif';
     const buffer = await loadFileBuffer(image);
     let compressedBytes: ArrayBuffer;
-    if (typeof filter === 'function' ? filter() : undefined) {
+    if (skipCompression === true) {
       compressedBytes = new Uint8Array(buffer as ArrayBuffer);
     } else {
       const worker = new WebWorker(pathToWorkerFile);
