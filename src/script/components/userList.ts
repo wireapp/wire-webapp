@@ -176,7 +176,7 @@ ko.components.register('user-list', {
       }
     };
 
-    const remoteTeamMembers = ko.observable();
+    const remoteTeamMembers = ko.observable([]);
 
     async function fetchMembers(query: string, isHandle: boolean, ignoreMembers: User[]) {
       const resultUsers: User[] = await this.searchRepository.search_by_name(query, isHandle);
@@ -255,7 +255,7 @@ ko.components.register('user-list', {
     this.users = ko.observable<User[]>([]);
 
     const filteredUsersSubscription = ko.computed(() => {
-      const users = this.filteredUserEntities();
+      const users = filteredUserEntities();
       if (conversation?.()) {
         const members: User[] = [];
         const admins: User[] = [];
