@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.7.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/compare/@wireapp/proteus@9.6.13...@wireapp/proteus@9.7.0) (2020-04-15)
+
+
+### Features
+
+* **proteus:** Use libsodium for key conversion (WEBAPP-6791) ([#2104](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/issues/2104)) ([c3fc637](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/commit/c3fc63764c850364ec4439d4767ca7ab415cf17a))
+
+
+
+
+
 ## [9.6.13](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/compare/@wireapp/proteus@9.6.12...@wireapp/proteus@9.6.13) (2020-04-15)
 
 **Note:** Version bump only for package @wireapp/proteus
