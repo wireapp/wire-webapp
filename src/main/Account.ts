@@ -98,7 +98,7 @@ export interface Account {
 export type StoreEngineProvider = (storeName: string) => Promise<CRUDEngine>;
 
 export class Account extends EventEmitter {
-  readonly apiClient: APIClient;
+  private readonly apiClient: APIClient;
   private readonly logger: logdown.Logger;
   private readonly storeEngineProvider: StoreEngineProvider;
   private storeEngine?: CRUDEngine;
