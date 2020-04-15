@@ -41,7 +41,7 @@ export class DerivedSecrets {
     const cipher_key = new Uint8Array(output_key_material.buffer.slice(0, 32));
     const mac_key = new Uint8Array(output_key_material.buffer.slice(32, 64));
 
-    MemoryUtil.zeroize(output_key_material.buffer);
+    MemoryUtil.zeroize(output_key_material);
 
     const ds = ClassUtil.new_instance(DerivedSecrets);
     ds.cipher_key = CipherKey.new(cipher_key);

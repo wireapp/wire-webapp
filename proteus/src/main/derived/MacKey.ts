@@ -41,8 +41,7 @@ export class MacKey {
    * @param msg Unsigned message
    */
   verify(signature: Uint8Array, msg: Uint8Array): boolean {
-    const verify = sodium.crypto_auth_hmacsha256_verify(signature, msg, this.key);
-    return verify;
+    return sodium.crypto_auth_hmacsha256_verify(signature, msg, this.key);
   }
 
   encode(encoder: CBOR.Encoder): CBOR.Encoder {

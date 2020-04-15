@@ -89,10 +89,10 @@ describe('CipherKey sanity checks (IETF ChaCha20 test vectors)', () => {
       const ciphertext = key.encrypt(plaintext, nonce);
 
       return {
-        ciphertext: ciphertext,
-        key: key,
-        nonce: nonce,
-        plaintext: plaintext,
+        ciphertext,
+        key,
+        nonce,
+        plaintext,
       };
     };
 

@@ -27,46 +27,61 @@ beforeAll(async () => {
 });
 
 describe('Message', () => {
-  const st = Proteus.message.SessionTag.new();
-  st.tag.fill(42);
+  const sessionTag = Proteus.message.SessionTag.new();
+  sessionTag.tag.fill(42);
 
-  const bk = Proteus.keys.PublicKey.new(
-    new Uint8Array(32).fill(0xff),
+  const baseKey = Proteus.keys.PublicKey.new(
     // prettier-ignore
-    new Uint8Array([63, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75]),
-  );
-  const rk = Proteus.keys.PublicKey.new(
-    new Uint8Array(32).fill(0xf0),
+    new Uint8Array([226, 201, 222, 33, 39, 107, 40, 144, 176, 61, 100, 172, 187, 75, 226, 187, 56, 224, 93, 172, 160, 59, 23, 5, 89, 135, 147, 150, 186, 35, 251, 244]),
     // prettier-ignore
-    new Uint8Array([185, 178, 44, 203, 178, 44, 203, 178, 44, 203, 178, 44, 203, 178, 44, 203, 178, 44, 203, 178, 44, 203, 178, 44, 203, 178, 44, 203, 178, 44, 203, 114]),
+    new Uint8Array([239, 255, 64, 169, 64, 181, 174, 73, 140, 59, 238, 132, 78, 180, 124, 168, 31, 86, 109, 137, 143, 133, 99, 134, 196, 21, 48, 194, 228, 57, 143, 97]),
   );
-  const ik_pk = Proteus.keys.PublicKey.new(
-    new Uint8Array(32).fill(0xa0),
+  const ratchetKey = Proteus.keys.PublicKey.new(
     // prettier-ignore
-    new Uint8Array([92, 62, 6, 231, 99, 112, 62, 6, 231, 99, 112, 62, 6, 231, 99, 112, 62, 6, 231, 99, 112, 62, 6, 231, 99, 112, 62, 6, 231, 99, 112, 126]),
+    new Uint8Array([133, 117, 192, 130, 228, 136, 206, 141, 238, 5, 132, 167, 121, 244, 82, 240, 233, 26, 205, 137, 188, 232, 29, 172, 208, 55, 162, 118, 135, 79, 197, 15]),
+    // prettier-ignore
+    new Uint8Array([136, 242, 230, 94, 41, 142, 44, 0, 181, 172, 69, 159, 61, 246, 118, 230, 28, 211, 115, 255, 177, 61, 31, 160, 108, 154, 194, 3, 208, 25, 139, 63]),
   );
-  const ik = Proteus.keys.IdentityKey.new(ik_pk);
+  const publicIdentityKey = Proteus.keys.PublicKey.new(
+    // prettier-ignore
+    new Uint8Array([159, 59, 98, 66, 70, 188, 133, 198, 240, 219, 174, 199, 124, 130, 51, 101, 242, 243, 137, 16, 44, 8, 130, 189, 245, 168, 190, 133, 108, 42, 103, 126]),
+    // prettier-ignore
+    new Uint8Array([222, 129, 110, 54, 26, 250, 178, 102, 255, 166, 210, 24, 142, 190, 231, 7, 140, 141, 253, 162, 102, 219, 176, 11, 169, 131, 39, 12, 103, 74, 232, 44]),
+  );
+  const identityKey = Proteus.keys.IdentityKey.new(publicIdentityKey);
 
   it('serialises and deserialises a CipherMessage correctly', () => {
     const expected =
-      '01a500502a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a010c020d03a1005820f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0044a0102030405060708090a';
+      '01a500502a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a010c020d03a10058208575c082e488ce8dee0584a779f452f0e91acd89bce81dacd037a276874fc50f044a0102030405060708090a';
 
-    const msg = Proteus.message.CipherMessage.new(st, 12, 13, rk, new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]));
+    const msg = Proteus.message.CipherMessage.new(
+      sessionTag,
+      12,
+      13,
+      ratchetKey,
+      new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+    );
 
     const bytes = new Uint8Array(msg.serialise());
     expect(expected).toBe(sodium.to_hex(bytes).toLowerCase());
 
     const deserialised = Proteus.message.Message.deserialise(bytes.buffer) as Proteus.message.CipherMessage;
     expect(deserialised.constructor).toBe(Proteus.message.CipherMessage);
-    expect(deserialised.ratchet_key.fingerprint()).toBe(rk.fingerprint());
+    expect(deserialised.ratchet_key.fingerprint()).toBe(ratchetKey.fingerprint());
   });
 
   it('serialises a PreKeyMessage correctly', () => {
     const expected =
-      '02a400181801a1005820ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff02a100a1005820a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a003a500502a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a010c020d03a1005820f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0044a0102030405060708090a';
+      '02a400181801a1005820e2c9de21276b2890b03d64acbb4be2bb38e05daca03b170559879396ba23fbf402a100a10058209f3b624246bc85c6f0dbaec77c823365f2f389102c0882bdf5a8be856c2a677e03a500502a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a010c020d03a10058208575c082e488ce8dee0584a779f452f0e91acd89bce81dacd037a276874fc50f044a0102030405060708090a';
 
-    const cmsg = Proteus.message.CipherMessage.new(st, 12, 13, rk, new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]));
-    const pkmsg = Proteus.message.PreKeyMessage.new(24, bk, ik, cmsg);
+    const cmsg = Proteus.message.CipherMessage.new(
+      sessionTag,
+      12,
+      13,
+      ratchetKey,
+      new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+    );
+    const pkmsg = Proteus.message.PreKeyMessage.new(24, baseKey, identityKey, cmsg);
 
     const bytes = new Uint8Array(pkmsg.serialise());
     expect(expected).toBe(sodium.to_hex(bytes).toLowerCase());
@@ -74,9 +89,9 @@ describe('Message', () => {
     const deserialised = Proteus.message.Message.deserialise(bytes.buffer) as Proteus.message.PreKeyMessage;
     expect(deserialised.constructor).toBe(Proteus.message.PreKeyMessage);
 
-    expect(deserialised.base_key.fingerprint()).toBe(bk.fingerprint());
-    expect(deserialised.identity_key.fingerprint()).toBe(ik.fingerprint());
+    expect(deserialised.base_key.fingerprint()).toBe(baseKey.fingerprint());
+    expect(deserialised.identity_key.fingerprint()).toBe(identityKey.fingerprint());
 
-    expect(deserialised.message.ratchet_key.fingerprint()).toBe(rk.fingerprint());
+    expect(deserialised.message.ratchet_key.fingerprint()).toBe(ratchetKey.fingerprint());
   });
 });

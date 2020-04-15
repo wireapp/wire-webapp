@@ -18,7 +18,6 @@
  */
 
 import * as CBOR from '@wireapp/cbor';
-import * as ed2curve from 'ed2curve';
 import * as sodium from 'libsodium-wrappers-sumo';
 
 import * as ClassUtil from '../util/ClassUtil';
@@ -87,11 +86,12 @@ export class SecretKey {
       }
     }
 
-    const sec_curve = ed2curve.convertSecretKey(self.sec_edward);
-    if (sec_curve) {
+    try {
+      const sec_curve = sodium.crypto_sign_ed25519_sk_to_curve25519(self.sec_edward);
       self.sec_curve = sec_curve;
       return self;
+    } catch (error) {
+      throw new InputError.ConversionError('Could not convert secret key with libsodium.', 408);
     }
-    throw new InputError.ConversionError('Could not convert public key with ed2curve.', 408);
   }
 }

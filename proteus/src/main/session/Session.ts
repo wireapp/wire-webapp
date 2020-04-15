@@ -118,7 +118,9 @@ export class Session {
       session._insert_session_state(preKeyMessage.message.session_tag, state);
 
       if (preKeyMessage.prekey_id < PreKey.MAX_PREKEY_ID) {
-        MemoryUtil.zeroize(await prekey_store.load_prekey(preKeyMessage.prekey_id));
+        const prekey = await prekey_store.load_prekey(preKeyMessage.prekey_id);
+        MemoryUtil.zeroize(prekey);
+
         try {
           await prekey_store.delete_prekey(preKeyMessage.prekey_id);
         } catch (error) {
@@ -149,7 +151,7 @@ export class Session {
       );
     }
     throw new ProteusError(
-      `Unable to find PreKey ID "${pre_key_message.prekey_id}" in PreKey store "${pre_key_store.constructor.name}".`,
+      `Unable to find PreKey with ID "${pre_key_message.prekey_id}" in PreKey store "${pre_key_store.constructor.name}".`,
       ProteusError.CODE.CASE_101,
     );
   }
@@ -165,7 +167,7 @@ export class Session {
 
       this.session_states[tag.toString()] = {
         idx: this.counter,
-        state: state,
+        state,
         tag,
       };
       this.counter++;
@@ -189,7 +191,7 @@ export class Session {
   private _evict_oldest_session_state(): void {
     const oldest = Object.keys(this.session_states)
       .filter(obj => obj.toString() !== this.session_tag.toString())
-      .reduce((lowest, obj, index) => {
+      .reduce((lowest, obj) => {
         return this.session_states[obj].idx < this.session_states[lowest].idx ? obj.toString() : lowest;
       });
 
@@ -258,8 +260,8 @@ export class Session {
         const plaintext = await state.decrypt(envelope, msg.message);
 
         if (msg.prekey_id !== PreKey.MAX_PREKEY_ID) {
-          // TODO: Zeroize should be tested (and awaited) here!
-          MemoryUtil.zeroize(await prekey_store.load_prekey(msg.prekey_id));
+          const prekey = await prekey_store.load_prekey(msg.prekey_id);
+          MemoryUtil.zeroize(prekey);
           await prekey_store.delete_prekey(msg.prekey_id);
         }
 

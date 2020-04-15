@@ -116,7 +116,7 @@ describe('PreKey', () => {
       expect(prekeys[9].key_id).toBe(3009);
     });
 
-    it('does not include the last resort pre key', async () => {
+    it('does not include the last resort PreKey', async () => {
       let prekeys = await Proteus.keys.PreKey.generate_prekeys(65530, 10);
       expect(prekeys.length).toBe(10);
       expect(prekeys[0].key_id).toBe(65530);
