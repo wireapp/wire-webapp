@@ -25,11 +25,12 @@ import {TeamAPI} from '../team/TeamAPI';
 import {ArrayUtil} from '@wireapp/commons';
 
 export class MemberAPI {
-  public static readonly DEFAULT_USERS_CHUNK_SIZE = 50;
+  public static readonly DEFAULT_USERS_CHUNK_SIZE = 2000;
   constructor(private readonly client: HttpClient) {}
 
   public static readonly URL = {
     MEMBERS: 'members',
+    MEMBERS_BY_ID_LIST: 'get-members-by-ids-using-post',
   };
 
   public async getMember(teamId: string, userId: string): Promise<MemberData> {
@@ -116,9 +117,9 @@ export class MemberAPI {
 
   private async _getMembers(teamId: string, parameters: {ids: string[]}): Promise<Members> {
     const config: AxiosRequestConfig = {
-      method: 'get',
-      params: {ids: parameters.ids.join(',')},
-      url: `${TeamAPI.URL.TEAMS}/${teamId}/${MemberAPI.URL.MEMBERS}`,
+      data: {user_ids: parameters.ids},
+      method: 'post',
+      url: `${TeamAPI.URL.TEAMS}/${teamId}/${MemberAPI.URL.MEMBERS_BY_ID_LIST}`,
     };
 
     const response = await this.client.sendJSON<Members>(config);
