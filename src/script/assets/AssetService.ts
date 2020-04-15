@@ -227,11 +227,13 @@ export class AssetService {
     filter?: Function,
   ): Promise<CompressedImage> {
     const buffer = await loadFileBuffer(image);
+    let compressedBytes: ArrayBuffer;
     if (typeof filter === 'function' ? filter() : undefined) {
-      new Uint8Array(buffer as ArrayBuffer);
+      compressedBytes = new Uint8Array(buffer as ArrayBuffer);
+    } else {
+      const worker = new WebWorker(pathToWorkerFile);
+      compressedBytes = await worker.post(buffer);
     }
-    const worker = new WebWorker(pathToWorkerFile);
-    const compressedBytes = await worker.post(buffer);
     const compressedImage = await loadImage(new Blob([compressedBytes], {type: image.type}));
     return {
       compressedBytes: new Uint8Array(compressedBytes),
