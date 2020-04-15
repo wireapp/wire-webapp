@@ -442,7 +442,7 @@ class App {
         .connectedUsers()
         .filter(({teamId}) => teamId === selfTeamId)
         .map(({id}) => id);
-      const members = await teamRepository.updateTeamMembersByIds(teamRepository.team(), teamMemberIds);
+      await teamRepository.updateTeamMembersByIds(teamRepository.team(), teamMemberIds);
 
       telemetry.time_step(AppInitTimingsStep.APP_LOADED);
       this._showInterface();
