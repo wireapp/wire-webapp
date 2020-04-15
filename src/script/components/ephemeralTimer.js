@@ -25,7 +25,7 @@ class EphemeralTimer {
 
   setAnimationDelay(data, event) {
     // every time the component gets rendered, the animation delay gets set
-    // to accomodate for the passed lifetime of the timed message
+    // to accommodate for the passed lifetime of the timed message
     event.target.style.animationDelay = `${(this.started - Date.now()) / 1000}s`;
   }
 }

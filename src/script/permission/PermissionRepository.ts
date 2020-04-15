@@ -47,10 +47,10 @@ export class PermissionRepository {
       [PermissionType.NOTIFICATIONS]: ko.observable(PermissionStatusState.PROMPT),
     };
 
-    this.initPermisionState(Object.keys(this.permissionState) as PermissionType[]);
+    this.initPermissionState(Object.keys(this.permissionState) as PermissionType[]);
   }
 
-  private initPermisionState(permissions: PermissionType[]): void {
+  private initPermissionState(permissions: PermissionType[]): void {
     if (!navigator.permissions) {
       return;
     }

@@ -161,9 +161,9 @@ export class CallingRepository {
     };
 
     wCall.setLogHandler((level: LOG_LEVEL, message: string) => {
-      const trimedMessage = message.trim();
-      logFunctions[level].call(avsLogger, trimedMessage);
-      this.callLog.push(`${new Date().toISOString()} [${logLevelStrs[level]}] ${trimedMessage}`);
+      const trimmedMessage = message.trim();
+      logFunctions[level].call(avsLogger, trimmedMessage);
+      this.callLog.push(`${new Date().toISOString()} [${logLevelStrs[level]}] ${trimmedMessage}`);
     });
 
     const avsEnv = Environment.browser.firefox ? AVS_ENV.FIREFOX : AVS_ENV.DEFAULT;
@@ -178,17 +178,17 @@ export class CallingRepository {
     const wUser = wCall.create(
       selfUserId,
       selfClientId,
-      this.setAvsVersion, //readyh,
-      this.sendMessage, //sendh,
-      this.incomingCall, //incomingh,
-      () => {}, //missedh,
-      () => {}, //answerh,
-      () => {}, //estabh,
-      this.callClosed, //closeh,
-      () => {}, //metricsh,
-      this.requestConfig, //cfg_reqh,
-      () => {}, //acbrh,
-      this.videoStateChanged, //vstateh,
+      this.setAvsVersion, // `readyh`,
+      this.sendMessage, // `sendh`,
+      this.incomingCall, // `incomingh`,
+      () => {}, // `missedh`,
+      () => {}, // `answerh`,
+      () => {}, // `estabh`,
+      this.callClosed, // `closeh`,
+      () => {}, // `metricsh`,
+      this.requestConfig, // `cfg_reqh`,
+      () => {}, // `acbrh`,
+      this.videoStateChanged, // `vstateh`,
       0,
     );
     wCall.setMuteHandler(wUser, this.isMuted);
@@ -685,7 +685,7 @@ export class CallingRepository {
     screen: boolean,
   ): Promise<MediaStream> => {
     if (this.mediaStreamQuery) {
-      // if a query is already occuring, we will return the result of this query
+      // if a query is already occurring, we will return the result of this query
       return this.mediaStreamQuery;
     }
     const call = this.findCall(conversationId);

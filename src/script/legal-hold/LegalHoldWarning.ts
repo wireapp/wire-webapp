@@ -25,6 +25,7 @@ import {WebAppEvents} from '../event/WebApp';
 import {SHOW_LEGAL_HOLD_MODAL} from '../view_model/content/LegalHoldModalViewModel';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {OPEN_CONVERSATION_DETAILS} from '../view_model/PanelViewModel';
+import {ConversationError} from '../error/ConversationError';
 
 export const showLegalHoldWarning = (conversationEntity: Conversation, verifyDevices: boolean = false) => {
   return new Promise((resolve, reject) => {
@@ -42,8 +43,12 @@ export const showLegalHoldWarning = (conversationEntity: Conversation, verifyDev
     }
     amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.MULTI_ACTIONS, {
       close: () => {
-        const errorType = z.error.ConversationError.TYPE.LEGAL_HOLD_CONVERSATION_CANCELLATION;
-        reject(new z.error.ConversationError(errorType));
+        reject(
+          new ConversationError(
+            ConversationError.TYPE.LEGAL_HOLD_CONVERSATION_CANCELLATION,
+            ConversationError.MESSAGE.LEGAL_HOLD_CONVERSATION_CANCELLATION,
+          ),
+        );
       },
       preventClose: true,
       primaryAction: {

@@ -815,7 +815,7 @@ export class NotificationRepository {
    * @param notificationContent Content of notification
    * @param notificationContent.title Title of notification
    * @param notificationContent.options Notification options
-   * @param notificationContent.trigger Function to be called on notificiation click
+   * @param notificationContent.trigger Function to be called on notification click
    * @param notificationContent.timeout Timeout after which notification is closed
    * @returns No return value
    */
@@ -878,7 +878,7 @@ export class NotificationRepository {
   }
 
   /**
-   * Check whether conversation is in state to trigger notitication.
+   * Check whether conversation is in state to trigger notification.
    *
    * @param conversationEntity Conversation to notify in
    * @param messageEntity The message to filter from

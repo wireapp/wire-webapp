@@ -19,15 +19,21 @@
 
 import {BaseError} from './BaseError';
 
-window.z = window.z || {};
-window.z.error = z.error || {};
+enum USER_ERROR_TYPE {
+  INVALID_UPDATE = 'INVALID_UPDATE',
+  PRE_KEY_NOT_FOUND = 'PRE_KEY_NOT_FOUND',
+  REQUEST_FAILURE = 'REQUEST_FAILURE',
+  USERNAME_TAKEN = 'USERNAME_TAKEN',
+  USER_MISSING_EMAIL = 'USER_MISSING_EMAIL',
+  USER_NOT_FOUND = 'USER_NOT_FOUND',
+}
 
-z.error.UserError = class UserError extends BaseError {
-  constructor(type, message) {
-    super('UserError', type, message);
+export class UserError extends BaseError {
+  constructor(type: USER_ERROR_TYPE | string, message: string) {
+    super(type, message);
   }
 
-  static get MESSAGE() {
+  static get MESSAGE(): Record<USER_ERROR_TYPE | string, string> {
     return {
       INVALID_UPDATE: 'False input data for requested update',
       PRE_KEY_NOT_FOUND: 'Pre-key not found',
@@ -38,14 +44,14 @@ z.error.UserError = class UserError extends BaseError {
     };
   }
 
-  static get TYPE() {
+  static get TYPE(): Record<USER_ERROR_TYPE, USER_ERROR_TYPE> {
     return {
-      INVALID_UPDATE: 'INVALID_UPDATE',
-      PRE_KEY_NOT_FOUND: 'PRE_KEY_NOT_FOUND',
-      REQUEST_FAILURE: 'REQUEST_FAILURE',
-      USERNAME_TAKEN: 'USERNAME_TAKEN',
-      USER_MISSING_EMAIL: 'USER_MISSING_EMAIL',
-      USER_NOT_FOUND: 'USER_NOT_FOUND',
+      INVALID_UPDATE: USER_ERROR_TYPE.INVALID_UPDATE,
+      PRE_KEY_NOT_FOUND: USER_ERROR_TYPE.PRE_KEY_NOT_FOUND,
+      REQUEST_FAILURE: USER_ERROR_TYPE.REQUEST_FAILURE,
+      USERNAME_TAKEN: USER_ERROR_TYPE.USERNAME_TAKEN,
+      USER_MISSING_EMAIL: USER_ERROR_TYPE.USER_MISSING_EMAIL,
+      USER_NOT_FOUND: USER_ERROR_TYPE.USER_NOT_FOUND,
     };
   }
-};
+}

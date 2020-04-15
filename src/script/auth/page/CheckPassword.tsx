@@ -56,7 +56,7 @@ const CheckPassword = ({loginData, doLogin, resetAuthError, isFetching}: Props &
   const passwordInput = useRef<HTMLInputElement>();
 
   const [error, setError] = useState(null);
-  const [password, setPassword] = useState();
+  const [password, setPassword] = useState<string | null>(null);
   const [validPasswordInput, setValidPasswordInput] = useState(true);
 
   useEffect(() => {

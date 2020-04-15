@@ -141,8 +141,13 @@ export class TeamRepository {
   };
 
   scheduleFetchTeamInfo = (): void => {
-    this.getTeam();
-    setTimeout(this.scheduleFetchTeamInfo, TIME_IN_MILLIS.DAY);
+    window.setInterval(async () => {
+      try {
+        await this.getTeam();
+      } catch (error) {
+        this.logger.error(error);
+      }
+    }, TIME_IN_MILLIS.DAY);
   };
 
   getTeam = async (): Promise<TeamEntity> => {
@@ -172,6 +177,14 @@ export class TeamRepository {
     if (members.length) {
       return this.teamMapper.mapMemberFromArray(members);
     }
+  }
+
+  async filterExternals(users: User[]): Promise<User[]> {
+    const userIds = users.map(({id}) => id);
+    const members = await this.teamService.getTeamMembersByIds(this.team()?.id, userIds);
+    return members
+      .filter(member => roleFromTeamPermissions(member.permissions) !== ROLE.PARTNER)
+      .map(({user}) => users.find(({id}) => id === user));
   }
 
   getTeamConversationRoles(): Promise<ConversationRolesList> {

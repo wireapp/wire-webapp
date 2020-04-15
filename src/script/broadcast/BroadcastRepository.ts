@@ -71,7 +71,7 @@ export class BroadcastRepository {
      * But this will create a cyclic dependency that we need to resolve first.
      * As of now, the cyclic dependency would go like this:
      *   - ConversationRepo needs UserRepository
-     *   - UserRepostory needs BroadcastRepository
+     *   - UserRepository needs BroadcastRepository
      *   - BroadcastRepository needs ConversationRepository
      *
      * Needing the ConversationRepository in the BroadcastRepository doesn't make sense. We need to get rid of that dependency
@@ -121,11 +121,11 @@ export class BroadcastRepository {
    */
   private _sendEncryptedMessage(eventInfoEntity: EventInfoEntity, payload: NewOTRMessage): Promise<any> {
     const messageType = eventInfoEntity.getType();
-    this.logger.info(`Sending '${messageType}' message as broadcast`, payload);
+    const receivingUsers = Object.keys(payload.recipients);
+    this.logger.info(`Sending '${messageType}' broadcast message to '${receivingUsers.length}' users`, payload);
 
-    const options = eventInfoEntity.options;
     return this.broadcastService
-      .postBroadcastMessage(payload, options.precondition)
+      .postBroadcastMessage(payload, eventInfoEntity.options.precondition)
       .then(response => {
         this.clientMismatchHandler.onClientMismatch(eventInfoEntity, response, payload);
         return response;

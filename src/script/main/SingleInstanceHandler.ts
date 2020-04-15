@@ -38,7 +38,7 @@ export class SingleInstanceHandler {
 
   /**
    * @param onOtherInstanceStarted A callback to be called if another instance starts.
-   * If provided, will also run an interval that checks the instance integrity once an instance is registrated
+   * If provided, will also run an interval that checks the instance integrity once an instance is registered
    */
   constructor(onOtherInstanceStarted?: () => void) {
     this.instanceId = undefined;
@@ -46,7 +46,7 @@ export class SingleInstanceHandler {
   }
 
   /**
-   * Set the cookie to verify we are running a single instace tab.
+   * Set the cookie to verify we are running a single instance tab.
    * Returns `true` if the instance has been registered successfully.
    * Returns `false` if the app is already running in another instance.
    *

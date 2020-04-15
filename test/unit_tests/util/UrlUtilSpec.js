@@ -29,11 +29,11 @@ import {
 
 describe('UrlUtil', () => {
   describe('appendParameter', () => {
-    it('append param with & when url contains param', () => {
+    it('append param with & when URL contains param', () => {
       expect(appendParameter('foo.com?bar=true', 'fum=true')).toBe('foo.com?bar=true&fum=true');
     });
 
-    it('append param with ? when url contains param', () => {
+    it('append param with ? when URL contains param', () => {
       expect(appendParameter('foo.com', 'fum=true')).toBe('foo.com?fum=true');
     });
   });
@@ -94,7 +94,7 @@ describe('UrlUtil', () => {
       });
     });
 
-    it('returns empty string if url is not set', () => {
+    it('returns empty string if URL is not set', () => {
       expect(getDomainName()).toBe('');
     });
   });

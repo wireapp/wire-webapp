@@ -122,8 +122,8 @@ export const WebAppEvents = {
   },
   EXTENSIONS: {
     GIPHY: {
-      SEND: 'wire.webapp.extionsions.giphy.send',
-      SHOW: 'wire.webapp.extionsions.giphy.show',
+      SEND: 'wire.webapp.extensions.giphy.send',
+      SHOW: 'wire.webapp.extensions.giphy.show',
     },
   },
   INPUT: {
