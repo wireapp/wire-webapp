@@ -413,6 +413,7 @@ class App {
       await conversationRepository.conversationRoleRepository.loadTeamRoles();
 
       await userRepository.loadUsers();
+
       const notificationsCount = await eventRepository.initializeFromStream();
 
       telemetry.time_step(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
@@ -435,6 +436,14 @@ class App {
       await this._handleUrlParams();
       await conversationRepository.updateConversationsOnAppInit();
       await conversationRepository.conversationLabelRepository.loadLabels();
+
+      const selfTeamId = userRepository.self().teamId;
+      const teamMemberIds = conversationRepository
+        .connectedUsers()
+        .filter(({teamId}) => teamId === selfTeamId)
+        .map(({id}) => id);
+      await teamRepository.updateTeamMembersByIds(teamRepository.team(), teamMemberIds);
+
       telemetry.time_step(AppInitTimingsStep.APP_LOADED);
       this._showInterface();
       this.applock = new AppLockViewModel(clientRepository, userRepository.self);

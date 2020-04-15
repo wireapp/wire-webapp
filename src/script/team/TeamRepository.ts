@@ -153,31 +153,30 @@ export class TeamRepository {
   getTeam = async (): Promise<TeamEntity> => {
     const teamData = this.selfUser().teamId ? await this.getTeamById() : await this.getBindingTeam();
 
-    if (teamData) {
-      const teamEntity = this.teamMapper.mapTeamFromObject(teamData);
-      this.team(teamEntity);
-      await this.updateTeamMembers(teamEntity);
-    } else {
-      this.team(new TeamEntity());
-    }
+    const teamEntity = teamData ? this.teamMapper.mapTeamFromObject(teamData) : new TeamEntity();
+    this.team(teamEntity);
+
     // doesn't need to be awaited because it publishes the account info over amplify.
     this.sendAccountInfo();
-    return this.team();
+    return teamEntity;
   };
 
-  getTeamMember(teamId: string, userId: string): Promise<TeamMemberEntity> {
-    return this.teamService
-      .getTeamMember(teamId, userId)
-      .then(memberResponse => this.teamMapper.mapMemberFromObject(memberResponse));
+  async getTeamMember(teamId: string, userId: string): Promise<TeamMemberEntity> {
+    const memberResponse = await this.teamService.getTeamMember(teamId, userId);
+    return this.teamMapper.mapMemberFromObject(memberResponse);
   }
 
-  getTeamMembers(teamId: string): Promise<TeamMemberEntity[] | void> {
-    return this.teamService.getTeamMembers(teamId).then(({members}) => {
-      if (members.length) {
-        return this.teamMapper.mapMemberFromArray(members);
-      }
-      return undefined;
-    });
+  async getSelfMember(teamId: string): Promise<TeamMemberEntity> {
+    const memberEntity = await this.getTeamMember(teamId, this.selfUser().id);
+    this.teamMapper.mapRole(this.selfUser(), memberEntity.permissions);
+    return memberEntity;
+  }
+
+  async getTeamMembers(teamId: string, userIds: string[]): Promise<TeamMemberEntity[] | void> {
+    const members = await this.teamService.getTeamMembersByIds(teamId, userIds);
+    if (members.length) {
+      return this.teamMapper.mapMemberFromArray(members);
+    }
   }
 
   async filterExternals(users: User[]): Promise<User[]> {
@@ -192,10 +191,9 @@ export class TeamRepository {
     return this.teamService.getTeamConversationRoles(this.team().id);
   }
 
-  getWhitelistedServices(teamId: string): Promise<ServiceEntity[]> {
-    return this.teamService.getWhitelistedServices(teamId).then(({services: servicesData}) => {
-      return IntegrationMapper.mapServicesFromArray(servicesData);
-    });
+  async getWhitelistedServices(teamId: string): Promise<ServiceEntity[]> {
+    const {services: servicesData} = await this.teamService.getWhitelistedServices(teamId);
+    return IntegrationMapper.mapServicesFromArray(servicesData);
   }
 
   onTeamEvent(eventJson: any, source: typeof EventRepository.SOURCE): void {
@@ -263,8 +261,26 @@ export class TeamRepository {
     }
   }
 
-  async updateTeamMembers(teamEntity: TeamEntity): Promise<void> {
-    const teamMembers = await this.getTeamMembers(teamEntity.id);
+  async updateTeamMembersByIds(teamEntity: TeamEntity, memberIds: string[] = []): Promise<void> {
+    const members = await this.teamService.getTeamMembersByIds(teamEntity.id, memberIds);
+    this.memberRoles({});
+    this.memberInviters({});
+    this.updateMemberRoles(members);
+
+    const selfId = this.selfUser().id;
+    const includesSelfId = memberIds.includes(selfId);
+    if (includesSelfId) {
+      memberIds = memberIds.filter(id => id !== selfId);
+      const selfMember = members.find(({user: userId}) => userId === selfId);
+      this.teamMapper.mapRole(this.selfUser(), selfMember.permissions);
+    }
+
+    const userEntities = await this.userRepository.getUsersById(memberIds);
+    teamEntity.members(userEntities);
+  }
+
+  async updateTeamMembers(teamEntity: TeamEntity, userIds: string[]): Promise<void> {
+    const teamMembers = await this.getTeamMembers(teamEntity.id, userIds);
     if (teamMembers) {
       this.memberRoles({});
       this.memberInviters({});

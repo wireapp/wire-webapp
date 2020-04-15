@@ -835,10 +835,11 @@ export class UserRepository {
   }
 
   mapGuestStatus(userEntities = this.users()): void {
+    const selfTeamId = this.self().teamId;
     userEntities.forEach(userEntity => {
       if (!userEntity.isMe) {
         const isTeamMember = this.teamMembers().some(teamMember => teamMember.id === userEntity.id);
-        const isGuest = !userEntity.isService && !isTeamMember;
+        const isGuest = !userEntity.isService && !isTeamMember && selfTeamId !== userEntity.teamId;
         userEntity.isGuest(isGuest);
         userEntity.isTeamMember(isTeamMember);
       }

@@ -494,6 +494,8 @@ describe('ConversationRepository', () => {
       const teamId = team1to1Conversation.team;
       const teamMemberId = team1to1Conversation.members.others[0].id;
       const userEntity = new User(teamMemberId);
+
+      testFactory.user_repository.self().teamId = teamId;
       userEntity.inTeam(true);
       userEntity.isTeamMember(true);
       userEntity.teamId = teamId;

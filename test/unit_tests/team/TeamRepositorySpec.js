@@ -51,6 +51,7 @@ describe('TeamRepository', () => {
       {user: '74fa64dc-8318-4426-9935-82590ff8aa3e', permissions: 8},
     ],
   };
+  const memberIds = team_members.members.map(({user}) => user);
   /* eslint sort-keys-fix/sort-keys-fix: "off" */
 
   let server = undefined;
@@ -75,6 +76,12 @@ describe('TeamRepository', () => {
     ]);
 
     server.respondWith(
+      'POST',
+      `${Config.getConfig().BACKEND_REST}/teams/${team_metadata.id}/get-members-by-ids-using-post`,
+      [200, {'Content-Type': 'application/json'}, JSON.stringify(team_members)],
+    );
+
+    server.respondWith(
       'GET',
       `${Config.getConfig().BACKEND_REST}/users?ids=${team_members.members.map(member => member.user).join(',')}`,
       [200, {'Content-Type': 'application/json'}, ''],
@@ -96,7 +103,7 @@ describe('TeamRepository', () => {
 
   describe('getTeamMembers()', () => {
     it('returns team member entities', () => {
-      return team_repository.getTeamMembers(team_metadata.id).then(entities => {
+      return team_repository.getTeamMembers(team_metadata.id, memberIds).then(entities => {
         expect(entities.length).toEqual(team_members.members.length);
         expect(entities[0].userId).toEqual(team_members.members[0].user);
         expect(entities[0].permissions).toEqual(team_members.members[0].permissions);

@@ -262,11 +262,12 @@ export class ConversationRepository {
       const inviterId = this.teamRepository.memberInviters()[this.selfUser().id];
       const inviter = inviterId ? this.userRepository.users().find(({id}) => id === inviterId) : null;
       const connectedUsers = inviter ? [inviter] : [];
+      const selfTeamId = this.selfUser().teamId;
       for (const conversation of this.conversations()) {
         for (const user of conversation.participating_user_ets()) {
           const isNotService = !user.isService;
           const isNotIncluded = !connectedUsers.includes(user);
-          if (isNotService && isNotIncluded && (user.isTeamMember() || user.isConnected())) {
+          if (isNotService && isNotIncluded && (user.teamId === selfTeamId || user.isConnected())) {
             connectedUsers.push(user);
           }
         }
@@ -1002,7 +1003,7 @@ export class ConversationRepository {
    * @returns {Promise} Resolves with the conversation with requested user
    */
   get1To1Conversation(userEntity) {
-    const inCurrentTeam = userEntity.inTeam() && userEntity.isTeamMember();
+    const inCurrentTeam = userEntity.inTeam() && userEntity.teamId === this.selfUser().teamId;
 
     if (inCurrentTeam) {
       const matchingConversationEntity = this.conversations().find(conversationEntity => {
