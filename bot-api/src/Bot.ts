@@ -95,7 +95,7 @@ export class Bot {
     );
   }
 
-  public async start(storeEngine?: CRUDEngine): Promise<void> {
+  public async start(storeEngine?: CRUDEngine): Promise<APIClient> {
     const login = {
       clientType: this.config.clientType,
       email: this.credentials.email,
@@ -117,6 +117,8 @@ export class Bot {
     await this.account.listen();
 
     this.handlers.forEach(handler => (handler.account = this.account));
+
+    return apiClient;
   }
 
   private handlePayload(payload: PayloadBundle | ConversationEvent | UserEvent | TeamEvent): void {
