@@ -19,13 +19,18 @@
 
 import axios, {AxiosRequestConfig} from 'axios';
 
-import {HttpClient, RequestCancelable, SyntheticErrorLabel} from '../http/';
+import {handleProgressEvent, HttpClient, ProgressCallback, RequestCancelable, SyntheticErrorLabel} from '../http/';
 import {base64MD5FromBuffer, concatToBuffer} from '../shims/node/buffer';
 import {unsafeAlphanumeric} from '../shims/node/random';
 import {RequestCancellationError} from '../user';
 import {AssetRetentionPolicy} from './AssetRetentionPolicy';
 import {AssetUploadData} from './AssetUploadData';
 import {isValidAssetId, isValidToken} from './AssetUtil';
+
+export interface AssetOptions {
+  public: boolean;
+  retention: AssetRetentionPolicy;
+}
 
 export class AssetAPI {
   private static readonly ASSET_URL = '/assets/v3';
@@ -58,7 +63,8 @@ export class AssetAPI {
 
   async postAsset(
     asset: Uint8Array,
-    options?: {public: boolean; retention: AssetRetentionPolicy},
+    options?: AssetOptions,
+    progressCallback?: ProgressCallback,
   ): Promise<RequestCancelable<AssetUploadData>> {
     const BOUNDARY = `Frontier${unsafeAlphanumeric()}`;
 
@@ -93,6 +99,8 @@ export class AssetAPI {
         'Content-Type': `multipart/mixed; boundary=${BOUNDARY}`,
       },
       method: 'post',
+      onDownloadProgress: handleProgressEvent(progressCallback),
+      onUploadProgress: handleProgressEvent(progressCallback),
       url: AssetAPI.ASSET_URL,
     };
 

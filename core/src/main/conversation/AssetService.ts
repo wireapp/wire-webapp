@@ -17,23 +17,23 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client';
-import {AssetRetentionPolicy} from '@wireapp/api-client/dist/asset/AssetRetentionPolicy';
+import type {APIClient} from '@wireapp/api-client';
+import type {AssetOptions} from '@wireapp/api-client/dist/asset';
+import type {ProgressCallback} from '@wireapp/api-client/dist/http';
 import {FileContent, ImageContent} from '../conversation/content/';
 import {EncryptedAssetUploaded} from '../cryptography/';
 import * as AssetCryptography from '../cryptography/AssetCryptography.node';
 
-export interface AssetOptions {
-  public: boolean;
-  retention: AssetRetentionPolicy;
-}
-
 export class AssetService {
   constructor(private readonly apiClient: APIClient) {}
 
-  private async postAsset(buffer: Buffer, options?: AssetOptions): Promise<EncryptedAssetUploaded> {
+  private async postAsset(
+    buffer: Buffer,
+    options?: AssetOptions,
+    progressCallback?: ProgressCallback,
+  ): Promise<EncryptedAssetUploaded> {
     const {cipherText, keyBytes, sha256} = await AssetCryptography.encryptAsset(buffer);
-    const request = await this.apiClient.asset.api.postAsset(new Uint8Array(cipherText), options);
+    const request = await this.apiClient.asset.api.postAsset(new Uint8Array(cipherText), options, progressCallback);
     const {key, token} = await request.response;
 
     return {
