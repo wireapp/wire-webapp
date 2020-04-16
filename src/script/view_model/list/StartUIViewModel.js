@@ -34,6 +34,7 @@ import {ParticipantAvatar} from 'Components/participantAvatar';
 import {WebAppEvents} from '../../event/WebApp';
 import {EventName} from '../../tracking/EventName';
 import {SearchRepository} from '../../search/SearchRepository';
+import {sortByPriority} from 'Util/StringUtil';
 
 class StartUIViewModel {
   static get STATE() {
@@ -380,7 +381,12 @@ class StartUIViewModel {
               const knownContactIds = this.searchResults.contacts().map(({id}) => id);
               const newContacts = contacts.filter(({id}) => !knownContactIds.includes(id));
               const nonExternalContacts = await this.teamRepository.filterExternals(newContacts);
-              this.searchResults.contacts.push(...nonExternalContacts);
+              if (nonExternalContacts.length) {
+                const sortedContacts = [...this.searchResults.contacts(), ...nonExternalContacts].sort((userA, userB) =>
+                  sortByPriority(userA.name(), userB.name(), normalizedQuery),
+                );
+                this.searchResults.contacts(sortedContacts);
+              }
               this.searchResults.others(others);
             } else {
               this.searchResults.others(userEntities);

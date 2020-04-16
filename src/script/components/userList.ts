@@ -20,6 +20,7 @@
 import ko from 'knockout';
 
 import {partition} from 'Util/ArrayUtil';
+import {sortByPriority} from 'Util/StringUtil';
 
 import {ConversationRepository} from '../conversation/ConversationRepository';
 import {Conversation} from '../entity/Conversation';
@@ -226,7 +227,15 @@ ko.components.register('user-list', {
       return selfUser.concat(otherUsers);
     });
 
-    this.foundUserEntities = ko.pureComputed(() => [...filteredUserEntities(), ...remoteTeamMembers()]);
+    this.foundUserEntities = ko.pureComputed(() => {
+      if (!remoteTeamMembers().length) {
+        return filteredUserEntities();
+      }
+      const normalizedQuery = SearchRepository.normalizeQuery(filter());
+      return [...filteredUserEntities(), ...remoteTeamMembers()].sort((userA, userB) =>
+        sortByPriority(userA.name(), userB.name(), normalizedQuery),
+      );
+    });
 
     this.isSelected = (userEntity: User): boolean => this.isSelectEnabled && selectedUsers().includes(userEntity);
 
