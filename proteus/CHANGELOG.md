@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.8.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/compare/@wireapp/proteus@9.7.0...@wireapp/proteus@9.8.0) (2020-04-16)
+
+
+### Features
+
+* **proteus:** Use constructor instead of ClassUtil (BREAKING) (WEBAPP-6789) ([#2938](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/issues/2938)) ([48e4c38](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/commit/48e4c385cf819f42e3e7cefe566a2e49f32ba980))
+
+
+
+
+
 # [9.7.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/compare/@wireapp/proteus@9.6.13...@wireapp/proteus@9.7.0) (2020-04-15)
 
 
