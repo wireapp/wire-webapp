@@ -510,13 +510,14 @@ export class UserRepository {
       return Promise.resolve([]);
     }
 
-    const _getUsers = (chunkOfUserIds: string[]) => {
+    const _getUsers = (chunkOfUserIds: string[]): Promise<(void | User)[]> => {
       return this.user_service
         .getUsers(chunkOfUserIds)
         .then(response => (response ? this.user_mapper.mapUsersFromJson(response) : []))
         .catch((error: AxiosError) => {
           const isNotFound = error.response?.status === BackendClientError.STATUS_CODE.NOT_FOUND;
-          if (isNotFound) {
+          const isBadRequest = ((error.code as unknown) as number) === BackendClientError.STATUS_CODE.BAD_REQUEST;
+          if (isNotFound || isBadRequest) {
             return [];
           }
           throw error;
