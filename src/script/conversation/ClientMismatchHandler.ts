@@ -184,7 +184,6 @@ export class ClientMismatchHandler {
    * @param clientFn Function to remove clients
    * @param conversationEntity Conversation entity
    * @param payload Initial payload resulting in a 412
-   * @returns Function array
    */
   async removePayload(
     recipients: UserClients,
