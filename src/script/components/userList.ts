@@ -179,7 +179,7 @@ ko.components.register('user-list', {
     const remoteTeamMembers = ko.observable([]);
 
     async function fetchMembers(query: string, isHandle: boolean, ignoreMembers: User[]) {
-      const resultUsers: User[] = await this.searchRepository.search_by_name(query, isHandle);
+      const resultUsers: User[] = await searchRepository.search_by_name(query, isHandle);
       const selfTeamId = teamRepository.selfUser().teamId;
       const foundMembers = resultUsers.filter(user => user.teamId === selfTeamId);
       const ignoreIds = ignoreMembers.map(member => member.id);
