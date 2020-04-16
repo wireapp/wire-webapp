@@ -210,7 +210,7 @@ ko.components.register('conversation-list-calling-cell', {
    <!-- ko if: conversation() && !isDeclined() -->
     <div class="conversation-list-calling-cell conversation-list-cell">
       <!-- ko ifnot: temporaryUserStyle -->
-        <div class="conversation-list-cell-left">
+        <div class="conversation-list-cell-left" data-bind="link_to: conversationUrl">
           <!-- ko if: conversation().isGroup() -->
             <group-avatar class="conversation-list-cell-avatar-arrow call-ui__avatar" params="users: conversationParticipants(), conversation: conversation"></group-avatar>
           <!-- /ko -->
