@@ -166,7 +166,7 @@ export class SearchRepository {
    */
   search_by_name(
     name: string,
-    isHandle?: string,
+    isHandle?: boolean,
     maxResults = SearchRepository.CONFIG.MAX_SEARCH_RESULTS,
   ): Promise<User[]> {
     const directorySearch = this.searchService
