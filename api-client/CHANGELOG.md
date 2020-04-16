@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.2.0...@wireapp/api-client@11.3.0) (2020-04-16)
+
+
+### Features
+
+* **api-client:** Export asset util ([#2959](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2959)) ([3da7add](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/3da7add59a1feac18b6290968eac1fa4bb2f9183))
+
+
+
+
+
 # [11.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.1.0...@wireapp/api-client@11.2.0) (2020-04-16)
 
 
