@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.1.0...@wireapp/api-client@11.2.0) (2020-04-16)
+
+
+### Features
+
+* **api-client,core:** Add progress callback for asset uploads ([#2958](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2958)) ([f90f8f2](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/f90f8f27bf091fc6fdf74bda7cf425b9c47ed7a0))
+
+
+
+
+
 # [11.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.0.7...@wireapp/api-client@11.1.0) (2020-04-16)
 
 
