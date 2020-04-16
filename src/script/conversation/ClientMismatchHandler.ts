@@ -198,7 +198,7 @@ export class ClientMismatchHandler {
       if (noRemainingClients && typeof conversationEntity !== 'undefined' && conversationEntity.isGroup()) {
         try {
           const users = await this.userRepository.fetchUsersById([userId]);
-          if (users.length === 0) {
+          if (users.length === 0 || users.every(user => user && !!user.isDeleted)) {
             throw new Error('No users found');
           }
         } catch (error) {
