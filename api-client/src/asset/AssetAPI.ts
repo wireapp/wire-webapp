@@ -17,11 +17,12 @@
  *
  */
 
-import {AxiosRequestConfig} from 'axios';
+import axios, {AxiosRequestConfig} from 'axios';
 
-import {HttpClient} from '../http/';
+import {HttpClient, RequestCancelable, SyntheticErrorLabel} from '../http/';
 import {base64MD5FromBuffer, concatToBuffer} from '../shims/node/buffer';
 import {unsafeAlphanumeric} from '../shims/node/random';
+import {RequestCancellationError} from '../user';
 import {AssetRetentionPolicy} from './AssetRetentionPolicy';
 import {AssetUploadData} from './AssetUploadData';
 import {isValidAssetId, isValidToken} from './AssetUtil';
@@ -58,7 +59,7 @@ export class AssetAPI {
   async postAsset(
     asset: Uint8Array,
     options?: {public: boolean; retention: AssetRetentionPolicy},
-  ): Promise<AssetUploadData> {
+  ): Promise<RequestCancelable<AssetUploadData>> {
     const BOUNDARY = `Frontier${unsafeAlphanumeric()}`;
 
     const metadata = JSON.stringify({
@@ -83,14 +84,33 @@ export class AssetAPI {
 
     const footer = `\r\n--${BOUNDARY}--\r\n`;
 
-    const response = await this.client.sendRequest<AssetUploadData>({
+    const cancelSource = axios.CancelToken.source();
+
+    const config: AxiosRequestConfig = {
+      cancelToken: cancelSource.token,
       data: concatToBuffer(body, asset, footer),
       headers: {
         'Content-Type': `multipart/mixed; boundary=${BOUNDARY}`,
       },
       method: 'post',
       url: AssetAPI.ASSET_URL,
-    });
-    return response.data;
+    };
+
+    const handleRequest = async () => {
+      try {
+        const response = await this.client.sendRequest<AssetUploadData>(config);
+        return response.data;
+      } catch (error) {
+        if (error.message === SyntheticErrorLabel.REQUEST_CANCELLED) {
+          throw new RequestCancellationError('Asset upload got cancelled.');
+        }
+        throw error;
+      }
+    };
+
+    return {
+      cancel: () => cancelSource.cancel(SyntheticErrorLabel.REQUEST_CANCELLED),
+      response: handleRequest(),
+    };
   }
 }
