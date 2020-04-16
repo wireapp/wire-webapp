@@ -21,7 +21,7 @@ import {GenericMessage} from '@wireapp/protocol-messaging';
 import {amplify} from 'amplify';
 
 import {Logger, getLogger} from 'Util/Logger';
-
+import {NewOTRMessage} from '@wireapp/api-client/dist/conversation';
 import {ClientRepository} from '../client/ClientRepository';
 import {ClientMismatchHandler} from '../conversation/ClientMismatchHandler';
 import {ConversationRepository} from '../conversation/ConversationRepository';
@@ -71,7 +71,7 @@ export class BroadcastRepository {
      * But this will create a cyclic dependency that we need to resolve first.
      * As of now, the cyclic dependency would go like this:
      *   - ConversationRepo needs UserRepository
-     *   - UserRepostory needs BroadcastRepository
+     *   - UserRepository needs BroadcastRepository
      *   - BroadcastRepository needs ConversationRepository
      *
      * Needing the ConversationRepository in the BroadcastRepository doesn't make sense. We need to get rid of that dependency
@@ -115,10 +115,11 @@ export class BroadcastRepository {
   /**
    * Broadcasts an OTR message / event.
    *
-   * @param eventInfoEntity Event to be broadcasted
+   * @param eventInfoEntity Event to broadcast
+   * @param payload OTR message to broadcast
    * @returns Promise that resolves after sending the encrypted message
    */
-  private _sendEncryptedMessage(eventInfoEntity: EventInfoEntity, payload: any): Promise<any> {
+  private _sendEncryptedMessage(eventInfoEntity: EventInfoEntity, payload: NewOTRMessage): Promise<any> {
     const messageType = eventInfoEntity.getType();
     this.logger.info(`Sending '${messageType}' message as broadcast`, payload);
 

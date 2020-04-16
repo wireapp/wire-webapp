@@ -32,7 +32,7 @@ ko.components.register('asset-header', {
     <span class="asset-header-name" data-bind="text: message_et.user().name(), css: message_et.accent_color"></span>
     <span class="asset-header-time" data-bind="text: timeText"></span>
   `,
-  viewModel: function({message}: Params): void {
+  viewModel: function ({message}: Params): void {
     this.message_et = message;
     this.timeText = ko.pureComputed(() => {
       const timeStamp = message.timestamp();

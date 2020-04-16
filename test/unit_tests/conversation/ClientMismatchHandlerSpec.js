@@ -31,7 +31,8 @@ describe('ClientMismatchHandler', () => {
 
   let conversationEntity = undefined;
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    await testFactory.exposeStorageActors();
     return testFactory.exposeConversationActors().then(conversationRepository => {
       conversationEntity = new Conversation(createRandomUuid());
       return conversationRepository.save_conversation(conversationEntity);
@@ -111,7 +112,7 @@ describe('ClientMismatchHandler', () => {
         .onClientMismatch(eventInfoEntity, clientMismatch, payload)
         .then(() => {
           expect(testFactory.conversation_repository.addMissingMember).toHaveBeenCalledWith(
-            conversationId,
+            conversationEntity,
             [unknownUserId],
             timestamp - 1,
           );
@@ -159,9 +160,7 @@ describe('ClientMismatchHandler', () => {
         time: '2016-04-29T10:38:23.002Z',
       };
 
-      testFactory.cryptography_repository.createCryptobox.and.callThrough();
-
-      return testFactory.cryptography_repository.createCryptobox(testFactory.storage_service.db).then(() => {
+      return testFactory.cryptography_repository.initCryptobox().then(() => {
         const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id);
         eventInfoEntity.setTimestamp(new Date(clientMismatch.time).getTime());
         return testFactory.conversation_repository.clientMismatchHandler

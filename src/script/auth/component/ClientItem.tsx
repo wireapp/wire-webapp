@@ -60,7 +60,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
   const [isAnimating, setIsAnimating] = useState(false);
   const [password, setPassword] = useState('');
   const [isValidPassword, setIsValidPassword] = useState(true);
-  const [validationError, setValidationError] = useState();
+  const [validationError, setValidationError] = useState<ValidationError | null>(null);
 
   useEffect(() => {
     if (!selected && isSelected) {

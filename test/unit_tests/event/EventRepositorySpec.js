@@ -35,6 +35,7 @@ import {NotificationService} from 'src/script/event/NotificationService';
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {TestFactory} from '../../helper/TestFactory';
+import {EventError} from 'src/script/error/EventError';
 
 const testFactory = new TestFactory();
 
@@ -123,7 +124,7 @@ describe('EventRepository', () => {
       spyOn(testFactory.notification_service, 'getLastNotificationIdFromDb').and.callFake(() => {
         return last_notification_id
           ? Promise.resolve(last_notification_id)
-          : Promise.reject(new z.error.EventError(z.error.EventError.TYPE.NO_LAST_ID));
+          : Promise.reject(new EventError(EventError.TYPE.NO_LAST_ID, EventError.MESSAGE.NO_LAST_ID));
       });
 
       spyOn(testFactory.notification_service, 'saveLastNotificationIdToDb').and.returnValue(
@@ -338,16 +339,21 @@ describe('EventRepository', () => {
   describe('processEvent', () => {
     it('processes OTR events', async () => {
       const text = 'Hello, this is a test!';
+
+      // Create client for testing
       const ownClientId = 'f180a823bf0d1204';
       const client = new ClientEntity();
       client.id = ownClientId;
-
       testFactory.client_repository.currentClient(client);
-      testFactory.cryptography_repository.createCryptobox.and.callThrough();
 
-      await testFactory.cryptography_repository.createCryptobox(testFactory.storage_service.db);
-      const preKeyBundle = await testFactory.cryptography_repository.cryptobox.get_prekey();
-      const ciphertext = await createEncodedCiphertext(preKeyBundle, text);
+      // Create Cryptobox for testing
+      const someEngine = new MemoryEngine();
+      await someEngine.init('someEngine');
+      const cryptobox = new Cryptobox(someEngine, 10);
+      const preKeys = await cryptobox.create();
+      testFactory.cryptography_repository.cryptobox = cryptobox;
+
+      const ciphertext = await createEncodedCiphertext(preKeys[0], text, cryptobox.identity);
       const event = {
         conversation: 'fdc6cf1a-4e37-424e-a106-ab3d2cc5c8e0',
         data: {
@@ -403,8 +409,8 @@ describe('EventRepository', () => {
         .processEvent(event)
         .then(() => fail('Method should have thrown an error'))
         .catch(error => {
-          expect(error).toEqual(jasmine.any(z.error.EventError));
-          expect(error.type).toBe(z.error.EventError.TYPE.VALIDATION_FAILED);
+          expect(error).toEqual(jasmine.any(EventError));
+          expect(error.type).toBe(EventError.TYPE.VALIDATION_FAILED);
           expect(testFactory.event_service.saveEvent).not.toHaveBeenCalled();
         });
     });
@@ -418,8 +424,8 @@ describe('EventRepository', () => {
         ._handleEventSaving(event)
         .then(() => fail('Method should have thrown an error'))
         .catch(error => {
-          expect(error).toEqual(jasmine.any(z.error.EventError));
-          expect(error.type).toBe(z.error.EventError.TYPE.VALIDATION_FAILED);
+          expect(error).toEqual(jasmine.any(EventError));
+          expect(error.type).toBe(EventError.TYPE.VALIDATION_FAILED);
           expect(testFactory.event_service.saveEvent).not.toHaveBeenCalled();
         });
     });
@@ -433,8 +439,8 @@ describe('EventRepository', () => {
         .processEvent(event)
         .then(() => fail('Method should have thrown an error'))
         .catch(error => {
-          expect(error).toEqual(jasmine.any(z.error.EventError));
-          expect(error.type).toBe(z.error.EventError.TYPE.VALIDATION_FAILED);
+          expect(error).toEqual(jasmine.any(EventError));
+          expect(error.type).toBe(EventError.TYPE.VALIDATION_FAILED);
           expect(testFactory.event_service.saveEvent).not.toHaveBeenCalled();
         });
     });
@@ -447,8 +453,8 @@ describe('EventRepository', () => {
         .processEvent(event)
         .then(() => fail('Method should have thrown an error'))
         .catch(error => {
-          expect(error).toEqual(jasmine.any(z.error.EventError));
-          expect(error.type).toBe(z.error.EventError.TYPE.VALIDATION_FAILED);
+          expect(error).toEqual(jasmine.any(EventError));
+          expect(error.type).toBe(EventError.TYPE.VALIDATION_FAILED);
           expect(testFactory.event_service.saveEvent).not.toHaveBeenCalled();
         });
     });
@@ -462,8 +468,8 @@ describe('EventRepository', () => {
         .processEvent(event)
         .then(() => fail('Method should have thrown an error'))
         .catch(error => {
-          expect(error).toEqual(jasmine.any(z.error.EventError));
-          expect(error.type).toBe(z.error.EventError.TYPE.VALIDATION_FAILED);
+          expect(error).toEqual(jasmine.any(EventError));
+          expect(error.type).toBe(EventError.TYPE.VALIDATION_FAILED);
           expect(testFactory.event_service.saveEvent).not.toHaveBeenCalled();
         });
     });
@@ -479,8 +485,8 @@ describe('EventRepository', () => {
         .processEvent(event)
         .then(() => fail('Method should have thrown an error'))
         .catch(error => {
-          expect(error).toEqual(jasmine.any(z.error.EventError));
-          expect(error.type).toBe(z.error.EventError.TYPE.VALIDATION_FAILED);
+          expect(error).toEqual(jasmine.any(EventError));
+          expect(error.type).toBe(EventError.TYPE.VALIDATION_FAILED);
           expect(testFactory.event_service.saveEvent).not.toHaveBeenCalled();
         });
     });

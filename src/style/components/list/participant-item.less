@@ -84,7 +84,7 @@ participant-item {
     margin: 0;
     cursor: pointer;
 
-    .participant-item-image {
+    &__image {
       position: relative;
       display: flex;
       width: 60px;
@@ -94,7 +94,7 @@ participant-item {
       justify-content: center;
     }
 
-    .participant-item-content {
+    &__content {
       display: flex;
       min-width: 0; // this will ensure that ellipses is working
       height: @avatar-diameter-m;
@@ -106,7 +106,7 @@ participant-item {
       font-weight: 400;
       line-height: 16px;
 
-      .participant-item-content-availability {
+      &__availability {
         .availability-state-label {
           .ellipsis;
         }
@@ -116,14 +116,24 @@ participant-item {
         }
       }
 
-      .participant-item-content-name {
-        .ellipsis;
+      &__name-wrapper {
+        display: flex;
+        overflow: hidden;
         width: 100%;
         padding-right: 8px;
+      }
+
+      &__name {
+        .ellipsis;
+        max-width: 100%;
         white-space: nowrap;
       }
 
-      .participant-item-content-info {
+      &__self-indicator {
+        margin-left: 4px;
+      }
+
+      &__info {
         .ellipsis;
         display: flex;
         max-width: 100%;
@@ -136,13 +146,13 @@ participant-item {
           font-size: 12px;
         }
 
-        .participant-item-content-username {
+        &__username {
           .ellipsis;
           display: block;
         }
       }
 
-      .participant-item-content-badge::before {
+      &__badge::before {
         display: inline-block;
         margin: 0 4px;
         content: '\00b7';

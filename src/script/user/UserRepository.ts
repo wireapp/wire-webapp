@@ -18,6 +18,7 @@
  */
 
 import {PublicClient} from '@wireapp/api-client/dist/client';
+import type {BackendError} from '@wireapp/api-client/dist/http';
 import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
 import {amplify} from 'amplify';
 import ko from 'knockout';
@@ -28,8 +29,8 @@ import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
 import {sortUsersByPriority} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {createRandomUuid, koArrayPushAll, loadUrlBlob} from 'Util/util';
-
+import {createRandomUuid, loadUrlBlob} from 'Util/util';
+import type {AxiosError} from 'axios';
 import {UNSPLASH_URL} from '../externalRoute';
 
 import {mapProfileAssetsV1} from '../assets/AssetMapper';
@@ -71,6 +72,7 @@ import {BackendClientError} from '../error/BackendClientError';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {SelfService} from '../self/SelfService';
 import {ServerTimeHandler} from '../time/serverTimeHandler';
+import {UserError} from '../error/UserError';
 
 export interface UserUpdate {
   accent_id?: AccentColor.AccentColorID;
@@ -84,14 +86,14 @@ export interface UserUpdate {
 export class UserRepository {
   private readonly asset_service: AssetService;
   private readonly client_repository: ClientRepository;
-  private readonly connected_users: ko.PureComputed<User[]>;
-  private readonly isTeam: ko.Observable<boolean>;
+  readonly connected_users: ko.PureComputed<User[]>;
+  isTeam: ko.Observable<boolean> | ko.PureComputed<boolean>;
   private readonly logger: Logger;
   private readonly propertyRepository: PropertiesRepository;
   private readonly selfService: SelfService;
-  private readonly teamMembers: ko.ObservableArray<User>;
+  teamMembers: ko.PureComputed<User[]>;
   /** Note: this does not include the self user */
-  private readonly teamUsers: ko.ObservableArray<User>;
+  teamUsers: ko.PureComputed<User[]>;
   private readonly user_mapper: UserMapper;
   private readonly user_service: UserService;
   private readonly users: ko.ObservableArray<User>;
@@ -155,8 +157,8 @@ export class UserRepository {
     this.isTemporaryGuest = ko.pureComputed(() => this.self()?.isTemporaryGuest());
 
     this.isTeam = ko.observable();
-    this.teamMembers = undefined;
-    this.teamUsers = undefined;
+    this.teamMembers = ko.pureComputed((): User[] => []);
+    this.teamUsers = ko.pureComputed((): User[] => []);
 
     this.number_of_contacts = ko.pureComputed(() => {
       const contacts = this.isTeam() ? this.teamUsers() : this.connected_users();
@@ -509,13 +511,14 @@ export class UserRepository {
       return Promise.resolve([]);
     }
 
-    const _getUsers = (chunkOfUserIds: string[]) => {
+    const _getUsers = (chunkOfUserIds: string[]): Promise<(void | User)[]> => {
       return this.user_service
         .getUsers(chunkOfUserIds)
         .then(response => (response ? this.user_mapper.mapUsersFromJson(response) : []))
-        .catch(error => {
-          const isNotFound = error.code === BackendClientError.STATUS_CODE.NOT_FOUND;
-          if (isNotFound) {
+        .catch((error: AxiosError | BackendError) => {
+          const isNotFound = (error as AxiosError).response?.status === BackendClientError.STATUS_CODE.NOT_FOUND;
+          const isBadRequest = (error as BackendError).code === BackendClientError.STATUS_CODE.BAD_REQUEST;
+          if (isNotFound || isBadRequest) {
             return [];
           }
           throw error;
@@ -598,7 +601,7 @@ export class UserRepository {
     return user
       ? Promise.resolve(user)
       : this._fetchUserById(user_id).catch(error => {
-          const isNotFound = error.type === z.error.UserError.TYPE.USER_NOT_FOUND;
+          const isNotFound = error.type === UserError.TYPE.USER_NOT_FOUND;
           if (!isNotFound) {
             this.logger.warn(`Failed to find user with ID '${user_id}': ${error.message}`, error);
           }
@@ -620,6 +623,7 @@ export class UserRepository {
 
   /**
    * Check for users locally and fetch them from the server otherwise.
+   * @param user_ids List of user ID
    * @param offline Should we only look for cached contacts
    */
   get_users_by_id(user_ids: string[] = [], offline: boolean = false): Promise<User[]> {
@@ -627,7 +631,7 @@ export class UserRepository {
       return Promise.resolve([]);
     }
 
-    const _find_user = (user_id: string) => {
+    const _find_user = (user_id: string): string | User => {
       return this.findUserById(user_id) || user_id;
     };
 
@@ -677,7 +681,7 @@ export class UserRepository {
    */
   save_users(user_ets: User[]): User[] {
     const newUsers = user_ets.filter(user_et => !this.findUserById(user_et.id));
-    koArrayPushAll(this.users, newUsers);
+    this.users.push(...newUsers);
     return user_ets;
   }
 
@@ -735,7 +739,7 @@ export class UserRepository {
       return this.selfService.putSelf({name}).then(() => this.user_update({user: {id: this.self().id, name}}));
     }
 
-    return Promise.reject(new z.error.UserError((z as any).error.UserError.TYPE.INVALID_UPDATE));
+    return Promise.reject(new UserError(UserError.TYPE.INVALID_UPDATE, UserError.MESSAGE.INVALID_UPDATE));
   }
 
   /**
@@ -784,13 +788,13 @@ export class UserRepository {
           if (
             [BackendClientError.STATUS_CODE.CONFLICT, BackendClientError.STATUS_CODE.BAD_REQUEST].includes(error_code)
           ) {
-            throw new z.error.UserError(z.error.UserError.TYPE.USERNAME_TAKEN);
+            throw new UserError(UserError.TYPE.USERNAME_TAKEN, UserError.MESSAGE.USERNAME_TAKEN);
           }
-          throw new z.error.UserError(z.error.UserError.TYPE.REQUEST_FAILURE);
+          throw new UserError(UserError.TYPE.REQUEST_FAILURE, UserError.MESSAGE.REQUEST_FAILURE);
         });
     }
 
-    return Promise.reject(new z.error.UserError((z as any).error.UserError.TYPE.INVALID_UPDATE));
+    return Promise.reject(new UserError(UserError.TYPE.INVALID_UPDATE, UserError.MESSAGE.INVALID_UPDATE));
   }
 
   /**
@@ -815,15 +819,15 @@ export class UserRepository {
           return username;
         }
         if (error_code === BackendClientError.STATUS_CODE.BAD_REQUEST) {
-          throw new z.error.UserError(z.error.UserError.TYPE.USERNAME_TAKEN);
+          throw new UserError(UserError.TYPE.USERNAME_TAKEN, UserError.MESSAGE.USERNAME_TAKEN);
         }
-        throw new z.error.UserError(z.error.UserError.TYPE.REQUEST_FAILURE);
+        throw new UserError(UserError.TYPE.REQUEST_FAILURE, UserError.MESSAGE.REQUEST_FAILURE);
       })
       .then(verified_username => {
         if (verified_username) {
           return verified_username;
         }
-        throw new z.error.UserError(z.error.UserError.TYPE.USERNAME_TAKEN);
+        throw new UserError(UserError.TYPE.USERNAME_TAKEN, UserError.MESSAGE.USERNAME_TAKEN);
       });
   }
 

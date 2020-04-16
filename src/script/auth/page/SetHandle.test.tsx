@@ -63,13 +63,9 @@ describe('SetHandle', () => {
       }),
     );
 
-    expect(setHandlePage.getHandleInput().exists())
-      .withContext('handle input should be present')
-      .toBe(true);
+    expect(setHandlePage.getHandleInput().exists()).withContext('handle input should be present').toBe(true);
 
-    expect(setHandlePage.getSetHandleButton().exists())
-      .withContext('Submit button should be present')
-      .toBe(true);
+    expect(setHandlePage.getSetHandleButton().exists()).withContext('Submit button should be present').toBe(true);
 
     expect(setHandlePage.getSetHandleButton().props().disabled)
       .withContext('Submit button should be disabled')
@@ -100,8 +96,6 @@ describe('SetHandle', () => {
     setHandlePage.getHandleInput().simulate('change', {target: {value: ` ${handle} `}});
     setHandlePage.clickSetHandleButton();
 
-    expect(actionRoot.selfAction.setHandle)
-      .withContext('action was called')
-      .toHaveBeenCalledWith(handle);
+    expect(actionRoot.selfAction.setHandle).withContext('action was called').toHaveBeenCalledWith(handle);
   });
 });

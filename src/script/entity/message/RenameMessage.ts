@@ -26,7 +26,7 @@ import {SystemMessage} from './SystemMessage';
 
 export class RenameMessage extends SystemMessage {
   public readonly system_message_type: SystemMessageType;
-  public readonly name: string;
+  public name: string;
   public readonly caption: ko.PureComputed<string>;
 
   constructor() {

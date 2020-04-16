@@ -38,12 +38,12 @@ describe('UserHandleGenerator', () => {
     });
   });
 
-  describe('normalize_name', () => {
+  describe('normalizeName', () => {
     it('should normalize user names', () => {
-      expect(normalizeName('Maria LaRochelle')).toBe('marialarochelle');
-      expect(normalizeName('Mêrié "LaRöche\'lle"')).toBe('merielaroechelle');
-      expect(normalizeName('Maria I ❤️🍕')).toBe('mariai');
-      expect(normalizeName('.-/Maria-.')).toBe('maria');
+      expect(normalizeName('Maria LaRochelle')).toBe('maria-larochelle');
+      expect(normalizeName('Mêrié "LaRöche\'lle"')).toBe('merie-laroeche-lle');
+      expect(normalizeName('Maria I ❤️🍕')).toBe('maria-i');
+      expect(normalizeName('.-/Maria-.')).toBe('.-maria-.');
       // expect(normalizeName('苹果')).toBe 'pingguo'
       // expect(normalizeName('תפוח ')).toBe 'tpwh'
       // expect(normalizeName('सेवफलम्')).toBe 'sevaphalam'
@@ -51,12 +51,12 @@ describe('UserHandleGenerator', () => {
       // expect(normalizeName('Яблоко')).toBe 'abloko'
       // expect(normalizeName('خطای سطح دسترسی')).toBe 'khtaysthdstrsy'
       expect(normalizeName('ᑭᒻᒥᓇᐅᔭᖅ')).toBe('');
-      expect(normalizeName('    Maria LaRochelle Von Schwerigstein ')).toBe('marialarochellevonsch');
+      expect(normalizeName('    Maria LaRochelle Von Schwerigstein ')).toBe('maria-larochelle-von-schwerigstein');
 
-      expect(normalizeName(' \n\t Maria LaRochelle Von Schwerigstein ')).toBe('marialarochellevonsch');
+      expect(normalizeName(' \n\t Maria LaRochelle Von Schwerigstein ')).toBe('maria-larochelle-von-schwerigstein');
 
       expect(normalizeName('🐙☀️')).toBe('');
-      expect(normalizeName('name@mail.com')).toBe('namemailcom');
+      expect(normalizeName('name@mail.com')).toBe('name-mail.com');
     });
   });
 
@@ -141,6 +141,8 @@ describe('UserHandleGenerator', () => {
       expect(validateHandle('1valid')).toBeTruthy();
       expect(validateHandle('val1d')).toBeTruthy();
       expect(validateHandle('still_valid')).toBeTruthy();
+      expect(validateHandle('thisisaverylongandthusinvalidhandle')).toBeTruthy();
+      expect(validateHandle('this-is-also-very-valid.')).toBeTruthy();
     });
 
     it('returns false for invalid handles', () => {
@@ -154,7 +156,6 @@ describe('UserHandleGenerator', () => {
       expect(validateHandle('invalid!')).toBeFalsy();
       expect(validateHandle('inva!lid')).toBeFalsy();
       expect(validateHandle('inva!lid')).toBeFalsy();
-      expect(validateHandle('thisisaverylongandthusinvalidhandle')).toBeFalsy();
     });
   });
 });

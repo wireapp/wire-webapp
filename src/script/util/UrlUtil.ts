@@ -73,7 +73,7 @@ export const getDomainName = (url = '') => {
   }
 };
 
-export const getLinksFromHtml = (html: string) => {
+export const getLinksFromHtml = <T extends HTMLElement>(html: string): T[] => {
   if (!html) {
     return [];
   }
@@ -82,7 +82,7 @@ export const getLinksFromHtml = (html: string) => {
   const links = html.match(anchorTags);
 
   const hasLinks = links?.length;
-  return hasLinks ? links.map(element => $(element)[0]) : [];
+  return hasLinks ? links.map(element => $<T>(element)[0]) : [];
 };
 
 /**

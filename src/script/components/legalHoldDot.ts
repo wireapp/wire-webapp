@@ -37,7 +37,7 @@ ko.components.register('legal-hold-dot', {
       <!-- /ko -->
     </div>
     `,
-  viewModel: function({
+  viewModel: function ({
     isPending = ko.observable(false),
     large = false,
     conversation,

@@ -17,24 +17,20 @@
  *
  */
 
-import Dexie from 'dexie';
 import {error as StoreEngineError} from '@wireapp/store-engine';
-import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 import {Cryptobox, version as cryptoboxVersion} from '@wireapp/cryptobox';
 import {errors as ProteusErrors} from '@wireapp/proteus';
 import {GenericMessage} from '@wireapp/protocol-messaging';
-
 import {getLogger} from 'Util/Logger';
 import {arrayToBase64, base64ToArray, zeroPadding} from 'Util/util';
-
 import {CryptographyMapper} from './CryptographyMapper';
-
 import {Config} from '../Config';
 import {WebAppEvents} from '../event/WebApp';
 import {EventName} from '../tracking/EventName';
 import {ClientEntity} from '../client/ClientEntity';
 import {BackendClientError} from '../error/BackendClientError';
-import {StorageService} from '../storage/StorageService';
+import {CryptographyError} from '../error/CryptographyError';
+import {UserError} from '../error/UserError';
 
 export class CryptographyRepository {
   static get CONFIG() {
@@ -63,66 +59,17 @@ export class CryptographyRepository {
   }
 
   /**
-   * Initializes the repository by loading an existing Cryptobox.
-   * @param {Dexie} [database] Database instance
-   * @returns {Promise} Resolves after initialization
-   */
-  createCryptobox(database) {
-    return this._init(database).then(() => this.cryptobox.create());
-  }
-
-  /**
    * Initializes the repository by creating a new Cryptobox.
-   * @param {Dexie} [database] Database instance
-   * @returns {Promise} Resolves after initialization
+   * @returns {Promise<ProteusKeys.PreKey[]>} Resolves with an array of PreKeys
    */
-  loadCryptobox(database) {
-    return this._init(database).then(() => this.cryptobox.load());
-  }
-
-  resetCryptobox(clientEntity) {
-    const deleteEverything = clientEntity ? clientEntity.isTemporary() : false;
-    const deletePromise = deleteEverything
-      ? this.storageRepository.deleteDatabase()
-      : this.storageRepository.deleteCryptographyStores();
-
-    return deletePromise
-      .catch(databaseError => {
-        const message = `Failed cryptography-related db deletion on client validation error: ${databaseError.message}`;
-        this.logger.error(message, databaseError);
-        throw new z.error.ClientError(z.error.ClientError.TYPE.DATABASE_FAILURE);
-      })
-      .then(() => deleteEverything);
-  }
-
-  /**
-   * Initialize the repository.
-   *
-   * @private
-   * @param {Dexie} [database] Dexie instance
-   * @returns {Promise} Resolves after initialization
-   */
-  async _init(database) {
-    let storeEngine;
-
-    if (database instanceof Dexie) {
-      this.logger.info(`Initializing Cryptobox with IndexedDB '${database.name}'...`);
-      storeEngine = new IndexedDBEngine();
-      try {
-        await storeEngine.initWithDb(database, true);
-      } catch (error) {
-        await storeEngine.initWithDb(database, false);
-      }
-    } else {
-      this.logger.info(`Initializing Cryptobox with encrypted database...`);
-      storeEngine = await StorageService.getUnitializedEngine();
-    }
+  async initCryptobox() {
+    const storeEngine = this.storageRepository.storageService.engine;
     this.cryptobox = new Cryptobox(storeEngine, 10);
 
     this.cryptobox.on(Cryptobox.TOPIC.NEW_PREKEYS, async preKeys => {
       const serializedPreKeys = preKeys.map(preKey => this.cryptobox.serialize_prekey(preKey));
-
       this.logger.log(`Received '${preKeys.length}' new PreKeys.`, serializedPreKeys);
+
       await this.cryptographyService.putClientPreKeys(this.currentClient().id, serializedPreKeys);
       this.logger.log(`Successfully uploaded '${serializedPreKeys.length}' PreKeys.`, serializedPreKeys);
     });
@@ -131,6 +78,8 @@ export class CryptographyRepository {
       const {userId, clientId} = ClientEntity.dismantleUserClientId(sessionId);
       amplify.publish(WebAppEvents.CLIENT.ADD, userId, {id: clientId}, true);
     });
+
+    return this.cryptobox.load();
   }
 
   /**
@@ -187,11 +136,11 @@ export class CryptographyRepository {
       .catch(error => {
         const isNotFound = error.code === BackendClientError.STATUS_CODE.NOT_FOUND;
         if (isNotFound) {
-          throw new z.error.UserError(z.error.UserError.TYPE.PRE_KEY_NOT_FOUND);
+          throw new UserError(UserError.TYPE.PRE_KEY_NOT_FOUND, UserError.MESSAGE.PRE_KEY_NOT_FOUND);
         }
 
         this.logger.error(`Failed to get pre-key from backend: ${error.message}`);
-        throw new z.error.UserError(z.error.UserError.TYPE.REQUEST_FAILURE);
+        throw new UserError(UserError.TYPE.REQUEST_FAILURE, UserError.MESSAGE.REQUEST_FAILURE);
       });
   }
 
@@ -204,11 +153,11 @@ export class CryptographyRepository {
     return this.cryptographyService.getUsersPreKeys(recipients).catch(error => {
       const isNotFound = error.code === BackendClientError.STATUS_CODE.NOT_FOUND;
       if (isNotFound) {
-        throw new z.error.UserError(z.error.UserError.TYPE.PRE_KEY_NOT_FOUND);
+        throw new UserError(UserError.TYPE.PRE_KEY_NOT_FOUND, UserError.MESSAGE.PRE_KEY_NOT_FOUND);
       }
 
       this.logger.error(`Failed to get pre-key from backend: ${error.message}`);
-      throw new z.error.UserError(z.error.UserError.TYPE.REQUEST_FAILURE);
+      throw new UserError(UserError.TYPE.REQUEST_FAILURE, UserError.MESSAGE.REQUEST_FAILURE);
     });
   }
 
@@ -305,7 +254,7 @@ export class CryptographyRepository {
       const logMessage = `Encrypted event with ID '${id}' from user '${userId}' does not have a 'data' property.`;
       this.logger.error(logMessage, event);
 
-      throw new z.error.CryptographyError(z.error.CryptographyError.TYPE.NO_DATA_CONTENT);
+      throw new CryptographyError(CryptographyError.TYPE.NO_DATA_CONTENT, CryptographyError.MESSAGE.NO_DATA_CONTENT);
     }
 
     // Check the length of the message
@@ -330,7 +279,7 @@ export class CryptographyRepository {
       const mappedMessage = await this.cryptographyMapper.mapGenericMessage(genericMessage, event);
       return mappedMessage;
     } catch (error) {
-      const isUnhandledType = error.type === z.error.CryptographyError.TYPE.UNHANDLED_TYPE;
+      const isUnhandledType = error.type === CryptographyError.TYPE.UNHANDLED_TYPE;
       if (isUnhandledType) {
         throw error;
       }
@@ -490,13 +439,13 @@ export class CryptographyRepository {
     // We don't need to show these message errors to the user
     if (isDuplicateMessage || isOutdatedMessage) {
       const message = `Message from user ID "${remoteUserId}" at "${formattedTime}" will not be handled because it is outdated or a duplicate.`;
-      throw new z.error.CryptographyError(z.error.CryptographyError.TYPE.UNHANDLED_TYPE, message);
+      throw new CryptographyError(CryptographyError.TYPE.UNHANDLED_TYPE, message);
     }
 
-    const isCryptographyError = error instanceof z.error.CryptographyError;
-    if (isCryptographyError && error.type === z.error.CryptographyError.TYPE.PREVIOUSLY_STORED) {
+    const isCryptographyError = error instanceof CryptographyError;
+    if (isCryptographyError && error.type === CryptographyError.TYPE.PREVIOUSLY_STORED) {
       const message = `Message from user ID "${remoteUserId}" at "${formattedTime}" will not be handled because it is already persisted.`;
-      throw new z.error.CryptographyError(z.error.CryptographyError.TYPE.UNHANDLED_TYPE, message);
+      throw new CryptographyError(CryptographyError.TYPE.UNHANDLED_TYPE, message);
     }
 
     const remoteClientId = eventData.sender;

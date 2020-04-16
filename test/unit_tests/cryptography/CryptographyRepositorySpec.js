@@ -27,6 +27,7 @@ import {arrayToBase64, createRandomUuid} from 'Util/util';
 import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 import {ClientEvent} from 'src/script/event/Client';
 import {TestFactory} from '../../helper/TestFactory';
+import {CryptographyError} from 'src/script/error/CryptographyError';
 
 describe('CryptographyRepository', () => {
   const testFactory = new TestFactory();
@@ -102,8 +103,6 @@ describe('CryptographyRepository', () => {
 
   describe('getRemoteFingerprint', () => {
     it('generates the remote fingerprint based on a prekey', async () => {
-      const database = testFactory.storage_service.db;
-      await testFactory.cryptography_repository.createCryptobox(database);
       const userId = '6f656da7-0c52-44d1-959d-ddc9fbdca244';
       const clientId = '689ce2df236eb2be';
       const preKey = {
@@ -157,8 +156,7 @@ describe('CryptographyRepository', () => {
     });
 
     it('detects duplicated messages', async () => {
-      const database = testFactory.storage_service.db;
-      const preKeys = await testFactory.cryptography_repository.createCryptobox(database);
+      const preKeys = await testFactory.cryptography_repository.initCryptobox();
       const alice = testFactory.cryptography_repository.cryptobox.identity;
 
       expect(alice).toBeDefined();
@@ -200,7 +198,7 @@ describe('CryptographyRepository', () => {
       try {
         await testFactory.cryptography_repository.handleEncryptedEvent(mockedEvent);
       } catch (error) {
-        expect(error.type).toBe(z.error.CryptographyError.TYPE.UNHANDLED_TYPE);
+        expect(error.type).toBe(CryptographyError.TYPE.UNHANDLED_TYPE);
       }
     });
 

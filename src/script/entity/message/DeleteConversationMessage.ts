@@ -17,9 +17,9 @@
  *
  */
 
+import {TEAM_EVENT} from '@wireapp/api-client/dist/event/TeamEvent';
 import {t} from 'Util/LocalizerUtil';
 
-import {BackendEvent} from '../../event/Backend';
 import {SystemMessageType} from '../../message/SystemMessageType';
 import {Conversation} from '../Conversation';
 import {SystemMessage} from './SystemMessage';
@@ -31,7 +31,7 @@ export class DeleteConversationMessage extends SystemMessage {
   constructor(conversationEntity: Conversation) {
     super();
 
-    this.type = BackendEvent.TEAM.DELETE;
+    this.type = TEAM_EVENT.DELETE;
     this.system_message_type = SystemMessageType.CONVERSATION_DELETE;
 
     this.caption = conversationEntity

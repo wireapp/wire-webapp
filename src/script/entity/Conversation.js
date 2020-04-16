@@ -24,7 +24,6 @@ import {debounce} from 'underscore';
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
-import {koArrayPushAll, koArrayUnshiftAll} from 'Util/util';
 import {truncate} from 'Util/StringUtil';
 
 import {Config} from '../Config';
@@ -42,6 +41,7 @@ import {ClientRepository} from '../client/ClientRepository';
 import {StatusType} from '../message/StatusType';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
 import {HIDE_LEGAL_HOLD_MODAL} from '../view_model/content/LegalHoldModalViewModel';
+import {ConversationError} from '../error/ConversationError';
 
 export class Conversation {
   static get TIMESTAMP_TYPE() {
@@ -431,7 +431,10 @@ export class Conversation {
 
     const entityTimestamp = this[type];
     if (!entityTimestamp) {
-      throw new z.error.ConversationError(z.error.ConversationError.TYPE.INVALID_PARAMETER);
+      throw new ConversationError(
+        ConversationError.TYPE.INVALID_PARAMETER,
+        ConversationError.MESSAGE.INVALID_PARAMETER,
+      );
     }
 
     const updatedTimestamp = forceUpdate ? timestamp : this._incrementTimeOnly(entityTimestamp(), timestamp);
@@ -497,13 +500,11 @@ export class Conversation {
     }
     const messageIds = message_ets.map(({id}) => id);
     this.incomingMessages.remove(({id}) => messageIds.includes(id));
-    koArrayPushAll(this.messages_unordered, message_ets);
+    this.messages_unordered.push(...message_ets);
   }
 
   getFirstUnreadSelfMention() {
-    return this.unreadState()
-      .selfMentions.slice()
-      .pop();
+    return this.unreadState().selfMentions.slice().pop();
   }
 
   get_last_known_timestamp(currentTimestamp) {
@@ -555,7 +556,7 @@ export class Conversation {
   prepend_messages(message_ets) {
     message_ets = message_ets.map(message_et => this._checkForDuplicate(message_et)).filter(message_et => message_et);
 
-    koArrayUnshiftAll(this.messages_unordered, message_ets);
+    this.messages_unordered.unshift(...message_ets);
   }
 
   /**

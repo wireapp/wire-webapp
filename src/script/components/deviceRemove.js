@@ -34,7 +34,7 @@ class DeviceRemove {
       }
     });
 
-    this.click_on_submit = function() {
+    this.click_on_submit = function () {
       if (typeof params.remove === 'function') {
         params.remove(this.password(), this.device);
       }

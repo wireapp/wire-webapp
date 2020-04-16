@@ -144,6 +144,7 @@ export class WebSocketService {
           blobReader.onload = () => {
             if (blobReader.result === 'pong') {
               this.hasAlreadySentUnansweredPing = false;
+              amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.NO_INTERNET);
             } else {
               this.onNotification(JSON.parse(blobReader.result.toString()));
             }

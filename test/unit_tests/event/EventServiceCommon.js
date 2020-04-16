@@ -23,6 +23,8 @@ import {MessageCategory} from 'src/script/message/MessageCategory';
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 import {StorageSchemata} from 'src/script/storage/StorageSchemata';
 import {TestFactory} from '../../helper/TestFactory';
+import {ConversationError} from 'src/script/error/ConversationError';
+import {StorageError} from 'src/script/error/StorageError';
 
 const testEventServiceClass = (testedServiceName, className) => {
   describe(className, () => {
@@ -223,10 +225,7 @@ const testEventServiceClass = (testedServiceName, className) => {
           {args: [new Date('2016-11-23T12:19:06.816Z'), 1000], expectedEvents: events.slice(8, 10)},
           {
             args: [new Date('2016-11-23T12:19:06.808Z'), 1000],
-            expectedEvents: events
-              .slice(0, 6)
-              .concat([events[7], events[6]])
-              .concat(events.slice(8)),
+            expectedEvents: events.slice(0, 6).concat([events[7], events[6]]).concat(events.slice(8)),
           },
         ];
 
@@ -415,7 +414,7 @@ const testEventServiceClass = (testedServiceName, className) => {
           .updateEventSequentially(12, updates)
           .then(fail)
           .catch(error => {
-            expect(error.type).toBe(z.error.ConversationError.TYPE.WRONG_CHANGE);
+            expect(error.type).toBe(ConversationError.TYPE.WRONG_CHANGE);
           });
       });
 
@@ -428,7 +427,7 @@ const testEventServiceClass = (testedServiceName, className) => {
           .updateEventSequentially(12, updates)
           .then(fail)
           .catch(error => {
-            expect(error.type).toBe(z.error.StorageError.TYPE.NON_SEQUENTIAL_UPDATE);
+            expect(error.type).toBe(StorageError.TYPE.NON_SEQUENTIAL_UPDATE);
           });
       });
 
@@ -442,7 +441,7 @@ const testEventServiceClass = (testedServiceName, className) => {
           .updateEventSequentially(12, updates)
           .then(fail)
           .catch(error => {
-            expect(error.type).toBe(z.error.StorageError.TYPE.NOT_FOUND);
+            expect(error.type).toBe(StorageError.TYPE.NOT_FOUND);
           });
       });
 
@@ -620,8 +619,8 @@ const testEventServiceClass = (testedServiceName, className) => {
           .updateEvent(12, undefined)
           .then(() => fail('should have thrown'))
           .catch(error => {
-            expect(error).toEqual(jasmine.any(z.error.ConversationError));
-            expect(error.type).toBe(z.error.ConversationError.TYPE.NO_CHANGES);
+            expect(error).toEqual(jasmine.any(ConversationError));
+            expect(error.type).toBe(ConversationError.TYPE.NO_CHANGES);
           });
       });
     });

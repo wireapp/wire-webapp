@@ -54,6 +54,7 @@ import {MessageCategory} from 'src/script/message/MessageCategory';
 import {UserGenerator} from '../../helper/UserGenerator';
 import {Config} from 'src/script/Config';
 import {TestFactory} from '../../helper/TestFactory';
+import {ConversationError} from 'src/script/error/ConversationError';
 
 describe('ConversationRepository', () => {
   const testFactory = new TestFactory();
@@ -368,8 +369,8 @@ describe('ConversationRepository', () => {
         .deleteMessageForEveryone(conversation_et, message_to_delete_et)
         .then(done.fail)
         .catch(error => {
-          expect(error).toEqual(jasmine.any(z.error.ConversationError));
-          expect(error.type).toBe(z.error.ConversationError.TYPE.WRONG_USER);
+          expect(error).toEqual(jasmine.any(ConversationError));
+          expect(error.type).toBe(ConversationError.TYPE.WRONG_USER);
           done();
         });
     });
@@ -700,7 +701,7 @@ describe('ConversationRepository', () => {
 
       return testFactory.conversation_repository._handleConversationEvent(event).then(() => {
         expect(testFactory.conversation_repository.addMissingMember).toHaveBeenCalledWith(
-          event.conversation,
+          conversationEntity,
           [event.from],
           new Date(event.time).getTime() - 1,
         );
@@ -1066,8 +1067,8 @@ describe('ConversationRepository', () => {
           ._handleConversationEvent(message_delete_event)
           .then(done.fail)
           .catch(error => {
-            expect(error).toEqual(jasmine.any(z.error.ConversationError));
-            expect(error.type).toBe(z.error.ConversationError.TYPE.WRONG_USER);
+            expect(error).toEqual(jasmine.any(ConversationError));
+            expect(error.type).toBe(ConversationError.TYPE.WRONG_USER);
             expect(testFactory.conversation_repository._onMessageDeleted).toHaveBeenCalled();
             expect(conversation_et.getMessage(message_et.id)).toBeDefined();
             expect(testFactory.conversation_repository._addDeleteMessage).not.toHaveBeenCalled();
@@ -1180,8 +1181,8 @@ describe('ConversationRepository', () => {
           ._handleConversationEvent(messageHiddenEvent)
           .then(done.fail)
           .catch(error => {
-            expect(error).toEqual(jasmine.any(z.error.ConversationError));
-            expect(error.type).toBe(z.error.ConversationError.TYPE.WRONG_USER);
+            expect(error).toEqual(jasmine.any(ConversationError));
+            expect(error.type).toBe(ConversationError.TYPE.WRONG_USER);
             expect(testFactory.conversation_repository._onMessageHidden).toHaveBeenCalled();
             expect(conversation_et.getMessage(messageId)).toBeDefined();
             done();
@@ -1479,9 +1480,11 @@ describe('ConversationRepository', () => {
       spyOn(testFactory.conversation_repository, 'get_conversation_by_id').and.returnValue(Promise.resolve({}));
       spyOn(z.conversation.EventBuilder, 'buildMemberJoin').and.returnValue(event);
 
-      return testFactory.conversation_repository.addMissingMember(conversationId, ['unknown-user-id']).then(() => {
-        expect(testFactory.event_repository.injectEvent).toHaveBeenCalledWith(event, EventRepository.SOURCE.INJECTED);
-      });
+      return testFactory.conversation_repository
+        .addMissingMember({id: conversationId}, ['unknown-user-id'])
+        .then(() => {
+          expect(testFactory.event_repository.injectEvent).toHaveBeenCalledWith(event, EventRepository.SOURCE.INJECTED);
+        });
     });
   });
 

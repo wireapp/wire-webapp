@@ -196,6 +196,14 @@ describe('renderMessage', () => {
     );
   });
 
+  it('renders links without changing their appearance', () => {
+    const punyLink = 'https://xn--outfank-jdc.nl/';
+
+    expect(renderMessage(punyLink)).toBe(
+      `<a href="${punyLink}" target="_blank" rel="nofollow noopener noreferrer">${punyLink}</a>`,
+    );
+  });
+
   describe('Mentions', () => {
     const tests = [
       {
@@ -466,5 +474,11 @@ describe('getRenderedTextContent', () => {
     const expected = 'This is italic and\nbold and\nbold-italic and email';
 
     expect(getRenderedTextContent(input)).toBe(expected);
+  });
+
+  it('keeps special characters as they are', () => {
+    const input = '17 % 5 == 2 && 3 < 4';
+
+    expect(getRenderedTextContent(input)).toBe(input);
   });
 });

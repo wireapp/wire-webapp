@@ -31,6 +31,7 @@ import {Config} from '../Config';
 import {SQLeetSchemata} from './SQLeetSchemata';
 import {StorageKey} from './StorageKey';
 import {StorageSchemata} from './StorageSchemata';
+import {StorageError} from '../error/StorageError';
 
 interface DatabaseListener {
   callback: DatabaseListenerCallback;
@@ -110,11 +111,11 @@ export class StorageService {
     } catch (error) {
       const logMessage = `Failed to initialize database '${this.dbName}': ${error.message || error}`;
       this.logger.error(logMessage, {error});
-      throw new z.error.StorageError(z.error.StorageError.TYPE.FAILED_TO_OPEN);
+      throw new StorageError(StorageError.TYPE.FAILED_TO_OPEN, StorageError.MESSAGE.FAILED_TO_OPEN);
     }
   }
 
-  static async getUnitializedEngine(): Promise<SQLeetEngine> {
+  static async getUninitializedEngine(): Promise<SQLeetEngine> {
     const encryptionKey = await getEphemeralValue();
     return new SQLeetEngine('/worker/sqleet-worker.js', SQLeetSchemata.getLatest(), encryptionKey);
   }
@@ -139,7 +140,7 @@ export class StorageService {
     listenableTables.forEach(table => {
       this.db
         .table(table)
-        .hook(DEXIE_CRUD_EVENT.UPDATING, function(
+        .hook(DEXIE_CRUD_EVENT.UPDATING, function (
           modifications: Object,
           primaryKey: string,
           obj: Object,
@@ -150,7 +151,7 @@ export class StorageService {
 
       this.db
         .table(table)
-        .hook(DEXIE_CRUD_EVENT.DELETING, function(
+        .hook(DEXIE_CRUD_EVENT.DELETING, function (
           primaryKey: string,
           obj: Object,
           transaction: Dexie.Transaction,
@@ -303,15 +304,8 @@ export class StorageService {
    */
   async getAll<T = Object>(storeName: string): Promise<T[]> {
     try {
-      const resultArray = await this.engine.readAll<T>(storeName);
-      return resultArray.filter(Boolean).map(record => {
-        if (typeof (record as any).data === 'string') {
-          try {
-            (record as any).data = JSON.parse((record as any).data);
-          } catch (error) {}
-        }
-        return record;
-      });
+      const records = await this.engine.readAll<T>(storeName);
+      return records.filter(Boolean);
     } catch (error) {
       this.logger.error(`Failed to load objects from store '${storeName}'`, error);
       throw error;
@@ -336,13 +330,7 @@ export class StorageService {
    */
   async load<T = Object>(storeName: string, primaryKey: string): Promise<T | undefined> {
     try {
-      const record = await this.engine.read<T>(storeName, primaryKey);
-      if (typeof (record as any).data === 'string') {
-        try {
-          (record as any).data = JSON.parse((record as any).data);
-        } catch (error) {}
-      }
-      return record;
+      return await this.engine.read<T>(storeName, primaryKey);
     } catch (error) {
       if (error instanceof StoreEngineError.RecordNotFoundError) {
         return undefined;
@@ -374,7 +362,7 @@ export class StorageService {
    */
   async save<T = Object>(storeName: string, primaryKey: string, entity: T): Promise<string> {
     if (!entity) {
-      throw new z.error.StorageError(z.error.StorageError.TYPE.NO_DATA);
+      throw new StorageError(StorageError.TYPE.NO_DATA, StorageError.MESSAGE.NO_DATA);
     }
 
     if (this.isTemporaryAndNonPersistent) {

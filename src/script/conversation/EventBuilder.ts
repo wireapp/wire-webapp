@@ -81,14 +81,14 @@ export type MemberJoinEvent = BackendEventMessage<{user_ids: string[]}>;
 export type MemberLeaveEvent = BackendEventMessage<{user_ids: string[]}>;
 export type MessageAddEvent = Omit<ConversationEvent<{}>, 'id'> & {status: StatusType};
 export type MissedEvent = BaseEvent & {id: string; type: string};
-export type OnetoOneCreationEvent = ConversationEvent<{userIds: string[]}>;
+export type OneToOneCreationEvent = ConversationEvent<{userIds: string[]}>;
 export type TeamMemberLeaveEvent = ConversationEvent<{name: string; user_ids: string[]}>;
 export type VoiceChannelDeactivateEvent = ConversationEvent<{duration: number; reason: AVS_REASON}> & {
   protocol_version: number;
 };
 
 export const EventBuilder = {
-  build1to1Creation(conversationEntity: Conversation, timestamp: number): OnetoOneCreationEvent {
+  build1to1Creation(conversationEntity: Conversation, timestamp: number): OneToOneCreationEvent {
     const {creator: creatorId, id} = conversationEntity;
     const isoDate = new Date(timestamp || 0).toISOString();
 

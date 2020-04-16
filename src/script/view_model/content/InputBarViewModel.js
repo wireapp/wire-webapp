@@ -44,6 +44,7 @@ import {Config} from '../../Config';
 import {AssetUploader} from '../../assets/AssetUploader';
 import {AssetService} from '../../assets/AssetService';
 import {BackendClient} from '../../service/BackendClient';
+import {ConversationError} from '../../error/ConversationError';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -465,10 +466,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       this.editMessageEntity(messageEntity);
 
       this.input(messageEntity.get_first_asset().text);
-      const newMentions = messageEntity
-        .get_first_asset()
-        .mentions()
-        .slice();
+      const newMentions = messageEntity.get_first_asset().mentions().slice();
       this.currentMentions(newMentions);
 
       if (messageEntity.quote()) {
@@ -771,7 +769,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.conversationRepository
       .sendMessageEdit(this.conversationEntity(), messageText, messageEntity, mentionEntities)
       .catch(error => {
-        if (error.type !== z.error.ConversationError.TYPE.NO_MESSAGE_CHANGES) {
+        if (error.type !== ConversationError.TYPE.NO_MESSAGE_CHANGES) {
           throw error;
         }
       });

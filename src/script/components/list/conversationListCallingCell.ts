@@ -60,6 +60,7 @@ class ConversationListCallingCell {
   readonly conversationParticipants: ko.PureComputed<User[]>;
   readonly conversationUrl: string;
   readonly disableScreenButton: boolean;
+  readonly disableMuteButton: ko.PureComputed<boolean>;
   readonly disableVideoButton: ko.PureComputed<boolean>;
   readonly dispose: () => void;
   readonly isConnecting: ko.PureComputed<boolean>;
@@ -109,10 +110,7 @@ class ConversationListCallingCell {
     this.videoGrid = videoGrid;
     this.conversationParticipants = ko.pureComputed(
       () =>
-        this.conversation() &&
-        this.conversation()
-          .participating_user_ets()
-          .concat([this.conversation().selfUser()]),
+        this.conversation() && this.conversation().participating_user_ets().concat([this.conversation().selfUser()]),
     );
 
     const isState = (state: CALL_STATE) => () => call.state() === state;
@@ -127,6 +125,7 @@ class ConversationListCallingCell {
     );
 
     this.isMuted = callingRepository.isMuted;
+    this.disableMuteButton = ko.pureComputed(() => !this.isOngoing());
 
     this.callDuration = ko.observable();
     let callDurationUpdateInterval: number;
@@ -211,7 +210,7 @@ ko.components.register('conversation-list-calling-cell', {
    <!-- ko if: conversation() && !isDeclined() -->
     <div class="conversation-list-calling-cell conversation-list-cell">
       <!-- ko ifnot: temporaryUserStyle -->
-        <div class="conversation-list-cell-left">
+        <div class="conversation-list-cell-left" data-bind="link_to: conversationUrl">
           <!-- ko if: conversation().isGroup() -->
             <group-avatar class="conversation-list-cell-avatar-arrow call-ui__avatar" params="users: conversationParticipants(), conversation: conversation"></group-avatar>
           <!-- /ko -->
@@ -244,7 +243,7 @@ ko.components.register('conversation-list-calling-cell', {
 
       <div class="conversation-list-cell-right">
         <!-- ko if: isConnecting() || isOngoing() -->
-          <div class="call-ui__button call-ui__button--red" data-bind="click: () => callActions.leave(call)" data-uie-name="do-call-controls-call-leave">
+          <div class="call-ui__button call-ui__button--red" data-bind="click: () => callActions.leave(call), attr: {'title': t('videoCallOverlayHangUp')}" data-uie-name="do-call-controls-call-leave">
             <hangup-icon class="small-icon"></hangup-icon>
           </div>
         <!-- /ko -->
@@ -269,11 +268,11 @@ ko.components.register('conversation-list-calling-cell', {
     <!-- ko if: !isDeclined() -->
       <div class="conversation-list-calling-cell-controls">
         <div class="conversation-list-calling-cell-controls-left">
-          <div class="call-ui__button" data-bind="click: () => callActions.toggleMute(call, !isMuted()), css: {'call-ui__button--active': isMuted()}, attr: {'data-uie-value': !isMuted() ? 'inactive' : 'active'}" data-uie-name="do-toggle-mute">
+          <button class="call-ui__button" data-bind="click: () => callActions.toggleMute(call, !isMuted()), css: {'call-ui__button--active': isMuted()}, disable: disableMuteButton(), attr: {'data-uie-value': !isMuted() ? 'inactive' : 'active', 'title': t('videoCallOverlayMute')}" data-uie-name="do-toggle-mute">
             <micoff-icon class="small-icon"></micoff-icon>
-          </div>
+          </button>
           <!-- ko if: showVideoButton() -->
-            <button class="call-ui__button" data-bind="click: () => callActions.toggleCamera(call), css: {'call-ui__button--active': call.selfParticipant.sharesCamera()}, disable: disableVideoButton(), attr: {'data-uie-value': call.selfParticipant.sharesCamera() ? 'active' : 'inactive'}" data-uie-name="do-toggle-video">
+            <button class="call-ui__button" data-bind="click: () => callActions.toggleCamera(call), css: {'call-ui__button--active': call.selfParticipant.sharesCamera()}, disable: disableVideoButton(), attr: {'data-uie-value': call.selfParticipant.sharesCamera() ? 'active' : 'inactive', 'title': t('videoCallOverlayVideo')}" data-uie-name="do-toggle-video">
               <camera-icon class="small-icon"></camera-icon>
             </button>
           <!-- /ko -->
@@ -283,7 +282,7 @@ ko.components.register('conversation-list-calling-cell', {
                 disabled: !disableScreenButton, position: 'bottom'},
                 click: () => callActions.toggleScreenshare(call),
                 css: {'call-ui__button--active': call.selfParticipant.sharesScreen(), 'call-ui__button--disabled': disableScreenButton},
-                attr: {'data-uie-value': call.selfParticipant.sharesScreen() ? 'active' : 'inactive', 'data-uie-enabled': disableScreenButton ? 'false' : 'true'}"
+                attr: {'data-uie-value': call.selfParticipant.sharesScreen() ? 'active' : 'inactive', 'data-uie-enabled': disableScreenButton ? 'false' : 'true', title: t('videoCallOverlayShareScreen')}"
               data-uie-name="do-call-controls-toggle-screenshare">
               <screenshare-icon class="small-icon"></screenshare-icon>
             </div>
@@ -297,7 +296,7 @@ ko.components.register('conversation-list-calling-cell', {
             </div>
           <!-- /ko -->
           <!-- ko if: isIncoming() || isOutgoing() -->
-            <div class="call-ui__button call-ui__button--red call-ui__button--large" data-bind="click: () => endCall(call)" data-uie-name="do-call-controls-call-decline">
+            <div class="call-ui__button call-ui__button--red call-ui__button--large" data-bind="click: () => endCall(call), attr: {'title': t('videoCallOverlayHangUp')}" data-uie-name="do-call-controls-call-decline">
               <hangup-icon class="small-icon"></hangup-icon>
             </div>
           <!-- /ko -->

@@ -131,23 +131,21 @@ export class MediaConstraintsHandler {
         streamConstraints.video.mandatory = {...streamConstraints.video.mandatory, chromeMediaSourceId};
 
         return streamConstraints as MediaStreamConstraints;
-
       case ScreensharingMethods.DISPLAY_MEDIA:
         this.logger.info('Enabling screen sharing from getDisplayMedia');
         return {
           audio: false,
           video: MediaConstraintsHandler.CONFIG.CONSTRAINTS.SCREEN.DISPLAY_MEDIA,
         };
-
       case ScreensharingMethods.USER_MEDIA:
         this.logger.info('Enabling screen sharing from getUserMedia');
         return {
           audio: false,
           video: MediaConstraintsHandler.CONFIG.CONSTRAINTS.SCREEN.USER_MEDIA,
         };
+      default:
+        return undefined;
     }
-
-    return undefined;
   }
 
   private getAudioStreamConstraints(mediaDeviceId: string = ''): MediaTrackConstraints | boolean {

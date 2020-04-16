@@ -91,6 +91,8 @@ function modifyMarkdownLinks(markdown: string): string {
   return result.join('');
 }
 
+markdownit.normalizeLinkText = text => text;
+
 export const renderMessage = (message: string, selfId: string, mentionEntities: MentionEntity[] = []) => {
   const createMentionHash = (mention: MentionEntity) => `@@${window.btoa(JSON.stringify(mention)).replace(/=/g, '')}`;
   const renderMention = (mentionData: MentionText) => {
@@ -108,7 +110,7 @@ export const renderMessage = (message: string, selfId: string, mentionEntities: 
 
   let mentionlessText = mentionEntities
     .slice()
-    // sort mentions to start with the latest mention first (in order not to have to recompute the index everytime we modify the original text)
+    // sort mentions to start with the latest mention first (in order not to have to recompute the index every time we modify the original text)
     .sort((mention1, mention2) => mention2.startIndex - mention1.startIndex)
     .reduce((strippedText, mention) => {
       const mentionText = message.slice(mention.startIndex, mention.startIndex + mention.length);
@@ -122,7 +124,7 @@ export const renderMessage = (message: string, selfId: string, mentionEntities: 
     }, message);
 
   markdownit.set({
-    highlight: function(code): string {
+    highlight: function (code): string {
       const containsMentions = mentionEntities.some(mention => {
         const hash = createMentionHash(mention);
         return code.includes(hash);
@@ -215,5 +217,5 @@ export const getRenderedTextContent = (text: string): string => {
   const renderedMessage = renderMessage(text, '');
   const messageWithLinebreaks = renderedMessage.replace(/<br>/g, '\n');
   const strippedMessage = messageWithLinebreaks.replace(/<.+?>/g, '');
-  return strippedMessage;
+  return markdownit.utils.unescapeAll(strippedMessage);
 };

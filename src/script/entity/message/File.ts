@@ -41,9 +41,9 @@ export class File extends Asset {
   public readonly preview_resource: ko.Observable<AssetRemoteData>;
   protected logger: Logger;
   public readonly downloadProgress: ko.PureComputed<number | undefined>;
-  public readonly file_name: string;
-  public readonly file_size: string;
-  public readonly meta: Partial<AssetMetaData>;
+  public file_name: string;
+  public file_size: string;
+  public meta: Partial<AssetMetaData>;
   public readonly status: ko.Observable<AssetTransferState>;
   public readonly upload_failed_reason: ko.Observable<AssetUploadFailedReason>;
 

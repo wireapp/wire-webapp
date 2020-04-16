@@ -122,9 +122,7 @@ describe('AuthAction', () => {
       await store.dispatch(actionRoot.authAction.doLoginPlain({clientType: ClientType.PERMANENT, email, password}));
       fail('TOO_MANY_CLIENTS error was not thrown');
     } catch (error) {
-      expect(error.label)
-        .withContext('Error is of type TOO_MANY_CLIENTS')
-        .toEqual(BackendError.LABEL.TOO_MANY_CLIENTS);
+      expect(error.label).withContext('Error is of type TOO_MANY_CLIENTS').toEqual(BackendError.LABEL.TOO_MANY_CLIENTS);
 
       expect(store.getActions()).toEqual([AuthActionCreator.startLogin(), AuthActionCreator.successfulLogin()]);
       expect(spies.doInitializeClient.calls.count()).toEqual(1);
@@ -209,7 +207,7 @@ describe('AuthAction', () => {
   });
 
   it('handles failed request for phone login code', async () => {
-    const error = new Error('testerror');
+    const error = new Error('test error');
     const phoneNumber = '+08723568';
     const mockedApiClient = {
       auth: {

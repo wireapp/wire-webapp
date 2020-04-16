@@ -300,9 +300,7 @@ export class BackendClient {
     rejectFn: (value: any) => any,
   ): void {
     this.requestQueue.pause().unshift(() => {
-      return this._sendRequest(config)
-        .then(resolveFn)
-        .catch(rejectFn);
+      return this._sendRequest(config).then(resolveFn).catch(rejectFn);
     });
   }
 
@@ -397,7 +395,9 @@ export class BackendClient {
             }
           }
 
-          reject(response || new BackendClientError(statusCode));
+          reject(
+            response || new BackendClientError({code: statusCode, message: `Api error status code: "${statusCode}"`}),
+          );
         });
     });
   }

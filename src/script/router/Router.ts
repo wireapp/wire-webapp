@@ -40,7 +40,7 @@ export class Router {
 
     window.addEventListener('hashchange', this.parseRoute);
 
-    // tigger an initial parsing of the current url
+    // trigger an initial parsing of the current URL
     this.parseRoute();
   }
 

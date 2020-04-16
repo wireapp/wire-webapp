@@ -17,9 +17,10 @@
  *
  */
 
+import {PermissionsData} from '@wireapp/api-client/dist/team/member/PermissionsData';
 import {capitalizeFirstChar} from 'Util/StringUtil';
+import {TeamError} from '../error/TeamError';
 
-// tslint:disable:object-literal-sort-keys
 /**
  * Enum for various team permissions.
  */
@@ -61,7 +62,6 @@ const PUBLIC_FEATURES = {
   UPDATE_CONVERSATION_SETTINGS: 1 << bitsCounter++,
   UPDATE_GROUP_PARTICIPANTS: 1 << bitsCounter++,
 };
-// tslint:enable:object-literal-sort-keys
 
 export const FEATURES = {...TEAM_FEATURES, ...PUBLIC_FEATURES};
 
@@ -133,7 +133,6 @@ function publicPermissionsForRole(role: ROLE): number {
   }
 }
 
-// tslint:disable:object-literal-sort-keys
 /**
  * Object describing all the roles of a team member
  * This object needs to be sorted from the highest priority to the lowest
@@ -146,11 +145,10 @@ export enum ROLE {
   NONE = 'z.team.TeamRole.ROLE.NONE',
   INVALID = 'z.team.TeamRole.ROLE.INVALID',
 }
-// tslint:enable:object-literal-sort-keys
 
-export function roleFromTeamPermissions(permissions: {self: number}): ROLE {
+export function roleFromTeamPermissions(permissions: PermissionsData): ROLE {
   if (!permissions) {
-    throw new z.error.TeamError(z.error.TeamError.TYPE.NO_PERMISSIONS);
+    throw new TeamError(TeamError.TYPE.NO_PERMISSIONS, TeamError.MESSAGE.NO_PERMISSIONS);
   }
 
   const invalidRoles = [ROLE.INVALID, ROLE.NONE];
@@ -168,17 +166,13 @@ export function roleFromTeamPermissions(permissions: {self: number}): ROLE {
  * The function generated will have the following format:
  *   `can<camel cased feature name>: () => boolean`
  *
- * @param boundRole Default role that will be used by default in every helper. Can be overriden by passing a role when calling the helper
+ * @param boundRole Default role that will be used by default in every helper. Can be overridden by passing a role when calling the helper
  * @returns helpers
  */
 export function generatePermissionHelpers(boundRole = ROLE.NONE): Record<string, (role: ROLE) => boolean> {
   return Object.entries(FEATURES).reduce<Record<string, (role: ROLE) => boolean>>(
     (helpers, [featureKey, featureValue]: [string, number]) => {
-      const camelCasedFeature = featureKey
-        .toLowerCase()
-        .split('_')
-        .map(capitalizeFirstChar)
-        .join('');
+      const camelCasedFeature = featureKey.toLowerCase().split('_').map(capitalizeFirstChar).join('');
       helpers[`can${camelCasedFeature}`] = (role = boundRole) => hasAccessToFeature(featureValue, role);
       return helpers;
     },
