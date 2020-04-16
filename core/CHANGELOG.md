@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [16.4.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@16.3.1...@wireapp/core@16.4.0) (2020-04-16)
+
+
+### Features
+
+* **api-client:** Provide cancellation token for asset upload ([#2955](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/2955)) ([00783da](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/00783dab6f2e24f0d1e49f6bd0144675d71fe88b))
+
+
+
+
+
 ## [16.3.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@16.3.0...@wireapp/core@16.3.1) (2020-04-15)
 
 **Note:** Version bump only for package @wireapp/core

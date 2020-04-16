@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.0.7...@wireapp/api-client@11.1.0) (2020-04-16)
+
+
+### Features
+
+* **api-client:** Provide cancellation token for asset upload ([#2955](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2955)) ([00783da](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/00783dab6f2e24f0d1e49f6bd0144675d71fe88b))
+
+
+
+
+
 ## [11.0.7](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.0.6...@wireapp/api-client@11.0.7) (2020-04-15)
 
 **Note:** Version bump only for package @wireapp/api-client
