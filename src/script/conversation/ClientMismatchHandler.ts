@@ -196,12 +196,8 @@ export class ClientMismatchHandler {
       const noRemainingClients = !clientIdsOfUser.length;
 
       if (noRemainingClients && typeof conversationEntity !== 'undefined' && conversationEntity.isGroup()) {
-        try {
-          const users = await this.userRepository.fetchUsersById([userId]);
-          if (users.length === 0 || users.every(user => user && !!user.isDeleted)) {
-            throw new Error('No users found');
-          }
-        } catch (error) {
+        const users = await this.userRepository.fetchUsersById([userId]);
+        if (users.length === 0 || users.every(user => user && !!user.isDeleted)) {
           const timestamp = this.serverTimeHandler.toServerTimestamp();
           const memberLeaveEvent = EventBuilder.buildMemberLeave(conversationEntity, userId, false, timestamp);
           this.eventRepository.injectEvent(memberLeaveEvent);
