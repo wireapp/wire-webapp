@@ -20,7 +20,7 @@
 import {ProteusError} from './ProteusError';
 
 export class InputError extends ProteusError {
-  static CODE = {
+  static readonly CODE = {
     CASE_400: 400,
     CASE_401: 401,
     CASE_402: 402,

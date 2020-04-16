@@ -20,7 +20,7 @@
 import {ProteusError} from './ProteusError';
 
 export class DecryptError extends ProteusError {
-  static CODE = {
+  static readonly CODE = {
     CASE_200: 200,
     CASE_201: 201,
     CASE_202: 202,

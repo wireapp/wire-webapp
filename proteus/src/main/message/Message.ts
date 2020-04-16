@@ -37,14 +37,14 @@ export class Message {
     return encoder.get_buffer();
   }
 
-  static deserialise(buf: ArrayBuffer): CipherMessage | PreKeyMessage {
+  static deserialise<T extends CipherMessage | PreKeyMessage>(buf: ArrayBuffer): T {
     const decoder = new CBOR.Decoder(buf);
 
     switch (decoder.u8()) {
       case 1:
-        return CipherMessage.decode(decoder);
+        return CipherMessage.decode(decoder) as T;
       case 2:
-        return PreKeyMessage.decode(decoder);
+        return PreKeyMessage.decode(decoder) as T;
       default:
         throw new DecodeError.InvalidType('Unrecognised message type', DecodeError.CODE.CASE_302);
     }

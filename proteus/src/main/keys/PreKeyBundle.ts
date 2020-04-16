@@ -20,12 +20,12 @@
 import * as CBOR from '@wireapp/cbor';
 import * as sodium from 'libsodium-wrappers-sumo';
 
-import * as ClassUtil from '../util/ClassUtil';
 import {IdentityKey} from './IdentityKey';
 import {IdentityKeyPair} from './IdentityKeyPair';
 import {PreKey} from './PreKey';
 import {PreKeyAuth} from './PreKeyAuth';
 import {PublicKey} from './PublicKey';
+import {DecodeError} from '../errors';
 
 export interface SerialisedJSON {
   id: number;
@@ -33,45 +33,48 @@ export interface SerialisedJSON {
 }
 
 export class PreKeyBundle {
-  version: number;
-  prekey_id: number;
-  public_key: PublicKey;
-  identity_key: IdentityKey;
-  signature: Uint8Array | null | undefined;
+  readonly identity_key: IdentityKey;
+  readonly prekey_id: number;
+  readonly public_key: PublicKey;
+  readonly signature?: Uint8Array | null;
+  readonly version: number;
+  private static readonly propertiesLength = 5;
 
-  constructor() {
-    this.version = -1;
-    this.prekey_id = -1;
-    this.public_key = new PublicKey();
-    this.identity_key = new IdentityKey();
-    this.signature = null;
+  constructor(publicIdentityKey: IdentityKey, preKey: PreKey);
+  constructor(
+    publicIdentityKey: IdentityKey,
+    preKeyId: number,
+    publicKey: PublicKey,
+    signature?: Uint8Array | null,
+    version?: number,
+  );
+  constructor(
+    publicIdentityKey: IdentityKey,
+    preKeyIdOrPreKey: number | PreKey,
+    publicKeyOrSignature?: PublicKey | Uint8Array | null,
+    signatureOrVersion: Uint8Array | number | null = null,
+    versionOrNone: number = 1,
+  ) {
+    this.identity_key = publicIdentityKey;
+
+    if (typeof preKeyIdOrPreKey === 'number') {
+      this.prekey_id = preKeyIdOrPreKey;
+      this.public_key = publicKeyOrSignature as PublicKey;
+      this.signature = signatureOrVersion as Uint8Array | null;
+      this.version = versionOrNone;
+    } else {
+      this.prekey_id = preKeyIdOrPreKey.key_id;
+      this.public_key = preKeyIdOrPreKey.key_pair.public_key;
+      this.signature = null;
+      this.version = 1;
+    }
   }
 
-  static new(public_identity_key: IdentityKey, prekey: PreKey): PreKeyBundle {
-    const bundle = ClassUtil.new_instance(PreKeyBundle);
+  static signed(identityPair: IdentityKeyPair, prekey: PreKey): PreKeyBundle {
+    const ratchetKey = prekey.key_pair.public_key;
+    const signature = identityPair.secret_key.sign(ratchetKey.pub_edward);
 
-    bundle.version = 1;
-    bundle.prekey_id = prekey.key_id;
-    bundle.public_key = prekey.key_pair.public_key;
-    bundle.identity_key = public_identity_key;
-    bundle.signature = null;
-
-    return bundle;
-  }
-
-  static signed(identity_pair: IdentityKeyPair, prekey: PreKey): PreKeyBundle {
-    const ratchet_key = prekey.key_pair.public_key;
-    const signature = identity_pair.secret_key.sign(ratchet_key.pub_edward);
-
-    const bundle = ClassUtil.new_instance(PreKeyBundle);
-
-    bundle.version = 1;
-    bundle.prekey_id = prekey.key_id;
-    bundle.public_key = ratchet_key;
-    bundle.identity_key = identity_pair.public_key;
-    bundle.signature = signature;
-
-    return bundle;
+    return new PreKeyBundle(identityPair.public_key, prekey.key_id, prekey.key_pair.public_key, signature);
   }
 
   verify(): PreKeyAuth {
@@ -82,6 +85,7 @@ export class PreKeyBundle {
     if (this.identity_key.public_key.verify(this.signature, this.public_key.pub_edward)) {
       return PreKeyAuth.VALID;
     }
+
     return PreKeyAuth.INVALID;
   }
 
@@ -103,7 +107,7 @@ export class PreKeyBundle {
   }
 
   encode(encoder: CBOR.Encoder): CBOR.Encoder {
-    encoder.object(5);
+    encoder.object(PreKeyBundle.propertiesLength);
     encoder.u8(0);
     encoder.u8(this.version);
     encoder.u8(1);
@@ -114,38 +118,31 @@ export class PreKeyBundle {
     this.identity_key.encode(encoder);
 
     encoder.u8(4);
-    if (!this.signature) {
-      return encoder.null();
-    }
-    return encoder.bytes(this.signature);
+
+    return this.signature ? encoder.bytes(this.signature) : encoder.null();
   }
 
   static decode(decoder: CBOR.Decoder): PreKeyBundle {
-    const self = ClassUtil.new_instance(PreKeyBundle);
+    const propertiesLength = decoder.object();
+    if (propertiesLength === PreKeyBundle.propertiesLength) {
+      decoder.u8();
+      const version = decoder.u8();
 
-    const nprops = decoder.object();
-    for (let index = 0; index <= nprops - 1; index++) {
-      switch (decoder.u8()) {
-        case 0:
-          self.version = decoder.u8();
-          break;
-        case 1:
-          self.prekey_id = decoder.u16();
-          break;
-        case 2:
-          self.public_key = PublicKey.decode(decoder);
-          break;
-        case 3:
-          self.identity_key = IdentityKey.decode(decoder);
-          break;
-        case 4:
-          self.signature = decoder.optional(() => new Uint8Array(decoder.bytes()));
-          break;
-        default:
-          decoder.skip();
-      }
+      decoder.u8();
+      const preKeyId = decoder.u16();
+
+      decoder.u8();
+      const publicKey = PublicKey.decode(decoder);
+
+      decoder.u8();
+      const identityKey = IdentityKey.decode(decoder);
+
+      decoder.u8();
+      const signature = decoder.optional(() => new Uint8Array(decoder.bytes()));
+
+      return new PreKeyBundle(identityKey, preKeyId, publicKey, signature, version);
     }
 
-    return self;
+    throw new DecodeError(`Unexpected number of properties: "${propertiesLength}"`);
   }
 }

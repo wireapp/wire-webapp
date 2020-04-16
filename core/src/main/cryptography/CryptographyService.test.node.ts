@@ -67,7 +67,7 @@ describe('CryptographyService', () => {
   describe('"decrypt"', () => {
     it('decrypts a Base64-encoded cipher message.', async () => {
       const alicePublicKey = cryptographyService.cryptobox.identity!.public_key;
-      const publicPreKeyBundle = Proteus.keys.PreKeyBundle.new(alicePublicKey, aliceLastResortPreKey);
+      const publicPreKeyBundle = new Proteus.keys.PreKeyBundle(alicePublicKey, aliceLastResortPreKey);
       const text = 'Hello Alice!';
       const encryptedPreKeyMessage = await bob.encrypt(
         'alice-user-id@alice-client-id',

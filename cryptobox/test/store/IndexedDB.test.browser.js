@@ -68,7 +68,7 @@ describe('cryptobox.store.IndexedDB', () => {
       const alice = await Proteus.keys.IdentityKeyPair.new();
       const bob = await Proteus.keys.IdentityKeyPair.new();
       const preKey = await Proteus.keys.PreKey.new(Proteus.keys.PreKey.MAX_PREKEY_ID);
-      const bobPreKeyBundle = Proteus.keys.PreKeyBundle.new(bob.public_key, preKey);
+      const bobPreKeyBundle = new Proteus.keys.PreKeyBundle(bob.public_key, preKey);
 
       const sessionId = 'session_with_bob';
       const proteusSession = await Proteus.session.Session.init_from_prekey(alice, bobPreKeyBundle);
@@ -91,7 +91,7 @@ describe('cryptobox.store.IndexedDB', () => {
       const aliceIdentity = await Proteus.keys.IdentityKeyPair.new();
       const bobIdentity = await Proteus.keys.IdentityKeyPair.new();
       const bobLastResortPreKey = await Proteus.keys.PreKey.new(Proteus.keys.PreKey.MAX_PREKEY_ID);
-      const bobPreKeyBundle = Proteus.keys.PreKeyBundle.new(bobIdentity.public_key, bobLastResortPreKey);
+      const bobPreKeyBundle = new Proteus.keys.PreKeyBundle(bobIdentity.public_key, bobLastResortPreKey);
       const sessionId = 'my_session_with_bob';
 
       let proteusSession = await Proteus.session.Session.init_from_prekey(aliceIdentity, bobPreKeyBundle);
@@ -119,7 +119,7 @@ describe('cryptobox.store.IndexedDB', () => {
 
       const bob = await Proteus.keys.IdentityKeyPair.new();
       const preKey = await Proteus.keys.PreKey.new(Proteus.keys.PreKey.MAX_PREKEY_ID);
-      const bobPreKeyBundle = Proteus.keys.PreKeyBundle.new(bob.public_key, preKey);
+      const bobPreKeyBundle = new Proteus.keys.PreKeyBundle(bob.public_key, preKey);
 
       const allPreKeys = await alice.create();
       expect(allPreKeys.length).toBe(1);
@@ -142,7 +142,7 @@ describe('cryptobox.store.IndexedDB', () => {
 
       const bob = await Proteus.keys.IdentityKeyPair.new();
       const preKey = await Proteus.keys.PreKey.new(Proteus.keys.PreKey.MAX_PREKEY_ID);
-      const bobPreKeyBundle = Proteus.keys.PreKeyBundle.new(bob.public_key, preKey);
+      const bobPreKeyBundle = new Proteus.keys.PreKeyBundle(bob.public_key, preKey);
 
       const allPreKeys = await alice.create();
       expect(allPreKeys.length).toBe(1);
@@ -208,7 +208,7 @@ describe('cryptobox.store.IndexedDB', () => {
       const sessionId = 'session_with_bob';
       const preKey = await bob.store.load_prekey(3);
 
-      const bobBundle = Proteus.keys.PreKeyBundle.new(bob.identity.public_key, preKey);
+      const bobBundle = new Proteus.keys.PreKeyBundle(bob.identity.public_key, preKey);
 
       const cipherMessage = await alice.encrypt(sessionId, 'Hello Bob!', bobBundle.serialise());
       expect((await bob.store.load_prekeys()).length).toBe(7);

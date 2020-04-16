@@ -36,7 +36,7 @@ async function initialSetup() {
   const bob = await createCryptobox('bob', 1);
   await bob.create();
 
-  const bobBundle = Proteus.keys.PreKeyBundle.new(
+  const bobBundle = new Proteus.keys.PreKeyBundle(
     bob.identity.public_key,
     await bob.store.load_prekey(Proteus.keys.PreKey.MAX_PREKEY_ID),
   );
@@ -110,7 +110,7 @@ async function pingPongWithMultipleSessions(messageCount) {
   const alice = await createCryptobox('alice', 1);
   await alice.create();
 
-  const aliceBundle = Proteus.keys.PreKeyBundle.new(
+  const aliceBundle = new Proteus.keys.PreKeyBundle(
     alice.identity.public_key,
     await alice.store.load_prekey(Proteus.keys.PreKey.MAX_PREKEY_ID),
   );

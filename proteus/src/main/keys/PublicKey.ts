@@ -21,23 +21,16 @@ import * as CBOR from '@wireapp/cbor';
 import * as sodium from 'libsodium-wrappers-sumo';
 
 import {InputError} from '../errors/InputError';
-import * as ClassUtil from '../util/ClassUtil';
+import {DecodeError} from '../errors';
 
 export class PublicKey {
-  pub_edward: Uint8Array;
-  pub_curve: Uint8Array;
+  readonly pub_edward: Uint8Array;
+  readonly pub_curve: Uint8Array;
+  private static readonly propertiesLength = 1;
 
-  constructor() {
-    this.pub_edward = new Uint8Array([]);
-    this.pub_curve = new Uint8Array([]);
-  }
-
-  static new(pub_edward: Uint8Array, pub_curve: Uint8Array): PublicKey {
-    const pk = ClassUtil.new_instance(PublicKey);
-
-    pk.pub_edward = pub_edward;
-    pk.pub_curve = pub_curve;
-    return pk;
+  constructor(pubEdward: Uint8Array, pubCurve: Uint8Array) {
+    this.pub_edward = pubEdward;
+    this.pub_curve = pubCurve;
   }
 
   /**
@@ -56,32 +49,25 @@ export class PublicKey {
   }
 
   encode(encoder: CBOR.Encoder): CBOR.Encoder {
-    encoder.object(1);
+    encoder.object(PublicKey.propertiesLength);
     encoder.u8(0);
     return encoder.bytes(this.pub_edward);
   }
 
   static decode(decoder: CBOR.Decoder): PublicKey {
-    const self = ClassUtil.new_instance(PublicKey);
+    const propertiesLength = decoder.object();
+    if (propertiesLength === PublicKey.propertiesLength) {
+      decoder.u8();
+      const pubEdward = new Uint8Array(decoder.bytes());
 
-    const nprops = decoder.object();
-    for (let index = 0; index <= nprops - 1; index++) {
-      switch (decoder.u8()) {
-        case 0:
-          self.pub_edward = new Uint8Array(decoder.bytes());
-          break;
-        default:
-          decoder.skip();
+      try {
+        const pubCurve = sodium.crypto_sign_ed25519_pk_to_curve25519(pubEdward);
+        return new PublicKey(pubEdward, pubCurve);
+      } catch (error) {
+        throw new InputError.ConversionError('Could not convert public key with libsodium.', 409);
       }
     }
 
-    try {
-      const pub_curve = sodium.crypto_sign_ed25519_pk_to_curve25519(self.pub_edward);
-
-      self.pub_curve = pub_curve;
-      return self;
-    } catch (error) {
-      throw new InputError.ConversionError('Could not convert public key with libsodium.', 409);
-    }
+    throw new DecodeError(`Unexpected number of properties: "${propertiesLength}"`);
   }
 }

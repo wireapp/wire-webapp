@@ -17,11 +17,10 @@
  *
  */
 
-const _sodium = require('libsodium-wrappers-sumo');
+const sodium = require('libsodium-wrappers-sumo');
 
 (async () => {
-  await _sodium.ready;
-  const sodium = _sodium;
+  await sodium.ready;
 
   const Proteus = require('@wireapp/proteus');
 

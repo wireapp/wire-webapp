@@ -178,7 +178,7 @@ export class Cryptobox extends EventEmitter {
       throw new CryptoboxError(`PreKey with ID "${preKeyId}" cannot be found.`);
     }
 
-    return ProteusKeys.PreKeyBundle.new(this.identity.public_key, preKey);
+    return new ProteusKeys.PreKeyBundle(this.identity.public_key, preKey);
   }
 
   public async get_serialized_standard_prekeys(): Promise<{id: number; key: string}[]> {
@@ -351,7 +351,7 @@ export class Cryptobox extends EventEmitter {
 
   public serialize_prekey(prekey: ProteusKeys.PreKey): {id: number; key: string} {
     if (this.identity) {
-      return ProteusKeys.PreKeyBundle.new(this.identity.public_key, prekey).serialised_json();
+      return new ProteusKeys.PreKeyBundle(this.identity.public_key, prekey).serialised_json();
     }
 
     throw new CryptoboxError('No local identity available.');

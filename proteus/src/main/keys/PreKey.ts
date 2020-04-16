@@ -19,56 +19,50 @@
 
 import * as CBOR from '@wireapp/cbor';
 
-import * as ClassUtil from '../util/ClassUtil';
-
 import {InputError} from '../errors/InputError';
 
 import {KeyPair} from './KeyPair';
-import {PublicKey} from './PublicKey';
-import {SecretKey} from './SecretKey';
+import {DecodeError} from '../errors';
 
 /**
  * Pre-generated (and regularly refreshed) pre-keys.
  * A Pre-Shared Key contains the public long-term identity and ephemeral handshake keys for the initial triple DH.
  */
 export class PreKey {
-  static MAX_PREKEY_ID = 0xffff;
-  key_id: number;
-  key_pair: KeyPair;
-  version: number;
+  static readonly MAX_PREKEY_ID = 0xffff;
+  readonly key_id: number;
+  readonly key_pair: KeyPair;
+  readonly version: number;
+  private static readonly propertiesLength = 3;
 
-  constructor() {
-    this.key_id = -1;
-    this.key_pair = new KeyPair(new PublicKey(), new SecretKey());
-    this.version = -1;
+  constructor(keyPair: KeyPair, keyId: number = -1, version: number = -1) {
+    this.key_id = keyId;
+    this.key_pair = keyPair;
+    this.version = version;
   }
 
-  static async new(pre_key_id: number): Promise<PreKey> {
-    this.validate_pre_key_id(pre_key_id);
+  static async new(preKeyId: number): Promise<PreKey> {
+    this.validate_pre_key_id(preKeyId);
 
-    const pk = ClassUtil.new_instance(PreKey);
-
-    pk.version = 1;
-    pk.key_id = pre_key_id;
-    pk.key_pair = await KeyPair.new();
-    return pk;
+    const keyPair = await KeyPair.new();
+    return new PreKey(keyPair, preKeyId, 1);
   }
 
-  static validate_pre_key_id(pre_key_id: number): void {
-    if (pre_key_id === undefined) {
+  static validate_pre_key_id(preKeyId: number): void {
+    if (preKeyId === undefined) {
       throw new InputError.TypeError('PreKey ID is undefined.', InputError.CODE.CASE_404);
     }
 
-    if (typeof pre_key_id === 'string') {
-      throw new InputError.TypeError(`PreKey ID "${pre_key_id}" is a string.`, InputError.CODE.CASE_403);
+    if (typeof preKeyId === 'string') {
+      throw new InputError.TypeError(`PreKey ID "${preKeyId}" is a string.`, InputError.CODE.CASE_403);
     }
 
-    if (pre_key_id % 1 !== 0) {
-      throw new InputError.TypeError(`PreKey ID "${pre_key_id}" is a floating-point number.`, InputError.CODE.CASE_403);
+    if (preKeyId % 1 !== 0) {
+      throw new InputError.TypeError(`PreKey ID "${preKeyId}" is a floating-point number.`, InputError.CODE.CASE_403);
     }
 
-    if (pre_key_id < 0 || pre_key_id > PreKey.MAX_PREKEY_ID) {
-      const message = `PreKey ID (${pre_key_id}) must be between or equal to 0 and ${PreKey.MAX_PREKEY_ID}.`;
+    if (preKeyId < 0 || preKeyId > PreKey.MAX_PREKEY_ID) {
+      const message = `PreKey ID (${preKeyId}) must be between or equal to 0 and ${PreKey.MAX_PREKEY_ID}.`;
       throw new InputError.RangeError(message, InputError.CODE.CASE_400);
     }
   }
@@ -101,7 +95,7 @@ export class PreKey {
   }
 
   encode(encoder: CBOR.Encoder): CBOR.Encoder {
-    encoder.object(3);
+    encoder.object(PreKey.propertiesLength);
     encoder.u8(0);
     encoder.u8(this.version);
     encoder.u8(1);
@@ -111,25 +105,20 @@ export class PreKey {
   }
 
   static decode(decoder: CBOR.Decoder): PreKey {
-    const self = ClassUtil.new_instance(PreKey);
+    const propertiesLength = decoder.object();
+    if (propertiesLength === PreKey.propertiesLength) {
+      decoder.u8();
+      const version = decoder.u8();
 
-    const nprops = decoder.object();
-    for (let index = 0; index <= nprops - 1; index++) {
-      switch (decoder.u8()) {
-        case 0:
-          self.version = decoder.u8();
-          break;
-        case 1:
-          self.key_id = decoder.u16();
-          break;
-        case 2:
-          self.key_pair = KeyPair.decode(decoder);
-          break;
-        default:
-          decoder.skip();
-      }
+      decoder.u8();
+      const keyId = decoder.u16();
+
+      decoder.u8();
+      const keyPair = KeyPair.decode(decoder);
+
+      return new PreKey(keyPair, keyId, version);
     }
 
-    return self;
+    throw new DecodeError(`Unexpected number of properties: "${propertiesLength}"`);
   }
 }

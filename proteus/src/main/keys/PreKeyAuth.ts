@@ -18,7 +18,7 @@
  */
 
 export class PreKeyAuth {
-  static INVALID = 'Invalid';
-  static UNKNOWN = 'Unknown';
-  static VALID = 'Valid';
+  static readonly INVALID = 'Invalid';
+  static readonly UNKNOWN = 'Unknown';
+  static readonly VALID = 'Valid';
 }

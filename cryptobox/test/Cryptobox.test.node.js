@@ -47,9 +47,9 @@ describe('Cryptobox', () => {
       const mallory = await createCryptobox('mallory', 2);
       await mallory.create();
 
-      const bobBundle = Proteus.keys.PreKeyBundle.new(bob.identity.public_key, await bob.store.load_prekey(0));
-      const eveBundle = Proteus.keys.PreKeyBundle.new(eve.identity.public_key, await eve.store.load_prekey(0));
-      const malloryBundle = Proteus.keys.PreKeyBundle.new(
+      const bobBundle = new Proteus.keys.PreKeyBundle(bob.identity.public_key, await bob.store.load_prekey(0));
+      const eveBundle = new Proteus.keys.PreKeyBundle(eve.identity.public_key, await eve.store.load_prekey(0));
+      const malloryBundle = new Proteus.keys.PreKeyBundle(
         mallory.identity.public_key,
         await mallory.store.load_prekey(0),
       );
@@ -106,7 +106,7 @@ describe('Cryptobox', () => {
       const bob = await createCryptobox('bob', 2);
       await bob.create();
 
-      const bobBundle = Proteus.keys.PreKeyBundle.new(bob.identity.public_key, await bob.store.load_prekey(0));
+      const bobBundle = new Proteus.keys.PreKeyBundle(bob.identity.public_key, await bob.store.load_prekey(0));
       const sessionName = 'alice-to-bob';
       await alice.encrypt(sessionName, 'Hello Bob. This is Alice.', bobBundle.serialise());
 
@@ -118,7 +118,7 @@ describe('Cryptobox', () => {
       const eve = await createCryptobox('eve', 5);
       await eve.create();
 
-      const aliceBundle = Proteus.keys.PreKeyBundle.new(alice.identity.public_key, await alice.store.load_prekey(0));
+      const aliceBundle = new Proteus.keys.PreKeyBundle(alice.identity.public_key, await alice.store.load_prekey(0));
       const cipherText = await eve.encrypt('eve-to-alice', 'Hello Alice. This is Eve.', aliceBundle.serialise());
       await alice.decrypt('alice-to-eve', cipherText);
 

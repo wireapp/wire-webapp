@@ -57,7 +57,7 @@ describe('cryptobox.Cryptobox', () => {
       const bob = await createCryptobox('bob');
       const bobsPreKeys = await bob.create();
 
-      const bobBundle = Proteus.keys.PreKeyBundle.new(bob.identity.public_key, bobsPreKeys[0]);
+      const bobBundle = new Proteus.keys.PreKeyBundle(bob.identity.public_key, bobsPreKeys[0]);
 
       const plaintext = 'Hello, Bob!';
       const ciphertext = await alice.encrypt('session-with-bob', plaintext, bobBundle.serialise());
@@ -197,7 +197,7 @@ describe('cryptobox.Cryptobox', () => {
         prekey: await Proteus.keys.PreKey.new(Proteus.keys.PreKey.MAX_PREKEY_ID),
       };
 
-      bob.bundle = Proteus.keys.PreKeyBundle.new(bob.identity.public_key, bob.prekey);
+      bob.bundle = new Proteus.keys.PreKeyBundle(bob.identity.public_key, bob.prekey);
 
       const session = await Proteus.session.Session.init_from_prekey(box.identity, bob.bundle);
       const cryptoBoxSession = new cryptobox.CryptoboxSession(sessionIdUnique, session);

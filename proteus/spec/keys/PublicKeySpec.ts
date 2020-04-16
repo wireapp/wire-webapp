@@ -31,7 +31,7 @@ describe('Public Key', () => {
 
       expect(alice_sk).toEqual(bob_sk);
 
-      bob_keypair.public_key.pub_curve = emptyCurve;
+      (bob_keypair.public_key as any).pub_curve = emptyCurve;
 
       alice_keypair.secret_key.shared_secret(bob_keypair.public_key);
 

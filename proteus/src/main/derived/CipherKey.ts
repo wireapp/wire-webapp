@@ -19,20 +19,14 @@
 
 import * as CBOR from '@wireapp/cbor';
 import * as sodium from 'libsodium-wrappers-sumo';
-
-import * as ClassUtil from '../util/ClassUtil';
+import {DecodeError} from '../errors';
 
 export class CipherKey {
-  key: Uint8Array;
+  readonly key: Uint8Array;
+  private static readonly propertiesLength = 1;
 
-  constructor() {
-    this.key = new Uint8Array([]);
-  }
-
-  static new(key: Uint8Array): CipherKey {
-    const ck = ClassUtil.new_instance(CipherKey);
-    ck.key = key;
-    return ck;
+  constructor(key: Uint8Array) {
+    this.key = key;
   }
 
   /**
@@ -54,24 +48,18 @@ export class CipherKey {
   }
 
   encode(encoder: CBOR.Encoder): CBOR.Encoder {
-    encoder.object(1);
+    encoder.object(CipherKey.propertiesLength);
     encoder.u8(0);
     return encoder.bytes(this.key);
   }
 
   static decode(decoder: CBOR.Decoder): CipherKey {
-    let key_bytes = new Uint8Array([]);
-
-    const nprops = decoder.object();
-    for (let index = 0; index <= nprops - 1; index++) {
-      switch (decoder.u8()) {
-        case 0:
-          key_bytes = new Uint8Array(decoder.bytes());
-          break;
-        default:
-          decoder.skip();
-      }
+    const propertiesLength = decoder.object();
+    if (propertiesLength === CipherKey.propertiesLength) {
+      decoder.u8();
+      const keyBytes = new Uint8Array(decoder.bytes());
+      return new CipherKey(keyBytes);
     }
-    return CipherKey.new(key_bytes);
+    throw new DecodeError(`Unexpected number of properties: "${propertiesLength}"`);
   }
 }

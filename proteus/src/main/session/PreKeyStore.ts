@@ -21,6 +21,6 @@ import {PreKey} from '../keys/PreKey';
 
 export abstract class PreKeyStore {
   abstract load_prekeys(): Promise<PreKey[]>;
-  abstract load_prekey(prekey_id: number): Promise<PreKey | undefined>;
-  abstract delete_prekey(prekey_id: number): Promise<number>;
+  abstract load_prekey(prekeyId: number): Promise<PreKey | undefined>;
+  abstract delete_prekey(prekeyId: number): Promise<number>;
 }

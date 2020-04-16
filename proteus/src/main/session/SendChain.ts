@@ -18,29 +18,22 @@
  */
 
 import * as CBOR from '@wireapp/cbor';
-import {PublicKey, SecretKey} from '../keys';
 import {KeyPair} from '../keys/KeyPair';
-import * as ClassUtil from '../util/ClassUtil';
 import {ChainKey} from './ChainKey';
+import {DecodeError} from '../errors';
 
 export class SendChain {
   chain_key: ChainKey;
-  ratchet_key: KeyPair;
+  readonly ratchet_key: KeyPair;
+  private static readonly propertiesLength = 2;
 
-  constructor() {
-    this.chain_key = new ChainKey();
-    this.ratchet_key = new KeyPair(new PublicKey(), new SecretKey());
-  }
-
-  static new(chain_key: ChainKey, keypair: KeyPair): SendChain {
-    const sc = ClassUtil.new_instance(SendChain);
-    sc.chain_key = chain_key;
-    sc.ratchet_key = keypair;
-    return sc;
+  constructor(chainKey: ChainKey, keypair: KeyPair) {
+    this.chain_key = chainKey;
+    this.ratchet_key = keypair;
   }
 
   encode(encoder: CBOR.Encoder): CBOR.Encoder {
-    encoder.object(2);
+    encoder.object(SendChain.propertiesLength);
     encoder.u8(0);
     this.chain_key.encode(encoder);
     encoder.u8(1);
@@ -48,21 +41,17 @@ export class SendChain {
   }
 
   static decode(decoder: CBOR.Decoder): SendChain {
-    const self = ClassUtil.new_instance(SendChain);
-    const nprops = decoder.object();
-    for (let index = 0; index <= nprops - 1; index++) {
-      switch (decoder.u8()) {
-        case 0:
-          self.chain_key = ChainKey.decode(decoder);
-          break;
-        case 1:
-          self.ratchet_key = KeyPair.decode(decoder);
-          break;
-        default:
-          decoder.skip();
-      }
+    const propertiesLength = decoder.object();
+    if (propertiesLength === SendChain.propertiesLength) {
+      decoder.u8();
+      const chainKey = ChainKey.decode(decoder);
+
+      decoder.u8();
+      const ratchetKey = KeyPair.decode(decoder);
+
+      return new SendChain(chainKey, ratchetKey);
     }
 
-    return self;
+    throw new DecodeError(`Unexpected number of properties: "${propertiesLength}"`);
   }
 }

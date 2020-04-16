@@ -21,25 +21,18 @@ import * as CBOR from '@wireapp/cbor';
 
 import {CipherKey} from '../derived/CipherKey';
 import {MacKey} from '../derived/MacKey';
-import * as ClassUtil from '../util/ClassUtil';
+import {DecodeError} from '../errors';
 
 export class MessageKeys {
-  cipher_key: CipherKey;
-  counter: number;
-  mac_key: MacKey;
+  readonly cipher_key: CipherKey;
+  readonly counter: number;
+  readonly mac_key: MacKey;
+  private static readonly propertiesLength = 3;
 
-  constructor() {
-    this.cipher_key = new CipherKey();
-    this.counter = -1;
-    this.mac_key = new MacKey(new Uint8Array([]));
-  }
-
-  static new(cipher_key: CipherKey, mac_key: MacKey, counter: number): MessageKeys {
-    const mk = ClassUtil.new_instance(MessageKeys);
-    mk.cipher_key = cipher_key;
-    mk.mac_key = mac_key;
-    mk.counter = counter;
-    return mk;
+  constructor(cipherKey: CipherKey, macKey: MacKey, counter: number) {
+    this.cipher_key = cipherKey;
+    this.mac_key = macKey;
+    this.counter = counter;
   }
 
   private _counter_as_nonce(): Uint8Array {
@@ -57,7 +50,7 @@ export class MessageKeys {
   }
 
   encode(encoder: CBOR.Encoder): CBOR.Encoder {
-    encoder.object(3);
+    encoder.object(MessageKeys.propertiesLength);
     encoder.u8(0);
     this.cipher_key.encode(encoder);
     encoder.u8(1);
@@ -67,25 +60,20 @@ export class MessageKeys {
   }
 
   static decode(decoder: CBOR.Decoder): MessageKeys {
-    const self = ClassUtil.new_instance(MessageKeys);
+    const propertiesLength = decoder.object();
+    if (propertiesLength === MessageKeys.propertiesLength) {
+      decoder.u8();
+      const cipherKey = CipherKey.decode(decoder);
 
-    const nprops = decoder.object();
-    for (let index = 0; index <= nprops - 1; index++) {
-      switch (decoder.u8()) {
-        case 0:
-          self.cipher_key = CipherKey.decode(decoder);
-          break;
-        case 1:
-          self.mac_key = MacKey.decode(decoder);
-          break;
-        case 2:
-          self.counter = decoder.u32();
-          break;
-        default:
-          decoder.skip();
-      }
+      decoder.u8();
+      const macKey = MacKey.decode(decoder);
+
+      decoder.u8();
+      const counter = decoder.u32();
+
+      return new MessageKeys(cipherKey, macKey, counter);
     }
 
-    return self;
+    throw new DecodeError(`Unexpected number of properties: "${propertiesLength}"`);
   }
 }

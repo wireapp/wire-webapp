@@ -18,7 +18,7 @@
  */
 
 export class ProteusError extends Error {
-  static CODE: Record<string, number> = {
+  static readonly CODE: Record<string, number> = {
     CASE_100: 100,
     CASE_101: 101,
     CASE_102: 102,

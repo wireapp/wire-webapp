@@ -22,28 +22,28 @@ import * as Proteus from '@wireapp/proteus';
 describe('DecryptError', () => {
   describe('constructor', () => {
     it('constructs a default error code', () => {
-      const correct_error_code = 2;
+      const correctErrorCode = 2;
 
       let error = new Proteus.errors.DecryptError.InvalidMessage();
-      expect(error.code).toBe(correct_error_code);
+      expect(error.code).toBe(correctErrorCode);
 
       error = new Proteus.errors.DecryptError.InvalidMessage('Custom Text');
-      expect(error.code).toBe(correct_error_code);
+      expect(error.code).toBe(correctErrorCode);
     });
   });
 
   describe('Wire for web compatibility', () => {
-    const error_code = 300;
-    const error_message = 'The received message was too big.';
+    const errorCode = 300;
+    const errorMessage = 'The received message was too big.';
 
     it('uses the generic error class as namespace', () => {
-      const error = new Proteus.errors.DecryptError.InvalidMessage(error_message, error_code);
-      expect(error.code).toBe(error_code);
-      expect(error.message).toBe(error_message);
+      const error = new Proteus.errors.DecryptError.InvalidMessage(errorMessage, errorCode);
+      expect(error.code).toBe(errorCode);
+      expect(error.message).toBe(errorMessage);
     });
 
     it('assures that specializations are the same type as generics', () => {
-      const error = new Proteus.errors.DecryptError.InvalidMessage(error_message, error_code);
+      const error = new Proteus.errors.DecryptError.InvalidMessage(errorMessage, errorCode);
       expect(error instanceof Proteus.errors.DecryptError).toBe(true);
       expect(error instanceof Proteus.errors.DecryptError.InvalidMessage).toBe(true);
     });

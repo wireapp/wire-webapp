@@ -21,17 +21,17 @@ import * as Proteus from '@wireapp/proteus';
 
 describe('KeyPair', () => {
   it('signs a message and verifies the signature', async () => {
-    const kp = await Proteus.keys.KeyPair.new();
-    const msg = 'what do ya want for nothing?';
-    const sig = kp.secret_key.sign(msg);
-    const bad_sig = new Uint8Array(sig);
+    const keyPair = await Proteus.keys.KeyPair.new();
+    const message = 'what do ya want for nothing?';
+    const signature = keyPair.secret_key.sign(message);
+    const badSignature = new Uint8Array(signature);
 
-    bad_sig.forEach((obj, index) => {
-      bad_sig[index] = ~bad_sig[index];
+    badSignature.forEach((obj, index) => {
+      badSignature[index] = ~badSignature[index];
     });
 
-    expect(kp.public_key.verify(sig, msg)).toBe(true);
-    expect(kp.public_key.verify(bad_sig, msg)).toBe(false);
+    expect(keyPair.public_key.verify(signature, message)).toBe(true);
+    expect(keyPair.public_key.verify(badSignature, message)).toBe(false);
   });
 
   it('computes a Diffie-Hellman shared secret', async () => {

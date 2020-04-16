@@ -21,47 +21,35 @@ import * as CBOR from '@wireapp/cbor';
 
 import {InputError} from '../errors/InputError';
 import {PublicKey} from '../keys/PublicKey';
-import * as ClassUtil from '../util/ClassUtil';
 import {Message} from './Message';
 import {SessionTag} from './SessionTag';
+import {DecodeError} from '../errors';
 
 export class CipherMessage extends Message {
-  cipher_text: Uint8Array;
-  counter: number;
-  prev_counter: number;
-  ratchet_key: PublicKey;
-  session_tag: SessionTag;
+  readonly cipher_text: Uint8Array;
+  readonly counter: number;
+  readonly prev_counter: number;
+  readonly ratchet_key: PublicKey;
+  readonly session_tag: SessionTag;
+  private static readonly propertiesLength = 5;
 
-  constructor() {
-    super();
-    this.cipher_text = new Uint8Array([]);
-    this.counter = -1;
-    this.prev_counter = -1;
-    this.ratchet_key = new PublicKey();
-    this.session_tag = new SessionTag();
-  }
-
-  static new(
-    session_tag: SessionTag,
+  constructor(
+    sessionTag: SessionTag,
     counter: number,
-    prev_counter: number,
-    ratchet_key: PublicKey,
-    cipher_text: Uint8Array,
-  ): CipherMessage {
-    const cm = ClassUtil.new_instance(CipherMessage);
-
-    cm.session_tag = session_tag;
-    cm.counter = counter;
-    cm.prev_counter = prev_counter;
-    cm.ratchet_key = ratchet_key;
-    cm.cipher_text = cipher_text;
-
-    Object.freeze(cm);
-    return cm;
+    prevCounter: number,
+    ratchetKey: PublicKey,
+    cipherText: Uint8Array,
+  ) {
+    super();
+    this.session_tag = sessionTag;
+    this.counter = counter;
+    this.prev_counter = prevCounter;
+    this.ratchet_key = ratchetKey;
+    this.cipher_text = cipherText;
   }
 
   encode(encoder: CBOR.Encoder): CBOR.Encoder {
-    encoder.object(5);
+    encoder.object(CipherMessage.propertiesLength);
     encoder.u8(0);
     this.session_tag.encode(encoder);
     encoder.u8(1);
@@ -75,41 +63,30 @@ export class CipherMessage extends Message {
   }
 
   static decode(decoder: CBOR.Decoder): CipherMessage {
-    let session_tag = null;
-    let counter = null;
-    let prev_counter = null;
-    let ratchet_key = null;
-    let cipher_text = null;
+    const propertiesLength = decoder.object();
+    if (propertiesLength === CipherMessage.propertiesLength) {
+      decoder.u8();
+      const sessionTag = SessionTag.decode(decoder);
 
-    const nprops = decoder.object();
-    for (let index = 0; index <= nprops - 1; index++) {
-      switch (decoder.u8()) {
-        case 0:
-          session_tag = SessionTag.decode(decoder);
-          break;
-        case 1:
-          counter = decoder.u32();
-          break;
-        case 2:
-          prev_counter = decoder.u32();
-          break;
-        case 3:
-          ratchet_key = PublicKey.decode(decoder);
-          break;
-        case 4:
-          cipher_text = new Uint8Array(decoder.bytes());
-          break;
-        default:
-          decoder.skip();
+      decoder.u8();
+      const counter = Number(decoder.u32());
+
+      decoder.u8();
+      const prevCounter = Number(decoder.u32());
+
+      decoder.u8();
+      const ratchetKey = PublicKey.decode(decoder);
+
+      decoder.u8();
+      const cipherText = new Uint8Array(decoder.bytes());
+
+      if (sessionTag && !isNaN(counter) && !isNaN(prevCounter) && ratchetKey && cipherText) {
+        return new CipherMessage(sessionTag, counter, prevCounter, ratchetKey, cipherText);
       }
+
+      throw new InputError.TypeError(`Given CipherMessage doesn't match expected signature.`, InputError.CODE.CASE_405);
     }
 
-    counter = Number(counter);
-    prev_counter = Number(prev_counter);
-
-    if (session_tag && !isNaN(counter) && !isNaN(prev_counter) && ratchet_key && cipher_text) {
-      return CipherMessage.new(session_tag, counter, prev_counter, ratchet_key, cipher_text);
-    }
-    throw new InputError.TypeError(`Given CipherMessage doesn't match expected signature.`, InputError.CODE.CASE_405);
+    throw new DecodeError(`Unexpected number of properties: "${propertiesLength}"`);
   }
 }

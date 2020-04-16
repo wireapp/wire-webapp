@@ -21,8 +21,8 @@ export const random_bytes = (length: number): Uint8Array => {
   if (typeof window !== 'undefined' && window.crypto) {
     // browser
     const buffer = new ArrayBuffer(length);
-    const buffer_view = new Uint8Array(buffer);
-    return window.crypto.getRandomValues(buffer_view);
+    const bufferView = new Uint8Array(buffer);
+    return window.crypto.getRandomValues(bufferView);
   }
   // node
   const crypto = require('crypto');

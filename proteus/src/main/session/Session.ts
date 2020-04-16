@@ -19,7 +19,6 @@
 
 import * as CBOR from '@wireapp/cbor';
 
-import * as ClassUtil from '../util/ClassUtil';
 import * as MemoryUtil from '../util/MemoryUtil';
 
 import {DecodeError} from '../errors/DecodeError';
@@ -53,20 +52,29 @@ export class Session {
   static MAX_RECV_CHAINS = 5;
   static MAX_SESSION_STATES = 100;
 
-  counter = 0;
-  local_identity: IdentityKeyPair;
-  pending_prekey: (number | PublicKey)[] | null;
-  remote_identity: IdentityKey;
+  readonly local_identity: IdentityKeyPair;
+  readonly remote_identity: IdentityKey;
+  readonly version: number;
+  private counter: number;
+  pending_prekey: [number, PublicKey] | null;
   session_states: IntermediateSessionState;
   session_tag: SessionTag;
-  version = 1;
 
-  constructor() {
-    this.local_identity = new IdentityKeyPair();
-    this.pending_prekey = null;
-    this.remote_identity = new IdentityKey();
-    this.session_states = {};
-    this.session_tag = new SessionTag();
+  constructor(
+    localIdentity: IdentityKeyPair,
+    remoteIdentity: IdentityKey,
+    sessionTag: SessionTag = new SessionTag(),
+    pendingPrekey: [number, PublicKey] | null = null,
+    sessionStates: IntermediateSessionState = {},
+    version: number = 1,
+  ) {
+    this.local_identity = localIdentity;
+    this.pending_prekey = pendingPrekey;
+    this.remote_identity = remoteIdentity;
+    this.session_states = sessionStates;
+    this.session_tag = sessionTag;
+    this.version = version;
+    this.counter = 0;
   }
 
   /**
@@ -78,21 +86,17 @@ export class Session {
 
     const state = await SessionState.init_as_alice(local_identity, alice_base, remote_pkbundle);
 
-    const session_tag = SessionTag.new();
+    const session_tag = new SessionTag();
 
-    const session = ClassUtil.new_instance(this);
-    session.session_tag = session_tag;
-    session.local_identity = local_identity;
-    session.remote_identity = remote_pkbundle.identity_key;
-    session.pending_prekey = [remote_pkbundle.prekey_id, alice_base.public_key];
-    session.session_states = {};
+    const pendingPrekey: [number, PublicKey] = [remote_pkbundle.prekey_id, alice_base.public_key];
+    const session = new Session(local_identity, remote_pkbundle.identity_key, session_tag, pendingPrekey);
 
     session._insert_session_state(session_tag, state);
     return session;
   }
 
   static async init_from_message(
-    our_identity: IdentityKeyPair,
+    ourIdentity: IdentityKeyPair,
     prekey_store: PreKeyStore,
     envelope: Envelope,
   ): Promise<[Session, Uint8Array]> {
@@ -106,12 +110,7 @@ export class Session {
     }
 
     if (preKeyMessage instanceof PreKeyMessage) {
-      const session = ClassUtil.new_instance(Session);
-      session.session_tag = preKeyMessage.message.session_tag;
-      session.local_identity = our_identity;
-      session.remote_identity = preKeyMessage.identity_key;
-      session.pending_prekey = null;
-      session.session_states = {};
+      const session = new Session(ourIdentity, preKeyMessage.identity_key, preKeyMessage.message.session_tag);
 
       const state = await session._new_state(prekey_store, preKeyMessage);
       const plain = await state.decrypt(envelope, preKeyMessage.message);
@@ -140,41 +139,41 @@ export class Session {
     );
   }
 
-  private async _new_state(pre_key_store: PreKeyStore, pre_key_message: PreKeyMessage): Promise<SessionState> {
-    const pre_key = await pre_key_store.load_prekey(pre_key_message.prekey_id);
+  private async _new_state(preKeyStore: PreKeyStore, preKeyMessage: PreKeyMessage): Promise<SessionState> {
+    const pre_key = await preKeyStore.load_prekey(preKeyMessage.prekey_id);
     if (pre_key) {
       return SessionState.init_as_bob(
         this.local_identity,
         pre_key.key_pair,
-        pre_key_message.identity_key,
-        pre_key_message.base_key,
+        preKeyMessage.identity_key,
+        preKeyMessage.base_key,
       );
     }
     throw new ProteusError(
-      `Unable to find PreKey with ID "${pre_key_message.prekey_id}" in PreKey store "${pre_key_store.constructor.name}".`,
+      `Unable to find PreKey with ID "${preKeyMessage.prekey_id}" in PreKey store "${preKeyStore.constructor.name}".`,
       ProteusError.CODE.CASE_101,
     );
   }
 
-  private _insert_session_state(tag: SessionTag, state: SessionState): void {
-    if (this.session_states.hasOwnProperty(tag.toString())) {
-      this.session_states[tag.toString()].state = state;
+  private _insert_session_state(sessionTag: SessionTag, state: SessionState): void {
+    if (this.session_states.hasOwnProperty(sessionTag.toString())) {
+      this.session_states[sessionTag.toString()].state = state;
     } else {
       if (this.counter >= Number.MAX_SAFE_INTEGER) {
         this.session_states = {};
         this.counter = 0;
       }
 
-      this.session_states[tag.toString()] = {
+      this.session_states[sessionTag.toString()] = {
         idx: this.counter,
         state,
-        tag,
+        tag: sessionTag,
       };
       this.counter++;
     }
 
-    if (this.session_tag.toString() !== tag.toString()) {
-      this.session_tag = tag;
+    if (this.session_tag.toString() !== sessionTag.toString()) {
+      this.session_tag = sessionTag;
     }
 
     const obj_size = (obj: IntermediateSessionState) => Object.keys(obj).length;
@@ -286,13 +285,13 @@ export class Session {
     // serialise and de-serialise for a deep clone
     // THIS IS IMPORTANT, DO NOT MUTATE THE SESSION STATE IN-PLACE
     // mutating in-place can lead to undefined behavior and undefined state in edge cases
-    const session_state = SessionState.deserialise(state.state.serialise());
+    const sessionState = SessionState.deserialise(state.state.serialise());
 
-    const plaintext = await session_state.decrypt(envelope, msg);
+    const plaintext = await sessionState.decrypt(envelope, msg);
 
     this.pending_prekey = null;
 
-    this._insert_session_state(msg.session_tag, session_state);
+    this._insert_session_state(msg.session_tag, sessionState);
     return plaintext;
   }
 
@@ -339,46 +338,50 @@ export class Session {
     }
   }
 
-  static decode(local_identity: IdentityKeyPair, decoder: CBOR.Decoder): Session {
-    const self = ClassUtil.new_instance(this);
+  static decode(localIdentity: IdentityKeyPair, decoder: CBOR.Decoder): Session {
+    let version;
+    let sessionTag;
+    let remoteIdentity;
+    let pendingPrekey: any;
+    let sessionStates: IntermediateSessionState = {};
 
-    const nprops = decoder.object();
-    for (let index = 0; index <= nprops - 1; index++) {
+    const propertiesLength = decoder.object();
+    for (let index = 0; index <= propertiesLength - 1; index++) {
       switch (decoder.u8()) {
         case 0: {
-          self.version = decoder.u8();
+          version = decoder.u8();
           break;
         }
         case 1: {
-          self.session_tag = SessionTag.decode(decoder);
+          sessionTag = SessionTag.decode(decoder);
           break;
         }
         case 2: {
           const identity_key = IdentityKey.decode(decoder);
-          if (local_identity.public_key.fingerprint() !== identity_key.fingerprint()) {
+          if (localIdentity.public_key.fingerprint() !== identity_key.fingerprint()) {
             throw new DecodeError.LocalIdentityChanged(undefined, DecodeError.CODE.CASE_300);
           }
-          self.local_identity = local_identity;
+          localIdentity = localIdentity;
           break;
         }
         case 3: {
-          self.remote_identity = IdentityKey.decode(decoder);
+          remoteIdentity = IdentityKey.decode(decoder);
           break;
         }
         case 4: {
           switch (decoder.optional(() => decoder.object())) {
             case null:
-              self.pending_prekey = null;
+              pendingPrekey = null;
               break;
             case 2:
-              self.pending_prekey = [];
+              pendingPrekey = [];
               for (let key = 0; key <= 1; ++key) {
                 switch (decoder.u8()) {
                   case 0:
-                    self.pending_prekey[0] = decoder.u16();
+                    pendingPrekey[0] = decoder.u16();
                     break;
                   case 1:
-                    self.pending_prekey[1] = PublicKey.decode(decoder);
+                    pendingPrekey[1] = PublicKey.decode(decoder);
                     break;
                 }
               }
@@ -389,13 +392,13 @@ export class Session {
           break;
         }
         case 5: {
-          self.session_states = {};
+          sessionStates = {};
 
           const nprops = decoder.object();
 
           for (let index = 0; index <= nprops - 1; index++) {
             const tag = SessionTag.decode(decoder);
-            self.session_states[tag.toString()] = {
+            sessionStates[tag.toString()] = {
               idx: index,
               state: SessionState.decode(decoder),
               tag,
@@ -409,6 +412,10 @@ export class Session {
       }
     }
 
-    return self;
+    if (!remoteIdentity) {
+      throw new DecodeError('Missing remote identity');
+    }
+
+    return new Session(localIdentity, remoteIdentity, sessionTag, pendingPrekey, sessionStates, version);
   }
 }

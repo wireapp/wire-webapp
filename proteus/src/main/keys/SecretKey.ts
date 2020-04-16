@@ -20,27 +20,19 @@
 import * as CBOR from '@wireapp/cbor';
 import * as sodium from 'libsodium-wrappers-sumo';
 
-import * as ClassUtil from '../util/ClassUtil';
-
 import {InputError} from '../errors/InputError';
 import * as ArrayUtil from '../util/ArrayUtil';
 import {PublicKey} from './PublicKey';
+import {DecodeError} from '../errors';
 
 export class SecretKey {
-  sec_curve: Uint8Array;
-  sec_edward: Uint8Array;
+  readonly sec_curve: Uint8Array;
+  readonly sec_edward: Uint8Array;
+  private static readonly propertiesLength = 1;
 
-  constructor() {
-    this.sec_curve = new Uint8Array([]);
-    this.sec_edward = new Uint8Array([]);
-  }
-
-  static new(sec_edward: Uint8Array, sec_curve: Uint8Array): SecretKey {
-    const sk = ClassUtil.new_instance(SecretKey);
-
-    sk.sec_edward = sec_edward;
-    sk.sec_curve = sec_curve;
-    return sk;
+  constructor(secEdward: Uint8Array, secCurve: Uint8Array) {
+    this.sec_edward = secEdward;
+    this.sec_curve = secCurve;
   }
 
   /**
@@ -55,43 +47,37 @@ export class SecretKey {
   /**
    * This function can be used to compute a shared secret given a user's secret key and another
    * user's public key.
-   * @param public_key Another user's public key
+   * @param publicKey Another user's public key
    * @returns Array buffer view of the computed shared secret
    */
-  shared_secret(public_key: PublicKey): Uint8Array {
-    const shared_secret = sodium.crypto_scalarmult(this.sec_curve, public_key.pub_curve);
+  shared_secret(publicKey: PublicKey): Uint8Array {
+    const sharedSecret = sodium.crypto_scalarmult(this.sec_curve, publicKey.pub_curve);
 
-    ArrayUtil.assert_is_not_zeros(shared_secret);
+    ArrayUtil.assert_is_not_zeros(sharedSecret);
 
-    return shared_secret;
+    return sharedSecret;
   }
 
   encode(encoder: CBOR.Encoder): CBOR.Encoder {
-    encoder.object(1);
+    encoder.object(SecretKey.propertiesLength);
     encoder.u8(0);
     return encoder.bytes(this.sec_edward);
   }
 
   static decode(decoder: CBOR.Decoder): SecretKey {
-    const self = ClassUtil.new_instance(SecretKey);
+    const propertiesLength = decoder.object();
+    if (propertiesLength === SecretKey.propertiesLength) {
+      decoder.u8();
+      const secEdward = new Uint8Array(decoder.bytes());
 
-    const nprops = decoder.object();
-    for (let index = 0; index <= nprops - 1; index++) {
-      switch (decoder.u8()) {
-        case 0:
-          self.sec_edward = new Uint8Array(decoder.bytes());
-          break;
-        default:
-          decoder.skip();
+      try {
+        const secCurve = sodium.crypto_sign_ed25519_sk_to_curve25519(secEdward);
+        return new SecretKey(secEdward, secCurve);
+      } catch (error) {
+        throw new InputError.ConversionError('Could not convert secret key with libsodium.', 408);
       }
     }
 
-    try {
-      const sec_curve = sodium.crypto_sign_ed25519_sk_to_curve25519(self.sec_edward);
-      self.sec_curve = sec_curve;
-      return self;
-    } catch (error) {
-      throw new InputError.ConversionError('Could not convert secret key with libsodium.', 408);
-    }
+    throw new DecodeError(`Unexpected number of properties: "${propertiesLength}"`);
   }
 }

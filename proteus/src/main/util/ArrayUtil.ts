@@ -20,16 +20,16 @@
 import {ProteusError} from '../errors/ProteusError';
 
 export function assert_is_not_zeros(array: number[] | Uint8Array): void {
-  let only_zeros = true;
+  let onlyZeros = true;
 
   for (const value of array) {
     if (value > 0) {
-      only_zeros = false;
+      onlyZeros = false;
       break;
     }
   }
 
-  if (only_zeros === true) {
+  if (onlyZeros === true) {
     throw new ProteusError('Array consists only of zeros', ProteusError.CODE.CASE_100);
   }
 }

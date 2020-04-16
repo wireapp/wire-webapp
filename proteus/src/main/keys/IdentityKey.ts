@@ -19,8 +19,8 @@
 
 import * as CBOR from '@wireapp/cbor';
 
-import * as ClassUtil from '../util/ClassUtil';
 import {PublicKey} from './PublicKey';
+import {DecodeError} from '../errors';
 
 /**
  * Construct a long-term identity key pair.
@@ -29,16 +29,11 @@ import {PublicKey} from './PublicKey';
  * Long-term identity keys are used to initialise "sessions" with other clients (triple DH).
  */
 export class IdentityKey {
-  public_key: PublicKey;
+  readonly public_key: PublicKey;
+  private static readonly propertiesLength = 1;
 
-  constructor() {
-    this.public_key = new PublicKey();
-  }
-
-  static new(public_key: PublicKey): IdentityKey {
-    const key = ClassUtil.new_instance(IdentityKey);
-    key.public_key = public_key;
-    return key;
+  constructor(publicKey: PublicKey) {
+    this.public_key = publicKey;
   }
 
   fingerprint(): string {
@@ -46,25 +41,19 @@ export class IdentityKey {
   }
 
   encode(encoder: CBOR.Encoder): CBOR.Encoder {
-    encoder.object(1);
+    encoder.object(IdentityKey.propertiesLength);
     encoder.u8(0);
     return this.public_key.encode(encoder);
   }
 
   static decode(decoder: CBOR.Decoder): IdentityKey {
-    let public_key = ClassUtil.new_instance(PublicKey);
-
-    const nprops = decoder.object();
-    for (let index = 0; index <= nprops - 1; index++) {
-      switch (decoder.u8()) {
-        case 0:
-          public_key = PublicKey.decode(decoder);
-          break;
-        default:
-          decoder.skip();
-      }
+    const propertiesLength = decoder.object();
+    if (propertiesLength === IdentityKey.propertiesLength) {
+      decoder.u8();
+      const publicKey = PublicKey.decode(decoder);
+      return new IdentityKey(publicKey);
     }
 
-    return IdentityKey.new(public_key);
+    throw new DecodeError(`Unexpected number of properties: "${propertiesLength}"`);
   }
 }

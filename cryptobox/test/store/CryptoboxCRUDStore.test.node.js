@@ -51,7 +51,7 @@ describe('cryptobox.store.CryptoboxCRUDStore', () => {
       const aliceIdentity = await Proteus.keys.IdentityKeyPair.new();
       const bobIdentity = await Proteus.keys.IdentityKeyPair.new();
       const bobLastResortPreKey = await Proteus.keys.PreKey.new(Proteus.keys.PreKey.MAX_PREKEY_ID);
-      const bobPreKeyBundle = Proteus.keys.PreKeyBundle.new(bobIdentity.public_key, bobLastResortPreKey);
+      const bobPreKeyBundle = new Proteus.keys.PreKeyBundle(bobIdentity.public_key, bobLastResortPreKey);
       const sessionId = 'my_session_with_bob';
 
       const sessionWithBob = await Proteus.session.Session.init_from_prekey(aliceIdentity, bobPreKeyBundle);
@@ -126,7 +126,7 @@ describe('cryptobox.store.CryptoboxCRUDStore', () => {
       const aliceIdentity = await Proteus.keys.IdentityKeyPair.new();
       const bobIdentity = await Proteus.keys.IdentityKeyPair.new();
       const bobLastResortPreKey = await Proteus.keys.PreKey.new(Proteus.keys.PreKey.MAX_PREKEY_ID);
-      const bobPreKeyBundle = Proteus.keys.PreKeyBundle.new(bobIdentity.public_key, bobLastResortPreKey);
+      const bobPreKeyBundle = new Proteus.keys.PreKeyBundle(bobIdentity.public_key, bobLastResortPreKey);
       const sessionId = 'my_session_with_bob';
 
       let proteusSession = await Proteus.session.Session.init_from_prekey(aliceIdentity, bobPreKeyBundle);
@@ -150,7 +150,7 @@ describe('cryptobox.store.CryptoboxCRUDStore', () => {
 
       const bob = await Proteus.keys.IdentityKeyPair.new();
       const preKey = await Proteus.keys.PreKey.new(Proteus.keys.PreKey.MAX_PREKEY_ID);
-      const bobPreKeyBundle = Proteus.keys.PreKeyBundle.new(bob.public_key, preKey);
+      const bobPreKeyBundle = new Proteus.keys.PreKeyBundle(bob.public_key, preKey);
 
       const allPreKeys = await alice.create();
       expect(allPreKeys.length).toBe(1);
@@ -169,7 +169,7 @@ describe('cryptobox.store.CryptoboxCRUDStore', () => {
 
       const bob = await Proteus.keys.IdentityKeyPair.new();
       const preKey = await Proteus.keys.PreKey.new(Proteus.keys.PreKey.MAX_PREKEY_ID);
-      const bobPreKeyBundle = Proteus.keys.PreKeyBundle.new(bob.public_key, preKey);
+      const bobPreKeyBundle = new Proteus.keys.PreKeyBundle(bob.public_key, preKey);
 
       const allPreKeys = await alice.create();
       expect(allPreKeys.length).toBe(1);

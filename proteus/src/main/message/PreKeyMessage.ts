@@ -21,40 +21,29 @@ import * as CBOR from '@wireapp/cbor';
 
 import {IdentityKey} from '../keys/IdentityKey';
 import {PublicKey} from '../keys/PublicKey';
-import * as ClassUtil from '../util/ClassUtil';
 
 import {InputError} from '../errors/InputError';
 import {CipherMessage} from './CipherMessage';
 import {Message} from './Message';
+import {DecodeError} from '../errors';
 
 export class PreKeyMessage extends Message {
-  base_key: PublicKey;
-  identity_key: IdentityKey;
-  message: CipherMessage;
-  prekey_id: number;
+  readonly base_key: PublicKey;
+  readonly identity_key: IdentityKey;
+  readonly message: CipherMessage;
+  readonly prekey_id: number;
+  private static readonly propertiesLength = 4;
 
-  constructor() {
+  constructor(prekeyId: number, baseKey: PublicKey, identityKey: IdentityKey, message: CipherMessage) {
     super();
-    this.base_key = new PublicKey();
-    this.identity_key = new IdentityKey();
-    this.message = new CipherMessage();
-    this.prekey_id = -1;
-  }
-
-  static new(prekey_id: number, base_key: PublicKey, identity_key: IdentityKey, message: CipherMessage): PreKeyMessage {
-    const pkm = ClassUtil.new_instance(PreKeyMessage);
-
-    pkm.prekey_id = prekey_id;
-    pkm.base_key = base_key;
-    pkm.identity_key = identity_key;
-    pkm.message = message;
-
-    Object.freeze(pkm);
-    return pkm;
+    this.prekey_id = prekeyId;
+    this.base_key = baseKey;
+    this.identity_key = identityKey;
+    this.message = message;
   }
 
   encode(encoder: CBOR.Encoder): CBOR.Encoder {
-    encoder.object(4);
+    encoder.object(PreKeyMessage.propertiesLength);
     encoder.u8(0);
     encoder.u16(this.prekey_id);
     encoder.u8(1);
@@ -66,36 +55,25 @@ export class PreKeyMessage extends Message {
   }
 
   static decode(decoder: CBOR.Decoder): PreKeyMessage {
-    let prekey_id = null;
-    let base_key = null;
-    let identity_key = null;
-    let message = null;
+    const propertiesLength = decoder.object();
+    if (propertiesLength === PreKeyMessage.propertiesLength) {
+      decoder.u8();
+      const prekeyId = Number(decoder.u16());
 
-    const nprops = decoder.object();
-    for (let index = 0; index <= nprops - 1; index++) {
-      switch (decoder.u8()) {
-        case 0:
-          prekey_id = decoder.u16();
-          break;
-        case 1:
-          base_key = PublicKey.decode(decoder);
-          break;
-        case 2:
-          identity_key = IdentityKey.decode(decoder);
-          break;
-        case 3:
-          message = CipherMessage.decode(decoder);
-          break;
-        default:
-          decoder.skip();
+      decoder.u8();
+      const baseKey = PublicKey.decode(decoder);
+
+      decoder.u8();
+      const identityKey = IdentityKey.decode(decoder);
+
+      decoder.u8();
+      const message = CipherMessage.decode(decoder);
+
+      if (!isNaN(prekeyId) && baseKey && identityKey && message) {
+        return new PreKeyMessage(prekeyId, baseKey, identityKey, message);
       }
+      throw new InputError.TypeError(`Given PreKeyMessage doesn't match expected signature.`, InputError.CODE.CASE_406);
     }
-
-    prekey_id = Number(prekey_id);
-
-    if (!isNaN(prekey_id) && base_key && identity_key && message) {
-      return PreKeyMessage.new(prekey_id, base_key, identity_key, message);
-    }
-    throw new InputError.TypeError(`Given PreKeyMessage doesn't match expected signature.`, InputError.CODE.CASE_406);
+    throw new DecodeError(`Unexpected number of properties: "${propertiesLength}"`);
   }
 }

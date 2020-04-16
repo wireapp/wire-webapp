@@ -19,31 +19,26 @@
 
 import * as CBOR from '@wireapp/cbor';
 
-import * as ClassUtil from '../util/ClassUtil';
 import {IdentityKey} from './IdentityKey';
 import {KeyPair} from './KeyPair';
 import {SecretKey} from './SecretKey';
+import {DecodeError} from '../errors';
 
 export class IdentityKeyPair {
-  public_key: IdentityKey;
-  secret_key: SecretKey;
-  version: number;
+  readonly public_key: IdentityKey;
+  readonly secret_key: SecretKey;
+  readonly version: number;
+  private static readonly propertiesLength = 3;
 
-  constructor() {
-    this.public_key = new IdentityKey();
-    this.secret_key = new SecretKey();
-    this.version = -1;
+  constructor(public_key: IdentityKey, secret_key: SecretKey, version: number = -1) {
+    this.public_key = public_key;
+    this.secret_key = secret_key;
+    this.version = version;
   }
 
   static async new(): Promise<IdentityKeyPair> {
-    const key_pair = await KeyPair.new();
-
-    const ikp = ClassUtil.new_instance(IdentityKeyPair);
-    ikp.version = 1;
-    ikp.secret_key = key_pair.secret_key;
-    ikp.public_key = IdentityKey.new(key_pair.public_key);
-
-    return ikp;
+    const keyPair = await KeyPair.new();
+    return new IdentityKeyPair(new IdentityKey(keyPair.public_key), keyPair.secret_key, 1);
   }
 
   serialise(): ArrayBuffer {
@@ -58,7 +53,7 @@ export class IdentityKeyPair {
   }
 
   encode(encoder: CBOR.Encoder): CBOR.Encoder {
-    encoder.object(3);
+    encoder.object(IdentityKeyPair.propertiesLength);
     encoder.u8(0);
     encoder.u8(this.version);
     encoder.u8(1);
@@ -68,25 +63,20 @@ export class IdentityKeyPair {
   }
 
   static decode(decoder: CBOR.Decoder): IdentityKeyPair {
-    const self = ClassUtil.new_instance(IdentityKeyPair);
+    const propertiesLength = decoder.object();
+    if (propertiesLength === IdentityKeyPair.propertiesLength) {
+      decoder.u8();
+      const version = decoder.u8();
 
-    const nprops = decoder.object();
-    for (let index = 0; index <= nprops - 1; index++) {
-      switch (decoder.u8()) {
-        case 0:
-          self.version = decoder.u8();
-          break;
-        case 1:
-          self.secret_key = SecretKey.decode(decoder);
-          break;
-        case 2:
-          self.public_key = IdentityKey.decode(decoder);
-          break;
-        default:
-          decoder.skip();
-      }
+      decoder.u8();
+      const secretKey = SecretKey.decode(decoder);
+
+      decoder.u8();
+      const publicKey = IdentityKey.decode(decoder);
+
+      return new IdentityKeyPair(publicKey, secretKey, version);
     }
 
-    return self;
+    throw new DecodeError(`Unexpected number of properties: "${propertiesLength}"`);
   }
 }

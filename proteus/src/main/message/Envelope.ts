@@ -20,39 +20,26 @@
 import * as CBOR from '@wireapp/cbor';
 
 import {MacKey} from '../derived/MacKey';
-import * as ClassUtil from '../util/ClassUtil';
 import {Message} from './Message';
+import {DecodeError} from '../errors';
 
 export class Envelope {
-  _message_enc: Uint8Array;
+  readonly _message_enc: Uint8Array;
+  readonly message: Message;
+  readonly version: number;
   mac: Uint8Array;
-  message: Message;
-  version: number;
 
-  constructor() {
-    this._message_enc = new Uint8Array([]);
-    this.mac = new Uint8Array([]);
-    this.message = new Message();
-    this.version = -1;
+  constructor(macKey: MacKey, message: Message, version: number = 1) {
+    const serializedMessage = new Uint8Array(message.serialise());
+    this.version = version;
+    this.mac = macKey.sign(serializedMessage);
+    this.message = message;
+    this._message_enc = serializedMessage;
   }
 
-  static new(mac_key: MacKey, message: Message): Envelope {
-    const serialized_message = new Uint8Array(message.serialise());
-
-    const env = ClassUtil.new_instance(Envelope);
-
-    env.version = 1;
-    env.mac = mac_key.sign(serialized_message);
-    env.message = message;
-    env._message_enc = serialized_message;
-
-    Object.freeze(env);
-    return env;
-  }
-
-  /** @param mac_key The remote party's MacKey */
-  verify(mac_key: MacKey): boolean {
-    return mac_key.verify(this.mac, this._message_enc);
+  /** @param macKey The remote party's MacKey */
+  verify(macKey: MacKey): boolean {
+    return macKey.verify(this.mac, this._message_enc);
   }
 
   /** @returns The serialized message envelope */
@@ -82,43 +69,27 @@ export class Envelope {
   }
 
   static decode(decoder: CBOR.Decoder): Envelope {
-    const env = ClassUtil.new_instance(Envelope);
-    const nprops = decoder.object();
+    const propertiesLength = decoder.object();
+    if (propertiesLength === 3) {
+      decoder.u8();
+      const version = decoder.u8();
 
-    for (let index = 0; index <= nprops - 1; index++) {
-      switch (decoder.u8()) {
-        case 0: {
-          env.version = decoder.u8();
-          break;
-        }
-        case 1: {
-          const nprops_mac = decoder.object();
+      decoder.u8();
+      decoder.object();
 
-          for (let subindex = 0; subindex <= nprops_mac - 1; subindex++) {
-            switch (decoder.u8()) {
-              case 0:
-                env.mac = new Uint8Array(decoder.bytes());
-                break;
-              default:
-                decoder.skip();
-            }
-          }
+      decoder.u8();
+      const mac = new Uint8Array(decoder.bytes());
 
-          break;
-        }
-        case 2: {
-          env._message_enc = new Uint8Array(decoder.bytes());
-          break;
-        }
-        default: {
-          decoder.skip();
-        }
-      }
+      decoder.u8();
+      const encodedMessage = new Uint8Array(decoder.bytes());
+
+      const message = Message.deserialise(encodedMessage.buffer);
+
+      const envelope = new Envelope(new MacKey(mac), message, version);
+      envelope.mac = mac;
+      return envelope;
     }
 
-    env.message = Message.deserialise(env._message_enc.buffer);
-
-    Object.freeze(env);
-    return env;
+    throw new DecodeError(`Unexpected number of properties: "${propertiesLength}"`);
   }
 }
