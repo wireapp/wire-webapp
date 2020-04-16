@@ -438,11 +438,13 @@ class App {
       await conversationRepository.conversationLabelRepository.loadLabels();
 
       const selfTeamId = userRepository.self().teamId;
-      const teamMemberIds = conversationRepository
-        .connectedUsers()
-        .filter(({teamId}) => teamId === selfTeamId)
-        .map(({id}) => id);
-      await teamRepository.updateTeamMembersByIds(teamRepository.team(), teamMemberIds);
+      if (selfTeamId) {
+        const teamMemberIds = conversationRepository
+          .connectedUsers()
+          .filter(({teamId}) => teamId === selfTeamId)
+          .map(({id}) => id);
+        await teamRepository.updateTeamMembersByIds(teamRepository.team(), teamMemberIds);
+      }
 
       telemetry.time_step(AppInitTimingsStep.APP_LOADED);
       this._showInterface();
