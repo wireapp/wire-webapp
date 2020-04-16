@@ -73,8 +73,8 @@ export class ClientMismatchHandler {
       eventInfoEntity.conversationId !== ''
         ? await this.conversationRepository.get_conversation_by_id(eventInfoEntity.conversationId)
         : undefined;
-    this.handleRedundant(redundant, payload, conversationEntity);
-    this.handleDeleted(deleted, payload, conversationEntity);
+    await this.handleRedundant(redundant, payload, conversationEntity);
+    await this.handleDeleted(deleted, payload, conversationEntity);
     return this.handleMissing(missing, payload, conversationEntity, eventInfoEntity);
   }
 
@@ -84,19 +84,23 @@ export class ClientMismatchHandler {
    * @note Contains clients of which the backend is sure that they should not be recipient of a message and verified they no longer exist.
    * @param recipients User client map containing redundant clients
    * @param payload Payload of the request
-   * @param [conversationEntity] Conversation entity
+   * @param conversationEntity Conversation entity
    * @returns Resolves when the payload got updated
    */
-  private handleDeleted(recipients: UserClients, payload: NewOTRMessage, conversationEntity?: Conversation): void {
+  private async handleDeleted(
+    recipients: UserClients,
+    payload: NewOTRMessage,
+    conversationEntity?: Conversation,
+  ): Promise<void> {
     if (Object.entries(recipients).length === 0) {
       return;
     }
     this.logger.debug(`Message contains deleted clients of '${Object.keys(recipients).length}' users`, recipients);
-    const removeDeletedClient = (userId: string, clientId: string) => {
+    const removeDeletedClient = async (userId: string, clientId: string) => {
       delete payload.recipients[userId][clientId];
-      this.userRepository.removeClientFromUser(userId, clientId);
+      await this.userRepository.removeClientFromUser(userId, clientId);
     };
-    this.removePayload(recipients, removeDeletedClient, conversationEntity, payload, false);
+    await this.removePayload(recipients, removeDeletedClient, conversationEntity, payload);
   }
 
   /**
@@ -104,7 +108,7 @@ export class ClientMismatchHandler {
    *
    * @param recipients User client map containing redundant clients
    * @param payload Payload of the request
-   * @param [conversationEntity] Conversation entity
+   * @param conversationEntity Conversation entity
    * @param eventInfoEntity Info about event
    * @returns Resolves with the updated payload
    */
@@ -117,7 +121,7 @@ export class ClientMismatchHandler {
     const missingUserIds = Object.keys(recipients);
 
     if (!missingUserIds.length) {
-      return Promise.resolve(payload);
+      return payload;
     }
 
     this.logger.debug(`Message is missing clients of '${missingUserIds.length}' users`, recipients);
@@ -157,16 +161,20 @@ export class ClientMismatchHandler {
    *   Sometimes clients of the self user are listed. Thus we cannot remove the payload for all the clients of a user without checking.
    * @param recipients User client map containing redundant clients
    * @param payload Payload of the request
-   * @param [conversationEntity] Conversation entity
+   * @param conversationEntity Conversation entity
    * @returns Resolves when the payload got updated
    */
-  private handleRedundant(recipients: UserClients, payload: NewOTRMessage, conversationEntity?: Conversation): void {
+  private async handleRedundant(
+    recipients: UserClients,
+    payload: NewOTRMessage,
+    conversationEntity?: Conversation,
+  ): Promise<void> {
     if (Object.entries(recipients).length === 0) {
       return;
     }
     this.logger.debug(`Message contains redundant clients of '${Object.keys(recipients).length}' users`, recipients);
     const removeRedundantClient = (userId: string, clientId: string) => delete payload.recipients[userId][clientId];
-    this.removePayload(recipients, removeRedundantClient, conversationEntity, payload, true);
+    await this.removePayload(recipients, removeRedundantClient, conversationEntity, payload);
   }
 
   /**
@@ -176,40 +184,40 @@ export class ClientMismatchHandler {
    * @param clientFn Function to remove clients
    * @param conversationEntity Conversation entity
    * @param payload Initial payload resulting in a 412
-   * @param verifyDeletedUsers Verifies if users still exist on the backend by checking their active clients
    * @returns Function array
    */
-  removePayload(
+  async removePayload(
     recipients: UserClients,
-    clientFn: Function,
+    clientFn: (userId: string, clientId: string) => any | Promise<any>,
     conversationEntity: Conversation = undefined,
     payload: NewOTRMessage,
-    verifyDeletedUsers: boolean,
-  ): void[] {
-    const result: void[] = [];
-
-    const removeDeletedUser = (userId: string) => {
+  ): Promise<void> {
+    const removeDeletedUser = async (userId: string): Promise<void> => {
       const clientIdsOfUser = Object.keys(payload.recipients[userId]);
       const noRemainingClients = !clientIdsOfUser.length;
 
-      if (noRemainingClients) {
-        if (conversationEntity !== undefined) {
-          if (conversationEntity.isGroup() && verifyDeletedUsers) {
-            const timestamp = this.serverTimeHandler.toServerTimestamp();
-            const event = EventBuilder.buildMemberLeave(conversationEntity, userId, false, timestamp);
-            this.eventRepository.injectEvent(event);
+      if (noRemainingClients && typeof conversationEntity !== 'undefined' && conversationEntity.isGroup()) {
+        try {
+          const users = await this.userRepository.fetchUsersById([userId]);
+          if (users.length === 0) {
+            throw new Error('No users found');
           }
+        } catch (error) {
+          const timestamp = this.serverTimeHandler.toServerTimestamp();
+          const memberLeaveEvent = EventBuilder.buildMemberLeave(conversationEntity, userId, false, timestamp);
+          this.eventRepository.injectEvent(memberLeaveEvent);
         }
-
-        delete payload.recipients[userId];
       }
+
+      delete payload.recipients[userId];
     };
 
-    Object.entries(recipients).forEach(([userId, clientIds = []]) => {
-      clientIds.forEach(clientId => result.push(clientFn(userId, clientId)));
-      result.push(removeDeletedUser(userId));
-    });
+    for (const [userId, clientIds = []] of Object.entries(recipients)) {
+      for (const clientId of clientIds) {
+        await clientFn(userId, clientId);
+      }
 
-    return result;
+      await removeDeletedUser(userId);
+    }
   }
 }
