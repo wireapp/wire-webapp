@@ -33,7 +33,7 @@ import {StatusCode} from '@wireapp/api-client/dist/http/';
 import {WebSocketClient} from '@wireapp/api-client/dist/tcp/';
 import * as cryptobox from '@wireapp/cryptobox';
 import {CRUDEngine, MemoryEngine, error as StoreEngineError} from '@wireapp/store-engine';
-import EventEmitter from 'events';
+import {EventEmitter} from 'events';
 import logdown from 'logdown';
 import {LoginSanitizer} from './auth/';
 import {BroadcastService} from './broadcast/';

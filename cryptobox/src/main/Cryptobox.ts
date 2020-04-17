@@ -22,7 +22,7 @@ import {PriorityQueue} from '@wireapp/priority-queue';
 import {keys as ProteusKeys, message as ProteusMessage, session as ProteusSession} from '@wireapp/proteus';
 import {CRUDEngine} from '@wireapp/store-engine';
 import {Decoder, Encoder} from 'bazinga64';
-import EventEmitter from 'events';
+import {EventEmitter} from 'events';
 import logdown from 'logdown';
 import {CryptoboxSession} from './CryptoboxSession';
 import {DecryptionError} from './DecryptionError';
