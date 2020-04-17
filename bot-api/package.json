@@ -2,7 +2,7 @@
   "dependencies": {
     "@types/long": "4.0.1",
     "@types/node": "*",
-    "@wireapp/core": "16.6.3",
+    "@wireapp/core": "16.6.4",
     "pure-uuid": "1.6.0"
   },
   "devDependencies": {
@@ -33,5 +33,5 @@
     "test:node": "jasmine --config=jasmine.json",
     "test:project": "yarn dist && yarn test"
   },
-  "version": "7.9.7"
+  "version": "7.9.8"
 }
