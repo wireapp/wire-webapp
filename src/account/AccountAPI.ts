@@ -21,6 +21,7 @@ import {AxiosRequestConfig} from 'axios';
 
 import {HttpClient, BackendErrorLabel} from '../http';
 import {CallConfigData} from './CallConfigData';
+import {BackendConfigData} from './BackendConfigData';
 import {DomainData} from './DomainData';
 import {CustomBackendNotFoundError} from './AccountError';
 import {SSOSettings} from './SSOSettings';
@@ -30,6 +31,7 @@ export class AccountAPI {
 
   public static readonly URL = {
     ACTIVATE: '/activate',
+    BACKEND_CONFIG: '/config.json',
     BY_DOMAIN: 'by-domain',
     CALLS: '/calls',
     CALLS_CONFIG: 'config',
@@ -190,6 +192,16 @@ export class AccountAPI {
     };
 
     const response = await this.client.sendJSON<CallConfigData>(config);
+    return response.data;
+  }
+
+  public async getConfig(): Promise<BackendConfigData> {
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      url: `${AccountAPI.URL.BACKEND_CONFIG}`,
+    };
+
+    const response = await this.client.sendJSON<BackendConfigData>(config);
     return response.data;
   }
 }
