@@ -18,13 +18,13 @@
  */
 
 import {APIClient} from '@wireapp/api-client';
+import {AssetRetentionPolicy} from '@wireapp/api-client/dist/asset';
 import {Asset, LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {arrayToMd5Base64, loadFileBuffer, loadImage} from 'Util/util';
 import {assetV3, legacyAsset} from 'Util/ValidationUtil';
 import {WebWorker} from 'Util/worker';
 
-import {AssetRetentionPolicy} from '../assets/AssetRetentionPolicy';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {encryptAesAsset} from './AssetCrypto';
 import {BackendClient} from '../service/BackendClient';

@@ -17,7 +17,7 @@
  *
  */
 
-import {AssetRetentionPolicy} from '../assets/AssetRetentionPolicy';
+import {AssetRetentionPolicy} from '@wireapp/api-client/dist/asset';
 import {Config} from '../Config';
 
 export class ValidationUtilError extends Error {
