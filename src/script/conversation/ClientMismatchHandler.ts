@@ -188,7 +188,7 @@ export class ClientMismatchHandler {
    */
   async removePayload(
     recipients: UserClients,
-    clientFn: (userId: string, clientId: string) => any | Promise<any>,
+    clientFn: (userId: string, clientId: string) => void | Promise<void>,
     conversationEntity: Conversation = undefined,
     payload: NewOTRMessage,
   ): Promise<void> {
