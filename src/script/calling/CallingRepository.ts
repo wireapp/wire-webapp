@@ -29,6 +29,7 @@ import {
   VIDEO_STATE,
   Wcall,
   getAvsInstance,
+  QUALITY,
 } from '@wireapp/avs';
 import {Calling, GenericMessage} from '@wireapp/protocol-messaging';
 import {amplify} from 'amplify';
@@ -190,6 +191,26 @@ export class CallingRepository {
       () => {}, // `acbrh`,
       this.videoStateChanged, // `vstateh`,
       0,
+    );
+    wCall.setNetworkQualityHandler(
+      wUser,
+      (conversationId: string, userId: string, quality: number) => {
+        switch (quality) {
+          case QUALITY.NORMAL: {
+            this.logger.log(`Normal call quality in conversation "${conversationId}".`);
+            break;
+          }
+          case QUALITY.MEDIUM: {
+            this.logger.warn(`Medium call quality in conversation "${conversationId}".`);
+            break;
+          }
+          case QUALITY.POOR: {
+            this.logger.warn(`Poor call quality in conversation "${conversationId}".`);
+            break;
+          }
+        }
+      },
+      10_000,
     );
     wCall.setMuteHandler(wUser, this.isMuted);
     wCall.setStateHandler(wUser, this.updateCallState);
