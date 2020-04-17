@@ -17,7 +17,7 @@
  *
  */
 
-import EventEmitter from 'events';
+import {EventEmitter} from 'events';
 import logdown from 'logdown';
 
 import {AccessTokenData} from '../auth/';

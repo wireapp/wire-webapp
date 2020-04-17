@@ -18,7 +18,7 @@
  */
 
 import {Runtime} from '@wireapp/commons';
-import EventEmitter from 'events';
+import {EventEmitter} from 'events';
 import {Cookie} from './Cookie';
 
 enum TOPIC {
