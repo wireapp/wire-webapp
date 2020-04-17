@@ -23,12 +23,13 @@ import {
   CALL_TYPE,
   CONV_TYPE,
   ENV as AVS_ENV,
+  getAvsInstance,
   LOG_LEVEL,
+  QUALITY,
   REASON,
   STATE as CALL_STATE,
   VIDEO_STATE,
   Wcall,
-  getAvsInstance,
 } from '@wireapp/avs';
 import {Calling, GenericMessage} from '@wireapp/protocol-messaging';
 import {amplify} from 'amplify';
@@ -37,7 +38,7 @@ import 'webrtc-adapter';
 
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
-import {Logger, getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 import {createRandomUuid} from 'Util/util';
 
 import {Config} from '../Config';
@@ -73,6 +74,7 @@ export class CallingRepository {
   private readonly eventRepository: EventRepository;
   private readonly mediaStreamHandler: MediaStreamHandler;
   private readonly serverTimeHandler: ServerTimeHandler;
+  private callQuality: {[conversationId: string]: QUALITY | undefined} = {};
 
   private avsVersion: number;
   private incomingCallCallback: (call: Call) => void;
@@ -189,7 +191,33 @@ export class CallingRepository {
       this.requestConfig, // `cfg_reqh`,
       () => {}, // `acbrh`,
       this.videoStateChanged, // `vstateh`,
-      0,
+    );
+    const tenSeconds = 10;
+    wCall.setNetworkQualityHandler(
+      wUser,
+      (conversationId: string, userId: string, quality: number) => {
+        if (this.callQuality[conversationId] === quality) {
+          return;
+        }
+
+        this.callQuality[conversationId] = quality;
+
+        switch (quality) {
+          case QUALITY.NORMAL: {
+            this.logger.log(`Normal call quality in conversation "${conversationId}".`);
+            break;
+          }
+          case QUALITY.MEDIUM: {
+            this.logger.warn(`Medium call quality in conversation "${conversationId}".`);
+            break;
+          }
+          case QUALITY.POOR: {
+            this.logger.warn(`Poor call quality in conversation "${conversationId}".`);
+            break;
+          }
+        }
+      },
+      tenSeconds,
     );
     wCall.setMuteHandler(wUser, this.isMuted);
     wCall.setStateHandler(wUser, this.updateCallState);
@@ -445,6 +473,7 @@ export class CallingRepository {
   }
 
   leaveCall(conversationId: ConversationId): void {
+    delete this.callQuality[conversationId];
     this.wCall.end(this.wUser, conversationId);
   }
 
@@ -723,7 +752,7 @@ export class CallingRepository {
           This bug crashes the browser if the mediaStream is returned right away (probably some race condition in Chrome internal code)
           The timeout(0) fixes this issue.
         */
-        setTimeout(() => resolve(selfParticipant.getMediaStream()), 0);
+        window.setTimeout(() => resolve(selfParticipant.getMediaStream()), 0);
       });
     }
     const isGroup = call.conversationType === CONV_TYPE.GROUP;
