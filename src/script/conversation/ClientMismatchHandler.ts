@@ -97,7 +97,7 @@ export class ClientMismatchHandler {
       return;
     }
     this.logger.debug(`Message contains deleted clients of '${Object.keys(recipients).length}' users`, recipients);
-    const removeDeletedClient = async (userId: string, clientId: string) => {
+    const removeDeletedClient = async (userId: string, clientId: string): Promise<void> => {
       delete payload.recipients[userId][clientId];
       await this.userRepository.removeClientFromUser(userId, clientId);
     };
@@ -174,7 +174,9 @@ export class ClientMismatchHandler {
       return;
     }
     this.logger.debug(`Message contains redundant clients of '${Object.keys(recipients).length}' users`, recipients);
-    const removeRedundantClient = (userId: string, clientId: string) => delete payload.recipients[userId][clientId];
+    const removeRedundantClient = (userId: string, clientId: string) => {
+      delete payload.recipients[userId][clientId];
+    };
     await this.removePayload(recipients, removeRedundantClient, conversationEntity, payload);
   }
 
