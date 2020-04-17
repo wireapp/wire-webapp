@@ -23,13 +23,13 @@ import {
   CALL_TYPE,
   CONV_TYPE,
   ENV as AVS_ENV,
+  getAvsInstance,
   LOG_LEVEL,
+  QUALITY,
   REASON,
   STATE as CALL_STATE,
   VIDEO_STATE,
   Wcall,
-  getAvsInstance,
-  QUALITY,
 } from '@wireapp/avs';
 import {Calling, GenericMessage} from '@wireapp/protocol-messaging';
 import {amplify} from 'amplify';
@@ -38,7 +38,7 @@ import 'webrtc-adapter';
 
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
-import {Logger, getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 import {createRandomUuid} from 'Util/util';
 
 import {Config} from '../Config';
@@ -74,6 +74,7 @@ export class CallingRepository {
   private readonly eventRepository: EventRepository;
   private readonly mediaStreamHandler: MediaStreamHandler;
   private readonly serverTimeHandler: ServerTimeHandler;
+  private callQuality: {[conversationId: string]: QUALITY | undefined} = {};
 
   private avsVersion: number;
   private incomingCallCallback: (call: Call) => void;
@@ -195,6 +196,12 @@ export class CallingRepository {
     wCall.setNetworkQualityHandler(
       wUser,
       (conversationId: string, userId: string, quality: number) => {
+        if (this.callQuality[conversationId] === quality) {
+          return;
+        }
+
+        this.callQuality[conversationId] = quality;
+
         switch (quality) {
           case QUALITY.NORMAL: {
             this.logger.log(`Normal call quality in conversation "${conversationId}".`);
@@ -466,6 +473,7 @@ export class CallingRepository {
   }
 
   leaveCall(conversationId: ConversationId): void {
+    delete this.callQuality[conversationId];
     this.wCall.end(this.wUser, conversationId);
   }
 
