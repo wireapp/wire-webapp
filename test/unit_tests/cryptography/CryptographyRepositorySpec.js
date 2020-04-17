@@ -161,7 +161,7 @@ describe('CryptographyRepository', () => {
 
       expect(alice).toBeDefined();
 
-      const aliceBundle = Proteus.keys.PreKeyBundle.new(alice.public_key, preKeys[0]);
+      const aliceBundle = new Proteus.keys.PreKeyBundle(alice.public_key, preKeys[0]);
 
       const bobEngine = new MemoryEngine();
       await bobEngine.init('bob');
