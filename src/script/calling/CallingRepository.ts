@@ -45,6 +45,7 @@ import {Config} from '../Config';
 
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
+import {WarningsViewModel} from '../view_model/WarningsViewModel';
 
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 
@@ -204,14 +205,17 @@ export class CallingRepository {
 
         switch (quality) {
           case QUALITY.NORMAL: {
+            amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.CALL_QUALITY_POOR);
             this.logger.log(`Normal call quality in conversation "${conversationId}".`);
             break;
           }
           case QUALITY.MEDIUM: {
+            amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.CALL_QUALITY_POOR);
             this.logger.warn(`Medium call quality in conversation "${conversationId}".`);
             break;
           }
           case QUALITY.POOR: {
+            amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.CALL_QUALITY_POOR);
             this.logger.warn(`Poor call quality in conversation "${conversationId}".`);
             break;
           }
@@ -473,6 +477,7 @@ export class CallingRepository {
   }
 
   leaveCall(conversationId: ConversationId): void {
+    amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.CALL_QUALITY_POOR);
     delete this.callQuality[conversationId];
     this.wCall.end(this.wUser, conversationId);
   }
