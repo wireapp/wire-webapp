@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.6.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.5.0...@wireapp/api-client@11.6.0) (2020-04-17)
+
+
+### Features
+
+* **api-client:** Expose expiring asset policies ([#2965](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2965)) ([44acef5](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/44acef5c318f6df6821cbcb9a4add1ec707b8f45))
+
+
+
+
+
 # [11.5.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.4.0...@wireapp/api-client@11.5.0) (2020-04-17)
 
 
