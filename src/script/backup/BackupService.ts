@@ -31,7 +31,7 @@ export class BackupService {
   // tslint:disable-next-line:typedef
   static get CONFIG() {
     return {
-      BATCH_SIZE: 10000,
+      BATCH_SIZE: 10_000,
       SUPPORTED_TABLES: [StorageSchemata.OBJECT_STORE.CONVERSATIONS, StorageSchemata.OBJECT_STORE.EVENTS],
     };
   }

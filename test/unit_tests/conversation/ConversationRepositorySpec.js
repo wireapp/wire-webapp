@@ -720,7 +720,7 @@ describe('ConversationRepository', () => {
               accent_id: 0,
               picture: [
                 {
-                  content_length: 19190,
+                  content_length: 19_190,
                   data: null,
                   content_type: 'image/jpeg',
                   id: 'ab7eb2f7-7c5b-4e55-ab16-dfc206891e67',
@@ -736,7 +736,7 @@ describe('ConversationRepository', () => {
                   },
                 },
                 {
-                  content_length: 82690,
+                  content_length: 82_690,
                   data: null,
                   content_type: 'image/jpeg',
                   id: '87c95372-fce7-4215-861a-a3e0fe262e48',

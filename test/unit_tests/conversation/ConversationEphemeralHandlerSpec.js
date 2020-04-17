@@ -34,7 +34,7 @@ describe('ConversationEphemeralHandler', () => {
       const conversationEphemeralHandler = buildConversationEphemeralHandler();
       const testedTimers = [
         {expected: 1000, value: 1000},
-        {expected: 36000000, value: 36000000},
+        {expected: 36_000_000, value: 36_000_000},
         {expected: null, value: null},
       ];
 

@@ -25,7 +25,7 @@ window.lorem_ipsum =
 window.entities = {
   picture: [
     {
-      content_length: 26466,
+      content_length: 26_466,
       data: null,
       content_type: 'image/jpeg',
       id: '6cb67e89-d48a-50e2-88f1-1733fff5c119',
@@ -42,7 +42,7 @@ window.entities = {
       },
     },
     {
-      content_length: 179848,
+      content_length: 179_848,
       data: null,
       content_type: 'image/jpeg',
       id: '2ea9f416-28dc-5d86-9d34-a30863833c2a',

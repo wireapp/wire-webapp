@@ -423,9 +423,9 @@ describe('Conversation Mapper', () => {
       };
       const tests = [
         {
-          expected: {message_timer: 10000},
+          expected: {message_timer: 10_000},
           local: {...baseConversation, message_timer: undefined},
-          remote: {...baseConversation, message_timer: 10000},
+          remote: {...baseConversation, message_timer: 10_000},
         },
         {
           expected: {message_timer: 0},

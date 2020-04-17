@@ -277,7 +277,7 @@ describe('Conversation', () => {
 
     const message1 = new Message();
     message1.id = createRandomUuid();
-    message1.timestamp(reference_timestamp - 10000);
+    message1.timestamp(reference_timestamp - 10_000);
     message1.user(self_user);
 
     const message2 = new Message();
@@ -451,7 +451,7 @@ describe('Conversation', () => {
       expect(conversation_et.get_next_iso_date(referenceTimestamp)).toBe(reference_iso_date);
       expect(conversation_et.get_next_iso_date('foo')).toBeGreaterThan(reference_iso_date);
 
-      const last_server_timestamp = referenceTimestamp + 10000;
+      const last_server_timestamp = referenceTimestamp + 10_000;
       conversation_et.last_server_timestamp(last_server_timestamp);
       const expected_iso_date = new Date(last_server_timestamp + 1).toISOString();
 

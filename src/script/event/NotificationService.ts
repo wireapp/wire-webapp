@@ -57,7 +57,7 @@ export class NotificationService {
    * @param size Maximum number of notifications to return
    * @returns Resolves with a pages list of notifications
    */
-  getNotifications(clientId?: string, notificationId?: string, size: number = 10000): Promise<NotificationList> {
+  getNotifications(clientId?: string, notificationId?: string, size: number = 10_000): Promise<NotificationList> {
     return this.apiClient.notification.api.getNotifications(clientId, size, notificationId);
   }
 

@@ -88,7 +88,7 @@ export class Configuration {
 
   // Maximum characters per received message
   // Encryption is approx. +40% of the original payload so let's round it at +50%
-  readonly MAXIMUM_MESSAGE_LENGTH_RECEIVING = 12000 * 1.5;
+  readonly MAXIMUM_MESSAGE_LENGTH_RECEIVING = 12_000 * 1.5;
 
   // bigger requests will be split in chunks with a maximum size as defined
   readonly MAXIMUM_USERS_PER_REQUEST = 200;

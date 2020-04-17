@@ -55,7 +55,7 @@ export class EventRepository {
       ],
       NOTIFICATION_BATCHES: {
         INITIAL: 500,
-        MAX: 10000,
+        MAX: 10_000,
         SUBSEQUENT: 5000,
       },
     };

@@ -102,7 +102,7 @@ export class RuntimeAction {
       return new Promise((resolve, reject) => {
         const connectionTimeout = setTimeout(
           () => reject(new Error('Error opening IndexedDB (response timeout)')),
-          10000,
+          10_000,
         );
         dbOpenRequest.onerror = event => {
           clearTimeout(connectionTimeout);
