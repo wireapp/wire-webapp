@@ -29,6 +29,7 @@ import {UserRepository} from '../user/UserRepository';
 import {EventInfoEntity} from './EventInfoEntity';
 import {NewOTRMessage} from '@wireapp/api-client/dist/conversation';
 import {Conversation} from '../entity/Conversation';
+import {BackendClientError} from '../error/BackendClientError';
 
 export class ClientMismatchHandler {
   private readonly conversationRepository: ConversationRepository;
@@ -196,11 +197,17 @@ export class ClientMismatchHandler {
       const noRemainingClients = !clientIdsOfUser.length;
 
       if (noRemainingClients && typeof conversationEntity !== 'undefined' && conversationEntity.isGroup()) {
-        const users = await this.userRepository.fetchUsersById([userId]);
-        if (users.length === 0 || users.every(user => user && !!user.isDeleted)) {
-          const timestamp = this.serverTimeHandler.toServerTimestamp();
-          const memberLeaveEvent = EventBuilder.buildMemberLeave(conversationEntity, userId, false, timestamp);
-          this.eventRepository.injectEvent(memberLeaveEvent);
+        try {
+          await this.userRepository['userService'].getUser('userId');
+        } catch (error) {
+          const isNotFound = error.code === BackendClientError.STATUS_CODE.NOT_FOUND;
+          if (isNotFound) {
+            const timestamp = this.serverTimeHandler.toServerTimestamp();
+            const memberLeaveEvent = EventBuilder.buildMemberLeave(conversationEntity, userId, false, timestamp);
+            this.eventRepository.injectEvent(memberLeaveEvent);
+          } else {
+            throw error;
+          }
         }
       }
 
