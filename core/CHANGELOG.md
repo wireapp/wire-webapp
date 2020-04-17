@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [16.6.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@16.6.2...@wireapp/core@16.6.3) (2020-04-17)
+
+
+### Bug Fixes
+
+* **api-client,core,cryptobox:** Improve type compatibility with Node.js v13 ([#2960](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/2960)) ([b442dfd](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/b442dfdd7d5adc496709992da692d71dc49bb754))
+
+
+
+
+
 ## [16.6.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@16.6.1...@wireapp/core@16.6.2) (2020-04-17)
 
 **Note:** Version bump only for package @wireapp/core

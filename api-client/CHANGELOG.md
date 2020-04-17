@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.3.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.3.0...@wireapp/api-client@11.3.1) (2020-04-17)
+
+
+### Bug Fixes
+
+* **api-client,core,cryptobox:** Improve type compatibility with Node.js v13 ([#2960](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2960)) ([b442dfd](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/b442dfdd7d5adc496709992da692d71dc49bb754))
+
+
+
+
+
 # [11.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.2.0...@wireapp/api-client@11.3.0) (2020-04-16)
 
 

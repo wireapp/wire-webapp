@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.2.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@12.2.1...@wireapp/cryptobox@12.2.2) (2020-04-17)
+
+
+### Bug Fixes
+
+* **api-client,core,cryptobox:** Improve type compatibility with Node.js v13 ([#2960](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/issues/2960)) ([b442dfd](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/commit/b442dfdd7d5adc496709992da692d71dc49bb754))
+
+
+
+
+
 ## [12.2.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@12.2.0...@wireapp/cryptobox@12.2.1) (2020-04-17)
 
 **Note:** Version bump only for package @wireapp/cryptobox
