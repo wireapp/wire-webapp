@@ -27,6 +27,20 @@ interface HeadingProps<T = HTMLHeadingElement> extends TextProps<T> {
   level?: string;
 }
 
+export const Heading = ({level, ...props}: HeadingProps) => {
+  switch (level) {
+    case '2':
+      return <H2 {...props} />;
+    case '3':
+      return <H3 {...props} />;
+    case '4':
+      return <H4 {...props} />;
+    case '1':
+    default:
+      return <H1 {...props} />;
+  }
+};
+
 export const h1Style: <T>(theme: Theme, props: HeadingProps<T>) => ObjectInterpolation<undefined> = (
   theme,
   {block = true, color = theme.general.color, level = '1', noWrap = false, textTransform = 'none', ...props},
@@ -90,17 +104,3 @@ export const h4Style: <T>(theme: Theme, props: HeadingProps<T>) => ObjectInterpo
 });
 
 export const H4 = (props: HeadingProps) => <h3 css={theme => h4Style(theme, props)} {...filterTextProps(props)} />;
-
-export const Heading = ({level, ...props}: HeadingProps) => {
-  switch (level) {
-    case '2':
-      return <H2 {...props} />;
-    case '3':
-      return <H3 {...props} />;
-    case '4':
-      return <H4 {...props} />;
-    case '1':
-    default:
-      return <H1 {...props} />;
-  }
-};
