@@ -135,6 +135,14 @@
         </div>
       <!-- /ko -->
 
+      <!-- ko if: visibleWarning() === TYPE.CALL_QUALITY_POOR -->
+      <div class="warning-bar warning-bar-connection warning-bar-poor-call-quality">
+        <div class="warning-bar-message">
+          <span data-bind="text: t('warningCallQualityPoor')"></span>
+        </div>
+      </div>
+      <!-- /ko -->
+
       <!-- ko if: visibleWarning() === TYPE.CONNECTIVITY_RECOVERY -->
         <div class="warning-bar warning-bar-progress"></div>
       <!-- /ko -->
