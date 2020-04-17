@@ -85,39 +85,12 @@ export const buttonStyle: <T>(theme: Theme, props: ButtonProps<T>) => ObjectInte
   width: block ? '100%' : 'auto',
 });
 
-export const buttonLinkStyle: (
-  theme: Theme,
-  props: ButtonProps<HTMLAnchorElement>,
-) => ObjectInterpolation<undefined> = (theme, props) => ({
-  ...buttonStyle(theme, props),
-  display: 'inline-flex !important',
-});
-
-export const filterButtonProps = (props: ButtonProps) => {
-  return filterProps(filterTextProps(props) as ButtonProps, ['backgroundColor', 'noCapital']);
-};
-
 export const Button = ({showLoading, children, loadingColor = COLOR.WHITE, ...props}: ButtonProps) => (
   <button css={theme => buttonStyle(theme, props)} {...filterButtonProps(props)}>
     {showLoading ? <Loading size={30} color={loadingColor} style={{display: 'flex', margin: 'auto'}} /> : children}
   </button>
 );
 
-const filterButtonLinkProps = (props: ButtonProps<HTMLAnchorElement>) => {
-  return filterProps(filterTextProps(props) as ButtonProps<HTMLAnchorElement>, [
-    'backgroundColor',
-    'disabled',
-    'noCapital',
-  ]);
+export const filterButtonProps = (props: ButtonProps) => {
+  return filterProps(filterTextProps(props) as ButtonProps, ['backgroundColor', 'noCapital']);
 };
-
-export const ButtonLink = ({
-  children,
-  showLoading,
-  loadingColor = COLOR.WHITE,
-  ...props
-}: ButtonProps<HTMLAnchorElement>) => (
-  <a css={theme => buttonLinkStyle(theme, props)} {...filterButtonLinkProps(props)}>
-    {showLoading ? <Loading size={30} color={loadingColor} style={{display: 'flex', margin: 'auto'}} /> : children}
-  </a>
-);

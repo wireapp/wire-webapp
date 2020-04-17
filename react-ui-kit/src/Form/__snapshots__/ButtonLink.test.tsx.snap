@@ -1,9 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`"Button" renders (dark theme) 1`] = `
+exports[`"ButtonLink" renders (dark theme) 1`] = `
 .emotion-0 {
   color: #fff;
-  display: inline-block;
+  display: -webkit-inline-box !important;
+  display: -webkit-inline-flex !important;
+  display: -ms-inline-flexbox !important;
+  display: inline-flex !important;
   font-size: 16px;
   font-weight: 600;
   opacity: 1;
@@ -47,15 +50,15 @@ exports[`"Button" renders (dark theme) 1`] = `
 <div
   className="emotion-1"
 >
-  <button
+  <a
     className="emotion-0"
   >
-    Button
-  </button>
+    ButtonLink
+  </a>
 </div>
 `;
 
-exports[`"Button" renders 1`] = `
+exports[`"ButtonLink" renders 1`] = `
 .emotion-1 {
   background: rgb(247,248,250);
   -webkit-transition: background 0.15s;
@@ -64,7 +67,10 @@ exports[`"Button" renders 1`] = `
 
 .emotion-0 {
   color: #fff;
-  display: inline-block;
+  display: -webkit-inline-box !important;
+  display: -webkit-inline-flex !important;
+  display: -ms-inline-flexbox !important;
+  display: inline-flex !important;
   font-size: 16px;
   font-weight: 600;
   opacity: 1;
@@ -102,70 +108,15 @@ exports[`"Button" renders 1`] = `
 <div
   className="emotion-1"
 >
-  <button
+  <a
     className="emotion-0"
   >
     Submit
-  </button>
+  </a>
 </div>
 `;
 
-exports[`"Button" renders as block 1`] = `
-.emotion-1 {
-  background: rgb(247,248,250);
-  -webkit-transition: background 0.15s;
-  transition: background 0.15s;
-}
-
-.emotion-0 {
-  color: #fff;
-  display: inline-block;
-  font-size: 16px;
-  font-weight: 600;
-  opacity: 1;
-  overflow: hidden;
-  text-align: center;
-  text-overflow: ellipsis;
-  text-transform: uppercase;
-  white-space: nowrap;
-  background-color: #2391d3;
-  border: 0;
-  border-radius: 8px;
-  cursor: pointer;
-  height: 48px;
-  line-height: 48px;
-  margin-bottom: 16px;
-  max-width: 100%;
-  min-width: 150px;
-  outline: none;
-  padding: 0 32px;
-  -webkit-text-decoration: none;
-  text-decoration: none;
-  touch-action: manipulation;
-  -webkit-transition: all 0.24s;
-  transition: all 0.24s;
-  width: 100%;
-}
-
-.emotion-0:hover,
-.emotion-0:focus {
-  background-color: rgb(33,136,198);
-  -webkit-text-decoration: none;
-  text-decoration: none;
-}
-
-<div
-  className="emotion-1"
->
-  <button
-    className="emotion-0"
-  >
-    Submit
-  </button>
-</div>
-`;
-
-exports[`"Button" renders in loading state 1`] = `
+exports[`"ButtonLink" renders in loading state 1`] = `
 @keyframes animation-0 {
   0% {
     stroke-dashoffset: 251.36;
@@ -198,7 +149,10 @@ exports[`"Button" renders in loading state 1`] = `
 
 .emotion-1 {
   color: #fff;
-  display: inline-block;
+  display: -webkit-inline-box !important;
+  display: -webkit-inline-flex !important;
+  display: -ms-inline-flexbox !important;
+  display: inline-flex !important;
   font-size: 16px;
   font-weight: 600;
   opacity: 1;
@@ -245,7 +199,7 @@ exports[`"Button" renders in loading state 1`] = `
 <div
   className="emotion-2"
 >
-  <button
+  <a
     className="emotion-1"
   >
     <svg
@@ -277,62 +231,6 @@ exports[`"Button" renders in loading state 1`] = `
         strokeLinecap="round"
       />
     </svg>
-  </button>
-</div>
-`;
-
-exports[`"Button" renders when disabled 1`] = `
-.emotion-1 {
-  background: rgb(247,248,250);
-  -webkit-transition: background 0.15s;
-  transition: background 0.15s;
-}
-
-.emotion-0 {
-  color: #fff;
-  display: inline-block;
-  font-size: 16px;
-  font-weight: 600;
-  opacity: 0.56;
-  overflow: hidden;
-  text-align: center;
-  text-overflow: ellipsis;
-  text-transform: uppercase;
-  white-space: nowrap;
-  background-color: #2391d3;
-  border: 0;
-  border-radius: 8px;
-  cursor: default;
-  height: 48px;
-  line-height: 48px;
-  margin-bottom: 16px;
-  max-width: 100%;
-  min-width: 150px;
-  outline: none;
-  padding: 0 32px;
-  -webkit-text-decoration: none;
-  text-decoration: none;
-  touch-action: manipulation;
-  -webkit-transition: all 0.24s;
-  transition: all 0.24s;
-  width: auto;
-}
-
-.emotion-0:hover,
-.emotion-0:focus {
-  background-color: #2391d3;
-  -webkit-text-decoration: none;
-  text-decoration: none;
-}
-
-<div
-  className="emotion-1"
->
-  <button
-    className="emotion-0"
-    disabled={true}
-  >
-    Submit
-  </button>
+  </a>
 </div>
 `;

@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,17 +17,13 @@
  *
  */
 
-export * from './Button';
-export * from './ButtonLink';
-export * from './Checkbox';
-export * from './CodeInput';
-export * from './ErrorMessage';
-export * from './Form';
-export * from './Input';
-export * from './InputBlock';
-export * from './InputSubmitCombo';
-export * from './RoundIconButton';
-export * from './Select';
-export * from './ShakeBox';
-export * from './TextArea';
-export * from './Tooltip';
+import React from 'react';
+import {THEME_ID} from '../Layout';
+import {matchComponent} from '../test/testUtil';
+import {ButtonLink} from './ButtonLink';
+
+describe('"ButtonLink"', () => {
+  it('renders', () => matchComponent(<ButtonLink>Submit</ButtonLink>));
+  it('renders (dark theme)', () => matchComponent(<ButtonLink>ButtonLink</ButtonLink>, THEME_ID.DARK));
+  it('renders in loading state', () => matchComponent(<ButtonLink showLoading>Submit</ButtonLink>));
+});
