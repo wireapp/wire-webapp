@@ -20,20 +20,8 @@
 const path = require('path');
 const webpack = require('webpack');
 
-const DEMO_DIR = path.resolve(__dirname, 'demo');
-
 module.exports = {
-  devServer: {
-    contentBase: DEMO_DIR,
-    hot: true,
-    hotOnly: true,
-    open: true,
-    overlay: true,
-  },
   devtool: 'source-map',
-  entry: {
-    bundle: ['react-hot-loader/patch', `${DEMO_DIR}/index.jsx`],
-  },
   mode: 'development',
   module: {
     rules: [
@@ -44,15 +32,10 @@ module.exports = {
       },
     ],
   },
-  output: {
-    filename: '[name].js',
-    path: DEMO_DIR,
-  },
   plugins: [new webpack.HotModuleReplacementPlugin(), new webpack.NamedModulesPlugin()],
   resolve: {
     alias: {
       '@wireapp/react-ui-kit': path.resolve(__dirname, 'src'),
-      'react-dom': '@hot-loader/react-dom',
     },
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
   },
