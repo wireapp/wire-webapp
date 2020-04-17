@@ -210,7 +210,7 @@ export class CallingRepository {
           }
         }
       },
-      10_000,
+      10000,
     );
     wCall.setMuteHandler(wUser, this.isMuted);
     wCall.setStateHandler(wUser, this.updateCallState);
