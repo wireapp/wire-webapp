@@ -199,17 +199,12 @@ export class ClientMismatchHandler {
       const noRemainingClients = !clientIdsOfUser.length;
 
       if (noRemainingClients && typeof conversationEntity !== 'undefined' && conversationEntity.isGroup()) {
-        try {
-          await this.userRepository['userService'].getUser('userId');
-        } catch (error) {
-          const isNotFound = error.code === BackendClientError.STATUS_CODE.NOT_FOUND;
-          if (isNotFound) {
-            const timestamp = this.serverTimeHandler.toServerTimestamp();
-            const memberLeaveEvent = EventBuilder.buildMemberLeave(conversationEntity, userId, false, timestamp);
-            this.eventRepository.injectEvent(memberLeaveEvent);
-          } else {
-            throw error;
-          }
+        const result = await this.userRepository['userService'].getUser(userId);
+        const isDeleted = result?.deleted === true;
+        if (isDeleted) {
+          const timestamp = this.serverTimeHandler.toServerTimestamp();
+          const memberLeaveEvent = EventBuilder.buildMemberLeave(conversationEntity, userId, false, timestamp);
+          this.eventRepository.injectEvent(memberLeaveEvent);
         }
       }
 
