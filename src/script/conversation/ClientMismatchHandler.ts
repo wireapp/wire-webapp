@@ -29,7 +29,6 @@ import {UserRepository} from '../user/UserRepository';
 import {EventInfoEntity} from './EventInfoEntity';
 import {NewOTRMessage} from '@wireapp/api-client/dist/conversation';
 import {Conversation} from '../entity/Conversation';
-import {BackendClientError} from '../error/BackendClientError';
 
 export class ClientMismatchHandler {
   private readonly conversationRepository: ConversationRepository;
