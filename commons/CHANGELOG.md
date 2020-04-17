@@ -1,6 +1,18 @@
 # Change Log
 
-All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.4.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@3.3.10...@wireapp/commons@3.4.0) (2020-04-17)
+
+
+### Features
+
+* **api-client:** Add backend config endpoint ([#2774](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/issues/2774)) ([5ee4128](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/commit/5ee41283dd9094a58baa84287e731ef067ac8418))
+
+
+
+
 
 ## [3.3.10](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@3.3.9...@wireapp/commons@3.3.10) (2020-04-08)
 

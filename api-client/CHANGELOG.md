@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.4.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.3.2...@wireapp/api-client@11.4.0) (2020-04-17)
+
+
+### Features
+
+* **api-client:** Add backend config endpoint ([#2774](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2774)) ([5ee4128](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/5ee41283dd9094a58baa84287e731ef067ac8418))
+
+
+
+
+
 ## [11.3.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.3.1...@wireapp/api-client@11.3.2) (2020-04-17)
 
 **Note:** Version bump only for package @wireapp/api-client

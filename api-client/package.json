@@ -7,7 +7,7 @@
     "@types/node": "~12",
     "@types/spark-md5": "3.0.2",
     "@types/tough-cookie": "4.0.0",
-    "@wireapp/commons": "3.3.10",
+    "@wireapp/commons": "3.4.0",
     "@wireapp/priority-queue": "1.5.7",
     "axios": "0.19.2",
     "logdown": "3.3.1",
@@ -84,5 +84,5 @@
     "test:node": "cross-env NODE_DEBUG=@wireapp/api-client* nyc jasmine --config=jasmine.json",
     "watch": "webpack-dev-server --config webpack.browser.js"
   },
-  "version": "11.3.2"
+  "version": "11.4.0"
 }
