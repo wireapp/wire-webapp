@@ -91,7 +91,7 @@
     "@types/uuid": "7.0.2",
     "@types/webpack-env": "1.15.1",
     "@typescript-eslint/eslint-plugin": "2.27.0",
-    "@typescript-eslint/parser": "2.27.0",
+    "@typescript-eslint/parser": "2.28.0",
     "@wireapp/copy-config": "1.0.8",
     "@wireapp/eslint-config": "1.4.0",
     "@wireapp/prettier-config": "0.3.0",
