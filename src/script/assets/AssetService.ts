@@ -48,7 +48,7 @@ export interface AssetUploadOptions {
 }
 
 export class AssetService {
-  private readonly apiClient: APIClient;
+  public readonly apiClient: APIClient;
   private readonly backendClient: BackendClient;
 
   constructor(apiClient: APIClient, backendClient: BackendClient) {

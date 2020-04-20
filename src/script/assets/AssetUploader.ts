@@ -17,14 +17,19 @@
  *
  */
 
+/* eslint-disable no-unused-expressions */
 import ko from 'knockout';
-import {Asset} from '../entity/message/Asset';
-import {AssetService} from './AssetService';
+import {Asset} from '@wireapp/protocol-messaging';
+import {AssetService, AssetUploadOptions} from './AssetService';
+import {loadFileBuffer} from 'Util/util';
+import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
+import {encryptAesAsset} from './AssetCrypto';
 
 export interface UploadStatus {
   messageId: string;
   progress: ko.Observable<number>;
-  xhr: XMLHttpRequest;
+  xhr?: XMLHttpRequest;
+  cancelHandler?: () => void;
 }
 
 const uploadQueue: ko.ObservableArray<UploadStatus> = ko.observableArray();
@@ -36,7 +41,36 @@ export class AssetUploader {
     this.assetService = assetService;
   }
 
-  uploadAsset(messageId: string, file: Blob, options: object, asImage: boolean): Promise<Asset> {
+  async uploadAssetV2(messageId: string, file: Blob, options: AssetUploadOptions, asImage: boolean): Promise<Asset> {
+    const bytes = (await loadFileBuffer(file)) as ArrayBuffer;
+    const {cipherText, keyBytes, sha256} = await encryptAesAsset(bytes);
+    const progressObservable: ko.Observable<number> = ko.observable(0);
+    const request = await this.assetService.apiClient.asset.api.postAsset(
+      new Uint8Array(cipherText),
+      {
+        public: options.public,
+        retention: options.retention,
+      },
+      (percentage: number) => progressObservable(percentage * 100),
+    );
+    uploadQueue.push({cancelHandler: request.cancel, messageId, progress: progressObservable});
+    return request.response.then(({key, token}) => {
+      const assetRemoteData = new Asset.RemoteData({
+        assetId: key,
+        assetToken: token,
+        otrKey: new Uint8Array(keyBytes),
+        sha256: new Uint8Array(sha256),
+      });
+      const protoAsset = new Asset({
+        [PROTO_MESSAGE_TYPE.ASSET_UPLOADED]: assetRemoteData,
+        [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: options.expectsReadConfirmation,
+        [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: options.legalHoldStatus,
+      });
+      return protoAsset;
+    });
+  }
+
+  uploadAsset(messageId: string, file: Blob, options: AssetUploadOptions, asImage: boolean): Promise<Asset> {
     const uploadFunction = asImage ? this.assetService.uploadImageAsset : this.assetService.uploadAsset;
 
     return uploadFunction
@@ -57,7 +91,10 @@ export class AssetUploader {
   cancelUpload(messageId: string): void {
     const uploadStatus = this._findUploadStatus(messageId);
     if (uploadStatus) {
-      uploadStatus.xhr.abort();
+      uploadStatus.xhr?.abort();
+      if (uploadStatus.cancelHandler) {
+        uploadStatus.cancelHandler();
+      }
       this._removeFromQueue(messageId);
     }
   }
