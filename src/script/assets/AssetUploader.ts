@@ -18,8 +18,8 @@
  */
 
 import ko from 'knockout';
-import {Asset} from '../entity/message/Asset';
-import {AssetService} from './AssetService';
+import {Asset} from '@wireapp/protocol-messaging';
+import {AssetService, AssetUploadOptions} from './AssetService';
 
 export interface UploadStatus {
   messageId: string;
@@ -36,7 +36,7 @@ export class AssetUploader {
     this.assetService = assetService;
   }
 
-  uploadAsset(messageId: string, file: Blob, options: object, asImage: boolean): Promise<Asset> {
+  uploadAsset(messageId: string, file: Blob, options: AssetUploadOptions, asImage: boolean): Promise<Asset> {
     const uploadFunction = asImage ? this.assetService.uploadImageAsset : this.assetService.uploadAsset;
 
     return uploadFunction
