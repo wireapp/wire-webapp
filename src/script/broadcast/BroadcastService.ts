@@ -37,12 +37,14 @@ export class BroadcastService {
    * @returns Promise that resolves when the message was sent
    */
   postBroadcastMessage(payload: NewOTRMessage, preconditionOption: string[] | boolean): Promise<ClientMismatch> {
-    const ignoreMissing = preconditionOption === true ? true : preconditionOption === false ? false : undefined;
-    const reportMissing = Array.isArray(preconditionOption) ? preconditionOption.join(',') : undefined;
+    let ignoreMissing;
 
-    return this.apiClient.broadcast.api.postBroadcastMessage(payload.sender, payload, {
-      ignore_missing: ignoreMissing,
-      report_missing: reportMissing,
-    });
+    if (typeof preconditionOption === 'boolean') {
+      ignoreMissing = preconditionOption;
+    } else if (Array.isArray(preconditionOption)) {
+      payload.report_missing = preconditionOption;
+    }
+
+    return this.apiClient.broadcast.api.postBroadcastMessage(payload.sender, payload, ignoreMissing);
   }
 }
