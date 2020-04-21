@@ -17,7 +17,6 @@
  *
  */
 
-/* eslint-disable no-unused-expressions */
 import ko from 'knockout';
 import {Asset} from '@wireapp/protocol-messaging';
 import {AssetService, AssetUploadOptions} from './AssetService';
@@ -44,7 +43,7 @@ export class AssetUploader {
   async uploadFile(messageId: string, file: Blob, options: AssetUploadOptions): Promise<Asset> {
     const bytes = (await loadFileBuffer(file)) as ArrayBuffer;
     const {cipherText, keyBytes, sha256} = await encryptAesAsset(bytes);
-    const progressObservable: ko.Observable<number> = ko.observable(0);
+    const progressObservable = ko.observable(0);
     const request = await this.assetService.apiClient.asset.api.postAsset(
       new Uint8Array(cipherText),
       {
@@ -72,7 +71,7 @@ export class AssetUploader {
         });
         return protoAsset;
       })
-      .then((asset: Asset) => {
+      .then(asset => {
         this._removeFromQueue(messageId);
         return asset;
       });
@@ -99,6 +98,8 @@ export class AssetUploader {
   cancelUpload(messageId: string): void {
     const uploadStatus = this._findUploadStatus(messageId);
     if (uploadStatus) {
+      /* eslint-disable no-unused-expressions */
+      /* @see https://github.com/typescript-eslint/typescript-eslint/issues/1138 */
       uploadStatus.xhr?.abort();
       uploadStatus.cancelHandler?.();
       this._removeFromQueue(messageId);
