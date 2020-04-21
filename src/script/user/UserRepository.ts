@@ -160,6 +160,7 @@ export class UserRepository {
     this.isTeam = ko.observable();
     this.teamMembers = ko.pureComputed((): User[] => []);
     this.teamUsers = ko.pureComputed((): User[] => []);
+    this.getTeamMembersFromUsers = async (_: User[]) => undefined;
     this.directlyConnectedUsers = ko.pureComputed((): User[] => []);
 
     this.number_of_contacts = ko.pureComputed(() => {
