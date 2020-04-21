@@ -185,6 +185,7 @@ ask(
 
       try {
         await announceRelease(tagName, commitId);
+        logger.info(`Sent announcement to conversation "${process.env.WIRE_CONVERSATION}".`);
       } catch (error) {
         logger.error(error);
       }
