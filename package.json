@@ -160,7 +160,7 @@
     "redux-logger": "3.0.6",
     "redux-mock-store": "1.5.4",
     "simple-git": "1.132.0",
-    "sinon": "9.0.1",
+    "sinon": "9.0.2",
     "snabbdom": "0.7.4",
     "stylelint": "13.3.3",
     "stylelint-config-idiomatic-order": "8.1.0",
