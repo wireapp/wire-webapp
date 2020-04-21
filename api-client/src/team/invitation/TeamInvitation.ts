@@ -23,6 +23,8 @@ export interface TeamInvitation {
   created_at: Date;
   created_by: string;
   email: string;
+  name?: string;
+  phone?: string;
   id: string;
   role: Role;
   team: string;
