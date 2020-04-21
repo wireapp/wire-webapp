@@ -100,9 +100,7 @@ export class AssetUploader {
     const uploadStatus = this._findUploadStatus(messageId);
     if (uploadStatus) {
       uploadStatus.xhr?.abort();
-      if (uploadStatus.cancelHandler) {
-        uploadStatus.cancelHandler();
-      }
+      uploadStatus.cancelHandler?.();
       this._removeFromQueue(messageId);
     }
   }
