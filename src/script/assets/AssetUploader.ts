@@ -41,7 +41,7 @@ export class AssetUploader {
     this.assetService = assetService;
   }
 
-  async uploadAssetV2(messageId: string, file: Blob, options: AssetUploadOptions, asImage: boolean): Promise<Asset> {
+  async uploadAssetV2(messageId: string, file: Blob, options: AssetUploadOptions): Promise<Asset> {
     const bytes = (await loadFileBuffer(file)) as ArrayBuffer;
     const {cipherText, keyBytes, sha256} = await encryptAesAsset(bytes);
     const progressObservable: ko.Observable<number> = ko.observable(0);
@@ -51,23 +51,31 @@ export class AssetUploader {
         public: options.public,
         retention: options.retention,
       },
-      (percentage: number) => progressObservable(percentage * 100),
+      (fraction: number) => {
+        const percentage = fraction * 100;
+        progressObservable(percentage);
+      },
     );
     uploadQueue.push({cancelHandler: request.cancel, messageId, progress: progressObservable});
-    return request.response.then(({key, token}) => {
-      const assetRemoteData = new Asset.RemoteData({
-        assetId: key,
-        assetToken: token,
-        otrKey: new Uint8Array(keyBytes),
-        sha256: new Uint8Array(sha256),
+    return request.response
+      .then(({key, token}) => {
+        const assetRemoteData = new Asset.RemoteData({
+          assetId: key,
+          assetToken: token,
+          otrKey: new Uint8Array(keyBytes),
+          sha256: new Uint8Array(sha256),
+        });
+        const protoAsset = new Asset({
+          [PROTO_MESSAGE_TYPE.ASSET_UPLOADED]: assetRemoteData,
+          [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: options.expectsReadConfirmation,
+          [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: options.legalHoldStatus,
+        });
+        return protoAsset;
+      })
+      .then((asset: Asset) => {
+        this._removeFromQueue(messageId);
+        return asset;
       });
-      const protoAsset = new Asset({
-        [PROTO_MESSAGE_TYPE.ASSET_UPLOADED]: assetRemoteData,
-        [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: options.expectsReadConfirmation,
-        [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: options.legalHoldStatus,
-      });
-      return protoAsset;
-    });
   }
 
   uploadAsset(messageId: string, file: Blob, options: AssetUploadOptions, asImage: boolean): Promise<Asset> {

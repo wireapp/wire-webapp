@@ -1879,7 +1879,10 @@ export class ConversationRepository {
           retention,
         };
 
-        const uploadPromise = this.assetUploader.uploadAsset(messageId, file, options, asImage);
+        const uploadPromise =
+          asImage === true
+            ? this.assetUploader.uploadAsset(messageId, file, options, asImage)
+            : this.assetUploader.uploadAssetV2(messageId, file, options);
         return uploadPromise;
       })
       .then(asset => {
