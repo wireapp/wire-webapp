@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.8.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.8.0...@wireapp/api-client@11.8.1) (2020-04-21)
+
+
+### Bug Fixes
+
+* **api-client:** Add missing params in BroadcastAPI ([#2974](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2974)) ([c0d825f](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/c0d825f46ffc5e7eaed49b6cbdf3061ffb2173fd))
+
+
+
+
+
 # [11.8.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.7.0...@wireapp/api-client@11.8.0) (2020-04-21)
 
 
