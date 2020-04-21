@@ -395,6 +395,9 @@ class App {
       loadingView.updateProgress(10);
       telemetry.time_step(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
+      await teamRepository.getTeam();
+      teamRepository.scheduleFetchTeamInfo();
+
       eventRepository.connectWebSocket();
       const conversationEntities = await conversationRepository.getConversations();
       const connectionEntities = await connectionRepository.getConnections();
@@ -406,9 +409,6 @@ class App {
 
       conversationRepository.map_connections(connectionRepository.connectionEntities());
       this._subscribeToUnloadEvents();
-
-      await teamRepository.getTeam();
-      teamRepository.scheduleFetchTeamInfo();
 
       await conversationRepository.conversationRoleRepository.loadTeamRoles();
 
@@ -436,15 +436,6 @@ class App {
       await this._handleUrlParams();
       await conversationRepository.updateConversationsOnAppInit();
       await conversationRepository.conversationLabelRepository.loadLabels();
-
-      const selfTeamId = userRepository.self().teamId;
-      if (selfTeamId) {
-        const teamMemberIds = conversationRepository
-          .connectedUsers()
-          .filter(({teamId}) => teamId === selfTeamId)
-          .map(({id}) => id);
-        await teamRepository.updateTeamMembersByIds(teamRepository.team(), teamMemberIds);
-      }
 
       telemetry.time_step(AppInitTimingsStep.APP_LOADED);
       this._showInterface();

@@ -103,6 +103,7 @@ export class UserRepository {
   readonly isTemporaryGuest: ko.PureComputed<boolean>;
   readonly number_of_contacts: ko.PureComputed<number>;
   readonly self: ko.Observable<User>;
+  getTeamMembersFromUsers: (users: User[]) => Promise<void>;
 
   // tslint:disable-next-line:typedef
   static get CONFIG() {
@@ -481,7 +482,7 @@ export class UserRepository {
   /**
    * Get users from the backend.
    */
-  fetchUsersById(userIds: string[] = []): Promise<User[]> {
+  async fetchUsersById(userIds: string[] = []): Promise<User[]> {
     userIds = userIds.filter(userId => !!userId);
 
     if (!userIds.length) {
@@ -502,25 +503,19 @@ export class UserRepository {
     };
 
     const chunksOfUserIds = chunk(userIds, Config.getConfig().MAXIMUM_USERS_PER_REQUEST) as string[][];
-    return Promise.all(chunksOfUserIds.map(chunkOfUserIds => _getUsers(chunkOfUserIds)))
-      .then(resolveArray => {
-        const newUserEntities = flatten(resolveArray);
-
-        if (this.isTeam()) {
-          this.mapGuestStatus(newUserEntities);
-        }
-
-        return this.saveUsers(newUserEntities);
-      })
-      .then(fetchedUserEntities => {
-        // If there is a difference then we most likely have a case with a suspended user
-        const isAllUserIds = userIds.length === fetchedUserEntities.length;
-        if (!isAllUserIds) {
-          fetchedUserEntities = this._add_suspended_users(userIds, fetchedUserEntities);
-        }
-
-        return fetchedUserEntities;
-      });
+    const resolveArray = await Promise.all(chunksOfUserIds.map(chunkOfUserIds_2 => _getUsers(chunkOfUserIds_2)));
+    const newUserEntities = flatten(resolveArray);
+    if (this.isTeam()) {
+      this.mapGuestStatus(newUserEntities);
+    }
+    let fetchedUserEntities = this.saveUsers(newUserEntities);
+    // If there is a difference then we most likely have a case with a suspended user
+    const isAllUserIds = userIds.length === fetchedUserEntities.length;
+    if (!isAllUserIds) {
+      fetchedUserEntities = this._add_suspended_users(userIds, fetchedUserEntities);
+    }
+    await this.getTeamMembersFromUsers(fetchedUserEntities);
+    return fetchedUserEntities;
   }
 
   /**
@@ -611,17 +606,19 @@ export class UserRepository {
       return this.findUserById(user_id) || user_id;
     };
 
-    const find_users = user_ids.map(user_id => _find_user(user_id));
+    const findUsers = user_ids.map(user_id => _find_user(user_id));
 
-    return Promise.all(find_users).then(resolve_array => {
-      const known_user_ets = resolve_array.filter(array_item => typeof array_item !== 'string') as User[];
-      const unknown_user_ids = resolve_array.filter(array_item => typeof array_item === 'string') as string[];
+    return Promise.all(findUsers).then(resolveArray => {
+      const [knownUserEts, unknownUserIds] = partition(resolveArray, item => typeof item !== 'string') as [
+        User[],
+        string[],
+      ];
 
-      if (offline || !unknown_user_ids.length) {
-        return known_user_ets;
+      if (offline || !unknownUserIds.length) {
+        return knownUserEts;
       }
 
-      return this.fetchUsersById(unknown_user_ids).then(user_ets => known_user_ets.concat(user_ets));
+      return this.fetchUsersById(unknownUserIds).then(userEts => knownUserEts.concat(userEts));
     });
   }
 

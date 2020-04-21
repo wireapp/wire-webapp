@@ -123,6 +123,7 @@ export class TeamRepository {
     this.userRepository.isTeam = this.isTeam;
     this.userRepository.teamMembers = this.teamMembers;
     this.userRepository.teamUsers = this.teamUsers;
+    this.userRepository.getTeamMembersFromUsers = this.getTeamMembersFromUsers;
 
     amplify.subscribe(WebAppEvents.TEAM.EVENT_FROM_BACKEND, this.onTeamEvent.bind(this));
     amplify.subscribe(WebAppEvents.TEAM.UPDATE_INFO, this.sendAccountInfo.bind(this));
@@ -151,11 +152,14 @@ export class TeamRepository {
   };
 
   getTeam = async (): Promise<TeamEntity> => {
-    const teamData = this.selfUser().teamId ? await this.getTeamById() : await this.getBindingTeam();
+    const selfTeamId = this.selfUser().teamId;
+    const teamData = selfTeamId ? await this.getTeamById() : await this.getBindingTeam();
 
     const teamEntity = teamData ? this.teamMapper.mapTeamFromObject(teamData) : new TeamEntity();
     this.team(teamEntity);
-
+    if (selfTeamId) {
+      await this.getSelfMember(selfTeamId);
+    }
     // doesn't need to be awaited because it publishes the account info over amplify.
     this.sendAccountInfo();
     return teamEntity;
@@ -178,6 +182,18 @@ export class TeamRepository {
       return this.teamMapper.mapMemberFromArray(members);
     }
   }
+
+  getTeamMembersFromUsers = async (users: User[]): Promise<void> => {
+    const selfTeamId = this.selfUser().teamId;
+    if (!selfTeamId) {
+      return;
+    }
+    const knownMemberIds = this.teamMembers().map(member => member.id);
+    const teamUsers = users.filter(user => user.teamId === selfTeamId);
+    const newTeamMembers = teamUsers.filter(user => !knownMemberIds.includes(user.id));
+    const newTeamMemberIds = newTeamMembers.map(({id}) => id);
+    await this.updateTeamMembersByIds(this.team(), newTeamMemberIds, true);
+  };
 
   async filterExternals(users: User[]): Promise<User[]> {
     const userIds = users.map(({id}) => id);
@@ -261,22 +277,32 @@ export class TeamRepository {
     }
   }
 
-  async updateTeamMembersByIds(teamEntity: TeamEntity, memberIds: string[] = []): Promise<void> {
+  async updateTeamMembersByIds(teamEntity: TeamEntity, memberIds: string[] = [], append = false): Promise<void> {
     const members = await this.teamService.getTeamMembersByIds(teamEntity.id, memberIds);
-    this.memberRoles({});
-    this.memberInviters({});
-    this.updateMemberRoles(members);
+    const mappedMembers = this.teamMapper.mapMemberFromArray(members);
+
+    if (!append) {
+      this.memberRoles({});
+      this.memberInviters({});
+    }
+    this.updateMemberRoles(mappedMembers);
 
     const selfId = this.selfUser().id;
     const includesSelfId = memberIds.includes(selfId);
     if (includesSelfId) {
       memberIds = memberIds.filter(id => id !== selfId);
-      const selfMember = members.find(({user: userId}) => userId === selfId);
+      const selfMember = mappedMembers.find(({userId}) => userId === selfId);
       this.teamMapper.mapRole(this.selfUser(), selfMember.permissions);
     }
 
     const userEntities = await this.userRepository.getUsersById(memberIds);
-    teamEntity.members(userEntities);
+    if (append) {
+      const knownUserIds = teamEntity.members().map(({id}) => id);
+      const newUserEntities = userEntities.filter(({id}) => !knownUserIds.includes(id));
+      teamEntity.members.push(...newUserEntities);
+    } else {
+      teamEntity.members(userEntities);
+    }
   }
 
   async updateTeamMembers(teamEntity: TeamEntity, userIds: string[]): Promise<void> {

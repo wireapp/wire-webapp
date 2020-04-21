@@ -94,10 +94,11 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
     this.navigateTo(z.viewModel.PanelViewModel.STATE.PARTICIPANT_DEVICES, {entity: this.selectedParticipant()});
   }
 
-  initView({entity: user}) {
-    const userEntity = user;
+  initView({entity: userEntity}) {
     this.selectedParticipant(userEntity);
-
+    if (this.teamRepository.isTeam()) {
+      this.teamRepository.updateTeamMembersByIds(this.teamRepository.team(), [userEntity.id], true);
+    }
     if (userEntity.isTemporaryGuest()) {
       userEntity.checkGuestExpiration();
     }
