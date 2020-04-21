@@ -56,7 +56,7 @@ export class BroadcastAPI {
     };
 
     if (typeof ignoreMissing === 'boolean') {
-      config.params.ignore_missing = ignoreMissing;
+      config.params = {ignore_missing: ignoreMissing};
     }
 
     const response =
