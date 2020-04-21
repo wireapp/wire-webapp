@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.8.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.7.0...@wireapp/api-client@11.8.0) (2020-04-21)
+
+
+### Features
+
+* update TeamInvitation interface ([#2972](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2972)) ([056a8d2](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/056a8d22f581ee7825a1ac5af9623c22c2ae7eee))
+
+
+
+
+
 # [11.7.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.6.0...@wireapp/api-client@11.7.0) (2020-04-21)
 
 
