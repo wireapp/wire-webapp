@@ -26,7 +26,7 @@ No license is granted to the Wire trademark and its associated logos, all of whi
 1. Install [Yarn](https://yarnpkg.com)
 1. Run `yarn`
 1. Rename `.env.localhost` to `.env` in order to run the app in a local environment
-1. Use a browser with disabled web security (`−−disasble−web−security` in Chrome) to circumvent CORS issues when connecting to our backend from localhost
+1. Use a browser with disabled web security (`−−disable−web−security` in Chrome) to circumvent CORS issues when connecting to our backend from localhost
 
 ### Execution
 
@@ -86,11 +86,11 @@ yarn release:production 90fda951916f0d60a5bffce69a7267830e313391
 
 ##### Release notes
 
-Release notes need to be generated with `yarn changelog` after merging to "master" and before creating the new production release tag. Release notes will be locally available (not committed to the repository) in [./CHANGELOG.md](./CHANGELOG.md) and sent to our marketing team to create release notes on [Medium](https://medium.com/wire-news/desktop-updates/home).
+Release notes need to be generated with `yarn changelog` after merging to "master" and before creating the new production release tag. Release notes will be locally available (not committed to the repository) in [CHANGELOG.md](./CHANGELOG.md) and sent to our marketing team to create release notes on [Medium](https://medium.com/wire-news/desktop-updates/home).
 
 #### Manual Deployments
 
-Based on the Git branch, builds get deployed automatically by [Travis CI](https://travis-ci.org/). In case Travis CI is not working, a manual deployment can be triggered using `yarn deploy`.
+Based on the git branch, builds get deployed automatically by [Travis CI](https://travis-ci.org/). In case Travis CI is not working, a manual deployment can be triggered using `yarn deploy`.
 
 A manual deployment requires the local setup of the Elastic Beanstalk Command Line Interface ([EB CLI](https://docs.aws.amazon.com/en_us/elasticbeanstalk/latest/dg/eb-cli3.html)). Manual deployments are also based on branch defaults which are configured [here](./.elasticbeanstalk/config.yml).
 

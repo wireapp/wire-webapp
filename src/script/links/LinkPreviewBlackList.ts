@@ -38,6 +38,7 @@ const soundCloudStatic = [
   'you',
 ];
 
+/* cspell:disable */
 const BLACKLIST = [
   `soundcloud.com/(?!${soundCloudStatic.join('|')})`,
   'spotify.com/(?!\\w\\w/)',
@@ -45,5 +46,6 @@ const BLACKLIST = [
   'youtube(-nocookie)?.com/(watch|embed)',
   'vimeo.com/(channels/[^/]+/|video/)?[0-9]+',
 ];
+/* cspell:enable */
 
 export const isBlacklisted = (url: string) => new RegExp(BLACKLIST.join('|')).test(url);
