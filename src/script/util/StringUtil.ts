@@ -48,6 +48,7 @@ export const getRandomChar = (): string => {
 };
 
 export const obfuscate = (text: string): string => {
+  /* cspell:disable-next-line */
   const alphabet = Array.from('abcdefghijklmnopqrstuvwxyz');
   return Array.from(text, char => (/\s/.test(char) ? char : randomElement(alphabet))).join('');
 };

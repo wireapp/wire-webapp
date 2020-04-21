@@ -18,6 +18,7 @@
  */
 
 import {PublicClient} from '@wireapp/api-client/dist/client';
+import type {BackendError} from '@wireapp/api-client/dist/http';
 import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
 import {amplify} from 'amplify';
 import ko from 'knockout';
@@ -490,13 +491,14 @@ export class UserRepository {
       return Promise.resolve([]);
     }
 
-    const _getUsers = (chunkOfUserIds: string[]) => {
+    const _getUsers = (chunkOfUserIds: string[]): Promise<(void | User)[]> => {
       return this.userService
         .getUsers(chunkOfUserIds)
         .then(response => (response ? this.userMapper.mapUsersFromJson(response) : []))
-        .catch((error: AxiosError) => {
-          const isNotFound = error.response?.status === BackendClientError.STATUS_CODE.NOT_FOUND;
-          if (isNotFound) {
+        .catch((error: AxiosError | BackendError) => {
+          const isNotFound = (error as AxiosError).response?.status === BackendClientError.STATUS_CODE.NOT_FOUND;
+          const isBadRequest = (error as BackendError).code === BackendClientError.STATUS_CODE.BAD_REQUEST;
+          if (isNotFound || isBadRequest) {
             return [];
           }
           throw error;

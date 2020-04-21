@@ -208,7 +208,7 @@ ko.components.register('conversation-list-calling-cell', {
    <!-- ko if: conversation() && !isDeclined() -->
     <div class="conversation-list-calling-cell conversation-list-cell">
       <!-- ko ifnot: temporaryUserStyle -->
-        <div class="conversation-list-cell-left">
+        <div class="conversation-list-cell-left" data-bind="link_to: conversationUrl">
           <!-- ko if: conversation().isGroup() -->
             <group-avatar class="conversation-list-cell-avatar-arrow call-ui__avatar" params="users: conversationParticipants(), conversation: conversation"></group-avatar>
           <!-- /ko -->
@@ -266,9 +266,9 @@ ko.components.register('conversation-list-calling-cell', {
     <!-- ko if: !isDeclined() -->
       <div class="conversation-list-calling-cell-controls">
         <div class="conversation-list-calling-cell-controls-left">
-          <div class="call-ui__button" data-bind="click: () => callActions.toggleMute(call, !isMuted()), css: {'call-ui__button--active': isMuted()}, attr: {'data-uie-value': !isMuted() ? 'inactive' : 'active', 'title': t('videoCallOverlayMute')}" data-uie-name="do-toggle-mute">
+          <button class="call-ui__button" data-bind="click: () => callActions.toggleMute(call, !isMuted()), css: {'call-ui__button--active': isMuted()}, attr: {'data-uie-value': !isMuted() ? 'inactive' : 'active', 'title': t('videoCallOverlayMute')}" data-uie-name="do-toggle-mute">
             <micoff-icon class="small-icon"></micoff-icon>
-          </div>
+          </button>
           <!-- ko if: showVideoButton() -->
             <button class="call-ui__button" data-bind="click: () => callActions.toggleCamera(call), css: {'call-ui__button--active': call.selfParticipant.sharesCamera()}, disable: disableVideoButton(), attr: {'data-uie-value': call.selfParticipant.sharesCamera() ? 'active' : 'inactive', 'title': t('videoCallOverlayVideo')}" data-uie-name="do-toggle-video">
               <camera-icon class="small-icon"></camera-icon>

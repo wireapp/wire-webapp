@@ -23,7 +23,7 @@ import {randomElement} from 'Util/ArrayUtil';
 import {getRandomNumber} from 'Util/NumberUtil';
 
 const MIN_HANDLE_LENGTH = 2;
-const MAX_HANDLE_LENGTH = 21;
+const MAX_HANDLE_LENGTH = 256;
 
 const RANDOM_WORDS_1 = 'acid|agate|agile|amber|aqua|arid|avid|azure|baby|basic|beige|best|black|blond|blue|brass|brave|brown|busy|chief|chill|clear|cold|cool|coral|cosy|cozy|cream|curly|cyan|dear|dry|early|even|fancy|fast|fit|folk|gold|green|grey|happy|hazy|icy|iron|kind|large|lazy|lemon|light|lilac|lime|lord|lucid|mauve|melt|merry|mint|nice|noir|ochre|odd|olive|opal|peach|pearl|pink|plain|purple|quiet|rapid|red|rock|rose|ruby|rust|sand|sassy|shiny|shy|silly|slow|small|stone|sweet|swift|talc|tame|tiny|topaz|torn|total|vinyl|violet|warm|white|wise|witty|yellow|young|zinc'.split(
   '|',
@@ -38,7 +38,7 @@ const getRandomWordCombination = () => `${randomElement(RANDOM_WORDS_1)}${random
  * Validates that a character can be used for a handle.
  */
 export const validateCharacter = (character: string): boolean => {
-  const isAlphaNumeric = /[a-z0-9_]/.test(character);
+  const isAlphaNumeric = /[a-z0-9_.-]/.test(character);
   const isString = typeof character === 'string' && character.length === 1;
   return isAlphaNumeric && isString;
 };
@@ -55,9 +55,9 @@ export const appendRandomDigits = (handle: string, additionalNumbers?: number): 
  * Creates a handle based on the users name.
  */
 export const normalizeName = (name: string): string =>
-  getSlug(name)
+  getSlug(name, {custom: ['.', '-']})
     .toLowerCase()
-    .replace(/[^a-z0-9_]/g, '')
+    .replace(/[^a-z0-9_.-]/g, '')
     .substring(0, MAX_HANDLE_LENGTH);
 
 /**

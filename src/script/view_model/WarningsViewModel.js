@@ -41,12 +41,14 @@ export class WarningsViewModel {
         WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT,
         WarningsViewModel.TYPE.LIFECYCLE_UPDATE,
         WarningsViewModel.TYPE.NO_INTERNET,
+        WarningsViewModel.TYPE.CALL_QUALITY_POOR,
       ],
     };
   }
 
   static get TYPE() {
     return {
+      CALL_QUALITY_POOR: 'call_quality_poor',
       CONNECTIVITY_RECONNECT: 'connectivity_reconnect',
       CONNECTIVITY_RECOVERY: 'connectivity_recovery',
       DENIED_CAMERA: 'camera_access_denied',
