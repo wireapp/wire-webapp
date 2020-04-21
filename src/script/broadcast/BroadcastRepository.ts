@@ -95,6 +95,7 @@ export class BroadcastRepository {
       const recipients = this.createBroadcastRecipients(userEntities);
       return this.cryptographyRepository.encryptGenericMessage(recipients, genericMessage).then(payload => {
         const eventInfoEntity = new EventInfoEntity(genericMessage);
+        eventInfoEntity.options.precondition = userEntities.map(user => user.id);
         this._sendEncryptedMessage(eventInfoEntity, payload);
       });
     });

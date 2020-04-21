@@ -137,24 +137,17 @@ export class ClientMismatchHandler {
       }
     }
 
-    const cappedRecipients = Object.fromEntries(Object.entries(recipients).slice(0, 500));
-    const cappedMissingUserIds = Object.keys(cappedRecipients);
-
-    const newPayload = await this.cryptographyRepository.encryptGenericMessage(
-      cappedRecipients,
-      genericMessage,
-      payload,
-    );
+    const newPayload = await this.cryptographyRepository.encryptGenericMessage(recipients, genericMessage, payload);
 
     await Promise.all(
-      cappedMissingUserIds.map(userId => {
+      missingUserIds.map(userId => {
         return this.userRepository.getClientsByUserId(userId, false).then(clients => {
           return Promise.all(clients.map(client => this.userRepository.addClientToUser(userId, client)));
         });
       }),
     );
 
-    this.conversationRepository.verificationStateHandler.onClientsAdded(cappedMissingUserIds);
+    this.conversationRepository.verificationStateHandler.onClientsAdded(missingUserIds);
 
     return newPayload;
   }
