@@ -95,7 +95,7 @@
     "@wireapp/copy-config": "1.0.9",
     "@wireapp/eslint-config": "1.4.0",
     "@wireapp/prettier-config": "0.3.0",
-    "autoprefixer": "9.7.5",
+    "autoprefixer": "9.7.6",
     "babel-eslint": "10.1.0",
     "babel-loader": "8.1.0",
     "babel-plugin-react-intl": "7.5.1",
