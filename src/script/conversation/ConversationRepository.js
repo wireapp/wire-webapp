@@ -39,6 +39,7 @@ import {
 } from '@wireapp/protocol-messaging';
 import {flatten} from 'underscore';
 import {ConnectionStatus} from '@wireapp/api-client/dist/connection';
+import {RequestCancellationError} from '@wireapp/api-client/dist/user';
 
 import {getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -1879,7 +1880,10 @@ export class ConversationRepository {
           retention,
         };
 
-        const uploadPromise = this.assetUploader.uploadAsset(messageId, file, options, asImage);
+        const uploadPromise =
+          asImage === true
+            ? this.assetUploader.uploadAsset(messageId, file, options)
+            : this.assetUploader.uploadFile(messageId, file, options);
         return uploadPromise;
       })
       .then(asset => {
@@ -1997,7 +2001,7 @@ export class ConversationRepository {
 
         const messageEntityPromise = this.getMessageInConversationById(conversationEntity, messageId);
         return messageEntityPromise.then(messageEntity => {
-          return this.assetUploader.uploadAsset(messageEntity.id, imageBlob, options).then(uploadedImageAsset => {
+          return this.assetUploader.uploadFile(messageEntity.id, imageBlob, options).then(uploadedImageAsset => {
             const assetPreview = new Asset.Preview(imageBlob.type, imageBlob.size, uploadedImageAsset.uploaded);
             const protoAsset = new Asset({
               [PROTO_MESSAGE_TYPE.ASSET_PREVIEW]: assetPreview,
@@ -3031,6 +3035,8 @@ export class ConversationRepository {
     } catch (error) {
       if (this._isUserCancellationError(error)) {
         throw error;
+      } else if (error instanceof RequestCancellationError) {
+        return;
       }
       this.logger.error(`Failed to upload asset for conversation '${conversationEntity.id}': ${error.message}`, error);
       const messageEntity = await this.getMessageInConversationById(conversationEntity, messageId);

@@ -33,12 +33,6 @@ describe('AssetsUploader', () => {
   const assetUploader = new AssetUploader(
     new AssetService(container.resolve(APIClientSingleton), container.resolve(BackendClient)),
   );
-  it('starts uploading when given an asset message', () => {
-    spyOn(assetUploader.assetService, 'uploadAsset').and.returnValue(Promise.resolve());
-    assetUploader.uploadAsset(messageId, file, options);
-
-    expect(assetUploader.assetService.uploadAsset).toHaveBeenCalledWith(file, options, jasmine.any(Function));
-  });
 
   it('keeps track of current uploads', () => {
     const xhr = {upload: {}};

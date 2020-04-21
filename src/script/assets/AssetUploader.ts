@@ -20,11 +20,15 @@
 import ko from 'knockout';
 import {Asset} from '@wireapp/protocol-messaging';
 import {AssetService, AssetUploadOptions} from './AssetService';
+import {loadFileBuffer} from 'Util/util';
+import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
+import {encryptAesAsset} from './AssetCrypto';
 
 export interface UploadStatus {
   messageId: string;
   progress: ko.Observable<number>;
-  xhr: XMLHttpRequest;
+  xhr?: XMLHttpRequest;
+  cancelHandler?: () => void;
 }
 
 const uploadQueue: ko.ObservableArray<UploadStatus> = ko.observableArray();
@@ -34,6 +38,43 @@ export class AssetUploader {
 
   constructor(assetService: AssetService) {
     this.assetService = assetService;
+  }
+
+  async uploadFile(messageId: string, file: Blob, options: AssetUploadOptions): Promise<Asset> {
+    const bytes = (await loadFileBuffer(file)) as ArrayBuffer;
+    const {cipherText, keyBytes, sha256} = await encryptAesAsset(bytes);
+    const progressObservable = ko.observable(0);
+    const request = await this.assetService.apiClient.asset.api.postAsset(
+      new Uint8Array(cipherText),
+      {
+        public: options.public,
+        retention: options.retention,
+      },
+      (fraction: number) => {
+        const percentage = fraction * 100;
+        progressObservable(percentage);
+      },
+    );
+    uploadQueue.push({cancelHandler: request.cancel, messageId, progress: progressObservable});
+    return request.response
+      .then(({key, token}) => {
+        const assetRemoteData = new Asset.RemoteData({
+          assetId: key,
+          assetToken: token,
+          otrKey: new Uint8Array(keyBytes),
+          sha256: new Uint8Array(sha256),
+        });
+        const protoAsset = new Asset({
+          [PROTO_MESSAGE_TYPE.ASSET_UPLOADED]: assetRemoteData,
+          [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: options.expectsReadConfirmation,
+          [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: options.legalHoldStatus,
+        });
+        return protoAsset;
+      })
+      .then(asset => {
+        this._removeFromQueue(messageId);
+        return asset;
+      });
   }
 
   uploadAsset(messageId: string, file: Blob, options: AssetUploadOptions, asImage: boolean): Promise<Asset> {
@@ -57,7 +98,10 @@ export class AssetUploader {
   cancelUpload(messageId: string): void {
     const uploadStatus = this._findUploadStatus(messageId);
     if (uploadStatus) {
-      uploadStatus.xhr.abort();
+      /* eslint-disable no-unused-expressions */
+      /* @see https://github.com/typescript-eslint/typescript-eslint/issues/1138 */
+      uploadStatus.xhr?.abort();
+      uploadStatus.cancelHandler?.();
       this._removeFromQueue(messageId);
     }
   }
