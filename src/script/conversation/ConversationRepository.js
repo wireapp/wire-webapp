@@ -39,6 +39,7 @@ import {
 } from '@wireapp/protocol-messaging';
 import {flatten} from 'underscore';
 import {ConnectionStatus} from '@wireapp/api-client/dist/connection';
+import {RequestCancellationError} from '@wireapp/api-client/dist/user';
 
 import {getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -1882,7 +1883,7 @@ export class ConversationRepository {
         const uploadPromise =
           asImage === true
             ? this.assetUploader.uploadAsset(messageId, file, options, asImage)
-            : this.assetUploader.uploadAssetV2(messageId, file, options);
+            : this.assetUploader.uploadFile(messageId, file, options);
         return uploadPromise;
       })
       .then(asset => {
@@ -3034,6 +3035,8 @@ export class ConversationRepository {
     } catch (error) {
       if (this._isUserCancellationError(error)) {
         throw error;
+      } else if (error instanceof RequestCancellationError) {
+        return;
       }
       this.logger.error(`Failed to upload asset for conversation '${conversationEntity.id}': ${error.message}`, error);
       const messageEntity = await this.getMessageInConversationById(conversationEntity, messageId);

@@ -41,7 +41,7 @@ export class AssetUploader {
     this.assetService = assetService;
   }
 
-  async uploadAssetV2(messageId: string, file: Blob, options: AssetUploadOptions): Promise<Asset> {
+  async uploadFile(messageId: string, file: Blob, options: AssetUploadOptions): Promise<Asset> {
     const bytes = (await loadFileBuffer(file)) as ArrayBuffer;
     const {cipherText, keyBytes, sha256} = await encryptAesAsset(bytes);
     const progressObservable: ko.Observable<number> = ko.observable(0);
