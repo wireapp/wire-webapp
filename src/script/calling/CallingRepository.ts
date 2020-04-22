@@ -150,7 +150,7 @@ export class CallingRepository {
 
   private configureCallingApi(wCall: Wcall): Wcall {
     const avsLogger = getLogger('avs');
-    const logLevelStrs: Record<LOG_LEVEL, string> = {
+    const logLevels: Record<LOG_LEVEL, string> = {
       [LOG_LEVEL.DEBUG]: 'DEBUG',
       [LOG_LEVEL.INFO]: 'INFO ',
       [LOG_LEVEL.WARN]: 'WARN ',
@@ -166,7 +166,7 @@ export class CallingRepository {
     wCall.setLogHandler((level: LOG_LEVEL, message: string) => {
       const trimmedMessage = message.trim();
       logFunctions[level].call(avsLogger, trimmedMessage);
-      this.callLog.push(`${new Date().toISOString()} [${logLevelStrs[level]}] ${trimmedMessage}`);
+      this.callLog.push(`${new Date().toISOString()} [${logLevels[level]}] ${trimmedMessage}`);
     });
 
     const avsEnv = Environment.browser.firefox ? AVS_ENV.FIREFOX : AVS_ENV.DEFAULT;
@@ -178,6 +178,7 @@ export class CallingRepository {
   }
 
   private createWUser(wCall: Wcall, selfUserId: string, selfClientId: string): number {
+    /* cspell:disable */
     const wUser = wCall.create(
       selfUserId,
       selfClientId,
@@ -193,6 +194,7 @@ export class CallingRepository {
       () => {}, // `acbrh`,
       this.videoStateChanged, // `vstateh`,
     );
+    /* cspell:enable */
     const tenSeconds = 10;
     wCall.setNetworkQualityHandler(
       wUser,
@@ -733,12 +735,13 @@ export class CallingRepository {
       camera: selfParticipant.videoStream(),
       screen: selfParticipant.videoStream(),
     };
+
     const missingStreams = Object.entries(cache).reduce(
-      (missings: MediaStreamQuery, [type, isCached]: [keyof MediaStreamQuery, MediaStream]) => {
+      (accumulator: MediaStreamQuery, [type, isCached]: [keyof MediaStreamQuery, MediaStream]) => {
         if (!isCached && !!query[type]) {
-          missings[type] = true;
+          accumulator[type] = true;
         }
-        return missings;
+        return accumulator;
       },
       {},
     );

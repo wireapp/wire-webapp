@@ -18,13 +18,14 @@
  */
 
 import {APIClient} from '@wireapp/api-client';
+import {AssetOptions, AssetUploadData, AssetRetentionPolicy} from '@wireapp/api-client/dist/asset';
+import {ProgressCallback, RequestCancelable} from '@wireapp/api-client/dist/http';
 import {Asset, LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {arrayToMd5Base64, loadFileBuffer, loadImage} from 'Util/util';
 import {assetV3, legacyAsset} from 'Util/ValidationUtil';
 import {WebWorker} from 'Util/worker';
 
-import {AssetRetentionPolicy} from '../assets/AssetRetentionPolicy';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {encryptAesAsset} from './AssetCrypto';
 import {BackendClient} from '../service/BackendClient';
@@ -40,11 +41,9 @@ export interface CompressedImage {
   compressedImage: HTMLImageElement;
 }
 
-export interface AssetUploadOptions {
+export interface AssetUploadOptions extends AssetOptions {
   expectsReadConfirmation: boolean;
   legalHoldStatus?: LegalHoldStatus;
-  public: boolean;
-  retention: AssetRetentionPolicy;
 }
 
 export class AssetService {
@@ -66,7 +65,7 @@ export class AssetService {
       this._compressProfileImage(image),
       this._compressImage(image),
     ]);
-    const assetUploadOptions = {
+    const assetUploadOptions: AssetUploadOptions = {
       expectsReadConfirmation: false,
       public: true,
       retention: AssetRetentionPolicy.ETERNAL,
@@ -100,11 +99,6 @@ export class AssetService {
       [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: options.legalHoldStatus,
     });
     return protoAsset;
-  }
-
-  async uploadAsset(file: Blob | File, options: AssetUploadOptions, xhrAccessorFunction: Function): Promise<Asset> {
-    const buffer = await loadFileBuffer(file);
-    return this._uploadAsset(buffer as ArrayBuffer, options, xhrAccessorFunction);
   }
 
   async uploadImageAsset(
@@ -159,6 +153,14 @@ export class AssetService {
 
     const isEternal = isTeamMember || isTeamConversation || isTeamUserInConversation;
     return isEternal ? AssetRetentionPolicy.ETERNAL : AssetRetentionPolicy.PERSISTENT;
+  }
+
+  public uploadFile(
+    asset: Uint8Array,
+    options: AssetOptions,
+    callback: ProgressCallback,
+  ): Promise<RequestCancelable<AssetUploadData>> {
+    return this.apiClient.asset.api.postAsset(asset, options, callback);
   }
 
   private async postAsset(

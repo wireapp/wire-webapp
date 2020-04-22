@@ -17,6 +17,8 @@
  *
  */
 
+/* cspell:disable */
+
 export interface CountryCode {
   code: number;
   iso: string;
