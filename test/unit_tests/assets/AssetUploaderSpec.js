@@ -64,37 +64,33 @@ describe('AssetsUploader', () => {
   });
 
   it('removes cancelled uploads and cancels upload', () => {
-    const xhr = {
-      abort: () => {},
-      upload: {},
-    };
-    spyOn(xhr, 'abort');
-    spyOn(assetUploader.assetService, 'uploadAsset').and.callFake((fileParam, optionsParam, callback) => {
-      callback(xhr);
-      return new Promise(() => {});
+    spyOn(assetUploader.assetService, 'uploadFile').and.callFake(() => {
+      expect(assetUploader.getNumberOfOngoingUploads()).toBe(1);
+      return Promise.resolve({
+        response: Promise.resolve({
+          key: '',
+          token: '',
+        }),
+      });
     });
 
-    assetUploader.uploadAsset(messageId, file, options);
-
-    expect(assetUploader.getNumberOfOngoingUploads()).toBe(1);
+    assetUploader.uploadFile(messageId, file, options);
 
     assetUploader.cancelUpload(messageId);
-
     expect(assetUploader.getNumberOfOngoingUploads()).toBe(0);
-    expect(xhr.abort).toHaveBeenCalled();
   });
 
   it('updates the upload progress while the file is being uploaded', async () => {
     spyOn(assetUploader.assetService, 'uploadFile').and.callFake((_asset, _options, callback) => {
       const uploadProgress = assetUploader.getUploadProgress(messageId);
+
       callback(0.1);
-
       expect(uploadProgress()).toBe(10);
+
       callback(0.5);
-
       expect(uploadProgress()).toBe(50);
-      callback(1);
 
+      callback(1);
       expect(uploadProgress()).toBe(100);
 
       return Promise.resolve({
