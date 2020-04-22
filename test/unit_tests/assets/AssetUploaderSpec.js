@@ -35,30 +35,32 @@ describe('AssetsUploader', () => {
   );
 
   it('keeps track of current uploads', () => {
-    const xhr = {upload: {}};
-    spyOn(assetUploader.assetService, 'uploadAsset').and.callFake((fileParam, optionsParam, callback) => {
-      callback(xhr);
-      return Promise.resolve();
+    spyOn(assetUploader.assetService, 'uploadFile').and.callFake(() => {
+      expect(assetUploader.getNumberOfOngoingUploads()).toBe(1);
+
+      return Promise.resolve({
+        response: Promise.resolve({
+          key: '',
+          token: '',
+        }),
+      });
     });
 
-    assetUploader.uploadAsset(messageId, file, options);
-
-    expect(assetUploader.getNumberOfOngoingUploads()).toBe(1);
-    expect(xhr.upload.onprogress).toBeDefined();
+    assetUploader.uploadFile(messageId, file, options);
   });
 
   it('removes finished uploads', () => {
-    const xhr = {upload: {}};
-    spyOn(assetUploader.assetService, 'uploadAsset').and.callFake((fileParam, optionsParam, callback) => {
-      callback(xhr);
-      return new Promise(resolve => setTimeout(resolve));
+    spyOn(assetUploader.assetService, 'uploadFile').and.callFake(() => {
+      expect(assetUploader.getNumberOfOngoingUploads()).toBe(1);
+      return Promise.resolve({
+        response: Promise.resolve({
+          key: '',
+          token: '',
+        }),
+      });
     });
 
-    const uploadPromise = assetUploader.uploadAsset(messageId, file, options);
-
-    expect(assetUploader.getNumberOfOngoingUploads()).toBe(1);
-
-    return uploadPromise.then(() => {
+    return assetUploader.uploadFile(messageId, file, options).then(() => {
       expect(assetUploader.getNumberOfOngoingUploads()).toBe(0);
     });
   });
