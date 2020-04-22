@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.27.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.26.22...@wireapp/react-ui-kit@7.27.0) (2020-04-22)
+
+
+### Features
+
+* **react-ui-kit:** Add ReloadIcon ([#2975](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/2975)) ([1cf5e09](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/1cf5e09fac7664629d591954642c9f0a0f441afd))
+
+
+
+
+
 ## [7.26.22](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.26.21...@wireapp/react-ui-kit@7.26.22) (2020-04-17)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
