@@ -143,7 +143,9 @@ export class TeamRepository {
 
   initTeam = async (): Promise<void> => {
     const team = await this.getTeam();
-    await this.updateTeamMembers(team);
+    if (this.selfUser().teamId) {
+      await this.updateTeamMembers(team);
+    }
     this.scheduleFetchTeamInfo();
   };
 
