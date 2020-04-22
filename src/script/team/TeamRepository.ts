@@ -184,13 +184,6 @@ export class TeamRepository {
     return memberEntity;
   }
 
-  async getTeamMembers(teamId: string, userIds: string[]): Promise<TeamMemberEntity[] | void> {
-    const members = await this.teamService.getTeamMembersByIds(teamId, userIds);
-    if (members.length) {
-      return this.teamMapper.mapMemberFromArray(members);
-    }
-  }
-
   async getAllTeamMembers(teamId: string): Promise<TeamMemberEntity[] | void> {
     const {members, hasMore} = await this.teamService.getAllTeamMembers(teamId);
     if (!hasMore && members.length) {
@@ -211,8 +204,12 @@ export class TeamRepository {
   };
 
   async filterExternals(users: User[]): Promise<User[]> {
+    const teamId = this.team()?.id;
+    if (!teamId) {
+      return users;
+    }
     const userIds = users.map(({id}) => id);
-    const members = await this.teamService.getTeamMembersByIds(this.team()?.id, userIds);
+    const members = await this.teamService.getTeamMembersByIds(teamId, userIds);
     return members
       .filter(member => roleFromTeamPermissions(member.permissions) !== ROLE.PARTNER)
       .map(({user}) => users.find(({id}) => id === user));
@@ -293,6 +290,10 @@ export class TeamRepository {
   }
 
   async updateTeamMembersByIds(teamEntity: TeamEntity, memberIds: string[] = [], append = false): Promise<void> {
+    const teamId = teamEntity.id;
+    if (!teamId) {
+      return;
+    }
     const members = await this.teamService.getTeamMembersByIds(teamEntity.id, memberIds);
     const mappedMembers = this.teamMapper.mapMemberFromArray(members);
 

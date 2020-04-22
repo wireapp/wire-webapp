@@ -51,7 +51,6 @@ describe('TeamRepository', () => {
       {user: '74fa64dc-8318-4426-9935-82590ff8aa3e', permissions: 8},
     ],
   };
-  const memberIds = team_members.members.map(({user}) => user);
   /* eslint sort-keys-fix/sort-keys-fix: "off" */
 
   let server = undefined;
@@ -101,9 +100,9 @@ describe('TeamRepository', () => {
     });
   });
 
-  describe('getTeamMembers()', () => {
+  describe('getAllTeamMembers()', () => {
     it('returns team member entities', () => {
-      return team_repository.getTeamMembers(team_metadata.id, memberIds).then(entities => {
+      return team_repository.getAllTeamMembers(team_metadata.id).then(entities => {
         expect(entities.length).toEqual(team_members.members.length);
         expect(entities[0].userId).toEqual(team_members.members[0].user);
         expect(entities[0].permissions).toEqual(team_members.members[0].permissions);
