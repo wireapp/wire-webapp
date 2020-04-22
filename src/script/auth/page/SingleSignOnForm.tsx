@@ -76,7 +76,7 @@ const SingleSignOnForm = ({
   const [disableInput, setDisableInput] = useState(false);
   const {formatMessage: _} = useIntl();
   const {history} = useReactRouter();
-  const [clientType, setClientType] = useState(ClientType.PERMANENT);
+  const [clientType, setClientType] = useState<ClientType>(null);
   const [ssoError, setSsoError] = useState(null);
   const [isCodeOrMailInputValid, setIsCodeOrMailInputValid] = useState(true);
   const [validationError, setValidationError] = useState<any>();
@@ -86,10 +86,21 @@ const SingleSignOnForm = ({
   const [conversationKey, setConversationKey] = useState<string>();
   const [isValidLink, setIsValidLink] = useState(true);
 
+  const [shouldAutoLogin, setShouldAutoLogin] = useState(false);
+
+  useEffect(() => {
+    const queryClientType = UrlUtil.hasURLParameter(QUERY_KEY.SSO_AUTO_LOGIN);
+    if (queryClientType === true && initialCode) {
+      setShouldAutoLogin(true);
+    }
+  }, []);
+
   useEffect(() => {
     const queryClientType = UrlUtil.getURLParameter(QUERY_KEY.CLIENT_TYPE);
     if (queryClientType === ClientType.TEMPORARY) {
       setClientType(ClientType.TEMPORARY);
+    } else {
+      setClientType(ClientType.PERMANENT);
     }
   }, []);
 
@@ -123,6 +134,12 @@ const SingleSignOnForm = ({
     }
   }, [initialCode]);
 
+  useEffect(() => {
+    if (shouldAutoLogin && clientType && initialCode && initialCode === codeOrMail) {
+      handleSubmit();
+    }
+  }, [shouldAutoLogin, clientType, initialCode, codeOrMail]);
+
   const handleSubmit = async (event?: React.FormEvent): Promise<void> => {
     if (event) {
       event.preventDefault();
@@ -154,7 +171,12 @@ const SingleSignOnForm = ({
         const domain = email.split('@')[1];
         const {webapp_welcome_url} = await doGetDomainInfo(domain);
         const [path, query = ''] = webapp_welcome_url.split('?');
-        const welcomeUrl = pathWithParams(path, {[QUERY_KEY.CLIENT_TYPE]: clientType}, null, query);
+        const welcomeUrl = pathWithParams(
+          path,
+          {[QUERY_KEY.CLIENT_TYPE]: clientType, [QUERY_KEY.SSO_AUTO_LOGIN]: true},
+          null,
+          query,
+        );
         if (isDesktopApp()) {
           await doSendNavigationEvent(welcomeUrl);
         } else {
