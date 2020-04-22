@@ -66,6 +66,12 @@ const defaultMemberRole: ConversationRole = {
 };
 
 export class ConversationRoleRepository {
+  static canLeaveGroup(arg0: Conversation) {
+    throw new Error('Method not implemented.');
+  }
+  static canRemoveParticipants(arg0: Conversation) {
+    throw new Error('Method not implemented.');
+  }
   readonly conversationRoles: Record<string, ConversationRole[]>;
   readonly conversationService: ConversationService;
   readonly isTeam: ko.PureComputed<boolean>;

@@ -68,7 +68,7 @@ interface DiscreteTimeUnit {
   value: number;
 }
 
-interface DurationUnit {
+export interface DurationUnit {
   text: string;
   symbol: string;
   value: number;
@@ -88,20 +88,21 @@ let locale = defaultLocale;
 
 export const setDateLocale = (newLocale: keyof typeof locales) => (locale = locales[newLocale] || defaultLocale);
 
-export const formatLocale = (date: FnDate, formatString: string) => format(new Date(date), formatString, {locale});
+export const formatLocale = (date: FnDate | string | number, formatString: string) =>
+  format(new Date(date), formatString, {locale});
 
 /**
  * Format the time as `12:00 AM`.
  * This is equivalent to momentjs' `LT` formatting
  */
-export const formatTimeShort = (date: FnDate) => formatLocale(date, 'p');
+export const formatTimeShort = (date: FnDate | string | number) => formatLocale(date, 'p');
 
 /**
  * Format the date as `May 29, 2020`.
  * This is equivalent to momentjs' `LL` formatting
  */
-export const formatDateShort = (date: FnDate) => formatLocale(date, 'PP');
-export const formatDayMonth = (date: FnDate) =>
+export const formatDateShort = (date: FnDate | string | number) => formatLocale(date, 'PP');
+export const formatDayMonth = (date: FnDate | string | number) =>
   formatDateShort(date)
     .replace(/[0-9]{4}/g, '')
     .replace(locale === de ? /^\s*|\s*$/g : /^\W|\W$|\W\W/, '');
@@ -110,8 +111,8 @@ export const formatDayMonth = (date: FnDate) =>
  * Format the date as `05/29/2020`.
  * This is equivalent to momentjs' `L` formatting
  */
-export const formatDateNumeral = (date: FnDate) => formatLocale(date, 'P');
-export const formatDayMonthNumeral = (date: FnDate) =>
+export const formatDateNumeral = (date: FnDate | string | number) => formatLocale(date, 'P');
+export const formatDayMonthNumeral = (date: FnDate | string | number) =>
   formatDateNumeral(date)
     .replace(/[0-9]{4}/g, '')
     .replace(locale === de ? /^\s*|\s*$/g : /^\W|\W$|\W\W/, '');

@@ -17,20 +17,33 @@
  *
  */
 
+import ko from 'knockout';
+import {User} from '../entity/User';
+
+interface AccentColorPickerParams {
+  selected: (id: string) => void;
+  user: ko.Observable<User>;
+}
+
 class AccentColorPicker {
-  constructor({user, selected}) {
+  accentColorIds: number[];
+  selected: (id: string) => void;
+  user: User;
+
+  constructor({user, selected}: AccentColorPickerParams) {
+    this.selected = selected;
     this.user = ko.unwrap(user);
 
     this.accentColorIds = [1, 2, 4, 5, 6, 7];
-
-    this.onSelect = function (id) {
-      selected(id);
-      return true;
-    };
-
-    this.getId = id => `accent${id}`;
-    this.getClass = id => `accent-color-${id}`;
   }
+
+  onSelect = (id: string) => {
+    this.selected(id);
+    return true;
+  };
+
+  getId = (id: string): string => `accent${id}`;
+  getClass = (id: string): string => `accent-color-${id}`;
 }
 
 // Knockout registration of the accent color picker component.

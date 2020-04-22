@@ -17,10 +17,26 @@
  *
  */
 
-class DeviceRemove {
-  constructor(params) {
-    this.dispose = this.dispose.bind(this);
+import ko from 'knockout';
+import {ClientEntity} from '../client/ClientEntity';
 
+interface DeviceRemoveParams {
+  cancel?: () => void;
+  device: ko.Observable<ClientEntity>;
+  error: ko.Observable<Error | false>;
+}
+
+class DeviceRemove {
+  device_remove_error: ko.Observable<Error | false>;
+  device: ClientEntity;
+  model?: string;
+  params: DeviceRemoveParams;
+  password: ko.Observable<string>;
+  passwordSubscription: any;
+  remove_form_visible: any;
+
+  constructor(params: DeviceRemoveParams) {
+    this.params = params;
     this.device = ko.unwrap(params.device);
     this.device_remove_error = params.error || ko.observable(false);
     this.model = this.device.model;
@@ -33,28 +49,28 @@ class DeviceRemove {
         return this.device_remove_error(false);
       }
     });
-
-    this.click_on_submit = function () {
-      if (typeof params.remove === 'function') {
-        params.remove(this.password(), this.device);
-      }
-    };
-
-    this.click_on_cancel = () => {
-      this.remove_form_visible(false);
-      if (typeof params.cancel === 'function') {
-        params.cancel();
-      }
-    };
-
-    this.click_on_remove_device = () => {
-      this.remove_form_visible(true);
-    };
   }
 
-  dispose() {
+  click_on_submit = function () {
+    if (typeof this.params.remove === 'function') {
+      this.params.remove(this.password(), this.device);
+    }
+  };
+
+  click_on_cancel = () => {
+    this.remove_form_visible(false);
+    if (typeof this.params.cancel === 'function') {
+      this.params.cancel();
+    }
+  };
+
+  click_on_remove_device = () => {
+    this.remove_form_visible(true);
+  };
+
+  dispose = () => {
     this.passwordSubscription.dispose();
-  }
+  };
 }
 
 ko.components.register('device-remove', {
@@ -81,8 +97,8 @@ ko.components.register('device-remove', {
     <!-- /ko -->
   `,
   viewModel: {
-    createViewModel(params, component_info) {
-      return new DeviceRemove(params, component_info);
+    createViewModel(params: DeviceRemoveParams) {
+      return new DeviceRemove(params);
     },
   },
 });

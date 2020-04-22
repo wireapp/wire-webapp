@@ -17,13 +17,35 @@
  *
  */
 
+import ko from 'knockout';
 import {noop} from 'Util/util';
 
 import {ParticipantAvatar} from 'Components/participantAvatar';
 
 import 'Components/list/participantItem';
+import {ServiceEntity} from '../integration/ServiceEntity';
+
+interface ServiceListParams {
+  isSearching?: ko.PureComputed<boolean>;
+  services: ko.ObservableArray<ServiceEntity>;
+  mode: string;
+  click: () => void;
+  noUnderline: boolean;
+  arrow: boolean;
+}
 
 class ServiceList {
+  arrow: boolean;
+  avatarSize: string;
+  cssClasses: ko.PureComputed<string>;
+  isCompactMode: boolean;
+  isDefaultMode: boolean;
+  isSearching: ko.PureComputed<boolean> | (() => void);
+  mode: string;
+  noUnderline: boolean;
+  onClick: () => void;
+  services: ko.ObservableArray<ServiceEntity>;
+
   static get MODE() {
     return {
       COMPACT: 'ServiceList.MODE.COMPACT',
@@ -31,7 +53,7 @@ class ServiceList {
     };
   }
 
-  constructor(params) {
+  constructor(params: ServiceListParams) {
     this.isSearching = params.isSearching || noop;
     this.mode = params.mode || ServiceList.MODE.DEFAULT;
     this.onClick = params.click;

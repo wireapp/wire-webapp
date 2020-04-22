@@ -94,7 +94,7 @@ class StartUIViewModel {
 
     this.searchInput = ko.observable('');
     this.searchInput.subscribe(this.search);
-    this.isSearching = ko.pureComputed(() => this.searchInput().length);
+    this.isSearching = ko.pureComputed(() => this.searchInput().length !== 0);
     this.showMatches = ko.observable(false);
     const {canInviteTeamMembers, canSearchUnconnectedUsers} = generatePermissionHelpers();
     this.showOnlyConnectedUsers = ko.pureComputed(() => !canSearchUnconnectedUsers(this.selfUser().teamRole()));

@@ -17,16 +17,25 @@
  *
  */
 
+import {Message} from '../entity/message/Message';
+
+interface EphemeralTimerParams {
+  message: Message;
+}
+
 class EphemeralTimer {
-  constructor({message: messageEntity}) {
+  started: number;
+  duration: number;
+
+  constructor({message: messageEntity}: EphemeralTimerParams) {
     this.started = messageEntity.ephemeral_started();
-    this.duration = (messageEntity.ephemeral_expires() - this.started) / 1000;
+    this.duration = ((messageEntity.ephemeral_expires() as number) - this.started) / 1000;
   }
 
-  setAnimationDelay(data, event) {
+  setAnimationDelay(data: any, event: Event) {
     // every time the component gets rendered, the animation delay gets set
     // to accommodate for the passed lifetime of the timed message
-    event.target.style.animationDelay = `${(this.started - Date.now()) / 1000}s`;
+    (event.target as HTMLElement).style.animationDelay = `${(this.started - Date.now()) / 1000}s`;
   }
 }
 

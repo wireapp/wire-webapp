@@ -17,20 +17,29 @@
  *
  */
 
+import ko from 'knockout';
+
 import {viewportObserver} from '../ui/viewportObserver';
+import {AssetRemoteData} from '../assets/AssetRemoteData';
+
+interface ImageParams {
+  asset: AssetRemoteData;
+  click?: (asset: AssetRemoteData) => void;
+}
 
 class Image {
-  constructor(params, componentInfo) {
+  asset: AssetRemoteData;
+  assetSrc: ko.Observable<any>;
+  assetIsLoading: ko.Observable<boolean>;
+  element: HTMLElement;
+  params: ImageParams;
+
+  constructor(params: ImageParams, componentInfo: {element: HTMLElement}) {
     this.asset = ko.unwrap(params.asset);
     this.assetSrc = ko.observable();
     this.assetIsLoading = ko.observable(false);
     this.element = componentInfo.element;
-
-    this.onClick = () => {
-      if (!this.assetIsLoading() && typeof params.click === 'function') {
-        params.click(this.asset);
-      }
-    };
+    this.params = params;
 
     const _onInViewport = () => {
       this.assetIsLoading(true);
@@ -44,6 +53,12 @@ class Image {
 
     viewportObserver.onElementInViewport(this.element, _onInViewport);
   }
+
+  onClick = () => {
+    if (!this.assetIsLoading() && typeof this.params.click === 'function') {
+      this.params.click(this.asset);
+    }
+  };
 
   dispose() {
     viewportObserver.removeElement(this.element);
@@ -64,7 +79,7 @@ ko.components.register('image-component', {
     <!-- /ko -->
   `,
   viewModel: {
-    createViewModel(params, componentInfo) {
+    createViewModel(params: ImageParams, componentInfo: {element: HTMLElement}) {
       return new Image(params, componentInfo);
     },
   },

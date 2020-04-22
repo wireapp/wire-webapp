@@ -36,17 +36,17 @@ import {File as FileAsset} from './File';
 import {CompositeMessage} from './CompositeMessage';
 
 export class Message {
-  private readonly ephemeral_expires: ko.Observable<boolean | number | string>;
-  private readonly ephemeral_remaining: ko.Observable<number>;
-  private readonly ephemeral_started: ko.Observable<number>;
-  private readonly ephemeral_status: ko.Computed<EphemeralStatusType>;
-  private readonly status: ko.Observable<StatusType>;
-  private readonly visible: ko.Observable<boolean>;
   private messageTimerStarted: boolean;
+  private readonly ephemeral_remaining: ko.Observable<number>;
+  private readonly ephemeral_status: ko.Computed<EphemeralStatusType>;
+  private readonly visible: ko.Observable<boolean>;
   protected readonly affect_order: ko.Observable<boolean>;
-  public readonly accent_color: ko.PureComputed<string>;
   public category?: MessageCategory;
   public conversation_id: string;
+  public readonly status: ko.Observable<StatusType>;
+  public readonly accent_color: ko.PureComputed<string>;
+  public readonly ephemeral_expires: ko.Observable<boolean | number | string>;
+  public readonly ephemeral_started: ko.Observable<number>;
   public readonly ephemeral_caption: ko.PureComputed<string>;
   public readonly ephemeral_duration: ko.Observable<number>;
   public readonly expectsReadConfirmation: boolean;

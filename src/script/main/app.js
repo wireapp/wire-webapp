@@ -80,7 +80,7 @@ import {WindowHandler} from '../ui/WindowHandler';
 import {Router} from '../router/Router';
 import {initRouterBindings} from '../router/routerBindings';
 
-import 'Components/mentionSuggestions.js';
+import 'Components/mentionSuggestions';
 import './globals';
 
 import {ReceiptsMiddleware} from '../event/preprocessor/ReceiptsMiddleware';
