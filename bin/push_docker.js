@@ -57,14 +57,18 @@ const repository = `${dockerRegistryDomain}/wire/webapp${suffix}`;
 const dockerImageTag = `${repository}:${buildCounter}-${pkg.version}-${commitShortSha}-${configVersion}${stage}`;
 const dockerImageStageTag = stageParam ? `${repository}:${stageParam}` : '';
 
-child.execSync(
+const dockerCommands = [
   `echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin ${dockerRegistryDomain}`,
-  {stdio: 'inherit'},
-);
-child.execSync(
-  `docker build . -t ${dockerImageTag} ${dockerImageStageTag ? `-t ${dockerImageStageTag}` : ''} &&
-  docker push ${dockerImageTag} &&
-  ${dockerImageStageTag ? `docker push ${dockerImageStageTag} &&` : ''}
-  docker logout ${dockerRegistryDomain}`,
-  {stdio: 'inherit'},
-);
+  `docker build . -t ${dockerImageTag} ${dockerImageStageTag ? `-t ${dockerImageStageTag}` : ''}`,
+  `docker push ${dockerImageTag}`,
+];
+
+if (dockerImageStageTag) {
+  dockerCommands.push(`docker push ${dockerImageStageTag}`);
+}
+
+dockerCommands.push(`docker logout ${dockerRegistryDomain}`);
+
+dockerCommands.forEach(command => {
+  child.execSync(command, {stdio: 'inherit'});
+});
