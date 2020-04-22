@@ -18,7 +18,8 @@
  */
 
 import {APIClient} from '@wireapp/api-client';
-import {AssetOptions, AssetRetentionPolicy} from '@wireapp/api-client/dist/asset';
+import {AssetOptions, AssetUploadData, AssetRetentionPolicy} from '@wireapp/api-client/dist/asset';
+import {ProgressCallback, RequestCancelable} from '@wireapp/api-client/dist/http';
 import {Asset, LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {arrayToMd5Base64, loadFileBuffer, loadImage} from 'Util/util';
@@ -46,7 +47,7 @@ export interface AssetUploadOptions extends AssetOptions {
 }
 
 export class AssetService {
-  public readonly apiClient: APIClient;
+  private readonly apiClient: APIClient;
   private readonly backendClient: BackendClient;
 
   constructor(apiClient: APIClient, backendClient: BackendClient) {
@@ -157,6 +158,14 @@ export class AssetService {
 
     const isEternal = isTeamMember || isTeamConversation || isTeamUserInConversation;
     return isEternal ? AssetRetentionPolicy.ETERNAL : AssetRetentionPolicy.PERSISTENT;
+  }
+
+  public uploadFile(
+    asset: Uint8Array,
+    options: AssetOptions,
+    callback: ProgressCallback,
+  ): Promise<RequestCancelable<AssetUploadData>> {
+    return this.apiClient.asset.api.postAsset(asset, options, callback);
   }
 
   private async postAsset(

@@ -28,10 +28,10 @@ export interface UploadStatus {
   messageId: string;
   progress: ko.Observable<number>;
   xhr?: XMLHttpRequest;
-  cancelHandler?: () => void;
 }
 
-const uploadQueue: ko.ObservableArray<UploadStatus> = ko.observableArray();
+const uploadProgressQueue: ko.ObservableArray<UploadStatus> = ko.observableArray();
+const uploadCancelTokens: {[messageId: string]: () => void} = {};
 
 export class AssetUploader {
   private readonly assetService: AssetService;
@@ -43,8 +43,11 @@ export class AssetUploader {
   async uploadFile(messageId: string, file: Blob, options: AssetUploadOptions): Promise<Asset> {
     const bytes = (await loadFileBuffer(file)) as ArrayBuffer;
     const {cipherText, keyBytes, sha256} = await encryptAesAsset(bytes);
+
     const progressObservable = ko.observable(0);
-    const request = await this.assetService.apiClient.asset.api.postAsset(
+    uploadProgressQueue.push({messageId, progress: progressObservable});
+
+    const request = await this.assetService.uploadFile(
       new Uint8Array(cipherText),
       {
         public: options.public,
@@ -55,7 +58,8 @@ export class AssetUploader {
         progressObservable(percentage);
       },
     );
-    uploadQueue.push({cancelHandler: request.cancel, messageId, progress: progressObservable});
+    uploadCancelTokens[messageId] = request.cancel;
+
     return request.response
       .then(({key, token}) => {
         const assetRemoteData = new Asset.RemoteData({
@@ -83,7 +87,7 @@ export class AssetUploader {
     return uploadFunction
       .call(this.assetService, file, options, (xhr: XMLHttpRequest) => {
         const progressObservable: ko.Observable<number> = ko.observable(0);
-        uploadQueue.push({messageId, progress: progressObservable, xhr});
+        uploadProgressQueue.push({messageId, progress: progressObservable, xhr});
         xhr.upload.onprogress = event => {
           const progress = (event.loaded / event.total) * 100;
           progressObservable(progress);
@@ -96,18 +100,24 @@ export class AssetUploader {
   }
 
   cancelUpload(messageId: string): void {
+    // Legacy code (will be removed soon)
     const uploadStatus = this._findUploadStatus(messageId);
     if (uploadStatus) {
       /* eslint-disable no-unused-expressions */
       /* @see https://github.com/typescript-eslint/typescript-eslint/issues/1138 */
       uploadStatus.xhr?.abort();
-      uploadStatus.cancelHandler?.();
+      this._removeFromQueue(messageId);
+    }
+    // New code
+    const cancelToken = uploadCancelTokens[messageId];
+    if (cancelToken) {
+      cancelToken();
       this._removeFromQueue(messageId);
     }
   }
 
   getNumberOfOngoingUploads(): number {
-    return uploadQueue().length;
+    return uploadProgressQueue().length;
   }
 
   getUploadProgress(messageId: string): ko.PureComputed<number> {
@@ -118,10 +128,11 @@ export class AssetUploader {
   }
 
   _findUploadStatus(messageId: string): UploadStatus {
-    return uploadQueue().find(upload => upload.messageId === messageId);
+    return uploadProgressQueue().find(upload => upload.messageId === messageId);
   }
 
   _removeFromQueue(messageId: string): void {
-    uploadQueue(uploadQueue().filter(upload => upload.messageId !== messageId));
+    uploadProgressQueue(uploadProgressQueue().filter(upload => upload.messageId !== messageId));
+    delete uploadCancelTokens[messageId];
   }
 }

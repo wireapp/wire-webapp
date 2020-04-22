@@ -18,14 +18,14 @@
  */
 
 import {container} from 'tsyringe';
-import UUID from 'uuidjs';
+import {createRandomUuid} from 'Util/util';
 
 import {AssetUploader} from 'src/script/assets/AssetUploader';
 import {AssetService} from 'src/script/assets/AssetService';
 import {APIClientSingleton} from 'src/script/service/APIClientSingleton';
 import {BackendClient} from 'src/script/service/BackendClient';
 
-const messageId = UUID.genV4().hexString;
+const messageId = createRandomUuid();
 const file = new Blob();
 const options = {};
 
@@ -64,7 +64,10 @@ describe('AssetsUploader', () => {
   });
 
   it('removes cancelled uploads and cancels upload', () => {
-    const xhr = {abort: () => {}, upload: {}};
+    const xhr = {
+      abort: () => {},
+      upload: {},
+    };
     spyOn(xhr, 'abort');
     spyOn(assetUploader.assetService, 'uploadAsset').and.callFake((fileParam, optionsParam, callback) => {
       callback(xhr);
@@ -81,25 +84,27 @@ describe('AssetsUploader', () => {
     expect(xhr.abort).toHaveBeenCalled();
   });
 
-  it('updates the upload progress while the file is being uploaded', () => {
-    const xhr = {abort: () => {}, upload: {}};
-    spyOn(assetUploader.assetService, 'uploadAsset').and.callFake((fileParam, optionsParam, callback) => {
-      callback(xhr);
-      return new Promise(() => {});
+  it('updates the upload progress while the file is being uploaded', async () => {
+    spyOn(assetUploader.assetService, 'uploadFile').and.callFake((_asset, _options, callback) => {
+      const uploadProgress = assetUploader.getUploadProgress(messageId);
+      callback(0.1);
+
+      expect(uploadProgress()).toBe(10);
+      callback(0.5);
+
+      expect(uploadProgress()).toBe(50);
+      callback(1);
+
+      expect(uploadProgress()).toBe(100);
+
+      return Promise.resolve({
+        response: Promise.resolve({
+          key: '',
+          token: '',
+        }),
+      });
     });
-    const uploadStates = [
-      {expected: 10, loaded: 10, total: 100},
-      {expected: 50, loaded: 50, total: 100},
-      {expected: 100, loaded: 100, total: 100},
-    ];
 
-    assetUploader.uploadAsset(messageId, file, options);
-    const uploadProgress = assetUploader.getUploadProgress(messageId);
-
-    uploadStates.forEach(({loaded, total, expected}) => {
-      xhr.upload.onprogress({loaded, total});
-
-      expect(uploadProgress()).toBe(expected);
-    });
+    await assetUploader.uploadFile(messageId, file, options);
   });
 });
