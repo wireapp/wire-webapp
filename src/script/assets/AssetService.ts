@@ -101,11 +101,6 @@ export class AssetService {
     return protoAsset;
   }
 
-  async uploadAsset(file: Blob | File, options: AssetUploadOptions, xhrAccessorFunction: Function): Promise<Asset> {
-    const buffer = await loadFileBuffer(file);
-    return this._uploadAsset(buffer as ArrayBuffer, options, xhrAccessorFunction);
-  }
-
   async uploadImageAsset(
     image: Blob | File,
     options: AssetUploadOptions,

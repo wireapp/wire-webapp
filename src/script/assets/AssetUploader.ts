@@ -81,11 +81,9 @@ export class AssetUploader {
       });
   }
 
-  uploadAsset(messageId: string, file: Blob, options: AssetUploadOptions, asImage: boolean): Promise<Asset> {
-    const uploadFunction = asImage ? this.assetService.uploadImageAsset : this.assetService.uploadAsset;
-
-    return uploadFunction
-      .call(this.assetService, file, options, (xhr: XMLHttpRequest) => {
+  uploadAsset(messageId: string, file: Blob, options: AssetUploadOptions): Promise<Asset> {
+    return this.assetService
+      .uploadImageAsset(file, options, (xhr: XMLHttpRequest) => {
         const progressObservable: ko.Observable<number> = ko.observable(0);
         uploadProgressQueue.push({messageId, progress: progressObservable, xhr});
         xhr.upload.onprogress = event => {
