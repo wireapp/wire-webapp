@@ -54,6 +54,7 @@ export * from './PlusIcon';
 export * from './ProfileIcon';
 export * from './RecordIcon';
 export * from './RecordPendingIcon';
+export * from './ReloadIcon';
 export * from './ScreenshareIcon';
 export * from './SearchIcon';
 export * from './ServicesIcon';
