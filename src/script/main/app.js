@@ -395,8 +395,7 @@ class App {
       loadingView.updateProgress(10);
       telemetry.time_step(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
-      await teamRepository.getTeam();
-      teamRepository.scheduleFetchTeamInfo();
+      await teamRepository.initTeam();
 
       eventRepository.connectWebSocket();
       const conversationEntities = await conversationRepository.getConversations();

@@ -141,6 +141,12 @@ export class TeamRepository {
     return this.memberRoles()[userId] !== ROLE.PARTNER || this.memberInviters()[userId] === this.selfUser().id;
   };
 
+  initTeam = async (): Promise<void> => {
+    const team = await this.getTeam();
+    await this.updateTeamMembers(team);
+    this.scheduleFetchTeamInfo();
+  };
+
   scheduleFetchTeamInfo = (): void => {
     window.setInterval(async () => {
       try {
@@ -179,6 +185,13 @@ export class TeamRepository {
   async getTeamMembers(teamId: string, userIds: string[]): Promise<TeamMemberEntity[] | void> {
     const members = await this.teamService.getTeamMembersByIds(teamId, userIds);
     if (members.length) {
+      return this.teamMapper.mapMemberFromArray(members);
+    }
+  }
+
+  async getAllTeamMembers(teamId: string): Promise<TeamMemberEntity[] | void> {
+    const {members, hasMore} = await this.teamService.getAllTeamMembers(teamId);
+    if (!hasMore && members.length) {
       return this.teamMapper.mapMemberFromArray(members);
     }
   }
@@ -305,8 +318,8 @@ export class TeamRepository {
     }
   }
 
-  async updateTeamMembers(teamEntity: TeamEntity, userIds: string[]): Promise<void> {
-    const teamMembers = await this.getTeamMembers(teamEntity.id, userIds);
+  async updateTeamMembers(teamEntity: TeamEntity): Promise<void> {
+    const teamMembers = await this.getAllTeamMembers(teamEntity.id);
     if (teamMembers) {
       this.memberRoles({});
       this.memberInviters({});
