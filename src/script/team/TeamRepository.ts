@@ -294,8 +294,10 @@ export class TeamRepository {
     if (!teamId) {
       return;
     }
+
     const members = await this.teamService.getTeamMembersByIds(teamEntity.id, memberIds);
     const mappedMembers = this.teamMapper.mapMemberFromArray(members);
+    memberIds = mappedMembers.map(member => member.userId);
 
     if (!append) {
       this.memberRoles({});
