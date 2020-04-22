@@ -31,9 +31,6 @@ export interface AssetPayload {
 }
 
 export class Asset {
-  load() {
-    throw new Error('Method not implemented.');
-  }
   public file_type?: string;
   public id?: string;
   public key: string;

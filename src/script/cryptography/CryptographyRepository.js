@@ -317,6 +317,7 @@ export class CryptographyRepository {
           accumulator.push(encryptionPromise);
         });
       }
+      return accumulator;
     }, []);
 
     const cipherPayload = await Promise.all(cipherPayloadPromises);

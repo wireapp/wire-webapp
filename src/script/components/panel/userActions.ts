@@ -47,7 +47,7 @@ export enum Actions {
 interface UserInputParams {
   actionsViewModel: ActionsViewModel;
   conversation: ko.Observable<Conversation> | (() => null);
-  conversationRoleRepository: typeof ConversationRoleRepository;
+  conversationRoleRepository: ConversationRoleRepository;
   isSelfActivated: ko.Observable<boolean>;
   onAction: (action: Actions) => void;
   user: ko.Observable<User>;
