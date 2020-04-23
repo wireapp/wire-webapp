@@ -28,7 +28,6 @@ import {AssetUploadData} from '@wireapp/api-client/dist/asset';
 export interface UploadStatus {
   messageId: string;
   progress: ko.Observable<number>;
-  xhr?: XMLHttpRequest;
 }
 
 const uploadProgressQueue: ko.ObservableArray<UploadStatus> = ko.observableArray();
@@ -60,18 +59,18 @@ export class AssetUploader {
     return protoAsset;
   }
 
-  private buildProtoImageAsset(protoAsset: Asset, imageMeta: CompressedImage, imageType: string): Asset {
+  private attachImageData(protoAsset: Asset, imageMeta: CompressedImage, imageType: string): Asset {
     const {compressedImage, compressedBytes} = imageMeta;
-    const assetImageMetadata = new Asset.ImageMetaData({
+    const imageMetaData = new Asset.ImageMetaData({
       height: compressedImage.height,
       width: compressedImage.width,
     });
-    const assetOriginal = new Asset.Original({
-      image: assetImageMetadata,
+    const imageAsset = new Asset.Original({
+      image: imageMetaData,
       mimeType: imageType,
       size: compressedBytes.length,
     });
-    protoAsset[PROTO_MESSAGE_TYPE.ASSET_ORIGINAL] = assetOriginal;
+    protoAsset[PROTO_MESSAGE_TYPE.ASSET_ORIGINAL] = imageAsset;
     return protoAsset;
   }
 
@@ -102,28 +101,19 @@ export class AssetUploader {
           return protoAsset;
         }
         const imageMeta = await this.assetService._compressImage(file);
-        return this.buildProtoImageAsset(protoAsset, imageMeta, file.type);
+        return this.attachImageData(protoAsset, imageMeta, file.type);
       })
       .then(asset => {
-        this._removeFromQueue(messageId);
+        this.removeFromQueue(messageId);
         return asset;
       });
   }
 
   cancelUpload(messageId: string): void {
-    // Legacy code (will be removed soon)
-    const uploadStatus = this._findUploadStatus(messageId);
-    if (uploadStatus) {
-      /* eslint-disable no-unused-expressions */
-      /* @see https://github.com/typescript-eslint/typescript-eslint/issues/1138 */
-      uploadStatus.xhr?.abort();
-      this._removeFromQueue(messageId);
-    }
-    // New code
     const cancelToken = uploadCancelTokens[messageId];
     if (cancelToken) {
       cancelToken();
-      this._removeFromQueue(messageId);
+      this.removeFromQueue(messageId);
     }
   }
 
@@ -133,16 +123,16 @@ export class AssetUploader {
 
   getUploadProgress(messageId: string): ko.PureComputed<number> {
     return ko.pureComputed(() => {
-      const uploadStatus = this._findUploadStatus(messageId);
+      const uploadStatus = this.findUploadStatus(messageId);
       return uploadStatus ? uploadStatus.progress() : -1;
     });
   }
 
-  _findUploadStatus(messageId: string): UploadStatus {
+  private findUploadStatus(messageId: string): UploadStatus {
     return uploadProgressQueue().find(upload => upload.messageId === messageId);
   }
 
-  _removeFromQueue(messageId: string): void {
+  private removeFromQueue(messageId: string): void {
     uploadProgressQueue(uploadProgressQueue().filter(upload => upload.messageId !== messageId));
     delete uploadCancelTokens[messageId];
   }
