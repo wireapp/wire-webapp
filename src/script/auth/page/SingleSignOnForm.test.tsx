@@ -228,7 +228,7 @@ describe('SingleSignOnForm', () => {
     });
     const email = ' mail@mail.com ';
     const inputHost = 'http://localhost:8080?test=true';
-    const expectedHost = 'http://localhost:8080?test=true&clienttype=permanent';
+    const expectedHost = 'http://localhost:8080?test=true&clienttype=permanent&sso_auto_login=true';
 
     spyOn(actionRoot.authAction, 'doGetDomainInfo').and.returnValue(() =>
       Promise.resolve({config_json_url: '', webapp_welcome_url: inputHost}),
@@ -274,7 +274,7 @@ describe('SingleSignOnForm', () => {
     });
     const email = ' mail@mail.com ';
     const inputHost = 'http://localhost:8080?test=true';
-    const expectedHost = 'http://localhost:8080?test=true&clienttype=temporary';
+    const expectedHost = 'http://localhost:8080?test=true&clienttype=temporary&sso_auto_login=true';
 
     spyOn(actionRoot.authAction, 'doGetDomainInfo').and.returnValue(() =>
       Promise.resolve({config_json_url: '', webapp_welcome_url: inputHost}),

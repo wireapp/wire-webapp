@@ -119,7 +119,6 @@ export class TestFactory {
     this.cryptography_repository.currentClient = ko.observable(currentClient);
 
     if (mockCryptobox === true) {
-      // eslint-disable-next-line jasmine/no-unsafe-spy
       spyOn(this.cryptography_repository, 'initCryptobox').and.returnValue(Promise.resolve());
     } else {
       const storeEngine = storageRepository.storageService.engine;

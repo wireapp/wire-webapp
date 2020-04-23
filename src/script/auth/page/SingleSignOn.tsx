@@ -233,13 +233,20 @@ const SingleSignOn = ({hasDefaultSSOCode}: Props & ConnectedProps & DispatchProp
             >
               <div>
                 <H1 center>{_(ssoLoginStrings.headline)}</H1>
-                <Muted>
-                  {_(
-                    Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY
-                      ? ssoLoginStrings.subheadCodeOrEmail
-                      : ssoLoginStrings.subheadCode,
-                  )}
-                </Muted>
+                {Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ? (
+                  <>
+                    <Muted center style={{display: 'block'}} data-uie-name="status-email-or-sso-code">
+                      {_(ssoLoginStrings.subheadCodeOrEmail)}
+                    </Muted>
+                    <Muted center style={{display: 'block'}} data-uie-name="status-email-environment-switch-warning">
+                      {_(ssoLoginStrings.subheadEmailEnvironmentSwitchWarning, {
+                        brandName: Config.getConfig().BRAND_NAME,
+                      })}
+                    </Muted>
+                  </>
+                ) : (
+                  <Muted data-uie-name="status-sso-code">{_(ssoLoginStrings.subheadCode)}</Muted>
+                )}
                 <SingleSignOnForm doLogin={handleSSOWindow} initialCode={match.params.code} />
               </div>
             </ContainerXS>

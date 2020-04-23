@@ -33,6 +33,7 @@ export const QUERY_KEY = {
   LOGOUT_REASON: 'reason',
   PERSIST_TEMPORARY_CLIENTS: 'persist_temporary_clients',
   PWA_AWARE: 'pwa_aware',
+  SSO_AUTO_LOGIN: 'sso_auto_login',
   TRACKING: 'tracking',
 };
 

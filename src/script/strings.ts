@@ -697,8 +697,13 @@ export const ssoLoginStrings = defineMessages({
     id: 'ssoLogin.subheadCode',
   },
   subheadCodeOrEmail: {
-    defaultMessage: 'Please enter your email or SSO code',
+    defaultMessage: 'Please enter your email or SSO code.',
     id: 'ssoLogin.subheadCodeOrEmail',
+  },
+  subheadEmailEnvironmentSwitchWarning: {
+    defaultMessage:
+      'If your email matches an enterprise installation of {brandName}, this app will connect to that server.',
+    id: 'ssoLogin.subheadEmailEnvironmentSwitchWarning',
   },
 });
 
