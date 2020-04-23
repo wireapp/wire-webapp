@@ -197,7 +197,7 @@ export class ClientMismatchHandler {
       const noRemainingClients = !clientIdsOfUser.length;
 
       if (noRemainingClients && typeof conversationEntity !== 'undefined' && conversationEntity.isGroup()) {
-        const result = await this.userRepository['userService'].getUser(userId);
+        const result = await this.userRepository.getUserFromBackend(userId);
         const isDeleted = result?.deleted === true;
         if (isDeleted) {
           const timestamp = this.serverTimeHandler.toServerTimestamp();

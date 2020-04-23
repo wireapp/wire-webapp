@@ -179,12 +179,18 @@ ko.components.register('user-list', {
 
     const remoteTeamMembers = ko.observable([]);
 
-    async function fetchMembers(query: string, isHandle: boolean, ignoreMembers: User[]) {
+    /**
+     * Try to load additional members from the backend.
+     * This is needed for large teams (>= 2000 members)
+     **/
+    async function fetchMembersFromBackend(query: string, isHandle: boolean, ignoreMembers: User[]) {
       const resultUsers: User[] = await searchRepository.search_by_name(query, isHandle);
       const selfTeamId = teamRepository.selfUser().teamId;
       const foundMembers = resultUsers.filter(user => user.teamId === selfTeamId);
       const ignoreIds = ignoreMembers.map(member => member.id);
       const uniqueMembers = foundMembers.filter(member => !ignoreIds.includes(member.id));
+
+      // We shouldn't show any members that have the 'external' role and are not already locally known.
       const nonExternalMembers = await teamRepository.filterExternals(uniqueMembers);
       remoteTeamMembers(nonExternalMembers);
     }
@@ -210,7 +216,7 @@ ko.components.register('user-list', {
             user.username() === normalizedQuery,
         );
         if (!skipSearch) {
-          fetchMembers(trimmedQuery, isHandle, resultUsers);
+          fetchMembersFromBackend(trimmedQuery, isHandle, resultUsers);
         }
       } else {
         resultUsers = userEntities().filter(

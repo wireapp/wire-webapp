@@ -20,6 +20,8 @@
 import {PublicClient} from '@wireapp/api-client/dist/client';
 import type {BackendError} from '@wireapp/api-client/dist/http';
 import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
+import {User as APIClientUser} from '@wireapp/api-client/dist/user';
+
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {flatten} from 'underscore';
@@ -623,6 +625,10 @@ export class UserRepository {
 
       return this.fetchUsersById(unknownUserIds).then(userEts => knownUserEts.concat(userEts));
     });
+  }
+
+  getUserFromBackend(userId: string): Promise<APIClientUser> {
+    return this.userService.getUser(userId);
   }
 
   /**

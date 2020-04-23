@@ -339,63 +339,67 @@ class StartUIViewModel {
 
   async _searchPeople(query) {
     const normalizedQuery = SearchRepository.normalizeQuery(query);
-    if (normalizedQuery) {
-      this.showMatches(false);
+    if (!normalizedQuery) {
+      return;
+    }
+    this.showMatches(false);
 
-      // Contacts, groups and others
-      const trimmedQuery = query.trim();
-      const isHandle = trimmedQuery.startsWith('@') && validateHandle(normalizedQuery);
+    // Contacts, groups and others
+    const trimmedQuery = query.trim();
+    const isHandle = trimmedQuery.startsWith('@') && validateHandle(normalizedQuery);
 
-      const allLocalUsers = this.isTeam() ? this.teamRepository.teamUsers() : this.userRepository.connected_users();
+    const allLocalUsers = this.isTeam() ? this.teamRepository.teamUsers() : this.userRepository.connected_users();
 
-      const localSearchSources = this.showOnlyConnectedUsers()
-        ? this.conversationRepository.connectedUsers()
-        : allLocalUsers;
+    const localSearchSources = this.showOnlyConnectedUsers()
+      ? this.conversationRepository.connectedUsers()
+      : allLocalUsers;
 
-      const SEARCHABLE_FIELDS = SearchRepository.CONFIG.SEARCHABLE_FIELDS;
-      const searchFields = isHandle ? [SEARCHABLE_FIELDS.USERNAME] : undefined;
+    const SEARCHABLE_FIELDS = SearchRepository.CONFIG.SEARCHABLE_FIELDS;
+    const searchFields = isHandle ? [SEARCHABLE_FIELDS.USERNAME] : undefined;
 
-      const contactResults = this.searchRepository.searchUserInSet(normalizedQuery, localSearchSources, searchFields);
-      const connectedUsers = this.conversationRepository.connectedUsers();
-      const filteredResults = contactResults.filter(user => {
-        return (
-          connectedUsers.includes(user) ||
-          this.teamRepository.isSelfConnectedTo(user.id) ||
-          user.username() === normalizedQuery
-        );
-      });
+    const contactResults = this.searchRepository.searchUserInSet(normalizedQuery, localSearchSources, searchFields);
+    const connectedUsers = this.conversationRepository.connectedUsers();
+    const filteredResults = contactResults.filter(
+      user =>
+        connectedUsers.includes(user) ||
+        this.teamRepository.isSelfConnectedTo(user.id) ||
+        user.username() === normalizedQuery,
+    );
 
-      this.searchResults.contacts(filteredResults);
+    this.searchResults.contacts(filteredResults);
 
-      this.searchResults.groups(this.conversationRepository.getGroupsByName(normalizedQuery, isHandle));
+    this.searchResults.groups(this.conversationRepository.getGroupsByName(normalizedQuery, isHandle));
 
-      if (!this.showOnlyConnectedUsers()) {
-        try {
-          const userEntities = await this.searchRepository.search_by_name(normalizedQuery, isHandle);
+    if (!this.showOnlyConnectedUsers()) {
+      await this._searchRemote(normalizedQuery, isHandle);
+    }
+  }
 
-          const isCurrentQuery = normalizedQuery === SearchRepository.normalizeQuery(this.searchInput());
-          if (isCurrentQuery) {
-            if (this.selfUser().inTeam()) {
-              const selfTeamId = this.selfUser().teamId;
-              const [contacts, others] = partition(userEntities, user => user.teamId === selfTeamId);
-              const knownContactIds = this.searchResults.contacts().map(({id}) => id);
-              const newContacts = contacts.filter(({id}) => !knownContactIds.includes(id));
-              const nonExternalContacts = await this.teamRepository.filterExternals(newContacts);
-              if (nonExternalContacts.length) {
-                const sortedContacts = [...this.searchResults.contacts(), ...nonExternalContacts].sort((userA, userB) =>
-                  sortByPriority(userA.name(), userB.name(), normalizedQuery),
-                );
-                this.searchResults.contacts(sortedContacts);
-              }
-              this.searchResults.others(others);
-            } else {
-              this.searchResults.others(userEntities);
-            }
+  async _searchRemote(normalizedQuery, isHandle) {
+    try {
+      const userEntities = await this.searchRepository.search_by_name(normalizedQuery, isHandle);
+
+      const isCurrentQuery = normalizedQuery === SearchRepository.normalizeQuery(this.searchInput());
+      if (isCurrentQuery) {
+        if (this.selfUser().inTeam()) {
+          const selfTeamId = this.selfUser().teamId;
+          const [contacts, others] = partition(userEntities, user => user.teamId === selfTeamId);
+          const knownContactIds = this.searchResults.contacts().map(({id}) => id);
+          const newContacts = contacts.filter(({id}) => !knownContactIds.includes(id));
+          const nonExternalContacts = await this.teamRepository.filterExternals(newContacts);
+          if (nonExternalContacts.length) {
+            const sortedContacts = [...this.searchResults.contacts(), ...nonExternalContacts].sort((userA, userB) =>
+              sortByPriority(userA.name(), userB.name(), normalizedQuery),
+            );
+            this.searchResults.contacts(sortedContacts);
           }
-        } catch (error) {
-          this.logger.error(`Error searching for contacts: ${error.message}`, error);
+          this.searchResults.others(others);
+        } else {
+          this.searchResults.others(userEntities);
         }
       }
+    } catch (error) {
+      this.logger.error(`Error searching for contacts: ${error.message}`, error);
     }
   }
 
