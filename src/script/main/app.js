@@ -867,9 +867,7 @@ class App {
       const isTemporaryGuestReason = App.CONFIG.SIGN_OUT_REASONS.TEMPORARY_GUEST.includes(signOutReason);
       const isLeavingGuestRoom = isTemporaryGuestReason && this.repository.user.isTemporaryGuest();
       if (isLeavingGuestRoom) {
-        const path = t('urlWebsiteRoot');
-        const url = getWebsiteUrl(path);
-        return window.location.replace(url);
+        return window.location.replace(getWebsiteUrl());
       }
 
       doRedirect(signOutReason);
