@@ -22,8 +22,8 @@ import {DecryptionError} from './DecryptionError';
 import {CryptoboxCRUDStore} from './store/';
 
 export class CryptoboxSession {
-  public id: string;
-  public session: ProteusSession.Session;
+  public readonly id: string;
+  public readonly session: ProteusSession.Session;
 
   constructor(id: string, session: ProteusSession.Session) {
     this.id = id;
@@ -31,17 +31,18 @@ export class CryptoboxSession {
     Object.freeze(this);
   }
 
-  public decrypt(ciphertext: ArrayBuffer, pk_store: CryptoboxCRUDStore): Promise<Uint8Array> {
+  public async decrypt(ciphertext: ArrayBuffer, pk_store: CryptoboxCRUDStore): Promise<Uint8Array> {
     if (ciphertext.byteLength === 0) {
-      return Promise.reject(new DecryptionError('Cannot decrypt an empty ArrayBuffer.'));
+      throw new DecryptionError('Cannot decrypt an empty ArrayBuffer.');
     }
 
     const envelope: ProteusMessage.Envelope = ProteusMessage.Envelope.deserialise(ciphertext);
     return this.session.decrypt(pk_store, envelope);
   }
 
-  public encrypt(plaintext: string | Uint8Array): Promise<ArrayBuffer> {
-    return this.session.encrypt(plaintext).then((ciphertext: ProteusMessage.Envelope) => ciphertext.serialise());
+  public async encrypt(plaintext: string | Uint8Array): Promise<ArrayBuffer> {
+    const ciphertext = await this.session.encrypt(plaintext);
+    return ciphertext.serialise();
   }
 
   public fingerprint_local(): string {
