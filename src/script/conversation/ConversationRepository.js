@@ -1880,11 +1880,7 @@ export class ConversationRepository {
           retention,
         };
 
-        const uploadPromise =
-          asImage === true
-            ? this.assetUploader.uploadAsset(messageId, file, options)
-            : this.assetUploader.uploadFile(messageId, file, options);
-        return uploadPromise;
+        return this.assetUploader.uploadFile(messageId, file, options, asImage);
       })
       .then(asset => {
         genericMessage = new GenericMessage({
@@ -2001,7 +1997,7 @@ export class ConversationRepository {
 
         const messageEntityPromise = this.getMessageInConversationById(conversationEntity, messageId);
         return messageEntityPromise.then(messageEntity => {
-          return this.assetUploader.uploadFile(messageEntity.id, imageBlob, options).then(uploadedImageAsset => {
+          return this.assetUploader.uploadFile(messageEntity.id, imageBlob, options, false).then(uploadedImageAsset => {
             const assetPreview = new Asset.Preview(imageBlob.type, imageBlob.size, uploadedImageAsset.uploaded);
             const protoAsset = new Asset({
               [PROTO_MESSAGE_TYPE.ASSET_PREVIEW]: assetPreview,
