@@ -97,11 +97,11 @@ export class AssetUploader {
     return request.response
       .then(async uploadedAsset => {
         const protoAsset = this.buildProtoAsset(encryptedAsset, uploadedAsset, options);
-        if (isImage === false) {
-          return protoAsset;
+        if (isImage === true) {
+          const imageMeta = await this.assetService._compressImage(file);
+          return this.attachImageData(protoAsset, imageMeta, file.type);
         }
-        const imageMeta = await this.assetService._compressImage(file);
-        return this.attachImageData(protoAsset, imageMeta, file.type);
+        return protoAsset;
       })
       .then(asset => {
         this.removeFromQueue(messageId);
