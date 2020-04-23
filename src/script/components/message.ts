@@ -249,7 +249,7 @@ class Message {
 
     if (messageEntity.is_downloadable()) {
       entries.push({
-        click: () => (messageEntity as any).download(),
+        click: () => messageEntity.download(),
         label: t('conversationContextMenuDownload'),
       });
     }
