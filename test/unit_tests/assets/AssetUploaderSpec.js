@@ -46,7 +46,7 @@ describe('AssetsUploader', () => {
       });
     });
 
-    assetUploader.uploadFile(messageId, file, options);
+    assetUploader.uploadFile(messageId, file, options, false);
   });
 
   it('removes finished uploads', () => {
@@ -60,7 +60,7 @@ describe('AssetsUploader', () => {
       });
     });
 
-    return assetUploader.uploadFile(messageId, file, options).then(() => {
+    return assetUploader.uploadFile(messageId, file, options, false).then(() => {
       expect(assetUploader.getNumberOfOngoingUploads()).toBe(0);
     });
   });
@@ -76,7 +76,7 @@ describe('AssetsUploader', () => {
       });
     });
 
-    assetUploader.uploadFile(messageId, file, options);
+    assetUploader.uploadFile(messageId, file, options, false);
 
     assetUploader.cancelUpload(messageId);
     expect(assetUploader.getNumberOfOngoingUploads()).toBe(0);
@@ -103,6 +103,6 @@ describe('AssetsUploader', () => {
       });
     });
 
-    await assetUploader.uploadFile(messageId, file, options);
+    await assetUploader.uploadFile(messageId, file, options, false);
   });
 });

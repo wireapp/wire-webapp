@@ -19,10 +19,11 @@
 
 import ko from 'knockout';
 import {Asset} from '@wireapp/protocol-messaging';
-import {AssetService, AssetUploadOptions} from './AssetService';
+import {AssetService, AssetUploadOptions, CompressedImage} from './AssetService';
 import {loadFileBuffer} from 'Util/util';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
-import {encryptAesAsset} from './AssetCrypto';
+import {encryptAesAsset, EncryptedAsset} from './AssetCrypto';
+import {AssetUploadData} from '@wireapp/api-client/dist/asset';
 
 export interface UploadStatus {
   messageId: string;
@@ -40,15 +41,49 @@ export class AssetUploader {
     this.assetService = assetService;
   }
 
-  async uploadFile(messageId: string, file: Blob, options: AssetUploadOptions): Promise<Asset> {
+  private buildProtoAsset(
+    encryptedAsset: EncryptedAsset,
+    uploadedAsset: AssetUploadData,
+    options: AssetUploadOptions,
+  ): Asset {
+    const assetRemoteData = new Asset.RemoteData({
+      assetId: uploadedAsset.key,
+      assetToken: uploadedAsset.token,
+      otrKey: new Uint8Array(encryptedAsset.keyBytes),
+      sha256: new Uint8Array(encryptedAsset.sha256),
+    });
+    const protoAsset = new Asset({
+      [PROTO_MESSAGE_TYPE.ASSET_UPLOADED]: assetRemoteData,
+      [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: options.expectsReadConfirmation,
+      [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: options.legalHoldStatus,
+    });
+    return protoAsset;
+  }
+
+  private buildProtoImageAsset(protoAsset: Asset, imageMeta: CompressedImage, imageType: string): Asset {
+    const {compressedImage, compressedBytes} = imageMeta;
+    const assetImageMetadata = new Asset.ImageMetaData({
+      height: compressedImage.height,
+      width: compressedImage.width,
+    });
+    const assetOriginal = new Asset.Original({
+      image: assetImageMetadata,
+      mimeType: imageType,
+      size: compressedBytes.length,
+    });
+    protoAsset[PROTO_MESSAGE_TYPE.ASSET_ORIGINAL] = assetOriginal;
+    return protoAsset;
+  }
+
+  async uploadFile(messageId: string, file: Blob, options: AssetUploadOptions, isImage: boolean): Promise<Asset> {
     const bytes = (await loadFileBuffer(file)) as ArrayBuffer;
-    const {cipherText, keyBytes, sha256} = await encryptAesAsset(bytes);
+    const encryptedAsset = await encryptAesAsset(bytes);
 
     const progressObservable = ko.observable(0);
     uploadProgressQueue.push({messageId, progress: progressObservable});
 
     const request = await this.assetService.uploadFile(
-      new Uint8Array(cipherText),
+      new Uint8Array(encryptedAsset.cipherText),
       {
         public: options.public,
         retention: options.retention,
@@ -61,19 +96,13 @@ export class AssetUploader {
     uploadCancelTokens[messageId] = request.cancel;
 
     return request.response
-      .then(({key, token}) => {
-        const assetRemoteData = new Asset.RemoteData({
-          assetId: key,
-          assetToken: token,
-          otrKey: new Uint8Array(keyBytes),
-          sha256: new Uint8Array(sha256),
-        });
-        const protoAsset = new Asset({
-          [PROTO_MESSAGE_TYPE.ASSET_UPLOADED]: assetRemoteData,
-          [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: options.expectsReadConfirmation,
-          [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: options.legalHoldStatus,
-        });
-        return protoAsset;
+      .then(async uploadedAsset => {
+        const protoAsset = this.buildProtoAsset(encryptedAsset, uploadedAsset, options);
+        if (isImage === false) {
+          return protoAsset;
+        }
+        const imageMeta = await this.assetService._compressImage(file);
+        return this.buildProtoImageAsset(protoAsset, imageMeta, file.type);
       })
       .then(asset => {
         this._removeFromQueue(messageId);

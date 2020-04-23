@@ -215,7 +215,7 @@ export class AssetService {
     });
   }
 
-  private _compressImage(image: File | Blob): Promise<CompressedImage> {
+  _compressImage(image: File | Blob): Promise<CompressedImage> {
     return this._compressImageWithWorker('worker/image-worker.js', image);
   }
 
