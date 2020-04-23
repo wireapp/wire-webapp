@@ -110,22 +110,6 @@ export class AssetUploader {
       });
   }
 
-  uploadAsset(messageId: string, file: Blob, options: AssetUploadOptions): Promise<Asset> {
-    return this.assetService
-      .uploadImageAsset(file, options, (xhr: XMLHttpRequest) => {
-        const progressObservable: ko.Observable<number> = ko.observable(0);
-        uploadProgressQueue.push({messageId, progress: progressObservable, xhr});
-        xhr.upload.onprogress = event => {
-          const progress = (event.loaded / event.total) * 100;
-          progressObservable(progress);
-        };
-      })
-      .then((asset: Asset) => {
-        this._removeFromQueue(messageId);
-        return asset;
-      });
-  }
-
   cancelUpload(messageId: string): void {
     // Legacy code (will be removed soon)
     const uploadStatus = this._findUploadStatus(messageId);
