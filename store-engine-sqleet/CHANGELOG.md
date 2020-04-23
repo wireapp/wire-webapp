@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# 1.3.0 (2020-04-23)
+
+
+### Features
+
+* **core,bot-api:** Add CompositeContentBuilder ([#2948](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/issues/2948)) ([d838a9b](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/commit/d838a9b4d111804c0bdc8f915c48719c6ce2c75e))
+
+
+
+
+
 ## [1.2.16](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/compare/@wireapp/store-engine-sqleet@1.2.15...@wireapp/store-engine-sqleet@1.2.16) (2020-04-08)
 
 **Note:** Version bump only for package @wireapp/store-engine-sqleet

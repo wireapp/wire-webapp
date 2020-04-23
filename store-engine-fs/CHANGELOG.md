@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# 2.2.0 (2020-04-23)
+
+
+### Features
+
+* **core,bot-api:** Add CompositeContentBuilder ([#2948](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-fs/issues/2948)) ([d838a9b](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-fs/commit/d838a9b4d111804c0bdc8f915c48719c6ce2c75e))
+
+
+
+
+
 ## [2.1.16](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-fs/compare/@wireapp/store-engine-fs@2.1.15...@wireapp/store-engine-fs@2.1.16) (2020-04-08)
 
 **Note:** Version bump only for package @wireapp/store-engine-fs
