@@ -66,6 +66,7 @@ import {ClientService} from 'src/script/client/ClientService';
 import {APIClientSingleton} from 'src/script/service/APIClientSingleton';
 import {TeamService} from 'src/script/team/TeamService';
 import {SearchService} from 'src/script/search/SearchService';
+import {AssetUploader} from '../../src/script/assets/AssetUploader';
 
 export class TestFactory {
   /**
@@ -279,6 +280,9 @@ export class TestFactory {
       new SelfService(container.resolve(APIClientSingleton).getClient()),
     );
 
+    const assetService = new AssetService(container.resolve(APIClientSingleton).getClient());
+    const assetUploader = new AssetUploader(assetService);
+
     this.conversation_repository = new ConversationRepository(
       this.conversation_service,
       this.asset_service,
@@ -287,10 +291,7 @@ export class TestFactory {
       this.cryptography_repository,
       this.event_repository,
       undefined,
-      new LinkPreviewRepository(
-        new AssetService(container.resolve(APIClientSingleton).getClient()),
-        propertiesRepository,
-      ),
+      new LinkPreviewRepository(assetUploader, propertiesRepository),
       new MessageSender(),
       serverTimeHandler,
       this.team_repository,
