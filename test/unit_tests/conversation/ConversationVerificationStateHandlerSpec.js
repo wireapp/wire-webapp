@@ -52,7 +52,7 @@ describe('ConversationVerificationStateHandler', () => {
       conversationC = new Conversation(createRandomUuid());
 
       selfUserEntity = new User(createRandomUuid());
-      selfUserEntity.is_me = true;
+      selfUserEntity.isMe = true;
       selfUserEntity.devices().forEach(clientEntity => clientEntity.meta.isVerified(true));
 
       spyOn(conversationRepository, 'selfUser').and.returnValue(selfUserEntity);

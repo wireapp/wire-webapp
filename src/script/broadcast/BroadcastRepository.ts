@@ -95,6 +95,7 @@ export class BroadcastRepository {
       const recipients = this.createBroadcastRecipients(userEntities);
       return this.cryptographyRepository.encryptGenericMessage(recipients, genericMessage).then(payload => {
         const eventInfoEntity = new EventInfoEntity(genericMessage);
+        eventInfoEntity.options.precondition = userEntities.map(user => user.id);
         this._sendEncryptedMessage(eventInfoEntity, payload);
       });
     });
@@ -121,11 +122,11 @@ export class BroadcastRepository {
    */
   private _sendEncryptedMessage(eventInfoEntity: EventInfoEntity, payload: NewOTRMessage): Promise<any> {
     const messageType = eventInfoEntity.getType();
-    this.logger.info(`Sending '${messageType}' message as broadcast`, payload);
+    const receivingUsers = Object.keys(payload.recipients);
+    this.logger.info(`Sending '${messageType}' broadcast message to '${receivingUsers.length}' users`, payload);
 
-    const options = eventInfoEntity.options;
     return this.broadcastService
-      .postBroadcastMessage(payload, options.precondition)
+      .postBroadcastMessage(payload, eventInfoEntity.options.precondition)
       .then(response => {
         this.clientMismatchHandler.onClientMismatch(eventInfoEntity, response, payload);
         return response;

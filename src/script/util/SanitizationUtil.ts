@@ -37,7 +37,7 @@ export const getSelfName = (declension = Declension.NOMINATIVE, bypassSanitizati
 };
 
 export const getUserName = (userEntity: User, declension: string, bypassSanitization: boolean = false): string => {
-  if (userEntity.is_me) {
+  if (userEntity.isMe) {
     return getSelfName(declension, bypassSanitization);
   }
   return bypassSanitization ? userEntity.name() : escape(userEntity.name());

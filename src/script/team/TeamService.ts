@@ -51,8 +51,12 @@ export class TeamService {
     return this.apiClient.teams.legalhold.api.putMemberApproveLegalHold(teamId, userId, password);
   }
 
-  getTeamMembers(teamId: string): Promise<Members> {
+  getAllTeamMembers(teamId: string): Promise<Members> {
     return this.apiClient.teams.member.api.getAllMembers(teamId);
+  }
+
+  getTeamMembersByIds(teamId: string, userIds: string[]): Promise<MemberData[]> {
+    return this.apiClient.teams.member.api.getMembers(teamId, {ids: userIds});
   }
 
   getTeams(): Promise<TeamChunkData> {

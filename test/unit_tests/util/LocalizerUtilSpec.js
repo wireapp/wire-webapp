@@ -176,7 +176,7 @@ describe('LocalizerUtil', () => {
       const beatles = [
         {name: () => 'John'},
         {name: () => 'Paul'},
-        {is_me: true, name: () => 'George'},
+        {isMe: true, name: () => 'George'},
         {name: () => 'Ringo'},
       ];
 

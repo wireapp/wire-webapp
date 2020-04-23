@@ -40,6 +40,7 @@ describe('GroupParticipantUserViewModel', () => {
         onGoToRoot: noop,
         repositories: {
           conversation: testFactory.conversation_repository,
+          team: testFactory.team_repository,
           user: testFactory.user_repository,
         },
       });

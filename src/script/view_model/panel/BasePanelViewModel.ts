@@ -60,7 +60,7 @@ export class BasePanelViewModel {
   }
 
   getEntityId(): string | false {
-    return this.activeConversation() ? this.activeConversation().id : false;
+    return this.activeConversation()?.id ?? false;
   }
 
   shouldSkipTransition(): boolean {

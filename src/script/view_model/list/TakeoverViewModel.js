@@ -53,7 +53,7 @@ class TakeoverViewModel {
 
   keepUsername() {
     this.userRepository
-      .change_username(this.username())
+      .changeUsername(this.username())
       .then(() => {
         const conversationEntity = this.conversationRepository.getMostRecentConversation();
         if (conversationEntity) {
