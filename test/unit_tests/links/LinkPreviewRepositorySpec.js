@@ -24,19 +24,18 @@ import {PropertiesService} from 'src/script/properties/PropertiesService';
 import {SelfService} from 'src/script/self/SelfService';
 import {LinkPreviewRepository} from 'src/script/links/LinkPreviewRepository';
 import {APIClientSingleton} from 'src/script/service/APIClientSingleton';
-import {BackendClient} from 'src/script/service/BackendClient';
 import {LinkPreviewError} from 'src/script/error/LinkPreviewError';
+import {AssetUploader} from '../../../src/script/assets/AssetUploader';
 
 describe('LinkPreviewRepository', () => {
   let link_preview_repository = null;
 
   beforeEach(() => {
     const apiClient = container.resolve(APIClientSingleton).getClient();
+    const assetService = new AssetService(container.resolve(APIClientSingleton).getClient());
+    const assetUploader = new AssetUploader(assetService);
     const propertiesRepository = new PropertiesRepository(new PropertiesService(apiClient), new SelfService(apiClient));
-    link_preview_repository = new LinkPreviewRepository(
-      new AssetService(apiClient, container.resolve(BackendClient)),
-      propertiesRepository,
-    );
+    link_preview_repository = new LinkPreviewRepository(assetUploader, propertiesRepository);
   });
 
   afterEach(() => (window.openGraphAsync = undefined));

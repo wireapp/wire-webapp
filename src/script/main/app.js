@@ -240,6 +240,8 @@ class App {
     repositories.team = new TeamRepository(new TeamService(this.apiClient), repositories.user);
     repositories.eventTracker = new EventTrackingRepository(repositories.team, repositories.user);
 
+    const assetUploader = new AssetUploader(this.service.asset);
+
     repositories.conversation = new ConversationRepository(
       this.service.conversation,
       this.service.asset,
@@ -248,13 +250,13 @@ class App {
       repositories.cryptography,
       repositories.event,
       repositories.giphy,
-      new LinkPreviewRepository(this.service.asset, repositories.properties),
+      new LinkPreviewRepository(assetUploader, repositories.properties),
       sendingMessageQueue,
       serverTimeHandler,
       repositories.team,
       repositories.user,
       repositories.properties,
-      new AssetUploader(this.service.asset),
+      assetUploader,
     );
 
     const serviceMiddleware = new ServiceMiddleware(repositories.conversation, repositories.user);
