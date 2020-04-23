@@ -327,7 +327,9 @@ class Message {
   }
 }
 
-const receiptStatusTemplate = `
+// if this is not explicitely defined as string,
+// TS will define this as the string's content.
+const receiptStatusTemplate: string = `
   <!-- ko if: isLastDeliveredMessage() && readReceiptText() === '' -->
     <span class="message-status" data-bind="text: t('conversationMessageDelivered')"></span>
   <!-- /ko -->
@@ -346,7 +348,7 @@ const receiptStatusTemplate = `
   <!-- /ko -->
 `;
 
-const normalTemplate = `
+const normalTemplate: string = `
   <!-- ko if: shouldShowAvatar -->
     <div class="message-header">
       <div class="message-header-icon">
@@ -446,7 +448,7 @@ const normalTemplate = `
   <!-- /ko -->
   `;
 
-const missedTemplate = `
+const missedTemplate: string = `
   <div class="message-header">
     <div class="message-header-icon">
       <span class="icon-sysmsg-error text-red"></span>
@@ -455,7 +457,7 @@ const missedTemplate = `
   </div>
   `;
 
-const unableToDecryptTemplate = `
+const unableToDecryptTemplate: string = `
   <div class="message-header">
     <div class="message-header-icon">
       <span class="icon-sysmsg-error text-red"></span>
@@ -479,7 +481,7 @@ const unableToDecryptTemplate = `
   </div>
   `;
 
-const systemTemplate = `
+const systemTemplate: string = `
   <div class="message-header">
     <div class="message-header-icon message-header-icon--svg text-foreground">
       <span data-bind="component: getSystemMessageIconComponent(message)"></span>
@@ -498,7 +500,7 @@ const systemTemplate = `
   <div class="message-body font-weight-bold" data-bind="text: message.name"></div>
   `;
 
-const pingTemplate = `
+const pingTemplate: string = `
   <div class="message-header">
     <div class="message-header-icon">
       <div class="icon-ping" data-bind="css: message.get_icon_classes"></div>
@@ -516,7 +518,7 @@ const pingTemplate = `
   </div>
   `;
 
-const deleteTemplate = `
+const deleteTemplate: string = `
   <div class="message-header">
     <div class="message-header-icon">
       <participant-avatar class="sender-avatar" params="participant: message.user, click: onClickAvatar, size: ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
@@ -531,7 +533,7 @@ const deleteTemplate = `
   </div>
   `;
 
-const legalHoldTemplate = `
+const legalHoldTemplate: string = `
   <div class="message-header">
     <div class="message-header-icon">
       <legal-hold-dot></legal-hold-dot>
@@ -548,7 +550,7 @@ const legalHoldTemplate = `
   </div>
   `;
 
-const verificationTemplate = `
+const verificationTemplate: string = `
   <div class="message-header">
     <div class="message-header-icon">
       <!-- ko if: message.isTypeVerified() -->
@@ -580,7 +582,7 @@ const verificationTemplate = `
   </div>
   `;
 
-const callTemplate = `
+const callTemplate: string = `
   <div class="message-header">
     <div class="message-header-icon message-header-icon--svg">
       <!-- ko if: message.was_completed() -->
@@ -600,7 +602,7 @@ const callTemplate = `
   </div>
   `;
 
-const memberTemplate = `
+const memberTemplate: string = `
   <!-- ko if: message.showLargeAvatar() -->
     <div class="message-connected">
       <span class="message-connected-header" data-bind='text: message.otherUser().name()'></span>
