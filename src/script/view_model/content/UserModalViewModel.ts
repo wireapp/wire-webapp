@@ -74,7 +74,7 @@ export class UserModalViewModel {
     this.userNotFound(false);
     if (userId) {
       this.userRepository
-        .get_user_by_id(userId)
+        .getUserById(userId)
         .then(user => {
           if (user.isDeleted) {
             return this.userNotFound(true);

@@ -395,6 +395,8 @@ class App {
       loadingView.updateProgress(10);
       telemetry.time_step(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
+      await teamRepository.initTeam();
+
       eventRepository.connectWebSocket();
       const conversationEntities = await conversationRepository.getConversations();
       const connectionEntities = await connectionRepository.getConnections();
@@ -407,12 +409,10 @@ class App {
       conversationRepository.map_connections(connectionRepository.connectionEntities());
       this._subscribeToUnloadEvents();
 
-      await teamRepository.getTeam();
-      teamRepository.scheduleFetchTeamInfo();
-
       await conversationRepository.conversationRoleRepository.loadTeamRoles();
 
       await userRepository.loadUsers();
+
       const notificationsCount = await eventRepository.initializeFromStream();
 
       telemetry.time_step(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
@@ -435,6 +435,7 @@ class App {
       await this._handleUrlParams();
       await conversationRepository.updateConversationsOnAppInit();
       await conversationRepository.conversationLabelRepository.loadLabels();
+
       telemetry.time_step(AppInitTimingsStep.APP_LOADED);
       this._showInterface();
       this.applock = new AppLockViewModel(clientRepository, userRepository.self);
@@ -571,10 +572,10 @@ class App {
   _checkUserInformation(userEntity) {
     if (userEntity.hasActivatedIdentity()) {
       if (!userEntity.mediumPictureResource()) {
-        this.repository.user.set_default_picture();
+        this.repository.user.setDefaultPicture();
       }
       if (!userEntity.username()) {
-        this.repository.user.get_username_suggestion();
+        this.repository.user.getUsernameSuggestion();
       }
     }
 

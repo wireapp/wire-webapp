@@ -166,7 +166,7 @@ export class SearchRepository {
    */
   search_by_name(
     name: string,
-    isHandle?: string,
+    isHandle?: boolean,
     maxResults = SearchRepository.CONFIG.MAX_SEARCH_RESULTS,
   ): Promise<User[]> {
     const directorySearch = this.searchService
@@ -176,7 +176,7 @@ export class SearchRepository {
     const searchPromises: Promise<any>[] = [directorySearch];
 
     if (validateHandle(name)) {
-      searchPromises.push(this.userRepository.get_user_id_by_handle(name));
+      searchPromises.push(this.userRepository.getUserIdByHandle(name));
     }
 
     return Promise.all(searchPromises)
@@ -187,10 +187,10 @@ export class SearchRepository {
 
         return directoryResults;
       })
-      .then(userIds => this.userRepository.get_users_by_id(userIds))
+      .then(userIds => this.userRepository.getUsersById(userIds))
       .then(userEntities => {
         return userEntities.filter(userEntity => {
-          return !userEntity.is_me && !userEntity.isConnected() && !userEntity.isTeamMember();
+          return !userEntity.isMe && !userEntity.isConnected() && !userEntity.isTeamMember();
         });
       })
       .then(userEntities => {

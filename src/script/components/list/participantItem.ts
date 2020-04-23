@@ -81,7 +81,7 @@ class ParticipantItem {
   ) {
     this.avatarSize = ParticipantAvatar.SIZE.SMALL;
     this.participant = ko.unwrap(participant);
-    this.isSelf = !!(this.participant as User).is_me;
+    this.isSelf = !!(this.participant as User).isMe;
     this.selfString = `(${capitalizeFirstChar(t('conversationYouNominative'))})`;
     this.isService = this.participant instanceof ServiceEntity || this.participant.isService;
     this.isUser = this.participant instanceof User && !this.participant.isService;

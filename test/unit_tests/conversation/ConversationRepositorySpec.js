@@ -360,7 +360,7 @@ describe('ConversationRepository', () => {
 
     it('should not delete other users messages', done => {
       const user_et = new User();
-      user_et.is_me = false;
+      user_et.isMe = false;
       const message_to_delete_et = new Message(createRandomUuid());
       message_to_delete_et.user(user_et);
       conversation_et.add_message(message_to_delete_et);
@@ -378,7 +378,7 @@ describe('ConversationRepository', () => {
     it('should send delete and deletes message for own messages', () => {
       spyOn(testFactory.event_service, 'deleteEvent');
       const userEntity = new User();
-      userEntity.is_me = true;
+      userEntity.isMe = true;
       const messageEntityToDelete = new Message();
       messageEntityToDelete.id = createRandomUuid();
       messageEntityToDelete.user(userEntity);
@@ -494,6 +494,8 @@ describe('ConversationRepository', () => {
       const teamId = team1to1Conversation.team;
       const teamMemberId = team1to1Conversation.members.others[0].id;
       const userEntity = new User(teamMemberId);
+
+      testFactory.user_repository.self().teamId = teamId;
       userEntity.inTeam(true);
       userEntity.isTeamMember(true);
       userEntity.teamId = teamId;
@@ -573,7 +575,7 @@ describe('ConversationRepository', () => {
 
   describe('getPrecedingMessages', () => {
     it('gets messages which are not broken by design', () => {
-      spyOn(testFactory.user_repository, 'get_user_by_id').and.returnValue(Promise.resolve(new User()));
+      spyOn(testFactory.user_repository, 'getUserById').and.returnValue(Promise.resolve(new User()));
 
       conversation_et = new Conversation(createRandomUuid());
       // prettier-ignore
@@ -998,7 +1000,7 @@ describe('ConversationRepository', () => {
       beforeEach(() => {
         spyOn(testFactory.conversation_repository, '_onMemberJoin').and.callThrough();
         spyOn(testFactory.conversation_repository, 'updateParticipatingUserEntities').and.callThrough();
-        spyOn(testFactory.user_repository, 'get_users_by_id').and.returnValue(Promise.resolve([]));
+        spyOn(testFactory.user_repository, 'getUsersById').and.returnValue(Promise.resolve([]));
 
         memberJoinEvent = {
           conversation: conversation_et.id,

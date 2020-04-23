@@ -49,7 +49,7 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
       () =>
         this.conversationRoleRepository.canChangeParticipantRoles(this.activeConversation()) &&
         !!this.selectedParticipant() &&
-        !this.selectedParticipant().is_me &&
+        !this.selectedParticipant().isMe &&
         !this.selectedParticipant().isTemporaryGuest(),
     );
 
@@ -73,7 +73,7 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
   };
 
   showActionDevices(userEntity) {
-    return !userEntity.is_me;
+    return !userEntity.isMe;
   }
 
   onUserAction(action) {
@@ -94,10 +94,11 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
     this.navigateTo(z.viewModel.PanelViewModel.STATE.PARTICIPANT_DEVICES, {entity: this.selectedParticipant()});
   }
 
-  initView({entity: user}) {
-    const userEntity = user;
+  initView({entity: userEntity}) {
     this.selectedParticipant(userEntity);
-
+    if (this.teamRepository.isTeam()) {
+      this.teamRepository.updateTeamMembersByIds(this.teamRepository.team(), [userEntity.id], true);
+    }
     if (userEntity.isTemporaryGuest()) {
       userEntity.checkGuestExpiration();
     }

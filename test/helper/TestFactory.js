@@ -142,7 +142,7 @@ export class TestFactory {
     const user = new User(entities.user.john_doe.id);
     user.devices.push(clientEntity);
     user.email(entities.user.john_doe.email);
-    user.is_me = true;
+    user.isMe = true;
     user.locale = entities.user.john_doe.locale;
     user.name(entities.user.john_doe.name);
     user.phone(entities.user.john_doe.phone);
@@ -225,7 +225,7 @@ export class TestFactory {
       serverTimeHandler,
       this.propertyRepository,
     );
-    this.user_repository.save_user(this.client_repository.selfUser(), true);
+    this.user_repository.saveUser(this.client_repository.selfUser(), true);
 
     return this.user_repository;
   }

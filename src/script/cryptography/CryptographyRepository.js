@@ -215,7 +215,7 @@ export class CryptographyRepository {
    */
   async encryptGenericMessage(recipients, genericMessage, payload = this._constructPayload(this.currentClient().id)) {
     const receivingUsers = Object.keys(recipients).length;
-    const encryptLogMessage = `Encrypting message of type '${genericMessage.content}' for '${receivingUsers}' users.`;
+    const encryptLogMessage = `Encrypting message of type '${genericMessage.content}' for '${receivingUsers}' users...`;
     this.logger.log(encryptLogMessage, recipients);
 
     let {messagePayload, missingRecipients} = await this._encryptGenericMessage(recipients, genericMessage, payload);

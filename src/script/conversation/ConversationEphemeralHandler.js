@@ -239,7 +239,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
 
   async _timeoutEphemeralMessage(messageEntity) {
     if (!messageEntity.is_expired()) {
-      if (messageEntity.user().is_me) {
+      if (messageEntity.user().isMe) {
         await this._obfuscateMessage(messageEntity);
       }
 

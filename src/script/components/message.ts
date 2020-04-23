@@ -304,7 +304,7 @@ class Message {
 
     const isSendingMessage = messageEntity.status() === StatusType.SENDING;
     const canDelete =
-      messageEntity.user().is_me && !this.conversation().removed_from_conversation() && !isSendingMessage;
+      messageEntity.user().isMe && !this.conversation().removed_from_conversation() && !isSendingMessage;
     if (canDelete) {
       entries.push({
         click: () => this.actionsViewModel.deleteMessageEveryone(this.conversation(), messageEntity),
@@ -680,7 +680,7 @@ const memberTemplate = `
       <!-- /ko -->
     <!-- /ko -->
 
-    <!-- ko if: message.isMemberLeave() && message.user().is_me && isSelfTemporaryGuest -->
+    <!-- ko if: message.isMemberLeave() && message.user().isMe && isSelfTemporaryGuest -->
       <div class="message-member-footer">
         <div class="message-member-footer-description" data-bind="text: t('temporaryGuestLeaveDescription')"></div>
       </div>

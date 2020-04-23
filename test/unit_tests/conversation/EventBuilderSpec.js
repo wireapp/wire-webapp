@@ -35,7 +35,7 @@ describe('z.conversation.EventBuilder', () => {
 
   beforeEach(() => {
     self_user_et = new User(createRandomUuid());
-    self_user_et.is_me = true;
+    self_user_et.isMe = true;
 
     conversation_et = new Conversation(createRandomUuid());
     conversation_et.selfUser(self_user_et);

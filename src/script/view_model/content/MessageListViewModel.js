@@ -72,7 +72,7 @@ export class MessageListViewModel {
     this.verticallyCenterMessage = ko.pureComputed(() => {
       if (this.conversation().messages_visible().length === 1) {
         const [messageEntity] = this.conversation().messages_visible();
-        return messageEntity.is_member() && messageEntity.isConnection();
+        return messageEntity.isMember() && messageEntity.isConnection();
       }
     });
 
@@ -387,7 +387,7 @@ export class MessageListViewModel {
     const conversationEntity = this.conversation_repository.active_conversation();
     const isSingleModeConversation = conversationEntity.is1to1() || conversationEntity.isRequest();
 
-    if (isSingleModeConversation && !userEntity.is_me) {
+    if (isSingleModeConversation && !userEntity.isMe) {
       return this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS);
     }
 
@@ -519,7 +519,7 @@ export class MessageListViewModel {
     const callbacks = [];
 
     if (!messageEntity.is_ephemeral()) {
-      const isCreationMessage = messageEntity.is_member() && messageEntity.isCreation();
+      const isCreationMessage = messageEntity.isMember() && messageEntity.isCreation();
       if (conversationEntity.is1to1() && isCreationMessage) {
         this.integrationRepository.addProviderNameToParticipant(messageEntity.otherUser());
       }
@@ -545,7 +545,7 @@ export class MessageListViewModel {
     }
 
     const isUnreadMessage = messageTimestamp > conversationEntity.last_read_timestamp();
-    const isNotOwnMessage = !messageEntity.user().is_me;
+    const isNotOwnMessage = !messageEntity.user().isMe;
 
     let shouldSendReadReceipt = false;
 
@@ -617,7 +617,7 @@ export class MessageListViewModel {
 
     if (userId) {
       this.userRepository
-        .get_user_by_id(userId)
+        .getUserById(userId)
         .then(userEntity => this.showUserDetails(userEntity))
         .catch(error => {
           if (error.type !== UserError.TYPE.USER_NOT_FOUND) {

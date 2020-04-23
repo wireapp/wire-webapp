@@ -86,7 +86,7 @@ export class MessageDetailsViewModel extends BasePanelViewModel {
 
     this.receipts.subscribe(receipts => {
       const userIds = receipts.map(({userId}) => userId);
-      userRepository.get_users_by_id(userIds).then(users => this.receiptUsers(users.sort(sortUsers)));
+      userRepository.getUsersById(userIds).then(users => this.receiptUsers(users.sort(sortUsers)));
       const receiptTimes = receipts.reduce((times, {userId, time}) => {
         times[userId] = formatTime(time);
         return times;
@@ -101,7 +101,7 @@ export class MessageDetailsViewModel extends BasePanelViewModel {
     const formatUserCount = users => (users.length ? ` (${users.length})` : '');
 
     this.supportsReceipts = ko.pureComputed(() => {
-      const isMe = this.message() && this.message().user().is_me;
+      const isMe = this.message() && this.message().user().isMe;
       const isTeamConversation = !!this.activeConversation().team_id;
       return isMe && isTeamConversation;
     });
@@ -121,7 +121,7 @@ export class MessageDetailsViewModel extends BasePanelViewModel {
     });
 
     this.likes.subscribe(likeIds => {
-      userRepository.get_users_by_id(likeIds).then(users => this.likeUsers(users.sort(sortUsers)));
+      userRepository.getUsersById(likeIds).then(users => this.likeUsers(users.sort(sortUsers)));
     });
 
     this.receiptsTitle = ko.pureComputed(() => {

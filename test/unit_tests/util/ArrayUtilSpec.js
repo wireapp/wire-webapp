@@ -17,7 +17,7 @@
  *
  */
 
-import {chunk, getNextItem, interpolate, isLastItem, iterateIndex, uniquify, flatten} from 'Util/ArrayUtil';
+import {chunk, getNextItem, interpolate, isLastItem, iterateIndex, uniquify, flatten, partition} from 'Util/ArrayUtil';
 
 describe('ArrayUtil', () => {
   describe('chunk', () => {
@@ -145,6 +145,21 @@ describe('ArrayUtil', () => {
       ];
 
       expect(flatten(arrays)).toEqual([1, 2, 3, 4, 5, 6]);
+    });
+  });
+
+  describe('partition', () => {
+    it('returns a correctly partitioned array', () => {
+      const array = [3, 6, 5, 1, 2, 4];
+      const isOdd = input => input % 2 === 1;
+      const isLessThanTen = input => input < 10;
+
+      expect(partition(array, isOdd)).toEqual([
+        [3, 5, 1],
+        [6, 2, 4],
+      ]);
+
+      expect(partition(array, isLessThanTen)).toEqual([[3, 6, 5, 1, 2, 4], []]);
     });
   });
 });
