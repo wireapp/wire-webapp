@@ -18,16 +18,13 @@
  */
 
 import {APIClient} from '@wireapp/api-client';
-import {AssetOptions, AssetUploadData, AssetRetentionPolicy} from '@wireapp/api-client/dist/asset';
+import {AssetOptions, AssetRetentionPolicy, AssetUploadData} from '@wireapp/api-client/dist/asset';
 import {ProgressCallback, RequestCancelable} from '@wireapp/api-client/dist/http';
-import {Asset, LegalHoldStatus} from '@wireapp/protocol-messaging';
+import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {arrayToMd5Base64, loadFileBuffer, loadImage} from 'Util/util';
 import {assetV3, legacyAsset} from 'Util/ValidationUtil';
 import {WebWorker} from 'Util/worker';
-
-import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
-import {encryptAesAsset} from './AssetCrypto';
 import {BackendClient} from '../service/BackendClient';
 import {Conversation} from '../entity/Conversation';
 
@@ -78,47 +75,6 @@ export class AssetService {
       mediumImageKey: mediumCredentials.key,
       previewImageKey: previewCredentials.key,
     };
-  }
-
-  private async _uploadAsset(
-    bytes: ArrayBuffer,
-    options: AssetUploadOptions,
-    xhrAccessorFunction: Function,
-  ): Promise<Asset> {
-    const {cipherText, keyBytes, sha256} = await encryptAesAsset(bytes);
-    const {key, token} = await this.postAsset(new Uint8Array(cipherText), options, xhrAccessorFunction);
-    const assetRemoteData = new Asset.RemoteData({
-      assetId: key,
-      assetToken: token,
-      otrKey: new Uint8Array(keyBytes),
-      sha256: new Uint8Array(sha256),
-    });
-    const protoAsset = new Asset({
-      [PROTO_MESSAGE_TYPE.ASSET_UPLOADED]: assetRemoteData,
-      [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: options.expectsReadConfirmation,
-      [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: options.legalHoldStatus,
-    });
-    return protoAsset;
-  }
-
-  async uploadImageAsset(
-    image: Blob | File,
-    options: AssetUploadOptions,
-    xhrAccessorFunction: Function,
-  ): Promise<Asset> {
-    const {compressedBytes, compressedImage} = await this._compressImage(image);
-    const protoAsset = await this._uploadAsset(compressedBytes, options, xhrAccessorFunction);
-    const assetImageMetadata = new Asset.ImageMetaData({
-      height: compressedImage.height,
-      width: compressedImage.width,
-    });
-    const assetOriginal = new Asset.Original({
-      image: assetImageMetadata,
-      mimeType: image.type,
-      size: compressedBytes.length,
-    });
-    protoAsset[PROTO_MESSAGE_TYPE.ASSET_ORIGINAL] = assetOriginal;
-    return protoAsset;
   }
 
   async generateAssetUrl(assetId: string, conversationId: string, forceCaching: boolean): Promise<string> {
