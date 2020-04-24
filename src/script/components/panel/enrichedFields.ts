@@ -38,7 +38,7 @@ class EnrichedFields {
   readonly fields: ko.Observable<RichInfoField[]>;
   readonly richProfileRepository: RichProfileRepository;
 
-  constructor(params: ComponentParams, element: Node) {
+  constructor(params: ComponentParams, element: HTMLElement) {
     const {
       user,
       onFieldsLoaded = noop,
@@ -86,7 +86,8 @@ ko.components.register('enriched-fields', {
     <!-- /ko -->
   `,
   viewModel: {
-    createViewModel: (params: ComponentParams, componentInfo: {element: Node}) =>
-      new EnrichedFields(params, componentInfo.element),
+    createViewModel: (params: ComponentParams, componentInfo: {element: HTMLElement}) => {
+      return new EnrichedFields(params, componentInfo.element);
+    },
   },
 });

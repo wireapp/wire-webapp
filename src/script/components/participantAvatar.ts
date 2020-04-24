@@ -19,44 +19,90 @@
 
 import ko from 'knockout';
 
-import {getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 import {createRandomUuid} from 'Util/util';
 import {getFirstChar} from 'Util/StringUtil';
 
 import {viewportObserver} from '../ui/viewportObserver';
 import {User} from '../entity/User';
 import {ServiceEntity} from '../integration/ServiceEntity';
+import {AssetRemoteData} from '../assets/AssetRemoteData';
+
+export enum SIZE {
+  LARGE = 'avatar-l',
+  MEDIUM = 'avatar-m',
+  SMALL = 'avatar-s',
+  XXX_SMALL = 'avatar-xxxs',
+  XX_SMALL = 'avatar-xxs',
+  X_LARGE = 'avatar-xl',
+  X_SMALL = 'avatar-xs',
+}
+
+enum STATE {
+  SELF = 'self',
+  SELECTED = 'selected',
+  BLOCKED = 'blocked',
+  PENDING = 'pending',
+  IGNORED = 'ignored',
+  UNKNOWN = 'unknown',
+  NONE = '',
+}
+
+interface ParticipantAvatarParams {
+  selected: any;
+  click: any;
+  participant?: ko.Observable<User> | User;
+  delay?: number;
+  size?: SIZE;
+}
 
 export class ParticipantAvatar {
-  static get SIZE() {
-    return {
-      LARGE: 'avatar-l',
-      MEDIUM: 'avatar-m',
-      SMALL: 'avatar-s',
-      XXX_SMALL: 'avatar-xxxs',
-      XX_SMALL: 'avatar-xxs',
-      X_LARGE: 'avatar-xl',
-      X_SMALL: 'avatar-xs',
-    };
+  logger: Logger;
+  participant: ko.Observable<User>;
+  isService: ko.PureComputed<boolean>;
+  isUser: ko.PureComputed<boolean>;
+  isTemporaryGuest: ko.PureComputed<boolean>;
+  remainingTimer: any;
+  avatarType: ko.PureComputed<string>;
+  delay: number;
+  size: SIZE;
+  element: JQuery<HTMLElement>;
+  borderWidth: number;
+  borderRadius: number;
+  timerLength: number;
+  timerOffset: ko.PureComputed<number>;
+  avatarLoadingBlocked: boolean;
+  avatarEnteredViewport: boolean;
+  initials: ko.PureComputed<string>;
+  state: ko.PureComputed<STATE>;
+  cssClasses: ko.PureComputed<string>;
+  onClick: (data: any, event: Event) => void;
+  pictureSubscription: ko.Subscription;
+  participantSubscription: ko.Subscription;
+
+  static get SIZE(): typeof SIZE {
+    return SIZE;
   }
 
   static get DIAMETER() {
     return {
-      [ParticipantAvatar.SIZE.LARGE]: 72,
-      [ParticipantAvatar.SIZE.MEDIUM]: 40,
-      [ParticipantAvatar.SIZE.SMALL]: 28,
-      [ParticipantAvatar.SIZE.X_LARGE]: 200,
-      [ParticipantAvatar.SIZE.X_SMALL]: 24,
-      [ParticipantAvatar.SIZE.XX_SMALL]: 20,
-      [ParticipantAvatar.SIZE.XXX_SMALL]: 16,
+      [SIZE.LARGE]: 72,
+      [SIZE.MEDIUM]: 40,
+      [SIZE.SMALL]: 28,
+      [SIZE.X_LARGE]: 200,
+      [SIZE.X_SMALL]: 24,
+      [SIZE.XX_SMALL]: 20,
+      [SIZE.XXX_SMALL]: 16,
     };
   }
 
-  constructor(params, componentInfo) {
+  constructor(params: ParticipantAvatarParams, componentInfo: {element: HTMLElement}) {
     this.logger = getLogger('ParticipantAvatar');
 
     const isParticipantObservable = typeof params.participant === 'function';
-    this.participant = isParticipantObservable ? params.participant : ko.observable(params.participant);
+    this.participant = isParticipantObservable
+      ? (params.participant as ko.Observable<User>)
+      : ko.observable(params.participant as User);
 
     this.isService = ko.pureComputed(() => {
       return this.participant() instanceof ServiceEntity || this.participant().isService;
@@ -72,16 +118,15 @@ export class ParticipantAvatar {
 
     this.avatarType = ko.pureComputed(() => `${this.isUser() ? 'user' : 'service'}-avatar`);
     this.delay = params.delay;
-    this.size = params.size || ParticipantAvatar.SIZE.LARGE;
+    this.size = params.size || SIZE.LARGE;
     this.element = $(componentInfo.element);
     this.element.addClass(`${this.avatarType()} ${this.size}`);
 
     const borderScale = 0.9916;
-    const finalBorderWidth = this.size === ParticipantAvatar.SIZE.X_LARGE ? 4 : 1;
+    const finalBorderWidth = this.size === SIZE.X_LARGE ? 4 : 1;
     this.borderWidth = (finalBorderWidth / ParticipantAvatar.DIAMETER[this.size]) * 32;
     this.borderRadius = (16 - this.borderWidth / 2) * borderScale;
     this.timerLength = this.borderRadius * Math.PI * 2;
-    this.timerOffset = ko.observable();
 
     this.timerOffset = ko.pureComputed(() => {
       if (this.isTemporaryGuest()) {
@@ -115,23 +160,23 @@ export class ParticipantAvatar {
     this.state = ko.pureComputed(() => {
       switch (true) {
         case this.isService():
-          return '';
+          return STATE.NONE;
         case this.participant().isMe:
-          return 'self';
+          return STATE.SELF;
         case typeof params.selected === 'function' && params.selected():
-          return 'selected';
+          return STATE.SELECTED;
         case this.participant().isTeamMember():
-          return '';
+          return STATE.NONE;
         case this.participant().isBlocked():
-          return 'blocked';
+          return STATE.BLOCKED;
         case this.participant().isRequest():
-          return 'pending';
+          return STATE.PENDING;
         case this.participant().isIgnored():
-          return 'ignored';
+          return STATE.IGNORED;
         case this.participant().isCanceled() || this.participant().isUnknown():
-          return 'unknown';
+          return STATE.UNKNOWN;
         default:
-          return '';
+          return STATE.NONE;
       }
     });
 
@@ -147,7 +192,7 @@ export class ParticipantAvatar {
 
     this.onClick = (data, event) => {
       if (typeof params.click === 'function') {
-        params.click(data.participant, event.currentTarget.parentNode);
+        params.click(data.participant, (event.currentTarget as Node).parentNode);
       }
     };
 
@@ -157,9 +202,9 @@ export class ParticipantAvatar {
       if (!this.avatarLoadingBlocked) {
         this.avatarLoadingBlocked = true;
 
-        const isSmall = this.size !== ParticipantAvatar.SIZE.LARGE && this.size !== ParticipantAvatar.SIZE.X_LARGE;
+        const isSmall = this.size !== SIZE.LARGE && this.size !== SIZE.X_LARGE;
         const loadHiRes = !isSmall && window.devicePixelRatio > 1;
-        const pictureResource = loadHiRes
+        const pictureResource: AssetRemoteData = loadHiRes
           ? this.participant().mediumPictureResource()
           : this.participant().previewPictureResource();
 
@@ -172,7 +217,7 @@ export class ParticipantAvatar {
               if (url) {
                 const image = new Image();
                 image.src = url;
-                this.element.find('.avatar-image').html(image);
+                this.element.find('.avatar-image').html(image as any);
                 this.element.addClass(`avatar-image-loaded ${isCached && isSmall ? '' : 'avatar-loading-transition'}`);
               }
               this.avatarLoadingBlocked = false;
@@ -237,7 +282,7 @@ ko.components.register('participant-avatar', {
     </div>
     `,
   viewModel: {
-    createViewModel(params, componentInfo) {
+    createViewModel(params: ParticipantAvatarParams, componentInfo: {element: HTMLElement}) {
       return new ParticipantAvatar(params, componentInfo);
     },
   },

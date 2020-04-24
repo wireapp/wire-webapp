@@ -17,22 +17,40 @@
  *
  */
 
+import ko from 'knockout';
+import SimpleBar from 'simplebar';
+
 import {clamp} from 'Util/NumberUtil';
 import {noop} from 'Util/util';
 import {KEY, isEnterKey} from 'Util/KeyboardUtil';
 
 import {ParticipantAvatar} from 'Components/participantAvatar';
+import {User} from '../entity/User';
+
+interface MentionSuggestionsParams {
+  onSelectionValidated: (data: User, element: HTMLInputElement) => void;
+  suggestions: ko.PureComputed<User[]>;
+  targetInputSelector: string;
+}
 
 class MentionSuggestions {
-  constructor(params) {
-    this.onInput = this.onInput.bind(this);
-    this.onSuggestionClick = this.onSuggestionClick.bind(this);
-    this.onInitSimpleBar = this.onInitSimpleBar.bind(this);
-    this.onMouseEnter = this.onMouseEnter.bind(this);
+  isVisible: ko.Observable<boolean>;
+  onSelectionValidated: (data: User, element: HTMLInputElement) => void | (() => void);
+  ParticipantAvatar: typeof ParticipantAvatar;
+  position: ko.Observable<{}>;
+  scrollElement: Element;
+  selectedSuggestion: ko.PureComputed<User>;
+  selectedSuggestionIndex: ko.Observable<number>;
+  selectedSuggestionIndexSubscription: ko.Subscription;
+  shouldUpdateScrollbar: ko.PureComputed<User[]>;
+  suggestions: ko.PureComputed<User[]>;
+  suggestionSubscription: ko.Subscription;
+  targetInput: HTMLInputElement;
+  targetInputSelector: string;
 
+  constructor(params: MentionSuggestionsParams) {
     this.isVisible = ko.observable(false);
     this.onSelectionValidated = params.onSelectionValidated || noop;
-    this.onEnd = params.onEnd || noop;
     this.suggestions = params.suggestions;
     this.targetInputSelector = params.targetInputSelector;
     this.targetInput = undefined;
@@ -63,17 +81,17 @@ class MentionSuggestions {
   }
 
   setWrapperSize(size = '') {
-    const wrapper = document.querySelector('.conversation-input-bar-mention-suggestion');
+    const wrapper = document.querySelector<HTMLInputElement>('.conversation-input-bar-mention-suggestion');
     if (wrapper) {
       wrapper.style.width = size;
     }
   }
 
-  onInitSimpleBar(simpleBar) {
+  onInitSimpleBar = (simpleBar: SimpleBar) => {
     this.scrollElement = simpleBar.getScrollElement();
-  }
+  };
 
-  onInput(keyboardEvent) {
+  onInput = (keyboardEvent: KeyboardEvent) => {
     const actions = {
       [KEY.ARROW_UP]: this.moveSelection.bind(this, 1),
       [KEY.ARROW_DOWN]: this.moveSelection.bind(this, -1),
@@ -89,26 +107,26 @@ class MentionSuggestions {
         keyboardEvent.stopPropagation();
       }
     }
-  }
+  };
 
-  onMouseEnter(user) {
+  onMouseEnter = (user: User): void => {
     this.selectedSuggestionIndex(this.suggestions().indexOf(user));
-  }
+  };
 
-  moveSelection(delta) {
+  moveSelection(delta: number): true {
     const currentIndex = this.selectedSuggestionIndex();
     const newIndex = clamp(currentIndex + delta, 0, this.suggestions().length - 1);
     this.selectedSuggestionIndex(newIndex);
     return true;
   }
 
-  onSuggestionClick(data, event) {
+  onSuggestionClick = (data: any, event: Event) => {
     event.preventDefault();
     $(this.targetInput).focus();
     this.onSelectionValidated(data, this.targetInput);
-  }
+  };
 
-  validateSelection(keyboardEvent) {
+  validateSelection(keyboardEvent: KeyboardEvent) {
     const isShiftEnter = isEnterKey(keyboardEvent) && keyboardEvent.shiftKey;
     if (isShiftEnter) {
       return false;
@@ -118,7 +136,7 @@ class MentionSuggestions {
     return true;
   }
 
-  updateScrollPosition(selectedNumber) {
+  updateScrollPosition(selectedNumber: number): void {
     if (!this.scrollElement) {
       return;
     }
@@ -131,27 +149,28 @@ class MentionSuggestions {
     const itemRect = selectedItem.getBoundingClientRect();
     const topDiff = scrollRect.top - itemRect.top;
     if (topDiff > 0) {
-      return (this.scrollElement.scrollTop -= topDiff + 4);
+      this.scrollElement.scrollTop -= topDiff + 4;
+      return;
     }
     const bottomDiff = itemRect.bottom - scrollRect.bottom + 20;
     if (bottomDiff > 0) {
-      return (this.scrollElement.scrollTop += bottomDiff + 4);
+      this.scrollElement.scrollTop += bottomDiff + 4;
     }
   }
 
-  initList() {
+  initList(): void {
     this.targetInput = this.initTargetInput();
     this.selectedSuggestionIndex(0);
   }
 
-  updatePosition() {
+  updatePosition(): void {
     const inputBoundingRect = this.targetInput.getBoundingClientRect();
     const bottom = window.innerHeight - inputBoundingRect.top + 24;
 
     this.position({bottom: `${bottom}px`});
   }
 
-  updateSelectedIndexBoundaries(suggestions) {
+  updateSelectedIndexBoundaries(suggestions: User[]): void {
     const currentIndex = this.selectedSuggestionIndex();
     this.selectedSuggestionIndex(clamp(currentIndex, 0, suggestions.length - 1));
   }
@@ -160,14 +179,14 @@ class MentionSuggestions {
     this.targetInput.removeEventListener('keydown', this.onInput, true);
   }
 
-  initTargetInput() {
-    const input = this.targetInput || document.querySelector(this.targetInputSelector);
+  initTargetInput(): HTMLInputElement {
+    const input = this.targetInput || document.querySelector<HTMLInputElement>(this.targetInputSelector);
     input.addEventListener('keydown', this.onInput, true);
     this.targetInput = input;
     return input;
   }
 
-  dispose() {
+  dispose(): void {
     this.suggestionSubscription.dispose();
     this.selectedSuggestionIndexSubscription.dispose();
   }

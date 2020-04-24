@@ -1641,6 +1641,11 @@
   resolved "https://registry.yarnpkg.com/@types/sharedworker/-/sharedworker-0.0.29.tgz#69ce70764a0380f4c27ae036f6f9c4e2c75dbdac"
   integrity sha512-vdlrZJKGrAedfcMt4Tn8gIa3tJxRhrTtwfEu9jmVtaCZHgbensRMEbpkZ+dY/6WpE12a8K00KaQnJV0lH9ZmdA==
 
+"@types/simplebar@5.1.1":
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/@types/simplebar/-/simplebar-5.1.1.tgz#9e9a69bf86fc5225141141031d8954acdd1eae0d"
+  integrity sha512-nC9iBQ4dfvvzJ3iAbL1qCfwjUyaF8EO56l/ApcRXUFK2zLOb8GDXC55V08JZvpzkUxGHtWVunp17KKH/3/KFJA==
+
 "@types/sizzle@*":
   version "2.3.2"
   resolved "https://registry.yarnpkg.com/@types/sizzle/-/sizzle-2.3.2.tgz#a811b8c18e2babab7d542b3365887ae2e4d9de47"

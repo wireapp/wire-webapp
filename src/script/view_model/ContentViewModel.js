@@ -29,7 +29,7 @@ import {GroupCreationViewModel} from './content/GroupCreationViewModel';
 import {EmojiInputViewModel} from './content/EmojiInputViewModel';
 import {ModalsViewModel} from './ModalsViewModel';
 import {WebAppEvents} from '../event/WebApp';
-import {PreferencesAVViewModel} from './content/PreferencesAVViewModel.js';
+import {PreferencesAVViewModel} from './content/PreferencesAVViewModel';
 import {ServiceModalViewModel} from './content/ServiceModalViewModel';
 import {InviteModalViewModel} from './content/InviteModalViewModel';
 import {ConversationError} from '../error/ConversationError';

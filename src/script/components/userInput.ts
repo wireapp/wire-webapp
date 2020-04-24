@@ -17,12 +17,32 @@
  *
  */
 
+import ko from 'knockout';
 import {isRemovalAction} from 'Util/KeyboardUtil';
+import {User} from '../entity/User';
+
+interface UserInputParams {
+  enter: () => void | Promise<void>;
+  focusDelay?: number;
+  input: ko.Observable<string>;
+  placeholder: string;
+  selected: ko.ObservableArray<User>;
+}
 
 class UserInput {
-  constructor(params, componentInfo) {
-    this.dispose = this.dispose.bind(this);
+  element: HTMLElement;
+  hasFocus: ko.Observable<boolean>;
+  innerElement: JQuery<HTMLElement>;
+  input: ko.Observable<string>;
+  inputElement: JQuery<HTMLElement>;
+  noSelectedUsers: ko.PureComputed<boolean>;
+  onEnter: () => void | Promise<void>;
+  placeholder: ko.PureComputed<string>;
+  placeholderText: string;
+  selectedSubscription: ko.Subscription;
+  selectedUsers: ko.ObservableArray<User>;
 
+  constructor(params: UserInputParams, componentInfo: {element: HTMLElement}) {
     this.input = params.input;
     this.onEnter = params.enter;
     this.placeholderText = params.placeholder;
@@ -63,7 +83,7 @@ class UserInput {
     });
   }
 
-  onKeyDown(data, keyboardEvent) {
+  onKeyDown(data: any, keyboardEvent: KeyboardEvent): true {
     if (typeof this.selectedUsers === 'function') {
       if (isRemovalAction(keyboardEvent) && !this.input().length) {
         this.selectedUsers.pop();
@@ -72,11 +92,11 @@ class UserInput {
     return true;
   }
 
-  dispose() {
+  dispose = (): void => {
     if (this.selectedSubscription) {
       this.selectedSubscription.dispose();
     }
-  }
+  };
 }
 
 ko.components.register('user-input', {
@@ -104,7 +124,7 @@ ko.components.register('user-input', {
     </form>
   `,
   viewModel: {
-    createViewModel(params, componentInfo) {
+    createViewModel(params: UserInputParams, componentInfo: {element: HTMLElement}) {
       return new UserInput(params, componentInfo);
     },
   },

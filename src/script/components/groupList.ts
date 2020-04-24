@@ -17,17 +17,21 @@
  *
  */
 
+import ko from 'knockout';
 import {ParticipantAvatar} from 'Components/participantAvatar';
+import {Conversation} from '../entity/Conversation';
+
+interface GroupListViewModelParams {
+  click: (group: Conversation) => void;
+  groups: ko.ObservableArray<Conversation[]>;
+}
 
 class GroupListViewModel {
-  /**
-   * Construct a new group list view model.
-   *
-   * @param {Object} params Component parameters
-   * @param {ko.observableArray} params.groups Data source
-   * @param {Function} params.click Function called when a list item is clicked
-   */
-  constructor(params) {
+  groups: ko.ObservableArray<Conversation[]>;
+  onSelect: (group: Conversation) => void;
+  ParticipantAvatar: typeof ParticipantAvatar;
+
+  constructor(params: GroupListViewModelParams) {
     this.groups = params.groups;
     this.onSelect = params.click;
     this.ParticipantAvatar = ParticipantAvatar;

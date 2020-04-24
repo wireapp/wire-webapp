@@ -17,6 +17,7 @@
  *
  */
 
+import ko from 'knockout';
 import {debounce, escape} from 'underscore';
 
 import {isScrolledBottom} from 'Util/scroll-helpers';
@@ -24,8 +25,26 @@ import {formatDateShort} from 'Util/TimeUtil';
 
 import {ParticipantAvatar} from 'Components/participantAvatar';
 import {getSearchRegex} from '../search/FullTextSearch';
+import {Message} from '../entity/message/Message';
+import {ContentMessage} from '../entity/message/ContentMessage';
+import {Text} from '../entity/message/Text';
+
+interface FullSearchParams {
+  change?: (query: string) => void;
+  click?: (messageEntity: Message) => void;
+  search_provider: (query: string) => Promise<{query: string; messageEntities: Message[]}>;
+}
 
 class FullSearch {
+  input: ko.Observable<string>;
+  inputSubscription: ko.Subscription;
+  messageEntities: Message[];
+  params: FullSearchParams;
+  ParticipantAvatar: typeof ParticipantAvatar;
+  searchProvider: (query: string) => Promise<{query: string; messageEntities: Message[]}>;
+  showNoResultsText: ko.Observable<boolean>;
+  visibleMessageEntities: ko.ObservableArray<Message>;
+
   static get CONFIG() {
     return {
       MAX_OFFSET_INDEX: 30,
@@ -35,21 +54,10 @@ class FullSearch {
     };
   }
 
-  constructor(params) {
+  constructor(params: FullSearchParams) {
     this.searchProvider = params.search_provider;
     this.ParticipantAvatar = ParticipantAvatar;
-
-    this.onInputChange = query => {
-      if (typeof params.change === 'function') {
-        params.change(query);
-      }
-    };
-
-    this.clickOnMessage = messageEntity => {
-      if (typeof params.click === 'function') {
-        params.click(messageEntity);
-      }
-    };
+    this.params = params;
 
     this.messageEntities = [];
     this.visibleMessageEntities = ko.observableArray();
@@ -91,14 +99,26 @@ class FullSearch {
     });
   }
 
-  htmlFormatResult(messageEntity) {
-    const text = escape(messageEntity.get_first_asset().text);
+  onInputChange = (query: string): void => {
+    if (typeof this.params.change === 'function') {
+      this.params.change(query);
+    }
+  };
+
+  clickOnMessage = (messageEntity: Message): void => {
+    if (typeof this.params.click === 'function') {
+      this.params.click(messageEntity);
+    }
+  };
+
+  htmlFormatResult(messageEntity: ContentMessage & {matchesCount: number}): string {
+    const text = escape((messageEntity.get_first_asset() as Text).text);
     const input = escape(this.input());
 
     messageEntity.matchesCount = 0;
 
     const replaceRegex = getSearchRegex(input);
-    const replaceFunction = match => {
+    const replaceFunction = (match: string): string => {
       messageEntity.matchesCount += 1;
       return `<mark class='full-search-marked' data-uie-name='full-search-item-mark'>${match}</mark>`;
     };
@@ -129,7 +149,7 @@ class FullSearch {
     return transformedText;
   }
 
-  resultTimestamp(messageEntity) {
+  resultTimestamp(messageEntity: Message) {
     return formatDateShort(messageEntity.timestamp());
   }
 

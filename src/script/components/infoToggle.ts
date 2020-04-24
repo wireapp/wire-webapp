@@ -18,9 +18,26 @@
  */
 
 import UUID from 'uuidjs';
+import ko from 'knockout';
+
+interface InfoToggleParams {
+  dataUieName: string;
+  info: string;
+  isChecked: ko.Observable<boolean>;
+  isDisabled: boolean;
+  name: string;
+}
 
 class InfoToggle {
-  constructor(params) {
+  dataUieNameInfoText: string;
+  dataUieNameLabelText: string;
+  info: string;
+  inputId: UUID;
+  isChecked: ko.Observable<boolean>;
+  isDisabled: boolean;
+  name: string;
+
+  constructor(params: InfoToggleParams) {
     this.dataUieNameInfoText = `status-info-toggle-${params.dataUieName}`;
     this.dataUieNameLabelText = `do-toggle-${params.dataUieName}`;
     this.info = params.info;

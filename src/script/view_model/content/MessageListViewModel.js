@@ -40,7 +40,7 @@ import {UserError} from '../../error/UserError';
  * @todo Get rid of the participants dependencies whenever bubble implementation has changed
  * @todo Remove all jQuery selectors
  */
-class MessageListViewModel {
+export class MessageListViewModel {
   constructor(mainViewModel, contentViewModel, repositories) {
     this._scrollAddedMessagesIntoView = this._scrollAddedMessagesIntoView.bind(this);
     this.onMessageContainerInitiated = this.onMessageContainerInitiated.bind(this);
@@ -643,5 +643,3 @@ class MessageListViewModel {
     }
   }
 }
-
-export {MessageListViewModel};
