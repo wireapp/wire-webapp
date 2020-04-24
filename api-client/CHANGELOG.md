@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.8.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.8.3...@wireapp/api-client@11.8.4) (2020-04-24)
+
+
+### Bug Fixes
+
+* **api-client:** Reduce member chunk size to prevent "413 RETL" ([#2976](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2976)) ([73c781f](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/73c781f3e87fe9d5e416d704926681df6610707b))
+
+
+
+
+
 ## [11.8.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.8.2...@wireapp/api-client@11.8.3) (2020-04-23)
 
 **Note:** Version bump only for package @wireapp/api-client
