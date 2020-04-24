@@ -99,7 +99,7 @@ export class LinkPreviewRepository {
     }
 
     const openGraphData = await this._fetchOpenGraphData(url);
-    if (!openGraphData || openGraphData instanceof Error) {
+    if (!openGraphData) {
       throw new LinkPreviewError(LinkPreviewError.TYPE.NO_DATA_AVAILABLE, LinkPreviewError.MESSAGE.NO_DATA_AVAILABLE);
     }
 
@@ -108,6 +108,7 @@ export class LinkPreviewRepository {
     if (!linkPreview) {
       throw new LinkPreviewError(LinkPreviewError.TYPE.UNSUPPORTED_TYPE, LinkPreviewError.MESSAGE.UNSUPPORTED_TYPE);
     }
+
     return this._fetchPreviewImage(linkPreview, openGraphData.image as {data: string});
   }
 
@@ -146,7 +147,7 @@ export class LinkPreviewRepository {
    * @param link Link to fetch open graph data from
    * @returns Resolves with the retrieved open graph data
    */
-  async _fetchOpenGraphData(link: string): Promise<OpenGraphResult | Error | undefined> {
+  async _fetchOpenGraphData(link: string): Promise<OpenGraphResult | undefined> {
     try {
       const data = await window.openGraphAsync(link);
       if (data) {
@@ -158,7 +159,7 @@ export class LinkPreviewRepository {
       return undefined;
     } catch (error) {
       this.logger.warn(`Error while fetching OpenGraph data: ${error.message}`);
-      return error;
+      throw new LinkPreviewError(LinkPreviewError.TYPE.UNSUPPORTED_TYPE, LinkPreviewError.MESSAGE.UNSUPPORTED_TYPE);
     }
   }
 
