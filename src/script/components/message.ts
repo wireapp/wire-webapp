@@ -42,6 +42,7 @@ import {User} from '../entity/User';
 import {MessageListViewModel} from '../view_model/content/MessageListViewModel';
 import {DecryptErrorMessage} from '../entity/message/DecryptErrorMessage';
 import {ConversationRepository} from '../conversation/ConversationRepository';
+import {SystemMessage} from '../entity/message/SystemMessage';
 
 import './asset/audioAsset';
 import './asset/fileAsset';
@@ -219,8 +220,8 @@ class Message {
     }
   }
 
-  getSystemMessageIconComponent(message: SystemMessageType): string {
-    switch (message) {
+  getSystemMessageIconComponent(message: SystemMessage): string | undefined {
+    switch (message.system_message_type) {
       case SystemMessageType.CONVERSATION_RENAME:
         return 'edit-icon';
 
@@ -231,7 +232,7 @@ class Message {
         return 'read-icon';
 
       default:
-        return '';
+        return undefined;
     }
   }
 
