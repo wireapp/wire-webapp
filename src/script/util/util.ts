@@ -18,7 +18,6 @@
  */
 
 import {Decoder} from 'bazinga64';
-import JsMD5 from 'js-md5';
 import {ObservableArray} from 'knockout';
 import sodium from 'libsodium-wrappers-sumo';
 import {formatE164} from 'phoneformat.js';
