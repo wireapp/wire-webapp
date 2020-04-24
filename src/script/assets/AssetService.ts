@@ -54,7 +54,7 @@ export class AssetService {
     previewImageKey: string;
   }> {
     const [{compressedBytes: previewImageBytes}, {compressedBytes: mediumImageBytes}] = await Promise.all([
-      this.compressImage(image, true),
+      this.compressProfileImage(image),
       this.compressImage(image),
     ]);
 
@@ -118,10 +118,11 @@ export class AssetService {
     return this.apiClient.asset.api.postAsset(asset, options, onProgress);
   }
 
-  compressImage(image: File | Blob, isProfileImage: boolean = false): Promise<CompressedImage> {
-    if (isProfileImage === true) {
-      return this.compressImageWithWorker('worker/profile-image-worker.js', image);
-    }
+  private compressProfileImage(image: File | Blob): Promise<CompressedImage> {
+    return this.compressImageWithWorker('worker/profile-image-worker.js', image);
+  }
+
+  compressImage(image: File | Blob): Promise<CompressedImage> {
     return this.compressImageWithWorker('worker/image-worker.js', image);
   }
 
