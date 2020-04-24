@@ -21,7 +21,6 @@ import $ from 'jquery';
 import sodium from 'libsodium-wrappers-sumo';
 import Dexie from 'dexie';
 import {util as ProteusUtil} from '@wireapp/proteus';
-import keyboardJS from 'keyboardjs';
 
 import {getLogger} from 'Util/Logger';
 
@@ -59,7 +58,6 @@ export class DebugUtil {
     this.logger = getLogger('DebugUtil');
 
     this.liveCallingStatsInterval = undefined;
-    keyboardJS.bind('alt+ctrl+c', this.toggleLiveCallingStats.bind(this));
   }
 
   blockAllConnections() {
