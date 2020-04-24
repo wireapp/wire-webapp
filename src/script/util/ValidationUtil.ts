@@ -34,7 +34,7 @@ export class ValidationUtilError extends Error {
   }
 }
 
-export const isValidUsername = (username: string) => /^@?[a-z_0-9]{2,21}$/.test(username);
+export const isValidUsername = (username: string) => /^@?[a-z_0-9.-]{2,256}$/.test(username);
 
 /**
  * Checks if input has the format of an international phone number
