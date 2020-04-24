@@ -208,15 +208,14 @@ export class GroupCreationViewModel {
   };
 
   _trackGroupCreation(conversationEntity) {
+    if (!conversationEntity) {
+      return;
+    }
     this._trackGroupCreationSucceeded(conversationEntity);
     this._trackAddParticipants(conversationEntity);
   }
 
   _trackGroupCreationSucceeded(conversationEntity) {
-    if (!conversationEntity) {
-      return;
-    }
-
     const attributes = {
       method: this.method,
       with_participants: !!this.selectedContacts().length,
