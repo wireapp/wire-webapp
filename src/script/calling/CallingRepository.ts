@@ -212,12 +212,10 @@ export class CallingRepository {
             break;
           }
           case QUALITY.MEDIUM: {
-            amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.CALL_QUALITY_POOR);
             this.logger.warn(`Medium call quality in conversation "${conversationId}".`);
             break;
           }
           case QUALITY.POOR: {
-            amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.CALL_QUALITY_POOR);
             this.logger.warn(`Poor call quality in conversation "${conversationId}".`);
             break;
           }
