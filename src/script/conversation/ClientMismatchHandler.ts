@@ -29,6 +29,8 @@ import {UserRepository} from '../user/UserRepository';
 import {EventInfoEntity} from './EventInfoEntity';
 import {NewOTRMessage} from '@wireapp/api-client/dist/conversation';
 import {Conversation} from '../entity/Conversation';
+import {amplify} from 'amplify';
+import {WebAppEvents} from '../event/WebApp';
 
 export class ClientMismatchHandler {
   private readonly conversationRepository: ConversationRepository;
@@ -196,13 +198,17 @@ export class ClientMismatchHandler {
       const clientIdsOfUser = Object.keys(payload.recipients[userId]);
       const noRemainingClients = !clientIdsOfUser.length;
 
-      if (noRemainingClients && typeof conversationEntity !== 'undefined' && conversationEntity.isGroup()) {
+      if (noRemainingClients && typeof conversationEntity !== 'undefined') {
         const result = await this.userRepository.getUserFromBackend(userId);
         const isDeleted = result?.deleted === true;
         if (isDeleted) {
-          const timestamp = this.serverTimeHandler.toServerTimestamp();
-          const memberLeaveEvent = EventBuilder.buildMemberLeave(conversationEntity, userId, false, timestamp);
-          this.eventRepository.injectEvent(memberLeaveEvent);
+          if (conversationEntity.isGroup()) {
+            const timestamp = this.serverTimeHandler.toServerTimestamp();
+            const memberLeaveEvent = EventBuilder.buildMemberLeave(conversationEntity, userId, false, timestamp);
+            this.eventRepository.injectEvent(memberLeaveEvent);
+          } else {
+            amplify.publish(WebAppEvents.USER.UPDATE, userId);
+          }
         }
       }
 
