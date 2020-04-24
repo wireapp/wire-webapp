@@ -17,9 +17,11 @@
  *
  */
 
+import ko from 'knockout';
 import {Article, LinkPreview} from '@wireapp/protocol-messaging';
+import {ConversationMessageTimerUpdateEvent} from '@wireapp/api-client/dist/event';
 
-import {getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {clamp} from 'Util/NumberUtil';
 import {arrayToBase64, noop} from 'Util/util';
@@ -30,8 +32,20 @@ import {StatusType} from '../message/StatusType';
 import {BackendEvent} from '../event/Backend';
 import {Text} from '../entity/message/Text';
 import {AbstractConversationEventHandler} from './AbstractConversationEventHandler';
+import {EventService} from '../event/EventService';
+import {ConversationMapper} from './ConversationMapper';
+import {Message} from '../entity/message/Message';
+import {ContentMessage} from '../entity/message/ContentMessage';
+import {Conversation} from '../entity/Conversation';
 
 export class ConversationEphemeralHandler extends AbstractConversationEventHandler {
+  eventListeners: Record<string, (...args: any[]) => void>;
+  eventService: EventService;
+  conversationMapper: ConversationMapper;
+  logger: Logger;
+  timedMessages: ko.ObservableArray<ContentMessage>;
+  timedMessagesSubscription: ko.Subscription;
+
   static get CONFIG() {
     return {
       INTERVAL_TIME: TIME_IN_MILLIS.SECOND * 0.25,
@@ -42,14 +56,18 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
     };
   }
 
-  static validateTimer(messageTimer) {
+  static validateTimer(messageTimer: number | null): number {
     const TIMER_RANGE = ConversationEphemeralHandler.CONFIG.TIMER_RANGE;
     const isTimerReset = messageTimer === null;
 
     return isTimerReset ? messageTimer : clamp(messageTimer, TIMER_RANGE.MIN, TIMER_RANGE.MAX);
   }
 
-  constructor(conversationMapper, eventService, eventListeners) {
+  constructor(
+    conversationMapper: ConversationMapper,
+    eventService: EventService,
+    eventListeners: Record<string, (...args: any[]) => void>,
+  ) {
     super();
 
     const defaultEventListeners = {onMessageTimeout: noop};
@@ -67,16 +85,17 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
 
     this.timedMessages = ko.observableArray([]);
 
-    let updateIntervalId = null;
+    let updateIntervalId: number | null = null;
+
     this.timedMessagesSubscription = this.timedMessages.subscribe(messageEntities => {
-      const shouldClearInterval = !messageEntities.length && updateIntervalId;
+      const shouldClearInterval = messageEntities.length === 0 && updateIntervalId;
       if (shouldClearInterval) {
         window.clearInterval(updateIntervalId);
         updateIntervalId = null;
         return this.logger.info('Cleared ephemeral message check interval');
       }
 
-      const shouldSetInterval = messageEntities.length && !updateIntervalId;
+      const shouldSetInterval = messageEntities.length !== 0 && !updateIntervalId;
       if (shouldSetInterval) {
         const INTERVAL_TIME = ConversationEphemeralHandler.CONFIG.INTERVAL_TIME;
         updateIntervalId = window.setInterval(() => this._updateTimedMessages(), INTERVAL_TIME);
@@ -88,11 +107,10 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
   /**
    * Check the remaining lifetime for a given ephemeral message.
    *
-   * @param {Message} messageEntity Message to check
-   * @param {number} timeOffset Approximate time different to backend in milliseconds
-   * @returns {Promise<void>} No return value
+   * @param messageEntity Message to check
+   * @param timeOffset Approximate time different to backend in milliseconds
    */
-  async checkMessageTimer(messageEntity, timeOffset) {
+  async checkMessageTimer(messageEntity: ContentMessage, timeOffset: number): Promise<void> {
     const hasHitBackend = messageEntity.status() > StatusType.SENDING;
     if (!hasHitBackend) {
       return;
@@ -123,7 +141,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
     }
   }
 
-  async validateMessage(messageEntity) {
+  async validateMessage(messageEntity: ContentMessage): Promise<Message | void> {
     const isEphemeralMessage = messageEntity.ephemeral_status() !== EphemeralStatusType.NONE;
     if (!isEphemeralMessage) {
       return messageEntity;
@@ -147,14 +165,14 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
     }
   }
 
-  async validateMessages(messageEntities) {
+  async validateMessages(messageEntities: ContentMessage[]): Promise<Message[]> {
     const validatedMessages = await Promise.all(
       messageEntities.map(messageEntity => this.validateMessage(messageEntity)),
     );
-    return validatedMessages.filter(messageEntity => !!messageEntity);
+    return validatedMessages.filter(messageEntity => !!messageEntity) as Message[];
   }
 
-  _obfuscateAssetMessage(messageEntity) {
+  _obfuscateAssetMessage(messageEntity: ContentMessage) {
     messageEntity.ephemeral_expires(true);
 
     const assetEntity = messageEntity.get_first_asset();
@@ -170,16 +188,16 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
     this.logger.info(`Obfuscated asset message '${messageEntity.id}'`);
   }
 
-  _obfuscateImageMessage(messageEntity) {
+  _obfuscateImageMessage(messageEntity: ContentMessage): void {
     messageEntity.ephemeral_expires(true);
 
     const assetEntity = messageEntity.get_first_asset();
     const changes = {
       data: {
         info: {
-          height: assetEntity.height,
+          height: (assetEntity as any).size,
           tag: 'medium',
-          width: assetEntity.width,
+          width: (assetEntity as any).width,
         },
       },
       ephemeral_expires: true,
@@ -189,7 +207,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
     this.logger.info(`Obfuscated image message '${messageEntity.id}'`);
   }
 
-  async _obfuscateMessage(messageEntity) {
+  async _obfuscateMessage(messageEntity: ContentMessage): Promise<void> {
     if (messageEntity.has_asset_text()) {
       await this._obfuscateTextMessage(messageEntity);
     } else if (messageEntity.has_asset()) {
@@ -201,10 +219,10 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
     }
   }
 
-  async _obfuscateTextMessage(messageEntity) {
+  async _obfuscateTextMessage(messageEntity: ContentMessage): Promise<void> {
     messageEntity.ephemeral_expires(true);
 
-    const assetEntity = messageEntity.get_first_asset();
+    const assetEntity = messageEntity.get_first_asset() as Text;
     const obfuscatedAsset = new Text(messageEntity.id);
     const obfuscatedPreviews = await Promise.all(
       assetEntity.previews().map(linkPreview => {
@@ -237,7 +255,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
     this.logger.info(`Obfuscated text message '${messageEntity.id}'`);
   }
 
-  async _timeoutEphemeralMessage(messageEntity) {
+  async _timeoutEphemeralMessage(messageEntity: ContentMessage): Promise<void> {
     if (!messageEntity.is_expired()) {
       if (messageEntity.user().isMe) {
         await this._obfuscateMessage(messageEntity);
@@ -250,20 +268,22 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
   /**
    * Updates the ephemeral timer of a conversation when an timer-update message is received.
    *
-   * @private
-   * @param {Conversation} conversationEntity Conversation entity which message timer was changed
-   * @param {Object} eventJson JSON data of 'conversation.message-timer-update' event
-   * @returns {Promise} Resolves when the event was handled
+   * @param conversationEntity Conversation entity which message timer was changed
+   * @param eventJson JSON data of 'conversation.message-timer-update' event
+   * @returns Resolves when the event was handled
    */
-  _updateEphemeralTimer(conversationEntity, eventJson) {
+  private _updateEphemeralTimer(
+    conversationEntity: Conversation,
+    eventJson: ConversationMessageTimerUpdateEvent,
+  ): Promise<Conversation> {
     const updates = {globalMessageTimer: ConversationEphemeralHandler.validateTimer(eventJson.data.message_timer)};
-    this.conversationMapper.updateProperties(conversationEntity, updates);
+    this.conversationMapper.updateProperties(conversationEntity, updates as any);
     return Promise.resolve(conversationEntity);
   }
 
-  async _updateTimedMessage(messageEntity) {
+  async _updateTimedMessage(messageEntity: ContentMessage): Promise<ContentMessage | void> {
     if (typeof messageEntity.ephemeral_expires() === 'string') {
-      const remainingTime = Math.max(0, messageEntity.ephemeral_expires() - Date.now());
+      const remainingTime = Math.max(0, (messageEntity.ephemeral_expires() as number) - Date.now());
       messageEntity.ephemeral_remaining(remainingTime);
 
       const isExpired = remainingTime === 0;
@@ -274,13 +294,13 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
     }
   }
 
-  async _updateTimedMessages() {
+  async _updateTimedMessages(): Promise<void> {
     const updatedMessages = await Promise.all(
       this.timedMessages().map(messageEntity => this._updateTimedMessage(messageEntity)),
     );
-    const expiredMessages = updatedMessages.filter(messageEntity => !!messageEntity);
+    const expiredMessages = updatedMessages.filter(messageEntity => !!messageEntity) as ContentMessage[];
 
-    if (expiredMessages.length) {
+    if (expiredMessages.length !== 0) {
       this.timedMessages.remove(messageEntity => {
         for (const expiredMessage of expiredMessages) {
           const {conversation_id: conversationId, id: messageId} = expiredMessage;
@@ -295,7 +315,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
     }
   }
 
-  dispose() {
+  dispose(): void {
     this.timedMessagesSubscription.dispose();
   }
 }
