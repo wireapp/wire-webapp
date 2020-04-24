@@ -98,7 +98,7 @@ export class AssetUploader {
       .then(async uploadedAsset => {
         const protoAsset = this.buildProtoAsset(encryptedAsset, uploadedAsset, options);
         if (isImage === true) {
-          const imageMeta = await this.assetService._compressImage(file);
+          const imageMeta = await this.assetService.compressImage(file);
           return this.attachImageData(protoAsset, imageMeta, file.type);
         }
         return protoAsset;
