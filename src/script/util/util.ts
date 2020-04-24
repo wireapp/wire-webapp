@@ -221,18 +221,8 @@ export const arrayToBase64 = async (array: ArrayBuffer | Uint8Array): Promise<st
 };
 
 /**
- * Returns a base64 encoded MD5 hash of the the given array.
- */
-export const arrayToMd5Base64 = async (array: Uint8Array): Promise<string> => {
-  await sodium.ready;
-  const md5Hash = JsMD5.arrayBuffer(array);
-  return sodium.to_base64(new Uint8Array(md5Hash), sodium.base64_variants.ORIGINAL);
-};
-
-/**
  * Convert base64 dataURI to Blob
  */
-
 export const base64ToBlob = async (base64: string): Promise<Blob> => {
   const mimeType = getContentTypeFromDataUrl(base64);
   const bytes = await base64ToArray(base64);
@@ -242,7 +232,6 @@ export const base64ToBlob = async (base64: string): Promise<Blob> => {
 /**
  * Downloads blob using a hidden link element.ƒ
  */
-
 export const downloadBlob = (blob: Blob, filename: string, mimeType?: string): number => {
   if (blob) {
     const url = window.URL.createObjectURL(blob);

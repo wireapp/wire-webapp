@@ -18,33 +18,23 @@
  */
 
 import {
-  createRandomUuid,
-  arrayToMd5Base64,
   arrayToBase64,
-  base64ToBlob,
-  formatBytes,
-  getFileExtension,
-  trimFileExtension,
   base64ToArray,
-  stripDataUri,
-  phoneNumberToE164,
+  base64ToBlob,
+  createRandomUuid,
+  formatBytes,
   getContentTypeFromDataUrl,
-  sortGroupsByLastEvent,
-  stripUrlWrapper,
+  getFileExtension,
+  phoneNumberToE164,
   printDevicesId,
+  sortGroupsByLastEvent,
+  stripDataUri,
+  stripUrlWrapper,
+  trimFileExtension,
   zeroPadding,
 } from 'Util/util';
 
 import {Conversation} from 'src/script/entity/Conversation';
-
-describe('arrayToMd5Base64', () => {
-  it('converts a typed array to base64', async () => {
-    const actual = await arrayToMd5Base64(new Uint8Array([8, 8]));
-    const expected = 'w+7NCDwPSCf1JgWbA7deTA==';
-
-    expect(actual).toBe(expected);
-  });
-});
 
 describe('base64ToBlob', () => {
   it('encodes Base64 data URI to blob', async () => {
