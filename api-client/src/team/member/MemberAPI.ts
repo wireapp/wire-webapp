@@ -25,7 +25,8 @@ import {TeamAPI} from '../team/TeamAPI';
 import {ArrayUtil} from '@wireapp/commons';
 
 export class MemberAPI {
-  public static readonly DEFAULT_USERS_CHUNK_SIZE = 2000;
+  // Maximum 1600 due to "413 Request Entity Too Large" response
+  private static readonly DEFAULT_MEMBERS_CHUNK_SIZE = 1600;
   constructor(private readonly client: HttpClient) {}
 
   public static readonly URL = {
@@ -96,7 +97,7 @@ export class MemberAPI {
   public async getMembers(
     teamId: string,
     parameters: {ids: string[]},
-    limit = MemberAPI.DEFAULT_USERS_CHUNK_SIZE,
+    limit = MemberAPI.DEFAULT_MEMBERS_CHUNK_SIZE,
   ): Promise<MemberData[]> {
     const {ids} = parameters;
 
