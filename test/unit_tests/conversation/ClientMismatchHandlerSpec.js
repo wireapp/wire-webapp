@@ -173,6 +173,12 @@ describe('ClientMismatchHandler', () => {
     });
 
     it('should remove the payload of deleted clients', () => {
+      spyOn(testFactory.user_repository, 'getUserFromBackend').and.callFake(() => {
+        return Promise.resolve({
+          deleted: true,
+        });
+      });
+
       clientMismatch = {
         deleted: {
           [janeRoe.user_id]: [`${janeRoe.client_id}`],
@@ -192,6 +198,12 @@ describe('ClientMismatchHandler', () => {
     });
 
     it('should remove the payload of redundant clients', () => {
+      spyOn(testFactory.user_repository, 'getUserFromBackend').and.callFake(() => {
+        return Promise.resolve({
+          deleted: true,
+        });
+      });
+
       clientMismatch = {
         deleted: {},
         missing: {},
