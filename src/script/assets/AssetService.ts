@@ -22,16 +22,11 @@ import {AssetOptions, AssetRetentionPolicy, AssetUploadData} from '@wireapp/api-
 import {ProgressCallback, RequestCancelable} from '@wireapp/api-client/dist/http';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
-import {arrayToMd5Base64, loadFileBuffer, loadImage} from 'Util/util';
+import {loadFileBuffer, loadImage} from 'Util/util';
 import {assetV3, legacyAsset} from 'Util/ValidationUtil';
 import {WebWorker} from 'Util/worker';
 import {BackendClient} from '../service/BackendClient';
 import {Conversation} from '../entity/Conversation';
-
-export interface UploadAssetResponse {
-  key: string;
-  token: string;
-}
 
 export interface CompressedImage {
   compressedBytes: Uint8Array;
@@ -59,21 +54,25 @@ export class AssetService {
     previewImageKey: string;
   }> {
     const [{compressedBytes: previewImageBytes}, {compressedBytes: mediumImageBytes}] = await Promise.all([
-      this._compressProfileImage(image),
-      this._compressImage(image),
+      this.compressImage(image, true),
+      this.compressImage(image),
     ]);
-    const assetUploadOptions: AssetUploadOptions = {
+
+    const options: AssetUploadOptions = {
       expectsReadConfirmation: false,
       public: true,
       retention: AssetRetentionPolicy.ETERNAL,
     };
-    const [previewCredentials, mediumCredentials] = await Promise.all([
-      this.postAsset(previewImageBytes, assetUploadOptions),
-      this.postAsset(mediumImageBytes, assetUploadOptions),
-    ]);
+
+    const previewPictureUpload = await this.uploadFile(previewImageBytes, options);
+    const uploadedPreviewPicture = await previewPictureUpload.response;
+
+    const mediumPictureUpload = await this.uploadFile(mediumImageBytes, options);
+    const mediumPicture = await mediumPictureUpload.response;
+
     return {
-      mediumImageKey: mediumCredentials.key,
-      previewImageKey: previewCredentials.key,
+      mediumImageKey: uploadedPreviewPicture.key,
+      previewImageKey: mediumPicture.key,
     };
   }
 
@@ -111,75 +110,22 @@ export class AssetService {
     return isEternal ? AssetRetentionPolicy.ETERNAL : AssetRetentionPolicy.PERSISTENT;
   }
 
-  public uploadFile(
+  uploadFile(
     asset: Uint8Array,
     options: AssetOptions,
-    callback: ProgressCallback,
+    onProgress?: ProgressCallback,
   ): Promise<RequestCancelable<AssetUploadData>> {
-    return this.apiClient.asset.api.postAsset(asset, options, callback);
+    return this.apiClient.asset.api.postAsset(asset, options, onProgress);
   }
 
-  private async postAsset(
-    assetData: Uint8Array,
-    options: AssetUploadOptions,
-    xhrAccessorFunction?: Function,
-  ): Promise<UploadAssetResponse> {
-    const BOUNDARY = 'frontier';
-
-    options = {
-      public: false,
-      retention: AssetRetentionPolicy.PERSISTENT,
-      ...options,
-    };
-
-    const optionsString = JSON.stringify(options);
-
-    const md5Base64Hash = await arrayToMd5Base64(assetData);
-
-    const body = [
-      `--${BOUNDARY}`,
-      'Content-Type: application/json; charset=utf-8',
-      `Content-length: ${optionsString.length}`,
-      '',
-      optionsString,
-      `--${BOUNDARY}`,
-      'Content-Type: application/octet-stream',
-      `Content-length: ${assetData.length}`,
-      `Content-MD5: ${md5Base64Hash}`,
-      '',
-      '',
-    ].join('\r\n');
-
-    const footer = `\r\n--${BOUNDARY}--\r\n`;
-    const xhr = new XMLHttpRequest();
-    if (typeof xhrAccessorFunction === 'function') {
-      xhrAccessorFunction(xhr);
+  compressImage(image: File | Blob, isProfileImage: boolean = false): Promise<CompressedImage> {
+    if (isProfileImage === true) {
+      return this.compressImageWithWorker('worker/profile-image-worker.js', image);
     }
-    xhr.open('POST', this.backendClient.createUrl('/assets/v3'));
-    xhr.setRequestHeader('Content-Type', `multipart/mixed; boundary=${BOUNDARY}`);
-    xhr.setRequestHeader(
-      'Authorization',
-      `${this.apiClient['accessTokenStore'].accessToken?.token_type} ${this.apiClient['accessTokenStore'].accessToken?.access_token}`,
-    );
-    xhr.send(new Blob([body, assetData, footer]));
-
-    return new Promise<UploadAssetResponse>((resolve, reject) => {
-      xhr.onload = function (event): void {
-        return this.status === 201 ? resolve(JSON.parse(this.response)) : reject(event);
-      };
-      xhr.onerror = reject;
-    });
+    return this.compressImageWithWorker('worker/image-worker.js', image);
   }
 
-  _compressImage(image: File | Blob): Promise<CompressedImage> {
-    return this._compressImageWithWorker('worker/image-worker.js', image);
-  }
-
-  private _compressProfileImage(image: File | Blob): Promise<CompressedImage> {
-    return this._compressImageWithWorker('worker/profile-image-worker.js', image);
-  }
-
-  private async _compressImageWithWorker(pathToWorkerFile: string, image: File | Blob): Promise<CompressedImage> {
+  private async compressImageWithWorker(pathToWorkerFile: string, image: File | Blob): Promise<CompressedImage> {
     const skipCompression = image.type === 'image/gif';
     const buffer = await loadFileBuffer(image);
     let compressedBytes: ArrayBuffer;
