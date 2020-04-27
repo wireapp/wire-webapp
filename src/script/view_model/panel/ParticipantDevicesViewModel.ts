@@ -17,11 +17,27 @@
  *
  */
 
-import {BasePanelViewModel} from './BasePanelViewModel';
-import {makeUserDevicesHistory, UserDevicesState} from 'Components/userDevices';
+import ko from 'knockout';
+
+import {makeUserDevicesHistory, UserDevicesState, UserDevicesHistory} from 'Components/userDevices';
+
+import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
+import {User} from '../../entity/User';
+import {ConversationRepository} from '../../conversation/ConversationRepository';
+import {ClientRepository} from '../../client/ClientRepository';
+import {CryptographyRepository} from '../../cryptography/CryptographyRepository';
 
 export class ParticipantDevicesViewModel extends BasePanelViewModel {
-  constructor(params) {
+  clientRepository: ClientRepository;
+  conversationRepository: ConversationRepository;
+  cryptographyRepository: CryptographyRepository;
+  userDevicesHistory: UserDevicesHistory;
+  showSelfFingerprint: () => boolean;
+  showDeviceDetails: () => boolean;
+  showDeviceList: () => boolean;
+  userEntity: ko.Observable<User>;
+
+  constructor(params: PanelViewModelProps) {
     super(params);
     const {client, conversation, cryptography} = params.repositories;
     this.clientRepository = client;
@@ -36,11 +52,11 @@ export class ParticipantDevicesViewModel extends BasePanelViewModel {
     this.userEntity = ko.observable();
   }
 
-  getElementId() {
+  getElementId(): string {
     return 'participant-devices';
   }
 
-  clickOnBack() {
+  clickOnBack(): void {
     if (!this.showDeviceList()) {
       return this.userDevicesHistory.goBack();
     }
@@ -48,7 +64,7 @@ export class ParticipantDevicesViewModel extends BasePanelViewModel {
     this.onGoBack();
   }
 
-  initView({entity: userEntity}) {
+  initView({entity: userEntity}: {entity: User}): void {
     this.userEntity(userEntity);
     this.userDevicesHistory = makeUserDevicesHistory();
   }

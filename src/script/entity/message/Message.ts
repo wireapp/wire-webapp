@@ -35,6 +35,11 @@ import {ContentMessage} from './ContentMessage';
 import {File as FileAsset} from './File';
 import {CompositeMessage} from './CompositeMessage';
 
+export interface ReadReceipt {
+  time: string;
+  userId: string;
+}
+
 export class Message {
   private messageTimerStarted: boolean;
   private readonly ephemeral_remaining: ko.Observable<number>;
@@ -62,7 +67,7 @@ export class Message {
   public readonly unsafeSenderName: ko.PureComputed<string>;
   public readonly user: ko.Observable<User>;
   public version: number;
-  public readReceipts: ko.ObservableArray<{time: string; userId: string}>;
+  public readReceipts: ko.ObservableArray<ReadReceipt>;
   public super_type: SuperType;
   public type: string;
 

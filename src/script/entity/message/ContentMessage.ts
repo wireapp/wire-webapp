@@ -33,11 +33,11 @@ import {Message} from './Message';
 import {Text as TextAsset} from './Text';
 
 export class ContentMessage extends Message {
-  private readonly edited_timestamp: ko.Observable<number>;
+  readonly edited_timestamp: ko.Observable<number>;
   private readonly is_liked_provisional: ko.Observable<boolean>;
   private readonly quote: ko.Observable<QuoteEntity>;
   private readonly reactions_user_ets: ko.ObservableArray<User>;
-  private readonly reactions: ko.Observable<{[userId: string]: string}>;
+  readonly reactions: ko.Observable<{[userId: string]: string}>;
   public readonly assets: ko.ObservableArray<Asset>;
   public readonly is_liked: ko.PureComputed<boolean>;
   public readonly like_caption: ko.PureComputed<string>;

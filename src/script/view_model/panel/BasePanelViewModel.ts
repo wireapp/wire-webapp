@@ -25,6 +25,9 @@ import {User} from '../../entity/User';
 import {ServiceEntity} from '../../integration/ServiceEntity';
 import {SearchRepository} from '../../search/SearchRepository';
 import {TeamRepository} from '../../team/TeamRepository';
+import {ClientRepository} from '../../client/ClientRepository';
+import {CryptographyRepository} from '../../cryptography/CryptographyRepository';
+import {UserRepository} from '../../user/UserRepository';
 
 export interface PanelViewModelProps {
   isVisible: ko.Observable<boolean>;
@@ -32,7 +35,14 @@ export interface PanelViewModelProps {
   onClose: () => void;
   onGoBack: () => void;
   onGoToRoot: () => void;
-  repositories: {search: SearchRepository; team: TeamRepository; conversation: ConversationRepository};
+  repositories: {
+    search: SearchRepository;
+    team: TeamRepository;
+    conversation: ConversationRepository;
+    client: ClientRepository;
+    cryptography: CryptographyRepository;
+    user: UserRepository;
+  };
 }
 
 export class BasePanelViewModel {
@@ -53,7 +63,7 @@ export class BasePanelViewModel {
     this.activeConversation = repositories.conversation.active_conversation;
   }
 
-  initView(): void {}
+  initView(param: unknown): void {}
 
   getElementId(): string {
     return 'conversation-details';
