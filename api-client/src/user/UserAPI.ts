@@ -253,6 +253,7 @@ export class UserAPI {
 
   /**
    * Get a user by ID.
+   * @note If you want to get all properties (`sso_id`, `managed_by`, etc.) for your own user, use "/self". Otherwise you will get a user payload with a limited set of properties (what's publicly available).
    * @param userId The user ID
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/user
    */
