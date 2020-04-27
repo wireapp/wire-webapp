@@ -43,7 +43,7 @@
     "tsyringe": "4.1.0",
     "uint32": "0.2.1",
     "underscore": "1.10.2",
-    "url-search-params-polyfill": "8.0.0",
+    "url-search-params-polyfill": "8.1.0",
     "use-react-router": "1.0.7",
     "uuidjs": "4.2.5",
     "webrtc-adapter": "6.4.8"
