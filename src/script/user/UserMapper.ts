@@ -41,7 +41,7 @@ export class UserMapper {
     this.serverTimeHandler = serverTimeHandler;
   }
 
-  mapUserFromJson(userData: APIClientSelf): User | void {
+  mapUserFromJson(userData: APIClientUser | APIClientSelf): User | void {
     return this.updateUserFromObject(new User(), userData);
   }
 

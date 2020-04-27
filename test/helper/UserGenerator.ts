@@ -18,6 +18,9 @@
  */
 
 import * as faker from 'faker';
+import {User as APIClientUser} from '@wireapp/api-client/dist/user';
+import {UserAssetType} from '@wireapp/api-client/dist/user';
+
 import {User} from '../../src/script/entity/User';
 import {serverTimeHandler} from '../../src/script/time/serverTimeHandler';
 import {UserMapper} from '../../src/script/user/UserMapper';
@@ -26,25 +29,23 @@ const UUID = require('pure-uuid');
 
 export class UserGenerator {
   static getRandomUser(): User | void {
-    const template: any = {
+    const template: APIClientUser = {
       accent_id: Math.floor(Math.random() * 7 + 1),
       assets: [
         {
           key: `3-1-${new UUID(4).format()}`,
-          size: 'preview',
+          size: UserAssetType.PREVIEW,
           type: 'image',
         },
         {
           key: `3-1-${new UUID(4).format()}`,
-          size: 'complete',
+          size: UserAssetType.COMPLETE,
           type: 'image',
         },
       ],
       handle: faker.internet.userName(),
       id: new UUID(4).format(),
-      locale: 'en',
       name: faker.name.findName(),
-      picture: [],
     };
 
     return new UserMapper(serverTimeHandler).mapUserFromJson(template);
