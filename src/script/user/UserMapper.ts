@@ -45,12 +45,12 @@ export class UserMapper {
     return this.updateUserFromObject(new User(), userData);
   }
 
-  mapSelfUserFromJson(userData: any): User {
+  mapSelfUserFromJson(userData: APIClientSelf | APIClientUser): User {
     const userEntity = this.updateUserFromObject(new User(), userData) as any;
     userEntity.isMe = true;
 
-    if (userData.locale) {
-      userEntity.locale = userData.locale;
+    if ((userData as any).locale) {
+      userEntity.locale = (userData as any).locale;
     }
 
     return userEntity;
@@ -61,7 +61,7 @@ export class UserMapper {
    * @note Return an empty array in any case to prevent crashes.
    * @returns Mapped user entities
    */
-  mapUsersFromJson(usersData: APIClientSelf[]): (void | User)[] {
+  mapUsersFromJson(usersData: (APIClientSelf | APIClientUser)[]): (void | User)[] {
     if (usersData?.length) {
       return usersData.filter(userData => userData).map(userData => this.mapUserFromJson(userData));
     }
@@ -76,7 +76,7 @@ export class UserMapper {
    * @param userData Updated user data from backend
    * @todo Pass in "serverTimeHandler", so that it can be removed from the "UserMapper" constructor
    */
-  updateUserFromObject(userEntity: User, userData: APIClientUser | APIClientSelf): User | undefined {
+  updateUserFromObject(userEntity: User, userData: Partial<APIClientUser | APIClientSelf>): User | undefined {
     if (!userData) {
       return undefined;
     }
