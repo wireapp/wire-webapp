@@ -155,6 +155,7 @@ export class UserMapper {
       userEntity.phone(phone);
     }
 
+    // TODO: Move `service` back to the destructuring once `userData` is correctly typed in the APIClient.
     if ((userData as any).service) {
       userEntity.isService = true;
       userEntity.providerId = (userData as any).service.provider;
