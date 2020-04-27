@@ -683,6 +683,9 @@ export class UserRepository {
         if (this.isTeam()) {
           this.mapGuestStatus([userEntity]);
         }
+        if (userEntity.inTeam() && userEntity.isDeleted) {
+          amplify.publish(WebAppEvents.TEAM.MEMBER_LEAVE, userEntity.teamId, userEntity.id);
+        }
       });
   }
 

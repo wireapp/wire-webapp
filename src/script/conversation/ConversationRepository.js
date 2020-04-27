@@ -192,13 +192,7 @@ export class ConversationRepository {
       this.eventRepository,
       this.serverTimeHandler,
     );
-    this.clientMismatchHandler = new ClientMismatchHandler(
-      this,
-      this.cryptography_repository,
-      this.eventRepository,
-      this.serverTimeHandler,
-      this.userRepository,
-    );
+    this.clientMismatchHandler = new ClientMismatchHandler(this, this.cryptography_repository, this.userRepository);
 
     this.active_conversation = ko.observable();
     this.conversations = ko.observableArray([]);
@@ -1596,10 +1590,10 @@ export class ConversationRepository {
    * @param {string} teamId ID of team that member was removed from
    * @param {string} userId ID of leaving user
    * @param {Date} isoDate Date of member removal
-   * @returns {undefined} No return value
+   * @returns {Promise<void>} No return value
    */
-  teamMemberLeave(teamId, userId, isoDate) {
-    this.userRepository.getUserById(userId).then(userEntity => {
+  teamMemberLeave(teamId, userId, isoDate = this.serverTimeHandler.toServerTimestamp()) {
+    return this.userRepository.getUserById(userId).then(userEntity => {
       this.conversations()
         .filter(conversationEntity => {
           const conversationInTeam = conversationEntity.team_id === teamId;

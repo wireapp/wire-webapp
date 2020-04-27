@@ -17,12 +17,14 @@
  *
  */
 
+import {UserAsset as APIClientUserAsset} from '@wireapp/api-client/dist/user';
+
 import {AssetPayload} from '../entity/message/Asset';
 import {AssetRemoteData} from './AssetRemoteData';
 
 export type MappedAsset = {[index: string]: AssetRemoteData};
 
-export const mapProfileAssets = (userId: string, assets: AssetPayload[]): MappedAsset => {
+export const mapProfileAssets = (userId: string, assets: APIClientUserAsset[]): MappedAsset => {
   const sizeMap: {[index: string]: string} = {
     complete: 'medium',
     preview: 'preview',

@@ -17,6 +17,8 @@
  *
  */
 
+import {Self as APIClientSelf} from '@wireapp/api-client/dist/self';
+
 import {joaatHash} from 'Util/Crypto';
 import {Logger, getLogger} from 'Util/Logger';
 
@@ -38,7 +40,7 @@ export class UserMapper {
     this.serverTimeHandler = serverTimeHandler;
   }
 
-  mapUserFromJson(userData: Object): User | void {
+  mapUserFromJson(userData: APIClientSelf): User | void {
     return this.updateUserFromObject(new User(), userData);
   }
 
@@ -58,7 +60,7 @@ export class UserMapper {
    * @note Return an empty array in any case to prevent crashes.
    * @returns Mapped user entities
    */
-  mapUsersFromJson(usersData: Object[]): (void | User)[] {
+  mapUsersFromJson(usersData: APIClientSelf[]): (void | User)[] {
     if (usersData?.length) {
       return usersData.filter(userData => userData).map(userData => this.mapUserFromJson(userData));
     }
@@ -70,9 +72,10 @@ export class UserMapper {
    * Maps JSON user into a blank user entity or updates an existing one.
    * @note Mapping of single properties to an existing user happens when the user changes his name or accent color.
    * @param userEntity User entity that the info shall be mapped to
+   * @param userData Updated user data from backend
    * TODO: Pass in "serverTimeHandler", so that it can be removed from the "UserMapper" constructor
    */
-  updateUserFromObject(userEntity: User, userData: any): User | undefined {
+  updateUserFromObject(userEntity: User, userData: APIClientSelf): User | undefined {
     if (!userData) {
       return undefined;
     }
@@ -92,6 +95,7 @@ export class UserMapper {
     const {
       accent_id: accentId,
       assets,
+      deleted,
       email,
       expires_at: expirationDate,
       managed_by,
@@ -99,9 +103,8 @@ export class UserMapper {
       name,
       phone,
       picture,
-      service,
       sso_id: ssoId,
-      team,
+      team: teamId,
     } = userData;
 
     if (accentId) {
@@ -114,7 +117,7 @@ export class UserMapper {
     if (hasAsset) {
       mappedAssets = mapProfileAssets(userEntity.id, userData.assets);
     } else if (hasPicture) {
-      mappedAssets = mapProfileAssetsV1(userEntity.id, userData.picture);
+      mappedAssets = mapProfileAssetsV1(userEntity.id, userData.picture as any);
     }
     updateUserEntityAssets(userEntity, mappedAssets);
 
@@ -152,20 +155,24 @@ export class UserMapper {
       userEntity.phone(phone);
     }
 
-    if (service) {
+    if ((userData as any).service) {
       userEntity.isService = true;
-      userEntity.providerId = service.provider;
+      userEntity.providerId = (userData as any).service.provider;
       userEntity.providerName('');
-      userEntity.serviceId = service.id;
+      userEntity.serviceId = (userData as any).service.id;
     }
 
     if (ssoId && Object.keys(ssoId).length) {
       userEntity.isSingleSignOn = true;
     }
 
-    if (team) {
+    if (teamId) {
       userEntity.inTeam(true);
-      userEntity.teamId = team;
+      userEntity.teamId = teamId;
+    }
+
+    if (deleted) {
+      userEntity.isDeleted = true;
     }
 
     return userEntity;

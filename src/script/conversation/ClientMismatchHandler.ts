@@ -17,40 +17,32 @@
  *
  */
 
+import {amplify} from 'amplify';
+import {ClientMismatch, NewOTRMessage, UserClients} from '@wireapp/api-client/dist/conversation';
+
 import {getLogger, Logger} from 'Util/Logger';
 import {getDifference} from 'Util/ArrayUtil';
-import {ClientMismatch, UserClients} from '@wireapp/api-client/dist/conversation';
-import {EventBuilder} from './EventBuilder';
+
 import {ConversationRepository} from './ConversationRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
-import {EventRepository} from '../event/EventRepository';
-import {ServerTimeHandler} from '../time/serverTimeHandler';
 import {UserRepository} from '../user/UserRepository';
 import {EventInfoEntity} from './EventInfoEntity';
-import {NewOTRMessage} from '@wireapp/api-client/dist/conversation';
 import {Conversation} from '../entity/Conversation';
-import {amplify} from 'amplify';
 import {WebAppEvents} from '../event/WebApp';
 
 export class ClientMismatchHandler {
   private readonly conversationRepository: ConversationRepository;
   private readonly cryptographyRepository: CryptographyRepository;
-  private readonly eventRepository: EventRepository;
-  private readonly serverTimeHandler: ServerTimeHandler;
   private readonly userRepository: UserRepository;
   private readonly logger: Logger;
 
   constructor(
     conversationRepository: ConversationRepository,
     cryptographyRepository: CryptographyRepository,
-    eventRepository: EventRepository,
-    serverTimeHandler: ServerTimeHandler,
     userRepository: UserRepository,
   ) {
     this.conversationRepository = conversationRepository;
     this.cryptographyRepository = cryptographyRepository;
-    this.eventRepository = eventRepository;
-    this.serverTimeHandler = serverTimeHandler;
     this.userRepository = userRepository;
     this.logger = getLogger('ClientMismatchHandler');
   }
@@ -102,7 +94,7 @@ export class ClientMismatchHandler {
       delete payload.recipients[userId][clientId];
       await this.userRepository.removeClientFromUser(userId, clientId);
     };
-    await this.removePayload(recipients, removeDeletedClient, conversationEntity, payload);
+    await this.removePayload(recipients, removeDeletedClient, payload, conversationEntity);
   }
 
   /**
@@ -177,7 +169,7 @@ export class ClientMismatchHandler {
     const removeRedundantClient = (userId: string, clientId: string) => {
       delete payload.recipients[userId][clientId];
     };
-    await this.removePayload(recipients, removeRedundantClient, conversationEntity, payload);
+    await this.removePayload(recipients, removeRedundantClient, payload, conversationEntity);
   }
 
   /**
@@ -191,24 +183,19 @@ export class ClientMismatchHandler {
   async removePayload(
     recipients: UserClients,
     clientFn: (userId: string, clientId: string) => void | Promise<void>,
-    conversationEntity: Conversation = undefined,
     payload: NewOTRMessage,
+    conversationEntity?: Conversation,
   ): Promise<void> {
     const removeDeletedUser = async (userId: string): Promise<void> => {
       const clientIdsOfUser = Object.keys(payload.recipients[userId]);
       const noRemainingClients = !clientIdsOfUser.length;
 
       if (noRemainingClients && typeof conversationEntity !== 'undefined') {
-        const result = await this.userRepository.getUserFromBackend(userId);
-        const isDeleted = result?.deleted === true;
-        if (isDeleted) {
-          if (conversationEntity.isGroup()) {
-            const timestamp = this.serverTimeHandler.toServerTimestamp();
-            const memberLeaveEvent = EventBuilder.buildMemberLeave(conversationEntity, userId, false, timestamp);
-            this.eventRepository.injectEvent(memberLeaveEvent);
-          } else {
-            amplify.publish(WebAppEvents.USER.UPDATE, userId);
-          }
+        const backendUser = await this.userRepository.getUserFromBackend(userId);
+        const isDeleted = backendUser?.deleted === true;
+
+        if (isDeleted && conversationEntity.inTeam) {
+          amplify.publish(WebAppEvents.TEAM.MEMBER_LEAVE, conversationEntity.team_id, userId);
         }
       }
 
