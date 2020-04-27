@@ -6,7 +6,7 @@
     "@types/generate-changelog": "1.8.0",
     "@types/long": "4.0.1",
     "@types/node": "~12",
-    "@wireapp/core": "16.6.13",
+    "@wireapp/core": "16.6.14",
     "commander": "5.0.0",
     "generate-changelog": "1.8.0"
   },
@@ -32,5 +32,5 @@
     "test:project": "yarn dist && yarn test"
   },
   "types": "dist/ChangelogBot.d.ts",
-  "version": "4.0.112"
+  "version": "4.0.113"
 }
