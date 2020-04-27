@@ -76,7 +76,7 @@ class UserActions {
   }: UserInputParams) {
     this.isSelfActivated = ko.unwrap(isSelfActivated);
     this.isMe = ko.computed(() => user()?.isMe);
-    this.isNotMe = ko.computed(() => !this.isMe() && isSelfActivated);
+    this.isNotMe = ko.computed(() => !this.isMe() && this.isSelfActivated);
 
     const allItems = [
       {
