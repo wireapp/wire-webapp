@@ -17,6 +17,7 @@
  *
  */
 
+import {User as APIClientUser} from '@wireapp/api-client/dist/user';
 import {Self as APIClientSelf} from '@wireapp/api-client/dist/self';
 
 import {joaatHash} from 'Util/Crypto';
@@ -73,9 +74,9 @@ export class UserMapper {
    * @note Mapping of single properties to an existing user happens when the user changes his name or accent color.
    * @param userEntity User entity that the info shall be mapped to
    * @param userData Updated user data from backend
-   * TODO: Pass in "serverTimeHandler", so that it can be removed from the "UserMapper" constructor
+   * @todo Pass in "serverTimeHandler", so that it can be removed from the "UserMapper" constructor
    */
-  updateUserFromObject(userEntity: User, userData: APIClientSelf): User | undefined {
+  updateUserFromObject(userEntity: User, userData: APIClientUser | APIClientSelf): User | undefined {
     if (!userData) {
       return undefined;
     }
@@ -106,7 +107,7 @@ export class UserMapper {
       service,
       sso_id: ssoId,
       team: teamId,
-    } = userData;
+    } = userData as APIClientSelf;
 
     if (accentId) {
       userEntity.accent_id(accentId);
@@ -118,7 +119,7 @@ export class UserMapper {
     if (hasAsset) {
       mappedAssets = mapProfileAssets(userEntity.id, userData.assets);
     } else if (hasPicture) {
-      mappedAssets = mapProfileAssetsV1(userEntity.id, userData.picture as any);
+      mappedAssets = mapProfileAssetsV1(userEntity.id, (userData as any).picture);
     }
     updateUserEntityAssets(userEntity, mappedAssets);
 

@@ -18,7 +18,6 @@
  */
 import {APIClient} from '@wireapp/api-client';
 import {User as APIClientUser} from '@wireapp/api-client/dist/user';
-import {Self as APIClientSelf} from '@wireapp/api-client/dist/self';
 
 import {Logger, getLogger} from 'Util/Logger';
 
@@ -111,7 +110,7 @@ export class UserService {
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/user
    */
-  getUser(userId: string): Promise<APIClientUser | APIClientSelf> {
+  getUser(userId: string): Promise<APIClientUser> {
     return this.apiClient.user.api.getUser(userId);
   }
 }

@@ -628,7 +628,7 @@ export class UserRepository {
     });
   }
 
-  getUserFromBackend(userId: string): Promise<APIClientUser | APIClientSelf> {
+  getUserFromBackend(userId: string): Promise<APIClientUser> {
     return this.userService.getUser(userId);
   }
 
@@ -678,7 +678,7 @@ export class UserRepository {
 
     return Promise.all([getLocalUser(), this.userService.getUser(userId)])
       .then(([localUserEntity, updatedUserData]) =>
-        this.userMapper.updateUserFromObject(localUserEntity, updatedUserData as APIClientSelf),
+        this.userMapper.updateUserFromObject(localUserEntity, updatedUserData),
       )
       .then(userEntity => {
         if (this.isTeam()) {
