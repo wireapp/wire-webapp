@@ -103,6 +103,7 @@ export class UserMapper {
       name,
       phone,
       picture,
+      service,
       sso_id: ssoId,
       team: teamId,
     } = userData;
@@ -155,12 +156,11 @@ export class UserMapper {
       userEntity.phone(phone);
     }
 
-    // TODO: Move `service` back to the destructuring once `userData` is correctly typed in the APIClient.
-    if ((userData as any).service) {
+    if (service) {
       userEntity.isService = true;
-      userEntity.providerId = (userData as any).service.provider;
+      userEntity.providerId = service.provider;
       userEntity.providerName('');
-      userEntity.serviceId = (userData as any).service.id;
+      userEntity.serviceId = service.id;
     }
 
     if (ssoId && Object.keys(ssoId).length) {
