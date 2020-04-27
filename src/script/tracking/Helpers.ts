@@ -60,7 +60,10 @@ export function getGuestAttributes(conversationEntity: Conversation): {is_allow_
   };
 }
 
-export function getParticipantTypes(userEntities: User[], countSelf?: boolean): {guests: number; users: number} {
+export function getParticipantTypes(
+  userEntities: User[],
+  countSelf?: boolean,
+): {guests: number; users: number; temporaryGuests: number} {
   const initialValue = {guests: 0, temporaryGuests: 0, users: countSelf ? 1 : 0};
   return userEntities.reduce((accumulator, userEntity) => {
     if (userEntity.isTemporaryGuest()) {

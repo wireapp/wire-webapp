@@ -17,12 +17,27 @@
  *
  */
 
-import {getLogger} from 'Util/Logger';
+import ko from 'knockout';
 
-import {BasePanelViewModel} from './BasePanelViewModel';
+import {getLogger, Logger} from 'Util/Logger';
+
+import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
+import {ServiceEntity} from '../../integration/ServiceEntity';
+import {ActionsViewModel} from '../ActionsViewModel';
+import {IntegrationRepository} from '../../integration/IntegrationRepository';
 
 export class GroupParticipantServiceViewModel extends BasePanelViewModel {
-  constructor(params) {
+  integrationRepository: IntegrationRepository;
+  actionsViewModel: ActionsViewModel;
+  logger: Logger;
+  selectedParticipant: ko.Observable<ServiceEntity>;
+  selectedService: ko.Observable<ServiceEntity>;
+  isAddMode: ko.Observable<boolean>;
+  conversationInTeam: ko.PureComputed<boolean>;
+  selectedInConversation: ko.PureComputed<boolean>;
+  selfIsActiveParticipant: ko.PureComputed<boolean>;
+  showActions: ko.PureComputed<boolean>;
+  constructor(params: PanelViewModelProps) {
     super(params);
 
     const {mainViewModel, repositories} = params;
@@ -44,6 +59,7 @@ export class GroupParticipantServiceViewModel extends BasePanelViewModel {
         const participatingUserIds = this.activeConversation().participating_user_ids();
         return participatingUserIds.some(id => this.selectedParticipant().id === id);
       }
+      return false;
     });
 
     this.selfIsActiveParticipant = ko.pureComputed(() => {
@@ -55,30 +71,29 @@ export class GroupParticipantServiceViewModel extends BasePanelViewModel {
     });
   }
 
-  getElementId() {
+  getElementId(): string {
     return 'group-participant-service';
   }
 
-  getEntityId() {
+  getEntityId(): string {
     return this.selectedParticipant().id;
   }
 
-  clickOnAdd() {
+  clickOnAdd(): void {
     this.integrationRepository.addService(this.activeConversation(), this.selectedService(), 'conversation_details');
     this.onGoToRoot();
   }
 
-  clickToOpen() {
+  clickToOpen(): void {
     this.actionsViewModel.open1to1ConversationWithService(this.selectedService());
   }
 
-  clickToRemove() {
-    this.actionsViewModel
-      .removeFromConversation(this.activeConversation(), this.selectedParticipant())
-      .then(this.onGoBack);
+  async clickToRemove(): Promise<void> {
+    await this.actionsViewModel.removeFromConversation(this.activeConversation(), this.selectedParticipant());
+    this.onGoBack();
   }
 
-  initView({entity: service, addMode = false}) {
+  initView({entity: service, addMode = false}: {entity: ServiceEntity; addMode: boolean}): void {
     const serviceEntity = ko.unwrap(service);
     this.selectedParticipant(serviceEntity);
     this.selectedService(undefined);
@@ -86,10 +101,9 @@ export class GroupParticipantServiceViewModel extends BasePanelViewModel {
     this._showService(this.selectedParticipant());
   }
 
-  _showService(entity) {
-    this.integrationRepository.getServiceFromUser(entity).then(serviceEntity => {
-      this.selectedService(serviceEntity);
-      this.integrationRepository.addProviderNameToParticipant(serviceEntity);
-    });
-  }
+  _showService = async (entity: ServiceEntity): Promise<void> => {
+    const serviceEntity = await this.integrationRepository.getServiceFromUser(entity);
+    this.selectedService(serviceEntity);
+    this.integrationRepository.addProviderNameToParticipant(serviceEntity);
+  };
 }

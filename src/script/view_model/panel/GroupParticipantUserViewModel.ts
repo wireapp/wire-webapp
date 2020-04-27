@@ -17,16 +17,34 @@
  *
  */
 
-import {getLogger} from 'Util/Logger';
+import ko from 'knockout';
+
+import {getLogger, Logger} from 'Util/Logger';
 
 import {Actions} from 'Components/panel/userActions';
 import 'Components/panel/enrichedFields';
 import 'Components/panel/userDetails';
-import {DefaultRole} from '../../conversation/ConversationRoleRepository';
-import {BasePanelViewModel} from './BasePanelViewModel';
+import {DefaultRole, ConversationRoleRepository} from '../../conversation/ConversationRoleRepository';
+import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
+import {UserRepository} from '../../user/UserRepository';
+import {ActionsViewModel} from '../ActionsViewModel';
+import {TeamRepository} from '../../team/TeamRepository';
+import {ConversationRepository} from '../../conversation/ConversationRepository';
+import {User} from '../../entity/User';
+import {PanelViewModel} from '../PanelViewModel';
 
 export class GroupParticipantUserViewModel extends BasePanelViewModel {
-  constructor(params) {
+  userRepository: UserRepository;
+  actionsViewModel: ActionsViewModel;
+  teamRepository: TeamRepository;
+  conversationRepository: ConversationRepository;
+  conversationRoleRepository: ConversationRoleRepository;
+  logger: Logger;
+  selectedParticipant: ko.Observable<User>;
+  isSelfVerified: ko.PureComputed<boolean>;
+  canChangeRole: ko.PureComputed<boolean>;
+  isAdmin: ko.PureComputed<boolean>;
+  constructor(params: PanelViewModelProps) {
     super(params);
 
     const {mainViewModel, repositories} = params;
@@ -40,9 +58,6 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
     this.logger = getLogger('GroupParticipantUserViewModel');
 
     this.selectedParticipant = ko.observable(undefined);
-
-    this.onUserAction = this.onUserAction.bind(this);
-
     this.isSelfVerified = ko.pureComputed(() => repositories.user.self()?.is_verified());
 
     this.canChangeRole = ko.pureComputed(
@@ -60,7 +75,7 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
     );
   }
 
-  onToggleAdmin = async () => {
+  onToggleAdmin = async (): Promise<void> => {
     const newRole = this.isAdmin() ? DefaultRole.WIRE_MEMBER : DefaultRole.WIRE_ADMIN;
     await this.conversationRoleRepository.setMemberConversationRole(
       this.activeConversation(),
@@ -72,29 +87,29 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
     this.activeConversation().roles(roles);
   };
 
-  showActionDevices(userEntity) {
+  showActionDevices(userEntity: User): boolean {
     return !userEntity.isMe;
   }
 
-  onUserAction(action) {
+  onUserAction = (action: Actions): void => {
     if (action === Actions.REMOVE) {
       this.onGoBack();
     }
-  }
+  };
 
-  getElementId() {
+  getElementId(): string {
     return 'group-participant-user';
   }
 
-  getEntityId() {
+  getEntityId(): string {
     return this.selectedParticipant().id;
   }
 
-  clickOnDevices() {
-    this.navigateTo(z.viewModel.PanelViewModel.STATE.PARTICIPANT_DEVICES, {entity: this.selectedParticipant()});
+  clickOnDevices(): void {
+    this.navigateTo(PanelViewModel.STATE.PARTICIPANT_DEVICES, {entity: this.selectedParticipant()});
   }
 
-  initView({entity: userEntity}) {
+  initView({entity: userEntity}: {entity: User}): void {
     this.selectedParticipant(userEntity);
     if (this.teamRepository.isTeam()) {
       this.teamRepository.updateTeamMembersByIds(this.teamRepository.team(), [userEntity.id], true);

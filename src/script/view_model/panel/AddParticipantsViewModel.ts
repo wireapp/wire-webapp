@@ -17,19 +17,55 @@
  *
  */
 
-import {getLogger} from 'Util/Logger';
+import ko from 'knockout';
+import {amplify} from 'amplify';
+
+import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
-import {BasePanelViewModel} from './BasePanelViewModel';
+import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
 import {getManageServicesUrl} from '../../externalRoute';
 import * as trackingHelpers from '../../tracking/Helpers';
 import {EventName} from '../../tracking/EventName';
 import {WebAppEvents} from '../../event/WebApp';
 import {MotionDuration} from '../../motion/MotionDuration';
+import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
+import {IntegrationRepository} from 'src/script/integration/IntegrationRepository';
+import {SearchRepository} from 'src/script/search/SearchRepository';
+import {TeamRepository} from 'src/script/team/TeamRepository';
+import {UserRepository} from 'src/script/user/UserRepository';
+import {ServiceEntity} from 'src/script/integration/ServiceEntity';
+import {User} from 'src/script/entity/User';
 
 export class AddParticipantsViewModel extends BasePanelViewModel {
+  conversationRepository: ConversationRepository;
+  integrationRepository: IntegrationRepository;
+  searchRepository: SearchRepository;
+  teamRepository: TeamRepository;
+  userRepository: UserRepository;
+  MotionDuration: typeof MotionDuration;
+  logger: Logger;
+  isTeam: ko.PureComputed<boolean>;
+  selfUser: ko.Observable<User>;
+  services: ko.ObservableArray<ServiceEntity>;
+  teamUsers: ko.PureComputed<User[]>;
+  teamMembers: ko.PureComputed<User[]>;
+  isInitialServiceSearch: ko.Observable<boolean>;
+  searchInput: ko.Observable<string>;
+  selectedContacts: ko.ObservableArray<any>;
+  selectedService: ko.Observable<any>;
+  state: ko.Observable<string>;
+  isTeamOnly: ko.PureComputed<boolean>;
+  showIntegrations: ko.PureComputed<boolean>;
+  enableAddAction: ko.PureComputed<boolean>;
+  isStateAddPeople: ko.PureComputed<boolean>;
+  isStateAddService: ko.PureComputed<boolean>;
+  contacts: ko.PureComputed<any>;
+  isSearching: ko.PureComputed<any>;
+  headerText: ko.PureComputed<string>;
+  manageServicesUrl: string;
   static get STATE() {
     return {
       ADD_PEOPLE: 'AddParticipantsViewModel.STATE.ADD_PEOPLE',
@@ -37,7 +73,7 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
     };
   }
 
-  constructor(params) {
+  constructor(params: PanelViewModelProps) {
     super(params);
 
     const {conversation, integration, search, team, user} = params.repositories;
@@ -71,6 +107,7 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
         const allowIntegrations = this.activeConversation().isGroup() || hasBotUser;
         return this.isTeam() && allowIntegrations && this.activeConversation().inTeam() && !this.isTeamOnly();
       }
+      return undefined;
     });
     this.enableAddAction = ko.pureComputed(() => this.selectedContacts().length > 0);
 
@@ -79,7 +116,7 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
 
     this.contacts = ko.pureComputed(() => {
       const activeConversation = this.activeConversation();
-      let userEntities = [];
+      let userEntities: User[] = [];
 
       if (!activeConversation) {
         return userEntities;
@@ -103,26 +140,26 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
         : t('addParticipantsHeader'),
     );
 
-    this.searchInput.subscribe(searchInput => this.searchServices(searchInput));
+    this.searchInput.subscribe(this.searchServices);
     this.clickOnSelectService = this.clickOnSelectService.bind(this);
 
     this.manageServicesUrl = getManageServicesUrl('client_landing');
   }
 
-  getElementId() {
+  getElementId(): string {
     return 'add-participants';
   }
 
-  clickOnAddPeople() {
+  clickOnAddPeople(): void {
     this.state(AddParticipantsViewModel.STATE.ADD_PEOPLE);
   }
 
-  clickOnAddService() {
+  clickOnAddService(): void {
     this.state(AddParticipantsViewModel.STATE.ADD_SERVICE);
-    this.searchServices(this.searchInput());
+    this.searchServices();
   }
 
-  clickOnSelectService(serviceEntity) {
+  clickOnSelectService(serviceEntity: ServiceEntity): void {
     this.selectedService(serviceEntity);
     this.navigateTo(z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE, {
       addMode: true,
@@ -130,19 +167,19 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
     });
   }
 
-  clickToAddParticipants() {
+  clickToAddParticipants(): void {
     this._addMembers();
     this.onGoBack();
   }
 
-  clickOpenManageServices() {
+  clickOpenManageServices(): void {
     if (this.manageServicesUrl) {
       safeWindowOpen(this.manageServicesUrl);
       amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.SETTINGS.OPENED_MANAGE_TEAM);
     }
   }
 
-  initView() {
+  initView(): void {
     this.state(AddParticipantsViewModel.STATE.ADD_PEOPLE);
     this.selectedContacts.removeAll();
     this.selectedService(undefined);
@@ -150,38 +187,39 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
     this.isInitialServiceSearch(true);
   }
 
-  searchServices() {
+  searchServices = async (): Promise<void> => {
     if (this.isStateAddService()) {
-      this.integrationRepository
-        .searchForServices(this.searchInput(), this.searchInput)
-        .then(() => this.isInitialServiceSearch(false));
+      await this.integrationRepository.searchForServices(this.searchInput(), this.searchInput);
+      this.isInitialServiceSearch(false);
     }
-  }
+  };
 
-  _addMembers() {
+  async _addMembers(): Promise<void> {
     const activeConversation = this.activeConversation();
     const userEntities = this.selectedContacts().slice();
 
-    this.conversationRepository.addMembers(activeConversation, userEntities).then(() => {
-      let attributes = {
-        method: 'add',
-        user_num: userEntities.length,
+    await this.conversationRepository.addMembers(activeConversation, userEntities);
+    let attributes = {
+      guest_num: undefined as number,
+      is_allow_guests: undefined as boolean,
+      method: 'add',
+      temporary_guest_num: undefined as number,
+      user_num: userEntities.length,
+    };
+
+    const isTeamConversation = !!this.activeConversation().team_id;
+    if (isTeamConversation) {
+      const participants = trackingHelpers.getParticipantTypes(userEntities, false);
+
+      attributes = {
+        ...attributes,
+        guest_num: participants.guests,
+        is_allow_guests: activeConversation.isGuestRoom(),
+        temporary_guest_num: participants.temporaryGuests,
+        user_num: participants.users,
       };
+    }
 
-      const isTeamConversation = !!this.activeConversation().team_id;
-      if (isTeamConversation) {
-        const participants = trackingHelpers.getParticipantTypes(userEntities, false);
-
-        attributes = {
-          ...attributes,
-          guest_num: participants.guests,
-          is_allow_guests: activeConversation.isGuestRoom(),
-          temporary_guest_num: participants.temporaryGuests,
-          user_num: participants.users,
-        };
-      }
-
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CONVERSATION.ADD_PARTICIPANTS, attributes);
-    });
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CONVERSATION.ADD_PARTICIPANTS, attributes);
   }
 }
