@@ -26,7 +26,7 @@ const UUID = require('pure-uuid');
 
 export class UserGenerator {
   static getRandomUser(): User | void {
-    const template: Object = {
+    const template: any = {
       accent_id: Math.floor(Math.random() * 7 + 1),
       assets: [
         {

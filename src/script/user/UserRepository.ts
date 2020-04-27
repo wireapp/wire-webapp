@@ -21,6 +21,7 @@ import {PublicClient} from '@wireapp/api-client/dist/client';
 import type {BackendError} from '@wireapp/api-client/dist/http';
 import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
 import {User as APIClientUser} from '@wireapp/api-client/dist/user';
+import {Self as APIClientSelf} from '@wireapp/api-client/dist/self';
 
 import {amplify} from 'amplify';
 import ko from 'knockout';
@@ -291,7 +292,7 @@ export class UserRepository {
     const isSelfUser = user.id === this.self().id;
     const userPromise = isSelfUser ? Promise.resolve(this.self()) : this.getUserById(user.id);
     return userPromise.then(user_et => {
-      this.userMapper.updateUserFromObject(user_et, user);
+      this.userMapper.updateUserFromObject(user_et, (user as unknown) as APIClientSelf);
 
       if (isSelfUser) {
         amplify.publish(WebAppEvents.TEAM.UPDATE_INFO);
@@ -496,7 +497,7 @@ export class UserRepository {
     const _getUsers = (chunkOfUserIds: string[]): Promise<(void | User)[]> => {
       return this.userService
         .getUsers(chunkOfUserIds)
-        .then(response => (response ? this.userMapper.mapUsersFromJson(response) : []))
+        .then(response => (response ? this.userMapper.mapUsersFromJson(response as APIClientSelf[]) : []))
         .catch((error: AxiosError | BackendError) => {
           const isNotFound = (error as AxiosError).response?.status === BackendClientError.STATUS_CODE.NOT_FOUND;
           const isBadRequest = (error as BackendError).code === BackendClientError.STATUS_CODE.BAD_REQUEST;
@@ -627,7 +628,7 @@ export class UserRepository {
     });
   }
 
-  getUserFromBackend(userId: string): Promise<APIClientUser> {
+  getUserFromBackend(userId: string): Promise<APIClientUser | APIClientSelf> {
     return this.userService.getUser(userId);
   }
 
@@ -677,7 +678,7 @@ export class UserRepository {
 
     return Promise.all([getLocalUser(), this.userService.getUser(userId)])
       .then(([localUserEntity, updatedUserData]) =>
-        this.userMapper.updateUserFromObject(localUserEntity, updatedUserData),
+        this.userMapper.updateUserFromObject(localUserEntity, updatedUserData as APIClientSelf),
       )
       .then(userEntity => {
         if (this.isTeam()) {
