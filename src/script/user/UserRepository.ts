@@ -21,6 +21,8 @@ import {PublicClient} from '@wireapp/api-client/dist/client';
 import type {BackendError} from '@wireapp/api-client/dist/http';
 import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
 import {User as APIClientUser} from '@wireapp/api-client/dist/user';
+import {Self as APIClientSelf} from '@wireapp/api-client/dist/self';
+import {UserAsset as APIClientUserAsset, UserAssetType as APIClientUserAssetType} from '@wireapp/api-client/dist/user';
 
 import {amplify} from 'amplify';
 import ko from 'knockout';
@@ -69,21 +71,11 @@ import {ClientMapper} from '../client/ClientMapper';
 import {ClientRepository} from '../client/ClientRepository';
 import {Config} from '../Config';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
-import {AssetPayload} from '../entity/message/Asset';
 import {BackendClientError} from '../error/BackendClientError';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {SelfService} from '../self/SelfService';
 import {ServerTimeHandler} from '../time/serverTimeHandler';
 import {UserError} from '../error/UserError';
-
-export interface UserUpdate {
-  accent_id?: AccentColor.AccentColorID;
-  assets?: {key: string; size: string; type: string}[];
-  handle?: string;
-  id?: string;
-  name?: string;
-  picture?: AssetPayload[];
-}
 
 export class UserRepository {
   private readonly asset_service: AssetService;
@@ -287,7 +279,7 @@ export class UserRepository {
   /**
    * Event to update the matching user.
    */
-  userUpdate({user}: {user: UserUpdate}): Promise<User> {
+  userUpdate({user}: {user: Partial<APIClientUser>}): Promise<User> {
     const isSelfUser = user.id === this.self().id;
     const userPromise = isSelfUser ? Promise.resolve(this.self()) : this.getUserById(user.id);
     return userPromise.then(user_et => {
@@ -536,7 +528,7 @@ export class UserRepository {
   getSelf(): Promise<User> {
     return this.selfService
       .getSelf()
-      .then(userData => this._upgradePictureAsset((userData as unknown) as UserUpdate))
+      .then(userData => this._upgradePictureAsset(userData))
       .then(response => this.userMapper.mapSelfUserFromJson(response))
       .then(userEntity => {
         this.saveUser(userEntity, true);
@@ -552,7 +544,7 @@ export class UserRepository {
    * Detects if the user has a profile picture that uses the outdated picture API.
    * Will migrate the picture to the newer assets API if so.
    */
-  private _upgradePictureAsset(userData: UserUpdate): UserUpdate {
+  private _upgradePictureAsset(userData: APIClientSelf): APIClientSelf {
     const hasPicture = userData.picture.length;
     const hasAsset = userData.assets.length;
 
@@ -682,6 +674,9 @@ export class UserRepository {
       .then(userEntity => {
         if (this.isTeam()) {
           this.mapGuestStatus([userEntity]);
+        }
+        if (userEntity.inTeam() && userEntity.isDeleted) {
+          amplify.publish(WebAppEvents.TEAM.MEMBER_LEAVE, userEntity.teamId, userEntity.id);
         }
       });
   }
@@ -820,9 +815,9 @@ export class UserRepository {
     return this.asset_service
       .uploadProfileImage(picture)
       .then(({previewImageKey, mediumImageKey}) => {
-        const assets = [
-          {key: previewImageKey, size: 'preview', type: 'image'},
-          {key: mediumImageKey, size: 'complete', type: 'image'},
+        const assets: APIClientUserAsset[] = [
+          {key: previewImageKey, size: APIClientUserAssetType.PREVIEW, type: 'image'},
+          {key: mediumImageKey, size: APIClientUserAssetType.COMPLETE, type: 'image'},
         ];
         return this.selfService
           .putSelf({assets, picture: []} as any)
