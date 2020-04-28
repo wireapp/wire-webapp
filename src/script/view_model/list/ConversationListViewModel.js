@@ -125,8 +125,7 @@ export class ConversationListViewModel {
       return this.preferenceNotificationRepository.notifications().length > 0;
     });
 
-    const showRecentConversationsValue = loadValue(StorageKey.VIEW.RECENT_CONVERSATIONS);
-    this.showRecentConversations = ko.observable(showRecentConversationsValue ?? true);
+    this.showRecentConversations = ko.observable(loadValue(StorageKey.VIEW.RECENT_CONVERSATIONS) ?? true);
     // TODO: Rename "expandedFolders" to "expandedFolderIds"
     this.expandedFolders = ko.observableArray([]);
 
