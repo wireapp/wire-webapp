@@ -26,7 +26,7 @@ import {LinkPreviewMetaDataType} from '../../links/LinkPreviewMetaDataType';
 
 export class LinkPreview {
   private readonly image_resource: ko.Observable<AssetRemoteData>;
-  private title: string;
+  public title: string;
   public url: string;
   public meta_data_type?: LinkPreviewMetaDataType;
   public meta_data?: ITweet;

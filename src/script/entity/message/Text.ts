@@ -33,7 +33,7 @@ export class Text extends Asset {
   public readonly previews: ko.ObservableArray<LinkPreview>;
   public readonly should_render_text: ko.PureComputed<boolean>;
   /** Raw message text */
-  public readonly text: string;
+  public text: string;
 
   constructor(id?: string, text: string = '') {
     super(id);

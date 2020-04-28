@@ -42,8 +42,6 @@ export interface ReadReceipt {
 
 export class Message {
   private messageTimerStarted: boolean;
-  private readonly ephemeral_remaining: ko.Observable<number>;
-  private readonly ephemeral_status: ko.Computed<EphemeralStatusType>;
   private readonly visible: ko.Observable<boolean>;
   protected readonly affect_order: ko.Observable<boolean>;
   public category?: MessageCategory;
@@ -51,9 +49,11 @@ export class Message {
   public readonly status: ko.Observable<StatusType>;
   public readonly accent_color: ko.PureComputed<string>;
   public readonly ephemeral_expires: ko.Observable<boolean | number | string>;
+  public readonly ephemeral_remaining: ko.Observable<number>;
   public readonly ephemeral_started: ko.Observable<number>;
   public readonly ephemeral_caption: ko.PureComputed<string>;
   public readonly ephemeral_duration: ko.Observable<number>;
+  public readonly ephemeral_status: ko.Computed<EphemeralStatusType>;
   public readonly expectsReadConfirmation: boolean;
   public from: string;
   public fromClientId: string;
