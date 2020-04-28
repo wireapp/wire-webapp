@@ -74,7 +74,7 @@ export class ServiceMiddleware {
   }
 
   _containsService(userIds) {
-    return this.userRepository.get_users_by_id(userIds).then(userEntities => {
+    return this.userRepository.getUsersById(userIds).then(userEntities => {
       return userEntities.some(userEntity => userEntity.isService);
     });
   }

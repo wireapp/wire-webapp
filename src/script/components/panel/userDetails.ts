@@ -23,6 +23,8 @@ import {ParticipantAvatar} from 'Components/participantAvatar';
 import {User} from '../../entity/User';
 
 import 'Components/availabilityState';
+import {WebAppEvents} from '../../event/WebApp';
+import {amplify} from 'amplify';
 
 interface UserDetailsProps {
   participant: ko.Observable<User>;
@@ -95,5 +97,7 @@ ko.components.register('panel-user-details', {
     this.badge = badge;
     this.isGroupAdmin = isGroupAdmin;
     this.isSelfVerified = isSelfVerified;
+
+    amplify.publish(WebAppEvents.USER.UPDATE, this.participant().id);
   },
 });

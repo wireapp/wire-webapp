@@ -53,9 +53,9 @@ const replaceSubstitute = (string: string, regex: RegExp | string, substitutes: 
 
 export const LocalizerUtil = {
   joinNames: (userEntities: User[], declension = Declension.ACCUSATIVE, skipAnd = false, boldNames = false) => {
-    const containsSelfUser = userEntities.some(userEntity => userEntity.is_me);
+    const containsSelfUser = userEntities.some(userEntity => userEntity.isMe);
     if (containsSelfUser) {
-      userEntities = userEntities.filter(userEntity => !userEntity.is_me);
+      userEntities = userEntities.filter(userEntity => !userEntity.isMe);
     }
 
     const userNames = userEntities.sort(sortUsersByPriority).map(userEntity => {

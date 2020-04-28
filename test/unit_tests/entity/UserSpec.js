@@ -59,7 +59,7 @@ describe('User', () => {
     });
   });
 
-  describe('add_client', () =>
+  describe('addClient', () =>
     it('accepts clients which are no duplicates', () => {
       const first_client = new ClientEntity();
       first_client.id = '5021d77752286cac';
@@ -68,9 +68,9 @@ describe('User', () => {
       second_client.id = '575b7a890cdb7635';
 
       const user_et = new User();
-      user_et.add_client(first_client);
-      user_et.add_client(second_client);
-      user_et.add_client(second_client);
+      user_et.addClient(first_client);
+      user_et.addClient(second_client);
+      user_et.addClient(second_client);
 
       expect(user_et.devices().length).toBe(2);
     }));

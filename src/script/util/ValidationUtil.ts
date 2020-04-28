@@ -17,7 +17,6 @@
  *
  */
 
-import {AssetRetentionPolicy} from '../assets/AssetRetentionPolicy';
 import {Config} from '../Config';
 
 export class ValidationUtilError extends Error {
@@ -35,7 +34,7 @@ export class ValidationUtilError extends Error {
   }
 }
 
-export const isValidUsername = (username: string) => /^@?[a-z_0-9]{2,21}$/.test(username);
+export const isValidUsername = (username: string) => /^@?[a-z_0-9.-]{2,256}$/.test(username);
 
 /**
  * Checks if input has the format of an international phone number
@@ -93,8 +92,7 @@ export const legacyAsset = (assetId: string, conversationId: string): true => {
 };
 
 // https://github.com/wireapp/wire-server/blob/dc3e9a8af5250c0d045e96a31aa23c255b4e01a3/libs/cargohold-types/src/CargoHold/Types/V3.hs#L156-L177
-export const assetRetentionPolicy = (policyId: number | string): boolean =>
-  policyId > 0 && policyId < Object.keys(AssetRetentionPolicy).length + 1;
+export const assetRetentionPolicy = (policyId: number | string): boolean => policyId > 0 && policyId < 6;
 
 export const assetV3 = (assetKey: string, assetToken?: string): true => {
   if (!assetKey) {

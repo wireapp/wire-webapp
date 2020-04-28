@@ -80,7 +80,7 @@ import {WindowHandler} from '../ui/WindowHandler';
 import {Router} from '../router/Router';
 import {initRouterBindings} from '../router/routerBindings';
 
-import 'Components/mentionSuggestions.js';
+import 'Components/mentionSuggestions';
 import './globals';
 
 import {ReceiptsMiddleware} from '../event/preprocessor/ReceiptsMiddleware';
@@ -240,6 +240,8 @@ class App {
     repositories.team = new TeamRepository(new TeamService(this.apiClient), repositories.user);
     repositories.eventTracker = new EventTrackingRepository(repositories.team, repositories.user);
 
+    const assetUploader = new AssetUploader(this.service.asset);
+
     repositories.conversation = new ConversationRepository(
       this.service.conversation,
       this.service.asset,
@@ -248,13 +250,13 @@ class App {
       repositories.cryptography,
       repositories.event,
       repositories.giphy,
-      new LinkPreviewRepository(this.service.asset, repositories.properties),
+      new LinkPreviewRepository(assetUploader, repositories.properties),
       sendingMessageQueue,
       serverTimeHandler,
       repositories.team,
       repositories.user,
       repositories.properties,
-      new AssetUploader(this.service.asset),
+      assetUploader,
     );
 
     const serviceMiddleware = new ServiceMiddleware(repositories.conversation, repositories.user);
@@ -395,6 +397,8 @@ class App {
       loadingView.updateProgress(10);
       telemetry.time_step(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
+      await teamRepository.initTeam();
+
       eventRepository.connectWebSocket();
       const conversationEntities = await conversationRepository.getConversations();
       const connectionEntities = await connectionRepository.getConnections();
@@ -407,12 +411,10 @@ class App {
       conversationRepository.map_connections(connectionRepository.connectionEntities());
       this._subscribeToUnloadEvents();
 
-      await teamRepository.getTeam();
-      teamRepository.scheduleFetchTeamInfo();
-
       await conversationRepository.conversationRoleRepository.loadTeamRoles();
 
       await userRepository.loadUsers();
+
       const notificationsCount = await eventRepository.initializeFromStream();
 
       telemetry.time_step(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
@@ -435,6 +437,7 @@ class App {
       await this._handleUrlParams();
       await conversationRepository.updateConversationsOnAppInit();
       await conversationRepository.conversationLabelRepository.loadLabels();
+
       telemetry.time_step(AppInitTimingsStep.APP_LOADED);
       this._showInterface();
       this.applock = new AppLockViewModel(clientRepository, userRepository.self);
@@ -571,10 +574,10 @@ class App {
   _checkUserInformation(userEntity) {
     if (userEntity.hasActivatedIdentity()) {
       if (!userEntity.mediumPictureResource()) {
-        this.repository.user.set_default_picture();
+        this.repository.user.setDefaultPicture();
       }
       if (!userEntity.username()) {
-        this.repository.user.get_username_suggestion();
+        this.repository.user.getUsernameSuggestion();
       }
     }
 
@@ -866,9 +869,7 @@ class App {
       const isTemporaryGuestReason = App.CONFIG.SIGN_OUT_REASONS.TEMPORARY_GUEST.includes(signOutReason);
       const isLeavingGuestRoom = isTemporaryGuestReason && this.repository.user.isTemporaryGuest();
       if (isLeavingGuestRoom) {
-        const path = t('urlWebsiteRoot');
-        const url = getWebsiteUrl(path);
-        return window.location.replace(url);
+        return window.location.replace(getWebsiteUrl());
       }
 
       doRedirect(signOutReason);

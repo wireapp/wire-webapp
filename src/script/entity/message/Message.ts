@@ -35,18 +35,23 @@ import {ContentMessage} from './ContentMessage';
 import {File as FileAsset} from './File';
 import {CompositeMessage} from './CompositeMessage';
 
+export interface ReadReceipt {
+  time: string;
+  userId: string;
+}
+
 export class Message {
-  private readonly ephemeral_expires: ko.Observable<boolean | number | string>;
-  private readonly ephemeral_remaining: ko.Observable<number>;
-  private readonly ephemeral_started: ko.Observable<number>;
-  private readonly ephemeral_status: ko.Computed<EphemeralStatusType>;
-  private readonly status: ko.Observable<StatusType>;
-  private readonly visible: ko.Observable<boolean>;
   private messageTimerStarted: boolean;
+  private readonly ephemeral_remaining: ko.Observable<number>;
+  private readonly ephemeral_status: ko.Computed<EphemeralStatusType>;
+  private readonly visible: ko.Observable<boolean>;
   protected readonly affect_order: ko.Observable<boolean>;
-  public readonly accent_color: ko.PureComputed<string>;
   public category?: MessageCategory;
   public conversation_id: string;
+  public readonly status: ko.Observable<StatusType>;
+  public readonly accent_color: ko.PureComputed<string>;
+  public readonly ephemeral_expires: ko.Observable<boolean | number | string>;
+  public readonly ephemeral_started: ko.Observable<number>;
   public readonly ephemeral_caption: ko.PureComputed<string>;
   public readonly ephemeral_duration: ko.Observable<number>;
   public readonly expectsReadConfirmation: boolean;
@@ -62,7 +67,7 @@ export class Message {
   public readonly unsafeSenderName: ko.PureComputed<string>;
   public readonly user: ko.Observable<User>;
   public version: number;
-  public readReceipts: ko.ObservableArray<{time: string; userId: string}>;
+  public readReceipts: ko.ObservableArray<ReadReceipt>;
   public super_type: SuperType;
   public type: string;
 
@@ -256,7 +261,7 @@ export class Message {
    * Check if message is a member message.
    * @returns Is message of type member
    */
-  is_member(): boolean {
+  isMember(): boolean {
     return this.super_type === SuperType.MEMBER;
   }
 
@@ -302,7 +307,7 @@ export class Message {
    */
 
   isCopyable(): boolean {
-    return this.has_asset_text() && !this.isComposite() && (!this.is_ephemeral() || this.user().is_me);
+    return this.has_asset_text() && !this.isComposite() && (!this.is_ephemeral() || this.user().isMe);
   }
 
   /**
@@ -310,7 +315,7 @@ export class Message {
    * @returns `true`, if message can be edited, `false` otherwise.
    */
   is_editable(): boolean {
-    return this.has_asset_text() && this.user().is_me && !this.is_ephemeral();
+    return this.has_asset_text() && this.user().isMe && !this.is_ephemeral();
   }
 
   /**
@@ -381,7 +386,7 @@ export class Message {
     }
 
     if (this.ephemeral_status() === EphemeralStatusType.INACTIVE) {
-      const startingTimestamp = this.user().is_me ? Math.min(this.timestamp() + timeOffset, Date.now()) : Date.now();
+      const startingTimestamp = this.user().isMe ? Math.min(this.timestamp() + timeOffset, Date.now()) : Date.now();
       const expirationTimestamp = `${startingTimestamp + Number(this.ephemeral_expires())}`;
       this.ephemeral_expires(expirationTimestamp);
       this.ephemeral_started(startingTimestamp);

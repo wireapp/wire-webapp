@@ -17,13 +17,26 @@
  *
  */
 
+import ko from 'knockout';
+
 import {formatDuration} from 'Util/TimeUtil';
 
-import {BasePanelViewModel} from './BasePanelViewModel';
+import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
 import {EphemeralTimings} from '../../ephemeral/EphemeralTimings';
+import {ConversationRepository} from '../../conversation/ConversationRepository';
+
+interface messageTime {
+  isCustom: boolean;
+  text: string;
+  value: number;
+}
 
 export class TimedMessagesViewModel extends BasePanelViewModel {
-  constructor(params) {
+  conversationRepository: ConversationRepository;
+  currentMessageTimer: ko.Observable<number>;
+  messageTimes: ko.PureComputed<messageTime[]>;
+
+  constructor(params: PanelViewModelProps) {
     super(params);
 
     this.timedMessageChange = this.timedMessageChange.bind(this);
@@ -49,6 +62,7 @@ export class TimedMessagesViewModel extends BasePanelViewModel {
       times.sort((timeA, timeB) => timeA - timeB);
 
       const mappedTimes = times.map(time => ({
+        isCustom: false,
         text: formatDuration(time).text,
         value: time,
       }));
@@ -65,16 +79,16 @@ export class TimedMessagesViewModel extends BasePanelViewModel {
     });
   }
 
-  timedMessageChange(viewModel, event) {
+  timedMessageChange(_: TimedMessagesViewModel, event: KeyboardEvent): void {
     if (this.activeConversation()) {
-      const timer = parseInt(event.target.value, 10);
+      const timer = parseInt((event.target as HTMLInputElement).value, 10);
       const finalTimer = timer === 0 ? null : timer;
       this.activeConversation().globalMessageTimer(finalTimer);
       this.conversationRepository.updateConversationMessageTimer(this.activeConversation(), finalTimer);
     }
   }
 
-  getElementId() {
+  getElementId(): string {
     return 'timed-messages';
   }
 }

@@ -18,6 +18,7 @@
  */
 
 import ko from 'knockout';
+import {amplify} from 'amplify';
 
 import {t} from 'Util/LocalizerUtil';
 import {noop} from 'Util/util';
@@ -25,38 +26,62 @@ import {noop} from 'Util/util';
 import {WebAppEvents} from '../../event/WebApp';
 
 import './panelActions';
+import {User} from '../../entity/User';
+import {ConversationRoleRepository} from '../../conversation/ConversationRoleRepository';
+import {Conversation} from '../../entity/Conversation';
+import {ActionsViewModel} from '../../view_model/ActionsViewModel';
 
-export const Actions = {
-  ACCEPT_REQUEST: 'UserActions.ACCEPT_REQUEST',
-  BLOCK: 'UserActions.BLOCK',
-  CANCEL_REQUEST: 'UserActions.CANCEL_REQUEST',
-  IGNORE_REQUEST: 'UserActions.IGNORE_REQUEST',
-  LEAVE: 'UserActions.LEAVE',
-  OPEN_CONVERSATION: 'UserActions.OPEN_CONVERSATION',
-  OPEN_PROFILE: 'UserActions.OPEN_PROFILE',
-  REMOVE: 'UserActions.REMOVE',
-  SEND_REQUEST: 'UserActions.SEND_REQUEST',
-  UNBLOCK: 'UserActions.UNBLOCK',
-};
+export enum Actions {
+  ACCEPT_REQUEST = 'UserActions.ACCEPT_REQUEST',
+  BLOCK = 'UserActions.BLOCK',
+  CANCEL_REQUEST = 'UserActions.CANCEL_REQUEST',
+  IGNORE_REQUEST = 'UserActions.IGNORE_REQUEST',
+  LEAVE = 'UserActions.LEAVE',
+  OPEN_CONVERSATION = 'UserActions.OPEN_CONVERSATION',
+  OPEN_PROFILE = 'UserActions.OPEN_PROFILE',
+  REMOVE = 'UserActions.REMOVE',
+  SEND_REQUEST = 'UserActions.SEND_REQUEST',
+  UNBLOCK = 'UserActions.UNBLOCK',
+}
 
-ko.components.register('user-actions', {
-  template: '<panel-actions params="items: items()"></panel-actions>',
-  viewModel: function ({
+interface UserInputParams {
+  actionsViewModel: ActionsViewModel;
+  conversation: ko.Observable<Conversation> | (() => null);
+  conversationRoleRepository: ConversationRoleRepository;
+  isSelfActivated: ko.Observable<boolean>;
+  onAction: (action: Actions) => void;
+  user: ko.Observable<User>;
+}
+
+interface UserActionItem {
+  click: () => void;
+  icon: string;
+  identifier: string;
+  label: string;
+}
+
+class UserActions {
+  isSelfActivated: boolean;
+  isMe: ko.Computed<boolean>;
+  isNotMe: ko.Computed<any>;
+  items: ko.Computed<UserActionItem[]>;
+
+  constructor({
     user,
     conversation = () => null,
     actionsViewModel,
     onAction = noop,
     isSelfActivated,
     conversationRoleRepository,
-  }) {
-    isSelfActivated = ko.unwrap(isSelfActivated);
-    const isMe = ko.computed(() => user()?.is_me);
-    const isNotMe = ko.computed(() => !isMe() && isSelfActivated);
+  }: UserInputParams) {
+    this.isSelfActivated = ko.unwrap(isSelfActivated);
+    this.isMe = ko.computed(() => user()?.isMe);
+    this.isNotMe = ko.computed(() => !this.isMe() && this.isSelfActivated);
 
     const allItems = [
       {
         // open self profile
-        condition: () => isMe(),
+        condition: () => this.isMe(),
         item: {
           click: () => {
             amplify.publish(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT);
@@ -71,8 +96,8 @@ ko.components.register('user-actions', {
         // self leave conversation
         condition: () => {
           return (
-            isMe() &&
-            isSelfActivated &&
+            this.isMe() &&
+            this.isSelfActivated &&
             conversation()?.isGroup() &&
             !conversation().removed_from_conversation() &&
             conversationRoleRepository.canLeaveGroup(conversation())
@@ -87,7 +112,7 @@ ko.components.register('user-actions', {
       },
       {
         // open conversation
-        condition: () => isNotMe() && (user().isConnected() || user().isTeamMember()),
+        condition: () => this.isNotMe() && (user().isConnected() || user().isTeamMember()),
         item: {
           click: () => actionsViewModel.open1to1Conversation(user()).then(() => onAction(Actions.OPEN_CONVERSATION)),
           icon: 'message-icon',
@@ -97,7 +122,7 @@ ko.components.register('user-actions', {
       },
       {
         // accept request
-        condition: () => isNotMe() && user().isIncomingRequest(),
+        condition: () => this.isNotMe() && user().isIncomingRequest(),
         item: {
           click: () =>
             actionsViewModel.acceptConnectionRequest(user(), true).then(() => onAction(Actions.ACCEPT_REQUEST)),
@@ -108,7 +133,7 @@ ko.components.register('user-actions', {
       },
       {
         //ignore request
-        condition: () => isNotMe() && user().isIncomingRequest(),
+        condition: () => this.isNotMe() && user().isIncomingRequest(),
         item: {
           click: () => actionsViewModel.ignoreConnectionRequest(user()).then(() => onAction(Actions.IGNORE_REQUEST)),
           icon: 'close-icon',
@@ -118,7 +143,7 @@ ko.components.register('user-actions', {
       },
       {
         // cancel request
-        condition: () => isNotMe() && user().isOutgoingRequest(),
+        condition: () => this.isNotMe() && user().isOutgoingRequest(),
         item: {
           click: () => actionsViewModel.cancelConnectionRequest(user()).then(() => onAction(Actions.CANCEL_REQUEST)),
           icon: 'undo-icon',
@@ -131,7 +156,7 @@ ko.components.register('user-actions', {
         condition: () => {
           const isNotConnectedUser = user().isCanceled() || user().isUnknown();
           const canConnect = !user().isTeamMember() && !user().isTemporaryGuest();
-          return isNotMe() && isNotConnectedUser && canConnect;
+          return this.isNotMe() && isNotConnectedUser && canConnect;
         },
         item: {
           click: () => actionsViewModel.sendConnectionRequest(user()).then(() => onAction(Actions.SEND_REQUEST)),
@@ -142,7 +167,7 @@ ko.components.register('user-actions', {
       },
       {
         // block user
-        condition: () => isNotMe() && (user().isConnected() || user().isRequest()),
+        condition: () => this.isNotMe() && (user().isConnected() || user().isRequest()),
         item: {
           click: () => actionsViewModel.blockUser(user()).then(() => onAction(Actions.BLOCK)),
           icon: 'block-icon',
@@ -152,7 +177,7 @@ ko.components.register('user-actions', {
       },
       {
         // unblock user
-        condition: () => isNotMe() && user().isBlocked(),
+        condition: () => this.isNotMe() && user().isBlocked(),
         item: {
           click: () => actionsViewModel.unblockUser(user()).then(() => onAction(Actions.UNBLOCK)),
           icon: 'block-icon',
@@ -163,7 +188,7 @@ ko.components.register('user-actions', {
       {
         // remove user from conversation
         condition: () =>
-          isNotMe() &&
+          this.isNotMe() &&
           conversation() &&
           !conversation().removed_from_conversation() &&
           conversation()
@@ -181,10 +206,20 @@ ko.components.register('user-actions', {
     ];
 
     this.items = ko.computed(() => (user() ? allItems.filter(({condition}) => condition()).map(({item}) => item) : []));
-    this.dispose = () => {
-      isMe.dispose();
-      isNotMe.dispose();
-      this.items.dispose();
-    };
+  }
+
+  dispose = () => {
+    this.isMe.dispose();
+    this.isNotMe.dispose();
+    this.items.dispose();
+  };
+}
+
+ko.components.register('user-actions', {
+  template: '<panel-actions params="items: items()"></panel-actions>',
+  viewModel: {
+    createViewModel(params: UserInputParams) {
+      return new UserActions(params);
+    },
   },
 });

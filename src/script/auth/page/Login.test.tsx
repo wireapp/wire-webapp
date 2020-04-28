@@ -138,7 +138,7 @@ describe('Login', () => {
     const history = createMemoryHistory();
     const historyPushSpy = spyOn(history, 'push');
 
-    const handle = 'handle';
+    const handle = 'extra-long-handle-with-special-characters...';
     const password = 'password';
 
     spyOn(actionRoot.authAction, 'doLogin').and.returnValue(() => Promise.resolve());

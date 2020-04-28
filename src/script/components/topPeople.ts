@@ -17,23 +17,37 @@
  *
  */
 
+import ko from 'knockout';
 import {ParticipantAvatar} from 'Components/participantAvatar';
+import {User} from '../entity/User';
+
+interface TopPeopleParams {
+  click: (userEntity: User, event: Event) => void;
+  max?: number;
+  users: ko.ObservableArray<User>;
+}
 
 class TopPeople {
-  constructor(params) {
+  click: (userEntity: User, event: Event) => void;
+  maxUsers: number;
+  userEntities: ko.Observable<User[]>;
+  ParticipantAvatar: typeof ParticipantAvatar;
+  displayedUsers: ko.PureComputed<User[]>;
+
+  constructor(params: TopPeopleParams) {
     this.click = params.click;
     this.maxUsers = params.max || 9;
-    this.userEntities = params.users;
     this.ParticipantAvatar = ParticipantAvatar;
+    this.userEntities = params.users;
 
     this.displayedUsers = ko.pureComputed(() => this.userEntities().slice(0, this.maxUsers));
-
-    this.onUserClick = (userEntity, event) => {
-      if (typeof this.click === 'function') {
-        return this.click(userEntity, event);
-      }
-    };
   }
+
+  onUserClick = (userEntity: User, event: Event): void => {
+    if (typeof this.click === 'function') {
+      return this.click(userEntity, event);
+    }
+  };
 }
 
 ko.components.register('top-people', {

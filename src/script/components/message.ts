@@ -18,6 +18,7 @@
  */
 
 import {amplify} from 'amplify';
+import ko from 'knockout';
 
 import {t} from 'Util/LocalizerUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
@@ -26,10 +27,22 @@ import {formatDateNumeral, formatTimeShort} from 'Util/TimeUtil';
 import {EphemeralStatusType} from '../message/EphemeralStatusType';
 import {WebAppEvents} from '../event/WebApp';
 import {Context} from '../ui/ContextMenu';
+import {ContentMessage} from '../entity/message/ContentMessage';
 
 import {SystemMessageType} from '../message/SystemMessageType';
+import {CompositeMessage} from '../entity/message/CompositeMessage';
+import {VerificationMessage} from '../entity/message/VerificationMessage';
 import {StatusType} from '../message/StatusType';
+import {Text} from '../entity/message/Text';
 import {ParticipantAvatar} from 'Components/participantAvatar';
+import {SHOW_LEGAL_HOLD_MODAL} from '../view_model/content/LegalHoldModalViewModel';
+import {ActionsViewModel} from '../view_model/ActionsViewModel';
+import {Conversation} from '../entity/Conversation';
+import {User} from '../entity/User';
+import {MessageListViewModel} from '../view_model/content/MessageListViewModel';
+import {DecryptErrorMessage} from '../entity/message/DecryptErrorMessage';
+import {ConversationRepository} from '../conversation/ConversationRepository';
+import {SystemMessage} from '../entity/message/SystemMessage';
 
 import './asset/audioAsset';
 import './asset/fileAsset';
@@ -38,9 +51,65 @@ import './asset/linkPreviewAsset';
 import './asset/locationAsset';
 import './asset/videoAsset';
 import './asset/messageButton';
-import {SHOW_LEGAL_HOLD_MODAL} from '../view_model/content/LegalHoldModalViewModel';
+
+interface MessageParams {
+  actionsViewModel: ActionsViewModel;
+  conversation: ko.Observable<Conversation>;
+  conversationRepository: ConversationRepository;
+  isLastDeliveredMessage: ko.Observable<boolean>;
+  isMarked: ko.Observable<boolean>;
+  isSelfTemporaryGuest: ko.Observable<boolean>;
+  message: ContentMessage;
+  onClickAvatar: (user: User) => void;
+  onClickCancelRequest: (message: ContentMessage) => void;
+  onClickImage: (message: ContentMessage, event: UIEvent) => void;
+  onClickInvitePeople: () => void;
+  onClickLikes: (view: MessageListViewModel) => void;
+  onClickMessage: (message: ContentMessage, event: Event) => boolean;
+  onClickParticipants: (participants: User[]) => void;
+  onClickReceipts: (view: Message) => void;
+  onClickResetSession: (messageError: DecryptErrorMessage) => void;
+  onClickTimestamp: (messageId: string) => void;
+  onContentUpdated: () => void;
+  onLike: (message: ContentMessage, button?: boolean) => void;
+  onMessageMarked: (element: HTMLElement) => void;
+  selfId: ko.Observable<string>;
+  shouldShowAvatar: ko.Observable<boolean>;
+  shouldShowInvitePeople: ko.Observable<boolean>;
+}
 
 class Message {
+  accentColor: ko.PureComputed<string>;
+  actionsViewModel: ActionsViewModel;
+  assetSubscription: ko.Subscription;
+  conversation: ko.Observable<Conversation>;
+  conversationRepository: ConversationRepository;
+  EphemeralStatusType: typeof EphemeralStatusType;
+  hasReadReceiptsTurnedOn: boolean;
+  includesOnlyEmojis: (text: string) => boolean;
+  isLastDeliveredMessage: ko.Observable<boolean>;
+  isSelfTemporaryGuest: ko.Observable<boolean>;
+  message: ContentMessage;
+  onClickAvatar: (user: User) => void;
+  onClickCancelRequest: (message: ContentMessage) => void;
+  onClickImage: (message: ContentMessage, event: UIEvent) => void;
+  onClickInvitePeople: () => void;
+  onClickLikes: (view: MessageListViewModel) => void;
+  onClickMessage: (message: ContentMessage, event: Event) => boolean;
+  onClickParticipants: (participants: User[]) => void;
+  onClickReceipts: (view: Message) => void;
+  onClickResetSession: (messageError: DecryptErrorMessage) => void;
+  onClickTimestamp: (messageId: string) => void;
+  onLike: (message: ContentMessage, button?: boolean) => void;
+  ParticipantAvatar: typeof ParticipantAvatar;
+  previewSubscription: ko.Subscription;
+  readReceiptText: ko.PureComputed<string>;
+  readReceiptTooltip: ko.PureComputed<string>;
+  selfId: ko.Observable<string>;
+  shouldShowAvatar: ko.Observable<boolean>;
+  shouldShowInvitePeople: ko.Observable<boolean>;
+  StatusType: typeof StatusType;
+
   constructor(
     {
       message,
@@ -66,8 +135,8 @@ class Message {
       onMessageMarked,
       conversationRepository,
       actionsViewModel,
-    },
-    componentInfo,
+    }: MessageParams,
+    componentInfo: {element: HTMLElement},
   ) {
     this.message = message;
     this.conversation = conversation;
@@ -110,7 +179,7 @@ class Message {
       // add a listener to any changes to the assets. This will warn the parent that the message has changed
       this.assetSubscription = message.assets.subscribe(onContentUpdated);
       // also listen for link previews on a single Text entity
-      this.previewSubscription = message.get_first_asset().previews.subscribe(onContentUpdated);
+      this.previewSubscription = (message.get_first_asset() as Text).previews.subscribe(onContentUpdated);
     }
 
     this.actionsViewModel = actionsViewModel;
@@ -135,32 +204,39 @@ class Message {
       const is1to1 = this.conversation().is1to1();
       return is1to1 ? formatTimeShort(receipts[0].time) : receipts.length.toString(10);
     });
-
-    this.dispose = () => {
-      if (this.assetSubscription) {
-        this.assetSubscription.dispose();
-        this.previewSubscription.dispose();
-      }
-    };
   }
 
-  async clickButton(message, buttonId) {
+  dispose = () => {
+    if (this.assetSubscription) {
+      this.assetSubscription.dispose();
+      this.previewSubscription.dispose();
+    }
+  };
+
+  clickButton(message: CompositeMessage, buttonId: string) {
     if (message.selectedButtonId() !== buttonId && message.waitingButtonId() !== buttonId) {
       message.waitingButtonId(buttonId);
       this.conversationRepository.sendButtonAction(this.conversation(), message, buttonId);
     }
   }
 
-  getSystemMessageIconComponent(message) {
-    const iconComponents = {
-      [SystemMessageType.CONVERSATION_RENAME]: 'edit-icon',
-      [SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE]: 'timer-icon',
-      [SystemMessageType.CONVERSATION_RECEIPT_MODE_UPDATE]: 'read-icon',
-    };
-    return iconComponents[message.system_message_type];
+  getSystemMessageIconComponent(message: SystemMessage): string | undefined {
+    switch (message.system_message_type) {
+      case SystemMessageType.CONVERSATION_RENAME:
+        return 'edit-icon';
+
+      case SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE:
+        return 'timer-icon';
+
+      case SystemMessageType.CONVERSATION_RECEIPT_MODE_UPDATE:
+        return 'read-icon';
+
+      default:
+        return undefined;
+    }
   }
 
-  showDevice(messageEntity) {
+  showDevice(messageEntity: VerificationMessage): void {
     const topic = messageEntity.isSelfClient() ? WebAppEvents.PREFERENCES.MANAGE_DEVICES : WebAppEvents.SHORTCUT.PEOPLE;
     amplify.publish(topic);
   }
@@ -169,7 +245,7 @@ class Message {
     amplify.publish(SHOW_LEGAL_HOLD_MODAL, this.conversationRepository.active_conversation());
   };
 
-  showContextMenu(messageEntity, event) {
+  showContextMenu(messageEntity: ContentMessage, event: Event) {
     const entries = [];
 
     if (messageEntity.is_downloadable()) {
@@ -229,7 +305,7 @@ class Message {
 
     const isSendingMessage = messageEntity.status() === StatusType.SENDING;
     const canDelete =
-      messageEntity.user().is_me && !this.conversation().removed_from_conversation() && !isSendingMessage;
+      messageEntity.user().isMe && !this.conversation().removed_from_conversation() && !isSendingMessage;
     if (canDelete) {
       entries.push({
         click: () => this.actionsViewModel.deleteMessageEveryone(this.conversation(), messageEntity),
@@ -240,19 +316,21 @@ class Message {
     Context.from(event, entries, 'message-options-menu');
   }
 
-  bindShowMore(elements, scope) {
+  bindShowMore(elements: HTMLElement[], scope: Message) {
     const label = elements.find(element => element.className === 'message-header-label');
     if (!label) {
       return;
     }
     const link = label.querySelector('.message-header-show-more');
     if (link) {
-      link.addEventListener('click', () => this.onClickParticipants(scope.message.highlightedUsers()));
+      link.addEventListener('click', () => this.onClickParticipants((scope.message as any).highlightedUsers()));
     }
   }
 }
 
-const receiptStatusTemplate = `
+// if this is not explicitely defined as string,
+// TS will define this as the string's content.
+const receiptStatusTemplate: string = `
   <!-- ko if: isLastDeliveredMessage() && readReceiptText() === '' -->
     <span class="message-status" data-bind="text: t('conversationMessageDelivered')"></span>
   <!-- /ko -->
@@ -271,7 +349,7 @@ const receiptStatusTemplate = `
   <!-- /ko -->
 `;
 
-const normalTemplate = `
+const normalTemplate: string = `
   <!-- ko if: shouldShowAvatar -->
     <div class="message-header">
       <div class="message-header-icon">
@@ -371,7 +449,7 @@ const normalTemplate = `
   <!-- /ko -->
   `;
 
-const missedTemplate = `
+const missedTemplate: string = `
   <div class="message-header">
     <div class="message-header-icon">
       <span class="icon-sysmsg-error text-red"></span>
@@ -380,7 +458,7 @@ const missedTemplate = `
   </div>
   `;
 
-const unableToDecryptTemplate = `
+const unableToDecryptTemplate: string = `
   <div class="message-header">
     <div class="message-header-icon">
       <span class="icon-sysmsg-error text-red"></span>
@@ -404,7 +482,7 @@ const unableToDecryptTemplate = `
   </div>
   `;
 
-const systemTemplate = `
+const systemTemplate: string = `
   <div class="message-header">
     <div class="message-header-icon message-header-icon--svg text-foreground">
       <span data-bind="component: getSystemMessageIconComponent(message)"></span>
@@ -423,7 +501,7 @@ const systemTemplate = `
   <div class="message-body font-weight-bold" data-bind="text: message.name"></div>
   `;
 
-const pingTemplate = `
+const pingTemplate: string = `
   <div class="message-header">
     <div class="message-header-icon">
       <div class="icon-ping" data-bind="css: message.get_icon_classes"></div>
@@ -441,7 +519,7 @@ const pingTemplate = `
   </div>
   `;
 
-const deleteTemplate = `
+const deleteTemplate: string = `
   <div class="message-header">
     <div class="message-header-icon">
       <participant-avatar class="sender-avatar" params="participant: message.user, click: onClickAvatar, size: ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
@@ -456,7 +534,7 @@ const deleteTemplate = `
   </div>
   `;
 
-const legalHoldTemplate = `
+const legalHoldTemplate: string = `
   <div class="message-header">
     <div class="message-header-icon">
       <legal-hold-dot></legal-hold-dot>
@@ -473,7 +551,7 @@ const legalHoldTemplate = `
   </div>
   `;
 
-const verificationTemplate = `
+const verificationTemplate: string = `
   <div class="message-header">
     <div class="message-header-icon">
       <!-- ko if: message.isTypeVerified() -->
@@ -505,7 +583,7 @@ const verificationTemplate = `
   </div>
   `;
 
-const callTemplate = `
+const callTemplate: string = `
   <div class="message-header">
     <div class="message-header-icon message-header-icon--svg">
       <!-- ko if: message.was_completed() -->
@@ -525,7 +603,7 @@ const callTemplate = `
   </div>
   `;
 
-const memberTemplate = `
+const memberTemplate: string = `
   <!-- ko if: message.showLargeAvatar() -->
     <div class="message-connected">
       <span class="message-connected-header" data-bind='text: message.otherUser().name()'></span>
@@ -605,7 +683,7 @@ const memberTemplate = `
       <!-- /ko -->
     <!-- /ko -->
 
-    <!-- ko if: message.isMemberLeave() && message.user().is_me && isSelfTemporaryGuest -->
+    <!-- ko if: message.isMemberLeave() && message.user().isMe && isSelfTemporaryGuest -->
       <div class="message-member-footer">
         <div class="message-member-footer-description" data-bind="text: t('temporaryGuestLeaveDescription')"></div>
       </div>
@@ -646,6 +724,8 @@ ko.components.register('message', {
     <!-- /ko -->
     `,
   viewModel: {
-    createViewModel: (params, componentInfo) => new Message(params, componentInfo),
+    createViewModel: (params: MessageParams, componentInfo: {element: HTMLElement}) => {
+      return new Message(params, componentInfo);
+    },
   },
 });

@@ -16,19 +16,47 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+import ko from 'knockout';
+import {amplify} from 'amplify';
 
 import {t} from 'Util/LocalizerUtil';
 import {formatLocale} from 'Util/TimeUtil';
 
-import {BasePanelViewModel} from './BasePanelViewModel';
+import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
 import {WebAppEvents} from '../../event/WebApp';
 import {SuperType} from '../../message/SuperType';
+import {Message, ReadReceipt} from '../../entity/message/Message';
+import {ConversationRepository} from '../../conversation/ConversationRepository';
+import {TeamRepository} from '../../team/TeamRepository';
+import {User} from '../../entity/User';
+import {ContentMessage} from '../../entity/message/ContentMessage';
 
 export class MessageDetailsViewModel extends BasePanelViewModel {
-  constructor(params) {
+  messageId: ko.Observable<string>;
+  isReceiptsOpen: ko.Observable<boolean>;
+  conversationRepository: ConversationRepository;
+  teamRepository: TeamRepository;
+  states: Record<string, string>;
+  message: ko.PureComputed<ContentMessage>;
+  state: ko.PureComputed<string>;
+  receiptUsers: ko.ObservableArray<User>;
+  likeUsers: ko.ObservableArray<User>;
+  receiptTimes: ko.Observable<Record<string, string>>;
+  receipts: ko.PureComputed<ReadReceipt[]>;
+  sentFooter: ko.PureComputed<string>;
+  supportsLikes: ko.PureComputed<boolean>;
+  supportsReceipts: ko.PureComputed<boolean>;
+  likes: ko.PureComputed<string[]>;
+  receiptsTitle: ko.PureComputed<string>;
+  likesTitle: ko.PureComputed<string>;
+  showTabs: ko.PureComputed<boolean>;
+  editedFooter: ko.PureComputed<string>;
+  panelTitle: ko.PureComputed<string>;
+
+  constructor(params: PanelViewModelProps) {
     super(params);
 
-    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.UPDATED, (oldId, updatedMessageEntity) => {
+    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.UPDATED, (oldId: string, updatedMessageEntity: Message) => {
       // listen for any changes to local message entities.
       // if the id of the message being viewed has changed, we store the new ID.
       if (oldId === this.messageId()) {
@@ -51,7 +79,7 @@ export class MessageDetailsViewModel extends BasePanelViewModel {
       RECEIPTS_OFF: 'receipts-off',
     };
 
-    const formatTime = time => formatLocale(time, 'P, p');
+    const formatTime = (time: string | number | Date) => formatLocale(time, 'P, p');
 
     this.message = ko.pureComputed(() => {
       if (!this.isVisible()) {
@@ -82,15 +110,16 @@ export class MessageDetailsViewModel extends BasePanelViewModel {
 
     this.receipts = ko.pureComputed(() => (this.message() && this.message().readReceipts()) || []);
 
-    const sortUsers = (userA, userB) => (userA.name() > userB.name() ? 1 : -1);
+    const sortUsers = (userA: User, userB: User): number =>
+      userA.name().localeCompare(userB.name(), undefined, {sensitivity: 'base'});
 
     this.receipts.subscribe(receipts => {
       const userIds = receipts.map(({userId}) => userId);
-      userRepository.get_users_by_id(userIds).then(users => this.receiptUsers(users.sort(sortUsers)));
+      userRepository.getUsersById(userIds).then((users: User[]) => this.receiptUsers(users.sort(sortUsers)));
       const receiptTimes = receipts.reduce((times, {userId, time}) => {
         times[userId] = formatTime(time);
         return times;
-      }, {});
+      }, {} as Record<string, string>);
       this.receiptTimes(receiptTimes);
     });
 
@@ -98,10 +127,10 @@ export class MessageDetailsViewModel extends BasePanelViewModel {
       return this.message() ? formatTime(this.message().timestamp()) : '';
     });
 
-    const formatUserCount = users => (users.length ? ` (${users.length})` : '');
+    const formatUserCount = (users: User[]): string => (users.length ? ` (${users.length})` : '');
 
     this.supportsReceipts = ko.pureComputed(() => {
-      const isMe = this.message() && this.message().user().is_me;
+      const isMe = this.message() && this.message().user().isMe;
       const isTeamConversation = !!this.activeConversation().team_id;
       return isMe && isTeamConversation;
     });
@@ -121,7 +150,7 @@ export class MessageDetailsViewModel extends BasePanelViewModel {
     });
 
     this.likes.subscribe(likeIds => {
-      userRepository.get_users_by_id(likeIds).then(users => this.likeUsers(users.sort(sortUsers)));
+      userRepository.getUsersById(likeIds).then(users => this.likeUsers(users.sort(sortUsers)));
     });
 
     this.receiptsTitle = ko.pureComputed(() => {
@@ -135,12 +164,7 @@ export class MessageDetailsViewModel extends BasePanelViewModel {
     this.showTabs = ko.pureComputed(() => this.supportsReceipts() && this.supportsLikes());
 
     this.editedFooter = ko.pureComputed(() => {
-      return (
-        this.message() &&
-        this.message().edited_timestamp &&
-        this.message().edited_timestamp() &&
-        formatTime(this.message().edited_timestamp())
-      );
+      return this.message()?.edited_timestamp?.() && formatTime(this.message().edited_timestamp());
     });
 
     this.panelTitle = ko.pureComputed(() => {
@@ -154,24 +178,24 @@ export class MessageDetailsViewModel extends BasePanelViewModel {
     });
   }
 
-  clickOnReceipts() {
+  clickOnReceipts(): void {
     this.isReceiptsOpen(true);
   }
 
-  clickOnLikes() {
+  clickOnLikes(): void {
     this.isReceiptsOpen(false);
   }
 
-  getEntityId() {
+  getEntityId(): string {
     return this.messageId();
   }
 
-  initView({entity: {id}, showLikes}) {
+  initView({entity: {id}, showLikes}: {entity: Message; showLikes: boolean}): void {
     this.isReceiptsOpen(!showLikes);
     this.messageId(id);
   }
 
-  getElementId() {
+  getElementId(): string {
     return 'message-details';
   }
 }

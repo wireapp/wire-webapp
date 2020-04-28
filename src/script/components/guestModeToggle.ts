@@ -17,10 +17,23 @@
  *
  */
 
+import ko from 'knockout';
 import {t} from 'Util/LocalizerUtil';
 
+interface GuestModeToggleParams {
+  extendedInfo?: string;
+  isChecked: ko.Observable<boolean>;
+  isDisabled: boolean;
+  onToggle: ko.Observable<boolean>;
+}
+
 class GuestModeToggle {
-  constructor(params) {
+  infoText: string;
+  isChecked: ko.Observable<boolean>;
+  isDisabled: boolean;
+  onToggle: ko.Observable<boolean>;
+
+  constructor(params: GuestModeToggleParams) {
     this.isChecked = params.isChecked;
     this.onToggle = params.onToggle;
     this.isDisabled = params.isDisabled;

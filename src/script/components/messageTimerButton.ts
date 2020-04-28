@@ -17,14 +17,26 @@
  *
  */
 
+import ko from 'knockout';
+
 import {t} from 'Util/LocalizerUtil';
-import {formatDuration} from 'Util/TimeUtil';
+import {formatDuration, DurationUnit} from 'Util/TimeUtil';
 
 import {EphemeralTimings} from '../ephemeral/EphemeralTimings';
 import {Context} from '../ui/ContextMenu';
+import {Conversation} from '../entity/Conversation';
+
+interface MessageTimerButtonParams {
+  conversation: ko.Observable<Conversation>;
+}
 
 class MessageTimerButton {
-  constructor(params) {
+  conversationEntity: ko.Observable<Conversation>;
+  hasMessageTimer: ko.PureComputed<any>;
+  isTimerDisabled: ko.PureComputed<any>;
+  duration: ko.PureComputed<DurationUnit | {}>;
+
+  constructor(params: MessageTimerButtonParams) {
     this.conversationEntity = params.conversation;
     this.hasMessageTimer = ko.pureComputed(() => {
       return this.conversationEntity() ? this.conversationEntity().messageTimer() : false;
@@ -35,13 +47,8 @@ class MessageTimerButton {
     });
   }
 
-  /**
-   * Click on ephemeral button
-   * @param {Object} data Object
-   * @param {DOMEvent} event Triggered event
-   * @returns {undefined} No return value
-   */
-  onClick(data, event) {
+  /** Click on ephemeral button */
+  onClick(data: any, event: Event): void {
     if (this.isTimerDisabled()) {
       return event.preventDefault();
     }
@@ -85,5 +92,9 @@ ko.components.register('message-timer-button', {
       <!-- /ko -->
     </span>
     `,
-  viewModel: MessageTimerButton,
+  viewModel: {
+    createViewModel(params: MessageTimerButtonParams) {
+      return new MessageTimerButton(params);
+    },
+  },
 });

@@ -56,7 +56,7 @@ async function createEncodedCiphertext(
   });
 
   const sessionId = `from-${sender.identity.public_key.fingerprint()}-to-${preKey.key_pair.public_key.fingerprint()}`;
-  const preKeyBundle = Proteus.keys.PreKeyBundle.new(receivingIdentity.public_key, preKey);
+  const preKeyBundle = new Proteus.keys.PreKeyBundle(receivingIdentity.public_key, preKey);
 
   const cipherText = await sender.encrypt(
     sessionId,

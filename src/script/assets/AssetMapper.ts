@@ -17,12 +17,14 @@
  *
  */
 
-import {AssetPayload} from '../entity/message/Asset';
+import {UserAsset as APIClientUserAsset} from '@wireapp/api-client/dist/user';
+import {Picture as APIClientPicture} from '@wireapp/api-client/dist/self';
+
 import {AssetRemoteData} from './AssetRemoteData';
 
 export type MappedAsset = {[index: string]: AssetRemoteData};
 
-export const mapProfileAssets = (userId: string, assets: AssetPayload[]): MappedAsset => {
+export const mapProfileAssets = (userId: string, assets: APIClientUserAsset[]): MappedAsset => {
   const sizeMap: {[index: string]: string} = {
     complete: 'medium',
     preview: 'preview',
@@ -36,7 +38,7 @@ export const mapProfileAssets = (userId: string, assets: AssetPayload[]): Mapped
     }, {});
 };
 
-export const mapProfileAssetsV1 = (userId: string, pictures: AssetPayload[]): MappedAsset => {
+export const mapProfileAssetsV1 = (userId: string, pictures: APIClientPicture[]): MappedAsset => {
   const [previewPicture, mediumPicture] = pictures;
   const previewAsset = previewPicture ? AssetRemoteData.v1(userId, previewPicture.id, true) : undefined;
   const mediumAsset = mediumPicture ? AssetRemoteData.v1(userId, mediumPicture.id, true) : undefined;

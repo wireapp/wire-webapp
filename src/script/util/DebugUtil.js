@@ -21,7 +21,6 @@ import $ from 'jquery';
 import sodium from 'libsodium-wrappers-sumo';
 import Dexie from 'dexie';
 import {util as ProteusUtil} from '@wireapp/proteus';
-import keyboardJS from 'keyboardjs';
 
 import {getLogger} from 'Util/Logger';
 
@@ -59,7 +58,6 @@ export class DebugUtil {
     this.logger = getLogger('DebugUtil');
 
     this.liveCallingStatsInterval = undefined;
-    keyboardJS.bind('alt+ctrl+c', this.toggleLiveCallingStats.bind(this));
   }
 
   blockAllConnections() {
@@ -189,7 +187,7 @@ export class DebugUtil {
       .get_conversation_by_id(event.conversation)
       .then(conversation_et => {
         debugInformation.conversation = conversation_et;
-        return this.userRepository.get_user_by_id(event.from);
+        return this.userRepository.getUserById(event.from);
       })
       .then(user_et => {
         debugInformation.user = user_et;
@@ -444,7 +442,7 @@ export class DebugUtil {
             return groups;
           }, {});
 
-          const user = await this.userRepository.get_user_by_id(participantStats.userid);
+          const user = await this.userRepository.getUserById(participantStats.userid);
 
           return createElement('div', [
             createElement('div', [createElement('strong', user.name())]),

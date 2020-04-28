@@ -240,7 +240,7 @@ export class NotificationRepository {
       const {conversationId, messageId, messageType} = notification.data || {};
 
       if (messageId) {
-        this.conversationRepository.is_message_read(conversationId, messageId).then(isRead => {
+        this.conversationRepository.isMessageRead(conversationId, messageId).then(isRead => {
           if (isRead) {
             notification.close();
             const messageInfo = messageId
@@ -647,7 +647,7 @@ export class NotificationRepository {
       return () => amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, showOptions);
     }
 
-    const isConnectionRequest = messageEntity.is_member() && (messageEntity as MemberMessage).isConnectionRequest();
+    const isConnectionRequest = messageEntity.isMember() && (messageEntity as MemberMessage).isConnectionRequest();
     if (isConnectionRequest) {
       return () => {
         amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.CONNECTION_REQUESTS);
@@ -728,7 +728,7 @@ export class NotificationRepository {
    */
   private notifySound(messageEntity: Message): void {
     const muteSound = !document.hasFocus() && Environment.browser.firefox && Environment.os.mac;
-    const isFromSelf = messageEntity.user().is_me;
+    const isFromSelf = messageEntity.user().isMe;
     const shouldPlaySound = !muteSound && !isFromSelf;
 
     if (shouldPlaySound) {
@@ -795,7 +795,7 @@ export class NotificationRepository {
       this.callingRepository.joinedCall() && !this.contentViewModelState.multitasking.isMinimized();
 
     const activeConversation = document.hasFocus() && inConversationView && inActiveConversation && !inMaximizedCall;
-    const messageFromSelf = messageEntity.user().is_me;
+    const messageFromSelf = messageEntity.user().isMe;
     const permissionDenied = this.permissionState() === PermissionStatusState.DENIED;
 
     // The in-app notification settings should be ignored for alerts (which are composite messages for now)

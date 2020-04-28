@@ -39,6 +39,7 @@ import {
 } from '@wireapp/protocol-messaging';
 import {flatten} from 'underscore';
 import {ConnectionStatus} from '@wireapp/api-client/dist/connection';
+import {RequestCancellationError} from '@wireapp/api-client/dist/user';
 
 import {getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -139,7 +140,7 @@ export class ConversationRepository {
    *
    * @param {ConversationService} conversation_service Backend REST API conversation service implementation
    * @param {AssetService} asset_service Backend REST API asset service implementation
-   * @param {ClientRepository} client_repository Repository for client interactions
+   * @param {ClientRepository} clientRepository Repository for client interactions
    * @param {ConnectionRepository} connectionRepository Repository for all connection interactions
    * @param {CryptographyRepository} cryptography_repository Repository for all cryptography interactions
    * @param {EventRepository} eventRepository Repository that handles events
@@ -148,14 +149,14 @@ export class ConversationRepository {
    * @param {MessageSender} messageSender Message sending queue handler
    * @param {serverTimeHandler} serverTimeHandler Handles time shift between server and client
    * @param {TeamRepository} teamRepository Repository for teams
-   * @param {UserRepository} user_repository Repository for all user interactions
+   * @param {UserRepository} userRepository Repository for all user interactions
    * @param {PropertiesRepository} propertyRepository Repository that stores all account preferences
    * @param {AssetUploader} assetUploader Manages uploading assets and keeping track of current uploads
    */
   constructor(
     conversation_service,
     asset_service,
-    client_repository,
+    clientRepository,
     connectionRepository,
     cryptography_repository,
     eventRepository,
@@ -164,7 +165,7 @@ export class ConversationRepository {
     messageSender,
     serverTimeHandler,
     teamRepository,
-    user_repository,
+    userRepository,
     propertyRepository,
     assetUploader,
   ) {
@@ -172,14 +173,14 @@ export class ConversationRepository {
     this.eventService = eventRepository.eventService;
     this.conversation_service = conversation_service;
     this.asset_service = asset_service;
-    this.client_repository = client_repository;
+    this.clientRepository = clientRepository;
     this.connectionRepository = connectionRepository;
     this.cryptography_repository = cryptography_repository;
     this.giphy_repository = giphy_repository;
     this.link_repository = link_repository;
     this.serverTimeHandler = serverTimeHandler;
     this.teamRepository = teamRepository;
-    this.user_repository = user_repository;
+    this.userRepository = userRepository;
     this.propertyRepository = propertyRepository;
     this.assetUploader = assetUploader;
     this.logger = getLogger('ConversationRepository');
@@ -191,13 +192,7 @@ export class ConversationRepository {
       this.eventRepository,
       this.serverTimeHandler,
     );
-    this.clientMismatchHandler = new ClientMismatchHandler(
-      this,
-      this.cryptography_repository,
-      this.eventRepository,
-      this.serverTimeHandler,
-      this.user_repository,
-    );
+    this.clientMismatchHandler = new ClientMismatchHandler(this, this.cryptography_repository, this.userRepository);
 
     this.active_conversation = ko.observable();
     this.conversations = ko.observableArray([]);
@@ -207,7 +202,7 @@ export class ConversationRepository {
     this.team = this.teamRepository.team;
     this.teamMembers = this.teamRepository.teamMembers;
 
-    this.selfUser = this.user_repository.self;
+    this.selfUser = this.userRepository.self;
 
     this.block_event_handling = ko.observable(true);
     this.fetching_conversations = {};
@@ -260,19 +255,22 @@ export class ConversationRepository {
 
     this.connectedUsers = ko.pureComputed(() => {
       const inviterId = this.teamRepository.memberInviters()[this.selfUser().id];
-      const inviter = inviterId ? this.user_repository.users().find(({id}) => id === inviterId) : null;
+      const inviter = inviterId ? this.userRepository.users().find(({id}) => id === inviterId) : null;
       const connectedUsers = inviter ? [inviter] : [];
+      const selfTeamId = this.selfUser().teamId;
       for (const conversation of this.conversations()) {
         for (const user of conversation.participating_user_ets()) {
           const isNotService = !user.isService;
           const isNotIncluded = !connectedUsers.includes(user);
-          if (isNotService && isNotIncluded && (user.isTeamMember() || user.isConnected())) {
+          if (isNotService && isNotIncluded && (user.teamId === selfTeamId || user.isConnected())) {
             connectedUsers.push(user);
           }
         }
       }
       return connectedUsers;
     });
+
+    this.userRepository.directlyConnectedUsers = this.connectedUsers;
 
     this.conversationLabelRepository = new ConversationLabelRepository(
       this.conversations,
@@ -556,7 +554,7 @@ export class ConversationRepository {
     if (ensureUser) {
       return messagePromise.then(message => {
         if (message.from && !message.user().id) {
-          return this.user_repository.get_user_by_id(message.from).then(userEntity => {
+          return this.userRepository.getUserById(message.from).then(userEntity => {
             message.user(userEntity);
             return message;
           });
@@ -597,7 +595,7 @@ export class ConversationRepository {
 
       if (!hasAdditionalMessages) {
         const firstMessage = conversationEntity.getFirstMessage();
-        const checkCreationMessage = firstMessage && firstMessage.is_member() && firstMessage.isCreation();
+        const checkCreationMessage = firstMessage && firstMessage.isMember() && firstMessage.isCreation();
         if (checkCreationMessage) {
           const groupCreationMessageIn1to1 = conversationEntity.is1to1() && firstMessage.isGroupCreation();
           const one2oneConnectionMessageInGroup = conversationEntity.isGroup() && firstMessage.isConnection();
@@ -812,8 +810,8 @@ export class ConversationRepository {
     const mapOfUserIds = conversationEntities.map(conversationEntity => conversationEntity.participating_user_ids());
     const userIds = flatten(mapOfUserIds);
 
-    return this.user_repository
-      .get_users_by_id(userIds)
+    return this.userRepository
+      .getUsersById(userIds)
       .then(() => conversationEntities.forEach(conversationEntity => this._fetch_users_and_events(conversationEntity)));
   }
 
@@ -1000,7 +998,7 @@ export class ConversationRepository {
    * @returns {Promise} Resolves with the conversation with requested user
    */
   get1To1Conversation(userEntity) {
-    const inCurrentTeam = userEntity.inTeam() && userEntity.isTeamMember();
+    const inCurrentTeam = userEntity.inTeam() && userEntity.teamId === this.selfUser().teamId;
 
     if (inCurrentTeam) {
       const matchingConversationEntity = this.conversations().find(conversationEntity => {
@@ -1061,7 +1059,7 @@ export class ConversationRepository {
    * @param {string} message_id Message ID
    * @returns {Promise} Resolves with `true` if message is marked as read
    */
-  is_message_read(conversation_id, message_id) {
+  isMessageRead(conversation_id, message_id) {
     if (!conversation_id || !message_id) {
       return Promise.resolve(false);
     }
@@ -1298,18 +1296,16 @@ export class ConversationRepository {
    * @returns {Promise} Resolves when users have been updated
    */
   updateParticipatingUserEntities(conversationEntity, offline = false, updateGuests = false) {
-    return this.user_repository
-      .get_users_by_id(conversationEntity.participating_user_ids(), offline)
-      .then(userEntities => {
-        userEntities.sort(sortUsersByPriority);
-        conversationEntity.participating_user_ets(userEntities);
+    return this.userRepository.getUsersById(conversationEntity.participating_user_ids(), offline).then(userEntities => {
+      userEntities.sort(sortUsersByPriority);
+      conversationEntity.participating_user_ets(userEntities);
 
-        if (updateGuests) {
-          conversationEntity.updateGuests();
-        }
+      if (updateGuests) {
+        conversationEntity.updateGuests();
+      }
 
-        return conversationEntity;
-      });
+      return conversationEntity;
+    });
   }
 
   //##############################################################################
@@ -1594,10 +1590,10 @@ export class ConversationRepository {
    * @param {string} teamId ID of team that member was removed from
    * @param {string} userId ID of leaving user
    * @param {Date} isoDate Date of member removal
-   * @returns {undefined} No return value
+   * @returns {Promise<void>} No return value
    */
-  teamMemberLeave(teamId, userId, isoDate) {
-    this.user_repository.get_user_by_id(userId).then(userEntity => {
+  teamMemberLeave(teamId, userId, isoDate = this.serverTimeHandler.toServerTimestamp()) {
+    return this.userRepository.getUserById(userId).then(userEntity => {
       this.conversations()
         .filter(conversationEntity => {
           const conversationInTeam = conversationEntity.team_id === teamId;
@@ -1787,7 +1783,7 @@ export class ConversationRepository {
 
   _handleUsersNotConnected(userIds = []) {
     const [userID] = userIds;
-    const userPromise = userIds.length === 1 ? this.user_repository.get_user_by_id(userID) : Promise.resolve();
+    const userPromise = userIds.length === 1 ? this.userRepository.getUserById(userID) : Promise.resolve();
 
     userPromise.then(userEntity => {
       const username = userEntity ? userEntity.name() : undefined;
@@ -1879,8 +1875,7 @@ export class ConversationRepository {
           retention,
         };
 
-        const uploadPromise = this.assetUploader.uploadAsset(messageId, file, options, asImage);
-        return uploadPromise;
+        return this.assetUploader.uploadFile(messageId, file, options, asImage);
       })
       .then(asset => {
         genericMessage = new GenericMessage({
@@ -1997,7 +1992,7 @@ export class ConversationRepository {
 
         const messageEntityPromise = this.getMessageInConversationById(conversationEntity, messageId);
         return messageEntityPromise.then(messageEntity => {
-          return this.assetUploader.uploadAsset(messageEntity.id, imageBlob, options).then(uploadedImageAsset => {
+          return this.assetUploader.uploadFile(messageEntity.id, imageBlob, options, false).then(uploadedImageAsset => {
             const assetPreview = new Asset.Preview(imageBlob.type, imageBlob.size, uploadedImageAsset.uploaded);
             const protoAsset = new Asset({
               [PROTO_MESSAGE_TYPE.ASSET_PREVIEW]: assetPreview,
@@ -2057,7 +2052,7 @@ export class ConversationRepository {
   _sendConfirmationStatus(conversationEntity, messageEntity, type, moreMessageEntities = []) {
     const typeToConfirm = EventTypeHandling.CONFIRM.includes(messageEntity.type);
 
-    if (messageEntity.user().is_me || !typeToConfirm) {
+    if (messageEntity.user().isMe || !typeToConfirm) {
       return;
     }
 
@@ -2484,7 +2479,7 @@ export class ConversationRepository {
       const recipients = {};
 
       for (const user_et of user_ets) {
-        if (!(skip_own_clients && user_et.is_me)) {
+        if (!(skip_own_clients && user_et.isMe)) {
           if (user_ids && !user_ids.includes(user_et.id)) {
             continue;
           }
@@ -2690,7 +2685,7 @@ export class ConversationRepository {
         const error = axiosError.response?.data;
         const isUnknownClient = error?.label === BackendClientError.LABEL.UNKNOWN_CLIENT;
         if (isUnknownClient) {
-          return this.client_repository.removeLocalClient();
+          return this.clientRepository.removeLocalClient();
         }
 
         if (!error?.missing) {
@@ -2721,7 +2716,7 @@ export class ConversationRepository {
     if (blockSystemMessage) {
       conversationEntity.blockLegalHoldMessage = true;
     }
-    const sender = this.client_repository.currentClient().id;
+    const sender = this.clientRepository.currentClient().id;
     try {
       await this.conversation_service.post_encrypted_message(conversationEntity.id, {recipients: {}, sender});
     } catch (axiosError) {
@@ -2744,7 +2739,7 @@ export class ConversationRepository {
 
         await Promise.all(
           Object.entries(deletedUserClients).map(([userId, clients]) =>
-            Promise.all(clients.map(clientId => this.user_repository.remove_client_from_user(userId, clientId))),
+            Promise.all(clients.map(clientId => this.userRepository.removeClientFromUser(userId, clientId))),
           ),
         );
 
@@ -2761,8 +2756,8 @@ export class ConversationRepository {
 
         await Promise.all(
           missingUserIds.map(async userId => {
-            const clients = await this.user_repository.getClientsByUserId(userId, false);
-            await Promise.all(clients.map(client => this.user_repository.addClientToUser(userId, client)));
+            const clients = await this.userRepository.getClientsByUserId(userId, false);
+            await Promise.all(clients.map(client => this.userRepository.addClientToUser(userId, client)));
           }),
         );
       }
@@ -2873,8 +2868,8 @@ export class ConversationRepository {
 
         userIds = userIds || conversationEntity.getUsersWithUnverifiedClients().map(userEntity => userEntity.id);
 
-        return this.user_repository
-          .get_users_by_id(userIds)
+        return this.userRepository
+          .getUsersById(userIds)
           .then(userEntities => {
             let actionString;
             let messageString;
@@ -2890,7 +2885,7 @@ export class ConversationRepository {
               const [userEntity] = userEntities;
 
               if (userEntity) {
-                titleString = userEntity.is_me
+                titleString = userEntity.isMe
                   ? t('modalConversationNewDeviceHeadlineYou', titleSubstitutions)
                   : t('modalConversationNewDeviceHeadlineOne', titleSubstitutions);
               } else {
@@ -3031,6 +3026,8 @@ export class ConversationRepository {
     } catch (error) {
       if (this._isUserCancellationError(error)) {
         throw error;
+      } else if (error instanceof RequestCancellationError) {
+        return;
       }
       this.logger.error(`Failed to upload asset for conversation '${conversationEntity.id}': ${error.message}`, error);
       const messageEntity = await this.getMessageInConversationById(conversationEntity, messageId);
@@ -3053,7 +3050,7 @@ export class ConversationRepository {
 
     return Promise.resolve()
       .then(() => {
-        if (!messageEntity.user().is_me && !messageEntity.ephemeral_expires()) {
+        if (!messageEntity.user().isMe && !messageEntity.ephemeral_expires()) {
           throw new ConversationError(ConversationError.TYPE.WRONG_USER, ConversationError.MESSAGE.WRONG_USER);
         }
 
@@ -3679,7 +3676,7 @@ export class ConversationRepository {
         .then(({messageEntity}) => {
           messageEntity
             .userEntities()
-            .filter(userEntity => !userEntity.is_me)
+            .filter(userEntity => !userEntity.isMe)
             .forEach(userEntity => {
               conversationEntity.participating_user_ids.remove(userEntity.id);
 
@@ -3965,10 +3962,10 @@ export class ConversationRepository {
 
   handleMessageExpiration(messageEntity) {
     amplify.publish(WebAppEvents.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, messageEntity);
-    const shouldDeleteMessage = !messageEntity.user().is_me || messageEntity.is_ping();
+    const shouldDeleteMessage = !messageEntity.user().isMe || messageEntity.is_ping();
     if (shouldDeleteMessage) {
       this.get_conversation_by_id(messageEntity.conversation_id).then(conversationEntity => {
-        const isPingFromSelf = messageEntity.user().is_me && messageEntity.is_ping();
+        const isPingFromSelf = messageEntity.user().isMe && messageEntity.is_ping();
         const deleteForSelf = isPingFromSelf || conversationEntity.removed_from_conversation();
         if (deleteForSelf) {
           return this.deleteMessage(conversationEntity, messageEntity);
@@ -4068,7 +4065,7 @@ export class ConversationRepository {
 
     const messageFromSelf = messageEntity.from === this.selfUser().id;
     if (messageFromSelf && event_data.reaction) {
-      return this.user_repository.get_user_by_id(from).then(userEntity => {
+      return this.userRepository.getUserById(from).then(userEntity => {
         const reactionMessageEntity = new Message(messageEntity.id, SuperType.REACTION);
         reactionMessageEntity.user(userEntity);
         reactionMessageEntity.reaction = event_data.reaction;
@@ -4091,11 +4088,11 @@ export class ConversationRepository {
    * @returns {Promise} Resolves when users have been update
    */
   _updateMessageUserEntities(messageEntity) {
-    return this.user_repository.get_user_by_id(messageEntity.from).then(userEntity => {
+    return this.userRepository.getUserById(messageEntity.from).then(userEntity => {
       messageEntity.user(userEntity);
 
-      if (messageEntity.is_member() || messageEntity.userEntities) {
-        return this.user_repository.get_users_by_id(messageEntity.userIds()).then(userEntities => {
+      if (messageEntity.isMember() || messageEntity.userEntities) {
+        return this.userRepository.getUsersById(messageEntity.userIds()).then(userEntities => {
           userEntities.sort(sortUsersByPriority);
           messageEntity.userEntities(userEntities);
           return messageEntity;
@@ -4107,7 +4104,7 @@ export class ConversationRepository {
 
         messageEntity.reactions_user_ets.removeAll();
         if (userIds.length) {
-          return this.user_repository.get_users_by_id(userIds).then(userEntities => {
+          return this.userRepository.getUsersById(userIds).then(userEntities => {
             messageEntity.reactions_user_ets(userEntities);
             return messageEntity;
           });

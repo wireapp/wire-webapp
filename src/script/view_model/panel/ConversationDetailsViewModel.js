@@ -414,4 +414,10 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
   updateConversationReceiptMode(conversationEntity, receiptMode) {
     this.conversationRepository.updateConversationReceiptMode(conversationEntity, receiptMode);
   }
+
+  initView() {
+    if (this.teamRepository.isTeam() && this.isSingleUserMode(this.activeConversation())) {
+      this.teamRepository.updateTeamMembersByIds(this.teamRepository.team(), [this.firstParticipant().id], true);
+    }
+  }
 }

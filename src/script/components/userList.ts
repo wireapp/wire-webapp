@@ -19,6 +19,9 @@
 
 import ko from 'knockout';
 
+import {partition} from 'Util/ArrayUtil';
+import {sortByPriority} from 'Util/StringUtil';
+
 import {ConversationRepository} from '../conversation/ConversationRepository';
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
@@ -65,13 +68,13 @@ const listTemplate = (data: string, uieName: string = ''): string => `
       css: cssClasses(),
       foreach: {data: ${data}, as: 'user', noChildContext: true }"
       ${uieName ? ` data-uie-name="${uieName}"` : ''}>
-    <!-- ko if: noSelfInteraction && user.is_me -->
+    <!-- ko if: noSelfInteraction && user.isMe -->
       <participant-item
         params="participant: user, customInfo: infos && infos()[user.id], canSelect: isSelectEnabled, isSelected: isSelected(user), mode: mode, external: teamRepository.isExternal(user.id), selfInTeam: selfInTeam, isSelfVerified: isSelfVerified"
         data-bind="css: {'no-underline': noUnderline, 'highlighted': highlightedUserIds.includes(user.id), 'no-interaction': true}">
       </participant-item>
     <!-- /ko -->
-    <!-- ko ifnot: noSelfInteraction && user.is_me -->
+    <!-- ko ifnot: noSelfInteraction && user.isMe -->
       <participant-item
         params="participant: user, customInfo: infos && infos()[user.id], canSelect: isSelectEnabled, isSelected: isSelected(user), mode: mode, external: teamRepository.isExternal(user.id), selfInTeam: selfInTeam, isSelfVerified: isSelfVerified"
         data-bind="click: (viewmodel, event) => onUserClick(user, event), css: {'no-underline': noUnderline, 'show-arrow': arrow, 'highlighted': highlightedUserIds.includes(user.id)}">
@@ -99,10 +102,10 @@ ko.components.register('user-list', {
     <!-- /ko -->
 
     <!-- ko ifnot: showRoles() -->
-    ${listTemplate('filteredUserEntities().slice(0, maxShownUsers())')}
+    ${listTemplate('foundUserEntities().slice(0, maxShownUsers())')}
     <!-- /ko -->
 
-    <!-- ko if: filteredUserEntities().length > maxShownUsers() -->
+    <!-- ko if: foundUserEntities().length > maxShownUsers() -->
       <div data-bind="template: {afterRender: attachLazyTrigger}"><div style="height: 100px"></div></div>
     <!-- /ko -->
 
@@ -111,7 +114,7 @@ ko.components.register('user-list', {
         <div class="user-list__no-results" data-bind="text: t('searchListEveryoneParticipates')" data-uie-name="status-all-added"></div>
       <!-- /ko -->
 
-      <!-- ko if: userEntities().length > 0 && filteredUserEntities().length === 0 -->
+      <!-- ko if: userEntities().length > 0 && foundUserEntities().length === 0 -->
         <div class="user-list__no-results" data-bind="text: t('searchListNoMatches')" data-uie-name="status-no-matches"></div>
       <!-- /ko -->
     <!-- /ko -->
@@ -174,29 +177,50 @@ ko.components.register('user-list', {
       }
     };
 
+    const remoteTeamMembers = ko.observable([]);
+
+    /**
+     * Try to load additional members from the backend.
+     * This is needed for large teams (>= 2000 members)
+     **/
+    async function fetchMembersFromBackend(query: string, isHandle: boolean, ignoreMembers: User[]) {
+      const resultUsers: User[] = await searchRepository.search_by_name(query, isHandle);
+      const selfTeamId = teamRepository.selfUser().teamId;
+      const foundMembers = resultUsers.filter(user => user.teamId === selfTeamId);
+      const ignoreIds = ignoreMembers.map(member => member.id);
+      const uniqueMembers = foundMembers.filter(member => !ignoreIds.includes(member.id));
+
+      // We shouldn't show any members that have the 'external' role and are not already locally known.
+      const nonExternalMembers = await teamRepository.filterExternals(uniqueMembers);
+      remoteTeamMembers(nonExternalMembers);
+    }
+
     // Filter all list items if a filter is provided
-    this.filteredUserEntities = ko.pureComputed(() => {
+    const filteredUserEntities = ko.pureComputed(() => {
       const connectedUsers = conversationRepository.connectedUsers();
       let resultUsers: User[] = userEntities();
       const normalizedQuery = SearchRepository.normalizeQuery(filter());
       if (normalizedQuery) {
+        const trimmedQuery = filter().trim();
+        const isHandle = trimmedQuery.startsWith('@') && validateHandle(normalizedQuery);
         if (!skipSearch) {
           const SEARCHABLE_FIELDS = SearchRepository.CONFIG.SEARCHABLE_FIELDS;
-          const trimmedQuery = filter().trim();
-          const isHandle = trimmedQuery.startsWith('@') && validateHandle(normalizedQuery);
           const properties = isHandle ? [SEARCHABLE_FIELDS.USERNAME] : undefined;
           resultUsers = searchRepository.searchUserInSet(normalizedQuery, userEntities(), properties);
         }
         resultUsers = resultUsers.filter(
           user =>
-            user.is_me ||
+            user.isMe ||
             connectedUsers.includes(user) ||
             teamRepository.isSelfConnectedTo(user.id) ||
             user.username() === normalizedQuery,
         );
+        if (!skipSearch) {
+          fetchMembersFromBackend(trimmedQuery, isHandle, resultUsers);
+        }
       } else {
         resultUsers = userEntities().filter(
-          user => user.is_me || connectedUsers.includes(user) || teamRepository.isSelfConnectedTo(user.id),
+          user => user.isMe || connectedUsers.includes(user) || teamRepository.isSelfConnectedTo(user.id),
         );
       }
 
@@ -205,9 +229,18 @@ ko.components.register('user-list', {
       }
 
       // make sure the self user is the first one in the list
-      const selfUser = resultUsers.filter(user => user.is_me);
-      const otherUsers = resultUsers.filter(user => !user.is_me);
+      const [selfUser, otherUsers] = partition(resultUsers, user => user.isMe);
       return selfUser.concat(otherUsers);
+    });
+
+    this.foundUserEntities = ko.pureComputed(() => {
+      if (!remoteTeamMembers().length) {
+        return filteredUserEntities();
+      }
+      const normalizedQuery = SearchRepository.normalizeQuery(filter());
+      return [...filteredUserEntities(), ...remoteTeamMembers()].sort((userA, userB) =>
+        sortByPriority(userA.name(), userB.name(), normalizedQuery),
+      );
     });
 
     this.isSelected = (userEntity: User): boolean => this.isSelectEnabled && selectedUsers().includes(userEntity);
@@ -237,7 +270,7 @@ ko.components.register('user-list', {
     this.users = ko.observable<User[]>([]);
 
     const filteredUsersSubscription = ko.computed(() => {
-      const users = this.filteredUserEntities();
+      const users = filteredUserEntities();
       if (conversation?.()) {
         const members: User[] = [];
         const admins: User[] = [];

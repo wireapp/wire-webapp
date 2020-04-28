@@ -43,7 +43,10 @@ class Server {
   constructor(private readonly config: ServerConfig) {
     if (this.config.SERVER.DEVELOPMENT) {
       console.info(this.config);
+    } else if (!this.config.SERVER.APP_BASE.startsWith('https')) {
+      throw new Error(`Config variable 'APP_BASE' must be protocol https but is '${this.config.SERVER.APP_BASE}'`);
     }
+
     this.app = express();
     this.init();
   }
@@ -100,7 +103,7 @@ class Server {
       const isInsecure = !req.secure || req.get('X-Forwarded-Proto') !== 'https';
 
       if (isInsecure && !shouldEnforceHTTPS) {
-        return res.redirect(STATUS_CODE_MOVED, `https://${req.headers.host}${req.url}`);
+        return res.redirect(STATUS_CODE_MOVED, `${this.config.SERVER.APP_BASE}${req.url}`);
       }
 
       next();

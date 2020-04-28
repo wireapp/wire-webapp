@@ -129,3 +129,16 @@ export const deArrayify = <T>(value: T[] | T): T => (value instanceof Array ? va
 export const uniquify = <T>(elements: T[]): T[] => Array.from(new Set<T>(elements));
 
 export const flatten = <T>(arrays: T[][]): T[] => ([] as T[]).concat(...arrays);
+
+export const partition = <T>(array: T[], condition: (element: T) => boolean): [T[], T[]] => {
+  const matching: T[] = [];
+  const notMatching: T[] = [];
+  array.forEach(element => {
+    if (condition(element)) {
+      matching.push(element);
+    } else {
+      notMatching.push(element);
+    }
+  });
+  return [matching, notMatching];
+};

@@ -258,7 +258,7 @@ export class Conversation {
       for (let index = messages.length - 1; index >= 0; index--) {
         const messageEntity = messages[index];
         if (messageEntity.visible()) {
-          const isReadMessage = messageEntity.timestamp() <= this.last_read_timestamp() || messageEntity.user().is_me;
+          const isReadMessage = messageEntity.timestamp() <= this.last_read_timestamp() || messageEntity.user().isMe;
           if (isReadMessage) {
             break;
           }
@@ -493,7 +493,7 @@ export class Conversation {
     // we found a message from self user
     for (let counter = message_ets.length - 1; counter >= 0; counter--) {
       const message_et = message_ets[counter];
-      if (message_et.user()?.is_me) {
+      if (message_et.user()?.isMe) {
         this.updateTimestamps(message_et);
         break;
       }
@@ -604,7 +604,7 @@ export class Conversation {
       }
 
       const isCallActivation = messageEntity.is_call() && messageEntity.is_activation();
-      const isMemberJoin = messageEntity.is_member() && messageEntity.isMemberJoin();
+      const isMemberJoin = messageEntity.isMember() && messageEntity.isMemberJoin();
       const wasSelfUserAdded = isMemberJoin && messageEntity.isUserAffected(this.selfUser().id);
 
       return isCallActivation || wasSelfUserAdded;
@@ -665,7 +665,7 @@ export class Conversation {
         if (message_et.timestamp_affects_order()) {
           this.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.LAST_EVENT, forceUpdate);
 
-          const from_self = message_et.user()?.is_me;
+          const from_self = message_et.user()?.isMe;
           if (from_self) {
             this.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.LAST_READ);
           }
@@ -735,7 +735,7 @@ export class Conversation {
       .reverse()
       .find(messageEntity => {
         const isDelivered = messageEntity.status() >= StatusType.DELIVERED;
-        return isDelivered && messageEntity.user().is_me;
+        return isDelivered && messageEntity.user().isMe;
       });
   }
 

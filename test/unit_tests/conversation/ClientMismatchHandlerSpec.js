@@ -66,7 +66,7 @@ describe('ClientMismatchHandler', () => {
     });
 
     beforeEach(() => {
-      spyOn(testFactory.user_repository, 'remove_client_from_user').and.returnValue(Promise.resolve());
+      spyOn(testFactory.user_repository, 'removeClientFromUser').and.returnValue(Promise.resolve());
 
       payload = {
         recipients: {
@@ -173,6 +173,12 @@ describe('ClientMismatchHandler', () => {
     });
 
     it('should remove the payload of deleted clients', () => {
+      spyOn(testFactory.user_repository, 'getUserFromBackend').and.callFake(() => {
+        return Promise.resolve({
+          deleted: true,
+        });
+      });
+
       clientMismatch = {
         deleted: {
           [janeRoe.user_id]: [`${janeRoe.client_id}`],
@@ -186,12 +192,18 @@ describe('ClientMismatchHandler', () => {
       return testFactory.conversation_repository.clientMismatchHandler
         .onClientMismatch(eventInfoEntity, clientMismatch, payload)
         .then(updatedPayload => {
-          expect(testFactory.user_repository.remove_client_from_user).toHaveBeenCalled();
+          expect(testFactory.user_repository.removeClientFromUser).toHaveBeenCalled();
           expect(Object.keys(updatedPayload.recipients).length).toBe(0);
         });
     });
 
     it('should remove the payload of redundant clients', () => {
+      spyOn(testFactory.user_repository, 'getUserFromBackend').and.callFake(() => {
+        return Promise.resolve({
+          deleted: true,
+        });
+      });
+
       clientMismatch = {
         deleted: {},
         missing: {},
@@ -205,7 +217,7 @@ describe('ClientMismatchHandler', () => {
       return testFactory.conversation_repository.clientMismatchHandler
         .onClientMismatch(eventInfoEntity, clientMismatch, payload)
         .then(updated_payload => {
-          expect(testFactory.user_repository.remove_client_from_user).not.toHaveBeenCalled();
+          expect(testFactory.user_repository.removeClientFromUser).not.toHaveBeenCalled();
           expect(Object.keys(updated_payload.recipients).length).toBe(0);
         });
     });

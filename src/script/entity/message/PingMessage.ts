@@ -31,7 +31,7 @@ export class PingMessage extends Message {
     super();
     this.super_type = SuperType.PING;
 
-    this.caption = ko.pureComputed(() => (this.user().is_me ? t('conversationPingYou') : t('conversationPing')));
+    this.caption = ko.pureComputed(() => (this.user().isMe ? t('conversationPingYou') : t('conversationPing')));
 
     this.get_icon_classes = ko.pureComputed(() => {
       const show_ping_animation = Date.now() - this.timestamp() < 2000;

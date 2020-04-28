@@ -66,6 +66,7 @@ import {ClientService} from 'src/script/client/ClientService';
 import {APIClientSingleton} from 'src/script/service/APIClientSingleton';
 import {TeamService} from 'src/script/team/TeamService';
 import {SearchService} from 'src/script/search/SearchService';
+import {AssetUploader} from '../../src/script/assets/AssetUploader';
 
 export class TestFactory {
   /**
@@ -119,7 +120,6 @@ export class TestFactory {
     this.cryptography_repository.currentClient = ko.observable(currentClient);
 
     if (mockCryptobox === true) {
-      // eslint-disable-next-line jasmine/no-unsafe-spy
       spyOn(this.cryptography_repository, 'initCryptobox').and.returnValue(Promise.resolve());
     } else {
       const storeEngine = storageRepository.storageService.engine;
@@ -143,7 +143,7 @@ export class TestFactory {
     const user = new User(entities.user.john_doe.id);
     user.devices.push(clientEntity);
     user.email(entities.user.john_doe.email);
-    user.is_me = true;
+    user.isMe = true;
     user.locale = entities.user.john_doe.locale;
     user.name(entities.user.john_doe.name);
     user.phone(entities.user.john_doe.phone);
@@ -226,7 +226,7 @@ export class TestFactory {
       serverTimeHandler,
       this.propertyRepository,
     );
-    this.user_repository.save_user(this.client_repository.selfUser(), true);
+    this.user_repository.saveUser(this.client_repository.selfUser(), true);
 
     return this.user_repository;
   }
@@ -280,6 +280,9 @@ export class TestFactory {
       new SelfService(container.resolve(APIClientSingleton).getClient()),
     );
 
+    const assetService = new AssetService(container.resolve(APIClientSingleton).getClient());
+    const assetUploader = new AssetUploader(assetService);
+
     this.conversation_repository = new ConversationRepository(
       this.conversation_service,
       this.asset_service,
@@ -288,10 +291,7 @@ export class TestFactory {
       this.cryptography_repository,
       this.event_repository,
       undefined,
-      new LinkPreviewRepository(
-        new AssetService(container.resolve(APIClientSingleton).getClient()),
-        propertiesRepository,
-      ),
+      new LinkPreviewRepository(assetUploader, propertiesRepository),
       new MessageSender(),
       serverTimeHandler,
       this.team_repository,

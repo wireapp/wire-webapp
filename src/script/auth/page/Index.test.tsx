@@ -75,7 +75,7 @@ describe('when visiting the index page', () => {
     const history = createMemoryHistory();
     const historyPushSpy = spyOn(history, 'push');
 
-    const defaultSSOCode = 'defaultt-a4b0-4c59-a31d-303a7f5eb5ab';
+    const defaultSSOCode = 'default-a4b0-4c59-a31d-303a7f5eb5ab';
 
     new IndexPage(
       mockStoreFactory()({

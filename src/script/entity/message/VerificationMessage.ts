@@ -30,7 +30,6 @@ import {User} from '../User';
 import {Message} from './Message';
 
 export class VerificationMessage extends Message {
-  private readonly isSelfClient: ko.PureComputed<boolean>;
   private readonly userEntities: ko.ObservableArray<User>;
   private readonly userIds: ko.ObservableArray<string>;
   private readonly verificationMessageType: ko.Observable<VerificationMessageType>;
@@ -38,6 +37,7 @@ export class VerificationMessage extends Message {
   public readonly captionStartedUsing: ko.PureComputed<string>;
   public readonly captionUnverifiedDevice: ko.PureComputed<string>;
   public readonly captionUser: ko.PureComputed<string>;
+  public readonly isSelfClient: ko.PureComputed<boolean>;
   public readonly isTypeNewDevice: ko.PureComputed<boolean>;
   public readonly isTypeNewMember: ko.PureComputed<boolean>;
   public readonly isTypeUnverified: ko.PureComputed<boolean>;

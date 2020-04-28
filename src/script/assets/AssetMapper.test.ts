@@ -17,7 +17,7 @@
  *
  */
 
-import {AssetPayload} from '../entity/message/Asset';
+import {UserAsset as APIClientUserAsset, UserAssetType} from '@wireapp/api-client/dist/user';
 import * as AssetMapper from './AssetMapper';
 
 describe('AssetMapper', () => {
@@ -26,17 +26,15 @@ describe('AssetMapper', () => {
       const userId = '';
       const previewPictureId = '3-1-e705c3f5-7b4b-4136-a09b-01614cb355a1';
       const completePictureId = '3-1-d22e106a-3632-4280-8367-c14943e2eca2';
-      const assets: AssetPayload[] = [
+      const assets: APIClientUserAsset[] = [
         {
-          id: 'id',
           key: previewPictureId,
-          size: 'preview',
+          size: UserAssetType.PREVIEW,
           type: 'image',
         },
         {
-          id: 'id',
           key: completePictureId,
-          size: 'complete',
+          size: UserAssetType.COMPLETE,
           type: 'image',
         },
       ];

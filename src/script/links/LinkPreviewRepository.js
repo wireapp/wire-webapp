@@ -17,7 +17,7 @@
  *
  */
 
-import {base64ToBlob} from 'Util/util';
+import {base64ToBlob, createRandomUuid} from 'Util/util';
 
 import {getFirstLinkWithOffset} from './LinkPreviewHelpers';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
@@ -29,11 +29,11 @@ import {getLogger} from 'Util/Logger';
 import {LinkPreviewError} from '../error/LinkPreviewError';
 
 class LinkPreviewRepository {
-  constructor(assetService, propertiesRepository) {
+  constructor(assetUploader, propertiesRepository) {
     this.getLinkPreviewFromString = this.getLinkPreviewFromString.bind(this);
     this.updatedSendPreference = this.updatedSendPreference.bind(this);
 
-    this.assetService = assetService;
+    this.assetUploader = assetUploader;
     this.logger = getLogger('LinkPreviewRepository');
 
     this.shouldSendPreviews = propertiesRepository.getPreference(PROPERTIES_TYPE.PREVIEWS.SEND);
@@ -166,7 +166,7 @@ class LinkPreviewRepository {
    */
   async _uploadPreviewImage(dataUri) {
     const blob = await base64ToBlob(dataUri);
-    return this.assetService.uploadImageAsset(blob, {public: true});
+    return this.assetUploader.uploadFile(createRandomUuid(), blob, {public: true}, true);
   }
 }
 

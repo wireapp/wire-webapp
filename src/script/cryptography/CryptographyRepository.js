@@ -215,7 +215,7 @@ export class CryptographyRepository {
    */
   async encryptGenericMessage(recipients, genericMessage, payload = this._constructPayload(this.currentClient().id)) {
     const receivingUsers = Object.keys(recipients).length;
-    const encryptLogMessage = `Encrypting message of type '${genericMessage.content}' for '${receivingUsers}' users.`;
+    const encryptLogMessage = `Encrypting message of type '${genericMessage.content}' for '${receivingUsers}' users...`;
     this.logger.log(encryptLogMessage, recipients);
 
     let {messagePayload, missingRecipients} = await this._encryptGenericMessage(recipients, genericMessage, payload);
@@ -306,26 +306,22 @@ export class CryptographyRepository {
     }
   }
 
-  _encryptGenericMessage(recipients, genericMessage, messagePayload) {
-    return Promise.resolve()
-      .then(() => {
-        const cipherPayloadPromises = [];
+  async _encryptGenericMessage(recipients, genericMessage, messagePayload) {
+    const cipherPayloadPromises = Object.entries(recipients).reduce((accumulator, [userId, clientIds]) => {
+      if (clientIds && clientIds.length) {
+        messagePayload.recipients[userId] = messagePayload.recipients[userId] || {};
+        clientIds.forEach(clientId => {
+          const sessionId = this._constructSessionId(userId, clientId);
+          const encryptionPromise = this._encryptPayloadForSession(sessionId, genericMessage);
 
-        Object.entries(recipients).forEach(([userId, clientIds]) => {
-          if (clientIds && clientIds.length) {
-            messagePayload.recipients[userId] = messagePayload.recipients[userId] || {};
-            clientIds.forEach(clientId => {
-              const sessionId = this._constructSessionId(userId, clientId);
-              const encryptionPromise = this._encryptPayloadForSession(sessionId, genericMessage);
-
-              cipherPayloadPromises.push(encryptionPromise);
-            });
-          }
+          accumulator.push(encryptionPromise);
         });
+      }
+      return accumulator;
+    }, []);
 
-        return Promise.all(cipherPayloadPromises);
-      })
-      .then(cipherPayload => this._mapCipherTextToPayload(messagePayload, cipherPayload));
+    const cipherPayload = await Promise.all(cipherPayloadPromises);
+    return this._mapCipherTextToPayload(messagePayload, cipherPayload);
   }
 
   async _encryptGenericMessageForMissingRecipients(missingRecipients, genericMessage, messagePayload) {

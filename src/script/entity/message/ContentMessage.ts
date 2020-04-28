@@ -33,11 +33,11 @@ import {Message} from './Message';
 import {Text as TextAsset} from './Text';
 
 export class ContentMessage extends Message {
-  private readonly edited_timestamp: ko.Observable<number>;
+  readonly edited_timestamp: ko.Observable<number>;
   private readonly is_liked_provisional: ko.Observable<boolean>;
   private readonly quote: ko.Observable<QuoteEntity>;
   private readonly reactions_user_ets: ko.ObservableArray<User>;
-  private readonly reactions: ko.Observable<{[userId: string]: string}>;
+  readonly reactions: ko.Observable<{[userId: string]: string}>;
   public readonly assets: ko.ObservableArray<Asset>;
   public readonly is_liked: ko.PureComputed<boolean>;
   public readonly like_caption: ko.PureComputed<string>;
@@ -75,14 +75,14 @@ export class ContentMessage extends Message {
           this.is_liked_provisional(null);
           return is_liked_provisional;
         }
-        const likes = this.reactions_user_ets().filter(user_et => user_et.is_me);
+        const likes = this.reactions_user_ets().filter(user_et => user_et.isMe);
         return likes.length === 1;
       },
       write: value => {
         return this.is_liked_provisional(value);
       },
     });
-    this.other_likes = ko.pureComputed(() => this.reactions_user_ets().filter(user_et => !user_et.is_me));
+    this.other_likes = ko.pureComputed(() => this.reactions_user_ets().filter(user_et => !user_et.isMe));
 
     this.like_caption = ko.pureComputed(() => {
       const maxShownNames = 2;

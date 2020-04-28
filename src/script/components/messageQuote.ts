@@ -17,14 +17,48 @@
  *
  */
 
+import ko from 'knockout';
+import {amplify} from 'amplify';
+
 import {isBeforeToday, formatDateNumeral, formatTimeShort} from 'Util/TimeUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
 
 import {WebAppEvents} from '../event/WebApp';
 import {QuoteEntity} from '../message/QuoteEntity';
 import {ConversationError} from '../error/ConversationError';
+import {Conversation} from '../entity/Conversation';
+import {ConversationRepository} from '../conversation/ConversationRepository';
+import {ContentMessage} from '../entity/message/ContentMessage';
+import {User} from '../entity/User';
+
+interface MessageQuoteParams {
+  conversation: ko.Observable<Conversation>;
+  conversationRepository: ConversationRepository;
+  focusMessage: (id: string) => void;
+  handleClickOnMessage: (message: ContentMessage, event: Event) => boolean;
+  quote: ko.Observable<QuoteEntity>;
+  selfId: ko.Observable<string>;
+  showDetail: (message: ContentMessage, event: UIEvent) => void;
+  showUserDetails: (user: User) => void;
+}
 
 class MessageQuote {
+  canShowMore: ko.Observable<boolean>;
+  dispose: () => void;
+  error: ko.Observable<any>;
+  focusMessage: () => void;
+  formatDateNumeral: (date: string | number | Date) => string;
+  formatTimeShort: (date: string | number | Date) => string;
+  handleClickOnMessage: (message: ContentMessage, event: Event) => boolean;
+  includesOnlyEmojis: (text: string) => boolean;
+  quotedMessage: ko.Observable<ContentMessage>;
+  quotedMessageId: ko.Observable<any>;
+  quotedMessageIsBeforeToday: ko.PureComputed<boolean>;
+  selfId: ko.Observable<string>;
+  showDetail: (message: ContentMessage, event: UIEvent) => void;
+  showFullText: ko.Observable<boolean>;
+  showUserDetails: (user: User) => void;
+
   constructor({
     conversation,
     conversationRepository,
@@ -34,10 +68,7 @@ class MessageQuote {
     selfId,
     showDetail,
     showUserDetails,
-  }) {
-    this.updateCanShowMore = this.updateCanShowMore.bind(this);
-    this.toggleShowMore = this.toggleShowMore.bind(this);
-
+  }: MessageQuoteParams) {
     this.showDetail = showDetail;
     this.handleClickOnMessage = handleClickOnMessage;
     this.showUserDetails = showUserDetails;
@@ -85,14 +116,14 @@ class MessageQuote {
         });
     }
 
-    const handleQuoteDeleted = messageId => {
+    const handleQuoteDeleted = (messageId: string) => {
       if (this.quotedMessageId() === messageId) {
         this.error(QuoteEntity.ERROR.MESSAGE_NOT_FOUND);
         this.quotedMessage(undefined);
       }
     };
 
-    const handleQuoteUpdated = (originalMessageId, messageEntity) => {
+    const handleQuoteUpdated = (originalMessageId: string, messageEntity: ContentMessage) => {
       if (this.quotedMessageId() === originalMessageId) {
         this.quotedMessage(messageEntity);
         this.quotedMessageId(messageEntity.id);
@@ -109,7 +140,7 @@ class MessageQuote {
     };
   }
 
-  updateCanShowMore(elements) {
+  updateCanShowMore = (elements: Element[]) => {
     const textQuote = elements.find(element => element.classList && element.classList.contains('message-quote__text'));
     if (textQuote) {
       const preNode = textQuote.querySelector('pre');
@@ -119,11 +150,11 @@ class MessageQuote {
       const isHigher = height > textQuote.clientHeight;
       this.canShowMore(isWider || isHigher);
     }
-  }
+  };
 
-  toggleShowMore() {
+  toggleShowMore = () => {
     this.showFullText(!this.showFullText());
-  }
+  };
 }
 
 ko.components.register('message-quote', {

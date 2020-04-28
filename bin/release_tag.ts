@@ -16,7 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-import {GiphySorting} from '@wireapp/api-client/dist/giphy';
+
 import {APIClient} from '@wireapp/api-client';
 import {ClientType} from '@wireapp/api-client/dist/client';
 import {Account} from '@wireapp/core';
@@ -107,14 +107,9 @@ const ask = (questionToAsk: string, callback: (answer: string) => void): void =>
 };
 
 const sendRandomGif = async (account: Account, conversationId: string, query: string): Promise<void> => {
-  const giphySearchResult = await account.service.giphy.searchGif({
-    limit: 25,
-    offset: 0,
-    q: query,
-    sort: GiphySorting.RELEVANT,
-  });
-  if (!giphySearchResult.data.length) {
-    logger.warn(`No gifs found for search query "${query}" :(`);
+  const giphySearchResult = await account.service.giphy.getRandomGif(query);
+  if (!giphySearchResult.data) {
+    logger.warn(`No gif found for search query "${query}" :(`);
     return;
   }
 
@@ -123,7 +118,7 @@ const sendRandomGif = async (account: Account, conversationId: string, query: st
     images: {
       downsized_large: {url: imageURL, height: imageHeight, width: imageWidth},
     },
-  } = giphySearchResult.data[0];
+  } = giphySearchResult.data;
   const {data: fileBuffer} = await axios.get<Buffer>(imageURL, {responseType: 'arraybuffer'});
 
   const payload = account.service.conversation.messageBuilder
@@ -185,6 +180,7 @@ ask(
 
       try {
         await announceRelease(tagName, commitId);
+        logger.info(`Sent announcement to conversation "${process.env.WIRE_CONVERSATION}".`);
       } catch (error) {
         logger.error(error);
       }

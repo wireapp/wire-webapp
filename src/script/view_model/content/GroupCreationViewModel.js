@@ -208,6 +208,9 @@ export class GroupCreationViewModel {
   };
 
   _trackGroupCreation(conversationEntity) {
+    if (!conversationEntity) {
+      return;
+    }
     this._trackGroupCreationSucceeded(conversationEntity);
     this._trackAddParticipants(conversationEntity);
   }

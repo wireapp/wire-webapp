@@ -17,14 +17,24 @@
  *
  */
 
-import {BasePanelViewModel} from './BasePanelViewModel';
+import ko from 'knockout';
+
+import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
 import {NOTIFICATION_STATE, getNotificationText} from '../../conversation/NotificationSetting';
+import {ConversationRepository} from '../../conversation/ConversationRepository';
+
+interface NotificationSetting {
+  text: string;
+  value: number;
+}
 
 export class NotificationsViewModel extends BasePanelViewModel {
-  constructor(params) {
-    super(params);
+  conversationRepository: ConversationRepository;
+  settings: NotificationSetting[];
+  currentNotificationSetting: ko.Observable<number>;
 
-    this.notificationChanged = this.notificationChanged.bind(this);
+  constructor(params: PanelViewModelProps) {
+    super(params);
 
     this.conversationRepository = params.repositories.conversation;
 
@@ -35,19 +45,19 @@ export class NotificationsViewModel extends BasePanelViewModel {
 
     this.currentNotificationSetting = ko.observable();
 
-    ko.pureComputed(() => {
-      return this.activeConversation() && this.activeConversation().notificationState();
-    }).subscribe(setting => {
-      this.currentNotificationSetting(setting);
-    });
+    ko.pureComputed(() => this.activeConversation() && this.activeConversation().notificationState()).subscribe(
+      setting => {
+        this.currentNotificationSetting(setting);
+      },
+    );
   }
 
-  notificationChanged(viewModel, event) {
-    const notificationState = parseInt(event.target.value, 10);
+  notificationChanged = (_: NotificationsViewModel, event: KeyboardEvent): void => {
+    const notificationState = parseInt((event.target as HTMLInputElement).value, 10);
     this.conversationRepository.setNotificationState(this.activeConversation(), notificationState);
-  }
+  };
 
-  getElementId() {
+  getElementId(): string {
     return 'notification-settings';
   }
 }
