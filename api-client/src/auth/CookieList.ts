@@ -18,15 +18,15 @@
  */
 
 export interface BackendCookie {
-  /**  The cookie's creation time */
+  /** The cookie's creation time */
   created: string;
-  /**  The cookie's expiration time */
+  /** The cookie's expiration time */
   expires: string;
-  /**  The primary cookie identifier */
+  /** The primary cookie identifier */
   id: number;
-  /**  The cookie's label */
+  /** The cookie's label */
   label: string;
-  /**  The cookie's type = ['session', 'persistent'] */
+  /** The cookie's type */
   type: 'session' | 'persistent';
 }
 
