@@ -39,4 +39,7 @@ export const StorageKey = {
   SEARCH: {
     SUGGESTED_SEARCH_ETS: 'z.storage.StorageKey.SEARCH.SUGGESTED_SEARCH_ETS',
   },
+  VIEW: {
+    RECENT_CONVERSATIONS: 'z.storage.StorageKey.VIEW.RECENT_CONVERSATIONS',
+  },
 };
