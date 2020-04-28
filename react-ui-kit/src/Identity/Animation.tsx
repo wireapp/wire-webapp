@@ -28,18 +28,18 @@ type TransitionProps = Partial<any> & {
 };
 
 type OpacityProps = TransitionProps & {
-  startValue?: number;
   endValue?: number;
+  startValue?: number;
 };
 
 type MovementProps = TransitionProps & {
-  startValue?: string;
   endValue?: string;
+  startValue?: string;
 };
 
 type TransitionContainerProps = React.HTMLProps<any> & {
-  component?: keyof JSX.IntrinsicElements;
   appear?: boolean;
+  component?: keyof JSX.IntrinsicElements;
   enter?: boolean;
   exit?: boolean;
 };

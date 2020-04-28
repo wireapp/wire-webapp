@@ -43,8 +43,8 @@ interface CrawlerResult {
 }
 
 interface License {
-  link?: string;
   license: string;
+  link?: string;
   package: string;
   parent?: string;
   platform: string;
@@ -52,8 +52,8 @@ interface License {
 
 interface Repository {
   dir: string;
-  url: string;
   name: string;
+  url: string;
 }
 
 const defaultOptions: Required<CollectorOptions> = {

@@ -25,6 +25,7 @@ yarn add --dev @wireapp/eslint-config \
                eslint-plugin-react \
                eslint-plugin-react-hooks \
                eslint-plugin-sort-keys-fix \
+               eslint-plugin-typescript-sort-keys \
                prettier \
                eslint
 ```
@@ -42,6 +43,7 @@ yarn add --dev @wireapp/eslint-config ^
                eslint-plugin-react ^
                eslint-plugin-react-hooks ^
                eslint-plugin-sort-keys-fix ^
+               eslint-plugin-typescript-sort-keys ^
                prettier ^
                eslint
 ```

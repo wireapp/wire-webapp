@@ -29,8 +29,8 @@ export interface ChangelogData {
 export type LoginDataBackend = LoginData & {backend?: string};
 
 export interface Parameters {
-  conversationIds?: string;
   backend?: string;
+  conversationIds?: string;
   email: string;
   excludeCommitTypes?: string[];
   message?: string;

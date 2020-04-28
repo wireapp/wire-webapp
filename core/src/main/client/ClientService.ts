@@ -28,8 +28,8 @@ import {ClientDatabaseRepository} from './ClientDatabaseRepository';
 
 export interface MetaClient extends RegisteredClient {
   meta: {
-    primary_key: string;
     is_verified?: boolean;
+    primary_key: string;
   };
 }
 

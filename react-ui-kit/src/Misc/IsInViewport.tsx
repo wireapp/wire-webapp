@@ -22,9 +22,9 @@ import {jsx} from '@emotion/core';
 import {useEffect, useRef} from 'react';
 
 export interface IsInViewportProps<T = HTMLDivElement> extends React.HTMLProps<T> {
-  onEnterViewport?: () => void;
   checkViewportOnce?: boolean;
   disabled?: boolean;
+  onEnterViewport?: () => void;
 }
 
 export const IsInViewport = ({

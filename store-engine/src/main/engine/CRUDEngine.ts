@@ -19,7 +19,11 @@
 
 export interface CRUDEngine {
   [index: string]: any;
-  storeName: string;
+  /**
+   * Clears all tables without deleting them.
+   * @returns Resolves when all tables are cleared.
+   */
+  clearTables(): Promise<void>;
 
   /**
    * Creates a record by its primary key within a table.
@@ -33,12 +37,6 @@ export interface CRUDEngine {
     primaryKey: PrimaryKey,
     entity: EntityType,
   ): Promise<PrimaryKey>;
-
-  /**
-   * Clears all tables without deleting them.
-   * @returns Resolves when all tables are cleared.
-   */
-  clearTables(): Promise<void>;
 
   /**
    * Deletes a record by its primary key within a table.
@@ -98,6 +96,8 @@ export interface CRUDEngine {
    * @returns Returns an array of primary keys.
    */
   readAllPrimaryKeys(tableName: string): Promise<string[]>;
+
+  storeName: string;
 
   /**
    * Updates a record with a set of properties.

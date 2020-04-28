@@ -21,9 +21,9 @@ export type NodeMap<T> = Record<string, T>;
 
 export interface Node<T> {
   key: string;
-  value: T;
   next: Node<T> | null;
   previous: Node<T> | null;
+  value: T;
 }
 
 export class LRUCache<T> {

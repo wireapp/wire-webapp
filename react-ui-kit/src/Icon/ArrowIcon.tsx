@@ -22,9 +22,9 @@ import {jsx} from '@emotion/core';
 import {SVGIcon, SVGIconProps} from './SVGIcon';
 
 export interface Rotation {
-  right: number;
   down: number;
   left: number;
+  right: number;
   up: number;
 }
 

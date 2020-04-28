@@ -227,7 +227,7 @@ export class ConversationService {
     plainTextArray: Uint8Array,
   ): Promise<NewOTRMessage> {
     if (error.response?.status === StatusCode.PRECONDITION_FAILED) {
-      const {missing, deleted}: {missing: UserClients; deleted: UserClients} = error.response.data;
+      const {missing, deleted}: {deleted: UserClients; missing: UserClients} = error.response.data;
 
       const deletedUserIds = Object.keys(deleted);
       const missingUserIds = Object.keys(missing);

@@ -23,8 +23,8 @@ export enum DatabaseStores {
   AMPLIFY = 'amplify',
   CLIENTS = 'clients',
   KEYS = 'keys',
-  SESSIONS = 'sessions',
   PRE_KEYS = 'prekeys',
+  SESSIONS = 'sessions',
 }
 
 export class CryptographyDatabaseRepository {

@@ -18,11 +18,11 @@
  */
 
 export interface RichInfoField {
-  value: string;
   type: string;
+  value: string;
 }
 
 export interface RichInfo {
-  version: number;
   fields: RichInfoField[];
+  version: number;
 }

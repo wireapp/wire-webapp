@@ -18,6 +18,6 @@
  */
 
 export interface VerifyDelete {
-  key: string;
   code: string;
+  key: string;
 }

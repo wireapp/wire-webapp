@@ -21,8 +21,8 @@ import {Picture, SSOSignature} from '../self/';
 import {User} from '../user/';
 
 export enum ManagedSource {
-  WIRE = 'wire',
   SCIM = 'scim',
+  WIRE = 'wire',
 }
 
 export interface Self extends User {

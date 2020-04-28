@@ -14,6 +14,7 @@
     "eslint-plugin-react": ">=7",
     "eslint-plugin-react-hooks": ">=2",
     "eslint-plugin-sort-keys-fix": ">=1",
+    "eslint-plugin-typescript-sort-keys": ">=0",
     "prettier": ">=1.19"
   },
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/eslint-config",
