@@ -25,8 +25,8 @@ export interface FileContent {
 
 export interface FileMetaDataContent {
   audio?: AudioMetaData;
-  name: string;
   length: number;
+  name: string;
   type: string;
   video?: VideoMetaData;
 }
