@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.9.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.9.0...@wireapp/api-client@11.9.1) (2020-04-28)
+
+
+### Bug Fixes
+
+* **eslint-config:** Add some comments back ([#2985](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2985)) ([0abf317](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/0abf317459fe36fe6ffba0ac25f00a9975421f73))
+
+
+
+
+
 # [11.9.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.8.5...@wireapp/api-client@11.9.0) (2020-04-28)
 
 
