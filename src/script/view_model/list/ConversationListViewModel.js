@@ -35,7 +35,7 @@ import {storeValue, loadValue} from '../../util/StorageUtil';
 import 'Components/legalHoldDot';
 import 'Components/availabilityState';
 import 'Components/list/groupedConversations';
-import {StorageKey} from 'src/script/storage';
+import {StorageKey} from '../../storage';
 
 export class ConversationListViewModel {
   /**
