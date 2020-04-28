@@ -17,60 +17,77 @@
  *
  */
 
+/* eslint-disable typescript-sort-keys/string-enum */
+
 /**
  * @note Backend error labels are defined by the backend team and their source code.
  * @see https://github.com/wireapp/wire-server/blob/master/services/galley/src/Galley/API/Error.hs
  */
-
 export enum BackendErrorLabel {
   ACCESS_DENIED = 'access-denied',
   BAD_REQUEST = 'bad-request',
-  BINDING_EXISTS = 'binding-exists',
-  BINDING_TEAM = 'binding-team',
-  BLACKLISTED_EMAIL = 'blacklisted-email',
-  BLACKLISTED_PHONE = 'blacklisted-phone',
   CLIENT_ERROR = 'client-error',
-  CUSTOM_BACKEND_NOT_FOUND = 'custom-backend-not-found',
-  EXPIRED_CARD = 'expired_card',
-  HANDLE_EXISTS = 'handle-exists',
   INSUFFICIENT_PERMISSIONS = 'insufficient-permissions',
   INTERNAL_ERROR = 'internal-error',
-  INVALID_CODE = 'invalid-code',
-  INVALID_CREDENTIALS = 'invalid-credentials',
-  INVALID_EMAIL = 'invalid-email',
-  INVALID_HANDLE = 'invalid-handle',
-  INVALID_INVITATION_CODE = 'invalid-invitation-code',
   INVALID_OPERATION = 'invalid-op',
   INVALID_PAYLOAD = 'invalid-payload',
   INVALID_PERMISSIONS = 'invalid-permissions',
+  NOT_FOUND = 'not-found',
+  OPERATION_DENIED = 'operation-denied',
+  QUEUE_FULL = 'queue-full',
+  UNAUTHORIZED = 'unauthorized',
+
+  // Authentication errors
+  BLACKLISTED_EMAIL = 'blacklisted-email',
+  BLACKLISTED_PHONE = 'blacklisted-phone',
+  INVALID_CODE = 'invalid-code',
+  INVALID_CREDENTIALS = 'invalid-credentials',
+  INVALID_EMAIL = 'invalid-email',
+  INVALID_INVITATION_CODE = 'invalid-invitation-code',
   INVALID_PHONE = 'invalid-phone',
-  INVALID_TEAM_STATUS_UPDATE = 'invalid-team-status-update',
-  INVITE_EMAIL_EXISTS = 'email-exists',
   KEY_EXISTS = 'key-exists',
   MISSING_AUTH = 'missing-auth',
-  NON_BINDING_TEAM = 'non-binding-team',
-  NON_BINDING_TEAM_MEMBERS = 'non-binding-team-members',
-  NOT_CONNECTED = 'not-connected',
-  NOT_FOUND = 'not-found',
-  NO_ADD_TO_MANAGED = 'no-add-to-managed',
-  NO_CONVERSATION = 'no-conversation',
-  NO_CONVERSATION_CODE = 'no-conversation-code',
-  NO_MANAGED_CONVERSATION = 'no-managed-team-conv',
-  NO_OTHER_OWNER = 'no-other-owner',
-  NO_SELF_DELETE_FOR_TEAM_OWNER = 'no-self-delete-for-team-owner',
-  NO_TEAM = 'no-team',
-  NO_TEAM_MEMBER = 'no-team-member',
-  OPERATION_DENIED = 'operation-denied',
   PASSWORD_EXISTS = 'password-exists',
   PENDING_ACTIVATION = 'pending-activation',
   PENDING_LOGIN = 'pending-login',
-  QUEUE_FULL = 'queue-full',
   SUSPENDED_ACCOUNT = 'suspended',
+
+  // Client errors
   TOO_MANY_CLIENTS = 'too-many-clients',
-  TOO_MANY_MEMBERS = 'too-many-members',
-  TOO_MANY_TEAM_MEMBERS = 'too-many-team-members',
-  UNAUTHORIZED = 'unauthorized',
   UNKNOWN_CLIENT = 'unknown-client',
+
+  // Conversation errors
+  TOO_MANY_MEMBERS = 'too-many-members',
+  NO_CONVERSATION = 'no-conversation',
+  NO_CONVERSATION_CODE = 'no-conversation-code',
+  NOT_CONNECTED = 'not-connected',
+
+  // Handle errors
+  HANDLE_EXISTS = 'handle-exists',
+  INVALID_HANDLE = 'invalid-handle',
+
+  // Team errors
+  /** @deprecated */
+  NO_OTHER_OWNER = 'no-other-owner',
+  /** This error is thrown when an owner tries to delete themself */
+  NO_SELF_DELETE_FOR_TEAM_OWNER = 'no-self-delete-for-team-owner',
+  NO_TEAM = 'no-team',
+  NO_TEAM_MEMBER = 'no-team-member',
+  TOO_MANY_TEAM_MEMBERS = 'too-many-team-members',
+  INVITE_EMAIL_EXISTS = 'email-exists',
+  BINDING_EXISTS = 'binding-exists',
+  BINDING_TEAM = 'binding-team',
+  NON_BINDING_TEAM = 'non-binding-team',
+  NON_BINDING_TEAM_MEMBERS = 'non-binding-team-members',
+  INVALID_TEAM_STATUS_UPDATE = 'invalid-team-status-update',
+  NO_MANAGED_CONVERSATION = 'no-managed-team-conv',
+  NO_ADD_TO_MANAGED = 'no-add-to-managed',
+
+  // Payment errors
+  EXPIRED_CARD = 'expired_card',
+
+  // Domain errors
+  CUSTOM_BACKEND_NOT_FOUND = 'custom-backend-not-found',
 }
 
 export enum SyntheticErrorLabel {
