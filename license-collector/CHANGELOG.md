@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# 0.7.0 (2020-04-28)
+
+
+### Features
+
+* **eslint-config:** Add eslint-plugin-typescript-sort-keys plugin (WEBAPP-6829) ([#2983](https://github.com/wireapp/wire-web-packages/tree/master/packages/license-collector/issues/2983)) ([0e177e6](https://github.com/wireapp/wire-web-packages/tree/master/packages/license-collector/commit/0e177e65b789e49d7187bcaffb6e375b8818d21b))
+
+
+
+
+
 ## [0.6.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/license-collector/compare/@wireapp/license-collector@0.6.0...@wireapp/license-collector@0.6.1) (2020-04-08)
 
 **Note:** Version bump only for package @wireapp/license-collector

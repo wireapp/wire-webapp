@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [16.7.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@16.6.14...@wireapp/core@16.7.0) (2020-04-28)
+
+
+### Features
+
+* **eslint-config:** Add eslint-plugin-typescript-sort-keys plugin (WEBAPP-6829) ([#2983](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/2983)) ([0e177e6](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/0e177e65b789e49d7187bcaffb6e375b8818d21b))
+
+
+
+
+
 ## [16.6.14](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@16.6.13...@wireapp/core@16.6.14) (2020-04-27)
 
 **Note:** Version bump only for package @wireapp/core

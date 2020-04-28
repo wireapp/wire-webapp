@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/changelog-bot/compare/@wireapp/changelog-bot@4.0.113...@wireapp/changelog-bot@4.1.0) (2020-04-28)
+
+
+### Features
+
+* **eslint-config:** Add eslint-plugin-typescript-sort-keys plugin (WEBAPP-6829) ([#2983](https://github.com/wireapp/wire-web-packages/tree/master/packages/changelog-bot/issues/2983)) ([0e177e6](https://github.com/wireapp/wire-web-packages/tree/master/packages/changelog-bot/commit/0e177e65b789e49d7187bcaffb6e375b8818d21b))
+
+
+
+
+
 ## [4.0.113](https://github.com/wireapp/wire-web-packages/tree/master/packages/changelog-bot/compare/@wireapp/changelog-bot@4.0.112...@wireapp/changelog-bot@4.0.113) (2020-04-27)
 
 **Note:** Version bump only for package @wireapp/changelog-bot

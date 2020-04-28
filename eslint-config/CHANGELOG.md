@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# 1.5.0 (2020-04-28)
+
+
+### Features
+
+* **eslint-config:** Add eslint-plugin-typescript-sort-keys plugin (WEBAPP-6829) ([#2983](https://github.com/wireapp/wire-web-packages/tree/master/packages/eslint-config/issues/2983)) ([0e177e6](https://github.com/wireapp/wire-web-packages/tree/master/packages/eslint-config/commit/0e177e65b789e49d7187bcaffb6e375b8818d21b))
+
+
+
+
+
 # 1.4.0 (2020-01-08)
 
 

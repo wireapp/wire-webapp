@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.5.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@4.4.0...@wireapp/store-engine@4.5.0) (2020-04-28)
+
+
+### Features
+
+* **eslint-config:** Add eslint-plugin-typescript-sort-keys plugin (WEBAPP-6829) ([#2983](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/issues/2983)) ([0e177e6](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/commit/0e177e65b789e49d7187bcaffb6e375b8818d21b))
+
+
+
+
+
 # 4.4.0 (2020-04-23)
 
 

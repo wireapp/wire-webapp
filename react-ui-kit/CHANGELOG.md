@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.28.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.27.1...@wireapp/react-ui-kit@7.28.0) (2020-04-28)
+
+
+### Features
+
+* **eslint-config:** Add eslint-plugin-typescript-sort-keys plugin (WEBAPP-6829) ([#2983](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/2983)) ([0e177e6](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/0e177e65b789e49d7187bcaffb6e375b8818d21b))
+
+
+
+
+
 ## [7.27.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.27.0...@wireapp/react-ui-kit@7.27.1) (2020-04-23)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit

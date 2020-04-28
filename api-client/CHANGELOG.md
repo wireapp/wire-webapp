@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.9.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.8.5...@wireapp/api-client@11.9.0) (2020-04-28)
+
+
+### Features
+
+* **eslint-config:** Add eslint-plugin-typescript-sort-keys plugin (WEBAPP-6829) ([#2983](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2983)) ([0e177e6](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/0e177e65b789e49d7187bcaffb6e375b8818d21b))
+
+
+
+
+
 ## [11.8.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.8.4...@wireapp/api-client@11.8.5) (2020-04-27)
 
 **Note:** Version bump only for package @wireapp/api-client
