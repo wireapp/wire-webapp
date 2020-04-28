@@ -30,10 +30,12 @@ import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
 import {ContentViewModel} from '../ContentViewModel';
 import {generateConversationUrl} from '../../router/routeGenerator';
+import {storeValue, loadValue} from '../../util/StorageUtil';
 
 import 'Components/legalHoldDot';
 import 'Components/availabilityState';
 import 'Components/list/groupedConversations';
+import {StorageKey} from 'src/script/storage';
 
 export class ConversationListViewModel {
   /**
@@ -123,15 +125,19 @@ export class ConversationListViewModel {
       return this.preferenceNotificationRepository.notifications().length > 0;
     });
 
-    this.showRecentConversations = ko.observable(true);
+    const showRecentConversationsValue = loadValue(StorageKey.VIEW.RECENT_CONVERSATIONS);
+    this.showRecentConversations = ko.observable(
+      showRecentConversationsValue === undefined ? true : showRecentConversationsValue,
+    );
     // TODO: Rename "expandedFolders" to "expandedFolderIds"
     this.expandedFolders = ko.observableArray([]);
 
-    this.showRecentConversations.subscribe(() => {
+    this.showRecentConversations.subscribe(value => {
       const conversationList = document.querySelector('.conversation-list');
       if (conversationList) {
         conversationList.scrollTop = 0;
       }
+      storeValue(StorageKey.VIEW.RECENT_CONVERSATIONS, value);
     });
 
     this.conversationRepository.active_conversation.subscribe(activeConversation => {
