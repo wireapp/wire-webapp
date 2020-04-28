@@ -26,7 +26,7 @@
     "@types/jasmine": "3.5.9",
     "@types/karma": "4.4.0",
     "@types/react": "16.9.19",
-    "@types/react-dom": "16.9.5",
+    "@types/react-dom": "16.9.7",
     "@types/ws": "7.2.3",
     "@wireapp/react-ui-kit": "7.28.0",
     "@wireapp/store-engine": "4.5.0",
