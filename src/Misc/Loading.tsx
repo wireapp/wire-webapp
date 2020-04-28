@@ -24,9 +24,9 @@ import {COLOR} from '../Identity';
 import {ANIMATION, DURATION} from '../Identity/motions';
 
 export interface LoadingProps<T = SVGSVGElement> extends React.SVGProps<T> {
+  color?: string;
   progress?: number;
   size?: number;
-  color?: string;
 }
 
 export const Loading = ({progress = undefined, size = 43, color = '#218fd1', ...props}: LoadingProps) => {

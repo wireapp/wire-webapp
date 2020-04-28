@@ -26,8 +26,8 @@ import {filterProps} from '../util';
 export interface FlexBoxProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   align?: string;
   column?: boolean;
-  justify?: string;
   flexWrap?: FlexWrapProperty;
+  justify?: string;
 }
 
 export const flexBoxStyle: <T>(props: FlexBoxProps<T>) => ObjectInterpolation<undefined> = ({

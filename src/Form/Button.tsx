@@ -28,9 +28,9 @@ import {filterProps} from '../util';
 
 export interface ButtonProps<T = HTMLButtonElement> extends TextProps<T> {
   backgroundColor?: string;
+  loadingColor?: string;
   noCapital?: boolean;
   showLoading?: boolean;
-  loadingColor?: string;
 }
 
 export const buttonStyle: <T>(theme: Theme, props: ButtonProps<T>) => ObjectInterpolation<undefined> = (

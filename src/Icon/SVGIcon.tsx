@@ -23,16 +23,16 @@ import React from 'react';
 import {Theme} from '../Layout';
 
 export interface InternalSVGIconProps<T = SVGSVGElement> extends SVGIconProps<T> {
-  realWidth: number;
   realHeight: number;
+  realWidth: number;
 }
 
 export interface SVGIconProps<T = SVGSVGElement> extends React.SVGProps<T> {
   color?: string;
   height?: number;
   scale?: number;
-  width?: number;
   shadow?: boolean;
+  width?: number;
 }
 
 const svgIconStyle: <T>(theme: Theme, props: SVGIconProps<T>) => ObjectInterpolation<undefined> = (
