@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.6.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/eslint-config/compare/@wireapp/eslint-config@1.5.0...@wireapp/eslint-config@1.6.0) (2020-04-28)
+
+
+### Features
+
+* **eslint-config:** Don't prefer uppercase when sorting ([#2986](https://github.com/wireapp/wire-web-packages/tree/master/packages/eslint-config/issues/2986)) ([3d71f5d](https://github.com/wireapp/wire-web-packages/tree/master/packages/eslint-config/commit/3d71f5d7f65b5d79e18b75be7ea22092dbb40e3e))
+
+
+
+
+
 # 1.5.0 (2020-04-28)
 
 

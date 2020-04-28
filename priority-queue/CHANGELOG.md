@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# 1.6.0 (2020-04-28)
+
+
+### Features
+
+* **proteus:** Use libsodium for key conversion (WEBAPP-6791) ([#2104](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/issues/2104)) ([c3fc637](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/commit/c3fc63764c850364ec4439d4767ca7ab415cf17a))
+
+
+
+
+
 ## 1.5.7 (2020-04-08)
 
 

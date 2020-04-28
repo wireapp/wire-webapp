@@ -2,7 +2,7 @@
   "dependencies": {
     "@emotion/core": "10.0.28",
     "@types/color": "3.0.1",
-    "bazinga64": "5.7.0",
+    "bazinga64": "5.7.1",
     "color": "3.1.2",
     "emotion-normalize": "10.1.0",
     "emotion-theming": "10.0.27",
@@ -65,5 +65,5 @@
     "test:update": "yarn test --updateSnapshot",
     "test:project": "yarn dist && yarn test"
   },
-  "version": "7.28.1"
+  "version": "7.28.2"
 }
