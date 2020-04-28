@@ -126,9 +126,7 @@ export class ConversationListViewModel {
     });
 
     const showRecentConversationsValue = loadValue(StorageKey.VIEW.RECENT_CONVERSATIONS);
-    this.showRecentConversations = ko.observable(
-      showRecentConversationsValue === undefined ? true : showRecentConversationsValue,
-    );
+    this.showRecentConversations = ko.observable(showRecentConversationsValue ?? true);
     // TODO: Rename "expandedFolders" to "expandedFolderIds"
     this.expandedFolders = ko.observableArray([]);
 
