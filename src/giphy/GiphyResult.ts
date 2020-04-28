@@ -22,9 +22,9 @@ import {GiphyImage} from './GiphyImage';
 export interface GiphyResult {
   data: GiphyImage;
   meta: {
-    status: number;
     msg: string;
     response_id: string;
+    status: number;
   };
 }
 

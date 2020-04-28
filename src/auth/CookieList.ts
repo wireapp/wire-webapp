@@ -24,10 +24,10 @@ export interface BackendCookie {
   expires: string;
   /**  The primary cookie identifier */
   id: number;
-  /**  The cookie's type = ['session', 'persistent'] */
-  type: 'session' | 'persistent';
   /**  The cookie's label */
   label: string;
+  /**  The cookie's type = ['session', 'persistent'] */
+  type: 'session' | 'persistent';
 }
 
 export interface CookieList {

@@ -28,12 +28,12 @@ enum PaymentStripeChargeStatus {
 }
 
 export interface PaymentStripeCharge {
-  id: string;
   amount: number;
   created: number;
   currency: SupportedCurrency;
   failureCode: string;
   failureMessage: string;
+  id: string;
   invoice: string;
   livemode: boolean;
   paid: boolean;

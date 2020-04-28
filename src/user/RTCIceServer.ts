@@ -18,7 +18,7 @@
  */
 
 export interface RTCIceServer {
-  urls: string[];
   credential: string;
+  urls: string[];
   username: string;
 }

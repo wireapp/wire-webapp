@@ -290,7 +290,7 @@ export class UserAPI {
   public async getUsers(parameters: {ids: string[]}, limit?: number): Promise<User[]>;
   public async getUsers(parameters: {handles: string[]}, limit?: number): Promise<User[]>;
   public async getUsers(
-    parameters: {ids?: string[]; handles?: string[]},
+    parameters: {handles?: string[]; ids?: string[]},
     limit: number = UserAPI.DEFAULT_USERS_CHUNK_SIZE,
   ): Promise<User[]> {
     const {handles, ids} = parameters;

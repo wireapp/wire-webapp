@@ -21,7 +21,7 @@ import {PreKey} from '../../auth';
 
 export interface UserLegalHoldRequestData {
   client: string;
-  last_prekey: PreKey;
   /** The ID of the user that is targeted (formally `target_user`) */
   id: string;
+  last_prekey: PreKey;
 }

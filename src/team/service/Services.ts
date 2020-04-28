@@ -20,6 +20,6 @@
 import {Service} from './Service';
 
 export interface Services {
-  services: Service[];
   has_more: boolean;
+  services: Service[];
 }

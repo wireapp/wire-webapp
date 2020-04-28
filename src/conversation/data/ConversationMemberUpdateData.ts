@@ -29,10 +29,10 @@ export interface ConversationMemberUpdateData extends Partial<ConversationOtherM
   otr_archived?: boolean;
   /** A reference point for (un)archiving */
   otr_archived_ref?: string;
-  /** A reference point for (un)muting */
-  otr_muted_ref?: string | null;
   /** Whether to notify on conversation updates for this user */
   otr_muted?: boolean | null;
+  /** A reference point for (un)muting */
+  otr_muted_ref?: string | null;
   otr_muted_status?: MutedStatus | null;
 }
 

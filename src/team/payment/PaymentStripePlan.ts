@@ -21,9 +21,9 @@
 import {PaymentInterval, SupportedCurrency} from '../payment/';
 
 export interface PaymentStripePlan {
-  id: string;
   amount: number;
   currency: SupportedCurrency;
+  id: string;
   interval: PaymentInterval;
   name: string;
   trialPeriodDays: number;

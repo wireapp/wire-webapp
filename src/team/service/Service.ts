@@ -20,12 +20,12 @@
 import {UserAsset} from '../../user/';
 
 export interface Service {
+  assets: UserAsset[];
+  description: string;
+  enabled: boolean;
   id: string;
   name: string;
   provider: string;
   summary: string;
-  description: string;
-  assets: UserAsset[];
   tags: string[];
-  enabled: boolean;
 }

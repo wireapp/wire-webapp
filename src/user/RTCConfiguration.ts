@@ -20,6 +20,6 @@
 import {RTCIceServer} from '../user/';
 
 export interface RTCConfiguration {
-  ttl: number;
   ice_servers: RTCIceServer[];
+  ttl: number;
 }

@@ -19,7 +19,7 @@
 
 export enum PaymentInterval {
   DAY = 'day',
-  WEEK = 'week',
   MONTH = 'month',
+  WEEK = 'week',
   YEAR = 'year',
 }

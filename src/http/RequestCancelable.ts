@@ -18,6 +18,6 @@
  */
 
 export interface RequestCancelable<T> {
-  response: Promise<T>;
   cancel: () => void;
+  response: Promise<T>;
 }

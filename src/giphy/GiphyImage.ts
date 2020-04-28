@@ -33,8 +33,8 @@ export interface ImageGifMeta {
 }
 
 export interface ImageWebPMeta {
-  webp_size: string;
   webp: string;
+  webp_size: string;
 }
 
 export interface GiphyImage {
