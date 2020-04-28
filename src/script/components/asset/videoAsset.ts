@@ -28,8 +28,8 @@ import {File as FileAsset} from '../../entity/message/File';
 import {AbstractAssetTransferStateTracker} from './AbstractAssetTransferStateTracker';
 
 interface Params {
-  message: ContentMessage;
   isQuote: boolean;
+  message: ContentMessage;
 }
 
 class VideoAssetComponent extends AbstractAssetTransferStateTracker {

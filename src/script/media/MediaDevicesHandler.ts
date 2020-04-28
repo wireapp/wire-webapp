@@ -177,8 +177,8 @@ export class MediaDevicesHandler {
   private filterMediaDevices(
     mediaDevices: MediaDeviceInfo[],
   ): {
-    microphones: MediaDeviceInfo[];
     cameras: MediaDeviceInfo[];
+    microphones: MediaDeviceInfo[];
     speakers: MediaDeviceInfo[];
   } {
     const videoInputDevices: MediaDeviceInfo[] = mediaDevices.filter(

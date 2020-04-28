@@ -20,8 +20,8 @@
 import ko from 'knockout';
 
 interface InputLevelParams {
-  level: ko.Observable<number>;
   disabled: ko.Observable<boolean>;
+  level: ko.Observable<number>;
 }
 
 class InputLevel {

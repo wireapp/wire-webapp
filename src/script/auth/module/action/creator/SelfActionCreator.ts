@@ -21,33 +21,33 @@ import {Consent, Self} from '@wireapp/api-client/dist/self';
 import {AppAction} from '.';
 
 export enum SELF_ACTION {
+  CONSENT_GET_FAILED = 'CONSENT_GET_FAILED',
   CONSENT_GET_START = 'CONSENT_GET_START',
   CONSENT_GET_SUCCESS = 'CONSENT_GET_SUCCESS',
-  CONSENT_GET_FAILED = 'CONSENT_GET_FAILED',
 
+  CONSENT_SET_FAILED = 'CONSENT_SET_FAILED',
   CONSENT_SET_START = 'CONSENT_SET_START',
   CONSENT_SET_SUCCESS = 'CONSENT_SET_SUCCESS',
-  CONSENT_SET_FAILED = 'CONSENT_SET_FAILED',
 
+  HANDLE_SET_FAILED = 'HANDLE_SET_FAILED',
   HANDLE_SET_START = 'HANDLE_SET_START',
   HANDLE_SET_SUCCESS = 'HANDLE_SET_SUCCESS',
-  HANDLE_SET_FAILED = 'HANDLE_SET_FAILED',
 
+  SELF_FETCH_FAILED = 'SELF_FETCH_FAILED',
   SELF_FETCH_START = 'SELF_FETCH_START',
   SELF_FETCH_SUCCESS = 'SELF_FETCH_SUCCESS',
-  SELF_FETCH_FAILED = 'SELF_FETCH_FAILED',
 
-  SELF_SET_PASSWORD_START = 'SELF_SET_PASSWORD_START',
-  SELF_SET_PASSWORD_SUCCESS = 'SELF_SET_PASSWORD_SUCCESS',
+  SELF_SET_EMAIL_FAILED = 'SELF_SET_EMAIL_FAILED',
+  SELF_SET_EMAIL_START = 'SELF_SET_EMAIL_START',
+  SELF_SET_EMAIL_SUCCESS = 'SELF_SET_EMAIL_SUCCESS',
+
   SELF_SET_PASSWORD_FAILED = 'SELF_SET_PASSWORD_FAILED',
+  SELF_SET_PASSWORD_START = 'SELF_SET_PASSWORD_START',
+  SELF_SET_PASSWORD_STATE_FAILED = 'SELF_SET_PASSWORD_STATE_FAILED',
 
   SELF_SET_PASSWORD_STATE_START = 'SELF_SET_PASSWORD_STATE_START',
   SELF_SET_PASSWORD_STATE_SUCCESS = 'SELF_SET_PASSWORD_STATE_SUCCESS',
-  SELF_SET_PASSWORD_STATE_FAILED = 'SELF_SET_PASSWORD_STATE_FAILED',
-
-  SELF_SET_EMAIL_START = 'SELF_SET_EMAIL_START',
-  SELF_SET_EMAIL_SUCCESS = 'SELF_SET_EMAIL_SUCCESS',
-  SELF_SET_EMAIL_FAILED = 'SELF_SET_EMAIL_FAILED',
+  SELF_SET_PASSWORD_SUCCESS = 'SELF_SET_PASSWORD_SUCCESS',
 }
 
 export type SelfActions =
@@ -81,8 +81,8 @@ export interface SetHandleSuccessAction extends AppAction {
   readonly type: SELF_ACTION.HANDLE_SET_SUCCESS;
 }
 export interface SetHandleFailedAction extends AppAction {
-  readonly type: SELF_ACTION.HANDLE_SET_FAILED;
   readonly error: Error;
+  readonly type: SELF_ACTION.HANDLE_SET_FAILED;
 }
 
 export interface SetPasswordStateStartAction extends AppAction {
@@ -93,8 +93,8 @@ export interface SetPasswordStateSuccessAction extends AppAction {
   readonly type: SELF_ACTION.SELF_SET_PASSWORD_STATE_SUCCESS;
 }
 export interface SetPasswordStateFailedAction extends AppAction {
-  readonly type: SELF_ACTION.SELF_SET_PASSWORD_STATE_FAILED;
   readonly error: Error;
+  readonly type: SELF_ACTION.SELF_SET_PASSWORD_STATE_FAILED;
 }
 
 export interface FetchSelfStartAction extends AppAction {
@@ -105,8 +105,8 @@ export interface FetchSelfSuccessAction extends AppAction {
   readonly type: SELF_ACTION.SELF_FETCH_SUCCESS;
 }
 export interface FetchSelfFailedAction extends AppAction {
-  readonly type: SELF_ACTION.SELF_FETCH_FAILED;
   readonly error: Error;
+  readonly type: SELF_ACTION.SELF_FETCH_FAILED;
 }
 
 export interface GetConsentsStartAction extends AppAction {
@@ -117,8 +117,8 @@ export interface GetConsentsSuccessAction extends AppAction {
   readonly type: SELF_ACTION.CONSENT_GET_SUCCESS;
 }
 export interface GetConsentsFailedAction extends AppAction {
-  readonly type: SELF_ACTION.CONSENT_GET_FAILED;
   readonly error: Error;
+  readonly type: SELF_ACTION.CONSENT_GET_FAILED;
 }
 
 export interface SetConsentStartAction extends AppAction {
@@ -129,8 +129,8 @@ export interface SetConsentSuccessAction extends AppAction {
   readonly type: SELF_ACTION.CONSENT_SET_SUCCESS;
 }
 export interface SetConsentFailedAction extends AppAction {
-  readonly type: SELF_ACTION.CONSENT_SET_FAILED;
   readonly error: Error;
+  readonly type: SELF_ACTION.CONSENT_SET_FAILED;
 }
 
 export interface SetSelfEmailStartAction extends AppAction {
@@ -141,8 +141,8 @@ export interface SetSelfEmailSuccessAction extends AppAction {
   readonly type: SELF_ACTION.SELF_SET_EMAIL_SUCCESS;
 }
 export interface SetSelfEmailFailedAction extends AppAction {
-  readonly type: SELF_ACTION.SELF_SET_EMAIL_FAILED;
   readonly error: Error;
+  readonly type: SELF_ACTION.SELF_SET_EMAIL_FAILED;
 }
 
 export interface SetSelfPasswordStartAction extends AppAction {
@@ -152,8 +152,8 @@ export interface SetSelfPasswordSuccessAction extends AppAction {
   readonly type: SELF_ACTION.SELF_SET_PASSWORD_SUCCESS;
 }
 export interface SetSelfPasswordFailedAction extends AppAction {
-  readonly type: SELF_ACTION.SELF_SET_PASSWORD_FAILED;
   readonly error: Error;
+  readonly type: SELF_ACTION.SELF_SET_PASSWORD_FAILED;
 }
 
 export class SelfActionCreator {

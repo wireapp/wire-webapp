@@ -23,7 +23,6 @@ import {CurrentAvailableDeviceId} from './MediaDevicesHandler';
 import {VIDEO_QUALITY_MODE} from './VideoQualityMode';
 
 interface Config {
-  DEFAULT_DEVICE_ID: string;
   CONSTRAINTS: {
     SCREEN: {
       DESKTOP_CAPTURER: MediaTrackConstraints & {
@@ -34,6 +33,7 @@ interface Config {
     };
     VIDEO: Record<VIDEO_QUALITY_MODE, MediaTrackConstraints> & {PREFERRED_FACING_MODE: string};
   };
+  DEFAULT_DEVICE_ID: string;
 }
 
 export enum ScreensharingMethods {

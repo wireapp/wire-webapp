@@ -28,14 +28,14 @@ import {AbstractAssetTransferStateTracker} from '../AbstractAssetTransferStateTr
 import '../assetLoader';
 
 interface Params {
-  src: HTMLMediaElement;
-  large: boolean;
   asset: FileAsset;
-  uploadProgress: ko.PureComputed<number>;
-  transferState: ko.PureComputed<AssetTransferState>;
-  play?: () => void;
-  pause?: () => void;
   cancel?: () => void;
+  large: boolean;
+  pause?: () => void;
+  play?: () => void;
+  src: HTMLMediaElement;
+  transferState: ko.PureComputed<AssetTransferState>;
+  uploadProgress: ko.PureComputed<number>;
 }
 
 class MediaButtonComponent extends AbstractAssetTransferStateTracker {

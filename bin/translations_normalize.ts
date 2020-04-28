@@ -23,8 +23,8 @@ import authTranslations from '../temp/i18n/src/script/strings.json';
 import webappTranslations from '../resource/translation/en-US.json';
 
 interface Translation {
-  id: string;
   defaultMessage: string;
+  id: string;
 }
 
 type Translations = Record<string, string>;

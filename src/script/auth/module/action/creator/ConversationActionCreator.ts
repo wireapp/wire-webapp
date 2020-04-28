@@ -21,12 +21,12 @@ import {ConversationEvent} from '@wireapp/api-client/dist/event';
 import {AppAction} from '.';
 
 export enum CONVERSATION_ACTION {
+  CONVERSATION_CODE_CHECK_FAILED = 'CONVERSATION_CODE_CHECK_FAILED',
   CONVERSATION_CODE_CHECK_START = 'CONVERSATION_CODE_CHECK_START',
   CONVERSATION_CODE_CHECK_SUCCESS = 'CONVERSATION_CODE_CHECK_SUCCESS',
-  CONVERSATION_CODE_CHECK_FAILED = 'CONVERSATION_CODE_CHECK_FAILED',
+  CONVERSATION_CODE_JOIN_FAILED = 'CONVERSATION_CODE_JOIN_FAILED',
   CONVERSATION_CODE_JOIN_START = 'CONVERSATION_CODE_JOIN_START',
   CONVERSATION_CODE_JOIN_SUCCESS = 'CONVERSATION_CODE_JOIN_SUCCESS',
-  CONVERSATION_CODE_JOIN_FAILED = 'CONVERSATION_CODE_JOIN_FAILED',
 }
 
 export type ConversationActions =
@@ -44,8 +44,8 @@ export interface ConversationCodeCheckSuccessAction extends AppAction {
   readonly type: CONVERSATION_ACTION.CONVERSATION_CODE_CHECK_SUCCESS;
 }
 export interface ConversationCodeCheckFailedAction extends AppAction {
-  readonly type: CONVERSATION_ACTION.CONVERSATION_CODE_CHECK_FAILED;
   readonly error: Error;
+  readonly type: CONVERSATION_ACTION.CONVERSATION_CODE_CHECK_FAILED;
 }
 
 export interface ConversationCodeJoinStartAction extends AppAction {
@@ -56,8 +56,8 @@ export interface ConversationCodeJoinSuccessAction extends AppAction {
   readonly type: CONVERSATION_ACTION.CONVERSATION_CODE_JOIN_SUCCESS;
 }
 export interface ConversationCodeJoinFailedAction extends AppAction {
-  readonly type: CONVERSATION_ACTION.CONVERSATION_CODE_JOIN_FAILED;
   readonly error: Error;
+  readonly type: CONVERSATION_ACTION.CONVERSATION_CODE_JOIN_FAILED;
 }
 
 export class ConversationActionCreator {

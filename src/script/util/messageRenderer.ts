@@ -27,9 +27,9 @@ import {replaceInRange} from './StringUtil';
 import {MentionEntity} from '../message/MentionEntity';
 
 interface MentionText {
+  isSelfMentioned: boolean;
   text: string;
   userId: string;
-  isSelfMentioned: boolean;
 }
 
 interface MarkdownItWithOptions extends MarkdownIt {

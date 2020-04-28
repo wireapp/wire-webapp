@@ -20,8 +20,8 @@
 import ko from 'knockout';
 
 interface LoadingBarParams {
-  progress: ko.Subscribable<number>;
   message: ko.Subscribable<string>;
+  progress: ko.Subscribable<number>;
 }
 
 ko.components.register('loading-bar', {

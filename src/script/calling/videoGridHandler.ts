@@ -25,8 +25,8 @@ let baseGrid: string[] = ['', '', '', ''];
 
 export interface Grid {
   grid: (Participant | null)[];
-  thumbnail: Participant | null;
   hasRemoteVideo: boolean;
+  thumbnail: Participant | null;
 }
 
 /**

@@ -31,15 +31,15 @@ import {WebAppEvents} from '../../event/WebApp';
 import 'Components/calling/deviceToggleButton';
 
 interface Params {
-  videoGrid: ko.Observable<Grid>;
   call: Call;
+  callActions: any;
+  canShareScreen: boolean;
   conversation: ko.Observable<Conversation>;
+  isChoosingScreen: ko.Observable<boolean>;
+  isMuted: ko.Observable<boolean>;
   mediaDevicesHandler: MediaDevicesHandler;
   multitasking: any;
-  canShareScreen: boolean;
-  callActions: any;
-  isMuted: ko.Observable<boolean>;
-  isChoosingScreen: ko.Observable<boolean>;
+  videoGrid: ko.Observable<Grid>;
 }
 
 export class FullscreenVideoCalling {

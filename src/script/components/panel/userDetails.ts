@@ -27,11 +27,11 @@ import {WebAppEvents} from '../../event/WebApp';
 import {amplify} from 'amplify';
 
 interface UserDetailsProps {
-  participant: ko.Observable<User>;
-  isVerified?: ko.PureComputed<boolean>;
   badge?: string;
   isGroupAdmin: boolean;
   isSelfVerified: ko.Subscribable<boolean>;
+  isVerified?: ko.PureComputed<boolean>;
+  participant: ko.Observable<User>;
 }
 
 ko.components.register('panel-user-details', {

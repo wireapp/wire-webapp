@@ -23,12 +23,12 @@ import ko from 'knockout';
 import {Logger, getLogger} from 'Util/Logger';
 
 export interface ServerTimeHandler {
-  logger: Logger;
-  timeOffset: ko.Observable<number>;
   computeTimeOffset: (serverTimeString: string) => void;
   getTimeOffset: () => number;
-  toServerTimestamp: (localTimestamp?: number) => number;
+  logger: Logger;
+  timeOffset: ko.Observable<number>;
   toLocalTimestamp: (serverTimestamp?: number) => number;
+  toServerTimestamp: (localTimestamp?: number) => number;
 }
 
 export const serverTimeHandler: ServerTimeHandler = {

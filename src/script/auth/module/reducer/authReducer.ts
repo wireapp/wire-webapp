@@ -48,10 +48,10 @@ export type AuthState = {
   readonly error: Error;
   readonly fetched: boolean;
   readonly fetching: boolean;
+  readonly fetchingSSOSettings: boolean;
   readonly isAuthenticated: boolean;
   readonly loginData: Partial<LoginData>;
   readonly ssoSettings?: SSOSettings;
-  readonly fetchingSSOSettings: boolean;
 };
 
 export const initialAuthState: AuthState = {

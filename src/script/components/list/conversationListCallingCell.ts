@@ -41,14 +41,14 @@ import {CallActions} from '../../view_model/CallingViewModel';
 
 interface ComponentParams {
   call: Call;
-  conversation: ko.PureComputed<Conversation>;
-  videoGrid: ko.PureComputed<Grid>;
-  callingRepository: CallingRepository;
-  temporaryUserStyle?: boolean;
-  multitasking: any;
   callActions: CallActions;
+  callingRepository: CallingRepository;
+  conversation: ko.PureComputed<Conversation>;
   hasAccessToCamera: ko.Observable<boolean>;
   isSelfVerified: ko.Subscribable<boolean>;
+  multitasking: any;
+  temporaryUserStyle?: boolean;
+  videoGrid: ko.PureComputed<Grid>;
 }
 
 class ConversationListCallingCell {

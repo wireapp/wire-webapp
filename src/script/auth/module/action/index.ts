@@ -38,13 +38,13 @@ export interface ActionRoot {
   cookieAction: CookieAction;
   invitationAction: InvitationAction;
   localStorageAction: LocalStorageAction;
+  navigationAction: NavigationAction;
   notificationAction: NotificationAction;
   runtimeAction: RuntimeAction;
   selfAction: SelfAction;
   userAction: UserAction;
   webSocketAction: WebSocketAction;
   wrapperEventAction: WrapperEventAction;
-  navigationAction: NavigationAction;
 }
 
 export const actionRoot: ActionRoot = {

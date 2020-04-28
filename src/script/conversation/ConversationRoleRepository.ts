@@ -34,15 +34,15 @@ export enum DefaultRole {
 }
 
 export enum Permissions {
-  renameConversation = 'modify_conversation_name',
   addParticipants = 'add_conversation_member',
-  removeParticipants = 'remove_conversation_member',
   changeParticipantRoles = 'modify_other_conversation_member',
+  deleteConversation = 'delete_conversation',
+  leaveConversation = 'leave_conversation',
+  removeParticipants = 'remove_conversation_member',
+  renameConversation = 'modify_conversation_name',
   toggleEphemeralTimer = 'modify_conversation_message_timer',
   toggleGuestsAndServices = 'modify_conversation_access',
   toggleReadReceipts = 'modify_conversation_receipt_mode',
-  deleteConversation = 'delete_conversation',
-  leaveConversation = 'leave_conversation',
 }
 
 const defaultAdminRole: ConversationRole = {

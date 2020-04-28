@@ -28,10 +28,10 @@ export interface Gif {
 }
 
 export interface RandomGifOptions {
-  /** Maximum gif size in bytes. Default is 3 megabytes. */
-  maxSize?: number;
   /** How many retries to get the correct size. Default is 3. */
   maxRetries?: number;
+  /** Maximum gif size in bytes. Default is 3 megabytes. */
+  maxSize?: number;
   /** Search query term or phrase */
   tag: string;
 }
@@ -43,9 +43,9 @@ export interface GetGifOptions {
   number: number;
   /**  Search query term or phrase */
   query: string;
-  results?: number;
   /**  Will return a randomized result. Default is `true`. */
   random?: boolean;
+  results?: number;
   /**  Specify sorting ('relevant' or 'recent'). Default is "relevant". */
   sorting: GiphySorting;
 }

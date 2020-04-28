@@ -20,9 +20,9 @@
 import {TeamInvitation} from '@wireapp/api-client/dist/team';
 
 export enum INVITATION_ACTION {
+  INVITE_ADD_FAILED = 'INVITE_ADD_FAILED',
   INVITE_ADD_START = 'INVITE_ADD_START',
   INVITE_ADD_SUCCESS = 'INVITE_ADD_SUCCESS',
-  INVITE_ADD_FAILED = 'INVITE_ADD_FAILED',
 
   INVITE_RESET_ERROR = 'INVITE_RESET_ERROR',
 }
@@ -37,12 +37,12 @@ export interface AddInviteStartAction {
   type: INVITATION_ACTION.INVITE_ADD_START;
 }
 export interface AddInviteSuccessAction {
-  type: INVITATION_ACTION.INVITE_ADD_SUCCESS;
   payload: {invite: TeamInvitation};
+  type: INVITATION_ACTION.INVITE_ADD_SUCCESS;
 }
 export interface AddInviteFailedAction {
-  type: INVITATION_ACTION.INVITE_ADD_FAILED;
   error: Error;
+  type: INVITATION_ACTION.INVITE_ADD_FAILED;
 }
 
 export interface ResetInviteErrorAction {

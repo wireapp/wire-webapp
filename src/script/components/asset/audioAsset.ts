@@ -28,10 +28,10 @@ import {File as FileAsset} from '../../entity/message/File';
 import {AbstractAssetTransferStateTracker} from './AbstractAssetTransferStateTracker';
 
 interface Params {
-  message: ContentMessage;
-
   /** Does the asset have a visible header? */
   header: boolean;
+
+  message: ContentMessage;
 }
 
 class AudioAssetComponent extends AbstractAssetTransferStateTracker {

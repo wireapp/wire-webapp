@@ -36,15 +36,15 @@ export enum LabelType {
 }
 
 export enum DefaultLabelIds {
-  Groups = 'groups',
   Contacts = 'contacts',
   Favorites = 'favorites',
+  Groups = 'groups',
 }
 
 export interface ConversationLabel {
+  conversations: ko.ObservableArray<Conversation>;
   id: string;
   name: string;
-  conversations: ko.ObservableArray<Conversation>;
   type: LabelType;
 }
 

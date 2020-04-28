@@ -29,9 +29,9 @@ import {APIClientSingleton} from '../../service/APIClientSingleton';
 import {RichProfileRepository} from '../../user/RichProfileRepository';
 
 interface ComponentParams {
-  user: ko.Observable<User>;
   onFieldsLoaded: (richFields: RichInfoField[]) => void;
   richProfileRepository: RichProfileRepository;
+  user: ko.Observable<User>;
 }
 
 class EnrichedFields {

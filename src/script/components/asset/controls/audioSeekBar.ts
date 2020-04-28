@@ -23,11 +23,11 @@ import {interpolate} from 'Util/ArrayUtil';
 import {clamp} from 'Util/NumberUtil';
 
 interface Params {
-  src: HTMLAudioElement;
-  disabled: ko.Subscribable<boolean>;
-
   // TODO: replace with proper Type once they are defined
   asset: any;
+  disabled: ko.Subscribable<boolean>;
+
+  src: HTMLAudioElement;
 }
 
 class AudioSeekBarComponent {

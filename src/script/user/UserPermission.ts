@@ -138,12 +138,12 @@ function publicPermissionsForRole(role: ROLE): number {
  * This object needs to be sorted from the highest priority to the lowest
  */
 export enum ROLE {
-  OWNER = 'z.team.TeamRole.ROLE.OWNER',
   ADMIN = 'z.team.TeamRole.ROLE.ADMIN',
-  MEMBER = 'z.team.TeamRole.ROLE.MEMBER',
-  PARTNER = 'z.team.TeamRole.ROLE.PARTNER',
-  NONE = 'z.team.TeamRole.ROLE.NONE',
   INVALID = 'z.team.TeamRole.ROLE.INVALID',
+  MEMBER = 'z.team.TeamRole.ROLE.MEMBER',
+  NONE = 'z.team.TeamRole.ROLE.NONE',
+  OWNER = 'z.team.TeamRole.ROLE.OWNER',
+  PARTNER = 'z.team.TeamRole.ROLE.PARTNER',
 }
 
 export function roleFromTeamPermissions(permissions: PermissionsData): ROLE {

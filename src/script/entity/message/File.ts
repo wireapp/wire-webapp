@@ -32,8 +32,8 @@ import {AssetType} from '../../assets/AssetType';
 import {AssetUploadFailedReason} from '../../assets/AssetUploadFailedReason';
 
 type AssetMetaData = (ProtobufAsset.IAudioMetaData | ProtobufAsset.IImageMetaData | ProtobufAsset.IVideoMetaData) & {
-  loudness?: number[];
   duration?: number;
+  loudness?: number[];
 };
 
 export class File extends Asset {

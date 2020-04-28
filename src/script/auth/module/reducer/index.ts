@@ -36,9 +36,9 @@ import {SelfState, initialSelfState, selfReducer} from './selfReducer';
 export type Api = {
   actions: ActionRoot;
   apiClient: APIClient;
-  getConfig: () => Configuration;
   cookieStore: CookiesStatic;
   core: Account;
+  getConfig: () => Configuration;
   localStorage: Storage;
 };
 

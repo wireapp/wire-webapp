@@ -18,9 +18,9 @@
  */
 
 interface GiphyImageStill {
+  height: string;
   url: string;
   width: string;
-  height: string;
 }
 
 interface GiphyImageDownsized extends GiphyImageStill {
@@ -41,19 +41,19 @@ interface GiphyImageDownsizedMp4 extends GiphyImageDownsizedWebp {
  * @see https://developers.giphy.com/docs/#images-object
  */
 export interface GiphyImages {
+  downsized: GiphyImageDownsized;
   downsized_large: GiphyImageDownsized;
   downsized_still: GiphyImageStill;
-  downsized: GiphyImageDownsized;
-  fixed_height_downsampled: GiphyImageDownsizedWebp;
-  fixed_height_small_still: GiphyImageStill;
-  fixed_height_small: GiphyImageDownsizedWebp;
-  fixed_height_still: GiphyImageStill;
   fixed_height: GiphyImageDownsizedMp4;
-  fixed_width_downsampled: GiphyImageDownsizedWebp;
-  fixed_width_small_still: GiphyImageStill;
-  fixed_width_small: GiphyImageDownsizedWebp;
-  fixed_width_still: GiphyImageStill;
+  fixed_height_downsampled: GiphyImageDownsizedWebp;
+  fixed_height_small: GiphyImageDownsizedWebp;
+  fixed_height_small_still: GiphyImageStill;
+  fixed_height_still: GiphyImageStill;
   fixed_width: GiphyImageDownsizedMp4;
+  fixed_width_downsampled: GiphyImageDownsizedWebp;
+  fixed_width_small: GiphyImageDownsizedWebp;
+  fixed_width_small_still: GiphyImageStill;
+  fixed_width_still: GiphyImageStill;
   original: GiphyImageDownsizedMp4 & {
     frames: string;
   };
@@ -74,9 +74,9 @@ export interface GiphyGif {
   import_datetime: string;
   rating: string;
   slug: string;
+  source: string;
   source_post_url: string;
   source_tld: string;
-  source: string;
   title: string;
   trending_datetime: string;
   type: string;
@@ -87,12 +87,12 @@ export interface GiphyGif {
 export interface GiphyResult<T> {
   data: T;
   meta: {
-    status: number;
     msg: string;
+    status: number;
   };
   pagination: {
-    total_count: number;
     count: number;
     offset: number;
+    total_count: number;
   };
 }

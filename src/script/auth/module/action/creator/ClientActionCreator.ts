@@ -21,19 +21,19 @@ import {RegisteredClient} from '@wireapp/api-client/dist/client/index';
 import {AppAction} from './index';
 
 export enum CLIENT_ACTION {
-  CLIENTS_FETCH_START = 'CLIENTS_FETCH_START',
-  CLIENTS_FETCH_SUCCESS = 'CLIENTS_FETCH_SUCCESS',
-  CLIENTS_FETCH_FAILED = 'CLIENTS_FETCH_FAILED',
-
-  CLIENT_REMOVE_START = 'CLIENT_REMOVE_START',
-  CLIENT_REMOVE_SUCCESS = 'CLIENT_REMOVE_SUCCESS',
-  CLIENT_REMOVE_FAILED = 'CLIENT_REMOVE_FAILED',
-
+  CLIENT_INIT_FAILED = 'CLIENT_INIT_FAILED',
   CLIENT_INIT_START = 'CLIENT_INIT_START',
   CLIENT_INIT_SUCCESS = 'CLIENT_INIT_SUCCESS',
-  CLIENT_INIT_FAILED = 'CLIENT_INIT_FAILED',
+
+  CLIENT_REMOVE_FAILED = 'CLIENT_REMOVE_FAILED',
+  CLIENT_REMOVE_START = 'CLIENT_REMOVE_START',
+  CLIENT_REMOVE_SUCCESS = 'CLIENT_REMOVE_SUCCESS',
 
   CLIENT_RESET_ERROR = 'CLIENT_RESET_ERROR',
+  CLIENTS_FETCH_FAILED = 'CLIENTS_FETCH_FAILED',
+  CLIENTS_FETCH_START = 'CLIENTS_FETCH_START',
+
+  CLIENTS_FETCH_SUCCESS = 'CLIENTS_FETCH_SUCCESS',
 }
 
 export type ClientActions =
@@ -56,8 +56,8 @@ export interface GetAllClientsSuccessAction extends AppAction {
   readonly type: CLIENT_ACTION.CLIENTS_FETCH_SUCCESS;
 }
 export interface GetAllClientsFailedAction extends AppAction {
-  readonly type: CLIENT_ACTION.CLIENTS_FETCH_FAILED;
   readonly error: Error;
+  readonly type: CLIENT_ACTION.CLIENTS_FETCH_FAILED;
 }
 
 export interface RemoveClientStartAction extends AppAction {
@@ -68,8 +68,8 @@ export interface RemoveClientSuccessAction extends AppAction {
   readonly type: CLIENT_ACTION.CLIENT_REMOVE_SUCCESS;
 }
 export interface RemoveClientFailedAction extends AppAction {
-  readonly type: CLIENT_ACTION.CLIENT_REMOVE_FAILED;
   readonly error: Error;
+  readonly type: CLIENT_ACTION.CLIENT_REMOVE_FAILED;
 }
 
 export interface InitializeClientStartAction extends AppAction {
@@ -83,8 +83,8 @@ export interface InitializeClientSuccessAction extends AppAction {
   readonly type: CLIENT_ACTION.CLIENT_INIT_SUCCESS;
 }
 export interface InitializeClientFailedAction extends AppAction {
-  readonly type: CLIENT_ACTION.CLIENT_INIT_FAILED;
   readonly error: Error;
+  readonly type: CLIENT_ACTION.CLIENT_INIT_FAILED;
 }
 
 export interface ResetClientErrorsAction extends AppAction {

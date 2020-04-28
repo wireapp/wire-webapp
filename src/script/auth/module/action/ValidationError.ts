@@ -18,6 +18,7 @@
  */
 
 interface ErrorTypes {
+  [key: string]: string;
   PATTERN_MISMATCH: string;
   RANGE_OVERFLOW: string;
   RANGE_UNDERFLOW: string;
@@ -25,7 +26,6 @@ interface ErrorTypes {
   TOO_LONG: string;
   TYPE_MISMATCH: string;
   VALUE_MISSING: string;
-  [key: string]: string;
 }
 
 export class ValidationError extends Error {

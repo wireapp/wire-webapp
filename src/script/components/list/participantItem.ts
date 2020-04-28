@@ -30,17 +30,17 @@ import {viewportObserver} from '../../ui/viewportObserver';
 import 'Components/availabilityState';
 
 interface ParticipantItemParams {
-  participant: User | ServiceEntity;
   badge: boolean;
-  mode: UserlistMode;
   canSelect: boolean;
-  isSelected: boolean;
-  showCamera: boolean;
   customInfo: string;
-  hideInfo: boolean;
-  selfInTeam: boolean;
   external: boolean;
+  hideInfo: boolean;
+  isSelected: boolean;
   isSelfVerified: ko.Subscribable<boolean>;
+  mode: UserlistMode;
+  participant: User | ServiceEntity;
+  selfInTeam: boolean;
+  showCamera: boolean;
 }
 
 class ParticipantItem {

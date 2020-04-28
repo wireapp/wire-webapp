@@ -53,7 +53,7 @@ class GroupVideoGrid {
       grid,
       muted,
       selfUserId,
-    }: {minimized: boolean; grid: ko.PureComputed<Grid>; muted: ko.Observable<boolean> | undefined; selfUserId: string},
+    }: {grid: ko.PureComputed<Grid>; minimized: boolean; muted: ko.Observable<boolean> | undefined; selfUserId: string},
     rootElement: HTMLElement,
   ) {
     this.selfUserId = selfUserId;

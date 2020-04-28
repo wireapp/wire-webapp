@@ -31,10 +31,6 @@ export interface ServerConfig {
       ACCOUNT_BASE: string;
       MOBILE_BASE: string;
       PRIVACY_POLICY: string;
-      TEAMS_BASE: string;
-      TERMS_OF_USE_PERSONAL: string;
-      TERMS_OF_USE_TEAMS: string;
-      WEBSITE_BASE: string;
       SUPPORT: {
         BUG_REPORT: string;
         CALLING: string;
@@ -48,6 +44,10 @@ export interface ServerConfig {
         MICROPHONE_ACCESS_DENIED: string;
         SCREEN_ACCESS_DENIED: string;
       };
+      TEAMS_BASE: string;
+      TERMS_OF_USE_PERSONAL: string;
+      TERMS_OF_USE_TEAMS: string;
+      WEBSITE_BASE: string;
     };
     VERSION: string;
   };
@@ -62,8 +62,8 @@ export interface ServerConfig {
     GOOGLE_WEBMASTER_ID: string;
     PORT_HTTP: number;
     ROBOTS: {
-      ALLOWED_HOSTS: string[];
       ALLOW: string;
+      ALLOWED_HOSTS: string[];
       DISALLOW: string;
     };
   };

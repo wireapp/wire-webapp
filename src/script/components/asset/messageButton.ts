@@ -23,10 +23,10 @@ import {noop} from 'Util/util';
 import {CompositeMessage} from '../../entity/message/CompositeMessage';
 
 interface MessageButtonProps {
-  label: string;
   id: string;
-  onClick?: () => void;
+  label: string;
   message: CompositeMessage;
+  onClick?: () => void;
 }
 
 ko.components.register('message-button', {

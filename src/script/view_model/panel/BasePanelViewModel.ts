@@ -36,11 +36,11 @@ export interface PanelViewModelProps {
   onGoBack: () => void;
   onGoToRoot: () => void;
   repositories: {
+    client: ClientRepository;
+    conversation: ConversationRepository;
+    cryptography: CryptographyRepository;
     search: SearchRepository;
     team: TeamRepository;
-    conversation: ConversationRepository;
-    client: ClientRepository;
-    cryptography: CryptographyRepository;
     user: UserRepository;
   };
 }
