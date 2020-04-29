@@ -208,19 +208,27 @@ export class CallingRepository {
         switch (quality) {
           case QUALITY.NORMAL: {
             amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.CALL_QUALITY_POOR);
-            this.logger.log(`Normal call quality in conversation "${conversationId}".`);
+            this.logger.log(
+              `Normal call quality with user "${userId}" and client "${clientId}" in conversation "${conversationId}".`,
+            );
             break;
           }
           case QUALITY.MEDIUM: {
-            this.logger.warn(`Medium call quality in conversation "${conversationId}".`);
+            this.logger.warn(
+              `Medium call quality with user "${userId}" and client "${clientId}" in conversation "${conversationId}".`,
+            );
             break;
           }
           case QUALITY.POOR: {
-            this.logger.warn(`Poor call quality in conversation "${conversationId}".`);
+            this.logger.warn(
+              `Poor call quality with user "${userId}" and client "${clientId}" in conversation "${conversationId}".`,
+            );
             break;
           }
           case QUALITY.NETWORK_PROBLEM: {
-            this.logger.warn(`Network problem during call in conversation "${conversationId}".`);
+            this.logger.warn(
+              `Network problem during call with user "${userId}" and client "${clientId}" in conversation "${conversationId}".`,
+            );
             break;
           }
         }
