@@ -17,24 +17,75 @@
  *
  */
 
-import {getLogger} from 'Util/Logger';
+import ko from 'knockout';
+import {amplify} from 'amplify';
+
+import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {formatDuration} from 'Util/TimeUtil';
 import {removeLineBreaks, sortUsersByPriority} from 'Util/StringUtil';
 
-import 'Components/receiptModeToggle';
-import {BasePanelViewModel} from './BasePanelViewModel';
-
+import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
 import {getNotificationText} from '../../conversation/NotificationSetting';
 import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
 import {WebAppEvents} from '../../event/WebApp';
 import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
+import {IntegrationRepository} from '../../integration/IntegrationRepository';
+import {SearchRepository} from '../../search/SearchRepository';
+import {TeamRepository} from '../../team/TeamRepository';
+import {UserRepository} from '../../user/UserRepository';
+import {ActionsViewModel} from '../ActionsViewModel';
+import {ServiceEntity} from '../../integration/ServiceEntity';
+import {User} from '../../entity/User';
+import {Conversation} from '../../entity/Conversation';
 
+import 'Components/receiptModeToggle';
 import 'Components/panel/panelActions';
 
 export class ConversationDetailsViewModel extends BasePanelViewModel {
+  conversationRepository: ConversationRepository;
+  integrationRepository: IntegrationRepository;
+  searchRepository: SearchRepository;
+  teamRepository: TeamRepository;
+  userRepository: UserRepository;
+  ConversationRepository: typeof ConversationRepository;
+  actionsViewModel: ActionsViewModel;
+  logger: Logger;
+  isActivatedAccount: ko.PureComputed<boolean>;
+  isTeam: ko.PureComputed<boolean>;
+  isTeamOnly: ko.PureComputed<boolean>;
+  serviceParticipants: ko.ObservableArray<ServiceEntity>;
+  userParticipants: ko.ObservableArray<User>;
+  showAllUsersCount: ko.Observable<number>;
+  selectedService: ko.Observable<ServiceEntity>;
+  isSelfVerified: ko.PureComputed<boolean>;
+  firstParticipant: ko.PureComputed<User>;
+  isActiveGroupParticipant: ko.PureComputed<boolean>;
+  isVerified: ko.PureComputed<boolean>;
+  isEditingName: ko.Observable<boolean>;
+  isServiceMode: ko.PureComputed<boolean>;
+  showTopActions: ko.PureComputed<boolean>;
+  showSectionOptions: ko.PureComputed<boolean>;
+  showActionAddParticipants: ko.PureComputed<boolean>;
+  showActionMute: ko.PureComputed<boolean>;
+  showOptionGuests: ko.PureComputed<boolean>;
+  showOptionReadReceipts: ko.PureComputed<boolean>;
+  hasReceiptsEnabled: ko.PureComputed<boolean>;
+  hasAdvancedNotifications: ko.PureComputed<boolean>;
+  showOptionNotificationsGroup: ko.PureComputed<boolean>;
+  showOptionNotifications1To1: ko.PureComputed<boolean>;
+  showOptionTimedMessages: ko.PureComputed<boolean>;
+  canRenameGroup: ko.PureComputed<boolean>;
+  participantsUserText: ko.PureComputed<string>;
+  participantsServiceText: ko.PureComputed<string>;
+  guestOptionsText: ko.PureComputed<string>;
+  notificationStatusText: ko.PureComputed<string>;
+  timedMessagesText: ko.PureComputed<string>;
+  addPeopleTooltip: ko.PureComputed<string>;
+  isSelfGroupAdmin: ko.PureComputed<boolean>;
+
   static get CONFIG() {
     return {
       MAX_USERS_VISIBLE: 7,
@@ -42,7 +93,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     };
   }
 
-  constructor(params) {
+  constructor(params: PanelViewModelProps) {
     super(params);
     this.clickOnShowService = this.clickOnShowService.bind(this);
     this.clickOnShowUser = this.clickOnShowUser.bind(this);
@@ -78,16 +129,16 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
 
     ko.computed(() => {
       if (this.activeConversation()) {
-        const users = [];
-        const services = [];
+        const users: User[] = [];
+        const services: ServiceEntity[] = [];
 
         this.activeConversation()
           .participating_user_ets()
-          .forEach(userEntity => {
-            if (userEntity.isService) {
-              return services.push(userEntity);
+          .forEach((userEntity: ServiceEntity | User) => {
+            if ((userEntity as User).isService) {
+              return services.push(userEntity as ServiceEntity);
             }
-            users.push(userEntity);
+            return users.push(userEntity as User);
           });
 
         this.serviceParticipants(services);
@@ -105,10 +156,6 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
 
     this.firstParticipant = ko.pureComputed(() => this.activeConversation()?.firstUserEntity());
 
-    this.isSingleUserMode = conversationEntity => {
-      return conversationEntity && (conversationEntity.is1to1() || conversationEntity.isRequest());
-    };
-
     this.isActiveGroupParticipant = ko.pureComputed(() => {
       return !!(this.activeConversation()?.isGroup() && !this.activeConversation().removed_from_conversation());
     });
@@ -119,12 +166,12 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
 
     this.isEditingName = ko.observable(false);
 
-    this.isEditingName.subscribe(isEditing => {
+    this.isEditingName.subscribe((isEditing: boolean) => {
       if (isEditing) {
         return window.setTimeout(() => $('.conversation-details__name--input').focus(), 0);
       }
       const name = $('.conversation-details__name--input');
-      $('.conversation-details__name').css('height', `${name.height()}px`);
+      return $('.conversation-details__name').css('height', `${name.height()}px`);
     });
 
     this.isServiceMode = ko.pureComputed(
@@ -216,18 +263,22 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
       this.conversationRepository.conversationRoleRepository.isSelfGroupAdmin(this.activeConversation()),
     );
 
-    this.isServiceMode.subscribe(isService => {
+    this.isServiceMode.subscribe(async (isService: boolean) => {
       if (isService) {
         const entity = this.firstParticipant();
-        this.integrationRepository.getServiceFromUser(entity).then(serviceEntity => {
-          this.selectedService(serviceEntity);
-          this.integrationRepository.addProviderNameToParticipant(serviceEntity);
-        });
+        const serviceEntity = await this.integrationRepository.getServiceFromUser(entity);
+        this.selectedService(serviceEntity);
+        this.integrationRepository.addProviderNameToParticipant(serviceEntity);
       }
     });
   }
 
-  getConversationActions(conversationEntity) {
+  isSingleUserMode = (conversationEntity: Conversation): boolean =>
+    conversationEntity && (conversationEntity.is1to1() || conversationEntity.isRequest());
+
+  getConversationActions(
+    conversationEntity: Conversation,
+  ): {click: () => void; icon: string; identifier: string; label: string}[] {
     if (!conversationEntity) {
       return [];
     }
@@ -238,7 +289,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
 
     const allMenuElements = [
       {
-        condition: () => z.userPermission().canCreateGroupConversation() && is1to1 && !this.isServiceMode(),
+        condition: () => window.z.userPermission().canCreateGroupConversation() && is1to1 && !this.isServiceMode(),
         item: {
           click: () => this.clickOnCreateGroup(),
           icon: 'group-icon',
@@ -312,51 +363,51 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     return allMenuElements.filter(menuElement => menuElement.condition()).map(menuElement => menuElement.item);
   }
 
-  getElementId() {
+  getElementId(): string {
     return 'conversation-details';
   }
 
-  clickOnAddParticipants() {
+  clickOnAddParticipants(): void {
     this.navigateTo(z.viewModel.PanelViewModel.STATE.ADD_PARTICIPANTS);
   }
 
-  clickOnShowAll() {
+  clickOnShowAll(): void {
     this.navigateTo(z.viewModel.PanelViewModel.STATE.CONVERSATION_PARTICIPANTS);
   }
 
-  clickOnCreateGroup() {
+  clickOnCreateGroup(): void {
     amplify.publish(WebAppEvents.CONVERSATION.CREATE_GROUP, 'conversation_details', this.firstParticipant());
   }
 
-  clickOnDevices() {
+  clickOnDevices(): void {
     this.navigateTo(z.viewModel.PanelViewModel.STATE.PARTICIPANT_DEVICES, {entity: this.firstParticipant()});
   }
 
-  clickOnGuestOptions() {
+  clickOnGuestOptions(): void {
     this.navigateTo(z.viewModel.PanelViewModel.STATE.GUEST_OPTIONS);
   }
 
-  clickOnTimedMessages() {
+  clickOnTimedMessages(): void {
     this.navigateTo(z.viewModel.PanelViewModel.STATE.TIMED_MESSAGES);
   }
 
-  clickOnNotifications() {
+  clickOnNotifications(): void {
     this.navigateTo(z.viewModel.PanelViewModel.STATE.NOTIFICATIONS);
   }
 
-  clickOnShowUser(userEntity) {
+  clickOnShowUser(userEntity: User): void {
     this.navigateTo(z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_USER, {entity: userEntity});
   }
 
-  clickOnShowService(serviceEntity) {
+  clickOnShowService(serviceEntity: ServiceEntity): void {
     this.navigateTo(z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE, {entity: serviceEntity});
   }
 
-  clickToArchive() {
+  clickToArchive(): void {
     this.actionsViewModel.archiveConversation(this.activeConversation());
   }
 
-  clickToBlock() {
+  clickToBlock(): void {
     if (this.activeConversation()) {
       const userEntity = this.activeConversation().firstUserEntity();
       const nextConversationEntity = this.conversationRepository.get_next_conversation(this.activeConversation());
@@ -365,7 +416,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     }
   }
 
-  clickToCancelRequest() {
+  clickToCancelRequest(): void {
     if (this.activeConversation()) {
       const userEntity = this.activeConversation().firstUserEntity();
       const nextConversationEntity = this.conversationRepository.get_next_conversation(this.activeConversation());
@@ -374,48 +425,49 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     }
   }
 
-  clickToClear() {
+  clickToClear(): void {
     this.actionsViewModel.clearConversation(this.activeConversation());
   }
 
-  clickToEditGroupName() {
+  clickToEditGroupName(): void {
     if (this.isActiveGroupParticipant()) {
       this.isEditingName(true);
     }
   }
 
-  clickToLeave() {
+  clickToLeave(): void {
     this.actionsViewModel.leaveConversation(this.activeConversation());
   }
 
-  clickToDelete() {
+  clickToDelete(): void {
     this.actionsViewModel.deleteConversation(this.activeConversation());
   }
 
-  clickToToggleMute() {
+  clickToToggleMute(): void {
     this.actionsViewModel.toggleMuteConversation(this.activeConversation());
   }
 
-  renameConversation(data, event) {
+  renameConversation(_: ConversationDetailsViewModel, event: KeyboardEvent): void {
     if (this.activeConversation()) {
+      const target = event.target as HTMLInputElement;
       const currentConversationName = this.activeConversation().display_name().trim();
 
-      const newConversationName = removeLineBreaks(event.target.value.trim());
+      const newConversationName = removeLineBreaks(target.value.trim());
 
       this.isEditingName(false);
       const hasNameChanged = newConversationName.length && newConversationName !== currentConversationName;
       if (hasNameChanged) {
-        event.target.value = currentConversationName;
+        target.value = currentConversationName;
         this.conversationRepository.renameConversation(this.activeConversation(), newConversationName);
       }
     }
   }
 
-  updateConversationReceiptMode(conversationEntity, receiptMode) {
+  updateConversationReceiptMode(conversationEntity: Conversation, receiptMode: any): void {
     this.conversationRepository.updateConversationReceiptMode(conversationEntity, receiptMode);
   }
 
-  initView() {
+  initView(): void {
     if (this.teamRepository.isTeam() && this.isSingleUserMode(this.activeConversation())) {
       this.teamRepository.updateTeamMembersByIds(this.teamRepository.team(), [this.firstParticipant().id], true);
     }
