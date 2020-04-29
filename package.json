@@ -60,6 +60,7 @@
     "@babel/preset-typescript": "7.9.0",
     "@emotion/babel-preset-css-prop": "10.0.27",
     "@hot-loader/react-dom": "16.13.0",
+    "@types/adm-zip": "0.4.33",
     "@types/dexie-batch": "0.4.0",
     "@types/enzyme": "3.10.5",
     "@types/faker": "4.1.11",
@@ -95,6 +96,7 @@
     "@wireapp/copy-config": "1.0.9",
     "@wireapp/eslint-config": "1.4.0",
     "@wireapp/prettier-config": "0.3.0",
+    "adm-zip": "0.4.14",
     "autoprefixer": "9.7.6",
     "babel-eslint": "10.1.0",
     "babel-loader": "8.1.0",
@@ -161,6 +163,7 @@
     "simple-git": "1.132.0",
     "sinon": "9.0.2",
     "snabbdom": "0.7.4",
+    "sort-json": "2.0.0",
     "stylelint": "13.3.3",
     "stylelint-config-idiomatic-order": "8.1.0",
     "stylelint-config-prettier": "8.0.1",
@@ -229,7 +232,8 @@
     "test:types": "tsc --noEmit",
     "translate:extract": "i18next-scanner 'src/{page,script}/**/*.{js,html,htm}'",
     "translate:merge": "yarn bundle:prod && ts-node ./bin/translations_normalize.ts",
-    "translate:upload": "yarn translate:merge && ts-node ./bin/translations_upload.ts"
+    "translate:upload": "yarn translate:merge && ts-node ./bin/translations_upload.ts",
+    "translate:download": "ts-node ./bin/translations_download.ts"
   },
   "version": "0.1.0"
 }
