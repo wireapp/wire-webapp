@@ -54,16 +54,16 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
   teamMembers: ko.PureComputed<User[]>;
   isInitialServiceSearch: ko.Observable<boolean>;
   searchInput: ko.Observable<string>;
-  selectedContacts: ko.ObservableArray<any>;
-  selectedService: ko.Observable<any>;
+  selectedContacts: ko.ObservableArray<User>;
+  selectedService: ko.Observable<ServiceEntity>;
   state: ko.Observable<string>;
   isTeamOnly: ko.PureComputed<boolean>;
   showIntegrations: ko.PureComputed<boolean>;
   enableAddAction: ko.PureComputed<boolean>;
   isStateAddPeople: ko.PureComputed<boolean>;
   isStateAddService: ko.PureComputed<boolean>;
-  contacts: ko.PureComputed<any>;
-  isSearching: ko.PureComputed<any>;
+  contacts: ko.PureComputed<User[]>;
+  isSearching: ko.PureComputed<boolean>;
   headerText: ko.PureComputed<string>;
   manageServicesUrl: string;
   static get STATE() {
@@ -133,7 +133,7 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
       });
     });
 
-    this.isSearching = ko.pureComputed(() => this.searchInput().length);
+    this.isSearching = ko.pureComputed(() => this.searchInput().length > 0);
     this.headerText = ko.pureComputed(() =>
       this.selectedContacts().length
         ? t('addParticipantsHeaderWithCounter', this.selectedContacts().length)
@@ -168,7 +168,7 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
   }
 
   clickToAddParticipants(): void {
-    this._addMembers();
+    this.addMembers();
     this.onGoBack();
   }
 
@@ -194,16 +194,19 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
     }
   };
 
-  async _addMembers(): Promise<void> {
+  private async addMembers(): Promise<void> {
     const activeConversation = this.activeConversation();
     const userEntities = this.selectedContacts().slice();
 
     await this.conversationRepository.addMembers(activeConversation, userEntities);
-    let attributes = {
-      guest_num: undefined as number,
-      is_allow_guests: undefined as boolean,
+    let attributes: {
+      guest_num?: number;
+      is_allow_guests?: boolean;
+      method: string;
+      temporary_guest_num?: number;
+      user_num: number;
+    } = {
       method: 'add',
-      temporary_guest_num: undefined as number,
       user_num: userEntities.length,
     };
 
