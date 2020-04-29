@@ -17,21 +17,72 @@
  *
  */
 
+import {amplify} from 'amplify';
 import ko from 'knockout';
 import {Availability} from '@wireapp/protocol-messaging';
 
 import {t} from 'Util/LocalizerUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {clamp} from 'Util/NumberUtil';
-import {compareTransliteration, startsWith, getFirstChar} from 'Util/StringUtil';
+import {getFirstChar} from 'Util/StringUtil';
 
 import {ACCENT_ID} from '../Config';
 import {ROLE as TEAM_ROLE} from '../user/UserPermission';
 import {WebAppEvents} from '../event/WebApp';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
+import {ClientEntity} from '../client/ClientEntity';
+import {AssetRemoteData} from '../assets/AssetRemoteData';
 
 // Please note: The own user has a "locale"
-class User {
+export class User {
+  private expirationIntervalId?: number;
+  private expirationTimeoutId?: number;
+  private readonly expirationIsUrgent: ko.Observable<boolean>;
+  public id: string;
+  public isDeleted: boolean;
+  public isMe: boolean;
+  public isService: boolean;
+  public isSingleSignOn: boolean;
+  public joaatHash: number;
+  public providerId?: string;
+  public readonly accent_color: ko.PureComputed<string>;
+  public readonly accent_id: ko.Observable<number>;
+  public readonly availability: ko.Observable<Availability.Type>;
+  public readonly connection: ko.Observable<ConnectionEntity>;
+  /** does not include current client/device */
+  public readonly devices: ko.ObservableArray<ClientEntity>;
+  public readonly email: ko.Observable<string>;
+  public readonly expirationRemaining: ko.Observable<number>;
+  public readonly expirationRemainingText: ko.Observable<string>;
+  public readonly expirationText: ko.Observable<string>;
+  public readonly hasPendingLegalHold: ko.PureComputed<boolean>;
+  public readonly initials: ko.PureComputed<string>;
+  public readonly inTeam: ko.Observable<boolean>;
+  public readonly is_verified: ko.PureComputed<boolean>;
+  public readonly isBlocked: ko.PureComputed<boolean>;
+  public readonly isCanceled: ko.PureComputed<boolean>;
+  public readonly isConnected: ko.PureComputed<boolean>;
+  public readonly isExpired: ko.Observable<boolean>;
+  public readonly isGuest: ko.Observable<boolean>;
+  public readonly isIgnored: ko.PureComputed<boolean>;
+  public readonly isIncomingRequest: ko.PureComputed<boolean>;
+  public readonly isOnLegalHold: ko.PureComputed<boolean>;
+  public readonly isOutgoingRequest: ko.PureComputed<boolean>;
+  public readonly isRequest: ko.PureComputed<boolean>;
+  public readonly isTeamMember: ko.Observable<boolean>;
+  public readonly isTemporaryGuest: ko.Observable<boolean>;
+  public readonly isUnknown: ko.PureComputed<boolean>;
+  public readonly managedBy: ko.Observable<string>;
+  public readonly mediumPictureResource: ko.Observable<AssetRemoteData>;
+  public readonly name: ko.Observable<string>;
+  public readonly phone: ko.Observable<string>;
+  public readonly previewPictureResource: ko.Observable<AssetRemoteData>;
+  public readonly providerName: ko.Observable<string>;
+  public readonly teamRole: ko.Observable<TEAM_ROLE>;
+  public readonly username: ko.Observable<string>;
+  public serviceId?: string;
+  public teamId?: string;
+
   static get ACCENT_COLOR() {
     return {
       [ACCENT_ID.BLUE]: '#2391d3',
@@ -58,7 +109,7 @@ class User {
     };
   }
 
-  constructor(id = '') {
+  constructor(id: string = '') {
     this.id = id;
     this.isMe = false;
     this.isService = false;
@@ -115,7 +166,7 @@ class User {
 
     this.isRequest = ko.pureComputed(() => this.connection().isRequest());
 
-    this.devices = ko.observableArray(); // does not include current client/device
+    this.devices = ko.observableArray();
     this.is_verified = ko.pureComputed(() => {
       if (this.devices().length === 0 && !this.isMe) {
         return false;
@@ -144,11 +195,11 @@ class User {
     this.isExpired = ko.observable(false);
   }
 
-  subscribeToChanges() {
+  subscribeToChanges(): void {
     this.availability.subscribe(() => amplify.publish(WebAppEvents.USER.PERSIST, this));
   }
 
-  addClient(new_client_et) {
+  addClient(new_client_et: ClientEntity): boolean {
     for (const client_et of this.devices()) {
       if (client_et.id === new_client_et.id) {
         return false;
@@ -158,32 +209,18 @@ class User {
     this.devices.push(new_client_et);
 
     if (this.isMe) {
-      this.devices.sort((client_a, client_b) => new Date(client_b.time) - new Date(client_a.time));
+      this.devices.sort((client_a, client_b) => new Date(client_b.time).getTime() - new Date(client_a.time).getTime());
     }
 
     return true;
   }
 
-  hasActivatedIdentity() {
-    return this.email() || this.phone() || this.isSingleSignOn;
+  hasActivatedIdentity(): boolean {
+    return !!this.email() || !!this.phone() || this.isSingleSignOn;
   }
 
-  remove_client(client_id) {
+  remove_client(client_id: string): ClientEntity[] {
     return this.devices.remove(client_et => client_et.id === client_id);
-  }
-
-  /**
-   * Check whether handle or name matches the given query
-   * @param {string} query Query
-   * @param {boolean} is_handle Query string is handle
-   * @param {array} excludedChars list of chars to exclude from getSlug
-   * @returns {undefined} No return value
-   */
-  matches(query, is_handle, excludedChars = []) {
-    if (is_handle) {
-      return startsWith(this.username(), query);
-    }
-    return compareTransliteration(this.name(), query, excludedChars) || this.username() === query;
   }
 
   serialize() {
@@ -193,7 +230,7 @@ class User {
     };
   }
 
-  setGuestExpiration(timestamp) {
+  setGuestExpiration(timestamp: number): void {
     if (this.expirationIntervalId) {
       window.clearInterval(this.expirationIntervalId);
       this.expirationIntervalId = undefined;
@@ -213,18 +250,19 @@ class User {
     }, this.expirationRemaining());
   }
 
-  clearExpirationTimeout() {
+  clearExpirationTimeout(): void {
     if (this.expirationTimeoutId) {
       window.clearTimeout(this.expirationTimeoutId);
       this.expirationTimeoutId = undefined;
     }
   }
 
-  checkGuestExpiration() {
+  checkGuestExpiration(): void {
     const checkExpiration = this.isTemporaryGuest() && !this.expirationTimeoutId;
     if (checkExpiration) {
       if (this.isExpired()) {
-        return amplify.publish(WebAppEvents.USER.UPDATE, this.id);
+        amplify.publish(WebAppEvents.USER.UPDATE, this.id);
+        return;
       }
 
       const timeout = this.expirationRemaining() + User.CONFIG.TEMPORARY_GUEST.EXPIRATION_THRESHOLD;
@@ -232,7 +270,7 @@ class User {
     }
   }
 
-  _setRemainingExpirationTime(expirationTime) {
+  _setRemainingExpirationTime(expirationTime: number): void {
     const remainingTime = clamp(expirationTime - Date.now(), 0, User.CONFIG.TEMPORARY_GUEST.LIFETIME);
     const remainingMinutes = Math.ceil(remainingTime / TIME_IN_MILLIS.MINUTE);
 
@@ -253,5 +291,3 @@ class User {
     this.expirationIsUrgent(remainingMinutes < 120);
   }
 }
-
-export {User};
