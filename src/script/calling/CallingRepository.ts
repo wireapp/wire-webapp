@@ -198,7 +198,7 @@ export class CallingRepository {
     const tenSeconds = 10;
     wCall.setNetworkQualityHandler(
       wUser,
-      (conversationId: string, userId: string, quality: number) => {
+      (conversationId: string, userId: string, clientId: string, quality: number) => {
         if (this.callQuality[conversationId] === quality) {
           return;
         }
@@ -217,6 +217,10 @@ export class CallingRepository {
           }
           case QUALITY.POOR: {
             this.logger.warn(`Poor call quality in conversation "${conversationId}".`);
+            break;
+          }
+          case QUALITY.NETWORK_PROBLEM: {
+            this.logger.warn(`Network problem during call in conversation "${conversationId}".`);
             break;
           }
         }
@@ -640,6 +644,7 @@ export class CallingRepository {
     conversationId: ConversationId,
     timestamp: number,
     userId: UserId,
+    clientId: string,
     hasVideo: number,
     shouldRing: number,
   ) => {
