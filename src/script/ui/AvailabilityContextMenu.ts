@@ -17,15 +17,17 @@
  *
  */
 
+import {amplify} from 'amplify';
 import {Availability} from '@wireapp/protocol-messaging';
+
 import {t} from 'Util/LocalizerUtil';
 
 import {WebAppEvents} from '../event/WebApp';
-import {Context} from '../ui/ContextMenu';
+import {Context, ContextMenuEntry} from './ContextMenu';
 
 export const AvailabilityContextMenu = {
-  show: (event, method, elementName) => {
-    const entries = [
+  show: (event: MouseEvent, method: string, elementName: string): void => {
+    const entries: ContextMenuEntry[] = [
       {
         click: () => amplify.publish(WebAppEvents.USER.SET_AVAILABILITY, Availability.Type.NONE, method),
         label: t('userAvailabilityNone'),

@@ -20,6 +20,11 @@
 import keyboardJS from 'keyboardjs';
 
 export class Modal {
+  autoclose: boolean;
+  beforeHideCallback: () => void;
+  hideCallback: () => void;
+  modal: HTMLElement;
+
   static get CLASS() {
     return {
       FADE_IN: 'modal-fadein',
@@ -27,8 +32,7 @@ export class Modal {
     };
   }
 
-  constructor(modal, hideCallback, beforeHideCallback) {
-    this._hide = this._hide.bind(this);
+  constructor(modal: string | HTMLElement, hideCallback: () => void, beforeHideCallback: () => void) {
     this.handleClick = this.handleClick.bind(this);
 
     this.modal = typeof modal === 'string' ? document.querySelector(modal) : modal;
@@ -44,26 +48,26 @@ export class Modal {
     }
   }
 
-  handleClick(event) {
+  handleClick = (event: MouseEvent): void => {
     if (event.target === this.modal) {
       this._hide();
     }
-  }
+  };
 
-  _hide() {
+  _hide = (): void => {
     if (this.autoclose) {
       this.hide();
     }
-  }
+  };
 
-  show() {
+  show(): void {
     if (this.modal) {
       this.modal.classList.add(Modal.CLASS.SHOW);
       setTimeout(() => this.modal.classList.add(Modal.CLASS.FADE_IN), 50);
     }
   }
 
-  hide(callback) {
+  hide(callback?: () => void): void {
     this.callOptional(this.beforeHideCallback);
 
     if (this.modal) {
@@ -78,7 +82,7 @@ export class Modal {
         const totals = delays.map((delay, index) => delay + durations[index]);
         const longestDelay = Math.max(...totals);
 
-        setTimeout(resolve, longestDelay * 1000);
+        window.setTimeout(resolve, longestDelay * 1000);
       });
 
       Promise.race([transitionendPromise, timeoutPromise]).then(() => {
@@ -91,13 +95,13 @@ export class Modal {
     }
   }
 
-  callOptional(fn) {
+  callOptional(fn?: () => void): void {
     if (typeof fn === 'function') {
       return fn();
     }
   }
 
-  toggle() {
+  toggle(): void {
     if (this.isShown()) {
       this.hide();
     } else {
@@ -105,15 +109,15 @@ export class Modal {
     }
   }
 
-  isShown() {
+  isShown(): boolean {
     return !!this.modal && this.modal.classList.contains(Modal.CLASS.SHOW);
   }
 
-  isHidden() {
+  isHidden(): boolean {
     return !this.isShown();
   }
 
-  setAutoclose(autoclose) {
+  setAutoclose(autoclose: boolean): void {
     this.autoclose = autoclose;
   }
 

@@ -1469,6 +1469,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/keyboardjs@2.4.1":
+  version "2.4.1"
+  resolved "https://registry.yarnpkg.com/@types/keyboardjs/-/keyboardjs-2.4.1.tgz#4ab56f9d1cff572677b2a5f8ae665789e5a1c657"
+  integrity sha512-6uy+xVxuK1hlj72Aa2zZ9qioWKmbxm2V0H5mOfW8nck8Mrzx6DF3nz0YIx/CBoHFoT4fxUxQvtMJkv5v9Q1ytQ==
+
 "@types/libsodium-wrappers-sumo@0.7.3":
   version "0.7.3"
   resolved "https://registry.yarnpkg.com/@types/libsodium-wrappers-sumo/-/libsodium-wrappers-sumo-0.7.3.tgz#3ce8c613ee1a05ca47bd20dd2e6009ce114a1a04"

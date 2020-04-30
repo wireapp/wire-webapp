@@ -17,13 +17,17 @@
  *
  */
 
+interface OverlayElement {
+  onChange?: (isChanged: boolean) => void;
+  onVisible?: () => void;
+}
+
 /**
  * Keeps track of elements that are overlayed by other elements (thus not visible on screen).
  *
  */
-// keeps track of all the elements we need to check when there is a mutation
-const overlayedElements = new Map();
-let overlayCheckerInterval = undefined;
+const overlayedElements = new Map<HTMLElement, OverlayElement>();
+let overlayCheckerInterval: number = undefined;
 
 function checkOverlayedElements() {
   overlayedElements.forEach(({onVisible, onChange}, element) => {
@@ -41,10 +45,9 @@ function checkOverlayedElements() {
 /**
  * Returns `true` if an element is above the element being watched.
  *
- * @param {HTMLElement} domElement the element we want to check.
- * @returns {boolean} Is the element overlayed.
+ * @param domElement the element we want to check.
  */
-const isOverlayed = domElement => {
+const isOverlayed = (domElement: HTMLElement): boolean => {
   const box = domElement.getBoundingClientRect();
   const middlePointX = (box.right + box.left) / 2;
   const middlePointY = (box.bottom + box.top) / 2;
@@ -52,25 +55,25 @@ const isOverlayed = domElement => {
   return elementAtPoint && domElement !== elementAtPoint && !domElement.contains(elementAtPoint);
 };
 
-const onElementVisible = (element, onVisible) => {
+const onElementVisible = (element: HTMLElement, onVisible: () => void) => {
   if (!isOverlayed(element)) {
     return onVisible();
   }
   if (!overlayCheckerInterval) {
-    overlayCheckerInterval = setInterval(checkOverlayedElements, 300);
+    overlayCheckerInterval = window.setInterval(checkOverlayedElements, 300);
   }
   overlayedElements.set(element, {onVisible});
 };
 
-const trackElement = (element, onChange) => {
+const trackElement = (element: HTMLElement, onChange: (isChanged: boolean) => void) => {
   onChange(!isOverlayed(element));
   if (!overlayCheckerInterval) {
-    overlayCheckerInterval = setInterval(checkOverlayedElements, 300);
+    overlayCheckerInterval = window.setInterval(checkOverlayedElements, 300);
   }
   overlayedElements.set(element, {onChange});
 };
 
-const removeElement = element => {
+const removeElement = (element: HTMLElement) => {
   overlayedElements.delete(element);
   if (overlayedElements.size < 1 && overlayCheckerInterval) {
     clearInterval(overlayCheckerInterval);
@@ -78,10 +81,8 @@ const removeElement = element => {
   }
 };
 
-const overlayedObserver = {
+export const overlayedObserver = {
   onElementVisible,
   removeElement,
   trackElement,
 };
-
-export {overlayedObserver};

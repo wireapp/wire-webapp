@@ -71,6 +71,7 @@
     "@types/js-cookie": "2.2.6",
     "@types/js-md5": "0.4.2",
     "@types/jszip": "3.1.7",
+    "@types/keyboardjs": "2.4.1",
     "@types/libsodium-wrappers-sumo": "0.7.3",
     "@types/linkify-it": "2.1.0",
     "@types/markdown-it": "10.0.0",

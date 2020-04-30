@@ -19,7 +19,8 @@
 
 const observedElements = new Map();
 const tolerance = 0.8;
-const onIntersect = entries => {
+
+const onIntersect: IntersectionObserverCallback = entries => {
   entries.forEach(({intersectionRatio, intersectionRect, isIntersecting, target: element}) => {
     const {onVisible, onChange, fullyInView, container} = observedElements.get(element) || {};
     const isFullyInView = () => {
@@ -43,19 +44,23 @@ const onIntersect = entries => {
 const stepCount = 100;
 const thresholdSteps = Array.from({length: stepCount + 1}, (_, index) => index / stepCount);
 
-const options = {root: null, rootMargin: '0px', threshold: thresholdSteps};
+const options: IntersectionObserverInit = {root: null, rootMargin: '0px', threshold: thresholdSteps};
 const observer = new IntersectionObserver(onIntersect, options);
 
 /**
  * Will track an element and trigger the callback only once when the element appears in viewport.
  *
- * @param {HTMLElement} element the element to observe
- * @param {Function} onVisible the callback to call when the element appears
- * @param {boolean} [fullyInView] should the element be fully in view
- * @param {HTMLElement} [container] the element containing the element
- * @returns {void} nothing
+ * @param element the element to observe
+ * @param onVisible the callback to call when the element appears
+ * @param fullyInView should the element be fully in view
+ * @param container the element containing the element
  */
-const onElementInViewport = (element, onVisible, fullyInView, container) => {
+const onElementInViewport = (
+  element: HTMLElement,
+  onVisible: Function,
+  fullyInView?: boolean,
+  container?: HTMLElement,
+): void => {
   observedElements.set(element, {container, fullyInView, onVisible});
   return observer.observe(element);
 };
@@ -63,26 +68,23 @@ const onElementInViewport = (element, onVisible, fullyInView, container) => {
 /**
  * Will track an element and trigger the callback whenever the intersecting state changes
  *
- * @param {HTMLElement} element the element to observe
- * @param {Function} onChange the callback to call when the element intersects or not
- * @param {boolean} fullyInView should the element be fully in view
- * @param {HTMLElement} container the element containing the element
- * @returns {void} - nothing
+ * @param element the element to observe
+ * @param onChange the callback to call when the element intersects or not
+ * @param fullyInView should the element be fully in view
+ * @param container the element containing the element
  */
-const trackElement = (element, onChange, fullyInView, container) => {
+const trackElement = (element: HTMLElement, onChange: Function, fullyInView: boolean, container: HTMLElement): void => {
   observedElements.set(element, {container, fullyInView, onChange});
   return observer.observe(element);
 };
 
-const removeElement = element => {
+const removeElement = (element: Element) => {
   observedElements.delete(element);
   observer.unobserve(element);
 };
 
-const viewportObserver = {
+export const viewportObserver = {
   onElementInViewport,
   removeElement,
   trackElement,
 };
-
-export {viewportObserver};

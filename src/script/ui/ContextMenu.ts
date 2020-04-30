@@ -17,7 +17,19 @@
  *
  */
 
+import ko from 'knockout';
 import {KEY, isOneOfKeys, isEnterKey, isEscapeKey} from 'Util/KeyboardUtil';
+
+export interface ContextMenuEntry {
+  click?: (event: MouseEvent) => void;
+  icon?: string;
+  identifier?: string;
+  isChecked?: boolean;
+  isDisabled?: boolean;
+  isSeparator?: boolean;
+  label?: string;
+  title?: string;
+}
 
 const _addListeners = () => {
   window.addEventListener('wheel', _onWheel);
@@ -26,7 +38,7 @@ const _addListeners = () => {
   window.addEventListener('resize', _cleanup);
 };
 
-const _onKeyDown = keyboardEvent => {
+const _onKeyDown = (keyboardEvent: KeyboardEvent): void => {
   keyboardEvent.preventDefault();
 
   if (isEscapeKey(keyboardEvent)) {
@@ -44,17 +56,17 @@ const _onKeyDown = keyboardEvent => {
   }
 };
 
-const _onMouseDown = event => {
-  const entry = document.querySelector('.ctx-menu');
-  const shouldCloseMenu = entry && !entry.contains(event.target);
+const _onMouseDown = (event: MouseEvent): void => {
+  const entry = document.querySelector<HTMLElement>('.ctx-menu');
+  const shouldCloseMenu = entry && !entry.contains(event.target as Node);
   if (shouldCloseMenu) {
     _cleanup();
   }
 };
 
-const _onWheel = event => event.preventDefault();
+const _onWheel = (event: MouseEvent): void => event.preventDefault();
 
-const _rotateItem = key => {
+const _rotateItem = (key: string): void => {
   const entries = Array.from(document.querySelectorAll('.ctx-menu-item'));
   const entry = document.querySelector('.ctx-menu-item.selected');
 
@@ -73,26 +85,26 @@ const _rotateItem = key => {
   }
 };
 
-const _removeListeners = () => {
+const _removeListeners = (): void => {
   window.removeEventListener('wheel', _onWheel);
   window.removeEventListener('keydown', _onKeyDown);
   window.removeEventListener('mousedown', _onMouseDown);
   window.removeEventListener('resize', _cleanup);
 };
 
-const _triggerItem = () => {
-  const entry = document.querySelector('.ctx-menu-item.selected');
+const _triggerItem = (): void => {
+  const entry = document.querySelector<HTMLButtonElement>('.ctx-menu-item.selected');
   if (entry) {
     entry.click();
   }
 };
 
-const _cleanup = () => {
+const _cleanup = (): void => {
   Array.from(document.querySelectorAll('.ctx-menu')).forEach(menu => menu.remove());
   _removeListeners();
 };
 
-const _build = (entries, defaultIdentifier) => {
+const _build = (entries: ContextMenuEntry[], defaultIdentifier: string) => {
   const menu = document.createElement('div');
   menu.classList.add('ctx-menu');
 
@@ -100,7 +112,8 @@ const _build = (entries, defaultIdentifier) => {
     const element = document.createElement('div');
     if (isSeparator) {
       element.classList.add('ctx-menu-separator');
-      return menu.appendChild(element);
+      menu.appendChild(element);
+      return;
     }
     element.setAttribute('data-uie-name', identifier || defaultIdentifier || 'ctx-menu-item');
     element.setAttribute('title', title || label || '');
@@ -111,7 +124,8 @@ const _build = (entries, defaultIdentifier) => {
 
     if (isDisabled) {
       element.classList.add('ctx-menu-item--disabled');
-      return menu.appendChild(element);
+      menu.appendChild(element);
+      return;
     }
     element.onclick = event => {
       event.stopPropagation();
@@ -128,7 +142,7 @@ const _build = (entries, defaultIdentifier) => {
     if (icon) {
       const iconComponent = document.createElement(icon);
       iconComponent.classList.add('ctx-menu-icon');
-      ko.applyBindingsToNode(iconComponent, {component: icon});
+      ko.applyBindingsToNode(iconComponent, {component: icon}, undefined);
       element.prepend(iconComponent);
     }
 
@@ -137,7 +151,7 @@ const _build = (entries, defaultIdentifier) => {
       const checkIcon = document.createElement('check-icon');
       checkIcon.classList.add('ctx-menu-check');
       checkIcon.setAttribute('data-uie-name', 'ctx-menu-check');
-      ko.applyBindingsToNode(checkIcon, {component: 'check-icon'});
+      ko.applyBindingsToNode(checkIcon, {component: 'check-icon'}, undefined);
       element.append(checkIcon);
     }
     menu.appendChild(element);
@@ -148,12 +162,11 @@ const _build = (entries, defaultIdentifier) => {
 export const Context = {
   /**
    * Build and display custom context menu
-   * @param {Event} event menu will appear at currentTarget position
-   * @param {Array} entries configuration to build the menu {label: 'label', click: function() {}}
-   * @param {string} identifier data-uie-name added to all entries
-   * @returns {undefined} No return value
+   * @param event menu will appear at currentTarget position
+   * @param entries configuration to build the menu
+   * @param identifier data-uie-name added to all entries
    */
-  from: (event, entries, identifier) => {
+  from: (event: MouseEvent, entries: ContextMenuEntry[], identifier: string): void => {
     event.preventDefault();
     event.stopPropagation();
 

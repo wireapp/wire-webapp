@@ -21,14 +21,15 @@ import {getLogger} from 'Util/Logger';
 import {ConversationError} from '../error/ConversationError';
 
 export class WindowHandler {
+  logger: any;
   constructor() {
     this.logger = getLogger('WindowHandler');
 
     this._listenToUnhandledPromiseRejection();
   }
 
-  _listenToUnhandledPromiseRejection() {
-    $(window).on('unhandledrejection', event => {
+  private _listenToUnhandledPromiseRejection(): void {
+    $(window).on('unhandledrejection', (event: any): void | false => {
       const promiseRejectionEvent = event.originalEvent;
       const error = promiseRejectionEvent.reason || {};
 
