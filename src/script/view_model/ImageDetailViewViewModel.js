@@ -179,6 +179,7 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
   }
 
   clickOnReply() {
+    amplify.publish(WebAppEvents.CONVERSATION.SHOW, this.conversationEntity());
     amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REPLY, this.messageEntity());
     this.imageModal.hide();
   }
