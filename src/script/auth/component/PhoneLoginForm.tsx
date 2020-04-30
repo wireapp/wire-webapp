@@ -95,7 +95,7 @@ const PhoneLoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
           markInvalid={!validInput}
           value={phoneNumber}
           autoComplete="section-login phone"
-          pattern={`.{1,1024}`}
+          pattern={'.{1,1024}'}
           type="tel"
           required
           placeholder="phone number"

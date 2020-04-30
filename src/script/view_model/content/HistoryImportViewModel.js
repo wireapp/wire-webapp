@@ -136,7 +136,7 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
 
   onError(error) {
     if (error instanceof z.backup.CancelError) {
-      this.logger.log(`History import was cancelled`);
+      this.logger.log('History import was cancelled');
       return this.dismissImport();
     }
     this.error(error);

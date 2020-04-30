@@ -35,6 +35,6 @@ class CopyToClipboard {
 }
 
 ko.components.register('copy-to-clipboard', {
-  template: `<div class="copy-to-clipboard" data-bind="click: onClick, text: text()"></div>`,
+  template: '<div class="copy-to-clipboard" data-bind="click: onClick, text: text()"></div>',
   viewModel: CopyToClipboard,
 });

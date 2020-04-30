@@ -55,7 +55,7 @@ export class MainViewModel {
       OPEN: {
         position: 'absolute',
         right: '0',
-        transform: `translateX(0px)`,
+        transform: 'translateX(0px)',
         width: `${MainViewModel.CONFIG.PANEL.WIDTH}px`,
       },
     };

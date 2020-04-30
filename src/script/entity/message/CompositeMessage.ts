@@ -16,14 +16,16 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+
 import ko from 'knockout';
 import {ContentMessage} from './ContentMessage';
 
 export class CompositeMessage extends ContentMessage {
-  selectedButtonId: ko.Observable<string>;
-  waitingButtonId: ko.Observable<string>;
   errorButtonId: ko.Observable<string>;
   errorMessage: ko.Observable<string>;
+  selectedButtonId: ko.Observable<string>;
+  waitingButtonId: ko.Observable<string>;
+
   constructor(id: string) {
     super(id);
     this.selectedButtonId = ko.observable();

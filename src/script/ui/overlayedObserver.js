@@ -19,7 +19,6 @@
 
 /**
  * Keeps track of elements that are overlayed by other elements (thus not visible on screen).
- *
  */
 // keeps track of all the elements we need to check when there is a mutation
 const overlayedElements = new Map();
