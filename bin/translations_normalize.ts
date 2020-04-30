@@ -20,7 +20,7 @@
 import fs from 'fs-extra';
 // @ts-ignore
 import authTranslations from '../temp/i18n/src/script/strings.json';
-import webappTranslations from '../resource/translation/en-US.json';
+import webappTranslations from '../src/i18n/en-US.json';
 
 interface Translation {
   id: string;
@@ -39,4 +39,4 @@ const normalizedAuthTranslations = authTranslations.reduce(
 
 const mergedTranslations = {...webappTranslations, ...normalizedAuthTranslations};
 
-fs.outputJson('resource/translation/en-US.json', mergedTranslations, {spaces: 2}).catch(err => console.error(err));
+fs.outputJson('src/i18n/en-US.json', mergedTranslations, {spaces: 2}).catch(err => console.error(err));

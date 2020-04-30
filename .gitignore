@@ -1,6 +1,5 @@
 !/.idea/codeStyleSettings.xml
 !/.idea/modules.xml
-!/src/i18n/**/*.json
 .env
 .env.defaults
 .nyc_output
@@ -15,7 +14,6 @@
 /package-lock.json
 /resource
 /src/ext
-/src/i18n/**/*
 /tags
 /temp
 aws-keys.json
