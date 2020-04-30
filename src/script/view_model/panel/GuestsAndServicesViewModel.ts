@@ -87,7 +87,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
 
   requestAccessCode = async (): Promise<void> => {
     // Handle conversations in legacy state
-    if (this.isGuestRoom()) {
+    if (!this.isGuestRoom()) {
       await this.stateHandler.changeAccessState(this.activeConversation(), ACCESS_STATE.TEAM.GUEST_ROOM);
     }
 
