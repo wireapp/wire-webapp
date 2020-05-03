@@ -65,7 +65,7 @@
     "@types/enzyme": "3.10.5",
     "@types/faker": "4.1.11",
     "@types/generate-changelog": "1.8.0",
-    "@types/helmet": "0.0.45",
+    "@types/helmet": "0.0.46",
     "@types/highlight.js": "9.12.3",
     "@types/jasmine": "3.5.10",
     "@types/js-cookie": "2.2.6",
