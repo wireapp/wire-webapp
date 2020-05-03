@@ -155,7 +155,7 @@
     "poster-image": "1.1.1",
     "prettier": "2.0.5",
     "raf": "3.4.1",
-    "react-hot-loader": "4.12.20",
+    "react-hot-loader": "4.12.21",
     "react-test-renderer": "16.13.1",
     "redux-devtools-extension": "2.13.8",
     "redux-logger": "3.0.6",
