@@ -2021,14 +2021,14 @@
   dependencies:
     protobufjs "6.8.8"
 
-"@wireapp/react-ui-kit@7.27.1":
-  version "7.27.1"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-7.27.1.tgz#39bc6f632c1421153db66d5151649cae3255d314"
-  integrity sha512-/rdegMv4yPirc9qv4kff8K6WZMBFTJz8KHekLQ/7b40DpRSgDjrfNZIZQ6S0pcVB0sym55HhXGY0XzNjV390FQ==
+"@wireapp/react-ui-kit@7.28.2":
+  version "7.28.2"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-7.28.2.tgz#8bfc83a89dadd8c6764ca77b92f4d22cbf095d1d"
+  integrity sha512-R2XkzkkjjRiAxfLlzKtEs0xpXnixfo1/R+W87oaHc6NMFG9pJWBJkv94FT97fLEiUWU3h4grR7BBfMIS+FoK1g==
   dependencies:
     "@emotion/core" "10.0.28"
     "@types/color" "3.0.1"
-    bazinga64 "5.7.0"
+    bazinga64 "5.7.1"
     color "3.1.2"
     emotion-normalize "10.1.0"
     emotion-theming "10.0.27"
@@ -2881,6 +2881,11 @@ bazinga64@5.7.0:
   version "5.7.0"
   resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.7.0.tgz#3a947e4de1c3eb36d357a5c6383c243b927c3f32"
   integrity sha512-hUq22GPWLMiU5LNtwlgo1xT6WBWNYtQ9M4b4ddVkyMvI+pjM2PIJ4pNG8RaaQez8QbdQXyQJ0SnUqgVfHvyFIQ==
+
+bazinga64@5.7.1:
+  version "5.7.1"
+  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.7.1.tgz#456d604c30ba1195c06849f0e37ce34a601f44ae"
+  integrity sha512-OQ54z9G6JVjYEt4LW4eU8MIpOKxqBYwMQ+AQaBsITlBR3/11M9ERyZggIg1V17k39zQZQaoPQzRgKI3LGogcvg==
 
 bcrypt-pbkdf@^1.0.0:
   version "1.0.2"
