@@ -5294,10 +5294,10 @@ eslint-plugin-import@2.20.2:
     read-pkg-up "^2.0.0"
     resolve "^1.12.0"
 
-eslint-plugin-jsdoc@24.0.0:
-  version "24.0.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-jsdoc/-/eslint-plugin-jsdoc-24.0.0.tgz#41c7b06d33741e41e80a8f08c82aaa58ceef2e4b"
-  integrity sha512-AGAc9PYpramsJGVmqtxnXBYlq+AMh+hIZdbJ52OLvyJS3f+PaT/PzuckRFOLnth2uhCDv4IjgsB3r5jUFWqUnw==
+eslint-plugin-jsdoc@24.0.1:
+  version "24.0.1"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-jsdoc/-/eslint-plugin-jsdoc-24.0.1.tgz#1a5e61f48bbe7cbb6a0de2b9b82288ec1abfc3b2"
+  integrity sha512-lVTBsiufOO55Vo924WLa6UyxzQRB5qDifaCBafPzzO6NsTv44Y79Y9a6fkLiYeLg/77yiKAMJoyeYR7xddxgEw==
   dependencies:
     comment-parser "^0.7.2"
     debug "^4.1.1"
