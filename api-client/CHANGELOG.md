@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.10.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.9.4...@wireapp/api-client@11.10.0) (2020-05-04)
+
+
+### Features
+
+* **api-client:** Add missing keys to NewTeamInvitation ([#3002](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3002)) ([3aa600f](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/3aa600fb7cf0a30ac9dbbcd2914a08353b92a2dc))
+
+
+
+
+
 ## [11.9.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.9.3...@wireapp/api-client@11.9.4) (2020-05-04)
 
 **Note:** Version bump only for package @wireapp/api-client

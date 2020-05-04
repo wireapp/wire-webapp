@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.5.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@3.4.0...@wireapp/commons@3.5.0) (2020-05-04)
+
+
+### Features
+
+* **commons:** Add DateUtil and pluralize ([#3000](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/issues/3000)) ([ed1633b](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/commit/ed1633b084421811abc5548789e64071b68f6f3e))
+
+
+
+
+
 # [3.4.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@3.3.10...@wireapp/commons@3.4.0) (2020-04-17)
 
 
