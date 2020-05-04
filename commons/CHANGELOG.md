@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.5.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@3.5.0...@wireapp/commons@3.5.1) (2020-05-04)
+
+
+### Bug Fixes
+
+* **commons:** Export directly ([b6f68b4](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/commit/b6f68b4214397d92cefa8c6337fea4e52d2c302d))
+
+
+
+
+
 # [3.5.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@3.4.0...@wireapp/commons@3.5.0) (2020-05-04)
 
 
