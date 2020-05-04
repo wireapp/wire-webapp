@@ -17,8 +17,7 @@
  *
  */
 
-import * as CommonConfig from './config/CommonConfig';
-export {CommonConfig};
+export * as CommonConfig from './config/CommonConfig';
 
 export * from './LogFactory';
 export * from './util/';
