@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.29.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.28.2...@wireapp/react-ui-kit@7.29.0) (2020-05-04)
+
+
+### Features
+
+* **react-ui-kit:** Add centerElement to HeaderMenu component ([#2999](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/2999)) ([cc54913](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/cc54913535210df456133eee4f7997fa0f9d2fd7))
+
+
+
+
+
 ## [7.28.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.28.1...@wireapp/react-ui-kit@7.28.2) (2020-04-28)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit

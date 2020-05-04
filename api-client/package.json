@@ -28,7 +28,7 @@
     "@types/react": "16.9.19",
     "@types/react-dom": "16.9.7",
     "@types/ws": "7.2.3",
-    "@wireapp/react-ui-kit": "7.28.2",
+    "@wireapp/react-ui-kit": "7.29.0",
     "@wireapp/store-engine": "4.5.1",
     "@wireapp/store-engine-fs": "2.2.2",
     "babel-loader": "8.0.6",
@@ -84,5 +84,5 @@
     "test:node": "cross-env NODE_DEBUG=@wireapp/api-client* nyc jasmine --config=jasmine.json",
     "watch": "webpack-dev-server --config webpack.browser.js"
   },
-  "version": "11.9.2"
+  "version": "11.9.3"
 }
