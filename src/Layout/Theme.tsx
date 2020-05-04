@@ -29,14 +29,14 @@ export enum THEME_ID {
 }
 
 export interface Theme {
+  general: {
+    backgroundColor: string;
+    color: string;
+  };
   Input: {
     backgroundColor: string;
     backgroundColorDisabled: string;
     placeholderColor: string;
-  };
-  general: {
-    backgroundColor: string;
-    color: string;
   };
 }
 

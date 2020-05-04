@@ -41,7 +41,7 @@ export const menuLinkStyle: <T>(theme: Theme, props: MenuLinkProps<T>) => Object
     '&:last-of-type': {
       marginRight: 0,
     },
-    margin: '12px 26px 0 10px',
+    margin: '0 26px 0 10px',
     [`.${DESKTOP_HEADER_SUB_MENU_CLASSNAME} &`]: {
       '&:first-of-type': {
         marginLeft: '10px',
@@ -64,9 +64,11 @@ export const menuLinkStyle: <T>(theme: Theme, props: MenuLinkProps<T>) => Object
   padding: button ? '10px 16px' : undefined,
 });
 
+export const MENU_LINK_CLASSNAME = 'menu-link';
+
 export const filterMenuLinkProps = (props: MenuLinkProps) =>
   filterProps(filterLinkProps(props) as MenuLinkProps, ['button']);
 
 export const MenuLink = (props: MenuLinkProps) => (
-  <a css={theme => menuLinkStyle(theme, props)} {...filterMenuLinkProps(props)} />
+  <a className={MENU_LINK_CLASSNAME} css={theme => menuLinkStyle(theme, props)} {...filterMenuLinkProps(props)} />
 );
