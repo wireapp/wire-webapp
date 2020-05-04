@@ -366,6 +366,7 @@ export class AuthAction {
       dispatch(AuthActionCreator.startLogout());
       try {
         await core.logout();
+        // TODO: Unmount database
         await dispatch(cookieAction.safelyRemoveCookie(COOKIE_NAME_APP_OPENED, getConfig().APP_INSTANCE_ID));
         await dispatch(localStorageAction.deleteLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.VALUE));
         dispatch(AuthActionCreator.successfulLogout());
