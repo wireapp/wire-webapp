@@ -35,4 +35,27 @@ describe('StringUtil', () => {
       expect(actual).toEqual(expected);
     });
   });
+
+  describe('pluralize', () => {
+    it('pluralizes the word "hour"', () => {
+      const test = 'hour';
+      const expected = 'hours';
+      const actual = StringUtil.pluralize(test, 5);
+      expect(actual).toEqual(expected);
+    });
+
+    it('pluralizes the word "bugfix"', () => {
+      const test = 'bugfix';
+      const expected = 'bugfixes';
+      const actual = StringUtil.pluralize(test, 2, {postfix: 'es'});
+      expect(actual).toEqual(expected);
+    });
+
+    it('does not pluralize if the count is 1', () => {
+      const test = 'time';
+      const expected = 'time';
+      const actual = StringUtil.pluralize(test, 1);
+      expect(actual).toEqual(expected);
+    });
+  });
 });

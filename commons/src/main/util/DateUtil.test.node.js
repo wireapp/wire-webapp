@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2019 Wire Swiss GmbH
+ * Copyright (C) 2020 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,18 @@
  *
  */
 
-export * as AccentColor from './AccentColor';
-export * as ArrayUtil from './ArrayUtil';
-export * as DateUtil from './DateUtil';
-export * as RandomUtil from './RandomUtil';
-export * as StringUtil from './StringUtil';
-export * as TimeUtil from './TimeUtil';
-export * as TypeUtil from './TypeUtil';
-export * as UrlUtil from './UrlUtil';
-export * as ValidationUtil from './ValidationUtil';
+const {DateUtil} = require('@wireapp/commons');
 
-export * from './Runtime';
+describe('DateUtil', () => {
+  describe('isoFormat', () => {
+    it('formats a valid date into the expected format', () => {
+      // May 4th 2020, 13:42:00
+      const date = new Date(1588599720000);
+      const expectedDate = '2020-05-04';
+      const expectedTime = '13:42:00';
+      const actual = DateUtil.isoFormat(date);
+      expect(actual.date).toEqual(expectedDate);
+      expect(actual.time).toEqual(expectedTime);
+    });
+  });
+});

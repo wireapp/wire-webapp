@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2019 Wire Swiss GmbH
+ * Copyright (C) 2020 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,14 @@
  *
  */
 
-export * as AccentColor from './AccentColor';
-export * as ArrayUtil from './ArrayUtil';
-export * as DateUtil from './DateUtil';
-export * as RandomUtil from './RandomUtil';
-export * as StringUtil from './StringUtil';
-export * as TimeUtil from './TimeUtil';
-export * as TypeUtil from './TypeUtil';
-export * as UrlUtil from './UrlUtil';
-export * as ValidationUtil from './ValidationUtil';
+/**
+ * Converts a date object into two strings of format `YYYY-MM-DD` and `HH:mm:ss`.
+ * @param date The date to format
+ */
+export function isoFormat(date: Date): {date: string; time: string} {
+  const isoString = date.toISOString();
 
-export * from './Runtime';
+  const dateAndTimeRegex = /(.+)T(.+)\./;
+  const [, formattedDate, formattedTime] = dateAndTimeRegex.exec(isoString)!;
+  return {date: formattedDate, time: formattedTime};
+}
