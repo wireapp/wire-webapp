@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.29.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.29.1...@wireapp/react-ui-kit@7.29.2) (2020-05-04)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Adjust HeaderMenu open button position ([#3003](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/3003)) ([c87f29c](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/c87f29c18b3f0193167e2056e33d16e7dc86f7ae))
+
+
+
+
+
 ## [7.29.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.29.0...@wireapp/react-ui-kit@7.29.1) (2020-05-04)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
