@@ -7,12 +7,10 @@ import {HeaderMenu, MenuLink, HeaderSubMenu, Logo, isDesktop, COLOR} from '@wire
 const [showFirstDropdown, setShowFirstDropdown] = useState(false);
 const [showSecondDropdown, setShowSecondDropdown] = useState(false);
 
-<HeaderMenu logoElement={<Logo width={72} />}>
+<HeaderMenu logoElement={<Logo width={72} />} centerElement={'center element'}>
   <MenuLink href="#" color={COLOR.GREEN} button>
     test1
   </MenuLink>
-  <MenuLink href="#">test1</MenuLink>
-  <MenuLink href="#">test2</MenuLink>
   <HeaderSubMenu
     caption={'Dropdown1'}
     isOpen={showFirstDropdown}
@@ -54,7 +52,5 @@ const [showSecondDropdown, setShowSecondDropdown] = useState(false);
     <MenuLink noWrap>{'File sharing & productivity2'}</MenuLink>
   </HeaderSubMenu>
   <MenuLink href="#">test3</MenuLink>
-  <MenuLink href="#">test4</MenuLink>
-  <MenuLink href="#">test5</MenuLink>
 </HeaderMenu>;
 ```

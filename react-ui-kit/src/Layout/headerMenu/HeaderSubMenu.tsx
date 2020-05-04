@@ -24,6 +24,7 @@ import {DURATION} from '../../Identity/motions';
 import {QUERY} from '../../mediaQueries';
 import {Theme} from '../Theme';
 import {MenuSubLink} from './MenuSubLink';
+import {MENU_LINK_CLASSNAME} from './MenuLink';
 
 export type DesktopStyledHeaderSubMenuProps<T = HTMLDivElement> = React.HTMLProps<T>;
 
@@ -52,6 +53,9 @@ const desktopStyledHeaderSubMenuStyle: (
     paddingLeft: '10px !important',
     paddingRight: '10px !important',
     whiteSpace: 'nowrap',
+  },
+  [`.${MENU_LINK_CLASSNAME}:nth-of-type(n+2)`]: {
+    marginTop: '8px',
   },
 });
 
