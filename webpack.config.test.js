@@ -60,7 +60,7 @@ module.exports = {
     ...commonConfig.plugins,
     new webpack.DefinePlugin({
       'process.env': {
-        NODE_ENV: `'test'`,
+        NODE_ENV: `"test"`,
       },
     }),
   ],
