@@ -1546,11 +1546,6 @@
   resolved "https://registry.yarnpkg.com/@types/parse-json/-/parse-json-4.0.0.tgz#2f8bb441434d163b35fb8ffdccd7138927ffb8c0"
   integrity sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA==
 
-"@types/phoneformat.js@1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@types/phoneformat.js/-/phoneformat.js-1.0.0.tgz#9f4bd3839aab66b1bfecac25820831e35f9de35c"
-  integrity sha512-M2ZMIYJiMBCXW6+c8m5kXZeiQ9AAbHnssW/sSwED228NvErM5ynpxAsF+QlX1Dm9qlH5VkO8Cu1e/Pv7VzezRg==
-
 "@types/platform@1.3.2":
   version "1.3.2"
   resolved "https://registry.yarnpkg.com/@types/platform/-/platform-1.3.2.tgz#c0404c4e2a08e04295ab3d1241a856c2a3cab06e"
@@ -9907,11 +9902,6 @@ performance-now@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/performance-now/-/performance-now-2.1.0.tgz#6309f4e0e5fa913ec1c69307ae364b4b377c9e7b"
   integrity sha1-Ywn04OX6kT7BxpMHrjZLSzd8nns=
-
-phoneformat.js@1.0.9:
-  version "1.0.9"
-  resolved "https://registry.yarnpkg.com/phoneformat.js/-/phoneformat.js-1.0.9.tgz#ac397d459db0d914ea4df3e84337f7d5bb93e58e"
-  integrity sha512-KdFjWtfuxTOEKw65TAuStLsNPAgKpels1pSb2lv2OSMT/8YzKcumh7lgGiZ7CIOzUswOplXQAZU+OKONSzqdzw==
 
 picomatch@^2.0.4, picomatch@^2.0.5:
   version "2.0.7"

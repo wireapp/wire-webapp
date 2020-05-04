@@ -25,7 +25,6 @@ import {
   formatBytes,
   getContentTypeFromDataUrl,
   getFileExtension,
-  phoneNumberToE164,
   printDevicesId,
   sortGroupsByLastEvent,
   stripDataUri,
@@ -166,24 +165,6 @@ describe('stripDataUri', () => {
     expect(base64Gif).toBe(base64);
     expect(base64Png).toBe(base64);
     expect(base64Jpg).toBe(base64);
-  });
-});
-
-describe('phoneNumberToE164', () => {
-  it('can convert a US number', () => {
-    expect(phoneNumberToE164('555-666-7777', 'US')).toBe('+15556667777');
-  });
-
-  it('can convert a GR number', () => {
-    expect(phoneNumberToE164('2310 863871', 'GR')).toBe('+302310863871');
-  });
-
-  it('can convert an unknown number', () => {
-    expect(phoneNumberToE164('2310 863871')).toBe('2310863871');
-  });
-
-  it('can convert an invalid number', () => {
-    expect(phoneNumberToE164('foo bar', 'earth')).toBe('');
   });
 });
 
