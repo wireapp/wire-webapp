@@ -846,7 +846,7 @@ class App {
       return amplify.publish(WebAppEvents.LIFECYCLE.RESTART);
     }
 
-    window.location.reload(true);
+    window.location.reload();
     window.focus();
   }
 

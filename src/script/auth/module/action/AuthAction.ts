@@ -366,7 +366,13 @@ export class AuthAction {
       dispatch(AuthActionCreator.startLogout());
       try {
         await core.logout();
-        // TODO: Unmount database
+        if (isTemporaryClientAndNonPersistent(false)) {
+          /**
+           * WEBAPP-6804: Our current implementation of "websql" has the drawback that a mounted database can only get unmounted by refreshing the page.
+           * @see https://github.com/wireapp/websql/blob/v0.0.15/packages/worker/src/Database.ts#L142-L145
+           */
+          window.location.reload();
+        }
         await dispatch(cookieAction.safelyRemoveCookie(COOKIE_NAME_APP_OPENED, getConfig().APP_INSTANCE_ID));
         await dispatch(localStorageAction.deleteLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.VALUE));
         dispatch(AuthActionCreator.successfulLogout());
