@@ -32,7 +32,7 @@ const selectConfiguration = () => {
       return currentBranch;
     }
     case 'dev': {
-      console.log(`Selecting configuration "staging" (reason: branch)`);
+      console.log('Selecting configuration "staging" (reason: branch)');
       return 'staging';
     }
     default: {

@@ -16,6 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {AssetService} from '../../assets/AssetService';
@@ -29,10 +30,10 @@ import {container} from 'tsyringe';
 import {BackendClient} from '../../service/BackendClient';
 
 export abstract class AbstractAssetTransferStateTracker {
-  assetUploader: AssetUploader;
-  uploadProgress: ko.PureComputed<number>;
   AssetTransferState: typeof AssetTransferState;
+  assetUploader: AssetUploader;
   transferState: ko.PureComputed<AssetTransferState>;
+  uploadProgress: ko.PureComputed<number>;
 
   constructor(message?: ContentMessage) {
     this.assetUploader = new AssetUploader(
