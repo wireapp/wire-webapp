@@ -20,7 +20,6 @@
 import {Decoder} from 'bazinga64';
 import {ObservableArray} from 'knockout';
 import sodium from 'libsodium-wrappers-sumo';
-import {formatE164} from 'phoneformat.js';
 import UUID from 'uuidjs';
 
 import {QUERY_KEY} from '../auth/route';
@@ -260,10 +259,6 @@ export const downloadFile = (url: string, fileName: string, mimeType?: string): 
     document.body.removeChild(anchor);
     window.URL.revokeObjectURL(objectURL);
   }, 100);
-};
-
-export const phoneNumberToE164 = (phoneNumber: string, countryCode: string): string => {
-  return formatE164(`${countryCode}`.toUpperCase(), `${phoneNumber}`);
 };
 
 export const createRandomUuid = (): string => UUID.genV4().hexString;
