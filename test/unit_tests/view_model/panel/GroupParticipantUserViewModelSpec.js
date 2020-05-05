@@ -48,7 +48,7 @@ describe('GroupParticipantUserViewModel', () => {
   });
 
   it('returns the id of the entity attached', () => {
-    const userId = UUID.genV4();
+    const userId = UUID.genV4().hexString;
     const user = new User(userId);
     groupParticipantUserViewModel.initView({entity: user});
 

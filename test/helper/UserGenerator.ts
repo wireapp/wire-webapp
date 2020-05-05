@@ -25,7 +25,7 @@ import {User} from '../../src/script/entity/User';
 import {serverTimeHandler} from '../../src/script/time/serverTimeHandler';
 import {UserMapper} from '../../src/script/user/UserMapper';
 
-const UUID = require('pure-uuid');
+import UUID from 'uuidjs';
 
 export class UserGenerator {
   static getRandomUser(): User | void {
@@ -33,18 +33,18 @@ export class UserGenerator {
       accent_id: Math.floor(Math.random() * 7 + 1),
       assets: [
         {
-          key: `3-1-${new UUID(4).format()}`,
+          key: `3-1-${UUID.genV4().hexString}`,
           size: UserAssetType.PREVIEW,
           type: 'image',
         },
         {
-          key: `3-1-${new UUID(4).format()}`,
+          key: `3-1-${UUID.genV4().hexString}`,
           size: UserAssetType.COMPLETE,
           type: 'image',
         },
       ],
       handle: faker.internet.userName(),
-      id: new UUID(4).format(),
+      id: UUID.genV4().hexString,
       name: faker.name.findName(),
     };
 

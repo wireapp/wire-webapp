@@ -18,7 +18,7 @@
  */
 
 import {ValidationUtil} from '@wireapp/commons';
-import UUID from 'pure-uuid';
+import UUID from 'uuidjs';
 const env = window.wire.env;
 
 export const ACCENT_ID = {
@@ -34,7 +34,7 @@ export const ACCENT_ID = {
 export class Configuration {
   readonly APP_BASE = env.APP_BASE || 'https://app.wire.com';
   readonly APP_NAME = env.APP_NAME || 'Webapp';
-  readonly APP_INSTANCE_ID = new UUID(4).format();
+  readonly APP_INSTANCE_ID = UUID.genV4().hexString;
   readonly BACKEND_NAME = env.BACKEND_NAME || 'Wire';
   readonly BACKEND_REST = env.BACKEND_REST || 'https://prod-nginz-https.wire.com';
   readonly BACKEND_WS = env.BACKEND_WS || 'wss://prod-nginz-ssl.wire.com';

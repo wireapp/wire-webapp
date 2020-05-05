@@ -25,8 +25,8 @@ import {Text} from 'src/script/entity/message/Text';
 
 describe('MessageComparator', () => {
   it('areMentionsDifferent', () => {
-    const mentionUser1 = {userId: UUID.genV4()};
-    const mentionUser2 = {userId: UUID.genV4()};
+    const mentionUser1 = {userId: UUID.genV4().hexString};
+    const mentionUser2 = {userId: UUID.genV4().hexString};
 
     const tests = [
       {expected: false, newMentions: [], originalMentions: []},

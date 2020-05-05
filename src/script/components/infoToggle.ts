@@ -32,7 +32,7 @@ class InfoToggle {
   dataUieNameInfoText: string;
   dataUieNameLabelText: string;
   info: string;
-  inputId: UUID;
+  inputId: string;
   isChecked: ko.Observable<boolean>;
   isDisabled: boolean;
   name: string;
@@ -41,7 +41,7 @@ class InfoToggle {
     this.dataUieNameInfoText = `status-info-toggle-${params.dataUieName}`;
     this.dataUieNameLabelText = `do-toggle-${params.dataUieName}`;
     this.info = params.info;
-    this.inputId = UUID.genV4();
+    this.inputId = UUID.genV4().hexString;
     this.isChecked = params.isChecked;
     this.isDisabled = params.isDisabled;
     this.name = params.name;
