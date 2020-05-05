@@ -1623,13 +1623,6 @@
   resolved "https://registry.yarnpkg.com/@types/unist/-/unist-2.0.3.tgz#9c088679876f374eb5983f150d4787aa6fb32d7e"
   integrity sha512-FvUupuM3rlRsRtCN+fDudtmytGO6iHJuuRKS1Ss0pG5z8oX0diNEw94UEL7hgDbpN94rgaK5R7sWm6RrSkZuAQ==
 
-"@types/uuidjs@3.6.0":
-  version "3.6.0"
-  resolved "https://registry.yarnpkg.com/@types/uuidjs/-/uuidjs-3.6.0.tgz#da7938d6dda1673669beebb6cf89535724714a08"
-  integrity sha512-kt8Y6a9olnHwOwxCvadgF6PD9+TM10ocoXLkuwBk90RsEUKMKfWqoYFYcn0WlxxOEsT6omqNffESVJYtkPkUGQ==
-  dependencies:
-    uuidjs "*"
-
 "@types/webpack-env@1.15.2":
   version "1.15.2"
   resolved "https://registry.yarnpkg.com/@types/webpack-env/-/webpack-env-1.15.2.tgz#927997342bb9f4a5185a86e6579a0a18afc33b0a"
@@ -13534,11 +13527,6 @@ uuid@^3.3.2:
   version "3.3.3"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.3.3.tgz#4568f0216e78760ee1dbf3a4d2cf53e224112866"
   integrity sha512-pW0No1RGHgzlpHJO1nsVrHKpOEIxkGg1xB+v0ZmdNH5OAeAwzAVrCnI2/6Mtx+Uys6iaylxa+D3g4j63IKKjSQ==
-
-uuidjs@*, uuidjs@4.2.5:
-  version "4.2.5"
-  resolved "https://registry.yarnpkg.com/uuidjs/-/uuidjs-4.2.5.tgz#a80439ece05dfe6ed875a5d62de0820046055713"
-  integrity sha512-0utbJ3L/C/AUv8cRAfFnUC7XhvRvaQaGNPbrroBeXF26BWfYT6aD8/n5UQ4ic3bpkJfVd2W15yQS+YCwvQxtXA==
 
 v8-compile-cache@2.0.3:
   version "2.0.3"

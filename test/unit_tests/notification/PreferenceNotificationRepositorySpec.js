@@ -18,7 +18,7 @@
  */
 
 import {amplify} from 'amplify';
-import UUID from 'uuidjs';
+import UUID from 'pure-uuid';
 
 import {PreferenceNotificationRepository} from 'src/script/notification/PreferenceNotificationRepository';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
@@ -26,7 +26,7 @@ import {BackendEvent} from 'src/script/event/Backend';
 import {WebAppEvents} from 'src/script/event/WebApp';
 
 describe('PreferenceNotificationRepository', () => {
-  const user = {id: UUID.genV4().hexString};
+  const user = {id: new UUID(4).format()};
   const userObservable = () => user;
 
   beforeEach(() => {
@@ -75,7 +75,7 @@ describe('PreferenceNotificationRepository', () => {
     const preferenceNotificationRepository = new PreferenceNotificationRepository(userObservable);
     const newClientData = {};
 
-    amplify.publish(WebAppEvents.USER.CLIENT_ADDED, UUID.genV4().hexString, newClientData);
+    amplify.publish(WebAppEvents.USER.CLIENT_ADDED, new UUID(4).format(), newClientData);
 
     expect(preferenceNotificationRepository.notifications().length).toBe(0);
   });

@@ -44,7 +44,6 @@
     "underscore": "1.10.2",
     "url-search-params-polyfill": "8.1.0",
     "use-react-router": "1.0.7",
-    "uuidjs": "4.2.5",
     "webrtc-adapter": "6.4.8"
   },
   "devDependencies": {
@@ -85,7 +84,6 @@
     "@types/speakingurl": "13.0.2",
     "@types/uint32": "0.2.0",
     "@types/underscore": "1.9.4",
-    "@types/uuidjs": "3.6.0",
     "@types/webpack-env": "1.15.2",
     "@typescript-eslint/eslint-plugin": "2.29.0",
     "@typescript-eslint/parser": "2.29.0",

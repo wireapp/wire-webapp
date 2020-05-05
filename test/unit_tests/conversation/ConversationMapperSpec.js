@@ -17,7 +17,7 @@
  *
  */
 
-import UUID from 'uuidjs';
+import UUID from 'pure-uuid';
 
 import {createRandomUuid} from 'Util/util';
 
@@ -274,11 +274,11 @@ describe('Conversation Mapper', () => {
 
   describe('mergeConversation', () => {
     function getDataWithReadReceiptMode(localReceiptMode, remoteReceiptMode) {
-      const conversationCreatorId = UUID.genV4().hexString;
-      const conversationId = UUID.genV4().hexString;
+      const conversationCreatorId = new UUID(4).format();
+      const conversationId = new UUID(4).format();
       const conversationName = 'Hello, World!';
-      const selfUserId = UUID.genV4().hexString;
-      const teamId = UUID.genV4().hexString;
+      const selfUserId = new UUID(4).format();
+      const teamId = new UUID(4).format();
 
       const localData = {
         archived_state: false,
