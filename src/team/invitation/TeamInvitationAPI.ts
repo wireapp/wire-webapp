@@ -22,7 +22,7 @@ import {AxiosRequestConfig} from 'axios';
 import {HttpClient, BackendErrorLabel} from '../../http/';
 import {NewTeamInvitation, TeamInvitation, TeamInvitationChunk} from '../invitation/';
 import {TeamAPI} from '../team/';
-import {InvitationInvalidPhoneError, InvitationInvalidEmailError} from './InvitationError';
+import {InvitationInvalidPhoneError, InvitationInvalidEmailError, InvitationEmailExistsError} from './InvitationError';
 
 export class TeamInvitationAPI {
   public static readonly MAX_CHUNK_SIZE = 100;
@@ -98,6 +98,9 @@ export class TeamInvitationAPI {
       return response.data;
     } catch (error) {
       switch (error.label) {
+        case BackendErrorLabel.INVITE_EMAIL_EXISTS: {
+          throw new InvitationEmailExistsError(error.message);
+        }
         case BackendErrorLabel.BAD_REQUEST: {
           throw new InvitationInvalidPhoneError(error.message);
         }

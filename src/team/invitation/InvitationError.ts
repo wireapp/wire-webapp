@@ -42,3 +42,10 @@ export class InvitationInvalidPhoneError extends InvitationError {
     this.name = 'InvitationInvalidPhoneError';
   }
 }
+export class InvitationEmailExistsError extends InvitationError {
+  constructor(message: string, label = BackendErrorLabel.INVITE_EMAIL_EXISTS, code = StatusCode.BAD_REQUEST) {
+    super(message, label, code);
+    Object.setPrototypeOf(this, new.target.prototype);
+    this.name = 'InvitationEmailExistsError';
+  }
+}
