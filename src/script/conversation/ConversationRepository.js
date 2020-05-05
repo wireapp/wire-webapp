@@ -2805,9 +2805,16 @@ export class ConversationRepository {
         id => id !== this.selfUser().id,
       );
       for (const recipientId of allRecipientsBesideSelf) {
-        const clients = eventInfoEntity.options.recipients[recipientId];
-        if (clients.length === 0) {
-          await this.teamMemberLeave(this.team().id, recipientId);
+        const clientIdsOfUser = eventInfoEntity.options.recipients[recipientId];
+        const noRemainingClients = clientIdsOfUser.length === 0;
+
+        if (noRemainingClients) {
+          const backendUser = await this.userRepository.getUserFromBackend(recipientId);
+          const isDeleted = backendUser?.deleted === true;
+
+          if (isDeleted) {
+            await this.teamMemberLeave(this.team().id, recipientId);
+          }
         }
       }
     }

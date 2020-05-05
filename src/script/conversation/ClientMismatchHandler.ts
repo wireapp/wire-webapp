@@ -188,7 +188,7 @@ export class ClientMismatchHandler {
   ): Promise<void> {
     const removeDeletedUser = async (userId: string): Promise<void> => {
       const clientIdsOfUser = Object.keys(payload.recipients[userId]);
-      const noRemainingClients = !clientIdsOfUser.length;
+      const noRemainingClients = clientIdsOfUser.length === 0;
 
       if (noRemainingClients && typeof conversationEntity !== 'undefined') {
         const backendUser = await this.userRepository.getUserFromBackend(userId);
