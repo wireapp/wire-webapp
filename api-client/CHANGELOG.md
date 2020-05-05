@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.11.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.10.2...@wireapp/api-client@11.11.0) (2020-05-05)
+
+
+### Features
+
+* **api-client:** Add custom error handling to postInvitation ([#3004](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3004)) ([e83d36e](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/e83d36e4a671eb888f700b287404cb910ab64209))
+
+
+
+
+
 ## [11.10.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.10.1...@wireapp/api-client@11.10.2) (2020-05-04)
 
 **Note:** Version bump only for package @wireapp/api-client
