@@ -2797,7 +2797,26 @@ export class ConversationRepository {
     const messageType = eventInfoEntity.getType();
     const allowedMessageTypes = ['cleared', 'clientAction', 'confirmation', 'deleted', 'lastRead'];
     if (allowedMessageTypes.includes(messageType)) {
-      return Promise.resolve();
+      return;
+    }
+
+    if (this.isTeam()) {
+      const allRecipientsBesideSelf = Object.keys(eventInfoEntity.options.recipients).filter(
+        id => id !== this.selfUser().id,
+      );
+      for (const recipientId of allRecipientsBesideSelf) {
+        const clientIdsOfUser = eventInfoEntity.options.recipients[recipientId];
+        const noRemainingClients = clientIdsOfUser.length === 0;
+
+        if (noRemainingClients) {
+          const backendUser = await this.userRepository.getUserFromBackend(recipientId);
+          const isDeleted = backendUser?.deleted === true;
+
+          if (isDeleted) {
+            await this.teamMemberLeave(this.team().id, recipientId);
+          }
+        }
+      }
     }
 
     const isMessageEdit = messageType === GENERIC_MESSAGE_TYPE.EDITED;
