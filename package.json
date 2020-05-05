@@ -22,7 +22,7 @@
     "babel-jest": "25.4.0",
     "babel-loader": "8.0.6",
     "babel-plugin-emotion": "10.0.29",
-    "jest": "25.4.0",
+    "jest": "26.0.1",
     "jest-emotion": "10.0.32",
     "react": "16.13.0",
     "react-dom": "16.13.1",
