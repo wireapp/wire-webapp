@@ -17,12 +17,13 @@
  *
  */
 
+import {Confirmation} from '@wireapp/protocol-messaging';
+
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {onEscKey, offEscKey} from 'Util/KeyboardUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
-import {ReceiptMode} from '../../conversation/ReceiptMode';
 import * as trackingHelpers from '../../tracking/Helpers';
 import {EventName} from '../../tracking/EventName';
 import {ACCESS_STATE} from '../../conversation/AccessState';
@@ -154,7 +155,7 @@ export class GroupCreationViewModel {
 
       const accessState = this.isTeam() ? this.accessState() : undefined;
       const options = {
-        receipt_mode: this.enableReadReceipts() ? ReceiptMode.DELIVERY_AND_READ : ReceiptMode.DELIVERY,
+        receipt_mode: this.enableReadReceipts() ? Confirmation.Type.READ : Confirmation.Type.DELIVERED,
       };
 
       this.conversationRepository

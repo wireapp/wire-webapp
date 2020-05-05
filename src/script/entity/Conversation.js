@@ -19,7 +19,7 @@
 
 import {amplify} from 'amplify';
 import ko from 'knockout';
-import {LegalHoldStatus} from '@wireapp/protocol-messaging';
+import {Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {debounce} from 'underscore';
 
 import {getLogger} from 'Util/Logger';
@@ -28,7 +28,6 @@ import {truncate} from 'Util/StringUtil';
 
 import {Config} from '../Config';
 
-import {ReceiptMode} from '../conversation/ReceiptMode';
 import {ACCESS_STATE} from '../conversation/AccessState';
 import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
 import {ConversationType} from '../conversation/ConversationType';
@@ -223,7 +222,7 @@ export class Conversation {
     this.localMessageTimer = ko.observable(null);
     this.globalMessageTimer = ko.observable(null);
 
-    this.receiptMode = ko.observable(ReceiptMode.DELIVERY);
+    this.receiptMode = ko.observable(Confirmation.Type.DELIVERED);
 
     this.messageTimer = ko.pureComputed(() => this.globalMessageTimer() || this.localMessageTimer());
     this.hasGlobalMessageTimer = ko.pureComputed(() => this.globalMessageTimer() > 0);
