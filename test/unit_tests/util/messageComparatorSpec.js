@@ -17,7 +17,7 @@
  *
  */
 
-import UUID from 'uuidjs';
+import UUID from 'pure-uuid';
 
 import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
 
@@ -25,8 +25,8 @@ import {Text} from 'src/script/entity/message/Text';
 
 describe('MessageComparator', () => {
   it('areMentionsDifferent', () => {
-    const mentionUser1 = {userId: UUID.genV4()};
-    const mentionUser2 = {userId: UUID.genV4()};
+    const mentionUser1 = {userId: new UUID(4).format()};
+    const mentionUser2 = {userId: new UUID(4).format()};
 
     const tests = [
       {expected: false, newMentions: [], originalMentions: []},
