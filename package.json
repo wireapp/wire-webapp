@@ -24,7 +24,7 @@
     "babel-plugin-emotion": "10.0.29",
     "jest": "26.0.1",
     "jest-emotion": "10.0.32",
-    "react": "16.13.0",
+    "react": "16.13.1",
     "react-dom": "16.13.1",
     "react-helmet": "5.2.1",
     "react-hot-loader": "4.12.20",
