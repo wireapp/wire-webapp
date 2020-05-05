@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.12.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.11.0...@wireapp/api-client@11.12.0) (2020-05-05)
+
+
+### Features
+
+* **api-client:** Add invite email exists error to postInvitation ([#3007](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3007)) ([97d7627](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/97d7627013d9f44dbe44f9c9e456febf8b3a24de))
+
+
+
+
+
 # [11.11.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.10.2...@wireapp/api-client@11.11.0) (2020-05-05)
 
 
