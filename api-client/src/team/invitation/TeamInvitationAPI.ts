@@ -19,9 +19,10 @@
 
 import {AxiosRequestConfig} from 'axios';
 
-import {HttpClient} from '../../http/';
+import {HttpClient, BackendErrorLabel} from '../../http/';
 import {NewTeamInvitation, TeamInvitation, TeamInvitationChunk} from '../invitation/';
 import {TeamAPI} from '../team/';
+import {InvitationInvalidPhoneError, InvitationInvalidEmailError} from './InvitationError';
 
 export class TeamInvitationAPI {
   public static readonly MAX_CHUNK_SIZE = 100;
@@ -92,8 +93,20 @@ export class TeamInvitationAPI {
       url: `${TeamAPI.URL.TEAMS}/${teamId}/${TeamInvitationAPI.URL.INVITATIONS}`,
     };
 
-    const response = await this.client.sendJSON<TeamInvitation>(config);
-    return response.data;
+    try {
+      const response = await this.client.sendJSON<TeamInvitation>(config);
+      return response.data;
+    } catch (error) {
+      switch (error.label) {
+        case BackendErrorLabel.BAD_REQUEST: {
+          throw new InvitationInvalidPhoneError(error.message);
+        }
+        case BackendErrorLabel.INVALID_EMAIL: {
+          throw new InvitationInvalidEmailError(error.message);
+        }
+      }
+      throw error;
+    }
   }
 
   public async getInvitationFromCode(invitationCode: string): Promise<TeamInvitation> {
