@@ -26,7 +26,7 @@ describe('PermissionRepository', () => {
     it('keep the default PROMPT value if permissionAPI is not available', done => {
       spyOn(navigator, 'permissions').and.returnValue(undefined);
       const permissionRepository = new PermissionRepository();
-      setTimeout(() => {
+      window.setTimeout(() => {
         Object.values(permissionRepository.permissionState).forEach(state => {
           expect(state()).toBe(PermissionStatusState.PROMPT);
         });
@@ -47,7 +47,7 @@ describe('PermissionRepository', () => {
       });
 
       const permissionRepository = new PermissionRepository();
-      setTimeout(() => {
+      window.setTimeout(() => {
         Object.entries(permissionRepository.permissionState).forEach(([type, state]) => {
           expect(state()).toBe(states[type].state);
         });
@@ -70,7 +70,7 @@ describe('PermissionRepository', () => {
       });
 
       const permissionRepository = new PermissionRepository();
-      setTimeout(() => {
+      window.setTimeout(() => {
         permissionRepository.getPermissionStates(Object.keys(states)).forEach(({state, type}) => {
           expect(state).toBe(states[type].state);
         });

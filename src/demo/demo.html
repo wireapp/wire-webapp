@@ -181,7 +181,7 @@
           const range = emojiFontFace.style.unicodeRange || '';
           const values = range.replace(/u\+|\s/gi, '').split(',');
           const ranges = values.map(value => {
-            const rangeLimits = value.split('-').map(numString => parseInt(numString, 16));
+            const rangeLimits = value.split('-').map(numString => window.parseInt(numString, 16));
             return generateRange(...rangeLimits);
           });
           const unicodeValues = [].concat(...ranges);

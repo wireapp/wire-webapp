@@ -25,11 +25,7 @@ import {WebAppEvents} from '../../event/WebApp';
 import {ContentViewModel} from '../ContentViewModel';
 import {sortUserDevices} from 'Components/userDevices';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.content = z.viewModel.content || {};
-
-z.viewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewModel {
+export class PreferencesDevicesViewModel {
   constructor(mainViewModel, contentViewModel, repositories) {
     this.clickOnRemoveDevice = this.clickOnRemoveDevice.bind(this);
     this.clickOnShowDevice = this.clickOnShowDevice.bind(this);
@@ -75,4 +71,9 @@ z.viewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
       this.localFingerprint(this.cryptographyRepository.getLocalFingerprint());
     }
   }
-};
+}
+
+window.z = window.z || {};
+window.z.viewModel = window.z.viewModel || {};
+window.z.viewModel.content = window.z.viewModel.content || {};
+window.z.viewModel.content.PreferencesDevicesViewModel = PreferencesDevicesViewModel;

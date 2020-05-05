@@ -29,11 +29,7 @@ import {ContentViewModel} from '../ContentViewModel';
 import 'Components/loadingBar';
 import {Config} from '../../Config';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.content = z.viewModel.content || {};
-
-z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
+export class HistoryExportViewModel {
   static get STATE() {
     return {
       COMPRESSING: 'HistoryExportViewModel.STATE.COMPRESSING',
@@ -141,7 +137,7 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
   }
 
   onError(error) {
-    if (error instanceof z.backup.CancelError) {
+    if (error instanceof window.z.backup.CancelError) {
       this.logger.log('History export was cancelled');
       return this.dismissExport();
     }
@@ -163,4 +159,9 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
   dismissExport() {
     amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.PREFERENCES_ACCOUNT);
   }
-};
+}
+
+window.z = window.z || {};
+window.z.viewModel = window.z.viewModel || {};
+window.z.viewModel.content = window.z.viewModel.content || {};
+window.z.viewModel.content.HistoryExportViewModel = HistoryExportViewModel;

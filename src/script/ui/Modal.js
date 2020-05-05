@@ -59,7 +59,7 @@ export class Modal {
   show() {
     if (this.modal) {
       this.modal.classList.add(Modal.CLASS.SHOW);
-      setTimeout(() => this.modal.classList.add(Modal.CLASS.FADE_IN), 50);
+      window.setTimeout(() => this.modal.classList.add(Modal.CLASS.FADE_IN), 50);
     }
   }
 
@@ -72,13 +72,13 @@ export class Modal {
       const timeoutPromise = new Promise(resolve => {
         const {transitionDelay, transitionDuration} = getComputedStyle(this.modal, '::before');
 
-        const delays = transitionDelay.split(',').map(parseFloat);
-        const durations = transitionDuration.split(',').map(parseFloat);
+        const delays = transitionDelay.split(',').map(window.parseFloat);
+        const durations = transitionDuration.split(',').map(window.parseFloat);
 
         const totals = delays.map((delay, index) => delay + durations[index]);
         const longestDelay = Math.max(...totals);
 
-        setTimeout(resolve, longestDelay * 1000);
+        window.setTimeout(resolve, longestDelay * 1000);
       });
 
       Promise.race([transitionendPromise, timeoutPromise]).then(() => {

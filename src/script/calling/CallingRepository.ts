@@ -173,7 +173,7 @@ export class CallingRepository {
     wCall.init(avsEnv);
     wCall.setUserMediaHandler(this.getCallMediaStream);
     wCall.setMediaStreamHandler(this.updateParticipantStream);
-    setInterval(() => wCall.poll(), 500);
+    window.setInterval(() => wCall.poll(), 500);
     return wCall;
   }
 

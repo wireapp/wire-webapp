@@ -26,7 +26,7 @@ describe('MessageSender', () => {
     spyOn(testData, 'sendMessageFunction').and.callThrough();
 
     messageSender.queueMessage(testData.sendMessageFunction);
-    setTimeout(() => {
+    window.setTimeout(() => {
       expect(testData.sendMessageFunction).not.toHaveBeenCalled();
       done();
     });

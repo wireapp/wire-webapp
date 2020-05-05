@@ -264,5 +264,5 @@ export class PanelViewModel {
 }
 
 window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-z.viewModel.PanelViewModel = PanelViewModel;
+window.z.viewModel = window.z.viewModel || {};
+window.z.viewModel.PanelViewModel = PanelViewModel;

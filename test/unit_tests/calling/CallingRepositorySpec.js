@@ -68,7 +68,7 @@ describe('CallingRepository', () => {
       const callType = CALL_TYPE.NORMAL;
       spyOn(wCall, 'start');
       callingRepository.startCall(conversationId, conversationType, callType).catch(done);
-      setTimeout(() => {
+      window.setTimeout(() => {
         expect(amplify.publish).toHaveBeenCalledWith(
           WebAppEvents.WARNING.MODAL,
           ModalsViewModel.TYPE.CONFIRM,
@@ -217,7 +217,7 @@ describe('CallingRepository', () => {
 
       expect(callingRepository.activeCalls().length).toBe(0);
       amplify.publish(WebAppEvents.CALL.EVENT_FROM_BACKEND, event);
-      setTimeout(() => {
+      window.setTimeout(() => {
         expect(callingRepository.activeCalls().length).toBe(1);
 
         expect(callingRepository.activeCalls()[0].initiator).toBe(event.from);
@@ -274,7 +274,7 @@ describe('e2e audio call', () => {
   beforeEach(() => {
     joinedCallSub = client.joinedCall.subscribe(call => {
       if (call) {
-        const audioFlowingInterval = setInterval(() => {
+        const audioFlowingInterval = window.setInterval(() => {
           /* Wait for audio to start flowing before calling the onCallConnected callback.
            * To achieve this, we check every couple of ms that the stats contain audio and that there are bytes flowing there
            * Jasmine will eventually timeout if the audio is not flowing after 5s
@@ -393,7 +393,7 @@ function createAutoAnsweringWuser(wCall, remoteCallingRepository) {
   const incoming = conversationId => wCall.answer(wUser, conversationId, CALL_TYPE.AUDIO, 0);
 
   const requestConfig = () => {
-    setTimeout(() => {
+    window.setTimeout(() => {
       wCall.configUpdate(wUser, 0, JSON.stringify({ice_servers: []}));
     });
   };

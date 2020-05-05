@@ -1475,7 +1475,7 @@ export const COUNTRY_CODES: CountryCode[] = [
  * @returns Returns the ISO standard country name of the most populated country with the matching country code
  */
 export const getCountryByCode = (countryCode: string): string | void => {
-  const parsedCode = parseInt(countryCode, 10);
+  const parsedCode = window.parseInt(countryCode, 10);
   const country = COUNTRY_CODES.filter(({code}) => code === parsedCode)
     .sort((countryA, countryB) => countryA.population - countryB.population)
     .pop();

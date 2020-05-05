@@ -54,11 +54,11 @@
               <div class="preferences-account-username-hint text-foreground font-size-xs"
                    data-bind="text: t('preferencesAccountUsernameHint')"></div>
             <!-- /ko -->
-            <!-- ko if: usernameState() === z.viewModel.content.PreferencesAccountViewModel.USERNAME_STATE.AVAILABLE -->
+            <!-- ko if: usernameState() === window.z.viewModel.content.PreferencesAccountViewModel.USERNAME_STATE.AVAILABLE -->
               <div class="preferences-account-username-error font-size-xs"
                    data-bind="text: t('preferencesAccountUsernameAvailable')"></div>
             <!-- /ko -->
-            <!-- ko if: usernameState() === z.viewModel.content.PreferencesAccountViewModel.USERNAME_STATE.TAKEN -->
+            <!-- ko if: usernameState() === window.z.viewModel.content.PreferencesAccountViewModel.USERNAME_STATE.TAKEN -->
               <div class="preferences-account-username-error font-size-xs"
                    data-bind="text: t('preferencesAccountUsernameErrorTaken'), css: {'text-red': submittedUsername() === enteredUsername()}"></div>
             <!-- /ko -->
@@ -91,7 +91,7 @@
           <participant-avatar params="participant: selfUser, size: ParticipantAvatar.SIZE.X_LARGE"></participant-avatar>
           <input id="self-upload-file-input"
                  type="file"
-                 data-bind="attr: {accept: z.viewModel.content.PreferencesAccountViewModel.CONFIG.PROFILE_IMAGE.FILE_TYPES.join(',')}, file_select: clickOnChangePicture"
+                 data-bind="attr: {accept: window.z.viewModel.content.PreferencesAccountViewModel.CONFIG.PROFILE_IMAGE.FILE_TYPES.join(',')}, file_select: clickOnChangePicture"
                  data-uie-name="do-select-picture"/>
           <span class="icon-camera"></span>
         </label>
@@ -164,7 +164,7 @@
       <section class="preferences-section preferences-section-account-security">
         <hr class="preferences-separator">
 
-        <!-- ko if: z.userPermission().canManageTeam() && !!manageTeamUrl -->
+        <!-- ko if: window.z.userPermission().canManageTeam() && !!manageTeamUrl -->
           <div class="preferences-link accent-text" data-bind="click: clickOpenManageTeam, text: t('preferencesAccountManageTeam')" data-uie-name="do-manage-team"></div>
         <!-- /ko -->
 

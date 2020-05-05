@@ -98,7 +98,7 @@ export class GiphyRepository {
           const staticGif = images.fixed_width_still;
           const animatedGif = images.downsized;
 
-          const exceedsMaxSize = parseInt(animatedGif.size, 10) > options.maxSize;
+          const exceedsMaxSize = window.parseInt(animatedGif.size, 10) > options.maxSize;
           if (exceedsMaxSize) {
             this.logger.info(`Gif size (${animatedGif.size}) is over maximum size (${animatedGif.size})`);
             return _getRandomGif(retry + 1);
@@ -163,7 +163,7 @@ export class GiphyRepository {
           const staticGif = images.fixed_width_still;
           const animatedGif = images.downsized;
 
-          const exceedsMaxSize = parseInt(animatedGif.size, 10) > options.maxSize;
+          const exceedsMaxSize = window.parseInt(animatedGif.size, 10) > options.maxSize;
           if (!exceedsMaxSize) {
             result.push({
               animated: animatedGif.url,

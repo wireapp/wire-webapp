@@ -161,6 +161,8 @@ export function roleFromTeamPermissions(permissions: PermissionsData): ROLE {
   return detectedRole || ROLE.INVALID;
 }
 
+export type PermissionHelpers = Record<string, (role?: ROLE) => boolean>;
+
 /**
  * Will generate a bunch of helper functions that can be consumed to know what features this role has access to.
  * The function generated will have the following format:
@@ -169,15 +171,12 @@ export function roleFromTeamPermissions(permissions: PermissionsData): ROLE {
  * @param boundRole Default role that will be used by default in every helper. Can be overridden by passing a role when calling the helper
  * @returns helpers
  */
-export function generatePermissionHelpers(boundRole = ROLE.NONE): Record<string, (role: ROLE) => boolean> {
-  return Object.entries(FEATURES).reduce<Record<string, (role: ROLE) => boolean>>(
-    (helpers, [featureKey, featureValue]: [string, number]) => {
-      const camelCasedFeature = featureKey.toLowerCase().split('_').map(capitalizeFirstChar).join('');
-      helpers[`can${camelCasedFeature}`] = (role = boundRole) => hasAccessToFeature(featureValue, role);
-      return helpers;
-    },
-    {},
-  );
+export function generatePermissionHelpers(boundRole = ROLE.NONE): PermissionHelpers {
+  return Object.entries(FEATURES).reduce<PermissionHelpers>((helpers, [featureKey, featureValue]: [string, number]) => {
+    const camelCasedFeature = featureKey.toLowerCase().split('_').map(capitalizeFirstChar).join('');
+    helpers[`can${camelCasedFeature}`] = (role = boundRole) => hasAccessToFeature(featureValue, role);
+    return helpers;
+  }, {});
 }
 
 export function hasAccessToFeature(feature: number, role: ROLE): boolean {

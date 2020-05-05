@@ -368,11 +368,11 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
   }
 
   clickOnAddParticipants(): void {
-    this.navigateTo(z.viewModel.PanelViewModel.STATE.ADD_PARTICIPANTS);
+    this.navigateTo(window.z.viewModel.PanelViewModel.STATE.ADD_PARTICIPANTS);
   }
 
   clickOnShowAll(): void {
-    this.navigateTo(z.viewModel.PanelViewModel.STATE.CONVERSATION_PARTICIPANTS);
+    this.navigateTo(window.z.viewModel.PanelViewModel.STATE.CONVERSATION_PARTICIPANTS);
   }
 
   clickOnCreateGroup(): void {
@@ -380,27 +380,27 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
   }
 
   clickOnDevices(): void {
-    this.navigateTo(z.viewModel.PanelViewModel.STATE.PARTICIPANT_DEVICES, {entity: this.firstParticipant()});
+    this.navigateTo(window.z.viewModel.PanelViewModel.STATE.PARTICIPANT_DEVICES, {entity: this.firstParticipant()});
   }
 
   clickOnGuestOptions(): void {
-    this.navigateTo(z.viewModel.PanelViewModel.STATE.GUEST_OPTIONS);
+    this.navigateTo(window.z.viewModel.PanelViewModel.STATE.GUEST_OPTIONS);
   }
 
   clickOnTimedMessages(): void {
-    this.navigateTo(z.viewModel.PanelViewModel.STATE.TIMED_MESSAGES);
+    this.navigateTo(window.z.viewModel.PanelViewModel.STATE.TIMED_MESSAGES);
   }
 
   clickOnNotifications(): void {
-    this.navigateTo(z.viewModel.PanelViewModel.STATE.NOTIFICATIONS);
+    this.navigateTo(window.z.viewModel.PanelViewModel.STATE.NOTIFICATIONS);
   }
 
   clickOnShowUser(userEntity: User): void {
-    this.navigateTo(z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_USER, {entity: userEntity});
+    this.navigateTo(window.z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_USER, {entity: userEntity});
   }
 
   clickOnShowService(serviceEntity: ServiceEntity): void {
-    this.navigateTo(z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE, {entity: serviceEntity});
+    this.navigateTo(window.z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE, {entity: serviceEntity});
   }
 
   clickToArchive(): void {

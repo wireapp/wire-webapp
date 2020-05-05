@@ -46,12 +46,8 @@ import {AssetService} from '../../assets/AssetService';
 import {BackendClient} from '../../service/BackendClient';
 import {ConversationError} from '../../error/ConversationError';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.content = z.viewModel.content || {};
-
 // Parent: ContentViewModel
-z.viewModel.content.InputBarViewModel = class InputBarViewModel {
+export class InputBarViewModel {
   static get CONFIG() {
     return {
       ASSETS: {
@@ -896,4 +892,9 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
   }
-};
+}
+
+window.z = window.z || {};
+window.z.viewModel = window.z.viewModel || {};
+window.z.viewModel.content = window.z.viewModel.content || {};
+window.z.viewModel.content.InputBarViewModel = InputBarViewModel;

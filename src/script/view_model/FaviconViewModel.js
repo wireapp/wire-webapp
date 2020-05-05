@@ -19,14 +19,11 @@
 
 import {WebAppEvents} from '../event/WebApp';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-
 /**
  * The FaviconViewModel is responsible for updating the favicon according to unread messages.
  * To do so, it will listen for the UNREAD_COUNT that the app dispatches through the given dispatcher.
  */
-z.viewModel.FaviconViewModel = class FaviconViewModel {
+export class FaviconViewModel {
   /**
    * Construct a new FaviconViewModel.
    *
@@ -57,4 +54,8 @@ z.viewModel.FaviconViewModel = class FaviconViewModel {
     this.dispatcher.unsubscribe(WebAppEvents.LIFECYCLE.UNREAD_COUNT, this, this._updateUnreadCount);
     this.unreadCountSubscription.dispose();
   }
-};
+}
+
+window.z = window.z || {};
+window.z.viewModel = window.z.viewModel || {};
+window.z.viewModel.FaviconViewModel = FaviconViewModel;

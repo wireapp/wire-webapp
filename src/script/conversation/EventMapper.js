@@ -339,7 +339,7 @@ export class EventMapper {
       messageEntity.ephemeral_started(Number(event.ephemeral_started) || 0);
     }
 
-    if (isNaN(messageEntity.timestamp())) {
+    if (window.isNaN(messageEntity.timestamp())) {
       this.logger.warn(`Could not get timestamp for message '${messageEntity.id}'. Skipping it.`, event);
       messageEntity = undefined;
     }

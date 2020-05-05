@@ -186,7 +186,7 @@ export const formatBytes = (bytes: number, decimals: number = 1): string => {
   decimals += 1;
   const unit = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
   const index = Math.floor(Math.log(bytes) / Math.log(kilobytes));
-  return parseFloat((bytes / Math.pow(kilobytes, index)).toFixed(decimals)) + unit[index];
+  return window.parseFloat((bytes / Math.pow(kilobytes, index)).toFixed(decimals)) + unit[index];
 };
 
 export const getContentTypeFromDataUrl = (dataUrl: string): string => {

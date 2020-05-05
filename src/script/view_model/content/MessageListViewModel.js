@@ -388,13 +388,13 @@ export class MessageListViewModel {
     const isSingleModeConversation = conversationEntity.is1to1() || conversationEntity.isRequest();
 
     if (isSingleModeConversation && !userEntity.isMe) {
-      return this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS);
+      return this.mainViewModel.panel.togglePanel(window.z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS);
     }
 
     const params = {entity: userEntity};
     const panelId = userEntity.isService
-      ? z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE
-      : z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_USER;
+      ? window.z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE
+      : window.z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_USER;
 
     this.mainViewModel.panel.togglePanel(panelId, params);
   }
@@ -505,7 +505,7 @@ export class MessageListViewModel {
   }
 
   clickOnInvitePeople() {
-    this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.GUEST_OPTIONS);
+    this.mainViewModel.panel.togglePanel(window.z.viewModel.PanelViewModel.STATE.GUEST_OPTIONS);
   }
 
   /**
@@ -631,12 +631,15 @@ export class MessageListViewModel {
   }
 
   showParticipants(participants) {
-    this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.CONVERSATION_PARTICIPANTS, participants);
+    this.mainViewModel.panel.togglePanel(
+      window.z.viewModel.PanelViewModel.STATE.CONVERSATION_PARTICIPANTS,
+      participants,
+    );
   }
 
   showMessageDetails(view, showLikes) {
     if (!this.conversation().is1to1()) {
-      this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.MESSAGE_DETAILS, {
+      this.mainViewModel.panel.togglePanel(window.z.viewModel.PanelViewModel.STATE.MESSAGE_DETAILS, {
         entity: {id: view.message.id},
         showLikes,
       });

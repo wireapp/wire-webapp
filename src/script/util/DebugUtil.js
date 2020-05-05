@@ -373,7 +373,7 @@ export class DebugUtil {
       const context = new window.AudioContext();
       const osc = context.createOscillator(); // instantiate an oscillator
       osc.type = 'sine'; // this is the default - also square, sawtooth, triangle
-      osc.frequency.value = parseInt(hz, 10); // Hz
+      osc.frequency.value = window.parseInt(hz, 10); // Hz
       const dest = context.createMediaStreamDestination();
       osc.connect(dest); // connect it to the destination
       osc.start(0);
@@ -389,7 +389,7 @@ export class DebugUtil {
       canvas.height = height;
       canvas.width = width;
       const ctx = canvas.getContext('2d');
-      setInterval(() => {
+      window.setInterval(() => {
         ctx.fillStyle = `#${color}`;
         ctx.fillRect(0, 0, width, height);
         ctx.fillStyle = '#000';
@@ -477,7 +477,7 @@ export class DebugUtil {
       const call = this.callingRepository.joinedCall();
       if (call) {
         renderFrame();
-        this.liveCallingStatsInterval = setInterval(renderFrame, 500);
+        this.liveCallingStatsInterval = window.setInterval(renderFrame, 500);
       } else {
         vdom = patch(vdom, createElement('div'));
         clearInterval(this.liveCallingStatsInterval);

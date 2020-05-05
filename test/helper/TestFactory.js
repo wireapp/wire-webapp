@@ -344,17 +344,6 @@ export class TestFactory {
 
     return this.tracking_repository;
   }
-
-  /**
-   * @returns {Promise<z.lifecycle.LifecycleRepository>} The lifecycle repository.
-   */
-  async exposeLifecycleActors() {
-    await this.exposeUserActors();
-    this.lifecycle_service = new z.lifecycle.LifecycleService();
-
-    this.lifecycle_repository = new z.lifecycle.LifecycleRepository(this.lifecycle_service, this.user_repository);
-    return this.lifecycle_repository;
-  }
 }
 
 const actorsCache = new Map();

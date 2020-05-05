@@ -24,7 +24,7 @@ describe('z.viewModel.FaviconViewModel', () => {
     const dispatcher = {subscribe: () => {}};
     spyOn(dispatcher, 'subscribe').and.returnValue(undefined);
 
-    const faviconViewModel = new z.viewModel.FaviconViewModel(dispatcher);
+    const faviconViewModel = new window.z.viewModel.FaviconViewModel(dispatcher);
 
     expect(dispatcher.subscribe).toHaveBeenCalledWith(
       WebAppEvents.LIFECYCLE.UNREAD_COUNT,
@@ -39,7 +39,7 @@ describe('z.viewModel.FaviconViewModel', () => {
 
     beforeEach(() => {
       dispatcher = {...window.amplify};
-      faviconViewModel = new z.viewModel.FaviconViewModel(dispatcher);
+      faviconViewModel = new window.z.viewModel.FaviconViewModel(dispatcher);
     });
 
     afterEach(() => {

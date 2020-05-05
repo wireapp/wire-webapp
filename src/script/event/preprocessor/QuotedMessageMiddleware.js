@@ -86,7 +86,7 @@ export class QuotedMessageMiddleware {
       replies.forEach(reply => {
         reply.data.quote.message_id = event.id;
         // we want to update the messages quoting the original message later, thus the timeout
-        setTimeout(() => this.eventService.replaceEvent(reply));
+        window.setTimeout(() => this.eventService.replaceEvent(reply));
       });
 
       const decoratedData = {...event.data, quote: originalEvent.data.quote};

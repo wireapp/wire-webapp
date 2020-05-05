@@ -68,12 +68,12 @@ export class ContentViewModel {
     this.state = ko.observable(ContentViewModel.STATE.WATERMARK);
 
     // Nested view models
-    this.collectionDetails = new z.viewModel.content.CollectionDetailsViewModel();
-    this.collection = new z.viewModel.content.CollectionViewModel(mainViewModel, this, repositories);
-    this.connectRequests = new z.viewModel.content.ConnectRequestsViewModel(mainViewModel, this, repositories);
+    this.collectionDetails = new window.z.viewModel.content.CollectionDetailsViewModel();
+    this.collection = new window.z.viewModel.content.CollectionViewModel(mainViewModel, this, repositories);
+    this.connectRequests = new window.z.viewModel.content.ConnectRequestsViewModel(mainViewModel, this, repositories);
     this.emojiInput = new EmojiInputViewModel(repositories.properties);
-    this.giphy = new z.viewModel.content.GiphyViewModel(mainViewModel, this, repositories);
-    this.inputBar = new z.viewModel.content.InputBarViewModel(mainViewModel, this, repositories);
+    this.giphy = new window.z.viewModel.content.GiphyViewModel(mainViewModel, this, repositories);
+    this.inputBar = new window.z.viewModel.content.InputBarViewModel(mainViewModel, this, repositories);
     this.groupCreation = new GroupCreationViewModel(
       repositories.conversation,
       repositories.search,
@@ -91,29 +91,37 @@ export class ContentViewModel {
       repositories.cryptography,
     );
     this.messageList = new MessageListViewModel(mainViewModel, this, repositories);
-    this.titleBar = new z.viewModel.content.TitleBarViewModel(
+    this.titleBar = new window.z.viewModel.content.TitleBarViewModel(
       mainViewModel.calling,
       mainViewModel.panel,
       this,
       repositories,
     );
 
-    this.preferencesAbout = new z.viewModel.content.PreferencesAboutViewModel(mainViewModel, this, repositories);
-    this.preferencesAccount = new z.viewModel.content.PreferencesAccountViewModel(mainViewModel, this, repositories);
-    this.preferencesAV = new PreferencesAVViewModel(repositories.media, repositories.user, {
-      mediaSourceChanged: repositories.calling.changeMediaSource.bind(repositories.calling),
-      willChangeMediaSource: repositories.calling.stopMediaSource.bind(repositories.calling),
-    });
-    this.preferencesDeviceDetails = new z.viewModel.content.PreferencesDeviceDetailsViewModel(
+    this.preferencesAbout = new window.z.viewModel.content.PreferencesAboutViewModel(mainViewModel, this, repositories);
+    this.preferencesAccount = new window.z.viewModel.content.PreferencesAccountViewModel(
       mainViewModel,
       this,
       repositories,
     );
-    this.preferencesDevices = new z.viewModel.content.PreferencesDevicesViewModel(mainViewModel, this, repositories);
-    this.preferencesOptions = new z.viewModel.content.PreferencesOptionsViewModel(repositories);
+    this.preferencesAV = new PreferencesAVViewModel(repositories.media, repositories.user, {
+      mediaSourceChanged: repositories.calling.changeMediaSource.bind(repositories.calling),
+      willChangeMediaSource: repositories.calling.stopMediaSource.bind(repositories.calling),
+    });
+    this.preferencesDeviceDetails = new window.z.viewModel.content.PreferencesDeviceDetailsViewModel(
+      mainViewModel,
+      this,
+      repositories,
+    );
+    this.preferencesDevices = new window.z.viewModel.content.PreferencesDevicesViewModel(
+      mainViewModel,
+      this,
+      repositories,
+    );
+    this.preferencesOptions = new window.z.viewModel.content.PreferencesOptionsViewModel(repositories);
 
-    this.historyExport = new z.viewModel.content.HistoryExportViewModel(mainViewModel, this, repositories);
-    this.historyImport = new z.viewModel.content.HistoryImportViewModel(mainViewModel, this, repositories);
+    this.historyExport = new window.z.viewModel.content.HistoryExportViewModel(mainViewModel, this, repositories);
+    this.historyImport = new window.z.viewModel.content.HistoryImportViewModel(mainViewModel, this, repositories);
 
     this.previousState = undefined;
     this.previousConversation = undefined;
@@ -225,7 +233,7 @@ export class ContentViewModel {
 
         if (isOpenedConversation) {
           if (openNotificationSettings) {
-            this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.NOTIFICATIONS);
+            this.mainViewModel.panel.togglePanel(window.z.viewModel.PanelViewModel.STATE.NOTIFICATIONS);
           }
           return;
         }
@@ -256,7 +264,7 @@ export class ContentViewModel {
             this._showContent(ContentViewModel.STATE.CONVERSATION);
             this.previousConversation = this.conversationRepository.active_conversation();
             if (openNotificationSettings) {
-              this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.NOTIFICATIONS);
+              this.mainViewModel.panel.togglePanel(window.z.viewModel.PanelViewModel.STATE.NOTIFICATIONS);
             }
           });
         });

@@ -52,11 +52,7 @@ import {loadValue} from 'Util/StorageUtil';
 import {StorageKey} from '../../storage';
 import {UserError} from '../../error/UserError';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.content = z.viewModel.content || {};
-
-z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewModel {
+export class PreferencesAccountViewModel {
   static get CONFIG() {
     return {
       PROFILE_IMAGE: {
@@ -440,4 +436,9 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   updateProperties = ({settings}) => {
     this.optionPrivacy(settings.privacy.improve_wire);
   };
-};
+}
+
+window.z = window.z || {};
+window.z.viewModel = window.z.viewModel || {};
+window.z.viewModel.content = window.z.viewModel.content || {};
+window.z.viewModel.content.PreferencesAccountViewModel = PreferencesAccountViewModel;

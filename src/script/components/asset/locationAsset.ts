@@ -36,6 +36,6 @@ ko.components.register('location-asset', {
   viewModel: function ({asset}: Params): void {
     this.asset = asset;
     const {latitude, longitude, name, zoom} = asset;
-    this.mapsUrl = getMapsUrl(parseFloat(latitude), parseFloat(longitude), name, zoom);
+    this.mapsUrl = getMapsUrl(window.parseFloat(latitude), window.parseFloat(longitude), name, zoom);
   },
 });

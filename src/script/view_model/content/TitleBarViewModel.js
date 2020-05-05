@@ -29,12 +29,8 @@ import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
 import {ContentViewModel} from '../ContentViewModel';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.content = z.viewModel.content || {};
-
 // Parent: ContentViewModel
-z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
+export class TitleBarViewModel {
   constructor(callingViewModel, panelViewModel, contentViewModel, repositories) {
     this.addedToView = this.addedToView.bind(this);
 
@@ -152,9 +148,14 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
 
   showDetails(addParticipants) {
     const panelId = addParticipants
-      ? z.viewModel.PanelViewModel.STATE.ADD_PARTICIPANTS
-      : z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS;
+      ? window.z.viewModel.PanelViewModel.STATE.ADD_PARTICIPANTS
+      : window.z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS;
 
     this.panelViewModel.togglePanel(panelId);
   }
-};
+}
+
+window.z = window.z || {};
+window.z.viewModel = window.z.viewModel || {};
+window.z.viewModel.content = window.z.viewModel.content || {};
+window.z.viewModel.content.TitleBarViewModel = TitleBarViewModel;

@@ -26,7 +26,7 @@ import {User} from 'src/script/entity/User';
 
 describe('SanitizationUtil', () => {
   beforeEach(() => {
-    setStrings({en: z.string});
+    setStrings({en: window.z.string});
   });
 
   describe('escapeRegex', () => {

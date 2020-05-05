@@ -161,7 +161,7 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
 
   clickOnSelectService(serviceEntity: ServiceEntity): void {
     this.selectedService(serviceEntity);
-    this.navigateTo(z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE, {
+    this.navigateTo(window.z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE, {
       addMode: true,
       entity: serviceEntity,
     });

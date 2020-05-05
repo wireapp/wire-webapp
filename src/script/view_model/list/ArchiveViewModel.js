@@ -49,12 +49,12 @@ export class ArchiveViewModel {
 
   clickOnConversation(conversationEntity) {
     this.conversationRepository.unarchiveConversation(conversationEntity, 'opened conversation from archive');
-    this.listViewModel.switchList(z.viewModel.ListViewModel.STATE.CONVERSATIONS);
+    this.listViewModel.switchList(window.z.viewModel.ListViewModel.STATE.CONVERSATIONS);
     amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
   }
 
   clickOnClose() {
-    this.listViewModel.switchList(z.viewModel.ListViewModel.STATE.CONVERSATIONS);
+    this.listViewModel.switchList(window.z.viewModel.ListViewModel.STATE.CONVERSATIONS);
   }
 
   updateList() {

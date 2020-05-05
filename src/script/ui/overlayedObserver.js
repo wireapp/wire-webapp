@@ -56,7 +56,7 @@ const onElementVisible = (element, onVisible) => {
     return onVisible();
   }
   if (!overlayCheckerInterval) {
-    overlayCheckerInterval = setInterval(checkOverlayedElements, 300);
+    overlayCheckerInterval = window.setInterval(checkOverlayedElements, 300);
   }
   overlayedElements.set(element, {onVisible});
 };
@@ -64,7 +64,7 @@ const onElementVisible = (element, onVisible) => {
 const trackElement = (element, onChange) => {
   onChange(!isOverlayed(element));
   if (!overlayCheckerInterval) {
-    overlayCheckerInterval = setInterval(checkOverlayedElements, 300);
+    overlayCheckerInterval = window.setInterval(checkOverlayedElements, 300);
   }
   overlayedElements.set(element, {onChange});
 };

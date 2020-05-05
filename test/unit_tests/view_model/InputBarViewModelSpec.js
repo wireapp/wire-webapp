@@ -29,7 +29,7 @@ describe('z.viewModel.content.InputBarViewModel', () => {
   beforeAll(() => testFactory.exposeSearchActors().then(() => testFactory.exposeConversationActors()));
 
   beforeEach(() => {
-    viewModel = new z.viewModel.content.InputBarViewModel(
+    viewModel = new window.z.viewModel.content.InputBarViewModel(
       undefined,
       {},
       {

@@ -46,7 +46,7 @@ class FileAssetComponent extends AbstractAssetTransferStateTracker {
     this.message = ko.unwrap(message);
     this.asset = this.message.get_first_asset() as FileAsset;
     this.header = header;
-    this.formattedFileSize = formatBytes(parseInt(this.asset.file_size, 10));
+    this.formattedFileSize = formatBytes(window.parseInt(this.asset.file_size, 10));
     this.fileName = trimFileExtension(this.asset.file_name);
     this.fileExtension = getFileExtension(this.asset.file_name);
   }

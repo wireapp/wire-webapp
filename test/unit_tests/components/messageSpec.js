@@ -103,7 +103,7 @@ describe('message', () => {
     const params = {...defaultParams, isMarked: () => true};
     return instantiateComponent('message', params)
       .then(() => {
-        setTimeout(() => {
+        window.setTimeout(() => {
           expect(defaultParams.onMessageMarked).toHaveBeenCalled();
           done();
         }, 1);

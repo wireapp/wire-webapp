@@ -43,7 +43,7 @@ export enum APPLOCK_STATE {
 const APP_LOCK_STORAGE = 'app_lock';
 
 const getTimeout = (queryName: string, configName: 'APPLOCK_SCHEDULED_TIMEOUT' | 'APPLOCK_UNFOCUS_TIMEOUT') => {
-  const queryTimeout = parseInt(getURLParameter(queryName), 10);
+  const queryTimeout = window.parseInt(getURLParameter(queryName), 10);
   const configTimeout = Config.getConfig().FEATURE && Config.getConfig().FEATURE[configName];
   const isNotFinite = (value: number) => !Number.isFinite(value);
   if (isNotFinite(queryTimeout) && isNotFinite(configTimeout)) {

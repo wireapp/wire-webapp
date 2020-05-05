@@ -24,7 +24,7 @@ export const EMOJI_RANGES = 'U+1f000-1f003, U+1f004, U+1f005-1f0ce, U+1f0cf, U+1
   .split(', ')
   .reduce((list, codepoint) => {
     const hexBase = 16;
-    const [start, end = start]: number[] = codepoint.split('-').map(code => parseInt(code, hexBase));
+    const [start, end = start]: number[] = codepoint.split('-').map(code => window.parseInt(code, hexBase));
     for (let code = start; code <= end; code++) {
       list.push(String.fromCodePoint(code));
     }

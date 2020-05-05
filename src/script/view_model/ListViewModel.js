@@ -17,12 +17,13 @@
  *
  */
 
+import {CALL_TYPE} from '@wireapp/avs';
+
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {iterateItem} from 'Util/ArrayUtil';
 import {Environment} from 'Util/Environment';
 import {isEscapeKey} from 'Util/KeyboardUtil';
-import {CALL_TYPE} from '@wireapp/avs';
 
 import {ArchiveViewModel} from './list/ArchiveViewModel';
 import {ConversationListViewModel} from './list/ConversationListViewModel';
@@ -39,10 +40,7 @@ import {ShortcutType} from '../ui/ShortcutType';
 import {ContentViewModel} from './ContentViewModel';
 import {DefaultLabelIds} from '../conversation/ConversationLabelRepository';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-
-z.viewModel.ListViewModel = class ListViewModel {
+export class ListViewModel {
   static get MODAL_TYPE() {
     return {
       TAKEOVER: 'ListViewModel.MODAL_TYPE.TAKEOVER',
@@ -161,7 +159,7 @@ z.viewModel.ListViewModel = class ListViewModel {
 
   changeNotificationSetting() {
     if (this.isProAccount()) {
-      this.panelViewModel.togglePanel(z.viewModel.PanelViewModel.STATE.NOTIFICATIONS);
+      this.panelViewModel.togglePanel(window.z.viewModel.PanelViewModel.STATE.NOTIFICATIONS);
     } else {
       this.clickToToggleMute();
     }
@@ -491,4 +489,8 @@ z.viewModel.ListViewModel = class ListViewModel {
 
     return isStateConversations && isActiveConversation;
   }
-};
+}
+
+window.z = window.z || {};
+window.z.viewModel = window.z.viewModel || {};
+window.z.viewModel.ListViewModel = ListViewModel;

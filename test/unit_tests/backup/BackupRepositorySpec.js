@@ -140,7 +140,7 @@ describe('BackupRepository', () => {
           throw new Error('Export should fail with a CancelError');
         })
         .catch(error => {
-          expect(error instanceof z.backup.CancelError).toBe(true);
+          expect(error instanceof window.z.backup.CancelError).toBe(true);
         });
 
       backupRepository.cancelAction();
@@ -153,15 +153,15 @@ describe('BackupRepository', () => {
     it(`fails if metadata doesn't match`, () => {
       const tests = [
         {
-          expectedError: z.backup.DifferentAccountError,
+          expectedError: window.z.backup.DifferentAccountError,
           metaChanges: {user_id: 'fail'},
         },
         {
-          expectedError: z.backup.IncompatibleBackupError,
+          expectedError: window.z.backup.IncompatibleBackupError,
           metaChanges: {version: 13}, // version 14 contains a migration script, thus will generate an error
         },
         {
-          expectedError: z.backup.IncompatiblePlatformError,
+          expectedError: window.z.backup.IncompatiblePlatformError,
           metaChanges: {platform: 'random'},
         },
       ];

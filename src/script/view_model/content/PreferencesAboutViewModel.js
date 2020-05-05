@@ -22,11 +22,7 @@ import {Config} from '../../Config';
 
 import {getPrivacyPolicyUrl, getTermsOfUsePersonalUrl, getTermsOfUseTeamUrl, getWebsiteUrl} from '../../externalRoute';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.content = z.viewModel.content || {};
-
-z.viewModel.content.PreferencesAboutViewModel = class PreferencesAboutViewModel {
+export class PreferencesAboutViewModel {
   constructor(mainViewModel, contentViewModel, repositories) {
     this.logger = getLogger('z.viewModel.content.PreferencesAboutViewModel');
 
@@ -50,4 +46,9 @@ z.viewModel.content.PreferencesAboutViewModel = class PreferencesAboutViewModel 
   showSupportSection() {
     return this.Config.URL.SUPPORT.INDEX || this.Config.URL.SUPPORT.CONTACT;
   }
-};
+}
+
+window.z = window.z || {};
+window.z.viewModel = window.z.viewModel || {};
+window.z.viewModel.content = window.z.viewModel.content || {};
+window.z.viewModel.content.PreferencesAboutViewModel = PreferencesAboutViewModel;

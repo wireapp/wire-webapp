@@ -50,7 +50,7 @@ import uk from 'I18n/uk-UA.json';
 
 window.z = window.z || {};
 
-const strings = {
+export const strings = {
   cs,
   da,
   de,

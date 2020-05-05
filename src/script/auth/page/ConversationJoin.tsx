@@ -90,7 +90,7 @@ const ConversationJoin = ({
   useEffect(() => {
     const localConversationCode = getURLParameter(QUERY_KEY.CONVERSATION_CODE);
     const localConversationKey = getURLParameter(QUERY_KEY.CONVERSATION_KEY);
-    const localExpiresIn = parseInt(getURLParameter(QUERY_KEY.JOIN_EXPIRES), 10) || undefined;
+    const localExpiresIn = window.parseInt(getURLParameter(QUERY_KEY.JOIN_EXPIRES), 10) || undefined;
 
     setConversationCode(localConversationCode);
     setConversationKey(localConversationKey);

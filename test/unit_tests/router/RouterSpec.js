@@ -75,7 +75,7 @@ describe('Router', () => {
 
       window.location.hash = '#/conversation/uuid';
 
-      setTimeout(() => {
+      window.setTimeout(() => {
         expect(handlers.conversation).toHaveBeenCalled();
         done();
       });

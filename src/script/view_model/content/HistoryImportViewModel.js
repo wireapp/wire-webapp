@@ -30,11 +30,7 @@ import {ContentViewModel} from '../ContentViewModel';
 
 import 'Components/loadingBar';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.content = z.viewModel.content || {};
-
-z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
+export class HistoryImportViewModel {
   static get STATE() {
     return {
       DONE: 'HistoryImportViewModel.STATE.DONE',
@@ -85,10 +81,10 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
       if (!error) {
         this.errorHeadline('');
         this.errorSecondary('');
-      } else if (error instanceof z.backup.DifferentAccountError) {
+      } else if (error instanceof window.z.backup.DifferentAccountError) {
         this.errorHeadline(t('backupImportAccountErrorHeadline'));
         this.errorSecondary(t('backupImportAccountErrorSecondary'));
-      } else if (error instanceof z.backup.IncompatibleBackupError) {
+      } else if (error instanceof window.z.backup.IncompatibleBackupError) {
         this.errorHeadline(t('backupImportVersionErrorHeadline'));
         this.errorSecondary(t('backupImportVersionErrorSecondary', Config.getConfig().BRAND_NAME));
       } else {
@@ -135,7 +131,7 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
   }
 
   onError(error) {
-    if (error instanceof z.backup.CancelError) {
+    if (error instanceof window.z.backup.CancelError) {
       this.logger.log('History import was cancelled');
       return this.dismissImport();
     }
@@ -143,4 +139,9 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
     this.logger.error(`Failed to import history: ${error.message}`, error);
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.HISTORY.RESTORE_FAILED);
   }
-};
+}
+
+window.z = window.z || {};
+window.z.viewModel = window.z.viewModel || {};
+window.z.viewModel.content = window.z.viewModel.content || {};
+window.z.viewModel.content.HistoryImportViewModel = HistoryImportViewModel;

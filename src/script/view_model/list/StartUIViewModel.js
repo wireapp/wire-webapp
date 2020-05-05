@@ -79,7 +79,7 @@ class StartUIViewModel {
     this.teamSize = this.teamRepository.teamSize;
 
     this.state = ko.observable(StartUIViewModel.STATE.ADD_PEOPLE);
-    this.isVisible = ko.pureComputed(() => listViewModel.state() === z.viewModel.ListViewModel.STATE.START_UI);
+    this.isVisible = ko.pureComputed(() => listViewModel.state() === window.z.viewModel.ListViewModel.STATE.START_UI);
 
     this.peopleTabActive = ko.pureComputed(() => this.state() === StartUIViewModel.STATE.ADD_PEOPLE);
 
@@ -288,7 +288,7 @@ class StartUIViewModel {
     $('user-input input').blur();
 
     amplify.publish(WebAppEvents.SEARCH.HIDE);
-    this.listViewModel.switchList(z.viewModel.ListViewModel.STATE.CONVERSATIONS);
+    this.listViewModel.switchList(window.z.viewModel.ListViewModel.STATE.CONVERSATIONS);
 
     this.resetView();
   }

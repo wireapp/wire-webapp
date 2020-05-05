@@ -100,7 +100,7 @@ export class RuntimeAction {
       }
 
       return new Promise((resolve, reject) => {
-        const connectionTimeout = setTimeout(
+        const connectionTimeout = window.setTimeout(
           () => reject(new Error('Error opening IndexedDB (response timeout)')),
           10000,
         );

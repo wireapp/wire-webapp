@@ -148,12 +148,12 @@ const generateYouTubeEmbedUrl = (url: string): string | void => {
 const convertYouTubeTimestampToSeconds = (timestamp: string): number => {
   if (timestamp) {
     if (/^[0-9]*$/.test(timestamp)) {
-      return parseInt(timestamp, 10);
+      return window.parseInt(timestamp, 10);
     }
 
     const _extractUnit = (unit: 'h' | 'm' | 's'): number => {
       const extracted = (timestamp.match(new RegExp(`([0-9]+)(?=${unit})`)) || ['0'])[0];
-      return parseInt(extracted, 10);
+      return window.parseInt(extracted, 10);
     };
 
     return _extractUnit('h') * 3600 + _extractUnit('m') * 60 + _extractUnit('s');

@@ -70,7 +70,7 @@ export class ConversationParticipantsViewModel extends BasePanelViewModel {
   }
 
   clickOnShowUser(userEntity: User): void {
-    this.navigateTo(z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_USER, {entity: userEntity});
+    this.navigateTo(window.z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_USER, {entity: userEntity});
   }
 
   initView(highlightedUsers: User[] = []): void {

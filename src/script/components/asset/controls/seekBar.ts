@@ -80,7 +80,7 @@ class SeekBarComponent {
   };
 
   on_change = (): void => {
-    const currentTime = this.mediaElement.duration * (parseInt(this.seekBar.value, 10) / 100);
+    const currentTime = this.mediaElement.duration * (window.parseInt(this.seekBar.value, 10) / 100);
     this.mediaElement.currentTime = clamp(currentTime, 0, this.mediaElement.duration);
   };
 

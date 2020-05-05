@@ -1479,7 +1479,7 @@ describe('ConversationRepository', () => {
       const conversationId = createRandomUuid();
       const event = {conversation: conversationId, from: 'unknown-user-id'};
       spyOn(testFactory.conversation_repository, 'get_conversation_by_id').and.returnValue(Promise.resolve({}));
-      spyOn(z.conversation.EventBuilder, 'buildMemberJoin').and.returnValue(event);
+      spyOn(window.z.conversation.EventBuilder, 'buildMemberJoin').and.returnValue(event);
 
       return testFactory.conversation_repository
         .addMissingMember({id: conversationId}, ['unknown-user-id'])

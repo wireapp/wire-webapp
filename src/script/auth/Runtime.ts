@@ -62,7 +62,7 @@ const getOsFamily = () => (getOs().family || '').toLowerCase();
 const getBrowserName = () => (getPlatform().name || '').toLowerCase();
 const getBrowserVersion = () => {
   const [majorVersion, minorVersion] = (getPlatform().version || '0.0').split('.');
-  return {major: parseInt(majorVersion, 10), minor: parseInt(minorVersion, 10)};
+  return {major: window.parseInt(majorVersion, 10), minor: window.parseInt(minorVersion, 10)};
 };
 
 const isSupportedBrowser = () => {

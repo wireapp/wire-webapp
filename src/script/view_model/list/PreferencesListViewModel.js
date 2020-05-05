@@ -62,7 +62,7 @@ class PreferencesListViewModel {
       if (!this.isActivatedAccount()) {
         return this.listViewModel.showTemporaryGuest();
       }
-      this.listViewModel.switchList(z.viewModel.ListViewModel.STATE.CONVERSATIONS);
+      this.listViewModel.switchList(window.z.viewModel.ListViewModel.STATE.CONVERSATIONS);
     }
   }
 

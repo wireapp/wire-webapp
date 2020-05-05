@@ -24,10 +24,7 @@ import {formatLocale} from 'Util/TimeUtil';
 import {WebAppEvents} from '../event/WebApp';
 import {Modal} from '../ui/Modal';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-
-z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
+export class ImageDetailViewViewModel {
   constructor(mainViewModel, repositories) {
     this.beforeHideCallback = this.beforeHideCallback.bind(this);
     this.hideCallback = this.hideCallback.bind(this);
@@ -202,4 +199,8 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
       this._loadImage();
     }
   }
-};
+}
+
+window.z = window.z || {};
+window.z.viewModel = window.z.viewModel || {};
+window.z.viewModel.ImageDetailViewViewModel = ImageDetailViewViewModel;

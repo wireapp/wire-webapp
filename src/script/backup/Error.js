@@ -17,62 +17,63 @@
  *
  */
 
-window.z = window.z || {};
-window.z.backup = z.backup || {};
-
-class ExportError extends Error {
+export class ExportError extends Error {
   constructor(message = 'Something went wrong.') {
     super(message);
     Object.setPrototypeOf(this, ExportError.prototype);
   }
 }
 
-class CancelError extends Error {
+export class CancelError extends Error {
   constructor(message = 'Action was cancelled') {
     super(message);
     Object.setPrototypeOf(this, CancelError.prototype);
   }
 }
 
-class ImportError extends Error {
+export class ImportError extends Error {
   constructor(message = 'Something went wrong.') {
     super(message);
     Object.setPrototypeOf(this, ImportError.prototype);
   }
 }
 
-class InvalidMetaDataError extends ImportError {
+export class InvalidMetaDataError extends ImportError {
   constructor(message = 'Meta data file is corrupt or missing properties.') {
     super(message);
     Object.setPrototypeOf(this, InvalidMetaDataError.prototype);
   }
 }
 
-class DifferentAccountError extends ImportError {
+export class DifferentAccountError extends ImportError {
   constructor(message = 'You cannot restore history from a different account.') {
     super(message);
     Object.setPrototypeOf(this, DifferentAccountError.prototype);
   }
 }
 
-class IncompatibleBackupError extends ImportError {
+export class IncompatibleBackupError extends ImportError {
   constructor(message = 'Backup created by incompatible database version') {
     super(message);
     Object.setPrototypeOf(this, IncompatibleBackupError.prototype);
   }
 }
 
-class IncompatiblePlatformError extends ImportError {
+export class IncompatiblePlatformError extends ImportError {
   constructor(message = 'Backup created by incompatible platform') {
     super(message);
     Object.setPrototypeOf(this, IncompatiblePlatformError.prototype);
   }
 }
 
-z.backup.CancelError = CancelError;
-z.backup.DifferentAccountError = DifferentAccountError;
-z.backup.ExportError = ExportError;
-z.backup.ImportError = ImportError;
-z.backup.IncompatibleBackupError = IncompatibleBackupError;
-z.backup.IncompatiblePlatformError = IncompatiblePlatformError;
-z.backup.InvalidMetaDataError = InvalidMetaDataError;
+window.z = window.z || {};
+window.z.backup = {
+  ...window.z.backup,
+  CancelError,
+  DifferentAccountError,
+  ExportError,
+  ImportError,
+  IncompatibleBackupError,
+  IncompatiblePlatformError,
+  InvalidMetaDataError,
+};

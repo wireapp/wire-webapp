@@ -165,7 +165,7 @@ class Message {
     ko.computed(
       () => {
         if (isMarked()) {
-          setTimeout(() => onMessageMarked(componentInfo.element));
+          window.setTimeout(() => onMessageMarked(componentInfo.element));
         }
       },
       {disposeWhenNodeIsRemoved: componentInfo.element},

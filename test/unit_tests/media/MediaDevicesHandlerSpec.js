@@ -172,7 +172,7 @@ describe('MediaDevicesHandler', () => {
 
       const devicesHandler = new MediaDevicesHandler();
 
-      setTimeout(() => {
+      window.setTimeout(() => {
         expect(devicesHandler.availableDevices.audioInput().length).withContext('Available microphones').toEqual(1);
       });
     });
@@ -188,7 +188,7 @@ describe('MediaDevicesHandler', () => {
       expect(realWorldTestSetup.microphones.length).withContext('Unfiltered microphones').toEqual(5);
       expect(realWorldTestSetup.speakers.length).withContext('Unfiltered speakers').toEqual(7);
 
-      setTimeout(() => {
+      window.setTimeout(() => {
         expect(devicesHandler.availableDevices.videoInput().length).withContext('Filtered cameras').toEqual(2);
         expect(devicesHandler.availableDevices.audioInput().length).withContext('Filtered microphones').toEqual(3);
         expect(devicesHandler.availableDevices.audioOutput().length).withContext('Filtered speakers').toEqual(4);
@@ -203,7 +203,7 @@ describe('MediaDevicesHandler', () => {
       );
 
       const devicesHandler = new MediaDevicesHandler();
-      setTimeout(() => {
+      window.setTimeout(() => {
         expect(navigator.mediaDevices.enumerateDevices).withContext('Initial enumeration').toHaveBeenCalledTimes(1);
         expect(devicesHandler.availableDevices.videoInput()).withContext('Initial cameras').toEqual(fakeWorldTestSetup.cameras);
         expect(devicesHandler.availableDevices.audioOutput()).withContext('Initial speakers').toEqual(fakeWorldTestSetup.speakers);
@@ -212,7 +212,7 @@ describe('MediaDevicesHandler', () => {
         navigator.mediaDevices.enumerateDevices.and.returnValue(Promise.resolve(newCameras));
         navigator.mediaDevices.ondevicechange();
 
-        setTimeout(() => {
+        window.setTimeout(() => {
           expect(navigator.mediaDevices.enumerateDevices).withContext('Updated enumeration').toHaveBeenCalledTimes(2);
           expect(devicesHandler.availableDevices.videoInput()).withContext('Updated cameras').toEqual(newCameras);
           expect(devicesHandler.availableDevices.audioOutput()).withContext('Updated speakers').toEqual([]);
@@ -229,7 +229,7 @@ describe('MediaDevicesHandler', () => {
       );
 
       const devicesHandler = new MediaDevicesHandler();
-      setTimeout(() => {
+      window.setTimeout(() => {
         devicesHandler.currentDeviceId.videoInput(fakeWorldTestSetup.cameras[0].deviceId);
 
         expect(devicesHandler.currentAvailableDeviceId.videoInput()).toBe(fakeWorldTestSetup.cameras[0].deviceId);

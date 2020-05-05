@@ -79,7 +79,7 @@ export class MainViewModel {
 
     this.actions = new ActionsViewModel(this, repositories);
 
-    this.panel = new z.viewModel.PanelViewModel(this, repositories);
+    this.panel = new window.z.viewModel.PanelViewModel(this, repositories);
     this.calling = new CallingViewModel(
       repositories.calling,
       repositories.conversation,
@@ -91,11 +91,11 @@ export class MainViewModel {
       this.multitasking,
     );
     this.content = new ContentViewModel(this, repositories);
-    this.list = new z.viewModel.ListViewModel(this, repositories);
+    this.list = new window.z.viewModel.ListViewModel(this, repositories);
 
-    this.lightbox = new z.viewModel.ImageDetailViewViewModel(this, repositories);
+    this.lightbox = new window.z.viewModel.ImageDetailViewViewModel(this, repositories);
     this.title = new WindowTitleViewModel(this, repositories);
-    this.favicon = new z.viewModel.FaviconViewModel(window.amplify);
+    this.favicon = new window.z.viewModel.FaviconViewModel(window.amplify);
     this.warnings = new WarningsViewModel();
 
     this.mainClasses = ko.pureComputed(() => {

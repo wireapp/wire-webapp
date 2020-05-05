@@ -18,6 +18,8 @@
  */
 
 import {amplify} from 'amplify';
+import * as platform from 'platform';
+import * as bazinga64 from 'bazinga64';
 import jQuery from 'jquery';
 import Cookies from 'js-cookie';
 import ko from 'knockout';
@@ -26,6 +28,9 @@ import 'raygun4js/dist/raygun.vanilla';
 
 import {AssetService} from '../assets/AssetService';
 import {NotificationService} from '../event/NotificationService';
+import type {Environment} from '../util/Environment';
+import type {WebAppEvents} from '../event/WebApp';
+import type {PermissionHelpers, ROLE} from '../user/UserPermission';
 
 // Needed for the wrapper
 import '../event/WebApp';
@@ -60,47 +65,55 @@ import 'Components/serviceList';
 import 'Components/topPeople';
 import 'Components/userInput';
 
-import 'Util/LocalizerUtil';
+import {t} from 'Util/LocalizerUtil';
 
-import '../backup/Error';
-import '../conversation/EventBuilder';
-import '../localization/Localizer';
+import {
+  CancelError,
+  DifferentAccountError,
+  ExportError,
+  ImportError,
+  IncompatibleBackupError,
+  IncompatiblePlatformError,
+  InvalidMetaDataError,
+} from '../backup/Error';
+import {EventBuilder} from '../conversation/EventBuilder';
+import {strings} from '../localization/Localizer';
 import '../message/MessageCategorization';
 import '../view_model/bindings/CommonBindings';
 import '../view_model/bindings/ConversationListBindings';
 import '../view_model/bindings/ListBackgroundBindings';
 import '../view_model/bindings/MessageListBindings';
 import '../view_model/bindings/VideoCallingBindings';
-import '../view_model/content/CollectionDetailsViewModel';
-import '../view_model/content/CollectionViewModel';
-import '../view_model/content/ConnectRequestsViewModel';
-import '../view_model/content/GiphyViewModel';
-import '../view_model/content/HistoryExportViewModel';
-import '../view_model/content/HistoryImportViewModel';
-import '../view_model/content/InputBarViewModel';
-import '../view_model/content/PreferencesAboutViewModel';
-import '../view_model/content/PreferencesAccountViewModel';
-import '../view_model/content/PreferencesDeviceDetailsViewModel';
-import '../view_model/content/PreferencesDevicesViewModel';
-import '../view_model/content/PreferencesOptionsViewModel';
-import '../view_model/content/TitleBarViewModel';
-import '../view_model/FaviconViewModel';
-import '../view_model/ImageDetailViewViewModel';
-import '../view_model/ListViewModel';
-import '../view_model/LoadingViewModel';
-import '../view_model/MainViewModel';
-import '../view_model/PanelViewModel';
+import {CollectionDetailsViewModel} from '../view_model/content/CollectionDetailsViewModel';
+import {CollectionViewModel} from '../view_model/content/CollectionViewModel';
+import {ConnectRequestsViewModel} from '../view_model/content/ConnectRequestsViewModel';
+import {GiphyViewModel} from '../view_model/content/GiphyViewModel';
+import {HistoryExportViewModel} from '../view_model/content/HistoryExportViewModel';
+import {HistoryImportViewModel} from '../view_model/content/HistoryImportViewModel';
+import {InputBarViewModel} from '../view_model/content/InputBarViewModel';
+import {PreferencesAboutViewModel} from '../view_model/content/PreferencesAboutViewModel';
+import {PreferencesAccountViewModel} from '../view_model/content/PreferencesAccountViewModel';
+import {PreferencesDeviceDetailsViewModel} from '../view_model/content/PreferencesDeviceDetailsViewModel';
+import {PreferencesDevicesViewModel} from '../view_model/content/PreferencesDevicesViewModel';
+import {PreferencesOptionsViewModel} from '../view_model/content/PreferencesOptionsViewModel';
+import {TitleBarViewModel} from '../view_model/content/TitleBarViewModel';
+import {FaviconViewModel} from '../view_model/FaviconViewModel';
+import {ImageDetailViewViewModel} from '../view_model/ImageDetailViewViewModel';
+import {ListViewModel} from '../view_model/ListViewModel';
+import {LoadingViewModel} from '../view_model/LoadingViewModel';
+import {MainViewModel} from '../view_model/MainViewModel';
+import {PanelViewModel} from '../view_model/PanelViewModel';
 
 declare global {
   interface Window {
-    $: any;
+    $: typeof jQuery;
     amplify: amplify.Static;
-    bazinga64: any;
-    jQuery: any;
+    bazinga64: typeof bazinga64;
+    jQuery: typeof jQuery;
     ko: typeof ko;
-    platform: any;
+    platform: typeof platform;
     Raygun: RaygunStatic;
-    t: any;
+    t: typeof t;
     wire: {
       app: {
         service: {
@@ -161,7 +174,52 @@ declare global {
       };
     };
     wSSOCapable: boolean;
-    z: any;
+    z: {
+      backup?: {
+        CancelError: typeof CancelError;
+        DifferentAccountError: typeof DifferentAccountError;
+        ExportError: typeof ExportError;
+        ImportError: typeof ImportError;
+        IncompatibleBackupError: typeof IncompatibleBackupError;
+        IncompatiblePlatformError: typeof IncompatiblePlatformError;
+        InvalidMetaDataError: typeof InvalidMetaDataError;
+      };
+      conversation?: {
+        EventBuilder?: typeof EventBuilder;
+      };
+      event?: {
+        WebApp?: typeof WebAppEvents;
+      };
+      string?: typeof strings;
+      team?: {
+        ROLE?: typeof ROLE;
+      };
+      userPermission?: ko.Observable<PermissionHelpers>;
+      util?: {
+        Environment?: typeof Environment;
+      };
+      viewModel?: {
+        CollectionDetailsViewModel: typeof CollectionDetailsViewModel;
+        CollectionViewModel: typeof CollectionViewModel;
+        ConnectRequestsViewModel: typeof ConnectRequestsViewModel;
+        GiphyViewModel: typeof GiphyViewModel;
+        HistoryExportViewModel: typeof HistoryExportViewModel;
+        HistoryImportViewModel: typeof HistoryImportViewModel;
+        InputBarViewModel: typeof InputBarViewModel;
+        PreferencesAboutViewModel: typeof PreferencesAboutViewModel;
+        PreferencesAccountViewModel: typeof PreferencesAccountViewModel;
+        PreferencesDeviceDetailsViewModel: typeof PreferencesDeviceDetailsViewModel;
+        PreferencesDevicesViewModel: typeof PreferencesDevicesViewModel;
+        PreferencesOptionsViewModel: typeof PreferencesOptionsViewModel;
+        TitleBarViewModel: typeof TitleBarViewModel;
+        FaviconViewModel: typeof FaviconViewModel;
+        ImageDetailViewViewModel: typeof ImageDetailViewViewModel;
+        ListViewModel: typeof ListViewModel;
+        LoadingViewModel: typeof LoadingViewModel;
+        MainViewModel: typeof MainViewModel;
+        PanelViewModel: typeof PanelViewModel;
+      };
+    };
   }
 }
 

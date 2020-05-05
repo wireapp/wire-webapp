@@ -41,7 +41,7 @@ describe('WindowTitleViewModel', () => {
   let title_view_model = undefined;
 
   beforeEach(() => {
-    setStrings({en: z.string});
+    setStrings({en: window.z.string});
     testFactory = new TestFactory();
 
     return testFactory.exposeConversationActors().then(conversationRepository => {

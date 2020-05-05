@@ -247,7 +247,7 @@ export class ConversationListViewModel {
   //##############################################################################
 
   clickOnArchivedButton() {
-    this.listViewModel.switchList(z.viewModel.ListViewModel.STATE.ARCHIVE);
+    this.listViewModel.switchList(window.z.viewModel.ListViewModel.STATE.ARCHIVE);
   }
 
   clickOnPreferencesButton() {
@@ -256,7 +256,7 @@ export class ConversationListViewModel {
 
   clickOnPeopleButton() {
     if (this.isActivatedAccount()) {
-      this.listViewModel.switchList(z.viewModel.ListViewModel.STATE.START_UI);
+      this.listViewModel.switchList(window.z.viewModel.ListViewModel.STATE.START_UI);
     }
   }
 }

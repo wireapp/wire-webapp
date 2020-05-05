@@ -59,7 +59,7 @@ describe('newVersionHandler', () => {
       jasmine.clock().tick(4 * 60 * 60 * 1000);
       jasmine.clock().uninstall();
 
-      setTimeout(() => {
+      window.setTimeout(() => {
         expect(testData.callback).toHaveBeenCalledWith(testData.response.version);
         done();
       });
