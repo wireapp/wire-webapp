@@ -30,7 +30,7 @@
     "react-hot-loader": "4.12.20",
     "react-styleguidist": "11.0.5",
     "react-test-renderer": "16.13.1",
-    "rimraf": "3.0.0",
+    "rimraf": "3.0.2",
     "typescript": "3.8.3",
     "webpack": "4.43.0",
     "webpack-cli": "3.3.11",

@@ -1,7 +1,7 @@
 {
   "description": "Events shared between Wire's web app and desktop app.",
   "devDependencies": {
-    "rimraf": "3.0.0",
+    "rimraf": "3.0.2",
     "typescript": "3.8.3"
   },
   "files": [

@@ -9,7 +9,7 @@
     "fs-extra": "9.0.0",
     "jszip": "3.2.2",
     "logdown": "3.3.1",
-    "rimraf": "3.0.0"
+    "rimraf": "3.0.2"
   },
   "description": "Wire's internal configuration copy tool",
   "devDependencies": {
