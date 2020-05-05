@@ -35,8 +35,8 @@ export class TeamMapper {
     this.logger = getLogger('TeamMapper');
   }
 
-  mapTeamFromObject(data: TeamData): TeamEntity {
-    return this.updateTeamFromObject(data);
+  mapTeamFromObject(data: TeamData, teamEntity?: TeamEntity): TeamEntity {
+    return this.updateTeamFromObject(data, teamEntity);
   }
 
   updateTeamFromObject(): void;
