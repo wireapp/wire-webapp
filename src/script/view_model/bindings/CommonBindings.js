@@ -203,6 +203,10 @@ ko.bindingHandlers.heightSync = {
           resizeCallback(sourceHeight, targetHeight);
         }
       }
+
+      const isScrolling = targetElement.scrollHeight > targetElement.offsetHeight;
+      element.style.overflowY = isScrolling ? 'scroll' : 'auto';
+      element.style.maxHeight = isScrolling ? `${targetElement.offsetHeight}px` : '';
     };
 
     // initial resize
