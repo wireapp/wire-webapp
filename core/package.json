@@ -66,6 +66,5 @@
     "test:project": "yarn dist && yarn test",
     "test:node": "nyc jasmine --config=jasmine.json"
   },
-  "types": "./dist/Account.d.ts",
   "version": "16.7.9"
 }

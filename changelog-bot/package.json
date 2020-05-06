@@ -31,6 +31,5 @@
     "test": "exit 0",
     "test:project": "yarn dist && yarn test"
   },
-  "types": "dist/ChangelogBot.d.ts",
   "version": "4.1.9"
 }

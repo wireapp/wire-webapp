@@ -29,7 +29,7 @@
     "wrapper"
   ],
   "license": "GPL-3.0",
-  "main": "./dist/commonjs/index.js",
+  "main": "dist/commonjs/index.js",
   "name": "@wireapp/store-engine",
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine",
   "scripts": {

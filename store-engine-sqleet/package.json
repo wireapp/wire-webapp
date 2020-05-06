@@ -33,7 +33,7 @@
     "dist"
   ],
   "license": "GPL-3.0",
-  "main": "./dist/index.js",
+  "main": "dist/index.js",
   "name": "@wireapp/store-engine-sqleet",
   "peerDependencies": {
     "@wireapp/store-engine": "4.x.x"

@@ -26,6 +26,5 @@
     "dist": "yarn clean && yarn build",
     "test": "nyc jasmine --config=jasmine.json"
   },
-  "types": "dist/commonjs/LRUCache.d.ts",
   "version": "3.6.1"
 }

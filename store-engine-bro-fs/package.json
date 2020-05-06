@@ -22,7 +22,7 @@
     "dist"
   ],
   "license": "GPL-3.0",
-  "main": "./dist/index.js",
+  "main": "dist/index.js",
   "name": "@wireapp/store-engine-bro-fs",
   "peerDependencies": {
     "@wireapp/store-engine": "4.x.x"
