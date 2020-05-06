@@ -31,7 +31,7 @@ module.exports = {
     auth: [
       'webpack-hot-middleware/client',
       'react-hot-loader/patch',
-      path.resolve(__dirname, srcScript, 'auth', 'main.tsx'),
+      path.resolve(__dirname, srcScript, 'auth/main.tsx'),
     ],
   },
   mode: 'development',

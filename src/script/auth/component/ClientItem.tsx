@@ -246,7 +246,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
                     setPassword(event.target.value);
                     setIsValidPassword(true);
                   }}
-                  pattern={`.{1,1024}`}
+                  pattern={'.{1,1024}'}
                   placeholder={_(clientItemStrings.passwordPlaceholder)}
                   required
                   style={{background: 'transparent'}}

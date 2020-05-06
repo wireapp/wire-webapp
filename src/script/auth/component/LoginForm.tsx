@@ -108,7 +108,7 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
           autoComplete="section-login password"
           type="password"
           placeholder={_(loginStrings.passwordPlaceholder)}
-          pattern={`.{1,1024}`}
+          pattern={'.{1,1024}'}
           required
           data-uie-name="enter-password"
         />

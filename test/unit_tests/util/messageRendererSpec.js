@@ -16,6 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+
 import {renderMessage, getRenderedTextContent} from 'Util/messageRenderer';
 import {MentionEntity} from 'src/script/message/MentionEntity';
 
@@ -447,7 +448,7 @@ describe('Ignored Markdown syntax', () => {
 
   it('does not render tables', () => {
     const input = 'First Header | Second Header\n------------ | -------------\nCell 1 | Cell 2';
-    const expected = `First Header | Second Header<br>------------ | -------------<br>Cell 1 | Cell 2`;
+    const expected = 'First Header | Second Header<br>------------ | -------------<br>Cell 1 | Cell 2';
 
     expect(renderMessage(input)).toBe(expected);
   });

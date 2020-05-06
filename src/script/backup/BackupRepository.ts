@@ -43,7 +43,7 @@ export interface Metadata {
 }
 
 export interface FileDescriptor {
-  content: string;
+  content: Uint8Array;
   filename: string;
 }
 
@@ -253,8 +253,11 @@ export class BackupRepository {
       return fileDescriptor.filename === BackupRepository.CONFIG.FILENAME.EVENTS;
     });
 
-    const conversationEntities = JSON.parse(conversationFileDescriptor.content);
-    const eventEntities = JSON.parse(eventFileDescriptor.content);
+    const conversationFileContent = new TextDecoder().decode(conversationFileDescriptor.content);
+    const conversationEntities = JSON.parse(conversationFileContent);
+
+    const eventFileContent = new TextDecoder().decode(eventFileDescriptor.content);
+    const eventEntities = JSON.parse(eventFileContent);
     const entityCount = conversationEntities.length + eventEntities.length;
     initCallback(entityCount);
 
@@ -314,7 +317,10 @@ export class BackupRepository {
   private _extractHistoryFiles(files: Record<string, JSZipObject>): Promise<FileDescriptor[]> {
     const unzipPromises = Object.values(files)
       .filter(zippedFile => zippedFile.name !== BackupRepository.CONFIG.FILENAME.METADATA)
-      .map(zippedFile => zippedFile.async('string').then(value => ({content: value, filename: zippedFile.name})));
+      .map(async zippedFile => {
+        const fileContent = await zippedFile.async('uint8array');
+        return {content: fileContent, filename: zippedFile.name};
+      });
 
     return Promise.all(unzipPromises).then(fileDescriptors => {
       this.logger.log('Unzipped files for history import', fileDescriptors);
@@ -336,9 +342,12 @@ export class BackupRepository {
 
   public verifyMetadata(files: Record<string, JSZipObject>): Promise<void> {
     return files[BackupRepository.CONFIG.FILENAME.METADATA]
-      .async('string')
-      .then(rawData => JSON.parse(rawData))
-      .then(metadata => this._verifyMetadata(metadata))
+      .async('uint8array')
+      .then(rawData => {
+        const metaData = new TextDecoder().decode(rawData);
+        const parsedMetaData = JSON.parse(metaData);
+        return this._verifyMetadata(parsedMetaData);
+      })
       .then(() => this.logger.log('Validated metadata during history import', files));
   }
 
@@ -367,7 +376,7 @@ export class BackupRepository {
     }, false);
 
     if (involvesDatabaseMigration) {
-      const message = `History cannot be restored: Database version mismatch`;
+      const message = 'History cannot be restored: Database version mismatch';
       throw new window.z.backup.IncompatibleBackupError(message);
     }
   }

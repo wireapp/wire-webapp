@@ -16,11 +16,12 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+
 import {Router} from 'express';
 import {ServerConfig} from '../../ServerConfig';
 
 export const ConfigRoute = (config: ServerConfig) =>
-  Router().get('/config.js', (req, res) => {
+  Router().get('/config.js', (_, res) => {
     const clientConfig = {
       ...config.CLIENT,
       APP_BASE: config.SERVER.APP_BASE,

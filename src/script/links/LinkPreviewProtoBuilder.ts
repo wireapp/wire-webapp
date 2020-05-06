@@ -18,7 +18,7 @@
  */
 
 import {Article, LinkPreview, Tweet} from '@wireapp/protocol-messaging';
-import {Data as OpenGraphData} from 'open-graph';
+import type {Data as OpenGraphData} from 'open-graph';
 import {isEmpty} from 'underscore';
 
 import {deArrayify} from 'Util/ArrayUtil';

@@ -17,7 +17,7 @@
  *
  */
 
-import UUID from 'uuidjs';
+import UUID from 'pure-uuid';
 import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {EventRepository} from 'src/script/event/EventRepository';
 import {Participant} from 'src/script/calling/Participant';
@@ -348,7 +348,7 @@ describe('e2e audio call', () => {
 });
 
 function genUUID() {
-  return UUID.genV4().hexString;
+  return new UUID(4).format();
 }
 
 function silence() {

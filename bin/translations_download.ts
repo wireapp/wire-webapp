@@ -30,11 +30,11 @@ import AdmZip from 'adm-zip';
 import sortJson from 'sort-json';
 
 const root = resolve(__dirname, '..');
-const destinationPath = resolve(root, 'src', 'i18n');
-const zipPath = resolve(root, 'temp', 'i18n', `wire-webapp.zip`);
+const destinationPath = resolve(root, 'src/i18n');
+const zipPath = resolve(root, 'temp/i18n/wire-webapp.zip');
 
 const getProjectKey = () => {
-  const crowdinYaml = join(root, 'keys', 'crowdin.yaml');
+  const crowdinYaml = join(root, 'keys/crowdin.yaml');
   const crowdinYamlContent = fs.readFileSync(crowdinYaml, 'utf8');
   const keyRegex = /api_key: ([0-9a-f]+)/;
   return crowdinYamlContent.match(keyRegex)[1];
@@ -42,7 +42,7 @@ const getProjectKey = () => {
 
 const projectKey = getProjectKey();
 
-const CROWDIN_API = `https://api.crowdin.com/api/project/wire-webapp`;
+const CROWDIN_API = 'https://api.crowdin.com/api/project/wire-webapp';
 
 const CROWDIN_URL = {
   DOWNLOAD: `${CROWDIN_API}/download/all.zip?key=${projectKey}`,

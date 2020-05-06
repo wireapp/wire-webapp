@@ -17,8 +17,8 @@
  *
  */
 
-export function getIceCandidatesTypes(iceCandidates) {
-  return iceCandidates.reduce((types, candidateStr) => {
+export function getIceCandidatesTypes(iceCandidates: string[]): Record<string, number> {
+  return iceCandidates.reduce((types: Record<string, number>, candidateStr) => {
     const typeMatches = candidateStr.match(/typ (\w+)/);
     if (!typeMatches) {
       return types;
@@ -32,11 +32,14 @@ export function getIceCandidatesTypes(iceCandidates) {
 /**
  * Returns `true` if the number and types of ice candidates gathered are sufficient to start a call
  *
- * @param {RTCConfiguration} peerConnectionConfig the configuration of the peerConnection that initiated the ICE candidate gathering
- * @param {Array<string>} iceCandidates ICE candidate strings from SDP
- * @returns {boolean} `true` if the candidates gathered are enough to send a SDP
+ * @param peerConnectionConfig the configuration of the peerConnection that initiated the ICE candidate gathering
+ * @param iceCandidates ICE candidate strings from SDP
+ * @returns `true` if the candidates gathered are enough to send a SDP
  */
-export function isValidIceCandidatesGathering(peerConnectionConfig, iceCandidates) {
+export function isValidIceCandidatesGathering(
+  peerConnectionConfig: RTCConfiguration,
+  iceCandidates: string[],
+): boolean {
   if (iceCandidates.length <= 0) {
     // if there are no candidates, no need to check for more conditions
     // the call cannot work

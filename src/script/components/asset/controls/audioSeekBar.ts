@@ -16,6 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+
 import ko from 'knockout';
 import {debounce} from 'underscore';
 
@@ -23,8 +24,8 @@ import {interpolate} from 'Util/ArrayUtil';
 import {clamp} from 'Util/NumberUtil';
 
 interface Params {
-  src: HTMLAudioElement;
   disabled: ko.Subscribable<boolean>;
+  src: HTMLAudioElement;
 
   // TODO: replace with proper Type once they are defined
   asset: any;

@@ -18,7 +18,7 @@
  */
 
 import {amplify} from 'amplify';
-import {Data as OpenGraphResult} from 'open-graph';
+import type {Data as OpenGraphResult} from 'open-graph';
 import {Asset, LinkPreview} from '@wireapp/protocol-messaging';
 import {AssetRetentionPolicy} from '@wireapp/api-client/dist/asset';
 

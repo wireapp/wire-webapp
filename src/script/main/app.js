@@ -840,13 +840,13 @@ class App {
    * @returns {undefined} No return value
    */
   refresh() {
-    this.logger.info(`Refresh to update started`);
+    this.logger.info('Refresh to update started');
     if (Environment.desktop) {
       // if we are in a desktop env, we just warn the wrapper that we need to reload. It then decide what should be done
       return amplify.publish(WebAppEvents.LIFECYCLE.RESTART);
     }
 
-    window.location.reload(true);
+    window.location.reload();
     window.focus();
   }
 

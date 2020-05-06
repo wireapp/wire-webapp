@@ -163,7 +163,7 @@ export class TeamRepository {
     const selfTeamId = this.selfUser().teamId;
     const teamData = selfTeamId ? await this.getTeamById() : await this.getBindingTeam();
 
-    const teamEntity = teamData ? this.teamMapper.mapTeamFromObject(teamData) : new TeamEntity();
+    const teamEntity = teamData ? this.teamMapper.mapTeamFromObject(teamData, this.team()) : new TeamEntity();
     this.team(teamEntity);
     if (selfTeamId) {
       await this.getSelfMember(selfTeamId);

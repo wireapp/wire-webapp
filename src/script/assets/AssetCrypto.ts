@@ -53,7 +53,7 @@ export const encryptAesAsset = async (plaintext: ArrayBuffer): Promise<Encrypted
     key,
     plaintext,
   );
-  const ivCipherText: Uint8Array = new Uint8Array(cipherText.byteLength + initializationVector.byteLength);
+  const ivCipherText = new Uint8Array(cipherText.byteLength + initializationVector.byteLength);
   ivCipherText.set(initializationVector, 0);
   ivCipherText.set(new Uint8Array(cipherText), initializationVector.byteLength);
 

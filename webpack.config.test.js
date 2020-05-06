@@ -25,7 +25,7 @@ const commonConfig = require('./webpack.config.common');
 module.exports = {
   ...prodConfig,
   devtool: 'inline-source-map',
-  entry: {...prodConfig.entry, test: path.resolve(__dirname, 'test', 'index.test.js')},
+  entry: {...prodConfig.entry, test: path.resolve(__dirname, 'test/index.test.js')},
   externals: {
     ...prodConfig.externals,
     // These will help enable enzyme to work properly
@@ -60,7 +60,7 @@ module.exports = {
     ...commonConfig.plugins,
     new webpack.DefinePlugin({
       'process.env': {
-        NODE_ENV: JSON.stringify('test'),
+        NODE_ENV: `"test"`,
       },
     }),
   ],

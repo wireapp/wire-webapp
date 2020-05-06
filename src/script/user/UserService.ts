@@ -16,6 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+
 import {APIClient} from '@wireapp/api-client';
 import {User as APIClientUser} from '@wireapp/api-client/dist/user';
 
