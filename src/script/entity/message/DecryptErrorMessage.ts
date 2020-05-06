@@ -38,7 +38,6 @@ export class DecryptErrorMessage extends Message {
   public readonly is_resetting_session: ko.Observable<boolean>;
   public readonly link: ko.PureComputed<string>;
 
-  // tslint:disable-next-line:typedef
   static get REMOTE_IDENTITY_CHANGED_ERROR() {
     return ProteusErrors.DecryptError.CODE.CASE_204.toString();
   }

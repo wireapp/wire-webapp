@@ -95,7 +95,6 @@ export class CallingRepository {
   private readonly logger: Logger;
   private readonly callLog: string[];
 
-  // tslint:disable-next-line:typedef
   static get CONFIG() {
     return {
       DEFAULT_CONFIG_TTL: 60 * 60, // 60 minutes in seconds

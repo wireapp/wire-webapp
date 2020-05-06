@@ -44,7 +44,6 @@ export class EventTrackingRepository {
   private readonly userRepository: UserRepository;
   isErrorReportingActivated: boolean;
 
-  // tslint:disable-next-line:typedef
   static get CONFIG() {
     return {
       ERROR_REPORTING: {

@@ -56,7 +56,6 @@ export class BackupRepository {
   private readonly userRepository: UserRepository;
   private canceled: boolean;
 
-  // tslint:disable-next-line:typedef
   static get CONFIG() {
     return {
       FILENAME: {

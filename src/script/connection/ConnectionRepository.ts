@@ -47,7 +47,6 @@ export class ConnectionRepository {
   private readonly connectionMapper: ConnectionMapper;
   public readonly connectionEntities: ko.ObservableArray<ConnectionEntity>;
 
-  // tslint:disable-next-line:typedef
   static get CONFIG(): Record<string, BackendEventType[]> {
     return {
       SUPPORTED_EVENTS: [USER_EVENT.CONNECTION],

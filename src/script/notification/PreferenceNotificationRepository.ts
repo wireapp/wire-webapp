@@ -45,7 +45,6 @@ interface GroupedNotifications {
 export class PreferenceNotificationRepository {
   private readonly notifications: ko.ObservableArray<Notification>;
 
-  // tslint:disable-next-line:typedef
   static get CONFIG() {
     return {
       NOTIFICATION_TYPES: {

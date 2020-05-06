@@ -64,7 +64,6 @@ export class WebSocketService {
     return CHANGE_TRIGGER;
   }
 
-  // tslint:disable-next-line:typedef
   static get CONFIG() {
     return {
       PING_INTERVAL: TIME_IN_MILLIS.SECOND * 5,

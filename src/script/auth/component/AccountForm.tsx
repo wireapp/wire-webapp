@@ -136,7 +136,6 @@ const AccountForm = ({account, ...props}: Props & ConnectedProps & DispatchProps
           }
         }
       } else {
-        // tslint:disable-next-line:no-console
         console.error('Account registration error', error);
       }
     }

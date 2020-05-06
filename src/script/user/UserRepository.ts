@@ -100,7 +100,6 @@ export class UserRepository {
   readonly self: ko.Observable<User>;
   getTeamMembersFromUsers: (users: User[]) => Promise<void>;
 
-  // tslint:disable-next-line:typedef
   static get CONFIG() {
     return {
       MAXIMUM_TEAM_SIZE_BROADCAST: 500,

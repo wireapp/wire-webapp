@@ -32,19 +32,11 @@
     "nyc": "15.0.1",
     "rimraf": "3.0.2",
     "ts-node": "8.9.1",
-    "tslint": "5.20.1",
-    "tslint-config-prettier": "1.18.0",
-    "tslint-eslint-rules": "5.4.0",
-    "tslint-plugin-prettier": "2.3.0",
     "typescript": "3.8.3"
   },
   "scripts": {
     "build": "yarn clean && tsc -P tsconfig.json && node ./bin/copy_server_assets.js && node ./bin/create_commit_sha_file.js",
     "clean": "rimraf ./dist/",
-    "fix": "yarn fix:ts",
-    "fix:ts": "yarn lint:ts --fix",
-    "lint": "yarn lint:ts",
-    "lint:ts": "tslint --config tslint.json --project tsconfig.json",
     "start:prod": "pm2 start \"./index.js\" --name \"Webapp\" && pm2 logs",
     "test": "nyc jasmine --config=jasmine.json",
     "test:dev": "nyc --all=false jasmine --config=jasmine.json"

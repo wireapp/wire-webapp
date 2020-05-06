@@ -93,7 +93,6 @@ export class NotificationRepository {
   private readonly selfUser: ko.Observable<User>;
   private readonly userRepository: UserRepository;
 
-  // tslint:disable-next-line:typedef
   static get CONFIG() {
     return {
       BODY_LENGTH: 80,

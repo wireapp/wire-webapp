@@ -79,7 +79,6 @@ export class BackendClient {
   public restUrl: string;
   public webSocketUrl: string;
 
-  // tslint:disable-next-line:typedef
   static get CONFIG() {
     return {
       CONNECTIVITY_CHECK: {
@@ -91,7 +90,6 @@ export class BackendClient {
     };
   }
 
-  // tslint:disable-next-line:typedef
   static get CONNECTIVITY_CHECK_TRIGGER() {
     return {
       ACCESS_TOKEN_REFRESH: 'BackendClient.CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_REFRESH',
@@ -104,7 +102,6 @@ export class BackendClient {
     };
   }
 
-  // tslint:disable-next-line:typedef
   static get IGNORED_BACKEND_ERRORS() {
     return [
       BackendClientError.STATUS_CODE.BAD_GATEWAY,
@@ -119,7 +116,6 @@ export class BackendClient {
     ];
   }
 
-  // tslint:disable-next-line:typedef
   static get IGNORED_BACKEND_LABELS() {
     return [
       BackendClientError.LABEL.INVALID_CREDENTIALS,
