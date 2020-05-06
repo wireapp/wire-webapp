@@ -387,7 +387,7 @@ export class MessageListViewModel {
     const conversationEntity = this.conversation_repository.active_conversation();
     const isSingleModeConversation = conversationEntity.is1to1() || conversationEntity.isRequest();
 
-    if (isSingleModeConversation && !userEntity.isMe) {
+    if (userEntity.isDeleted || (isSingleModeConversation && !userEntity.isMe)) {
       return this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS);
     }
 
