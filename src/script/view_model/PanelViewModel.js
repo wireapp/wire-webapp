@@ -238,7 +238,10 @@ export class PanelViewModel {
 
     const panelStateElementId = this.subViews[state].getElementId();
     const exitPanel = $(`#${panelStateElementId}`);
-    exitPanel.removeClass('panel__page--visible panel__page--move-out--left panel__page--move-out--right');
+    exitPanel.removeClass('panel__page--move-out--left panel__page--move-out--right');
+    if (this.state() !== state) {
+      exitPanel.removeClass('panel__page--visible');
+    }
   }
 
   _openPanel(newState, params) {

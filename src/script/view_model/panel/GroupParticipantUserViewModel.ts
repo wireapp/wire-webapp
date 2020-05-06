@@ -18,12 +18,14 @@
  */
 
 import ko from 'knockout';
+import {amplify} from 'amplify';
 
 import {getLogger, Logger} from 'Util/Logger';
 
 import {Actions} from 'Components/panel/userActions';
 import 'Components/panel/enrichedFields';
 import 'Components/panel/userDetails';
+
 import {DefaultRole, ConversationRoleRepository} from '../../conversation/ConversationRoleRepository';
 import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
 import {UserRepository} from '../../user/UserRepository';
@@ -32,6 +34,9 @@ import {TeamRepository} from '../../team/TeamRepository';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
 import {User} from '../../entity/User';
 import {PanelViewModel} from '../PanelViewModel';
+import {WebAppEvents} from '../../event/WebApp';
+import {ClientEvent} from '../../event/Client';
+import {MemberLeaveEvent} from '../../conversation/EventBuilder';
 
 export class GroupParticipantUserViewModel extends BasePanelViewModel {
   userRepository: UserRepository;
@@ -73,7 +78,18 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
         this.activeConversation().isGroup() &&
         this.conversationRoleRepository.isUserGroupAdmin(this.activeConversation(), this.selectedParticipant()),
     );
+    amplify.subscribe(WebAppEvents.CONVERSATION.EVENT_FROM_BACKEND, this.checkMemberLeave);
   }
+
+  private readonly checkMemberLeave = ({type, data}: MemberLeaveEvent) => {
+    if (
+      this.isVisible() &&
+      type === ClientEvent.CONVERSATION.TEAM_MEMBER_LEAVE &&
+      data.user_ids.includes(this.getEntityId())
+    ) {
+      this.onGoToRoot();
+    }
+  };
 
   onToggleAdmin = async (): Promise<void> => {
     const newRole = this.isAdmin() ? DefaultRole.WIRE_MEMBER : DefaultRole.WIRE_ADMIN;
