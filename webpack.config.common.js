@@ -22,7 +22,7 @@ const webpack = require('webpack');
 const {ROOT_PATH, DIST_PATH, SRC_PATH} = require('./locations');
 
 const dist = path.resolve(DIST_PATH, 'static');
-const auth = path.resolve(SRC_PATH, 'script', 'auth');
+const auth = path.resolve(SRC_PATH, 'script/auth');
 const srcScript = path.resolve(SRC_PATH, 'script');
 
 module.exports = {
@@ -92,6 +92,7 @@ module.exports = {
   resolve: {
     alias: {
       Components: path.resolve(srcScript, 'components'),
+      I18n: path.resolve(SRC_PATH, 'i18n'),
       Resource: path.resolve(ROOT_PATH, 'resource'),
       Util: path.resolve(srcScript, 'util'),
     },

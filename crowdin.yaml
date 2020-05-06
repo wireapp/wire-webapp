@@ -3,6 +3,6 @@ base_path: .
 
 files:
   -
-    source: 'resource/translation/en-US.json'
+    source: 'src/i18n/en-US.json'
     translation: '%locale%.json'
     update_option: 'update_as_unapproved'

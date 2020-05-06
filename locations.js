@@ -16,10 +16,11 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+
 const {resolve} = require('path');
 
 module.exports = {
-  DIST_PATH: resolve(__dirname, 'server', 'dist'),
+  DIST_PATH: resolve(__dirname, 'server/dist'),
   ROOT_PATH: resolve(__dirname),
   SRC_PATH: resolve(__dirname, 'src'),
 };

@@ -149,7 +149,7 @@ export class MediaStreamHandler {
       ? this.constraintsHandler.getScreenStreamConstraints(this.screensharingMethod)
       : this.constraintsHandler.getMediaStreamConstraints(audio, video, isGroup);
 
-    this.logger.info(`Requesting MediaStream`, mediaConstraints);
+    this.logger.info('Requesting MediaStream', mediaConstraints);
 
     const willPromptForPermission = !hasPermission && !Environment.desktop;
     if (willPromptForPermission) {

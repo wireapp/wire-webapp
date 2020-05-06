@@ -392,7 +392,7 @@ export class DebugUtil {
       setInterval(() => {
         ctx.fillStyle = `#${color}`;
         ctx.fillRect(0, 0, width, height);
-        ctx.fillStyle = `#000`;
+        ctx.fillStyle = '#000';
         ctx.fillRect(0, 0, Math.random() * 10, Math.random() * 10);
       }, 500);
       const stream = canvas.captureStream(25);

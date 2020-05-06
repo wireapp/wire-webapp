@@ -367,7 +367,7 @@ export class BackupRepository {
     }, false);
 
     if (involvesDatabaseMigration) {
-      const message = `History cannot be restored: Database version mismatch`;
+      const message = 'History cannot be restored: Database version mismatch';
       throw new window.z.backup.IncompatibleBackupError(message);
     }
   }

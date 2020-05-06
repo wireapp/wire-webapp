@@ -77,7 +77,7 @@ const Root = ({
   }, []);
 
   const loadLanguage = (language: string) => {
-    return require(`Resource/translation/${mapLanguage(language)}.json`);
+    return require(`I18n/${mapLanguage(language)}.json`);
   };
 
   const navigate = (route: string): null => {

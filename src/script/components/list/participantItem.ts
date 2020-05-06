@@ -16,6 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+
 import ko from 'knockout';
 
 import {ParticipantAvatar} from 'Components/participantAvatar';
@@ -30,38 +31,38 @@ import {viewportObserver} from '../../ui/viewportObserver';
 import 'Components/availabilityState';
 
 interface ParticipantItemParams {
-  participant: User | ServiceEntity;
   badge: boolean;
-  mode: UserlistMode;
   canSelect: boolean;
-  isSelected: boolean;
-  showCamera: boolean;
   customInfo: string;
-  hideInfo: boolean;
-  selfInTeam: boolean;
   external: boolean;
+  hideInfo: boolean;
+  isSelected: boolean;
   isSelfVerified: ko.Subscribable<boolean>;
+  mode: UserlistMode;
+  participant: User | ServiceEntity;
+  selfInTeam: boolean;
+  showCamera: boolean;
 }
 
 class ParticipantItem {
   avatarSize: string;
-  participant: User | ServiceEntity;
+  badge: boolean;
+  canSelect: boolean;
+  contentInfo: string | ko.Observable<string>;
+  external: boolean;
+  hasUsernameInfo: boolean;
+  isDefaultMode: boolean;
+  isInViewport: ko.Observable<boolean>;
+  isOthersMode: boolean;
+  isSelected: boolean;
+  isSelf: boolean;
+  isSelfVerified: ko.Subscribable<boolean>;
   isService: boolean;
   isUser: boolean;
-  isSelf: boolean;
+  participant: User | ServiceEntity;
   selfInTeam: boolean;
-  badge: boolean;
-  isDefaultMode: boolean;
-  isOthersMode: boolean;
-  external: boolean;
-  canSelect: boolean;
-  isSelected: boolean;
-  showCamera: boolean;
-  hasUsernameInfo: boolean;
-  contentInfo: string | ko.Observable<string>;
-  isInViewport: ko.Observable<boolean>;
-  isSelfVerified: ko.Subscribable<boolean>;
   selfString: string;
+  showCamera: boolean;
 
   constructor(
     {

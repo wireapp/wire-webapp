@@ -540,7 +540,7 @@ export class ClientRepository {
    * @returns Resolves with all locally known clients except the current one
    */
   getClientsForSelf(): Promise<any[]> {
-    this.logger.info(`Retrieving all clients of the self user from database`);
+    this.logger.info('Retrieving all clients of the self user from database');
     return this.getClientByUserIdFromDb(this.selfUser().id)
       .then(clientsData => ClientMapper.mapClients(clientsData, true))
       .then(clientEntities => {

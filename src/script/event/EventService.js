@@ -360,7 +360,7 @@ export class EventService {
    * Update an unencrypted event.
    * A valid update must not contain a 'version' property.
    *
-   * @param {number} primaryKey event's primary key
+   * @param {string} primaryKey event's primary key
    * @param {Object<Event>} [updates={}] Updates to perform on the message.
    * @returns {Promise} Resolves when the message was updated in database.
    */

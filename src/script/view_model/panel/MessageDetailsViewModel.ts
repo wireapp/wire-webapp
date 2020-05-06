@@ -16,6 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+
 import ko from 'knockout';
 import {amplify} from 'amplify';
 
@@ -32,26 +33,26 @@ import {User} from '../../entity/User';
 import {ContentMessage} from '../../entity/message/ContentMessage';
 
 export class MessageDetailsViewModel extends BasePanelViewModel {
-  messageId: ko.Observable<string>;
-  isReceiptsOpen: ko.Observable<boolean>;
   conversationRepository: ConversationRepository;
-  teamRepository: TeamRepository;
-  states: Record<string, string>;
-  message: ko.PureComputed<ContentMessage>;
-  state: ko.PureComputed<string>;
-  receiptUsers: ko.ObservableArray<User>;
+  editedFooter: ko.PureComputed<string>;
+  isReceiptsOpen: ko.Observable<boolean>;
+  likes: ko.PureComputed<string[]>;
+  likesTitle: ko.PureComputed<string>;
   likeUsers: ko.ObservableArray<User>;
-  receiptTimes: ko.Observable<Record<string, string>>;
+  message: ko.PureComputed<ContentMessage>;
+  messageId: ko.Observable<string>;
+  panelTitle: ko.PureComputed<string>;
   receipts: ko.PureComputed<ReadReceipt[]>;
+  receiptsTitle: ko.PureComputed<string>;
+  receiptTimes: ko.Observable<Record<string, string>>;
+  receiptUsers: ko.ObservableArray<User>;
   sentFooter: ko.PureComputed<string>;
+  showTabs: ko.PureComputed<boolean>;
+  state: ko.PureComputed<string>;
+  states: Record<string, string>;
   supportsLikes: ko.PureComputed<boolean>;
   supportsReceipts: ko.PureComputed<boolean>;
-  likes: ko.PureComputed<string[]>;
-  receiptsTitle: ko.PureComputed<string>;
-  likesTitle: ko.PureComputed<string>;
-  showTabs: ko.PureComputed<boolean>;
-  editedFooter: ko.PureComputed<string>;
-  panelTitle: ko.PureComputed<string>;
+  teamRepository: TeamRepository;
 
   constructor(params: PanelViewModelProps) {
     super(params);

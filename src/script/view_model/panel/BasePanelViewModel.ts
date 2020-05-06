@@ -28,10 +28,12 @@ import {TeamRepository} from '../../team/TeamRepository';
 import {ClientRepository} from '../../client/ClientRepository';
 import {CryptographyRepository} from '../../cryptography/CryptographyRepository';
 import {UserRepository} from '../../user/UserRepository';
+import {MainViewModel} from '../MainViewModel';
+import {IntegrationRepository} from '../../integration/IntegrationRepository';
 
 export interface PanelViewModelProps {
   isVisible: ko.Observable<boolean>;
-  navigateTo: (target: string, params?: {entity?: User | ServiceEntity}) => void;
+  navigateTo: (target: string, params?: {entity?: User | ServiceEntity; addMode?: boolean}) => void;
   onClose: () => void;
   onGoBack: () => void;
   onGoToRoot: () => void;
@@ -42,7 +44,9 @@ export interface PanelViewModelProps {
     client: ClientRepository;
     cryptography: CryptographyRepository;
     user: UserRepository;
+    integration: IntegrationRepository;
   };
+  mainViewModel: MainViewModel;
 }
 
 export class BasePanelViewModel {
@@ -63,7 +67,7 @@ export class BasePanelViewModel {
     this.activeConversation = repositories.conversation.active_conversation;
   }
 
-  initView(param: unknown): void {}
+  initView(_: unknown): void {}
 
   getElementId(): string {
     return 'conversation-details';

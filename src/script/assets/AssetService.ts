@@ -93,7 +93,7 @@ export class AssetService {
 
   async generateAssetUrlV3(assetKey: string, assetToken: string, forceCaching: boolean): Promise<string> {
     assetV3(assetKey, assetToken);
-    const url = `${this.backendClient.createUrl(`/assets/v3/${assetKey}`)}`;
+    const url = this.backendClient.createUrl(`/assets/v3/${assetKey}`);
     const assetTokenParam = assetToken ? `&asset_token=${encodeURIComponent(assetToken)}` : '';
     const cachingParam = forceCaching ? '&forceCaching=true' : '';
     return `${url}?access_token=${this.apiClient['accessTokenStore'].accessToken?.access_token}${assetTokenParam}${cachingParam}`;

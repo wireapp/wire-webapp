@@ -31,12 +31,9 @@ import {WebAppEvents} from '../event/WebApp';
 import {MotionDuration} from '../motion/MotionDuration';
 import {ContentViewModel} from './ContentViewModel';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-
 export const OPEN_CONVERSATION_DETAILS = 'PanelViewModel.OPEN_CONVERSATION_DETAILS';
 
-z.viewModel.PanelViewModel = class PanelViewModel {
+export class PanelViewModel {
   static get STATE() {
     return {
       ADD_PARTICIPANTS: 'PanelViewModel.STATE.ADD_PARTICIPANTS',
@@ -264,4 +261,8 @@ z.viewModel.PanelViewModel = class PanelViewModel {
       return $(`#${panelStateElementId}`).addClass('panel__page--visible');
     }
   }
-};
+}
+
+window.z = window.z || {};
+window.z.viewModel = z.viewModel || {};
+z.viewModel.PanelViewModel = PanelViewModel;

@@ -124,7 +124,7 @@ const CheckPassword = ({loginData, doLogin, resetAuthError, isFetching}: Props &
               name="password-login"
               autoComplete="section-login password"
               placeholder={_(loginStrings.passwordPlaceholder)}
-              pattern={`.{1,1024}`}
+              pattern={'.{1,1024}'}
               data-uie-name="enter-password"
               required
               autoFocus

@@ -25,6 +25,7 @@ import {RaygunStatic} from 'raygun4js';
 import 'raygun4js/dist/raygun.vanilla';
 
 import {AssetService} from '../assets/AssetService';
+import {NotificationService} from '../event/NotificationService';
 
 // Needed for the wrapper
 import '../event/WebApp';
@@ -104,6 +105,7 @@ declare global {
       app: {
         service: {
           asset: AssetService;
+          notification: NotificationService;
         };
       };
       env: {

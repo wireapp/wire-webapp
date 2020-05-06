@@ -20,6 +20,7 @@
     "outDir": "src/script/auth",
     "paths": {
       "Components/*": ["./src/script/components/*"],
+      "I18n/*": ["./src/i18n/*"],
       "Resource/*": ["./resource/*"],
       "Util/*": ["./src/script/util/*"]
     },

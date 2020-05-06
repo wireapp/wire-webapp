@@ -18,7 +18,7 @@
  */
 
 import {ConnectionStatus} from '@wireapp/api-client/dist/connection';
-import {GenericMessage, LegalHoldStatus, Text} from '@wireapp/protocol-messaging';
+import {Confirmation, GenericMessage, LegalHoldStatus, Text} from '@wireapp/protocol-messaging';
 
 import {createRandomUuid} from 'Util/util';
 
@@ -43,7 +43,6 @@ import {ACCESS_MODE} from 'src/script/conversation/AccessMode';
 import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
 import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
 import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
-import {ReceiptMode} from 'src/script/conversation/ReceiptMode';
 
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 import {StorageSchemata} from 'src/script/storage/StorageSchemata';
@@ -290,7 +289,7 @@ describe('ConversationRepository', () => {
         muted_timestamp: 0,
         name: 'Test Group',
         others: [conversationPartner.id],
-        receipt_mode: ReceiptMode.DELIVERY_AND_READ,
+        receipt_mode: Confirmation.Type.READ,
         status: ConversationStatus.CURRENT_MEMBER,
         team_id: createRandomUuid(),
         type: ConversationType.GROUP,

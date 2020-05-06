@@ -71,9 +71,9 @@ export class TeamRepository {
   private readonly memberRoles: ko.Observable<any>;
   private readonly supportsLegalHold: ko.Observable<boolean>;
   private readonly teamMapper: TeamMapper;
-  private readonly teamMembers: ko.PureComputed<User[]>;
+  readonly teamMembers: ko.PureComputed<User[]>;
   private readonly teamName: ko.PureComputed<string>;
-  private readonly teamUsers: ko.PureComputed<User[]>;
+  readonly teamUsers: ko.PureComputed<User[]>;
   private readonly userRepository: UserRepository;
   readonly isTeam: ko.PureComputed<boolean>;
   readonly selfUser: ko.Observable<User>;
@@ -163,7 +163,7 @@ export class TeamRepository {
     const selfTeamId = this.selfUser().teamId;
     const teamData = selfTeamId ? await this.getTeamById() : await this.getBindingTeam();
 
-    const teamEntity = teamData ? this.teamMapper.mapTeamFromObject(teamData) : new TeamEntity();
+    const teamEntity = teamData ? this.teamMapper.mapTeamFromObject(teamData, this.team()) : new TeamEntity();
     this.team(teamEntity);
     if (selfTeamId) {
       await this.getSelfMember(selfTeamId);

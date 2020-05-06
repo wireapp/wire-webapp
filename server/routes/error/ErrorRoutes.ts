@@ -28,7 +28,7 @@ const logger = logdown('@wireapp/wire-webapp/routes/error/errorRoutes', {
   markdown: false,
 });
 
-const InternalErrorRoute = (): express.ErrorRequestHandler => (err, req, res, next) => {
+const InternalErrorRoute = (): express.ErrorRequestHandler => (err, req, res) => {
   logger.error(`[${formatDate()}] ${err.stack}`);
   const error = {
     code: 500,
