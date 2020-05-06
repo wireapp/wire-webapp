@@ -40,13 +40,12 @@ export class BackupService {
     this.storageService = storageService;
   }
 
-  public exportTable(table: Dexie.Table<any, string>, onProgress: (batch: any[]) => void): Dexie.Promise<void> {
+  public async exportTable(table: Dexie.Table<any, string>, onProgress: (batch: any[]) => void): Promise<void> {
     const collection = table.toCollection();
-    return table
-      .count()
-      .then(count => new DexieBatch({batchSize: BackupService.CONFIG.BATCH_SIZE, limit: count}))
-      .then(batchDriver => batchDriver.eachBatch(collection, batch => onProgress(batch)))
-      .then(count => this.logger.log(`Exported store '${table.name}' in '${count}' batches`));
+    const tableCount = await table.count();
+    const batchDriver = new DexieBatch({batchSize: BackupService.CONFIG.BATCH_SIZE, limit: tableCount});
+    const batchCount = await batchDriver.eachBatch(collection, batch => onProgress(batch));
+    return this.logger.log(`Exported store '${table.name}' in '${batchCount}' batches`);
   }
 
   public getDatabaseVersion(): number {
@@ -56,10 +55,9 @@ export class BackupService {
     return 1;
   }
 
-  public getHistoryCount(): Promise<number> {
-    return Promise.all(this.getTables().map(table => table.count())).then(recordsPerTable => {
-      return recordsPerTable.reduce((accumulator, recordCount) => accumulator + recordCount, 0);
-    });
+  public async getHistoryCount(): Promise<number> {
+    const recordsPerTable = await Promise.all(this.getTables().map(table => table.count()));
+    return recordsPerTable.reduce((accumulator, recordCount) => accumulator + recordCount, 0);
   }
 
   public getTables(): Dexie.Table<any, string>[] {
