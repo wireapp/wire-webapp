@@ -50,7 +50,6 @@ export class MemberMessage extends SystemMessage {
   public readonly userIds: ko.ObservableArray<string>;
   public memberMessageType: SystemMessageType;
 
-  // tslint:disable-next-line:typedef
   static get CONFIG() {
     return {
       MAX_USERS_VISIBLE: 17,

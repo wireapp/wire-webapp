@@ -55,14 +55,12 @@ export class ClientRepository {
   currentClient: ko.Observable<ClientEntity>;
   isTemporaryClient: ko.PureComputed<boolean>;
 
-  // tslint:disable-next-line:typedef
   static get CONFIG() {
     return {
       AVERAGE_NUMBER_OF_CLIENTS: 4,
     };
   }
 
-  // tslint:disable-next-line:typedef
   static get PRIMARY_KEY_CURRENT_CLIENT() {
     return 'local_identity';
   }

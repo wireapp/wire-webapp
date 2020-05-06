@@ -37,7 +37,6 @@ import {PROPERTIES_TYPE} from './PropertiesType';
 
 export class PropertiesRepository {
   // Value names are specified by the protocol but key names can be changed.
-  // tslint:disable-next-line:typedef
   static get CONFIG() {
     return {
       WEBAPP_ACCOUNT_SETTINGS: 'webapp',

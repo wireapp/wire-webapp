@@ -28,7 +28,6 @@ export class BackupService {
   private readonly logger: Logger;
   private readonly storageService: StorageService;
 
-  // tslint:disable-next-line:typedef
   static get CONFIG() {
     return {
       BATCH_SIZE: 10000,
