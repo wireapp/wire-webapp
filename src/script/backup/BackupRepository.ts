@@ -205,11 +205,15 @@ export class BackupRepository {
     const zip = new JSZip();
 
     // first write the metadata file
-    zip.file(BackupRepository.CONFIG.FILENAME.METADATA, JSON.stringify(metaData, null, 2));
+    const stringifiedMetadata = JSON.stringify(metaData, null, 2);
+    const encodedMetadata = new TextEncoder().encode(stringifiedMetadata);
+    zip.file(BackupRepository.CONFIG.FILENAME.METADATA, encodedMetadata, {binary: true});
 
     // then all the other tables
     Object.keys(exportedData).forEach(tableName => {
-      zip.file(`${tableName}.json`, JSON.stringify(exportedData[tableName]));
+      const stringifiedData = JSON.stringify(exportedData[tableName]);
+      const encodedData = new TextEncoder().encode(stringifiedData);
+      zip.file(`${tableName}.json`, encodedData, {binary: true});
     });
 
     return zip;
