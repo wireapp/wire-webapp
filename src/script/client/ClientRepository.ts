@@ -17,7 +17,15 @@
  *
  */
 
-import {ClientClassification, NewClient, PublicClient, RegisteredClient} from '@wireapp/api-client/dist/client/';
+import {
+  ClientClassification,
+  ClientType,
+  NewClient,
+  PublicClient,
+  RegisteredClient,
+} from '@wireapp/api-client/dist/client/';
+import {PreKey} from '@wireapp/api-client/dist/auth/PreKey';
+import {UserClientAddEvent, UserClientRemoveEvent} from '@wireapp/api-client/dist/event';
 import {amplify} from 'amplify';
 import platform from 'platform';
 
@@ -37,10 +45,7 @@ import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {ClientEntity} from './ClientEntity';
 import {ClientMapper} from './ClientMapper';
 import {ClientService} from './ClientService';
-import {ClientType} from './ClientType';
 
-import {PreKey} from '@wireapp/api-client/dist/auth/PreKey';
-import {UserClientAddEvent, UserClientRemoveEvent} from '@wireapp/api-client/dist/event';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {User} from '../entity/User';
 import {BackendClientError} from '../error/BackendClientError';

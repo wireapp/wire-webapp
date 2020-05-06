@@ -17,6 +17,7 @@
  *
  */
 
+import {NotificationPreference} from '@wireapp/api-client/dist/user/data';
 import {Availability} from '@wireapp/protocol-messaging';
 import {amplify} from 'amplify';
 import ko from 'knockout';
@@ -35,7 +36,6 @@ import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
 import {WebAppEvents} from '../event/WebApp';
 import {PermissionStatusState} from '../permission/PermissionStatusState';
 import {PermissionType} from '../permission/PermissionType';
-import {NotificationPreference} from './NotificationPreference';
 import {PermissionState} from './PermissionState';
 
 import {CallingRepository} from '../calling/CallingRepository';

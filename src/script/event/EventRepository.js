@@ -17,12 +17,13 @@
  *
  */
 
+import {NotUploaded as AssetUploadFailedReason} from '@wireapp/protocol-messaging';
+
 import {getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
-import {AssetUploadFailedReason} from '../assets/AssetUploadFailedReason';
 import {AssetTransferState} from '../assets/AssetTransferState';
 
 import {EVENT_TYPE} from './EventType';

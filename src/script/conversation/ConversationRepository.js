@@ -36,10 +36,12 @@ import {
   MessageHide,
   Reaction,
   Text,
+  NotUploaded as AssetUploadFailedReason,
 } from '@wireapp/protocol-messaging';
 import {flatten} from 'underscore';
-import {ConnectionStatus} from '@wireapp/api-client/dist/connection';
+import {ConnectionStatus, ReactionType} from '@wireapp/api-client/dist/connection';
 import {RequestCancellationError} from '@wireapp/api-client/dist/user';
+import {DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/dist/conversation';
 
 import {getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -56,7 +58,6 @@ import {
   sortUsersByPriority,
 } from 'Util/StringUtil';
 
-import {AssetUploadFailedReason} from '../assets/AssetUploadFailedReason';
 import {encryptAesAsset} from '../assets/AssetCrypto';
 
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
@@ -102,7 +103,6 @@ import {SystemMessageType} from '../message/SystemMessageType';
 import {StatusType} from '../message/StatusType';
 import {SuperType} from '../message/SuperType';
 import {MessageCategory} from '../message/MessageCategory';
-import {ReactionType} from '../message/ReactionType';
 import {Config} from '../Config';
 
 import {BaseError} from '../error/BaseError';
@@ -111,7 +111,6 @@ import {showLegalHoldWarning} from '../legal-hold/LegalHoldWarning';
 import * as LegalHoldEvaluator from '../legal-hold/LegalHoldEvaluator';
 import {DeleteConversationMessage} from '../entity/message/DeleteConversationMessage';
 import {ConversationRoleRepository} from './ConversationRoleRepository';
-import {DefaultRole} from './ConversationRoleRepository';
 import {ConversationError} from '../error/ConversationError';
 
 // Conversation repository for all conversation interactions with the conversation service

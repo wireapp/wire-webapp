@@ -20,6 +20,7 @@
 import {amplify} from 'amplify';
 import {Confirmation} from '@wireapp/protocol-messaging';
 import {AudioPreference, NotificationPreference, WebappProperties} from '@wireapp/api-client/dist/user/data';
+import {ConsentType} from '@wireapp/api-client/dist/self';
 
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
@@ -29,7 +30,6 @@ import {Config} from '../Config';
 import {User} from '../entity/User';
 import {WebAppEvents} from '../event/WebApp';
 import {SelfService} from '../self/SelfService';
-import {ConsentType} from '../user/ConsentType';
 import {ConsentValue} from '../user/ConsentValue';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {PropertiesService} from './PropertiesService';

@@ -17,7 +17,7 @@
  *
  */
 
-import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
+import {Asset as ProtobufAsset, NotUploaded as AssetUploadFailedReason} from '@wireapp/protocol-messaging';
 import ko from 'knockout';
 
 import {Logger, getLogger} from 'Util/Logger';
@@ -29,7 +29,6 @@ import {Asset} from './Asset';
 import {AssetRemoteData} from '../../assets/AssetRemoteData';
 import {AssetTransferState} from '../../assets/AssetTransferState';
 import {AssetType} from '../../assets/AssetType';
-import {AssetUploadFailedReason} from '../../assets/AssetUploadFailedReason';
 
 type AssetMetaData = (ProtobufAsset.IAudioMetaData | ProtobufAsset.IImageMetaData | ProtobufAsset.IVideoMetaData) & {
   loudness?: number[];

@@ -19,6 +19,7 @@
 
 import ko from 'knockout';
 import {amplify} from 'amplify';
+import {DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/dist/conversation';
 
 import {getLogger, Logger} from 'Util/Logger';
 
@@ -26,7 +27,7 @@ import {Actions} from 'Components/panel/userActions';
 import 'Components/panel/enrichedFields';
 import 'Components/panel/userDetails';
 
-import {DefaultRole, ConversationRoleRepository} from '../../conversation/ConversationRoleRepository';
+import {ConversationRoleRepository} from '../../conversation/ConversationRoleRepository';
 import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
 import {UserRepository} from '../../user/UserRepository';
 import {ActionsViewModel} from '../ActionsViewModel';

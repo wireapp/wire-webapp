@@ -17,11 +17,12 @@
  *
  */
 
+import {AccentColor} from '@wireapp/commons';
 import {PublicClient} from '@wireapp/api-client/dist/client';
 import type {BackendError} from '@wireapp/api-client/dist/http';
 import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
 import {User as APIClientUser} from '@wireapp/api-client/dist/user';
-import {Self as APIClientSelf} from '@wireapp/api-client/dist/self';
+import {ConsentType, Self as APIClientSelf} from '@wireapp/api-client/dist/self';
 import {UserAsset as APIClientUserAsset, UserAssetType as APIClientUserAssetType} from '@wireapp/api-client/dist/user';
 
 import {amplify} from 'amplify';
@@ -58,13 +59,11 @@ import {
 } from '../view_model/content/LegalHoldModalViewModel';
 import {protoFromType, valueFromType} from './AvailabilityMapper';
 import {showAvailabilityModal} from './AvailabilityModal';
-import {ConsentType} from './ConsentType';
 import {ConsentValue} from './ConsentValue';
 import {createSuggestions} from './UserHandleGenerator';
 import {UserMapper} from './UserMapper';
 import {UserService} from './UserService';
 
-import {AccentColor} from '@wireapp/commons';
 import {AssetService} from '../assets/AssetService';
 import {ClientEntity} from '../client/ClientEntity';
 import {ClientMapper} from '../client/ClientMapper';

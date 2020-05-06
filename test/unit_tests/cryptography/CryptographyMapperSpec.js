@@ -35,6 +35,7 @@ import {
   Text,
 } from '@wireapp/protocol-messaging';
 import {isObject} from 'underscore';
+import {ReactionType} from '@wireapp/api-client/dist/connection';
 
 import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 import {CryptographyMapper} from 'src/script/cryptography/CryptographyMapper';
@@ -42,8 +43,7 @@ import {arrayToBase64, createRandomUuid} from 'Util/util';
 import {encryptAesAsset} from 'src/script/assets/AssetCrypto';
 import {ClientEvent} from 'src/script/event/Client';
 import {BackendEvent} from 'src/script/event/Backend';
-import {ReactionType} from 'src/script/message/ReactionType';
-import {PROTO_MESSAGE_TYPE} from '../../../src/script/cryptography/ProtoMessageType';
+import {PROTO_MESSAGE_TYPE} from 'src/script/cryptography/ProtoMessageType';
 import {CryptographyError} from 'src/script/error/CryptographyError';
 
 describe('CryptographyMapper', () => {

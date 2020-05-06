@@ -17,12 +17,11 @@
  *
  */
 
-import {ClientClassification} from '@wireapp/api-client/dist/client/';
+import {ClientClassification, ClientType} from '@wireapp/api-client/dist/client/';
 import ko from 'knockout';
 
 import {zeroPadding} from 'Util/util';
 import {ClientMapper} from './ClientMapper';
-import {ClientType} from './ClientType';
 
 export class ClientEntity {
   static CONFIG = {

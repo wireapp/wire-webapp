@@ -19,13 +19,12 @@
 
 import {MemoryEngine} from '@wireapp/store-engine';
 import {Cryptobox} from '@wireapp/cryptobox';
-import {GenericMessage, Text} from '@wireapp/protocol-messaging';
+import {GenericMessage, Text, NotUploaded as AssetUploadFailedReason} from '@wireapp/protocol-messaging';
 import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 import * as Proteus from '@wireapp/proteus';
 
 import {createRandomUuid, arrayToBase64} from 'Util/util';
 
-import {AssetUploadFailedReason} from 'src/script/assets/AssetUploadFailedReason';
 import {ClientEvent} from 'src/script/event/Client';
 import {BackendEvent} from 'src/script/event/Backend';
 import {WebAppEvents} from 'src/script/event/WebApp';
