@@ -116,39 +116,34 @@ export class BackupRepository {
    * @param progressCallback called on every step of the export
    * @returns The promise that contains all the exported tables
    */
-  public generateHistory(progressCallback: (tableRows: number) => void): Promise<JSZip> {
+  public async generateHistory(progressCallback: (tableRows: number) => void): Promise<JSZip> {
     this.isCanceled = false;
 
-    return Promise.resolve()
-      .then(() => this._exportHistory(progressCallback))
-      .then(exportedData => this.compressHistoryFiles(exportedData))
-      .catch(error => {
-        this.logger.error(`Could not export history: ${error.message}`, error);
-
-        const isCancelError = error instanceof window.z.backup.CancelError;
-        throw isCancelError ? error : new window.z.backup.ExportError();
-      });
+    try {
+      const exportedData = await this._exportHistory(progressCallback);
+      return this.compressHistoryFiles(exportedData);
+    } catch (error) {
+      this.logger.error(`Could not export history: ${error.message}`, error);
+      const isCancelError = error instanceof window.z.backup.CancelError;
+      throw isCancelError ? error : new window.z.backup.ExportError();
+    }
   }
 
-  private _exportHistory(progressCallback: (tableRows: number) => void): Dexie.Promise<Record<string, any[]>> {
+  private async _exportHistory(progressCallback: (tableRows: number) => void): Promise<Record<string, any[]>> {
     const tables = this.backupService.getTables();
     const tableData: Record<string, any[]> = {};
 
-    return this._exportHistoryConversations(tables, progressCallback)
-      .then(conversationsData => {
-        tableData[StorageSchemata.OBJECT_STORE.CONVERSATIONS] = conversationsData;
-        return this._exportHistoryEvents(tables, progressCallback);
-      })
-      .then(eventsData => {
-        tableData[StorageSchemata.OBJECT_STORE.EVENTS] = eventsData;
-        return tableData;
-      });
+    const conversationsData = await this._exportHistoryConversations(tables, progressCallback);
+    tableData[StorageSchemata.OBJECT_STORE.CONVERSATIONS] = conversationsData;
+    const eventsData = await this._exportHistoryEvents(tables, progressCallback);
+    tableData[StorageSchemata.OBJECT_STORE.EVENTS] = eventsData;
+    return tableData;
   }
 
   private _exportHistoryConversations(
     tables: Dexie.Table<any, string>[],
     progressCallback: (chunkLength: number) => void,
-  ): Dexie.Promise<any[]> {
+  ): Promise<any[]> {
     const conversationsTable = tables.find(table => table.name === StorageSchemata.OBJECT_STORE.CONVERSATIONS);
     const onProgress = (tableRows: any[], exportedEntitiesCount: number) => {
       progressCallback(tableRows.length);
@@ -163,7 +158,7 @@ export class BackupRepository {
   private _exportHistoryEvents(
     tables: Dexie.Table<any, string>[],
     progressCallback: (chunkLength: number) => void,
-  ): Dexie.Promise<any[]> {
+  ): Promise<any[]> {
     const eventsTable = tables.find(table => table.name === StorageSchemata.OBJECT_STORE.EVENTS);
     const onProgress = (tableRows: any[], exportedEntitiesCount: number) => {
       progressCallback(tableRows.length);
@@ -181,24 +176,22 @@ export class BackupRepository {
     return this._exportHistoryFromTable(eventsTable, onProgress);
   }
 
-  private _exportHistoryFromTable(
+  private async _exportHistoryFromTable(
     table: Dexie.Table<any, string>,
     onProgress: (tableRows: any[], exportedEntitiesCount: number) => void,
-  ): Dexie.Promise<any[]> {
+  ): Promise<any[]> {
     const tableData: any[] = [];
     let exportedEntitiesCount = 0;
 
-    return this.backupService
-      .exportTable(table, tableRows => {
-        if (this.isCanceled) {
-          throw new window.z.backup.CancelError();
-        }
-        exportedEntitiesCount += tableRows.length;
-
-        onProgress(tableRows, exportedEntitiesCount);
-        tableData.push(tableRows);
-      })
-      .then(() => [].concat(...tableData));
+    await this.backupService.exportTable(table, tableRows => {
+      if (this.isCanceled) {
+        throw new window.z.backup.CancelError();
+      }
+      exportedEntitiesCount += tableRows.length;
+      onProgress(tableRows, exportedEntitiesCount);
+      tableData.push(tableRows);
+    });
+    return [].concat(...tableData);
   }
 
   private compressHistoryFiles(exportedData: Record<string, any>): JSZip {
@@ -220,7 +213,7 @@ export class BackupRepository {
     return this.backupService.getHistoryCount();
   }
 
-  public importHistory(
+  public async importHistory(
     archive: JSZip,
     initCallback: (numberOfRecords: number) => void,
     progressCallback: (numberProcessed: number) => void,
@@ -231,13 +224,14 @@ export class BackupRepository {
       throw new window.z.backup.InvalidMetaDataError();
     }
 
-    return this.verifyMetadata(files)
-      .then(() => this._extractHistoryFiles(files))
-      .then(fileDescriptors => this._importHistoryData(fileDescriptors, initCallback, progressCallback))
-      .catch(error => {
-        this.logger.error(`Could not export history: ${error.message}`, error);
-        throw error;
-      });
+    try {
+      await this.verifyMetadata(files);
+      const fileDescriptors = await this._extractHistoryFiles(files);
+      await this._importHistoryData(fileDescriptors, initCallback, progressCallback);
+    } catch (error) {
+      this.logger.error(`Could not export history: ${error.message}`, error);
+      throw error;
+    }
   }
 
   private async _importHistoryData(
@@ -254,7 +248,7 @@ export class BackupRepository {
     });
 
     const conversationFileContent = new TextDecoder().decode(conversationFileDescriptor.content);
-    const conversationEntities = JSON.parse(conversationFileContent);
+    const conversationEntities = JSON.parse(conversationFileContent) as Conversation[];
 
     const eventFileContent = new TextDecoder().decode(eventFileDescriptor.content);
     const eventEntities = JSON.parse(eventFileContent);
@@ -269,23 +263,26 @@ export class BackupRepository {
     this.conversationRepository.checkForDeletedConversations();
   }
 
-  private _importHistoryConversations(
+  private async _importHistoryConversations(
     conversationEntities: Conversation[],
     progressCallback: (chunkLength: number) => void,
-  ): Promise<any[]> {
+  ): Promise<Conversation[]> {
     const entityCount = conversationEntities.length;
-    let importedEntities: any[] = [];
+    let importedEntities: Conversation[] = [];
 
     const entityChunks = chunk(conversationEntities, BackupService.CONFIG.BATCH_SIZE);
 
-    const importConversationChunk = (conversationChunk: any[]): Promise<void> =>
-      this.conversationRepository.updateConversationStates(conversationChunk).then(importedConversationEntities => {
-        importedEntities = importedEntities.concat(importedConversationEntities);
-        this.logger.log(`Imported '${importedEntities.length}' of '${entityCount}' conversation states from backup`);
-        progressCallback(conversationChunk.length);
-      });
+    const importConversationChunk = async (conversationChunk: Conversation[]): Promise<void> => {
+      const importedConversationEntities = await this.conversationRepository.updateConversationStates(
+        conversationChunk,
+      );
+      importedEntities = importedEntities.concat(importedConversationEntities);
+      this.logger.log(`Imported '${importedEntities.length}' of '${entityCount}' conversation states from backup`);
+      progressCallback(conversationChunk.length);
+    };
 
-    return this._chunkImport(importConversationChunk, entityChunks).then(() => importedEntities);
+    await this._chunkImport(importConversationChunk, entityChunks);
+    return importedEntities;
   }
 
   private _importHistoryEvents(eventEntities: any[], progressCallback: (chunkLength: number) => void): Promise<void> {
@@ -295,12 +292,12 @@ export class BackupRepository {
     const entities = eventEntities.map(entity => this.mapEntityDataType(entity));
     const entityChunks = chunk(entities, BackupService.CONFIG.BATCH_SIZE);
 
-    const importEventChunk = (eventChunk: any[]): Promise<void> =>
-      this.backupService.importEntities(StorageSchemata.OBJECT_STORE.EVENTS, eventChunk).then(() => {
-        importedEntities += eventChunk.length;
-        this.logger.log(`Imported '${importedEntities}' of '${entityCount}' events from backup`);
-        progressCallback(eventChunk.length);
-      });
+    const importEventChunk = async (eventChunk: any[]): Promise<void> => {
+      await this.backupService.importEntities(StorageSchemata.OBJECT_STORE.EVENTS, eventChunk);
+      importedEntities += eventChunk.length;
+      this.logger.log(`Imported '${importedEntities}' of '${entityCount}' events from backup`);
+      progressCallback(eventChunk.length);
+    };
 
     return this._chunkImport(importEventChunk, entityChunks);
   }
@@ -314,7 +311,7 @@ export class BackupRepository {
     }
   }
 
-  private _extractHistoryFiles(files: Record<string, JSZipObject>): Promise<FileDescriptor[]> {
+  private async _extractHistoryFiles(files: Record<string, JSZipObject>): Promise<FileDescriptor[]> {
     const unzipPromises = Object.values(files)
       .filter(zippedFile => zippedFile.name !== BackupRepository.CONFIG.FILENAME.METADATA)
       .map(async zippedFile => {
@@ -322,10 +319,9 @@ export class BackupRepository {
         return {content: fileContent, filename: zippedFile.name};
       });
 
-    return Promise.all(unzipPromises).then(fileDescriptors => {
-      this.logger.log('Unzipped files for history import', fileDescriptors);
-      return fileDescriptors;
-    });
+    const fileDescriptors = await Promise.all(unzipPromises);
+    this.logger.log('Unzipped files for history import', fileDescriptors);
+    return fileDescriptors;
   }
 
   public mapEntityDataType(entity: any): any {
@@ -340,15 +336,12 @@ export class BackupRepository {
     return entity;
   }
 
-  public verifyMetadata(files: Record<string, JSZipObject>): Promise<void> {
-    return files[BackupRepository.CONFIG.FILENAME.METADATA]
-      .async('uint8array')
-      .then(rawData => {
-        const metaData = new TextDecoder().decode(rawData);
-        const parsedMetaData = JSON.parse(metaData);
-        return this._verifyMetadata(parsedMetaData);
-      })
-      .then(() => this.logger.log('Validated metadata during history import', files));
+  public async verifyMetadata(files: Record<string, JSZipObject>): Promise<void> {
+    const rawData = await files[BackupRepository.CONFIG.FILENAME.METADATA].async('uint8array');
+    const metaData = new TextDecoder().decode(rawData);
+    const parsedMetaData = JSON.parse(metaData);
+    this._verifyMetadata(parsedMetaData);
+    return this.logger.log('Validated metadata during history import', files);
   }
 
   private _verifyMetadata(archiveMetadata: Metadata): void {
