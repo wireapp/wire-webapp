@@ -17,6 +17,7 @@
  *
  */
 
+import {amplify} from 'amplify';
 import keyboardJS from 'keyboardjs';
 
 import {Environment} from 'Util/Environment';
@@ -25,7 +26,22 @@ import {capitalizeFirstChar, includesString} from 'Util/StringUtil';
 import {ShortcutType} from './ShortcutType';
 import {WebAppEvents} from '../event/WebApp';
 
-const SHORTCUT_MAP = {
+interface Shortcut {
+  event: string;
+  shortcut: {
+    electron: {
+      macos: string;
+      menu: boolean;
+      pc: string;
+    };
+    webapp: {
+      macos: string;
+      pc: string;
+    };
+  };
+}
+
+const SHORTCUT_MAP: Record<string, Shortcut> = {
   [ShortcutType.ADD_PEOPLE]: {
     event: WebAppEvents.SHORTCUT.ADD_PEOPLE,
     shortcut: {
@@ -140,14 +156,14 @@ const SHORTCUT_MAP = {
   },
 };
 
-const _registerEvent = (platformSpecificShortcut, event) => {
+const _registerEvent = (platformSpecificShortcut: string, event: string): void => {
   // bind also 'command + alt + n' for start shortcut
   if (includesString(platformSpecificShortcut, 'graveaccent')) {
     const replacedShortcut = platformSpecificShortcut.replace('graveaccent', 'n');
     _registerEvent(replacedShortcut, event);
   }
 
-  return keyboardJS.on(platformSpecificShortcut, inputEvent => {
+  return keyboardJS.bind(platformSpecificShortcut, inputEvent => {
     keyboardJS.releaseKey(inputEvent.keyCode);
 
     // Hotfix WEBAPP-1916
@@ -160,8 +176,8 @@ const _registerEvent = (platformSpecificShortcut, event) => {
 };
 
 export const Shortcut = {
-  __test__assignEnvironment: data => Object.assign(Environment, data),
-  getBeautifiedShortcutMac: shortcut => {
+  __test__assignEnvironment: (data: any): void => Object.assign(Environment, data),
+  getBeautifiedShortcutMac: (shortcut: string): string => {
     return shortcut
       .replace(/\+/g, '')
       .replace(/\s+/g, '')
@@ -174,7 +190,7 @@ export const Shortcut = {
       .toUpperCase();
   },
 
-  getBeautifiedShortcutWin: shortcut => {
+  getBeautifiedShortcutWin: (shortcut: string): string => {
     return shortcut
       .replace('up', '↑')
       .replace('down', '↓')
@@ -182,22 +198,20 @@ export const Shortcut = {
       .replace(/\w+/g, string => capitalizeFirstChar(string));
   },
 
-  getShortcut: shortcutName => {
+  getShortcut: (shortcutName: string): string => {
     const platform = Environment.desktop ? 'electron' : 'webapp';
     const platformShortcuts = SHORTCUT_MAP[shortcutName].shortcut[platform];
     return Environment.os.mac ? platformShortcuts.macos : platformShortcuts.pc;
   },
 
-  getShortcutTooltip: shortcutName => {
+  getShortcutTooltip: (shortcutName: string): string => {
     const shortcut = Shortcut.getShortcut(shortcutName);
-    if (shortcut) {
-      return Environment.os.mac
-        ? Shortcut.getBeautifiedShortcutMac(shortcut)
-        : Shortcut.getBeautifiedShortcutWin(shortcut);
-    }
+    return Environment.os.mac
+      ? Shortcut.getBeautifiedShortcutMac(shortcut)
+      : Shortcut.getBeautifiedShortcutWin(shortcut);
   },
 
-  init: () => {
+  init: (): void => {
     for (const shortcut in SHORTCUT_MAP) {
       const shortcutData = SHORTCUT_MAP[shortcut];
       const isMenuShortcut = Environment.desktop && shortcutData.shortcut.electron.menu;
