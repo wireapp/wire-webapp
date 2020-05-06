@@ -66,7 +66,7 @@
     "src"
   ],
   "license": "GPL-3.0",
-  "main": "./dist/APIClient.js",
+  "main": "dist/APIClient.js",
   "name": "@wireapp/api-client",
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client",
   "scripts": {
