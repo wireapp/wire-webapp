@@ -118,7 +118,7 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
   }
 
   getEntityId(): string {
-    return this.selectedParticipant().id;
+    return this.selectedParticipant()?.id;
   }
 
   clickOnDevices(): void {
@@ -126,6 +126,10 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
   }
 
   initView({entity: userEntity}: {entity: User}): void {
+    if (userEntity.isDeleted) {
+      return this.onGoToRoot();
+    }
+
     this.selectedParticipant(userEntity);
     if (this.teamRepository.isTeam()) {
       this.teamRepository.updateTeamMembersByIds(this.teamRepository.team(), [userEntity.id], true);
