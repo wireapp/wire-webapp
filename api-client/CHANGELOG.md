@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.15.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.14.0...@wireapp/api-client@11.15.0) (2020-05-07)
+
+
+### Features
+
+* **api-client:** Add Giphy rating and fix API ([#3011](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3011)) ([d360223](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/d36022328be9c3055f77635f2b88055abb8638f4))
+
+
+
+
+
 # [11.14.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.13.0...@wireapp/api-client@11.14.0) (2020-05-07)
 
 
