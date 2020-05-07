@@ -39,9 +39,10 @@ import {
   Asset as ProtobufAsset,
 } from '@wireapp/protocol-messaging';
 import {flatten} from 'underscore';
-import {ConnectionStatus, ReactionType} from '@wireapp/api-client/dist/connection';
+import {ConnectionStatus} from '@wireapp/api-client/dist/connection';
 import {RequestCancellationError} from '@wireapp/api-client/dist/user';
 import {DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/dist/conversation';
+import {ReactionType} from '@wireapp/core/dist/conversation';
 
 import {getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';

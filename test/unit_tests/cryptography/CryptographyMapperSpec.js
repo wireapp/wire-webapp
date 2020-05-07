@@ -35,7 +35,7 @@ import {
   Text,
 } from '@wireapp/protocol-messaging';
 import {isObject} from 'underscore';
-import {ReactionType} from '@wireapp/api-client/dist/connection';
+import {ReactionType} from '@wireapp/core/dist/conversation';
 
 import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 import {CryptographyMapper} from 'src/script/cryptography/CryptographyMapper';
