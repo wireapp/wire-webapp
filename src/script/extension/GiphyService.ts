@@ -53,7 +53,7 @@ export class GiphyService {
    * @param tag GIF tag to limit randomness by
    */
   getRandom(tag: string): Promise<GiphyResult> {
-    return this.apiClient.giphy.api.getGiphyRandom(tag);
+    return this.apiClient.giphy.api.getGiphyRandom({tag});
   }
 
   /**
