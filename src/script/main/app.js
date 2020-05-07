@@ -34,6 +34,7 @@ import {exposeWrapperGlobals} from 'Util/wrapper';
 import {includesString} from 'Util/StringUtil';
 import {appendParameter} from 'Util/UrlUtil';
 import Dexie from 'dexie';
+import {APIClient} from '@wireapp/api-client';
 
 import {Config} from '../Config';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
@@ -165,6 +166,7 @@ class App {
    */
   constructor(apiClient, backendClient, appContainer, encryptedEngine) {
     this.apiClient = apiClient;
+    this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () => this.logout(SIGN_OUT_REASON.NOT_SIGNED_IN, false));
     this.backendClient = backendClient;
     this.logger = getLogger('App');
     this.appContainer = appContainer;
