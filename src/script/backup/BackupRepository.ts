@@ -18,7 +18,7 @@
  */
 
 import Dexie from 'dexie';
-import JSZip, {JSZipObject} from 'jszip';
+import JSZip from 'jszip';
 
 import {chunk} from 'Util/ArrayUtil';
 import {Logger, getLogger} from 'Util/Logger';
@@ -217,12 +217,11 @@ export class BackupRepository {
   }
 
   public async importHistory(
-    archive: JSZip,
+    files: Record<string, Uint8Array>,
     initCallback: (numberOfRecords: number) => void,
     progressCallback: (numberProcessed: number) => void,
   ): Promise<void> {
     this.isCanceled = false;
-    const files = archive.files;
     if (!files[BackupRepository.CONFIG.FILENAME.METADATA]) {
       throw new window.z.backup.InvalidMetaDataError();
     }
@@ -314,17 +313,11 @@ export class BackupRepository {
     }
   }
 
-  private async _extractHistoryFiles(files: Record<string, JSZipObject>): Promise<FileDescriptor[]> {
-    const unzipPromises = Object.values(files)
-      .filter(zippedFile => zippedFile.name !== BackupRepository.CONFIG.FILENAME.METADATA)
-      .map(async zippedFile => {
-        const fileContent = await zippedFile.async('uint8array');
-        return {content: fileContent, filename: zippedFile.name};
-      });
-
-    const fileDescriptors = await Promise.all(unzipPromises);
-    this.logger.log('Unzipped files for history import', fileDescriptors);
-    return fileDescriptors;
+  private async _extractHistoryFiles(files: Record<string, Uint8Array>): Promise<FileDescriptor[]> {
+    return Object.entries(files).map(([filename, content]) => ({
+      content,
+      filename,
+    }));
   }
 
   public mapEntityDataType(entity: any): any {
@@ -339,8 +332,8 @@ export class BackupRepository {
     return entity;
   }
 
-  public async verifyMetadata(files: Record<string, JSZipObject>): Promise<void> {
-    const rawData = await files[BackupRepository.CONFIG.FILENAME.METADATA].async('uint8array');
+  public async verifyMetadata(files: Record<string, Uint8Array>): Promise<void> {
+    const rawData = files[BackupRepository.CONFIG.FILENAME.METADATA];
     const metaData = new TextDecoder().decode(rawData);
     const parsedMetaData = JSON.parse(metaData);
     this._verifyMetadata(parsedMetaData);
