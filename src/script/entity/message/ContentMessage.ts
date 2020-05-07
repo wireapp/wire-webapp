@@ -115,7 +115,7 @@ export class ContentMessage extends Message {
    * Get the first asset attached to the message.
    * @returns The first asset attached to the message
    */
-  get_first_asset(): Asset {
+  get_first_asset(): Asset | FileAsset | TextAsset {
     return this.assets()[0];
   }
 

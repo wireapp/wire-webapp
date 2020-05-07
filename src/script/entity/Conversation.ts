@@ -19,10 +19,10 @@
 
 import {amplify} from 'amplify';
 import ko from 'knockout';
-import {Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
-import {debounce} from 'underscore';
+import {Availability, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
+import {debounce, Cancelable} from 'underscore';
 
-import {getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {truncate} from 'Util/StringUtil';
 
@@ -41,23 +41,129 @@ import {StatusType} from '../message/StatusType';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
 import {HIDE_LEGAL_HOLD_MODAL} from '../view_model/content/LegalHoldModalViewModel';
 import {ConversationError} from '../error/ConversationError';
+import {User} from './User';
+import {ContentMessage} from './message/ContentMessage';
+import {MemberMessage} from './message/MemberMessage';
+import {Message} from './message/Message';
+import {SystemMessage} from './message/SystemMessage';
+
+interface UnreadState {
+  allEvents: Message[];
+  allMessages: ContentMessage[];
+  calls: ContentMessage[];
+  otherMessages: ContentMessage[];
+  pings: ContentMessage[];
+  selfMentions: ContentMessage[];
+  selfReplies: ContentMessage[];
+}
+
+enum TIMESTAMP_TYPE {
+  ARCHIVED = 'archivedTimestamp',
+  CLEARED = 'cleared_timestamp',
+  LAST_EVENT = 'last_event_timestamp',
+  LAST_READ = 'last_read_timestamp',
+  LAST_SERVER = 'last_server_timestamp',
+  MUTED = 'mutedTimestamp',
+}
+
+interface SerializedConversation {
+  archived_state: boolean;
+  archived_timestamp: number;
+  cleared_timestamp: number;
+  ephemeral_timer: number;
+  global_message_timer: number;
+  id: string;
+  is_guest: boolean;
+  is_managed: boolean;
+  last_event_timestamp: number;
+  last_read_timestamp: number;
+  last_server_timestamp: number;
+  legal_hold_status: LegalHoldStatus;
+  muted_state: number;
+  muted_timestamp: number;
+  name: string;
+  others: string[];
+  receipt_mode: Confirmation.Type;
+  status: ConversationStatus;
+  team_id: string;
+  type: ConversationType;
+  verification_state: ConversationVerificationState;
+}
 
 export class Conversation {
-  static get TIMESTAMP_TYPE() {
-    return {
-      ARCHIVED: 'archivedTimestamp',
-      CLEARED: 'cleared_timestamp',
-      LAST_EVENT: 'last_event_timestamp',
-      LAST_READ: 'last_read_timestamp',
-      LAST_SERVER: 'last_server_timestamp',
-      MUTED: 'mutedTimestamp',
-    };
+  accessCode: ko.Observable<string>;
+  accessState: ko.Observable<string>;
+  archivedState: ko.Observable<boolean>;
+  availabilityOfUser: ko.PureComputed<Availability.Type>;
+  blockLegalHoldMessage: boolean;
+  connection: ko.Observable<ConnectionEntity>;
+  creator: string;
+  display_name: ko.PureComputed<string>;
+  firstUserEntity: ko.PureComputed<User>;
+  globalMessageTimer: ko.Observable<number>;
+  hasAdditionalMessages: ko.Observable<boolean>;
+  hasCreationMessage: boolean;
+  hasGlobalMessageTimer: ko.PureComputed<boolean>;
+  hasGuest: ko.PureComputed<boolean>;
+  hasLegalHold: ko.Computed<boolean>;
+  removed_from_conversation?: ko.PureComputed<boolean>;
+  hasService: ko.PureComputed<boolean>;
+  hasUnread: ko.PureComputed<boolean>;
+  id: string;
+  incomingMessages: ko.ObservableArray<ContentMessage>;
+  inTeam: ko.PureComputed<boolean>;
+  is_archived: ko.Observable<boolean>;
+  is_cleared: ko.PureComputed<boolean>;
+  is_loaded: ko.Observable<boolean>;
+  is_pending: ko.Observable<boolean>;
+  is_verified: ko.PureComputed<boolean>;
+  is1to1: ko.PureComputed<boolean>;
+  isActiveParticipant: ko.PureComputed<boolean>;
+  isClearable: ko.PureComputed<boolean>;
+  isCreatedBySelf: ko.PureComputed<boolean>;
+  isGroup: ko.PureComputed<boolean>;
+  isGuest: ko.Observable<boolean>;
+  isGuestRoom: ko.PureComputed<boolean>;
+  isLeavable: ko.PureComputed<boolean>;
+  isManaged: boolean;
+  isMutable: ko.PureComputed<boolean>;
+  isRequest: ko.PureComputed<boolean>;
+  isSelf: ko.PureComputed<boolean>;
+  isTeam1to1: ko.PureComputed<boolean>;
+  isTeamOnly: ko.PureComputed<boolean>;
+  legalHoldStatus: ko.Observable<LegalHoldStatus>;
+  localMessageTimer: ko.Observable<number>;
+  logger: Logger;
+  messages_unordered: ko.ObservableArray<ContentMessage | MemberMessage>;
+  messages_visible: ko.PureComputed<(ContentMessage | MemberMessage)[]>;
+  messages: ko.PureComputed<(ContentMessage | MemberMessage)[]>;
+  messageTimer: ko.PureComputed<number>;
+  mutedState: ko.Observable<number>;
+  name: ko.Observable<string>;
+  notificationState: ko.PureComputed<any>;
+  participating_user_ets: ko.ObservableArray<User>;
+  participating_user_ids: ko.ObservableArray<string>;
+  publishPersistState: (() => void) & Cancelable;
+  receiptMode: ko.Observable<Confirmation.Type>;
+  roles: ko.Observable<Record<string, string>>;
+  selfUser: ko.Observable<User>;
+  shouldPersistStateChanges: boolean;
+  showNotificationsEverything: ko.PureComputed<boolean>;
+  showNotificationsMentionsAndReplies: ko.PureComputed<boolean>;
+  showNotificationsNothing: ko.PureComputed<boolean>;
+  status: ko.Observable<ConversationStatus>;
+  team_id: string;
+  type: ko.Observable<ConversationType>;
+  unreadState: ko.PureComputed<UnreadState>;
+  verification_state: ko.Observable<ConversationVerificationState>;
+  withAllTeamMembers: ko.Observable<User[]>;
+  timeStamps: Record<TIMESTAMP_TYPE, ko.Observable<number>>;
+
+  static get TIMESTAMP_TYPE(): typeof TIMESTAMP_TYPE {
+    return TIMESTAMP_TYPE;
   }
 
-  /**
-   * @param {string} conversation_id Conversation ID
-   */
-  constructor(conversation_id = '') {
+  constructor(conversation_id: string = '') {
     this.id = conversation_id;
 
     this.logger = getLogger(`Conversation (${this.id})`);
@@ -75,7 +181,6 @@ export class Conversation {
     this.participating_user_ets = ko.observableArray([]); // Does not include self user
     this.participating_user_ids = ko.observableArray([]); // Does not include self user
     this.selfUser = ko.observable();
-    /** @type {ko.Observable<Record<string, string>>} */
     this.roles = ko.observable({});
 
     this.hasCreationMessage = false;
@@ -127,12 +232,14 @@ export class Conversation {
     this.mutedState = ko.observable(NOTIFICATION_STATE.EVERYTHING);
     this.verification_state = ko.observable(ConversationVerificationState.UNVERIFIED);
 
-    this.archivedTimestamp = ko.observable(0);
-    this.cleared_timestamp = ko.observable(0);
-    this.last_event_timestamp = ko.observable(0);
-    this.last_read_timestamp = ko.observable(0);
-    this.last_server_timestamp = ko.observable(0);
-    this.mutedTimestamp = ko.observable(0);
+    this.timeStamps = {
+      archivedTimestamp: ko.observable(0),
+      cleared_timestamp: ko.observable(0),
+      last_event_timestamp: ko.observable(0),
+      last_read_timestamp: ko.observable(0),
+      last_server_timestamp: ko.observable(0),
+      mutedTimestamp: ko.observable(0),
+    };
 
     // Conversation states for view
     this.notificationState = ko.pureComputed(() => {
@@ -160,7 +267,9 @@ export class Conversation {
     });
 
     this.is_archived = this.archivedState;
-    this.is_cleared = ko.pureComputed(() => this.last_event_timestamp() <= this.cleared_timestamp());
+    this.is_cleared = ko.pureComputed(
+      () => this.timeStamps.last_event_timestamp() <= this.timeStamps.cleared_timestamp(),
+    );
     this.is_verified = ko.pureComputed(() => {
       if (!this._isInitialized()) {
         return undefined;
@@ -244,7 +353,7 @@ export class Conversation {
 
     // Calling
     this.unreadState = ko.pureComputed(() => {
-      const unreadState = {
+      const unreadState: UnreadState = {
         allEvents: [],
         allMessages: [],
         calls: [],
@@ -257,7 +366,8 @@ export class Conversation {
       for (let index = messages.length - 1; index >= 0; index--) {
         const messageEntity = messages[index];
         if (messageEntity.visible()) {
-          const isReadMessage = messageEntity.timestamp() <= this.last_read_timestamp() || messageEntity.user().isMe;
+          const isReadMessage =
+            messageEntity.timestamp() <= this.timeStamps.last_read_timestamp() || messageEntity.user().isMe;
           if (isReadMessage) {
             break;
           }
@@ -265,26 +375,28 @@ export class Conversation {
           const isMissedCall = messageEntity.is_call() && !messageEntity.was_completed();
           const isPing = messageEntity.is_ping();
           const isMessage = messageEntity.is_content();
-          const isSelfMentioned = isMessage && this.selfUser() && messageEntity.isUserMentioned(this.selfUser().id);
-          const isSelfQuoted = isMessage && this.selfUser() && messageEntity.isUserQuoted(this.selfUser().id);
+          const isSelfMentioned =
+            isMessage && this.selfUser() && (messageEntity as ContentMessage).isUserMentioned(this.selfUser().id);
+          const isSelfQuoted =
+            isMessage && this.selfUser() && (messageEntity as ContentMessage).isUserQuoted(this.selfUser().id);
 
           if (isMissedCall || isPing || isMessage) {
-            unreadState.allMessages.push(messageEntity);
+            unreadState.allMessages.push(messageEntity as ContentMessage);
           }
 
           if (isSelfMentioned) {
-            unreadState.selfMentions.push(messageEntity);
+            unreadState.selfMentions.push(messageEntity as ContentMessage);
           } else if (isSelfQuoted) {
-            unreadState.selfReplies.push(messageEntity);
+            unreadState.selfReplies.push(messageEntity as ContentMessage);
           } else if (isMissedCall) {
-            unreadState.calls.push(messageEntity);
+            unreadState.calls.push(messageEntity as ContentMessage);
           } else if (isPing) {
-            unreadState.pings.push(messageEntity);
+            unreadState.pings.push(messageEntity as ContentMessage);
           } else if (isMessage) {
-            unreadState.otherMessages.push(messageEntity);
+            unreadState.otherMessages.push(messageEntity as ContentMessage);
           }
 
-          unreadState.allEvents.push(messageEntity);
+          unreadState.allEvents.push(messageEntity as ContentMessage);
         }
       }
 
@@ -358,7 +470,9 @@ export class Conversation {
     });
 
     this.shouldPersistStateChanges = false;
-    this.publishPersistState = debounce(() => amplify.publish(WebAppEvents.CONVERSATION.PERSIST_STATE, this), 100);
+    this.publishPersistState = debounce(() => {
+      amplify.publish(WebAppEvents.CONVERSATION.PERSIST_STATE, this);
+    }, 100);
 
     this._initSubscriptions();
   }
@@ -371,43 +485,42 @@ export class Conversation {
   _initSubscriptions() {
     [
       this.archivedState,
-      this.archivedTimestamp,
-      this.cleared_timestamp,
+      this.timeStamps.archivedTimestamp,
+      this.timeStamps.cleared_timestamp,
       this.messageTimer,
       this.isGuest,
-      this.last_event_timestamp,
-      this.last_read_timestamp,
-      this.last_server_timestamp,
+      this.timeStamps.last_event_timestamp,
+      this.timeStamps.last_read_timestamp,
+      this.timeStamps.last_server_timestamp,
       this.mutedState,
-      this.mutedTimestamp,
+      this.timeStamps.mutedTimestamp,
       this.name,
       this.participating_user_ids,
       this.receiptMode,
       this.status,
       this.type,
       this.verification_state,
-    ].forEach(property => property.subscribe(this.persistState.bind(this)));
+    ].forEach(property => (property as any).subscribe(this.persistState.bind(this)));
   }
 
   get allUserEntities() {
     return [this.selfUser()].concat(this.participating_user_ets());
   }
 
-  persistState() {
+  persistState(): void {
     if (this.shouldPersistStateChanges) {
       this.publishPersistState();
     }
   }
 
-  setStateChangePersistence(persistChanges) {
+  setStateChangePersistence(persistChanges: boolean): void {
     this.shouldPersistStateChanges = persistChanges;
   }
 
   /**
    * Remove all message from conversation unless there are unread messages.
-   * @returns {undefined} No return value
    */
-  release() {
+  release(): void {
     if (!this.unreadState().allEvents.length) {
       this.remove_messages();
       this.is_loaded(false);
@@ -418,17 +531,17 @@ export class Conversation {
   /**
    * Set the timestamp of a given type.
    * @note This will only increment timestamps
-   * @param {string|number} timestamp Timestamp to be set
-   * @param {Conversation.TIMESTAMP_TYPE} type Type of timestamp to be updated
-   * @param {boolean} forceUpdate set the timestamp regardless of previous timestamp value (no checks)
-   * @returns {boolean|number} Timestamp value which can be 'false' (boolean) if there is no timestamp
+   * @param timestamp Timestamp to be set
+   * @param type Type of timestamp to be updated
+   * @param forceUpdate set the timestamp regardless of previous timestamp value (no checks)
+   * @returns Timestamp value which can be 'false' (boolean) if there is no timestamp
    */
-  setTimestamp(timestamp, type, forceUpdate = false) {
+  setTimestamp(timestamp: string | number, type: TIMESTAMP_TYPE, forceUpdate: boolean = false): number | false {
     if (typeof timestamp === 'string') {
       timestamp = window.parseInt(timestamp, 10);
     }
 
-    const entityTimestamp = this[type];
+    const entityTimestamp = this.timeStamps[type];
     if (!entityTimestamp) {
       throw new ConversationError(
         ConversationError.TYPE.INVALID_PARAMETER,
@@ -441,26 +554,27 @@ export class Conversation {
     if (updatedTimestamp !== false) {
       entityTimestamp(updatedTimestamp);
     }
+
     return updatedTimestamp;
   }
 
   /**
    * Increment only on timestamp update
-   * @param {number} currentTimestamp Current timestamp
-   * @param {number} updatedTimestamp Timestamp from update
-   * @returns {number|false} Updated timestamp or `false` if not increased
+   * @param currentTimestamp Current timestamp
+   * @param updatedTimestamp Timestamp from update
+   * @returns Updated timestamp or `false` if not increased
    */
-  _incrementTimeOnly(currentTimestamp, updatedTimestamp) {
+  _incrementTimeOnly(currentTimestamp: number, updatedTimestamp: number): number | false {
     const timestampIncreased = updatedTimestamp > currentTimestamp;
     return timestampIncreased ? updatedTimestamp : false;
   }
 
   /**
    * Adds a single message to the conversation.
-   * @param {Message} messageEntity Message entity to be added to the conversation.
-   * @returns {Message | undefined} replacedEntity - If a message was replaced in the conversation, returns the original message
+   * @param messageEntity Message entity to be added to the conversation.
+   * @returns If a message was replaced in the conversation
    */
-  add_message(messageEntity) {
+  add_message(messageEntity: ContentMessage): boolean | void {
     if (messageEntity) {
       const messageWithLinkPreview = () => this._findDuplicate(messageEntity.id, messageEntity.from);
       const editedMessage = () => this._findDuplicate(messageEntity.replacing_message_id, messageEntity.from);
@@ -482,11 +596,12 @@ export class Conversation {
 
   /**
    * Adds multiple messages to the conversation.
-   * @param {Array<Message>} message_ets Array of message entities to be added to the conversation
-   * @returns {undefined} No return value
+   * @param message_ets Array of message entities to be added to the conversation
    */
-  add_messages(message_ets) {
-    message_ets = message_ets.map(message_et => this._checkForDuplicate(message_et)).filter(message_et => message_et);
+  add_messages(message_ets: ContentMessage[]): void {
+    message_ets = message_ets
+      .map(message_et => this._checkForDuplicate(message_et))
+      .filter(message_et => !!message_et) as ContentMessage[];
 
     // in order to avoid multiple db writes check the messages from the end and stop once
     // we found a message from self user
@@ -502,39 +617,42 @@ export class Conversation {
     this.messages_unordered.push(...message_ets);
   }
 
-  getFirstUnreadSelfMention() {
+  getFirstUnreadSelfMention(): ContentMessage {
     return this.unreadState().selfMentions.slice().pop();
   }
 
-  get_last_known_timestamp(currentTimestamp) {
-    const last_known_timestamp = Math.max(this.last_server_timestamp(), this.last_event_timestamp());
+  get_last_known_timestamp(currentTimestamp?: number): number {
+    const last_known_timestamp = Math.max(
+      this.timeStamps.last_server_timestamp(),
+      this.timeStamps.last_event_timestamp(),
+    );
     return last_known_timestamp || currentTimestamp;
   }
 
-  get_latest_timestamp(currentTimestamp) {
-    return Math.max(this.last_server_timestamp(), this.last_event_timestamp(), currentTimestamp);
+  get_latest_timestamp(currentTimestamp: number): number {
+    return Math.max(this.timeStamps.last_server_timestamp(), this.timeStamps.last_event_timestamp(), currentTimestamp);
   }
 
-  get_next_iso_date(currentTimestamp) {
+  get_next_iso_date(currentTimestamp: number): string {
     if (typeof currentTimestamp !== 'number') {
       currentTimestamp = Date.now();
     }
-    const timestamp = Math.max(this.last_server_timestamp() + 1, currentTimestamp);
+    const timestamp = Math.max(this.timeStamps.last_server_timestamp() + 1, currentTimestamp);
     return new Date(timestamp).toISOString();
   }
 
-  getNumberOfServices() {
+  getNumberOfServices(): number {
     return this.participating_user_ets().filter(userEntity => userEntity.isService).length;
   }
 
-  getNumberOfParticipants(countSelf = true, countServices = true) {
+  getNumberOfParticipants(countSelf: boolean = true, countServices: boolean = true): number {
     const adjustCountForSelf = countSelf && !this.removed_from_conversation() ? 1 : 0;
     const adjustCountForServices = countServices ? 0 : this.getNumberOfServices();
 
     return this.participating_user_ids().length + adjustCountForSelf - adjustCountForServices;
   }
 
-  getNumberOfClients() {
+  getNumberOfClients(): number {
     const participantsMapped = this.participating_user_ids().length === this.participating_user_ets().length;
     if (participantsMapped) {
       return this.participating_user_ets().reduce((accumulator, userEntity) => {
@@ -549,42 +667,42 @@ export class Conversation {
 
   /**
    * Prepends messages with new batch of messages.
-   * @param {Array<Message>} message_ets Array of messages to be added to conversation
-   * @returns {undefined} No return value
+   * @param message_ets Array of messages to be added to conversation
    */
-  prepend_messages(message_ets) {
-    message_ets = message_ets.map(message_et => this._checkForDuplicate(message_et)).filter(message_et => message_et);
+  prepend_messages(message_ets: ContentMessage[]): void {
+    message_ets = message_ets
+      .map(message_et => this._checkForDuplicate(message_et))
+      .filter(message_et => !!message_et) as ContentMessage[];
 
     this.messages_unordered.unshift(...message_ets);
   }
 
   /**
    * Removes message from the conversation by message id.
-   * @param {string} message_id ID of the message entity to be removed from the conversation
-   * @returns {undefined} No return value
+   * @param message_id ID of the message entity to be removed from the conversation
    */
-  remove_message_by_id(message_id) {
+  remove_message_by_id(message_id: string): void {
     this.messages_unordered.remove(message_et => message_id && message_id === message_et.id);
   }
 
   /**
    * Removes messages from the conversation.
-   * @param {number} [timestamp] Optional timestamp which messages should be removed
-   * @returns {undefined} No return value
+   * @param timestamp Optional timestamp which messages should be removed
    */
-  remove_messages(timestamp) {
+  remove_messages(timestamp?: number): void {
     if (timestamp && typeof timestamp === 'number') {
-      return this.messages_unordered.remove(message_et => timestamp >= message_et.timestamp());
+      this.messages_unordered.remove(message_et => timestamp >= message_et.timestamp());
+      return;
     }
     this.messages_unordered.removeAll();
   }
 
-  shouldUnarchive() {
+  shouldUnarchive(): boolean {
     if (!this.archivedState() || this.showNotificationsNothing()) {
       return false;
     }
 
-    const isNewerMessage = messageEntity => messageEntity.timestamp() > this.archivedTimestamp();
+    const isNewerMessage = (messageEntity: Message) => messageEntity.timestamp() > this.timeStamps.archivedTimestamp();
 
     const {allEvents, allMessages, selfMentions, selfReplies} = this.unreadState();
     if (this.showNotificationsMentionsAndReplies()) {
@@ -603,8 +721,8 @@ export class Conversation {
       }
 
       const isCallActivation = messageEntity.is_call() && messageEntity.is_activation();
-      const isMemberJoin = messageEntity.isMember() && messageEntity.isMemberJoin();
-      const wasSelfUserAdded = isMemberJoin && messageEntity.isUserAffected(this.selfUser().id);
+      const isMemberJoin = messageEntity.isMember() && (messageEntity as MemberMessage).isMemberJoin();
+      const wasSelfUserAdded = isMemberJoin && (messageEntity as MemberMessage).isUserAffected(this.selfUser().id);
 
       return isCallActivation || wasSelfUserAdded;
     });
@@ -613,11 +731,10 @@ export class Conversation {
   /**
    * Checks for message duplicates.
    *
-   * @private
-   * @param {Message} messageEntity Message entity to be added to the conversation
-   * @returns {Message|undefined} Message if it is not a duplicate
+   * @param messageEntity Message entity to be added to the conversation
+   * @returns Message if it is not a duplicate
    */
-  _checkForDuplicate(messageEntity) {
+  private _checkForDuplicate(messageEntity: ContentMessage): ContentMessage | void {
     if (messageEntity) {
       const existingMessageEntity = this._findDuplicate(messageEntity.id, messageEntity.from);
       if (existingMessageEntity) {
@@ -629,7 +746,9 @@ export class Conversation {
     }
   }
 
-  _findDuplicate(messageId, from) {
+  private _findDuplicate(): void;
+  private _findDuplicate(messageId: string, from: string): ContentMessage | MemberMessage;
+  private _findDuplicate(messageId?: string, from?: string): void | ContentMessage | MemberMessage {
     if (messageId) {
       return this.messages_unordered().find(messageEntity => {
         const sameId = messageEntity.id === messageId;
@@ -639,12 +758,12 @@ export class Conversation {
     }
   }
 
-  update_timestamp_server(time, is_backend_timestamp = false) {
+  update_timestamp_server(time: number, is_backend_timestamp: boolean = false): void {
     if (is_backend_timestamp) {
       const timestamp = new Date(time).getTime();
 
       if (!isNaN(timestamp)) {
-        this.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.LAST_SERVER);
+        this.setTimestamp(timestamp, TIMESTAMP_TYPE.LAST_SERVER);
       }
     }
   }
@@ -652,57 +771,48 @@ export class Conversation {
   /**
    * Update information about conversation activity from single message.
    *
-   * @private
-   * @param {Message} message_et Message to be added to conversation
-   * @param {boolean} forceUpdate set the timestamp regardless of previous timestamp value (no checks)
-   * @returns {undefined} No return value
+   * @param message_et Message to be added to conversation
+   * @param forceUpdate set the timestamp regardless of previous timestamp value (no checks)
    */
-  updateTimestamps(message_et, forceUpdate = false) {
+  private updateTimestamps(message_et?: ContentMessage, forceUpdate: boolean = false): void {
     if (message_et) {
       const timestamp = message_et.timestamp();
-      if (timestamp <= this.last_server_timestamp()) {
+      if (timestamp <= this.timeStamps.last_server_timestamp()) {
         if (message_et.timestamp_affects_order()) {
-          this.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.LAST_EVENT, forceUpdate);
+          this.setTimestamp(timestamp, TIMESTAMP_TYPE.LAST_EVENT, forceUpdate);
 
           const from_self = message_et.user()?.isMe;
           if (from_self) {
-            this.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.LAST_READ);
+            this.setTimestamp(timestamp, TIMESTAMP_TYPE.LAST_READ);
           }
         }
       }
     }
   }
 
-  /**
-   * Get all messages.
-   * @returns {Array<Message>} Array of all message in the conversation
-   */
-  get_all_messages() {
+  get_all_messages(): (ContentMessage | MemberMessage | SystemMessage)[] {
     return this.messages();
   }
 
   /**
    * Get the first message of the conversation.
-   * @returns {Message|undefined} First message entity or undefined
    */
-  getFirstMessage() {
+  getFirstMessage(): ContentMessage | MemberMessage | SystemMessage | undefined {
     return this.messages()[0];
   }
 
   /**
    * Get the last message of the conversation.
-   * @returns {Message|undefined} Last message entity or undefined
    */
-  getLastMessage() {
+  getLastMessage(): ContentMessage | MemberMessage | SystemMessage | undefined {
     return this.messages()[this.messages().length - 1];
   }
 
   /**
    * Get the message before a given message.
-   * @param {Message} message_et Message to look up from
-   * @returns {Message | undefined} Previous message
+   * @param message_et Message to look up from
    */
-  get_previous_message(message_et) {
+  get_previous_message(message_et: ContentMessage): ContentMessage | MemberMessage | SystemMessage | void {
     const messages_visible = this.messages_visible();
     const message_index = messages_visible.indexOf(message_et);
     if (message_index > 0) {
@@ -712,9 +822,8 @@ export class Conversation {
 
   /**
    * Get the last text message that was added by self user.
-   * @returns {Message} Last message edited
    */
-  get_last_editable_message() {
+  get_last_editable_message(): ContentMessage | MemberMessage | SystemMessage | void {
     const messages = this.messages();
     for (let index = messages.length - 1; index >= 0; index--) {
       const message_et = messages[index];
@@ -726,9 +835,8 @@ export class Conversation {
 
   /**
    * Get the last delivered message.
-   * @returns {Message} Last delivered message
    */
-  getLastDeliveredMessage() {
+  getLastDeliveredMessage(): ContentMessage | MemberMessage | SystemMessage | undefined {
     return this.messages()
       .slice()
       .reverse()
@@ -739,35 +847,34 @@ export class Conversation {
   }
 
   /**
-   * Get a message by it's unique ID.
+   * Get a message by its unique ID.
    * Only lookup in the loaded message list which is a limited view of all the messages in DB.
    *
-   * @param {string} messageId ID of message to be retrieved
-   * @returns {Message|undefined} Message with ID or undefined
+   * @param messageId ID of message to be retrieved
    */
-  getMessage(messageId) {
+  getMessage(messageId: string): ContentMessage | MemberMessage | SystemMessage | undefined {
     return this.messages().find(messageEntity => messageEntity.id === messageId);
   }
 
-  updateGuests() {
+  updateGuests(): void {
     this.getTemporaryGuests().forEach(userEntity => userEntity.checkGuestExpiration());
   }
 
-  getTemporaryGuests() {
+  getTemporaryGuests(): User[] {
     const userEntities = this.selfUser()
       ? this.participating_user_ets().concat(this.selfUser())
       : this.participating_user_ets();
     return userEntities.filter(userEntity => userEntity.isTemporaryGuest());
   }
 
-  getUsersWithUnverifiedClients() {
+  getUsersWithUnverifiedClients(): User[] {
     const userEntities = this.selfUser()
       ? this.participating_user_ets().concat(this.selfUser())
       : this.participating_user_ets();
     return userEntities.filter(userEntity => !userEntity.is_verified());
   }
 
-  supportsVideoCall(isCreatingUser = false) {
+  supportsVideoCall(isCreatingUser: boolean = false): boolean {
     if (this.is1to1()) {
       return true;
     }
@@ -790,25 +897,28 @@ export class Conversation {
     return true;
   }
 
-  isShowingLastReceivedMessage = () =>
-    this.getLastMessage()?.timestamp() ? this.getLastMessage().timestamp() >= this.last_event_timestamp() : true;
+  isShowingLastReceivedMessage = (): boolean => {
+    return this.getLastMessage()?.timestamp()
+      ? this.getLastMessage().timestamp() >= this.timeStamps.last_event_timestamp()
+      : true;
+  };
 
-  serialize() {
+  serialize(): SerializedConversation {
     return {
       archived_state: this.archivedState(),
-      archived_timestamp: this.archivedTimestamp(),
-      cleared_timestamp: this.cleared_timestamp(),
+      archived_timestamp: this.timeStamps.archivedTimestamp(),
+      cleared_timestamp: this.timeStamps.cleared_timestamp(),
       ephemeral_timer: this.localMessageTimer(),
       global_message_timer: this.globalMessageTimer(),
       id: this.id,
       is_guest: this.isGuest(),
       is_managed: this.isManaged,
-      last_event_timestamp: this.last_event_timestamp(),
-      last_read_timestamp: this.last_read_timestamp(),
-      last_server_timestamp: this.last_server_timestamp(),
+      last_event_timestamp: this.timeStamps.last_event_timestamp(),
+      last_read_timestamp: this.timeStamps.last_read_timestamp(),
+      last_server_timestamp: this.timeStamps.last_server_timestamp(),
       legal_hold_status: this.legalHoldStatus(),
       muted_state: this.mutedState(),
-      muted_timestamp: this.mutedTimestamp(),
+      muted_timestamp: this.timeStamps.mutedTimestamp(),
       name: this.name(),
       others: this.participating_user_ids(),
       receipt_mode: this.receiptMode(),
