@@ -17,6 +17,7 @@
  *
  */
 
+import {GIPHY_RATING} from '@wireapp/api-client/dist/giphy';
 import {APIClient} from '@wireapp/api-client';
 import {ClientType} from '@wireapp/api-client/dist/client';
 import {Account} from '@wireapp/core';
@@ -107,7 +108,7 @@ const ask = (questionToAsk: string, callback: (answer: string) => void): void =>
 };
 
 const sendRandomGif = async (account: Account, conversationId: string, query: string): Promise<void> => {
-  const giphySearchResult = await account.service.giphy.getRandomGif(query, 'pg-13');
+  const giphySearchResult = await account.service.giphy.getRandomGif(query, GIPHY_RATING.PG_13);
   if (!giphySearchResult.data) {
     logger.warn(`No gif found for search query "${query}" :(`);
     return;
