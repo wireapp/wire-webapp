@@ -16,10 +16,6 @@ yarn add @wireapp/lru-cache
 
 ### Usage
 
-**Browser**
-
-- [demo.html](./src/demo/demo.html)
-
 **Node.js**
 
 - [LRUCacheSpec.js](./src/main/LRUCacheSpec.test.ts)

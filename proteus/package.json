@@ -11,7 +11,6 @@
   "description": "Axolotl protocol implementation for JavaScript.",
   "devDependencies": {
     "@types/jasmine": "3.5.9",
-    "bower": "1.8.8",
     "chai": "4.2.0",
     "jasmine": "3.5.0",
     "nyc": "15.0.1",
@@ -30,10 +29,9 @@
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus",
   "scripts": {
     "benchmark": "ts-node src/demo/benchmark.ts",
-    "build:browser": "bower install && webpack --progress",
     "build:node": "tsc",
     "clean": "rimraf dist",
-    "dist": "yarn clean && yarn build:node && yarn build:browser",
+    "dist": "yarn clean && yarn build:node",
     "start": "node dist/index.js",
     "test": "yarn test:types && yarn test:node",
     "test:node": "nyc jasmine --config=jasmine.json",

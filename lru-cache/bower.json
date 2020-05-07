@@ -1,9 +1,0 @@
-{
-  "authors": ["Wire"],
-  "description": "Least Recently Used (LRU) Cache for JavaScript and TypeScript.",
-  "ignore": ["**/.*", "node_modules", "bower_components", "test", "tests"],
-  "keywords": ["cache", "lru", "performance", "wire"],
-  "license": "GPL-3.0",
-  "main": "dist/window/LRUCache.js",
-  "name": "wire-webapp-lru-cache"
-}

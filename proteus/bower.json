@@ -1,9 +1,0 @@
-{
-  "dependencies": {
-    "libsodium.js": "0.7.3",
-    "wire-webapp-cbor": "2.1.2"
-  },
-  "license": "GPL-3.0",
-  "main": ["dist/window/proteus.js"],
-  "name": "wire-webapp-proteus"
-}

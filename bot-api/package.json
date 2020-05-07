@@ -22,14 +22,12 @@
   "name": "@wireapp/bot-api",
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api",
   "scripts": {
-    "build": "yarn build:node && yarn build:browser",
-    "build:browser": "exit 0",
+    "build": "yarn build:node",
     "build:node": "tsc",
     "clean": "rimraf dist",
     "demo:admin": "ts-node src/demo/admin.ts",
     "dist": "yarn clean && yarn build",
-    "test": "yarn test:node && yarn test:browser",
-    "test:browser": "exit 0",
+    "test": "yarn test:node",
     "test:node": "jasmine --config=jasmine.json",
     "test:project": "yarn dist && yarn test"
   },

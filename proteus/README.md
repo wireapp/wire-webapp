@@ -16,10 +16,6 @@ yarn add @wireapp/proteus
 
 ### Usage
 
-#### Browser
-
-- [demo.html](./src/demo/demo.html)
-
 #### Node.js
 
 - [demo.js](./src/demo/demo.js)
@@ -27,8 +23,7 @@ yarn add @wireapp/proteus
 #### TypeScript
 
 ```typescript
-(async () => {
-  import Proteus from '@wireapp/proteus';
-  const identity: Proteus.keys.IdentityKeyPair = await Proteus.keys.IdentityKeyPair.new();
-})();
+import Proteus from '@wireapp/proteus';
+
+const identity: Proteus.keys.IdentityKeyPair = await Proteus.keys.IdentityKeyPair.new();
 ```

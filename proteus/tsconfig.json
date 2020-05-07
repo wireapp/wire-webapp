@@ -4,6 +4,6 @@
     "outDir": "dist",
     "rootDir": "src/main"
   },
-  "exclude": ["bower_components", "dist", "node_modules", "spec", "src/demo"],
+  "exclude": ["dist", "node_modules", "spec", "src/demo"],
   "extends": "../../tsconfig.json"
 }
