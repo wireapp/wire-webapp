@@ -36,7 +36,7 @@ import {
   MessageHide,
   Reaction,
   Text,
-  NotUploaded as AssetUploadFailedReason,
+  Asset as ProtobufAsset,
 } from '@wireapp/protocol-messaging';
 import {flatten} from 'underscore';
 import {ConnectionStatus, ReactionType} from '@wireapp/api-client/dist/connection';
@@ -2019,11 +2019,11 @@ export class ConversationRepository {
    *
    * @param {Conversation} conversationEntity Conversation that should receive the file
    * @param {string} messageId ID of the metadata message
-   * @param {AssetUploadFailedReason} [reason=AssetUploadFailedReason.FAILED] Cause for the failed upload (optional)
+   * @param {ProtobufAsset.NotUploaded} [reason=ProtobufAsset.NotUploaded.FAILED] Cause for the failed upload (optional)
    * @returns {Promise} Resolves when the asset failure was sent
    */
-  send_asset_upload_failed(conversationEntity, messageId, reason = AssetUploadFailedReason.FAILED) {
-    const wasCancelled = reason === AssetUploadFailedReason.CANCELLED;
+  send_asset_upload_failed(conversationEntity, messageId, reason = ProtobufAsset.NotUploaded.FAILED) {
+    const wasCancelled = reason === ProtobufAsset.NotUploaded.CANCELLED;
     const protoReason = wasCancelled ? Asset.NotUploaded.CANCELLED : Asset.NotUploaded.FAILED;
     const protoAsset = new Asset({
       [PROTO_MESSAGE_TYPE.ASSET_NOT_UPLOADED]: protoReason,
@@ -3786,7 +3786,7 @@ export class ConversationRepository {
     const fromSelf = event.from === this.selfUser().id;
 
     const isRemoteFailure = !fromSelf && event.data.status === AssetTransferState.UPLOAD_FAILED;
-    const isLocalCancel = fromSelf && event.data.reason === AssetUploadFailedReason.CANCELLED;
+    const isLocalCancel = fromSelf && event.data.reason === ProtobufAsset.NotUploaded.CANCELLED;
 
     if (isRemoteFailure || isLocalCancel) {
       return conversationEntity.remove_message_by_id(event.id);
@@ -4139,7 +4139,7 @@ export class ConversationRepository {
    * @returns {undefined} No return value
    */
   cancel_asset_upload(messageId) {
-    this.send_asset_upload_failed(this.active_conversation(), messageId, AssetUploadFailedReason.CANCELLED);
+    this.send_asset_upload_failed(this.active_conversation(), messageId, ProtobufAsset.NotUploaded.CANCELLED);
   }
 
   /**
@@ -4217,7 +4217,7 @@ export class ConversationRepository {
         }
 
         asset_et.status(reason);
-        asset_et.upload_failed_reason(AssetUploadFailedReason.FAILED);
+        asset_et.upload_failed_reason(ProtobufAsset.NotUploaded.FAILED);
       }
 
       return this.eventService.updateEventAsUploadFailed(message_et.primary_key, reason);

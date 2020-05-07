@@ -17,7 +17,7 @@
  *
  */
 
-import {Asset as ProtobufAsset, NotUploaded as AssetUploadFailedReason} from '@wireapp/protocol-messaging';
+import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 import ko from 'knockout';
 
 import {Logger, getLogger} from 'Util/Logger';
@@ -44,7 +44,7 @@ export class File extends Asset {
   public file_size: string;
   public meta: Partial<AssetMetaData>;
   public readonly status: ko.Observable<AssetTransferState>;
-  public readonly upload_failed_reason: ko.Observable<AssetUploadFailedReason>;
+  public readonly upload_failed_reason: ko.Observable<ProtobufAsset.NotUploaded>;
 
   constructor(id?: string) {
     super(id);

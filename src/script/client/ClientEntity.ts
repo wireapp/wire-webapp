@@ -42,7 +42,7 @@ export class ClientEntity {
   };
   model?: string;
   time?: string;
-  type?: ClientType;
+  type?: ClientType.PERMANENT | ClientType.TEMPORARY;
 
   constructor(isSelfClient = false) {
     this.isSelfClient = isSelfClient;

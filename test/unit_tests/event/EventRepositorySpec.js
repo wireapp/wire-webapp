@@ -19,7 +19,7 @@
 
 import {MemoryEngine} from '@wireapp/store-engine';
 import {Cryptobox} from '@wireapp/cryptobox';
-import {GenericMessage, Text, NotUploaded as AssetUploadFailedReason} from '@wireapp/protocol-messaging';
+import {GenericMessage, Text, Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 import * as Proteus from '@wireapp/proteus';
 
@@ -614,7 +614,7 @@ describe('EventRepository', () => {
         const assetAddEvent = {...event, from, type: ClientEvent.CONVERSATION.ASSET_ADD};
         const assetCancelEvent = {
           ...assetAddEvent,
-          data: {reason: AssetUploadFailedReason.CANCELLED, status: AssetTransferState.UPLOAD_FAILED},
+          data: {reason: ProtobufAsset.NotUploaded.CANCELLED, status: AssetTransferState.UPLOAD_FAILED},
           time: '2017-09-06T09:43:36.528Z',
         };
 
@@ -634,7 +634,7 @@ describe('EventRepository', () => {
       const assetAddEvent = {...event, type: ClientEvent.CONVERSATION.ASSET_ADD};
       const assetUploadFailedEvent = {
         ...assetAddEvent,
-        data: {reason: AssetUploadFailedReason.FAILED, status: AssetTransferState.UPLOAD_FAILED},
+        data: {reason: ProtobufAsset.NotUploaded.FAILED, status: AssetTransferState.UPLOAD_FAILED},
         time: '2017-09-06T09:43:36.528Z',
       };
 
@@ -651,7 +651,7 @@ describe('EventRepository', () => {
       const assetAddEvent = {...event, type: ClientEvent.CONVERSATION.ASSET_ADD};
       const assetUploadFailedEvent = {
         ...assetAddEvent,
-        data: {reason: AssetUploadFailedReason.FAILED, status: AssetTransferState.UPLOAD_FAILED},
+        data: {reason: ProtobufAsset.NotUploaded.FAILED, status: AssetTransferState.UPLOAD_FAILED},
         time: '2017-09-06T09:43:36.528Z',
       };
 

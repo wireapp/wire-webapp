@@ -359,7 +359,7 @@ export class ClientRepository {
    * @returns Payload to register client with backend
    */
   private createRegistrationPayload(
-    clientType: ClientType,
+    clientType: ClientType.TEMPORARY | ClientType.PERMANENT,
     password: string,
     [lastResortKey, preKeys, signalingKeys]: [PreKey, PreKey[], PreKey[]],
   ): NewClient & {sigkeys: PreKey[]} {
@@ -417,7 +417,10 @@ export class ClientRepository {
    * @param cookieLabel Cookie label, something like "webapp@2153234453@temporary@145770538393"
    * @returns Resolves with the key of the stored cookie label
    */
-  private transferCookieLabel(clientType: ClientType, cookieLabel: string): Promise<string> {
+  private transferCookieLabel(
+    clientType: ClientType.PERMANENT | ClientType.TEMPORARY,
+    cookieLabel: string,
+  ): Promise<string> {
     const indexedDbKey = StorageKey.AUTH.COOKIE_LABEL;
     const userIdentifier = this.selfUser().email() || this.selfUser().phone();
     const localStorageKey = this.constructCookieLabelKey(userIdentifier, clientType);
@@ -440,7 +443,7 @@ export class ClientRepository {
    * Load current client type from amplify store.
    * @returns Type of current client
    */
-  private loadCurrentClientType(): ClientType {
+  private loadCurrentClientType(): ClientType.PERMANENT | ClientType.TEMPORARY {
     if (this.currentClient()) {
       return this.currentClient().type;
     }
