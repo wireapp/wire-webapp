@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.13.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.12.1...@wireapp/api-client@11.13.0) (2020-05-07)
+
+
+### Features
+
+* **api-client:** Update Giphy endpoints (BREAKING) ([#3010](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3010)) ([e905cf8](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/e905cf8c8d600091e66f3bab1e0fbb8d4fc76623))
+
+
+
+
+
 ## [11.12.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.12.0...@wireapp/api-client@11.12.1) (2020-05-06)
 
 **Note:** Version bump only for package @wireapp/api-client
