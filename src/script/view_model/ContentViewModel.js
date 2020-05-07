@@ -244,7 +244,7 @@ export class ContentViewModel {
           : exposeMessageEntity;
 
         if (conversationEntity.is_cleared()) {
-          conversationEntity.cleared_timestamp(0);
+          conversationEntity.timeStamps.cleared_timestamp(0);
         }
 
         const unarchivePromise = conversationEntity.is_archived()

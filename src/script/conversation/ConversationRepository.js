@@ -728,7 +728,7 @@ export class ConversationRepository {
    */
   _get_unread_events(conversationEntity) {
     const first_message = conversationEntity.getFirstMessage();
-    const lower_bound = new Date(conversationEntity.last_read_timestamp());
+    const lower_bound = new Date(conversationEntity.timeStamps.last_read_timestamp());
     const upper_bound = first_message
       ? new Date(first_message.timestamp())
       : new Date(conversationEntity.get_latest_timestamp(this.serverTimeHandler.toServerTimestamp()) + 1);
@@ -1067,7 +1067,7 @@ export class ConversationRepository {
     return this.get_conversation_by_id(conversation_id)
       .then(conversationEntity => {
         return this.getMessageInConversationById(conversationEntity, message_id).then(
-          message_et => conversationEntity.last_read_timestamp() >= message_et.timestamp(),
+          message_et => conversationEntity.timeStamps.last_read_timestamp() >= message_et.timestamp(),
         );
       })
       .catch(error => {
@@ -1215,7 +1215,7 @@ export class ConversationRepository {
    */
   markAsRead(conversationEntity) {
     const conversationId = conversationEntity.id;
-    const timestamp = conversationEntity.last_read_timestamp();
+    const timestamp = conversationEntity.timeStamps.last_read_timestamp();
     const protoLastRead = new LastRead({
       conversationId,
       lastReadTimestamp: timestamp,
@@ -1694,7 +1694,7 @@ export class ConversationRepository {
 
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
     const archiveTimestamp = conversationEntity.get_last_known_timestamp(currentTimestamp);
-    const sameTimestamp = conversationEntity.archivedTimestamp() === archiveTimestamp;
+    const sameTimestamp = conversationEntity.timeStamps.archivedTimestamp() === archiveTimestamp;
     const skipChange = sameTimestamp && !forceChange;
 
     if (!stateChange && skipChange) {
@@ -3451,7 +3451,7 @@ export class ConversationRepository {
         }
 
         if (conversationEntity.is_cleared()) {
-          conversationEntity.cleared_timestamp(0);
+          conversationEntity.timeStamps.cleared_timestamp(0);
         }
       }
 
@@ -3767,7 +3767,7 @@ export class ConversationRepository {
     }
 
     if (conversationEntity.is_cleared()) {
-      this._clear_conversation(conversationEntity, conversationEntity.cleared_timestamp());
+      this._clear_conversation(conversationEntity, conversationEntity.timeStamps.cleared_timestamp());
     }
 
     if (isActiveConversation && (conversationEntity.is_archived() || conversationEntity.is_cleared())) {

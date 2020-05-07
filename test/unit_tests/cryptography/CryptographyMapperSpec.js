@@ -281,7 +281,7 @@ describe('CryptographyMapper', () => {
         expect(event_json.from).toBe(event.from);
         expect(event_json.time).toBe(event.time);
         expect(event_json.id).toBe(generic_message.messageId);
-        expect(event_json.data.cleared_timestamp).toBe(date);
+        expect(event_json.data.timeStamps.cleared_timestamp).toBe(date);
         expect(event_json.data.conversationId).toBe(conversation_id);
       });
     });
@@ -538,7 +538,7 @@ describe('CryptographyMapper', () => {
         expect(event_json.time).toBe(event.time);
         expect(event_json.id).toBe(generic_message.messageId);
         expect(event_json.data.conversationId).toBe(conversation_id);
-        expect(event_json.data.last_read_timestamp).toBe(date);
+        expect(event_json.data.timeStamps.last_read_timestamp).toBe(date);
       });
     });
 
