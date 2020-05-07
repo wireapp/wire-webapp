@@ -19,12 +19,12 @@
 
 import {amplify} from 'amplify';
 import {intersection} from 'underscore';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Logger, getLogger} from 'Util/Logger';
 
 import {Conversation} from '../entity/Conversation';
 import {EventRepository} from '../event/EventRepository';
-import {WebAppEvents} from '../event/WebApp';
 import {VerificationMessageType} from '../message/VerificationMessageType';
 import {ServerTimeHandler} from '../time/serverTimeHandler';
 import {ConversationRepository} from './ConversationRepository';

@@ -18,13 +18,13 @@
  */
 
 import ko from 'knockout';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
 
 import {ParticipantAvatar} from 'Components/participantAvatar';
 import {User} from '../../entity/User';
 
 import 'Components/availabilityState';
-import {WebAppEvents} from '../../event/WebApp';
-import {amplify} from 'amplify';
 
 interface UserDetailsProps {
   participant: ko.Observable<User>;

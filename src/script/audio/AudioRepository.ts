@@ -18,12 +18,12 @@
  */
 
 import {WebappProperties} from '@wireapp/api-client/dist/user/data';
+import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {Logger, getLogger} from 'Util/Logger';
 
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
-import {WebAppEvents} from '../event/WebApp';
 import {AudioPlayingType} from './AudioPlayingType';
 import {AudioPreference} from './AudioPreference';
 import {AudioType} from './AudioType';
