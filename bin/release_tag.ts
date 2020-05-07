@@ -107,7 +107,7 @@ const ask = (questionToAsk: string, callback: (answer: string) => void): void =>
 };
 
 const sendRandomGif = async (account: Account, conversationId: string, query: string): Promise<void> => {
-  const giphySearchResult = await account.service.giphy.getRandomGif(query);
+  const giphySearchResult = await account.service.giphy.getRandomGif(query, 'pg-13');
   if (!giphySearchResult.data) {
     logger.warn(`No gif found for search query "${query}" :(`);
     return;
