@@ -18,6 +18,6 @@
  */
 
 export * from './GiphyAPI';
-export * from './GiphySearch';
+export * from './GiphyOptions';
 export * from './GiphyResult';
 export * from './GiphyImage';

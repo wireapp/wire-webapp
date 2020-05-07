@@ -19,7 +19,8 @@
 
 import {AxiosRequestConfig} from 'axios';
 
-import {GiphySearch, GiphyResult, GiphySearchResult} from '../giphy/';
+import {GiphySearchOptions, GiphyRandomOptions, GiphyTrendingOptions, GiphyIdOptions} from './GiphyOptions';
+import {GiphyResult, GiphyMultipleResult} from './GiphyResult';
 import {HttpClient} from '../http/';
 
 export class GiphyAPI {
@@ -30,33 +31,50 @@ export class GiphyAPI {
     PROXY: '/proxy',
     RANDOM: 'random',
     SEARCH: 'search',
+    TRENDING: 'trending',
   };
 
   /**
-   * Get a Giphy image by its ID.
-   * @param ids one or multiple image ID(s)
+   * Get multiple Giphy images by IDs.
+   * @see https://developers.giphy.com/docs/api/endpoint#get-gifs-by-id
    */
-  public async getGiphyById(ids: string | string[]): Promise<GiphyResult> {
-    const allIds = Array<string>().concat(ids);
+  public async getGiphyByIds(options: GiphyIdOptions): Promise<GiphyMultipleResult> {
+    const allIds = options.ids.join(',');
+
+    delete options.ids;
+
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${GiphyAPI.URL.PROXY}/${GiphyAPI.URL.GIPHY}/${allIds.join(',')}`,
+      params: options,
+      url: `${GiphyAPI.URL.PROXY}/${GiphyAPI.URL.GIPHY}/${allIds}`,
     };
 
-    const response = await this.client.sendJSON<GiphyResult>(config);
+    const response = await this.client.sendJSON<GiphyMultipleResult>(config);
+    return response.data;
+  }
+
+  /**
+   * Get a Giphy image by its ID.
+   * @see https://developers.giphy.com/docs/api/endpoint#get-gif-by-id
+   */
+  public async getGiphyById(id: string): Promise<GiphyResult> {
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      url: `${GiphyAPI.URL.PROXY}/${GiphyAPI.URL.GIPHY}/${id}`,
+    };
+
+    const response = await this.client.sendJSON<GiphyMultipleResult>(config);
     return response.data;
   }
 
   /**
    * Get a random GIF from Giphy.
-   * @param tag GIF tag to limit randomness
+   * @see https://developers.giphy.com/docs/api/endpoint#random
    */
-  public async getGiphyRandom(tag?: string): Promise<GiphyResult> {
+  public async getGiphyRandom(options?: GiphyRandomOptions | string): Promise<GiphyResult> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      params: {
-        tag,
-      },
+      params: options,
       url: `${GiphyAPI.URL.PROXY}/${GiphyAPI.URL.GIPHY}/${GiphyAPI.URL.RANDOM}`,
     };
 
@@ -66,16 +84,31 @@ export class GiphyAPI {
 
   /**
    * Get GIF search results from Giphy.
-   * @param options Search options
+   * @see https://developers.giphy.com/docs/api/endpoint#search
    */
-  public async getGiphySearch(options: GiphySearch): Promise<GiphySearchResult> {
+  public async getGiphySearch(options: GiphySearchOptions): Promise<GiphyMultipleResult> {
     const config: AxiosRequestConfig = {
       method: 'get',
       params: options,
       url: `${GiphyAPI.URL.PROXY}/${GiphyAPI.URL.GIPHY}/${GiphyAPI.URL.SEARCH}`,
     };
 
-    const response = await this.client.sendJSON<GiphySearchResult>(config);
+    const response = await this.client.sendJSON<GiphyMultipleResult>(config);
+    return response.data;
+  }
+
+  /**
+   * Get GIF trending results from Giphy.
+   * @see https://developers.giphy.com/docs/api/endpoint#trending
+   */
+  public async getGiphyTrending(options: GiphyTrendingOptions): Promise<GiphyMultipleResult> {
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      params: options,
+      url: `${GiphyAPI.URL.PROXY}/${GiphyAPI.URL.GIPHY}/${GiphyAPI.URL.TRENDING}`,
+    };
+
+    const response = await this.client.sendJSON<GiphyMultipleResult>(config);
     return response.data;
   }
 }

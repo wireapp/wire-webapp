@@ -28,7 +28,7 @@ export interface GiphyResult {
   };
 }
 
-export type GiphySearchResult = GiphyResult & {
+export type GiphyMultipleResult = GiphyResult & {
   data: GiphyImage[];
   pagination: {
     count: number;
