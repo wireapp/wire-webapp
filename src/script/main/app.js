@@ -341,6 +341,18 @@ class App {
   _subscribeToEvents() {
     amplify.subscribe(WebAppEvents.LIFECYCLE.REFRESH, this.refresh.bind(this));
     amplify.subscribe(WebAppEvents.LIFECYCLE.SIGN_OUT, this.logout.bind(this));
+    amplify.subscribe(WebAppEvents.CONNECTION.ACCESS_TOKEN.RENEW, async source => {
+      this.logger.info(`Access token refresh triggered by "${source}"...`);
+      const apiClient = container.resolve(APIClientSingleton).getClient();
+      try {
+        await apiClient.transport.http.refreshAccessToken();
+        amplify.publish(WebAppEvents.CONNECTION.ACCESS_TOKEN.RENEWED);
+        this.logger.info(`Refreshed access token.`);
+      } catch (error) {
+        this.logger.warn(`Logging out user because access token cannot be refreshed: ${error.message}`, error);
+        this.logout(SIGN_OUT_REASON.NOT_SIGNED_IN, false);
+      }
+    });
   }
 
   //##############################################################################
@@ -557,7 +569,7 @@ class App {
             Raygun.send(error);
           }
 
-          return this.logout(SIGN_OUT_REASON.APP_INIT);
+          return this.logout(SIGN_OUT_REASON.APP_INIT, false);
         }
       }
     }
@@ -750,7 +762,7 @@ class App {
    * @param {boolean} clearData Keep data in database
    * @returns {undefined} No return value
    */
-  logout(signOutReason, clearData = false) {
+  logout(signOutReason, clearData) {
     const _redirectToLogin = () => {
       amplify.publish(WebAppEvents.LIFECYCLE.SIGNED_OUT, clearData);
       this._redirectToLogin(signOutReason);
