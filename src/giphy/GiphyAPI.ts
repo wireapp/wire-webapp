@@ -71,7 +71,7 @@ export class GiphyAPI {
    * Get a random GIF from Giphy.
    * @see https://developers.giphy.com/docs/api/endpoint#random
    */
-  public async getGiphyRandom(options?: GiphyRandomOptions | string): Promise<GiphyResult> {
+  public async getGiphyRandom(options?: GiphyRandomOptions): Promise<GiphyResult> {
     const config: AxiosRequestConfig = {
       method: 'get',
       params: options,

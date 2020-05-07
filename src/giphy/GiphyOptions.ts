@@ -17,6 +17,14 @@
  *
  */
 
+/** @see https://developers.giphy.com/docs/optional-settings/#rating */
+export enum GIPHY_RATING {
+  ALL_AGES_AND_PEOPLE = 'g',
+  MILD_SUBSTANCE = 'pg-13',
+  REQUIRE_PARENTAL_PREVIEW = 'pg',
+  STRONG_LANGUAGE = 'r',
+}
+
 export interface GiphyBaseOptions {
   /** An ID/proxy for a specific user. */
   random_id?: string;
@@ -26,7 +34,7 @@ export interface GiphyBaseOptions {
    * If you do not specify a rating, you will receive results
    * from all possible ratings.
    */
-  rating?: string;
+  rating?: GIPHY_RATING;
 }
 
 /** @see https://developers.giphy.com/docs/api/endpoint#random */
