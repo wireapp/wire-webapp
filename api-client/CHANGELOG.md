@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.14.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.13.0...@wireapp/api-client@11.14.0) (2020-05-07)
+
+
+### Features
+
+* **api-client:** Add PropertyApi ([#3009](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3009)) ([90e9ee5](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/90e9ee5e3e946d25145a180255ef86336a20d695))
+
+
+
+
+
 # [11.13.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.12.1...@wireapp/api-client@11.13.0) (2020-05-07)
 
 
