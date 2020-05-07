@@ -18,16 +18,20 @@
  */
 
 import {APIClient} from '@wireapp/api-client';
-import {GiphySearch, GiphySearchResult, GiphyResult} from '@wireapp/api-client/dist/giphy/';
+import {GiphySearchOptions, GiphyMultipleResult, GiphyResult} from '@wireapp/api-client/dist/giphy/';
 
 export class GiphyService {
   constructor(private readonly apiClient: APIClient) {}
 
-  public getRandomGif(tag?: string): Promise<GiphyResult> {
-    return this.apiClient.giphy.api.getGiphyRandom(tag);
+  public getRandomGif(tag?: string, rating?: string): Promise<GiphyResult> {
+    return this.apiClient.giphy.api.getGiphyRandom({rating, tag});
   }
 
-  public searchGif(options: GiphySearch): Promise<GiphySearchResult> {
+  public getTrendingGif(rating?: string): Promise<GiphyResult> {
+    return this.apiClient.giphy.api.getGiphyTrending({rating});
+  }
+
+  public searchGif(options: GiphySearchOptions): Promise<GiphyMultipleResult> {
     return this.apiClient.giphy.api.getGiphySearch(options);
   }
 }
