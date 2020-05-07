@@ -67,7 +67,7 @@ export class GiphyRepository {
   /**
    * Get random GIF for a word or phrase.
    */
-  async getRandomGif(options: RandomGifOptions, retry = 0): Promise<Gif> {
+  async getRandomGif(options: RandomGifOptions, retry: number = 0): Promise<Gif> {
     options = {
       maxRetries: GiphyRepository.CONFIG.MAX_RETRIES,
       maxSize: GiphyRepository.CONFIG.MAX_SIZE,
@@ -88,7 +88,7 @@ export class GiphyRepository {
     } = await this.giphyService.getById(randomGif.id);
     const staticGif = images.fixed_width_still;
     const animatedGif = images.downsized;
-    const exceedsMaxSize = parseInt(animatedGif.size, 10) > options.maxSize;
+    const exceedsMaxSize = window.parseInt(animatedGif.size, 10) > options.maxSize;
 
     if (exceedsMaxSize) {
       this.logger.info(`Gif size (${animatedGif.size}) is over maximum size (${animatedGif.size})`);
