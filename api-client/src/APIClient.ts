@@ -46,6 +46,7 @@ import {
   ServiceAPI,
   TeamAPI,
   TeamInvitationAPI,
+  PropertyAPI,
 } from './team/';
 import {UserAPI} from './user/';
 
@@ -89,6 +90,7 @@ export class APIClient extends EventEmitter {
     legalhold: {api: LegalHoldAPI};
     member: {api: MemberAPI};
     payment: {api: PaymentAPI};
+    property: {api: PropertyAPI};
     service: {api: ServiceAPI};
     team: {api: TeamAPI};
   };
@@ -187,6 +189,9 @@ export class APIClient extends EventEmitter {
       },
       payment: {
         api: new PaymentAPI(this.transport.http),
+      },
+      property: {
+        api: new PropertyAPI(this.transport.http),
       },
       service: {
         api: new ServiceAPI(this.transport.http),
