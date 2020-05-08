@@ -128,13 +128,13 @@ export class AssetService {
 
   private async compressImageWithWorker(pathToWorkerFile: string, image: File | Blob): Promise<CompressedImage> {
     const skipCompression = image.type === 'image/gif';
-    const buffer = await loadFileBuffer(image) as ArrayBuffer;
+    const buffer = await loadFileBuffer(image);
     let compressedBytes: ArrayBuffer;
     if (skipCompression === true) {
-      compressedBytes = new Uint8Array(buffer);
+      compressedBytes = new Uint8Array(buffer as ArrayBuffer);
     } else {
       const worker = new WebWorker(pathToWorkerFile);
-      compressedBytes = await worker.post<ArrayBuffer>(buffer);
+      compressedBytes = await worker.post(buffer);
     }
     const compressedImage = await loadImage(new Blob([compressedBytes], {type: image.type}));
     return {
