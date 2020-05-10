@@ -2691,10 +2691,10 @@ babel-plugin-macros@^2.0.0:
     cosmiconfig "^5.2.0"
     resolve "^1.10.0"
 
-babel-plugin-react-intl@7.5.5:
-  version "7.5.5"
-  resolved "https://registry.yarnpkg.com/babel-plugin-react-intl/-/babel-plugin-react-intl-7.5.5.tgz#4c96e8584545119c49cf6855814639fc143167a0"
-  integrity sha512-vRR0BzlaQ07EA/jRvSsMYBOrJSAQezNwgwiwMMN4ZoLy6fmqTNIv15X5T+aDZBZ7CqCytpPK1AEwgHL9zSuE6A==
+babel-plugin-react-intl@7.5.7:
+  version "7.5.7"
+  resolved "https://registry.yarnpkg.com/babel-plugin-react-intl/-/babel-plugin-react-intl-7.5.7.tgz#00dc00389779f910866a9270f52e0b8c1640ba72"
+  integrity sha512-9WCijcMIyPhJ0LPgsd+EIF00wJGz8+IcKT17IG5FH7CDVTdJBvC5lK/9V42NP8/CHalXKJZTrqwhdzsm3KIG6w==
   dependencies:
     "@babel/core" "^7.9.0"
     "@babel/helper-plugin-utils" "^7.8.3"
