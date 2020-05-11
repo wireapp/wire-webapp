@@ -94,8 +94,10 @@ export class Conversation {
   accessCode: ko.Observable<string>;
   accessState: ko.Observable<string>;
   archivedState: ko.Observable<boolean>;
+  archivedTimestamp: ko.Observable<number>;
   availabilityOfUser: ko.PureComputed<Availability.Type>;
   blockLegalHoldMessage: boolean;
+  cleared_timestamp: ko.Observable<number>;
   connection: ko.Observable<ConnectionEntity>;
   creator: string;
   display_name: ko.PureComputed<string>;
@@ -106,7 +108,6 @@ export class Conversation {
   hasGlobalMessageTimer: ko.PureComputed<boolean>;
   hasGuest: ko.PureComputed<boolean>;
   hasLegalHold: ko.Computed<boolean>;
-  removed_from_conversation?: ko.PureComputed<boolean>;
   hasService: ko.PureComputed<boolean>;
   hasUnread: ko.PureComputed<boolean>;
   id: string;
@@ -131,6 +132,9 @@ export class Conversation {
   isSelf: ko.PureComputed<boolean>;
   isTeam1to1: ko.PureComputed<boolean>;
   isTeamOnly: ko.PureComputed<boolean>;
+  last_event_timestamp: ko.Observable<number>;
+  last_read_timestamp: ko.Observable<number>;
+  last_server_timestamp: ko.Observable<number>;
   legalHoldStatus: ko.Observable<LegalHoldStatus>;
   localMessageTimer: ko.Observable<number>;
   logger: Logger;
@@ -139,12 +143,14 @@ export class Conversation {
   messages: ko.PureComputed<(ContentMessage | MemberMessage)[]>;
   messageTimer: ko.PureComputed<number>;
   mutedState: ko.Observable<number>;
+  mutedTimestamp: ko.Observable<number>;
   name: ko.Observable<string>;
-  notificationState: ko.PureComputed<any>;
+  notificationState: ko.PureComputed<number>;
   participating_user_ets: ko.ObservableArray<User>;
   participating_user_ids: ko.ObservableArray<string>;
   publishPersistState: (() => void) & Cancelable;
   receiptMode: ko.Observable<Confirmation.Type>;
+  removed_from_conversation?: ko.PureComputed<boolean>;
   roles: ko.Observable<Record<string, string>>;
   selfUser: ko.Observable<User>;
   shouldPersistStateChanges: boolean;
@@ -157,12 +163,6 @@ export class Conversation {
   unreadState: ko.PureComputed<UnreadState>;
   verification_state: ko.Observable<ConversationVerificationState>;
   withAllTeamMembers: ko.Observable<User[]>;
-  archivedTimestamp: any;
-  cleared_timestamp: ko.Observable<number>;
-  last_event_timestamp: ko.Observable<number>;
-  last_read_timestamp: ko.Observable<number>;
-  last_server_timestamp: ko.Observable<number>;
-  mutedTimestamp: ko.Observable<number>;
 
   static get TIMESTAMP_TYPE(): typeof TIMESTAMP_TYPE {
     return TIMESTAMP_TYPE;
