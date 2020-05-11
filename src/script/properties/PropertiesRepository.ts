@@ -19,6 +19,7 @@
 
 import {amplify} from 'amplify';
 import {Confirmation} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
 import {AudioPreference, NotificationPreference, WebappProperties} from '@wireapp/api-client/dist/user/data';
 
 import {Environment} from 'Util/Environment';
@@ -27,7 +28,6 @@ import {Logger, getLogger} from 'Util/Logger';
 
 import {Config} from '../Config';
 import {User} from '../entity/User';
-import {WebAppEvents} from '../event/WebApp';
 import {SelfService} from '../self/SelfService';
 import {ConsentType} from '../user/ConsentType';
 import {ConsentValue} from '../user/ConsentValue';

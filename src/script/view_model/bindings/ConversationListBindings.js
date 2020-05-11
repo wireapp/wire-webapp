@@ -20,7 +20,7 @@
 import {throttle} from 'underscore';
 import {isScrollable, isScrolledBottom, isScrolledTop} from 'Util/scroll-helpers';
 
-import {WebAppEvents} from '../../event/WebApp';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 // show scroll borders
 ko.bindingHandlers.bordered_list = (function () {

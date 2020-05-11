@@ -21,11 +21,13 @@ import {error as StoreEngineError} from '@wireapp/store-engine';
 import {Cryptobox, version as cryptoboxVersion} from '@wireapp/cryptobox';
 import {errors as ProteusErrors} from '@wireapp/proteus';
 import {GenericMessage} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {getLogger} from 'Util/Logger';
 import {arrayToBase64, base64ToArray, zeroPadding} from 'Util/util';
+
 import {CryptographyMapper} from './CryptographyMapper';
 import {Config} from '../Config';
-import {WebAppEvents} from '../event/WebApp';
 import {EventName} from '../tracking/EventName';
 import {ClientEntity} from '../client/ClientEntity';
 import {BackendClientError} from '../error/BackendClientError';

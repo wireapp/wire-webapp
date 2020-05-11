@@ -21,6 +21,7 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import {Availability, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {debounce, Cancelable} from 'underscore';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
@@ -35,7 +36,6 @@ import {ConversationStatus} from '../conversation/ConversationStatus';
 import {ConversationRepository} from '../conversation/ConversationRepository';
 import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
 
-import {WebAppEvents} from '../event/WebApp';
 import {ClientRepository} from '../client/ClientRepository';
 import {StatusType} from '../message/StatusType';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
