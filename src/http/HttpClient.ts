@@ -29,10 +29,12 @@ import {sendRequestWithCookie} from '../shims/node/cookie';
 
 enum TOPIC {
   ON_CONNECTION_STATE_CHANGE = 'HttpClient.TOPIC.ON_CONNECTION_STATE_CHANGE',
+  ON_INVALID_TOKEN = 'HttpClient.TOPIC.ON_INVALID_TOKEN',
 }
 
 export interface HttpClient {
   on(event: TOPIC.ON_CONNECTION_STATE_CHANGE, listener: (state: ConnectionState) => void): this;
+  on(event: TOPIC.ON_INVALID_TOKEN, listener: (error: Error) => void): this;
 }
 
 export class HttpClient extends EventEmitter {
@@ -149,12 +151,22 @@ export class HttpClient extends EventEmitter {
       expiredAccessToken = this.accessTokenStore.accessToken;
     }
 
-    const accessToken = await this.postAccess(expiredAccessToken);
-    this.logger.info(
-      `Received updated access token. It will expire in "${accessToken.expires_in}" seconds.`,
-      ObfuscationUtil.obfuscateAccessToken(accessToken),
-    );
-    return this.accessTokenStore.updateToken(accessToken);
+    try {
+      const accessToken = await this.postAccess(expiredAccessToken);
+      this.logger.info(
+        `Received updated access token. It will expire in "${accessToken.expires_in}" seconds.`,
+        ObfuscationUtil.obfuscateAccessToken(accessToken),
+      );
+      return this.accessTokenStore.updateToken(accessToken);
+    } catch (error) {
+      if (error instanceof NetworkError) {
+        this.logger.warn(`Failed to refresh access token because of networking error: ${error.message}`);
+      } else {
+        this.logger.error(`Failed to refresh access token: ${error.message}`);
+        this.emit(HttpClient.TOPIC.ON_INVALID_TOKEN, error);
+      }
+      throw error;
+    }
   }
 
   public async postAccess(expiredAccessToken?: AccessTokenData): Promise<AccessTokenData> {
