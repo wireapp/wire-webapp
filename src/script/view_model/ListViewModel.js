@@ -40,7 +40,7 @@ import {ShortcutType} from '../ui/ShortcutType';
 import {ContentViewModel} from './ContentViewModel';
 import {DefaultLabelIds} from '../conversation/ConversationLabelRepository';
 
-export class ListViewModel {
+export const ListViewModel = class ListViewModel {
   static get MODAL_TYPE() {
     return {
       TAKEOVER: 'ListViewModel.MODAL_TYPE.TAKEOVER',
@@ -489,7 +489,7 @@ export class ListViewModel {
 
     return isStateConversations && isActiveConversation;
   }
-}
+};
 
 window.z = window.z || {};
 window.z.viewModel = window.z.viewModel || {};

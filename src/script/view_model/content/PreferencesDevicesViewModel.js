@@ -25,7 +25,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {ContentViewModel} from '../ContentViewModel';
 import {sortUserDevices} from 'Components/userDevices';
 
-export class PreferencesDevicesViewModel {
+export const PreferencesDevicesViewModel = class PreferencesDevicesViewModel {
   constructor(mainViewModel, contentViewModel, repositories) {
     this.clickOnRemoveDevice = this.clickOnRemoveDevice.bind(this);
     this.clickOnShowDevice = this.clickOnShowDevice.bind(this);
@@ -71,7 +71,7 @@ export class PreferencesDevicesViewModel {
       this.localFingerprint(this.cryptographyRepository.getLocalFingerprint());
     }
   }
-}
+};
 
 window.z = window.z || {};
 window.z.viewModel = window.z.viewModel || {};

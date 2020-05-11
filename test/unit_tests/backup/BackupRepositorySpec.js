@@ -39,7 +39,7 @@ const messages = [
   ];
 /* eslint-enable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
 
-describe('BackupRepository', () => {
+fdescribe('BackupRepository', () => {
   const testFactory = new TestFactory();
   let backupRepository = undefined;
 

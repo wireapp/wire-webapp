@@ -34,7 +34,7 @@ import {ContentViewModel} from './ContentViewModel';
 
 export const OPEN_CONVERSATION_DETAILS = 'PanelViewModel.OPEN_CONVERSATION_DETAILS';
 
-export class PanelViewModel {
+export const PanelViewModel = class PanelViewModel {
   static get STATE() {
     return {
       ADD_PARTICIPANTS: 'PanelViewModel.STATE.ADD_PARTICIPANTS',
@@ -265,7 +265,7 @@ export class PanelViewModel {
       return $(`#${panelStateElementId}`).addClass('panel__page--visible');
     }
   }
-}
+};
 
 window.z = window.z || {};
 window.z.viewModel = window.z.viewModel || {};

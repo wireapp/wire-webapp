@@ -22,7 +22,7 @@ import {Config} from '../../Config';
 
 import {getPrivacyPolicyUrl, getTermsOfUsePersonalUrl, getTermsOfUseTeamUrl, URL} from '../../externalRoute';
 
-export class PreferencesAboutViewModel {
+export const PreferencesAboutViewModel = class PreferencesAboutViewModel {
   constructor(mainViewModel, contentViewModel, repositories) {
     this.logger = getLogger('z.viewModel.content.PreferencesAboutViewModel');
 
@@ -46,7 +46,7 @@ export class PreferencesAboutViewModel {
   showSupportSection() {
     return this.Config.URL.SUPPORT.INDEX || this.Config.URL.SUPPORT.CONTACT;
   }
-}
+};
 
 window.z = window.z || {};
 window.z.viewModel = window.z.viewModel || {};

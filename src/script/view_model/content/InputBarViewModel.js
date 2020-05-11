@@ -47,7 +47,7 @@ import {BackendClient} from '../../service/BackendClient';
 import {ConversationError} from '../../error/ConversationError';
 
 // Parent: ContentViewModel
-export class InputBarViewModel {
+export const InputBarViewModel = class InputBarViewModel {
   static get CONFIG() {
     return {
       ASSETS: {
@@ -892,7 +892,7 @@ export class InputBarViewModel {
 
     amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
   }
-}
+};
 
 window.z = window.z || {};
 window.z.viewModel = window.z.viewModel || {};

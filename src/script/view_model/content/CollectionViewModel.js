@@ -25,7 +25,7 @@ import {MessageCategory} from '../../message/MessageCategory';
 import {ContentViewModel} from '../ContentViewModel';
 
 // Parent: ContentViewModel
-export class CollectionViewModel {
+export const CollectionViewModel = class CollectionViewModel {
   constructor(mainViewModel, contentViewModel, repositories) {
     this.addedToView = this.addedToView.bind(this);
     this.clickOnMessage = this.clickOnMessage.bind(this);
@@ -149,7 +149,7 @@ export class CollectionViewModel {
   clickOnImage(messageEntity) {
     amplify.publish(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, messageEntity, this.images(), 'collection');
   }
-}
+};
 
 window.z = window.z || {};
 window.z.viewModel = window.z.viewModel || {};

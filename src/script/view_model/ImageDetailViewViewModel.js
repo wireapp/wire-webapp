@@ -24,7 +24,7 @@ import {formatLocale} from 'Util/TimeUtil';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {Modal} from '../ui/Modal';
 
-export class ImageDetailViewViewModel {
+export const ImageDetailViewViewModel = class ImageDetailViewViewModel {
   constructor(mainViewModel, repositories) {
     this.beforeHideCallback = this.beforeHideCallback.bind(this);
     this.hideCallback = this.hideCallback.bind(this);
@@ -199,7 +199,7 @@ export class ImageDetailViewViewModel {
       this._loadImage();
     }
   }
-}
+};
 
 window.z = window.z || {};
 window.z.viewModel = window.z.viewModel || {};

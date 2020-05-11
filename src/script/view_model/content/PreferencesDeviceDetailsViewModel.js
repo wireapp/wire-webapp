@@ -27,7 +27,7 @@ import {Config} from '../../Config';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {ContentViewModel} from '../ContentViewModel';
 
-export class PreferencesDeviceDetailsViewModel {
+export const PreferencesDeviceDetailsViewModel = class PreferencesDeviceDetailsViewModel {
   static get SESSION_RESET_STATE() {
     return {
       CONFIRMATION: 'confirmation',
@@ -103,7 +103,7 @@ export class PreferencesDeviceDetailsViewModel {
     const toggleVerified = !this.device().meta.isVerified();
     this.clientRepository.verifyClient(this.selfUser().id, this.device(), toggleVerified);
   }
-}
+};
 
 window.z = window.z || {};
 window.z.viewModel = window.z.viewModel || {};

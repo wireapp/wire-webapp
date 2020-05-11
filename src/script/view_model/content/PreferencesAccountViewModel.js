@@ -52,7 +52,7 @@ import {loadValue} from 'Util/StorageUtil';
 import {StorageKey} from '../../storage';
 import {UserError} from '../../error/UserError';
 
-export class PreferencesAccountViewModel {
+export const PreferencesAccountViewModel = class PreferencesAccountViewModel {
   static get CONFIG() {
     return {
       PROFILE_IMAGE: {
@@ -436,7 +436,7 @@ export class PreferencesAccountViewModel {
   updateProperties = ({settings}) => {
     this.optionPrivacy(settings.privacy.improve_wire);
   };
-}
+};
 
 window.z = window.z || {};
 window.z.viewModel = window.z.viewModel || {};

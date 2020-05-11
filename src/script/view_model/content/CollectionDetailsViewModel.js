@@ -27,7 +27,7 @@ import {MessageCategory} from '../../message/MessageCategory';
 import {ContentViewModel} from '../ContentViewModel';
 
 // Parent: ContentViewModel
-export class CollectionDetailsViewModel {
+export const CollectionDetailsViewModel = class CollectionDetailsViewModel {
   constructor() {
     this.itemAdded = this.itemAdded.bind(this);
     this.itemRemoved = this.itemRemoved.bind(this);
@@ -149,7 +149,7 @@ export class CollectionDetailsViewModel {
     }
     return isThisYear(messageDate) ? formatLocale(messageDate, 'MMMM') : formatLocale(messageDate, 'MMMM y');
   }
-}
+};
 
 window.z = window.z || {};
 window.z.viewModel = window.z.viewModel || {};

@@ -23,7 +23,7 @@ import {isLastItem} from 'Util/ArrayUtil';
 
 import {ParticipantAvatar} from 'Components/participantAvatar';
 
-export class ConnectRequestsViewModel {
+export const ConnectRequestsViewModel = class ConnectRequestsViewModel {
   /**
    * View model for connection requests.
    *
@@ -77,7 +77,7 @@ export class ConnectRequestsViewModel {
   clickOnIgnore(userEntity) {
     this.actionsViewModel.ignoreConnectionRequest(userEntity);
   }
-}
+};
 
 window.z = window.z || {};
 window.z.viewModel = window.z.viewModel || {};

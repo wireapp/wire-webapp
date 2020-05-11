@@ -30,7 +30,7 @@ import {ContentViewModel} from '../ContentViewModel';
 
 import 'Components/loadingBar';
 
-export class HistoryImportViewModel {
+export const HistoryImportViewModel = class HistoryImportViewModel {
   static get STATE() {
     return {
       DONE: 'HistoryImportViewModel.STATE.DONE',
@@ -139,7 +139,7 @@ export class HistoryImportViewModel {
     this.logger.error(`Failed to import history: ${error.message}`, error);
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.HISTORY.RESTORE_FAILED);
   }
-}
+};
 
 window.z = window.z || {};
 window.z.viewModel = window.z.viewModel || {};

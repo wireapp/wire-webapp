@@ -48,8 +48,6 @@ import sl from 'I18n/sl-SI.json';
 import tr from 'I18n/tr-TR.json';
 import uk from 'I18n/uk-UA.json';
 
-window.z = window.z || {};
-
 export const strings = {
   cs,
   da,
@@ -75,6 +73,7 @@ export const strings = {
   uk,
 };
 
+window.z = window.z || {};
 window.z.string = strings;
 setStrings(strings);
 

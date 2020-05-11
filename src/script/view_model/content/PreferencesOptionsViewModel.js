@@ -32,7 +32,7 @@ import {Config} from '../../Config';
 import {THEMES as ThemeViewModelThemes} from '../ThemeViewModel';
 import {ModalsViewModel} from '../ModalsViewModel';
 
-export class PreferencesOptionsViewModel {
+export const PreferencesOptionsViewModel = class PreferencesOptionsViewModel {
   static get CONFIG() {
     return {
       MINIMUM_CALL_LOG_LENGTH: 15,
@@ -118,7 +118,7 @@ export class PreferencesOptionsViewModel {
     this.optionSendPreviews(settings.previews.send);
     this.optionNotifications(settings.notifications);
   };
-}
+};
 
 window.z = window.z || {};
 window.z.viewModel = window.z.viewModel || {};

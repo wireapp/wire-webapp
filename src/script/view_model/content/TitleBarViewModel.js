@@ -30,7 +30,7 @@ import {ShortcutType} from '../../ui/ShortcutType';
 import {ContentViewModel} from '../ContentViewModel';
 
 // Parent: ContentViewModel
-export class TitleBarViewModel {
+export const TitleBarViewModel = class TitleBarViewModel {
   constructor(callingViewModel, panelViewModel, contentViewModel, repositories) {
     this.addedToView = this.addedToView.bind(this);
 
@@ -153,7 +153,7 @@ export class TitleBarViewModel {
 
     this.panelViewModel.togglePanel(panelId);
   }
-}
+};
 
 window.z = window.z || {};
 window.z.viewModel = window.z.viewModel || {};

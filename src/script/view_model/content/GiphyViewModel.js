@@ -22,7 +22,7 @@ import {getLogger} from 'Util/Logger';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {Modal} from '../../ui/Modal';
 
-export class GiphyViewModel {
+export const GiphyViewModel = class GiphyViewModel {
   static get CONFIG() {
     return {
       NUMBER_OF_GIFS: 6,
@@ -191,7 +191,7 @@ export class GiphyViewModel {
         });
     }
   }
-}
+};
 
 window.z = window.z || {};
 window.z.viewModel = window.z.viewModel || {};

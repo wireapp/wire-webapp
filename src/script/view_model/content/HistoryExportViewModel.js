@@ -29,7 +29,7 @@ import {ContentViewModel} from '../ContentViewModel';
 import 'Components/loadingBar';
 import {Config} from '../../Config';
 
-export class HistoryExportViewModel {
+export const HistoryExportViewModel = class HistoryExportViewModel {
   static get STATE() {
     return {
       COMPRESSING: 'HistoryExportViewModel.STATE.COMPRESSING',
@@ -159,7 +159,7 @@ export class HistoryExportViewModel {
   dismissExport() {
     amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.PREFERENCES_ACCOUNT);
   }
-}
+};
 
 window.z = window.z || {};
 window.z.viewModel = window.z.viewModel || {};
