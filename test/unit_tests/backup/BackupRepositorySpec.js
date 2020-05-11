@@ -39,7 +39,7 @@ const messages = [
   ];
 /* eslint-enable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
 
-fdescribe('BackupRepository', () => {
+describe('BackupRepository', () => {
   const testFactory = new TestFactory();
   let backupRepository = undefined;
 
@@ -87,7 +87,7 @@ fdescribe('BackupRepository', () => {
       const fileNames = Object.keys(zip.files);
 
       expect(fileNames).toContain('export.json');
-      filesToCheck.map(filename => expect(fileNames).toContain(filename));
+      filesToCheck.forEach(filename => expect(fileNames).toContain(filename));
 
       const conversationsStr = await zip.files[BackupRepository.CONFIG.FILENAME.CONVERSATIONS].async('string');
       const conversations = JSON.parse(conversationsStr);
