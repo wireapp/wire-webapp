@@ -17,6 +17,7 @@
  *
  */
 
+import axios, {AxiosError} from 'axios';
 import {APIClient} from '@wireapp/api-client';
 import {CallConfigData} from '@wireapp/api-client/dist/account/CallConfigData';
 import {
@@ -177,15 +178,10 @@ export class CallingRepository {
   }
 
   private sendSFTRequest(context: number, url: string, data: string, dataLength: number, _: number): number {
-    // TODO:
-    // Send POST request to "url" with "data" in request body
-    // Forward:
-    // - wuser
-    // - perr <- status code from request
-    // - buf <- response body
-    // - len <- buffer length
-    // - ctx
-    // this.wCall.sftResp(context);
+    axios.post(url, data).then(response => {
+      const {status, data} = response;
+      this.wCall.sftResp(this.wUser!, status, data, data.length, context);
+    });
     return 0;
   }
 
@@ -256,15 +252,21 @@ export class CallingRepository {
     return wUser;
   }
 
-  private requestClients(wUser: number, conversationId: string, _: number) {
-    // TODO: Fetch userid:clientid map for conversation
-    const data = {
-      clients: [
-        {clientid: 'xxxx', userid: 'xxxx'},
-        {clientid: 'xxxx', userid: 'xxxx'},
-      ],
-    };
-    this.wCall.setClientsForConv(wUser, conversationId, JSON.stringify(data));
+  private async requestClients(wUser: number, conversationId: string, _: number) {
+    try {
+      await this.apiClient.conversation.api.postOTRMessage(this.selfClientId, conversationId);
+    } catch (error) {
+      const mismatch = (error as AxiosError).response!.data;
+      const data: {clients: {clientid: string; userid: string}[]} = {
+        clients: [],
+      };
+      Object.entries(mismatch.missing).forEach((entry: any) => {
+        const userId = entry[0];
+        const clientIds: string[] = entry[1];
+        clientIds.forEach(clientId => data.clients.push({clientid: clientId, userid: userId}));
+      });
+      this.wCall.setClientsForConv(wUser, conversationId, JSON.stringify(data));
+    }
   }
 
   onIncomingCall(callback: (call: Call) => void): void {
