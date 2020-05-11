@@ -72,7 +72,8 @@ const SetAccountType = ({}: Props) => {
             </Column>
           </IsMobile>
           <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
-            <Logo scale={1.68} data-uie-name="ui-wire-logo" />
+            {/*             <Logo scale={1.68} data-uie-name="ui-wire-logo" />
+             */}
             <Columns style={{margin: '70px auto'}}>
               <Column style={{marginLeft: isMacOsWrapper ? 0 : 16}}>
                 <Link onClick={() => history.push(ROUTE.CREATE_ACCOUNT)} data-uie-name="go-register-personal">
