@@ -17,6 +17,7 @@
  *
  */
 
+import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {getLogger} from 'Util/Logger';
@@ -24,7 +25,6 @@ import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
-import {AssetUploadFailedReason} from '../assets/AssetUploadFailedReason';
 import {AssetTransferState} from '../assets/AssetTransferState';
 
 import {EVENT_TYPE} from './EventType';
@@ -787,7 +787,7 @@ export class EventRepository {
       case AssetTransferState.UPLOAD_FAILED: {
         // case of both failed or canceled upload
         const fromOther = newEvent.from !== this.userRepository.self().id;
-        const selfCancel = !fromOther && newEvent.data.reason === AssetUploadFailedReason.CANCELLED;
+        const selfCancel = !fromOther && newEvent.data.reason === ProtobufAsset.NotUploaded.CANCELLED;
         // we want to delete the event in the case of an error from the remote client or a cancel on the user's own client
         const shouldDeleteEvent = fromOther || selfCancel;
         return shouldDeleteEvent

@@ -37,10 +37,10 @@ interface Config {
 }
 
 export enum ScreensharingMethods {
-  DISPLAY_MEDIA,
-  USER_MEDIA,
-  DESKTOP_CAPTURER,
-  NONE,
+  DISPLAY_MEDIA = 0,
+  USER_MEDIA = 1,
+  DESKTOP_CAPTURER = 2,
+  NONE = 3,
 }
 
 export class MediaConstraintsHandler {
