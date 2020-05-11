@@ -38,7 +38,7 @@ export class ContentMessage extends Message {
   private readonly quote: ko.Observable<QuoteEntity>;
   private readonly reactions_user_ets: ko.ObservableArray<User>;
   readonly reactions: ko.Observable<{[userId: string]: string}>;
-  public readonly assets: ko.ObservableArray<Asset>;
+  public readonly assets: ko.ObservableArray<Asset | FileAsset | TextAsset | MediumImage>;
   public readonly is_liked: ko.PureComputed<boolean>;
   public readonly like_caption: ko.PureComputed<string>;
   public readonly other_likes: ko.PureComputed<User[]>;
@@ -115,7 +115,7 @@ export class ContentMessage extends Message {
    * Get the first asset attached to the message.
    * @returns The first asset attached to the message
    */
-  get_first_asset(): Asset {
+  get_first_asset(): Asset | FileAsset | TextAsset | MediumImage {
     return this.assets()[0];
   }
 
