@@ -42,7 +42,7 @@ export class ContentMessage extends Message {
   public readonly is_liked: ko.PureComputed<boolean>;
   public readonly like_caption: ko.PureComputed<string>;
   public readonly other_likes: ko.PureComputed<User[]>;
-  public readonly reactions_user_ids: ko.PureComputed<void>;
+  public readonly reactions_user_ids: ko.PureComputed<string>;
   public readonly was_edited: ko.PureComputed<boolean>;
   public replacing_message_id: null | string;
 
@@ -59,7 +59,7 @@ export class ContentMessage extends Message {
     this.reactions = ko.observable({});
     this.reactions_user_ets = ko.observableArray();
     this.reactions_user_ids = ko.pureComputed(() => {
-      this.reactions_user_ets()
+      return this.reactions_user_ets()
         .map(user_et => user_et.name())
         .join(', ');
     });
