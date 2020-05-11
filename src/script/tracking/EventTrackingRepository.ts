@@ -18,6 +18,7 @@
  */
 
 import {amplify} from 'amplify';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Environment} from 'Util/Environment';
 import {Logger, getLogger} from 'Util/Logger';
@@ -26,7 +27,6 @@ import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {getParameter} from 'Util/UrlUtil';
 
 import {URLParameter} from '../auth/URLParameter';
-import {WebAppEvents} from '../event/WebApp';
 
 import {TeamRepository} from '../team/TeamRepository';
 import {UserRepository} from '../user/UserRepository';

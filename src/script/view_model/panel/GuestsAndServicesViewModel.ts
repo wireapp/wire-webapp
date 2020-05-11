@@ -19,6 +19,7 @@
 
 import ko from 'knockout';
 import {amplify} from 'amplify';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {copyText} from 'Util/ClipboardUtil';
@@ -28,7 +29,6 @@ import {Config} from '../../Config';
 import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
 import {ModalsViewModel} from '../ModalsViewModel';
 import {ACCESS_STATE} from '../../conversation/AccessState';
-import {WebAppEvents} from '../../event/WebApp';
 import {EventName} from '../../tracking/EventName';
 import {ConversationStateHandler} from '../../conversation/ConversationStateHandler';
 import {Conversation} from '../../entity/Conversation';

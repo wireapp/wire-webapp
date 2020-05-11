@@ -19,11 +19,11 @@
 
 import {amplify} from 'amplify';
 import UUID from 'pure-uuid';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PreferenceNotificationRepository} from 'src/script/notification/PreferenceNotificationRepository';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {BackendEvent} from 'src/script/event/Backend';
-import {WebAppEvents} from 'src/script/event/WebApp';
 
 describe('PreferenceNotificationRepository', () => {
   const user = {id: new UUID(4).format()};

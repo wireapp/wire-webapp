@@ -22,7 +22,7 @@ import {isToday, isThisYear, isSameDay, isSameMonth, formatLocale} from 'Util/Ti
 import {t} from 'Util/LocalizerUtil';
 import {koPushDeferred} from 'Util/util';
 
-import {WebAppEvents} from '../../event/WebApp';
+import {WebAppEvents} from '@wireapp/webapp-events';
 import {MessageCategory} from '../../message/MessageCategory';
 import {ContentViewModel} from '../ContentViewModel';
 

@@ -20,6 +20,7 @@
 import {ClientClassification, NewClient, PublicClient, RegisteredClient} from '@wireapp/api-client/dist/client/';
 import {amplify} from 'amplify';
 import platform from 'platform';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
@@ -30,7 +31,6 @@ import {murmurhash3} from 'Util/util';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {Config} from '../Config';
 import {BackendEvent} from '../event/Backend';
-import {WebAppEvents} from '../event/WebApp';
 import {StorageKey} from '../storage/StorageKey';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 

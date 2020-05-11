@@ -26,7 +26,7 @@ import {getLogger, Logger} from 'Util/Logger';
 import {PromiseQueue} from 'Util/PromiseQueue';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {isValidApiPath} from 'Util/ValidationUtil';
-import {WebAppEvents} from '../event/WebApp';
+import {WebAppEvents} from '@wireapp/webapp-events';
 import {APIClientSingleton} from './APIClientSingleton';
 
 /**

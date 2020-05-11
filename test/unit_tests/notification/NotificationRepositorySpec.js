@@ -19,6 +19,7 @@
 
 import {amplify} from 'amplify';
 import {Availability} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {t} from 'Util/LocalizerUtil';
 import {createRandomUuid} from 'Util/util';
@@ -46,7 +47,6 @@ import {PermissionStatusState} from 'src/script/permission/PermissionStatusState
 import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
 import {ConversationType} from 'src/script/conversation/ConversationType';
 import {BackendEvent} from 'src/script/event/Backend';
-import {WebAppEvents} from 'src/script/event/WebApp';
 import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
 
 import {CallMessage} from 'src/script/entity/message/CallMessage';
