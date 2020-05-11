@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.16.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.15.0...@wireapp/api-client@11.16.0) (2020-05-11)
+
+
+### Features
+
+* Logout on access token refresh error ([#3013](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3013)) ([0c822b3](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/0c822b36341c71e7472c734956b0fbfbabb8c524))
+
+
+
+
+
 # [11.15.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.14.0...@wireapp/api-client@11.15.0) (2020-05-07)
 
 
