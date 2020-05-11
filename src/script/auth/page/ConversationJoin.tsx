@@ -153,14 +153,12 @@ const ConversationJoin = ({
               );
               if (!isValidationError) {
                 doLogout();
-                // tslint:disable-next-line:no-console
                 console.warn('Unable to create wireless account', error);
               }
             }
           }
         } else {
           await doLogout();
-          // tslint:disable-next-line:no-console
           console.warn('Unable to create wireless account', error);
         }
       }
@@ -315,7 +313,6 @@ const ConversationJoin = ({
                   await doJoinConversationByCode(conversationKey, conversationCode);
                   routeToApp();
                 } catch (error) {
-                  // tslint:disable-next-line:no-console
                   console.warn('Unable to join conversation with existing account', error);
                 }
               }}

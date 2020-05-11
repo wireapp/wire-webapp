@@ -19,7 +19,7 @@
 
 import {getLogger} from 'Util/Logger';
 
-import {WebAppEvents} from '../../event/WebApp';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 export class ArchiveViewModel {
   /**

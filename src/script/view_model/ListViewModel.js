@@ -18,6 +18,7 @@
  */
 
 import {CALL_TYPE} from '@wireapp/avs';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
@@ -31,7 +32,6 @@ import {PreferencesListViewModel} from './list/PreferencesListViewModel';
 import {StartUIViewModel} from './list/StartUIViewModel';
 import {TakeoverViewModel} from './list/TakeoverViewModel';
 import {TemporaryGuestViewModel} from './list/TemporaryGuestViewModel';
-import {WebAppEvents} from '../event/WebApp';
 
 import {Context} from '../ui/ContextMenu';
 import {showLabelContextMenu} from '../ui/LabelContextMenu';

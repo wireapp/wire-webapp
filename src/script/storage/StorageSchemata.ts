@@ -29,7 +29,6 @@ interface DexieSchema {
 }
 
 export class StorageSchemata {
-  // tslint:disable-next-line:typedef
   static get OBJECT_STORE() {
     return {
       AMPLIFY: 'amplify',

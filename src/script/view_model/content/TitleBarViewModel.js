@@ -17,14 +17,14 @@
  *
  */
 
+import {CONV_TYPE, CALL_TYPE} from '@wireapp/avs';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
-import {CONV_TYPE, CALL_TYPE} from '@wireapp/avs';
-
 import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
-import {WebAppEvents} from '../../event/WebApp';
 import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
 import {ContentViewModel} from '../ContentViewModel';

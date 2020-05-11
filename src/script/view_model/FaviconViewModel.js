@@ -17,7 +17,7 @@
  *
  */
 
-import {WebAppEvents} from '../event/WebApp';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 /**
  * The FaviconViewModel is responsible for updating the favicon according to unread messages.

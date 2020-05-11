@@ -20,7 +20,7 @@
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 
-import {WebAppEvents} from '../../event/WebApp';
+import {WebAppEvents} from '@wireapp/webapp-events';
 import {NOTIFICATION_HANDLING_STATE} from '../../event/NotificationHandlingState';
 import {ParticipantAvatar} from 'Components/participantAvatar';
 

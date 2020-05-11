@@ -19,6 +19,7 @@
 
 import {APIClient} from '@wireapp/api-client';
 import {amplify} from 'amplify';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {loadValue} from 'Util/StorageUtil';
@@ -29,7 +30,6 @@ import {AuthRepository} from '../auth/AuthRepository';
 import {BackendClient} from '../service/BackendClient';
 import {StorageKey} from '../storage/StorageKey';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
-import {WebAppEvents} from './WebApp';
 
 enum CHANGE_TRIGGER {
   CLEANUP = 'CHANGE_TRIGGER.CLEANUP',
@@ -64,7 +64,6 @@ export class WebSocketService {
     return CHANGE_TRIGGER;
   }
 
-  // tslint:disable-next-line:typedef
   static get CONFIG() {
     return {
       PING_INTERVAL: TIME_IN_MILLIS.SECOND * 5,

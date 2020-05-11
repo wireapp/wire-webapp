@@ -17,8 +17,8 @@
  *
  */
 
+import {WebAppEvents} from '@wireapp/webapp-events';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
-import {WebAppEvents} from '../event/WebApp';
 
 const THEMES_CLASS_PREFIX = 'theme-';
 

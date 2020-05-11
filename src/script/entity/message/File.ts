@@ -29,7 +29,6 @@ import {Asset} from './Asset';
 import {AssetRemoteData} from '../../assets/AssetRemoteData';
 import {AssetTransferState} from '../../assets/AssetTransferState';
 import {AssetType} from '../../assets/AssetType';
-import {AssetUploadFailedReason} from '../../assets/AssetUploadFailedReason';
 
 type AssetMetaData = (ProtobufAsset.IAudioMetaData | ProtobufAsset.IImageMetaData | ProtobufAsset.IVideoMetaData) & {
   loudness?: number[];
@@ -45,7 +44,7 @@ export class File extends Asset {
   public file_size: string;
   public meta: Partial<AssetMetaData>;
   public readonly status: ko.Observable<AssetTransferState>;
-  public readonly upload_failed_reason: ko.Observable<AssetUploadFailedReason>;
+  public readonly upload_failed_reason: ko.Observable<ProtobufAsset.NotUploaded>;
 
   constructor(id?: string) {
     super(id);

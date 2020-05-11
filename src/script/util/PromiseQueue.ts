@@ -51,7 +51,6 @@ export class PromiseQueue {
   private readonly queue: QueueEntry<any>[];
   private readonly timeout: number;
 
-  // tslint:disable-next-line:typedef
   static get CONFIG() {
     return {
       UNBLOCK_INTERVAL: TIME_IN_MILLIS.MINUTE,

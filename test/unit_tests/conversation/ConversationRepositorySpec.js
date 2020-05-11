@@ -19,6 +19,7 @@
 
 import {ConnectionStatus} from '@wireapp/api-client/dist/connection';
 import {Confirmation, GenericMessage, LegalHoldStatus, Text} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {createRandomUuid} from 'Util/util';
 
@@ -30,7 +31,6 @@ import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 
 import {ClientEvent} from 'src/script/event/Client';
 import {BackendEvent} from 'src/script/event/Backend';
-import {WebAppEvents} from 'src/script/event/WebApp';
 import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
 import {EventRepository} from 'src/script/event/EventRepository';
 import {ClientEntity} from 'src/script/client/ClientEntity';

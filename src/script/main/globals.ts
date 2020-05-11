@@ -32,9 +32,6 @@ import type {Environment} from '../util/Environment';
 import type {WebAppEvents} from '../event/WebApp';
 import type {PermissionHelpers, ROLE} from '../user/UserPermission';
 
-// Needed for the wrapper
-import '../event/WebApp';
-
 import '../Config';
 
 import 'Components/accentColorPicker';

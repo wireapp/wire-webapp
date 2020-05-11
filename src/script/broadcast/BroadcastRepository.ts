@@ -19,6 +19,7 @@
 
 import {GenericMessage} from '@wireapp/protocol-messaging';
 import {amplify} from 'amplify';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {NewOTRMessage} from '@wireapp/api-client/dist/conversation';
@@ -29,7 +30,6 @@ import {EventInfoEntity} from '../conversation/EventInfoEntity';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {User} from '../entity/User';
 import {BackendClientError} from '../error/BackendClientError';
-import {WebAppEvents} from '../event/WebApp';
 import {MessageSender} from '../message/MessageSender';
 import {BroadcastService} from './BroadcastService';
 

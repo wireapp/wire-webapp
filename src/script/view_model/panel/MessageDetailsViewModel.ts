@@ -18,13 +18,13 @@
  */
 
 import ko from 'knockout';
+import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 
 import {t} from 'Util/LocalizerUtil';
 import {formatLocale} from 'Util/TimeUtil';
 
 import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
-import {WebAppEvents} from '../../event/WebApp';
 import {SuperType} from '../../message/SuperType';
 import {Message, ReadReceipt} from '../../entity/message/Message';
 import {ConversationRepository} from '../../conversation/ConversationRepository';

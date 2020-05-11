@@ -18,6 +18,7 @@
  */
 
 import {Availability, Confirmation} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
@@ -39,7 +40,6 @@ import {ConsentValue} from '../../user/ConsentValue';
 import {validateCharacter, validateHandle} from '../../user/UserHandleGenerator';
 import {UserRepository} from '../../user/UserRepository';
 import {nameFromType} from '../../user/AvailabilityMapper';
-import {WebAppEvents} from '../../event/WebApp';
 import {ParticipantAvatar} from 'Components/participantAvatar';
 import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
 import {MotionDuration} from '../../motion/MotionDuration';

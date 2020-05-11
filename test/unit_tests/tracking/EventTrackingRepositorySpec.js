@@ -17,7 +17,7 @@
  *
  */
 
-import {WebAppEvents} from 'src/script/event/WebApp';
+import {WebAppEvents} from '@wireapp/webapp-events';
 import {EventTrackingRepository} from 'src/script/tracking/EventTrackingRepository';
 import {TestFactory} from '../../helper/TestFactory';
 

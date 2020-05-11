@@ -18,6 +18,7 @@
  */
 
 import ko from 'knockout';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {t, setStrings} from 'Util/LocalizerUtil';
 import {createRandomUuid} from 'Util/util';
@@ -32,7 +33,6 @@ import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
 import {ConversationType} from 'src/script/conversation/ConversationType';
 import {WindowTitleViewModel} from 'src/script/view_model/WindowTitleViewModel';
 import {ContentViewModel} from 'src/script/view_model/ContentViewModel';
-import {WebAppEvents} from 'src/script/event/WebApp';
 import {TestFactory} from '../../helper/TestFactory';
 
 describe('WindowTitleViewModel', () => {

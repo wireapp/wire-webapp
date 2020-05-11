@@ -17,7 +17,7 @@
  *
  */
 
-import {WebAppEvents} from 'src/script/event/WebApp';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 describe('z.viewModel.FaviconViewModel', () => {
   it('subscribes to uread count events', () => {

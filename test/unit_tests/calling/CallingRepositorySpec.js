@@ -17,7 +17,10 @@
  *
  */
 
+import {WebAppEvents} from '@wireapp/webapp-events';
 import UUID from 'pure-uuid';
+import {CONV_TYPE, CALL_TYPE, STATE as CALL_STATE, REASON} from '@wireapp/avs';
+
 import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {EventRepository} from 'src/script/event/EventRepository';
 import {Participant} from 'src/script/calling/Participant';
@@ -25,8 +28,6 @@ import {Call} from 'src/script/calling/Call';
 import {User} from 'src/script/entity/User';
 import {MediaType} from 'src/script/media/MediaType';
 import {Conversation} from 'src/script/entity/Conversation';
-import {CONV_TYPE, CALL_TYPE, STATE as CALL_STATE, REASON} from '@wireapp/avs';
-import {WebAppEvents} from 'src/script/event/WebApp';
 import {ModalsViewModel} from 'src/script/view_model/ModalsViewModel';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 import {TestFactory} from '../../helper/TestFactory';

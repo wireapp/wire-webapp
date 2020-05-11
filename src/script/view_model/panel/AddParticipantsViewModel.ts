@@ -19,6 +19,7 @@
 
 import ko from 'knockout';
 import {amplify} from 'amplify';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
@@ -29,8 +30,8 @@ import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
 import {getManageServicesUrl} from '../../externalRoute';
 import * as trackingHelpers from '../../tracking/Helpers';
 import {EventName} from '../../tracking/EventName';
-import {WebAppEvents} from '../../event/WebApp';
 import {MotionDuration} from '../../motion/MotionDuration';
+
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {IntegrationRepository} from 'src/script/integration/IntegrationRepository';
 import {SearchRepository} from 'src/script/search/SearchRepository';

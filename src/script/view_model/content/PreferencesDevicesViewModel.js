@@ -21,7 +21,7 @@ import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {formatTimestamp} from 'Util/TimeUtil';
 
-import {WebAppEvents} from '../../event/WebApp';
+import {WebAppEvents} from '@wireapp/webapp-events';
 import {ContentViewModel} from '../ContentViewModel';
 import {sortUserDevices} from 'Components/userDevices';
 

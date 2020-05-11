@@ -18,15 +18,15 @@
  */
 
 import {CALL_TYPE} from '@wireapp/avs';
+import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
+
 import {TIME_IN_MILLIS, formatSeconds} from 'Util/TimeUtil';
 import {Call} from '../../calling/Call';
 import {Grid} from '../../calling/videoGridHandler';
 import {Conversation} from '../../entity/Conversation';
 import {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
-
-import {WebAppEvents} from '../../event/WebApp';
 
 import 'Components/calling/deviceToggleButton';
 
@@ -71,7 +71,6 @@ export class FullscreenVideoCalling {
   public HIDE_CONTROLS_TIMEOUT: number;
   public dispose: () => void;
 
-  // tslint:disable-next-line:typedef
   static get CONFIG() {
     return {
       AUTO_MINIMIZE_TIMEOUT: TIME_IN_MILLIS.SECOND * 4,

@@ -71,7 +71,6 @@ export class MediaDevicesHandler {
   public currentAvailableDeviceId: CurrentAvailableDeviceId;
   public deviceSupport: DeviceSupport;
 
-  // tslint:disable-next-line:typedef
   static get CONFIG() {
     return {
       DEFAULT_DEVICE: {

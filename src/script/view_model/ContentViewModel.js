@@ -17,6 +17,8 @@
  *
  */
 
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {alias} from 'Util/util';
@@ -28,7 +30,6 @@ import {LegalHoldModalViewModel} from './content/LegalHoldModalViewModel';
 import {GroupCreationViewModel} from './content/GroupCreationViewModel';
 import {EmojiInputViewModel} from './content/EmojiInputViewModel';
 import {ModalsViewModel} from './ModalsViewModel';
-import {WebAppEvents} from '../event/WebApp';
 import {PreferencesAVViewModel} from './content/PreferencesAVViewModel';
 import {ServiceModalViewModel} from './content/ServiceModalViewModel';
 import {InviteModalViewModel} from './content/InviteModalViewModel';

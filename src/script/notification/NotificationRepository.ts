@@ -17,9 +17,11 @@
  *
  */
 
+import {NotificationPreference} from '@wireapp/api-client/dist/user/data';
 import {Availability} from '@wireapp/protocol-messaging';
 import {amplify} from 'amplify';
 import ko from 'knockout';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Environment} from 'Util/Environment';
 import {Declension, t} from 'Util/LocalizerUtil';
@@ -32,10 +34,8 @@ import {getRenderedTextContent} from 'Util/messageRenderer';
 
 import {AudioType} from '../audio/AudioType';
 import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
-import {WebAppEvents} from '../event/WebApp';
 import {PermissionStatusState} from '../permission/PermissionStatusState';
 import {PermissionType} from '../permission/PermissionType';
-import {NotificationPreference} from './NotificationPreference';
 import {PermissionState} from './PermissionState';
 
 import {CallingRepository} from '../calling/CallingRepository';
@@ -93,7 +93,6 @@ export class NotificationRepository {
   private readonly selfUser: ko.Observable<User>;
   private readonly userRepository: UserRepository;
 
-  // tslint:disable-next-line:typedef
   static get CONFIG() {
     return {
       BODY_LENGTH: 80,

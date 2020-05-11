@@ -19,6 +19,7 @@
 
 import $ from 'jquery';
 import {groupBy} from 'underscore';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {getLogger} from 'Util/Logger';
 import {scrollEnd, scrollToBottom, scrollBy} from 'Util/scroll-helpers';
@@ -29,7 +30,6 @@ import {isSameDay, differenceInMinutes} from 'Util/TimeUtil';
 import {Config} from '../../Config';
 import {Conversation} from '../../entity/Conversation';
 import {ModalsViewModel} from '../ModalsViewModel';
-import {WebAppEvents} from '../../event/WebApp';
 import {MessageCategory} from '../../message/MessageCategory';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {UserError} from '../../error/UserError';
@@ -387,7 +387,7 @@ export class MessageListViewModel {
     const conversationEntity = this.conversation_repository.active_conversation();
     const isSingleModeConversation = conversationEntity.is1to1() || conversationEntity.isRequest();
 
-    if (isSingleModeConversation && !userEntity.isMe) {
+    if (userEntity.isDeleted || (isSingleModeConversation && !userEntity.isMe)) {
       return this.mainViewModel.panel.togglePanel(window.z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS);
     }
 

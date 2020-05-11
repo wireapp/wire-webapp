@@ -17,12 +17,13 @@
  *
  */
 
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 
 import {ModalsViewModel} from './ModalsViewModel';
 import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
-import {WebAppEvents} from '../event/WebApp';
 import {BackendClientError} from '../error/BackendClientError';
 
 export class ActionsViewModel {

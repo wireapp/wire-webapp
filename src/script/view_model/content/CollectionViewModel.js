@@ -20,7 +20,7 @@
 import {getLogger} from 'Util/Logger';
 import {isEscapeKey} from 'Util/KeyboardUtil';
 
-import {WebAppEvents} from '../../event/WebApp';
+import {WebAppEvents} from '@wireapp/webapp-events';
 import {MessageCategory} from '../../message/MessageCategory';
 import {ContentViewModel} from '../ContentViewModel';
 
