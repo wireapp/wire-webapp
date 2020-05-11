@@ -83,7 +83,7 @@ describe('BackupRepository', () => {
     it('generates an archive of the database', async () => {
       const zip = await backupRepository.generateHistory(noop);
       const zipFilenames = Object.keys(zip.files);
-      Object.keys(BackupRepository.CONFIG.FILENAME).forEach(filename => expect(zipFilenames).toContain(filename));
+      Object.values(BackupRepository.CONFIG.FILENAME).forEach(filename => expect(zipFilenames).toContain(filename));
 
       const conversationsStr = await zip.files[BackupRepository.CONFIG.FILENAME.CONVERSATIONS].async('string');
       const conversations = JSON.parse(conversationsStr);
