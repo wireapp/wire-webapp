@@ -164,7 +164,7 @@ describe('WindowTitleViewModel', () => {
     it('sets the name when opening the preferences about page', () => {
       title_view_model.contentState(ContentViewModel.STATE.PREFERENCES_ABOUT);
 
-      const expected_title = `${z.string.preferencesAbout} · ${suffix}`;
+      const expected_title = `${window.z.string.preferencesAbout} · ${suffix}`;
       title_view_model.initiateTitleUpdates();
 
       expect(window.document.title).toBe(expected_title);
@@ -173,7 +173,7 @@ describe('WindowTitleViewModel', () => {
     it('sets the name when opening the preferences account page', () => {
       title_view_model.contentState(ContentViewModel.STATE.PREFERENCES_ACCOUNT);
 
-      const expected_title = `${z.string.preferencesAccount} · ${suffix}`;
+      const expected_title = `${window.z.string.preferencesAccount} · ${suffix}`;
       title_view_model.initiateTitleUpdates();
 
       expect(window.document.title).toBe(expected_title);
@@ -182,7 +182,7 @@ describe('WindowTitleViewModel', () => {
     it('sets the name when opening the preferences av page', () => {
       title_view_model.contentState(ContentViewModel.STATE.PREFERENCES_AV);
 
-      const expected_title = `${z.string.preferencesAV} · ${suffix}`;
+      const expected_title = `${window.z.string.preferencesAV} · ${suffix}`;
       title_view_model.initiateTitleUpdates();
 
       expect(window.document.title).toBe(expected_title);
@@ -191,7 +191,7 @@ describe('WindowTitleViewModel', () => {
     it('sets the name when opening the preferences device details page', () => {
       title_view_model.contentState(ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS);
 
-      const expected_title = `${z.string.preferencesDeviceDetails} · ${suffix}`;
+      const expected_title = `${window.z.string.preferencesDeviceDetails} · ${suffix}`;
       title_view_model.initiateTitleUpdates();
 
       expect(window.document.title).toBe(expected_title);
@@ -200,7 +200,7 @@ describe('WindowTitleViewModel', () => {
     it('sets the name when opening the preferences devices page', () => {
       title_view_model.contentState(ContentViewModel.STATE.PREFERENCES_DEVICES);
 
-      const expected_title = `${z.string.preferencesDevices} · ${suffix}`;
+      const expected_title = `${window.z.string.preferencesDevices} · ${suffix}`;
       title_view_model.initiateTitleUpdates();
 
       expect(window.document.title).toBe(expected_title);
@@ -209,7 +209,7 @@ describe('WindowTitleViewModel', () => {
     it('sets the name when opening the preferences options page', () => {
       title_view_model.contentState(ContentViewModel.STATE.PREFERENCES_OPTIONS);
 
-      const expected_title = `${z.string.preferencesOptions} · ${suffix}`;
+      const expected_title = `${window.z.string.preferencesOptions} · ${suffix}`;
       title_view_model.initiateTitleUpdates();
 
       expect(window.document.title).toBe(expected_title);

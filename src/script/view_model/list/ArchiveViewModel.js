@@ -25,7 +25,7 @@ export class ArchiveViewModel {
   /**
    * View model for the archive.
    *
-   * @param {z.viewModel.ListViewModel} listViewModel List view model
+   * @param {window.z.viewModel.ListViewModel} listViewModel List view model
    * @param {ConversationRepository} conversationRepository Repository responsible for conversations
    * @param {Function} onJoinCall Callback called when the user wants to join a call
    */

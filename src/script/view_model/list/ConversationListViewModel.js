@@ -42,7 +42,7 @@ export class ConversationListViewModel {
    * View model for conversation list.
    *
    * @param {MainViewModel} mainViewModel Main view model
-   * @param {z.viewModel.ListViewModel} listViewModel List view model
+   * @param {window.z.viewModel.ListViewModel} listViewModel List view model
    * @param {Object} repositories Object containing all repositories
    * @param {Function} onJoinCall Callback called when the user wants to join a call
    */
