@@ -17,16 +17,12 @@
  *
  */
 
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {ROLE} from '../user/UserPermission';
 import {Environment} from './Environment';
 
 export function exposeWrapperGlobals(): void {
   if (Environment.desktop) {
     window.z = window.z || {};
-
-    window.z.event = window.z.event || {};
-    window.z.event.WebApp = WebAppEvents;
 
     window.z.util = window.z.util || {};
     window.z.util.Environment = Environment;

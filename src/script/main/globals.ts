@@ -29,7 +29,6 @@ import 'raygun4js/dist/raygun.vanilla';
 import {AssetService} from '../assets/AssetService';
 import {NotificationService} from '../event/NotificationService';
 import type {Environment} from '../util/Environment';
-import type {WebAppEvents} from '../event/WebApp';
 import type {PermissionHelpers, ROLE} from '../user/UserPermission';
 
 import '../Config';
@@ -183,9 +182,6 @@ declare global {
       };
       conversation?: {
         EventBuilder?: typeof EventBuilder;
-      };
-      event?: {
-        WebApp?: typeof WebAppEvents;
       };
       string?: typeof strings;
       team?: {
