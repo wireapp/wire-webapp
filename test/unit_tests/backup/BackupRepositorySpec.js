@@ -30,7 +30,7 @@ import {TestFactory} from '../../helper/TestFactory';
 const conversationId = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a';
 // prettier-ignore
 /* eslint-disable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
-const conversation = {"id": conversationId,"accessModes":["private"],"accessRole":"private","creator":"1ccd93e0-0f4b-4a73-b33f-05c464b88439","name":"Tom @ Staging","status":0,"team_id":null,"type":2,"others":["a7122859-3f16-4870-b7f2-5cbca5572ab2"],"timeStamps":{"last_event_timestamp":2,"last_server_timestamp":2,"archivedTimestamp":0,"muted_timestamp":0},"archived_state":false,"muted_state":false,};
+const conversation = {"id": conversationId,"accessModes":["private"],"accessRole":"private","creator":"1ccd93e0-0f4b-4a73-b33f-05c464b88439","name":"Tom @ Staging","status":0,"team_id":null,"type":2,"others":["a7122859-3f16-4870-b7f2-5cbca5572ab2"],"last_event_timestamp":2,"last_server_timestamp":2,"archived_state":false,"archived_timestamp":0,"muted_state":false,"muted_timestamp":0};
 
 // prettier-ignore
 const messages = [

@@ -181,11 +181,11 @@ describe('sortGroupsByLastEvent', () => {
   it('finds out that Group A is more recent than Group B', () => {
     const groupA = new Conversation();
     groupA.name('Latest');
-    groupA.timeStamps.last_event_timestamp(1414505857975);
+    groupA.last_event_timestamp(1414505857975);
 
     const groupB = new Conversation();
     groupB.name('Older');
-    groupB.timeStamps.last_event_timestamp(1414505766449);
+    groupB.last_event_timestamp(1414505766449);
 
     const groups = [groupA, groupB];
     const [firstGroup, secondGroup] = groups.sort(sortGroupsByLastEvent);
@@ -197,11 +197,11 @@ describe('sortGroupsByLastEvent', () => {
   it('finds out that Group B is more recent than Group A', () => {
     const groupA = new Conversation();
     groupA.name('Older');
-    groupA.timeStamps.last_event_timestamp(1414505766449);
+    groupA.last_event_timestamp(1414505766449);
 
     const groupB = new Conversation();
     groupB.name('Latest');
-    groupB.timeStamps.last_event_timestamp(1414505857975);
+    groupB.last_event_timestamp(1414505857975);
 
     const groups = [groupA, groupB];
     const [firstGroup, secondGroup] = groups.sort(sortGroupsByLastEvent);
@@ -214,11 +214,11 @@ describe('sortGroupsByLastEvent', () => {
     const groupA = new Conversation();
     const timestamp = 1414505857975;
     groupA.name('Group A');
-    groupA.timeStamps.last_event_timestamp(timestamp);
+    groupA.last_event_timestamp(timestamp);
 
     const groupB = new Conversation();
     groupB.name('Group B');
-    groupB.timeStamps.last_event_timestamp(timestamp);
+    groupB.last_event_timestamp(timestamp);
 
     expect(sortGroupsByLastEvent(groupA, groupB)).toEqual(0);
 

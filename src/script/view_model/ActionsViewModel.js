@@ -271,7 +271,7 @@ export class ActionsViewModel {
       }
 
       if (conversationEntity.is_cleared()) {
-        conversationEntity.timeStamps.cleared_timestamp(0);
+        conversationEntity.cleared_timestamp(0);
       }
 
       amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);

@@ -198,12 +198,12 @@ describe('Conversation', () => {
         const message_et = new Message(createRandomUuid());
         message_et.timestamp(second_timestamp);
 
-        conversation_et.timeStamps.last_event_timestamp(first_timestamp);
-        conversation_et.timeStamps.last_server_timestamp(second_timestamp);
+        conversation_et.last_event_timestamp(first_timestamp);
+        conversation_et.last_server_timestamp(second_timestamp);
 
         conversation_et.add_message(message_et);
 
-        expect(conversation_et.timeStamps.last_event_timestamp()).toBe(second_timestamp);
+        expect(conversation_et.last_event_timestamp()).toBe(second_timestamp);
       });
 
       it('and adding a message should not update it if affect_order is false', () => {
@@ -211,24 +211,24 @@ describe('Conversation', () => {
         message_et.timestamp(second_timestamp);
         message_et.affect_order(false);
 
-        conversation_et.timeStamps.last_event_timestamp(first_timestamp);
-        conversation_et.timeStamps.last_server_timestamp(second_timestamp);
+        conversation_et.last_event_timestamp(first_timestamp);
+        conversation_et.last_server_timestamp(second_timestamp);
 
         conversation_et.add_message(message_et);
 
-        expect(conversation_et.timeStamps.last_event_timestamp()).toBe(first_timestamp);
+        expect(conversation_et.last_event_timestamp()).toBe(first_timestamp);
       });
 
       it('and adding a message should not update it if timestamp is greater than the last server timestamp', () => {
         const message_et = new Message(createRandomUuid());
         message_et.timestamp(second_timestamp);
 
-        conversation_et.timeStamps.last_event_timestamp(first_timestamp);
-        conversation_et.timeStamps.last_server_timestamp(first_timestamp);
+        conversation_et.last_event_timestamp(first_timestamp);
+        conversation_et.last_server_timestamp(first_timestamp);
 
         conversation_et.add_message(message_et);
 
-        expect(conversation_et.timeStamps.last_event_timestamp()).toBe(first_timestamp);
+        expect(conversation_et.last_event_timestamp()).toBe(first_timestamp);
       });
     });
 
@@ -238,36 +238,36 @@ describe('Conversation', () => {
         message_et.timestamp(second_timestamp);
         message_et.user(self_user);
 
-        conversation_et.timeStamps.last_read_timestamp(first_timestamp);
-        conversation_et.timeStamps.last_server_timestamp(second_timestamp);
+        conversation_et.last_read_timestamp(first_timestamp);
+        conversation_et.last_server_timestamp(second_timestamp);
 
         conversation_et.add_message(message_et);
 
-        expect(conversation_et.timeStamps.last_read_timestamp()).toBe(second_timestamp);
+        expect(conversation_et.last_read_timestamp()).toBe(second_timestamp);
       });
 
       it('should not update last read if last message was not send from self user', () => {
         const message_et = new Message(createRandomUuid());
         message_et.timestamp(second_timestamp);
 
-        conversation_et.timeStamps.last_read_timestamp(first_timestamp);
-        conversation_et.timeStamps.last_server_timestamp(second_timestamp);
+        conversation_et.last_read_timestamp(first_timestamp);
+        conversation_et.last_server_timestamp(second_timestamp);
 
         conversation_et.add_message(message_et);
 
-        expect(conversation_et.timeStamps.last_read_timestamp()).toBe(first_timestamp);
+        expect(conversation_et.last_read_timestamp()).toBe(first_timestamp);
       });
 
       it('should not update last read if timestamp is greater than the last server timestamp', () => {
         const message_et = new Message(createRandomUuid());
         message_et.timestamp(second_timestamp);
 
-        conversation_et.timeStamps.last_read_timestamp(first_timestamp);
-        conversation_et.timeStamps.last_server_timestamp(first_timestamp);
+        conversation_et.last_read_timestamp(first_timestamp);
+        conversation_et.last_server_timestamp(first_timestamp);
 
         conversation_et.add_message(message_et);
 
-        expect(conversation_et.timeStamps.last_read_timestamp()).toBe(first_timestamp);
+        expect(conversation_et.last_read_timestamp()).toBe(first_timestamp);
       });
     });
   });
@@ -452,7 +452,7 @@ describe('Conversation', () => {
       expect(conversation_et.get_next_iso_date('foo')).toBeGreaterThan(reference_iso_date);
 
       const last_server_timestamp = referenceTimestamp + 10000;
-      conversation_et.timeStamps.last_server_timestamp(last_server_timestamp);
+      conversation_et.last_server_timestamp(last_server_timestamp);
       const expected_iso_date = new Date(last_server_timestamp + 1).toISOString();
 
       expect(conversation_et.get_next_iso_date(referenceTimestamp)).toEqual(expected_iso_date);
@@ -724,7 +724,7 @@ describe('Conversation', () => {
       const message_et = new Message(createRandomUuid());
       message_et.timestamp(second_timestamp);
       conversation_et.add_message(message_et);
-      conversation_et.timeStamps.last_read_timestamp(first_timestamp);
+      conversation_et.last_read_timestamp(first_timestamp);
 
       expect(conversation_et.messages().length).toBe(1);
       expect(conversation_et.unreadState().allEvents.length).toBe(1);
@@ -739,7 +739,7 @@ describe('Conversation', () => {
       const message_et = new Message(createRandomUuid());
       message_et.timestamp(first_timestamp);
       conversation_et.add_message(message_et);
-      conversation_et.timeStamps.last_read_timestamp(first_timestamp);
+      conversation_et.last_read_timestamp(first_timestamp);
 
       expect(conversation_et.messages().length).toBe(1);
       expect(conversation_et.unreadState().allEvents.length).toBe(0);
@@ -834,30 +834,30 @@ describe('Conversation', () => {
 
   describe('setTimestamp', () => {
     it('turns strings into numbers', () => {
-      const lrt = conversation_et.timeStamps.last_read_timestamp();
+      const lrt = conversation_et.last_read_timestamp();
 
       expect(lrt).toBe(0);
       const new_lrt_string = '1480338525243';
       const new_lrt_number = window.parseInt(new_lrt_string, 10);
       conversation_et.setTimestamp(new_lrt_string, Conversation.TIMESTAMP_TYPE.LAST_READ);
 
-      expect(conversation_et.timeStamps.last_read_timestamp()).toBe(new_lrt_number);
+      expect(conversation_et.last_read_timestamp()).toBe(new_lrt_number);
     });
 
     it('checks that new timestamp is newer that previous one', () => {
-      const currentTimestamp = conversation_et.timeStamps.last_read_timestamp();
+      const currentTimestamp = conversation_et.last_read_timestamp();
       const newTimestamp = currentTimestamp - 10;
       conversation_et.setTimestamp(newTimestamp, Conversation.TIMESTAMP_TYPE.LAST_READ);
 
-      expect(conversation_et.timeStamps.last_read_timestamp()).toBe(currentTimestamp);
+      expect(conversation_et.last_read_timestamp()).toBe(currentTimestamp);
     });
 
     it('allows to set an older timestamp with the forceUpdate flag', () => {
-      const currentTimestamp = conversation_et.timeStamps.last_read_timestamp();
+      const currentTimestamp = conversation_et.last_read_timestamp();
       const newTimestamp = currentTimestamp - 10;
       conversation_et.setTimestamp(newTimestamp, Conversation.TIMESTAMP_TYPE.LAST_READ, true);
 
-      expect(conversation_et.timeStamps.last_read_timestamp()).toBe(newTimestamp);
+      expect(conversation_et.last_read_timestamp()).toBe(newTimestamp);
     });
   });
 
@@ -878,7 +878,7 @@ describe('Conversation', () => {
 
     beforeEach(() => {
       timestamp = Date.now();
-      conversationEntity.timeStamps.archivedTimestamp(timestamp);
+      conversationEntity.archivedTimestamp(timestamp);
       conversationEntity.archivedState(true);
 
       mutedTimestampMessage = new PingMessage();
@@ -1026,13 +1026,13 @@ describe('Conversation', () => {
   describe('check subscribers', () =>
     it('to state updates', () => {
       conversation_et.archivedState(false);
-      conversation_et.timeStamps.cleared_timestamp(0);
-      conversation_et.timeStamps.last_event_timestamp(1467650148305);
-      conversation_et.timeStamps.last_read_timestamp(1467650148305);
+      conversation_et.cleared_timestamp(0);
+      conversation_et.last_event_timestamp(1467650148305);
+      conversation_et.last_read_timestamp(1467650148305);
       conversation_et.mutedState(NOTIFICATION_STATE.EVERYTHING);
 
-      expect(conversation_et.timeStamps.last_event_timestamp.getSubscriptionsCount()).toEqual(1);
-      expect(conversation_et.timeStamps.last_read_timestamp.getSubscriptionsCount()).toEqual(1);
+      expect(conversation_et.last_event_timestamp.getSubscriptionsCount()).toEqual(1);
+      expect(conversation_et.last_read_timestamp.getSubscriptionsCount()).toEqual(1);
     }));
 
   describe('connection', () => {

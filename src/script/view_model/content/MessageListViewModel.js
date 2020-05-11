@@ -202,9 +202,7 @@ export class MessageListViewModel {
   }
 
   _isLastReceivedMessage(messageEntity, conversationEntity) {
-    return (
-      messageEntity.timestamp() && messageEntity.timestamp() >= conversationEntity.timeStamps.last_event_timestamp()
-    );
+    return messageEntity.timestamp() && messageEntity.timestamp() >= conversationEntity.last_event_timestamp();
   }
 
   getMessagesContainer() {
@@ -546,7 +544,7 @@ export class MessageListViewModel {
       callbacks.push(startTimer);
     }
 
-    const isUnreadMessage = messageTimestamp > conversationEntity.timeStamps.last_read_timestamp();
+    const isUnreadMessage = messageTimestamp > conversationEntity.last_read_timestamp();
     const isNotOwnMessage = !messageEntity.user().isMe;
 
     let shouldSendReadReceipt = false;
@@ -581,7 +579,7 @@ export class MessageListViewModel {
   }
 
   updateConversationLastRead(conversationEntity, messageEntity) {
-    const conversationLastRead = conversationEntity.timeStamps.last_read_timestamp();
+    const conversationLastRead = conversationEntity.last_read_timestamp();
     const lastKnownTimestamp = conversationEntity.get_last_known_timestamp(this.serverTimeHandler.toServerTimestamp());
     const needsUpdate = conversationLastRead < lastKnownTimestamp;
     if (needsUpdate && this._isLastReceivedMessage(messageEntity, conversationEntity)) {

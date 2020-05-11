@@ -520,12 +520,12 @@ describe('ConversationRepository', () => {
 
       const group_cleared = _generate_conversation(ConversationType.GROUP);
       group_cleared.name('Cleared');
-      group_cleared.timeStamps.last_event_timestamp(Date.now() - 1000);
+      group_cleared.last_event_timestamp(Date.now() - 1000);
       group_cleared.setTimestamp(Date.now(), Conversation.TIMESTAMP_TYPE.CLEARED);
 
       const group_removed = _generate_conversation(ConversationType.GROUP);
       group_removed.name('Removed');
-      group_removed.timeStamps.last_event_timestamp(Date.now() - 1000);
+      group_removed.last_event_timestamp(Date.now() - 1000);
       group_removed.setTimestamp(Date.now(), Conversation.TIMESTAMP_TYPE.CLEARED);
       group_removed.status(ConversationStatus.PAST_MEMBER);
 

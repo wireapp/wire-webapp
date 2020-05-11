@@ -291,7 +291,7 @@ export const zeroPadding = (value: string | number, length = 2): string => {
 };
 
 export const sortGroupsByLastEvent = (groupA: Conversation, groupB: Conversation): number =>
-  groupB.timeStamps.last_event_timestamp() - groupA.timeStamps.last_event_timestamp();
+  groupB.last_event_timestamp() - groupA.last_event_timestamp();
 
 export const sortObjectByKeys = (object: Record<string, any>, reverse: boolean) => {
   const keys = Object.keys(object);

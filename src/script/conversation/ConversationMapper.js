@@ -272,9 +272,9 @@ export class ConversationMapper {
     const selfState = members ? members.self : conversationData;
     conversationEntity = this.updateSelfStatus(conversationEntity, selfState);
 
-    if (!conversationEntity.timeStamps.last_event_timestamp() && initialTimestamp) {
-      conversationEntity.timeStamps.last_event_timestamp(initialTimestamp);
-      conversationEntity.timeStamps.last_server_timestamp(initialTimestamp);
+    if (!conversationEntity.last_event_timestamp() && initialTimestamp) {
+      conversationEntity.last_event_timestamp(initialTimestamp);
+      conversationEntity.last_server_timestamp(initialTimestamp);
     }
 
     // Active participants from database or backend payload
