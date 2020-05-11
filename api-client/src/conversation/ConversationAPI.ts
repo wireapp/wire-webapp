@@ -17,40 +17,40 @@
  *
  */
 
-import {AxiosRequestConfig} from 'axios';
+import {AxiosError, AxiosRequestConfig} from 'axios';
 import {
   ClientMismatch,
   Conversation,
   ConversationCode,
   ConversationIds,
+  ConversationRolesList,
   Conversations,
   Invite,
   Member,
   NewConversation,
   NewOTRMessage,
-  ConversationRolesList,
 } from './';
 import {
+  ConversationAccessUpdateEvent,
+  ConversationCodeDeleteEvent,
+  ConversationCodeUpdateEvent,
   ConversationEvent,
   ConversationMemberJoinEvent,
   ConversationMemberLeaveEvent,
   ConversationMessageTimerUpdateEvent,
-  ConversationRenameEvent,
-  ConversationCodeUpdateEvent,
-  ConversationCodeDeleteEvent,
   ConversationReceiptModeUpdateEvent,
-  ConversationAccessUpdateEvent,
+  ConversationRenameEvent,
 } from '../event/';
 import {HttpClient} from '../http/';
 import {ValidationError} from '../validation/';
 import {
+  ConversationAccessUpdateData,
   ConversationMemberUpdateData,
   ConversationMessageTimerUpdateData,
   ConversationNameUpdateData,
+  ConversationOtherMemberUpdateData,
   ConversationReceiptModeUpdateData,
   ConversationTypingData,
-  ConversationOtherMemberUpdateData,
-  ConversationAccessUpdateData,
 } from './data';
 import {DefaultConversationRoleName} from './ConversationRole';
 
@@ -478,6 +478,15 @@ export class ConversationAPI {
         ? await this.client.sendJSON<ClientMismatch>(config, true)
         : await this.client.sendProtocolBuffer<ClientMismatch>(config, true);
     return response.data;
+  }
+
+  public async postForClients(clientId: string, conversationId: string): Promise<ClientMismatch> {
+    try {
+      await this.postOTRMessage(clientId, conversationId);
+      throw new Error(`Expected backend to throw error.`);
+    } catch (error) {
+      return (error as AxiosError).response!.data;
+    }
   }
 
   /**

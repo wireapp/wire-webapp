@@ -127,8 +127,8 @@ export class APIClient extends EventEmitter {
     const httpClient = new HttpClient(this.config.urls.rest, this.accessTokenStore);
     const webSocket = new WebSocketClient(this.config.urls.ws, httpClient);
 
-    httpClient.on(HttpClient.TOPIC.ON_INVALID_TOKEN, this.logoutOnAccessTokenRefreshError);
-    webSocket.on(WebSocketClient.TOPIC.ON_INVALID_TOKEN, this.logoutOnAccessTokenRefreshError);
+    httpClient.on(HttpClient.TOPIC.ON_INVALID_TOKEN, this.logoutOnAccessTokenRefreshError.bind(this));
+    webSocket.on(WebSocketClient.TOPIC.ON_INVALID_TOKEN, this.logoutOnAccessTokenRefreshError.bind(this));
 
     this.transport = {
       http: httpClient,
