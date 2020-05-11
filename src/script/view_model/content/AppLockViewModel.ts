@@ -21,6 +21,8 @@ import {ValidationUtil} from '@wireapp/commons';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import sodium from 'libsodium-wrappers-sumo';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {t} from 'Util/LocalizerUtil';
 import {afterRender} from 'Util/util';
 import {QUERY_KEY} from '../../auth/route';
@@ -29,7 +31,6 @@ import {getURLParameter} from '../../auth/util/urlUtil';
 import {ClientRepository} from '../../client/ClientRepository';
 import {Config} from '../../Config';
 import {User} from '../../entity/User';
-import {WebAppEvents} from '../../event/WebApp';
 
 export enum APPLOCK_STATE {
   NONE = 'applock.none',

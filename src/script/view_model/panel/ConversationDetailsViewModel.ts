@@ -19,6 +19,7 @@
 
 import ko from 'knockout';
 import {amplify} from 'amplify';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
@@ -28,7 +29,6 @@ import {removeLineBreaks, sortUsersByPriority} from 'Util/StringUtil';
 import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
 import {getNotificationText} from '../../conversation/NotificationSetting';
 import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
-import {WebAppEvents} from '../../event/WebApp';
 import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
 import {ConversationRepository} from '../../conversation/ConversationRepository';

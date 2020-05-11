@@ -20,6 +20,7 @@
 import {container} from 'tsyringe';
 import {escape} from 'underscore';
 import {Availability} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
@@ -32,7 +33,6 @@ import {ParticipantAvatar} from 'Components/participantAvatar';
 import {ModalsViewModel} from '../ModalsViewModel';
 
 import {StorageKey} from '../../storage/StorageKey';
-import {WebAppEvents} from '../../event/WebApp';
 
 import {QuoteEntity} from '../../message/QuoteEntity';
 import {MessageHasher} from '../../message/MessageHasher';

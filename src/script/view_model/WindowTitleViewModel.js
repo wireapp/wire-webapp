@@ -18,12 +18,12 @@
  */
 
 import ko from 'knockout';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 
 import {Config} from '../Config';
-import {WebAppEvents} from '../event/WebApp';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {ContentViewModel} from './ContentViewModel';
 

@@ -23,6 +23,7 @@ import 'core-js/es7/reflect';
 import ko from 'knockout';
 import platform from 'platform';
 import {container} from 'tsyringe';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
@@ -33,9 +34,7 @@ import {Environment} from 'Util/Environment';
 import {exposeWrapperGlobals} from 'Util/wrapper';
 import {includesString} from 'Util/StringUtil';
 import {appendParameter} from 'Util/UrlUtil';
-import Dexie from 'dexie';
 import {APIClient} from '@wireapp/api-client';
-
 import {Config} from '../Config';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {LoadingViewModel} from '../view_model/LoadingViewModel';
@@ -58,7 +57,7 @@ import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {TeamRepository} from '../team/TeamRepository';
 import {SearchRepository} from '../search/SearchRepository';
 import {ConversationRepository} from '../conversation/ConversationRepository';
-
+import Dexie from 'dexie';
 import {EventRepository} from '../event/EventRepository';
 import {EventServiceNoCompound} from '../event/EventServiceNoCompound';
 import {EventService} from '../event/EventService';
@@ -90,7 +89,6 @@ import {getWebsiteUrl} from '../externalRoute';
 
 import {modals} from '../view_model/ModalsViewModel';
 import {showInitialModal} from '../user/AvailabilityModal';
-import {WebAppEvents} from '../event/WebApp';
 
 import {URLParameter} from '../auth/URLParameter';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
