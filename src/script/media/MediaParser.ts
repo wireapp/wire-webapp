@@ -17,11 +17,12 @@
  *
  */
 
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
+
 import {getLinksFromHtml} from 'Util/UrlUtil';
 
 import {MediaEmbeds} from './MediaEmbeds';
-import {WebAppEvents} from '../event/WebApp';
-import {amplify} from 'amplify';
 
 class MediaParser {
   showEmbed: boolean;

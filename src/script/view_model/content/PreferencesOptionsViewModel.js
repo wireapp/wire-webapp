@@ -17,6 +17,9 @@
  *
  */
 
+import {AudioPreference} from '@wireapp/api-client/dist/user/data';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {getCurrentDate} from 'Util/TimeUtil';
@@ -24,12 +27,10 @@ import {Environment} from 'Util/Environment';
 import {downloadBlob} from 'Util/util';
 
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
-import {WebAppEvents} from '../../event/WebApp';
 
 import {Config} from '../../Config';
 import {THEMES as ThemeViewModelThemes} from '../ThemeViewModel';
 import {ModalsViewModel} from '../ModalsViewModel';
-import {AudioPreference} from '../../audio/AudioPreference';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};

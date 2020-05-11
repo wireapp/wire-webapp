@@ -21,13 +21,13 @@ import {amplify} from 'amplify';
 import type {Data as OpenGraphResult} from 'open-graph';
 import {Asset, LinkPreview} from '@wireapp/protocol-messaging';
 import {AssetRetentionPolicy} from '@wireapp/api-client/dist/asset';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {base64ToBlob, createRandomUuid} from 'Util/util';
 import {getLogger, Logger} from 'Util/Logger';
 
 import {getFirstLinkWithOffset} from './LinkPreviewHelpers';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
-import {WebAppEvents} from '../event/WebApp';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {isBlacklisted} from './LinkPreviewBlackList';
 import {buildFromOpenGraphData} from './LinkPreviewProtoBuilder';

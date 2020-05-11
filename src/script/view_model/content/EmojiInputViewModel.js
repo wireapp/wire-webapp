@@ -17,6 +17,8 @@
  *
  */
 
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {loadValue, storeValue} from 'Util/StorageUtil';
 import {getCursorPixelPosition} from 'Util/PopupUtil';
 import {KEY, isKey, isEnterKey} from 'Util/KeyboardUtil';
@@ -24,7 +26,6 @@ import {sortByPriority} from 'Util/StringUtil';
 
 import emojiBindings from './emoji.json';
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
-import {WebAppEvents} from '../../event/WebApp';
 import {StorageKey} from '../../storage/StorageKey';
 
 export class EmojiInputViewModel {
