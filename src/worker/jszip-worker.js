@@ -20,10 +20,10 @@
 importScripts('jszip.min.js');
 
 self.addEventListener('message', async event => {
-  const data = await JSZip.loadAsync(event.data);
+  const archive = await JSZip.loadAsync(event.data);
   const files = {};
-  for (const fileName in data.files) {
-    files[fileName] = await data.files[fileName].async('uint8array');
+  for (const fileName in archive.files) {
+    files[fileName] = await archive.files[fileName].async('uint8array');
   }
   self.postMessage(files);
   return self.close();

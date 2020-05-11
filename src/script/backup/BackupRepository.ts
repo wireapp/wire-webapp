@@ -228,7 +228,10 @@ export class BackupRepository {
 
     try {
       await this.verifyMetadata(files);
-      const fileDescriptors = await this._extractHistoryFiles(files);
+      const fileDescriptors = Object.entries(files).map(([filename, content]) => ({
+        content,
+        filename,
+      }));
       await this._importHistoryData(fileDescriptors, initCallback, progressCallback);
     } catch (error) {
       this.logger.error(`Could not export history: ${error.message}`, error);
@@ -313,13 +316,6 @@ export class BackupRepository {
     }
   }
 
-  private async _extractHistoryFiles(files: Record<string, Uint8Array>): Promise<FileDescriptor[]> {
-    return Object.entries(files).map(([filename, content]) => ({
-      content,
-      filename,
-    }));
-  }
-
   public mapEntityDataType(entity: any): any {
     if (entity.data) {
       BackupRepository.CONFIG.UINT8ARRAY_FIELDS.forEach(field => {
@@ -337,7 +333,7 @@ export class BackupRepository {
     const metaData = new TextDecoder().decode(rawData);
     const parsedMetaData = JSON.parse(metaData);
     this._verifyMetadata(parsedMetaData);
-    return this.logger.log('Validated metadata during history import', files);
+    this.logger.log('Validated metadata during history import', files);
   }
 
   private _verifyMetadata(archiveMetadata: Metadata): void {
