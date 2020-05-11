@@ -81,13 +81,16 @@ describe('BackupRepository', () => {
     afterEach(() => testFactory.storage_service.clearStores());
 
     it('generates an archive of the database', async () => {
-      const filesToCheck = [BackupRepository.CONFIG.FILENAME.CONVERSATIONS, BackupRepository.CONFIG.FILENAME.EVENTS];
+      const fileNamesToCheck = [
+        BackupRepository.CONFIG.FILENAME.CONVERSATIONS,
+        BackupRepository.CONFIG.FILENAME.EVENTS,
+        BackupRepository.CONFIG.FILENAME.METADATA,
+      ];
 
       const zip = await backupRepository.generateHistory(noop);
       const fileNames = Object.keys(zip.files);
 
-      expect(fileNames).toContain('export.json');
-      filesToCheck.forEach(filename => expect(fileNames).toContain(filename));
+      fileNamesToCheck.forEach(filename => expect(fileNames).toContain(filename));
 
       const conversationsStr = await zip.files[BackupRepository.CONFIG.FILENAME.CONVERSATIONS].async('string');
       const conversations = JSON.parse(conversationsStr);
