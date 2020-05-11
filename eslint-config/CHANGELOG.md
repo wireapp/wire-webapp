@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.7.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/eslint-config/compare/@wireapp/eslint-config@1.6.0...@wireapp/eslint-config@1.7.0) (2020-05-11)
+
+
+### Features
+
+* **eslint-config:** Warn when using fdescribe or fit ([#3027](https://github.com/wireapp/wire-web-packages/tree/master/packages/eslint-config/issues/3027)) ([5045c96](https://github.com/wireapp/wire-web-packages/tree/master/packages/eslint-config/commit/5045c968b49430d630faeb66976ab536ac15051c))
+
+
+
+
+
 # [1.6.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/eslint-config/compare/@wireapp/eslint-config@1.5.0...@wireapp/eslint-config@1.6.0) (2020-04-28)
 
 
