@@ -176,6 +176,19 @@ export class CallingRepository {
     return wCall;
   }
 
+  private sendSFTRequest(context: number, url: string, data: string, dataLength: number, _: number): number {
+    // TODO:
+    // Send POST request to "url" with "data" in request body
+    // Forward:
+    // - wuser
+    // - perr <- status code from request
+    // - buf <- response body
+    // - len <- buffer length
+    // - ctx
+    // this.wCall.sftResp(context);
+    return 0;
+  }
+
   private createWUser(wCall: Wcall, selfUserId: string, selfClientId: string): number {
     /* cspell:disable */
     const wUser = wCall.create(
@@ -183,6 +196,7 @@ export class CallingRepository {
       selfClientId,
       this.setAvsVersion, // `readyh`,
       this.sendMessage, // `sendh`,
+      this.sendSFTRequest, // `sfth`
       this.incomingCall, // `incomingh`,
       () => {}, // `missedh`,
       () => {}, // `answerh`,
@@ -237,8 +251,20 @@ export class CallingRepository {
     wCall.setMuteHandler(wUser, this.isMuted);
     wCall.setStateHandler(wUser, this.updateCallState);
     wCall.setParticipantChangedHandler(wUser, this.updateCallParticipants);
+    wCall.setReqClientsHandler(wUser, this.requestClients);
 
     return wUser;
+  }
+
+  private requestClients(wUser: number, conversationId: string, _: number) {
+    // TODO: Fetch userid:clientid map for conversation
+    const data = {
+      clients: [
+        {clientid: 'xxxx', userid: 'xxxx'},
+        {clientid: 'xxxx', userid: 'xxxx'},
+      ],
+    };
+    this.wCall.setClientsForConv(wUser, conversationId, JSON.stringify(data));
   }
 
   onIncomingCall(callback: (call: Call) => void): void {
@@ -430,7 +456,8 @@ export class CallingRepository {
 
         return loadPreviewPromise.then(success => {
           if (success) {
-            this.wCall.start(this.wUser, conversationId, callType, conversationType, 0);
+            const conferenceCall = conversationType === CONV_TYPE.GROUP ? CONV_TYPE.CONFERENCE : conversationType;
+            this.wCall.start(this.wUser, conversationId, callType, conferenceCall, 0);
           } else {
             this.showNoCameraModal();
             this.removeCall(call);
@@ -586,7 +613,7 @@ export class CallingRepository {
   }
 
   private readonly sendMessage = (
-    context: any,
+    context: number,
     conversationId: ConversationId,
     userId: UserId,
     clientId: DeviceId,
@@ -654,6 +681,7 @@ export class CallingRepository {
     clientId: string,
     hasVideo: number,
     shouldRing: number,
+    conversationType: CONV_TYPE,
   ) => {
     const conversationEntity = this.conversationRepository.find_conversation_by_id(conversationId);
     if (!conversationEntity) {
@@ -671,7 +699,7 @@ export class CallingRepository {
     const call = new Call(
       userId,
       conversationId,
-      conversationEntity.isGroup() ? CONV_TYPE.GROUP : CONV_TYPE.ONEONONE,
+      conversationType,
       selfParticipant,
       hasVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL,
     );
