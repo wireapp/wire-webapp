@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.17.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.16.0...@wireapp/api-client@11.17.0) (2020-05-11)
+
+
+### Features
+
+* **api-client:** Get client mismatch info ([#3028](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3028)) ([6811cc9](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/6811cc9aee31769db8e1ba37499c092e589af41e))
+
+
+
+
+
 # [11.16.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.15.0...@wireapp/api-client@11.16.0) (2020-05-11)
 
 
