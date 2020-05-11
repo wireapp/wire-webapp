@@ -17,6 +17,8 @@
  *
  */
 
+import sinon from 'sinon';
+
 import {Config} from 'src/script/Config';
 import {TestFactory} from '../../helper/TestFactory';
 

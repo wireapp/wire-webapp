@@ -293,7 +293,7 @@ export class CryptographyRepository {
   async _createSessionFromPreKey(preKey, userId, clientId) {
     try {
       if (!preKey) {
-        Raygun.send(new Error('Failed to create session: No pre-key found'));
+        window.Raygun.send(new Error('Failed to create session: No pre-key found'));
         this.logger.warn(`No pre-key for user '${userId}' ('${clientId}') found. The client might have been deleted.`);
       } else {
         this.logger.log(`Initializing session with user '${userId}' (${clientId}) with pre-key ID '${preKey.id}'.`);
@@ -302,7 +302,7 @@ export class CryptographyRepository {
         return this.cryptobox.session_from_prekey(sessionId, preKeyArray.buffer);
       }
     } catch (error) {
-      Raygun.send(new Error(`Failed to create session: ${error.message}`));
+      window.Raygun.send(new Error(`Failed to create session: ${error.message}`));
       const message = `Pre-key for user '${userId}' ('${clientId}') invalid. Skipping encryption: ${error.message}`;
       this.logger.warn(message, error);
     }
@@ -470,7 +470,7 @@ export class CryptographyRepository {
   }
 
   /**
-   * Report decryption error to Localytics and stack traces to Raygun.
+   * Report decryption error to Localytics and stack traces to window.Raygun.
    *
    * @private
    * @param {Error} error Error from event decryption
@@ -493,6 +493,6 @@ export class CryptographyRepository {
 
     const raygunError = new Error(`Decryption failed: ${error.code || error.message}`);
     raygunError.stack = error.stack;
-    Raygun.send(raygunError, customData);
+    window.Raygun.send(raygunError, customData);
   }
 }

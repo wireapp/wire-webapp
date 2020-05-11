@@ -23,7 +23,7 @@ import {ClientMapper} from 'src/script/client/ClientMapper';
 describe('ClientMapper', () => {
   describe('mapClient', () => {
     it('can map a permanent client payload from the backend', () => {
-      const clientPayload = entities.clients.john_doe.permanent;
+      const clientPayload = window.entities.clients.john_doe.permanent;
 
       const clientEntity = ClientMapper.mapClient(clientPayload, true);
 
@@ -43,7 +43,7 @@ describe('ClientMapper', () => {
     });
 
     it('can map a temporary client payload from the backend', () => {
-      const clientPayload = entities.clients.john_doe.temporary;
+      const clientPayload = window.entities.clients.john_doe.temporary;
 
       const clientEntity = ClientMapper.mapClient(clientPayload, true);
 
@@ -63,7 +63,7 @@ describe('ClientMapper', () => {
     });
 
     it('can map a remote client payload from the backend', () => {
-      const clientPayload = entities.clients.jane_roe.plain;
+      const clientPayload = window.entities.clients.jane_roe.plain;
 
       const clientEntity = ClientMapper.mapClient(clientPayload, false);
 
@@ -110,20 +110,20 @@ describe('ClientMapper', () => {
 
   describe('mapClients', () =>
     it('can map a multiple clients at once', () => {
-      const clientEntities = ClientMapper.mapClients(payload.clients.get.many, true);
+      const clientEntities = ClientMapper.mapClients(window.payload.clients.get.many, true);
       const [firstClientEntity, secondClientEntity] = clientEntities;
 
       expect(clientEntities.length).toBe(2);
-      expect(firstClientEntity.id).toBe(entities.clients.john_doe.temporary.id);
+      expect(firstClientEntity.id).toBe(window.entities.clients.john_doe.temporary.id);
       expect(firstClientEntity.isTemporary()).toBe(true);
-      expect(secondClientEntity.id).toBe(entities.clients.john_doe.permanent.id);
+      expect(secondClientEntity.id).toBe(window.entities.clients.john_doe.permanent.id);
       expect(secondClientEntity.isPermanent()).toBe(true);
     }));
 
   describe('updateClient', () => {
     it('can map changes into a client', () => {
-      const initialClientEntity = ClientMapper.mapClient(entities.clients.john_doe.plain, true);
-      const clientPayload = entities.clients.john_doe.permanent;
+      const initialClientEntity = ClientMapper.mapClient(window.entities.clients.john_doe.plain, true);
+      const clientPayload = window.entities.clients.john_doe.permanent;
 
       const {client: clientEntity, wasUpdated} = ClientMapper.updateClient(initialClientEntity, clientPayload);
 
@@ -144,7 +144,7 @@ describe('ClientMapper', () => {
     });
 
     it('does not change the client if there are no updates', () => {
-      const clientPayload = entities.clients.john_doe.permanent;
+      const clientPayload = window.entities.clients.john_doe.permanent;
       const initialClientEntity = ClientMapper.mapClient(clientPayload, true);
 
       const {client: clientEntity, wasUpdated} = ClientMapper.updateClient(initialClientEntity, clientPayload);

@@ -109,7 +109,7 @@ window.entities = {
   },
 };
 
-entities.clients = {
+window.entities.clients = {
   john_doe: {
     permanent: {
       cookie: 'webapp@2153234453@permanent@1458071394172',
@@ -152,12 +152,12 @@ entities.clients = {
   },
 };
 
-entities.user = {
+window.entities.user = {
   john_doe: {
     email: 'jd@wire.com',
     phone: '+49177123456',
     accent_id: 3,
-    picture: entities.picture,
+    picture: window.entities.picture,
     name: 'John Doe',
     id: 'd5a39ffb-6ce3-4cc8-9048-0e15d031b4c5',
     locale: 'en',
@@ -166,7 +166,7 @@ entities.user = {
     email: 'jr@wire.com',
     phone: null,
     accent_id: 1,
-    picture: entities.picture,
+    picture: window.entities.picture,
     name: 'Jane Roe',
     handle: 'jaro',
     id: '7025598b-ffac-4993-8a81-af3f35b7147f',
@@ -176,20 +176,20 @@ entities.user = {
 window.payload = {
   clients: {
     get: {
-      one: entities.clients.john_doe.permanent,
-      many: [entities.clients.john_doe.temporary, entities.clients.john_doe.permanent],
+      one: window.entities.clients.john_doe.permanent,
+      many: [entities.clients.john_doe.temporary, window.entities.clients.john_doe.permanent],
     },
   },
   connections: {
     get: {
       has_more: false,
-      connections: [entities.connection, entities.connection],
+      connections: [entities.connection, window.entities.connection],
     },
   },
   conversations: {
     get: {
       has_more: false,
-      conversations: [entities.conversation, entities.conversation],
+      conversations: [entities.conversation, window.entities.conversation],
     },
     last_events: {
       get: {
@@ -280,12 +280,12 @@ window.payload = {
     },
   },
   self: {
-    get: entities.user.john_doe,
+    get: window.entities.user.john_doe,
   },
   users: {
     get: {
       one: [entities.user.john_doe],
-      many: [entities.user.john_doe, entities.user.jane_roe],
+      many: [entities.user.john_doe, window.entities.user.jane_roe],
     },
   },
 };

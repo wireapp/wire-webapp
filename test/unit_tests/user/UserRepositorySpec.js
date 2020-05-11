@@ -17,6 +17,7 @@
  *
  */
 
+import sinon from 'sinon';
 import {Confirmation} from '@wireapp/protocol-messaging';
 
 import {ConsentValue} from 'src/script/user/ConsentValue';
@@ -165,7 +166,7 @@ describe('UserRepository', () => {
       let user = null;
 
       beforeEach(() => {
-        user = new User(entities.user.john_doe.id);
+        user = new User(window.entities.user.john_doe.id);
         return testFactory.user_repository.saveUser(user);
       });
 
@@ -191,7 +192,7 @@ describe('UserRepository', () => {
 
       it('saves a user', () => {
         const user = new User();
-        user.id = entities.user.jane_roe.id;
+        user.id = window.entities.user.jane_roe.id;
 
         testFactory.user_repository.saveUser(user);
 
@@ -201,7 +202,7 @@ describe('UserRepository', () => {
 
       it('saves self user', () => {
         const user = new User();
-        user.id = entities.user.jane_roe.id;
+        user.id = window.entities.user.jane_roe.id;
 
         testFactory.user_repository.saveUser(user, true);
 
@@ -217,16 +218,16 @@ describe('UserRepository', () => {
 
       beforeEach(() => {
         testFactory.user_repository.users.removeAll();
-        user_jane_roe = new User(entities.user.jane_roe.id);
-        user_john_doe = new User(entities.user.john_doe.id);
+        user_jane_roe = new User(window.entities.user.jane_roe.id);
+        user_john_doe = new User(window.entities.user.john_doe.id);
 
         testFactory.user_repository.saveUsers([user_jane_roe, user_john_doe]);
-        const permanent_client = ClientMapper.mapClient(entities.clients.john_doe.permanent);
-        const plain_client = ClientMapper.mapClient(entities.clients.jane_roe.plain);
-        const temporary_client = ClientMapper.mapClient(entities.clients.john_doe.temporary);
+        const permanent_client = ClientMapper.mapClient(window.entities.clients.john_doe.permanent);
+        const plain_client = ClientMapper.mapClient(window.entities.clients.jane_roe.plain);
+        const temporary_client = ClientMapper.mapClient(window.entities.clients.john_doe.temporary);
         const recipients = {
-          [entities.user.john_doe.id]: [permanent_client, temporary_client],
-          [entities.user.jane_roe.id]: [plain_client],
+          [window.entities.user.john_doe.id]: [permanent_client, temporary_client],
+          [window.entities.user.jane_roe.id]: [plain_client],
         };
 
         spyOn(testFactory.client_repository, 'getAllClientsFromDb').and.returnValue(Promise.resolve(recipients));
@@ -238,10 +239,10 @@ describe('UserRepository', () => {
         return testFactory.user_repository._assignAllClients().then(() => {
           expect(testFactory.client_repository.getAllClientsFromDb).toHaveBeenCalled();
           expect(user_jane_roe.devices().length).toBe(1);
-          expect(user_jane_roe.devices()[0].id).toBe(entities.clients.jane_roe.plain.id);
+          expect(user_jane_roe.devices()[0].id).toBe(window.entities.clients.jane_roe.plain.id);
           expect(user_john_doe.devices().length).toBe(2);
-          expect(user_john_doe.devices()[0].id).toBe(entities.clients.john_doe.permanent.id);
-          expect(user_john_doe.devices()[1].id).toBe(entities.clients.john_doe.temporary.id);
+          expect(user_john_doe.devices()[0].id).toBe(window.entities.clients.john_doe.permanent.id);
+          expect(user_john_doe.devices()[1].id).toBe(window.entities.clients.john_doe.temporary.id);
         });
       });
     });

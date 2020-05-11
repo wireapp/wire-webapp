@@ -566,7 +566,7 @@ class App {
           if (isAccessTokenError) {
             this.logger.error(`Could not get access token: ${error.message}. Logging out user.`, error);
           } else {
-            Raygun.send(error);
+            window.Raygun.send(error);
           }
 
           return this.logout(SIGN_OUT_REASON.APP_INIT, false);
@@ -947,9 +947,9 @@ $(async () => {
       doRedirect(SIGN_OUT_REASON.NOT_SIGNED_IN);
     } else if (isTemporaryClientAndNonPersistent(shouldPersist)) {
       const engine = await StorageService.getUninitializedEngine();
-      wire.app = new App(apiClient, backendClient, appContainer, engine);
+      window.wire.app = new App(apiClient, backendClient, appContainer, engine);
     } else {
-      wire.app = new App(apiClient, backendClient, appContainer);
+      window.wire.app = new App(apiClient, backendClient, appContainer);
     }
   }
 });

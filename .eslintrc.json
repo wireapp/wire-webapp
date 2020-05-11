@@ -6,15 +6,9 @@
   "globals": {
     "$": true,
     "amplify": true,
-    "entities": true,
     "jQuery": true,
     "ko": true,
-    "lorem_ipsum": true,
-    "payload": true,
-    "Raygun": true,
-    "sinon": true,
-    "wire": true,
-    "z": true
+    "Raygun": true
   },
   "ignorePatterns": [".git/", "docs/", "node_modules/", "resource/", "server/bin/", "server/dist/", "server/node_modules/", "src/ext/", "src/script/localization/**/webapp*.js", "src/worker/"],
   "overrides": [

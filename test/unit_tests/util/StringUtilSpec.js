@@ -154,28 +154,28 @@ describe('StringUtil', () => {
 
   describe('truncate', () => {
     it('returns the full string if it is shorter than the target length', () => {
-      const text = truncate(`${lorem_ipsum.substr(0, 80)}`, 90);
+      const text = truncate(`${window.lorem_ipsum.substr(0, 80)}`, 90);
 
       expect(text.length).toBe(80);
       expect(text.charAt(79)).not.toBe('…');
     });
 
     it('returns a truncated string of correct length if it is longer than the target length', () => {
-      const text = truncate(`${lorem_ipsum.substr(0, 80)}`, 70);
+      const text = truncate(`${window.lorem_ipsum.substr(0, 80)}`, 70);
 
       expect(text.length).toBe(64);
       expect(text.charAt(63)).toBe('…');
     });
 
     it('returns a truncated string of correct length if word boundary is disabled', () => {
-      const text = truncate(`${lorem_ipsum.substr(0, 80)}`, 70, false);
+      const text = truncate(`${window.lorem_ipsum.substr(0, 80)}`, 70, false);
 
       expect(text.length).toBe(70);
       expect(text.charAt(69)).toBe('…');
     });
 
     it('returns a truncated string of correct length if word boundary is enabled and there are no whitespaces in the string', () => {
-      const text = truncate(`${lorem_ipsum.replace(/\s/g, '').substr(0, 80)}`, 70);
+      const text = truncate(`${window.lorem_ipsum.replace(/\s/g, '').substr(0, 80)}`, 70);
 
       expect(text.length).toBe(70);
       expect(text.charAt(69)).toBe('…');

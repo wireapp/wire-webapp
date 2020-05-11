@@ -30,7 +30,7 @@ describe('User Mapper', () => {
   let self_user_payload = null;
 
   beforeEach(() => {
-    self_user_payload = JSON.parse(JSON.stringify(payload.self.get));
+    self_user_payload = JSON.parse(JSON.stringify(window.payload.self.get));
   });
 
   describe('mapUserFromJson', () => {
@@ -90,7 +90,7 @@ describe('User Mapper', () => {
 
   describe('mapUsersFromJson', () => {
     it('can convert JSON into multiple user entities', () => {
-      const user_ets = mapper.mapUsersFromJson(payload.users.get.many);
+      const user_ets = mapper.mapUsersFromJson(window.payload.users.get.many);
 
       expect(user_ets.length).toBe(2);
       expect(user_ets[0].email()).toBe('jd@wire.com');
@@ -115,8 +115,8 @@ describe('User Mapper', () => {
   describe('updateUserFromObject', () => {
     it('can update the accent color', () => {
       const user_et = new User();
-      user_et.id = entities.user.john_doe.id;
-      const data = {accent_id: 1, id: entities.user.john_doe.id};
+      user_et.id = window.entities.user.john_doe.id;
+      const data = {accent_id: 1, id: window.entities.user.john_doe.id};
       const updated_user_et = mapper.updateUserFromObject(user_et, data);
 
       expect(updated_user_et.accent_id()).toBe(ACCENT_ID.BLUE);
@@ -124,25 +124,25 @@ describe('User Mapper', () => {
 
     it('can update the user name', () => {
       const user_et = new User();
-      user_et.id = entities.user.john_doe.id;
-      const data = {id: entities.user.john_doe.id, name: entities.user.jane_roe.name};
+      user_et.id = window.entities.user.john_doe.id;
+      const data = {id: window.entities.user.john_doe.id, name: window.entities.user.jane_roe.name};
       const updated_user_et = mapper.updateUserFromObject(user_et, data);
 
-      expect(updated_user_et.name()).toBe(entities.user.jane_roe.name);
+      expect(updated_user_et.name()).toBe(window.entities.user.jane_roe.name);
     });
 
     it('can update the user handle', () => {
       const user_et = new User();
-      user_et.id = entities.user.john_doe.id;
-      const data = {handle: entities.user.jane_roe.handle, id: entities.user.john_doe.id};
+      user_et.id = window.entities.user.john_doe.id;
+      const data = {handle: window.entities.user.jane_roe.handle, id: window.entities.user.john_doe.id};
       const updated_user_et = mapper.updateUserFromObject(user_et, data);
 
-      expect(updated_user_et.username()).toBe(entities.user.jane_roe.handle);
+      expect(updated_user_et.username()).toBe(window.entities.user.jane_roe.handle);
     });
 
     it("converts user's expiration date to local timestamp", () => {
       const userEntity = new User();
-      userEntity.id = entities.user.john_doe.id;
+      userEntity.id = window.entities.user.john_doe.id;
       const expirationDate = new Date('2018-10-16T09:16:41.294Z');
       const adjustedExpirationDate = new Date('2018-10-16T09:16:59.294Z');
 
@@ -162,8 +162,8 @@ describe('User Mapper', () => {
 
     it('cannot update the user name of a wrong user', () => {
       const user_et = new User();
-      user_et.id = entities.user.john_doe.id;
-      const data = {id: entities.user.jane_roe.id, name: entities.user.jane_roe.name};
+      user_et.id = window.entities.user.john_doe.id;
+      const data = {id: window.entities.user.jane_roe.id, name: window.entities.user.jane_roe.name};
       const functionCall = () => mapper.updateUserFromObject(user_et, data);
 
       expect(functionCall).toThrow();
@@ -171,14 +171,14 @@ describe('User Mapper', () => {
 
     it('can update user with v3 assets', () => {
       const user_et = new User();
-      user_et.id = entities.user.john_doe.id;
+      user_et.id = window.entities.user.john_doe.id;
       const data = {
         assets: [
           {key: createRandomUuid(), size: 'preview', type: 'image'},
           {key: createRandomUuid(), size: 'complete', type: 'image'},
         ],
-        id: entities.user.john_doe.id,
-        name: entities.user.jane_roe.name,
+        id: window.entities.user.john_doe.id,
+        name: window.entities.user.jane_roe.name,
       };
       const updated_user_et = mapper.updateUserFromObject(user_et, data);
 

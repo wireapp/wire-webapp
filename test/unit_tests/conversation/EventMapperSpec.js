@@ -36,7 +36,7 @@ describe('Event Mapper', () => {
 
   beforeAll(() => {
     return testFactory.exposeUserActors().then(() => {
-      wire.app = {
+      window.wire.app = {
         service: {
           asset: testFactory.asset_service,
         },

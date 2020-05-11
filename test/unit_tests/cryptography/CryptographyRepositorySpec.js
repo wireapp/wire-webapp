@@ -44,14 +44,14 @@ describe('CryptographyRepository', () => {
           desktop_id: 'b29034060fed476e',
           phone_id: '4b0a0fbf418d264c',
         },
-        id: entities.user.john_doe.id,
+        id: window.entities.user.john_doe.id,
       };
 
       jane_roe = {
         clients: {
           phone_id: '55cdd1dbe3c2ed74',
         },
-        id: entities.user.jane_roe.id,
+        id: window.entities.user.jane_roe.id,
       };
     });
 

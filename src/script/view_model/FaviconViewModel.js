@@ -19,6 +19,10 @@
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+window.z = window.z || {};
+window.z.viewModel = window.z.viewModel || {};
+window.z.viewModel.FaviconViewModel = FaviconViewModel;
+
 /**
  * The FaviconViewModel is responsible for updating the favicon according to unread messages.
  * To do so, it will listen for the UNREAD_COUNT that the app dispatches through the given dispatcher.
@@ -55,7 +59,3 @@ export class FaviconViewModel {
     this.unreadCountSubscription.dispose();
   }
 }
-
-window.z = window.z || {};
-window.z.viewModel = window.z.viewModel || {};
-window.z.viewModel.FaviconViewModel = FaviconViewModel;

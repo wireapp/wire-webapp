@@ -17,6 +17,7 @@
  *
  */
 
+import sinon from 'sinon';
 import {container} from 'tsyringe';
 
 import {GiphyRepository} from 'src/script/extension/GiphyRepository';

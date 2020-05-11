@@ -83,7 +83,7 @@ export class EventMapper {
           const errorMessage = `Failure while mapping events. Affected '${event.type}' event: ${error.message}`;
           this.logger.error(errorMessage, {error, event});
           const customData = {eventTime: new Date(event.time).toISOString(), eventType: event.type};
-          Raygun.send(new Error(errorMessage), customData);
+          window.Raygun.send(new Error(errorMessage), customData);
         }
       }),
     );
@@ -109,7 +109,7 @@ export class EventMapper {
         this.logger.error(errorMessage, {error, event});
 
         const customData = {eventTime: new Date(event.time).toISOString(), eventType: event.type};
-        Raygun.send(new Error(errorMessage), customData);
+        window.Raygun.send(new Error(errorMessage), customData);
 
         throw new ConversationError(
           ConversationError.TYPE.MESSAGE_NOT_FOUND,

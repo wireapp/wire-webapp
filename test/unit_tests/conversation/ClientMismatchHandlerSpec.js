@@ -57,11 +57,11 @@ describe('ClientMismatchHandler', () => {
 
       johnDoe = {
         client_id: 'd13a2ec9b6436122',
-        user_id: entities.user.john_doe.id,
+        user_id: window.entities.user.john_doe.id,
       };
       janeRoe = {
         client_id: 'edc943ba4d6ef6b1',
-        user_id: entities.user.jane_roe.id,
+        user_id: window.entities.user.jane_roe.id,
       };
     });
 

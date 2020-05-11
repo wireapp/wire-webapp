@@ -17,6 +17,7 @@
  *
  */
 
+import sinon from 'sinon';
 import {ConnectionStatus} from '@wireapp/api-client/dist/connection';
 import {Confirmation, GenericMessage, LegalHoldStatus, Text} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -94,13 +95,13 @@ describe('ConversationRepository', () => {
 
       spyOn(testFactory.event_repository, 'injectEvent').and.returnValue(Promise.resolve({}));
       conversation_et = _generate_conversation(ConversationType.SELF);
-      conversation_et.id = payload.conversations.knock.post.conversation;
+      conversation_et.id = window.payload.conversations.knock.post.conversation;
 
       const ping_url = `${Config.getConfig().BACKEND_REST}/conversations/${conversation_et.id}/knock`;
       server.respondWith('POST', ping_url, [
         201,
         {'Content-Type': 'application/json'},
-        JSON.stringify(payload.conversations.knock.post),
+        JSON.stringify(window.payload.conversations.knock.post),
       ]);
 
       server.respondWith('GET', `${Config.getConfig().BACKEND_REST}/users?ids=${messageSenderId}`, [
@@ -1402,10 +1403,10 @@ describe('ConversationRepository', () => {
       bob = new User('532af01e-1e24-4366-aacf-33b67d4ee376');
       bob.name('Bob');
 
-      jane = new User(entities.user.jane_roe.id);
+      jane = new User(window.entities.user.jane_roe.id);
       jane.name('Jane');
 
-      john = new User(entities.user.john_doe.id);
+      john = new User(window.entities.user.john_doe.id);
       john.name('John');
 
       const johns_computer = new ClientEntity();

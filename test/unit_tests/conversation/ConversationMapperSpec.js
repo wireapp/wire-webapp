@@ -58,7 +58,7 @@ describe('Conversation Mapper', () => {
     });
 
     it('maps a single conversation', () => {
-      const conversation = entities.conversation;
+      const conversation = window.entities.conversation;
       const initial_timestamp = Date.now();
       const [conversation_et] = conversation_mapper.mapConversations([conversation], initial_timestamp);
 
@@ -86,7 +86,7 @@ describe('Conversation Mapper', () => {
     });
 
     it('maps multiple conversations', () => {
-      const conversations = payload.conversations.get.conversations;
+      const conversations = window.payload.conversations.get.conversations;
       const conversation_ets = conversation_mapper.mapConversations(conversations);
 
       expect(conversation_ets.length).toBe(conversations.length);
@@ -120,7 +120,7 @@ describe('Conversation Mapper', () => {
   describe('updateProperties', () => {
     it('can update the properties of a conversation', () => {
       const creator_id = createRandomUuid();
-      const conversationsData = [payload.conversations.get.conversations[0]];
+      const conversationsData = [window.payload.conversations.get.conversations[0]];
       const [conversation_et] = conversation_mapper.mapConversations(conversationsData);
       const data = {
         creator: creator_id,
@@ -156,7 +156,7 @@ describe('Conversation Mapper', () => {
     let conversation_et = undefined;
 
     beforeEach(() => {
-      const conversationsData = [payload.conversations.get.conversations[0]];
+      const conversationsData = [window.payload.conversations.get.conversations[0]];
       [conversation_et] = conversation_mapper.mapConversations(conversationsData);
     });
 

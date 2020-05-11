@@ -59,7 +59,7 @@ describe('ClientRepository', () => {
         Promise.resolve(allClients),
       );
 
-      return testFactory.client_repository.getClientsByUserId(entities.user.john_doe.id).then(clientEntities => {
+      return testFactory.client_repository.getClientsByUserId(window.entities.user.john_doe.id).then(clientEntities => {
         expect(clientEntities.length).toBe(allClients.length);
       });
     }));

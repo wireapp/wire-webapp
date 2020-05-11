@@ -17,6 +17,7 @@
  *
  */
 
+import sinon from 'sinon';
 import {ConnectionStatus} from '@wireapp/api-client/dist/connection';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -108,13 +109,13 @@ describe('ConnectionRepository', () => {
       server.respondWith('GET', `${Config.getConfig().BACKEND_REST}/connections?size=500`, [
         200,
         {'Content-Type': 'application/json'},
-        JSON.stringify(payload.connections.get),
+        JSON.stringify(window.payload.connections.get),
       ]);
 
-      server.respondWith('GET', `${Config.getConfig().BACKEND_REST}/users?ids=${entities.user.jane_roe.id}`, [
+      server.respondWith('GET', `${Config.getConfig().BACKEND_REST}/users?ids=${window.entities.user.jane_roe.id}`, [
         200,
         {'Content-Type': 'application/json'},
-        JSON.stringify(payload.users.get.many),
+        JSON.stringify(window.payload.users.get.many),
       ]);
 
       return connectionRepository.getConnections().then(() => {

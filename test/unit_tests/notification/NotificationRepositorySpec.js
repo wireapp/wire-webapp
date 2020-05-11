@@ -81,8 +81,8 @@ describe('NotificationRepository', () => {
 
       // Create entities
       const conversationMapper = testFactory.conversation_repository.conversationMapper;
-      user_et = testFactory.user_repository.userMapper.mapUserFromJson(payload.users.get.one[0]);
-      [conversation_et] = conversationMapper.mapConversations([entities.conversation]);
+      user_et = testFactory.user_repository.userMapper.mapUserFromJson(window.payload.users.get.one[0]);
+      [conversation_et] = conversationMapper.mapConversations([window.entities.conversation]);
       conversation_et.team_id = undefined;
       const selfUserEntity = new User(createRandomUuid());
       selfUserEntity.isMe = true;
@@ -541,7 +541,7 @@ describe('NotificationRepository', () => {
     });
 
     it('if a group is created', () => {
-      conversation_et.from = payload.users.get.one[0].id;
+      conversation_et.from = window.payload.users.get.one[0].id;
       message_et = new MemberMessage();
       message_et.user(user_et);
       message_et.type = BackendEvent.CONVERSATION.CREATE;
@@ -584,7 +584,7 @@ describe('NotificationRepository', () => {
       message_et = new MemberMessage();
       message_et.user(user_et);
       message_et.memberMessageType = SystemMessageType.NORMAL;
-      other_user_et = testFactory.user_repository.userMapper.mapUserFromJson(payload.users.get.many[1]);
+      other_user_et = testFactory.user_repository.userMapper.mapUserFromJson(window.payload.users.get.many[1]);
     });
 
     describe('if people are added', () => {
@@ -600,7 +600,7 @@ describe('NotificationRepository', () => {
       it('with one user being added to the conversation', () => {
         message_et.userEntities([other_user_et]);
 
-        const user_name_added = entities.user.jane_roe.name;
+        const user_name_added = window.entities.user.jane_roe.name;
         const expected_body = `${user_et.name()} added ${user_name_added} to the conversation`;
         return verify_notification_system(conversation_et, message_et, expected_body);
       });
@@ -614,7 +614,7 @@ describe('NotificationRepository', () => {
       });
 
       it('with multiple users being added to the conversation', () => {
-        const user_ids = [entities.user.john_doe.id, entities.user.jane_roe.id];
+        const user_ids = [window.entities.user.john_doe.id, window.entities.user.jane_roe.id];
         message_et.userIds(user_ids);
 
         const expected_body = `${user_et.name()} added 2 people to the conversation`;
@@ -648,7 +648,7 @@ describe('NotificationRepository', () => {
       });
 
       it('with multiple users being removed from the conversation', () => {
-        const user_ets = testFactory.user_repository.userMapper.mapUsersFromJson(payload.users.get.many);
+        const user_ets = testFactory.user_repository.userMapper.mapUsersFromJson(window.payload.users.get.many);
         message_et.userEntities(user_ets);
 
         return testFactory.notification_repository.notify(message_et, undefined, conversation_et).then(() => {
@@ -674,7 +674,7 @@ describe('NotificationRepository', () => {
       conversation_et.type(ConversationType.ONE2ONE);
 
       const connectionMapper = new ConnectionMapper();
-      connectionEntity = connectionMapper.mapConnectionFromJson(entities.connection);
+      connectionEntity = connectionMapper.mapConnectionFromJson(window.entities.connection);
       message_et = new MemberMessage();
       message_et.user(user_et);
     });
@@ -706,7 +706,7 @@ describe('NotificationRepository', () => {
     const expected_body = window.z.string.notificationPing;
 
     beforeAll(() => {
-      user_et = testFactory.user_repository.userMapper.mapUserFromJson(payload.users.get.one[0]);
+      user_et = testFactory.user_repository.userMapper.mapUserFromJson(window.payload.users.get.one[0]);
     });
 
     beforeEach(() => {

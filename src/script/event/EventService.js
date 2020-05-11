@@ -423,7 +423,7 @@ export class EventService {
 
             this.logger.error(logMessage, logObject);
 
-            Raygun.send(new Error(logMessage), logObject);
+            window.Raygun.send(new Error(logMessage), logObject);
             throw new StorageError(StorageError.TYPE.NON_SEQUENTIAL_UPDATE, StorageError.MESSAGE.NON_SEQUENTIAL_UPDATE);
           });
         });

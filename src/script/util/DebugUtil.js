@@ -225,7 +225,9 @@ export class DebugUtil {
       this.logger.log(`Notification '${notificationId}' was not found in encrypted notification stream`);
     };
 
-    return wire.app.service.notification.getNotifications(clientId, notificationIdSince, 10000).then(_gotNotifications);
+    return window.wire.app.service.notification
+      .getNotifications(clientId, notificationIdSince, 10000)
+      .then(_gotNotifications);
   }
 
   getNotificationsFromStream(remoteUserId, remoteClientId, matchingNotifications = [], notificationIdSince) {
@@ -270,7 +272,7 @@ export class DebugUtil {
     };
 
     const clientScope = remoteUserId === localUserId ? undefined : localClientId;
-    return wire.app.service.notification
+    return window.wire.app.service.notification
       .getNotifications(clientScope, notificationIdSince, 10000)
       .then(_gotNotifications);
   }

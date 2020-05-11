@@ -1233,7 +1233,7 @@ export class ConversationRepository {
       .catch(error => {
         const errorMessage = 'Failed to update last read timestamp';
         this.logger.error(`${errorMessage}: ${error.message}`, error);
-        Raygun.send(new Error(errorMessage), {label: error.label, message: error.message});
+        window.Raygun.send(new Error(errorMessage), {label: error.label, message: error.message});
       });
   }
 
@@ -2933,7 +2933,7 @@ export class ConversationRepository {
                   verificationState,
                 };
 
-                Raygun.send(error, customData);
+                window.Raygun.send(error, customData);
 
                 reject(error);
               }

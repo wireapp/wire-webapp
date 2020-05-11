@@ -113,7 +113,7 @@ export class TestFactory {
   async exposeCryptographyActors(mockCryptobox = true) {
     const storageRepository = await this.exposeStorageActors();
     const currentClient = new ClientEntity(true);
-    currentClient.id = entities.clients.john_doe.permanent.id;
+    currentClient.id = window.entities.clients.john_doe.permanent.id;
     this.cryptography_service = new CryptographyService(container.resolve(APIClientSingleton).getClient());
 
     this.cryptography_repository = new CryptographyRepository(this.cryptography_service, this.storage_repository);
@@ -144,7 +144,7 @@ export class TestFactory {
     user.devices.push(clientEntity);
     user.email(entities.user.john_doe.email);
     user.isMe = true;
-    user.locale = entities.user.john_doe.locale;
+    user.locale = window.entities.user.john_doe.locale;
     user.name(entities.user.john_doe.name);
     user.phone(entities.user.john_doe.phone);
 
