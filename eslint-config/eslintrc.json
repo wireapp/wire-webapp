@@ -50,6 +50,17 @@
         "ignore": [-1, 0, 1, 2]
       }
     ],
+    "no-restricted-globals": [
+      "warn",
+      {
+        "name": "fit",
+        "message": "Do not commit `fit`. Use `it` instead."
+      },
+      {
+        "name": "fdescribe",
+        "message": "Do not commit `fdescribe`. Use `describe` instead."
+      }
+    ],
     "no-return-await": "error",
     "no-sequences": "error",
     "no-sparse-arrays": "error",
