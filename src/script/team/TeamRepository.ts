@@ -43,7 +43,7 @@ import {TeamMapper} from './TeamMapper';
 import {TeamEntity} from './TeamEntity';
 import {roleFromTeamPermissions, ROLE} from '../user/UserPermission';
 
-import {WebAppEvents} from '../event/WebApp';
+import {WebAppEvents} from '@wireapp/webapp-events';
 import {IntegrationMapper} from '../integration/IntegrationMapper';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {SuperProperty} from '../tracking/SuperProperty';

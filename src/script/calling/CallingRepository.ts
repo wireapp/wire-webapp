@@ -32,6 +32,7 @@ import {
   Wcall,
 } from '@wireapp/avs';
 import {Calling, GenericMessage} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import 'webrtc-adapter';
@@ -53,7 +54,6 @@ import {ConversationRepository} from '../conversation/ConversationRepository';
 import {EventBuilder} from '../conversation/EventBuilder';
 import {EventInfoEntity} from '../conversation/EventInfoEntity';
 import {EventRepository} from '../event/EventRepository';
-import {WebAppEvents} from '../event/WebApp';
 
 import {MediaStreamHandler} from '../media/MediaStreamHandler';
 import {MediaType} from '../media/MediaType';

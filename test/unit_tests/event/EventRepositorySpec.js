@@ -20,21 +20,21 @@
 import {MemoryEngine} from '@wireapp/store-engine';
 import {Cryptobox} from '@wireapp/cryptobox';
 import {GenericMessage, Text, Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
-import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
+import {WebAppEvents} from '@wireapp/webapp-events';
 import * as Proteus from '@wireapp/proteus';
 
 import {createRandomUuid, arrayToBase64} from 'Util/util';
 
+import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 import {ClientEvent} from 'src/script/event/Client';
 import {BackendEvent} from 'src/script/event/Backend';
-import {WebAppEvents} from 'src/script/event/WebApp';
 import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
 import {EventRepository} from 'src/script/event/EventRepository';
 import {NotificationService} from 'src/script/event/NotificationService';
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 import {ClientEntity} from 'src/script/client/ClientEntity';
-import {TestFactory} from '../../helper/TestFactory';
 import {EventError} from 'src/script/error/EventError';
+import {TestFactory} from '../../helper/TestFactory';
 
 const testFactory = new TestFactory();
 

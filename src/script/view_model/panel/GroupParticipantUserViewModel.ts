@@ -20,6 +20,7 @@
 import ko from 'knockout';
 import {amplify} from 'amplify';
 import {DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/dist/conversation';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {getLogger, Logger} from 'Util/Logger';
 
@@ -35,7 +36,6 @@ import {TeamRepository} from '../../team/TeamRepository';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
 import {User} from '../../entity/User';
 import {PanelViewModel} from '../PanelViewModel';
-import {WebAppEvents} from '../../event/WebApp';
 import {ClientEvent} from '../../event/Client';
 import {MemberLeaveEvent} from '../../conversation/EventBuilder';
 

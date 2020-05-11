@@ -24,10 +24,11 @@ import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
 import {User as APIClientUser} from '@wireapp/api-client/dist/user';
 import {ConsentType, Self as APIClientSelf} from '@wireapp/api-client/dist/self';
 import {UserAsset as APIClientUserAsset, UserAssetType as APIClientUserAssetType} from '@wireapp/api-client/dist/user';
-
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {flatten} from 'underscore';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import type {AxiosError} from 'axios';
 
 import {chunk, partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -35,7 +36,6 @@ import {Logger, getLogger} from 'Util/Logger';
 import {sortUsersByPriority} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {createRandomUuid, loadUrlBlob} from 'Util/util';
-import type {AxiosError} from 'axios';
 import {UNSPLASH_URL} from '../externalRoute';
 
 import {mapProfileAssetsV1} from '../assets/AssetMapper';
@@ -45,7 +45,6 @@ import {BackendEvent} from '../event/Backend';
 import {ClientEvent} from '../event/Client';
 import {EventRepository} from '../event/EventRepository';
 import {EventSource} from '../event/EventSource';
-import {WebAppEvents} from '../event/WebApp';
 
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';

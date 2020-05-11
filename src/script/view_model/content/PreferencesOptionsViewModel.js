@@ -18,6 +18,7 @@
  */
 
 import {AudioPreference} from '@wireapp/api-client/dist/user/data';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
@@ -26,7 +27,6 @@ import {Environment} from 'Util/Environment';
 import {downloadBlob} from 'Util/util';
 
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
-import {WebAppEvents} from '../../event/WebApp';
 
 import {Config} from '../../Config';
 import {THEMES as ThemeViewModelThemes} from '../ThemeViewModel';

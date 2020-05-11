@@ -19,12 +19,12 @@
 
 import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE} from '@wireapp/api-client/dist/conversation';
 import {amplify} from 'amplify';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {t} from 'Util/LocalizerUtil';
 
 import {BackendClientError} from '../error/BackendClientError';
 import {BackendEvent} from '../event/Backend';
-import {WebAppEvents} from '../event/WebApp';
 import {EventName} from '../tracking/EventName';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 

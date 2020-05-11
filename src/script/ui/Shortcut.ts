@@ -19,12 +19,12 @@
 
 import {amplify} from 'amplify';
 import keyboardJS from 'keyboardjs';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Environment} from 'Util/Environment';
 import {capitalizeFirstChar, includesString} from 'Util/StringUtil';
 
 import {ShortcutType} from './ShortcutType';
-import {WebAppEvents} from '../event/WebApp';
 
 interface Shortcut {
   event: string;

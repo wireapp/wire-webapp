@@ -18,6 +18,7 @@
  */
 
 import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -30,7 +31,6 @@ import {EVENT_TYPE} from './EventType';
 import {ClientEvent} from './Client';
 import {EventTypeHandling} from './EventTypeHandling';
 import {BackendEvent} from './Backend';
-import {WebAppEvents} from './WebApp';
 import {NOTIFICATION_HANDLING_STATE} from './NotificationHandlingState';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {categoryFromEvent} from '../message/MessageCategorization';

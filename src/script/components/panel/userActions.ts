@@ -18,12 +18,11 @@
  */
 
 import ko from 'knockout';
+import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 
 import {t} from 'Util/LocalizerUtil';
 import {noop} from 'Util/util';
-
-import {WebAppEvents} from '../../event/WebApp';
 
 import './panelActions';
 import {User} from '../../entity/User';
