@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.17.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.17.0...@wireapp/api-client@11.17.1) (2020-05-12)
+
+
+### Bug Fixes
+
+* Update PropertyData keys to be optional ([#3029](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3029)) ([f118a1e](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/f118a1ef2aeeb74693035b7073dc8e5b2a6e062f))
+
+
+
+
+
 # [11.17.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.16.0...@wireapp/api-client@11.17.0) (2020-05-11)
 
 
