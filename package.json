@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "@wireapp/antiscroll-2": "1.0.2",
-    "@wireapp/avs": "6.0.18",
+    "@wireapp/avs": "6.0.20",
     "@wireapp/commons": "3.4.0",
     "@wireapp/core": "16.9.2",
     "@wireapp/protocol-messaging": "1.25.4",
