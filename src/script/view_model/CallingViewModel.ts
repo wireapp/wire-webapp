@@ -30,13 +30,14 @@ import {Grid, getGrid} from '../calling/videoGridHandler';
 import {User} from '../entity/User';
 import {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import {MediaStreamHandler} from '../media/MediaStreamHandler';
-
-import 'Components/calling/chooseScreen';
 import {AudioRepository} from '../audio/AudioRepository';
 import {ConversationRepository} from '../conversation/ConversationRepository';
 import {Conversation} from '../entity/Conversation';
 import {PermissionRepository} from '../permission/PermissionRepository';
 import {PermissionStatusState} from '../permission/PermissionStatusState';
+import {Multitasking} from '../notification/NotificationRepository';
+
+import 'Components/calling/chooseScreen';
 
 export interface CallActions {
   answer: (call: Call) => void;
@@ -45,6 +46,7 @@ export interface CallActions {
   startAudio: (conversationEntity: Conversation) => void;
   startVideo: (conversationEntity: Conversation) => void;
   switchCameraInput: (call: Call, deviceId: string) => void;
+  switchScreenInput: (call: Call, deviceId: string) => void;
   toggleCamera: (call: Call) => void;
   toggleMute: (call: Call, muteState: boolean) => void;
   toggleScreenshare: (call: Call) => void;
@@ -69,7 +71,7 @@ export class CallingViewModel {
   readonly isChoosingScreen: ko.PureComputed<boolean>;
   readonly mediaDevicesHandler: MediaDevicesHandler;
   readonly mediaStreamHandler: MediaStreamHandler;
-  readonly multitasking: any;
+  readonly multitasking: Multitasking;
   readonly permissionRepository: PermissionRepository;
   readonly selectableScreens: ko.Observable<ElectronDesktopCapturerSource[]>;
   readonly isSelfVerified: ko.Computed<boolean>;
@@ -82,7 +84,7 @@ export class CallingViewModel {
     mediaStreamHandler: MediaStreamHandler,
     permissionRepository: PermissionRepository,
     selfUser: ko.Observable<User>,
-    multitasking: any,
+    multitasking: Multitasking,
   ) {
     this.logger = getLogger('CallingViewModel');
     this.callingRepository = callingRepository;
@@ -160,6 +162,9 @@ export class CallingViewModel {
       },
       switchCameraInput: (call: Call, deviceId: string) => {
         this.mediaDevicesHandler.currentDeviceId.videoInput(deviceId);
+      },
+      switchScreenInput: (call: Call, deviceId: string) => {
+        this.mediaDevicesHandler.currentDeviceId.screenInput(deviceId);
       },
       toggleCamera: (call: Call) => {
         this.callingRepository.toggleCamera(call);

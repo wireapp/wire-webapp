@@ -59,8 +59,13 @@ import {UserRepository} from '../user/UserRepository';
 import {ContentViewModel} from '../view_model/ContentViewModel';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
 
+export interface Multitasking {
+  autoMinimize?: ko.Observable<boolean>;
+  isMinimized: ko.Observable<boolean> | (() => false);
+}
+
 interface ContentViewModelState {
-  multitasking: {isMinimized: ko.Observable<boolean> | (() => false)};
+  multitasking: Multitasking;
   state: () => string | false;
 }
 

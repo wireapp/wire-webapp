@@ -27,6 +27,8 @@ import {Call} from '../../calling/Call';
 import {Grid} from '../../calling/videoGridHandler';
 import {Conversation} from '../../entity/Conversation';
 import {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
+import {CallActions} from '../../view_model/CallingViewModel';
+import {Multitasking} from '../../notification/NotificationRepository';
 
 import 'Components/calling/deviceToggleButton';
 
@@ -35,9 +37,9 @@ interface Params {
   call: Call;
   conversation: ko.Observable<Conversation>;
   mediaDevicesHandler: MediaDevicesHandler;
-  multitasking: any;
+  multitasking: Multitasking;
   canShareScreen: boolean;
-  callActions: any;
+  callActions: CallActions;
   isMuted: ko.Observable<boolean>;
   isChoosingScreen: ko.Observable<boolean>;
 }
@@ -47,9 +49,9 @@ export class FullscreenVideoCalling {
   public call: Call;
   public conversation: ko.Observable<Conversation>;
   public mediaDevicesHandler: MediaDevicesHandler;
-  public multitasking: any;
+  public multitasking: Multitasking;
   public canShareScreen: boolean;
-  public callActions: any;
+  public callActions: CallActions;
   public isMuted: ko.Observable<boolean>;
   public isChoosingScreen: ko.Observable<boolean>;
 
