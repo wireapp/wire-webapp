@@ -108,10 +108,6 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
 
       this.backupRepository
         .generateHistory(this.onProgress.bind(this))
-        .then(archive => {
-          this.state(HistoryExportViewModel.STATE.COMPRESSING);
-          return archive.generateAsync({compression: 'DEFLATE', type: 'blob'});
-        })
         .then(archiveBlob => {
           this.onSuccess(archiveBlob);
           this.logger.log(`Completed export of '${numberOfRecords}' records from history`);
