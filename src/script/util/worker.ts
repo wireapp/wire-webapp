@@ -18,15 +18,18 @@
  */
 
 export class WebWorker {
-  post: (data: string | ArrayBuffer) => Promise<ArrayBuffer>;
+  private readonly uri: string;
+
   constructor(uri: string) {
-    this.post = data => {
-      return new Promise((resolve, reject) => {
-        const worker = new Worker(uri);
-        worker.onmessage = event => resolve(event.data);
-        worker.onerror = error => reject(error);
-        worker.postMessage(data);
-      });
-    };
+    this.uri = uri;
+  }
+
+  post<T>(data: string | ArrayBuffer): Promise<T> {
+    return new Promise((resolve, reject) => {
+      const worker = new Worker(this.uri);
+      worker.onmessage = event => resolve(event.data);
+      worker.onerror = error => reject(error);
+      worker.postMessage(data);
+    });
   }
 }

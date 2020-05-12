@@ -19,13 +19,12 @@
 
 import {MemoryEngine} from '@wireapp/store-engine';
 import {Cryptobox} from '@wireapp/cryptobox';
-import {GenericMessage, Text} from '@wireapp/protocol-messaging';
+import {GenericMessage, Text, Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import * as Proteus from '@wireapp/proteus';
 
 import {createRandomUuid, arrayToBase64} from 'Util/util';
 
-import {AssetUploadFailedReason} from 'src/script/assets/AssetUploadFailedReason';
 import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 import {ClientEvent} from 'src/script/event/Client';
 import {BackendEvent} from 'src/script/event/Backend';
@@ -34,8 +33,8 @@ import {EventRepository} from 'src/script/event/EventRepository';
 import {NotificationService} from 'src/script/event/NotificationService';
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 import {ClientEntity} from 'src/script/client/ClientEntity';
-import {TestFactory} from '../../helper/TestFactory';
 import {EventError} from 'src/script/error/EventError';
+import {TestFactory} from '../../helper/TestFactory';
 
 const testFactory = new TestFactory();
 
@@ -615,7 +614,7 @@ describe('EventRepository', () => {
         const assetAddEvent = {...event, from, type: ClientEvent.CONVERSATION.ASSET_ADD};
         const assetCancelEvent = {
           ...assetAddEvent,
-          data: {reason: AssetUploadFailedReason.CANCELLED, status: AssetTransferState.UPLOAD_FAILED},
+          data: {reason: ProtobufAsset.NotUploaded.CANCELLED, status: AssetTransferState.UPLOAD_FAILED},
           time: '2017-09-06T09:43:36.528Z',
         };
 
@@ -635,7 +634,7 @@ describe('EventRepository', () => {
       const assetAddEvent = {...event, type: ClientEvent.CONVERSATION.ASSET_ADD};
       const assetUploadFailedEvent = {
         ...assetAddEvent,
-        data: {reason: AssetUploadFailedReason.FAILED, status: AssetTransferState.UPLOAD_FAILED},
+        data: {reason: ProtobufAsset.NotUploaded.FAILED, status: AssetTransferState.UPLOAD_FAILED},
         time: '2017-09-06T09:43:36.528Z',
       };
 
@@ -652,7 +651,7 @@ describe('EventRepository', () => {
       const assetAddEvent = {...event, type: ClientEvent.CONVERSATION.ASSET_ADD};
       const assetUploadFailedEvent = {
         ...assetAddEvent,
-        data: {reason: AssetUploadFailedReason.FAILED, status: AssetTransferState.UPLOAD_FAILED},
+        data: {reason: ProtobufAsset.NotUploaded.FAILED, status: AssetTransferState.UPLOAD_FAILED},
         time: '2017-09-06T09:43:36.528Z',
       };
 

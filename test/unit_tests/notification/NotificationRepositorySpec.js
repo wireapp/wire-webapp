@@ -19,6 +19,7 @@
 
 import {amplify} from 'amplify';
 import {Availability} from '@wireapp/protocol-messaging';
+import {NotificationPreference} from '@wireapp/api-client/dist/user/data';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {t} from 'Util/LocalizerUtil';
@@ -42,7 +43,6 @@ import {PingMessage} from 'src/script/entity/message/PingMessage';
 
 import {TERMINATION_REASON} from 'src/script/calling/enum/TerminationReason';
 import {NotificationRepository} from 'src/script/notification/NotificationRepository';
-import {NotificationPreference} from 'src/script/notification/NotificationPreference';
 import {PermissionStatusState} from 'src/script/permission/PermissionStatusState';
 import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
 import {ConversationType} from 'src/script/conversation/ConversationType';

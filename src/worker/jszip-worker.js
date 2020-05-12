@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2020 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,19 @@
  *
  */
 
-export enum ReactionType {
-  LIKE = '❤️',
-  NONE = '',
-}
+importScripts('jszip.min.js');
+
+self.addEventListener('message', async event => {
+  try {
+    const archive = await JSZip.loadAsync(event.data);
+    const files = {};
+    for (const fileName in archive.files) {
+      files[fileName] = await archive.files[fileName].async('uint8array');
+    }
+    self.postMessage(files);
+  } catch (error) {
+    self.postMessage({error: error.message});
+  }
+
+  return self.close();
+});
