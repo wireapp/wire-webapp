@@ -41,7 +41,8 @@ import {
 import {flatten} from 'underscore';
 import {ConnectionStatus} from '@wireapp/api-client/dist/connection';
 import {RequestCancellationError} from '@wireapp/api-client/dist/user';
-import {DefaultConversationRoleName as DefaultRole, ReactionType} from '@wireapp/api-client/dist/conversation';
+import {DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/dist/conversation';
+import {ReactionType} from '@wireapp/core/dist/conversation';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {getLogger} from 'Util/Logger';
