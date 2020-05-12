@@ -111,7 +111,14 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
     this.error(null);
     const buffer = await loadFileBuffer(file);
     const worker = new WebWorker('worker/jszip-worker.js');
-    const files = await worker.post(buffer);
+
+    let files;
+
+    try {
+      files = await worker.post(buffer);
+    } catch (error) {
+      return this.onError(error);
+    }
 
     try {
       await this.backupRepository.importHistory(files, this.onInit.bind(this), this.onProgress.bind(this));
