@@ -18,7 +18,7 @@
  */
 
 import Dexie from 'dexie';
-import JSZip, {JSZipObject} from 'jszip';
+import JSZip from 'jszip';
 
 import {chunk} from 'Util/ArrayUtil';
 import {Logger, getLogger} from 'Util/Logger';
@@ -217,19 +217,21 @@ export class BackupRepository {
   }
 
   public async importHistory(
-    archive: JSZip,
+    files: Record<string, Uint8Array>,
     initCallback: (numberOfRecords: number) => void,
     progressCallback: (numberProcessed: number) => void,
   ): Promise<void> {
     this.isCanceled = false;
-    const files = archive.files;
     if (!files[BackupRepository.CONFIG.FILENAME.METADATA]) {
       throw new window.z.backup.InvalidMetaDataError();
     }
 
     try {
       await this.verifyMetadata(files);
-      const fileDescriptors = await this._extractHistoryFiles(files);
+      const fileDescriptors = Object.entries(files).map(([filename, content]) => ({
+        content,
+        filename,
+      }));
       await this._importHistoryData(fileDescriptors, initCallback, progressCallback);
     } catch (error) {
       this.logger.error(`Could not export history: ${error.message}`, error);
@@ -314,19 +316,6 @@ export class BackupRepository {
     }
   }
 
-  private async _extractHistoryFiles(files: Record<string, JSZipObject>): Promise<FileDescriptor[]> {
-    const unzipPromises = Object.values(files)
-      .filter(zippedFile => zippedFile.name !== BackupRepository.CONFIG.FILENAME.METADATA)
-      .map(async zippedFile => {
-        const fileContent = await zippedFile.async('uint8array');
-        return {content: fileContent, filename: zippedFile.name};
-      });
-
-    const fileDescriptors = await Promise.all(unzipPromises);
-    this.logger.log('Unzipped files for history import', fileDescriptors);
-    return fileDescriptors;
-  }
-
   public mapEntityDataType(entity: any): any {
     if (entity.data) {
       BackupRepository.CONFIG.UINT8ARRAY_FIELDS.forEach(field => {
@@ -339,12 +328,12 @@ export class BackupRepository {
     return entity;
   }
 
-  public async verifyMetadata(files: Record<string, JSZipObject>): Promise<void> {
-    const rawData = await files[BackupRepository.CONFIG.FILENAME.METADATA].async('uint8array');
+  public async verifyMetadata(files: Record<string, Uint8Array>): Promise<void> {
+    const rawData = files[BackupRepository.CONFIG.FILENAME.METADATA];
     const metaData = new TextDecoder().decode(rawData);
     const parsedMetaData = JSON.parse(metaData);
     this._verifyMetadata(parsedMetaData);
-    return this.logger.log('Validated metadata during history import', files);
+    this.logger.log('Validated metadata during history import', files);
   }
 
   private _verifyMetadata(archiveMetadata: Metadata): void {

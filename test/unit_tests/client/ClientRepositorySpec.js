@@ -17,11 +17,12 @@
  *
  */
 
+import {ClientType} from '@wireapp/api-client/dist/client/';
+
 import {User} from 'src/script/entity/User';
 import {Environment} from 'src/script/util/Environment';
 
 import {ClientRepository} from 'src/script/client/ClientRepository';
-import {ClientType} from 'src/script/client/ClientType';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {ClientMapper} from 'src/script/client/ClientMapper';
 import {ClientError} from 'src/script/error/ClientError';

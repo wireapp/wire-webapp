@@ -18,7 +18,7 @@
  */
 
 import ko from 'knockout';
-import {ConversationRole} from '@wireapp/api-client/dist/conversation/ConversationRole';
+import {DefaultConversationRoleName as DefaultRole, ConversationRole} from '@wireapp/api-client/dist/conversation';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {Conversation} from '../entity/Conversation';
@@ -27,11 +27,6 @@ import {TeamEntity} from '../team/TeamEntity';
 import {TeamRepository} from '../team/TeamRepository';
 import {ConversationRepository} from './ConversationRepository';
 import {ConversationService} from './ConversationService';
-
-export enum DefaultRole {
-  WIRE_ADMIN = 'wire_admin',
-  WIRE_MEMBER = 'wire_member',
-}
 
 export enum Permissions {
   renameConversation = 'modify_conversation_name',
