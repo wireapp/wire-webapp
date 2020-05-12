@@ -89,8 +89,8 @@ const SingleSignOnForm = ({
   const [shouldAutoLogin, setShouldAutoLogin] = useState(false);
 
   useEffect(() => {
-    const queryClientType = UrlUtil.hasURLParameter(QUERY_KEY.SSO_AUTO_LOGIN);
-    if (queryClientType === true && initialCode) {
+    const queryAutoLogin = UrlUtil.hasURLParameter(QUERY_KEY.SSO_AUTO_LOGIN);
+    if (queryAutoLogin === true && initialCode) {
       setShouldAutoLogin(true);
     }
   }, []);
