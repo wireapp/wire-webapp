@@ -110,17 +110,14 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
     this.state(HistoryImportViewModel.STATE.PREPARING);
     this.error(null);
     const fileBuffer = await loadFileBuffer(file);
-    const worker = new WebWorker('worker/jszip-unpack-worker.js');
-
-    let files;
+    const worker = new WebWorker('worker/jszip-worker.js');
 
     try {
-      files = await worker.post(fileBuffer);
-    } catch (error) {
-      return this.onError(error);
-    }
-
-    try {
+      const files = await worker.post(fileBuffer);
+      if (files.error) {
+        throw new z.backup.ImportError(files.error);
+      }
+      this.logger.log('Unzipped files for history import', files);
       await this.backupRepository.importHistory(files, this.onInit.bind(this), this.onProgress.bind(this));
       this.onSuccess();
     } catch (error) {
