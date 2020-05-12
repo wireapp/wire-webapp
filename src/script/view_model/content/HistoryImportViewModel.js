@@ -156,7 +156,7 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
       return this.dismissImport();
     }
     this.error(error);
-    this.logger.error(`Failed to import history:`, error);
+    this.logger.error(`Failed to import history: ${error.message}`, error);
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.HISTORY.RESTORE_FAILED);
   }
 };
