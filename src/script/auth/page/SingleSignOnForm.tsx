@@ -65,9 +65,7 @@ const SingleSignOnForm = ({
   validateSSOCode,
   doLogin,
   doFinalizeSSOLogin,
-  doSendNavigationEvent,
   doGetDomainInfo,
-  doNavigate,
   doCheckConversationCode,
   doJoinConversationByCode,
 }: SingleSignOnFormProps & ConnectedProps & DispatchProps) => {
@@ -177,11 +175,7 @@ const SingleSignOnForm = ({
           null,
           query,
         );
-        if (isDesktopApp()) {
-          await doSendNavigationEvent(welcomeUrl);
-        } else {
-          doNavigate(welcomeUrl);
-        }
+        history.push(pathWithParams(ROUTE.CUSTOM_ENV_REDIRECT, {[QUERY_KEY.DESTINATION_URL]: welcomeUrl}));
       } else {
         const strippedCode = stripPrefix(codeOrMail);
         await validateSSOCode(strippedCode);
@@ -323,8 +317,6 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
       doGetAllClients: ROOT_ACTIONS.clientAction.doGetAllClients,
       doGetDomainInfo: ROOT_ACTIONS.authAction.doGetDomainInfo,
       doJoinConversationByCode: ROOT_ACTIONS.conversationAction.doJoinConversationByCode,
-      doNavigate: ROOT_ACTIONS.navigationAction.doNavigate,
-      doSendNavigationEvent: ROOT_ACTIONS.wrapperEventAction.doSendNavigationEvent,
       resetAuthError: ROOT_ACTIONS.authAction.resetAuthError,
       validateSSOCode: ROOT_ACTIONS.authAction.validateSSOCode,
     },

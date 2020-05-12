@@ -17,20 +17,23 @@
  *
  */
 
-import {ContainerXS} from '@wireapp/react-ui-kit';
+import {ContainerXS, FlexBox, WireIcon, RoundIconButton} from '@wireapp/react-ui-kit';
 import React, {useState, useEffect} from 'react';
 // import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
-import {RootState, bindActionCreators} from '../module/reducer';
+import {bindActionCreators} from '../module/reducer';
 import Page from './Page';
 import {UrlUtil} from '@wireapp/commons';
 import {QUERY_KEY} from '../route';
+import {actionRoot} from '../module/action';
+import {isDesktopApp} from '../Runtime';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
-const CustomEnvironmentRedirect = ({}: Props & ConnectedProps & DispatchProps) => {
+const CustomEnvironmentRedirect = ({doNavigate, doSendNavigationEvent}: Props & DispatchProps) => {
   // const {formatMessage: _} = useIntl();
+  const REDIRECT_DELAY = 5000;
 
   const [destinationUrl, setDestinationUrl] = useState(null);
 
@@ -42,9 +45,14 @@ const CustomEnvironmentRedirect = ({}: Props & ConnectedProps & DispatchProps) =
     let redirectTimeoutId: number;
     if (destinationUrl) {
       redirectTimeoutId = window.setTimeout(() => {
-        // console.log('destination', destinationUrl);
-        // window.location.assign(destinationUrl);
-      }, 5000);
+        if (isDesktopApp()) {
+          // console.log('destination desktop', destinationUrl);
+          doSendNavigationEvent(destinationUrl).catch(console.error);
+        } else {
+          // console.log('destination web', destinationUrl);
+          doNavigate(destinationUrl);
+        }
+      }, REDIRECT_DELAY);
     }
     return () => {
       window.clearTimeout(redirectTimeoutId);
@@ -53,22 +61,33 @@ const CustomEnvironmentRedirect = ({}: Props & ConnectedProps & DispatchProps) =
 
   return (
     <Page>
-      <ContainerXS
-        centerText
-        verticalCenter
-        style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
-      >
-        hallo
-        <div>{destinationUrl}</div>
-      </ContainerXS>
+      <FlexBox column>
+        <div style={{backgroundColor: 'black', height: '300px', width: '100vw'}}>
+          <RoundIconButton>
+            <WireIcon style={{backgroundColor: 'white', position: 'absolute'}} />
+          </RoundIconButton>
+        </div>
+        <ContainerXS
+          centerText
+          verticalCenter
+          style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
+        >
+          hallo
+          <div>{destinationUrl}</div>
+        </ContainerXS>
+      </FlexBox>
     </Page>
   );
 };
 
-type ConnectedProps = ReturnType<typeof mapStateToProps>;
-const mapStateToProps = (state: RootState) => ({});
-
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => bindActionCreators({}, dispatch);
+const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
+  bindActionCreators(
+    {
+      doNavigate: actionRoot.navigationAction.doNavigate,
+      doSendNavigationEvent: actionRoot.wrapperEventAction.doSendNavigationEvent,
+    },
+    dispatch,
+  );
 
-export default connect(mapStateToProps, mapDispatchToProps)(CustomEnvironmentRedirect);
+export default connect(null, mapDispatchToProps)(CustomEnvironmentRedirect);
