@@ -49,6 +49,7 @@ import {QUERY_KEY, ROUTE} from '../route';
 import {isDesktopApp} from '../Runtime';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {Redirect} from 'react-router';
+import {getSearchParams} from '../util/urlUtil';
 
 export interface SingleSignOnFormProps extends React.HTMLAttributes<HTMLDivElement> {
   doLogin: (code: string) => Promise<void>;
@@ -175,7 +176,15 @@ const SingleSignOnForm = ({
           null,
           query,
         );
-        history.push(pathWithParams(ROUTE.CUSTOM_ENV_REDIRECT, {[QUERY_KEY.DESTINATION_URL]: welcomeUrl}));
+
+        // This refreshes the page as we replace the whole URL.
+        // This works for now as we don't need anything from the state anymore at this point.
+        // Ideal would be to abandon the HashRouter (in the near future) and use something that
+        // allows us to pass search query parameters.
+        // https://reacttraining.com/react-router/web/api/HashRouter
+        window.location.assign(
+          `/auth?${getSearchParams({[QUERY_KEY.DESTINATION_URL]: welcomeUrl})}#${ROUTE.CUSTOM_ENV_REDIRECT}`,
+        );
       } else {
         const strippedCode = stripPrefix(codeOrMail);
         await validateSSOCode(strippedCode);

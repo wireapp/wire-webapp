@@ -35,6 +35,17 @@ export const footerStrings = defineMessages({
   },
 });
 
+export const customEnvRedirectStrings = defineMessages({
+  credentialsInfo: {
+    defaultMessage: 'Provide credentials only if you are sure is your Organization log in.',
+    id: 'customEnvRedirect.credentialsInfo',
+  },
+  redirectTo: {
+    defaultMessage: 'You are being redirected to',
+    id: 'customEnvRedirect.redirectTo',
+  },
+});
+
 export const cookiePolicyStrings = defineMessages({
   bannerText: {
     defaultMessage:
