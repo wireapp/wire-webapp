@@ -646,7 +646,8 @@ export class CallingRepository {
   ): number => {
     axios.post(url, data).then(response => {
       const {status, data} = response;
-      this.wCall.sftResp(this.wUser!, status, data, data.length, context);
+      const jsonData = JSON.stringify(data);
+      this.wCall.sftResp(this.wUser!, status, jsonData, jsonData.length, context);
     });
     return 0;
   };
