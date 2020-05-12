@@ -109,18 +109,15 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
   async importHistory(file) {
     this.state(HistoryImportViewModel.STATE.PREPARING);
     this.error(null);
-    const buffer = await loadFileBuffer(file);
+    const fileBuffer = await loadFileBuffer(file);
     const worker = new WebWorker('worker/jszip-worker.js');
 
-    let files;
-
     try {
-      files = await worker.post(buffer);
-    } catch (error) {
-      return this.onError(error);
-    }
-
-    try {
+      const files = await worker.post(fileBuffer);
+      if (files.error) {
+        throw new z.backup.ImportError(files.error);
+      }
+      this.logger.log('Unzipped files for history import', files);
       await this.backupRepository.importHistory(files, this.onInit.bind(this), this.onProgress.bind(this));
       this.onSuccess();
     } catch (error) {
@@ -159,7 +156,7 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
       return this.dismissImport();
     }
     this.error(error);
-    this.logger.error(`Failed to import history: ${error.message}`, error);
+    this.logger.error(`Failed to import history:`, error);
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.HISTORY.RESTORE_FAILED);
   }
 };
