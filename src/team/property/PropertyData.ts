@@ -19,8 +19,8 @@
 
 export interface PropertyData {
   properties: {
-    features: {
-      digital_signature_enabled: boolean;
+    features?: {
+      digital_signature_enabled?: boolean;
     };
   };
   version: number;
