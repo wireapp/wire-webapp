@@ -229,7 +229,7 @@ describe('CallingRepository', () => {
   });
 });
 
-describe('e2e audio call', () => {
+xdescribe('e2e audio call', () => {
   const conversationRepository = {
     find_conversation_by_id: () => new Conversation(),
     grantMessage: () => Promise.resolve(true),

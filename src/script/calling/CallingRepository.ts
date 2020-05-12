@@ -177,14 +177,6 @@ export class CallingRepository {
     return wCall;
   }
 
-  private sendSFTRequest(context: number, url: string, data: string, dataLength: number, _: number): number {
-    axios.post(url, data).then(response => {
-      const {status, data} = response;
-      this.wCall.sftResp(this.wUser!, status, data, data.length, context);
-    });
-    return 0;
-  }
-
   private createWUser(wCall: Wcall, selfUserId: string, selfClientId: string): number {
     /* cspell:disable */
     const wUser = wCall.create(
@@ -252,7 +244,7 @@ export class CallingRepository {
     return wUser;
   }
 
-  private async requestClients(wUser: number, conversationId: string, _: number) {
+  private async pushClients(conversationId: ConversationId) {
     try {
       await this.apiClient.conversation.api.postOTRMessage(this.selfClientId, conversationId);
     } catch (error) {
@@ -265,7 +257,7 @@ export class CallingRepository {
         const clientIds: string[] = entry[1];
         clientIds.forEach(clientId => data.clients.push({clientid: clientId, userid: userId}));
       });
-      this.wCall.setClientsForConv(wUser, conversationId, JSON.stringify(data));
+      this.wCall.setClientsForConv(this.wUser, conversationId, JSON.stringify(data));
     }
   }
 
@@ -645,6 +637,21 @@ export class CallingRepository {
     return 0;
   };
 
+  private readonly sendSFTRequest = (
+    context: number,
+    url: string,
+    data: string,
+    dataLength: number,
+    _: number,
+  ): number => {
+    axios.post(url, data).then(response => {
+      const {status, data} = response;
+      const jsonData = JSON.stringify(data);
+      this.wCall.sftResp(this.wUser!, status, jsonData, jsonData.length, context);
+    });
+    return 0;
+  };
+
   private readonly requestConfig = () => {
     const limit = Environment.browser.firefox ? CallingRepository.CONFIG.MAX_FIREFOX_TURN_COUNT : undefined;
     this.fetchConfig(limit)
@@ -752,6 +759,10 @@ export class CallingRepository {
       newMembers.forEach(participant => call.participants.unshift(participant));
       removedMembers.forEach(participant => call.participants.remove(participant));
     }
+  };
+
+  private readonly requestClients = (wUser: number, conversationId: ConversationId, _: number) => {
+    this.pushClients(conversationId);
   };
 
   private readonly getCallMediaStream = (
