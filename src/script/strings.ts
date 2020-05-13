@@ -29,10 +29,6 @@ export const footerStrings = defineMessages({
     defaultMessage: '© Wire Swiss GmbH',
     id: 'footer.copy',
   },
-  wireLink: {
-    defaultMessage: 'wire.com',
-    id: 'footer.wireLink',
-  },
 });
 
 export const customEnvRedirectStrings = defineMessages({
