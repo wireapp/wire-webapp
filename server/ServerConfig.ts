@@ -50,6 +50,7 @@ export interface ServerConfig {
       };
     };
     VERSION: string;
+    WEBSITE_LABEL: string;
   };
   COMMIT: string;
   SERVER: {

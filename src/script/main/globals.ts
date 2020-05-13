@@ -153,6 +153,7 @@ declare global {
           };
         };
         VERSION: string;
+        WEBSITE_LABEL: string;
       };
     };
     wSSOCapable: boolean;
