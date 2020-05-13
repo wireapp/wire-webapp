@@ -271,7 +271,7 @@ export class CallingRepository {
 
   private findParticipant(conversationId: ConversationId, userId: UserId): Participant | undefined {
     const call = this.findCall(conversationId);
-    return call?.participants().find(participant => participant.userId === userId);
+    return call?.getParticipant(userId);
   }
 
   private storeCall(call: Call): void {
@@ -756,8 +756,8 @@ export class CallingRepository {
           ({userId, deviceId}) => !members.find(({userid, clientid}) => userid === userId && clientid === deviceId),
         );
 
-      newMembers.forEach(participant => call.participants.unshift(participant));
-      removedMembers.forEach(participant => call.participants.remove(participant));
+      newMembers.forEach(participant => call.addParticipant(participant));
+      removedMembers.forEach(participant => call.removeParticipant(participant));
     }
   };
 
@@ -840,7 +840,8 @@ export class CallingRepository {
     let participant = this.findParticipant(conversationId, userId);
     if (!participant) {
       participant = new Participant(userId, deviceId);
-      this.findCall(conversationId).participants.unshift(participant);
+      const call = this.findCall(conversationId);
+      call.addParticipant(participant);
     }
 
     if (streams.length === 0) {
