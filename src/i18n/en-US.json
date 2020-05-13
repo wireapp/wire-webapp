@@ -447,7 +447,7 @@
   "guestRoomToggleInfo": "Open this conversation to services and people outside your team.",
   "guestRoomToggleInfoExtended": "Open this conversation to services and people outside your team. You can always change it later.",
   "guestRoomToggleName": "Allow guests and services",
-  "historyInfo.hasHistoryHeadline": "You’ve used Wire on this device before.",
+  "historyInfo.hasHistoryHeadline": "You’ve used {brandName} on this device before.",
   "historyInfo.hasHistoryInfo": "Messages sent in the meantime {newline}will not appear here.",
   "historyInfo.learnMore": "Learn more",
   "historyInfo.noHistoryHeadline": "It’s the first time you’re using {brandName} on this device.",
@@ -456,8 +456,8 @@
   "index.createAccount": "Create account",
   "index.createAccountForOrganizations": "Pro",
   "index.createAccountForPersonalUse": "Personal",
-  "index.createPersonalAccount": "Chat privately with groups of friends and family",
-  "index.createTeam": "Secure collaboration for businesses, institutions and professional organizations",
+  "index.createPersonalAccount": "create an account",
+  "index.createTeam": "create a team",
   "index.enterprise": "Enterprise Login",
   "index.login": "Log in",
   "index.loginInfo": "Already have an account?",
@@ -884,7 +884,7 @@
   "setPassword.button": "Set password",
   "setPassword.headline": "Set password",
   "setPassword.passwordPlaceholder": "Password",
-  "ssoLogin.codeInputPlaceholder": "SSO Code",
+  "ssoLogin.codeInputPlaceholder": "SSO access code",
   "ssoLogin.codeOrMailInputPlaceholder": "Email or SSO access code",
   "ssoLogin.headline": "Company log in",
   "ssoLogin.overlayDescription": "If you don't see the Single Sign On window, continue your Company Log in from here.",
@@ -995,5 +995,7 @@
   "wireLinux": "{{brandName}} for Linux",
   "wireMacos": "{{brandName}} for macOS",
   "wireWindows": "{{brandName}} for Windows",
-  "wire_for_web": "{{brandName}} for Web"
+  "wire_for_web": "{{brandName}} for Web",
+  "customEnvRedirect.credentialsInfo": "Provide credentials only if you are sure this is your Organization log in.",
+  "customEnvRedirect.redirectTo": "You are being redirected to"
 }
