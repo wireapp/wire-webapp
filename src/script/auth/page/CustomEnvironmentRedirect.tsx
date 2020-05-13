@@ -32,6 +32,7 @@ import {actionRoot} from '../module/action';
 import {isDesktopApp} from '../Runtime';
 import SVGProvider from '../util/SVGProvider';
 import {customEnvRedirectStrings} from '../../strings';
+import {afterRender} from 'Util/util';
 
 const REDIRECT_DELAY = 5000;
 const CustomEnvironmentRedirect = ({doNavigate, doSendNavigationEvent}: DispatchProps) => {
@@ -58,7 +59,7 @@ const CustomEnvironmentRedirect = ({doNavigate, doSendNavigationEvent}: Dispatch
           doNavigate(destinationUrl);
         }
       }, REDIRECT_DELAY);
-      window.requestAnimationFrame(() => setIsAnimating(true));
+      afterRender(() => setIsAnimating(true));
     }
     return () => {
       window.clearTimeout(redirectTimeoutId);
