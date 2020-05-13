@@ -47,10 +47,6 @@ export function pathWithParams(
   return `${path}${params.length ? `?${params}` : ''}`;
 }
 
-// export function getURLParameter(parameterName: string): string {
-//   return (window.location.search.split(`${parameterName}=`)[1] || '').split('&')[0];
-// }
-
 export function hasURLParameter(parameterName: string): boolean {
   return window.location.search
     .split(/\?|&/)
