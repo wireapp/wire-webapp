@@ -33,10 +33,8 @@ import {isDesktopApp} from '../Runtime';
 import SVGProvider from '../util/SVGProvider';
 import {customEnvRedirectStrings} from '../../strings';
 
-interface Props extends React.HTMLProps<HTMLDivElement> {}
-
 const REDIRECT_DELAY = 5000;
-const CustomEnvironmentRedirect = ({doNavigate, doSendNavigationEvent}: Props & DispatchProps) => {
+const CustomEnvironmentRedirect = ({doNavigate, doSendNavigationEvent}: DispatchProps) => {
   const {formatMessage: _} = useIntl();
 
   const [destinationUrl, setDestinationUrl] = useState(null);
