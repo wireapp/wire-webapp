@@ -88,7 +88,14 @@ const CustomEnvironmentRedirect = ({doNavigate, doSendNavigationEvent}: Dispatch
             <SVGIcon color={COLOR.WHITE} realWidth={47} realHeight={38}>
               <g dangerouslySetInnerHTML={{__html: SVGProvider['logo-icon']?.documentElement?.innerHTML}} />
             </SVGIcon>
-            <svg style={{position: 'absolute'}} width={124} height={124} viewBox="0 0 124 124" fill="none">
+            <svg
+              style={{position: 'absolute'}}
+              width={124}
+              height={124}
+              viewBox="0 0 124 124"
+              fill="none"
+              data-uie-name="redirection-timer"
+            >
               <circle
                 style={{
                   strokeDashoffset: isAnimating ? 0 : 377,
@@ -112,7 +119,7 @@ const CustomEnvironmentRedirect = ({doNavigate, doSendNavigationEvent}: Dispatch
           <Text block center>
             {_(customEnvRedirectStrings.redirectTo)}
           </Text>
-          <Bold block center>
+          <Bold block center data-uie-name="destination-url">
             {displayUrl}
           </Bold>
           <FlexBox
@@ -121,7 +128,7 @@ const CustomEnvironmentRedirect = ({doNavigate, doSendNavigationEvent}: Dispatch
             style={{backgroundColor: COLOR.BLUE_OPAQUE_16, borderRadius: 8, marginTop: 40, padding: '16px 24px'}}
           >
             <InfoIcon color={COLOR.BLUE} style={{marginBottom: 8}} />
-            <Text fontSize="14px" color={COLOR.BLUE}>
+            <Text fontSize="14px" color={COLOR.BLUE} data-uie-name="credentials-info">
               {_(customEnvRedirectStrings.credentialsInfo)}
             </Text>
           </FlexBox>
