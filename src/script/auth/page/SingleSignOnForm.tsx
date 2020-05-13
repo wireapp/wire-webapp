@@ -69,6 +69,7 @@ const SingleSignOnForm = ({
   doGetDomainInfo,
   doCheckConversationCode,
   doJoinConversationByCode,
+  doNavigate,
 }: SingleSignOnFormProps & ConnectedProps & DispatchProps) => {
   const codeOrMailInput = useRef<HTMLInputElement>();
   const [codeOrMail, setCodeOrMail] = useState('');
@@ -182,9 +183,7 @@ const SingleSignOnForm = ({
         // Ideal would be to abandon the HashRouter (in the near future) and use something that
         // allows us to pass search query parameters.
         // https://reacttraining.com/react-router/web/api/HashRouter
-        window.location.assign(
-          `/auth?${getSearchParams({[QUERY_KEY.DESTINATION_URL]: welcomeUrl})}#${ROUTE.CUSTOM_ENV_REDIRECT}`,
-        );
+        doNavigate(`/auth?${getSearchParams({[QUERY_KEY.DESTINATION_URL]: welcomeUrl})}#${ROUTE.CUSTOM_ENV_REDIRECT}`);
       } else {
         const strippedCode = stripPrefix(codeOrMail);
         await validateSSOCode(strippedCode);
@@ -326,6 +325,7 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
       doGetAllClients: ROOT_ACTIONS.clientAction.doGetAllClients,
       doGetDomainInfo: ROOT_ACTIONS.authAction.doGetDomainInfo,
       doJoinConversationByCode: ROOT_ACTIONS.conversationAction.doJoinConversationByCode,
+      doNavigate: ROOT_ACTIONS.navigationAction.doNavigate,
       resetAuthError: ROOT_ACTIONS.authAction.resetAuthError,
       validateSSOCode: ROOT_ACTIONS.authAction.validateSSOCode,
     },
