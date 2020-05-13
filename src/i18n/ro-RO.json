@@ -382,6 +382,8 @@
   "createAccount.nextButton": "Mai departe",
   "createPersonalAccount.headLine": "New account",
   "createPersonalAccount.nextButton": "Register",
+  "customEnvRedirect.credentialsInfo": "Provide credentials only if you are sure this is your Organization log in.",
+  "customEnvRedirect.redirectTo": "You are being redirected to",
   "enumerationAnd": ", și ",
   "ephemeralRemaining": "remaining",
   "ephemeralUnitsDay": "day",

@@ -382,6 +382,8 @@
   "createAccount.nextButton": "Далі",
   "createPersonalAccount.headLine": "Новий акаунт",
   "createPersonalAccount.nextButton": "Зареєструватися",
+  "customEnvRedirect.credentialsInfo": "Provide credentials only if you are sure this is your Organization log in.",
+  "customEnvRedirect.redirectTo": "You are being redirected to",
   "enumerationAnd": ", і ",
   "ephemeralRemaining": "залишилось",
   "ephemeralUnitsDay": "день",

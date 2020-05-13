@@ -382,6 +382,8 @@
   "createAccount.nextButton": "التالي",
   "createPersonalAccount.headLine": "حساب جديد",
   "createPersonalAccount.nextButton": "إنشاء حساب",
+  "customEnvRedirect.credentialsInfo": "Provide credentials only if you are sure this is your Organization log in.",
+  "customEnvRedirect.redirectTo": "You are being redirected to",
   "enumerationAnd": "، و ",
   "ephemeralRemaining": "متبقى",
   "ephemeralUnitsDay": "يوم",

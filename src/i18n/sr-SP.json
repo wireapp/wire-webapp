@@ -382,6 +382,8 @@
   "createAccount.nextButton": "Следећи",
   "createPersonalAccount.headLine": "Нови налог",
   "createPersonalAccount.nextButton": "Регистровати",
+  "customEnvRedirect.credentialsInfo": "Provide credentials only if you are sure this is your Organization log in.",
+  "customEnvRedirect.redirectTo": "You are being redirected to",
   "enumerationAnd": ", и",
   "ephemeralRemaining": "преостали",
   "ephemeralUnitsDay": "дан",
