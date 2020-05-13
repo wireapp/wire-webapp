@@ -17,7 +17,7 @@
  *
  */
 
-import {CloseIcon, Content, Footer, Header, Link, Small, Logo} from '@wireapp/react-ui-kit';
+import {CloseIcon, Content, Footer, Header, Link, Small} from '@wireapp/react-ui-kit';
 import React from 'react';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {cookiePolicyStrings, footerStrings} from '../../strings';
