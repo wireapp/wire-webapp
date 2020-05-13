@@ -382,7 +382,7 @@
   "createAccount.nextButton": "Weiter",
   "createPersonalAccount.headLine": "Neues Benutzerkonto",
   "createPersonalAccount.nextButton": "Registrieren",
-  "customEnvRedirect.credentialsInfo": "Provide credentials only if you are sure this is your Organization log in.",
+  "customEnvRedirect.credentialsInfo": "Provide credentials only if you're sure this is your organization's login.",
   "customEnvRedirect.redirectTo": "Sie werden weitergeleitet zu",
   "enumerationAnd": " und ",
   "ephemeralRemaining": "verbleibend",

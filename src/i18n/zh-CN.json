@@ -382,7 +382,7 @@
   "createAccount.nextButton": "继续",
   "createPersonalAccount.headLine": "新建账户",
   "createPersonalAccount.nextButton": "注册",
-  "customEnvRedirect.credentialsInfo": "Provide credentials only if you are sure this is your Organization log in.",
+  "customEnvRedirect.credentialsInfo": "Provide credentials only if you're sure this is your organization's login.",
   "customEnvRedirect.redirectTo": "You are being redirected to",
   "enumerationAnd": "，和 ",
   "ephemeralRemaining": "还剩",
