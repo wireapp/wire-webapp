@@ -382,6 +382,8 @@
   "createAccount.nextButton": "İleri",
   "createPersonalAccount.headLine": "Yeni hesap",
   "createPersonalAccount.nextButton": "Üye ol",
+  "customEnvRedirect.credentialsInfo": "Provide credentials only if you are sure this is your Organization log in.",
+  "customEnvRedirect.redirectTo": "You are being redirected to",
   "enumerationAnd": ", ve ",
   "ephemeralRemaining": "kalan",
   "ephemeralUnitsDay": "gün",

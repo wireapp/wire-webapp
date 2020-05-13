@@ -382,6 +382,8 @@
   "createAccount.nextButton": "Volgende",
   "createPersonalAccount.headLine": "New account",
   "createPersonalAccount.nextButton": "Registreer",
+  "customEnvRedirect.credentialsInfo": "Provide credentials only if you are sure this is your Organization log in.",
+  "customEnvRedirect.redirectTo": "You are being redirected to",
   "enumerationAnd": ", en ",
   "ephemeralRemaining": "remaining",
   "ephemeralUnitsDay": "day",
