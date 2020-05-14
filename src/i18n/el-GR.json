@@ -382,6 +382,8 @@
   "createAccount.nextButton": "Επόμενο",
   "createPersonalAccount.headLine": "New account",
   "createPersonalAccount.nextButton": "Εγγραφή",
+  "customEnvRedirect.credentialsInfo": "Provide credentials only if you're sure this is your organization's login.",
+  "customEnvRedirect.redirectTo": "You are being redirected to",
   "enumerationAnd": ", και ",
   "ephemeralRemaining": "remaining",
   "ephemeralUnitsDay": "day",

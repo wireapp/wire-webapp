@@ -23,7 +23,7 @@ import sodium from 'libsodium-wrappers-sumo';
 import UUID from 'pure-uuid';
 
 import {QUERY_KEY} from '../auth/route';
-import * as URLUtil from '../auth/util/urlUtil';
+import {UrlUtil} from '@wireapp/commons';
 import {Config} from '../Config';
 import {Conversation} from '../entity/Conversation';
 import {StorageKey} from '../storage/StorageKey';
@@ -37,7 +37,7 @@ export const isTemporaryClientAndNonPersistent = (persist: boolean): boolean => 
     throw new Error('Type of client is unspecified.');
   }
 
-  const isNonPersistentByUrl = URLUtil.getURLParameter(QUERY_KEY.PERSIST_TEMPORARY_CLIENTS) === 'false';
+  const isNonPersistentByUrl = UrlUtil.getURLParameter(QUERY_KEY.PERSIST_TEMPORARY_CLIENTS) === 'false';
   const isNonPersistentByServerConfig = Config.getConfig().FEATURE?.PERSIST_TEMPORARY_CLIENTS === false;
   const isNonPersistent = isNonPersistentByUrl || isNonPersistentByServerConfig;
 

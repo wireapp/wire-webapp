@@ -175,6 +175,7 @@ const config: ServerConfig = {
       WEBSITE_BASE: process.env.URL_WEBSITE_BASE,
     },
     VERSION: readFile(VERSION_FILE, '0.0.0'),
+    WEBSITE_LABEL: process.env.WEBSITE_LABEL,
   },
   COMMIT: readFile(COMMIT_FILE, ''),
   SERVER: {

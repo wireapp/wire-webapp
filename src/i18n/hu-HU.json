@@ -382,6 +382,8 @@
   "createAccount.nextButton": "Tovább",
   "createPersonalAccount.headLine": "Új fiók",
   "createPersonalAccount.nextButton": "Regisztráció",
+  "customEnvRedirect.credentialsInfo": "Provide credentials only if you're sure this is your organization's login.",
+  "customEnvRedirect.redirectTo": "You are being redirected to",
   "enumerationAnd": "és ",
   "ephemeralRemaining": "fennmaradó",
   "ephemeralUnitsDay": "nap",

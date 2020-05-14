@@ -880,7 +880,7 @@ export class CallingRepository {
     payload: string,
     remoteUserId: UserId | null,
     remoteClientId: DeviceId | null,
-  ): {precondition: any; recipients: any} {
+  ): {precondition?: boolean | string[]; recipients: Record<string, string[]>} {
     const {type, resp} = JSON.parse(payload);
     let precondition;
     let recipients;

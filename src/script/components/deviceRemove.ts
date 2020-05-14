@@ -32,8 +32,8 @@ class DeviceRemove {
   model?: string;
   params: DeviceRemoveParams;
   password: ko.Observable<string>;
-  passwordSubscription: any;
-  remove_form_visible: any;
+  passwordSubscription: ko.Subscription;
+  remove_form_visible: ko.Observable<boolean>;
 
   constructor(params: DeviceRemoveParams) {
     this.params = params;

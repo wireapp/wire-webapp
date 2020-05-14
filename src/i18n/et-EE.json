@@ -382,6 +382,8 @@
   "createAccount.nextButton": "Järgmine",
   "createPersonalAccount.headLine": "Uus konto",
   "createPersonalAccount.nextButton": "Registreeru",
+  "customEnvRedirect.credentialsInfo": "Provide credentials only if you're sure this is your organization's login.",
+  "customEnvRedirect.redirectTo": "You are being redirected to",
   "enumerationAnd": " ja ",
   "ephemeralRemaining": "on jäänud",
   "ephemeralUnitsDay": "päev",

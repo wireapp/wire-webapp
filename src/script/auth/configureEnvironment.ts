@@ -19,10 +19,6 @@
 
 const jQuery = require('jquery');
 import {amplify} from 'amplify';
-import * as bazinga64 from 'bazinga64';
-import * as platform from 'platform';
-
-import {noop} from 'Util/util';
 
 import '../event/Client';
 import '../message/MessageCategorization';
@@ -31,11 +27,5 @@ import '../service/BackendEnvironment';
 import '../storage/StorageSchemata';
 
 window.amplify = amplify;
-window.bazinga64 = bazinga64;
-window.platform = platform;
 window.jQuery = jQuery;
 window.$ = jQuery;
-
-const configureEnvironment = noop;
-
-export {configureEnvironment};

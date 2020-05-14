@@ -382,6 +382,8 @@
   "createAccount.nextButton": "Další",
   "createPersonalAccount.headLine": "Nový účet",
   "createPersonalAccount.nextButton": "Registrovat se",
+  "customEnvRedirect.credentialsInfo": "Provide credentials only if you're sure this is your organization's login.",
+  "customEnvRedirect.redirectTo": "You are being redirected to",
   "enumerationAnd": ", a ",
   "ephemeralRemaining": "remaining",
   "ephemeralUnitsDay": "day",
