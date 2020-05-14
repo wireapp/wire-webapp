@@ -55,6 +55,9 @@ export class Call {
   }
 
   addParticipant(participant: Participant): void {
+    if (participant.deviceId === 'sft' && participant.userId === 'sft') {
+      return;
+    }
     this.participants.unshift(participant);
   }
 
