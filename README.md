@@ -42,6 +42,20 @@ Alternatively, you can test specific parts of the app:
 
 `yarn test:(server|types|app)`
 
+### Development
+
+#### Bypass Chrome's security restrictions for local development
+
+1. Add the following entry to your hosts file: `127.0.0.1 webapp.zinfra.io`
+1. Open `chrome://flags/#unsafely-treat-insecure-origin-as-secure`
+1. Add `http://webapp.zinfra.io:8081` to the list of "Insecure origins treated as secure"
+1. Restart your browser with: `open -a Google\ Chrome --args --disable-web-security --user-data-dir=/Users/your-name/your-chrome-data --ignore-certificate-errors`
+
+Host file location:
+
+- On macOS the hosts file can be found at: `/etc/hosts`
+- On Windows 10 the hosts file can be found at: `%WINDIR%\system32\drivers\etc\hosts`
+
 ### Deployment
 
 #### General workflow
