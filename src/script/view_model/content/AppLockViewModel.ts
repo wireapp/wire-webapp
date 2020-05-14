@@ -22,15 +22,15 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import sodium from 'libsodium-wrappers-sumo';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {UrlUtil} from '@wireapp/commons';
 
 import {t} from 'Util/LocalizerUtil';
 import {afterRender} from 'Util/util';
 import {QUERY_KEY} from '../../auth/route';
 import {SIGN_OUT_REASON} from '../../auth/SignOutReason';
-import {UrlUtil} from '@wireapp/commons';
-import {ClientRepository} from '../../client/ClientRepository';
+import type {ClientRepository} from '../../client/ClientRepository';
 import {Config} from '../../Config';
-import {User} from '../../entity/User';
+import type {User} from '../../entity/User';
 
 export enum APPLOCK_STATE {
   NONE = 'applock.none',

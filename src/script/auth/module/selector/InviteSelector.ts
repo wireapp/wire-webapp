@@ -17,7 +17,7 @@
  *
  */
 
-import {RootState} from '../reducer';
+import type {RootState} from '../reducer';
 
 export const getInvites = (state: RootState) => state.inviteState.invites;
 export const getError = (state: RootState) => state.inviteState.error;

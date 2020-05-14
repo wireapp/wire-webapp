@@ -17,7 +17,7 @@
  *
  */
 
-import {User} from '../../entity/User';
+import type {User} from '../../entity/User';
 
 interface ComponentParams {
   users: ko.PureComputed<User[]>;

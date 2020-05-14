@@ -19,12 +19,13 @@
 
 import * as Events from '@wireapp/api-client/dist/event';
 import {ConnectionState, HttpClient} from '@wireapp/api-client/dist/http';
-import {Notification} from '@wireapp/api-client/dist/notification';
+import type {Notification} from '@wireapp/api-client/dist/notification';
 import {PayloadBundle, PayloadBundleSource, PayloadBundleType} from '@wireapp/core/dist/conversation/';
-import {UserUpdateMessage} from '@wireapp/core/dist/conversation/message/UserMessage';
+import type {UserUpdateMessage} from '@wireapp/core/dist/conversation/message/UserMessage';
 import {UserMapper} from '@wireapp/core/dist/user/UserMapper';
+
 import {getLogger} from 'Util/Logger';
-import {ThunkAction} from '../../module/reducer';
+import type {ThunkAction} from '../../module/reducer';
 import * as SelfSelector from '../../module/selector/SelfSelector';
 
 export class WebSocketAction {

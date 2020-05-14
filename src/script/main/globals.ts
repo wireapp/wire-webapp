@@ -20,12 +20,12 @@
 import {amplify} from 'amplify';
 import jQuery from 'jquery';
 import ko from 'knockout';
-import {RaygunStatic} from 'raygun4js';
+import type {RaygunStatic} from 'raygun4js';
 import 'raygun4js/dist/raygun.vanilla';
-import {t} from 'Util/LocalizerUtil';
+import type {t} from 'Util/LocalizerUtil';
 
-import {AssetService} from '../assets/AssetService';
-import {NotificationService} from '../event/NotificationService';
+import type {AssetService} from '../assets/AssetService';
+import type {NotificationService} from '../event/NotificationService';
 
 import '../Config';
 

@@ -17,8 +17,8 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client';
-import {
+import type {APIClient} from '@wireapp/api-client';
+import type {
   CONVERSATION_ACCESS,
   CONVERSATION_ACCESS_ROLE,
   ClientMismatch,
@@ -27,12 +27,12 @@ import {
   NewConversation,
   NewOTRMessage,
 } from '@wireapp/api-client/dist/conversation';
-import {
+import type {
   ConversationMemberUpdateData,
   ConversationOtherMemberUpdateData,
   ConversationReceiptModeUpdateData,
 } from '@wireapp/api-client/dist/conversation/data';
-import {
+import type {
   ConversationCodeDeleteEvent,
   ConversationCodeUpdateEvent,
   ConversationEvent,
@@ -45,11 +45,11 @@ import {
 
 import {Logger, getLogger} from 'Util/Logger';
 
-import {Conversation as ConversationEntity} from '../entity/Conversation';
-import {EventService} from '../event/EventService';
+import type {Conversation as ConversationEntity} from '../entity/Conversation';
+import type {EventService} from '../event/EventService';
 import {MessageCategory} from '../message/MessageCategory';
 import {search as fullTextSearch} from '../search/FullTextSearch';
-import {StorageService} from '../storage';
+import type {StorageService} from '../storage';
 import {StorageSchemata} from '../storage/StorageSchemata';
 
 export class ConversationService {

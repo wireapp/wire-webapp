@@ -18,6 +18,7 @@
  */
 
 import ko from 'knockout';
+
 import {t} from 'Util/LocalizerUtil';
 
 interface GuestModeToggleParams {

@@ -17,7 +17,7 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client';
+import type {APIClient} from '@wireapp/api-client';
 
 class PropertiesService {
   private readonly apiClient: APIClient;

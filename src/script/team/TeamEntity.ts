@@ -21,7 +21,7 @@ import ko from 'knockout';
 
 import {AssetRemoteData} from '../assets/AssetRemoteData';
 import {assetV3} from '../util/ValidationUtil';
-import {User} from '../entity/User';
+import type {User} from '../entity/User';
 
 export class TeamEntity {
   creator?: string;

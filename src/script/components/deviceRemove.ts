@@ -18,7 +18,8 @@
  */
 
 import ko from 'knockout';
-import {ClientEntity} from '../client/ClientEntity';
+
+import type {ClientEntity} from '../client/ClientEntity';
 
 interface DeviceRemoveParams {
   cancel?: () => void;

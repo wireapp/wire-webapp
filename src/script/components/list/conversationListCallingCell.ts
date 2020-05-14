@@ -32,13 +32,13 @@ import {generateConversationUrl} from '../../router/routeGenerator';
 import 'Components/calling/fullscreenVideoCall';
 import 'Components/groupVideoGrid';
 import 'Components/list/participantItem';
-import {Call} from '../../calling/Call';
-import {CallingRepository} from '../../calling/CallingRepository';
-import {Grid} from '../../calling/videoGridHandler';
-import {Conversation} from '../../entity/Conversation';
-import {User} from '../../entity/User';
-import {CallActions} from '../../view_model/CallingViewModel';
-import {Multitasking} from '../../notification/NotificationRepository';
+import type {Call} from '../../calling/Call';
+import type {CallingRepository} from '../../calling/CallingRepository';
+import type {Grid} from '../../calling/videoGridHandler';
+import type {Conversation} from '../../entity/Conversation';
+import type {User} from '../../entity/User';
+import type {CallActions} from '../../view_model/CallingViewModel';
+import type {Multitasking} from '../../notification/NotificationRepository';
 
 interface ComponentParams {
   call: Call;

@@ -17,8 +17,8 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client';
-import {
+import type {APIClient} from '@wireapp/api-client';
+import type {
   GiphySearchOptions,
   GiphyMultipleResult,
   GiphyResult,

@@ -17,18 +17,19 @@
  *
  */
 
-import {Action} from 'redux';
-import {AuthActions} from './AuthActionCreator';
-import {ClientActions} from './ClientActionCreator';
-import {ConversationActions} from './ConversationActionCreator';
-import {CookieActions} from './CookieActionCreator';
-import {InvitationActions} from './InvitationActionCreator';
-import {LanguageActions} from './LanguageActionCreator';
-import {LocalStorageActions} from './LocalStorageActionCreator';
-import {NotificationActions} from './NotificationActionCreator';
-import {RuntimeActions} from './RuntimeActionCreator';
-import {SelfActions} from './SelfActionCreator';
-import {UserActions} from './UserActionCreator';
+import type {Action} from 'redux';
+
+import type {AuthActions} from './AuthActionCreator';
+import type {ClientActions} from './ClientActionCreator';
+import type {ConversationActions} from './ConversationActionCreator';
+import type {CookieActions} from './CookieActionCreator';
+import type {InvitationActions} from './InvitationActionCreator';
+import type {LanguageActions} from './LanguageActionCreator';
+import type {LocalStorageActions} from './LocalStorageActionCreator';
+import type {NotificationActions} from './NotificationActionCreator';
+import type {RuntimeActions} from './RuntimeActionCreator';
+import type {SelfActions} from './SelfActionCreator';
+import type {UserActions} from './UserActionCreator';
 
 export interface AppAction extends Action {
   type: string;

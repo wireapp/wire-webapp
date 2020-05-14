@@ -17,9 +17,9 @@
  *
  */
 
-const codeBlockRegex = /(`+)[^`]*?\1$/gm;
 import Linkify from 'linkify-it';
 
+const codeBlockRegex = /(`+)[^`]*?\1$/gm;
 const linkify = new Linkify();
 
 /**
