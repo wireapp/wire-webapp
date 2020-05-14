@@ -44,7 +44,7 @@ Alternatively, you can test specific parts of the app:
 
 ### Development
 
-#### Bypass Chrome's security restrictions for local development
+Bypass Chrome's security restrictions for local development:
 
 1. Add the following entry to your hosts file: `127.0.0.1 webapp.zinfra.io`
 1. Open `chrome://flags/#unsafely-treat-insecure-origin-as-secure`
