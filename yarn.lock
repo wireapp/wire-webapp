@@ -1855,20 +1855,6 @@
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-4.6.3.tgz#39ae14430d62e410ec5f1d5f3dbe222bd2d048bb"
   integrity sha512-EHRhYUt5JMiwnXB6Vz4BxT1wsrCcg9K7olFhwxPLV1WEtJrf2gAKbg2p66Qv2kOFiE8A9VaoqWPZSeBofpVUYg==
 
-"@wireapp/commons@3.4.0":
-  version "3.4.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-3.4.0.tgz#c295fe50fb82fe641293d57f394b71a7ec3a823e"
-  integrity sha512-NNK2iK5JIKkOCk+WFfr/8+vI2BDWKehlWwrK3bhiXveo/bzm32ROUK/+tZ8doHeguj5SLqNmzkk2GFxBEVCg5w==
-  dependencies:
-    "@types/fs-extra" "8.1.0"
-    "@types/node" "~12"
-    "@types/platform" "1.3.2"
-    ansi-regex "5.0.0"
-    fs-extra "9.0.0"
-    logdown "3.3.1"
-    platform "1.3.5"
-    url-search-params-polyfill "8.0.0"
-
 "@wireapp/commons@3.5.2":
   version "3.5.2"
   resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-3.5.2.tgz#9f13329e77db60cbaaf61eac6acb8eefe8ce99be"
