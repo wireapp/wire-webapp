@@ -75,7 +75,7 @@ export class CallingRepository {
   private readonly eventRepository: EventRepository;
   private readonly mediaStreamHandler: MediaStreamHandler;
   private readonly serverTimeHandler: ServerTimeHandler;
-  private callQuality: {[conversationId: string]: QUALITY | undefined} = {};
+  private poorCallQualityUsers: {[conversationId: string]: string[]} = {};
 
   private avsVersion: number;
   private incomingCallCallback: (call: Call) => void;
@@ -195,51 +195,65 @@ export class CallingRepository {
     );
     /* cspell:enable */
     const tenSeconds = 10;
-    wCall.setNetworkQualityHandler(
-      wUser,
-      (conversationId: string, userId: string, clientId: string, quality: number) => {
-        if (this.callQuality[conversationId] === quality) {
-          return;
-        }
-
-        this.callQuality[conversationId] = quality;
-
-        switch (quality) {
-          case QUALITY.NORMAL: {
-            amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.CALL_QUALITY_POOR);
-            this.logger.log(
-              `Normal call quality with user "${userId}" and client "${clientId}" in conversation "${conversationId}".`,
-            );
-            break;
-          }
-          case QUALITY.MEDIUM: {
-            this.logger.warn(
-              `Medium call quality with user "${userId}" and client "${clientId}" in conversation "${conversationId}".`,
-            );
-            break;
-          }
-          case QUALITY.POOR: {
-            this.logger.warn(
-              `Poor call quality with user "${userId}" and client "${clientId}" in conversation "${conversationId}".`,
-            );
-            break;
-          }
-          case QUALITY.NETWORK_PROBLEM: {
-            this.logger.warn(
-              `Network problem during call with user "${userId}" and client "${clientId}" in conversation "${conversationId}".`,
-            );
-            break;
-          }
-        }
-      },
-      tenSeconds,
-    );
+    wCall.setNetworkQualityHandler(wUser, this.updateCallQuality, tenSeconds);
     wCall.setMuteHandler(wUser, this.isMuted);
     wCall.setStateHandler(wUser, this.updateCallState);
     wCall.setParticipantChangedHandler(wUser, this.updateCallParticipants);
 
     return wUser;
   }
+
+  updateCallQuality = (conversationId: string, userId: string, clientId: string, quality: number) => {
+    const call = this.findCall(conversationId);
+    if (!call) {
+      return;
+    }
+
+    if (!this.poorCallQualityUsers[conversationId]) {
+      this.poorCallQualityUsers[conversationId] = [];
+    }
+
+    let users = this.poorCallQualityUsers[conversationId];
+    const isOldPoorCallQualityUser = users.some(_userId => _userId === userId);
+    if (isOldPoorCallQualityUser && quality !== QUALITY.POOR) {
+      users = users.filter(_userId => _userId !== userId);
+    }
+    if (!isOldPoorCallQualityUser && quality === QUALITY.POOR) {
+      users = [...users, userId];
+    }
+    if (users.length === call.participants.length) {
+      amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.CALL_QUALITY_POOR);
+    } else {
+      amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.CALL_QUALITY_POOR);
+    }
+
+    switch (quality) {
+      case QUALITY.NORMAL: {
+        this.logger.log(
+          `Normal call quality with user "${userId}" and client "${clientId}" in conversation "${conversationId}".`,
+        );
+        break;
+      }
+      case QUALITY.MEDIUM: {
+        this.logger.warn(
+          `Medium call quality with user "${userId}" and client "${clientId}" in conversation "${conversationId}".`,
+        );
+        break;
+      }
+      case QUALITY.POOR: {
+        this.logger.warn(
+          `Poor call quality with user "${userId}" and client "${clientId}" in conversation "${conversationId}".`,
+        );
+        break;
+      }
+      case QUALITY.NETWORK_PROBLEM: {
+        this.logger.warn(
+          `Network problem during call with user "${userId}" and client "${clientId}" in conversation "${conversationId}".`,
+        );
+        break;
+      }
+    }
+  };
 
   onIncomingCall(callback: (call: Call) => void): void {
     this.incomingCallCallback = callback;
@@ -489,7 +503,7 @@ export class CallingRepository {
 
   leaveCall(conversationId: ConversationId): void {
     amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.CALL_QUALITY_POOR);
-    delete this.callQuality[conversationId];
+    delete this.poorCallQualityUsers[conversationId];
     this.wCall.end(this.wUser, conversationId);
   }
 
@@ -708,20 +722,22 @@ export class CallingRepository {
 
   private readonly updateCallParticipants = (conversationId: ConversationId, membersJson: string) => {
     const call = this.findCall(conversationId);
-    if (call) {
-      const {members}: {members: {userid: UserId; clientid: DeviceId}[]} = JSON.parse(membersJson);
-      const newMembers = members
-        .filter(({userid}) => !this.findParticipant(conversationId, userid))
-        .map(({userid, clientid}) => new Participant(userid, clientid));
-      const removedMembers = call
-        .participants()
-        .filter(
-          ({userId, deviceId}) => !members.find(({userid, clientid}) => userid === userId && clientid === deviceId),
-        );
-
-      newMembers.forEach(participant => call.participants.unshift(participant));
-      removedMembers.forEach(participant => call.participants.remove(participant));
+    if (!call) {
+      return;
     }
+
+    const {members}: {members: {userid: UserId; clientid: DeviceId}[]} = JSON.parse(membersJson);
+    const newMembers = members
+      .filter(({userid}) => !this.findParticipant(conversationId, userid))
+      .map(({userid, clientid}) => new Participant(userid, clientid));
+    const removedMembers = call
+      .participants()
+      .filter(
+        ({userId, deviceId}) => !members.find(({userid, clientid}) => userid === userId && clientid === deviceId),
+      );
+
+    newMembers.forEach(participant => call.participants.unshift(participant));
+    removedMembers.forEach(participant => call.participants.remove(participant));
   };
 
   private readonly getCallMediaStream = (
