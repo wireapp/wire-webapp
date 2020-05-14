@@ -218,10 +218,10 @@ export class CallingRepository {
     if (isOldPoorCallQualityUser && quality !== QUALITY.POOR) {
       users = users.filter(_userId => _userId !== userId);
     }
-    if (!isOldPoorCallQualityUser && quality === QUALITY.POOR) {
+    if (!isOldPoorCallQualityUser && quality === QUALITY.POOR && userId !== this.selfUser.id) {
       users = [...users, userId];
     }
-    if (users.length === call.participants.length) {
+    if (users.length === call.participants.length - 1) {
       amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.CALL_QUALITY_POOR);
     } else {
       amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.CALL_QUALITY_POOR);
