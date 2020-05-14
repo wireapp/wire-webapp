@@ -20,7 +20,7 @@
 import {loadValue, storeValue} from 'Util/StorageUtil';
 import {getParameter} from 'Util/UrlUtil';
 import {DEFAULT_LOCALE, setLocale, setStrings} from 'Util/LocalizerUtil';
-import {setDateLocale} from 'Util/TimeUtil';
+import {setDateLocale, LocaleType} from 'Util/TimeUtil';
 
 import {URLParameter} from '../auth/URLParameter';
 import {StorageKey} from '../storage/StorageKey';
@@ -80,14 +80,14 @@ setStrings(strings);
 
 (function setAppLocale() {
   const queryParam = getParameter(URLParameter.LOCALE);
-  const currentBrowserLocale = navigator.language.substr(0, 2);
-  let storedLocale = loadValue(StorageKey.LOCALIZATION.LOCALE);
+  const currentBrowserLocale = navigator.language.substr(0, 2) as LocaleType;
+  const storedLocale = loadValue<LocaleType>(StorageKey.LOCALIZATION.LOCALE);
 
   if (queryParam) {
-    storedLocale = storeValue(StorageKey.LOCALIZATION.LOCALE, queryParam);
+    storeValue(StorageKey.LOCALIZATION.LOCALE, queryParam);
   }
 
-  const locale = storedLocale || currentBrowserLocale || DEFAULT_LOCALE;
+  const locale: LocaleType = storedLocale || currentBrowserLocale || (DEFAULT_LOCALE as LocaleType);
   setLocale(locale);
   setDateLocale(locale);
 
