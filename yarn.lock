@@ -10843,10 +10843,10 @@ react-intl-po@2.2.2:
     po2json "^0.4.5"
     ramda "^0.25.0"
 
-react-intl@4.5.2:
-  version "4.5.2"
-  resolved "https://registry.yarnpkg.com/react-intl/-/react-intl-4.5.2.tgz#896920103d5c0e2d17b02ce4cec0f6ac1a618e5c"
-  integrity sha512-QNhNDWh24VbtYmFEp81AE3Gt7zBDtnABPJ6zSIZewcoAiobyRgug9QqZFdNfNs7xb4m6H8zptQYiBPd/wDo2sw==
+react-intl@4.5.3:
+  version "4.5.3"
+  resolved "https://registry.yarnpkg.com/react-intl/-/react-intl-4.5.3.tgz#d24774fa20aeb1049c5d8cb04f1c8d9da0efb6a8"
+  integrity sha512-qx7R7bRdmmoBbHBaQCTWIui5KcMOpUWZwe7oF83x1oLf5KJ5zm4Qt9XCGF7Ki4JbYTNuUiz7QUc4IPy0HFoMGg==
   dependencies:
     "@formatjs/intl-displaynames" "^1.2.9"
     "@formatjs/intl-listformat" "^1.4.7"
