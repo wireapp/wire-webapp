@@ -30,6 +30,7 @@ import {
   STATE as CALL_STATE,
   VIDEO_STATE,
   Wcall,
+  ERROR,
 } from '@wireapp/avs';
 import {Calling, GenericMessage} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -382,6 +383,15 @@ export class CallingRepository {
 
       if (res !== 0) {
         this.logger.warn(`recv_msg failed with code: ${res}`);
+        if (res === ERROR.UNKNOWN_PROTOCOL) {
+          const brandName = Config.getConfig().BRAND_NAME;
+          amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+            text: {
+              message: t('modalCallUpdateClientMessage', brandName),
+              title: t('modalCallUpdateClientHeadline', brandName),
+            },
+          });
+        }
         return;
       }
       this.handleCallEventSaving(content.type, conversationId, userId, time, source);

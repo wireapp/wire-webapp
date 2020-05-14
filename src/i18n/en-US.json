@@ -601,6 +601,8 @@
   "modalCallSecondOutgoingAction": "Call Anyway",
   "modalCallSecondOutgoingHeadline": "Hang up current call?",
   "modalCallSecondOutgoingMessage": "A call is active in another conversation. Calling here will hang up the other call.",
+  "modalCallUpdateClientHeadline": "Please update {{brandName}}",
+  "modalCallUpdateClientMessage": "You received a call that isn't supported by this version of {{brandName}}.",
   "modalConfirmSecondary": "Cancel",
   "modalConnectAcceptAction": "Connect",
   "modalConnectAcceptHeadline": "Accept?",
