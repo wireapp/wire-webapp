@@ -601,6 +601,8 @@
   "modalCallSecondOutgoingAction": "Legg på",
   "modalCallSecondOutgoingHeadline": "Legg på nåværende samtale?",
   "modalCallSecondOutgoingMessage": "Du kan bare være i ett anrop om gangen.",
+  "modalCallUpdateClientHeadline": "Please update {{brandName}}",
+  "modalCallUpdateClientMessage": "You received a call that isn't supported by this version of {{brandName}}.",
   "modalConfirmSecondary": "Avbryt",
   "modalConnectAcceptAction": "Connect",
   "modalConnectAcceptHeadline": "Accept?",

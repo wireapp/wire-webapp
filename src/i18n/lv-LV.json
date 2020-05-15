@@ -601,6 +601,8 @@
   "modalCallSecondOutgoingAction": "Beigt Zvanu",
   "modalCallSecondOutgoingHeadline": "Pārtraukt šo zvanu?",
   "modalCallSecondOutgoingMessage": "Jūs varat vienlaicīgi veikt tikai vienu zvanu.",
+  "modalCallUpdateClientHeadline": "Please update {{brandName}}",
+  "modalCallUpdateClientMessage": "You received a call that isn't supported by this version of {{brandName}}.",
   "modalConfirmSecondary": "Atcelt",
   "modalConnectAcceptAction": "Pievienoties",
   "modalConnectAcceptHeadline": "Accept?",

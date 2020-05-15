@@ -601,6 +601,8 @@
   "modalCallSecondOutgoingAction": "結束通話",
   "modalCallSecondOutgoingHeadline": "確定要結束當前的通話？",
   "modalCallSecondOutgoingMessage": "您同一時間只能進行一場通話。",
+  "modalCallUpdateClientHeadline": "Please update {{brandName}}",
+  "modalCallUpdateClientMessage": "You received a call that isn't supported by this version of {{brandName}}.",
   "modalConfirmSecondary": "取消",
   "modalConnectAcceptAction": "連接",
   "modalConnectAcceptHeadline": "接受？",

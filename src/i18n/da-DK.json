@@ -601,6 +601,8 @@
   "modalCallSecondOutgoingAction": "Læg På",
   "modalCallSecondOutgoingHeadline": "Læg nuværende opkald på?",
   "modalCallSecondOutgoingMessage": "Du kan kun være i et opkald af gangen.",
+  "modalCallUpdateClientHeadline": "Please update {{brandName}}",
+  "modalCallUpdateClientMessage": "You received a call that isn't supported by this version of {{brandName}}.",
   "modalConfirmSecondary": "Annuller",
   "modalConnectAcceptAction": "Forbind",
   "modalConnectAcceptHeadline": "Acceptér?",

@@ -601,6 +601,8 @@
   "modalCallSecondOutgoingAction": "Užbaigti",
   "modalCallSecondOutgoingHeadline": "Užbaigti esamą skambutį?",
   "modalCallSecondOutgoingMessage": "Jūs vienu metu galite dalyvauti tik viename skambutyje.",
+  "modalCallUpdateClientHeadline": "Please update {{brandName}}",
+  "modalCallUpdateClientMessage": "You received a call that isn't supported by this version of {{brandName}}.",
   "modalConfirmSecondary": "Atsisakyti",
   "modalConnectAcceptAction": "Užmegzti kontaktą",
   "modalConnectAcceptHeadline": "Priimti?",
