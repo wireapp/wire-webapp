@@ -385,12 +385,17 @@ export class CallingRepository {
         this.logger.warn(`recv_msg failed with code: ${res}`);
         if (res === ERROR.UNKNOWN_PROTOCOL) {
           const brandName = Config.getConfig().BRAND_NAME;
-          amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
-            text: {
-              message: t('modalCallUpdateClientMessage', brandName),
-              title: t('modalCallUpdateClientHeadline', brandName),
+          amplify.publish(
+            WebAppEvents.WARNING.MODAL,
+            ModalsViewModel.TYPE.ACKNOWLEDGE,
+            {
+              text: {
+                message: t('modalCallUpdateClientMessage', brandName),
+                title: t('modalCallUpdateClientHeadline', brandName),
+              },
             },
-          });
+            'update-client-warning',
+          );
         }
         return;
       }
