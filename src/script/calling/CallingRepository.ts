@@ -383,7 +383,7 @@ export class CallingRepository {
 
       if (res !== 0) {
         this.logger.warn(`recv_msg failed with code: ${res}`);
-        if (res === ERROR.UNKNOWN_PROTOCOL) {
+        if (res === ERROR.UNKNOWN_PROTOCOL && event.content.type === 'CONFSTART') {
           const brandName = Config.getConfig().BRAND_NAME;
           amplify.publish(
             WebAppEvents.WARNING.MODAL,
