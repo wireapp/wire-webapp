@@ -601,6 +601,8 @@
   "modalCallSecondOutgoingAction": "Desligar",
   "modalCallSecondOutgoingHeadline": "Desligar a chamada atual?",
   "modalCallSecondOutgoingMessage": "Só pode fazer uma chamada de cada vez.",
+  "modalCallUpdateClientHeadline": "Please update {{brandName}}",
+  "modalCallUpdateClientMessage": "You received a call that isn't supported by this version of {{brandName}}.",
   "modalConfirmSecondary": "Cancelar",
   "modalConnectAcceptAction": "Ligar",
   "modalConnectAcceptHeadline": "Aceitar?",

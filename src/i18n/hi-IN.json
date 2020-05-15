@@ -601,6 +601,8 @@
   "modalCallSecondOutgoingAction": "Call Anyway",
   "modalCallSecondOutgoingHeadline": "Hang up current call?",
   "modalCallSecondOutgoingMessage": "एक समय में आप केवल एक कॉल में हो सकते हैं।",
+  "modalCallUpdateClientHeadline": "Please update {{brandName}}",
+  "modalCallUpdateClientMessage": "You received a call that isn't supported by this version of {{brandName}}.",
   "modalConfirmSecondary": "Cancel",
   "modalConnectAcceptAction": "Connect",
   "modalConnectAcceptHeadline": "स्वीकारें?",

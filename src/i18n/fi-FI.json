@@ -601,6 +601,8 @@
   "modalCallSecondOutgoingAction": "Katkaise puhelu",
   "modalCallSecondOutgoingHeadline": "Katkaise nykyinen puhelu?",
   "modalCallSecondOutgoingMessage": "Voit olla vain yhdessä puhelussa kerrallaan.",
+  "modalCallUpdateClientHeadline": "Please update {{brandName}}",
+  "modalCallUpdateClientMessage": "You received a call that isn't supported by this version of {{brandName}}.",
   "modalConfirmSecondary": "Peruuta",
   "modalConnectAcceptAction": "Yhdistä",
   "modalConnectAcceptHeadline": "Hyväksy?",
