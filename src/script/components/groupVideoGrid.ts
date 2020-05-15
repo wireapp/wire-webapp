@@ -64,8 +64,19 @@ class GroupVideoGrid {
 
     this.minimized = minimized;
     // scale videos when the grid is updated (on the next rendering cycle)
-    const gridSubscription = this.grid.subscribe(() => afterRender(this.scaleVideos));
+    const gridSubscription = this.grid.subscribe(({grid}) => {
+      this.setRowsAndColumns(rootElement, grid.length);
+      afterRender(this.scaleVideos);
+    });
     this.dispose = () => gridSubscription.dispose();
+  }
+
+  setRowsAndColumns(rootElement: HTMLElement, totalCount: number) {
+    const rows = Math.ceil(Math.sqrt(totalCount));
+    const columns = Math.ceil(totalCount / rows);
+    const gridContainer = rootElement.querySelector('.group-video-grid') as HTMLElement;
+    gridContainer.style.setProperty('--rows', `${rows}`);
+    gridContainer.style.setProperty('--columns', `${columns}`);
   }
 
   hasBlackBackground(): boolean {
@@ -139,17 +150,6 @@ class GroupVideoGrid {
     const mirrorClass = shouldBeMirrored ? ' mirror' : '';
     return `group-video-grid__element${index} ${extraClasses[size]}${mirrorClass}${roundedClass}`;
   }
-
-  getUIEValueForVideo(index: number): string {
-    const size = this.getSizeForVideo(index);
-    const extraClasses = {
-      [VIDEO_SIZE.EMPTY]: '',
-      [VIDEO_SIZE.FULL_SCREEN]: 'full',
-      [VIDEO_SIZE.HALF_SCREEN]: 'half',
-      [VIDEO_SIZE.QUARTER_SCREEN]: 'quarter',
-    };
-    return extraClasses[size];
-  }
 }
 
 ko.components.register('group-video-grid', {
@@ -161,8 +161,7 @@ ko.components.register('group-video-grid', {
       >
         <!-- ko if: participant -->
           <div class="group-video-grid__element" data-bind="
-              css: getClassNameForVideo($index(), participant),
-              attr: {'data-uie-value': getUIEValueForVideo($index()), 'data-user-id': participant.userId},
+              attr: {'data-user-id': participant.userId},
               event: {dblclick: doubleClickedOnVideo}"
             data-uie-name="item-grid"
           >
