@@ -46,15 +46,15 @@ export class MediumImage extends File {
   /**
    * Loads and decrypts otr asset as initiates download
    */
-  download(filename?: string): Promise<number | void> {
-    return this.resource()
-      .load()
-      .then(blob => {
-        if (!blob) {
-          throw new Error('No blob received.');
-        }
-        return downloadBlob(blob, filename);
-      })
-      .catch(error => this.logger.error('Failed to download image', error));
+  async download(filename?: string): Promise<number | void> {
+    try {
+      const blob = await this.resource().load();
+      if (!blob) {
+        throw new Error('No blob received.');
+      }
+      return downloadBlob(blob, filename);
+    } catch (error) {
+      return this.logger.error('Failed to download image', error);
+    }
   }
 }
