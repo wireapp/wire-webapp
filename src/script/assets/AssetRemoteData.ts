@@ -162,7 +162,7 @@ export class AssetRemoteData {
       return this.loadPromise;
     }
 
-    this.loadPromise = this.loadBuffer()
+    this.loadPromise = this._loadBuffer()
       .then(({buffer, mimeType}) => {
         type = mimeType;
         this.loadPromise = undefined;
@@ -191,7 +191,7 @@ export class AssetRemoteData {
     return this.loadPromise;
   }
 
-  private async loadBuffer(): Promise<{
+  async _loadBuffer(): Promise<{
     buffer: ArrayBuffer;
     mimeType: string;
   }> {
