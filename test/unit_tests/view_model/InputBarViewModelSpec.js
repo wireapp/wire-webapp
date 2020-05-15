@@ -33,6 +33,7 @@ describe('z.viewModel.content.InputBarViewModel', () => {
       undefined,
       {},
       {
+        asset: testFactory.assetRepository,
         conversation: testFactory.conversation_repository,
         search: testFactory.search_repository,
         user: testFactory.user_repository,
