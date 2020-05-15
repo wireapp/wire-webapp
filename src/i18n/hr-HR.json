@@ -601,6 +601,8 @@
   "modalCallSecondOutgoingAction": "Poklopi",
   "modalCallSecondOutgoingHeadline": "Prekinuti trenutni poziv?",
   "modalCallSecondOutgoingMessage": "Možete biti u samo jednom pozivu u isto vrijeme.",
+  "modalCallUpdateClientHeadline": "Please update {{brandName}}",
+  "modalCallUpdateClientMessage": "You received a call that isn't supported by this version of {{brandName}}.",
   "modalConfirmSecondary": "Odustani",
   "modalConnectAcceptAction": "Poveži se",
   "modalConnectAcceptHeadline": "Prihvatiti?",

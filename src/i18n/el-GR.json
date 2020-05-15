@@ -601,6 +601,8 @@
   "modalCallSecondOutgoingAction": "Τερματισμός κλήσης",
   "modalCallSecondOutgoingHeadline": "Τερματισμός τρέχουσας κλήσης,",
   "modalCallSecondOutgoingMessage": "Μπορείτε να είστε σε μία κλήση κάθε φορά.",
+  "modalCallUpdateClientHeadline": "Please update {{brandName}}",
+  "modalCallUpdateClientMessage": "You received a call that isn't supported by this version of {{brandName}}.",
   "modalConfirmSecondary": "Ακύρωση",
   "modalConnectAcceptAction": "Σύνδεση",
   "modalConnectAcceptHeadline": "Αποδοχή,",

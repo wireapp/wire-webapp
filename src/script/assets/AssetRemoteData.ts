@@ -155,7 +155,7 @@ export class AssetRemoteData {
         });
   }
 
-  load(): Promise<void | Blob> {
+  public load(): Promise<void | Blob> {
     let type: string;
 
     if (this.loadPromise) {
@@ -191,26 +191,23 @@ export class AssetRemoteData {
     return this.loadPromise;
   }
 
-  _loadBuffer(): Promise<{
+  async _loadBuffer(): Promise<{
     buffer: ArrayBuffer;
     mimeType: string;
   }> {
-    return this.generateUrl()
-      .then(generatedUrl => {
-        return loadUrlBuffer(generatedUrl, (xhr: XMLHttpRequest) => {
-          xhr.onprogress = event => this.downloadProgress(Math.round((event.loaded / event.total) * 100));
-          this.cancelDownload = () => xhr.abort.call(xhr);
-        });
-      })
-      .catch(error => {
-        const isValidationUtilError = error instanceof ValidationUtilError;
-        const message = isValidationUtilError
-          ? `Failed to validate an asset URL (_loadBuffer): ${error.message}`
-          : `Failed to load asset: ${error.message || error}`;
-
-        this.logger.error(message);
-
-        throw error;
+    try {
+      const generatedUrl = await this.generateUrl();
+      return loadUrlBuffer(generatedUrl, (xhr: XMLHttpRequest) => {
+        xhr.onprogress = event => this.downloadProgress(Math.round((event.loaded / event.total) * 100));
+        this.cancelDownload = () => xhr.abort.call(xhr);
       });
+    } catch (error) {
+      const isValidationUtilError = error instanceof ValidationUtilError;
+      const message = isValidationUtilError
+        ? `Failed to validate an asset URL (loadBuffer): ${error.message}`
+        : `Failed to load asset: ${error.message || error}`;
+      this.logger.error(message);
+      throw error;
+    }
   }
 }

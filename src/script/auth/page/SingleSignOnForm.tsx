@@ -183,7 +183,11 @@ const SingleSignOnForm = ({
         // Ideal would be to abandon the HashRouter (in the near future) and use something that
         // allows us to pass search query parameters.
         // https://reacttraining.com/react-router/web/api/HashRouter
-        doNavigate(`/auth?${getSearchParams({[QUERY_KEY.DESTINATION_URL]: welcomeUrl})}#${ROUTE.CUSTOM_ENV_REDIRECT}`);
+        doNavigate(
+          `/auth?${getSearchParams({[QUERY_KEY.DESTINATION_URL]: encodeURIComponent(welcomeUrl)})}#${
+            ROUTE.CUSTOM_ENV_REDIRECT
+          }`,
+        );
       } else {
         const strippedCode = stripPrefix(codeOrMail);
         await validateSSOCode(strippedCode);

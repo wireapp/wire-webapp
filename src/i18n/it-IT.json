@@ -601,6 +601,8 @@
   "modalCallSecondOutgoingAction": "Riattacca",
   "modalCallSecondOutgoingHeadline": "Riagganciare la chiamata corrente?",
   "modalCallSecondOutgoingMessage": "È possibile partecipare a una sola chiamata alla volta.",
+  "modalCallUpdateClientHeadline": "Please update {{brandName}}",
+  "modalCallUpdateClientMessage": "You received a call that isn't supported by this version of {{brandName}}.",
   "modalConfirmSecondary": "Annulla",
   "modalConnectAcceptAction": "Connetti",
   "modalConnectAcceptHeadline": "Accettare?",

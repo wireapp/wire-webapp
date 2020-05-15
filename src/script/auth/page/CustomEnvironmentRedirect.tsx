@@ -129,7 +129,7 @@ const CustomEnvironmentRedirect = ({doNavigate, doSendNavigationEvent}: Dispatch
             style={{backgroundColor: COLOR.BLUE_OPAQUE_16, borderRadius: 8, marginTop: 40, padding: '16px 24px'}}
           >
             <InfoIcon color={COLOR.BLUE} style={{marginBottom: 8}} />
-            <Text fontSize="14px" color={COLOR.BLUE} data-uie-name="credentials-info">
+            <Text center fontSize="14px" color={COLOR.BLUE} data-uie-name="credentials-info">
               {_(customEnvRedirectStrings.credentialsInfo)}
             </Text>
           </FlexBox>

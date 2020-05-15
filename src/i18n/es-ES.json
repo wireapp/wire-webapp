@@ -601,6 +601,8 @@
   "modalCallSecondOutgoingAction": "Colgar",
   "modalCallSecondOutgoingHeadline": "¿Colgar llamada actual?",
   "modalCallSecondOutgoingMessage": "Solo puedes estar en una llamada a la vez.",
+  "modalCallUpdateClientHeadline": "Please update {{brandName}}",
+  "modalCallUpdateClientMessage": "You received a call that isn't supported by this version of {{brandName}}.",
   "modalConfirmSecondary": "Cancelar",
   "modalConnectAcceptAction": "Conectar",
   "modalConnectAcceptHeadline": "¿Aceptar?",

@@ -601,6 +601,8 @@
   "modalCallSecondOutgoingAction": "Închide",
   "modalCallSecondOutgoingHeadline": "Închide apelul curent?",
   "modalCallSecondOutgoingMessage": "Nu poți fi decât într-un singur apel la un moment dat.",
+  "modalCallUpdateClientHeadline": "Please update {{brandName}}",
+  "modalCallUpdateClientMessage": "You received a call that isn't supported by this version of {{brandName}}.",
   "modalConfirmSecondary": "Renunță",
   "modalConnectAcceptAction": "Conectare",
   "modalConnectAcceptHeadline": "Acceptă?",

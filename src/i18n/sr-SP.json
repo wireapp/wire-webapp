@@ -601,6 +601,8 @@
   "modalCallSecondOutgoingAction": "Прекини везу",
   "modalCallSecondOutgoingHeadline": "Прекинути текући позив?",
   "modalCallSecondOutgoingMessage": "Можете бити само у једном разговору.",
+  "modalCallUpdateClientHeadline": "Please update {{brandName}}",
+  "modalCallUpdateClientMessage": "You received a call that isn't supported by this version of {{brandName}}.",
   "modalConfirmSecondary": "Откажи",
   "modalConnectAcceptAction": "Повежи се",
   "modalConnectAcceptHeadline": "Прихватити?",
