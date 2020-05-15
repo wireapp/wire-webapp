@@ -18,7 +18,9 @@
  */
 
 import {GenericMessage, LegalHoldStatus, Text} from '@wireapp/protocol-messaging';
+
 import {createRandomUuid} from 'Util/util';
+
 import {CryptographyMapper} from '../cryptography/CryptographyMapper';
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 import {ClientEvent} from '../event/Client';

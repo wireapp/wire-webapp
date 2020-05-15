@@ -18,6 +18,7 @@
  */
 
 import {APIClient} from '@wireapp/api-client';
+
 import {Config} from '../Config';
 
 const configureClient = () => {

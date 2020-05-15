@@ -19,11 +19,13 @@
 
 import ko from 'knockout';
 import {Asset} from '@wireapp/protocol-messaging';
-import {AssetService, AssetUploadOptions, CompressedImage} from './AssetService';
+import type {AssetUploadData} from '@wireapp/api-client/dist/asset';
+
 import {loadFileBuffer} from 'Util/util';
+
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {encryptAesAsset, EncryptedAsset} from './AssetCrypto';
-import {AssetUploadData} from '@wireapp/api-client/dist/asset';
+import type {AssetService, AssetUploadOptions, CompressedImage} from './AssetService';
 
 export interface UploadStatus {
   messageId: string;

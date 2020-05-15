@@ -18,7 +18,7 @@
  */
 
 import {ParticipantAvatar} from 'Components/participantAvatar';
-import {ServiceEntity} from '../../integration/ServiceEntity';
+import type {ServiceEntity} from '../../integration/ServiceEntity';
 
 interface ComponentParams {
   service: ServiceEntity;

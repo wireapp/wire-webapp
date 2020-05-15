@@ -24,18 +24,18 @@ import ko from 'knockout';
 import {Logger, getLogger} from 'Util/Logger';
 
 import {AudioType} from '../audio/AudioType';
-import {Call} from '../calling/Call';
-import {CallingRepository} from '../calling/CallingRepository';
+import type {Call} from '../calling/Call';
+import type {CallingRepository} from '../calling/CallingRepository';
 import {Grid, getGrid} from '../calling/videoGridHandler';
-import {User} from '../entity/User';
-import {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../media/MediaDevicesHandler';
-import {MediaStreamHandler} from '../media/MediaStreamHandler';
-import {AudioRepository} from '../audio/AudioRepository';
-import {ConversationRepository} from '../conversation/ConversationRepository';
-import {Conversation} from '../entity/Conversation';
-import {PermissionRepository} from '../permission/PermissionRepository';
+import type {User} from '../entity/User';
+import type {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../media/MediaDevicesHandler';
+import type {MediaStreamHandler} from '../media/MediaStreamHandler';
+import type {AudioRepository} from '../audio/AudioRepository';
+import type {ConversationRepository} from '../conversation/ConversationRepository';
+import type {Conversation} from '../entity/Conversation';
+import type {PermissionRepository} from '../permission/PermissionRepository';
 import {PermissionStatusState} from '../permission/PermissionStatusState';
-import {Multitasking} from '../notification/NotificationRepository';
+import type {Multitasking} from '../notification/NotificationRepository';
 
 import 'Components/calling/chooseScreen';
 

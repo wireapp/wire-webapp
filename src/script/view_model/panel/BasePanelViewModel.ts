@@ -19,17 +19,17 @@
 
 import ko from 'knockout';
 
-import {ConversationRepository} from '../../conversation/ConversationRepository';
-import {Conversation} from '../../entity/Conversation';
-import {User} from '../../entity/User';
-import {ServiceEntity} from '../../integration/ServiceEntity';
-import {SearchRepository} from '../../search/SearchRepository';
-import {TeamRepository} from '../../team/TeamRepository';
-import {ClientRepository} from '../../client/ClientRepository';
-import {CryptographyRepository} from '../../cryptography/CryptographyRepository';
-import {UserRepository} from '../../user/UserRepository';
-import {MainViewModel} from '../MainViewModel';
-import {IntegrationRepository} from '../../integration/IntegrationRepository';
+import type {ConversationRepository} from '../../conversation/ConversationRepository';
+import type {Conversation} from '../../entity/Conversation';
+import type {User} from '../../entity/User';
+import type {ServiceEntity} from '../../integration/ServiceEntity';
+import type {SearchRepository} from '../../search/SearchRepository';
+import type {TeamRepository} from '../../team/TeamRepository';
+import type {ClientRepository} from '../../client/ClientRepository';
+import type {CryptographyRepository} from '../../cryptography/CryptographyRepository';
+import type {UserRepository} from '../../user/UserRepository';
+import type {MainViewModel} from '../MainViewModel';
+import type {IntegrationRepository} from '../../integration/IntegrationRepository';
 
 export interface PanelViewModelProps {
   isVisible: ko.Observable<boolean>;

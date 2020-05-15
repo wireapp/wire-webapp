@@ -18,8 +18,9 @@
  */
 
 import ko from 'knockout';
+
 import {getDifference} from 'Util/ArrayUtil';
-import {Participant, UserId} from '../calling/Participant';
+import type {Participant, UserId} from '../calling/Participant';
 
 let baseGrid: string[] = ['', '', '', ''];
 

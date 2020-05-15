@@ -19,7 +19,7 @@
 
 import {escape} from 'underscore';
 
-import {User} from '../entity/User';
+import type {User} from '../entity/User';
 import {getSelfName} from './SanitizationUtil';
 import {sortUsersByPriority} from './StringUtil';
 

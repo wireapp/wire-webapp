@@ -17,21 +17,21 @@
  *
  */
 
-import {LegalHoldStatus} from '@wireapp/api-client/dist/team/legalhold';
-import {REASON as AVS_REASON} from '@wireapp/avs';
+import type {LegalHoldStatus} from '@wireapp/api-client/dist/team/legalhold';
+import type {REASON as AVS_REASON} from '@wireapp/avs';
 
 import {createRandomUuid} from 'Util/util';
 
 import {BackendEvent} from '../event/Backend';
 import {CALL, CONVERSATION, ClientEvent} from '../event/Client';
 
-import {Call as CallEntity} from '../calling/Call';
+import type {Call as CallEntity} from '../calling/Call';
 import {StatusType} from '../message/StatusType';
 import {VerificationMessageType} from '../message/VerificationMessageType';
 
-import {Conversation} from '../entity/Conversation';
-import {Message} from '../entity/message/Message';
-import {User} from '../entity/User';
+import type {Conversation} from '../entity/Conversation';
+import type {Message} from '../entity/message/Message';
+import type {User} from '../entity/User';
 
 export interface BaseEvent {
   conversation: string;

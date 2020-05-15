@@ -28,8 +28,8 @@ import {getParameter} from 'Util/UrlUtil';
 
 import {URLParameter} from '../auth/URLParameter';
 
-import {TeamRepository} from '../team/TeamRepository';
-import {UserRepository} from '../user/UserRepository';
+import type {TeamRepository} from '../team/TeamRepository';
+import type {UserRepository} from '../user/UserRepository';
 import {EventName} from './EventName';
 import * as trackingHelpers from './Helpers';
 import {SuperProperty} from './SuperProperty';

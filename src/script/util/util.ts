@@ -18,14 +18,14 @@
  */
 
 import {Decoder} from 'bazinga64';
-import {ObservableArray} from 'knockout';
+import type {ObservableArray} from 'knockout';
 import sodium from 'libsodium-wrappers-sumo';
 import UUID from 'pure-uuid';
+import {UrlUtil} from '@wireapp/commons';
 
 import {QUERY_KEY} from '../auth/route';
-import {UrlUtil} from '@wireapp/commons';
 import {Config} from '../Config';
-import {Conversation} from '../entity/Conversation';
+import type {Conversation} from '../entity/Conversation';
 import {StorageKey} from '../storage/StorageKey';
 
 import {Environment} from './Environment';

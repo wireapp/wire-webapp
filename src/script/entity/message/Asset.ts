@@ -18,10 +18,10 @@
  */
 
 import {AssetType} from '../../assets/AssetType';
-import {File as FileAsset} from './File';
-import {Location as LocationAsset} from './Location';
-import {MediumImage as MediumImageAsset} from './MediumImage';
-import {Text as TextAsset} from './Text';
+import type {File as FileAsset} from './File';
+import type {Location as LocationAsset} from './Location';
+import type {MediumImage as MediumImageAsset} from './MediumImage';
+import type {Text as TextAsset} from './Text';
 
 export interface AssetPayload {
   id: string;

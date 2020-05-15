@@ -18,6 +18,7 @@
  */
 
 import ko from 'knockout';
+
 import {ContentMessage} from './ContentMessage';
 
 export class CompositeMessage extends ContentMessage {

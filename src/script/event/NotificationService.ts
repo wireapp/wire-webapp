@@ -17,13 +17,14 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client';
-import {NotificationList} from '@wireapp/api-client/dist/notification/';
-
+import type {APIClient} from '@wireapp/api-client';
+import type {NotificationList} from '@wireapp/api-client/dist/notification/';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
-import {Notification} from '@wireapp/api-client/dist/notification';
+import type {Notification} from '@wireapp/api-client/dist/notification';
 import {DatabaseKeys} from '@wireapp/core/dist/notification/NotificationDatabaseRepository';
+
 import {Logger, getLogger} from 'Util/Logger';
+
 import {EventRecord, StorageSchemata, StorageService} from '../storage/';
 import {EventError} from '../error/EventError';
 

@@ -17,8 +17,8 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client';
-import {GiphySearch, GiphyResult, GiphySearchResult} from '@wireapp/api-client/dist/giphy';
+import type {APIClient} from '@wireapp/api-client';
+import type {GiphySearch, GiphyResult, GiphySearchResult} from '@wireapp/api-client/dist/giphy';
 
 export class GiphyService {
   private readonly apiClient: APIClient;

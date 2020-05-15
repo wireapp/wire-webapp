@@ -20,14 +20,14 @@
 import {t} from 'Util/LocalizerUtil';
 import {getRenderedTextContent} from 'Util/messageRenderer';
 
-import {Text} from '../entity/message/Text';
-import {File} from '../entity/message/File';
+import type {Text} from '../entity/message/Text';
+import type {File} from '../entity/message/File';
 import {AssetTransferState} from '../assets/AssetTransferState';
-import {Conversation} from '../entity/Conversation';
+import type {Conversation} from '../entity/Conversation';
 import {ConversationStatusIcon} from './ConversationStatusIcon';
 import {ConversationError} from '../error/ConversationError';
-import {MemberMessage} from '../entity/message/MemberMessage';
-import {SystemMessage} from '../entity/message/SystemMessage';
+import type {MemberMessage} from '../entity/message/MemberMessage';
+import type {SystemMessage} from '../entity/message/SystemMessage';
 
 enum ACTIVITY_TYPE {
   CALL = 'ConversationCellState.ACTIVITY_TYPE.CALL',

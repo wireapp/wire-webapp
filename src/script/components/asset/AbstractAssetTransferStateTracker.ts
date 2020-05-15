@@ -25,8 +25,8 @@ import {container} from 'tsyringe';
 import {AssetService} from '../../assets/AssetService';
 import {AssetTransferState} from '../../assets/AssetTransferState';
 import {AssetUploader} from '../../assets/AssetUploader';
-import {ContentMessage} from '../../entity/message/ContentMessage';
-import {File as FileAsset} from '../../entity/message/File';
+import type {ContentMessage} from '../../entity/message/ContentMessage';
+import type {File as FileAsset} from '../../entity/message/File';
 import {APIClientSingleton} from '../../service/APIClientSingleton';
 import {BackendClient} from '../../service/BackendClient';
 

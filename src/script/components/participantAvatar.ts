@@ -19,14 +19,14 @@
 
 import ko from 'knockout';
 
-import {getLogger, Logger} from 'Util/Logger';
+import {Logger, getLogger} from 'Util/Logger';
 import {createRandomUuid} from 'Util/util';
 import {getFirstChar} from 'Util/StringUtil';
 
 import {viewportObserver} from '../ui/viewportObserver';
 import {User} from '../entity/User';
 import {ServiceEntity} from '../integration/ServiceEntity';
-import {AssetRemoteData} from '../assets/AssetRemoteData';
+import type {AssetRemoteData} from '../assets/AssetRemoteData';
 
 export enum SIZE {
   LARGE = 'avatar-l',

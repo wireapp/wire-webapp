@@ -18,7 +18,8 @@
  */
 
 import ko from 'knockout';
-import {ConversationLabel} from '../../conversation/ConversationLabelRepository';
+
+import type {ConversationLabel} from '../../conversation/ConversationLabelRepository';
 
 interface GroupedConversationHeaderParams {
   conversationLabel: ConversationLabel;
