@@ -601,6 +601,8 @@
   "modalCallSecondOutgoingAction": "قطع کنید",
   "modalCallSecondOutgoingHeadline": "قطع تماس فعلی?",
   "modalCallSecondOutgoingMessage": "شما تنها می‌توانید در هر تماس فقط با یک نفر صحبت کنید.",
+  "modalCallUpdateClientHeadline": "Please update {{brandName}}",
+  "modalCallUpdateClientMessage": "You received a call that isn't supported by this version of {{brandName}}.",
   "modalConfirmSecondary": "انصراف",
   "modalConnectAcceptAction": "درخواست دوستی",
   "modalConnectAcceptHeadline": "قبول‌میکنید؟",

@@ -228,7 +228,9 @@ describe('SingleSignOnForm', () => {
     });
     const email = ' mail@mail.com ';
     const inputHost = 'http://localhost:8080?test=true';
-    const expectedHost = `/auth?${QUERY_KEY.DESTINATION_URL}=${inputHost}&clienttype=permanent&sso_auto_login=true#${ROUTE.CUSTOM_ENV_REDIRECT}`;
+    const expectedHost = `/auth?${QUERY_KEY.DESTINATION_URL}=${encodeURIComponent(
+      `${inputHost}&clienttype=permanent&sso_auto_login=true`,
+    )}#${ROUTE.CUSTOM_ENV_REDIRECT}`;
 
     spyOn(actionRoot.authAction, 'doGetDomainInfo').and.returnValue(() =>
       Promise.resolve({config_json_url: '', webapp_welcome_url: inputHost}),
@@ -274,7 +276,9 @@ describe('SingleSignOnForm', () => {
     });
     const email = ' mail@mail.com ';
     const inputHost = 'http://localhost:8080?test=true';
-    const expectedHost = `/auth?${QUERY_KEY.DESTINATION_URL}=${inputHost}&clienttype=temporary&sso_auto_login=true#${ROUTE.CUSTOM_ENV_REDIRECT}`;
+    const expectedHost = `/auth?${QUERY_KEY.DESTINATION_URL}=${encodeURIComponent(
+      `${inputHost}&clienttype=temporary&sso_auto_login=true`,
+    )}#${ROUTE.CUSTOM_ENV_REDIRECT}`;
 
     spyOn(actionRoot.authAction, 'doGetDomainInfo').and.returnValue(() =>
       Promise.resolve({config_json_url: '', webapp_welcome_url: inputHost}),

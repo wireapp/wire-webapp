@@ -601,6 +601,8 @@
   "modalCallSecondOutgoingAction": "Lõpeta kõne",
   "modalCallSecondOutgoingHeadline": "Lõpetad käimasoleva kõne?",
   "modalCallSecondOutgoingMessage": "Sa saad olla korraga ainult ühes kõnes.",
+  "modalCallUpdateClientHeadline": "Please update {{brandName}}",
+  "modalCallUpdateClientMessage": "You received a call that isn't supported by this version of {{brandName}}.",
   "modalConfirmSecondary": "Tühista",
   "modalConnectAcceptAction": "Ühendu",
   "modalConnectAcceptHeadline": "Nõustud?",

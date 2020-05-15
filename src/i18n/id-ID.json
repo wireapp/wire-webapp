@@ -601,6 +601,8 @@
   "modalCallSecondOutgoingAction": "Tutup",
   "modalCallSecondOutgoingHeadline": "Akhiri panggilan ini?",
   "modalCallSecondOutgoingMessage": "Anda hanya dapat melakukan satu panggilan.",
+  "modalCallUpdateClientHeadline": "Please update {{brandName}}",
+  "modalCallUpdateClientMessage": "You received a call that isn't supported by this version of {{brandName}}.",
   "modalConfirmSecondary": "Batal",
   "modalConnectAcceptAction": "Hubungkan",
   "modalConnectAcceptHeadline": "Terima?",

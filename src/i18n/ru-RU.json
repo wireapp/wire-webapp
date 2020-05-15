@@ -601,6 +601,8 @@
   "modalCallSecondOutgoingAction": "Позвонить",
   "modalCallSecondOutgoingHeadline": "Завершить текущий вызов?",
   "modalCallSecondOutgoingMessage": "Уже есть активный вызов в другом разговоре. Он будет завершен, если вы начнете новый.",
+  "modalCallUpdateClientHeadline": "Please update {{brandName}}",
+  "modalCallUpdateClientMessage": "You received a call that isn't supported by this version of {{brandName}}.",
   "modalConfirmSecondary": "Отмена",
   "modalConnectAcceptAction": "Связаться",
   "modalConnectAcceptHeadline": "Принять?",

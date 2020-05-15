@@ -2857,7 +2857,7 @@ export class ConversationRepository {
     return this.grantMessage(eventInfoEntity, consentType, userIds);
   }
 
-  grantMessage(eventInfoEntity, consentType, userIds, shouldShowLegalHoldWarning = false) {
+  grantMessage(eventInfoEntity, consentType, userIds = null, shouldShowLegalHoldWarning = false) {
     return this.get_conversation_by_id(eventInfoEntity.conversationId).then(conversationEntity => {
       const legalHoldMessageTypes = [
         GENERIC_MESSAGE_TYPE.ASSET,

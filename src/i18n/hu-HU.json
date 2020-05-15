@@ -601,6 +601,8 @@
   "modalCallSecondOutgoingAction": "Hívás befejezése",
   "modalCallSecondOutgoingHeadline": "Leteszed a folyamatban lévő hívást?",
   "modalCallSecondOutgoingMessage": "Egyszerre csak egy hívásban vehetsz részt.",
+  "modalCallUpdateClientHeadline": "Please update {{brandName}}",
+  "modalCallUpdateClientMessage": "You received a call that isn't supported by this version of {{brandName}}.",
   "modalConfirmSecondary": "Mégsem",
   "modalConnectAcceptAction": "Csatlakozás",
   "modalConnectAcceptHeadline": "Elfogadod?",

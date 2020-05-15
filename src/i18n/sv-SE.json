@@ -601,6 +601,8 @@
   "modalCallSecondOutgoingAction": "Lägg på",
   "modalCallSecondOutgoingHeadline": "Lägg på nuvarande samtal?",
   "modalCallSecondOutgoingMessage": "Du kan bara vara i ett samtal i taget.",
+  "modalCallUpdateClientHeadline": "Please update {{brandName}}",
+  "modalCallUpdateClientMessage": "You received a call that isn't supported by this version of {{brandName}}.",
   "modalConfirmSecondary": "Avbryt",
   "modalConnectAcceptAction": "Anslut",
   "modalConnectAcceptHeadline": "Acceptera?",
