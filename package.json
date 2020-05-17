@@ -61,7 +61,7 @@
     "@types/adm-zip": "0.4.33",
     "@types/dexie-batch": "0.4.0",
     "@types/enzyme": "3.10.5",
-    "@types/faker": "4.1.11",
+    "@types/faker": "4.1.12",
     "@types/generate-changelog": "1.8.0",
     "@types/highlight.js": "9.12.3",
     "@types/jasmine": "3.5.10",
