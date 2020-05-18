@@ -2712,10 +2712,10 @@ babel-plugin-macros@^2.0.0:
     cosmiconfig "^5.2.0"
     resolve "^1.10.0"
 
-babel-plugin-react-intl@7.5.7:
-  version "7.5.7"
-  resolved "https://registry.yarnpkg.com/babel-plugin-react-intl/-/babel-plugin-react-intl-7.5.7.tgz#00dc00389779f910866a9270f52e0b8c1640ba72"
-  integrity sha512-9WCijcMIyPhJ0LPgsd+EIF00wJGz8+IcKT17IG5FH7CDVTdJBvC5lK/9V42NP8/CHalXKJZTrqwhdzsm3KIG6w==
+babel-plugin-react-intl@7.5.8:
+  version "7.5.8"
+  resolved "https://registry.yarnpkg.com/babel-plugin-react-intl/-/babel-plugin-react-intl-7.5.8.tgz#95b72ab54f584b5890a37c87619027c9197b0e46"
+  integrity sha512-yz9CGFzDxF2M/ZDE48KhP1V20H2swU+BFCKoBuotO6Sd71CERhD67sXHAuRqoxmDklxtF4ZuxYCjJMhJEadLIg==
   dependencies:
     "@babel/core" "^7.9.0"
     "@babel/helper-plugin-utils" "^7.8.3"
@@ -2724,7 +2724,7 @@ babel-plugin-react-intl@7.5.7:
     "@types/fs-extra" "^8.1.0"
     "@types/schema-utils" "^2.4.0"
     fs-extra "^9.0.0"
-    intl-messageformat-parser "^5.0.3"
+    intl-messageformat-parser "^5.0.4"
     schema-utils "^2.6.6"
 
 babel-plugin-syntax-jsx@^6.18.0:
@@ -7092,7 +7092,7 @@ intl-format-cache@^4.2.28:
   resolved "https://registry.yarnpkg.com/intl-format-cache/-/intl-format-cache-4.2.28.tgz#67cccee0ae5234cb61bb72f82c4f1df5804aed7f"
   integrity sha512-yFACAtiacQj2nPfFSyDd/ZRgDFDDtw55cmqdYux7ncqrqvaMTajf3Biuc4a3HAWNuMvk0r2VHBfwy2YmOmAZ+A==
 
-intl-messageformat-parser@^5.0.3, intl-messageformat-parser@^5.0.4:
+intl-messageformat-parser@^5.0.4:
   version "5.0.4"
   resolved "https://registry.yarnpkg.com/intl-messageformat-parser/-/intl-messageformat-parser-5.0.4.tgz#c3e2f3be02a51ae78bb3cc61f8ade6d1e2aa7f5c"
   integrity sha512-7+MvIzLkcjCEPBKW/NLGBIZr1cpOz/iAp6Thx8tc1BZUeWMfHOIb/Z53/nTwWd4p0ij9plB8+tHcFmI24Ubvuw==
