@@ -27,6 +27,7 @@ enum EMOJI {
 
 enum INTERFACE {
   THEME = 'settings.interface.theme',
+  VIEW_FOLDERS = 'settings.interface.view_folders',
 }
 
 enum PREVIEWS {
@@ -41,17 +42,12 @@ enum PROPERTIES {
   VERSION = 'version',
 }
 
-enum VIEW {
-  RECENT_CONVERSATIONS = 'recent_conversations',
-}
-
 const PROPERTIES_TYPE = {
   ...PROPERTIES,
   CONTACT_IMPORT,
   EMOJI,
   INTERFACE,
   PREVIEWS,
-  VIEW,
 };
 
 export {PROPERTIES_TYPE};

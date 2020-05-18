@@ -123,17 +123,17 @@ export class ConversationListViewModel {
     });
 
     this.showRecentConversations = ko.observable(
-      this.propertiesRepository.getPreference(PROPERTIES_TYPE.VIEW.RECENT_CONVERSATIONS) ?? true,
+      !this.propertiesRepository.getPreference(PROPERTIES_TYPE.INTERFACE.VIEW_FOLDERS) ?? false,
     );
     // TODO: Rename "expandedFolders" to "expandedFolderIds"
     this.expandedFolders = ko.observableArray([]);
 
-    this.showRecentConversations.subscribe(value => {
+    this.showRecentConversations.subscribe(showRecentConversations => {
       const conversationList = document.querySelector('.conversation-list');
       if (conversationList) {
         conversationList.scrollTop = 0;
       }
-      this.propertiesRepository.savePreference(PROPERTIES_TYPE.VIEW.RECENT_CONVERSATIONS, value);
+      this.propertiesRepository.savePreference(PROPERTIES_TYPE.INTERFACE.VIEW_FOLDERS, !showRecentConversations);
     });
 
     this.conversationRepository.active_conversation.subscribe(activeConversation => {
@@ -193,6 +193,13 @@ export class ConversationListViewModel {
     amplify.subscribe(WebAppEvents.LIFECYCLE.LOADED, this.onWebappLoaded.bind(this));
     amplify.subscribe(WebAppEvents.SHORTCUT.START, this.clickOnPeopleButton.bind(this));
     amplify.subscribe(WebAppEvents.CONTENT.EXPAND_FOLDER, this.expandFolder);
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, properties => {
+      const viewFolders = properties.settings.interface.view_folders;
+      this.showRecentConversations(!viewFolders);
+    });
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.VIEW_FOLDERS, viewFolders => {
+      this.showRecentConversations(!viewFolders);
+    });
   }
 
   expandFolder = label => {
