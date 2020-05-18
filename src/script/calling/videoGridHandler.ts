@@ -48,10 +48,7 @@ function computeGrid(previousGrid: string[], participants: Participant[]): strin
 
   const streamIds = filteredGrid.filter(streamId => streamId !== '');
   // Add the new streams at the end
-  const newStreamsIds = streamIds.concat(addedStreamIds);
-  return newStreamsIds.length === 2
-    ? [newStreamsIds[0], '', newStreamsIds[1], '']
-    : [newStreamsIds[0] || '', newStreamsIds[3] || '', newStreamsIds[1] || '', newStreamsIds[2] || ''];
+  return streamIds.concat(addedStreamIds);
 }
 
 export function getGrid(
