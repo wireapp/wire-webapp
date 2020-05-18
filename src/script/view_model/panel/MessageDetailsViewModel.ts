@@ -155,7 +155,10 @@ export class MessageDetailsViewModel extends BasePanelViewModel {
     });
 
     this.receiptsTitle = ko.pureComputed(() => {
-      return t('messageDetailsTitleReceipts', formatUserCount(this.receiptUsers()));
+      return t(
+        'messageDetailsTitleReceipts',
+        this.message().expectsReadConfirmation ? formatUserCount(this.receiptUsers()) : '',
+      );
     });
 
     this.likesTitle = ko.pureComputed(() => {
