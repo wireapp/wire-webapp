@@ -35,5 +35,5 @@ export const childrenWithDefaultProps = <E extends Element, P extends any>(props
     }
 
     const elementChild: React.ReactElement<P> = node;
-    return React.cloneElement<P>(elementChild, {...props.defaultProps, ...elementChild.props});
+    return React.cloneElement<P>(elementChild, {...(props.defaultProps as any), ...(elementChild.props as any)});
   });
