@@ -7,7 +7,7 @@
     "copy": "0.3.2",
     "cosmiconfig": "6.0.0",
     "fs-extra": "9.0.0",
-    "jszip": "3.2.2",
+    "jszip": "3.4.0",
     "logdown": "3.3.1",
     "rimraf": "3.0.2"
   },
