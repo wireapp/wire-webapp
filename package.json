@@ -66,7 +66,6 @@
     "@types/highlight.js": "9.12.3",
     "@types/jasmine": "3.5.10",
     "@types/js-cookie": "2.2.6",
-    "@types/jszip": "3.4.1",
     "@types/keyboardjs": "2.4.1",
     "@types/libsodium-wrappers-sumo": "0.7.3",
     "@types/linkify-it": "2.1.0",
