@@ -17,21 +17,21 @@
  *
  */
 
-import {GenericMessage} from '@wireapp/protocol-messaging';
+import type {GenericMessage} from '@wireapp/protocol-messaging';
 import {amplify} from 'amplify';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import type {NewOTRMessage} from '@wireapp/api-client/dist/conversation';
 
 import {Logger, getLogger} from 'Util/Logger';
-import {NewOTRMessage} from '@wireapp/api-client/dist/conversation';
-import {ClientRepository} from '../client/ClientRepository';
-import {ClientMismatchHandler} from '../conversation/ClientMismatchHandler';
-import {ConversationRepository} from '../conversation/ConversationRepository';
+import type {ClientRepository} from '../client/ClientRepository';
+import type {ClientMismatchHandler} from '../conversation/ClientMismatchHandler';
+import type {ConversationRepository} from '../conversation/ConversationRepository';
 import {EventInfoEntity} from '../conversation/EventInfoEntity';
-import {CryptographyRepository} from '../cryptography/CryptographyRepository';
-import {User} from '../entity/User';
+import type {CryptographyRepository} from '../cryptography/CryptographyRepository';
+import type {User} from '../entity/User';
 import {BackendClientError} from '../error/BackendClientError';
-import {WebAppEvents} from '../event/WebApp';
-import {MessageSender} from '../message/MessageSender';
-import {BroadcastService} from './BroadcastService';
+import type {MessageSender} from '../message/MessageSender';
+import type {BroadcastService} from './BroadcastService';
 
 export class BroadcastRepository {
   private readonly broadcastService: BroadcastService;

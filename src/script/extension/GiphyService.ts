@@ -17,8 +17,8 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client';
-import {
+import type {APIClient} from '@wireapp/api-client';
+import type {
   GiphySearchOptions,
   GiphyMultipleResult,
   GiphyResult,
@@ -49,7 +49,7 @@ export class GiphyService {
   }
 
   /**
-   * Get a randomg Giphy GIFs.
+   * Get a random Giphy GIF.
    * @param tag GIF tag to limit randomness by
    */
   getRandom(tag: string): Promise<GiphyResult> {

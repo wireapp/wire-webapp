@@ -19,20 +19,20 @@
 
 import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE} from '@wireapp/api-client/dist/conversation';
 import {amplify} from 'amplify';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {t} from 'Util/LocalizerUtil';
 
 import {BackendClientError} from '../error/BackendClientError';
 import {BackendEvent} from '../event/Backend';
-import {WebAppEvents} from '../event/WebApp';
 import {EventName} from '../tracking/EventName';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 
-import {Conversation} from '../entity/Conversation';
+import type {Conversation} from '../entity/Conversation';
 import {AbstractConversationEventHandler, EventHandlingConfig} from './AbstractConversationEventHandler';
 import {ACCESS_STATE} from './AccessState';
-import {ConversationMapper} from './ConversationMapper';
-import {ConversationService} from './ConversationService';
+import type {ConversationMapper} from './ConversationMapper';
+import type {ConversationService} from './ConversationService';
 
 export class ConversationStateHandler extends AbstractConversationEventHandler {
   private readonly conversationMapper: ConversationMapper;

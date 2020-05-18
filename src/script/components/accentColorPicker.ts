@@ -18,7 +18,8 @@
  */
 
 import ko from 'knockout';
-import {User} from '../entity/User';
+
+import type {User} from '../entity/User';
 
 interface AccentColorPickerParams {
   selected: (id: string) => void;

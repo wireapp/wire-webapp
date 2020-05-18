@@ -17,7 +17,7 @@
  *
  */
 
-import {AppAction} from '.';
+import type {AppAction} from '.';
 
 export enum RUNTIME_ACTION {
   RUNTIME_CHECK_INDEXEDDB_START = 'RUNTIME_CHECK_INDEXEDDB_START',

@@ -52,6 +52,7 @@ import TeamName from './TeamName';
 import VerifyEmailCode from './VerifyEmailCode';
 import VerifyEmailLink from './VerifyEmailLink';
 import VerifyPhoneCode from './VerifyPhoneCode';
+import CustomEnvironmentRedirect from './CustomEnvironmentRedirect';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
@@ -125,6 +126,7 @@ const Root = ({
               <Route path={`${ROUTE.SSO}/:code?`} component={SingleSignOn} />
               <Route path={ROUTE.VERIFY_EMAIL_LINK} component={VerifyEmailLink} />
               <Route path={ROUTE.VERIFY_PHONE_CODE} component={VerifyPhoneCode} />
+              <Route path={ROUTE.CUSTOM_ENV_REDIRECT} component={CustomEnvironmentRedirect} />
               <Route
                 path={ROUTE.VERIFY_EMAIL_CODE}
                 component={Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && VerifyEmailCode}

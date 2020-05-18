@@ -19,21 +19,21 @@
 
 import {amplify} from 'amplify';
 import type {Data as OpenGraphResult} from 'open-graph';
-import {Asset, LinkPreview} from '@wireapp/protocol-messaging';
+import type {Asset, LinkPreview} from '@wireapp/protocol-messaging';
 import {AssetRetentionPolicy} from '@wireapp/api-client/dist/asset';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {base64ToBlob, createRandomUuid} from 'Util/util';
-import {getLogger, Logger} from 'Util/Logger';
+import {Logger, getLogger} from 'Util/Logger';
 
 import {getFirstLinkWithOffset} from './LinkPreviewHelpers';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
-import {WebAppEvents} from '../event/WebApp';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {isBlacklisted} from './LinkPreviewBlackList';
 import {buildFromOpenGraphData} from './LinkPreviewProtoBuilder';
 import {LinkPreviewError} from '../error/LinkPreviewError';
-import {AssetUploader} from '../assets/AssetUploader';
-import {PropertiesRepository} from '../properties/PropertiesRepository';
+import type {AssetUploader} from '../assets/AssetUploader';
+import type {PropertiesRepository} from '../properties/PropertiesRepository';
 
 declare global {
   interface Window {

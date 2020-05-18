@@ -23,7 +23,7 @@ import React from 'react';
 import waitForExpect from 'wait-for-expect';
 import {actionRoot} from '../module/action';
 import {initialRootState, RootState, Api} from '../module/reducer';
-import {ROUTE} from '../route';
+import {ROUTE, QUERY_KEY} from '../route';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
 import SingleSignOnForm, {SingleSignOnFormProps} from './SingleSignOnForm';
@@ -228,7 +228,9 @@ describe('SingleSignOnForm', () => {
     });
     const email = ' mail@mail.com ';
     const inputHost = 'http://localhost:8080?test=true';
-    const expectedHost = 'http://localhost:8080?test=true&clienttype=permanent&sso_auto_login=true';
+    const expectedHost = `/auth?${QUERY_KEY.DESTINATION_URL}=${encodeURIComponent(
+      `${inputHost}&clienttype=permanent&sso_auto_login=true`,
+    )}#${ROUTE.CUSTOM_ENV_REDIRECT}`;
 
     spyOn(actionRoot.authAction, 'doGetDomainInfo').and.returnValue(() =>
       Promise.resolve({config_json_url: '', webapp_welcome_url: inputHost}),
@@ -274,7 +276,9 @@ describe('SingleSignOnForm', () => {
     });
     const email = ' mail@mail.com ';
     const inputHost = 'http://localhost:8080?test=true';
-    const expectedHost = 'http://localhost:8080?test=true&clienttype=temporary&sso_auto_login=true';
+    const expectedHost = `/auth?${QUERY_KEY.DESTINATION_URL}=${encodeURIComponent(
+      `${inputHost}&clienttype=temporary&sso_auto_login=true`,
+    )}#${ROUTE.CUSTOM_ENV_REDIRECT}`;
 
     spyOn(actionRoot.authAction, 'doGetDomainInfo').and.returnValue(() =>
       Promise.resolve({config_json_url: '', webapp_welcome_url: inputHost}),

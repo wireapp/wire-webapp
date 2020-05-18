@@ -18,7 +18,8 @@
  */
 
 import ko from 'knockout';
-import {Conversation} from '../entity/Conversation';
+
+import type {Conversation} from '../entity/Conversation';
 
 interface ReceiptModeToggleParams {
   conversation: ko.Observable<Conversation>;

@@ -19,7 +19,7 @@
 
 import * as express from 'express';
 
-import {ServerConfig} from '../ServerConfig';
+import type {ServerConfig} from '../ServerConfig';
 import * as BrowserUtil from '../util/BrowserUtil';
 
 const STATUS_CODE_FOUND = 302;

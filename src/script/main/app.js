@@ -23,6 +23,7 @@ import 'core-js/es7/reflect';
 import ko from 'knockout';
 import platform from 'platform';
 import {container} from 'tsyringe';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
@@ -33,8 +34,7 @@ import {Environment} from 'Util/Environment';
 import {exposeWrapperGlobals} from 'Util/wrapper';
 import {includesString} from 'Util/StringUtil';
 import {appendParameter} from 'Util/UrlUtil';
-import Dexie from 'dexie';
-
+import {APIClient} from '@wireapp/api-client';
 import {Config} from '../Config';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {LoadingViewModel} from '../view_model/LoadingViewModel';
@@ -57,7 +57,7 @@ import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {TeamRepository} from '../team/TeamRepository';
 import {SearchRepository} from '../search/SearchRepository';
 import {ConversationRepository} from '../conversation/ConversationRepository';
-
+import Dexie from 'dexie';
 import {EventRepository} from '../event/EventRepository';
 import {EventServiceNoCompound} from '../event/EventServiceNoCompound';
 import {EventService} from '../event/EventService';
@@ -89,7 +89,6 @@ import {getWebsiteUrl} from '../externalRoute';
 
 import {modals} from '../view_model/ModalsViewModel';
 import {showInitialModal} from '../user/AvailabilityModal';
-import {WebAppEvents} from '../event/WebApp';
 
 import {URLParameter} from '../auth/URLParameter';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
@@ -165,6 +164,7 @@ class App {
    */
   constructor(apiClient, backendClient, appContainer, encryptedEngine) {
     this.apiClient = apiClient;
+    this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () => this.logout(SIGN_OUT_REASON.NOT_SIGNED_IN, false));
     this.backendClient = backendClient;
     this.logger = getLogger('App');
     this.appContainer = appContainer;
@@ -341,6 +341,18 @@ class App {
   _subscribeToEvents() {
     amplify.subscribe(WebAppEvents.LIFECYCLE.REFRESH, this.refresh.bind(this));
     amplify.subscribe(WebAppEvents.LIFECYCLE.SIGN_OUT, this.logout.bind(this));
+    amplify.subscribe(WebAppEvents.CONNECTION.ACCESS_TOKEN.RENEW, async source => {
+      this.logger.info(`Access token refresh triggered by "${source}"...`);
+      const apiClient = container.resolve(APIClientSingleton).getClient();
+      try {
+        await apiClient.transport.http.refreshAccessToken();
+        amplify.publish(WebAppEvents.CONNECTION.ACCESS_TOKEN.RENEWED);
+        this.logger.info(`Refreshed access token.`);
+      } catch (error) {
+        this.logger.warn(`Logging out user because access token cannot be refreshed: ${error.message}`, error);
+        this.logout(SIGN_OUT_REASON.NOT_SIGNED_IN, false);
+      }
+    });
   }
 
   //##############################################################################
@@ -557,7 +569,7 @@ class App {
             Raygun.send(error);
           }
 
-          return this.logout(SIGN_OUT_REASON.APP_INIT);
+          return this.logout(SIGN_OUT_REASON.APP_INIT, false);
         }
       }
     }
@@ -750,7 +762,7 @@ class App {
    * @param {boolean} clearData Keep data in database
    * @returns {undefined} No return value
    */
-  logout(signOutReason, clearData = false) {
+  logout(signOutReason, clearData) {
     const _redirectToLogin = () => {
       amplify.publish(WebAppEvents.LIFECYCLE.SIGNED_OUT, clearData);
       this._redirectToLogin(signOutReason);

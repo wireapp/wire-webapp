@@ -19,10 +19,11 @@
 
 import ko from 'knockout';
 import {amplify} from 'amplify';
-import {ConversationRolesList} from '@wireapp/api-client/dist/conversation/ConversationRole';
-import {TeamData} from '@wireapp/api-client/dist/team/team/TeamData';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import type {ConversationRolesList} from '@wireapp/api-client/dist/conversation/ConversationRole';
+import type {TeamData} from '@wireapp/api-client/dist/team/team/TeamData';
 import {TEAM_EVENT} from '@wireapp/api-client/dist/event/TeamEvent';
-import {
+import type {
   TeamConversationDeleteEvent,
   TeamDeleteEvent,
   TeamEvent,
@@ -32,7 +33,7 @@ import {
   TeamUpdateEvent,
 } from '@wireapp/api-client/dist/event';
 
-import {getLogger, Logger} from 'Util/Logger';
+import {Logger, getLogger} from 'Util/Logger';
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
 import {loadDataUrl} from 'Util/util';
@@ -43,17 +44,16 @@ import {TeamMapper} from './TeamMapper';
 import {TeamEntity} from './TeamEntity';
 import {roleFromTeamPermissions, ROLE} from '../user/UserPermission';
 
-import {WebAppEvents} from '../event/WebApp';
 import {IntegrationMapper} from '../integration/IntegrationMapper';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {SuperProperty} from '../tracking/SuperProperty';
-import {User} from '../entity/User';
-import {TeamService} from './TeamService';
-import {ROLE as TEAM_ROLE} from '../user/UserPermission';
-import {UserRepository} from '../user/UserRepository';
-import {EventRepository} from '../event/EventRepository';
-import {TeamMemberEntity} from './TeamMemberEntity';
-import {ServiceEntity} from '../integration/ServiceEntity';
+import type {User} from '../entity/User';
+import type {TeamService} from './TeamService';
+import type {ROLE as TEAM_ROLE} from '../user/UserPermission';
+import type {UserRepository} from '../user/UserRepository';
+import type {EventRepository} from '../event/EventRepository';
+import type {TeamMemberEntity} from './TeamMemberEntity';
+import type {ServiceEntity} from '../integration/ServiceEntity';
 
 export interface AccountInfo {
   accentID: number;

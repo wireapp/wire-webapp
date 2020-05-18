@@ -20,7 +20,7 @@
 import {Logger, getLogger} from 'Util/Logger';
 
 import {StorageSchemata} from '../storage/StorageSchemata';
-import {StorageService} from './StorageService';
+import type {StorageService} from './StorageService';
 import {StorageError} from '../error/StorageError';
 
 type AmplifyRecord = {key: string; value: string};

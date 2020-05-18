@@ -19,17 +19,17 @@
 
 import ko from 'knockout';
 import {amplify} from 'amplify';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {isBeforeToday, formatDateNumeral, formatTimeShort} from 'Util/TimeUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
 
-import {WebAppEvents} from '../event/WebApp';
 import {QuoteEntity} from '../message/QuoteEntity';
 import {ConversationError} from '../error/ConversationError';
-import {Conversation} from '../entity/Conversation';
-import {ConversationRepository} from '../conversation/ConversationRepository';
-import {ContentMessage} from '../entity/message/ContentMessage';
-import {User} from '../entity/User';
+import type {Conversation} from '../entity/Conversation';
+import type {ConversationRepository} from '../conversation/ConversationRepository';
+import type {ContentMessage} from '../entity/message/ContentMessage';
+import type {User} from '../entity/User';
 
 interface MessageQuoteParams {
   conversation: ko.Observable<Conversation>;

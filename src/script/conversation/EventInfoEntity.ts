@@ -17,8 +17,9 @@
  *
  */
 
-import {GenericMessage, IGenericMessage} from '@wireapp/protocol-messaging';
-import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
+import type {GenericMessage, IGenericMessage} from '@wireapp/protocol-messaging';
+
+import type {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 
 export interface MessageSendingOptions {
   /** Send native push notification for message. Default is `true`. */

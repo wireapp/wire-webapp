@@ -19,8 +19,8 @@
 
 import {t} from 'Util/LocalizerUtil';
 
-import {ConversationLabelRepository} from '../conversation/ConversationLabelRepository';
-import {Conversation} from '../entity/Conversation';
+import type {ConversationLabelRepository} from '../conversation/ConversationLabelRepository';
+import type {Conversation} from '../entity/Conversation';
 import {Context, ContextMenuEntry} from '../ui/ContextMenu';
 
 export const showLabelContextMenu = (

@@ -17,8 +17,9 @@
  *
  */
 
-import {ConversationEvent} from '@wireapp/api-client/dist/event';
-import {AppAction} from '.';
+import type {ConversationEvent} from '@wireapp/api-client/dist/event';
+
+import type {AppAction} from '.';
 
 export enum CONVERSATION_ACTION {
   CONVERSATION_CODE_CHECK_START = 'CONVERSATION_CODE_CHECK_START',

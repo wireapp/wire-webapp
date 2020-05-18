@@ -18,6 +18,7 @@
  */
 
 import {amplify} from 'amplify';
+
 import {resetStoreValue} from 'Util/StorageUtil';
 
 import {StorageKey} from '../storage/StorageKey';

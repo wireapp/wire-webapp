@@ -18,16 +18,16 @@
  */
 
 import {amplify} from 'amplify';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {getLogger, Logger} from 'Util/Logger';
+import {Logger, getLogger} from 'Util/Logger';
 import {Environment} from 'Util/Environment';
 
 import {AppInitStatistics, AppStatistics} from './AppInitStatistics';
 import {AppInitTimings, AppTimings} from './AppInitTimings';
-import {WebAppEvents} from '../../event/WebApp';
 import {EventName} from '../../tracking/EventName';
-import {AppInitStatisticsValue} from './AppInitStatisticsValue';
-import {AppInitTimingsStep} from './AppInitTimingsStep';
+import type {AppInitStatisticsValue} from './AppInitStatisticsValue';
+import type {AppInitTimingsStep} from './AppInitTimingsStep';
 
 export class AppInitTelemetry {
   private readonly logger: Logger;

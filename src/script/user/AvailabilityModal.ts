@@ -18,6 +18,7 @@
  */
 
 import {Availability} from '@wireapp/protocol-messaging';
+
 import {t} from 'Util/LocalizerUtil';
 import {loadValue, storeValue} from 'Util/StorageUtil';
 

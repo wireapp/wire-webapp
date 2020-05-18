@@ -19,6 +19,7 @@
 
 import {amplify} from 'amplify';
 import ko from 'knockout';
+import {WebAppEvents} from '@wireapp/webapp-events';
 import {Availability} from '@wireapp/protocol-messaging';
 
 import {t} from 'Util/LocalizerUtil';
@@ -28,10 +29,9 @@ import {getFirstChar} from 'Util/StringUtil';
 
 import {ACCENT_ID} from '../Config';
 import {ROLE as TEAM_ROLE} from '../user/UserPermission';
-import {WebAppEvents} from '../event/WebApp';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
-import {ClientEntity} from '../client/ClientEntity';
-import {AssetRemoteData} from '../assets/AssetRemoteData';
+import type {ClientEntity} from '../client/ClientEntity';
+import type {AssetRemoteData} from '../assets/AssetRemoteData';
 
 // Please note: The own user has a "locale"
 export class User {

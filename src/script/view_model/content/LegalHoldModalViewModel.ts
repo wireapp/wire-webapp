@@ -19,18 +19,21 @@
 
 import {LegalHoldMemberStatus} from '@wireapp/api-client/dist/team/legalhold';
 import {amplify} from 'amplify';
-import {UserDevicesHistory, UserDevicesState, makeUserDevicesHistory} from 'Components/userDevices';
+
 import ko from 'knockout';
-import {ClientRepository} from 'src/script/client/ClientRepository';
-import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
-import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
-import {Conversation} from 'src/script/entity/Conversation';
-import {User} from 'src/script/entity/User';
-import {TeamRepository} from 'src/script/team/TeamRepository';
-import {UserRepository} from 'src/script/user/UserRepository';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
+import {UserDevicesHistory, UserDevicesState, makeUserDevicesHistory} from 'Components/userDevices';
 import {t} from 'Util/LocalizerUtil';
+
+import type {ClientRepository} from 'src/script/client/ClientRepository';
+import type {ConversationRepository} from 'src/script/conversation/ConversationRepository';
+import type {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
+import type {Conversation} from 'src/script/entity/Conversation';
+import type {User} from 'src/script/entity/User';
+import type {TeamRepository} from 'src/script/team/TeamRepository';
+import type {UserRepository} from 'src/script/user/UserRepository';
 import {BackendClientError} from '../../error/BackendClientError';
-import {WebAppEvents} from '../../event/WebApp';
 
 export const SHOW_REQUEST_MODAL = 'LegalHold.showRequestModal';
 export const HIDE_REQUEST_MODAL = 'LegalHold.hideRequestModal';

@@ -19,14 +19,14 @@
 
 import {amplify} from 'amplify';
 import ko from 'knockout';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Declension, joinNames, t} from 'Util/LocalizerUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 
-import {WebAppEvents} from '../../event/WebApp';
 import {SuperType} from '../../message/SuperType';
 import {VerificationMessageType} from '../../message/VerificationMessageType';
-import {User} from '../User';
+import type {User} from '../User';
 import {Message} from './Message';
 
 export class VerificationMessage extends Message {

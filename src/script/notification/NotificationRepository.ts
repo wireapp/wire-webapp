@@ -17,9 +17,11 @@
  *
  */
 
+import {NotificationPreference} from '@wireapp/api-client/dist/user/data';
 import {Availability} from '@wireapp/protocol-messaging';
 import {amplify} from 'amplify';
 import ko from 'knockout';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Environment} from 'Util/Environment';
 import {Declension, t} from 'Util/LocalizerUtil';
@@ -32,35 +34,38 @@ import {getRenderedTextContent} from 'Util/messageRenderer';
 
 import {AudioType} from '../audio/AudioType';
 import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
-import {WebAppEvents} from '../event/WebApp';
 import {PermissionStatusState} from '../permission/PermissionStatusState';
 import {PermissionType} from '../permission/PermissionType';
-import {NotificationPreference} from './NotificationPreference';
 import {PermissionState} from './PermissionState';
 
-import {CallingRepository} from '../calling/CallingRepository';
-import {ConnectionEntity} from '../connection/ConnectionEntity';
+import type {CallingRepository} from '../calling/CallingRepository';
+import type {ConnectionEntity} from '../connection/ConnectionEntity';
 import {ConversationEphemeralHandler} from '../conversation/ConversationEphemeralHandler';
-import {ConversationRepository} from '../conversation/ConversationRepository';
-import {Conversation} from '../entity/Conversation';
-import {CallMessage} from '../entity/message/CallMessage';
-import {ContentMessage} from '../entity/message/ContentMessage';
-import {DeleteConversationMessage} from '../entity/message/DeleteConversationMessage';
-import {MemberMessage} from '../entity/message/MemberMessage';
-import {Message} from '../entity/message/Message';
-import {MessageTimerUpdateMessage} from '../entity/message/MessageTimerUpdateMessage';
-import {RenameMessage} from '../entity/message/RenameMessage';
-import {SystemMessage} from '../entity/message/SystemMessage';
-import {User} from '../entity/User';
+import type {ConversationRepository} from '../conversation/ConversationRepository';
+import type {Conversation} from '../entity/Conversation';
+import type {CallMessage} from '../entity/message/CallMessage';
+import type {ContentMessage} from '../entity/message/ContentMessage';
+import type {DeleteConversationMessage} from '../entity/message/DeleteConversationMessage';
+import type {MemberMessage} from '../entity/message/MemberMessage';
+import type {Message} from '../entity/message/Message';
+import type {MessageTimerUpdateMessage} from '../entity/message/MessageTimerUpdateMessage';
+import type {RenameMessage} from '../entity/message/RenameMessage';
+import type {SystemMessage} from '../entity/message/SystemMessage';
+import type {User} from '../entity/User';
 import {SuperType} from '../message/SuperType';
 import {SystemMessageType} from '../message/SystemMessageType';
-import {PermissionRepository} from '../permission/PermissionRepository';
-import {UserRepository} from '../user/UserRepository';
+import type {PermissionRepository} from '../permission/PermissionRepository';
+import type {UserRepository} from '../user/UserRepository';
 import {ContentViewModel} from '../view_model/ContentViewModel';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
 
+export interface Multitasking {
+  autoMinimize?: ko.Observable<boolean>;
+  isMinimized: ko.Observable<boolean> | (() => false);
+}
+
 interface ContentViewModelState {
-  multitasking: {isMinimized: ko.Observable<boolean> | (() => false)};
+  multitasking: Multitasking;
   state: () => string | false;
 }
 

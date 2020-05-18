@@ -19,9 +19,8 @@
 
 import {FORWARDED_QUERY_KEYS} from '../route';
 
-export function pathWithParams(
-  path: string,
-  additionalParams?: string,
+export function getSearchParams(
+  additionalParams: {[query: string]: string} = {},
   whitelistParams: string[] = FORWARDED_QUERY_KEYS,
 ): string {
   const searchParams = window.location.search
@@ -32,16 +31,20 @@ export function pathWithParams(
       const paramName = searchParam.split('=')[0];
       return whitelistParams.includes(paramName);
     });
+  Object.entries(additionalParams).forEach(([query, value]) => {
+    searchParams.push(`${query}=${value}`);
+  });
 
-  if (additionalParams) {
-    searchParams.push(additionalParams);
-  }
-  const joinedParams = searchParams.join('&');
-  return `${path}${joinedParams.length ? `?${joinedParams}` : ''}`;
+  return searchParams.join('&');
 }
 
-export function getURLParameter(parameterName: string): string {
-  return (window.location.search.split(`${parameterName}=`)[1] || '').split('&')[0];
+export function pathWithParams(
+  path: string,
+  additionalParams?: {[query: string]: string},
+  whitelistParams: string[] = FORWARDED_QUERY_KEYS,
+): string {
+  const params = getSearchParams(additionalParams, whitelistParams);
+  return `${path}${params.length ? `?${params}` : ''}`;
 }
 
 export function hasURLParameter(parameterName: string): boolean {

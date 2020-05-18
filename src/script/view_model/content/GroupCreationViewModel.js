@@ -18,6 +18,7 @@
  */
 
 import {Confirmation} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
@@ -27,7 +28,6 @@ import {sortUsersByPriority} from 'Util/StringUtil';
 import * as trackingHelpers from '../../tracking/Helpers';
 import {EventName} from '../../tracking/EventName';
 import {ACCESS_STATE} from '../../conversation/AccessState';
-import {WebAppEvents} from '../../event/WebApp';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
 
 export class GroupCreationViewModel {

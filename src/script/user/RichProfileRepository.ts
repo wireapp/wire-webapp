@@ -17,8 +17,8 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client';
-import {RichInfo} from '@wireapp/api-client/dist/user/';
+import type {APIClient} from '@wireapp/api-client';
+import type {RichInfo} from '@wireapp/api-client/dist/user/';
 
 export class RichProfileRepository {
   private readonly apiClient: APIClient;

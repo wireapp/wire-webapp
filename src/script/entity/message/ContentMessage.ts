@@ -23,14 +23,14 @@ import {copyText} from 'Util/ClipboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatLocale, formatTimeShort} from 'Util/TimeUtil';
 
-import {QuoteEntity} from '../../message/QuoteEntity';
+import type {QuoteEntity} from '../../message/QuoteEntity';
 import {SuperType} from '../../message/SuperType';
-import {User} from '../User';
-import {Asset} from './Asset';
-import {File as FileAsset} from './File';
-import {MediumImage} from './MediumImage';
+import type {User} from '../User';
+import type {Asset} from './Asset';
+import type {File as FileAsset} from './File';
+import type {MediumImage} from './MediumImage';
 import {Message} from './Message';
-import {Text as TextAsset} from './Text';
+import type {Text as TextAsset} from './Text';
 
 export class ContentMessage extends Message {
   readonly edited_timestamp: ko.Observable<number>;
@@ -38,11 +38,11 @@ export class ContentMessage extends Message {
   private readonly quote: ko.Observable<QuoteEntity>;
   private readonly reactions_user_ets: ko.ObservableArray<User>;
   readonly reactions: ko.Observable<{[userId: string]: string}>;
-  public readonly assets: ko.ObservableArray<Asset>;
+  public readonly assets: ko.ObservableArray<Asset | FileAsset | TextAsset | MediumImage>;
   public readonly is_liked: ko.PureComputed<boolean>;
   public readonly like_caption: ko.PureComputed<string>;
   public readonly other_likes: ko.PureComputed<User[]>;
-  public readonly reactions_user_ids: ko.PureComputed<void>;
+  public readonly reactions_user_ids: ko.PureComputed<string>;
   public readonly was_edited: ko.PureComputed<boolean>;
   public replacing_message_id: null | string;
 
@@ -59,7 +59,7 @@ export class ContentMessage extends Message {
     this.reactions = ko.observable({});
     this.reactions_user_ets = ko.observableArray();
     this.reactions_user_ids = ko.pureComputed(() => {
-      this.reactions_user_ets()
+      return this.reactions_user_ets()
         .map(user_et => user_et.name())
         .join(', ');
     });
@@ -115,7 +115,7 @@ export class ContentMessage extends Message {
    * Get the first asset attached to the message.
    * @returns The first asset attached to the message
    */
-  get_first_asset(): Asset {
+  get_first_asset(): Asset | FileAsset | TextAsset | MediumImage {
     return this.assets()[0];
   }
 

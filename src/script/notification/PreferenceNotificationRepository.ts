@@ -20,13 +20,13 @@
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {groupBy} from 'underscore';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {loadValue, resetStoreValue, storeValue} from 'Util/StorageUtil';
 
-import {ClientEntity} from '../client/ClientEntity';
-import {User} from '../entity/User';
+import type {ClientEntity} from '../client/ClientEntity';
+import type {User} from '../entity/User';
 import {BackendEvent} from '../event/Backend';
-import {WebAppEvents} from '../event/WebApp';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 
 interface Notification {

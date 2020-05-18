@@ -18,6 +18,7 @@
  */
 
 import {amplify} from 'amplify';
+import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
 
 import {t} from 'Util/LocalizerUtil';
@@ -25,24 +26,23 @@ import {includesOnlyEmojis} from 'Util/EmojiUtil';
 import {formatDateNumeral, formatTimeShort} from 'Util/TimeUtil';
 
 import {EphemeralStatusType} from '../message/EphemeralStatusType';
-import {WebAppEvents} from '../event/WebApp';
 import {Context} from '../ui/ContextMenu';
-import {ContentMessage} from '../entity/message/ContentMessage';
+import type {ContentMessage} from '../entity/message/ContentMessage';
 
 import {SystemMessageType} from '../message/SystemMessageType';
-import {CompositeMessage} from '../entity/message/CompositeMessage';
-import {VerificationMessage} from '../entity/message/VerificationMessage';
+import type {CompositeMessage} from '../entity/message/CompositeMessage';
+import type {VerificationMessage} from '../entity/message/VerificationMessage';
 import {StatusType} from '../message/StatusType';
-import {Text} from '../entity/message/Text';
+import type {Text} from '../entity/message/Text';
 import {ParticipantAvatar} from 'Components/participantAvatar';
 import {SHOW_LEGAL_HOLD_MODAL} from '../view_model/content/LegalHoldModalViewModel';
-import {ActionsViewModel} from '../view_model/ActionsViewModel';
-import {Conversation} from '../entity/Conversation';
-import {User} from '../entity/User';
-import {MessageListViewModel} from '../view_model/content/MessageListViewModel';
-import {DecryptErrorMessage} from '../entity/message/DecryptErrorMessage';
-import {ConversationRepository} from '../conversation/ConversationRepository';
-import {SystemMessage} from '../entity/message/SystemMessage';
+import type {ActionsViewModel} from '../view_model/ActionsViewModel';
+import type {Conversation} from '../entity/Conversation';
+import type {User} from '../entity/User';
+import type {MessageListViewModel} from '../view_model/content/MessageListViewModel';
+import type {DecryptErrorMessage} from '../entity/message/DecryptErrorMessage';
+import type {ConversationRepository} from '../conversation/ConversationRepository';
+import type {SystemMessage} from '../entity/message/SystemMessage';
 
 import './asset/audioAsset';
 import './asset/fileAsset';
@@ -197,6 +197,9 @@ class Message {
     });
 
     this.readReceiptText = ko.pureComputed(() => {
+      if (!this.message.expectsReadConfirmation) {
+        return '';
+      }
       const receipts = this.message.readReceipts();
       if (!receipts.length) {
         return '';

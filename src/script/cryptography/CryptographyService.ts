@@ -17,10 +17,10 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client';
-import {ClientPreKey, PreKey} from '@wireapp/api-client/dist/auth';
-import {UserClients} from '@wireapp/api-client/dist/conversation';
-import {UserPreKeyBundleMap} from '@wireapp/api-client/dist/user';
+import type {APIClient} from '@wireapp/api-client';
+import type {ClientPreKey, PreKey} from '@wireapp/api-client/dist/auth';
+import type {UserClients} from '@wireapp/api-client/dist/conversation';
+import type {UserPreKeyBundleMap} from '@wireapp/api-client/dist/user';
 
 export class CryptographyService {
   private readonly apiClient: APIClient;

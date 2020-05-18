@@ -28,12 +28,12 @@ interface Params {
 class DeviceToggleButton {
   private readonly availableDevices: ko.Observable<string[]>;
   private readonly currentDevice: ko.Observable<string>;
-  public selectNextDevice: (data: any, event: any) => void;
+  public selectNextDevice: (_: unknown, event: Event) => void;
 
   constructor({currentDevice, devices, onChooseDevice}: Params) {
     this.availableDevices = devices;
     this.currentDevice = currentDevice;
-    this.selectNextDevice = (data: any, event: any) => {
+    this.selectNextDevice = (_: unknown, event: Event) => {
       event.preventDefault();
       event.stopPropagation();
       const currentDeviceIndex = this.availableDevices().indexOf(this.currentDevice());

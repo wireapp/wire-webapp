@@ -1,4 +1,4 @@
-import {IHelmetContentSecurityPolicyDirectives} from 'helmet';
+import type {IHelmetContentSecurityPolicyDirectives} from 'helmet';
 
 export interface ServerConfig {
   CLIENT: {
@@ -50,6 +50,7 @@ export interface ServerConfig {
       };
     };
     VERSION: string;
+    WEBSITE_LABEL: string;
   };
   COMMIT: string;
   SERVER: {

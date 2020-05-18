@@ -18,19 +18,20 @@
  */
 
 import ko from 'knockout';
+import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 
 import {t} from 'Util/LocalizerUtil';
 import {formatLocale} from 'Util/TimeUtil';
 
 import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
-import {WebAppEvents} from '../../event/WebApp';
 import {SuperType} from '../../message/SuperType';
-import {Message, ReadReceipt} from '../../entity/message/Message';
-import {ConversationRepository} from '../../conversation/ConversationRepository';
-import {TeamRepository} from '../../team/TeamRepository';
-import {User} from '../../entity/User';
-import {ContentMessage} from '../../entity/message/ContentMessage';
+import type {Message, ReadReceipt} from '../../entity/message/Message';
+import type {ConversationRepository} from '../../conversation/ConversationRepository';
+import type {TeamRepository} from '../../team/TeamRepository';
+import type {User} from '../../entity/User';
+import type {ContentMessage} from '../../entity/message/ContentMessage';
+import type {MemberMessage} from '../../entity/message/MemberMessage';
 
 export class MessageDetailsViewModel extends BasePanelViewModel {
   conversationRepository: ConversationRepository;
@@ -39,7 +40,7 @@ export class MessageDetailsViewModel extends BasePanelViewModel {
   likes: ko.PureComputed<string[]>;
   likesTitle: ko.PureComputed<string>;
   likeUsers: ko.ObservableArray<User>;
-  message: ko.PureComputed<ContentMessage>;
+  message: ko.PureComputed<ContentMessage | MemberMessage | undefined>;
   messageId: ko.Observable<string>;
   panelTitle: ko.PureComputed<string>;
   receipts: ko.PureComputed<ReadReceipt[]>;
@@ -84,15 +85,14 @@ export class MessageDetailsViewModel extends BasePanelViewModel {
 
     this.message = ko.pureComputed(() => {
       if (!this.isVisible()) {
-        return;
+        return undefined;
       }
 
       const visibleMessage = this.activeConversation()
         .messages_unordered()
         .find(({id}) => id === this.messageId());
-      if (visibleMessage) {
-        return visibleMessage;
-      }
+
+      return visibleMessage;
     });
 
     this.state = ko.pureComputed(() => {
@@ -146,7 +146,7 @@ export class MessageDetailsViewModel extends BasePanelViewModel {
     });
 
     this.likes = ko.pureComputed(() => {
-      const reactions = this.supportsLikes() && this.message().reactions();
+      const reactions = this.supportsLikes() && (this.message() as ContentMessage).reactions();
       return reactions ? Object.keys(reactions) : [];
     });
 
@@ -155,7 +155,10 @@ export class MessageDetailsViewModel extends BasePanelViewModel {
     });
 
     this.receiptsTitle = ko.pureComputed(() => {
-      return t('messageDetailsTitleReceipts', formatUserCount(this.receiptUsers()));
+      return t(
+        'messageDetailsTitleReceipts',
+        this.message().expectsReadConfirmation ? formatUserCount(this.receiptUsers()) : '',
+      );
     });
 
     this.likesTitle = ko.pureComputed(() => {
@@ -165,7 +168,10 @@ export class MessageDetailsViewModel extends BasePanelViewModel {
     this.showTabs = ko.pureComputed(() => this.supportsReceipts() && this.supportsLikes());
 
     this.editedFooter = ko.pureComputed(() => {
-      return this.message()?.edited_timestamp?.() && formatTime(this.message().edited_timestamp());
+      return (
+        (this.message() as ContentMessage)?.edited_timestamp?.() &&
+        formatTime((this.message() as ContentMessage).edited_timestamp())
+      );
     });
 
     this.panelTitle = ko.pureComputed(() => {

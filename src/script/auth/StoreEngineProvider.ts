@@ -17,7 +17,7 @@
  *
  */
 
-import {CRUDEngine} from '@wireapp/store-engine';
+import type {CRUDEngine} from '@wireapp/store-engine';
 import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
 import Dexie from 'dexie';
