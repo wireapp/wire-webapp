@@ -174,6 +174,7 @@ export const WebAppEvents = {
       INTERFACE: {
         THEME: 'wire.webapp.properties.update.interface.theme',
         USE_DARK_MODE: 'wire.webapp.properties.update.interface.use_dark_mode',
+        VIEW_FOLDERS: 'wire.webapp.properties.update.interface.view_folders',
       },
       NOTIFICATIONS: 'wire.webapp.properties.update.notifications',
       PREVIEWS: {
