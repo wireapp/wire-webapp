@@ -1508,10 +1508,10 @@
   resolved "https://registry.yarnpkg.com/@types/raygun4js/-/raygun4js-2.13.3.tgz#24be92a9e21ae5fa7b954b5ed31922987b5c77cb"
   integrity sha512-tx7hfTXUTYF3XxPrRaVwL/nYQAdQS1PuOkyvkgJyzoAleLs+ezIG66lb5aEfNZ0NzBDp7/hanEvFuptCjjGzPg==
 
-"@types/react-dom@16.9.7":
-  version "16.9.7"
-  resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-16.9.7.tgz#60844d48ce252d7b2dccf0c7bb937130e27c0cd2"
-  integrity sha512-GHTYhM8/OwUCf254WO5xqR/aqD3gC9kSTLpopWGpQLpnw23jk44RvMHsyUSEplvRJZdHxhJGMMLF0kCPYHPhQA==
+"@types/react-dom@16.9.8":
+  version "16.9.8"
+  resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-16.9.8.tgz#fe4c1e11dfc67155733dfa6aa65108b4971cb423"
+  integrity sha512-ykkPQ+5nFknnlU6lDd947WbQ6TE3NNzbQAkInC2EKY1qeYdTKp7onFusmYZb+ityzx2YviqT6BXSu+LyWWJwcA==
   dependencies:
     "@types/react" "*"
 
