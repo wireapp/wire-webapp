@@ -22,7 +22,16 @@ import logdown from 'logdown';
 
 import {AccountAPI} from './account/AccountAPI';
 import {AssetAPI} from './asset/';
-import {AccessTokenData, AccessTokenStore, AuthAPI, Context, Cookie, LoginData, RegisterData} from './auth/';
+import {
+  AccessTokenData,
+  AccessTokenStore,
+  AuthAPI,
+  Context,
+  Cookie,
+  InvalidTokenError,
+  LoginData,
+  RegisterData,
+} from './auth/';
 import {CookieStore} from './auth/CookieStore';
 import {BroadcastAPI} from './broadcast/';
 import {ClientAPI, ClientType} from './client/';
@@ -64,7 +73,7 @@ const defaultConfig: Config = {
 };
 
 export interface APIClient {
-  on(event: TOPIC.ON_LOGOUT, listener: () => void): this;
+  on(event: TOPIC.ON_LOGOUT, listener: (error: InvalidTokenError) => void): this;
   on(event: TOPIC.COOKIE_REFRESH, listener: (cookie?: Cookie) => void): this;
   on(event: TOPIC.ACCESS_TOKEN_REFRESH, listener: (accessToken: AccessTokenData) => void): this;
 }
@@ -128,8 +137,11 @@ export class APIClient extends EventEmitter {
     const httpClient = new HttpClient(this.config.urls.rest, this.accessTokenStore);
     const webSocket = new WebSocketClient(this.config.urls.ws, httpClient);
 
-    httpClient.on(HttpClient.TOPIC.ON_INVALID_TOKEN, this.logoutOnAccessTokenRefreshError.bind(this));
-    webSocket.on(WebSocketClient.TOPIC.ON_INVALID_TOKEN, this.logoutOnAccessTokenRefreshError.bind(this));
+    webSocket.on(WebSocketClient.TOPIC.ON_INVALID_TOKEN, async error => {
+      this.logger.warn(`Cannot renew access token because cookie is invalid: ${error.message}`, error);
+      await this.logout();
+      this.emit(APIClient.TOPIC.ON_LOGOUT, error);
+    });
 
     this.transport = {
       http: httpClient,
@@ -203,18 +215,6 @@ export class APIClient extends EventEmitter {
     this.user = {
       api: new UserAPI(this.transport.http),
     };
-  }
-
-  private async logoutOnAccessTokenRefreshError() {
-    this.logger.warn(`Cannot renew access token.`);
-    try {
-      await this.logout();
-    } catch (error) {
-      // Catching to avoid uncaught promises / unhandled promise rejection warnings when you cannot logout because of an invalid cookie or access token.
-      this.logger.warn(`Cannot logout: ${error.message}`, error);
-    } finally {
-      this.emit(APIClient.TOPIC.ON_LOGOUT);
-    }
   }
 
   public async init(clientType: ClientType = ClientType.NONE, cookie?: Cookie): Promise<Context> {
