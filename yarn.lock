@@ -1310,10 +1310,10 @@
   dependencies:
     "@types/color-convert" "*"
 
-"@types/dexie-batch@0.4.0":
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/@types/dexie-batch/-/dexie-batch-0.4.0.tgz#9a25fa378f23baf9007b5052fe17d43a0442426d"
-  integrity sha512-gYWGxfFK25ykXia0uhJA/Xeius87qK+maLP7lxpYZ/RZMC8rwpjReXkUbiRhp9jVAn3e9A6j8nGQxKv7hLNRJA==
+"@types/dexie-batch@0.4.1":
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/@types/dexie-batch/-/dexie-batch-0.4.1.tgz#4e83ecf216f846616c9179080dc139b70197158b"
+  integrity sha512-9mtP3BIQui9TwqW5t1GTRPWQa0OSUBdC8OLZGrdPRQQ6UZHRXRN5ZO1+u82OxH/LlpGiUpz+/E4EdJmHv0wYKg==
   dependencies:
     dexie "^2.0.0"
 
