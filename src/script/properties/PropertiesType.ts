@@ -42,7 +42,7 @@ enum PROPERTIES {
 }
 
 enum VIEW {
-  RECENT_CONVERSATIONS = 'labels',
+  RECENT_CONVERSATIONS = 'settings.view.labels',
 }
 
 const PROPERTIES_TYPE = {
