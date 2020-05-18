@@ -24,7 +24,6 @@ import {
   PublicClient,
   RegisteredClient,
 } from '@wireapp/api-client/dist/client/';
-import type {PreKey} from '@wireapp/api-client/dist/auth/PreKey';
 import type {UserClientAddEvent, UserClientRemoveEvent} from '@wireapp/api-client/dist/event';
 import {amplify} from 'amplify';
 import platform from 'platform';
@@ -36,6 +35,7 @@ import {Logger, getLogger} from 'Util/Logger';
 import {loadValue, storeValue} from 'Util/StorageUtil';
 import {murmurhash3} from 'Util/util';
 
+import type {ClientKeys} from '../cryptography/CryptographyRepository';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {Config} from '../Config';
 import {BackendEvent} from '../event/Backend';
@@ -46,7 +46,7 @@ import {ClientEntity} from './ClientEntity';
 import {ClientMapper} from './ClientMapper';
 import type {ClientService} from './ClientService';
 
-import type {CryptographyRepository} from '../cryptography/CryptographyRepository';
+import type {CryptographyRepository, SignalingKeys} from '../cryptography/CryptographyRepository';
 import type {User} from '../entity/User';
 import {BackendClientError} from '../error/BackendClientError';
 import {ClientError} from '../error/ClientError';
@@ -361,8 +361,8 @@ export class ClientRepository {
   private createRegistrationPayload(
     clientType: ClientType.TEMPORARY | ClientType.PERMANENT,
     password: string,
-    [lastResortKey, preKeys, signalingKeys]: [PreKey, PreKey[], PreKey[]],
-  ): NewClient & {sigkeys: PreKey[]} {
+    {lastResortKey, preKeys, signalingKeys}: ClientKeys,
+  ): NewClient & {sigkeys: SignalingKeys} {
     let deviceLabel = `${platform.os.family}`;
 
     if (platform.os.version) {
