@@ -23,7 +23,7 @@ import 'Components/availabilityState';
 import 'Components/legalHoldDot';
 import 'Components/list/groupedConversations';
 import {ParticipantAvatar} from 'Components/participantAvatar';
-import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
+import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {NOTIFICATION_HANDLING_STATE} from '../../event/NotificationHandlingState';
