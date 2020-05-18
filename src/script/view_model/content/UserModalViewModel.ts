@@ -24,9 +24,9 @@ import {noop} from 'Util/util';
 import {Actions} from 'Components/panel/userActions';
 
 import {Config} from '../../Config';
-import {User} from '../../entity/User';
-import {UserRepository} from '../../user/UserRepository';
-import {ActionsViewModel} from '../ActionsViewModel';
+import type {User} from '../../entity/User';
+import type {UserRepository} from '../../user/UserRepository';
+import type {ActionsViewModel} from '../ActionsViewModel';
 
 export class UserModalViewModel {
   userRepository: UserRepository;

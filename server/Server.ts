@@ -23,6 +23,7 @@ import * as hbs from 'hbs';
 import * as helmet from 'helmet';
 import * as http from 'http';
 import * as path from 'path';
+
 import {HealthCheckRoute} from './routes/_health/HealthRoute';
 import {AppleAssociationRoute} from './routes/appleassociation/AppleAssociationRoute';
 import {ConfigRoute} from './routes/config/ConfigRoute';
@@ -30,7 +31,7 @@ import {InternalErrorRoute, NotFoundRoute} from './routes/error/ErrorRoutes';
 import {GoogleWebmasterRoute} from './routes/googlewebmaster/GoogleWebmasterRoute';
 import {RedirectRoutes} from './routes/RedirectRoutes';
 import {Root} from './routes/Root';
-import {ServerConfig} from './ServerConfig';
+import type {ServerConfig} from './ServerConfig';
 import * as BrowserUtil from './util/BrowserUtil';
 
 const STATUS_CODE_MOVED = 301;

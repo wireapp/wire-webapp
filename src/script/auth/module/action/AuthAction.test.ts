@@ -17,9 +17,10 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client';
+import type {APIClient} from '@wireapp/api-client';
 import {ClientType} from '@wireapp/api-client/dist/client';
-import {TypeUtil} from '@wireapp/commons';
+import type {TypeUtil} from '@wireapp/commons';
+
 import {mockStoreFactory} from '../../util/test/mockStoreFactory';
 import {actionRoot} from './';
 import {BackendError} from './BackendError';

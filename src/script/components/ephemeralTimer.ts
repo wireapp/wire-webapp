@@ -17,7 +17,7 @@
  *
  */
 
-import {Message} from '../entity/message/Message';
+import type {Message} from '../entity/message/Message';
 
 interface EphemeralTimerParams {
   message: Message;

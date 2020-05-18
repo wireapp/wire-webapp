@@ -24,8 +24,8 @@ import {
   PublicClient,
   RegisteredClient,
 } from '@wireapp/api-client/dist/client/';
-import {PreKey} from '@wireapp/api-client/dist/auth/PreKey';
-import {UserClientAddEvent, UserClientRemoveEvent} from '@wireapp/api-client/dist/event';
+import type {PreKey} from '@wireapp/api-client/dist/auth/PreKey';
+import type {UserClientAddEvent, UserClientRemoveEvent} from '@wireapp/api-client/dist/event';
 import {amplify} from 'amplify';
 import platform from 'platform';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -44,10 +44,10 @@ import {ModalsViewModel} from '../view_model/ModalsViewModel';
 
 import {ClientEntity} from './ClientEntity';
 import {ClientMapper} from './ClientMapper';
-import {ClientService} from './ClientService';
+import type {ClientService} from './ClientService';
 
-import {CryptographyRepository} from '../cryptography/CryptographyRepository';
-import {User} from '../entity/User';
+import type {CryptographyRepository} from '../cryptography/CryptographyRepository';
+import type {User} from '../entity/User';
 import {BackendClientError} from '../error/BackendClientError';
 import {ClientError} from '../error/ClientError';
 

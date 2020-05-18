@@ -1,4 +1,4 @@
-import {IHelmetContentSecurityPolicyDirectives} from 'helmet';
+import type {IHelmetContentSecurityPolicyDirectives} from 'helmet';
 
 export interface ServerConfig {
   CLIENT: {

@@ -20,7 +20,7 @@
 import {Environment} from 'Util/Environment';
 
 import {Conversation} from '../entity/Conversation';
-import {User} from '../entity/User';
+import type {User} from '../entity/User';
 import {ConversationType, PlatformType, UserType} from './attribute';
 
 /**

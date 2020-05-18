@@ -17,8 +17,8 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client';
-import {CallConfigData} from '@wireapp/api-client/dist/account/CallConfigData';
+import type {APIClient} from '@wireapp/api-client';
+import type {CallConfigData} from '@wireapp/api-client/dist/account/CallConfigData';
 import {
   CALL_TYPE,
   CONV_TYPE,
@@ -40,7 +40,7 @@ import 'webrtc-adapter';
 
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
-import {getLogger, Logger} from 'Util/Logger';
+import {Logger, getLogger} from 'Util/Logger';
 import {createRandomUuid} from 'Util/util';
 
 import {Config} from '../Config';
@@ -56,11 +56,11 @@ import {EventBuilder} from '../conversation/EventBuilder';
 import {EventInfoEntity} from '../conversation/EventInfoEntity';
 import {EventRepository} from '../event/EventRepository';
 
-import {MediaStreamHandler} from '../media/MediaStreamHandler';
+import type {MediaStreamHandler} from '../media/MediaStreamHandler';
 import {MediaType} from '../media/MediaType';
 
-import {User} from '../entity/User';
-import {ServerTimeHandler} from '../time/serverTimeHandler';
+import type {User} from '../entity/User';
+import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import {Call, ConversationId} from './Call';
 import {DeviceId, Participant, UserId} from './Participant';
 
@@ -383,14 +383,19 @@ export class CallingRepository {
 
       if (res !== 0) {
         this.logger.warn(`recv_msg failed with code: ${res}`);
-        if (res === ERROR.UNKNOWN_PROTOCOL) {
+        if (res === ERROR.UNKNOWN_PROTOCOL && event.content.type === 'CONFSTART') {
           const brandName = Config.getConfig().BRAND_NAME;
-          amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
-            text: {
-              message: t('modalCallUpdateClientMessage', brandName),
-              title: t('modalCallUpdateClientHeadline', brandName),
+          amplify.publish(
+            WebAppEvents.WARNING.MODAL,
+            ModalsViewModel.TYPE.ACKNOWLEDGE,
+            {
+              text: {
+                message: t('modalCallUpdateClientMessage', brandName),
+                title: t('modalCallUpdateClientHeadline', brandName),
+              },
             },
-          });
+            'update-client-warning',
+          );
         }
         return;
       }

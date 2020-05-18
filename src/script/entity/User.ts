@@ -30,8 +30,8 @@ import {getFirstChar} from 'Util/StringUtil';
 import {ACCENT_ID} from '../Config';
 import {ROLE as TEAM_ROLE} from '../user/UserPermission';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
-import {ClientEntity} from '../client/ClientEntity';
-import {AssetRemoteData} from '../assets/AssetRemoteData';
+import type {ClientEntity} from '../client/ClientEntity';
+import type {AssetRemoteData} from '../assets/AssetRemoteData';
 
 // Please note: The own user has a "locale"
 export class User {

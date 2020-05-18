@@ -19,12 +19,12 @@
 
 import ko from 'knockout';
 
-import {getLogger, Logger} from 'Util/Logger';
+import {Logger, getLogger} from 'Util/Logger';
 
 import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
-import {ServiceEntity} from '../../integration/ServiceEntity';
-import {ActionsViewModel} from '../ActionsViewModel';
-import {IntegrationRepository} from '../../integration/IntegrationRepository';
+import type {ServiceEntity} from '../../integration/ServiceEntity';
+import type {ActionsViewModel} from '../ActionsViewModel';
+import type {IntegrationRepository} from '../../integration/IntegrationRepository';
 
 export class GroupParticipantServiceViewModel extends BasePanelViewModel {
   integrationRepository: IntegrationRepository;

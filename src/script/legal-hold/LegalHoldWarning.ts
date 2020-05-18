@@ -23,7 +23,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {t} from 'Util/LocalizerUtil';
 
 import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
-import {Conversation} from '../entity/Conversation';
+import type {Conversation} from '../entity/Conversation';
 import {SHOW_LEGAL_HOLD_MODAL} from '../view_model/content/LegalHoldModalViewModel';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {OPEN_CONVERSATION_DETAILS} from '../view_model/PanelViewModel';

@@ -18,6 +18,7 @@
  */
 
 import ko from 'knockout';
+
 import {Call} from 'src/script/calling/Call';
 import {Participant} from 'src/script/calling/Participant';
 import {Conversation} from 'src/script/entity/Conversation';

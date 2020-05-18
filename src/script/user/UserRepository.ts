@@ -17,11 +17,11 @@
  *
  */
 
-import {AccentColor} from '@wireapp/commons';
-import {PublicClient} from '@wireapp/api-client/dist/client';
+import type {AccentColor} from '@wireapp/commons';
+import type {PublicClient} from '@wireapp/api-client/dist/client';
 import type {BackendError} from '@wireapp/api-client/dist/http';
 import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
-import {User as APIClientUser} from '@wireapp/api-client/dist/user';
+import type {User as APIClientUser} from '@wireapp/api-client/dist/user';
 import {ConsentType, Self as APIClientSelf} from '@wireapp/api-client/dist/self';
 import {UserAsset as APIClientUserAsset, UserAssetType as APIClientUserAssetType} from '@wireapp/api-client/dist/user';
 import {amplify} from 'amplify';
@@ -44,7 +44,7 @@ import {User} from '../entity/User';
 import {BackendEvent} from '../event/Backend';
 import {ClientEvent} from '../event/Client';
 import {EventRepository} from '../event/EventRepository';
-import {EventSource} from '../event/EventSource';
+import type {EventSource} from '../event/EventSource';
 
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
@@ -61,18 +61,18 @@ import {showAvailabilityModal} from './AvailabilityModal';
 import {ConsentValue} from './ConsentValue';
 import {createSuggestions} from './UserHandleGenerator';
 import {UserMapper} from './UserMapper';
-import {UserService} from './UserService';
+import type {UserService} from './UserService';
 
 import {AssetRepository} from '../assets/AssetRepository';
 import {ClientEntity} from '../client/ClientEntity';
 import {ClientMapper} from '../client/ClientMapper';
-import {ClientRepository} from '../client/ClientRepository';
+import type {ClientRepository} from '../client/ClientRepository';
 import {Config} from '../Config';
-import {ConnectionEntity} from '../connection/ConnectionEntity';
+import type {ConnectionEntity} from '../connection/ConnectionEntity';
 import {BackendClientError} from '../error/BackendClientError';
-import {PropertiesRepository} from '../properties/PropertiesRepository';
-import {SelfService} from '../self/SelfService';
-import {ServerTimeHandler} from '../time/serverTimeHandler';
+import type {PropertiesRepository} from '../properties/PropertiesRepository';
+import type {SelfService} from '../self/SelfService';
+import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import {UserError} from '../error/UserError';
 
 export class UserRepository {

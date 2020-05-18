@@ -17,8 +17,9 @@
  *
  */
 
-import {Consent, Self} from '@wireapp/api-client/dist/self';
-import {AppAction} from '.';
+import type {Consent, Self} from '@wireapp/api-client/dist/self';
+
+import type {AppAction} from '.';
 
 export enum SELF_ACTION {
   CONSENT_GET_START = 'CONSENT_GET_START',

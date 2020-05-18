@@ -18,6 +18,7 @@
  */
 
 import ko from 'knockout';
+
 import {instantiateComponent} from '../../../../test/helper/knockoutHelpers';
 import './deviceToggleButton';
 

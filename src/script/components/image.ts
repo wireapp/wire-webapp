@@ -20,7 +20,7 @@
 import ko from 'knockout';
 
 import {viewportObserver} from '../ui/viewportObserver';
-import {AssetRemoteData} from '../assets/AssetRemoteData';
+import type {AssetRemoteData} from '../assets/AssetRemoteData';
 
 interface ImageParams {
   asset: AssetRemoteData;

@@ -23,14 +23,14 @@ import {copyText} from 'Util/ClipboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatLocale, formatTimeShort} from 'Util/TimeUtil';
 
-import {QuoteEntity} from '../../message/QuoteEntity';
+import type {QuoteEntity} from '../../message/QuoteEntity';
 import {SuperType} from '../../message/SuperType';
-import {User} from '../User';
-import {Asset} from './Asset';
-import {File as FileAsset} from './File';
-import {MediumImage} from './MediumImage';
+import type {User} from '../User';
+import type {Asset} from './Asset';
+import type {File as FileAsset} from './File';
+import type {MediumImage} from './MediumImage';
 import {Message} from './Message';
-import {Text as TextAsset} from './Text';
+import type {Text as TextAsset} from './Text';
 
 export class ContentMessage extends Message {
   readonly edited_timestamp: ko.Observable<number>;

@@ -18,8 +18,9 @@
  */
 
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
-import {Conversation} from '../entity/Conversation';
-import {User} from '../entity/User';
+
+import type {Conversation} from '../entity/Conversation';
+import type {User} from '../entity/User';
 import {CONVERSATION, ClientEvent} from '../event/Client';
 
 export type MappedEvent = Record<string, any> & {

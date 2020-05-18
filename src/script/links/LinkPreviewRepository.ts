@@ -19,7 +19,7 @@
 
 import {amplify} from 'amplify';
 import type {Data as OpenGraphResult} from 'open-graph';
-import {Asset, LinkPreview} from '@wireapp/protocol-messaging';
+import type {Asset, LinkPreview} from '@wireapp/protocol-messaging';
 import {AssetRetentionPolicy} from '@wireapp/api-client/dist/asset';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {base64ToBlob, createRandomUuid} from 'Util/util';

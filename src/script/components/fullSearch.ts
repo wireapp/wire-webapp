@@ -25,9 +25,9 @@ import {formatDateShort} from 'Util/TimeUtil';
 
 import {ParticipantAvatar} from 'Components/participantAvatar';
 import {getSearchRegex} from '../search/FullTextSearch';
-import {Message} from '../entity/message/Message';
-import {ContentMessage} from '../entity/message/ContentMessage';
-import {Text} from '../entity/message/Text';
+import type {Message} from '../entity/message/Message';
+import type {ContentMessage} from '../entity/message/ContentMessage';
+import type {Text} from '../entity/message/Text';
 
 interface FullSearchParams {
   change?: (query: string) => void;

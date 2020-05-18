@@ -17,19 +17,19 @@
  *
  */
 
-import Dexie from 'dexie';
+import type Dexie from 'dexie';
 import JSZip from 'jszip';
 
 import {chunk} from 'Util/ArrayUtil';
 import {Logger, getLogger} from 'Util/Logger';
 
-import {ClientRepository} from '../client/ClientRepository';
-import {ConnectionRepository} from '../connection/ConnectionRepository';
-import {ConversationRepository} from '../conversation/ConversationRepository';
-import {Conversation} from '../entity/Conversation';
+import type {ClientRepository} from '../client/ClientRepository';
+import type {ConnectionRepository} from '../connection/ConnectionRepository';
+import type {ConversationRepository} from '../conversation/ConversationRepository';
+import type {Conversation} from '../entity/Conversation';
 import {ClientEvent} from '../event/Client';
 import {StorageSchemata} from '../storage/StorageSchemata';
-import {UserRepository} from '../user/UserRepository';
+import type {UserRepository} from '../user/UserRepository';
 import {BackupService} from './BackupService';
 
 export interface Metadata {

@@ -28,11 +28,11 @@ import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
 
 import {Config} from '../Config';
-import {User} from '../entity/User';
-import {SelfService} from '../self/SelfService';
+import type {User} from '../entity/User';
+import type {SelfService} from '../self/SelfService';
 import {ConsentValue} from '../user/ConsentValue';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
-import {PropertiesService} from './PropertiesService';
+import type {PropertiesService} from './PropertiesService';
 import {PROPERTIES_TYPE} from './PropertiesType';
 
 export class PropertiesRepository {

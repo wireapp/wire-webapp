@@ -18,7 +18,8 @@
  */
 
 import {Logger, getLogger} from '../util/Logger';
-import {GiphyService} from './GiphyService';
+
+import type {GiphyService} from './GiphyService';
 import {GiphySorting} from '@wireapp/api-client/dist/giphy';
 
 export interface Gif {
