@@ -10780,10 +10780,10 @@ raw-body@~1.1.0:
     bytes "1"
     string_decoder "0.10"
 
-raygun4js@2.18.3:
-  version "2.18.3"
-  resolved "https://registry.yarnpkg.com/raygun4js/-/raygun4js-2.18.3.tgz#204a403dcc95d6e449d58952d0a6ade0bde2ca98"
-  integrity sha512-JVVAIYOqUcU9zqMhUJ34Wuh2U45ZY8E/S0v6FVieOku0boZYRMh+8jh7g/OQ8JqAXDjjMpF+GJCcdeVAXHIUeg==
+raygun4js@2.18.4:
+  version "2.18.4"
+  resolved "https://registry.yarnpkg.com/raygun4js/-/raygun4js-2.18.4.tgz#30fc802c3280b02ef0efe2eee309e030250071d5"
+  integrity sha512-EwE4FRtlxB3J8Fdw//1mMay8WKOaG6MyyU/8zROLe3rbi2CFoi6YBHK5/E9Z21CCqx/B6fwiKM+mON00p/1d2A==
 
 rc@^1.2.7:
   version "1.2.8"
