@@ -197,6 +197,9 @@ class Message {
     });
 
     this.readReceiptText = ko.pureComputed(() => {
+      if (!this.message.expectsReadConfirmation) {
+        return '';
+      }
       const receipts = this.message.readReceipts();
       if (!receipts.length) {
         return '';
