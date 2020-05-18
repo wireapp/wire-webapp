@@ -5,7 +5,7 @@
     "@babel/plugin-proposal-object-rest-spread": "7.9.6",
     "@babel/plugin-proposal-optional-chaining": "7.9.0",
     "@babel/preset-typescript": "7.8.3",
-    "@wireapp/websql": "0.0.15",
+    "@wireapp/websql": "0.0.17",
     "uint32": "0.2.1"
   },
   "devDependencies": {
