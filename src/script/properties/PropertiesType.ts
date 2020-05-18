@@ -41,12 +41,17 @@ enum PROPERTIES {
   VERSION = 'version',
 }
 
+enum VIEW {
+  RECENT_CONVERSATIONS = 'labels',
+}
+
 const PROPERTIES_TYPE = {
   ...PROPERTIES,
   CONTACT_IMPORT,
   EMOJI,
   INTERFACE,
   PREVIEWS,
+  VIEW,
 };
 
 export {PROPERTIES_TYPE};

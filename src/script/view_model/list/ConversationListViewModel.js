@@ -17,25 +17,21 @@
  *
  */
 
-import {getLogger} from 'Util/Logger';
-import {t} from 'Util/LocalizerUtil';
-
+import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {NOTIFICATION_HANDLING_STATE} from '../../event/NotificationHandlingState';
+import 'Components/availabilityState';
+import 'Components/legalHoldDot';
+import 'Components/list/groupedConversations';
 import {ParticipantAvatar} from 'Components/participantAvatar';
-
-import {STATE as CALL_STATE, REASON as CALL_REASON} from '@wireapp/avs';
+import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
+import {t} from 'Util/LocalizerUtil';
+import {getLogger} from 'Util/Logger';
+import {NOTIFICATION_HANDLING_STATE} from '../../event/NotificationHandlingState';
+import {generateConversationUrl} from '../../router/routeGenerator';
 import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
 import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
 import {ContentViewModel} from '../ContentViewModel';
-import {generateConversationUrl} from '../../router/routeGenerator';
-import {storeValue, loadValue} from '../../util/StorageUtil';
-
-import 'Components/legalHoldDot';
-import 'Components/availabilityState';
-import 'Components/list/groupedConversations';
-import {StorageKey} from '../../storage';
 
 export class ConversationListViewModel {
   /**
@@ -57,6 +53,7 @@ export class ConversationListViewModel {
     this.teamRepository = repositories.team;
     this.userRepository = repositories.user;
     this.videoGridRepository = repositories.videoGrid;
+    this.propertiesRepository = repositories.properties;
     this.ParticipantAvatar = ParticipantAvatar;
 
     this.contentViewModel = mainViewModel.content;
@@ -125,7 +122,9 @@ export class ConversationListViewModel {
       return this.preferenceNotificationRepository.notifications().length > 0;
     });
 
-    this.showRecentConversations = ko.observable(loadValue(StorageKey.VIEW.RECENT_CONVERSATIONS) ?? true);
+    this.showRecentConversations = ko.observable(
+      this.propertiesRepository.getPreference(PROPERTIES_TYPE.VIEW.RECENT_CONVERSATIONS) ?? true,
+    );
     // TODO: Rename "expandedFolders" to "expandedFolderIds"
     this.expandedFolders = ko.observableArray([]);
 
@@ -134,7 +133,7 @@ export class ConversationListViewModel {
       if (conversationList) {
         conversationList.scrollTop = 0;
       }
-      storeValue(StorageKey.VIEW.RECENT_CONVERSATIONS, value);
+      this.propertiesRepository.savePreference(PROPERTIES_TYPE.VIEW.RECENT_CONVERSATIONS, value);
     });
 
     this.conversationRepository.active_conversation.subscribe(activeConversation => {
