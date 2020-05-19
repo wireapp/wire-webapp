@@ -53,7 +53,7 @@ interface EncryptedPayload {
   sessionId: string;
 }
 
-type Recipients = Record<string, string[]>;
+export type Recipients = Record<string, string[]>;
 
 export interface ClientKeys {
   lastResortKey: BackendPreKey;
