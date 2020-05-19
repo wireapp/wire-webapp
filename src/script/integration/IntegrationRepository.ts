@@ -18,22 +18,22 @@
  */
 
 import {amplify} from 'amplify';
-import {Observable, ObservableArray, PureComputed} from 'knockout';
+import type {Observable, ObservableArray, PureComputed} from 'knockout';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
 import {compareTransliteration, sortByPriority} from 'Util/StringUtil';
 
 import {ACCESS_STATE} from '../conversation/AccessState';
-import {ConversationRepository} from '../conversation/ConversationRepository';
-import {Conversation} from '../entity/Conversation';
-import {User} from '../entity/User';
-import {WebAppEvents} from '../event/WebApp';
-import {TeamRepository} from '../team/TeamRepository';
+import type {ConversationRepository} from '../conversation/ConversationRepository';
+import type {Conversation} from '../entity/Conversation';
+import type {User} from '../entity/User';
+import type {TeamRepository} from '../team/TeamRepository';
 import {EventName} from '../tracking/EventName';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {IntegrationMapper} from './IntegrationMapper';
-import {IntegrationService} from './IntegrationService';
+import type {IntegrationService} from './IntegrationService';
 import {ServiceEntity} from './ServiceEntity';
 import {ServiceTag} from './ServiceTag';
 import {ConversationError} from '../error/ConversationError';

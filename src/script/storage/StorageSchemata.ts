@@ -17,7 +17,7 @@
  *
  */
 
-import {Dexie} from 'dexie';
+import type {Dexie} from 'dexie';
 
 import {base64ToArraySync} from 'Util/util';
 import {categoryFromEvent} from '../message/MessageCategorization';
@@ -29,7 +29,6 @@ interface DexieSchema {
 }
 
 export class StorageSchemata {
-  // tslint:disable-next-line:typedef
   static get OBJECT_STORE() {
     return {
       AMPLIFY: 'amplify',

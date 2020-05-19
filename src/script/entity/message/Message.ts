@@ -18,22 +18,22 @@
  */
 
 import ko from 'knockout';
+import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {getUserName} from 'Util/SanitizationUtil';
 import {TIME_IN_MILLIS, formatDurationCaption, formatTimeShort, fromUnixTime} from 'Util/TimeUtil';
 
-import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {AssetTransferState} from '../../assets/AssetTransferState';
 import {AssetType} from '../../assets/AssetType';
 import {EphemeralStatusType} from '../../message/EphemeralStatusType';
-import {MessageCategory} from '../../message/MessageCategory';
+import type {MessageCategory} from '../../message/MessageCategory';
 import {StatusType} from '../../message/StatusType';
 import {SuperType} from '../../message/SuperType';
 import {User} from '../User';
-import {CallMessage} from './CallMessage';
-import {ContentMessage} from './ContentMessage';
-import {File as FileAsset} from './File';
-import {CompositeMessage} from './CompositeMessage';
+import type {CallMessage} from './CallMessage';
+import type {ContentMessage} from './ContentMessage';
+import type {File as FileAsset} from './File';
+import type {CompositeMessage} from './CompositeMessage';
 
 export interface ReadReceipt {
   time: string;
@@ -42,7 +42,7 @@ export interface ReadReceipt {
 
 export class Message {
   private messageTimerStarted: boolean;
-  private readonly visible: ko.Observable<boolean>;
+  public readonly visible: ko.Observable<boolean>;
   protected readonly affect_order: ko.Observable<boolean>;
   public category?: MessageCategory;
   public conversation_id: string;

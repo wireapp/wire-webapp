@@ -23,8 +23,8 @@ import {Logger, getLogger} from 'Util/Logger';
 import {formatSeconds} from 'Util/TimeUtil';
 
 import {AssetTransferState} from '../../assets/AssetTransferState';
-import {ContentMessage} from '../../entity/message/ContentMessage';
-import {File as FileAsset} from '../../entity/message/File';
+import type {ContentMessage} from '../../entity/message/ContentMessage';
+import type {File as FileAsset} from '../../entity/message/File';
 import {AbstractAssetTransferStateTracker} from './AbstractAssetTransferStateTracker';
 
 interface Params {

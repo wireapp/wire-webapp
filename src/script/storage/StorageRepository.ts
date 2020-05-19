@@ -20,7 +20,7 @@
 import {Logger, getLogger} from 'Util/Logger';
 
 import {StorageSchemata} from '../storage/StorageSchemata';
-import {StorageService} from './StorageService';
+import type {StorageService} from './StorageService';
 import {StorageError} from '../error/StorageError';
 
 type AmplifyRecord = {key: string; value: string};
@@ -30,7 +30,6 @@ export class StorageRepository {
   private readonly logger: Logger;
   private readonly storageService: StorageService;
 
-  // tslint:disable-next-line:typedef
   static get CONFIG() {
     return {
       CRYPTOGRAPHY_TABLES: [

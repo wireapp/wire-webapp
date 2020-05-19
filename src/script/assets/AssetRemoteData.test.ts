@@ -37,10 +37,9 @@ describe('AssetRemoteData', () => {
       );
     });
 
-    it('should load and decrypt v1 asset', () => {
-      return remote_data.load().then((blob: Blob) => {
-        expect(new Blob([video_bytes], {type: video_type})).toEqual(blob);
-      });
+    it('should load and decrypt v1 asset', async () => {
+      const blob = await remote_data.load();
+      expect<void | Blob>(new Blob([video_bytes], {type: video_type})).toEqual(blob);
     });
   });
 
@@ -49,19 +48,17 @@ describe('AssetRemoteData', () => {
     const video_bytes = new Uint8Array([1, 2, 3, 4]);
     const video_type = 'video/mp4';
 
-    beforeEach(() => {
-      return encryptAesAsset(video_bytes).then(({cipherText, keyBytes, sha256}) => {
-        const conversation_id = createRandomUuid();
-        const asset_id = createRandomUuid();
-        remote_data = AssetRemoteData.v2(conversation_id, asset_id, new Uint8Array(keyBytes), new Uint8Array(sha256));
-        spyOn(remote_data, '_loadBuffer').and.returnValue(Promise.resolve({buffer: cipherText, mimeType: video_type}));
-      });
+    beforeEach(async () => {
+      const {cipherText, keyBytes, sha256} = await encryptAesAsset(video_bytes);
+      const conversation_id = createRandomUuid();
+      const asset_id = createRandomUuid();
+      remote_data = AssetRemoteData.v2(conversation_id, asset_id, new Uint8Array(keyBytes), new Uint8Array(sha256));
+      spyOn(remote_data, '_loadBuffer').and.returnValue(Promise.resolve({buffer: cipherText, mimeType: video_type}));
     });
 
-    it('should load and decrypt v2 asset', () => {
-      return remote_data.load().then((blob: Blob) => {
-        expect(new Blob([video_bytes], {type: video_type})).toEqual(blob);
-      });
+    it('should load and decrypt v2 asset', async () => {
+      const blob = await remote_data.load();
+      expect<void | Blob>(new Blob([video_bytes], {type: video_type})).toEqual(blob);
     });
   });
 });

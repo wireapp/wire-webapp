@@ -18,11 +18,11 @@
  */
 
 import ko from 'knockout';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {t} from 'Util/LocalizerUtil';
 
 import {Config} from '../Config';
-import {WebAppEvents} from '../event/WebApp';
 
 import 'Components/loadingBar';
 

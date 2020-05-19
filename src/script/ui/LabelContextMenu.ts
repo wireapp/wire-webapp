@@ -19,30 +19,30 @@
 
 import {t} from 'Util/LocalizerUtil';
 
-import {ConversationLabelRepository} from '../conversation/ConversationLabelRepository';
-import {Conversation} from '../entity/Conversation';
-import {Context} from '../ui/ContextMenu';
+import type {ConversationLabelRepository} from '../conversation/ConversationLabelRepository';
+import type {Conversation} from '../entity/Conversation';
+import {Context, ContextMenuEntry} from '../ui/ContextMenu';
 
 export const showLabelContextMenu = (
   event: MouseEvent,
   conversation: Conversation,
   labelRepository: ConversationLabelRepository,
 ): void => {
-  const newLabel = {
+  const newLabel: ContextMenuEntry = {
     click: () => labelRepository.addConversationToNewLabel(conversation),
     icon: 'plus-icon',
     label: t('conversationsPopoverNewFolder'),
   };
-  const separator = {isSeparator: true};
+  const separator: ContextMenuEntry = {isSeparator: true};
 
-  const noLabels = {
+  const noLabels: ContextMenuEntry = {
     isDisabled: true,
     label: t('conversationsPopoverNoCustomFolders'),
   };
 
   const conversationLabel = labelRepository.getConversationCustomLabel(conversation);
   const labels = labelRepository.getLabels().filter(label => !!labelRepository.getLabelConversations(label).length);
-  const namedLabels = labels.length
+  const namedLabels: ContextMenuEntry[] = labels.length
     ? labels.map(label => ({
         click: () => labelRepository.addConversationToLabel(label, conversation),
         isChecked: label === conversationLabel,
@@ -50,6 +50,6 @@ export const showLabelContextMenu = (
       }))
     : [noLabels];
 
-  const entries = [newLabel, separator, ...namedLabels];
+  const entries: ContextMenuEntry[] = [newLabel, separator, ...namedLabels];
   Context.from(event, entries, 'conversation-label-context-menu');
 };

@@ -17,12 +17,12 @@
  *
  */
 
-import {ChangePassword, ConsentType, Self} from '@wireapp/api-client/dist/self';
+import type {ChangePassword, ConsentType, Self} from '@wireapp/api-client/dist/self';
 
 import {Environment} from 'Util/Environment';
 import {getLogger} from 'Util/Logger';
 
-import {ThunkAction} from '../reducer';
+import type {ThunkAction} from '../reducer';
 import {SelfActionCreator} from './creator/';
 
 const logger = getLogger('SelfAction');

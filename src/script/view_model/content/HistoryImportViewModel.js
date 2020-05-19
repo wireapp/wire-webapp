@@ -17,16 +17,18 @@
  *
  */
 
-import JSZip from 'jszip';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
+import {loadFileBuffer} from 'Util/util';
+import {WebWorker} from 'Util/worker';
 
 import {Config} from '../../Config';
-import {WebAppEvents} from '../../event/WebApp';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {EventName} from '../../tracking/EventName';
 import {ContentViewModel} from '../ContentViewModel';
+import {CancelError, DifferentAccountError, ImportError, IncompatibleBackupError} from '../../backup/Error';
 
 import 'Components/loadingBar';
 
@@ -85,10 +87,10 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
       if (!error) {
         this.errorHeadline('');
         this.errorSecondary('');
-      } else if (error instanceof z.backup.DifferentAccountError) {
+      } else if (error instanceof DifferentAccountError) {
         this.errorHeadline(t('backupImportAccountErrorHeadline'));
         this.errorSecondary(t('backupImportAccountErrorSecondary'));
-      } else if (error instanceof z.backup.IncompatibleBackupError) {
+      } else if (error instanceof IncompatibleBackupError) {
         this.errorHeadline(t('backupImportVersionErrorHeadline'));
         this.errorSecondary(t('backupImportVersionErrorSecondary', Config.getConfig().BRAND_NAME));
       } else {
@@ -100,13 +102,28 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
     amplify.subscribe(WebAppEvents.BACKUP.IMPORT.START, this.importHistory.bind(this));
   }
 
-  importHistory(file) {
+  /**
+   * Import history from file
+   * @param {File} file The file
+   * @returns {void} void
+   */
+  async importHistory(file) {
     this.state(HistoryImportViewModel.STATE.PREPARING);
     this.error(null);
-    JSZip.loadAsync(file)
-      .then(archive => this.backupRepository.importHistory(archive, this.onInit.bind(this), this.onProgress.bind(this)))
-      .then(this.onSuccess.bind(this))
-      .catch(this.onError.bind(this));
+    const fileBuffer = await loadFileBuffer(file);
+    const worker = new WebWorker('worker/jszip-worker.js');
+
+    try {
+      const files = await worker.post(fileBuffer);
+      if (files.error) {
+        throw new ImportError(files.error);
+      }
+      this.logger.log('Unzipped files for history import', files);
+      await this.backupRepository.importHistory(files, this.onInit.bind(this), this.onProgress.bind(this));
+      this.onSuccess();
+    } catch (error) {
+      this.onError(error);
+    }
   }
 
   onInit(numberOfRecords) {
@@ -135,7 +152,7 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
   }
 
   onError(error) {
-    if (error instanceof z.backup.CancelError) {
+    if (error instanceof CancelError) {
       this.logger.log('History import was cancelled');
       return this.dismissImport();
     }

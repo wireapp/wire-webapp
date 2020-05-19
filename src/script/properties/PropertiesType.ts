@@ -27,6 +27,7 @@ enum EMOJI {
 
 enum INTERFACE {
   THEME = 'settings.interface.theme',
+  VIEW_FOLDERS = 'settings.interface.view_folders',
 }
 
 enum PREVIEWS {

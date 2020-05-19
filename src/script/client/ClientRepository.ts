@@ -17,9 +17,18 @@
  *
  */
 
-import {ClientClassification, NewClient, PublicClient, RegisteredClient} from '@wireapp/api-client/dist/client/';
+import {
+  ClientClassification,
+  ClientType,
+  NewClient,
+  PublicClient,
+  RegisteredClient,
+} from '@wireapp/api-client/dist/client/';
+import type {PreKey} from '@wireapp/api-client/dist/auth/PreKey';
+import type {UserClientAddEvent, UserClientRemoveEvent} from '@wireapp/api-client/dist/event';
 import {amplify} from 'amplify';
 import platform from 'platform';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
@@ -30,19 +39,15 @@ import {murmurhash3} from 'Util/util';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {Config} from '../Config';
 import {BackendEvent} from '../event/Backend';
-import {WebAppEvents} from '../event/WebApp';
 import {StorageKey} from '../storage/StorageKey';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 
 import {ClientEntity} from './ClientEntity';
 import {ClientMapper} from './ClientMapper';
-import {ClientService} from './ClientService';
-import {ClientType} from './ClientType';
+import type {ClientService} from './ClientService';
 
-import {PreKey} from '@wireapp/api-client/dist/auth/PreKey';
-import {UserClientAddEvent, UserClientRemoveEvent} from '@wireapp/api-client/dist/event';
-import {CryptographyRepository} from '../cryptography/CryptographyRepository';
-import {User} from '../entity/User';
+import type {CryptographyRepository} from '../cryptography/CryptographyRepository';
+import type {User} from '../entity/User';
 import {BackendClientError} from '../error/BackendClientError';
 import {ClientError} from '../error/ClientError';
 
@@ -55,14 +60,12 @@ export class ClientRepository {
   currentClient: ko.Observable<ClientEntity>;
   isTemporaryClient: ko.PureComputed<boolean>;
 
-  // tslint:disable-next-line:typedef
   static get CONFIG() {
     return {
       AVERAGE_NUMBER_OF_CLIENTS: 4,
     };
   }
 
-  // tslint:disable-next-line:typedef
   static get PRIMARY_KEY_CURRENT_CLIENT() {
     return 'local_identity';
   }
@@ -356,7 +359,7 @@ export class ClientRepository {
    * @returns Payload to register client with backend
    */
   private createRegistrationPayload(
-    clientType: ClientType,
+    clientType: ClientType.TEMPORARY | ClientType.PERMANENT,
     password: string,
     [lastResortKey, preKeys, signalingKeys]: [PreKey, PreKey[], PreKey[]],
   ): NewClient & {sigkeys: PreKey[]} {
@@ -414,7 +417,10 @@ export class ClientRepository {
    * @param cookieLabel Cookie label, something like "webapp@2153234453@temporary@145770538393"
    * @returns Resolves with the key of the stored cookie label
    */
-  private transferCookieLabel(clientType: ClientType, cookieLabel: string): Promise<string> {
+  private transferCookieLabel(
+    clientType: ClientType.PERMANENT | ClientType.TEMPORARY,
+    cookieLabel: string,
+  ): Promise<string> {
     const indexedDbKey = StorageKey.AUTH.COOKIE_LABEL;
     const userIdentifier = this.selfUser().email() || this.selfUser().phone();
     const localStorageKey = this.constructCookieLabelKey(userIdentifier, clientType);
@@ -437,7 +443,7 @@ export class ClientRepository {
    * Load current client type from amplify store.
    * @returns Type of current client
    */
-  private loadCurrentClientType(): ClientType {
+  private loadCurrentClientType(): ClientType.PERMANENT | ClientType.TEMPORARY {
     if (this.currentClient()) {
       return this.currentClient().type;
     }

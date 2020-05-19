@@ -19,25 +19,25 @@
 
 import {ConnectionStatus} from '@wireapp/api-client/dist/connection';
 import {USER_EVENT, UserConnectionEvent} from '@wireapp/api-client/dist/event';
-import {BackendEventType} from '@wireapp/api-client/dist/event/BackendEvent';
-import {UserConnectionData} from '@wireapp/api-client/dist/user/data';
+import type {BackendEventType} from '@wireapp/api-client/dist/event/BackendEvent';
+import type {UserConnectionData} from '@wireapp/api-client/dist/user/data';
 import {amplify} from 'amplify';
+import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
 
 import {Logger, getLogger} from 'Util/Logger';
 
-import {Conversation} from '../entity/Conversation';
+import type {Conversation} from '../entity/Conversation';
 import {MemberMessage} from '../entity/message/MemberMessage';
-import {User} from '../entity/User';
+import type {User} from '../entity/User';
 import {BaseError} from '../error/BaseError';
 import {EventRepository} from '../event/EventRepository';
-import {EventSource} from '../event/EventSource';
-import {WebAppEvents} from '../event/WebApp';
+import type {EventSource} from '../event/EventSource';
 import {SystemMessageType} from '../message/SystemMessageType';
-import {UserRepository} from '../user/UserRepository';
-import {ConnectionEntity} from './ConnectionEntity';
+import type {UserRepository} from '../user/UserRepository';
+import type {ConnectionEntity} from './ConnectionEntity';
 import {ConnectionMapper} from './ConnectionMapper';
-import {ConnectionService} from './ConnectionService';
+import type {ConnectionService} from './ConnectionService';
 import {ConnectionError} from '../error/ConnectionError';
 
 export class ConnectionRepository {
@@ -47,7 +47,6 @@ export class ConnectionRepository {
   private readonly connectionMapper: ConnectionMapper;
   public readonly connectionEntities: ko.ObservableArray<ConnectionEntity>;
 
-  // tslint:disable-next-line:typedef
   static get CONFIG(): Record<string, BackendEventType[]> {
     return {
       SUPPORTED_EVENTS: [USER_EVENT.CONNECTION],

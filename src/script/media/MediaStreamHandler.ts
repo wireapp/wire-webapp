@@ -18,18 +18,19 @@
  */
 
 import {amplify} from 'amplify';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {Environment} from 'Util/Environment';
 import {Logger, getLogger} from 'Util/Logger';
 
 import {MediaError} from '../error/MediaError';
 import {PermissionError} from '../error/PermissionError';
-import {WebAppEvents} from '../event/WebApp';
-import {PermissionRepository} from '../permission/PermissionRepository';
+import type {PermissionRepository} from '../permission/PermissionRepository';
 import {PermissionStatusState} from '../permission/PermissionStatusState';
 import {PermissionType} from '../permission/PermissionType';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {MediaConstraintsHandler, ScreensharingMethods} from './MediaConstraintsHandler';
-import {MEDIA_STREAM_ERROR} from './MediaStreamError';
+import type {MEDIA_STREAM_ERROR} from './MediaStreamError';
 import {MEDIA_STREAM_ERROR_TYPES} from './MediaStreamErrorTypes';
 import {MediaType} from './MediaType';
 
@@ -40,7 +41,6 @@ declare global {
 }
 
 export class MediaStreamHandler {
-  // tslint:disable-next-line:typedef
   static get CONFIG() {
     return {PERMISSION_HINT_DELAY: 200};
   }

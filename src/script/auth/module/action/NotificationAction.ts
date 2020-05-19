@@ -17,7 +17,7 @@
  *
  */
 
-import {ThunkAction} from '../reducer';
+import type {ThunkAction} from '../reducer';
 import {NotificationActionCreator} from './creator/';
 
 export class NotificationAction {

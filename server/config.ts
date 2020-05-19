@@ -19,10 +19,11 @@
 
 import * as dotenv from 'dotenv-extended';
 import * as fs from 'fs-extra';
-import {IHelmetContentSecurityPolicyDirectives as HelmetCSP} from 'helmet';
+import type {IHelmetContentSecurityPolicyDirectives as HelmetCSP} from 'helmet';
 import * as logdown from 'logdown';
 import * as path from 'path';
-import {ServerConfig} from './ServerConfig';
+
+import type {ServerConfig} from './ServerConfig';
 
 const nodeEnvironment = process.env.NODE_ENV || 'production';
 
@@ -175,6 +176,7 @@ const config: ServerConfig = {
       WEBSITE_BASE: process.env.URL_WEBSITE_BASE,
     },
     VERSION: readFile(VERSION_FILE, '0.0.0'),
+    WEBSITE_LABEL: process.env.WEBSITE_LABEL,
   },
   COMMIT: readFile(COMMIT_FILE, ''),
   SERVER: {

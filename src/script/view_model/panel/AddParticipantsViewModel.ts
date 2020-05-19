@@ -19,8 +19,9 @@
 
 import ko from 'knockout';
 import {amplify} from 'amplify';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {getLogger, Logger} from 'Util/Logger';
+import {Logger, getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
@@ -29,15 +30,15 @@ import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
 import {getManageServicesUrl} from '../../externalRoute';
 import * as trackingHelpers from '../../tracking/Helpers';
 import {EventName} from '../../tracking/EventName';
-import {WebAppEvents} from '../../event/WebApp';
 import {MotionDuration} from '../../motion/MotionDuration';
-import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
-import {IntegrationRepository} from 'src/script/integration/IntegrationRepository';
-import {SearchRepository} from 'src/script/search/SearchRepository';
-import {TeamRepository} from 'src/script/team/TeamRepository';
-import {UserRepository} from 'src/script/user/UserRepository';
-import {ServiceEntity} from 'src/script/integration/ServiceEntity';
-import {User} from 'src/script/entity/User';
+
+import type {ConversationRepository} from 'src/script/conversation/ConversationRepository';
+import type {IntegrationRepository} from 'src/script/integration/IntegrationRepository';
+import type {SearchRepository} from 'src/script/search/SearchRepository';
+import type {TeamRepository} from 'src/script/team/TeamRepository';
+import type {UserRepository} from 'src/script/user/UserRepository';
+import type {ServiceEntity} from 'src/script/integration/ServiceEntity';
+import type {User} from 'src/script/entity/User';
 
 export class AddParticipantsViewModel extends BasePanelViewModel {
   conversationRepository: ConversationRepository;

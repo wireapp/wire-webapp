@@ -22,7 +22,8 @@ import {escape} from 'underscore';
 import {Declension, t} from 'Util/LocalizerUtil';
 import {prependProtocol} from 'Util/UrlUtil';
 import {isValidEmail} from 'Util/ValidationUtil';
-import {User} from '../entity/User';
+
+import type {User} from '../entity/User';
 
 export const escapeRegex = (string: string): string => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 

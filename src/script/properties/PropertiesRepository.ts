@@ -19,25 +19,24 @@
 
 import {amplify} from 'amplify';
 import {Confirmation} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
 import {AudioPreference, NotificationPreference, WebappProperties} from '@wireapp/api-client/dist/user/data';
+import {ConsentType} from '@wireapp/api-client/dist/self';
 
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
 
 import {Config} from '../Config';
-import {User} from '../entity/User';
-import {WebAppEvents} from '../event/WebApp';
-import {SelfService} from '../self/SelfService';
-import {ConsentType} from '../user/ConsentType';
+import type {User} from '../entity/User';
+import type {SelfService} from '../self/SelfService';
 import {ConsentValue} from '../user/ConsentValue';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
-import {PropertiesService} from './PropertiesService';
+import type {PropertiesService} from './PropertiesService';
 import {PROPERTIES_TYPE} from './PropertiesType';
 
 export class PropertiesRepository {
   // Value names are specified by the protocol but key names can be changed.
-  // tslint:disable-next-line:typedef
   static get CONFIG() {
     return {
       WEBAPP_ACCOUNT_SETTINGS: 'webapp',
@@ -287,6 +286,9 @@ export class PropertiesRepository {
         break;
       case PROPERTIES_TYPE.INTERFACE.THEME:
         amplify.publish(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, updatedPreference);
+        break;
+      case PROPERTIES_TYPE.INTERFACE.VIEW_FOLDERS:
+        amplify.publish(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.VIEW_FOLDERS, updatedPreference);
         break;
       case PROPERTIES_TYPE.EMOJI.REPLACE_INLINE:
         amplify.publish(WebAppEvents.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE, updatedPreference);

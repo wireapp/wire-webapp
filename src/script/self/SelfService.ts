@@ -17,9 +17,9 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client';
-import {Consent, Self} from '@wireapp/api-client/dist/self';
-import {UserUpdate} from '@wireapp/api-client/dist/user';
+import type {APIClient} from '@wireapp/api-client';
+import type {Consent, Self} from '@wireapp/api-client/dist/self';
+import type {UserUpdate} from '@wireapp/api-client/dist/user';
 
 export class SelfService {
   private readonly apiClient: APIClient;

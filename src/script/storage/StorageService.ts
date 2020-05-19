@@ -18,15 +18,15 @@
  */
 
 import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
+import {ClientType} from '@wireapp/api-client/dist/client/';
 import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
-
 import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
 import Dexie from 'dexie';
-import {getEphemeralValue} from 'Util/ephemeralValueStore';
 
+import {getEphemeralValue} from 'Util/ephemeralValueStore';
 import {Logger, getLogger} from 'Util/Logger';
 import {loadValue, storeValue} from 'Util/StorageUtil';
-import {ClientType} from '../client/ClientType';
+
 import {Config} from '../Config';
 import {SQLeetSchemata} from './SQLeetSchemata';
 import {StorageKey} from './StorageKey';

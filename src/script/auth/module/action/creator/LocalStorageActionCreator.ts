@@ -17,7 +17,7 @@
  *
  */
 
-import {AppAction} from '.';
+import type {AppAction} from '.';
 
 export enum LOCAL_STORAGE_ACTION {
   LOCAL_STORAGE_SET_START = 'LOCAL_STORAGE_SET_START',

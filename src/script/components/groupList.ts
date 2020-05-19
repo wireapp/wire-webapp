@@ -18,8 +18,9 @@
  */
 
 import ko from 'knockout';
+
 import {ParticipantAvatar} from 'Components/participantAvatar';
-import {Conversation} from '../entity/Conversation';
+import type {Conversation} from '../entity/Conversation';
 
 interface GroupListViewModelParams {
   click: (group: Conversation) => void;

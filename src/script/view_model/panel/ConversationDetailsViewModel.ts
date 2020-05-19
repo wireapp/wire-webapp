@@ -19,8 +19,9 @@
 
 import ko from 'knockout';
 import {amplify} from 'amplify';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {getLogger, Logger} from 'Util/Logger';
+import {Logger, getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {formatDuration} from 'Util/TimeUtil';
 import {removeLineBreaks, sortUsersByPriority} from 'Util/StringUtil';
@@ -28,18 +29,17 @@ import {removeLineBreaks, sortUsersByPriority} from 'Util/StringUtil';
 import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
 import {getNotificationText} from '../../conversation/NotificationSetting';
 import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
-import {WebAppEvents} from '../../event/WebApp';
 import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
-import {IntegrationRepository} from '../../integration/IntegrationRepository';
-import {SearchRepository} from '../../search/SearchRepository';
-import {TeamRepository} from '../../team/TeamRepository';
-import {UserRepository} from '../../user/UserRepository';
-import {ActionsViewModel} from '../ActionsViewModel';
-import {ServiceEntity} from '../../integration/ServiceEntity';
-import {User} from '../../entity/User';
-import {Conversation} from '../../entity/Conversation';
+import type {IntegrationRepository} from '../../integration/IntegrationRepository';
+import type {SearchRepository} from '../../search/SearchRepository';
+import type {TeamRepository} from '../../team/TeamRepository';
+import type {UserRepository} from '../../user/UserRepository';
+import type {ActionsViewModel} from '../ActionsViewModel';
+import type {ServiceEntity} from '../../integration/ServiceEntity';
+import type {User} from '../../entity/User';
+import type {Conversation} from '../../entity/Conversation';
 
 import 'Components/receiptModeToggle';
 import 'Components/panel/panelActions';

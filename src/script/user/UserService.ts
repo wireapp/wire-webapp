@@ -17,14 +17,14 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client';
-import {User as APIClientUser} from '@wireapp/api-client/dist/user';
+import type {APIClient} from '@wireapp/api-client';
+import type {User as APIClientUser} from '@wireapp/api-client/dist/user';
 
 import {Logger, getLogger} from 'Util/Logger';
 
-import {User} from '../entity/User';
+import type {User} from '../entity/User';
 import {StorageSchemata} from '../storage/StorageSchemata';
-import {StorageService} from '../storage/StorageService';
+import type {StorageService} from '../storage/StorageService';
 
 export class UserService {
   private readonly apiClient: APIClient;

@@ -17,11 +17,12 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client';
+import type {APIClient} from '@wireapp/api-client';
+import type {NewClient, PublicClient, RegisteredClient} from '@wireapp/api-client/dist/client';
+
 import {Logger, getLogger} from 'Util/Logger';
 
-import {NewClient, PublicClient, RegisteredClient} from '@wireapp/api-client/dist/client';
-import {StorageService} from '../storage';
+import type {StorageService} from '../storage';
 import {StorageSchemata} from '../storage/StorageSchemata';
 
 export class ClientService {

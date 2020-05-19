@@ -36,10 +36,14 @@ import {
   MessageHide,
   Reaction,
   Text,
+  Asset as ProtobufAsset,
 } from '@wireapp/protocol-messaging';
 import {flatten} from 'underscore';
 import {ConnectionStatus} from '@wireapp/api-client/dist/connection';
 import {RequestCancellationError} from '@wireapp/api-client/dist/user';
+import {DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/dist/conversation';
+import {ReactionType} from '@wireapp/core/dist/conversation';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -56,7 +60,6 @@ import {
   sortUsersByPriority,
 } from 'Util/StringUtil';
 
-import {AssetUploadFailedReason} from '../assets/AssetUploadFailedReason';
 import {encryptAesAsset} from '../assets/AssetCrypto';
 
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
@@ -65,7 +68,6 @@ import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {ClientEvent} from '../event/Client';
 import {EventTypeHandling} from '../event/EventTypeHandling';
 import {BackendEvent} from '../event/Backend';
-import {WebAppEvents} from '../event/WebApp';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {EventRepository} from '../event/EventRepository';
 
@@ -102,7 +104,6 @@ import {SystemMessageType} from '../message/SystemMessageType';
 import {StatusType} from '../message/StatusType';
 import {SuperType} from '../message/SuperType';
 import {MessageCategory} from '../message/MessageCategory';
-import {ReactionType} from '../message/ReactionType';
 import {Config} from '../Config';
 
 import {BaseError} from '../error/BaseError';
@@ -111,7 +112,6 @@ import {showLegalHoldWarning} from '../legal-hold/LegalHoldWarning';
 import * as LegalHoldEvaluator from '../legal-hold/LegalHoldEvaluator';
 import {DeleteConversationMessage} from '../entity/message/DeleteConversationMessage';
 import {ConversationRoleRepository} from './ConversationRoleRepository';
-import {DefaultRole} from './ConversationRoleRepository';
 import {ConversationError} from '../error/ConversationError';
 
 // Conversation repository for all conversation interactions with the conversation service
@@ -2020,11 +2020,11 @@ export class ConversationRepository {
    *
    * @param {Conversation} conversationEntity Conversation that should receive the file
    * @param {string} messageId ID of the metadata message
-   * @param {AssetUploadFailedReason} [reason=AssetUploadFailedReason.FAILED] Cause for the failed upload (optional)
+   * @param {ProtobufAsset.NotUploaded} [reason=ProtobufAsset.NotUploaded.FAILED] Cause for the failed upload (optional)
    * @returns {Promise} Resolves when the asset failure was sent
    */
-  send_asset_upload_failed(conversationEntity, messageId, reason = AssetUploadFailedReason.FAILED) {
-    const wasCancelled = reason === AssetUploadFailedReason.CANCELLED;
+  send_asset_upload_failed(conversationEntity, messageId, reason = ProtobufAsset.NotUploaded.FAILED) {
+    const wasCancelled = reason === ProtobufAsset.NotUploaded.CANCELLED;
     const protoReason = wasCancelled ? Asset.NotUploaded.CANCELLED : Asset.NotUploaded.FAILED;
     const protoAsset = new Asset({
       [PROTO_MESSAGE_TYPE.ASSET_NOT_UPLOADED]: protoReason,
@@ -2857,7 +2857,7 @@ export class ConversationRepository {
     return this.grantMessage(eventInfoEntity, consentType, userIds);
   }
 
-  grantMessage(eventInfoEntity, consentType, userIds, shouldShowLegalHoldWarning = false) {
+  grantMessage(eventInfoEntity, consentType, userIds = null, shouldShowLegalHoldWarning = false) {
     return this.get_conversation_by_id(eventInfoEntity.conversationId).then(conversationEntity => {
       const legalHoldMessageTypes = [
         GENERIC_MESSAGE_TYPE.ASSET,
@@ -3787,7 +3787,7 @@ export class ConversationRepository {
     const fromSelf = event.from === this.selfUser().id;
 
     const isRemoteFailure = !fromSelf && event.data.status === AssetTransferState.UPLOAD_FAILED;
-    const isLocalCancel = fromSelf && event.data.reason === AssetUploadFailedReason.CANCELLED;
+    const isLocalCancel = fromSelf && event.data.reason === ProtobufAsset.NotUploaded.CANCELLED;
 
     if (isRemoteFailure || isLocalCancel) {
       return conversationEntity.remove_message_by_id(event.id);
@@ -4140,7 +4140,7 @@ export class ConversationRepository {
    * @returns {undefined} No return value
    */
   cancel_asset_upload(messageId) {
-    this.send_asset_upload_failed(this.active_conversation(), messageId, AssetUploadFailedReason.CANCELLED);
+    this.send_asset_upload_failed(this.active_conversation(), messageId, ProtobufAsset.NotUploaded.CANCELLED);
   }
 
   /**
@@ -4218,7 +4218,7 @@ export class ConversationRepository {
         }
 
         asset_et.status(reason);
-        asset_et.upload_failed_reason(AssetUploadFailedReason.FAILED);
+        asset_et.upload_failed_reason(ProtobufAsset.NotUploaded.FAILED);
       }
 
       return this.eventService.updateEventAsUploadFailed(message_et.primary_key, reason);

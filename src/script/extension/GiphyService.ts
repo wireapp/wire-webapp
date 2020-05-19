@@ -17,8 +17,13 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client';
-import {GiphySearch, GiphyResult, GiphySearchResult} from '@wireapp/api-client/dist/giphy';
+import type {APIClient} from '@wireapp/api-client';
+import type {
+  GiphySearchOptions,
+  GiphyMultipleResult,
+  GiphyResult,
+  GiphyTrendingOptions,
+} from '@wireapp/api-client/dist/giphy';
 
 export class GiphyService {
   private readonly apiClient: APIClient;
@@ -28,28 +33,40 @@ export class GiphyService {
   }
 
   /**
-   * Get GIFs for IDs.
-   * @param ids A single id or comma separated list of IDs to fetch GIF size data
-   * @returns Resolves with the size data
+   * Get GIFs for an ID
+   * @param ids A single id to fetch GIF data
    */
-  getById(ids: string | string[]): Promise<GiphyResult> {
-    return this.apiClient.giphy.api.getGiphyById(ids);
+  getById(id: string): Promise<GiphyResult> {
+    return this.apiClient.giphy.api.getGiphyById(id);
   }
 
   /**
-   * Search all Giphy GIFs for a word or phrase.
+   * Get GIFs for IDs
+   * @param ids Multiple IDs to fetch GIF data
+   */
+  getByIds(ids: string[]): Promise<GiphyMultipleResult> {
+    return this.apiClient.giphy.api.getGiphyByIds({ids});
+  }
+
+  /**
+   * Get a random Giphy GIF.
    * @param tag GIF tag to limit randomness by
-   * @returns Resolves with random gifs for given tag
    */
   getRandom(tag: string): Promise<GiphyResult> {
-    return this.apiClient.giphy.api.getGiphyRandom(tag);
+    return this.apiClient.giphy.api.getGiphyRandom({tag});
   }
 
   /**
    * Search GIFs for a word or phrase.
-   * @returns Resolves with matches
    */
-  getSearch(options: GiphySearch): Promise<GiphySearchResult> {
+  getSearch(options: GiphySearchOptions): Promise<GiphyMultipleResult> {
     return this.apiClient.giphy.api.getGiphySearch(options);
+  }
+
+  /**
+   * Search GIFs for a word or phrase.
+   */
+  getTrending(options: GiphyTrendingOptions): Promise<GiphyMultipleResult> {
+    return this.apiClient.giphy.api.getGiphyTrending(options);
   }
 }

@@ -32,12 +32,13 @@ import {generateConversationUrl} from '../../router/routeGenerator';
 import 'Components/calling/fullscreenVideoCall';
 import 'Components/groupVideoGrid';
 import 'Components/list/participantItem';
-import {Call} from '../../calling/Call';
-import {CallingRepository} from '../../calling/CallingRepository';
-import {Grid} from '../../calling/videoGridHandler';
-import {Conversation} from '../../entity/Conversation';
-import {User} from '../../entity/User';
-import {CallActions} from '../../view_model/CallingViewModel';
+import type {Call} from '../../calling/Call';
+import type {CallingRepository} from '../../calling/CallingRepository';
+import type {Grid} from '../../calling/videoGridHandler';
+import type {Conversation} from '../../entity/Conversation';
+import type {User} from '../../entity/User';
+import type {CallActions} from '../../view_model/CallingViewModel';
+import type {Multitasking} from '../../notification/NotificationRepository';
 
 interface ComponentParams {
   call: Call;
@@ -45,7 +46,7 @@ interface ComponentParams {
   videoGrid: ko.PureComputed<Grid>;
   callingRepository: CallingRepository;
   temporaryUserStyle?: boolean;
-  multitasking: any;
+  multitasking: Multitasking;
   callActions: CallActions;
   hasAccessToCamera: ko.Observable<boolean>;
   isSelfVerified: ko.Subscribable<boolean>;
@@ -69,7 +70,7 @@ class ConversationListCallingCell {
   readonly isMuted: ko.Observable<boolean>;
   readonly isOngoing: ko.PureComputed<boolean>;
   readonly isOutgoing: ko.PureComputed<boolean>;
-  readonly multitasking: any;
+  readonly multitasking: Multitasking;
   readonly ParticipantAvatar: typeof ParticipantAvatar;
   readonly participantsButtonLabel: ko.PureComputed<string>;
   readonly showMaximize: ko.PureComputed<boolean>;

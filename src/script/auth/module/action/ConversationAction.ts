@@ -17,8 +17,9 @@
  *
  */
 
-import {ConversationEvent} from '@wireapp/api-client/dist/event';
-import {ThunkAction} from '../reducer';
+import type {ConversationEvent} from '@wireapp/api-client/dist/event';
+
+import type {ThunkAction} from '../reducer';
 import {ConversationActionCreator} from './creator/';
 
 export class ConversationAction {

@@ -17,7 +17,7 @@
  *
  */
 
-import {ThunkAction} from '../reducer';
+import type {ThunkAction} from '../reducer';
 import * as CookieSelector from '../selector/CookieSelector';
 import {CookieActionCreator} from './creator/';
 

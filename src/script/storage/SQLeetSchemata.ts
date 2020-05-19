@@ -18,6 +18,7 @@
  */
 
 import {SQLiteProvidedSchema, SQLiteType} from '@wireapp/store-engine-sqleet';
+
 import {StorageSchemata} from './StorageSchemata';
 
 interface SQLeetSchema {

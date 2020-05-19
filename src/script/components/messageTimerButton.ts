@@ -24,7 +24,7 @@ import {formatDuration, DurationUnit} from 'Util/TimeUtil';
 
 import {EphemeralTimings} from '../ephemeral/EphemeralTimings';
 import {Context} from '../ui/ContextMenu';
-import {Conversation} from '../entity/Conversation';
+import type {Conversation} from '../entity/Conversation';
 
 interface MessageTimerButtonParams {
   conversation: ko.Observable<Conversation>;
@@ -48,7 +48,7 @@ class MessageTimerButton {
   }
 
   /** Click on ephemeral button */
-  onClick(data: any, event: Event): void {
+  onClick(_: unknown, event: MouseEvent): void {
     if (this.isTimerDisabled()) {
       return event.preventDefault();
     }

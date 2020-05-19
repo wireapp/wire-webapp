@@ -23,7 +23,7 @@ import {formatDuration} from 'Util/TimeUtil';
 
 import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
 import {EphemeralTimings} from '../../ephemeral/EphemeralTimings';
-import {ConversationRepository} from '../../conversation/ConversationRepository';
+import type {ConversationRepository} from '../../conversation/ConversationRepository';
 
 interface messageTime {
   isCustom: boolean;

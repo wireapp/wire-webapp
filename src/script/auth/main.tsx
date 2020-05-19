@@ -31,12 +31,11 @@ import {exposeWrapperGlobals} from 'Util/wrapper';
 import {Config} from '../Config';
 import {configureClient} from './configureClient';
 import {configureCore} from './configureCore';
-import {configureEnvironment} from './configureEnvironment';
+import './configureEnvironment';
 import {configureStore} from './configureStore';
 import {actionRoot} from './module/action';
 import Root from './page/Root';
 
-configureEnvironment();
 exposeWrapperGlobals();
 
 const apiClient = configureClient();

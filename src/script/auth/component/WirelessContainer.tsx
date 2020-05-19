@@ -17,12 +17,14 @@
  *
  */
 
-import {CloseIcon, Content, Footer, Header, Link, Logo, Small} from '@wireapp/react-ui-kit';
+import {CloseIcon, Content, Footer, Header, Link, Small} from '@wireapp/react-ui-kit';
 import React from 'react';
 import {FormattedMessage, useIntl} from 'react-intl';
-import {addLocaleToUrl} from '../../externalRoute';
 import {cookiePolicyStrings, footerStrings} from '../../strings';
 import {EXTERNAL_ROUTE} from '../externalRoute';
+import {SVGIcon} from '@wireapp/react-ui-kit/dist/Icon/SVGIcon';
+import SVGProvider from '../util/SVGProvider';
+import {Config} from '../../Config';
 
 export interface Props extends React.HTMLAttributes<HTMLDivElement> {
   showCookiePolicyBanner?: boolean;
@@ -80,11 +82,13 @@ export const WirelessContainer: React.SFC<Props> = ({showCookiePolicyBanner, onC
       )}
       <Content>
         <Header style={{height: '40px', marginLeft: '8px', marginTop: '20px'}}>
-          <Logo width={72} />
+          <SVGIcon scale={0.9} realWidth={78} realHeight={25}>
+            <g dangerouslySetInnerHTML={{__html: SVGProvider['logo-full-icon']?.documentElement?.innerHTML}} />
+          </SVGIcon>
         </Header>
         <Content style={{flex: '1', paddingLeft: '8px', width: '100%'}}>{children}</Content>
         <Footer style={{height: '30px', justifyContent: 'flex-end', margin: '0 0 18px 8px'}}>
-          <Link href={addLocaleToUrl(EXTERNAL_ROUTE.WIRE_WEBSITE)}>{_(footerStrings.wireLink)}</Link>
+          <Link href={EXTERNAL_ROUTE.WIRE_WEBSITE}>{Config.getConfig().WEBSITE_LABEL}</Link>
           <Small> &middot; {_(footerStrings.copy)}</Small>
         </Footer>
       </Content>

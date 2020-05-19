@@ -17,16 +17,16 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client';
+import type {APIClient} from '@wireapp/api-client';
 import {AssetOptions, AssetRetentionPolicy, AssetUploadData} from '@wireapp/api-client/dist/asset';
-import {ProgressCallback, RequestCancelable} from '@wireapp/api-client/dist/http';
-import {LegalHoldStatus} from '@wireapp/protocol-messaging';
+import type {ProgressCallback, RequestCancelable} from '@wireapp/api-client/dist/http';
+import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {loadFileBuffer, loadImage} from 'Util/util';
 import {assetV3, legacyAsset} from 'Util/ValidationUtil';
 import {WebWorker} from 'Util/worker';
-import {BackendClient} from '../service/BackendClient';
-import {Conversation} from '../entity/Conversation';
+import type {BackendClient} from '../service/BackendClient';
+import type {Conversation} from '../entity/Conversation';
 
 export interface CompressedImage {
   compressedBytes: Uint8Array;
