@@ -53,6 +53,8 @@ interface EncryptedPayload {
   sessionId: string;
 }
 
+type Recipients = Record<string, string[]>;
+
 export interface ClientKeys {
   lastResortKey: BackendPreKey;
   preKeys: BackendPreKey[];
@@ -144,7 +146,7 @@ export class CryptographyRepository {
    */
   async getRemoteFingerprint(userId: string, clientId: string, preKey?: BackendPreKey): Promise<RegExpMatchArray> {
     const cryptoboxSession = preKey
-      ? await this._createSessionFromPreKey(preKey, userId, clientId)
+      ? await this.createSessionFromPreKey(preKey, userId, clientId)
       : await this.loadSession(userId, clientId);
     return cryptoboxSession ? this.formatFingerprint(cryptoboxSession.fingerprint_remote()) : [];
   }
@@ -197,7 +199,7 @@ export class CryptographyRepository {
 
     return this.cryptobox.session_load(sessionId).catch(() => {
       return this.getUserPreKeyByIds(userId, clientId).then(preKey => {
-        return this._createSessionFromPreKey(preKey, userId, clientId);
+        return this.createSessionFromPreKey(preKey, userId, clientId);
       });
     });
   }
@@ -241,7 +243,7 @@ export class CryptographyRepository {
    * @returns Resolves with the encrypted payload
    */
   async encryptGenericMessage(
-    recipients: Record<string, string[]>,
+    recipients: Recipients,
     genericMessage: GenericMessage,
     payload: NewOTRMessage = this.constructPayload(this.currentClient().id),
   ) {
@@ -249,10 +251,10 @@ export class CryptographyRepository {
     const encryptLogMessage = `Encrypting message of type '${genericMessage.content}' for '${receivingUsers}' users...`;
     this.logger.log(encryptLogMessage, recipients);
 
-    let {messagePayload, missingRecipients} = await this._encryptGenericMessage(recipients, genericMessage, payload);
+    let {messagePayload, missingRecipients} = await this.buildPayload(recipients, genericMessage, payload);
 
     if (Object.keys(missingRecipients).length) {
-      const reEncryptedMessage = await this._encryptGenericMessageForMissingRecipients(
+      const reEncryptedMessage = await this.encryptGenericMessageForMissingRecipients(
         missingRecipients,
         genericMessage,
         messagePayload,
@@ -306,7 +308,7 @@ export class CryptographyRepository {
     }
 
     try {
-      const genericMessage = await this._decryptEvent(event);
+      const genericMessage = await this.decryptEvent(event);
       const mappedMessage = await this.cryptographyMapper.mapGenericMessage(genericMessage, event);
       return mappedMessage;
     } catch (error) {
@@ -319,7 +321,7 @@ export class CryptographyRepository {
     }
   }
 
-  private async _createSessionFromPreKey(
+  private async createSessionFromPreKey(
     preKey: BackendPreKey,
     userId: string,
     clientId: string,
@@ -341,18 +343,18 @@ export class CryptographyRepository {
     }
   }
 
-  async _encryptGenericMessage(
-    recipients: Record<string, string[]>,
+  private async buildPayload(
+    recipients: Recipients,
     genericMessage: GenericMessage,
     messagePayload: NewOTRMessage,
-  ) {
+  ): Promise<{messagePayload: NewOTRMessage; missingRecipients: Recipients}> {
     const cipherPayloadPromises = Object.entries(recipients).reduce<Promise<EncryptedPayload>[]>(
       (accumulator, [userId, clientIds]) => {
         if (clientIds && clientIds.length) {
           messagePayload.recipients[userId] = messagePayload.recipients[userId] || {};
           clientIds.forEach(clientId => {
             const sessionId = this.constructSessionId(userId, clientId);
-            const encryptionPromise = this._encryptPayloadForSession(sessionId, genericMessage);
+            const encryptionPromise = this.encryptPayloadForSession(sessionId, genericMessage);
 
             accumulator.push(encryptionPromise);
           });
@@ -366,8 +368,8 @@ export class CryptographyRepository {
     return this.mapCipherTextToPayload(messagePayload, cipherPayload);
   }
 
-  async _encryptGenericMessageForMissingRecipients(
-    missingRecipients: Record<string, string[]>,
+  private async encryptGenericMessageForMissingRecipients(
+    missingRecipients: Recipients,
     genericMessage: GenericMessage,
     messagePayload: NewOTRMessage,
   ) {
@@ -381,7 +383,7 @@ export class CryptographyRepository {
           if (preKeyPayload) {
             const sessionId = this.constructSessionId(userId, clientId);
             const encryptionPromise = base64ToArray(preKeyPayload.key).then(payloadArray =>
-              this._encryptPayloadForSession(sessionId, genericMessage, payloadArray.buffer),
+              this.encryptPayloadForSession(sessionId, genericMessage, payloadArray.buffer),
             );
             cipherPayloadPromises.push(encryptionPromise);
           }
@@ -393,8 +395,11 @@ export class CryptographyRepository {
     return this.mapCipherTextToPayload(messagePayload, cipherPayload);
   }
 
-  private mapCipherTextToPayload(messagePayload: NewOTRMessage, cipherPayload: EncryptedPayload[]) {
-    const missingRecipients: Record<string, string[]> = {};
+  private mapCipherTextToPayload(
+    messagePayload: NewOTRMessage,
+    cipherPayload: EncryptedPayload[],
+  ): {messagePayload: NewOTRMessage; missingRecipients: Recipients} {
+    const missingRecipients: Recipients = {};
 
     cipherPayload.forEach(({cipherText, sessionId}) => {
       const {userId, clientId} = ClientEntity.dismantleUserClientId(sessionId);
@@ -430,7 +435,7 @@ export class CryptographyRepository {
    * @param event Backend event to decrypt
    * @returns Resolves with the decrypted message in ProtocolBuffer format
    */
-  private async _decryptEvent(event: EventRecord): Promise<GenericMessage> {
+  private async decryptEvent(event: EventRecord): Promise<GenericMessage> {
     const {data: eventData, from: userId} = event;
     const cipherTextArray = await base64ToArray(eventData.text || eventData.key);
     const cipherText = cipherTextArray.buffer;
@@ -449,7 +454,7 @@ export class CryptographyRepository {
    * @param preKeyBundle Pre-key bundle
    * @returns Contains session ID and encrypted message as base64 encoded string
    */
-  private async _encryptPayloadForSession(
+  private async encryptPayloadForSession(
     sessionId: string,
     genericMessage: GenericMessage,
     preKeyBundle?: ArrayBuffer,
