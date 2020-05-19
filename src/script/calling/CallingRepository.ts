@@ -888,6 +888,10 @@ export class CallingRepository {
     const [stream] = streams;
     if (stream.getAudioTracks().length > 0) {
       participant.audioStream(stream);
+      const audio = new Audio();
+
+      audio.srcObject = stream;
+      audio.play();
     }
     if (stream.getVideoTracks().length > 0) {
       participant.videoStream(stream);
