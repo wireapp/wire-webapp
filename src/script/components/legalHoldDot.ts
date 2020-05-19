@@ -48,7 +48,7 @@ ko.components.register('legal-hold-dot', {
     this.isPending = isPending;
     this.isInteractive = !!legalHoldModal;
 
-    this.onClick = (data: any, event: MouseEvent): void => {
+    this.onClick = (_data: unknown, event: MouseEvent): void => {
       event.stopPropagation();
       if (this.isInteractive) {
         if (isPending()) {

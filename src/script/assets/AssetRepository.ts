@@ -17,19 +17,21 @@
  *
  */
 
+import {Asset} from '@wireapp/protocol-messaging';
+import {LegalHoldStatus} from '@wireapp/protocol-messaging';
+
 import {Environment} from 'Util/Environment';
 import {Logger, getLogger} from 'Util/Logger';
 import {AssetService} from './AssetService';
 import {loadFileBuffer, loadImage} from 'Util/util';
 import {WebWorker} from 'Util/worker';
-import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {AssetOptions, AssetRetentionPolicy} from '@wireapp/api-client/dist/asset';
 import {Conversation} from '../entity/Conversation';
 
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {encryptAesAsset, EncryptedAsset} from './AssetCrypto';
 import {AssetUploadData} from '@wireapp/api-client/dist/asset';
-import {Asset} from '@wireapp/protocol-messaging';
+import type {User} from '../entity/User';
 
 export interface CompressedImage {
   compressedBytes: Uint8Array;
@@ -115,12 +117,12 @@ export class AssetRepository {
       compressedImage,
     };
   }
-  getAssetRetention(userEntity: any, conversationEntity: Conversation): AssetRetentionPolicy {
+  getAssetRetention(userEntity: User, conversationEntity: Conversation): AssetRetentionPolicy {
     const isTeamMember = userEntity.inTeam();
     const isTeamConversation = conversationEntity.inTeam();
     const isTeamUserInConversation = conversationEntity
       .participating_user_ets()
-      .some((conversationParticipant: any) => conversationParticipant.inTeam());
+      .some(conversationParticipant => conversationParticipant.inTeam());
 
     const isEternal = isTeamMember || isTeamConversation || isTeamUserInConversation;
     return isEternal ? AssetRetentionPolicy.ETERNAL : AssetRetentionPolicy.PERSISTENT;

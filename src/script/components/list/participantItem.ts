@@ -187,7 +187,7 @@ ko.components.register('participant-item', {
     </div>
   `,
   viewModel: {
-    createViewModel: (props: ParticipantItemParams, componentInfo: any) =>
+    createViewModel: (props: ParticipantItemParams, componentInfo: {element: HTMLElement}) =>
       new ParticipantItem(props, componentInfo.element),
   },
 });
