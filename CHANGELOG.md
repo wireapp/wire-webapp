@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.18.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.17.5...@wireapp/api-client@11.18.0) (2020-05-19)
+
+
+### Features
+
+* Add support for phone-exists api error ([#3041](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3041)) ([0f31803](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/0f31803853d6091ba5aedab8959fac2274d4e56a))
+
+
+
+
+
 ## [11.17.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.17.4...@wireapp/api-client@11.17.5) (2020-05-19)
 
 **Note:** Version bump only for package @wireapp/api-client
