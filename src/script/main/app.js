@@ -111,7 +111,6 @@ import {BackupService} from '../backup/BackupService';
 import {AuthRepository} from '../auth/AuthRepository';
 import {MediaRepository} from '../media/MediaRepository';
 import {GiphyRepository} from '../extension/GiphyRepository';
-import {AssetUploader} from '../assets/AssetUploader';
 import {GiphyService} from '../extension/GiphyService';
 import {PermissionRepository} from '../permission/PermissionRepository';
 import {loadValue} from 'Util/StorageUtil';
@@ -124,6 +123,7 @@ import {CryptographyService} from '../cryptography/CryptographyService';
 import {AccessTokenError} from '../error/AccessTokenError';
 import {ClientError} from '../error/ClientError';
 import {AuthError} from '../error/AuthError';
+import {AssetRepository} from '../assets/AssetRepository';
 
 function doRedirect(signOutReason) {
   let url = `/auth/${location.search}`;
@@ -203,6 +203,7 @@ class App {
     const selfService = new SelfService(this.apiClient);
     const sendingMessageQueue = new MessageSender();
 
+    repositories.asset = new AssetRepository(this.service.asset);
     repositories.audio = new AudioRepository();
     repositories.auth = new AuthRepository(this.apiClient);
     repositories.giphy = new GiphyRepository(new GiphyService(this.apiClient));
@@ -221,7 +222,7 @@ class App {
     repositories.media = new MediaRepository(new PermissionRepository());
     repositories.user = new UserRepository(
       new UserService(this.apiClient, this.service.storage),
-      this.service.asset,
+      repositories.asset,
       selfService,
       repositories.client,
       serverTimeHandler,
@@ -240,23 +241,20 @@ class App {
     repositories.team = new TeamRepository(new TeamService(this.apiClient), repositories.user);
     repositories.eventTracker = new EventTrackingRepository(repositories.team, repositories.user);
 
-    const assetUploader = new AssetUploader(this.service.asset);
-
     repositories.conversation = new ConversationRepository(
       this.service.conversation,
-      this.service.asset,
+      repositories.asset,
       repositories.client,
       repositories.connection,
       repositories.cryptography,
       repositories.event,
       repositories.giphy,
-      new LinkPreviewRepository(assetUploader, repositories.properties),
+      new LinkPreviewRepository(repositories.asset, repositories.properties),
       sendingMessageQueue,
       serverTimeHandler,
       repositories.team,
       repositories.user,
       repositories.properties,
-      assetUploader,
     );
 
     const serviceMiddleware = new ServiceMiddleware(repositories.conversation, repositories.user);

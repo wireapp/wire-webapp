@@ -63,8 +63,8 @@ import {createSuggestions} from './UserHandleGenerator';
 import {UserMapper} from './UserMapper';
 import type {UserService} from './UserService';
 
-import type {AssetService} from '../assets/AssetService';
-import type {ClientEntity} from '../client/ClientEntity';
+import {AssetRepository} from '../assets/AssetRepository';
+import {ClientEntity} from '../client/ClientEntity';
 import {ClientMapper} from '../client/ClientMapper';
 import type {ClientRepository} from '../client/ClientRepository';
 import {Config} from '../Config';
@@ -76,7 +76,7 @@ import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import {UserError} from '../error/UserError';
 
 export class UserRepository {
-  private readonly asset_service: AssetService;
+  private readonly assetRepository: AssetRepository;
   private readonly clientRepository: ClientRepository;
   readonly connected_users: ko.PureComputed<User[]>;
   isTeam: ko.Observable<boolean> | ko.PureComputed<boolean>;
@@ -112,7 +112,7 @@ export class UserRepository {
 
   constructor(
     userService: UserService,
-    asset_service: AssetService,
+    assetRepository: AssetRepository,
     selfService: SelfService,
     clientRepository: ClientRepository,
     serverTimeHandler: ServerTimeHandler,
@@ -120,7 +120,7 @@ export class UserRepository {
   ) {
     this.logger = getLogger('UserRepository');
 
-    this.asset_service = asset_service;
+    this.assetRepository = assetRepository;
     this.clientRepository = clientRepository;
     this.propertyRepository = propertyRepository;
     this.selfService = selfService;
@@ -809,7 +809,7 @@ export class UserRepository {
    * Change the profile image.
    */
   changePicture(picture: Blob): Promise<User> {
-    return this.asset_service
+    return this.assetRepository
       .uploadProfileImage(picture)
       .then(({previewImageKey, mediumImageKey}) => {
         const assets: APIClientUserAsset[] = [
