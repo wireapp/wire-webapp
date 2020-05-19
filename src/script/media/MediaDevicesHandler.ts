@@ -78,6 +78,7 @@ export class MediaDevicesHandler {
         audioOutput: 'default',
         screenInput: 'screen',
         videoInput: 'default',
+        windowInput: 'window',
       },
     };
   }
@@ -250,7 +251,10 @@ export class MediaDevicesHandler {
         height: 176,
         width: 312,
       },
-      types: [MediaDevicesHandler.CONFIG.DEFAULT_DEVICE.screenInput],
+      types: [
+        MediaDevicesHandler.CONFIG.DEFAULT_DEVICE.screenInput,
+        MediaDevicesHandler.CONFIG.DEFAULT_DEVICE.windowInput,
+      ],
     };
 
     const getSourcesWrapper = (options: ElectronGetSourcesOptions): Promise<ElectronDesktopCapturerSource[]> => {
