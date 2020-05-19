@@ -63,6 +63,7 @@ import type {User} from '../entity/User';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import {Call, ConversationId} from './Call';
 import {DeviceId, Participant, UserId} from './Participant';
+import type {Recipients} from '../cryptography/CryptographyRepository';
 
 interface MediaStreamQuery {
   audio?: boolean;
@@ -869,7 +870,7 @@ export class CallingRepository {
     payload: string,
     remoteUserId: UserId | null,
     remoteClientId: DeviceId | null,
-  ): {precondition?: boolean | string[]; recipients: Record<string, string[]>} {
+  ): {precondition?: boolean | string[]; recipients: Recipients} {
     const {type, resp} = JSON.parse(payload);
     let precondition;
     let recipients;

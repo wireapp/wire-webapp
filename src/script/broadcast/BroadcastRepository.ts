@@ -27,7 +27,7 @@ import type {ClientRepository} from '../client/ClientRepository';
 import type {ClientMismatchHandler} from '../conversation/ClientMismatchHandler';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import {EventInfoEntity} from '../conversation/EventInfoEntity';
-import type {CryptographyRepository} from '../cryptography/CryptographyRepository';
+import type {CryptographyRepository, Recipients} from '../cryptography/CryptographyRepository';
 import type {User} from '../entity/User';
 import {BackendClientError} from '../error/BackendClientError';
 import type {MessageSender} from '../message/MessageSender';
@@ -106,8 +106,8 @@ export class BroadcastRepository {
    * @param userEntities Recipients of the message
    * @returns Resolves with a user client map
    */
-  private createBroadcastRecipients(userEntities: User[]): Record<string, string[]> {
-    return userEntities.reduce((recipientsIndex: Record<string, string[]>, userEntity) => {
+  private createBroadcastRecipients(userEntities: User[]): Recipients {
+    return userEntities.reduce<Recipients>((recipientsIndex, userEntity) => {
       recipientsIndex[userEntity.id] = userEntity.devices().map(clientEntity => clientEntity.id);
       return recipientsIndex;
     }, {});
