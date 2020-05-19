@@ -876,7 +876,8 @@ export class ConversationService {
   }
 
   public async getAsset({assetId, assetToken, otrKey, sha256}: RemoteData): Promise<Buffer> {
-    const encryptedBuffer = await this.apiClient.asset.api.getAsset(assetId, assetToken);
+    const request = await this.apiClient.asset.api.getAssetV3(assetId, assetToken);
+    const encryptedBuffer = await request.response;
 
     return AssetCryptography.decryptAsset({
       cipherText: Buffer.from(encryptedBuffer),
@@ -886,7 +887,8 @@ export class ConversationService {
   }
 
   public async getUnencryptedAsset(assetId: string, assetToken?: string): Promise<ArrayBuffer> {
-    return this.apiClient.asset.api.getAsset(assetId, assetToken);
+    const request = await this.apiClient.asset.api.getAssetV3(assetId, assetToken);
+    return request.response;
   }
 
   public async addUser(conversationId: string, userId: string): Promise<string>;

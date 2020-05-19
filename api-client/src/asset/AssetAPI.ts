@@ -25,7 +25,7 @@ import {unsafeAlphanumeric} from '../shims/node/random';
 import {RequestCancellationError} from '../user';
 import {AssetRetentionPolicy} from './AssetRetentionPolicy';
 import {AssetUploadData} from './AssetUploadData';
-import {isValidAssetId, isValidToken} from './AssetUtil';
+import {isValidToken, isValidUUID} from './AssetUtil';
 
 export interface AssetOptions {
   public: boolean;
@@ -33,12 +33,118 @@ export interface AssetOptions {
 }
 
 export class AssetAPI {
-  private static readonly ASSET_URL = '/assets/v3';
+  private static readonly ASSET_V3_URL = '/assets/v3';
+  private static readonly ASSET_V2_URL = '/otr/assets';
+  private static readonly ASSET_V2_CONVERSATION_URL = '/conversations';
+  private static readonly ASSET_V1_URL = '/assets';
 
   constructor(private readonly client: HttpClient) {}
 
-  async getAsset(assetId: string, token?: string | null): Promise<ArrayBuffer> {
-    if (!isValidAssetId(assetId)) {
+  async getAssetV1(
+    assetId: string,
+    conversationId: string,
+    forceCaching: boolean = false,
+    progressCallback?: ProgressCallback,
+  ): Promise<RequestCancelable<ArrayBuffer>> {
+    if (!isValidUUID(assetId)) {
+      throw new TypeError(`Expected asset ID "${assetId}" to only contain alphanumeric values and dashes.`);
+    }
+    if (!isValidUUID(conversationId)) {
+      throw new TypeError(
+        `Expected conversation ID "${conversationId}" to only contain alphanumeric values and dashes.`,
+      );
+    }
+
+    const cancelSource = axios.CancelToken.source();
+    const config: AxiosRequestConfig = {
+      cancelToken: cancelSource.token,
+      method: 'get',
+      onDownloadProgress: handleProgressEvent(progressCallback),
+      onUploadProgress: handleProgressEvent(progressCallback),
+      params: {
+        conv_id: conversationId,
+      },
+      responseType: 'arraybuffer',
+      url: `${AssetAPI.ASSET_V1_URL}/${assetId}`,
+    };
+
+    if (forceCaching) {
+      config.params.forceCaching = forceCaching;
+    }
+
+    const handleRequest = async (): Promise<ArrayBuffer> => {
+      try {
+        const response = await this.client.sendRequest<ArrayBuffer>(config, true);
+        return response.data;
+      } catch (error) {
+        if (error.message === SyntheticErrorLabel.REQUEST_CANCELLED) {
+          throw new RequestCancellationError('Asset download got cancelled.');
+        }
+        throw error;
+      }
+    };
+
+    return {
+      cancel: () => cancelSource.cancel(SyntheticErrorLabel.REQUEST_CANCELLED),
+      response: handleRequest(),
+    };
+  }
+
+  async getAssetV2(
+    assetId: string,
+    conversationId: string,
+    forceCaching: boolean = false,
+    progressCallback?: ProgressCallback,
+  ): Promise<RequestCancelable<ArrayBuffer>> {
+    if (!isValidUUID(assetId)) {
+      throw new TypeError(`Expected asset ID "${assetId}" to only contain alphanumeric values and dashes.`);
+    }
+    if (!isValidUUID(conversationId)) {
+      throw new TypeError(
+        `Expected conversation ID "${conversationId}" to only contain alphanumeric values and dashes.`,
+      );
+    }
+
+    const cancelSource = axios.CancelToken.source();
+    const config: AxiosRequestConfig = {
+      cancelToken: cancelSource.token,
+      method: 'get',
+      onDownloadProgress: handleProgressEvent(progressCallback),
+      onUploadProgress: handleProgressEvent(progressCallback),
+      params: {},
+      responseType: 'arraybuffer',
+      url: `${AssetAPI.ASSET_V2_CONVERSATION_URL}/${conversationId}${AssetAPI.ASSET_V2_URL}/${assetId}`,
+    };
+
+    if (forceCaching) {
+      config.params.forceCaching = forceCaching;
+    }
+
+    const handleRequest = async (): Promise<ArrayBuffer> => {
+      try {
+        const response = await this.client.sendRequest<ArrayBuffer>(config, true);
+        return response.data;
+      } catch (error) {
+        if (error.message === SyntheticErrorLabel.REQUEST_CANCELLED) {
+          throw new RequestCancellationError('Asset download got cancelled.');
+        }
+        throw error;
+      }
+    };
+
+    return {
+      cancel: () => cancelSource.cancel(SyntheticErrorLabel.REQUEST_CANCELLED),
+      response: handleRequest(),
+    };
+  }
+
+  async getAssetV3(
+    assetId: string,
+    token?: string | null,
+    forceCaching: boolean = false,
+    progressCallback?: ProgressCallback,
+  ): Promise<RequestCancelable<ArrayBuffer>> {
+    if (!isValidUUID(assetId)) {
       throw new TypeError(`Expected asset ID "${assetId}" to only contain alphanumeric values and dashes.`);
     }
 
@@ -46,19 +152,40 @@ export class AssetAPI {
       throw new TypeError(`Expected token "${token.substr(0, 5)}..." (redacted) to be base64 encoded string.`);
     }
 
+    const cancelSource = axios.CancelToken.source();
     const config: AxiosRequestConfig = {
+      cancelToken: cancelSource.token,
       method: 'get',
+      onDownloadProgress: handleProgressEvent(progressCallback),
+      onUploadProgress: handleProgressEvent(progressCallback),
       params: {},
       responseType: 'arraybuffer',
-      url: `${AssetAPI.ASSET_URL}/${assetId}`,
+      url: `${AssetAPI.ASSET_V3_URL}/${assetId}`,
     };
 
     if (token) {
       config.params.asset_token = token;
     }
+    if (forceCaching) {
+      config.params.forceCaching = forceCaching;
+    }
 
-    const response = await this.client.sendRequest<ArrayBuffer>(config, true);
-    return response.data;
+    const handleRequest = async (): Promise<ArrayBuffer> => {
+      try {
+        const response = await this.client.sendRequest<ArrayBuffer>(config, true);
+        return response.data;
+      } catch (error) {
+        if (error.message === SyntheticErrorLabel.REQUEST_CANCELLED) {
+          throw new RequestCancellationError('Asset download got cancelled.');
+        }
+        throw error;
+      }
+    };
+
+    return {
+      cancel: () => cancelSource.cancel(SyntheticErrorLabel.REQUEST_CANCELLED),
+      response: handleRequest(),
+    };
   }
 
   async postAsset(
@@ -101,10 +228,10 @@ export class AssetAPI {
       method: 'post',
       onDownloadProgress: handleProgressEvent(progressCallback),
       onUploadProgress: handleProgressEvent(progressCallback),
-      url: AssetAPI.ASSET_URL,
+      url: AssetAPI.ASSET_V3_URL,
     };
 
-    const handleRequest = async () => {
+    const handleRequest = async (): Promise<AssetUploadData> => {
       try {
         const response = await this.client.sendRequest<AssetUploadData>(config);
         return response.data;
