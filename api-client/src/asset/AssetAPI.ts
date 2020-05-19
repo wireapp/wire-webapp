@@ -32,6 +32,11 @@ export interface AssetOptions {
   retention: AssetRetentionPolicy;
 }
 
+export interface AssetResponse {
+  buffer: ArrayBuffer;
+  mimeType: string;
+}
+
 export class AssetAPI {
   private static readonly ASSET_V3_URL = '/assets/v3';
   private static readonly ASSET_V2_URL = '/otr/assets';
@@ -45,7 +50,7 @@ export class AssetAPI {
     conversationId: string,
     forceCaching: boolean = false,
     progressCallback?: ProgressCallback,
-  ): Promise<RequestCancelable<ArrayBuffer>> {
+  ): Promise<RequestCancelable<AssetResponse>> {
     if (!isValidUUID(assetId)) {
       throw new TypeError(`Expected asset ID "${assetId}" to only contain alphanumeric values and dashes.`);
     }
@@ -72,10 +77,13 @@ export class AssetAPI {
       config.params.forceCaching = forceCaching;
     }
 
-    const handleRequest = async (): Promise<ArrayBuffer> => {
+    const handleRequest = async (): Promise<AssetResponse> => {
       try {
         const response = await this.client.sendRequest<ArrayBuffer>(config, true);
-        return response.data;
+        return {
+          buffer: response.data,
+          mimeType: response.headers['content-type'],
+        };
       } catch (error) {
         if (error.message === SyntheticErrorLabel.REQUEST_CANCELLED) {
           throw new RequestCancellationError('Asset download got cancelled.');
@@ -95,7 +103,7 @@ export class AssetAPI {
     conversationId: string,
     forceCaching: boolean = false,
     progressCallback?: ProgressCallback,
-  ): Promise<RequestCancelable<ArrayBuffer>> {
+  ): Promise<RequestCancelable<AssetResponse>> {
     if (!isValidUUID(assetId)) {
       throw new TypeError(`Expected asset ID "${assetId}" to only contain alphanumeric values and dashes.`);
     }
@@ -120,10 +128,13 @@ export class AssetAPI {
       config.params.forceCaching = forceCaching;
     }
 
-    const handleRequest = async (): Promise<ArrayBuffer> => {
+    const handleRequest = async (): Promise<AssetResponse> => {
       try {
         const response = await this.client.sendRequest<ArrayBuffer>(config, true);
-        return response.data;
+        return {
+          buffer: response.data,
+          mimeType: response.headers['content-type'],
+        };
       } catch (error) {
         if (error.message === SyntheticErrorLabel.REQUEST_CANCELLED) {
           throw new RequestCancellationError('Asset download got cancelled.');
@@ -143,7 +154,7 @@ export class AssetAPI {
     token?: string | null,
     forceCaching: boolean = false,
     progressCallback?: ProgressCallback,
-  ): Promise<RequestCancelable<ArrayBuffer>> {
+  ): Promise<RequestCancelable<AssetResponse>> {
     if (!isValidUUID(assetId)) {
       throw new TypeError(`Expected asset ID "${assetId}" to only contain alphanumeric values and dashes.`);
     }
@@ -170,10 +181,13 @@ export class AssetAPI {
       config.params.forceCaching = forceCaching;
     }
 
-    const handleRequest = async (): Promise<ArrayBuffer> => {
+    const handleRequest = async (): Promise<AssetResponse> => {
       try {
         const response = await this.client.sendRequest<ArrayBuffer>(config, true);
-        return response.data;
+        return {
+          buffer: response.data,
+          mimeType: response.headers['content-type'],
+        };
       } catch (error) {
         if (error.message === SyntheticErrorLabel.REQUEST_CANCELLED) {
           throw new RequestCancellationError('Asset download got cancelled.');

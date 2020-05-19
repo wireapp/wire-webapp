@@ -157,7 +157,7 @@ const messageIdCache = {};
 
       if (originalLinkPreviewImage) {
         const request = await account.service.conversation.getAssetV3(originalLinkPreviewImage.uploaded);
-        const imageBuffer = await request.response;
+        const imageBuffer = (await request.response).buffer;
 
         linkPreviewImage = {
           data: imageBuffer,
@@ -237,7 +237,7 @@ const messageIdCache = {};
     }
 
     const request = await account.service.conversation.getAssetV3(content.uploaded);
-    const fileBuffer = await request.response;
+    const fileBuffer = (await request.response).buffer;
 
     await handleIncomingMessage(data);
 
@@ -318,7 +318,7 @@ const messageIdCache = {};
     } = data;
 
     const request = await account.service.conversation.getAssetV3(uploaded);
-    const imageBuffer = await request.response;
+    const imageBuffer = (await request.response).buffer;
 
     const imagePayload = await account.service.conversation.messageBuilder.createImage(conversationId, {
       data: imageBuffer,
