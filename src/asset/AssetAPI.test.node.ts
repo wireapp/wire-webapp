@@ -35,7 +35,7 @@ describe('"AssetAPI"', () => {
     const assetId = 'my-asset-id';
     const assetToken = 'my-asset-token';
 
-    await apiClient.asset.api.getAsset(assetId, assetToken);
+    await apiClient.asset.api.getAssetV3(assetId, assetToken);
 
     expect(apiClient.transport.http.sendRequest).toHaveBeenCalledWith(
       jasmine.objectContaining({
@@ -60,7 +60,7 @@ describe('"AssetAPI"', () => {
     );
     const assetId = 'my-asset-id';
 
-    await apiClient.asset.api.getAsset(assetId);
+    await apiClient.asset.api.getAssetV3(assetId);
 
     expect(apiClient.transport.http.sendRequest).toHaveBeenCalledWith(
       jasmine.objectContaining({

@@ -17,7 +17,7 @@
  *
  */
 
-import {isValidAssetId, isValidToken} from './AssetUtil';
+import {isValidToken, isValidUUID} from './AssetUtil';
 
 describe('"isValidToken"', () => {
   it('should return true if token is valid', () => {
@@ -34,12 +34,12 @@ describe('"isValidToken"', () => {
 
 describe('"isValidKey"', () => {
   it('should return true if key is valid', () => {
-    expect(isValidAssetId('3-2-1e33cc4b-a003-4fd3-b980-ba077fc189ff')).toBeTruthy();
+    expect(isValidUUID('3-2-1e33cc4b-a003-4fd3-b980-ba077fc189ff')).toBeTruthy();
   });
 
   it('should return false if key is not valid', () => {
-    expect(isValidAssetId('3-2-1e33cc4b-a003-4fd3-b980-ba077fc189ff!')).toBeFalsy();
-    expect(isValidAssetId('3-2-1e33cc4b-a003-4fd3-b980-ba077fc189ff.')).toBeFalsy();
-    expect(isValidAssetId('3-2-1e33cc4b-a003-4fd3-b980-ba077fc189ffö')).toBeFalsy();
+    expect(isValidUUID('3-2-1e33cc4b-a003-4fd3-b980-ba077fc189ff!')).toBeFalsy();
+    expect(isValidUUID('3-2-1e33cc4b-a003-4fd3-b980-ba077fc189ff.')).toBeFalsy();
+    expect(isValidUUID('3-2-1e33cc4b-a003-4fd3-b980-ba077fc189ffö')).toBeFalsy();
   });
 });
