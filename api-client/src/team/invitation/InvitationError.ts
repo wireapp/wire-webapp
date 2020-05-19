@@ -49,3 +49,11 @@ export class InvitationEmailExistsError extends InvitationError {
     this.name = 'InvitationEmailExistsError';
   }
 }
+
+export class InvitationPhoneExistsError extends InvitationError {
+  constructor(message: string, label = BackendErrorLabel.PHONE_EXISTS, code = StatusCode.CONFLICT) {
+    super(message, label, code);
+    Object.setPrototypeOf(this, new.target.prototype);
+    this.name = 'InvitationPhoneExistsError';
+  }
+}
