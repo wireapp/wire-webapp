@@ -18,8 +18,9 @@
  */
 
 import ko from 'knockout';
+
 import {ParticipantAvatar} from 'Components/participantAvatar';
-import {User} from '../entity/User';
+import type {User} from '../entity/User';
 
 interface TopPeopleParams {
   click: (userEntity: User, event: Event) => void;

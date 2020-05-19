@@ -17,9 +17,10 @@
  *
  */
 
-import {TeamData} from '@wireapp/api-client/dist/team';
-import {RootState} from '../reducer';
-import {RegistrationDataState} from '../reducer/authReducer';
+import type {TeamData} from '@wireapp/api-client/dist/team';
+
+import type {RootState} from '../reducer';
+import type {RegistrationDataState} from '../reducer/authReducer';
 
 export const REGISTER_FLOW = {
   GENERIC_INVITATION: 'REGISTER_FLOW_GENERIC_INVITATION',

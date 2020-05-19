@@ -22,11 +22,11 @@ import ko from 'knockout';
 import {partition} from 'Util/ArrayUtil';
 import {sortByPriority} from 'Util/StringUtil';
 
-import {ConversationRepository} from '../conversation/ConversationRepository';
-import {Conversation} from '../entity/Conversation';
-import {User} from '../entity/User';
+import type {ConversationRepository} from '../conversation/ConversationRepository';
+import type {Conversation} from '../entity/Conversation';
+import type {User} from '../entity/User';
 import {SearchRepository} from '../search/SearchRepository';
-import {TeamRepository} from '../team/TeamRepository';
+import type {TeamRepository} from '../team/TeamRepository';
 import {viewportObserver} from '../ui/viewportObserver';
 import {validateHandle} from '../user/UserHandleGenerator';
 

@@ -22,7 +22,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 
 import {ParticipantAvatar} from 'Components/participantAvatar';
-import {User} from '../../entity/User';
+import type {User} from '../../entity/User';
 
 import 'Components/availabilityState';
 

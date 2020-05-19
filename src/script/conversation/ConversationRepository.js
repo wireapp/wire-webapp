@@ -139,7 +139,7 @@ export class ConversationRepository {
    * Construct a new Conversation Repository.
    *
    * @param {ConversationService} conversation_service Backend REST API conversation service implementation
-   * @param {AssetService} asset_service Backend REST API asset service implementation
+   * @param {AssetRepository} assetRepository Manages uploading assets and keeping track of current uploads
    * @param {ClientRepository} clientRepository Repository for client interactions
    * @param {ConnectionRepository} connectionRepository Repository for all connection interactions
    * @param {CryptographyRepository} cryptography_repository Repository for all cryptography interactions
@@ -151,11 +151,11 @@ export class ConversationRepository {
    * @param {TeamRepository} teamRepository Repository for teams
    * @param {UserRepository} userRepository Repository for all user interactions
    * @param {PropertiesRepository} propertyRepository Repository that stores all account preferences
-   * @param {AssetUploader} assetUploader Manages uploading assets and keeping track of current uploads
+
    */
   constructor(
     conversation_service,
-    asset_service,
+    assetRepository,
     clientRepository,
     connectionRepository,
     cryptography_repository,
@@ -167,12 +167,11 @@ export class ConversationRepository {
     teamRepository,
     userRepository,
     propertyRepository,
-    assetUploader,
   ) {
     this.eventRepository = eventRepository;
+    this.assetRepository = assetRepository;
     this.eventService = eventRepository.eventService;
     this.conversation_service = conversation_service;
-    this.asset_service = asset_service;
     this.clientRepository = clientRepository;
     this.connectionRepository = connectionRepository;
     this.cryptography_repository = cryptography_repository;
@@ -182,7 +181,7 @@ export class ConversationRepository {
     this.teamRepository = teamRepository;
     this.userRepository = userRepository;
     this.propertyRepository = propertyRepository;
-    this.assetUploader = assetUploader;
+
     this.logger = getLogger('ConversationRepository');
 
     this.conversationMapper = new ConversationMapper();
@@ -1868,14 +1867,14 @@ export class ConversationRepository {
 
     return this.getMessageInConversationById(conversationEntity, messageId)
       .then(() => {
-        const retention = this.asset_service.getAssetRetention(this.selfUser(), conversationEntity);
+        const retention = this.assetRepository.getAssetRetention(this.selfUser(), conversationEntity);
         const options = {
           expectsReadConfirmation: this.expectReadReceipt(conversationEntity),
           legalHoldStatus: conversationEntity.legalHoldStatus(),
           retention,
         };
 
-        return this.assetUploader.uploadFile(messageId, file, options, asImage);
+        return this.assetRepository.uploadFile(messageId, file, options, asImage);
       })
       .then(asset => {
         genericMessage = new GenericMessage({
@@ -1983,7 +1982,7 @@ export class ConversationRepository {
           throw Error('No image available');
         }
 
-        const retention = this.asset_service.getAssetRetention(this.selfUser(), conversationEntity);
+        const retention = this.assetRepository.getAssetRetention(this.selfUser(), conversationEntity);
         const options = {
           expectsReadConfirmation: this.expectReadReceipt(conversationEntity),
           legalHoldStatus: conversationEntity.legalHoldStatus(),
@@ -1992,21 +1991,23 @@ export class ConversationRepository {
 
         const messageEntityPromise = this.getMessageInConversationById(conversationEntity, messageId);
         return messageEntityPromise.then(messageEntity => {
-          return this.assetUploader.uploadFile(messageEntity.id, imageBlob, options, false).then(uploadedImageAsset => {
-            const assetPreview = new Asset.Preview(imageBlob.type, imageBlob.size, uploadedImageAsset.uploaded);
-            const protoAsset = new Asset({
-              [PROTO_MESSAGE_TYPE.ASSET_PREVIEW]: assetPreview,
-              [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: options.expectsReadConfirmation,
-              [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: options.legalHoldStatus,
-            });
+          return this.assetRepository
+            .uploadFile(messageEntity.id, imageBlob, options, false)
+            .then(uploadedImageAsset => {
+              const assetPreview = new Asset.Preview(imageBlob.type, imageBlob.size, uploadedImageAsset.uploaded);
+              const protoAsset = new Asset({
+                [PROTO_MESSAGE_TYPE.ASSET_PREVIEW]: assetPreview,
+                [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: options.expectsReadConfirmation,
+                [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: options.legalHoldStatus,
+              });
 
-            const genericMessage = new GenericMessage({
-              [GENERIC_MESSAGE_TYPE.ASSET]: protoAsset,
-              messageId,
-            });
+              const genericMessage = new GenericMessage({
+                [GENERIC_MESSAGE_TYPE.ASSET]: protoAsset,
+                messageId,
+              });
 
-            return this._send_and_inject_generic_message(conversationEntity, genericMessage, false);
-          });
+              return this._send_and_inject_generic_message(conversationEntity, genericMessage, false);
+            });
         });
       })
       .catch(error => {

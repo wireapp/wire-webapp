@@ -21,7 +21,7 @@ import ko from 'knockout';
 
 import {getMapsUrl} from 'Util/LocationUtil';
 
-import {Location} from '../../entity/message/Location';
+import type {Location} from '../../entity/message/Location';
 
 interface Params {
   asset: Location;

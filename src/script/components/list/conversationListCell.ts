@@ -24,12 +24,12 @@ import {noop} from 'Util/util';
 import {ParticipantAvatar} from 'Components/participantAvatar';
 import {generateCellState} from '../../conversation/ConversationCellState';
 import {ConversationStatusIcon} from '../../conversation/ConversationStatusIcon';
-import {Conversation} from '../../entity/Conversation';
+import type {Conversation} from '../../entity/Conversation';
 import {MediaType} from '../../media/MediaType';
 import {viewportObserver} from '../../ui/viewportObserver';
 
 import 'Components/availabilityState';
-import {User} from '../../entity/User';
+import type {User} from '../../entity/User';
 
 interface ConversationListCellProps {
   showJoinButton: boolean;

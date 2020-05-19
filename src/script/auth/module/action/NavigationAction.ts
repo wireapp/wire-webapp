@@ -17,7 +17,7 @@
  *
  */
 
-import {ThunkAction} from '../reducer';
+import type {ThunkAction} from '../reducer';
 
 export class NavigationAction {
   doNavigate = (url: string): ThunkAction<void> => {

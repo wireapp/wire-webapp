@@ -28,11 +28,11 @@ import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
 
 import {Config} from '../Config';
-import {User} from '../entity/User';
-import {SelfService} from '../self/SelfService';
+import type {User} from '../entity/User';
+import type {SelfService} from '../self/SelfService';
 import {ConsentValue} from '../user/ConsentValue';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
-import {PropertiesService} from './PropertiesService';
+import type {PropertiesService} from './PropertiesService';
 import {PROPERTIES_TYPE} from './PropertiesType';
 
 export class PropertiesRepository {
@@ -286,6 +286,9 @@ export class PropertiesRepository {
         break;
       case PROPERTIES_TYPE.INTERFACE.THEME:
         amplify.publish(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, updatedPreference);
+        break;
+      case PROPERTIES_TYPE.INTERFACE.VIEW_FOLDERS:
+        amplify.publish(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.VIEW_FOLDERS, updatedPreference);
         break;
       case PROPERTIES_TYPE.EMOJI.REPLACE_INLINE:
         amplify.publish(WebAppEvents.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE, updatedPreference);

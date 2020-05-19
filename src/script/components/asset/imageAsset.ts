@@ -19,8 +19,8 @@
 
 import ko from 'knockout';
 
-import {ContentMessage} from '../../entity/message/ContentMessage';
-import {MediumImage} from '../../entity/message/MediumImage';
+import type {ContentMessage} from '../../entity/message/ContentMessage';
+import type {MediumImage} from '../../entity/message/MediumImage';
 import {viewportObserver} from '../../ui/viewportObserver';
 import {AbstractAssetTransferStateTracker} from './AbstractAssetTransferStateTracker';
 

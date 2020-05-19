@@ -18,6 +18,7 @@
  */
 
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
+
 import {SuperType} from '../../message/SuperType';
 import {Message} from './Message';
 

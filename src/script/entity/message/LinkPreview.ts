@@ -18,11 +18,11 @@
  */
 
 import ko from 'knockout';
+import type {ITweet} from '@wireapp/protocol-messaging';
 
 import {obfuscate} from 'Util/StringUtil';
-import {AssetRemoteData} from '../../assets/AssetRemoteData';
-import {ITweet} from '@wireapp/protocol-messaging';
-import {LinkPreviewMetaDataType} from '../../links/LinkPreviewMetaDataType';
+import type {AssetRemoteData} from '../../assets/AssetRemoteData';
+import type {LinkPreviewMetaDataType} from '../../links/LinkPreviewMetaDataType';
 
 export class LinkPreview {
   private readonly image_resource: ko.Observable<AssetRemoteData>;

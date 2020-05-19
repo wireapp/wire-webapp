@@ -22,22 +22,22 @@ import {amplify} from 'amplify';
 import {DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/dist/conversation';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {getLogger, Logger} from 'Util/Logger';
+import {Logger, getLogger} from 'Util/Logger';
 
 import {Actions} from 'Components/panel/userActions';
 import 'Components/panel/enrichedFields';
 import 'Components/panel/userDetails';
 
-import {ConversationRoleRepository} from '../../conversation/ConversationRoleRepository';
+import type {ConversationRoleRepository} from '../../conversation/ConversationRoleRepository';
 import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
-import {UserRepository} from '../../user/UserRepository';
-import {ActionsViewModel} from '../ActionsViewModel';
-import {TeamRepository} from '../../team/TeamRepository';
-import {ConversationRepository} from '../../conversation/ConversationRepository';
-import {User} from '../../entity/User';
+import type {UserRepository} from '../../user/UserRepository';
+import type {ActionsViewModel} from '../ActionsViewModel';
+import type {TeamRepository} from '../../team/TeamRepository';
+import type {ConversationRepository} from '../../conversation/ConversationRepository';
+import type {User} from '../../entity/User';
 import {PanelViewModel} from '../PanelViewModel';
 import {ClientEvent} from '../../event/Client';
-import {MemberLeaveEvent} from '../../conversation/EventBuilder';
+import type {MemberLeaveEvent} from '../../conversation/EventBuilder';
 
 export class GroupParticipantUserViewModel extends BasePanelViewModel {
   userRepository: UserRepository;

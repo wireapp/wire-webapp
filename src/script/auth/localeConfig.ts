@@ -18,9 +18,10 @@
  */
 
 import {SupportedCurrency} from '@wireapp/api-client/dist/team/payment';
+import {UrlUtil} from '@wireapp/commons';
+
 import {QUERY_KEY} from './route';
 import {supportedLocales as Locales} from './supportedLocales';
-import {UrlUtil} from '@wireapp/commons';
 
 export const DEFAULT_CURRENCY = SupportedCurrency.EUR;
 export const DEFAULT_LANGUAGE = 'en-US';

@@ -18,10 +18,11 @@
  */
 
 import ko from 'knockout';
-import {ClientRepository} from '../../client/ClientRepository';
-import {ClientService} from '../../client/ClientService';
+
+import type {ClientRepository} from '../../client/ClientRepository';
+import type {ClientService} from '../../client/ClientService';
 import {Config, Configuration} from '../../Config';
-import {User} from '../../entity/User';
+import type {User} from '../../entity/User';
 import {APPLOCK_STATE, AppLockViewModel} from './AppLockViewModel';
 
 type Writable<T> = {

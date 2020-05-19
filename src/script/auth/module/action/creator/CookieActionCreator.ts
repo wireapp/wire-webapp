@@ -17,7 +17,7 @@
  *
  */
 
-import {AppAction} from '.';
+import type {AppAction} from '.';
 
 export enum COOKIE_ACTION {
   COOKIE_POLLING_STOP = 'COOKIE_POLLING_STOP',

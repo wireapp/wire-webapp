@@ -17,7 +17,7 @@
  *
  */
 
-import {AppAction} from '.';
+import type {AppAction} from '.';
 
 export enum LANGUAGE_ACTION {
   SWITCH_LANGUAGE_START = 'SWITCH_LANGUAGE_START',

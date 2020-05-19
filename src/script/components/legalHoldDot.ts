@@ -18,8 +18,9 @@
  */
 
 import ko from 'knockout';
-import {Conversation} from '../entity/Conversation';
-import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
+
+import type {Conversation} from '../entity/Conversation';
+import type {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
 
 interface LegalHoldParams {
   isPending?: ko.Observable<boolean>;

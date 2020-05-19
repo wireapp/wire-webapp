@@ -17,10 +17,11 @@
  *
  */
 
-import {SSOSettings} from '@wireapp/api-client/dist/account/SSOSettings';
-import {LoginData, RegisterData} from '@wireapp/api-client/dist/auth';
-import {AppAction} from '.';
-import {RegistrationDataState} from '../../reducer/authReducer';
+import type {SSOSettings} from '@wireapp/api-client/dist/account/SSOSettings';
+import type {LoginData, RegisterData} from '@wireapp/api-client/dist/auth';
+
+import type {AppAction} from '.';
+import type {RegistrationDataState} from '../../reducer/authReducer';
 
 export enum AUTH_ACTION {
   LOGIN_START = 'LOGIN_START',

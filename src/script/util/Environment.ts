@@ -18,6 +18,7 @@
  */
 
 import platform from 'platform';
+
 import {BackendEnvironment} from '../service/BackendEnvironment';
 
 const APP_ENV = {
