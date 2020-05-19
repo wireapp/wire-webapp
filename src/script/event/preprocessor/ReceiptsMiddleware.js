@@ -17,9 +17,10 @@
  *
  */
 
+import {Confirmation} from '@wireapp/protocol-messaging';
+
 import {getLogger} from 'Util/Logger';
 
-import {ReceiptMode} from '../../conversation/ReceiptMode';
 import {StatusType} from '../../message/StatusType';
 import {ClientEvent} from '../Client';
 
@@ -54,7 +55,7 @@ export class ReceiptsMiddleware {
       case ClientEvent.CONVERSATION.MESSAGE_ADD: {
         return this.conversationRepository.get_conversation_by_id(event.conversation).then(conversation => {
           if (conversation && conversation.isGroup()) {
-            const expectsReadConfirmation = conversation.receiptMode() === ReceiptMode.DELIVERY_AND_READ;
+            const expectsReadConfirmation = conversation.receiptMode() === Confirmation.Type.READ;
             event.data.expects_read_confirmation = !!expectsReadConfirmation;
           }
           return event;

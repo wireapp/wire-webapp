@@ -17,9 +17,10 @@
  *
  */
 
+import {Confirmation} from '@wireapp/protocol-messaging';
+
 import {ConsentValue} from 'src/script/user/ConsentValue';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
-import {ReceiptMode} from 'src/script/conversation/ReceiptMode';
 import {User} from 'src/script/entity/User';
 import {EventRepository} from 'src/script/event/EventRepository';
 import {ClientMapper} from 'src/script/client/ClientMapper';
@@ -123,7 +124,7 @@ describe('UserRepository', () => {
         const turnOnReceiptMode = {
           key: PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key,
           type: 'user.properties-set',
-          value: ReceiptMode.DELIVERY_AND_READ,
+          value: Confirmation.Type.READ,
         };
         const turnOffReceiptMode = {
           key: PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key,
@@ -132,15 +133,15 @@ describe('UserRepository', () => {
         const source = EventRepository.SOURCE.WEB_SOCKET;
         const receiptMode = testFactory.user_repository.propertyRepository.receiptMode;
 
-        expect(receiptMode()).toBe(ReceiptMode.DELIVERY);
+        expect(receiptMode()).toBe(Confirmation.Type.DELIVERED);
 
         testFactory.user_repository.onUserEvent(turnOnReceiptMode, source);
 
-        expect(receiptMode()).toBe(ReceiptMode.DELIVERY_AND_READ);
+        expect(receiptMode()).toBe(Confirmation.Type.READ);
 
         testFactory.user_repository.onUserEvent(turnOffReceiptMode, source);
 
-        expect(receiptMode()).toBe(ReceiptMode.DELIVERY);
+        expect(receiptMode()).toBe(Confirmation.Type.DELIVERED);
       });
     });
   });

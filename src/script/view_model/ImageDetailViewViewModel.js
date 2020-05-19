@@ -21,7 +21,7 @@ import {iterateItem} from 'Util/ArrayUtil';
 import {KEY} from 'Util/KeyboardUtil';
 import {formatLocale} from 'Util/TimeUtil';
 
-import {WebAppEvents} from '../event/WebApp';
+import {WebAppEvents} from '@wireapp/webapp-events';
 import {Modal} from '../ui/Modal';
 
 window.z = window.z || {};

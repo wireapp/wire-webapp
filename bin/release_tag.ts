@@ -71,7 +71,9 @@ switch (firstArgument) {
   }
 }
 
-if (!commitId) {
+if (commitId) {
+  logger.info(`Got commit ID "${commitId}".`);
+} else {
   logger.info(`No commit ID specified. Will use latest commit from branch "${branch}".`);
   commitId = exec(`git rev-parse ${branch}`);
 }
@@ -96,13 +98,15 @@ const createTagName = (index: number = 0): string => {
 
 const tagName = createTagName();
 
-const ask = (questionToAsk: string, callback: (answer: string) => void): void => {
-  input.question(questionToAsk, (answer: string) => {
-    if (/^(yes|no)$/.test(answer)) {
-      callback(answer);
-    } else {
-      ask('⚠️  Please enter yes or no: ', callback);
-    }
+const ask = (questionToAsk: string): Promise<string> => {
+  return new Promise(resolve => {
+    input.question(questionToAsk, (answer: string) => {
+      if (/^(yes|no)$/.test(answer)) {
+        resolve(answer);
+      } else {
+        resolve(ask('⚠️  Please enter yes or no: '));
+      }
+    });
   });
 };
 
@@ -165,31 +169,36 @@ const announceRelease = async (tagName: string, commitId: string): Promise<void>
     const payload = account.service.conversation.messageBuilder.createText(WIRE_CONVERSATION, message).build();
     await sendRandomGif(account, WIRE_CONVERSATION, 'in the oven');
     await account.service.conversation.send(payload);
+    logger.info(`Sent announcement to conversation "${process.env.WIRE_CONVERSATION}".`);
+  } else {
+    logger.info(`WIRE_EMAIL, WIRE_PASSWORD or WIRE_CONVERSATION missing. No announcement sent.`);
   }
 };
 
-ask(
-  `ℹ️  The commit "${commitMessage}" will be released with tag "${tagName}". Continue? [yes/no] `,
-  async (answer: string) => {
-    if (answer === 'yes') {
-      logger.info(`Creating tag "${tagName}" ...`);
-      exec(`git tag ${tagName} ${commitId}`);
+(async () => {
+  const answer = await ask(
+    `ℹ️  The commit "${commitMessage}" will be released with tag "${tagName}". Continue? [yes/no] `,
+  );
+  if (answer === 'yes') {
+    logger.info(`Creating tag "${tagName}" ...`);
+    exec(`git tag ${tagName} ${commitId}`);
 
-      logger.info(`Pushing "${tagName}" to "${origin}" ...`);
-      exec(`git push ${origin} ${tagName}`);
+    logger.info(`Pushing "${tagName}" to "${origin}" ...`);
+    exec(`git push ${origin} ${tagName}`);
 
-      try {
-        await announceRelease(tagName, commitId);
-        logger.info(`Sent announcement to conversation "${process.env.WIRE_CONVERSATION}".`);
-      } catch (error) {
-        logger.error(error);
-      }
-
-      logger.info('Done.');
-    } else {
-      logger.info('Aborting.');
+    try {
+      await announceRelease(tagName, commitId);
+    } catch (error) {
+      logger.error(error);
     }
 
-    process.exit();
-  },
-);
+    logger.info('Done.');
+  } else {
+    logger.info('Aborting.');
+  }
+
+  process.exit();
+})().catch(error => {
+  logger.error(error);
+  process.exit(1);
+});

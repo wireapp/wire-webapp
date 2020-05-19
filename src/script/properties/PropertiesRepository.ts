@@ -17,18 +17,19 @@
  *
  */
 
+import {amplify} from 'amplify';
+import {Confirmation} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {AudioPreference, NotificationPreference, WebappProperties} from '@wireapp/api-client/dist/user/data';
+import {ConsentType} from '@wireapp/api-client/dist/self';
+
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
 
-import {AudioPreference, NotificationPreference, WebappProperties} from '@wireapp/api-client/dist/user/data';
-import {amplify} from 'amplify';
 import {Config} from '../Config';
-import {ReceiptMode} from '../conversation/ReceiptMode';
 import {User} from '../entity/User';
-import {WebAppEvents} from '../event/WebApp';
 import {SelfService} from '../self/SelfService';
-import {ConsentType} from '../user/ConsentType';
 import {ConsentValue} from '../user/ConsentValue';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {PropertiesService} from './PropertiesService';
@@ -36,7 +37,6 @@ import {PROPERTIES_TYPE} from './PropertiesType';
 
 export class PropertiesRepository {
   // Value names are specified by the protocol but key names can be changed.
-  // tslint:disable-next-line:typedef
   static get CONFIG() {
     return {
       WEBAPP_ACCOUNT_SETTINGS: 'webapp',
@@ -45,7 +45,7 @@ export class PropertiesRepository {
         key: 'WIRE_MARKETING_CONSENT',
       },
       WIRE_RECEIPT_MODE: {
-        defaultValue: ReceiptMode.DELIVERY,
+        defaultValue: Confirmation.Type.DELIVERED,
         key: 'WIRE_RECEIPT_MODE',
       },
     };
@@ -220,7 +220,7 @@ export class PropertiesRepository {
   deleteProperty(key: string): void {
     switch (key) {
       case PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key:
-        this.setProperty(key, ReceiptMode.DELIVERY);
+        this.setProperty(key, Confirmation.Type.DELIVERED);
         break;
       case PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT.key:
         this.setProperty(key, ConsentValue.NOT_GIVEN);
@@ -250,7 +250,7 @@ export class PropertiesRepository {
   updateProperty(key: string, value: any): Promise<void> | void {
     switch (key) {
       case PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key:
-        if (value === ReceiptMode.DELIVERY) {
+        if (value === Confirmation.Type.DELIVERED) {
           return this.propertiesService.deletePropertiesByKey(key);
         }
         return this.propertiesService.putPropertiesByKey(key, value);

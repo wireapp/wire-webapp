@@ -17,7 +17,8 @@
  *
  */
 
-import {Availability} from '@wireapp/protocol-messaging';
+import {Availability, Confirmation} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
@@ -28,7 +29,6 @@ import {safeWindowOpen} from 'Util/SanitizationUtil';
 
 import {PreferenceNotificationRepository} from '../../notification/PreferenceNotificationRepository';
 import {getAccountPagesUrl, getCreateTeamUrl, getManageTeamUrl, URL_PATH} from '../../externalRoute';
-import {ReceiptMode} from '../../conversation/ReceiptMode';
 import {PropertiesRepository} from '../../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 
@@ -40,7 +40,6 @@ import {ConsentValue} from '../../user/ConsentValue';
 import {validateCharacter, validateHandle} from '../../user/UserHandleGenerator';
 import {UserRepository} from '../../user/UserRepository';
 import {nameFromType} from '../../user/AvailabilityMapper';
-import {WebAppEvents} from '../../event/WebApp';
 import {ParticipantAvatar} from 'Components/participantAvatar';
 import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
 import {MotionDuration} from '../../motion/MotionDuration';
@@ -426,7 +425,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
   onReadReceiptsChange(viewModel, event) {
     const isChecked = event.target.checked;
-    const mode = isChecked ? ReceiptMode.DELIVERY_AND_READ : ReceiptMode.DELIVERY;
+    const mode = isChecked ? Confirmation.Type.READ : Confirmation.Type.DELIVERED;
     this.propertiesRepository.updateProperty(PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key, mode);
     return true;
   }

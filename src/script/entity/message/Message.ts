@@ -42,7 +42,7 @@ export interface ReadReceipt {
 
 export class Message {
   private messageTimerStarted: boolean;
-  private readonly visible: ko.Observable<boolean>;
+  public readonly visible: ko.Observable<boolean>;
   protected readonly affect_order: ko.Observable<boolean>;
   public category?: MessageCategory;
   public conversation_id: string;

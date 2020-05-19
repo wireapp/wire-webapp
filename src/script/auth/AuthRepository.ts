@@ -18,10 +18,10 @@
  */
 
 import {Context} from '@wireapp/api-client/dist/auth';
+import {ClientType} from '@wireapp/api-client/dist/client';
 import {Logger, getLogger} from 'Util/Logger';
 import {APIClient} from '@wireapp/api-client';
 import {loadValue} from 'Util/StorageUtil';
-import {ClientType} from '../client/ClientType';
 import {StorageKey} from '../storage/StorageKey';
 
 export class AuthRepository {

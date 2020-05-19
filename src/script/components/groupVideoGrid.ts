@@ -39,7 +39,6 @@ class GroupVideoGrid {
 
   public readonly dispose: () => void;
 
-  // tslint:disable-next-line:typedef
   static get CONFIG() {
     return {
       CONTAIN_CLASS: 'group-video-grid__element-video--contain',

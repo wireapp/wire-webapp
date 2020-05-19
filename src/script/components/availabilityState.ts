@@ -18,7 +18,6 @@
  */
 
 import ko from 'knockout';
-
 import {Availability} from '@wireapp/protocol-messaging';
 
 interface AvailabilityStateParams {

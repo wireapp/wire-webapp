@@ -20,7 +20,6 @@
 import {ClientEntity} from './ClientEntity';
 
 export class ClientMapper {
-  // tslint:disable-next-line:typedef
   static get CONFIG() {
     return {
       CLIENT_PAYLOAD: ['class', 'id'],

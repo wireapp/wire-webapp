@@ -53,4 +53,16 @@ export class Call {
     this.reason = ko.observable();
     this.startedAt = ko.observable();
   }
+
+  addParticipant(participant: Participant): void {
+    this.participants.unshift(participant);
+  }
+
+  getParticipant(userId: string): Participant {
+    return this.participants().find(participant => participant.userId === userId);
+  }
+
+  removeParticipant(participant: Participant): void {
+    this.participants.remove(participant);
+  }
 }

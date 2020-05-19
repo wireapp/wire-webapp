@@ -43,7 +43,7 @@ import {TeamMapper} from './TeamMapper';
 import {TeamEntity} from './TeamEntity';
 import {roleFromTeamPermissions, ROLE} from '../user/UserPermission';
 
-import {WebAppEvents} from '../event/WebApp';
+import {WebAppEvents} from '@wireapp/webapp-events';
 import {IntegrationMapper} from '../integration/IntegrationMapper';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {SuperProperty} from '../tracking/SuperProperty';
@@ -163,7 +163,7 @@ export class TeamRepository {
     const selfTeamId = this.selfUser().teamId;
     const teamData = selfTeamId ? await this.getTeamById() : await this.getBindingTeam();
 
-    const teamEntity = teamData ? this.teamMapper.mapTeamFromObject(teamData) : new TeamEntity();
+    const teamEntity = teamData ? this.teamMapper.mapTeamFromObject(teamData, this.team()) : new TeamEntity();
     this.team(teamEntity);
     if (selfTeamId) {
       await this.getSelfMember(selfTeamId);

@@ -21,7 +21,7 @@ import ko from 'knockout';
 
 interface Screen {
   id: string;
-  thumbnail: any;
+  thumbnail: HTMLCanvasElement;
 }
 
 interface Params {

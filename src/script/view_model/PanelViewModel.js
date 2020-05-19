@@ -17,6 +17,8 @@
  *
  */
 
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {AddParticipantsViewModel} from './panel/AddParticipantsViewModel';
 import {ConversationDetailsViewModel} from './panel/ConversationDetailsViewModel';
 import {ConversationParticipantsViewModel} from './panel/ConversationParticipantsViewModel';
@@ -27,7 +29,6 @@ import {MessageDetailsViewModel} from './panel/MessageDetailsViewModel';
 import {NotificationsViewModel} from './panel/NotificationsViewModel';
 import {ParticipantDevicesViewModel} from './panel/ParticipantDevicesViewModel';
 import {TimedMessagesViewModel} from './panel/TimedMessagesViewModel';
-import {WebAppEvents} from '../event/WebApp';
 import {MotionDuration} from '../motion/MotionDuration';
 import {ContentViewModel} from './ContentViewModel';
 
@@ -165,7 +166,7 @@ export class PanelViewModel {
 
   _resetState() {
     this.isAnimating(false);
-    this._hidePanel(this.state());
+    this._hidePanel(this.state(), true);
     this.state(null);
     this.stateHistory = [];
   }
@@ -184,7 +185,7 @@ export class PanelViewModel {
   }
 
   _goToRoot() {
-    this._openPanel(PanelViewModel.STATE.CONVERSATION_DETAILS);
+    this._openPanel(PanelViewModel.STATE.CONVERSATION_DETAILS, undefined, true);
   }
 
   _switchContent(newContentState) {
@@ -230,7 +231,7 @@ export class PanelViewModel {
     }, MotionDuration.MEDIUM);
   }
 
-  _hidePanel(state) {
+  _hidePanel(state, forceInvisible = false) {
     if (!this.subViews[state]) {
       return;
     }
@@ -238,12 +239,15 @@ export class PanelViewModel {
 
     const panelStateElementId = this.subViews[state].getElementId();
     const exitPanel = $(`#${panelStateElementId}`);
-    exitPanel.removeClass('panel__page--visible panel__page--move-out--left panel__page--move-out--right');
+    exitPanel.removeClass('panel__page--move-out--left panel__page--move-out--right');
+    if (this.state() !== state || forceInvisible) {
+      exitPanel.removeClass('panel__page--visible');
+    }
   }
 
-  _openPanel(newState, params) {
-    if (!this.isAnimating()) {
-      this._hidePanel(this.state());
+  _openPanel(newState, params, overrideAnimating = false) {
+    if (!this.isAnimating() || overrideAnimating) {
+      this._hidePanel(this.state(), true);
       const rootState = PanelViewModel.STATE.CONVERSATION_DETAILS;
       this.stateHistory = [{state: rootState}, {params, state: newState}];
       this.isAnimating(true);

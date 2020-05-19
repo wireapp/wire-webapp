@@ -17,13 +17,14 @@
  *
  */
 
-import JSZip from 'jszip';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
+import {loadFileBuffer} from 'Util/util';
+import {WebWorker} from 'Util/worker';
 
 import {Config} from '../../Config';
-import {WebAppEvents} from '../../event/WebApp';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {EventName} from '../../tracking/EventName';
 import {ContentViewModel} from '../ContentViewModel';
@@ -100,13 +101,28 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
     amplify.subscribe(WebAppEvents.BACKUP.IMPORT.START, this.importHistory.bind(this));
   }
 
-  importHistory(file) {
+  /**
+   * Import history from file
+   * @param {File} file The file
+   * @returns {void} void
+   */
+  async importHistory(file) {
     this.state(HistoryImportViewModel.STATE.PREPARING);
     this.error(null);
-    JSZip.loadAsync(file)
-      .then(archive => this.backupRepository.importHistory(archive, this.onInit.bind(this), this.onProgress.bind(this)))
-      .then(this.onSuccess.bind(this))
-      .catch(this.onError.bind(this));
+    const fileBuffer = await loadFileBuffer(file);
+    const worker = new WebWorker('worker/jszip-worker.js');
+
+    try {
+      const files = await worker.post(fileBuffer);
+      if (files.error) {
+        throw new z.backup.ImportError(files.error);
+      }
+      this.logger.log('Unzipped files for history import', files);
+      await this.backupRepository.importHistory(files, this.onInit.bind(this), this.onProgress.bind(this));
+      this.onSuccess();
+    } catch (error) {
+      this.onError(error);
+    }
   }
 
   onInit(numberOfRecords) {

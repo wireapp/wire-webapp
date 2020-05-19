@@ -33,7 +33,6 @@ export class NotificationService {
   private readonly storageService: StorageService;
   private readonly AMPLIFY_STORE_NAME: string;
 
-  // tslint:disable-next-line:typedef
   static get CONFIG() {
     return {
       PRIMARY_KEY_MISSED: 'z.storage.StorageKey.NOTIFICATION.MISSED',

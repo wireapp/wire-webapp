@@ -17,7 +17,7 @@
  *
  */
 
-import {ClientType} from 'src/script/client/ClientType';
+import {ClientType} from '@wireapp/api-client/dist/client/';
 import {ClientMapper} from 'src/script/client/ClientMapper';
 
 describe('ClientMapper', () => {

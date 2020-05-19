@@ -18,7 +18,8 @@
  */
 
 import {ConnectionStatus} from '@wireapp/api-client/dist/connection';
-import {GenericMessage, LegalHoldStatus, Text} from '@wireapp/protocol-messaging';
+import {Confirmation, GenericMessage, LegalHoldStatus, Text} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {createRandomUuid} from 'Util/util';
 
@@ -30,7 +31,6 @@ import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 
 import {ClientEvent} from 'src/script/event/Client';
 import {BackendEvent} from 'src/script/event/Backend';
-import {WebAppEvents} from 'src/script/event/WebApp';
 import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
 import {EventRepository} from 'src/script/event/EventRepository';
 import {ClientEntity} from 'src/script/client/ClientEntity';
@@ -43,7 +43,6 @@ import {ACCESS_MODE} from 'src/script/conversation/AccessMode';
 import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
 import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
 import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
-import {ReceiptMode} from 'src/script/conversation/ReceiptMode';
 
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 import {StorageSchemata} from 'src/script/storage/StorageSchemata';
@@ -290,7 +289,7 @@ describe('ConversationRepository', () => {
         muted_timestamp: 0,
         name: 'Test Group',
         others: [conversationPartner.id],
-        receipt_mode: ReceiptMode.DELIVERY_AND_READ,
+        receipt_mode: Confirmation.Type.READ,
         status: ConversationStatus.CURRENT_MEMBER,
         team_id: createRandomUuid(),
         type: ConversationType.GROUP,

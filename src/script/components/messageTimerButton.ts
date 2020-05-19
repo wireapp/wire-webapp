@@ -48,7 +48,7 @@ class MessageTimerButton {
   }
 
   /** Click on ephemeral button */
-  onClick(data: any, event: Event): void {
+  onClick(_: unknown, event: MouseEvent): void {
     if (this.isTimerDisabled()) {
       return event.preventDefault();
     }

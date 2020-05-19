@@ -17,9 +17,9 @@
  *
  */
 
+import {AudioPreference} from '@wireapp/api-client/dist/user/data';
 import {difference} from 'underscore';
 
-import {AudioPreference} from 'src/script/audio/AudioPreference';
 import {AudioPlayingType} from 'src/script/audio/AudioPlayingType';
 import {AudioType} from 'src/script/audio/AudioType';
 import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';

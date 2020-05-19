@@ -20,7 +20,7 @@
 import {getLogger} from 'Util/Logger';
 import {Config} from '../../Config';
 
-import {getPrivacyPolicyUrl, getTermsOfUsePersonalUrl, getTermsOfUseTeamUrl, getWebsiteUrl} from '../../externalRoute';
+import {getPrivacyPolicyUrl, getTermsOfUsePersonalUrl, getTermsOfUseTeamUrl, URL} from '../../externalRoute';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -34,7 +34,7 @@ z.viewModel.content.PreferencesAboutViewModel = class PreferencesAboutViewModel 
     this.selfUser = this.userRepository.self;
     this.Config = Config.getConfig();
 
-    this.websiteUrl = getWebsiteUrl();
+    this.websiteUrl = URL.WEBSITE;
     this.privacyPolicyUrl = getPrivacyPolicyUrl();
     this.termsOfUseUrl = ko.pureComputed(() => {
       if (this.selfUser()) {

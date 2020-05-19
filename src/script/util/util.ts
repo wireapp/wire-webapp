@@ -20,11 +20,10 @@
 import {Decoder} from 'bazinga64';
 import {ObservableArray} from 'knockout';
 import sodium from 'libsodium-wrappers-sumo';
-import {formatE164} from 'phoneformat.js';
-import UUID from 'uuidjs';
+import UUID from 'pure-uuid';
 
 import {QUERY_KEY} from '../auth/route';
-import * as URLUtil from '../auth/util/urlUtil';
+import {UrlUtil} from '@wireapp/commons';
 import {Config} from '../Config';
 import {Conversation} from '../entity/Conversation';
 import {StorageKey} from '../storage/StorageKey';
@@ -38,7 +37,7 @@ export const isTemporaryClientAndNonPersistent = (persist: boolean): boolean => 
     throw new Error('Type of client is unspecified.');
   }
 
-  const isNonPersistentByUrl = URLUtil.getURLParameter(QUERY_KEY.PERSIST_TEMPORARY_CLIENTS) === 'false';
+  const isNonPersistentByUrl = UrlUtil.getURLParameter(QUERY_KEY.PERSIST_TEMPORARY_CLIENTS) === 'false';
   const isNonPersistentByServerConfig = Config.getConfig().FEATURE?.PERSIST_TEMPORARY_CLIENTS === false;
   const isNonPersistent = isNonPersistentByUrl || isNonPersistentByServerConfig;
 
@@ -262,11 +261,7 @@ export const downloadFile = (url: string, fileName: string, mimeType?: string): 
   }, 100);
 };
 
-export const phoneNumberToE164 = (phoneNumber: string, countryCode: string): string => {
-  return formatE164(`${countryCode}`.toUpperCase(), `${phoneNumber}`);
-};
-
-export const createRandomUuid = (): string => UUID.genV4().hexString;
+export const createRandomUuid = (): string => new UUID(4).format();
 
 // Note IE10 listens to "transitionend" instead of "animationend"
 export const alias = {

@@ -20,7 +20,7 @@
 import {AppActions, CONVERSATION_ACTION} from '../action/creator/';
 
 export interface ConversationState {
-  error: any;
+  error: Error & {label?: string};
   fetched: boolean;
   fetching: boolean;
 }

@@ -49,36 +49,35 @@ enum STATE {
 }
 
 interface ParticipantAvatarParams {
-  selected: any;
-  click: any;
-  participant?: ko.Observable<User> | User;
+  click: (participant: User, target: Node) => void;
   delay?: number;
+  participant?: ko.Observable<User> | User;
+  selected?: () => any;
   size?: SIZE;
 }
 
 export class ParticipantAvatar {
-  logger: Logger;
-  participant: ko.Observable<User>;
-  isService: ko.PureComputed<boolean>;
-  isUser: ko.PureComputed<boolean>;
-  isTemporaryGuest: ko.PureComputed<boolean>;
-  remainingTimer: any;
+  avatarEnteredViewport: boolean;
+  avatarLoadingBlocked: boolean;
   avatarType: ko.PureComputed<string>;
-  delay: number;
-  size: SIZE;
-  element: JQuery<HTMLElement>;
-  borderWidth: number;
   borderRadius: number;
+  borderWidth: number;
+  cssClasses: ko.PureComputed<string>;
+  delay: number;
+  element: JQuery<HTMLElement>;
+  initials: ko.PureComputed<string>;
+  isService: ko.PureComputed<boolean>;
+  isTemporaryGuest: ko.PureComputed<boolean>;
+  isUser: ko.PureComputed<boolean>;
+  logger: Logger;
+  onClick: (data: {participant: User}, event: Event) => void;
+  participant: ko.Observable<User>;
+  participantSubscription: ko.Subscription;
+  pictureSubscription: ko.Subscription;
+  size: SIZE;
+  state: ko.PureComputed<STATE>;
   timerLength: number;
   timerOffset: ko.PureComputed<number>;
-  avatarLoadingBlocked: boolean;
-  avatarEnteredViewport: boolean;
-  initials: ko.PureComputed<string>;
-  state: ko.PureComputed<STATE>;
-  cssClasses: ko.PureComputed<string>;
-  onClick: (data: any, event: Event) => void;
-  pictureSubscription: ko.Subscription;
-  participantSubscription: ko.Subscription;
 
   static get SIZE(): typeof SIZE {
     return SIZE;
@@ -113,8 +112,6 @@ export class ParticipantAvatar {
     });
 
     this.isTemporaryGuest = ko.pureComputed(() => this.isUser() && this.participant().isTemporaryGuest());
-
-    this.remainingTimer = undefined;
 
     this.avatarType = ko.pureComputed(() => `${this.isUser() ? 'user' : 'service'}-avatar`);
     this.delay = params.delay;
@@ -158,26 +155,31 @@ export class ParticipantAvatar {
     });
 
     this.state = ko.pureComputed(() => {
-      switch (true) {
-        case this.isService():
-          return STATE.NONE;
-        case this.participant().isMe:
-          return STATE.SELF;
-        case typeof params.selected === 'function' && params.selected():
-          return STATE.SELECTED;
-        case this.participant().isTeamMember():
-          return STATE.NONE;
-        case this.participant().isBlocked():
-          return STATE.BLOCKED;
-        case this.participant().isRequest():
-          return STATE.PENDING;
-        case this.participant().isIgnored():
-          return STATE.IGNORED;
-        case this.participant().isCanceled() || this.participant().isUnknown():
-          return STATE.UNKNOWN;
-        default:
-          return STATE.NONE;
+      if (this.isService()) {
+        return STATE.NONE;
       }
+      if (this.participant().isMe) {
+        return STATE.SELF;
+      }
+      if (typeof params.selected === 'function' && params.selected()) {
+        return STATE.SELECTED;
+      }
+      if (this.participant().isTeamMember()) {
+        return STATE.NONE;
+      }
+      if (this.participant().isBlocked()) {
+        return STATE.BLOCKED;
+      }
+      if (this.participant().isRequest()) {
+        return STATE.PENDING;
+      }
+      if (this.participant().isIgnored()) {
+        return STATE.IGNORED;
+      }
+      if (this.participant().isCanceled() || this.participant().isUnknown()) {
+        return STATE.UNKNOWN;
+      }
+      return STATE.NONE;
     });
 
     this.cssClasses = ko.pureComputed(() => {

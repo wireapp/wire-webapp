@@ -17,7 +17,7 @@
  *
  */
 
-import {WebAppEvents} from '../event/WebApp';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};

@@ -18,6 +18,7 @@
  */
 
 import {amplify} from 'amplify';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
@@ -26,7 +27,6 @@ import {formatLocale} from 'Util/TimeUtil';
 import {onEscKey, offEscKey, isEnterKey, isSpaceKey} from 'Util/KeyboardUtil';
 
 import {Config} from '../Config';
-import {WebAppEvents} from '../event/WebApp';
 
 const defaultContent = {
   checkboxLabel: '',

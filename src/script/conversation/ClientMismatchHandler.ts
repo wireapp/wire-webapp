@@ -18,6 +18,7 @@
  */
 
 import {amplify} from 'amplify';
+import {WebAppEvents} from '@wireapp/webapp-events';
 import {ClientMismatch, NewOTRMessage, UserClients} from '@wireapp/api-client/dist/conversation';
 
 import {getLogger, Logger} from 'Util/Logger';
@@ -28,7 +29,6 @@ import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {UserRepository} from '../user/UserRepository';
 import {EventInfoEntity} from './EventInfoEntity';
 import {Conversation} from '../entity/Conversation';
-import {WebAppEvents} from '../event/WebApp';
 
 export class ClientMismatchHandler {
   private readonly conversationRepository: ConversationRepository;
@@ -188,7 +188,7 @@ export class ClientMismatchHandler {
   ): Promise<void> {
     const removeDeletedUser = async (userId: string): Promise<void> => {
       const clientIdsOfUser = Object.keys(payload.recipients[userId]);
-      const noRemainingClients = !clientIdsOfUser.length;
+      const noRemainingClients = clientIdsOfUser.length === 0;
 
       if (noRemainingClients && typeof conversationEntity !== 'undefined') {
         const backendUser = await this.userRepository.getUserFromBackend(userId);

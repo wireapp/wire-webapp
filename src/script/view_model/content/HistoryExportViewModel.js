@@ -22,7 +22,7 @@ import {t} from 'Util/LocalizerUtil';
 import {getCurrentDate} from 'Util/TimeUtil';
 import {downloadBlob} from 'Util/util';
 
-import {WebAppEvents} from '../../event/WebApp';
+import {WebAppEvents} from '@wireapp/webapp-events';
 import {EventName} from '../../tracking/EventName';
 import {ContentViewModel} from '../ContentViewModel';
 

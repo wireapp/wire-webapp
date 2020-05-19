@@ -18,6 +18,7 @@
  */
 
 import {amplify} from 'amplify';
+import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
 
 import {t} from 'Util/LocalizerUtil';
@@ -25,7 +26,6 @@ import {includesOnlyEmojis} from 'Util/EmojiUtil';
 import {formatDateNumeral, formatTimeShort} from 'Util/TimeUtil';
 
 import {EphemeralStatusType} from '../message/EphemeralStatusType';
-import {WebAppEvents} from '../event/WebApp';
 import {Context} from '../ui/ContextMenu';
 import {ContentMessage} from '../entity/message/ContentMessage';
 
@@ -245,7 +245,7 @@ class Message {
     amplify.publish(SHOW_LEGAL_HOLD_MODAL, this.conversationRepository.active_conversation());
   };
 
-  showContextMenu(messageEntity: ContentMessage, event: Event) {
+  showContextMenu(messageEntity: ContentMessage, event: MouseEvent) {
     const entries = [];
 
     if (messageEntity.is_downloadable()) {

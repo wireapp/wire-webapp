@@ -20,10 +20,10 @@
 import {amplify} from 'amplify';
 import {Environment} from 'Util/Environment';
 import {Logger, getLogger} from 'Util/Logger';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {MediaError} from '../error/MediaError';
 import {PermissionError} from '../error/PermissionError';
-import {WebAppEvents} from '../event/WebApp';
 import {PermissionRepository} from '../permission/PermissionRepository';
 import {PermissionStatusState} from '../permission/PermissionStatusState';
 import {PermissionType} from '../permission/PermissionType';
@@ -40,7 +40,6 @@ declare global {
 }
 
 export class MediaStreamHandler {
-  // tslint:disable-next-line:typedef
   static get CONFIG() {
     return {PERMISSION_HINT_DELAY: 200};
   }

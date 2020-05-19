@@ -17,11 +17,12 @@
  *
  */
 
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {getLogger} from 'Util/Logger';
 
 import {Config} from '../../Config';
 import {getSupportUsernameUrl} from '../../externalRoute';
-import {WebAppEvents} from '../../event/WebApp';
 import {ContentViewModel} from '../ContentViewModel';
 
 class TakeoverViewModel {
