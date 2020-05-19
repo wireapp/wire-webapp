@@ -851,6 +851,7 @@ export class CallingRepository {
     if (stream.getAudioTracks().length > 0) {
       participant.audioStream(stream);
       const audio = new Audio();
+
       audio.srcObject = stream;
       audio.play();
     }
