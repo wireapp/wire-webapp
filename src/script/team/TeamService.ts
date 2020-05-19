@@ -17,12 +17,12 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client';
-import {LegalHoldMemberData} from '@wireapp/api-client/dist/team/legalhold/';
-import {MemberData, Members} from '@wireapp/api-client/dist/team/member/';
-import {Services} from '@wireapp/api-client/dist/team/service/';
-import {ConversationRolesList} from '@wireapp/api-client/dist/conversation/ConversationRole';
-import {TeamChunkData, TeamData} from '@wireapp/api-client/dist/team/team/';
+import type {APIClient} from '@wireapp/api-client';
+import type {LegalHoldMemberData} from '@wireapp/api-client/dist/team/legalhold/';
+import type {MemberData, Members} from '@wireapp/api-client/dist/team/member/';
+import type {Services} from '@wireapp/api-client/dist/team/service/';
+import type {ConversationRolesList} from '@wireapp/api-client/dist/conversation/ConversationRole';
+import type {TeamChunkData, TeamData} from '@wireapp/api-client/dist/team/team/';
 
 export class TeamService {
   private readonly apiClient: APIClient;

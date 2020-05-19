@@ -21,8 +21,8 @@ import ko from 'knockout';
 
 import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {File as FileAsset} from '../../entity/message/File';
+import type {ContentMessage} from 'src/script/entity/message/ContentMessage';
+import type {File as FileAsset} from '../../entity/message/File';
 import {AbstractAssetTransferStateTracker} from './AbstractAssetTransferStateTracker';
 import './assetLoader';
 

@@ -18,10 +18,11 @@
  */
 
 import {ClientClassification, ClientType, RegisteredClient} from '@wireapp/api-client/dist/client/index';
-import {ClientInfo} from '@wireapp/core/dist/client/';
+import type {ClientInfo} from '@wireapp/core/dist/client/';
+
 import * as Runtime from '../../Runtime';
 import * as StringUtil from '../../util/stringUtil';
-import {ThunkAction} from '../reducer';
+import type {ThunkAction} from '../reducer';
 import {ClientActionCreator} from './creator/';
 
 export class ClientAction {

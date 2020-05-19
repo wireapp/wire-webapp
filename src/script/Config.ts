@@ -67,6 +67,7 @@ export class Configuration {
     WEBSITE_BASE: 'https://wire.com',
   };
   readonly VERSION = env.VERSION || '0.0.0';
+  readonly WEBSITE_LABEL = env.WEBSITE_LABEL;
 
   // 10 seconds until phone code expires
   readonly LOGIN_CODE_EXPIRATION = 10 * 60;

@@ -24,7 +24,7 @@ import {formatDuration, DurationUnit} from 'Util/TimeUtil';
 
 import {EphemeralTimings} from '../ephemeral/EphemeralTimings';
 import {Context} from '../ui/ContextMenu';
-import {Conversation} from '../entity/Conversation';
+import type {Conversation} from '../entity/Conversation';
 
 interface MessageTimerButtonParams {
   conversation: ko.Observable<Conversation>;

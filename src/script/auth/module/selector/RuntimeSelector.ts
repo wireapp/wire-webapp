@@ -17,7 +17,7 @@
  *
  */
 
-import {RootState} from '../reducer';
+import type {RootState} from '../reducer';
 
 export const isChecking = (state: RootState) =>
   state.runtimeState.isCheckingIndexedDb || state.runtimeState.isCheckingCookie;

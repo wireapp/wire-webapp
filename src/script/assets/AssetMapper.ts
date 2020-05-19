@@ -17,8 +17,8 @@
  *
  */
 
-import {UserAsset as APIClientUserAsset} from '@wireapp/api-client/dist/user';
-import {Picture as APIClientPicture} from '@wireapp/api-client/dist/self';
+import type {UserAsset as APIClientUserAsset} from '@wireapp/api-client/dist/user';
+import type {Picture as APIClientPicture} from '@wireapp/api-client/dist/self';
 
 import {AssetRemoteData} from './AssetRemoteData';
 

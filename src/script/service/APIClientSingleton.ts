@@ -19,6 +19,7 @@
 
 import {APIClient} from '@wireapp/api-client';
 import {singleton} from 'tsyringe';
+
 import {Config} from '../Config';
 
 @singleton()

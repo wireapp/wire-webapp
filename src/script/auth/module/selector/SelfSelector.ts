@@ -17,9 +17,10 @@
  *
  */
 
-import {Self} from '@wireapp/api-client/dist/self';
+import type {Self} from '@wireapp/api-client/dist/self';
+
 import {Config} from '../../../Config';
-import {RootState} from '../reducer';
+import type {RootState} from '../reducer';
 
 const unsetSelf: Self = {
   accent_id: undefined,

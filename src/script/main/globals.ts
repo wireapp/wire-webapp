@@ -18,13 +18,11 @@
  */
 
 import {amplify} from 'amplify';
-import * as platform from 'platform';
-import * as bazinga64 from 'bazinga64';
 import jQuery from 'jquery';
-import Cookies from 'js-cookie';
 import ko from 'knockout';
-import {RaygunStatic} from 'raygun4js';
+import type {RaygunStatic} from 'raygun4js';
 import 'raygun4js/dist/raygun.vanilla';
+import type {t} from 'Util/LocalizerUtil';
 
 import {AssetService} from '../assets/AssetService';
 import {NotificationService} from '../event/NotificationService';
@@ -60,8 +58,6 @@ import 'Components/panel/userDetails';
 import 'Components/serviceList';
 import 'Components/topPeople';
 import 'Components/userInput';
-
-import {t} from 'Util/LocalizerUtil';
 
 import {
   CancelError,
@@ -104,10 +100,8 @@ declare global {
   interface Window {
     $: typeof jQuery;
     amplify: amplify.Static;
-    bazinga64: typeof bazinga64;
     jQuery: typeof jQuery;
     ko: typeof ko;
-    platform: typeof platform;
     Raygun: RaygunStatic;
     t: typeof t;
     wire: {
@@ -167,6 +161,7 @@ declare global {
           };
         };
         VERSION: string;
+        WEBSITE_LABEL: string;
       };
     };
     wSSOCapable: boolean;
@@ -217,7 +212,6 @@ declare global {
 }
 
 window.amplify = amplify;
-window.Cookies = Cookies;
 // we need to publish jQuery on the window so that knockout can use it
 window.jQuery = jQuery;
 window.ko = ko;

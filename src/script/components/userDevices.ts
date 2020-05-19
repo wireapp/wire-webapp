@@ -18,21 +18,21 @@
  */
 
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
+import type Dexie from 'dexie';
+import ko from 'knockout';
 import {ClientClassification} from '@wireapp/api-client/dist/client';
 
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 
-import {amplify} from 'amplify';
-import Dexie from 'dexie';
-import ko from 'knockout';
-import {ClientEntity} from '../client/ClientEntity';
-import {ClientRepository} from '../client/ClientRepository';
+import type {ClientEntity} from '../client/ClientEntity';
+import type {ClientRepository} from '../client/ClientRepository';
 import {Config} from '../Config';
-import {ConversationRepository} from '../conversation/ConversationRepository';
-import {CryptographyRepository} from '../cryptography/CryptographyRepository';
-import {User} from '../entity/User';
+import type {ConversationRepository} from '../conversation/ConversationRepository';
+import type {CryptographyRepository} from '../cryptography/CryptographyRepository';
+import type {User} from '../entity/User';
 import {getPrivacyHowUrl, getPrivacyWhyUrl, getPrivacyPolicyUrl} from '../externalRoute';
 import {MotionDuration} from '../motion/MotionDuration';
 

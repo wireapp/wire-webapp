@@ -18,6 +18,7 @@
  */
 
 import ko from 'knockout';
+
 import {KEY, isOneOfKeys, isEnterKey, isEscapeKey} from 'Util/KeyboardUtil';
 
 export interface ContextMenuEntry {

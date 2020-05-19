@@ -20,10 +20,14 @@
 import {t} from 'Util/LocalizerUtil';
 import {getRenderedTextContent} from 'Util/messageRenderer';
 
+import type {Text} from '../entity/message/Text';
+import type {File} from '../entity/message/File';
 import {AssetTransferState} from '../assets/AssetTransferState';
-import {Conversation} from '../entity/Conversation';
+import type {Conversation} from '../entity/Conversation';
 import {ConversationStatusIcon} from './ConversationStatusIcon';
 import {ConversationError} from '../error/ConversationError';
+import type {MemberMessage} from '../entity/message/MemberMessage';
+import type {SystemMessage} from '../entity/message/SystemMessage';
 
 enum ACTIVITY_TYPE {
   CALL = 'ConversationCellState.ACTIVITY_TYPE.CALL',
@@ -80,8 +84,8 @@ const _accumulateSummary = (conversationEntity: Conversation, prioritizeMentionA
       }
 
       return conversationEntity.isGroup()
-        ? `${messageEntity.unsafeSenderName()}: ${messageEntity.get_first_asset().text}`
-        : messageEntity.get_first_asset().text;
+        ? `${messageEntity.unsafeSenderName()}: ${(messageEntity.get_first_asset() as Text).text}`
+        : (messageEntity.get_first_asset() as Text).text;
     }
   }
 
@@ -185,19 +189,19 @@ const _getStateGroupActivity = {
     const lastMessageEntity = conversationEntity.getLastMessage();
 
     if (lastMessageEntity.isMember()) {
-      const userCount = lastMessageEntity.userEntities().length;
+      const userCount = (lastMessageEntity as MemberMessage).userEntities().length;
       const hasUserCount = userCount >= 1;
 
       if (hasUserCount) {
         const userCountIsOne = userCount === 1;
 
-        if (lastMessageEntity.isMemberJoin()) {
+        if ((lastMessageEntity as MemberMessage).isMemberJoin()) {
           if (userCountIsOne) {
-            if (!lastMessageEntity.remoteUserEntities().length) {
-              return t('conversationsSecondaryLinePersonAddedYou', lastMessageEntity.user().name());
+            if (!(lastMessageEntity as MemberMessage).remoteUserEntities().length) {
+              return t('conversationsSecondaryLinePersonAddedYou', (lastMessageEntity as MemberMessage).user().name());
             }
 
-            const [remoteUserEntity] = lastMessageEntity.remoteUserEntities();
+            const [remoteUserEntity] = (lastMessageEntity as MemberMessage).remoteUserEntities();
             const userSelfJoined = lastMessageEntity.user().id === remoteUserEntity.id;
             const string = userSelfJoined
               ? t('conversationsSecondaryLinePersonAddedSelf', remoteUserEntity.name())
@@ -209,13 +213,13 @@ const _getStateGroupActivity = {
           return t('conversationsSecondaryLinePeopleAdded', userCount);
         }
 
-        if (lastMessageEntity.isMemberRemoval()) {
+        if ((lastMessageEntity as MemberMessage).isMemberRemoval()) {
           if (userCountIsOne) {
-            const [remoteUserEntity] = lastMessageEntity.remoteUserEntities();
+            const [remoteUserEntity] = (lastMessageEntity as MemberMessage).remoteUserEntities();
 
             if (remoteUserEntity) {
-              if (lastMessageEntity.isTeamMemberLeave()) {
-                const name = lastMessageEntity.name() || remoteUserEntity.name();
+              if ((lastMessageEntity as MemberMessage).isTeamMemberLeave()) {
+                const name = (lastMessageEntity as MemberMessage).name() || remoteUserEntity.name();
                 return t('conversationsSecondaryLinePersonRemovedTeam', name);
               }
 
@@ -233,14 +237,15 @@ const _getStateGroupActivity = {
       }
     }
 
-    const isConversationRename = lastMessageEntity.is_system() && lastMessageEntity.is_conversation_rename();
+    const isConversationRename =
+      lastMessageEntity.is_system() && (lastMessageEntity as SystemMessage).is_conversation_rename();
     if (isConversationRename) {
       return t('conversationsSecondaryLineRenamed', lastMessageEntity.user().name());
     }
   },
   icon: (conversationEntity: Conversation): ConversationStatusIcon | void => {
     const lastMessageEntity = conversationEntity.getLastMessage();
-    const isMemberRemoval = lastMessageEntity.isMember() && lastMessageEntity.isMemberRemoval();
+    const isMemberRemoval = lastMessageEntity.isMember() && (lastMessageEntity as MemberMessage).isMemberRemoval();
 
     if (isMemberRemoval) {
       return conversationEntity.showNotificationsEverything()
@@ -285,8 +290,9 @@ const _getStateRemoved = {
     const lastMessageEntity = conversationEntity.getLastMessage();
     const selfUserId = conversationEntity.selfUser().id;
 
-    const isMemberRemoval = lastMessageEntity && lastMessageEntity.isMember() && lastMessageEntity.isMemberRemoval();
-    const wasSelfRemoved = isMemberRemoval && lastMessageEntity.userIds().includes(selfUserId);
+    const isMemberRemoval =
+      lastMessageEntity && lastMessageEntity.isMember() && (lastMessageEntity as MemberMessage).isMemberRemoval();
+    const wasSelfRemoved = isMemberRemoval && (lastMessageEntity as MemberMessage).userIds().includes(selfUserId);
     if (wasSelfRemoved) {
       const selfLeft = lastMessageEntity.user().id === selfUserId;
       return selfLeft ? t('conversationsSecondaryLineYouLeft') : t('conversationsSecondaryLineYouWereRemoved');
@@ -311,7 +317,7 @@ const _getStateUnreadMessage = {
         string = true;
       } else if (messageEntity.has_asset()) {
         const assetEntity = messageEntity.get_first_asset();
-        const isUploaded = assetEntity.status() === AssetTransferState.UPLOADED;
+        const isUploaded = (assetEntity as File).status() === AssetTransferState.UPLOADED;
 
         if (isUploaded) {
           if (assetEntity.is_audio()) {
@@ -338,7 +344,7 @@ const _getStateUnreadMessage = {
         const hasString = string && string !== true;
         const stateText: string = hasString
           ? (string as string)
-          : getRenderedTextContent(messageEntity.get_first_asset().text);
+          : getRenderedTextContent((messageEntity.get_first_asset() as Text).text);
         return conversationEntity.isGroup() ? `${messageEntity.unsafeSenderName()}: ${stateText}` : stateText;
       }
     }
@@ -360,7 +366,8 @@ const _getStateUserName = {
   },
   match: (conversationEntity: Conversation): boolean => {
     const lastMessageEntity = conversationEntity.getLastMessage();
-    const isMemberJoin = lastMessageEntity && lastMessageEntity.isMember() && lastMessageEntity.isMemberJoin();
+    const isMemberJoin =
+      lastMessageEntity && lastMessageEntity.isMember() && (lastMessageEntity as MemberMessage).isMemberJoin();
     const isEmpty1to1Conversation = conversationEntity.is1to1() && isMemberJoin;
 
     return conversationEntity.isRequest() || isEmpty1to1Conversation;

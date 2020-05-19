@@ -18,7 +18,8 @@
  */
 
 import {ClientType, RegisteredClient} from '@wireapp/api-client/dist/client/index';
-import {RootState} from '../reducer';
+
+import type {RootState} from '../reducer';
 
 export const getClients = (state: RootState) => state.clientState.clients || [];
 export const getCurrentSelfClient = (state: RootState): RegisteredClient => state.clientState.currentClient;

@@ -21,11 +21,11 @@ import ko from 'knockout';
 
 import {sortUsersByPriority} from 'Util/StringUtil';
 
-import {ConversationRepository} from '../../conversation/ConversationRepository';
-import {User} from '../../entity/User';
+import type {ConversationRepository} from '../../conversation/ConversationRepository';
+import type {User} from '../../entity/User';
 import {MotionDuration} from '../../motion/MotionDuration';
-import {SearchRepository} from '../../search/SearchRepository';
-import {TeamRepository} from '../../team/TeamRepository';
+import type {SearchRepository} from '../../search/SearchRepository';
+import type {TeamRepository} from '../../team/TeamRepository';
 import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
 
 export class ConversationParticipantsViewModel extends BasePanelViewModel {

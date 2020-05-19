@@ -24,9 +24,9 @@ import {renderMessage} from 'Util/messageRenderer';
 import {AssetType} from '../../assets/AssetType';
 import {containsOnlyLink} from '../../links/LinkPreviewHelpers';
 import {mediaParser} from '../../media/MediaParser';
-import {MentionEntity} from '../../message/MentionEntity';
+import type {MentionEntity} from '../../message/MentionEntity';
 import {Asset} from './Asset';
-import {LinkPreview} from './LinkPreview';
+import type {LinkPreview} from './LinkPreview';
 
 export class Text extends Asset {
   public readonly mentions: ko.ObservableArray<MentionEntity>;

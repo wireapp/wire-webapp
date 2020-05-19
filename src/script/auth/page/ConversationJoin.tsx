@@ -56,7 +56,7 @@ import {isPwaSupportedBrowser} from '../Runtime';
 import * as AccentColor from '../util/AccentColor';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import * as StringUtil from '../util/stringUtil';
-import {getURLParameter, hasURLParameter, pathWithParams} from '../util/urlUtil';
+import {UrlUtil} from '@wireapp/commons';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
@@ -88,9 +88,9 @@ const ConversationJoin = ({
   const [showCookiePolicyBanner, setShowCookiePolicyBanner] = useState(true);
 
   useEffect(() => {
-    const localConversationCode = getURLParameter(QUERY_KEY.CONVERSATION_CODE);
-    const localConversationKey = getURLParameter(QUERY_KEY.CONVERSATION_KEY);
-    const localExpiresIn = window.parseInt(getURLParameter(QUERY_KEY.JOIN_EXPIRES), 10) || undefined;
+    const localConversationCode = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_CODE);
+    const localConversationKey = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_KEY);
+    const localExpiresIn = window.parseInt(UrlUtil.getURLParameter(QUERY_KEY.JOIN_EXPIRES), 10) || undefined;
 
     setConversationCode(localConversationCode);
     setConversationKey(localConversationKey);
@@ -110,7 +110,7 @@ const ConversationJoin = ({
 
   useEffect(() => {
     const isEnabled =
-      Config.getConfig().URL.MOBILE_BASE && hasURLParameter(QUERY_KEY.PWA_AWARE) && isPwaSupportedBrowser();
+      Config.getConfig().URL.MOBILE_BASE && UrlUtil.hasURLParameter(QUERY_KEY.PWA_AWARE) && isPwaSupportedBrowser();
     setIsPwaEnabled(isEnabled);
     if (isEnabled) {
       setForceNewTemporaryGuestAccount(true);
@@ -119,8 +119,8 @@ const ConversationJoin = ({
 
   const routeToApp = () => {
     const redirectLocation = isPwaEnabled
-      ? pathWithParams(EXTERNAL_ROUTE.PWA_LOGIN, QUERY_KEY.IMMEDIATE_LOGIN)
-      : pathWithParams(EXTERNAL_ROUTE.WEBAPP);
+      ? UrlUtil.pathWithParams(EXTERNAL_ROUTE.PWA_LOGIN, {[QUERY_KEY.IMMEDIATE_LOGIN]: 'true'})
+      : UrlUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP);
     window.location.replace(redirectLocation);
   };
 

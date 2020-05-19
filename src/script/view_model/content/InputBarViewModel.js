@@ -17,7 +17,6 @@
  *
  */
 
-import {container} from 'tsyringe';
 import {escape} from 'underscore';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -41,9 +40,6 @@ import {MentionEntity} from '../../message/MentionEntity';
 import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
 import {Config} from '../../Config';
-import {AssetUploader} from '../../assets/AssetUploader';
-import {AssetService} from '../../assets/AssetService';
-import {BackendClient} from '../../service/BackendClient';
 import {ConversationError} from '../../error/ConversationError';
 
 // Parent: ContentViewModel
@@ -74,7 +70,6 @@ export const InputBarViewModel = class InputBarViewModel {
     this.onWindowClick = this.onWindowClick.bind(this);
     this.setElements = this.setElements.bind(this);
     this.updateSelectionState = this.updateSelectionState.bind(this);
-    this.assetUploader = new AssetUploader(new AssetService(container.resolve(BackendClient)));
 
     this.shadowInput = null;
     this.textarea = null;
@@ -84,6 +79,7 @@ export const InputBarViewModel = class InputBarViewModel {
 
     this.emojiInput = contentViewModel.emojiInput;
 
+    this.assetRepository = repositories.asset;
     this.eventRepository = repositories.event;
     this.conversationRepository = repositories.conversation;
     this.searchRepository = repositories.search;
@@ -850,7 +846,7 @@ export const InputBarViewModel = class InputBarViewModel {
 
   _isHittingUploadLimit(files) {
     const concurrentUploadLimit = InputBarViewModel.CONFIG.ASSETS.CONCURRENT_UPLOAD_LIMIT;
-    const concurrentUploads = files.length + this.assetUploader.getNumberOfOngoingUploads();
+    const concurrentUploads = files.length + this.assetRepository.getNumberOfOngoingUploads();
     const isHittingUploadLimit = concurrentUploads > InputBarViewModel.CONFIG.ASSETS.CONCURRENT_UPLOAD_LIMIT;
 
     if (isHittingUploadLimit) {

@@ -17,7 +17,7 @@
  *
  */
 
-import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
+import type {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 import ko from 'knockout';
 
 import {Logger, getLogger} from 'Util/Logger';
@@ -26,7 +26,7 @@ import {downloadBlob} from 'Util/util';
 
 import {Asset} from './Asset';
 
-import {AssetRemoteData} from '../../assets/AssetRemoteData';
+import type {AssetRemoteData} from '../../assets/AssetRemoteData';
 import {AssetTransferState} from '../../assets/AssetTransferState';
 import {AssetType} from '../../assets/AssetType';
 
@@ -89,44 +89,41 @@ export class File extends Asset {
   /**
    * Loads and decrypts otr asset
    */
-  load(): Promise<void | Blob> {
+  async load(): Promise<void | Blob> {
     this.status(AssetTransferState.DOWNLOADING);
 
-    return this.original_resource()
-      .load()
-      .then(blob => {
-        this.status(AssetTransferState.UPLOADED);
-        return blob;
-      })
-      .catch(error => {
-        this.status(AssetTransferState.UPLOADED);
-        throw error;
-      });
+    try {
+      const blob = await this.original_resource().load();
+      this.status(AssetTransferState.UPLOADED);
+      return blob;
+    } catch (error) {
+      this.status(AssetTransferState.UPLOADED);
+      throw error;
+    }
   }
 
   /**
    * Loads and decrypts otr asset as initiates download
    */
-  download(): Promise<number | void> {
+  async download(): Promise<number | void> {
     if (this.status() !== AssetTransferState.UPLOADED) {
       return Promise.resolve(undefined);
     }
 
     const download_started = Date.now();
 
-    return this.load()
-      .then(blob => {
-        if (!blob) {
-          throw new Error('No blob received.');
-        }
-        return downloadBlob(blob, this.file_name);
-      })
-      .then(blob => {
-        const download_duration = (Date.now() - download_started) / TIME_IN_MILLIS.SECOND;
-        this.logger.info(`Downloaded asset in ${download_duration} seconds`);
-        return blob;
-      })
-      .catch(error => this.logger.error('Failed to download asset', error));
+    try {
+      const blob = await this.load();
+      if (!blob) {
+        throw new Error('No blob received.');
+      }
+      const downloadedBlob = downloadBlob(blob, this.file_name);
+      const download_duration = (Date.now() - download_started) / TIME_IN_MILLIS.SECOND;
+      this.logger.info(`Downloaded asset in ${download_duration} seconds`);
+      return downloadedBlob;
+    } catch (error) {
+      return this.logger.error('Failed to download asset', error);
+    }
   }
 
   cancel_download(): void {

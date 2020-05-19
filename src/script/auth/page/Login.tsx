@@ -19,7 +19,6 @@
 
 import {LoginData} from '@wireapp/api-client/dist/auth';
 import {ClientType} from '@wireapp/api-client/dist/client/index';
-import {UrlUtil} from '@wireapp/commons';
 import {
   ArrowIcon,
   COLOR,
@@ -58,6 +57,7 @@ import * as AuthSelector from '../module/selector/AuthSelector';
 import {QUERY_KEY, ROUTE} from '../route';
 import {isDesktopApp} from '../Runtime';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
+import {UrlUtil} from '@wireapp/commons';
 import * as URLUtil from '../util/urlUtil';
 import Page from './Page';
 
@@ -101,8 +101,8 @@ const Login = ({
   }, [defaultSSOCode]);
 
   useEffect(() => {
-    const queryConversationCode = URLUtil.getURLParameter(QUERY_KEY.CONVERSATION_CODE) || null;
-    const queryConversationKey = URLUtil.getURLParameter(QUERY_KEY.CONVERSATION_KEY) || null;
+    const queryConversationCode = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_CODE) || null;
+    const queryConversationKey = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_KEY) || null;
 
     const keyAndCodeExistent = queryConversationKey && queryConversationCode;
     if (keyAndCodeExistent) {
@@ -118,7 +118,7 @@ const Login = ({
 
   useEffect(() => {
     resetAuthError();
-    const isImmediateLogin = URLUtil.hasURLParameter(QUERY_KEY.IMMEDIATE_LOGIN);
+    const isImmediateLogin = UrlUtil.hasURLParameter(QUERY_KEY.IMMEDIATE_LOGIN);
     if (isImmediateLogin) {
       immediateLogin();
     }

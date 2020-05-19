@@ -17,9 +17,9 @@
  *
  */
 
-import {ContentMessage} from '../entity/message/ContentMessage';
-import {Text as TextAsset} from '../entity/message/Text';
-import {MentionEntity} from '../message/MentionEntity';
+import type {ContentMessage} from '../entity/message/ContentMessage';
+import type {Text as TextAsset} from '../entity/message/Text';
+import type {MentionEntity} from '../message/MentionEntity';
 
 /**
  * Checks if two arrays with mentions contain different values.

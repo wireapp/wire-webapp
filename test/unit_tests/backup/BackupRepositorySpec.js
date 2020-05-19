@@ -22,7 +22,12 @@ import JSZip from 'jszip';
 import {noop} from 'Util/util';
 
 import {BackupRepository} from 'src/script/backup/BackupRepository';
-
+import {
+  CancelError,
+  DifferentAccountError,
+  IncompatibleBackupError,
+  IncompatiblePlatformError,
+} from 'src/script/backup/Error';
 import {ClientEvent} from 'src/script/event/Client';
 import {StorageSchemata} from 'src/script/storage/StorageSchemata';
 import {TestFactory} from '../../helper/TestFactory';
@@ -43,9 +48,10 @@ fdescribe('BackupRepository', () => {
   const testFactory = new TestFactory();
   let backupRepository = undefined;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     jasmine.clock().install();
-    return testFactory.exposeBackupActors().then(() => (backupRepository = testFactory.backup_repository));
+    await testFactory.exposeBackupActors();
+    backupRepository = testFactory.backup_repository;
   });
 
   afterEach(() => jasmine.clock().uninstall());
@@ -79,94 +85,66 @@ fdescribe('BackupRepository', () => {
 
     afterEach(() => testFactory.storage_service.clearStores());
 
-    it('generates an archive of the database', () => {
-      const filesToCheck = [BackupRepository.CONFIG.FILENAME.CONVERSATIONS, BackupRepository.CONFIG.FILENAME.EVENTS];
+    it('generates an archive of the database', async () => {
+      const zip = await backupRepository.generateHistory(noop);
+      const zipFilenames = Object.keys(zip.files);
+      Object.values(BackupRepository.CONFIG.FILENAME).forEach(filename => expect(zipFilenames).toContain(filename));
 
-      const archivePromise = backupRepository.generateHistory(noop);
+      const conversationsStr = await zip.files[BackupRepository.CONFIG.FILENAME.CONVERSATIONS].async('string');
+      const conversations = JSON.parse(conversationsStr);
+      expect(conversations).toEqual([conversation]);
 
-      return archivePromise.then(zip => {
-        const fileNames = Object.keys(zip.files);
-
-        expect(fileNames).toContain('export.json');
-        filesToCheck.map(filename => expect(fileNames).toContain(filename));
-
-        const validateConversationsPromise = zip.files[BackupRepository.CONFIG.FILENAME.CONVERSATIONS]
-          .async('string')
-          .then(conversationsStr => JSON.parse(conversationsStr))
-          .then(conversations => {
-            expect(conversations).toEqual([conversation]);
-          });
-
-        const validateEventsPromise = zip.files[BackupRepository.CONFIG.FILENAME.EVENTS]
-          .async('string')
-          .then(eventsStr => JSON.parse(eventsStr))
-          .then(events => {
-            expect(events).toEqual(messages);
-          });
-
-        return Promise.all([validateConversationsPromise, validateEventsPromise]);
-      });
+      const eventsStr = await zip.files[BackupRepository.CONFIG.FILENAME.EVENTS].async('string');
+      const events = JSON.parse(eventsStr);
+      expect(events).toEqual(messages);
     });
 
-    it('ignores verification events in the backup', () => {
+    it('ignores verification events in the backup', async () => {
       const verificationEvent = {
         conversation: conversationId,
         type: ClientEvent.CONVERSATION.VERIFICATION,
       };
 
-      return testFactory.storage_service
-        .save(StorageSchemata.OBJECT_STORE.EVENTS, undefined, verificationEvent)
-        .then(() => {
-          const archivePromise = backupRepository.generateHistory(noop);
+      await testFactory.storage_service.save(StorageSchemata.OBJECT_STORE.EVENTS, undefined, verificationEvent);
+      const zip = await backupRepository.generateHistory(noop);
 
-          return archivePromise.then(zip => {
-            return zip.files[`${StorageSchemata.OBJECT_STORE.EVENTS}.json`]
-              .async('string')
-              .then(eventsStr => JSON.parse(eventsStr))
-              .then(events => {
-                expect(events).not.toContain(verificationEvent);
-                expect(events.length).toBe(messages.length);
-              });
-          });
-        });
+      const eventsStr = await zip.files[`${StorageSchemata.OBJECT_STORE.EVENTS}.json`].async('string');
+      const events = JSON.parse(eventsStr);
+      expect(events).not.toContain(verificationEvent);
+      expect(events.length).toBe(messages.length);
     });
 
-    it('cancels export', () => {
-      spyOn(backupRepository, 'isCanceled').and.returnValue(true);
-
-      const promise = backupRepository
-        .generateHistory(noop)
-        .then(() => {
-          throw new Error('Export should fail with a CancelError');
-        })
-        .catch(error => {
-          expect(error instanceof window.z.backup.CancelError).toBe(true);
-        });
-
+    it('cancels export', async () => {
+      spyOnProperty(backupRepository, 'isCanceled').and.returnValue(true);
       backupRepository.cancelAction();
 
-      return promise;
+      try {
+        await backupRepository.generateHistory(noop);
+        fail('Export should fail with a CancelError');
+      } catch (error) {
+        expect(error).toEqual(jasmine.any(CancelError));
+      }
     });
   });
 
   describe('importHistory', () => {
-    it(`fails if metadata doesn't match`, () => {
+    it(`fails if metadata doesn't match`, async () => {
       const tests = [
         {
-          expectedError: window.z.backup.DifferentAccountError,
+          expectedError: DifferentAccountError,
           metaChanges: {user_id: 'fail'},
         },
         {
-          expectedError: window.z.backup.IncompatibleBackupError,
+          expectedError: IncompatibleBackupError,
           metaChanges: {version: 13}, // version 14 contains a migration script, thus will generate an error
         },
         {
-          expectedError: window.z.backup.IncompatiblePlatformError,
+          expectedError: IncompatiblePlatformError,
           metaChanges: {platform: 'random'},
         },
       ];
 
-      const promises = tests.map(testDescription => {
+      for (const testDescription of tests) {
         const archive = new JSZip();
         const meta = {
           ...backupRepository.createMetaData(),
@@ -175,20 +153,21 @@ fdescribe('BackupRepository', () => {
 
         archive.file(BackupRepository.CONFIG.FILENAME.METADATA, JSON.stringify(meta));
 
-        return backupRepository
-          .importHistory(archive, noop, noop)
-          .then(() => {
-            throw new Error('Import should fail');
-          })
-          .catch(error => {
-            expect(error instanceof testDescription.expectedError).toBe(true);
-          });
-      });
+        const files = {};
+        for (const fileName in archive.files) {
+          files[fileName] = await archive.files[fileName].async('uint8array');
+        }
 
-      return Promise.all(promises);
+        try {
+          await backupRepository.importHistory(files, noop, noop);
+          fail('Import should fail');
+        } catch (error) {
+          expect(error).toEqual(jasmine.any(testDescription.expectedError));
+        }
+      }
     });
 
-    it('successfully imports a backup', () => {
+    it('successfully imports a backup', async () => {
       function removePrimaryKey(message) {
         return {
           ...message,
@@ -207,28 +186,25 @@ fdescribe('BackupRepository', () => {
         return archive;
       });
 
-      const importPromises = archives.map(archive => {
-        return backupRepository.importHistory(archive, noop, noop).then(() => {
-          const conversationsTest = testFactory.storage_service
-            .getAll(StorageSchemata.OBJECT_STORE.CONVERSATIONS)
-            .then(conversationsData => {
-              expect(conversationsData.length).toEqual(1);
-              const [conversationData] = conversationsData;
+      for (const archive of archives) {
+        const files = {};
+        for (const fileName in archive.files) {
+          files[fileName] = await archive.files[fileName].async('uint8array');
+        }
 
-              expect(conversationData.name).toEqual(conversation.name);
-              expect(conversationData.id).toEqual(conversation.id);
-            });
+        await backupRepository.importHistory(files, noop, noop);
 
-          const eventsTest = testFactory.storage_service.getAll(StorageSchemata.OBJECT_STORE.EVENTS).then(events => {
-            expect(events.length).toEqual(messages.length);
-            expect(events.map(removePrimaryKey)).toEqual(messages.map(removePrimaryKey));
-          });
+        const conversationsData = await testFactory.storage_service.getAll(StorageSchemata.OBJECT_STORE.CONVERSATIONS);
+        expect(conversationsData.length).toEqual(1);
+        const [conversationData] = conversationsData;
 
-          return Promise.all([conversationsTest, eventsTest]);
-        });
-      });
+        expect(conversationData.name).toEqual(conversation.name);
+        expect(conversationData.id).toEqual(conversation.id);
 
-      return Promise.all(importPromises);
+        const events = await testFactory.storage_service.getAll(StorageSchemata.OBJECT_STORE.EVENTS);
+        expect(events.length).toEqual(messages.length);
+        expect(events.map(removePrimaryKey)).toEqual(messages.map(removePrimaryKey));
+      }
     });
   });
 });

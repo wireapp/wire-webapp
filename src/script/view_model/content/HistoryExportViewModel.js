@@ -17,17 +17,20 @@
  *
  */
 
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {getCurrentDate} from 'Util/TimeUtil';
 import {downloadBlob} from 'Util/util';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {EventName} from '../../tracking/EventName';
 import {ContentViewModel} from '../ContentViewModel';
+import {Config} from '../../Config';
+
+import {CancelError} from '../../backup/Error';
 
 import 'Components/loadingBar';
-import {Config} from '../../Config';
 
 export const HistoryExportViewModel = class HistoryExportViewModel {
   static get STATE() {
@@ -137,7 +140,7 @@ export const HistoryExportViewModel = class HistoryExportViewModel {
   }
 
   onError(error) {
-    if (error instanceof window.z.backup.CancelError) {
+    if (error instanceof CancelError) {
       this.logger.log('History export was cancelled');
       return this.dismissExport();
     }

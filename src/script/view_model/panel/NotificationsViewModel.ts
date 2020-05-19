@@ -21,7 +21,7 @@ import ko from 'knockout';
 
 import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
 import {NOTIFICATION_STATE, getNotificationText} from '../../conversation/NotificationSetting';
-import {ConversationRepository} from '../../conversation/ConversationRepository';
+import type {ConversationRepository} from '../../conversation/ConversationRepository';
 
 interface NotificationSetting {
   text: string;

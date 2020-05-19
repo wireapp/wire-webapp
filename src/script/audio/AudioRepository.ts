@@ -21,6 +21,7 @@ import {AudioPreference, WebappProperties} from '@wireapp/api-client/dist/user/d
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
+
 import {Logger, getLogger} from 'Util/Logger';
 
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';

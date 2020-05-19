@@ -18,7 +18,8 @@
  */
 
 import {Request, Router} from 'express';
-import {ServerConfig} from '../ServerConfig';
+
+import type {ServerConfig} from '../ServerConfig';
 
 const geolite2 = require('geolite2');
 const maxmind = require('maxmind');

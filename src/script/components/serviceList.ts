@@ -18,12 +18,13 @@
  */
 
 import ko from 'knockout';
+
 import {noop} from 'Util/util';
 
 import {ParticipantAvatar} from 'Components/participantAvatar';
 
 import 'Components/list/participantItem';
-import {ServiceEntity} from '../integration/ServiceEntity';
+import type {ServiceEntity} from '../integration/ServiceEntity';
 
 interface ServiceListParams {
   isSearching?: ko.PureComputed<boolean>;

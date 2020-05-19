@@ -24,11 +24,12 @@ import {noop} from 'Util/util';
 import {ParticipantAvatar} from 'Components/participantAvatar';
 import {generateCellState} from '../../conversation/ConversationCellState';
 import {ConversationStatusIcon} from '../../conversation/ConversationStatusIcon';
-import {Conversation} from '../../entity/Conversation';
+import type {Conversation} from '../../entity/Conversation';
 import {MediaType} from '../../media/MediaType';
 import {viewportObserver} from '../../ui/viewportObserver';
 
 import 'Components/availabilityState';
+import type {User} from '../../entity/User';
 
 interface ConversationListCellProps {
   showJoinButton: boolean;
@@ -51,7 +52,7 @@ class ConversationListCell {
   is1To1: boolean;
   isInTeam: boolean;
   isInViewport: ko.Observable<boolean>;
-  users: any;
+  users: ko.ObservableArray<User>;
   cell_state: ko.Observable<ReturnType<typeof generateCellState>>;
   ConversationStatusIcon: typeof ConversationStatusIcon;
   onClickJoinCall: (viewModel: ConversationListCell, event: MouseEvent) => void;

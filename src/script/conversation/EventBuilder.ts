@@ -17,21 +17,21 @@
  *
  */
 
-import {LegalHoldStatus} from '@wireapp/api-client/dist/team/legalhold';
-import {REASON as AVS_REASON} from '@wireapp/avs';
+import type {LegalHoldStatus} from '@wireapp/api-client/dist/team/legalhold';
+import type {REASON as AVS_REASON} from '@wireapp/avs';
 
 import {createRandomUuid} from 'Util/util';
 
 import {BackendEvent} from '../event/Backend';
 import {CALL, CONVERSATION, ClientEvent} from '../event/Client';
 
-import {Call as CallEntity} from '../calling/Call';
+import type {Call as CallEntity} from '../calling/Call';
 import {StatusType} from '../message/StatusType';
 import {VerificationMessageType} from '../message/VerificationMessageType';
 
-import {Conversation} from '../entity/Conversation';
-import {Message} from '../entity/message/Message';
-import {User} from '../entity/User';
+import type {Conversation} from '../entity/Conversation';
+import type {Message} from '../entity/message/Message';
+import type {User} from '../entity/User';
 
 export interface BaseEvent {
   conversation: string;
@@ -75,7 +75,7 @@ export type AllVerifiedEvent = ConversationEvent<{type: VerificationMessageType}
 export type AssetAddEvent = Omit<ConversationEvent<any>, 'id'> & {status: StatusType};
 export type DegradedMessageEvent = ConversationEvent<{type: VerificationMessageType; userIds: string[]}>;
 export type DeleteEvent = ConversationEvent<{deleted_time: number}>;
-export type GroupCreationEvent = ConversationEvent<{allTeamMembers: boolean; name: string; userIds: string[]}>;
+export type GroupCreationEvent = ConversationEvent<{allTeamMembers: User[]; name: string; userIds: string[]}>;
 export type LegalHoldMessageEvent = ConversationEvent<{legal_hold_status: LegalHoldStatus}>;
 export type MemberJoinEvent = BackendEventMessage<{user_ids: string[]}>;
 export type MemberLeaveEvent = BackendEventMessage<{user_ids: string[]}>;
@@ -297,7 +297,7 @@ export const EventBuilder = {
       type: ClientEvent.CONVERSATION.TEAM_MEMBER_LEAVE,
     };
   },
-  buildUnableToDecrypt(event: any, decryptionError: Error, errorCode: number): ErrorEvent {
+  buildUnableToDecrypt(event: any, decryptionError: Error, errorCode: number | string): ErrorEvent {
     const {conversation: conversationId, data: eventData, from, time} = event;
 
     return {

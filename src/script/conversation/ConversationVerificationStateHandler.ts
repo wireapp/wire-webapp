@@ -23,11 +23,11 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Logger, getLogger} from 'Util/Logger';
 
-import {Conversation} from '../entity/Conversation';
-import {EventRepository} from '../event/EventRepository';
+import type {Conversation} from '../entity/Conversation';
+import type {EventRepository} from '../event/EventRepository';
 import {VerificationMessageType} from '../message/VerificationMessageType';
-import {ServerTimeHandler} from '../time/serverTimeHandler';
-import {ConversationRepository} from './ConversationRepository';
+import type {ServerTimeHandler} from '../time/serverTimeHandler';
+import type {ConversationRepository} from './ConversationRepository';
 import {ConversationVerificationState} from './ConversationVerificationState';
 
 export class ConversationVerificationStateHandler {

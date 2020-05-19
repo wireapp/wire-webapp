@@ -17,11 +17,12 @@
  *
  */
 
-import {CookiesStatic} from 'js-cookie';
+import type {CookiesStatic} from 'js-cookie';
+
 import {QUERY_KEY} from '../../route';
 import {isFirefox, isPwaSupportedBrowser, isSupportedBrowser} from '../../Runtime';
 import {hasURLParameter} from '../../util/urlUtil';
-import {ThunkAction} from '../reducer';
+import type {ThunkAction} from '../reducer';
 import {RuntimeActionCreator} from './creator/';
 
 export class RuntimeAction {

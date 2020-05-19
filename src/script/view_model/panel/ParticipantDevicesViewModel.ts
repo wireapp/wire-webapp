@@ -22,10 +22,10 @@ import ko from 'knockout';
 import {makeUserDevicesHistory, UserDevicesState, UserDevicesHistory} from 'Components/userDevices';
 
 import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
-import {User} from '../../entity/User';
-import {ConversationRepository} from '../../conversation/ConversationRepository';
-import {ClientRepository} from '../../client/ClientRepository';
-import {CryptographyRepository} from '../../cryptography/CryptographyRepository';
+import type {User} from '../../entity/User';
+import type {ConversationRepository} from '../../conversation/ConversationRepository';
+import type {ClientRepository} from '../../client/ClientRepository';
+import type {CryptographyRepository} from '../../cryptography/CryptographyRepository';
 
 export class ParticipantDevicesViewModel extends BasePanelViewModel {
   clientRepository: ClientRepository;
