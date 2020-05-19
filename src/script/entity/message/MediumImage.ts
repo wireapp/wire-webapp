@@ -20,7 +20,7 @@
 import {getLogger} from 'Util/Logger';
 import {downloadBlob} from 'Util/util';
 
-import {AssetRemoteData} from '../../assets/AssetRemoteData';
+import type {AssetRemoteData} from '../../assets/AssetRemoteData';
 import {AssetType} from '../../assets/AssetType';
 import {File} from './File';
 

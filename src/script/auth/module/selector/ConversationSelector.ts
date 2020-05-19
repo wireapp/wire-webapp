@@ -17,7 +17,7 @@
  *
  */
 
-import {RootState} from '../reducer';
+import type {RootState} from '../reducer';
 
 export const isFetching = (state: RootState) => state.conversationState.fetching;
 export const getError = (state: RootState) => state.conversationState.error;

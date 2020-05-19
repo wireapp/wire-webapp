@@ -17,7 +17,7 @@
  *
  */
 
-import Dexie from 'dexie';
+import type Dexie from 'dexie';
 import DexieBatch from 'dexie-batch';
 
 import {Logger, getLogger} from 'Util/Logger';

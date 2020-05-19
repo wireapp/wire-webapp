@@ -17,7 +17,7 @@
  *
  */
 
-import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
+import type {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 import ko from 'knockout';
 
 import {Logger, getLogger} from 'Util/Logger';
@@ -26,7 +26,7 @@ import {downloadBlob} from 'Util/util';
 
 import {Asset} from './Asset';
 
-import {AssetRemoteData} from '../../assets/AssetRemoteData';
+import type {AssetRemoteData} from '../../assets/AssetRemoteData';
 import {AssetTransferState} from '../../assets/AssetTransferState';
 import {AssetType} from '../../assets/AssetType';
 

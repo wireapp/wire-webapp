@@ -18,6 +18,7 @@
  */
 
 import ko from 'knockout';
+
 import {MediaConstraintsHandler, ScreensharingMethods} from './MediaConstraintsHandler';
 
 describe('MediaConstraintsHandler', () => {

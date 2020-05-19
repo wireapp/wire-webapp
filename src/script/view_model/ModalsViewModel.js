@@ -76,6 +76,7 @@ export class ModalsViewModel {
     this.inputFocus = ko.observable(false);
     this.content = ko.observable(defaultContent);
     this.state = ko.observable(States.NONE);
+    this.currentId = ko.observable(null);
     this.queue = [];
     this.errorMessage = ko.observable('');
     this.actionEnabled = ko.pureComputed(() => !this.hasInput() || !!this.inputValue().trim().length);
@@ -86,6 +87,10 @@ export class ModalsViewModel {
   isModalVisible = () => this.state() === States.OPEN;
 
   showModal = (type, options, modalId) => {
+    const alreadyOpen = modalId && modalId === this.currentId();
+    if (alreadyOpen) {
+      return this.unqueue();
+    }
     const found = modalId && this.queue.find(({id}) => id === modalId);
     const newModal = {id: modalId, options, type};
     if (found) {
@@ -105,8 +110,8 @@ export class ModalsViewModel {
 
   unqueue = () => {
     if (this.state() === States.READY && this.queue.length) {
-      const {type, options} = this.queue.shift();
-      this._showModal(type, options);
+      const {type, options, id} = this.queue.shift();
+      this._showModal(type, options, id);
     }
   };
 
@@ -119,9 +124,10 @@ export class ModalsViewModel {
    * @param {Function} options.action Called when action in modal is triggered
    * @param {boolean} [options.preventClose] Set to `true` to disable autoclose behavior
    * @param {Function} options.secondary Called when secondary action in modal is triggered
+   * @param {string} [id] The optional ID of ther modal to prevent multiple instances
    * @returns {undefined} No return value
    */
-  _showModal = (type, options = {}) => {
+  _showModal = (type, options = {}, id) => {
     if (!Object.values(Types).includes(type)) {
       return this.logger.warn(`Modal of type '${type}' is not supported`);
     }
@@ -224,6 +230,7 @@ export class ModalsViewModel {
     }
     this.content(content);
     this.state(States.OPEN);
+    this.currentId(id);
     if (!preventClose) {
       onEscKey(this.hide);
     }
@@ -282,6 +289,7 @@ export class ModalsViewModel {
     this.inputFocus(false);
     this.state(States.CLOSING);
     this.content().closeFn();
+    this.currentId(null);
   };
 
   onModalHidden = () => {

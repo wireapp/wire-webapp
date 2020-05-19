@@ -23,12 +23,12 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 
 import {TIME_IN_MILLIS, formatSeconds} from 'Util/TimeUtil';
-import {Call} from '../../calling/Call';
-import {Grid} from '../../calling/videoGridHandler';
-import {Conversation} from '../../entity/Conversation';
-import {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
-import {CallActions} from '../../view_model/CallingViewModel';
-import {Multitasking} from '../../notification/NotificationRepository';
+import type {Call} from '../../calling/Call';
+import type {Grid} from '../../calling/videoGridHandler';
+import type {Conversation} from '../../entity/Conversation';
+import type {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
+import type {CallActions} from '../../view_model/CallingViewModel';
+import type {Multitasking} from '../../notification/NotificationRepository';
 
 import 'Components/calling/deviceToggleButton';
 

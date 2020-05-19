@@ -24,7 +24,7 @@ import {container} from 'tsyringe';
 
 import {AssetService} from '../../assets/AssetService';
 import {AssetTransferState} from '../../assets/AssetTransferState';
-import {AssetUploader} from '../../assets/AssetUploader';
+import {AssetRepository} from '../../assets/AssetRepository';
 import {ContentMessage} from '../../entity/message/ContentMessage';
 import {File as FileAsset} from '../../entity/message/File';
 import {APIClientSingleton} from '../../service/APIClientSingleton';
@@ -32,15 +32,15 @@ import {BackendClient} from '../../service/BackendClient';
 
 export abstract class AbstractAssetTransferStateTracker {
   AssetTransferState: typeof AssetTransferState;
-  assetUploader: AssetUploader;
+  assetRepository: AssetRepository;
   transferState: ko.PureComputed<AssetTransferState>;
   uploadProgress: ko.PureComputed<number>;
 
   constructor(message?: ContentMessage) {
-    this.assetUploader = new AssetUploader(
+    this.assetRepository = new AssetRepository(
       new AssetService(container.resolve(APIClientSingleton).getClient(), container.resolve(BackendClient)),
     );
-    this.uploadProgress = this.assetUploader.getUploadProgress(message?.id);
+    this.uploadProgress = this.assetRepository.getUploadProgress(message?.id);
     this.AssetTransferState = AssetTransferState;
 
     this.transferState = ko.pureComputed(() => {
@@ -62,7 +62,7 @@ export abstract class AbstractAssetTransferStateTracker {
   }
 
   cancelUpload(message: ContentMessage): void {
-    this.assetUploader.cancelUpload(message.id);
+    this.assetRepository.cancelUpload(message.id);
     amplify.publish(WebAppEvents.CONVERSATION.ASSET.CANCEL, message.id);
   }
 }

@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2019 Wire Swiss GmbH
+ * Copyright (C) 2020 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,13 +17,29 @@
  *
  */
 
-import ko from 'knockout';
-import {Asset} from '@wireapp/protocol-messaging';
-import {AssetService, AssetUploadOptions, CompressedImage} from './AssetService';
-import {loadFileBuffer} from 'Util/util';
+import {Environment} from 'Util/Environment';
+import {Logger, getLogger} from 'Util/Logger';
+import {AssetService} from './AssetService';
+import {loadFileBuffer, loadImage} from 'Util/util';
+import {WebWorker} from 'Util/worker';
+import {LegalHoldStatus} from '@wireapp/protocol-messaging';
+import {AssetOptions, AssetRetentionPolicy} from '@wireapp/api-client/dist/asset';
+import {Conversation} from '../entity/Conversation';
+
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {encryptAesAsset, EncryptedAsset} from './AssetCrypto';
 import {AssetUploadData} from '@wireapp/api-client/dist/asset';
+import {Asset} from '@wireapp/protocol-messaging';
+
+export interface CompressedImage {
+  compressedBytes: Uint8Array;
+  compressedImage: HTMLImageElement;
+}
+
+export interface AssetUploadOptions extends AssetOptions {
+  expectsReadConfirmation: boolean;
+  legalHoldStatus?: LegalHoldStatus;
+}
 
 export interface UploadStatus {
   messageId: string;
@@ -33,11 +49,81 @@ export interface UploadStatus {
 const uploadProgressQueue: ko.ObservableArray<UploadStatus> = ko.observableArray();
 const uploadCancelTokens: {[messageId: string]: () => void} = {};
 
-export class AssetUploader {
-  private readonly assetService: AssetService;
+export class AssetRepository {
+  readonly assetService: AssetService;
+  logger: Logger;
 
   constructor(assetService: AssetService) {
     this.assetService = assetService;
+    this.logger = getLogger('AssetRepository');
+  }
+
+  __test__assignEnvironment(data: any): void {
+    Object.assign(Environment, data);
+  }
+
+  async uploadProfileImage(
+    image: Blob | File,
+  ): Promise<{
+    mediumImageKey: string;
+    previewImageKey: string;
+  }> {
+    const [{compressedBytes: previewImageBytes}, {compressedBytes: mediumImageBytes}] = await Promise.all([
+      this.compressProfileImage(image),
+      this.compressImage(image),
+    ]);
+
+    const options: AssetUploadOptions = {
+      expectsReadConfirmation: false,
+      public: true,
+      retention: AssetRetentionPolicy.ETERNAL,
+    };
+
+    const previewPictureUpload = await this.assetService.uploadFile(previewImageBytes, options);
+    const uploadedPreviewPicture = await previewPictureUpload.response;
+
+    const mediumPictureUpload = await this.assetService.uploadFile(mediumImageBytes, options);
+    const mediumPicture = await mediumPictureUpload.response;
+
+    return {
+      mediumImageKey: uploadedPreviewPicture.key,
+      previewImageKey: mediumPicture.key,
+    };
+  }
+
+  private compressProfileImage(image: File | Blob): Promise<CompressedImage> {
+    return this.compressImageWithWorker('worker/profile-image-worker.js', image);
+  }
+
+  compressImage(image: File | Blob): Promise<CompressedImage> {
+    return this.compressImageWithWorker('worker/image-worker.js', image);
+  }
+
+  private async compressImageWithWorker(pathToWorkerFile: string, image: File | Blob): Promise<CompressedImage> {
+    const skipCompression = image.type === 'image/gif';
+    const buffer = await loadFileBuffer(image);
+    let compressedBytes: ArrayBuffer;
+    if (skipCompression === true) {
+      compressedBytes = new Uint8Array(buffer as ArrayBuffer);
+    } else {
+      const worker = new WebWorker(pathToWorkerFile);
+      compressedBytes = await worker.post(buffer);
+    }
+    const compressedImage = await loadImage(new Blob([compressedBytes], {type: image.type}));
+    return {
+      compressedBytes: new Uint8Array(compressedBytes),
+      compressedImage,
+    };
+  }
+  getAssetRetention(userEntity: any, conversationEntity: Conversation): AssetRetentionPolicy {
+    const isTeamMember = userEntity.inTeam();
+    const isTeamConversation = conversationEntity.inTeam();
+    const isTeamUserInConversation = conversationEntity
+      .participating_user_ets()
+      .some((conversationParticipant: any) => conversationParticipant.inTeam());
+
+    const isEternal = isTeamMember || isTeamConversation || isTeamUserInConversation;
+    return isEternal ? AssetRetentionPolicy.ETERNAL : AssetRetentionPolicy.PERSISTENT;
   }
 
   private buildProtoAsset(
@@ -98,7 +184,7 @@ export class AssetUploader {
       .then(async uploadedAsset => {
         const protoAsset = this.buildProtoAsset(encryptedAsset, uploadedAsset, options);
         if (isImage === true) {
-          const imageMeta = await this.assetService.compressImage(file);
+          const imageMeta = await this.compressImage(file);
           return this.attachImageData(protoAsset, imageMeta, file.type);
         }
         return protoAsset;

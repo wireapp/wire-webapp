@@ -17,8 +17,9 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client';
+import type {APIClient} from '@wireapp/api-client';
 import {Account} from '@wireapp/core';
+
 import {providePermanentEngine} from './StoreEngineProvider';
 
 const configureCore = (apiClient: APIClient) => new Account(apiClient, providePermanentEngine);

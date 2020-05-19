@@ -19,10 +19,10 @@
 
 import * as faker from 'faker';
 import UUID from 'pure-uuid';
-import {User as APIClientUser} from '@wireapp/api-client/dist/user';
+import type {User as APIClientUser} from '@wireapp/api-client/dist/user';
 import {UserAssetType} from '@wireapp/api-client/dist/user';
 
-import {User} from '../../src/script/entity/User';
+import type {User} from '../../src/script/entity/User';
 import {serverTimeHandler} from '../../src/script/time/serverTimeHandler';
 import {UserMapper} from '../../src/script/user/UserMapper';
 

@@ -18,7 +18,8 @@
  */
 
 import ko from 'knockout';
-import {Router} from './Router';
+
+import type {Router} from './Router';
 
 export function initRouterBindings(routerInstance: Router): void {
   ko.bindingHandlers.link_to = {

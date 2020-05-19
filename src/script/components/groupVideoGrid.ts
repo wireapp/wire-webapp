@@ -18,10 +18,11 @@
  */
 
 import ko from 'knockout';
+
 import {afterRender} from 'Util/util';
 
-import {Participant} from '../calling/Participant';
-import {Grid} from '../calling/videoGridHandler';
+import type {Participant} from '../calling/Participant';
+import type {Grid} from '../calling/videoGridHandler';
 
 enum VIDEO_SIZE {
   EMPTY = 'empty',

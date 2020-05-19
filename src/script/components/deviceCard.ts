@@ -18,7 +18,8 @@
  */
 
 import {ClientClassification} from '@wireapp/api-client/dist/client';
-import {ClientEntity} from '../client/ClientEntity';
+
+import type {ClientEntity} from '../client/ClientEntity';
 
 interface DeviceCardParams {
   click?: (device: ClientEntity) => void;

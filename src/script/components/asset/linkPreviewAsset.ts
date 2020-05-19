@@ -23,10 +23,10 @@ import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {getDomainName} from 'Util/UrlUtil';
 import {isTweetUrl} from 'Util/ValidationUtil';
 
-import {ContentMessage} from '../../entity/message/ContentMessage';
-import {LinkPreview} from '../../entity/message/LinkPreview';
+import type {ContentMessage} from '../../entity/message/ContentMessage';
+import type {LinkPreview} from '../../entity/message/LinkPreview';
 import {LinkPreviewMetaDataType} from '../../links/LinkPreviewMetaDataType';
-import {Text} from '../../entity/message/Text';
+import type {Text} from '../../entity/message/Text';
 
 interface Params {
   message: ContentMessage | ko.Subscribable<ContentMessage>;

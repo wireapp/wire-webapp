@@ -18,6 +18,7 @@
  */
 
 import {UserAsset as APIClientUserAsset, UserAssetType} from '@wireapp/api-client/dist/user';
+
 import * as AssetMapper from './AssetMapper';
 
 describe('AssetMapper', () => {

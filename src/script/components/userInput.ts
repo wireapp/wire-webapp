@@ -18,8 +18,9 @@
  */
 
 import ko from 'knockout';
+
 import {isRemovalAction} from 'Util/KeyboardUtil';
-import {User} from '../entity/User';
+import type {User} from '../entity/User';
 
 interface UserInputParams {
   enter: () => void | Promise<void>;
