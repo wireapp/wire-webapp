@@ -45,6 +45,7 @@ export enum BackendErrorLabel {
   INVALID_EMAIL = 'invalid-email',
   INVALID_INVITATION_CODE = 'invalid-invitation-code',
   INVALID_PHONE = 'invalid-phone',
+  PHONE_EXISTS = 'phone-exists',
   KEY_EXISTS = 'key-exists',
   MISSING_AUTH = 'missing-auth',
   PASSWORD_EXISTS = 'password-exists',
