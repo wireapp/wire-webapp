@@ -37,6 +37,7 @@ import {ClientEntity} from 'src/script/client/ClientEntity';
 
 import {EventInfoEntity} from 'src/script/conversation/EventInfoEntity';
 import {ConversationType} from 'src/script/conversation/ConversationType';
+import {EventBuilder} from 'src/script/conversation/EventBuilder';
 import {ConversationStatus} from 'src/script/conversation/ConversationStatus';
 import {ACCESS_ROLE} from 'src/script/conversation/AccessRole';
 import {ACCESS_MODE} from 'src/script/conversation/AccessMode';
@@ -1479,7 +1480,7 @@ describe('ConversationRepository', () => {
       const conversationId = createRandomUuid();
       const event = {conversation: conversationId, from: 'unknown-user-id'};
       spyOn(testFactory.conversation_repository, 'get_conversation_by_id').and.returnValue(Promise.resolve({}));
-      spyOn(z.conversation.EventBuilder, 'buildMemberJoin').and.returnValue(event);
+      spyOn(EventBuilder, 'buildMemberJoin').and.returnValue(event);
 
       return testFactory.conversation_repository
         .addMissingMember({id: conversationId}, ['unknown-user-id'])
