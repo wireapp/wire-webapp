@@ -24,7 +24,7 @@ interface Screen {
   thumbnail: HTMLCanvasElement;
 }
 
-interface Params {
+interface ChooseScreenParams {
   cancel: () => void;
   choose: (screenId: string) => void;
   screens: ko.Observable<Screen[]>;
@@ -33,8 +33,8 @@ interface Params {
 ko.components.register('choose-screen', {
   template: `
     <div class="choose-screen-list" data-bind="foreach: {data: screens, as: 'screen', noChildContext: true}">
-      <div class="choose-screen-list-item" data-bind="click: () => onChoose(screen.id)">
-        <image class="choose-screen-list-image" data-bind="attr: {src: screen.thumbnail.toDataURL()}">
+      <div class="choose-screen-list-item" data-uie-name="item-screen" data-bind="click: () => onChoose(screen.id)">
+        <image class="choose-screen-list-image" data-uie-name="item-window" data-bind="attr: {src: screen.thumbnail.toDataURL()}">
       </div>
     </div>
     <div class="label-xs text-white" data-bind="text: t('callChooseSharedScreen')"></div>
@@ -44,9 +44,15 @@ ko.components.register('choose-screen', {
            data-bind="click: onCancel"></div>
     </div>
   `,
-  viewModel: function ({cancel, choose, screens}: Params): void {
-    this.onCancel = cancel;
-    this.onChoose = choose;
-    this.screens = screens || [];
+  viewModel: class ChooseScreen {
+    onCancel: () => void;
+    onChoose: (screenId: string) => void;
+    screens: Screen[] | ko.Observable<Screen[]>;
+
+    constructor({cancel, choose, screens}: ChooseScreenParams) {
+      this.onCancel = cancel;
+      this.onChoose = choose;
+      this.screens = screens || [];
+    }
   },
 });
