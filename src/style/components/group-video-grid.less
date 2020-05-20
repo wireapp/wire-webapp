@@ -80,14 +80,15 @@
     height: 100%;
     flex-wrap: wrap;
     justify-content: center;
-    --rows: 2;
-    --columns: 2;
+    --rows: 1;
+    --columns: 1;
 
     &--black-background {
       background-color: #000;
     }
 
     &__element {
+      position: relative;
       overflow: hidden;
       width: calc(100% / var(--columns));
       height: calc(100% / var(--rows));

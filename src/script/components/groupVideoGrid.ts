@@ -64,10 +64,11 @@ class GroupVideoGrid {
 
     this.minimized = minimized;
     // scale videos when the grid is updated (on the next rendering cycle)
-    const gridSubscription = this.grid.subscribe(({grid}) => {
-      this.setRowsAndColumns(rootElement, grid.length);
+    const gridSubscription = this.grid.subscribe(newGrid => {
+      this.setRowsAndColumns(rootElement, newGrid.grid.length);
       afterRender(this.scaleVideos);
     });
+    this.setRowsAndColumns(rootElement, grid().grid.length);
     this.dispose = () => gridSubscription.dispose();
   }
 
