@@ -59,10 +59,7 @@ import 'Components/userInput';
 
 import 'Util/LocalizerUtil';
 
-import '../backup/Error';
-import '../conversation/EventBuilder';
 import '../localization/Localizer';
-import '../message/MessageCategorization';
 import '../view_model/bindings/CommonBindings';
 import '../view_model/bindings/ConversationListBindings';
 import '../view_model/bindings/ListBackgroundBindings';
