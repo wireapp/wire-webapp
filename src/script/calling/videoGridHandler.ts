@@ -19,40 +19,12 @@
 
 import ko from 'knockout';
 
-import {getDifference} from 'Util/ArrayUtil';
-import type {Participant, UserId} from '../calling/Participant';
-
-let baseGrid: string[] = ['', '', '', ''];
+import type {Participant} from '../calling/Participant';
 
 export interface Grid {
-  grid: (Participant | null)[];
+  grid: Participant[];
   thumbnail: Participant | null;
   hasRemoteVideo: boolean;
-}
-
-/**
- * Will compute the next grid layout according to the previous state and the new array of streams
- * The grid will fill according to this pattern
- * - 1 stream : [id, '', '', '']
- * - 2 streams: [id, '', id, '']
- * - 3 streams: [id, '', id, id]
- * - 3 streams: [id, id, '', id]
- * - 4 streams: [id, id, id, id]
- */
-function computeGrid(previousGrid: string[], participants: Participant[]): string[] {
-  const previousStreamIds = previousGrid.filter(streamId => streamId !== '');
-  const currentStreamIds = participants.map(participant => participant.userId);
-
-  const addedStreamIds = getDifference(previousStreamIds, currentStreamIds);
-
-  const filteredGrid = previousGrid.map(id => (currentStreamIds.includes(id) ? id : ''));
-
-  const streamIds = filteredGrid.filter(streamId => streamId !== '');
-  // Add the new streams at the end
-  const newStreamsIds = streamIds.concat(addedStreamIds);
-  return newStreamsIds.length === 2
-    ? [newStreamsIds[0], '', newStreamsIds[1], '']
-    : [newStreamsIds[0] || '', newStreamsIds[3] || '', newStreamsIds[1] || '', newStreamsIds[2] || ''];
 }
 
 export function getGrid(
@@ -68,16 +40,13 @@ export function getGrid(
       thumbnailParticipant = selfParticipant.hasActiveVideo() ? selfParticipant : null;
     } else {
       inGridParticipants = selfParticipant.hasActiveVideo()
-        ? remoteVideoParticipants.concat(selfParticipant)
+        ? [selfParticipant, ...remoteVideoParticipants]
         : remoteVideoParticipants;
       thumbnailParticipant = null;
     }
-    baseGrid = computeGrid(baseGrid, inGridParticipants);
 
     return {
-      grid: baseGrid.map((userId: UserId) => {
-        return inGridParticipants.find(participant => participant.userId === userId) || null;
-      }),
+      grid: inGridParticipants,
       hasRemoteVideo: remoteVideoParticipants.length > 0,
       thumbnail: thumbnailParticipant,
     };
