@@ -24,6 +24,7 @@ import {Conversation} from 'src/script/entity/Conversation';
 import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
 import {User} from 'src/script/entity/User';
 import {TestFactory} from '../../helper/TestFactory';
+import {EventBuilder} from 'src/script/conversation/EventBuilder';
 
 describe('ConversationVerificationStateHandler', () => {
   const testFactory = new TestFactory();
@@ -93,7 +94,7 @@ describe('ConversationVerificationStateHandler', () => {
   describe('onClientAdd', () => {
     it('should change state to DEGRADED if new unverified client was added', () => {
       const degradedEvent = {type: 'degraded'};
-      spyOn(z.conversation.EventBuilder, 'buildDegraded').and.returnValue(degradedEvent);
+      spyOn(EventBuilder, 'buildDegraded').and.returnValue(degradedEvent);
 
       expect(conversationAB.verification_state()).toBe(ConversationVerificationState.VERIFIED);
       expect(conversationB.verification_state()).toBe(ConversationVerificationState.VERIFIED);
@@ -109,12 +110,12 @@ describe('ConversationVerificationStateHandler', () => {
       expect(conversationB.verification_state()).toBe(ConversationVerificationState.DEGRADED);
       expect(conversationAB.is_verified()).toBeDefined();
       expect(conversationAB.is_verified()).toBeFalsy();
-      expect(z.conversation.EventBuilder.buildDegraded).toHaveBeenCalledTimes(2);
+      expect(EventBuilder.buildDegraded).toHaveBeenCalledTimes(2);
       expect(testFactory.event_repository.injectEvent).toHaveBeenCalledWith(degradedEvent);
     });
 
     it('should not change VERIFIED state if new verified client was added', () => {
-      spyOn(z.conversation.EventBuilder, 'buildAllVerified');
+      spyOn(EventBuilder, 'buildAllVerified');
 
       expect(conversationAB.verification_state()).toBe(ConversationVerificationState.VERIFIED);
       expect(conversationB.verification_state()).toBe(ConversationVerificationState.VERIFIED);
@@ -131,7 +132,7 @@ describe('ConversationVerificationStateHandler', () => {
       expect(conversationB.verification_state()).toBe(ConversationVerificationState.VERIFIED);
       expect(conversationAB.is_verified()).toBeDefined();
       expect(conversationAB.is_verified()).toBeTruthy();
-      expect(z.conversation.EventBuilder.buildAllVerified).not.toHaveBeenCalled();
+      expect(EventBuilder.buildAllVerified).not.toHaveBeenCalled();
       expect(testFactory.event_repository.injectEvent).not.toHaveBeenCalled();
     });
   });
@@ -140,8 +141,8 @@ describe('ConversationVerificationStateHandler', () => {
     it('should change state from DEGRADED to VERIFIED if last unverified client was removed', () => {
       const degradedEvent = {type: 'degraded'};
       const verifiedEvent = {type: 'verified'};
-      spyOn(z.conversation.EventBuilder, 'buildDegraded').and.returnValue(degradedEvent);
-      spyOn(z.conversation.EventBuilder, 'buildAllVerified').and.returnValue(verifiedEvent);
+      spyOn(EventBuilder, 'buildDegraded').and.returnValue(degradedEvent);
+      spyOn(EventBuilder, 'buildAllVerified').and.returnValue(verifiedEvent);
 
       expect(conversationAB.verification_state()).toBe(ConversationVerificationState.VERIFIED);
       expect(conversationB.verification_state()).toBe(ConversationVerificationState.VERIFIED);
@@ -156,7 +157,7 @@ describe('ConversationVerificationStateHandler', () => {
       expect(conversationAB.verification_state()).toBe(ConversationVerificationState.DEGRADED);
       expect(conversationB.verification_state()).toBe(ConversationVerificationState.DEGRADED);
       expect(conversationC.verification_state()).toBe(ConversationVerificationState.DEGRADED);
-      expect(z.conversation.EventBuilder.buildDegraded).toHaveBeenCalledTimes(3);
+      expect(EventBuilder.buildDegraded).toHaveBeenCalledTimes(3);
       expect(testFactory.event_repository.injectEvent).toHaveBeenCalledWith(degradedEvent);
 
       selfUserEntity.devices.remove(new_client);
@@ -165,7 +166,7 @@ describe('ConversationVerificationStateHandler', () => {
       expect(conversationAB.verification_state()).toBe(ConversationVerificationState.VERIFIED);
       expect(conversationB.verification_state()).toBe(ConversationVerificationState.VERIFIED);
       expect(conversationC.verification_state()).toBe(ConversationVerificationState.VERIFIED);
-      expect(z.conversation.EventBuilder.buildAllVerified).toHaveBeenCalledTimes(3);
+      expect(EventBuilder.buildAllVerified).toHaveBeenCalledTimes(3);
       expect(testFactory.event_repository.injectEvent).toHaveBeenCalledWith(verifiedEvent);
     });
   });
@@ -174,8 +175,8 @@ describe('ConversationVerificationStateHandler', () => {
     it('should change state from DEGRADED to VERIFIED if last unverified client was removed by other user', () => {
       const degradedEvent = {type: 'degraded'};
       const verifiedEvent = {type: 'verified'};
-      spyOn(z.conversation.EventBuilder, 'buildDegraded').and.returnValue(degradedEvent);
-      spyOn(z.conversation.EventBuilder, 'buildAllVerified').and.returnValue(verifiedEvent);
+      spyOn(EventBuilder, 'buildDegraded').and.returnValue(degradedEvent);
+      spyOn(EventBuilder, 'buildAllVerified').and.returnValue(verifiedEvent);
 
       const new_client = new ClientEntity();
       new_client.meta.isVerified(false);
@@ -186,7 +187,7 @@ describe('ConversationVerificationStateHandler', () => {
       expect(conversationAB.verification_state()).toBe(ConversationVerificationState.DEGRADED);
       expect(conversationB.verification_state()).toBe(ConversationVerificationState.DEGRADED);
       expect(conversationC.verification_state()).toBe(ConversationVerificationState.DEGRADED);
-      expect(z.conversation.EventBuilder.buildDegraded).toHaveBeenCalledTimes(3);
+      expect(EventBuilder.buildDegraded).toHaveBeenCalledTimes(3);
       expect(testFactory.event_repository.injectEvent).toHaveBeenCalledWith(degradedEvent);
 
       selfUserEntity.devices.remove(new_client);
@@ -195,7 +196,7 @@ describe('ConversationVerificationStateHandler', () => {
       expect(conversationAB.verification_state()).toBe(ConversationVerificationState.VERIFIED);
       expect(conversationB.verification_state()).toBe(ConversationVerificationState.VERIFIED);
       expect(conversationC.verification_state()).toBe(ConversationVerificationState.VERIFIED);
-      expect(z.conversation.EventBuilder.buildAllVerified).toHaveBeenCalledTimes(3);
+      expect(EventBuilder.buildAllVerified).toHaveBeenCalledTimes(3);
       expect(testFactory.event_repository.injectEvent).toHaveBeenCalledWith(verifiedEvent);
     });
   });
@@ -203,7 +204,7 @@ describe('ConversationVerificationStateHandler', () => {
   describe('onMemberJoined', () => {
     it('should change state to DEGRADED if new user with unverified client was added to conversation', () => {
       const degradedEvent = {type: 'degraded'};
-      spyOn(z.conversation.EventBuilder, 'buildDegraded').and.returnValue(degradedEvent);
+      spyOn(EventBuilder, 'buildDegraded').and.returnValue(degradedEvent);
 
       const new_user = new User(createRandomUuid());
       const new_client_b = new ClientEntity();
@@ -217,12 +218,12 @@ describe('ConversationVerificationStateHandler', () => {
 
       expect(conversationAB.verification_state()).toBe(ConversationVerificationState.DEGRADED);
       expect(conversationAB.is_verified()).toBeFalsy();
-      expect(z.conversation.EventBuilder.buildDegraded).toHaveBeenCalledTimes(1);
+      expect(EventBuilder.buildDegraded).toHaveBeenCalledTimes(1);
       expect(testFactory.event_repository.injectEvent).toHaveBeenCalledWith(degradedEvent);
     });
 
     it('should not change state if new user with verified client was added to conversation', () => {
-      spyOn(z.conversation.EventBuilder, 'buildDegraded');
+      spyOn(EventBuilder, 'buildDegraded');
 
       const new_user = new User(createRandomUuid());
       const new_client_b = new ClientEntity();
@@ -236,7 +237,7 @@ describe('ConversationVerificationStateHandler', () => {
 
       expect(conversationAB.verification_state()).toBe(ConversationVerificationState.VERIFIED);
       expect(conversationAB.is_verified()).toBeTruthy();
-      expect(z.conversation.EventBuilder.buildDegraded).not.toHaveBeenCalled();
+      expect(EventBuilder.buildDegraded).not.toHaveBeenCalled();
       expect(testFactory.event_repository.injectEvent).not.toHaveBeenCalled();
     });
   });
