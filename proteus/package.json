@@ -10,7 +10,7 @@
   },
   "description": "Axolotl protocol implementation for JavaScript.",
   "devDependencies": {
-    "@types/jasmine": "3.5.9",
+    "@types/jasmine": "3.5.10",
     "chai": "4.2.0",
     "jasmine": "3.5.0",
     "nyc": "15.0.1",
