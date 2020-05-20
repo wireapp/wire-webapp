@@ -19,12 +19,10 @@
 
 import ko from 'knockout';
 
-import type {Participant, UserId} from '../calling/Participant';
-
-let baseGrid: string[] = [];
+import type {Participant} from '../calling/Participant';
 
 export interface Grid {
-  grid: (Participant | null)[];
+  grid: Participant[];
   thumbnail: Participant | null;
   hasRemoteVideo: boolean;
 }
@@ -46,12 +44,9 @@ export function getGrid(
         : remoteVideoParticipants;
       thumbnailParticipant = null;
     }
-    baseGrid = inGridParticipants.map(({userId}) => userId);
 
     return {
-      grid: baseGrid.map((userId: UserId) => {
-        return inGridParticipants.find(participant => participant.userId === userId) || null;
-      }),
+      grid: inGridParticipants,
       hasRemoteVideo: remoteVideoParticipants.length > 0,
       thumbnail: thumbnailParticipant,
     };
