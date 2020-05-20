@@ -58,6 +58,7 @@ interface ElectronGetSourcesOptions {
   types: string[];
 }
 
+/** @see http://electronjs.org/docs/api/structures/desktop-capturer-source */
 export interface ElectronDesktopCapturerSource {
   display_id: string;
   id: string;
