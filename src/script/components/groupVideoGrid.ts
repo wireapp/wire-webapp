@@ -73,8 +73,8 @@ class GroupVideoGrid {
   }
 
   setRowsAndColumns(rootElement: HTMLElement, totalCount: number) {
-    const rows = Math.ceil(Math.sqrt(totalCount));
-    const columns = Math.ceil(totalCount / rows);
+    const columns = Math.ceil(Math.sqrt(totalCount));
+    const rows = Math.ceil(totalCount / columns);
     const gridContainer = rootElement.querySelector('.group-video-grid') as HTMLElement;
     gridContainer.style.setProperty('--rows', `${rows}`);
     gridContainer.style.setProperty('--columns', `${columns}`);
