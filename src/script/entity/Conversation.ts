@@ -894,25 +894,7 @@ export class Conversation {
   }
 
   supportsVideoCall(isCreatingUser: boolean = false): boolean {
-    if (this.is1to1()) {
-      return true;
-    }
-
-    const participantCount = this.getNumberOfParticipants(true, false);
-    const passesParticipantLimit = participantCount <= Config.getConfig().MAX_VIDEO_PARTICIPANTS;
-
-    if (!passesParticipantLimit) {
-      return false;
-    }
-
-    if (this.selfUser().inTeam()) {
-      return true;
-    }
-
-    if (isCreatingUser) {
-      return false;
-    }
-
+    this.logger.warn(isCreatingUser);
     return true;
   }
 
