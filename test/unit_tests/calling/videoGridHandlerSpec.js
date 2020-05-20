@@ -33,72 +33,29 @@ describe('videoGridHandler', () => {
   });
 
   describe('getGrid', () => {
-    describe('people joining call', () => {
-      it('computes a new grid', () => {
-        const tests = [
-          {
-            expected: [participants[0], null, null, null],
-            participants: [participants[0]],
-            scenario: 'dispatches a single initial participant',
-          },
-          {
-            expected: [participants[0], null, participants[1], null],
-            participants: [participants[0], participants[1]],
-            scenario: 'dispatches two initial participants',
-          },
-          {
-            expected: [participants[0], null, participants[1], participants[2]],
-            participants: [participants[0], participants[1], participants[2]],
-            scenario: 'dispatches three initial participants',
-          },
-          {
-            expected: [participants[0], participants[3], participants[1], participants[2]],
-            participants: [participants[0], participants[1], participants[2], participants[3]],
-            scenario: 'dispatches four initial participants',
-          },
-          {
-            expected: [participants[0], null, participants[1], null],
-            participants: [participants[0], participants[1]],
-            scenario: 'second participant joins',
-          },
-          {
-            expected: [participants[0], null, participants[1], participants[2]],
-            participants: [participants[0], participants[1], participants[2]],
-            scenario: 'third participant joins',
-          },
-        ];
-
-        tests.forEach(({participants: participantList, expected, scenario}) => {
-          const grid = getGrid(ko.observable(participantList), new Participant('self', 'selfdevice'));
-
-          expect(grid().grid.map(toParticipantId)).toEqual(expected.map(toParticipantId), scenario);
-        });
-      });
-    });
-
     describe('people leaving call', () => {
       it('removes people from the grid', () => {
         const tests = [
           {
-            expected: [participants[0], null, null, null],
+            expected: [participants[0]],
             newParticipants: [participants[0]],
             oldParticipants: [participants[0], participants[1]],
             scenario: 'second participant (of 2) leaves',
           },
           {
-            expected: [participants[0], null, participants[2], null],
+            expected: [participants[0], participants[2]],
             newParticipants: [participants[0], participants[2]],
             oldParticipants: [participants[0], participants[1], participants[2]],
             scenario: 'second participant (of 3) leaves',
           },
           {
-            expected: [participants[0], null, participants[2], participants[3]],
+            expected: [participants[0], participants[2], participants[3]],
             newParticipants: [participants[0], participants[2], participants[3]],
             oldParticipants: [participants[0], participants[1], participants[2], participants[3]],
             scenario: 'second participant (of 4) leaves',
           },
           {
-            expected: [participants[0], null, participants[3], null],
+            expected: [participants[0], participants[3]],
             newParticipants: [participants[0], participants[3]],
             oldParticipants: [participants[0], participants[3], participants[2]],
             scenario: 'one participant leaves one column empty',
@@ -122,7 +79,7 @@ describe('videoGridHandler', () => {
 
         const grid = getGrid(ko.observable([participants[0]]), selfUser);
 
-        expect(grid().grid.map(toParticipantId)).toEqual([participants[0], null, null, null].map(toParticipantId));
+        expect(grid().grid.map(toParticipantId)).toEqual([participants[0]].map(toParticipantId));
         expect(grid().thumbnail).toBe(selfUser);
       });
 
@@ -131,7 +88,7 @@ describe('videoGridHandler', () => {
 
         const grid = getGrid(ko.observable([]), selfUser);
 
-        expect(grid().grid.map(toParticipantId)).toEqual([selfUser, null, null, null].map(toParticipantId));
+        expect(grid().grid.map(toParticipantId)).toEqual([selfUser].map(toParticipantId));
         expect(grid().thumbnail).toBe(null);
       });
 
@@ -141,7 +98,7 @@ describe('videoGridHandler', () => {
         const grid = getGrid(ko.observable([participants[0], participants[1]]), selfUser);
 
         expect(grid().grid.map(toParticipantId)).toEqual(
-          [selfUser, null, participants[0], participants[1]].map(toParticipantId),
+          [selfUser, participants[0], participants[1]].map(toParticipantId),
         );
 
         expect(grid().thumbnail).toBe(null);

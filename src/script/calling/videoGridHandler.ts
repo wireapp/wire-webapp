@@ -19,7 +19,6 @@
 
 import ko from 'knockout';
 
-import {getDifference} from 'Util/ArrayUtil';
 import type {Participant, UserId} from '../calling/Participant';
 
 let baseGrid: string[] = [];
@@ -28,19 +27,6 @@ export interface Grid {
   grid: (Participant | null)[];
   thumbnail: Participant | null;
   hasRemoteVideo: boolean;
-}
-
-function computeGrid(previousGrid: string[], participants: Participant[]): string[] {
-  const previousStreamIds = previousGrid.filter(streamId => streamId !== '');
-  const currentStreamIds = participants.map(participant => participant.userId);
-
-  const addedStreamIds = getDifference(previousGrid, currentStreamIds);
-
-  const filteredGrid = previousGrid.map(id => (currentStreamIds.includes(id) ? id : ''));
-
-  const streamIds = filteredGrid.filter(streamId => streamId !== '');
-  // Add the new streams at the end
-  return streamIds.concat(addedStreamIds);
 }
 
 export function getGrid(
@@ -56,7 +42,7 @@ export function getGrid(
       thumbnailParticipant = selfParticipant.hasActiveVideo() ? selfParticipant : null;
     } else {
       inGridParticipants = selfParticipant.hasActiveVideo()
-        ? remoteVideoParticipants.concat(selfParticipant)
+        ? [selfParticipant, ...remoteVideoParticipants]
         : remoteVideoParticipants;
       thumbnailParticipant = null;
     }
