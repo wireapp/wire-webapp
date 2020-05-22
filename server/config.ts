@@ -193,6 +193,8 @@ const config: ServerConfig = {
       ALLOWED_HOSTS: ['app.wire.com'],
       DISALLOW: readFile(ROBOTS_DISALLOW_FILE, 'User-agent: *\r\nDisallow: /'),
     },
+    SSL_CERTIFICATE_KEY_PATH: process.env.SSL_CERTIFICATE_KEY_PATH,
+    SSL_CERTIFICATE_PATH: process.env.SSL_CERTIFICATE_PATH,
   },
 };
 
