@@ -18,7 +18,7 @@
  */
 
 import {PreKey} from '../auth/';
-import {ClientClassification, ClientType, Location} from '../client/';
+import {ClientClassification, ClientType, Location} from './';
 
 interface SharedClientModel {
   label?: string;
