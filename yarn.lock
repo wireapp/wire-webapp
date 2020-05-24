@@ -5231,10 +5231,10 @@ eslint-plugin-import@2.20.2:
     read-pkg-up "^2.0.0"
     resolve "^1.12.0"
 
-eslint-plugin-jsdoc@25.4.1:
-  version "25.4.1"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-jsdoc/-/eslint-plugin-jsdoc-25.4.1.tgz#d7fc913bb7c0a4668628e40b8525b3b409370bc4"
-  integrity sha512-EixCLTv36/etbr5GGC89n0GLDkU/5NmadPzI3x6gSzldqrZpyQVh6qqN3jarWdfTvJsimorP4KNCIwe5mk/7TA==
+eslint-plugin-jsdoc@25.4.2:
+  version "25.4.2"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-jsdoc/-/eslint-plugin-jsdoc-25.4.2.tgz#1a8480e880c4d343ba9bc77caf6c91e4500d7a71"
+  integrity sha512-IFZnxBBt2fGYZ9yaLt+KP/jHa6u8LQPwH9QzRlhbU+WKBq7ou6XTXoxG0EZVn9ohcbJ0sM8X70iRRX/J3Wu37w==
   dependencies:
     comment-parser "^0.7.4"
     debug "^4.1.1"
@@ -5242,7 +5242,7 @@ eslint-plugin-jsdoc@25.4.1:
     lodash "^4.17.15"
     regextras "^0.7.1"
     semver "^6.3.0"
-    spdx-expression-parse "^3.0.0"
+    spdx-expression-parse "^3.0.1"
 
 eslint-plugin-no-unsanitized@3.1.1:
   version "3.1.1"
@@ -12072,10 +12072,10 @@ spdx-exceptions@^2.1.0:
   resolved "https://registry.yarnpkg.com/spdx-exceptions/-/spdx-exceptions-2.2.0.tgz#2ea450aee74f2a89bfb94519c07fcd6f41322977"
   integrity sha512-2XQACfElKi9SlVb1CYadKDXvoajPgBVPn/gOQLrTvHdElaVhr7ZEbqJaRnJLVNeaI4cMEAgVCeBMKF6MWRDCRA==
 
-spdx-expression-parse@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/spdx-expression-parse/-/spdx-expression-parse-3.0.0.tgz#99e119b7a5da00e05491c9fa338b7904823b41d0"
-  integrity sha512-Yg6D3XpRD4kkOmTpdgbUiEJFKghJH03fiC1OPll5h/0sO6neh2jqRDVHOQ4o/LMea0tgCkbMgea5ip/e+MkWyg==
+spdx-expression-parse@^3.0.0, spdx-expression-parse@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/spdx-expression-parse/-/spdx-expression-parse-3.0.1.tgz#cf70f50482eefdc98e3ce0a6833e4a53ceeba679"
+  integrity sha512-cbqHunsQWnJNE6KhVSMsMeH5H/L9EpymbzqTQ3uLwNCLZ1Q481oWaofqH7nO6V07xlXwY6PhQdQ2IedWx/ZK4Q==
   dependencies:
     spdx-exceptions "^2.1.0"
     spdx-license-ids "^3.0.0"
