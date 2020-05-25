@@ -1867,20 +1867,6 @@
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-4.6.5.tgz#1dfb93e0bb4f6b30ebc344e49e06a00d926a90c2"
   integrity sha512-iWkf8EENWUNJxHx95aDlXFRBb/iqasIuJBPFZsK+XNAij6wZZhmXL6MrTFBLkR6uZxVlKQnKhaC3pbccQuh2hw==
 
-"@wireapp/commons@3.5.3":
-  version "3.5.3"
-  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-3.5.3.tgz#019eab0b9fba3de57c10426601bd9c819112db3f"
-  integrity sha512-aTezfZL0p8+cvM/wZxIFZC6Y7CnF2C1sUDyurSEe5GILXUmyUII7ZEQ7om0px6RnZpTIOfBbyJvOfF6VHijuBw==
-  dependencies:
-    "@types/fs-extra" "8.1.0"
-    "@types/node" "~12"
-    "@types/platform" "1.3.2"
-    ansi-regex "5.0.0"
-    fs-extra "9.0.0"
-    logdown "3.3.1"
-    platform "1.3.5"
-    url-search-params-polyfill "8.1.0"
-
 "@wireapp/commons@3.5.4":
   version "3.5.4"
   resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-3.5.4.tgz#a3e399be61c61f02b7ea8373922109b4749a9e5b"
@@ -8332,13 +8318,6 @@ log-symbols@^2.2.0:
   integrity sha512-VeIAFslyIerEJLXHziedo2basKbMKtTw3vfn5IzG0XTjhAVEJyNHnL2p7vc+wBDSdQuUpNw3M2u6xb9QsAY5Eg==
   dependencies:
     chalk "^2.0.1"
-
-log-symbols@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/log-symbols/-/log-symbols-3.0.0.tgz#f3a08516a5dea893336a7dee14d18a1cfdab77c4"
-  integrity sha512-dSkNGuI7iG3mfvDzUuYZyvk5dD9ocYCYzNU6CYDE6+Xqd+gwme6Z00NS3dUh8mq/73HaEtT7m6W+yUPtU6BZnQ==
-  dependencies:
-    chalk "^2.4.2"
 
 log-symbols@^4.0.0:
   version "4.0.0"
