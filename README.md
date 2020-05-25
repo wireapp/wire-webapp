@@ -47,8 +47,6 @@ Alternatively, you can test specific parts of the app:
 Bypass Chrome's security restrictions for local development:
 
 1. Add the following entry to your hosts file: `127.0.0.1 local.zinfra.io`
-1. Open `chrome://flags/#unsafely-treat-insecure-origin-as-secure`
-1. Add `http://local.zinfra.io:8081` to the list of "Insecure origins treated as secure"
 1. Restart your browser with: `open -a Google\ Chrome --args --disable-web-security --user-data-dir=/Users/your-name/your-chrome-data --ignore-certificate-errors`
 
 Host file location:
