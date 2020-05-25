@@ -17,13 +17,13 @@
  *
  */
 
-import {join, resolve} from 'path';
+import * as path from 'path';
 import {execSync} from 'child_process';
 
-const root = resolve(__dirname, '..');
+const root = path.resolve(__dirname, '..');
 
 const uploadToCrowdin = (): void => {
-  const crowdinYaml = join(root, 'keys', 'crowdin.yaml');
+  const crowdinYaml = path.join(root, 'keys/crowdin.yaml');
   execSync(`crowdin upload sources --identity="${crowdinYaml}"`, {stdio: [0, 1]});
 };
 

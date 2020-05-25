@@ -19,22 +19,20 @@
  *
  */
 
-/* eslint-disable no-console */
-
 import https from 'https';
-import {join, resolve} from 'path';
+import * as path from 'path';
 import fs from 'fs';
 import AdmZip from 'adm-zip';
 
 // @ts-ignore
 import sortJson from 'sort-json';
 
-const root = resolve(__dirname, '..');
-const destinationPath = resolve(root, 'src/i18n');
-const zipPath = resolve(root, 'temp/i18n/wire-webapp.zip');
+const root = path.resolve(__dirname, '..');
+const destinationPath = path.resolve(root, 'src/i18n');
+const zipPath = path.resolve(root, 'temp/i18n/wire-webapp.zip');
 
 const getProjectKey = () => {
-  const crowdinYaml = join(root, 'keys/crowdin.yaml');
+  const crowdinYaml = path.join(root, 'keys/crowdin.yaml');
   const crowdinYamlContent = fs.readFileSync(crowdinYaml, 'utf8');
   const keyRegex = /api_key: ([0-9a-f]+)/;
   return crowdinYamlContent.match(keyRegex)[1];
@@ -50,7 +48,7 @@ const CROWDIN_URL = {
 };
 
 function fetchUpdates() {
-  console.log('Building translations ...');
+  console.info('Building translations ...');
 
   return new Promise((resolve, reject) => {
     https.get(CROWDIN_URL.EXPORT, response => {
@@ -64,7 +62,7 @@ function fetchUpdates() {
 }
 
 function download() {
-  console.log('Downloading built translations ...');
+  console.info('Downloading built translations ...');
 
   return new Promise((resolve, reject) => {
     https.get(CROWDIN_URL.DOWNLOAD, response => {
@@ -75,7 +73,7 @@ function download() {
       response.on('error', reject);
 
       const writeStream = fs.createWriteStream(zipPath);
-      console.log('Writing zip file ...');
+      console.info('Writing zip file ...');
 
       response.pipe(writeStream);
 
@@ -94,7 +92,7 @@ function download() {
 }
 
 function sortTranslationJson() {
-  return fs.readdirSync(destinationPath).forEach(filename => sortJson.overwrite(join(destinationPath, filename)));
+  return fs.readdirSync(destinationPath).forEach(filename => sortJson.overwrite(path.join(destinationPath, filename)));
 }
 
 fetchUpdates()
