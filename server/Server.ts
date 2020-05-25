@@ -222,11 +222,7 @@ class Server {
       if (this.server) {
         reject('Server is already running.');
       } else if (this.config.SERVER.PORT_HTTP) {
-        if (
-          this.config.SERVER.DEVELOPMENT &&
-          this.config.SERVER.SSL_CERTIFICATE_KEY_PATH &&
-          this.config.SERVER.SSL_CERTIFICATE_PATH
-        ) {
+        if (this.config.SERVER.DEVELOPMENT) {
           const options = {
             cert: fs.readFileSync(this.config.SERVER.SSL_CERTIFICATE_PATH),
             key: fs.readFileSync(this.config.SERVER.SSL_CERTIFICATE_KEY_PATH),

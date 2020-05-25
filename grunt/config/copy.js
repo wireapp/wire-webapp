@@ -20,6 +20,12 @@
 // https://github.com/gruntjs/grunt-contrib-copy
 
 module.exports = {
+  dist_certificate: {
+    cwd: '<%= dir.server %>',
+    dest: '<%= dir.dist_ %>',
+    expand: true,
+    src: ['certificate/*'],
+  },
   dist_resource: {
     cwd: '<%= dir.resource %>',
     dest: '<%= dir.dist.static %>',
