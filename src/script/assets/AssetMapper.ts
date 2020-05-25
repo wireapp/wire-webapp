@@ -21,6 +21,8 @@ import type {UserAsset as APIClientUserAsset} from '@wireapp/api-client/dist/use
 import type {Picture as APIClientPicture} from '@wireapp/api-client/dist/self';
 
 import {AssetRemoteData} from './AssetRemoteData';
+import type {User} from '../entity/User';
+import type {ServiceEntity} from '../integration/ServiceEntity';
 
 export type MappedAsset = {[index: string]: AssetRemoteData};
 
@@ -46,8 +48,7 @@ export const mapProfileAssetsV1 = (userId: string, pictures: APIClientPicture[])
   return {medium: mediumAsset, preview: previewAsset};
 };
 
-// TODO: Fake user entity signature until "User" has been converted to TypeScript
-export const updateUserEntityAssets = (userEntity: any, mappedAssets: MappedAsset = {}) => {
+export const updateUserEntityAssets = (userEntity: User | ServiceEntity, mappedAssets: MappedAsset = {}) => {
   const {preview, medium} = mappedAssets;
   if (preview) {
     userEntity.previewPictureResource(preview);

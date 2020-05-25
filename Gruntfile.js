@@ -18,6 +18,7 @@
  */
 
 const path = require('path');
+const {format} = require('date-fns');
 const {SRC_PATH, DIST_PATH} = require('./locations');
 
 module.exports = grunt => {
@@ -32,6 +33,7 @@ module.exports = grunt => {
       page: `${SRC_PATH}/page`,
       style: `${SRC_PATH}/style`,
     },
+    server: 'server',
     dist: {
       s3: `${DIST_PATH}/s3`,
       static: `${DIST_PATH}/static`,
@@ -53,7 +55,7 @@ module.exports = grunt => {
   };
 
   grunt.initConfig({
-    dir: dir,
+    dir,
     aws_s3: require('./grunt/config/aws_s3'),
     clean: require('./grunt/config/clean'),
     compress: require('./grunt/config/compress'),
@@ -74,6 +76,7 @@ module.exports = grunt => {
     'build_style',
     'copy:dist_serviceworker',
     'copy:dist_resource',
+    'copy:dist_certificate',
     'build_markup',
   ]);
 
@@ -93,13 +96,8 @@ module.exports = grunt => {
       user = user.substr(0, user.indexOf(' ')).toLowerCase();
     }
 
-    const date = new Date();
-    const month = `0${date.getMonth() + 1}`.slice(-2);
-    const day = `0${date.getDate()}`.slice(-2);
-    const hour = `0${date.getHours()}`.slice(-2);
-    const minute = `0${date.getMinutes()}`.slice(-2);
+    let version = format(new Date(), 'yyyy-MM-dd-HH-mm');
 
-    let version = `${date.getFullYear()}-${month}-${day}-${hour}-${minute}`;
     if (user) {
       version = `${version}-${user}`;
     }
@@ -108,6 +106,6 @@ module.exports = grunt => {
     }
 
     grunt.log.ok(`Version set to ${version}`);
-    grunt.file.write(path.join('server', 'dist', 'version'), version);
+    grunt.file.write(path.join('server/dist/version'), version);
   });
 };

@@ -120,7 +120,7 @@ class MentionSuggestions {
     return true;
   }
 
-  onSuggestionClick = (data: any, event: Event) => {
+  onSuggestionClick = (data: User, event: Event) => {
     event.preventDefault();
     $(this.targetInput).focus();
     this.onSelectionValidated(data, this.targetInput);

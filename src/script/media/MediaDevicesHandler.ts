@@ -58,6 +58,7 @@ interface ElectronGetSourcesOptions {
   types: string[];
 }
 
+/** @see http://electronjs.org/docs/api/structures/desktop-capturer-source */
 export interface ElectronDesktopCapturerSource {
   display_id: string;
   id: string;
@@ -190,7 +191,7 @@ export class MediaDevicesHandler {
      * In such a scenario, the device listed as "communications" device is preferred for conferencing calls, so we filter its duplicates.
      */
     const microphones = mediaDevices.filter(device => device.kind === MediaDeviceType.AUDIO_INPUT);
-    const dedupedMicrophones = microphones.reduce((microphoneList: Record<string, MediaDeviceInfo>, microphone) => {
+    const dedupedMicrophones = microphones.reduce<Record<string, MediaDeviceInfo>>((microphoneList, microphone) => {
       if (!microphoneList.hasOwnProperty(microphone.groupId) || microphone.deviceId === 'communications') {
         microphoneList[microphone.groupId] = microphone;
       }
@@ -198,7 +199,7 @@ export class MediaDevicesHandler {
     }, {});
 
     const speakers = mediaDevices.filter(device => device.kind === MediaDeviceType.AUDIO_OUTPUT);
-    const dedupedSpeakers = speakers.reduce((speakerList: Record<string, MediaDeviceInfo>, speaker) => {
+    const dedupedSpeakers = speakers.reduce<Record<string, MediaDeviceInfo>>((speakerList, speaker) => {
       if (!speakerList.hasOwnProperty(speaker.groupId) || speaker.deviceId === 'communications') {
         speakerList[speaker.groupId] = speaker;
       }

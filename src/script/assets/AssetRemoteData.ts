@@ -20,6 +20,7 @@
 import {Logger, getLogger} from 'Util/Logger';
 import {loadUrlBuffer, noop} from 'Util/util';
 import {ValidationUtilError} from 'Util/ValidationUtil';
+import ko from 'knockout';
 
 import {decryptAesAsset} from './AssetCrypto';
 import {getAssetUrl, setAssetUrl} from './AssetURLCache';
