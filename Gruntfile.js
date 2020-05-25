@@ -33,6 +33,7 @@ module.exports = grunt => {
       page: `${SRC_PATH}/page`,
       style: `${SRC_PATH}/style`,
     },
+    server: 'server',
     dist: {
       s3: `${DIST_PATH}/s3`,
       static: `${DIST_PATH}/static`,
@@ -75,6 +76,7 @@ module.exports = grunt => {
     'build_style',
     'copy:dist_serviceworker',
     'copy:dist_resource',
+    'copy:dist_certificate',
     'build_markup',
   ]);
 

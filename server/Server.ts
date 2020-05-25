@@ -22,7 +22,9 @@ import * as express from 'express';
 import * as hbs from 'hbs';
 import * as helmet from 'helmet';
 import * as http from 'http';
+import * as https from 'https';
 import * as path from 'path';
+import * as fs from 'fs';
 
 import {HealthCheckRoute} from './routes/_health/HealthRoute';
 import {AppleAssociationRoute} from './routes/appleassociation/AppleAssociationRoute';
@@ -39,7 +41,7 @@ const STATUS_CODE_FOUND = 302;
 
 class Server {
   private readonly app: express.Express;
-  private server?: http.Server;
+  private server?: http.Server | https.Server;
 
   constructor(private readonly config: ServerConfig) {
     if (this.config.SERVER.DEVELOPMENT) {
@@ -72,14 +74,16 @@ class Server {
   }
 
   private initWebpack() {
-    if (this.config.SERVER.DEVELOPMENT) {
-      const webpackCompiler = require('webpack')(require('../../webpack.config.dev'));
-      const webpackDevMiddleware = require('webpack-dev-middleware');
-      const webpackHotMiddleware = require('webpack-hot-middleware');
-
-      this.app.use(webpackDevMiddleware(webpackCompiler));
-      this.app.use(webpackHotMiddleware(webpackCompiler));
+    if (!this.config.SERVER.DEVELOPMENT) {
+      return;
     }
+
+    const webpackCompiler = require('webpack')(require('../../webpack.config.dev'));
+    const webpackDevMiddleware = require('webpack-dev-middleware');
+    const webpackHotMiddleware = require('webpack-hot-middleware');
+
+    this.app.use(webpackDevMiddleware(webpackCompiler));
+    this.app.use(webpackHotMiddleware(webpackCompiler));
   }
 
   private initCaching() {
@@ -218,7 +222,17 @@ class Server {
       if (this.server) {
         reject('Server is already running.');
       } else if (this.config.SERVER.PORT_HTTP) {
-        this.server = this.app.listen(this.config.SERVER.PORT_HTTP, () => resolve(this.config.SERVER.PORT_HTTP));
+        if (this.config.SERVER.DEVELOPMENT) {
+          const options = {
+            cert: fs.readFileSync(this.config.SERVER.SSL_CERTIFICATE_PATH),
+            key: fs.readFileSync(this.config.SERVER.SSL_CERTIFICATE_KEY_PATH),
+          };
+          this.server = https
+            .createServer(options, this.app)
+            .listen(this.config.SERVER.PORT_HTTP, () => resolve(this.config.SERVER.PORT_HTTP));
+        } else {
+          this.server = this.app.listen(this.config.SERVER.PORT_HTTP, () => resolve(this.config.SERVER.PORT_HTTP));
+        }
       } else {
         reject('Server port not specified.');
       }

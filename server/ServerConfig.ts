@@ -67,5 +67,7 @@ export interface ServerConfig {
       ALLOW: string;
       DISALLOW: string;
     };
+    SSL_CERTIFICATE_KEY_PATH?: string;
+    SSL_CERTIFICATE_PATH?: string;
   };
 }
