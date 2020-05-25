@@ -150,17 +150,17 @@ class Server {
   private initStaticRoutes() {
     this.app.use(RedirectRoutes(this.config));
 
-    this.app.use('/audio', express.static(path.join(__dirname, 'static', 'audio')));
-    this.app.use('/ext', express.static(path.join(__dirname, 'static', 'ext')));
-    this.app.use('/font', express.static(path.join(__dirname, 'static', 'font')));
-    this.app.use('/image', express.static(path.join(__dirname, 'static', 'image')));
-    this.app.use('/min', express.static(path.join(__dirname, 'static', 'min')));
-    this.app.use('/proto', express.static(path.join(__dirname, 'static', 'proto')));
-    this.app.use('/style', express.static(path.join(__dirname, 'static', 'style')));
-    this.app.use('/worker', express.static(path.join(__dirname, 'static', 'worker')));
+    this.app.use('/audio', express.static(path.join(__dirname, 'static/audio')));
+    this.app.use('/ext', express.static(path.join(__dirname, 'static/ext')));
+    this.app.use('/font', express.static(path.join(__dirname, 'static/font')));
+    this.app.use('/image', express.static(path.join(__dirname, 'static/image')));
+    this.app.use('/min', express.static(path.join(__dirname, 'static/min')));
+    this.app.use('/proto', express.static(path.join(__dirname, 'static/proto')));
+    this.app.use('/style', express.static(path.join(__dirname, 'static/style')));
+    this.app.use('/worker', express.static(path.join(__dirname, 'static/worker')));
 
-    this.app.get('/favicon.ico', (req, res) => res.sendFile(path.join(__dirname, 'static', 'image', 'favicon.ico')));
-    this.app.get('/sw.js', (req, res) => res.sendFile(path.join(__dirname, 'static', 'sw.js')));
+    this.app.get('/favicon.ico', (_req, res) => res.sendFile(path.join(__dirname, 'static/image/favicon.ico')));
+    this.app.get('/sw.js', (_req, res) => res.sendFile(path.join(__dirname, 'static/sw.js')));
   }
 
   public initLatestBrowserRequired() {
