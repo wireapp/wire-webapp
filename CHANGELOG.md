@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.19.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.18.1...@wireapp/api-client@11.19.0) (2020-05-25)
+
+
+### Features
+
+* **api-client:** Add endpoint for initiating the bot password reset flow ([#3049](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3049)) ([b4c4f9f](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/b4c4f9f7ced6f26def0087f148d7b8fdbff9d319))
+
+
+
+
+
 ## [11.18.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.18.0...@wireapp/api-client@11.18.1) (2020-05-23)
 
 
