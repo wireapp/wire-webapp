@@ -130,7 +130,7 @@ export class CallingViewModel {
       });
     };
 
-    const startCall = (conversationEntity: any, callType: CALL_TYPE): void => {
+    const startCall = (conversationEntity: Conversation, callType: CALL_TYPE): void => {
       const convType = conversationEntity.isGroup() ? CONV_TYPE.GROUP : CONV_TYPE.ONEONONE;
       this.callingRepository.startCall(conversationEntity.id, convType, callType).then(call => {
         if (!call) {
@@ -158,10 +158,10 @@ export class CallingViewModel {
       reject: (call: Call) => {
         this.callingRepository.rejectCall(call.conversationId);
       },
-      startAudio: (conversationEntity: any): void => {
+      startAudio: (conversationEntity: Conversation): void => {
         startCall(conversationEntity, CALL_TYPE.NORMAL);
       },
-      startVideo(conversationEntity: any): void {
+      startVideo(conversationEntity: Conversation): void {
         startCall(conversationEntity, CALL_TYPE.VIDEO);
       },
       switchCameraInput: (call: Call, deviceId: string) => {

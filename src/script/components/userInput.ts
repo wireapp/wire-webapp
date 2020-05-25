@@ -84,7 +84,7 @@ class UserInput {
     });
   }
 
-  onKeyDown(data: any, keyboardEvent: KeyboardEvent): true {
+  onKeyDown(_data: unknown, keyboardEvent: KeyboardEvent): true {
     if (typeof this.selectedUsers === 'function') {
       if (isRemovalAction(keyboardEvent) && !this.input().length) {
         this.selectedUsers.pop();

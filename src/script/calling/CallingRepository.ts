@@ -64,6 +64,7 @@ import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import {Call, ConversationId} from './Call';
 import {DeviceId, Participant, UserId} from './Participant';
 import type {Recipients} from '../cryptography/CryptographyRepository';
+import type {Conversation} from '../entity/Conversation';
 
 interface MediaStreamQuery {
   audio?: boolean;
@@ -135,7 +136,7 @@ export class CallingRepository {
     return this.wCall.getStats(conversationId);
   }
 
-  initAvs(selfUser: any, clientId: DeviceId): Promise<{wCall: Wcall; wUser: number}> {
+  initAvs(selfUser: User, clientId: DeviceId): Promise<{wCall: Wcall; wUser: number}> {
     this.selfUser = selfUser;
     this.selfClientId = clientId;
     return getAvsInstance().then(callingInstance => {
@@ -430,7 +431,7 @@ export class CallingRepository {
   //##############################################################################
 
   toggleState(withVideo: boolean): void {
-    const conversationEntity: any = this.conversationRepository.active_conversation();
+    const conversationEntity: Conversation | undefined = this.conversationRepository.active_conversation();
     if (conversationEntity) {
       const isActiveCall = this.findCall(conversationEntity.id);
       const isGroupCall = conversationEntity.isGroup() ? CONV_TYPE.GROUP : CONV_TYPE.ONEONONE;
@@ -905,7 +906,7 @@ export class CallingRepository {
         // Send to all clients of self user
         precondition = [this.selfUser.id];
         recipients = {
-          [this.selfUser.id]: this.selfUser.devices().map((device: any) => device.id),
+          [this.selfUser.id]: this.selfUser.devices().map(device => device.id),
         };
         break;
       }
@@ -916,7 +917,7 @@ export class CallingRepository {
           precondition = [this.selfUser.id];
           recipients = {
             [remoteUserId]: [`${remoteClientId}`],
-            [this.selfUser.id]: this.selfUser.devices().map((device: any) => device.id),
+            [this.selfUser.id]: this.selfUser.devices().map(device => device.id),
           };
         }
         break;

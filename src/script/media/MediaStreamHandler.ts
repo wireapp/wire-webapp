@@ -243,7 +243,7 @@ export class MediaStreamHandler {
     }
   }
 
-  private selectPermissionDeniedWarningType(audio: boolean, video: boolean, screen: boolean): any {
+  private selectPermissionDeniedWarningType(audio: boolean, video: boolean, screen: boolean): string {
     if (video) {
       return WarningsViewModel.TYPE.DENIED_CAMERA;
     }
@@ -253,7 +253,7 @@ export class MediaStreamHandler {
     return WarningsViewModel.TYPE.DENIED_MICROPHONE;
   }
 
-  private selectPermissionRequestWarningType(audio: boolean, video: boolean, screen: boolean): any {
+  private selectPermissionRequestWarningType(audio: boolean, video: boolean, screen: boolean): string {
     if (video) {
       return WarningsViewModel.TYPE.REQUEST_CAMERA;
     }

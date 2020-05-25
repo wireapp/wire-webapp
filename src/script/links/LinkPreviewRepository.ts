@@ -20,10 +20,13 @@
 import {amplify} from 'amplify';
 import type {Data as OpenGraphResult} from 'open-graph';
 import type {Asset, LinkPreview} from '@wireapp/protocol-messaging';
+import type {WebappProperties} from '@wireapp/api-client/dist/user/data';
 import {AssetRetentionPolicy} from '@wireapp/api-client/dist/asset';
 import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {base64ToBlob, createRandomUuid} from 'Util/util';
 import {getLogger, Logger} from 'Util/Logger';
+
 import {getFirstLinkWithOffset} from './LinkPreviewHelpers';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
@@ -51,7 +54,7 @@ export class LinkPreviewRepository {
     this.shouldSendPreviews = propertiesRepository.getPreference(PROPERTIES_TYPE.PREVIEWS.SEND);
 
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.PREVIEWS.SEND, this.updatedSendPreference);
-    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, ({settings}: any) => {
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, ({settings}: WebappProperties) => {
       this.updatedSendPreference(settings.previews.send);
     });
   }
@@ -149,7 +152,7 @@ export class LinkPreviewRepository {
     try {
       const data = await window.openGraphAsync(link);
       if (data) {
-        return Object.entries(data).reduce((result: OpenGraphResult, [key, value]) => {
+        return Object.entries(data).reduce<OpenGraphResult>((result, [key, value]) => {
           result[key] = Array.isArray(value) ? value[0] : value;
           return result;
         }, {} as OpenGraphResult);

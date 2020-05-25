@@ -33,7 +33,7 @@ describe('fullscreenVideoCall', () => {
     const conversation = new Conversation();
     spyOn(conversation, 'supportsVideoCall').and.returnValue(true);
     call = new Call('', '', 0, new Participant('', ''), 0);
-    const params: any = {
+    const params = {
       call,
       callActions: {},
       canShareScreen: false,
@@ -45,7 +45,7 @@ describe('fullscreenVideoCall', () => {
           audioInput: () => '',
           videoInput: () => '',
         },
-      } as any,
+      },
       multitasking: {autoMinimize: () => false},
       videoGrid: ko.observable({grid: [], hasRemoteVideo: false, thumbnail: null}),
     };

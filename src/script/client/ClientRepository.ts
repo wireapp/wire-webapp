@@ -534,7 +534,7 @@ export class ClientRepository {
 
   getClientByUserIdFromDb(requestedUserId: string): Promise<any[]> {
     return this.clientService.loadAllClientsFromDb().then(clients => {
-      return clients.filter((client: any) => {
+      return clients.filter(client => {
         const {userId} = ClientEntity.dismantleUserClientId(client.meta.primary_key);
         return userId === requestedUserId;
       });
