@@ -1895,16 +1895,16 @@
     platform "1.3.5"
     url-search-params-polyfill "8.1.0"
 
-"@wireapp/copy-config@1.0.10":
-  version "1.0.10"
-  resolved "https://registry.yarnpkg.com/@wireapp/copy-config/-/copy-config-1.0.10.tgz#597ba346e1ba5b2c9f0bee13bd9772ae9d45a439"
-  integrity sha512-fY8wE6osM56VyZ4EiNs5VIepJZdNlGQDeTWlCh8359JI2Vg8CLp1YRdsYPJnnxs/MyrxTdvaDh07qZZP0L7xCg==
+"@wireapp/copy-config@1.0.11":
+  version "1.0.11"
+  resolved "https://registry.yarnpkg.com/@wireapp/copy-config/-/copy-config-1.0.11.tgz#c307d566da047da17ac6eb8c31b30b5125db5632"
+  integrity sha512-zdQERSh1ynx8lmVEGHN46bNBEn/aEpiQmLp5uVvsUF2c9U1EbOuuktdvJHpubaES4ppRMKs1dXszNAEfKW6zUA==
   dependencies:
     axios "0.19.2"
     copy "0.3.2"
     cosmiconfig "6.0.0"
     fs-extra "9.0.0"
-    jszip "3.2.2"
+    jszip "3.4.0"
     logdown "3.3.1"
     rimraf "3.0.2"
 
@@ -7831,16 +7831,6 @@ jsx-ast-utils@^2.2.3:
   dependencies:
     array-includes "^3.0.3"
     object.assign "^4.1.0"
-
-jszip@3.2.2:
-  version "3.2.2"
-  resolved "https://registry.yarnpkg.com/jszip/-/jszip-3.2.2.tgz#b143816df7e106a9597a94c77493385adca5bd1d"
-  integrity sha512-NmKajvAFQpbg3taXQXr/ccS2wcucR1AZ+NtyWp2Nq7HHVsXhcJFR8p0Baf32C2yVvBylFWVeKf+WI2AnvlPhpA==
-  dependencies:
-    lie "~3.3.0"
-    pako "~1.0.2"
-    readable-stream "~2.3.6"
-    set-immediate-shim "~1.0.1"
 
 jszip@3.4.0:
   version "3.4.0"
