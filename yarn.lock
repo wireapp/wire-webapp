@@ -13082,10 +13082,10 @@ tsutils@^3.17.1:
   dependencies:
     tslib "^1.8.1"
 
-tsyringe@4.2.0:
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/tsyringe/-/tsyringe-4.2.0.tgz#98aca590e19f02949e63a8e374e77e5c8513d594"
-  integrity sha512-NV5BODaXYJJII2MFlSJMiyVVSYW8GjqS5+YAkzATINrH5SlLiz2fS24RLt6/GfodR428ZH6Cykko4yabzJ5wNw==
+tsyringe@4.3.0:
+  version "4.3.0"
+  resolved "https://registry.yarnpkg.com/tsyringe/-/tsyringe-4.3.0.tgz#50ce2ec56c83569a2dfafb7233a5265a2a10bde4"
+  integrity sha512-Vzty1M/EQXSsEE8aoIOLl1l793chcPyQAnFJaS1mFDtFvNPY+jknSPwMIF6yfcjua+2GTgwxWFzuA3cjIx4NZA==
   dependencies:
     tslib "^1.9.3"
 
