@@ -79,6 +79,22 @@ export class AccountAPI {
   }
 
   /**
+   * Start bot password reset flow
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/provider/password-reset
+   */
+  public async postBotPasswordReset(email: string): Promise<void> {
+    const config: AxiosRequestConfig = {
+      data: {
+        email,
+      },
+      method: 'post',
+      url: `${AccountAPI.URL.PROVIDER}${AccountAPI.URL.PASSWORD_RESET}`,
+    };
+
+    await this.client.sendJSON(config);
+  }
+
+  /**
    * Finish password reset flow
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/password-reset/complete
    */
