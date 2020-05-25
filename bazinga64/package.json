@@ -5,7 +5,7 @@
     "@types/karma": "4.4.0",
     "@types/libsodium-wrappers-sumo": "0.7.3",
     "@types/node": "~12",
-    "cross-env": "7.0.0",
+    "cross-env": "7.0.2",
     "jasmine": "3.5.0",
     "karma": "4.4.1",
     "karma-chrome-launcher": "3.1.0",
