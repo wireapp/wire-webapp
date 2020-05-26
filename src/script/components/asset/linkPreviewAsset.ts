@@ -29,10 +29,10 @@ import {LinkPreviewMetaDataType} from '../../links/LinkPreviewMetaDataType';
 import type {Text} from '../../entity/message/Text';
 
 interface Params {
-  message: ContentMessage | ko.Subscribable<ContentMessage>;
-
   /** Does the asset have a visible header? */
   header: boolean;
+
+  message: ContentMessage | ko.Subscribable<ContentMessage>;
 }
 
 class LinkPreviewAssetComponent {

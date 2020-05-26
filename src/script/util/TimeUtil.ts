@@ -69,8 +69,8 @@ interface DiscreteTimeUnit {
 }
 
 export interface DurationUnit {
-  text: string;
   symbol: string;
+  text: string;
   value: number;
 }
 

@@ -130,11 +130,7 @@ declare global {
         URL: {
           ACCOUNT_BASE: string;
           MOBILE_BASE: string;
-          TEAMS_BASE: string;
-          WEBSITE_BASE: string;
           PRIVACY_POLICY: string;
-          TERMS_OF_USE_PERSONAL: string;
-          TERMS_OF_USE_TEAMS: string;
           SUPPORT: {
             BUG_REPORT: string;
             CALLING: string;
@@ -148,6 +144,10 @@ declare global {
             MICROPHONE_ACCESS_DENIED: string;
             SCREEN_ACCESS_DENIED: string;
           };
+          TEAMS_BASE: string;
+          TERMS_OF_USE_PERSONAL: string;
+          TERMS_OF_USE_TEAMS: string;
+          WEBSITE_BASE: string;
         };
         VERSION: string;
         WEBSITE_LABEL: string;

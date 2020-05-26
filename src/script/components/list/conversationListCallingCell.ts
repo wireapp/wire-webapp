@@ -42,14 +42,14 @@ import type {Multitasking} from '../../notification/NotificationRepository';
 
 interface ComponentParams {
   call: Call;
-  conversation: ko.PureComputed<Conversation>;
-  videoGrid: ko.PureComputed<Grid>;
-  callingRepository: CallingRepository;
-  temporaryUserStyle?: boolean;
-  multitasking: Multitasking;
   callActions: CallActions;
+  callingRepository: CallingRepository;
+  conversation: ko.PureComputed<Conversation>;
   hasAccessToCamera: ko.Observable<boolean>;
   isSelfVerified: ko.Subscribable<boolean>;
+  multitasking: Multitasking;
+  temporaryUserStyle?: boolean;
+  videoGrid: ko.PureComputed<Grid>;
 }
 
 class ConversationListCallingCell {

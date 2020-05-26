@@ -22,10 +22,10 @@ import ko from 'knockout';
 import {clamp} from 'Util/NumberUtil';
 
 interface Params {
-  /** Media source */
-  src: HTMLMediaElement;
   dark: boolean;
   disabled: ko.Subscribable<boolean>;
+  /** Media source */
+  src: HTMLMediaElement;
 }
 
 class SeekBarComponent {
