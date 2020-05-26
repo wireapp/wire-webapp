@@ -132,7 +132,7 @@ export class CallingRepository {
     this.subscribeToEvents();
   }
 
-  getStats(conversationId: ConversationId): Promise<{userid: UserId; stats: RTCStatsReport}[]> {
+  getStats(conversationId: ConversationId): Promise<{stats: RTCStatsReport; userid: UserId}[]> {
     return this.wCall.getStats(conversationId);
   }
 
@@ -743,7 +743,7 @@ export class CallingRepository {
       return;
     }
 
-    const {members}: {members: {userid: UserId; clientid: DeviceId}[]} = JSON.parse(membersJson);
+    const {members}: {members: {clientid: DeviceId; userid: UserId}[]} = JSON.parse(membersJson);
     const newMembers = members
       .filter(({userid}) => !this.findParticipant(conversationId, userid))
       .map(({userid, clientid}) => new Participant(userid, clientid));

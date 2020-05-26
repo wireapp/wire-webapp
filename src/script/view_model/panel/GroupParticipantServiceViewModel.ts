@@ -93,7 +93,7 @@ export class GroupParticipantServiceViewModel extends BasePanelViewModel {
     this.onGoBack();
   }
 
-  initView({entity: service, addMode = false}: {entity: ServiceEntity; addMode: boolean}): void {
+  initView({entity: service, addMode = false}: {addMode: boolean; entity: ServiceEntity}): void {
     const serviceEntity = ko.unwrap(service);
     this.selectedParticipant(serviceEntity);
     this.selectedService(undefined);

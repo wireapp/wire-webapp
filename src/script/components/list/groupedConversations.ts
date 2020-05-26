@@ -35,12 +35,12 @@ import './groupedConversationHeader';
 
 interface GroupedConversationsParams {
   conversationRepository: ConversationRepository;
-  listViewModel: ConversationListViewModel;
-  hasJoinableCall: (conversationId: string) => boolean;
-  onJoinCall: (conversationEntity: Conversation) => void;
-  isSelectedConversation: (conversationEntity: Conversation) => boolean;
   expandedFolders: ko.ObservableArray<string>;
+  hasJoinableCall: (conversationId: string) => boolean;
+  isSelectedConversation: (conversationEntity: Conversation) => boolean;
   isVisibleFunc: (top: number, bottom: number) => boolean;
+  listViewModel: ConversationListViewModel;
+  onJoinCall: (conversationEntity: Conversation) => void;
 }
 
 ko.components.register('grouped-conversations', {

@@ -138,6 +138,8 @@ function publicPermissionsForRole(role: ROLE): number {
  * Object describing all the roles of a team member
  * This object needs to be sorted from the highest priority to the lowest
  */
+
+/* eslint-disable typescript-sort-keys/string-enum */
 export enum ROLE {
   OWNER = 'z.team.TeamRole.ROLE.OWNER',
   ADMIN = 'z.team.TeamRole.ROLE.ADMIN',
@@ -146,6 +148,7 @@ export enum ROLE {
   NONE = 'z.team.TeamRole.ROLE.NONE',
   INVALID = 'z.team.TeamRole.ROLE.INVALID',
 }
+/* eslint-enable typescript-sort-keys/string-enum */
 
 export function roleFromTeamPermissions(permissions: PermissionsData): ROLE {
   if (!permissions) {
