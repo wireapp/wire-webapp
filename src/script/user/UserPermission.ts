@@ -134,21 +134,26 @@ function publicPermissionsForRole(role: ROLE): number {
   }
 }
 
-/**
- * Object describing all the roles of a team member
- * This object needs to be sorted from the highest priority to the lowest
- */
-
-/* eslint-disable typescript-sort-keys/string-enum */
+/** Enum describing all the roles of a team member */
 export enum ROLE {
-  OWNER = 'z.team.TeamRole.ROLE.OWNER',
   ADMIN = 'z.team.TeamRole.ROLE.ADMIN',
-  MEMBER = 'z.team.TeamRole.ROLE.MEMBER',
-  PARTNER = 'z.team.TeamRole.ROLE.PARTNER',
-  NONE = 'z.team.TeamRole.ROLE.NONE',
   INVALID = 'z.team.TeamRole.ROLE.INVALID',
+  MEMBER = 'z.team.TeamRole.ROLE.MEMBER',
+  NONE = 'z.team.TeamRole.ROLE.NONE',
+  OWNER = 'z.team.TeamRole.ROLE.OWNER',
+  PARTNER = 'z.team.TeamRole.ROLE.PARTNER',
 }
-/* eslint-enable typescript-sort-keys/string-enum */
+
+/** Roles sorted by priority, highest first. */
+// prettier-ignore
+const RolesByPriority = [
+  ROLE.OWNER,
+  ROLE.ADMIN,
+  ROLE.MEMBER,
+  ROLE.PARTNER,
+  ROLE.NONE,
+  ROLE.INVALID,
+]
 
 export function roleFromTeamPermissions(permissions: PermissionsData): ROLE {
   if (!permissions) {
@@ -156,11 +161,9 @@ export function roleFromTeamPermissions(permissions: PermissionsData): ROLE {
   }
 
   const invalidRoles = [ROLE.INVALID, ROLE.NONE];
-  const detectedRole = Object.values(ROLE)
-    // necessary to extract only the actual values from a TS enum
-    .filter(value => typeof value === 'string')
-    .filter(role => !invalidRoles.includes(role))
-    .find(role => hasPermissionForRole(permissions.self, role));
+  const detectedRole = RolesByPriority.filter(role => !invalidRoles.includes(role)).find(role =>
+    hasPermissionForRole(permissions.self, role),
+  );
 
   return detectedRole || ROLE.INVALID;
 }
