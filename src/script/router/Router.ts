@@ -33,6 +33,7 @@ export class Router {
 
     this.parseRoute = () => {
       const currentPath = window.location.hash.replace('#', '') || '/';
+
       const {value} = switchPath(currentPath, routes);
       return typeof value === 'function' ? value() : value;
     };
