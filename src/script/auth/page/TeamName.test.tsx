@@ -23,6 +23,7 @@ import {initialRootState, RootState, Api} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
 import TeamName from './TeamName';
+import {HashRouter as Router} from 'react-router-dom';
 import {MockStoreEnhanced} from 'redux-mock-store';
 import {TypeUtil} from '@wireapp/commons';
 import {ThunkDispatch} from 'redux-thunk';
@@ -38,7 +39,13 @@ class SetTeamNamePage {
     store: MockStoreEnhanced<TypeUtil.RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
     history?: History<any>,
   ) {
-    this.driver = mountComponent(<TeamName />, store, history);
+    this.driver = mountComponent(
+      <Router hashType="noslash">
+        <TeamName />
+      </Router>,
+      store,
+      history,
+    );
   }
 
   getTeamNameInput = () => this.driver.find('input[data-uie-name="enter-team-name"]');

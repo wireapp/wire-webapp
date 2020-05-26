@@ -32,8 +32,10 @@ export class Router {
     const routes = {...defaultRoute, ...routeDefinitions};
 
     this.parseRoute = () => {
-      const currentPath = window.location.hash.replace('#', '') || '/';
-
+      let currentPath = window.location.hash.replace('#', '') || '/';
+      if (currentPath.charAt(0) !== '/') {
+        currentPath = `/${currentPath}`;
+      }
       const {value} = switchPath(currentPath, routes);
       return typeof value === 'function' ? value() : value;
     };

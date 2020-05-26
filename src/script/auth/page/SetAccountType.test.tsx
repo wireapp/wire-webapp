@@ -29,6 +29,7 @@ import {MockStoreEnhanced} from 'redux-mock-store';
 import {ThunkDispatch} from 'redux-thunk';
 import {AnyAction} from 'redux';
 import {History} from 'history';
+import {HashRouter as Router} from 'react-router-dom';
 
 class SetAccountTypePage {
   private readonly driver: ReactWrapper;
@@ -37,7 +38,13 @@ class SetAccountTypePage {
     store: MockStoreEnhanced<TypeUtil.RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
     history?: History<any>,
   ) {
-    this.driver = mountComponent(<SetAccountType />, store, history);
+    this.driver = mountComponent(
+      <Router hashType="noslash">
+        <SetAccountType />
+      </Router>,
+      store,
+      history,
+    );
   }
 
   getPersonalAccountButton = () => this.driver.find('a[data-uie-name="go-register-personal"]');

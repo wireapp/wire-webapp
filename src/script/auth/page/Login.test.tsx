@@ -19,6 +19,7 @@
 
 import {ReactWrapper} from 'enzyme';
 import React from 'react';
+import {HashRouter as Router} from 'react-router-dom';
 import {initialRootState, RootState, Api} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
@@ -43,7 +44,13 @@ class LoginPage {
     store: MockStoreEnhanced<TypeUtil.RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
     history?: History<any>,
   ) {
-    this.driver = mountComponent(<Login />, store, history);
+    this.driver = mountComponent(
+      <Router hashType="noslash">
+        <Login />
+      </Router>,
+      store,
+      history,
+    );
   }
 
   getBackButton = () => this.driver.find('[data-uie-name="go-index"]');
