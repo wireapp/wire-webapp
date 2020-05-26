@@ -77,49 +77,43 @@ account.on(PayloadBundleType.TEXT, textMessage => {
   );
 });
 
-account
-  .login(loginData)
-  .then(() => account.listen())
-  .catch((error: AxiosError) => {
-    const data = error.response?.data;
+(async () => {
+  try {
+    await account.login(loginData);
+    await account.listen();
+  } catch (error) {
+    const data = (error as AxiosError).response?.data;
     const errorLabel = data?.label;
     // TODO: The following is just a quick hack to continue if too many clients are registered!
     // We should expose this fail-safe method as an emergency function
     if (errorLabel === BackendErrorLabel.TOO_MANY_CLIENTS) {
-      return (
-        apiClient.client.api
-          .getClients()
-          .then((clients: RegisteredClient[]) => {
-            const client: RegisteredClient = clients[0];
-            return apiClient.client.api.deleteClient(client.id, loginData.password);
-          })
-          .then(() => account.logout())
-          // TODO: Completely removing the Wire Cryptobox directoy isn't a good idea! The "logout" method should
-          // handle already the cleanup of artifacts. Unfortunately "logout" sometimes has issues (we need to solve
-          // these!)
-          .then(() => fs.remove(directory))
-          .then(() => account.login(loginData))
-          .then(() => account.listen())
-      );
+      const clients = await apiClient.client.api.getClients();
+      const client: RegisteredClient = clients[0];
+      await apiClient.client.api.deleteClient(client.id, loginData.password);
+      await account.logout();
+
+      // TODO: Completely removing the Wire Cryptobox directoy isn't a good idea! The "logout" method should
+      // handle already the cleanup of artifacts. Unfortunately "logout" sometimes has issues (we need to solve
+      // these!)
+      await fs.remove(directory);
+      await account.login(loginData);
+      await account.listen();
     }
     throw error;
-  })
-  .then(() => {
-    const {clientId, userId} = apiClient.context!;
-    console.info(`Connected to Wire — User ID "${userId}" — Client ID "${clientId}"`);
-  })
-  .then(() => {
-    const stdin = process.openStdin();
-    stdin.addListener('data', data => {
-      const message = data.toString().trim();
-      if (account.service) {
-        const payload = account.service.conversation.messageBuilder.createText(conversationID, message).build();
-        return account.service.conversation.send(payload);
-      }
-      return undefined;
-    });
-  })
-  .catch((error: Error) => {
-    console.error(error.message, error);
-    process.exit(1);
+  }
+
+  const {clientId, userId} = apiClient.context!;
+  console.info(`Connected to Wire — User ID "${userId}" — Client ID "${clientId}"`);
+
+  const stdin = process.openStdin();
+  stdin.addListener('data', async data => {
+    const message = data.toString().trim();
+    if (account.service) {
+      const payload = account.service.conversation.messageBuilder.createText(conversationID, message).build();
+      await account.service.conversation.send(payload);
+    }
   });
+})().catch((error: Error) => {
+  console.error(error.message, error);
+  process.exit(1);
+});

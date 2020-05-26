@@ -49,29 +49,33 @@ class Auth extends Component {
     this.onPasswordChange = this.onPasswordChange.bind(this);
   }
 
-  componentDidMount() {
-    window.wire.client
-      .init()
-      .then(() => this.setState({authenticated: true}))
-      .catch(error => {
-        logger.error('Could not recover from cookie', error);
-      });
+  async componentDidMount() {
+    try {
+      await window.wire.client.init();
+      this.setState({authenticated: true});
+    } catch (error) {
+      logger.error('Could not recover from cookie', error);
+    }
   }
 
-  doAuth(event) {
+  async doAuth(event) {
     event.preventDefault();
     this.setState({authenticated: false, authenticationError: undefined});
-    return window.wire.client
-      .init()
-      .catch(() => window.wire.client.login(this.state.login))
-      .then(context => {
-        logger.log('Login successful', context);
-        this.setState({authenticated: true, authenticationError: undefined});
-        return window.wire.client.connect();
-      })
-      .catch(error => {
-        this.setState({authenticated: false, authenticationError: error});
-      });
+
+    let context;
+
+    try {
+      context = await window.wire.client.init();
+    } catch (error) {
+      context = await window.wire.client.login(this.state.login);
+    }
+    try {
+      logger.log('Login successful', context);
+      this.setState({authenticated: true, authenticationError: undefined});
+      await window.wire.client.connect();
+    } catch (error) {
+      this.setState({authenticated: false, authenticationError: error});
+    }
   }
 
   onEmailChange(event) {

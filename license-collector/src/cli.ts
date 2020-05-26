@@ -34,14 +34,15 @@ try {
 
 const outputFile = path.resolve('licenses.json');
 
-new LicenseCollector({devDependencies: false, filter, repositories})
-  .collect()
-  .then(async licenses => {
-    if (licenses.length) {
-      await fs.writeJSON(outputFile, licenses, {spaces: 2});
-      console.info(`Saved licenses to "${outputFile}".`);
-    } else {
-      console.info('No licenses collected.');
-    }
-  })
-  .catch(console.error);
+(async () => {
+  const licenses = await new LicenseCollector({devDependencies: false, filter, repositories}).collect();
+  if (licenses.length) {
+    await fs.writeJSON(outputFile, licenses, {spaces: 2});
+    console.info(`Saved licenses to "${outputFile}".`);
+  } else {
+    console.info('No licenses collected.');
+  }
+})().catch(error => {
+  console.error(error);
+  process.exit(1);
+});

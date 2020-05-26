@@ -30,20 +30,17 @@ const logger = logdown('@wireapp/copy-config/cli', {
 });
 logger.state.isEnabled = true;
 
-configExplorer
-  .search()
-  .then(configFile => {
-    if (configFile) {
-      logger.info(`Found configuration file "${configFile.filepath}".`);
-    }
-    const config: CopyConfigOptions = configFile ? configFile.config : undefined;
-    return new CopyConfig(config).copy();
-  })
-  .then(copiedFiles => {
-    const copyMessage = copiedFiles.length ? `Copied ${copiedFiles.length}` : "Didn't copy any";
-    logger.info(`${copyMessage} file${copiedFiles.length === 1 ? '' : 's'}.`);
-  })
-  .catch(error => {
-    console.error(error.stack);
-    process.exit(1);
-  });
+(async () => {
+  const configFile = await configExplorer.search();
+  if (configFile) {
+    logger.info(`Found configuration file "${configFile.filepath}".`);
+  }
+  const config: CopyConfigOptions = configFile ? configFile.config : undefined;
+
+  const copiedFiles = await new CopyConfig(config).copy();
+  const copyMessage = copiedFiles.length ? `Copied ${copiedFiles.length}` : "Didn't copy any";
+  logger.info(`${copyMessage} file${copiedFiles.length === 1 ? '' : 's'}.`);
+})().catch(error => {
+  console.error(error);
+  process.exit(1);
+});

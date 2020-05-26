@@ -139,9 +139,10 @@ requiredEnvVars.forEach(envVar => {
   }
 });
 
-start()
-  .then(() => process.exit(0))
-  .catch(error => {
-    console.error(error);
-    process.exit(1);
-  });
+(async () => {
+  await start();
+  process.exit(0);
+})().catch(error => {
+  console.error(error);
+  process.exit(1);
+});
