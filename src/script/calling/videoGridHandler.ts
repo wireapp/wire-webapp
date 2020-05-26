@@ -20,6 +20,7 @@
 import ko from 'knockout';
 
 import type {Participant} from '../calling/Participant';
+import {Call} from './Call';
 
 export interface Grid {
   grid: Participant[];
@@ -27,14 +28,14 @@ export interface Grid {
   hasRemoteVideo: boolean;
 }
 
-export function getGrid(
-  participants: ko.Observable<Participant[]>,
-  selfParticipant: Participant,
-): ko.PureComputed<Grid> {
+export function getGrid(call: Call): ko.PureComputed<Grid> {
   return ko.pureComputed(() => {
     let inGridParticipants: Participant[];
     let thumbnailParticipant: Participant | null;
-    const remoteVideoParticipants = participants().filter(participant => participant.hasActiveVideo());
+    const selfParticipant = call.getSelfParticipant();
+    const remoteParticipants = call.participants().filter(participant => participant !== selfParticipant);
+
+    const remoteVideoParticipants = remoteParticipants.filter(participant => participant.hasActiveVideo());
     if (remoteVideoParticipants.length === 1) {
       inGridParticipants = remoteVideoParticipants;
       thumbnailParticipant = selfParticipant.hasActiveVideo() ? selfParticipant : null;

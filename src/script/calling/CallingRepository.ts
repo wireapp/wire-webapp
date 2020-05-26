@@ -286,9 +286,9 @@ export class CallingRepository {
     return this.activeCalls().find((callInstance: Call) => callInstance.conversationId === conversationId);
   }
 
-  private findParticipant(conversationId: ConversationId, userId: UserId): Participant | undefined {
+  private findParticipant(conversationId: ConversationId, userId: UserId, deviceId: DeviceId): Participant | undefined {
     const call = this.findCall(conversationId);
-    return call?.getParticipant(userId);
+    return call?.getParticipant(userId, deviceId);
   }
 
   private storeCall(call: Call): void {
@@ -297,7 +297,7 @@ export class CallingRepository {
 
   private removeCall(call: Call): void {
     const index = this.activeCalls().indexOf(call);
-    call.selfParticipant.releaseMediaStream();
+    call.getSelfParticipant().releaseMediaStream();
     call.participants.removeAll();
     if (index !== -1) {
       this.activeCalls.splice(index, 1);
@@ -310,9 +310,9 @@ export class CallingRepository {
     try {
       const mediaStream = await this.getMediaStream({audio, camera}, isGroup);
       if (call.state() !== CALL_STATE.NONE) {
-        call.selfParticipant.updateMediaStream(mediaStream);
+        call.getSelfParticipant().updateMediaStream(mediaStream);
         if (camera) {
-          call.selfParticipant.videoState(VIDEO_STATE.STARTED);
+          call.getSelfParticipant().videoState(VIDEO_STATE.STARTED);
         }
       } else {
         mediaStream.getTracks().forEach(track => track.stop());
@@ -494,7 +494,7 @@ export class CallingRepository {
    * Toggles the camera ON and OFF for the given call (does not switch between different cameras)
    */
   toggleCamera(call: Call): void {
-    const selfParticipant = call.selfParticipant;
+    const selfParticipant = call.getSelfParticipant();
     const newState = selfParticipant.sharesCamera() ? VIDEO_STATE.STOPPED : VIDEO_STATE.STARTED;
     if (call.state() === CALL_STATE.INCOMING) {
       selfParticipant.videoState(newState);
@@ -511,7 +511,7 @@ export class CallingRepository {
    * Toggles screenshare ON and OFF for the given call (does not switch between different screens)
    */
   toggleScreenshare(call: Call): void {
-    const selfParticipant = call.selfParticipant;
+    const selfParticipant = call.getSelfParticipant();
     const newState = selfParticipant.sharesScreen() ? VIDEO_STATE.STOPPED : VIDEO_STATE.SCREENSHARE;
     this.wCall.setVideoSendState(this.wUser, call.conversationId, newState);
   }
@@ -522,7 +522,7 @@ export class CallingRepository {
 
       const isVideoCall = callType === CALL_TYPE.VIDEO;
       if (!isVideoCall) {
-        call.selfParticipant.releaseVideoStream();
+        call.getSelfParticipant().releaseVideoStream();
       }
       await this.warmupMediaStreams(call, true, isVideoCall);
       this.wCall.answer(this.wUser, call.conversationId, callType, 0);
@@ -576,11 +576,11 @@ export class CallingRepository {
     }
     switch (mediaType) {
       case MediaType.AUDIO:
-        activeCall.selfParticipant.releaseAudioStream();
+        activeCall.getSelfParticipant().releaseAudioStream();
         break;
 
       case MediaType.VIDEO:
-        activeCall.selfParticipant.releaseVideoStream();
+        activeCall.getSelfParticipant().releaseVideoStream();
         break;
     }
     return true;
@@ -593,14 +593,15 @@ export class CallingRepository {
     if (!call) {
       return;
     }
+    const selfParticipant = call.getSelfParticipant();
     if (mediaType === MediaType.AUDIO) {
       const audioTracks = mediaStream.getAudioTracks().map(track => track.clone());
-      call.selfParticipant.setAudioStream(new MediaStream(audioTracks));
+      selfParticipant.setAudioStream(new MediaStream(audioTracks));
       this.wCall.replaceTrack(call.conversationId, audioTracks[0]);
     }
-    if (mediaType === MediaType.VIDEO && call.selfParticipant.sharesCamera()) {
+    if (mediaType === MediaType.VIDEO && selfParticipant.sharesCamera()) {
       const videoTracks = mediaStream.getVideoTracks().map(track => track.clone());
-      call.selfParticipant.setVideoStream(new MediaStream(videoTracks));
+      selfParticipant.setVideoStream(new MediaStream(videoTracks));
       this.wCall.replaceTrack(call.conversationId, videoTracks[0]);
     }
   }
@@ -714,8 +715,9 @@ export class CallingRepository {
       this.removeCall(call);
       return;
     }
-    call.selfParticipant.releaseMediaStream();
-    call.selfParticipant.videoState(VIDEO_STATE.STOPPED);
+    const selfParticipant = call.getSelfParticipant();
+    selfParticipant.releaseMediaStream();
+    selfParticipant.videoState(VIDEO_STATE.STOPPED);
     call.reason(reason);
   };
 
@@ -787,7 +789,7 @@ export class CallingRepository {
 
     const {members}: {members: {userid: UserId; clientid: DeviceId}[]} = JSON.parse(membersJson);
     const newMembers = members
-      .filter(({userid}) => !this.findParticipant(conversationId, userid))
+      .filter(({userid, clientid}) => !this.findParticipant(conversationId, userid, clientid))
       .map(({userid, clientid}) => new Participant(userid, clientid));
     const removedMembers = call
       .participants()
@@ -817,7 +819,7 @@ export class CallingRepository {
     if (!call) {
       return Promise.reject();
     }
-    const selfParticipant = call.selfParticipant;
+    const selfParticipant = call.getSelfParticipant();
     const query: Required<MediaStreamQuery> = {audio, camera, screen};
     const cache = {
       audio: selfParticipant.audioStream(),
@@ -876,7 +878,7 @@ export class CallingRepository {
     deviceId: DeviceId,
     streams: MediaStream[],
   ): void => {
-    let participant = this.findParticipant(conversationId, userId);
+    let participant = this.findParticipant(conversationId, userId, deviceId);
     if (!participant) {
       participant = new Participant(userId, deviceId);
       const call = this.findCall(conversationId);
@@ -904,13 +906,13 @@ export class CallingRepository {
   ) => {
     const call = this.findCall(conversationId);
     if (call) {
-      if (call.state() === CALL_STATE.MEDIA_ESTAB && userId === call.selfParticipant.userId) {
-        call.selfParticipant.releaseVideoStream();
+      const selfParticipant = call.getSelfParticipant();
+      if (call.state() === CALL_STATE.MEDIA_ESTAB && userId === selfParticipant.userId) {
+        selfParticipant.releaseVideoStream();
       }
       call
         .participants()
-        .concat(call.selfParticipant)
-        .filter(participant => participant.userId === userId)
+        .filter(participant => participant.userId === userId && participant.deviceId === deviceId)
         .forEach(participant => participant.videoState(state));
     }
   };

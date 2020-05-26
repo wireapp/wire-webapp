@@ -103,8 +103,8 @@ export class FullscreenVideoCalling {
     this.HIDE_CONTROLS_TIMEOUT = FullscreenVideoCalling.CONFIG.HIDE_CONTROLS_TIMEOUT;
 
     this.canShareScreen = canShareScreen;
-    this.selfSharesScreen = call.selfParticipant.sharesScreen;
-    this.selfSharesCamera = call.selfParticipant.sharesCamera;
+    this.selfSharesScreen = call.getSelfParticipant().sharesScreen;
+    this.selfSharesCamera = call.getSelfParticipant().sharesCamera;
     this.currentCameraDevice = mediaDevicesHandler.currentDeviceId.videoInput;
     this.currentScreenDevice = mediaDevicesHandler.currentDeviceId.screenInput;
 
@@ -189,7 +189,7 @@ ko.components.register('fullscreen-video-call', {
   template: `
 <div id="video-calling" data-bind="hide_controls: {timeout: HIDE_CONTROLS_TIMEOUT, skipClass: 'video-controls__button'}" class="video-calling">
   <div id="video-element-remote" class="video-element-remote">
-    <group-video-grid params="grid: videoGrid, muted: isMuted, selfUserId: call.selfParticipant.userId"></group-video-grid>
+    <group-video-grid params="grid: videoGrid, muted: isMuted, selfUserId: call.getSelfParticipant().userId"></group-video-grid>
   </div>
 
   <!-- ko if: !isChoosingScreen() -->

@@ -27,9 +27,9 @@ import 'src/script/components/list/conversationListCallingCell';
 import {User} from 'src/script/entity/User';
 
 function createCall(state) {
-  const call = new Call();
+  const selfParticipant = new Participant('selfId');
+  const call = new Call('', '', undefined, selfParticipant);
   call.state(state);
-  call.selfParticipant = new Participant('selfId');
   return call;
 }
 
