@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# 0.8.0 (2020-05-26)
+
+
+### Features
+
+* **eslint-config:** Warn when using fdescribe or fit ([#3027](https://github.com/wireapp/wire-web-packages/tree/master/packages/license-collector/issues/3027)) ([5045c96](https://github.com/wireapp/wire-web-packages/tree/master/packages/license-collector/commit/5045c968b49430d630faeb66976ab536ac15051c))
+
+
+
+
+
 ## [0.7.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/license-collector/compare/@wireapp/license-collector@0.7.0...@wireapp/license-collector@0.7.1) (2020-05-06)
 
 **Note:** Version bump only for package @wireapp/license-collector
