@@ -30,6 +30,6 @@ module.exports = {
     cwd: '<%= dir.src_ %>',
     dest: '<%= dir.dist.static %>',
     expand: true,
-    src: ['worker/*', 'sw.js'],
+    src: ['worker/*'],
   },
 };

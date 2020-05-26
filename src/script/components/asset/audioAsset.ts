@@ -81,7 +81,12 @@ class AudioAssetComponent extends AbstractAssetTransferStateTracker {
     Promise.resolve()
       .then(() => {
         if (!this.audioSrc()) {
-          return this.asset.load().then(blob => this.audioSrc(window.URL.createObjectURL(blob)));
+          this.asset.status(AssetTransferState.DOWNLOADING);
+          return this.assetRepository
+            .load(this.asset.original_resource())
+            .then(blob => this.audioSrc(window.URL.createObjectURL(blob)))
+            .then(() => this.asset.status(AssetTransferState.UPLOADED))
+            .catch(() => this.asset.status(AssetTransferState.UPLOADED));
         }
         return null;
       })

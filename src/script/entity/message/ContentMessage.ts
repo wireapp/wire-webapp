@@ -30,7 +30,9 @@ import type {Asset} from './Asset';
 import type {File as FileAsset} from './File';
 import type {MediumImage} from './MediumImage';
 import {Message} from './Message';
-import type {Text as TextAsset} from './Text';
+import {Text as TextAsset} from './Text';
+import {AssetRepository} from '../../assets/AssetRepository';
+import {AssetTransferState} from '../../assets/AssetTransferState';
 
 export class ContentMessage extends Message {
   readonly edited_timestamp: ko.Observable<number>;
@@ -175,10 +177,18 @@ export class ContentMessage extends Message {
   /**
    * Download message content.
    */
-  download(): void {
+  download(assetRepository: AssetRepository): void {
     const asset_et = this.get_first_asset() as FileAsset | MediumImage;
     const fileName = this.get_content_name();
-    asset_et.download(fileName);
+
+    if (typeof (asset_et as MediumImage).resource === 'function') {
+      assetRepository.download((asset_et as MediumImage).resource(), fileName);
+    } else if (typeof (asset_et as FileAsset).original_resource === 'function') {
+      const fileAsset: FileAsset = asset_et;
+      fileAsset.status(AssetTransferState.DOWNLOADING);
+      assetRepository.download(fileAsset.original_resource(), fileName);
+      fileAsset.status(AssetTransferState.UPLOADED);
+    }
   }
 
   /**

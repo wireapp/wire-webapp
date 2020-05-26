@@ -21,8 +21,8 @@ import type {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 import ko from 'knockout';
 
 import {Logger, getLogger} from 'Util/Logger';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {downloadBlob} from 'Util/util';
+// import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+// import {downloadBlob} from 'Util/util';
 
 import {Asset} from './Asset';
 
@@ -36,7 +36,7 @@ type AssetMetaData = (ProtobufAsset.IAudioMetaData | ProtobufAsset.IImageMetaDat
 };
 
 export class File extends Asset {
-  private readonly original_resource: ko.Observable<AssetRemoteData>;
+  public readonly original_resource: ko.Observable<AssetRemoteData>;
   public readonly preview_resource: ko.Observable<AssetRemoteData>;
   protected logger: Logger;
   public readonly downloadProgress: ko.PureComputed<number | undefined>;
@@ -48,7 +48,7 @@ export class File extends Asset {
 
   constructor(id?: string) {
     super(id);
-    this.cancel_download = this.cancel_download.bind(this);
+    // this.cancel_download = this.cancel_download.bind(this);
 
     this.type = AssetType.FILE;
     this.logger = getLogger('File');
@@ -67,7 +67,7 @@ export class File extends Asset {
     this.original_resource = ko.observable();
     this.preview_resource = ko.observable();
 
-    this.download = this.download.bind(this);
+    // this.download = this.download.bind(this);
     this.downloadProgress = ko.pureComputed(() => {
       if (this.original_resource()) {
         return this.original_resource().downloadProgress();
@@ -79,57 +79,10 @@ export class File extends Asset {
     this.upload_failed_reason = ko.observable();
   }
 
-  /**
-   * Loads and decrypts otr asset preview
-   */
-  load_preview(): Promise<void | Blob> {
-    return this.preview_resource().load();
-  }
-
-  /**
-   * Loads and decrypts otr asset
-   */
-  async load(): Promise<void | Blob> {
-    this.status(AssetTransferState.DOWNLOADING);
-
-    try {
-      const blob = await this.original_resource().load();
-      this.status(AssetTransferState.UPLOADED);
-      return blob;
-    } catch (error) {
-      this.status(AssetTransferState.UPLOADED);
-      throw error;
-    }
-  }
-
-  /**
-   * Loads and decrypts otr asset as initiates download
-   */
-  async download(): Promise<number | void> {
-    if (this.status() !== AssetTransferState.UPLOADED) {
-      return Promise.resolve(undefined);
-    }
-
-    const download_started = Date.now();
-
-    try {
-      const blob = await this.load();
-      if (!blob) {
-        throw new Error('No blob received.');
-      }
-      const downloadedBlob = downloadBlob(blob, this.file_name);
-      const download_duration = (Date.now() - download_started) / TIME_IN_MILLIS.SECOND;
-      this.logger.info(`Downloaded asset in ${download_duration} seconds`);
-      return downloadedBlob;
-    } catch (error) {
-      return this.logger.error('Failed to download asset', error);
-    }
-  }
-
-  cancel_download(): void {
-    this.status(AssetTransferState.UPLOADED);
-    this.original_resource().cancelDownload();
-  }
+  // cancel_download(): void {
+  //   this.status(AssetTransferState.UPLOADED);
+  //   this.original_resource().cancelDownload();
+  // }
 
   reload(): void {
     this.logger.info('Restart upload');

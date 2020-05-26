@@ -23,7 +23,6 @@ import type {ContentMessage} from '../../entity/message/ContentMessage';
 import type {MediumImage} from '../../entity/message/MediumImage';
 import {viewportObserver} from '../../ui/viewportObserver';
 import {AbstractAssetTransferStateTracker} from './AbstractAssetTransferStateTracker';
-
 import './assetLoader';
 
 interface Params {
@@ -59,12 +58,12 @@ class ImageAssetComponent extends AbstractAssetTransferStateTracker {
     ko.computed(
       () => {
         if (this.isVisible() && asset.resource()) {
-          asset
-            .resource()
-            .load()
+          this.assetRepository
+            .load(asset.resource())
             .then(blob => {
               this.imageUrl(window.URL.createObjectURL(blob));
-            });
+            })
+            .catch(error => console.error(error));
         }
       },
       {disposeWhenNodeIsRemoved: element},

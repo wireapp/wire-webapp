@@ -203,7 +203,7 @@ class App {
     const selfService = new SelfService(this.apiClient);
     const sendingMessageQueue = new MessageSender();
 
-    repositories.asset = new AssetRepository(this.service.asset);
+    repositories.asset = container.resolve(AssetRepository);
     repositories.audio = new AudioRepository();
     repositories.auth = new AuthRepository(this.apiClient);
     repositories.giphy = new GiphyRepository(new GiphyService(this.apiClient));
@@ -238,7 +238,7 @@ class App {
       repositories.user,
     );
     repositories.search = new SearchRepository(new SearchService(this.apiClient), repositories.user);
-    repositories.team = new TeamRepository(new TeamService(this.apiClient), repositories.user);
+    repositories.team = new TeamRepository(new TeamService(this.apiClient), repositories.user, repositories.asset);
     repositories.eventTracker = new EventTrackingRepository(repositories.team, repositories.user);
 
     repositories.conversation = new ConversationRepository(
@@ -322,7 +322,7 @@ class App {
       : new EventService(storageService);
 
     return {
-      asset: new AssetService(this.apiClient, this.backendClient),
+      asset: container.resolve(AssetService),
       conversation: new ConversationService(this.apiClient, eventService, storageService),
       event: eventService,
       integration: new IntegrationService(this.apiClient),

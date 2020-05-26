@@ -160,7 +160,7 @@ class Server {
     this.app.use('/worker', express.static(path.join(__dirname, 'static', 'worker')));
 
     this.app.get('/favicon.ico', (req, res) => res.sendFile(path.join(__dirname, 'static', 'image', 'favicon.ico')));
-    this.app.get('/sw.js', (req, res) => res.sendFile(path.join(__dirname, 'static', 'sw.js')));
+    // this.app.get('/sw.js', (req, res) => res.sendFile(path.join(__dirname, 'static', 'sw.js')));
   }
 
   public initLatestBrowserRequired() {

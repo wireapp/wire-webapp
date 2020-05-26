@@ -18,7 +18,6 @@
  */
 
 import {getLogger} from 'Util/Logger';
-import {downloadBlob} from 'Util/util';
 
 import type {AssetRemoteData} from '../../assets/AssetRemoteData';
 import {AssetType} from '../../assets/AssetType';
@@ -41,20 +40,5 @@ export class MediumImage extends File {
 
     this.resource = ko.observable();
     this.logger = getLogger('MediumImage');
-  }
-
-  /**
-   * Loads and decrypts otr asset as initiates download
-   */
-  async download(filename?: string): Promise<number | void> {
-    try {
-      const blob = await this.resource().load();
-      if (!blob) {
-        throw new Error('No blob received.');
-      }
-      return downloadBlob(blob, filename);
-    } catch (error) {
-      return this.logger.error('Failed to download image', error);
-    }
   }
 }

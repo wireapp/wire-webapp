@@ -58,6 +58,8 @@ import type {PermissionRepository} from '../permission/PermissionRepository';
 import type {UserRepository} from '../user/UserRepository';
 import {ContentViewModel} from '../view_model/ContentViewModel';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
+import {AssetRepository} from '../assets/AssetRepository';
+import {container} from 'tsyringe';
 
 export interface Multitasking {
   autoMinimize?: ko.Observable<boolean>;
@@ -97,6 +99,7 @@ export class NotificationRepository {
   private readonly permissionState: ko.Observable<string>;
   private readonly selfUser: ko.Observable<User>;
   private readonly userRepository: UserRepository;
+  private readonly assetRepository: AssetRepository;
 
   static get CONFIG() {
     return {
@@ -124,6 +127,7 @@ export class NotificationRepository {
     permissionRepository: PermissionRepository,
     userRepository: UserRepository,
   ) {
+    this.assetRepository = container.resolve(AssetRepository);
     this.callingRepository = callingRepository;
     this.conversationRepository = conversationRepository;
     this.permissionRepository = permissionRepository;
@@ -575,18 +579,16 @@ export class NotificationRepository {
    * @param userEntity Sender of message
    * @returns Resolves with the icon URL
    */
-  private createOptionsIcon(shouldObfuscateSender: boolean, userEntity: User): Promise<string> {
+  private async createOptionsIcon(shouldObfuscateSender: boolean, userEntity: User): Promise<string> {
     const canShowUserImage = userEntity.previewPictureResource() && !shouldObfuscateSender;
     if (canShowUserImage) {
-      return userEntity
-        .previewPictureResource()
-        .generateUrl()
-        .catch((error: Error) => {
-          if (error instanceof ValidationUtilError) {
-            this.logger.error(`Failed to validate an asset URL: ${error.message}`);
-          }
-          return '';
-        });
+      try {
+        return this.assetRepository.generateAssetUrl(userEntity.previewPictureResource());
+      } catch (error) {
+        if (error instanceof ValidationUtilError) {
+          this.logger.error(`Failed to validate an asset URL: ${error.message}`);
+        }
+      }
     }
 
     const isMacOsWrapper = Environment.electron && Environment.os.mac;

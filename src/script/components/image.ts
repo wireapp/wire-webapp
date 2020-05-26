@@ -20,11 +20,14 @@
 import ko from 'knockout';
 
 import {viewportObserver} from '../ui/viewportObserver';
-import type {AssetRemoteData} from '../assets/AssetRemoteData';
+import {AssetRemoteData} from '../assets/AssetRemoteData';
+import {AssetRepository} from '../assets/AssetRepository';
+import {container} from 'tsyringe';
 
 interface ImageParams {
   asset: AssetRemoteData;
   click?: (asset: AssetRemoteData) => void;
+  assetRepository: AssetRepository;
 }
 
 class Image {
@@ -34,16 +37,19 @@ class Image {
   element: HTMLElement;
   params: ImageParams;
 
-  constructor(params: ImageParams, componentInfo: {element: HTMLElement}) {
+  constructor(
+    {assetRepository = container.resolve(AssetRepository), ...params}: ImageParams,
+    componentInfo: {element: HTMLElement},
+  ) {
     this.asset = ko.unwrap(params.asset);
     this.assetSrc = ko.observable();
     this.assetIsLoading = ko.observable(false);
     this.element = componentInfo.element;
-    this.params = params;
+    this.params = {...params, assetRepository};
 
     const _onInViewport = () => {
       this.assetIsLoading(true);
-      this.asset.load().then(blob => {
+      assetRepository.load(this.asset).then(blob => {
         if (blob) {
           this.assetSrc(window.URL.createObjectURL(blob));
         }

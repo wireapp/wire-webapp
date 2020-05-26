@@ -38,6 +38,7 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
     this.elementId = 'detail-view';
     this.mainViewModel = mainViewModel;
     this.conversationRepository = repositories.conversation;
+    this.assetRepository = repositories.asset;
 
     this.actionsViewModel = this.mainViewModel.actions;
     this.source = undefined;
@@ -171,7 +172,7 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
   }
 
   clickOnDownload() {
-    this.messageEntity().download();
+    this.messageEntity().download(this.assetRepository);
   }
 
   clickOnLike() {

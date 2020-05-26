@@ -20,7 +20,7 @@
 import type {APIClient} from '@wireapp/api-client';
 import {amplify} from 'amplify';
 import ko from 'knockout';
-import {container} from 'tsyringe';
+import {container, singleton} from 'tsyringe';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Logger, getLogger} from 'Util/Logger';
@@ -37,6 +37,7 @@ interface Settings {
   webSocketUrl: string;
 }
 
+@singleton()
 export class BackendClient {
   private readonly apiClient: APIClient;
   private connectivityTimeout: number;

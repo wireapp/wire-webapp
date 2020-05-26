@@ -236,7 +236,7 @@ export class Message {
     if (this.is_content()) {
       const assetEntity = this.get_first_asset();
 
-      if (assetEntity && typeof (assetEntity as FileAsset).download === 'function') {
+      if (assetEntity && typeof (assetEntity as FileAsset).original_resource === 'function') {
         return true;
       }
     }
