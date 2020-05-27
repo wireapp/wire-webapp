@@ -32,20 +32,20 @@ export enum SIZE {
   LARGE = 'avatar-l',
   MEDIUM = 'avatar-m',
   SMALL = 'avatar-s',
-  XXX_SMALL = 'avatar-xxxs',
-  XX_SMALL = 'avatar-xxs',
   X_LARGE = 'avatar-xl',
   X_SMALL = 'avatar-xs',
+  XX_SMALL = 'avatar-xxs',
+  XXX_SMALL = 'avatar-xxxs',
 }
 
 enum STATE {
-  SELF = 'self',
-  SELECTED = 'selected',
   BLOCKED = 'blocked',
-  PENDING = 'pending',
   IGNORED = 'ignored',
-  UNKNOWN = 'unknown',
   NONE = '',
+  PENDING = 'pending',
+  SELECTED = 'selected',
+  SELF = 'self',
+  UNKNOWN = 'unknown',
 }
 
 interface ParticipantAvatarParams {

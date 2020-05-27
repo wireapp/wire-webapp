@@ -23,11 +23,11 @@ import type {ClientEntity} from '../client/ClientEntity';
 
 interface DeviceCardParams {
   click?: (device: ClientEntity) => void;
-  device: ClientEntity | ko.Observable<ClientEntity>;
-  detailed?: boolean;
   current?: boolean;
-  showVerified?: boolean;
+  detailed?: boolean;
+  device: ClientEntity | ko.Observable<ClientEntity>;
   showIcon?: boolean;
+  showVerified?: boolean;
 }
 
 ko.components.register('device-card', {

@@ -26,8 +26,8 @@ export interface SelfState {
   error: Error;
   fetched: boolean;
   fetching: boolean;
-  self: Self;
   hasPassword: boolean;
+  self: Self;
 }
 
 export const initialSelfState: SelfState = {

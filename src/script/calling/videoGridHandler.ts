@@ -23,8 +23,8 @@ import type {Participant} from '../calling/Participant';
 
 export interface Grid {
   grid: Participant[];
-  thumbnail: Participant | null;
   hasRemoteVideo: boolean;
+  thumbnail: Participant | null;
 }
 
 export function getGrid(

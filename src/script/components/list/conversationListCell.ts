@@ -32,14 +32,14 @@ import 'Components/availabilityState';
 import type {User} from '../../entity/User';
 
 interface ConversationListCellProps {
-  showJoinButton: boolean;
-  conversation: Conversation;
-  onJoinCall: (conversation: Conversation, mediaType: MediaType) => void;
-  is_selected: (conversation: Conversation) => boolean;
   click: () => void;
+  conversation: Conversation;
   index: ko.Observable<number>;
+  is_selected: (conversation: Conversation) => boolean;
   isVisibleFunc: (top: number, bottom: number) => boolean;
   offsetTop: ko.Observable<number>;
+  onJoinCall: (conversation: Conversation, mediaType: MediaType) => void;
+  showJoinButton: boolean;
 }
 
 class ConversationListCell {

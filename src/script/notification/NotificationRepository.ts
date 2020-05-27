@@ -72,12 +72,12 @@ interface ContentViewModelState {
 interface NotificationContent {
   /** Notification options */
   options: {data: {conversationId: string; messageId: string; messageType: string}};
-  /** Function to be triggered on click */
-  trigger: Function;
-  /** Notification title */
-  title: string;
   /** Timeout for notification */
   timeout: number;
+  /** Notification title */
+  title: string;
+  /** Function to be triggered on click */
+  trigger: Function;
 }
 
 /**

@@ -18,13 +18,13 @@
  */
 
 export enum AppInitTimingsStep {
+  APP_LOADED = 'app_loaded',
+  APP_PRE_LOADED = 'app_pre_loaded',
+  INITIALIZED_CRYPTOGRAPHY = 'initialized_cryptography',
   RECEIVED_ACCESS_TOKEN = 'received_access_token',
   RECEIVED_SELF_USER = 'received_self_user',
-  INITIALIZED_CRYPTOGRAPHY = 'initialized_cryptography',
-  VALIDATED_CLIENT = 'validated_client',
   RECEIVED_USER_DATA = 'received_user_data',
-  UPDATED_FROM_NOTIFICATIONS = 'updated_from_notifications',
-  APP_PRE_LOADED = 'app_pre_loaded',
-  APP_LOADED = 'app_loaded',
   UPDATED_CONVERSATIONS = 'updated_conversations',
+  UPDATED_FROM_NOTIFICATIONS = 'updated_from_notifications',
+  VALIDATED_CLIENT = 'validated_client',
 }
