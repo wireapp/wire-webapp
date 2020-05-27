@@ -19,6 +19,7 @@
 
 import {getGrid} from 'src/script/calling/videoGridHandler';
 import {Participant} from 'src/script/calling/Participant';
+import {Call} from 'src/script/calling/Call';
 
 describe('videoGridHandler', () => {
   let participants;
@@ -63,10 +64,13 @@ describe('videoGridHandler', () => {
         ];
 
         const participantsObs = ko.observable([]);
-        const grid = getGrid(participantsObs, new Participant('self', 'selfdevice'));
+        const selfParticipant = new Participant('self', 'selfdevice');
+        const call = new Call('', '', undefined, selfParticipant);
+        call.participants = participantsObs;
+        const grid = getGrid(call);
         tests.forEach(({oldParticipants, newParticipants, expected, scenario}) => {
-          participantsObs(oldParticipants);
-          participantsObs(newParticipants);
+          participantsObs([selfParticipant, ...oldParticipants]);
+          participantsObs([selfParticipant, ...newParticipants]);
 
           expect(grid().grid.map(toParticipantId)).toEqual(expected.map(toParticipantId), scenario);
         });
@@ -76,8 +80,9 @@ describe('videoGridHandler', () => {
     describe('self user with video', () => {
       it('places the self user in the thumbnail if there is only one other participant', () => {
         const selfUser = generateVideoParticipant('self');
-
-        const grid = getGrid(ko.observable([participants[0]]), selfUser);
+        const call = new Call('', '', undefined, selfUser);
+        call.addParticipant(participants[0]);
+        const grid = getGrid(call);
 
         expect(grid().grid.map(toParticipantId)).toEqual([participants[0]].map(toParticipantId));
         expect(grid().thumbnail).toBe(selfUser);
@@ -85,8 +90,8 @@ describe('videoGridHandler', () => {
 
       it('places the self user in the grid if there are no other video participants', () => {
         const selfUser = generateVideoParticipant('self');
-
-        const grid = getGrid(ko.observable([]), selfUser);
+        const call = new Call('', '', undefined, selfUser);
+        const grid = getGrid(call);
 
         expect(grid().grid.map(toParticipantId)).toEqual([selfUser].map(toParticipantId));
         expect(grid().thumbnail).toBe(null);
@@ -94,8 +99,10 @@ describe('videoGridHandler', () => {
 
       it('places the self user in the grid if there are more than 1 other participant', () => {
         const selfUser = generateVideoParticipant('self');
-
-        const grid = getGrid(ko.observable([participants[0], participants[1]]), selfUser);
+        const call = new Call('', '', undefined, selfUser);
+        call.addParticipant(participants[0]);
+        call.addParticipant(participants[1]);
+        const grid = getGrid(call);
 
         expect(grid().grid.map(toParticipantId)).toEqual(
           [selfUser, participants[0], participants[1]].map(toParticipantId),

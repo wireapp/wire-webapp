@@ -112,12 +112,12 @@ describe('CallingRepository', () => {
 
   describe('getCallMediaStream', () => {
     it('return cached mediastream for self user if set', () => {
-      const call = new Call();
+      const selfParticipant = new Participant();
+      const call = new Call('', '', undefined, selfParticipant);
       const audioTrack = silence();
       const selfMediaStream = new MediaStream([audioTrack]);
-      call.selfParticipant = new Participant();
-      call.selfParticipant.audioStream(selfMediaStream);
-      spyOn(call.selfParticipant, 'getMediaStream').and.callThrough();
+      selfParticipant.audioStream(selfMediaStream);
+      spyOn(selfParticipant, 'getMediaStream').and.callThrough();
       spyOn(callingRepository, 'findCall').and.returnValue(call);
 
       const queries = [1, 2, 3, 4].map(() => {
@@ -126,15 +126,15 @@ describe('CallingRepository', () => {
         });
       });
       return Promise.all(queries).then(() => {
-        expect(call.selfParticipant.getMediaStream).toHaveBeenCalledTimes(queries.length);
+        expect(selfParticipant.getMediaStream).toHaveBeenCalledTimes(queries.length);
       });
     });
 
     it('ask only once for mediastream when queried multiple times', () => {
-      const call = new Call();
+      const selfParticipant = new Participant();
+      const call = new Call('', '', undefined, selfParticipant);
       const audioTrack = silence();
       const selfMediaStream = new MediaStream([audioTrack]);
-      call.selfParticipant = new Participant();
       spyOn(callingRepository.mediaStreamHandler, 'requestMediaStream').and.returnValue(
         Promise.resolve(selfMediaStream),
       );

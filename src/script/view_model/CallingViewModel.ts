@@ -149,7 +149,7 @@ export class CallingViewModel {
 
     this.callActions = {
       answer: (call: Call) => {
-        const callType = call.selfParticipant.sharesCamera() ? call.initialType : CALL_TYPE.NORMAL;
+        const callType = call.getSelfParticipant().sharesCamera() ? call.initialType : CALL_TYPE.NORMAL;
         this.callingRepository.answerCall(call, callType);
       },
       leave: (call: Call) => {
@@ -177,7 +177,7 @@ export class CallingViewModel {
         this.callingRepository.muteCall(call.conversationId, muteState);
       },
       toggleScreenshare: (call: Call) => {
-        if (call.selfParticipant.sharesScreen()) {
+        if (call.getSelfParticipant().sharesScreen()) {
           return this.callingRepository.toggleScreenshare(call);
         }
         const showScreenSelection = (): Promise<void> => {
@@ -282,12 +282,11 @@ export class CallingViewModel {
   }
 
   getVideoGrid(call: Call): ko.PureComputed<Grid> {
-    return getGrid(call.participants, call.selfParticipant);
+    return getGrid(call);
   }
 
   hasVideos(call: Call): boolean {
-    const callParticipants = call.participants().concat(call.selfParticipant);
-    return !!callParticipants.find(participant => participant.hasActiveVideo());
+    return !!call.participants().find(participant => participant.hasActiveVideo());
   }
 
   isIdle(call: Call): boolean {

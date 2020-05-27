@@ -21,11 +21,11 @@ import {VIDEO_STATE} from '@wireapp/avs';
 import ko from 'knockout';
 
 export type UserId = string;
-export type DeviceId = string;
+export type ClientId = string;
 
 export class Participant {
   public userId: UserId;
-  public deviceId: DeviceId;
+  public clientId: ClientId;
   public videoState: ko.Observable<number>;
   public videoStream: ko.Observable<MediaStream | undefined>;
   public audioStream: ko.Observable<MediaStream | undefined>;
@@ -34,9 +34,9 @@ export class Participant {
   public sharesCamera: ko.PureComputed<boolean>;
   public hasPausedVideo: ko.PureComputed<boolean>;
 
-  constructor(userId: UserId, deviceId: DeviceId) {
+  constructor(userId: UserId, clientId: ClientId) {
     this.userId = userId;
-    this.deviceId = deviceId;
+    this.clientId = clientId;
     this.videoState = ko.observable(VIDEO_STATE.STOPPED);
     this.hasActiveVideo = ko.pureComputed(() => {
       return (this.sharesCamera() || this.sharesScreen()) && !!this.videoStream();

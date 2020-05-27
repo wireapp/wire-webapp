@@ -39,6 +39,7 @@ import type {Conversation} from '../../entity/Conversation';
 import type {User} from '../../entity/User';
 import type {CallActions} from '../../view_model/CallingViewModel';
 import type {Multitasking} from '../../notification/NotificationRepository';
+import {Participant} from '../../calling/Participant';
 
 interface ComponentParams {
   call: Call;
@@ -83,6 +84,7 @@ class ConversationListCallingCell {
   readonly videoGrid: ko.PureComputed<Grid>;
   readonly isSelfVerified: ko.Subscribable<boolean>;
   readonly users: ko.PureComputed<User[]>;
+  readonly selfParticipant: Participant;
 
   constructor({
     call,
@@ -157,8 +159,9 @@ class ConversationListCallingCell {
     this.showVideoButton = ko.pureComputed(() => call.initialType === CALL_TYPE.VIDEO || this.isOngoing());
     this.disableScreenButton = !this.callingRepository.supportsScreenSharing;
     this.disableVideoButton = ko.pureComputed(() => {
-      const isOutgoingVideoCall = this.isOutgoing() && call.selfParticipant.sharesCamera();
-      const isVideoUnsupported = !call.selfParticipant.sharesCamera() && !conversation().supportsVideoCall(true);
+      const selfParticipant = call.getSelfParticipant();
+      const isOutgoingVideoCall = this.isOutgoing() && selfParticipant.sharesCamera();
+      const isVideoUnsupported = !selfParticipant.sharesCamera() && !conversation().supportsVideoCall(true);
       return isOutgoingVideoCall || isVideoUnsupported;
     });
 
@@ -167,8 +170,13 @@ class ConversationListCallingCell {
     });
 
     this.users = ko.pureComputed(() =>
-      [call.selfParticipant, ...call.participants()].map(({userId}) => this.findUser(userId)).sort(sortUsersByPriority),
+      call
+        .participants()
+        .map(({userId}) => this.findUser(userId))
+        .sort(sortUsersByPriority),
     );
+
+    this.selfParticipant = call.getSelfParticipant();
 
     this.dispose = () => {
       window.clearInterval(callDurationUpdateInterval);
@@ -251,7 +259,7 @@ ko.components.register('conversation-list-calling-cell', {
 
     <!-- ko if: showVideoGrid() -->
       <div class="group-video__minimized-wrapper" data-bind="click: showFullscreenVideoGrid">
-        <group-video-grid params="minimized: true, grid: videoGrid, selfUserId: call.selfParticipant.userId"></group-video-grid>
+        <group-video-grid params="minimized: true, grid: videoGrid, selfUserId: selfParticipant.userId"></group-video-grid>
         <!-- ko if: showMaximize() -->
           <div class="group-video__minimized-wrapper__overlay" data-uie-name="do-maximize-call">
             <fullscreen-icon></fullscreen-icon>
@@ -271,7 +279,7 @@ ko.components.register('conversation-list-calling-cell', {
             <micoff-icon class="small-icon"></micoff-icon>
           </button>
           <!-- ko if: showVideoButton() -->
-            <button class="call-ui__button" data-bind="click: () => callActions.toggleCamera(call), css: {'call-ui__button--active': call.selfParticipant.sharesCamera()}, disable: disableVideoButton(), attr: {'data-uie-value': call.selfParticipant.sharesCamera() ? 'active' : 'inactive', 'title': t('videoCallOverlayVideo')}" data-uie-name="do-toggle-video">
+            <button class="call-ui__button" data-bind="click: () => callActions.toggleCamera(call), css: {'call-ui__button--active': selfParticipant.sharesCamera()}, disable: disableVideoButton(), attr: {'data-uie-value': selfParticipant.sharesCamera() ? 'active' : 'inactive', 'title': t('videoCallOverlayVideo')}" data-uie-name="do-toggle-video">
               <camera-icon class="small-icon"></camera-icon>
             </button>
           <!-- /ko -->
@@ -280,8 +288,8 @@ ko.components.register('conversation-list-calling-cell', {
               data-bind="tooltip: {text: t('videoCallScreenShareNotSupported'),
                 disabled: !disableScreenButton, position: 'bottom'},
                 click: () => callActions.toggleScreenshare(call),
-                css: {'call-ui__button--active': call.selfParticipant.sharesScreen(), 'call-ui__button--disabled': disableScreenButton},
-                attr: {'data-uie-value': call.selfParticipant.sharesScreen() ? 'active' : 'inactive', 'data-uie-enabled': disableScreenButton ? 'false' : 'true', title: t('videoCallOverlayShareScreen')}"
+                css: {'call-ui__button--active': selfParticipant.sharesScreen(), 'call-ui__button--disabled': disableScreenButton},
+                attr: {'data-uie-value': selfParticipant.sharesScreen() ? 'active' : 'inactive', 'data-uie-enabled': disableScreenButton ? 'false' : 'true', title: t('videoCallOverlayShareScreen')}"
               data-uie-name="do-call-controls-toggle-screenshare">
               <screenshare-icon class="small-icon"></screenshare-icon>
             </div>
