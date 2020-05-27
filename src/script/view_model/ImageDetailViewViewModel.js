@@ -23,15 +23,12 @@ import {formatLocale} from 'Util/TimeUtil';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {Modal} from '../ui/Modal';
-import {container} from 'tsyringe';
-import {AssetRepository} from '../assets/AssetRepository';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 
 z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
   constructor(mainViewModel, repositories) {
-    this.assetRepository = container.resolve(AssetRepository);
     this.beforeHideCallback = this.beforeHideCallback.bind(this);
     this.hideCallback = this.hideCallback.bind(this);
     this.messageAdded = this.messageAdded.bind(this);
