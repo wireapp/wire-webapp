@@ -20,7 +20,7 @@
 import {CALL_TYPE, CONV_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 import ko from 'knockout';
 
-import type {Participant, UserId, DeviceId} from './Participant';
+import type {Participant, UserId, ClientId} from './Participant';
 
 export type ConversationId = string;
 
@@ -56,7 +56,7 @@ export class Call {
 
   getSelfParticipant(): Participant {
     return this.participants().find(
-      ({userId, deviceId}) => this.selfParticipant.userId === userId && this.selfParticipant.deviceId === deviceId,
+      ({userId, clientId}) => this.selfParticipant.userId === userId && this.selfParticipant.clientId === clientId,
     );
   }
 
@@ -64,8 +64,8 @@ export class Call {
     this.participants.push(participant);
   }
 
-  getParticipant(userId: UserId, deviceId: DeviceId): Participant {
-    return this.participants().find(participant => participant.userId === userId && deviceId === participant.deviceId);
+  getParticipant(userId: UserId, clientId: ClientId): Participant {
+    return this.participants().find(participant => participant.userId === userId && clientId === participant.clientId);
   }
 
   removeParticipant(participant: Participant): void {
