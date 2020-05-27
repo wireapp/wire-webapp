@@ -23,12 +23,15 @@ import {formatLocale} from 'Util/TimeUtil';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {Modal} from '../ui/Modal';
+import {container} from 'tsyringe';
+import {AssetRepository} from '../assets/AssetRepository';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 
 z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
   constructor(mainViewModel, repositories) {
+    this.assetRepository = container.resolve(AssetRepository);
     this.beforeHideCallback = this.beforeHideCallback.bind(this);
     this.hideCallback = this.hideCallback.bind(this);
     this.messageAdded = this.messageAdded.bind(this);
@@ -155,16 +158,12 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
 
   _loadImage() {
     this.imageVisible(false);
-    this.messageEntity()
-      .get_first_asset()
-      .resource()
-      .load()
-      .then(blob => {
-        if (blob) {
-          this.imageSrc(window.URL.createObjectURL(blob));
-          this.imageVisible(true);
-        }
-      });
+    this.assetRepository.load(this.messageEntity().get_first_asset().resource()).then(blob => {
+      if (blob) {
+        this.imageSrc(window.URL.createObjectURL(blob));
+        this.imageVisible(true);
+      }
+    });
   }
 
   clickOnClose() {
