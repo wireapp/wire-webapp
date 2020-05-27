@@ -78,23 +78,12 @@ describe('videoGridHandler', () => {
     });
 
     describe('self user with video', () => {
-      it('places the self user in the thumbnail if there is only one other participant', () => {
-        const selfUser = generateVideoParticipant('self');
-        const call = new Call('', '', undefined, selfUser);
-        call.addParticipant(participants[0]);
-        const grid = getGrid(call);
-
-        expect(grid().grid.map(toParticipantId)).toEqual([participants[0]].map(toParticipantId));
-        expect(grid().thumbnail).toBe(selfUser);
-      });
-
       it('places the self user in the grid if there are no other video participants', () => {
         const selfUser = generateVideoParticipant('self');
         const call = new Call('', '', undefined, selfUser);
         const grid = getGrid(call);
 
         expect(grid().grid.map(toParticipantId)).toEqual([selfUser].map(toParticipantId));
-        expect(grid().thumbnail).toBe(null);
       });
 
       it('places the self user in the grid if there are more than 1 other participant', () => {
@@ -107,8 +96,6 @@ describe('videoGridHandler', () => {
         expect(grid().grid.map(toParticipantId)).toEqual(
           [selfUser, participants[0], participants[1]].map(toParticipantId),
         );
-
-        expect(grid().thumbnail).toBe(null);
       });
     });
   });

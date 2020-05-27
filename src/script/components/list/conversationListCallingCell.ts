@@ -150,7 +150,7 @@ class ConversationListCallingCell {
 
     const hasVideoGrid = () => {
       const grid = this.videoGrid();
-      return grid.grid.filter(participant => !!participant).length > 0 || grid.thumbnail;
+      return grid.grid.filter(participant => !!participant).length > 0;
     };
     this.showVideoGrid = ko.pureComputed(() => {
       return hasVideoGrid() && (this.multitasking.isMinimized() || !this.isOngoing());

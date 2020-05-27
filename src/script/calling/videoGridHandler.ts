@@ -25,31 +25,20 @@ import {Call} from './Call';
 export interface Grid {
   grid: Participant[];
   hasRemoteVideo: boolean;
-  thumbnail: Participant | null;
 }
 
 export function getGrid(call: Call): ko.PureComputed<Grid> {
   return ko.pureComputed(() => {
-    let inGridParticipants: Participant[];
-    let thumbnailParticipant: Participant | null;
     const selfParticipant = call.getSelfParticipant();
     const remoteParticipants = call.participants().filter(participant => participant !== selfParticipant);
-
     const remoteVideoParticipants = remoteParticipants.filter(participant => participant.hasActiveVideo());
-    if (remoteVideoParticipants.length === 1) {
-      inGridParticipants = remoteVideoParticipants;
-      thumbnailParticipant = selfParticipant.hasActiveVideo() ? selfParticipant : null;
-    } else {
-      inGridParticipants = selfParticipant.hasActiveVideo()
-        ? [selfParticipant, ...remoteVideoParticipants]
-        : remoteVideoParticipants;
-      thumbnailParticipant = null;
-    }
+    const grid = selfParticipant.hasActiveVideo()
+      ? [selfParticipant, ...remoteVideoParticipants]
+      : remoteVideoParticipants;
 
     return {
-      grid: inGridParticipants,
+      grid,
       hasRemoteVideo: remoteVideoParticipants.length > 0,
-      thumbnail: thumbnailParticipant,
     };
   });
 }
