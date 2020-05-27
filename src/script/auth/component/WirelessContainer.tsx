@@ -27,8 +27,8 @@ import SVGProvider from '../util/SVGProvider';
 import {Config} from '../../Config';
 
 export interface Props extends React.HTMLAttributes<HTMLDivElement> {
-  showCookiePolicyBanner?: boolean;
   onCookiePolicyBannerClose?: (event: React.MouseEvent<HTMLElement>) => void;
+  showCookiePolicyBanner?: boolean;
 }
 
 export const WirelessContainer: React.SFC<Props> = ({showCookiePolicyBanner, onCookiePolicyBannerClose, children}) => {

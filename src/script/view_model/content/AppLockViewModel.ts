@@ -33,10 +33,10 @@ import {Config} from '../../Config';
 import type {User} from '../../entity/User';
 
 export enum APPLOCK_STATE {
+  FORGOT = 'applock.forgot',
+  LOCKED = 'applock.locked',
   NONE = 'applock.none',
   SETUP = 'applock.setup',
-  LOCKED = 'applock.locked',
-  FORGOT = 'applock.forgot',
   WIPE_CONFIRM = 'applock.wipe-confirm',
   WIPE_PASSWORD = 'applock.wipe-password',
 }

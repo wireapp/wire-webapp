@@ -23,9 +23,9 @@ import type {Conversation} from '../entity/Conversation';
 import type {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
 
 interface LegalHoldParams {
+  conversation?: Conversation;
   isPending?: ko.Observable<boolean>;
   large?: boolean;
-  conversation?: Conversation;
   legalHoldModal?: LegalHoldModalViewModel;
 }
 
