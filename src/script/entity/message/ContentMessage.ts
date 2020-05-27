@@ -179,14 +179,13 @@ export class ContentMessage extends Message {
    */
   download(assetRepository: AssetRepository): void {
     const asset_et = this.get_first_asset() as FileAsset | MediumImage;
-    const fileName = this.get_content_name();
 
     if (typeof (asset_et as MediumImage).resource === 'function') {
-      assetRepository.download((asset_et as MediumImage).resource(), fileName);
+      assetRepository.download((asset_et as MediumImage).resource(), this.get_content_name());
     } else if (typeof (asset_et as FileAsset).original_resource === 'function') {
       const fileAsset: FileAsset = asset_et;
       fileAsset.status(AssetTransferState.DOWNLOADING);
-      assetRepository.download(fileAsset.original_resource(), fileName);
+      assetRepository.download(fileAsset.original_resource(), asset_et.file_name);
       fileAsset.status(AssetTransferState.UPLOADED);
     }
   }
