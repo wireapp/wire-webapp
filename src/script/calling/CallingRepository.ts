@@ -63,6 +63,8 @@ import type {User} from '../entity/User';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import {Call, ConversationId} from './Call';
 import {DeviceId, Participant, UserId} from './Participant';
+import type {Recipients} from '../cryptography/CryptographyRepository';
+import type {Conversation} from '../entity/Conversation';
 
 interface MediaStreamQuery {
   audio?: boolean;
@@ -130,11 +132,11 @@ export class CallingRepository {
     this.subscribeToEvents();
   }
 
-  getStats(conversationId: ConversationId): Promise<{userid: UserId; stats: RTCStatsReport}[]> {
+  getStats(conversationId: ConversationId): Promise<{stats: RTCStatsReport; userid: UserId}[]> {
     return this.wCall.getStats(conversationId);
   }
 
-  initAvs(selfUser: any, clientId: DeviceId): Promise<{wCall: Wcall; wUser: number}> {
+  initAvs(selfUser: User, clientId: DeviceId): Promise<{wCall: Wcall; wUser: number}> {
     this.selfUser = selfUser;
     this.selfClientId = clientId;
     return getAvsInstance().then(callingInstance => {
@@ -429,7 +431,7 @@ export class CallingRepository {
   //##############################################################################
 
   toggleState(withVideo: boolean): void {
-    const conversationEntity: any = this.conversationRepository.active_conversation();
+    const conversationEntity: Conversation | undefined = this.conversationRepository.active_conversation();
     if (conversationEntity) {
       const isActiveCall = this.findCall(conversationEntity.id);
       const isGroupCall = conversationEntity.isGroup() ? CONV_TYPE.GROUP : CONV_TYPE.ONEONONE;
@@ -741,7 +743,7 @@ export class CallingRepository {
       return;
     }
 
-    const {members}: {members: {userid: UserId; clientid: DeviceId}[]} = JSON.parse(membersJson);
+    const {members}: {members: {clientid: DeviceId; userid: UserId}[]} = JSON.parse(membersJson);
     const newMembers = members
       .filter(({userid}) => !this.findParticipant(conversationId, userid))
       .map(({userid, clientid}) => new Participant(userid, clientid));
@@ -869,7 +871,7 @@ export class CallingRepository {
     payload: string,
     remoteUserId: UserId | null,
     remoteClientId: DeviceId | null,
-  ): {precondition?: boolean | string[]; recipients: Record<string, string[]>} {
+  ): {precondition?: boolean | string[]; recipients: Recipients} {
     const {type, resp} = JSON.parse(payload);
     let precondition;
     let recipients;
@@ -904,7 +906,7 @@ export class CallingRepository {
         // Send to all clients of self user
         precondition = [this.selfUser.id];
         recipients = {
-          [this.selfUser.id]: this.selfUser.devices().map((device: any) => device.id),
+          [this.selfUser.id]: this.selfUser.devices().map(device => device.id),
         };
         break;
       }
@@ -915,7 +917,7 @@ export class CallingRepository {
           precondition = [this.selfUser.id];
           recipients = {
             [remoteUserId]: [`${remoteClientId}`],
-            [this.selfUser.id]: this.selfUser.devices().map((device: any) => device.id),
+            [this.selfUser.id]: this.selfUser.devices().map(device => device.id),
           };
         }
         break;

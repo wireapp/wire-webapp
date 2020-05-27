@@ -297,7 +297,7 @@ export const EventBuilder = {
       type: ClientEvent.CONVERSATION.TEAM_MEMBER_LEAVE,
     };
   },
-  buildUnableToDecrypt(event: any, decryptionError: Error, errorCode: number): ErrorEvent {
+  buildUnableToDecrypt(event: any, decryptionError: Error, errorCode: number | string): ErrorEvent {
     const {conversation: conversationId, data: eventData, from, time} = event;
 
     return {
@@ -347,7 +347,3 @@ export const EventBuilder = {
     };
   },
 };
-
-window.z = window.z || {};
-window.z.conversation = window.z.conversation || {};
-window.z.conversation.EventBuilder = EventBuilder;

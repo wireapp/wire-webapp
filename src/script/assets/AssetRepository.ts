@@ -17,23 +17,25 @@
  *
  */
 
+import {Asset} from '@wireapp/protocol-messaging';
+import {LegalHoldStatus} from '@wireapp/protocol-messaging';
+
 import {Environment} from 'Util/Environment';
 import {Logger, getLogger} from 'Util/Logger';
 import {AssetService} from './AssetService';
 import {loadFileBuffer, loadImage, downloadBlob} from 'Util/util';
 import {WebWorker} from 'Util/worker';
-import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {AssetOptions, AssetRetentionPolicy} from '@wireapp/api-client/dist/asset';
 import {Conversation} from '../entity/Conversation';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {encryptAesAsset, EncryptedAsset, decryptAesAsset} from './AssetCrypto';
 import {AssetUploadData} from '@wireapp/api-client/dist/asset';
-import {Asset} from '@wireapp/protocol-messaging';
 import {AssetRemoteData} from './AssetRemoteData';
 import {getAssetUrl, setAssetUrl} from './AssetURLCache';
 import {BackendClientError} from '../error/BackendClientError';
 import {ValidationUtilError} from 'Util/ValidationUtil';
 import {singleton, container} from 'tsyringe';
+import type {User} from '../entity/User';
 
 export interface CompressedImage {
   compressedBytes: Uint8Array;
@@ -242,12 +244,12 @@ export class AssetRepository {
     };
   }
 
-  getAssetRetention(userEntity: any, conversationEntity: Conversation): AssetRetentionPolicy {
+  getAssetRetention(userEntity: User, conversationEntity: Conversation): AssetRetentionPolicy {
     const isTeamMember = userEntity.inTeam();
     const isTeamConversation = conversationEntity.inTeam();
     const isTeamUserInConversation = conversationEntity
       .participating_user_ets()
-      .some((conversationParticipant: any) => conversationParticipant.inTeam());
+      .some(conversationParticipant => conversationParticipant.inTeam());
 
     const isEternal = isTeamMember || isTeamConversation || isTeamUserInConversation;
     return isEternal ? AssetRetentionPolicy.ETERNAL : AssetRetentionPolicy.PERSISTENT;

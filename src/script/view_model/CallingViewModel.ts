@@ -74,6 +74,7 @@ export class CallingViewModel {
   readonly multitasking: Multitasking;
   readonly permissionRepository: PermissionRepository;
   readonly selectableScreens: ko.Observable<ElectronDesktopCapturerSource[]>;
+  readonly selectableWindows: ko.Observable<ElectronDesktopCapturerSource[]>;
   readonly isSelfVerified: ko.Computed<boolean>;
 
   constructor(
@@ -98,7 +99,10 @@ export class CallingViewModel {
       callingRepository.activeCalls().filter(call => call.reason() !== CALL_REASON.ANSWERED_ELSEWHERE),
     );
     this.selectableScreens = ko.observable([]);
-    this.isChoosingScreen = ko.pureComputed(() => this.selectableScreens().length > 0);
+    this.selectableWindows = ko.observable([]);
+    this.isChoosingScreen = ko.pureComputed(
+      () => this.selectableScreens().length > 0 || this.selectableWindows().length > 0,
+    );
     this.multitasking = multitasking;
 
     this.onChooseScreen = () => {};
@@ -126,7 +130,7 @@ export class CallingViewModel {
       });
     };
 
-    const startCall = (conversationEntity: any, callType: CALL_TYPE): void => {
+    const startCall = (conversationEntity: Conversation, callType: CALL_TYPE): void => {
       const convType = conversationEntity.isGroup() ? CONV_TYPE.GROUP : CONV_TYPE.ONEONONE;
       this.callingRepository.startCall(conversationEntity.id, convType, callType).then(call => {
         if (!call) {
@@ -154,10 +158,10 @@ export class CallingViewModel {
       reject: (call: Call) => {
         this.callingRepository.rejectCall(call.conversationId);
       },
-      startAudio: (conversationEntity: any): void => {
+      startAudio: (conversationEntity: Conversation): void => {
         startCall(conversationEntity, CALL_TYPE.NORMAL);
       },
-      startVideo(conversationEntity: any): void {
+      startVideo(conversationEntity: Conversation): void {
         startCall(conversationEntity, CALL_TYPE.VIDEO);
       },
       switchCameraInput: (call: Call, deviceId: string) => {
@@ -181,13 +185,15 @@ export class CallingViewModel {
             this.onChooseScreen = (deviceId: string): void => {
               this.mediaDevicesHandler.currentDeviceId.screenInput(deviceId);
               this.selectableScreens([]);
+              this.selectableWindows([]);
               resolve();
             };
             this.mediaDevicesHandler.getScreenSources().then((sources: ElectronDesktopCapturerSource[]) => {
               if (sources.length === 1) {
                 return this.onChooseScreen(sources[0].id);
               }
-              this.selectableScreens(sources);
+              this.selectableScreens(sources.filter(source => source.id.startsWith('screen')));
+              this.selectableWindows(sources.filter(source => source.id.startsWith('window')));
             });
           });
         };
@@ -314,5 +320,6 @@ export class CallingViewModel {
 
   onCancelScreenSelection = () => {
     this.selectableScreens([]);
+    this.selectableWindows([]);
   };
 }

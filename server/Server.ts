@@ -22,7 +22,9 @@ import * as express from 'express';
 import * as hbs from 'hbs';
 import * as helmet from 'helmet';
 import * as http from 'http';
+import * as https from 'https';
 import * as path from 'path';
+import * as fs from 'fs';
 
 import {HealthCheckRoute} from './routes/_health/HealthRoute';
 import {AppleAssociationRoute} from './routes/appleassociation/AppleAssociationRoute';
@@ -39,7 +41,7 @@ const STATUS_CODE_FOUND = 302;
 
 class Server {
   private readonly app: express.Express;
-  private server?: http.Server;
+  private server?: http.Server | https.Server;
 
   constructor(private readonly config: ServerConfig) {
     if (this.config.SERVER.DEVELOPMENT) {
@@ -72,14 +74,16 @@ class Server {
   }
 
   private initWebpack() {
-    if (this.config.SERVER.DEVELOPMENT) {
-      const webpackCompiler = require('webpack')(require('../../webpack.config.dev'));
-      const webpackDevMiddleware = require('webpack-dev-middleware');
-      const webpackHotMiddleware = require('webpack-hot-middleware');
-
-      this.app.use(webpackDevMiddleware(webpackCompiler));
-      this.app.use(webpackHotMiddleware(webpackCompiler));
+    if (!this.config.SERVER.DEVELOPMENT) {
+      return;
     }
+
+    const webpackCompiler = require('webpack')(require('../../webpack.config.dev'));
+    const webpackDevMiddleware = require('webpack-dev-middleware');
+    const webpackHotMiddleware = require('webpack-hot-middleware');
+
+    this.app.use(webpackDevMiddleware(webpackCompiler));
+    this.app.use(webpackHotMiddleware(webpackCompiler));
   }
 
   private initCaching() {
@@ -150,17 +154,17 @@ class Server {
   private initStaticRoutes() {
     this.app.use(RedirectRoutes(this.config));
 
-    this.app.use('/audio', express.static(path.join(__dirname, 'static', 'audio')));
-    this.app.use('/ext', express.static(path.join(__dirname, 'static', 'ext')));
-    this.app.use('/font', express.static(path.join(__dirname, 'static', 'font')));
-    this.app.use('/image', express.static(path.join(__dirname, 'static', 'image')));
-    this.app.use('/min', express.static(path.join(__dirname, 'static', 'min')));
-    this.app.use('/proto', express.static(path.join(__dirname, 'static', 'proto')));
-    this.app.use('/style', express.static(path.join(__dirname, 'static', 'style')));
-    this.app.use('/worker', express.static(path.join(__dirname, 'static', 'worker')));
+    this.app.use('/audio', express.static(path.join(__dirname, 'static/audio')));
+    this.app.use('/ext', express.static(path.join(__dirname, 'static/ext')));
+    this.app.use('/font', express.static(path.join(__dirname, 'static/font')));
+    this.app.use('/image', express.static(path.join(__dirname, 'static/image')));
+    this.app.use('/min', express.static(path.join(__dirname, 'static/min')));
+    this.app.use('/proto', express.static(path.join(__dirname, 'static/proto')));
+    this.app.use('/style', express.static(path.join(__dirname, 'static/style')));
+    this.app.use('/worker', express.static(path.join(__dirname, 'static/worker')));
 
-    this.app.get('/favicon.ico', (req, res) => res.sendFile(path.join(__dirname, 'static', 'image', 'favicon.ico')));
-    // this.app.get('/sw.js', (req, res) => res.sendFile(path.join(__dirname, 'static', 'sw.js')));
+    this.app.get('/favicon.ico', (_req, res) => res.sendFile(path.join(__dirname, 'static/image/favicon.ico')));
+    // this.app.get('/sw.js', (_req, res) => res.sendFile(path.join(__dirname, 'static/sw.js')));
   }
 
   public initLatestBrowserRequired() {
@@ -218,7 +222,17 @@ class Server {
       if (this.server) {
         reject('Server is already running.');
       } else if (this.config.SERVER.PORT_HTTP) {
-        this.server = this.app.listen(this.config.SERVER.PORT_HTTP, () => resolve(this.config.SERVER.PORT_HTTP));
+        if (this.config.SERVER.DEVELOPMENT) {
+          const options = {
+            cert: fs.readFileSync(this.config.SERVER.SSL_CERTIFICATE_PATH),
+            key: fs.readFileSync(this.config.SERVER.SSL_CERTIFICATE_KEY_PATH),
+          };
+          this.server = https
+            .createServer(options, this.app)
+            .listen(this.config.SERVER.PORT_HTTP, () => resolve(this.config.SERVER.PORT_HTTP));
+        } else {
+          this.server = this.app.listen(this.config.SERVER.PORT_HTTP, () => resolve(this.config.SERVER.PORT_HTTP));
+        }
       } else {
         reject('Server port not specified.');
       }

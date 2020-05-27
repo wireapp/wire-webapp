@@ -18,7 +18,7 @@
  */
 
 export function getIceCandidatesTypes(iceCandidates: string[]): Record<string, number> {
-  return iceCandidates.reduce((types: Record<string, number>, candidateStr) => {
+  return iceCandidates.reduce<Record<string, number>>((types, candidateStr) => {
     const typeMatches = candidateStr.match(/typ (\w+)/);
     if (!typeMatches) {
       return types;

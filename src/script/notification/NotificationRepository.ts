@@ -17,7 +17,7 @@
  *
  */
 
-import {NotificationPreference} from '@wireapp/api-client/dist/user/data';
+import {NotificationPreference, WebappProperties} from '@wireapp/api-client/dist/user/data';
 import {Availability} from '@wireapp/protocol-messaging';
 import {amplify} from 'amplify';
 import ko from 'knockout';
@@ -74,12 +74,12 @@ interface ContentViewModelState {
 interface NotificationContent {
   /** Notification options */
   options: {data: {conversationId: string; messageId: string; messageType: string}};
-  /** Function to be triggered on click */
-  trigger: Function;
-  /** Notification title */
-  title: string;
   /** Timeout for notification */
   timeout: number;
+  /** Notification title */
+  title: string;
+  /** Function to be triggered on click */
+  trigger: Function;
 }
 
 /**
@@ -96,7 +96,7 @@ export class NotificationRepository {
   private readonly notifications: any[];
   private readonly notificationsPreference: ko.Observable<NotificationPreference>;
   private readonly permissionRepository: PermissionRepository;
-  private readonly permissionState: ko.Observable<string>;
+  private readonly permissionState: ko.Observable<PermissionState | PermissionStatusState>;
   private readonly selfUser: ko.Observable<User>;
   private readonly userRepository: UserRepository;
   private readonly assetRepository: AssetRepository;
@@ -188,7 +188,7 @@ export class NotificationRepository {
       return shouldRequestPermission ? this._requestPermission() : this.checkPermissionState();
     }
 
-    const currentPermission = window.Notification.permission;
+    const currentPermission = window.Notification.permission as PermissionState;
     const shouldRequestPermission = currentPermission === PermissionState.DEFAULT;
     return shouldRequestPermission ? this._requestPermission() : this.updatePermissionState(currentPermission);
   }
@@ -261,7 +261,7 @@ export class NotificationRepository {
     });
   }
 
-  updatedProperties(properties: any): void {
+  updatedProperties(properties: WebappProperties): void {
     const notificationPreference = properties.settings.notifications;
     return this.notificationsPreference(notificationPreference);
   }
@@ -275,7 +275,7 @@ export class NotificationRepository {
    * @param permissionState State of browser permission
    * @returns Resolves with `true` if notifications are enabled
    */
-  updatePermissionState(permissionState: string): Promise<boolean> {
+  updatePermissionState(permissionState: PermissionState | PermissionStatusState): Promise<boolean> {
     this.permissionState(permissionState);
     return this.checkPermissionState();
   }
@@ -758,7 +758,7 @@ export class NotificationRepository {
     // Note: The callback will be only triggered in Chrome.
     // If you ignore a permission request on Firefox, then the callback will not be triggered.
     if (window.Notification.requestPermission) {
-      const permissionState = await window.Notification.requestPermission();
+      const permissionState = (await window.Notification.requestPermission()) as PermissionState;
       amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.REQUEST_NOTIFICATION);
       await this.updatePermissionState(permissionState);
     }

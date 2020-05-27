@@ -40,8 +40,8 @@ import 'Components/deviceCard';
 
 export interface UserDevicesHistory {
   current: ko.PureComputed<UserDevicesState>;
-  goTo: (to: UserDevicesState, head: string) => void;
   goBack: () => void;
+  goTo: (to: UserDevicesState, head: string) => void;
   headline: ko.PureComputed<string>;
   reset: () => void;
 }
@@ -50,9 +50,9 @@ interface UserDevicesParams {
   clientRepository: ClientRepository;
   conversationRepository: ConversationRepository;
   cryptographyRepository: CryptographyRepository;
-  userEntity: ko.Observable<User>;
   history: UserDevicesHistory;
   noPadding?: boolean;
+  userEntity: ko.Observable<User>;
 }
 
 enum FIND_MODE {
@@ -62,8 +62,8 @@ enum FIND_MODE {
 }
 
 export enum UserDevicesState {
-  DEVICE_LIST = 'UserDevices.DEVICE_LIST',
   DEVICE_DETAILS = 'UserDevices.DEVICE_DETAILS',
+  DEVICE_LIST = 'UserDevices.DEVICE_LIST',
   SELF_FINGERPRINT = 'UserDevices.SELF_FINGERPRINT',
 }
 

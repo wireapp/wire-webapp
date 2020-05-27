@@ -22,6 +22,7 @@ import ko from 'knockout';
 export interface ServiceData {
   assets?: any[];
   description?: string;
+  enabled?: boolean;
   id?: string;
   name?: string;
   provider?: string;

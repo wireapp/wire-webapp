@@ -87,7 +87,7 @@ export const IntegrationMapper = {
     return serviceEntity;
   },
 
-  mapServicesFromArray: (servicesData: any[] = []) => {
+  mapServicesFromArray: (servicesData: ServiceData[] = []) => {
     return servicesData
       .filter(serviceData => serviceData.enabled)
       .map(serviceData => IntegrationMapper.mapServiceFromObject(serviceData));

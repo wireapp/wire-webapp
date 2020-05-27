@@ -19,7 +19,7 @@
 
 // https://github.com/gruntjs/grunt-contrib-clean
 
-/* eslint sort-keys-fix/sort-keys-fix: "off"*/
+/* eslint-disable sort-keys-fix/sort-keys-fix */
 
 module.exports = {
   //##############################################################################

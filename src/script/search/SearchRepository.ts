@@ -82,7 +82,7 @@ export class SearchRepository {
     if (term === '') {
       return userEntities;
     }
-    const excludedEmojis = Array.from(term).reduce((emojis: Record<string, string>, char) => {
+    const excludedEmojis = Array.from(term).reduce<Record<string, string>>((emojis, char) => {
       const isEmoji = EMOJI_RANGES.includes(char);
       if (isEmoji) {
         emojis[char] = char;

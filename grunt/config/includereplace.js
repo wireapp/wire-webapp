@@ -31,9 +31,7 @@ module.exports = {
       includesDir: '<%= dir.src.page %>/template',
       prefix: '#',
     },
-    rename(dest) {
-      return `${dest}/index.html`;
-    },
+    rename: dest => `${dest}/index.html`,
     src: 'auth.html',
   },
 
@@ -48,9 +46,7 @@ module.exports = {
       includesDir: '<%= dir.src.demo %>/template',
       prefix: '#',
     },
-    rename(dest) {
-      return `${dest}/index.html`;
-    },
+    rename: dest => `${dest}/index.html`,
     src: 'demo.html',
   },
 

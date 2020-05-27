@@ -17,6 +17,8 @@
  *
  */
 
+import ko from 'knockout';
+
 export type AssetUrlData = AssetUrlDataVersion1 | AssetUrlDataVersion2 | AssetUrlDataVersion3;
 
 export interface AssetUrlDataVersion3 {

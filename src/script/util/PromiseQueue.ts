@@ -37,8 +37,8 @@ export type PromiseRejectFn = (reason?: any) => void;
 
 export interface QueueEntry<T> {
   fn: PromiseFn<T>;
-  resolveFn?: PromiseResolveFn;
   rejectFn: PromiseRejectFn;
+  resolveFn?: PromiseResolveFn;
 }
 
 export class PromiseQueue {

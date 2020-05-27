@@ -26,8 +26,8 @@ export interface SelfState {
   error: Error;
   fetched: boolean;
   fetching: boolean;
-  self: Self;
   hasPassword: boolean;
+  self: Self;
 }
 
 export const initialSelfState: SelfState = {
@@ -72,7 +72,7 @@ export function selfReducer(state: SelfState = initialSelfState, action: AppActi
     case SELF_ACTION.CONSENT_GET_SUCCESS: {
       return {
         ...state,
-        consents: action.payload.reduce((consentAccumulator: Record<number, number>, consent) => {
+        consents: action.payload.reduce<Record<number, number>>((consentAccumulator, consent) => {
           consentAccumulator[consent.type] = consent.value;
           return consentAccumulator;
         }, {}),
