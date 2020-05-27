@@ -26,8 +26,8 @@ import {container} from 'tsyringe';
 
 interface ImageParams {
   asset: AssetRemoteData;
-  click?: (asset: AssetRemoteData) => void;
   assetRepository: AssetRepository;
+  click?: (asset: AssetRemoteData) => void;
 }
 
 class Image {
