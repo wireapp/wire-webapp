@@ -225,7 +225,7 @@ export class CallingViewModel {
     ko.computed(() => {
       const call = this.callingRepository.joinedCall();
       if (call) {
-        call.participants().forEach(participant => {
+        call.getRemoteParticipants().forEach(participant => {
           const stream = participant.audioStream();
           if (!stream) {
             return;
