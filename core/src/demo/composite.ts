@@ -9,7 +9,7 @@ import {Text} from '@wireapp/protocol-messaging';
 require('dotenv').config();
 
 const args = process.argv.slice(2);
-const conversationId = args[0];
+const conversationId = args[0] || process.env.WIRE_CONVERSATION;
 
 if (!conversationId) {
   console.error('Please provide a conversation ID when starting this script.');
