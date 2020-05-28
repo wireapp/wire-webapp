@@ -812,7 +812,7 @@ export class CallingRepository {
         this.mediaStreamQuery = undefined;
         const newStream = selfParticipant.updateMediaStream(mediaStream);
         if (missingStreams.screen) {
-          // https://stackoverflow.com/q/25141080/7091035
+          // https://stackoverflow.com/a/25179198/451634
           newStream.getVideoTracks()[0].onended = () => {
             selfParticipant.releaseVideoStream();
           };
