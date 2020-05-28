@@ -19,7 +19,7 @@
 
 import {MediumImage} from 'src/script/entity/message/MediumImage';
 import {StatusType} from 'src/script/message/StatusType';
-import {File} from 'src/script/entity/message/File';
+import {File} from 'src/script/entity/message/FileAsset';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {Text} from 'src/script/entity/message/Text';
 

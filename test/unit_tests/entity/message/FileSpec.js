@@ -19,7 +19,7 @@
 
 //@ts-check
 
-import {File} from 'src/script/entity/message/File';
+import {File} from 'src/script/entity/message/FileAsset';
 
 describe('File', () => {
   /** @type {File} */

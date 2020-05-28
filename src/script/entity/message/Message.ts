@@ -32,7 +32,7 @@ import {SuperType} from '../../message/SuperType';
 import {User} from '../User';
 import type {CallMessage} from './CallMessage';
 import type {ContentMessage} from './ContentMessage';
-import type {File as FileAsset} from './File';
+import type {FileAsset} from './FileAsset';
 import type {CompositeMessage} from './CompositeMessage';
 
 export interface ReadReceipt {

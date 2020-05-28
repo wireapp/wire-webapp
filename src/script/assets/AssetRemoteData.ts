@@ -48,6 +48,7 @@ export class AssetRemoteData {
   public readonly sha256?: Uint8Array;
   public readonly urlData?: AssetUrlData;
   public readonly downloadProgress: ko.Observable<number>;
+  public cancelDownload: () => void;
 
   constructor(identifier: string, urlData: AssetUrlData, otrKey?: Uint8Array, sha256Checksum?: Uint8Array) {
     this.identifier = identifier;
@@ -55,6 +56,7 @@ export class AssetRemoteData {
     this.sha256 = sha256Checksum;
     this.urlData = urlData;
     this.downloadProgress = ko.observable();
+    this.cancelDownload = () => {};
   }
 
   static v3(

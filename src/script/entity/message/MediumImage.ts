@@ -21,9 +21,9 @@ import {getLogger} from 'Util/Logger';
 
 import type {AssetRemoteData} from '../../assets/AssetRemoteData';
 import {AssetType} from '../../assets/AssetType';
-import {File} from './File';
+import {FileAsset} from './FileAsset';
 
-export class MediumImage extends File {
+export class MediumImage extends FileAsset {
   public readonly resource: ko.Observable<AssetRemoteData>;
   public readonly correlation_id: string;
   public height: string;

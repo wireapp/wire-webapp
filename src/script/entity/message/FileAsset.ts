@@ -19,13 +19,8 @@
 
 import type {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 import ko from 'knockout';
-
 import {Logger, getLogger} from 'Util/Logger';
-// import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-// import {downloadBlob} from 'Util/util';
-
 import {Asset} from './Asset';
-
 import type {AssetRemoteData} from '../../assets/AssetRemoteData';
 import {AssetTransferState} from '../../assets/AssetTransferState';
 import {AssetType} from '../../assets/AssetType';
@@ -35,11 +30,12 @@ type AssetMetaData = (ProtobufAsset.IAudioMetaData | ProtobufAsset.IImageMetaDat
   loudness?: number[];
 };
 
-export class File extends Asset {
+export class FileAsset extends Asset {
   public readonly original_resource: ko.Observable<AssetRemoteData>;
   public readonly preview_resource: ko.Observable<AssetRemoteData>;
   protected logger: Logger;
   public readonly downloadProgress: ko.PureComputed<number | undefined>;
+  public readonly cancelDownload: () => void;
   public file_name: string;
   public file_size: string;
   public meta: Partial<AssetMetaData>;
@@ -48,10 +44,8 @@ export class File extends Asset {
 
   constructor(id?: string) {
     super(id);
-    // this.cancel_download = this.cancel_download.bind(this);
-
     this.type = AssetType.FILE;
-    this.logger = getLogger('File');
+    this.logger = getLogger('FileAsset');
 
     // AssetTransferState
     this.status = ko.observable();
@@ -67,7 +61,6 @@ export class File extends Asset {
     this.original_resource = ko.observable();
     this.preview_resource = ko.observable();
 
-    // this.download = this.download.bind(this);
     this.downloadProgress = ko.pureComputed(() => {
       if (this.original_resource()) {
         return this.original_resource().downloadProgress();
@@ -76,13 +69,14 @@ export class File extends Asset {
       return undefined;
     });
 
+    this.cancelDownload = () => {
+      if (this.original_resource()) {
+        this.original_resource().cancelDownload();
+      }
+    };
+
     this.upload_failed_reason = ko.observable();
   }
-
-  // cancel_download(): void {
-  //   this.status(AssetTransferState.UPLOADED);
-  //   this.original_resource().cancelDownload();
-  // }
 
   reload(): void {
     this.logger.info('Restart upload');

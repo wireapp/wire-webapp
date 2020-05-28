@@ -47,7 +47,7 @@ import {ConversationVerificationState} from 'src/script/conversation/Conversatio
 
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 import {StorageSchemata} from 'src/script/storage/StorageSchemata';
-import {File} from 'src/script/entity/message/File';
+import {File} from 'src/script/entity/message/FileAsset';
 
 import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
 import {MessageCategory} from 'src/script/message/MessageCategory';

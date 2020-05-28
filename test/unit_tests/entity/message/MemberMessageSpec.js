@@ -27,7 +27,7 @@ import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 
 import {StatusType} from 'src/script/message/StatusType';
-import {File} from 'src/script/entity/message/File';
+import {File} from 'src/script/entity/message/FileAsset';
 
 describe('Member Message', () => {
   describe('generateNameString', () => {

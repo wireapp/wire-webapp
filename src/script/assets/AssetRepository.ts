@@ -36,6 +36,8 @@ import {BackendClientError} from '../error/BackendClientError';
 import {ValidationUtilError} from 'Util/ValidationUtil';
 import {singleton, container} from 'tsyringe';
 import type {User} from '../entity/User';
+import {FileAsset} from '../entity/message/FileAsset';
+import {AssetTransferState} from './AssetTransferState';
 
 export interface CompressedImage {
   compressedBytes: Uint8Array;
@@ -143,8 +145,9 @@ export class AssetRepository {
             asset.urlData.assetKey,
             asset.urlData.assetToken,
             asset.urlData.forceCaching,
-            progress => asset.downloadProgress(progress),
+            progress => asset.downloadProgress(progress * 100),
           );
+          asset.cancelDownload = request.cancel;
           return request.response;
         }
         case 2: {
@@ -154,6 +157,7 @@ export class AssetRepository {
             asset.urlData.forceCaching,
             progress => asset.downloadProgress(progress),
           );
+          asset.cancelDownload = request.cancel;
           return request.response;
         }
         case 1: {
@@ -163,6 +167,7 @@ export class AssetRepository {
             asset.urlData.forceCaching,
             progress => asset.downloadProgress(progress),
           );
+          asset.cancelDownload = request.cancel;
           return request.response;
         }
         default:
@@ -187,6 +192,21 @@ export class AssetRepository {
       return downloadBlob(blob, fileName);
     } catch (error) {
       return this.logger.error('Failed to download blob', error);
+    }
+  }
+
+  public async downloadFile(asset: FileAsset) {
+    try {
+      asset.status(AssetTransferState.DOWNLOADING);
+      const blob = await this.load(asset.original_resource());
+      if (!blob) {
+        throw new Error('No blob received.');
+      }
+      asset.status(AssetTransferState.UPLOADED);
+      return downloadBlob(blob, asset.file_name);
+    } catch (error) {
+      asset.status(AssetTransferState.UPLOADED);
+      return this.logger.error('Failed to download FileAsset blob', error);
     }
   }
 

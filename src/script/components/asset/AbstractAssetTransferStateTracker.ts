@@ -24,7 +24,7 @@ import {container} from 'tsyringe';
 import {AssetTransferState} from '../../assets/AssetTransferState';
 import {AssetRepository} from '../../assets/AssetRepository';
 import {ContentMessage} from '../../entity/message/ContentMessage';
-import {File as FileAsset} from '../../entity/message/File';
+import {FileAsset} from '../../entity/message/FileAsset';
 
 export abstract class AbstractAssetTransferStateTracker {
   AssetTransferState: typeof AssetTransferState;

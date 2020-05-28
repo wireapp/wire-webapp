@@ -21,7 +21,7 @@ import {t} from 'Util/LocalizerUtil';
 import {getRenderedTextContent} from 'Util/messageRenderer';
 
 import type {Text} from '../entity/message/Text';
-import type {File} from '../entity/message/File';
+import type {File} from '../entity/message/FileAsset';
 import {AssetTransferState} from '../assets/AssetTransferState';
 import type {Conversation} from '../entity/Conversation';
 import {ConversationStatusIcon} from './ConversationStatusIcon';
