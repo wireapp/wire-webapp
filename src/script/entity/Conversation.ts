@@ -44,6 +44,7 @@ import type {ContentMessage} from './message/ContentMessage';
 import type {MemberMessage} from './message/MemberMessage';
 import type {Message} from './message/Message';
 import type {SystemMessage} from './message/SystemMessage';
+import {Config} from '../Config';
 
 interface UnreadState {
   allEvents: Message[];
@@ -892,7 +893,24 @@ export class Conversation {
   }
 
   supportsVideoCall(isCreatingUser: boolean = false): boolean {
-    this.logger.warn(isCreatingUser);
+    if (this.is1to1()) {
+      return true;
+    }
+
+    const participantCount = this.getNumberOfParticipants(true, false);
+    const passesParticipantLimit = participantCount <= Config.getConfig().MAX_VIDEO_PARTICIPANTS;
+
+    if (!passesParticipantLimit) {
+      return false;
+    }
+
+    if (this.selfUser().inTeam()) {
+      return true;
+    }
+
+    if (isCreatingUser) {
+      return false;
+    }
     return true;
   }
 
