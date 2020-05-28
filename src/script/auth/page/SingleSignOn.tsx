@@ -79,10 +79,8 @@ const SingleSignOn = ({hasDefaultSSOCode}: Props & ConnectedProps & DispatchProp
 
       onReceiveChildWindowMessage = (event: MessageEvent) => {
         // We need to copy properties to `JSON.stringify` because `event` is not serializable
-        logger.log(
-          `Received SSO login event from wrapper: ${JSON.stringify({data: event.data, origin: event.origin})}`,
-          event,
-        );
+        const serializedEvent = JSON.stringify({data: event.data, origin: event.origin});
+        logger.log(`Received SSO login event from wrapper: ${serializedEvent}`, event);
         const isExpectedOrigin = event.origin === Config.getConfig().BACKEND_REST;
         if (!isExpectedOrigin) {
           onChildWindowClose();
@@ -91,7 +89,7 @@ const SingleSignOn = ({hasDefaultSSOCode}: Props & ConnectedProps & DispatchProp
             new BackendError({
               code: 500,
               label: BackendError.LABEL.SSO_GENERIC_ERROR,
-              message: `Origin "${event.origin}" of event "${JSON.stringify(event)}" not matching "${
+              message: `Origin "${event.origin}" of event "${serializedEvent}" not matching "${
                 Config.getConfig().BACKEND_REST
               }"`,
             }),
