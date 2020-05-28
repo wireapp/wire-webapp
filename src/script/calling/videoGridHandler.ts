@@ -38,9 +38,9 @@ export function getGrid(call: Call): ko.PureComputed<Grid> {
     const remoteVideoParticipants = call.getRemoteParticipants().filter(participant => participant.hasActiveVideo());
     if (showThumbnail && remoteVideoParticipants.length === 1) {
       inGridParticipants = remoteVideoParticipants;
-      thumbnailParticipant = selfParticipant.hasActiveVideo() ? selfParticipant : null;
+      thumbnailParticipant = selfParticipant?.hasActiveVideo() ? selfParticipant : null;
     } else {
-      inGridParticipants = selfParticipant.hasActiveVideo()
+      inGridParticipants = selfParticipant?.hasActiveVideo()
         ? [selfParticipant, ...remoteVideoParticipants]
         : remoteVideoParticipants;
       thumbnailParticipant = null;
