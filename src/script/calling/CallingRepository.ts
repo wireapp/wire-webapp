@@ -811,6 +811,12 @@ export class CallingRepository {
       .then(mediaStream => {
         this.mediaStreamQuery = undefined;
         const newStream = selfParticipant.updateMediaStream(mediaStream);
+        if (missingStreams.screen) {
+          // https://stackoverflow.com/a/25179198/451634
+          newStream.getVideoTracks()[0].onended = () => {
+            selfParticipant.releaseVideoStream();
+          };
+        }
         return newStream;
       })
       .catch(error => {
