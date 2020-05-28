@@ -32,7 +32,7 @@ export function getGrid(call: Call): ko.PureComputed<Grid> {
     const selfParticipant = call.getSelfParticipant();
     const remoteParticipants = call.participants().filter(participant => participant !== selfParticipant);
     const remoteVideoParticipants = remoteParticipants.filter(participant => participant.hasActiveVideo());
-    const grid = selfParticipant.hasActiveVideo()
+    const grid = selfParticipant?.hasActiveVideo()
       ? [selfParticipant, ...remoteVideoParticipants]
       : remoteVideoParticipants;
 
