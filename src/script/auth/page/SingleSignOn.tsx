@@ -78,6 +78,7 @@ const SingleSignOn = ({hasDefaultSSOCode}: Props & ConnectedProps & DispatchProp
       };
 
       onReceiveChildWindowMessage = (event: MessageEvent) => {
+        logger.log(`Received SSO login event from wrapper: ${JSON.stringify(event)}`);
         const isExpectedOrigin = event.origin === Config.getConfig().BACKEND_REST;
         if (!isExpectedOrigin) {
           onChildWindowClose();
@@ -112,7 +113,7 @@ const SingleSignOn = ({hasDefaultSSOCode}: Props & ConnectedProps & DispatchProp
             );
           }
           default: {
-            logger.warn(`Received unmatched event type: "${JSON.stringify(event)}"`);
+            logger.warn(`Received unmatched event type: "${eventType}"`);
           }
         }
       };
