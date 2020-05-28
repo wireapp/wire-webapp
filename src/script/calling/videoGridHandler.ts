@@ -18,6 +18,7 @@
  */
 
 import ko from 'knockout';
+import {CONV_TYPE} from '@wireapp/avs';
 
 import type {Participant} from '../calling/Participant';
 import {Call} from './Call';
@@ -25,20 +26,30 @@ import {Call} from './Call';
 export interface Grid {
   grid: Participant[];
   hasRemoteVideo: boolean;
+  thumbnail: Participant | null;
 }
 
 export function getGrid(call: Call): ko.PureComputed<Grid> {
+  const showThumbnail = call.conversationType === CONV_TYPE.ONEONONE;
   return ko.pureComputed(() => {
+    let inGridParticipants: Participant[];
+    let thumbnailParticipant: Participant | null;
     const selfParticipant = call.getSelfParticipant();
-    const remoteParticipants = call.participants().filter(participant => participant !== selfParticipant);
-    const remoteVideoParticipants = remoteParticipants.filter(participant => participant.hasActiveVideo());
-    const grid = selfParticipant?.hasActiveVideo()
-      ? [selfParticipant, ...remoteVideoParticipants]
-      : remoteVideoParticipants;
+    const remoteVideoParticipants = call.getRemoteParticipants().filter(participant => participant.hasActiveVideo());
+    if (showThumbnail && remoteVideoParticipants.length === 1) {
+      inGridParticipants = remoteVideoParticipants;
+      thumbnailParticipant = selfParticipant.hasActiveVideo() ? selfParticipant : null;
+    } else {
+      inGridParticipants = selfParticipant.hasActiveVideo()
+        ? [selfParticipant, ...remoteVideoParticipants]
+        : remoteVideoParticipants;
+      thumbnailParticipant = null;
+    }
 
     return {
-      grid,
+      grid: inGridParticipants,
       hasRemoteVideo: remoteVideoParticipants.length > 0,
+      thumbnail: thumbnailParticipant,
     };
   });
 }

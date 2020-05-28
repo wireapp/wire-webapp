@@ -47,7 +47,7 @@ describe('fullscreenVideoCall', () => {
         },
       },
       multitasking: {autoMinimize: () => false},
-      videoGrid: ko.observable({grid: [], hasRemoteVideo: false}),
+      videoGrid: ko.observable({grid: [], hasRemoteVideo: false, thumbnail: null}),
     };
 
     return instantiateComponent('fullscreen-video-call', params).then((container: Element) => {

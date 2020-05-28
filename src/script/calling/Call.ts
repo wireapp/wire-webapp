@@ -49,8 +49,8 @@ export class Call {
     this.state = ko.observable(CALL_STATE.UNKNOWN);
     this.conversationType = conversationType;
     this.initialType = callType;
-    this.selfUserId = selfParticipant.userId;
-    this.selfClientId = selfParticipant.clientId;
+    this.selfUserId = selfParticipant?.userId;
+    this.selfClientId = selfParticipant?.clientId;
     this.participants = ko.observableArray([selfParticipant]);
     this.reason = ko.observable();
     this.startedAt = ko.observable();
@@ -72,7 +72,7 @@ export class Call {
 
   getRemoteParticipants(): Participant[] {
     return this.participants().filter(
-      ({userId, clientId}) => this.selfUserId !== userId && this.selfClientId !== clientId,
+      ({userId, clientId}) => this.selfUserId !== userId || this.selfClientId !== clientId,
     );
   }
 
