@@ -90,7 +90,7 @@ describe('videoGridHandler', () => {
         expect(grid().thumbnail).toBe(selfUser);
       });
 
-      it('places the self user in the thumbnail if the call is a group call with just one other participant', () => {
+      it('places the self user in the grid if the call is a group call with just one other participant', () => {
         const selfUser = generateVideoParticipant('self');
         const call = new Call('', '', CONV_TYPE.GROUP, selfUser);
         call.addParticipant(participants[0]);
