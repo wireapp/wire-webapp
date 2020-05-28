@@ -78,7 +78,7 @@ const SingleSignOn = ({hasDefaultSSOCode}: Props & ConnectedProps & DispatchProp
       };
 
       onReceiveChildWindowMessage = (event: MessageEvent) => {
-        logger.log(`Received SSO login event from wrapper: ${JSON.stringify(event)}`);
+        logger.log(`Received SSO login event from wrapper: ${JSON.stringify(event)}`, event);
         const isExpectedOrigin = event.origin === Config.getConfig().BACKEND_REST;
         if (!isExpectedOrigin) {
           onChildWindowClose();
