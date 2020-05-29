@@ -103,7 +103,8 @@ const SingleSignOn = ({hasDefaultSSOCode}: Props & ConnectedProps & DispatchProp
             ssoWindowRef.current.close();
             return resolve();
           }
-          case 'AUTH_ERROR': {
+          case 'AUTH_ERROR':
+          case 'AUTH_ERROR_COOKIE': {
             onChildWindowClose();
             ssoWindowRef.current.close();
             return reject(
