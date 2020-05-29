@@ -37,8 +37,12 @@ export const customEnvRedirectStrings = defineMessages({
     defaultMessage: "Provide credentials only if you're sure this is your organization's login.",
     id: 'customEnvRedirect.credentialsInfo',
   },
+  redirectHeadline: {
+    defaultMessage: 'Leaving {brandName}',
+    id: 'customEnvRedirect.redirectHeadline',
+  },
   redirectTo: {
-    defaultMessage: 'You are being redirected to',
+    defaultMessage: 'You are being redirected.',
     id: 'customEnvRedirect.redirectTo',
   },
 });
