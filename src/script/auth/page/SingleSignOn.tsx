@@ -114,6 +114,17 @@ const SingleSignOn = ({hasDefaultSSOCode}: Props & ConnectedProps & DispatchProp
               }),
             );
           }
+          case 'AUTH_ERROR_COOKIE': {
+            onChildWindowClose();
+            ssoWindowRef.current.close();
+            return reject(
+              new BackendError({
+                code: 401,
+                label: event.data.payload.label || BackendError.LABEL.SSO_GENERIC_ERROR,
+                message: `Authentication error: "${JSON.stringify(event.data.payload)}"`,
+              }),
+            );
+          }
           default: {
             logger.warn(`Received unmatched event type: "${eventType}"`);
           }
