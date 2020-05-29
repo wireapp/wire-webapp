@@ -90,7 +90,7 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
     });
 
     this.supportsVideoCall = ko.pureComputed(() => {
-      return this.conversationEntity() && this.conversationEntity().supportsVideoCall(true);
+      return this.conversationEntity() && this.conversationEntity().supportsVideoCall();
     });
 
     const shortcut = Shortcut.getShortcutTooltip(ShortcutType.PEOPLE);

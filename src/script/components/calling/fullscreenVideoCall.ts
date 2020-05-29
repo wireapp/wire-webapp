@@ -126,7 +126,7 @@ export class FullscreenVideoCalling {
     });
 
     this.showToggleVideo = ko.pureComputed(() => {
-      return this.call.initialType === CALL_TYPE.VIDEO || conversation().supportsVideoCall(true);
+      return this.call.initialType === CALL_TYPE.VIDEO || conversation().supportsVideoCall();
     });
 
     this.callDuration = ko.observable();

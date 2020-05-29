@@ -892,26 +892,10 @@ export class Conversation {
     return userEntities.filter(userEntity => !userEntity.is_verified());
   }
 
-  supportsVideoCall(isCreatingUser: boolean = false): boolean {
-    if (this.is1to1()) {
-      return true;
-    }
-
+  supportsVideoCall(): boolean {
     const participantCount = this.getNumberOfParticipants(true, false);
     const passesParticipantLimit = participantCount <= Config.getConfig().MAX_VIDEO_PARTICIPANTS;
-
-    if (!passesParticipantLimit) {
-      return false;
-    }
-
-    if (this.selfUser().inTeam()) {
-      return true;
-    }
-
-    if (isCreatingUser) {
-      return false;
-    }
-    return true;
+    return passesParticipantLimit;
   }
 
   isShowingLastReceivedMessage = (): boolean => {
