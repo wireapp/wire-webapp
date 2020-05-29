@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [16.9.12](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@16.9.11...@wireapp/core@16.9.12) (2020-05-29)
+
+
+### Bug Fixes
+
+* **core:** Add missing cookie in Account init method ([#3053](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/3053)) ([6abfec4](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/6abfec472b41e4fdf1b3c0b2ffab6c5dc46707b0))
+
+
+
+
+
 ## [16.9.11](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@16.9.10...@wireapp/core@16.9.11) (2020-05-26)
 
 **Note:** Version bump only for package @wireapp/core
