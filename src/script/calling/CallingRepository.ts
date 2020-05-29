@@ -656,6 +656,7 @@ export class CallingRepository {
   };
 
   private readonly callClosed = (reason: REASON, conversationId: ConversationId) => {
+    amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.CALL_QUALITY_POOR);
     const call = this.findCall(conversationId);
     if (!call) {
       return;
