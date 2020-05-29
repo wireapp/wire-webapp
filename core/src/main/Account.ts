@@ -168,8 +168,8 @@ export class Account extends EventEmitter {
     return context;
   }
 
-  public async init(clientType: ClientType): Promise<Context> {
-    const context = await this.apiClient.init(clientType);
+  public async init(clientType: ClientType, cookie?: Cookie): Promise<Context> {
+    const context = await this.apiClient.init(clientType, cookie);
     const storeEngine = await this.initEngine(context);
     await this.initServices(storeEngine);
     return context;
