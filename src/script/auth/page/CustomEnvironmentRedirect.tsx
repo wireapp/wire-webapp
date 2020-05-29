@@ -32,7 +32,6 @@ import {isDesktopApp} from '../Runtime';
 import SVGProvider from '../util/SVGProvider';
 import {customEnvRedirectStrings} from '../../strings';
 import {afterRender} from 'Util/util';
-import {Config} from '../../Config';
 
 const REDIRECT_DELAY = 5000;
 const CustomEnvironmentRedirect = ({doNavigate, doSendNavigationEvent}: DispatchProps) => {
@@ -114,7 +113,7 @@ const CustomEnvironmentRedirect = ({doNavigate, doSendNavigationEvent}: Dispatch
         </FlexBox>
         <ContainerXS centerText style={{marginTop: 48}}>
           <Text block bold fontSize={'24px'} center style={{marginBottom: 16, marginTop: 0}}>
-            {_(customEnvRedirectStrings.redirectHeadline, {brandName: Config.getConfig().BRAND_NAME})}
+            {_(customEnvRedirectStrings.redirectHeadline)}
           </Text>
           <Text block center>
             {_(customEnvRedirectStrings.redirectTo)}
