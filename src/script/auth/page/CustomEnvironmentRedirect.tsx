@@ -69,7 +69,7 @@ const CustomEnvironmentRedirect = ({doNavigate, doSendNavigationEvent}: Dispatch
         <FlexBox
           justify="center"
           align="flex-end"
-          style={{backgroundColor: 'black', height: 216, marginBottom: 40, width: '100vw'}}
+          style={{backgroundColor: 'black', height: 216, marginBottom: 64, width: '100vw'}}
         >
           <FlexBox
             justify="center"
@@ -113,7 +113,7 @@ const CustomEnvironmentRedirect = ({doNavigate, doSendNavigationEvent}: Dispatch
           </FlexBox>
         </FlexBox>
         <ContainerXS centerText style={{marginTop: 48}}>
-          <Text block bold fontSize={'24px'} center style={{marginBottom: 32, marginTop: 0}}>
+          <Text block bold fontSize={'24px'} center style={{marginBottom: 16, marginTop: 0}}>
             {_(customEnvRedirectStrings.redirectHeadline, {brandName: Config.getConfig().BRAND_NAME})}
           </Text>
           <Text block center>

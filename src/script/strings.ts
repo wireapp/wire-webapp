@@ -38,11 +38,11 @@ export const customEnvRedirectStrings = defineMessages({
     id: 'customEnvRedirect.credentialsInfo',
   },
   redirectHeadline: {
-    defaultMessage: 'Leaving {brandName}',
+    defaultMessage: 'Redirecting...',
     id: 'customEnvRedirect.redirectHeadline',
   },
   redirectTo: {
-    defaultMessage: 'You are being redirected.',
+    defaultMessage: 'You are being redirected to an enterprise server.',
     id: 'customEnvRedirect.redirectTo',
   },
 });
