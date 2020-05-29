@@ -31,6 +31,7 @@ import {
   Input,
   InputSubmitCombo,
   RoundIconButton,
+  Loading,
 } from '@wireapp/react-ui-kit';
 import React, {useEffect, useRef, useState} from 'react';
 import {FormattedMessage, useIntl} from 'react-intl';
@@ -81,6 +82,7 @@ const SingleSignOnForm = ({
   const [isCodeOrMailInputValid, setIsCodeOrMailInputValid] = useState(true);
   const [validationError, setValidationError] = useState<any>();
   const [logoutReason, setLogoutReason] = useState<string>();
+  const [isLoading, setIsLoading] = useState(false);
 
   const [conversationCode, setConversationCode] = useState<string>();
   const [conversationKey, setConversationKey] = useState<string>();
@@ -189,6 +191,7 @@ const SingleSignOnForm = ({
           }`,
         );
       } else {
+        setIsLoading(true);
         const strippedCode = stripPrefix(codeOrMail);
         await validateSSOCode(strippedCode);
         await doLogin(strippedCode);
@@ -201,6 +204,7 @@ const SingleSignOnForm = ({
         history.push(ROUTE.HISTORY_INFO);
       }
     } catch (error) {
+      setIsLoading(false);
       switch (error.label) {
         case BackendError.LABEL.TOO_MANY_CLIENTS: {
           resetAuthError();
@@ -232,7 +236,9 @@ const SingleSignOnForm = ({
   const stripPrefix = (prefixedCode: string) =>
     prefixedCode && prefixedCode.trim().toLowerCase().replace(SSO_CODE_PREFIX, '');
 
-  return (
+  return isLoading ? (
+    <Loading style={{marginTop: '24px'}} />
+  ) : (
     <Form style={{marginTop: 30}} data-uie-name="sso" onSubmit={handleSubmit}>
       {!isValidLink && <Redirect to={ROUTE.CONVERSATION_JOIN_INVALID} />}
       <InputSubmitCombo>

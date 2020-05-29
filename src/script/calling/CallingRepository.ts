@@ -536,7 +536,6 @@ export class CallingRepository {
   }
 
   leaveCall(conversationId: ConversationId): void {
-    amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.CALL_QUALITY_POOR);
     delete this.poorCallQualityUsers[conversationId];
     this.wCall.end(this.wUser, conversationId);
   }
@@ -698,6 +697,7 @@ export class CallingRepository {
   };
 
   private readonly callClosed = (reason: REASON, conversationId: ConversationId) => {
+    amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.CALL_QUALITY_POOR);
     const call = this.findCall(conversationId);
     if (!call) {
       return;
@@ -861,6 +861,12 @@ export class CallingRepository {
         const mediaStream = await this.getMediaStream(missingStreams, isGroup);
         this.mediaStreamQuery = undefined;
         const newStream = selfParticipant.updateMediaStream(mediaStream);
+        if (missingStreams.screen) {
+          // https://stackoverflow.com/a/25179198/451634
+          newStream.getVideoTracks()[0].onended = () => {
+            selfParticipant.releaseVideoStream();
+          };
+        }
         return newStream;
       } catch (error) {
         this.mediaStreamQuery = undefined;
