@@ -519,7 +519,6 @@ export class CallingRepository {
   }
 
   leaveCall(conversationId: ConversationId): void {
-    amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.CALL_QUALITY_POOR);
     delete this.poorCallQualityUsers[conversationId];
     this.wCall.end(this.wUser, conversationId);
   }
