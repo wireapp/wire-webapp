@@ -52,7 +52,7 @@ const CustomEnvironmentRedirect = ({doNavigate, doSendNavigationEvent}: Dispatch
         if (isDesktopApp()) {
           doSendNavigationEvent(destinationUrl).catch(console.error);
         } else {
-          // doNavigate(destinationUrl);
+          doNavigate(destinationUrl);
         }
       }, REDIRECT_DELAY);
       afterRender(() => setIsAnimating(true));
