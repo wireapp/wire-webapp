@@ -783,7 +783,7 @@
   dependencies:
     "@babel/helper-plugin-utils" "^7.8.3"
 
-"@babel/plugin-transform-typescript@^7.8.3", "@babel/plugin-transform-typescript@^7.9.0":
+"@babel/plugin-transform-typescript@^7.9.0":
   version "7.9.4"
   resolved "https://registry.yarnpkg.com/@babel/plugin-transform-typescript/-/plugin-transform-typescript-7.9.4.tgz#4bb4dde4f10bbf2d787fce9707fb09b483e33359"
   integrity sha512-yeWeUkKx2auDbSxRe8MusAG+n4m9BFY/v+lPjmQDgOFX5qnySkUY5oXzkp6FwPdsYqnKay6lorXYdC0n3bZO7w==
@@ -888,14 +888,6 @@
     "@babel/plugin-transform-react-jsx-development" "^7.9.0"
     "@babel/plugin-transform-react-jsx-self" "^7.9.0"
     "@babel/plugin-transform-react-jsx-source" "^7.9.0"
-
-"@babel/preset-typescript@7.8.3":
-  version "7.8.3"
-  resolved "https://registry.yarnpkg.com/@babel/preset-typescript/-/preset-typescript-7.8.3.tgz#90af8690121beecd9a75d0cc26c6be39d1595d13"
-  integrity sha512-qee5LgPGui9zQ0jR1TeU5/fP9L+ovoArklEqY12ek8P/wV5ZeM/VYSQYwICeoT6FfpJTekG9Ilay5PhwsOpMHA==
-  dependencies:
-    "@babel/helper-plugin-utils" "^7.8.3"
-    "@babel/plugin-transform-typescript" "^7.8.3"
 
 "@babel/preset-typescript@7.9.0":
   version "7.9.0"
@@ -1977,16 +1969,16 @@
   dependencies:
     dexie "2.0.4"
 
-"@wireapp/store-engine-sqleet@1.3.5":
-  version "1.3.5"
-  resolved "https://registry.yarnpkg.com/@wireapp/store-engine-sqleet/-/store-engine-sqleet-1.3.5.tgz#0b39c60bf6d530110545e80f4c90367c6980ed87"
-  integrity sha512-0XxLMJKRhywdSJvCYg8pSgy1Ioyzg8soYppCVDNuMev8RwM8/NV4IxalDQXt96ETFYN8WOqQJgAhXFFzx94yiA==
+"@wireapp/store-engine-sqleet@1.3.7":
+  version "1.3.7"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine-sqleet/-/store-engine-sqleet-1.3.7.tgz#c90ca96353f897f3cf8da7f47c28082eb5143058"
+  integrity sha512-utCC7FA0kxtYvMkpm/SoByPZbrYXLX5t1V7Pq47yAgiuudjXE7wA4Mqjo9MUToH1l6Xfo74k36MtWrefTVzt6Q==
   dependencies:
     "@babel/core" "7.9.0"
     "@babel/plugin-proposal-class-properties" "7.8.3"
     "@babel/plugin-proposal-object-rest-spread" "7.9.6"
     "@babel/plugin-proposal-optional-chaining" "7.9.0"
-    "@babel/preset-typescript" "7.8.3"
+    "@babel/preset-typescript" "7.9.0"
     "@wireapp/websql" "0.0.17"
     uint32 "0.2.1"
 
