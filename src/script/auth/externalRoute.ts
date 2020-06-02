@@ -25,7 +25,6 @@ export const EXTERNAL_ROUTE = {
   WEBAPP: '../',
   WIRE_ACCOUNT: Config.getConfig().URL.ACCOUNT_BASE,
   WIRE_ACCOUNT_PASSWORD_RESET: `${Config.getConfig().URL.ACCOUNT_BASE}/forgot/`,
-  WIRE_PRIVACY_POLICY: `${Config.getConfig().URL.WEBSITE_BASE}/legal/#privacy`,
   WIRE_TEAM_FEATURES: `${Config.getConfig().URL.WEBSITE_BASE}/create-team/#features`,
   WIRE_TERMS_PERSONAL: `${Config.getConfig().URL.WEBSITE_BASE}/legal/terms/#personal`,
   WIRE_TERMS_TEAMS: `${Config.getConfig().URL.WEBSITE_BASE}/legal/terms/#teams`,

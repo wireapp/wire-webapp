@@ -40,7 +40,7 @@ const AcceptNewsModal = ({onConfirm, onDecline}: Props) => {
         </H3>
         <div data-uie-name="modal-marketing-consent-description">
           <Text block>{_(acceptNewsModalStrings.unsubscribeDescription)}</Text>
-          <Link href={addLocaleToUrl(EXTERNAL_ROUTE.WIRE_PRIVACY_POLICY)} target="_blank" data-uie-name="go-privacy">
+          <Link href={Config.getConfig().URL.PRIVACY_POLICY} target="_blank" data-uie-name="go-privacy">
             <Text block>
               <FormattedMessage
                 {...acceptNewsModalStrings.privacyDescription}
