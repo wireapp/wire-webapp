@@ -17,10 +17,9 @@
  *
  */
 
-import {ContainerXS, FlexBox, COLOR, InfoIcon, Text, Bold} from '@wireapp/react-ui-kit';
+import {ContainerXS, FlexBox, COLOR, Text} from '@wireapp/react-ui-kit';
 import {SVGIcon} from '@wireapp/react-ui-kit/dist/Icon/SVGIcon';
 import {UrlUtil} from '@wireapp/commons';
-
 import React, {useState, useEffect} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
@@ -39,14 +38,11 @@ const CustomEnvironmentRedirect = ({doNavigate, doSendNavigationEvent}: Dispatch
   const {formatMessage: _} = useIntl();
 
   const [destinationUrl, setDestinationUrl] = useState(null);
-  const [displayUrl, setDisplayUrl] = useState(null);
   const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {
     const destinationParam = UrlUtil.getURLParameter(QUERY_KEY.DESTINATION_URL);
-    const [destinationAddress] = destinationParam.split('?');
     setDestinationUrl(destinationParam);
-    setDisplayUrl(destinationAddress);
   }, []);
 
   useEffect(() => {
@@ -115,24 +111,16 @@ const CustomEnvironmentRedirect = ({doNavigate, doSendNavigationEvent}: Dispatch
             </svg>
           </FlexBox>
         </FlexBox>
-
         <ContainerXS centerText style={{marginTop: 48}}>
+          <Text block bold fontSize={'24px'} center style={{marginBottom: 16, marginTop: 0}}>
+            {_(customEnvRedirectStrings.redirectHeadline)}
+          </Text>
           <Text block center>
             {_(customEnvRedirectStrings.redirectTo)}
           </Text>
-          <Bold block center data-uie-name="destination-url">
-            {displayUrl}
-          </Bold>
-          <FlexBox
-            column
-            align="center"
-            style={{backgroundColor: COLOR.BLUE_OPAQUE_16, borderRadius: 8, marginTop: 40, padding: '16px 24px'}}
-          >
-            <InfoIcon color={COLOR.BLUE} style={{marginBottom: 8}} />
-            <Text center fontSize="14px" color={COLOR.BLUE} data-uie-name="credentials-info">
-              {_(customEnvRedirectStrings.credentialsInfo)}
-            </Text>
-          </FlexBox>
+          <Text block center fontSize="16px" bold style={{marginTop: '16px'}} data-uie-name="credentials-info">
+            {_(customEnvRedirectStrings.credentialsInfo)}
+          </Text>
         </ContainerXS>
       </FlexBox>
     </Page>
