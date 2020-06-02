@@ -23,6 +23,7 @@ import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 
 import {ModalsViewModel} from '../ModalsViewModel';
+import {Config} from '../../Config';
 
 class TemporaryGuestViewModel {
   /**
@@ -44,6 +45,7 @@ class TemporaryGuestViewModel {
     this.logger = getLogger('TemporaryGuestViewModel');
 
     this.selfUser = this.userRepository.self;
+    this.isAccountCreationEnabled = Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION;
   }
 
   clickOnPreferencesButton() {
