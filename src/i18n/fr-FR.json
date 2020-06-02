@@ -385,7 +385,7 @@
   "createPersonalAccount.nextButton": "Inscription",
   "customEnvRedirect.credentialsInfo": "N'entrez vos identifiants que si vous êtes sûr d'être connecté à votre organisation.",
   "customEnvRedirect.redirectHeadline": "Redirecting...",
-  "customEnvRedirect.redirectTo": "You are being redirected to an enterprise server.",
+  "customEnvRedirect.redirectTo": "Vous êtes redirigés vers votre service entreprise.",
   "enumerationAnd": ", et ",
   "ephemeralRemaining": "restant",
   "ephemeralUnitsDay": "jour",

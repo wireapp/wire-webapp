@@ -385,7 +385,7 @@
   "createPersonalAccount.nextButton": "Зареєструватися",
   "customEnvRedirect.credentialsInfo": "Provide credentials only if you're sure this is your organization's login.",
   "customEnvRedirect.redirectHeadline": "Redirecting...",
-  "customEnvRedirect.redirectTo": "You are being redirected to an enterprise server.",
+  "customEnvRedirect.redirectTo": "You are redirected to your enterprise service.",
   "enumerationAnd": ", і ",
   "ephemeralRemaining": "залишилось",
   "ephemeralUnitsDay": "день",
