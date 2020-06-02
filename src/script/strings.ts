@@ -42,7 +42,7 @@ export const customEnvRedirectStrings = defineMessages({
     id: 'customEnvRedirect.redirectHeadline',
   },
   redirectTo: {
-    defaultMessage: 'You are being redirected to an enterprise server.',
+    defaultMessage: 'You are redirected to your enterprise service.',
     id: 'customEnvRedirect.redirectTo',
   },
 });
