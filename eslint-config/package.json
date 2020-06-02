@@ -4,18 +4,18 @@
   "main": "eslintrc.json",
   "name": "@wireapp/eslint-config",
   "peerDependencies": {
-    "@typescript-eslint/eslint-plugin": ">=2",
-    "@typescript-eslint/parser": ">=2",
-    "eslint": ">=6",
+    "@typescript-eslint/eslint-plugin": ">=3",
+    "@typescript-eslint/parser": ">=3",
+    "eslint": ">=7",
     "eslint-config-prettier": ">=6",
-    "eslint-plugin-jsdoc": ">=18",
+    "eslint-plugin-jsdoc": ">=25",
     "eslint-plugin-no-unsanitized": ">=3",
     "eslint-plugin-prettier": ">=3",
     "eslint-plugin-react": ">=7",
     "eslint-plugin-react-hooks": ">=2",
     "eslint-plugin-sort-keys-fix": ">=1",
-    "eslint-plugin-typescript-sort-keys": ">=0",
-    "prettier": ">=1.19"
+    "eslint-plugin-typescript-sort-keys": ">=1",
+    "prettier": ">=2"
   },
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/eslint-config",
   "version": "1.7.0"
