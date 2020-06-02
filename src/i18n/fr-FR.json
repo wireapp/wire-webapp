@@ -383,7 +383,7 @@
   "createAccount.nextButton": "Suivant",
   "createPersonalAccount.headLine": "Nouveau compte",
   "createPersonalAccount.nextButton": "Inscription",
-  "customEnvRedirect.credentialsInfo": "N'entrez vos identifiants que si vous êtes sûr d'être connecté à votre organisation.",
+  "customEnvRedirect.credentialsInfo": "Ne saisissez vos identifiants que si vous êtes sûr d'être connecté à votre organisation.",
   "customEnvRedirect.redirectHeadline": "Redirecting...",
   "customEnvRedirect.redirectTo": "Vous allez être redirigé vers votre service entreprise dédié.",
   "enumerationAnd": ", et ",
