@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.19.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.19.2...@wireapp/api-client@11.19.3) (2020-06-03)
+
+
+### Bug Fixes
+
+* **api-client:** Add next invitation chunk when batch fetching invitations ([#3059](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3059)) ([763c407](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/763c40792ae55093254d126089934da05f2eda94))
+
+
+
+
+
 ## [11.19.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.19.1...@wireapp/api-client@11.19.2) (2020-06-02)
 
 **Note:** Version bump only for package @wireapp/api-client

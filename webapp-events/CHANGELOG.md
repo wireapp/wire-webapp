@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/webapp-events/compare/@wireapp/webapp-events@0.2.0...@wireapp/webapp-events@0.3.0) (2020-06-03)
+
+
+### Features
+
+* **webapp-events:** Add variable bitrate encoding call setting ([fc9f656](https://github.com/wireapp/wire-web-packages/tree/master/packages/webapp-events/commit/fc9f6566a762db9d7ad5147bc1a0df07f98bc0de))
+
+
+
+
+
 # [0.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/webapp-events/compare/@wireapp/webapp-events@0.1.3...@wireapp/webapp-events@0.2.0) (2020-05-18)
 
 
