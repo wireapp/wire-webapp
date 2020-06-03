@@ -33,6 +33,7 @@ import {ModalsViewModel} from './ModalsViewModel';
 import {PreferencesAVViewModel} from './content/PreferencesAVViewModel';
 import {ServiceModalViewModel} from './content/ServiceModalViewModel';
 import {InviteModalViewModel} from './content/InviteModalViewModel';
+import {PreferencesOptionsViewModel} from './content/PreferencesOptionsViewModel';
 import {ConversationError} from '../error/ConversationError';
 
 export class ContentViewModel {
@@ -111,7 +112,12 @@ export class ContentViewModel {
       repositories,
     );
     this.preferencesDevices = new z.viewModel.content.PreferencesDevicesViewModel(mainViewModel, this, repositories);
-    this.preferencesOptions = new z.viewModel.content.PreferencesOptionsViewModel(repositories);
+    this.preferencesOptions = new PreferencesOptionsViewModel(
+      repositories.calling,
+      repositories.properties,
+      repositories.team,
+      repositories.user,
+    );
 
     this.historyExport = new z.viewModel.content.HistoryExportViewModel(mainViewModel, this, repositories);
     this.historyImport = new z.viewModel.content.HistoryImportViewModel(mainViewModel, this, repositories);

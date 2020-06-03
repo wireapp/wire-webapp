@@ -76,7 +76,6 @@ import '../view_model/content/PreferencesAboutViewModel';
 import '../view_model/content/PreferencesAccountViewModel';
 import '../view_model/content/PreferencesDeviceDetailsViewModel';
 import '../view_model/content/PreferencesDevicesViewModel';
-import '../view_model/content/PreferencesOptionsViewModel';
 import '../view_model/content/TitleBarViewModel';
 import '../view_model/FaviconViewModel';
 import '../view_model/ImageDetailViewViewModel';
