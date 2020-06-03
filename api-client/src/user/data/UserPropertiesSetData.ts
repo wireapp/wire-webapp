@@ -38,11 +38,15 @@ export interface WebappProperties {
   };
   enable_debugging: boolean;
   settings: {
+    call: {
+      enable_vbr_encoding: boolean;
+    };
     emoji: {
       replace_inline: boolean;
     };
     interface: {
       theme: 'dark' | 'default';
+      view_folders: boolean;
     };
     notifications: NotificationPreference;
     previews: {
