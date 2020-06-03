@@ -1829,10 +1829,10 @@
   resolved "https://registry.yarnpkg.com/@wireapp/antiscroll-2/-/antiscroll-2-1.0.2.tgz#71a78d294ee0c88f42d50477ab61fa39272f5bca"
   integrity sha512-9KeB3yh9k01PjpuuRQsve4yY3+OVS2/hp9j+N13Is5wYCZRkUzZVCs8w9CyA/C6J5o9ukH0EzT7uurysWuhn/A==
 
-"@wireapp/api-client@11.19.0":
-  version "11.19.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-11.19.0.tgz#7f8b89b557ea15b570ea7fab3380ef5a324c7987"
-  integrity sha512-zi4pAdDYSj6XLOkYgfCjqxI5bDb0ZSJNSl+MWOXn79P00kDUOzBOf3Rmp296eWbU4Xrszuf/gSqaFSalSUnPVA==
+"@wireapp/api-client@11.20.0":
+  version "11.20.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-11.20.0.tgz#748e4f57ba61e26b2f0c40809e2be26cc0469b43"
+  integrity sha512-VsqpAFrWKM8JbrIh5hgUPpD/10TTS0rvknkZfK+sqnlMNG06/l/24YFvIOWa1dJQqiTXAiuIcwR0IotNlZQO+w==
   dependencies:
     "@types/node" "~12"
     "@types/spark-md5" "3.0.2"
@@ -1883,33 +1883,33 @@
     logdown "3.3.1"
     rimraf "3.0.2"
 
-"@wireapp/core@16.9.10":
-  version "16.9.10"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-16.9.10.tgz#c54eaf1e526920c8304bd1dbff8f6c0eba7d647f"
-  integrity sha512-phFBY4NJ5iBIKqRzz85ZPExW8h5gOEHjaopTj5dnmbU+FtrZdPra52qKFwJlQ90xB5U0CgyK4WDH1Sqv2dBWkA==
+"@wireapp/core@16.9.15":
+  version "16.9.15"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-16.9.15.tgz#5a2e28271bd89398884537b8092494102539df6e"
+  integrity sha512-jIkBgsPhvJV/gYQz1uJVytvzs0wx0K9eJjQ81JOtuJcqRifoocSkBcmo0x9PgPcBvkIcJ4laiZ/nH3Uoad08eg==
   dependencies:
     "@types/long" "4.0.1"
     "@types/node" "~12"
-    "@wireapp/api-client" "11.19.0"
-    "@wireapp/cryptobox" "12.2.10"
+    "@wireapp/api-client" "11.20.0"
+    "@wireapp/cryptobox" "12.2.11"
     "@wireapp/protocol-messaging" "1.25.4"
-    "@wireapp/store-engine" "4.5.4"
+    "@wireapp/store-engine" "4.5.5"
     bazinga64 "5.7.5"
     hash.js "1.1.7"
     logdown "3.3.1"
     protobufjs "6.8.9"
     pure-uuid "1.6.0"
 
-"@wireapp/cryptobox@12.2.10":
-  version "12.2.10"
-  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-12.2.10.tgz#a35f505f45dab147f2d4c9fee3af66a0f495abd0"
-  integrity sha512-VlROcwgaDR3EWDtnQI8kxsCbnpXqdPzMMZFcAV0dvEawv1htg77P8KO7Sdsv/YilnRW7npGSCUYe9ZnJOLzh/A==
+"@wireapp/cryptobox@12.2.11":
+  version "12.2.11"
+  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-12.2.11.tgz#bd06215da96d1831a4c2ee14feb581630d0fed07"
+  integrity sha512-+EWzZbMinOd1EJDKDCjCoFAGcDzH1orfYpMfAF3dWOLlytK/pmqgT4b+g8M9P5v3tIWNdIylcAzoG7vXx/iDvA==
   dependencies:
     "@types/node" "~12"
     "@wireapp/lru-cache" "3.6.6"
     "@wireapp/priority-queue" "1.6.3"
     "@wireapp/proteus" "9.8.8"
-    "@wireapp/store-engine" "4.5.4"
+    "@wireapp/store-engine" "4.5.5"
     bazinga64 "5.7.5"
     logdown "3.3.1"
 
@@ -1990,17 +1990,17 @@
     "@wireapp/websql" "0.0.17"
     uint32 "0.2.1"
 
-"@wireapp/store-engine@4.5.4":
-  version "4.5.4"
-  resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-4.5.4.tgz#96d29098eda606398967faecb4fe0ddfeb181f78"
-  integrity sha512-EjuMKCA0ovma0W765cqGQM+TVTvPlWGmVUuNwzlmfsBaaRhWoQkTKaD5+XxFj+bx9vHZnpshU8uDMsfdtP3xJg==
+"@wireapp/store-engine@4.5.5":
+  version "4.5.5"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-4.5.5.tgz#71f83894181b5ef10b7cc3b1fc2b9ac251b24cb8"
+  integrity sha512-mU3/gj8fNY6LPZwG7BWtK63kmckn7nJTfeWJJ8F9Q6vMhqRHwNCIKeH5yt8AGmUjnSrsdNHy2qIh7EnD2IGSVQ==
   dependencies:
     "@types/node" "~12"
 
-"@wireapp/webapp-events@0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/webapp-events/-/webapp-events-0.2.0.tgz#3118a56a03bb0e2176987652d3853af5655537e6"
-  integrity sha512-tcbNzWBpsYGpwNGTqRbsfbMRsnuF0fmFEnfpmvL5RRWYjM4ZwyIAI3IT+HosF9mSByhShlgO6HAJHUDhlFgT9w==
+"@wireapp/webapp-events@0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/webapp-events/-/webapp-events-0.3.0.tgz#e1a6c68002531e7479c02133dd64870afbe86c9f"
+  integrity sha512-wDrjfl7VuHRUzNTXMl0DjON8T3SttI5hWJLu37xddvdhhi75rygoVDPclwFG1xRrqWqgWedsnddsxWjGZz/tgA==
 
 "@wireapp/websql@0.0.17":
   version "0.0.17"

@@ -98,6 +98,7 @@ export class CallingRepository {
 
   private readonly logger: Logger;
   private readonly callLog: string[];
+  private readonly cbrEncoding: ko.Observable<number>;
 
   static get CONFIG() {
     return {
@@ -129,8 +130,13 @@ export class CallingRepository {
 
     this.logger = getLogger('CallingRepository');
     this.callLog = [];
+    this.cbrEncoding = ko.observable(0);
 
     this.subscribeToEvents();
+  }
+
+  toggleCbrEncoding(vbrEnabled: boolean) {
+    this.cbrEncoding(vbrEnabled ? 0 : 1);
   }
 
   getStats(conversationId: ConversationId): Promise<{stats: RTCStatsReport; userid: UserId}[]> {
@@ -344,7 +350,8 @@ export class CallingRepository {
    */
   subscribeToEvents(): void {
     amplify.subscribe(WebAppEvents.CALL.EVENT_FROM_BACKEND, this.onCallEvent.bind(this));
-    amplify.subscribe(WebAppEvents.CALL.STATE.TOGGLE, this.toggleState.bind(this)); // This event needs to be kept, it is sent by the wrapper
+    amplify.subscribe(WebAppEvents.CALL.STATE.TOGGLE, this.toggleState.bind(this));
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_VBR_ENCODING, this.toggleCbrEncoding.bind(this)); // This event needs to be kept, it is sent by the wrapper
   }
 
   //##############################################################################
@@ -481,7 +488,7 @@ export class CallingRepository {
       const success = await loadPreviewPromise;
       if (success) {
         const conferenceCall = conversationType === CONV_TYPE.GROUP ? CONV_TYPE.CONFERENCE : conversationType;
-        this.wCall.start(this.wUser, conversationId, callType, conferenceCall, 0);
+        this.wCall.start(this.wUser, conversationId, callType, conferenceCall, this.cbrEncoding());
       } else {
         this.showNoCameraModal();
         this.removeCall(call);
@@ -525,7 +532,7 @@ export class CallingRepository {
         call.getSelfParticipant().releaseVideoStream();
       }
       await this.warmupMediaStreams(call, true, isVideoCall);
-      this.wCall.answer(this.wUser, call.conversationId, callType, 0);
+      this.wCall.answer(this.wUser, call.conversationId, callType, this.cbrEncoding());
     } catch (_) {
       this.rejectCall(call.conversationId);
     }
