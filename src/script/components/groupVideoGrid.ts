@@ -24,13 +24,6 @@ import {afterRender} from 'Util/util';
 import type {Participant} from '../calling/Participant';
 import type {Grid} from '../calling/videoGridHandler';
 
-enum VIDEO_SIZE {
-  EMPTY = 'empty',
-  FULL_SCREEN = 'full_screen',
-  HALF_SCREEN = 'half_screen',
-  QUARTER_SCREEN = 'quarter_screen',
-}
-
 interface GroupVideoGripParams {
   grid: ko.PureComputed<Grid>;
   minimized: boolean;
@@ -45,13 +38,6 @@ class GroupVideoGrid {
   public readonly muted: ko.Observable<boolean>;
   public readonly selfUserId: string;
   public readonly dispose: () => void;
-
-  static get CONFIG() {
-    return {
-      CONTAIN_CLASS: 'group-video-grid__element-video--contain',
-      RATIO_THRESHOLD: 0.4,
-    };
-  }
 
   constructor({minimized, grid, muted, selfUserId}: GroupVideoGripParams, rootElement: HTMLElement) {
     this.selfUserId = selfUserId;
@@ -70,7 +56,7 @@ class GroupVideoGrid {
     this.dispose = () => gridSubscription.dispose();
   }
 
-  setRowsAndColumns(rootElement: HTMLElement, totalCount: number) {
+  setRowsAndColumns(rootElement: HTMLElement, totalCount: number): void {
     const columns = Math.ceil(Math.sqrt(totalCount));
     const rows = Math.ceil(totalCount / columns);
     const gridContainer = rootElement.querySelector('.group-video-grid') as HTMLElement;
@@ -83,72 +69,26 @@ class GroupVideoGrid {
     return this.minimized && gridElementsCount > 1;
   }
 
+  toggleContain(element: HTMLVideoElement, force?: boolean): void {
+    element.classList.toggle('group-video-grid__element-video--contain', force);
+  }
+
   scaleVideos(rootElement: HTMLElement): void {
-    const elements = Array.from(rootElement.querySelectorAll('.group-video-grid__element'));
-    const setScale = (videoElement: HTMLVideoElement, wrapper: HTMLElement) => {
-      const userId = wrapper.dataset.userId;
+    const gridElements = Array.from(rootElement.querySelectorAll('.group-video-grid__element'));
+    gridElements.forEach((element: HTMLElement) => {
+      const videoElement = element.querySelector('video');
+      const userId = element.dataset.userId;
       const participant = this.videoParticipants().find(participant => participant.userId === userId);
       if (participant) {
-        updateContainClass(videoElement, wrapper, participant);
-      }
-    };
-
-    const updateContainClass = (
-      videoElement: HTMLVideoElement,
-      wrapper: HTMLElement,
-      participant: Participant,
-    ): void => {
-      const wrapperRatio = wrapper.clientWidth / wrapper.clientHeight;
-      const videoRatio = videoElement.videoWidth / videoElement.videoHeight;
-      const isVeryDifferent = Math.abs(wrapperRatio - videoRatio) > GroupVideoGrid.CONFIG.RATIO_THRESHOLD;
-      const shouldBeContain = isVeryDifferent || participant.sharesScreen();
-      videoElement.classList.toggle(GroupVideoGrid.CONFIG.CONTAIN_CLASS, shouldBeContain);
-    };
-
-    elements.forEach((element: HTMLElement) => {
-      const videoElement = element.querySelector('video');
-      if (videoElement.videoWidth > 0) {
-        afterRender(() => setScale(videoElement, element));
-      } else {
-        videoElement.addEventListener('loadedmetadata', () => setScale(videoElement, element), {once: true});
+        afterRender(() => this.toggleContain(videoElement, participant.sharesScreen()));
       }
     });
   }
 
-  doubleClickedOnVideo = (viewModel: any, {currentTarget}: any): void => {
-    const childVideo = currentTarget.querySelector('video');
-    childVideo.classList.toggle(GroupVideoGrid.CONFIG.CONTAIN_CLASS);
+  doubleClickedOnVideo = (_: GroupVideoGrid, {currentTarget}: MouseEvent): void => {
+    const childVideo = (currentTarget as HTMLElement).querySelector('video');
+    this.toggleContain(childVideo);
   };
-
-  getSizeForVideo(index: number): VIDEO_SIZE {
-    const grid = this.grid().grid;
-
-    const isAlone = grid.filter(member => !!member).length === 1;
-    const hasVerticalNeighbor = index % 2 === 0 ? grid[index + 1] !== null : grid[index - 1] !== null;
-
-    if (isAlone) {
-      return VIDEO_SIZE.FULL_SCREEN;
-    } else if (!hasVerticalNeighbor) {
-      return VIDEO_SIZE.HALF_SCREEN;
-    }
-    return VIDEO_SIZE.QUARTER_SCREEN;
-  }
-
-  getClassNameForVideo(index: number, participant: Participant): string {
-    const size = this.getSizeForVideo(index);
-    const extraClasses: Record<VIDEO_SIZE, string> = {
-      [VIDEO_SIZE.EMPTY]: 'group-video-grid__element--empty',
-      [VIDEO_SIZE.FULL_SCREEN]: 'group-video-grid__element--full-size',
-      [VIDEO_SIZE.HALF_SCREEN]: 'group-video-grid__element--full-height',
-      [VIDEO_SIZE.QUARTER_SCREEN]: '',
-    };
-
-    const roundedClass =
-      this.minimized && this.videoParticipants().length === 1 ? ' group-video-grid__element--rounded' : '';
-    const shouldBeMirrored = participant.userId === this.selfUserId && participant.sharesCamera();
-    const mirrorClass = shouldBeMirrored ? ' mirror' : '';
-    return `group-video-grid__element${index} ${extraClasses[size]}${mirrorClass}${roundedClass}`;
-  }
 }
 
 ko.components.register('group-video-grid', {
@@ -160,6 +100,7 @@ ko.components.register('group-video-grid', {
       >
         <!-- ko if: participant -->
           <div class="group-video-grid__element" data-bind="
+              css: {mirror: participant.userId === selfUserId && participant.sharesCamera()},
               attr: {'data-user-id': participant.userId},
               event: {dblclick: doubleClickedOnVideo}"
             data-uie-name="item-grid"
