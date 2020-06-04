@@ -32,7 +32,6 @@ import type {MediumImage} from './MediumImage';
 import {Message} from './Message';
 import {Text as TextAsset} from './Text';
 import {AssetRepository} from '../../assets/AssetRepository';
-import {AssetTransferState} from '../../assets/AssetTransferState';
 
 export class ContentMessage extends Message {
   readonly edited_timestamp: ko.Observable<number>;
