@@ -319,6 +319,7 @@ export class TestFactory {
     this.calling_repository = new CallingRepository(
       container.resolve(APIClientSingleton).getClient(),
       this.conversation_repository,
+      this.user_repository,
       this.event_repository,
       new MediaRepository(new PermissionRepository()).streamHandler,
       serverTimeHandler,

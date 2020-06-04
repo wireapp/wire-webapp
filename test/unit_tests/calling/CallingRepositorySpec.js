@@ -32,6 +32,12 @@ import {ModalsViewModel} from 'src/script/view_model/ModalsViewModel';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 import {TestFactory} from '../../helper/TestFactory';
 
+const createSelfParticipant = () => {
+  const selfUser = new User();
+  selfUser.isMe = true;
+  return new Participant(selfUser);
+};
+
 describe('CallingRepository', () => {
   const testFactory = new TestFactory();
   let callingRepository;
@@ -111,8 +117,8 @@ describe('CallingRepository', () => {
   });
 
   describe('getCallMediaStream', () => {
-    it('return cached mediastream for self user if set', () => {
-      const selfParticipant = new Participant();
+    it('returns cached mediastream for self user if set', () => {
+      const selfParticipant = createSelfParticipant();
       const call = new Call('', '', undefined, selfParticipant);
       const audioTrack = silence();
       const selfMediaStream = new MediaStream([audioTrack]);
@@ -131,7 +137,7 @@ describe('CallingRepository', () => {
     });
 
     it('ask only once for mediastream when queried multiple times', () => {
-      const selfParticipant = new Participant();
+      const selfParticipant = createSelfParticipant();
       const call = new Call('', '', undefined, selfParticipant);
       const audioTrack = silence();
       const selfMediaStream = new MediaStream([audioTrack]);
@@ -153,7 +159,7 @@ describe('CallingRepository', () => {
 
   describe('stopMediaSource', () => {
     it('release media streams', () => {
-      const selfParticipant = new Participant();
+      const selfParticipant = createSelfParticipant();
       spyOn(selfParticipant, 'releaseAudioStream');
       spyOn(selfParticipant, 'releaseVideoStream');
       const call = new Call('', '', 0, selfParticipant, 0);
@@ -173,7 +179,7 @@ describe('CallingRepository', () => {
   describe('changeMediaSource', () => {
     it('changes active call sent media streams', () => {
       spyOn(callingRepository.wCall, 'replaceTrack');
-      const selfParticipant = new Participant();
+      const selfParticipant = createSelfParticipant();
       spyOn(selfParticipant, 'releaseStream');
       spyOn(selfParticipant, 'sharesCamera').and.returnValue(true);
       const call = new Call('', '', 0, selfParticipant, 0);

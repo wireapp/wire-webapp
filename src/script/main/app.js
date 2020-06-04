@@ -290,6 +290,7 @@ class App {
       this.apiClient,
       repositories.conversation,
       repositories.event,
+      repositories.user,
       repositories.media.streamHandler,
       serverTimeHandler,
     );

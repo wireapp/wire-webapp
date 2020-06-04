@@ -31,7 +31,6 @@ export class Call {
   public readonly startedAt: ko.Observable<number | undefined>;
   public readonly state: ko.Observable<CALL_STATE>;
   public readonly participants: ko.ObservableArray<Participant>;
-  public readonly selfUserId: UserId;
   public readonly selfClientId: ClientId;
   public readonly conversationType: CONV_TYPE;
   public readonly initialType: CALL_TYPE;
@@ -49,7 +48,6 @@ export class Call {
     this.state = ko.observable(CALL_STATE.UNKNOWN);
     this.conversationType = conversationType;
     this.initialType = callType;
-    this.selfUserId = selfParticipant?.userId;
     this.selfClientId = selfParticipant?.clientId;
     this.participants = ko.observableArray([selfParticipant]);
     this.reason = ko.observable();
@@ -57,9 +55,7 @@ export class Call {
   }
 
   getSelfParticipant(): Participant {
-    return this.participants().find(
-      ({userId, clientId}) => this.selfUserId === userId && this.selfClientId === clientId,
-    );
+    return this.participants().find(({user, clientId}) => user.isMe && this.selfClientId === clientId);
   }
 
   addParticipant(participant: Participant): void {
@@ -67,13 +63,11 @@ export class Call {
   }
 
   getParticipant(userId: UserId, clientId: ClientId): Participant {
-    return this.participants().find(participant => participant.userId === userId && clientId === participant.clientId);
+    return this.participants().find(participant => participant.user.id === userId && clientId === participant.clientId);
   }
 
   getRemoteParticipants(): Participant[] {
-    return this.participants().filter(
-      ({userId, clientId}) => this.selfUserId !== userId || this.selfClientId !== clientId,
-    );
+    return this.participants().filter(({user, clientId}) => !user.isMe || this.selfClientId !== clientId);
   }
 
   removeParticipant(participant: Participant): void {

@@ -230,7 +230,7 @@ export class CallingViewModel {
           if (!stream) {
             return;
           }
-          const audioId = `${participant.userId}-${stream.id}`;
+          const audioId = `${participant.user.id}-${stream.id}`;
           if (
             participantsAudioElement[audioId] &&
             (participantsAudioElement[audioId].srcObject as MediaStream).active

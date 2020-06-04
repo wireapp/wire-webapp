@@ -27,8 +27,8 @@ import {Conversation} from 'src/script/entity/Conversation';
 import 'src/script/components/list/conversationListCallingCell';
 import {User} from 'src/script/entity/User';
 
-function createCall(state, selfId = createRandomUuid()) {
-  const selfParticipant = new Participant(selfId);
+function createCall(state, selfUser = new User(createRandomUuid())) {
+  const selfParticipant = new Participant(selfUser);
   const call = new Call('', '', undefined, selfParticipant);
   call.state(state);
   return call;
@@ -86,11 +86,10 @@ describe('conversationListCallingCell', () => {
   it('displays the running time of an ongoing call', () => {
     const conversation = new Conversation();
     spyOn(conversation, 'supportsVideoCall').and.returnValue(true);
-    const selfId = createRandomUuid();
-    const selfUserEntity = new User(selfId);
+    const selfUserEntity = new User(createRandomUuid());
     selfUserEntity.isMe = true;
     conversation.selfUser(selfUserEntity);
-    const call = createCall(CALL_STATE.MEDIA_ESTAB, selfId);
+    const call = createCall(CALL_STATE.MEDIA_ESTAB, selfUserEntity);
     const params = {...defaultParams, call, conversation: () => conversation};
     return instantiateComponent('conversation-list-calling-cell', params).then(domContainer => {
       call.startedAt(Date.now());
