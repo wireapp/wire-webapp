@@ -32,6 +32,14 @@ const ASSET_CACHE_MAX_ITEMS = 1000;
 const CACHE_VERSION = 3;
 const ASSET_CACHE_NAME = `asset-cache-v${CACHE_VERSION}`;
 
+// Clear old caches
+const DEPRECATED_ASSET_CACHE_NAME = `asset: 'asset-cache-v2`;
+caches.delete(DEPRECATED_ASSET_CACHE_NAME).then(isDeprecatedCacheDeleted => {
+  if (isDeprecatedCacheDeleted) {
+    console.log(`Deprecated asset cache "${DEPRECATED_ASSET_CACHE_NAME}" got deleted`);
+  }
+});
+
 registerRoute(
   ({url}) => {
     return url.search.includes('forceCaching=true');
