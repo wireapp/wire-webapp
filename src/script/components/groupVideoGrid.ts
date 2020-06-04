@@ -78,7 +78,7 @@ class GroupVideoGrid {
     gridElements.forEach((element: HTMLElement) => {
       const videoElement = element.querySelector('video');
       const userId = element.dataset.userId;
-      const participant = this.videoParticipants().find(participant => participant.userId === userId);
+      const participant = this.videoParticipants().find(participant => participant.user.id === userId);
       if (participant) {
         afterRender(() => this.toggleContain(videoElement, participant.sharesScreen()));
       }
@@ -100,14 +100,14 @@ ko.components.register('group-video-grid', {
       >
         <!-- ko if: participant -->
           <div class="group-video-grid__element" data-bind="
-              css: {mirror: participant.userId === selfUserId && participant.sharesCamera()},
-              attr: {'data-user-id': participant.userId},
+              css: {mirror: participant.user.isMe && participant.sharesCamera()},
+              attr: {'data-user-id': participant.user.id},
               event: {dblclick: doubleClickedOnVideo}"
             data-uie-name="item-grid"
           >
             <video class="group-video-grid__element-video" autoplay playsinline data-bind="sourceStream: participant.videoStream(), css: {'group-video-grid__element-video--contain': participant.sharesScreen()}">
             </video>
-            <!-- ko if: !minimized && muted() && participant.userId === selfUserId -->
+            <!-- ko if: !minimized && muted() && participant.user.isMe -->
               <div class="group-video-grid__mute-overlay" data-uie-name="status-call-audio-muted">
                 <micoff-icon></micoff-icon>
               </div>

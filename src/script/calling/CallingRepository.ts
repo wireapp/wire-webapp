@@ -66,6 +66,7 @@ import {Call, ConversationId} from './Call';
 import {ClientId, Participant, UserId} from './Participant';
 import type {Recipients} from '../cryptography/CryptographyRepository';
 import type {Conversation} from '../entity/Conversation';
+import {UserRepository} from '../user/UserRepository';
 
 interface MediaStreamQuery {
   audio?: boolean;
@@ -74,11 +75,6 @@ interface MediaStreamQuery {
 }
 
 export class CallingRepository {
-  private readonly apiClient: APIClient;
-  private readonly conversationRepository: ConversationRepository;
-  private readonly eventRepository: EventRepository;
-  private readonly mediaStreamHandler: MediaStreamHandler;
-  private readonly serverTimeHandler: ServerTimeHandler;
   private poorCallQualityUsers: {[conversationId: string]: string[]} = {};
 
   private avsVersion: number;
@@ -108,11 +104,12 @@ export class CallingRepository {
   }
 
   constructor(
-    apiClient: APIClient,
-    conversationRepository: ConversationRepository,
-    eventRepository: EventRepository,
-    mediaStreamHandler: MediaStreamHandler,
-    serverTimeHandler: ServerTimeHandler,
+    private readonly apiClient: APIClient,
+    private readonly conversationRepository: ConversationRepository,
+    private readonly eventRepository: EventRepository,
+    private readonly userRepository: UserRepository,
+    private readonly mediaStreamHandler: MediaStreamHandler,
+    private readonly serverTimeHandler: ServerTimeHandler,
   ) {
     this.activeCalls = ko.observableArray();
     this.isMuted = ko.observable(false);
@@ -120,12 +117,6 @@ export class CallingRepository {
       return this.activeCalls().find(call => call.state() === CALL_STATE.MEDIA_ESTAB);
     });
 
-    this.apiClient = apiClient;
-    this.conversationRepository = conversationRepository;
-    this.eventRepository = eventRepository;
-    this.serverTimeHandler = serverTimeHandler;
-    // Media Handler
-    this.mediaStreamHandler = mediaStreamHandler;
     this.incomingCallCallback = () => {};
 
     this.logger = getLogger('CallingRepository');
@@ -478,7 +469,7 @@ export class CallingRepository {
         rejectedCallInConversation.state(CALL_STATE.NONE);
         this.removeCall(rejectedCallInConversation);
       }
-      const selfParticipant = new Participant(this.selfUser.id, this.selfClientId);
+      const selfParticipant = new Participant(this.selfUser, this.selfClientId);
       const call = new Call(this.selfUser.id, conversationId, conversationType, selfParticipant, callType);
       this.storeCall(call);
       const loadPreviewPromise =
@@ -748,7 +739,7 @@ export class CallingRepository {
       this.removeCall(storedCall);
     }
     const canRing = !conversationEntity.showNotificationsNothing() && shouldRing && this.isReady;
-    const selfParticipant = new Participant(this.selfUser.id, this.selfClientId);
+    const selfParticipant = new Participant(this.selfUser, this.selfClientId);
     const isVideoCall = hasVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL;
     const call = new Call(
       userId,
@@ -797,12 +788,12 @@ export class CallingRepository {
     const {members}: {members: {clientid: ClientId; userid: UserId}[]} = JSON.parse(membersJson);
     const newMembers = members
       .filter(({userid, clientid}) => !this.findParticipant(conversationId, userid, clientid))
-      .map(({userid, clientid}) => new Participant(userid, clientid));
+      .map(({userid, clientid}) => new Participant(this.userRepository.findUserById(userid), clientid));
     const removedMembers = call
       .participants()
       .filter(
         participant =>
-          !members.find(member => member.userid === participant.userId && member.clientid === participant.clientId),
+          !members.find(member => member.userid === participant.user.id && member.clientid === participant.clientId),
       );
 
     newMembers.forEach(participant => call.participants.unshift(participant));
@@ -894,7 +885,7 @@ export class CallingRepository {
   ): void => {
     let participant = this.findParticipant(conversationId, userId, clientId);
     if (!participant) {
-      participant = new Participant(userId, clientId);
+      participant = new Participant(this.userRepository.findUserById(userId), clientId);
       const call = this.findCall(conversationId);
       call.addParticipant(participant);
     }
@@ -921,12 +912,12 @@ export class CallingRepository {
     const call = this.findCall(conversationId);
     if (call) {
       const selfParticipant = call.getSelfParticipant();
-      if (call.state() === CALL_STATE.MEDIA_ESTAB && userId === selfParticipant.userId) {
+      if (call.state() === CALL_STATE.MEDIA_ESTAB && userId === selfParticipant.user.id) {
         selfParticipant.releaseVideoStream();
       }
       call
         .participants()
-        .filter(participant => participant.userId === userId && participant.clientId === clientId)
+        .filter(participant => participant.user.id === userId && participant.clientId === clientId)
         .forEach(participant => participant.videoState(state));
     }
   };

@@ -160,8 +160,8 @@ class ConversationListCallingCell {
     this.disableScreenButton = !this.callingRepository.supportsScreenSharing;
     this.disableVideoButton = ko.pureComputed(() => {
       const selfParticipant = call.getSelfParticipant();
-      const isOutgoingVideoCall = this.isOutgoing() && selfParticipant.sharesCamera();
-      const isVideoUnsupported = !selfParticipant.sharesCamera() && !conversation().supportsVideoCall();
+      const isOutgoingVideoCall = this.isOutgoing() && selfParticipant?.sharesCamera();
+      const isVideoUnsupported = !selfParticipant?.sharesCamera() && !conversation().supportsVideoCall();
       return isOutgoingVideoCall || isVideoUnsupported;
     });
 
@@ -172,7 +172,7 @@ class ConversationListCallingCell {
     this.users = ko.pureComputed(() =>
       call
         .participants()
-        .map(({userId}) => this.findUser(userId))
+        .map(({user}) => user)
         .sort(sortUsersByPriority),
     );
 
@@ -206,8 +206,8 @@ class ConversationListCallingCell {
     return this.conversationParticipants().find(user => user.id === userId);
   }
 
-  userHasCamera(user: User): boolean {
-    const participant = this.call.participants().find(({userId}) => userId === user.id);
+  userHasCamera(userEntity: User): boolean {
+    const participant = this.call.participants().find(({user}) => user === userEntity);
     return participant?.hasActiveVideo() ?? false;
   }
 }
