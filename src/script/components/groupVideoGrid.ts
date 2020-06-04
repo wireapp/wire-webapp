@@ -40,7 +40,7 @@ class GroupVideoGrid {
   public readonly dispose: () => void;
 
   constructor({minimized, grid, muted, selfUserId}: GroupVideoGripParams, rootElement: HTMLElement) {
-    this.selfUserId = selfUserId;
+    this.selfUserId = ko.unwrap(selfUserId);
     this.scaleVideos = this.scaleVideos.bind(this, rootElement);
     this.grid = grid;
     this.muted = muted || ko.observable(false);
