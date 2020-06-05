@@ -107,9 +107,15 @@ ko.components.register('group-video-grid', {
           >
             <video class="group-video-grid__element-video" autoplay playsinline data-bind="sourceStream: participant.videoStream(), css: {'group-video-grid__element-video--contain': participant.sharesScreen()}">
             </video>
-            <!-- ko if: !minimized && muted() && participant.user.isMe -->
-              <div class="group-video-grid__mute-overlay" data-uie-name="status-call-audio-muted">
-                <micoff-icon></micoff-icon>
+            <!-- ko if: !minimized -->
+              <!-- ko if: participant.user.isMe && muted() -->
+                <div class="group-video-grid__mute-overlay" data-uie-name="status-call-audio-muted">
+                  <micoff-icon></micoff-icon>
+                </div>
+              <!-- /ko -->
+              <div class="group-video-grid__element__label">
+                <!-- microphone icon goes here -->
+                <span class="group-video-grid__element__label__name" data-bind="text: participant.user.name()"></span>
               </div>
             <!-- /ko -->
             <!-- ko if: participant.hasPausedVideo() -->
