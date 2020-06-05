@@ -100,12 +100,14 @@ ko.components.register('group-video-grid', {
       >
         <!-- ko if: participant -->
           <div class="group-video-grid__element" data-bind="
-              css: {mirror: participant.user.isMe && participant.sharesCamera()},
               attr: {'data-user-id': participant.user.id},
               event: {dblclick: doubleClickedOnVideo}"
             data-uie-name="item-grid"
           >
-            <video class="group-video-grid__element-video" autoplay playsinline data-bind="sourceStream: participant.videoStream(), css: {'group-video-grid__element-video--contain': participant.sharesScreen()}">
+            <video class="group-video-grid__element-video" autoplay playsinline 
+              data-bind="
+                sourceStream: participant.videoStream(), 
+                css: {'group-video-grid__element-video--contain': participant.sharesScreen(), mirror: participant.user.isMe && participant.sharesCamera()}">
             </video>
             <!-- ko if: !minimized -->
               <!-- ko if: participant.user.isMe && muted() -->
@@ -114,7 +116,12 @@ ko.components.register('group-video-grid', {
                 </div>
               <!-- /ko -->
               <div class="group-video-grid__element__label">
-                <!-- microphone icon goes here -->
+                <!-- ko if: participant.user.isMe && muted() -->
+                  <micoff-icon class="group-video-grid__element__label__icon"></micoff-icon>
+                <!-- /ko -->
+                <!-- ko ifnot: participant.user.isMe && muted() -->
+                  <audio-icon class="group-video-grid__element__label__icon"></audio-icon>
+                <!-- /ko -->
                 <span class="group-video-grid__element__label__name" data-bind="text: participant.user.name()"></span>
               </div>
             <!-- /ko -->

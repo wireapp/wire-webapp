@@ -116,11 +116,40 @@
       }
 
       &__label {
+        position: absolute;
+        bottom: 0;
+        display: flex;
+        max-width: calc(100% - 16px);
+        align-items: center;
+        padding: 8px;
+        margin: 8px;
         backdrop-filter: blur(10px);
         background-color: rgba(128, 128, 128, 0.24);
+        border-radius: 100px;
+        color: #fff;
+        font-size: 12px;
+        line-height: 1em;
+        opacity: 0;
+        white-space: nowrap;
+
+        .hide-controls & {
+          opacity: 1;
+          transition: opacity 0.25s ease-in-out;
+        }
+
+        &__icon {
+          margin-right: 8px;
+          svg {
+            width: 16px;
+            path {
+              fill: #fff;
+            }
+          }
+        }
+
         &__name {
-          color: #fff;
-          font-size: 12px;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
       }
     }
