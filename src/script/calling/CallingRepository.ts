@@ -62,7 +62,7 @@ import {MediaType} from '../media/MediaType';
 import type {User} from '../entity/User';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import {Call, ConversationId} from './Call';
-import {DeviceId, Participant, UserId} from './Participant';
+import {ClientId, Participant, UserId} from './Participant';
 import type {Recipients} from '../cryptography/CryptographyRepository';
 import type {Conversation} from '../entity/Conversation';
 
@@ -83,7 +83,7 @@ export class CallingRepository {
   private avsVersion: number;
   private incomingCallCallback: (call: Call) => void;
   private isReady: boolean = false;
-  private selfClientId: DeviceId;
+  private selfClientId: ClientId;
   private selfUser: User;
   private wCall?: Wcall;
   private wUser?: number;
@@ -136,7 +136,7 @@ export class CallingRepository {
     return this.wCall.getStats(conversationId);
   }
 
-  initAvs(selfUser: User, clientId: DeviceId): Promise<{wCall: Wcall; wUser: number}> {
+  initAvs(selfUser: User, clientId: ClientId): Promise<{wCall: Wcall; wUser: number}> {
     this.selfUser = selfUser;
     this.selfClientId = clientId;
     return getAvsInstance().then(callingInstance => {
@@ -266,9 +266,9 @@ export class CallingRepository {
     return this.activeCalls().find((callInstance: Call) => callInstance.conversationId === conversationId);
   }
 
-  private findParticipant(conversationId: ConversationId, userId: UserId): Participant | undefined {
+  private findParticipant(conversationId: ConversationId, userId: UserId, clientId: ClientId): Participant | undefined {
     const call = this.findCall(conversationId);
-    return call?.participants().find(participant => participant.userId === userId);
+    return call?.participants().find(participant => participant.userId === userId && participant.clientId === clientId);
   }
 
   private storeCall(call: Call): void {
@@ -619,9 +619,9 @@ export class CallingRepository {
     context: any,
     conversationId: ConversationId,
     userId: UserId,
-    clientId: DeviceId,
+    clientId: ClientId,
     destinationUserId: UserId,
-    destinationClientId: DeviceId,
+    destinationClientId: ClientId,
     payload: string,
   ): number => {
     const protoCalling = new Calling({content: payload});
@@ -743,14 +743,14 @@ export class CallingRepository {
       return;
     }
 
-    const {members}: {members: {clientid: DeviceId; userid: UserId}[]} = JSON.parse(membersJson);
+    const {members}: {members: {clientid: ClientId; userid: UserId}[]} = JSON.parse(membersJson);
     const newMembers = members
-      .filter(({userid}) => !this.findParticipant(conversationId, userid))
+      .filter(({userid, clientid}) => !this.findParticipant(conversationId, userid, clientid))
       .map(({userid, clientid}) => new Participant(userid, clientid));
     const removedMembers = call
       .participants()
       .filter(
-        ({userId, deviceId}) => !members.find(({userid, clientid}) => userid === userId && clientid === deviceId),
+        ({userId, clientId}) => !members.find(member => member.userid === userId && member.clientid === clientId),
       );
 
     newMembers.forEach(participant => call.participants.unshift(participant));
@@ -832,12 +832,12 @@ export class CallingRepository {
   private readonly updateParticipantStream = (
     conversationId: ConversationId,
     userId: UserId,
-    deviceId: DeviceId,
+    clientId: ClientId,
     streams: MediaStream[],
   ): void => {
-    let participant = this.findParticipant(conversationId, userId);
+    let participant = this.findParticipant(conversationId, userId, clientId);
     if (!participant) {
-      participant = new Participant(userId, deviceId);
+      participant = new Participant(userId, clientId);
       this.findCall(conversationId).participants.unshift(participant);
     }
 
@@ -857,7 +857,7 @@ export class CallingRepository {
   private readonly videoStateChanged = (
     conversationId: ConversationId,
     userId: UserId,
-    deviceId: DeviceId,
+    clientId: ClientId,
     state: number,
   ) => {
     const call = this.findCall(conversationId);
@@ -868,7 +868,7 @@ export class CallingRepository {
       call
         .participants()
         .concat(call.selfParticipant)
-        .filter(participant => participant.userId === userId)
+        .filter(participant => participant.userId === userId && participant.clientId === clientId)
         .forEach(participant => participant.videoState(state));
     }
   };
@@ -876,7 +876,7 @@ export class CallingRepository {
   private targetMessageRecipients(
     payload: string,
     remoteUserId: UserId | null,
-    remoteClientId: DeviceId | null,
+    remoteClientId: ClientId | null,
   ): {precondition?: boolean | string[]; recipients: Recipients} {
     const {type, resp} = JSON.parse(payload);
     let precondition;
