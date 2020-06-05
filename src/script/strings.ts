@@ -37,8 +37,12 @@ export const customEnvRedirectStrings = defineMessages({
     defaultMessage: "Provide credentials only if you're sure this is your organization's login.",
     id: 'customEnvRedirect.credentialsInfo',
   },
+  redirectHeadline: {
+    defaultMessage: 'Redirecting...',
+    id: 'customEnvRedirect.redirectHeadline',
+  },
   redirectTo: {
-    defaultMessage: 'You are being redirected to',
+    defaultMessage: 'You are being redirected to your dedicated enterprise service.',
     id: 'customEnvRedirect.redirectTo',
   },
 });
@@ -84,11 +88,11 @@ export const setAccountTypeStrings = defineMessages({
     id: 'index.createAccountForPersonalUse',
   },
   createPersonalAccount: {
-    defaultMessage: 'create an account',
+    defaultMessage: 'Chat privately with groups of friends and family',
     id: 'index.createPersonalAccount',
   },
   createTeam: {
-    defaultMessage: 'create a team',
+    defaultMessage: 'Secure collaboration for businesses, institutions and professional organizations',
     id: 'index.createTeam',
   },
 });
@@ -628,11 +632,11 @@ export const validationErrorStrings = defineMessages({
     id: 'ValidationError.FIELD.PASSWORD_LOGIN.PATTERN_MISMATCH',
   },
   [ValidationError.FIELD.SSO_CODE.PATTERN_MISMATCH]: {
-    defaultMessage: 'Please enter a valid SSO access code',
+    defaultMessage: 'Please enter a valid SSO code',
     id: 'ValidationError.FIELD.SSO_CODE.PATTERN_MISMATCH',
   },
   [ValidationError.FIELD.SSO_EMAIL_CODE.PATTERN_MISMATCH]: {
-    defaultMessage: 'Please enter a valid email or SSO access code',
+    defaultMessage: 'Please enter a valid email or SSO code',
     id: 'ValidationError.FIELD.SSO_EMAIL_CODE.PATTERN_MISMATCH',
   },
   [ValidationError.FIELD.EMAIL.TYPE_MISMATCH]: {
@@ -682,11 +686,11 @@ export const loginStrings = defineMessages({
 
 export const ssoLoginStrings = defineMessages({
   codeInputPlaceholder: {
-    defaultMessage: 'SSO access code',
+    defaultMessage: 'SSO code',
     id: 'ssoLogin.codeInputPlaceholder',
   },
   codeOrMailInputPlaceholder: {
-    defaultMessage: 'Email or SSO access code',
+    defaultMessage: 'Email or SSO code',
     id: 'ssoLogin.codeOrMailInputPlaceholder',
   },
   headline: {

@@ -18,6 +18,7 @@
  */
 
 import {amplify} from 'amplify';
+import {escape} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {getLogger} from 'Util/Logger';
@@ -168,7 +169,7 @@ export class ModalsViewModel {
         const deviceList = data
           .map(device => {
             const deviceTime = formatLocale(device.time || new Date(), 'PP, p');
-            const deviceModel = `${t('modalAccountNewDevicesFrom')} ${device.model}`;
+            const deviceModel = `${t('modalAccountNewDevicesFrom')} ${escape(device.model)}`;
             return `<div>${deviceTime} - UTC</div><div>${deviceModel}</div>`;
           })
           .join('');
