@@ -20,9 +20,10 @@
 import ko from 'knockout';
 import {CONV_TYPE} from '@wireapp/avs';
 
+import {sortUsersByPriority} from 'Util/StringUtil';
+
 import type {Participant} from '../calling/Participant';
 import {Call} from './Call';
-import {sortUsersByPriority} from 'Util/StringUtil';
 
 export interface Grid {
   grid: Participant[];
