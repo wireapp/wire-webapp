@@ -20,6 +20,8 @@
 import ko from 'knockout';
 import {CONV_TYPE} from '@wireapp/avs';
 
+import {sortUsersByPriority} from 'Util/StringUtil';
+
 import type {Participant} from '../calling/Participant';
 import {Call} from './Call';
 
@@ -35,7 +37,10 @@ export function getGrid(call: Call): ko.PureComputed<Grid> {
     let inGridParticipants: Participant[];
     let thumbnailParticipant: Participant | null;
     const selfParticipant = call.getSelfParticipant();
-    const remoteVideoParticipants = call.getRemoteParticipants().filter(participant => participant.hasActiveVideo());
+    const remoteVideoParticipants = call
+      .getRemoteParticipants()
+      .filter(participant => participant.hasActiveVideo())
+      .sort((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user));
     if (showThumbnail && remoteVideoParticipants.length === 1) {
       inGridParticipants = remoteVideoParticipants;
       thumbnailParticipant = selfParticipant?.hasActiveVideo() ? selfParticipant : null;
