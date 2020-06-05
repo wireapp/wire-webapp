@@ -1,0 +1,33 @@
+{
+  "dependencies": {
+    "@types/long": "4.0.1",
+    "@types/node": "*",
+    "@wireapp/bot-api": "*"
+  },
+  "devDependencies": {
+    "@types/node": "~12",
+    "@wireapp/bot-api": "7.9.47",
+    "jasmine": "3.5.0",
+    "rimraf": "3.0.2",
+    "ts-node": "8.6.2",
+    "typescript": "3.8.3"
+  },
+  "files": [
+    "dist",
+    "!dist/demo"
+  ],
+  "license": "GPL-3.0",
+  "main": "dist/index.js",
+  "name": "@wireapp/bot-handler-debug",
+  "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-debug",
+  "scripts": {
+    "build": "yarn build:node",
+    "build:node": "tsc",
+    "clean": "rimraf dist",
+    "dist": "yarn clean && yarn build",
+    "test": "yarn test:node",
+    "test:node": "exit 0",
+    "test:project": "yarn dist && yarn test"
+  },
+  "version": "0.0.0"
+}
