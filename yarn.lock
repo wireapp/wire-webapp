@@ -1937,10 +1937,10 @@
   resolved "https://registry.yarnpkg.com/@wireapp/antiscroll-2/-/antiscroll-2-1.0.2.tgz#71a78d294ee0c88f42d50477ab61fa39272f5bca"
   integrity sha512-9KeB3yh9k01PjpuuRQsve4yY3+OVS2/hp9j+N13Is5wYCZRkUzZVCs8w9CyA/C6J5o9ukH0EzT7uurysWuhn/A==
 
-"@wireapp/api-client@11.19.2":
-  version "11.19.2"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-11.19.2.tgz#ddfbcc51df8bd9311d4454b20ffd566d7ee930a7"
-  integrity sha512-yQeOWrjuL6tQ4bqKqFJjNO8jkE56rx51PzPzlaJYh5r35wNZ0glbW8l4h8WiTxfluakRzrENBbzWaBQspguElg==
+"@wireapp/api-client@11.20.0":
+  version "11.20.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-11.20.0.tgz#748e4f57ba61e26b2f0c40809e2be26cc0469b43"
+  integrity sha512-VsqpAFrWKM8JbrIh5hgUPpD/10TTS0rvknkZfK+sqnlMNG06/l/24YFvIOWa1dJQqiTXAiuIcwR0IotNlZQO+w==
   dependencies:
     "@types/node" "~12"
     "@types/spark-md5" "3.0.2"
@@ -1991,14 +1991,14 @@
     logdown "3.3.1"
     rimraf "3.0.2"
 
-"@wireapp/core@16.9.13":
-  version "16.9.13"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-16.9.13.tgz#6a0a22710147518a93e20596794538950c600ffa"
-  integrity sha512-lpXGzD25gC5wY3QavqZj2rIDQP4muU8q0XPLpb6byXCGL1EHoA5lZZNUYpd0hiSXVBJque9f627OnOvpjn7vdA==
+"@wireapp/core@16.9.15":
+  version "16.9.15"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-16.9.15.tgz#5a2e28271bd89398884537b8092494102539df6e"
+  integrity sha512-jIkBgsPhvJV/gYQz1uJVytvzs0wx0K9eJjQ81JOtuJcqRifoocSkBcmo0x9PgPcBvkIcJ4laiZ/nH3Uoad08eg==
   dependencies:
     "@types/long" "4.0.1"
     "@types/node" "~12"
-    "@wireapp/api-client" "11.19.2"
+    "@wireapp/api-client" "11.20.0"
     "@wireapp/cryptobox" "12.2.11"
     "@wireapp/protocol-messaging" "1.25.4"
     "@wireapp/store-engine" "4.5.5"
@@ -2105,10 +2105,10 @@
   dependencies:
     "@types/node" "~12"
 
-"@wireapp/webapp-events@0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/webapp-events/-/webapp-events-0.2.0.tgz#3118a56a03bb0e2176987652d3853af5655537e6"
-  integrity sha512-tcbNzWBpsYGpwNGTqRbsfbMRsnuF0fmFEnfpmvL5RRWYjM4ZwyIAI3IT+HosF9mSByhShlgO6HAJHUDhlFgT9w==
+"@wireapp/webapp-events@0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/webapp-events/-/webapp-events-0.3.0.tgz#e1a6c68002531e7479c02133dd64870afbe86c9f"
+  integrity sha512-wDrjfl7VuHRUzNTXMl0DjON8T3SttI5hWJLu37xddvdhhi75rygoVDPclwFG1xRrqWqgWedsnddsxWjGZz/tgA==
 
 "@wireapp/websql@0.0.17":
   version "0.0.17"

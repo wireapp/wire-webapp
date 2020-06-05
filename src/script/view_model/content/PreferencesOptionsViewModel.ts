@@ -17,26 +17,39 @@
  *
  */
 
-import {AudioPreference} from '@wireapp/api-client/dist/user/data';
+import ko from 'knockout';
+import {amplify} from 'amplify';
+import {AudioPreference, WebappProperties, NotificationPreference} from '@wireapp/api-client/dist/user/data';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {getCurrentDate} from 'Util/TimeUtil';
 import {Environment} from 'Util/Environment';
 import {downloadBlob} from 'Util/util';
 
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
-
 import {Config} from '../../Config';
 import {THEMES as ThemeViewModelThemes} from '../ThemeViewModel';
 import {ModalsViewModel} from '../ModalsViewModel';
+import {CallingRepository} from 'src/script/calling/CallingRepository';
+import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
+import {TeamRepository} from 'src/script/team/TeamRepository';
+import {UserRepository} from 'src/script/user/UserRepository';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.content = z.viewModel.content || {};
+export class PreferencesOptionsViewModel {
+  isActivatedAccount: ko.PureComputed<boolean>;
+  isTeam: ko.PureComputed<boolean>;
+  supportsCalling: boolean;
+  Environment: typeof Environment;
+  optionAudio: ko.Observable<AudioPreference>;
+  optionDarkMode: ko.Observable<boolean>;
+  optionReplaceInlineEmoji: ko.Observable<boolean>;
+  optionNotifications: ko.Observable<NotificationPreference>;
+  optionSendPreviews: ko.Observable<boolean>;
+  optionVbrEncoding: ko.Observable<boolean>;
+  AudioPreference: typeof AudioPreference;
+  brandName: string;
 
-z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewModel {
   static get CONFIG() {
     return {
       MINIMUM_CALL_LOG_LENGTH: 15,
@@ -44,14 +57,12 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
     };
   }
 
-  constructor(repositories) {
-    this.logger = getLogger('z.viewModel.content.PreferencesOptionsViewModel');
-
-    this.callingRepository = repositories.calling;
-    this.propertiesRepository = repositories.properties;
-    this.teamRepository = repositories.team;
-    this.userRepository = repositories.user;
-
+  constructor(
+    private readonly callingRepository: CallingRepository,
+    private readonly propertiesRepository: PropertiesRepository,
+    private readonly teamRepository: TeamRepository,
+    private readonly userRepository: UserRepository,
+  ) {
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
     this.isTeam = this.teamRepository.isTeam;
     this.supportsCalling = this.callingRepository.supportsCalling;
@@ -84,6 +95,11 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
       this.propertiesRepository.savePreference(PROPERTIES_TYPE.PREVIEWS.SEND, sendPreviewsPreference);
     });
 
+    this.optionVbrEncoding = ko.observable(false);
+    this.optionVbrEncoding.subscribe(vbrEncoding => {
+      this.propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.ENABLE_VBR_ENCODING, vbrEncoding);
+    });
+
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, this.updateProperties.bind(this));
     this.updateProperties(this.propertiesRepository.properties);
 
@@ -91,7 +107,7 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
     this.brandName = Config.getConfig().BRAND_NAME;
   }
 
-  saveCallLogs() {
+  saveCallLogs(): number | void {
     const messageLog = this.callingRepository.getCallLog();
     // Very short logs will not contain useful information
     const logExceedsMinimumLength = messageLog.length > PreferencesOptionsViewModel.CONFIG.MINIMUM_CALL_LOG_LENGTH;
@@ -115,11 +131,12 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
     });
   }
 
-  updateProperties = ({settings}) => {
+  updateProperties = ({settings}: WebappProperties): void => {
     this.optionAudio(settings.sound.alerts);
     this.optionReplaceInlineEmoji(settings.emoji.replace_inline);
     this.optionDarkMode(settings.interface.theme === ThemeViewModelThemes.DARK);
     this.optionSendPreviews(settings.previews.send);
     this.optionNotifications(settings.notifications);
+    this.optionVbrEncoding(settings.call.enable_vbr_encoding);
   };
-};
+}

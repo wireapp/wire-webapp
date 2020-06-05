@@ -97,6 +97,7 @@ export class CallingRepository {
 
   private readonly logger: Logger;
   private readonly callLog: string[];
+  private readonly cbrEncoding: ko.Observable<number>;
 
   static get CONFIG() {
     return {
@@ -128,8 +129,13 @@ export class CallingRepository {
 
     this.logger = getLogger('CallingRepository');
     this.callLog = [];
+    this.cbrEncoding = ko.observable(0);
 
     this.subscribeToEvents();
+  }
+
+  toggleCbrEncoding(vbrEnabled: boolean) {
+    this.cbrEncoding(vbrEnabled ? 0 : 1);
   }
 
   getStats(conversationId: ConversationId): Promise<{stats: RTCStatsReport; userid: UserId}[]> {
@@ -324,6 +330,7 @@ export class CallingRepository {
   subscribeToEvents(): void {
     amplify.subscribe(WebAppEvents.CALL.EVENT_FROM_BACKEND, this.onCallEvent.bind(this));
     amplify.subscribe(WebAppEvents.CALL.STATE.TOGGLE, this.toggleState.bind(this)); // This event needs to be kept, it is sent by the wrapper
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_VBR_ENCODING, this.toggleCbrEncoding.bind(this));
   }
 
   //##############################################################################
@@ -461,7 +468,7 @@ export class CallingRepository {
 
         return loadPreviewPromise.then(success => {
           if (success) {
-            this.wCall.start(this.wUser, conversationId, callType, conversationType, 0);
+            this.wCall.start(this.wUser, conversationId, callType, conversationType, this.cbrEncoding());
           } else {
             this.showNoCameraModal();
             this.removeCall(call);
@@ -506,7 +513,7 @@ export class CallingRepository {
           call.selfParticipant.releaseVideoStream();
         }
         return this.warmupMediaStreams(call, true, isVideoCall).then(() => {
-          this.wCall.answer(this.wUser, call.conversationId, callType, 0);
+          this.wCall.answer(this.wUser, call.conversationId, callType, this.cbrEncoding());
         });
       })
       .catch(() => {
