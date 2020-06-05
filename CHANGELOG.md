@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [16.10.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@16.9.15...@wireapp/core@16.10.0) (2020-06-05)
+
+
+### Features
+
+* **bot-api:** Reuse cookie to login ([#3061](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/3061)) ([0ec66a1](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/0ec66a1505719d36e19991a1d12076041c224dc6))
+
+
+
+
+
 ## [16.9.15](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@16.9.14...@wireapp/core@16.9.15) (2020-06-03)
 
 **Note:** Version bump only for package @wireapp/core
