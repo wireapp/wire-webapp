@@ -193,7 +193,7 @@ export class CallingRepository {
       this.callClosed, // `closeh`,
       () => {}, // `metricsh`,
       this.requestConfig, // `cfg_reqh`,
-      () => {}, // `acbrh`,
+      this.audioCbrChanged, // `acbrh`,
       this.videoStateChanged, // `vstateh`,
     );
     /* cspell:enable */
@@ -851,6 +851,13 @@ export class CallingRepository {
     }
     if (stream.getVideoTracks().length > 0) {
       participant.videoStream(stream);
+    }
+  };
+
+  private readonly audioCbrChanged = (userid: UserId, clientid: ClientId, enabled: number) => {
+    const activeCall = this.activeCalls()[0];
+    if (activeCall) {
+      activeCall.isCbrEnabled(!!enabled);
     }
   };
 
