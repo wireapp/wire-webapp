@@ -158,7 +158,7 @@ class ConversationListCallingCell {
     this.disableScreenButton = !this.callingRepository.supportsScreenSharing;
     this.disableVideoButton = ko.pureComputed(() => {
       const isOutgoingVideoCall = this.isOutgoing() && call.selfParticipant.sharesCamera();
-      const isVideoUnsupported = !call.selfParticipant.sharesCamera() && !conversation().supportsVideoCall(true);
+      const isVideoUnsupported = !call.selfParticipant.sharesCamera() && !conversation().supportsVideoCall();
       return isOutgoingVideoCall || isVideoUnsupported;
     });
 
