@@ -143,8 +143,13 @@ export const accountFormStrings = defineMessages({
     id: 'accountForm.submitButton',
   },
   terms: {
-    defaultMessage: 'I accept the <a>terms and conditions</a>',
+    defaultMessage: 'I accept the <terms>terms and conditions</terms>',
     id: 'accountForm.terms',
+  },
+  termsAndPrivacyPolicy: {
+    defaultMessage:
+      'I accept the <terms>terms and conditions</terms> and <privacypolicy>privacy policy</privacypolicy>',
+    id: 'accountForm.termsAndPrivacyPolicy',
   },
 });
 

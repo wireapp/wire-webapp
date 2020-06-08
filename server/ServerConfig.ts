@@ -16,6 +16,7 @@ export interface ServerConfig {
       CHECK_CONSENT: boolean;
       DEFAULT_LOGIN_TEMPORARY_CLIENT: boolean;
       ENABLE_ACCOUNT_REGISTRATION: boolean;
+      ENABLE_ACCOUNT_REGISTRATION_ACCEPT_TERMS_AND_PRIVACY_POLICY: boolean;
       ENABLE_DEBUG: boolean;
       ENABLE_DOMAIN_DISCOVERY: boolean;
       ENABLE_PHONE_LOGIN: boolean;
