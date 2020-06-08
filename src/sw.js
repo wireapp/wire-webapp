@@ -16,7 +16,6 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-/* eslint-disable */
 
 import {skipWaiting, clientsClaim} from 'workbox-core';
 import {registerRoute} from 'workbox-routing';
@@ -26,6 +25,8 @@ import {ExpirationPlugin} from 'workbox-expiration';
 skipWaiting();
 clientsClaim();
 
+// Even without using precaching bundled files yet we need to include this in order to satisfy workbox.
+// eslint-disable-next-line
 self.__WB_MANIFEST;
 
 const ASSET_CACHE_MAX_ITEMS = 1000;
@@ -36,6 +37,7 @@ const ASSET_CACHE_NAME = `asset-cache-v${CACHE_VERSION}`;
 const DEPRECATED_ASSET_CACHE_NAME = `asset: 'asset-cache-v2`;
 caches.delete(DEPRECATED_ASSET_CACHE_NAME).then(isDeprecatedCacheDeleted => {
   if (isDeprecatedCacheDeleted) {
+    // eslint-disable-next-line
     console.log(`Deprecated asset cache "${DEPRECATED_ASSET_CACHE_NAME}" got deleted`);
   }
 });
@@ -49,14 +51,14 @@ registerRoute(
     cacheableResponse: {
       statuses: [200],
     },
+    matchOptions: {
+      ignoreSearch: true,
+    },
     plugins: [
       new ExpirationPlugin({
         maxAgeSeconds: 7 * 24 * 60 * 60, // One week
         maxEntries: ASSET_CACHE_MAX_ITEMS,
       }),
     ],
-    matchOptions: {
-      ignoreSearch: true,
-    },
   }),
 );
