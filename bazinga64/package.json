@@ -16,7 +16,7 @@
     "karma-spec-reporter": "0.0.32",
     "karma-typescript": "5.0.2",
     "libsodium-wrappers-sumo": "0.7.6",
-    "nyc": "15.0.1",
+    "nyc": "15.1.0",
     "rimraf": "3.0.2",
     "ts-node": "8.6.2",
     "typescript": "3.9.2",
