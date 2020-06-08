@@ -47,13 +47,14 @@ import {roleFromTeamPermissions, ROLE} from '../user/UserPermission';
 import {IntegrationMapper} from '../integration/IntegrationMapper';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {SuperProperty} from '../tracking/SuperProperty';
-import type {User} from '../entity/User';
-import type {TeamService} from './TeamService';
-import type {ROLE as TEAM_ROLE} from '../user/UserPermission';
-import type {UserRepository} from '../user/UserRepository';
-import type {EventRepository} from '../event/EventRepository';
-import type {TeamMemberEntity} from './TeamMemberEntity';
-import type {ServiceEntity} from '../integration/ServiceEntity';
+import {User} from '../entity/User';
+import {TeamService} from './TeamService';
+import {ROLE as TEAM_ROLE} from '../user/UserPermission';
+import {UserRepository} from '../user/UserRepository';
+import {EventRepository} from '../event/EventRepository';
+import {TeamMemberEntity} from './TeamMemberEntity';
+import {ServiceEntity} from '../integration/ServiceEntity';
+import {AssetRepository} from '../assets/AssetRepository';
 
 export interface AccountInfo {
   accentID: number;
@@ -75,17 +76,19 @@ export class TeamRepository {
   private readonly teamName: ko.PureComputed<string>;
   readonly teamUsers: ko.PureComputed<User[]>;
   private readonly userRepository: UserRepository;
+  private readonly assetRepository: AssetRepository;
   readonly isTeam: ko.PureComputed<boolean>;
   readonly selfUser: ko.Observable<User>;
   readonly team: ko.Observable<TeamEntity>;
   readonly teamService: TeamService;
   readonly teamSize: ko.PureComputed<number>;
 
-  constructor(teamService: TeamService, userRepository: UserRepository) {
+  constructor(teamService: TeamService, userRepository: UserRepository, assetRepository: AssetRepository) {
     this.logger = getLogger('TeamRepository');
 
     this.teamMapper = new TeamMapper();
     this.teamService = teamService;
+    this.assetRepository = assetRepository;
     this.userRepository = userRepository;
 
     this.selfUser = this.userRepository.self;
@@ -270,7 +273,7 @@ export class TeamRepository {
       let imageDataUrl;
 
       if (imageResource) {
-        const imageBlob = imageResource ? await imageResource.load() : undefined;
+        const imageBlob = imageResource ? await this.assetRepository.load(imageResource) : undefined;
         imageDataUrl = imageBlob ? await loadDataUrl(imageBlob) : undefined;
       }
 

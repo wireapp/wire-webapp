@@ -19,17 +19,20 @@
 
 import {APIClient} from '@wireapp/api-client';
 import {ProgressCallback, RequestCancelable} from '@wireapp/api-client/dist/http';
-import {assetV3, legacyAsset} from 'Util/ValidationUtil';
-import {BackendClient} from '../service/BackendClient';
 import {AssetOptions, AssetUploadData} from '@wireapp/api-client/dist/asset';
+import {singleton, container} from 'tsyringe';
+import {legacyAsset, assetV3} from 'Util/ValidationUtil';
+import {BackendClient} from '../service/BackendClient';
+import {APIClientSingleton} from '../service/APIClientSingleton';
 
+@singleton()
 export class AssetService {
   private readonly apiClient: APIClient;
   private readonly backendClient: BackendClient;
 
-  constructor(apiClient: APIClient, backendClient: BackendClient) {
-    this.apiClient = apiClient;
-    this.backendClient = backendClient;
+  constructor() {
+    this.apiClient = container.resolve(APIClientSingleton).getClient();
+    this.backendClient = container.resolve(BackendClient);
   }
 
   async generateAssetUrl(assetId: string, conversationId: string, forceCaching: boolean): Promise<string> {
@@ -61,5 +64,27 @@ export class AssetService {
     onProgress?: ProgressCallback,
   ): Promise<RequestCancelable<AssetUploadData>> {
     return this.apiClient.asset.api.postAsset(asset, options, onProgress);
+  }
+
+  async downloadAssetV1(
+    assetId: string,
+    conversationId: string,
+    forceCaching?: boolean,
+    progressCallback?: ProgressCallback,
+  ) {
+    return this.apiClient.asset.api.getAssetV1(assetId, conversationId, forceCaching, progressCallback);
+  }
+
+  async downloadAssetV2(
+    assetId: string,
+    conversationId: string,
+    forceCaching?: boolean,
+    progressCallback?: ProgressCallback,
+  ) {
+    return this.apiClient.asset.api.getAssetV2(assetId, conversationId, forceCaching, progressCallback);
+  }
+
+  async downloadAssetV3(assetId: string, token?: string, forceCaching?: boolean, progressCallback?: ProgressCallback) {
+    return this.apiClient.asset.api.getAssetV3(assetId, token, forceCaching, progressCallback);
   }
 }

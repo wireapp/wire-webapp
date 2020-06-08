@@ -549,7 +549,7 @@ export class UserRepository {
       if (!hasAsset) {
         // if there are no assets, just upload the old picture to the new api
         const {medium} = mapProfileAssetsV1(userData.id, userData.picture);
-        medium.load().then(imageBlob => this.changePicture(imageBlob as Blob));
+        this.assetRepository.load(medium).then(imageBlob => this.changePicture(imageBlob as Blob));
       } else {
         // if an asset is already there, remove the pointer to the old picture
         this.selfService.putSelf({picture: []} as any);

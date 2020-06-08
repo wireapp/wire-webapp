@@ -21,31 +21,26 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {container} from 'tsyringe';
-
-import {AssetService} from '../../assets/AssetService';
 import {AssetTransferState} from '../../assets/AssetTransferState';
 import {AssetRepository} from '../../assets/AssetRepository';
 import {ContentMessage} from '../../entity/message/ContentMessage';
-import {File as FileAsset} from '../../entity/message/File';
-import {APIClientSingleton} from '../../service/APIClientSingleton';
-import {BackendClient} from '../../service/BackendClient';
+import {FileAsset} from '../../entity/message/FileAsset';
 
 export abstract class AbstractAssetTransferStateTracker {
   AssetTransferState: typeof AssetTransferState;
-  assetRepository: AssetRepository;
+  public readonly assetRepository: AssetRepository;
   transferState: ko.PureComputed<AssetTransferState>;
   uploadProgress: ko.PureComputed<number>;
 
   constructor(message?: ContentMessage) {
-    this.assetRepository = new AssetRepository(
-      new AssetService(container.resolve(APIClientSingleton).getClient(), container.resolve(BackendClient)),
-    );
+    this.assetRepository = container.resolve(AssetRepository);
     this.uploadProgress = this.assetRepository.getUploadProgress(message?.id);
     this.AssetTransferState = AssetTransferState;
 
     this.transferState = ko.pureComputed(() => {
       const asset = message?.get_first_asset() as FileAsset;
-      return this.uploadProgress() > -1 ? AssetTransferState.UPLOADING : asset?.status();
+      const status = this.uploadProgress() > -1 ? AssetTransferState.UPLOADING : asset?.status();
+      return status;
     });
   }
 

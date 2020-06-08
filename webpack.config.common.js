@@ -19,6 +19,7 @@
 
 const path = require('path');
 const webpack = require('webpack');
+const WorkboxPlugin = require('workbox-webpack-plugin');
 const {ROOT_PATH, DIST_PATH, SRC_PATH} = require('./locations');
 
 const dist = path.resolve(DIST_PATH, 'static');
@@ -87,6 +88,11 @@ module.exports = {
       _: 'underscore',
       jQuery: 'jquery',
       ko: 'knockout',
+    }),
+    new WorkboxPlugin.InjectManifest({
+      maximumFileSizeToCacheInBytes: process.env.NODE_ENV !== 'production' ? 10 * 1024 * 1024 : undefined,
+      swDest: path.resolve(dist, 'sw.js'),
+      swSrc: path.resolve(SRC_PATH, 'sw.js'),
     }),
   ],
   resolve: {

@@ -22,7 +22,7 @@ import ko from 'knockout';
 import {noop} from 'Util/util';
 
 import type {AssetTransferState} from '../../../assets/AssetTransferState';
-import type {File as FileAsset} from '../../../entity/message/File';
+import type {FileAsset} from '../../../entity/message/FileAsset';
 import {AbstractAssetTransferStateTracker} from '../AbstractAssetTransferStateTracker';
 
 import '../assetLoader';
@@ -90,7 +90,7 @@ ko.components.register('media-button', {
       <div class='media-button media-button-pause icon-pause' data-bind="click: onClickPause, visible: isPlaying()" data-uie-name="do-pause-media"></div>
     <!-- /ko -->
     <!-- ko if: isDownloading(transferState()) -->
-      <asset-loader params="large: large, loadProgress: asset.downloadProgress, onCancel: asset.cancel_download"></asset-loader>
+      <asset-loader params="large: large, loadProgress: asset.downloadProgress, onCancel: asset.cancelDownload"></asset-loader>
     <!-- /ko -->
     <!-- ko if: isUploading(transferState()) -->
       <asset-loader params="large: large, loadProgress: uploadProgress, onCancel: onClickCancel"></asset-loader>

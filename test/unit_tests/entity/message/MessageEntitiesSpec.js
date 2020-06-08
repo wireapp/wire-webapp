@@ -19,7 +19,7 @@
 
 import {MediumImage} from 'src/script/entity/message/MediumImage';
 import {StatusType} from 'src/script/message/StatusType';
-import {File} from 'src/script/entity/message/File';
+import {FileAsset} from 'src/script/entity/message/FileAsset';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {Text} from 'src/script/entity/message/Text';
 
@@ -43,7 +43,7 @@ describe('Message Entities', () => {
 
     it('message with file asset should be downloadable', () => {
       message_et = new ContentMessage();
-      message_et.assets.push(new File());
+      message_et.assets.push(new FileAsset());
 
       expect(message_et.is_downloadable()).toBeTruthy();
     });
