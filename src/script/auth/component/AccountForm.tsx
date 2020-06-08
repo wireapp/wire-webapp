@@ -239,7 +239,7 @@ const AccountForm = ({account, ...props}: Props & ConnectedProps & DispatchProps
               {...accountFormStrings.termsAndPrivacyPolicy}
               values={{
                 // eslint-disable-next-line react/display-name
-                privacypolicy: (...chunks: any[]) => (
+                privacypolicy: (...chunks: string[] | React.ReactNode[]) => (
                   <a
                     target="_blank"
                     rel="noopener noreferrer"
@@ -250,7 +250,7 @@ const AccountForm = ({account, ...props}: Props & ConnectedProps & DispatchProps
                   </a>
                 ),
                 // eslint-disable-next-line react/display-name
-                terms: (...chunks: any[]) => (
+                terms: (...chunks: string[] | React.ReactNode[]) => (
                   <a
                     target="_blank"
                     rel="noopener noreferrer"
@@ -271,7 +271,7 @@ const AccountForm = ({account, ...props}: Props & ConnectedProps & DispatchProps
               {...accountFormStrings.terms}
               values={{
                 // eslint-disable-next-line react/display-name
-                terms: (...chunks: any[]) => (
+                terms: (...chunks: string[] | React.ReactNode[]) => (
                   <a
                     target="_blank"
                     rel="noopener noreferrer"
