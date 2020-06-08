@@ -43,12 +43,12 @@ export interface AssetUrlDataVersion1 {
 }
 
 export class AssetRemoteData {
+  public cancelDownload: () => void;
+  public readonly downloadProgress: ko.Observable<number>;
   public readonly identifier?: string;
   public readonly otrKey?: Uint8Array;
   public readonly sha256?: Uint8Array;
   public readonly urlData?: AssetUrlData;
-  public readonly downloadProgress: ko.Observable<number>;
-  public cancelDownload: () => void;
 
   constructor(identifier: string, urlData: AssetUrlData, otrKey?: Uint8Array, sha256Checksum?: Uint8Array) {
     this.identifier = identifier;
