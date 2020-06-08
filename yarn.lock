@@ -8159,10 +8159,10 @@ karma@5.0.9:
     ua-parser-js "0.7.21"
     yargs "^15.3.1"
 
-keyboardjs@2.5.1:
-  version "2.5.1"
-  resolved "https://registry.yarnpkg.com/keyboardjs/-/keyboardjs-2.5.1.tgz#2eb5d96bd1028e07136cd71919f607579edca716"
-  integrity sha512-mRf7MQMiFcudADEpPn3vTtl/rtFELo5MAiKA6yH4ShsFsnwwjMrVfaNt6bpYhBDeODs/T5NXwltz4+ktRQyP7A==
+keyboardjs@2.6.3:
+  version "2.6.3"
+  resolved "https://registry.yarnpkg.com/keyboardjs/-/keyboardjs-2.6.3.tgz#2bf8f68cd986591111eb30673d1d833f85b237c4"
+  integrity sha512-xV0dZq6fER0GM0uPrfIqXlAArhNQgGH44zT11g58gGDxtGdWhyhYC9bFajqYaGd7SstiU3GmWaxMVpr6Fa1UOA==
 
 kind-of@^3.0.2, kind-of@^3.0.3, kind-of@^3.2.0:
   version "3.2.2"
