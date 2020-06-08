@@ -70,11 +70,15 @@ export class PropertiesRepository {
       },
       enable_debugging: false,
       settings: {
+        call: {
+          enable_vbr_encoding: true,
+        },
         emoji: {
           replace_inline: true,
         },
         interface: {
           theme: 'default',
+          view_folders: false,
         },
         notifications: NotificationPreference.ON,
         previews: {
@@ -307,6 +311,9 @@ export class PropertiesRepository {
         break;
       case PROPERTIES_TYPE.SOUND_ALERTS:
         amplify.publish(WebAppEvents.PROPERTIES.UPDATE.SOUND_ALERTS, updatedPreference);
+        break;
+      case PROPERTIES_TYPE.CALL.ENABLE_VBR_ENCODING:
+        amplify.publish(WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_VBR_ENCODING, updatedPreference);
         break;
       default:
         throw new Error(`Failed to update preference of unhandled type '${propertiesType}'`);

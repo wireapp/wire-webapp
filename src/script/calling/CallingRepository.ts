@@ -62,7 +62,7 @@ import {MediaType} from '../media/MediaType';
 import type {User} from '../entity/User';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import {Call, ConversationId} from './Call';
-import {DeviceId, Participant, UserId} from './Participant';
+import {ClientId, Participant, UserId} from './Participant';
 import type {Recipients} from '../cryptography/CryptographyRepository';
 import type {Conversation} from '../entity/Conversation';
 
@@ -83,7 +83,7 @@ export class CallingRepository {
   private avsVersion: number;
   private incomingCallCallback: (call: Call) => void;
   private isReady: boolean = false;
-  private selfClientId: DeviceId;
+  private selfClientId: ClientId;
   private selfUser: User;
   private wCall?: Wcall;
   private wUser?: number;
@@ -97,6 +97,7 @@ export class CallingRepository {
 
   private readonly logger: Logger;
   private readonly callLog: string[];
+  private readonly cbrEncoding: ko.Observable<number>;
 
   static get CONFIG() {
     return {
@@ -128,15 +129,20 @@ export class CallingRepository {
 
     this.logger = getLogger('CallingRepository');
     this.callLog = [];
+    this.cbrEncoding = ko.observable(0);
 
     this.subscribeToEvents();
+  }
+
+  toggleCbrEncoding(vbrEnabled: boolean) {
+    this.cbrEncoding(vbrEnabled ? 0 : 1);
   }
 
   getStats(conversationId: ConversationId): Promise<{stats: RTCStatsReport; userid: UserId}[]> {
     return this.wCall.getStats(conversationId);
   }
 
-  initAvs(selfUser: User, clientId: DeviceId): Promise<{wCall: Wcall; wUser: number}> {
+  initAvs(selfUser: User, clientId: ClientId): Promise<{wCall: Wcall; wUser: number}> {
     this.selfUser = selfUser;
     this.selfClientId = clientId;
     return getAvsInstance().then(callingInstance => {
@@ -193,7 +199,7 @@ export class CallingRepository {
       this.callClosed, // `closeh`,
       () => {}, // `metricsh`,
       this.requestConfig, // `cfg_reqh`,
-      () => {}, // `acbrh`,
+      this.audioCbrChanged, // `acbrh`,
       this.videoStateChanged, // `vstateh`,
     );
     /* cspell:enable */
@@ -266,9 +272,9 @@ export class CallingRepository {
     return this.activeCalls().find((callInstance: Call) => callInstance.conversationId === conversationId);
   }
 
-  private findParticipant(conversationId: ConversationId, userId: UserId): Participant | undefined {
+  private findParticipant(conversationId: ConversationId, userId: UserId, clientId: ClientId): Participant | undefined {
     const call = this.findCall(conversationId);
-    return call?.participants().find(participant => participant.userId === userId);
+    return call?.participants().find(participant => participant.userId === userId && participant.clientId === clientId);
   }
 
   private storeCall(call: Call): void {
@@ -324,6 +330,7 @@ export class CallingRepository {
   subscribeToEvents(): void {
     amplify.subscribe(WebAppEvents.CALL.EVENT_FROM_BACKEND, this.onCallEvent.bind(this));
     amplify.subscribe(WebAppEvents.CALL.STATE.TOGGLE, this.toggleState.bind(this)); // This event needs to be kept, it is sent by the wrapper
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_VBR_ENCODING, this.toggleCbrEncoding.bind(this));
   }
 
   //##############################################################################
@@ -461,7 +468,7 @@ export class CallingRepository {
 
         return loadPreviewPromise.then(success => {
           if (success) {
-            this.wCall.start(this.wUser, conversationId, callType, conversationType, 0);
+            this.wCall.start(this.wUser, conversationId, callType, conversationType, this.cbrEncoding());
           } else {
             this.showNoCameraModal();
             this.removeCall(call);
@@ -506,7 +513,7 @@ export class CallingRepository {
           call.selfParticipant.releaseVideoStream();
         }
         return this.warmupMediaStreams(call, true, isVideoCall).then(() => {
-          this.wCall.answer(this.wUser, call.conversationId, callType, 0);
+          this.wCall.answer(this.wUser, call.conversationId, callType, this.cbrEncoding());
         });
       })
       .catch(() => {
@@ -619,9 +626,9 @@ export class CallingRepository {
     context: any,
     conversationId: ConversationId,
     userId: UserId,
-    clientId: DeviceId,
+    clientId: ClientId,
     destinationUserId: UserId,
-    destinationClientId: DeviceId,
+    destinationClientId: ClientId,
     payload: string,
   ): number => {
     const protoCalling = new Calling({content: payload});
@@ -743,14 +750,14 @@ export class CallingRepository {
       return;
     }
 
-    const {members}: {members: {clientid: DeviceId; userid: UserId}[]} = JSON.parse(membersJson);
+    const {members}: {members: {clientid: ClientId; userid: UserId}[]} = JSON.parse(membersJson);
     const newMembers = members
-      .filter(({userid}) => !this.findParticipant(conversationId, userid))
+      .filter(({userid, clientid}) => !this.findParticipant(conversationId, userid, clientid))
       .map(({userid, clientid}) => new Participant(userid, clientid));
     const removedMembers = call
       .participants()
       .filter(
-        ({userId, deviceId}) => !members.find(({userid, clientid}) => userid === userId && clientid === deviceId),
+        ({userId, clientId}) => !members.find(member => member.userid === userId && member.clientid === clientId),
       );
 
     newMembers.forEach(participant => call.participants.unshift(participant));
@@ -832,12 +839,12 @@ export class CallingRepository {
   private readonly updateParticipantStream = (
     conversationId: ConversationId,
     userId: UserId,
-    deviceId: DeviceId,
+    clientId: ClientId,
     streams: MediaStream[],
   ): void => {
-    let participant = this.findParticipant(conversationId, userId);
+    let participant = this.findParticipant(conversationId, userId, clientId);
     if (!participant) {
-      participant = new Participant(userId, deviceId);
+      participant = new Participant(userId, clientId);
       this.findCall(conversationId).participants.unshift(participant);
     }
 
@@ -854,10 +861,17 @@ export class CallingRepository {
     }
   };
 
+  private readonly audioCbrChanged = (userid: UserId, clientid: ClientId, enabled: number) => {
+    const activeCall = this.activeCalls()[0];
+    if (activeCall) {
+      activeCall.isCbrEnabled(!!enabled);
+    }
+  };
+
   private readonly videoStateChanged = (
     conversationId: ConversationId,
     userId: UserId,
-    deviceId: DeviceId,
+    clientId: ClientId,
     state: number,
   ) => {
     const call = this.findCall(conversationId);
@@ -868,7 +882,7 @@ export class CallingRepository {
       call
         .participants()
         .concat(call.selfParticipant)
-        .filter(participant => participant.userId === userId)
+        .filter(participant => participant.userId === userId && participant.clientId === clientId)
         .forEach(participant => participant.videoState(state));
     }
   };
@@ -876,7 +890,7 @@ export class CallingRepository {
   private targetMessageRecipients(
     payload: string,
     remoteUserId: UserId | null,
-    remoteClientId: DeviceId | null,
+    remoteClientId: ClientId | null,
   ): {precondition?: boolean | string[]; recipients: Recipients} {
     const {type, resp} = JSON.parse(payload);
     let precondition;
