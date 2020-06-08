@@ -2106,10 +2106,10 @@
   dependencies:
     protobufjs "6.8.8"
 
-"@wireapp/react-ui-kit@7.29.6":
-  version "7.29.6"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-7.29.6.tgz#20637946bfa02f762c3411cb99454b453a4db0dd"
-  integrity sha512-2bDLCcBtu8V1+lUgAOY7i0dNsDu5qLqcoxepM0/nN5/ONpD3FgJKaUAsb755co48rjnwW7x6gR7t2WG7yihnCw==
+"@wireapp/react-ui-kit@7.29.7":
+  version "7.29.7"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-7.29.7.tgz#f7f8428eea2a47efaf221679f860daf0448618f1"
+  integrity sha512-7H6c+vT2ZuuR9PzIycKYnydOyPE2JuRCr9VWFcxk1CfMInSeWNuj3WYOXzXh9EOwo+Dx9y3iB428yRyTHFEuKg==
   dependencies:
     "@emotion/core" "10.0.28"
     "@types/color" "3.0.1"
