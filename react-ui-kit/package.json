@@ -28,7 +28,7 @@
     "react-dom": "16.13.1",
     "react-helmet": "5.2.1",
     "react-hot-loader": "4.12.21",
-    "react-styleguidist": "11.0.6",
+    "react-styleguidist": "11.0.8",
     "react-test-renderer": "16.13.1",
     "rimraf": "3.0.2",
     "typescript": "3.9.2",
