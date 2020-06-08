@@ -37,8 +37,7 @@ const ASSET_CACHE_NAME = `asset-cache-v${CACHE_VERSION}`;
 const DEPRECATED_ASSET_CACHE_NAME = `asset: 'asset-cache-v2`;
 caches.delete(DEPRECATED_ASSET_CACHE_NAME).then(isDeprecatedCacheDeleted => {
   if (isDeprecatedCacheDeleted) {
-    // eslint-disable-next-line
-    console.log(`Deprecated asset cache "${DEPRECATED_ASSET_CACHE_NAME}" got deleted`);
+    console.info(`Deprecated asset cache "${DEPRECATED_ASSET_CACHE_NAME}" got deleted`);
   }
 });
 
