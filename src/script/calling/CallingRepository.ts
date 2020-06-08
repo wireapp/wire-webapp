@@ -18,6 +18,7 @@
  */
 
 import type {APIClient} from '@wireapp/api-client';
+import type {WebappProperties} from '@wireapp/api-client/dist/user/data';
 import type {CallConfigData} from '@wireapp/api-client/dist/account/CallConfigData';
 import {
   CALL_TYPE,
@@ -331,6 +332,9 @@ export class CallingRepository {
     amplify.subscribe(WebAppEvents.CALL.EVENT_FROM_BACKEND, this.onCallEvent.bind(this));
     amplify.subscribe(WebAppEvents.CALL.STATE.TOGGLE, this.toggleState.bind(this)); // This event needs to be kept, it is sent by the wrapper
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_VBR_ENCODING, this.toggleCbrEncoding.bind(this));
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, ({settings}: WebappProperties) => {
+      this.toggleCbrEncoding(settings.call.enable_vbr_encoding);
+    });
   }
 
   //##############################################################################

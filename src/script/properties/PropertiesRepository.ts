@@ -275,7 +275,7 @@ export class PropertiesRepository {
   private savePreferenceActivatedAccount(propertiesType: string, updatedPreference: any): Promise<void> {
     return this.propertiesService
       .putPropertiesByKey(PropertiesRepository.CONFIG.WEBAPP_ACCOUNT_SETTINGS, this.properties)
-      .then(() => this.logger.info(`Saved updated preference: '${propertiesType}' - '${updatedPreference}'`));
+      .then(() => this.logger.info(`Saved updated preference "${propertiesType}": ${updatedPreference}`));
   }
 
   private savePreferenceTemporaryGuestAccount(propertiesType: string, updatedPreference: any): Promise<void> {
