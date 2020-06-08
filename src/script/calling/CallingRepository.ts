@@ -225,10 +225,10 @@ export class CallingRepository {
 
     let users = this.poorCallQualityUsers[conversationId];
     const isOldPoorCallQualityUser = users.some(_userId => _userId === userId);
-    if (isOldPoorCallQualityUser && quality !== QUALITY.POOR) {
+    if (isOldPoorCallQualityUser && quality === QUALITY.NORMAL) {
       users = users.filter(_userId => _userId !== userId);
     }
-    if (!isOldPoorCallQualityUser && quality === QUALITY.POOR) {
+    if (!isOldPoorCallQualityUser && quality !== QUALITY.NORMAL) {
       users = [...users, userId];
     }
     if (users.length === 0) {
