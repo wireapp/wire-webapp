@@ -821,7 +821,7 @@ export class CallingRepository {
         if (missingStreams.screen) {
           // https://stackoverflow.com/a/25179198/451634
           newStream.getVideoTracks()[0].onended = () => {
-            selfParticipant.releaseVideoStream();
+            this.toggleScreenshare(call);
           };
         }
         return newStream;
