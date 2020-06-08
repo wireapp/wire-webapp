@@ -84,9 +84,8 @@ describe('AssetRepository', () => {
 
   it('detects a malformed asset key', () => {
     // prettier-ignore
-    /* eslint-disable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
+    // eslint-disable-next-line
     const event: any = {"conversation":"61350a90-e522-4ee5-90b7-f55b648e34da","from":"532af01e-1e24-4366-aacf-33b67d4ee376","id":"51b8e5c5-4088-4177-a5ad-b001fef11eac","status":1,"time":"2017-08-16T16:13:01.168Z","data":{"content_length":73029,"content_type":"image/jpeg","info":{"name":null,"nonce":"51b8e5c5-4088-4177-a5ad-b001fef11eac","height":448,"width":588,"tag":"medium"},"key":"../../../search/contacts","otr_key":{"0":130,"1":255,"2":81,"3":125,"4":202,"5":165,"6":197,"7":175,"8":79,"9":18,"10":2,"11":194,"12":160,"13":122,"14":173,"15":82,"16":36,"17":77,"18":50,"19":186,"20":246,"21":54,"22":36,"23":235,"24":81,"25":19,"26":179,"27":69,"28":127,"29":113,"30":248,"31":74},"sha256":{"0":49,"1":137,"2":43,"3":166,"4":242,"5":222,"6":42,"7":96,"8":44,"9":22,"10":37,"11":35,"12":87,"13":175,"14":205,"15":157,"16":225,"17":173,"18":63,"19":43,"20":133,"21":197,"22":115,"23":195,"24":142,"25":44,"26":98,"27":222,"28":75,"29":56,"30":159,"31":66},"status":"uploaded","token":"hYQytxHS6hSP6DlemD13uQ==&size=100&q=test"},"type":"conversation.asset-add","category":128,"primary_key":6};
-    /* eslint-enable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
 
     const asset_et = new EventMapper()['_mapAssetImage'](event);
 
