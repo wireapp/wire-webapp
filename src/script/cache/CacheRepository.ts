@@ -26,7 +26,7 @@ import {StorageKey} from '../storage/StorageKey';
 export class CacheRepository {
   public static CACHE_KEY = {
     // Redefine name from "sw.js"
-    ASSETS: `asset: 'asset-cache-v3`,
+    ASSETS: `asset-cache-v3`,
   };
 
   // Caution! When refactoring this code, make sure that it works in an "beforeunload" scenario!
