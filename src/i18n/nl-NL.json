@@ -171,6 +171,7 @@
   "callJoin": "Deelnemen",
   "callNoCameraAccess": "No camera access",
   "callParticipants": "{{number}} bellen",
+  "callStateCbr": "Constant Bit Rate",
   "callStateConnecting": "Verbinden…",
   "callStateIncoming": "Bellen…",
   "callStateIncomingGroup": "{{user}} is calling",

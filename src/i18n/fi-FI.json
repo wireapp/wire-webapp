@@ -171,6 +171,7 @@
   "callJoin": "Liity",
   "callNoCameraAccess": "Kameran käyttö ei sallittu",
   "callParticipants": "{{number}} puhelussa",
+  "callStateCbr": "Constant Bit Rate",
   "callStateConnecting": "Yhdistetään…",
   "callStateIncoming": "Soitetaan…",
   "callStateIncomingGroup": "{{user}} soittaa",

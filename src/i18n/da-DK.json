@@ -171,6 +171,7 @@
   "callJoin": "Deltag",
   "callNoCameraAccess": "No camera access",
   "callParticipants": "{{number}} i samtalen",
+  "callStateCbr": "Constant Bit Rate",
   "callStateConnecting": "Forbinder…",
   "callStateIncoming": "Ringer op…",
   "callStateIncomingGroup": "{{user}} is calling",

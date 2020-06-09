@@ -171,6 +171,7 @@
   "callJoin": "Присоединиться",
   "callNoCameraAccess": "Нет доступа к камере",
   "callParticipants": "{{number}} участников",
+  "callStateCbr": "Constant Bit Rate",
   "callStateConnecting": "Подключение…",
   "callStateIncoming": "Вызывает…",
   "callStateIncomingGroup": "{{user}} вызывает",

@@ -171,6 +171,7 @@
   "callJoin": "انضم إلى",
   "callNoCameraAccess": "لايمكن الوصول للكاميرا",
   "callParticipants": "{{number}} في مكالمة",
+  "callStateCbr": "Constant Bit Rate",
   "callStateConnecting": "جاري الربط",
   "callStateIncoming": "يتصل بك",
   "callStateIncomingGroup": "{{user}} يتصل",

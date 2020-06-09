@@ -171,6 +171,7 @@
   "callJoin": "Приєднатись",
   "callNoCameraAccess": "Відсутній доступ до камери",
   "callParticipants": "{{number}} учасників",
+  "callStateCbr": "Constant Bit Rate",
   "callStateConnecting": "Підключення…",
   "callStateIncoming": "Дзвінок…",
   "callStateIncomingGroup": "{{user}} дзвонить",

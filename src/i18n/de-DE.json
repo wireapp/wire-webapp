@@ -171,6 +171,7 @@
   "callJoin": "Beitreten",
   "callNoCameraAccess": "Kein Kamerazugriff",
   "callParticipants": "{{number}} im Anruf",
+  "callStateCbr": "Constant Bit Rate",
   "callStateConnecting": "Verbinde…",
   "callStateIncoming": "Ruft an…",
   "callStateIncomingGroup": "{{user}} ruft an",

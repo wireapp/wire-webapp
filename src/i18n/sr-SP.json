@@ -171,6 +171,7 @@
   "callJoin": "Придружи се",
   "callNoCameraAccess": "Нема приступа камери",
   "callParticipants": "{{number}} на позив",
+  "callStateCbr": "Constant Bit Rate",
   "callStateConnecting": "Повезивање…",
   "callStateIncoming": "Позивање…",
   "callStateIncomingGroup": "{{user}} неко зове",

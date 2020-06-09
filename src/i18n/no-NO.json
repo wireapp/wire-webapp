@@ -171,6 +171,7 @@
   "callJoin": "Bli med",
   "callNoCameraAccess": "Ingen kamera tilgang",
   "callParticipants": "{{number}} i samtalen",
+  "callStateCbr": "Constant Bit Rate",
   "callStateConnecting": "Kobler til …",
   "callStateIncoming": "Ringer …",
   "callStateIncomingGroup": "{{user}} ringer",

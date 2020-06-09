@@ -171,6 +171,7 @@
   "callJoin": "Pievienoties",
   "callNoCameraAccess": "No camera access",
   "callParticipants": "{{number}} on call",
+  "callStateCbr": "Constant Bit Rate",
   "callStateConnecting": "Savienojas…",
   "callStateIncoming": "Zvana…",
   "callStateIncomingGroup": "{{user}} is calling",

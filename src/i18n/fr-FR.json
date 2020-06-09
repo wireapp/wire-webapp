@@ -171,6 +171,7 @@
   "callJoin": "Rejoindre",
   "callNoCameraAccess": "Appareil photo indisponible",
   "callParticipants": "{{number}} sur l’appel",
+  "callStateCbr": "Constant Bit Rate",
   "callStateConnecting": "Connexion…",
   "callStateIncoming": "Appel…",
   "callStateIncomingGroup": "{{user}} appelle",

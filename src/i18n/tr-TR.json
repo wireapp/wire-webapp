@@ -171,6 +171,7 @@
   "callJoin": "Katıl",
   "callNoCameraAccess": "Kamera erişimi yok",
   "callParticipants": "{{number}} çağrıda",
+  "callStateCbr": "Constant Bit Rate",
   "callStateConnecting": "Bağlanıyor…",
   "callStateIncoming": "Arıyor…",
   "callStateIncomingGroup": "{{user}} Aranıyor",

@@ -171,6 +171,7 @@
   "callJoin": "پیوستن",
   "callNoCameraAccess": "No camera access",
   "callParticipants": "{{number}} در تماس",
+  "callStateCbr": "Constant Bit Rate",
   "callStateConnecting": "در حال اتصال…",
   "callStateIncoming": "در حال برقراری تماس ...",
   "callStateIncomingGroup": "{{user}} is calling",

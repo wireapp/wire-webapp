@@ -171,6 +171,7 @@
   "callJoin": "Vstoupit",
   "callNoCameraAccess": "Žádný přístup k fotoaparátu",
   "callParticipants": "{{number}} se účastní hovoru",
+  "callStateCbr": "Constant Bit Rate",
   "callStateConnecting": "Připojuji…",
   "callStateIncoming": "Volá…",
   "callStateIncomingGroup": "{{user}} is calling",
