@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2020 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,10 @@
  *
  */
 
-import * as path from 'path';
-import {execSync} from 'child_process';
+const {join, resolve} = require('path');
+const {execSync} = require('child_process');
 
-const root = path.resolve(__dirname, '..');
-
-const uploadToCrowdin = (): void => {
-  const crowdinYaml = path.join(root, 'keys/crowdin.yaml');
-  execSync(`crowdin upload sources --identity="${crowdinYaml}"`, {stdio: [0, 1]});
-};
-
-uploadToCrowdin();
+const root = resolve(__dirname, '..');
+const config = join(root, 'crowdin.yaml');
+const identity = join(root, 'keys', 'crowdin.yaml');
+execSync(`crowdin upload sources --config="${config}" --identity="${identity}"`, {stdio: [0, 1]});

@@ -171,6 +171,7 @@
   "callJoin": "Alătură-te",
   "callNoCameraAccess": "No camera access",
   "callParticipants": "{{number}} în apel",
+  "callStateCbr": "Constant Bit Rate",
   "callStateConnecting": "Se conectează…",
   "callStateIncoming": "Se apelează…",
   "callStateIncomingGroup": "{{user}} is calling",

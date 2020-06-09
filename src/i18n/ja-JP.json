@@ -171,6 +171,7 @@
   "callJoin": "参加する",
   "callNoCameraAccess": "カメラへのアクセスがありません",
   "callParticipants": "{{number}} - 通話中",
+  "callStateCbr": "Constant Bit Rate",
   "callStateConnecting": "接続中...",
   "callStateIncoming": "発信中...",
   "callStateIncomingGroup": "{{user}} が呼び出し中",

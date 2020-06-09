@@ -171,6 +171,7 @@
   "callJoin": "Gabung",
   "callNoCameraAccess": "No camera access",
   "callParticipants": "{{number}} saat dihubungi",
+  "callStateCbr": "Constant Bit Rate",
   "callStateConnecting": "Menghubungkan…",
   "callStateIncoming": "Memanggil…",
   "callStateIncomingGroup": "{{user}} is calling",

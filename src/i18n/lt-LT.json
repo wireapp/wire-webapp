@@ -171,6 +171,7 @@
   "callJoin": "Prisijungti",
   "callNoCameraAccess": "Nėra galimybės naudotis kamera",
   "callParticipants": "{{number}} kalba",
+  "callStateCbr": "Constant Bit Rate",
   "callStateConnecting": "Sujungiama…",
   "callStateIncoming": "Skambinama…",
   "callStateIncomingGroup": "{{user}} jums skambina",

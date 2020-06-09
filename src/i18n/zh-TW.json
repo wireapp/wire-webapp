@@ -171,6 +171,7 @@
   "callJoin": "加入",
   "callNoCameraAccess": "No camera access",
   "callParticipants": "{{number}} 來電",
+  "callStateCbr": "Constant Bit Rate",
   "callStateConnecting": "連接中…",
   "callStateIncoming": "呼叫中...",
   "callStateIncomingGroup": "{{user}} is calling",

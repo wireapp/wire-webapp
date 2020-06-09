@@ -171,6 +171,7 @@
   "callJoin": "Csatlakozás",
   "callNoCameraAccess": "Nincs kamera hozzáférés",
   "callParticipants": "{{number}} partner a vonalban",
+  "callStateCbr": "Constant Bit Rate",
   "callStateConnecting": "Csatlakozás…",
   "callStateIncoming": "Hívás…",
   "callStateIncomingGroup": "{{user}} hív",

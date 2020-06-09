@@ -171,6 +171,7 @@
   "callJoin": "Liitu",
   "callNoCameraAccess": "Kaamera ligipääs puudub",
   "callParticipants": "{{number}} kõnes",
+  "callStateCbr": "Constant Bit Rate",
   "callStateConnecting": "Ühendan…",
   "callStateIncoming": "Helistab…",
   "callStateIncomingGroup": "{{user}} helistab",

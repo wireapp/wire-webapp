@@ -171,6 +171,7 @@
   "callJoin": "Συμμετοχή",
   "callNoCameraAccess": "No camera access",
   "callParticipants": "{{number}} στο τηλεφώνημα",
+  "callStateCbr": "Constant Bit Rate",
   "callStateConnecting": "Συνδέεται…",
   "callStateIncoming": "Καλεί…",
   "callStateIncomingGroup": "{{user}} is calling",

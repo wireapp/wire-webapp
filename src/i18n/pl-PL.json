@@ -171,6 +171,7 @@
   "callJoin": "Dołącz",
   "callNoCameraAccess": "No camera access",
   "callParticipants": "{{number}} uczestników",
+  "callStateCbr": "Constant Bit Rate",
   "callStateConnecting": "Łączenie…",
   "callStateIncoming": "Dzwoni…",
   "callStateIncomingGroup": "{{user}} is calling",
