@@ -115,7 +115,7 @@
     levenary "^1.1.1"
     semver "^5.5.0"
 
-"@babel/helper-create-class-features-plugin@^7.10.1":
+"@babel/helper-create-class-features-plugin@^7.10.1", "@babel/helper-create-class-features-plugin@^7.8.3":
   version "7.10.2"
   resolved "https://registry.yarnpkg.com/@babel/helper-create-class-features-plugin/-/helper-create-class-features-plugin-7.10.2.tgz#7474295770f217dbcf288bf7572eb213db46ee67"
   integrity sha512-5C/QhkGFh1vqcziq1vAL6SI9ymzUp8BCYjFpvYVhWP4DlATIb3u5q3iUd35mvlyGs8fO7hckkW7i0tmH+5+bvQ==
@@ -327,6 +327,14 @@
   dependencies:
     "@babel/helper-create-class-features-plugin" "^7.10.1"
     "@babel/helper-plugin-utils" "^7.10.1"
+
+"@babel/plugin-proposal-class-properties@7.8.3":
+  version "7.8.3"
+  resolved "https://registry.yarnpkg.com/@babel/plugin-proposal-class-properties/-/plugin-proposal-class-properties-7.8.3.tgz#5e06654af5cd04b608915aada9b2a6788004464e"
+  integrity sha512-EqFhbo7IosdgPgZggHaNObkmO1kNUe3slaKu54d5OWvy+p9QIKOzK1GAEpAIsZtWVtPXUHSMcT4smvDrCfY4AA==
+  dependencies:
+    "@babel/helper-create-class-features-plugin" "^7.8.3"
+    "@babel/helper-plugin-utils" "^7.8.3"
 
 "@babel/plugin-proposal-decorators@7.10.1":
   version "7.10.1"
@@ -2010,10 +2018,10 @@
     logdown "3.3.1"
     rimraf "3.0.2"
 
-"@wireapp/core@16.10.0":
-  version "16.10.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-16.10.0.tgz#a525e5b3d30326ad4dd55ba994891fc06126067d"
-  integrity sha512-K9DCvYMcW3gZZLhWjiLeD0MrJrQE+bNbW0W8RyFb0gZaozKCgXs3VmqNnBw63NI9gqCgLDX15XPlnq0wyWLyfw==
+"@wireapp/core@16.9.15":
+  version "16.9.15"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-16.9.15.tgz#5a2e28271bd89398884537b8092494102539df6e"
+  integrity sha512-jIkBgsPhvJV/gYQz1uJVytvzs0wx0K9eJjQ81JOtuJcqRifoocSkBcmo0x9PgPcBvkIcJ4laiZ/nH3Uoad08eg==
   dependencies:
     "@types/long" "4.0.1"
     "@types/node" "~12"
@@ -2104,13 +2112,13 @@
   dependencies:
     dexie "2.0.4"
 
-"@wireapp/store-engine-sqleet@1.3.8":
-  version "1.3.8"
-  resolved "https://registry.yarnpkg.com/@wireapp/store-engine-sqleet/-/store-engine-sqleet-1.3.8.tgz#3238adb66b42fce930dcabc36dc5d0f00933c148"
-  integrity sha512-DPG9F5oZH2m4/PtGwvD83dqRRaInx+DDEBKSnJAUmaYXwGK5G2sWoWzWjv4RtC4IS5xtUgUvfHhu0wHyAqbG8w==
+"@wireapp/store-engine-sqleet@1.3.7":
+  version "1.3.7"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine-sqleet/-/store-engine-sqleet-1.3.7.tgz#c90ca96353f897f3cf8da7f47c28082eb5143058"
+  integrity sha512-utCC7FA0kxtYvMkpm/SoByPZbrYXLX5t1V7Pq47yAgiuudjXE7wA4Mqjo9MUToH1l6Xfo74k36MtWrefTVzt6Q==
   dependencies:
     "@babel/core" "7.9.0"
-    "@babel/plugin-proposal-class-properties" "7.10.1"
+    "@babel/plugin-proposal-class-properties" "7.8.3"
     "@babel/plugin-proposal-object-rest-spread" "7.9.6"
     "@babel/plugin-proposal-optional-chaining" "7.9.0"
     "@babel/preset-typescript" "7.9.0"
