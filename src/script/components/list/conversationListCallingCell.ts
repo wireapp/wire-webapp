@@ -236,10 +236,12 @@ ko.components.register('conversation-list-calling-cell', {
           <span class="conversation-list-cell-description" data-bind="text: t('callStateConnecting')" data-uie-name="call-label-connecting"></span>
         <!-- /ko -->
         <!-- ko if: callDuration() -->
-          <span class="conversation-list-cell-description" data-bind="text: callDuration()" data-uie-name="call-duration"></span>
-        <!-- /ko -->
-        <!-- ko if: call.isCbrEnabled -->
-          <span class="conversation-list-cell-description" data-bind="text: t('callStateCbr')" data-uie-name="call-cbr"></span>
+          <div class="conversation-list-info-wrapper">
+            <span class="conversation-list-cell-description" data-bind="text: callDuration()" data-uie-name="call-duration"></span>
+            <!-- ko if: call.isCbrEnabled -->
+              <span class="conversation-list-cell-description" data-bind="text: t('callStateCbr')" data-uie-name="call-cbr"></span>
+            <!-- /ko -->
+          </div>
         <!-- /ko -->
       </div>
 
