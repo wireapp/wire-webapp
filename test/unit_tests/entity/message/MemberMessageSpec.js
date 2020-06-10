@@ -104,12 +104,12 @@ describe('Member Message', () => {
       expect(message_et.is_deletable()).toBe(false);
     });
 
-    it('should be deletable when message is a file and uploading or downloading', () => {
+    it('should not be deletable when message is a file and uploading or downloading', () => {
       const file_et = new FileAsset();
       file_et.status(AssetTransferState.UPLOADING);
       message_et.assets.push(file_et);
 
-      expect(message_et.is_deletable()).toBe(true);
+      expect(message_et.is_deletable()).toBe(false);
     });
   });
 
