@@ -302,7 +302,7 @@ export const sortObjectByKeys = (object: Record<string, any>, reverse: boolean) 
   }
 
   // Returns a copy of an object, which is ordered by the keys of the original object.
-  return keys.reduce((sortedObject: Record<string, any>, key: string) => {
+  return keys.reduce<Record<string, any>>((sortedObject, key: string) => {
     sortedObject[key] = object[key];
     return sortedObject;
   }, {});
@@ -311,7 +311,7 @@ export const sortObjectByKeys = (object: Record<string, any>, reverse: boolean) 
 // Removes url(' and url(" from the beginning of the string and also ") and ') from the end
 export const stripUrlWrapper = (url: string) => url.replace(/^url\(["']?/, '').replace(/["']?\)$/, '');
 
-export const validateProfileImageResolution = (file: any, minWidth: number, minHeight: number): Promise<boolean> => {
+export const validateProfileImageResolution = (file: File, minWidth: number, minHeight: number): Promise<boolean> => {
   return new Promise((resolve, reject) => {
     const image = new Image();
     image.onload = () => resolve(image.width >= minWidth && image.height >= minHeight);

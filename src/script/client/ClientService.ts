@@ -167,7 +167,7 @@ export class ClientService {
    * @param clientPayload Client payload
    * @returns Resolves with the client payload stored in database
    */
-  saveClientInDb(primaryKey: string, clientPayload: any): Promise<any> {
+  saveClientInDb(primaryKey: string, clientPayload: Record<string, any>): Promise<any> {
     if (!clientPayload.meta) {
       clientPayload.meta = {};
     }

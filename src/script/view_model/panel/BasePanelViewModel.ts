@@ -33,20 +33,20 @@ import type {IntegrationRepository} from '../../integration/IntegrationRepositor
 
 export interface PanelViewModelProps {
   isVisible: ko.Observable<boolean>;
-  navigateTo: (target: string, params?: {entity?: User | ServiceEntity; addMode?: boolean}) => void;
+  mainViewModel: MainViewModel;
+  navigateTo: (target: string, params?: {addMode?: boolean; entity?: User | ServiceEntity}) => void;
   onClose: () => void;
   onGoBack: () => void;
   onGoToRoot: () => void;
   repositories: {
+    client: ClientRepository;
+    conversation: ConversationRepository;
+    cryptography: CryptographyRepository;
+    integration: IntegrationRepository;
     search: SearchRepository;
     team: TeamRepository;
-    conversation: ConversationRepository;
-    client: ClientRepository;
-    cryptography: CryptographyRepository;
     user: UserRepository;
-    integration: IntegrationRepository;
   };
-  mainViewModel: MainViewModel;
 }
 
 export class BasePanelViewModel {

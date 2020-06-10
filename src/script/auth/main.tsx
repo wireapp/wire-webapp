@@ -23,7 +23,7 @@ import * as cookieStore from 'js-cookie';
 import React from 'react';
 import * as ReactDOM from 'react-dom';
 import {AppContainer} from 'react-hot-loader';
-import {Provider} from 'react-redux';
+import {Provider, ConnectedComponent} from 'react-redux';
 
 import {enableLogging} from 'Util/LoggerUtil';
 import {exposeWrapperGlobals} from 'Util/wrapper';
@@ -55,7 +55,7 @@ const store = configureStore({
   localStorage,
 });
 
-const Wrapper = (Component: React.ComponentClass): JSX.Element => (
+const Wrapper = (Component: ConnectedComponent<React.FunctionComponent, any>): JSX.Element => (
   <AppContainer>
     <Provider store={store}>
       <Component />
@@ -63,7 +63,7 @@ const Wrapper = (Component: React.ComponentClass): JSX.Element => (
   </AppContainer>
 );
 
-const render = (Component: React.ComponentClass): void => {
+const render = (Component: ConnectedComponent<React.FunctionComponent, any>): void => {
   ReactDOM.render(Wrapper(Component), document.getElementById('main'));
 };
 

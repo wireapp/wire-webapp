@@ -70,6 +70,7 @@ import {EventTypeHandling} from '../event/EventTypeHandling';
 import {BackendEvent} from '../event/Backend';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {EventRepository} from '../event/EventRepository';
+import {EventBuilder} from '../conversation/EventBuilder';
 
 import {Conversation} from '../entity/Conversation';
 import {Message} from '../entity/message/Message';
@@ -139,7 +140,7 @@ export class ConversationRepository {
    * Construct a new Conversation Repository.
    *
    * @param {ConversationService} conversation_service Backend REST API conversation service implementation
-   * @param {AssetService} asset_service Backend REST API asset service implementation
+   * @param {AssetRepository} assetRepository Manages uploading assets and keeping track of current uploads
    * @param {ClientRepository} clientRepository Repository for client interactions
    * @param {ConnectionRepository} connectionRepository Repository for all connection interactions
    * @param {CryptographyRepository} cryptography_repository Repository for all cryptography interactions
@@ -151,11 +152,11 @@ export class ConversationRepository {
    * @param {TeamRepository} teamRepository Repository for teams
    * @param {UserRepository} userRepository Repository for all user interactions
    * @param {PropertiesRepository} propertyRepository Repository that stores all account preferences
-   * @param {AssetUploader} assetUploader Manages uploading assets and keeping track of current uploads
+
    */
   constructor(
     conversation_service,
-    asset_service,
+    assetRepository,
     clientRepository,
     connectionRepository,
     cryptography_repository,
@@ -167,12 +168,11 @@ export class ConversationRepository {
     teamRepository,
     userRepository,
     propertyRepository,
-    assetUploader,
   ) {
     this.eventRepository = eventRepository;
+    this.assetRepository = assetRepository;
     this.eventService = eventRepository.eventService;
     this.conversation_service = conversation_service;
-    this.asset_service = asset_service;
     this.clientRepository = clientRepository;
     this.connectionRepository = connectionRepository;
     this.cryptography_repository = cryptography_repository;
@@ -182,7 +182,7 @@ export class ConversationRepository {
     this.teamRepository = teamRepository;
     this.userRepository = userRepository;
     this.propertyRepository = propertyRepository;
-    this.assetUploader = assetUploader;
+
     this.logger = getLogger('ConversationRepository');
 
     this.conversationMapper = new ConversationMapper();
@@ -631,8 +631,8 @@ export class ConversationRepository {
     }
 
     const creationEvent = conversationEntity.isGroup()
-      ? z.conversation.EventBuilder.buildGroupCreation(conversationEntity, isTemporaryGuest, timestamp)
-      : z.conversation.EventBuilder.build1to1Creation(conversationEntity);
+      ? EventBuilder.buildGroupCreation(conversationEntity, isTemporaryGuest, timestamp)
+      : EventBuilder.build1to1Creation(conversationEntity);
 
     this.eventRepository.injectEvent(creationEvent, eventSource);
   }
@@ -1334,7 +1334,7 @@ export class ConversationRepository {
 
   addMissingMember(conversationEntity, userIds, timestamp) {
     const [sender] = userIds;
-    const event = z.conversation.EventBuilder.buildMemberJoin(conversationEntity, sender, userIds, timestamp);
+    const event = EventBuilder.buildMemberJoin(conversationEntity, sender, userIds, timestamp);
     return this.eventRepository.injectEvent(event, EventRepository.SOURCE.INJECTED);
   }
 
@@ -1468,8 +1468,7 @@ export class ConversationRepository {
       delete roles[userId];
       conversationEntity.roles(roles);
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-      const event =
-        response || z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
+      const event = response || EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
 
       this.eventRepository.injectEvent(event, EventRepository.SOURCE.BACKEND_RESPONSE);
       return event;
@@ -1489,7 +1488,7 @@ export class ConversationRepository {
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
       const event = hasResponse
         ? response.event
-        : z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
+        : EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
 
       this.eventRepository.injectEvent(event, EventRepository.SOURCE.BACKEND_RESPONSE);
       return event;
@@ -1601,7 +1600,7 @@ export class ConversationRepository {
           return conversationInTeam && userIsParticipant && !conversationEntity.removed_from_conversation();
         })
         .forEach(conversationEntity => {
-          const leaveEvent = z.conversation.EventBuilder.buildTeamMemberLeave(conversationEntity, userEntity, isoDate);
+          const leaveEvent = EventBuilder.buildTeamMemberLeave(conversationEntity, userEntity, isoDate);
           this.eventRepository.injectEvent(leaveEvent);
         });
     });
@@ -1868,14 +1867,14 @@ export class ConversationRepository {
 
     return this.getMessageInConversationById(conversationEntity, messageId)
       .then(() => {
-        const retention = this.asset_service.getAssetRetention(this.selfUser(), conversationEntity);
+        const retention = this.assetRepository.getAssetRetention(this.selfUser(), conversationEntity);
         const options = {
           expectsReadConfirmation: this.expectReadReceipt(conversationEntity),
           legalHoldStatus: conversationEntity.legalHoldStatus(),
           retention,
         };
 
-        return this.assetUploader.uploadFile(messageId, file, options, asImage);
+        return this.assetRepository.uploadFile(messageId, file, options, asImage);
       })
       .then(asset => {
         genericMessage = new GenericMessage({
@@ -1903,7 +1902,7 @@ export class ConversationRepository {
         };
 
         const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-        const assetAddEvent = z.conversation.EventBuilder.buildAssetAdd(conversationEntity, data, currentTimestamp);
+        const assetAddEvent = EventBuilder.buildAssetAdd(conversationEntity, data, currentTimestamp);
 
         assetAddEvent.id = messageId;
         assetAddEvent.time = payload.time;
@@ -1983,7 +1982,7 @@ export class ConversationRepository {
           throw Error('No image available');
         }
 
-        const retention = this.asset_service.getAssetRetention(this.selfUser(), conversationEntity);
+        const retention = this.assetRepository.getAssetRetention(this.selfUser(), conversationEntity);
         const options = {
           expectsReadConfirmation: this.expectReadReceipt(conversationEntity),
           legalHoldStatus: conversationEntity.legalHoldStatus(),
@@ -1992,21 +1991,23 @@ export class ConversationRepository {
 
         const messageEntityPromise = this.getMessageInConversationById(conversationEntity, messageId);
         return messageEntityPromise.then(messageEntity => {
-          return this.assetUploader.uploadFile(messageEntity.id, imageBlob, options, false).then(uploadedImageAsset => {
-            const assetPreview = new Asset.Preview(imageBlob.type, imageBlob.size, uploadedImageAsset.uploaded);
-            const protoAsset = new Asset({
-              [PROTO_MESSAGE_TYPE.ASSET_PREVIEW]: assetPreview,
-              [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: options.expectsReadConfirmation,
-              [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: options.legalHoldStatus,
-            });
+          return this.assetRepository
+            .uploadFile(messageEntity.id, imageBlob, options, false)
+            .then(uploadedImageAsset => {
+              const assetPreview = new Asset.Preview(imageBlob.type, imageBlob.size, uploadedImageAsset.uploaded);
+              const protoAsset = new Asset({
+                [PROTO_MESSAGE_TYPE.ASSET_PREVIEW]: assetPreview,
+                [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: options.expectsReadConfirmation,
+                [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: options.legalHoldStatus,
+              });
 
-            const genericMessage = new GenericMessage({
-              [GENERIC_MESSAGE_TYPE.ASSET]: protoAsset,
-              messageId,
-            });
+              const genericMessage = new GenericMessage({
+                [GENERIC_MESSAGE_TYPE.ASSET]: protoAsset,
+                messageId,
+              });
 
-            return this._send_and_inject_generic_message(conversationEntity, genericMessage, false);
-          });
+              return this._send_and_inject_generic_message(conversationEntity, genericMessage, false);
+            });
         });
       })
       .catch(error => {
@@ -2509,7 +2510,7 @@ export class ConversationRepository {
         }
 
         const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-        const optimisticEvent = z.conversation.EventBuilder.buildMessageAdd(conversationEntity, currentTimestamp);
+        const optimisticEvent = EventBuilder.buildMessageAdd(conversationEntity, currentTimestamp);
         return this.cryptography_repository.cryptographyMapper.mapGenericMessage(genericMessage, optimisticEvent);
       })
       .then(mappedEvent => {
@@ -2783,7 +2784,7 @@ export class ConversationRepository {
       const servertime = this.serverTimeHandler.toServerTimestamp();
       timestamp = conversation.get_latest_timestamp(servertime);
     }
-    const legalHoldUpdateMessage = z.conversation.EventBuilder.buildLegalHoldMessage(
+    const legalHoldUpdateMessage = EventBuilder.buildLegalHoldMessage(
       conversationId || conversationEntity.id,
       userId,
       timestamp,
@@ -3519,7 +3520,7 @@ export class ConversationRepository {
       .filter(conversationEntity => !conversationEntity.removed_from_conversation())
       .forEach(conversationEntity => {
         const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-        const missed_event = z.conversation.EventBuilder.buildMissed(conversationEntity, currentTimestamp);
+        const missed_event = EventBuilder.buildMissed(conversationEntity, currentTimestamp);
         this.eventRepository.injectEvent(missed_event);
       });
   }
@@ -4190,7 +4191,7 @@ export class ConversationRepository {
    * @returns {undefined} No return value
    */
   _addDeleteMessage(conversationId, messageId, time, messageEntity) {
-    const deleteEvent = z.conversation.EventBuilder.buildDelete(conversationId, messageId, time, messageEntity);
+    const deleteEvent = EventBuilder.buildDelete(conversationId, messageId, time, messageEntity);
     this.eventRepository.injectEvent(deleteEvent);
   }
 

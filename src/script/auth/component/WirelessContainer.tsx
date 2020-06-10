@@ -27,8 +27,8 @@ import SVGProvider from '../util/SVGProvider';
 import {Config} from '../../Config';
 
 export interface Props extends React.HTMLAttributes<HTMLDivElement> {
-  showCookiePolicyBanner?: boolean;
   onCookiePolicyBannerClose?: (event: React.MouseEvent<HTMLElement>) => void;
+  showCookiePolicyBanner?: boolean;
 }
 
 export const WirelessContainer: React.SFC<Props> = ({showCookiePolicyBanner, onCookiePolicyBannerClose, children}) => {
@@ -54,7 +54,7 @@ export const WirelessContainer: React.SFC<Props> = ({showCookiePolicyBanner, onC
           <div style={{margin: '16px 40px', textAlign: 'center', width: '100%'}}>
             <Link
               onClick={(event: React.MouseEvent<HTMLAnchorElement>) => onCookiePolicyBannerClose(event)}
-              href={EXTERNAL_ROUTE.WIRE_PRIVACY_POLICY}
+              href={Config.getConfig().URL.PRIVACY_POLICY}
               style={{fontSize: '16px'}}
               target="_blank"
               textTransform="none"

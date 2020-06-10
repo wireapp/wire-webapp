@@ -47,14 +47,19 @@ Alternatively, you can test specific parts of the app:
 Bypass Chrome's security restrictions for local development:
 
 1. Add the following entry to your hosts file: `127.0.0.1 local.zinfra.io`
-1. Open `chrome://flags/#unsafely-treat-insecure-origin-as-secure`
-1. Add `http://local.zinfra.io:8081` to the list of "Insecure origins treated as secure"
-1. Restart your browser with: `open -a Google\ Chrome --args --disable-web-security --user-data-dir=/Users/your-name/your-chrome-data --ignore-certificate-errors`
+1. Restart your Chrome browser with flags: `--disable-web-security --ignore-certificate-errors --user-data-dir=...`
+1. Run `yarn start`
 
 Host file location:
 
-- On macOS the hosts file can be found at: `/etc/hosts`
+- On macOS / Linux the hosts file can be found at: `/etc/hosts`
 - On Windows 10 the hosts file can be found at: `%WINDIR%\system32\drivers\etc\hosts`
+
+Optional: If your browser does not trust the certificate from "local.zinfra.io":
+
+1. Download [mkcert](https://github.com/FiloSottile/mkcert/releases/latest)
+1. Set `CAROOT` env variable to `./server/certificate`
+1. Run `mkcert -install`
 
 ### Deployment
 
@@ -115,3 +120,13 @@ A manual deployment requires the local setup of the Elastic Beanstalk Command Li
 ### Translations
 
 All Wire translations are crowdsourced via [Crowdin](https://crowdin.com/projects/wire).
+
+#### Add new strings
+
+1. Verify you have a "keys/crowdin.yaml" in place with "api_key" and "api_token" in it
+1. Add string variable and text to "i18n/en-US.json"
+1. Run `yarn translate:upload`
+1. Verify your string shows up on [Crowdin project: wire-webapp](https://crowdin.com/translate/wire-webapp/1224/en-en)
+1. Add translation on Crowdin
+1. Approve translation on Crowdin
+1. Run `yarn translate:download`

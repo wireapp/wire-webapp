@@ -39,6 +39,8 @@ import {isArrowKey, isPageUpDownKey, isMetaKey, isPasteAction} from 'Util/Keyboa
 import {noop} from 'Util/util';
 
 import {viewportObserver} from '../../ui/viewportObserver';
+import {container} from 'tsyringe';
+import {AssetRepository} from '../../assets/AssetRepository';
 
 /**
  * Focus input field when user starts typing if no other input field or textarea is selected.
@@ -141,9 +143,10 @@ ko.bindingHandlers.infinite_scroll = {
  */
 ko.bindingHandlers.background_image = {
   init(element, valueAccessor) {
-    const assetLoader = valueAccessor();
+    const assetRepository = container.resolve(AssetRepository);
+    const asset = valueAccessor();
 
-    if (!assetLoader) {
+    if (!asset) {
       return;
     }
 
@@ -151,8 +154,8 @@ ko.bindingHandlers.background_image = {
     let objectUrl;
 
     const loadImage = () => {
-      assetLoader
-        .load()
+      assetRepository
+        .load(asset)
         .then(blob => {
           objectUrl = window.URL.createObjectURL(blob);
           imageElement[0].src = objectUrl;

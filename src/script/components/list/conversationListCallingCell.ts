@@ -42,14 +42,14 @@ import type {Multitasking} from '../../notification/NotificationRepository';
 
 interface ComponentParams {
   call: Call;
-  conversation: ko.PureComputed<Conversation>;
-  videoGrid: ko.PureComputed<Grid>;
-  callingRepository: CallingRepository;
-  temporaryUserStyle?: boolean;
-  multitasking: Multitasking;
   callActions: CallActions;
+  callingRepository: CallingRepository;
+  conversation: ko.PureComputed<Conversation>;
   hasAccessToCamera: ko.Observable<boolean>;
   isSelfVerified: ko.Subscribable<boolean>;
+  multitasking: Multitasking;
+  temporaryUserStyle?: boolean;
+  videoGrid: ko.PureComputed<Grid>;
 }
 
 class ConversationListCallingCell {
@@ -158,7 +158,7 @@ class ConversationListCallingCell {
     this.disableScreenButton = !this.callingRepository.supportsScreenSharing;
     this.disableVideoButton = ko.pureComputed(() => {
       const isOutgoingVideoCall = this.isOutgoing() && call.selfParticipant.sharesCamera();
-      const isVideoUnsupported = !call.selfParticipant.sharesCamera() && !conversation().supportsVideoCall(true);
+      const isVideoUnsupported = !call.selfParticipant.sharesCamera() && !conversation().supportsVideoCall();
       return isOutgoingVideoCall || isVideoUnsupported;
     });
 
@@ -236,7 +236,12 @@ ko.components.register('conversation-list-calling-cell', {
           <span class="conversation-list-cell-description" data-bind="text: t('callStateConnecting')" data-uie-name="call-label-connecting"></span>
         <!-- /ko -->
         <!-- ko if: callDuration() -->
-          <span class="conversation-list-cell-description" data-bind="text: callDuration()" data-uie-name="call-duration"></span>
+          <div class="conversation-list-info-wrapper">
+            <span class="conversation-list-cell-description" data-bind="text: callDuration()" data-uie-name="call-duration"></span>
+            <!-- ko if: call.isCbrEnabled -->
+              <span class="conversation-list-cell-description" data-bind="text: t('callStateCbr')" data-uie-name="call-cbr"></span>
+            <!-- /ko -->
+          </div>
         <!-- /ko -->
       </div>
 

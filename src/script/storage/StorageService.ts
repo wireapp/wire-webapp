@@ -408,7 +408,7 @@ export class StorageService {
     }
   }
 
-  private notifyListeners(storeName: string, eventType: DEXIE_CRUD_EVENT, oldRecord: any, newRecord: any): void {
+  private notifyListeners<T, U>(storeName: string, eventType: DEXIE_CRUD_EVENT, oldRecord: T, newRecord: U): void {
     this.dbListeners
       .filter(dbListener => dbListener.store === storeName && dbListener.type === eventType)
       .forEach(dbListener => dbListener.callback({obj: newRecord, oldObj: oldRecord}));

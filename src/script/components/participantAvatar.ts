@@ -26,29 +26,32 @@ import {getFirstChar} from 'Util/StringUtil';
 import {viewportObserver} from '../ui/viewportObserver';
 import {User} from '../entity/User';
 import {ServiceEntity} from '../integration/ServiceEntity';
-import type {AssetRemoteData} from '../assets/AssetRemoteData';
+import {AssetRemoteData} from '../assets/AssetRemoteData';
+import {AssetRepository} from '../assets/AssetRepository';
+import {container} from 'tsyringe';
 
 export enum SIZE {
   LARGE = 'avatar-l',
   MEDIUM = 'avatar-m',
   SMALL = 'avatar-s',
-  XXX_SMALL = 'avatar-xxxs',
-  XX_SMALL = 'avatar-xxs',
   X_LARGE = 'avatar-xl',
   X_SMALL = 'avatar-xs',
+  XX_SMALL = 'avatar-xxs',
+  XXX_SMALL = 'avatar-xxxs',
 }
 
 enum STATE {
-  SELF = 'self',
-  SELECTED = 'selected',
   BLOCKED = 'blocked',
-  PENDING = 'pending',
   IGNORED = 'ignored',
-  UNKNOWN = 'unknown',
   NONE = '',
+  PENDING = 'pending',
+  SELECTED = 'selected',
+  SELF = 'self',
+  UNKNOWN = 'unknown',
 }
 
 interface ParticipantAvatarParams {
+  assetRepository: AssetRepository;
   click: (participant: User, target: Node) => void;
   delay?: number;
   participant?: ko.Observable<User> | User;
@@ -79,6 +82,8 @@ export class ParticipantAvatar {
   timerLength: number;
   timerOffset: ko.PureComputed<number>;
 
+  private readonly assetRepository: AssetRepository;
+
   static get SIZE(): typeof SIZE {
     return SIZE;
   }
@@ -95,13 +100,24 @@ export class ParticipantAvatar {
     };
   }
 
-  constructor(params: ParticipantAvatarParams, componentInfo: {element: HTMLElement}) {
+  constructor(
+    {
+      assetRepository = container.resolve(AssetRepository),
+      participant,
+      delay,
+      size,
+      selected,
+      click,
+    }: ParticipantAvatarParams,
+    componentInfo: {element: HTMLElement},
+  ) {
     this.logger = getLogger('ParticipantAvatar');
+    this.assetRepository = assetRepository;
 
-    const isParticipantObservable = typeof params.participant === 'function';
+    const isParticipantObservable = typeof participant === 'function';
     this.participant = isParticipantObservable
-      ? (params.participant as ko.Observable<User>)
-      : ko.observable(params.participant as User);
+      ? (participant as ko.Observable<User>)
+      : ko.observable(participant as User);
 
     this.isService = ko.pureComputed(() => {
       return this.participant() instanceof ServiceEntity || this.participant().isService;
@@ -114,8 +130,8 @@ export class ParticipantAvatar {
     this.isTemporaryGuest = ko.pureComputed(() => this.isUser() && this.participant().isTemporaryGuest());
 
     this.avatarType = ko.pureComputed(() => `${this.isUser() ? 'user' : 'service'}-avatar`);
-    this.delay = params.delay;
-    this.size = params.size || SIZE.LARGE;
+    this.delay = delay;
+    this.size = size || SIZE.LARGE;
     this.element = $(componentInfo.element);
     this.element.addClass(`${this.avatarType()} ${this.size}`);
 
@@ -161,7 +177,7 @@ export class ParticipantAvatar {
       if (this.participant().isMe) {
         return STATE.SELF;
       }
-      if (typeof params.selected === 'function' && params.selected()) {
+      if (typeof selected === 'function' && selected()) {
         return STATE.SELECTED;
       }
       if (this.participant().isTeamMember()) {
@@ -193,12 +209,12 @@ export class ParticipantAvatar {
     });
 
     this.onClick = (data, event) => {
-      if (typeof params.click === 'function') {
-        params.click(data.participant, (event.currentTarget as Node).parentNode);
+      if (typeof click === 'function') {
+        click(data.participant, (event.currentTarget as Node).parentNode);
       }
     };
 
-    const _loadAvatarPicture = () => {
+    const _loadAvatarPicture = async () => {
       this.element.find('.avatar-image').html('');
       this.element.removeClass('avatar-image-loaded avatar-loading-transition');
       if (!this.avatarLoadingBlocked) {
@@ -213,20 +229,18 @@ export class ParticipantAvatar {
         if (pictureResource) {
           const isCached = pictureResource.downloadProgress() === 100;
 
-          pictureResource
-            .getObjectUrl()
-            .then(url => {
-              if (url) {
-                const image = new Image();
-                image.src = url;
-                this.element.find('.avatar-image').html(image as any);
-                this.element.addClass(`avatar-image-loaded ${isCached && isSmall ? '' : 'avatar-loading-transition'}`);
-              }
-              this.avatarLoadingBlocked = false;
-            })
-            .catch(error => {
-              this.logger.warn('Failed to load avatar picture.', error);
-            });
+          try {
+            const url = await this.assetRepository.getObjectUrl(pictureResource);
+            if (url) {
+              const image = new Image();
+              image.src = url;
+              this.element.find('.avatar-image').html(image as any);
+              this.element.addClass(`avatar-image-loaded ${isCached && isSmall ? '' : 'avatar-loading-transition'}`);
+            }
+            this.avatarLoadingBlocked = false;
+          } catch (error) {
+            this.logger.warn('Failed to load avatar picture.', error);
+          }
         } else {
           this.avatarLoadingBlocked = false;
         }

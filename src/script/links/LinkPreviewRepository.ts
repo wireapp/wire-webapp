@@ -20,11 +20,12 @@
 import {amplify} from 'amplify';
 import type {Data as OpenGraphResult} from 'open-graph';
 import type {Asset, LinkPreview} from '@wireapp/protocol-messaging';
+import type {WebappProperties} from '@wireapp/api-client/dist/user/data';
 import {AssetRetentionPolicy} from '@wireapp/api-client/dist/asset';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {base64ToBlob, createRandomUuid} from 'Util/util';
-import {Logger, getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 
 import {getFirstLinkWithOffset} from './LinkPreviewHelpers';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
@@ -32,8 +33,8 @@ import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {isBlacklisted} from './LinkPreviewBlackList';
 import {buildFromOpenGraphData} from './LinkPreviewProtoBuilder';
 import {LinkPreviewError} from '../error/LinkPreviewError';
-import type {AssetUploader} from '../assets/AssetUploader';
-import type {PropertiesRepository} from '../properties/PropertiesRepository';
+import {PropertiesRepository} from '../properties/PropertiesRepository';
+import {AssetRepository} from '../assets/AssetRepository';
 
 declare global {
   interface Window {
@@ -42,18 +43,18 @@ declare global {
 }
 
 export class LinkPreviewRepository {
-  assetUploader: AssetUploader;
+  assetRepository: AssetRepository;
   logger: Logger;
   shouldSendPreviews: boolean;
 
-  constructor(assetUploader: AssetUploader, propertiesRepository: PropertiesRepository) {
-    this.assetUploader = assetUploader;
+  constructor(assetRepository: AssetRepository, propertiesRepository: PropertiesRepository) {
+    this.assetRepository = assetRepository;
     this.logger = getLogger('LinkPreviewRepository');
 
     this.shouldSendPreviews = propertiesRepository.getPreference(PROPERTIES_TYPE.PREVIEWS.SEND);
 
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.PREVIEWS.SEND, this.updatedSendPreference);
-    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, ({settings}: any) => {
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, ({settings}: WebappProperties) => {
       this.updatedSendPreference(settings.previews.send);
     });
   }
@@ -151,7 +152,7 @@ export class LinkPreviewRepository {
     try {
       const data = await window.openGraphAsync(link);
       if (data) {
-        return Object.entries(data).reduce((result: OpenGraphResult, [key, value]) => {
+        return Object.entries(data).reduce<OpenGraphResult>((result, [key, value]) => {
           result[key] = Array.isArray(value) ? value[0] : value;
           return result;
         }, {} as OpenGraphResult);
@@ -171,7 +172,7 @@ export class LinkPreviewRepository {
    */
   private async _uploadPreviewImage(dataUri: string): Promise<Asset> {
     const blob = await base64ToBlob(dataUri);
-    return this.assetUploader.uploadFile(
+    return this.assetRepository.uploadFile(
       createRandomUuid(),
       blob,
       {expectsReadConfirmation: false, public: true, retention: AssetRetentionPolicy.PERSISTENT},

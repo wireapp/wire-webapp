@@ -25,6 +25,10 @@ enum EMOJI {
   REPLACE_INLINE = 'settings.emoji.replace_inline',
 }
 
+enum CALL {
+  ENABLE_VBR_ENCODING = 'settings.call.enable_vbr_encoding',
+}
+
 enum INTERFACE {
   THEME = 'settings.interface.theme',
   VIEW_FOLDERS = 'settings.interface.view_folders',
@@ -44,6 +48,7 @@ enum PROPERTIES {
 
 const PROPERTIES_TYPE = {
   ...PROPERTIES,
+  CALL,
   CONTACT_IMPORT,
   EMOJI,
   INTERFACE,

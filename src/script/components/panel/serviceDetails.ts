@@ -21,8 +21,8 @@ import {ParticipantAvatar} from 'Components/participantAvatar';
 import type {ServiceEntity} from '../../integration/ServiceEntity';
 
 interface ComponentParams {
-  service: ServiceEntity;
   participantAvatar: ParticipantAvatar;
+  service: ServiceEntity;
 }
 
 ko.components.register('panel-service-details', {

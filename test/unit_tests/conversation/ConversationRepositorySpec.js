@@ -37,6 +37,7 @@ import {ClientEntity} from 'src/script/client/ClientEntity';
 
 import {EventInfoEntity} from 'src/script/conversation/EventInfoEntity';
 import {ConversationType} from 'src/script/conversation/ConversationType';
+import {EventBuilder} from 'src/script/conversation/EventBuilder';
 import {ConversationStatus} from 'src/script/conversation/ConversationStatus';
 import {ACCESS_ROLE} from 'src/script/conversation/AccessRole';
 import {ACCESS_MODE} from 'src/script/conversation/AccessMode';
@@ -46,7 +47,7 @@ import {ConversationVerificationState} from 'src/script/conversation/Conversatio
 
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 import {StorageSchemata} from 'src/script/storage/StorageSchemata';
-import {File} from 'src/script/entity/message/File';
+import {FileAsset} from 'src/script/entity/message/FileAsset';
 
 import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
 import {MessageCategory} from 'src/script/message/MessageCategory';
@@ -130,7 +131,7 @@ describe('ConversationRepository', () => {
       conversation_et = _generate_conversation(ConversationType.GROUP);
 
       return testFactory.conversation_repository.save_conversation(conversation_et).then(() => {
-        const file_et = new File();
+        const file_et = new FileAsset();
         file_et.status(AssetTransferState.UPLOADING);
         message_et = new ContentMessage(createRandomUuid());
         message_et.assets.push(file_et);
@@ -1479,7 +1480,7 @@ describe('ConversationRepository', () => {
       const conversationId = createRandomUuid();
       const event = {conversation: conversationId, from: 'unknown-user-id'};
       spyOn(testFactory.conversation_repository, 'get_conversation_by_id').and.returnValue(Promise.resolve({}));
-      spyOn(z.conversation.EventBuilder, 'buildMemberJoin').and.returnValue(event);
+      spyOn(EventBuilder, 'buildMemberJoin').and.returnValue(event);
 
       return testFactory.conversation_repository
         .addMissingMember({id: conversationId}, ['unknown-user-id'])

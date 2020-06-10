@@ -21,9 +21,7 @@ import {Button, COLOR, Column, Columns, Container, H3, Link, Modal, Text} from '
 import React from 'react';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {Config} from '../../Config';
-import {addLocaleToUrl} from '../../externalRoute';
 import {acceptNewsModalStrings} from '../../strings';
-import {EXTERNAL_ROUTE} from '../externalRoute';
 
 export interface Props extends React.HTMLProps<HTMLDivElement> {
   onConfirm: (event: React.MouseEvent<HTMLButtonElement>) => void;
@@ -40,7 +38,7 @@ const AcceptNewsModal = ({onConfirm, onDecline}: Props) => {
         </H3>
         <div data-uie-name="modal-marketing-consent-description">
           <Text block>{_(acceptNewsModalStrings.unsubscribeDescription)}</Text>
-          <Link href={addLocaleToUrl(EXTERNAL_ROUTE.WIRE_PRIVACY_POLICY)} target="_blank" data-uie-name="go-privacy">
+          <Link href={Config.getConfig().URL.PRIVACY_POLICY} target="_blank" data-uie-name="go-privacy">
             <Text block>
               <FormattedMessage
                 {...acceptNewsModalStrings.privacyDescription}

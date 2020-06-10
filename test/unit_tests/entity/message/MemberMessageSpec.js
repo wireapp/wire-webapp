@@ -27,7 +27,7 @@ import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 
 import {StatusType} from 'src/script/message/StatusType';
-import {File} from 'src/script/entity/message/File';
+import {FileAsset} from 'src/script/entity/message/FileAsset';
 
 describe('Member Message', () => {
   describe('generateNameString', () => {
@@ -105,7 +105,7 @@ describe('Member Message', () => {
     });
 
     it('should be deletable when message is a file and uploading or downloading', () => {
-      const file_et = new File();
+      const file_et = new FileAsset();
       file_et.status(AssetTransferState.UPLOADING);
       message_et.assets.push(file_et);
 
@@ -130,8 +130,8 @@ describe('Member Message', () => {
       expect(message_et.has_asset_file()).toBeFalsy();
     });
 
-    it('should return true for File asset', () => {
-      message_et.assets.push(new File());
+    it('should return true for FileAsset asset', () => {
+      message_et.assets.push(new FileAsset());
 
       expect(message_et.has_asset_file()).toBeTruthy();
     });

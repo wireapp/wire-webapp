@@ -78,6 +78,9 @@ const SingleSignOn = ({hasDefaultSSOCode}: Props & ConnectedProps & DispatchProp
       };
 
       onReceiveChildWindowMessage = (event: MessageEvent) => {
+        // We need to copy properties to `JSON.stringify` because `event` is not serializable
+        const serializedEvent = JSON.stringify({data: event.data, origin: event.origin});
+        logger.log(`Received SSO login event from wrapper: ${serializedEvent}`, event);
         const isExpectedOrigin = event.origin === Config.getConfig().BACKEND_REST;
         if (!isExpectedOrigin) {
           onChildWindowClose();
@@ -86,7 +89,7 @@ const SingleSignOn = ({hasDefaultSSOCode}: Props & ConnectedProps & DispatchProp
             new BackendError({
               code: 500,
               label: BackendError.LABEL.SSO_GENERIC_ERROR,
-              message: `Origin "${event.origin}" of event "${JSON.stringify(event)}" not matching "${
+              message: `Origin "${event.origin}" of event "${serializedEvent}" not matching "${
                 Config.getConfig().BACKEND_REST
               }"`,
             }),
@@ -100,7 +103,8 @@ const SingleSignOn = ({hasDefaultSSOCode}: Props & ConnectedProps & DispatchProp
             ssoWindowRef.current.close();
             return resolve();
           }
-          case 'AUTH_ERROR': {
+          case 'AUTH_ERROR':
+          case 'AUTH_ERROR_COOKIE': {
             onChildWindowClose();
             ssoWindowRef.current.close();
             return reject(
@@ -112,7 +116,7 @@ const SingleSignOn = ({hasDefaultSSOCode}: Props & ConnectedProps & DispatchProp
             );
           }
           default: {
-            logger.warn(`Received unmatched event type: "${JSON.stringify(event)}"`);
+            logger.warn(`Received unmatched event type: "${eventType}"`);
           }
         }
       };

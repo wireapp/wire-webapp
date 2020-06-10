@@ -19,6 +19,7 @@
 
 import ko from 'knockout';
 import {amplify} from 'amplify';
+import {Confirmation} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Logger, getLogger} from 'Util/Logger';
@@ -97,7 +98,6 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     super(params);
     this.clickOnShowService = this.clickOnShowService.bind(this);
     this.clickOnShowUser = this.clickOnShowUser.bind(this);
-    this.updateConversationReceiptMode = this.updateConversationReceiptMode.bind(this);
 
     const {mainViewModel, repositories} = params;
 
@@ -463,9 +463,9 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     }
   }
 
-  updateConversationReceiptMode(conversationEntity: Conversation, receiptMode: any): void {
+  updateConversationReceiptMode = (conversationEntity: Conversation, receiptMode: Confirmation.Type): void => {
     this.conversationRepository.updateConversationReceiptMode(conversationEntity, receiptMode);
-  }
+  };
 
   initView(): void {
     if (this.teamRepository.isTeam() && this.isSingleUserMode(this.activeConversation())) {

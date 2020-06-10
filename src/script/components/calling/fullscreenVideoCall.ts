@@ -33,15 +33,15 @@ import type {Multitasking} from '../../notification/NotificationRepository';
 import 'Components/calling/deviceToggleButton';
 
 interface Params {
-  videoGrid: ko.Observable<Grid>;
   call: Call;
+  callActions: CallActions;
+  canShareScreen: boolean;
   conversation: ko.Observable<Conversation>;
+  isChoosingScreen: ko.Observable<boolean>;
+  isMuted: ko.Observable<boolean>;
   mediaDevicesHandler: MediaDevicesHandler;
   multitasking: Multitasking;
-  canShareScreen: boolean;
-  callActions: CallActions;
-  isMuted: ko.Observable<boolean>;
-  isChoosingScreen: ko.Observable<boolean>;
+  videoGrid: ko.Observable<Grid>;
 }
 
 export class FullscreenVideoCalling {
@@ -126,7 +126,7 @@ export class FullscreenVideoCalling {
     });
 
     this.showToggleVideo = ko.pureComputed(() => {
-      return this.call.initialType === CALL_TYPE.VIDEO || conversation().supportsVideoCall(true);
+      return this.call.initialType === CALL_TYPE.VIDEO || conversation().supportsVideoCall();
     });
 
     this.callDuration = ko.observable();

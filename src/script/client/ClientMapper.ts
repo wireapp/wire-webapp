@@ -62,7 +62,7 @@ export class ClientMapper {
    * @param isSelfClient Creating self client
    * @returns Mapped client entities
    */
-  static mapClients(clientsPayload: any[], isSelfClient: boolean): ClientEntity[] {
+  static mapClients(clientsPayload: Record<string, any>[], isSelfClient: boolean): ClientEntity[] {
     return clientsPayload.map(clientPayload => ClientMapper.mapClient(clientPayload, isSelfClient));
   }
 
@@ -91,7 +91,7 @@ export class ClientMapper {
     return {client: clientData, wasUpdated: containsUpdate};
   }
 
-  static _mapMember(clientEntity: Record<string, any>, clientPayload: Record<string, any>, memberName: string): void {
+  static _mapMember(clientEntity: any, clientPayload: any, memberName: string): void {
     const payloadValue = clientPayload[memberName];
     const isMemberUndefined = payloadValue === undefined;
     if (!isMemberUndefined) {

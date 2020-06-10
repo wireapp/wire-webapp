@@ -17,7 +17,7 @@
  *
  */
 
-import {NotificationPreference} from '@wireapp/api-client/dist/user/data';
+import {NotificationPreference, WebappProperties} from '@wireapp/api-client/dist/user/data';
 import {Availability} from '@wireapp/protocol-messaging';
 import {amplify} from 'amplify';
 import ko from 'knockout';
@@ -58,6 +58,8 @@ import type {PermissionRepository} from '../permission/PermissionRepository';
 import type {UserRepository} from '../user/UserRepository';
 import {ContentViewModel} from '../view_model/ContentViewModel';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
+import {AssetRepository} from '../assets/AssetRepository';
+import {container} from 'tsyringe';
 
 export interface Multitasking {
   autoMinimize?: ko.Observable<boolean>;
@@ -72,12 +74,12 @@ interface ContentViewModelState {
 interface NotificationContent {
   /** Notification options */
   options: {data: {conversationId: string; messageId: string; messageType: string}};
-  /** Function to be triggered on click */
-  trigger: Function;
-  /** Notification title */
-  title: string;
   /** Timeout for notification */
   timeout: number;
+  /** Notification title */
+  title: string;
+  /** Function to be triggered on click */
+  trigger: Function;
 }
 
 /**
@@ -94,9 +96,10 @@ export class NotificationRepository {
   private readonly notifications: any[];
   private readonly notificationsPreference: ko.Observable<NotificationPreference>;
   private readonly permissionRepository: PermissionRepository;
-  private readonly permissionState: ko.Observable<string>;
+  private readonly permissionState: ko.Observable<PermissionState | PermissionStatusState>;
   private readonly selfUser: ko.Observable<User>;
   private readonly userRepository: UserRepository;
+  private readonly assetRepository: AssetRepository;
 
   static get CONFIG() {
     return {
@@ -124,6 +127,7 @@ export class NotificationRepository {
     permissionRepository: PermissionRepository,
     userRepository: UserRepository,
   ) {
+    this.assetRepository = container.resolve(AssetRepository);
     this.callingRepository = callingRepository;
     this.conversationRepository = conversationRepository;
     this.permissionRepository = permissionRepository;
@@ -184,7 +188,7 @@ export class NotificationRepository {
       return shouldRequestPermission ? this._requestPermission() : this.checkPermissionState();
     }
 
-    const currentPermission = window.Notification.permission;
+    const currentPermission = window.Notification.permission as PermissionState;
     const shouldRequestPermission = currentPermission === PermissionState.DEFAULT;
     return shouldRequestPermission ? this._requestPermission() : this.updatePermissionState(currentPermission);
   }
@@ -257,7 +261,7 @@ export class NotificationRepository {
     });
   }
 
-  updatedProperties(properties: any): void {
+  updatedProperties(properties: WebappProperties): void {
     const notificationPreference = properties.settings.notifications;
     return this.notificationsPreference(notificationPreference);
   }
@@ -271,7 +275,7 @@ export class NotificationRepository {
    * @param permissionState State of browser permission
    * @returns Resolves with `true` if notifications are enabled
    */
-  updatePermissionState(permissionState: string): Promise<boolean> {
+  updatePermissionState(permissionState: PermissionState | PermissionStatusState): Promise<boolean> {
     this.permissionState(permissionState);
     return this.checkPermissionState();
   }
@@ -575,18 +579,16 @@ export class NotificationRepository {
    * @param userEntity Sender of message
    * @returns Resolves with the icon URL
    */
-  private createOptionsIcon(shouldObfuscateSender: boolean, userEntity: User): Promise<string> {
+  private async createOptionsIcon(shouldObfuscateSender: boolean, userEntity: User): Promise<string> {
     const canShowUserImage = userEntity.previewPictureResource() && !shouldObfuscateSender;
     if (canShowUserImage) {
-      return userEntity
-        .previewPictureResource()
-        .generateUrl()
-        .catch((error: Error) => {
-          if (error instanceof ValidationUtilError) {
-            this.logger.error(`Failed to validate an asset URL: ${error.message}`);
-          }
-          return '';
-        });
+      try {
+        return this.assetRepository.generateAssetUrl(userEntity.previewPictureResource());
+      } catch (error) {
+        if (error instanceof ValidationUtilError) {
+          this.logger.error(`Failed to validate an asset URL: ${error.message}`);
+        }
+      }
     }
 
     const isMacOsWrapper = Environment.electron && Environment.os.mac;
@@ -756,7 +758,7 @@ export class NotificationRepository {
     // Note: The callback will be only triggered in Chrome.
     // If you ignore a permission request on Firefox, then the callback will not be triggered.
     if (window.Notification.requestPermission) {
-      const permissionState = await window.Notification.requestPermission();
+      const permissionState = (await window.Notification.requestPermission()) as PermissionState;
       amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.REQUEST_NOTIFICATION);
       await this.updatePermissionState(permissionState);
     }

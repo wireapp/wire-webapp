@@ -52,7 +52,6 @@ import {ConversationService} from 'src/script/conversation/ConversationService';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {SelfService} from 'src/script/self/SelfService';
 import {LinkPreviewRepository} from 'src/script/links/LinkPreviewRepository';
-import {AssetService} from 'src/script/assets/AssetService';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {PropertiesService} from 'src/script/properties/PropertiesService';
 import {MessageSender} from 'src/script/message/MessageSender';
@@ -66,7 +65,7 @@ import {ClientService} from 'src/script/client/ClientService';
 import {APIClientSingleton} from 'src/script/service/APIClientSingleton';
 import {TeamService} from 'src/script/team/TeamService';
 import {SearchService} from 'src/script/search/SearchService';
-import {AssetUploader} from '../../src/script/assets/AssetUploader';
+import {AssetRepository} from '../../src/script/assets/AssetRepository';
 
 export class TestFactory {
   /**
@@ -210,17 +209,18 @@ export class TestFactory {
    */
   async exposeUserActors() {
     await this.exposeClientActors();
-    this.asset_service = new AssetService(container.resolve(APIClientSingleton).getClient());
+    this.assetRepository = new AssetRepository();
+
     this.connection_service = new ConnectionService(container.resolve(APIClientSingleton).getClient());
     this.user_service = new UserService(container.resolve(APIClientSingleton).getClient(), this.storage_service);
-    this.propertyRepository = this.propertyRepository = new PropertiesRepository(
+    this.propertyRepository = new PropertiesRepository(
       new PropertiesService(container.resolve(APIClientSingleton).getClient()),
       new SelfService(container.resolve(APIClientSingleton).getClient()),
     );
 
     this.user_repository = new UserRepository(
       this.user_service,
-      this.asset_service,
+      this.assetRepository,
       new SelfService(container.resolve(APIClientSingleton).getClient()),
       this.client_repository,
       serverTimeHandler,
@@ -257,7 +257,7 @@ export class TestFactory {
   async exposeTeamActors() {
     await this.exposeUserActors();
     this.team_service = new TeamService(container.resolve(APIClientSingleton).getClient());
-    this.team_repository = new TeamRepository(this.team_service, this.user_repository);
+    this.team_repository = new TeamRepository(this.team_service, this.user_repository, this.assetRepository);
     return this.team_repository;
   }
 
@@ -280,18 +280,17 @@ export class TestFactory {
       new SelfService(container.resolve(APIClientSingleton).getClient()),
     );
 
-    const assetService = new AssetService(container.resolve(APIClientSingleton).getClient());
-    const assetUploader = new AssetUploader(assetService);
+    const assetRepository = container.resolve(AssetRepository);
 
     this.conversation_repository = new ConversationRepository(
       this.conversation_service,
-      this.asset_service,
+      assetRepository,
       this.client_repository,
       this.connection_repository,
       this.cryptography_repository,
       this.event_repository,
       undefined,
-      new LinkPreviewRepository(assetUploader, propertiesRepository),
+      new LinkPreviewRepository(assetRepository, propertiesRepository),
       new MessageSender(),
       serverTimeHandler,
       this.team_repository,
