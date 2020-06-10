@@ -2,7 +2,7 @@
   "dependencies": {
     "@types/long": "4.0.1",
     "@types/node": "*",
-    "@wireapp/bot-api": "*"
+    "@wireapp/bot-api": "7.10.1"
   },
   "devDependencies": {
     "@types/node": "~12",
@@ -29,5 +29,5 @@
     "test:node": "exit 0",
     "test:project": "yarn dist && yarn test"
   },
-  "version": "0.0.0"
+  "version": "0.1.0"
 }
