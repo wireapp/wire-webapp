@@ -17,7 +17,7 @@
     "!dist/demo"
   ],
   "license": "GPL-3.0",
-  "main": "dist/index.js",
+  "main": "dist/DebugHandler.js",
   "name": "@wireapp/bot-handler-debug",
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-debug",
   "scripts": {
