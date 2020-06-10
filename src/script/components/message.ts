@@ -308,9 +308,8 @@ class Message {
       });
     }
 
-    const isSendingMessage = messageEntity.status() === StatusType.SENDING;
     const canDelete =
-      messageEntity.user().isMe && !this.conversation().removed_from_conversation() && !isSendingMessage;
+      messageEntity.user().isMe && !this.conversation().removed_from_conversation() && messageEntity.is_deletable();
     if (canDelete) {
       entries.push({
         click: () => this.actionsViewModel.deleteMessageEveryone(this.conversation(), messageEntity),
