@@ -3789,7 +3789,16 @@ export class ConversationRepository {
     const isLocalCancel = fromSelf && event.data.reason === ProtobufAsset.NotUploaded.CANCELLED;
 
     if (isRemoteFailure || isLocalCancel) {
-      return conversationEntity.remove_message_by_id(event.id);
+      /**
+       * WEBAPP-6916: An unsuccessful asset upload triggers a removal of the original asset message in the `EventRepository`.
+       * Thus the event timestamps need to get updated, so that the latest event timestamp is from the message which was send before the original message.
+       *
+       * Info: Since the `EventRepository` does not have a reference to the `ConversationRepository` we do that event update at this location.
+       * A more fitting place would be the `AssetTransferState.UPLOAD_FAILED` case in `EventRepository._handleAssetUpdate`.
+       *
+       * Our assumption is that the `_handleAssetUpdate` function (invoked by `notificationsQueue.subscribe`) is executed before this function.
+       */
+      return conversationEntity.updateTimestamps(conversationEntity.getLastMessage(), true);
     }
 
     return this._addEventToConversation(conversationEntity, event).then(({messageEntity}) => {
@@ -4149,12 +4158,12 @@ export class ConversationRepository {
    * @returns {Promise} Resolves when message was deleted
    */
   async _delete_message_by_id(conversationEntity, messageId) {
-    amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, messageId, conversationEntity.id);
-
     const isLastDeleted =
       conversationEntity.isShowingLastReceivedMessage() && conversationEntity.getLastMessage()?.id === messageId;
 
     const deleteCount = await this.eventService.deleteEvent(conversationEntity.id, messageId);
+
+    amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, messageId, conversationEntity.id);
 
     if (isLastDeleted && conversationEntity.getLastMessage()?.timestamp()) {
       conversationEntity.updateTimestamps(conversationEntity.getLastMessage(), true);
