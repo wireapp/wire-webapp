@@ -3089,7 +3089,6 @@ export class ConversationRepository {
         });
       })
       .then(() => {
-        amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, messageId, conversationId);
         return this._delete_message_by_id(conversationEntity, messageId);
       })
       .catch(error => {
@@ -3127,7 +3126,6 @@ export class ConversationRepository {
         return this.sendGenericMessageToConversation(eventInfoEntity);
       })
       .then(() => {
-        amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, messageEntity.id, conversationEntity.id);
         return this._delete_message_by_id(conversationEntity, messageEntity.id);
       })
       .catch(error => {
@@ -3830,7 +3828,6 @@ export class ConversationRepository {
         }
       })
       .then(() => {
-        amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, eventData.message_id, conversationEntity.id);
         return this._delete_message_by_id(conversationEntity, eventData.message_id);
       })
       .catch(error => {
@@ -3870,7 +3867,6 @@ export class ConversationRepository {
         return this.get_conversation_by_id(eventData.conversation_id);
       })
       .then(conversationEntity => {
-        amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, eventData.message_id, conversationEntity.id);
         return this._delete_message_by_id(conversationEntity, eventData.message_id);
       })
       .catch(error => {
@@ -4149,14 +4145,16 @@ export class ConversationRepository {
    *
    * @private
    * @param {Conversation} conversationEntity Conversation that contains the message
-   * @param {string} message_id ID of message to delete
+   * @param {string} messageId ID of message to delete
    * @returns {Promise} Resolves when message was deleted
    */
-  async _delete_message_by_id(conversationEntity, message_id) {
-    const isLastDeleted =
-      conversationEntity.isShowingLastReceivedMessage() && conversationEntity.getLastMessage()?.id === message_id;
+  async _delete_message_by_id(conversationEntity, messageId) {
+    amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, messageId, conversationEntity.id);
 
-    const deleteCount = await this.eventService.deleteEvent(conversationEntity.id, message_id);
+    const isLastDeleted =
+      conversationEntity.isShowingLastReceivedMessage() && conversationEntity.getLastMessage()?.id === messageId;
+
+    const deleteCount = await this.eventService.deleteEvent(conversationEntity.id, messageId);
 
     if (isLastDeleted && conversationEntity.getLastMessage()?.timestamp()) {
       conversationEntity.updateTimestamps(conversationEntity.getLastMessage(), true);
