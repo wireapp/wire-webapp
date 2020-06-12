@@ -70,7 +70,7 @@
   "accountForm.passwordPlaceholder": "Parolă (minim 8 caractere)",
   "accountForm.submitButton": "Mai departe",
   "accountForm.terms": "I accept the <terms>terms and conditions</terms>",
-  "accountForm.termsAndPrivacyPolicy": "I accept the <terms>terms and conditions</terms> and <privacypolicy>privacy policy</privacypolicy>",
+  "accountForm.termsAndPrivacyPolicy": "I accept the <privacypolicy>privacy policy</privacypolicy> and <terms>terms and conditions</terms>",
   "addParticipantsConfirmLabel": "Adaugă",
   "addParticipantsHeader": "Adaugă persoane",
   "addParticipantsHeaderWithCounter": "Add participants ({{number}})",

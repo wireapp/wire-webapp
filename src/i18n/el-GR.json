@@ -70,7 +70,7 @@
   "accountForm.passwordPlaceholder": "Κωδικος προσβασης (το λιγοτερο 8 χαρακτηρες)",
   "accountForm.submitButton": "Επόμενο",
   "accountForm.terms": "I accept the <terms>terms and conditions</terms>",
-  "accountForm.termsAndPrivacyPolicy": "I accept the <terms>terms and conditions</terms> and <privacypolicy>privacy policy</privacypolicy>",
+  "accountForm.termsAndPrivacyPolicy": "I accept the <privacypolicy>privacy policy</privacypolicy> and <terms>terms and conditions</terms>",
   "addParticipantsConfirmLabel": "Προσθήκη",
   "addParticipantsHeader": "Προσθήκη ατόμων",
   "addParticipantsHeaderWithCounter": "Προσθήκη ατόμων ({{number}})",

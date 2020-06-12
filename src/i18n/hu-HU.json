@@ -70,7 +70,7 @@
   "accountForm.passwordPlaceholder": "Jelszó (legalább 8 karakter)",
   "accountForm.submitButton": "Tovább",
   "accountForm.terms": "Elfogadom a <a>felhasználási feltételeket</a>",
-  "accountForm.termsAndPrivacyPolicy": "I accept the <terms>terms and conditions</terms> and <privacypolicy>privacy policy</privacypolicy>",
+  "accountForm.termsAndPrivacyPolicy": "I accept the <privacypolicy>privacy policy</privacypolicy> and <terms>terms and conditions</terms>",
   "addParticipantsConfirmLabel": "Hozzáadás",
   "addParticipantsHeader": "Partnerek hozzáadása",
   "addParticipantsHeaderWithCounter": "Partnerek hozzáadása ({{number}})",

@@ -70,7 +70,7 @@
   "accountForm.passwordPlaceholder": "Heslo (alespoň 8 znaků)",
   "accountForm.submitButton": "Další",
   "accountForm.terms": "I accept the <terms>terms and conditions</terms>",
-  "accountForm.termsAndPrivacyPolicy": "I accept the <terms>terms and conditions</terms> and <privacypolicy>privacy policy</privacypolicy>",
+  "accountForm.termsAndPrivacyPolicy": "I accept the <privacypolicy>privacy policy</privacypolicy> and <terms>terms and conditions</terms>",
   "addParticipantsConfirmLabel": "Přidat",
   "addParticipantsHeader": "Přidat účastníky",
   "addParticipantsHeaderWithCounter": "Přidat účastníky ({{number}})",

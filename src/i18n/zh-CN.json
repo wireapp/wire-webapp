@@ -70,7 +70,7 @@
   "accountForm.passwordPlaceholder": "密码",
   "accountForm.submitButton": "继续",
   "accountForm.terms": "我接受此 <a>条款和条件</a>",
-  "accountForm.termsAndPrivacyPolicy": "I accept the <terms>terms and conditions</terms> and <privacypolicy>privacy policy</privacypolicy>",
+  "accountForm.termsAndPrivacyPolicy": "I accept the <privacypolicy>privacy policy</privacypolicy> and <terms>terms and conditions</terms>",
   "addParticipantsConfirmLabel": "新增",
   "addParticipantsHeader": "新增好友",
   "addParticipantsHeaderWithCounter": "添加人员（{{number}}）",
