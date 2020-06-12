@@ -10652,11 +10652,6 @@ postcss@^7.0.0, postcss@^7.0.1, postcss@^7.0.14, postcss@^7.0.17, postcss@^7.0.2
     source-map "^0.6.1"
     supports-color "^6.1.0"
 
-poster-image@1.1.1:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/poster-image/-/poster-image-1.1.1.tgz#fe263322b583aef7ad4190c248644027914d534a"
-  integrity sha512-o1s09JA5FLQocp/XVbxOwS9FhLqA8N0vgLhFsMX4rNt+i2oyMJsNON+OHR5tOA66EPF9zfxCCyOL9bqPZ5p85g==
-
 prebuild-install@^5.3.2:
   version "5.3.2"
   resolved "https://registry.yarnpkg.com/prebuild-install/-/prebuild-install-5.3.2.tgz#6392e9541ac0b879ef0f22b3d65037417eb2035e"
