@@ -19,6 +19,7 @@
 
 import axios, {AxiosError} from 'axios';
 import type {APIClient} from '@wireapp/api-client';
+import type {WebappProperties} from '@wireapp/api-client/dist/user/data';
 import type {CallConfigData} from '@wireapp/api-client/dist/account/CallConfigData';
 import {
   CALL_TYPE,
@@ -192,7 +193,7 @@ export class CallingRepository {
       this.callClosed, // `closeh`,
       () => {}, // `metricsh`,
       this.requestConfig, // `cfg_reqh`,
-      () => {}, // `acbrh`,
+      this.audioCbrChanged, // `acbrh`,
       this.videoStateChanged, // `vstateh`,
     );
     /* cspell:enable */
@@ -235,10 +236,10 @@ export class CallingRepository {
 
     let users = this.poorCallQualityUsers[conversationId];
     const isOldPoorCallQualityUser = users.some(_userId => _userId === userId);
-    if (isOldPoorCallQualityUser && quality !== QUALITY.POOR) {
+    if (isOldPoorCallQualityUser && quality === QUALITY.NORMAL) {
       users = users.filter(_userId => _userId !== userId);
     }
-    if (!isOldPoorCallQualityUser && quality === QUALITY.POOR && userId !== this.selfUser.id) {
+    if (!isOldPoorCallQualityUser && quality !== QUALITY.NORMAL) {
       users = [...users, userId];
     }
     if (users.length === call.participants.length - 1) {
@@ -341,8 +342,11 @@ export class CallingRepository {
    */
   subscribeToEvents(): void {
     amplify.subscribe(WebAppEvents.CALL.EVENT_FROM_BACKEND, this.onCallEvent.bind(this));
-    amplify.subscribe(WebAppEvents.CALL.STATE.TOGGLE, this.toggleState.bind(this));
-    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_VBR_ENCODING, this.toggleCbrEncoding.bind(this)); // This event needs to be kept, it is sent by the wrapper
+    amplify.subscribe(WebAppEvents.CALL.STATE.TOGGLE, this.toggleState.bind(this)); // This event needs to be kept, it is sent by the wrapper
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_VBR_ENCODING, this.toggleCbrEncoding.bind(this));
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, ({settings}: WebappProperties) => {
+      this.toggleCbrEncoding(settings.call.enable_vbr_encoding);
+    });
   }
 
   //##############################################################################
@@ -862,7 +866,7 @@ export class CallingRepository {
         if (missingStreams.screen) {
           // https://stackoverflow.com/a/25179198/451634
           newStream.getVideoTracks()[0].onended = () => {
-            selfParticipant.releaseVideoStream();
+            this.toggleScreenshare(call);
           };
         }
         return newStream;
@@ -900,6 +904,13 @@ export class CallingRepository {
     }
     if (stream.getVideoTracks().length > 0) {
       participant.videoStream(stream);
+    }
+  };
+
+  private readonly audioCbrChanged = (userid: UserId, clientid: ClientId, enabled: number) => {
+    const activeCall = this.activeCalls()[0];
+    if (activeCall) {
+      activeCall.isCbrEnabled(!!enabled);
     }
   };
 

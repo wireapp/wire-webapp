@@ -31,20 +31,21 @@ const root = path.resolve(__dirname, '..');
 const destinationPath = path.resolve(root, 'src/i18n');
 const zipPath = path.resolve(root, 'temp/i18n/wire-webapp.zip');
 
-const getProjectKey = () => {
+// https://crowdin.com/project/wire-webapp/settings#api
+const getProjectAPIKey = () => {
   const crowdinYaml = path.join(root, 'keys/crowdin.yaml');
   const crowdinYamlContent = fs.readFileSync(crowdinYaml, 'utf8');
   const keyRegex = /api_key: ([0-9a-f]+)/;
   return crowdinYamlContent.match(keyRegex)[1];
 };
 
-const projectKey = getProjectKey();
+const projectAPIKey = getProjectAPIKey();
 
 const CROWDIN_API = 'https://api.crowdin.com/api/project/wire-webapp';
 
 const CROWDIN_URL = {
-  DOWNLOAD: `${CROWDIN_API}/download/all.zip?key=${projectKey}`,
-  EXPORT: `${CROWDIN_API}/export?key=${projectKey}&json`,
+  DOWNLOAD: `${CROWDIN_API}/download/all.zip?key=${projectAPIKey}`,
+  EXPORT: `${CROWDIN_API}/export?key=${projectAPIKey}&json`,
 };
 
 function fetchUpdates() {

@@ -120,3 +120,13 @@ A manual deployment requires the local setup of the Elastic Beanstalk Command Li
 ### Translations
 
 All Wire translations are crowdsourced via [Crowdin](https://crowdin.com/projects/wire).
+
+#### Add new strings
+
+1. Verify you have a "keys/crowdin.yaml" in place with "api_key" and "api_token" in it
+1. Add string variable and text to "i18n/en-US.json"
+1. Run `yarn translate:upload`
+1. Verify your string shows up on [Crowdin project: wire-webapp](https://crowdin.com/translate/wire-webapp/1224/en-en)
+1. Add translation on Crowdin
+1. Approve translation on Crowdin
+1. Run `yarn translate:download`

@@ -47,7 +47,7 @@ import {ConversationVerificationState} from 'src/script/conversation/Conversatio
 
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 import {StorageSchemata} from 'src/script/storage/StorageSchemata';
-import {File} from 'src/script/entity/message/File';
+import {FileAsset} from 'src/script/entity/message/FileAsset';
 
 import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
 import {MessageCategory} from 'src/script/message/MessageCategory';
@@ -131,7 +131,7 @@ describe('ConversationRepository', () => {
       conversation_et = _generate_conversation(ConversationType.GROUP);
 
       return testFactory.conversation_repository.save_conversation(conversation_et).then(() => {
-        const file_et = new File();
+        const file_et = new FileAsset();
         file_et.status(AssetTransferState.UPLOADING);
         message_et = new ContentMessage(createRandomUuid());
         message_et.assets.push(file_et);
@@ -792,114 +792,6 @@ describe('ConversationRepository', () => {
           };
           xhr.respond(200, {'Content-Type': 'application/json'}, JSON.stringify(conversation));
         });
-      });
-
-      it('removes a file upload from the messages list of the sender when the upload gets canceled', () => {
-        const conversation_id = createRandomUuid();
-        const message_id = createRandomUuid();
-        const sending_user_id = testFactory.user_repository.self().id;
-
-        // prettier-ignore
-        const upload_start = {
-          'conversation': conversation_id,
-          'from': sending_user_id,
-          'id': message_id,
-          'status': 1,
-          'time': '2017-09-06T09:43:32.278Z',
-          'data': {
-            'content_length': 23089240,
-            'content_type': 'application/x-msdownload',
-            'info': {'name': 'AirDroid_Desktop_Client_3.4.2.0.exe', 'nonce': '79072f78-15ee-4d54-a63c-fd46cd5607ae'},
-          },
-          'type': 'conversation.asset-add',
-          'category': 512,
-          'primary_key': 107,
-        };
-        // prettier-ignore
-        const upload_cancel = {
-          'conversation': conversation_id,
-          'from': sending_user_id,
-          'id': message_id,
-          'status': 1,
-          'time': '2017-09-06T09:43:36.528Z',
-          'data': {'reason': 0, 'status': 'upload-failed'},
-          'type': 'conversation.asset-add',
-        };
-
-        return testFactory.conversation_repository
-          .fetch_conversation_by_id(conversation_id)
-          .then(fetched_conversation => {
-            expect(fetched_conversation).toBeDefined();
-            testFactory.conversation_repository.active_conversation(fetched_conversation);
-            return testFactory.conversation_repository._handleConversationEvent(upload_start);
-          })
-          .then(() => {
-            const number_of_messages = Object.keys(testFactory.conversation_repository.active_conversation().messages())
-              .length;
-
-            expect(number_of_messages).toBe(1);
-            return testFactory.conversation_repository._handleConversationEvent(upload_cancel);
-          })
-          .then(() => {
-            const number_of_messages = Object.keys(testFactory.conversation_repository.active_conversation().messages())
-              .length;
-
-            expect(number_of_messages).toBe(0);
-          });
-      });
-
-      it('removes a file upload from the messages list of the receiver when the upload gets canceled', () => {
-        const conversation_id = createRandomUuid();
-        const message_id = createRandomUuid();
-        const sending_user_id = createRandomUuid();
-
-        // prettier-ignore
-        const upload_start = {
-          'conversation': conversation_id,
-          'from': sending_user_id,
-          'id': message_id,
-          'status': 1,
-          'time': '2017-09-06T09:43:32.278Z',
-          'data': {
-            'content_length': 23089240,
-            'content_type': 'application/x-msdownload',
-            'info': {'name': 'AirDroid_Desktop_Client_3.4.2.0.exe', 'nonce': '79072f78-15ee-4d54-a63c-fd46cd5607ae'},
-          },
-          'type': 'conversation.asset-add',
-          'category': 512,
-          'primary_key': 107,
-        };
-        // prettier-ignore
-        const upload_cancel = {
-          'conversation': conversation_id,
-          'from': sending_user_id,
-          'id': message_id,
-          'status': 1,
-          'time': '2017-09-06T09:43:36.528Z',
-          'data': {'reason': 0, 'status': 'upload-failed'},
-          'type': 'conversation.asset-add',
-        };
-
-        return testFactory.conversation_repository
-          .fetch_conversation_by_id(conversation_id)
-          .then(fetched_conversation => {
-            expect(fetched_conversation).toBeDefined();
-            testFactory.conversation_repository.active_conversation(fetched_conversation);
-            return testFactory.conversation_repository._handleConversationEvent(upload_start);
-          })
-          .then(() => {
-            const number_of_messages = Object.keys(testFactory.conversation_repository.active_conversation().messages())
-              .length;
-
-            expect(number_of_messages).toBe(1);
-            return testFactory.conversation_repository._handleConversationEvent(upload_cancel);
-          })
-          .then(() => {
-            const number_of_messages = Object.keys(testFactory.conversation_repository.active_conversation().messages())
-              .length;
-
-            expect(number_of_messages).toBe(0);
-          });
       });
 
       it("shows a failed message on the sender's side if the upload fails", () => {

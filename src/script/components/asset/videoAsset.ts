@@ -24,7 +24,7 @@ import {formatSeconds} from 'Util/TimeUtil';
 
 import {AssetTransferState} from '../../assets/AssetTransferState';
 import type {ContentMessage} from '../../entity/message/ContentMessage';
-import type {File as FileAsset} from '../../entity/message/File';
+import type {FileAsset} from '../../entity/message/FileAsset';
 import {AbstractAssetTransferStateTracker} from './AbstractAssetTransferStateTracker';
 
 interface Params {
@@ -67,7 +67,9 @@ class VideoAssetComponent extends AbstractAssetTransferStateTracker {
     ko.computed(
       () => {
         if (this.asset.preview_resource()) {
-          this.asset.load_preview().then(blob => this.preview(window.URL.createObjectURL(blob)));
+          this.assetRepository
+            .load(this.asset.preview_resource())
+            .then(blob => this.preview(window.URL.createObjectURL(blob)));
         }
       },
       {disposeWhenNodeIsRemoved: element},
@@ -101,8 +103,8 @@ class VideoAssetComponent extends AbstractAssetTransferStateTracker {
         this.videoElement.play();
       }
     } else {
-      this.asset
-        .load()
+      this.assetRepository
+        .load(this.asset.original_resource())
         .then(blob => {
           this.videoSrc(window.URL.createObjectURL(blob));
           if (this.videoElement) {

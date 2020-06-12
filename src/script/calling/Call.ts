@@ -34,6 +34,7 @@ export class Call {
   public readonly selfClientId: ClientId;
   public readonly conversationType: CONV_TYPE;
   public readonly initialType: CALL_TYPE;
+  public readonly isCbrEnabled: ko.Observable<boolean>;
   public blockMessages: boolean = false;
 
   constructor(
@@ -52,6 +53,7 @@ export class Call {
     this.participants = ko.observableArray([selfParticipant]);
     this.reason = ko.observable();
     this.startedAt = ko.observable();
+    this.isCbrEnabled = ko.observable(false);
   }
 
   getSelfParticipant(): Participant {

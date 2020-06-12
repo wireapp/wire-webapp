@@ -43,6 +43,8 @@ import type {MessageListViewModel} from '../view_model/content/MessageListViewMo
 import type {DecryptErrorMessage} from '../entity/message/DecryptErrorMessage';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import type {SystemMessage} from '../entity/message/SystemMessage';
+import {AssetRepository} from '../assets/AssetRepository';
+import {container} from 'tsyringe';
 
 import './asset/audioAsset';
 import './asset/fileAsset';
@@ -253,7 +255,7 @@ class Message {
 
     if (messageEntity.is_downloadable()) {
       entries.push({
-        click: () => messageEntity.download(),
+        click: () => messageEntity.download(container.resolve(AssetRepository)),
         label: t('conversationContextMenuDownload'),
       });
     }
@@ -306,9 +308,8 @@ class Message {
       });
     }
 
-    const isSendingMessage = messageEntity.status() === StatusType.SENDING;
     const canDelete =
-      messageEntity.user().isMe && !this.conversation().removed_from_conversation() && !isSendingMessage;
+      messageEntity.user().isMe && !this.conversation().removed_from_conversation() && messageEntity.is_deletable();
     if (canDelete) {
       entries.push({
         click: () => this.actionsViewModel.deleteMessageEveryone(this.conversation(), messageEntity),

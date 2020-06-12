@@ -37,7 +37,7 @@ import {ContentMessage} from '../entity/message/ContentMessage';
 import {MissedMessage} from '../entity/message/MissedMessage';
 import {PingMessage} from '../entity/message/PingMessage';
 import {Text} from '../entity/message/Text';
-import {File} from '../entity/message/File';
+import {FileAsset} from '../entity/message/FileAsset';
 import {Button} from '../entity/message/Button';
 import {ReceiptModeUpdateMessage} from '../entity/message/ReceiptModeUpdateMessage';
 import {LinkPreview as LinkPreviewEntity} from '../entity/message/LinkPreview';
@@ -685,13 +685,13 @@ export class EventMapper {
    *
    * @private
    * @param {Object} event Asset data received as JSON
-   * @returns {File} File asset entity
+   * @returns {FileAsset} FileAsset entity
    */
   _mapAssetFile(event) {
     const {conversation: conversationId, data: eventData} = event;
     const {content_length, content_type, id, info, meta, status} = eventData;
 
-    const assetEntity = new File(id);
+    const assetEntity = new FileAsset(id);
 
     assetEntity.conversationId = conversationId;
 

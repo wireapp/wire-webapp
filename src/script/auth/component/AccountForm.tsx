@@ -24,9 +24,7 @@ import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 import {Config} from '../../Config';
-import {addLocaleToUrl} from '../../externalRoute';
 import {accountFormStrings} from '../../strings';
-import {EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {BackendError} from '../module/action/BackendError';
 import {ValidationError} from '../module/action/ValidationError';
@@ -80,9 +78,6 @@ const AccountForm = ({account, ...props}: Props & ConnectedProps & DispatchProps
       name: account.name,
     });
   }, [account.name]);
-
-  const createURLForToU = () =>
-    addLocaleToUrl(`${EXTERNAL_ROUTE.WIRE_WEBSITE}/legal/terms/${props.isPersonalFlow ? 'personal' : 'teams'}/`);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -239,17 +234,60 @@ const AccountForm = ({account, ...props}: Props & ConnectedProps & DispatchProps
         style={{justifyContent: 'center'}}
       >
         <CheckboxLabel>
-          <FormattedMessage
-            {...accountFormStrings.terms}
-            values={{
-              // eslint-disable-next-line react/display-name
-              a: (...chunks: any[]) => (
-                <a target="_blank" rel="noopener noreferrer" data-uie-name="go-terms" href={createURLForToU()}>
-                  {chunks}
-                </a>
-              ),
-            }}
-          />
+          {Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION_ACCEPT_TERMS_AND_PRIVACY_POLICY ? (
+            <FormattedMessage
+              {...accountFormStrings.termsAndPrivacyPolicy}
+              values={{
+                // eslint-disable-next-line react/display-name
+                privacypolicy: (...chunks: string[] | React.ReactNode[]) => (
+                  <a
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-uie-name="go-privacy-policy"
+                    href={Config.getConfig().URL.PRIVACY_POLICY}
+                  >
+                    {chunks}
+                  </a>
+                ),
+                // eslint-disable-next-line react/display-name
+                terms: (...chunks: string[] | React.ReactNode[]) => (
+                  <a
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-uie-name="go-terms"
+                    href={
+                      props.isPersonalFlow
+                        ? Config.getConfig().URL.TERMS_OF_USE_PERSONAL
+                        : Config.getConfig().URL.TERMS_OF_USE_TEAMS
+                    }
+                  >
+                    {chunks}
+                  </a>
+                ),
+              }}
+            />
+          ) : (
+            <FormattedMessage
+              {...accountFormStrings.terms}
+              values={{
+                // eslint-disable-next-line react/display-name
+                terms: (...chunks: string[] | React.ReactNode[]) => (
+                  <a
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-uie-name="go-terms"
+                    href={
+                      props.isPersonalFlow
+                        ? Config.getConfig().URL.TERMS_OF_USE_PERSONAL
+                        : Config.getConfig().URL.TERMS_OF_USE_TEAMS
+                    }
+                  >
+                    {chunks}
+                  </a>
+                ),
+              }}
+            />
+          )}
         </CheckboxLabel>
       </Checkbox>
       <Button

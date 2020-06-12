@@ -25,10 +25,11 @@ audio-seek-bar {
   cursor: pointer;
 
   span {
-    .vertical-align;
-
+    position: relative;
+    top: 20px;
     flex-grow: 1;
     background-color: var(--foreground);
+    transform: translateY(-50%);
 
     &.active {
       background-color: var(--accent-color);

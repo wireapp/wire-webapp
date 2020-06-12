@@ -21,7 +21,7 @@ import {t} from 'Util/LocalizerUtil';
 import {getRenderedTextContent} from 'Util/messageRenderer';
 
 import type {Text} from '../entity/message/Text';
-import type {File} from '../entity/message/File';
+import type {FileAsset} from '../entity/message/FileAsset';
 import {AssetTransferState} from '../assets/AssetTransferState';
 import type {Conversation} from '../entity/Conversation';
 import {ConversationStatusIcon} from './ConversationStatusIcon';
@@ -317,7 +317,7 @@ const _getStateUnreadMessage = {
         string = true;
       } else if (messageEntity.has_asset()) {
         const assetEntity = messageEntity.get_first_asset();
-        const isUploaded = (assetEntity as File).status() === AssetTransferState.UPLOADED;
+        const isUploaded = (assetEntity as FileAsset).status() === AssetTransferState.UPLOADED;
 
         if (isUploaded) {
           if (assetEntity.is_audio()) {
