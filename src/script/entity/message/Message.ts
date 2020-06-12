@@ -216,7 +216,7 @@ export class Message {
    * @returns `true`, if message is deletable, `false` otherwise.
    */
   is_deletable(): boolean {
-    return !this.isComposite() && this.status() !== StatusType.SENDING;
+    return !this.hasUnavailableAsset(false) && !this.isComposite() && this.status() !== StatusType.SENDING;
   }
 
   /**
@@ -336,14 +336,13 @@ export class Message {
    * Check if message has an unavailable (uploading or failed) asset.
    * @returns `true`, if an asset is unavailable, `false` otherwise.
    */
-  hasUnavailableAsset(): boolean {
+  hasUnavailableAsset(includeFailedState = true): boolean {
     if (this.has_asset()) {
       return ((this as unknown) as ContentMessage).assets().some(asset => {
-        const unavailableStatus = [
-          AssetTransferState.UPLOAD_PENDING,
-          AssetTransferState.UPLOADING,
-          AssetTransferState.UPLOAD_FAILED,
-        ];
+        const unavailableStatus = [AssetTransferState.UPLOAD_PENDING, AssetTransferState.UPLOADING];
+        if (includeFailedState) {
+          unavailableStatus.push(AssetTransferState.UPLOAD_FAILED);
+        }
         const assetStatus = (asset as FileAsset).status();
         return unavailableStatus.includes(assetStatus);
       });
