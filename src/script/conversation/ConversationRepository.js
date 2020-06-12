@@ -17,7 +17,6 @@
  *
  */
 
-import poster from 'poster-image';
 import {
   Asset,
   ButtonAction,
@@ -1968,55 +1967,6 @@ export class ConversationRepository {
   }
 
   /**
-   * Send asset preview message to specified conversation.
-   *
-   * @param {Conversation} conversationEntity Conversation that should receive the preview
-   * @param {File} file File to generate preview from
-   * @param {string} messageId Message ID of the message to generate a preview for
-   * @returns {Promise} Resolves when the asset preview was sent
-   */
-  sendAssetPreview(conversationEntity, file, messageId) {
-    return poster(file)
-      .then(imageBlob => {
-        if (!imageBlob) {
-          throw Error('No image available');
-        }
-
-        const retention = this.assetRepository.getAssetRetention(this.selfUser(), conversationEntity);
-        const options = {
-          expectsReadConfirmation: this.expectReadReceipt(conversationEntity),
-          legalHoldStatus: conversationEntity.legalHoldStatus(),
-          retention,
-        };
-
-        const messageEntityPromise = this.getMessageInConversationById(conversationEntity, messageId);
-        return messageEntityPromise.then(messageEntity => {
-          return this.assetRepository
-            .uploadFile(messageEntity.id, imageBlob, options, false)
-            .then(uploadedImageAsset => {
-              const assetPreview = new Asset.Preview(imageBlob.type, imageBlob.size, uploadedImageAsset.uploaded);
-              const protoAsset = new Asset({
-                [PROTO_MESSAGE_TYPE.ASSET_PREVIEW]: assetPreview,
-                [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: options.expectsReadConfirmation,
-                [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: options.legalHoldStatus,
-              });
-
-              const genericMessage = new GenericMessage({
-                [GENERIC_MESSAGE_TYPE.ASSET]: protoAsset,
-                messageId,
-              });
-
-              return this._send_and_inject_generic_message(conversationEntity, genericMessage, false);
-            });
-        });
-      })
-      .catch(error => {
-        const message = `No preview for asset '${messageId}' in conversation '${conversationEntity.id}' uploaded `;
-        this.logger.warn(message, error);
-      });
-  }
-
-  /**
    * Send asset upload failed message to specified conversation.
    *
    * @param {Conversation} conversationEntity Conversation that should receive the file
@@ -3037,9 +2987,6 @@ export class ConversationRepository {
       const uploadStarted = Date.now();
       const injectedEvent = await this.send_asset_metadata(conversationEntity, file, asImage);
       messageId = injectedEvent.id;
-      if (isVideo(file)) {
-        await this.sendAssetPreview(conversationEntity, file, messageId);
-      }
       await this.send_asset_remotedata(conversationEntity, file, messageId, asImage);
       const uploadDuration = (Date.now() - uploadStarted) / TIME_IN_MILLIS.SECOND;
       this.logger.info(`Finished to upload asset for conversation'${conversationEntity.id} in ${uploadDuration}`);
