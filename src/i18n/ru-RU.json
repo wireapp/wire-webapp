@@ -468,7 +468,7 @@
   "index.login": "Вход",
   "index.loginInfo": "Уже зарегистрированы?",
   "index.ssoLogin": "Войти при помощи SSO",
-  "index.welcome": "Добро пожаловать в {brandName}",
+  "index.welcome": "Приветствуем вас в {brandName}",
   "initDecryption": "Расшифровка сообщений",
   "initEvents": "Загрузка сообщений",
   "initProgress": " — {{number1}} из {{number2}}",

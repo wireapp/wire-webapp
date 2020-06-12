@@ -70,7 +70,7 @@
   "accountForm.passwordPlaceholder": "Password (almeno 8 caratteri)",
   "accountForm.submitButton": "Next",
   "accountForm.terms": "I accept the <terms>terms and conditions</terms>",
-  "accountForm.termsAndPrivacyPolicy": "I accept the <terms>terms and conditions</terms> and <privacypolicy>privacy policy</privacypolicy>",
+  "accountForm.termsAndPrivacyPolicy": "I accept the <privacypolicy>privacy policy</privacypolicy> and <terms>terms and conditions</terms>",
   "addParticipantsConfirmLabel": "Aggiungi",
   "addParticipantsHeader": "Add participants",
   "addParticipantsHeaderWithCounter": "Add participants ({{number}})",

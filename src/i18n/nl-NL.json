@@ -70,7 +70,7 @@
   "accountForm.passwordPlaceholder": "Wachtwoord (minimaal 8 tekens)",
   "accountForm.submitButton": "Volgende",
   "accountForm.terms": "I accept the <terms>terms and conditions</terms>",
-  "accountForm.termsAndPrivacyPolicy": "I accept the <terms>terms and conditions</terms> and <privacypolicy>privacy policy</privacypolicy>",
+  "accountForm.termsAndPrivacyPolicy": "I accept the <privacypolicy>privacy policy</privacypolicy> and <terms>terms and conditions</terms>",
   "addParticipantsConfirmLabel": "Toevoegen",
   "addParticipantsHeader": "Personen toevoegen",
   "addParticipantsHeaderWithCounter": "Add participants ({{number}})",

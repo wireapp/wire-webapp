@@ -70,7 +70,7 @@
   "accountForm.passwordPlaceholder": "Mot de passe",
   "accountForm.submitButton": "Suivant",
   "accountForm.terms": "J'accepte les <terms>termes d'utilisation</terms>",
-  "accountForm.termsAndPrivacyPolicy": "J'accepte les <terms>conditions d'utilisation</terms> et <privacypolicy>la politique de confidentialité</privacypolicy>",
+  "accountForm.termsAndPrivacyPolicy": "J'accepte les <privacypolicy>la politique de confidentialité</privacypolicy> et <terms>conditions d'utilisation</terms>",
   "addParticipantsConfirmLabel": "Ajouter",
   "addParticipantsHeader": "Ajouter des participants",
   "addParticipantsHeaderWithCounter": "Ajouter des participants ({{number}})",
