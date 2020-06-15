@@ -30,7 +30,7 @@ No license is granted to the Wire trademark and its associated logos, all of whi
 
 ### Execution
 
-Run `yarn start` and Wire's web app will be available at: http://localhost:8081/auth/#login
+Run `yarn start` and Wire's web app will be available at: https://localhost:8081/auth/
 
 ### Testing
 
