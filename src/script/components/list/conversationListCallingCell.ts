@@ -206,6 +206,10 @@ class ConversationListCallingCell {
     return this.conversationParticipants().find(user => user.id === userId);
   }
 
+  getCallParticipant(userEntity: User): Participant {
+    return this.call.participants().find(({user}) => user === userEntity);
+  }
+
   userHasCamera(userEntity: User): boolean {
     const participant = this.call.participants().find(({user}) => user === userEntity);
     return participant?.hasActiveVideo() ?? false;
@@ -322,7 +326,7 @@ ko.components.register('conversation-list-calling-cell', {
 
       <div class="call-ui__participant-list__wrapper" data-bind="css: {'call-ui__participant-list__wrapper--active': showParticipants}">
         <div class="call-ui__participant-list" data-bind="foreach: {data: users, as: 'user', noChildContext: true}, fadingscrollbar" data-uie-name="list-call-ui-participants">
-            <participant-item params="participant: user, hideInfo: true, showCamera: userHasCamera(user), selfInTeam: $parent.selfInTeam, isSelfVerified: isSelfVerified" data-bind="css: {'no-underline': true}"></participant-item>
+            <participant-item params="participant: user, hideInfo: true, callParticipant: getCallParticipant(user), selfInTeam: $parent.selfInTeam, isSelfVerified: isSelfVerified" data-bind="css: {'no-underline': true}"></participant-item>
         </div>
       </div>
 

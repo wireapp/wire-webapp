@@ -28,6 +28,7 @@ export class Participant {
   public videoState: ko.Observable<number>;
   public videoStream: ko.Observable<MediaStream | undefined>;
   public audioStream: ko.Observable<MediaStream | undefined>;
+  public hasActiveAudio: ko.PureComputed<boolean>;
   public hasActiveVideo: ko.PureComputed<boolean>;
   public sharesScreen: ko.PureComputed<boolean>;
   public sharesCamera: ko.PureComputed<boolean>;
@@ -35,6 +36,9 @@ export class Participant {
 
   constructor(public user: User, public clientId: ClientId) {
     this.videoState = ko.observable(VIDEO_STATE.STOPPED);
+    this.hasActiveAudio = ko.pureComputed(() => {
+      return !!this.audioStream();
+    });
     this.hasActiveVideo = ko.pureComputed(() => {
       return (this.sharesCamera() || this.sharesScreen()) && !!this.videoStream();
     });
