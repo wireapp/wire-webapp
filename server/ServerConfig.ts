@@ -62,6 +62,11 @@ export interface ServerConfig {
     ENFORCE_HTTPS: boolean;
     ENVIRONMENT: string;
     GOOGLE_WEBMASTER_ID: string;
+    OPEN_GRAPH: {
+      DESCRIPTION: string;
+      IMAGE_URL: string;
+      TITLE: string;
+    };
     PORT_HTTP: number;
     ROBOTS: {
       ALLOW: string;
