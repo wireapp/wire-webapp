@@ -843,7 +843,7 @@ export class EventRepository {
   }
 
   _getUpdatesForEditMessage(originalEvent, newEvent) {
-    return {...newEvent, reactions: []};
+    return {...newEvent, reactions: {}};
   }
 
   _getUpdatesForLinkPreview(originalEvent, newEvent) {
