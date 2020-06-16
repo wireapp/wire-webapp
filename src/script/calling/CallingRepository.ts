@@ -33,6 +33,7 @@ import {
   VIDEO_STATE,
   Wcall,
   ERROR,
+  WcallMember,
 } from '@wireapp/avs';
 import {Calling, GenericMessage} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -789,7 +790,7 @@ export class CallingRepository {
       return;
     }
 
-    const {members}: {members: {clientid: ClientId; userid: UserId}[]} = JSON.parse(membersJson);
+    const {members}: {members: WcallMember[]} = JSON.parse(membersJson);
     const newMembers = members
       .filter(({userid, clientid}) => !this.findParticipant(conversationId, userid, clientid))
       .map(({userid, clientid}) => new Participant(this.userRepository.findUserById(userid), clientid));
