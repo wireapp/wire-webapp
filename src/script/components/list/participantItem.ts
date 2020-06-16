@@ -172,15 +172,21 @@ ko.components.register('participant-item', {
           <guest-icon data-uie-name="status-guest"></guest-icon>
         <!-- /ko -->
 
-        <partner-icon data-uie-name="status-external"></partner-icon>
+        <!-- ko if: external -->
+          <partner-icon data-uie-name="status-external"></partner-icon>
+        <!-- /ko -->
 
-        <camera-icon data-uie-name="status-video"></camera-icon>
+        <!-- ko if: callParticipant?.hasActiveVideo() -->
+          <camera-icon data-uie-name="status-video"></camera-icon>
+        <!-- /ko -->
 
         <!-- ko if: callParticipant?.hasActiveAudio() -->
           <audio-icon data-uie-name="status-audio-on"></audio-icon>
         <!-- /ko -->
 
-        <micoff-icon data-uie-name="status-audio-off"></micoff-icon>
+        <!-- ko if: !callParticipant?.hasActiveAudio() -->
+          <micoff-icon data-uie-name="status-audio-off"></micoff-icon>
+        <!-- /ko -->
 
         <!-- ko if: canSelect -->
           <div class="search-list-item-select icon-check" data-bind="css: {'selected': isSelected}" data-uie-name="status-selected"></div>
