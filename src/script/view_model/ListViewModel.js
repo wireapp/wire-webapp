@@ -131,7 +131,7 @@ z.viewModel.ListViewModel = class ListViewModel {
     );
     this.start = new StartUIViewModel(mainViewModel, this, repositories);
     this.takeover = new TakeoverViewModel(mainViewModel, this, repositories);
-    this.temporaryGuest = new TemporaryGuestViewModel(mainViewModel, this, repositories);
+    this.temporaryGuest = new TemporaryGuestViewModel(mainViewModel, this, repositories, this.answerCall);
 
     this._initSubscriptions();
 

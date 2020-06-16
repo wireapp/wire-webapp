@@ -1478,10 +1478,10 @@ helmet-csp@2.10.0:
     content-security-policy-builder "2.1.0"
     dasherize "2.0.0"
 
-helmet@3.22.0:
-  version "3.22.0"
-  resolved "https://registry.yarnpkg.com/helmet/-/helmet-3.22.0.tgz#3a6f11d931799145f0aff15dbc563cff9e13131f"
-  integrity sha512-Xrqicn2nm1ZIUxP3YGuTBmbDL04neKsIT583Sjh0FkiwKDXYCMUqGqC88w3NUvVXtA75JyR2Jn6jw6ZEMOD+ZA==
+helmet@3.23.0:
+  version "3.23.0"
+  resolved "https://registry.yarnpkg.com/helmet/-/helmet-3.23.0.tgz#b9377e96f8f9b8e42ff902238af28fa44b4b91bd"
+  integrity sha512-/AKPymGd+mJsFN43IkX+nf8J11V51bxLNYReQZmWrVx7M/FEOs2OEE6U1YIt8Y00rpOupbIeVWv5woEGja1Pug==
   dependencies:
     depd "2.0.0"
     dns-prefetch-control "0.2.0"
@@ -1917,12 +1917,12 @@ map-age-cleaner@^0.1.3:
   dependencies:
     p-defer "^1.0.0"
 
-maxmind@4.1.2:
-  version "4.1.2"
-  resolved "https://registry.yarnpkg.com/maxmind/-/maxmind-4.1.2.tgz#9c0417e84106c81d995b589055469e0fb4ed6749"
-  integrity sha512-05/UfsVyErdTsPObVGEBkx9PPccIySWpkPrRtmDprfEA4fTp9Pca8y3+/+Ek6dfm3CzrwmSjFC/UVncoK1Ak3w==
+maxmind@4.1.3:
+  version "4.1.3"
+  resolved "https://registry.yarnpkg.com/maxmind/-/maxmind-4.1.3.tgz#ed1060f45085b7ae2dc95cf5c1672f593d7fa076"
+  integrity sha512-6foBs2wNAfZ7Hu3Ag3nFiIs0gVlHtP1UioHHOuYBi2fH24Ngc5XujUi2GLk0r2HJLjRAaYgaSSTnRoIPs/RWNw==
   dependencies:
-    tiny-lru "7.0.4"
+    tiny-lru "7.0.6"
 
 media-typer@0.3.0:
   version "0.3.0"
@@ -2970,10 +2970,10 @@ thunkify@^2.1.2:
   resolved "https://registry.yarnpkg.com/thunkify/-/thunkify-2.1.2.tgz#faa0e9d230c51acc95ca13a361ac05ca7e04553d"
   integrity sha1-+qDp0jDFGsyVyhOjYawFyn4EVT0=
 
-tiny-lru@7.0.4:
-  version "7.0.4"
-  resolved "https://registry.yarnpkg.com/tiny-lru/-/tiny-lru-7.0.4.tgz#9cc8e976c61cd670cf32a53560a9969e23e1b865"
-  integrity sha512-nwZ+yE4tbXv1anGXHKn7NYdkGtETd370V3XetF7ZXKAimAnU8EV/dL6xSsxax4kKkJjoB7tyl5VOnWzDhs4Fsg==
+tiny-lru@7.0.6:
+  version "7.0.6"
+  resolved "https://registry.yarnpkg.com/tiny-lru/-/tiny-lru-7.0.6.tgz#b0c3cdede1e5882aa2d1ae21cb2ceccf2a331f24"
+  integrity sha512-zNYO0Kvgn5rXzWpL0y3RS09sMK67eGaQj9805jlK9G6pSadfriTczzLHFXa/xcW4mIRfmlB9HyQ/+SgL0V1uow==
 
 to-fast-properties@^2.0.0:
   version "2.0.0"

@@ -565,7 +565,7 @@ describe('EventRepository', () => {
         expect(updatedEvent.time).not.toEqual(changed_time);
         expect(updatedEvent.data.content).toEqual('new content');
         expect(updatedEvent.primary_key).toEqual(originalMessage.primary_key);
-        expect(updatedEvent.reactions).toEqual([]);
+        expect(Object.keys(updatedEvent.reactions).length).toEqual(0);
         expect(testFactory.event_service.replaceEvent).toHaveBeenCalled();
       });
     });

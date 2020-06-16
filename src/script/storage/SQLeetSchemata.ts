@@ -77,6 +77,7 @@ export class SQLeetSchemata {
             id: SQLiteType.TEXT,
             primary_key: SQLiteType.INTEGER,
             reactions: SQLiteType.JSON,
+            read_receipts: SQLiteType.JSON,
             status: SQLiteType.INTEGER,
             time: SQLiteType.TEXT,
             type: SQLiteType.TEXT,
