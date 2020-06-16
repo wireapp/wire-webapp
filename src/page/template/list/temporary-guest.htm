@@ -15,6 +15,9 @@
       </conversation-list-calling-cell>
     <!-- /ko -->
   <!-- /ko -->
+  <!-- ko if: hasJoinableCall() -->
+    <div class="call-ui__button call-ui__button--green call-ui__button--join" style="margin: 0 16px;" data-bind="click: onClickJoinCall, text: t('callJoin')" data-uie-name="do-call-controls-call-join"></div>
+  <!-- /ko -->
   <div class="temporary-guest__content">
     <logo-full-icon></logo-full-icon>
     <div class="temporary-guest__description" data-bind="text: t('temporaryGuestDescription')"></div>
