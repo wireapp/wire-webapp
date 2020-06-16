@@ -164,8 +164,12 @@ ko.components.register('participant-item', {
           </div>
         </div>
 
-        <!-- ko if: isUser && isSelfVerified() && participant.is_verified() -->
-          <verified-icon data-uie-name="status-verified"></verified-icon>
+        <!-- ko if: callParticipant?.hasActiveAudio() -->
+          <audio-icon data-uie-name="status-audio-on"></audio-icon>
+        <!-- /ko -->
+
+        <!-- ko if: !callParticipant?.hasActiveAudio() -->
+          <micoff-icon data-uie-name="status-audio-off"></micoff-icon>
         <!-- /ko -->
 
         <!-- ko if: isUser && !isOthersMode && participant.isGuest() -->
@@ -180,12 +184,8 @@ ko.components.register('participant-item', {
           <camera-icon data-uie-name="status-video"></camera-icon>
         <!-- /ko -->
 
-        <!-- ko if: callParticipant?.hasActiveAudio() -->
-          <audio-icon data-uie-name="status-audio-on"></audio-icon>
-        <!-- /ko -->
-
-        <!-- ko if: !callParticipant?.hasActiveAudio() -->
-          <micoff-icon data-uie-name="status-audio-off"></micoff-icon>
+        <!-- ko if: isUser && isSelfVerified() && participant.is_verified() -->
+          <verified-icon data-uie-name="status-verified"></verified-icon>
         <!-- /ko -->
 
         <!-- ko if: canSelect -->
