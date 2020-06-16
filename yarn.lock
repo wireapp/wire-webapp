@@ -1981,10 +1981,10 @@
     tough-cookie "4.0.0"
     ws "7.2.5"
 
-"@wireapp/avs@6.0.33":
-  version "6.0.33"
-  resolved "https://registry.yarnpkg.com/@wireapp/avs/-/avs-6.0.33.tgz#5800cdac48ac83a14fddc2de14916c72d4d0308e"
-  integrity sha512-tBJjbuOiL6mFprYM/Vt6ewXasFYZ3JLy3eR8JbnA5fgsySUKJ8oBs1EkzEpOC4hUsUTuEYWK3UR+dqjdgqd88Q==
+"@wireapp/avs@6.0.34":
+  version "6.0.34"
+  resolved "https://registry.yarnpkg.com/@wireapp/avs/-/avs-6.0.34.tgz#d1ff1f9ea02c2e2b5ce1566033960d80f12fbd21"
+  integrity sha512-i+cN3Mgfw0FuhkKqrk0+0ghHmykG6Xx+mB2gYH+QNpM6s+m46wEjGxgkfcKXECpHtcyHpxSpNB5xtXG/UZj4JA==
 
 "@wireapp/cbor@4.6.6":
   version "4.6.6"
