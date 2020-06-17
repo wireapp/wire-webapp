@@ -99,7 +99,8 @@ const modalBackgroundStyle: <T>(props: OverlayBackgroundProps<T>) => ObjectInter
 const ModalBackground = (props: OverlayBackgroundProps) => <div css={modalBackgroundStyle(props)} {...props} />;
 
 export interface ModalActionItem {
-  bold: boolean;
+  bold?: boolean;
+  dataUieName?: string;
   onClick: (event: React.MouseEvent<HTMLElement>) => void;
   title: string;
 }
@@ -149,7 +150,12 @@ const modalActionStyles: ({bold}: {bold: boolean}) => ObjectInterpolation<undefi
 const ModalActions: React.FC<ModalActions> = ({actions}) => (
   <div css={modalActionsWrapperStyles()}>
     {actions.map(action => (
-      <div key={action.title} onClick={action.onClick} css={modalActionStyles({bold: action.bold})}>
+      <div
+        key={action.title}
+        onClick={action.onClick}
+        css={modalActionStyles({bold: action.bold})}
+        data-uie-name={action.dataUieName}
+      >
         {action.title}
       </div>
     ))}
