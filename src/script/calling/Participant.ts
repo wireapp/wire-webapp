@@ -25,20 +25,20 @@ export type UserId = string;
 export type ClientId = string;
 
 export class Participant {
+  // Video
   public videoState: ko.Observable<number>;
   public videoStream: ko.Observable<MediaStream | undefined>;
-  public audioStream: ko.Observable<MediaStream | undefined>;
-  public hasActiveAudio: ko.PureComputed<boolean>;
   public hasActiveVideo: ko.PureComputed<boolean>;
+  public hasPausedVideo: ko.PureComputed<boolean>;
   public sharesScreen: ko.PureComputed<boolean>;
   public sharesCamera: ko.PureComputed<boolean>;
-  public hasPausedVideo: ko.PureComputed<boolean>;
+
+  // Audio
+  public audioStream: ko.Observable<MediaStream | undefined>;
+  public isMuted: ko.Observable<boolean>;
 
   constructor(public user: User, public clientId: ClientId) {
     this.videoState = ko.observable(VIDEO_STATE.STOPPED);
-    this.hasActiveAudio = ko.pureComputed(() => {
-      return !!this.audioStream();
-    });
     this.hasActiveVideo = ko.pureComputed(() => {
       return (this.sharesCamera() || this.sharesScreen()) && !!this.videoStream();
     });
@@ -53,6 +53,7 @@ export class Participant {
     });
     this.videoStream = ko.observable();
     this.audioStream = ko.observable();
+    this.isMuted = ko.observable(false);
   }
 
   setAudioStream(audioStream: MediaStream): void {

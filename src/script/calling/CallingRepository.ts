@@ -202,7 +202,7 @@ export class CallingRepository {
     wCall.setNetworkQualityHandler(wUser, this.updateCallQuality, tenSeconds);
     wCall.setMuteHandler(wUser, this.isMuted);
     wCall.setStateHandler(wUser, this.updateCallState);
-    wCall.setParticipantChangedHandler(wUser, this.updateCallParticipants);
+    wCall.setParticipantChangedHandler(wUser, this.handleCallParticipantChanges);
     wCall.setReqClientsHandler(wUser, this.requestClients);
 
     return wUser;
@@ -784,16 +784,15 @@ export class CallingRepository {
     }
   };
 
-  private readonly updateCallParticipants = (conversationId: ConversationId, membersJson: string) => {
-    const call = this.findCall(conversationId);
-    if (!call) {
-      return;
-    }
+  private updateParticipantMutedState(call: Call, members: WcallMember[]): void {
+    members.forEach(member => call.getParticipant(member.userid, member.clientid)?.isMuted(!!member.muted));
+  }
 
-    const {members}: {members: WcallMember[]} = JSON.parse(membersJson);
+  private updateParticipantList(call: Call, members: WcallMember[]) {
     const newMembers = members
-      .filter(({userid, clientid}) => !this.findParticipant(conversationId, userid, clientid))
+      .filter(({userid, clientid}) => !call.getParticipant(userid, clientid))
       .map(({userid, clientid}) => new Participant(this.userRepository.findUserById(userid), clientid));
+
     const removedMembers = call
       .participants()
       .filter(
@@ -803,6 +802,19 @@ export class CallingRepository {
 
     newMembers.forEach(participant => call.participants.unshift(participant));
     removedMembers.forEach(participant => call.participants.remove(participant));
+  }
+
+  private readonly handleCallParticipantChanges = (conversationId: ConversationId, membersJson: string) => {
+    const call = this.findCall(conversationId);
+
+    if (!call) {
+      return;
+    }
+
+    const {members}: {members: WcallMember[]} = JSON.parse(membersJson);
+
+    this.updateParticipantList(call, members);
+    this.updateParticipantMutedState(call, members);
   };
 
   private readonly requestClients = (wUser: number, conversationId: ConversationId, _: number) => {

@@ -172,11 +172,11 @@ ko.components.register('participant-item', {
           <screenshare-icon data-uie-name="status-screenshare"></screenshare-icon>
         <!-- /ko -->
 
-        <!-- ko if: callParticipant?.hasActiveAudio() -->
+        <!-- ko ifnot: callParticipant?.isMuted() -->
           <mic-on-icon data-uie-name="status-audio-on"></mic-on-icon>
         <!-- /ko -->
 
-        <!-- ko if: !callParticipant?.hasActiveAudio() -->
+        <!-- ko if: callParticipant?.isMuted() -->
           <mic-off-icon data-uie-name="status-audio-off"></mic-off-icon>
         <!-- /ko -->
 
