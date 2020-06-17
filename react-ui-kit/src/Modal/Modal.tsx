@@ -164,7 +164,7 @@ const ModalActions: React.FC<ModalActions> = ({actions}) => (
 
 interface ModalProps {
   actions?: ModalActionItem[];
-  bodyStyle: CSSProperties;
+  bodyStyle?: CSSProperties;
   fullscreen?: boolean;
   onBackgroundClick?: () => void;
   onClose?: () => void;
