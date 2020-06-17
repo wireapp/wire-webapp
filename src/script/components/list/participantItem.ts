@@ -180,8 +180,12 @@ ko.components.register('participant-item', {
           <partner-icon data-uie-name="status-external"></partner-icon>
         <!-- /ko -->
 
-        <!-- ko if: callParticipant?.hasActiveVideo() -->
+        <!-- ko if: callParticipant?.sharesCamera() -->
           <camera-icon data-uie-name="status-video"></camera-icon>
+        <!-- /ko -->
+
+        <!-- ko if: callParticipant?.sharesScreen() -->
+          <screenshare-icon data-uie-name="status-screenshare"></screenshare-icon>
         <!-- /ko -->
 
         <!-- ko if: isUser && isSelfVerified() && participant.is_verified() -->
