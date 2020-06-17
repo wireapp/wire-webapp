@@ -122,6 +122,9 @@ ko.components.register('group-video-grid', {
                 <!-- ko ifnot: participant.user.isMe && muted() -->
                   <audio-icon class="group-video-grid__element__label__icon"></audio-icon>
                 <!-- /ko -->
+                <!-- ko if: participant.sharesVideo() -->
+                  <camera-icon class="group-video-grid__element__label__icon"></camera-icon>
+                <!-- /ko -->
                 <!-- ko if: participant.sharesScreen() -->
                   <screenshare-icon class="group-video-grid__element__label__icon"></screenshare-icon>
                 <!-- /ko -->
