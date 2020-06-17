@@ -164,6 +164,14 @@ ko.components.register('participant-item', {
           </div>
         </div>
 
+        <!-- ko if: callParticipant?.sharesCamera() -->
+          <camera-icon data-uie-name="status-video"></camera-icon>
+        <!-- /ko -->
+
+        <!-- ko if: callParticipant?.sharesScreen() -->
+          <screenshare-icon data-uie-name="status-screenshare"></screenshare-icon>
+        <!-- /ko -->
+
         <!-- ko if: callParticipant?.hasActiveAudio() -->
           <audio-icon data-uie-name="status-audio-on"></audio-icon>
         <!-- /ko -->
@@ -178,14 +186,6 @@ ko.components.register('participant-item', {
 
         <!-- ko if: external -->
           <partner-icon data-uie-name="status-external"></partner-icon>
-        <!-- /ko -->
-
-        <!-- ko if: callParticipant?.sharesCamera() -->
-          <camera-icon data-uie-name="status-video"></camera-icon>
-        <!-- /ko -->
-
-        <!-- ko if: callParticipant?.sharesScreen() -->
-          <screenshare-icon data-uie-name="status-screenshare"></screenshare-icon>
         <!-- /ko -->
 
         <!-- ko if: isUser && isSelfVerified() && participant.is_verified() -->
