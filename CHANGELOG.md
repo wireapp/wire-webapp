@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.30.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.29.8...@wireapp/react-ui-kit@7.30.0) (2020-06-17)
+
+
+### Features
+
+* **react-ui-kit:** Add support for modal action buttons ([#3071](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/3071)) ([bef5713](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/bef571368273bd84534fa8dc80e15300e9498e84))
+
+
+
+
+
 ## [7.29.8](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.29.7...@wireapp/react-ui-kit@7.29.8) (2020-06-10)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
