@@ -19,7 +19,8 @@
 
 /** @jsx jsx */
 import {ObjectInterpolation, jsx} from '@emotion/core';
-import React from 'react';
+import React, {CSSProperties} from 'react';
+import Color from 'color';
 import {CloseIcon} from '../Icon';
 import {SVGIconProps} from '../Icon/SVGIcon';
 import {COLOR} from '../Identity';
@@ -64,22 +65,22 @@ const ModalBody = (props: ModalBodyProps) => (
 
 const ModalClose = (props: SVGIconProps<SVGSVGElement>) => (
   <CloseIcon
+    width={16}
+    height={16}
     css={{
       alignItems: 'center',
       cursor: 'pointer',
       display: 'flex',
       justifyContent: 'center',
-      marginRight: '10px',
-      marginTop: '10px',
       position: 'absolute',
-      right: '10px',
-      top: '10px',
+      right: 16,
+      top: 16,
     }}
     {...props}
   />
 );
 
-const ModalContent = (props: React.HTMLProps<HTMLDivElement>) => (
+const ModalContent: React.FC<React.HTMLProps<HTMLDivElement>> = props => (
   <div
     css={{
       maxWidth: '100%',
@@ -97,23 +98,86 @@ const modalBackgroundStyle: <T>(props: OverlayBackgroundProps<T>) => ObjectInter
 
 const ModalBackground = (props: OverlayBackgroundProps) => <div css={modalBackgroundStyle(props)} {...props} />;
 
+export interface ModalActionItem {
+  bold: boolean;
+  onClick: (event: React.MouseEvent<HTMLElement>) => void;
+  title: string;
+}
+
+interface ModalActions {
+  actions?: ModalActionItem[];
+}
+
+const modalActionsWrapperStyles: () => ObjectInterpolation<undefined> = () => ({
+  borderTop: `1px solid ${COLOR.GRAY_LIGHTEN_72}`,
+  bottom: 0,
+  display: 'flex',
+  div: {
+    '&:hover': {
+      backgroundColor: COLOR.opaque(COLOR.GRAY_DARKEN_72, 0.04),
+    },
+    // eslint-disable-next-line sort-keys-fix/sort-keys-fix
+    '&:active': {
+      backgroundColor: COLOR.opaque(COLOR.GRAY_DARKEN_72, 0.08),
+    },
+    borderRight: `1px solid ${COLOR.GRAY_LIGHTEN_72}`,
+  },
+  'div:first-child': {
+    borderBottomLeftRadius: 8,
+  },
+  'div:last-child': {
+    borderBottomRightRadius: 8,
+    borderRight: 0,
+  },
+  position: 'absolute',
+  width: '100%',
+});
+
+const modalActionStyles: ({bold}: {bold: boolean}) => ObjectInterpolation<undefined> = ({bold}) => ({
+  '&:hover': {
+    color: Color(COLOR.BLUE).mix(Color(COLOR.BLACK), 0.16).toString(),
+  },
+  color: COLOR.BLUE,
+  cursor: 'pointer',
+  display: 'flex',
+  flex: 1,
+  fontWeight: bold ? 'bold' : 'normal',
+  justifyContent: 'center',
+  padding: '8px 0',
+});
+
+const ModalActions: React.FC<ModalActions> = ({actions}) => (
+  <div css={modalActionsWrapperStyles()}>
+    {actions.map(action => (
+      <div key={action.title} onClick={action.onClick} css={modalActionStyles({bold: action.bold})}>
+        {action.title}
+      </div>
+    ))}
+  </div>
+);
+
 interface ModalProps {
+  actions?: ModalActionItem[];
+  bodyStyle: CSSProperties;
   fullscreen?: boolean;
   onBackgroundClick?: () => void;
   onClose?: () => void;
 }
 
 export const Modal: React.SFC<ModalProps & React.HTMLProps<HTMLDivElement>> = ({
+  actions = [],
   children,
+  bodyStyle,
   fullscreen,
   onClose,
   onBackgroundClick,
   ...props
 }) => (
   <OverlayWrapper {...props} data-uie-name="modal">
-    <ModalBody fullscreen={fullscreen}>
+    <ModalBody fullscreen={fullscreen} style={bodyStyle}>
       <ModalContent>{children}</ModalContent>
       {onClose !== noop && <ModalClose onClick={onClose} data-uie-name="do-close" />}
+      {actions.length > 0 && <ModalActions actions={actions} data-uie-name="modal-actions" />}
     </ModalBody>
     {!fullscreen && (
       <ModalBackground
@@ -125,6 +189,7 @@ export const Modal: React.SFC<ModalProps & React.HTMLProps<HTMLDivElement>> = ({
 );
 
 Modal.defaultProps = {
+  actions: [],
   fullscreen: false,
   onBackgroundClick: noop,
   onClose: noop,

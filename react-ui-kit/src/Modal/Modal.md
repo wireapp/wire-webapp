@@ -21,6 +21,7 @@ import {
 const [isFullscreenModalOpen, setIsFullscreenModalOpen] = useState(false);
 const [isMenuModalOpen, setIsMenuModalOpen] = useState(false);
 const [isModalOpen, setIsModalOpen] = useState(false);
+const [isModalWidthActionsOpen, setIsModalWidthActionsOpen] = useState(false);
 const [isOverlayOpen, setIsOverlayOpen] = useState(false);
 
 <Container>
@@ -31,6 +32,21 @@ const [isOverlayOpen, setIsOverlayOpen] = useState(false);
         <Text block>Normal Modal</Text>
       </Paragraph>
       <Button>Button</Button>
+    </Modal>
+  )}
+  {isModalWidthActionsOpen && (
+    <Modal
+      onClose={() => setIsModalWidthActionsOpen(false)}
+      bodyStyle={{width: 360}}
+      actions={[
+        {title: 'Cancel', onClick: () => {}, bold: false},
+        {title: 'Send', onClick: () => {}, bold: true},
+      ]}
+    >
+      <H2 style={{margin: 0}}>Modal with actions</H2>
+      <Paragraph>
+        <Text block>Modal with actions</Text>
+      </Paragraph>
     </Modal>
   )}
   {isFullscreenModalOpen && (
@@ -67,6 +83,12 @@ const [isOverlayOpen, setIsOverlayOpen] = useState(false);
     <Column>Normal</Column>
     <Column>
       <Button onClick={() => setIsModalOpen(true)}>Open</Button>
+    </Column>
+  </Columns>
+  <Columns>
+    <Column>Modal with actions</Column>
+    <Column>
+      <Button onClick={() => setIsModalWidthActionsOpen(true)}>Open</Button>
     </Column>
   </Columns>
   <Columns>
