@@ -64,7 +64,7 @@ export class Call {
     this.participants.push(participant);
   }
 
-  getParticipant(userId: UserId, clientId: ClientId): Participant {
+  getParticipant(userId: UserId, clientId: ClientId): Participant | undefined {
     return this.participants().find(participant => participant.user.id === userId && clientId === participant.clientId);
   }
 

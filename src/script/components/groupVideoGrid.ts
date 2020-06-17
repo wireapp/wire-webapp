@@ -116,11 +116,11 @@ ko.components.register('group-video-grid', {
                 </div>
               <!-- /ko -->
               <div class="group-video-grid__element__label">
-                <!-- ko if: participant.user.isMe && muted() -->
-                  <micoff-icon class="group-video-grid__element__label__icon"></micoff-icon>
+                <!-- ko if: participant.isMuted() -->
+                  <mic-off-icon class="group-video-grid__element__label__icon"></mic-off-icon>
                 <!-- /ko -->
-                <!-- ko ifnot: participant.user.isMe && muted() -->
-                  <audio-icon class="group-video-grid__element__label__icon"></audio-icon>
+                <!-- ko ifnot: participant.isMuted() -->
+                  <mic-on-icon class="group-video-grid__element__label__icon"></mic-on-icon>
                 <!-- /ko -->
                 <span class="group-video-grid__element__label__name" data-bind="text: participant.user.name()"></span>
               </div>
