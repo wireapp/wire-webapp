@@ -165,11 +165,11 @@ ko.components.register('participant-item', {
         </div>
 
         <!-- ko if: callParticipant?.hasActiveAudio() -->
-          <audio-icon data-uie-name="status-audio-on"></audio-icon>
+          <mic-on-icon data-uie-name="status-audio-on"></mic-on-icon>
         <!-- /ko -->
 
         <!-- ko if: !callParticipant?.hasActiveAudio() -->
-          <micoff-icon data-uie-name="status-audio-off"></micoff-icon>
+          <mic-off-icon data-uie-name="status-audio-off"></mic-off-icon>
         <!-- /ko -->
 
         <!-- ko if: isUser && !isOthersMode && participant.isGuest() -->
