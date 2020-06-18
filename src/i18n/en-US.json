@@ -640,6 +640,7 @@
   "modalConversationLeaveAction": "Leave",
   "modalConversationLeaveHeadline": "Leave {{name}} conversation?",
   "modalConversationLeaveMessage": "You won’t be able to send or receive messages in this conversation.",
+  "modalConversationLeaveOption": "Also clear the content",
   "modalConversationMessageTooLongHeadline": "Message too long",
   "modalConversationMessageTooLongMessage": "You can send messages up to {{number}} characters long.",
   "modalConversationNewDeviceAction": "Send anyway",
