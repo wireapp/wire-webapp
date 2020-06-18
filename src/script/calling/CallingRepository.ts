@@ -324,7 +324,7 @@ export class CallingRepository {
   }
 
   get supportsConferenceCalling(): boolean {
-    return !isFirefox;
+    return !isFirefox();
   }
 
   /**
