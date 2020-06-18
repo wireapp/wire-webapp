@@ -219,16 +219,21 @@ export class ActionsViewModel {
   leaveConversation(conversationEntity) {
     if (conversationEntity) {
       return new Promise(resolve => {
-        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.OPTION, {
           primaryAction: {
-            action: () => {
-              this.conversationRepository.removeMember(conversationEntity, this.userRepository.self().id);
+            action: (clearContent = false) => {
+              if (clearContent) {
+                this.conversationRepository.clear_conversation(conversationEntity, true);
+              } else {
+                this.conversationRepository.removeMember(conversationEntity, this.userRepository.self().id);
+              }
               resolve();
             },
             text: t('modalConversationLeaveAction'),
           },
           text: {
             message: t('modalConversationLeaveMessage'),
+            option: t('modalConversationLeaveOption'),
             title: t('modalConversationLeaveHeadline', conversationEntity.display_name()),
           },
         });
