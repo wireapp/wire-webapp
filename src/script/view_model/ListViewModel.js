@@ -39,6 +39,7 @@ import {Shortcut} from '../ui/Shortcut';
 import {ShortcutType} from '../ui/ShortcutType';
 import {ContentViewModel} from './ContentViewModel';
 import {DefaultLabelIds} from '../conversation/ConversationLabelRepository';
+import {ModalsViewModel} from './ModalsViewModel';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -153,10 +154,19 @@ z.viewModel.ListViewModel = class ListViewModel {
   }
 
   answerCall = conversationEntity => {
-    const call = this.callingRepository.findCall(conversationEntity.id);
-    if (call) {
-      const callType = call.getSelfParticipant().sharesCamera() ? call.initialType : CALL_TYPE.NORMAL;
-      this.callingRepository.answerCall(call, callType);
+    if (this.callingRepository.supportsConferenceCalling) {
+      const call = this.callingRepository.findCall(conversationEntity.id);
+      if (call) {
+        const callType = call.getSelfParticipant().sharesCamera() ? call.initialType : CALL_TYPE.NORMAL;
+        this.callingRepository.answerCall(call, callType);
+      }
+    } else {
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+        text: {
+          message: `${t('modalConferenceCallNotSupportedMessage')} ${t('modalConferenceCallNotSupportedJoinMessage')}`,
+          title: t('modalConferenceCallNotSupportedHeadline'),
+        },
+      });
     }
   };
 

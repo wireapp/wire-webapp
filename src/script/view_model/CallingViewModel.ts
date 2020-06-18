@@ -21,12 +21,12 @@ import {CALL_TYPE, CONV_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '
 import {Availability} from '@wireapp/protocol-messaging';
 import ko from 'knockout';
 
-import {Logger, getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 
 import {AudioType} from '../audio/AudioType';
 import type {Call} from '../calling/Call';
 import type {CallingRepository} from '../calling/CallingRepository';
-import {Grid, getGrid} from '../calling/videoGridHandler';
+import {getGrid, Grid} from '../calling/videoGridHandler';
 import type {User} from '../entity/User';
 import type {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import type {MediaStreamHandler} from '../media/MediaStreamHandler';
@@ -38,6 +38,11 @@ import {PermissionStatusState} from '../permission/PermissionStatusState';
 import type {Multitasking} from '../notification/NotificationRepository';
 
 import 'Components/calling/chooseScreen';
+import {amplify} from 'amplify';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {ModalsViewModel} from './ModalsViewModel';
+import {t} from 'Util/LocalizerUtil';
+import {isFirefox} from '../auth/Runtime';
 
 export interface CallActions {
   answer: (call: Call) => void;
@@ -131,13 +136,24 @@ export class CallingViewModel {
     };
 
     const startCall = (conversationEntity: Conversation, callType: CALL_TYPE): void => {
-      const convType = conversationEntity.isGroup() ? CONV_TYPE.GROUP : CONV_TYPE.ONEONONE;
-      this.callingRepository.startCall(conversationEntity.id, convType, callType).then(call => {
-        if (!call) {
-          return;
-        }
-        ring(call);
-      });
+      if (this.callingRepository.supportsConferenceCalling) {
+        const convType = conversationEntity.isGroup() ? CONV_TYPE.GROUP : CONV_TYPE.ONEONONE;
+        this.callingRepository.startCall(conversationEntity.id, convType, callType).then(call => {
+          if (!call) {
+            return;
+          }
+          ring(call);
+        });
+      } else {
+        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+          text: {
+            message: `${t('modalConferenceCallNotSupportedMessage')} ${t(
+              'modalConferenceCallNotSupportedStartMessage',
+            )}`,
+            title: t('modalConferenceCallNotSupportedHeadline'),
+          },
+        });
+      }
     };
 
     this.callingRepository.onIncomingCall((call: Call) => {
@@ -149,8 +165,25 @@ export class CallingViewModel {
 
     this.callActions = {
       answer: (call: Call) => {
-        const callType = call.getSelfParticipant().sharesCamera() ? call.initialType : CALL_TYPE.NORMAL;
-        this.callingRepository.answerCall(call, callType);
+        if (isFirefox) {
+          amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+            primaryAction: {
+              action: () => {
+                alert('nicee');
+                this.callingRepository.rejectCall(call.conversationId);
+              },
+            },
+            text: {
+              message: `${t('modalConferenceCallNotSupportedMessage')} ${t(
+                'modalConferenceCallNotSupportedJoinMessage',
+              )}`,
+              title: t('modalConferenceCallNotSupportedHeadline'),
+            },
+          });
+        } else {
+          const callType = call.getSelfParticipant().sharesCamera() ? call.initialType : CALL_TYPE.NORMAL;
+          this.callingRepository.answerCall(call, callType);
+        }
       },
       leave: (call: Call) => {
         this.callingRepository.leaveCall(call.conversationId);
