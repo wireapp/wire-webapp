@@ -42,7 +42,6 @@ import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {ModalsViewModel} from './ModalsViewModel';
 import {t} from 'Util/LocalizerUtil';
-import {isFirefox} from '../auth/Runtime';
 
 export interface CallActions {
   answer: (call: Call) => void;
@@ -165,11 +164,10 @@ export class CallingViewModel {
 
     this.callActions = {
       answer: (call: Call) => {
-        if (isFirefox) {
+        if (this.callingRepository.supportsConferenceCalling) {
           amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
             primaryAction: {
               action: () => {
-                alert('nicee');
                 this.callingRepository.rejectCall(call.conversationId);
               },
             },
