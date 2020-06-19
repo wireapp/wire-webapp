@@ -69,7 +69,6 @@ import {ClientId, Participant, UserId} from './Participant';
 import type {Recipients} from '../cryptography/CryptographyRepository';
 import type {Conversation} from '../entity/Conversation';
 import {UserRepository} from '../user/UserRepository';
-import {isFirefox} from '../auth/Runtime';
 
 interface MediaStreamQuery {
   audio?: boolean;
@@ -324,7 +323,7 @@ export class CallingRepository {
   }
 
   get supportsConferenceCalling(): boolean {
-    return !isFirefox();
+    return Wcall.supportsConferenceCalls();
   }
 
   /**
