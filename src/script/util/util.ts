@@ -20,7 +20,7 @@
 import {Decoder} from 'bazinga64';
 import type {ObservableArray} from 'knockout';
 import sodium from 'libsodium-wrappers-sumo';
-import UUID from 'pure-uuid';
+import UUID from 'uuidjs';
 import {UrlUtil} from '@wireapp/commons';
 
 import {QUERY_KEY} from '../auth/route';
@@ -261,7 +261,7 @@ export const downloadFile = (url: string, fileName: string, mimeType?: string): 
   }, 100);
 };
 
-export const createRandomUuid = (): string => new UUID(4).format();
+export const createRandomUuid = (): string => UUID.generate();
 
 // Note IE10 listens to "transitionend" instead of "animationend"
 export const alias = {
