@@ -17,8 +17,8 @@
  *
  */
 
-import UUID from 'pure-uuid';
 import ko from 'knockout';
+import {createRandomUuid} from 'Util/util';
 
 interface InfoToggleParams {
   dataUieName: string;
@@ -41,7 +41,7 @@ class InfoToggle {
     this.dataUieNameInfoText = `status-info-toggle-${params.dataUieName}`;
     this.dataUieNameLabelText = `do-toggle-${params.dataUieName}`;
     this.info = params.info;
-    this.inputId = new UUID(4).format();
+    this.inputId = createRandomUuid();
     this.isChecked = params.isChecked;
     this.isDisabled = params.isDisabled;
     this.name = params.name;
