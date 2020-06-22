@@ -110,11 +110,6 @@ ko.components.register('group-video-grid', {
                 css: {'group-video-grid__element-video--contain': participant.sharesScreen(), mirror: participant.user.isMe && participant.sharesCamera()}">
             </video>
             <!-- ko if: !minimized -->
-              <!-- ko if: participant.user.isMe && muted() -->
-                <div class="group-video-grid__mute-overlay" data-uie-name="status-call-audio-muted">
-                  <micoff-icon></micoff-icon>
-                </div>
-              <!-- /ko -->
               <div class="group-video-grid__element__label">
                 <!-- ko if: participant.isMuted() -->
                   <mic-off-icon class="group-video-grid__element__label__icon"></mic-off-icon>
