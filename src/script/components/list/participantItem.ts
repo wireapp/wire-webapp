@@ -163,21 +163,23 @@ ko.components.register('participant-item', {
             <!-- /ko -->
           </div>
         </div>
+        
+        <!-- ko if: callParticipant -->
+          <!-- ko if: callParticipant.sharesCamera() -->
+            <camera-icon data-uie-name="status-video"></camera-icon>
+          <!-- /ko -->
 
-        <!-- ko if: callParticipant?.sharesCamera() -->
-          <camera-icon data-uie-name="status-video"></camera-icon>
-        <!-- /ko -->
+          <!-- ko if: callParticipant.sharesScreen() -->
+            <screenshare-icon data-uie-name="status-screenshare"></screenshare-icon>
+          <!-- /ko -->
 
-        <!-- ko if: callParticipant?.sharesScreen() -->
-          <screenshare-icon data-uie-name="status-screenshare"></screenshare-icon>
-        <!-- /ko -->
+          <!-- ko ifnot: callParticipant.isMuted() -->
+            <mic-on-icon data-uie-name="status-audio-on"></mic-on-icon>
+          <!-- /ko -->
 
-        <!-- ko ifnot: callParticipant?.isMuted() -->
-          <mic-on-icon data-uie-name="status-audio-on"></mic-on-icon>
-        <!-- /ko -->
-
-        <!-- ko if: callParticipant?.isMuted() -->
-          <mic-off-icon data-uie-name="status-audio-off"></mic-off-icon>
+          <!-- ko if: callParticipant.isMuted() -->
+            <mic-off-icon data-uie-name="status-audio-off"></mic-off-icon>
+          <!-- /ko -->
         <!-- /ko -->
 
         <!-- ko if: isUser && !isOthersMode && participant.isGuest() -->
