@@ -30,8 +30,6 @@ import {UserRepository} from '../../user/UserRepository';
 import {Call} from '../../calling/Call';
 import {MediaDevicesHandler, Devices, DeviceIds, DeviceSupport} from '../../media/MediaDevicesHandler';
 
-const noop = () => {};
-
 type MediaSourceChanged = (mediaStream: MediaStream, mediaType: MediaType, call?: Call) => void;
 type WillChangeMediaSource = (mediaType: MediaType) => boolean;
 type CallBacksType = {
@@ -40,30 +38,30 @@ type CallBacksType = {
 };
 
 export class PreferencesAVViewModel {
-  willChangeMediaSource: WillChangeMediaSource;
-  mediaSourceChanged: MediaSourceChanged;
-  logger: Logger;
-  userRepository: UserRepository;
-  isActivatedAccount: ko.PureComputed<boolean>;
-  devicesHandler: MediaDevicesHandler;
-  availableDevices: Devices;
-  currentDeviceId: DeviceIds;
-  deviceSupport: DeviceSupport;
-  Config: Configuration;
-  mediaStream: ko.Observable<MediaStream>;
-  streamHandler: MediaStreamHandler;
-  constraintsHandler: MediaConstraintsHandler;
-  audioMediaStream: ko.PureComputed<MediaStream>;
-  videoMediaStream: ko.PureComputed<MediaStream>;
-  isVisible: boolean;
-  isTemporaryGuest: ko.PureComputed<boolean>;
   audioContext: AudioContext;
   audioInterval: number;
   audioLevel: ko.Observable<number>;
+  audioMediaStream: ko.PureComputed<MediaStream>;
   audioSource: MediaStreamAudioSourceNode;
+  availableDevices: Devices;
   brandName: string;
-  supportsAudioOutput: ko.PureComputed<boolean>;
+  Config: Configuration;
+  constraintsHandler: MediaConstraintsHandler;
+  currentDeviceId: DeviceIds;
   currentMediaType: MediaType;
+  devicesHandler: MediaDevicesHandler;
+  deviceSupport: DeviceSupport;
+  isActivatedAccount: ko.PureComputed<boolean>;
+  isTemporaryGuest: ko.PureComputed<boolean>;
+  isVisible: boolean;
+  logger: Logger;
+  mediaSourceChanged: MediaSourceChanged;
+  mediaStream: ko.Observable<MediaStream>;
+  streamHandler: MediaStreamHandler;
+  supportsAudioOutput: ko.PureComputed<boolean>;
+  userRepository: UserRepository;
+  videoMediaStream: ko.PureComputed<MediaStream>;
+  willChangeMediaSource: WillChangeMediaSource;
 
   static get CONFIG() {
     return {
@@ -77,8 +75,8 @@ export class PreferencesAVViewModel {
   }
 
   constructor(mediaRepository: MediaRepository, userRepository: UserRepository, callbacks: CallBacksType) {
-    this.willChangeMediaSource = callbacks.willChangeMediaSource || (noop as () => boolean);
-    this.mediaSourceChanged = callbacks.mediaSourceChanged || noop;
+    this.willChangeMediaSource = callbacks.willChangeMediaSource;
+    this.mediaSourceChanged = callbacks.mediaSourceChanged;
 
     this.logger = getLogger('PreferencesAVViewModel');
 
@@ -149,7 +147,7 @@ export class PreferencesAVViewModel {
     this.audioLevel = ko.observable(0);
     this.audioSource = undefined;
 
-    this.brandName = Config.getConfig().BRAND_NAME;
+    this.brandName = this.Config.BRAND_NAME;
 
     this.supportsAudioOutput = ko.pureComputed(() => {
       return this.deviceSupport.audioOutput() && Environment.browser.supports.audioOutputSelection;
