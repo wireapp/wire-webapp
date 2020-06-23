@@ -51,6 +51,7 @@ export class PreferencesAVViewModel {
   currentMediaType: MediaType;
   devicesHandler: MediaDevicesHandler;
   deviceSupport: DeviceSupport;
+  hasOnlyOneMicrophone: ko.PureComputed<boolean>;
   isActivatedAccount: ko.PureComputed<boolean>;
   isTemporaryGuest: ko.PureComputed<boolean>;
   isVisible: boolean;
@@ -92,7 +93,7 @@ export class PreferencesAVViewModel {
 
     const updateStream = async (mediaType: MediaType): Promise<void> => {
       this.currentMediaType = mediaType;
-      this._releaseAudioMeter();
+      this.releaseAudioMeter();
       const needsStreamUpdate = this.willChangeMediaSource(mediaType);
       if (this.mediaStream()) {
         this.streamHandler.releaseTracksFromStream(this.mediaStream(), mediaType);
@@ -102,7 +103,7 @@ export class PreferencesAVViewModel {
       }
 
       try {
-        const stream = await this._getMediaStream(mediaType);
+        const stream = await this.getMediaStream(mediaType);
         if (typeof stream === 'boolean') {
           return this.mediaStream(undefined);
         }
@@ -111,7 +112,7 @@ export class PreferencesAVViewModel {
           stream.getTracks().forEach(track => {
             this.mediaStream().addTrack(track);
           });
-          this._initiateAudioMeter(this.mediaStream());
+          this.initiateAudioMeter(this.mediaStream());
         } else {
           stream.getTracks().forEach(track => track.stop());
         }
@@ -136,6 +137,7 @@ export class PreferencesAVViewModel {
     this.mediaStream = ko.observable();
     this.audioMediaStream = ko.pureComputed(() => createMediaStreamOfType('getAudioTracks'));
     this.videoMediaStream = ko.pureComputed(() => createMediaStreamOfType('getVideoTracks'));
+    this.hasOnlyOneMicrophone = ko.pureComputed(() => this.availableDevices.audioInput().length < 2);
 
     this.isVisible = false;
 
@@ -154,21 +156,17 @@ export class PreferencesAVViewModel {
     });
   }
 
-  /**
-   * Initiate media devices.
-   * @returns {undefined} No return value
-   */
   async initiateDevices(): Promise<void> {
     this.isVisible = true;
 
     try {
-      const mediaStream = await this._getMediaStream();
+      const mediaStream = await this.getMediaStream();
       if (typeof mediaStream === 'boolean') {
         return;
       }
       this.mediaStream(mediaStream);
-      if (mediaStream && !this.audioInterval) {
-        this._initiateAudioMeter(mediaStream);
+      if (mediaStream?.getAudioTracks().length && !this.audioInterval) {
+        this.initiateAudioMeter(mediaStream);
       }
     } catch (error) {
       this.logger.warn(`Requesting MediaStream failed: ${error.message}`, error);
@@ -180,23 +178,13 @@ export class PreferencesAVViewModel {
     this.initiateDevices();
   }
 
-  /**
-   * Release media devices.
-   * @returns {undefined} No return value.
-   */
   releaseDevices(): void {
     this.isVisible = false;
-    this._releaseAudioMeter();
-    this._releaseMediaStream();
+    this.releaseAudioMeter();
+    this.releaseMediaStream();
   }
 
-  /**
-   * Get current MediaStream or initiate it.
-   * @private
-   * @param {MediaType} requestedMediaType MediaType to request the user
-   * @returns {Promise} Resolves with a MediaStream
-   */
-  async _getMediaStream(requestedMediaType = MediaType.AUDIO_VIDEO): Promise<MediaStream | boolean> {
+  private async getMediaStream(requestedMediaType = MediaType.AUDIO_VIDEO): Promise<MediaStream | boolean> {
     if (!this.deviceSupport.videoInput() && !this.deviceSupport.audioInput()) {
       return Promise.resolve(undefined);
     }
@@ -254,14 +242,7 @@ export class PreferencesAVViewModel {
     }
   }
 
-  /**
-   * Initiate audio meter.
-   *
-   * @private
-   * @param {MediaStream} mediaStream MediaStream to measure audio levels on
-   * @returns {undefined} No return value
-   */
-  _initiateAudioMeter(mediaStream: MediaStream) {
+  private initiateAudioMeter(mediaStream: MediaStream) {
     this.logger.info('Initiating new audio meter', mediaStream);
     if (!window.AudioContext || !window.AudioContext.prototype.createMediaStreamSource) {
       this.logger.warn('AudioContext is not supported, no volume indicator can be generated');
@@ -292,7 +273,7 @@ export class PreferencesAVViewModel {
     this.audioSource.connect(audioAnalyser);
   }
 
-  async _releaseAudioMeter(): Promise<void> {
+  private async releaseAudioMeter(): Promise<void> {
     window.clearInterval(this.audioInterval);
     this.audioInterval = undefined;
 
@@ -312,7 +293,7 @@ export class PreferencesAVViewModel {
     }
   }
 
-  _releaseMediaStream() {
+  private releaseMediaStream() {
     if (this.mediaStream()) {
       this.streamHandler.releaseTracksFromStream(this.mediaStream(), this.currentMediaType);
       this.mediaStream(undefined);
