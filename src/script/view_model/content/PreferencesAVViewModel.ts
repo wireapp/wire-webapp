@@ -22,13 +22,12 @@ import {getLogger, Logger} from 'Util/Logger';
 import {Environment} from 'Util/Environment';
 import {Config, Configuration} from '../../Config';
 import {MediaType} from '../../media/MediaType';
-import {MediaError} from '../../error/MediaError';
 import {MediaRepository} from '../../media/MediaRepository';
 import {MediaStreamHandler} from '../../media/MediaStreamHandler';
 import {MediaConstraintsHandler} from '../../media/MediaConstraintsHandler';
 import {UserRepository} from '../../user/UserRepository';
 import {Call} from '../../calling/Call';
-import {MediaDevicesHandler, Devices, DeviceIds, DeviceSupport} from '../../media/MediaDevicesHandler';
+import {DeviceIds, Devices, DeviceSupport, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
 
 type MediaSourceChanged = (mediaStream: MediaStream, mediaType: MediaType, call?: Call) => void;
 type WillChangeMediaSource = (mediaType: MediaType) => boolean;
@@ -104,9 +103,6 @@ export class PreferencesAVViewModel {
 
       try {
         const stream = await this.getMediaStream(mediaType);
-        if (typeof stream === 'boolean') {
-          return this.mediaStream(undefined);
-        }
         this.mediaSourceChanged(stream, mediaType);
         if (this.mediaStream()) {
           stream.getTracks().forEach(track => {
@@ -117,6 +113,7 @@ export class PreferencesAVViewModel {
           stream.getTracks().forEach(track => track.stop());
         }
       } catch (error) {
+        this.mediaStream(undefined);
         this.logger.warn(`Requesting MediaStream failed: ${error.message}`, error);
       }
     };
@@ -156,24 +153,26 @@ export class PreferencesAVViewModel {
     });
   }
 
+  updateCurrentStream() {
+    console.info('useCurrentStream');
+  }
+
   async initiateDevices(): Promise<void> {
     this.isVisible = true;
 
     try {
       const mediaStream = await this.getMediaStream();
-      if (typeof mediaStream === 'boolean') {
-        return;
-      }
       this.mediaStream(mediaStream);
-      if (mediaStream?.getAudioTracks().length && !this.audioInterval) {
+      if (mediaStream.getAudioTracks().length && !this.audioInterval) {
         this.initiateAudioMeter(mediaStream);
       }
     } catch (error) {
+      this.mediaStream(undefined);
       this.logger.warn(`Requesting MediaStream failed: ${error.message}`, error);
     }
   }
 
-  tryAgain() {
+  tryAgain(): void {
     this.releaseDevices();
     this.initiateDevices();
   }
@@ -184,7 +183,7 @@ export class PreferencesAVViewModel {
     this.releaseMediaStream();
   }
 
-  private async getMediaStream(requestedMediaType = MediaType.AUDIO_VIDEO): Promise<MediaStream | boolean> {
+  private async getMediaStream(requestedMediaType = MediaType.AUDIO_VIDEO): Promise<MediaStream> {
     if (!this.deviceSupport.videoInput() && !this.deviceSupport.audioInput()) {
       return Promise.resolve(undefined);
     }
@@ -193,7 +192,7 @@ export class PreferencesAVViewModel {
     const requestAudio = supportsAudio && [MediaType.AUDIO, MediaType.AUDIO_VIDEO].includes(requestedMediaType);
     const requestVideo = supportsVideo && [MediaType.VIDEO, MediaType.AUDIO_VIDEO].includes(requestedMediaType);
     try {
-      const stream = this.streamHandler.requestMediaStream(requestAudio, requestVideo, false, false);
+      const stream = await this.streamHandler.requestMediaStream(requestAudio, requestVideo, false, false);
       this.devicesHandler.refreshMediaDevices();
       return stream;
     } catch (error) {
@@ -202,48 +201,32 @@ export class PreferencesAVViewModel {
     }
   }
 
-  async getStreamsSeparately(
-    requestAudio: boolean,
-    requestVideo: boolean,
-    error: Error,
-  ): Promise<boolean | MediaStream> {
-    try {
-      const splitMediaStreamsAttempts = [];
-      if (requestAudio) {
-        splitMediaStreamsAttempts.push(
-          this.streamHandler.requestMediaStream(true, false, false, false).catch(() => undefined),
-        );
-      }
-      if (requestVideo) {
-        splitMediaStreamsAttempts.push(
-          this.streamHandler.requestMediaStream(false, true, false, false).catch(() => undefined),
-        );
-      }
-      return Promise.all(splitMediaStreamsAttempts).then(mediaStreams => {
-        const workingMediaStreams = mediaStreams.filter(mediaStream => !!mediaStream);
-        if (workingMediaStreams.length === 0) {
-          throw error;
-        }
-        const tracks = workingMediaStreams.reduce((trackList, mediaStream) => {
-          return trackList.concat(mediaStream.getTracks());
-        });
-        return new MediaStream(tracks);
-      });
-    } catch (error) {
-      this.logger.warn(`Requesting MediaStream failed: ${error.message}`, error);
-      const expectedErrors = [MediaError.TYPE.MEDIA_STREAM_DEVICE, MediaError.TYPE.MEDIA_STREAM_PERMISSION];
-
-      const isExpectedError = expectedErrors.includes(error.type);
-      if (isExpectedError) {
-        return false;
-      }
-
-      throw error;
+  async getStreamsSeparately(requestAudio: boolean, requestVideo: boolean, error: Error): Promise<MediaStream> {
+    const splitMediaStreamsAttempts = [];
+    if (requestAudio) {
+      splitMediaStreamsAttempts.push(
+        this.streamHandler.requestMediaStream(true, false, false, false).catch(() => undefined),
+      );
     }
+    if (requestVideo) {
+      splitMediaStreamsAttempts.push(
+        this.streamHandler.requestMediaStream(false, true, false, false).catch(() => undefined),
+      );
+    }
+    return Promise.all(splitMediaStreamsAttempts).then(mediaStreams => {
+      const workingMediaStreams = mediaStreams.filter(mediaStream => !!mediaStream);
+      if (workingMediaStreams.length === 0) {
+        throw error;
+      }
+      const tracks = workingMediaStreams.reduce((trackList, mediaStream) => {
+        return trackList.concat(mediaStream.getTracks());
+      });
+      return new MediaStream(tracks);
+    });
   }
 
-  private initiateAudioMeter(mediaStream: MediaStream) {
-    this.logger.info('Initiating new audio meter', mediaStream);
+  private initiateAudioMeter(mediaStream: MediaStream): void {
+    this.logger.info(`Initiating new audio meter for stream ID "${mediaStream.id}"`, mediaStream);
     if (!window.AudioContext || !window.AudioContext.prototype.createMediaStreamSource) {
       this.logger.warn('AudioContext is not supported, no volume indicator can be generated');
     }
@@ -293,7 +276,7 @@ export class PreferencesAVViewModel {
     }
   }
 
-  private releaseMediaStream() {
+  private releaseMediaStream(): void {
     if (this.mediaStream()) {
       this.streamHandler.releaseTracksFromStream(this.mediaStream(), this.currentMediaType);
       this.mediaStream(undefined);
