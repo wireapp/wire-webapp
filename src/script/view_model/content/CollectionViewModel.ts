@@ -20,6 +20,7 @@
 import {getLogger, Logger} from 'Util/Logger';
 import {isEscapeKey} from 'Util/KeyboardUtil';
 import {amplify} from 'amplify';
+import ko from 'knockout';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {MessageCategory} from '../../message/MessageCategory';

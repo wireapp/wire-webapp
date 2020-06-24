@@ -17,21 +17,28 @@
  *
  */
 
-import {getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 import {isToday, isThisYear, isSameDay, isSameMonth, formatLocale} from 'Util/TimeUtil';
 import {t} from 'Util/LocalizerUtil';
 import {koPushDeferred} from 'Util/util';
+import {amplify} from 'amplify';
+import ko from 'knockout';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {MessageCategory} from '../../message/MessageCategory';
 import {ContentViewModel} from '../ContentViewModel';
-
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.content = z.viewModel.content || {};
+import {Conversation} from '../../entity/Conversation';
+import {ContentMessage} from '../../entity/message/ContentMessage';
 
 // Parent: ContentViewModel
 export class CollectionDetailsViewModel {
+  logger: Logger;
+  template: ko.Observable<string>;
+  conversationEntity: ko.Observable<Conversation>;
+  items: ko.ObservableArray<ContentMessage>;
+  lastMessageTimestamp: any;
+  MessageCategory: typeof MessageCategory;
+
   constructor() {
     this.itemAdded = this.itemAdded.bind(this);
     this.itemRemoved = this.itemRemoved.bind(this);
@@ -50,7 +57,7 @@ export class CollectionDetailsViewModel {
     this.MessageCategory = MessageCategory;
   }
 
-  setConversation(conversationEntity, category, items) {
+  setConversation(conversationEntity: Conversation, category: string, items: ContentMessage[]) {
     amplify.subscribe(WebAppEvents.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageRemoved);
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.ADDED, this.itemAdded);
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, this.itemRemoved);
@@ -59,7 +66,7 @@ export class CollectionDetailsViewModel {
     koPushDeferred(this.items, items);
   }
 
-  itemAdded(messageEntity) {
+  itemAdded(messageEntity: ContentMessage) {
     const isCurrentConversation = this.conversationEntity().id === messageEntity.conversation_id;
     if (isCurrentConversation) {
       switch (this.template()) {
@@ -93,7 +100,7 @@ export class CollectionDetailsViewModel {
     }
   }
 
-  itemRemoved(messageId, conversationId) {
+  itemRemoved(messageId: string, conversationId: string) {
     const isCurrentConversation = this.conversationEntity().id === conversationId;
     if (isCurrentConversation) {
       this.items.remove(messageEntity => messageEntity.id === messageId);
@@ -103,7 +110,7 @@ export class CollectionDetailsViewModel {
     }
   }
 
-  messageRemoved(messageEntity) {
+  messageRemoved(messageEntity: ContentMessage) {
     this.itemRemoved(messageEntity.id, messageEntity.conversation_id);
   }
 
@@ -120,11 +127,11 @@ export class CollectionDetailsViewModel {
     amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.COLLECTION);
   }
 
-  clickOnImage(messageEntity) {
+  clickOnImage(messageEntity: ContentMessage) {
     amplify.publish(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, messageEntity, this.items(), 'collection');
   }
 
-  shouldShowHeader(messageEntity) {
+  shouldShowHeader(messageEntity: ContentMessage) {
     if (!this.lastMessageTimestamp) {
       this.lastMessageTimestamp = messageEntity.timestamp();
       return true;
@@ -144,9 +151,11 @@ export class CollectionDetailsViewModel {
       this.lastMessageTimestamp = messageEntity.timestamp();
       return true;
     }
+
+    return false;
   }
 
-  getTitleForHeader(messageEntity) {
+  getTitleForHeader(messageEntity: ContentMessage) {
     const messageDate = messageEntity.timestamp();
     if (isToday(messageDate)) {
       return t('conversationToday');
@@ -154,5 +163,3 @@ export class CollectionDetailsViewModel {
     return isThisYear(messageDate) ? formatLocale(messageDate, 'MMMM') : formatLocale(messageDate, 'MMMM y');
   }
 }
-
-z.viewModel.content.CollectionDetailsViewModel = CollectionDetailsViewModel;
