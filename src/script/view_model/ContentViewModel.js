@@ -36,6 +36,7 @@ import {InviteModalViewModel} from './content/InviteModalViewModel';
 import {PreferencesOptionsViewModel} from './content/PreferencesOptionsViewModel';
 import {ConversationError} from '../error/ConversationError';
 import {CollectionViewModel} from './content/CollectionViewModel';
+import {CollectionDetailsViewModel} from './content/CollectionDetailsViewModel';
 
 export class ContentViewModel {
   static get STATE() {
@@ -71,7 +72,7 @@ export class ContentViewModel {
     this.state = ko.observable(ContentViewModel.STATE.WATERMARK);
 
     // Nested view models
-    this.collectionDetails = new z.viewModel.content.CollectionDetailsViewModel();
+    this.collectionDetails = new CollectionDetailsViewModel();
     this.collection = new CollectionViewModel(mainViewModel, this, repositories);
     this.connectRequests = new z.viewModel.content.ConnectRequestsViewModel(mainViewModel, this, repositories);
     this.emojiInput = new EmojiInputViewModel(repositories.properties);
