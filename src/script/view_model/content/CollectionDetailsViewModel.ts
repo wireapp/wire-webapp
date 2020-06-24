@@ -151,6 +151,8 @@ export class CollectionDetailsViewModel {
       this.lastMessageTimestamp = messageEntity.timestamp();
       return true;
     }
+
+    return false;
   }
 
   getTitleForHeader(messageEntity: ContentMessage) {
