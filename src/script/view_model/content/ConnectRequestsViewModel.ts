@@ -39,7 +39,7 @@ export class ConnectRequestsViewModel {
   actionsViewModel: ActionsViewModel;
   connectRequests: ko.Computed<User[]>;
   ParticipantAvatar: typeof ParticipantAvatar;
-  shouldUpdateScrollbar: any;
+  shouldUpdateScrollbar: ko.Computed<User[]>;
   /**
    * View model for connection requests.
    *
