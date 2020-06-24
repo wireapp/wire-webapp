@@ -17,16 +17,35 @@
  *
  */
 
-import {getLogger} from 'Util/Logger';
-
+import {getLogger, Logger} from 'Util/Logger';
+import {amplify} from 'amplify';
+import ko from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {Modal} from '../../ui/Modal';
+import {MainViewModel} from '../MainViewModel';
+import {ContentViewModel} from '../ContentViewModel';
+import {GiphyRepository, Gif} from '../../extension/GiphyRepository';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.content = z.viewModel.content || {};
+type Repositories = {
+  giphy: GiphyRepository;
+};
 
-z.viewModel.content.GiphyViewModel = class GiphyViewModel {
+export class GiphyViewModel {
+  giphyRepository: GiphyRepository;
+  logger: Logger;
+  modal: Modal;
+  state: ko.Observable<string>;
+  query: ko.Observable<string>;
+  sendingGiphyMessage: boolean;
+  gif: ko.Observable<Gif>;
+  gifs: ko.ObservableArray<Gif>;
+  selectedGif: ko.Observable<Gif>;
+  isStateError: ko.PureComputed<boolean>;
+  isStateLoading: ko.PureComputed<boolean>;
+  isStateResult: ko.PureComputed<boolean>;
+  isStateResults: ko.PureComputed<boolean>;
+  isResultState: ko.PureComputed<boolean>;
+
   static get CONFIG() {
     return {
       NUMBER_OF_GIFS: 6,
@@ -43,11 +62,11 @@ z.viewModel.content.GiphyViewModel = class GiphyViewModel {
     };
   }
 
-  constructor(mainViewModel, contentViewModel, repositories) {
+  constructor(mainViewModel: MainViewModel, contentViewModel: ContentViewModel, repositories: Repositories) {
     this.clickToSelectGif = this.clickToSelectGif.bind(this);
 
     this.giphyRepository = repositories.giphy;
-    this.logger = getLogger('z.viewModel.content.GiphyViewModel');
+    this.logger = getLogger('GiphyViewModel');
 
     this.modal = undefined;
     this.state = ko.observable(GiphyViewModel.STATE.DEFAULT);
@@ -97,7 +116,7 @@ z.viewModel.content.GiphyViewModel = class GiphyViewModel {
     this._getRandomGifs();
   }
 
-  clickToSelectGif(clickedGif, event) {
+  clickToSelectGif(clickedGif: Gif, event: MouseEvent) {
     const hasMultipleGifs = this.gifs().length !== 1;
     if (hasMultipleGifs) {
       const gifItem = $(event.currentTarget);
@@ -131,7 +150,7 @@ z.viewModel.content.GiphyViewModel = class GiphyViewModel {
     }
   }
 
-  showGiphy(query) {
+  showGiphy(query: string) {
     this.sendingGiphyMessage = false;
     this.query(query);
     this.state(GiphyViewModel.STATE.DEFAULT);
@@ -195,4 +214,4 @@ z.viewModel.content.GiphyViewModel = class GiphyViewModel {
         });
     }
   }
-};
+}

@@ -37,6 +37,7 @@ import {PreferencesOptionsViewModel} from './content/PreferencesOptionsViewModel
 import {ConversationError} from '../error/ConversationError';
 import {CollectionViewModel} from './content/CollectionViewModel';
 import {CollectionDetailsViewModel} from './content/CollectionDetailsViewModel';
+import {GiphyViewModel} from './content/GiphyViewModel';
 
 export class ContentViewModel {
   static get STATE() {
@@ -76,7 +77,7 @@ export class ContentViewModel {
     this.collection = new CollectionViewModel(mainViewModel, this, repositories);
     this.connectRequests = new z.viewModel.content.ConnectRequestsViewModel(mainViewModel, this, repositories);
     this.emojiInput = new EmojiInputViewModel(repositories.properties);
-    this.giphy = new z.viewModel.content.GiphyViewModel(mainViewModel, this, repositories);
+    this.giphy = GiphyViewModel(mainViewModel, this, repositories);
     this.inputBar = new z.viewModel.content.InputBarViewModel(mainViewModel, this, repositories);
     this.groupCreation = new GroupCreationViewModel(
       repositories.conversation,
