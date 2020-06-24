@@ -31,7 +31,7 @@ window.z.viewModel = z.viewModel || {};
 window.z.viewModel.content = z.viewModel.content || {};
 
 // Parent: ContentViewModel
-z.viewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewModel {
+export class CollectionDetailsViewModel {
   constructor() {
     this.itemAdded = this.itemAdded.bind(this);
     this.itemRemoved = this.itemRemoved.bind(this);
@@ -153,4 +153,6 @@ z.viewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
     }
     return isThisYear(messageDate) ? formatLocale(messageDate, 'MMMM') : formatLocale(messageDate, 'MMMM y');
   }
-};
+}
+
+z.viewModel.content.CollectionDetailsViewModel = CollectionDetailsViewModel;

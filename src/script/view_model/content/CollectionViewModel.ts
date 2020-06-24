@@ -17,20 +17,35 @@
  *
  */
 
-import {getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 import {isEscapeKey} from 'Util/KeyboardUtil';
+import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {MessageCategory} from '../../message/MessageCategory';
 import {ContentViewModel} from '../ContentViewModel';
+import {MainViewModel} from '../MainViewModel';
+import {ConversationRepository} from '../../conversation/ConversationRepository';
+import {ContentMessage} from '../../entity/message/ContentMessage';
+import {CollectionDetailsViewModel} from './CollectionDetailsViewModel';
+import {Conversation} from '../../entity/Conversation';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.content = z.viewModel.content || {};
+type Repositories = {
+  conversation: ConversationRepository;
+};
 
-// Parent: ContentViewModel
-z.viewModel.content.CollectionViewModel = class CollectionViewModel {
-  constructor(mainViewModel, contentViewModel, repositories) {
+export class CollectionViewModel {
+  collectionDetails: CollectionDetailsViewModel;
+  conversation_repository: ConversationRepository;
+  logger: Logger;
+  conversationEntity: ko.Observable<Conversation>;
+  audio: ko.ObservableArray<ContentMessage>;
+  files: ko.ObservableArray<ContentMessage>;
+  images: ko.ObservableArray<ContentMessage>;
+  links: ko.ObservableArray<ContentMessage>;
+  searchInput: ko.Observable<string>;
+
+  constructor(mainViewModel: MainViewModel, contentViewModel: ContentViewModel, repositories: Repositories) {
     this.addedToView = this.addedToView.bind(this);
     this.clickOnMessage = this.clickOnMessage.bind(this);
     this.itemAdded = this.itemAdded.bind(this);
@@ -43,7 +58,7 @@ z.viewModel.content.CollectionViewModel = class CollectionViewModel {
 
     this.collectionDetails = contentViewModel.collectionDetails;
     this.conversation_repository = repositories.conversation;
-    this.logger = getLogger('z.viewModel.CollectionViewModel');
+    this.logger = getLogger('CollectionViewModel');
 
     this.conversationEntity = ko.observable();
 
@@ -60,36 +75,36 @@ z.viewModel.content.CollectionViewModel = class CollectionViewModel {
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.ADDED, this.itemAdded);
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, this.itemRemoved);
     $(document).on('keydown.collection', keyboardEvent => {
-      if (isEscapeKey(keyboardEvent)) {
+      if (isEscapeKey((keyboardEvent as unknown) as KeyboardEvent)) {
         amplify.publish(WebAppEvents.CONVERSATION.SHOW, this.conversationEntity());
       }
     });
   }
 
-  searchInConversation(query) {
+  searchInConversation(query: string) {
     return this.conversation_repository.searchInConversation(this.conversationEntity(), query);
   }
 
-  onInputChange(input) {
+  onInputChange(input: string) {
     this.searchInput(input || '');
   }
 
-  itemAdded(messageEntity) {
+  itemAdded(messageEntity: ContentMessage) {
     const isCurrentConversation = this.conversationEntity().id === messageEntity.conversation_id;
     if (isCurrentConversation) {
       this._populateItems([messageEntity]);
     }
   }
 
-  itemRemoved(messageId, conversationId) {
+  itemRemoved(messageId: string, conversationId: string) {
     const isCurrentConversation = this.conversationEntity().id === conversationId;
     if (isCurrentConversation) {
-      const _removeItem = messageEntity => messageEntity.id === messageId;
+      const _removeItem = (messageEntity: ContentMessage) => messageEntity.id === messageId;
       [this.audio, this.files, this.images, this.links].forEach(array => array.remove(_removeItem));
     }
   }
 
-  messageRemoved(messageEntity) {
+  messageRemoved(messageEntity: ContentMessage) {
     this.itemRemoved(messageEntity.id, messageEntity.conversation_id);
   }
 
@@ -113,8 +128,8 @@ z.viewModel.content.CollectionViewModel = class CollectionViewModel {
     }
   }
 
-  _populateItems(messageEntities) {
-    messageEntities.forEach(messageEntity => {
+  _populateItems(messageEntities: ContentMessage[]) {
+    messageEntities.forEach((messageEntity: ContentMessage) => {
       if (!messageEntity.is_expired()) {
         // TODO: create binary map helper
         const isImage = messageEntity.category & MessageCategory.IMAGE;
@@ -134,10 +149,11 @@ z.viewModel.content.CollectionViewModel = class CollectionViewModel {
           this.links.push(messageEntity);
         }
       }
+      return undefined;
     });
   }
 
-  clickOnMessage(messageEntity) {
+  clickOnMessage(messageEntity: ContentMessage) {
     amplify.publish(WebAppEvents.CONVERSATION.SHOW, this.conversationEntity(), {exposeMessage: messageEntity});
   }
 
@@ -145,12 +161,12 @@ z.viewModel.content.CollectionViewModel = class CollectionViewModel {
     amplify.publish(WebAppEvents.CONVERSATION.SHOW, this.conversationEntity());
   }
 
-  clickOnSection(category, items) {
+  clickOnSection(category: string, items: ContentMessage[]) {
     this.collectionDetails.setConversation(this.conversationEntity(), category, [].concat(items));
     amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.COLLECTION_DETAILS);
   }
 
-  clickOnImage(messageEntity) {
+  clickOnImage(messageEntity: ContentMessage) {
     amplify.publish(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, messageEntity, this.images(), 'collection');
   }
-};
+}

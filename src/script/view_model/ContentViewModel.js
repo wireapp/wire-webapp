@@ -35,6 +35,7 @@ import {ServiceModalViewModel} from './content/ServiceModalViewModel';
 import {InviteModalViewModel} from './content/InviteModalViewModel';
 import {PreferencesOptionsViewModel} from './content/PreferencesOptionsViewModel';
 import {ConversationError} from '../error/ConversationError';
+import {CollectionViewModel} from './content/CollectionViewModel';
 
 export class ContentViewModel {
   static get STATE() {
@@ -71,7 +72,7 @@ export class ContentViewModel {
 
     // Nested view models
     this.collectionDetails = new z.viewModel.content.CollectionDetailsViewModel();
-    this.collection = new z.viewModel.content.CollectionViewModel(mainViewModel, this, repositories);
+    this.collection = new CollectionViewModel(mainViewModel, this, repositories);
     this.connectRequests = new z.viewModel.content.ConnectRequestsViewModel(mainViewModel, this, repositories);
     this.emojiInput = new EmojiInputViewModel(repositories.properties);
     this.giphy = new z.viewModel.content.GiphyViewModel(mainViewModel, this, repositories);
