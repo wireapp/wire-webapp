@@ -40,6 +40,7 @@ import {ConnectRequestsViewModel} from './content/ConnectRequestsViewModel';
 import {CollectionDetailsViewModel} from './content/CollectionDetailsViewModel';
 import {GiphyViewModel} from './content/GiphyViewModel';
 import {HistoryImportViewModel} from './content/HistoryImportViewModel';
+import {HistoryExportViewModel} from './content/HistoryExportViewModel';
 
 export class ContentViewModel {
   static get STATE() {
@@ -119,7 +120,7 @@ export class ContentViewModel {
       repositories.user,
     );
 
-    this.historyExport = new z.viewModel.content.HistoryExportViewModel(mainViewModel, this, repositories);
+    this.historyExport = new HistoryExportViewModel(repositories.backup, repositories.user);
     this.historyImport = new HistoryImportViewModel(repositories.backup);
 
     this.previousState = undefined;
