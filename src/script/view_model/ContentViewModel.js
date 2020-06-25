@@ -36,6 +36,7 @@ import {InviteModalViewModel} from './content/InviteModalViewModel';
 import {PreferencesOptionsViewModel} from './content/PreferencesOptionsViewModel';
 import {ConversationError} from '../error/ConversationError';
 import {CollectionViewModel} from './content/CollectionViewModel';
+import {ConnectRequestsViewModel} from './content/ConnectRequestsViewModel';
 import {CollectionDetailsViewModel} from './content/CollectionDetailsViewModel';
 import {GiphyViewModel} from './content/GiphyViewModel';
 
@@ -75,7 +76,7 @@ export class ContentViewModel {
     // Nested view models
     this.collectionDetails = new CollectionDetailsViewModel();
     this.collection = new CollectionViewModel(mainViewModel, this, repositories);
-    this.connectRequests = new z.viewModel.content.ConnectRequestsViewModel(mainViewModel, this, repositories);
+    this.connectRequests = new ConnectRequestsViewModel(mainViewModel, repositories.user);
     this.emojiInput = new EmojiInputViewModel(repositories.properties);
     this.giphy = GiphyViewModel(mainViewModel, this, repositories);
     this.inputBar = new z.viewModel.content.InputBarViewModel(mainViewModel, this, repositories);
