@@ -22,21 +22,13 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {Modal} from '../../ui/Modal';
-import {MainViewModel} from '../MainViewModel';
-import {ContentViewModel} from '../ContentViewModel';
 import {GiphyRepository, Gif} from '../../extension/GiphyRepository';
 
-type Repositories = {
-  giphy: GiphyRepository;
-};
-
 export class GiphyViewModel {
-  giphyRepository: GiphyRepository;
-  logger: Logger;
-  modal: Modal;
-  state: ko.Observable<string>;
-  query: ko.Observable<string>;
-  sendingGiphyMessage: boolean;
+  private readonly logger: Logger;
+  private modal: Modal;
+  private readonly state: ko.Observable<string>;
+  private readonly query: ko.Observable<string>;
   gif: ko.Observable<Gif>;
   gifs: ko.ObservableArray<Gif>;
   selectedGif: ko.Observable<Gif>;
@@ -62,16 +54,12 @@ export class GiphyViewModel {
     };
   }
 
-  constructor(mainViewModel: MainViewModel, contentViewModel: ContentViewModel, repositories: Repositories) {
-    this.clickToSelectGif = this.clickToSelectGif.bind(this);
-
-    this.giphyRepository = repositories.giphy;
+  constructor(private readonly giphyRepository: GiphyRepository) {
     this.logger = getLogger('GiphyViewModel');
 
     this.modal = undefined;
     this.state = ko.observable(GiphyViewModel.STATE.DEFAULT);
     this.query = ko.observable('');
-    this.sendingGiphyMessage = false;
 
     // GIF presented in the single GIF view
     this.gif = ko.observable();
@@ -94,29 +82,29 @@ export class GiphyViewModel {
     this._initSubscriptions();
   }
 
-  _initSubscriptions() {
+  _initSubscriptions = (): void => {
     amplify.subscribe(WebAppEvents.EXTENSIONS.GIPHY.SHOW, this.showGiphy.bind(this));
-  }
+  };
 
-  clickOnBack() {
+  clickOnBack = (): void => {
     this.gifs([this.gif()]);
     this.selectedGif(this.gif());
     this.state(GiphyViewModel.STATE.RESULT);
-  }
+  };
 
-  clickOnClose() {
+  clickOnClose = (): void => {
     this.modal.hide();
-  }
+  };
 
-  clickOnTryAnother() {
+  clickOnTryAnother = (): void => {
     this._getRandomGif();
-  }
+  };
 
-  clickOnGrid() {
+  clickOnGrid = (): void => {
     this._getRandomGifs();
-  }
+  };
 
-  clickToSelectGif(clickedGif: Gif, event: MouseEvent) {
+  clickToSelectGif = (clickedGif: Gif, event: MouseEvent): void => {
     const hasMultipleGifs = this.gifs().length !== 1;
     if (hasMultipleGifs) {
       const gifItem = $(event.currentTarget);
@@ -139,19 +127,18 @@ export class GiphyViewModel {
         this.selectedGif(clickedGif);
       }
     }
-  }
+  };
 
-  clickToSend() {
+  clickToSend = (): void => {
     const selectedGif = this.selectedGif();
     if (selectedGif) {
       amplify.publish(WebAppEvents.EXTENSIONS.GIPHY.SEND, selectedGif.animated, this.query());
       this.selectedGif(undefined);
       this.modal.hide();
     }
-  }
+  };
 
-  showGiphy(query: string) {
-    this.sendingGiphyMessage = false;
+  showGiphy = (query: string): void => {
     this.query(query);
     this.state(GiphyViewModel.STATE.DEFAULT);
     this._getRandomGif();
@@ -161,57 +148,53 @@ export class GiphyViewModel {
     }
 
     this.modal.show();
-  }
+  };
 
-  _clearGifs() {
+  _clearGifs = (): void => {
     this.gifs.removeAll();
     this.selectedGif(undefined);
     this.state(GiphyViewModel.STATE.LOADING);
-  }
+  };
 
-  _getRandomGif() {
+  _getRandomGif = async (): Promise<void> => {
     const isStateError = this.state() === GiphyViewModel.STATE.ERROR;
-    if (!isStateError) {
-      this._clearGifs();
-
-      this.giphyRepository
-        .getRandomGif({tag: this.query()})
-        .then(gif => {
-          this.gif(gif);
-          this.gifs([this.gif()]);
-          this.selectedGif(this.gif());
-          this.state(GiphyViewModel.STATE.RESULT);
-        })
-        .catch(error => {
-          this.logger.error(`No gif found for query: ${this.query()}`, error);
-          this.state(GiphyViewModel.STATE.ERROR);
-        });
+    if (isStateError) {
+      return;
     }
-  }
 
-  _getRandomGifs() {
+    this._clearGifs();
+    try {
+      const gif = await this.giphyRepository.getRandomGif({tag: this.query()});
+      this.gif(gif);
+      this.gifs([this.gif()]);
+      this.selectedGif(this.gif());
+      this.state(GiphyViewModel.STATE.RESULT);
+    } catch (error) {
+      this.logger.error(`No gif found for query: ${this.query()}`, error);
+      this.state(GiphyViewModel.STATE.ERROR);
+    }
+  };
+
+  _getRandomGifs = async (): Promise<void> => {
     const isStateError = this.state() === GiphyViewModel.STATE.ERROR;
-    if (!isStateError) {
-      this._clearGifs();
-
-      this.giphyRepository
-        .getGifs({
-          number: GiphyViewModel.CONFIG.NUMBER_OF_GIFS,
-          query: this.query(),
-        })
-        .then(gifs => {
-          this.gifs(gifs);
-
-          if (gifs.length === 1) {
-            this.selectedGif(gifs[0]);
-          }
-
-          this.state(GiphyViewModel.STATE.RESULTS);
-        })
-        .catch(error => {
-          this.logger.error(`No gifs found for query: ${this.query()}`, error);
-          this.state(GiphyViewModel.STATE.ERROR);
-        });
+    if (isStateError) {
+      return;
     }
-  }
+    this._clearGifs();
+
+    try {
+      const gifs = await this.giphyRepository.getGifs({
+        number: GiphyViewModel.CONFIG.NUMBER_OF_GIFS,
+        query: this.query(),
+      });
+      this.gifs(gifs);
+      if (gifs.length === 1) {
+        this.selectedGif(gifs[0]);
+      }
+      this.state(GiphyViewModel.STATE.RESULTS);
+    } catch (error) {
+      this.logger.error(`No gifs found for query: ${this.query()}`, error);
+      this.state(GiphyViewModel.STATE.ERROR);
+    }
+  };
 }
