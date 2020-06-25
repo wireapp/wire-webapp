@@ -17,33 +17,22 @@
  *
  */
 
-import {getLogger} from 'Util/Logger';
 import {scrollToBottom} from 'Util/scroll-helpers';
 import {isLastItem} from 'Util/ArrayUtil';
 
 import {ParticipantAvatar} from 'Components/participantAvatar';
+import {MainViewModel} from '../MainViewModel';
+import {UserRepository} from '../../user/UserRepository';
+import {ActionsViewModel} from '../ActionsViewModel';
+import {User} from '../../entity/User';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.content = z.viewModel.content || {};
+export class ConnectRequestsViewModel {
+  actionsViewModel: ActionsViewModel;
+  connectRequests: ko.Computed<User[]>;
+  ParticipantAvatar: typeof ParticipantAvatar;
+  shouldUpdateScrollbar: ko.Computed<User[]>;
 
-z.viewModel.content.ConnectRequestsViewModel = class ConnectRequestsViewModel {
-  /**
-   * View model for connection requests.
-   *
-   * @param {MainViewModel} mainViewModel Main view model
-   * @param {ContentViewModel} contentViewModel Content view model
-   * @param {Object} repositories Object containing all repositories
-   */
-  constructor(mainViewModel, contentViewModel, repositories) {
-    this.afterRender = this.afterRender.bind(this);
-    this.clickOnAccept = this.clickOnAccept.bind(this);
-    this.clickOnIgnore = this.clickOnIgnore.bind(this);
-
-    this.mainViewModel = mainViewModel;
-    this.userRepository = repositories.user;
-    this.logger = getLogger('z.viewModel.content.ConnectRequestsViewModel');
-
+  constructor(private readonly mainViewModel: MainViewModel, private readonly userRepository: UserRepository) {
     this.actionsViewModel = this.mainViewModel.actions;
     this.connectRequests = this.userRepository.connect_requests;
     this.ParticipantAvatar = ParticipantAvatar;
@@ -51,34 +40,18 @@ z.viewModel.content.ConnectRequestsViewModel = class ConnectRequestsViewModel {
     this.shouldUpdateScrollbar = ko.computed(() => this.connectRequests()).extend({notify: 'always', rateLimit: 500});
   }
 
-  /**
-   * Called after each connection request is rendered.
-   * @param {Object} elements rendered objects
-   * @param {User} request Rendered connection request
-   * @returns {undefined} No return value
-   */
-  afterRender(elements, request) {
+  afterRender = (elements: Object, request: User): void => {
     if (isLastItem(this.connectRequests(), request)) {
       window.requestAnimationFrame(() => scrollToBottom(document.querySelector('.connect-requests')));
     }
-  }
+  };
 
-  /**
-   * Click on accept.
-   * @param {User} userEntity User to accept connection request from
-   * @returns {undefined} No return value
-   */
-  clickOnAccept(userEntity) {
+  clickOnAccept = (userEntity: User): void => {
     const showConversation = this.connectRequests().length === 1;
     this.actionsViewModel.acceptConnectionRequest(userEntity, showConversation);
-  }
+  };
 
-  /**
-   * Click on ignore.
-   * @param {User} userEntity User to ignore connection request from
-   * @returns {undefined} No return value
-   */
-  clickOnIgnore(userEntity) {
+  clickOnIgnore = (userEntity: User): void => {
     this.actionsViewModel.ignoreConnectionRequest(userEntity);
-  }
-};
+  };
+}
