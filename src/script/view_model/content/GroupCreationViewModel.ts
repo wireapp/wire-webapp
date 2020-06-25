@@ -35,12 +35,14 @@ import {UserRepository} from '../../user/UserRepository';
 import {Conversation} from '../../entity/Conversation';
 import {User} from '../../entity/User';
 
+type GroupCreationSource = 'start_ui' | 'conversation_details';
+
 export class GroupCreationViewModel {
   isTeam: ko.PureComputed<boolean>;
   isShown: ko.Observable<boolean>;
   state: ko.Observable<string>;
   private isCreatingConversation: boolean;
-  private method: string;
+  private groupCreationSource: GroupCreationSource;
   nameError: ko.Observable<string>;
   nameInput: ko.Observable<string>;
   selectedContacts: ko.ObservableArray<User>;
@@ -75,7 +77,7 @@ export class GroupCreationViewModel {
     this.state = ko.observable(GroupCreationViewModel.STATE.DEFAULT);
 
     this.isCreatingConversation = false;
-    this.method = undefined;
+    this.groupCreationSource = undefined;
     this.nameError = ko.observable('');
     this.nameInput = ko.observable('');
     this.selectedContacts = ko.observableArray([]);
@@ -144,8 +146,8 @@ export class GroupCreationViewModel {
     amplify.subscribe(WebAppEvents.CONVERSATION.CREATE_GROUP, this.showCreateGroup);
   }
 
-  showCreateGroup = (method: string, userEntity: User) => {
-    this.method = method;
+  showCreateGroup = (groupCreationSource: GroupCreationSource, userEntity: User) => {
+    this.groupCreationSource = groupCreationSource;
     this.enableReadReceipts(this.isTeam());
     this.isShown(true);
     this.state(GroupCreationViewModel.STATE.PREFERENCES);
@@ -153,7 +155,7 @@ export class GroupCreationViewModel {
       this.selectedContacts.push(userEntity);
     }
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CONVERSATION.OPENED_GROUP_CREATION, {
-      method: this.method,
+      method: this.groupCreationSource,
     });
   };
 
@@ -218,7 +220,7 @@ export class GroupCreationViewModel {
     }
 
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CONVERSATION.OPENED_SELECT_PARTICIPANTS, {
-      method: this.method,
+      method: this.groupCreationSource,
     });
 
     this.state(GroupCreationViewModel.STATE.PARTICIPANTS);
@@ -226,7 +228,7 @@ export class GroupCreationViewModel {
 
   afterHideModal = (): void => {
     this.isCreatingConversation = false;
-    this.method = undefined;
+    this.groupCreationSource = undefined;
     this.nameError('');
     this.nameInput('');
     this.participantsInput('');
@@ -249,7 +251,7 @@ export class GroupCreationViewModel {
       method: string;
       with_participants: boolean;
     } = {
-      method: this.method,
+      method: this.groupCreationSource,
       with_participants: !!this.selectedContacts().length,
     };
 
