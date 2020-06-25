@@ -19,18 +19,43 @@
 
 import {Confirmation} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import ko from 'knockout';
+import {amplify} from 'amplify';
 
-import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {onEscKey, offEscKey} from 'Util/KeyboardUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
 import * as trackingHelpers from '../../tracking/Helpers';
 import {EventName} from '../../tracking/EventName';
-import {ACCESS_STATE} from '../../conversation/AccessState';
+import {ACCESS_STATE, TEAM} from '../../conversation/AccessState';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
+import {TeamRepository} from '../../team/TeamRepository';
+import {UserRepository} from '../../user/UserRepository';
+import {Conversation} from '../../entity/Conversation';
+import {User} from '../../entity/User';
 
 export class GroupCreationViewModel {
+  isTeam: ko.PureComputed<boolean>;
+  isShown: ko.Observable<boolean>;
+  state: ko.Observable<string>;
+  private isCreatingConversation: boolean;
+  private method: string;
+  nameError: ko.Observable<string>;
+  nameInput: ko.Observable<string>;
+  selectedContacts: ko.ObservableArray<User>;
+  showContacts: ko.Observable<boolean>;
+  participantsInput: ko.Observable<string>;
+  accessState: ko.Observable<TEAM>;
+  isGuestRoom: ko.PureComputed<boolean>;
+  enableReadReceipts: ko.Observable<boolean>;
+  contacts: ko.PureComputed<User[]>;
+  participantsActionText: ko.PureComputed<string>;
+  participantsHeaderText: ko.PureComputed<string>;
+  stateIsPreferences: ko.PureComputed<boolean>;
+  stateIsParticipants: ko.PureComputed<boolean>;
+  shouldUpdateScrollbar: ko.Computed<User[]>;
+
   static get STATE() {
     return {
       DEFAULT: 'GroupCreationViewModel.STATE.DEFAULT',
@@ -39,16 +64,12 @@ export class GroupCreationViewModel {
     };
   }
 
-  constructor(conversationRepository, searchRepository, teamRepository, userRepository) {
-    this.logger = getLogger('z.viewModel.content.GroupCreationViewModel');
-
-    this.conversationRepository = conversationRepository;
-    this.searchRepository = searchRepository;
-    this.teamRepository = teamRepository;
-    this.userRepository = userRepository;
+  constructor(
+    private readonly conversationRepository: ConversationRepository,
+    private readonly teamRepository: TeamRepository,
+    private readonly userRepository: UserRepository,
+  ) {
     this.isTeam = this.teamRepository.isTeam;
-
-    this.ConversationRepository = ConversationRepository;
 
     this.isShown = ko.observable(false);
     this.state = ko.observable(GroupCreationViewModel.STATE.DEFAULT);
@@ -63,15 +84,14 @@ export class GroupCreationViewModel {
 
     this.accessState = ko.observable(ACCESS_STATE.TEAM.GUEST_ROOM);
     this.isGuestRoom = ko.pureComputed(() => this.accessState() === ACCESS_STATE.TEAM.GUEST_ROOM);
-    this.isGuestRoom.subscribe(isGuestRoom => {
+    this.isGuestRoom.subscribe((isGuestRoom: boolean) => {
       if (!isGuestRoom) {
-        this.selectedContacts.remove(userEntity => !userEntity.isTeamMember());
+        this.selectedContacts.remove((userEntity: User) => !userEntity.isTeamMember());
       }
     });
 
     this.enableReadReceipts = ko.observable(false);
 
-    this.activateNext = ko.pureComputed(() => this.nameInput().length);
     this.contacts = ko.pureComputed(() => {
       if (this.showContacts()) {
         if (!this.isTeam()) {
@@ -101,16 +121,18 @@ export class GroupCreationViewModel {
 
     this.nameInput.subscribe(() => this.nameError(''));
     const onEscape = () => this.isShown(false);
-    this.stateIsPreferences.subscribe(stateIsPreference => {
+    this.stateIsPreferences.subscribe((stateIsPreference: boolean): void => {
       if (stateIsPreference) {
-        return onEscKey(onEscape);
+        onEscKey(onEscape);
+        return;
       }
       offEscKey(onEscape);
     });
 
-    this.stateIsParticipants.subscribe(stateIsParticipants => {
+    this.stateIsParticipants.subscribe((stateIsParticipants: boolean): void => {
       if (stateIsParticipants) {
-        return window.setTimeout(() => this.showContacts(true));
+        window.setTimeout(() => this.showContacts(true));
+        return;
       }
       this.showContacts(false);
     });
@@ -122,7 +144,7 @@ export class GroupCreationViewModel {
     amplify.subscribe(WebAppEvents.CONVERSATION.CREATE_GROUP, this.showCreateGroup);
   }
 
-  showCreateGroup = (method, userEntity) => {
+  showCreateGroup = (method: string, userEntity: User) => {
     this.method = method;
     this.enableReadReceipts(this.isTeam());
     this.isShown(true);
@@ -135,21 +157,21 @@ export class GroupCreationViewModel {
     });
   };
 
-  clickOnBack() {
+  clickOnBack = (): void => {
     this.state(GroupCreationViewModel.STATE.PREFERENCES);
-  }
+  };
 
-  clickOnClose() {
+  clickOnClose = (): void => {
     this.isShown(false);
-  }
+  };
 
-  clickOnToggleGuestMode = () => {
+  clickOnToggleGuestMode = (): void => {
     const accessState = this.isGuestRoom() ? ACCESS_STATE.TEAM.TEAM_ONLY : ACCESS_STATE.TEAM.GUEST_ROOM;
 
     this.accessState(accessState);
   };
 
-  clickOnCreate = () => {
+  clickOnCreate = async (): Promise<void> => {
     if (!this.isCreatingConversation) {
       this.isCreatingConversation = true;
 
@@ -158,46 +180,51 @@ export class GroupCreationViewModel {
         receipt_mode: this.enableReadReceipts() ? Confirmation.Type.READ : Confirmation.Type.DELIVERED,
       };
 
-      this.conversationRepository
-        .createGroupConversation(this.selectedContacts(), this.nameInput(), accessState, options)
-        .then(conversationEntity => {
-          this.isShown(false);
+      try {
+        const conversationEntity = await this.conversationRepository.createGroupConversation(
+          this.selectedContacts(),
+          this.nameInput(),
+          accessState,
+          options,
+        );
+        this.isShown(false);
 
-          amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
+        amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
 
-          this._trackGroupCreation(conversationEntity);
-        })
-        .catch(error => {
-          this.isCreatingConversation = false;
-          throw error;
-        });
+        this._trackGroupCreation(conversationEntity);
+      } catch (error) {
+        this.isCreatingConversation = false;
+        throw error;
+      }
     }
   };
 
-  clickOnNext() {
-    if (this.nameInput().length) {
-      const trimmedNameInput = this.nameInput().trim();
-      const nameTooLong = trimmedNameInput.length > ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
-      const nameTooShort = !trimmedNameInput.length;
-
-      this.nameInput(trimmedNameInput.slice(0, ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH));
-      if (nameTooLong) {
-        return this.nameError(t('groupCreationPreferencesErrorNameLong'));
-      }
-
-      if (nameTooShort) {
-        return this.nameError(t('groupCreationPreferencesErrorNameShort'));
-      }
-
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CONVERSATION.OPENED_SELECT_PARTICIPANTS, {
-        method: this.method,
-      });
-
-      this.state(GroupCreationViewModel.STATE.PARTICIPANTS);
+  clickOnNext = (): void => {
+    if (!this.nameInput().length) {
+      return;
     }
-  }
 
-  afterHideModal = () => {
+    const trimmedNameInput = this.nameInput().trim();
+    const nameTooLong = trimmedNameInput.length > ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
+    const nameTooShort = !trimmedNameInput.length;
+
+    this.nameInput(trimmedNameInput.slice(0, ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH));
+    if (nameTooLong) {
+      return this.nameError(t('groupCreationPreferencesErrorNameLong'));
+    }
+
+    if (nameTooShort) {
+      return this.nameError(t('groupCreationPreferencesErrorNameShort'));
+    }
+
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CONVERSATION.OPENED_SELECT_PARTICIPANTS, {
+      method: this.method,
+    });
+
+    this.state(GroupCreationViewModel.STATE.PARTICIPANTS);
+  };
+
+  afterHideModal = (): void => {
     this.isCreatingConversation = false;
     this.method = undefined;
     this.nameError('');
@@ -208,16 +235,20 @@ export class GroupCreationViewModel {
     this.accessState(ACCESS_STATE.TEAM.GUEST_ROOM);
   };
 
-  _trackGroupCreation(conversationEntity) {
+  _trackGroupCreation = (conversationEntity: Conversation): void => {
     if (!conversationEntity) {
       return;
     }
     this._trackGroupCreationSucceeded(conversationEntity);
     this._trackAddParticipants(conversationEntity);
-  }
+  };
 
-  _trackGroupCreationSucceeded(conversationEntity) {
-    const attributes = {
+  _trackGroupCreationSucceeded = (conversationEntity: Conversation): void => {
+    const attributes: {
+      is_allow_guests?: boolean;
+      method: string;
+      with_participants: boolean;
+    } = {
       method: this.method,
       with_participants: !!this.selectedContacts().length,
     };
@@ -229,10 +260,16 @@ export class GroupCreationViewModel {
 
     const eventName = EventName.CONVERSATION.GROUP_CREATION_SUCCEEDED;
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, eventName, attributes);
-  }
+  };
 
-  _trackAddParticipants(conversationEntity) {
-    let attributes = {
+  _trackAddParticipants = (conversationEntity: Conversation): void => {
+    let attributes: {
+      guest_num?: number;
+      is_allow_guests?: boolean;
+      method: string;
+      temporary_guest_num?: number;
+      user_num: number;
+    } = {
       method: 'create',
       user_num: conversationEntity.getNumberOfParticipants(),
     };
@@ -251,5 +288,5 @@ export class GroupCreationViewModel {
     }
 
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CONVERSATION.ADD_PARTICIPANTS, attributes);
-  }
+  };
 }
