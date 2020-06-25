@@ -75,7 +75,7 @@ export class ContentViewModel {
 
     // Nested view models
     this.collectionDetails = new CollectionDetailsViewModel();
-    this.collection = new CollectionViewModel(mainViewModel, this, repositories);
+    this.collection = new CollectionViewModel(this, repositories.conversation);
     this.connectRequests = new ConnectRequestsViewModel(mainViewModel, repositories.user);
     this.emojiInput = new EmojiInputViewModel(repositories.properties);
     this.giphy = new GiphyViewModel(repositories.giphy);
