@@ -36,16 +36,16 @@ import 'Components/loadingBar';
 import {BackupRepository} from 'src/script/backup/BackupRepository';
 
 export class HistoryImportViewModel {
-  logger: Logger;
-  error: ko.Observable<Error>;
+  private readonly logger: Logger;
+  private readonly error: ko.Observable<Error>;
   errorHeadline: ko.Observable<string>;
   errorSecondary: ko.Observable<string>;
-  state: ko.Observable<string>;
+  private readonly state: ko.Observable<string>;
   isPreparing: ko.PureComputed<boolean>;
   isImporting: ko.PureComputed<boolean>;
   isDone: ko.PureComputed<boolean>;
-  numberOfRecords: ko.Observable<number>;
-  numberOfProcessedRecords: ko.Observable<number>;
+  private readonly numberOfRecords: ko.Observable<number>;
+  private readonly numberOfProcessedRecords: ko.Observable<number>;
   loadingProgress: ko.PureComputed<number>;
   loadingMessage: ko.PureComputed<string>;
 
