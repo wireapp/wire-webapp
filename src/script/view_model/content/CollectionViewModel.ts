@@ -17,7 +17,6 @@
  *
  */
 
-import {getLogger, Logger} from 'Util/Logger';
 import {isEscapeKey} from 'Util/KeyboardUtil';
 import {amplify} from 'amplify';
 import ko from 'knockout';
@@ -25,20 +24,13 @@ import ko from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {MessageCategory} from '../../message/MessageCategory';
 import {ContentViewModel} from '../ContentViewModel';
-import {MainViewModel} from '../MainViewModel';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
 import {ContentMessage} from '../../entity/message/ContentMessage';
 import {CollectionDetailsViewModel} from './CollectionDetailsViewModel';
 import {Conversation} from '../../entity/Conversation';
 
-type Repositories = {
-  conversation: ConversationRepository;
-};
-
 export class CollectionViewModel {
   collectionDetails: CollectionDetailsViewModel;
-  conversation_repository: ConversationRepository;
-  logger: Logger;
   conversationEntity: ko.Observable<Conversation>;
   audio: ko.ObservableArray<ContentMessage>;
   files: ko.ObservableArray<ContentMessage>;
@@ -46,7 +38,7 @@ export class CollectionViewModel {
   links: ko.ObservableArray<ContentMessage>;
   searchInput: ko.Observable<string>;
 
-  constructor(mainViewModel: MainViewModel, contentViewModel: ContentViewModel, repositories: Repositories) {
+  constructor(contentViewModel: ContentViewModel, private readonly conversationRepository: ConversationRepository) {
     this.addedToView = this.addedToView.bind(this);
     this.clickOnMessage = this.clickOnMessage.bind(this);
     this.itemAdded = this.itemAdded.bind(this);
@@ -58,8 +50,6 @@ export class CollectionViewModel {
     this.setConversation = this.setConversation.bind(this);
 
     this.collectionDetails = contentViewModel.collectionDetails;
-    this.conversation_repository = repositories.conversation;
-    this.logger = getLogger('CollectionViewModel');
 
     this.conversationEntity = ko.observable();
 
@@ -83,7 +73,7 @@ export class CollectionViewModel {
   }
 
   searchInConversation(query: string) {
-    return this.conversation_repository.searchInConversation(this.conversationEntity(), query);
+    return this.conversationRepository.searchInConversation(this.conversationEntity(), query);
   }
 
   onInputChange(input: string) {
@@ -119,11 +109,11 @@ export class CollectionViewModel {
     [this.images, this.files, this.links, this.audio].forEach(array => array.removeAll());
   }
 
-  setConversation(conversationEntity = this.conversation_repository.active_conversation()) {
+  setConversation(conversationEntity = this.conversationRepository.active_conversation()) {
     if (conversationEntity) {
       this.conversationEntity(conversationEntity);
 
-      this.conversation_repository
+      this.conversationRepository
         .get_events_for_category(conversationEntity, MessageCategory.LINK_PREVIEW)
         .then(messageEntities => this._populateItems(messageEntities));
     }
