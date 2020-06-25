@@ -39,6 +39,7 @@ import {CollectionViewModel} from './content/CollectionViewModel';
 import {ConnectRequestsViewModel} from './content/ConnectRequestsViewModel';
 import {CollectionDetailsViewModel} from './content/CollectionDetailsViewModel';
 import {GiphyViewModel} from './content/GiphyViewModel';
+import {HistoryImportViewModel} from './content/HistoryImportViewModel';
 
 export class ContentViewModel {
   static get STATE() {
@@ -124,7 +125,7 @@ export class ContentViewModel {
     );
 
     this.historyExport = new z.viewModel.content.HistoryExportViewModel(mainViewModel, this, repositories);
-    this.historyImport = new z.viewModel.content.HistoryImportViewModel(mainViewModel, this, repositories);
+    this.historyImport = new HistoryImportViewModel(repositories.backup);
 
     this.previousState = undefined;
     this.previousConversation = undefined;
