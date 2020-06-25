@@ -18,7 +18,6 @@
             <select class="preferences-av-select" name="select"
                     data-bind="attr: {'disabled': hasOnlyOneMicrophone()},
                                css: {'preferences-av-select-disabled': hasOnlyOneMicrophone()},
-                               event: {change: updateCurrentStream},
                                options: availableDevices.audioInput,
                                optionsText: function(item) {return item.label || z.string.preferencesAVMicrophone},
                                optionsValue: 'deviceId',
