@@ -35,7 +35,7 @@ import {UserRepository} from '../../user/UserRepository';
 import {Conversation} from '../../entity/Conversation';
 import {User} from '../../entity/User';
 
-type GroupCreationSource = 'start_ui' | 'conversation_details';
+type GroupCreationSource = 'start_ui' | 'conversation_details' | 'create';
 
 export class GroupCreationViewModel {
   isTeam: ko.PureComputed<boolean>;
@@ -248,7 +248,7 @@ export class GroupCreationViewModel {
   _trackGroupCreationSucceeded = (conversationEntity: Conversation): void => {
     const attributes: {
       is_allow_guests?: boolean;
-      method: string;
+      method: GroupCreationSource;
       with_participants: boolean;
     } = {
       method: this.groupCreationSource,
@@ -268,7 +268,7 @@ export class GroupCreationViewModel {
     let attributes: {
       guest_num?: number;
       is_allow_guests?: boolean;
-      method: string;
+      method: GroupCreationSource;
       temporary_guest_num?: number;
       user_num: number;
     } = {
