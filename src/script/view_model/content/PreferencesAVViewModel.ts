@@ -194,28 +194,23 @@ export class PreferencesAVViewModel {
 
   async getStreamsSeparately(requestAudio: boolean, requestVideo: boolean): Promise<MediaStream> {
     const mediaStreams = [];
-    let latestError: Error | undefined = undefined;
 
     if (requestAudio) {
       try {
         const audioStream = await this.streamHandler.requestMediaStream(true, false, false, false);
         mediaStreams.push(audioStream);
-      } catch (error) {
-        latestError = error;
-      }
+      } catch (error) {}
     }
 
     if (requestVideo) {
       try {
         const videoStream = await this.streamHandler.requestMediaStream(false, true, false, false);
         mediaStreams.push(videoStream);
-      } catch (error) {
-        latestError = error;
-      }
+      } catch (error) {}
     }
 
     if (mediaStreams.length === 0) {
-      throw latestError;
+      throw new Error('No medium streams available.');
     }
 
     const tracks = mediaStreams.reduce((trackList, mediaStream) => {
