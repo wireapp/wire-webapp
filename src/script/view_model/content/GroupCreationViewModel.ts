@@ -57,6 +57,7 @@ export class GroupCreationViewModel {
   stateIsPreferences: ko.PureComputed<boolean>;
   stateIsParticipants: ko.PureComputed<boolean>;
   shouldUpdateScrollbar: ko.Computed<User[]>;
+  ConversationRepository: typeof ConversationRepository;
 
   static get STATE() {
     return {
@@ -72,6 +73,7 @@ export class GroupCreationViewModel {
     private readonly userRepository: UserRepository,
   ) {
     this.isTeam = this.teamRepository.isTeam;
+    this.ConversationRepository = ConversationRepository;
 
     this.isShown = ko.observable(false);
     this.state = ko.observable(GroupCreationViewModel.STATE.DEFAULT);
