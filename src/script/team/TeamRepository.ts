@@ -73,7 +73,7 @@ export class TeamRepository {
   private readonly supportsLegalHold: ko.Observable<boolean>;
   private readonly teamMapper: TeamMapper;
   readonly teamMembers: ko.PureComputed<User[]>;
-  private readonly teamName: ko.PureComputed<string>;
+  public readonly teamName: ko.PureComputed<string>;
   readonly teamUsers: ko.PureComputed<User[]>;
   private readonly userRepository: UserRepository;
   private readonly assetRepository: AssetRepository;

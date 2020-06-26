@@ -45,8 +45,8 @@ enum DeviceTypes {
   SCREEN_INPUT = 'screenInput',
   VIDEO_INPUT = 'videoInput',
 }
-type Devices = Record<DeviceTypes, ko.ObservableArray<ElectronDesktopCapturerSource | MediaDeviceInfo>>;
-type DeviceIds = Record<DeviceTypes, ko.Observable<string>>;
+export type Devices = Record<DeviceTypes, ko.ObservableArray<ElectronDesktopCapturerSource | MediaDeviceInfo>>;
+export type DeviceIds = Record<DeviceTypes, ko.Observable<string>>;
 type ElectronDesktopCapturerCallback = (error: Error | null, screenSources: ElectronDesktopCapturerSource[]) => void;
 
 interface ElectronGetSourcesOptions {
