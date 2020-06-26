@@ -81,7 +81,12 @@ export class ContentViewModel {
     this.emojiInput = new EmojiInputViewModel(repositories.properties);
     this.giphy = new GiphyViewModel(repositories.giphy);
     this.inputBar = new z.viewModel.content.InputBarViewModel(mainViewModel, this, repositories);
-    this.groupCreation = new GroupCreationViewModel(repositories.conversation, repositories.team, repositories.user);
+    this.groupCreation = new GroupCreationViewModel(
+      repositories.conversation,
+      repositories.search,
+      repositories.team,
+      repositories.user,
+    );
     this.userModal = new UserModalViewModel(repositories.user, mainViewModel.actions);
     this.serviceModal = new ServiceModalViewModel(repositories.integration, mainViewModel.actions);
     this.inviteModal = new InviteModalViewModel(repositories.user);

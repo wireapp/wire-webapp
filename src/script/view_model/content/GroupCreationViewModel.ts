@@ -34,6 +34,7 @@ import {TeamRepository} from '../../team/TeamRepository';
 import {UserRepository} from '../../user/UserRepository';
 import {Conversation} from '../../entity/Conversation';
 import {User} from '../../entity/User';
+import {SearchRepository} from '../../search/SearchRepository';
 
 type GroupCreationSource = 'start_ui' | 'conversation_details' | 'create';
 
@@ -58,6 +59,7 @@ export class GroupCreationViewModel {
   stateIsParticipants: ko.PureComputed<boolean>;
   shouldUpdateScrollbar: ko.Computed<User[]>;
   ConversationRepository: typeof ConversationRepository;
+  searchRepository: SearchRepository;
 
   static get STATE() {
     return {
@@ -69,11 +71,13 @@ export class GroupCreationViewModel {
 
   constructor(
     private readonly conversationRepository: ConversationRepository,
+    searchRepository: SearchRepository,
     private readonly teamRepository: TeamRepository,
     private readonly userRepository: UserRepository,
   ) {
     this.isTeam = this.teamRepository.isTeam;
     this.ConversationRepository = ConversationRepository;
+    this.searchRepository = searchRepository;
 
     this.isShown = ko.observable(false);
     this.state = ko.observable(GroupCreationViewModel.STATE.DEFAULT);
