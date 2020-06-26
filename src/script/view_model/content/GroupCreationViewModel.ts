@@ -34,6 +34,7 @@ import {TeamRepository} from '../../team/TeamRepository';
 import {UserRepository} from '../../user/UserRepository';
 import {Conversation} from '../../entity/Conversation';
 import {User} from '../../entity/User';
+import {SearchRepository} from '../../search/SearchRepository';
 
 type GroupCreationSource = 'start_ui' | 'conversation_details' | 'create';
 
@@ -60,6 +61,7 @@ export class GroupCreationViewModel {
   ConversationRepository: typeof ConversationRepository;
   maxNameLength: number;
   maxSize: number;
+  searchRepository: SearchRepository;
 
   static get STATE() {
     return {
@@ -71,6 +73,7 @@ export class GroupCreationViewModel {
 
   constructor(
     private readonly conversationRepository: ConversationRepository,
+    searchRepository: SearchRepository,
     private readonly teamRepository: TeamRepository,
     private readonly userRepository: UserRepository,
   ) {
@@ -78,6 +81,7 @@ export class GroupCreationViewModel {
     this.ConversationRepository = ConversationRepository;
     this.maxNameLength = ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
     this.maxSize = ConversationRepository.CONFIG.GROUP.MAX_SIZE;
+    this.searchRepository = searchRepository;
 
     this.isShown = ko.observable(false);
     this.state = ko.observable(GroupCreationViewModel.STATE.DEFAULT);
