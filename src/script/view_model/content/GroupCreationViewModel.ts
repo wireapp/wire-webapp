@@ -58,6 +58,8 @@ export class GroupCreationViewModel {
   stateIsParticipants: ko.PureComputed<boolean>;
   shouldUpdateScrollbar: ko.Computed<User[]>;
   ConversationRepository: typeof ConversationRepository;
+  maxNameLength: number;
+  maxSize: number;
 
   static get STATE() {
     return {
@@ -74,6 +76,8 @@ export class GroupCreationViewModel {
   ) {
     this.isTeam = this.teamRepository.isTeam;
     this.ConversationRepository = ConversationRepository;
+    this.maxNameLength = ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
+    this.maxSize = ConversationRepository.CONFIG.GROUP.MAX_SIZE;
 
     this.isShown = ko.observable(false);
     this.state = ko.observable(GroupCreationViewModel.STATE.DEFAULT);

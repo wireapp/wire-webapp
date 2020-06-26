@@ -51,6 +51,7 @@ import {isAppLockEnabled} from './AppLockViewModel';
 import {loadValue} from 'Util/StorageUtil';
 import {StorageKey} from '../../storage';
 import {UserError} from '../../error/UserError';
+import {HistoryExportViewModel} from './HistoryExportViewModel';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -78,7 +79,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.removedFromView = this.removedFromView.bind(this);
 
     this.logger = getLogger('z.viewModel.content.PreferencesAccountViewModel');
-
+    this.fileExtension = HistoryExportViewModel.CONFIG.FILE_EXTENSION;
     this.mainViewModel = mainViewModel;
     this.backupRepository = repositories.backup;
     this.clientRepository = repositories.client;
