@@ -58,7 +58,6 @@ export class GroupCreationViewModel {
   stateIsPreferences: ko.PureComputed<boolean>;
   stateIsParticipants: ko.PureComputed<boolean>;
   shouldUpdateScrollbar: ko.Computed<User[]>;
-  ConversationRepository: typeof ConversationRepository;
   maxNameLength: number;
   maxSize: number;
   searchRepository: SearchRepository;
@@ -78,7 +77,6 @@ export class GroupCreationViewModel {
     private readonly userRepository: UserRepository,
   ) {
     this.isTeam = this.teamRepository.isTeam;
-    this.ConversationRepository = ConversationRepository;
     this.maxNameLength = ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
     this.maxSize = ConversationRepository.CONFIG.GROUP.MAX_SIZE;
     this.searchRepository = searchRepository;
@@ -217,10 +215,10 @@ export class GroupCreationViewModel {
     }
 
     const trimmedNameInput = this.nameInput().trim();
-    const nameTooLong = trimmedNameInput.length > ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
+    const nameTooLong = trimmedNameInput.length > this.maxNameLength;
     const nameTooShort = !trimmedNameInput.length;
 
-    this.nameInput(trimmedNameInput.slice(0, ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH));
+    this.nameInput(trimmedNameInput.slice(0, this.maxNameLength));
     if (nameTooLong) {
       return this.nameError(t('groupCreationPreferencesErrorNameLong'));
     }
