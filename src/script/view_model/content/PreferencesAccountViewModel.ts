@@ -47,6 +47,8 @@ import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {EventName} from '../../tracking/EventName';
 import {ContentViewModel} from '../ContentViewModel';
+import {Logger} from '@wireapp/commons';
+import {getLogger} from 'Util/Logger';
 
 import 'Components/availabilityState';
 import {isAppLockEnabled} from './AppLockViewModel';
@@ -61,6 +63,7 @@ import {AccentColorID} from '@wireapp/commons/dist/commonjs/util/AccentColor';
 import {TeamEntity} from '../../team/TeamEntity';
 
 export class PreferencesAccountViewModel {
+  logger: Logger;
   fileExtension: string;
   isDesktop: boolean;
   brandName: string;
@@ -115,6 +118,7 @@ export class PreferencesAccountViewModel {
     private readonly teamRepository: TeamRepository,
     private readonly userRepository: UserRepository,
   ) {
+    this.logger = getLogger('PreferencesAccountViewModel');
     this.fileExtension = HistoryExportViewModel.CONFIG.FILE_EXTENSION;
     this.isDesktop = Environment.desktop;
     this.brandName = Config.getConfig().BRAND_NAME;
@@ -180,7 +184,7 @@ export class PreferencesAccountViewModel {
     this.userRepository.changeAccentColor(id);
   };
 
-  changeName = (viewModel: unknown, event: ChangeEvent<HTMLInputElement>) => {
+  changeName = async (viewModel: unknown, event: ChangeEvent<HTMLInputElement>): Promise<void> => {
     const newName = event.target.value.trim();
 
     const isUnchanged = newName === this.selfUser().name();
@@ -190,15 +194,18 @@ export class PreferencesAccountViewModel {
 
     const isValidName = newName.length >= UserRepository.CONFIG.MINIMUM_NAME_LENGTH;
     if (isValidName) {
-      this.userRepository.changeName(newName).then(() => {
+      try {
+        await this.userRepository.changeName(newName);
         this.nameSaved(true);
         event.target.blur();
         window.setTimeout(() => this.nameSaved(false), PreferencesAccountViewModel.CONFIG.SAVE_ANIMATION_TIMEOUT);
-      });
+      } catch (error) {
+        this.logger.warn('Failed to update name', error);
+      }
     }
   };
 
-  changeUsername = (username: string, event: ChangeEvent<HTMLInputElement>) => {
+  changeUsername = async (username: string, event: ChangeEvent<HTMLInputElement>): Promise<void> => {
     const enteredUsername = event.target.value;
     const normalizedUsername = enteredUsername.toLowerCase().replace(/[^a-z0-9_]/g, '');
 
@@ -218,25 +225,24 @@ export class PreferencesAccountViewModel {
     }
 
     this.submittedUsername(normalizedUsername);
-    this.userRepository
-      .changeUsername(normalizedUsername)
-      .then(() => {
-        const isCurrentRequest = this.enteredUsername() === this.submittedUsername();
-        if (isCurrentRequest) {
-          this.usernameState(null);
-          this.usernameSaved(true);
+    try {
+      await this.userRepository.changeUsername(normalizedUsername);
 
-          event.target.blur();
-          window.setTimeout(() => this.usernameSaved(false), PreferencesAccountViewModel.CONFIG.SAVE_ANIMATION_TIMEOUT);
-        }
-      })
-      .catch(error => {
-        const isUsernameTaken = error.type === UserError.TYPE.USERNAME_TAKEN;
-        const isCurrentRequest = this.enteredUsername() === this.submittedUsername();
-        if (isUsernameTaken && isCurrentRequest) {
-          this.usernameState(PreferencesAccountViewModel.USERNAME_STATE.TAKEN);
-        }
-      });
+      const isCurrentRequest = this.enteredUsername() === this.submittedUsername();
+      if (isCurrentRequest) {
+        this.usernameState(null);
+        this.usernameSaved(true);
+
+        event.target.blur();
+        window.setTimeout(() => this.usernameSaved(false), PreferencesAccountViewModel.CONFIG.SAVE_ANIMATION_TIMEOUT);
+      }
+    } catch (error) {
+      const isUsernameTaken = error.type === UserError.TYPE.USERNAME_TAKEN;
+      const isCurrentRequest = this.enteredUsername() === this.submittedUsername();
+      if (isUsernameTaken && isCurrentRequest) {
+        this.usernameState(PreferencesAccountViewModel.USERNAME_STATE.TAKEN);
+      }
+    }
   };
 
   checkUsernameInput = (username: string, keyboardEvent: KeyboardEvent) => {
@@ -339,7 +345,14 @@ export class PreferencesAccountViewModel {
       {
         preventClose: true,
         primaryAction: {
-          action: () => this.conversationRepository.leaveGuestRoom().then(() => this.clientRepository.logoutClient()),
+          action: async (): Promise<void> => {
+            try {
+              await this.conversationRepository.leaveGuestRoom();
+              this.clientRepository.logoutClient();
+            } catch (error) {
+              this.logger.warn('Error while leaving room', error);
+            }
+          },
           text: t('modalAccountLeaveGuestRoomAction'),
         },
         text: {
@@ -387,7 +400,7 @@ export class PreferencesAccountViewModel {
     }
   };
 
-  setPicture = (newUserPicture: File): Promise<boolean | User> => {
+  setPicture = async (newUserPicture: File): Promise<boolean | User> => {
     const isTooLarge = newUserPicture.size > Config.getConfig().MAXIMUM_IMAGE_FILE_SIZE;
     if (isTooLarge) {
       const maximumSizeInMB = Config.getConfig().MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024;
@@ -408,7 +421,8 @@ export class PreferencesAccountViewModel {
     const minHeight = UserRepository.CONFIG.MINIMUM_PICTURE_SIZE.HEIGHT;
     const minWidth = UserRepository.CONFIG.MINIMUM_PICTURE_SIZE.WIDTH;
 
-    return validateProfileImageResolution(newUserPicture, minWidth, minHeight).then(isValid => {
+    try {
+      const isValid = await validateProfileImageResolution(newUserPicture, minWidth, minHeight);
       if (isValid) {
         return this.userRepository.changePicture(newUserPicture);
       }
@@ -416,7 +430,10 @@ export class PreferencesAccountViewModel {
       const messageString = t('modalPictureTooSmallMessage');
       const titleString = t('modalPictureTooSmallHeadline');
       return this._showUploadWarning(titleString, messageString);
-    });
+    } catch (error) {
+      this.logger.error('Failed to validate profile image', error);
+      return false;
+    }
   };
 
   shouldFocusUsername = (): boolean => this.userRepository.should_set_username;
