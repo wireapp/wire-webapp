@@ -132,6 +132,8 @@ export class PropertiesRepository {
         });
   }
 
+  getReceiptMode = () => this.receiptMode;
+
   getPreference(propertiesType: string): any {
     const typeParts = propertiesType.split('.');
     const [partOne, partTwo, partThree] = typeParts;

@@ -132,6 +132,8 @@ export class TeamRepository {
     amplify.subscribe(WebAppEvents.TEAM.UPDATE_INFO, this.sendAccountInfo.bind(this));
   }
 
+  getTeamName = () => this.teamName;
+
   getRoleBadge = (userId: string): string => {
     return this.isExternal(userId) ? t('rolePartner') : '';
   };

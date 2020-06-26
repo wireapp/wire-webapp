@@ -172,6 +172,8 @@ export class UserRepository {
     amplify.subscribe(WebAppEvents.USER.UPDATE, this.updateUserById.bind(this));
   }
 
+  getShouldSetUsername = () => this.should_set_username;
+
   /**
    * Listener for incoming user events.
    */
