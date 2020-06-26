@@ -90,8 +90,8 @@ export class PreferencesAVViewModel {
     this.deviceSupport = this.devicesHandler.deviceSupport;
     this.Config = Config.getConfig();
 
-    this.currentDeviceId.audioInput.subscribe(this.updateAudioStream.bind(this));
-    this.currentDeviceId.videoInput.subscribe(this.updateVideoStream.bind(this));
+    this.currentDeviceId.audioInput.subscribe(() => this.updateStream(MediaType.AUDIO));
+    this.currentDeviceId.videoInput.subscribe(() => this.updateStream(MediaType.VIDEO));
 
     this.constraintsHandler = mediaRepository.constraintsHandler;
     this.streamHandler = mediaRepository.streamHandler;
@@ -125,28 +125,18 @@ export class PreferencesAVViewModel {
     });
   }
 
-  private updateAudioStream() {
-    return this.updateStream(MediaType.AUDIO);
-  }
-
-  private updateVideoStream() {
-    return this.updateStream(MediaType.VIDEO);
-  }
-
   async updateStream(mediaType: MediaType): Promise<void> {
     this.currentMediaType = mediaType;
-    this.releaseAudioMeter();
+    await this.tryAgain();
+
     const needsStreamUpdate = this.willChangeMediaSource(mediaType);
-    if (this.mediaStream()) {
-      this.streamHandler.releaseTracksFromStream(this.mediaStream(), mediaType);
-    }
+
     if (!needsStreamUpdate && !this.mediaStream()) {
       return undefined;
     }
 
     try {
       const stream = await this.getMediaStream(mediaType);
-      // this.mediaStream(stream);
       this.mediaSourceChanged(stream, mediaType);
       if (this.mediaStream()) {
         stream.getTracks().forEach(track => {
@@ -157,7 +147,6 @@ export class PreferencesAVViewModel {
         stream.getTracks().forEach(track => track.stop());
       }
     } catch (error) {
-      this.mediaStream(undefined);
       this.logger.warn(`Requesting MediaStream failed: ${error.message}`, error);
     }
   }
@@ -177,14 +166,14 @@ export class PreferencesAVViewModel {
     }
   }
 
-  tryAgain(): void {
-    this.releaseDevices();
+  async tryAgain(): Promise<void> {
+    await this.releaseDevices();
     this.initiateDevices();
   }
 
-  releaseDevices(): void {
+  async releaseDevices(): Promise<void> {
     this.isVisible = false;
-    this.releaseAudioMeter();
+    await this.releaseAudioMeter();
     this.releaseMediaStream();
   }
 
@@ -194,40 +183,48 @@ export class PreferencesAVViewModel {
     }
     const supportsVideo = this.deviceSupport.videoInput();
     const supportsAudio = this.deviceSupport.audioInput();
+
     const requestAudio = supportsAudio && [MediaType.AUDIO, MediaType.AUDIO_VIDEO].includes(requestedMediaType);
     const requestVideo = supportsVideo && [MediaType.VIDEO, MediaType.AUDIO_VIDEO].includes(requestedMediaType);
-    try {
-      const stream = await this.streamHandler.requestMediaStream(requestAudio, requestVideo, false, false);
-      this.devicesHandler.refreshMediaDevices();
-      return stream;
-    } catch (error) {
-      // if getting the streams all together failed, we try to get them separately.
-      return this.getStreamsSeparately(requestAudio, requestVideo, error);
-    }
+
+    const stream = await this.getStreamsSeparately(requestAudio, requestVideo);
+    await this.devicesHandler.refreshMediaDevices();
+    return stream;
   }
 
-  async getStreamsSeparately(requestAudio: boolean, requestVideo: boolean, error: Error): Promise<MediaStream> {
-    const splitMediaStreamsAttempts = [];
+  async getStreamsSeparately(requestAudio: boolean, requestVideo: boolean): Promise<MediaStream> {
+    const mediaStreams = [];
+    let latestError: Error | undefined = undefined;
+
     if (requestAudio) {
-      splitMediaStreamsAttempts.push(
-        this.streamHandler.requestMediaStream(true, false, false, false).catch(() => undefined),
-      );
-    }
-    if (requestVideo) {
-      splitMediaStreamsAttempts.push(
-        this.streamHandler.requestMediaStream(false, true, false, false).catch(() => undefined),
-      );
-    }
-    return Promise.all(splitMediaStreamsAttempts).then(mediaStreams => {
-      const workingMediaStreams = mediaStreams.filter(mediaStream => !!mediaStream);
-      if (workingMediaStreams.length === 0) {
-        throw error;
+      try {
+        const audioStream = await this.streamHandler.requestMediaStream(true, false, false, false);
+        mediaStreams.push(audioStream);
+      } catch (error) {
+        latestError = error;
       }
-      const tracks = workingMediaStreams.reduce((trackList, mediaStream) => {
-        return trackList.concat(mediaStream.getTracks());
-      }, []);
-      return new MediaStream(tracks);
-    });
+    }
+
+    if (requestVideo) {
+      try {
+        const videoStream = await this.streamHandler
+          .requestMediaStream(false, true, false, false)
+          .catch(() => undefined);
+        mediaStreams.push(videoStream);
+      } catch (error) {
+        latestError = error;
+      }
+    }
+
+    if (mediaStreams.length === 0) {
+      throw latestError;
+    }
+
+    const tracks = mediaStreams.reduce((trackList, mediaStream) => {
+      return trackList.concat(mediaStream.getTracks());
+    }, []);
+
+    return new MediaStream(tracks);
   }
 
   private initiateAudioMeter(mediaStream: MediaStream): void {
