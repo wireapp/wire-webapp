@@ -58,7 +58,7 @@ export class HistoryImportViewModel {
   }
 
   constructor(private readonly backupRepository: BackupRepository) {
-    this.logger = getLogger('z.viewModel.content.HistoryExportViewModel');
+    this.logger = getLogger('HistoryImportViewModel');
 
     this.error = ko.observable(null);
     this.errorHeadline = ko.observable('');
