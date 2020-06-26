@@ -66,14 +66,16 @@ export class MediaStreamHandler {
     }
   }
 
-  requestMediaStream(audio: boolean, video: boolean, screen: boolean, isGroup: boolean): Promise<MediaStream> {
+  async requestMediaStream(audio: boolean, video: boolean, screen: boolean, isGroup: boolean): Promise<MediaStream> {
     const hasPermission = this.hasPermissionToAccess(audio, video);
-    return this.getMediaStream(audio, video, screen, isGroup, hasPermission).catch(error => {
+    try {
+      return await this.getMediaStream(audio, video, screen, isGroup, hasPermission);
+    } catch (error) {
       const isPermissionDenied = error.type === PermissionError.TYPE.DENIED;
       throw isPermissionDenied
         ? new MediaError(MediaError.TYPE.MEDIA_STREAM_PERMISSION, MediaError.MESSAGE.MEDIA_STREAM_PERMISSION)
         : error;
-    });
+    }
   }
 
   selectScreenToShare(showScreenSelection: () => Promise<void>): Promise<void> {
@@ -125,16 +127,19 @@ export class MediaStreamHandler {
     const mediaStreamTracks = this.getMediaTracks(mediaStream, mediaType);
 
     if (mediaStreamTracks.length) {
-      mediaStreamTracks.forEach(mediaStreamTrack => {
+      mediaStreamTracks.forEach((mediaStreamTrack: MediaStreamTrack) => {
         mediaStream.removeTrack(mediaStreamTrack);
         mediaStreamTrack.stop();
-        this.logger.info(`Stopping MediaStreamTrack of kind '${mediaStreamTrack.kind}' successful`, mediaStreamTrack);
+        this.logger.info(
+          `Stopped MediaStreamTrack ID '${mediaStreamTrack.id}' of kind '${mediaStreamTrack.kind}'`,
+          mediaStreamTrack,
+        );
       });
 
       return true;
     }
 
-    this.logger.warn('No MediaStreamTrack found to stop', mediaStream);
+    this.logger.warn('No MediaStreamTracks found to stop', mediaStream);
     return false;
   }
 
