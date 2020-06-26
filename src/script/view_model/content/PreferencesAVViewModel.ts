@@ -207,9 +207,7 @@ export class PreferencesAVViewModel {
 
     if (requestVideo) {
       try {
-        const videoStream = await this.streamHandler
-          .requestMediaStream(false, true, false, false)
-          .catch(() => undefined);
+        const videoStream = await this.streamHandler.requestMediaStream(false, true, false, false);
         mediaStreams.push(videoStream);
       } catch (error) {
         latestError = error;
