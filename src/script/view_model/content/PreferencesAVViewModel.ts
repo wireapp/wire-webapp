@@ -148,6 +148,7 @@ export class PreferencesAVViewModel {
       }
     } catch (error) {
       this.logger.warn(`Requesting MediaStream failed: ${error.message}`, error);
+      this.releaseMediaStream();
     }
   }
 
@@ -161,8 +162,8 @@ export class PreferencesAVViewModel {
         this.initiateAudioMeter(mediaStream);
       }
     } catch (error) {
-      this.mediaStream(undefined);
       this.logger.warn(`Requesting MediaStream failed: ${error.message}`, error);
+      this.releaseMediaStream();
     }
   }
 
