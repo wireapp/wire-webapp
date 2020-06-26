@@ -199,14 +199,18 @@ export class PreferencesAVViewModel {
       try {
         const audioStream = await this.streamHandler.requestMediaStream(true, false, false, false);
         mediaStreams.push(audioStream);
-      } catch (error) {}
+      } catch (error) {
+        this.logger.warn(error);
+      }
     }
 
     if (requestVideo) {
       try {
         const videoStream = await this.streamHandler.requestMediaStream(false, true, false, false);
         mediaStreams.push(videoStream);
-      } catch (error) {}
+      } catch (error) {
+        this.logger.warn(error);
+      }
     }
 
     if (mediaStreams.length === 0) {
