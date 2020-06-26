@@ -69,9 +69,6 @@ export class Configuration {
   readonly VERSION = env.VERSION || '0.0.0';
   readonly WEBSITE_LABEL = env.WEBSITE_LABEL;
 
-  // 10 seconds until phone code expires
-  readonly LOGIN_CODE_EXPIRATION = 10 * 60;
-
   // 25 megabyte upload limit for personal use (private users & guests)
   readonly MAXIMUM_ASSET_FILE_SIZE_PERSONAL = 25 * 1024 * 1024;
 
