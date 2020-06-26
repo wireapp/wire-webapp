@@ -53,7 +53,7 @@ export class PropertiesRepository {
 
   private readonly logger: Logger;
   private readonly propertiesService: PropertiesService;
-  private readonly receiptMode: ko.Observable<any>;
+  public readonly receiptMode: ko.Observable<any>;
   private readonly selfService: SelfService;
   private readonly selfUser: ko.Observable<User>;
   public properties: WebappProperties;
@@ -131,8 +131,6 @@ export class PropertiesRepository {
           });
         });
   }
-
-  getReceiptMode = () => this.receiptMode;
 
   getPreference(propertiesType: string): any {
     const typeParts = propertiesType.split('.');

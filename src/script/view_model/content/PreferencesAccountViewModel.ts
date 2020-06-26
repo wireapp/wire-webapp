@@ -147,14 +147,14 @@ export class PreferencesAccountViewModel {
 
     this.isTeam = this.teamRepository.isTeam;
     this.team = this.teamRepository.team;
-    this.teamName = ko.pureComputed(() => t('preferencesAccountTeam', this.teamRepository.getTeamName()()));
+    this.teamName = ko.pureComputed(() => t('preferencesAccountTeam', this.teamRepository.teamName()));
 
     this.optionPrivacy = ko.observable();
     this.optionPrivacy.subscribe(privacyPreference => {
       this.propertiesRepository.savePreference(PROPERTIES_TYPE.PRIVACY, privacyPreference);
     });
 
-    this.optionReadReceipts = this.propertiesRepository.getReceiptMode();
+    this.optionReadReceipts = this.propertiesRepository.receiptMode;
     this.optionMarketingConsent = this.propertiesRepository.marketingConsent;
 
     this.optionResetAppLock = isAppLockEnabled();
@@ -419,7 +419,7 @@ export class PreferencesAccountViewModel {
     });
   };
 
-  shouldFocusUsername = (): boolean => this.userRepository.getShouldSetUsername();
+  shouldFocusUsername = (): boolean => this.userRepository.should_set_username;
 
   verifyUsername = (username: string, event: ChangeEvent<HTMLInputElement>): void => {
     const enteredUsername = event.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '');

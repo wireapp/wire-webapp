@@ -90,7 +90,7 @@ export class UserRepository {
   private readonly userMapper: UserMapper;
   private readonly userService: UserService;
   private readonly users: ko.ObservableArray<User>;
-  private should_set_username: boolean;
+  public should_set_username: boolean;
   readonly connect_requests: ko.PureComputed<User[]>;
   readonly isActivatedAccount: ko.PureComputed<boolean>;
   readonly isTemporaryGuest: ko.PureComputed<boolean>;
@@ -171,8 +171,6 @@ export class UserRepository {
     amplify.subscribe(WebAppEvents.USER.PERSIST, this.saveUserInDb.bind(this));
     amplify.subscribe(WebAppEvents.USER.UPDATE, this.updateUserById.bind(this));
   }
-
-  getShouldSetUsername = () => this.should_set_username;
 
   /**
    * Listener for incoming user events.

@@ -73,7 +73,7 @@ export class TeamRepository {
   private readonly supportsLegalHold: ko.Observable<boolean>;
   private readonly teamMapper: TeamMapper;
   readonly teamMembers: ko.PureComputed<User[]>;
-  private readonly teamName: ko.PureComputed<string>;
+  public readonly teamName: ko.PureComputed<string>;
   readonly teamUsers: ko.PureComputed<User[]>;
   private readonly userRepository: UserRepository;
   private readonly assetRepository: AssetRepository;
@@ -131,8 +131,6 @@ export class TeamRepository {
     amplify.subscribe(WebAppEvents.TEAM.EVENT_FROM_BACKEND, this.onTeamEvent.bind(this));
     amplify.subscribe(WebAppEvents.TEAM.UPDATE_INFO, this.sendAccountInfo.bind(this));
   }
-
-  getTeamName = () => this.teamName;
 
   getRoleBadge = (userId: string): string => {
     return this.isExternal(userId) ? t('rolePartner') : '';
