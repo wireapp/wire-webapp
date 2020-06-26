@@ -225,7 +225,7 @@ export class PreferencesAVViewModel {
       }
       const tracks = workingMediaStreams.reduce((trackList, mediaStream) => {
         return trackList.concat(mediaStream.getTracks());
-      });
+      }, []);
       return new MediaStream(tracks);
     });
   }
