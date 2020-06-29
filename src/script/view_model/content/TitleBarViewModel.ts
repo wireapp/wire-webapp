@@ -39,16 +39,16 @@ import {Call} from '../../calling/Call';
 
 // Parent: ContentViewModel
 export class TitleBarViewModel {
-  panelIsVisible: ko.PureComputed<boolean>;
-  conversationEntity: ko.Observable<Conversation>;
-  ConversationVerificationState: typeof ConversationVerificationState;
-  joinedCall: ko.PureComputed<Call | undefined>;
-  isActivatedAccount: ko.PureComputed<boolean>;
-  hasCall: ko.PureComputed<boolean>;
-  badgeLabelCopy: ko.PureComputed<string>;
-  showCallControls: ko.PureComputed<boolean>;
-  supportsVideoCall: ko.PureComputed<boolean>;
-  peopleTooltip: string;
+  readonly panelIsVisible: ko.PureComputed<boolean>;
+  readonly conversationEntity: ko.Observable<Conversation>;
+  readonly ConversationVerificationState: typeof ConversationVerificationState;
+  private readonly joinedCall: ko.PureComputed<Call | undefined>;
+  readonly isActivatedAccount: ko.PureComputed<boolean>;
+  private readonly hasCall: ko.PureComputed<boolean>;
+  readonly badgeLabelCopy: ko.PureComputed<string>;
+  readonly showCallControls: ko.PureComputed<boolean>;
+  readonly supportsVideoCall: ko.PureComputed<boolean>;
+  readonly peopleTooltip: string;
 
   constructor(
     readonly callingViewModel: CallingViewModel,
