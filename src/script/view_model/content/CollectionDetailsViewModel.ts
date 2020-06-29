@@ -46,7 +46,7 @@ export class CollectionDetailsViewModel {
     this.removedFromView = this.removedFromView.bind(this);
     this.setConversation = this.setConversation.bind(this);
 
-    this.logger = getLogger('CollectionDetailsViewModel');
+    this.logger = getLogger('z.viewModel.CollectionDetailsViewModel');
 
     this.template = ko.observable();
     this.conversationEntity = ko.observable();
