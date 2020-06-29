@@ -20,9 +20,9 @@
 import {APIClient} from '@wireapp/api-client';
 import {User} from '@wireapp/api-client/dist/user/';
 import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
-import {AvailabilityType, BroadcastService} from '../broadcast/';
+import UUID from 'uuidjs';
 
-const UUID = require('pure-uuid');
+import {AvailabilityType, BroadcastService} from '../broadcast/';
 
 export class UserService {
   private readonly apiClient: APIClient;
@@ -45,7 +45,7 @@ export class UserService {
   public setAvailability(teamId: string, type: AvailabilityType): Promise<void> {
     const genericMessage = GenericMessage.create({
       availability: new Availability({type}),
-      messageId: new UUID(4).format(),
+      messageId: UUID.genV4().toString(),
     });
 
     return this.broadcastService.broadcastGenericMessage(teamId, genericMessage);

@@ -18,12 +18,10 @@
  */
 
 import Dexie from 'dexie';
-const UUID = require('pure-uuid');
-const {Account} = require('@wireapp/core');
-const {IndexedDBEngine} = require('@wireapp/store-engine-dexie');
-const {APIClient} = require('@wireapp/api-client');
-
-const UUIDVersion = 4;
+import UUID from 'uuidjs';
+import {Account} from '@wireapp/core';
+import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
+import {APIClient} from '@wireapp/api-client';
 
 describe('Account', () => {
   describe('"initClient"', () => {
@@ -40,7 +38,7 @@ describe('Account', () => {
     });
 
     it('creates a client if there is none', async () => {
-      storeName = new UUID(UUIDVersion).format();
+      storeName = UUID.genV4().toString();
       const db = new Dexie(storeName);
       db.version(1).stores({
         amplify: '',
@@ -58,7 +56,7 @@ describe('Account', () => {
 
       const context = {
         clientId: 'aa9ecc1b-ed3a-49fc-987d-68d69ce59c0d',
-        userId: new UUID(UUIDVersion),
+        userId: UUID.genV4().toString(),
       };
 
       const account = new Account(apiClient, () => Promise.resolve(engine));
@@ -80,7 +78,7 @@ describe('Account', () => {
       const apiClient = new APIClient({
         urls: APIClient.BACKEND.STAGING,
       });
-      const clientId = new UUID(UUIDVersion).toString();
+      const clientId = UUID.genV4().toString().toString();
       const account = new Account(apiClient, () => Promise.resolve(engine));
       await account.initServices(engine);
       spyOn(account.service.cryptography, 'initCryptobox').and.returnValue(Promise.resolve());
@@ -100,7 +98,7 @@ describe('Account', () => {
       const apiClient = new APIClient({
         urls: APIClient.BACKEND.STAGING,
       });
-      const clientId = new UUID(UUIDVersion).toString();
+      const clientId = UUID.genV4().toString().toString();
       const account = new Account(apiClient, () => Promise.resolve(engine));
       await account.initServices(engine);
       spyOn(account.service.client, 'register').and.returnValue(Promise.resolve({id: clientId}));
