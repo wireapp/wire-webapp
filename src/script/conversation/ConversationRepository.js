@@ -1590,19 +1590,19 @@ export class ConversationRepository {
    * @param {Date} isoDate Date of member removal
    * @returns {Promise<void>} No return value
    */
-  teamMemberLeave(teamId, userId, isoDate = this.serverTimeHandler.toServerTimestamp()) {
-    return this.userRepository.getUserById(userId).then(userEntity => {
-      this.conversations()
-        .filter(conversationEntity => {
-          const conversationInTeam = conversationEntity.team_id === teamId;
-          const userIsParticipant = conversationEntity.participating_user_ids().includes(userId);
-          return conversationInTeam && userIsParticipant && !conversationEntity.removed_from_conversation();
-        })
-        .forEach(conversationEntity => {
-          const leaveEvent = EventBuilder.buildTeamMemberLeave(conversationEntity, userEntity, isoDate);
-          this.eventRepository.injectEvent(leaveEvent);
-        });
-    });
+  async teamMemberLeave(teamId, userId, isoDate = this.serverTimeHandler.toServerTimestamp()) {
+    const userEntity = await this.userRepository.getUserById(userId);
+    this.conversations()
+      .filter(conversationEntity => {
+        const conversationInTeam = conversationEntity.team_id === teamId;
+        const userIsParticipant = conversationEntity.participating_user_ids().includes(userId);
+        return conversationInTeam && userIsParticipant && !conversationEntity.removed_from_conversation();
+      })
+      .forEach(conversationEntity => {
+        const leaveEvent = EventBuilder.buildTeamMemberLeave(conversationEntity, userEntity, isoDate);
+        this.eventRepository.injectEvent(leaveEvent);
+      });
+    userEntity.isDeleted = true;
   }
 
   /**
@@ -4167,8 +4167,7 @@ export class ConversationRepository {
 
       const asset_et = message_et.get_first_asset();
       if (asset_et) {
-        const is_proper_asset = asset_et.is_audio() || asset_et.is_file() || asset_et.is_video();
-        if (!is_proper_asset) {
+        if (!asset_et.is_downloadable()) {
           throw new Error(`Tried to update message with wrong asset type as upload failed '${asset_et.type}'`);
         }
 

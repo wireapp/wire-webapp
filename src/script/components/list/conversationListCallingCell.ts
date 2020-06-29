@@ -66,6 +66,7 @@ class ConversationListCallingCell {
   readonly dispose: () => void;
   readonly isConnecting: ko.PureComputed<boolean>;
   readonly isDeclined: ko.PureComputed<boolean>;
+  readonly isStillOngoing: ko.PureComputed<boolean>;
   readonly isIdle: ko.PureComputed<boolean>;
   readonly isIncoming: ko.PureComputed<boolean>;
   readonly isMuted: ko.Observable<boolean>;
@@ -79,6 +80,7 @@ class ConversationListCallingCell {
   readonly showParticipants: ko.Observable<boolean>;
   readonly showParticipantsButton: ko.PureComputed<boolean>;
   readonly showVideoButton: ko.PureComputed<boolean>;
+  readonly showJoinButton: ko.PureComputed<boolean>;
   readonly showVideoGrid: ko.PureComputed<boolean>;
   readonly temporaryUserStyle: boolean;
   readonly videoGrid: ko.PureComputed<Grid>;
@@ -126,6 +128,8 @@ class ConversationListCallingCell {
       [CALL_REASON.STILL_ONGOING, CALL_REASON.ANSWERED_ELSEWHERE].includes(call.reason()),
     );
 
+    this.isStillOngoing = ko.pureComputed(() => [CALL_REASON.STILL_ONGOING].includes(call.reason()));
+
     this.isMuted = callingRepository.isMuted;
 
     this.callDuration = ko.observable();
@@ -157,6 +161,7 @@ class ConversationListCallingCell {
     });
 
     this.showVideoButton = ko.pureComputed(() => call.initialType === CALL_TYPE.VIDEO || this.isOngoing());
+    this.showJoinButton = ko.pureComputed(() => conversation() && this.isStillOngoing() && temporaryUserStyle);
     this.disableScreenButton = !this.callingRepository.supportsScreenSharing;
     this.disableVideoButton = ko.pureComputed(() => {
       const selfParticipant = call.getSelfParticipant();
@@ -189,6 +194,10 @@ class ConversationListCallingCell {
     return this.isIncoming() ? this.callActions.reject(call) : this.callActions.leave(call);
   }
 
+  joinCall(call: Call) {
+    this.callActions.answer(call);
+  }
+
   showFullscreenVideoGrid(): void {
     this.multitasking.autoMinimize(false);
     this.multitasking.isMinimized(false);
@@ -213,6 +222,9 @@ class ConversationListCallingCell {
 
 ko.components.register('conversation-list-calling-cell', {
   template: `
+   <!-- ko if: showJoinButton() -->
+     <div class="call-ui__button call-ui__button--green call-ui__button--join" style="margin: 16px 16px 0 16px;" data-bind="click: () => joinCall(call), text: t('callJoin')" data-uie-name="do-call-controls-call-join"></div>
+   <!-- /ko -->
    <!-- ko if: conversation() && !isDeclined() -->
     <div class="conversation-list-calling-cell conversation-list-cell">
       <!-- ko ifnot: temporaryUserStyle -->

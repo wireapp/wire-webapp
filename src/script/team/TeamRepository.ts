@@ -73,7 +73,7 @@ export class TeamRepository {
   private readonly supportsLegalHold: ko.Observable<boolean>;
   private readonly teamMapper: TeamMapper;
   readonly teamMembers: ko.PureComputed<User[]>;
-  private readonly teamName: ko.PureComputed<string>;
+  public readonly teamName: ko.PureComputed<string>;
   readonly teamUsers: ko.PureComputed<User[]>;
   private readonly userRepository: UserRepository;
   private readonly assetRepository: AssetRepository;
@@ -298,7 +298,7 @@ export class TeamRepository {
       return;
     }
 
-    const members = await this.teamService.getTeamMembersByIds(teamEntity.id, memberIds);
+    const members = await this.teamService.getTeamMembersByIds(teamId, memberIds);
     const mappedMembers = this.teamMapper.mapMemberFromArray(members);
     memberIds = mappedMembers.map(member => member.userId);
 

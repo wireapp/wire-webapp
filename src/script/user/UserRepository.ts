@@ -90,7 +90,7 @@ export class UserRepository {
   private readonly userMapper: UserMapper;
   private readonly userService: UserService;
   private readonly users: ko.ObservableArray<User>;
-  private should_set_username: boolean;
+  public should_set_username: boolean;
   readonly connect_requests: ko.PureComputed<User[]>;
   readonly isActivatedAccount: ko.PureComputed<boolean>;
   readonly isTemporaryGuest: ko.PureComputed<boolean>;
@@ -659,23 +659,16 @@ export class UserRepository {
   /**
    * Update a local user from the backend by ID.
    */
-  updateUserById(userId: string): Promise<void> {
-    const getLocalUser = () => {
-      return this.findUserById(userId) || new User();
-    };
-
-    return Promise.all([getLocalUser(), this.userService.getUser(userId)])
-      .then(([localUserEntity, updatedUserData]) =>
-        this.userMapper.updateUserFromObject(localUserEntity, updatedUserData),
-      )
-      .then(userEntity => {
-        if (this.isTeam()) {
-          this.mapGuestStatus([userEntity]);
-        }
-        if (userEntity.inTeam() && userEntity.isDeleted) {
-          amplify.publish(WebAppEvents.TEAM.MEMBER_LEAVE, userEntity.teamId, userEntity.id);
-        }
-      });
+  async updateUserById(userId: string): Promise<void> {
+    const localUserEntity = this.findUserById(userId) || new User();
+    const updatedUserData = await this.userService.getUser(userId);
+    const updatedUserEntity = this.userMapper.updateUserFromObject(localUserEntity, updatedUserData);
+    if (this.isTeam()) {
+      this.mapGuestStatus([updatedUserEntity]);
+    }
+    if (updatedUserEntity.inTeam() && updatedUserEntity.isDeleted) {
+      amplify.publish(WebAppEvents.TEAM.MEMBER_LEAVE, updatedUserEntity.teamId, updatedUserEntity.id);
+    }
   }
 
   /**

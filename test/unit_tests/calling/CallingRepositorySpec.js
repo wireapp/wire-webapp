@@ -18,7 +18,6 @@
  */
 
 import {WebAppEvents} from '@wireapp/webapp-events';
-import UUID from 'pure-uuid';
 import {CONV_TYPE, CALL_TYPE, STATE as CALL_STATE, REASON} from '@wireapp/avs';
 
 import {CallingRepository} from 'src/script/calling/CallingRepository';
@@ -31,6 +30,7 @@ import {Conversation} from 'src/script/entity/Conversation';
 import {ModalsViewModel} from 'src/script/view_model/ModalsViewModel';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 import {TestFactory} from '../../helper/TestFactory';
+import {createRandomUuid} from 'Util/util';
 
 const createSelfParticipant = () => {
   const selfUser = new User();
@@ -43,8 +43,8 @@ describe('CallingRepository', () => {
   let callingRepository;
   let wCall;
   let wUser;
-  const selfUser = new User(genUUID());
-  const clientId = genUUID();
+  const selfUser = new User(createRandomUuid());
+  const clientId = createRandomUuid();
 
   beforeAll(() => {
     return testFactory.exposeCallingActors().then(injectedCallingRepository => {
@@ -66,11 +66,17 @@ describe('CallingRepository', () => {
 
   describe('startCall', () => {
     it('warns the user that there is an ongoing call before starting a new one', done => {
-      const activeCall = new Call(selfUser.id, genUUID(), CONV_TYPE.ONEONONE, new Participant(), CALL_TYPE.NORMAL);
+      const activeCall = new Call(
+        selfUser.id,
+        createRandomUuid(),
+        CONV_TYPE.ONEONONE,
+        new Participant(),
+        CALL_TYPE.NORMAL,
+      );
       activeCall.state(CALL_STATE.MEDIA_ESTAB);
       spyOn(callingRepository, 'activeCalls').and.returnValue([activeCall]);
       spyOn(amplify, 'publish').and.returnValue(undefined);
-      const conversationId = genUUID();
+      const conversationId = createRandomUuid();
       const conversationType = CONV_TYPE.ONEONONE;
       const callType = CALL_TYPE.NORMAL;
       spyOn(wCall, 'start');
@@ -88,7 +94,7 @@ describe('CallingRepository', () => {
     });
 
     it('starts a normal call in a 1:1 conversation', () => {
-      const conversationId = genUUID();
+      const conversationId = createRandomUuid();
       const conversationType = CONV_TYPE.ONEONONE;
       const callType = CALL_TYPE.NORMAL;
       spyOn(wCall, 'start');
@@ -354,10 +360,6 @@ xdescribe('e2e audio call', () => {
   });
 });
 
-function genUUID() {
-  return new UUID(4).format();
-}
-
 function silence() {
   const ctx = new AudioContext();
   const oscillator = ctx.createOscillator();
@@ -384,8 +386,8 @@ function extractAudioStats(stats) {
 }
 
 function createAutoAnsweringWuser(wCall, remoteCallingRepository) {
-  const selfUserId = genUUID();
-  const selfClientId = genUUID();
+  const selfUserId = createRandomUuid();
+  const selfClientId = createRandomUuid();
   const sendMsg = (context, conversationId, userId, clientId, destinationUserId, destinationClientId, payload) => {
     const event = {
       content: JSON.parse(payload),
