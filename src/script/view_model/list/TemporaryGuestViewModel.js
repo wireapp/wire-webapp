@@ -17,7 +17,6 @@
  *
  */
 
-import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {getLogger} from 'Util/Logger';
@@ -33,9 +32,8 @@ class TemporaryGuestViewModel {
    * @param {MainViewModel} mainViewModel Main view model
    * @param {z.viewModel.ListViewModel} listViewModel List view model
    * @param {Object} repositories Object containing all repositories
-   * @param {Function} onJoinCall Callback called when the user wants to join a call
    */
-  constructor(mainViewModel, listViewModel, repositories, onJoinCall) {
+  constructor(mainViewModel, listViewModel, repositories) {
     this.conversationRepository = repositories.conversation;
     this.userRepository = repositories.user;
     this.callingRepository = repositories.calling;
@@ -48,8 +46,6 @@ class TemporaryGuestViewModel {
 
     this.selfUser = this.userRepository.self;
     this.isAccountCreationEnabled = Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION;
-
-    this.onJoinCall = onJoinCall;
   }
 
   clickOnPreferencesButton() {
@@ -69,20 +65,6 @@ class TemporaryGuestViewModel {
       },
     });
   }
-
-  hasJoinableCall = ko.pureComputed(() => {
-    const activeConversation = this.conversationRepository.active_conversation();
-    if (activeConversation) {
-      const call = this.callingRepository.findCall(activeConversation.id);
-      return call && call.state() === CALL_STATE.INCOMING && call.reason() !== CALL_REASON.ANSWERED_ELSEWHERE;
-    }
-  });
-
-  onClickJoinCall = (viewModel, event) => {
-    event.preventDefault();
-    const activeConversation = this.conversationRepository.active_conversation();
-    this.onJoinCall(activeConversation);
-  };
 
   isSelectedConversation() {
     return true;

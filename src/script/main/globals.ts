@@ -66,7 +66,6 @@ import '../view_model/bindings/ListBackgroundBindings';
 import '../view_model/bindings/MessageListBindings';
 import '../view_model/bindings/VideoCallingBindings';
 import '../view_model/content/InputBarViewModel';
-import '../view_model/content/PreferencesAboutViewModel';
 import '../view_model/content/PreferencesDeviceDetailsViewModel';
 import '../view_model/content/PreferencesDevicesViewModel';
 import '../view_model/FaviconViewModel';
