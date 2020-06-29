@@ -116,10 +116,16 @@ export class ContentViewModel {
       repositories.team,
       repositories.user,
     );
-    this.preferencesAV = new PreferencesAVViewModel(repositories.media, repositories.user, {
-      mediaSourceChanged: repositories.calling.changeMediaSource.bind(repositories.calling),
-      willChangeMediaSource: repositories.calling.stopMediaSource.bind(repositories.calling),
-    });
+    this.preferencesAV = new PreferencesAVViewModel(
+      repositories.media,
+      repositories.user,
+      repositories.properties,
+      repositories.calling,
+      {
+        mediaSourceChanged: repositories.calling.changeMediaSource.bind(repositories.calling),
+        willChangeMediaSource: repositories.calling.stopMediaSource.bind(repositories.calling),
+      },
+    );
     this.preferencesDeviceDetails = new z.viewModel.content.PreferencesDeviceDetailsViewModel(
       mainViewModel,
       this,
@@ -127,7 +133,6 @@ export class ContentViewModel {
     );
     this.preferencesDevices = new z.viewModel.content.PreferencesDevicesViewModel(mainViewModel, this, repositories);
     this.preferencesOptions = new PreferencesOptionsViewModel(
-      repositories.calling,
       repositories.properties,
       repositories.team,
       repositories.user,
