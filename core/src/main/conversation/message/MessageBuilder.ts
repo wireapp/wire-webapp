@@ -19,6 +19,8 @@
 
 import {APIClient} from '@wireapp/api-client';
 import {ClientAction, Confirmation} from '@wireapp/protocol-messaging';
+import UUID from 'uuidjs';
+
 import {AbortReason, PayloadBundleSource, PayloadBundleState, PayloadBundleType} from '..';
 import {AssetService} from '../AssetService';
 import {
@@ -63,8 +65,6 @@ import {
   TextMessage,
 } from './OtrMessage';
 import {TextContentBuilder} from './TextContentBuilder';
-
-const UUID = require('pure-uuid');
 
 export class MessageBuilder {
   private readonly apiClient: APIClient;
@@ -401,7 +401,7 @@ export class MessageBuilder {
   }
 
   public static createId(): string {
-    return new UUID(4).format();
+    return UUID.genV4().toString();
   }
 
   private getSelfUserId(): string {

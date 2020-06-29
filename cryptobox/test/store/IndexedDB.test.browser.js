@@ -19,11 +19,11 @@
 
 /* eslint no-magic-numbers: "off" */
 
-const {store: CryptoboxStore, Cryptobox} = require('@wireapp/cryptobox');
-const {LRUCache} = require('@wireapp/lru-cache');
-const Proteus = require('@wireapp/proteus');
-const UUID = require('pure-uuid');
-const {IndexedDBEngine} = require('@wireapp/store-engine-dexie');
+import {store as CryptoboxStore, Cryptobox} from '@wireapp/cryptobox';
+import {LRUCache} from '@wireapp/lru-cache';
+import * as Proteus from '@wireapp/proteus';
+import UUID from 'uuidjs';
+import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 
 describe('cryptobox.store.IndexedDB', () => {
   let dexieInstances = [];
@@ -55,7 +55,7 @@ describe('cryptobox.store.IndexedDB', () => {
   }
 
   async function createStore() {
-    const dbName = new UUID(4);
+    const dbName = UUID.genV4().toString();
     const engine = await createEngine(dbName);
     dexieInstances.push(engine.db);
     return new CryptoboxStore.CryptoboxCRUDStore(engine);

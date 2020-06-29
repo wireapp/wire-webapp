@@ -19,7 +19,7 @@
 
 import {APIClient} from '@wireapp/api-client';
 import {MemoryEngine} from '@wireapp/store-engine';
-import UUID from 'pure-uuid';
+import UUID from 'uuidjs';
 import {Account} from '../Account';
 
 describe('AssetService', () => {
@@ -34,10 +34,10 @@ describe('AssetService', () => {
   describe('"uploadImageAsset"', () => {
     it('builds an encrypted asset payload', async () => {
       const assetServerData = {
-        key: `3-2-${new UUID(4).format()}`,
-        keyBytes: Buffer.from(new UUID(4).format()),
-        sha256: new UUID(4).format(),
-        token: new UUID(4).format(),
+        key: `3-2-${UUID.genV4().toString()}`,
+        keyBytes: Buffer.from(UUID.genV4().toString()),
+        sha256: UUID.genV4().toString(),
+        token: UUID.genV4().toString(),
       };
 
       const assetService = account.service!.conversation['assetService'];

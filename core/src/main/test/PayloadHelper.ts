@@ -18,10 +18,10 @@
  */
 
 import faker = require('faker');
-import UUID from 'pure-uuid';
+import UUID from 'uuidjs';
 
 export function getUUID(): string {
-  return new UUID(4).format();
+  return UUID.genV4().toString();
 }
 
 export function getUrlParameter(url: string, parameter: string): string | string[] | null {

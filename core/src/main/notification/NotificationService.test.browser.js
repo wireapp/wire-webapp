@@ -21,9 +21,7 @@ import {APIClient} from '@wireapp/api-client';
 import {NotificationService} from '@wireapp/core/dist/notification/';
 import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 import Dexie from 'dexie';
-import UUID from 'pure-uuid';
-
-const UUIDVersion = 4;
+import UUID from 'uuidjs';
 
 describe('NotificationService', () => {
   let storeName = undefined;
@@ -39,7 +37,7 @@ describe('NotificationService', () => {
     });
 
     it('initializes last event date if database entry is not present', async () => {
-      storeName = new UUID(UUIDVersion).format();
+      storeName = UUID.genV4().toString();
       const db = new Dexie(storeName);
       db.version(1).stores({
         amplify: '',
@@ -67,7 +65,7 @@ describe('NotificationService', () => {
     });
 
     it('updates last event date if an older database record exists', async () => {
-      storeName = storeName = new UUID(UUIDVersion).format();
+      storeName = storeName = UUID.genV4().toString();
       const db = new Dexie(storeName);
       db.version(1).stores({
         amplify: '',
@@ -98,7 +96,7 @@ describe('NotificationService', () => {
   });
 
   it('ignores last event date update if newer database entry exists', async () => {
-    storeName = new UUID(UUIDVersion).format();
+    storeName = UUID.genV4().toString();
     const db = new Dexie(storeName);
     db.version(1).stores({
       amplify: '',
@@ -132,7 +130,7 @@ describe('NotificationService', () => {
   });
 
   it('initializes last notification ID if database entry is not present', async () => {
-    storeName = new UUID(UUIDVersion).format();
+    storeName = UUID.genV4().toString();
     const db = new Dexie(storeName);
     db.version(1).stores({
       amplify: '',
@@ -155,7 +153,7 @@ describe('NotificationService', () => {
   });
 
   it('updates last notification ID if database entry exists', async () => {
-    storeName = new UUID(UUIDVersion).format();
+    storeName = UUID.genV4().toString();
     const db = new Dexie(storeName);
     db.version(1).stores({
       amplify: '',

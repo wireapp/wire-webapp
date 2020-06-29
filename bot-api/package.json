@@ -3,7 +3,7 @@
     "@types/long": "4.0.1",
     "@types/node": "*",
     "@wireapp/core": "16.10.4",
-    "pure-uuid": "1.6.0"
+    "uuidjs": "4.2.5"
   },
   "devDependencies": {
     "cross-env": "7.0.2",

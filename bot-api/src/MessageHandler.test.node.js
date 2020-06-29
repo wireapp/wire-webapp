@@ -21,9 +21,7 @@ const {MemoryEngine} = require('@wireapp/store-engine');
 const {MessageHandler} = require('@wireapp/bot-api');
 const {Account} = require('@wireapp/core');
 const {CONVERSATION_TYPING} = require('@wireapp/api-client/dist/conversation/data/');
-
-const UUID = require('pure-uuid');
-const UUID_VERSION = 4;
+const UUID = require('uuidjs');
 
 describe('MessageHandler', () => {
   let mainHandler;
@@ -46,7 +44,7 @@ describe('MessageHandler', () => {
 
   describe('"sendConnectionResponse"', () => {
     it('sends the correct data when accepting the connection', async () => {
-      const userId = new UUID(UUID_VERSION).format();
+      const userId = UUID.genV4().toString();
       const acceptConnection = true;
 
       spyOn(mainHandler.account.service.connection, 'acceptConnection').and.returnValue(Promise.resolve());
@@ -58,7 +56,7 @@ describe('MessageHandler', () => {
     });
 
     it('sends the correct data when ignoring the connection', async () => {
-      const userId = new UUID(UUID_VERSION).format();
+      const userId = UUID.genV4().toString();
       const acceptConnection = false;
 
       spyOn(mainHandler.account.service.connection, 'acceptConnection').and.returnValue(Promise.resolve());
@@ -72,15 +70,15 @@ describe('MessageHandler', () => {
 
   describe('"sendFile"', () => {
     it('sends the correct data', async () => {
-      const conversationId = new UUID(UUID_VERSION).format();
-      const file = new UUID(UUID_VERSION).format();
-      const metadata = new UUID(UUID_VERSION).format();
+      const conversationId = UUID.genV4().toString();
+      const file = UUID.genV4().toString();
+      const metadata = UUID.genV4().toString();
 
       const filePayload = {
         data: file,
       };
       const metadataPayload = {
-        id: new UUID(UUID_VERSION).format(),
+        id: UUID.genV4().toString(),
       };
 
       spyOn(mainHandler.account.service.conversation.messageBuilder, 'createFileMetadata').and.returnValue(
@@ -108,15 +106,15 @@ describe('MessageHandler', () => {
     });
 
     it('sends the correct data if uploading fails', async () => {
-      const conversationId = new UUID(UUID_VERSION).format();
-      const file = new UUID(UUID_VERSION).format();
-      const metadata = new UUID(UUID_VERSION).format();
+      const conversationId = UUID.genV4().toString();
+      const file = UUID.genV4().toString();
+      const metadata = UUID.genV4().toString();
 
       const abortPayload = {
         data: file,
       };
       const metadataPayload = {
-        id: new UUID(UUID_VERSION).format(),
+        id: UUID.genV4().toString(),
       };
 
       spyOn(mainHandler.account.service.conversation.messageBuilder, 'createFileMetadata').and.returnValue(
@@ -145,11 +143,11 @@ describe('MessageHandler', () => {
 
   describe('"sendText"', () => {
     it('sends the correct data', async () => {
-      const conversationId = new UUID(UUID_VERSION).format();
-      const messageText = new UUID(UUID_VERSION).format();
+      const conversationId = UUID.genV4().toString();
+      const messageText = UUID.genV4().toString();
       const mentionData = [
         {
-          data: new UUID(UUID_VERSION).format(),
+          data: UUID.genV4().toString(),
         },
       ];
 
@@ -168,8 +166,8 @@ describe('MessageHandler', () => {
     });
 
     it('sends the correct data with mentions', async () => {
-      const conversationId = new UUID(UUID_VERSION).format();
-      const message = new UUID(UUID_VERSION).format();
+      const conversationId = UUID.genV4().toString();
+      const message = UUID.genV4().toString();
 
       spyOn(mainHandler.account.service.conversation.messageBuilder, 'createText').and.callThrough();
 
@@ -186,9 +184,9 @@ describe('MessageHandler', () => {
     });
 
     it('sends the correct data to target users', async () => {
-      const conversationId = new UUID(UUID_VERSION).format();
-      const message = new UUID(UUID_VERSION).format();
-      const userIds = [new UUID(UUID_VERSION).format(), new UUID(UUID_VERSION).format()];
+      const conversationId = UUID.genV4().toString();
+      const message = UUID.genV4().toString();
+      const userIds = [UUID.genV4().toString(), UUID.genV4().toString()];
 
       spyOn(mainHandler.account.service.conversation.messageBuilder, 'createText').and.callThrough();
 
@@ -207,7 +205,7 @@ describe('MessageHandler', () => {
 
   describe('"sendTyping"', () => {
     it('sends the correct data when typing started', async () => {
-      const conversationId = new UUID(UUID_VERSION).format();
+      const conversationId = UUID.genV4().toString();
 
       spyOn(mainHandler.account.service.conversation, 'sendTypingStart').and.returnValue(Promise.resolve());
       spyOn(mainHandler.account.service.conversation, 'sendTypingStop').and.returnValue(Promise.resolve());
@@ -219,7 +217,7 @@ describe('MessageHandler', () => {
     });
 
     it('sends the correct data when typing stopped', async () => {
-      const conversationId = new UUID(UUID_VERSION).format();
+      const conversationId = UUID.genV4().toString();
 
       spyOn(mainHandler.account.service.conversation, 'sendTypingStart').and.returnValue(Promise.resolve());
       spyOn(mainHandler.account.service.conversation, 'sendTypingStop').and.returnValue(Promise.resolve());
