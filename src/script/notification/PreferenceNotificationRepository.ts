@@ -29,7 +29,7 @@ import type {User} from '../entity/User';
 import {BackendEvent} from '../event/Backend';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 
-export interface Notification {
+interface Notification {
   data: ClientEntity | boolean;
   type: string;
 }

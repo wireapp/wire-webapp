@@ -45,7 +45,7 @@ export class GroupParticipantServiceViewModel extends BasePanelViewModel {
     this.integrationRepository = repositories.integration;
     this.actionsViewModel = mainViewModel.actions;
 
-    this.logger = getLogger('GroupParticipantServiceViewModel');
+    this.logger = getLogger('z.viewModel.panel.GroupParticipantServiceViewModel');
 
     this.selectedParticipant = ko.observable(undefined);
     this.selectedService = ko.observable(undefined);
