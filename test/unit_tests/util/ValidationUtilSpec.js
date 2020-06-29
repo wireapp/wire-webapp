@@ -17,8 +17,6 @@
  *
  */
 
-import UUID from 'pure-uuid';
-
 import {createRandomUuid} from 'Util/util';
 import {
   isBearerToken,
@@ -149,7 +147,7 @@ describe('ValidationUtil', () => {
 
   describe('"isUUID"', () => {
     it('detects a correct UUID', () => {
-      const uuid = new UUID(4).format();
+      const uuid = createRandomUuid();
       const actual = isUUID(uuid);
 
       expect(actual).toBe(true);
