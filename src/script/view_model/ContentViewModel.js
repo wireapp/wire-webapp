@@ -42,6 +42,7 @@ import {GiphyViewModel} from './content/GiphyViewModel';
 import {HistoryImportViewModel} from './content/HistoryImportViewModel';
 import {HistoryExportViewModel} from './content/HistoryExportViewModel';
 import {PreferencesAccountViewModel} from './content/PreferencesAccountViewModel';
+import {TitleBarViewModel} from './content/TitleBarViewModel';
 
 export class ContentViewModel {
   static get STATE() {
@@ -100,11 +101,13 @@ export class ContentViewModel {
       repositories.cryptography,
     );
     this.messageList = new MessageListViewModel(mainViewModel, this, repositories);
-    this.titleBar = new z.viewModel.content.TitleBarViewModel(
+    this.titleBar = new TitleBarViewModel(
       mainViewModel.calling,
       mainViewModel.panel,
       this,
-      repositories,
+      repositories.calling,
+      repositories.conversation,
+      repositories.user,
     );
 
     this.preferencesAbout = new z.viewModel.content.PreferencesAboutViewModel(mainViewModel, this, repositories);
