@@ -69,8 +69,8 @@ interface DiscreteTimeUnit {
 }
 
 export interface DurationUnit {
-  text: string;
   symbol: string;
+  text: string;
   value: number;
 }
 
@@ -85,8 +85,8 @@ export enum TIME_IN_MILLIS {
 const locales = {cs, da, de, el, es, et, fi, fr, hr, hu, it, lt, nl, pl, pt, ro, ru, sk, sl, tr, uk};
 const defaultLocale = enUS;
 let locale = defaultLocale;
-
-export const setDateLocale = (newLocale: keyof typeof locales) => (locale = locales[newLocale] || defaultLocale);
+export type LocaleType = keyof typeof locales;
+export const setDateLocale = (newLocale: LocaleType) => (locale = locales[newLocale] || defaultLocale);
 
 export const formatLocale = (date: FnDate | string | number, formatString: string) =>
   format(new Date(date), formatString, {locale});

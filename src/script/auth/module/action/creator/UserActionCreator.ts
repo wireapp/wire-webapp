@@ -17,12 +17,12 @@
  *
  */
 
-import {AppAction} from '.';
+import type {AppAction} from '.';
 
 export enum USER_ACTION {
+  USER_SEND_ACTIVATION_CODE_FAILED = 'USER_SEND_ACTIVATION_CODE_FAILED',
   USER_SEND_ACTIVATION_CODE_START = 'USER_SEND_ACTIVATION_CODE_START',
   USER_SEND_ACTIVATION_CODE_SUCCESS = 'USER_SEND_ACTIVATION_CODE_SUCCESS',
-  USER_SEND_ACTIVATION_CODE_FAILED = 'USER_SEND_ACTIVATION_CODE_FAILED',
 }
 
 export type UserActions =
@@ -37,8 +37,8 @@ export interface SendActivationCodeSuccessAction extends AppAction {
   readonly type: USER_ACTION.USER_SEND_ACTIVATION_CODE_SUCCESS;
 }
 export interface SendActivationCodeFailedAction extends AppAction {
-  readonly type: USER_ACTION.USER_SEND_ACTIVATION_CODE_FAILED;
   readonly error: Error;
+  readonly type: USER_ACTION.USER_SEND_ACTIVATION_CODE_FAILED;
 }
 
 export class UserActionCreator {

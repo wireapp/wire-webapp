@@ -17,15 +17,15 @@
  *
  */
 
-import {User as APIClientUser} from '@wireapp/api-client/dist/user';
-import {Self as APIClientSelf} from '@wireapp/api-client/dist/self';
+import type {User as APIClientUser} from '@wireapp/api-client/dist/user';
+import type {Self as APIClientSelf} from '@wireapp/api-client/dist/self';
 
 import {joaatHash} from 'Util/Crypto';
 import {Logger, getLogger} from 'Util/Logger';
 
 import {mapProfileAssets, mapProfileAssetsV1, updateUserEntityAssets} from '../assets/AssetMapper';
 import {User} from '../entity/User';
-import {ServerTimeHandler} from '../time/serverTimeHandler';
+import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import '../view_model/bindings/CommonBindings';
 
 export class UserMapper {

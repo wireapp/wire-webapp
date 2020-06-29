@@ -32,23 +32,24 @@ import {generateConversationUrl} from '../../router/routeGenerator';
 import 'Components/calling/fullscreenVideoCall';
 import 'Components/groupVideoGrid';
 import 'Components/list/participantItem';
-import {Call} from '../../calling/Call';
-import {CallingRepository} from '../../calling/CallingRepository';
-import {Grid} from '../../calling/videoGridHandler';
-import {Conversation} from '../../entity/Conversation';
-import {User} from '../../entity/User';
-import {CallActions} from '../../view_model/CallingViewModel';
+import type {Call} from '../../calling/Call';
+import type {CallingRepository} from '../../calling/CallingRepository';
+import type {Grid} from '../../calling/videoGridHandler';
+import type {Conversation} from '../../entity/Conversation';
+import type {User} from '../../entity/User';
+import type {CallActions} from '../../view_model/CallingViewModel';
+import type {Multitasking} from '../../notification/NotificationRepository';
 
 interface ComponentParams {
   call: Call;
-  conversation: ko.PureComputed<Conversation>;
-  videoGrid: ko.PureComputed<Grid>;
-  callingRepository: CallingRepository;
-  temporaryUserStyle?: boolean;
-  multitasking: any;
   callActions: CallActions;
+  callingRepository: CallingRepository;
+  conversation: ko.PureComputed<Conversation>;
   hasAccessToCamera: ko.Observable<boolean>;
   isSelfVerified: ko.Subscribable<boolean>;
+  multitasking: Multitasking;
+  temporaryUserStyle?: boolean;
+  videoGrid: ko.PureComputed<Grid>;
 }
 
 class ConversationListCallingCell {
@@ -64,12 +65,13 @@ class ConversationListCallingCell {
   readonly dispose: () => void;
   readonly isConnecting: ko.PureComputed<boolean>;
   readonly isDeclined: ko.PureComputed<boolean>;
+  readonly isStillOngoing: ko.PureComputed<boolean>;
   readonly isIdle: ko.PureComputed<boolean>;
   readonly isIncoming: ko.PureComputed<boolean>;
   readonly isMuted: ko.Observable<boolean>;
   readonly isOngoing: ko.PureComputed<boolean>;
   readonly isOutgoing: ko.PureComputed<boolean>;
-  readonly multitasking: any;
+  readonly multitasking: Multitasking;
   readonly ParticipantAvatar: typeof ParticipantAvatar;
   readonly participantsButtonLabel: ko.PureComputed<string>;
   readonly showMaximize: ko.PureComputed<boolean>;
@@ -77,6 +79,7 @@ class ConversationListCallingCell {
   readonly showParticipants: ko.Observable<boolean>;
   readonly showParticipantsButton: ko.PureComputed<boolean>;
   readonly showVideoButton: ko.PureComputed<boolean>;
+  readonly showJoinButton: ko.PureComputed<boolean>;
   readonly showVideoGrid: ko.PureComputed<boolean>;
   readonly temporaryUserStyle: boolean;
   readonly videoGrid: ko.PureComputed<Grid>;
@@ -123,6 +126,8 @@ class ConversationListCallingCell {
       [CALL_REASON.STILL_ONGOING, CALL_REASON.ANSWERED_ELSEWHERE].includes(call.reason()),
     );
 
+    this.isStillOngoing = ko.pureComputed(() => [CALL_REASON.STILL_ONGOING].includes(call.reason()));
+
     this.isMuted = callingRepository.isMuted;
 
     this.callDuration = ko.observable();
@@ -154,10 +159,11 @@ class ConversationListCallingCell {
     });
 
     this.showVideoButton = ko.pureComputed(() => call.initialType === CALL_TYPE.VIDEO || this.isOngoing());
+    this.showJoinButton = ko.pureComputed(() => conversation() && this.isStillOngoing() && temporaryUserStyle);
     this.disableScreenButton = !this.callingRepository.supportsScreenSharing;
     this.disableVideoButton = ko.pureComputed(() => {
       const isOutgoingVideoCall = this.isOutgoing() && call.selfParticipant.sharesCamera();
-      const isVideoUnsupported = !call.selfParticipant.sharesCamera() && !conversation().supportsVideoCall(true);
+      const isVideoUnsupported = !call.selfParticipant.sharesCamera() && !conversation().supportsVideoCall();
       return isOutgoingVideoCall || isVideoUnsupported;
     });
 
@@ -178,6 +184,10 @@ class ConversationListCallingCell {
 
   endCall(call: Call): void {
     return this.isIncoming() ? this.callActions.reject(call) : this.callActions.leave(call);
+  }
+
+  joinCall(call: Call) {
+    this.callActions.answer(call);
   }
 
   showFullscreenVideoGrid(): void {
@@ -205,6 +215,9 @@ class ConversationListCallingCell {
 
 ko.components.register('conversation-list-calling-cell', {
   template: `
+   <!-- ko if: showJoinButton() -->
+     <div class="call-ui__button call-ui__button--green call-ui__button--join" style="margin: 16px 16px 0 16px;" data-bind="click: () => joinCall(call), text: t('callJoin')" data-uie-name="do-call-controls-call-join"></div>
+   <!-- /ko -->
    <!-- ko if: conversation() && !isDeclined() -->
     <div class="conversation-list-calling-cell conversation-list-cell">
       <!-- ko ifnot: temporaryUserStyle -->
@@ -235,7 +248,12 @@ ko.components.register('conversation-list-calling-cell', {
           <span class="conversation-list-cell-description" data-bind="text: t('callStateConnecting')" data-uie-name="call-label-connecting"></span>
         <!-- /ko -->
         <!-- ko if: callDuration() -->
-          <span class="conversation-list-cell-description" data-bind="text: callDuration()" data-uie-name="call-duration"></span>
+          <div class="conversation-list-info-wrapper">
+            <span class="conversation-list-cell-description" data-bind="text: callDuration()" data-uie-name="call-duration"></span>
+            <!-- ko if: call.isCbrEnabled -->
+              <span class="conversation-list-cell-description" data-bind="text: t('callStateCbr')" data-uie-name="call-cbr"></span>
+            <!-- /ko -->
+          </div>
         <!-- /ko -->
       </div>
 

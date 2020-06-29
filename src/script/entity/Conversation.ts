@@ -23,7 +23,7 @@ import {Availability, Confirmation, LegalHoldStatus} from '@wireapp/protocol-mes
 import {debounce, Cancelable} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {getLogger, Logger} from 'Util/Logger';
+import {Logger, getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {truncate} from 'Util/StringUtil';
 
@@ -41,11 +41,11 @@ import {StatusType} from '../message/StatusType';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
 import {HIDE_LEGAL_HOLD_MODAL} from '../view_model/content/LegalHoldModalViewModel';
 import {ConversationError} from '../error/ConversationError';
-import {User} from './User';
-import {ContentMessage} from './message/ContentMessage';
-import {MemberMessage} from './message/MemberMessage';
-import {Message} from './message/Message';
-import {SystemMessage} from './message/SystemMessage';
+import type {User} from './User';
+import type {ContentMessage} from './message/ContentMessage';
+import type {MemberMessage} from './message/MemberMessage';
+import type {Message} from './message/Message';
+import type {SystemMessage} from './message/SystemMessage';
 
 interface UnreadState {
   allEvents: Message[];
@@ -893,27 +893,10 @@ export class Conversation {
     return userEntities.filter(userEntity => !userEntity.is_verified());
   }
 
-  supportsVideoCall(isCreatingUser: boolean = false): boolean {
-    if (this.is1to1()) {
-      return true;
-    }
-
+  supportsVideoCall(): boolean {
     const participantCount = this.getNumberOfParticipants(true, false);
     const passesParticipantLimit = participantCount <= Config.getConfig().MAX_VIDEO_PARTICIPANTS;
-
-    if (!passesParticipantLimit) {
-      return false;
-    }
-
-    if (this.selfUser().inTeam()) {
-      return true;
-    }
-
-    if (isCreatingUser) {
-      return false;
-    }
-
-    return true;
+    return passesParticipantLimit;
   }
 
   isShowingLastReceivedMessage = (): boolean => {

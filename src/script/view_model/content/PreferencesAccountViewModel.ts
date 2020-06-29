@@ -19,15 +19,18 @@
 
 import {Availability, Confirmation} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {getLogger} from 'Util/Logger';
+import {amplify} from 'amplify';
+import ko from 'knockout';
+import {WebappProperties} from '@wireapp/api-client/dist/user/data';
 import {t} from 'Util/LocalizerUtil';
 import {isTemporaryClientAndNonPersistent, validateProfileImageResolution} from 'Util/util';
 import {Environment} from 'Util/Environment';
 import {isKey, KEY} from 'Util/KeyboardUtil';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
+import type {RichInfoField} from '@wireapp/api-client/dist/user/RichInfo';
+import {ChangeEvent} from 'react';
 
-import {PreferenceNotificationRepository} from '../../notification/PreferenceNotificationRepository';
+import {PreferenceNotificationRepository, Notification} from '../../notification/PreferenceNotificationRepository';
 import {getAccountPagesUrl, getCreateTeamUrl, getManageTeamUrl, URL_PATH} from '../../externalRoute';
 import {PropertiesRepository} from '../../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
@@ -45,18 +48,55 @@ import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {EventName} from '../../tracking/EventName';
 import {ContentViewModel} from '../ContentViewModel';
+import {Logger} from '@wireapp/commons';
+import {getLogger} from 'Util/Logger';
 
 import 'Components/availabilityState';
 import {isAppLockEnabled} from './AppLockViewModel';
 import {loadValue} from 'Util/StorageUtil';
 import {StorageKey} from '../../storage';
 import {UserError} from '../../error/UserError';
+import {HistoryExportViewModel} from './HistoryExportViewModel';
+import {ClientRepository} from '../../client/ClientRepository';
+import {ConversationRepository} from '../../conversation/ConversationRepository';
+import {TeamRepository} from '../../team/TeamRepository';
+import {AccentColorID} from '@wireapp/commons/dist/commonjs/util/AccentColor';
+import {TeamEntity} from '../../team/TeamEntity';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.content = z.viewModel.content || {};
+export class PreferencesAccountViewModel {
+  logger: Logger;
+  fileExtension: string;
+  isDesktop: boolean;
+  brandName: string;
+  isActivatedAccount: ko.PureComputed<boolean>;
+  selfUser: ko.Observable<User>;
+  name: ko.PureComputed<string>;
+  availability: ko.PureComputed<Availability.Type>;
+  availabilityLabel: ko.PureComputed<string>;
+  username: ko.PureComputed<string>;
+  enteredUsername: ko.Observable<string>;
+  submittedUsername: ko.Observable<string>;
+  usernameState: ko.Observable<string>;
+  richProfileFields: ko.Observable<RichInfoField[]>;
+  nameSaved: ko.Observable<boolean>;
+  usernameSaved: ko.Observable<boolean>;
+  isTeam: ko.PureComputed<boolean>;
+  team: ko.Observable<TeamEntity>;
+  teamName: ko.PureComputed<string>;
+  optionPrivacy: ko.Observable<boolean>;
+  optionReadReceipts: ko.Observable<Confirmation.Type>;
+  optionMarketingConsent: ko.Observable<boolean | ConsentValue>;
+  optionResetAppLock: boolean;
+  ParticipantAvatar: typeof ParticipantAvatar;
+  isMacOsWrapper: boolean;
+  manageTeamUrl: string;
+  createTeamUrl: string;
+  isTemporaryAndNonPersistent: boolean;
+  isConsentCheckEnabled: () => boolean;
+  canEditProfile: (user: User) => boolean;
+  Config: typeof PreferencesAccountViewModel.CONFIG;
+  UserNameState: typeof PreferencesAccountViewModel.USERNAME_STATE;
 
-z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewModel {
   static get CONFIG() {
     return {
       PROFILE_IMAGE: {
@@ -73,25 +113,23 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     };
   }
 
-  constructor(mainViewModel, contentViewModel, repositories) {
-    this.changeAccentColor = this.changeAccentColor.bind(this);
-    this.removedFromView = this.removedFromView.bind(this);
-
-    this.logger = getLogger('z.viewModel.content.PreferencesAccountViewModel');
-
-    this.mainViewModel = mainViewModel;
-    this.backupRepository = repositories.backup;
-    this.clientRepository = repositories.client;
-    this.conversationRepository = repositories.conversation;
-    this.preferenceNotificationRepository = repositories.preferenceNotification;
-    this.propertiesRepository = repositories.properties;
-    this.teamRepository = repositories.team;
-    this.userRepository = repositories.user;
-    this.Environment = Environment;
+  constructor(
+    private readonly clientRepository: ClientRepository,
+    private readonly conversationRepository: ConversationRepository,
+    private readonly preferenceNotificationRepository: PreferenceNotificationRepository,
+    private readonly propertiesRepository: PropertiesRepository,
+    private readonly teamRepository: TeamRepository,
+    private readonly userRepository: UserRepository,
+  ) {
+    this.logger = getLogger('PreferencesAccountViewModel');
+    this.fileExtension = HistoryExportViewModel.CONFIG.FILE_EXTENSION;
+    this.isDesktop = Environment.desktop;
     this.brandName = Config.getConfig().BRAND_NAME;
 
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
     this.selfUser = this.userRepository.self;
+    this.Config = PreferencesAccountViewModel.CONFIG;
+    this.UserNameState = PreferencesAccountViewModel.USERNAME_STATE;
 
     this.name = ko.pureComputed(() => this.selfUser().name());
     this.availability = ko.pureComputed(() => this.selfUser().availability());
@@ -101,9 +139,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
       const noStatusSet = this.availability() === Availability.Type.NONE;
       if (noStatusSet) {
-        // TODO: fix typo in translation string
-        /* cspell:disable-next-line */
-        label = t('preferencesAccountAvaibilityUnset');
+        label = t('preferencesAccountAvailabilityUnset');
       }
 
       return label;
@@ -145,15 +181,15 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this._initSubscriptions();
   }
 
-  _initSubscriptions() {
+  _initSubscriptions = () => {
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, this.updateProperties);
-  }
+  };
 
-  changeAccentColor(id) {
+  changeAccentColor = (id: AccentColorID) => {
     this.userRepository.changeAccentColor(id);
-  }
+  };
 
-  changeName(viewModel, event) {
+  changeName = async (viewModel: unknown, event: ChangeEvent<HTMLInputElement>): Promise<void> => {
     const newName = event.target.value.trim();
 
     const isUnchanged = newName === this.selfUser().name();
@@ -163,15 +199,18 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
     const isValidName = newName.length >= UserRepository.CONFIG.MINIMUM_NAME_LENGTH;
     if (isValidName) {
-      this.userRepository.changeName(newName).then(() => {
+      try {
+        await this.userRepository.changeName(newName);
         this.nameSaved(true);
         event.target.blur();
         window.setTimeout(() => this.nameSaved(false), PreferencesAccountViewModel.CONFIG.SAVE_ANIMATION_TIMEOUT);
-      });
+      } catch (error) {
+        this.logger.warn('Failed to update name', error);
+      }
     }
-  }
+  };
 
-  changeUsername(username, event) {
+  changeUsername = async (username: string, event: ChangeEvent<HTMLInputElement>): Promise<void> => {
     const enteredUsername = event.target.value;
     const normalizedUsername = enteredUsername.toLowerCase().replace(/[^a-z0-9_]/g, '');
 
@@ -191,69 +230,76 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     }
 
     this.submittedUsername(normalizedUsername);
-    this.userRepository
-      .changeUsername(normalizedUsername)
-      .then(() => {
-        const isCurrentRequest = this.enteredUsername() === this.submittedUsername();
-        if (isCurrentRequest) {
-          this.usernameState(null);
-          this.usernameSaved(true);
+    try {
+      await this.userRepository.changeUsername(normalizedUsername);
 
-          event.target.blur();
-          window.setTimeout(() => this.usernameSaved(false), PreferencesAccountViewModel.CONFIG.SAVE_ANIMATION_TIMEOUT);
-        }
-      })
-      .catch(error => {
-        const isUsernameTaken = error.type === UserError.TYPE.USERNAME_TAKEN;
-        const isCurrentRequest = this.enteredUsername() === this.submittedUsername();
-        if (isUsernameTaken && isCurrentRequest) {
-          this.usernameState(PreferencesAccountViewModel.USERNAME_STATE.TAKEN);
-        }
-      });
-  }
+      const isCurrentRequest = this.enteredUsername() === this.submittedUsername();
+      if (isCurrentRequest) {
+        this.usernameState(null);
+        this.usernameSaved(true);
 
-  checkUsernameInput(username, keyboardEvent) {
+        event.target.blur();
+        window.setTimeout(() => this.usernameSaved(false), PreferencesAccountViewModel.CONFIG.SAVE_ANIMATION_TIMEOUT);
+      }
+    } catch (error) {
+      const isUsernameTaken = error.type === UserError.TYPE.USERNAME_TAKEN;
+      const isCurrentRequest = this.enteredUsername() === this.submittedUsername();
+      if (isUsernameTaken && isCurrentRequest) {
+        this.usernameState(PreferencesAccountViewModel.USERNAME_STATE.TAKEN);
+      }
+    }
+  };
+
+  checkUsernameInput = (username: string, keyboardEvent: KeyboardEvent) => {
     if (isKey(keyboardEvent, KEY.BACKSPACE)) {
       return true;
     }
 
     // Automation: KeyboardEvent triggered during tests is missing key property
-    const inputChar = keyboardEvent.key || String.fromCharCode(event.charCode);
+    const inputChar = keyboardEvent.key || String.fromCharCode(keyboardEvent.charCode);
     return validateCharacter(inputChar.toLowerCase());
-  }
+  };
 
-  popNotification() {
+  popNotification = () => {
     this.preferenceNotificationRepository
       .getNotifications()
       .forEach(({type, notification}) => this._showNotification(type, notification));
-  }
+  };
 
-  _showNotification(type, aggregatedNotifications) {
+  _showNotification = (type: string, aggregatedNotifications: Notification[]) => {
     switch (type) {
       case PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT: {
-        modals.showModal(ModalsViewModel.TYPE.ACCOUNT_NEW_DEVICES, {
-          data: aggregatedNotifications.map(notification => notification.data),
-          preventClose: true,
-          secondaryAction: {
-            action: () => {
-              amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.PREFERENCES_DEVICES);
+        modals.showModal(
+          ModalsViewModel.TYPE.ACCOUNT_NEW_DEVICES,
+          {
+            data: aggregatedNotifications.map(notification => notification.data),
+            preventClose: true,
+            secondaryAction: {
+              action: () => {
+                amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.PREFERENCES_DEVICES);
+              },
             },
           },
-        });
+          undefined,
+        );
         break;
       }
 
       case PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.READ_RECEIPTS_CHANGED: {
-        modals.showModal(ModalsViewModel.TYPE.ACCOUNT_READ_RECEIPTS_CHANGED, {
-          data: aggregatedNotifications.pop().data,
-          preventClose: true,
-        });
+        modals.showModal(
+          ModalsViewModel.TYPE.ACCOUNT_READ_RECEIPTS_CHANGED,
+          {
+            data: aggregatedNotifications.pop().data,
+            preventClose: true,
+          },
+          undefined,
+        );
         break;
       }
     }
-  }
+  };
 
-  clickOnChangePicture(files) {
+  clickOnChangePicture = (files: File[]) => {
     const [newUserPicture] = Array.from(files);
 
     this.setPicture(newUserPicture).catch(error => {
@@ -262,89 +308,104 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
         throw error;
       }
     });
-  }
+  };
 
-  clickOnAvailability(viewModel, event) {
+  clickOnAvailability = (viewModel: unknown, event: MouseEvent) => {
     AvailabilityContextMenu.show(event, 'settings', 'preferences-account-availability-menu');
-  }
+  };
 
-  clickOnBackupExport() {
+  clickOnBackupExport = (): void => {
     amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.HISTORY_EXPORT);
     amplify.publish(WebAppEvents.BACKUP.EXPORT.START);
-  }
+  };
 
-  onImportFileChange(viewModel, event) {
+  onImportFileChange = (viewModel: unknown, event: ChangeEvent<HTMLInputElement>): void => {
     const file = event.target.files[0];
     if (file) {
       amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.HISTORY_IMPORT);
       amplify.publish(WebAppEvents.BACKUP.IMPORT.START, file);
     }
-  }
+  };
 
-  clickOnDeleteAccount() {
-    modals.showModal(ModalsViewModel.TYPE.CONFIRM, {
-      primaryAction: {
-        action: () => this.userRepository.deleteMe(),
-        text: t('modalAccountDeletionAction'),
+  clickOnDeleteAccount = (): void => {
+    modals.showModal(
+      ModalsViewModel.TYPE.CONFIRM,
+      {
+        primaryAction: {
+          action: () => this.userRepository.deleteMe(),
+          text: t('modalAccountDeletionAction'),
+        },
+        text: {
+          message: t('modalAccountDeletionMessage'),
+          title: t('modalAccountDeletionHeadline'),
+        },
       },
-      text: {
-        message: t('modalAccountDeletionMessage'),
-        title: t('modalAccountDeletionHeadline'),
-      },
-    });
-  }
+      undefined,
+    );
+  };
 
-  clickOnLeaveGuestRoom() {
-    modals.showModal(ModalsViewModel.TYPE.CONFIRM, {
-      preventClose: true,
-      primaryAction: {
-        action: () => this.conversationRepository.leaveGuestRoom().then(() => this.clientRepository.logoutClient()),
-        text: t('modalAccountLeaveGuestRoomAction'),
+  clickOnLeaveGuestRoom = (): void => {
+    modals.showModal(
+      ModalsViewModel.TYPE.CONFIRM,
+      {
+        preventClose: true,
+        primaryAction: {
+          action: async (): Promise<void> => {
+            try {
+              await this.conversationRepository.leaveGuestRoom();
+              this.clientRepository.logoutClient();
+            } catch (error) {
+              this.logger.warn('Error while leaving room', error);
+            }
+          },
+          text: t('modalAccountLeaveGuestRoomAction'),
+        },
+        text: {
+          message: t('modalAccountLeaveGuestRoomMessage'),
+          title: t('modalAccountLeaveGuestRoomHeadline'),
+        },
       },
-      text: {
-        message: t('modalAccountLeaveGuestRoomMessage'),
-        title: t('modalAccountLeaveGuestRoomHeadline'),
-      },
-    });
-  }
+      undefined,
+    );
+  };
 
-  clickOnLogout() {
+  clickOnLogout = (): void => {
     this.clientRepository.logoutClient();
-  }
+  };
 
-  clickOpenManageTeam() {
+  clickOpenManageTeam = (): void => {
     if (this.manageTeamUrl) {
       safeWindowOpen(this.manageTeamUrl);
       amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.SETTINGS.OPENED_MANAGE_TEAM);
     }
-  }
+  };
 
-  clickOnResetPassword() {
+  clickOnResetPassword = (): void => {
     safeWindowOpen(getAccountPagesUrl(URL_PATH.PASSWORD_RESET));
-  }
+  };
 
-  clickOnResetAppLockPassphrase() {
+  clickOnResetAppLockPassphrase = (): void => {
     amplify.publish(WebAppEvents.PREFERENCES.CHANGE_APP_LOCK_PASSPHRASE);
-  }
+  };
 
-  removedFromView() {
+  removedFromView = (): void => {
     this._resetUsernameInput();
-  }
+  };
 
-  resetNameInput() {
+  resetNameInput = (): void => {
     if (!this.nameSaved()) {
       this.name.notifySubscribers();
     }
-  }
+  };
 
-  resetUsernameInput() {
+  resetUsernameInput = (): void => {
     if (!this.usernameSaved()) {
       this._resetUsernameInput();
       this.username.notifySubscribers();
     }
-  }
+  };
 
-  setPicture(newUserPicture) {
+  setPicture = async (newUserPicture: File): Promise<boolean | User> => {
     const isTooLarge = newUserPicture.size > Config.getConfig().MAXIMUM_IMAGE_FILE_SIZE;
     if (isTooLarge) {
       const maximumSizeInMB = Config.getConfig().MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024;
@@ -365,7 +426,8 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     const minHeight = UserRepository.CONFIG.MINIMUM_PICTURE_SIZE.HEIGHT;
     const minWidth = UserRepository.CONFIG.MINIMUM_PICTURE_SIZE.WIDTH;
 
-    return validateProfileImageResolution(newUserPicture, minWidth, minHeight).then(isValid => {
+    try {
+      const isValid = await validateProfileImageResolution(newUserPicture, minWidth, minHeight);
       if (isValid) {
         return this.userRepository.changePicture(newUserPicture);
       }
@@ -373,14 +435,15 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
       const messageString = t('modalPictureTooSmallMessage');
       const titleString = t('modalPictureTooSmallHeadline');
       return this._showUploadWarning(titleString, messageString);
-    });
-  }
+    } catch (error) {
+      this.logger.error('Failed to validate profile image', error);
+      return false;
+    }
+  };
 
-  shouldFocusUsername() {
-    return this.userRepository.should_set_username;
-  }
+  shouldFocusUsername = (): boolean => this.userRepository.should_set_username;
 
-  verifyUsername(username, event) {
+  verifyUsername = (username: string, event: ChangeEvent<HTMLInputElement>): void => {
     const enteredUsername = event.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '');
 
     const usernameTooShort = enteredUsername.length < UserRepository.CONFIG.MINIMUM_USERNAME_LENGTH;
@@ -408,36 +471,36 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
           }
         });
     }
-  }
+  };
 
-  _showUploadWarning(title, message) {
+  _showUploadWarning = (title: string, message: string): Promise<never> => {
     const modalOptions = {text: {message, title}};
-    modals.showModal(ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
+    modals.showModal(ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions, undefined);
 
     return Promise.reject(new UserError(UserError.TYPE.INVALID_UPDATE, UserError.MESSAGE.INVALID_UPDATE));
-  }
+  };
 
-  _resetUsernameInput() {
+  _resetUsernameInput = (): void => {
     this.usernameState(null);
     this.enteredUsername(null);
     this.submittedUsername(null);
-  }
+  };
 
-  onReadReceiptsChange(viewModel, event) {
+  onReadReceiptsChange = (viewModel: unknown, event: ChangeEvent<HTMLInputElement>): boolean => {
     const isChecked = event.target.checked;
     const mode = isChecked ? Confirmation.Type.READ : Confirmation.Type.DELIVERED;
     this.propertiesRepository.updateProperty(PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key, mode);
     return true;
-  }
+  };
 
-  onMarketingConsentChange(viewModel, event) {
+  onMarketingConsentChange = (viewModel: unknown, event: ChangeEvent<HTMLInputElement>): boolean => {
     const isChecked = event.target.checked;
     const mode = isChecked ? ConsentValue.GIVEN : ConsentValue.NOT_GIVEN;
     this.propertiesRepository.updateProperty(PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT.key, mode);
     return true;
-  }
+  };
 
-  updateProperties = ({settings}) => {
+  updateProperties = ({settings}: WebappProperties): void => {
     this.optionPrivacy(settings.privacy.improve_wire);
   };
-};
+}

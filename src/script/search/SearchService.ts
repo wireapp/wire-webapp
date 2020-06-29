@@ -17,8 +17,8 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client';
-import {SearchResult} from '@wireapp/api-client/dist/user';
+import type {APIClient} from '@wireapp/api-client';
+import type {SearchResult} from '@wireapp/api-client/dist/user';
 
 export class SearchService {
   private readonly apiClient: APIClient;

@@ -20,14 +20,14 @@
 import {t} from 'Util/LocalizerUtil';
 import {getRenderedTextContent} from 'Util/messageRenderer';
 
-import {Text} from '../entity/message/Text';
-import {File} from '../entity/message/File';
+import type {Text} from '../entity/message/Text';
+import type {FileAsset} from '../entity/message/FileAsset';
 import {AssetTransferState} from '../assets/AssetTransferState';
-import {Conversation} from '../entity/Conversation';
+import type {Conversation} from '../entity/Conversation';
 import {ConversationStatusIcon} from './ConversationStatusIcon';
 import {ConversationError} from '../error/ConversationError';
-import {MemberMessage} from '../entity/message/MemberMessage';
-import {SystemMessage} from '../entity/message/SystemMessage';
+import type {MemberMessage} from '../entity/message/MemberMessage';
+import type {SystemMessage} from '../entity/message/SystemMessage';
 
 enum ACTIVITY_TYPE {
   CALL = 'ConversationCellState.ACTIVITY_TYPE.CALL',
@@ -317,7 +317,7 @@ const _getStateUnreadMessage = {
         string = true;
       } else if (messageEntity.has_asset()) {
         const assetEntity = messageEntity.get_first_asset();
-        const isUploaded = (assetEntity as File).status() === AssetTransferState.UPLOADED;
+        const isUploaded = (assetEntity as FileAsset).status() === AssetTransferState.UPLOADED;
 
         if (isUploaded) {
           if (assetEntity.is_audio()) {

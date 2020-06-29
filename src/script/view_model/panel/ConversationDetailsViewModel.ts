@@ -19,9 +19,10 @@
 
 import ko from 'knockout';
 import {amplify} from 'amplify';
+import {Confirmation} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {getLogger, Logger} from 'Util/Logger';
+import {Logger, getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {formatDuration} from 'Util/TimeUtil';
 import {removeLineBreaks, sortUsersByPriority} from 'Util/StringUtil';
@@ -32,14 +33,14 @@ import {ConversationVerificationState} from '../../conversation/ConversationVeri
 import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
-import {IntegrationRepository} from '../../integration/IntegrationRepository';
-import {SearchRepository} from '../../search/SearchRepository';
-import {TeamRepository} from '../../team/TeamRepository';
-import {UserRepository} from '../../user/UserRepository';
-import {ActionsViewModel} from '../ActionsViewModel';
-import {ServiceEntity} from '../../integration/ServiceEntity';
-import {User} from '../../entity/User';
-import {Conversation} from '../../entity/Conversation';
+import type {IntegrationRepository} from '../../integration/IntegrationRepository';
+import type {SearchRepository} from '../../search/SearchRepository';
+import type {TeamRepository} from '../../team/TeamRepository';
+import type {UserRepository} from '../../user/UserRepository';
+import type {ActionsViewModel} from '../ActionsViewModel';
+import type {ServiceEntity} from '../../integration/ServiceEntity';
+import type {User} from '../../entity/User';
+import type {Conversation} from '../../entity/Conversation';
 
 import 'Components/receiptModeToggle';
 import 'Components/panel/panelActions';
@@ -97,7 +98,6 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     super(params);
     this.clickOnShowService = this.clickOnShowService.bind(this);
     this.clickOnShowUser = this.clickOnShowUser.bind(this);
-    this.updateConversationReceiptMode = this.updateConversationReceiptMode.bind(this);
 
     const {mainViewModel, repositories} = params;
 
@@ -112,7 +112,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
 
     this.actionsViewModel = mainViewModel.actions;
 
-    this.logger = getLogger('z.viewModel.panel.ConversationDetailsViewModel');
+    this.logger = getLogger('ConversationDetailsViewModel');
 
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
     this.isTeam = this.teamRepository.isTeam;
@@ -463,9 +463,9 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     }
   }
 
-  updateConversationReceiptMode(conversationEntity: Conversation, receiptMode: any): void {
+  updateConversationReceiptMode = (conversationEntity: Conversation, receiptMode: Confirmation.Type): void => {
     this.conversationRepository.updateConversationReceiptMode(conversationEntity, receiptMode);
-  }
+  };
 
   initView(): void {
     if (this.teamRepository.isTeam() && this.isSingleUserMode(this.activeConversation())) {

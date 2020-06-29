@@ -23,14 +23,15 @@ import {copyText} from 'Util/ClipboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatLocale, formatTimeShort} from 'Util/TimeUtil';
 
-import {QuoteEntity} from '../../message/QuoteEntity';
+import type {QuoteEntity} from '../../message/QuoteEntity';
 import {SuperType} from '../../message/SuperType';
-import {User} from '../User';
-import {Asset} from './Asset';
-import {File as FileAsset} from './File';
-import {MediumImage} from './MediumImage';
+import type {User} from '../User';
+import type {Asset} from './Asset';
+import type {FileAsset} from './FileAsset';
+import type {MediumImage} from './MediumImage';
 import {Message} from './Message';
 import {Text as TextAsset} from './Text';
+import {AssetRepository} from '../../assets/AssetRepository';
 
 export class ContentMessage extends Message {
   readonly edited_timestamp: ko.Observable<number>;
@@ -175,10 +176,15 @@ export class ContentMessage extends Message {
   /**
    * Download message content.
    */
-  download(): void {
+  download(assetRepository: AssetRepository): void {
     const asset_et = this.get_first_asset() as FileAsset | MediumImage;
-    const fileName = this.get_content_name();
-    asset_et.download(fileName);
+
+    if (typeof (asset_et as MediumImage).resource === 'function') {
+      assetRepository.download((asset_et as MediumImage).resource(), this.get_content_name());
+    } else if (typeof (asset_et as FileAsset).original_resource === 'function') {
+      const fileAsset: FileAsset = asset_et;
+      assetRepository.downloadFile(fileAsset);
+    }
   }
 
   /**

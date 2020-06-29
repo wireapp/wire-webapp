@@ -17,12 +17,12 @@
  *
  */
 
-import {AppAction} from '.';
+import type {AppAction} from '.';
 
 export enum LANGUAGE_ACTION {
+  SWITCH_LANGUAGE_FAILED = 'SWITCH_LANGUAGE_FAILED',
   SWITCH_LANGUAGE_START = 'SWITCH_LANGUAGE_START',
   SWITCH_LANGUAGE_SUCCESS = 'SWITCH_LANGUAGE_SUCCESS',
-  SWITCH_LANGUAGE_FAILED = 'SWITCH_LANGUAGE_FAILED',
 }
 
 export type LanguageActions = LanguageSwitchStartAction | LanguageSwitchSuccessAction | LanguageSwitchFailedAction;
@@ -35,8 +35,8 @@ export interface LanguageSwitchSuccessAction extends AppAction {
   readonly type: LANGUAGE_ACTION.SWITCH_LANGUAGE_SUCCESS;
 }
 export interface LanguageSwitchFailedAction extends AppAction {
-  readonly type: LANGUAGE_ACTION.SWITCH_LANGUAGE_FAILED;
   readonly error: Error;
+  readonly type: LANGUAGE_ACTION.SWITCH_LANGUAGE_FAILED;
 }
 
 export class LanguageActionCreator {

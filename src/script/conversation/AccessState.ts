@@ -22,7 +22,7 @@ enum PERSONAL {
   ONE2ONE = 'z.conversation.ACCESS_STATE.PERSONAL.ONE2ONE',
 }
 
-enum TEAM {
+export enum TEAM {
   GUEST_ROOM = 'z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM',
   LEGACY = 'z.conversation.ACCESS_STATE.TEAM.LEGACY',
   ONE2ONE = 'z.conversation.ACCESS_STATE.TEAM.ONE2ONE',

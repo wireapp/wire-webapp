@@ -9,6 +9,7 @@
           conversation: getConversationById(activeCall.conversationId),
           multitasking: multitasking,
           callingRepository: callingRepository,
+          temporaryUserStyle: true,
           callActions: callActions,
           hasAccessToCamera: hasAccessToCamera()"
         data-uie-name="item-call">
@@ -18,7 +19,9 @@
   <div class="temporary-guest__content">
     <logo-full-icon></logo-full-icon>
     <div class="temporary-guest__description" data-bind="text: t('temporaryGuestDescription')"></div>
-    <div class="temporary-guest__create-account" data-bind="click: clickToCreateAccount, text: t('temporaryGuestCta')" data-uie-name="do-create-account"></div>
+    <!-- ko if: isAccountCreationEnabled -->
+      <div class="temporary-guest__create-account" data-bind="click: clickToCreateAccount, text: t('temporaryGuestCta')" data-uie-name="do-create-account"></div>
+    <!-- /ko -->
   </div>
   <div class="temporary-guest__footer">
     <span class="temporary-guest__footer__info-text">

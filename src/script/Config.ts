@@ -18,7 +18,7 @@
  */
 
 import {ValidationUtil} from '@wireapp/commons';
-import UUID from 'pure-uuid';
+import {createRandomUuid} from 'Util/util';
 const env = window.wire.env;
 
 export const ACCENT_ID = {
@@ -34,7 +34,7 @@ export const ACCENT_ID = {
 export class Configuration {
   readonly APP_BASE = env.APP_BASE || 'https://app.wire.com';
   readonly APP_NAME = env.APP_NAME || 'Webapp';
-  readonly APP_INSTANCE_ID = new UUID(4).format();
+  readonly APP_INSTANCE_ID = createRandomUuid();
   readonly BACKEND_NAME = env.BACKEND_NAME || 'Wire';
   readonly BACKEND_REST = env.BACKEND_REST || 'https://prod-nginz-https.wire.com';
   readonly BACKEND_WS = env.BACKEND_WS || 'wss://prod-nginz-ssl.wire.com';
@@ -67,9 +67,7 @@ export class Configuration {
     WEBSITE_BASE: 'https://wire.com',
   };
   readonly VERSION = env.VERSION || '0.0.0';
-
-  // 10 seconds until phone code expires
-  readonly LOGIN_CODE_EXPIRATION = 10 * 60;
+  readonly WEBSITE_LABEL = env.WEBSITE_LABEL;
 
   // 25 megabyte upload limit for personal use (private users & guests)
   readonly MAXIMUM_ASSET_FILE_SIZE_PERSONAL = 25 * 1024 * 1024;

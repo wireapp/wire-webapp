@@ -22,21 +22,21 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import sodium from 'libsodium-wrappers-sumo';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {UrlUtil} from '@wireapp/commons';
 
 import {t} from 'Util/LocalizerUtil';
 import {afterRender} from 'Util/util';
 import {QUERY_KEY} from '../../auth/route';
 import {SIGN_OUT_REASON} from '../../auth/SignOutReason';
-import {getURLParameter} from '../../auth/util/urlUtil';
-import {ClientRepository} from '../../client/ClientRepository';
+import type {ClientRepository} from '../../client/ClientRepository';
 import {Config} from '../../Config';
-import {User} from '../../entity/User';
+import type {User} from '../../entity/User';
 
 export enum APPLOCK_STATE {
+  FORGOT = 'applock.forgot',
+  LOCKED = 'applock.locked',
   NONE = 'applock.none',
   SETUP = 'applock.setup',
-  LOCKED = 'applock.locked',
-  FORGOT = 'applock.forgot',
   WIPE_CONFIRM = 'applock.wipe-confirm',
   WIPE_PASSWORD = 'applock.wipe-password',
 }
@@ -44,7 +44,7 @@ export enum APPLOCK_STATE {
 const APP_LOCK_STORAGE = 'app_lock';
 
 const getTimeout = (queryName: string, configName: 'APPLOCK_SCHEDULED_TIMEOUT' | 'APPLOCK_UNFOCUS_TIMEOUT') => {
-  const queryTimeout = parseInt(getURLParameter(queryName), 10);
+  const queryTimeout = parseInt(UrlUtil.getURLParameter(queryName), 10);
   const configTimeout = Config.getConfig().FEATURE && Config.getConfig().FEATURE[configName];
   const isNotFinite = (value: number) => !Number.isFinite(value);
   if (isNotFinite(queryTimeout) && isNotFinite(configTimeout)) {

@@ -33,7 +33,15 @@ import {ModalsViewModel} from './ModalsViewModel';
 import {PreferencesAVViewModel} from './content/PreferencesAVViewModel';
 import {ServiceModalViewModel} from './content/ServiceModalViewModel';
 import {InviteModalViewModel} from './content/InviteModalViewModel';
+import {PreferencesOptionsViewModel} from './content/PreferencesOptionsViewModel';
 import {ConversationError} from '../error/ConversationError';
+import {CollectionViewModel} from './content/CollectionViewModel';
+import {ConnectRequestsViewModel} from './content/ConnectRequestsViewModel';
+import {CollectionDetailsViewModel} from './content/CollectionDetailsViewModel';
+import {GiphyViewModel} from './content/GiphyViewModel';
+import {HistoryImportViewModel} from './content/HistoryImportViewModel';
+import {HistoryExportViewModel} from './content/HistoryExportViewModel';
+import {PreferencesAccountViewModel} from './content/PreferencesAccountViewModel';
 
 export class ContentViewModel {
   static get STATE() {
@@ -69,11 +77,11 @@ export class ContentViewModel {
     this.state = ko.observable(ContentViewModel.STATE.WATERMARK);
 
     // Nested view models
-    this.collectionDetails = new z.viewModel.content.CollectionDetailsViewModel();
-    this.collection = new z.viewModel.content.CollectionViewModel(mainViewModel, this, repositories);
-    this.connectRequests = new z.viewModel.content.ConnectRequestsViewModel(mainViewModel, this, repositories);
+    this.collectionDetails = new CollectionDetailsViewModel();
+    this.collection = new CollectionViewModel(this, repositories.conversation);
+    this.connectRequests = new ConnectRequestsViewModel(mainViewModel, repositories.user);
     this.emojiInput = new EmojiInputViewModel(repositories.properties);
-    this.giphy = new z.viewModel.content.GiphyViewModel(mainViewModel, this, repositories);
+    this.giphy = new GiphyViewModel(repositories.giphy);
     this.inputBar = new z.viewModel.content.InputBarViewModel(mainViewModel, this, repositories);
     this.groupCreation = new GroupCreationViewModel(
       repositories.conversation,
@@ -100,7 +108,14 @@ export class ContentViewModel {
     );
 
     this.preferencesAbout = new z.viewModel.content.PreferencesAboutViewModel(mainViewModel, this, repositories);
-    this.preferencesAccount = new z.viewModel.content.PreferencesAccountViewModel(mainViewModel, this, repositories);
+    this.preferencesAccount = new PreferencesAccountViewModel(
+      repositories.client,
+      repositories.conversation,
+      repositories.preferenceNotification,
+      repositories.properties,
+      repositories.team,
+      repositories.user,
+    );
     this.preferencesAV = new PreferencesAVViewModel(repositories.media, repositories.user, {
       mediaSourceChanged: repositories.calling.changeMediaSource.bind(repositories.calling),
       willChangeMediaSource: repositories.calling.stopMediaSource.bind(repositories.calling),
@@ -111,10 +126,15 @@ export class ContentViewModel {
       repositories,
     );
     this.preferencesDevices = new z.viewModel.content.PreferencesDevicesViewModel(mainViewModel, this, repositories);
-    this.preferencesOptions = new z.viewModel.content.PreferencesOptionsViewModel(repositories);
+    this.preferencesOptions = new PreferencesOptionsViewModel(
+      repositories.calling,
+      repositories.properties,
+      repositories.team,
+      repositories.user,
+    );
 
-    this.historyExport = new z.viewModel.content.HistoryExportViewModel(mainViewModel, this, repositories);
-    this.historyImport = new z.viewModel.content.HistoryImportViewModel(mainViewModel, this, repositories);
+    this.historyExport = new HistoryExportViewModel(repositories.backup, repositories.user);
+    this.historyImport = new HistoryImportViewModel(repositories.backup);
 
     this.previousState = undefined;
     this.previousConversation = undefined;

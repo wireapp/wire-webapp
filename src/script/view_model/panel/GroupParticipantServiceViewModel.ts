@@ -19,12 +19,12 @@
 
 import ko from 'knockout';
 
-import {getLogger, Logger} from 'Util/Logger';
+import {Logger, getLogger} from 'Util/Logger';
 
 import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
-import {ServiceEntity} from '../../integration/ServiceEntity';
-import {ActionsViewModel} from '../ActionsViewModel';
-import {IntegrationRepository} from '../../integration/IntegrationRepository';
+import type {ServiceEntity} from '../../integration/ServiceEntity';
+import type {ActionsViewModel} from '../ActionsViewModel';
+import type {IntegrationRepository} from '../../integration/IntegrationRepository';
 
 export class GroupParticipantServiceViewModel extends BasePanelViewModel {
   integrationRepository: IntegrationRepository;
@@ -45,7 +45,7 @@ export class GroupParticipantServiceViewModel extends BasePanelViewModel {
     this.integrationRepository = repositories.integration;
     this.actionsViewModel = mainViewModel.actions;
 
-    this.logger = getLogger('z.viewModel.panel.GroupParticipantServiceViewModel');
+    this.logger = getLogger('GroupParticipantServiceViewModel');
 
     this.selectedParticipant = ko.observable(undefined);
     this.selectedService = ko.observable(undefined);
@@ -93,7 +93,7 @@ export class GroupParticipantServiceViewModel extends BasePanelViewModel {
     this.onGoBack();
   }
 
-  initView({entity: service, addMode = false}: {entity: ServiceEntity; addMode: boolean}): void {
+  initView({entity: service, addMode = false}: {addMode: boolean; entity: ServiceEntity}): void {
     const serviceEntity = ko.unwrap(service);
     this.selectedParticipant(serviceEntity);
     this.selectedService(undefined);

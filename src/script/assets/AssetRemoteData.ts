@@ -17,14 +17,7 @@
  *
  */
 
-import {Logger, getLogger} from 'Util/Logger';
-import {loadUrlBuffer, noop} from 'Util/util';
-import {ValidationUtilError} from 'Util/ValidationUtil';
-
-import {decryptAesAsset} from './AssetCrypto';
-import {getAssetUrl, setAssetUrl} from './AssetURLCache';
-
-import {BackendClientError} from '../error/BackendClientError';
+import ko from 'knockout';
 
 export type AssetUrlData = AssetUrlDataVersion1 | AssetUrlDataVersion2 | AssetUrlDataVersion3;
 
@@ -51,49 +44,19 @@ export interface AssetUrlDataVersion1 {
 
 export class AssetRemoteData {
   public cancelDownload: () => void;
-
   public readonly downloadProgress: ko.Observable<number>;
-  private readonly identifier?: string;
-  private loadPromise?: Promise<void | Blob>;
-  private readonly logger: Logger;
-  private readonly otrKey?: Uint8Array;
-  private readonly sha256?: Uint8Array;
-  private readonly urlData?: AssetUrlData;
+  public readonly identifier?: string;
+  public readonly otrKey?: Uint8Array;
+  public readonly sha256?: Uint8Array;
+  public readonly urlData?: AssetUrlData;
 
   constructor(identifier: string, urlData: AssetUrlData, otrKey?: Uint8Array, sha256Checksum?: Uint8Array) {
-    this.cancelDownload = noop;
-    this.downloadProgress = ko.observable();
     this.identifier = identifier;
-    this.loadPromise = undefined;
-    this.logger = getLogger('AssetRemoteData');
     this.otrKey = otrKey;
     this.sha256 = sha256Checksum;
     this.urlData = urlData;
-  }
-
-  generateUrl(): Promise<string> {
-    switch (this.urlData.version) {
-      case 3:
-        return window.wire.app.service.asset.generateAssetUrlV3(
-          this.urlData.assetKey,
-          this.urlData.assetToken,
-          this.urlData.forceCaching,
-        );
-      case 2:
-        return window.wire.app.service.asset.generateAssetUrlV2(
-          this.urlData.assetId,
-          this.urlData.conversationId,
-          this.urlData.forceCaching,
-        );
-      case 1:
-        return window.wire.app.service.asset.generateAssetUrl(
-          this.urlData.assetId,
-          this.urlData.conversationId,
-          this.urlData.forceCaching,
-        );
-      default:
-        throw Error('Cannot map URL data.');
-    }
+    this.downloadProgress = ko.observable();
+    this.cancelDownload = () => {};
   }
 
   static v3(
@@ -143,74 +106,5 @@ export class AssetRemoteData {
       forceCaching,
       version: 1,
     });
-  }
-
-  getObjectUrl(): Promise<string> {
-    const objectUrl = getAssetUrl(this.identifier);
-    return objectUrl
-      ? Promise.resolve(objectUrl)
-      : this.load().then(blob => {
-          const url = window.URL.createObjectURL(blob);
-          return setAssetUrl(this.identifier, url);
-        });
-  }
-
-  load(): Promise<void | Blob> {
-    let type: string;
-
-    if (this.loadPromise) {
-      return this.loadPromise;
-    }
-
-    this.loadPromise = this._loadBuffer()
-      .then(({buffer, mimeType}) => {
-        type = mimeType;
-        this.loadPromise = undefined;
-        const isEncryptedAsset = this.otrKey && this.sha256;
-
-        if (isEncryptedAsset) {
-          const otrKey = this.otrKey instanceof Uint8Array ? this.otrKey : Uint8Array.from(Object.values(this.otrKey));
-          const sha256 = this.sha256 instanceof Uint8Array ? this.sha256 : Uint8Array.from(Object.values(this.sha256));
-          return decryptAesAsset(buffer, otrKey.buffer, sha256.buffer);
-        }
-        return buffer;
-      })
-      .then(plaintext => new Blob([new Uint8Array(plaintext)], {type}))
-      .catch(error => {
-        this.loadPromise = undefined;
-        const errorMessage = error?.message || '';
-        const isAssetNotFound = errorMessage.endsWith(BackendClientError.STATUS_CODE.NOT_FOUND);
-        const isServerError = errorMessage.endsWith(BackendClientError.STATUS_CODE.INTERNAL_SERVER_ERROR);
-
-        const isExpectedError = isAssetNotFound || isServerError;
-        if (!isExpectedError) {
-          throw error;
-        }
-      });
-
-    return this.loadPromise;
-  }
-
-  _loadBuffer(): Promise<{
-    buffer: ArrayBuffer;
-    mimeType: string;
-  }> {
-    return this.generateUrl()
-      .then(generatedUrl => {
-        return loadUrlBuffer(generatedUrl, (xhr: XMLHttpRequest) => {
-          xhr.onprogress = event => this.downloadProgress(Math.round((event.loaded / event.total) * 100));
-          this.cancelDownload = () => xhr.abort.call(xhr);
-        });
-      })
-      .catch(error => {
-        const isValidationUtilError = error instanceof ValidationUtilError;
-        const message = isValidationUtilError
-          ? `Failed to validate an asset URL (_loadBuffer): ${error.message}`
-          : `Failed to load asset: ${error.message || error}`;
-
-        this.logger.error(message);
-
-        throw error;
-      });
   }
 }

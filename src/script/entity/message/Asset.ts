@@ -18,10 +18,10 @@
  */
 
 import {AssetType} from '../../assets/AssetType';
-import {File as FileAsset} from './File';
-import {Location as LocationAsset} from './Location';
-import {MediumImage as MediumImageAsset} from './MediumImage';
-import {Text as TextAsset} from './Text';
+import type {FileAsset} from './FileAsset';
+import type {Location as LocationAsset} from './Location';
+import type {MediumImage as MediumImageAsset} from './MediumImage';
+import type {Text as TextAsset} from './Text';
 
 export interface AssetPayload {
   id: string;
@@ -41,6 +41,10 @@ export class Asset {
     this.id = id;
     this.key = '';
     this.type = '';
+  }
+
+  is_downloadable(): boolean {
+    return this.is_audio() || this.is_file() || this.is_video() || this.is_image();
   }
 
   is_image(): this is MediumImageAsset {

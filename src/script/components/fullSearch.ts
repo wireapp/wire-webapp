@@ -25,14 +25,14 @@ import {formatDateShort} from 'Util/TimeUtil';
 
 import {ParticipantAvatar} from 'Components/participantAvatar';
 import {getSearchRegex} from '../search/FullTextSearch';
-import {Message} from '../entity/message/Message';
-import {ContentMessage} from '../entity/message/ContentMessage';
-import {Text} from '../entity/message/Text';
+import type {Message} from '../entity/message/Message';
+import type {ContentMessage} from '../entity/message/ContentMessage';
+import type {Text} from '../entity/message/Text';
 
 interface FullSearchParams {
   change?: (query: string) => void;
   click?: (messageEntity: Message) => void;
-  search_provider: (query: string) => Promise<{query: string; messageEntities: Message[]}>;
+  search_provider: (query: string) => Promise<{messageEntities: Message[]; query: string}>;
 }
 
 class FullSearch {
@@ -41,7 +41,7 @@ class FullSearch {
   messageEntities: Message[];
   params: FullSearchParams;
   ParticipantAvatar: typeof ParticipantAvatar;
-  searchProvider: (query: string) => Promise<{query: string; messageEntities: Message[]}>;
+  searchProvider: (query: string) => Promise<{messageEntities: Message[]; query: string}>;
   showNoResultsText: ko.Observable<boolean>;
   visibleMessageEntities: ko.ObservableArray<Message>;
 

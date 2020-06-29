@@ -19,10 +19,11 @@
 
 import ko from 'knockout';
 import {amplify} from 'amplify';
-import {ConversationRolesList} from '@wireapp/api-client/dist/conversation/ConversationRole';
-import {TeamData} from '@wireapp/api-client/dist/team/team/TeamData';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import type {ConversationRolesList} from '@wireapp/api-client/dist/conversation/ConversationRole';
+import type {TeamData} from '@wireapp/api-client/dist/team/team/TeamData';
 import {TEAM_EVENT} from '@wireapp/api-client/dist/event/TeamEvent';
-import {
+import type {
   TeamConversationDeleteEvent,
   TeamDeleteEvent,
   TeamEvent,
@@ -32,7 +33,7 @@ import {
   TeamUpdateEvent,
 } from '@wireapp/api-client/dist/event';
 
-import {getLogger, Logger} from 'Util/Logger';
+import {Logger, getLogger} from 'Util/Logger';
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
 import {loadDataUrl} from 'Util/util';
@@ -43,7 +44,6 @@ import {TeamMapper} from './TeamMapper';
 import {TeamEntity} from './TeamEntity';
 import {roleFromTeamPermissions, ROLE} from '../user/UserPermission';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {IntegrationMapper} from '../integration/IntegrationMapper';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {SuperProperty} from '../tracking/SuperProperty';
@@ -54,6 +54,7 @@ import {UserRepository} from '../user/UserRepository';
 import {EventRepository} from '../event/EventRepository';
 import {TeamMemberEntity} from './TeamMemberEntity';
 import {ServiceEntity} from '../integration/ServiceEntity';
+import {AssetRepository} from '../assets/AssetRepository';
 
 export interface AccountInfo {
   accentID: number;
@@ -72,20 +73,22 @@ export class TeamRepository {
   private readonly supportsLegalHold: ko.Observable<boolean>;
   private readonly teamMapper: TeamMapper;
   readonly teamMembers: ko.PureComputed<User[]>;
-  private readonly teamName: ko.PureComputed<string>;
+  public readonly teamName: ko.PureComputed<string>;
   readonly teamUsers: ko.PureComputed<User[]>;
   private readonly userRepository: UserRepository;
+  private readonly assetRepository: AssetRepository;
   readonly isTeam: ko.PureComputed<boolean>;
   readonly selfUser: ko.Observable<User>;
   readonly team: ko.Observable<TeamEntity>;
   readonly teamService: TeamService;
   readonly teamSize: ko.PureComputed<number>;
 
-  constructor(teamService: TeamService, userRepository: UserRepository) {
+  constructor(teamService: TeamService, userRepository: UserRepository, assetRepository: AssetRepository) {
     this.logger = getLogger('TeamRepository');
 
     this.teamMapper = new TeamMapper();
     this.teamService = teamService;
+    this.assetRepository = assetRepository;
     this.userRepository = userRepository;
 
     this.selfUser = this.userRepository.self;
@@ -270,7 +273,7 @@ export class TeamRepository {
       let imageDataUrl;
 
       if (imageResource) {
-        const imageBlob = imageResource ? await imageResource.load() : undefined;
+        const imageBlob = imageResource ? await this.assetRepository.load(imageResource) : undefined;
         imageDataUrl = imageBlob ? await loadDataUrl(imageBlob) : undefined;
       }
 
@@ -295,7 +298,7 @@ export class TeamRepository {
       return;
     }
 
-    const members = await this.teamService.getTeamMembersByIds(teamEntity.id, memberIds);
+    const members = await this.teamService.getTeamMembersByIds(teamId, memberIds);
     const mappedMembers = this.teamMapper.mapMemberFromArray(members);
     memberIds = mappedMembers.map(member => member.userId);
 

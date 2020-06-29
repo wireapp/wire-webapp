@@ -17,7 +17,7 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client';
+import type {APIClient} from '@wireapp/api-client';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -27,7 +27,7 @@ import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {appendParameter} from 'Util/UrlUtil';
 
 import {AuthRepository} from '../auth/AuthRepository';
-import {BackendClient} from '../service/BackendClient';
+import type {BackendClient} from '../service/BackendClient';
 import {StorageKey} from '../storage/StorageKey';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
 

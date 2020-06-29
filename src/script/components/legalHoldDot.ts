@@ -18,13 +18,14 @@
  */
 
 import ko from 'knockout';
-import {Conversation} from '../entity/Conversation';
-import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
+
+import type {Conversation} from '../entity/Conversation';
+import type {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
 
 interface LegalHoldParams {
+  conversation?: Conversation;
   isPending?: ko.Observable<boolean>;
   large?: boolean;
-  conversation?: Conversation;
   legalHoldModal?: LegalHoldModalViewModel;
 }
 
@@ -47,7 +48,7 @@ ko.components.register('legal-hold-dot', {
     this.isPending = isPending;
     this.isInteractive = !!legalHoldModal;
 
-    this.onClick = (data: any, event: MouseEvent): void => {
+    this.onClick = (_data: unknown, event: MouseEvent): void => {
       event.stopPropagation();
       if (this.isInteractive) {
         if (isPending()) {

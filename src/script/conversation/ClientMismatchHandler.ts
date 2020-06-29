@@ -19,16 +19,16 @@
 
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {ClientMismatch, NewOTRMessage, UserClients} from '@wireapp/api-client/dist/conversation';
+import type {ClientMismatch, NewOTRMessage, UserClients} from '@wireapp/api-client/dist/conversation';
 
-import {getLogger, Logger} from 'Util/Logger';
+import {Logger, getLogger} from 'Util/Logger';
 import {getDifference} from 'Util/ArrayUtil';
 
-import {ConversationRepository} from './ConversationRepository';
-import {CryptographyRepository} from '../cryptography/CryptographyRepository';
-import {UserRepository} from '../user/UserRepository';
-import {EventInfoEntity} from './EventInfoEntity';
-import {Conversation} from '../entity/Conversation';
+import type {ConversationRepository} from './ConversationRepository';
+import type {CryptographyRepository} from '../cryptography/CryptographyRepository';
+import type {UserRepository} from '../user/UserRepository';
+import type {EventInfoEntity} from './EventInfoEntity';
+import type {Conversation} from '../entity/Conversation';
 
 export class ClientMismatchHandler {
   private readonly conversationRepository: ConversationRepository;

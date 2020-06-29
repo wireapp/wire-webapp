@@ -31,6 +31,7 @@ import {
   Input,
   InputSubmitCombo,
   RoundIconButton,
+  Loading,
 } from '@wireapp/react-ui-kit';
 import React, {useEffect, useRef, useState} from 'react';
 import {FormattedMessage, useIntl} from 'react-intl';
@@ -49,6 +50,7 @@ import {QUERY_KEY, ROUTE} from '../route';
 import {isDesktopApp} from '../Runtime';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {Redirect} from 'react-router';
+import {getSearchParams} from '../util/urlUtil';
 
 export interface SingleSignOnFormProps extends React.HTMLAttributes<HTMLDivElement> {
   doLogin: (code: string) => Promise<void>;
@@ -65,11 +67,10 @@ const SingleSignOnForm = ({
   validateSSOCode,
   doLogin,
   doFinalizeSSOLogin,
-  doSendNavigationEvent,
   doGetDomainInfo,
-  doNavigate,
   doCheckConversationCode,
   doJoinConversationByCode,
+  doNavigate,
 }: SingleSignOnFormProps & ConnectedProps & DispatchProps) => {
   const codeOrMailInput = useRef<HTMLInputElement>();
   const [codeOrMail, setCodeOrMail] = useState('');
@@ -81,6 +82,7 @@ const SingleSignOnForm = ({
   const [isCodeOrMailInputValid, setIsCodeOrMailInputValid] = useState(true);
   const [validationError, setValidationError] = useState<any>();
   const [logoutReason, setLogoutReason] = useState<string>();
+  const [isLoading, setIsLoading] = useState(false);
 
   const [conversationCode, setConversationCode] = useState<string>();
   const [conversationKey, setConversationKey] = useState<string>();
@@ -89,8 +91,8 @@ const SingleSignOnForm = ({
   const [shouldAutoLogin, setShouldAutoLogin] = useState(false);
 
   useEffect(() => {
-    const queryClientType = UrlUtil.hasURLParameter(QUERY_KEY.SSO_AUTO_LOGIN);
-    if (queryClientType === true && initialCode) {
+    const queryAutoLogin = UrlUtil.hasURLParameter(QUERY_KEY.SSO_AUTO_LOGIN);
+    if (queryAutoLogin === true && initialCode) {
       setShouldAutoLogin(true);
     }
   }, []);
@@ -177,12 +179,19 @@ const SingleSignOnForm = ({
           null,
           query,
         );
-        if (isDesktopApp()) {
-          await doSendNavigationEvent(welcomeUrl);
-        } else {
-          doNavigate(welcomeUrl);
-        }
+
+        // This refreshes the page as we replace the whole URL.
+        // This works for now as we don't need anything from the state anymore at this point.
+        // Ideal would be to abandon the HashRouter (in the near future) and use something that
+        // allows us to pass search query parameters.
+        // https://reacttraining.com/react-router/web/api/HashRouter
+        doNavigate(
+          `/auth?${getSearchParams({[QUERY_KEY.DESTINATION_URL]: encodeURIComponent(welcomeUrl)})}#${
+            ROUTE.CUSTOM_ENV_REDIRECT
+          }`,
+        );
       } else {
+        setIsLoading(true);
         const strippedCode = stripPrefix(codeOrMail);
         await validateSSOCode(strippedCode);
         await doLogin(strippedCode);
@@ -195,6 +204,7 @@ const SingleSignOnForm = ({
         history.push(ROUTE.HISTORY_INFO);
       }
     } catch (error) {
+      setIsLoading(false);
       switch (error.label) {
         case BackendError.LABEL.TOO_MANY_CLIENTS: {
           resetAuthError();
@@ -226,7 +236,9 @@ const SingleSignOnForm = ({
   const stripPrefix = (prefixedCode: string) =>
     prefixedCode && prefixedCode.trim().toLowerCase().replace(SSO_CODE_PREFIX, '');
 
-  return (
+  return isLoading ? (
+    <Loading style={{marginTop: '24px'}} />
+  ) : (
     <Form style={{marginTop: 30}} data-uie-name="sso" onSubmit={handleSubmit}>
       {!isValidLink && <Redirect to={ROUTE.CONVERSATION_JOIN_INVALID} />}
       <InputSubmitCombo>
@@ -324,7 +336,6 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
       doGetDomainInfo: ROOT_ACTIONS.authAction.doGetDomainInfo,
       doJoinConversationByCode: ROOT_ACTIONS.conversationAction.doJoinConversationByCode,
       doNavigate: ROOT_ACTIONS.navigationAction.doNavigate,
-      doSendNavigationEvent: ROOT_ACTIONS.wrapperEventAction.doSendNavigationEvent,
       resetAuthError: ROOT_ACTIONS.authAction.resetAuthError,
       validateSSOCode: ROOT_ACTIONS.authAction.validateSSOCode,
     },

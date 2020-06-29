@@ -17,11 +17,11 @@
  *
  */
 
-import {AccentColor} from '@wireapp/commons';
-import {PublicClient} from '@wireapp/api-client/dist/client';
+import type {AccentColor} from '@wireapp/commons';
+import type {PublicClient} from '@wireapp/api-client/dist/client';
 import type {BackendError} from '@wireapp/api-client/dist/http';
 import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
-import {User as APIClientUser} from '@wireapp/api-client/dist/user';
+import type {User as APIClientUser} from '@wireapp/api-client/dist/user';
 import {ConsentType, Self as APIClientSelf} from '@wireapp/api-client/dist/self';
 import {UserAsset as APIClientUserAsset, UserAssetType as APIClientUserAssetType} from '@wireapp/api-client/dist/user';
 import {amplify} from 'amplify';
@@ -44,7 +44,7 @@ import {User} from '../entity/User';
 import {BackendEvent} from '../event/Backend';
 import {ClientEvent} from '../event/Client';
 import {EventRepository} from '../event/EventRepository';
-import {EventSource} from '../event/EventSource';
+import type {EventSource} from '../event/EventSource';
 
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
@@ -61,22 +61,22 @@ import {showAvailabilityModal} from './AvailabilityModal';
 import {ConsentValue} from './ConsentValue';
 import {createSuggestions} from './UserHandleGenerator';
 import {UserMapper} from './UserMapper';
-import {UserService} from './UserService';
+import type {UserService} from './UserService';
 
-import {AssetService} from '../assets/AssetService';
+import {AssetRepository} from '../assets/AssetRepository';
 import {ClientEntity} from '../client/ClientEntity';
 import {ClientMapper} from '../client/ClientMapper';
-import {ClientRepository} from '../client/ClientRepository';
+import type {ClientRepository} from '../client/ClientRepository';
 import {Config} from '../Config';
-import {ConnectionEntity} from '../connection/ConnectionEntity';
+import type {ConnectionEntity} from '../connection/ConnectionEntity';
 import {BackendClientError} from '../error/BackendClientError';
-import {PropertiesRepository} from '../properties/PropertiesRepository';
-import {SelfService} from '../self/SelfService';
-import {ServerTimeHandler} from '../time/serverTimeHandler';
+import type {PropertiesRepository} from '../properties/PropertiesRepository';
+import type {SelfService} from '../self/SelfService';
+import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import {UserError} from '../error/UserError';
 
 export class UserRepository {
-  private readonly asset_service: AssetService;
+  private readonly assetRepository: AssetRepository;
   private readonly clientRepository: ClientRepository;
   readonly connected_users: ko.PureComputed<User[]>;
   isTeam: ko.Observable<boolean> | ko.PureComputed<boolean>;
@@ -90,7 +90,7 @@ export class UserRepository {
   private readonly userMapper: UserMapper;
   private readonly userService: UserService;
   private readonly users: ko.ObservableArray<User>;
-  private should_set_username: boolean;
+  public should_set_username: boolean;
   readonly connect_requests: ko.PureComputed<User[]>;
   readonly isActivatedAccount: ko.PureComputed<boolean>;
   readonly isTemporaryGuest: ko.PureComputed<boolean>;
@@ -112,7 +112,7 @@ export class UserRepository {
 
   constructor(
     userService: UserService,
-    asset_service: AssetService,
+    assetRepository: AssetRepository,
     selfService: SelfService,
     clientRepository: ClientRepository,
     serverTimeHandler: ServerTimeHandler,
@@ -120,7 +120,7 @@ export class UserRepository {
   ) {
     this.logger = getLogger('UserRepository');
 
-    this.asset_service = asset_service;
+    this.assetRepository = assetRepository;
     this.clientRepository = clientRepository;
     this.propertyRepository = propertyRepository;
     this.selfService = selfService;
@@ -549,7 +549,7 @@ export class UserRepository {
       if (!hasAsset) {
         // if there are no assets, just upload the old picture to the new api
         const {medium} = mapProfileAssetsV1(userData.id, userData.picture);
-        medium.load().then(imageBlob => this.changePicture(imageBlob as Blob));
+        this.assetRepository.load(medium).then(imageBlob => this.changePicture(imageBlob as Blob));
       } else {
         // if an asset is already there, remove the pointer to the old picture
         this.selfService.putSelf({picture: []} as any);
@@ -659,23 +659,16 @@ export class UserRepository {
   /**
    * Update a local user from the backend by ID.
    */
-  updateUserById(userId: string): Promise<void> {
-    const getLocalUser = () => {
-      return this.findUserById(userId) || new User();
-    };
-
-    return Promise.all([getLocalUser(), this.userService.getUser(userId)])
-      .then(([localUserEntity, updatedUserData]) =>
-        this.userMapper.updateUserFromObject(localUserEntity, updatedUserData),
-      )
-      .then(userEntity => {
-        if (this.isTeam()) {
-          this.mapGuestStatus([userEntity]);
-        }
-        if (userEntity.inTeam() && userEntity.isDeleted) {
-          amplify.publish(WebAppEvents.TEAM.MEMBER_LEAVE, userEntity.teamId, userEntity.id);
-        }
-      });
+  async updateUserById(userId: string): Promise<void> {
+    const localUserEntity = this.findUserById(userId) || new User();
+    const updatedUserData = await this.userService.getUser(userId);
+    const updatedUserEntity = this.userMapper.updateUserFromObject(localUserEntity, updatedUserData);
+    if (this.isTeam()) {
+      this.mapGuestStatus([updatedUserEntity]);
+    }
+    if (updatedUserEntity.inTeam() && updatedUserEntity.isDeleted) {
+      amplify.publish(WebAppEvents.TEAM.MEMBER_LEAVE, updatedUserEntity.teamId, updatedUserEntity.id);
+    }
   }
 
   /**
@@ -809,7 +802,7 @@ export class UserRepository {
    * Change the profile image.
    */
   changePicture(picture: Blob): Promise<User> {
-    return this.asset_service
+    return this.assetRepository
       .uploadProfileImage(picture)
       .then(({previewImageKey, mediumImageKey}) => {
         const assets: APIClientUserAsset[] = [

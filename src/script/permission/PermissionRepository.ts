@@ -18,13 +18,15 @@
  */
 
 import ko from 'knockout';
+
 import {Logger, getLogger} from 'Util/Logger';
 
-import {PermissionStatusState} from './PermissionStatusState';
 import {PermissionType} from './PermissionType';
+import {PermissionStatusState} from './PermissionStatusState';
+import {PermissionState} from '../notification/PermissionState';
 
 interface PermissionStateResult {
-  state: PermissionStatusState;
+  state: PermissionState | PermissionStatusState;
   type: PermissionType;
 }
 
@@ -35,7 +37,7 @@ interface PermissionStateResult {
  */
 export class PermissionRepository {
   private readonly logger: Logger;
-  readonly permissionState: Record<PermissionType, ko.Observable<PermissionStatusState>>;
+  readonly permissionState: Record<PermissionType, ko.Observable<PermissionState | PermissionStatusState>>;
 
   constructor() {
     this.logger = getLogger('PermissionRepository');
@@ -60,13 +62,13 @@ export class PermissionRepository {
 
       return navigator.permissions
         .query({name: permissionType})
-        .then((permissionStatus: any) => {
+        .then(permissionStatus => {
           this.logger.log(`Permission state for '${permissionType}' is '${permissionStatus.state}'`);
-          setPermissionState(permissionStatus.state);
+          setPermissionState(permissionStatus.state as PermissionStatusState);
 
           permissionStatus.onchange = () => {
             this.logger.log(`Permission state for '${permissionType}' changed to '${permissionStatus.state}'`);
-            setPermissionState(permissionStatus.state);
+            setPermissionState(permissionStatus.state as PermissionStatusState);
           };
 
           return permissionStatus.state;
@@ -75,7 +77,7 @@ export class PermissionRepository {
     });
   }
 
-  getPermissionState(permissionType: PermissionType): PermissionStatusState {
+  getPermissionState(permissionType: PermissionType): PermissionState | PermissionStatusState {
     return this.permissionState[permissionType]();
   }
 

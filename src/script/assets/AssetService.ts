@@ -18,62 +18,21 @@
  */
 
 import {APIClient} from '@wireapp/api-client';
-import {AssetOptions, AssetRetentionPolicy, AssetUploadData} from '@wireapp/api-client/dist/asset';
 import {ProgressCallback, RequestCancelable} from '@wireapp/api-client/dist/http';
-import {LegalHoldStatus} from '@wireapp/protocol-messaging';
-
-import {loadFileBuffer, loadImage} from 'Util/util';
-import {assetV3, legacyAsset} from 'Util/ValidationUtil';
-import {WebWorker} from 'Util/worker';
+import {AssetOptions, AssetUploadData} from '@wireapp/api-client/dist/asset';
+import {singleton, container} from 'tsyringe';
+import {legacyAsset, assetV3} from 'Util/ValidationUtil';
 import {BackendClient} from '../service/BackendClient';
-import {Conversation} from '../entity/Conversation';
+import {APIClientSingleton} from '../service/APIClientSingleton';
 
-export interface CompressedImage {
-  compressedBytes: Uint8Array;
-  compressedImage: HTMLImageElement;
-}
-
-export interface AssetUploadOptions extends AssetOptions {
-  expectsReadConfirmation: boolean;
-  legalHoldStatus?: LegalHoldStatus;
-}
-
+@singleton()
 export class AssetService {
   private readonly apiClient: APIClient;
   private readonly backendClient: BackendClient;
 
-  constructor(apiClient: APIClient, backendClient: BackendClient) {
-    this.apiClient = apiClient;
-    this.backendClient = backendClient;
-  }
-
-  async uploadProfileImage(
-    image: Blob | File,
-  ): Promise<{
-    mediumImageKey: string;
-    previewImageKey: string;
-  }> {
-    const [{compressedBytes: previewImageBytes}, {compressedBytes: mediumImageBytes}] = await Promise.all([
-      this.compressProfileImage(image),
-      this.compressImage(image),
-    ]);
-
-    const options: AssetUploadOptions = {
-      expectsReadConfirmation: false,
-      public: true,
-      retention: AssetRetentionPolicy.ETERNAL,
-    };
-
-    const previewPictureUpload = await this.uploadFile(previewImageBytes, options);
-    const uploadedPreviewPicture = await previewPictureUpload.response;
-
-    const mediumPictureUpload = await this.uploadFile(mediumImageBytes, options);
-    const mediumPicture = await mediumPictureUpload.response;
-
-    return {
-      mediumImageKey: uploadedPreviewPicture.key,
-      previewImageKey: mediumPicture.key,
-    };
+  constructor() {
+    this.apiClient = container.resolve(APIClientSingleton).getClient();
+    this.backendClient = container.resolve(BackendClient);
   }
 
   async generateAssetUrl(assetId: string, conversationId: string, forceCaching: boolean): Promise<string> {
@@ -99,17 +58,6 @@ export class AssetService {
     return `${url}?access_token=${this.apiClient['accessTokenStore'].accessToken?.access_token}${assetTokenParam}${cachingParam}`;
   }
 
-  getAssetRetention(userEntity: any, conversationEntity: Conversation): AssetRetentionPolicy {
-    const isTeamMember = userEntity.inTeam();
-    const isTeamConversation = conversationEntity.inTeam();
-    const isTeamUserInConversation = conversationEntity
-      .participating_user_ets()
-      .some((conversationParticipant: any) => conversationParticipant.inTeam());
-
-    const isEternal = isTeamMember || isTeamConversation || isTeamUserInConversation;
-    return isEternal ? AssetRetentionPolicy.ETERNAL : AssetRetentionPolicy.PERSISTENT;
-  }
-
   uploadFile(
     asset: Uint8Array,
     options: AssetOptions,
@@ -118,28 +66,25 @@ export class AssetService {
     return this.apiClient.asset.api.postAsset(asset, options, onProgress);
   }
 
-  private compressProfileImage(image: File | Blob): Promise<CompressedImage> {
-    return this.compressImageWithWorker('worker/profile-image-worker.js', image);
+  async downloadAssetV1(
+    assetId: string,
+    conversationId: string,
+    forceCaching?: boolean,
+    progressCallback?: ProgressCallback,
+  ) {
+    return this.apiClient.asset.api.getAssetV1(assetId, conversationId, forceCaching, progressCallback);
   }
 
-  compressImage(image: File | Blob): Promise<CompressedImage> {
-    return this.compressImageWithWorker('worker/image-worker.js', image);
+  async downloadAssetV2(
+    assetId: string,
+    conversationId: string,
+    forceCaching?: boolean,
+    progressCallback?: ProgressCallback,
+  ) {
+    return this.apiClient.asset.api.getAssetV2(assetId, conversationId, forceCaching, progressCallback);
   }
 
-  private async compressImageWithWorker(pathToWorkerFile: string, image: File | Blob): Promise<CompressedImage> {
-    const skipCompression = image.type === 'image/gif';
-    const buffer = await loadFileBuffer(image);
-    let compressedBytes: ArrayBuffer;
-    if (skipCompression === true) {
-      compressedBytes = new Uint8Array(buffer as ArrayBuffer);
-    } else {
-      const worker = new WebWorker(pathToWorkerFile);
-      compressedBytes = await worker.post(buffer);
-    }
-    const compressedImage = await loadImage(new Blob([compressedBytes], {type: image.type}));
-    return {
-      compressedBytes: new Uint8Array(compressedBytes),
-      compressedImage,
-    };
+  async downloadAssetV3(assetId: string, token?: string, forceCaching?: boolean, progressCallback?: ProgressCallback) {
+    return this.apiClient.asset.api.getAssetV3(assetId, token, forceCaching, progressCallback);
   }
 }

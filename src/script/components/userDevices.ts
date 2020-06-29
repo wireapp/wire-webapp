@@ -18,21 +18,21 @@
  */
 
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
+import type Dexie from 'dexie';
+import ko from 'knockout';
 import {ClientClassification} from '@wireapp/api-client/dist/client';
 
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 
-import {amplify} from 'amplify';
-import Dexie from 'dexie';
-import ko from 'knockout';
-import {ClientEntity} from '../client/ClientEntity';
-import {ClientRepository} from '../client/ClientRepository';
+import type {ClientEntity} from '../client/ClientEntity';
+import type {ClientRepository} from '../client/ClientRepository';
 import {Config} from '../Config';
-import {ConversationRepository} from '../conversation/ConversationRepository';
-import {CryptographyRepository} from '../cryptography/CryptographyRepository';
-import {User} from '../entity/User';
+import type {ConversationRepository} from '../conversation/ConversationRepository';
+import type {CryptographyRepository} from '../cryptography/CryptographyRepository';
+import type {User} from '../entity/User';
 import {getPrivacyHowUrl, getPrivacyWhyUrl, getPrivacyPolicyUrl} from '../externalRoute';
 import {MotionDuration} from '../motion/MotionDuration';
 
@@ -40,8 +40,8 @@ import 'Components/deviceCard';
 
 export interface UserDevicesHistory {
   current: ko.PureComputed<UserDevicesState>;
-  goTo: (to: UserDevicesState, head: string) => void;
   goBack: () => void;
+  goTo: (to: UserDevicesState, head: string) => void;
   headline: ko.PureComputed<string>;
   reset: () => void;
 }
@@ -50,9 +50,9 @@ interface UserDevicesParams {
   clientRepository: ClientRepository;
   conversationRepository: ConversationRepository;
   cryptographyRepository: CryptographyRepository;
-  userEntity: ko.Observable<User>;
   history: UserDevicesHistory;
   noPadding?: boolean;
+  userEntity: ko.Observable<User>;
 }
 
 enum FIND_MODE {
@@ -62,8 +62,8 @@ enum FIND_MODE {
 }
 
 export enum UserDevicesState {
-  DEVICE_LIST = 'UserDevices.DEVICE_LIST',
   DEVICE_DETAILS = 'UserDevices.DEVICE_DETAILS',
+  DEVICE_LIST = 'UserDevices.DEVICE_LIST',
   SELF_FINGERPRINT = 'UserDevices.SELF_FINGERPRINT',
 }
 

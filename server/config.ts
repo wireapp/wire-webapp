@@ -19,10 +19,11 @@
 
 import * as dotenv from 'dotenv-extended';
 import * as fs from 'fs-extra';
-import {IHelmetContentSecurityPolicyDirectives as HelmetCSP} from 'helmet';
+import type {IHelmetContentSecurityPolicyDirectives as HelmetCSP} from 'helmet';
 import * as logdown from 'logdown';
 import * as path from 'path';
-import {ServerConfig} from './ServerConfig';
+
+import type {ServerConfig} from './ServerConfig';
 
 const nodeEnvironment = process.env.NODE_ENV || 'production';
 
@@ -140,6 +141,8 @@ const config: ServerConfig = {
       CHECK_CONSENT: process.env.FEATURE_CHECK_CONSENT != 'false',
       DEFAULT_LOGIN_TEMPORARY_CLIENT: process.env.FEATURE_DEFAULT_LOGIN_TEMPORARY_CLIENT == 'true',
       ENABLE_ACCOUNT_REGISTRATION: process.env.FEATURE_ENABLE_ACCOUNT_REGISTRATION != 'false',
+      ENABLE_ACCOUNT_REGISTRATION_ACCEPT_TERMS_AND_PRIVACY_POLICY:
+        process.env.FEATURE_ENABLE_ACCOUNT_REGISTRATION_ACCEPT_TERMS_AND_PRIVACY_POLICY == 'true',
       ENABLE_DEBUG: process.env.FEATURE_ENABLE_DEBUG == 'true',
       ENABLE_DOMAIN_DISCOVERY: process.env.FEATURE_ENABLE_DOMAIN_DISCOVERY != 'false',
       ENABLE_PHONE_LOGIN: process.env.FEATURE_ENABLE_PHONE_LOGIN != 'false',
@@ -175,6 +178,7 @@ const config: ServerConfig = {
       WEBSITE_BASE: process.env.URL_WEBSITE_BASE,
     },
     VERSION: readFile(VERSION_FILE, '0.0.0'),
+    WEBSITE_LABEL: process.env.WEBSITE_LABEL,
   },
   COMMIT: readFile(COMMIT_FILE, ''),
   SERVER: {
@@ -185,12 +189,20 @@ const config: ServerConfig = {
     ENFORCE_HTTPS: process.env.ENFORCE_HTTPS != 'false',
     ENVIRONMENT: nodeEnvironment,
     GOOGLE_WEBMASTER_ID: process.env.GOOGLE_WEBMASTER_ID,
+    OPEN_GRAPH: {
+      DESCRIPTION: process.env.OPEN_GRAPH_DESCRIPTION,
+      IMAGE_URL: process.env.OPEN_GRAPH_IMAGE_URL,
+      TITLE: process.env.OPEN_GRAPH_TITLE,
+    },
     PORT_HTTP: Number(process.env.PORT) || 21080,
     ROBOTS: {
       ALLOW: readFile(ROBOTS_ALLOW_FILE, 'User-agent: *\r\nDisallow: /'),
       ALLOWED_HOSTS: ['app.wire.com'],
       DISALLOW: readFile(ROBOTS_DISALLOW_FILE, 'User-agent: *\r\nDisallow: /'),
     },
+    SSL_CERTIFICATE_KEY_PATH:
+      process.env.SSL_CERTIFICATE_KEY_PATH || path.join(__dirname, 'certificate/development-key.pem'),
+    SSL_CERTIFICATE_PATH: process.env.SSL_CERTIFICATE_PATH || path.join(__dirname, 'certificate/development-cert.pem'),
   },
 };
 

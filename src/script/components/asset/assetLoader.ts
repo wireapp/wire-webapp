@@ -27,7 +27,7 @@ interface Params {
 
 ko.components.register('asset-loader', {
   template: `
-  <div class="media-button" data-bind="click: onCancel" data-uie-name="status-loading-media">
+  <div class="media-button" data-bind="click: onCancel, clickBubble: false" data-uie-name="status-loading-media">
     <svg data-bind="attr: {viewBox: viewBox}">
       <circle data-bind="style: {'stroke-dasharray': progress}" class="accent-stroke" r="50%" cx="50%" cy="50%"></circle>
     </svg>

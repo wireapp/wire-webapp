@@ -18,10 +18,11 @@
  */
 
 import ko from 'knockout';
+
 import {afterRender} from 'Util/util';
 
-import {Participant} from '../calling/Participant';
-import {Grid} from '../calling/videoGridHandler';
+import type {Participant} from '../calling/Participant';
+import type {Grid} from '../calling/videoGridHandler';
 
 enum VIDEO_SIZE {
   EMPTY = 'empty',
@@ -30,13 +31,19 @@ enum VIDEO_SIZE {
   QUARTER_SCREEN = 'quarter_screen',
 }
 
+interface GroupVideoGripParams {
+  grid: ko.PureComputed<Grid>;
+  minimized: boolean;
+  muted?: ko.Observable<boolean>;
+  selfUserId: string;
+}
+
 class GroupVideoGrid {
   private readonly grid: ko.PureComputed<Grid>;
   private readonly videoParticipants: ko.PureComputed<Participant[]>;
   private readonly minimized: boolean;
   public readonly muted: ko.Observable<boolean>;
   public readonly selfUserId: string;
-
   public readonly dispose: () => void;
 
   static get CONFIG() {
@@ -46,15 +53,7 @@ class GroupVideoGrid {
     };
   }
 
-  constructor(
-    {
-      minimized,
-      grid,
-      muted,
-      selfUserId,
-    }: {minimized: boolean; grid: ko.PureComputed<Grid>; muted: ko.Observable<boolean> | undefined; selfUserId: string},
-    rootElement: HTMLElement,
-  ) {
+  constructor({minimized, grid, muted, selfUserId}: GroupVideoGripParams, rootElement: HTMLElement) {
     this.selfUserId = selfUserId;
     this.scaleVideos = this.scaleVideos.bind(this, rootElement);
     this.grid = grid;
@@ -198,6 +197,7 @@ ko.components.register('group-video-grid', {
     </div>
   `,
   viewModel: {
-    createViewModel: (params: any, componentInfo: any) => new GroupVideoGrid(params, componentInfo.element),
+    createViewModel: (params: GroupVideoGripParams, componentInfo: {element: HTMLElement}) =>
+      new GroupVideoGrid(params, componentInfo.element),
   },
 });

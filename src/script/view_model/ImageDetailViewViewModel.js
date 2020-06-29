@@ -38,6 +38,7 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
     this.elementId = 'detail-view';
     this.mainViewModel = mainViewModel;
     this.conversationRepository = repositories.conversation;
+    this.assetRepository = repositories.asset;
 
     this.actionsViewModel = this.mainViewModel.actions;
     this.source = undefined;
@@ -154,16 +155,12 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
 
   _loadImage() {
     this.imageVisible(false);
-    this.messageEntity()
-      .get_first_asset()
-      .resource()
-      .load()
-      .then(blob => {
-        if (blob) {
-          this.imageSrc(window.URL.createObjectURL(blob));
-          this.imageVisible(true);
-        }
-      });
+    this.assetRepository.load(this.messageEntity().get_first_asset().resource()).then(blob => {
+      if (blob) {
+        this.imageSrc(window.URL.createObjectURL(blob));
+        this.imageVisible(true);
+      }
+    });
   }
 
   clickOnClose() {
@@ -171,7 +168,7 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
   }
 
   clickOnDownload() {
-    this.messageEntity().download();
+    this.messageEntity().download(this.assetRepository);
   }
 
   clickOnLike() {

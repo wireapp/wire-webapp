@@ -23,15 +23,15 @@ import {Logger, getLogger} from 'Util/Logger';
 import {formatSeconds} from 'Util/TimeUtil';
 
 import {AssetTransferState} from '../../assets/AssetTransferState';
-import {ContentMessage} from '../../entity/message/ContentMessage';
-import {File as FileAsset} from '../../entity/message/File';
+import type {ContentMessage} from '../../entity/message/ContentMessage';
+import type {FileAsset} from '../../entity/message/FileAsset';
 import {AbstractAssetTransferStateTracker} from './AbstractAssetTransferStateTracker';
 
 interface Params {
-  message: ContentMessage;
-
   /** Does the asset have a visible header? */
   header: boolean;
+
+  message: ContentMessage;
 }
 
 class AudioAssetComponent extends AbstractAssetTransferStateTracker {
@@ -81,7 +81,12 @@ class AudioAssetComponent extends AbstractAssetTransferStateTracker {
     Promise.resolve()
       .then(() => {
         if (!this.audioSrc()) {
-          return this.asset.load().then(blob => this.audioSrc(window.URL.createObjectURL(blob)));
+          this.asset.status(AssetTransferState.DOWNLOADING);
+          return this.assetRepository
+            .load(this.asset.original_resource())
+            .then(blob => this.audioSrc(window.URL.createObjectURL(blob)))
+            .then(() => this.asset.status(AssetTransferState.UPLOADED))
+            .catch(() => this.asset.status(AssetTransferState.UPLOADED));
         }
         return null;
       })

@@ -28,11 +28,11 @@ import {BackendEvent} from '../event/Backend';
 import {EventName} from '../tracking/EventName';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 
-import {Conversation} from '../entity/Conversation';
+import type {Conversation} from '../entity/Conversation';
 import {AbstractConversationEventHandler, EventHandlingConfig} from './AbstractConversationEventHandler';
 import {ACCESS_STATE} from './AccessState';
-import {ConversationMapper} from './ConversationMapper';
-import {ConversationService} from './ConversationService';
+import type {ConversationMapper} from './ConversationMapper';
+import type {ConversationService} from './ConversationService';
 
 export class ConversationStateHandler extends AbstractConversationEventHandler {
   private readonly conversationMapper: ConversationMapper;

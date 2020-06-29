@@ -23,6 +23,9 @@ import {viewportObserver} from 'src/script/ui/viewportObserver';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {MediumImage} from 'src/script/entity/message/MediumImage';
 import 'src/script/components/asset/imageAsset';
+import {AssetRemoteData} from 'src/script/assets/AssetRemoteData';
+import {container} from 'tsyringe';
+import {AssetRepository} from 'src/script/assets/AssetRepository';
 
 describe('image-asset', () => {
   const defaultParams = {
@@ -52,17 +55,24 @@ describe('image-asset', () => {
   });
 
   it('displays the image url when resource is loaded', () => {
+    const assetRepository = container.resolve(AssetRepository);
+    spyOn(assetRepository, 'load').and.returnValue(Promise.resolve(new Blob()));
+
     const image = new MediumImage();
-    image.resource({load: () => Promise.resolve(new Blob())});
+    image.resource(new AssetRemoteData());
     const params = {...defaultParams, asset: image};
 
     spyOn(window.URL, 'createObjectURL').and.returnValue('/image-url');
 
-    return instantiateComponent('image-asset', params).then(domContainer => {
-      expect(window.URL.createObjectURL).toHaveBeenCalled();
-      const img = domContainer.querySelector('img');
+    instantiateComponent('image-asset', params)
+      .then(domContainer => {
+        expect(window.URL.createObjectURL).toHaveBeenCalled();
+        const img = domContainer.querySelector('img');
 
-      expect(img.src).toContain('/image-url');
-    });
+        expect(img.src).toContain('/image-url');
+      })
+      .finally(() => {
+        container.reset();
+      });
   });
 });

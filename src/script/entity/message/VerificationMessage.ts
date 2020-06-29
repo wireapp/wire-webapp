@@ -26,7 +26,7 @@ import {capitalizeFirstChar} from 'Util/StringUtil';
 
 import {SuperType} from '../../message/SuperType';
 import {VerificationMessageType} from '../../message/VerificationMessageType';
-import {User} from '../User';
+import type {User} from '../User';
 import {Message} from './Message';
 
 export class VerificationMessage extends Message {

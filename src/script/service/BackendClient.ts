@@ -17,16 +17,16 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client';
+import type {APIClient} from '@wireapp/api-client';
 import {amplify} from 'amplify';
 import ko from 'knockout';
-import {container} from 'tsyringe';
+import {container, singleton} from 'tsyringe';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {getLogger, Logger} from 'Util/Logger';
+import {Logger, getLogger} from 'Util/Logger';
 import {PromiseQueue} from 'Util/PromiseQueue';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {isValidApiPath} from 'Util/ValidationUtil';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {APIClientSingleton} from './APIClientSingleton';
 
 /**
@@ -37,6 +37,7 @@ interface Settings {
   webSocketUrl: string;
 }
 
+@singleton()
 export class BackendClient {
   private readonly apiClient: APIClient;
   private connectivityTimeout: number;

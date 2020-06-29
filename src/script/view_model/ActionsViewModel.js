@@ -49,6 +49,12 @@ export class ActionsViewModel {
     }
   }
 
+  /**
+   * @param {User} userEntity User to block
+   * @param {boolean} [hideConversation] Hide current conversation
+   * @param {Conversation} [nextConversationEntity] Conversation to be switched to
+   * @returns {Promise<void>} Resolves when the user was blocked
+   */
   blockUser(userEntity, hideConversation, nextConversationEntity) {
     if (userEntity) {
       // TODO: Does the promise resolve when there is no primary action (i.e. cancel button gets clicked)?
@@ -71,6 +77,13 @@ export class ActionsViewModel {
     }
   }
 
+  /**
+   *
+   * @param {User} userEntity User to cancel the sent connection request
+   * @param {boolean} [hideConversation] Hide current conversation
+   * @param {Conversation} [nextConversationEntity] Conversation to be switched to
+   * @returns {Promise<void>} Resolves when the connection request was canceled
+   */
   cancelConnectionRequest(userEntity, hideConversation, nextConversationEntity) {
     if (userEntity) {
       return new Promise(resolve => {
@@ -206,16 +219,21 @@ export class ActionsViewModel {
   leaveConversation(conversationEntity) {
     if (conversationEntity) {
       return new Promise(resolve => {
-        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.OPTION, {
           primaryAction: {
-            action: () => {
-              this.conversationRepository.removeMember(conversationEntity, this.userRepository.self().id);
+            action: (clearContent = false) => {
+              if (clearContent) {
+                this.conversationRepository.clear_conversation(conversationEntity, true);
+              } else {
+                this.conversationRepository.removeMember(conversationEntity, this.userRepository.self().id);
+              }
               resolve();
             },
             text: t('modalConversationLeaveAction'),
           },
           text: {
             message: t('modalConversationLeaveMessage'),
+            option: t('modalConversationLeaveOption'),
             title: t('modalConversationLeaveHeadline', conversationEntity.display_name()),
           },
         });
@@ -302,6 +320,11 @@ export class ActionsViewModel {
     }
   }
 
+  /**
+   * @param {User} userEntity User to connect to
+   * @param {boolean} [showConversation] Should we open the new conversation?
+   * @returns {Promise<void>} Resolves when the connection request was successfully created
+   */
   sendConnectionRequest(userEntity, showConversation) {
     if (userEntity) {
       return this.connectionRepository.createConnection(userEntity, showConversation);
@@ -317,6 +340,11 @@ export class ActionsViewModel {
     }
   }
 
+  /**
+   * @param {User} userEntity User to unblock
+   * @param {boolean} [showConversation] Show new conversation on success
+   * @returns {Promise<void>} Resolves when the user was unblocked
+   */
   unblockUser(userEntity, showConversation) {
     if (userEntity) {
       return new Promise(resolve => {

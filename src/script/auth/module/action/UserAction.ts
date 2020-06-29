@@ -18,7 +18,7 @@
  */
 
 import {currentLanguage} from '../../localeConfig';
-import {ThunkAction} from '../reducer';
+import type {ThunkAction} from '../reducer';
 import {UserActionCreator} from './creator/';
 
 export class UserAction {

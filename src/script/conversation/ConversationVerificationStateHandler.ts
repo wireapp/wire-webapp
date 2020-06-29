@@ -23,12 +23,13 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Logger, getLogger} from 'Util/Logger';
 
-import {Conversation} from '../entity/Conversation';
-import {EventRepository} from '../event/EventRepository';
+import type {Conversation} from '../entity/Conversation';
+import type {EventRepository} from '../event/EventRepository';
 import {VerificationMessageType} from '../message/VerificationMessageType';
-import {ServerTimeHandler} from '../time/serverTimeHandler';
-import {ConversationRepository} from './ConversationRepository';
+import type {ServerTimeHandler} from '../time/serverTimeHandler';
+import type {ConversationRepository} from './ConversationRepository';
 import {ConversationVerificationState} from './ConversationVerificationState';
+import {EventBuilder} from '../conversation/EventBuilder';
 
 export class ConversationVerificationStateHandler {
   conversationRepository: ConversationRepository;
@@ -135,10 +136,7 @@ export class ConversationVerificationStateHandler {
   private checkChangeToVerified(conversationEntity: Conversation): boolean {
     if (this.willChangeToVerified(conversationEntity)) {
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-      const allVerifiedEvent = window.z.conversation.EventBuilder.buildAllVerified(
-        conversationEntity,
-        currentTimestamp,
-      );
+      const allVerifiedEvent = EventBuilder.buildAllVerified(conversationEntity, currentTimestamp);
       this.eventRepository.injectEvent(allVerifiedEvent);
       return true;
     }
@@ -178,12 +176,7 @@ export class ConversationVerificationStateHandler {
       }
 
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-      const event = window.z.conversation.EventBuilder.buildDegraded(
-        conversationEntity,
-        userIds,
-        type,
-        currentTimestamp,
-      );
+      const event = EventBuilder.buildDegraded(conversationEntity, userIds, type, currentTimestamp);
       this.eventRepository.injectEvent(event);
 
       return true;

@@ -32,7 +32,7 @@ export class Modal {
     };
   }
 
-  constructor(modal: string | HTMLElement, hideCallback: () => void, beforeHideCallback: () => void) {
+  constructor(modal: string | HTMLElement, hideCallback?: () => void, beforeHideCallback?: () => void) {
     this.handleClick = this.handleClick.bind(this);
 
     this.modal = typeof modal === 'string' ? document.querySelector(modal) : modal;

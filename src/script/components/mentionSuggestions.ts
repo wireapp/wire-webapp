@@ -18,14 +18,14 @@
  */
 
 import ko from 'knockout';
-import SimpleBar from 'simplebar';
+import type SimpleBar from 'simplebar';
 
 import {clamp} from 'Util/NumberUtil';
 import {noop} from 'Util/util';
 import {KEY, isEnterKey} from 'Util/KeyboardUtil';
 
 import {ParticipantAvatar} from 'Components/participantAvatar';
-import {User} from '../entity/User';
+import type {User} from '../entity/User';
 
 interface MentionSuggestionsParams {
   onSelectionValidated: (data: User, element: HTMLInputElement) => void;
@@ -120,7 +120,7 @@ class MentionSuggestions {
     return true;
   }
 
-  onSuggestionClick = (data: any, event: Event) => {
+  onSuggestionClick = (data: User, event: Event) => {
     event.preventDefault();
     $(this.targetInput).focus();
     this.onSelectionValidated(data, this.targetInput);

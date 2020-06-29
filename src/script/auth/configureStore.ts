@@ -20,13 +20,12 @@
 import {Store, applyMiddleware, combineReducers, createStore} from 'redux';
 import {composeWithDevTools} from 'redux-devtools-extension/developmentOnly';
 import thunk from 'redux-thunk';
+const reduxLogdown = require('redux-logdown');
 
 import {LOGGER_NAMESPACE} from 'Util/Logger';
 
 import {runtimeAction} from './module/action/RuntimeAction';
 import {RootState, ThunkDispatch, reducers} from './module/reducer';
-
-const reduxLogdown = require('redux-logdown');
 
 const configureStore = (thunkArguments: object = {}) => {
   const store: Store<RootState> = createStore(combineReducers(reducers), createMiddleware(thunkArguments));

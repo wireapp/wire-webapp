@@ -25,10 +25,10 @@ import {t} from 'Util/LocalizerUtil';
 import {noop} from 'Util/util';
 
 import './panelActions';
-import {User} from '../../entity/User';
-import {ConversationRoleRepository} from '../../conversation/ConversationRoleRepository';
-import {Conversation} from '../../entity/Conversation';
-import {ActionsViewModel} from '../../view_model/ActionsViewModel';
+import type {User} from '../../entity/User';
+import type {ConversationRoleRepository} from '../../conversation/ConversationRoleRepository';
+import type {Conversation} from '../../entity/Conversation';
+import type {ActionsViewModel} from '../../view_model/ActionsViewModel';
 
 export enum Actions {
   ACCEPT_REQUEST = 'UserActions.ACCEPT_REQUEST',

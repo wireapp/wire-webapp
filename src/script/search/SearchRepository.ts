@@ -17,14 +17,14 @@
  *
  */
 
-import {getLogger, Logger} from 'Util/Logger';
+import {Logger, getLogger} from 'Util/Logger';
 import {EMOJI_RANGES} from 'Util/EmojiUtil';
 import {startsWith, computeTransliteration, sortByPriority, transliterationIndex} from 'Util/StringUtil';
 
 import {validateHandle} from '../user/UserHandleGenerator';
-import {SearchService} from './SearchService';
-import {UserRepository} from '../user/UserRepository';
-import {User} from '../entity/User';
+import type {SearchService} from './SearchService';
+import type {UserRepository} from '../user/UserRepository';
+import type {User} from '../entity/User';
 
 export class SearchRepository {
   logger: Logger;
@@ -82,7 +82,7 @@ export class SearchRepository {
     if (term === '') {
       return userEntities;
     }
-    const excludedEmojis = Array.from(term).reduce((emojis: Record<string, string>, char) => {
+    const excludedEmojis = Array.from(term).reduce<Record<string, string>>((emojis, char) => {
       const isEmoji = EMOJI_RANGES.includes(char);
       if (isEmoji) {
         emojis[char] = char;

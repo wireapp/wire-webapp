@@ -17,8 +17,9 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client';
-import {CallConfigData} from '@wireapp/api-client/dist/account/CallConfigData';
+import type {APIClient} from '@wireapp/api-client';
+import type {WebappProperties} from '@wireapp/api-client/dist/user/data';
+import type {CallConfigData} from '@wireapp/api-client/dist/account/CallConfigData';
 import {
   CALL_TYPE,
   CONV_TYPE,
@@ -30,6 +31,7 @@ import {
   STATE as CALL_STATE,
   VIDEO_STATE,
   Wcall,
+  ERROR,
 } from '@wireapp/avs';
 import {Calling, GenericMessage} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -39,7 +41,7 @@ import 'webrtc-adapter';
 
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
-import {getLogger, Logger} from 'Util/Logger';
+import {Logger, getLogger} from 'Util/Logger';
 import {createRandomUuid} from 'Util/util';
 
 import {Config} from '../Config';
@@ -55,13 +57,15 @@ import {EventBuilder} from '../conversation/EventBuilder';
 import {EventInfoEntity} from '../conversation/EventInfoEntity';
 import {EventRepository} from '../event/EventRepository';
 
-import {MediaStreamHandler} from '../media/MediaStreamHandler';
+import type {MediaStreamHandler} from '../media/MediaStreamHandler';
 import {MediaType} from '../media/MediaType';
 
-import {User} from '../entity/User';
-import {ServerTimeHandler} from '../time/serverTimeHandler';
+import type {User} from '../entity/User';
+import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import {Call, ConversationId} from './Call';
-import {DeviceId, Participant, UserId} from './Participant';
+import {ClientId, Participant, UserId} from './Participant';
+import type {Recipients} from '../cryptography/CryptographyRepository';
+import type {Conversation} from '../entity/Conversation';
 
 interface MediaStreamQuery {
   audio?: boolean;
@@ -75,12 +79,12 @@ export class CallingRepository {
   private readonly eventRepository: EventRepository;
   private readonly mediaStreamHandler: MediaStreamHandler;
   private readonly serverTimeHandler: ServerTimeHandler;
-  private callQuality: {[conversationId: string]: QUALITY | undefined} = {};
+  private poorCallQualityUsers: {[conversationId: string]: string[]} = {};
 
   private avsVersion: number;
   private incomingCallCallback: (call: Call) => void;
   private isReady: boolean = false;
-  private selfClientId: DeviceId;
+  private selfClientId: ClientId;
   private selfUser: User;
   private wCall?: Wcall;
   private wUser?: number;
@@ -94,6 +98,7 @@ export class CallingRepository {
 
   private readonly logger: Logger;
   private readonly callLog: string[];
+  private readonly cbrEncoding: ko.Observable<number>;
 
   static get CONFIG() {
     return {
@@ -125,15 +130,20 @@ export class CallingRepository {
 
     this.logger = getLogger('CallingRepository');
     this.callLog = [];
+    this.cbrEncoding = ko.observable(0);
 
     this.subscribeToEvents();
   }
 
-  getStats(conversationId: ConversationId): Promise<{userid: UserId; stats: RTCStatsReport}[]> {
+  toggleCbrEncoding(vbrEnabled: boolean) {
+    this.cbrEncoding(vbrEnabled ? 0 : 1);
+  }
+
+  getStats(conversationId: ConversationId): Promise<{stats: RTCStatsReport; userid: UserId}[]> {
     return this.wCall.getStats(conversationId);
   }
 
-  initAvs(selfUser: any, clientId: DeviceId): Promise<{wCall: Wcall; wUser: number}> {
+  initAvs(selfUser: User, clientId: ClientId): Promise<{wCall: Wcall; wUser: number}> {
     this.selfUser = selfUser;
     this.selfClientId = clientId;
     return getAvsInstance().then(callingInstance => {
@@ -190,56 +200,70 @@ export class CallingRepository {
       this.callClosed, // `closeh`,
       () => {}, // `metricsh`,
       this.requestConfig, // `cfg_reqh`,
-      () => {}, // `acbrh`,
+      this.audioCbrChanged, // `acbrh`,
       this.videoStateChanged, // `vstateh`,
     );
     /* cspell:enable */
     const tenSeconds = 10;
-    wCall.setNetworkQualityHandler(
-      wUser,
-      (conversationId: string, userId: string, clientId: string, quality: number) => {
-        if (this.callQuality[conversationId] === quality) {
-          return;
-        }
-
-        this.callQuality[conversationId] = quality;
-
-        switch (quality) {
-          case QUALITY.NORMAL: {
-            amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.CALL_QUALITY_POOR);
-            this.logger.log(
-              `Normal call quality with user "${userId}" and client "${clientId}" in conversation "${conversationId}".`,
-            );
-            break;
-          }
-          case QUALITY.MEDIUM: {
-            this.logger.warn(
-              `Medium call quality with user "${userId}" and client "${clientId}" in conversation "${conversationId}".`,
-            );
-            break;
-          }
-          case QUALITY.POOR: {
-            this.logger.warn(
-              `Poor call quality with user "${userId}" and client "${clientId}" in conversation "${conversationId}".`,
-            );
-            break;
-          }
-          case QUALITY.NETWORK_PROBLEM: {
-            this.logger.warn(
-              `Network problem during call with user "${userId}" and client "${clientId}" in conversation "${conversationId}".`,
-            );
-            break;
-          }
-        }
-      },
-      tenSeconds,
-    );
+    wCall.setNetworkQualityHandler(wUser, this.updateCallQuality, tenSeconds);
     wCall.setMuteHandler(wUser, this.isMuted);
     wCall.setStateHandler(wUser, this.updateCallState);
     wCall.setParticipantChangedHandler(wUser, this.updateCallParticipants);
 
     return wUser;
   }
+
+  updateCallQuality = (conversationId: string, userId: string, clientId: string, quality: number) => {
+    const call = this.findCall(conversationId);
+    if (!call) {
+      return;
+    }
+
+    if (!this.poorCallQualityUsers[conversationId]) {
+      this.poorCallQualityUsers[conversationId] = [];
+    }
+
+    let users = this.poorCallQualityUsers[conversationId];
+    const isOldPoorCallQualityUser = users.some(_userId => _userId === userId);
+    if (isOldPoorCallQualityUser && quality === QUALITY.NORMAL) {
+      users = users.filter(_userId => _userId !== userId);
+    }
+    if (!isOldPoorCallQualityUser && quality !== QUALITY.NORMAL) {
+      users = [...users, userId];
+    }
+    if (users.length === 0) {
+      amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.CALL_QUALITY_POOR);
+    } else {
+      amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.CALL_QUALITY_POOR);
+    }
+
+    switch (quality) {
+      case QUALITY.NORMAL: {
+        this.logger.log(
+          `Normal call quality with user "${userId}" and client "${clientId}" in conversation "${conversationId}".`,
+        );
+        break;
+      }
+      case QUALITY.MEDIUM: {
+        this.logger.warn(
+          `Medium call quality with user "${userId}" and client "${clientId}" in conversation "${conversationId}".`,
+        );
+        break;
+      }
+      case QUALITY.POOR: {
+        this.logger.warn(
+          `Poor call quality with user "${userId}" and client "${clientId}" in conversation "${conversationId}".`,
+        );
+        break;
+      }
+      case QUALITY.NETWORK_PROBLEM: {
+        this.logger.warn(
+          `Network problem during call with user "${userId}" and client "${clientId}" in conversation "${conversationId}".`,
+        );
+        break;
+      }
+    }
+  };
 
   onIncomingCall(callback: (call: Call) => void): void {
     this.incomingCallCallback = callback;
@@ -249,9 +273,9 @@ export class CallingRepository {
     return this.activeCalls().find((callInstance: Call) => callInstance.conversationId === conversationId);
   }
 
-  private findParticipant(conversationId: ConversationId, userId: UserId): Participant | undefined {
+  private findParticipant(conversationId: ConversationId, userId: UserId, clientId: ClientId): Participant | undefined {
     const call = this.findCall(conversationId);
-    return call?.participants().find(participant => participant.userId === userId);
+    return call?.participants().find(participant => participant.userId === userId && participant.clientId === clientId);
   }
 
   private storeCall(call: Call): void {
@@ -307,6 +331,10 @@ export class CallingRepository {
   subscribeToEvents(): void {
     amplify.subscribe(WebAppEvents.CALL.EVENT_FROM_BACKEND, this.onCallEvent.bind(this));
     amplify.subscribe(WebAppEvents.CALL.STATE.TOGGLE, this.toggleState.bind(this)); // This event needs to be kept, it is sent by the wrapper
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_VBR_ENCODING, this.toggleCbrEncoding.bind(this));
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, ({settings}: WebappProperties) => {
+      this.toggleCbrEncoding(settings.call.enable_vbr_encoding);
+    });
   }
 
   //##############################################################################
@@ -368,6 +396,20 @@ export class CallingRepository {
 
       if (res !== 0) {
         this.logger.warn(`recv_msg failed with code: ${res}`);
+        if (res === ERROR.UNKNOWN_PROTOCOL && event.content.type === 'CONFSTART') {
+          const brandName = Config.getConfig().BRAND_NAME;
+          amplify.publish(
+            WebAppEvents.WARNING.MODAL,
+            ModalsViewModel.TYPE.ACKNOWLEDGE,
+            {
+              text: {
+                message: t('modalCallUpdateClientMessage', brandName),
+                title: t('modalCallUpdateClientHeadline', brandName),
+              },
+            },
+            'update-client-warning',
+          );
+        }
         return;
       }
       this.handleCallEventSaving(content.type, conversationId, userId, time, source);
@@ -400,7 +442,7 @@ export class CallingRepository {
   //##############################################################################
 
   toggleState(withVideo: boolean): void {
-    const conversationEntity: any = this.conversationRepository.active_conversation();
+    const conversationEntity: Conversation | undefined = this.conversationRepository.active_conversation();
     if (conversationEntity) {
       const isActiveCall = this.findCall(conversationEntity.id);
       const isGroupCall = conversationEntity.isGroup() ? CONV_TYPE.GROUP : CONV_TYPE.ONEONONE;
@@ -430,7 +472,7 @@ export class CallingRepository {
 
         return loadPreviewPromise.then(success => {
           if (success) {
-            this.wCall.start(this.wUser, conversationId, callType, conversationType, 0);
+            this.wCall.start(this.wUser, conversationId, callType, conversationType, this.cbrEncoding());
           } else {
             this.showNoCameraModal();
             this.removeCall(call);
@@ -475,7 +517,7 @@ export class CallingRepository {
           call.selfParticipant.releaseVideoStream();
         }
         return this.warmupMediaStreams(call, true, isVideoCall).then(() => {
-          this.wCall.answer(this.wUser, call.conversationId, callType, 0);
+          this.wCall.answer(this.wUser, call.conversationId, callType, this.cbrEncoding());
         });
       })
       .catch(() => {
@@ -488,8 +530,7 @@ export class CallingRepository {
   }
 
   leaveCall(conversationId: ConversationId): void {
-    amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.CALL_QUALITY_POOR);
-    delete this.callQuality[conversationId];
+    delete this.poorCallQualityUsers[conversationId];
     this.wCall.end(this.wUser, conversationId);
   }
 
@@ -589,9 +630,9 @@ export class CallingRepository {
     context: any,
     conversationId: ConversationId,
     userId: UserId,
-    clientId: DeviceId,
+    clientId: ClientId,
     destinationUserId: UserId,
-    destinationClientId: DeviceId,
+    destinationClientId: ClientId,
     payload: string,
   ): number => {
     const protoCalling = new Calling({content: payload});
@@ -625,6 +666,7 @@ export class CallingRepository {
   };
 
   private readonly callClosed = (reason: REASON, conversationId: ConversationId) => {
+    amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.CALL_QUALITY_POOR);
     const call = this.findCall(conversationId);
     if (!call) {
       return;
@@ -708,20 +750,22 @@ export class CallingRepository {
 
   private readonly updateCallParticipants = (conversationId: ConversationId, membersJson: string) => {
     const call = this.findCall(conversationId);
-    if (call) {
-      const {members}: {members: {userid: UserId; clientid: DeviceId}[]} = JSON.parse(membersJson);
-      const newMembers = members
-        .filter(({userid}) => !this.findParticipant(conversationId, userid))
-        .map(({userid, clientid}) => new Participant(userid, clientid));
-      const removedMembers = call
-        .participants()
-        .filter(
-          ({userId, deviceId}) => !members.find(({userid, clientid}) => userid === userId && clientid === deviceId),
-        );
-
-      newMembers.forEach(participant => call.participants.unshift(participant));
-      removedMembers.forEach(participant => call.participants.remove(participant));
+    if (!call) {
+      return;
     }
+
+    const {members}: {members: {clientid: ClientId; userid: UserId}[]} = JSON.parse(membersJson);
+    const newMembers = members
+      .filter(({userid, clientid}) => !this.findParticipant(conversationId, userid, clientid))
+      .map(({userid, clientid}) => new Participant(userid, clientid));
+    const removedMembers = call
+      .participants()
+      .filter(
+        ({userId, clientId}) => !members.find(member => member.userid === userId && member.clientid === clientId),
+      );
+
+    newMembers.forEach(participant => call.participants.unshift(participant));
+    removedMembers.forEach(participant => call.participants.remove(participant));
   };
 
   private readonly getCallMediaStream = (
@@ -778,6 +822,12 @@ export class CallingRepository {
       .then(mediaStream => {
         this.mediaStreamQuery = undefined;
         const newStream = selfParticipant.updateMediaStream(mediaStream);
+        if (missingStreams.screen) {
+          // https://stackoverflow.com/a/25179198/451634
+          newStream.getVideoTracks()[0].onended = () => {
+            this.toggleScreenshare(call);
+          };
+        }
         return newStream;
       })
       .catch(error => {
@@ -793,12 +843,12 @@ export class CallingRepository {
   private readonly updateParticipantStream = (
     conversationId: ConversationId,
     userId: UserId,
-    deviceId: DeviceId,
+    clientId: ClientId,
     streams: MediaStream[],
   ): void => {
-    let participant = this.findParticipant(conversationId, userId);
+    let participant = this.findParticipant(conversationId, userId, clientId);
     if (!participant) {
-      participant = new Participant(userId, deviceId);
+      participant = new Participant(userId, clientId);
       this.findCall(conversationId).participants.unshift(participant);
     }
 
@@ -815,10 +865,17 @@ export class CallingRepository {
     }
   };
 
+  private readonly audioCbrChanged = (userid: UserId, clientid: ClientId, enabled: number) => {
+    const activeCall = this.activeCalls()[0];
+    if (activeCall) {
+      activeCall.isCbrEnabled(!!enabled);
+    }
+  };
+
   private readonly videoStateChanged = (
     conversationId: ConversationId,
     userId: UserId,
-    deviceId: DeviceId,
+    clientId: ClientId,
     state: number,
   ) => {
     const call = this.findCall(conversationId);
@@ -829,7 +886,7 @@ export class CallingRepository {
       call
         .participants()
         .concat(call.selfParticipant)
-        .filter(participant => participant.userId === userId)
+        .filter(participant => participant.userId === userId && participant.clientId === clientId)
         .forEach(participant => participant.videoState(state));
     }
   };
@@ -837,8 +894,8 @@ export class CallingRepository {
   private targetMessageRecipients(
     payload: string,
     remoteUserId: UserId | null,
-    remoteClientId: DeviceId | null,
-  ): {precondition: any; recipients: any} {
+    remoteClientId: ClientId | null,
+  ): {precondition?: boolean | string[]; recipients: Recipients} {
     const {type, resp} = JSON.parse(payload);
     let precondition;
     let recipients;
@@ -873,7 +930,7 @@ export class CallingRepository {
         // Send to all clients of self user
         precondition = [this.selfUser.id];
         recipients = {
-          [this.selfUser.id]: this.selfUser.devices().map((device: any) => device.id),
+          [this.selfUser.id]: this.selfUser.devices().map(device => device.id),
         };
         break;
       }
@@ -884,7 +941,7 @@ export class CallingRepository {
           precondition = [this.selfUser.id];
           recipients = {
             [remoteUserId]: [`${remoteClientId}`],
-            [this.selfUser.id]: this.selfUser.devices().map((device: any) => device.id),
+            [this.selfUser.id]: this.selfUser.devices().map(device => device.id),
           };
         }
         break;

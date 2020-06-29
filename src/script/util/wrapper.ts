@@ -18,6 +18,7 @@
  */
 
 import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {ROLE} from '../user/UserPermission';
 import {Environment} from './Environment';
 

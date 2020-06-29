@@ -18,8 +18,9 @@
  */
 
 import ko from 'knockout';
+
 import {isRemovalAction} from 'Util/KeyboardUtil';
-import {User} from '../entity/User';
+import type {User} from '../entity/User';
 
 interface UserInputParams {
   enter: () => void | Promise<void>;
@@ -83,7 +84,7 @@ class UserInput {
     });
   }
 
-  onKeyDown(data: any, keyboardEvent: KeyboardEvent): true {
+  onKeyDown(_data: unknown, keyboardEvent: KeyboardEvent): true {
     if (typeof this.selectedUsers === 'function') {
       if (isRemovalAction(keyboardEvent) && !this.input().length) {
         this.selectedUsers.pop();

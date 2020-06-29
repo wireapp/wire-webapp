@@ -17,21 +17,21 @@
  *
  */
 
-import {LegalHoldStatus} from '@wireapp/api-client/dist/team/legalhold';
-import {REASON as AVS_REASON} from '@wireapp/avs';
+import type {LegalHoldStatus} from '@wireapp/api-client/dist/team/legalhold';
+import type {REASON as AVS_REASON} from '@wireapp/avs';
 
 import {createRandomUuid} from 'Util/util';
 
 import {BackendEvent} from '../event/Backend';
 import {CALL, CONVERSATION, ClientEvent} from '../event/Client';
 
-import {Call as CallEntity} from '../calling/Call';
+import type {Call as CallEntity} from '../calling/Call';
 import {StatusType} from '../message/StatusType';
 import {VerificationMessageType} from '../message/VerificationMessageType';
 
-import {Conversation} from '../entity/Conversation';
-import {Message} from '../entity/message/Message';
-import {User} from '../entity/User';
+import type {Conversation} from '../entity/Conversation';
+import type {Message} from '../entity/message/Message';
+import type {User} from '../entity/User';
 
 export interface BaseEvent {
   conversation: string;
@@ -297,7 +297,7 @@ export const EventBuilder = {
       type: ClientEvent.CONVERSATION.TEAM_MEMBER_LEAVE,
     };
   },
-  buildUnableToDecrypt(event: any, decryptionError: Error, errorCode: number): ErrorEvent {
+  buildUnableToDecrypt(event: any, decryptionError: Error, errorCode: number | string): ErrorEvent {
     const {conversation: conversationId, data: eventData, from, time} = event;
 
     return {
@@ -347,7 +347,3 @@ export const EventBuilder = {
     };
   },
 };
-
-window.z = window.z || {};
-window.z.conversation = window.z.conversation || {};
-window.z.conversation.EventBuilder = EventBuilder;

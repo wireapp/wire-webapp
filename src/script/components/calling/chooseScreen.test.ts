@@ -18,25 +18,31 @@
  */
 
 import ko from 'knockout';
+
 import {instantiateComponent} from '../../../../test/helper/knockoutHelpers';
 import './chooseScreen';
 
 describe('chooseScreen', () => {
   it('shows the available screens', () => {
     const screens = [
-      {id: 'first', thumbnail: {toDataURL: () => 'first'}},
-      {id: 'second', thumbnail: {toDataURL: () => 'second'}},
+      {id: 'screen:first', thumbnail: {toDataURL: () => 'first screen'}},
+      {id: 'screen:second', thumbnail: {toDataURL: () => 'second screen'}},
+    ];
+    const windows = [
+      {id: 'window:first', thumbnail: {toDataURL: () => 'first window'}},
+      {id: 'window:second', thumbnail: {toDataURL: () => 'second window'}},
     ];
     const params = {
       cancel: () => {},
       choose: () => {},
       screens: ko.observable(screens),
+      windows: ko.observable(windows),
     };
 
     return instantiateComponent('choose-screen', params).then((domContainer: Element) => {
       const screenItems = domContainer.querySelectorAll('.choose-screen-list-item');
 
-      expect(screenItems.length).toBe(screens.length);
+      expect(screenItems.length).toBe(screens.length + windows.length);
     });
   });
 });

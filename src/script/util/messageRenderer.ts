@@ -19,17 +19,17 @@
 
 import hljs from 'highlight.js';
 import MarkdownIt from 'markdown-it';
-import Token from 'markdown-it/lib/token';
+import type Token from 'markdown-it/lib/token';
 import {escape} from 'underscore';
 
 import {replaceInRange} from './StringUtil';
 
-import {MentionEntity} from '../message/MentionEntity';
+import type {MentionEntity} from '../message/MentionEntity';
 
 interface MentionText {
+  isSelfMentioned: boolean;
   text: string;
   userId: string;
-  isSelfMentioned: boolean;
 }
 
 interface MarkdownItWithOptions extends MarkdownIt {

@@ -17,24 +17,24 @@
  *
  */
 
-import {AppAction} from '.';
+import type {AppAction} from '.';
 
 export enum COOKIE_ACTION {
-  COOKIE_POLLING_STOP = 'COOKIE_POLLING_STOP',
-  COOKIE_POLLING_START = 'COOKIE_POLLING_START',
-  COOKIE_POLLING_FAILED = 'COOKIE_POLLING_FAILED',
-
+  COOKIE_GET_FAILED = 'COOKIE_GET_FAILED',
   COOKIE_GET_START = 'COOKIE_GET_START',
   COOKIE_GET_SUCCESS = 'COOKIE_GET_SUCCESS',
-  COOKIE_GET_FAILED = 'COOKIE_GET_FAILED',
 
-  COOKIE_SET_START = 'COOKIE_SET_START',
-  COOKIE_SET_SUCCESS = 'COOKIE_SET_SUCCESS',
-  COOKIE_SET_FAILED = 'COOKIE_SET_FAILED',
+  COOKIE_POLLING_FAILED = 'COOKIE_POLLING_FAILED',
+  COOKIE_POLLING_START = 'COOKIE_POLLING_START',
+  COOKIE_POLLING_STOP = 'COOKIE_POLLING_STOP',
 
+  COOKIE_REMOVE_FAILED = 'COOKIE_REMOVE_FAILED',
   COOKIE_REMOVE_START = 'COOKIE_REMOVE_START',
   COOKIE_REMOVE_SUCCESS = 'COOKIE_REMOVE_SUCCESS',
-  COOKIE_REMOVE_FAILED = 'COOKIE_REMOVE_FAILED',
+
+  COOKIE_SET_FAILED = 'COOKIE_SET_FAILED',
+  COOKIE_SET_START = 'COOKIE_SET_START',
+  COOKIE_SET_SUCCESS = 'COOKIE_SET_SUCCESS',
 }
 
 export type CookieActions =
@@ -52,16 +52,16 @@ export type CookieActions =
   | CookieRemoveFailedAction;
 
 export interface CookiePollingStartAction extends AppAction {
-  readonly type: COOKIE_ACTION.COOKIE_POLLING_START;
   readonly payload: {name: string; timerId: number};
+  readonly type: COOKIE_ACTION.COOKIE_POLLING_START;
 }
 export interface CookiePollingStopAction extends AppAction {
-  readonly type: COOKIE_ACTION.COOKIE_POLLING_STOP;
   readonly payload: {name: string; timerId: number};
+  readonly type: COOKIE_ACTION.COOKIE_POLLING_STOP;
 }
 export interface CookiePollingFailedAction extends AppAction {
-  readonly type: COOKIE_ACTION.COOKIE_POLLING_FAILED;
   readonly error: Error;
+  readonly type: COOKIE_ACTION.COOKIE_POLLING_FAILED;
 }
 
 export interface CookieGetStartAction extends AppAction {
@@ -73,8 +73,8 @@ export interface CookieGetSuccessAction extends AppAction {
   readonly type: COOKIE_ACTION.COOKIE_GET_SUCCESS;
 }
 export interface CookieGetFailedAction extends AppAction {
-  readonly type: COOKIE_ACTION.COOKIE_GET_FAILED;
   readonly error: Error;
+  readonly type: COOKIE_ACTION.COOKIE_GET_FAILED;
 }
 
 export interface CookieSetStartAction extends AppAction {
@@ -86,8 +86,8 @@ export interface CookieSetSuccessAction extends AppAction {
   readonly type: COOKIE_ACTION.COOKIE_SET_SUCCESS;
 }
 export interface CookieSetFailedAction extends AppAction {
-  readonly type: COOKIE_ACTION.COOKIE_SET_FAILED;
   readonly error: Error;
+  readonly type: COOKIE_ACTION.COOKIE_SET_FAILED;
 }
 
 export interface CookieRemoveStartAction extends AppAction {
@@ -99,8 +99,8 @@ export interface CookieRemoveSuccessAction extends AppAction {
   readonly type: COOKIE_ACTION.COOKIE_REMOVE_SUCCESS;
 }
 export interface CookieRemoveFailedAction extends AppAction {
-  readonly type: COOKIE_ACTION.COOKIE_REMOVE_FAILED;
   readonly error: Error;
+  readonly type: COOKIE_ACTION.COOKIE_REMOVE_FAILED;
 }
 
 export class CookieActionCreator {

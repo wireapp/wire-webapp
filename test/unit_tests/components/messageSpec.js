@@ -17,17 +17,17 @@
  *
  */
 
-import UUID from 'pure-uuid';
 import {instantiateComponent} from '../../helper/knockoutHelpers';
+import {TestFactory} from '../../helper/TestFactory';
 
 import {Conversation} from 'src/script/entity/Conversation';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {LinkPreview} from 'src/script/entity/message/LinkPreview';
 import {Text} from 'src/script/entity/message/Text';
 import {User} from 'src/script/entity/User';
-import {TestFactory} from '../../helper/TestFactory';
 import 'src/script/components/message';
 import {t} from 'Util/LocalizerUtil';
+import {createRandomUuid} from 'Util/util';
 
 describe('message', () => {
   const testFactory = new TestFactory();
@@ -62,7 +62,7 @@ describe('message', () => {
         onClickTimestamp: () => {},
         onLike: () => {},
         onMessageMarked: () => {},
-        selfId: () => new UUID(4).format(),
+        selfId: () => createRandomUuid(),
         shouldShowAvatar: true,
         shouldShowInvitePeople: true,
       };

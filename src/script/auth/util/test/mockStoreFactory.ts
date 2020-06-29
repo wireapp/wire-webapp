@@ -19,20 +19,21 @@
 
 const {createLogger} = require('redux-logger');
 import {APIClient} from '@wireapp/api-client';
-import {TypeUtil} from '@wireapp/commons';
+import type {TypeUtil} from '@wireapp/commons';
 import {Account} from '@wireapp/core';
 import Cookies, {CookiesStatic} from 'js-cookie';
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
-import {RootState, ThunkDispatch} from '../..//module/reducer';
+
+import type {RootState, ThunkDispatch} from '../..//module/reducer';
 import {ActionRoot, actionRoot} from '../../module/action/';
 
 export interface MockStoreParameters {
   actions?: TypeUtil.RecursivePartial<ActionRoot>;
   apiClient?: TypeUtil.RecursivePartial<APIClient>;
-  getConfig?: () => any;
   cookieStore?: CookiesStatic<object>;
   core?: TypeUtil.RecursivePartial<Account>;
+  getConfig?: () => any;
   localStorage?: Storage;
 }
 

@@ -18,14 +18,14 @@
  */
 
 import {Decoder} from 'bazinga64';
-import {ObservableArray} from 'knockout';
+import type {ObservableArray} from 'knockout';
 import sodium from 'libsodium-wrappers-sumo';
-import UUID from 'pure-uuid';
+import UUID from 'uuidjs';
+import {UrlUtil} from '@wireapp/commons';
 
 import {QUERY_KEY} from '../auth/route';
-import * as URLUtil from '../auth/util/urlUtil';
 import {Config} from '../Config';
-import {Conversation} from '../entity/Conversation';
+import type {Conversation} from '../entity/Conversation';
 import {StorageKey} from '../storage/StorageKey';
 
 import {Environment} from './Environment';
@@ -37,7 +37,7 @@ export const isTemporaryClientAndNonPersistent = (persist: boolean): boolean => 
     throw new Error('Type of client is unspecified.');
   }
 
-  const isNonPersistentByUrl = URLUtil.getURLParameter(QUERY_KEY.PERSIST_TEMPORARY_CLIENTS) === 'false';
+  const isNonPersistentByUrl = UrlUtil.getURLParameter(QUERY_KEY.PERSIST_TEMPORARY_CLIENTS) === 'false';
   const isNonPersistentByServerConfig = Config.getConfig().FEATURE?.PERSIST_TEMPORARY_CLIENTS === false;
   const isNonPersistent = isNonPersistentByUrl || isNonPersistentByServerConfig;
 
@@ -261,7 +261,7 @@ export const downloadFile = (url: string, fileName: string, mimeType?: string): 
   }, 100);
 };
 
-export const createRandomUuid = (): string => new UUID(4).format();
+export const createRandomUuid = (): string => UUID.genV4().toString();
 
 // Note IE10 listens to "transitionend" instead of "animationend"
 export const alias = {
@@ -302,7 +302,7 @@ export const sortObjectByKeys = (object: Record<string, any>, reverse: boolean) 
   }
 
   // Returns a copy of an object, which is ordered by the keys of the original object.
-  return keys.reduce((sortedObject: Record<string, any>, key: string) => {
+  return keys.reduce<Record<string, any>>((sortedObject, key: string) => {
     sortedObject[key] = object[key];
     return sortedObject;
   }, {});
@@ -311,7 +311,7 @@ export const sortObjectByKeys = (object: Record<string, any>, reverse: boolean) 
 // Removes url(' and url(" from the beginning of the string and also ") and ') from the end
 export const stripUrlWrapper = (url: string) => url.replace(/^url\(["']?/, '').replace(/["']?\)$/, '');
 
-export const validateProfileImageResolution = (file: any, minWidth: number, minHeight: number): Promise<boolean> => {
+export const validateProfileImageResolution = (file: File, minWidth: number, minHeight: number): Promise<boolean> => {
   return new Promise((resolve, reject) => {
     const image = new Image();
     image.onload = () => resolve(image.width >= minWidth && image.height >= minHeight);

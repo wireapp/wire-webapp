@@ -17,20 +17,28 @@
  *
  */
 
-import Dexie from 'dexie';
+import type Dexie from 'dexie';
 
 import {chunk} from 'Util/ArrayUtil';
 import {Logger, getLogger} from 'Util/Logger';
 
-import {ClientRepository} from '../client/ClientRepository';
-import {ConnectionRepository} from '../connection/ConnectionRepository';
-import {ConversationRepository} from '../conversation/ConversationRepository';
-import {Conversation} from '../entity/Conversation';
+import type {ClientRepository} from '../client/ClientRepository';
+import type {ConnectionRepository} from '../connection/ConnectionRepository';
+import type {ConversationRepository} from '../conversation/ConversationRepository';
+import type {Conversation} from '../entity/Conversation';
 import {ClientEvent} from '../event/Client';
 import {StorageSchemata} from '../storage/StorageSchemata';
-import {UserRepository} from '../user/UserRepository';
+import type {UserRepository} from '../user/UserRepository';
 import {BackupService} from './BackupService';
 import {WebWorker} from '../util/worker';
+import {
+  CancelError,
+  DifferentAccountError,
+  ExportError,
+  IncompatibleBackupError,
+  IncompatiblePlatformError,
+  InvalidMetaDataError,
+} from './Error';
 
 export interface Metadata {
   client_id: string;
@@ -123,8 +131,8 @@ export class BackupRepository {
       return this.compressHistoryFiles(exportedData);
     } catch (error) {
       this.logger.error(`Could not export history: ${error.message}`, error);
-      const isCancelError = error instanceof window.z.backup.CancelError;
-      throw isCancelError ? error : new window.z.backup.ExportError();
+      const isCancelError = error instanceof CancelError;
+      throw isCancelError ? error : new ExportError();
     }
   }
 
@@ -184,7 +192,7 @@ export class BackupRepository {
 
     await this.backupService.exportTable(table, tableRows => {
       if (this.isCanceled) {
-        throw new window.z.backup.CancelError();
+        throw new CancelError();
       }
       exportedEntitiesCount += tableRows.length;
       onProgress(tableRows, exportedEntitiesCount);
@@ -227,7 +235,7 @@ export class BackupRepository {
   ): Promise<void> {
     this.isCanceled = false;
     if (!files[BackupRepository.CONFIG.FILENAME.METADATA]) {
-      throw new window.z.backup.InvalidMetaDataError();
+      throw new InvalidMetaDataError();
     }
 
     try {
@@ -315,7 +323,7 @@ export class BackupRepository {
     for (const importChunk of importChunks) {
       await importFunction(importChunk);
       if (this.isCanceled) {
-        throw new window.z.backup.CancelError();
+        throw new CancelError();
       }
     }
   }
@@ -347,13 +355,13 @@ export class BackupRepository {
       const fromUserId = archiveMetadata.user_id;
       const toUserId = localMetadata.user_id;
       const message = `History from user "${fromUserId}" cannot be restored for user "${toUserId}".`;
-      throw new window.z.backup.DifferentAccountError(message);
+      throw new DifferentAccountError(message);
     }
 
     const isExpectedPlatform = archiveMetadata.platform === localMetadata.platform;
     if (!isExpectedPlatform) {
       const message = `History created from "${archiveMetadata.platform}" device cannot be imported`;
-      throw new window.z.backup.IncompatiblePlatformError(message);
+      throw new IncompatiblePlatformError(message);
     }
 
     const lowestDbVersion = Math.min(archiveMetadata.version, localMetadata.version);
@@ -366,7 +374,7 @@ export class BackupRepository {
 
     if (involvesDatabaseMigration) {
       const message = 'History cannot be restored: Database version mismatch';
-      throw new window.z.backup.IncompatibleBackupError(message);
+      throw new IncompatibleBackupError(message);
     }
   }
 }

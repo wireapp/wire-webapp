@@ -17,11 +17,12 @@
  *
  */
 
-import {SSOSettings} from '@wireapp/api-client/dist/account/SSOSettings';
-import {LoginData} from '@wireapp/api-client/dist/auth';
+import type {SSOSettings} from '@wireapp/api-client/dist/account/SSOSettings';
+import type {LoginData} from '@wireapp/api-client/dist/auth';
 import {ClientType} from '@wireapp/api-client/dist/client';
-import {TeamData} from '@wireapp/api-client/dist/team';
-import {UserAsset} from '@wireapp/api-client/dist/user';
+import type {TeamData} from '@wireapp/api-client/dist/team';
+import type {UserAsset} from '@wireapp/api-client/dist/user';
+
 import {Config} from '../../../Config';
 import {AUTH_ACTION, AppActions, USER_ACTION} from '../action/creator/';
 import {REGISTER_FLOW} from '../selector/AuthSelector';
@@ -48,10 +49,10 @@ export type AuthState = {
   readonly error: Error;
   readonly fetched: boolean;
   readonly fetching: boolean;
+  readonly fetchingSSOSettings: boolean;
   readonly isAuthenticated: boolean;
   readonly loginData: Partial<LoginData>;
   readonly ssoSettings?: SSOSettings;
-  readonly fetchingSSOSettings: boolean;
 };
 
 export const initialAuthState: AuthState = {

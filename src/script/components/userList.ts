@@ -22,11 +22,11 @@ import ko from 'knockout';
 import {partition} from 'Util/ArrayUtil';
 import {sortByPriority} from 'Util/StringUtil';
 
-import {ConversationRepository} from '../conversation/ConversationRepository';
-import {Conversation} from '../entity/Conversation';
-import {User} from '../entity/User';
+import type {ConversationRepository} from '../conversation/ConversationRepository';
+import type {Conversation} from '../entity/Conversation';
+import type {User} from '../entity/User';
 import {SearchRepository} from '../search/SearchRepository';
-import {TeamRepository} from '../team/TeamRepository';
+import type {TeamRepository} from '../team/TeamRepository';
 import {viewportObserver} from '../ui/viewportObserver';
 import {validateHandle} from '../user/UserHandleGenerator';
 
@@ -41,26 +41,26 @@ export enum UserlistMode {
 const USER_CHUNK_SIZE = 64;
 
 interface UserListParams {
+  arrow: boolean;
   click: (userEntity: User, event: MouseEvent) => void;
+  conversation: ko.Observable<Conversation>;
+  conversationRepository: ConversationRepository;
   filter: ko.Observable<string>;
-  selected: ko.ObservableArray<User>;
+  highlightedUsers: () => User[];
+  infos: Record<string, string>;
+  maxVisibleUsers: number;
+  mode: UserlistMode;
+  noSelfInteraction: boolean;
+  noUnderline: boolean;
+  reducedUserCount: number;
   searchRepository: SearchRepository;
+  selected: ko.ObservableArray<User>;
+  selfFirst: boolean;
+  showEmptyAdmin: boolean;
   skipSearch: boolean;
   teamRepository: TeamRepository;
-  conversationRepository: ConversationRepository;
-  user: ko.Observable<User[]>;
-  infos: Record<string, string>;
-  highlightedUsers: () => User[];
-  noUnderline: boolean;
-  arrow: boolean;
-  mode: UserlistMode;
-  conversation: ko.Observable<Conversation>;
   truncate: boolean;
-  maxVisibleUsers: number;
-  reducedUserCount: number;
-  showEmptyAdmin: boolean;
-  selfFirst: boolean;
-  noSelfInteraction: boolean;
+  user: ko.Observable<User[]>;
 }
 
 const listTemplate = (data: string, uieName: string = ''): string => `

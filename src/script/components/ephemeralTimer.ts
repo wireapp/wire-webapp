@@ -17,7 +17,7 @@
  *
  */
 
-import {Message} from '../entity/message/Message';
+import type {Message} from '../entity/message/Message';
 
 interface EphemeralTimerParams {
   message: Message;
@@ -32,7 +32,7 @@ class EphemeralTimer {
     this.duration = ((messageEntity.ephemeral_expires() as number) - this.started) / 1000;
   }
 
-  setAnimationDelay(data: any, event: Event) {
+  setAnimationDelay(_: unknown, event: Event) {
     // every time the component gets rendered, the animation delay gets set
     // to accommodate for the passed lifetime of the timed message
     (event.target as HTMLElement).style.animationDelay = `${(this.started - Date.now()) / 1000}s`;

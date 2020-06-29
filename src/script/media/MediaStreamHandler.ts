@@ -18,18 +18,19 @@
  */
 
 import {amplify} from 'amplify';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {Environment} from 'Util/Environment';
 import {Logger, getLogger} from 'Util/Logger';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {MediaError} from '../error/MediaError';
 import {PermissionError} from '../error/PermissionError';
-import {PermissionRepository} from '../permission/PermissionRepository';
+import type {PermissionRepository} from '../permission/PermissionRepository';
 import {PermissionStatusState} from '../permission/PermissionStatusState';
 import {PermissionType} from '../permission/PermissionType';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {MediaConstraintsHandler, ScreensharingMethods} from './MediaConstraintsHandler';
-import {MEDIA_STREAM_ERROR} from './MediaStreamError';
+import type {MEDIA_STREAM_ERROR} from './MediaStreamError';
 import {MEDIA_STREAM_ERROR_TYPES} from './MediaStreamErrorTypes';
 import {MediaType} from './MediaType';
 
@@ -65,14 +66,16 @@ export class MediaStreamHandler {
     }
   }
 
-  requestMediaStream(audio: boolean, video: boolean, screen: boolean, isGroup: boolean): Promise<MediaStream> {
+  async requestMediaStream(audio: boolean, video: boolean, screen: boolean, isGroup: boolean): Promise<MediaStream> {
     const hasPermission = this.hasPermissionToAccess(audio, video);
-    return this.getMediaStream(audio, video, screen, isGroup, hasPermission).catch(error => {
+    try {
+      return await this.getMediaStream(audio, video, screen, isGroup, hasPermission);
+    } catch (error) {
       const isPermissionDenied = error.type === PermissionError.TYPE.DENIED;
       throw isPermissionDenied
         ? new MediaError(MediaError.TYPE.MEDIA_STREAM_PERMISSION, MediaError.MESSAGE.MEDIA_STREAM_PERMISSION)
         : error;
-    });
+    }
   }
 
   selectScreenToShare(showScreenSelection: () => Promise<void>): Promise<void> {
@@ -124,16 +127,19 @@ export class MediaStreamHandler {
     const mediaStreamTracks = this.getMediaTracks(mediaStream, mediaType);
 
     if (mediaStreamTracks.length) {
-      mediaStreamTracks.forEach(mediaStreamTrack => {
+      mediaStreamTracks.forEach((mediaStreamTrack: MediaStreamTrack) => {
         mediaStream.removeTrack(mediaStreamTrack);
         mediaStreamTrack.stop();
-        this.logger.info(`Stopping MediaStreamTrack of kind '${mediaStreamTrack.kind}' successful`, mediaStreamTrack);
+        this.logger.info(
+          `Stopped MediaStreamTrack ID '${mediaStreamTrack.id}' of kind '${mediaStreamTrack.kind}'`,
+          mediaStreamTrack,
+        );
       });
 
       return true;
     }
 
-    this.logger.warn('No MediaStreamTrack found to stop', mediaStream);
+    this.logger.warn('No MediaStreamTracks found to stop', mediaStream);
     return false;
   }
 
@@ -242,7 +248,7 @@ export class MediaStreamHandler {
     }
   }
 
-  private selectPermissionDeniedWarningType(audio: boolean, video: boolean, screen: boolean): any {
+  private selectPermissionDeniedWarningType(audio: boolean, video: boolean, screen: boolean): string {
     if (video) {
       return WarningsViewModel.TYPE.DENIED_CAMERA;
     }
@@ -252,7 +258,7 @@ export class MediaStreamHandler {
     return WarningsViewModel.TYPE.DENIED_MICROPHONE;
   }
 
-  private selectPermissionRequestWarningType(audio: boolean, video: boolean, screen: boolean): any {
+  private selectPermissionRequestWarningType(audio: boolean, video: boolean, screen: boolean): string {
     if (video) {
       return WarningsViewModel.TYPE.REQUEST_CAMERA;
     }

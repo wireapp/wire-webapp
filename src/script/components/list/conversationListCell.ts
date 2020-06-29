@@ -24,21 +24,22 @@ import {noop} from 'Util/util';
 import {ParticipantAvatar} from 'Components/participantAvatar';
 import {generateCellState} from '../../conversation/ConversationCellState';
 import {ConversationStatusIcon} from '../../conversation/ConversationStatusIcon';
-import {Conversation} from '../../entity/Conversation';
+import type {Conversation} from '../../entity/Conversation';
 import {MediaType} from '../../media/MediaType';
 import {viewportObserver} from '../../ui/viewportObserver';
 
 import 'Components/availabilityState';
+import type {User} from '../../entity/User';
 
 interface ConversationListCellProps {
-  showJoinButton: boolean;
-  conversation: Conversation;
-  onJoinCall: (conversation: Conversation, mediaType: MediaType) => void;
-  is_selected: (conversation: Conversation) => boolean;
   click: () => void;
+  conversation: Conversation;
   index: ko.Observable<number>;
+  is_selected: (conversation: Conversation) => boolean;
   isVisibleFunc: (top: number, bottom: number) => boolean;
   offsetTop: ko.Observable<number>;
+  onJoinCall: (conversation: Conversation, mediaType: MediaType) => void;
+  showJoinButton: boolean;
 }
 
 class ConversationListCell {
@@ -51,7 +52,7 @@ class ConversationListCell {
   is1To1: boolean;
   isInTeam: boolean;
   isInViewport: ko.Observable<boolean>;
-  users: any;
+  users: ko.ObservableArray<User>;
   cell_state: ko.Observable<ReturnType<typeof generateCellState>>;
   ConversationStatusIcon: typeof ConversationStatusIcon;
   onClickJoinCall: (viewModel: ConversationListCell, event: MouseEvent) => void;

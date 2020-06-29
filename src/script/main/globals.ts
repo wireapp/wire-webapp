@@ -19,13 +19,13 @@
 
 import {amplify} from 'amplify';
 import jQuery from 'jquery';
-import Cookies from 'js-cookie';
 import ko from 'knockout';
-import {RaygunStatic} from 'raygun4js';
+import type {RaygunStatic} from 'raygun4js';
 import 'raygun4js/dist/raygun.vanilla';
+import type {t} from 'Util/LocalizerUtil';
 
-import {AssetService} from '../assets/AssetService';
-import {NotificationService} from '../event/NotificationService';
+import type {AssetService} from '../assets/AssetService';
+import type {NotificationService} from '../event/NotificationService';
 
 import '../Config';
 
@@ -59,27 +59,16 @@ import 'Components/userInput';
 
 import 'Util/LocalizerUtil';
 
-import '../backup/Error';
-import '../conversation/EventBuilder';
 import '../localization/Localizer';
-import '../message/MessageCategorization';
 import '../view_model/bindings/CommonBindings';
 import '../view_model/bindings/ConversationListBindings';
 import '../view_model/bindings/ListBackgroundBindings';
 import '../view_model/bindings/MessageListBindings';
 import '../view_model/bindings/VideoCallingBindings';
-import '../view_model/content/CollectionDetailsViewModel';
-import '../view_model/content/CollectionViewModel';
-import '../view_model/content/ConnectRequestsViewModel';
-import '../view_model/content/GiphyViewModel';
-import '../view_model/content/HistoryExportViewModel';
-import '../view_model/content/HistoryImportViewModel';
 import '../view_model/content/InputBarViewModel';
 import '../view_model/content/PreferencesAboutViewModel';
-import '../view_model/content/PreferencesAccountViewModel';
 import '../view_model/content/PreferencesDeviceDetailsViewModel';
 import '../view_model/content/PreferencesDevicesViewModel';
-import '../view_model/content/PreferencesOptionsViewModel';
 import '../view_model/content/TitleBarViewModel';
 import '../view_model/FaviconViewModel';
 import '../view_model/ImageDetailViewViewModel';
@@ -90,14 +79,12 @@ import '../view_model/PanelViewModel';
 
 declare global {
   interface Window {
-    $: any;
+    $: typeof jQuery;
     amplify: amplify.Static;
-    bazinga64: any;
-    jQuery: any;
+    jQuery: typeof jQuery;
     ko: typeof ko;
-    platform: any;
     Raygun: RaygunStatic;
-    t: any;
+    t: typeof t;
     wire: {
       app: {
         service: {
@@ -121,6 +108,7 @@ declare global {
           CHECK_CONSENT: boolean;
           DEFAULT_LOGIN_TEMPORARY_CLIENT: boolean;
           ENABLE_ACCOUNT_REGISTRATION: boolean;
+          ENABLE_ACCOUNT_REGISTRATION_ACCEPT_TERMS_AND_PRIVACY_POLICY: boolean;
           ENABLE_DEBUG: boolean;
           ENABLE_DOMAIN_DISCOVERY: boolean;
           ENABLE_PHONE_LOGIN: boolean;
@@ -135,11 +123,7 @@ declare global {
         URL: {
           ACCOUNT_BASE: string;
           MOBILE_BASE: string;
-          TEAMS_BASE: string;
-          WEBSITE_BASE: string;
           PRIVACY_POLICY: string;
-          TERMS_OF_USE_PERSONAL: string;
-          TERMS_OF_USE_TEAMS: string;
           SUPPORT: {
             BUG_REPORT: string;
             CALLING: string;
@@ -153,8 +137,13 @@ declare global {
             MICROPHONE_ACCESS_DENIED: string;
             SCREEN_ACCESS_DENIED: string;
           };
+          TEAMS_BASE: string;
+          TERMS_OF_USE_PERSONAL: string;
+          TERMS_OF_USE_TEAMS: string;
+          WEBSITE_BASE: string;
         };
         VERSION: string;
+        WEBSITE_LABEL: string;
       };
     };
     wSSOCapable: boolean;
@@ -163,7 +152,6 @@ declare global {
 }
 
 window.amplify = amplify;
-window.Cookies = Cookies;
 // we need to publish jQuery on the window so that knockout can use it
 window.jQuery = jQuery;
 window.ko = ko;

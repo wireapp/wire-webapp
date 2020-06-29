@@ -110,9 +110,9 @@ describe('NotificationRepository', () => {
       testFactory.notification_repository.permissionState(PermissionStatusState.GRANTED);
       Environment.browser.supports.notifications = true;
       testFactory.notification_repository.__test__assignEnvironment(Environment);
-      window.wire.app = {
-        service: {asset: {generateAssetUrl: () => Promise.resolve('/image/logo/notification.png')}},
-      };
+      spyOn(testFactory.notification_repository.assetRepository, 'generateAssetUrl').and.returnValue(
+        Promise.resolve('/image/logo/notification.png'),
+      );
       contentViewModelState.state = ko.observable(ContentViewModel.STATE.CONVERSATION);
       contentViewModelState.multitasking = {
         isMinimized: () => true,

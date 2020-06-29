@@ -18,6 +18,7 @@
  */
 
 import ko from 'knockout';
+
 import {Call} from 'src/script/calling/Call';
 import {Participant} from 'src/script/calling/Participant';
 import {Conversation} from 'src/script/entity/Conversation';
@@ -32,7 +33,7 @@ describe('fullscreenVideoCall', () => {
     const conversation = new Conversation();
     spyOn(conversation, 'supportsVideoCall').and.returnValue(true);
     call = new Call('', '', 0, new Participant('', ''), 0);
-    const params: any = {
+    const params = {
       call,
       callActions: {},
       canShareScreen: false,
@@ -44,7 +45,7 @@ describe('fullscreenVideoCall', () => {
           audioInput: () => '',
           videoInput: () => '',
         },
-      } as any,
+      },
       multitasking: {autoMinimize: () => false},
       videoGrid: ko.observable({grid: [], hasRemoteVideo: false, thumbnail: null}),
     };

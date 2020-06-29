@@ -26,10 +26,10 @@ import {includesOnlyEmojis} from 'Util/EmojiUtil';
 
 import {QuoteEntity} from '../message/QuoteEntity';
 import {ConversationError} from '../error/ConversationError';
-import {Conversation} from '../entity/Conversation';
-import {ConversationRepository} from '../conversation/ConversationRepository';
-import {ContentMessage} from '../entity/message/ContentMessage';
-import {User} from '../entity/User';
+import type {Conversation} from '../entity/Conversation';
+import type {ConversationRepository} from '../conversation/ConversationRepository';
+import type {ContentMessage} from '../entity/message/ContentMessage';
+import type {User} from '../entity/User';
 
 interface MessageQuoteParams {
   conversation: ko.Observable<Conversation>;

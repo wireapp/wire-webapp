@@ -17,20 +17,20 @@
  *
  */
 
-import {AppAction} from '.';
+import type {AppAction} from '.';
 
 export enum LOCAL_STORAGE_ACTION {
-  LOCAL_STORAGE_SET_START = 'LOCAL_STORAGE_SET_START',
-  LOCAL_STORAGE_SET_SUCCESS = 'LOCAL_STORAGE_SET_SUCCESS',
-  LOCAL_STORAGE_SET_FAILED = 'LOCAL_STORAGE_SET_FAILED',
-
-  LOCAL_STORAGE_GET_START = 'LOCAL_STORAGE_GET_START',
-  LOCAL_STORAGE_GET_SUCCESS = 'LOCAL_STORAGE_GET_SUCCESS',
-  LOCAL_STORAGE_GET_FAILED = 'LOCAL_STORAGE_GET_FAILED',
-
+  LOCAL_STORAGE_DELETE_FAILED = 'LOCAL_STORAGE_DELETE_FAILED',
   LOCAL_STORAGE_DELETE_START = 'LOCAL_STORAGE_DELETE_START',
   LOCAL_STORAGE_DELETE_SUCCESS = 'LOCAL_STORAGE_DELETE_SUCCESS',
-  LOCAL_STORAGE_DELETE_FAILED = 'LOCAL_STORAGE_DELETE_FAILED',
+
+  LOCAL_STORAGE_GET_FAILED = 'LOCAL_STORAGE_GET_FAILED',
+  LOCAL_STORAGE_GET_START = 'LOCAL_STORAGE_GET_START',
+  LOCAL_STORAGE_GET_SUCCESS = 'LOCAL_STORAGE_GET_SUCCESS',
+
+  LOCAL_STORAGE_SET_FAILED = 'LOCAL_STORAGE_SET_FAILED',
+  LOCAL_STORAGE_SET_START = 'LOCAL_STORAGE_SET_START',
+  LOCAL_STORAGE_SET_SUCCESS = 'LOCAL_STORAGE_SET_SUCCESS',
 }
 
 export type LocalStorageActions =
@@ -52,8 +52,8 @@ export interface SetSuccessAction extends AppAction {
   readonly type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_SET_SUCCESS;
 }
 export interface SetFailedAction extends AppAction {
-  readonly type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_SET_FAILED;
   readonly error: Error;
+  readonly type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_SET_FAILED;
 }
 
 export interface GetStartAction extends AppAction {
@@ -64,8 +64,8 @@ export interface GetSuccessAction extends AppAction {
   readonly type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_GET_SUCCESS;
 }
 export interface GetFailedAction extends AppAction {
-  readonly type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_GET_FAILED;
   readonly error: Error;
+  readonly type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_GET_FAILED;
 }
 
 export interface DeleteStartAction extends AppAction {
@@ -76,8 +76,8 @@ export interface DeleteSuccessAction extends AppAction {
   readonly type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_DELETE_SUCCESS;
 }
 export interface DeleteFailedAction extends AppAction {
-  readonly type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_DELETE_FAILED;
   readonly error: Error;
+  readonly type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_DELETE_FAILED;
 }
 
 export class LocalStorageActionCreator {

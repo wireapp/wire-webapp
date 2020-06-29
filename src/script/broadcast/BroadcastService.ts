@@ -17,8 +17,8 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client';
-import {ClientMismatch, NewOTRMessage} from '@wireapp/api-client/dist/conversation';
+import type {APIClient} from '@wireapp/api-client';
+import type {ClientMismatch, NewOTRMessage} from '@wireapp/api-client/dist/conversation';
 
 export class BroadcastService {
   private readonly apiClient: APIClient;

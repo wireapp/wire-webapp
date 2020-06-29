@@ -18,10 +18,11 @@
  */
 
 import {TEAM_EVENT} from '@wireapp/api-client/dist/event/TeamEvent';
+
 import {t} from 'Util/LocalizerUtil';
 
 import {SystemMessageType} from '../../message/SystemMessageType';
-import {Conversation} from '../Conversation';
+import type {Conversation} from '../Conversation';
 import {SystemMessage} from './SystemMessage';
 
 export class DeleteConversationMessage extends SystemMessage {

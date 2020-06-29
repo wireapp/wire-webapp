@@ -17,21 +17,21 @@
  *
  */
 
-import {RichInfoField} from '@wireapp/api-client/dist/user/RichInfo';
+import type {RichInfoField} from '@wireapp/api-client/dist/user/RichInfo';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
 import {t} from 'Util/LocalizerUtil';
 import {noop} from 'Util/util';
 
-import {User} from '../../entity/User';
+import type {User} from '../../entity/User';
 import {APIClientSingleton} from '../../service/APIClientSingleton';
 import {RichProfileRepository} from '../../user/RichProfileRepository';
 
 interface ComponentParams {
-  user: ko.Observable<User>;
   onFieldsLoaded: (richFields: RichInfoField[]) => void;
   richProfileRepository: RichProfileRepository;
+  user: ko.Observable<User>;
 }
 
 class EnrichedFields {

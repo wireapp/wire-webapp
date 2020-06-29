@@ -18,7 +18,8 @@
  */
 
 import ko from 'knockout';
-import {Conversation} from '../entity/Conversation';
+
+import type {Conversation} from '../entity/Conversation';
 
 interface ReceiptModeToggleParams {
   conversation: ko.Observable<Conversation>;
@@ -32,10 +33,10 @@ interface ReceiptModeToggleParams {
 
 class ReceiptModeToggle {
   conversation: Conversation;
-  updateValue: (data: any, event: Event) => void;
+  updateValue: (_data: unknown, _event: Event) => void;
   constructor(params: ReceiptModeToggleParams) {
     this.conversation = ko.unwrap(params.conversation);
-    this.updateValue = (data: any, event: Event) => {
+    this.updateValue = (_data: unknown, event: Event) => {
       const intValue = (event.target as HTMLInputElement).checked ? 1 : 0;
       this.conversation.receiptMode(intValue);
       params.onReceiptModeChanged(this.conversation, {

@@ -23,7 +23,7 @@ import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
 
 import {Config} from '../../Config';
-import {UserRepository} from '../../user/UserRepository';
+import type {UserRepository} from '../../user/UserRepository';
 
 export class InviteModalViewModel {
   inviteMessage: ko.PureComputed<string>;

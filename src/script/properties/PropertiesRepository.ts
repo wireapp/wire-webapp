@@ -28,11 +28,11 @@ import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
 
 import {Config} from '../Config';
-import {User} from '../entity/User';
-import {SelfService} from '../self/SelfService';
+import type {User} from '../entity/User';
+import type {SelfService} from '../self/SelfService';
 import {ConsentValue} from '../user/ConsentValue';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
-import {PropertiesService} from './PropertiesService';
+import type {PropertiesService} from './PropertiesService';
 import {PROPERTIES_TYPE} from './PropertiesType';
 
 export class PropertiesRepository {
@@ -53,7 +53,7 @@ export class PropertiesRepository {
 
   private readonly logger: Logger;
   private readonly propertiesService: PropertiesService;
-  private readonly receiptMode: ko.Observable<any>;
+  public readonly receiptMode: ko.Observable<Confirmation.Type>;
   private readonly selfService: SelfService;
   private readonly selfUser: ko.Observable<User>;
   public properties: WebappProperties;
@@ -70,11 +70,15 @@ export class PropertiesRepository {
       },
       enable_debugging: false,
       settings: {
+        call: {
+          enable_vbr_encoding: true,
+        },
         emoji: {
           replace_inline: true,
         },
         interface: {
           theme: 'default',
+          view_folders: false,
         },
         notifications: NotificationPreference.ON,
         previews: {
@@ -271,7 +275,7 @@ export class PropertiesRepository {
   private savePreferenceActivatedAccount(propertiesType: string, updatedPreference: any): Promise<void> {
     return this.propertiesService
       .putPropertiesByKey(PropertiesRepository.CONFIG.WEBAPP_ACCOUNT_SETTINGS, this.properties)
-      .then(() => this.logger.info(`Saved updated preference: '${propertiesType}' - '${updatedPreference}'`));
+      .then(() => this.logger.info(`Saved updated preference "${propertiesType}": ${updatedPreference}`));
   }
 
   private savePreferenceTemporaryGuestAccount(propertiesType: string, updatedPreference: any): Promise<void> {
@@ -286,6 +290,9 @@ export class PropertiesRepository {
         break;
       case PROPERTIES_TYPE.INTERFACE.THEME:
         amplify.publish(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, updatedPreference);
+        break;
+      case PROPERTIES_TYPE.INTERFACE.VIEW_FOLDERS:
+        amplify.publish(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.VIEW_FOLDERS, updatedPreference);
         break;
       case PROPERTIES_TYPE.EMOJI.REPLACE_INLINE:
         amplify.publish(WebAppEvents.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE, updatedPreference);
@@ -304,6 +311,9 @@ export class PropertiesRepository {
         break;
       case PROPERTIES_TYPE.SOUND_ALERTS:
         amplify.publish(WebAppEvents.PROPERTIES.UPDATE.SOUND_ALERTS, updatedPreference);
+        break;
+      case PROPERTIES_TYPE.CALL.ENABLE_VBR_ENCODING:
+        amplify.publish(WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_VBR_ENCODING, updatedPreference);
         break;
       default:
         throw new Error(`Failed to update preference of unhandled type '${propertiesType}'`);

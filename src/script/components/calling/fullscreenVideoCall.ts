@@ -23,23 +23,25 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 
 import {TIME_IN_MILLIS, formatSeconds} from 'Util/TimeUtil';
-import {Call} from '../../calling/Call';
-import {Grid} from '../../calling/videoGridHandler';
-import {Conversation} from '../../entity/Conversation';
-import {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
+import type {Call} from '../../calling/Call';
+import type {Grid} from '../../calling/videoGridHandler';
+import type {Conversation} from '../../entity/Conversation';
+import type {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
+import type {CallActions} from '../../view_model/CallingViewModel';
+import type {Multitasking} from '../../notification/NotificationRepository';
 
 import 'Components/calling/deviceToggleButton';
 
 interface Params {
-  videoGrid: ko.Observable<Grid>;
   call: Call;
-  conversation: ko.Observable<Conversation>;
-  mediaDevicesHandler: MediaDevicesHandler;
-  multitasking: any;
+  callActions: CallActions;
   canShareScreen: boolean;
-  callActions: any;
-  isMuted: ko.Observable<boolean>;
+  conversation: ko.Observable<Conversation>;
   isChoosingScreen: ko.Observable<boolean>;
+  isMuted: ko.Observable<boolean>;
+  mediaDevicesHandler: MediaDevicesHandler;
+  multitasking: Multitasking;
+  videoGrid: ko.Observable<Grid>;
 }
 
 export class FullscreenVideoCalling {
@@ -47,9 +49,9 @@ export class FullscreenVideoCalling {
   public call: Call;
   public conversation: ko.Observable<Conversation>;
   public mediaDevicesHandler: MediaDevicesHandler;
-  public multitasking: any;
+  public multitasking: Multitasking;
   public canShareScreen: boolean;
-  public callActions: any;
+  public callActions: CallActions;
   public isMuted: ko.Observable<boolean>;
   public isChoosingScreen: ko.Observable<boolean>;
 
@@ -124,7 +126,7 @@ export class FullscreenVideoCalling {
     });
 
     this.showToggleVideo = ko.pureComputed(() => {
-      return this.call.initialType === CALL_TYPE.VIDEO || conversation().supportsVideoCall(true);
+      return this.call.initialType === CALL_TYPE.VIDEO || conversation().supportsVideoCall();
     });
 
     this.callDuration = ko.observable();

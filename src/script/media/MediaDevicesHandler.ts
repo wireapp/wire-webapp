@@ -45,8 +45,8 @@ enum DeviceTypes {
   SCREEN_INPUT = 'screenInput',
   VIDEO_INPUT = 'videoInput',
 }
-type Devices = Record<DeviceTypes, ko.ObservableArray<ElectronDesktopCapturerSource | MediaDeviceInfo>>;
-type DeviceIds = Record<DeviceTypes, ko.Observable<string>>;
+export type Devices = Record<DeviceTypes, ko.ObservableArray<ElectronDesktopCapturerSource | MediaDeviceInfo>>;
+export type DeviceIds = Record<DeviceTypes, ko.Observable<string>>;
 type ElectronDesktopCapturerCallback = (error: Error | null, screenSources: ElectronDesktopCapturerSource[]) => void;
 
 interface ElectronGetSourcesOptions {
@@ -58,6 +58,7 @@ interface ElectronGetSourcesOptions {
   types: string[];
 }
 
+/** @see http://electronjs.org/docs/api/structures/desktop-capturer-source */
 export interface ElectronDesktopCapturerSource {
   display_id: string;
   id: string;
@@ -78,6 +79,7 @@ export class MediaDevicesHandler {
         audioOutput: 'default',
         screenInput: 'screen',
         videoInput: 'default',
+        windowInput: 'window',
       },
     };
   }
@@ -176,8 +178,8 @@ export class MediaDevicesHandler {
   private filterMediaDevices(
     mediaDevices: MediaDeviceInfo[],
   ): {
-    microphones: MediaDeviceInfo[];
     cameras: MediaDeviceInfo[];
+    microphones: MediaDeviceInfo[];
     speakers: MediaDeviceInfo[];
   } {
     const videoInputDevices: MediaDeviceInfo[] = mediaDevices.filter(
@@ -189,7 +191,7 @@ export class MediaDevicesHandler {
      * In such a scenario, the device listed as "communications" device is preferred for conferencing calls, so we filter its duplicates.
      */
     const microphones = mediaDevices.filter(device => device.kind === MediaDeviceType.AUDIO_INPUT);
-    const dedupedMicrophones = microphones.reduce((microphoneList: Record<string, MediaDeviceInfo>, microphone) => {
+    const dedupedMicrophones = microphones.reduce<Record<string, MediaDeviceInfo>>((microphoneList, microphone) => {
       if (!microphoneList.hasOwnProperty(microphone.groupId) || microphone.deviceId === 'communications') {
         microphoneList[microphone.groupId] = microphone;
       }
@@ -197,7 +199,7 @@ export class MediaDevicesHandler {
     }, {});
 
     const speakers = mediaDevices.filter(device => device.kind === MediaDeviceType.AUDIO_OUTPUT);
-    const dedupedSpeakers = speakers.reduce((speakerList: Record<string, MediaDeviceInfo>, speaker) => {
+    const dedupedSpeakers = speakers.reduce<Record<string, MediaDeviceInfo>>((speakerList, speaker) => {
       if (!speakerList.hasOwnProperty(speaker.groupId) || speaker.deviceId === 'communications') {
         speakerList[speaker.groupId] = speaker;
       }
@@ -250,7 +252,10 @@ export class MediaDevicesHandler {
         height: 176,
         width: 312,
       },
-      types: [MediaDevicesHandler.CONFIG.DEFAULT_DEVICE.screenInput],
+      types: [
+        MediaDevicesHandler.CONFIG.DEFAULT_DEVICE.screenInput,
+        MediaDevicesHandler.CONFIG.DEFAULT_DEVICE.windowInput,
+      ],
     };
 
     const getSourcesWrapper = (options: ElectronGetSourcesOptions): Promise<ElectronDesktopCapturerSource[]> => {

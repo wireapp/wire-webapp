@@ -18,20 +18,23 @@
  */
 
 import {alias} from 'Util/util';
+import {container} from 'tsyringe';
+import {AssetRepository} from '../../assets/AssetRepository';
 
 ko.bindingHandlers.switchBackground = (() => ({
   update(element, valueAccessor) {
     const imageResource = ko.unwrap(valueAccessor());
 
     if (imageResource) {
+      const assetRepository = container.resolve(AssetRepository);
       const backgroundImages = $(element).find('.background');
       const backgroundLast = backgroundImages.last();
       const backgroundNext = backgroundLast.clone();
       backgroundNext.css({opacity: '0'});
       backgroundNext.insertAfter(backgroundLast);
 
-      imageResource
-        .load()
+      assetRepository
+        .load(imageResource)
         .then(blob => {
           if (blob) {
             backgroundNext

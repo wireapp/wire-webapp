@@ -1,4 +1,4 @@
-import {IHelmetContentSecurityPolicyDirectives} from 'helmet';
+import type {IHelmetContentSecurityPolicyDirectives} from 'helmet';
 
 export interface ServerConfig {
   CLIENT: {
@@ -16,6 +16,7 @@ export interface ServerConfig {
       CHECK_CONSENT: boolean;
       DEFAULT_LOGIN_TEMPORARY_CLIENT: boolean;
       ENABLE_ACCOUNT_REGISTRATION: boolean;
+      ENABLE_ACCOUNT_REGISTRATION_ACCEPT_TERMS_AND_PRIVACY_POLICY: boolean;
       ENABLE_DEBUG: boolean;
       ENABLE_DOMAIN_DISCOVERY: boolean;
       ENABLE_PHONE_LOGIN: boolean;
@@ -31,10 +32,6 @@ export interface ServerConfig {
       ACCOUNT_BASE: string;
       MOBILE_BASE: string;
       PRIVACY_POLICY: string;
-      TEAMS_BASE: string;
-      TERMS_OF_USE_PERSONAL: string;
-      TERMS_OF_USE_TEAMS: string;
-      WEBSITE_BASE: string;
       SUPPORT: {
         BUG_REPORT: string;
         CALLING: string;
@@ -48,8 +45,13 @@ export interface ServerConfig {
         MICROPHONE_ACCESS_DENIED: string;
         SCREEN_ACCESS_DENIED: string;
       };
+      TEAMS_BASE: string;
+      TERMS_OF_USE_PERSONAL: string;
+      TERMS_OF_USE_TEAMS: string;
+      WEBSITE_BASE: string;
     };
     VERSION: string;
+    WEBSITE_LABEL: string;
   };
   COMMIT: string;
   SERVER: {
@@ -60,11 +62,18 @@ export interface ServerConfig {
     ENFORCE_HTTPS: boolean;
     ENVIRONMENT: string;
     GOOGLE_WEBMASTER_ID: string;
+    OPEN_GRAPH: {
+      DESCRIPTION: string;
+      IMAGE_URL: string;
+      TITLE: string;
+    };
     PORT_HTTP: number;
     ROBOTS: {
-      ALLOWED_HOSTS: string[];
       ALLOW: string;
+      ALLOWED_HOSTS: string[];
       DISALLOW: string;
     };
+    SSL_CERTIFICATE_KEY_PATH?: string;
+    SSL_CERTIFICATE_PATH?: string;
   };
 }

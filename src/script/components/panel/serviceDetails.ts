@@ -18,11 +18,11 @@
  */
 
 import {ParticipantAvatar} from 'Components/participantAvatar';
-import {ServiceEntity} from '../../integration/ServiceEntity';
+import type {ServiceEntity} from '../../integration/ServiceEntity';
 
 interface ComponentParams {
-  service: ServiceEntity;
   participantAvatar: ParticipantAvatar;
+  service: ServiceEntity;
 }
 
 ko.components.register('panel-service-details', {
