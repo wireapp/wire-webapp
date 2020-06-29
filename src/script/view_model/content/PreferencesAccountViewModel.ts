@@ -27,6 +27,7 @@ import {isTemporaryClientAndNonPersistent, validateProfileImageResolution} from 
 import {Environment} from 'Util/Environment';
 import {isKey, KEY} from 'Util/KeyboardUtil';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
+import type {RichInfoField} from '@wireapp/api-client/dist/user/RichInfo';
 import {ChangeEvent} from 'react';
 
 import {PreferenceNotificationRepository, Notification} from '../../notification/PreferenceNotificationRepository';
@@ -76,14 +77,14 @@ export class PreferencesAccountViewModel {
   enteredUsername: ko.Observable<string>;
   submittedUsername: ko.Observable<string>;
   usernameState: ko.Observable<string>;
-  richProfileFields: ko.Observable<any[]>;
+  richProfileFields: ko.Observable<RichInfoField[]>;
   nameSaved: ko.Observable<boolean>;
   usernameSaved: ko.Observable<boolean>;
   isTeam: ko.PureComputed<boolean>;
   team: ko.Observable<TeamEntity>;
   teamName: ko.PureComputed<string>;
   optionPrivacy: ko.Observable<boolean>;
-  optionReadReceipts: ko.Observable<any>;
+  optionReadReceipts: ko.Observable<Confirmation.Type>;
   optionMarketingConsent: ko.Observable<boolean | ConsentValue>;
   optionResetAppLock: boolean;
   ParticipantAvatar: typeof ParticipantAvatar;
