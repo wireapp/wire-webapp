@@ -9,13 +9,11 @@
           conversation: getConversationById(activeCall.conversationId),
           multitasking: multitasking,
           callingRepository: callingRepository,
+          temporaryUserStyle: true,
           callActions: callActions,
           hasAccessToCamera: hasAccessToCamera()"
         data-uie-name="item-call">
       </conversation-list-calling-cell>
-    <!-- /ko -->
-    <!-- ko if: $parent.hasJoinableCall() && !activeCalls -->
-      <div class="call-ui__button call-ui__button--green call-ui__button--join" style="margin: 0 16px;" data-bind="click: onClickJoinCall, text: t('callJoin')" data-uie-name="do-call-controls-call-join"></div>
     <!-- /ko -->
   <!-- /ko -->
   <div class="temporary-guest__content">
