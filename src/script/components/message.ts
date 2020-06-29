@@ -26,7 +26,7 @@ import {includesOnlyEmojis} from 'Util/EmojiUtil';
 import {formatDateNumeral, formatTimeShort} from 'Util/TimeUtil';
 
 import {EphemeralStatusType} from '../message/EphemeralStatusType';
-import {Context} from '../ui/ContextMenu';
+import {Context, ContextMenuEntry} from '../ui/ContextMenu';
 import type {ContentMessage} from '../entity/message/ContentMessage';
 
 import {SystemMessageType} from '../message/SystemMessageType';
@@ -84,6 +84,7 @@ class Message {
   accentColor: ko.PureComputed<string>;
   actionsViewModel: ActionsViewModel;
   assetSubscription: ko.Subscription;
+  contextMenuEntries: ko.PureComputed<ContextMenuEntry[]>;
   conversation: ko.Observable<Conversation>;
   conversationRepository: ConversationRepository;
   EphemeralStatusType: typeof EphemeralStatusType;
@@ -209,6 +210,79 @@ class Message {
       const is1to1 = this.conversation().is1to1();
       return is1to1 ? formatTimeShort(receipts[0].time) : receipts.length.toString(10);
     });
+
+    this.contextMenuEntries = ko.pureComputed(() => {
+      const messageEntity = this.message;
+      const entries: ContextMenuEntry[] = [];
+
+      const canDelete =
+        messageEntity.user().isMe && !this.conversation().removed_from_conversation() && messageEntity.is_deletable();
+
+      const hasDetails =
+        !this.conversation().is1to1() &&
+        !messageEntity.is_ephemeral() &&
+        !this.conversation().removed_from_conversation();
+
+      if (messageEntity.is_downloadable()) {
+        entries.push({
+          click: () => messageEntity.download(container.resolve(AssetRepository)),
+          label: t('conversationContextMenuDownload'),
+        });
+      }
+
+      if (messageEntity.isReactable() && !this.conversation().removed_from_conversation()) {
+        const label = messageEntity.is_liked() ? t('conversationContextMenuUnlike') : t('conversationContextMenuLike');
+
+        entries.push({
+          click: () => this.onLike(messageEntity, false),
+          label,
+        });
+      }
+
+      if (messageEntity.is_editable() && !this.conversation().removed_from_conversation()) {
+        entries.push({
+          click: () => amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.EDIT, messageEntity),
+          label: t('conversationContextMenuEdit'),
+        });
+      }
+
+      if (messageEntity.isReplyable() && !this.conversation().removed_from_conversation()) {
+        entries.push({
+          click: () => amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REPLY, messageEntity),
+          label: t('conversationContextMenuReply'),
+        });
+      }
+
+      if (messageEntity.isCopyable()) {
+        entries.push({
+          click: () => messageEntity.copy(),
+          label: t('conversationContextMenuCopy'),
+        });
+      }
+
+      if (hasDetails) {
+        entries.push({
+          click: () => this.onClickReceipts(this),
+          label: t('conversationContextMenuDetails'),
+        });
+      }
+
+      if (messageEntity.is_deletable()) {
+        entries.push({
+          click: () => this.actionsViewModel.deleteMessage(this.conversation(), messageEntity),
+          label: t('conversationContextMenuDelete'),
+        });
+      }
+
+      if (canDelete) {
+        entries.push({
+          click: () => this.actionsViewModel.deleteMessageEveryone(this.conversation(), messageEntity),
+          label: t('conversationContextMenuDeleteEveryone'),
+        });
+      }
+
+      return entries;
+    });
   }
 
   dispose = () => {
@@ -250,73 +324,8 @@ class Message {
     amplify.publish(SHOW_LEGAL_HOLD_MODAL, this.conversationRepository.active_conversation());
   };
 
-  showContextMenu(messageEntity: ContentMessage, event: MouseEvent) {
-    const entries = [];
-
-    if (messageEntity.is_downloadable()) {
-      entries.push({
-        click: () => messageEntity.download(container.resolve(AssetRepository)),
-        label: t('conversationContextMenuDownload'),
-      });
-    }
-
-    if (messageEntity.isReactable() && !this.conversation().removed_from_conversation()) {
-      const label = messageEntity.is_liked() ? t('conversationContextMenuUnlike') : t('conversationContextMenuLike');
-
-      entries.push({
-        click: () => this.onLike(messageEntity, false),
-        label,
-      });
-    }
-
-    if (messageEntity.is_editable() && !this.conversation().removed_from_conversation()) {
-      entries.push({
-        click: () => amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.EDIT, messageEntity),
-        label: t('conversationContextMenuEdit'),
-      });
-    }
-
-    if (messageEntity.isReplyable() && !this.conversation().removed_from_conversation()) {
-      entries.push({
-        click: () => amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REPLY, messageEntity),
-        label: t('conversationContextMenuReply'),
-      });
-    }
-
-    if (messageEntity.isCopyable()) {
-      entries.push({
-        click: () => messageEntity.copy(),
-        label: t('conversationContextMenuCopy'),
-      });
-    }
-
-    if (
-      !this.conversation().is1to1() &&
-      !messageEntity.is_ephemeral() &&
-      !this.conversation().removed_from_conversation()
-    ) {
-      entries.push({
-        click: () => this.onClickReceipts(this),
-        label: t('conversationContextMenuDetails'),
-      });
-    }
-
-    if (messageEntity.is_deletable()) {
-      entries.push({
-        click: () => this.actionsViewModel.deleteMessage(this.conversation(), messageEntity),
-        label: t('conversationContextMenuDelete'),
-      });
-    }
-
-    const canDelete =
-      messageEntity.user().isMe && !this.conversation().removed_from_conversation() && messageEntity.is_deletable();
-    if (canDelete) {
-      entries.push({
-        click: () => this.actionsViewModel.deleteMessageEveryone(this.conversation(), messageEntity),
-        label: t('conversationContextMenuDeleteEveryone'),
-      });
-    }
-
+  showContextMenu(event: MouseEvent) {
+    const entries = this.contextMenuEntries();
     Context.from(event, entries, 'message-options-menu');
   }
 
@@ -332,7 +341,7 @@ class Message {
   }
 }
 
-// if this is not explicitely defined as string,
+// If this is not explicitly defined as string,
 // TS will define this as the string's content.
 const receiptStatusTemplate: string = `
   <!-- ko if: isLastDeliveredMessage() && readReceiptText() === '' -->
@@ -427,7 +436,9 @@ const normalTemplate: string = `
     <!-- /ko -->
 
     <div class="message-body-actions">
-      <span class="context-menu icon-more font-size-xs" data-bind="click: (data, event) => showContextMenu(message, event)"></span>
+      <!-- ko if: contextMenuEntries().length > 0 -->
+        <span class="context-menu icon-more font-size-xs" data-bind="click: (data, event) => showContextMenu(event)"></span>
+      <!-- /ko -->
       <!-- ko if: message.ephemeral_status() === EphemeralStatusType.ACTIVE -->
         <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id, 'title': message.ephemeral_caption()}, showAllTimestamps"></time>
       <!-- /ko -->
