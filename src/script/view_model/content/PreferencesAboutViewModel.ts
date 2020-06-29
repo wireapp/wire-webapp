@@ -16,21 +16,20 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-
-import {getLogger} from 'Util/Logger';
-import {Config} from '../../Config';
-
+import ko from 'knockout';
+import {Config, Configuration} from '../../Config';
 import {getPrivacyPolicyUrl, getTermsOfUsePersonalUrl, getTermsOfUseTeamUrl, URL} from '../../externalRoute';
+import {UserRepository} from '../../user/UserRepository';
+import {User} from '../../entity/User';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.content = z.viewModel.content || {};
+export class PreferencesAboutViewModel {
+  private readonly selfUser: ko.Observable<User>;
+  readonly Config: Configuration;
+  readonly websiteUrl: string;
+  readonly privacyPolicyUrl: string;
+  readonly termsOfUseUrl: ko.PureComputed<string>;
 
-z.viewModel.content.PreferencesAboutViewModel = class PreferencesAboutViewModel {
-  constructor(mainViewModel, contentViewModel, repositories) {
-    this.logger = getLogger('z.viewModel.content.PreferencesAboutViewModel');
-
-    this.userRepository = repositories.user;
+  constructor(private readonly userRepository: UserRepository) {
     this.selfUser = this.userRepository.self;
     this.Config = Config.getConfig();
 
@@ -40,14 +39,15 @@ z.viewModel.content.PreferencesAboutViewModel = class PreferencesAboutViewModel 
       if (this.selfUser()) {
         return this.selfUser().inTeam() ? getTermsOfUseTeamUrl() : getTermsOfUsePersonalUrl();
       }
+      return '';
     });
   }
 
-  showWireSection() {
-    return this.termsOfUseUrl() || this.websiteUrl || this.privacyPolicyUrl;
-  }
+  showWireSection = (): boolean => {
+    return !!(this.termsOfUseUrl() || this.websiteUrl || this.privacyPolicyUrl);
+  };
 
-  showSupportSection() {
-    return this.Config.URL.SUPPORT.INDEX || this.Config.URL.SUPPORT.CONTACT;
-  }
-};
+  showSupportSection = (): boolean => {
+    return !!(this.Config.URL.SUPPORT.INDEX || this.Config.URL.SUPPORT.CONTACT);
+  };
+}
