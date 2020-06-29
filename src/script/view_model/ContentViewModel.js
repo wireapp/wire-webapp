@@ -44,6 +44,7 @@ import {HistoryExportViewModel} from './content/HistoryExportViewModel';
 import {PreferencesAccountViewModel} from './content/PreferencesAccountViewModel';
 import {TitleBarViewModel} from './content/TitleBarViewModel';
 import {PreferencesAboutViewModel} from './content/PreferencesAboutViewModel';
+import {PreferencesDevicesViewModel} from './content/PreferencesDevicesViewModel';
 
 export class ContentViewModel {
   static get STATE() {
@@ -129,7 +130,13 @@ export class ContentViewModel {
       this,
       repositories,
     );
-    this.preferencesDevices = new z.viewModel.content.PreferencesDevicesViewModel(mainViewModel, this, repositories);
+    this.preferencesDevices = new PreferencesDevicesViewModel(
+      mainViewModel,
+      this,
+      repositories.client,
+      repositories.cryptography,
+      repositories.user,
+    );
     this.preferencesOptions = new PreferencesOptionsViewModel(
       repositories.calling,
       repositories.properties,
