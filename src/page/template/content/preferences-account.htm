@@ -54,11 +54,11 @@
               <div class="preferences-account-username-hint text-foreground font-size-xs"
                    data-bind="text: t('preferencesAccountUsernameHint')"></div>
             <!-- /ko -->
-            <!-- ko if: usernameState() === z.viewModel.content.PreferencesAccountViewModel.USERNAME_STATE.AVAILABLE -->
+            <!-- ko if: usernameState() === UserNameState.AVAILABLE -->
               <div class="preferences-account-username-error font-size-xs"
                    data-bind="text: t('preferencesAccountUsernameAvailable')"></div>
             <!-- /ko -->
-            <!-- ko if: usernameState() === z.viewModel.content.PreferencesAccountViewModel.USERNAME_STATE.TAKEN -->
+            <!-- ko if: usernameState() === UserNameState.TAKEN -->
               <div class="preferences-account-username-error font-size-xs"
                    data-bind="text: t('preferencesAccountUsernameErrorTaken'), css: {'text-red': submittedUsername() === enteredUsername()}"></div>
             <!-- /ko -->
@@ -91,7 +91,7 @@
           <participant-avatar params="participant: selfUser, size: ParticipantAvatar.SIZE.X_LARGE"></participant-avatar>
           <input id="self-upload-file-input"
                  type="file"
-                 data-bind="attr: {accept: z.viewModel.content.PreferencesAccountViewModel.CONFIG.PROFILE_IMAGE.FILE_TYPES.join(',')}, file_select: clickOnChangePicture"
+                 data-bind="attr: {accept: Config.PROFILE_IMAGE.FILE_TYPES.join(',')}, file_select: clickOnChangePicture"
                  data-uie-name="do-select-picture"/>
           <span class="icon-camera"></span>
         </label>

@@ -93,6 +93,8 @@ export class PreferencesAccountViewModel {
   isTemporaryAndNonPersistent: boolean;
   isConsentCheckEnabled: () => boolean;
   canEditProfile: (user: User) => boolean;
+  Config: typeof PreferencesAccountViewModel.CONFIG;
+  UserNameState: typeof PreferencesAccountViewModel.USERNAME_STATE;
 
   static get CONFIG() {
     return {
@@ -125,6 +127,8 @@ export class PreferencesAccountViewModel {
 
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
     this.selfUser = this.userRepository.self;
+    this.Config = PreferencesAccountViewModel.CONFIG;
+    this.UserNameState = PreferencesAccountViewModel.USERNAME_STATE;
 
     this.name = ko.pureComputed(() => this.selfUser().name());
     this.availability = ko.pureComputed(() => this.selfUser().availability());
