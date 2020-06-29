@@ -1590,19 +1590,19 @@ export class ConversationRepository {
    * @param {Date} isoDate Date of member removal
    * @returns {Promise<void>} No return value
    */
-  teamMemberLeave(teamId, userId, isoDate = this.serverTimeHandler.toServerTimestamp()) {
-    return this.userRepository.getUserById(userId).then(userEntity => {
-      this.conversations()
-        .filter(conversationEntity => {
-          const conversationInTeam = conversationEntity.team_id === teamId;
-          const userIsParticipant = conversationEntity.participating_user_ids().includes(userId);
-          return conversationInTeam && userIsParticipant && !conversationEntity.removed_from_conversation();
-        })
-        .forEach(conversationEntity => {
-          const leaveEvent = EventBuilder.buildTeamMemberLeave(conversationEntity, userEntity, isoDate);
-          this.eventRepository.injectEvent(leaveEvent);
-        });
-    });
+  async teamMemberLeave(teamId, userId, isoDate = this.serverTimeHandler.toServerTimestamp()) {
+    const userEntity = await this.userRepository.getUserById(userId);
+    this.conversations()
+      .filter(conversationEntity => {
+        const conversationInTeam = conversationEntity.team_id === teamId;
+        const userIsParticipant = conversationEntity.participating_user_ids().includes(userId);
+        return conversationInTeam && userIsParticipant && !conversationEntity.removed_from_conversation();
+      })
+      .forEach(conversationEntity => {
+        const leaveEvent = EventBuilder.buildTeamMemberLeave(conversationEntity, userEntity, isoDate);
+        this.eventRepository.injectEvent(leaveEvent);
+      });
+    userEntity.isDeleted = true;
   }
 
   /**
