@@ -19,17 +19,18 @@
 
 import {container} from 'tsyringe';
 import {instantiateComponent} from '../../../helper/knockoutHelpers';
-import UUID from 'uuidjs';
+
 import 'src/script/components/panel/enrichedFields';
 import {RichProfileRepository} from 'src/script/user/RichProfileRepository';
 import {APIClientSingleton} from 'src/script/service/APIClientSingleton';
+import {createRandomUuid} from 'Util/util';
 
 const entriesListSelector = '.enriched-fields__entry';
 
 describe('enriched-fields', () => {
   it('displays all the given fields', () => {
     const richProfileRepository = new RichProfileRepository(container.resolve(APIClientSingleton).getClient());
-    const userId = UUID.genV4().toString();
+    const userId = createRandomUuid();
     const params = {richProfileRepository, user: () => ({email: () => {}, id: userId})};
 
     spyOn(richProfileRepository, 'getUserRichProfile').and.returnValue(
@@ -48,7 +49,7 @@ describe('enriched-fields', () => {
 
   it('displays the email if set on user', () => {
     const richProfileRepository = new RichProfileRepository(container.resolve(APIClientSingleton).getClient());
-    const userId = UUID.genV4().toString();
+    const userId = createRandomUuid();
     const params = {richProfileRepository, user: () => ({email: () => 'user@inter.net', id: userId})};
 
     spyOn(richProfileRepository, 'getUserRichProfile').and.returnValue(
@@ -67,7 +68,7 @@ describe('enriched-fields', () => {
 
   it('calls the `onFieldsLoaded` function when fields are loaded', () => {
     const richProfileRepository = new RichProfileRepository(container.resolve(APIClientSingleton).getClient());
-    const userId = UUID.genV4().toString();
+    const userId = createRandomUuid();
     const params = {onFieldsLoaded: () => {}, richProfileRepository, user: () => ({email: () => {}, id: userId})};
     const richProfile = {
       fields: [

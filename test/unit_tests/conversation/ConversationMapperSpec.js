@@ -17,8 +17,6 @@
  *
  */
 
-import UUID from 'uuidjs';
-
 import {createRandomUuid} from 'Util/util';
 
 import {Conversation} from 'src/script/entity/Conversation';
@@ -267,18 +265,17 @@ describe('Conversation Mapper', () => {
       const self_status = {last_read_timestamp: '1480339377099'};
       const last_read_timestamp_number = window.parseInt(self_status.last_read_timestamp, 10);
       const updated_conversation_et = conversation_mapper.updateSelfStatus(conversation_et, self_status);
-
       expect(updated_conversation_et.last_read_timestamp()).toBe(last_read_timestamp_number);
     });
   });
 
   describe('mergeConversation', () => {
     function getDataWithReadReceiptMode(localReceiptMode, remoteReceiptMode) {
-      const conversationCreatorId = UUID.genV4().toString();
-      const conversationId = UUID.genV4().toString();
+      const conversationCreatorId = createRandomUuid();
+      const conversationId = createRandomUuid();
       const conversationName = 'Hello, World!';
-      const selfUserId = UUID.genV4().toString();
-      const teamId = UUID.genV4().toString();
+      const selfUserId = createRandomUuid();
+      const teamId = createRandomUuid();
 
       const localData = {
         archived_state: false,

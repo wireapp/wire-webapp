@@ -19,9 +19,9 @@
 
 import {container} from 'tsyringe';
 
-import UUID from 'uuidjs';
 import {RichProfileRepository} from 'src/script/user/RichProfileRepository';
 import {APIClientSingleton} from 'src/script/service/APIClientSingleton';
+import {createRandomUuid} from 'Util/util';
 
 describe('RichProfileRepository', () => {
   let richProfileRepository;
@@ -32,7 +32,7 @@ describe('RichProfileRepository', () => {
 
   describe('getUserRichProfile', () => {
     it("fetches the user's rich profile if it is not already in cache", () => {
-      const userId = UUID.genV4().toString();
+      const userId = createRandomUuid();
       const response = [];
       spyOn(richProfileRepository.apiClient.user.api, 'getRichInfo').and.returnValue(Promise.resolve(response));
 

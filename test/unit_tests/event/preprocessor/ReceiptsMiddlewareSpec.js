@@ -17,15 +17,14 @@
  *
  */
 
-import UUID from 'uuidjs';
-
 import {noop} from 'Util/util';
+import {createRandomUuid} from 'Util/util';
 
 import {ReceiptsMiddleware} from 'src/script/event/preprocessor/ReceiptsMiddleware';
 import {ClientEvent} from 'src/script/event/Client';
 
 describe('ReceiptsMiddleware', () => {
-  const selfId = UUID.genV4().toString();
+  const selfId = createRandomUuid();
   let readReceiptMiddleware;
   const eventService = {loadEvents: noop, replaceEvent: noop};
   const userRepository = {
@@ -66,7 +65,7 @@ describe('ReceiptsMiddleware', () => {
 
     it('ignores read receipts for messages that are not mine', () => {
       const event = createConfirmationEvent(4);
-      const originaleEvent = {from: UUID.genV4().toString()};
+      const originaleEvent = {from: createRandomUuid()};
       spyOn(eventService, 'loadEvents').and.returnValue(Promise.resolve([originaleEvent]));
       spyOn(eventService, 'replaceEvent');
       return readReceiptMiddleware.processEvent(event).then(() => {
@@ -112,13 +111,13 @@ describe('ReceiptsMiddleware', () => {
 
 function createConfirmationEvent(status, moreMessageIds = []) {
   return {
-    conversation: UUID.genV4().toString(),
+    conversation: createRandomUuid(),
     data: {
-      message_id: UUID.genV4().toString(),
+      message_id: createRandomUuid(),
       more_message_ids: moreMessageIds,
       status,
     },
-    from: UUID.genV4().toString(),
+    from: createRandomUuid(),
     time: '12-12-12',
     type: ClientEvent.CONVERSATION.CONFIRMATION,
   };

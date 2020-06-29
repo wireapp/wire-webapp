@@ -17,16 +17,15 @@
  *
  */
 
-import UUID from 'uuidjs';
-
 import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
+import {createRandomUuid} from 'Util/util';
 
 import {Text} from 'src/script/entity/message/Text';
 
 describe('MessageComparator', () => {
   it('areMentionsDifferent', () => {
-    const mentionUser1 = {userId: UUID.genV4().toString()};
-    const mentionUser2 = {userId: UUID.genV4().toString()};
+    const mentionUser1 = {userId: createRandomUuid()};
+    const mentionUser2 = {userId: createRandomUuid()};
 
     const tests = [
       {expected: false, newMentions: [], originalMentions: []},

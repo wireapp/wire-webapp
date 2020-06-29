@@ -18,15 +18,15 @@
  */
 
 import {amplify} from 'amplify';
-import UUID from 'uuidjs';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PreferenceNotificationRepository} from 'src/script/notification/PreferenceNotificationRepository';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {BackendEvent} from 'src/script/event/Backend';
+import {createRandomUuid} from 'Util/util';
 
 describe('PreferenceNotificationRepository', () => {
-  const user = {id: UUID.genV4().toString()};
+  const user = {id: createRandomUuid()};
   const userObservable = () => user;
 
   beforeEach(() => {
@@ -75,7 +75,7 @@ describe('PreferenceNotificationRepository', () => {
     const preferenceNotificationRepository = new PreferenceNotificationRepository(userObservable);
     const newClientData = {};
 
-    amplify.publish(WebAppEvents.USER.CLIENT_ADDED, UUID.genV4().toString(), newClientData);
+    amplify.publish(WebAppEvents.USER.CLIENT_ADDED, createRandomUuid(), newClientData);
 
     expect(preferenceNotificationRepository.notifications().length).toBe(0);
   });

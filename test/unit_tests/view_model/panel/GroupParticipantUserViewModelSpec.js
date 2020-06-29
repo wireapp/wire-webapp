@@ -17,9 +17,8 @@
  *
  */
 
-import UUID from 'uuidjs';
-
 import {noop} from 'Util/util';
+import {createRandomUuid} from 'Util/util';
 
 import {GroupParticipantUserViewModel} from 'src/script/view_model/panel/GroupParticipantUserViewModel';
 import {User} from 'src/script/entity/User';
@@ -48,7 +47,7 @@ describe('GroupParticipantUserViewModel', () => {
   });
 
   it('returns the id of the entity attached', () => {
-    const userId = UUID.genV4().toString();
+    const userId = createRandomUuid();
     const user = new User(userId);
     groupParticipantUserViewModel.initView({entity: user});
 
