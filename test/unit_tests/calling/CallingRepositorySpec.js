@@ -18,7 +18,7 @@
  */
 
 import {WebAppEvents} from '@wireapp/webapp-events';
-import UUID from 'pure-uuid';
+import UUID from 'uuidjs';
 import {CONV_TYPE, CALL_TYPE, STATE as CALL_STATE, REASON} from '@wireapp/avs';
 
 import {CallingRepository} from 'src/script/calling/CallingRepository';
@@ -349,7 +349,7 @@ describe('e2e audio call', () => {
 });
 
 function genUUID() {
-  return new UUID(4).format();
+  return UUID.genV4().toString();
 }
 
 function silence() {

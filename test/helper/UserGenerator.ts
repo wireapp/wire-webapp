@@ -18,7 +18,7 @@
  */
 
 import * as faker from 'faker';
-import UUID from 'pure-uuid';
+import UUID from 'uuidjs';
 import type {User as APIClientUser} from '@wireapp/api-client/dist/user';
 import {UserAssetType} from '@wireapp/api-client/dist/user';
 
@@ -32,18 +32,18 @@ export class UserGenerator {
       accent_id: Math.floor(Math.random() * 7 + 1),
       assets: [
         {
-          key: `3-1-${new UUID(4).format()}`,
+          key: `3-1-${UUID.genV4().toString()}`,
           size: UserAssetType.PREVIEW,
           type: 'image',
         },
         {
-          key: `3-1-${new UUID(4).format()}`,
+          key: `3-1-${UUID.genV4().toString()}`,
           size: UserAssetType.COMPLETE,
           type: 'image',
         },
       ],
       handle: faker.internet.userName(),
-      id: new UUID(4).format(),
+      id: UUID.genV4().toString(),
       name: faker.name.findName(),
     };
 

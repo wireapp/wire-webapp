@@ -17,7 +17,7 @@
  *
  */
 
-import UUID from 'pure-uuid';
+import UUID from 'uuidjs';
 import {instantiateComponent} from '../../helper/knockoutHelpers';
 
 import {Conversation} from 'src/script/entity/Conversation';
@@ -62,7 +62,7 @@ describe('message', () => {
         onClickTimestamp: () => {},
         onLike: () => {},
         onMessageMarked: () => {},
-        selfId: () => new UUID(4).format(),
+        selfId: () => UUID.genV4().toString(),
         shouldShowAvatar: true,
         shouldShowInvitePeople: true,
       };

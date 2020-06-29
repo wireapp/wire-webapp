@@ -17,7 +17,7 @@
  *
  */
 
-import UUID from 'pure-uuid';
+import UUID from 'uuidjs';
 
 import {noop} from 'Util/util';
 
@@ -48,7 +48,7 @@ describe('GroupParticipantUserViewModel', () => {
   });
 
   it('returns the id of the entity attached', () => {
-    const userId = new UUID(4).format();
+    const userId = UUID.genV4().toString();
     const user = new User(userId);
     groupParticipantUserViewModel.initView({entity: user});
 

@@ -17,7 +17,7 @@
  *
  */
 
-import UUID from 'pure-uuid';
+import UUID from 'uuidjs';
 
 import {createRandomUuid} from 'Util/util';
 import {
@@ -149,7 +149,7 @@ describe('ValidationUtil', () => {
 
   describe('"isUUID"', () => {
     it('detects a correct UUID', () => {
-      const uuid = new UUID(4).format();
+      const uuid = UUID.genV4().toString();
       const actual = isUUID(uuid);
 
       expect(actual).toBe(true);
