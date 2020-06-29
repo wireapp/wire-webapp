@@ -4167,8 +4167,7 @@ export class ConversationRepository {
 
       const asset_et = message_et.get_first_asset();
       if (asset_et) {
-        const isDownloadable = asset_et.is_audio() || asset_et.is_file() || asset_et.is_video() || asset_et.is_image();
-        if (!isDownloadable) {
+        if (!asset_et.is_downloadable()) {
           throw new Error(`Tried to update message with wrong asset type as upload failed '${asset_et.type}'`);
         }
 
