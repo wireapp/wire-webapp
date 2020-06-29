@@ -85,7 +85,7 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
     this.userRepository = user;
     this.MotionDuration = MotionDuration;
 
-    this.logger = getLogger('z.viewModel.panel.AddParticipantsViewModel');
+    this.logger = getLogger('AddParticipantsViewModel');
 
     this.isTeam = this.teamRepository.isTeam;
     this.selfUser = this.userRepository.self;

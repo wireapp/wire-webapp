@@ -90,7 +90,7 @@ export class UserRepository {
   private readonly userMapper: UserMapper;
   private readonly userService: UserService;
   private readonly users: ko.ObservableArray<User>;
-  private should_set_username: boolean;
+  public should_set_username: boolean;
   readonly connect_requests: ko.PureComputed<User[]>;
   readonly isActivatedAccount: ko.PureComputed<boolean>;
   readonly isTemporaryGuest: ko.PureComputed<boolean>;

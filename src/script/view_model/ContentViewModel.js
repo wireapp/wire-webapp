@@ -41,6 +41,7 @@ import {CollectionDetailsViewModel} from './content/CollectionDetailsViewModel';
 import {GiphyViewModel} from './content/GiphyViewModel';
 import {HistoryImportViewModel} from './content/HistoryImportViewModel';
 import {HistoryExportViewModel} from './content/HistoryExportViewModel';
+import {PreferencesAccountViewModel} from './content/PreferencesAccountViewModel';
 
 export class ContentViewModel {
   static get STATE() {
@@ -107,7 +108,14 @@ export class ContentViewModel {
     );
 
     this.preferencesAbout = new z.viewModel.content.PreferencesAboutViewModel(mainViewModel, this, repositories);
-    this.preferencesAccount = new z.viewModel.content.PreferencesAccountViewModel(mainViewModel, this, repositories);
+    this.preferencesAccount = new PreferencesAccountViewModel(
+      repositories.client,
+      repositories.conversation,
+      repositories.preferenceNotification,
+      repositories.properties,
+      repositories.team,
+      repositories.user,
+    );
     this.preferencesAV = new PreferencesAVViewModel(repositories.media, repositories.user, {
       mediaSourceChanged: repositories.calling.changeMediaSource.bind(repositories.calling),
       willChangeMediaSource: repositories.calling.stopMediaSource.bind(repositories.calling),
