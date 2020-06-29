@@ -387,6 +387,7 @@ export class CallingRepository {
       }
 
       case CALL_MESSAGE_TYPE.SETUP:
+      case CALL_MESSAGE_TYPE.CONF_START:
       case CALL_MESSAGE_TYPE.GROUP_START: {
         if (source !== EventRepository.SOURCE.STREAM) {
           const eventInfoEntity = new EventInfoEntity(undefined, conversationId, {recipients: [userId]});
@@ -437,6 +438,7 @@ export class CallingRepository {
     // save event if needed
     switch (type) {
       case CALL_MESSAGE_TYPE.SETUP:
+      case CALL_MESSAGE_TYPE.CONF_START:
       case CALL_MESSAGE_TYPE.GROUP_START:
         const activeCall = this.findCall(conversationId);
         const ignoreNotificationStates = [CALL_STATE.MEDIA_ESTAB, CALL_STATE.ANSWERED, CALL_STATE.OUTGOING];
