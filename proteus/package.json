@@ -38,5 +38,5 @@
     "test:project": "yarn dist && yarn test",
     "test:types": "tsc --noEmit"
   },
-  "version": "9.8.10"
+  "version": "9.8.11"
 }

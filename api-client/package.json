@@ -30,7 +30,7 @@
     "@types/ws": "7.2.4",
     "@wireapp/react-ui-kit": "7.30.3",
     "@wireapp/store-engine": "4.5.7",
-    "@wireapp/store-engine-fs": "2.2.8",
+    "@wireapp/store-engine-fs": "2.2.9",
     "babel-loader": "8.1.0",
     "browser-sync": "2.26.7",
     "concurrently": "5.2.0",
@@ -84,5 +84,5 @@
     "test:node": "cross-env NODE_DEBUG=@wireapp/api-client* nyc jasmine --config=jasmine.json",
     "watch": "webpack-dev-server --config webpack.browser.js"
   },
-  "version": "11.20.6"
+  "version": "11.20.7"
 }
