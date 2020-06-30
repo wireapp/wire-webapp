@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.20.8](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.20.7...@wireapp/api-client@11.20.8) (2020-06-30)
+
+
+### Bug Fixes
+
+* **api-client:** Chunk `postMultiPreKeyBundles` requests to prevent `413 Request entity too large` ([#3092](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3092)) ([db80a6a](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/db80a6a643af8f38a0e1499a76427b7342c789bb))
+
+
+
+
+
 ## [11.20.7](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.20.6...@wireapp/api-client@11.20.7) (2020-06-30)
 
 **Note:** Version bump only for package @wireapp/api-client
