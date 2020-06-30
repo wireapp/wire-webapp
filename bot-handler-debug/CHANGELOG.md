@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-debug/compare/@wireapp/bot-handler-debug@0.1.5...@wireapp/bot-handler-debug@0.2.0) (2020-06-30)
+
+
+### Features
+
+* **bot-handler-uptime:** Respond to uptime requests ([#3082](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-debug/issues/3082)) ([5488ebb](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-debug/commit/5488ebb24f989eb17c8aa439593709d2b92ccf3d))
+
+
+
+
+
 ## [0.1.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-debug/compare/@wireapp/bot-handler-debug@0.1.4...@wireapp/bot-handler-debug@0.1.5) (2020-06-29)
 
 **Note:** Version bump only for package @wireapp/bot-handler-debug
