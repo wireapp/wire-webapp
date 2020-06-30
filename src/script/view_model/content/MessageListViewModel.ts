@@ -97,7 +97,7 @@ export class MessageListViewModel {
       return false;
     });
 
-    amplify.subscribe(WebAppEvents.INPUT.RESIZE, this._handleInputResize);
+    amplify.subscribe(WebAppEvents.INPUT.RESIZE, this.handleInputResize);
 
     this.conversationLoaded = ko.observable(false);
     // Store last read to show until user switches conversation
@@ -148,26 +148,26 @@ export class MessageListViewModel {
       this.messagesChangeSubscription.dispose();
     }
     this.conversationLastReadTimestamp = undefined;
-    window.removeEventListener('resize', this._adjustScroll);
+    window.removeEventListener('resize', this.adjustScroll);
   };
 
-  _shouldStickToBottom = (): boolean => {
+  private readonly shouldStickToBottom = (): boolean => {
     const messagesContainer = this.getMessagesContainer();
     const scrollPosition = Math.ceil(messagesContainer.scrollTop);
     const scrollEndValue = Math.ceil(scrollEnd(messagesContainer));
     return scrollPosition > scrollEndValue - Config.getConfig().SCROLL_TO_LAST_MESSAGE_THRESHOLD;
   };
 
-  _adjustScroll = (): void => {
-    if (this._shouldStickToBottom()) {
+  private readonly adjustScroll = (): void => {
+    if (this.shouldStickToBottom()) {
       scrollToBottom(this.getMessagesContainer());
     }
   };
 
-  _handleInputResize = (inputSizeDiff: number): void => {
+  private readonly handleInputResize = (inputSizeDiff: number): void => {
     if (inputSizeDiff) {
       scrollBy(this.getMessagesContainer(), inputSizeDiff);
-    } else if (this._shouldStickToBottom()) {
+    } else if (this.shouldStickToBottom()) {
       scrollToBottom(this.getMessagesContainer());
     }
   };
@@ -180,6 +180,7 @@ export class MessageListViewModel {
     }
 
     // Update new conversation
+    this.logger.info('conversationEntity', conversationEntity);
     this.conversation(conversationEntity);
 
     // Keep last read timestamp to render unread when entering conversation
@@ -188,13 +189,16 @@ export class MessageListViewModel {
     }
 
     conversationEntity.is_loaded(false);
-    await this._loadConversation(conversationEntity, messageEntity);
-    await this._renderConversation(conversationEntity, messageEntity);
+    await this.loadConversation(conversationEntity, messageEntity);
+    await this.renderConversation(conversationEntity, messageEntity);
     conversationEntity.is_loaded(true);
     this.conversationLoaded(true);
   };
 
-  _loadConversation = async (conversationEntity: Conversation, messageEntity: Message): Promise<void> => {
+  private readonly loadConversation = async (
+    conversationEntity: Conversation,
+    messageEntity: Message,
+  ): Promise<void> => {
     const _conversationEntity = await this.conversationRepository.updateParticipatingUserEntities(
       conversationEntity,
       false,
@@ -208,7 +212,7 @@ export class MessageListViewModel {
     }
   };
 
-  _isLastReceivedMessage = (messageEntity: Message, conversationEntity: Conversation): boolean => {
+  private readonly isLastReceivedMessage = (messageEntity: Message, conversationEntity: Conversation): boolean => {
     return messageEntity.timestamp() && messageEntity.timestamp() >= conversationEntity.last_event_timestamp();
   };
 
@@ -216,7 +220,7 @@ export class MessageListViewModel {
     return this.messagesContainer;
   };
 
-  _renderConversation = (conversationEntity: Conversation, messageEntity: Message): Promise<void> => {
+  private readonly renderConversation = (conversationEntity: Conversation, messageEntity: Message): Promise<void> => {
     const messages_container = this.getMessagesContainer();
 
     const is_current_conversation = conversationEntity === this.conversation();
@@ -243,14 +247,14 @@ export class MessageListViewModel {
           }
         }
 
-        window.addEventListener('resize', this._adjustScroll);
+        window.addEventListener('resize', this.adjustScroll);
 
         let shouldStickToBottomOnMessageAdd: boolean;
 
         this.messagesBeforeChangeSubscription = conversationEntity.messages_visible.subscribe(
           () => {
             // we need to keep track of the scroll position before the message array has changed
-            shouldStickToBottomOnMessageAdd = this._shouldStickToBottom();
+            shouldStickToBottomOnMessageAdd = this.shouldStickToBottom();
           },
           null,
           'beforeChange',
@@ -259,7 +263,7 @@ export class MessageListViewModel {
         // Subscribe for incoming messages
         this.messagesChangeSubscription = conversationEntity.messages_visible.subscribe(
           changedMessages => {
-            this._scrollAddedMessagesIntoView(changedMessages, shouldStickToBottomOnMessageAdd);
+            this.scrollAddedMessagesIntoView(changedMessages, shouldStickToBottomOnMessageAdd);
             shouldStickToBottomOnMessageAdd = undefined;
           },
           null,
@@ -270,7 +274,7 @@ export class MessageListViewModel {
     });
   };
 
-  _scrollAddedMessagesIntoView = (
+  private readonly scrollAddedMessagesIntoView = (
     changedMessages: ko.utils.ArrayChanges<ContentMessage | MemberMessage>,
     shouldStickToBottom: boolean,
   ) => {
@@ -327,7 +331,7 @@ export class MessageListViewModel {
     const lastMessage = this.conversation().getLastMessage();
 
     if (lastMessage) {
-      if (!this._isLastReceivedMessage(lastMessage, this.conversation())) {
+      if (!this.isLastReceivedMessage(lastMessage, this.conversation())) {
         // if the last loaded message is not the last of the conversation, we load the subsequent messages
         return this.conversationRepository.getSubsequentMessages(this.conversation(), lastMessage, false);
       }
@@ -516,7 +520,7 @@ export class MessageListViewModel {
       }
     }
 
-    if (this._isLastReceivedMessage(messageEntity, conversationEntity)) {
+    if (this.isLastReceivedMessage(messageEntity, conversationEntity)) {
       callbacks.push(() => this.updateConversationLastRead(conversationEntity, messageEntity));
     }
 
@@ -541,7 +545,7 @@ export class MessageListViewModel {
     const conversationLastRead = conversationEntity.last_read_timestamp();
     const lastKnownTimestamp = conversationEntity.get_last_known_timestamp(this.serverTimeHandler.toServerTimestamp());
     const needsUpdate = conversationLastRead < lastKnownTimestamp;
-    if (needsUpdate && this._isLastReceivedMessage(messageEntity, conversationEntity)) {
+    if (needsUpdate && this.isLastReceivedMessage(messageEntity, conversationEntity)) {
       conversationEntity.setTimestamp(lastKnownTimestamp, Conversation.TIMESTAMP_TYPE.LAST_READ);
       this.conversationRepository.markAsRead(conversationEntity);
     }
