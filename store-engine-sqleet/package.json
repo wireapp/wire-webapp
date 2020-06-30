@@ -24,7 +24,6 @@
     "karma-jasmine": "3.1.1",
     "karma-webpack": "4.0.2",
     "rimraf": "3.0.2",
-    "ts-node": "8.6.2",
     "typescript": "3.9.2",
     "webpack": "4.43.0"
   },

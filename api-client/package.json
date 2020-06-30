@@ -77,7 +77,7 @@
     "coverage": "istanbul cover --report html ./node_modules/jasmine/bin/jasmine.js",
     "dist": "yarn clean && yarn build",
     "start": "yarn build:node && concurrently \"tsc -w\" \"webpack -w\" \"browser-sync start -c bs-config.js\"",
-    "start:node": "ts-node demo.ts",
+    "start:node": "ts-node -r tsconfig-paths/register demo.ts",
     "test": "yarn test:node && yarn test:browser",
     "test:project": "yarn dist && yarn test",
     "test:browser": "karma start",

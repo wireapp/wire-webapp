@@ -28,7 +28,7 @@
   "name": "@wireapp/proteus",
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus",
   "scripts": {
-    "benchmark": "ts-node src/demo/benchmark.ts",
+    "benchmark": "ts-node -r tsconfig-paths/register src/demo/benchmark.ts",
     "build:node": "tsc",
     "clean": "rimraf dist",
     "dist": "yarn clean && yarn build:node",
