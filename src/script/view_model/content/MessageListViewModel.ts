@@ -20,8 +20,10 @@
 import $ from 'jquery';
 import {groupBy} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
+import ko from 'knockout';
 
-import {getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 import {scrollEnd, scrollToBottom, scrollBy} from 'Util/scroll-helpers';
 import {t} from 'Util/LocalizerUtil';
 import {safeWindowOpen, safeMailOpen} from 'Util/SanitizationUtil';
@@ -33,7 +35,20 @@ import {ModalsViewModel} from '../ModalsViewModel';
 import {MessageCategory} from '../../message/MessageCategory';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {UserError} from '../../error/UserError';
-
+import {MemberMessage} from '../../entity/message/MemberMessage';
+import {ContentMessage} from '../../entity/message/ContentMessage';
+import {User} from '../../entity/User';
+import {DecryptErrorMessage} from '../../entity/message/DecryptErrorMessage';
+import {Message} from '../../entity/message/Message';
+import {Text} from '../../entity/message/Text';
+import {Participant} from '../../calling/Participant';
+import {MainViewModel} from '../MainViewModel';
+import {ConversationRepository} from '../../conversation/ConversationRepository';
+import {IntegrationRepository} from '../../integration/IntegrationRepository';
+import {ServerTimeHandler} from '../../time/serverTimeHandler';
+import {UserRepository} from '../../user/UserRepository';
+import {ActionsViewModel} from '../ActionsViewModel';
+import {PanelViewModel} from '../PanelViewModel';
 /*
  * Message list rendering view model.
  *
@@ -41,27 +56,29 @@ import {UserError} from '../../error/UserError';
  * @todo Remove all jQuery selectors
  */
 export class MessageListViewModel {
-  constructor(mainViewModel, contentViewModel, repositories) {
-    this._scrollAddedMessagesIntoView = this._scrollAddedMessagesIntoView.bind(this);
-    this.onMessageContainerInitiated = this.onMessageContainerInitiated.bind(this);
-    this.click_on_cancel_request = this.click_on_cancel_request.bind(this);
-    this.click_on_like = this.click_on_like.bind(this);
-    this.clickOnInvitePeople = this.clickOnInvitePeople.bind(this);
-    this.handleClickOnMessage = this.handleClickOnMessage.bind(this);
-    this.is_last_delivered_message = this.is_last_delivered_message.bind(this);
-    this.on_session_reset_click = this.on_session_reset_click.bind(this);
-    this.should_hide_user_avatar = this.should_hide_user_avatar.bind(this);
-    this.showUserDetails = this.showUserDetails.bind(this);
-    this.focusMessage = this.focusMessage.bind(this);
-    this.showParticipants = this.showParticipants.bind(this);
-    this.showMessageDetails = this.showMessageDetails.bind(this);
-    this.show_detail = this.show_detail.bind(this);
+  private readonly logger: Logger;
+  readonly actionsViewModel: ActionsViewModel;
+  readonly selfUser: ko.Observable<User>;
+  readonly focusedMessage: ko.Observable<any>;
+  readonly conversation: ko.Observable<Conversation>;
+  readonly verticallyCenterMessage: ko.PureComputed<boolean>;
+  private readonly conversationLoaded: ko.Observable<boolean>;
+  conversationLastReadTimestamp: number;
+  private readonly readMessagesBuffer: ko.ObservableArray<{conversation: Conversation; message: Message}>;
+  private messagesChangeSubscription: ko.Subscription;
+  private messagesBeforeChangeSubscription: ko.Subscription;
+  private messagesContainer: HTMLElement;
+  showInvitePeople: ko.PureComputed<boolean>;
+  message: Message;
 
+  constructor(
+    private readonly mainViewModel: MainViewModel,
+    private readonly conversationRepository: ConversationRepository,
+    private readonly integrationRepository: IntegrationRepository,
+    private readonly serverTimeHandler: ServerTimeHandler,
+    private readonly userRepository: UserRepository,
+  ) {
     this.mainViewModel = mainViewModel;
-    this.conversation_repository = repositories.conversation;
-    this.integrationRepository = repositories.integration;
-    this.serverTimeHandler = repositories.serverTime;
-    this.userRepository = repositories.user;
     this.logger = getLogger('MessageListViewModel');
 
     this.actionsViewModel = this.mainViewModel.actions;
@@ -72,15 +89,19 @@ export class MessageListViewModel {
     this.verticallyCenterMessage = ko.pureComputed(() => {
       if (this.conversation().messages_visible().length === 1) {
         const [messageEntity] = this.conversation().messages_visible();
-        return messageEntity.isMember() && messageEntity.isConnection();
+        if (messageEntity instanceof MemberMessage) {
+          return messageEntity.isMember() && messageEntity.isConnection();
+        }
+        return false;
       }
+      return false;
     });
 
-    amplify.subscribe(WebAppEvents.INPUT.RESIZE, this._handleInputResize.bind(this));
+    amplify.subscribe(WebAppEvents.INPUT.RESIZE, this._handleInputResize);
 
     this.conversationLoaded = ko.observable(false);
     // Store last read to show until user switches conversation
-    this.conversation_last_read_timestamp = undefined;
+    this.conversationLastReadTimestamp = undefined;
 
     // this buffer will collect all the read messages and send a read receipt in batch
     this.readMessagesBuffer = ko.observableArray();
@@ -93,7 +114,7 @@ export class MessageListViewModel {
           Object.values(groupedMessages).forEach(readMessagesBatch => {
             const {conversation, message: firstMessage} = readMessagesBatch.pop();
             const otherMessages = readMessagesBatch.map(({message}) => message);
-            this.conversation_repository.sendReadReceipt(conversation, firstMessage, otherMessages);
+            this.conversationRepository.sendReadReceipt(conversation, firstMessage, otherMessages);
           });
           this.readMessagesBuffer.removeAll();
         }
@@ -112,16 +133,11 @@ export class MessageListViewModel {
     });
   }
 
-  onMessageContainerInitiated(messagesContainer) {
+  onMessageContainerInitiated = (messagesContainer: HTMLElement): void => {
     this.messagesContainer = messagesContainer;
-  }
+  };
 
-  /**
-   * Remove all subscriptions and reset states.
-   * @param {Conversation} [conversation_et] Conversation entity to change to
-   * @returns {undefined} No return value
-   */
-  release_conversation(conversation_et) {
+  release_conversation = (conversation_et: Conversation): void => {
     if (conversation_et) {
       conversation_et.release();
     }
@@ -131,43 +147,32 @@ export class MessageListViewModel {
     if (this.messagesChangeSubscription) {
       this.messagesChangeSubscription.dispose();
     }
-    this.conversation_last_read_timestamp = undefined;
+    this.conversationLastReadTimestamp = undefined;
     window.removeEventListener('resize', this._adjustScroll);
-  }
+  };
 
-  _shouldStickToBottom() {
+  _shouldStickToBottom = (): boolean => {
     const messagesContainer = this.getMessagesContainer();
     const scrollPosition = Math.ceil(messagesContainer.scrollTop);
     const scrollEndValue = Math.ceil(scrollEnd(messagesContainer));
     return scrollPosition > scrollEndValue - Config.getConfig().SCROLL_TO_LAST_MESSAGE_THRESHOLD;
-  }
+  };
 
-  /**
-   * Adjust the scroll position
-   * @returns {void} - nothing
-   */
-  _adjustScroll = () => {
+  _adjustScroll = (): void => {
     if (this._shouldStickToBottom()) {
       scrollToBottom(this.getMessagesContainer());
     }
   };
 
-  _handleInputResize(inputSizeDiff) {
+  _handleInputResize = (inputSizeDiff: number): void => {
     if (inputSizeDiff) {
       scrollBy(this.getMessagesContainer(), inputSizeDiff);
     } else if (this._shouldStickToBottom()) {
       scrollToBottom(this.getMessagesContainer());
     }
-  }
+  };
 
-  /**
-   * Change conversation.
-   *
-   * @param {Conversation} conversationEntity Conversation entity to change to
-   * @param {Message} messageEntity message to be focused
-   * @returns {Promise} Resolves when conversation was changed
-   */
-  changeConversation(conversationEntity, messageEntity) {
+  changeConversation = async (conversationEntity: Conversation, messageEntity: Message): Promise<void> => {
     // Clean up old conversation
     this.conversationLoaded(false);
     if (this.conversation()) {
@@ -179,43 +184,39 @@ export class MessageListViewModel {
 
     // Keep last read timestamp to render unread when entering conversation
     if (this.conversation().unreadState().allEvents.length) {
-      this.conversation_last_read_timestamp = this.conversation().last_read_timestamp();
+      this.conversationLastReadTimestamp = this.conversation().last_read_timestamp();
     }
 
     conversationEntity.is_loaded(false);
-    return this._loadConversation(conversationEntity, messageEntity)
-      .then(() => this._renderConversation(conversationEntity, messageEntity))
-      .then(() => {
-        conversationEntity.is_loaded(true);
-        this.conversationLoaded(true);
-      });
-  }
+    await this._loadConversation(conversationEntity, messageEntity);
+    await this._renderConversation(conversationEntity, messageEntity);
+    conversationEntity.is_loaded(true);
+    this.conversationLoaded(true);
+  };
 
-  _loadConversation(conversationEntity, messageEntity) {
-    return this.conversation_repository
-      .updateParticipatingUserEntities(conversationEntity, false, true)
-      .then(_conversationEntity => {
-        return messageEntity
-          ? this.conversation_repository.getMessagesWithOffset(_conversationEntity, messageEntity)
-          : this.conversation_repository.getPrecedingMessages(_conversationEntity);
-      });
-  }
+  _loadConversation = async (conversationEntity: Conversation, messageEntity: Message): Promise<void> => {
+    const _conversationEntity = await this.conversationRepository.updateParticipatingUserEntities(
+      conversationEntity,
+      false,
+      true,
+    );
 
-  _isLastReceivedMessage(messageEntity, conversationEntity) {
+    if (messageEntity) {
+      this.conversationRepository.getMessagesWithOffset(_conversationEntity, messageEntity);
+    } else {
+      this.conversationRepository.getPrecedingMessages(_conversationEntity);
+    }
+  };
+
+  _isLastReceivedMessage = (messageEntity: Message, conversationEntity: Conversation): boolean => {
     return messageEntity.timestamp() && messageEntity.timestamp() >= conversationEntity.last_event_timestamp();
-  }
+  };
 
-  getMessagesContainer() {
+  getMessagesContainer = () => {
     return this.messagesContainer;
-  }
+  };
 
-  /**
-   * Sets the conversation and waits for further processing until knockout has rendered the messages.
-   * @param {Conversation} conversationEntity Conversation entity to set
-   * @param {Message} messageEntity Message that should be in focus when the conversation loads
-   * @returns {Promise} Resolves when conversation was rendered
-   */
-  _renderConversation(conversationEntity, messageEntity) {
+  _renderConversation = (conversationEntity: Conversation, messageEntity: Message): Promise<void> => {
     const messages_container = this.getMessagesContainer();
 
     const is_current_conversation = conversationEntity === this.conversation();
@@ -244,7 +245,7 @@ export class MessageListViewModel {
 
         window.addEventListener('resize', this._adjustScroll);
 
-        let shouldStickToBottomOnMessageAdd;
+        let shouldStickToBottomOnMessageAdd: boolean;
 
         this.messagesBeforeChangeSubscription = conversationEntity.messages_visible.subscribe(
           () => {
@@ -267,15 +268,12 @@ export class MessageListViewModel {
         resolve();
       }, 100);
     });
-  }
+  };
 
-  /**
-   * Checks how to scroll message list and if conversation should be marked as unread.
-   * @param {Array} changedMessages List of the messages that were added or removed from the list
-   * @param {boolean} shouldStickToBottom should the list stick to the bottom
-   * @returns {undefined} No return value
-   */
-  _scrollAddedMessagesIntoView(changedMessages, shouldStickToBottom) {
+  _scrollAddedMessagesIntoView = (
+    changedMessages: ko.utils.ArrayChanges<ContentMessage | MemberMessage>,
+    shouldStickToBottom: boolean,
+  ) => {
     const messages_container = this.getMessagesContainer();
     const lastAddedItem = changedMessages
       .slice()
@@ -306,40 +304,32 @@ export class MessageListViewModel {
     if (shouldStickToBottom) {
       window.requestAnimationFrame(() => scrollToBottom(messages_container));
     }
-  }
+  };
 
-  /**
-   * Fetch older messages beginning from the oldest message in view
-   * @returns {Promise<any>} A promise that resolves when the loading is done
-   */
-  loadPrecedingMessages() {
+  loadPrecedingMessages = async (): Promise<void> => {
     const shouldPullMessages = !this.conversation().is_pending() && this.conversation().hasAdditionalMessages();
-    const [messagesContainer] = this.getMessagesContainer().children;
+    const messagesContainer = this.getMessagesContainer();
 
     if (shouldPullMessages && messagesContainer) {
       const initialListHeight = messagesContainer.scrollHeight;
 
-      return this.conversation_repository.getPrecedingMessages(this.conversation()).then(() => {
-        if (messagesContainer) {
-          const newListHeight = messagesContainer.scrollHeight;
-          this.getMessagesContainer().scrollTop = newListHeight - initialListHeight;
-        }
-      });
+      await this.conversationRepository.getPrecedingMessages(this.conversation());
+      if (messagesContainer) {
+        const newListHeight = messagesContainer.scrollHeight;
+        this.getMessagesContainer().scrollTop = newListHeight - initialListHeight;
+      }
+      return;
     }
     return Promise.resolve();
-  }
+  };
 
-  /**
-   * Fetch newer messages beginning from the newest message in view
-   * @returns {Promise<any>} A promise that resolves when the loading is done
-   */
-  loadFollowingMessages() {
+  loadFollowingMessages = (): Promise<void> => {
     const lastMessage = this.conversation().getLastMessage();
 
     if (lastMessage) {
       if (!this._isLastReceivedMessage(lastMessage, this.conversation())) {
         // if the last loaded message is not the last of the conversation, we load the subsequent messages
-        return this.conversation_repository.getSubsequentMessages(this.conversation(), lastMessage, false);
+        return this.conversationRepository.getSubsequentMessages(this.conversation(), lastMessage, false);
       }
       if (document.hasFocus()) {
         // if the message is the last of the conversation and the app is in the foreground, then we update the last read timestamp of the conversation
@@ -347,29 +337,24 @@ export class MessageListViewModel {
       }
     }
     return Promise.resolve();
-  }
+  };
 
-  /**
-   * Scroll to given message in the list.
-   *
-   * @note Ideally message is centered horizontally
-   * @param {string} messageId Target message's id
-   * @returns {undefined} No return value
-   */
-  focusMessage(messageId) {
+  focusMessage = async (messageId: string): Promise<void> => {
     const messageIsLoaded = !!this.conversation().getMessage(messageId);
     this.focusedMessage(messageId);
 
     if (!messageIsLoaded) {
       const conversationEntity = this.conversation();
-      this.conversation_repository.getMessageInConversationById(conversationEntity, messageId).then(messageEntity => {
-        conversationEntity.remove_messages();
-        return this.conversation_repository.getMessagesWithOffset(conversationEntity, messageEntity);
-      });
+      const messageEntity = await this.conversationRepository.getMessageInConversationById(
+        conversationEntity,
+        messageId,
+      );
+      conversationEntity.remove_messages();
+      this.conversationRepository.getMessagesWithOffset(conversationEntity, messageEntity);
     }
-  }
+  };
 
-  onMessageMarked = messageElement => {
+  onMessageMarked = (messageElement: HTMLElement) => {
     const messagesContainer = this.getMessagesContainer();
     messageElement.classList.remove('message-marked');
     scrollBy(messagesContainer, messageElement.getBoundingClientRect().top - messagesContainer.offsetHeight / 2);
@@ -377,34 +362,24 @@ export class MessageListViewModel {
     this.focusedMessage(null);
   };
 
-  /**
-   * Triggered when user clicks on an avatar in the message list.
-   * @param {User} userEntity User entity of the selected user
-   * @returns {undefined} No return value
-   */
-  showUserDetails(userEntity) {
+  showUserDetails = (userEntity: User): void => {
     userEntity = ko.unwrap(userEntity);
-    const conversationEntity = this.conversation_repository.active_conversation();
+    const conversationEntity = this.conversationRepository.active_conversation();
     const isSingleModeConversation = conversationEntity.is1to1() || conversationEntity.isRequest();
 
     if (userEntity.isDeleted || (isSingleModeConversation && !userEntity.isMe)) {
-      return this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS);
+      return this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.CONVERSATION_DETAILS, undefined);
     }
 
     const params = {entity: userEntity};
     const panelId = userEntity.isService
-      ? z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE
-      : z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_USER;
+      ? PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE
+      : PanelViewModel.STATE.GROUP_PARTICIPANT_USER;
 
     this.mainViewModel.panel.togglePanel(panelId, params);
-  }
+  };
 
-  /**
-   * Triggered when user clicks on the session reset link in a decrypt error message.
-   * @param {DecryptErrorMessage} message_et Decrypt error message
-   * @returns {undefined} No return value
-   */
-  on_session_reset_click(message_et) {
+  on_session_reset_click = async (message_et: DecryptErrorMessage): Promise<void> => {
     const reset_progress = () =>
       window.setTimeout(() => {
         message_et.is_resetting_session(false);
@@ -412,43 +387,41 @@ export class MessageListViewModel {
       }, MotionDuration.LONG);
 
     message_et.is_resetting_session(true);
-    this.conversation_repository
-      .reset_session(message_et.from, message_et.client_id, this.conversation().id)
-      .then(() => reset_progress())
-      .catch(() => reset_progress());
-  }
+    try {
+      await this.conversationRepository.reset_session(message_et.from, message_et.client_id, this.conversation().id);
+      reset_progress();
+    } catch (error) {
+      this.logger.warn('Error while trying to reset_session', error);
+      reset_progress();
+    }
+  };
 
-  /**
-   * Shows detail image view.
-   *
-   * @param {Message} message_et Message with asset to be displayed
-   * @param {UIEvent} event Actual scroll event
-   * @returns {undefined} No return value
-   */
-  show_detail(message_et, event) {
+  show_detail = async (message_et: Message, event: MouseEvent): Promise<void> => {
     if (message_et.is_expired() || $(event.currentTarget).hasClass('image-asset--no-image')) {
       return;
     }
 
-    this.conversation_repository.get_events_for_category(this.conversation(), MessageCategory.IMAGE).then(items => {
-      const message_ets = items.filter(
-        item => item.category & MessageCategory.IMAGE && !(item.category & MessageCategory.GIF),
-      );
-      const [image_message_et] = message_ets.filter(item => item.id === message_et.id);
+    const items: Message[] = await this.conversationRepository.get_events_for_category(
+      this.conversation(),
+      MessageCategory.IMAGE,
+    );
+    const message_ets = items.filter(
+      item => item.category & MessageCategory.IMAGE && !(item.category & MessageCategory.GIF),
+    );
+    const [image_message_et] = message_ets.filter(item => item.id === message_et.id);
 
-      amplify.publish(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, image_message_et || message_et, message_ets);
-    });
-  }
+    amplify.publish(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, image_message_et || message_et, message_ets);
+  };
 
-  get_timestamp_class = messageEntity => {
+  get_timestamp_class = (messageEntity: ContentMessage): string => {
     const previousMessage = this.conversation().get_previous_message(messageEntity);
     if (!previousMessage || messageEntity.is_call()) {
       return '';
     }
 
     const isFirstUnread =
-      previousMessage.timestamp() <= this.conversation_last_read_timestamp &&
-      messageEntity.timestamp() > this.conversation_last_read_timestamp;
+      previousMessage.timestamp() <= this.conversationLastReadTimestamp &&
+      messageEntity.timestamp() > this.conversationLastReadTimestamp;
 
     if (isFirstUnread) {
       return 'message-timestamp-visible message-timestamp-unread';
@@ -464,14 +437,11 @@ export class MessageListViewModel {
     if (differenceInMinutes(current, last) > 60) {
       return 'message-timestamp-visible';
     }
+
+    return '';
   };
 
-  /**
-   * Checks its older neighbor in order to see if the avatar should be rendered or not
-   * @param {Message} message_et Message to check
-   * @returns {boolean} Should user avatar be hidden
-   */
-  should_hide_user_avatar(message_et) {
+  should_hide_user_avatar = (message_et: ContentMessage): boolean => {
     // @todo avoid double check
     if (this.get_timestamp_class(message_et)) {
       return false;
@@ -483,40 +453,29 @@ export class MessageListViewModel {
 
     const last_message = this.conversation().get_previous_message(message_et);
     return last_message && last_message.is_content() && last_message.user().id === message_et.user().id;
-  }
+  };
 
-  /**
-   * Checks if the given message is the last delivered one
-   * @param {Message} message_et Message to check
-   * @returns {boolean} Message is last delivered one
-   */
-  is_last_delivered_message(message_et) {
+  is_last_delivered_message = (message_et: Message): boolean => {
     return this.conversation().getLastDeliveredMessage() === message_et;
-  }
+  };
 
-  click_on_cancel_request(messageEntity) {
-    const conversationEntity = this.conversation_repository.active_conversation();
-    const nextConversationEntity = this.conversation_repository.get_next_conversation(conversationEntity);
+  click_on_cancel_request = (messageEntity: MemberMessage): void => {
+    const conversationEntity = this.conversationRepository.active_conversation();
+    const nextConversationEntity = this.conversationRepository.get_next_conversation(conversationEntity);
     this.actionsViewModel.cancelConnectionRequest(messageEntity.otherUser(), true, nextConversationEntity);
-  }
+  };
 
-  click_on_like(message_et, button = true) {
-    this.conversation_repository.toggle_like(this.conversation(), message_et, button);
-  }
+  click_on_like = (message_et: Message): void => {
+    this.conversationRepository.toggle_like(this.conversation(), message_et);
+  };
 
-  clickOnInvitePeople() {
-    this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.GUEST_OPTIONS);
-  }
+  clickOnInvitePeople = (): void => {
+    this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.GUEST_OPTIONS, undefined);
+  };
 
-  /**
-   * Message appeared in viewport.
-   * @param {Conversation} conversationEntity Conversation the message belongs to
-   * @param {Message} messageEntity Message to check
-   * @returns {Function|null} Callback or null
-   */
-  getInViewportCallback(conversationEntity, messageEntity) {
+  getInViewportCallback = (conversationEntity: Conversation, messageEntity: MemberMessage): Function | null => {
     const messageTimestamp = messageEntity.timestamp();
-    const callbacks = [];
+    const callbacks: Function[] = [];
 
     if (!messageEntity.is_ephemeral()) {
       const isCreationMessage = messageEntity.isMember() && messageEntity.isCreation();
@@ -536,7 +495,7 @@ export class MessageListViewModel {
 
     const startTimer = async () => {
       if (messageEntity.conversation_id === conversationEntity.id) {
-        await this.conversation_repository.checkMessageTimer(messageEntity);
+        await this.conversationRepository.checkMessageTimer(messageEntity);
       }
     };
 
@@ -551,7 +510,7 @@ export class MessageListViewModel {
 
     if (messageEntity.expectsReadConfirmation) {
       if (conversationEntity.is1to1()) {
-        shouldSendReadReceipt = this.conversation_repository.expectReadReceipt(conversationEntity);
+        shouldSendReadReceipt = this.conversationRepository.expectReadReceipt(conversationEntity);
       } else if (conversationEntity.isGroup() && (conversationEntity.inTeam() || conversationEntity.isGuestRoom())) {
         shouldSendReadReceipt = true;
       }
@@ -576,19 +535,19 @@ export class MessageListViewModel {
       const trigger = () => callbacks.forEach(callback => callback());
       return document.hasFocus() ? trigger() : $(window).one('focus', trigger);
     };
-  }
+  };
 
-  updateConversationLastRead(conversationEntity, messageEntity) {
+  updateConversationLastRead = (conversationEntity: Conversation, messageEntity: Message): void => {
     const conversationLastRead = conversationEntity.last_read_timestamp();
     const lastKnownTimestamp = conversationEntity.get_last_known_timestamp(this.serverTimeHandler.toServerTimestamp());
     const needsUpdate = conversationLastRead < lastKnownTimestamp;
     if (needsUpdate && this._isLastReceivedMessage(messageEntity, conversationEntity)) {
       conversationEntity.setTimestamp(lastKnownTimestamp, Conversation.TIMESTAMP_TYPE.LAST_READ);
-      this.conversation_repository.markAsRead(conversationEntity);
+      this.conversationRepository.markAsRead(conversationEntity);
     }
-  }
+  };
 
-  handleClickOnMessage(messageEntity, event) {
+  handleClickOnMessage = (messageEntity: ContentMessage | Text, event: Event) => {
     const emailTarget = event.target.closest('[data-email-link]');
     if (emailTarget) {
       safeMailOpen(emailTarget.href);
@@ -611,35 +570,37 @@ export class MessageListViewModel {
       });
       return false;
     }
-    const hasMentions = messageEntity.mentions().length;
+    const hasMentions = messageEntity instanceof Text && messageEntity.mentions().length;
     const mentionElement = hasMentions && event.target.closest('.message-mention');
     const userId = mentionElement && mentionElement.dataset.userId;
 
     if (userId) {
-      this.userRepository
-        .getUserById(userId)
-        .then(userEntity => this.showUserDetails(userEntity))
-        .catch(error => {
+      (async () => {
+        try {
+          const userEntity = await this.userRepository.getUserById(userId);
+          this.showUserDetails(userEntity);
+        } catch (error) {
           if (error.type !== UserError.TYPE.USER_NOT_FOUND) {
             throw error;
           }
-        });
+        }
+      })();
     }
 
     // need to return `true` because knockout will prevent default if we return anything else (including undefined)
     return true;
-  }
+  };
 
-  showParticipants(participants) {
-    this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.CONVERSATION_PARTICIPANTS, participants);
-  }
+  showParticipants = (participants: Participant[]): void => {
+    this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.CONVERSATION_PARTICIPANTS, participants);
+  };
 
-  showMessageDetails(view, showLikes) {
+  showMessageDetails = (view: MessageListViewModel, showLikes: boolean): void => {
     if (!this.conversation().is1to1()) {
-      this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.MESSAGE_DETAILS, {
+      this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.MESSAGE_DETAILS, {
         entity: {id: view.message.id},
         showLikes,
       });
     }
-  }
+  };
 }

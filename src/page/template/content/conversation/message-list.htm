@@ -26,7 +26,7 @@
           isMarked: focusedMessage() === message.id,
           isSelfTemporaryGuest: selfUser().isTemporaryGuest(),
           isLastDeliveredMessage: is_last_delivered_message(message),
-          conversationRepository: conversation_repository,
+          conversationRepository: conversationRepository,
           onContentUpdated: _adjustScroll,
           onClickAvatar: showUserDetails,
           onClickImage: show_detail,
