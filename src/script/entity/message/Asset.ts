@@ -43,6 +43,10 @@ export class Asset {
     this.type = '';
   }
 
+  is_downloadable(): boolean {
+    return this.is_audio() || this.is_file() || this.is_video() || this.is_image();
+  }
+
   is_image(): this is MediumImageAsset {
     return this.type === AssetType.IMAGE;
   }
