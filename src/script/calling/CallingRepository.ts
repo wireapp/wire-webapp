@@ -973,9 +973,11 @@ export class CallingRepository {
   }
 
   private checkConcurrentJoinedCall(conversationId: ConversationId, newCallState: CALL_STATE): Promise<void> {
-    const activeCall = this.activeCalls().find(call => call.conversationId !== conversationId);
     const idleCallStates = [CALL_STATE.INCOMING, CALL_STATE.NONE, CALL_STATE.UNKNOWN];
-    if (!activeCall || idleCallStates.includes(activeCall.state())) {
+    const activeCall = this.activeCalls().find(
+      call => call.conversationId !== conversationId && !idleCallStates.includes(call.state()),
+    );
+    if (!activeCall) {
       return Promise.resolve();
     }
 
