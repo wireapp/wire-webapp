@@ -20,7 +20,7 @@
     "@types/react-test-renderer": "16.9.2",
     "@types/webpack-env": "1.15.2",
     "babel-jest": "26.0.1",
-    "babel-loader": "8.0.6",
+    "babel-loader": "8.1.0",
     "babel-plugin-emotion": "10.0.29",
     "jest": "26.0.1",
     "jest-emotion": "10.0.32",
