@@ -45,6 +45,7 @@ import {PreferencesAccountViewModel} from './content/PreferencesAccountViewModel
 import {TitleBarViewModel} from './content/TitleBarViewModel';
 import {PreferencesAboutViewModel} from './content/PreferencesAboutViewModel';
 import {PreferencesDevicesViewModel} from './content/PreferencesDevicesViewModel';
+import {PreferencesDeviceDetailsViewModel} from './content/PreferencesDeviceDetailsViewModel';
 
 export class ContentViewModel {
   static get STATE() {
@@ -125,10 +126,11 @@ export class ContentViewModel {
       mediaSourceChanged: repositories.calling.changeMediaSource.bind(repositories.calling),
       willChangeMediaSource: repositories.calling.stopMediaSource.bind(repositories.calling),
     });
-    this.preferencesDeviceDetails = new z.viewModel.content.PreferencesDeviceDetailsViewModel(
+    this.preferencesDeviceDetails = new PreferencesDeviceDetailsViewModel(
       mainViewModel,
-      this,
-      repositories,
+      repositories.client,
+      repositories.conversation,
+      repositories.cryptography,
     );
     this.preferencesDevices = new PreferencesDevicesViewModel(
       mainViewModel,
