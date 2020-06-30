@@ -88,7 +88,7 @@ export class PreferencesDeviceDetailsViewModel {
       const fingerprint = await this.cryptographyRepository.getRemoteFingerprint(this.selfUser().id, this.device().id);
       this.fingerprint(fingerprint);
     } catch (error) {
-      this.logger.warn('Error while trying updating finger print', error);
+      this.logger.warn('Error while trying to update fingerprint', error);
     }
   };
 
