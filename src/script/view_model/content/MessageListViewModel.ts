@@ -547,13 +547,13 @@ export class MessageListViewModel {
     }
   };
 
-  handleClickOnMessage = (messageEntity: ContentMessage | Text, event: Event) => {
-    const emailTarget = event.target.closest('[data-email-link]');
+  handleClickOnMessage = (messageEntity: ContentMessage | Text, event: MouseEvent) => {
+    const emailTarget: HTMLAnchorElement = (event.target as HTMLElement).closest('[data-email-link]');
     if (emailTarget) {
       safeMailOpen(emailTarget.href);
       return false;
     }
-    const linkTarget = event.target.closest('[data-md-link]');
+    const linkTarget: HTMLAnchorElement = (event.target as HTMLElement).closest('[data-md-link]');
     if (linkTarget) {
       const href = linkTarget.href;
       amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
@@ -571,8 +571,8 @@ export class MessageListViewModel {
       return false;
     }
     const hasMentions = messageEntity instanceof Text && messageEntity.mentions().length;
-    const mentionElement = hasMentions && event.target.closest('.message-mention');
-    const userId = mentionElement && mentionElement.dataset.userId;
+    const mentionElement = hasMentions && (event.target as HTMLElement).closest('.message-mention');
+    const userId = mentionElement && (mentionElement as any).dataset.userId;
 
     if (userId) {
       (async () => {
