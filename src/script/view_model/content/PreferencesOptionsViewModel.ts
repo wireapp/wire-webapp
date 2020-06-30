@@ -22,16 +22,11 @@ import {amplify} from 'amplify';
 import {AudioPreference, WebappProperties, NotificationPreference} from '@wireapp/api-client/dist/user/data';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {t} from 'Util/LocalizerUtil';
-import {getCurrentDate} from 'Util/TimeUtil';
 import {Environment} from 'Util/Environment';
-import {downloadBlob} from 'Util/util';
 
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 import {Config} from '../../Config';
 import {THEMES as ThemeViewModelThemes} from '../ThemeViewModel';
-import {ModalsViewModel} from '../ModalsViewModel';
-import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {TeamRepository} from 'src/script/team/TeamRepository';
 import {UserRepository} from 'src/script/user/UserRepository';
@@ -39,33 +34,22 @@ import {UserRepository} from 'src/script/user/UserRepository';
 export class PreferencesOptionsViewModel {
   isActivatedAccount: ko.PureComputed<boolean>;
   isTeam: ko.PureComputed<boolean>;
-  supportsCalling: boolean;
   Environment: typeof Environment;
   optionAudio: ko.Observable<AudioPreference>;
   optionDarkMode: ko.Observable<boolean>;
   optionReplaceInlineEmoji: ko.Observable<boolean>;
   optionNotifications: ko.Observable<NotificationPreference>;
   optionSendPreviews: ko.Observable<boolean>;
-  optionVbrEncoding: ko.Observable<boolean>;
   AudioPreference: typeof AudioPreference;
   brandName: string;
 
-  static get CONFIG() {
-    return {
-      MINIMUM_CALL_LOG_LENGTH: 15,
-      OBFUSCATION_TRUNCATE_TO: 4,
-    };
-  }
-
   constructor(
-    private readonly callingRepository: CallingRepository,
     private readonly propertiesRepository: PropertiesRepository,
     private readonly teamRepository: TeamRepository,
     private readonly userRepository: UserRepository,
   ) {
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
     this.isTeam = this.teamRepository.isTeam;
-    this.supportsCalling = this.callingRepository.supportsCalling;
     this.Environment = Environment;
 
     this.optionAudio = ko.observable();
@@ -95,40 +79,11 @@ export class PreferencesOptionsViewModel {
       this.propertiesRepository.savePreference(PROPERTIES_TYPE.PREVIEWS.SEND, sendPreviewsPreference);
     });
 
-    this.optionVbrEncoding = ko.observable(false);
-    this.optionVbrEncoding.subscribe(vbrEncoding => {
-      this.propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.ENABLE_VBR_ENCODING, vbrEncoding);
-    });
-
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, this.updateProperties.bind(this));
     this.updateProperties(this.propertiesRepository.properties);
 
     this.AudioPreference = AudioPreference;
     this.brandName = Config.getConfig().BRAND_NAME;
-  }
-
-  saveCallLogs(): number | void {
-    const messageLog = this.callingRepository.getCallLog();
-    // Very short logs will not contain useful information
-    const logExceedsMinimumLength = messageLog.length > PreferencesOptionsViewModel.CONFIG.MINIMUM_CALL_LOG_LENGTH;
-    if (logExceedsMinimumLength) {
-      const callLog = [messageLog.join('\r\n')];
-      const blob = new Blob(callLog, {type: 'text/plain;charset=utf-8'});
-
-      const selfUserId = this.userRepository.self().id;
-      const truncatedId = selfUserId.substr(0, PreferencesOptionsViewModel.CONFIG.OBFUSCATION_TRUNCATE_TO);
-      const sanitizedBrandName = Config.getConfig().BRAND_NAME.replace(/[^A-Za-z0-9_]/g, '');
-      const filename = `${sanitizedBrandName}-${truncatedId}-Calling_${getCurrentDate()}.log`;
-
-      return downloadBlob(blob, filename);
-    }
-
-    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
-      text: {
-        message: t('modalCallEmptyLogMessage'),
-        title: t('modalCallEmptyLogHeadline'),
-      },
-    });
   }
 
   updateProperties = ({settings}: WebappProperties): void => {
@@ -137,6 +92,5 @@ export class PreferencesOptionsViewModel {
     this.optionDarkMode(settings.interface.theme === ThemeViewModelThemes.DARK);
     this.optionSendPreviews(settings.previews.send);
     this.optionNotifications(settings.notifications);
-    this.optionVbrEncoding(settings.call.enable_vbr_encoding);
   };
 }
