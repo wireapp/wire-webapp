@@ -69,7 +69,6 @@ export class MessageListViewModel {
   private messagesBeforeChangeSubscription: ko.Subscription;
   private messagesContainer: HTMLElement;
   showInvitePeople: ko.PureComputed<boolean>;
-  message: Message;
 
   constructor(
     private readonly mainViewModel: MainViewModel,
@@ -158,7 +157,7 @@ export class MessageListViewModel {
     return scrollPosition > scrollEndValue - Config.getConfig().SCROLL_TO_LAST_MESSAGE_THRESHOLD;
   };
 
-  private readonly adjustScroll = (): void => {
+  readonly adjustScroll = (): void => {
     if (this.shouldStickToBottom()) {
       scrollToBottom(this.getMessagesContainer());
     }
@@ -599,7 +598,7 @@ export class MessageListViewModel {
     this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.CONVERSATION_PARTICIPANTS, participants);
   };
 
-  showMessageDetails = (view: MessageListViewModel, showLikes: boolean): void => {
+  showMessageDetails = (view: {message: {id: string}}, showLikes: boolean): void => {
     if (!this.conversation().is1to1()) {
       this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.MESSAGE_DETAILS, {
         entity: {id: view.message.id},
