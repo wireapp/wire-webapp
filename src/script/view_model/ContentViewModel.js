@@ -46,6 +46,7 @@ import {TitleBarViewModel} from './content/TitleBarViewModel';
 import {PreferencesAboutViewModel} from './content/PreferencesAboutViewModel';
 import {PreferencesDevicesViewModel} from './content/PreferencesDevicesViewModel';
 import {PreferencesDeviceDetailsViewModel} from './content/PreferencesDeviceDetailsViewModel';
+import {MediaType} from '../media/MediaType';
 
 export class ContentViewModel {
   static get STATE() {
@@ -162,7 +163,7 @@ export class ContentViewModel {
           this.preferencesAccount.popNotification();
           break;
         case ContentViewModel.STATE.PREFERENCES_AV:
-          this.preferencesAV.initiateDevices();
+          this.preferencesAV.initiateDevices(MediaType.AUDIO_VIDEO);
           break;
         case ContentViewModel.STATE.PREFERENCES_DEVICES:
           this.preferencesDevices.updateDeviceInfo();
@@ -390,7 +391,7 @@ export class ContentViewModel {
 
     const isStatePreferencesAv = this.previousState === ContentViewModel.STATE.PREFERENCES_AV;
     if (isStatePreferencesAv) {
-      this.preferencesAV.releaseDevices();
+      this.preferencesAV.releaseDevices(MediaType.AUDIO_VIDEO);
     }
   }
 

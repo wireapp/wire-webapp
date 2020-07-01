@@ -123,24 +123,17 @@ export class MediaStreamHandler {
     return shouldCheckPermissions ? checkPermissionStates(permissionTypes) : true;
   }
 
-  releaseTracksFromStream(mediaStream: MediaStream, mediaType: MediaType): boolean {
+  releaseTracksFromStream(mediaStream: MediaStream, mediaType: MediaType): void {
     const mediaStreamTracks = this.getMediaTracks(mediaStream, mediaType);
 
-    if (mediaStreamTracks.length) {
-      mediaStreamTracks.forEach((mediaStreamTrack: MediaStreamTrack) => {
-        mediaStream.removeTrack(mediaStreamTrack);
-        mediaStreamTrack.stop();
-        this.logger.info(
-          `Stopped MediaStreamTrack ID '${mediaStreamTrack.id}' of kind '${mediaStreamTrack.kind}'`,
-          mediaStreamTrack,
-        );
-      });
-
-      return true;
-    }
-
-    this.logger.warn('No MediaStreamTracks found to stop', mediaStream);
-    return false;
+    mediaStreamTracks.forEach((mediaStreamTrack: MediaStreamTrack) => {
+      mediaStream.removeTrack(mediaStreamTrack);
+      mediaStreamTrack.stop();
+      this.logger.info(
+        `Stopped MediaStreamTrack ID '${mediaStreamTrack.id}' of kind '${mediaStreamTrack.kind}'`,
+        mediaStreamTrack,
+      );
+    });
   }
 
   private getMediaStream(

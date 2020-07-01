@@ -40,27 +40,25 @@ export class PreferencesAVViewModel {
   audioContext: AudioContext;
   audioInterval: number;
   audioLevel: ko.Observable<number>;
-  audioMediaStream: ko.PureComputed<MediaStream>;
   audioSource: MediaStreamAudioSourceNode;
   availableDevices: Devices;
   brandName: string;
   Config: Configuration;
   constraintsHandler: MediaConstraintsHandler;
   currentDeviceId: DeviceIds;
-  currentMediaType: MediaType;
   devicesHandler: MediaDevicesHandler;
   deviceSupport: DeviceSupport;
+  hasAudioTrack: ko.PureComputed<boolean>;
   hasOnlyOneMicrophone: ko.PureComputed<boolean>;
+  hasVideoTrack: ko.PureComputed<boolean>;
   isActivatedAccount: ko.PureComputed<boolean>;
   isTemporaryGuest: ko.PureComputed<boolean>;
-  isVisible: boolean;
   logger: Logger;
   mediaSourceChanged: MediaSourceChanged;
   mediaStream: ko.Observable<MediaStream>;
   streamHandler: MediaStreamHandler;
   supportsAudioOutput: ko.PureComputed<boolean>;
   userRepository: UserRepository;
-  videoMediaStream: ko.PureComputed<MediaStream>;
   willChangeMediaSource: WillChangeMediaSource;
 
   static get CONFIG() {
@@ -90,25 +88,20 @@ export class PreferencesAVViewModel {
     this.deviceSupport = this.devicesHandler.deviceSupport;
     this.Config = Config.getConfig();
 
-    this.currentDeviceId.audioInput.subscribe(() => this.updateStream(MediaType.AUDIO));
-    this.currentDeviceId.videoInput.subscribe(() => this.updateStream(MediaType.VIDEO));
+    this.currentDeviceId.audioInput.subscribe(() => this.tryAgain(MediaType.AUDIO));
+    this.currentDeviceId.videoInput.subscribe(() => this.tryAgainVideo());
 
     this.constraintsHandler = mediaRepository.constraintsHandler;
     this.streamHandler = mediaRepository.streamHandler;
 
-    const createMediaStreamOfType = (tracksGetter: 'getAudioTracks' | 'getVideoTracks') => {
+    const hasTracksOfType = (tracksGetter: 'getAudioTracks' | 'getVideoTracks') => {
       const tracks = this.mediaStream() && this.mediaStream()[tracksGetter]();
-      if (!tracks || tracks.length === 0) {
-        return undefined;
-      }
-      return new MediaStream(tracks);
+      return !!tracks;
     };
-    this.mediaStream = ko.observable();
-    this.audioMediaStream = ko.pureComputed(() => createMediaStreamOfType('getAudioTracks'));
-    this.videoMediaStream = ko.pureComputed(() => createMediaStreamOfType('getVideoTracks'));
+    this.mediaStream = ko.observable(new MediaStream());
+    this.hasAudioTrack = ko.pureComputed(() => hasTracksOfType('getAudioTracks'));
+    this.hasVideoTrack = ko.pureComputed(() => hasTracksOfType('getVideoTracks'));
     this.hasOnlyOneMicrophone = ko.pureComputed(() => this.availableDevices.audioInput().length < 2);
-
-    this.isVisible = false;
 
     const selfUser = this.userRepository.self;
     this.isTemporaryGuest = ko.pureComputed(() => selfUser() && selfUser().isTemporaryGuest());
@@ -125,60 +118,67 @@ export class PreferencesAVViewModel {
     });
   }
 
-  async updateStream(mediaType: MediaType): Promise<void> {
-    this.currentMediaType = mediaType;
-    await this.tryAgain();
-
-    const needsStreamUpdate = this.willChangeMediaSource(mediaType);
-
-    if (!needsStreamUpdate && !this.mediaStream()) {
-      return undefined;
-    }
-
-    try {
-      const stream = await this.getMediaStream(mediaType);
-      this.mediaSourceChanged(stream, mediaType);
-      if (this.mediaStream()) {
-        stream.getTracks().forEach(track => {
-          this.mediaStream().addTrack(track);
-        });
-        this.initiateAudioMeter(this.mediaStream());
-      } else {
-        stream.getTracks().forEach(track => track.stop());
-      }
-    } catch (error) {
-      this.logger.warn(`Requesting MediaStream failed: ${error.message}`, error);
-      this.releaseMediaStream();
-    }
+  tryAgainVideo() {
+    return this.tryAgain(MediaType.VIDEO);
   }
 
-  async initiateDevices(): Promise<void> {
-    this.isVisible = true;
+  // async updateStream(mediaType: MediaType): Promise<void> {
+  //   alert('updateStream');
+  //   this.currentMediaType = mediaType;
+  //   await this.tryAgain();
+  //
+  //   const needsStreamUpdate = this.willChangeMediaSource(mediaType);
+  //
+  //   if (!needsStreamUpdate && !this.mediaStream()) {
+  //     return undefined;
+  //   }
+  //
+  //   try {
+  //     const stream = await this.getMediaStream(mediaType);
+  //     this.mediaSourceChanged(stream, mediaType);
+  //     if (this.mediaStream()) {
+  //       stream.getTracks().forEach(track => {
+  //         this.mediaStream().addTrack(track);
+  //       });
+  //       this.initiateAudioMeter(this.mediaStream());
+  //     } else {
+  //       stream.getTracks().forEach(track => track.stop());
+  //     }
+  //   } catch (error) {
+  //     this.logger.warn(`Requesting MediaStream failed: ${error.message}`, error);
+  //     this.releaseMediaStream();
+  //   }
+  // }
 
+  async initiateDevices(mediaType: MediaType): Promise<void> {
     try {
-      const mediaStream = await this.getMediaStream();
-      this.mediaStream(mediaStream);
+      const mediaStream = await this.getMediaStream(mediaType);
+      // this.mediaStream(mediaStream);
+      mediaStream.getTracks().forEach(track => this.mediaStream().addTrack(track));
+      this.mediaSourceChanged(mediaStream, mediaType);
+
       if (mediaStream.getAudioTracks().length && !this.audioInterval) {
         this.initiateAudioMeter(mediaStream);
       }
     } catch (error) {
       this.logger.warn(`Requesting MediaStream failed: ${error.message}`, error);
-      this.releaseMediaStream();
+      this.releaseMediaStream(mediaType);
     }
   }
 
-  async tryAgain(): Promise<void> {
-    await this.releaseDevices();
-    this.initiateDevices();
+  async tryAgain(mediaType: MediaType): Promise<void> {
+    // TODO: Check if there is already a pending media stream request
+    await this.releaseDevices(mediaType);
+    this.initiateDevices(mediaType);
+    await this.willChangeMediaSource(mediaType);
   }
 
-  async releaseDevices(): Promise<void> {
-    this.isVisible = false;
+  async releaseDevices(requestedMediaType: MediaType): Promise<void> {
     await this.releaseAudioMeter();
-    this.releaseMediaStream();
+    this.releaseMediaStream(requestedMediaType);
   }
 
-  private async getMediaStream(requestedMediaType = MediaType.AUDIO_VIDEO): Promise<MediaStream> {
+  private async getMediaStream(requestedMediaType: MediaType): Promise<MediaStream> {
     if (!this.deviceSupport.videoInput() && !this.deviceSupport.audioInput()) {
       return Promise.resolve(undefined);
     }
@@ -193,7 +193,7 @@ export class PreferencesAVViewModel {
     return stream;
   }
 
-  async getStreamsSeparately(requestAudio: boolean, requestVideo: boolean): Promise<MediaStream> {
+  private async getStreamsSeparately(requestAudio: boolean, requestVideo: boolean): Promise<MediaStream> {
     const mediaStreams = [];
 
     if (requestAudio) {
@@ -215,7 +215,7 @@ export class PreferencesAVViewModel {
     }
 
     if (mediaStreams.length === 0) {
-      throw new Error('No medium streams available.');
+      throw new Error('No media streams available.');
     }
 
     const tracks = mediaStreams.reduce((trackList, mediaStream) => {
@@ -276,10 +276,13 @@ export class PreferencesAVViewModel {
     }
   }
 
-  private releaseMediaStream(): void {
+  private releaseMediaStream(mediaType: MediaType): void {
     if (this.mediaStream()) {
-      this.streamHandler.releaseTracksFromStream(this.mediaStream(), this.currentMediaType);
-      this.mediaStream(undefined);
+      this.streamHandler.releaseTracksFromStream(this.mediaStream(), mediaType);
+      // const hasNoTracks = this.mediaStream().getTracks().length === 0;
+      // if (hasNoTracks) {
+      //   this.mediaStream(undefined);
+      // }
     }
   }
 }

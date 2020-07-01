@@ -5,7 +5,7 @@
     <!-- ko if: deviceSupport.audioInput() -->
       <section class="preferences-section">
         <header class="preferences-header preferences-av-header" data-bind="text: t('preferencesAVMicrophone')"></header>
-        <!-- ko if: !audioMediaStream() -->
+        <!-- ko if: !hasAudioTrack() -->
           <div class="preferences-av-detail">
             <a rel="nofollow noopener noreferrer" target="_blank" data-bind="text: t('preferencesAVPermissionDetail'), attr: {href: Config.URL.SUPPORT.DEVICE_ACCESS_DENIED}"></a>
           </div>
@@ -27,7 +27,7 @@
             <label class="icon-down preferences-av-label" data-bind="visible: !hasOnlyOneMicrophone()"></label>
           </div>
         </div>
-        <input-level class="preferences-av-meter accent-text" params="level: audioLevel, disabled: !audioMediaStream()"></input-level>
+        <input-level class="preferences-av-meter accent-text" params="level: audioLevel, disabled: !hasAudioTrack()"></input-level>
       </section>
     <!-- /ko -->
 
@@ -56,19 +56,19 @@
     <!-- ko if: deviceSupport.videoInput() -->
       <section class="preferences-section">
         <header class="preferences-header preferences-av-header" data-bind="text: t('preferencesAVCamera')"></header>
-        <!-- ko if: !videoMediaStream() -->
+        <!-- ko if: !hasVideoTrack() -->
           <div class="preferences-av-detail">
             <a rel="nofollow noopener noreferrer" target="_blank" data-bind="text: t('preferencesAVPermissionDetail'), attr: {href: Config.URL.SUPPORT.DEVICE_ACCESS_DENIED}"></a>
           </div>
         <!-- /ko -->
-        <div class="preferences-option" data-bind="css: {'preferences-av-select-disabled': !videoMediaStream()}">
+        <div class="preferences-option" data-bind="css: {'preferences-av-select-disabled': !hasVideoTrack()}">
           <div class="preferences-option-icon preferences-av-select-icon">
             <camera-icon></camera-icon>
           </div>
           <div class="input-select">
             <select class="preferences-av-select" name="select"
-                    data-bind="attr: {'disabled': availableDevices.audioInput().length < 2 || !videoMediaStream()},
-                               css: {'preferences-av-select-disabled': !videoMediaStream()},
+                    data-bind="attr: {'disabled': availableDevices.audioInput().length < 2 || !hasVideoTrack()},
+                               css: {'preferences-av-select-disabled': !hasVideoTrack()},
                                options: availableDevices.videoInput,
                                optionsText: function(item) {return item.label || z.string.preferencesAVCamera},
                                optionsValue: 'deviceId',
@@ -81,13 +81,13 @@
         <!-- ko if: isTemporaryGuest() -->
           <div class="preferences-detail" data-bind="text: t('preferencesAVTemporaryDisclaimer')"></div>
         <!-- /ko -->
-        <!-- ko ifnot: videoMediaStream() -->
+        <!-- ko ifnot: hasVideoTrack() -->
           <div class="preferences-av-video-disabled">
               <div class="preferences-av-video-disabled__info" data-bind="html: t('preferencesAVNoCamera', brandName, {'faqLink': '<a href=\'https://support.wire.com/hc/articles/202935412\' data-uie-name=\'go-no-camera-faq\' target=\'_blank\' rel=\'noopener noreferrer\'>', '/faqLink': '</a>', 'br': '<br>'})"></div>
-              <div class="preferences-av-video-disabled__try-again" data-bind="click: tryAgain, text: z.string.preferencesAVTryAgain" data-uie-name="do-try-again-preferences-av"></div>
+              <div class="preferences-av-video-disabled__try-again" data-bind="click: tryAgainVideo, text: z.string.preferencesAVTryAgain" data-uie-name="do-try-again-preferences-av"></div>
           </div>
         <!-- /ko -->
-        <!-- ko if: videoMediaStream() -->
+        <!-- ko if: hasVideoTrack() -->
           <video class="preferences-av-video mirror"
                 autoplay
                 playsinline
