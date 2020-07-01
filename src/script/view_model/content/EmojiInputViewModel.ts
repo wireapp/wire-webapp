@@ -18,7 +18,9 @@
  */
 
 import {WebAppEvents} from '@wireapp/webapp-events';
-
+import type {WebappProperties} from '@wireapp/api-client/dist/user/data';
+import {amplify} from 'amplify';
+import ko from 'knockout';
 import {loadValue, storeValue} from 'Util/StorageUtil';
 import {getCursorPixelPosition} from 'Util/PopupUtil';
 import {KEY, isKey, isEnterKey} from 'Util/KeyboardUtil';
@@ -27,8 +29,26 @@ import {sortByPriority} from 'Util/StringUtil';
 import emojiBindings from './emoji.json';
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 import {StorageKey} from '../../storage/StorageKey';
+import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
+
+type EmojiData = {
+  aliases: string[];
+  code: string;
+  name: string;
+};
+
+type EmojiBinding = {[key in string]: EmojiData};
 
 export class EmojiInputViewModel {
+  private isVisible: boolean;
+  private readonly emojiList: {icon: string; name: string}[];
+  private emojiDict: {[key in string]: string} = {};
+  private readonly emojiDiv: JQuery<HTMLElement>;
+  private emojiStartPosition: number;
+  private emojiUsageCount: {[key in string]: number} = {};
+  private shouldReplaceEmoji: boolean;
+  private suppressKeyUp: boolean;
+
   static get CONFIG() {
     return {
       LIST: {
@@ -42,7 +62,7 @@ export class EmojiInputViewModel {
   // DO NOT USE COLON WITH LOWERCASE LETTERS IN THE SHORTCUTS, or you will prevent searching emojis.
   // For example, while :D should be replaced with unicode symbol, :d should allow searching for :dancer:
   /* eslint-disable sort-keys-fix/sort-keys-fix, no-multi-spaces */
-  static get INLINE_REPLACEMENT() {
+  static get INLINE_REPLACEMENT(): {name: string; shortcut: string}[] {
     return [
       {shortcut: ':)', name: 'slight smile'},
       {shortcut: ':-)', name: 'slight smile'},
@@ -107,14 +127,10 @@ export class EmojiInputViewModel {
   }
   /* eslint-enable sort-keys-fix/sort-keys-fix, no-multi-spaces */
 
-  constructor(propertiesRepository) {
-    this.removeEmojiPopup = this.removeEmojiPopup.bind(this);
+  static INLINE_MAX_LENGTH = Math.max(...EmojiInputViewModel.INLINE_REPLACEMENT.map(({shortcut}) => shortcut.length));
 
+  constructor(propertiesRepository: PropertiesRepository) {
     const EMOJI_DIV_CLASS = 'conversation-input-bar-emoji-list';
-    this.INLINE_MAX_LENGTH = EmojiInputViewModel.INLINE_REPLACEMENT.reduce((accumulator, currentItem) => {
-      return accumulator.length > currentItem.length ? accumulator : currentItem;
-    }).length;
-
     this.isVisible = false;
 
     this.emojiList = [];
@@ -129,8 +145,8 @@ export class EmojiInputViewModel {
     $(document).on('click', `.${EMOJI_DIV_CLASS}`, event => {
       const clicked = $(event.target);
       const emojiLine = clicked.hasClass('emoji') ? clicked : clicked.closest('.emoji');
-      const [input] = $('#conversation-input-bar-text');
-      this._enterEmojiPopupLine(input, emojiLine);
+      const [input] = $<HTMLInputElement>('#conversation-input-bar-text');
+      this.enterEmojiPopupLine(input, emojiLine);
       return false;
     });
 
@@ -140,14 +156,14 @@ export class EmojiInputViewModel {
     });
 
     for (const code in emojiBindings) {
-      const details = emojiBindings[code];
+      const details = (emojiBindings as EmojiBinding)[code];
 
       // Ignore 'tone' emojis for now, they clutter suggestions too much.
       if (details.name.match(/_tone\d/)) {
         continue;
       }
 
-      const icon = String.fromCodePoint.apply(
+      const icon: string = String.fromCodePoint.apply(
         null,
         details.code.split('-').map(char => `0x${char}`),
       );
@@ -161,23 +177,23 @@ export class EmojiInputViewModel {
       });
     }
 
-    this._initSubscriptions();
+    this.initSubscriptions();
   }
 
-  onInputKeyDown(data, keyboardEvent) {
-    const input = keyboardEvent.target;
+  onInputKeyDown = (data: unknown, keyboardEvent: KeyboardEvent): boolean => {
+    const input = keyboardEvent.target as HTMLInputElement;
 
     // Handling just entered inline emoji
     switch (keyboardEvent.key) {
       case KEY.SPACE: {
-        if (this._tryReplaceInlineEmoji(input)) {
+        if (this.tryReplaceInlineEmoji(input)) {
           return false;
         }
         break;
       }
 
       case KEY.TAB: {
-        if (this._tryReplaceInlineEmoji(input)) {
+        if (this.tryReplaceInlineEmoji(input)) {
           keyboardEvent.preventDefault();
           return true;
         }
@@ -199,7 +215,7 @@ export class EmojiInputViewModel {
 
         case KEY.ARROW_UP:
         case KEY.ARROW_DOWN: {
-          this._rotateEmojiPopup(isKey(keyboardEvent, KEY.ARROW_UP));
+          this.rotateEmojiPopup(isKey(keyboardEvent, KEY.ARROW_UP));
           this.suppressKeyUp = true;
           keyboardEvent.preventDefault();
           return true;
@@ -211,7 +227,7 @@ export class EmojiInputViewModel {
             break;
           }
 
-          this._enterEmojiPopupLine(input, this.emojiDiv.find('.emoji.selected'));
+          this.enterEmojiPopupLine(input, this.emojiDiv.find('.emoji.selected'));
           keyboardEvent.preventDefault();
           return true;
         }
@@ -223,19 +239,19 @@ export class EmojiInputViewModel {
 
     // Handling inline emoji in the whole text
     if (isEnterKey(keyboardEvent)) {
-      this._replaceAllInlineEmoji(input);
+      this.replaceAllInlineEmoji(input);
     }
 
     return false;
-  }
+  };
 
-  onInputKeyUp(data, keyboardEvent) {
+  onInputKeyUp = (data: unknown, keyboardEvent: KeyboardEvent): boolean => {
     if (this.suppressKeyUp) {
       this.suppressKeyUp = false;
       return true;
     }
 
-    const input = keyboardEvent.target;
+    const input = keyboardEvent.target as HTMLTextAreaElement;
     const {selectionStart: selection, value: text} = input;
 
     if (text) {
@@ -243,45 +259,48 @@ export class EmojiInputViewModel {
       const containsPopupTrigger = /\B:$/.test(popupTrigger);
       if (containsPopupTrigger) {
         this.emojiStartPosition = selection;
-        this._updateEmojiPopup(input);
+        this.updateEmojiPopup(input);
       } else if (this.emojiStartPosition !== -1) {
         if (selection < this.emojiStartPosition || text[this.emojiStartPosition - 1] !== ':') {
           this.removeEmojiPopup();
         } else {
-          this._updateEmojiPopup(input);
+          this.updateEmojiPopup(input);
         }
       }
     }
 
     return true;
-  }
+  };
 
-  _initSubscriptions() {
+  initSubscriptions = (): void => {
     amplify.subscribe(WebAppEvents.CONTENT.SWITCH, this.removeEmojiPopup);
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE, this.updatedReplaceEmojiPreference);
-    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, properties => {
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, (properties: WebappProperties) => {
       this.updatedReplaceEmojiPreference(properties.settings.emoji.replace_inline);
     });
-  }
+  };
 
-  updatedReplaceEmojiPreference = preference => {
+  updatedReplaceEmojiPreference = (preference: boolean): void => {
     this.shouldReplaceEmoji = preference;
   };
 
-  _tryReplaceInlineEmoji(input) {
+  private readonly tryReplaceInlineEmoji = (input: HTMLInputElement): boolean => {
     const {selectionStart: selection, value: text} = input;
 
     if (this.shouldReplaceEmoji && text) {
-      const textUntilCursor = text.substring(Math.max(0, selection - this.INLINE_MAX_LENGTH - 1), selection);
+      const textUntilCursor = text.substring(
+        Math.max(0, selection - EmojiInputViewModel.INLINE_MAX_LENGTH - 1),
+        selection,
+      );
 
       for (const replacement of EmojiInputViewModel.INLINE_REPLACEMENT) {
         const icon = this.emojiDict[replacement.name];
         if (icon) {
-          const validInlineEmojiRegEx = new RegExp(`(^|\\s)${this._escapeRegexp(replacement.shortcut)}$`);
+          const validInlineEmojiRegEx = new RegExp(`(^|\\s)${this.escapeRegexp(replacement.shortcut)}$`);
 
           if (validInlineEmojiRegEx.test(textUntilCursor)) {
             this.emojiStartPosition = selection - replacement.shortcut.length + 1;
-            this._enterEmoji(input, icon);
+            this.enterEmoji(input, icon);
 
             return true;
           }
@@ -290,9 +309,9 @@ export class EmojiInputViewModel {
     }
 
     return false;
-  }
+  };
 
-  _replaceAllInlineEmoji(input) {
+  private readonly replaceAllInlineEmoji = (input: HTMLInputElement): void | boolean => {
     if (!this.shouldReplaceEmoji) {
       return false;
     }
@@ -305,7 +324,7 @@ export class EmojiInputViewModel {
       const icon = this.emojiDict[replacement.name];
 
       if (icon) {
-        const validIInlineEmojiRegex = new RegExp(`(^|\\s)${this._escapeRegexp(replacement.shortcut)}(?=\\s|$)`, 'g');
+        const validIInlineEmojiRegex = new RegExp(`(^|\\s)${this.escapeRegexp(replacement.shortcut)}(?=\\s|$)`, 'g');
         textBeforeCursor = textBeforeCursor.replace(validIInlineEmojiRegex, `$1${icon}`);
         textAfterCursor = textAfterCursor.replace(validIInlineEmojiRegex, `$1${icon}`);
       }
@@ -315,9 +334,9 @@ export class EmojiInputViewModel {
     input.setSelectionRange(textBeforeCursor.length, textBeforeCursor.length);
     ko.utils.triggerEvent(input, 'change');
     $(input).focus();
-  }
+  };
 
-  _updateEmojiPopup(input) {
+  private readonly updateEmojiPopup = (input: HTMLTextAreaElement): void => {
     const {selectionStart: selection, value: text} = input;
     if (!text) {
       return;
@@ -325,7 +344,7 @@ export class EmojiInputViewModel {
 
     const query = text.substr(this.emojiStartPosition, selection - this.emojiStartPosition);
     if (!query.length) {
-      return this._closeEmojiPopup();
+      return this.closeEmojiPopup();
     }
 
     const shouldRemovePopup = !this.emojiList.length || query.startsWith(' ') || /\s{2,}/.test(query);
@@ -345,7 +364,7 @@ export class EmojiInputViewModel {
         }
 
         return queryWords.every(queryWord => {
-          return emojiNameWords.some(emojiNameWord => emojiNameWord.startsWith(queryWord));
+          return emojiNameWords.some((emojiNameWord: string) => emojiNameWord.startsWith(queryWord));
         });
       })
       .reduce((accumulator, emoji) => {
@@ -356,8 +375,8 @@ export class EmojiInputViewModel {
         return accumulator;
       }, [])
       .sort((emojiA, emojiB) => {
-        const usageCountA = this._getUsageCount(emojiA.name);
-        const usageCountB = this._getUsageCount(emojiB.name);
+        const usageCountA = this.getUsageCount(emojiA.name);
+        const usageCountB = this.getUsageCount(emojiB.name);
 
         const sameUsageCount = usageCountA === usageCountB;
         return sameUsageCount ? sortByPriority(emojiA.name, emojiB.name, query) : usageCountB - usageCountA;
@@ -372,7 +391,7 @@ export class EmojiInputViewModel {
       .join('');
 
     if (emojiMatched === '') {
-      return this._closeEmojiPopup();
+      return this.closeEmojiPopup();
     }
 
     window.addEventListener('click', this.removeEmojiPopup);
@@ -386,24 +405,27 @@ export class EmojiInputViewModel {
 
     this.emojiDiv.css('left', left);
     this.emojiDiv.css('top', top);
-  }
+  };
 
-  _rotateEmojiPopup(backward) {
+  private readonly rotateEmojiPopup = (backward: boolean): void => {
     const previous = this.emojiDiv.find('.emoji.selected');
     const newSelection = (previous.index() + (backward ? -1 : 1)) % this.emojiDiv.find('.emoji').length;
     previous.removeClass('selected');
     this.emojiDiv.find(`.emoji:nth(${newSelection})`).addClass('selected');
-  }
+  };
 
-  _enterEmojiPopupLine(input, emojiLine) {
+  private readonly enterEmojiPopupLine = (
+    input: HTMLInputElement,
+    emojiLine: JQuery<HTMLElement> | JQuery<Document>,
+  ): void => {
     const emojiIcon = emojiLine.find('.symbol').text();
     const emojiName = emojiLine.find('.name').text().toLowerCase();
 
-    this._enterEmoji(input, emojiIcon);
-    this._increaseUsageCount(emojiName); // only emojis selected from the list should affect the count
-  }
+    this.enterEmoji(input, emojiIcon);
+    this.increaseUsageCount(emojiName); // only emojis selected from the list should affect the count
+  };
 
-  _enterEmoji(input, emojiIcon) {
+  private readonly enterEmoji = (input: HTMLInputElement, emojiIcon: string): void => {
     const {selectionStart: selection, value: text} = input;
 
     const textBeforeEmoji = text.substr(0, this.emojiStartPosition - 1);
@@ -414,29 +436,29 @@ export class EmojiInputViewModel {
     this.removeEmojiPopup();
     ko.utils.triggerEvent(input, 'change');
     $(input).focus();
-  }
+  };
 
-  _closeEmojiPopup() {
+  private readonly closeEmojiPopup = (): void => {
     this.isVisible = false;
     window.removeEventListener('click', this.removeEmojiPopup);
     this.emojiDiv.remove();
-  }
+  };
 
-  removeEmojiPopup() {
-    this._closeEmojiPopup();
+  removeEmojiPopup = (): void => {
+    this.closeEmojiPopup();
     this.emojiStartPosition = -1;
-  }
+  };
 
-  _getUsageCount(emojiName) {
+  private readonly getUsageCount = (emojiName: string): number => {
     return this.emojiUsageCount[emojiName] || 0;
-  }
+  };
 
-  _increaseUsageCount(emojiName) {
-    this.emojiUsageCount[emojiName] = this._getUsageCount(emojiName) + 1;
+  private readonly increaseUsageCount = (emojiName: string): void => {
+    this.emojiUsageCount[emojiName] = this.getUsageCount(emojiName) + 1;
     storeValue(StorageKey.CONVERSATION.EMOJI_USAGE_COUNT, this.emojiUsageCount);
-  }
+  };
 
-  _escapeRegexp(string) {
+  private readonly escapeRegexp = (string: string): string => {
     return string.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
-  }
+  };
 }
