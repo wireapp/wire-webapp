@@ -2766,7 +2766,7 @@ export class ConversationRepository {
       }
       const userList = await this.userRepository.getUsersById(userIdsWithoutClients);
       for (const user of userList) {
-        const isDeleted = user?.deleted === true;
+        const isDeleted = user?.isDeleted === true;
 
         if (isDeleted) {
           await this.teamMemberLeave(this.team().id, user.id);
