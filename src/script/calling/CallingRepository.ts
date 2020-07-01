@@ -369,38 +369,18 @@ export class CallingRepository {
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
     const toSecond = (timestamp: number) => Math.floor(timestamp / 1000);
     const contentStr = JSON.stringify(content);
-
-    let validatedPromise = Promise.resolve();
-    switch (content.type) {
-      case CALL_MESSAGE_TYPE.GROUP_LEAVE: {
-        const isAnotherSelfClient = userId === this.selfUser.id && clientId !== this.selfClientId;
-        if (isAnotherSelfClient) {
-          const call = this.findCall(conversationId);
-          if (call?.state() === CALL_STATE.INCOMING) {
-            // If the group leave was sent from the self user from another device,
-            // we reset the reason so that the call is not shown in the UI.
-            // If the call is already accepted, we keep the call UI.
-            call.reason(REASON.STILL_ONGOING);
-          }
+    if (content.type === CALL_MESSAGE_TYPE.GROUP_LEAVE) {
+      const isAnotherSelfClient = userId === this.selfUser.id && clientId !== this.selfClientId;
+      if (isAnotherSelfClient) {
+        const call = this.findCall(conversationId);
+        if (call?.state() === CALL_STATE.INCOMING) {
+          // If the group leave was sent from the self user from another device,
+          // we reset the reason so that the call is not shown in the UI.
+          // If the call is already accepted, we keep the call UI.
+          call.reason(REASON.STILL_ONGOING);
         }
-        break;
-      }
-
-      case CALL_MESSAGE_TYPE.SETUP:
-      case CALL_MESSAGE_TYPE.CONF_START:
-      case CALL_MESSAGE_TYPE.GROUP_START: {
-        if (source !== EventRepository.SOURCE.STREAM) {
-          const eventInfoEntity = new EventInfoEntity(undefined, conversationId, {recipients: [userId]});
-          eventInfoEntity.setType(GENERIC_MESSAGE_TYPE.CALLING);
-          const consentType = ConversationRepository.CONSENT_TYPE.INCOMING_CALL;
-          validatedPromise = this.conversationRepository.grantMessage(eventInfoEntity, consentType);
-        }
-
-        break;
       }
     }
-
-    await validatedPromise;
     const res = this.wCall.recvMsg(
       this.wUser,
       contentStr,
@@ -525,9 +505,15 @@ export class CallingRepository {
     this.wCall.setVideoSendState(this.wUser, call.conversationId, newState);
   }
 
-  async answerCall(call: Call, callType: number): Promise<void> {
+  async answerCall(call: Call, callType: CALL_TYPE): Promise<void> {
     try {
       await this.checkConcurrentJoinedCall(call.conversationId, CALL_STATE.INCOMING);
+      const eventInfoEntity = new EventInfoEntity(undefined, call.conversationId);
+      eventInfoEntity.setType(GENERIC_MESSAGE_TYPE.CALLING);
+      await this.conversationRepository.grantMessage(
+        eventInfoEntity,
+        ConversationRepository.CONSENT_TYPE.INCOMING_CALL,
+      );
 
       const isVideoCall = callType === CALL_TYPE.VIDEO;
       if (!isVideoCall) {
