@@ -2755,17 +2755,21 @@ export class ConversationRepository {
       const allRecipientsBesideSelf = Object.keys(eventInfoEntity.options.recipients).filter(
         id => id !== this.selfUser().id,
       );
+      const userIdsWithoutClients = [];
       for (const recipientId of allRecipientsBesideSelf) {
         const clientIdsOfUser = eventInfoEntity.options.recipients[recipientId];
         const noRemainingClients = clientIdsOfUser.length === 0;
 
         if (noRemainingClients) {
-          const backendUser = await this.userRepository.getUserFromBackend(recipientId);
-          const isDeleted = backendUser?.deleted === true;
+          userIdsWithoutClients.push(recipientId);
+        }
+      }
+      const userList = await this.userRepository.getUsersById(userIdsWithoutClients);
+      for (const user of userList) {
+        const isDeleted = user?.isDeleted === true;
 
-          if (isDeleted) {
-            await this.teamMemberLeave(this.team().id, recipientId);
-          }
+        if (isDeleted) {
+          await this.teamMemberLeave(this.team().id, user.id);
         }
       }
     }
