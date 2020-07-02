@@ -2744,6 +2744,11 @@ export class ConversationRepository {
     await this.eventRepository.injectEvent(legalHoldUpdateMessage);
   }
 
+  async injectFileTypeRestrictedMessage(conversation, user, isIncoming, fileExt) {
+    const fileRestrictionMessage = EventBuilder.buildFileTypeRestricted(conversation, user, isIncoming, fileExt);
+    await this.eventRepository.injectEvent(fileRestrictionMessage);
+  }
+
   async _grantOutgoingMessage(eventInfoEntity, userIds, skipLegalHold = false) {
     const messageType = eventInfoEntity.getType();
     const allowedMessageTypes = ['cleared', 'clientAction', 'confirmation', 'deleted', 'lastRead'];
@@ -3344,6 +3349,7 @@ export class ConversationRepository {
       case BackendEvent.CONVERSATION.MESSAGE_TIMER_UPDATE:
       case ClientEvent.CONVERSATION.COMPOSITE_MESSAGE_ADD:
       case ClientEvent.CONVERSATION.DELETE_EVERYWHERE:
+      case ClientEvent.CONVERSATION.FILE_TYPE_RESTRICTED:
       case ClientEvent.CONVERSATION.INCOMING_MESSAGE_TOO_BIG:
       case ClientEvent.CONVERSATION.KNOCK:
       case ClientEvent.CONVERSATION.LEGAL_HOLD_UPDATE:

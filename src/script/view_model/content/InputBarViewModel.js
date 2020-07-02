@@ -807,19 +807,24 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     if (!allowAllExtensions) {
       // Creates a regex like this: (\.txt|\.pdf)$
-      const fileNameRegex = new RegExp(`(\\${allowedFileUploadExtensions.join('|\\')})$`);
+      const fileExtRegex = new RegExp(`(\\${allowedFileUploadExtensions.join('|\\')})$`);
 
       for (const file of fileArray) {
-        const allowedFiletype = fileNameRegex.test(file.name.toLowerCase());
-
-        if (!allowedFiletype) {
+        const fileExtMatch = fileExtRegex.test(file.name.toLowerCase());
+        if (!fileExtMatch) {
+          const [fileExt] = file.name.match(/(\.?[^.]*)$/);
+          this.conversationRepository.injectFileTypeRestrictedMessage(
+            this.conversationEntity(),
+            this.selfUser(),
+            false,
+            fileExt,
+          );
           const options = {
             text: {
               message: t('modalAssetFileTypeRestrictionMessage', file.name),
               title: t('modalAssetFileTypeRestrictionHeadline'),
             },
           };
-
           return amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, options);
         }
       }

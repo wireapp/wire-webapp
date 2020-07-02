@@ -86,6 +86,7 @@ export type TeamMemberLeaveEvent = ConversationEvent<{name: string; user_ids: st
 export type VoiceChannelDeactivateEvent = ConversationEvent<{duration: number; reason: AVS_REASON}> & {
   protocol_version: number;
 };
+export type FileTypeRestrictedEvent = ConversationEvent<{fileExt: string; isIncoming: boolean; name: string}>;
 
 export const EventBuilder = {
   build1to1Creation(conversationEntity: Conversation, timestamp: number): OneToOneCreationEvent {
@@ -103,6 +104,7 @@ export const EventBuilder = {
       type: ClientEvent.CONVERSATION.ONE2ONE_CREATION,
     };
   },
+
   buildAllVerified(conversationEntity: Conversation, currentTimestamp: number): AllVerifiedEvent {
     return {
       conversation: conversationEntity.id,
@@ -115,6 +117,7 @@ export const EventBuilder = {
       type: ClientEvent.CONVERSATION.VERIFICATION,
     };
   },
+
   buildAssetAdd(conversationEntity: Conversation, data: any, currentTimestamp: number): AssetAddEvent {
     return {
       conversation: conversationEntity.id,
@@ -125,6 +128,7 @@ export const EventBuilder = {
       type: ClientEvent.CONVERSATION.ASSET_ADD,
     };
   },
+
   buildCalling(
     conversationEntity: Conversation,
     callMessage: CallEntity,
@@ -139,6 +143,7 @@ export const EventBuilder = {
       type: ClientEvent.CALL.E_CALL,
     };
   },
+
   buildDegraded(
     conversationEntity: Conversation,
     userIds: string[],
@@ -157,6 +162,7 @@ export const EventBuilder = {
       type: ClientEvent.CONVERSATION.VERIFICATION,
     };
   },
+
   buildDelete(conversationId: string, messageId: string, time: number, deletedMessageEntity: Message): DeleteEvent {
     return {
       conversation: conversationId,
@@ -169,6 +175,27 @@ export const EventBuilder = {
       type: ClientEvent.CONVERSATION.DELETE_EVERYWHERE,
     };
   },
+
+  buildFileTypeRestricted(
+    conversation: Conversation,
+    user: User,
+    isIncoming: boolean,
+    fileExt: string,
+  ): FileTypeRestrictedEvent {
+    return {
+      conversation: conversation.id,
+      data: {
+        fileExt,
+        isIncoming,
+        name: user.name(),
+      },
+      from: user.id,
+      id: createRandomUuid(),
+      time: conversation.get_next_iso_date(),
+      type: ClientEvent.CONVERSATION.FILE_TYPE_RESTRICTED,
+    };
+  },
+
   buildGroupCreation(
     conversationEntity: Conversation,
     isTemporaryGuest: boolean = false,
@@ -197,6 +224,7 @@ export const EventBuilder = {
       type: ClientEvent.CONVERSATION.GROUP_CREATION,
     };
   },
+
   buildIncomingMessageTooBig(event: any, messageError: Error, errorCode: number): ErrorEvent {
     const {conversation: conversationId, data: eventData, from, time} = event;
 
@@ -210,6 +238,7 @@ export const EventBuilder = {
       type: ClientEvent.CONVERSATION.INCOMING_MESSAGE_TOO_BIG,
     };
   },
+
   buildLegalHoldMessage(
     conversationId: string,
     userId: string,
@@ -228,6 +257,7 @@ export const EventBuilder = {
       type: ClientEvent.CONVERSATION.LEGAL_HOLD_UPDATE,
     };
   },
+
   buildMemberJoin(
     conversationEntity: Conversation,
     sender: string,
@@ -249,6 +279,7 @@ export const EventBuilder = {
       type: BackendEvent.CONVERSATION.MEMBER_JOIN,
     };
   },
+
   buildMemberLeave(
     conversationEntity: Conversation,
     userId: string,
@@ -265,6 +296,7 @@ export const EventBuilder = {
       type: BackendEvent.CONVERSATION.MEMBER_LEAVE,
     };
   },
+
   buildMessageAdd(conversationEntity: Conversation, currentTimestamp: number): MessageAddEvent {
     return {
       conversation: conversationEntity.id,
@@ -275,6 +307,7 @@ export const EventBuilder = {
       type: ClientEvent.CONVERSATION.MESSAGE_ADD,
     };
   },
+
   buildMissed(conversationEntity: Conversation, currentTimestamp: number): MissedEvent {
     return {
       conversation: conversationEntity.id,
@@ -284,6 +317,7 @@ export const EventBuilder = {
       type: ClientEvent.CONVERSATION.MISSED_MESSAGES,
     };
   },
+
   buildTeamMemberLeave(conversationEntity: Conversation, userEntity: User, isoDate: string): TeamMemberLeaveEvent {
     return {
       conversation: conversationEntity.id,
@@ -297,6 +331,7 @@ export const EventBuilder = {
       type: ClientEvent.CONVERSATION.TEAM_MEMBER_LEAVE,
     };
   },
+
   buildUnableToDecrypt(event: any, decryptionError: Error, errorCode: number | string): ErrorEvent {
     const {conversation: conversationId, data: eventData, from, time} = event;
 
@@ -310,6 +345,7 @@ export const EventBuilder = {
       type: ClientEvent.CONVERSATION.UNABLE_TO_DECRYPT,
     };
   },
+
   buildVoiceChannelActivate(
     conversationId: string,
     userId: string,
@@ -325,6 +361,7 @@ export const EventBuilder = {
       type: ClientEvent.CONVERSATION.VOICE_CHANNEL_ACTIVATE,
     };
   },
+
   buildVoiceChannelDeactivate(
     conversationId: string,
     userId: string,

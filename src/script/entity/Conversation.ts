@@ -652,7 +652,7 @@ export class Conversation {
     return Math.max(this.last_server_timestamp(), this.last_event_timestamp(), currentTimestamp);
   }
 
-  get_next_iso_date(currentTimestamp: number): string {
+  get_next_iso_date(currentTimestamp?: number): string {
     if (typeof currentTimestamp !== 'number') {
       currentTimestamp = Date.now();
     }
