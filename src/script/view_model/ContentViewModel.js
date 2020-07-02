@@ -46,6 +46,7 @@ import {TitleBarViewModel} from './content/TitleBarViewModel';
 import {PreferencesAboutViewModel} from './content/PreferencesAboutViewModel';
 import {PreferencesDevicesViewModel} from './content/PreferencesDevicesViewModel';
 import {PreferencesDeviceDetailsViewModel} from './content/PreferencesDeviceDetailsViewModel';
+import {InputBarViewModel} from './content/InputBarViewModel';
 
 export class ContentViewModel {
   static get STATE() {
@@ -86,7 +87,15 @@ export class ContentViewModel {
     this.connectRequests = new ConnectRequestsViewModel(mainViewModel, repositories.user);
     this.emojiInput = new EmojiInputViewModel(repositories.properties);
     this.giphy = new GiphyViewModel(repositories.giphy);
-    this.inputBar = new z.viewModel.content.InputBarViewModel(mainViewModel, this, repositories);
+    this.inputBar = new InputBarViewModel(
+      this.emojiInput,
+      repositories.asset,
+      repositories.event,
+      repositories.conversation,
+      repositories.search,
+      repositories.storage,
+      repositories.user,
+    );
     this.groupCreation = new GroupCreationViewModel(
       repositories.conversation,
       repositories.search,

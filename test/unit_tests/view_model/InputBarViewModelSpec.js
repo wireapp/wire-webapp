@@ -21,15 +21,16 @@ import {createRandomUuid} from 'Util/util';
 
 import {User} from 'src/script/entity/User';
 import {TestFactory} from '../../helper/TestFactory';
+import {InputBarViewModel} from 'src/script/view_model/content/InputBarViewModel';
 
-describe('z.viewModel.content.InputBarViewModel', () => {
+describe('InputBarViewModel', () => {
   const testFactory = new TestFactory();
   let viewModel;
 
   beforeAll(() => testFactory.exposeSearchActors().then(() => testFactory.exposeConversationActors()));
 
   beforeEach(() => {
-    viewModel = new z.viewModel.content.InputBarViewModel(
+    viewModel = new InputBarViewModel(
       undefined,
       {},
       {

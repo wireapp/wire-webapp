@@ -28,7 +28,7 @@ type AmplifyRecord = {key: string; value: string};
 export class StorageRepository {
   private readonly AMPLIFY_STORE_NAME: string;
   private readonly logger: Logger;
-  private readonly storageService: StorageService;
+  public readonly storageService: StorageService;
 
   static get CONFIG() {
     return {

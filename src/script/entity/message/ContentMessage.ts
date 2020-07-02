@@ -36,7 +36,7 @@ import {AssetRepository} from '../../assets/AssetRepository';
 export class ContentMessage extends Message {
   readonly edited_timestamp: ko.Observable<number>;
   private readonly is_liked_provisional: ko.Observable<boolean>;
-  private readonly quote: ko.Observable<QuoteEntity>;
+  public readonly quote: ko.Observable<QuoteEntity>;
   private readonly reactions_user_ets: ko.ObservableArray<User>;
   readonly reactions: ko.Observable<{[userId: string]: string}>;
   public readonly assets: ko.ObservableArray<Asset | FileAsset | TextAsset | MediumImage>;
