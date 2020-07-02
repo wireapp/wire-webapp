@@ -112,7 +112,13 @@ export class ContentViewModel {
       repositories.client,
       repositories.cryptography,
     );
-    this.messageList = new MessageListViewModel(mainViewModel, this, repositories);
+    this.messageList = new MessageListViewModel(
+      mainViewModel,
+      repositories.conversation,
+      repositories.integration,
+      repositories.serverTime,
+      repositories.user,
+    );
     this.titleBar = new TitleBarViewModel(
       mainViewModel.calling,
       mainViewModel.panel,
