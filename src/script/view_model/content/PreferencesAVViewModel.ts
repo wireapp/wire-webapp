@@ -32,8 +32,8 @@ import {DeviceIds, Devices, DeviceSupport, MediaDevicesHandler} from '../../medi
 type MediaSourceChanged = (mediaStream: MediaStream, mediaType: MediaType, call?: Call) => void;
 type WillChangeMediaSource = (mediaType: MediaType) => boolean;
 type CallBacksType = {
-  mediaSourceChanged: MediaSourceChanged;
-  willChangeMediaSource: WillChangeMediaSource;
+  replaceActiveMediaSource: MediaSourceChanged;
+  stopActiveMediaSource: WillChangeMediaSource;
 };
 
 export class PreferencesAVViewModel {
@@ -48,18 +48,19 @@ export class PreferencesAVViewModel {
   currentDeviceId: DeviceIds;
   devicesHandler: MediaDevicesHandler;
   deviceSupport: DeviceSupport;
-  hasAudioTrack: ko.PureComputed<boolean>;
-  hasOnlyOneMicrophone: ko.PureComputed<boolean>;
-  hasVideoTrack: ko.PureComputed<boolean>;
+  hasAudioTrack: ko.Observable<boolean>;
+  hasNoneOrOneAudioInput: ko.PureComputed<boolean>;
+  hasNoneOrOneVideoInput: ko.PureComputed<boolean>;
+  hasVideoTrack: ko.Observable<boolean>;
   isActivatedAccount: ko.PureComputed<boolean>;
   isTemporaryGuest: ko.PureComputed<boolean>;
   logger: Logger;
-  mediaSourceChanged: MediaSourceChanged;
   mediaStream: ko.Observable<MediaStream>;
+  replaceActiveMediaSource: MediaSourceChanged;
+  stopActiveMediaSource: WillChangeMediaSource;
   streamHandler: MediaStreamHandler;
   supportsAudioOutput: ko.PureComputed<boolean>;
   userRepository: UserRepository;
-  willChangeMediaSource: WillChangeMediaSource;
 
   static get CONFIG() {
     return {
@@ -73,8 +74,8 @@ export class PreferencesAVViewModel {
   }
 
   constructor(mediaRepository: MediaRepository, userRepository: UserRepository, callbacks: CallBacksType) {
-    this.willChangeMediaSource = callbacks.willChangeMediaSource;
-    this.mediaSourceChanged = callbacks.mediaSourceChanged;
+    this.stopActiveMediaSource = callbacks.stopActiveMediaSource;
+    this.replaceActiveMediaSource = callbacks.replaceActiveMediaSource;
 
     this.logger = getLogger('PreferencesAVViewModel');
 
@@ -88,20 +89,17 @@ export class PreferencesAVViewModel {
     this.deviceSupport = this.devicesHandler.deviceSupport;
     this.Config = Config.getConfig();
 
-    this.currentDeviceId.audioInput.subscribe(() => this.tryAgain(MediaType.AUDIO));
+    this.currentDeviceId.audioInput.subscribe(() => this.updateMediaStreamTrack(MediaType.AUDIO));
     this.currentDeviceId.videoInput.subscribe(() => this.tryAgainVideo());
 
     this.constraintsHandler = mediaRepository.constraintsHandler;
     this.streamHandler = mediaRepository.streamHandler;
 
-    const hasTracksOfType = (tracksGetter: 'getAudioTracks' | 'getVideoTracks') => {
-      const tracks = this.mediaStream() && this.mediaStream()[tracksGetter]();
-      return !!tracks;
-    };
     this.mediaStream = ko.observable(new MediaStream());
-    this.hasAudioTrack = ko.pureComputed(() => hasTracksOfType('getAudioTracks'));
-    this.hasVideoTrack = ko.pureComputed(() => hasTracksOfType('getVideoTracks'));
-    this.hasOnlyOneMicrophone = ko.pureComputed(() => this.availableDevices.audioInput().length < 2);
+    this.hasAudioTrack = ko.observable(false);
+    this.hasVideoTrack = ko.observable(false);
+    this.hasNoneOrOneAudioInput = ko.pureComputed(() => this.availableDevices.audioInput().length < 2);
+    this.hasNoneOrOneVideoInput = ko.pureComputed(() => this.availableDevices.videoInput().length < 2);
 
     const selfUser = this.userRepository.self;
     this.isTemporaryGuest = ko.pureComputed(() => selfUser() && selfUser().isTemporaryGuest());
@@ -119,63 +117,48 @@ export class PreferencesAVViewModel {
   }
 
   tryAgainVideo() {
-    return this.tryAgain(MediaType.VIDEO);
+    return this.updateMediaStreamTrack(MediaType.VIDEO);
   }
 
-  // async updateStream(mediaType: MediaType): Promise<void> {
-  //   alert('updateStream');
-  //   this.currentMediaType = mediaType;
-  //   await this.tryAgain();
-  //
-  //   const needsStreamUpdate = this.willChangeMediaSource(mediaType);
-  //
-  //   if (!needsStreamUpdate && !this.mediaStream()) {
-  //     return undefined;
-  //   }
-  //
-  //   try {
-  //     const stream = await this.getMediaStream(mediaType);
-  //     this.mediaSourceChanged(stream, mediaType);
-  //     if (this.mediaStream()) {
-  //       stream.getTracks().forEach(track => {
-  //         this.mediaStream().addTrack(track);
-  //       });
-  //       this.initiateAudioMeter(this.mediaStream());
-  //     } else {
-  //       stream.getTracks().forEach(track => track.stop());
-  //     }
-  //   } catch (error) {
-  //     this.logger.warn(`Requesting MediaStream failed: ${error.message}`, error);
-  //     this.releaseMediaStream();
-  //   }
-  // }
-
-  async initiateDevices(mediaType: MediaType): Promise<void> {
+  private async initiateDevices(mediaType: MediaType): Promise<void> {
     try {
       const mediaStream = await this.getMediaStream(mediaType);
-      // this.mediaStream(mediaStream);
       mediaStream.getTracks().forEach(track => this.mediaStream().addTrack(track));
-      this.mediaSourceChanged(mediaStream, mediaType);
 
-      if (mediaStream.getAudioTracks().length && !this.audioInterval) {
-        this.initiateAudioMeter(mediaStream);
+      if (this.mediaStream().getAudioTracks().length && !this.audioInterval) {
+        this.initiateAudioMeter(this.mediaStream());
       }
+
+      await this.stopActiveMediaSource(mediaType);
+      this.replaceActiveMediaSource(this.mediaStream(), mediaType);
     } catch (error) {
-      this.logger.warn(`Requesting MediaStream failed: ${error.message}`, error);
-      this.releaseMediaStream(mediaType);
+      this.logger.warn(`Requesting MediaStream for type "${mediaType}" failed: ${error.message}`, error);
+    } finally {
+      if (this.mediaStream().getAudioTracks().length === 0) {
+        this.hasAudioTrack(false);
+      } else {
+        this.hasAudioTrack(true);
+      }
+
+      if (this.mediaStream().getVideoTracks().length === 0) {
+        this.hasVideoTrack(false);
+      } else {
+        this.hasVideoTrack(true);
+      }
     }
   }
 
-  async tryAgain(mediaType: MediaType): Promise<void> {
+  async updateMediaStreamTrack(mediaType: MediaType): Promise<void> {
     // TODO: Check if there is already a pending media stream request
     await this.releaseDevices(mediaType);
-    this.initiateDevices(mediaType);
-    await this.willChangeMediaSource(mediaType);
+    await this.initiateDevices(mediaType);
   }
 
-  async releaseDevices(requestedMediaType: MediaType): Promise<void> {
-    await this.releaseAudioMeter();
-    this.releaseMediaStream(requestedMediaType);
+  private async releaseDevices(mediaType: MediaType): Promise<void> {
+    if (mediaType === MediaType.AUDIO || mediaType === MediaType.AUDIO_VIDEO) {
+      await this.releaseAudioMeter();
+    }
+    this.streamHandler.releaseTracksFromStream(this.mediaStream(), mediaType);
   }
 
   private async getMediaStream(requestedMediaType: MediaType): Promise<MediaStream> {
@@ -273,16 +256,6 @@ export class PreferencesAVViewModel {
     if (this.audioSource) {
       this.audioSource.disconnect();
       this.audioSource = undefined;
-    }
-  }
-
-  private releaseMediaStream(mediaType: MediaType): void {
-    if (this.mediaStream()) {
-      this.streamHandler.releaseTracksFromStream(this.mediaStream(), mediaType);
-      // const hasNoTracks = this.mediaStream().getTracks().length === 0;
-      // if (hasNoTracks) {
-      //   this.mediaStream(undefined);
-      // }
     }
   }
 }

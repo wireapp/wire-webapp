@@ -124,8 +124,8 @@ export class ContentViewModel {
       repositories.user,
     );
     this.preferencesAV = new PreferencesAVViewModel(repositories.media, repositories.user, {
-      mediaSourceChanged: repositories.calling.changeMediaSource.bind(repositories.calling),
-      willChangeMediaSource: repositories.calling.stopMediaSource.bind(repositories.calling),
+      replaceActiveMediaSource: repositories.calling.changeMediaSource.bind(repositories.calling),
+      stopActiveMediaSource: repositories.calling.stopMediaSource.bind(repositories.calling),
     });
     this.preferencesDeviceDetails = new PreferencesDeviceDetailsViewModel(
       mainViewModel,
@@ -163,7 +163,7 @@ export class ContentViewModel {
           this.preferencesAccount.popNotification();
           break;
         case ContentViewModel.STATE.PREFERENCES_AV:
-          this.preferencesAV.initiateDevices(MediaType.AUDIO_VIDEO);
+          this.preferencesAV.updateMediaStreamTrack(MediaType.AUDIO_VIDEO);
           break;
         case ContentViewModel.STATE.PREFERENCES_DEVICES:
           this.preferencesDevices.updateDeviceInfo();
