@@ -32,13 +32,12 @@ describe('InputBarViewModel', () => {
   beforeEach(() => {
     viewModel = new InputBarViewModel(
       undefined,
-      {},
-      {
-        asset: testFactory.assetRepository,
-        conversation: testFactory.conversation_repository,
-        search: testFactory.search_repository,
-        user: testFactory.user_repository,
-      },
+      testFactory.assetRepository,
+      testFactory.event_repository,
+      testFactory.conversation_repository,
+      testFactory.search_repository,
+      testFactory.storage_repository,
+      testFactory.user_repository,
     );
   });
 
