@@ -65,38 +65,38 @@ type DraftMessage = {
 };
 
 export class InputBarViewModel {
-  shadowInput: HTMLDivElement;
-  textarea: HTMLTextAreaElement;
-  selectionStart: ko.Observable<number>;
-  selectionEnd: ko.Observable<number>;
-  participantAvatarSize = ParticipantAvatar.SIZE.X_SMALL;
-  conversationEntity: ko.Observable<Conversation>;
-  selfUser: ko.Observable<User>;
-  conversationHasFocus: ko.Observable<boolean>;
-  editMessageEntity: ko.Observable<ContentMessage>;
-  replyMessageEntity: ko.Observable<ContentMessage>;
-  replyAsset: ko.PureComputed<Asset | FileAsset | Text | MediumImage>;
-  isEditing: ko.PureComputed<boolean>;
-  isReplying: ko.PureComputed<boolean>;
-  replyMessageId: ko.PureComputed<string>;
-  pastedFile: ko.Observable<File>;
-  pastedFilePreviewUrl: ko.Observable<string>;
-  pastedFileName: ko.Observable<string>;
-  pingDisabled: ko.Observable<boolean>;
-  editedMention: ko.Observable<{startIndex: number; term: string}>;
-  currentMentions: ko.ObservableArray<MentionEntity>;
-  hasFocus: ko.PureComputed<boolean>;
-  hasTextInput: ko.PureComputed<boolean>;
-  draftMessage: ko.PureComputed<DraftMessage>;
-  mentionSuggestions: ko.PureComputed<User[]>;
-  richTextInput: ko.PureComputed<string>;
-  inputPlaceholder: ko.PureComputed<string>;
-  showGiphyButton: ko.PureComputed<boolean>;
-  pingTooltip: string;
-  hasLocalEphemeralTimer: ko.PureComputed<boolean>;
-  renderMessage: typeof renderMessage;
-  input: ko.Observable<string>;
-  showAvailabilityTooltip: ko.PureComputed<boolean>;
+  private shadowInput: HTMLDivElement;
+  private textarea: HTMLTextAreaElement;
+  private readonly selectionStart: ko.Observable<number>;
+  private readonly selectionEnd: ko.Observable<number>;
+  readonly participantAvatarSize = ParticipantAvatar.SIZE.X_SMALL;
+  readonly conversationEntity: ko.Observable<Conversation>;
+  readonly selfUser: ko.Observable<User>;
+  private readonly conversationHasFocus: ko.Observable<boolean>;
+  private readonly editMessageEntity: ko.Observable<ContentMessage>;
+  readonly replyMessageEntity: ko.Observable<ContentMessage>;
+  readonly replyAsset: ko.PureComputed<Asset | FileAsset | Text | MediumImage>;
+  readonly isEditing: ko.PureComputed<boolean>;
+  readonly isReplying: ko.PureComputed<boolean>;
+  readonly replyMessageId: ko.PureComputed<string>;
+  readonly pastedFile: ko.Observable<File>;
+  readonly pastedFilePreviewUrl: ko.Observable<string>;
+  readonly pastedFileName: ko.Observable<string>;
+  readonly pingDisabled: ko.Observable<boolean>;
+  private readonly editedMention: ko.Observable<{startIndex: number; term: string}>;
+  private readonly currentMentions: ko.ObservableArray<MentionEntity>;
+  readonly hasFocus: ko.PureComputed<boolean>;
+  private readonly hasTextInput: ko.PureComputed<boolean>;
+  private readonly draftMessage: ko.PureComputed<DraftMessage>;
+  readonly mentionSuggestions: ko.PureComputed<User[]>;
+  readonly richTextInput: ko.PureComputed<string>;
+  readonly inputPlaceholder: ko.PureComputed<string>;
+  readonly showGiphyButton: ko.PureComputed<boolean>;
+  readonly pingTooltip: string;
+  readonly hasLocalEphemeralTimer: ko.PureComputed<boolean>;
+  readonly renderMessage: typeof renderMessage;
+  readonly input: ko.Observable<string>;
+  private readonly showAvailabilityTooltip: ko.PureComputed<boolean>;
 
   static get CONFIG() {
     return {
@@ -332,7 +332,7 @@ export class InputBarViewModel {
     this._initSubscriptions();
   }
 
-  _initSubscriptions() {
+  _initSubscriptions = (): void => {
     amplify.subscribe(WebAppEvents.CONVERSATION.IMAGE.SEND, this.uploadImages);
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.EDIT, this.editMessage);
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REPLY, this.replyMessage);
@@ -341,15 +341,15 @@ export class InputBarViewModel {
     amplify.subscribe(WebAppEvents.SEARCH.HIDE, () => {
       window.requestAnimationFrame(() => this.conversationHasFocus(true));
     });
-  }
+  };
 
-  setElements(nodes: HTMLElement[]) {
+  setElements = (nodes: HTMLElement[]): void => {
     this.textarea = nodes.find(node => node.id === 'conversation-input-bar-text') as HTMLTextAreaElement;
     this.shadowInput = nodes.find(node => node.classList && node.classList.contains('shadow-input')) as HTMLDivElement;
     this.updateSelectionState();
-  }
+  };
 
-  async loadInitialStateForConversation(conversationEntity: Conversation) {
+  loadInitialStateForConversation = async (conversationEntity: Conversation): Promise<void> => {
     this.conversationHasFocus(true);
     this.pastedFile(null);
     this.cancelMessageEditing();
@@ -370,25 +370,26 @@ export class InputBarViewModel {
         });
       }
     }
-  }
+  };
 
-  async _saveDraftState(
+  _saveDraftState = async (
     conversationEntity: Conversation,
     text: string,
     mentions: MentionEntity[],
     reply: ContentMessage,
-  ) {
-    if (!this.isEditing()) {
-      // we only save state for newly written messages
-      const updatedReply = reply && reply.id ? {messageId: reply.id} : {};
-      const storageKey = this._generateStorageKey(conversationEntity);
-      await this.storageRepository.storageService.saveToSimpleStorage(storageKey, {mentions, text, updatedReply});
+  ): Promise<void> => {
+    if (this.isEditing()) {
+      return;
     }
-  }
+    // we only save state for newly written messages
+    const updatedReply = reply && reply.id ? {messageId: reply.id} : {};
+    const storageKey = this._generateStorageKey(conversationEntity);
+    await this.storageRepository.storageService.saveToSimpleStorage(storageKey, {mentions, text, updatedReply});
+  };
 
-  _generateStorageKey(conversationEntity: Conversation) {
+  _generateStorageKey = (conversationEntity: Conversation): string => {
     return `${StorageKey.CONVERSATION.INPUT}|${conversationEntity.id}`;
-  }
+  };
 
   _loadDraftState = async (conversationEntity: Conversation): Promise<DraftMessage> => {
     const storageKey = this._generateStorageKey(conversationEntity);
@@ -424,17 +425,17 @@ export class InputBarViewModel {
     return draftMessage;
   };
 
-  _resetDraftState() {
+  _resetDraftState = (): void => {
     this.currentMentions.removeAll();
     this.input('');
-  }
+  };
 
-  _createMentionEntity(userEntity: User) {
+  _createMentionEntity = (userEntity: User): MentionEntity => {
     const mentionLength = userEntity.name().length + 1;
     return new MentionEntity(this.editedMention().startIndex, mentionLength, userEntity.id);
-  }
+  };
 
-  addMention(userEntity: User, inputElement: HTMLInputElement) {
+  addMention = (userEntity: User, inputElement: HTMLInputElement): void => {
     const mentionEntity = this._createMentionEntity(userEntity);
 
     // keep track of what is before and after the mention being edited
@@ -453,57 +454,57 @@ export class InputBarViewModel {
     inputElement.selectionStart = caretPosition;
     inputElement.selectionEnd = caretPosition;
     this.endMentionFlow();
-  }
+  };
 
-  endMentionFlow() {
+  endMentionFlow = (): void => {
     this.editedMention(undefined);
     this.updateSelectionState();
-  }
+  };
 
-  addedToView() {
+  addedToView = (): void => {
     amplify.subscribe(WebAppEvents.SHORTCUT.PING, this.clickToPing);
-  }
+  };
 
-  cancelMessageEditing(resetDraft = true) {
+  cancelMessageEditing = (resetDraft = true): void => {
     this.editMessageEntity(undefined);
     this.replyMessageEntity(undefined);
     if (resetDraft) {
       this._resetDraftState();
     }
-  }
+  };
 
-  cancelMessageReply(resetDraft = true) {
+  cancelMessageReply = (resetDraft = true): void => {
     this.replyMessageEntity(undefined);
     if (resetDraft) {
       this._resetDraftState();
     }
-  }
+  };
 
-  handleCancelReply() {
+  handleCancelReply = (): void => {
     if (!this.mentionSuggestions().length) {
       this.cancelMessageReply(false);
     }
     this.textarea.focus();
-  }
+  };
 
-  clickToCancelPastedFile() {
+  clickToCancelPastedFile = (): void => {
     this.pastedFile(null);
-  }
+  };
 
-  clickToShowGiphy() {
+  clickToShowGiphy = (): void => {
     amplify.publish(WebAppEvents.EXTENSIONS.GIPHY.SHOW, this.input());
-  }
+  };
 
-  clickToPing() {
+  clickToPing = (): void => {
     if (this.conversationEntity() && !this.pingDisabled()) {
       this.pingDisabled(true);
       this.conversationRepository.sendKnock(this.conversationEntity()).then(() => {
         window.setTimeout(() => this.pingDisabled(false), InputBarViewModel.CONFIG.PING_TIMEOUT);
       });
     }
-  }
+  };
 
-  editMessage(messageEntity: ContentMessage) {
+  editMessage = (messageEntity: ContentMessage): void => {
     if (messageEntity && messageEntity.is_editable() && messageEntity !== this.editMessageEntity()) {
       this.cancelMessageReply();
       this.cancelMessageEditing();
@@ -520,49 +521,52 @@ export class InputBarViewModel {
 
       this._moveCursorToEnd();
     }
-  }
+  };
 
-  replyMessage(messageEntity: ContentMessage) {
+  replyMessage = (messageEntity: ContentMessage): void => {
     if (messageEntity && messageEntity.isReplyable() && messageEntity !== this.replyMessageEntity()) {
       this.cancelMessageReply(false);
       this.cancelMessageEditing(!!this.editMessageEntity());
       this.replyMessageEntity(messageEntity);
       this.textarea.focus();
     }
-  }
+  };
 
-  onDropFiles(droppedFiles: File[]) {
+  onDropFiles = (droppedFiles: File[]): void => {
     const images: File[] = [];
     const files: File[] = [];
 
     const tooManyConcurrentUploads = this._isHittingUploadLimit(droppedFiles);
-    if (!tooManyConcurrentUploads) {
-      Array.from(droppedFiles).forEach((file): void | number => {
-        const isSupportedImage = InputBarViewModel.CONFIG.IMAGE.FILE_TYPES.includes(file.type);
-        if (isSupportedImage) {
-          return images.push(file);
-        }
-        files.push(file);
-      });
-
-      this.uploadImages(images);
-      this.uploadFiles(files);
+    if (tooManyConcurrentUploads) {
+      return;
     }
-  }
 
-  onPasteFiles(pastedFiles: File[]) {
+    Array.from(droppedFiles).forEach((file): void | number => {
+      const isSupportedImage = InputBarViewModel.CONFIG.IMAGE.FILE_TYPES.includes(file.type);
+      if (isSupportedImage) {
+        return images.push(file);
+      }
+      files.push(file);
+    });
+
+    this.uploadImages(images);
+    this.uploadFiles(files);
+  };
+
+  onPasteFiles = (pastedFiles: File[]): void => {
     const [pastedFile] = pastedFiles;
     this.pastedFile(pastedFile);
-  }
+  };
 
-  onWindowClick(event: Event) {
-    if (!$(event.target).closest('.conversation-input-bar, .conversation-input-bar-mention-suggestion').length) {
-      this.cancelMessageEditing();
-      this.cancelMessageReply();
+  onWindowClick = (event: Event): void => {
+    if ($(event.target).closest('.conversation-input-bar, .conversation-input-bar-mention-suggestion').length) {
+      return;
     }
-  }
+    this.cancelMessageEditing();
+    this.cancelMessageReply();
+  };
 
-  onInputEnter(data: unknown, event: Event) {
+  onInputEnter = (data: unknown, event: Event): void | boolean => {
     if (this.pastedFile()) {
       return this.sendPastedFile();
     }
@@ -594,9 +598,9 @@ export class InputBarViewModel {
 
     this._resetDraftState();
     $(event.target).focus();
-  }
+  };
 
-  onInputKeyDown(data: unknown, keyboardEvent: KeyboardEvent): void | boolean {
+  onInputKeyDown = (data: unknown, keyboardEvent: KeyboardEvent): void | boolean => {
     const inputHandledByEmoji = !this.editedMention() && this.emojiInput.onInputKeyDown(data, keyboardEvent);
 
     if (!inputHandledByEmoji) {
@@ -637,18 +641,13 @@ export class InputBarViewModel {
 
       return true;
     }
-  }
+  };
 
-  /**
-   * Returns a term which is a mention match together with its starting position.
-   * If nothing could be matched, it returns `undefined`.
-   *
-   * @param {number} selectionStart Current caret position or start of selection  (if text is marked)
-   * @param {number} selectionEnd Current caret position or end of selection (if text is marked)
-   * @param {string} value Text input
-   * @returns {undefined|{startIndex: number, term: string}} Matched mention info
-   */
-  getMentionCandidate(selectionStart: number, selectionEnd: number, value: string) {
+  getMentionCandidate = (
+    selectionStart: number,
+    selectionEnd: number,
+    value: string,
+  ): {startIndex: number; term: string} => {
     const textInSelection = value.substring(selectionStart, selectionEnd);
     const wordBeforeSelection = value.substring(0, selectionStart).replace(/[^]*\s/, '');
     const isSpaceSelected = /\s/.test(textInSelection);
@@ -668,16 +667,16 @@ export class InputBarViewModel {
     }
 
     return undefined;
-  }
+  };
 
-  handleMentionFlow() {
+  handleMentionFlow = (): void => {
     const {selectionStart, selectionEnd, value} = this.textarea;
     const mentionCandidate = this.getMentionCandidate(selectionStart, selectionEnd, value);
     this.editedMention(mentionCandidate);
     this.updateSelectionState();
-  }
+  };
 
-  updateSelectionState() {
+  updateSelectionState = (): void => {
     if (!this.textarea) {
       return;
     }
@@ -698,9 +697,9 @@ export class InputBarViewModel {
     }
     this.selectionStart(newStart);
     this.selectionEnd(newEnd);
-  }
+  };
 
-  updateMentions(data: unknown, event: Event) {
+  updateMentions = (data: unknown, event: Event): void => {
     const textarea = event.target as HTMLTextAreaElement;
     const value = textarea.value;
     const previousValue = this.input();
@@ -712,9 +711,9 @@ export class InputBarViewModel {
       textarea.selectionStart = edgeMention.startIndex;
       textarea.selectionEnd = edgeMention.endIndex;
     }
-  }
+  };
 
-  detectMentionEdgeDeletion(textarea: HTMLTextAreaElement, lengthDifference: number) {
+  detectMentionEdgeDeletion = (textarea: HTMLTextAreaElement, lengthDifference: number): MentionEntity => {
     const hadSelection = this.selectionStart() !== this.selectionEnd();
     if (hadSelection) {
       return null;
@@ -726,9 +725,14 @@ export class InputBarViewModel {
     const forwardDeleted = currentSelectionStart === this.selectionStart();
     const checkPosition = forwardDeleted ? currentSelectionStart + 1 : currentSelectionStart;
     return this.findMentionAtPosition(checkPosition, this.currentMentions());
-  }
+  };
 
-  updateMentionRanges(mentions: MentionEntity[], start: number, end: number, difference: number) {
+  updateMentionRanges = (
+    mentions: MentionEntity[],
+    start: number,
+    end: number,
+    difference: number,
+  ): MentionEntity[] => {
     const remainingMentions = mentions.filter(({startIndex, endIndex}) => endIndex <= start || startIndex >= end);
 
     remainingMentions.forEach(mention => {
@@ -738,39 +742,39 @@ export class InputBarViewModel {
     });
 
     return remainingMentions;
-  }
+  };
 
-  findMentionAtPosition(position: number, mentions: MentionEntity[]) {
+  findMentionAtPosition = (position: number, mentions: MentionEntity[]): MentionEntity => {
     return mentions.find(({startIndex, endIndex}) => position > startIndex && position < endIndex);
-  }
+  };
 
-  onInputKeyUp(data: unknown, keyboardEvent: KeyboardEvent) {
+  onInputKeyUp = (data: unknown, keyboardEvent: KeyboardEvent): void => {
     if (!this.editedMention()) {
       this.emojiInput.onInputKeyUp(data, keyboardEvent);
     }
     if (keyboardEvent.key !== KEY.ESC) {
       this.handleMentionFlow();
     }
-  }
+  };
 
-  removedFromView() {
+  removedFromView = (): void => {
     amplify.unsubscribeAll(WebAppEvents.SHORTCUT.PING);
-  }
+  };
 
-  triggerInputChangeEvent(newInputHeight = 0, previousInputHeight = 0) {
+  triggerInputChangeEvent = (newInputHeight = 0, previousInputHeight = 0): void => {
     amplify.publish(WebAppEvents.INPUT.RESIZE, newInputHeight - previousInputHeight);
-  }
+  };
 
-  sendGiphy(gifUrl: string, tag: string) {
+  sendGiphy = (gifUrl: string, tag: string): void => {
     const conversationEntity = this.conversationEntity();
     const replyMessageEntity = this.replyMessageEntity();
     this._generateQuote(replyMessageEntity).then(quoteEntity => {
       this.conversationRepository.sendGif(conversationEntity, gifUrl, tag, quoteEntity);
       this.cancelMessageEditing(true);
     });
-  }
+  };
 
-  _generateQuote(replyMessageEntity: ContentMessage): Promise<QuoteEntity> {
+  _generateQuote = (replyMessageEntity: ContentMessage): Promise<QuoteEntity> => {
     return !replyMessageEntity
       ? Promise.resolve()
       : this.eventRepository
@@ -783,25 +787,26 @@ export class InputBarViewModel {
               userId: replyMessageEntity.from,
             });
           });
-  }
+  };
 
-  sendMessage(messageText: string, replyMessageEntity: ContentMessage) {
-    if (messageText.length) {
-      const mentionEntities = this.currentMentions.slice(0);
-
-      this._generateQuote(replyMessageEntity).then(quoteEntity => {
-        this.conversationRepository.sendTextWithLinkPreview(
-          this.conversationEntity(),
-          messageText,
-          mentionEntities,
-          quoteEntity,
-        );
-        this.cancelMessageReply();
-      });
+  sendMessage = (messageText: string, replyMessageEntity: ContentMessage): void => {
+    if (!messageText.length) {
+      return;
     }
-  }
 
-  sendMessageEdit(messageText: string, messageEntity: ContentMessage): void | Promise<any> {
+    const mentionEntities = this.currentMentions.slice(0);
+    this._generateQuote(replyMessageEntity).then(quoteEntity => {
+      this.conversationRepository.sendTextWithLinkPreview(
+        this.conversationEntity(),
+        messageText,
+        mentionEntities,
+        quoteEntity,
+      );
+      this.cancelMessageReply();
+    });
+  };
+
+  sendMessageEdit = (messageText: string, messageEntity: ContentMessage): void | Promise<any> => {
     const mentionEntities = this.currentMentions.slice(0);
     this.cancelMessageEditing();
 
@@ -817,19 +822,14 @@ export class InputBarViewModel {
         }
       });
     this.cancelMessageReply();
-  }
+  };
 
-  sendPastedFile() {
+  sendPastedFile = (): void => {
     this.onDropFiles([this.pastedFile()]);
     this.pastedFile(null);
-  }
+  };
 
-  /**
-   * Post images to a conversation.
-   * @param {Array|FileList} images Images
-   * @returns {undefined} No return value
-   */
-  uploadImages(images: File[]) {
+  uploadImages = (images: File[]): void => {
     if (!this._isHittingUploadLimit(images)) {
       for (const image of Array.from(images)) {
         const isTooLarge = image.size > Config.getConfig().MAXIMUM_IMAGE_FILE_SIZE;
@@ -840,14 +840,9 @@ export class InputBarViewModel {
 
       this.conversationRepository.upload_images(this.conversationEntity(), images);
     }
-  }
+  };
 
-  /**
-   * Post files to a conversation.
-   * @param {Array|FileList} files Files
-   * @returns {undefined} No return value
-   */
-  uploadFiles(files: File[]): void | boolean {
+  uploadFiles = (files: File[]): void | boolean => {
     const fileArray = Array.from(files);
     const allowedFileUploadExtensions = InputBarViewModel.CONFIG.FILES.ALLOWED_FILE_UPLOAD_EXTENSIONS;
     const allowAllExtensions = allowedFileUploadExtensions.some(extension => ['*', '.*', '*.*'].includes(extension));
@@ -893,9 +888,9 @@ export class InputBarViewModel {
 
       this.conversationRepository.upload_files(this.conversationEntity(), files);
     }
-  }
+  };
 
-  _isHittingUploadLimit(files: File[]) {
+  _isHittingUploadLimit = (files: File[]): boolean => {
     const concurrentUploadLimit = InputBarViewModel.CONFIG.ASSETS.CONCURRENT_UPLOAD_LIMIT;
     const concurrentUploads = files.length + this.assetRepository.getNumberOfOngoingUploads();
     const isHittingUploadLimit = concurrentUploads > InputBarViewModel.CONFIG.ASSETS.CONCURRENT_UPLOAD_LIMIT;
@@ -912,9 +907,9 @@ export class InputBarViewModel {
     }
 
     return isHittingUploadLimit;
-  }
+  };
 
-  _moveCursorToEnd() {
+  _moveCursorToEnd = (): void => {
     afterRender(() => {
       if (this.textarea) {
         const endPosition = this.textarea.value.length;
@@ -922,9 +917,9 @@ export class InputBarViewModel {
         this.updateSelectionState();
       }
     });
-  }
+  };
 
-  _showUploadWarning(image: File) {
+  _showUploadWarning = (image: File): void => {
     const isGif = image.type === 'image/gif';
     const maxSize = Config.getConfig().MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024;
     const message = isGif ? t('modalGifTooLargeMessage', maxSize) : t('modalPictureTooLargeMessage', maxSize);
@@ -938,5 +933,5 @@ export class InputBarViewModel {
     };
 
     amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
-  }
+  };
 }
