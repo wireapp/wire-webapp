@@ -90,7 +90,7 @@ export class PreferencesAVViewModel {
     this.Config = Config.getConfig();
 
     this.currentDeviceId.audioInput.subscribe(() => this.updateMediaStreamTrack(MediaType.AUDIO));
-    this.currentDeviceId.videoInput.subscribe(() => this.tryAgainVideo());
+    this.currentDeviceId.videoInput.subscribe(() => this.updateMediaStreamVideoTrack());
 
     this.constraintsHandler = mediaRepository.constraintsHandler;
     this.streamHandler = mediaRepository.streamHandler;
@@ -116,7 +116,7 @@ export class PreferencesAVViewModel {
     });
   }
 
-  tryAgainVideo() {
+  updateMediaStreamVideoTrack() {
     return this.updateMediaStreamTrack(MediaType.VIDEO);
   }
 
