@@ -21,6 +21,7 @@ import type {Dexie} from 'dexie';
 
 import {base64ToArraySync} from 'Util/util';
 import {categoryFromEvent} from '../message/MessageCategorization';
+import {AUTH_TABLE_NAME} from '@wireapp/api-client/dist/auth';
 
 interface DexieSchema {
   schema: Record<string, string>;
@@ -32,6 +33,7 @@ export class StorageSchemata {
   static get OBJECT_STORE() {
     return {
       AMPLIFY: 'amplify',
+      AUTHENTICATION: AUTH_TABLE_NAME,
       CLIENTS: 'clients',
       CONVERSATIONS: 'conversations',
       CONVERSATION_EVENTS: 'conversation_events',
