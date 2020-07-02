@@ -2766,7 +2766,7 @@ export class ConversationRepository {
       }
       const userList = await this.userRepository.getUsersById(userIdsWithoutClients);
       for (const user of userList) {
-        // FIXME: It seems `userEntity.deleted` doesn't exist bu changing it to `userEntity.isDeleted` breaks functionality
+        // FIXME: It seems `userEntity.deleted` doesn't exist but changing it to `userEntity.isDeleted` breaks functionality
         const isDeleted = user?.deleted === true;
 
         if (isDeleted) {
