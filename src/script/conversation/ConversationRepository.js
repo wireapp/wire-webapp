@@ -2766,7 +2766,8 @@ export class ConversationRepository {
       }
       const userList = await this.userRepository.getUsersById(userIdsWithoutClients);
       for (const user of userList) {
-        const isDeleted = user?.isDeleted === true;
+        // FIXME: It seems `userEntity.deleted` doesn't exist but changing it to `userEntity.isDeleted` breaks functionality
+        const isDeleted = user?.deleted === true;
 
         if (isDeleted) {
           await this.teamMemberLeave(this.team().id, user.id);
