@@ -18,7 +18,6 @@
  */
 
 import {SQLiteProvidedSchema, SQLiteType} from '@wireapp/store-engine-sqleet';
-import {AUTH_ACCESS_TOKEN_KEY, AUTH_COOKIE_KEY} from '@wireapp/api-client/dist/auth';
 
 import {StorageSchemata} from './StorageSchemata';
 
@@ -105,10 +104,7 @@ export class SQLeetSchemata {
           [StorageSchemata.OBJECT_STORE.USERS]: {
             id: SQLiteType.TEXT,
           },
-          [StorageSchemata.OBJECT_STORE.AUTHENTICATION]: {
-            [AUTH_ACCESS_TOKEN_KEY]: SQLiteType.TEXT,
-            [AUTH_COOKIE_KEY]: SQLiteType.TEXT,
-          },
+          [StorageSchemata.OBJECT_STORE.AUTHENTICATION]: SQLiteType.JSON_OR_TEXT,
         },
         version: 1,
       },
