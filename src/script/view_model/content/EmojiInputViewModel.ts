@@ -37,7 +37,7 @@ export interface EmojiData {
   name: string;
 };
 
-type EmojiBinding = {[key in string]: EmojiData};
+type EmojiBinding = Record<string, EmojiData>;
 
 export class EmojiInputViewModel {
   private isVisible: boolean;
