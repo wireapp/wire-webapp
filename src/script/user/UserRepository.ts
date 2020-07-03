@@ -620,6 +620,10 @@ export class UserRepository {
     return this.userService.getUser(userId);
   }
 
+  getUserListFromBackend(userIds: string[]): Promise<APIClientUser[]> {
+    return this.userService.getUsers(userIds);
+  }
+
   /**
    * Is the user the logged in user.
    */
