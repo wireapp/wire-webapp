@@ -31,7 +31,7 @@ import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 import {StorageKey} from '../../storage/StorageKey';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 
-type EmojiData = {
+export interface EmojiData {
   aliases: string[];
   code: string;
   name: string;
