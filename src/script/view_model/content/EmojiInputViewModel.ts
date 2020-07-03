@@ -45,7 +45,7 @@ export class EmojiInputViewModel {
   private emojiDict: Record<string, string> = {};
   private readonly emojiDiv: JQuery<HTMLElement>;
   private emojiStartPosition: number;
-  private emojiUsageCount: {[key in string]: number} = {};
+  private emojiUsageCount: Record<string, number> = {};
   private shouldReplaceEmoji: boolean;
   private suppressKeyUp: boolean;
 
