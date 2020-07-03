@@ -258,7 +258,7 @@ export class InputBarViewModel {
     this.inputPlaceholder = ko.pureComputed(() => {
       if (this.showAvailabilityTooltip()) {
         const userEntity = this.conversationEntity().firstUserEntity();
-        const availabilityStrings: {[key in string]: string} = {
+        const availabilityStrings: Record<{string, string> = {
           [Availability.Type.AVAILABLE]: t('userAvailabilityAvailable'),
           [Availability.Type.AWAY]: t('userAvailabilityAway'),
           [Availability.Type.BUSY]: t('userAvailabilityBusy'),
