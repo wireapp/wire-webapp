@@ -272,7 +272,7 @@ export class EmojiInputViewModel {
     return true;
   };
 
-  initSubscriptions = (): void => {
+  private readonly initSubscriptions = (): void => {
     amplify.subscribe(WebAppEvents.CONTENT.SWITCH, this.removeEmojiPopup);
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE, this.updatedReplaceEmojiPreference);
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, (properties: WebappProperties) => {
