@@ -35,7 +35,7 @@ export interface EmojiData {
   aliases: string[];
   code: string;
   name: string;
-};
+}
 
 type EmojiBinding = Record<string, EmojiData>;
 
@@ -364,7 +364,7 @@ export class EmojiInputViewModel {
         }
 
         return queryWords.every(queryWord => {
-          return emojiNameWords.some<string>(emojiNameWord => emojiNameWord.startsWith(queryWord));
+          return emojiNameWords.some(emojiNameWord => emojiNameWord.startsWith(queryWord));
         });
       })
       .reduce((accumulator, emoji) => {
