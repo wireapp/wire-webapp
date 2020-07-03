@@ -78,21 +78,27 @@
             <label class="icon-down preferences-av-label" data-bind="visible: !hasNoneOrOneVideoInput()"></label>
           </div>
         </div>
-        <!-- ko if: isTemporaryGuest() -->
-          <div class="preferences-detail" data-bind="text: t('preferencesAVTemporaryDisclaimer')"></div>
-        <!-- /ko -->
-        <!-- ko ifnot: hasVideoTrack() -->
+
+        <!-- ko if: isRequestingVideo() -->
           <div class="preferences-av-video-disabled">
-              <div class="preferences-av-video-disabled__info" data-bind="html: t('preferencesAVNoCamera', brandName, {'faqLink': '<a href=\'https://support.wire.com/hc/articles/202935412\' data-uie-name=\'go-no-camera-faq\' target=\'_blank\' rel=\'noopener noreferrer\'>', '/faqLink': '</a>', 'br': '<br>'})"></div>
-              <div class="preferences-av-video-disabled__try-again" data-bind="click: updateMediaStreamVideoTrack, text: z.string.preferencesAVTryAgain" data-uie-name="do-try-again-preferences-av"></div>
+            <div class="icon-spinner spin accent-text"></div>
           </div>
         <!-- /ko -->
-        <!-- ko if: hasVideoTrack() -->
-          <video class="preferences-av-video mirror"
-                autoplay
-                playsinline
-                data-bind="muteMediaElement: mediaStream(), sourceStream: mediaStream()">
-          </video>
+
+        <!-- ko if: !isRequestingVideo() -->
+          <!-- ko if: hasVideoTrack() -->
+            <video class="preferences-av-video mirror"
+                   autoplay
+                   playsinline
+                   data-bind="muteMediaElement: mediaStream(), sourceStream: mediaStream()">
+            </video>
+          <!-- /ko -->
+          <!-- ko if: !hasVideoTrack() -->
+            <div class="preferences-av-video-disabled">
+              <div class="preferences-av-video-disabled__info" data-bind="html: t('preferencesAVNoCamera', brandName, {'faqLink': '<a href=\'https://support.wire.com/hc/articles/202935412\' data-uie-name=\'go-no-camera-faq\' target=\'_blank\' rel=\'noopener noreferrer\'>', '/faqLink': '</a>', 'br': '<br>'})"></div>
+              <div class="preferences-av-video-disabled__try-again" data-bind="click: updateMediaStreamVideoTrack, text: z.string.preferencesAVTryAgain" data-uie-name="do-try-again-preferences-av"></div>
+            </div>
+          <!-- /ko -->
         <!-- /ko -->
       </section>
     <!-- /ko -->

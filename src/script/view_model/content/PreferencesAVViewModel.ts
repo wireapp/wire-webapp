@@ -53,6 +53,8 @@ export class PreferencesAVViewModel {
   hasNoneOrOneVideoInput: ko.PureComputed<boolean>;
   hasVideoTrack: ko.Observable<boolean>;
   isActivatedAccount: ko.PureComputed<boolean>;
+  isRequestingAudio: ko.Observable<boolean>;
+  isRequestingVideo: ko.Observable<boolean>;
   isTemporaryGuest: ko.PureComputed<boolean>;
   logger: Logger;
   mediaStream: ko.Observable<MediaStream>;
@@ -114,6 +116,9 @@ export class PreferencesAVViewModel {
     this.supportsAudioOutput = ko.pureComputed(() => {
       return this.deviceSupport.audioOutput() && Environment.browser.supports.audioOutputSelection;
     });
+
+    this.isRequestingAudio = ko.observable(false);
+    this.isRequestingVideo = ko.observable(false);
   }
 
   updateMediaStreamVideoTrack() {
@@ -121,6 +126,21 @@ export class PreferencesAVViewModel {
   }
 
   private async initiateDevices(mediaType: MediaType): Promise<void> {
+    switch (mediaType) {
+      case MediaType.AUDIO: {
+        this.isRequestingAudio(true);
+        break;
+      }
+      case MediaType.VIDEO: {
+        this.isRequestingVideo(true);
+        break;
+      }
+      case MediaType.AUDIO_VIDEO: {
+        this.isRequestingAudio(true);
+        this.isRequestingVideo(true);
+      }
+    }
+
     try {
       const mediaStream = await this.getMediaStream(mediaType);
       mediaStream.getTracks().forEach(track => this.mediaStream().addTrack(track));
@@ -144,6 +164,25 @@ export class PreferencesAVViewModel {
         this.hasVideoTrack(false);
       } else {
         this.hasVideoTrack(true);
+      }
+
+      switch (mediaType) {
+        case MediaType.AUDIO: {
+          this.isRequestingAudio(false);
+          break;
+        }
+        case MediaType.VIDEO: {
+          this.isRequestingVideo(false);
+          break;
+        }
+        case MediaType.AUDIO_VIDEO: {
+          this.isRequestingAudio(false);
+          this.isRequestingVideo(false);
+        }
+        default: {
+          this.isRequestingAudio(false);
+          this.isRequestingVideo(false);
+        }
       }
     }
   }
