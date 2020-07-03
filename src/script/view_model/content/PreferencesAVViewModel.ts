@@ -19,7 +19,6 @@
 
 import ko from 'knockout';
 import {getLogger, Logger} from 'Util/Logger';
-import {Environment} from 'Util/Environment';
 import {Config, Configuration} from '../../Config';
 import {MediaType} from '../../media/MediaType';
 import {MediaRepository} from '../../media/MediaRepository';
@@ -53,13 +52,14 @@ export class PreferencesAVViewModel {
   hasNoneOrOneVideoInput: ko.PureComputed<boolean>;
   hasVideoTrack: ko.Observable<boolean>;
   isActivatedAccount: ko.PureComputed<boolean>;
+  isRequestingAudio: ko.Observable<boolean>;
+  isRequestingVideo: ko.Observable<boolean>;
   isTemporaryGuest: ko.PureComputed<boolean>;
   logger: Logger;
   mediaStream: ko.Observable<MediaStream>;
   replaceActiveMediaSource: MediaSourceChanged;
   stopActiveMediaSource: WillChangeMediaSource;
   streamHandler: MediaStreamHandler;
-  supportsAudioOutput: ko.PureComputed<boolean>;
   userRepository: UserRepository;
 
   static get CONFIG() {
@@ -111,9 +111,8 @@ export class PreferencesAVViewModel {
 
     this.brandName = this.Config.BRAND_NAME;
 
-    this.supportsAudioOutput = ko.pureComputed(() => {
-      return this.deviceSupport.audioOutput() && Environment.browser.supports.audioOutputSelection;
-    });
+    this.isRequestingAudio = ko.observable(false);
+    this.isRequestingVideo = ko.observable(false);
   }
 
   updateMediaStreamVideoTrack() {
@@ -121,6 +120,30 @@ export class PreferencesAVViewModel {
   }
 
   private async initiateDevices(mediaType: MediaType): Promise<void> {
+    switch (mediaType) {
+      case MediaType.AUDIO: {
+        if (this.isRequestingAudio()) {
+          return;
+        }
+        this.isRequestingAudio(true);
+        break;
+      }
+      case MediaType.VIDEO: {
+        if (this.isRequestingVideo()) {
+          return;
+        }
+        this.isRequestingVideo(true);
+        break;
+      }
+      case MediaType.AUDIO_VIDEO: {
+        if (this.isRequestingAudio() || this.isRequestingVideo()) {
+          return;
+        }
+        this.isRequestingAudio(true);
+        this.isRequestingVideo(true);
+      }
+    }
+
     try {
       const mediaStream = await this.getMediaStream(mediaType);
       mediaStream.getTracks().forEach(track => this.mediaStream().addTrack(track));
@@ -144,6 +167,25 @@ export class PreferencesAVViewModel {
         this.hasVideoTrack(false);
       } else {
         this.hasVideoTrack(true);
+      }
+
+      switch (mediaType) {
+        case MediaType.AUDIO: {
+          this.isRequestingAudio(false);
+          break;
+        }
+        case MediaType.VIDEO: {
+          this.isRequestingVideo(false);
+          break;
+        }
+        case MediaType.AUDIO_VIDEO: {
+          this.isRequestingAudio(false);
+          this.isRequestingVideo(false);
+        }
+        default: {
+          this.isRequestingAudio(false);
+          this.isRequestingVideo(false);
+        }
       }
     }
   }
@@ -171,9 +213,7 @@ export class PreferencesAVViewModel {
     const requestAudio = supportsAudio && [MediaType.AUDIO, MediaType.AUDIO_VIDEO].includes(requestedMediaType);
     const requestVideo = supportsVideo && [MediaType.VIDEO, MediaType.AUDIO_VIDEO].includes(requestedMediaType);
 
-    const stream = await this.getStreamsSeparately(requestAudio, requestVideo);
-    await this.devicesHandler.refreshMediaDevices();
-    return stream;
+    return this.getStreamsSeparately(requestAudio, requestVideo);
   }
 
   private async getStreamsSeparately(requestAudio: boolean, requestVideo: boolean): Promise<MediaStream> {
