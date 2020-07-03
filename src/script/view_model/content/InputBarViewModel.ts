@@ -97,6 +97,7 @@ export class InputBarViewModel {
   readonly renderMessage: typeof renderMessage;
   readonly input: ko.Observable<string>;
   private readonly showAvailabilityTooltip: ko.PureComputed<boolean>;
+  Config: typeof InputBarViewModel.CONFIG;
 
   static get CONFIG() {
     return {
@@ -125,6 +126,7 @@ export class InputBarViewModel {
   ) {
     this.shadowInput = null;
     this.textarea = null;
+    this.Config = InputBarViewModel.CONFIG;
 
     this.selectionStart = ko.observable(0);
     this.selectionEnd = ko.observable(0);
