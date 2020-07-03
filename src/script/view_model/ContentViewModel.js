@@ -47,6 +47,7 @@ import {PreferencesAboutViewModel} from './content/PreferencesAboutViewModel';
 import {PreferencesDevicesViewModel} from './content/PreferencesDevicesViewModel';
 import {PreferencesDeviceDetailsViewModel} from './content/PreferencesDeviceDetailsViewModel';
 import {InputBarViewModel} from './content/InputBarViewModel';
+import {MediaType} from '../media/MediaType';
 
 export class ContentViewModel {
   static get STATE() {
@@ -138,8 +139,8 @@ export class ContentViewModel {
       repositories.user,
     );
     this.preferencesAV = new PreferencesAVViewModel(repositories.media, repositories.user, {
-      mediaSourceChanged: repositories.calling.changeMediaSource.bind(repositories.calling),
-      willChangeMediaSource: repositories.calling.stopMediaSource.bind(repositories.calling),
+      replaceActiveMediaSource: repositories.calling.changeMediaSource.bind(repositories.calling),
+      stopActiveMediaSource: repositories.calling.stopMediaSource.bind(repositories.calling),
     });
     this.preferencesDeviceDetails = new PreferencesDeviceDetailsViewModel(
       mainViewModel,
@@ -177,7 +178,7 @@ export class ContentViewModel {
           this.preferencesAccount.popNotification();
           break;
         case ContentViewModel.STATE.PREFERENCES_AV:
-          this.preferencesAV.initiateDevices();
+          this.preferencesAV.updateMediaStreamTrack(MediaType.AUDIO_VIDEO);
           break;
         case ContentViewModel.STATE.PREFERENCES_DEVICES:
           this.preferencesDevices.updateDeviceInfo();
@@ -405,7 +406,7 @@ export class ContentViewModel {
 
     const isStatePreferencesAv = this.previousState === ContentViewModel.STATE.PREFERENCES_AV;
     if (isStatePreferencesAv) {
-      this.preferencesAV.releaseDevices();
+      this.preferencesAV.releaseDevices(MediaType.AUDIO_VIDEO);
     }
   }
 

@@ -176,27 +176,6 @@ describe('CallingRepository', () => {
     });
   });
 
-  describe('changeMediaSource', () => {
-    it('changes active call sent media streams', () => {
-      spyOn(callingRepository.wCall, 'replaceTrack');
-      const selfParticipant = new Participant();
-      spyOn(selfParticipant, 'releaseStream');
-      spyOn(selfParticipant, 'sharesCamera').and.returnValue(true);
-      const call = new Call('', '', 0, selfParticipant, 0);
-      const newMediaStream = new MediaStream();
-
-      callingRepository.changeMediaSource(newMediaStream, MediaType.AUDIO, call);
-
-      expect(selfParticipant.releaseStream).toHaveBeenCalledTimes(1);
-      expect(callingRepository.wCall.replaceTrack).toHaveBeenCalledTimes(1);
-
-      callingRepository.changeMediaSource(newMediaStream, MediaType.VIDEO, call);
-
-      expect(selfParticipant.releaseStream).toHaveBeenCalledTimes(2);
-      expect(callingRepository.wCall.replaceTrack).toHaveBeenCalledTimes(2);
-    });
-  });
-
   describe('incoming call', () => {
     it('create a stores a new call when an incoming call arrives', done => {
       spyOn(callingRepository.conversationRepository, 'grantMessage').and.returnValue(Promise.resolve());

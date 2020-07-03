@@ -32,36 +32,35 @@ import {DeviceIds, Devices, DeviceSupport, MediaDevicesHandler} from '../../medi
 type MediaSourceChanged = (mediaStream: MediaStream, mediaType: MediaType, call?: Call) => void;
 type WillChangeMediaSource = (mediaType: MediaType) => boolean;
 type CallBacksType = {
-  mediaSourceChanged: MediaSourceChanged;
-  willChangeMediaSource: WillChangeMediaSource;
+  replaceActiveMediaSource: MediaSourceChanged;
+  stopActiveMediaSource: WillChangeMediaSource;
 };
 
 export class PreferencesAVViewModel {
   audioContext: AudioContext;
   audioInterval: number;
   audioLevel: ko.Observable<number>;
-  audioMediaStream: ko.PureComputed<MediaStream>;
   audioSource: MediaStreamAudioSourceNode;
   availableDevices: Devices;
   brandName: string;
   Config: Configuration;
   constraintsHandler: MediaConstraintsHandler;
   currentDeviceId: DeviceIds;
-  currentMediaType: MediaType;
   devicesHandler: MediaDevicesHandler;
   deviceSupport: DeviceSupport;
-  hasOnlyOneMicrophone: ko.PureComputed<boolean>;
+  hasAudioTrack: ko.Observable<boolean>;
+  hasNoneOrOneAudioInput: ko.PureComputed<boolean>;
+  hasNoneOrOneVideoInput: ko.PureComputed<boolean>;
+  hasVideoTrack: ko.Observable<boolean>;
   isActivatedAccount: ko.PureComputed<boolean>;
   isTemporaryGuest: ko.PureComputed<boolean>;
-  isVisible: boolean;
   logger: Logger;
-  mediaSourceChanged: MediaSourceChanged;
   mediaStream: ko.Observable<MediaStream>;
+  replaceActiveMediaSource: MediaSourceChanged;
+  stopActiveMediaSource: WillChangeMediaSource;
   streamHandler: MediaStreamHandler;
   supportsAudioOutput: ko.PureComputed<boolean>;
   userRepository: UserRepository;
-  videoMediaStream: ko.PureComputed<MediaStream>;
-  willChangeMediaSource: WillChangeMediaSource;
 
   static get CONFIG() {
     return {
@@ -75,8 +74,8 @@ export class PreferencesAVViewModel {
   }
 
   constructor(mediaRepository: MediaRepository, userRepository: UserRepository, callbacks: CallBacksType) {
-    this.willChangeMediaSource = callbacks.willChangeMediaSource;
-    this.mediaSourceChanged = callbacks.mediaSourceChanged;
+    this.stopActiveMediaSource = callbacks.stopActiveMediaSource;
+    this.replaceActiveMediaSource = callbacks.replaceActiveMediaSource;
 
     this.logger = getLogger('PreferencesAVViewModel');
 
@@ -90,25 +89,17 @@ export class PreferencesAVViewModel {
     this.deviceSupport = this.devicesHandler.deviceSupport;
     this.Config = Config.getConfig();
 
-    this.currentDeviceId.audioInput.subscribe(() => this.updateStream(MediaType.AUDIO));
-    this.currentDeviceId.videoInput.subscribe(() => this.updateStream(MediaType.VIDEO));
+    this.currentDeviceId.audioInput.subscribe(() => this.updateMediaStreamTrack(MediaType.AUDIO));
+    this.currentDeviceId.videoInput.subscribe(() => this.updateMediaStreamVideoTrack());
 
     this.constraintsHandler = mediaRepository.constraintsHandler;
     this.streamHandler = mediaRepository.streamHandler;
 
-    const createMediaStreamOfType = (tracksGetter: 'getAudioTracks' | 'getVideoTracks') => {
-      const tracks = this.mediaStream() && this.mediaStream()[tracksGetter]();
-      if (!tracks || tracks.length === 0) {
-        return undefined;
-      }
-      return new MediaStream(tracks);
-    };
-    this.mediaStream = ko.observable();
-    this.audioMediaStream = ko.pureComputed(() => createMediaStreamOfType('getAudioTracks'));
-    this.videoMediaStream = ko.pureComputed(() => createMediaStreamOfType('getVideoTracks'));
-    this.hasOnlyOneMicrophone = ko.pureComputed(() => this.availableDevices.audioInput().length < 2);
-
-    this.isVisible = false;
+    this.mediaStream = ko.observable(new MediaStream());
+    this.hasAudioTrack = ko.observable(false);
+    this.hasVideoTrack = ko.observable(false);
+    this.hasNoneOrOneAudioInput = ko.pureComputed(() => this.availableDevices.audioInput().length < 2);
+    this.hasNoneOrOneVideoInput = ko.pureComputed(() => this.availableDevices.videoInput().length < 2);
 
     const selfUser = this.userRepository.self;
     this.isTemporaryGuest = ko.pureComputed(() => selfUser() && selfUser().isTemporaryGuest());
@@ -125,60 +116,52 @@ export class PreferencesAVViewModel {
     });
   }
 
-  async updateStream(mediaType: MediaType): Promise<void> {
-    this.currentMediaType = mediaType;
-    await this.tryAgain();
+  updateMediaStreamVideoTrack() {
+    return this.updateMediaStreamTrack(MediaType.VIDEO);
+  }
 
-    const needsStreamUpdate = this.willChangeMediaSource(mediaType);
-
-    if (!needsStreamUpdate && !this.mediaStream()) {
-      return undefined;
-    }
-
+  private async initiateDevices(mediaType: MediaType): Promise<void> {
     try {
-      const stream = await this.getMediaStream(mediaType);
-      this.mediaSourceChanged(stream, mediaType);
-      if (this.mediaStream()) {
-        stream.getTracks().forEach(track => {
-          this.mediaStream().addTrack(track);
-        });
+      const mediaStream = await this.getMediaStream(mediaType);
+      mediaStream.getTracks().forEach(track => this.mediaStream().addTrack(track));
+
+      if (this.mediaStream().getAudioTracks().length && !this.audioInterval) {
         this.initiateAudioMeter(this.mediaStream());
+      }
+
+      await this.stopActiveMediaSource(mediaType);
+      this.replaceActiveMediaSource(this.mediaStream(), mediaType);
+    } catch (error) {
+      this.logger.warn(`Requesting MediaStream for type "${mediaType}" failed: ${error.message}`, error);
+    } finally {
+      if (this.mediaStream().getAudioTracks().length === 0) {
+        this.hasAudioTrack(false);
       } else {
-        stream.getTracks().forEach(track => track.stop());
+        this.hasAudioTrack(true);
       }
-    } catch (error) {
-      this.logger.warn(`Requesting MediaStream failed: ${error.message}`, error);
-      this.releaseMediaStream();
+
+      if (this.mediaStream().getVideoTracks().length === 0) {
+        this.hasVideoTrack(false);
+      } else {
+        this.hasVideoTrack(true);
+      }
     }
   }
 
-  async initiateDevices(): Promise<void> {
-    this.isVisible = true;
+  async updateMediaStreamTrack(mediaType: MediaType): Promise<void> {
+    // TODO: Check if there is already a pending media stream request
+    await this.releaseDevices(mediaType);
+    await this.initiateDevices(mediaType);
+  }
 
-    try {
-      const mediaStream = await this.getMediaStream();
-      this.mediaStream(mediaStream);
-      if (mediaStream.getAudioTracks().length && !this.audioInterval) {
-        this.initiateAudioMeter(mediaStream);
-      }
-    } catch (error) {
-      this.logger.warn(`Requesting MediaStream failed: ${error.message}`, error);
-      this.releaseMediaStream();
+  private async releaseDevices(mediaType: MediaType): Promise<void> {
+    if (mediaType === MediaType.AUDIO || mediaType === MediaType.AUDIO_VIDEO) {
+      await this.releaseAudioMeter();
     }
+    this.streamHandler.releaseTracksFromStream(this.mediaStream(), mediaType);
   }
 
-  async tryAgain(): Promise<void> {
-    await this.releaseDevices();
-    this.initiateDevices();
-  }
-
-  async releaseDevices(): Promise<void> {
-    this.isVisible = false;
-    await this.releaseAudioMeter();
-    this.releaseMediaStream();
-  }
-
-  private async getMediaStream(requestedMediaType = MediaType.AUDIO_VIDEO): Promise<MediaStream> {
+  private async getMediaStream(requestedMediaType: MediaType): Promise<MediaStream> {
     if (!this.deviceSupport.videoInput() && !this.deviceSupport.audioInput()) {
       return Promise.resolve(undefined);
     }
@@ -193,7 +176,7 @@ export class PreferencesAVViewModel {
     return stream;
   }
 
-  async getStreamsSeparately(requestAudio: boolean, requestVideo: boolean): Promise<MediaStream> {
+  private async getStreamsSeparately(requestAudio: boolean, requestVideo: boolean): Promise<MediaStream> {
     const mediaStreams = [];
 
     if (requestAudio) {
@@ -215,7 +198,7 @@ export class PreferencesAVViewModel {
     }
 
     if (mediaStreams.length === 0) {
-      throw new Error('No medium streams available.');
+      throw new Error('No media streams available.');
     }
 
     const tracks = mediaStreams.reduce((trackList, mediaStream) => {
@@ -273,13 +256,6 @@ export class PreferencesAVViewModel {
     if (this.audioSource) {
       this.audioSource.disconnect();
       this.audioSource = undefined;
-    }
-  }
-
-  private releaseMediaStream(): void {
-    if (this.mediaStream()) {
-      this.streamHandler.releaseTracksFromStream(this.mediaStream(), this.currentMediaType);
-      this.mediaStream(undefined);
     }
   }
 }
