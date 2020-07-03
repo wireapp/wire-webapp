@@ -5,19 +5,19 @@
     <!-- ko if: deviceSupport.audioInput() -->
       <section class="preferences-section">
         <header class="preferences-header preferences-av-header" data-bind="text: t('preferencesAVMicrophone')"></header>
-        <!-- ko if: !hasAudioTrack() -->
+        <!-- ko if: !hasAudioTrack() && !isRequestingAudio() -->
           <div class="preferences-av-detail">
             <a rel="nofollow noopener noreferrer" target="_blank" data-bind="text: t('preferencesAVPermissionDetail'), attr: {href: Config.URL.SUPPORT.DEVICE_ACCESS_DENIED}"></a>
           </div>
         <!-- /ko -->
-        <div class="preferences-option" data-bind="css: {'preferences-av-select-disabled': hasNoneOrOneAudioInput()}">
+        <div class="preferences-option" data-bind="css: {'preferences-av-select-disabled': hasNoneOrOneAudioInput() || isRequestingAudio()}">
           <div class="preferences-option-icon preferences-av-select-icon">
             <div class="icon-microphone"></div>
           </div>
           <div class="input-select">
             <select class="preferences-av-select" name="select"
-                    data-bind="attr: {'disabled': hasNoneOrOneAudioInput()},
-                               css: {'preferences-av-select-disabled': hasNoneOrOneAudioInput()},
+                    data-bind="attr: {'disabled': hasNoneOrOneAudioInput() || isRequestingAudio()},
+                               css: {'preferences-av-select-disabled': hasNoneOrOneAudioInput() || isRequestingAudio()},
                                options: availableDevices.audioInput,
                                optionsText: function(item) {return item.label || z.string.preferencesAVMicrophone},
                                optionsValue: 'deviceId',
@@ -27,7 +27,14 @@
             <label class="icon-down preferences-av-label" data-bind="visible: !hasNoneOrOneAudioInput()"></label>
           </div>
         </div>
-        <input-level class="preferences-av-meter accent-text" params="level: audioLevel, disabled: !hasAudioTrack()"></input-level>
+        <!-- ko if: isRequestingAudio() -->
+          <div class="preferences-av-spinner">
+            <div class="icon-spinner spin accent-text"></div>
+          </div>
+        <!-- /ko -->
+        <!-- ko if: !isRequestingAudio() -->
+          <input-level class="preferences-av-meter accent-text" params="level: audioLevel, disabled: !hasAudioTrack()"></input-level>
+        <!-- /ko -->
       </section>
     <!-- /ko -->
 

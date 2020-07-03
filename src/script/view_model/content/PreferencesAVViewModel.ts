@@ -219,9 +219,7 @@ export class PreferencesAVViewModel {
     const requestAudio = supportsAudio && [MediaType.AUDIO, MediaType.AUDIO_VIDEO].includes(requestedMediaType);
     const requestVideo = supportsVideo && [MediaType.VIDEO, MediaType.AUDIO_VIDEO].includes(requestedMediaType);
 
-    const stream = await this.getStreamsSeparately(requestAudio, requestVideo);
-    await this.devicesHandler.refreshMediaDevices();
-    return stream;
+    return this.getStreamsSeparately(requestAudio, requestVideo);
   }
 
   private async getStreamsSeparately(requestAudio: boolean, requestVideo: boolean): Promise<MediaStream> {
