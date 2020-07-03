@@ -19,7 +19,6 @@
 
 import ko from 'knockout';
 import {getLogger, Logger} from 'Util/Logger';
-import {Environment} from 'Util/Environment';
 import {Config, Configuration} from '../../Config';
 import {MediaType} from '../../media/MediaType';
 import {MediaRepository} from '../../media/MediaRepository';
@@ -61,7 +60,6 @@ export class PreferencesAVViewModel {
   replaceActiveMediaSource: MediaSourceChanged;
   stopActiveMediaSource: WillChangeMediaSource;
   streamHandler: MediaStreamHandler;
-  supportsAudioOutput: ko.PureComputed<boolean>;
   userRepository: UserRepository;
 
   static get CONFIG() {
@@ -112,10 +110,6 @@ export class PreferencesAVViewModel {
     this.audioSource = undefined;
 
     this.brandName = this.Config.BRAND_NAME;
-
-    this.supportsAudioOutput = ko.pureComputed(() => {
-      return this.deviceSupport.audioOutput() && Environment.browser.supports.audioOutputSelection;
-    });
 
     this.isRequestingAudio = ko.observable(false);
     this.isRequestingVideo = ko.observable(false);
