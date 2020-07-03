@@ -2764,9 +2764,9 @@ export class ConversationRepository {
           userIdsWithoutClients.push(recipientId);
         }
       }
-      const userList = await this.userRepository.getUsersById(userIdsWithoutClients);
-      for (const user of userList) {
-        // FIXME: It seems `userEntity.deleted` doesn't exist but changing it to `userEntity.isDeleted` breaks functionality
+      const bareUserList = await this.userRepository.getUserListFromBackend(userIdsWithoutClients);
+      for (const user of bareUserList) {
+        // Since this is a bare API client user we use `.deleted`
         const isDeleted = user?.deleted === true;
 
         if (isDeleted) {
