@@ -56,19 +56,19 @@
     <!-- ko if: deviceSupport.videoInput() -->
       <section class="preferences-section">
         <header class="preferences-header preferences-av-header" data-bind="text: t('preferencesAVCamera')"></header>
-        <!-- ko if: !hasVideoTrack() -->
+        <!-- ko if: !hasVideoTrack() && !isRequestingVideo() -->
           <div class="preferences-av-detail">
             <a rel="nofollow noopener noreferrer" target="_blank" data-bind="text: t('preferencesAVPermissionDetail'), attr: {href: Config.URL.SUPPORT.DEVICE_ACCESS_DENIED}"></a>
           </div>
         <!-- /ko -->
-        <div class="preferences-option" data-bind="css: {'preferences-av-select-disabled': hasNoneOrOneVideoInput()}">
+        <div class="preferences-option" data-bind="css: {'preferences-av-select-disabled': hasNoneOrOneVideoInput() || isRequestingVideo()}">
           <div class="preferences-option-icon preferences-av-select-icon">
             <camera-icon></camera-icon>
           </div>
           <div class="input-select">
             <select class="preferences-av-select" name="select"
-                    data-bind="attr: {'disabled': hasNoneOrOneVideoInput()},
-                               css: {'preferences-av-select-disabled': hasNoneOrOneVideoInput()},
+                    data-bind="attr: {'disabled': hasNoneOrOneVideoInput() || isRequestingVideo()},
+                               css: {'preferences-av-select-disabled': hasNoneOrOneVideoInput() || isRequestingVideo()},
                                options: availableDevices.videoInput,
                                optionsText: function(item) {return item.label || z.string.preferencesAVCamera},
                                optionsValue: 'deviceId',

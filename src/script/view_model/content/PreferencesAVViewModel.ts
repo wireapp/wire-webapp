@@ -128,14 +128,23 @@ export class PreferencesAVViewModel {
   private async initiateDevices(mediaType: MediaType): Promise<void> {
     switch (mediaType) {
       case MediaType.AUDIO: {
+        if (this.isRequestingAudio()) {
+          return;
+        }
         this.isRequestingAudio(true);
         break;
       }
       case MediaType.VIDEO: {
+        if (this.isRequestingVideo()) {
+          return;
+        }
         this.isRequestingVideo(true);
         break;
       }
       case MediaType.AUDIO_VIDEO: {
+        if (this.isRequestingAudio() || this.isRequestingVideo()) {
+          return;
+        }
         this.isRequestingAudio(true);
         this.isRequestingVideo(true);
       }
