@@ -364,7 +364,7 @@ export class EmojiInputViewModel {
         }
 
         return queryWords.every(queryWord => {
-          return emojiNameWords.some((emojiNameWord: string) => emojiNameWord.startsWith(queryWord));
+          return emojiNameWords.some<string>(emojiNameWord => emojiNameWord.startsWith(queryWord));
         });
       })
       .reduce((accumulator, emoji) => {
