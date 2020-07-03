@@ -49,7 +49,15 @@ import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {PromiseQueue} from 'Util/PromiseQueue';
 import {Declension, joinNames, t} from 'Util/LocalizerUtil';
 import {getDifference, getNextItem} from 'Util/ArrayUtil';
-import {arrayToBase64, createRandomUuid, loadUrlBlob, sortGroupsByLastEvent} from 'Util/util';
+import {
+  arrayToBase64,
+  createRandomUuid,
+  loadUrlBlob,
+  sortGroupsByLastEvent,
+  allowsAllFiles,
+  hasAllowedExtension,
+  getFileExtensionOrName,
+} from 'Util/util';
 import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
 import {
   capitalizeFirstChar,
@@ -2744,8 +2752,8 @@ export class ConversationRepository {
     await this.eventRepository.injectEvent(legalHoldUpdateMessage);
   }
 
-  async injectFileTypeRestrictedMessage(conversation, user, isIncoming, fileExt) {
-    const fileRestrictionMessage = EventBuilder.buildFileTypeRestricted(conversation, user, isIncoming, fileExt);
+  async injectFileTypeRestrictedMessage(conversation, user, isIncoming, fileExt, id = createRandomUuid()) {
+    const fileRestrictionMessage = EventBuilder.buildFileTypeRestricted(conversation, user, isIncoming, fileExt, id);
     await this.eventRepository.injectEvent(fileRestrictionMessage);
   }
 
@@ -3740,7 +3748,7 @@ export class ConversationRepository {
    * @param {Object} event JSON data of 'conversation.asset-add'
    * @returns {Promise} Resolves when the event was handled
    */
-  _onAssetAdd(conversationEntity, event) {
+  async _onAssetAdd(conversationEntity, event) {
     const fromSelf = event.from === this.selfUser().id;
 
     const isRemoteFailure = !fromSelf && event.data.status === AssetTransferState.UPLOAD_FAILED;
@@ -3759,12 +3767,24 @@ export class ConversationRepository {
       return conversationEntity.updateTimestamps(conversationEntity.getLastMessage(), true);
     }
 
-    return this._addEventToConversation(conversationEntity, event).then(({messageEntity}) => {
-      const firstAsset = messageEntity.get_first_asset();
-      if (firstAsset.is_image() || firstAsset.status() === AssetTransferState.UPLOADED) {
-        return {conversationEntity, messageEntity};
+    if (!allowsAllFiles()) {
+      const fileName = event.data.info.name;
+      if (!hasAllowedExtension(fileName)) {
+        const user = await this.userRepository.getUserById(event.from);
+        return this.injectFileTypeRestrictedMessage(
+          conversationEntity,
+          user,
+          true,
+          getFileExtensionOrName(fileName),
+          event.id,
+        );
       }
-    });
+    }
+    const {messageEntity} = await this._addEventToConversation(conversationEntity, event);
+    const firstAsset = messageEntity.get_first_asset();
+    if (firstAsset.is_image() || firstAsset.status() === AssetTransferState.UPLOADED) {
+      return {conversationEntity, messageEntity};
+    }
   }
 
   /**

@@ -177,6 +177,21 @@ export const trimFileExtension = (filename: string): string => {
   return '';
 };
 
+export const allowsAllFiles = (): boolean => {
+  const allowedExtentions = Config.getConfig().FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS;
+  return allowedExtentions.some(extension => ['*', '.*', '*.*'].includes(extension));
+};
+
+export const hasAllowedExtension = (fileName: string): boolean => {
+  const allowedExtentions = Config.getConfig().FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS;
+
+  // Creates a regex like this: (\.txt|\.pdf)$
+  const fileExtRegex = new RegExp(`(\\${allowedExtentions.join('|\\')})$`);
+  return fileExtRegex.test(fileName.toLowerCase());
+};
+
+export const getFileExtensionOrName = (fileName: string): string => fileName.match(/(\.?[^.]*)$/)[0];
+
 export const formatBytes = (bytes: number, decimals: number = 1): string => {
   if (bytes === 0) {
     return '0B';

@@ -181,6 +181,7 @@ export const EventBuilder = {
     user: User,
     isIncoming: boolean,
     fileExt: string,
+    id: string,
   ): FileTypeRestrictedEvent {
     return {
       conversation: conversation.id,
@@ -190,7 +191,7 @@ export const EventBuilder = {
         name: user.name(),
       },
       from: user.id,
-      id: createRandomUuid(),
+      id,
       time: conversation.get_next_iso_date(),
       type: ClientEvent.CONVERSATION.FILE_TYPE_RESTRICTED,
     };

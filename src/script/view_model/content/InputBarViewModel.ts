@@ -25,7 +25,7 @@ import ko from 'knockout';
 
 import {t} from 'Util/LocalizerUtil';
 import {TIME_IN_MILLIS, formatLocale} from 'Util/TimeUtil';
-import {afterRender, formatBytes} from 'Util/util';
+import {afterRender, formatBytes, allowsAllFiles, hasAllowedExtension, getFileExtensionOrName} from 'Util/util';
 import {renderMessage} from 'Util/messageRenderer';
 import {KEY, isFunctionKey, insertAtCaret} from 'Util/KeyboardUtil';
 import {ParticipantAvatar} from 'Components/participantAvatar';
@@ -97,15 +97,13 @@ export class InputBarViewModel {
   readonly renderMessage: typeof renderMessage;
   readonly input: ko.Observable<string>;
   private readonly showAvailabilityTooltip: ko.PureComputed<boolean>;
-  Config: typeof InputBarViewModel.CONFIG;
+  readonly allowedImageTypes: string;
+  readonly allowedFileTypes: string;
 
   static get CONFIG() {
     return {
       ASSETS: {
         CONCURRENT_UPLOAD_LIMIT: 10,
-      },
-      FILES: {
-        ALLOWED_FILE_UPLOAD_EXTENSIONS: Config.getConfig().FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS,
       },
       GIPHY_TEXT_LENGTH: 256,
       IMAGE: {
@@ -126,7 +124,8 @@ export class InputBarViewModel {
   ) {
     this.shadowInput = null;
     this.textarea = null;
-    this.Config = InputBarViewModel.CONFIG;
+    this.allowedImageTypes = InputBarViewModel.CONFIG.IMAGE.FILE_TYPES.join(',');
+    this.allowedFileTypes = Config.getConfig().FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS.join(',');
 
     this.selectionStart = ko.observable(0);
     this.selectionEnd = ko.observable(0);
@@ -846,22 +845,14 @@ export class InputBarViewModel {
 
   uploadFiles = (files: File[]): void | boolean => {
     const fileArray = Array.from(files);
-    const allowedFileUploadExtensions = InputBarViewModel.CONFIG.FILES.ALLOWED_FILE_UPLOAD_EXTENSIONS;
-    const allowAllExtensions = allowedFileUploadExtensions.some(extension => ['*', '.*', '*.*'].includes(extension));
-
-    if (!allowAllExtensions) {
-      // Creates a regex like this: (\.txt|\.pdf)$
-      const fileExtRegex = new RegExp(`(\\${allowedFileUploadExtensions.join('|\\')})$`);
-
+    if (!allowsAllFiles()) {
       for (const file of fileArray) {
-        const fileExtMatch = fileExtRegex.test(file.name.toLowerCase());
-        if (!fileExtMatch) {
-          const [fileExt] = file.name.match(/(\.?[^.]*)$/);
+        if (!hasAllowedExtension(file.name)) {
           this.conversationRepository.injectFileTypeRestrictedMessage(
             this.conversationEntity(),
             this.selfUser(),
             false,
-            fileExt,
+            getFileExtensionOrName(file.name),
           );
           const options = {
             text: {
