@@ -138,7 +138,7 @@ ko.components.register('group-video-grid', {
           </video>
           <!-- ko if: muted() -->
             <div class="group-video-grid__mute-overlay" data-uie-name="status-call-audio-muted">
-              <micoff-icon></micoff-icon>
+              <mic-off-icon></mic-off-icon>
             </div>
           <!-- /ko -->
         </div>

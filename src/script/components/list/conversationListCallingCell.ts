@@ -292,7 +292,7 @@ ko.components.register('conversation-list-calling-cell', {
       <div class="conversation-list-calling-cell-controls">
         <div class="conversation-list-calling-cell-controls-left">
           <button class="call-ui__button" data-bind="click: () => callActions.toggleMute(call, !isMuted()), css: {'call-ui__button--active': isMuted()}, attr: {'data-uie-value': !isMuted() ? 'inactive' : 'active', 'title': t('videoCallOverlayMute')}" data-uie-name="do-toggle-mute">
-            <micoff-icon class="small-icon"></micoff-icon>
+            <mic-off-icon class="small-icon"></mic-off-icon>
           </button>
           <!-- ko if: showVideoButton() -->
             <button class="call-ui__button" data-bind="click: () => callActions.toggleCamera(call), css: {'call-ui__button--active': selfParticipant.sharesCamera()}, disable: disableVideoButton(), attr: {'data-uie-value': selfParticipant.sharesCamera() ? 'active' : 'inactive', 'title': t('videoCallOverlayVideo')}" data-uie-name="do-toggle-video">

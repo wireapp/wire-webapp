@@ -220,7 +220,7 @@ ko.components.register('fullscreen-video-call', {
         <div class="video-controls__button"
             data-bind="click: () => callActions.toggleMute(call, !isMuted()), css: {'video-controls__button--active': isMuted()}, attr: {'data-uie-value': !isMuted() ? 'inactive' : 'active'}"
             data-uie-name="do-call-controls-video-call-mute">
-          <micoff-icon></micoff-icon>
+          <mic-off-icon></mic-off-icon>
           <div class="video-controls__button__label" data-bind="text: t('videoCallOverlayMute')"></div>
         </div>
 
