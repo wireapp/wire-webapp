@@ -42,7 +42,7 @@ type EmojiBinding = Record<string, EmojiData>;
 export class EmojiInputViewModel {
   private isVisible: boolean;
   private readonly emojiList: {icon: string; name: string}[];
-  private emojiDict: {[key in string]: string} = {};
+  private emojiDict: Record<string, string> = {};
   private readonly emojiDiv: JQuery<HTMLElement>;
   private emojiStartPosition: number;
   private emojiUsageCount: {[key in string]: number} = {};
