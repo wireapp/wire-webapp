@@ -20,8 +20,9 @@
 import {escape} from 'underscore';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
+import ko from 'knockout';
 
-import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {TIME_IN_MILLIS, formatLocale} from 'Util/TimeUtil';
 import {afterRender, formatBytes} from 'Util/util';
@@ -41,13 +42,62 @@ import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
 import {Config} from '../../Config';
 import {ConversationError} from '../../error/ConversationError';
+import {AssetRepository} from 'src/script/assets/AssetRepository';
+import {EventRepository} from 'src/script/event/EventRepository';
+import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
+import {SearchRepository} from 'src/script/search/SearchRepository';
+import {StorageRepository} from 'src/script/storage';
+import {UserRepository} from 'src/script/user/UserRepository';
+import {EmojiInputViewModel} from './EmojiInputViewModel';
+import {User} from 'src/script/entity/User';
+import {Conversation} from 'src/script/entity/Conversation';
+import {Text} from 'src/script/entity/message/Text';
+import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+import {Asset} from 'src/script/entity/message/Asset';
+import {FileAsset} from 'src/script/entity/message/FileAsset';
+import {MediumImage} from 'src/script/entity/message/MediumImage';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.content = z.viewModel.content || {};
+type DraftMessage = {
+  mentions: MentionEntity[];
+  reply: ContentMessage;
+  replyEntityPromise?: Promise<ContentMessage>;
+  text: string;
+};
 
-// Parent: ContentViewModel
-z.viewModel.content.InputBarViewModel = class InputBarViewModel {
+export class InputBarViewModel {
+  private shadowInput: HTMLDivElement;
+  private textarea: HTMLTextAreaElement;
+  private readonly selectionStart: ko.Observable<number>;
+  private readonly selectionEnd: ko.Observable<number>;
+  readonly participantAvatarSize = ParticipantAvatar.SIZE.X_SMALL;
+  readonly conversationEntity: ko.Observable<Conversation>;
+  readonly selfUser: ko.Observable<User>;
+  private readonly conversationHasFocus: ko.Observable<boolean>;
+  private readonly editMessageEntity: ko.Observable<ContentMessage>;
+  readonly replyMessageEntity: ko.Observable<ContentMessage>;
+  readonly replyAsset: ko.PureComputed<Asset | FileAsset | Text | MediumImage>;
+  readonly isEditing: ko.PureComputed<boolean>;
+  readonly isReplying: ko.PureComputed<boolean>;
+  readonly replyMessageId: ko.PureComputed<string>;
+  readonly pastedFile: ko.Observable<File>;
+  readonly pastedFilePreviewUrl: ko.Observable<string>;
+  readonly pastedFileName: ko.Observable<string>;
+  readonly pingDisabled: ko.Observable<boolean>;
+  private readonly editedMention: ko.Observable<{startIndex: number; term: string}>;
+  private readonly currentMentions: ko.ObservableArray<MentionEntity>;
+  readonly hasFocus: ko.PureComputed<boolean>;
+  private readonly hasTextInput: ko.PureComputed<boolean>;
+  private readonly draftMessage: ko.PureComputed<DraftMessage>;
+  readonly mentionSuggestions: ko.PureComputed<User[]>;
+  readonly richTextInput: ko.PureComputed<string>;
+  readonly inputPlaceholder: ko.PureComputed<string>;
+  readonly showGiphyButton: ko.PureComputed<boolean>;
+  readonly pingTooltip: string;
+  readonly hasLocalEphemeralTimer: ko.PureComputed<boolean>;
+  readonly renderMessage: typeof renderMessage;
+  readonly input: ko.Observable<string>;
+  private readonly showAvailabilityTooltip: ko.PureComputed<boolean>;
+
   static get CONFIG() {
     return {
       ASSETS: {
@@ -64,33 +114,20 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     };
   }
 
-  constructor(mainViewModel, contentViewModel, repositories) {
-    this.addedToView = this.addedToView.bind(this);
-    this.addMention = this.addMention.bind(this);
-    this.clickToPing = this.clickToPing.bind(this);
-    this.endMentionFlow = this.endMentionFlow.bind(this);
-    this.onDropFiles = this.onDropFiles.bind(this);
-    this.onPasteFiles = this.onPasteFiles.bind(this);
-    this.onWindowClick = this.onWindowClick.bind(this);
-    this.setElements = this.setElements.bind(this);
-    this.updateSelectionState = this.updateSelectionState.bind(this);
-
+  constructor(
+    private readonly emojiInput: EmojiInputViewModel,
+    private readonly assetRepository: AssetRepository,
+    private readonly eventRepository: EventRepository,
+    private readonly conversationRepository: ConversationRepository,
+    private readonly searchRepository: SearchRepository,
+    private readonly storageRepository: StorageRepository,
+    private readonly userRepository: UserRepository,
+  ) {
     this.shadowInput = null;
     this.textarea = null;
 
     this.selectionStart = ko.observable(0);
     this.selectionEnd = ko.observable(0);
-
-    this.emojiInput = contentViewModel.emojiInput;
-
-    this.assetRepository = repositories.asset;
-    this.eventRepository = repositories.event;
-    this.conversationRepository = repositories.conversation;
-    this.searchRepository = repositories.search;
-    this.storageRepository = repositories.storage;
-    this.userRepository = repositories.user;
-    this.ParticipantAvatar = ParticipantAvatar;
-    this.logger = getLogger('z.viewModel.content.InputBarViewModel');
 
     this.conversationEntity = this.conversationRepository.active_conversation;
     this.selfUser = this.userRepository.self;
@@ -100,32 +137,34 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.editMessageEntity = ko.observable();
     this.replyMessageEntity = ko.observable();
 
-    const handleRepliedMessageDeleted = messageId => {
+    const handleRepliedMessageDeleted = (messageId: string) => {
       if (this.replyMessageEntity() && this.replyMessageEntity().id === messageId) {
         this.replyMessageEntity(undefined);
       }
     };
 
-    const handleRepliedMessageUpdated = (originalMessageId, messageEntity) => {
+    const handleRepliedMessageUpdated = (originalMessageId: string, messageEntity: ContentMessage) => {
       if (this.replyMessageEntity() && this.replyMessageEntity().id === originalMessageId) {
         this.replyMessageEntity(messageEntity);
       }
     };
 
-    ko.pureComputed(() => !!this.replyMessageEntity())
-      .extend({notify: 'always', rateLimit: 100})
-      .subscribeChanged((isReplyingToMessage, wasReplyingToMessage) => {
-        if (isReplyingToMessage !== wasReplyingToMessage) {
-          this.triggerInputChangeEvent();
-          if (isReplyingToMessage) {
-            amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, handleRepliedMessageDeleted);
-            amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.UPDATED, handleRepliedMessageUpdated);
-          } else {
-            amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, handleRepliedMessageDeleted);
-            amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.UPDATED, handleRepliedMessageUpdated);
-          }
+    const computedReplyMessageEntity: any = ko
+      .pureComputed(() => !!this.replyMessageEntity())
+      .extend({notify: 'always', rateLimit: 100});
+
+    computedReplyMessageEntity.subscribeChanged((isReplyingToMessage: boolean, wasReplyingToMessage: boolean) => {
+      if (isReplyingToMessage !== wasReplyingToMessage) {
+        this.triggerInputChangeEvent();
+        if (isReplyingToMessage) {
+          amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, handleRepliedMessageDeleted);
+          amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.UPDATED, handleRepliedMessageUpdated);
+        } else {
+          amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, handleRepliedMessageDeleted);
+          amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.UPDATED, handleRepliedMessageUpdated);
         }
-      });
+      }
+    });
 
     this.replyAsset = ko.pureComputed(() => {
       return this.replyMessageEntity() && this.replyMessageEntity().assets() && this.replyMessageEntity().assets()[0];
@@ -145,11 +184,11 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.currentMentions = ko.observableArray();
 
     this.hasFocus = ko.pureComputed(() => this.isEditing() || this.conversationHasFocus()).extend({notify: 'always'});
-    this.hasTextInput = ko.pureComputed(() => this.input().length);
+    this.hasTextInput = ko.pureComputed(() => !!this.input().length);
 
     this.input = ko.observable('');
 
-    this.input.subscribeChanged((newValue, oldValue) => {
+    (this.input as any).subscribeChanged((newValue: string, oldValue: string) => {
       const difference = newValue.length - oldValue.length;
       const updatedMentions = this.updateMentionRanges(
         this.currentMentions(),
@@ -219,7 +258,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.inputPlaceholder = ko.pureComputed(() => {
       if (this.showAvailabilityTooltip()) {
         const userEntity = this.conversationEntity().firstUserEntity();
-        const availabilityStrings = {
+        const availabilityStrings: Record<string, string> = {
           [Availability.Type.AVAILABLE]: t('userAvailabilityAvailable'),
           [Availability.Type.AWAY]: t('userAvailabilityAway'),
           [Availability.Type.BUSY]: t('userAvailabilityBusy'),
@@ -268,7 +307,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
           this.pastedFilePreviewUrl(URL.createObjectURL(blob));
         }
 
-        const date = formatLocale(blob.lastModifiedDate || new Date(), 'PP, pp');
+        const date = formatLocale(blob.lastModified || new Date(), 'PP, pp');
         return this.pastedFileName(t('conversationSendPastedFile', date));
       }
 
@@ -281,7 +320,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       return conversationEntity.localMessageTimer() && !conversationEntity.hasGlobalMessageTimer();
     });
 
-    this.conversationEntity.subscribe(this.loadInitialStateForConversation.bind(this));
+    this.conversationEntity.subscribe(this.loadInitialStateForConversation);
     this.draftMessage.subscribe(message => {
       if (this.conversationEntity()) {
         this._saveDraftState(this.conversationEntity(), message.text, message.mentions, message.reply);
@@ -293,24 +332,24 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this._initSubscriptions();
   }
 
-  _initSubscriptions() {
-    amplify.subscribe(WebAppEvents.CONVERSATION.IMAGE.SEND, this.uploadImages.bind(this));
-    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.EDIT, this.editMessage.bind(this));
-    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REPLY, this.replyMessage.bind(this));
-    amplify.subscribe(WebAppEvents.EXTENSIONS.GIPHY.SEND, this.sendGiphy.bind(this));
+  _initSubscriptions = (): void => {
+    amplify.subscribe(WebAppEvents.CONVERSATION.IMAGE.SEND, this.uploadImages);
+    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.EDIT, this.editMessage);
+    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REPLY, this.replyMessage);
+    amplify.subscribe(WebAppEvents.EXTENSIONS.GIPHY.SEND, this.sendGiphy);
     amplify.subscribe(WebAppEvents.SEARCH.SHOW, () => this.conversationHasFocus(false));
     amplify.subscribe(WebAppEvents.SEARCH.HIDE, () => {
       window.requestAnimationFrame(() => this.conversationHasFocus(true));
     });
-  }
+  };
 
-  setElements(nodes) {
-    this.textarea = nodes.find(node => node.id === 'conversation-input-bar-text');
-    this.shadowInput = nodes.find(node => node.classList && node.classList.contains('shadow-input'));
+  setElements = (nodes: HTMLElement[]): void => {
+    this.textarea = nodes.find(node => node.id === 'conversation-input-bar-text') as HTMLTextAreaElement;
+    this.shadowInput = nodes.find(node => node.classList && node.classList.contains('shadow-input')) as HTMLDivElement;
     this.updateSelectionState();
-  }
+  };
 
-  async loadInitialStateForConversation(conversationEntity) {
+  loadInitialStateForConversation = async (conversationEntity: Conversation): Promise<void> => {
     this.conversationHasFocus(true);
     this.pastedFile(null);
     this.cancelMessageEditing();
@@ -331,41 +370,51 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         });
       }
     }
-  }
+  };
 
-  async _saveDraftState(conversationEntity, text, mentions, reply) {
-    if (!this.isEditing()) {
-      // we only save state for newly written messages
-      reply = reply && reply.id ? {messageId: reply.id} : {};
-      const storageKey = this._generateStorageKey(conversationEntity);
-      await this.storageRepository.storageService.saveToSimpleStorage(storageKey, {mentions, reply, text});
+  _saveDraftState = async (
+    conversationEntity: Conversation,
+    text: string,
+    mentions: MentionEntity[],
+    reply: ContentMessage,
+  ): Promise<void> => {
+    if (this.isEditing()) {
+      return;
     }
-  }
+    // we only save state for newly written messages
+    const updatedReply = reply && reply.id ? {messageId: reply.id} : {};
+    const storageKey = this._generateStorageKey(conversationEntity);
+    await this.storageRepository.storageService.saveToSimpleStorage(storageKey, {mentions, text, updatedReply});
+  };
 
-  _generateStorageKey(conversationEntity) {
+  _generateStorageKey = (conversationEntity: Conversation): string => {
     return `${StorageKey.CONVERSATION.INPUT}|${conversationEntity.id}`;
-  }
+  };
 
-  async _loadDraftState(conversationEntity) {
+  _loadDraftState = async (conversationEntity: Conversation): Promise<DraftMessage> => {
     const storageKey = this._generateStorageKey(conversationEntity);
     const storageValue = await this.storageRepository.storageService.loadFromSimpleStorage(storageKey);
 
     if (typeof storageValue === 'undefined') {
-      return {mentions: [], reply: {}, text: ''};
+      return {mentions: [], reply: {} as ContentMessage, text: ''};
     }
 
     if (typeof storageValue === 'string') {
-      return {mentions: [], reply: {}, text: storageValue};
+      return {mentions: [], reply: {} as ContentMessage, text: storageValue};
     }
 
-    storageValue.mentions = storageValue.mentions.map(mention => {
+    const draftMessage: DraftMessage = {...(storageValue as DraftMessage)};
+
+    draftMessage.mentions = draftMessage.mentions.map(mention => {
       return new MentionEntity(mention.startIndex, mention.length, mention.userId);
     });
 
-    const replyMessageId = storageValue.reply ? storageValue.reply.messageId : undefined;
+    const replyMessageId = draftMessage.reply
+      ? ((draftMessage.reply as unknown) as {messageId: string}).messageId
+      : undefined;
 
     if (replyMessageId) {
-      storageValue.replyEntityPromise = this.conversationRepository.getMessageInConversationById(
+      draftMessage.replyEntityPromise = this.conversationRepository.getMessageInConversationById(
         conversationEntity,
         replyMessageId,
         false,
@@ -373,20 +422,20 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       );
     }
 
-    return storageValue;
-  }
+    return draftMessage;
+  };
 
-  _resetDraftState() {
+  _resetDraftState = (): void => {
     this.currentMentions.removeAll();
     this.input('');
-  }
+  };
 
-  _createMentionEntity(userEntity) {
+  _createMentionEntity = (userEntity: User): MentionEntity => {
     const mentionLength = userEntity.name().length + 1;
     return new MentionEntity(this.editedMention().startIndex, mentionLength, userEntity.id);
-  }
+  };
 
-  addMention(userEntity, inputElement) {
+  addMention = (userEntity: User, inputElement: HTMLInputElement): void => {
     const mentionEntity = this._createMentionEntity(userEntity);
 
     // keep track of what is before and after the mention being edited
@@ -405,64 +454,63 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     inputElement.selectionStart = caretPosition;
     inputElement.selectionEnd = caretPosition;
     this.endMentionFlow();
-  }
+  };
 
-  endMentionFlow() {
+  endMentionFlow = (): void => {
     this.editedMention(undefined);
     this.updateSelectionState();
-  }
+  };
 
-  addedToView() {
+  addedToView = (): void => {
     amplify.subscribe(WebAppEvents.SHORTCUT.PING, this.clickToPing);
-  }
+  };
 
-  cancelMessageEditing(resetDraft = true) {
+  cancelMessageEditing = (resetDraft = true): void => {
     this.editMessageEntity(undefined);
     this.replyMessageEntity(undefined);
     if (resetDraft) {
       this._resetDraftState();
     }
-  }
+  };
 
-  cancelMessageReply(resetDraft = true) {
+  cancelMessageReply = (resetDraft = true): void => {
     this.replyMessageEntity(undefined);
     if (resetDraft) {
       this._resetDraftState();
     }
-  }
+  };
 
-  handleCancelReply() {
+  handleCancelReply = (): void => {
     if (!this.mentionSuggestions().length) {
       this.cancelMessageReply(false);
     }
     this.textarea.focus();
-  }
+  };
 
-  clickToCancelPastedFile() {
+  clickToCancelPastedFile = (): void => {
     this.pastedFile(null);
-  }
+  };
 
-  clickToShowGiphy() {
+  clickToShowGiphy = (): void => {
     amplify.publish(WebAppEvents.EXTENSIONS.GIPHY.SHOW, this.input());
-  }
+  };
 
-  clickToPing() {
+  clickToPing = (): void => {
     if (this.conversationEntity() && !this.pingDisabled()) {
       this.pingDisabled(true);
       this.conversationRepository.sendKnock(this.conversationEntity()).then(() => {
         window.setTimeout(() => this.pingDisabled(false), InputBarViewModel.CONFIG.PING_TIMEOUT);
       });
     }
-  }
+  };
 
-  editMessage(messageEntity) {
+  editMessage = (messageEntity: ContentMessage): void => {
     if (messageEntity && messageEntity.is_editable() && messageEntity !== this.editMessageEntity()) {
       this.cancelMessageReply();
       this.cancelMessageEditing();
       this.editMessageEntity(messageEntity);
-
-      this.input(messageEntity.get_first_asset().text);
-      const newMentions = messageEntity.get_first_asset().mentions().slice();
+      this.input((messageEntity.get_first_asset() as Text).text);
+      const newMentions = (messageEntity.get_first_asset() as Text).mentions().slice();
       this.currentMentions(newMentions);
 
       if (messageEntity.quote()) {
@@ -473,49 +521,52 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
       this._moveCursorToEnd();
     }
-  }
+  };
 
-  replyMessage(messageEntity) {
+  replyMessage = (messageEntity: ContentMessage): void => {
     if (messageEntity && messageEntity.isReplyable() && messageEntity !== this.replyMessageEntity()) {
       this.cancelMessageReply(false);
       this.cancelMessageEditing(!!this.editMessageEntity());
       this.replyMessageEntity(messageEntity);
       this.textarea.focus();
     }
-  }
+  };
 
-  onDropFiles(droppedFiles) {
-    const images = [];
-    const files = [];
+  onDropFiles = (droppedFiles: File[]): void => {
+    const images: File[] = [];
+    const files: File[] = [];
 
     const tooManyConcurrentUploads = this._isHittingUploadLimit(droppedFiles);
-    if (!tooManyConcurrentUploads) {
-      Array.from(droppedFiles).forEach(file => {
-        const isSupportedImage = InputBarViewModel.CONFIG.IMAGE.FILE_TYPES.includes(file.type);
-        if (isSupportedImage) {
-          return images.push(file);
-        }
-        files.push(file);
-      });
-
-      this.uploadImages(images);
-      this.uploadFiles(files);
+    if (tooManyConcurrentUploads) {
+      return;
     }
-  }
 
-  onPasteFiles(pastedFiles) {
+    Array.from(droppedFiles).forEach((file): void | number => {
+      const isSupportedImage = InputBarViewModel.CONFIG.IMAGE.FILE_TYPES.includes(file.type);
+      if (isSupportedImage) {
+        return images.push(file);
+      }
+      files.push(file);
+    });
+
+    this.uploadImages(images);
+    this.uploadFiles(files);
+  };
+
+  onPasteFiles = (pastedFiles: File[]): void => {
     const [pastedFile] = pastedFiles;
     this.pastedFile(pastedFile);
-  }
+  };
 
-  onWindowClick(event) {
-    if (!$(event.target).closest('.conversation-input-bar, .conversation-input-bar-mention-suggestion').length) {
-      this.cancelMessageEditing();
-      this.cancelMessageReply();
+  onWindowClick = (event: Event): void => {
+    if ($(event.target).closest('.conversation-input-bar, .conversation-input-bar-mention-suggestion').length) {
+      return;
     }
-  }
+    this.cancelMessageEditing();
+    this.cancelMessageReply();
+  };
 
-  onInputEnter(data, event) {
+  onInputEnter = (data: unknown, event: Event): void | boolean => {
     if (this.pastedFile()) {
       return this.sendPastedFile();
     }
@@ -540,23 +591,23 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     }
 
     if (this.isEditing()) {
-      this.sendMessageEdit(messageText, this.editMessageEntity(), this.replyMessageEntity());
+      this.sendMessageEdit(messageText, this.editMessageEntity());
     } else {
       this.sendMessage(messageText, this.replyMessageEntity());
     }
 
     this._resetDraftState();
     $(event.target).focus();
-  }
+  };
 
-  onInputKeyDown(data, keyboardEvent) {
+  onInputKeyDown = (data: unknown, keyboardEvent: KeyboardEvent): void | boolean => {
     const inputHandledByEmoji = !this.editedMention() && this.emojiInput.onInputKeyDown(data, keyboardEvent);
 
     if (!inputHandledByEmoji) {
       switch (keyboardEvent.key) {
         case KEY.ARROW_UP: {
           if (!isFunctionKey(keyboardEvent) && !this.input().length) {
-            this.editMessage(this.conversationEntity().get_last_editable_message());
+            this.editMessage(this.conversationEntity().get_last_editable_message() as ContentMessage);
             this.updateMentions(data, keyboardEvent);
           }
           break;
@@ -577,8 +628,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
         case KEY.ENTER: {
           if (keyboardEvent.altKey || keyboardEvent.metaKey) {
-            insertAtCaret(keyboardEvent.target, '\n');
-            ko.utils.triggerEvent(keyboardEvent.target, 'change');
+            insertAtCaret(keyboardEvent.target.toString(), '\n');
+            ko.utils.triggerEvent(keyboardEvent.target as Element, 'change');
             keyboardEvent.preventDefault();
           }
           break;
@@ -590,18 +641,13 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
       return true;
     }
-  }
+  };
 
-  /**
-   * Returns a term which is a mention match together with its starting position.
-   * If nothing could be matched, it returns `undefined`.
-   *
-   * @param {number} selectionStart Current caret position or start of selection  (if text is marked)
-   * @param {number} selectionEnd Current caret position or end of selection (if text is marked)
-   * @param {string} value Text input
-   * @returns {undefined|{startIndex: number, term: string}} Matched mention info
-   */
-  getMentionCandidate(selectionStart, selectionEnd, value) {
+  getMentionCandidate = (
+    selectionStart: number,
+    selectionEnd: number,
+    value: string,
+  ): {startIndex: number; term: string} => {
     const textInSelection = value.substring(selectionStart, selectionEnd);
     const wordBeforeSelection = value.substring(0, selectionStart).replace(/[^]*\s/, '');
     const isSpaceSelected = /\s/.test(textInSelection);
@@ -621,16 +667,16 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     }
 
     return undefined;
-  }
+  };
 
-  handleMentionFlow() {
+  handleMentionFlow = (): void => {
     const {selectionStart, selectionEnd, value} = this.textarea;
     const mentionCandidate = this.getMentionCandidate(selectionStart, selectionEnd, value);
     this.editedMention(mentionCandidate);
     this.updateSelectionState();
-  }
+  };
 
-  updateSelectionState() {
+  updateSelectionState = (): void => {
     if (!this.textarea) {
       return;
     }
@@ -651,10 +697,10 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     }
     this.selectionStart(newStart);
     this.selectionEnd(newEnd);
-  }
+  };
 
-  updateMentions(data, event) {
-    const textarea = event.target;
+  updateMentions = (data: unknown, event: Event): void => {
+    const textarea = event.target as HTMLTextAreaElement;
     const value = textarea.value;
     const previousValue = this.input();
 
@@ -665,9 +711,9 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       textarea.selectionStart = edgeMention.startIndex;
       textarea.selectionEnd = edgeMention.endIndex;
     }
-  }
+  };
 
-  detectMentionEdgeDeletion(textarea, lengthDifference) {
+  detectMentionEdgeDeletion = (textarea: HTMLTextAreaElement, lengthDifference: number): MentionEntity => {
     const hadSelection = this.selectionStart() !== this.selectionEnd();
     if (hadSelection) {
       return null;
@@ -679,9 +725,14 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     const forwardDeleted = currentSelectionStart === this.selectionStart();
     const checkPosition = forwardDeleted ? currentSelectionStart + 1 : currentSelectionStart;
     return this.findMentionAtPosition(checkPosition, this.currentMentions());
-  }
+  };
 
-  updateMentionRanges(mentions, start, end, difference) {
+  updateMentionRanges = (
+    mentions: MentionEntity[],
+    start: number,
+    end: number,
+    difference: number,
+  ): MentionEntity[] => {
     const remainingMentions = mentions.filter(({startIndex, endIndex}) => endIndex <= start || startIndex >= end);
 
     remainingMentions.forEach(mention => {
@@ -691,71 +742,72 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     });
 
     return remainingMentions;
-  }
+  };
 
-  findMentionAtPosition(position, mentions) {
+  findMentionAtPosition = (position: number, mentions: MentionEntity[]): MentionEntity => {
     return mentions.find(({startIndex, endIndex}) => position > startIndex && position < endIndex);
-  }
+  };
 
-  onInputKeyUp(data, keyboardEvent) {
+  onInputKeyUp = (data: unknown, keyboardEvent: KeyboardEvent): void => {
     if (!this.editedMention()) {
       this.emojiInput.onInputKeyUp(data, keyboardEvent);
     }
     if (keyboardEvent.key !== KEY.ESC) {
       this.handleMentionFlow();
     }
-  }
+  };
 
-  removedFromView() {
+  removedFromView = (): void => {
     amplify.unsubscribeAll(WebAppEvents.SHORTCUT.PING);
-  }
+  };
 
-  triggerInputChangeEvent(newInputHeight = 0, previousInputHeight = 0) {
+  triggerInputChangeEvent = (newInputHeight = 0, previousInputHeight = 0): void => {
     amplify.publish(WebAppEvents.INPUT.RESIZE, newInputHeight - previousInputHeight);
-  }
+  };
 
-  sendGiphy(gifUrl, tag) {
+  sendGiphy = (gifUrl: string, tag: string): void => {
     const conversationEntity = this.conversationEntity();
     const replyMessageEntity = this.replyMessageEntity();
     this._generateQuote(replyMessageEntity).then(quoteEntity => {
       this.conversationRepository.sendGif(conversationEntity, gifUrl, tag, quoteEntity);
       this.cancelMessageEditing(true);
     });
-  }
+  };
 
-  _generateQuote(replyMessageEntity) {
+  _generateQuote = (replyMessageEntity: ContentMessage): Promise<QuoteEntity> => {
     return !replyMessageEntity
       ? Promise.resolve()
       : this.eventRepository
           .loadEvent(replyMessageEntity.conversation_id, replyMessageEntity.id)
           .then(MessageHasher.hashEvent)
-          .then(messageHash => {
+          .then((messageHash: ArrayBuffer) => {
             return new QuoteEntity({
               hash: messageHash,
               messageId: replyMessageEntity.id,
               userId: replyMessageEntity.from,
             });
           });
-  }
+  };
 
-  sendMessage(messageText, replyMessageEntity) {
-    if (messageText.length) {
-      const mentionEntities = this.currentMentions.slice();
-
-      this._generateQuote(replyMessageEntity).then(quoteEntity => {
-        this.conversationRepository.sendTextWithLinkPreview(
-          this.conversationEntity(),
-          messageText,
-          mentionEntities,
-          quoteEntity,
-        );
-        this.cancelMessageReply();
-      });
+  sendMessage = (messageText: string, replyMessageEntity: ContentMessage): void => {
+    if (!messageText.length) {
+      return;
     }
-  }
 
-  sendMessageEdit(messageText, messageEntity) {
-    const mentionEntities = this.currentMentions.slice();
+    const mentionEntities = this.currentMentions.slice(0);
+    this._generateQuote(replyMessageEntity).then(quoteEntity => {
+      this.conversationRepository.sendTextWithLinkPreview(
+        this.conversationEntity(),
+        messageText,
+        mentionEntities,
+        quoteEntity,
+      );
+      this.cancelMessageReply();
+    });
+  };
+
+  sendMessageEdit = (messageText: string, messageEntity: ContentMessage): void | Promise<any> => {
+    const mentionEntities = this.currentMentions.slice(0);
     this.cancelMessageEditing();
 
     if (!messageText.length) {
@@ -770,19 +822,14 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         }
       });
     this.cancelMessageReply();
-  }
+  };
 
-  sendPastedFile() {
+  sendPastedFile = (): void => {
     this.onDropFiles([this.pastedFile()]);
     this.pastedFile(null);
-  }
+  };
 
-  /**
-   * Post images to a conversation.
-   * @param {Array|FileList} images Images
-   * @returns {undefined} No return value
-   */
-  uploadImages(images) {
+  uploadImages = (images: File[]): void => {
     if (!this._isHittingUploadLimit(images)) {
       for (const image of Array.from(images)) {
         const isTooLarge = image.size > Config.getConfig().MAXIMUM_IMAGE_FILE_SIZE;
@@ -793,14 +840,9 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
       this.conversationRepository.upload_images(this.conversationEntity(), images);
     }
-  }
+  };
 
-  /**
-   * Post files to a conversation.
-   * @param {Array|FileList} files Files
-   * @returns {undefined} No return value
-   */
-  uploadFiles(files) {
+  uploadFiles = (files: File[]): void | boolean => {
     const fileArray = Array.from(files);
     const allowedFileUploadExtensions = InputBarViewModel.CONFIG.FILES.ALLOWED_FILE_UPLOAD_EXTENSIONS;
     const allowAllExtensions = allowedFileUploadExtensions.some(extension => ['*', '.*', '*.*'].includes(extension));
@@ -846,9 +888,9 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
       this.conversationRepository.upload_files(this.conversationEntity(), files);
     }
-  }
+  };
 
-  _isHittingUploadLimit(files) {
+  _isHittingUploadLimit = (files: File[]): boolean => {
     const concurrentUploadLimit = InputBarViewModel.CONFIG.ASSETS.CONCURRENT_UPLOAD_LIMIT;
     const concurrentUploads = files.length + this.assetRepository.getNumberOfOngoingUploads();
     const isHittingUploadLimit = concurrentUploads > InputBarViewModel.CONFIG.ASSETS.CONCURRENT_UPLOAD_LIMIT;
@@ -865,9 +907,9 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     }
 
     return isHittingUploadLimit;
-  }
+  };
 
-  _moveCursorToEnd() {
+  _moveCursorToEnd = (): void => {
     afterRender(() => {
       if (this.textarea) {
         const endPosition = this.textarea.value.length;
@@ -875,9 +917,9 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         this.updateSelectionState();
       }
     });
-  }
+  };
 
-  _showUploadWarning(image) {
+  _showUploadWarning = (image: File): void => {
     const isGif = image.type === 'image/gif';
     const maxSize = Config.getConfig().MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024;
     const message = isGif ? t('modalGifTooLargeMessage', maxSize) : t('modalPictureTooLargeMessage', maxSize);
@@ -891,5 +933,5 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     };
 
     amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
-  }
-};
+  };
+}
