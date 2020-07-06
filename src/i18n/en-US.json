@@ -409,6 +409,8 @@
   "extensionsGiphyMessage": "{{tag}} • via giphy.com",
   "extensionsGiphyNoGifs": "Oops, no gifs",
   "extensionsGiphyRandom": "Random",
+  "fileTypeRestrictedIncoming": "File from&nbsp;[bold]{{name}}[/bold]&nbsp;can’t be opened",
+  "fileTypeRestrictedOutgoing": "Sharing files with the {{fileExt}} extension is not permitted by your organization",
   "folderViewTooltip": "Folders",
   "footer.copy": "© Wire Swiss GmbH",
   "footer.wireLink": "wire.com",
@@ -1007,7 +1009,5 @@
   "wireLinux": "{{brandName}} for Linux",
   "wireMacos": "{{brandName}} for macOS",
   "wireWindows": "{{brandName}} for Windows",
-  "wire_for_web": "{{brandName}} for Web",
-  "fileTypeRestrictedIncoming": "File from&nbsp;[bold]{{name}}[/bold]&nbsp;can’t be opened",
-  "fileTypeRestrictedOutgoing": "Sharing files with the {{fileExt}} extension is not permitted by your organization"
+  "wire_for_web": "{{brandName}} for Web"
 }

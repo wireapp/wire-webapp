@@ -409,6 +409,8 @@
   "extensionsGiphyMessage": "{{tag}} giphy.comから",
   "extensionsGiphyNoGifs": "Oops, gifがありません。",
   "extensionsGiphyRandom": "ランダム",
+  "fileTypeRestrictedIncoming": "File from&nbsp;[bold]{{name}}[/bold]&nbsp;can’t be opened",
+  "fileTypeRestrictedOutgoing": "Sharing files with the {{fileExt}} extension is not permitted by your organization",
   "folderViewTooltip": "フォルダ",
   "footer.copy": "© Wire Swiss GmbH",
   "footer.wireLink": "wire.com",

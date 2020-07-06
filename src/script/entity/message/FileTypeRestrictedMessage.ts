@@ -22,9 +22,6 @@ import {t} from 'Util/LocalizerUtil';
 import {SuperType} from '../../message/SuperType';
 import {Message} from './Message';
 
-/**
- * Legal hold system message
- */
 export class FileTypeRestrictedMessage extends Message {
   public caption: string;
   constructor(isIncoming: boolean, name: string, fileExt: string, timestamp: number) {
