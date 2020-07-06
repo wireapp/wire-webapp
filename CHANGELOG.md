@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [16.10.10](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@16.10.9...@wireapp/core@16.10.10) (2020-07-06)
+
+
+### Bug Fixes
+
+* **core, bot-api:** Move access token refresh handler to bot-api ([#3099](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/3099)) ([da102cc](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/da102cc89ca34799c59ccd2435d6d4919d7e9c3b))
+
+
+
+
+
 ## [16.10.9](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@16.10.8...@wireapp/core@16.10.9) (2020-07-06)
 
 **Note:** Version bump only for package @wireapp/core
