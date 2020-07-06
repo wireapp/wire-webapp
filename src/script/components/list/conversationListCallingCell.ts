@@ -85,7 +85,7 @@ class ConversationListCallingCell {
   readonly temporaryUserStyle: boolean;
   readonly videoGrid: ko.PureComputed<Grid>;
   readonly isSelfVerified: ko.Subscribable<boolean>;
-  readonly users: ko.PureComputed<User[]>;
+  readonly participants: ko.PureComputed<Participant[]>;
   readonly selfParticipant: Participant;
 
   constructor({
@@ -148,7 +148,7 @@ class ConversationListCallingCell {
     this.showParticipants = ko.observable(false);
     this.showParticipantsButton = ko.pureComputed(() => this.isOngoing() && this.conversation().isGroup());
     this.participantsButtonLabel = ko.pureComputed(() => {
-      return t('callParticipants', this.users().length);
+      return t('callParticipants', this.participants().length);
     });
     this.showMaximize = ko.pureComputed(() => this.multitasking.isMinimized() && this.isOngoing());
 
@@ -174,11 +174,11 @@ class ConversationListCallingCell {
       return !hasAccessToCamera() && call.initialType === CALL_TYPE.VIDEO && !this.showVideoGrid() && !this.isOngoing();
     });
 
-    this.users = ko.pureComputed(() =>
+    this.participants = ko.pureComputed(() =>
       call
         .participants()
-        .map(({user}) => user)
-        .sort(sortUsersByPriority),
+        .slice()
+        .sort((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user)),
     );
 
     this.selfParticipant = call.getSelfParticipant();
@@ -209,14 +209,6 @@ class ConversationListCallingCell {
     // TODO: this is a very hacky way to get antiscroll to recalculate the height of the conversationlist.
     // Once there is a new solution to this, this needs to go.
     afterRender(() => window.dispatchEvent(new Event('resize')));
-  }
-
-  findUser(userId: string): User {
-    return this.conversationParticipants().find(user => user.id === userId);
-  }
-
-  getCallParticipant(userEntity: User): Participant {
-    return this.call.participants().find(({user}) => user === userEntity);
   }
 }
 
@@ -332,8 +324,8 @@ ko.components.register('conversation-list-calling-cell', {
       </div>
 
       <div class="call-ui__participant-list__wrapper" data-bind="css: {'call-ui__participant-list__wrapper--active': showParticipants}">
-        <div class="call-ui__participant-list" data-bind="foreach: {data: users, as: 'user', noChildContext: true}, fadingscrollbar" data-uie-name="list-call-ui-participants">
-          <participant-item params="participant: user, hideInfo: true, callParticipant: getCallParticipant(user), selfInTeam: $parent.selfInTeam, isSelfVerified: isSelfVerified" data-bind="css: {'no-underline': true}"></participant-item>
+        <div class="call-ui__participant-list" data-bind="foreach: {data: participants, as: 'participant', noChildContext: true}, fadingscrollbar" data-uie-name="list-call-ui-participants">
+          <participant-item params="participant: participant.user, hideInfo: true, callParticipant: participant, selfInTeam: $parent.selfInTeam, isSelfVerified: isSelfVerified" data-bind="css: {'no-underline': true}"></participant-item>
         </div>
       </div>
 
