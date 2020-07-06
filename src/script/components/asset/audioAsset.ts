@@ -144,6 +144,9 @@ ko.components.register('audio-asset', {
         </div>
       <!-- /ko -->
     <!-- /ko -->
+    <!-- ko if:  message.isObfuscated() -->
+      <mic-on-icon></mic-on-icon>
+    <!-- /ko -->
   `,
   viewModel: {
     createViewModel(params: Params, {element}: ko.components.ComponentInfo): AudioAssetComponent {
