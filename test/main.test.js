@@ -23,7 +23,6 @@ window.wire.env = {
   BACKEND_REST: 'http://localhost',
   BACKEND_WS: 'wss://localhost',
   FEATURE: {
-    ALLOWED_FILE_UPLOAD_EXTENSIONS: ['*'],
     CHECK_CONSENT: false,
     DEFAULT_LOGIN_TEMPORARY_CLIENT: false,
     ENABLE_DOMAIN_DISCOVERY: true,

@@ -798,6 +798,7 @@ describe('ConversationRepository', () => {
         const conversation_id = createRandomUuid();
         const message_id = createRandomUuid();
         const sending_user_id = testFactory.user_repository.self().id;
+        spyOn(Config, 'getConfig').and.returnValue({FEATURE: {ALLOWED_FILE_UPLOAD_EXTENSIONS: ['*']}});
 
         // prettier-ignore
         const upload_start = {

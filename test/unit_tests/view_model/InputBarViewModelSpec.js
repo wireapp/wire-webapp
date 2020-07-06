@@ -22,12 +22,16 @@ import {createRandomUuid} from 'Util/util';
 import {User} from 'src/script/entity/User';
 import {TestFactory} from '../../helper/TestFactory';
 import {InputBarViewModel} from 'src/script/view_model/content/InputBarViewModel';
+import {Config} from 'src/script/Config';
 
 describe('InputBarViewModel', () => {
   const testFactory = new TestFactory();
   let viewModel;
 
-  beforeAll(() => testFactory.exposeSearchActors().then(() => testFactory.exposeConversationActors()));
+  beforeAll(() => {
+    testFactory.exposeSearchActors().then(() => testFactory.exposeConversationActors());
+    spyOn(Config, 'getConfig').and.returnValue({FEATURE: {ALLOWED_FILE_UPLOAD_EXTENSIONS: ['*']}});
+  });
 
   beforeEach(() => {
     viewModel = new InputBarViewModel(
