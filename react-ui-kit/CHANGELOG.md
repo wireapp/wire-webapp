@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.31.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.30.3...@wireapp/react-ui-kit@7.31.0) (2020-07-06)
+
+
+### Features
+
+* **react-ui-kit:** Outline selected form elements ([#3098](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/3098)) ([bda99c1](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/bda99c191929eb0ff73b1c5b5954fd3ddba46411))
+
+
+
+
+
 ## [7.30.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.30.2...@wireapp/react-ui-kit@7.30.3) (2020-06-30)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
