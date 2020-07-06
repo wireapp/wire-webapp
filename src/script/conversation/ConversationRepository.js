@@ -55,8 +55,8 @@ import {
   loadUrlBlob,
   sortGroupsByLastEvent,
   allowsAllFiles,
-  hasAllowedExtension,
   getFileExtensionOrName,
+  isAllowedFile,
 } from 'Util/util';
 import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
 import {
@@ -3769,7 +3769,8 @@ export class ConversationRepository {
 
     if (!allowsAllFiles()) {
       const fileName = event.data.info.name;
-      if (!hasAllowedExtension(fileName)) {
+      const contentType = event.data.content_type;
+      if (!isAllowedFile(fileName, contentType)) {
         const user = await this.userRepository.getUserById(event.from);
         return this.injectFileTypeRestrictedMessage(
           conversationEntity,

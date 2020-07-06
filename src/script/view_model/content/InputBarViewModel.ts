@@ -25,7 +25,14 @@ import ko from 'knockout';
 
 import {t} from 'Util/LocalizerUtil';
 import {TIME_IN_MILLIS, formatLocale} from 'Util/TimeUtil';
-import {afterRender, formatBytes, allowsAllFiles, hasAllowedExtension, getFileExtensionOrName} from 'Util/util';
+import {
+  afterRender,
+  formatBytes,
+  allowsAllFiles,
+  hasAllowedExtension,
+  getFileExtensionOrName,
+  allowedImageTypes,
+} from 'Util/util';
 import {renderMessage} from 'Util/messageRenderer';
 import {KEY, isFunctionKey, insertAtCaret} from 'Util/KeyboardUtil';
 import {ParticipantAvatar} from 'Components/participantAvatar';
@@ -106,9 +113,6 @@ export class InputBarViewModel {
         CONCURRENT_UPLOAD_LIMIT: 10,
       },
       GIPHY_TEXT_LENGTH: 256,
-      IMAGE: {
-        FILE_TYPES: ['image/bmp', 'image/gif', 'image/jpeg', 'image/jpg', 'image/png', '.jpg-large'],
-      },
       PING_TIMEOUT: TIME_IN_MILLIS.SECOND * 2,
     };
   }
@@ -124,7 +128,7 @@ export class InputBarViewModel {
   ) {
     this.shadowInput = null;
     this.textarea = null;
-    this.allowedImageTypes = InputBarViewModel.CONFIG.IMAGE.FILE_TYPES.join(',');
+    this.allowedImageTypes = allowedImageTypes.join(',');
     this.allowedFileTypes = Config.getConfig().FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS.join(',');
 
     this.selectionStart = ko.observable(0);
@@ -303,7 +307,7 @@ export class InputBarViewModel {
 
     this.pastedFile.subscribe(blob => {
       if (blob) {
-        const isSupportedFileType = InputBarViewModel.CONFIG.IMAGE.FILE_TYPES.includes(blob.type);
+        const isSupportedFileType = allowedImageTypes.includes(blob.type);
         if (isSupportedFileType) {
           this.pastedFilePreviewUrl(URL.createObjectURL(blob));
         }
@@ -543,7 +547,7 @@ export class InputBarViewModel {
     }
 
     Array.from(droppedFiles).forEach((file): void | number => {
-      const isSupportedImage = InputBarViewModel.CONFIG.IMAGE.FILE_TYPES.includes(file.type);
+      const isSupportedImage = allowedImageTypes.includes(file.type);
       if (isSupportedImage) {
         return images.push(file);
       }
@@ -854,13 +858,7 @@ export class InputBarViewModel {
             false,
             getFileExtensionOrName(file.name),
           );
-          const options = {
-            text: {
-              message: t('modalAssetFileTypeRestrictionMessage', file.name),
-              title: t('modalAssetFileTypeRestrictionHeadline'),
-            },
-          };
-          return amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, options);
+          return false;
         }
       }
     }
