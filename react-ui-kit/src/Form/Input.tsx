@@ -52,6 +52,9 @@ export const inputStyle: <T>(theme: Theme, props: InputProps<T>) => ObjectInterp
     '&::-webkit-input-placeholder': {
       ...placeholderStyle,
     },
+    '&:focus': {
+      boxShadow: `0 0 0 1px ${COLOR.BLUE}`,
+    },
     '&:invalid': !markInvalid
       ? {
           boxShadow: 'none',

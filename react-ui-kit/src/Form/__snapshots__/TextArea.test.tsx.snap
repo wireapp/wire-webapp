@@ -42,6 +42,10 @@ exports[`"TextArea" renders 1`] = `
   text-transform: uppercase;
 }
 
+.emotion-0:focus {
+  box-shadow: 0 0 0 1px #2391d3;
+}
+
 .emotion-0:invalid {
   box-shadow: none;
 }
@@ -97,6 +101,10 @@ exports[`"TextArea" renders as disabled 1`] = `
   color: rgb(141,152,159);
   font-size: 11px;
   text-transform: uppercase;
+}
+
+.emotion-0:focus {
+  box-shadow: 0 0 0 1px #2391d3;
 }
 
 .emotion-0:invalid {
@@ -157,6 +165,10 @@ exports[`"TextArea" renders as invalid 1`] = `
   text-transform: uppercase;
 }
 
+.emotion-0:focus {
+  box-shadow: 0 0 0 1px #2391d3;
+}
+
 <div
   className="emotion-1"
 >
@@ -208,6 +220,10 @@ exports[`"TextArea" renders with placeholderTextTransform 1`] = `
   color: rgb(141,152,159);
   font-size: 11px;
   text-transform: lowercase;
+}
+
+.emotion-0:focus {
+  box-shadow: 0 0 0 1px #2391d3;
 }
 
 .emotion-0:invalid {
