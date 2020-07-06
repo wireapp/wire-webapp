@@ -804,7 +804,6 @@ export class CallingRepository {
     }
 
     const {members}: {members: WcallMember[]} = JSON.parse(membersJson);
-
     this.updateParticipantList(call, members);
     this.updateParticipantMutedState(call, members);
   };

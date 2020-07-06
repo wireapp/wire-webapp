@@ -85,7 +85,7 @@ class ConversationListCallingCell {
   readonly temporaryUserStyle: boolean;
   readonly videoGrid: ko.PureComputed<Grid>;
   readonly isSelfVerified: ko.Subscribable<boolean>;
-  readonly users: ko.PureComputed<User[]>;
+  readonly participants: ko.PureComputed<Participant[]>;
   readonly selfParticipant: Participant;
 
   constructor({
@@ -148,7 +148,7 @@ class ConversationListCallingCell {
     this.showParticipants = ko.observable(false);
     this.showParticipantsButton = ko.pureComputed(() => this.isOngoing() && this.conversation().isGroup());
     this.participantsButtonLabel = ko.pureComputed(() => {
-      return t('callParticipants', this.users().length);
+      return t('callParticipants', this.participants().length);
     });
     this.showMaximize = ko.pureComputed(() => this.multitasking.isMinimized() && this.isOngoing());
 
@@ -174,11 +174,11 @@ class ConversationListCallingCell {
       return !hasAccessToCamera() && call.initialType === CALL_TYPE.VIDEO && !this.showVideoGrid() && !this.isOngoing();
     });
 
-    this.users = ko.pureComputed(() =>
+    this.participants = ko.pureComputed(() =>
       call
         .participants()
-        .map(({user}) => user)
-        .sort(sortUsersByPriority),
+        .slice()
+        .sort((a, b) => sortUsersByPriority(a.user, b.user)),
     );
 
     this.selfParticipant = call.getSelfParticipant();
@@ -209,14 +209,6 @@ class ConversationListCallingCell {
     // TODO: this is a very hacky way to get antiscroll to recalculate the height of the conversationlist.
     // Once there is a new solution to this, this needs to go.
     afterRender(() => window.dispatchEvent(new Event('resize')));
-  }
-
-  findUser(userId: string): User {
-    return this.conversationParticipants().find(user => user.id === userId);
-  }
-
-  getCallParticipant(userEntity: User): Participant {
-    return this.call.participants().find(({user}) => user === userEntity);
   }
 }
 
@@ -292,7 +284,7 @@ ko.components.register('conversation-list-calling-cell', {
       <div class="conversation-list-calling-cell-controls">
         <div class="conversation-list-calling-cell-controls-left">
           <button class="call-ui__button" data-bind="click: () => callActions.toggleMute(call, !isMuted()), css: {'call-ui__button--active': isMuted()}, attr: {'data-uie-value': !isMuted() ? 'inactive' : 'active', 'title': t('videoCallOverlayMute')}" data-uie-name="do-toggle-mute">
-            <micoff-icon class="small-icon"></micoff-icon>
+            <mic-off-icon class="small-icon"></mic-off-icon>
           </button>
           <!-- ko if: showVideoButton() -->
             <button class="call-ui__button" data-bind="click: () => callActions.toggleCamera(call), css: {'call-ui__button--active': selfParticipant.sharesCamera()}, disable: disableVideoButton(), attr: {'data-uie-value': selfParticipant.sharesCamera() ? 'active' : 'inactive', 'title': t('videoCallOverlayVideo')}" data-uie-name="do-toggle-video">
@@ -332,8 +324,8 @@ ko.components.register('conversation-list-calling-cell', {
       </div>
 
       <div class="call-ui__participant-list__wrapper" data-bind="css: {'call-ui__participant-list__wrapper--active': showParticipants}">
-        <div class="call-ui__participant-list" data-bind="foreach: {data: users, as: 'user', noChildContext: true}, fadingscrollbar" data-uie-name="list-call-ui-participants">
-          <participant-item params="participant: user, hideInfo: true, callParticipant: getCallParticipant(user), selfInTeam: $parent.selfInTeam, isSelfVerified: isSelfVerified" data-bind="css: {'no-underline': true}"></participant-item>
+        <div class="call-ui__participant-list" data-bind="foreach: {data: participants, as: 'participant', noChildContext: true}, fadingscrollbar" data-uie-name="list-call-ui-participants">
+          <participant-item params="participant: participant.user, hideInfo: true, callParticipant: participant, selfInTeam: $parent.selfInTeam, isSelfVerified: isSelfVerified" data-bind="css: {'no-underline': true}"></participant-item>
         </div>
       </div>
 
