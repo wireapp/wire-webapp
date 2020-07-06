@@ -178,7 +178,7 @@ class ConversationListCallingCell {
       call
         .participants()
         .slice()
-        .sort((a, b) => sortUsersByPriority(a.user, b.user)),
+        .sort((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user)),
     );
 
     this.selfParticipant = call.getSelfParticipant();
