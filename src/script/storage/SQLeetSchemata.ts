@@ -104,7 +104,6 @@ export class SQLeetSchemata {
           [StorageSchemata.OBJECT_STORE.USERS]: {
             id: SQLiteType.TEXT,
           },
-          [StorageSchemata.OBJECT_STORE.AUTHENTICATION]: SQLiteType.JSON_OR_TEXT,
         },
         version: 1,
       },
