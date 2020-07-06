@@ -18,7 +18,7 @@
  */
 
 import {APIClient} from '@wireapp/api-client';
-import {RegisterData, AccessTokenData, AUTH_ACCESS_TOKEN_KEY} from '@wireapp/api-client/dist/auth';
+import {RegisterData} from '@wireapp/api-client/dist/auth';
 import {
   AUTH_COOKIE_KEY,
   AUTH_TABLE_NAME,
@@ -131,10 +131,6 @@ export class Account extends EventEmitter {
         return engine;
       };
     }
-
-    apiClient.on(APIClient.TOPIC.ACCESS_TOKEN_REFRESH, async (accessToken: AccessTokenData) => {
-      await this.storeEngine?.updateOrCreate(AUTH_TABLE_NAME, AUTH_ACCESS_TOKEN_KEY, accessToken);
-    });
 
     apiClient.on(APIClient.TOPIC.COOKIE_REFRESH, async (cookie?: Cookie) => {
       if (cookie && this.storeEngine) {
