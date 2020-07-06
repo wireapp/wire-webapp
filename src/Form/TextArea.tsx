@@ -52,6 +52,9 @@ export const textAreaStyle: <T>(theme: Theme, props: TextAreaProps<T>) => Object
     '&::-webkit-input-placeholder': {
       ...placeholderStyle,
     },
+    '&:focus': {
+      boxShadow: `0 0 0 1px ${COLOR.BLUE}`,
+    },
     '&:invalid': !markInvalid
       ? {
           boxShadow: 'none',
