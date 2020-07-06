@@ -473,6 +473,15 @@ const missedTemplate: string = `
   </div>
   `;
 
+const fileTypeRestrictedTemplate: string = `
+  <div class="message-header">
+    <div class="message-header-icon">
+      <span class="icon-sysmsg-error text-red"></span>
+    </div>
+    <div class="message-header-label" data-bind="html: message.caption"></div>
+  </div>
+  `;
+
 const unableToDecryptTemplate: string = `
   <div class="message-header">
     <div class="message-header-icon">
@@ -733,6 +742,9 @@ ko.components.register('message', {
     <!-- /ko -->
     <!-- ko if: message.super_type === 'ping' -->
       ${pingTemplate}
+    <!-- /ko -->
+    <!-- ko if: message.super_type === 'file-type-restricted' -->
+      ${fileTypeRestrictedTemplate}
     <!-- /ko -->
     <!-- ko if: message.isLegalHold() -->
       ${legalHoldTemplate}

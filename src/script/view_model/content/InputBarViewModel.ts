@@ -25,7 +25,14 @@ import ko from 'knockout';
 
 import {t} from 'Util/LocalizerUtil';
 import {TIME_IN_MILLIS, formatLocale} from 'Util/TimeUtil';
-import {afterRender, formatBytes} from 'Util/util';
+import {
+  afterRender,
+  formatBytes,
+  allowsAllFiles,
+  hasAllowedExtension,
+  getFileExtensionOrName,
+  allowedImageTypes,
+} from 'Util/util';
 import {renderMessage} from 'Util/messageRenderer';
 import {KEY, isFunctionKey, insertAtCaret} from 'Util/KeyboardUtil';
 import {ParticipantAvatar} from 'Components/participantAvatar';
@@ -97,20 +104,15 @@ export class InputBarViewModel {
   readonly renderMessage: typeof renderMessage;
   readonly input: ko.Observable<string>;
   private readonly showAvailabilityTooltip: ko.PureComputed<boolean>;
-  Config: typeof InputBarViewModel.CONFIG;
+  readonly allowedImageTypes: string;
+  readonly allowedFileTypes: string;
 
   static get CONFIG() {
     return {
       ASSETS: {
         CONCURRENT_UPLOAD_LIMIT: 10,
       },
-      FILES: {
-        ALLOWED_FILE_UPLOAD_EXTENSIONS: Config.getConfig().FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS,
-      },
       GIPHY_TEXT_LENGTH: 256,
-      IMAGE: {
-        FILE_TYPES: ['image/bmp', 'image/gif', 'image/jpeg', 'image/jpg', 'image/png', '.jpg-large'],
-      },
       PING_TIMEOUT: TIME_IN_MILLIS.SECOND * 2,
     };
   }
@@ -126,7 +128,8 @@ export class InputBarViewModel {
   ) {
     this.shadowInput = null;
     this.textarea = null;
-    this.Config = InputBarViewModel.CONFIG;
+    this.allowedImageTypes = allowedImageTypes.join(',');
+    this.allowedFileTypes = Config.getConfig().FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS.join(',');
 
     this.selectionStart = ko.observable(0);
     this.selectionEnd = ko.observable(0);
@@ -304,7 +307,7 @@ export class InputBarViewModel {
 
     this.pastedFile.subscribe(blob => {
       if (blob) {
-        const isSupportedFileType = InputBarViewModel.CONFIG.IMAGE.FILE_TYPES.includes(blob.type);
+        const isSupportedFileType = allowedImageTypes.includes(blob.type);
         if (isSupportedFileType) {
           this.pastedFilePreviewUrl(URL.createObjectURL(blob));
         }
@@ -544,7 +547,7 @@ export class InputBarViewModel {
     }
 
     Array.from(droppedFiles).forEach((file): void | number => {
-      const isSupportedImage = InputBarViewModel.CONFIG.IMAGE.FILE_TYPES.includes(file.type);
+      const isSupportedImage = allowedImageTypes.includes(file.type);
       if (isSupportedImage) {
         return images.push(file);
       }
@@ -846,25 +849,16 @@ export class InputBarViewModel {
 
   uploadFiles = (files: File[]): void | boolean => {
     const fileArray = Array.from(files);
-    const allowedFileUploadExtensions = InputBarViewModel.CONFIG.FILES.ALLOWED_FILE_UPLOAD_EXTENSIONS;
-    const allowAllExtensions = allowedFileUploadExtensions.some(extension => ['*', '.*', '*.*'].includes(extension));
-
-    if (!allowAllExtensions) {
-      // Creates a regex like this: (\.txt|\.pdf)$
-      const fileNameRegex = new RegExp(`(\\${allowedFileUploadExtensions.join('|\\')})$`);
-
+    if (!allowsAllFiles()) {
       for (const file of fileArray) {
-        const allowedFiletype = fileNameRegex.test(file.name.toLowerCase());
-
-        if (!allowedFiletype) {
-          const options = {
-            text: {
-              message: t('modalAssetFileTypeRestrictionMessage', file.name),
-              title: t('modalAssetFileTypeRestrictionHeadline'),
-            },
-          };
-
-          return amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, options);
+        if (!hasAllowedExtension(file.name)) {
+          this.conversationRepository.injectFileTypeRestrictedMessage(
+            this.conversationEntity(),
+            this.selfUser(),
+            false,
+            getFileExtensionOrName(file.name),
+          );
+          return false;
         }
       }
     }

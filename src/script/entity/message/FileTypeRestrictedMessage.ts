@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2020 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,20 +17,17 @@
  *
  */
 
-// Configure default test config
-window.wire = {};
-window.wire.env = {
-  BACKEND_REST: 'http://localhost',
-  BACKEND_WS: 'wss://localhost',
-  FEATURE: {
-    ALLOWED_FILE_UPLOAD_EXTENSIONS: ['*'],
-    CHECK_CONSENT: false,
-    DEFAULT_LOGIN_TEMPORARY_CLIENT: false,
-    ENABLE_DOMAIN_DISCOVERY: true,
-  },
-};
+import {t} from 'Util/LocalizerUtil';
 
-// create initial div element with ID 'main' for react
-const main = document.createElement('div');
-main.id = 'main';
-document.body.appendChild(main);
+import {SuperType} from '../../message/SuperType';
+import {Message} from './Message';
+
+export class FileTypeRestrictedMessage extends Message {
+  public caption: string;
+  constructor(isIncoming: boolean, name: string, fileExt: string, timestamp: number) {
+    super();
+    this.super_type = SuperType.FILE_TYPE_RESTRICTED;
+    this.timestamp(timestamp);
+    this.caption = isIncoming ? t('fileTypeRestrictedIncoming', name) : t('fileTypeRestrictedOutgoing', fileExt);
+  }
+}

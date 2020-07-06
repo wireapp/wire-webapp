@@ -409,6 +409,8 @@
   "extensionsGiphyMessage": "{{tag}} • через giphy.com",
   "extensionsGiphyNoGifs": "Упс, нет GIF-ок",
   "extensionsGiphyRandom": "Случайно",
+  "fileTypeRestrictedIncoming": "File from&nbsp;[bold]{{name}}[/bold]&nbsp;can’t be opened",
+  "fileTypeRestrictedOutgoing": "Sharing files with the {{fileExt}} extension is not permitted by your organization",
   "folderViewTooltip": "Папки",
   "footer.copy": "© Wire Swiss GmbH",
   "footer.wireLink": "wire.com",

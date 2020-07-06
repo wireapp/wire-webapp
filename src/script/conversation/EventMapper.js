@@ -56,6 +56,7 @@ import {MentionEntity} from '../message/MentionEntity';
 import {LegalHoldMessage} from '../entity/message/LegalHoldMessage';
 import {CompositeMessage} from '../entity/message/CompositeMessage';
 import {ConversationError} from '../error/ConversationError';
+import {FileTypeRestrictedMessage} from '../entity/message/FileTypeRestrictedMessage';
 
 // Event Mapper to convert all server side JSON events into core entities.
 export class EventMapper {
@@ -294,6 +295,11 @@ export class EventMapper {
 
       case ClientEvent.CONVERSATION.VOICE_CHANNEL_DEACTIVATE: {
         messageEntity = this._mapEventVoiceChannelDeactivate(event);
+        break;
+      }
+
+      case ClientEvent.CONVERSATION.FILE_TYPE_RESTRICTED: {
+        messageEntity = this._mapFileTypeRestricted(event);
         break;
       }
 
@@ -863,6 +869,14 @@ export class EventMapper {
     }
 
     return assetEntity;
+  }
+
+  _mapFileTypeRestricted(event) {
+    const {
+      data: {isIncoming, name, fileExt},
+      time,
+    } = event;
+    return new FileTypeRestrictedMessage(isIncoming, name, fileExt, time);
   }
 }
 

@@ -23,6 +23,7 @@ export enum SuperType {
   CONTENT = 'normal',
   DELETE = 'delete',
   DEVICE = 'device',
+  FILE_TYPE_RESTRICTED = 'file-type-restricted',
   LEGALHOLD = 'legal-hold',
   LOCATION = 'location',
   MEMBER = 'member',

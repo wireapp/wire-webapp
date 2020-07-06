@@ -409,6 +409,8 @@
   "extensionsGiphyMessage": "{{tag}} • Forrás: giphy.com",
   "extensionsGiphyNoGifs": "Hoppá, nincs gif",
   "extensionsGiphyRandom": "Véletlenszerű",
+  "fileTypeRestrictedIncoming": "File from&nbsp;[bold]{{name}}[/bold]&nbsp;can’t be opened",
+  "fileTypeRestrictedOutgoing": "Sharing files with the {{fileExt}} extension is not permitted by your organization",
   "folderViewTooltip": "Mappák",
   "footer.copy": "© Wire Swiss GmbH",
   "footer.wireLink": "wire.com",
