@@ -134,7 +134,6 @@ export class PreferencesAccountViewModel {
 
     this.name = ko.pureComputed(() => this.selfUser().name());
     this.email = ko.pureComputed(() => this.selfUser().email());
-
     this.availability = ko.pureComputed(() => this.selfUser().availability());
 
     this.availabilityLabel = ko.pureComputed(() => {
