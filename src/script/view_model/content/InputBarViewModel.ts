@@ -73,7 +73,7 @@ type DraftMessage = {
 
 interface Draft {
   mentions: MentionEntity[];
-  reply: {messageId: string} | {};
+  reply: {messageId?: string};
   text: string;
 }
 
