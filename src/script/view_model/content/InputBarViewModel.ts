@@ -143,13 +143,13 @@ export class InputBarViewModel {
     this.replyMessageEntity = ko.observable();
 
     const handleRepliedMessageDeleted = (messageId: string) => {
-      if (this.replyMessageEntity() && this.replyMessageEntity().id === messageId) {
+      if (this.replyMessageEntity()?.id === messageId) {
         this.replyMessageEntity(undefined);
       }
     };
 
     const handleRepliedMessageUpdated = (originalMessageId: string, messageEntity: ContentMessage) => {
-      if (this.replyMessageEntity() && this.replyMessageEntity().id === originalMessageId) {
+      if (this.replyMessageEntity()?.id === originalMessageId) {
         this.replyMessageEntity(messageEntity);
       }
     };
@@ -172,12 +172,12 @@ export class InputBarViewModel {
     });
 
     this.replyAsset = ko.pureComputed(() => {
-      return this.replyMessageEntity() && this.replyMessageEntity().assets() && this.replyMessageEntity().assets()[0];
+      return this.replyMessageEntity()?.assets()?.[0];
     });
 
     this.isEditing = ko.pureComputed(() => !!this.editMessageEntity());
     this.isReplying = ko.pureComputed(() => !!this.replyMessageEntity());
-    this.replyMessageId = ko.pureComputed(() => (this.replyMessageEntity() ? this.replyMessageEntity().id : undefined));
+    this.replyMessageId = ko.pureComputed(() => this.replyMessageEntity()?.id);
 
     this.pastedFile = ko.observable();
     this.pastedFilePreviewUrl = ko.observable();
@@ -369,7 +369,7 @@ export class InputBarViewModel {
 
       if (previousSessionData.replyEntityPromise) {
         previousSessionData.replyEntityPromise.then(replyEntity => {
-          if (replyEntity && replyEntity.isReplyable()) {
+          if (replyEntity?.isReplyable()) {
             this.replyMessageEntity(replyEntity);
           }
         });
@@ -387,9 +387,9 @@ export class InputBarViewModel {
       return;
     }
     // we only save state for newly written messages
-    const updatedReply = reply && reply.id ? {messageId: reply.id} : {};
+    const storeReply = reply?.id ? {messageId: reply.id} : {};
     const storageKey = this._generateStorageKey(conversationEntity);
-    await this.storageRepository.storageService.saveToSimpleStorage(storageKey, {mentions, text, updatedReply});
+    await this.storageRepository.storageService.saveToSimpleStorage(storageKey, {mentions, reply: storeReply, text});
   };
 
   _generateStorageKey = (conversationEntity: Conversation): string => {
