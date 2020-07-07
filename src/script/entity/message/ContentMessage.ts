@@ -68,7 +68,7 @@ export class ContentMessage extends Message {
     this.quote = ko.observable();
     this.readReceipts = ko.observableArray([]);
 
-    this.isLikedProvisional = ko.observable();
+    this.isLikedProvisional = ko.observable(null);
     this.is_liked = ko.pureComputed({
       read: () => {
         const isLikedProvisional = this.isLikedProvisional();
@@ -77,8 +77,7 @@ export class ContentMessage extends Message {
           this.isLikedProvisional(null);
           return isLikedProvisional;
         }
-        const likes = reactionsUserEts.filter(user => user.isMe);
-        return likes.length === 1;
+        return reactionsUserEts.some(user => user.isMe);
       },
       write: value => {
         return this.isLikedProvisional(value);
