@@ -21,6 +21,7 @@ import * as platform from 'platform';
 
 const BROWSER = {
   CHROME: 'chrome',
+  CHROMIUM: 'chromium',
   EDGE: 'microsoft edge',
   ELECTRON: 'electron',
   FIREFOX: 'firefox',
@@ -48,9 +49,10 @@ export const OS = {
 
 export const SUPPORTED_BROWSERS = {
   [BROWSER.CHROME]: {major: 56, minor: 0},
-  [BROWSER.FIREFOX]: {major: 60, minor: 0},
+  [BROWSER.CHROMIUM]: {major: 56, minor: 0},
   [BROWSER.EDGE]: {major: 15, minor: 0},
   [BROWSER.ELECTRON]: {major: 1, minor: 6},
+  [BROWSER.FIREFOX]: {major: 60, minor: 0},
   [BROWSER.OPERA]: {major: 43, minor: 0},
 };
 
