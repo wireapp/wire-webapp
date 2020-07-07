@@ -31,8 +31,9 @@ import {BackendEvent} from '../event/Backend';
 import {StorageSchemata} from '../storage/StorageSchemata';
 import {EventRepository} from '../event/EventRepository';
 
-import {h as createElement, init as snabbdomInit} from 'snabbdom';
-import style from 'snabbdom/modules/style';
+import {h as createElement} from 'snabbdom/h';
+import {init as snabbdomInit} from 'snabbdom/init';
+import {styleModule} from 'snabbdom/modules/style';
 
 function downloadText(text, filename = 'default.txt') {
   const url = `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`;
@@ -413,7 +414,7 @@ export class DebugUtil {
     const statsDomElement = document.createElement('div');
     statsDomElement.id = containerId;
     document.body.appendChild(statsDomElement);
-    const patch = snabbdomInit([style]);
+    const patch = snabbdomInit([styleModule]);
     let vdom = createElement('div');
     patch(statsDomElement, vdom);
 
