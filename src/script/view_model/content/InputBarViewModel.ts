@@ -71,6 +71,12 @@ type DraftMessage = {
   text: string;
 };
 
+interface Draft {
+  mentions: MentionEntity[];
+  reply: {messageId?: string};
+  text: string;
+}
+
 export class InputBarViewModel {
   private shadowInput: HTMLDivElement;
   private textarea: HTMLTextAreaElement;
@@ -143,13 +149,13 @@ export class InputBarViewModel {
     this.replyMessageEntity = ko.observable();
 
     const handleRepliedMessageDeleted = (messageId: string) => {
-      if (this.replyMessageEntity() && this.replyMessageEntity().id === messageId) {
+      if (this.replyMessageEntity()?.id === messageId) {
         this.replyMessageEntity(undefined);
       }
     };
 
     const handleRepliedMessageUpdated = (originalMessageId: string, messageEntity: ContentMessage) => {
-      if (this.replyMessageEntity() && this.replyMessageEntity().id === originalMessageId) {
+      if (this.replyMessageEntity()?.id === originalMessageId) {
         this.replyMessageEntity(messageEntity);
       }
     };
@@ -172,12 +178,12 @@ export class InputBarViewModel {
     });
 
     this.replyAsset = ko.pureComputed(() => {
-      return this.replyMessageEntity() && this.replyMessageEntity().assets() && this.replyMessageEntity().assets()[0];
+      return this.replyMessageEntity()?.assets()?.[0];
     });
 
     this.isEditing = ko.pureComputed(() => !!this.editMessageEntity());
     this.isReplying = ko.pureComputed(() => !!this.replyMessageEntity());
-    this.replyMessageId = ko.pureComputed(() => (this.replyMessageEntity() ? this.replyMessageEntity().id : undefined));
+    this.replyMessageId = ko.pureComputed(() => this.replyMessageEntity()?.id);
 
     this.pastedFile = ko.observable();
     this.pastedFilePreviewUrl = ko.observable();
@@ -280,7 +286,7 @@ export class InputBarViewModel {
     });
 
     this.showAvailabilityTooltip = ko.pureComputed(() => {
-      if (this.conversationEntity() && this.conversationEntity().firstUserEntity()) {
+      if (this.conversationEntity()?.firstUserEntity()) {
         const isOne2OneConversation = this.conversationEntity().is1to1();
         const firstUserEntity = this.conversationEntity().firstUserEntity();
         const availabilityIsNone = firstUserEntity.availability() === Availability.Type.NONE;
@@ -350,7 +356,7 @@ export class InputBarViewModel {
 
   setElements = (nodes: HTMLElement[]): void => {
     this.textarea = nodes.find(node => node.id === 'conversation-input-bar-text') as HTMLTextAreaElement;
-    this.shadowInput = nodes.find(node => node.classList && node.classList.contains('shadow-input')) as HTMLDivElement;
+    this.shadowInput = nodes.find(node => node.classList?.contains('shadow-input')) as HTMLDivElement;
     this.updateSelectionState();
   };
 
@@ -369,7 +375,7 @@ export class InputBarViewModel {
 
       if (previousSessionData.replyEntityPromise) {
         previousSessionData.replyEntityPromise.then(replyEntity => {
-          if (replyEntity && replyEntity.isReplyable()) {
+          if (replyEntity?.isReplyable()) {
             this.replyMessageEntity(replyEntity);
           }
         });
@@ -387,9 +393,13 @@ export class InputBarViewModel {
       return;
     }
     // we only save state for newly written messages
-    const updatedReply = reply && reply.id ? {messageId: reply.id} : {};
+    const storeReply = reply?.id ? {messageId: reply.id} : {};
     const storageKey = this._generateStorageKey(conversationEntity);
-    await this.storageRepository.storageService.saveToSimpleStorage(storageKey, {mentions, text, updatedReply});
+    await this.storageRepository.storageService.saveToSimpleStorage<Draft>(storageKey, {
+      mentions,
+      reply: storeReply,
+      text,
+    });
   };
 
   _generateStorageKey = (conversationEntity: Conversation): string => {
@@ -398,7 +408,7 @@ export class InputBarViewModel {
 
   _loadDraftState = async (conversationEntity: Conversation): Promise<DraftMessage> => {
     const storageKey = this._generateStorageKey(conversationEntity);
-    const storageValue = await this.storageRepository.storageService.loadFromSimpleStorage(storageKey);
+    const storageValue = await this.storageRepository.storageService.loadFromSimpleStorage<Draft>(storageKey);
 
     if (typeof storageValue === 'undefined') {
       return {mentions: [], reply: {} as ContentMessage, text: ''};
@@ -510,7 +520,7 @@ export class InputBarViewModel {
   };
 
   editMessage = (messageEntity: ContentMessage): void => {
-    if (messageEntity && messageEntity.is_editable() && messageEntity !== this.editMessageEntity()) {
+    if (messageEntity?.is_editable() && messageEntity !== this.editMessageEntity()) {
       this.cancelMessageReply();
       this.cancelMessageEditing();
       this.editMessageEntity(messageEntity);
@@ -529,7 +539,7 @@ export class InputBarViewModel {
   };
 
   replyMessage = (messageEntity: ContentMessage): void => {
-    if (messageEntity && messageEntity.isReplyable() && messageEntity !== this.replyMessageEntity()) {
+    if (messageEntity?.isReplyable() && messageEntity !== this.replyMessageEntity()) {
       this.cancelMessageReply(false);
       this.cancelMessageEditing(!!this.editMessageEntity());
       this.replyMessageEntity(messageEntity);
