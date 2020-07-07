@@ -71,6 +71,12 @@ type DraftMessage = {
   text: string;
 };
 
+interface Draft {
+  mentions: MentionEntity[];
+  reply: {messageId: string} | {};
+  text: string;
+}
+
 export class InputBarViewModel {
   private shadowInput: HTMLDivElement;
   private textarea: HTMLTextAreaElement;
@@ -389,7 +395,11 @@ export class InputBarViewModel {
     // we only save state for newly written messages
     const storeReply = reply?.id ? {messageId: reply.id} : {};
     const storageKey = this._generateStorageKey(conversationEntity);
-    await this.storageRepository.storageService.saveToSimpleStorage(storageKey, {mentions, reply: storeReply, text});
+    await this.storageRepository.storageService.saveToSimpleStorage<Draft>(storageKey, {
+      mentions,
+      reply: storeReply,
+      text,
+    });
   };
 
   _generateStorageKey = (conversationEntity: Conversation): string => {
@@ -398,7 +408,7 @@ export class InputBarViewModel {
 
   _loadDraftState = async (conversationEntity: Conversation): Promise<DraftMessage> => {
     const storageKey = this._generateStorageKey(conversationEntity);
-    const storageValue = await this.storageRepository.storageService.loadFromSimpleStorage(storageKey);
+    const storageValue = await this.storageRepository.storageService.loadFromSimpleStorage<Draft>(storageKey);
 
     if (typeof storageValue === 'undefined') {
       return {mentions: [], reply: {} as ContentMessage, text: ''};
