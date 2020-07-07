@@ -17,29 +17,40 @@
  *
  */
 
-import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {formatTimestamp} from 'Util/TimeUtil';
-
+import {amplify} from 'amplify';
+import ko from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {ContentViewModel} from '../ContentViewModel';
 import {sortUserDevices} from 'Components/userDevices';
+import {MainViewModel} from '../MainViewModel';
+import {ClientRepository} from '../../client/ClientRepository';
+import {CryptographyRepository} from '../../cryptography/CryptographyRepository';
+import {UserRepository} from '../../user/UserRepository';
+import {User} from '../../entity/User';
+import {ClientEntity} from '../../client/ClientEntity';
+import {ActionsViewModel} from '../ActionsViewModel';
+import {PreferencesDeviceDetailsViewModel} from './PreferencesDeviceDetailsViewModel';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.content = z.viewModel.content || {};
+export class PreferencesDevicesViewModel {
+  private readonly actionsViewModel: ActionsViewModel;
+  private readonly preferencesDeviceDetails: PreferencesDeviceDetailsViewModel;
+  readonly currentClient: ko.Observable<ClientEntity>;
+  readonly displayClientId: ko.PureComputed<string[]>;
+  readonly activationDate: ko.Observable<string>;
+  readonly devices: ko.PureComputed<ClientEntity[]>;
+  readonly localFingerprint: ko.ObservableArray<string>;
+  private readonly selfUser: ko.Observable<User>;
+  readonly isSSO: ko.PureComputed<boolean>;
 
-z.viewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewModel {
-  constructor(mainViewModel, contentViewModel, repositories) {
-    this.clickOnRemoveDevice = this.clickOnRemoveDevice.bind(this);
-    this.clickOnShowDevice = this.clickOnShowDevice.bind(this);
-    this.updateDeviceInfo = this.updateDeviceInfo.bind(this);
-
-    this.clientRepository = repositories.client;
-    this.cryptographyRepository = repositories.cryptography;
-    this.userRepository = repositories.user;
-    this.logger = getLogger('z.viewModel.content.PreferencesDevicesViewModel');
-
+  constructor(
+    mainViewModel: MainViewModel,
+    contentViewModel: ContentViewModel,
+    private readonly clientRepository: ClientRepository,
+    private readonly cryptographyRepository: CryptographyRepository,
+    private readonly userRepository: UserRepository,
+  ) {
     this.actionsViewModel = mainViewModel.actions;
     this.preferencesDeviceDetails = contentViewModel.preferencesDeviceDetails;
     this.currentClient = this.clientRepository.currentClient;
@@ -58,21 +69,21 @@ z.viewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
     this.isSSO = ko.pureComputed(() => this.selfUser() && this.selfUser().isSingleSignOn);
   }
 
-  clickOnShowDevice(clientEntity) {
+  clickOnShowDevice = (clientEntity: ClientEntity): void => {
     this.preferencesDeviceDetails.device(clientEntity);
     amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS);
-  }
+  };
 
-  clickOnRemoveDevice(clientEntity, event) {
+  clickOnRemoveDevice = (clientEntity: ClientEntity, event: MouseEvent): void => {
     this.actionsViewModel.deleteClient(clientEntity);
     event.stopPropagation();
-  }
+  };
 
-  updateDeviceInfo() {
+  updateDeviceInfo = (): void => {
     if (this.currentClient() && !this.localFingerprint().length) {
       const date = formatTimestamp(this.currentClient().time);
       this.activationDate(t('preferencesDevicesActivatedOn', {date}));
       this.localFingerprint(this.cryptographyRepository.getLocalFingerprint());
     }
-  }
-};
+  };
+}

@@ -573,7 +573,10 @@ export class CallingRepository {
         break;
 
       case MediaType.VIDEO:
-        activeCall.selfParticipant.releaseVideoStream();
+        // Don't stop video input (coming from A/V preferences) when screensharing is activated
+        if (!activeCall.selfParticipant.sharesScreen()) {
+          activeCall.selfParticipant.releaseVideoStream();
+        }
         break;
     }
     return true;
@@ -586,15 +589,22 @@ export class CallingRepository {
     if (!call) {
       return;
     }
+
     if (mediaType === MediaType.AUDIO) {
       const audioTracks = mediaStream.getAudioTracks().map(track => track.clone());
-      call.selfParticipant.setAudioStream(new MediaStream(audioTracks));
-      this.wCall.replaceTrack(call.conversationId, audioTracks[0]);
+      if (audioTracks.length > 0) {
+        call.selfParticipant.setAudioStream(new MediaStream(audioTracks));
+        this.wCall.replaceTrack(call.conversationId, audioTracks[0]);
+      }
     }
-    if (mediaType === MediaType.VIDEO && call.selfParticipant.sharesCamera()) {
+
+    // Don't update video input (coming from A/V preferences) when screensharing is activated
+    if (mediaType === MediaType.VIDEO && call.selfParticipant.sharesCamera() && !call.selfParticipant.sharesScreen()) {
       const videoTracks = mediaStream.getVideoTracks().map(track => track.clone());
-      call.selfParticipant.setVideoStream(new MediaStream(videoTracks));
-      this.wCall.replaceTrack(call.conversationId, videoTracks[0]);
+      if (videoTracks.length > 0) {
+        call.selfParticipant.setVideoStream(new MediaStream(videoTracks));
+        this.wCall.replaceTrack(call.conversationId, videoTracks[0]);
+      }
     }
   }
 
@@ -973,9 +983,11 @@ export class CallingRepository {
   }
 
   private checkConcurrentJoinedCall(conversationId: ConversationId, newCallState: CALL_STATE): Promise<void> {
-    const activeCall = this.activeCalls().find(call => call.conversationId !== conversationId);
     const idleCallStates = [CALL_STATE.INCOMING, CALL_STATE.NONE, CALL_STATE.UNKNOWN];
-    if (!activeCall || idleCallStates.includes(activeCall.state())) {
+    const activeCall = this.activeCalls().find(
+      call => call.conversationId !== conversationId && !idleCallStates.includes(call.state()),
+    );
+    if (!activeCall) {
       return Promise.resolve();
     }
 

@@ -35,8 +35,8 @@ import {AssetRepository} from '../../assets/AssetRepository';
 
 export class ContentMessage extends Message {
   readonly edited_timestamp: ko.Observable<number>;
-  private readonly is_liked_provisional: ko.Observable<boolean>;
-  private readonly quote: ko.Observable<QuoteEntity>;
+  private readonly isLikedProvisional: ko.Observable<boolean>;
+  public readonly quote: ko.Observable<QuoteEntity>;
   private readonly reactions_user_ets: ko.ObservableArray<User>;
   readonly reactions: ko.Observable<{[userId: string]: string}>;
   public readonly assets: ko.ObservableArray<Asset | FileAsset | TextAsset | MediumImage>;
@@ -68,19 +68,19 @@ export class ContentMessage extends Message {
     this.quote = ko.observable();
     this.readReceipts = ko.observableArray([]);
 
-    this.is_liked_provisional = ko.observable();
+    this.isLikedProvisional = ko.observable(null);
     this.is_liked = ko.pureComputed({
       read: () => {
-        if (this.is_liked_provisional() != null) {
-          const is_liked_provisional = this.is_liked_provisional();
-          this.is_liked_provisional(null);
-          return is_liked_provisional;
+        const isLikedProvisional = this.isLikedProvisional();
+        const reactionsUserEts = this.reactions_user_ets();
+        if (isLikedProvisional !== null) {
+          this.isLikedProvisional(null);
+          return isLikedProvisional;
         }
-        const likes = this.reactions_user_ets().filter(user_et => user_et.isMe);
-        return likes.length === 1;
+        return reactionsUserEts.some(user => user.isMe);
       },
       write: value => {
-        return this.is_liked_provisional(value);
+        return this.isLikedProvisional(value);
       },
     });
     this.other_likes = ko.pureComputed(() => this.reactions_user_ets().filter(user_et => !user_et.isMe));

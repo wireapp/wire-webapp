@@ -79,6 +79,7 @@ const CustomEnvironmentRedirect = ({doNavigate, doSendNavigationEvent}: Dispatch
               boxShadow: '0 2px 4px 0 rgba(53, 63, 71, 0.29)',
               height: 120,
               marginBottom: -64,
+              position: 'relative',
               width: 120,
             }}
           >
