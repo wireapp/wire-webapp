@@ -49,11 +49,11 @@ const CustomEnvironmentRedirect = ({doNavigate, doSendNavigationEvent}: Dispatch
     let redirectTimeoutId: number;
     if (destinationUrl) {
       redirectTimeoutId = window.setTimeout(() => {
-        if (isDesktopApp()) {
-          doSendNavigationEvent(destinationUrl).catch(console.error);
-        } else {
-          doNavigate(destinationUrl);
-        }
+        // if (isDesktopApp()) {
+        //   doSendNavigationEvent(destinationUrl).catch(console.error);
+        // } else {
+        //   doNavigate(destinationUrl);
+        // }
       }, REDIRECT_DELAY);
       afterRender(() => setIsAnimating(true));
     }
@@ -79,6 +79,7 @@ const CustomEnvironmentRedirect = ({doNavigate, doSendNavigationEvent}: Dispatch
               boxShadow: '0 2px 4px 0 rgba(53, 63, 71, 0.29)',
               height: 120,
               marginBottom: -64,
+              position: 'relative',
               width: 120,
             }}
           >
