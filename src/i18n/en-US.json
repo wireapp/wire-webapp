@@ -781,7 +781,7 @@
   "preferencesAccountDataCheckbox": "Send anonymous data",
   "preferencesAccountDataDetail": "Help make {{brandName}} better by sending anonymous usage and crash reports.",
   "preferencesAccountDelete": "Delete account",
-  "preferencesAccountEmailPlaceholder": "username@example.com",
+  "preferencesAccountEmailPlaceholder": "Your email address",
   "preferencesAccountInfo": "Info",
   "preferencesAccountLeaveGuestRoom": "Leave the guest room",
   "preferencesAccountLeaveGuestRoomDescription": "You will no longer be able to access the messages in this conversation.",
