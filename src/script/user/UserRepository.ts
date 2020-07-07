@@ -482,7 +482,7 @@ export class UserRepository {
       return Promise.resolve([]);
     }
 
-    const _getUsers = (chunkOfUserIds: string[]): Promise<(void | User)[]> => {
+    const _getUsers = (chunkOfUserIds: string[]): Promise<User[]> => {
       return this.userService
         .getUsers(chunkOfUserIds)
         .then(response => (response ? this.userMapper.mapUsersFromJson(response) : []))
