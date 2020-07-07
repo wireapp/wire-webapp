@@ -286,7 +286,7 @@ export class InputBarViewModel {
     });
 
     this.showAvailabilityTooltip = ko.pureComputed(() => {
-      if (this.conversationEntity() && this.conversationEntity().firstUserEntity()) {
+      if (this.conversationEntity()?.firstUserEntity()) {
         const isOne2OneConversation = this.conversationEntity().is1to1();
         const firstUserEntity = this.conversationEntity().firstUserEntity();
         const availabilityIsNone = firstUserEntity.availability() === Availability.Type.NONE;
@@ -356,7 +356,7 @@ export class InputBarViewModel {
 
   setElements = (nodes: HTMLElement[]): void => {
     this.textarea = nodes.find(node => node.id === 'conversation-input-bar-text') as HTMLTextAreaElement;
-    this.shadowInput = nodes.find(node => node.classList && node.classList.contains('shadow-input')) as HTMLDivElement;
+    this.shadowInput = nodes.find(node => node.classList?.contains('shadow-input')) as HTMLDivElement;
     this.updateSelectionState();
   };
 
@@ -520,7 +520,7 @@ export class InputBarViewModel {
   };
 
   editMessage = (messageEntity: ContentMessage): void => {
-    if (messageEntity && messageEntity.is_editable() && messageEntity !== this.editMessageEntity()) {
+    if (messageEntity?.is_editable() && messageEntity !== this.editMessageEntity()) {
       this.cancelMessageReply();
       this.cancelMessageEditing();
       this.editMessageEntity(messageEntity);
@@ -539,7 +539,7 @@ export class InputBarViewModel {
   };
 
   replyMessage = (messageEntity: ContentMessage): void => {
-    if (messageEntity && messageEntity.isReplyable() && messageEntity !== this.replyMessageEntity()) {
+    if (messageEntity?.isReplyable() && messageEntity !== this.replyMessageEntity()) {
       this.cancelMessageReply(false);
       this.cancelMessageEditing(!!this.editMessageEntity());
       this.replyMessageEntity(messageEntity);
