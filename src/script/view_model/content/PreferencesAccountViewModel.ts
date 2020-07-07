@@ -259,16 +259,16 @@ export class PreferencesAccountViewModel {
       await this.userRepository.changeEmail(enteredEmail);
       amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
         text: {
-          message: 'We have sent you a link to verify your new email',
-          title: 'Check your inbox',
+          message: t('authPostedResendDetail'),
+          title: t('modalPreferencesAccountEmailHeadline'),
         },
       });
     } catch (error) {
       this.logger.warn('Failed to send reset email request', error);
       amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
         text: {
-          message: 'The email you entered is in use or invalid',
-          title: 'Oops...!',
+          message: t('modalPreferencesAccountEmailErrorMessage'),
+          title: t('modalPreferencesAccountEmailErrorHeadline'),
         },
       });
     }
