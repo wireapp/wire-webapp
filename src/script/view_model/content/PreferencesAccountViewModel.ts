@@ -71,6 +71,7 @@ export class PreferencesAccountViewModel {
   isActivatedAccount: ko.PureComputed<boolean>;
   selfUser: ko.Observable<User>;
   name: ko.PureComputed<string>;
+  email: ko.PureComputed<string>;
   availability: ko.PureComputed<Availability.Type>;
   availabilityLabel: ko.PureComputed<string>;
   username: ko.PureComputed<string>;
@@ -132,6 +133,8 @@ export class PreferencesAccountViewModel {
     this.UserNameState = PreferencesAccountViewModel.USERNAME_STATE;
 
     this.name = ko.pureComputed(() => this.selfUser().name());
+    this.email = ko.pureComputed(() => this.selfUser().email());
+
     this.availability = ko.pureComputed(() => this.selfUser().availability());
 
     this.availabilityLabel = ko.pureComputed(() => {
@@ -247,6 +250,28 @@ export class PreferencesAccountViewModel {
       if (isUsernameTaken && isCurrentRequest) {
         this.usernameState(PreferencesAccountViewModel.USERNAME_STATE.TAKEN);
       }
+    }
+  };
+
+  changeEmail = async (data: unknown, event: ChangeEvent<HTMLInputElement>): Promise<void> => {
+    try {
+      const enteredEmail = event.target.value;
+
+      await this.userRepository.changeEmail(enteredEmail);
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+        text: {
+          message: 'We have sent you a link to verify your new email',
+          title: 'Check your inbox',
+        },
+      });
+    } catch (error) {
+      this.logger.warn('Failed to send reset email request', error);
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+        text: {
+          message: 'The email you entered is in use or invalid',
+          title: 'Oops...!',
+        },
+      });
     }
   };
 
@@ -396,6 +421,10 @@ export class PreferencesAccountViewModel {
     if (!this.nameSaved()) {
       this.name.notifySubscribers();
     }
+  };
+
+  resetEmailInput = (): void => {
+    this.email.notifySubscribers();
   };
 
   resetUsernameInput = (): void => {

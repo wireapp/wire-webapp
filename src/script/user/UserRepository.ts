@@ -714,6 +714,13 @@ export class UserRepository {
   }
 
   /**
+   * Change email.
+   */
+  async changeEmail(email: string): Promise<void> {
+    return this.selfService.putSelfEmail(email);
+  }
+
+  /**
    * Whether the user needs to set a username.
    */
   shouldChangeUsername(): boolean {

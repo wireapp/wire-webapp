@@ -68,7 +68,17 @@
             <div class="preferences-account-team preferences-section-account-space-after" data-bind="html: teamName()" data-uie-name="status-team"></div>
           <!-- /ko -->
 
-          <div class="preferences-account-mail" data-bind="text: selfUser().email()" data-uie-name="enter-email"></div>
+          <div class="preferences-account-email-wrapper">
+            <input class="preferences-account-email preferences-account-input"
+                   id="email" type="text"
+                   data-bind="value: email, event: {blur: resetEmailInput}, enter: changeEmail, attr: {placeholder: t('preferencesAccountEmailPlaceholder'), readonly: !canEditProfile(selfUser())}"
+                   data-uie-name="enter-email"
+                   maxlength="64"
+                   spellcheck="false" />
+            <!-- ko if: canEditProfile(selfUser()) -->
+                <edit-icon data-uie-name="enter-email-icon"></edit-icon>
+            <!-- /ko -->
+          </div>
           <div class="preferences-account-phone" data-bind="text: selfUser().phone()" data-uie-name="enter-phone"></div>
 
           <!-- ko if: canEditProfile(selfUser()) -->
