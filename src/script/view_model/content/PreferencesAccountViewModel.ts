@@ -265,12 +265,22 @@ export class PreferencesAccountViewModel {
       });
     } catch (error) {
       this.logger.warn('Failed to send reset email request', error);
-      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
-        text: {
-          message: t('modalPreferencesAccountEmailErrorMessage'),
-          title: t('modalPreferencesAccountEmailErrorHeadline'),
-        },
-      });
+      if (error.code === 400) {
+        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+          text: {
+            message: t('modalPreferencesAccountEmailInvalidMessage'),
+            title: t('modalPreferencesAccountEmailErrorHeadline'),
+          },
+        });
+      }
+      if (error.code === 409) {
+        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+          text: {
+            message: t('modalPreferencesAccountEmailTakenMessage'),
+            title: t('modalPreferencesAccountEmailErrorHeadline'),
+          },
+        });
+      }
     }
   };
 
