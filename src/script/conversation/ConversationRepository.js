@@ -49,15 +49,8 @@ import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {PromiseQueue} from 'Util/PromiseQueue';
 import {Declension, joinNames, t} from 'Util/LocalizerUtil';
 import {getDifference, getNextItem} from 'Util/ArrayUtil';
-import {
-  arrayToBase64,
-  createRandomUuid,
-  loadUrlBlob,
-  sortGroupsByLastEvent,
-  allowsAllFiles,
-  getFileExtensionOrName,
-  isAllowedFile,
-} from 'Util/util';
+import {arrayToBase64, createRandomUuid, loadUrlBlob, sortGroupsByLastEvent} from 'Util/util';
+import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/FileTypeUtil';
 import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
 import {
   capitalizeFirstChar,

@@ -30,7 +30,10 @@ describe('InputBarViewModel', () => {
 
   beforeAll(() => {
     testFactory.exposeSearchActors().then(() => testFactory.exposeConversationActors());
-    spyOn(Config, 'getConfig').and.returnValue({FEATURE: {ALLOWED_FILE_UPLOAD_EXTENSIONS: ['*']}});
+    spyOn(Config, 'getConfig').and.returnValue({
+      ALLOWED_IMAGE_TYPES: [],
+      FEATURE: {ALLOWED_FILE_UPLOAD_EXTENSIONS: ['*']},
+    });
   });
 
   beforeEach(() => {

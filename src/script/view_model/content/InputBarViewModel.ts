@@ -25,14 +25,8 @@ import ko from 'knockout';
 
 import {t} from 'Util/LocalizerUtil';
 import {TIME_IN_MILLIS, formatLocale} from 'Util/TimeUtil';
-import {
-  afterRender,
-  formatBytes,
-  allowsAllFiles,
-  hasAllowedExtension,
-  getFileExtensionOrName,
-  allowedImageTypes,
-} from 'Util/util';
+import {afterRender, formatBytes} from 'Util/util';
+import {allowsAllFiles, hasAllowedExtension, getFileExtensionOrName} from 'Util/FileTypeUtil';
 import {renderMessage} from 'Util/messageRenderer';
 import {KEY, isFunctionKey, insertAtCaret} from 'Util/KeyboardUtil';
 import {ParticipantAvatar} from 'Components/participantAvatar';
@@ -134,7 +128,7 @@ export class InputBarViewModel {
   ) {
     this.shadowInput = null;
     this.textarea = null;
-    this.allowedImageTypes = allowedImageTypes.join(',');
+    this.allowedImageTypes = Config.getConfig().ALLOWED_IMAGE_TYPES.join(',');
     this.allowedFileTypes = Config.getConfig().FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS.join(',');
 
     this.selectionStart = ko.observable(0);
@@ -313,7 +307,7 @@ export class InputBarViewModel {
 
     this.pastedFile.subscribe(blob => {
       if (blob) {
-        const isSupportedFileType = allowedImageTypes.includes(blob.type);
+        const isSupportedFileType = Config.getConfig().ALLOWED_IMAGE_TYPES.includes(blob.type);
         if (isSupportedFileType) {
           this.pastedFilePreviewUrl(URL.createObjectURL(blob));
         }
@@ -555,6 +549,8 @@ export class InputBarViewModel {
     if (tooManyConcurrentUploads) {
       return;
     }
+
+    const allowedImageTypes = Config.getConfig().ALLOWED_IMAGE_TYPES;
 
     Array.from(droppedFiles).forEach((file): void | number => {
       const isSupportedImage = allowedImageTypes.includes(file.type);
