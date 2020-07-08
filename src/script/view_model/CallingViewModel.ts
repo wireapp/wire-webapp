@@ -63,7 +63,6 @@ export class CallingViewModel {
   private readonly logger: Logger;
   private readonly selfUser: ko.Observable<User>;
 
-  readonly CALL_REASON: typeof CALL_REASON;
   readonly activeCalls: ko.PureComputed<Call[]>;
   readonly audioRepository: AudioRepository;
   readonly callActions: CallActions;
@@ -107,7 +106,6 @@ export class CallingViewModel {
     this.multitasking = multitasking;
 
     this.onChooseScreen = () => {};
-    this.CALL_REASON = CALL_REASON;
 
     const ring = (call: Call): void => {
       const sounds: Partial<Record<CALL_STATE, AudioType>> = {

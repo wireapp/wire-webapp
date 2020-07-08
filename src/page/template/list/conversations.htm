@@ -20,7 +20,7 @@
   </div>
   <!-- ko using: callingViewModel -->
     <!-- ko foreach: {data: activeCalls, as: 'activeCall', noChildContext: true} -->
-      <!-- ko if: activeCall.reason() === CALL_REASON.NORMAL -->
+      <!-- ko if: typeof activeCall.reason() === 'undefined' -->
         <conversation-list-calling-cell
           data-bind="attr: {'data-uie-uid': $data.id, 'data-uie-value': getConversationById(activeCall.conversationId).display_name}"
           params="
