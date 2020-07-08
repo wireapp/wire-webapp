@@ -63,6 +63,7 @@ export class CallingViewModel {
   private readonly logger: Logger;
   private readonly selfUser: ko.Observable<User>;
 
+  readonly CALL_REASON: typeof CALL_REASON;
   readonly activeCalls: ko.PureComputed<Call[]>;
   readonly audioRepository: AudioRepository;
   readonly callActions: CallActions;
@@ -106,6 +107,7 @@ export class CallingViewModel {
     this.multitasking = multitasking;
 
     this.onChooseScreen = () => {};
+    this.CALL_REASON = CALL_REASON;
 
     const ring = (call: Call): void => {
       const sounds: Partial<Record<CALL_STATE, AudioType>> = {
@@ -114,13 +116,13 @@ export class CallingViewModel {
       };
       const initialCallState = call.state();
       const soundId = sounds[initialCallState];
-      if (!soundId || call.reason() !== undefined) {
+      if (!soundId || typeof call.reason() !== 'undefined') {
         return;
       }
 
       audioRepository.loop(soundId).then(() => {
         const stateSubscription = ko.computed(() => {
-          if (call.state() !== initialCallState || call.reason() !== undefined) {
+          if (call.state() !== initialCallState || typeof call.reason() !== 'undefined') {
             window.setTimeout(() => {
               audioRepository.stop(soundId);
               stateSubscription.dispose();

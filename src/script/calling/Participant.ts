@@ -55,7 +55,7 @@ export class Participant {
     this.audioStream(audioStream);
   }
 
-  setVideoStream(videoStream: MediaStream | undefined): void {
+  setVideoStream(videoStream?: MediaStream): void {
     this.releaseStream(this.videoStream());
     this.videoStream(videoStream);
   }
@@ -91,7 +91,7 @@ export class Participant {
     this.releaseAudioStream();
   }
 
-  private releaseStream(mediaStream: MediaStream | undefined): void {
+  private releaseStream(mediaStream?: MediaStream): void {
     if (!mediaStream) {
       return;
     }
