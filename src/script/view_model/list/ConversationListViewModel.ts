@@ -148,7 +148,7 @@ export class ConversationListViewModel {
     this.conversationsTooltip = t('conversationViewTooltip');
     this.foldersTooltip = t('folderViewTooltip');
 
-    this.showConnectRequests = ko.pureComputed(() => !!this.connectRequests().length);
+    this.showConnectRequests = ko.pureComputed(() => this.connectRequests().length > 0);
 
     this.showBadge = ko.pureComputed(() => {
       return this.preferenceNotificationRepository.notifications().length > 0;
