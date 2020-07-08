@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# 3.6.0 (2020-07-08)
+
+
+### Features
+
+* **api-client:** Expose VBR call setting ([#3060](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/issues/3060)) ([42ec268](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/commit/42ec26826f05c6fe6c27e84967ab74c3e5d4d72d))
+
+
+
+
+
 ## [3.5.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@3.5.3...@wireapp/commons@3.5.4) (2020-05-23)
 
 **Note:** Version bump only for package @wireapp/commons
