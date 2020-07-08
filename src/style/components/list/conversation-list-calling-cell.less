@@ -199,8 +199,6 @@ conversation-list-calling-cell {
   flex-shrink: 0;
   margin: 0 16px 16px;
   animation: show-call-ui @animation-timing-fast ease-in-out 0s 1;
-  background-color: var(--app-bg-secondary);
-  border-radius: 8px;
 
   &.dark-bg {
     color: var(--app-bg-secondary);
@@ -248,6 +246,11 @@ conversation-list-calling-cell:first-of-type {
   &::before {
     top: -40px;
   }
+}
+
+.conversation-list-calling-cell-background {
+  background-color: var(--app-bg-secondary);
+  border-radius: 8px;
 }
 
 .conversation-list-calling-cell {

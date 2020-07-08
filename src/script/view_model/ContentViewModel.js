@@ -42,6 +42,12 @@ import {GiphyViewModel} from './content/GiphyViewModel';
 import {HistoryImportViewModel} from './content/HistoryImportViewModel';
 import {HistoryExportViewModel} from './content/HistoryExportViewModel';
 import {PreferencesAccountViewModel} from './content/PreferencesAccountViewModel';
+import {TitleBarViewModel} from './content/TitleBarViewModel';
+import {PreferencesAboutViewModel} from './content/PreferencesAboutViewModel';
+import {PreferencesDevicesViewModel} from './content/PreferencesDevicesViewModel';
+import {PreferencesDeviceDetailsViewModel} from './content/PreferencesDeviceDetailsViewModel';
+import {InputBarViewModel} from './content/InputBarViewModel';
+import {MediaType} from '../media/MediaType';
 
 export class ContentViewModel {
   static get STATE() {
@@ -82,7 +88,15 @@ export class ContentViewModel {
     this.connectRequests = new ConnectRequestsViewModel(mainViewModel, repositories.user);
     this.emojiInput = new EmojiInputViewModel(repositories.properties);
     this.giphy = new GiphyViewModel(repositories.giphy);
-    this.inputBar = new z.viewModel.content.InputBarViewModel(mainViewModel, this, repositories);
+    this.inputBar = new InputBarViewModel(
+      this.emojiInput,
+      repositories.asset,
+      repositories.event,
+      repositories.conversation,
+      repositories.search,
+      repositories.storage,
+      repositories.user,
+    );
     this.groupCreation = new GroupCreationViewModel(
       repositories.conversation,
       repositories.search,
@@ -99,15 +113,23 @@ export class ContentViewModel {
       repositories.client,
       repositories.cryptography,
     );
-    this.messageList = new MessageListViewModel(mainViewModel, this, repositories);
-    this.titleBar = new z.viewModel.content.TitleBarViewModel(
+    this.messageList = new MessageListViewModel(
+      mainViewModel,
+      repositories.conversation,
+      repositories.integration,
+      repositories.serverTime,
+      repositories.user,
+    );
+    this.titleBar = new TitleBarViewModel(
       mainViewModel.calling,
       mainViewModel.panel,
       this,
-      repositories,
+      repositories.calling,
+      repositories.conversation,
+      repositories.user,
     );
 
-    this.preferencesAbout = new z.viewModel.content.PreferencesAboutViewModel(mainViewModel, this, repositories);
+    this.preferencesAbout = new PreferencesAboutViewModel(repositories.user);
     this.preferencesAccount = new PreferencesAccountViewModel(
       repositories.client,
       repositories.conversation,
@@ -122,16 +144,23 @@ export class ContentViewModel {
       repositories.properties,
       repositories.calling,
       {
-        mediaSourceChanged: repositories.calling.changeMediaSource.bind(repositories.calling),
-        willChangeMediaSource: repositories.calling.stopMediaSource.bind(repositories.calling),
+        replaceActiveMediaSource: repositories.calling.changeMediaSource.bind(repositories.calling),
+        stopActiveMediaSource: repositories.calling.stopMediaSource.bind(repositories.calling),
       },
     );
-    this.preferencesDeviceDetails = new z.viewModel.content.PreferencesDeviceDetailsViewModel(
+    this.preferencesDeviceDetails = new PreferencesDeviceDetailsViewModel(
+      mainViewModel,
+      repositories.client,
+      repositories.conversation,
+      repositories.cryptography,
+    );
+    this.preferencesDevices = new PreferencesDevicesViewModel(
       mainViewModel,
       this,
-      repositories,
+      repositories.client,
+      repositories.cryptography,
+      repositories.user,
     );
-    this.preferencesDevices = new z.viewModel.content.PreferencesDevicesViewModel(mainViewModel, this, repositories);
     this.preferencesOptions = new PreferencesOptionsViewModel(
       repositories.properties,
       repositories.team,
@@ -154,7 +183,7 @@ export class ContentViewModel {
           this.preferencesAccount.popNotification();
           break;
         case ContentViewModel.STATE.PREFERENCES_AV:
-          this.preferencesAV.initiateDevices();
+          this.preferencesAV.updateMediaStreamTrack(MediaType.AUDIO_VIDEO);
           break;
         case ContentViewModel.STATE.PREFERENCES_DEVICES:
           this.preferencesDevices.updateDeviceInfo();
@@ -382,7 +411,7 @@ export class ContentViewModel {
 
     const isStatePreferencesAv = this.previousState === ContentViewModel.STATE.PREFERENCES_AV;
     if (isStatePreferencesAv) {
-      this.preferencesAV.releaseDevices();
+      this.preferencesAV.releaseDevices(MediaType.AUDIO_VIDEO);
     }
   }
 

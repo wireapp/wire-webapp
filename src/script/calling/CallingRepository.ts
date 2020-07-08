@@ -568,14 +568,19 @@ export class CallingRepository {
     if (!activeCall) {
       return false;
     }
+    const selfParticipant = activeCall.getSelfParticipant();
     switch (mediaType) {
       case MediaType.AUDIO:
-        activeCall.getSelfParticipant().releaseAudioStream();
+        selfParticipant.releaseAudioStream();
         break;
 
-      case MediaType.VIDEO:
-        activeCall.getSelfParticipant().releaseVideoStream();
+      case MediaType.VIDEO: {
+        // Don't stop video input (coming from A/V preferences) when screensharing is activated
+        if (!selfParticipant.sharesScreen()) {
+          selfParticipant.releaseVideoStream();
+        }
         break;
+      }
     }
     return true;
   }
@@ -588,15 +593,22 @@ export class CallingRepository {
       return;
     }
     const selfParticipant = call.getSelfParticipant();
+
     if (mediaType === MediaType.AUDIO) {
       const audioTracks = mediaStream.getAudioTracks().map(track => track.clone());
-      selfParticipant.setAudioStream(new MediaStream(audioTracks));
-      this.wCall.replaceTrack(call.conversationId, audioTracks[0]);
+      if (audioTracks.length > 0) {
+        selfParticipant.setAudioStream(new MediaStream(audioTracks));
+        this.wCall.replaceTrack(call.conversationId, audioTracks[0]);
+      }
     }
-    if (mediaType === MediaType.VIDEO && selfParticipant.sharesCamera()) {
+
+    // Don't update video input (coming from A/V preferences) when screensharing is activated
+    if (mediaType === MediaType.VIDEO && selfParticipant.sharesCamera() && !selfParticipant.sharesScreen()) {
       const videoTracks = mediaStream.getVideoTracks().map(track => track.clone());
-      selfParticipant.setVideoStream(new MediaStream(videoTracks));
-      this.wCall.replaceTrack(call.conversationId, videoTracks[0]);
+      if (videoTracks.length > 0) {
+        selfParticipant.setVideoStream(new MediaStream(videoTracks));
+        this.wCall.replaceTrack(call.conversationId, videoTracks[0]);
+      }
     }
   }
 
