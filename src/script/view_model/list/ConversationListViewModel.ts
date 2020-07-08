@@ -208,7 +208,7 @@ export class ConversationListViewModel {
      *  lot of flickering every time the list updates.
      */
     this.getIsVisibleFunc = () => {
-      const conversationList = document.querySelector('.conversation-list');
+      const conversationList: HTMLElement = document.querySelector('.conversation-list');
       if (!conversationList) {
         return () => false;
       }
