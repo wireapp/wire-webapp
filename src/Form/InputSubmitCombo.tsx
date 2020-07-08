@@ -44,6 +44,7 @@ export const InputSubmitCombo = (props: InputSubmitComboProps) => (
       },
       alignItems: 'center',
       display: 'flex',
+      height: '57px', // needs a bit more space to not overlap with the `boxShadow` from `:focus`
       justifyContent: 'space-between',
       marginBottom: '4px',
       paddingLeft: 0,
