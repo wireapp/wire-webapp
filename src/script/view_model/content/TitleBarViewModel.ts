@@ -72,7 +72,7 @@ export class TitleBarViewModel {
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
 
     this.hasCall = ko.pureComputed(() => {
-      const hasEntities = this.conversationEntity() && this.joinedCall();
+      const hasEntities = this.conversationEntity() && !!this.joinedCall();
       return hasEntities ? this.conversationEntity().id === this.joinedCall().conversationId : false;
     });
 
