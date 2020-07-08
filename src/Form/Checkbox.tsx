@@ -38,10 +38,10 @@ const StyledLabel = (props: StyledLabelProps) => {
   return (
     <label
       css={theme => ({
-        [`${INPUT_CLASSNAME}:checked + &::before`]: {
+        [`.${INPUT_CLASSNAME}:checked + &::before`]: {
           background: `#000 url('data:image/svg+xml; utf8, ${checkSvg}') no-repeat center`,
         },
-        [`${INPUT_CLASSNAME}:focus + &::before`]: {
+        [`.${INPUT_CLASSNAME}:focus + &::before`]: {
           borderColor: COLOR.BLUE,
         },
         '&::before': {

@@ -21,34 +21,39 @@
 import {jsx} from '@emotion/core';
 import {INPUT_CLASSNAME, InputProps, inputStyle} from './Input';
 import {COLOR} from '../Identity';
+import {Label} from '../Text';
 
 export type InputSubmitComboProps<T = HTMLDivElement> = InputProps<T>;
 
 export const INPUT_SUBMIT_COMBO_CLASSNAME = 'inputSubmitCombo';
 
-export const InputSubmitCombo = (props: InputSubmitComboProps) => (
-  <div
-    className={INPUT_SUBMIT_COMBO_CLASSNAME}
-    css={theme => ({
-      ...inputStyle(theme, props),
-      '&:focus-within': {
-        boxShadow: `0 0 0 1px ${COLOR.BLUE}`,
-      },
-      [INPUT_CLASSNAME]: {
-        '&:focus': {
-          boxShadow: 'none',
+export const InputSubmitCombo = ({children, label, ...props}: InputSubmitComboProps) => (
+  <Label style={{width: '100%'}} bold={false} className={INPUT_SUBMIT_COMBO_CLASSNAME}>
+    {label && <span style={{margin: '16px'}}>{label}</span>}
+    <div
+      css={theme => ({
+        ...inputStyle(theme, props),
+        '&:focus-within': {
+          boxShadow: `0 0 0 1px ${COLOR.BLUE}`,
         },
-        flexGrow: 1,
-        margin: '0 8px 0 0',
-        padding: '0 0 0 16px',
-      },
-      alignItems: 'center',
-      display: 'flex',
-      height: '57px', // needs a bit more space to not overlap with the `boxShadow` from `:focus`
-      justifyContent: 'space-between',
-      marginBottom: '4px',
-      paddingLeft: 0,
-    })}
-    {...props}
-  />
+        [`.${INPUT_CLASSNAME}`]: {
+          '&:focus': {
+            boxShadow: 'none',
+          },
+          flexGrow: 1,
+          margin: '0 8px 0 0',
+          padding: '0 0 0 16px',
+        },
+        alignItems: 'center',
+        display: 'flex',
+        height: '57px', // needs a bit more space to not overlap with the `boxShadow` from `:focus`
+        justifyContent: 'space-between',
+        marginBottom: '4px',
+        paddingLeft: 0,
+      })}
+      {...props}
+    >
+      {children}
+    </div>
+  </Label>
 );
