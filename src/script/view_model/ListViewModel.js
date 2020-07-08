@@ -140,7 +140,15 @@ export class ListViewModel {
       repositories.user,
       repositories.calling,
     );
-    this.start = new StartUIViewModel(mainViewModel, this, repositories);
+    this.start = new StartUIViewModel(
+      mainViewModel,
+      this,
+      repositories.conversation,
+      repositories.integration,
+      repositories.search,
+      repositories.team,
+      repositories.user,
+    );
     this.takeover = new TakeoverViewModel(this, repositories.user, repositories.conversation);
     this.temporaryGuest = new TemporaryGuestViewModel(mainViewModel, repositories.user, repositories.calling);
 
