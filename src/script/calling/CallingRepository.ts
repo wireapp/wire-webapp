@@ -67,7 +67,6 @@ import {ClientId, Participant, UserId} from './Participant';
 import type {Recipients} from '../cryptography/CryptographyRepository';
 import type {Conversation} from '../entity/Conversation';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {getDifference} from 'Util/ArrayUtil';
 
 interface MediaStreamQuery {
   audio?: boolean;
