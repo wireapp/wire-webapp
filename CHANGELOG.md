@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.31.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.31.0...@wireapp/react-ui-kit@7.31.1) (2020-07-08)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Fix overlapping boxShadow issue ([#3101](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/3101)) ([b5eb9a3](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/b5eb9a3c2ea3f7fd99d22f98369e5e8ff2d5c631))
+
+
+
+
+
 # [7.31.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.30.3...@wireapp/react-ui-kit@7.31.0) (2020-07-06)
 
 
