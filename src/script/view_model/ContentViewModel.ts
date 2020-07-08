@@ -298,6 +298,17 @@ export class ContentViewModel {
       });
   }
 
+  /**
+   * Opens the specified conversation.
+   *
+   * @note If the conversation_et is not defined, it will open the incoming connection requests instead
+   *
+   * @param conversation Conversation entity or conversation ID
+   * @param options State to open conversation in
+   * @param options.exposeMessage Scroll to message and highlight it
+   * @param options.openFirstSelfMention Open first self mention instead of passed message
+   * @param options.openNotificationSettings Open notification settings of conversation
+   */
   showConversation = (
     conversation: Conversation | string,
     options: ShowConversationOptions = {} as ShowConversationOptions,
