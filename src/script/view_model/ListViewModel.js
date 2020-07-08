@@ -43,7 +43,7 @@ import {DefaultLabelIds} from '../conversation/ConversationLabelRepository';
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 
-z.viewModel.ListViewModel = class ListViewModel {
+export class ListViewModel {
   static get MODAL_TYPE() {
     return {
       TAKEOVER: 'ListViewModel.MODAL_TYPE.TAKEOVER',
@@ -492,4 +492,6 @@ z.viewModel.ListViewModel = class ListViewModel {
 
     return isStateConversations && isActiveConversation;
   }
-};
+}
+
+z.viewModel.ListViewModel = ListViewModel;
