@@ -70,7 +70,7 @@ class TemporaryGuestViewModel {
     });
   };
 
-  isSelectedConversation = (): Boolean => {
+  isSelectedConversation = (): true => {
     return true;
   };
 }
