@@ -122,7 +122,18 @@ export class ListViewModel {
 
     // Nested view models
     this.archive = new ArchiveViewModel(this, repositories.conversation, this.answerCall);
-    this.conversations = new ConversationListViewModel(mainViewModel, this, repositories, this.answerCall);
+    this.conversations = new ConversationListViewModel(
+      mainViewModel,
+      this,
+      this.answerCall,
+      repositories.event,
+      repositories.calling,
+      repositories.conversation,
+      repositories.preferenceNotification,
+      repositories.team,
+      repositories.user,
+      repositories.properties,
+    );
     this.preferences = new PreferencesListViewModel(
       this.contentViewModel,
       this,

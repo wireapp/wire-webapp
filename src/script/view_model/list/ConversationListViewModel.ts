@@ -22,53 +22,91 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import 'Components/availabilityState';
 import 'Components/legalHoldDot';
 import 'Components/list/groupedConversations';
+import ko from 'knockout';
+import {amplify} from 'amplify';
+
 import {ParticipantAvatar} from 'Components/participantAvatar';
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 import {t} from 'Util/LocalizerUtil';
-import {getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 import {NOTIFICATION_HANDLING_STATE} from '../../event/NotificationHandlingState';
 import {generateConversationUrl} from '../../router/routeGenerator';
 import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
 import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
 import {ContentViewModel} from '../ContentViewModel';
+import {ListViewModel} from '../ListViewModel';
+import type {WebappProperties} from '@wireapp/api-client/dist/user/data';
+import type {MainViewModel} from '../MainViewModel';
+import type {CallingViewModel} from '../CallingViewModel';
+import type {CallingRepository} from '../../calling/CallingRepository';
+import type {ConversationRepository} from '../../conversation/ConversationRepository';
+import type {PreferenceNotificationRepository} from '../../notification/PreferenceNotificationRepository';
+import type {TeamRepository} from '../../team/TeamRepository';
+import type {UserRepository} from '../../user/UserRepository';
+import type {PropertiesRepository} from '../../properties/PropertiesRepository';
+import type {Conversation} from '../../entity/Conversation';
+import type {User} from '../../entity/User';
+import type {EventRepository} from '../../event/EventRepository';
+import type {Availability} from '@wireapp/protocol-messaging';
 
 export class ConversationListViewModel {
-  /**
-   * View model for conversation list.
-   *
-   * @param {MainViewModel} mainViewModel Main view model
-   * @param {z.viewModel.ListViewModel} listViewModel List view model
-   * @param {Object} repositories Object containing all repositories
-   * @param {Function} onJoinCall Callback called when the user wants to join a call
-   */
-  constructor(mainViewModel, listViewModel, repositories, onJoinCall) {
-    this.isSelectedConversation = this.isSelectedConversation.bind(this);
+  readonly startTooltip: string;
+  readonly foldersTooltip: string;
+  readonly conversationsTooltip: string;
+  readonly isTeam: ko.PureComputed<boolean>;
+  readonly contentViewModel: ContentViewModel;
+  readonly showBadge: ko.PureComputed<boolean>;
+  readonly selfUserName: ko.PureComputed<string>;
+  readonly isOnLegalHold: ko.PureComputed<boolean>;
+  readonly archiveTooltip: ko.PureComputed<string>;
+  readonly shouldUpdateScrollbar: ko.Computed<void>;
+  readonly stateIsRequests: ko.PureComputed<boolean>;
+  readonly noConversations: ko.PureComputed<boolean>;
+  readonly connectRequestsText: ko.PureComputed<string>;
+  readonly hasPendingLegalHold: ko.PureComputed<boolean>;
+  readonly showConnectRequests: ko.PureComputed<boolean>;
+  readonly selfAvailability: ko.PureComputed<Availability.Type>;
+  readonly getConversationUrl: (conversationId: string) => string;
+  readonly participantAvatarSize: typeof ParticipantAvatar.SIZE.SMALL;
+  readonly getIsVisibleFunc: () => (() => boolean) | ((top: number, bottom: number) => boolean);
+  private readonly logger: Logger;
+  private readonly selfUser: ko.PureComputed<User>;
+  private readonly showCalls: ko.Observable<boolean>;
+  private readonly callingViewModel: CallingViewModel;
+  private readonly contentState: ko.Observable<string>;
+  private readonly webappIsLoaded: ko.Observable<boolean>;
+  private readonly connectRequests: ko.PureComputed<User[]>;
+  private readonly isActivatedAccount: ko.PureComputed<boolean>;
+  private readonly expandedFoldersIds: ko.ObservableArray<string>;
+  private readonly showRecentConversations: ko.Observable<boolean>;
+  private readonly archivedConversations: ko.ObservableArray<Conversation>;
+  private readonly unarchivedConversations: ko.ObservableArray<Conversation>;
 
-    this.audioRepository = repositories.audio;
-    this.callingRepository = repositories.calling;
-    this.conversationRepository = repositories.conversation;
-    this.permissionRepository = repositories.permission;
-    this.preferenceNotificationRepository = repositories.preferenceNotification;
-    this.teamRepository = repositories.team;
-    this.userRepository = repositories.user;
-    this.videoGridRepository = repositories.videoGrid;
-    this.propertiesRepository = repositories.properties;
-    this.ParticipantAvatar = ParticipantAvatar;
+  constructor(
+    mainViewModel: MainViewModel,
+    readonly listViewModel: ListViewModel,
+    readonly onJoinCall: Function,
+    eventRepository: EventRepository,
+    readonly callingRepository: CallingRepository,
+    readonly conversationRepository: ConversationRepository,
+    private readonly preferenceNotificationRepository: PreferenceNotificationRepository,
+    private readonly teamRepository: TeamRepository,
+    private readonly userRepository: UserRepository,
+    private readonly propertiesRepository: PropertiesRepository,
+  ) {
+    this.participantAvatarSize = ParticipantAvatar.SIZE.SMALL;
 
     this.contentViewModel = mainViewModel.content;
     this.callingViewModel = mainViewModel.calling;
-    this.listViewModel = listViewModel;
-    this.onJoinCall = onJoinCall;
 
     this.logger = getLogger('ConversationListViewModel');
 
     this.showCalls = ko.observable();
-    this.setShowCallsState(repositories.event.notificationHandlingState());
-    repositories.event.notificationHandlingState.subscribe(this.setShowCallsState.bind(this));
+    this.setShowCallsState(eventRepository.notificationHandlingState());
+    eventRepository.notificationHandlingState.subscribe(this.setShowCallsState);
 
     this.contentState = this.contentViewModel.state;
-    this.selectedConversation = ko.observable();
 
     this.isOnLegalHold = ko.pureComputed(() => this.selfUser().isOnLegalHold());
     this.hasPendingLegalHold = ko.pureComputed(() => this.selfUser().hasPendingLegalHold());
@@ -101,12 +139,6 @@ export class ConversationListViewModel {
 
     this.webappIsLoaded = ko.observable(false);
 
-    this.activeConversationId = ko.pureComputed(() => {
-      if (this.conversationRepository.active_conversation()) {
-        return this.conversationRepository.active_conversation().id;
-      }
-    });
-
     this.archiveTooltip = ko.pureComputed(() => {
       return t('tooltipConversationsArchived', this.archivedConversations().length);
     });
@@ -116,7 +148,7 @@ export class ConversationListViewModel {
     this.conversationsTooltip = t('conversationViewTooltip');
     this.foldersTooltip = t('folderViewTooltip');
 
-    this.showConnectRequests = ko.pureComputed(() => this.connectRequests().length);
+    this.showConnectRequests = ko.pureComputed(() => !!this.connectRequests().length);
 
     this.showBadge = ko.pureComputed(() => {
       return this.preferenceNotificationRepository.notifications().length > 0;
@@ -125,8 +157,7 @@ export class ConversationListViewModel {
     this.showRecentConversations = ko.observable(
       !this.propertiesRepository.getPreference(PROPERTIES_TYPE.INTERFACE.VIEW_FOLDERS) ?? false,
     );
-    // TODO: Rename "expandedFolders" to "expandedFolderIds"
-    this.expandedFolders = ko.observableArray([]);
+    this.expandedFoldersIds = ko.observableArray([]);
 
     this.showRecentConversations.subscribe(showRecentConversations => {
       const conversationList = document.querySelector('.conversation-list');
@@ -144,7 +175,7 @@ export class ConversationListViewModel {
         activeConversation,
       );
 
-      const isAlreadyOpen = activeLabelIds.some(labelId => this.expandedFolders().includes(labelId));
+      const isAlreadyOpen = activeLabelIds.some(labelId => this.expandedFoldersIds().includes(labelId));
 
       if (!isAlreadyOpen) {
         this.expandFolder(activeLabelIds[0]);
@@ -163,7 +194,7 @@ export class ConversationListViewModel {
         this.webappIsLoaded();
         this.connectRequests();
         this.showRecentConversations();
-        this.expandedFolders();
+        this.expandedFoldersIds();
         this.callingViewModel.activeCalls();
       })
       .extend({notify: 'always', rateLimit: 500});
@@ -183,45 +214,45 @@ export class ConversationListViewModel {
       }
       const containerTop = conversationList.scrollTop;
       const containerBottom = containerTop + conversationList.offsetHeight;
-      return (top, bottom) => bottom > containerTop && top < containerBottom;
+      return (top: number, bottom: number) => bottom > containerTop && top < containerBottom;
     };
 
     this._initSubscriptions();
   }
 
-  _initSubscriptions() {
-    amplify.subscribe(WebAppEvents.LIFECYCLE.LOADED, this.onWebappLoaded.bind(this));
-    amplify.subscribe(WebAppEvents.SHORTCUT.START, this.clickOnPeopleButton.bind(this));
+  _initSubscriptions = (): void => {
+    amplify.subscribe(WebAppEvents.LIFECYCLE.LOADED, this.onWebappLoaded);
+    amplify.subscribe(WebAppEvents.SHORTCUT.START, this.clickOnPeopleButton);
     amplify.subscribe(WebAppEvents.CONTENT.EXPAND_FOLDER, this.expandFolder);
-    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, properties => {
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, (properties: WebappProperties) => {
       const viewFolders = properties.settings.interface.view_folders;
       this.showRecentConversations(!viewFolders);
     });
-    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.VIEW_FOLDERS, viewFolders => {
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.VIEW_FOLDERS, (viewFolders: boolean) => {
       this.showRecentConversations(!viewFolders);
     });
-  }
+  };
 
-  expandFolder = label => {
-    if (!this.expandedFolders().includes(label)) {
-      this.expandedFolders.push(label);
+  expandFolder = (label: string) => {
+    if (!this.expandedFoldersIds().includes(label)) {
+      this.expandedFoldersIds.push(label);
     }
   };
 
-  clickOnAvailability(viewModel, event) {
+  clickOnAvailability = (viewModel: unknown, event: MouseEvent): void => {
     AvailabilityContextMenu.show(event, 'list_header', 'left-list-availability-menu');
-  }
+  };
 
-  clickOnConnectRequests() {
+  clickOnConnectRequests = (): void => {
     this.contentViewModel.switchContent(ContentViewModel.STATE.CONNECTION_REQUESTS);
-  }
+  };
 
-  hasJoinableCall = conversationId => {
+  hasJoinableCall = (conversationId: string) => {
     const call = this.callingRepository.findCall(conversationId);
     return call && call.state() === CALL_STATE.INCOMING && call.reason() !== CALL_REASON.ANSWERED_ELSEWHERE;
   };
 
-  setShowCallsState(handlingNotifications) {
+  setShowCallsState = (handlingNotifications: string) => {
     const shouldShowCalls = handlingNotifications === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
 
     const isStateChange = this.showCalls() !== shouldShowCalls;
@@ -229,9 +260,9 @@ export class ConversationListViewModel {
       this.showCalls(shouldShowCalls);
       this.logger.debug(`Set show calls state to: ${this.showCalls()}`);
     }
-  }
+  };
 
-  isSelectedConversation(conversationEntity) {
+  isSelectedConversation = (conversationEntity: Conversation): boolean => {
     const expectedStates = [
       ContentViewModel.STATE.COLLECTION,
       ContentViewModel.STATE.COLLECTION_DETAILS,
@@ -242,27 +273,27 @@ export class ConversationListViewModel {
     const isExpectedState = expectedStates.includes(this.contentState());
 
     return isSelectedConversation && isExpectedState;
-  }
+  };
 
-  onWebappLoaded() {
+  onWebappLoaded = (): void => {
     this.webappIsLoaded(true);
-  }
+  };
 
   //##############################################################################
   // Footer actions
   //##############################################################################
 
-  clickOnArchivedButton() {
-    this.listViewModel.switchList(z.viewModel.ListViewModel.STATE.ARCHIVE);
-  }
+  clickOnArchivedButton = (): void => {
+    this.listViewModel.switchList(ListViewModel.STATE.ARCHIVE);
+  };
 
-  clickOnPreferencesButton() {
+  clickOnPreferencesButton = (): void => {
     amplify.publish(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT);
-  }
+  };
 
-  clickOnPeopleButton() {
+  clickOnPeopleButton = (): void => {
     if (this.isActivatedAccount()) {
-      this.listViewModel.switchList(z.viewModel.ListViewModel.STATE.START_UI);
+      this.listViewModel.switchList(ListViewModel.STATE.START_UI);
     }
-  }
+  };
 }

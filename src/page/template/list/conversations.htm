@@ -45,7 +45,7 @@
             <div class="conversation-list-cell-left">
               <!-- ko if: connectRequests().length === 1 -->
                 <div class="avatar-halo">
-                  <participant-avatar params="participant: connectRequests()[0], size: ParticipantAvatar.SIZE.SMALL"></participant-avatar>
+                  <participant-avatar params="participant: connectRequests()[0], size: participantAvatarSize"></participant-avatar>
                 </div>
               <!-- /ko -->
 
@@ -82,7 +82,7 @@
               hasJoinableCall: hasJoinableCall,
               onJoinCall: onJoinCall,
               isSelectedConversation: isSelectedConversation,
-              expandedFolders: expandedFolders,
+              expandedFolders: expandedFolderIds,
               isVisibleFunc: isVisibleFunc">
             </grouped-conversations>
           </div>
