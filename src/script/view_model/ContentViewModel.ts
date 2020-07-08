@@ -92,7 +92,7 @@ interface Repositories {
   user: UserRepository;
 };
 
-type ShowConversationOptions = {
+interface ShowConversationOptions {
   exposeMessage: Message;
   openFirstSelfMention: boolean;
   openNotificationSettings: boolean;
