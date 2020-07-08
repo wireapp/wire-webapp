@@ -141,8 +141,8 @@ export class ListViewModel {
       repositories.calling,
     );
     this.start = new StartUIViewModel(mainViewModel, this, repositories);
-    this.takeover = new TakeoverViewModel(mainViewModel, this, repositories);
-    this.temporaryGuest = new TemporaryGuestViewModel(mainViewModel, this, repositories, this.answerCall);
+    this.takeover = new TakeoverViewModel(this, repositories.user, repositories.conversation);
+    this.temporaryGuest = new TemporaryGuestViewModel(mainViewModel, repositories.user, repositories.calling);
 
     this._initSubscriptions();
 
