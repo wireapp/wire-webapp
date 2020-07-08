@@ -66,6 +66,8 @@ import {Call, ConversationId} from './Call';
 import {ClientId, Participant, UserId} from './Participant';
 import type {Recipients} from '../cryptography/CryptographyRepository';
 import type {Conversation} from '../entity/Conversation';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {getDifference} from 'Util/ArrayUtil';
 
 interface MediaStreamQuery {
   audio?: boolean;
@@ -99,6 +101,8 @@ export class CallingRepository {
   private readonly logger: Logger;
   private readonly callLog: string[];
   private readonly cbrEncoding: ko.Observable<number>;
+  private readonly acceptedVersionWarnings: ko.ObservableArray<string>;
+  private readonly acceptVersionWarning: (conversationId: string) => void;
 
   static get CONFIG() {
     return {
@@ -118,6 +122,17 @@ export class CallingRepository {
     this.isMuted = ko.observable(false);
     this.joinedCall = ko.pureComputed(() => {
       return this.activeCalls().find(call => call.state() === CALL_STATE.MEDIA_ESTAB);
+    });
+
+    this.acceptedVersionWarnings = ko.observableArray<string>();
+    this.acceptVersionWarning = (conversationId: string) => {
+      this.acceptedVersionWarnings.push(conversationId);
+      window.setTimeout(() => this.acceptedVersionWarnings.remove(conversationId), TIME_IN_MILLIS.MINUTE * 15);
+    };
+
+    this.activeCalls.subscribe(activeCalls => {
+      const activeCallIds = activeCalls.map(call => call.conversationId);
+      this.acceptedVersionWarnings.remove(acceptedId => !activeCallIds.includes(acceptedId));
     });
 
     this.apiClient = apiClient;
@@ -396,12 +411,17 @@ export class CallingRepository {
 
       if (res !== 0) {
         this.logger.warn(`recv_msg failed with code: ${res}`);
-        if (res === ERROR.UNKNOWN_PROTOCOL && event.content.type === 'CONFSTART') {
+        if (
+          this.acceptedVersionWarnings().every((acceptedId: string) => acceptedId !== conversationId) &&
+          res === ERROR.UNKNOWN_PROTOCOL &&
+          event.content.type === 'CONFSTART'
+        ) {
           const brandName = Config.getConfig().BRAND_NAME;
           amplify.publish(
             WebAppEvents.WARNING.MODAL,
             ModalsViewModel.TYPE.ACKNOWLEDGE,
             {
+              close: () => this.acceptVersionWarning(conversationId),
               text: {
                 message: t('modalCallUpdateClientMessage', brandName),
                 title: t('modalCallUpdateClientHeadline', brandName),
