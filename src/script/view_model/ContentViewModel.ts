@@ -93,9 +93,9 @@ interface Repositories {
 };
 
 interface ShowConversationOptions {
-  exposeMessage: Message;
-  openFirstSelfMention: boolean;
-  openNotificationSettings: boolean;
+  exposeMessage?: Message;
+  openFirstSelfMention?: boolean;
+  openNotificationSettings?: boolean;
 };
 
 export class ContentViewModel {
