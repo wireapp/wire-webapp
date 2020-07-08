@@ -90,13 +90,13 @@ interface Repositories {
   storage: StorageRepository;
   team: TeamRepository;
   user: UserRepository;
-};
+}
 
 interface ShowConversationOptions {
   exposeMessage?: Message;
   openFirstSelfMention?: boolean;
   openNotificationSettings?: boolean;
-};
+}
 
 export class ContentViewModel {
   elementId: string;
