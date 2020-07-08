@@ -72,7 +72,7 @@ import type {UserRepository} from '../user/UserRepository';
 import type {Conversation} from '../entity/Conversation';
 import type {Message} from '../entity/message/Message';
 
-type Repositories = {
+interface Repositories {
   asset: AssetRepository;
   backup: BackupRepository;
   calling: CallingRepository;
@@ -92,10 +92,10 @@ type Repositories = {
   user: UserRepository;
 };
 
-type ShowConversationOptions = {
-  exposeMessage: Message;
-  openFirstSelfMention: boolean;
-  openNotificationSettings: boolean;
+interface ShowConversationOptions {
+  exposeMessage?: Message;
+  openFirstSelfMention?: boolean;
+  openNotificationSettings?: boolean;
 };
 
 export class ContentViewModel {
