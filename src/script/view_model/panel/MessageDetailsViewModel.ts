@@ -35,7 +35,7 @@ import type {MemberMessage} from '../../entity/message/MemberMessage';
 
 export class MessageDetailsViewModel extends BasePanelViewModel {
   conversationRepository: ConversationRepository;
-  editedFooter: ko.PureComputed<string>;
+  editedFooter: ko.PureComputed<string | undefined>;
   isReceiptsOpen: ko.Observable<boolean>;
   likes: ko.PureComputed<string[]>;
   likesTitle: ko.PureComputed<string>;
