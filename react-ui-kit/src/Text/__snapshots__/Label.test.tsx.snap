@@ -1,20 +1,24 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`"Label" renders (dark theme) 1`] = `
-.emotion-1 {
-  background: #000;
-  -webkit-transition: background 0.15s;
-  transition: background 0.15s;
-}
-
 .emotion-0 {
-  color: #fff;
+  color: initial;
   display: inline;
   font-size: 12px;
   font-weight: 600;
   opacity: 1;
   text-align: left;
   text-transform: none;
+}
+
+.emotion-0:focus-within {
+  color: #2391d3;
+}
+
+.emotion-1 {
+  background: #000;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
 }
 
 <div
@@ -36,13 +40,17 @@ exports[`"Label" renders 1`] = `
 }
 
 .emotion-0 {
-  color: rgb(52,56,59);
+  color: initial;
   display: inline;
   font-size: 12px;
   font-weight: 600;
   opacity: 1;
   text-align: left;
   text-transform: none;
+}
+
+.emotion-0:focus-within {
+  color: #2391d3;
 }
 
 <div

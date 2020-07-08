@@ -22,14 +22,21 @@ import {ObjectInterpolation, jsx} from '@emotion/core';
 import {Theme} from '../Layout';
 import {LinkProps, linkStyle} from './Link';
 import {TextProps, filterTextProps, textStyle} from './Text';
+import {COLOR} from '../Identity';
 
-export type LabelProps<T = HTMLSpanElement> = TextProps<T>;
+export interface LabelProps<T = HTMLSpanElement> extends TextProps<T> {
+  markInvalid?: boolean;
+}
 
 const labelStyle: <T>(theme: Theme, props: LabelProps<T>) => ObjectInterpolation<undefined> = (
   theme,
-  {bold = true, color = theme.general.color, fontSize = '12px', ...props},
+  {markInvalid, bold = true, color = theme.general.color, fontSize = '12px', ...props},
 ) => ({
   ...textStyle(theme, {bold, color, fontSize, ...props}),
+  '&:focus-within': {
+    color: COLOR.BLUE,
+  },
+  color: markInvalid ? COLOR.RED : 'initial',
 });
 
 export const Label = (props: LabelProps) => (
