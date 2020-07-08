@@ -5,7 +5,7 @@
   },
   "devDependencies": {
     "@types/node": "~12",
-    "@wireapp/bot-api": "7.10.11",
+    "@wireapp/bot-api": "7.10.12",
     "jasmine": "3.5.0",
     "rimraf": "3.0.2",
     "typescript": "3.8.3"
@@ -30,5 +30,5 @@
     "test:node": "exit 0",
     "test:project": "yarn dist && yarn test"
   },
-  "version": "0.2.5"
+  "version": "0.2.6"
 }

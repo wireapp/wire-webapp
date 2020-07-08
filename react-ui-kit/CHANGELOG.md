@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.32.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.31.1...@wireapp/react-ui-kit@7.32.0) (2020-07-08)
+
+
+### Features
+
+* **react-ui-kit:** Input label & InputSubmitCombo label ([#3100](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/3100)) ([6c79b05](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/6c79b053538685c79323a9702e50d098a8d1fc37))
+
+
+
+
+
 ## [7.31.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.31.0...@wireapp/react-ui-kit@7.31.1) (2020-07-08)
 
 
