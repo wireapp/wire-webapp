@@ -27,9 +27,9 @@ import {TextProps, Label} from '../Text';
 import {filterProps} from '../util';
 
 export interface InputProps<T = HTMLInputElement> extends TextProps<T> {
+  label?: string;
   markInvalid?: boolean;
   placeholderTextTransform?: TextTransformProperty;
-  label?: string;
 }
 
 export const inputStyle: <T>(theme: Theme, props: InputProps<T>) => ObjectInterpolation<undefined> = (
@@ -56,7 +56,7 @@ export const inputStyle: <T>(theme: Theme, props: InputProps<T>) => ObjectInterp
     '&:focus': {
       boxShadow: `0 0 0 1px ${COLOR.BLUE}`,
     },
-    '&:invalid': !markInvalid
+    '&:invalid:not(:focus)': !markInvalid
       ? {
           boxShadow: 'none',
         }

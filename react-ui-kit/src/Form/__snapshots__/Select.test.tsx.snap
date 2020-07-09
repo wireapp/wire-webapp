@@ -51,7 +51,7 @@ exports[`"Select" renders 1`] = `
   box-shadow: 0 0 0 1px #2391d3;
 }
 
-.emotion-0:invalid {
+.emotion-0:invalid:not(:focus) {
   box-shadow: none;
 }
 
@@ -131,7 +131,7 @@ exports[`"Select" renders as disabled 1`] = `
   box-shadow: 0 0 0 1px #2391d3;
 }
 
-.emotion-0:invalid {
+.emotion-0:invalid:not(:focus) {
   box-shadow: none;
 }
 
@@ -212,7 +212,7 @@ exports[`"Select" renders as invalid 1`] = `
   box-shadow: 0 0 0 1px #2391d3;
 }
 
-.emotion-0:invalid {
+.emotion-0:invalid:not(:focus) {
   box-shadow: none;
 }
 
