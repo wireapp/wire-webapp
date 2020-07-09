@@ -72,7 +72,7 @@ export class ActionsViewModel {
    * @param nextConversationEntity Conversation to be switched to
    * @returns Resolves when the user was blocked
    */
-  blockUser = (userEntity: User, hideConversation: boolean, nextConversationEntity: Conversation): Promise<void> => {
+  blockUser = (userEntity: User, hideConversation?: boolean, nextConversationEntity?: Conversation): Promise<void> => {
     if (!userEntity) {
       return Promise.reject();
     }
@@ -104,8 +104,8 @@ export class ActionsViewModel {
    */
   cancelConnectionRequest = (
     userEntity: User,
-    hideConversation: boolean,
-    nextConversationEntity: Conversation,
+    hideConversation?: boolean,
+    nextConversationEntity?: Conversation,
   ): Promise<void> => {
     if (!userEntity) {
       return Promise.reject();
@@ -367,7 +367,7 @@ export class ActionsViewModel {
    * @param showConversation Should we open the new conversation?
    * @returns Resolves when the connection request was successfully created
    */
-  sendConnectionRequest = (userEntity: User, showConversation: boolean): Promise<void> => {
+  sendConnectionRequest = (userEntity: User, showConversation?: boolean): Promise<void> => {
     if (!userEntity) {
       return Promise.reject();
     }
@@ -388,7 +388,7 @@ export class ActionsViewModel {
    * @param showConversation Show new conversation on success
    * @returns Resolves when the user was unblocked
    */
-  unblockUser = (userEntity: User, showConversation: boolean): Promise<void> => {
+  unblockUser = (userEntity: User, showConversation?: boolean): Promise<void> => {
     if (!userEntity) {
       return Promise.reject();
     }
