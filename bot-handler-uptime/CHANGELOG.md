@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.8](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-uptime/compare/@wireapp/bot-handler-uptime@0.1.7...@wireapp/bot-handler-uptime@0.1.8) (2020-07-09)
+
+**Note:** Version bump only for package @wireapp/bot-handler-uptime
+
+
+
+
+
 ## [0.1.7](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-uptime/compare/@wireapp/bot-handler-uptime@0.1.6...@wireapp/bot-handler-uptime@0.1.7) (2020-07-09)
 
 **Note:** Version bump only for package @wireapp/bot-handler-uptime
