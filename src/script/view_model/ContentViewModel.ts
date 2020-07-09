@@ -105,6 +105,7 @@ export class ContentViewModel {
   userRepository: UserRepository;
   logger: Logger;
   state: ko.Observable<string>;
+  State: typeof ContentViewModel.STATE;
   collectionDetails: CollectionDetailsViewModel;
   collection: CollectionViewModel;
   connectRequests: ConnectRequestsViewModel;
@@ -155,6 +156,7 @@ export class ContentViewModel {
     this.logger = getLogger('ContentViewModel');
 
     // State
+    this.State = ContentViewModel.STATE;
     this.state = ko.observable(ContentViewModel.STATE.WATERMARK);
 
     // Nested view models

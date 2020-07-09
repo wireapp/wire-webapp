@@ -21,7 +21,7 @@ import {Environment} from 'Util/Environment';
 import ko from 'knockout';
 
 import {ContentViewModel} from '../ContentViewModel';
-import type {ListViewModel} from '../ListViewModel';
+import {ListViewModel} from '../ListViewModel';
 import type {UserRepository} from 'src/script/user/UserRepository';
 import type {CallingRepository} from 'src/script/calling/CallingRepository';
 
@@ -72,7 +72,7 @@ class PreferencesListViewModel {
       if (!this.isActivatedAccount()) {
         return this.listViewModel.showTemporaryGuest();
       }
-      this.listViewModel.switchList(z.viewModel.ListViewModel.STATE.CONVERSATIONS);
+      this.listViewModel.switchList(ListViewModel.STATE.CONVERSATIONS);
     }
   };
 
