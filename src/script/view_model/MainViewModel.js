@@ -26,6 +26,7 @@ import {WarningsViewModel} from './WarningsViewModel';
 import {ContentViewModel} from './ContentViewModel';
 import {CallingViewModel} from './CallingViewModel';
 import {ActionsViewModel} from './ActionsViewModel';
+import {ListViewModel} from './ListViewModel';
 
 export class MainViewModel {
   static get CONFIG() {
@@ -91,7 +92,7 @@ export class MainViewModel {
       this.multitasking,
     );
     this.content = new ContentViewModel(this, repositories);
-    this.list = new z.viewModel.ListViewModel(this, repositories);
+    this.list = new ListViewModel(this, repositories);
 
     this.lightbox = new z.viewModel.ImageDetailViewViewModel(this, repositories);
     this.title = new WindowTitleViewModel(this, repositories);
