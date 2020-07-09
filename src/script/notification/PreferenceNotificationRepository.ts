@@ -43,7 +43,7 @@ interface GroupedNotifications {
  * Take care of storing and keeping track of all the notifications relative to the user preferences (read receipts config, active devices ...)
  */
 export class PreferenceNotificationRepository {
-  private readonly notifications: ko.ObservableArray<Notification>;
+  public readonly notifications: ko.ObservableArray<Notification>;
 
   static get CONFIG() {
     return {

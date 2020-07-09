@@ -17,28 +17,38 @@
  *
  */
 
-import {getLogger} from 'Util/Logger';
 import {Environment} from 'Util/Environment';
+import ko from 'knockout';
 
 import {ContentViewModel} from '../ContentViewModel';
+import type {ListViewModel} from '../ListViewModel';
+import type {UserRepository} from 'src/script/user/UserRepository';
+import type {CallingRepository} from 'src/script/calling/CallingRepository';
 
 class PreferencesListViewModel {
-  /**
-   * View model for the preferences list.
-   * @param {ContentViewModel} contentViewModel content view model
-   * @param {z.viewModel.ListViewModel} listViewModel List view model
-   * @param {UserRepository} userRepository Repository managing users
-   * @param {CallingRepository} callingRepository Repository managing calls
-   */
-  constructor(contentViewModel, listViewModel, userRepository, callingRepository) {
+  contentState: ko.Observable<string>;
+  isActivatedAccount: ko.PureComputed<boolean>;
+  isDesktop: boolean;
+  supportsCalling: boolean;
+  selectedAbout: ko.PureComputed<boolean>;
+  selectedAccount: ko.PureComputed<boolean>;
+  selectedAV: ko.PureComputed<boolean>;
+  selectedDevices: ko.PureComputed<boolean>;
+  selectedOptions: ko.PureComputed<boolean>;
+
+  constructor(
+    private readonly contentViewModel: ContentViewModel,
+    private readonly listViewModel: ListViewModel,
+    private readonly userRepository: UserRepository,
+    callingRepository: CallingRepository,
+  ) {
     this.listViewModel = listViewModel;
     this.userRepository = userRepository;
-    this.logger = getLogger('PreferencesListViewModel');
 
     this.contentViewModel = contentViewModel;
     this.contentState = this.contentViewModel.state;
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
-    this.Environment = Environment;
+    this.isDesktop = Environment.desktop;
 
     this.supportsCalling = callingRepository.supportsCalling;
 
@@ -55,7 +65,7 @@ class PreferencesListViewModel {
     this.selectedOptions = ko.pureComputed(() => this.contentState() === ContentViewModel.STATE.PREFERENCES_OPTIONS);
   }
 
-  clickOnClosePreferences() {
+  clickOnClosePreferences = (): void => {
     const preventingContentViewStates = [ContentViewModel.STATE.HISTORY_EXPORT, ContentViewModel.STATE.HISTORY_IMPORT];
 
     if (!preventingContentViewStates.includes(this.contentState())) {
@@ -64,31 +74,31 @@ class PreferencesListViewModel {
       }
       this.listViewModel.switchList(z.viewModel.ListViewModel.STATE.CONVERSATIONS);
     }
-  }
+  };
 
-  clickOnAbout() {
+  clickOnAbout = (): void => {
     this._switchContent(ContentViewModel.STATE.PREFERENCES_ABOUT);
-  }
+  };
 
-  clickOnAccount() {
+  clickOnAccount = (): void => {
     this._switchContent(ContentViewModel.STATE.PREFERENCES_ACCOUNT);
-  }
+  };
 
-  clickOnAV() {
+  clickOnAV = (): void => {
     this._switchContent(ContentViewModel.STATE.PREFERENCES_AV);
-  }
+  };
 
-  clickOnDevices() {
+  clickOnDevices = (): void => {
     this._switchContent(ContentViewModel.STATE.PREFERENCES_DEVICES);
-  }
+  };
 
-  clickOnOptions() {
+  clickOnOptions = (): void => {
     this._switchContent(ContentViewModel.STATE.PREFERENCES_OPTIONS);
-  }
+  };
 
-  _switchContent(newContentState) {
+  _switchContent = (newContentState: string): void => {
     this.contentViewModel.switchContent(newContentState);
-  }
+  };
 }
 
 export {PreferencesListViewModel};

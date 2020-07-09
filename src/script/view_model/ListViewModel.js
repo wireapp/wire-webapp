@@ -43,7 +43,7 @@ import {DefaultLabelIds} from '../conversation/ConversationLabelRepository';
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 
-z.viewModel.ListViewModel = class ListViewModel {
+export class ListViewModel {
   static get MODAL_TYPE() {
     return {
       TAKEOVER: 'ListViewModel.MODAL_TYPE.TAKEOVER',
@@ -122,16 +122,35 @@ z.viewModel.ListViewModel = class ListViewModel {
 
     // Nested view models
     this.archive = new ArchiveViewModel(this, repositories.conversation, this.answerCall);
-    this.conversations = new ConversationListViewModel(mainViewModel, this, repositories, this.answerCall);
+    this.conversations = new ConversationListViewModel(
+      mainViewModel,
+      this,
+      this.answerCall,
+      repositories.event,
+      repositories.calling,
+      repositories.conversation,
+      repositories.preferenceNotification,
+      repositories.team,
+      repositories.user,
+      repositories.properties,
+    );
     this.preferences = new PreferencesListViewModel(
       this.contentViewModel,
       this,
       repositories.user,
       repositories.calling,
     );
-    this.start = new StartUIViewModel(mainViewModel, this, repositories);
-    this.takeover = new TakeoverViewModel(mainViewModel, this, repositories);
-    this.temporaryGuest = new TemporaryGuestViewModel(mainViewModel, this, repositories, this.answerCall);
+    this.start = new StartUIViewModel(
+      mainViewModel,
+      this,
+      repositories.conversation,
+      repositories.integration,
+      repositories.search,
+      repositories.team,
+      repositories.user,
+    );
+    this.takeover = new TakeoverViewModel(this, repositories.user, repositories.conversation);
+    this.temporaryGuest = new TemporaryGuestViewModel(mainViewModel, repositories.user, repositories.calling);
 
     this._initSubscriptions();
 
@@ -492,4 +511,6 @@ z.viewModel.ListViewModel = class ListViewModel {
 
     return isStateConversations && isActiveConversation;
   }
-};
+}
+
+z.viewModel.ListViewModel = ListViewModel;
