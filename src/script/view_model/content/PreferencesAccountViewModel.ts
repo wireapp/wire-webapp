@@ -71,6 +71,7 @@ export class PreferencesAccountViewModel {
   isActivatedAccount: ko.PureComputed<boolean>;
   selfUser: ko.Observable<User>;
   name: ko.PureComputed<string>;
+  email: ko.PureComputed<string>;
   availability: ko.PureComputed<Availability.Type>;
   availabilityLabel: ko.PureComputed<string>;
   username: ko.PureComputed<string>;
@@ -132,6 +133,7 @@ export class PreferencesAccountViewModel {
     this.UserNameState = PreferencesAccountViewModel.USERNAME_STATE;
 
     this.name = ko.pureComputed(() => this.selfUser().name());
+    this.email = ko.pureComputed(() => this.selfUser().email());
     this.availability = ko.pureComputed(() => this.selfUser().availability());
 
     this.availabilityLabel = ko.pureComputed(() => {
@@ -246,6 +248,38 @@ export class PreferencesAccountViewModel {
       const isCurrentRequest = this.enteredUsername() === this.submittedUsername();
       if (isUsernameTaken && isCurrentRequest) {
         this.usernameState(PreferencesAccountViewModel.USERNAME_STATE.TAKEN);
+      }
+    }
+  };
+
+  changeEmail = async (data: unknown, event: ChangeEvent<HTMLInputElement>): Promise<void> => {
+    try {
+      const enteredEmail = event.target.value;
+
+      await this.userRepository.changeEmail(enteredEmail);
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+        text: {
+          message: t('authPostedResendDetail'),
+          title: t('modalPreferencesAccountEmailHeadline'),
+        },
+      });
+    } catch (error) {
+      this.logger.warn('Failed to send reset email request', error);
+      if (error.code === 400) {
+        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+          text: {
+            message: t('modalPreferencesAccountEmailInvalidMessage'),
+            title: t('modalPreferencesAccountEmailErrorHeadline'),
+          },
+        });
+      }
+      if (error.code === 409) {
+        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+          text: {
+            message: t('modalPreferencesAccountEmailTakenMessage'),
+            title: t('modalPreferencesAccountEmailErrorHeadline'),
+          },
+        });
       }
     }
   };
@@ -396,6 +430,10 @@ export class PreferencesAccountViewModel {
     if (!this.nameSaved()) {
       this.name.notifySubscribers();
     }
+  };
+
+  resetEmailInput = (): void => {
+    this.email.notifySubscribers();
   };
 
   resetUsernameInput = (): void => {
