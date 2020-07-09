@@ -294,6 +294,10 @@ export class CallingRepository {
 
   private storeCall(call: Call): void {
     this.activeCalls.push(call);
+    const conversation = this.conversationRepository.find_conversation_by_id(call.conversationId);
+    if (conversation) {
+      conversation.call(call);
+    }
   }
 
   private removeCall(call: Call): void {
@@ -302,6 +306,10 @@ export class CallingRepository {
     call.participants.removeAll();
     if (index !== -1) {
       this.activeCalls.splice(index, 1);
+    }
+    const conversation = this.conversationRepository.find_conversation_by_id(call.conversationId);
+    if (conversation) {
+      conversation.call(null);
     }
   }
 
