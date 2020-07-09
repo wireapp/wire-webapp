@@ -93,6 +93,18 @@ const shakeBox = useRef();
           </InputSubmitCombo>
         </Tooltip>
       </InputBlock>
+      <InputBlock>
+        <Input placeholder="InputBlock" />
+        <Input placeholder="Second Input" />
+        <Tooltip text="Lots of icons here">
+          <InputSubmitCombo>
+            <Input placeholder="InputSubmitCombo" name="password" />
+            <RoundIconButton type="submit" formNoValidate>
+              <ArrowIcon />
+            </RoundIconButton>
+          </InputSubmitCombo>
+        </Tooltip>
+      </InputBlock>
     </Form>
   </ShakeBox>
   <ErrorMessage>Submit form for shake effect</ErrorMessage>
