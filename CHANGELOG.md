@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.32.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.32.1...@wireapp/react-ui-kit@7.32.2) (2020-07-09)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Enforce margins in InputBlock ([#3102](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/3102)) ([c289b33](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/c289b33fb43e7fdf9aa1e423f8f2c6a0872f60c5))
+
+
+
+
+
 ## [7.32.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.32.0...@wireapp/react-ui-kit@7.32.1) (2020-07-09)
 
 
