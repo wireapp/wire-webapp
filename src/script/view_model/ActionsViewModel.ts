@@ -50,16 +50,20 @@ export class ActionsViewModel {
     this.modalsViewModel = mainViewModel.modals;
   }
 
-  acceptConnectionRequest = (userEntity: User, showConversation: boolean): Promise<void> | void => {
-    if (userEntity) {
-      return this.connectionRepository.acceptRequest(userEntity, showConversation);
+  acceptConnectionRequest = (userEntity: User, showConversation: boolean): Promise<void> => {
+    if (!userEntity) {
+      return Promise.reject();
     }
+
+    return this.connectionRepository.acceptRequest(userEntity, showConversation);
   };
 
-  archiveConversation = (conversationEntity: Conversation): Promise<void> | void => {
-    if (conversationEntity) {
-      return this.conversationRepository.archiveConversation(conversationEntity);
+  archiveConversation = (conversationEntity: Conversation): Promise<void> => {
+    if (!conversationEntity) {
+      return Promise.reject();
     }
+
+    return this.conversationRepository.archiveConversation(conversationEntity);
   };
 
   /**
@@ -68,30 +72,27 @@ export class ActionsViewModel {
    * @param nextConversationEntity Conversation to be switched to
    * @returns Resolves when the user was blocked
    */
-  blockUser = (
-    userEntity: User,
-    hideConversation: boolean,
-    nextConversationEntity: Conversation,
-  ): Promise<void> | void => {
-    if (userEntity) {
-      // TODO: Does the promise resolve when there is no primary action (i.e. cancel button gets clicked)?
-      return new Promise(resolve => {
-        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
-          primaryAction: {
-            action: async () => {
-              await this.connectionRepository.blockUser(userEntity, hideConversation, nextConversationEntity);
-              resolve();
-            },
-            text: t('modalUserBlockAction'),
-          },
-
-          text: {
-            message: t('modalUserBlockMessage', userEntity.name()),
-            title: t('modalUserBlockHeadline', userEntity.name()),
-          },
-        });
-      });
+  blockUser = (userEntity: User, hideConversation: boolean, nextConversationEntity: Conversation): Promise<void> => {
+    if (!userEntity) {
+      return Promise.reject();
     }
+    // TODO: Does the promise resolve when there is no primary action (i.e. cancel button gets clicked)?
+    return new Promise(resolve => {
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+        primaryAction: {
+          action: async () => {
+            await this.connectionRepository.blockUser(userEntity, hideConversation, nextConversationEntity);
+            resolve();
+          },
+          text: t('modalUserBlockAction'),
+        },
+
+        text: {
+          message: t('modalUserBlockMessage', userEntity.name()),
+          title: t('modalUserBlockHeadline', userEntity.name()),
+        },
+      });
+    });
   };
 
   /**
@@ -105,27 +106,29 @@ export class ActionsViewModel {
     userEntity: User,
     hideConversation: boolean,
     nextConversationEntity: Conversation,
-  ): Promise<void> | void => {
-    if (userEntity) {
-      return new Promise(resolve => {
-        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
-          primaryAction: {
-            action: () => {
-              this.connectionRepository.cancelRequest(userEntity, hideConversation, nextConversationEntity);
-              resolve();
-            },
-            text: t('modalConnectCancelAction'),
-          },
-          secondaryAction: {
-            text: t('modalConnectCancelSecondary'),
-          },
-          text: {
-            message: t('modalConnectCancelMessage', userEntity.name()),
-            title: t('modalConnectCancelHeadline'),
-          },
-        });
-      });
+  ): Promise<void> => {
+    if (!userEntity) {
+      return Promise.reject();
     }
+
+    return new Promise(resolve => {
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+        primaryAction: {
+          action: () => {
+            this.connectionRepository.cancelRequest(userEntity, hideConversation, nextConversationEntity);
+            resolve();
+          },
+          text: t('modalConnectCancelAction'),
+        },
+        secondaryAction: {
+          text: t('modalConnectCancelSecondary'),
+        },
+        text: {
+          message: t('modalConnectCancelMessage', userEntity.name()),
+          title: t('modalConnectCancelHeadline'),
+        },
+      });
+    });
   };
 
   clearConversation = (conversationEntity: Conversation): void => {
@@ -195,7 +198,7 @@ export class ActionsViewModel {
     });
   };
 
-  deleteMessage = (conversationEntity: Conversation, messageEntity: Message): Promise<void> | void => {
+  deleteMessage = (conversationEntity: Conversation, messageEntity: Message): Promise<void> => {
     if (conversationEntity && messageEntity) {
       return new Promise(resolve => {
         amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
@@ -213,9 +216,11 @@ export class ActionsViewModel {
         });
       });
     }
+
+    return Promise.reject();
   };
 
-  deleteMessageEveryone = (conversationEntity: Conversation, messageEntity: Message): Promise<void> | void => {
+  deleteMessageEveryone = (conversationEntity: Conversation, messageEntity: Message): Promise<void> => {
     if (conversationEntity && messageEntity) {
       return new Promise(resolve => {
         amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
@@ -233,40 +238,45 @@ export class ActionsViewModel {
         });
       });
     }
+
+    return Promise.reject();
   };
 
-  ignoreConnectionRequest = (userEntity: User): Promise<void> | void => {
-    if (userEntity) {
-      return this.connectionRepository.ignoreRequest(userEntity);
+  ignoreConnectionRequest = (userEntity: User): Promise<void> => {
+    if (!userEntity) {
+      return Promise.reject();
     }
+    return this.connectionRepository.ignoreRequest(userEntity);
   };
 
-  leaveConversation = (conversationEntity: Conversation): Promise<void> | void => {
-    if (conversationEntity) {
-      return new Promise(resolve => {
-        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.OPTION, {
-          primaryAction: {
-            action: (clearContent = false) => {
-              if (clearContent) {
-                this.conversationRepository.clear_conversation(conversationEntity, true);
-              } else {
-                this.conversationRepository.removeMember(conversationEntity, this.userRepository.self().id);
-              }
-              resolve();
-            },
-            text: t('modalConversationLeaveAction'),
+  leaveConversation = (conversationEntity: Conversation): Promise<void> => {
+    if (!conversationEntity) {
+      return Promise.reject();
+    }
+
+    return new Promise(resolve => {
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.OPTION, {
+        primaryAction: {
+          action: (clearContent = false) => {
+            if (clearContent) {
+              this.conversationRepository.clear_conversation(conversationEntity, true);
+            } else {
+              this.conversationRepository.removeMember(conversationEntity, this.userRepository.self().id);
+            }
+            resolve();
           },
-          text: {
-            message: t('modalConversationLeaveMessage'),
-            option: t('modalConversationLeaveOption'),
-            title: t('modalConversationLeaveHeadline', conversationEntity.display_name()),
-          },
-        });
+          text: t('modalConversationLeaveAction'),
+        },
+        text: {
+          message: t('modalConversationLeaveMessage'),
+          option: t('modalConversationLeaveOption'),
+          title: t('modalConversationLeaveHeadline', conversationEntity.display_name()),
+        },
       });
-    }
+    });
   };
 
-  deleteConversation = (conversationEntity: Conversation): Promise<void> | void => {
+  deleteConversation = (conversationEntity: Conversation): Promise<void> => {
     if (conversationEntity && conversationEntity.isCreatedBySelf()) {
       return new Promise(() => {
         amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
@@ -283,28 +293,33 @@ export class ActionsViewModel {
         });
       });
     }
+
+    return Promise.reject();
   };
 
-  open1to1Conversation = (userEntity: User): Promise<void> | void => {
-    if (userEntity) {
-      return this.conversationRepository
-        .get1To1Conversation(userEntity)
-        .then(conversationEntity => this.openConversation(conversationEntity));
+  open1to1Conversation = (userEntity: User): Promise<void> => {
+    if (!userEntity) {
+      return Promise.reject();
     }
+    return this.conversationRepository
+      .get1To1Conversation(userEntity)
+      .then(conversationEntity => this.openConversation(conversationEntity));
   };
 
-  open1to1ConversationWithService = (serviceEntity: ServiceEntity): Promise<void> | void => {
-    if (serviceEntity) {
-      return this.integrationRepository
-        .get1To1ConversationWithService(serviceEntity)
-        .then(conversationEntity => this.openConversation(conversationEntity));
+  open1to1ConversationWithService = (serviceEntity: ServiceEntity): Promise<void> => {
+    if (!serviceEntity) {
+      return Promise.reject();
     }
+    return this.integrationRepository
+      .get1To1ConversationWithService(serviceEntity)
+      .then(conversationEntity => this.openConversation(conversationEntity));
   };
 
-  openGroupConversation = (conversationEntity: Conversation): Promise<void> | void => {
-    if (conversationEntity) {
-      return Promise.resolve().then(() => this.openConversation(conversationEntity));
+  openGroupConversation = (conversationEntity: Conversation): Promise<void> => {
+    if (!conversationEntity) {
+      return Promise.reject();
     }
+    return Promise.resolve().then(() => this.openConversation(conversationEntity));
   };
 
   private readonly openConversation = (conversationEntity: Conversation): void => {
@@ -321,7 +336,7 @@ export class ActionsViewModel {
     }
   };
 
-  removeFromConversation = (conversationEntity: Conversation, userEntity: User): Promise<void> | void => {
+  removeFromConversation = (conversationEntity: Conversation, userEntity: User): Promise<void> => {
     if (conversationEntity && userEntity) {
       if (userEntity.isService) {
         return this.integrationRepository.removeService(conversationEntity, userEntity);
@@ -343,6 +358,8 @@ export class ActionsViewModel {
         });
       });
     }
+
+    return Promise.reject();
   };
 
   /**
@@ -350,10 +367,11 @@ export class ActionsViewModel {
    * @param showConversation Should we open the new conversation?
    * @returns Resolves when the connection request was successfully created
    */
-  sendConnectionRequest = (userEntity: User, showConversation: boolean): Promise<void> | void => {
-    if (userEntity) {
-      return this.connectionRepository.createConnection(userEntity, showConversation);
+  sendConnectionRequest = (userEntity: User, showConversation: boolean): Promise<void> => {
+    if (!userEntity) {
+      return Promise.reject();
     }
+    return this.connectionRepository.createConnection(userEntity, showConversation);
   };
 
   toggleMuteConversation = (conversationEntity: Conversation): void => {
@@ -370,28 +388,30 @@ export class ActionsViewModel {
    * @param showConversation Show new conversation on success
    * @returns Resolves when the user was unblocked
    */
-  unblockUser = (userEntity: User, showConversation: boolean): Promise<void> | void => {
-    if (userEntity) {
-      return new Promise(resolve => {
-        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
-          primaryAction: {
-            action: () => {
-              this.connectionRepository
-                .unblockUser(userEntity, showConversation)
-                .then(() => this.conversationRepository.get1To1Conversation(userEntity))
-                .then(conversationEntity => {
-                  resolve();
-                  return this.conversationRepository.updateParticipatingUserEntities(conversationEntity);
-                });
-            },
-            text: t('modalUserUnblockAction'),
-          },
-          text: {
-            message: t('modalUserUnblockMessage', userEntity.name()),
-            title: t('modalUserUnblockHeadline'),
-          },
-        });
-      });
+  unblockUser = (userEntity: User, showConversation: boolean): Promise<void> => {
+    if (!userEntity) {
+      return Promise.reject();
     }
+
+    return new Promise(resolve => {
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+        primaryAction: {
+          action: () => {
+            this.connectionRepository
+              .unblockUser(userEntity, showConversation)
+              .then(() => this.conversationRepository.get1To1Conversation(userEntity))
+              .then(conversationEntity => {
+                resolve();
+                return this.conversationRepository.updateParticipatingUserEntities(conversationEntity);
+              });
+          },
+          text: t('modalUserUnblockAction'),
+        },
+        text: {
+          message: t('modalUserUnblockMessage', userEntity.name()),
+          title: t('modalUserUnblockHeadline'),
+        },
+      });
+    });
   };
 }
