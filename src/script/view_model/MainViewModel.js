@@ -78,7 +78,14 @@ export class MainViewModel {
 
     this.isPanelOpen = ko.observable(false);
 
-    this.actions = new ActionsViewModel(this, repositories);
+    this.actions = new ActionsViewModel(
+      this,
+      repositories.client,
+      repositories.connection,
+      repositories.conversation,
+      repositories.integration,
+      repositories.user,
+    );
 
     this.panel = new z.viewModel.PanelViewModel(this, repositories);
     this.calling = new CallingViewModel(
