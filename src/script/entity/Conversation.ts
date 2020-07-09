@@ -22,6 +22,7 @@ import ko from 'knockout';
 import {Availability, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {debounce, Cancelable} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {STATE as CALL_STATE} from '@wireapp/avs';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
@@ -46,6 +47,7 @@ import type {ContentMessage} from './message/ContentMessage';
 import type {MemberMessage} from './message/MemberMessage';
 import type {Message} from './message/Message';
 import type {SystemMessage} from './message/SystemMessage';
+import type {Call} from '../calling/Call';
 
 interface UnreadState {
   allEvents: Message[];
@@ -97,6 +99,7 @@ export class Conversation {
   archivedTimestamp: ko.Observable<number>;
   availabilityOfUser: ko.PureComputed<Availability.Type>;
   blockLegalHoldMessage: boolean;
+  call: ko.Observable<Call>;
   cleared_timestamp: ko.Observable<number>;
   connection: ko.Observable<ConnectionEntity>;
   creator: string;
@@ -243,6 +246,8 @@ export class Conversation {
     this.last_read_timestamp = ko.observable(0);
     this.last_server_timestamp = ko.observable(0);
     this.mutedTimestamp = ko.observable(0);
+
+    this.call = ko.observable(null);
 
     // Conversation states for view
     this.notificationState = ko.pureComputed(() => {
@@ -902,6 +907,8 @@ export class Conversation {
   isShowingLastReceivedMessage = (): boolean => {
     return this.getLastMessage()?.timestamp() ? this.getLastMessage().timestamp() >= this.last_event_timestamp() : true;
   };
+
+  hasActiveCall = (): boolean => [CALL_STATE.INCOMING, CALL_STATE.MEDIA_ESTAB].includes(this.call()?.state());
 
   serialize(): SerializedConversation {
     return {

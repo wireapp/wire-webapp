@@ -2892,12 +2892,18 @@ export class ConversationRepository {
 
             switch (consentType) {
               case ConversationRepository.CONSENT_TYPE.INCOMING_CALL: {
+                if (conversationEntity.hasActiveCall()) {
+                  return resolve(true);
+                }
                 actionString = t('modalConversationNewDeviceIncomingCallAction');
                 messageString = t('modalConversationNewDeviceIncomingCallMessage');
                 break;
               }
 
               case ConversationRepository.CONSENT_TYPE.OUTGOING_CALL: {
+                if (conversationEntity.hasActiveCall()) {
+                  return resolve(true);
+                }
                 actionString = t('modalConversationNewDeviceOutgoingCallAction');
                 messageString = t('modalConversationNewDeviceOutgoingCallMessage');
                 break;
