@@ -1638,10 +1638,10 @@
   resolved "https://registry.yarnpkg.com/@types/q/-/q-1.5.2.tgz#690a1475b84f2a884fd07cd797c00f5f31356ea8"
   integrity sha512-ce5d3q03Ex0sy4R14722Rmt6MT07Ua+k4FwDfdcToYJcMKNtRVQvJ6JCAPdAmAnbRb6CsX6aYb9m96NGod9uTw==
 
-"@types/raygun4js@2.13.3":
-  version "2.13.3"
-  resolved "https://registry.yarnpkg.com/@types/raygun4js/-/raygun4js-2.13.3.tgz#24be92a9e21ae5fa7b954b5ed31922987b5c77cb"
-  integrity sha512-tx7hfTXUTYF3XxPrRaVwL/nYQAdQS1PuOkyvkgJyzoAleLs+ezIG66lb5aEfNZ0NzBDp7/hanEvFuptCjjGzPg==
+"@types/raygun4js@2.13.5":
+  version "2.13.5"
+  resolved "https://registry.yarnpkg.com/@types/raygun4js/-/raygun4js-2.13.5.tgz#31445d5f5bbadee8001c8fff6d3b22e0c542ac3e"
+  integrity sha512-v/fTmvGLH25OWIa8Ij904sojwJ53adDbfR0Az1PmD5zcLM3oLXPMmhdDs01UzPXaTmkBzP/FCjI2g60OgIyDlg==
 
 "@types/react-dom@16.9.8":
   version "16.9.8"
