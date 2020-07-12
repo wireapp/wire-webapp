@@ -1586,7 +1586,12 @@
   resolved "https://registry.yarnpkg.com/@types/minimist/-/minimist-1.2.0.tgz#69a23a3ad29caf0097f06eda59b361ee2f0639f6"
   integrity sha1-aaI6OtKcrwCX8G7aWbNh7i8GOfY=
 
-"@types/node@*", "@types/node@13.13.4":
+"@types/node@*", "@types/node@^13.7.0":
+  version "13.13.12"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-13.13.12.tgz#9c72e865380a7dc99999ea0ef20fc9635b503d20"
+  integrity sha512-zWz/8NEPxoXNT9YyF2osqyA9WjssZukYpgI4UYZpOjcyqwIUqWGkcCionaEb9Ki+FULyPyvNFpg/329Kd2/pbw==
+
+"@types/node@13.13.4":
   version "13.13.4"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-13.13.4.tgz#1581d6c16e3d4803eb079c87d4ac893ee7501c2c"
   integrity sha512-x26ur3dSXgv5AwKS0lNfbjpCakGIduWU1DU91Zz58ONRWrIKGunmZBNv4P7N+e27sJkiGDsw/3fT4AtsqQBrBA==
@@ -1595,11 +1600,6 @@
   version "10.14.22"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.14.22.tgz#34bcdf6b6cb5fc0db33d24816ad9d3ece22feea4"
   integrity sha512-9taxKC944BqoTVjE+UT3pQH0nHZlTvITwfsOZqyc+R3sfJuxaTtxWjfn1K2UlxyPcKHf0rnaXcVFrS9F9vf0bw==
-
-"@types/node@^13.7.0":
-  version "13.13.12"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-13.13.12.tgz#9c72e865380a7dc99999ea0ef20fc9635b503d20"
-  integrity sha512-zWz/8NEPxoXNT9YyF2osqyA9WjssZukYpgI4UYZpOjcyqwIUqWGkcCionaEb9Ki+FULyPyvNFpg/329Kd2/pbw==
 
 "@types/node@~12":
   version "12.12.14"
@@ -2020,6 +2020,20 @@
   version "3.5.4"
   resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-3.5.4.tgz#a3e399be61c61f02b7ea8373922109b4749a9e5b"
   integrity sha512-GJjbcAQ2ZAgBgXhAkYumG7h2nYvfSSoemhro3kp64EAvo+tMf2TaXtdjWF7FmurdnqVWhMNRVJUkqYJ+/k3UEg==
+  dependencies:
+    "@types/fs-extra" "8.1.0"
+    "@types/node" "~12"
+    "@types/platform" "1.3.2"
+    ansi-regex "5.0.0"
+    fs-extra "9.0.0"
+    logdown "3.3.1"
+    platform "1.3.5"
+    url-search-params-polyfill "8.1.0"
+
+"@wireapp/commons@3.6.0":
+  version "3.6.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-3.6.0.tgz#3147352ea49502788c87192dae4a8a374df3c66d"
+  integrity sha512-RoQBLlh4cdPQ+KaSta7KgvYsuVpAavvTl1BjSnJ7uoX9+8huYApnufyp/lj+FFxBaSX7XHptaCUREvO8vo4wLA==
   dependencies:
     "@types/fs-extra" "8.1.0"
     "@types/node" "~12"
