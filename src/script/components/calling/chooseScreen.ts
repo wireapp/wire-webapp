@@ -33,12 +33,6 @@ interface ChooseScreenParams {
 
 ko.components.register('choose-screen', {
   template: `
-    <div class="choose-screen-list" data-bind="foreach: {data: screens, as: 'screen', noChildContext: true}">
-      <div class="choose-screen-list-item" data-uie-name="item-screen" data-bind="click: () => onChoose(screen.id)">
-        <image class="choose-screen-list-image" data-bind="attr: {src: screen.thumbnail.toDataURL()}">
-      </div>
-    </div>
-    <div class="label-xs text-white" data-bind="text: t('callChooseSharedScreen')"></div>
     <!-- ko if: windows().length > 0 -->
       <div class="choose-screen-list" data-bind="foreach: {data: windows, as: 'window', noChildContext: true}">
         <div class="choose-screen-list-item" data-uie-name="item-window" data-bind="click: () => onChoose(window.id)">
@@ -47,6 +41,12 @@ ko.components.register('choose-screen', {
       </div>
       <div class="label-xs text-white" data-bind="text: t('callChooseSharedWindow')"></div>
     <!-- /ko -->
+    <div class="choose-screen-list" data-bind="foreach: {data: screens, as: 'screen', noChildContext: true}">
+      <div class="choose-screen-list-item" data-uie-name="item-screen" data-bind="click: () => onChoose(screen.id)">
+        <image class="choose-screen-list-image" data-bind="attr: {src: screen.thumbnail.toDataURL()}">
+      </div>
+    </div>
+    <div class="label-xs text-white" data-bind="text: t('callChooseSharedScreen')"></div>
     <div id="choose-screen-controls" class="choose-screen-controls">
       <div class="choose-screen-controls-button button-round button-round-dark button-round-md icon-close"
            data-uie-name="do-choose-screen-cancel"
