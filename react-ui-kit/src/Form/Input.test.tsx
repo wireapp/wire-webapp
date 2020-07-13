@@ -26,5 +26,5 @@ describe('"Input"', () => {
   it('renders as invalid', () => matchComponent(<Input markInvalid />));
   it('renders as disabled', () => matchComponent(<Input disabled />));
   it('renders with placeholderTextTransform', () =>
-    matchComponent(<Input placeholderTextTransform="lowercase" placeholder="Input" />));
+    matchComponent(<Input placeholderTextTransform="uppercase" placeholder="Input" />));
 });

@@ -34,7 +34,7 @@ export interface InputProps<T = HTMLInputElement> extends TextProps<T> {
 
 export const inputStyle: <T>(theme: Theme, props: InputProps<T>) => ObjectInterpolation<undefined> = (
   theme,
-  {markInvalid = false, placeholderTextTransform = 'uppercase', disabled = false},
+  {markInvalid = false, placeholderTextTransform = 'none', disabled = false},
 ) => {
   const placeholderStyle = {
     color: theme.Input.placeholderColor,

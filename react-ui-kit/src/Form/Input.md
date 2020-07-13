@@ -8,8 +8,8 @@ import {InputSubmitCombo, RoundIconButton, ArrowIcon, Input} from '@wireapp/reac
   <Input label={"I'm a label!"} placeholder="Focus me!" />
   <Input label={'Uh error!'} placeholder="Error" markInvalid />
 
-  <InputSubmitCombo label="SubmitCombo Label">
-    <Input placeholder="InputSubmitCombo" name="password" />
+  <InputSubmitCombo label="SubmitCombo label">
+    <Input placeholder="Input submit Combo" name="password" />
     <RoundIconButton type="submit" formNoValidate>
       <ArrowIcon />
     </RoundIconButton>

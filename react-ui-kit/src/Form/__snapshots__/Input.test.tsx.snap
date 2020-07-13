@@ -26,20 +26,20 @@ exports[`"Input" renders 1`] = `
 .emotion-0::-moz-placeholder {
   color: rgb(141,152,159);
   font-size: 11px;
-  text-transform: uppercase;
+  text-transform: none;
   opacity: 1;
 }
 
 .emotion-0::-ms-input-placeholder {
   color: rgb(141,152,159);
   font-size: 11px;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .emotion-0::-webkit-input-placeholder {
   color: rgb(141,152,159);
   font-size: 11px;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .emotion-0:focus {
@@ -85,20 +85,20 @@ exports[`"Input" renders as disabled 1`] = `
 .emotion-0::-moz-placeholder {
   color: rgb(141,152,159);
   font-size: 11px;
-  text-transform: uppercase;
+  text-transform: none;
   opacity: 1;
 }
 
 .emotion-0::-ms-input-placeholder {
   color: rgb(141,152,159);
   font-size: 11px;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .emotion-0::-webkit-input-placeholder {
   color: rgb(141,152,159);
   font-size: 11px;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .emotion-0:focus {
@@ -145,20 +145,20 @@ exports[`"Input" renders as invalid 1`] = `
 .emotion-0::-moz-placeholder {
   color: rgb(141,152,159);
   font-size: 11px;
-  text-transform: uppercase;
+  text-transform: none;
   opacity: 1;
 }
 
 .emotion-0::-ms-input-placeholder {
   color: rgb(141,152,159);
   font-size: 11px;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .emotion-0::-webkit-input-placeholder {
   color: rgb(141,152,159);
   font-size: 11px;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .emotion-0:focus {
@@ -200,20 +200,20 @@ exports[`"Input" renders with placeholderTextTransform 1`] = `
 .emotion-0::-moz-placeholder {
   color: rgb(141,152,159);
   font-size: 11px;
-  text-transform: lowercase;
+  text-transform: uppercase;
   opacity: 1;
 }
 
 .emotion-0::-ms-input-placeholder {
   color: rgb(141,152,159);
   font-size: 11px;
-  text-transform: lowercase;
+  text-transform: uppercase;
 }
 
 .emotion-0::-webkit-input-placeholder {
   color: rgb(141,152,159);
   font-size: 11px;
-  text-transform: lowercase;
+  text-transform: uppercase;
 }
 
 .emotion-0:focus {

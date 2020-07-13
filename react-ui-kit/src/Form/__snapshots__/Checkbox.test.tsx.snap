@@ -41,20 +41,20 @@ exports[`"Checkbox" renders (dark theme) 1`] = `
 .emotion-0::-moz-placeholder {
   color: rgb(247,248,250);
   font-size: 11px;
-  text-transform: uppercase;
+  text-transform: none;
   opacity: 1;
 }
 
 .emotion-0::-ms-input-placeholder {
   color: rgb(247,248,250);
   font-size: 11px;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .emotion-0::-webkit-input-placeholder {
   color: rgb(247,248,250);
   font-size: 11px;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .emotion-0:focus {
@@ -188,20 +188,20 @@ exports[`"Checkbox" renders 1`] = `
 .emotion-0::-moz-placeholder {
   color: rgb(141,152,159);
   font-size: 11px;
-  text-transform: uppercase;
+  text-transform: none;
   opacity: 1;
 }
 
 .emotion-0::-ms-input-placeholder {
   color: rgb(141,152,159);
   font-size: 11px;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .emotion-0::-webkit-input-placeholder {
   color: rgb(141,152,159);
   font-size: 11px;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .emotion-0:focus {
@@ -335,20 +335,20 @@ exports[`"Checkbox" renders as invalid 1`] = `
 .emotion-0::-moz-placeholder {
   color: rgb(141,152,159);
   font-size: 11px;
-  text-transform: uppercase;
+  text-transform: none;
   opacity: 1;
 }
 
 .emotion-0::-ms-input-placeholder {
   color: rgb(141,152,159);
   font-size: 11px;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .emotion-0::-webkit-input-placeholder {
   color: rgb(141,152,159);
   font-size: 11px;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .emotion-0:focus {
@@ -482,20 +482,20 @@ exports[`"Checkbox" renders disabled 1`] = `
 .emotion-0::-moz-placeholder {
   color: rgb(141,152,159);
   font-size: 11px;
-  text-transform: uppercase;
+  text-transform: none;
   opacity: 1;
 }
 
 .emotion-0::-ms-input-placeholder {
   color: rgb(141,152,159);
   font-size: 11px;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .emotion-0::-webkit-input-placeholder {
   color: rgb(141,152,159);
   font-size: 11px;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .emotion-0:focus {

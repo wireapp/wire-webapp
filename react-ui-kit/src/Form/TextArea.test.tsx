@@ -27,7 +27,7 @@ describe('"TextArea"', () => {
   it('renders as disabled', () => matchComponent(<TextArea disabled>TextArea</TextArea>));
   it('renders with placeholderTextTransform', () =>
     matchComponent(
-      <TextArea placeholderTextTransform="lowercase" placeholder="TextArea">
+      <TextArea placeholderTextTransform="uppercase" placeholder="TextArea">
         TextArea
       </TextArea>,
     ));
