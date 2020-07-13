@@ -64,6 +64,17 @@ ko.components.register('choose-screen', {
       this.onChoose = choose;
       this.screens = screens || [];
       this.windows = windows || [];
+      document.addEventListener('keydown', this.closeOnEsc);
     }
+
+    closeOnEsc = ({key}: KeyboardEvent): void => {
+      if (key === 'Escape') {
+        this.onCancel();
+      }
+    };
+
+    dispose = (): void => {
+      document.removeEventListener('keydown', this.closeOnEsc);
+    };
   },
 });
