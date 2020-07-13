@@ -31,20 +31,20 @@ exports[`"Select" renders 1`] = `
 .emotion-0::-moz-placeholder {
   color: rgb(141,152,159);
   font-size: 11px;
-  text-transform: uppercase;
+  text-transform: none;
   opacity: 1;
 }
 
 .emotion-0::-ms-input-placeholder {
   color: rgb(141,152,159);
   font-size: 11px;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .emotion-0::-webkit-input-placeholder {
   color: rgb(141,152,159);
   font-size: 11px;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .emotion-0:focus {
@@ -111,20 +111,20 @@ exports[`"Select" renders as disabled 1`] = `
 .emotion-0::-moz-placeholder {
   color: rgb(141,152,159);
   font-size: 11px;
-  text-transform: uppercase;
+  text-transform: none;
   opacity: 1;
 }
 
 .emotion-0::-ms-input-placeholder {
   color: rgb(141,152,159);
   font-size: 11px;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .emotion-0::-webkit-input-placeholder {
   color: rgb(141,152,159);
   font-size: 11px;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .emotion-0:focus {
@@ -192,20 +192,20 @@ exports[`"Select" renders as invalid 1`] = `
 .emotion-0::-moz-placeholder {
   color: rgb(141,152,159);
   font-size: 11px;
-  text-transform: uppercase;
+  text-transform: none;
   opacity: 1;
 }
 
 .emotion-0::-ms-input-placeholder {
   color: rgb(141,152,159);
   font-size: 11px;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .emotion-0::-webkit-input-placeholder {
   color: rgb(141,152,159);
   font-size: 11px;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .emotion-0:focus {
