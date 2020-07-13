@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.34.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.33.0...@wireapp/react-ui-kit@7.34.0) (2020-07-13)
+
+
+### Features
+
+* **react-ui-kit:** Labeled Select component ([#3111](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/3111)) ([3c224a8](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/3c224a8c1d54cdc3633fd0697d4292c6d1538588))
+
+
+
+
+
 # [7.33.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.32.2...@wireapp/react-ui-kit@7.33.0) (2020-07-13)
 
 
