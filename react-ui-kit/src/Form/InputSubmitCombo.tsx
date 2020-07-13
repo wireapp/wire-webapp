@@ -28,8 +28,8 @@ export type InputSubmitComboProps<T = HTMLDivElement> = InputProps<T>;
 export const INPUT_SUBMIT_COMBO_CLASSNAME = 'inputSubmitCombo';
 
 export const InputSubmitCombo = ({children, label, ...props}: InputSubmitComboProps) => (
-  <Label style={{width: '100%'}} bold={false}>
-    {label && <span style={{margin: '16px'}}>{label}</span>}
+  <Label bold={false}>
+    {label && <div style={{marginLeft: '16px'}}>{label}</div>}
     <div
       className={INPUT_SUBMIT_COMBO_CLASSNAME}
       css={theme => ({
