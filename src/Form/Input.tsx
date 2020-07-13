@@ -96,7 +96,7 @@ export const Input: React.FC<InputProps<HTMLInputElement>> = React.forwardRef<
   );
   return props.label ? (
     <Label bold={false} markInvalid={props.markInvalid}>
-      <span style={{margin: '16px'}}>{props.label}</span>
+      <div style={{marginLeft: '16px'}}>{props.label}</div>
       {input}
     </Label>
   ) : (

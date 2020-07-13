@@ -23,6 +23,7 @@ import {COLOR} from '../Identity';
 import {Theme} from '../Layout';
 import {filterProps, inlineSVG} from '../util';
 import {InputProps, inputStyle} from './Input';
+import {Label} from '../Text';
 
 export interface SelectProps<T = HTMLSelectElement> extends InputProps<T> {
   disabled?: boolean;
@@ -53,12 +54,19 @@ export const selectStyle: <T>(theme: Theme, props: SelectProps<T>) => ObjectInte
     : `${theme.Input.backgroundColor} center right 16px no-repeat url("${inlineSVG(ArrowDown(theme))}")`,
   boxShadow: markInvalid ? `0 0 0 1px ${COLOR.RED}` : 'none',
   cursor: disabled ? 'normal' : 'pointer',
+  fontSize: '16px',
   fontWeight: 300,
   paddingRight: '30px',
 });
 
 const filterSelectProps = (props: SelectProps) => filterProps(props, ['markInvalid']);
 
-export const Select = (props: SelectProps) => (
-  <select css={theme => selectStyle(theme, props)} {...filterSelectProps(props)} />
-);
+export const Select = (props: SelectProps) =>
+  props.label ? (
+    <Label bold={false} markInvalid={props.markInvalid}>
+      <div style={{marginLeft: '16px'}}>{props.label}</div>
+      <select css={theme => selectStyle(theme, props)} {...filterSelectProps(props)} />
+    </Label>
+  ) : (
+    <select css={theme => selectStyle(theme, props)} {...filterSelectProps(props)} />
+  );

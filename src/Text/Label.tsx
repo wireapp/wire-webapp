@@ -37,6 +37,7 @@ const labelStyle: <T>(theme: Theme, props: LabelProps<T>) => ObjectInterpolation
     color: COLOR.BLUE,
   },
   color: markInvalid ? COLOR.RED : 'initial',
+  width: '100%',
 });
 
 export const Label = (props: LabelProps) => (

@@ -9,6 +9,7 @@ exports[`"Label" renders (dark theme) 1`] = `
   opacity: 1;
   text-align: left;
   text-transform: none;
+  width: 100%;
 }
 
 .emotion-0:focus-within {
@@ -47,6 +48,7 @@ exports[`"Label" renders 1`] = `
   opacity: 1;
   text-align: left;
   text-transform: none;
+  width: 100%;
 }
 
 .emotion-0:focus-within {
