@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.33.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.32.2...@wireapp/react-ui-kit@7.33.0) (2020-07-13)
+
+
+### Features
+
+* **react-ui-kit:** Non-Uppercase input placeholders ([#3104](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/3104)) ([3cb08f8](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/3cb08f8e208aba42ab01850cc05521037f3d3794))
+
+
+
+
+
 ## [7.32.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.32.1...@wireapp/react-ui-kit@7.32.2) (2020-07-09)
 
 
