@@ -838,10 +838,7 @@ export class CallingRepository {
 
     const removedMembers = call
       .participants()
-      .filter(
-        participant =>
-          !members.find(member => member.userid === participant.user.id && member.clientid === participant.clientId),
-      );
+      .filter(participant => !members.find(({userid, clientid}) => participant.doesMatchIds(userid, clientid)));
 
     newMembers.forEach(participant => call.participants.unshift(participant));
     removedMembers.forEach(participant => call.participants.remove(participant));
@@ -979,12 +976,12 @@ export class CallingRepository {
     const call = this.findCall(conversationId);
     if (call) {
       const selfParticipant = call.getSelfParticipant();
-      if (call.state() === CALL_STATE.MEDIA_ESTAB && userId === selfParticipant.user.id) {
+      if (call.state() === CALL_STATE.MEDIA_ESTAB && selfParticipant.doesMatchIds(userId, clientId)) {
         selfParticipant.releaseVideoStream();
       }
       call
         .participants()
-        .filter(participant => participant.user.id === userId && participant.clientId === clientId)
+        .filter(participant => participant.doesMatchIds(userId, clientId))
         .forEach(participant => participant.videoState(state));
     }
   };

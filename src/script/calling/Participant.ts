@@ -56,6 +56,8 @@ export class Participant {
     this.isMuted = ko.observable(false);
   }
 
+  doesMatchIds = (userId: UserId, clientId: ClientId): boolean => userId === this.user.id && clientId === this.clientId;
+
   setAudioStream(audioStream: MediaStream): void {
     this.releaseStream(this.audioStream());
     this.audioStream(audioStream);

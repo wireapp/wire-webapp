@@ -39,11 +39,14 @@ class GroupVideoGrid {
   public readonly selfUserId: string;
   public readonly dispose: () => void;
 
-  constructor({minimized, grid, muted, selfUserId}: GroupVideoGripParams, rootElement: HTMLElement) {
+  constructor(
+    {minimized, grid, muted = ko.observable(false), selfUserId}: GroupVideoGripParams,
+    rootElement: HTMLElement,
+  ) {
     this.selfUserId = ko.unwrap(selfUserId);
     this.scaleVideos = this.scaleVideos.bind(this, rootElement);
     this.grid = grid;
-    this.muted = muted || ko.observable(false);
+    this.muted = muted;
     this.videoParticipants = ko.pureComputed(() => this.grid().grid.filter(participant => !!participant));
 
     this.minimized = minimized;
@@ -77,8 +80,8 @@ class GroupVideoGrid {
     const gridElements = Array.from(rootElement.querySelectorAll('.group-video-grid__element'));
     gridElements.forEach((element: HTMLElement) => {
       const videoElement = element.querySelector('video');
-      const userId = element.dataset.userId;
-      const participant = this.videoParticipants().find(participant => participant.user.id === userId);
+      const {userId, clientId} = element.dataset;
+      const participant = this.videoParticipants().find(participant => participant.doesMatchIds(userId, clientId));
       if (participant) {
         afterRender(() => this.toggleContain(videoElement, participant.sharesScreen()));
       }
@@ -100,7 +103,7 @@ ko.components.register('group-video-grid', {
       >
         <!-- ko if: participant -->
           <div class="group-video-grid__element" data-bind="
-              attr: {'data-user-id': participant.user.id},
+              attr: {'data-user-id': participant.user.id, 'data-client-id': participant.clientId},
               event: {dblclick: doubleClickedOnVideo}"
             data-uie-name="item-grid"
           >
