@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# 0.4.0 (2020-07-14)
+
+
+### Features
+
+* **webapp-events:** Add Analytics events ([#3112](https://github.com/wireapp/wire-web-packages/tree/master/packages/webapp-events/issues/3112)) ([53324ab](https://github.com/wireapp/wire-web-packages/tree/master/packages/webapp-events/commit/53324ab5bd0598ae73d0c7e186fe7de76483f6eb))
+
+
+
+
+
 # [0.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/webapp-events/compare/@wireapp/webapp-events@0.2.0...@wireapp/webapp-events@0.3.0) (2020-06-03)
 
 
