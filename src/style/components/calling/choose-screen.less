@@ -34,16 +34,18 @@ choose-screen {
   overflow-y: auto;
 
   &:hover > .choose-screen-list-item {
-    &::before {
+    &::after {
       background-color: fade(#000, 24%);
     }
   }
 
   & > .choose-screen-list-item:hover {
-    transform: scale(0.95);
-
-    &::before {
+    img {
+      transform: scale(0.95);
+    }
+    &::after {
       background-color: transparent;
+      transform: scale(0.95);
     }
   }
 }
@@ -56,18 +58,23 @@ choose-screen {
   cursor: pointer;
   transition: all @animation-timing-faster;
 
-  &::before {
+  img {
+    transition: all @animation-timing-faster;
+  }
+
+  &::after {
     .full-screen;
     right: 32px;
     left: 0;
     background-color: transparent;
+    border-radius: 4px;
     content: '';
     transition: all @animation-timing-faster;
   }
 
   &:first-child {
     padding-left: 32px;
-    &::before {
+    &::after {
       left: 32px;
     }
   }
