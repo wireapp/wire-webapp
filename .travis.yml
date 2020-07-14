@@ -99,9 +99,9 @@ deploy:
     env: wire-webapp-avs
     bucket_name: wire-webapp-builds
     on:
-      repo: wireapp/wire-webapp
       branch: avs
       condition: $DISTRIBUTION = wire
+      repo: wireapp/wire-webapp
 
   # Stage 1: https://wire-webapp-edge.zinfra.io/
   - provider: elasticbeanstalk
@@ -116,9 +116,9 @@ deploy:
     env: wire-webapp-edge
     bucket_name: wire-webapp-builds
     on:
-      repo: wireapp/wire-webapp
       branch: edge
       condition: $DISTRIBUTION = wire
+      repo: wireapp/wire-webapp
 
   # Stage 2: https://wire-webapp-dev.zinfra.io/
   - provider: elasticbeanstalk
@@ -133,9 +133,10 @@ deploy:
     env: wire-webapp-dev
     bucket_name: wire-webapp-builds
     on:
-      repo: wireapp/wire-webapp
       branch: dev
       condition: $DISTRIBUTION = wire
+      repo: wireapp/wire-webapp
+      tags: false
 
   # http://wire-webapp-s3-test.s3-website.eu-central-1.amazonaws.com/
   - provider: s3
@@ -149,9 +150,10 @@ deploy:
       secure: aCiIP0To/YPm9E3G/q/JIHASRN0b69R23w8WYovmMsBFHddh0MBXnhh+Kf5Cuos+NdVatNs7mAqulLdmBF8TZhreEhLOd9PppEXPVXJrlvdDKejX3S6czUWD8tb4fSE4/qF9H8XYVa+Aznn/2Vlu3fFggAcAMv8lm7igTNb8rc2YZkaByNvwDjauoB1CwgvMsJiptDNy/m9EOJST9RqS/SDAFsPEFQLih0BRWbSYnEZ6yYtQ7T+ROOjjBxTefqf9E6s6PuXI9zrDzGtKE3mwibASts5lfVcKWBp/m1Droog7QxRgixUo9CoE4bK3tcSqpgBx/Mn1RL43C8pt2n2yxeXr6Rl1rdnpvVmz/7XbQqBtbX+atot63PKW4fuTlwCmnQfBWwsAqUZmnCHs0EgcFQR6VoO1D5FLKAWOFeo4RBCQ3mOr/kU3wTG0OrDVf3C1VpTD8W07AVIwcYm/jOSPJYgWwDk+OPz0f8UYbJTe8UO14LU/Wy6QT81cjEwjXJdCcv6IZS50iDNq9PxaACoOqAmfDZNwxuQBxN0kR1eWEobE+zucIfpa6OteA980X22xQIimPcVmmBcDjYce//o/12UNKZprUXeUqSPJsXWw8p3CIbJP8lI35aiTR3kjOG7XBG0QO1HyBHKudZHPGo3RU6dXVegu6POujy+oxbkQNyo=
     region: eu-central-1
     on:
-      repo: wireapp/wire-webapp
       branch: dev
       condition: $DISTRIBUTION = wire
+      repo: wireapp/wire-webapp
+      tags: false
 
   # Stage 3: https://wire-webapp-staging.zinfra.io/
   - provider: elasticbeanstalk
@@ -166,8 +168,9 @@ deploy:
     env: wire-webapp-staging
     bucket_name: wire-webapp-builds
     on:
-      tags: true
+      branch: dev
       condition: $TRAVIS_TAG =~ .*-staging.* && $DISTRIBUTION = wire
+      tags: true
 
   # Stage 4: https://wire-webapp-master.zinfra.io/
   - provider: elasticbeanstalk
@@ -182,9 +185,9 @@ deploy:
     env: wire-webapp-master
     bucket_name: wire-webapp-builds
     on:
-      repo: wireapp/wire-webapp
       branch: master
       condition: $DISTRIBUTION = wire
+      repo: wireapp/wire-webapp
 
   # Stage 5: https://wire-webapp-prod.wire.com/
   - provider: elasticbeanstalk
@@ -199,8 +202,9 @@ deploy:
     env: wire-webapp-prod
     bucket_name: wire-webapp-builds
     on:
-      tags: true
+      branch: master
       condition: $TRAVIS_TAG =~ .*-production.* && $DISTRIBUTION = wire
+      tags: true
 
 after_deploy:
   - |

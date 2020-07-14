@@ -63,7 +63,6 @@ export class FullscreenVideoCalling {
   public availableCameras: ko.PureComputed<string[]>;
   public availableScreens: ko.PureComputed<string[]>;
   public showSwitchCamera: ko.PureComputed<boolean>;
-  public showSwitchScreen: ko.PureComputed<boolean>;
 
   public hasUnreadMessages: ko.Observable<boolean>;
 
@@ -120,9 +119,6 @@ export class FullscreenVideoCalling {
     );
     this.showSwitchCamera = ko.pureComputed(() => {
       return this.selfSharesCamera() && this.availableCameras().length > 1;
-    });
-    this.showSwitchScreen = ko.pureComputed(() => {
-      return this.selfSharesScreen() && this.availableScreens().length > 1;
     });
 
     this.showToggleVideo = ko.pureComputed(() => {
@@ -247,13 +243,7 @@ ko.components.register('fullscreen-video-call', {
               attr: {'data-uie-value': selfSharesScreen() ? 'active' : 'inactive', 'data-uie-enabled': canShareScreen ? 'true' : 'false'}"
             data-uie-name="do-toggle-screen">
           <screenshare-icon></screenshare-icon>
-          <!-- ko if: showSwitchScreen() -->
-            <device-toggle-button params="currentDevice: currentScreenDevice, devices: availableScreens, onChooseDevice: deviceId => switchScreenSource(call, deviceId)">
-            </device-toggle-button>
-          <!-- /ko -->
-          <!-- ko ifnot: showSwitchScreen() -->
-            <div class="video-controls__button__label" data-bind="text: t('videoCallOverlayShareScreen')"></div>
-          <!-- /ko -->
+          <div class="video-controls__button__label" data-bind="text: t('videoCallOverlayShareScreen')"></div>
         </div>
 
         <div class="video-controls__button video-controls__button--red" data-bind="click: () => callActions.leave(call)" data-uie-name="do-call-controls-video-call-cancel">

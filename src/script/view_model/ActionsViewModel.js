@@ -33,7 +33,7 @@ export class ActionsViewModel {
     this.conversationRepository = repositories.conversation;
     this.integrationRepository = repositories.integration;
     this.userRepository = repositories.user;
-    this.logger = getLogger('z.viewModel.ListViewModel');
+    this.logger = getLogger('ActionsViewModel');
     this.modalsViewModel = mainViewModel.modals;
   }
 

@@ -45,6 +45,7 @@ import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
 import {createRandomUuid} from 'Util/util';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {Config} from '../Config';
 
@@ -97,6 +98,8 @@ export class CallingRepository {
   private readonly logger: Logger;
   private readonly callLog: string[];
   private readonly cbrEncoding: ko.Observable<number>;
+  private readonly acceptedVersionWarnings: ko.ObservableArray<string>;
+  private readonly acceptVersionWarning: (conversationId: string) => void;
 
   static get CONFIG() {
     return {
@@ -119,6 +122,23 @@ export class CallingRepository {
       return this.activeCalls().find(call => call.state() === CALL_STATE.MEDIA_ESTAB);
     });
 
+    this.acceptedVersionWarnings = ko.observableArray<string>();
+    this.acceptVersionWarning = (conversationId: string) => {
+      this.acceptedVersionWarnings.push(conversationId);
+      window.setTimeout(() => this.acceptedVersionWarnings.remove(conversationId), TIME_IN_MILLIS.MINUTE * 15);
+    };
+
+    this.activeCalls.subscribe(activeCalls => {
+      const activeCallIds = activeCalls.map(call => call.conversationId);
+      this.acceptedVersionWarnings.remove(acceptedId => !activeCallIds.includes(acceptedId));
+    });
+
+    this.apiClient = apiClient;
+    this.conversationRepository = conversationRepository;
+    this.eventRepository = eventRepository;
+    this.serverTimeHandler = serverTimeHandler;
+    // Media Handler
+    this.mediaStreamHandler = mediaStreamHandler;
     this.incomingCallCallback = () => {};
 
     this.logger = getLogger('CallingRepository');
@@ -292,6 +312,10 @@ export class CallingRepository {
 
   private storeCall(call: Call): void {
     this.activeCalls.push(call);
+    const conversation = this.conversationRepository.find_conversation_by_id(call.conversationId);
+    if (conversation) {
+      conversation.call(call);
+    }
   }
 
   private removeCall(call: Call): void {
@@ -300,6 +324,10 @@ export class CallingRepository {
     call.participants.removeAll();
     if (index !== -1) {
       this.activeCalls.splice(index, 1);
+    }
+    const conversation = this.conversationRepository.find_conversation_by_id(call.conversationId);
+    if (conversation) {
+      conversation.call(null);
     }
   }
 
@@ -381,6 +409,7 @@ export class CallingRepository {
         }
       }
     }
+
     const res = this.wCall.recvMsg(
       this.wUser,
       contentStr,
@@ -394,18 +423,28 @@ export class CallingRepository {
 
     if (res !== 0) {
       this.logger.warn(`recv_msg failed with code: ${res}`);
-      if (res === ERROR.UNKNOWN_PROTOCOL) {
+      if (
+        this.acceptedVersionWarnings().every((acceptedId: string) => acceptedId !== conversationId) &&
+        res === ERROR.UNKNOWN_PROTOCOL &&
+        event.content.type === 'CONFSTART'
+      ) {
         const brandName = Config.getConfig().BRAND_NAME;
-        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
-          text: {
-            message: t('modalCallUpdateClientMessage', brandName),
-            title: t('modalCallUpdateClientHeadline', brandName),
+        amplify.publish(
+          WebAppEvents.WARNING.MODAL,
+          ModalsViewModel.TYPE.ACKNOWLEDGE,
+          {
+            close: () => this.acceptVersionWarning(conversationId),
+            text: {
+              message: t('modalCallUpdateClientMessage', brandName),
+              title: t('modalCallUpdateClientHeadline', brandName),
+            },
           },
-        });
+          'update-client-warning',
+        );
       }
       return;
     }
-    this.handleCallEventSaving(content.type, conversationId, userId, time, source);
+    return this.handleCallEventSaving(content.type, conversationId, userId, time, source);
   }
 
   handleCallEventSaving(

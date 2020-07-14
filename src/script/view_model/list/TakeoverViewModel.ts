@@ -18,27 +18,30 @@
  */
 
 import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {getLogger} from 'Util/Logger';
+import ko from 'knockout';
+import {amplify} from 'amplify';
 
 import {Config} from '../../Config';
 import {getSupportUsernameUrl} from '../../externalRoute';
 import {ContentViewModel} from '../ContentViewModel';
+import type {UserRepository} from '../../user/UserRepository';
+import type {ConversationRepository} from '../../conversation/ConversationRepository';
+import type {ListViewModel} from '../ListViewModel';
+import type {User} from '../../entity/User';
 
 class TakeoverViewModel {
-  /**
-   * View model for the username takeover screen.
-   *
-   * @param {MainViewModel} mainViewModel Main view model
-   * @param {z.viewModel.ListViewModel} listViewModel List view model
-   * @param {Object} repositories Object containing all repositories
-   */
-  constructor(mainViewModel, listViewModel, repositories) {
-    this.listViewModel = listViewModel;
-    this.conversationRepository = repositories.conversation;
-    this.userRepository = repositories.user;
-    this.logger = getLogger('TakeoverViewModel');
+  readonly brandName: string;
+  readonly supportUsernameUrl: string;
+  readonly name: ko.PureComputed<string>;
+  readonly username: ko.PureComputed<string>;
+  private readonly selfUser: ko.Observable<User>;
 
+  constructor(
+    private readonly listViewModel: ListViewModel,
+    private readonly userRepository: UserRepository,
+    private readonly conversationRepository: ConversationRepository,
+  ) {
+    this.listViewModel = listViewModel;
     this.selfUser = this.userRepository.self;
 
     this.name = ko.pureComputed(() => (this.selfUser() ? this.selfUser().name() : ''));
@@ -47,27 +50,28 @@ class TakeoverViewModel {
     this.brandName = Config.getConfig().BRAND_NAME;
   }
 
-  chooseUsername() {
+  chooseUsername = (): void => {
     this.listViewModel.dismissModal();
     window.requestAnimationFrame(() => amplify.publish(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT));
-  }
+  };
 
-  keepUsername() {
-    this.userRepository
-      .changeUsername(this.username())
-      .then(() => {
-        const conversationEntity = this.conversationRepository.getMostRecentConversation();
-        if (conversationEntity) {
-          return amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
-        }
+  keepUsername = async (): Promise<boolean | void> => {
+    try {
+      await this.userRepository.changeUsername(this.username());
+      const conversationEntity = this.conversationRepository.getMostRecentConversation();
+      if (conversationEntity) {
+        return amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
+      }
 
-        if (this.userRepository.connect_requests().length) {
-          amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.CONNECTION_REQUESTS);
-        }
-      })
-      .catch(() => amplify.publish(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT))
-      .then(() => this.listViewModel.dismissModal());
-  }
+      if (this.userRepository.connect_requests().length) {
+        amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.CONNECTION_REQUESTS);
+      }
+    } catch (error) {
+      amplify.publish(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT);
+    } finally {
+      this.listViewModel.dismissModal();
+    }
+  };
 }
 
 export {TakeoverViewModel};

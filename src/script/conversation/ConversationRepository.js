@@ -49,15 +49,8 @@ import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {PromiseQueue} from 'Util/PromiseQueue';
 import {Declension, joinNames, t} from 'Util/LocalizerUtil';
 import {getDifference, getNextItem} from 'Util/ArrayUtil';
-import {
-  arrayToBase64,
-  createRandomUuid,
-  loadUrlBlob,
-  sortGroupsByLastEvent,
-  allowsAllFiles,
-  getFileExtensionOrName,
-  isAllowedFile,
-} from 'Util/util';
+import {arrayToBase64, createRandomUuid, loadUrlBlob, sortGroupsByLastEvent} from 'Util/util';
+import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/FileTypeUtil';
 import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
 import {
   capitalizeFirstChar,
@@ -2899,12 +2892,18 @@ export class ConversationRepository {
 
             switch (consentType) {
               case ConversationRepository.CONSENT_TYPE.INCOMING_CALL: {
+                if (conversationEntity.hasActiveCall()) {
+                  return resolve(true);
+                }
                 actionString = t('modalConversationNewDeviceIncomingCallAction');
                 messageString = t('modalConversationNewDeviceIncomingCallMessage');
                 break;
               }
 
               case ConversationRepository.CONSENT_TYPE.OUTGOING_CALL: {
+                if (conversationEntity.hasActiveCall()) {
+                  return resolve(true);
+                }
                 actionString = t('modalConversationNewDeviceOutgoingCallAction');
                 messageString = t('modalConversationNewDeviceOutgoingCallMessage');
                 break;

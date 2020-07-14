@@ -713,6 +713,10 @@ export class UserRepository {
     return Promise.reject(new UserError(UserError.TYPE.INVALID_UPDATE, UserError.MESSAGE.INVALID_UPDATE));
   }
 
+  async changeEmail(email: string): Promise<void> {
+    return this.selfService.putSelfEmail(email);
+  }
+
   /**
    * Whether the user needs to set a username.
    */
