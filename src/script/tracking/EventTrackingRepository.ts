@@ -34,6 +34,8 @@ import {EventName} from './EventName';
 import * as trackingHelpers from './Helpers';
 import {SuperProperty} from './SuperProperty';
 
+const Countly = require('countly-sdk-nodejs');
+
 export class EventTrackingRepository {
   private isUserAnalyticsActivated: boolean;
   private lastReportTimestamp?: number;
@@ -215,8 +217,10 @@ export class EventTrackingRepository {
   }
 
   private _unsubscribeFromAnalyticsEvents(): void {
+    amplify.unsubscribeAll(WebAppEvents.ANALYTICS.CLOSE_SESSION);
     amplify.unsubscribeAll(WebAppEvents.ANALYTICS.SUPER_PROPERTY);
     amplify.unsubscribeAll(WebAppEvents.ANALYTICS.EVENT);
+    amplify.unsubscribeAll(WebAppEvents.ANALYTICS.START_SESSION);
   }
 
   //##############################################################################
@@ -280,5 +284,13 @@ export class EventTrackingRepository {
       window.Raygun.withCustomData({electron_version: Environment.version(true)});
     }
     window.Raygun.onBeforeSend(this._checkErrorPayload.bind(this));
+  }
+
+  start_session() {
+    Countly.begin_session();
+  }
+
+  close_session() {
+    Countly.end_session();
   }
 }

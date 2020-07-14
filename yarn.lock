@@ -2157,10 +2157,10 @@
   dependencies:
     "@types/node" "~12"
 
-"@wireapp/webapp-events@0.3.0":
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/webapp-events/-/webapp-events-0.3.0.tgz#e1a6c68002531e7479c02133dd64870afbe86c9f"
-  integrity sha512-wDrjfl7VuHRUzNTXMl0DjON8T3SttI5hWJLu37xddvdhhi75rygoVDPclwFG1xRrqWqgWedsnddsxWjGZz/tgA==
+"@wireapp/webapp-events@0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/webapp-events/-/webapp-events-0.4.0.tgz#c37a772d89b6fbc7aa46fdff8b3f6e2f54092a35"
+  integrity sha512-SE6lV5U6iT86kWvi6GqkxJtkJoTgEf0hnppw7pHIpgKyGWB7w3Jntb5Qes1GAkNpQ0Ts0E9z+QlmDdHcZqqA1Q==
 
 "@wireapp/websql@0.0.17":
   version "0.0.17"
@@ -4063,6 +4063,11 @@ cosmiconfig@^5.0.0, cosmiconfig@^5.2.0:
     is-directory "^0.3.1"
     js-yaml "^3.13.1"
     parse-json "^4.0.0"
+
+countly-sdk-nodejs@20.4.0:
+  version "20.4.0"
+  resolved "https://registry.yarnpkg.com/countly-sdk-nodejs/-/countly-sdk-nodejs-20.4.0.tgz#949aae31eb732c8f3aee477d089572a2d0f6d3b0"
+  integrity sha512-BZ+TCuhl8iwjCenK7CKic3Q/AB3YkL+dpSaTmS0sS+1FrK+8UT3WprPHkMWUXZ6OGP54zXf2+jmX1X/k/xvyLA==
 
 cpr@3.0.1:
   version "3.0.1"

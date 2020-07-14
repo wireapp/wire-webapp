@@ -769,6 +769,7 @@ class App {
     const _logout = async () => {
       // Disconnect from our backend, end tracking and clear cached data
       this.repository.event.disconnectWebSocket(WebSocketService.CHANGE_TRIGGER.LOGOUT);
+      amplify.publish(z.event.WebApp.ANALYTICS.CLOSE_SESSION);
 
       // Clear Local Storage (but don't delete the cookie label if you were logged in with a permanent client)
       const keysToKeep = [StorageKey.AUTH.SHOW_LOGIN];
