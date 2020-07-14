@@ -11,7 +11,7 @@
     "@wireapp/webapp-events": "0.4.0",
     "amplify": "git+https://git@github.com/wireapp/amplify",
     "core-js": "2.6.10",
-    "countly-sdk-nodejs": "20.4.0",
+    "countly-sdk-web": "20.4.0",
     "date-fns": "2.14.0",
     "dexie-batch": "0.4.2",
     "highlight.js": "10.0.3",
@@ -46,7 +46,8 @@
     "url-search-params-polyfill": "8.1.0",
     "use-react-router": "1.0.7",
     "uuidjs": "4.2.5",
-    "webrtc-adapter": "6.4.8"
+    "webrtc-adapter": "6.4.8",
+    "yarn": "1.22.4"
   },
   "devDependencies": {
     "@babel/core": "7.10.4",

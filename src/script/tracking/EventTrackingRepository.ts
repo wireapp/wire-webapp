@@ -34,7 +34,7 @@ import {EventName} from './EventName';
 import * as trackingHelpers from './Helpers';
 import {SuperProperty} from './SuperProperty';
 
-const Countly = require('countly-sdk-nodejs');
+const Countly = require('countly-sdk-web');
 
 export class EventTrackingRepository {
   private isUserAnalyticsActivated: boolean;
