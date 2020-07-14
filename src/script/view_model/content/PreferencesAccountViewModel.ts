@@ -281,6 +281,8 @@ export class PreferencesAccountViewModel {
           },
         });
       }
+    } finally {
+      event.target.blur();
     }
   };
 
