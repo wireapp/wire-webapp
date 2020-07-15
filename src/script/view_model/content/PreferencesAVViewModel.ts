@@ -196,7 +196,7 @@ export class PreferencesAVViewModel {
     await this.initiateDevices(mediaType);
   }
 
-  public async releaseDevices(mediaType: MediaType): Promise<void> {
+  private async releaseDevices(mediaType: MediaType): Promise<void> {
     if (mediaType === MediaType.AUDIO || mediaType === MediaType.AUDIO_VIDEO) {
       await this.releaseAudioMeter();
     }
