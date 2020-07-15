@@ -39,6 +39,7 @@ import type {Conversation} from '../../entity/Conversation';
 import type {User} from '../../entity/User';
 import type {CallActions} from '../../view_model/CallingViewModel';
 import type {Multitasking} from '../../notification/NotificationRepository';
+import type {TeamRepository} from 'src/script/team/TeamRepository';
 import {Participant} from '../../calling/Participant';
 
 interface ComponentParams {
@@ -49,6 +50,7 @@ interface ComponentParams {
   hasAccessToCamera: ko.Observable<boolean>;
   isSelfVerified: ko.Subscribable<boolean>;
   multitasking: Multitasking;
+  teamRepository: TeamRepository;
   temporaryUserStyle?: boolean;
   videoGrid: ko.PureComputed<Grid>;
 }
@@ -87,6 +89,7 @@ class ConversationListCallingCell {
   readonly isSelfVerified: ko.Subscribable<boolean>;
   readonly participants: ko.PureComputed<Participant[]>;
   readonly selfParticipant: Participant;
+  readonly teamRepository: TeamRepository;
 
   constructor({
     call,
@@ -96,12 +99,14 @@ class ConversationListCallingCell {
     temporaryUserStyle = false,
     multitasking,
     callActions,
+    teamRepository,
     hasAccessToCamera,
     isSelfVerified = ko.observable(false),
   }: ComponentParams) {
     this.call = call;
     this.conversation = conversation;
     this.callingRepository = callingRepository;
+    this.teamRepository = teamRepository;
     this.temporaryUserStyle = temporaryUserStyle;
     this.multitasking = multitasking;
     this.callActions = callActions;
@@ -326,7 +331,7 @@ ko.components.register('conversation-list-calling-cell', {
 
         <div class="call-ui__participant-list__wrapper" data-bind="css: {'call-ui__participant-list__wrapper--active': showParticipants}">
           <div class="call-ui__participant-list" data-bind="foreach: {data: participants, as: 'participant', noChildContext: true}, fadingscrollbar" data-uie-name="list-call-ui-participants">
-            <participant-item params="participant: participant.user, hideInfo: true, callParticipant: participant, selfInTeam: $parent.selfInTeam, isSelfVerified: isSelfVerified" data-bind="css: {'no-underline': true}"></participant-item>
+            <participant-item params="participant: participant.user, hideInfo: true, callParticipant: participant, selfInTeam: $parent.selfInTeam, isSelfVerified: isSelfVerified, external: teamRepository.isExternal(participant.user.id)" data-bind="css: {'no-underline': true}"></participant-item>
           </div>
         </div>
 

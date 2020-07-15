@@ -194,7 +194,12 @@ export class ListViewModel {
       repositories.user,
     );
     this.takeover = new TakeoverViewModel(this, repositories.user, repositories.conversation);
-    this.temporaryGuest = new TemporaryGuestViewModel(mainViewModel, repositories.user, repositories.calling);
+    this.temporaryGuest = new TemporaryGuestViewModel(
+      mainViewModel,
+      repositories.user,
+      repositories.calling,
+      repositories.team,
+    );
 
     this._initSubscriptions();
 
