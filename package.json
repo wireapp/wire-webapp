@@ -46,8 +46,7 @@
     "url-search-params-polyfill": "8.1.0",
     "use-react-router": "1.0.7",
     "uuidjs": "4.2.5",
-    "webrtc-adapter": "6.4.8",
-    "yarn": "1.22.4"
+    "webrtc-adapter": "6.4.8"
   },
   "devDependencies": {
     "@babel/core": "7.10.4",
