@@ -36,6 +36,26 @@ import {SuperProperty} from './SuperProperty';
 
 const Countly = require('countly-sdk-web');
 
+Countly.q = Countly.q || [];
+
+Countly.app_key = '9927e629a9302b8c800fc60055723362b0608f19';
+Countly.url = 'https://wire.count.ly/';
+Countly.debug = true;
+
+Countly.add_event({
+  count: 1,
+  key: 'contributed',
+  segmentation: {
+    action: 'text',
+    app: 'web',
+    app_version: '1.0',
+    conversation_type: 'one_to_one',
+    is_allow_guests: 'false',
+    is_ephemeral: 'false',
+    is_global_ephemeral: 'false',
+  },
+});
+
 export class EventTrackingRepository {
   private isUserAnalyticsActivated: boolean;
   private lastReportTimestamp?: number;
