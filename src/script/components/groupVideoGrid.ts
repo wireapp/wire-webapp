@@ -28,7 +28,7 @@ interface GroupVideoGripParams {
   grid: ko.PureComputed<Grid>;
   minimized: boolean;
   muted?: ko.Observable<boolean>;
-  selfUserId: string;
+  selfParticipant: Participant;
 }
 
 class GroupVideoGrid {
@@ -36,14 +36,17 @@ class GroupVideoGrid {
   private readonly videoParticipants: ko.PureComputed<Participant[]>;
   private readonly minimized: boolean;
   public readonly muted: ko.Observable<boolean>;
-  public readonly selfUserId: string;
+  public readonly selfParticipant: Participant;
   public readonly dispose: () => void;
 
-  constructor({minimized, grid, muted, selfUserId}: GroupVideoGripParams, rootElement: HTMLElement) {
-    this.selfUserId = ko.unwrap(selfUserId);
+  constructor(
+    {minimized, grid, muted = ko.observable(false), selfParticipant}: GroupVideoGripParams,
+    rootElement: HTMLElement,
+  ) {
+    this.selfParticipant = ko.unwrap(selfParticipant);
     this.scaleVideos = this.scaleVideos.bind(this, rootElement);
     this.grid = grid;
-    this.muted = muted || ko.observable(false);
+    this.muted = muted;
     this.videoParticipants = ko.pureComputed(() => this.grid().grid.filter(participant => !!participant));
 
     this.minimized = minimized;
@@ -77,8 +80,8 @@ class GroupVideoGrid {
     const gridElements = Array.from(rootElement.querySelectorAll('.group-video-grid__element'));
     gridElements.forEach((element: HTMLElement) => {
       const videoElement = element.querySelector('video');
-      const userId = element.dataset.userId;
-      const participant = this.videoParticipants().find(participant => participant.user.id === userId);
+      const {userId, clientId} = element.dataset;
+      const participant = this.videoParticipants().find(participant => participant.doesMatchIds(userId, clientId));
       if (participant) {
         afterRender(() => this.toggleContain(videoElement, participant.sharesScreen()));
       }
@@ -100,14 +103,14 @@ ko.components.register('group-video-grid', {
       >
         <!-- ko if: participant -->
           <div class="group-video-grid__element" data-bind="
-              attr: {'data-user-id': participant.user.id},
+              attr: {'data-user-id': participant.user.id, 'data-client-id': participant.clientId},
               event: {dblclick: doubleClickedOnVideo}"
             data-uie-name="item-grid"
           >
             <video class="group-video-grid__element-video" autoplay playsinline
               data-bind="
                 sourceStream: participant.videoStream(),
-                css: {'group-video-grid__element-video--contain': participant.sharesScreen(), mirror: participant.user.isMe && participant.sharesCamera()}">
+                css: {'group-video-grid__element-video--contain': participant.sharesScreen(), mirror: participant === selfParticipant}">
             </video>
             <!-- ko if: !minimized -->
               <div class="group-video-grid__element__label">
@@ -146,7 +149,7 @@ ko.components.register('group-video-grid', {
     </div>
   `,
   viewModel: {
-    createViewModel: (params: GroupVideoGripParams, componentInfo: {element: HTMLElement}) =>
-      new GroupVideoGrid(params, componentInfo.element),
+    createViewModel: (params: GroupVideoGripParams, componentInfo: ko.components.ComponentInfo) =>
+      new GroupVideoGrid(params, componentInfo.element as HTMLElement),
   },
 });

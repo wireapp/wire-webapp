@@ -65,7 +65,7 @@ export class Call {
   }
 
   getParticipant(userId: UserId, clientId: ClientId): Participant | undefined {
-    return this.participants().find(participant => participant.user.id === userId && clientId === participant.clientId);
+    return this.participants().find(participant => participant.doesMatchIds(userId, clientId));
   }
 
   getRemoteParticipants(): Participant[] {

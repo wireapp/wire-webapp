@@ -268,7 +268,7 @@ ko.components.register('conversation-list-calling-cell', {
 
       <!-- ko if: showVideoGrid() -->
         <div class="group-video__minimized-wrapper" data-bind="click: showFullscreenVideoGrid">
-          <group-video-grid params="minimized: true, grid: videoGrid, selfUserId: selfParticipant.userId"></group-video-grid>
+          <group-video-grid params="minimized: true, grid: videoGrid, selfParticipant: selfParticipant"></group-video-grid>
           <!-- ko if: showMaximize() -->
             <div class="group-video__minimized-wrapper__overlay" data-uie-name="do-maximize-call">
               <fullscreen-icon></fullscreen-icon>
