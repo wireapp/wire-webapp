@@ -90,7 +90,10 @@ describe('conversationListCallingCell', () => {
     selfUserEntity.isMe = true;
     conversation.selfUser(selfUserEntity);
     const call = createCall(CALL_STATE.MEDIA_ESTAB, selfUserEntity);
-    const params = {...defaultParams, call, conversation: () => conversation};
+    const mockedTeamRepository = {
+      isExternal: () => false,
+    };
+    const params = {...defaultParams, call, conversation: () => conversation, mockedTeamRepository};
     return instantiateComponent('conversation-list-calling-cell', params).then(domContainer => {
       call.startedAt(Date.now());
       const callDurationElement = domContainer.querySelector('[data-uie-name=call-duration]');
