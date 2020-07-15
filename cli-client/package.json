@@ -11,9 +11,8 @@
   },
   "devDependencies": {
     "@types/fs-extra": "8.1.0",
-    "@types/long": "4.0.1",
     "rimraf": "3.0.2",
-    "typescript": "3.8.3"
+    "typescript": "3.9.2"
   },
   "description": "Command-line interface for Wire's secure messaging platform.",
   "files": [

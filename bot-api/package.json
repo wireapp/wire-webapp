@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "@types/long": "4.0.1",
     "@types/node": "*",
     "@wireapp/core": "16.10.17",
     "uuidjs": "4.2.5"
@@ -11,7 +10,7 @@
     "jasmine": "3.5.0",
     "rimraf": "3.0.2",
     "ts-node": "8.6.2",
-    "typescript": "3.8.3"
+    "typescript": "3.9.2"
   },
   "files": [
     "dist",

@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "@types/long": "4.0.1",
     "@types/moment-duration-format": "2.2.2",
     "moment": "2.26.0",
     "moment-duration-format": "2.3.2"
