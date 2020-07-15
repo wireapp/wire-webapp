@@ -23,11 +23,10 @@ import {TextTransformProperty} from 'csstype';
 import React from 'react';
 import {COLOR} from '../Identity';
 import {Theme} from '../Layout';
-import {TextProps, Label} from '../Text';
+import {TextProps} from '../Text';
 import {filterProps} from '../util';
 
 export interface InputProps<T = HTMLInputElement> extends TextProps<T> {
-  label?: string;
   markInvalid?: boolean;
   placeholderTextTransform?: TextTransformProperty;
 }
@@ -78,14 +77,13 @@ export const inputStyle: <T>(theme: Theme, props: InputProps<T>) => ObjectInterp
 };
 
 export const INPUT_CLASSNAME = 'wireinput';
-const filterInputProps = (props: InputProps) =>
-  filterProps(props, ['markInvalid', 'placeholderTextTransform', 'label']);
+const filterInputProps = (props: InputProps) => filterProps(props, ['markInvalid', 'placeholderTextTransform']);
 
 export const Input: React.FC<InputProps<HTMLInputElement>> = React.forwardRef<
   HTMLInputElement,
   InputProps<HTMLInputElement>
 >(({type, ...props}, ref) => {
-  const input = (
+  return (
     <input
       className={INPUT_CLASSNAME}
       css={theme => inputStyle(theme, props)}
@@ -93,13 +91,5 @@ export const Input: React.FC<InputProps<HTMLInputElement>> = React.forwardRef<
       type={type}
       {...filterInputProps(props)}
     />
-  );
-  return props.label ? (
-    <Label bold={false} markInvalid={props.markInvalid}>
-      <div style={{marginLeft: '16px'}}>{props.label}</div>
-      {input}
-    </Label>
-  ) : (
-    input
   );
 });
