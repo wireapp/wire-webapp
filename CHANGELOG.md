@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.35.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.34.0...@wireapp/react-ui-kit@7.35.0) (2020-07-15)
+
+
+### Features
+
+* **react-ui-kit:** External Label ([#3113](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/3113)) ([44c0767](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/44c076733ff64be12a583b937265eda6724506a5))
+
+
+
+
+
 # [7.34.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.33.0...@wireapp/react-ui-kit@7.34.0) (2020-07-13)
 
 
