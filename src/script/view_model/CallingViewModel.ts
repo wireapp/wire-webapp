@@ -36,6 +36,7 @@ import type {Conversation} from '../entity/Conversation';
 import type {PermissionRepository} from '../permission/PermissionRepository';
 import {PermissionStatusState} from '../permission/PermissionStatusState';
 import type {Multitasking} from '../notification/NotificationRepository';
+import type {TeamRepository} from '../team/TeamRepository';
 
 import 'Components/calling/chooseScreen';
 import {amplify} from 'amplify';
@@ -80,6 +81,7 @@ export class CallingViewModel {
   readonly selectableScreens: ko.Observable<ElectronDesktopCapturerSource[]>;
   readonly selectableWindows: ko.Observable<ElectronDesktopCapturerSource[]>;
   readonly isSelfVerified: ko.Computed<boolean>;
+  readonly teamRepository: TeamRepository;
 
   constructor(
     callingRepository: CallingRepository,
@@ -88,6 +90,7 @@ export class CallingViewModel {
     mediaDevicesHandler: MediaDevicesHandler,
     mediaStreamHandler: MediaStreamHandler,
     permissionRepository: PermissionRepository,
+    teamRepository: TeamRepository,
     selfUser: ko.Observable<User>,
     multitasking: Multitasking,
   ) {
@@ -97,6 +100,8 @@ export class CallingViewModel {
     this.mediaDevicesHandler = mediaDevicesHandler;
     this.mediaStreamHandler = mediaStreamHandler;
     this.permissionRepository = permissionRepository;
+    this.teamRepository = teamRepository;
+
     this.selfUser = selfUser;
     this.isSelfVerified = ko.pureComputed(() => selfUser().is_verified());
     this.activeCalls = ko.pureComputed(() =>

@@ -91,7 +91,7 @@ export class ConversationListViewModel {
     readonly callingRepository: CallingRepository,
     readonly conversationRepository: ConversationRepository,
     private readonly preferenceNotificationRepository: PreferenceNotificationRepository,
-    public readonly teamRepository: TeamRepository,
+    private readonly teamRepository: TeamRepository,
     private readonly userRepository: UserRepository,
     private readonly propertiesRepository: PropertiesRepository,
   ) {
