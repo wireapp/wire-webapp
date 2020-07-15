@@ -93,7 +93,7 @@ describe('conversationListCallingCell', () => {
     const mockedTeamRepository = {
       isExternal: () => false,
     };
-    const params = {...defaultParams, call, conversation: () => conversation, mockedTeamRepository};
+    const params = {...defaultParams, call, conversation: () => conversation, teamRepository: mockedTeamRepository};
     return instantiateComponent('conversation-list-calling-cell', params).then(domContainer => {
       call.startedAt(Date.now());
       const callDurationElement = domContainer.querySelector('[data-uie-name=call-duration]');
