@@ -19,6 +19,7 @@
 
 import {getLogger} from 'Util/Logger';
 import {afterRender} from 'Util/util';
+import {amplify} from 'amplify';
 
 import {WindowTitleViewModel} from './WindowTitleViewModel';
 import {modals} from './ModalsViewModel';
@@ -97,7 +98,7 @@ export class MainViewModel {
 
     this.lightbox = new z.viewModel.ImageDetailViewViewModel(this, repositories);
     this.title = new WindowTitleViewModel(this, repositories);
-    this.favicon = new FaviconViewModel(window.amplify);
+    this.favicon = new FaviconViewModel(amplify);
     this.warnings = new WarningsViewModel();
 
     this.mainClasses = ko.pureComputed(() => {
