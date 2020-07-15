@@ -17,17 +17,6 @@ import {Columns, Column, Select} from '@wireapp/react-ui-kit';
     </Column>
   </Columns>
   <Columns>
-    <Column>Labeled Select</Column>
-    <Column>
-      <Select label="Labeled Select">
-        <option>a</option>
-        <option>b</option>
-        <option>c</option>
-        <option>d</option>
-      </Select>
-    </Column>
-  </Columns>
-  <Columns>
     <Column>Disabled Select</Column>
     <Column>
       <Select disabled>

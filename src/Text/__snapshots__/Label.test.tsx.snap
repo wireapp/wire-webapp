@@ -5,7 +5,7 @@ exports[`"Label" renders (dark theme) 1`] = `
   color: initial;
   display: inline;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 300;
   opacity: 1;
   text-align: left;
   text-transform: none;
@@ -25,11 +25,11 @@ exports[`"Label" renders (dark theme) 1`] = `
 <div
   className="emotion-1"
 >
-  <span
+  <label
     className="emotion-0"
   >
     Label
-  </span>
+  </label>
 </div>
 `;
 
@@ -44,7 +44,7 @@ exports[`"Label" renders 1`] = `
   color: initial;
   display: inline;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 300;
   opacity: 1;
   text-align: left;
   text-transform: none;
@@ -58,11 +58,11 @@ exports[`"Label" renders 1`] = `
 <div
   className="emotion-1"
 >
-  <span
+  <label
     className="emotion-0"
   >
     Label
-  </span>
+  </label>
 </div>
 `;
 

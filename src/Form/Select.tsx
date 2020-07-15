@@ -23,7 +23,6 @@ import {COLOR} from '../Identity';
 import {Theme} from '../Layout';
 import {filterProps, inlineSVG} from '../util';
 import {InputProps, inputStyle} from './Input';
-import {Label} from '../Text';
 
 export interface SelectProps<T = HTMLSelectElement> extends InputProps<T> {
   disabled?: boolean;
@@ -61,12 +60,6 @@ export const selectStyle: <T>(theme: Theme, props: SelectProps<T>) => ObjectInte
 
 const filterSelectProps = (props: SelectProps) => filterProps(props, ['markInvalid']);
 
-export const Select = (props: SelectProps) =>
-  props.label ? (
-    <Label bold={false} markInvalid={props.markInvalid}>
-      <div style={{marginLeft: '16px'}}>{props.label}</div>
-      <select css={theme => selectStyle(theme, props)} {...filterSelectProps(props)} />
-    </Label>
-  ) : (
-    <select css={theme => selectStyle(theme, props)} {...filterSelectProps(props)} />
-  );
+export const Select = (props: SelectProps) => (
+  <select css={theme => selectStyle(theme, props)} {...filterSelectProps(props)} />
+);
