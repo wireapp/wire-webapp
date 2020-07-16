@@ -21,7 +21,7 @@ import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Environment} from 'Util/Environment';
-import {Logger, getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 import {includesString} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {getParameter} from 'Util/UrlUtil';
@@ -33,12 +33,14 @@ import type {UserRepository} from '../user/UserRepository';
 import {EventName} from './EventName';
 import * as trackingHelpers from './Helpers';
 import {SuperProperty} from './SuperProperty';
+import {RaygunStatic} from 'raygun4js';
+
+declare const Raygun: RaygunStatic;
 
 export class EventTrackingRepository {
-  private isUserAnalyticsActivated: boolean;
+  private isProductReportingActivated: boolean;
   private lastReportTimestamp?: number;
   private privacyPreference?: boolean;
-  private providerAPI?: boolean;
   private readonly logger: Logger;
   private readonly teamRepository: TeamRepository;
   private readonly userRepository: UserRepository;
@@ -65,12 +67,11 @@ export class EventTrackingRepository {
     this.teamRepository = teamRepository;
     this.userRepository = userRepository;
 
-    this.providerAPI = undefined;
     this.lastReportTimestamp = undefined;
     this.privacyPreference = undefined;
 
     this.isErrorReportingActivated = false;
-    this.isUserAnalyticsActivated = false;
+    this.isProductReportingActivated = false;
   }
 
   /**
@@ -82,7 +83,7 @@ export class EventTrackingRepository {
     this.logger.info(`Initialize analytics and error reporting: ${this.privacyPreference}`);
 
     if (this.privacyPreference) {
-      this._enableServices(false);
+      this.enableServices(false);
     }
 
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.PRIVACY, this.updatePrivacyPreference);
@@ -93,61 +94,46 @@ export class EventTrackingRepository {
     if (hasPreferenceChanged) {
       this.privacyPreference = privacyPreference;
 
-      return this.privacyPreference ? this._enableServices(true) : this._disableServices();
+      return this.privacyPreference ? this.enableServices(true) : this.disableServices();
     }
   };
 
-  private async _enableServices(isOptIn = false): Promise<void> {
-    this._enableErrorReporting();
-    if (this._isDomainAllowedForAnalytics()) {
-      await this._enableAnalytics();
+  private async enableServices(isOptIn = false): Promise<void> {
+    this.enableErrorReporting();
+    if (this.isDomainAllowedForAnalytics()) {
+      await this.enableProductReporting();
       if (isOptIn) {
-        this._trackEvent(EventName.SETTINGS.OPTED_IN_TRACKING);
+        this.trackEvent(EventName.SETTINGS.OPTED_IN_TRACKING);
       }
     }
   }
 
-  private _disableServices(): void {
-    this._disableErrorReporting();
-    this._trackEvent(EventName.SETTINGS.OPTED_OUT_TRACKING);
-    this._disableAnalytics();
+  private disableServices(): void {
+    this.disableErrorReporting();
+    this.trackEvent(EventName.SETTINGS.OPTED_OUT_TRACKING);
+    this.disableAnalytics();
   }
 
   //##############################################################################
   // Analytics
   //##############################################################################
 
-  private _disableAnalytics(): void {
+  private disableAnalytics(): void {
     this.logger.debug('Analytics was disabled due to user preferences');
-    this.isUserAnalyticsActivated = false;
-
-    this._unsubscribeFromAnalyticsEvents();
-
-    if (this.providerAPI) {
-      // Disable provider API
-      this.providerAPI = undefined;
-    }
+    this.isProductReportingActivated = false;
+    this.unsubscribeFromAnalyticsEvents();
   }
 
-  private _enableAnalytics(): Promise<void> {
-    this.isUserAnalyticsActivated = true;
+  private async enableProductReporting(): Promise<void> {
+    this.isProductReportingActivated = true;
 
-    // Check if provider API is available and reuse if possible
-    const providerPromise = this.providerAPI ? Promise.resolve(this.providerAPI) : this._initAnalytics();
-    return providerPromise.then(providerInstance => {
-      if (providerInstance) {
-        this._setSuperProperties();
-        this._subscribeToAnalyticsEvents();
-      }
-    });
+    // TODO: Asynchronously init provider (Localytics, Mixpanel, Countly, ...) here
+
+    this.setSuperProperties();
+    this.subscribeToProductEvents();
   }
 
-  private _initAnalytics(): Promise<boolean | undefined> {
-    // Initialize provider API
-    return Promise.resolve(this.providerAPI);
-  }
-
-  private _isDomainAllowedForAnalytics(): boolean {
+  private isDomainAllowedForAnalytics(): boolean {
     const trackingParameter = getParameter(URLParameter.TRACKING);
     return typeof trackingParameter === 'boolean'
       ? trackingParameter
@@ -160,29 +146,27 @@ export class EventTrackingRepository {
         });
   }
 
-  private _resetSuperProperties(): void {
-    if (this.providerAPI) {
-      // Reset super properties on provider API and forget distinct ids
-    }
+  private resetSuperProperties(): void {
+    // noop
   }
 
-  private _subscribeToAnalyticsEvents(): void {
+  private subscribeToProductEvents(): void {
     amplify.subscribe(WebAppEvents.ANALYTICS.SUPER_PROPERTY, this, (superPropertyName: string, value: any) => {
-      if (this.isUserAnalyticsActivated) {
+      if (this.isProductReportingActivated) {
         this._setSuperProperty(superPropertyName, value);
       }
     });
 
     amplify.subscribe(WebAppEvents.ANALYTICS.EVENT, this, (eventName: string, attributes?: any) => {
-      if (this.isUserAnalyticsActivated) {
-        this._trackEvent(eventName, attributes);
+      if (this.isProductReportingActivated) {
+        this.trackEvent(eventName, attributes);
       }
     });
 
-    amplify.subscribe(WebAppEvents.LIFECYCLE.SIGNED_OUT, this._resetSuperProperties.bind(this));
+    amplify.subscribe(WebAppEvents.LIFECYCLE.SIGNED_OUT, this.resetSuperProperties.bind(this));
   }
 
-  private _setSuperProperties(): void {
+  private setSuperProperties(): void {
     this._setSuperProperty(SuperProperty.APP, EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE);
     this._setSuperProperty(SuperProperty.APP_VERSION, Environment.version(false));
     this._setSuperProperty(SuperProperty.DESKTOP_APP, trackingHelpers.getPlatform());
@@ -202,7 +186,7 @@ export class EventTrackingRepository {
     this.logger.info(`Set super property '${superPropertyName}' to value '${value}'`);
   }
 
-  private _trackEvent(eventName: string, attributes?: any): void {
+  private trackEvent(eventName: string, attributes?: any): void {
     const isDisabledEvent = EventTrackingRepository.CONFIG.USER_ANALYTICS.DISABLED_EVENTS.includes(eventName);
     if (isDisabledEvent) {
       this.logger.info(`Skipped sending disabled event of type '${eventName}'`);
@@ -214,7 +198,7 @@ export class EventTrackingRepository {
     }
   }
 
-  private _unsubscribeFromAnalyticsEvents(): void {
+  private unsubscribeFromAnalyticsEvents(): void {
     amplify.unsubscribeAll(WebAppEvents.ANALYTICS.SUPER_PROPERTY);
     amplify.unsubscribeAll(WebAppEvents.ANALYTICS.EVENT);
   }
@@ -230,7 +214,7 @@ export class EventTrackingRepository {
    * @param raygunPayload Error payload about to be send
    * @returns Payload if error will be reported, otherwise `false`
    */
-  private _checkErrorPayload<T extends object>(raygunPayload: T): T | false {
+  private checkErrorPayload<T extends object>(raygunPayload: T): T | false {
     if (!this.lastReportTimestamp) {
       this.lastReportTimestamp = Date.now();
       return raygunPayload;
@@ -245,14 +229,14 @@ export class EventTrackingRepository {
     return false;
   }
 
-  private _disableErrorReporting(): void {
+  private disableErrorReporting(): void {
     this.logger.debug('Disabling Raygun error reporting');
     this.isErrorReportingActivated = false;
-    window.Raygun.detach();
-    window.Raygun.init(EventTrackingRepository.CONFIG.ERROR_REPORTING.API_KEY, {disableErrorTracking: true});
+    Raygun.detach();
+    Raygun.init(EventTrackingRepository.CONFIG.ERROR_REPORTING.API_KEY, {disableErrorTracking: true});
   }
 
-  private _enableErrorReporting(): void {
+  private enableErrorReporting(): void {
     this.logger.debug('Enabling Raygun error reporting');
     this.isErrorReportingActivated = true;
 
@@ -265,8 +249,8 @@ export class EventTrackingRepository {
       ignoreAjaxError: true,
     };
 
-    window.Raygun.init(EventTrackingRepository.CONFIG.ERROR_REPORTING.API_KEY, options).attach();
-    window.Raygun.disableAutoBreadcrumbs();
+    Raygun.init(EventTrackingRepository.CONFIG.ERROR_REPORTING.API_KEY, options).attach();
+    Raygun.disableAutoBreadcrumbs();
 
     /*
      * Adding a version to the Raygun reports to identify which version of the WebApp ran into the issue.
@@ -274,11 +258,11 @@ export class EventTrackingRepository {
      * @see https://github.com/MindscapeHQ/raygun4js#version-filtering
      */
     if (!Environment.frontend.isLocalhost()) {
-      window.Raygun.setVersion(Environment.version(false));
+      Raygun.setVersion(Environment.version(false));
     }
     if (Environment.desktop) {
-      window.Raygun.withCustomData({electron_version: Environment.version(true)});
+      Raygun.withCustomData({electron_version: Environment.version(true)});
     }
-    window.Raygun.onBeforeSend(this._checkErrorPayload.bind(this));
+    Raygun.onBeforeSend(this.checkErrorPayload.bind(this));
   }
 }

@@ -20,7 +20,6 @@
 import {amplify} from 'amplify';
 import jQuery from 'jquery';
 import ko from 'knockout';
-import type {RaygunStatic} from 'raygun4js';
 import 'raygun4js/dist/raygun.vanilla';
 import type {t} from 'Util/LocalizerUtil';
 
@@ -79,7 +78,6 @@ declare global {
     amplify: amplify.Static;
     jQuery: typeof jQuery;
     ko: typeof ko;
-    Raygun: RaygunStatic;
     t: typeof t;
     wire: {
       app: {
