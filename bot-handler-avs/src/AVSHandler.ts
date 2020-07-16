@@ -24,6 +24,50 @@ import {CALL_TYPE, CONV_TYPE, ENV as AVS_ENV, getAvsInstance, LOG_LEVEL, REASON,
 import axios from 'axios';
 import type {CallMessage} from '@wireapp/core/dist/conversation/message/OtrMessage';
 
+const wrtc = require('wrtc');
+
+declare global {
+  namespace NodeJS {
+    interface Global {
+      getUserMedia: NavigatorGetUserMedia;
+      MediaStream: MediaStream;
+      MediaStreamTrack: MediaStreamTrack;
+      navigator: Navigator;
+      nonstandard: {
+        i420ToRgba: unknown;
+        rgbaToI420: unknown;
+        RTCAudioSink: unknown;
+        RTCAudioSource: unknown;
+        RTCVideoSink: unknown;
+        RTCVideoSource: unknown;
+      };
+      RTCDataChannel: RTCDataChannel;
+      RTCDataChannelEvent: RTCDataChannelEvent;
+      RTCDtlsTransport: RTCDtlsTransport;
+      RTCIceCandidate: unknown;
+      RTCIceTransport: RTCIceTransport;
+      RTCPeerConnection: RTCPeerConnection;
+      RTCPeerConnectionIceEvent: RTCPeerConnectionIceEvent;
+      RTCRtpReceiver: RTCRtpReceiver;
+      RTCRtpSender: RTCRtpSender;
+      RTCRtpTransceiver: RTCRtpTransceiver;
+      RTCSctpTransport: RTCSctpTransport;
+      RTCSessionDescription: unknown;
+    }
+  }
+}
+
+global.RTCPeerConnection = wrtc.RTCPeerConnection;
+global.MediaStream = wrtc.MediaStream;
+global.MediaStreamTrack = wrtc.MediaStreamTrack;
+global.navigator = {
+  ...global.navigator,
+  mediaDevices: {
+    ...(global.navigator || {}).mediaDevices,
+    getUserMedia: wrtc.getUserMedia,
+  },
+};
+
 export class AVSHandler extends MessageHandler {
   private wCall?: Wcall;
   private wUser?: number;
