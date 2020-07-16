@@ -61,6 +61,8 @@ import {
   TeamIcon,
   TimedIcon,
   TrashIcon,
+  HideIcon,
+  ShowIcon,
   TriangleIcon,
   TwitterIcon,
   WireIcon,
@@ -114,6 +116,8 @@ const icons = [
   TimedIcon,
   TrashIcon,
   TriangleIcon,
+  HideIcon,
+  ShowIcon,
   WireIcon,
 ];
 
