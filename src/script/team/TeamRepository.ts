@@ -70,7 +70,7 @@ export class TeamRepository {
   private readonly logger: Logger;
   private readonly memberInviters: ko.Observable<any>;
   private readonly memberRoles: ko.Observable<any>;
-  public readonly supportsLegalHold: ko.Observable<boolean>;
+  private readonly supportsLegalHold: ko.Observable<boolean>;
   private readonly teamMapper: TeamMapper;
   readonly teamMembers: ko.PureComputed<User[]>;
   public readonly teamName: ko.PureComputed<string>;

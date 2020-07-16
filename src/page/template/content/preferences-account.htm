@@ -73,7 +73,6 @@
                    id="email" type="text"
                    data-bind="value: email, event: {blur: resetEmailInput}, enter: changeEmail, attr: {placeholder: t('preferencesAccountEmailPlaceholder'), readonly: !canEditProfile(selfUser())}"
                    data-uie-name="enter-email"
-                   maxlength="64"
                    spellcheck="false" />
             <!-- ko if: canEditProfile(selfUser()) -->
               <edit-icon data-uie-name="enter-email-icon"></edit-icon>
