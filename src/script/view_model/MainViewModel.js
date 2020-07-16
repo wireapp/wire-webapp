@@ -95,7 +95,7 @@ export class MainViewModel {
     this.list = new ListViewModel(this, repositories);
 
     this.lightbox = new z.viewModel.ImageDetailViewViewModel(this, repositories);
-    this.title = new WindowTitleViewModel(this, repositories);
+    this.title = new WindowTitleViewModel(this, repositories.user, repositories.conversation);
     this.favicon = new z.viewModel.FaviconViewModel(window.amplify);
     this.warnings = new WarningsViewModel();
 
