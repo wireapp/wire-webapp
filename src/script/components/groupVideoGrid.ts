@@ -110,7 +110,7 @@ ko.components.register('group-video-grid', {
             <video class="group-video-grid__element-video" autoplay playsinline
               data-bind="
                 sourceStream: participant.videoStream(),
-                css: {'group-video-grid__element-video--contain': participant.sharesScreen(), mirror: participant === selfParticipant}">
+                css: {'group-video-grid__element-video--contain': participant.sharesScreen(), mirror: participant === selfParticipant && participant.sharesCamera()}">
             </video>
             <!-- ko if: !minimized -->
               <div class="group-video-grid__element__label">
@@ -137,7 +137,7 @@ ko.components.register('group-video-grid', {
       </div>
       <!-- ko if: grid().thumbnail && grid().thumbnail.videoStream() -->
         <div class="group-video__thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized}">
-          <video class="mirror group-video__thumbnail-video" autoplay playsinline data-uie-name="self-video-thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized, 'mirror': grid().thumbnail.hasActiveVideo()}, sourceStream: grid().thumbnail.videoStream()">
+          <video class="group-video__thumbnail-video" autoplay playsinline data-uie-name="self-video-thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized, 'mirror': grid().thumbnail.hasActiveVideo() && !grid().thumbnail.sharesScreen()}, sourceStream: grid().thumbnail.videoStream()">
           </video>
           <!-- ko if: muted() -->
             <div class="group-video-grid__mute-overlay" data-uie-name="status-call-audio-muted">
