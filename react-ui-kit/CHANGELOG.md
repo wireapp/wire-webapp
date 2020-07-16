@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.36.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.35.0...@wireapp/react-ui-kit@7.36.0) (2020-07-16)
+
+
+### Features
+
+* **react-ui-kit:** Hide/Show icon ([#3116](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/3116)) ([89932f1](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/89932f1f3023af3d9ebb3207020c0ff3deb65593))
+
+
+
+
+
 # [7.35.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.34.0...@wireapp/react-ui-kit@7.35.0) (2020-07-15)
 
 
