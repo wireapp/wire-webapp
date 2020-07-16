@@ -42,6 +42,9 @@ import {UserError} from '../error/UserError';
 import type {CryptographyService} from './CryptographyService';
 import type {StorageRepository, EventRecord} from '../storage';
 import {EventBuilder} from '../conversation/EventBuilder';
+import {RaygunStatic} from 'raygun4js';
+
+declare const Raygun: RaygunStatic;
 
 export interface SignalingKeys {
   enckey: string;
@@ -544,6 +547,6 @@ export class CryptographyRepository {
 
     const raygunError = new Error(`Decryption failed: ${(error as AxiosError).code || error.message}`);
     raygunError.stack = error.stack;
-    window.Raygun.send(raygunError, customData);
+    Raygun.send(raygunError, customData);
   }
 }
