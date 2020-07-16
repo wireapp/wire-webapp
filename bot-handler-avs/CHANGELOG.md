@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-avs/compare/@wireapp/bot-handler-avs@0.1.0...@wireapp/bot-handler-avs@0.1.1) (2020-07-16)
+
+
+### Bug Fixes
+
+* **bot-handler-avs:** Fake MediaStream API for Node.js through DOM library ([#3118](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-avs/issues/3118)) ([486cf86](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-avs/commit/486cf861ecd65cfbe38bb3b880ccc45ae549c57b))
+
+
+
+
+
 # 0.1.0 (2020-07-16)
 
 
