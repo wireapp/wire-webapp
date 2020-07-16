@@ -30,11 +30,11 @@ describe('FaviconViewModel', () => {
     expect(dispatcher.subscribe).toHaveBeenCalledWith(
       WebAppEvents.LIFECYCLE.UNREAD_COUNT,
       faviconViewModel,
-      faviconViewModel._updateUnreadCount,
+      faviconViewModel.updateUnreadCount,
     );
   });
 
-  describe('_updateUnreadCount', () => {
+  describe('updateUnreadCount', () => {
     let faviconViewModel;
     let dispatcher;
 
