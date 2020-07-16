@@ -1,0 +1,38 @@
+{
+  "dependencies": {
+    "@types/webrtc": "0.0.26",
+    "@wireapp/avs": "6.0.46"
+  },
+  "description": "Adds audio/video/signaling (AVS) functionality for Wire bots.",
+  "devDependencies": {
+    "@types/node": "~12",
+    "jasmine": "3.5.0",
+    "rimraf": "3.0.2",
+    "typescript": "3.9.2",
+    "@wireapp/bot-api": "7.10.18"
+  },
+  "files": [
+    "dist",
+    "!dist/demo"
+  ],
+  "license": "GPL-3.0",
+  "main": "dist/index.js",
+  "name": "@wireapp/bot-handler-avs",
+  "peerDependencies": {
+    "@wireapp/bot-api": "7.x.x"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-avs",
+  "scripts": {
+    "build": "yarn build:node",
+    "build:node": "tsc",
+    "clean": "rimraf dist",
+    "dist": "yarn clean && yarn build",
+    "test": "yarn test:node",
+    "test:node": "yarn build:node --noEmit",
+    "test:project": "yarn dist && yarn test"
+  },
+  "version": "0.0.0"
+}
