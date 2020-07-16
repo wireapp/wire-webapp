@@ -20,16 +20,58 @@
 import {amplify} from 'amplify';
 import {escape} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import ko from 'knockout';
 
-import {getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {noop, afterRender} from 'Util/util';
 import {formatLocale} from 'Util/TimeUtil';
 import {onEscKey, offEscKey, isEnterKey, isSpaceKey} from 'Util/KeyboardUtil';
 
 import {Config} from '../Config';
+import type {ClientEntity} from '../client/ClientEntity';
 
-const defaultContent = {
+interface Content {
+  checkboxLabel: string;
+  closeFn: Function;
+  closeOnConfirm?: boolean;
+  currentType: string;
+  inputPlaceholder: string;
+  messageHtml: string;
+  messageText: string;
+  modalUie: string;
+  onBgClick: Function;
+  primaryAction: Action;
+  secondaryAction: Action[] | Action;
+  titleText: string;
+}
+
+interface Action {
+  action?: Function;
+  text?: string;
+}
+
+interface Text {
+  htmlMessage?: string;
+  input?: string;
+  message?: string;
+  option?: string;
+  title?: string;
+}
+
+interface ModalOptions {
+  close?: Function;
+  closeOnConfirm?: boolean;
+  data?: ClientEntity[] | boolean;
+  hideSecondary?: boolean;
+  preventClose?: boolean;
+  primaryAction?: Action;
+  secondaryAction?: Action;
+  showClose?: boolean;
+  text?: Text;
+}
+
+const defaultContent: Content = {
   checkboxLabel: '',
   closeFn: noop,
   currentType: null,
@@ -38,7 +80,7 @@ const defaultContent = {
   messageText: '',
   modalUie: '',
   onBgClick: noop,
-  primaryAction: {},
+  primaryAction: {} as Action,
   secondaryAction: [],
   titleText: '',
 };
@@ -63,6 +105,19 @@ const Types = {
 };
 
 export class ModalsViewModel {
+  logger: Logger;
+  elementId: 'modals';
+  optionChecked: ko.Observable<boolean>;
+  passwordValue: ko.Observable<string>;
+  inputValue: ko.Observable<string>;
+  inputFocus: ko.Observable<boolean>;
+  content: ko.Observable<Content>;
+  state: ko.Observable<string>;
+  currentId: ko.Observable<any>;
+  queue: any[];
+  errorMessage: ko.Observable<string>;
+  actionEnabled: ko.PureComputed<boolean>;
+
   static get TYPE() {
     return Types;
   }
@@ -87,7 +142,7 @@ export class ModalsViewModel {
 
   isModalVisible = () => this.state() === States.OPEN;
 
-  showModal = (type, options, modalId) => {
+  showModal = (type: string, options: ModalOptions, modalId: string) => {
     const alreadyOpen = modalId && modalId === this.currentId();
     if (alreadyOpen) {
       return this.unqueue();
@@ -128,7 +183,7 @@ export class ModalsViewModel {
    * @param {string} [id] The optional ID of ther modal to prevent multiple instances
    * @returns {undefined} No return value
    */
-  _showModal = (type, options = {}, id) => {
+  _showModal = (type: string, options: ModalOptions = {} as ModalOptions, id: string) => {
     if (!Object.values(Types).includes(type)) {
       return this.logger.warn(`Modal of type '${type}' is not supported`);
     }
@@ -142,7 +197,7 @@ export class ModalsViewModel {
       secondaryAction,
       hideSecondary,
       showClose = false,
-      text = {},
+      text = {} as Text,
     } = options;
     const content = {
       checkboxLabel: text.option,
@@ -166,7 +221,7 @@ export class ModalsViewModel {
         content.primaryAction = {...primaryAction, text: t('modalAcknowledgeAction')};
         content.secondaryAction = {...secondaryAction, text: t('modalAccountNewDevicesSecondary')};
         content.messageText = t('modalAccountNewDevicesMessage');
-        const deviceList = data
+        const deviceList = ((data as unknown) as ClientEntity[])
           .map(device => {
             const deviceTime = formatLocale(device.time || new Date(), 'PP, p');
             const deviceModel = `${t('modalAccountNewDevicesFrom')} ${escape(device.model)}`;
@@ -224,10 +279,10 @@ export class ModalsViewModel {
     if (content.secondaryAction) {
       // force it into array format
       const uieNames = ['do-secondary', 'do-tertiary', 'do-quaternary'];
-      content.secondaryAction = [].concat(content.secondaryAction).map((action, index) => {
+      (content.secondaryAction as Action[]) = [].concat(content.secondaryAction).map((action, index) => {
         const uieName = uieNames[index] || 'do-remaining';
         return {...action, uieName};
-      });
+      }) as Action[];
     }
     this.content(content);
     this.state(States.OPEN);
@@ -239,10 +294,10 @@ export class ModalsViewModel {
     afterRender(() => this.inputFocus(true));
   };
 
-  handleEnterKey = event => {
-    if (event.target.tagName === 'BUTTON') {
+  handleEnterKey = (event: KeyboardEvent) => {
+    if ((event.target as HTMLElement).tagName === 'BUTTON') {
       if (isSpaceKey(event) || isEnterKey(event)) {
-        event.target.click();
+        (event.target as HTMLElement).click();
       }
       event.stopPropagation();
       event.preventDefault();
@@ -272,7 +327,7 @@ export class ModalsViewModel {
     }
   };
 
-  doAction = (action, closeAfter, skipValidation = false) => {
+  doAction = (action: Function, closeAfter: boolean, skipValidation = false) => {
     if (!skipValidation && !this.actionEnabled()) {
       return;
     }
