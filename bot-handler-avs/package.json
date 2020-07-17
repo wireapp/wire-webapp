@@ -35,5 +35,5 @@
     "test:node": "yarn build:node --noEmit",
     "test:project": "yarn dist && yarn test"
   },
-  "version": "0.1.3"
+  "version": "0.1.4"
 }

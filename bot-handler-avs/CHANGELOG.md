@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-avs/compare/@wireapp/bot-handler-avs@0.1.3...@wireapp/bot-handler-avs@0.1.4) (2020-07-17)
+
+
+### Bug Fixes
+
+* **bot-handler-avs:** Use property initilizer syntax to correctly bind this ([#3123](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-avs/issues/3123)) ([744d1b3](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-avs/commit/744d1b3e45479fb694f41105145b71a386b85e40))
+
+
+
+
+
 ## [0.1.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-avs/compare/@wireapp/bot-handler-avs@0.1.2...@wireapp/bot-handler-avs@0.1.3) (2020-07-17)
 
 **Note:** Version bump only for package @wireapp/bot-handler-avs
