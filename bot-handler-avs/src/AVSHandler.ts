@@ -88,7 +88,7 @@ export class AVSHandler extends MessageHandler {
     this.wCall = wCall;
   }
 
-  onIncomingCallMessage(callMessage: CallMessage): void {
+  onIncomingCallMessage = (callMessage: CallMessage): void => {
     const callContent = callMessage.content;
 
     if (!callMessage.fromClientId) {
@@ -111,17 +111,17 @@ export class AVSHandler extends MessageHandler {
     }
 
     this.answerCall(callMessage);
-  }
+  };
 
-  startCall(conversationId: string, conversationType: CONV_TYPE, callType: CALL_TYPE): void {
+  startCall = (conversationId: string, conversationType: CONV_TYPE, callType: CALL_TYPE): void => {
     this.wCall!.start(this.wUser!, conversationId, callType, conversationType, 0);
-  }
+  };
 
-  private answerCall(call: CallMessage) {
+  private readonly answerCall = (call: CallMessage) => {
     this.wCall!.answer(this.wUser!, call.conversation, CALL_TYPE.NORMAL, 0);
-  }
+  };
 
-  private configureCallingApi(wCall: Wcall): Wcall {
+  private readonly configureCallingApi = (wCall: Wcall): Wcall => {
     wCall.setLogHandler((level: LOG_LEVEL, message: string) => {
       console.info(`${level}: ${message}`);
     });
@@ -132,7 +132,7 @@ export class AVSHandler extends MessageHandler {
     wCall.setMediaStreamHandler(() => {});
     setInterval(() => wCall.poll(), 500);
     return wCall;
-  }
+  };
 
   private readonly mediaHandler = async (): Promise<MediaStream> => {
     return this.mediaStream;
@@ -161,7 +161,7 @@ export class AVSHandler extends MessageHandler {
     return wUser;
   };
 
-  private callConfigRequestHandler(): number {
+  private readonly callConfigRequestHandler = (): number => {
     this.account!.service!.account.getCallConfig()
       .then(config => {
         this.wCall!.configUpdate(this.wUser!, 0, JSON.stringify(config));
@@ -171,7 +171,7 @@ export class AVSHandler extends MessageHandler {
       });
 
     return 0;
-  }
+  };
 
   private readonly sendSFTRequest = (
     context: number,
