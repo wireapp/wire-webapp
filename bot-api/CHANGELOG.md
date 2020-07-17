@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.10.19](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@7.10.18...@wireapp/bot-api@7.10.19) (2020-07-17)
+
+
+### Bug Fixes
+
+* **bot-api:** Use Account api instead of api-client ([#3122](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/issues/3122)) ([42fff6c](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/commit/42fff6c9be5c614c974335a44746f9ae10c97bfa))
+
+
+
+
+
 ## [7.10.18](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@7.10.17...@wireapp/bot-api@7.10.18) (2020-07-16)
 
 **Note:** Version bump only for package @wireapp/bot-api

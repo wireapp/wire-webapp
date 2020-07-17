@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [16.10.19](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@16.10.18...@wireapp/core@16.10.19) (2020-07-17)
+
+
+### Bug Fixes
+
+* **core, cryptobox, store-engine-bro-fs, store-engine-sqleet, store-engine-web-storage:** Correctly handle RecordNotFoundError error ([#3121](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/3121)) ([de85320](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/de8532022c2bf0a7b7b03b3aa7ff6b92862f227a))
+
+
+
+
+
 ## [16.10.18](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@16.10.17...@wireapp/core@16.10.18) (2020-07-16)
 
 **Note:** Version bump only for package @wireapp/core

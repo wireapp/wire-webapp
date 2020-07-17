@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.2.18](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@12.2.17...@wireapp/cryptobox@12.2.18) (2020-07-17)
+
+
+### Bug Fixes
+
+* **core, cryptobox, store-engine-bro-fs, store-engine-sqleet, store-engine-web-storage:** Correctly handle RecordNotFoundError error ([#3121](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/issues/3121)) ([de85320](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/commit/de8532022c2bf0a7b7b03b3aa7ff6b92862f227a))
+
+
+
+
+
 ## [12.2.17](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@12.2.16...@wireapp/cryptobox@12.2.17) (2020-07-16)
 
 **Note:** Version bump only for package @wireapp/cryptobox

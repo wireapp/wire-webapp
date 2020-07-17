@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.12](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-web-storage/compare/@wireapp/store-engine-web-storage@1.2.11...@wireapp/store-engine-web-storage@1.2.12) (2020-07-17)
+
+
+### Bug Fixes
+
+* **core, cryptobox, store-engine-bro-fs, store-engine-sqleet, store-engine-web-storage:** Correctly handle RecordNotFoundError error ([#3121](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-web-storage/issues/3121)) ([de85320](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-web-storage/commit/de8532022c2bf0a7b7b03b3aa7ff6b92862f227a))
+
+
+
+
+
 ## [1.2.11](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-web-storage/compare/@wireapp/store-engine-web-storage@1.2.10...@wireapp/store-engine-web-storage@1.2.11) (2020-07-16)
 
 **Note:** Version bump only for package @wireapp/store-engine-web-storage
