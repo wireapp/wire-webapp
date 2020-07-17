@@ -132,7 +132,7 @@ export class Bot {
       await this.account.init(this.config.clientType, cookie);
     } catch (error) {
       this.logger.info('Failed to init account from cookie', error);
-      await apiClient.login(login);
+      await this.account.login(login);
     }
 
     await this.account.listen();
