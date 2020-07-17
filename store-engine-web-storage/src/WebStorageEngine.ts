@@ -45,7 +45,12 @@ export class WebStorageEngine implements CRUDEngine {
       const message = `Record "${primaryKey}" already exists in "${tableName}". You need to delete the record first if you want to overwrite it.`;
       throw new StoreEngineError.RecordAlreadyExistsError(message);
     } catch (error) {
-      if (!(error instanceof StoreEngineError.RecordNotFoundError)) {
+      if (
+        !(
+          error instanceof StoreEngineError.RecordNotFoundError ||
+          error.constructor.name === StoreEngineError.RecordNotFoundError.name
+        )
+      ) {
         throw error;
       }
     }
@@ -179,7 +184,10 @@ export class WebStorageEngine implements CRUDEngine {
     try {
       internalPrimaryKey = await this.update(tableName, primaryKey, changes);
     } catch (error) {
-      if (error instanceof StoreEngineError.RecordNotFoundError) {
+      if (
+        error instanceof StoreEngineError.RecordNotFoundError ||
+        error.constructor.name === StoreEngineError.RecordNotFoundError.name
+      ) {
         internalPrimaryKey = await this.create(tableName, primaryKey, changes);
       } else {
         throw error;

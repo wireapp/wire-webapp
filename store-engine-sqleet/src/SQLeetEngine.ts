@@ -301,7 +301,9 @@ export class SQLeetEngine implements CRUDEngine {
     try {
       await this.update(tableName, primaryKey, changes);
     } catch (error) {
-      const isRecordNotFound = error instanceof StoreEngineError.RecordNotFoundError;
+      const isRecordNotFound =
+        error instanceof StoreEngineError.RecordNotFoundError ||
+        error.constructor.name === StoreEngineError.RecordNotFoundError.name;
       if (isRecordNotFound) {
         return this.create(tableName, primaryKey, changes);
       }

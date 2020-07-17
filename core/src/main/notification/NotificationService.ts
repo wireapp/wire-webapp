@@ -122,7 +122,10 @@ export class NotificationService extends EventEmitter {
     try {
       databaseLastEventDate = await this.database.getLastEventDate();
     } catch (error) {
-      if (error instanceof StoreEngineError.RecordNotFoundError) {
+      if (
+        error instanceof StoreEngineError.RecordNotFoundError ||
+        error.constructor.name === StoreEngineError.RecordNotFoundError.name
+      ) {
         return this.database.createLastEventDate(eventDate);
       }
       throw error;

@@ -239,7 +239,7 @@ export class Account extends EventEmitter {
         error instanceof cryptobox.error.CryptoboxError ||
         error.constructor.name === 'CryptoboxError' ||
         error instanceof StoreEngineError.RecordNotFoundError ||
-        error.constructor.name === StoreEngineError.RecordNotFoundError.constructor.name;
+        error.constructor.name === StoreEngineError.RecordNotFoundError.name;
       const notFoundOnBackend = error.response?.status === StatusCode.NOT_FOUND;
 
       if (notFoundInDatabase) {
