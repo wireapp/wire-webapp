@@ -187,7 +187,7 @@ export class AVSHandler extends MessageHandler {
         const jsonData = JSON.stringify(axiosData);
         this.wCall!.sftResp(this.wUser!, status, jsonData, jsonData.length, context);
       } catch (error) {
-        console.info('Failed to send SFT request', error);
+        console.warn('Failed to send SFT request', error);
       }
     })();
     return 0;
