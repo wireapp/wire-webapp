@@ -93,6 +93,7 @@ declare global {
         BACKEND_REST: string;
         BACKEND_WS: string;
         BRAND_NAME: string;
+        COUNTLY_API_KEY: string;
         ENVIRONMENT: string;
         FEATURE: {
           ALLOWED_FILE_UPLOAD_EXTENSIONS: string[];

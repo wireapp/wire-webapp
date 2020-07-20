@@ -22,7 +22,7 @@
  */
 export const SuperProperty = {
   APP: 'app',
-  APP_VERSION: 'App Version',
+  APP_VERSION: 'app_version',
   CONTACTS: 'contacts',
   DESKTOP_APP: 'desktop_app',
   TEAM: {

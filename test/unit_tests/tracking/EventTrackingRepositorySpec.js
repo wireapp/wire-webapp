@@ -32,9 +32,7 @@ describe('EventTrackingRepository', () => {
 
   describe('Initialization', () => {
     it('enables error reporting, user analytics and subscribes to analytics events', () => {
-      expect(testFactory.tracking_repository.providerAPI).toBeUndefined();
-      testFactory.tracking_repository.providerAPI = true;
-      spyOn(testFactory.tracking_repository, 'enableErrorReporting').and.callThrough();
+      spyOn(testFactory.tracking_repository, 'startErrorReporting').and.callThrough();
       spyOn(testFactory.tracking_repository, 'subscribeToProductEvents').and.callThrough();
 
       const properties = {
@@ -68,50 +66,46 @@ describe('EventTrackingRepository', () => {
       expect(privacyPreference).toBeFalsy();
 
       return testFactory.tracking_repository.init(true).then(() => {
-        expect(testFactory.tracking_repository.providerAPI).toBeDefined();
-        expect(testFactory.tracking_repository.enableErrorReporting).toHaveBeenCalled();
+        expect(testFactory.tracking_repository.startErrorReporting).toHaveBeenCalled();
         expect(testFactory.tracking_repository.subscribeToProductEvents).toHaveBeenCalled();
       });
     });
 
     it('allows changing initial tracking properties', () => {
-      testFactory.tracking_repository.providerAPI = true;
-
       expect(testFactory.tracking_repository.isErrorReportingActivated).toBe(false);
       expect(testFactory.tracking_repository.isProductReportingActivated).toBe(false);
-      testFactory.tracking_repository.trackEvent = jasmine.createSpy('trackEvent');
+      testFactory.tracking_repository.trackProductReportingEvent = jasmine.createSpy('trackProductReportingEvent');
 
       return testFactory.tracking_repository.init(true).then(() => {
         expect(testFactory.tracking_repository.isErrorReportingActivated).toBe(true);
         expect(testFactory.tracking_repository.isProductReportingActivated).toBe(true);
         amplify.publish(WebAppEvents.ANALYTICS.EVENT, 'i_am_an_event');
 
-        expect(testFactory.tracking_repository.trackEvent).toHaveBeenCalledTimes(1);
+        expect(testFactory.tracking_repository.trackProductReportingEvent).toHaveBeenCalledTimes(1);
         amplify.publish(WebAppEvents.ANALYTICS.EVENT, 'i_am_another_event');
 
-        expect(testFactory.tracking_repository.trackEvent).toHaveBeenCalledTimes(2);
+        expect(testFactory.tracking_repository.trackProductReportingEvent).toHaveBeenCalledTimes(2);
         amplify.publish(WebAppEvents.PROPERTIES.UPDATE.PRIVACY, false);
 
-        expect(testFactory.tracking_repository.trackEvent).toHaveBeenCalledTimes(3);
+        expect(testFactory.tracking_repository.trackProductReportingEvent).toHaveBeenCalledTimes(3);
         amplify.publish(WebAppEvents.ANALYTICS.EVENT, 'i_am_not_tracking');
 
-        expect(testFactory.tracking_repository.trackEvent).toHaveBeenCalledTimes(3);
+        expect(testFactory.tracking_repository.trackProductReportingEvent).toHaveBeenCalledTimes(3);
       });
     });
   });
 
   describe('User Tracking', () => {
     beforeEach(() => {
-      testFactory.tracking_repository.providerAPI = true;
-      testFactory.tracking_repository.trackEvent = jasmine.createSpy('trackEvent');
+      testFactory.tracking_repository.trackProductReportingEvent = jasmine.createSpy('trackProductReportingEvent');
       return testFactory.tracking_repository.init(true);
     });
 
     it('immediately reports events', () => {
       amplify.publish(WebAppEvents.ANALYTICS.EVENT, 'i_am_an_event');
 
-      expect(testFactory.tracking_repository.trackEvent).toHaveBeenCalled();
-      expect(testFactory.tracking_repository.trackEvent).toHaveBeenCalledTimes(1);
+      expect(testFactory.tracking_repository.trackProductReportingEvent).toHaveBeenCalled();
+      expect(testFactory.tracking_repository.trackProductReportingEvent).toHaveBeenCalledTimes(1);
     });
 
     it('allows additional parameters for events', () => {
@@ -123,15 +117,13 @@ describe('EventTrackingRepository', () => {
 
       amplify.publish(WebAppEvents.ANALYTICS.EVENT, event_name, attributes);
 
-      expect(testFactory.tracking_repository.trackEvent).toHaveBeenCalledWith(event_name, attributes);
+      expect(testFactory.tracking_repository.trackProductReportingEvent).toHaveBeenCalledWith(event_name, attributes);
     });
   });
 
   describe('Error Tracking', () => {
     beforeEach(() => {
       jasmine.clock().install();
-
-      testFactory.tracking_repository.providerAPI = true;
       return testFactory.tracking_repository.init(true);
     });
 

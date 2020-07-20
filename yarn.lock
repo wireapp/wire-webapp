@@ -2998,11 +2998,6 @@ base@^0.11.1:
     mixin-deep "^1.2.0"
     pascalcase "^0.1.1"
 
-bazinga64@5.7.6:
-  version "5.7.6"
-  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.7.6.tgz#31d7ac8188c583bb26c4b3237259e5dc6e260e9b"
-  integrity sha512-HKUvoXgymXR2jgwtznRfPE1C4W5XRpL58JnPC2XlSh1iNGgW/oN1KWoOCV8XyIciyQrSYbJrHQP+LYYcqXLXZA==
-
 bazinga64@5.7.7:
   version "5.7.7"
   resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.7.7.tgz#33718ecd3e48ca6d81112c30b7f8d87a45a639cd"
@@ -4076,6 +4071,11 @@ cosmiconfig@^5.0.0, cosmiconfig@^5.2.0:
     is-directory "^0.3.1"
     js-yaml "^3.13.1"
     parse-json "^4.0.0"
+
+countly-sdk-web@20.4.0:
+  version "20.4.0"
+  resolved "https://registry.yarnpkg.com/countly-sdk-web/-/countly-sdk-web-20.4.0.tgz#00e618ef4caf588ec4dc8dfcc4b6a76362eeb328"
+  integrity sha512-O3Hi7nRom9iih9j1/9rqd222AsvZgH+C/z1rPfMw9M0gJFtQ13Yo2JLxI+5sKWvkQ2ISCyQPpRWc5uaeLw7gRA==
 
 cpr@3.0.1:
   version "3.0.1"
