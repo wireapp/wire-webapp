@@ -34,8 +34,11 @@ import {EventName} from './EventName';
 import * as trackingHelpers from './Helpers';
 import {SuperProperty} from './SuperProperty';
 import {RaygunStatic} from 'raygun4js';
+import {createRandomUuid} from 'Util/util';
 
 declare const Raygun: RaygunStatic;
+
+const Countly = require('countly-sdk-web');
 
 export class EventTrackingRepository {
   private isProductReportingActivated: boolean;
@@ -99,37 +102,43 @@ export class EventTrackingRepository {
   };
 
   private async enableServices(isOptIn = false): Promise<void> {
-    this.enableErrorReporting();
+    this.startErrorReporting();
     if (this.isDomainAllowedForAnalytics()) {
-      await this.enableProductReporting();
+      await this.startProductReporting();
       if (isOptIn) {
-        this.trackEvent(EventName.SETTINGS.OPTED_IN_TRACKING);
+        this.trackProductReportingEvent(EventName.SETTINGS.OPTED_IN_TRACKING);
       }
     }
   }
 
   private disableServices(): void {
-    this.disableErrorReporting();
-    this.trackEvent(EventName.SETTINGS.OPTED_OUT_TRACKING);
-    this.disableAnalytics();
+    this.stopErrorReporting();
+    this.trackProductReportingEvent(EventName.SETTINGS.OPTED_OUT_TRACKING);
+    this.stopProductReporting();
   }
 
   //##############################################################################
   // Analytics
   //##############################################################################
 
-  private disableAnalytics(): void {
+  private stopProductReporting(): void {
     this.logger.debug('Analytics was disabled due to user preferences');
     this.isProductReportingActivated = false;
-    this.unsubscribeFromAnalyticsEvents();
+    this.stopProductReportingSession();
+    this.unsubscribeFromProductTrackingEvents();
   }
 
-  private async enableProductReporting(): Promise<void> {
+  private async startProductReporting(): Promise<void> {
     this.isProductReportingActivated = true;
 
-    // TODO: Asynchronously init provider (Localytics, Mixpanel, Countly, ...) here
+    Countly.init({
+      app_key: window.wire.env.COUNTLY_API_KEY,
+      debug: true,
+      device_id: createRandomUuid(),
+      url: 'https://wire.count.ly/',
+    });
 
-    this.setSuperProperties();
+    this.startProductReportingSession();
     this.subscribeToProductEvents();
   }
 
@@ -146,27 +155,23 @@ export class EventTrackingRepository {
         });
   }
 
-  private resetSuperProperties(): void {
-    // noop
+  private stopProductReportingSession(): void {
+    if (this.isProductReportingActivated) {
+      Countly.end_session();
+    }
   }
 
   private subscribeToProductEvents(): void {
-    amplify.subscribe(WebAppEvents.ANALYTICS.SUPER_PROPERTY, this, (superPropertyName: string, value: any) => {
-      if (this.isProductReportingActivated) {
-        this._setSuperProperty(superPropertyName, value);
-      }
-    });
-
     amplify.subscribe(WebAppEvents.ANALYTICS.EVENT, this, (eventName: string, attributes?: any) => {
-      if (this.isProductReportingActivated) {
-        this.trackEvent(eventName, attributes);
-      }
+      this.trackProductReportingEvent(eventName, attributes);
     });
 
-    amplify.subscribe(WebAppEvents.LIFECYCLE.SIGNED_OUT, this.resetSuperProperties.bind(this));
+    amplify.subscribe(WebAppEvents.LIFECYCLE.SIGNED_OUT, this.stopProductReportingSession.bind(this));
   }
 
-  private setSuperProperties(): void {
+  private startProductReportingSession(): void {
+    Countly.begin_session();
+
     this._setSuperProperty(SuperProperty.APP, EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE);
     this._setSuperProperty(SuperProperty.APP_VERSION, Environment.version(false));
     this._setSuperProperty(SuperProperty.DESKTOP_APP, trackingHelpers.getPlatform());
@@ -186,19 +191,18 @@ export class EventTrackingRepository {
     this.logger.info(`Set super property '${superPropertyName}' to value '${value}'`);
   }
 
-  private trackEvent(eventName: string, attributes?: any): void {
-    const isDisabledEvent = EventTrackingRepository.CONFIG.USER_ANALYTICS.DISABLED_EVENTS.includes(eventName);
-    if (isDisabledEvent) {
-      this.logger.info(`Skipped sending disabled event of type '${eventName}'`);
-    } else {
-      const logAttributes = attributes ? `with attributes: ${JSON.stringify(attributes)}` : 'without attributes';
-      this.logger.info(`Tracking event '${eventName}' ${logAttributes}`);
-
-      // Send event if provider API available
-    }
+  private trackProductReportingEvent(eventName: string, attributes?: any): void {
+    Countly.add_event({
+      key: eventName,
+      segmentation: {
+        ...attributes,
+        [SuperProperty.APP]: EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE,
+        [SuperProperty.APP_VERSION]: Environment.version(false),
+      },
+    });
   }
 
-  private unsubscribeFromAnalyticsEvents(): void {
+  private unsubscribeFromProductTrackingEvents(): void {
     amplify.unsubscribeAll(WebAppEvents.ANALYTICS.SUPER_PROPERTY);
     amplify.unsubscribeAll(WebAppEvents.ANALYTICS.EVENT);
   }
@@ -229,14 +233,14 @@ export class EventTrackingRepository {
     return false;
   }
 
-  private disableErrorReporting(): void {
+  private stopErrorReporting(): void {
     this.logger.debug('Disabling Raygun error reporting');
     this.isErrorReportingActivated = false;
     Raygun.detach();
     Raygun.init(EventTrackingRepository.CONFIG.ERROR_REPORTING.API_KEY, {disableErrorTracking: true});
   }
 
-  private enableErrorReporting(): void {
+  private startErrorReporting(): void {
     this.logger.debug('Enabling Raygun error reporting');
     this.isErrorReportingActivated = true;
 
