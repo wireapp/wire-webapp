@@ -155,8 +155,8 @@ export class EventTrackingRepository {
   }
 
   private subscribeToProductEvents(): void {
-    amplify.subscribe(WebAppEvents.ANALYTICS.EVENT, this, (eventName: string, attributes?: any) => {
-      this.trackProductReportingEvent(eventName, attributes);
+    amplify.subscribe(WebAppEvents.ANALYTICS.EVENT, this, (eventName: string, segmentations?: any) => {
+      this.trackProductReportingEvent(eventName, segmentations);
     });
 
     amplify.subscribe(WebAppEvents.LIFECYCLE.SIGNED_OUT, this.stopProductReportingSession.bind(this));
@@ -184,11 +184,11 @@ export class EventTrackingRepository {
     this.logger.info(`Set super property '${superPropertyName}' to value '${value}'`);
   }
 
-  private trackProductReportingEvent(eventName: string, attributes?: any): void {
+  private trackProductReportingEvent(eventName: string, segmentations?: any): void {
     Countly.add_event({
       key: eventName,
       segmentation: {
-        ...attributes,
+        ...segmentations,
         [SuperProperty.APP]: EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE,
         [SuperProperty.APP_VERSION]: Environment.version(false),
       },

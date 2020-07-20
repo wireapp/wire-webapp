@@ -4304,7 +4304,7 @@ export class ConversationRepository {
     }
 
     if (actionType) {
-      let attributes = {
+      let segmentations = {
         action: actionType,
         conversation_type: trackingHelpers.getConversationType(conversationEntity),
         ephemeral_time: isEphemeral ? messageTimer : undefined,
@@ -4316,10 +4316,10 @@ export class ConversationRepository {
 
       const isTeamConversation = !!conversationEntity.team_id;
       if (isTeamConversation) {
-        attributes = {...attributes, ...trackingHelpers.getGuestAttributes(conversationEntity)};
+        segmentations = {...segmentations, ...trackingHelpers.getGuestAttributes(conversationEntity)};
       }
 
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CONTRIBUTED, attributes);
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CONTRIBUTED, segmentations);
     }
   }
 }
