@@ -77,10 +77,6 @@ export class EventTrackingRepository {
     this.isProductReportingActivated = false;
   }
 
-  /**
-   * @param privacyPreference Privacy preference
-   * @returns Resolves after initialization
-   */
   async init(privacyPreference: boolean): Promise<void> {
     this.privacyPreference = privacyPreference;
     this.logger.info(`Initialize analytics and error reporting: ${this.privacyPreference}`);
@@ -116,10 +112,6 @@ export class EventTrackingRepository {
     this.trackProductReportingEvent(EventName.SETTINGS.OPTED_OUT_TRACKING);
     this.stopProductReporting();
   }
-
-  //##############################################################################
-  // Analytics
-  //##############################################################################
 
   private stopProductReporting(): void {
     this.logger.debug('Analytics was disabled due to user preferences');
@@ -206,10 +198,6 @@ export class EventTrackingRepository {
     amplify.unsubscribeAll(WebAppEvents.ANALYTICS.SUPER_PROPERTY);
     amplify.unsubscribeAll(WebAppEvents.ANALYTICS.EVENT);
   }
-
-  //##############################################################################
-  // Error reporting
-  //##############################################################################
 
   /**
    * Checks if a Raygun payload should be reported.
