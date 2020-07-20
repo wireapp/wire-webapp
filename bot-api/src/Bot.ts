@@ -131,7 +131,7 @@ export class Bot {
       const cookie = await this.getCookie(storeEngine);
       await this.account.init(this.config.clientType, cookie);
     } catch (error) {
-      this.logger.info('Failed to init account from cookie', error);
+      this.logger.warn('Failed to init account from cookie', error);
       await this.account.login(login);
     }
 
