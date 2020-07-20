@@ -36,7 +36,6 @@ import {ConversationRepository} from '../../conversation/ConversationRepository'
 import {UserRepository} from '../../user/UserRepository';
 import {Conversation} from '../../entity/Conversation';
 import {Call} from '../../calling/Call';
-import {EventName} from '../../tracking/EventName';
 
 // Parent: ContentViewModel
 export class TitleBarViewModel {
