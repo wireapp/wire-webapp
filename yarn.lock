@@ -2205,14 +2205,14 @@
   dependencies:
     protobufjs "6.8.8"
 
-"@wireapp/react-ui-kit@7.30.3":
-  version "7.30.3"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-7.30.3.tgz#5a2198b184bf89bfb5b9a18afd3cb7835bd4305d"
-  integrity sha512-VJ9ELhso/xBxwEC10LmeQ9zd4nJpQWlKeFMnzWW0+w4wnOpAYQw+vqvpzytCIbjQbE2ETEiDMw0oEnyAlpauwA==
+"@wireapp/react-ui-kit@7.36.0":
+  version "7.36.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-7.36.0.tgz#c594a58a34afde1a255e71c86cd4fcd608144784"
+  integrity sha512-e/58LsoYKSx0ucJEukvw0RrEwJvoPlnAnGi8cYPdSsc2ytDnB6iY8HiWw+ggJ8VGwCwAlGbVhYbGRA8K/nBeIA==
   dependencies:
     "@emotion/core" "10.0.28"
     "@types/color" "3.0.1"
-    bazinga64 "5.7.6"
+    bazinga64 "5.7.7"
     color "3.1.2"
     emotion-normalize "10.1.0"
     emotion-theming "10.0.27"
@@ -3077,6 +3077,11 @@ bazinga64@5.7.6:
   version "5.7.6"
   resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.7.6.tgz#31d7ac8188c583bb26c4b3237259e5dc6e260e9b"
   integrity sha512-HKUvoXgymXR2jgwtznRfPE1C4W5XRpL58JnPC2XlSh1iNGgW/oN1KWoOCV8XyIciyQrSYbJrHQP+LYYcqXLXZA==
+
+bazinga64@5.7.7:
+  version "5.7.7"
+  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.7.7.tgz#33718ecd3e48ca6d81112c30b7f8d87a45a639cd"
+  integrity sha512-GysbX1iiYLRomOl9CqBtCsuRGmqBwtKZeUjft5stsD/m0K/15doTswm3JLQc4ldAZMLTS3rl97ppQ8KHs07vkA==
 
 bcrypt-pbkdf@^1.0.0:
   version "1.0.2"
@@ -8460,12 +8465,7 @@ lodash.uniq@^4.5.0:
   resolved "https://registry.yarnpkg.com/lodash.uniq/-/lodash.uniq-4.5.0.tgz#d0225373aeb652adc1bc82e4945339a842754773"
   integrity sha1-0CJTc662Uq3BvILklFM5qEJ1R3M=
 
-lodash@4.17.x, lodash@^4.0.0, lodash@^4.15.0, lodash@^4.17.10, lodash@^4.17.11, lodash@^4.17.13, lodash@^4.17.14, lodash@^4.17.15, lodash@^4.17.4, lodash@^4.7.0, lodash@^4.8.0, lodash@~4.17.10, lodash@~4.17.5:
-  version "4.17.19"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.19.tgz#e48ddedbe30b3321783c5b4301fbd353bc1e4a4b"
-  integrity sha512-JNvd8XER9GQX0v2qJgsaN/mzFCNA5BRe/j8JN9d+tWyGLSodKQHKFicdwNYzWwI3wjRnaKPsGj1XkBjx/F96DQ==
-
-lodash@^4.17.19:
+lodash@4.17.x, lodash@^4.0.0, lodash@^4.15.0, lodash@^4.17.10, lodash@^4.17.11, lodash@^4.17.13, lodash@^4.17.14, lodash@^4.17.15, lodash@^4.17.19, lodash@^4.17.4, lodash@^4.7.0, lodash@^4.8.0, lodash@~4.17.10, lodash@~4.17.5:
   version "4.17.19"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.19.tgz#e48ddedbe30b3321783c5b4301fbd353bc1e4a4b"
   integrity sha512-JNvd8XER9GQX0v2qJgsaN/mzFCNA5BRe/j8JN9d+tWyGLSodKQHKFicdwNYzWwI3wjRnaKPsGj1XkBjx/F96DQ==
