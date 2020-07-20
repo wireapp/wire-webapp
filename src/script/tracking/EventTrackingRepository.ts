@@ -36,6 +36,8 @@ import {SuperProperty} from './SuperProperty';
 
 const Countly = require('countly-sdk-web');
 
+window.Countly = Countly;
+
 Countly.q = Countly.q || [];
 
 Countly.app_key = '9927e629a9302b8c800fc60055723362b0608f19';
