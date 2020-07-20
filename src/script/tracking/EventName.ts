@@ -21,6 +21,9 @@
  * Definition of events used for user analytics (defined by Business Intelligence Team)
  */
 export const EventName = {
+  CALLING: {
+    INITIATED_CALL: 'calling.initiated_call',
+  },
   CONTRIBUTED: 'contributed',
   CONVERSATION: {
     ADD_PARTICIPANTS: 'conversation.add_participants',

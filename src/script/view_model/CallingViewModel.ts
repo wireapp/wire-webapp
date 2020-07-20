@@ -19,6 +19,7 @@
 
 import {CALL_TYPE, CONV_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {Availability} from '@wireapp/protocol-messaging';
+import {amplify} from 'amplify';
 import ko from 'knockout';
 
 import {Logger, getLogger} from 'Util/Logger';
@@ -38,6 +39,8 @@ import {PermissionStatusState} from '../permission/PermissionStatusState';
 import type {Multitasking} from '../notification/NotificationRepository';
 
 import 'Components/calling/chooseScreen';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {EventName} from '../tracking/EventName';
 
 export interface CallActions {
   answer: (call: Call) => void;
@@ -138,6 +141,7 @@ export class CallingViewModel {
         }
         ring(call);
       });
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.INITIATED_CALL, {callType});
     };
 
     this.callingRepository.onIncomingCall((call: Call) => {
