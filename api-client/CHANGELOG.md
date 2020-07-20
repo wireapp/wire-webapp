@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.21.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.20.17...@wireapp/api-client@11.21.0) (2020-07-20)
+
+
+### Features
+
+* **api-client:** Add enable_sft_calling to WebappProperties call settings ([#3131](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3131)) ([6b85300](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/6b85300be876aa2ded5c63576d43b6c592837db5))
+
+
+
+
+
 ## [11.20.17](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.20.16...@wireapp/api-client@11.20.17) (2020-07-16)
 
 **Note:** Version bump only for package @wireapp/api-client
