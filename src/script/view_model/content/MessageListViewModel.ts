@@ -204,9 +204,11 @@ export class MessageListViewModel {
       true,
     );
 
-    return messageEntity
-      ? this.conversationRepository.getMessagesWithOffset(_conversationEntity, messageEntity)
-      : this.conversationRepository.getPrecedingMessages(_conversationEntity);
+    if (messageEntity) {
+      this.conversationRepository.getMessagesWithOffset(_conversationEntity, messageEntity);
+    } else {
+      this.conversationRepository.getPrecedingMessages(_conversationEntity);
+    }
   };
 
   private readonly isLastReceivedMessage = (messageEntity: Message, conversationEntity: Conversation): boolean => {
