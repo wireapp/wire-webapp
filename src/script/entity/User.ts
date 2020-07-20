@@ -33,7 +33,6 @@ import {ConnectionEntity} from '../connection/ConnectionEntity';
 import type {ClientEntity} from '../client/ClientEntity';
 import type {AssetRemoteData} from '../assets/AssetRemoteData';
 
-// Please note: The own user has a "locale"
 export class User {
   private expirationIntervalId?: number;
   private expirationTimeoutId?: number;
@@ -52,6 +51,7 @@ export class User {
   /** does not include current client/device */
   public readonly devices: ko.ObservableArray<ClientEntity>;
   public readonly email: ko.Observable<string>;
+  public locale?: string;
   public readonly expirationRemaining: ko.Observable<number>;
   public readonly expirationRemainingText: ko.Observable<string>;
   public readonly expirationText: ko.Observable<string>;
