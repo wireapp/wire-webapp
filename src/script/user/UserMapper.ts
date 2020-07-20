@@ -41,16 +41,16 @@ export class UserMapper {
     this.serverTimeHandler = serverTimeHandler;
   }
 
-  mapUserFromJson(userData: APIClientUser | APIClientSelf): User | void {
+  mapUserFromJson(userData: APIClientUser | APIClientSelf): User {
     return this.updateUserFromObject(new User(), userData);
   }
 
   mapSelfUserFromJson(userData: APIClientSelf | APIClientUser): User {
-    const userEntity = this.updateUserFromObject(new User(), userData) as any;
+    const userEntity = this.updateUserFromObject(new User(), userData);
     userEntity.isMe = true;
 
-    if ((userData as any).locale) {
-      userEntity.locale = (userData as any).locale;
+    if ((userData as APIClientSelf).locale) {
+      userEntity.locale = (userData as APIClientSelf).locale;
     }
 
     return userEntity;
@@ -61,7 +61,7 @@ export class UserMapper {
    * @note Return an empty array in any case to prevent crashes.
    * @returns Mapped user entities
    */
-  mapUsersFromJson(usersData: (APIClientSelf | APIClientUser)[]): (void | User)[] {
+  mapUsersFromJson(usersData: (APIClientSelf | APIClientUser)[]): User[] {
     if (usersData?.length) {
       return usersData.filter(userData => userData).map(userData => this.mapUserFromJson(userData));
     }
