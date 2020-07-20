@@ -125,9 +125,10 @@ export class EventTrackingRepository {
 
     Countly.init({
       app_key: window.wire.env.COUNTLY_API_KEY,
-      debug: true,
+      debug: !Environment.frontend.isProduction(),
       device_id: createRandomUuid(),
       url: 'https://wire.count.ly/',
+      use_session_cookie: false,
     });
 
     this.startProductReportingSession();
