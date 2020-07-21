@@ -20,7 +20,16 @@
 import {MessageHandler} from '@wireapp/bot-api';
 import type {PayloadBundle} from '@wireapp/core/dist/conversation/';
 import type {Call} from './Call';
-import {CALL_TYPE, CONV_TYPE, ENV as AVS_ENV, getAvsInstance, LOG_LEVEL, REASON, Wcall} from '@wireapp/avs';
+import {
+  CALL_TYPE,
+  CONV_TYPE,
+  ENV as AVS_ENV,
+  getAvsInstance,
+  LOG_LEVEL,
+  REASON,
+  Wcall,
+  WcallParticipantChangedHandler,
+} from '@wireapp/avs';
 import axios from 'axios';
 import type {CallMessage} from '@wireapp/core/dist/conversation/message/OtrMessage';
 
@@ -68,6 +77,10 @@ global.navigator = {
   },
 };
 
+interface InitOptions {
+  callParticipantChangedHandler?: WcallParticipantChangedHandler;
+}
+
 export class AVSHandler extends MessageHandler {
   private wCall?: Wcall;
   private wUser?: number;
@@ -76,14 +89,14 @@ export class AVSHandler extends MessageHandler {
 
   async handleEvent(payload: PayloadBundle): Promise<void> {}
 
-  async init(): Promise<void> {
+  async init(options: InitOptions = {}): Promise<void> {
     if (!this.account) {
       throw new Error(`No account found. Please login first.`);
     }
     const {clientId, userId} = this.account;
     const callingInstance = await getAvsInstance();
     const wCall = this.configureCallingApi(callingInstance);
-    const wUser = this.createWUser(wCall, userId, clientId);
+    const wUser = this.createWUser(wCall, userId, clientId, options.callParticipantChangedHandler);
     this.wUser = wUser;
     this.wCall = wCall;
   }
@@ -117,6 +130,10 @@ export class AVSHandler extends MessageHandler {
     this.wCall!.start(this.wUser!, conversationId, callType, conversationType, 0);
   };
 
+  leaveCall = (conversationId: string): void => {
+    this.wCall!.end(this.wUser!, conversationId);
+  };
+
   private readonly answerCall = (call: CallMessage) => {
     this.wCall!.answer(this.wUser!, call.conversation, CALL_TYPE.NORMAL, 0);
   };
@@ -138,7 +155,12 @@ export class AVSHandler extends MessageHandler {
     return this.mediaStream;
   };
 
-  private readonly createWUser = (wCall: Wcall, selfUserId: string, selfClientId: string): number => {
+  private readonly createWUser = (
+    wCall: Wcall,
+    selfUserId: string,
+    selfClientId: string,
+    callPrticipantChangedHandler: WcallParticipantChangedHandler = () => {},
+  ): number => {
     /* cspell:disable */
     const wUser = wCall.create(
       selfUserId,
@@ -157,7 +179,7 @@ export class AVSHandler extends MessageHandler {
       () => {}, // vstateh
     );
 
-    wCall.setParticipantChangedHandler(wUser, () => {});
+    wCall.setParticipantChangedHandler(wUser, callPrticipantChangedHandler);
     return wUser;
   };
 
