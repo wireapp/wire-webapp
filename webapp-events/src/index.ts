@@ -170,6 +170,7 @@ export const WebAppEvents = {
   PROPERTIES: {
     UPDATE: {
       CALL: {
+        ENABLE_SFT_CALLING: 'wire.webapp.properties.update.call.enable_sft_calling',
         ENABLE_VBR_ENCODING: 'wire.webapp.properties.update.call.enable_vbr_encoding',
       },
       CONTACTS: 'wire.webapp.properties.update.contacts',
