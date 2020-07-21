@@ -32,7 +32,7 @@ import type {TeamRepository} from '../team/TeamRepository';
 import type {UserRepository} from '../user/UserRepository';
 import {EventName} from './EventName';
 import * as trackingHelpers from './Helpers';
-import {SuperProperty} from './SuperProperty';
+import {Segmantations} from './Segmentations';
 import {RaygunStatic} from 'raygun4js';
 import {createRandomUuid} from 'Util/util';
 
@@ -165,17 +165,17 @@ export class EventTrackingRepository {
   private startProductReportingSession(): void {
     Countly.begin_session();
 
-    this._setSuperProperty(SuperProperty.APP, EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE);
-    this._setSuperProperty(SuperProperty.APP_VERSION, Environment.version(false));
-    this._setSuperProperty(SuperProperty.DESKTOP_APP, trackingHelpers.getPlatform());
+    this._setSuperProperty(Segmantations.APP, EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE);
+    this._setSuperProperty(Segmantations.APP_VERSION, Environment.version(false));
+    this._setSuperProperty(Segmantations.DESKTOP_APP, trackingHelpers.getPlatform());
     if (Environment.desktop) {
-      this._setSuperProperty(SuperProperty.WRAPPER_VERSION, Environment.version(true));
+      this._setSuperProperty(Segmantations.WRAPPER_VERSION, Environment.version(true));
     }
 
     if (this.userRepository) {
-      this._setSuperProperty(SuperProperty.CONTACTS, this.userRepository.number_of_contacts());
-      this._setSuperProperty(SuperProperty.TEAM.IN_TEAM, this.teamRepository.isTeam());
-      this._setSuperProperty(SuperProperty.TEAM.SIZE, this.teamRepository.teamSize());
+      this._setSuperProperty(Segmantations.CONTACTS, this.userRepository.number_of_contacts());
+      this._setSuperProperty(Segmantations.TEAM.IN_TEAM, this.teamRepository.isTeam());
+      this._setSuperProperty(Segmantations.TEAM.SIZE, this.teamRepository.teamSize());
     }
   }
 
@@ -189,8 +189,8 @@ export class EventTrackingRepository {
       key: eventName,
       segmentation: {
         ...segmentations,
-        [SuperProperty.APP]: EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE,
-        [SuperProperty.APP_VERSION]: Environment.version(false),
+        [Segmantations.APP]: EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE,
+        [Segmantations.APP_VERSION]: Environment.version(false),
       },
     });
   }
