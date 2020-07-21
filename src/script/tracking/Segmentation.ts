@@ -20,7 +20,7 @@
 /**
  * Enumeration of properties that should get send with every user tracking call.
  */
-export const Segmantations = {
+export const Segmantation = {
   APP: 'app',
   APP_VERSION: 'app_version',
   CONTACTS: 'contacts',
