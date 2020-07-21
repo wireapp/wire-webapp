@@ -127,6 +127,7 @@ const config: ServerConfig = {
     BACKEND_REST: process.env.BACKEND_REST,
     BACKEND_WS: process.env.BACKEND_WS,
     BRAND_NAME: process.env.BRAND_NAME,
+    COUNTLY_API_KEY: process.env.COUNTLY_API_KEY,
     ENVIRONMENT: nodeEnvironment,
     FEATURE: {
       ALLOWED_FILE_UPLOAD_EXTENSIONS: (process.env.FEATURE_ALLOWED_FILE_UPLOAD_EXTENSIONS || '*')

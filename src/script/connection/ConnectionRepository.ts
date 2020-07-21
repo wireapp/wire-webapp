@@ -39,6 +39,9 @@ import type {ConnectionEntity} from './ConnectionEntity';
 import {ConnectionMapper} from './ConnectionMapper';
 import type {ConnectionService} from './ConnectionService';
 import {ConnectionError} from '../error/ConnectionError';
+import {RaygunStatic} from 'raygun4js';
+
+declare const Raygun: RaygunStatic;
 
 export class ConnectionRepository {
   private readonly connectionService: ConnectionService;
@@ -312,7 +315,7 @@ export class ConnectionRepository {
           serverError: error,
         };
 
-        window.Raygun.send(new Error(logMessage), customData);
+        Raygun.send(new Error(logMessage), customData);
       });
   }
 
