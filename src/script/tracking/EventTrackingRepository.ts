@@ -165,23 +165,23 @@ export class EventTrackingRepository {
   private startProductReportingSession(): void {
     Countly.begin_session();
 
-    this._setSuperProperty(Segmantations.APP, EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE);
-    this._setSuperProperty(Segmantations.APP_VERSION, Environment.version(false));
-    this._setSuperProperty(Segmantations.DESKTOP_APP, trackingHelpers.getPlatform());
+    this._setSegmantation(Segmantations.APP, EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE);
+    this._setSegmantation(Segmantations.APP_VERSION, Environment.version(false));
+    this._setSegmantation(Segmantations.DESKTOP_APP, trackingHelpers.getPlatform());
     if (Environment.desktop) {
-      this._setSuperProperty(Segmantations.WRAPPER_VERSION, Environment.version(true));
+      this._setSegmantation(Segmantations.WRAPPER_VERSION, Environment.version(true));
     }
 
     if (this.userRepository) {
-      this._setSuperProperty(Segmantations.CONTACTS, this.userRepository.number_of_contacts());
-      this._setSuperProperty(Segmantations.TEAM.IN_TEAM, this.teamRepository.isTeam());
-      this._setSuperProperty(Segmantations.TEAM.SIZE, this.teamRepository.teamSize());
+      this._setSegmantation(Segmantations.CONTACTS, this.userRepository.number_of_contacts());
+      this._setSegmantation(Segmantations.TEAM.IN_TEAM, this.teamRepository.isTeam());
+      this._setSegmantation(Segmantations.TEAM.SIZE, this.teamRepository.teamSize());
     }
   }
 
-  private _setSuperProperty(superPropertyName: string, value: any): void {
+  private _setSegmantation(segmantationName: string, value: any): void {
     // Set property on provider API
-    this.logger.info(`Set super property '${superPropertyName}' to value '${value}'`);
+    this.logger.info(`Set segmentation property '${segmantationName}' to value '${value}'`);
   }
 
   private trackProductReportingEvent(eventName: string, segmentations?: any): void {

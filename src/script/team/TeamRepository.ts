@@ -46,7 +46,7 @@ import {roleFromTeamPermissions, ROLE} from '../user/UserPermission';
 
 import {IntegrationMapper} from '../integration/IntegrationMapper';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
-import {SuperProperty} from '../tracking/SuperProperty';
+import {Segmantations} from '../tracking/Segmentations';
 import {User} from '../entity/User';
 import {TeamService} from './TeamService';
 import {ROLE as TEAM_ROLE} from '../user/UserPermission';
@@ -120,7 +120,7 @@ export class TeamRepository {
 
     this.teamMembers.subscribe(() => this.userRepository.mapGuestStatus());
     this.teamSize.subscribe(teamSize => {
-      amplify.publish(WebAppEvents.ANALYTICS.SUPER_PROPERTY, SuperProperty.TEAM.SIZE, teamSize);
+      amplify.publish(WebAppEvents.ANALYTICS.SUPER_PROPERTY, Segmantations.TEAM.SIZE, teamSize);
     });
 
     this.userRepository.isTeam = this.isTeam;
