@@ -91,7 +91,7 @@ export class ReconnectingWebsocket {
   };
 
   private readonly internalOnMessage = (event: MessageEvent) => {
-    this.logger.debug('Incoming message', event);
+    this.logger.debug('Incoming message');
 
     const data = buffer.bufferToString(event.data);
     if (data === PingMessage.PONG) {
