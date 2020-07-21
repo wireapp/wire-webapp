@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-avs/compare/@wireapp/bot-handler-avs@0.1.8...@wireapp/bot-handler-avs@0.2.0) (2020-07-21)
+
+
+### Features
+
+* **bot-handler-avs:** Implement leaveCall and callParticipantChangedHandler ([aed17a6](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-avs/commit/aed17a69a08271e3b9fc91e9f65ed8a1921c49da))
+
+
+
+
+
 ## [0.1.8](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-avs/compare/@wireapp/bot-handler-avs@0.1.7...@wireapp/bot-handler-avs@0.1.8) (2020-07-21)
 
 **Note:** Version bump only for package @wireapp/bot-handler-avs
