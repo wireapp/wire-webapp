@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.5.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/webapp-events/compare/@wireapp/webapp-events@0.4.1...@wireapp/webapp-events@0.5.0) (2020-07-21)
+
+
+### Features
+
+* **webapp-events:** Add ENABLE_SFT_CALLING update event ([#3133](https://github.com/wireapp/wire-web-packages/tree/master/packages/webapp-events/issues/3133)) ([710cd8a](https://github.com/wireapp/wire-web-packages/tree/master/packages/webapp-events/commit/710cd8ac6bd6561147d92619d200663ec3ac5a44))
+
+
+
+
+
 ## [0.4.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/webapp-events/compare/@wireapp/webapp-events@0.4.0...@wireapp/webapp-events@0.4.1) (2020-07-16)
 
 **Note:** Version bump only for package @wireapp/webapp-events

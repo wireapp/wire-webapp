@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.36.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.36.0...@wireapp/react-ui-kit@7.36.1) (2020-07-21)
+
+**Note:** Version bump only for package @wireapp/react-ui-kit
+
+
+
+
+
 # [7.36.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.35.0...@wireapp/react-ui-kit@7.36.0) (2020-07-16)
 
 
