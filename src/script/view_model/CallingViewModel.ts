@@ -134,6 +134,7 @@ export class CallingViewModel {
     };
 
     const startCall = (conversationEntity: Conversation, callType: CALL_TYPE): void => {
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.INITIATED_CALL, {callType});
       const convType = conversationEntity.isGroup() ? CONV_TYPE.GROUP : CONV_TYPE.ONEONONE;
       this.callingRepository.startCall(conversationEntity.id, convType, callType).then(call => {
         if (!call) {
@@ -141,7 +142,6 @@ export class CallingViewModel {
         }
         ring(call);
       });
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.INITIATED_CALL, {callType});
     };
 
     this.callingRepository.onIncomingCall((call: Call) => {
@@ -149,6 +149,7 @@ export class CallingViewModel {
       if (shouldRing) {
         ring(call);
       }
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.RECIEVED_CALL);
     });
 
     this.callActions = {

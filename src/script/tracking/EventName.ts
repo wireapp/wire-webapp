@@ -22,7 +22,11 @@
  */
 export const EventName = {
   CALLING: {
+    ENDED_CALL: 'calling.ended_call',
+    ESTABLISHED_CALL: 'calling.established_call',
     INITIATED_CALL: 'calling.initiated_call',
+    JOINED_CALL: 'calling.joined_call',
+    RECIEVED_CALL: 'calling.received_call',
   },
   CONTRIBUTED: 'contributed',
   CONVERSATION: {

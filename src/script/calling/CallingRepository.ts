@@ -67,6 +67,7 @@ import {ClientId, Participant, UserId} from './Participant';
 import type {Recipients} from '../cryptography/CryptographyRepository';
 import type {Conversation} from '../entity/Conversation';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {EventName} from '../tracking/EventName';
 
 interface MediaStreamQuery {
   audio?: boolean;
@@ -545,6 +546,7 @@ export class CallingRepository {
         }
         return this.warmupMediaStreams(call, true, isVideoCall).then(() => {
           this.wCall.answer(this.wUser, call.conversationId, callType, this.cbrEncoding());
+          amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.JOINED_CALL, {callType});
         });
       })
       .catch(() => {
@@ -709,6 +711,7 @@ export class CallingRepository {
       return;
     }
     const stillActiveState = [REASON.STILL_ONGOING, REASON.ANSWERED_ELSEWHERE];
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.ENDED_CALL, {reason, stillActiveState});
     if (!stillActiveState.includes(reason)) {
       this.injectDeactivateEvent(
         call.conversationId,
@@ -780,6 +783,7 @@ export class CallingRepository {
 
     switch (state) {
       case CALL_STATE.MEDIA_ESTAB:
+        amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.ESTABLISHED_CALL, {state});
         call.startedAt(Date.now());
         break;
     }
