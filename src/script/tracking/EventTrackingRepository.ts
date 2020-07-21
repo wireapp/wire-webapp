@@ -32,7 +32,7 @@ import type {TeamRepository} from '../team/TeamRepository';
 import type {UserRepository} from '../user/UserRepository';
 import {EventName} from './EventName';
 import * as trackingHelpers from './Helpers';
-import {Segmantations} from './Segmentations';
+import {Segmantation} from './Segmentation';
 import {RaygunStatic} from 'raygun4js';
 import {createRandomUuid} from 'Util/util';
 
@@ -164,17 +164,17 @@ export class EventTrackingRepository {
   private startProductReportingSession(): void {
     Countly.begin_session();
 
-    this._setSegmantation(Segmantations.APP, EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE);
-    this._setSegmantation(Segmantations.APP_VERSION, Environment.version(false));
-    this._setSegmantation(Segmantations.DESKTOP_APP, trackingHelpers.getPlatform());
+    this._setSegmantation(Segmantation.APP, EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE);
+    this._setSegmantation(Segmantation.APP_VERSION, Environment.version(false));
+    this._setSegmantation(Segmantation.DESKTOP_APP, trackingHelpers.getPlatform());
     if (Environment.desktop) {
-      this._setSegmantation(Segmantations.WRAPPER_VERSION, Environment.version(true));
+      this._setSegmantation(Segmantation.WRAPPER_VERSION, Environment.version(true));
     }
 
     if (this.userRepository) {
-      this._setSegmantation(Segmantations.CONTACTS, this.userRepository.number_of_contacts());
-      this._setSegmantation(Segmantations.TEAM.IN_TEAM, this.teamRepository.isTeam());
-      this._setSegmantation(Segmantations.TEAM.SIZE, this.teamRepository.teamSize());
+      this._setSegmantation(Segmantation.CONTACTS, this.userRepository.number_of_contacts());
+      this._setSegmantation(Segmantation.TEAM.IN_TEAM, this.teamRepository.isTeam());
+      this._setSegmantation(Segmantation.TEAM.SIZE, this.teamRepository.teamSize());
     }
   }
 
@@ -188,8 +188,8 @@ export class EventTrackingRepository {
       key: eventName,
       segmentation: {
         ...segmentations,
-        [Segmantations.APP]: EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE,
-        [Segmantations.APP_VERSION]: Environment.version(false),
+        [Segmantation.APP]: EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE,
+        [Segmantation.APP_VERSION]: Environment.version(false),
       },
     });
   }
