@@ -78,7 +78,7 @@ export class EventTrackingRepository {
   }
 
   async init(privacyPreference: boolean): Promise<void> {
-    this.privacyPreference = privacyPreference;
+    this.privacyPreference = privacyPreference || this.userRepository.isTeam();
     this.logger.info(`Initialize analytics and error reporting: ${this.privacyPreference}`);
 
     if (this.privacyPreference) {
@@ -92,7 +92,6 @@ export class EventTrackingRepository {
     const hasPreferenceChanged = privacyPreference !== this.privacyPreference;
     if (hasPreferenceChanged) {
       this.privacyPreference = privacyPreference;
-
       return this.privacyPreference ? this.enableServices(true) : this.disableServices();
     }
   };
