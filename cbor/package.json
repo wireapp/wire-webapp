@@ -7,7 +7,7 @@
     "cross-env": "7.0.2",
     "istanbul": "1.1.0-alpha.1",
     "jasmine": "3.5.0",
-    "karma": "4.4.1",
+    "karma": "5.1.0",
     "karma-chrome-launcher": "3.1.0",
     "karma-jasmine": "3.1.1",
     "karma-typescript": "5.0.3",
