@@ -132,14 +132,17 @@
     <!-- /ko -->
 
     <section class="preferences-section">
-      <header class="preferences-header" data-bind="text: t('preferencesOptionsEnableBetaProgramCheckbox')"></header>
+      <header class="preferences-header" data-bind="text: t('preferencesOptionsEnableBetaProgramConferenceCalls')"></header>
       <div class="preferences-option">
         <div class="preferences-option-icon checkbox accent-text" data-bind="attr: {'data-uie-value': true}" data-uie-name="status-preference-beta-program">
-          <input type="checkbox" id="beta-program-checkbox" data-bind="checked: true">
-          <label class="preferences-options-checkbox-label" for="beta-program-checkbox" data-bind="text: t('preferencesOptionsEnableBetaProgramCheckbox')"></label>
+          <input type="checkbox" id="beta-program-checkbox" data-bind="checked: false" disabled>
+          <label class="preferences-options-checkbox-label disabled" for="beta-program-checkbox" data-bind="text: t('preferencesOptionsEnableBetaProgramCheckbox')"></label>
         </div>
       </div>
-      <div class="preferences-detail" data-bind="text: t('preferencesOptionsEnableBetaProgramDetails')"></div>
+      <div class="preferences-detail">
+        <span data-bind="text: t('preferencesOptionsEnableBetaProgramDetails')"></span>
+        <span class="preferences-detail-bold" data-bind="text: t('preferencesOptionsEnableBetaProgramDetailsDisabled')"></span>
+      </div>
     </section>
   </div>
 </div>
