@@ -28,10 +28,8 @@ import {getParameter} from 'Util/UrlUtil';
 
 import {URLParameter} from '../auth/URLParameter';
 
-import type {TeamRepository} from '../team/TeamRepository';
 import type {UserRepository} from '../user/UserRepository';
 import {EventName} from './EventName';
-import * as trackingHelpers from './Helpers';
 import {Segmantation} from './Segmentation';
 import {RaygunStatic} from 'raygun4js';
 import {createRandomUuid} from 'Util/util';
