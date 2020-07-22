@@ -65,7 +65,7 @@ export class AppInitTelemetry {
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.TELEMETRY.APP_INITIALIZATION, segmentations);
   }
 
-  time_step(step: AppInitTimingsStep): void {
-    return this.timings.time_step(step);
+  timeStep(step: AppInitTimingsStep): void {
+    return this.timings.timeStep(step);
   }
 }

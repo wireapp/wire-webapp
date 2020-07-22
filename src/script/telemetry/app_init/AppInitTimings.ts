@@ -58,7 +58,7 @@ export class AppInitTimings {
     this.logger.debug('App initialization step durations', this.timings);
   }
 
-  time_step(step: AppInitTimingsStep): void {
+  timeStep(step: AppInitTimingsStep): void {
     if (!this.timings[step]) {
       this.timings[step] = window.performance.now() - this.init;
     }
