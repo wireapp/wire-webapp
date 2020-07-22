@@ -140,8 +140,8 @@ export class CallingViewModel {
     };
 
     const startCall = (conversationEntity: Conversation, callType: CALL_TYPE): void => {
-      if (this.callingRepository.supportsConferenceCalling) {
-        const convType = conversationEntity.isGroup() ? CONV_TYPE.GROUP : CONV_TYPE.ONEONONE;
+      const convType = conversationEntity.isGroup() ? CONV_TYPE.GROUP : CONV_TYPE.ONEONONE;
+      if (convType === CONV_TYPE.ONEONONE || this.callingRepository.supportsConferenceCalling) {
         this.callingRepository.startCall(conversationEntity.id, convType, callType).then(call => {
           if (!call) {
             return;
@@ -169,7 +169,7 @@ export class CallingViewModel {
 
     this.callActions = {
       answer: (call: Call) => {
-        if (this.callingRepository.supportsConferenceCalling) {
+        if (call.conversationType === CONV_TYPE.ONEONONE || this.callingRepository.supportsConferenceCalling) {
           const callType = call.getSelfParticipant().sharesCamera() ? call.initialType : CALL_TYPE.NORMAL;
           this.callingRepository.answerCall(call, callType);
         } else {
