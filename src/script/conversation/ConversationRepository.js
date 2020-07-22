@@ -4289,6 +4289,11 @@ export class ConversationRepository {
         break;
       }
 
+      case 'reaction': {
+        actionType = 'like';
+        break;
+      }
+
       case 'text': {
         const protoText = genericMessage.text;
         const length = protoText[PROTO_MESSAGE_TYPE.LINK_PREVIEWS].length;
