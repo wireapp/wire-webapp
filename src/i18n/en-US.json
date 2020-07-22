@@ -919,7 +919,7 @@
   "ssoLogin.pasteButton": "Paste code",
   "ssoLogin.subhead": "Enter the company SSO access code.",
   "ssoLogin.subheadCode": "Please enter your SSO code",
-  "ssoLogin.subheadCodeOrEmail": "Please enter your email or SSO code",
+  "ssoLogin.subheadCodeOrEmail": "Please enter your email or SSO code.",
   "ssoLogin.subheadEmailEnvironmentSwitchWarning": "If your email matches an enterprise installation of {brandName}, this app will connect to that server.",
   "takeoverButtonChoose": "Choose your own",
   "takeoverButtonKeep": "Keep this one",
