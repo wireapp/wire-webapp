@@ -61,15 +61,13 @@ export class AppInitTelemetry {
   }
 
   report(): void {
-    const statistics = this.get_statistics();
-
-    statistics.loading_time = this.timings.get_app_load();
-    statistics.app_version = Environment.version(false);
-    this.logger.info(`App version '${statistics.app_version}' initialized within ${statistics.loading_time}s`);
+    const segmentations = this.get_statistics();
+    segmentations.loading_time = this.timings.get_app_load();
+    this.logger.info(`App version '${segmentations.app_version}' initialized within ${segmentations.loading_time}s`);
     this.log_statistics();
     this.log_timings();
 
-    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.TELEMETRY.APP_INITIALIZATION, statistics);
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.TELEMETRY.APP_INITIALIZATION, segmentations);
   }
 
   time_step(step: AppInitTimingsStep): void {

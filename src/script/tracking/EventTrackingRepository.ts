@@ -163,24 +163,6 @@ export class EventTrackingRepository {
 
   private startProductReportingSession(): void {
     Countly.begin_session();
-
-    this._setSegmantation(Segmantation.APP, EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE);
-    this._setSegmantation(Segmantation.APP_VERSION, Environment.version(false));
-    this._setSegmantation(Segmantation.DESKTOP_APP, trackingHelpers.getPlatform());
-    if (Environment.desktop) {
-      this._setSegmantation(Segmantation.WRAPPER_VERSION, Environment.version(true));
-    }
-
-    if (this.userRepository) {
-      this._setSegmantation(Segmantation.CONTACTS, this.userRepository.number_of_contacts());
-      this._setSegmantation(Segmantation.TEAM.IN_TEAM, this.teamRepository.isTeam());
-      this._setSegmantation(Segmantation.TEAM.SIZE, this.teamRepository.teamSize());
-    }
-  }
-
-  private _setSegmantation(segmantationName: string, value: any): void {
-    // Set property on provider API
-    this.logger.info(`Set segmentation property '${segmantationName}' to value '${value}'`);
   }
 
   private trackProductReportingEvent(eventName: string, segmentations?: any): void {
