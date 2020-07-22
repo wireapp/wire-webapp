@@ -57,7 +57,7 @@ export class AppInitTelemetry {
 
   report(): void {
     const segmentations = this.getStatistics();
-    segmentations.loading_time = this.timings.get_app_load();
+    segmentations.loading_time = this.timings.getAppLoad();
     this.logger.info(`App version '${segmentations.app_version}' initialized within ${segmentations.loading_time}s`);
     this.logStatistics();
     this.logTimings();

@@ -47,7 +47,7 @@ export class AppInitTimings {
     return {...this.timings};
   }
 
-  get_app_load(): number {
+  getAppLoad(): number {
     const appLoaded = this.timings[AppInitTimingsStep.APP_LOADED];
     const appLoadedInSeconds = appLoaded / TIME_IN_MILLIS.SECOND;
 
