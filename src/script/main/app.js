@@ -401,7 +401,7 @@ class App {
       callingRepository.initAvs(selfUser, clientEntity.id);
       loadingView.updateProgress(7.5, t('initValidatedClient'));
       telemetry.time_step(AppInitTimingsStep.VALIDATED_CLIENT);
-      telemetry.add_statistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity.type);
+      telemetry.addStatistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity.type);
 
       await cryptographyRepository.initCryptobox();
       loadingView.updateProgress(10);
@@ -415,8 +415,8 @@ class App {
       loadingView.updateProgress(25, t('initReceivedUserData'));
 
       telemetry.time_step(AppInitTimingsStep.RECEIVED_USER_DATA);
-      telemetry.add_statistic(AppInitStatisticsValue.CONVERSATIONS, conversationEntities.length, 50);
-      telemetry.add_statistic(AppInitStatisticsValue.CONNECTIONS, connectionEntities.length, 50);
+      telemetry.addStatistic(AppInitStatisticsValue.CONVERSATIONS, conversationEntities.length, 50);
+      telemetry.addStatistic(AppInitStatisticsValue.CONNECTIONS, connectionEntities.length, 50);
 
       conversationRepository.map_connections(connectionRepository.connectionEntities());
       this._subscribeToUnloadEvents();
@@ -428,7 +428,7 @@ class App {
       const notificationsCount = await eventRepository.initializeFromStream();
 
       telemetry.time_step(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
-      telemetry.add_statistic(AppInitStatisticsValue.NOTIFICATIONS, notificationsCount, 100);
+      telemetry.addStatistic(AppInitStatisticsValue.NOTIFICATIONS, notificationsCount, 100);
 
       eventTrackerRepository.init(propertiesRepository.properties.settings.privacy.improve_wire);
       await conversationRepository.initialize_conversations();
@@ -439,7 +439,7 @@ class App {
 
       loadingView.updateProgress(99);
 
-      telemetry.add_statistic(AppInitStatisticsValue.CLIENTS, clientEntities.length);
+      telemetry.addStatistic(AppInitStatisticsValue.CLIENTS, clientEntities.length);
       telemetry.time_step(AppInitTimingsStep.APP_PRE_LOADED);
 
       userRepository.self().devices(clientEntities);

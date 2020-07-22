@@ -39,32 +39,28 @@ export class AppInitTelemetry {
     this.statistics = new AppInitStatistics();
   }
 
-  add_statistic(statistic: AppInitStatisticsValue, value: string | number, bucket_size: number): void {
+  addStatistic(statistic: AppInitStatisticsValue, value: string | number, bucket_size: number): void {
     this.statistics.add(statistic, value, bucket_size);
   }
 
-  get_statistics(): AppStatistics {
+  getStatistics(): AppStatistics {
     return this.statistics.get();
   }
 
-  get_timings(): AppTimings {
-    return this.timings.get();
-  }
-
-  log_statistics(): void {
+  logStatistics(): void {
     this.statistics.log();
   }
 
-  log_timings(): void {
+  logTimings(): void {
     this.timings.log();
   }
 
   report(): void {
-    const segmentations = this.get_statistics();
+    const segmentations = this.getStatistics();
     segmentations.loading_time = this.timings.get_app_load();
     this.logger.info(`App version '${segmentations.app_version}' initialized within ${segmentations.loading_time}s`);
-    this.log_statistics();
-    this.log_timings();
+    this.logStatistics();
+    this.logTimings();
 
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.TELEMETRY.APP_INITIALIZATION, segmentations);
   }
