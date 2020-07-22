@@ -77,6 +77,10 @@ interface MediaStreamQuery {
   screen?: boolean;
 }
 
+interface SendMessageTarget {
+  clients: {clientid: string; userid: string}[];
+}
+
 export class CallingRepository {
   private poorCallQualityUsers: {[conversationId: string]: string[]} = {};
 
@@ -684,8 +688,8 @@ export class CallingRepository {
     conversationId: ConversationId,
     userId: UserId,
     clientId: ClientId,
-    destinationUserId: UserId,
-    destinationClientId: ClientId,
+    targets: string | null,
+    destinationClientId: null,
     payload: string,
   ): number => {
     const protoCalling = new Calling({content: payload});
@@ -697,8 +701,11 @@ export class CallingRepository {
     if (call?.blockMessages) {
       return 0;
     }
-
-    const options = this.targetMessageRecipients(payload, destinationUserId, destinationClientId);
+    const parsedTargets: SendMessageTarget = JSON.parse(targets);
+    let options;
+    if (parsedTargets !== null) {
+      options = this.targetMessageRecipients(payload, parsedTargets);
+    }
     const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId, options);
     this.conversationRepository.sendCallingMessage(eventInfoEntity, conversationId).catch(() => {
       if (call) {
@@ -988,21 +995,20 @@ export class CallingRepository {
 
   private targetMessageRecipients(
     payload: string,
-    remoteUserId: UserId | null,
-    remoteClientId: ClientId | null,
+    targets: SendMessageTarget,
   ): {precondition?: boolean | string[]; recipients: Recipients} {
     const {type, resp} = JSON.parse(payload);
     let precondition;
-    let recipients;
+    const mappedTargets: Recipients = {};
+    targets.clients.forEach(target => (mappedTargets[target.userid] = [target.clientid]));
+    let recipients: Recipients = mappedTargets;
 
     switch (type) {
       case CALL_MESSAGE_TYPE.CANCEL: {
-        if (resp && remoteUserId) {
+        if (resp) {
           // Send to remote client that initiated call
           precondition = true;
-          recipients = {
-            [remoteUserId]: [`${remoteClientId}`],
-          };
+          recipients = mappedTargets;
         }
         break;
       }
@@ -1012,12 +1018,8 @@ export class CallingRepository {
       case CALL_MESSAGE_TYPE.PROP_SYNC:
       case CALL_MESSAGE_TYPE.UPDATE: {
         // Send to remote client that call is connected with
-        if (remoteClientId) {
-          precondition = true;
-          recipients = {
-            [remoteUserId]: [`${remoteClientId}`],
-          };
-        }
+        precondition = true;
+        recipients = mappedTargets;
         break;
       }
 
@@ -1031,11 +1033,11 @@ export class CallingRepository {
       }
 
       case CALL_MESSAGE_TYPE.SETUP: {
-        if (resp && remoteUserId) {
+        if (resp && targets) {
           // Send to remote client that initiated call and all clients of self user
           precondition = [this.selfUser.id];
           recipients = {
-            [remoteUserId]: [`${remoteClientId}`],
+            ...mappedTargets,
             [this.selfUser.id]: this.selfUser.devices().map(device => device.id),
           };
         }
