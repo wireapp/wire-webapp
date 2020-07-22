@@ -45,7 +45,6 @@ export class EventTrackingRepository {
   private lastReportTimestamp?: number;
   private privacyPreference?: boolean;
   private readonly logger: Logger;
-  private readonly teamRepository: TeamRepository;
   private readonly userRepository: UserRepository;
   isErrorReportingActivated: boolean;
 
@@ -64,10 +63,9 @@ export class EventTrackingRepository {
     };
   }
 
-  constructor(teamRepository: TeamRepository, userRepository: UserRepository) {
+  constructor(userRepository: UserRepository) {
     this.logger = getLogger('EventTrackingRepository');
 
-    this.teamRepository = teamRepository;
     this.userRepository = userRepository;
 
     this.lastReportTimestamp = undefined;
