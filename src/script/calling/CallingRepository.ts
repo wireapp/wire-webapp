@@ -21,6 +21,7 @@ import axios, {AxiosError} from 'axios';
 import type {APIClient} from '@wireapp/api-client';
 import type {WebappProperties} from '@wireapp/api-client/dist/user/data';
 import type {CallConfigData} from '@wireapp/api-client/dist/account/CallConfigData';
+import type {NewOTRMessage} from '@wireapp/api-client/dist/conversation';
 import {
   CALL_TYPE,
   CONV_TYPE,
@@ -70,6 +71,7 @@ import {ClientId, Participant, UserId} from './Participant';
 import type {Recipients} from '../cryptography/CryptographyRepository';
 import type {Conversation} from '../entity/Conversation';
 import {UserRepository} from '../user/UserRepository';
+import {flatten} from 'Util/ArrayUtil';
 
 interface MediaStreamQuery {
   audio?: boolean;
@@ -233,14 +235,22 @@ export class CallingRepository {
       await this.apiClient.conversation.api.postOTRMessage(this.selfClientId, conversationId);
     } catch (error) {
       const mismatch = (error as AxiosError).response!.data;
-      const data: {clients: {clientid: string; userid: string}[]} = {
-        clients: [],
+      const eventInfoEntity = new EventInfoEntity(undefined, conversationId);
+      eventInfoEntity.setType(GENERIC_MESSAGE_TYPE.CALLING);
+      const payload: NewOTRMessage = {
+        native_push: true,
+        recipients: {},
+        sender: this.selfClientId,
       };
-      Object.entries(mismatch.missing).forEach((entry: any) => {
-        const userId = entry[0];
-        const clientIds: string[] = entry[1];
-        clientIds.forEach(clientId => data.clients.push({clientid: clientId, userid: userId}));
-      });
+      await this.conversationRepository.clientMismatchHandler.onClientMismatch(eventInfoEntity, mismatch, payload);
+
+      type Clients = {clientid: string; userid: string}[];
+
+      const clients: Clients[] = mismatch.missing.map(([userid, clientids]: [string, string[]]) =>
+        clientids.map(clientid => ({clientid, userid})),
+      );
+
+      const data: {clients: Clients} = {clients: flatten(clients)};
       this.wCall.setClientsForConv(this.wUser, conversationId, JSON.stringify(data));
     }
   }
