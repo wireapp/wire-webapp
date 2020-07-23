@@ -22,6 +22,7 @@ import ko from 'knockout';
 import {afterRender} from 'Util/util';
 
 import type {Participant} from '../calling/Participant';
+import {VideoFillMode} from '../calling/Participant';
 import type {Grid} from '../calling/videoGridHandler';
 
 interface GroupVideoGripParams {
@@ -72,8 +73,8 @@ class GroupVideoGrid {
     return this.minimized && gridElementsCount > 1;
   }
 
-  toggleContain(element: HTMLVideoElement, force?: boolean): void {
-    element.classList.toggle('group-video-grid__element-video--contain', force);
+  toggleContain(element: HTMLVideoElement, videoFillMode: VideoFillMode): void {
+    element.classList.toggle('group-video-grid__element-video--contain', videoFillMode === VideoFillMode.CONTAIN);
   }
 
   scaleVideos(rootElement: HTMLElement): void {
@@ -82,15 +83,24 @@ class GroupVideoGrid {
       const videoElement = element.querySelector('video');
       const {userId, clientId} = element.dataset;
       const participant = this.videoParticipants().find(participant => participant.doesMatchIds(userId, clientId));
-      if (participant) {
-        afterRender(() => this.toggleContain(videoElement, participant.sharesScreen()));
+      if (!participant) {
+        return;
       }
+      if (participant.videoFillMode() === VideoFillMode.UNSET) {
+        participant.videoFillMode(participant.sharesScreen() ? VideoFillMode.CONTAIN : VideoFillMode.COVER);
+      }
+      afterRender(() => this.toggleContain(videoElement, participant.videoFillMode()));
     });
   }
 
-  doubleClickedOnVideo = (_: GroupVideoGrid, {currentTarget}: MouseEvent): void => {
-    const childVideo = (currentTarget as HTMLElement).querySelector('video');
-    this.toggleContain(childVideo);
+  doubleClickedOnVideo = (_: GroupVideoGrid, event: MouseEvent): void => {
+    const target = event.currentTarget as HTMLElement;
+    const childVideo = target.querySelector('video');
+    const {userId, clientId} = target.dataset;
+    const participant = this.videoParticipants().find(participant => participant.doesMatchIds(userId, clientId));
+    const isContain = participant.videoFillMode() === VideoFillMode.CONTAIN;
+    participant.videoFillMode(isContain ? VideoFillMode.COVER : VideoFillMode.CONTAIN);
+    this.toggleContain(childVideo, participant.videoFillMode());
   };
 }
 
