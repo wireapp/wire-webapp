@@ -18,12 +18,12 @@
  */
 
 import type {GenericMessage, IGenericMessage} from '@wireapp/protocol-messaging';
-
 import type {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
+import {Recipients} from '../cryptography/CryptographyRepository';
 
 export interface MessageSendingOptions {
   /** Send native push notification for message. Default is `true`. */
-  nativePush?: string[] | boolean;
+  nativePush: string[] | boolean;
   /**
    * Level that backend checks for missing clients. Default is `false`.
    *
@@ -32,9 +32,9 @@ export interface MessageSendingOptions {
    *  * `Array<string>`: only clients of listed users
    *  * `true`: force sending
    */
-  precondition?: string[] | boolean;
-  /** Message recipients */
-  recipients?: Object;
+  precondition: string[] | boolean;
+  /** User client map */
+  recipients: Recipients;
 }
 
 export class EventInfoEntity {

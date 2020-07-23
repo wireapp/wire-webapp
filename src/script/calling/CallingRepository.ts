@@ -41,29 +41,22 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import 'webrtc-adapter';
-
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
 import {createRandomUuid} from 'Util/util';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-
 import {Config} from '../Config';
-
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
-
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
-
 import {ConversationRepository} from '../conversation/ConversationRepository';
 import {EventBuilder} from '../conversation/EventBuilder';
-import {EventInfoEntity} from '../conversation/EventInfoEntity';
+import {EventInfoEntity, MessageSendingOptions} from '../conversation/EventInfoEntity';
 import {EventRepository} from '../event/EventRepository';
-
 import type {MediaStreamHandler} from '../media/MediaStreamHandler';
 import {MediaType} from '../media/MediaType';
-
 import type {User} from '../entity/User';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import {Call, ConversationId} from './Call';
@@ -656,9 +649,21 @@ export class CallingRepository {
     }
   }
 
-  //##############################################################################
-  // Notifications
-  //##############################################################################
+  private mapTargets(targets: SendMessageTarget): Recipients {
+    const recipients: Recipients = {};
+
+    for (const target of targets.clients) {
+      const {userid, clientid} = target;
+
+      if (!recipients[userid]) {
+        recipients[userid] = [];
+      }
+
+      recipients[userid].push(clientid);
+    }
+
+    return recipients;
+  }
 
   private injectActivateEvent(conversationId: ConversationId, userId: UserId, time: string, source: string): void {
     const event = EventBuilder.buildVoiceChannelActivate(conversationId, userId, time, this.avsVersion);
@@ -703,10 +708,18 @@ export class CallingRepository {
       return 0;
     }
 
-    let options;
+    let options: MessageSendingOptions;
+
     if (typeof targets === 'string') {
-      const options: SendMessageTarget = JSON.parse(targets);
+      const parsedTargets: SendMessageTarget = JSON.parse(targets);
+      const recipients = this.mapTargets(parsedTargets);
+      options = {
+        nativePush: true,
+        precondition: false,
+        recipients,
+      };
     }
+
     const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId, options);
     this.conversationRepository.sendCallingMessage(eventInfoEntity, conversationId).catch(() => {
       if (call) {

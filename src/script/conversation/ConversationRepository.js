@@ -2424,7 +2424,7 @@ export class ConversationRepository {
    * @param {string} conversation_id Conversation ID
    * @param {boolean} [skip_own_clients=false] True, if other own clients should be skipped (to not sync messages on own clients)
    * @param {Array<string>} user_ids Optionally the intended recipient users
-   * @returns {Promise} Resolves with a user client map
+   * @returns {Promise<Recipients>} Resolves with a user client map
    */
   create_recipients(conversation_id, skip_own_clients = false, user_ids) {
     return this.get_all_users_in_conversation(conversation_id).then(user_ets => {
