@@ -18,8 +18,10 @@
  */
 
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
+import ko from 'knockout';
 
-import {getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {loadFileBuffer} from 'Util/util';
 import {WebWorker} from 'Util/worker';
@@ -31,12 +33,22 @@ import {ContentViewModel} from '../ContentViewModel';
 import {CancelError, DifferentAccountError, ImportError, IncompatibleBackupError} from '../../backup/Error';
 
 import 'Components/loadingBar';
+import {BackupRepository} from 'src/script/backup/BackupRepository';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.content = z.viewModel.content || {};
+export class HistoryImportViewModel {
+  private readonly logger: Logger;
+  private readonly error: ko.Observable<Error>;
+  errorHeadline: ko.Observable<string>;
+  errorSecondary: ko.Observable<string>;
+  private readonly state: ko.Observable<string>;
+  isPreparing: ko.PureComputed<boolean>;
+  isImporting: ko.PureComputed<boolean>;
+  isDone: ko.PureComputed<boolean>;
+  private readonly numberOfRecords: ko.Observable<number>;
+  private readonly numberOfProcessedRecords: ko.Observable<number>;
+  loadingProgress: ko.PureComputed<number>;
+  loadingMessage: ko.PureComputed<string>;
 
-z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
   static get STATE() {
     return {
       DONE: 'HistoryImportViewModel.STATE.DONE',
@@ -45,10 +57,8 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
     };
   }
 
-  constructor(mainViewModel, contentViewModel, repositories) {
-    this.backupRepository = repositories.backup;
-
-    this.logger = getLogger('z.viewModel.content.HistoryExportViewModel');
+  constructor(private readonly backupRepository: BackupRepository) {
+    this.logger = getLogger('HistoryImportViewModel');
 
     this.error = ko.observable(null);
     this.errorHeadline = ko.observable('');
@@ -72,9 +82,9 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
         }
         case HistoryImportViewModel.STATE.IMPORTING: {
           const replacements = {
-            processed: this.numberOfProcessedRecords(),
-            progress: this.loadingProgress(),
-            total: this.numberOfRecords(),
+            processed: this.numberOfProcessedRecords().toString(),
+            progress: this.loadingProgress().toString(),
+            total: this.numberOfRecords().toString(),
           };
           return t('backupImportProgressSecondary', replacements);
         }
@@ -99,59 +109,54 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
       }
     });
 
-    amplify.subscribe(WebAppEvents.BACKUP.IMPORT.START, this.importHistory.bind(this));
+    amplify.subscribe(WebAppEvents.BACKUP.IMPORT.START, this.importHistory);
   }
 
-  /**
-   * Import history from file
-   * @param {File} file The file
-   * @returns {void} void
-   */
-  async importHistory(file) {
+  importHistory = async (file: File): Promise<void> => {
     this.state(HistoryImportViewModel.STATE.PREPARING);
     this.error(null);
     const fileBuffer = await loadFileBuffer(file);
     const worker = new WebWorker('worker/jszip-worker.js');
 
     try {
-      const files = await worker.post(fileBuffer);
+      const files: Record<string, Uint8Array> = await worker.post(fileBuffer);
       if (files.error) {
-        throw new ImportError(files.error);
+        throw new ImportError((files.error as unknown) as string);
       }
       this.logger.log('Unzipped files for history import', files);
-      await this.backupRepository.importHistory(files, this.onInit.bind(this), this.onProgress.bind(this));
+      await this.backupRepository.importHistory(files, this.onInit, this.onProgress);
       this.onSuccess();
     } catch (error) {
       this.onError(error);
     }
-  }
+  };
 
-  onInit(numberOfRecords) {
+  onInit = (numberOfRecords: number): void => {
     this.state(HistoryImportViewModel.STATE.IMPORTING);
     this.numberOfRecords(numberOfRecords);
     this.numberOfProcessedRecords(0);
-  }
+  };
 
-  onProgress(numberProcessed) {
+  onProgress = (numberProcessed: number): void => {
     this.numberOfProcessedRecords(this.numberOfProcessedRecords() + numberProcessed);
-  }
+  };
 
-  onSuccess() {
+  onSuccess = (): void => {
     this.error(null);
     this.state(HistoryImportViewModel.STATE.DONE);
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.HISTORY.RESTORE_SUCCEEDED);
-    window.setTimeout(this.dismissImport.bind(this), MotionDuration.X_LONG * 2);
-  }
+    window.setTimeout(this.dismissImport, MotionDuration.X_LONG * 2);
+  };
 
-  onCancel() {
+  onCancel = (): void => {
     this.backupRepository.cancelAction();
-  }
+  };
 
-  dismissImport() {
+  dismissImport = (): void => {
     amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.PREFERENCES_ACCOUNT);
-  }
+  };
 
-  onError(error) {
+  onError = (error: Error): void => {
     if (error instanceof CancelError) {
       this.logger.log('History import was cancelled');
       return this.dismissImport();
@@ -159,5 +164,5 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
     this.error(error);
     this.logger.error(`Failed to import history: ${error.message}`, error);
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.HISTORY.RESTORE_FAILED);
-  }
-};
+  };
+}

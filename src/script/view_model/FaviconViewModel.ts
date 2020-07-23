@@ -18,43 +18,42 @@
  */
 
 import {WebAppEvents} from '@wireapp/webapp-events';
-
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
+import ko from 'knockout';
+import {amplify} from 'amplify';
 
 /**
  * The FaviconViewModel is responsible for updating the favicon according to unread messages.
  * To do so, it will listen for the UNREAD_COUNT that the app dispatches through the given dispatcher.
  */
-z.viewModel.FaviconViewModel = class FaviconViewModel {
-  /**
-   * Construct a new FaviconViewModel.
-   *
-   * @param {Dispatcher} dispatcher event dispatcher
-   */
-  constructor(dispatcher) {
+export class FaviconViewModel {
+  dispatcher: amplify.Static;
+  unreadCount: ko.Observable<number>;
+  unreadCountSubscription: ko.Subscription;
+
+  constructor(dispatcher: amplify.Static) {
     this.dispatcher = dispatcher;
     this.unreadCount = ko.observable(0);
 
-    this.unreadCountSubscription = this.unreadCount.subscribe(this._updateFavicon.bind(this));
-    this.dispatcher.subscribe(WebAppEvents.LIFECYCLE.UNREAD_COUNT, this, this._updateUnreadCount);
+    this.unreadCountSubscription = this.unreadCount.subscribe(this.updateFavicon);
+    this.dispatcher.subscribe(WebAppEvents.LIFECYCLE.UNREAD_COUNT, this, this.updateUnreadCount);
   }
 
-  _updateUnreadCount(unreadCount) {
+  private readonly updateUnreadCount = (unreadCount: number): void => {
     this.unreadCount(unreadCount);
-  }
+  };
 
-  _updateFavicon(unreadCount) {
+  private readonly updateFavicon = (unreadCount: number): void => {
     const iconBadge = unreadCount ? '-badge' : '';
-    const link = document.querySelector("link[rel*='shortcut icon']") || document.createElement('link');
+    const link: HTMLLinkElement =
+      document.querySelector("link[rel*='shortcut icon']") || document.createElement('link');
     link.type = 'image/x-icon';
     link.rel = 'shortcut icon';
     link.href = `/image/favicon${iconBadge}.ico`;
     document.getElementsByTagName('head')[0].appendChild(link);
-  }
+  };
 
   dispose() {
-    this.dispatcher.unsubscribe(WebAppEvents.LIFECYCLE.UNREAD_COUNT, this, this._updateUnreadCount);
+    this.dispatcher.unsubscribe(WebAppEvents.LIFECYCLE.UNREAD_COUNT, this.updateUnreadCount);
     this.unreadCountSubscription.dispose();
   }
-};
+}

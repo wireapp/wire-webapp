@@ -200,7 +200,12 @@ class Server {
     this.app.engine('html', hbs.__express);
     this.app.set('views', [path.resolve(__dirname, 'static'), path.resolve(__dirname, 'templates')]);
     hbs.localsAsTemplateData(this.app);
-    this.app.locals.config = this.config.CLIENT;
+    this.app.locals.config = {
+      APP_BASE: this.config.SERVER.APP_BASE,
+      BRAND_NAME: this.config.CLIENT.BRAND_NAME,
+      OPEN_GRAPH: this.config.SERVER.OPEN_GRAPH,
+      VERSION: this.config.CLIENT.VERSION,
+    };
   }
 
   private initSiteMap(config: ServerConfig) {

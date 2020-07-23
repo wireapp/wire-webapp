@@ -33,7 +33,7 @@ export class ActionsViewModel {
     this.conversationRepository = repositories.conversation;
     this.integrationRepository = repositories.integration;
     this.userRepository = repositories.user;
-    this.logger = getLogger('z.viewModel.ListViewModel');
+    this.logger = getLogger('ActionsViewModel');
     this.modalsViewModel = mainViewModel.modals;
   }
 
@@ -219,16 +219,21 @@ export class ActionsViewModel {
   leaveConversation(conversationEntity) {
     if (conversationEntity) {
       return new Promise(resolve => {
-        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.OPTION, {
           primaryAction: {
-            action: () => {
-              this.conversationRepository.removeMember(conversationEntity, this.userRepository.self().id);
+            action: (clearContent = false) => {
+              if (clearContent) {
+                this.conversationRepository.clear_conversation(conversationEntity, true);
+              } else {
+                this.conversationRepository.removeMember(conversationEntity, this.userRepository.self().id);
+              }
               resolve();
             },
             text: t('modalConversationLeaveAction'),
           },
           text: {
             message: t('modalConversationLeaveMessage'),
+            option: t('modalConversationLeaveOption'),
             title: t('modalConversationLeaveHeadline', conversationEntity.display_name()),
           },
         });

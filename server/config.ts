@@ -127,6 +127,7 @@ const config: ServerConfig = {
     BACKEND_REST: process.env.BACKEND_REST,
     BACKEND_WS: process.env.BACKEND_WS,
     BRAND_NAME: process.env.BRAND_NAME,
+    COUNTLY_API_KEY: process.env.COUNTLY_API_KEY,
     ENVIRONMENT: nodeEnvironment,
     FEATURE: {
       ALLOWED_FILE_UPLOAD_EXTENSIONS: (process.env.FEATURE_ALLOWED_FILE_UPLOAD_EXTENSIONS || '*')
@@ -189,6 +190,11 @@ const config: ServerConfig = {
     ENFORCE_HTTPS: process.env.ENFORCE_HTTPS != 'false',
     ENVIRONMENT: nodeEnvironment,
     GOOGLE_WEBMASTER_ID: process.env.GOOGLE_WEBMASTER_ID,
+    OPEN_GRAPH: {
+      DESCRIPTION: process.env.OPEN_GRAPH_DESCRIPTION,
+      IMAGE_URL: process.env.OPEN_GRAPH_IMAGE_URL,
+      TITLE: process.env.OPEN_GRAPH_TITLE,
+    },
     PORT_HTTP: Number(process.env.PORT) || 21080,
     ROBOTS: {
       ALLOW: readFile(ROBOTS_ALLOW_FILE, 'User-agent: *\r\nDisallow: /'),

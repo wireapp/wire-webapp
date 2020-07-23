@@ -69,9 +69,6 @@ export class Configuration {
   readonly VERSION = env.VERSION || '0.0.0';
   readonly WEBSITE_LABEL = env.WEBSITE_LABEL;
 
-  // 10 seconds until phone code expires
-  readonly LOGIN_CODE_EXPIRATION = 10 * 60;
-
   // 25 megabyte upload limit for personal use (private users & guests)
   readonly MAXIMUM_ASSET_FILE_SIZE_PERSONAL = 25 * 1024 * 1024;
 
@@ -101,6 +98,8 @@ export class Configuration {
 
   // measured in pixel
   readonly SCROLL_TO_LAST_MESSAGE_THRESHOLD = 100;
+
+  readonly ALLOWED_IMAGE_TYPES = ['image/bmp', 'image/gif', 'image/jpeg', 'image/jpg', 'image/png', '.jpg-large'];
 }
 
 let instance: Configuration;

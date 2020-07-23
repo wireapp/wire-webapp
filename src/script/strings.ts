@@ -148,7 +148,7 @@ export const accountFormStrings = defineMessages({
   },
   termsAndPrivacyPolicy: {
     defaultMessage:
-      'I accept the <terms>terms and conditions</terms> and <privacypolicy>privacy policy</privacypolicy>',
+      'I accept the <privacypolicy>privacy policy</privacypolicy> and <terms>terms and conditions</terms>',
     id: 'accountForm.termsAndPrivacyPolicy',
   },
 });

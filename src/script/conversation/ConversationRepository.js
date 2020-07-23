@@ -50,6 +50,7 @@ import {PromiseQueue} from 'Util/PromiseQueue';
 import {Declension, joinNames, t} from 'Util/LocalizerUtil';
 import {getDifference, getNextItem} from 'Util/ArrayUtil';
 import {arrayToBase64, createRandomUuid, loadUrlBlob, sortGroupsByLastEvent} from 'Util/util';
+import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/FileTypeUtil';
 import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
 import {
   capitalizeFirstChar,
@@ -1590,19 +1591,19 @@ export class ConversationRepository {
    * @param {Date} isoDate Date of member removal
    * @returns {Promise<void>} No return value
    */
-  teamMemberLeave(teamId, userId, isoDate = this.serverTimeHandler.toServerTimestamp()) {
-    return this.userRepository.getUserById(userId).then(userEntity => {
-      this.conversations()
-        .filter(conversationEntity => {
-          const conversationInTeam = conversationEntity.team_id === teamId;
-          const userIsParticipant = conversationEntity.participating_user_ids().includes(userId);
-          return conversationInTeam && userIsParticipant && !conversationEntity.removed_from_conversation();
-        })
-        .forEach(conversationEntity => {
-          const leaveEvent = EventBuilder.buildTeamMemberLeave(conversationEntity, userEntity, isoDate);
-          this.eventRepository.injectEvent(leaveEvent);
-        });
-    });
+  async teamMemberLeave(teamId, userId, isoDate = this.serverTimeHandler.toServerTimestamp()) {
+    const userEntity = await this.userRepository.getUserById(userId);
+    this.conversations()
+      .filter(conversationEntity => {
+        const conversationInTeam = conversationEntity.team_id === teamId;
+        const userIsParticipant = conversationEntity.participating_user_ids().includes(userId);
+        return conversationInTeam && userIsParticipant && !conversationEntity.removed_from_conversation();
+      })
+      .forEach(conversationEntity => {
+        const leaveEvent = EventBuilder.buildTeamMemberLeave(conversationEntity, userEntity, isoDate);
+        this.eventRepository.injectEvent(leaveEvent);
+      });
+    userEntity.isDeleted = true;
   }
 
   /**
@@ -2744,6 +2745,11 @@ export class ConversationRepository {
     await this.eventRepository.injectEvent(legalHoldUpdateMessage);
   }
 
+  async injectFileTypeRestrictedMessage(conversation, user, isIncoming, fileExt, id = createRandomUuid()) {
+    const fileRestrictionMessage = EventBuilder.buildFileTypeRestricted(conversation, user, isIncoming, fileExt, id);
+    await this.eventRepository.injectEvent(fileRestrictionMessage);
+  }
+
   async _grantOutgoingMessage(eventInfoEntity, userIds, skipLegalHold = false) {
     const messageType = eventInfoEntity.getType();
     const allowedMessageTypes = ['cleared', 'clientAction', 'confirmation', 'deleted', 'lastRead'];
@@ -2755,17 +2761,22 @@ export class ConversationRepository {
       const allRecipientsBesideSelf = Object.keys(eventInfoEntity.options.recipients).filter(
         id => id !== this.selfUser().id,
       );
+      const userIdsWithoutClients = [];
       for (const recipientId of allRecipientsBesideSelf) {
         const clientIdsOfUser = eventInfoEntity.options.recipients[recipientId];
         const noRemainingClients = clientIdsOfUser.length === 0;
 
         if (noRemainingClients) {
-          const backendUser = await this.userRepository.getUserFromBackend(recipientId);
-          const isDeleted = backendUser?.deleted === true;
+          userIdsWithoutClients.push(recipientId);
+        }
+      }
+      const bareUserList = await this.userRepository.getUserListFromBackend(userIdsWithoutClients);
+      for (const user of bareUserList) {
+        // Since this is a bare API client user we use `.deleted`
+        const isDeleted = user?.deleted === true;
 
-          if (isDeleted) {
-            await this.teamMemberLeave(this.team().id, recipientId);
-          }
+        if (isDeleted) {
+          await this.teamMemberLeave(this.team().id, user.id);
         }
       }
     }
@@ -2881,12 +2892,18 @@ export class ConversationRepository {
 
             switch (consentType) {
               case ConversationRepository.CONSENT_TYPE.INCOMING_CALL: {
+                if (conversationEntity.hasActiveCall()) {
+                  return resolve(true);
+                }
                 actionString = t('modalConversationNewDeviceIncomingCallAction');
                 messageString = t('modalConversationNewDeviceIncomingCallMessage');
                 break;
               }
 
               case ConversationRepository.CONSENT_TYPE.OUTGOING_CALL: {
+                if (conversationEntity.hasActiveCall()) {
+                  return resolve(true);
+                }
                 actionString = t('modalConversationNewDeviceOutgoingCallAction');
                 messageString = t('modalConversationNewDeviceOutgoingCallMessage');
                 break;
@@ -3339,6 +3356,7 @@ export class ConversationRepository {
       case BackendEvent.CONVERSATION.MESSAGE_TIMER_UPDATE:
       case ClientEvent.CONVERSATION.COMPOSITE_MESSAGE_ADD:
       case ClientEvent.CONVERSATION.DELETE_EVERYWHERE:
+      case ClientEvent.CONVERSATION.FILE_TYPE_RESTRICTED:
       case ClientEvent.CONVERSATION.INCOMING_MESSAGE_TOO_BIG:
       case ClientEvent.CONVERSATION.KNOCK:
       case ClientEvent.CONVERSATION.LEGAL_HOLD_UPDATE:
@@ -3729,7 +3747,7 @@ export class ConversationRepository {
    * @param {Object} event JSON data of 'conversation.asset-add'
    * @returns {Promise} Resolves when the event was handled
    */
-  _onAssetAdd(conversationEntity, event) {
+  async _onAssetAdd(conversationEntity, event) {
     const fromSelf = event.from === this.selfUser().id;
 
     const isRemoteFailure = !fromSelf && event.data.status === AssetTransferState.UPLOAD_FAILED;
@@ -3748,12 +3766,25 @@ export class ConversationRepository {
       return conversationEntity.updateTimestamps(conversationEntity.getLastMessage(), true);
     }
 
-    return this._addEventToConversation(conversationEntity, event).then(({messageEntity}) => {
-      const firstAsset = messageEntity.get_first_asset();
-      if (firstAsset.is_image() || firstAsset.status() === AssetTransferState.UPLOADED) {
-        return {conversationEntity, messageEntity};
+    if (!allowsAllFiles()) {
+      const fileName = event.data.info.name;
+      const contentType = event.data.content_type;
+      if (!isAllowedFile(fileName, contentType)) {
+        const user = await this.userRepository.getUserById(event.from);
+        return this.injectFileTypeRestrictedMessage(
+          conversationEntity,
+          user,
+          true,
+          getFileExtensionOrName(fileName),
+          event.id,
+        );
       }
-    });
+    }
+    const {messageEntity} = await this._addEventToConversation(conversationEntity, event);
+    const firstAsset = messageEntity.get_first_asset();
+    if (firstAsset.is_image() || firstAsset.status() === AssetTransferState.UPLOADED) {
+      return {conversationEntity, messageEntity};
+    }
   }
 
   /**
@@ -4167,8 +4198,7 @@ export class ConversationRepository {
 
       const asset_et = message_et.get_first_asset();
       if (asset_et) {
-        const is_proper_asset = asset_et.is_audio() || asset_et.is_file() || asset_et.is_video();
-        if (!is_proper_asset) {
+        if (!asset_et.is_downloadable()) {
           throw new Error(`Tried to update message with wrong asset type as upload failed '${asset_et.type}'`);
         }
 

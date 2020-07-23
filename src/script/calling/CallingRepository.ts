@@ -66,6 +66,7 @@ import {Call, ConversationId} from './Call';
 import {ClientId, Participant, UserId} from './Participant';
 import type {Recipients} from '../cryptography/CryptographyRepository';
 import type {Conversation} from '../entity/Conversation';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 interface MediaStreamQuery {
   audio?: boolean;
@@ -99,6 +100,8 @@ export class CallingRepository {
   private readonly logger: Logger;
   private readonly callLog: string[];
   private readonly cbrEncoding: ko.Observable<number>;
+  private readonly acceptedVersionWarnings: ko.ObservableArray<string>;
+  private readonly acceptVersionWarning: (conversationId: string) => void;
 
   static get CONFIG() {
     return {
@@ -118,6 +121,17 @@ export class CallingRepository {
     this.isMuted = ko.observable(false);
     this.joinedCall = ko.pureComputed(() => {
       return this.activeCalls().find(call => call.state() === CALL_STATE.MEDIA_ESTAB);
+    });
+
+    this.acceptedVersionWarnings = ko.observableArray<string>();
+    this.acceptVersionWarning = (conversationId: string) => {
+      this.acceptedVersionWarnings.push(conversationId);
+      window.setTimeout(() => this.acceptedVersionWarnings.remove(conversationId), TIME_IN_MILLIS.MINUTE * 15);
+    };
+
+    this.activeCalls.subscribe(activeCalls => {
+      const activeCallIds = activeCalls.map(call => call.conversationId);
+      this.acceptedVersionWarnings.remove(acceptedId => !activeCallIds.includes(acceptedId));
     });
 
     this.apiClient = apiClient;
@@ -280,6 +294,10 @@ export class CallingRepository {
 
   private storeCall(call: Call): void {
     this.activeCalls.push(call);
+    const conversation = this.conversationRepository.find_conversation_by_id(call.conversationId);
+    if (conversation) {
+      conversation.call(call);
+    }
   }
 
   private removeCall(call: Call): void {
@@ -288,6 +306,10 @@ export class CallingRepository {
     call.participants.removeAll();
     if (index !== -1) {
       this.activeCalls.splice(index, 1);
+    }
+    const conversation = this.conversationRepository.find_conversation_by_id(call.conversationId);
+    if (conversation) {
+      conversation.call(null);
     }
   }
 
@@ -396,12 +418,17 @@ export class CallingRepository {
 
       if (res !== 0) {
         this.logger.warn(`recv_msg failed with code: ${res}`);
-        if (res === ERROR.UNKNOWN_PROTOCOL && event.content.type === 'CONFSTART') {
+        if (
+          this.acceptedVersionWarnings().every((acceptedId: string) => acceptedId !== conversationId) &&
+          res === ERROR.UNKNOWN_PROTOCOL &&
+          event.content.type === 'CONFSTART'
+        ) {
           const brandName = Config.getConfig().BRAND_NAME;
           amplify.publish(
             WebAppEvents.WARNING.MODAL,
             ModalsViewModel.TYPE.ACKNOWLEDGE,
             {
+              close: () => this.acceptVersionWarning(conversationId),
               text: {
                 message: t('modalCallUpdateClientMessage', brandName),
                 title: t('modalCallUpdateClientHeadline', brandName),
@@ -573,7 +600,10 @@ export class CallingRepository {
         break;
 
       case MediaType.VIDEO:
-        activeCall.selfParticipant.releaseVideoStream();
+        // Don't stop video input (coming from A/V preferences) when screensharing is activated
+        if (!activeCall.selfParticipant.sharesScreen()) {
+          activeCall.selfParticipant.releaseVideoStream();
+        }
         break;
     }
     return true;
@@ -586,15 +616,22 @@ export class CallingRepository {
     if (!call) {
       return;
     }
+
     if (mediaType === MediaType.AUDIO) {
       const audioTracks = mediaStream.getAudioTracks().map(track => track.clone());
-      call.selfParticipant.setAudioStream(new MediaStream(audioTracks));
-      this.wCall.replaceTrack(call.conversationId, audioTracks[0]);
+      if (audioTracks.length > 0) {
+        call.selfParticipant.setAudioStream(new MediaStream(audioTracks));
+        this.wCall.replaceTrack(call.conversationId, audioTracks[0]);
+      }
     }
-    if (mediaType === MediaType.VIDEO && call.selfParticipant.sharesCamera()) {
+
+    // Don't update video input (coming from A/V preferences) when screensharing is activated
+    if (mediaType === MediaType.VIDEO && call.selfParticipant.sharesCamera() && !call.selfParticipant.sharesScreen()) {
       const videoTracks = mediaStream.getVideoTracks().map(track => track.clone());
-      call.selfParticipant.setVideoStream(new MediaStream(videoTracks));
-      this.wCall.replaceTrack(call.conversationId, videoTracks[0]);
+      if (videoTracks.length > 0) {
+        call.selfParticipant.setVideoStream(new MediaStream(videoTracks));
+        this.wCall.replaceTrack(call.conversationId, videoTracks[0]);
+      }
     }
   }
 
@@ -973,9 +1010,11 @@ export class CallingRepository {
   }
 
   private checkConcurrentJoinedCall(conversationId: ConversationId, newCallState: CALL_STATE): Promise<void> {
-    const activeCall = this.activeCalls().find(call => call.conversationId !== conversationId);
     const idleCallStates = [CALL_STATE.INCOMING, CALL_STATE.NONE, CALL_STATE.UNKNOWN];
-    if (!activeCall || idleCallStates.includes(activeCall.state())) {
+    const activeCall = this.activeCalls().find(
+      call => call.conversationId !== conversationId && !idleCallStates.includes(call.state()),
+    );
+    if (!activeCall) {
       return Promise.resolve();
     }
 

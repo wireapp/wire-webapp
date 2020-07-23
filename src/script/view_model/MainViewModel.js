@@ -19,6 +19,7 @@
 
 import {getLogger} from 'Util/Logger';
 import {afterRender} from 'Util/util';
+import {amplify} from 'amplify';
 
 import {WindowTitleViewModel} from './WindowTitleViewModel';
 import {modals} from './ModalsViewModel';
@@ -26,6 +27,8 @@ import {WarningsViewModel} from './WarningsViewModel';
 import {ContentViewModel} from './ContentViewModel';
 import {CallingViewModel} from './CallingViewModel';
 import {ActionsViewModel} from './ActionsViewModel';
+import {ListViewModel} from './ListViewModel';
+import {FaviconViewModel} from './FaviconViewModel';
 
 export class MainViewModel {
   static get CONFIG() {
@@ -91,11 +94,11 @@ export class MainViewModel {
       this.multitasking,
     );
     this.content = new ContentViewModel(this, repositories);
-    this.list = new z.viewModel.ListViewModel(this, repositories);
+    this.list = new ListViewModel(this, repositories);
 
     this.lightbox = new z.viewModel.ImageDetailViewViewModel(this, repositories);
-    this.title = new WindowTitleViewModel(this, repositories);
-    this.favicon = new z.viewModel.FaviconViewModel(window.amplify);
+    this.title = new WindowTitleViewModel(this, repositories.user, repositories.conversation);
+    this.favicon = new FaviconViewModel(amplify);
     this.warnings = new WarningsViewModel();
 
     this.mainClasses = ko.pureComputed(() => {

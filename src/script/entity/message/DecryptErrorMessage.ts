@@ -28,7 +28,7 @@ import {SuperType} from '../../message/SuperType';
 import {Message} from './Message';
 
 export class DecryptErrorMessage extends Message {
-  private readonly client_id: string;
+  public readonly client_id: string;
   private readonly error_code: string;
   private readonly error_message: ko.PureComputed<string>;
   private readonly is_remote_identity_changed: ko.PureComputed<boolean>;

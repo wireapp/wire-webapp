@@ -14,10 +14,10 @@
             #include('list/preferences.htm')
             #include('list/start-ui.htm')
           <!-- /ko -->
-          <!-- ko if: modal() === z.viewModel.ListViewModel.MODAL_TYPE.TAKEOVER -->
+          <!-- ko if: modal() === ModalType.TAKEOVER -->
             #include('list/takeover.htm')
           <!-- /ko -->
-          <!-- ko if: modal() === z.viewModel.ListViewModel.MODAL_TYPE.TEMPORARY_GUEST -->
+          <!-- ko if: modal() === ModalType.TEMPORARY_GUEST -->
             #include('list/temporary-guest.htm')
             #include('list/preferences.htm')
           <!-- /ko -->

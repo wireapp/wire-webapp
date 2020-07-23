@@ -23,7 +23,7 @@
           <div class="center-column" data-bind="text: t('preferencesAV')"></div>
         </li>
       <!-- /ko -->
-      <!-- ko ifnot: Environment.desktop -->
+      <!-- ko ifnot: isDesktop -->
         <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnAbout, css: {'accent-text accent-fill': selectedAbout}" data-uie-name="go-about">
           <about-icon class="left-column-icon"></about-icon>
           <div class="center-column" data-bind="text: t('preferencesAbout')"></div>

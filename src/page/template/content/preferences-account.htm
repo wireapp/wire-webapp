@@ -54,11 +54,11 @@
               <div class="preferences-account-username-hint text-foreground font-size-xs"
                    data-bind="text: t('preferencesAccountUsernameHint')"></div>
             <!-- /ko -->
-            <!-- ko if: usernameState() === z.viewModel.content.PreferencesAccountViewModel.USERNAME_STATE.AVAILABLE -->
+            <!-- ko if: usernameState() === UserNameState.AVAILABLE -->
               <div class="preferences-account-username-error font-size-xs"
                    data-bind="text: t('preferencesAccountUsernameAvailable')"></div>
             <!-- /ko -->
-            <!-- ko if: usernameState() === z.viewModel.content.PreferencesAccountViewModel.USERNAME_STATE.TAKEN -->
+            <!-- ko if: usernameState() === UserNameState.TAKEN -->
               <div class="preferences-account-username-error font-size-xs"
                    data-bind="text: t('preferencesAccountUsernameErrorTaken'), css: {'text-red': submittedUsername() === enteredUsername()}"></div>
             <!-- /ko -->
@@ -68,7 +68,16 @@
             <div class="preferences-account-team preferences-section-account-space-after" data-bind="html: teamName()" data-uie-name="status-team"></div>
           <!-- /ko -->
 
-          <div class="preferences-account-mail" data-bind="text: selfUser().email()" data-uie-name="enter-email"></div>
+          <div class="preferences-account-email-wrapper">
+            <input class="preferences-account-email preferences-account-input"
+                   id="email" type="text"
+                   data-bind="value: email, event: {blur: resetEmailInput}, enter: changeEmail, attr: {placeholder: t('preferencesAccountEmailPlaceholder'), readonly: !canEditProfile(selfUser())}"
+                   data-uie-name="enter-email"
+                   spellcheck="false" />
+            <!-- ko if: canEditProfile(selfUser()) -->
+              <edit-icon data-uie-name="enter-email-icon"></edit-icon>
+            <!-- /ko -->
+          </div>
           <div class="preferences-account-phone" data-bind="text: selfUser().phone()" data-uie-name="enter-phone"></div>
 
           <!-- ko if: canEditProfile(selfUser()) -->
@@ -91,7 +100,7 @@
           <participant-avatar params="participant: selfUser, size: ParticipantAvatar.SIZE.X_LARGE"></participant-avatar>
           <input id="self-upload-file-input"
                  type="file"
-                 data-bind="attr: {accept: z.viewModel.content.PreferencesAccountViewModel.CONFIG.PROFILE_IMAGE.FILE_TYPES.join(',')}, file_select: clickOnChangePicture"
+                 data-bind="attr: {accept: Config.PROFILE_IMAGE.FILE_TYPES.join(',')}, file_select: clickOnChangePicture"
                  data-uie-name="do-select-picture"/>
           <span class="icon-camera"></span>
         </label>
@@ -155,7 +164,7 @@
           <div class="preferences-detail" data-bind="text: t('preferencesOptionsBackupExportSecondary', brandName)"></div>
           <label class="preferences-link accent-text preferences-history-backup-import-field" data-uie-name="do-backup-import">
             <span data-bind="text: t('preferencesOptionsBackupImportHeadline')"></span>
-            <input type="file" data-bind="event: {change: onImportFileChange}, attr: {accept: `.${z.viewModel.content.HistoryExportViewModel.CONFIG.FILE_EXTENSION}`}" data-uie-name="input-import-file"/>
+            <input type="file" data-bind="event: {change: onImportFileChange}, attr: {accept: `.${fileExtension}`}" data-uie-name="input-import-file"/>
           </label>
           <div class="preferences-detail" data-bind="text: t('preferencesOptionsBackupImportSecondary')"></div>
         </section>
@@ -186,7 +195,7 @@
       </section>
     <!-- /ko -->
 
-    <!-- ko if: isActivatedAccount() && !Environment.desktop -->
+    <!-- ko if: isActivatedAccount() && !isDesktop -->
       <section class="preferences-section">
         <div class="preferences-link accent-text" data-bind="click: clickOnLogout, text: t('preferencesAccountLogOut')" data-uie-name="do-logout"></div>
       </section>

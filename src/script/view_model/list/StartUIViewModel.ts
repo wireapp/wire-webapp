@@ -18,8 +18,10 @@
  */
 
 import {debounce} from 'underscore';
+import ko from 'knockout';
+import {amplify} from 'amplify';
 
-import {getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {partition} from 'Util/ArrayUtil';
 
@@ -30,13 +32,65 @@ import {Config} from '../../Config';
 import {User} from '../../entity/User';
 import {generatePermissionHelpers} from '../../user/UserPermission';
 import {validateHandle} from '../../user/UserHandleGenerator';
-import {ParticipantAvatar} from 'Components/participantAvatar';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {EventName} from '../../tracking/EventName';
 import {SearchRepository} from '../../search/SearchRepository';
 import {sortByPriority} from 'Util/StringUtil';
+import {ListViewModel} from '../ListViewModel';
+import type {MainViewModel} from '../MainViewModel';
+import type {ConversationRepository} from '../../conversation/ConversationRepository';
+import type {IntegrationRepository} from '../../integration/IntegrationRepository';
+import type {TeamRepository} from '../../team/TeamRepository';
+import type {UserRepository} from '../../user/UserRepository';
+import type {ActionsViewModel} from '../ActionsViewModel';
+import type {ServiceEntity} from '../../integration/ServiceEntity';
+import type {Conversation} from '../../entity/Conversation';
 
 class StartUIViewModel {
+  readonly brandName: string;
+  readonly UserlistMode: typeof UserlistMode;
+  readonly teamName: ko.PureComputed<string>;
+  readonly isVisible: ko.PureComputed<boolean>;
+  readonly showCreateGuestRoom: ko.PureComputed<boolean>;
+  readonly showInvitePeople: ko.PureComputed<boolean>;
+  readonly showNoContacts: ko.PureComputed<boolean>;
+  readonly showNoMatches: ko.PureComputed<boolean>;
+  readonly showNoSearchResults: ko.PureComputed<boolean>;
+  readonly showTopPeople: ko.PureComputed<boolean>;
+  readonly shouldUpdateScrollbar: ko.Computed<number>;
+  readonly showSearchResults: ko.PureComputed<boolean>;
+  readonly showContacts: ko.PureComputed<boolean>;
+  readonly searchInput: ko.Observable<string>;
+  readonly isTeam: ko.PureComputed<boolean>;
+  readonly peopleTabActive: ko.PureComputed<boolean>;
+  readonly isSearching: ko.PureComputed<boolean>;
+  readonly showOnlyConnectedUsers: ko.PureComputed<boolean>;
+  readonly contacts: ko.PureComputed<User[]>;
+  readonly services: ko.ObservableArray<ServiceEntity>;
+  readonly topUsers: ko.ObservableArray<User>;
+  readonly searchResults: {
+    contacts: ko.ObservableArray<User>;
+    groups: ko.ObservableArray<Conversation>;
+    others: ko.ObservableArray<User>;
+  };
+  readonly showInviteMember: ko.PureComputed<boolean>;
+  readonly showSpinner: ko.Observable<boolean>;
+  readonly isInitialServiceSearch: ko.Observable<boolean>;
+  readonly manageTeamUrl: string;
+  readonly manageServicesUrl: string;
+  private submittedSearch: boolean;
+  private readonly matchedUsers: ko.ObservableArray<User>;
+  private readonly alreadyClickedOnContact: Record<string, boolean>;
+  private readonly logger: Logger;
+  private readonly actionsViewModel: ActionsViewModel;
+  private readonly selfUser: ko.Observable<User>;
+  private readonly teamSize: ko.PureComputed<number>;
+  private readonly state: ko.Observable<string>;
+  private readonly search: ko.SubscriptionCallback<string, void>;
+  private readonly showMatches: ko.Observable<boolean>;
+  private readonly hasSearchResults: ko.PureComputed<boolean>;
+  private readonly showContent: ko.PureComputed<boolean>;
+
   static get STATE() {
     return {
       ADD_PEOPLE: 'StartUIViewModel.STATE.ADD_PEOPLE',
@@ -44,31 +98,19 @@ class StartUIViewModel {
     };
   }
 
-  /**
-   * @param {MainViewModel} mainViewModel Main view model
-   * @param {z.viewModel.ListViewModel} listViewModel List view model
-   * @param {Object} repositories Object containing all repositories
-   */
-  constructor(mainViewModel, listViewModel, repositories) {
-    this.clickOnClose = this.clickOnClose.bind(this);
-    this.clickOnContact = this.clickOnContact.bind(this);
+  constructor(
+    private readonly mainViewModel: MainViewModel,
+    private readonly listViewModel: ListViewModel,
+    readonly conversationRepository: ConversationRepository,
+    private readonly integrationRepository: IntegrationRepository,
+    readonly searchRepository: SearchRepository,
+    readonly teamRepository: TeamRepository,
+    private readonly userRepository: UserRepository,
+  ) {
     this.alreadyClickedOnContact = {};
-    this.clickOnConversation = this.clickOnConversation.bind(this);
-    this.clickOnOther = this.clickOnOther.bind(this);
-    this.handleSearchInput = this.handleSearchInput.bind(this);
-
-    this.mainViewModel = mainViewModel;
-    this.listViewModel = listViewModel;
-    this.conversationRepository = repositories.conversation;
-    this.integrationRepository = repositories.integration;
-    this.propertiesRepository = repositories.properties;
-    this.searchRepository = repositories.search;
-    this.teamRepository = repositories.team;
-    this.userRepository = repositories.user;
-    this.logger = getLogger('z.viewModel.list.StartUIViewModel');
+    this.logger = getLogger('StartUIViewModel');
     this.brandName = Config.getConfig().BRAND_NAME;
     this.UserlistMode = UserlistMode;
-    this.ParticipantAvatar = ParticipantAvatar;
 
     this.actionsViewModel = this.mainViewModel.actions;
 
@@ -79,16 +121,16 @@ class StartUIViewModel {
     this.teamSize = this.teamRepository.teamSize;
 
     this.state = ko.observable(StartUIViewModel.STATE.ADD_PEOPLE);
-    this.isVisible = ko.pureComputed(() => listViewModel.state() === z.viewModel.ListViewModel.STATE.START_UI);
+    this.isVisible = ko.pureComputed(() => listViewModel.state() === ListViewModel.STATE.START_UI);
 
     this.peopleTabActive = ko.pureComputed(() => this.state() === StartUIViewModel.STATE.ADD_PEOPLE);
 
     this.submittedSearch = false;
 
-    this.search = debounce(query => {
-      this._clearSearchResults();
+    this.search = debounce((query: string): Promise<void> | void => {
+      this.clearSearchResults();
       if (this.peopleTabActive()) {
-        return this._searchPeople(query);
+        return this.searchPeople(query);
       }
 
       this.integrationRepository.searchForServices(query, this.searchInput);
@@ -136,7 +178,7 @@ class StartUIViewModel {
     // View states
     this.hasSearchResults = ko.pureComputed(() => {
       const {contacts, groups, others} = this.searchResults;
-      return contacts().length || groups().length || others().length;
+      return !!(contacts().length || groups().length || others().length);
     });
 
     this.showContent = ko.pureComputed(() => this.showContacts() || this.showMatches() || this.showSearchResults());
@@ -148,7 +190,7 @@ class StartUIViewModel {
       () => canInviteTeamMembers(this.selfUser().teamRole()) && this.teamSize() === 1,
     );
 
-    this.showContacts = ko.pureComputed(() => this.contacts().length);
+    this.showContacts = ko.pureComputed(() => !!this.contacts().length);
 
     this.showNoMatches = ko.pureComputed(() => {
       const isTeamOrMatch = this.isTeam() || this.showMatches();
@@ -161,14 +203,12 @@ class StartUIViewModel {
     this.showSearchResults = ko.pureComputed(() => {
       const shouldShowResults = this.hasSearchResults() || this.isSearching();
       if (!shouldShowResults) {
-        this._clearSearchResults();
+        this.clearSearchResults();
       }
       return shouldShowResults;
     });
     this.showSpinner = ko.observable(false);
     this.showTopPeople = ko.pureComputed(() => !this.isTeam() && this.topUsers().length && !this.showMatches());
-
-    this.serviceConversations = ko.observable([]);
 
     this.isInitialServiceSearch = ko.observable(true);
 
@@ -178,151 +218,149 @@ class StartUIViewModel {
     this.shouldUpdateScrollbar = ko
       .computed(() => this.listViewModel.lastUpdate())
       .extend({notify: 'always', rateLimit: 500});
-
-    this.shouldUpdateServiceScrollbar = ko
-      .computed(() => this.serviceConversations())
-      .extend({notify: 'always', rateLimit: 500});
   }
 
-  clickOnClose() {
-    this._closeList();
-  }
+  clickOnClose = (): void => {
+    this.closeList();
+  };
 
-  async clickOnContact(userEntity) {
+  clickOnContact = async (userEntity: User): Promise<void> => {
     if (this.alreadyClickedOnContact[userEntity.id] === true) {
       return;
     }
     this.alreadyClickedOnContact[userEntity.id] = true;
     await this.actionsViewModel.open1to1Conversation(userEntity);
-    this._closeList();
+    this.closeList();
     delete this.alreadyClickedOnContact[userEntity.id];
-  }
+  };
 
-  clickOnConversation(conversationEntity) {
-    return this.actionsViewModel.openGroupConversation(conversationEntity).then(() => this._closeList());
-  }
+  clickOnConversation = (conversationEntity: Conversation): Promise<void> => {
+    return this.actionsViewModel.openGroupConversation(conversationEntity).then(() => this.closeList());
+  };
 
-  clickOnCreateGroup() {
+  clickOnCreateGroup = (): void => {
     amplify.publish(WebAppEvents.CONVERSATION.CREATE_GROUP, 'start_ui');
-  }
+  };
 
-  clickOnCreateGuestRoom() {
+  clickOnCreateGuestRoom = (): void => {
     this.conversationRepository.createGuestRoom().then(conversationEntity => {
       amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
       amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.GUEST_ROOMS.GUEST_ROOM_CREATION);
     });
-  }
+  };
 
-  clickOpenManageTeam() {
-    if (this.manageTeamUrl) {
-      safeWindowOpen(this.manageTeamUrl);
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.SETTINGS.OPENED_MANAGE_TEAM);
+  clickOpenManageTeam = (): void => {
+    if (!this.manageTeamUrl) {
+      return;
     }
-  }
+    safeWindowOpen(this.manageTeamUrl);
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.SETTINGS.OPENED_MANAGE_TEAM);
+  };
 
-  clickOpenManageServices() {
+  clickOpenManageServices = () => {
     if (this.manageServicesUrl) {
       safeWindowOpen(this.manageServicesUrl);
       amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.SETTINGS.OPENED_MANAGE_TEAM);
     }
-  }
+  };
 
-  clickOnOther(participantEntity, event) {
+  clickOnOther = (participantEntity: User | ServiceEntity): Promise<void> | void => {
     const isUser = participantEntity instanceof User;
-    if (isUser && participantEntity.isOutgoingRequest()) {
-      return this.clickOnContact(participantEntity);
+    if (isUser && (participantEntity as User).isOutgoingRequest()) {
+      return this.clickOnContact(participantEntity as User);
     }
     if (isUser) {
       return this.mainViewModel.content.userModal.showUser(participantEntity.id);
     }
-    return this.mainViewModel.content.serviceModal.showService(participantEntity);
-  }
+    return this.mainViewModel.content.serviceModal.showService(participantEntity as ServiceEntity);
+  };
 
-  clickOnShowPeople() {
+  clickOnShowPeople = (): void => {
     this.updateList(StartUIViewModel.STATE.ADD_PEOPLE);
-  }
+  };
 
-  clickOnShowServices() {
+  clickOnShowServices = (): void => {
     this.updateList(StartUIViewModel.STATE.ADD_SERVICE);
-  }
+  };
 
-  handleSearchInput() {
+  handleSearchInput = (): void => {
     if (!this.submittedSearch && this.isSearching()) {
       const [matchingContact] = this.searchResults.contacts();
       if (matchingContact) {
         this.submittedSearch = true;
-        return this.clickOnContact(matchingContact).then(() => (this.submittedSearch = false));
+        this.clickOnContact(matchingContact).then(() => (this.submittedSearch = false));
+        return;
       }
 
       const [matchingGroup] = this.searchResults.groups();
       if (matchingGroup) {
-        return this.clickOnConversation(matchingGroup);
+        this.clickOnConversation(matchingGroup);
       }
     }
-  }
+  };
 
-  resetView() {
+  public readonly resetView = (): void => {
     this.showMatches(false);
     this.showSpinner(false);
 
     this.state(StartUIViewModel.STATE.ADD_PEOPLE);
     this.searchInput('');
-  }
+  };
 
-  updateList(state = StartUIViewModel.STATE.ADD_PEOPLE) {
+  public readonly updateList = (state = StartUIViewModel.STATE.ADD_PEOPLE): void => {
     this.showSpinner(false);
 
     // Clean up
-    this._clearSearchResults();
+    this.clearSearchResults();
     $('user-input input').focus();
 
     this.state(state);
     const isAddingPeople = state === StartUIViewModel.STATE.ADD_PEOPLE;
     if (isAddingPeople) {
-      return this._updatePeopleList();
+      return this.updatePeopleList();
     }
-    this._updateServicesList();
-  }
+    this.updateServicesList();
+  };
 
-  _closeList() {
+  private readonly closeList = (): void => {
     $('user-input input').blur();
 
     amplify.publish(WebAppEvents.SEARCH.HIDE);
-    this.listViewModel.switchList(z.viewModel.ListViewModel.STATE.CONVERSATIONS);
+    this.listViewModel.switchList(ListViewModel.STATE.CONVERSATIONS);
 
     this.resetView();
-  }
+  };
 
-  _updatePeopleList() {
+  private readonly updatePeopleList = (): void => {
     if (!this.isTeam()) {
       this.getTopPeople().then(userEntities => this.topUsers(userEntities));
     }
-    this._searchPeople(this.searchInput());
-  }
+    this.searchPeople(this.searchInput());
+  };
 
-  _updateServicesList() {
+  private readonly updateServicesList = (): void => {
     this.isInitialServiceSearch(true);
     this.integrationRepository
       .searchForServices(this.searchInput(), this.searchInput)
       .then(() => this.isInitialServiceSearch(false));
-  }
+  };
 
   //##############################################################################
   // Data sources
   //##############################################################################
 
-  getTopPeople() {
+  private readonly getTopPeople = () => {
     return this.conversationRepository
       .get_most_active_conversations()
       .then(conversationEntities => {
         return conversationEntities
-          .filter(conversationEntity => conversationEntity.is1to1())
+          .filter((conversationEntity: Conversation) => conversationEntity.is1to1())
           .slice(0, 6)
-          .map(conversationEntity => conversationEntity.participating_user_ids()[0]);
+          .map((conversationEntity: Conversation) => conversationEntity.participating_user_ids()[0]);
       })
       .then(userIds => this.userRepository.getUsersById(userIds))
       .then(userEntities => userEntities.filter(userEntity => !userEntity.isBlocked()));
-  }
+  };
 
   clickToShowInviteModal = () => this.mainViewModel.content.inviteModal.show();
 
@@ -330,14 +368,14 @@ class StartUIViewModel {
   // Search
   //##############################################################################
 
-  _clearSearchResults() {
+  clearSearchResults = (): void => {
     this.searchResults.groups.removeAll();
     this.searchResults.contacts.removeAll();
     this.searchResults.others.removeAll();
     this.services.removeAll();
-  }
+  };
 
-  async _searchPeople(query) {
+  private readonly searchPeople = async (query: string): Promise<void> => {
     const normalizedQuery = SearchRepository.normalizeQuery(query);
     if (!normalizedQuery) {
       return;
@@ -371,11 +409,11 @@ class StartUIViewModel {
     this.searchResults.groups(this.conversationRepository.getGroupsByName(normalizedQuery, isHandle));
 
     if (!this.showOnlyConnectedUsers()) {
-      await this._searchRemote(normalizedQuery, isHandle);
+      await this.searchRemote(normalizedQuery, isHandle);
     }
-  }
+  };
 
-  async _searchRemote(normalizedQuery, isHandle) {
+  private readonly searchRemote = async (normalizedQuery: string, isHandle: boolean): Promise<void> => {
     try {
       const userEntities = await this.searchRepository.search_by_name(normalizedQuery, isHandle);
 
@@ -401,11 +439,7 @@ class StartUIViewModel {
     } catch (error) {
       this.logger.error(`Error searching for contacts: ${error.message}`, error);
     }
-  }
-
-  dispose() {
-    this.renderAvatarComputed.dispose();
-  }
+  };
 }
 
 export {StartUIViewModel};

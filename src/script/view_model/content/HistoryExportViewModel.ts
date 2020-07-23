@@ -19,10 +19,12 @@
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {getCurrentDate} from 'Util/TimeUtil';
 import {downloadBlob} from 'Util/util';
+import {amplify} from 'amplify';
+import ko from 'knockout';
 
 import {EventName} from '../../tracking/EventName';
 import {ContentViewModel} from '../ContentViewModel';
@@ -31,12 +33,22 @@ import {Config} from '../../Config';
 import {CancelError} from '../../backup/Error';
 
 import 'Components/loadingBar';
+import {BackupRepository} from '../../backup/BackupRepository';
+import {UserRepository} from '../../user/UserRepository';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.content = z.viewModel.content || {};
+export class HistoryExportViewModel {
+  private readonly logger: Logger;
+  hasError: ko.Observable<boolean>;
+  private readonly state: ko.Observable<string>;
+  isPreparing: ko.PureComputed<boolean>;
+  isExporting: ko.PureComputed<boolean>;
+  isDone: ko.PureComputed<boolean>;
+  private readonly numberOfRecords: ko.Observable<number>;
+  private readonly numberOfProcessedRecords: ko.Observable<number>;
+  loadingProgress: ko.PureComputed<number>;
+  private readonly archiveBlob: ko.Observable<Blob>;
+  loadingMessage: ko.PureComputed<string>;
 
-z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
   static get STATE() {
     return {
       COMPRESSING: 'HistoryExportViewModel.STATE.COMPRESSING',
@@ -52,10 +64,8 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
     };
   }
 
-  constructor(mainViewModel, contentViewModel, repositories) {
-    this.backupRepository = repositories.backup;
-    this.userRepository = repositories.user;
-    this.logger = getLogger('z.viewModel.content.HistoryExportViewModel');
+  constructor(private readonly backupRepository: BackupRepository, private readonly userRepository: UserRepository) {
+    this.logger = getLogger('HistoryExportViewModel');
 
     this.hasError = ko.observable(false);
     this.state = ko.observable(HistoryExportViewModel.STATE.PREPARING);
@@ -83,9 +93,9 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
         }
         case HistoryExportViewModel.STATE.EXPORTING: {
           const replacements = {
-            processed: this.numberOfProcessedRecords(),
-            progress: this.loadingProgress(),
-            total: this.numberOfRecords(),
+            processed: this.numberOfProcessedRecords().toString(),
+            progress: this.loadingProgress().toString(),
+            total: this.numberOfRecords().toString(),
           };
           return t('backupExportProgressSecondary', replacements);
         }
@@ -97,33 +107,29 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
       }
     });
 
-    amplify.subscribe(WebAppEvents.BACKUP.EXPORT.START, this.exportHistory.bind(this));
+    amplify.subscribe(WebAppEvents.BACKUP.EXPORT.START, this.exportHistory);
   }
 
-  exportHistory() {
+  exportHistory = async (): Promise<void> => {
     this.state(HistoryExportViewModel.STATE.PREPARING);
     this.hasError(false);
-    this.backupRepository.getBackupInitData().then(numberOfRecords => {
+    try {
+      const numberOfRecords = await this.backupRepository.getBackupInitData();
       this.logger.log(`Exporting '${numberOfRecords}' records from history`);
 
       this.numberOfRecords(numberOfRecords);
       this.numberOfProcessedRecords(0);
+      const archive = await this.backupRepository.generateHistory(this.onProgress);
+      this.state(HistoryExportViewModel.STATE.COMPRESSING);
+      const archiveBlob = await archive.generateAsync({compression: 'DEFLATE', type: 'blob'});
+      this.onSuccess(archiveBlob);
+      this.logger.log(`Completed export of '${numberOfRecords}' records from history`);
+    } catch (error) {
+      this.onError(error);
+    }
+  };
 
-      this.backupRepository
-        .generateHistory(this.onProgress.bind(this))
-        .then(archive => {
-          this.state(HistoryExportViewModel.STATE.COMPRESSING);
-          return archive.generateAsync({compression: 'DEFLATE', type: 'blob'});
-        })
-        .then(archiveBlob => {
-          this.onSuccess(archiveBlob);
-          this.logger.log(`Completed export of '${numberOfRecords}' records from history`);
-        })
-        .catch(this.onError.bind(this));
-    });
-  }
-
-  downloadArchiveFile() {
+  downloadArchiveFile = (): void => {
     const userName = this.userRepository.self().username();
     const fileExtension = HistoryExportViewModel.CONFIG.FILE_EXTENSION;
     const sanitizedBrandName = Config.getConfig().BRAND_NAME.replace(/[^A-Za-z0-9_]/g, '');
@@ -132,18 +138,18 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
     this.dismissExport();
     downloadBlob(this.archiveBlob(), filename, 'application/octet-stream');
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.HISTORY.BACKUP_SUCCEEDED);
-  }
+  };
 
-  onCancel() {
+  onCancel = (): void => {
     this.backupRepository.cancelAction();
-  }
+  };
 
-  onProgress(processedNumber) {
+  onProgress = (processedNumber: number): void => {
     this.state(HistoryExportViewModel.STATE.EXPORTING);
     this.numberOfProcessedRecords(this.numberOfProcessedRecords() + processedNumber);
-  }
+  };
 
-  onError(error) {
+  onError = (error: Error): void => {
     if (error instanceof CancelError) {
       this.logger.log('History export was cancelled');
       return this.dismissExport();
@@ -151,19 +157,19 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
     this.hasError(true);
     this.logger.error(`Failed to export history: ${error.message}`, error);
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.HISTORY.BACKUP_FAILED);
-  }
+  };
 
-  onSuccess(archiveBlob) {
+  onSuccess = (archiveBlob: Blob): void => {
     this.state(HistoryExportViewModel.STATE.DONE);
     this.hasError(false);
     this.archiveBlob(archiveBlob);
-  }
+  };
 
-  onTryAgain() {
+  onTryAgain = (): void => {
     this.exportHistory();
-  }
+  };
 
-  dismissExport() {
+  dismissExport = (): void => {
     amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.PREFERENCES_ACCOUNT);
-  }
-};
+  };
+}

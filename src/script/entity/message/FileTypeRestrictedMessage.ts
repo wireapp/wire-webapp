@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2020 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,21 +17,17 @@
  *
  */
 
-enum PERSONAL {
-  GROUP = 'z.conversation.ACCESS_STATE.PERSONAL.GROUP',
-  ONE2ONE = 'z.conversation.ACCESS_STATE.PERSONAL.ONE2ONE',
-}
+import {t} from 'Util/LocalizerUtil';
 
-export enum TEAM {
-  GUEST_ROOM = 'z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM',
-  LEGACY = 'z.conversation.ACCESS_STATE.TEAM.LEGACY',
-  ONE2ONE = 'z.conversation.ACCESS_STATE.TEAM.ONE2ONE',
-  TEAM_ONLY = 'z.conversation.ACCESS_STATE.TEAM.TEAM_ONLY',
-}
+import {SuperType} from '../../message/SuperType';
+import {Message} from './Message';
 
-export const ACCESS_STATE = {
-  PERSONAL,
-  SELF: 'z.conversation.ACCESS_STATE.SELF',
-  TEAM,
-  UNKNOWN: 'z.conversation.ACCESS_STATE.UNKNOWN',
-};
+export class FileTypeRestrictedMessage extends Message {
+  public caption: string;
+  constructor(isIncoming: boolean, name: string, fileExt: string, timestamp: number) {
+    super();
+    this.super_type = SuperType.FILE_TYPE_RESTRICTED;
+    this.timestamp(timestamp);
+    this.caption = isIncoming ? t('fileTypeRestrictedIncoming', name) : t('fileTypeRestrictedOutgoing', fileExt);
+  }
+}

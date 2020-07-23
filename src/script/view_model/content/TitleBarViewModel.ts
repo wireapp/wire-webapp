@@ -19,8 +19,9 @@
 
 import {CONV_TYPE, CALL_TYPE} from '@wireapp/avs';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
+import ko from 'knockout';
 
-import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
@@ -28,27 +29,38 @@ import {ConversationVerificationState} from '../../conversation/ConversationVeri
 import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
 import {ContentViewModel} from '../ContentViewModel';
-
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.content = z.viewModel.content || {};
+import {CallingViewModel} from '../CallingViewModel';
+import {PanelViewModel} from '../PanelViewModel';
+import {CallingRepository} from '../../calling/CallingRepository';
+import {ConversationRepository} from '../../conversation/ConversationRepository';
+import {UserRepository} from '../../user/UserRepository';
+import {Conversation} from '../../entity/Conversation';
+import {Call} from '../../calling/Call';
 
 // Parent: ContentViewModel
-z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
-  constructor(callingViewModel, panelViewModel, contentViewModel, repositories) {
-    this.addedToView = this.addedToView.bind(this);
+export class TitleBarViewModel {
+  readonly panelIsVisible: ko.PureComputed<boolean>;
+  readonly conversationEntity: ko.Observable<Conversation>;
+  readonly ConversationVerificationState: typeof ConversationVerificationState;
+  private readonly joinedCall: ko.PureComputed<Call | undefined>;
+  readonly isActivatedAccount: ko.PureComputed<boolean>;
+  private readonly hasCall: ko.PureComputed<boolean>;
+  readonly badgeLabelCopy: ko.PureComputed<string>;
+  readonly showCallControls: ko.PureComputed<boolean>;
+  readonly supportsVideoCall: ko.PureComputed<boolean>;
+  readonly peopleTooltip: string;
 
-    this.callingViewModel = callingViewModel;
-    this.callingRepository = repositories.calling;
-    this.conversationRepository = repositories.conversation;
-    this.userRepository = repositories.user;
-    this.multitasking = contentViewModel.multitasking;
-    this.logger = getLogger('z.viewModel.content.TitleBarViewModel');
-
-    this.panelViewModel = panelViewModel;
+  constructor(
+    readonly callingViewModel: CallingViewModel,
+    private readonly panelViewModel: PanelViewModel,
+    readonly contentViewModel: ContentViewModel,
+    private readonly callingRepository: CallingRepository,
+    private readonly conversationRepository: ConversationRepository,
+    private readonly userRepository: UserRepository,
+  ) {
     this.contentViewModel = contentViewModel;
 
-    this.panelIsVisible = this.panelViewModel.isVisible;
+    this.panelIsVisible = panelViewModel.isVisible;
 
     // TODO remove the titlebar for now to ensure that buttons are clickable in macOS wrappers
     window.setTimeout(() => $('.titlebar').remove(), TIME_IN_MILLIS.SECOND);
@@ -60,7 +72,7 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
 
     this.hasCall = ko.pureComputed(() => {
-      const hasEntities = this.conversationEntity() && this.joinedCall();
+      const hasEntities = this.conversationEntity() && !!this.joinedCall();
       return hasEntities ? this.conversationEntity().id === this.joinedCall().conversationId : false;
     });
 
@@ -97,64 +109,64 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
     this.peopleTooltip = t('tooltipConversationPeople', shortcut);
   }
 
-  addedToView() {
+  addedToView = (): void => {
     window.setTimeout(() => {
-      amplify.subscribe(WebAppEvents.SHORTCUT.PEOPLE, () => this.showDetails());
+      amplify.subscribe(WebAppEvents.SHORTCUT.PEOPLE, () => this.showDetails(false));
       amplify.subscribe(WebAppEvents.SHORTCUT.ADD_PEOPLE, () => {
         if (this.isActivatedAccount()) {
           this.showAddParticipant();
         }
       });
     }, 50);
-  }
+  };
 
-  removedFromView() {
+  removedFromView = () => {
     amplify.unsubscribeAll(WebAppEvents.SHORTCUT.PEOPLE);
     amplify.unsubscribeAll(WebAppEvents.SHORTCUT.ADD_PEOPLE);
-  }
+  };
 
-  startAudioCall(conversationEntity) {
+  startAudioCall = (conversationEntity: Conversation): void => {
     this._startCall(conversationEntity, CALL_TYPE.NORMAL);
-  }
+  };
 
-  startVideoCall(conversationEntity) {
+  startVideoCall = (conversationEntity: Conversation): void => {
     this._startCall(conversationEntity, CALL_TYPE.VIDEO);
-  }
+  };
 
-  _startCall(conversationEntity, callType) {
+  _startCall = (conversationEntity: Conversation, callType: CALL_TYPE): void => {
     const convType = conversationEntity.isGroup() ? CONV_TYPE.GROUP : CONV_TYPE.ONEONONE;
     this.callingRepository.startCall(conversationEntity.id, convType, callType);
-  }
+  };
 
-  clickOnDetails() {
-    this.showDetails();
-  }
+  clickOnDetails = (): void => {
+    this.showDetails(false);
+  };
 
-  clickOnCollectionButton() {
+  clickOnCollectionButton = (): void => {
     amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.COLLECTION);
-  }
+  };
 
-  showAddParticipant() {
+  showAddParticipant = (): void => {
     const canAddPeople = this.conversationEntity() && this.conversationEntity().isActiveParticipant();
 
     if (!canAddPeople) {
-      return this.showDetails();
+      return this.showDetails(false);
     }
 
-    return this.conversationEntity().isGroup()
-      ? this.showDetails(true)
-      : amplify.publish(
-          WebAppEvents.CONVERSATION.CREATE_GROUP,
-          'conversation_details',
-          this.conversationEntity().firstUserEntity(),
-        );
-  }
+    if (this.conversationEntity().isGroup()) {
+      this.showDetails(true);
+    } else {
+      amplify.publish(
+        WebAppEvents.CONVERSATION.CREATE_GROUP,
+        'conversation_details',
+        this.conversationEntity().firstUserEntity(),
+      );
+    }
+  };
 
-  showDetails(addParticipants) {
-    const panelId = addParticipants
-      ? z.viewModel.PanelViewModel.STATE.ADD_PARTICIPANTS
-      : z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS;
+  showDetails = (addParticipants: boolean): void => {
+    const panelId = addParticipants ? PanelViewModel.STATE.ADD_PARTICIPANTS : PanelViewModel.STATE.CONVERSATION_DETAILS;
 
-    this.panelViewModel.togglePanel(panelId);
-  }
-};
+    this.panelViewModel.togglePanel(panelId, undefined);
+  };
+}

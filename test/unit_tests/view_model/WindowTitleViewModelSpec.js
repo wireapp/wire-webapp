@@ -51,10 +51,8 @@ describe('WindowTitleViewModel', () => {
             state: ko.observable(ContentViewModel.STATE.CONVERSATION),
           },
         },
-        {
-          conversation: conversationRepository,
-          user: testFactory.user_repository,
-        },
+        testFactory.user_repository,
+        conversationRepository,
       );
     });
   });

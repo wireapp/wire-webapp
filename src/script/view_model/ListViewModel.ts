@@ -19,8 +19,9 @@
 
 import {CALL_TYPE} from '@wireapp/avs';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import ko from 'knockout';
+import {amplify} from 'amplify';
 
-import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {iterateItem} from 'Util/ArrayUtil';
 import {Environment} from 'Util/Environment';
@@ -39,11 +40,61 @@ import {Shortcut} from '../ui/Shortcut';
 import {ShortcutType} from '../ui/ShortcutType';
 import {ContentViewModel} from './ContentViewModel';
 import {DefaultLabelIds} from '../conversation/ConversationLabelRepository';
+import {PanelViewModel} from './PanelViewModel';
+import type {MainViewModel} from './MainViewModel';
+import type {CallingRepository} from '../calling/CallingRepository';
+import type {ConversationRepository} from '../conversation/ConversationRepository';
+import type {EventRepository} from '../event/EventRepository';
+import type {IntegrationRepository} from '../integration/IntegrationRepository';
+import type {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
+import type {PropertiesRepository} from '../properties/PropertiesRepository';
+import type {SearchRepository} from '../search/SearchRepository';
+import type {TeamRepository} from '../team/TeamRepository';
+import type {UserRepository} from '../user/UserRepository';
+import type {ActionsViewModel} from './ActionsViewModel';
+import type {Conversation} from '../entity/Conversation';
+import type {ClientEntity} from '../client/ClientEntity';
+import type {User} from '../entity/User';
+import type {AssetRemoteData} from '../assets/AssetRemoteData';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
+interface Repositories {
+  calling: CallingRepository;
+  conversation: ConversationRepository;
+  event: EventRepository;
+  integration: IntegrationRepository;
+  preferenceNotification: PreferenceNotificationRepository;
+  properties: PropertiesRepository;
+  search: SearchRepository;
+  team: TeamRepository;
+  user: UserRepository;
+}
 
-z.viewModel.ListViewModel = class ListViewModel {
+export class ListViewModel {
+  readonly preferences: PreferencesListViewModel;
+  readonly takeover: TakeoverViewModel;
+  readonly temporaryGuest: TemporaryGuestViewModel;
+  readonly selfUserPicture: ko.PureComputed<AssetRemoteData | void>;
+  readonly ModalType: typeof ListViewModel.MODAL_TYPE;
+  readonly isActivatedAccount: ko.PureComputed<boolean>;
+  readonly webappLoaded: ko.Observable<boolean>;
+  readonly state: ko.Observable<string>;
+  readonly lastUpdate: ko.Observable<number>;
+  private readonly elementId: 'left-column';
+  private readonly conversationRepository: ConversationRepository;
+  private readonly callingRepository: CallingRepository;
+  private readonly teamRepository: TeamRepository;
+  private readonly userRepository: UserRepository;
+  private readonly actionsViewModel: ActionsViewModel;
+  private readonly contentViewModel: ContentViewModel;
+  private readonly panelViewModel: PanelViewModel;
+  private readonly isProAccount: ko.PureComputed<boolean>;
+  private readonly selfUser: ko.Observable<User>;
+  private readonly modal: ko.Observable<string>;
+  private readonly visibleListItems: ko.PureComputed<string[]>;
+  private readonly archive: ArchiveViewModel;
+  private readonly conversations: ConversationListViewModel;
+  private readonly start: StartUIViewModel;
+
   static get MODAL_TYPE() {
     return {
       TAKEOVER: 'ListViewModel.MODAL_TYPE.TAKEOVER',
@@ -60,16 +111,8 @@ z.viewModel.ListViewModel = class ListViewModel {
       TEMPORARY_GUEST: 'ListViewModel.STATE.TEMPORARY_GUEST',
     };
   }
-  /**
-   * View model for the list column.
-   * @param {MainViewModel} mainViewModel Main view model
-   * @param {Object} repositories Object containing all the repositories
-   */
-  constructor(mainViewModel, repositories) {
-    this.changeNotificationSetting = this.changeNotificationSetting.bind(this);
-    this.switchList = this.switchList.bind(this);
-    this.onContextMenu = this.onContextMenu.bind(this);
 
+  constructor(mainViewModel: MainViewModel, repositories: Repositories) {
     this.elementId = 'left-column';
     this.conversationRepository = repositories.conversation;
     this.callingRepository = repositories.calling;
@@ -84,7 +127,7 @@ z.viewModel.ListViewModel = class ListViewModel {
     this.isProAccount = this.teamRepository.isTeam;
     this.selfUser = this.userRepository.self;
 
-    this.logger = getLogger('z.viewModel.ListViewModel');
+    this.ModalType = ListViewModel.MODAL_TYPE;
 
     // State
     this.state = ko.observable(ListViewModel.STATE.CONVERSATIONS);
@@ -92,7 +135,7 @@ z.viewModel.ListViewModel = class ListViewModel {
     this.modal = ko.observable();
     this.webappLoaded = ko.observable(false);
 
-    this.selfUserPicture = ko.pureComputed(() => {
+    this.selfUserPicture = ko.pureComputed((): AssetRemoteData | void => {
       if (this.webappLoaded() && this.selfUser()) {
         return this.selfUser().mediumPictureResource();
       }
@@ -122,37 +165,56 @@ z.viewModel.ListViewModel = class ListViewModel {
 
     // Nested view models
     this.archive = new ArchiveViewModel(this, repositories.conversation, this.answerCall);
-    this.conversations = new ConversationListViewModel(mainViewModel, this, repositories, this.answerCall);
+    this.conversations = new ConversationListViewModel(
+      mainViewModel,
+      this,
+      this.answerCall,
+      repositories.event,
+      repositories.calling,
+      repositories.conversation,
+      repositories.preferenceNotification,
+      repositories.team,
+      repositories.user,
+      repositories.properties,
+    );
     this.preferences = new PreferencesListViewModel(
       this.contentViewModel,
       this,
       repositories.user,
       repositories.calling,
     );
-    this.start = new StartUIViewModel(mainViewModel, this, repositories);
-    this.takeover = new TakeoverViewModel(mainViewModel, this, repositories);
-    this.temporaryGuest = new TemporaryGuestViewModel(mainViewModel, this, repositories);
+    this.start = new StartUIViewModel(
+      mainViewModel,
+      this,
+      repositories.conversation,
+      repositories.integration,
+      repositories.search,
+      repositories.team,
+      repositories.user,
+    );
+    this.takeover = new TakeoverViewModel(this, repositories.user, repositories.conversation);
+    this.temporaryGuest = new TemporaryGuestViewModel(mainViewModel, repositories.user, repositories.calling);
 
     this._initSubscriptions();
 
     ko.applyBindings(this, document.getElementById(this.elementId));
   }
 
-  _initSubscriptions() {
-    amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, this.openConversations.bind(this));
+  _initSubscriptions = () => {
+    amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, this.openConversations);
     amplify.subscribe(WebAppEvents.LIFECYCLE.LOADED, () => this.webappLoaded(true));
-    amplify.subscribe(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT, this.openPreferencesAccount.bind(this));
-    amplify.subscribe(WebAppEvents.PREFERENCES.MANAGE_DEVICES, this.openPreferencesDevices.bind(this));
-    amplify.subscribe(WebAppEvents.SEARCH.SHOW, this.openStartUI.bind(this));
-    amplify.subscribe(WebAppEvents.SHORTCUT.NEXT, this.goToNext.bind(this));
-    amplify.subscribe(WebAppEvents.SHORTCUT.PREV, this.goToPrevious.bind(this));
-    amplify.subscribe(WebAppEvents.SHORTCUT.ARCHIVE, this.clickToArchive.bind(this));
-    amplify.subscribe(WebAppEvents.SHORTCUT.DELETE, this.clickToClear.bind(this));
+    amplify.subscribe(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT, this.openPreferencesAccount);
+    amplify.subscribe(WebAppEvents.PREFERENCES.MANAGE_DEVICES, this.openPreferencesDevices);
+    amplify.subscribe(WebAppEvents.SEARCH.SHOW, this.openStartUI);
+    amplify.subscribe(WebAppEvents.SHORTCUT.NEXT, this.goToNext);
+    amplify.subscribe(WebAppEvents.SHORTCUT.PREV, this.goToPrevious);
+    amplify.subscribe(WebAppEvents.SHORTCUT.ARCHIVE, this.clickToArchive);
+    amplify.subscribe(WebAppEvents.SHORTCUT.DELETE, this.clickToClear);
     amplify.subscribe(WebAppEvents.SHORTCUT.NOTIFICATIONS, this.changeNotificationSetting);
     amplify.subscribe(WebAppEvents.SHORTCUT.SILENCE, this.changeNotificationSetting); // todo: deprecated - remove when user base of wrappers version >= 3.4 is large enough
-  }
+  };
 
-  answerCall = conversationEntity => {
+  answerCall = (conversationEntity: Conversation) => {
     const call = this.callingRepository.findCall(conversationEntity.id);
     if (call) {
       const callType = call.selfParticipant.sharesCamera() ? call.initialType : CALL_TYPE.NORMAL;
@@ -160,28 +222,28 @@ z.viewModel.ListViewModel = class ListViewModel {
     }
   };
 
-  changeNotificationSetting() {
+  changeNotificationSetting = () => {
     if (this.isProAccount()) {
-      this.panelViewModel.togglePanel(z.viewModel.PanelViewModel.STATE.NOTIFICATIONS);
+      this.panelViewModel.togglePanel(PanelViewModel.STATE.NOTIFICATIONS, undefined);
     } else {
       this.clickToToggleMute();
     }
-  }
+  };
 
-  goToNext() {
-    this._iterateActiveItem(true);
-  }
+  goToNext = () => {
+    this.iterateActiveItem(true);
+  };
 
-  goToPrevious() {
-    this._iterateActiveItem(false);
-  }
+  goToPrevious = () => {
+    this.iterateActiveItem(false);
+  };
 
-  _iterateActiveItem(reverse = false) {
+  private readonly iterateActiveItem = (reverse = false) => {
     const isStatePreferences = this.state() === ListViewModel.STATE.PREFERENCES;
-    return isStatePreferences ? this._iterateActivePreference(reverse) : this._iterateActiveConversation(reverse);
-  }
+    return isStatePreferences ? this.iterateActivePreference(reverse) : this.iterateActiveConversation(reverse);
+  };
 
-  _iterateActiveConversation(reverse) {
+  private readonly iterateActiveConversation = (reverse: boolean) => {
     const isStateRequests = this.contentViewModel.state() === ContentViewModel.STATE.CONNECTION_REQUESTS;
     const activeConversationItem = isStateRequests
       ? ContentViewModel.STATE.CONNECTION_REQUESTS
@@ -197,9 +259,9 @@ z.viewModel.ListViewModel = class ListViewModel {
     if (nextItem) {
       amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextItem);
     }
-  }
+  };
 
-  _iterateActivePreference(reverse) {
+  private readonly iterateActivePreference = (reverse: boolean) => {
     let activePreference = this.contentViewModel.state();
 
     const isDeviceDetails = activePreference === ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS;
@@ -211,9 +273,9 @@ z.viewModel.ListViewModel = class ListViewModel {
     if (nextPreference) {
       this.contentViewModel.switchContent(nextPreference);
     }
-  }
+  };
 
-  async openPreferencesAccount() {
+  openPreferencesAccount = async (): Promise<void> => {
     await this.teamRepository.getTeam();
 
     if (this.isActivatedAccount()) {
@@ -222,9 +284,9 @@ z.viewModel.ListViewModel = class ListViewModel {
 
     this.switchList(ListViewModel.STATE.PREFERENCES);
     this.contentViewModel.switchContent(ContentViewModel.STATE.PREFERENCES_ACCOUNT);
-  }
+  };
 
-  openPreferencesDevices(deviceEntity) {
+  openPreferencesDevices = (deviceEntity: ClientEntity): void => {
     this.switchList(ListViewModel.STATE.PREFERENCES);
 
     if (deviceEntity) {
@@ -233,57 +295,57 @@ z.viewModel.ListViewModel = class ListViewModel {
     }
 
     return this.contentViewModel.switchContent(ContentViewModel.STATE.PREFERENCES_DEVICES);
-  }
+  };
 
-  openStartUI() {
+  openStartUI = (): void => {
     this.switchList(ListViewModel.STATE.START_UI);
-  }
+  };
 
-  switchList(newListState, respectLastState = true) {
+  switchList = (newListState: string, respectLastState = true): void => {
     const isStateChange = this.state() !== newListState;
     if (isStateChange) {
-      this._hideList();
-      this._updateList(newListState, respectLastState);
-      this._showList(newListState);
+      this.hideList();
+      this.updateList(newListState, respectLastState);
+      this.showList(newListState);
     }
-  }
+  };
 
-  openConversations() {
+  openConversations = (): void => {
     const newState = this.isActivatedAccount()
       ? ListViewModel.STATE.CONVERSATIONS
       : ListViewModel.STATE.TEMPORARY_GUEST;
     this.switchList(newState, false);
-  }
+  };
 
-  _hideList() {
+  private readonly hideList = (): void => {
     const stateIsStartUI = this.state() === ListViewModel.STATE.START_UI;
     if (stateIsStartUI) {
       this.start.resetView();
     }
 
-    const listStateElementId = this._getElementIdOfList(this.state());
+    const listStateElementId = this.getElementIdOfList(this.state());
     $(`#${listStateElementId}`).removeClass('left-list-is-visible');
     $(document).off('keydown.listView');
-  }
+  };
 
-  _showList(newListState) {
-    const listStateElementId = this._getElementIdOfList(newListState);
+  private readonly showList = (newListState: string): void => {
+    const listStateElementId = this.getElementIdOfList(newListState);
     $(`#${listStateElementId}`).addClass('left-list-is-visible');
 
     this.state(newListState);
     this.lastUpdate(Date.now());
 
     $(document).on('keydown.listView', keyboardEvent => {
-      if (isEscapeKey(keyboardEvent)) {
+      if (isEscapeKey((keyboardEvent as unknown) as KeyboardEvent)) {
         const newState = this.isActivatedAccount()
           ? ListViewModel.STATE.CONVERSATIONS
           : ListViewModel.STATE.TEMPORARY_GUEST;
         this.switchList(newState);
       }
     });
-  }
+  };
 
-  _updateList(newListState, respectLastState) {
+  private readonly updateList = (newListState: string, respectLastState: boolean): void => {
     switch (newListState) {
       case ListViewModel.STATE.ARCHIVE:
         this.archive.updateList();
@@ -299,9 +361,9 @@ z.viewModel.ListViewModel = class ListViewModel {
           this.contentViewModel.switchPreviousContent();
         }
     }
-  }
+  };
 
-  _getElementIdOfList(listState) {
+  private readonly getElementIdOfList = (listState: string) => {
     switch (listState) {
       case ListViewModel.STATE.ARCHIVE:
         return 'archive';
@@ -314,24 +376,24 @@ z.viewModel.ListViewModel = class ListViewModel {
       default:
         return 'conversations';
     }
-  }
+  };
 
-  dismissModal() {
+  dismissModal = (): void => {
     this.modal(undefined);
-  }
+  };
 
-  showTakeover() {
+  showTakeover = (): void => {
     this.modal(ListViewModel.MODAL_TYPE.TAKEOVER);
-  }
+  };
 
-  showTemporaryGuest() {
+  showTemporaryGuest = (): void => {
     this.switchList(ListViewModel.STATE.TEMPORARY_GUEST);
     this.modal(ListViewModel.MODAL_TYPE.TEMPORARY_GUEST);
     const conversationEntity = this.conversationRepository.getMostRecentConversation();
     amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
-  }
+  };
 
-  onContextMenu(conversationEntity, event) {
+  onContextMenu = (conversationEntity: Conversation, event: MouseEvent): void => {
     const entries = [];
 
     if (conversationEntity.isMutable()) {
@@ -439,57 +501,57 @@ z.viewModel.ListViewModel = class ListViewModel {
     }
 
     Context.from(event, entries, 'conversation-list-options-menu');
-  }
+  };
 
-  clickToArchive(conversationEntity = this.conversationRepository.active_conversation()) {
+  clickToArchive = (conversationEntity = this.conversationRepository.active_conversation()): void => {
     if (this.isActivatedAccount()) {
       this.actionsViewModel.archiveConversation(conversationEntity);
     }
-  }
+  };
 
-  async clickToBlock(conversationEntity) {
+  clickToBlock = async (conversationEntity: Conversation): Promise<void> => {
     const userEntity = conversationEntity.firstUserEntity();
-    const hideConversation = this._shouldHideConversation(conversationEntity);
+    const hideConversation = this.shouldHideConversation(conversationEntity);
     const nextConversationEntity = this.conversationRepository.get_next_conversation(conversationEntity);
     await this.actionsViewModel.blockUser(userEntity, hideConversation, nextConversationEntity);
-  }
+  };
 
-  clickToCancelRequest(conversationEntity) {
+  clickToCancelRequest = (conversationEntity: Conversation): void => {
     const userEntity = conversationEntity.firstUserEntity();
-    const hideConversation = this._shouldHideConversation(conversationEntity);
+    const hideConversation = this.shouldHideConversation(conversationEntity);
     const nextConversationEntity = this.conversationRepository.get_next_conversation(conversationEntity);
 
     this.actionsViewModel.cancelConnectionRequest(userEntity, hideConversation, nextConversationEntity);
-  }
+  };
 
-  clickToClear(conversationEntity = this.conversationRepository.active_conversation()) {
+  clickToClear = (conversationEntity = this.conversationRepository.active_conversation()): void => {
     this.actionsViewModel.clearConversation(conversationEntity);
-  }
+  };
 
-  clickToLeave(conversationEntity) {
+  clickToLeave = (conversationEntity: Conversation): void => {
     this.actionsViewModel.leaveConversation(conversationEntity);
-  }
+  };
 
-  clickToToggleMute(conversationEntity = this.conversationRepository.active_conversation()) {
+  clickToToggleMute = (conversationEntity = this.conversationRepository.active_conversation()): void => {
     this.actionsViewModel.toggleMuteConversation(conversationEntity);
-  }
+  };
 
-  clickToOpenNotificationSettings(conversationEntity = this.conversationRepository.active_conversation()) {
+  clickToOpenNotificationSettings = (conversationEntity = this.conversationRepository.active_conversation()): void => {
     amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {openNotificationSettings: true});
-  }
+  };
 
-  clickToUnarchive(conversationEntity) {
+  clickToUnarchive = (conversationEntity: Conversation): void => {
     this.conversationRepository.unarchiveConversation(conversationEntity, true, 'manual un-archive').then(() => {
       if (!this.conversationRepository.conversations_archived().length) {
         this.switchList(ListViewModel.STATE.CONVERSATIONS);
       }
     });
-  }
+  };
 
-  _shouldHideConversation(conversationEntity) {
+  private readonly shouldHideConversation = (conversationEntity: Conversation): boolean => {
     const isStateConversations = this.state() === ListViewModel.STATE.CONVERSATIONS;
     const isActiveConversation = this.conversationRepository.is_active_conversation(conversationEntity);
 
     return isStateConversations && isActiveConversation;
-  }
-};
+  };
+}

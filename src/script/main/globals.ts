@@ -20,7 +20,6 @@
 import {amplify} from 'amplify';
 import jQuery from 'jquery';
 import ko from 'knockout';
-import type {RaygunStatic} from 'raygun4js';
 import 'raygun4js/dist/raygun.vanilla';
 import type {t} from 'Util/LocalizerUtil';
 
@@ -65,19 +64,7 @@ import '../view_model/bindings/ConversationListBindings';
 import '../view_model/bindings/ListBackgroundBindings';
 import '../view_model/bindings/MessageListBindings';
 import '../view_model/bindings/VideoCallingBindings';
-import '../view_model/content/CollectionDetailsViewModel';
-import '../view_model/content/CollectionViewModel';
-import '../view_model/content/ConnectRequestsViewModel';
-import '../view_model/content/GiphyViewModel';
-import '../view_model/content/HistoryExportViewModel';
-import '../view_model/content/HistoryImportViewModel';
-import '../view_model/content/InputBarViewModel';
-import '../view_model/content/PreferencesAboutViewModel';
-import '../view_model/content/PreferencesAccountViewModel';
-import '../view_model/content/PreferencesDeviceDetailsViewModel';
-import '../view_model/content/PreferencesDevicesViewModel';
-import '../view_model/content/TitleBarViewModel';
-import '../view_model/FaviconViewModel';
+
 import '../view_model/ImageDetailViewViewModel';
 import '../view_model/ListViewModel';
 import '../view_model/LoadingViewModel';
@@ -90,7 +77,6 @@ declare global {
     amplify: amplify.Static;
     jQuery: typeof jQuery;
     ko: typeof ko;
-    Raygun: RaygunStatic;
     t: typeof t;
     wire: {
       app: {
@@ -107,6 +93,7 @@ declare global {
         BACKEND_REST: string;
         BACKEND_WS: string;
         BRAND_NAME: string;
+        COUNTLY_API_KEY: string;
         ENVIRONMENT: string;
         FEATURE: {
           ALLOWED_FILE_UPLOAD_EXTENSIONS: string[];
