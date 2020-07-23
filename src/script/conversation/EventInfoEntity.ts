@@ -33,7 +33,6 @@ export interface MessageSendingOptions {
    *  * `true`: force sending
    */
   precondition: string[] | boolean;
-  /** User client map */
   recipients: Recipients;
 }
 
