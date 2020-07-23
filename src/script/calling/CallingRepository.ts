@@ -34,6 +34,7 @@ import {
   Wcall,
   ERROR,
   WcallMember,
+  WcallClient,
 } from '@wireapp/avs';
 import {Calling, GenericMessage} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -78,7 +79,7 @@ interface MediaStreamQuery {
 }
 
 interface SendMessageTarget {
-  clients: {clientid: string; userid: string}[];
+  clients: WcallClient[];
 }
 
 export class CallingRepository {
@@ -689,7 +690,7 @@ export class CallingRepository {
     userId: UserId,
     clientId: ClientId,
     targets: string | null,
-    destinationClientId: null,
+    unused: null,
     payload: string,
   ): number => {
     const protoCalling = new Calling({content: payload});
@@ -701,10 +702,10 @@ export class CallingRepository {
     if (call?.blockMessages) {
       return 0;
     }
-    const parsedTargets: SendMessageTarget = JSON.parse(targets);
+
     let options;
-    if (parsedTargets !== null) {
-      options = this.targetMessageRecipients(payload, parsedTargets);
+    if (typeof targets === 'string') {
+      const options: SendMessageTarget = JSON.parse(targets);
     }
     const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId, options);
     this.conversationRepository.sendCallingMessage(eventInfoEntity, conversationId).catch(() => {
@@ -992,65 +993,6 @@ export class CallingRepository {
         .forEach(participant => participant.videoState(state));
     }
   };
-
-  private targetMessageRecipients(
-    payload: string,
-    targets: SendMessageTarget,
-  ): {precondition?: boolean | string[]; recipients: Recipients} {
-    const {type, resp} = JSON.parse(payload);
-    let precondition;
-    const mappedTargets: Recipients = {};
-    targets.clients.forEach(target => (mappedTargets[target.userid] = [target.clientid]));
-    let recipients: Recipients = mappedTargets;
-
-    switch (type) {
-      case CALL_MESSAGE_TYPE.CANCEL: {
-        if (resp) {
-          // Send to remote client that initiated call
-          precondition = true;
-          recipients = mappedTargets;
-        }
-        break;
-      }
-
-      case CALL_MESSAGE_TYPE.GROUP_SETUP:
-      case CALL_MESSAGE_TYPE.HANGUP:
-      case CALL_MESSAGE_TYPE.PROP_SYNC:
-      case CALL_MESSAGE_TYPE.UPDATE: {
-        // Send to remote client that call is connected with
-        precondition = true;
-        recipients = mappedTargets;
-        break;
-      }
-
-      case CALL_MESSAGE_TYPE.REJECT: {
-        // Send to all clients of self user
-        precondition = [this.selfUser.id];
-        recipients = {
-          [this.selfUser.id]: this.selfUser.devices().map(device => device.id),
-        };
-        break;
-      }
-
-      case CALL_MESSAGE_TYPE.SETUP: {
-        if (resp && targets) {
-          // Send to remote client that initiated call and all clients of self user
-          precondition = [this.selfUser.id];
-          recipients = {
-            ...mappedTargets,
-            [this.selfUser.id]: this.selfUser.devices().map(device => device.id),
-          };
-        }
-        break;
-      }
-    }
-
-    return {precondition, recipients};
-  }
-
-  //##############################################################################
-  // Helper functions
-  //##############################################################################
 
   /**
    * Leave a call we joined immediately in case the browser window is closed.
