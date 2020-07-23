@@ -121,6 +121,8 @@ export class EventTrackingRepository {
   }
 
   private async startProductReporting(): Promise<void> {
+    // Info: Always deactivate product reporting for now.
+    return;
     this.isProductReportingActivated = true;
 
     Countly.init({
@@ -149,7 +151,7 @@ export class EventTrackingRepository {
   }
 
   private stopProductReportingSession(): void {
-    if (this.isProductReportingActivated) {
+    if (this.isProductReportingActivated === true) {
       Countly.end_session();
     }
   }
@@ -163,19 +165,21 @@ export class EventTrackingRepository {
   }
 
   private startProductReportingSession(): void {
-    Countly.begin_session();
+    if (this.isProductReportingActivated === true) {
+      Countly.begin_session();
 
-    this._setSuperProperty(SuperProperty.APP, EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE);
-    this._setSuperProperty(SuperProperty.APP_VERSION, Environment.version(false));
-    this._setSuperProperty(SuperProperty.DESKTOP_APP, trackingHelpers.getPlatform());
-    if (Environment.desktop) {
-      this._setSuperProperty(SuperProperty.WRAPPER_VERSION, Environment.version(true));
-    }
+      this._setSuperProperty(SuperProperty.APP, EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE);
+      this._setSuperProperty(SuperProperty.APP_VERSION, Environment.version(false));
+      this._setSuperProperty(SuperProperty.DESKTOP_APP, trackingHelpers.getPlatform());
+      if (Environment.desktop) {
+        this._setSuperProperty(SuperProperty.WRAPPER_VERSION, Environment.version(true));
+      }
 
-    if (this.userRepository) {
-      this._setSuperProperty(SuperProperty.CONTACTS, this.userRepository.number_of_contacts());
-      this._setSuperProperty(SuperProperty.TEAM.IN_TEAM, this.teamRepository.isTeam());
-      this._setSuperProperty(SuperProperty.TEAM.SIZE, this.teamRepository.teamSize());
+      if (this.userRepository) {
+        this._setSuperProperty(SuperProperty.CONTACTS, this.userRepository.number_of_contacts());
+        this._setSuperProperty(SuperProperty.TEAM.IN_TEAM, this.teamRepository.isTeam());
+        this._setSuperProperty(SuperProperty.TEAM.SIZE, this.teamRepository.teamSize());
+      }
     }
   }
 
@@ -185,14 +189,16 @@ export class EventTrackingRepository {
   }
 
   private trackProductReportingEvent(eventName: string, attributes?: any): void {
-    Countly.add_event({
-      key: eventName,
-      segmentation: {
-        ...attributes,
-        [SuperProperty.APP]: EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE,
-        [SuperProperty.APP_VERSION]: Environment.version(false),
-      },
-    });
+    if (this.isProductReportingActivated === true) {
+      Countly.add_event({
+        key: eventName,
+        segmentation: {
+          ...attributes,
+          [SuperProperty.APP]: EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE,
+          [SuperProperty.APP_VERSION]: Environment.version(false),
+        },
+      });
+    }
   }
 
   private unsubscribeFromProductTrackingEvents(): void {
