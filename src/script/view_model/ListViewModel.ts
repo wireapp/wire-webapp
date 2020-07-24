@@ -222,7 +222,7 @@ export class ListViewModel {
 
   answerCall = (conversationEntity: Conversation): void => {
     const call = this.callingRepository.findCall(conversationEntity.id);
-    if (call.conversationType === CONV_TYPE.ONEONONE || this.callingRepository.supportsConferenceCalling) {
+    if (call.conversationType === CONV_TYPE.CONFERENCE && this.callingRepository.supportsConferenceCalling) {
       if (call) {
         const callType = call.getSelfParticipant().sharesCamera() ? call.initialType : CALL_TYPE.NORMAL;
         this.callingRepository.answerCall(call, callType);
