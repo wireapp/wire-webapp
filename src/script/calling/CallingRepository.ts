@@ -145,6 +145,7 @@ export class CallingRepository {
     this.logger = getLogger('CallingRepository');
     this.callLog = [];
     this.cbrEncoding = ko.observable(0);
+    this.useSftCalling = ko.observable(false);
 
     this.subscribeToEvents();
   }
