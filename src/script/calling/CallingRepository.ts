@@ -34,35 +34,29 @@ import {
   Wcall,
   ERROR,
   WcallMember,
+  WcallClient,
 } from '@wireapp/avs';
 import {Calling, GenericMessage} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import 'webrtc-adapter';
-
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
 import {createRandomUuid} from 'Util/util';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-
 import {Config} from '../Config';
-
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
-
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
-
 import {ConversationRepository} from '../conversation/ConversationRepository';
 import {EventBuilder} from '../conversation/EventBuilder';
-import {EventInfoEntity} from '../conversation/EventInfoEntity';
+import {EventInfoEntity, MessageSendingOptions} from '../conversation/EventInfoEntity';
 import {EventRepository} from '../event/EventRepository';
-
 import type {MediaStreamHandler} from '../media/MediaStreamHandler';
 import {MediaType} from '../media/MediaType';
-
 import type {User} from '../entity/User';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import {Call, ConversationId} from './Call';
@@ -75,6 +69,10 @@ interface MediaStreamQuery {
   audio?: boolean;
   camera?: boolean;
   screen?: boolean;
+}
+
+interface SendMessageTarget {
+  clients: WcallClient[];
 }
 
 export class CallingRepository {
@@ -651,9 +649,21 @@ export class CallingRepository {
     }
   }
 
-  //##############################################################################
-  // Notifications
-  //##############################################################################
+  private mapTargets(targets: SendMessageTarget): Recipients {
+    const recipients: Recipients = {};
+
+    for (const target of targets.clients) {
+      const {userid, clientid} = target;
+
+      if (!recipients[userid]) {
+        recipients[userid] = [];
+      }
+
+      recipients[userid].push(clientid);
+    }
+
+    return recipients;
+  }
 
   private injectActivateEvent(conversationId: ConversationId, userId: UserId, time: string, source: string): void {
     const event = EventBuilder.buildVoiceChannelActivate(conversationId, userId, time, this.avsVersion);
@@ -684,8 +694,8 @@ export class CallingRepository {
     conversationId: ConversationId,
     userId: UserId,
     clientId: ClientId,
-    destinationUserId: UserId,
-    destinationClientId: ClientId,
+    targets: string | null,
+    unused: null,
     payload: string,
   ): number => {
     const protoCalling = new Calling({content: payload});
@@ -698,7 +708,18 @@ export class CallingRepository {
       return 0;
     }
 
-    const options = this.targetMessageRecipients(payload, destinationUserId, destinationClientId);
+    let options: MessageSendingOptions;
+
+    if (typeof targets === 'string') {
+      const parsedTargets: SendMessageTarget = JSON.parse(targets);
+      const recipients = this.mapTargets(parsedTargets);
+      options = {
+        nativePush: true,
+        precondition: false,
+        recipients,
+      };
+    }
+
     const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId, options);
     this.conversationRepository.sendCallingMessage(eventInfoEntity, conversationId).catch(() => {
       if (call) {
@@ -985,70 +1006,6 @@ export class CallingRepository {
         .forEach(participant => participant.videoState(state));
     }
   };
-
-  private targetMessageRecipients(
-    payload: string,
-    remoteUserId: UserId | null,
-    remoteClientId: ClientId | null,
-  ): {precondition?: boolean | string[]; recipients: Recipients} {
-    const {type, resp} = JSON.parse(payload);
-    let precondition;
-    let recipients;
-
-    switch (type) {
-      case CALL_MESSAGE_TYPE.CANCEL: {
-        if (resp && remoteUserId) {
-          // Send to remote client that initiated call
-          precondition = true;
-          recipients = {
-            [remoteUserId]: [`${remoteClientId}`],
-          };
-        }
-        break;
-      }
-
-      case CALL_MESSAGE_TYPE.GROUP_SETUP:
-      case CALL_MESSAGE_TYPE.HANGUP:
-      case CALL_MESSAGE_TYPE.PROP_SYNC:
-      case CALL_MESSAGE_TYPE.UPDATE: {
-        // Send to remote client that call is connected with
-        if (remoteClientId) {
-          precondition = true;
-          recipients = {
-            [remoteUserId]: [`${remoteClientId}`],
-          };
-        }
-        break;
-      }
-
-      case CALL_MESSAGE_TYPE.REJECT: {
-        // Send to all clients of self user
-        precondition = [this.selfUser.id];
-        recipients = {
-          [this.selfUser.id]: this.selfUser.devices().map(device => device.id),
-        };
-        break;
-      }
-
-      case CALL_MESSAGE_TYPE.SETUP: {
-        if (resp && remoteUserId) {
-          // Send to remote client that initiated call and all clients of self user
-          precondition = [this.selfUser.id];
-          recipients = {
-            [remoteUserId]: [`${remoteClientId}`],
-            [this.selfUser.id]: this.selfUser.devices().map(device => device.id),
-          };
-        }
-        break;
-      }
-    }
-
-    return {precondition, recipients};
-  }
-
-  //##############################################################################
-  // Helper functions
-  //##############################################################################
 
   /**
    * Leave a call we joined immediately in case the browser window is closed.
