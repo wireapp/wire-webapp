@@ -155,7 +155,7 @@ export class CallingRepository {
   }
 
   toggleSftCalling(enableSftCalling: boolean) {
-    this.useSftCalling(Boolean(this.supportsConferenceCalling && enableSftCalling));
+    this.useSftCalling(this.supportsConferenceCalling && enableSftCalling);
   }
 
   getStats(conversationId: ConversationId): Promise<{stats: RTCStatsReport; userid: UserId}[]> {
