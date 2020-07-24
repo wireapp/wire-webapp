@@ -17,7 +17,7 @@
  *
  */
 
-import {CALL_TYPE} from '@wireapp/avs';
+import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
 import {amplify} from 'amplify';
@@ -221,8 +221,8 @@ export class ListViewModel {
   };
 
   answerCall = (conversationEntity: Conversation): void => {
-    if (this.callingRepository.supportsConferenceCalling) {
-      const call = this.callingRepository.findCall(conversationEntity.id);
+    const call = this.callingRepository.findCall(conversationEntity.id);
+    if (call.conversationType === CONV_TYPE.CONFERENCE && this.callingRepository.supportsConferenceCalling) {
       if (call) {
         const callType = call.getSelfParticipant().sharesCamera() ? call.initialType : CALL_TYPE.NORMAL;
         this.callingRepository.answerCall(call, callType);

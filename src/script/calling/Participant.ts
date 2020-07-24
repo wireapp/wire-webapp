@@ -24,6 +24,12 @@ import {User} from '../entity/User';
 export type UserId = string;
 export type ClientId = string;
 
+export enum VideoFillMode {
+  UNSET,
+  CONTAIN,
+  COVER,
+}
+
 export class Participant {
   // Video
   public videoState: ko.Observable<number>;
@@ -36,6 +42,7 @@ export class Participant {
   // Audio
   public audioStream: ko.Observable<MediaStream | undefined>;
   public isMuted: ko.Observable<boolean>;
+  public videoFillMode: ko.Observable<VideoFillMode>;
 
   constructor(public user: User, public clientId: ClientId) {
     this.videoState = ko.observable(VIDEO_STATE.STOPPED);
@@ -54,6 +61,7 @@ export class Participant {
     this.videoStream = ko.observable();
     this.audioStream = ko.observable();
     this.isMuted = ko.observable(false);
+    this.videoFillMode = ko.observable(VideoFillMode.UNSET);
   }
 
   doesMatchIds = (userId: UserId, clientId: ClientId): boolean => userId === this.user.id && clientId === this.clientId;
