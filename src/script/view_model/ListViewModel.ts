@@ -222,18 +222,16 @@ export class ListViewModel {
 
   answerCall = (conversationEntity: Conversation): void => {
     const call = this.callingRepository.findCall(conversationEntity.id);
-    if (call.conversationType === CONV_TYPE.CONFERENCE && this.callingRepository.supportsConferenceCalling) {
-      if (call) {
-        const callType = call.getSelfParticipant().sharesCamera() ? call.initialType : CALL_TYPE.NORMAL;
-        this.callingRepository.answerCall(call, callType);
-      }
-    } else {
+    if (call.conversationType === CONV_TYPE.CONFERENCE && !this.callingRepository.supportsConferenceCalling) {
       amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
         text: {
           message: `${t('modalConferenceCallNotSupportedMessage')} ${t('modalConferenceCallNotSupportedJoinMessage')}`,
           title: t('modalConferenceCallNotSupportedHeadline'),
         },
       });
+    } else if (call) {
+      const callType = call.getSelfParticipant().sharesCamera() ? call.initialType : CALL_TYPE.NORMAL;
+      this.callingRepository.answerCall(call, callType);
     }
   };
 
