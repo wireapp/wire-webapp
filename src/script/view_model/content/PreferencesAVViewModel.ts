@@ -138,8 +138,8 @@ export class PreferencesAVViewModel {
     });
 
     this.optionSftCalling = ko.observable(false);
-    this.optionSftCalling.subscribe(sftCalling => {
-      this.propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.ENABLE_SFT_CALLING, sftCalling);
+    this.optionSftCalling.subscribe(enableSftCalling => {
+      this.propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.ENABLE_SFT_CALLING, enableSftCalling);
     });
 
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, this.updateProperties.bind(this));

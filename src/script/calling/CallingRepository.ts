@@ -98,7 +98,7 @@ export class CallingRepository {
   private readonly logger: Logger;
   private readonly callLog: string[];
   private readonly cbrEncoding: ko.Observable<number>;
-  private readonly sftCalling: ko.Observable<boolean>;
+  private readonly useSftCalling: ko.Observable<boolean>;
   private readonly acceptedVersionWarnings: ko.ObservableArray<string>;
   private readonly acceptVersionWarning: (conversationId: string) => void;
 
@@ -153,8 +153,8 @@ export class CallingRepository {
     this.cbrEncoding(vbrEnabled ? 0 : 1);
   }
 
-  toggleSftCalling(sftEnabled: boolean) {
-    this.sftCalling(Boolean(this.supportsConferenceCalling && sftEnabled));
+  toggleSftCalling(enableSftCalling: boolean) {
+    this.useSftCalling(Boolean(this.supportsConferenceCalling && enableSftCalling));
   }
 
   getStats(conversationId: ConversationId): Promise<{stats: RTCStatsReport; userid: UserId}[]> {
@@ -516,7 +516,7 @@ export class CallingRepository {
       const success = await loadPreviewPromise;
       if (success) {
         const conferenceCall =
-          conversationType === CONV_TYPE.GROUP && this.sftCalling() ? CONV_TYPE.CONFERENCE : conversationType;
+          conversationType === CONV_TYPE.GROUP && this.useSftCalling() ? CONV_TYPE.CONFERENCE : conversationType;
         this.wCall.start(this.wUser, conversationId, callType, conferenceCall, this.cbrEncoding());
       } else {
         this.showNoCameraModal();
