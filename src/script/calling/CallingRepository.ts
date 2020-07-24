@@ -98,6 +98,7 @@ export class CallingRepository {
   private readonly logger: Logger;
   private readonly callLog: string[];
   private readonly cbrEncoding: ko.Observable<number>;
+  private readonly sftCalling: ko.Observable<boolean>;
   private readonly acceptedVersionWarnings: ko.ObservableArray<string>;
   private readonly acceptVersionWarning: (conversationId: string) => void;
 
@@ -150,6 +151,10 @@ export class CallingRepository {
 
   toggleCbrEncoding(vbrEnabled: boolean) {
     this.cbrEncoding(vbrEnabled ? 0 : 1);
+  }
+
+  toggleSftCalling(sftEnabled: boolean) {
+    this.sftCalling(Boolean(this.supportsConferenceCalling && sftEnabled));
   }
 
   getStats(conversationId: ConversationId): Promise<{stats: RTCStatsReport; userid: UserId}[]> {
@@ -377,8 +382,10 @@ export class CallingRepository {
     amplify.subscribe(WebAppEvents.CALL.EVENT_FROM_BACKEND, this.onCallEvent.bind(this));
     amplify.subscribe(WebAppEvents.CALL.STATE.TOGGLE, this.toggleState.bind(this)); // This event needs to be kept, it is sent by the wrapper
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_VBR_ENCODING, this.toggleCbrEncoding.bind(this));
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_SFT_CALLING, this.toggleSftCalling.bind(this));
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, ({settings}: WebappProperties) => {
       this.toggleCbrEncoding(settings.call.enable_vbr_encoding);
+      this.toggleSftCalling(settings.call.enable_sft_calling);
     });
   }
 
@@ -508,7 +515,8 @@ export class CallingRepository {
           : Promise.resolve(true);
       const success = await loadPreviewPromise;
       if (success) {
-        const conferenceCall = conversationType === CONV_TYPE.GROUP ? CONV_TYPE.CONFERENCE : conversationType;
+        const conferenceCall =
+          conversationType === CONV_TYPE.GROUP && this.sftCalling() ? CONV_TYPE.CONFERENCE : conversationType;
         this.wCall.start(this.wUser, conversationId, callType, conferenceCall, this.cbrEncoding());
       } else {
         this.showNoCameraModal();
