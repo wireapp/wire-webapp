@@ -159,10 +159,6 @@ export class UserRepository {
       const contacts = this.isTeam() ? this.teamUsers() : this.connected_users();
       return contacts.filter(user_et => !user_et.isService).length;
     });
-    this.number_of_contacts.subscribe(number_of_contacts => {
-      amplify.publish(WebAppEvents.ANALYTICS.SUPER_PROPERTY, Segmantation.CONTACTS, number_of_contacts);
-    });
-
     amplify.subscribe(WebAppEvents.CLIENT.ADD, this.addClientToUser.bind(this));
     amplify.subscribe(WebAppEvents.CLIENT.REMOVE, this.removeClientFromUser.bind(this));
     amplify.subscribe(WebAppEvents.CLIENT.UPDATE, this.updateClientsFromUser.bind(this));

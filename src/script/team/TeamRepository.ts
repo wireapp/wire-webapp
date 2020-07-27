@@ -119,9 +119,6 @@ export class TeamRepository {
     this.supportsLegalHold = ko.observable(false);
 
     this.teamMembers.subscribe(() => this.userRepository.mapGuestStatus());
-    this.teamSize.subscribe(teamSize => {
-      amplify.publish(WebAppEvents.ANALYTICS.SUPER_PROPERTY, Segmantation.TEAM.SIZE, teamSize);
-    });
 
     this.userRepository.isTeam = this.isTeam;
     this.userRepository.teamMembers = this.teamMembers;
