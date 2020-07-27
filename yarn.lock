@@ -1128,6 +1128,11 @@
   dependencies:
     emojis-list "^3.0.0"
 
+"@formatjs/ts-transformer@^2.5.0":
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/@formatjs/ts-transformer/-/ts-transformer-2.5.0.tgz#2b450daacbfc4e226d3335273dc31f0900518075"
+  integrity sha512-a1aMJa8JMinXuEXhAa/s6yLZZy5dPuMl48dHqKZ4yHAEwF8SxlMm0yNDBRY9ytLHSDYfXytpEDiDZiezy5Fcew==
+
 "@hapi/address@2.x.x":
   version "2.1.4"
   resolved "https://registry.yarnpkg.com/@hapi/address/-/address-2.1.4.tgz#5d67ed43f3fd41a69d4b9ff7b56e7c0d1d0a81e5"
@@ -2851,19 +2856,20 @@ babel-plugin-macros@^2.0.0:
     cosmiconfig "^5.2.0"
     resolve "^1.10.0"
 
-babel-plugin-react-intl@7.8.2:
-  version "7.8.2"
-  resolved "https://registry.yarnpkg.com/babel-plugin-react-intl/-/babel-plugin-react-intl-7.8.2.tgz#83d23d7fed4057a86ef30772507a4ad8cbb6484a"
-  integrity sha512-NaCg2zmLxLX9yq6kXcu0EXYAyo1q1cNm0l7WiM3G4X6A5oIg7WF4AON9VAvCkSpqqM50uJ6BlUPP1RDslwWO4Q==
+babel-plugin-react-intl@7.9.1:
+  version "7.9.1"
+  resolved "https://registry.yarnpkg.com/babel-plugin-react-intl/-/babel-plugin-react-intl-7.9.1.tgz#ec16f4859f01a5a67269986f8f32dfaf5cd9bbd8"
+  integrity sha512-FKBOdz3V/TOE9XD5UrXFLc//EGB9+p35/5K1mfcTAas8z1RltxVNpwtEmHRrisqRBz7EWsPeo79lQdtnsK17Lg==
   dependencies:
     "@babel/core" "^7.9.0"
     "@babel/helper-plugin-utils" "^7.8.3"
     "@babel/types" "^7.9.5"
+    "@formatjs/ts-transformer" "^2.5.0"
     "@types/babel__core" "^7.1.7"
     "@types/fs-extra" "^9.0.1"
     "@types/schema-utils" "^2.4.0"
     fs-extra "^9.0.0"
-    intl-messageformat-parser "^5.3.5"
+    intl-messageformat-parser "^5.3.7"
     schema-utils "^2.6.6"
 
 babel-plugin-syntax-jsx@^6.18.0:
@@ -7211,7 +7217,7 @@ intl-format-cache@^4.3.1:
   resolved "https://registry.yarnpkg.com/intl-format-cache/-/intl-format-cache-4.3.1.tgz#484d31a9872161e6c02139349b259a6229ade377"
   integrity sha512-OEUYNA7D06agqPOYhbTkl0T8HA3QKSuwWh1HiClEnpd9vw7N+3XsQt5iZ0GUEchp5CW1fQk/tary+NsbF3yQ1Q==
 
-intl-messageformat-parser@^5.3.5, intl-messageformat-parser@^5.3.7:
+intl-messageformat-parser@^5.3.7:
   version "5.3.7"
   resolved "https://registry.yarnpkg.com/intl-messageformat-parser/-/intl-messageformat-parser-5.3.7.tgz#96d93cc1856048ee8e09193951f1e1ba69073204"
   integrity sha512-83C+eODXu/zfR35bKjSz/HKEGkNSHbsF1WOuZDgFs/TudaEuVIZ8pstQYFyY0CIuCGXomcSevrFW1d4y7nW5xw==
