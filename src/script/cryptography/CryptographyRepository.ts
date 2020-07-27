@@ -28,6 +28,7 @@ import {errors as ProteusErrors, keys as ProteusKeys} from '@wireapp/proteus';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import type {PreKey as BackendPreKey} from '@wireapp/api-client/dist/auth/';
+import * as HTTP_STATUS from 'http-status-codes';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {arrayToBase64, base64ToArray, zeroPadding} from 'Util/util';
@@ -36,7 +37,6 @@ import {CryptographyMapper} from './CryptographyMapper';
 import {Config} from '../Config';
 import {EventName} from '../tracking/EventName';
 import {ClientEntity} from '../client/ClientEntity';
-import {BackendClientError} from '../error/BackendClientError';
 import {CryptographyError} from '../error/CryptographyError';
 import {UserError} from '../error/UserError';
 import type {CryptographyService} from './CryptographyService';
@@ -170,7 +170,7 @@ export class CryptographyRepository {
       .getUserPreKeyByIds(userId, clientId)
       .then(response => response.prekey)
       .catch(error => {
-        const isNotFound = error.code === BackendClientError.STATUS_CODE.NOT_FOUND;
+        const isNotFound = error.code === HTTP_STATUS.NOT_FOUND;
         if (isNotFound) {
           throw new UserError(UserError.TYPE.PRE_KEY_NOT_FOUND, UserError.MESSAGE.PRE_KEY_NOT_FOUND);
         }
@@ -187,7 +187,7 @@ export class CryptographyRepository {
    */
   getUsersPreKeys(recipients: UserClients): Promise<UserPreKeyBundleMap> {
     return this.cryptographyService.getUsersPreKeys(recipients).catch(error => {
-      const isNotFound = error.code === BackendClientError.STATUS_CODE.NOT_FOUND;
+      const isNotFound = error.code === HTTP_STATUS.NOT_FOUND;
       if (isNotFound) {
         throw new UserError(UserError.TYPE.PRE_KEY_NOT_FOUND, UserError.MESSAGE.PRE_KEY_NOT_FOUND);
       }

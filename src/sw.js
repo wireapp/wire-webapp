@@ -21,6 +21,7 @@ import {skipWaiting, clientsClaim} from 'workbox-core';
 import {registerRoute} from 'workbox-routing';
 import {CacheFirst} from 'workbox-strategies';
 import {ExpirationPlugin} from 'workbox-expiration';
+import * as HTTP_STATUS from 'http-status-codes';
 
 skipWaiting();
 clientsClaim();
@@ -48,7 +49,7 @@ registerRoute(
   new CacheFirst({
     cacheName: ASSET_CACHE_NAME,
     cacheableResponse: {
-      statuses: [200],
+      statuses: [HTTP_STATUS.OK],
     },
     matchOptions: {
       ignoreSearch: true,

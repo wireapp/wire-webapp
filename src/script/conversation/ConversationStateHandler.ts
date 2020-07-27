@@ -20,10 +20,10 @@
 import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE} from '@wireapp/api-client/dist/conversation';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import * as HTTP_STATUS from 'http-status-codes';
 
 import {t} from 'Util/LocalizerUtil';
 
-import {BackendClientError} from '../error/BackendClientError';
 import {BackendEvent} from '../event/Backend';
 import {EventName} from '../tracking/EventName';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
@@ -102,7 +102,7 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
       .getConversationCode(conversationEntity.id)
       .then(response => this.conversationMapper.mapAccessCode(conversationEntity, response))
       .catch(error => {
-        const isNotFound = error.code === BackendClientError.STATUS_CODE.NOT_FOUND;
+        const isNotFound = error.code === HTTP_STATUS.NOT_FOUND;
         if (!isNotFound) {
           this._showModal(t('modalConversationGuestOptionsGetCodeMessage'));
         }

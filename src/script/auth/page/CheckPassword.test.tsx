@@ -33,6 +33,7 @@ import {TypeUtil} from '@wireapp/commons';
 import {ThunkDispatch} from 'redux-thunk';
 import {AnyAction} from 'redux';
 import {History} from 'history';
+import * as HTTP_STATUS from 'http-status-codes';
 
 class CheckPasswordPage {
   private readonly driver: ReactWrapper;
@@ -118,7 +119,7 @@ describe('CheckPassword', () => {
   });
 
   it('handles invalid credentials', async () => {
-    const error = new BackendError({code: 404, label: BackendError.LABEL.INVALID_CREDENTIALS});
+    const error = new BackendError({code: HTTP_STATUS.NOT_FOUND, label: BackendError.LABEL.INVALID_CREDENTIALS});
     spyOn(actionRoot.authAction, 'doLogin').and.returnValue(() => Promise.reject(error));
 
     const checkPasswordPage = new CheckPasswordPage(
@@ -156,7 +157,7 @@ describe('CheckPassword', () => {
     const history = createMemoryHistory();
     const historyPushSpy = spyOn(history, 'push');
 
-    const error = new BackendError({code: 404, label: BackendError.LABEL.TOO_MANY_CLIENTS});
+    const error = new BackendError({code: HTTP_STATUS.NOT_FOUND, label: BackendError.LABEL.TOO_MANY_CLIENTS});
     spyOn(actionRoot.authAction, 'doLogin').and.returnValue(() => Promise.reject(error));
 
     const checkPasswordPage = new CheckPasswordPage(
