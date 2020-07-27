@@ -176,6 +176,7 @@ export class EventTrackingRepository {
           ...segmentations,
           [Segmantation.APP]: EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE,
           [Segmantation.APP_VERSION]: Environment.version(false),
+          [Segmantation.IN_TEAM]: this.userRepository.isTeam(),
         },
       });
     }

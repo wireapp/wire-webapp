@@ -17,17 +17,11 @@
  *
  */
 
-/**
- * Enumeration of properties that should get send with every user tracking call.
- */
 export const Segmantation = {
   APP: 'app',
   APP_VERSION: 'app_version',
   CONTACTS: 'contacts',
   DESKTOP_APP: 'desktop_app',
-  TEAM: {
-    IN_TEAM: 'team.in_team',
-    SIZE: 'team.size',
-  },
+  IN_TEAM: 'in_team',
   WRAPPER_VERSION: 'wrapper_version',
 };
