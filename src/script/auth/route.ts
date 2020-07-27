@@ -26,6 +26,7 @@ export const QUERY_KEY = {
   CONVERSATION_KEY: 'join_key',
   CURRENCY: 'currency',
   DESTINATION_URL: 'destination_url',
+  ENABLE_SFT_CALLING: 'enable_sft_calling',
   ENVIRONMENT: 'env',
   IMMEDIATE_LOGIN: 'immediate_login',
   JOIN_EXPIRES: 'expires_in',

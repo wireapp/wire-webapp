@@ -64,6 +64,8 @@ import {ClientId, Participant, UserId} from './Participant';
 import type {Recipients} from '../cryptography/CryptographyRepository';
 import type {Conversation} from '../entity/Conversation';
 import {UserRepository} from '../user/UserRepository';
+import {UrlUtil} from '@wireapp/commons';
+import {QUERY_KEY} from '../auth/route';
 
 interface MediaStreamQuery {
   audio?: boolean;
@@ -143,7 +145,7 @@ export class CallingRepository {
     this.logger = getLogger('CallingRepository');
     this.callLog = [];
     this.cbrEncoding = ko.observable(0);
-    this.useSftCalling = ko.observable(false);
+    this.useSftCalling = ko.observable(UrlUtil.getURLParameter(QUERY_KEY.ENABLE_SFT_CALLING) === 'true');
 
     this.subscribeToEvents();
   }
@@ -153,7 +155,14 @@ export class CallingRepository {
   }
 
   toggleSftCalling(enableSftCalling: boolean) {
-    this.useSftCalling(this.supportsConferenceCalling && enableSftCalling);
+    const urlSetting = UrlUtil.getURLParameter(QUERY_KEY.ENABLE_SFT_CALLING);
+    if (urlSetting) {
+      this.logger.warn(
+        `URL config parameter "${QUERY_KEY.ENABLE_SFT_CALLING}" prevents setting SFT calling setting to "${enableSftCalling}" via backend properties.`,
+      );
+    } else {
+      this.useSftCalling(this.supportsConferenceCalling && enableSftCalling);
+    }
   }
 
   getStats(conversationId: ConversationId): Promise<{stats: RTCStatsReport; userid: UserId}[]> {
