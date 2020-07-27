@@ -146,3 +146,4 @@ Contributions are welcome! Feel free to check our [issues page](https://github.c
 The following commits will help you getting started quickly with our code base:
 
 - [Show a modal / pop-up](https://github.com/wireapp/wire-webapp/commit/00d3d120aacb3f36da80edd1ca829afc045331e9)
+- [Sync setting between via backend](https://github.com/wireapp/wire-webapp/commit/3e4595a208189b7b6b51935fd2c41a74bbd16994)
