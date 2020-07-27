@@ -76,6 +76,7 @@ export class PreferencesAVViewModel {
   willChangeMediaSource: WillChangeMediaSource;
   optionVbrEncoding: ko.Observable<boolean>;
   optionSftCalling: ko.Observable<boolean>;
+  supportsConferenceCalling: boolean;
 
   static get CONFIG() {
     return {
@@ -121,6 +122,7 @@ export class PreferencesAVViewModel {
     this.hasVideoTrack = ko.observable(false);
     this.hasNoneOrOneAudioInput = ko.pureComputed(() => this.availableDevices.audioInput().length < 2);
     this.hasNoneOrOneVideoInput = ko.pureComputed(() => this.availableDevices.videoInput().length < 2);
+    this.supportsConferenceCalling = callingRepository.supportsConferenceCalling;
 
     const selfUser = this.userRepository.self;
     this.isTemporaryGuest = ko.pureComputed(() => selfUser() && selfUser().isTemporaryGuest());
