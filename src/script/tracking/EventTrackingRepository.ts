@@ -22,7 +22,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Environment} from 'Util/Environment';
 import {getLogger, Logger} from 'Util/Logger';
-import {includesString} from 'Util/StringUtil';
+import {includesString, bytesToHex} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {getParameter} from 'Util/UrlUtil';
 
@@ -32,7 +32,6 @@ import type {UserRepository} from '../user/UserRepository';
 import {EventName} from './EventName';
 import {Segmantation} from './Segmentation';
 import {RaygunStatic} from 'raygun4js';
-import {createRandomUuid} from 'Util/util';
 
 declare const Raygun: RaygunStatic;
 
@@ -55,7 +54,7 @@ export class EventTrackingRepository {
       USER_ANALYTICS: {
         API_KEY: window.wire.env.ANALYTICS_API_KEY,
         CLIENT_TYPE: 'desktop',
-        DISABLED_DOMAINS: ['localhost', 'zinfra.io'],
+        DISABLED_DOMAINS: ['localhost'],
         DISABLED_EVENTS: [EventName.TELEMETRY.APP_INITIALIZATION],
       },
     };
@@ -116,12 +115,18 @@ export class EventTrackingRepository {
   }
 
   private async startProductReporting(): Promise<void> {
+    // Info: Always deactivate product reporting for now.
     this.isProductReportingActivated = true;
+    const encoder = new TextEncoder();
+    const user_id = (await this.userRepository.getSelf()).id;
+    const data = encoder.encode(user_id);
+    const digest = await window.crypto.subtle.digest('SHA-256', data);
+    const hash = bytesToHex([...new Uint8Array(digest)]);
 
     Countly.init({
       app_key: window.wire.env.COUNTLY_API_KEY,
       debug: !Environment.frontend.isProduction(),
-      device_id: createRandomUuid(),
+      device_id: hash,
       url: 'https://wire.count.ly/',
       use_session_cookie: false,
     });
@@ -144,7 +149,7 @@ export class EventTrackingRepository {
   }
 
   private stopProductReportingSession(): void {
-    if (this.isProductReportingActivated) {
+    if (this.isProductReportingActivated === true) {
       Countly.end_session();
     }
   }
@@ -158,18 +163,22 @@ export class EventTrackingRepository {
   }
 
   private startProductReportingSession(): void {
-    Countly.begin_session();
+    if (this.isProductReportingActivated === true) {
+      Countly.begin_session();
+    }
   }
 
   private trackProductReportingEvent(eventName: string, segmentations?: any): void {
-    Countly.add_event({
-      key: eventName,
-      segmentation: {
-        ...segmentations,
-        [Segmantation.APP]: EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE,
-        [Segmantation.APP_VERSION]: Environment.version(false),
-      },
-    });
+    if (this.isProductReportingActivated === true) {
+      Countly.add_event({
+        key: eventName,
+        segmentation: {
+          ...segmentations,
+          [Segmantation.APP]: EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE,
+          [Segmantation.APP_VERSION]: Environment.version(false),
+        },
+      });
+    }
   }
 
   private unsubscribeFromProductTrackingEvents(): void {
