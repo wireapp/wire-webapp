@@ -29,6 +29,7 @@ import {CallingViewModel} from './CallingViewModel';
 import {ActionsViewModel} from './ActionsViewModel';
 import {ListViewModel} from './ListViewModel';
 import {FaviconViewModel} from './FaviconViewModel';
+import {ImageDetailViewViewModel} from './ImageDetailViewViewModel';
 
 export class MainViewModel {
   static get CONFIG() {
@@ -96,7 +97,7 @@ export class MainViewModel {
     this.content = new ContentViewModel(this, repositories);
     this.list = new ListViewModel(this, repositories);
 
-    this.lightbox = new z.viewModel.ImageDetailViewViewModel(this, repositories);
+    this.lightbox = new ImageDetailViewViewModel(this, repositories.conversation, repositories.asset);
     this.title = new WindowTitleViewModel(this, repositories.user, repositories.conversation);
     this.favicon = new FaviconViewModel(amplify);
     this.warnings = new WarningsViewModel();
