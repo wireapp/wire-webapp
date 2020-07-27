@@ -159,7 +159,7 @@ export class AVSHandler extends MessageHandler {
     wCall: Wcall,
     selfUserId: string,
     selfClientId: string,
-    callPrticipantChangedHandler: WcallParticipantChangedHandler = () => {},
+    callParticipantChangedHandler?: WcallParticipantChangedHandler,
   ): number => {
     /* cspell:disable */
     const wUser = wCall.create(
@@ -179,7 +179,10 @@ export class AVSHandler extends MessageHandler {
       () => {}, // vstateh
     );
 
-    wCall.setParticipantChangedHandler(wUser, callPrticipantChangedHandler);
+    if (callParticipantChangedHandler) {
+      wCall.setParticipantChangedHandler(wUser, callParticipantChangedHandler);
+    }
+
     return wUser;
   };
 
