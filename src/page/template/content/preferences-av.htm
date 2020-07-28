@@ -135,8 +135,8 @@
       <header class="preferences-header" data-bind="text: t('preferencesOptionsEnableBetaProgramConferenceCalls')"></header>
       <div class="preferences-option">
         <div class="preferences-option-icon checkbox accent-text" data-bind="attr: {'data-uie-value': optionSftCalling}" data-uie-name="status-preference-beta-program">
-          <input type="checkbox" id="beta-program-checkbox" data-bind="checked: optionSftCalling">
-          <label class="preferences-options-checkbox-label" for="beta-program-checkbox" data-bind="text: t('preferencesOptionsEnableBetaProgramCheckbox')"></label>
+          <input type="checkbox" id="beta-program-checkbox" data-bind="attr: {checked: optionSftCalling, disabled: supportsConferenceCalling === false}">
+          <label class="preferences-options-checkbox-label" for="beta-program-checkbox" data-bind="css: {'disabled': supportsConferenceCalling === false}, text: t('preferencesOptionsEnableBetaProgramCheckbox')"></label>
         </div>
       </div>
       <div class="preferences-detail">
