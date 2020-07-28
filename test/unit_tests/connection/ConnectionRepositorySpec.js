@@ -19,6 +19,7 @@
 
 import {ConnectionStatus} from '@wireapp/api-client/dist/connection';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import * as HTTP_STATUS from 'http-status-codes';
 
 import {createRandomUuid} from 'Util/util';
 
@@ -106,13 +107,13 @@ describe('ConnectionRepository', () => {
     // [update 16/08/2018] flaky test reenabled (on probation). Could be removed if fails again
     it('should return the connected users', () => {
       server.respondWith('GET', `${Config.getConfig().BACKEND_REST}/connections?size=500`, [
-        200,
+        HTTP_STATUS.OK,
         {'Content-Type': 'application/json'},
         JSON.stringify(payload.connections.get),
       ]);
 
       server.respondWith('GET', `${Config.getConfig().BACKEND_REST}/users?ids=${entities.user.jane_roe.id}`, [
-        200,
+        HTTP_STATUS.OK,
         {'Content-Type': 'application/json'},
         JSON.stringify(payload.users.get.many),
       ]);

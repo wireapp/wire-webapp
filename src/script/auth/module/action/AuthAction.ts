@@ -24,6 +24,7 @@ import type {Account} from '@wireapp/core';
 import type {CRUDEngine} from '@wireapp/store-engine';
 import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
 import {LowDiskSpaceError} from '@wireapp/store-engine/dist/commonjs/engine/error/';
+import * as HTTP_STATUS from 'http-status-codes';
 
 import {isTemporaryClientAndNonPersistent, noop} from 'Util/util';
 import {currentCurrency, currentLanguage} from '../../localeConfig';
@@ -152,13 +153,19 @@ export class AuthAction {
     return async (dispatch, getState, {apiClient}) => {
       const mapError = (error: any) => {
         const statusCode = error?.response?.status;
-        if (statusCode === 404) {
-          return new BackendError({code: 404, label: BackendError.SSO_ERRORS.SSO_NOT_FOUND});
+        if (statusCode === HTTP_STATUS.NOT_FOUND) {
+          return new BackendError({code: HTTP_STATUS.NOT_FOUND, label: BackendError.SSO_ERRORS.SSO_NOT_FOUND});
         }
-        if (statusCode >= 500) {
-          return new BackendError({code: 500, label: BackendError.SSO_ERRORS.SSO_SERVER_ERROR});
+        if (statusCode >= HTTP_STATUS.INTERNAL_SERVER_ERROR) {
+          return new BackendError({
+            code: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+            label: BackendError.SSO_ERRORS.SSO_SERVER_ERROR,
+          });
         }
-        return new BackendError({code: 500, label: BackendError.SSO_ERRORS.SSO_GENERIC_ERROR});
+        return new BackendError({
+          code: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+          label: BackendError.SSO_ERRORS.SSO_GENERIC_ERROR,
+        });
       };
 
       try {
