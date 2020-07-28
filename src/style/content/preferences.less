@@ -103,6 +103,14 @@
 .preferences-option {
   display: flex;
   margin-bottom: 16px;
+
+  input:disabled {
+    &,
+    & + label {
+      cursor: default;
+      opacity: 0.5;
+    }
+  }
 }
 
 .preferences-option-pointer {
