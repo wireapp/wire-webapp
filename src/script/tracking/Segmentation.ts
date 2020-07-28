@@ -18,10 +18,20 @@
  */
 
 export const Segmantation = {
-  APP: 'app',
-  APP_VERSION: 'app_version',
-  CONTACTS: 'contacts',
-  DESKTOP_APP: 'desktop_app',
-  IN_TEAM: 'in_team',
-  WRAPPER_VERSION: 'wrapper_version',
+  CONVERSATION: {
+    ALLOW_GUESTS: 'conversation_allow_guests',
+    EPHEMERAL_MESSAGE: 'conversation_ephemeral_message',
+    GUESTS: 'conversation_guests',
+    SERVICES: 'conversation_services',
+    SIZE: 'conversation_size',
+    TYPE: 'conversation_type',
+    WIRELESS_GUESTS: 'conversation_wireless_guests',
+  },
+  MESSAGE: {
+    ACTION: 'message_action',
+    EPHEMERAL_EXPIRATION: 'message_ephemeral_expiration',
+    IS_EPHEMERAL_MESSAGE: 'message_is_ephemeral_message',
+    IS_REPLY: 'message_is_reply',
+    MENTION: 'message_mention',
+  },
 };

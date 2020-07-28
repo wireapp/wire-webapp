@@ -114,6 +114,7 @@ import * as LegalHoldEvaluator from '../legal-hold/LegalHoldEvaluator';
 import {DeleteConversationMessage} from '../entity/message/DeleteConversationMessage';
 import {ConversationRoleRepository} from './ConversationRoleRepository';
 import {ConversationError} from '../error/ConversationError';
+import {Segmantation} from '../tracking/Segmentation';
 
 // Conversation repository for all conversation interactions with the conversation service
 export class ConversationRepository {
@@ -4310,18 +4311,18 @@ export class ConversationRepository {
 
     if (actionType) {
       let segmentations = {
-        conversation_allow_guests: '',
-        conversation_ephemeral_message: !!conversationEntity.globalMessageTimer(),
-        conversation_guests: conversationEntity.hasGuest(),
-        conversation_services: conversationEntity.hasService(),
-        conversation_size: '',
-        conversation_type: trackingHelpers.getConversationType(conversationEntity),
-        conversation_wireless_guests: '',
-        message_action: actionType,
-        message_ephemeral_expiration: isEphemeral ? messageTimer : undefined,
-        message_is_ephemeral_message: isEphemeral,
-        message_is_reply: '',
-        message_mention: numberOfMentions,
+        [Segmantation.CONVERSATION.ALLOW_GUESTS]: '',
+        [Segmantation.CONVERSATION.EPHEMERAL_MESSAGE]: !!conversationEntity.globalMessageTimer(),
+        [Segmantation.CONVERSATION.GUESTS]: conversationEntity.hasGuest(),
+        [Segmantation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
+        [Segmantation.CONVERSATION.SIZE]: '',
+        [Segmantation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
+        [Segmantation.CONVERSATION.WIRELESS_GUESTS]: '',
+        [Segmantation.MESSAGE.ACTION]: actionType,
+        [Segmantation.MESSAGE.EPHEMERAL_EXPIRATION]: isEphemeral ? messageTimer : undefined,
+        [Segmantation.MESSAGE.IS_EPHEMERAL_MESSAGE]: isEphemeral,
+        [Segmantation.MESSAGE.IS_REPLY]: '',
+        [Segmantation.MESSAGE.MENTION]: numberOfMentions,
       };
       const isTeamConversation = !!conversationEntity.team_id;
       if (isTeamConversation) {

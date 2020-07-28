@@ -30,7 +30,6 @@ import {URLParameter} from '../auth/URLParameter';
 
 import type {UserRepository} from '../user/UserRepository';
 import {EventName} from './EventName';
-import {Segmantation} from './Segmentation';
 import {RaygunStatic} from 'raygun4js';
 import {UserData} from './UserData';
 
