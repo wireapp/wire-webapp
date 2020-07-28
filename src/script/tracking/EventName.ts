@@ -61,7 +61,4 @@ export const EventName = {
     OPTED_IN_TRACKING: 'settings.opted_in_tracking',
     OPTED_OUT_TRACKING: 'settings.opted_out_tracking',
   },
-  TELEMETRY: {
-    APP_INITIALIZATION: 'telemetry.app_initialization',
-  },
 };

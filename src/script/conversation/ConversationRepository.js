@@ -4310,15 +4310,19 @@ export class ConversationRepository {
 
     if (actionType) {
       let segmentations = {
-        action: actionType,
+        conversation_allow_guests: '',
+        conversation_ephemeral_message: !!conversationEntity.globalMessageTimer(),
+        conversation_guests: conversationEntity.hasGuest(),
+        conversation_services: conversationEntity.hasService(),
+        conversation_size: '',
         conversation_type: trackingHelpers.getConversationType(conversationEntity),
-        ephemeral_time: isEphemeral ? messageTimer : undefined,
-        is_ephemeral: isEphemeral,
-        is_global_ephemeral: !!conversationEntity.globalMessageTimer(),
-        mention_num: numberOfMentions,
-        with_service: conversationEntity.hasService(),
+        conversation_wireless_guests: '',
+        message_action: actionType,
+        message_ephemeral_expiration: isEphemeral ? messageTimer : undefined,
+        message_is_ephemeral_message: isEphemeral,
+        message_is_reply: '',
+        message_mention: numberOfMentions,
       };
-
       const isTeamConversation = !!conversationEntity.team_id;
       if (isTeamConversation) {
         segmentations = {...segmentations, ...trackingHelpers.getGuestAttributes(conversationEntity)};

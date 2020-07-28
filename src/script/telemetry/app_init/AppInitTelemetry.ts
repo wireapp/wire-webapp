@@ -61,8 +61,6 @@ export class AppInitTelemetry {
     this.logger.info(`App version '${segmentations.app_version}' initialized within ${segmentations.loading_time}s`);
     this.logStatistics();
     this.logTimings();
-
-    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.TELEMETRY.APP_INITIALIZATION, segmentations);
   }
 
   timeStep(step: AppInitTimingsStep): void {
