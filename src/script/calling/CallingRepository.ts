@@ -733,7 +733,7 @@ export class CallingRepository {
       const recipients = this.mapTargets(parsedTargets);
       options = {
         nativePush: true,
-        precondition: false,
+        precondition: true,
         recipients,
       };
     }

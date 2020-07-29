@@ -105,7 +105,14 @@ export class CallingViewModel {
     this.selfUser = selfUser;
     this.isSelfVerified = ko.pureComputed(() => selfUser().is_verified());
     this.activeCalls = ko.pureComputed(() =>
-      callingRepository.activeCalls().filter(call => call.reason() !== CALL_REASON.ANSWERED_ELSEWHERE),
+      callingRepository.activeCalls().filter(call => {
+        const conversation = this.conversationRepository.find_conversation_by_id(call.conversationId);
+        if (!conversation || conversation.removed_from_conversation()) {
+          return false;
+        }
+
+        return call.reason() !== CALL_REASON.ANSWERED_ELSEWHERE;
+      }),
     );
     this.selectableScreens = ko.observable([]);
     this.selectableWindows = ko.observable([]);
