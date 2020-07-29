@@ -141,7 +141,9 @@
       </div>
       <div class="preferences-detail">
         <span data-bind="text: t('preferencesOptionsEnableBetaProgramDetails')"></span>
-        <span class="preferences-detail-bold" data-bind="text: t('preferencesOptionsEnableBetaProgramDetailsDisabled')"></span>
+        <!-- ko ifnot: supportsConferenceCalling -->
+          <span class="preferences-detail-bold" data-bind="text: t('preferencesOptionsEnableBetaProgramDetailsDisabled')"></span>
+        <!-- /ko -->  
       </div>
     </section>
   </div>
