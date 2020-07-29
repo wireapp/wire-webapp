@@ -22,6 +22,7 @@ import type {ObservableArray} from 'knockout';
 import sodium from 'libsodium-wrappers-sumo';
 import UUID from 'uuidjs';
 import {UrlUtil} from '@wireapp/commons';
+import * as HTTP_STATUS from 'http-status-codes';
 
 import {QUERY_KEY} from '../auth/route';
 import {Config} from '../Config';
@@ -118,7 +119,7 @@ export const loadUrlBuffer = (
     xhr.responseType = 'arraybuffer';
 
     xhr.onload = () => {
-      const isStatusOK = xhr.status === 200;
+      const isStatusOK = xhr.status === HTTP_STATUS.OK;
       return isStatusOK
         ? resolve({buffer: xhr.response, mimeType: xhr.getResponseHeader('content-type')})
         : reject(new Error(xhr.status.toString(10)));
