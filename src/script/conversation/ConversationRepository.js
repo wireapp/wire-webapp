@@ -2585,7 +2585,7 @@ export class ConversationRepository {
         });
       })
       .catch(error => {
-        const isRequestTooLarge = error?.code === HTTP_STATUS.REQUEST_TOO_LARGE;
+        const isRequestTooLarge = error?.code === HTTP_STATUS.REQUEST_TOO_LONG;
         if (isRequestTooLarge) {
           return this._sendExternalGenericMessage(eventInfoEntity);
         }
