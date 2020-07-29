@@ -17,14 +17,10 @@
  *
  */
 
-import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {Logger, getLogger} from 'Util/Logger';
 
 import {AppInitStatistics, AppStatistics} from './AppInitStatistics';
 import {AppInitTimings} from './AppInitTimings';
-import {EventName} from '../../tracking/EventName';
 import type {AppInitStatisticsValue} from './AppInitStatisticsValue';
 import type {AppInitTimingsStep} from './AppInitTimingsStep';
 

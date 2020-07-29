@@ -24,6 +24,7 @@ import ko from 'knockout';
 
 import {Logger, getLogger} from 'Util/Logger';
 
+import * as trackingHelpers from '../tracking/Helpers';
 import {AudioType} from '../audio/AudioType';
 import type {Call} from '../calling/Call';
 import type {CallingRepository} from '../calling/CallingRepository';
@@ -41,6 +42,7 @@ import type {Multitasking} from '../notification/NotificationRepository';
 import 'Components/calling/chooseScreen';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {EventName} from '../tracking/EventName';
+import {Segmantation} from '../tracking/Segmentation';
 
 export interface CallActions {
   answer: (call: Call) => void;
@@ -134,7 +136,18 @@ export class CallingViewModel {
     };
 
     const startCall = (conversationEntity: Conversation, callType: CALL_TYPE): void => {
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.INITIATED_CALL, {callType});
+      const segmentations = {
+        [Segmantation.CALL.VIDEO]: callType === CALL_TYPE.VIDEO,
+        [Segmantation.CONVERSATION.ALLOW_GUESTS]: '',
+        [Segmantation.CONVERSATION.EPHEMERAL_MESSAGE]: !!conversationEntity.globalMessageTimer(),
+        [Segmantation.CONVERSATION.GUESTS]: conversationEntity.hasGuest(),
+        [Segmantation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
+        [Segmantation.CONVERSATION.SIZE]: '',
+        [Segmantation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
+        [Segmantation.CONVERSATION.WIRELESS_GUESTS]: '',
+      };
+
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.INITIATED_CALL, segmentations);
       const convType = conversationEntity.isGroup() ? CONV_TYPE.GROUP : CONV_TYPE.ONEONONE;
       this.callingRepository.startCall(conversationEntity.id, convType, callType).then(call => {
         if (!call) {
@@ -149,7 +162,18 @@ export class CallingViewModel {
       if (shouldRing) {
         ring(call);
       }
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.RECIEVED_CALL);
+      const conversationEntity = this.conversationRepository.find_conversation_by_id(call.conversationId);
+      const segmentations = {
+        [Segmantation.CALL.VIDEO]: call.initialType === CALL_TYPE.VIDEO,
+        [Segmantation.CONVERSATION.ALLOW_GUESTS]: '',
+        [Segmantation.CONVERSATION.EPHEMERAL_MESSAGE]: !!conversationEntity.globalMessageTimer(),
+        [Segmantation.CONVERSATION.GUESTS]: conversationEntity.hasGuest(),
+        [Segmantation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
+        [Segmantation.CONVERSATION.SIZE]: '',
+        [Segmantation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
+        [Segmantation.CONVERSATION.WIRELESS_GUESTS]: '',
+      };
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.RECIEVED_CALL, segmentations);
     });
 
     this.callActions = {

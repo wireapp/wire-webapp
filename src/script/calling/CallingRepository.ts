@@ -68,6 +68,8 @@ import type {Recipients} from '../cryptography/CryptographyRepository';
 import type {Conversation} from '../entity/Conversation';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {EventName} from '../tracking/EventName';
+import {Segmantation} from '../tracking/Segmentation';
+import * as trackingHelpers from '../tracking/Helpers';
 
 interface MediaStreamQuery {
   audio?: boolean;
@@ -546,7 +548,21 @@ export class CallingRepository {
         }
         return this.warmupMediaStreams(call, true, isVideoCall).then(() => {
           this.wCall.answer(this.wUser, call.conversationId, callType, this.cbrEncoding());
-          amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.JOINED_CALL, {callType});
+
+          const conversationEntity = this.conversationRepository.find_conversation_by_id(call.conversationId);
+          const segmentations = {
+            [Segmantation.CALL.DIRECTION]: '',
+            [Segmantation.CALL.VIDEO]: callType === CALL_TYPE.VIDEO,
+            [Segmantation.CONVERSATION.ALLOW_GUESTS]: '',
+            [Segmantation.CONVERSATION.EPHEMERAL_MESSAGE]: !!conversationEntity.globalMessageTimer(),
+            [Segmantation.CONVERSATION.GUESTS]: conversationEntity.hasGuest(),
+            [Segmantation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
+            [Segmantation.CONVERSATION.SIZE]: '',
+            [Segmantation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
+            [Segmantation.CONVERSATION.WIRELESS_GUESTS]: '',
+          };
+
+          amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.JOINED_CALL, segmentations);
         });
       })
       .catch(() => {
@@ -711,7 +727,26 @@ export class CallingRepository {
       return;
     }
     const stillActiveState = [REASON.STILL_ONGOING, REASON.ANSWERED_ELSEWHERE];
-    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.ENDED_CALL, {reason, stillActiveState});
+
+    const conversationEntity = this.conversationRepository.find_conversation_by_id(call.conversationId);
+    const segmentations = {
+      [Segmantation.CALL.AV_SWITCH_TOGGLE]: '',
+      [Segmantation.CALL.DIRECTION]: call.state(),
+      [Segmantation.CALL.DURATION]: '',
+      [Segmantation.CALL.END_REASON]: reason,
+      [Segmantation.CALL.PARTICIPANTS]: call.participants().length,
+      [Segmantation.CALL.SCREEN_SHARE]: '',
+      [Segmantation.CALL.SETUP_TIME]: '',
+      [Segmantation.CALL.VIDEO]: call.initialType === CALL_TYPE.VIDEO,
+      [Segmantation.CONVERSATION.ALLOW_GUESTS]: '',
+      [Segmantation.CONVERSATION.EPHEMERAL_MESSAGE]: !!conversationEntity.globalMessageTimer(),
+      [Segmantation.CONVERSATION.GUESTS]: conversationEntity.hasGuest(),
+      [Segmantation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
+      [Segmantation.CONVERSATION.SIZE]: '',
+      [Segmantation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
+      [Segmantation.CONVERSATION.WIRELESS_GUESTS]: '',
+    };
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.ENDED_CALL, segmentations);
     if (!stillActiveState.includes(reason)) {
       this.injectDeactivateEvent(
         call.conversationId,
@@ -783,7 +818,21 @@ export class CallingRepository {
 
     switch (state) {
       case CALL_STATE.MEDIA_ESTAB:
-        amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.ESTABLISHED_CALL, {state});
+        const conversationEntity = this.conversationRepository.find_conversation_by_id(call.conversationId);
+        const segmentations = {
+          [Segmantation.CALL.DIRECTION]: call.state(),
+          [Segmantation.CALL.SETUP_TIME]: '',
+          [Segmantation.CALL.VIDEO]: call.initialType === CALL_TYPE.VIDEO,
+          [Segmantation.CONVERSATION.ALLOW_GUESTS]: '',
+          [Segmantation.CONVERSATION.EPHEMERAL_MESSAGE]: !!conversationEntity.globalMessageTimer(),
+          [Segmantation.CONVERSATION.GUESTS]: conversationEntity.hasGuest(),
+          [Segmantation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
+          [Segmantation.CONVERSATION.SIZE]: '',
+          [Segmantation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
+          [Segmantation.CONVERSATION.WIRELESS_GUESTS]: '',
+        };
+
+        amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.ESTABLISHED_CALL, segmentations);
         call.startedAt(Date.now());
         break;
     }

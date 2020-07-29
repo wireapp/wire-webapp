@@ -18,6 +18,16 @@
  */
 
 export const Segmantation = {
+  CALL: {
+    AV_SWITCH_TOGGLE: 'call_av_switch_toggle',
+    DIRECTION: 'call_direction',
+    DURATION: 'call_duration',
+    END_REASON: 'call_end_reason',
+    PARTICIPANTS: 'call_participants',
+    SCREEN_SHARE: 'call_screen_share',
+    SETUP_TIME: 'call_setup_time',
+    VIDEO: 'call_video',
+  },
   CONVERSATION: {
     ALLOW_GUESTS: 'conversation_allow_guests',
     EPHEMERAL_MESSAGE: 'conversation_ephemeral_message',
