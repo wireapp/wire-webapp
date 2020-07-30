@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# 1.1.0 (2020-07-30)
+
+
+### Features
+
+* **react-ui-kit:** Non-Uppercase input placeholders ([#3104](https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config/issues/3104)) ([3cb08f8](https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config/commit/3cb08f8e208aba42ab01850cc05521037f3d3794))
+
+
+
+
+
 ## [1.0.13](https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config/compare/@wireapp/copy-config@1.0.12...@wireapp/copy-config@1.0.13) (2020-06-29)
 
 **Note:** Version bump only for package @wireapp/copy-config

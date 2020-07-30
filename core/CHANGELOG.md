@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [16.10.23](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@16.10.22...@wireapp/core@16.10.23) (2020-07-30)
+
+**Note:** Version bump only for package @wireapp/core
+
+
+
+
+
 ## [16.10.22](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@16.10.21...@wireapp/core@16.10.22) (2020-07-21)
 
 **Note:** Version bump only for package @wireapp/core

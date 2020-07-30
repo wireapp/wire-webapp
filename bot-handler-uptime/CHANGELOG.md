@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.18](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-uptime/compare/@wireapp/bot-handler-uptime@0.1.17...@wireapp/bot-handler-uptime@0.1.18) (2020-07-30)
+
+
+### Bug Fixes
+
+* **bot-handler-uptime:** Prevent type error when importing moment ([#3142](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-uptime/issues/3142)) ([48f6510](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-uptime/commit/48f651090a14f3718419122f99f7bf2a8367287c))
+
+
+
+
+
 ## [0.1.17](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-uptime/compare/@wireapp/bot-handler-uptime@0.1.16...@wireapp/bot-handler-uptime@0.1.17) (2020-07-21)
 
 **Note:** Version bump only for package @wireapp/bot-handler-uptime
