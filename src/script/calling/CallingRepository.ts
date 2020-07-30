@@ -372,7 +372,7 @@ export class CallingRepository {
   get supportsConferenceCalling(): boolean {
     const supportsEncodedStreams = RTCRtpSender.prototype.hasOwnProperty('createEncodedStreams');
     const supportsEncodedVideoStreams = RTCRtpSender.prototype.hasOwnProperty('createEncodedVideoStreams');
-    return supportsEncodedStreams && supportsEncodedVideoStreams;
+    return supportsEncodedStreams || supportsEncodedVideoStreams;
   }
 
   /**
