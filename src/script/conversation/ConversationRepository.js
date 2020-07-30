@@ -43,6 +43,7 @@ import {RequestCancellationError} from '@wireapp/api-client/dist/user';
 import {DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/dist/conversation';
 import {ReactionType} from '@wireapp/core/dist/conversation';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import * as HTTP_STATUS from 'http-status-codes';
 
 import {getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -459,7 +460,7 @@ export class ConversationRepository {
         return conversationEntity;
       })
       .catch(originalError => {
-        if (originalError.code === BackendClientError.STATUS_CODE.NOT_FOUND) {
+        if (originalError.code === HTTP_STATUS.NOT_FOUND) {
           this.deleteConversationLocally(conversationId);
         }
         const error = new ConversationError(
@@ -1153,7 +1154,7 @@ export class ConversationRepository {
         try {
           await this.conversation_service.get_conversation_by_id(conversation.id);
         } catch ({code}) {
-          if (code === BackendClientError.STATUS_CODE.NOT_FOUND) {
+          if (code === HTTP_STATUS.NOT_FOUND) {
             this.deleteConversationLocally(conversation.id, true);
           }
         }
@@ -1715,7 +1716,7 @@ export class ConversationRepository {
           const logMessage = `Failed to change archived state of '${conversationId}' to '${newState}': ${error.code}`;
           this.logger.error(logMessage);
 
-          const isNotFound = error.code === BackendClientError.STATUS_CODE.NOT_FOUND;
+          const isNotFound = error.code === HTTP_STATUS.NOT_FOUND;
           if (!isNotFound) {
             throw error;
           }
@@ -2424,7 +2425,7 @@ export class ConversationRepository {
    * @param {string} conversation_id Conversation ID
    * @param {boolean} [skip_own_clients=false] True, if other own clients should be skipped (to not sync messages on own clients)
    * @param {Array<string>} user_ids Optionally the intended recipient users
-   * @returns {Promise} Resolves with a user client map
+   * @returns {Promise<Recipients>} Resolves with a user client map
    */
   create_recipients(conversation_id, skip_own_clients = false, user_ids) {
     return this.get_all_users_in_conversation(conversation_id).then(user_ets => {
@@ -2584,7 +2585,7 @@ export class ConversationRepository {
         });
       })
       .catch(error => {
-        const isRequestTooLarge = error?.code === BackendClientError.STATUS_CODE.REQUEST_TOO_LARGE;
+        const isRequestTooLarge = error?.code === HTTP_STATUS.REQUEST_TOO_LONG;
         if (isRequestTooLarge) {
           return this._sendExternalGenericMessage(eventInfoEntity);
         }
@@ -3056,7 +3057,7 @@ export class ConversationRepository {
         return this._delete_message_by_id(conversationEntity, messageId);
       })
       .catch(error => {
-        const isConversationNotFound = error.code === BackendClientError.STATUS_CODE.NOT_FOUND;
+        const isConversationNotFound = error.code === HTTP_STATUS.NOT_FOUND;
         if (isConversationNotFound) {
           this.logger.warn(`Conversation '${conversationId}' not found. Deleting message for self user only.`);
           return this.deleteMessage(conversationEntity, messageEntity);

@@ -105,7 +105,14 @@ export class CallingViewModel {
     this.selfUser = selfUser;
     this.isSelfVerified = ko.pureComputed(() => selfUser().is_verified());
     this.activeCalls = ko.pureComputed(() =>
-      callingRepository.activeCalls().filter(call => call.reason() !== CALL_REASON.ANSWERED_ELSEWHERE),
+      callingRepository.activeCalls().filter(call => {
+        const conversation = this.conversationRepository.find_conversation_by_id(call.conversationId);
+        if (!conversation || conversation.removed_from_conversation()) {
+          return false;
+        }
+
+        return call.reason() !== CALL_REASON.ANSWERED_ELSEWHERE;
+      }),
     );
     this.selectableScreens = ko.observable([]);
     this.selectableWindows = ko.observable([]);
@@ -158,10 +165,7 @@ export class CallingViewModel {
 
     this.callActions = {
       answer: (call: Call) => {
-        if (call.conversationType === CONV_TYPE.CONFERENCE && this.callingRepository.supportsConferenceCalling) {
-          const callType = call.getSelfParticipant().sharesCamera() ? call.initialType : CALL_TYPE.NORMAL;
-          this.callingRepository.answerCall(call, callType);
-        } else {
+        if (call.conversationType === CONV_TYPE.CONFERENCE && !this.callingRepository.supportsConferenceCalling) {
           amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
             primaryAction: {
               action: () => {
@@ -175,6 +179,9 @@ export class CallingViewModel {
               title: t('modalConferenceCallNotSupportedHeadline'),
             },
           });
+        } else {
+          const callType = call.getSelfParticipant().sharesCamera() ? call.initialType : CALL_TYPE.NORMAL;
+          this.callingRepository.answerCall(call, callType);
         }
       },
       leave: (call: Call) => {

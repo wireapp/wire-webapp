@@ -247,12 +247,20 @@ export class ConversationListViewModel {
     this.contentViewModel.switchContent(ContentViewModel.STATE.CONNECTION_REQUESTS);
   };
 
-  hasJoinableCall = (conversationId: string) => {
+  hasJoinableCall = (conversationId: string): boolean => {
     const call = this.callingRepository.findCall(conversationId);
-    return call && call.state() === CALL_STATE.INCOMING && call.reason() !== CALL_REASON.ANSWERED_ELSEWHERE;
+    if (!call) {
+      return false;
+    }
+    const conversation = this.conversationRepository.find_conversation_by_id(conversationId);
+    return (
+      !conversation.removed_from_conversation() &&
+      call.state() === CALL_STATE.INCOMING &&
+      call.reason() !== CALL_REASON.ANSWERED_ELSEWHERE
+    );
   };
 
-  setShowCallsState = (handlingNotifications: string) => {
+  setShowCallsState = (handlingNotifications: string): void => {
     const shouldShowCalls = handlingNotifications === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
 
     const isStateChange = this.showCalls() !== shouldShowCalls;

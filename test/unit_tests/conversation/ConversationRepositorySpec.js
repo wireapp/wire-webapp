@@ -20,6 +20,7 @@
 import {ConnectionStatus} from '@wireapp/api-client/dist/connection';
 import {Confirmation, GenericMessage, LegalHoldStatus, Text} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import * as HTTP_STATUS from 'http-status-codes';
 
 import {createRandomUuid} from 'Util/util';
 
@@ -99,19 +100,19 @@ describe('ConversationRepository', () => {
 
       const ping_url = `${Config.getConfig().BACKEND_REST}/conversations/${conversation_et.id}/knock`;
       server.respondWith('POST', ping_url, [
-        201,
+        HTTP_STATUS.CREATED,
         {'Content-Type': 'application/json'},
         JSON.stringify(payload.conversations.knock.post),
       ]);
 
       server.respondWith('GET', `${Config.getConfig().BACKEND_REST}/users?ids=${messageSenderId}`, [
-        200,
+        HTTP_STATUS.OK,
         {'Content-Type': 'application/json'},
         '',
       ]);
 
       const mark_as_read_url = `${Config.getConfig().BACKEND_REST}/conversations/${conversation_et.id}/self`;
-      server.respondWith('PUT', mark_as_read_url, [200, {}, '']);
+      server.respondWith('PUT', mark_as_read_url, [HTTP_STATUS.OK, {}, '']);
 
       return conversation_repository.save_conversation(conversation_et);
     });
@@ -759,7 +760,7 @@ describe('ConversationRepository', () => {
               assets: [],
             });
           }
-          xhr.respond(200, {'Content-Type': 'application/json'}, JSON.stringify(users));
+          xhr.respond(HTTP_STATUS.OK, {'Content-Type': 'application/json'}, JSON.stringify(users));
         });
 
         const matchConversations = new RegExp(`${Config.getConfig().BACKEND_REST}/conversations/([a-z0-9-]+)`);
@@ -790,7 +791,7 @@ describe('ConversationRepository', () => {
             last_event_time: '1970-01-01T00:00:00.000Z',
             last_event: '0.0',
           };
-          xhr.respond(200, {'Content-Type': 'application/json'}, JSON.stringify(conversation));
+          xhr.respond(HTTP_STATUS.OK, {'Content-Type': 'application/json'}, JSON.stringify(conversation));
         });
       });
 
@@ -1422,7 +1423,7 @@ describe('ConversationRepository', () => {
       spyOn(testFactory.conversation_service, 'get_conversation_by_id').and.callFake(id => {
         if (id === deletedGroup.id) {
           // eslint-disable-next-line prefer-promise-reject-errors
-          return Promise.reject({code: 404});
+          return Promise.reject({code: HTTP_STATUS.NOT_FOUND});
         }
         return Promise.resolve();
       });

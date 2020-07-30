@@ -26,6 +26,7 @@ enum EMOJI {
 }
 
 enum CALL {
+  ENABLE_SFT_CALLING = 'settings.call.enable_sft_calling',
   ENABLE_VBR_ENCODING = 'settings.call.enable_vbr_encoding',
 }
 

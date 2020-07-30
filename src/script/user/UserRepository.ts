@@ -29,6 +29,7 @@ import ko from 'knockout';
 import {flatten} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import type {AxiosError} from 'axios';
+import * as HTTP_STATUS from 'http-status-codes';
 
 import {chunk, partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -69,7 +70,6 @@ import {ClientMapper} from '../client/ClientMapper';
 import type {ClientRepository} from '../client/ClientRepository';
 import {Config} from '../Config';
 import type {ConnectionEntity} from '../connection/ConnectionEntity';
-import {BackendClientError} from '../error/BackendClientError';
 import type {PropertiesRepository} from '../properties/PropertiesRepository';
 import type {SelfService} from '../self/SelfService';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
@@ -487,8 +487,8 @@ export class UserRepository {
         .getUsers(chunkOfUserIds)
         .then(response => (response ? this.userMapper.mapUsersFromJson(response) : []))
         .catch((error: AxiosError | BackendError) => {
-          const isNotFound = (error as AxiosError).response?.status === BackendClientError.STATUS_CODE.NOT_FOUND;
-          const isBadRequest = (error as BackendError).code === BackendClientError.STATUS_CODE.BAD_REQUEST;
+          const isNotFound = (error as AxiosError).response?.status === HTTP_STATUS.NOT_FOUND;
+          const isBadRequest = (error as BackendError).code === HTTP_STATUS.BAD_REQUEST;
           if (isNotFound || isBadRequest) {
             return [];
           }
@@ -580,7 +580,7 @@ export class UserRepository {
       return user_id;
     } catch (axiosError) {
       const error = axiosError.response || axiosError;
-      if (error.status !== BackendClientError.STATUS_CODE.NOT_FOUND) {
+      if (error.status !== HTTP_STATUS.NOT_FOUND) {
         throw error;
       }
     }
@@ -740,7 +740,7 @@ export class UserRepository {
         this.self().username(valid_suggestions[0]);
       })
       .catch(error => {
-        if (error.code === BackendClientError.STATUS_CODE.NOT_FOUND) {
+        if (error.code === HTTP_STATUS.NOT_FOUND) {
           this.should_set_username = false;
         }
 
@@ -760,9 +760,7 @@ export class UserRepository {
           return this.userUpdate({user: {handle: username, id: this.self().id}});
         })
         .catch(({code: error_code}) => {
-          if (
-            [BackendClientError.STATUS_CODE.CONFLICT, BackendClientError.STATUS_CODE.BAD_REQUEST].includes(error_code)
-          ) {
+          if ([HTTP_STATUS.CONFLICT, HTTP_STATUS.BAD_REQUEST].includes(error_code)) {
             throw new UserError(UserError.TYPE.USERNAME_TAKEN, UserError.MESSAGE.USERNAME_TAKEN);
           }
           throw new UserError(UserError.TYPE.REQUEST_FAILURE, UserError.MESSAGE.REQUEST_FAILURE);
@@ -790,10 +788,10 @@ export class UserRepository {
       .checkUserHandle(username)
       .catch(error => {
         const error_code = error.response?.status;
-        if (error_code === BackendClientError.STATUS_CODE.NOT_FOUND) {
+        if (error_code === HTTP_STATUS.NOT_FOUND) {
           return username;
         }
-        if (error_code === BackendClientError.STATUS_CODE.BAD_REQUEST) {
+        if (error_code === HTTP_STATUS.BAD_REQUEST) {
           throw new UserError(UserError.TYPE.USERNAME_TAKEN, UserError.MESSAGE.USERNAME_TAKEN);
         }
         throw new UserError(UserError.TYPE.REQUEST_FAILURE, UserError.MESSAGE.REQUEST_FAILURE);

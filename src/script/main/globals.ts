@@ -65,9 +65,6 @@ import '../view_model/bindings/ListBackgroundBindings';
 import '../view_model/bindings/MessageListBindings';
 import '../view_model/bindings/VideoCallingBindings';
 
-import '../view_model/ImageDetailViewViewModel';
-import '../view_model/ListViewModel';
-import '../view_model/LoadingViewModel';
 import '../view_model/MainViewModel';
 import '../view_model/PanelViewModel';
 

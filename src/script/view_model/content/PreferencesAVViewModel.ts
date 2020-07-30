@@ -75,6 +75,8 @@ export class PreferencesAVViewModel {
   videoMediaStream: ko.PureComputed<MediaStream>;
   willChangeMediaSource: WillChangeMediaSource;
   optionVbrEncoding: ko.Observable<boolean>;
+  optionSftCalling: ko.Observable<boolean>;
+  supportsConferenceCalling: boolean;
 
   static get CONFIG() {
     return {
@@ -120,6 +122,7 @@ export class PreferencesAVViewModel {
     this.hasVideoTrack = ko.observable(false);
     this.hasNoneOrOneAudioInput = ko.pureComputed(() => this.availableDevices.audioInput().length < 2);
     this.hasNoneOrOneVideoInput = ko.pureComputed(() => this.availableDevices.videoInput().length < 2);
+    this.supportsConferenceCalling = callingRepository.supportsConferenceCalling;
 
     const selfUser = this.userRepository.self;
     this.isTemporaryGuest = ko.pureComputed(() => selfUser() && selfUser().isTemporaryGuest());
@@ -134,6 +137,11 @@ export class PreferencesAVViewModel {
     this.optionVbrEncoding = ko.observable(false);
     this.optionVbrEncoding.subscribe(vbrEncoding => {
       this.propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.ENABLE_VBR_ENCODING, vbrEncoding);
+    });
+
+    this.optionSftCalling = ko.observable(false);
+    this.optionSftCalling.subscribe(enableSftCalling => {
+      this.propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.ENABLE_SFT_CALLING, enableSftCalling);
     });
 
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, this.updateProperties.bind(this));
@@ -335,6 +343,7 @@ export class PreferencesAVViewModel {
 */
   updateProperties = ({settings}: WebappProperties): void => {
     this.optionVbrEncoding(settings.call.enable_vbr_encoding);
+    this.optionSftCalling(settings.call.enable_sft_calling);
   };
 
   saveCallLogs(): number | void {

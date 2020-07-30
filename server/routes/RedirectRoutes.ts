@@ -18,11 +18,10 @@
  */
 
 import * as express from 'express';
+import * as HTTP_STATUS from 'http-status-codes';
 
 import type {ServerConfig} from '../ServerConfig';
 import * as BrowserUtil from '../util/BrowserUtil';
-
-const STATUS_CODE_FOUND = 302;
 
 const router = express.Router();
 
@@ -36,7 +35,7 @@ export const RedirectRoutes = (config: ServerConfig) => [
   router.get('/join/?', (req, res) => {
     const key = req.query.key;
     const code = req.query.code;
-    res.redirect(STATUS_CODE_FOUND, `/auth/?join_key=${key}&join_code=${code}#join-conversation`);
+    res.redirect(HTTP_STATUS.MOVED_TEMPORARILY, `/auth/?join_key=${key}&join_code=${code}#join-conversation`);
   }),
   router.get('/browser/?', (req, res, next) => {
     if (config.SERVER.DEVELOPMENT) {
@@ -45,7 +44,7 @@ export const RedirectRoutes = (config: ServerConfig) => [
     const userAgent = req.header('User-Agent');
     const parseResult = BrowserUtil.parseUserAgent(userAgent);
     if (!parseResult) {
-      return res.redirect(STATUS_CODE_FOUND, `${config.CLIENT.URL.WEBSITE_BASE}/unsupported/`);
+      return res.redirect(HTTP_STATUS.MOVED_TEMPORARILY, `${config.CLIENT.URL.WEBSITE_BASE}/unsupported/`);
     }
 
     return res.json(parseResult);
