@@ -50,6 +50,7 @@ describe('fullscreenVideoCall', () => {
         },
       },
       multitasking: {autoMinimize: () => false},
+      useSftCalling: ko.observable(true),
       videoGrid: ko.observable({grid: [], hasRemoteVideo: false, thumbnail: null}),
     };
 

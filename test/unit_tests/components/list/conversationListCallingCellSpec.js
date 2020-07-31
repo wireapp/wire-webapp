@@ -42,6 +42,7 @@ describe('conversationListCallingCell', () => {
     const mockedCallingRepository = {
       isMuted: () => false,
       supportsScreenSharing: () => true,
+      useSftCalling: () => true,
     };
     defaultParams = {
       call: new Call(),
