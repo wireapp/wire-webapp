@@ -41,6 +41,7 @@ interface Params {
   isMuted: ko.Observable<boolean>;
   mediaDevicesHandler: MediaDevicesHandler;
   multitasking: Multitasking;
+  useSftCalling: ko.Subscribable<boolean>;
   videoGrid: ko.Observable<Grid>;
 }
 
@@ -89,6 +90,7 @@ export class FullscreenVideoCalling {
     callActions,
     isMuted,
     isChoosingScreen,
+    useSftCalling,
   }: Params) {
     this.call = call;
     this.conversation = conversation;
@@ -122,7 +124,7 @@ export class FullscreenVideoCalling {
     });
 
     this.showToggleVideo = ko.pureComputed(() => {
-      return this.call.initialType === CALL_TYPE.VIDEO || conversation().supportsVideoCall();
+      return this.call.initialType === CALL_TYPE.VIDEO || conversation().supportsVideoCall(useSftCalling());
     });
 
     this.callDuration = ko.observable();

@@ -897,9 +897,11 @@ export class Conversation {
     return userEntities.filter(userEntity => !userEntity.is_verified());
   }
 
-  supportsVideoCall(): boolean {
+  supportsVideoCall(sftEnabled = true): boolean {
     const participantCount = this.getNumberOfParticipants(true, false);
-    const passesParticipantLimit = participantCount <= Config.getConfig().MAX_VIDEO_PARTICIPANTS;
+    const config = Config.getConfig();
+    const passesParticipantLimit =
+      participantCount <= (sftEnabled ? config.MAX_SFT_VIDEO_PARTICIPANTS : config.MAX_VIDEO_PARTICIPANTS);
     return passesParticipantLimit;
   }
 

@@ -98,7 +98,7 @@ export class CallingRepository {
   private readonly logger: Logger;
   private readonly callLog: string[];
   private readonly cbrEncoding: ko.Observable<number>;
-  private readonly useSftCalling: ko.Observable<boolean>;
+  public readonly useSftCalling: ko.Observable<boolean>;
   private readonly acceptedVersionWarnings: ko.ObservableArray<string>;
   private readonly acceptVersionWarning: (conversationId: string) => void;
 
