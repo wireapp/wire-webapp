@@ -17,7 +17,7 @@
  *
  */
 
-import {CALL_TYPE} from '@wireapp/avs';
+import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
@@ -41,7 +41,6 @@ interface Params {
   isMuted: ko.Observable<boolean>;
   mediaDevicesHandler: MediaDevicesHandler;
   multitasking: Multitasking;
-  useSftCalling: ko.Subscribable<boolean>;
   videoGrid: ko.Observable<Grid>;
 }
 
@@ -90,7 +89,6 @@ export class FullscreenVideoCalling {
     callActions,
     isMuted,
     isChoosingScreen,
-    useSftCalling,
   }: Params) {
     this.call = call;
     this.conversation = conversation;
@@ -124,7 +122,10 @@ export class FullscreenVideoCalling {
     });
 
     this.showToggleVideo = ko.pureComputed(() => {
-      return this.call.initialType === CALL_TYPE.VIDEO || conversation().supportsVideoCall(useSftCalling());
+      return (
+        this.call.initialType === CALL_TYPE.VIDEO ||
+        conversation().supportsVideoCall(call.conversationType === CONV_TYPE.CONFERENCE)
+      );
     });
 
     this.callDuration = ko.observable();
