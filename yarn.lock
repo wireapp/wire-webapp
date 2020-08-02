@@ -1120,10 +1120,12 @@
   dependencies:
     emojis-list "^3.0.0"
 
-"@formatjs/ts-transformer@^2.5.0":
-  version "2.5.0"
-  resolved "https://registry.yarnpkg.com/@formatjs/ts-transformer/-/ts-transformer-2.5.0.tgz#2b450daacbfc4e226d3335273dc31f0900518075"
-  integrity sha512-a1aMJa8JMinXuEXhAa/s6yLZZy5dPuMl48dHqKZ4yHAEwF8SxlMm0yNDBRY9ytLHSDYfXytpEDiDZiezy5Fcew==
+"@formatjs/ts-transformer@^2.5.1":
+  version "2.5.1"
+  resolved "https://registry.yarnpkg.com/@formatjs/ts-transformer/-/ts-transformer-2.5.1.tgz#4f8b6abf9bcd0b22b2b325cf9162160da1b2673e"
+  integrity sha512-2yiXepJNI+CT+dcLH5Qvn47DUj/cs/JhOpAo8+60WjXPN98XeUBAKtjoYnbWc0SnYrBh6mGMLqTOgWR+2680fQ==
+  dependencies:
+    typescript "^3.8"
 
 "@hapi/address@2.x.x":
   version "2.1.4"
@@ -2862,15 +2864,15 @@ babel-plugin-macros@^2.0.0:
     cosmiconfig "^5.2.0"
     resolve "^1.10.0"
 
-babel-plugin-react-intl@7.9.1:
-  version "7.9.1"
-  resolved "https://registry.yarnpkg.com/babel-plugin-react-intl/-/babel-plugin-react-intl-7.9.1.tgz#ec16f4859f01a5a67269986f8f32dfaf5cd9bbd8"
-  integrity sha512-FKBOdz3V/TOE9XD5UrXFLc//EGB9+p35/5K1mfcTAas8z1RltxVNpwtEmHRrisqRBz7EWsPeo79lQdtnsK17Lg==
+babel-plugin-react-intl@7.9.2:
+  version "7.9.2"
+  resolved "https://registry.yarnpkg.com/babel-plugin-react-intl/-/babel-plugin-react-intl-7.9.2.tgz#485931003230d2d3dd457858d1b7fa5b39fb4fbf"
+  integrity sha512-Ny8A6iwz09I+w68t75JK/TNyZ1fD+TD87mPH+0PIr4F0ABIs5MSA8C/TaXjTCir4klGYK/I2lqwNYi7LfWxreg==
   dependencies:
     "@babel/core" "^7.9.0"
     "@babel/helper-plugin-utils" "^7.8.3"
     "@babel/types" "^7.9.5"
-    "@formatjs/ts-transformer" "^2.5.0"
+    "@formatjs/ts-transformer" "^2.5.1"
     "@types/babel__core" "^7.1.7"
     "@types/fs-extra" "^9.0.1"
     "@types/schema-utils" "^2.4.0"
@@ -13285,7 +13287,7 @@ typedarray@^0.0.6:
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
 
-typescript@3.9.7:
+typescript@3.9.7, typescript@^3.8:
   version "3.9.7"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.9.7.tgz#98d600a5ebdc38f40cb277522f12dc800e9e25fa"
   integrity sha512-BLbiRkiBzAwsjut4x/dsibSTB6yWpwT5qWmC2OfuCg3GgVQCSgMs4vEctYPhsaGtd0AeuuHMkjZ2h2WG8MSzRw==
