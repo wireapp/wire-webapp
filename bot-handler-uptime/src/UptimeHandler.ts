@@ -18,11 +18,14 @@
  */
 
 import * as moment from 'moment';
-import 'moment-duration-format';
+import momentDurationFormatSetup from 'moment-duration-format';
+
 import {PayloadBundle, PayloadBundleSource, PayloadBundleType} from '@wireapp/core/dist/conversation/';
 import {QuotableMessage} from '@wireapp/core/dist/conversation/message/OtrMessage';
 import {MessageHandler} from '@wireapp/bot-api';
 import {TextContent} from '@wireapp/core/dist/conversation/content';
+
+momentDurationFormatSetup(moment as any);
 
 export class UptimeHandler extends MessageHandler {
   static getUptime(): string {
