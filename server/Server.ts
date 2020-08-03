@@ -25,6 +25,7 @@ import * as http from 'http';
 import * as https from 'https';
 import * as path from 'path';
 import * as fs from 'fs';
+import * as HTTP_STATUS from 'http-status-codes';
 
 import {HealthCheckRoute} from './routes/_health/HealthRoute';
 import {AppleAssociationRoute} from './routes/appleassociation/AppleAssociationRoute';
@@ -35,9 +36,6 @@ import {RedirectRoutes} from './routes/RedirectRoutes';
 import {Root} from './routes/Root';
 import type {ServerConfig} from './ServerConfig';
 import * as BrowserUtil from './util/BrowserUtil';
-
-const STATUS_CODE_MOVED = 301;
-const STATUS_CODE_FOUND = 302;
 
 class Server {
   private readonly app: express.Express;
@@ -108,7 +106,7 @@ class Server {
       const isInsecure = !req.secure || req.get('X-Forwarded-Proto') !== 'https';
 
       if (isInsecure && !shouldEnforceHTTPS) {
-        return res.redirect(STATUS_CODE_MOVED, `${this.config.SERVER.APP_BASE}${req.url}`);
+        return res.redirect(HTTP_STATUS.MOVED_PERMANENTLY, `${this.config.SERVER.APP_BASE}${req.url}`);
       }
 
       next();
@@ -189,7 +187,7 @@ class Server {
 
       const userAgent = req.header('User-Agent');
       if (!BrowserUtil.isSupportedBrowser(userAgent)) {
-        return res.redirect(STATUS_CODE_FOUND, '/auth/');
+        return res.redirect(HTTP_STATUS.MOVED_TEMPORARILY, '/auth/');
       }
       return next();
     });

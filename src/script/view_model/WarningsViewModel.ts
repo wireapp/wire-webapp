@@ -18,18 +18,33 @@
  */
 
 import {WebAppEvents} from '@wireapp/webapp-events';
+import ko from 'knockout';
+import {amplify} from 'amplify';
 
-import {getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {Environment} from 'Util/Environment';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {afterRender} from 'Util/util';
 
-import {Config} from '../Config';
+import {Config, Configuration} from '../Config';
 import {ModalsViewModel} from './ModalsViewModel';
 import {PermissionState} from '../notification/PermissionState';
 
 export class WarningsViewModel {
+  elementId: 'warnings';
+  logger: Logger;
+  warnings: ko.ObservableArray<any>;
+  visibleWarning: ko.PureComputed<any>;
+  Config: Configuration;
+  name: ko.Observable<string>;
+  warningDimmed: ko.PureComputed<boolean>;
+  brandName: string;
+  browser: typeof Environment.browser;
+  isDesktop: boolean;
+  type: typeof WarningsViewModel.TYPE;
+  lifeCycleRefresh: string;
+
   static get CONFIG() {
     return {
       DIMMED_MODES: [
@@ -75,8 +90,9 @@ export class WarningsViewModel {
     // Array of warning banners
     this.warnings = ko.observableArray();
     this.visibleWarning = ko.pureComputed(() => this.warnings()[this.warnings().length - 1]);
-    this.Environment = Environment;
-    this.TYPE = WarningsViewModel.TYPE;
+    this.browser = Environment.browser;
+    this.isDesktop = Environment.desktop;
+    this.type = WarningsViewModel.TYPE;
     this.Config = Config.getConfig();
 
     this.warnings.subscribe(warnings => {
@@ -106,12 +122,12 @@ export class WarningsViewModel {
       })
       .extend({rateLimit: 200});
 
-    amplify.subscribe(WebAppEvents.WARNING.SHOW, this.showWarning.bind(this));
-    amplify.subscribe(WebAppEvents.WARNING.DISMISS, this.dismissWarning.bind(this));
+    amplify.subscribe(WebAppEvents.WARNING.SHOW, this.showWarning);
+    amplify.subscribe(WebAppEvents.WARNING.DISMISS, this.dismissWarning);
 
     ko.applyBindings(this, document.getElementById(this.elementId));
 
-    this.WebAppEvents = WebAppEvents;
+    this.lifeCycleRefresh = WebAppEvents.LIFECYCLE.REFRESH;
     this.brandName = Config.getConfig().BRAND_NAME;
   }
 
@@ -120,7 +136,7 @@ export class WarningsViewModel {
    * @note Used to close a warning banner by clicking the close button
    * @returns {undefined} No return value
    */
-  closeWarning() {
+  closeWarning = () => {
     const warningToClose = this.visibleWarning();
     this.dismissWarning(warningToClose);
 
@@ -150,16 +166,16 @@ export class WarningsViewModel {
       default:
         break;
     }
-  }
+  };
 
-  dismissWarning(type = this.visibleWarning()) {
+  dismissWarning = (type = this.visibleWarning()) => {
     const dismissedWarnings = this.warnings.remove(type);
     if (dismissedWarnings.length) {
       this.logger.info(`Dismissed warning of type '${type}'`);
     }
-  }
+  };
 
-  showWarning(type, info) {
+  showWarning = (type: string, info: {name: string}) => {
     const connectivityTypes = [WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT, WarningsViewModel.TYPE.NO_INTERNET];
     const isConnectivityWarning = connectivityTypes.includes(type);
     const visibleWarningIsLifecycleUpdate = this.visibleWarning() === WarningsViewModel.TYPE.LIFECYCLE_UPDATE;
@@ -172,5 +188,5 @@ export class WarningsViewModel {
       this.name(info.name);
     }
     this.warnings.push(type);
-  }
+  };
 }

@@ -19,6 +19,7 @@
 
 import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import * as HTTP_STATUS from 'http-status-codes';
 
 import {getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -34,7 +35,6 @@ import {BackendEvent} from './Backend';
 import {NOTIFICATION_HANDLING_STATE} from './NotificationHandlingState';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {categoryFromEvent} from '../message/MessageCategorization';
-import {BackendClientError} from '../error/BackendClientError';
 import {EventSource} from './EventSource';
 import {EventValidation} from './EventValidation';
 import {validateEvent} from './EventValidator';
@@ -304,7 +304,7 @@ export class EventRepository {
           return _gotNotifications(errorResponse);
         }
 
-        const isNotFound = errorResponse.response?.status === BackendClientError.STATUS_CODE.NOT_FOUND;
+        const isNotFound = errorResponse.response?.status === HTTP_STATUS.NOT_FOUND;
         if (isNotFound) {
           this.logger.info(`No notifications found since '${notificationId}'`, errorResponse);
           return reject(new EventError(EventError.TYPE.NO_NOTIFICATIONS, EventError.MESSAGE.NO_NOTIFICATIONS));

@@ -28,6 +28,7 @@ import type {UserClientAddEvent, UserClientRemoveEvent} from '@wireapp/api-clien
 import {amplify} from 'amplify';
 import platform from 'platform';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import * as HTTP_STATUS from 'http-status-codes';
 
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
@@ -138,7 +139,7 @@ export class ClientRepository {
   getClientByIdFromBackend(clientId: string): Promise<RegisteredClient> {
     return this.clientService.getClientById(clientId).catch(error => {
       const status = error.response?.status;
-      const clientNotFoundBackend = status === BackendClientError.STATUS_CODE.NOT_FOUND;
+      const clientNotFoundBackend = status === HTTP_STATUS.NOT_FOUND;
       if (clientNotFoundBackend) {
         this.logger.warn(`Local client '${clientId}' no longer exists on the backend`, error);
         throw new ClientError(ClientError.TYPE.NO_VALID_CLIENT, ClientError.MESSAGE.NO_VALID_CLIENT);
