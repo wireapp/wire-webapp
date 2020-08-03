@@ -22,7 +22,6 @@ export const WebAppEvents = {
     CLOSE_SESSION: 'wire.webapp.analytics.close_session',
     EVENT: 'wire.webapp.analytics.event',
     START_SESSION: 'wire.webapp.analytics.start_session',
-    SUPER_PROPERTY: 'wire.webapp.analytics.super_property',
   },
   APP: {
     UPDATE_PROGRESS: 'wire.webapp.app.update_progress',
