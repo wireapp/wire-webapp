@@ -537,6 +537,21 @@ export class CallingRepository {
     const selfParticipant = call.selfParticipant;
     const newState = selfParticipant.sharesScreen() ? VIDEO_STATE.STOPPED : VIDEO_STATE.SCREENSHARE;
     this.wCall.setVideoSendState(this.wUser, call.conversationId, newState);
+
+    if (newState === VIDEO_STATE.SCREENSHARE) {
+      const conversationEntity = this.conversationRepository.find_conversation_by_id(call.conversationId);
+      const segmentations = {
+        [Segmantation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
+        [Segmantation.CONVERSATION.SIZE]: '',
+        [Segmantation.CONVERSATION.ALLOW_GUESTS]: '',
+        [Segmantation.CONVERSATION.GUESTS]: conversationEntity.hasGuest(),
+        [Segmantation.CONVERSATION.WIRELESS_GUESTS]: '',
+        [Segmantation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
+        [Segmantation.SCREEN_SHARE.DIRECTION]: '',
+        [Segmantation.SCREEN_SHARE.DURATION]: '',
+      };
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.SCREEN_SHARE, segmentations);
+    }
   }
 
   answerCall(call: Call, callType: number): void {

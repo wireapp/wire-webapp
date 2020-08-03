@@ -27,6 +27,7 @@ export const EventName = {
     INITIATED_CALL: 'calling.initiated_call',
     JOINED_CALL: 'calling.joined_call',
     RECIEVED_CALL: 'calling.received_call',
+    SCREEN_SHARE: 'calling.screen_share',
   },
   CONTRIBUTED: 'contributed',
   CONVERSATION: {

@@ -44,4 +44,8 @@ export const Segmantation = {
     IS_REPLY: 'message_is_reply',
     MENTION: 'message_mention',
   },
+  SCREEN_SHARE: {
+    DIRECTION: 'screen_share_direction',
+    DURATION: 'screen_share_duration',
+  },
 };
