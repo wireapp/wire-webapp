@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.19](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-uptime/compare/@wireapp/bot-handler-uptime@0.1.18...@wireapp/bot-handler-uptime@0.1.19) (2020-08-03)
+
+
+### Bug Fixes
+
+* Correctly setup moment-duration-format ([#3152](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-uptime/issues/3152)) ([0c06c69](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-uptime/commit/0c06c6987229d387735b033d6dd4ecbe86929d74))
+
+
+
+
+
 ## [0.1.18](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-uptime/compare/@wireapp/bot-handler-uptime@0.1.17...@wireapp/bot-handler-uptime@0.1.18) (2020-07-30)
 
 
