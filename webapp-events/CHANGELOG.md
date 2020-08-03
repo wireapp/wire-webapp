@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/webapp-events/compare/@wireapp/webapp-events@0.5.0...@wireapp/webapp-events@0.5.1) (2020-08-03)
+
+
+### Bug Fixes
+
+* **webapp-events:** Remove unused SUPER_PROPERTY ([#3140](https://github.com/wireapp/wire-web-packages/tree/master/packages/webapp-events/issues/3140)) ([4f0f1e8](https://github.com/wireapp/wire-web-packages/tree/master/packages/webapp-events/commit/4f0f1e842f8486339a8655905849c68cd57454de))
+
+
+
+
+
 # [0.5.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/webapp-events/compare/@wireapp/webapp-events@0.4.1...@wireapp/webapp-events@0.5.0) (2020-07-21)
 
 
