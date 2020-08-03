@@ -124,7 +124,7 @@
         <hr class="preferences-separator">
         <header class="preferences-header" data-bind="text: t('preferencesAccountData')"></header>
 
-        <!-- ko if: isSendAnalytics() -->
+        <!-- ko if: canSendAnalytics() -->
           <div class="preferences-option">
             <div class="preferences-option-icon checkbox accent-text" data-bind="attr: {'data-uie-value': optionPrivacy}" data-uie-name="status-preference-privacy">
               <input type="checkbox" id="privacy-checkbox" data-bind="checked: optionPrivacy">
