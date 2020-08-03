@@ -42,7 +42,8 @@ export class Configuration {
   readonly ENVIRONMENT = env.ENVIRONMENT || 'production';
   readonly FEATURE = env.FEATURE;
   readonly MAX_GROUP_PARTICIPANTS = env.MAX_GROUP_PARTICIPANTS || 500;
-  readonly MAX_VIDEO_PARTICIPANTS = env.MAX_VIDEO_PARTICIPANTS || 4;
+  readonly MAX_SFT_VIDEO_PARTICIPANTS = env.MAX_VIDEO_PARTICIPANTS || 4;
+  readonly MAX_VIDEO_PARTICIPANTS = Math.min(4, this.MAX_SFT_VIDEO_PARTICIPANTS);
   readonly NEW_PASSWORD_MINIMUM_LENGTH = env.NEW_PASSWORD_MINIMUM_LENGTH || ValidationUtil.DEFAULT_PASSWORD_MIN_LENGTH;
   readonly URL = env.URL || {
     ACCOUNT_BASE: 'https://account.wire.com',

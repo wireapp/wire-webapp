@@ -19,7 +19,7 @@
 
 import ko from 'knockout';
 
-import {CALL_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
+import {CALL_TYPE, REASON as CALL_REASON, STATE as CALL_STATE, CONV_TYPE} from '@wireapp/avs';
 
 import {t} from 'Util/LocalizerUtil';
 import {formatSeconds} from 'Util/TimeUtil';
@@ -171,7 +171,9 @@ class ConversationListCallingCell {
     this.disableVideoButton = ko.pureComputed(() => {
       const selfParticipant = call.getSelfParticipant();
       const isOutgoingVideoCall = this.isOutgoing() && selfParticipant?.sharesCamera();
-      const isVideoUnsupported = !selfParticipant?.sharesCamera() && !conversation().supportsVideoCall();
+      const isVideoUnsupported =
+        !selfParticipant?.sharesCamera() &&
+        !conversation().supportsVideoCall(call.conversationType === CONV_TYPE.CONFERENCE);
       return isOutgoingVideoCall || isVideoUnsupported;
     });
 

@@ -17,7 +17,7 @@
  *
  */
 
-import {CALL_TYPE} from '@wireapp/avs';
+import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
@@ -122,7 +122,10 @@ export class FullscreenVideoCalling {
     });
 
     this.showToggleVideo = ko.pureComputed(() => {
-      return this.call.initialType === CALL_TYPE.VIDEO || conversation().supportsVideoCall();
+      return (
+        this.call.initialType === CALL_TYPE.VIDEO ||
+        conversation().supportsVideoCall(call.conversationType === CONV_TYPE.CONFERENCE)
+      );
     });
 
     this.callDuration = ko.observable();

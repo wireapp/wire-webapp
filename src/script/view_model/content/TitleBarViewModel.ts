@@ -101,9 +101,9 @@ export class TitleBarViewModel {
       return !this.hasCall() && isSupportedConversation && isActiveConversation;
     });
 
-    this.supportsVideoCall = ko.pureComputed(() => {
-      return this.conversationEntity() && this.conversationEntity().supportsVideoCall();
-    });
+    this.supportsVideoCall = ko.pureComputed(() =>
+      this.conversationEntity()?.supportsVideoCall(callingRepository.useSftCalling()),
+    );
 
     const shortcut = Shortcut.getShortcutTooltip(ShortcutType.PEOPLE);
     this.peopleTooltip = t('tooltipConversationPeople', shortcut);
