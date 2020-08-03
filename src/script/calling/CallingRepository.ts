@@ -541,12 +541,12 @@ export class CallingRepository {
     if (newState === VIDEO_STATE.SCREENSHARE) {
       const conversationEntity = this.conversationRepository.find_conversation_by_id(call.conversationId);
       const segmentations = {
-        [Segmantation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
-        [Segmantation.CONVERSATION.SIZE]: '',
         [Segmantation.CONVERSATION.ALLOW_GUESTS]: '',
         [Segmantation.CONVERSATION.GUESTS]: conversationEntity.hasGuest(),
-        [Segmantation.CONVERSATION.WIRELESS_GUESTS]: '',
         [Segmantation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
+        [Segmantation.CONVERSATION.SIZE]: '',
+        [Segmantation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
+        [Segmantation.CONVERSATION.WIRELESS_GUESTS]: '',
         [Segmantation.SCREEN_SHARE.DIRECTION]: '',
         [Segmantation.SCREEN_SHARE.DURATION]: '',
       };
