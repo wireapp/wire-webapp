@@ -205,7 +205,10 @@ export class HttpClient extends EventEmitter {
     config: AxiosRequestConfig,
     isSynchronousRequest: boolean = false,
   ): Promise<AxiosResponse<T>> {
-    config.headers['Content-Type'] = ContentType.APPLICATION_PROTOBUF;
+    config.headers = {
+      ...config.headers,
+      'Content-Type': ContentType.APPLICATION_PROTOBUF,
+    };
     return this.sendRequest<T>(config, isSynchronousRequest);
   }
 }
