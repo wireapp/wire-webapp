@@ -4312,11 +4312,11 @@ export class ConversationRepository {
 
     if (actionType) {
       let segmentations = {
-        [Segmantation.CONVERSATION.ALLOW_GUESTS]: '',
+        [Segmantation.CONVERSATION.ALLOW_GUESTS]: conversationEntity.isGuestRoom(),
         [Segmantation.CONVERSATION.EPHEMERAL_MESSAGE]: !!conversationEntity.globalMessageTimer(),
         [Segmantation.CONVERSATION.GUESTS]: conversationEntity.hasGuest(),
         [Segmantation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
-        [Segmantation.CONVERSATION.SIZE]: '',
+        [Segmantation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
         [Segmantation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
         [Segmantation.CONVERSATION.WIRELESS_GUESTS]: '',
         [Segmantation.MESSAGE.ACTION]: actionType,

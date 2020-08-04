@@ -544,7 +544,7 @@ export class CallingRepository {
         [Segmantation.CONVERSATION.ALLOW_GUESTS]: '',
         [Segmantation.CONVERSATION.GUESTS]: conversationEntity.hasGuest(),
         [Segmantation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
-        [Segmantation.CONVERSATION.SIZE]: '',
+        [Segmantation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
         [Segmantation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
         [Segmantation.CONVERSATION.WIRELESS_GUESTS]: '',
         [Segmantation.SCREEN_SHARE.DIRECTION]: '',
@@ -572,7 +572,7 @@ export class CallingRepository {
             [Segmantation.CONVERSATION.EPHEMERAL_MESSAGE]: !!conversationEntity.globalMessageTimer(),
             [Segmantation.CONVERSATION.GUESTS]: conversationEntity.hasGuest(),
             [Segmantation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
-            [Segmantation.CONVERSATION.SIZE]: '',
+            [Segmantation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
             [Segmantation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
             [Segmantation.CONVERSATION.WIRELESS_GUESTS]: '',
           };
@@ -757,7 +757,7 @@ export class CallingRepository {
       [Segmantation.CONVERSATION.EPHEMERAL_MESSAGE]: !!conversationEntity.globalMessageTimer(),
       [Segmantation.CONVERSATION.GUESTS]: conversationEntity.hasGuest(),
       [Segmantation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
-      [Segmantation.CONVERSATION.SIZE]: '',
+      [Segmantation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
       [Segmantation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
       [Segmantation.CONVERSATION.WIRELESS_GUESTS]: '',
     };
@@ -842,7 +842,7 @@ export class CallingRepository {
           [Segmantation.CONVERSATION.EPHEMERAL_MESSAGE]: !!conversationEntity.globalMessageTimer(),
           [Segmantation.CONVERSATION.GUESTS]: conversationEntity.hasGuest(),
           [Segmantation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
-          [Segmantation.CONVERSATION.SIZE]: '',
+          [Segmantation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
           [Segmantation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
           [Segmantation.CONVERSATION.WIRELESS_GUESTS]: '',
         };
