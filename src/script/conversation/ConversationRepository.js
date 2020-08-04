@@ -4323,7 +4323,7 @@ export class ConversationRepository {
         [Segmantation.MESSAGE.ACTION]: actionType,
         [Segmantation.MESSAGE.EPHEMERAL_EXPIRATION]: isEphemeral ? messageTimer : undefined,
         [Segmantation.MESSAGE.IS_EPHEMERAL_MESSAGE]: isEphemeral,
-        [Segmantation.MESSAGE.IS_REPLY]: '',
+        [Segmantation.MESSAGE.IS_REPLY]: !!genericMessage.text?.quote,
         [Segmantation.MESSAGE.MENTION]: numberOfMentions,
       };
       const isTeamConversation = !!conversationEntity.team_id;
