@@ -1,8 +1,8 @@
-name: Notify on Push
+name: Notify AVS deployments on Push
 
 on:
   push:
-    branches: [dev]
+    branches: [avs]
 
 jobs:
   send_notification:
@@ -14,4 +14,4 @@ jobs:
           email: ${{secrets.WIRE_BOT_EMAIL}}
           password: ${{secrets.WIRE_BOT_PASSWORD}}
           conversation: '6936f0a3-be49-4f81-b4a7-d734661beff2'
-          text: "Deployed commit **${{github.event.head_commit.id}}** (\"${{github.event.head_commit.message}}\") on [wire-webapp-avs](https://wire-webapp-avs.zinfra.io/). 🏁"
+          text: "Deploying commit **${{github.event.head_commit.id}}** (\"${{github.event.head_commit.message}}\") on [wire-webapp-avs](https://wire-webapp-avs.zinfra.io/). 🏁"
