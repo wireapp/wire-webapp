@@ -21,6 +21,7 @@ import axios, {AxiosError} from 'axios';
 import type {APIClient} from '@wireapp/api-client';
 import type {WebappProperties} from '@wireapp/api-client/dist/user/data';
 import type {CallConfigData} from '@wireapp/api-client/dist/account/CallConfigData';
+import type {NewOTRMessage, ClientMismatch, UserClients} from '@wireapp/api-client/dist/conversation';
 import {
   CALL_TYPE,
   CONV_TYPE,
@@ -38,6 +39,7 @@ import {
 } from '@wireapp/avs';
 import {Calling, GenericMessage} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {UrlUtil} from '@wireapp/commons';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import 'webrtc-adapter';
@@ -64,7 +66,7 @@ import {ClientId, Participant, UserId} from './Participant';
 import type {Recipients} from '../cryptography/CryptographyRepository';
 import type {Conversation} from '../entity/Conversation';
 import {UserRepository} from '../user/UserRepository';
-import {UrlUtil} from '@wireapp/commons';
+import {flatten} from 'Util/ArrayUtil';
 import {QUERY_KEY} from '../auth/route';
 
 interface MediaStreamQuery {
@@ -76,6 +78,8 @@ interface MediaStreamQuery {
 interface SendMessageTarget {
   clients: WcallClient[];
 }
+
+type ClientListEntry = [string, string];
 
 export class CallingRepository {
   private poorCallQualityUsers: {[conversationId: string]: string[]} = {};
@@ -245,15 +249,58 @@ export class CallingRepository {
     try {
       await this.apiClient.conversation.api.postOTRMessage(this.selfClientId, conversationId);
     } catch (error) {
-      const mismatch = (error as AxiosError).response!.data;
-      const data: {clients: {clientid: string; userid: string}[]} = {
-        clients: [],
+      const mismatch: ClientMismatch = (error as AxiosError).response!.data;
+      const localClients: UserClients = await this.conversationRepository.create_recipients(conversationId);
+
+      const makeClientList = (recipients: UserClients): ClientListEntry[] =>
+        Object.entries(recipients).reduce(
+          (acc, [userId, clients]) => acc.concat(clients.map(clientId => [userId, clientId])),
+          [],
+        );
+
+      const isSameEntry = ([userA, clientA]: ClientListEntry, [userB, clientB]: ClientListEntry): boolean =>
+        userA === userB && clientA === clientB;
+
+      const fromClientList = (clientList: ClientListEntry[]): UserClients =>
+        clientList.reduce((acc, [userId, clientId]) => {
+          const currentClients = acc[userId] || [];
+          return {...acc, [userId]: [...currentClients, clientId]};
+        }, {} as UserClients);
+      const localClientList = makeClientList(localClients);
+      const remoteClientList = makeClientList(mismatch.missing);
+      const missingClients = remoteClientList.filter(
+        remoteClient => !localClientList.some(localClient => isSameEntry(remoteClient, localClient)),
+      );
+      const deletedClients = localClientList.filter(
+        localClient => !remoteClientList.some(remoteClient => isSameEntry(remoteClient, localClient)),
+      );
+      const localMismatch: ClientMismatch = {
+        deleted: fromClientList(deletedClients),
+        missing: fromClientList(missingClients),
+        redundant: {},
+        time: mismatch.time,
       };
-      Object.entries(mismatch.missing).forEach((entry: any) => {
-        const userId = entry[0];
-        const clientIds: string[] = entry[1];
-        clientIds.forEach(clientId => data.clients.push({clientid: clientId, userid: userId}));
+
+      const genericMessage = new GenericMessage({
+        [GENERIC_MESSAGE_TYPE.CALLING]: new Calling({content: ''}),
+        messageId: createRandomUuid(),
       });
+      const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId);
+      eventInfoEntity.setType(GENERIC_MESSAGE_TYPE.CALLING);
+      const payload: NewOTRMessage = {
+        native_push: true,
+        recipients: {},
+        sender: this.selfClientId,
+      };
+      await this.conversationRepository.clientMismatchHandler.onClientMismatch(eventInfoEntity, localMismatch, payload);
+
+      type Clients = {clientid: string; userid: string}[];
+
+      const clients: Clients[] = Object.entries(mismatch.missing).map(([userid, clientids]: [string, string[]]) =>
+        clientids.map(clientid => ({clientid, userid})),
+      );
+
+      const data: {clients: Clients} = {clients: flatten(clients)};
       this.wCall.setClientsForConv(this.wUser, conversationId, JSON.stringify(data));
     }
   }
@@ -420,18 +467,39 @@ export class CallingRepository {
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
     const toSecond = (timestamp: number) => Math.floor(timestamp / 1000);
     const contentStr = JSON.stringify(content);
-    if (content.type === CALL_MESSAGE_TYPE.GROUP_LEAVE) {
-      const isAnotherSelfClient = userId === this.selfUser.id && clientId !== this.selfClientId;
-      if (isAnotherSelfClient) {
-        const call = this.findCall(conversationId);
-        if (call?.state() === CALL_STATE.INCOMING) {
-          // If the group leave was sent from the self user from another device,
-          // we reset the reason so that the call is not shown in the UI.
-          // If the call is already accepted, we keep the call UI.
-          call.reason(REASON.STILL_ONGOING);
+
+    let validatedPromise = Promise.resolve('default');
+    switch (content.type) {
+      case CALL_MESSAGE_TYPE.GROUP_LEAVE: {
+        const isAnotherSelfClient = userId === this.selfUser.id && clientId !== this.selfClientId;
+        if (isAnotherSelfClient) {
+          const call = this.findCall(conversationId);
+          if (call?.state() === CALL_STATE.INCOMING) {
+            // If the group leave was sent from the self user from another device,
+            // we reset the reason so that the call is not shown in the UI.
+            // If the call is already accepted, we keep the call UI.
+            call.reason(REASON.STILL_ONGOING);
+          }
         }
+        break;
+      }
+      case CALL_MESSAGE_TYPE.SETUP:
+      case CALL_MESSAGE_TYPE.CONF_START:
+      case CALL_MESSAGE_TYPE.CONFKEY:
+      case CALL_MESSAGE_TYPE.GROUP_START: {
+        if (source !== EventRepository.SOURCE.STREAM) {
+          const recipients = await this.conversationRepository.create_recipients(conversationId, false, [userId]);
+          const eventInfoEntity = new EventInfoEntity(undefined, conversationId, {recipients});
+          eventInfoEntity.setType(GENERIC_MESSAGE_TYPE.CALLING);
+          const consentType = ConversationRepository.CONSENT_TYPE.INCOMING_CALL;
+          validatedPromise = this.conversationRepository.grantMessage(eventInfoEntity, consentType);
+        }
+
+        break;
       }
     }
+
+    await validatedPromise.catch(() => this.leaveCall(conversationId));
 
     const res = this.wCall.recvMsg(
       this.wUser,
@@ -571,12 +639,6 @@ export class CallingRepository {
   async answerCall(call: Call, callType: CALL_TYPE): Promise<void> {
     try {
       await this.checkConcurrentJoinedCall(call.conversationId, CALL_STATE.INCOMING);
-      const eventInfoEntity = new EventInfoEntity(undefined, call.conversationId);
-      eventInfoEntity.setType(GENERIC_MESSAGE_TYPE.CALLING);
-      await this.conversationRepository.grantMessage(
-        eventInfoEntity,
-        ConversationRepository.CONSENT_TYPE.INCOMING_CALL,
-      );
 
       const isVideoCall = callType === CALL_TYPE.VIDEO;
       if (!isVideoCall) {
