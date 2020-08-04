@@ -79,6 +79,8 @@ interface SendMessageTarget {
   clients: WcallClient[];
 }
 
+type ClientListEntry = [string, string];
+
 export class CallingRepository {
   private poorCallQualityUsers: {[conversationId: string]: string[]} = {};
 
@@ -247,7 +249,6 @@ export class CallingRepository {
     try {
       await this.apiClient.conversation.api.postOTRMessage(this.selfClientId, conversationId);
     } catch (error) {
-      type ClientListEntry = [string, string];
       const mismatch: ClientMismatch = (error as AxiosError).response!.data;
       const localClients: UserClients = await this.conversationRepository.create_recipients(conversationId);
 
@@ -261,10 +262,10 @@ export class CallingRepository {
         userA === userB && clientA === clientB;
 
       const fromClientList = (clientList: ClientListEntry[]): UserClients =>
-        clientList.reduce(
-          (acc, [userId, clientId]) => ({...acc, [userId]: [...(acc[userId] || []), clientId]}),
-          {} as UserClients,
-        );
+        clientList.reduce((acc, [userId, clientId]) => {
+          const currentClients = acc[userId] || [];
+          return {...acc, [userId]: [...currentClients, clientId]};
+        }, {} as UserClients);
       const localClientList = makeClientList(localClients);
       const remoteClientList = makeClientList(mismatch.missing);
       const missingClients = remoteClientList.filter(
