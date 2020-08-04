@@ -1,0 +1,27 @@
+name: Notify on Pull Request
+
+on:
+  pull_request:
+    branches: [dev]
+
+jobs:
+  send_notification:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          ref: ${{github.event.after}}
+      - name: Get Commit Message
+        run: |
+          MSG=$(git log --format=%B -n 1 ${{github.event.after}})
+          echo "::set-env name=COMMIT_MESSAGE::${MSG}"
+      - name: Send message
+        uses: wireapp/github-action-wire-messenger@v1
+        with:
+          email: ${{secrets.WIRE_BOT_EMAIL}}
+          password: ${{secrets.WIRE_BOT_PASSWORD}}
+          conversation: '6936f0a3-be49-4f81-b4a7-d734661beff2'
+          text: "Deployed commit **${{github.event.after}}** (\"${{env.COMMIT_MESSAGE}}\") on [wire-webapp-avs](https://wire-webapp-avs.zinfra.io/). 🏁"

@@ -1,8 +1,6 @@
-name: CI
+name: Notify on Push
 
 on:
-  pull_request:
-    branches: [dev]
   push:
     branches: [dev]
 
@@ -16,4 +14,4 @@ jobs:
           email: ${{secrets.WIRE_BOT_EMAIL}}
           password: ${{secrets.WIRE_BOT_PASSWORD}}
           conversation: '6936f0a3-be49-4f81-b4a7-d734661beff2'
-          text: 'Building new packages...'
+          text: "Deployed commit **${{github.event.head_commit.id}}** (\"${{github.event.head_commit.message}}\") on [wire-webapp-avs](https://wire-webapp-avs.zinfra.io/). 🏁"
