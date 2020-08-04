@@ -136,11 +136,12 @@ export class CallingViewModel {
     };
 
     const startCall = (conversationEntity: Conversation, callType: CALL_TYPE): void => {
+      const guests = conversationEntity.participating_user_ets().filter(user => user.isGuest()).length;
       const segmentations = {
         [Segmantation.CALL.VIDEO]: callType === CALL_TYPE.VIDEO,
         [Segmantation.CONVERSATION.ALLOW_GUESTS]: conversationEntity.isGuestRoom(),
         [Segmantation.CONVERSATION.EPHEMERAL_MESSAGE]: !!conversationEntity.globalMessageTimer(),
-        [Segmantation.CONVERSATION.GUESTS]: conversationEntity.hasGuest(),
+        [Segmantation.CONVERSATION.GUESTS]: guests,
         [Segmantation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
         [Segmantation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
         [Segmantation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
@@ -163,11 +164,12 @@ export class CallingViewModel {
         ring(call);
       }
       const conversationEntity = this.conversationRepository.find_conversation_by_id(call.conversationId);
+      const guests = conversationEntity.participating_user_ets().filter(user => user.isGuest()).length;
       const segmentations = {
         [Segmantation.CALL.VIDEO]: call.initialType === CALL_TYPE.VIDEO,
         [Segmantation.CONVERSATION.ALLOW_GUESTS]: conversationEntity.isGuestRoom(),
         [Segmantation.CONVERSATION.EPHEMERAL_MESSAGE]: !!conversationEntity.globalMessageTimer(),
-        [Segmantation.CONVERSATION.GUESTS]: conversationEntity.hasGuest(),
+        [Segmantation.CONVERSATION.GUESTS]: guests,
         [Segmantation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
         [Segmantation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
         [Segmantation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),

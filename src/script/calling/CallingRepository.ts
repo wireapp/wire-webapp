@@ -540,9 +540,10 @@ export class CallingRepository {
 
     if (newState === VIDEO_STATE.SCREENSHARE) {
       const conversationEntity = this.conversationRepository.find_conversation_by_id(call.conversationId);
+      const guests = conversationEntity.participating_user_ets().filter(user => user.isGuest()).length;
       const segmentations = {
         [Segmantation.CONVERSATION.ALLOW_GUESTS]: conversationEntity.isGuestRoom(),
-        [Segmantation.CONVERSATION.GUESTS]: conversationEntity.hasGuest(),
+        [Segmantation.CONVERSATION.GUESTS]: guests,
         [Segmantation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
         [Segmantation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
         [Segmantation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
@@ -565,12 +566,13 @@ export class CallingRepository {
           this.wCall.answer(this.wUser, call.conversationId, callType, this.cbrEncoding());
 
           const conversationEntity = this.conversationRepository.find_conversation_by_id(call.conversationId);
+          const guests = conversationEntity.participating_user_ets().filter(user => user.isGuest()).length;
           const segmentations = {
             [Segmantation.CALL.DIRECTION]: '',
             [Segmantation.CALL.VIDEO]: callType === CALL_TYPE.VIDEO,
             [Segmantation.CONVERSATION.ALLOW_GUESTS]: conversationEntity.isGuestRoom(),
             [Segmantation.CONVERSATION.EPHEMERAL_MESSAGE]: !!conversationEntity.globalMessageTimer(),
-            [Segmantation.CONVERSATION.GUESTS]: conversationEntity.hasGuest(),
+            [Segmantation.CONVERSATION.GUESTS]: guests,
             [Segmantation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
             [Segmantation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
             [Segmantation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
@@ -744,6 +746,7 @@ export class CallingRepository {
     const stillActiveState = [REASON.STILL_ONGOING, REASON.ANSWERED_ELSEWHERE];
 
     const conversationEntity = this.conversationRepository.find_conversation_by_id(call.conversationId);
+    const guests = conversationEntity.participating_user_ets().filter(user => user.isGuest()).length;
     const segmentations = {
       [Segmantation.CALL.AV_SWITCH_TOGGLE]: '',
       [Segmantation.CALL.DIRECTION]: call.state(),
@@ -755,7 +758,7 @@ export class CallingRepository {
       [Segmantation.CALL.VIDEO]: call.initialType === CALL_TYPE.VIDEO,
       [Segmantation.CONVERSATION.ALLOW_GUESTS]: conversationEntity.isGuestRoom(),
       [Segmantation.CONVERSATION.EPHEMERAL_MESSAGE]: !!conversationEntity.globalMessageTimer(),
-      [Segmantation.CONVERSATION.GUESTS]: conversationEntity.hasGuest(),
+      [Segmantation.CONVERSATION.GUESTS]: guests,
       [Segmantation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
       [Segmantation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
       [Segmantation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
@@ -834,13 +837,14 @@ export class CallingRepository {
     switch (state) {
       case CALL_STATE.MEDIA_ESTAB:
         const conversationEntity = this.conversationRepository.find_conversation_by_id(call.conversationId);
+        const guests = conversationEntity.participating_user_ets().filter(user => user.isGuest()).length;
         const segmentations = {
           [Segmantation.CALL.DIRECTION]: call.state(),
           [Segmantation.CALL.SETUP_TIME]: '',
           [Segmantation.CALL.VIDEO]: call.initialType === CALL_TYPE.VIDEO,
           [Segmantation.CONVERSATION.ALLOW_GUESTS]: conversationEntity.isGuestRoom(),
           [Segmantation.CONVERSATION.EPHEMERAL_MESSAGE]: !!conversationEntity.globalMessageTimer(),
-          [Segmantation.CONVERSATION.GUESTS]: conversationEntity.hasGuest(),
+          [Segmantation.CONVERSATION.GUESTS]: guests,
           [Segmantation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
           [Segmantation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
           [Segmantation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),

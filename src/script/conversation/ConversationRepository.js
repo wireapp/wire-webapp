@@ -4309,12 +4309,12 @@ export class ConversationRepository {
       default:
         break;
     }
-
     if (actionType) {
+      const guests = conversationEntity.participating_user_ets().filter(user => user.isGuest()).length;
       let segmentations = {
         [Segmantation.CONVERSATION.ALLOW_GUESTS]: conversationEntity.isGuestRoom(),
         [Segmantation.CONVERSATION.EPHEMERAL_MESSAGE]: !!conversationEntity.globalMessageTimer(),
-        [Segmantation.CONVERSATION.GUESTS]: conversationEntity.hasGuest(),
+        [Segmantation.CONVERSATION.GUESTS]: guests,
         [Segmantation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
         [Segmantation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
         [Segmantation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
