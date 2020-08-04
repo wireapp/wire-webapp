@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.21.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.21.4...@wireapp/api-client@11.21.5) (2020-08-04)
+
+
+### Bug Fixes
+
+* **api-client:** Add headers to config if they don't exist yet ([#3155](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3155)) ([17053d1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/17053d19e9e202c82b4e1463f5814816512d0df9))
+
+
+
+
+
 ## [11.21.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.21.3...@wireapp/api-client@11.21.4) (2020-08-03)
 
 **Note:** Version bump only for package @wireapp/api-client
