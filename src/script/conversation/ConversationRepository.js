@@ -2427,7 +2427,7 @@ export class ConversationRepository {
    * @param {Array<string>} user_ids Optionally the intended recipient users
    * @returns {Promise<Recipients>} Resolves with a user client map
    */
-  create_recipients(conversation_id, skip_own_clients = false, user_ids) {
+  create_recipients(conversation_id, skip_own_clients = false, user_ids = null) {
     return this.get_all_users_in_conversation(conversation_id).then(user_ets => {
       const recipients = {};
 
@@ -2893,18 +2893,12 @@ export class ConversationRepository {
 
             switch (consentType) {
               case ConversationRepository.CONSENT_TYPE.INCOMING_CALL: {
-                if (conversationEntity.hasActiveCall()) {
-                  return resolve(true);
-                }
                 actionString = t('modalConversationNewDeviceIncomingCallAction');
                 messageString = t('modalConversationNewDeviceIncomingCallMessage');
                 break;
               }
 
               case ConversationRepository.CONSENT_TYPE.OUTGOING_CALL: {
-                if (conversationEntity.hasActiveCall()) {
-                  return resolve(true);
-                }
                 actionString = t('modalConversationNewDeviceOutgoingCallAction');
                 messageString = t('modalConversationNewDeviceOutgoingCallMessage');
                 break;

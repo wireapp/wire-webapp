@@ -909,7 +909,7 @@ export class Conversation {
     return this.getLastMessage()?.timestamp() ? this.getLastMessage().timestamp() >= this.last_event_timestamp() : true;
   };
 
-  hasActiveCall = (): boolean => [CALL_STATE.INCOMING, CALL_STATE.MEDIA_ESTAB].includes(this.call()?.state());
+  hasActiveCall = (): boolean => this.call()?.state() === CALL_STATE.MEDIA_ESTAB;
 
   serialize(): SerializedConversation {
     return {
