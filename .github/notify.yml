@@ -3,9 +3,9 @@ name: CI
 
 on:
   pull_request:
-    branches: [master]
+    branches: [dev]
   push:
-    branches: [master]
+    branches: [dev]
 
 jobs:
   send_notification:
