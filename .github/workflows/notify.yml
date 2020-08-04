@@ -15,5 +15,5 @@ jobs:
         with:
           email: ${{secrets.WIRE_BOT_EMAIL}}
           password: ${{secrets.WIRE_BOT_PASSWORD}}
-          conversation: '4272e0dc-7745-47f7-9e03-42287fcbdd35'
+          conversation: '6936f0a3-be49-4f81-b4a7-d734661beff2'
           text: 'Building new packages...'
