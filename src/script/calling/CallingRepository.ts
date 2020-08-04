@@ -541,7 +541,7 @@ export class CallingRepository {
     if (newState === VIDEO_STATE.SCREENSHARE) {
       const conversationEntity = this.conversationRepository.find_conversation_by_id(call.conversationId);
       const segmentations = {
-        [Segmantation.CONVERSATION.ALLOW_GUESTS]: '',
+        [Segmantation.CONVERSATION.ALLOW_GUESTS]: conversationEntity.isGuestRoom(),
         [Segmantation.CONVERSATION.GUESTS]: conversationEntity.hasGuest(),
         [Segmantation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
         [Segmantation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
@@ -568,7 +568,7 @@ export class CallingRepository {
           const segmentations = {
             [Segmantation.CALL.DIRECTION]: '',
             [Segmantation.CALL.VIDEO]: callType === CALL_TYPE.VIDEO,
-            [Segmantation.CONVERSATION.ALLOW_GUESTS]: '',
+            [Segmantation.CONVERSATION.ALLOW_GUESTS]: conversationEntity.isGuestRoom(),
             [Segmantation.CONVERSATION.EPHEMERAL_MESSAGE]: !!conversationEntity.globalMessageTimer(),
             [Segmantation.CONVERSATION.GUESTS]: conversationEntity.hasGuest(),
             [Segmantation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
@@ -753,7 +753,7 @@ export class CallingRepository {
       [Segmantation.CALL.SCREEN_SHARE]: '',
       [Segmantation.CALL.SETUP_TIME]: '',
       [Segmantation.CALL.VIDEO]: call.initialType === CALL_TYPE.VIDEO,
-      [Segmantation.CONVERSATION.ALLOW_GUESTS]: '',
+      [Segmantation.CONVERSATION.ALLOW_GUESTS]: conversationEntity.isGuestRoom(),
       [Segmantation.CONVERSATION.EPHEMERAL_MESSAGE]: !!conversationEntity.globalMessageTimer(),
       [Segmantation.CONVERSATION.GUESTS]: conversationEntity.hasGuest(),
       [Segmantation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
@@ -838,7 +838,7 @@ export class CallingRepository {
           [Segmantation.CALL.DIRECTION]: call.state(),
           [Segmantation.CALL.SETUP_TIME]: '',
           [Segmantation.CALL.VIDEO]: call.initialType === CALL_TYPE.VIDEO,
-          [Segmantation.CONVERSATION.ALLOW_GUESTS]: '',
+          [Segmantation.CONVERSATION.ALLOW_GUESTS]: conversationEntity.isGuestRoom(),
           [Segmantation.CONVERSATION.EPHEMERAL_MESSAGE]: !!conversationEntity.globalMessageTimer(),
           [Segmantation.CONVERSATION.GUESTS]: conversationEntity.hasGuest(),
           [Segmantation.CONVERSATION.SERVICES]: conversationEntity.hasService(),

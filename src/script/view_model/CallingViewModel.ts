@@ -138,7 +138,7 @@ export class CallingViewModel {
     const startCall = (conversationEntity: Conversation, callType: CALL_TYPE): void => {
       const segmentations = {
         [Segmantation.CALL.VIDEO]: callType === CALL_TYPE.VIDEO,
-        [Segmantation.CONVERSATION.ALLOW_GUESTS]: '',
+        [Segmantation.CONVERSATION.ALLOW_GUESTS]: conversationEntity.isGuestRoom(),
         [Segmantation.CONVERSATION.EPHEMERAL_MESSAGE]: !!conversationEntity.globalMessageTimer(),
         [Segmantation.CONVERSATION.GUESTS]: conversationEntity.hasGuest(),
         [Segmantation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
@@ -165,7 +165,7 @@ export class CallingViewModel {
       const conversationEntity = this.conversationRepository.find_conversation_by_id(call.conversationId);
       const segmentations = {
         [Segmantation.CALL.VIDEO]: call.initialType === CALL_TYPE.VIDEO,
-        [Segmantation.CONVERSATION.ALLOW_GUESTS]: '',
+        [Segmantation.CONVERSATION.ALLOW_GUESTS]: conversationEntity.isGuestRoom(),
         [Segmantation.CONVERSATION.EPHEMERAL_MESSAGE]: !!conversationEntity.globalMessageTimer(),
         [Segmantation.CONVERSATION.GUESTS]: conversationEntity.hasGuest(),
         [Segmantation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
