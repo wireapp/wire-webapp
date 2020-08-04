@@ -571,7 +571,7 @@ export class CallingRepository {
           const wirelessGuests = conversationEntity.participating_user_ets().filter(user => user.isTemporaryGuest())
             .length;
           const segmentations = {
-            [Segmantation.CALL.DIRECTION]: '',
+            [Segmantation.CALL.DIRECTION]: call.state(),
             [Segmantation.CALL.VIDEO]: callType === CALL_TYPE.VIDEO,
             [Segmantation.CONVERSATION.ALLOW_GUESTS]: conversationEntity.isGuestRoom(),
             [Segmantation.CONVERSATION.EPHEMERAL_MESSAGE]: !!conversationEntity.globalMessageTimer(),
