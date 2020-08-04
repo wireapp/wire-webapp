@@ -1,0 +1,20 @@
+  
+name: CI
+
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+
+jobs:
+  send_notification:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: wireapp/github-action-wire-messenger@v1
+        with:
+          email: ${{secrets.WIRE_BOT_EMAIL}}
+          password: ${{secrets.WIRE_BOT_PASSWORD}}
+          conversation: '4272e0dc-7745-47f7-9e03-42287fcbdd35'
+          text: 'Building new packages...'
