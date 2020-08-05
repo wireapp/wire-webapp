@@ -50,7 +50,7 @@ import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {PromiseQueue} from 'Util/PromiseQueue';
 import {Declension, joinNames, t} from 'Util/LocalizerUtil';
 import {getDifference, getNextItem} from 'Util/ArrayUtil';
-import {arrayToBase64, createRandomUuid, loadUrlBlob, sortGroupsByLastEvent} from 'Util/util';
+import {arrayToBase64, createRandomUuid, loadUrlBlob, sortGroupsByLastEvent, noop} from 'Util/util';
 import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/FileTypeUtil';
 import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
 import {
@@ -280,6 +280,7 @@ export class ConversationRepository {
     );
 
     this.conversationRoleRepository = new ConversationRoleRepository(this);
+    this.leaveCall = noop;
   }
 
   checkMessageTimer(messageEntity) {
@@ -1408,6 +1409,7 @@ export class ConversationRepository {
 
     if (leaveConversation) {
       conversationEntity.status(ConversationStatus.PAST_MEMBER);
+      this.leaveCall(conversationEntity.id);
     }
 
     this._updateClearedTimestamp(conversationEntity);
@@ -3643,7 +3645,7 @@ export class ConversationRepository {
 
     if (removesSelfUser) {
       conversationEntity.status(ConversationStatus.PAST_MEMBER);
-
+      this.leaveCall(conversationEntity.id);
       if (this.selfUser().isTemporaryGuest()) {
         eventJson.from = this.selfUser().id;
       }
