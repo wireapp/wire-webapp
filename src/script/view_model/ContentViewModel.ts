@@ -19,9 +19,11 @@
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {alias} from 'Util/util';
+import ko from 'knockout';
+import {amplify} from 'amplify';
 
 import {Config} from '../Config';
 import {MessageListViewModel} from './content/MessageListViewModel';
@@ -48,8 +50,86 @@ import {PreferencesDevicesViewModel} from './content/PreferencesDevicesViewModel
 import {PreferencesDeviceDetailsViewModel} from './content/PreferencesDeviceDetailsViewModel';
 import {InputBarViewModel} from './content/InputBarViewModel';
 import {MediaType} from '../media/MediaType';
+import {PanelViewModel} from './PanelViewModel';
+import type {MainViewModel} from './MainViewModel';
+import type {AssetRepository} from '../assets/AssetRepository';
+import type {ClientRepository} from '../client/ClientRepository';
+import type {ConversationRepository} from '../conversation/ConversationRepository';
+import type {CryptographyRepository} from '../cryptography/CryptographyRepository';
+import type {EventRepository} from '../event/EventRepository';
+import type {GiphyRepository} from '../extension/GiphyRepository';
+import type {IntegrationRepository} from '../integration/IntegrationRepository';
+import type {MediaRepository} from '../media/MediaRepository';
+import type {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
+import type {PropertiesRepository} from '../properties/PropertiesRepository';
+import type {SearchRepository} from '../search/SearchRepository';
+import type {ServerTimeHandler} from '../time/serverTimeHandler';
+import type {StorageRepository} from '../storage';
+import type {TeamRepository} from '../team/TeamRepository';
+import type {BackupRepository} from '../backup/BackupRepository';
+import type {CallingRepository} from '../calling/CallingRepository';
+import type {UserRepository} from '../user/UserRepository';
+import type {Conversation} from '../entity/Conversation';
+import type {Message} from '../entity/message/Message';
+
+interface Repositories {
+  asset: AssetRepository;
+  backup: BackupRepository;
+  calling: CallingRepository;
+  client: ClientRepository;
+  conversation: ConversationRepository;
+  cryptography: CryptographyRepository;
+  event: EventRepository;
+  giphy: GiphyRepository;
+  integration: IntegrationRepository;
+  media: MediaRepository;
+  preferenceNotification: PreferenceNotificationRepository;
+  properties: PropertiesRepository;
+  search: SearchRepository;
+  serverTime: ServerTimeHandler;
+  storage: StorageRepository;
+  team: TeamRepository;
+  user: UserRepository;
+}
+
+interface ShowConversationOptions {
+  exposeMessage?: Message;
+  openFirstSelfMention?: boolean;
+  openNotificationSettings?: boolean;
+}
 
 export class ContentViewModel {
+  elementId: string;
+  mainViewModel: MainViewModel;
+  conversationRepository: ConversationRepository;
+  userRepository: UserRepository;
+  logger: Logger;
+  state: ko.Observable<string>;
+  collectionDetails: CollectionDetailsViewModel;
+  collection: CollectionViewModel;
+  connectRequests: ConnectRequestsViewModel;
+  emojiInput: EmojiInputViewModel;
+  giphy: GiphyViewModel;
+  inputBar: InputBarViewModel;
+  groupCreation: GroupCreationViewModel;
+  userModal: UserModalViewModel;
+  serviceModal: ServiceModalViewModel;
+  inviteModal: InviteModalViewModel;
+  legalHoldModal: LegalHoldModalViewModel;
+  messageList: MessageListViewModel;
+  titleBar: TitleBarViewModel;
+  preferencesAbout: PreferencesAboutViewModel;
+  preferencesAccount: PreferencesAccountViewModel;
+  preferencesAV: PreferencesAVViewModel;
+  preferencesDeviceDetails: PreferencesDeviceDetailsViewModel;
+  preferencesDevices: PreferencesDevicesViewModel;
+  preferencesOptions: PreferencesOptionsViewModel;
+  historyExport: HistoryExportViewModel;
+  historyImport: HistoryImportViewModel;
+  previousState: string;
+  previousConversation: Conversation;
+  State: typeof ContentViewModel.STATE;
+
   static get STATE() {
     return {
       COLLECTION: 'ContentViewModel.STATE.COLLECTION',
@@ -68,16 +148,13 @@ export class ContentViewModel {
     };
   }
 
-  constructor(mainViewModel, repositories) {
-    this.switchContent = this.switchContent.bind(this);
-    this.switchPreviousContent = this.switchPreviousContent.bind(this);
-
+  constructor(mainViewModel: MainViewModel, repositories: Repositories) {
     this.elementId = 'center-column';
     this.mainViewModel = mainViewModel;
     this.conversationRepository = repositories.conversation;
     this.userRepository = repositories.user;
     this.logger = getLogger('ContentViewModel');
-    this.STATE = ContentViewModel.STATE;
+    this.State = ContentViewModel.STATE;
 
     // State
     this.state = ko.observable(ContentViewModel.STATE.WATERMARK);
@@ -212,16 +289,11 @@ export class ContentViewModel {
   }
 
   _initSubscriptions() {
-    amplify.subscribe(WebAppEvents.CONTENT.SWITCH, this.switchContent.bind(this));
+    amplify.subscribe(WebAppEvents.CONTENT.SWITCH, this.switchContent);
     amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, this.showConversation);
   }
 
-  /**
-   * Slide in specified content.
-   * @param {string} contentSelector DOM element to apply slide in animation
-   * @returns {undefined} No return value
-   */
-  _shiftContent(contentSelector) {
+  _shiftContent(contentSelector: string): void {
     const incomingCssClass = 'content-animation-incoming-horizontal-left';
 
     $(contentSelector)
@@ -238,14 +310,16 @@ export class ContentViewModel {
    *
    * @note If the conversation_et is not defined, it will open the incoming connection requests instead
    *
-   * @param {Conversation|string} conversation Conversation entity or conversation ID
-   * @param {Object} options State to open conversation in
-   * @param {Message} [options.exposeMessage] Scroll to message and highlight it
-   * @param {boolean} [options.openFirstSelfMention=false] Open first self mention instead of passed message
-   * @param {boolean} [options.openNotificationSettings=false] Open notification settings of conversation
-   * @returns {undefined} No return value
+   * @param conversation Conversation entity or conversation ID
+   * @param options State to open conversation in
+   * @param options.exposeMessage Scroll to message and highlight it
+   * @param options.openFirstSelfMention Open first self mention instead of passed message
+   * @param options.openNotificationSettings Open notification settings of conversation
    */
-  showConversation = (conversation, options = {}) => {
+  showConversation = (
+    conversation: Conversation | string,
+    options: ShowConversationOptions = {} as ShowConversationOptions,
+  ) => {
     const {
       exposeMessage: exposeMessageEntity,
       openFirstSelfMention = false,
@@ -264,7 +338,7 @@ export class ContentViewModel {
 
     const conversationPromise = isConversation
       ? Promise.resolve(conversation)
-      : this.conversationRepository.get_conversation_by_id(conversation);
+      : this.conversationRepository.get_conversation_by_id(conversation as string);
 
     conversationPromise
       .then(conversationEntity => {
@@ -280,12 +354,12 @@ export class ContentViewModel {
 
         if (isOpenedConversation) {
           if (openNotificationSettings) {
-            this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.NOTIFICATIONS);
+            this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.NOTIFICATIONS, undefined);
           }
           return;
         }
 
-        this._releaseContent(this.state());
+        this.releaseContent(this.state());
 
         this.state(ContentViewModel.STATE.CONVERSATION);
         this.mainViewModel.list.openConversations();
@@ -308,10 +382,10 @@ export class ContentViewModel {
 
         unarchivePromise.then(() => {
           this.messageList.changeConversation(conversationEntity, messageEntity).then(() => {
-            this._showContent(ContentViewModel.STATE.CONVERSATION);
+            this.showContent(ContentViewModel.STATE.CONVERSATION);
             this.previousConversation = this.conversationRepository.active_conversation();
             if (openNotificationSettings) {
-              this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.NOTIFICATIONS);
+              this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.NOTIFICATIONS, undefined);
             }
           });
         });
@@ -319,27 +393,31 @@ export class ContentViewModel {
       .catch(error => {
         const isConversationNotFound = error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
         if (isConversationNotFound) {
-          this.mainViewModel.modals.showModal(ModalsViewModel.TYPE.ACKNOWLEDGE, {
-            text: {
-              message: t('conversationNotFoundMessage'),
-              title: t('conversationNotFoundTitle', Config.getConfig().BRAND_NAME),
+          this.mainViewModel.modals.showModal(
+            ModalsViewModel.TYPE.ACKNOWLEDGE,
+            {
+              text: {
+                message: t('conversationNotFoundMessage'),
+                title: t('conversationNotFoundTitle', Config.getConfig().BRAND_NAME),
+              },
             },
-          });
+            undefined,
+          );
         } else {
           throw error;
         }
       });
   };
 
-  switchContent(newContentState) {
+  switchContent = (newContentState: string): void => {
     const isStateChange = newContentState !== this.state();
     if (isStateChange) {
-      this._releaseContent(newContentState);
-      this._showContent(this._checkContentAvailability(newContentState));
+      this.releaseContent(newContentState);
+      this.showContent(this.checkContentAvailability(newContentState));
     }
-  }
+  };
 
-  switchPreviousContent() {
+  switchPreviousContent = (): void => {
     const isStateChange = this.previousState !== this.state();
     if (isStateChange) {
       const isStateRequests = this.previousState === ContentViewModel.STATE.CONNECTION_REQUESTS;
@@ -355,9 +433,9 @@ export class ContentViewModel {
 
       return this.switchContent(ContentViewModel.STATE.WATERMARK);
     }
-  }
+  };
 
-  _checkContentAvailability(state) {
+  private readonly checkContentAvailability = (state: string) => {
     const isStateRequests = state === ContentViewModel.STATE.CONNECTION_REQUESTS;
     if (isStateRequests) {
       const hasConnectRequests = !!this.userRepository.connect_requests().length;
@@ -366,9 +444,9 @@ export class ContentViewModel {
       }
     }
     return state;
-  }
+  };
 
-  _getElementOfContent(state) {
+  private readonly getElementOfContent = (state: string) => {
     switch (state) {
       case ContentViewModel.STATE.COLLECTION:
         return '.collection';
@@ -393,9 +471,9 @@ export class ContentViewModel {
       default:
         return '.watermark';
     }
-  }
+  };
 
-  _releaseContent(newContentState) {
+  private readonly releaseContent = (newContentState: string) => {
     this.previousState = this.state();
 
     const isStateConversation = this.previousState === ContentViewModel.STATE.CONVERSATION;
@@ -406,17 +484,17 @@ export class ContentViewModel {
         this.conversationRepository.active_conversation(null);
       }
 
-      return this.messageList.release_conversation();
+      return this.messageList.release_conversation(undefined);
     }
 
     const isStatePreferencesAv = this.previousState === ContentViewModel.STATE.PREFERENCES_AV;
     if (isStatePreferencesAv) {
       this.preferencesAV.releaseDevices(MediaType.AUDIO_VIDEO);
     }
-  }
+  };
 
-  _showContent(newContentState) {
+  private readonly showContent = (newContentState: string) => {
     this.state(newContentState);
-    return this._shiftContent(this._getElementOfContent(newContentState));
-  }
+    return this._shiftContent(this.getElementOfContent(newContentState));
+  };
 }
