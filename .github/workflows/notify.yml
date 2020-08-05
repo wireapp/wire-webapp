@@ -1,4 +1,4 @@
-name: Notify AVS deployments on Push
+name: Notify About AVS Deployments On Push
 
 on:
   push:
@@ -10,9 +10,9 @@ jobs:
     if: |
       !contains(github.event.head_commit.message, '[ci skip]') &&
       !contains(github.event.head_commit.message, '[skip ci]')
-
     steps:
-      - uses: wireapp/github-action-wire-messenger@v1
+      - name: Send message
+        uses: wireapp/github-action-wire-messenger@v1
         with:
           email: ${{secrets.WIRE_BOT_EMAIL}}
           password: ${{secrets.WIRE_BOT_PASSWORD}}
