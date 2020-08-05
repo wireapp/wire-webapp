@@ -308,6 +308,7 @@ class App {
     );
     repositories.preferenceNotification = new PreferenceNotificationRepository(repositories.user.self);
 
+    repositories.conversation.leaveCall = repositories.calling.leaveCall;
     return repositories;
   }
 
