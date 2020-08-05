@@ -484,7 +484,6 @@ export class CallingRepository {
         break;
       }
       case CALL_MESSAGE_TYPE.SETUP:
-      case CALL_MESSAGE_TYPE.CONF_START:
       case CALL_MESSAGE_TYPE.CONFKEY:
       case CALL_MESSAGE_TYPE.GROUP_START: {
         if (source !== EventRepository.SOURCE.STREAM) {
