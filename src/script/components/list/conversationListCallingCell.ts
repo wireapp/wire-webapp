@@ -19,7 +19,7 @@
 
 import ko from 'knockout';
 
-import {CALL_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
+import {CALL_TYPE, REASON as CALL_REASON, STATE as CALL_STATE, CONV_TYPE} from '@wireapp/avs';
 
 import {t} from 'Util/LocalizerUtil';
 import {formatSeconds} from 'Util/TimeUtil';
@@ -39,6 +39,8 @@ import type {Conversation} from '../../entity/Conversation';
 import type {User} from '../../entity/User';
 import type {CallActions} from '../../view_model/CallingViewModel';
 import type {Multitasking} from '../../notification/NotificationRepository';
+import type {TeamRepository} from 'src/script/team/TeamRepository';
+import {Participant} from '../../calling/Participant';
 
 interface ComponentParams {
   call: Call;
@@ -48,6 +50,7 @@ interface ComponentParams {
   hasAccessToCamera: ko.Observable<boolean>;
   isSelfVerified: ko.Subscribable<boolean>;
   multitasking: Multitasking;
+  teamRepository: TeamRepository;
   temporaryUserStyle?: boolean;
   videoGrid: ko.PureComputed<Grid>;
 }
@@ -84,7 +87,9 @@ class ConversationListCallingCell {
   readonly temporaryUserStyle: boolean;
   readonly videoGrid: ko.PureComputed<Grid>;
   readonly isSelfVerified: ko.Subscribable<boolean>;
-  readonly users: ko.PureComputed<User[]>;
+  readonly participants: ko.PureComputed<Participant[]>;
+  readonly selfParticipant: Participant;
+  readonly teamRepository: TeamRepository;
 
   constructor({
     call,
@@ -94,12 +99,14 @@ class ConversationListCallingCell {
     temporaryUserStyle = false,
     multitasking,
     callActions,
+    teamRepository,
     hasAccessToCamera,
     isSelfVerified = ko.observable(false),
   }: ComponentParams) {
     this.call = call;
     this.conversation = conversation;
     this.callingRepository = callingRepository;
+    this.teamRepository = teamRepository;
     this.temporaryUserStyle = temporaryUserStyle;
     this.multitasking = multitasking;
     this.callActions = callActions;
@@ -146,7 +153,7 @@ class ConversationListCallingCell {
     this.showParticipants = ko.observable(false);
     this.showParticipantsButton = ko.pureComputed(() => this.isOngoing() && this.conversation().isGroup());
     this.participantsButtonLabel = ko.pureComputed(() => {
-      return t('callParticipants', this.users().length);
+      return t('callParticipants', this.participants().length);
     });
     this.showMaximize = ko.pureComputed(() => this.multitasking.isMinimized() && this.isOngoing());
 
@@ -162,8 +169,11 @@ class ConversationListCallingCell {
     this.showJoinButton = ko.pureComputed(() => conversation() && this.isStillOngoing() && temporaryUserStyle);
     this.disableScreenButton = !this.callingRepository.supportsScreenSharing;
     this.disableVideoButton = ko.pureComputed(() => {
-      const isOutgoingVideoCall = this.isOutgoing() && call.selfParticipant.sharesCamera();
-      const isVideoUnsupported = !call.selfParticipant.sharesCamera() && !conversation().supportsVideoCall();
+      const selfParticipant = call.getSelfParticipant();
+      const isOutgoingVideoCall = this.isOutgoing() && selfParticipant?.sharesCamera();
+      const isVideoUnsupported =
+        !selfParticipant?.sharesCamera() &&
+        !conversation().supportsVideoCall(call.conversationType === CONV_TYPE.CONFERENCE);
       return isOutgoingVideoCall || isVideoUnsupported;
     });
 
@@ -171,9 +181,14 @@ class ConversationListCallingCell {
       return !hasAccessToCamera() && call.initialType === CALL_TYPE.VIDEO && !this.showVideoGrid() && !this.isOngoing();
     });
 
-    this.users = ko.pureComputed(() =>
-      [call.selfParticipant, ...call.participants()].map(({userId}) => this.findUser(userId)).sort(sortUsersByPriority),
+    this.participants = ko.pureComputed(() =>
+      call
+        .participants()
+        .slice()
+        .sort((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user)),
     );
+
+    this.selfParticipant = call.getSelfParticipant();
 
     this.dispose = () => {
       window.clearInterval(callDurationUpdateInterval);
@@ -201,15 +216,6 @@ class ConversationListCallingCell {
     // TODO: this is a very hacky way to get antiscroll to recalculate the height of the conversationlist.
     // Once there is a new solution to this, this needs to go.
     afterRender(() => window.dispatchEvent(new Event('resize')));
-  }
-
-  findUser(userId: string): User {
-    return this.conversationParticipants().find(user => user.id === userId);
-  }
-
-  userHasCamera(user: User): boolean {
-    const participant = this.call.participants().find(({userId}) => userId === user.id);
-    return participant?.hasActiveVideo() ?? false;
   }
 }
 
@@ -269,7 +275,7 @@ ko.components.register('conversation-list-calling-cell', {
 
       <!-- ko if: showVideoGrid() -->
         <div class="group-video__minimized-wrapper" data-bind="click: showFullscreenVideoGrid">
-          <group-video-grid params="minimized: true, grid: videoGrid, selfUserId: call.selfParticipant.userId"></group-video-grid>
+          <group-video-grid params="minimized: true, grid: videoGrid, selfParticipant: selfParticipant"></group-video-grid>
           <!-- ko if: showMaximize() -->
             <div class="group-video__minimized-wrapper__overlay" data-uie-name="do-maximize-call">
               <fullscreen-icon></fullscreen-icon>
@@ -286,10 +292,10 @@ ko.components.register('conversation-list-calling-cell', {
         <div class="conversation-list-calling-cell-controls">
           <div class="conversation-list-calling-cell-controls-left">
             <button class="call-ui__button" data-bind="click: () => callActions.toggleMute(call, !isMuted()), css: {'call-ui__button--active': isMuted()}, attr: {'data-uie-value': !isMuted() ? 'inactive' : 'active', 'title': t('videoCallOverlayMute')}" data-uie-name="do-toggle-mute">
-              <micoff-icon class="small-icon"></micoff-icon>
+              <mic-off-icon class="small-icon"></mic-off-icon>
             </button>
             <!-- ko if: showVideoButton() -->
-              <button class="call-ui__button" data-bind="click: () => callActions.toggleCamera(call), css: {'call-ui__button--active': call.selfParticipant.sharesCamera()}, disable: disableVideoButton(), attr: {'data-uie-value': call.selfParticipant.sharesCamera() ? 'active' : 'inactive', 'title': t('videoCallOverlayVideo')}" data-uie-name="do-toggle-video">
+              <button class="call-ui__button" data-bind="click: () => callActions.toggleCamera(call), css: {'call-ui__button--active': selfParticipant.sharesCamera()}, disable: disableVideoButton(), attr: {'data-uie-value': selfParticipant.sharesCamera() ? 'active' : 'inactive', 'title': t('videoCallOverlayVideo')}" data-uie-name="do-toggle-video">
                 <camera-icon class="small-icon"></camera-icon>
               </button>
             <!-- /ko -->
@@ -298,8 +304,8 @@ ko.components.register('conversation-list-calling-cell', {
                 data-bind="tooltip: {text: t('videoCallScreenShareNotSupported'),
                   disabled: !disableScreenButton, position: 'bottom'},
                   click: () => callActions.toggleScreenshare(call),
-                  css: {'call-ui__button--active': call.selfParticipant.sharesScreen(), 'call-ui__button--disabled': disableScreenButton},
-                  attr: {'data-uie-value': call.selfParticipant.sharesScreen() ? 'active' : 'inactive', 'data-uie-enabled': disableScreenButton ? 'false' : 'true', title: t('videoCallOverlayShareScreen')}"
+                  css: {'call-ui__button--active': selfParticipant.sharesScreen(), 'call-ui__button--disabled': disableScreenButton},
+                  attr: {'data-uie-value': selfParticipant.sharesScreen() ? 'active' : 'inactive', 'data-uie-enabled': disableScreenButton ? 'false' : 'true', title: t('videoCallOverlayShareScreen')}"
                 data-uie-name="do-call-controls-toggle-screenshare">
                 <screenshare-icon class="small-icon"></screenshare-icon>
               </div>
@@ -326,8 +332,8 @@ ko.components.register('conversation-list-calling-cell', {
         </div>
 
         <div class="call-ui__participant-list__wrapper" data-bind="css: {'call-ui__participant-list__wrapper--active': showParticipants}">
-          <div class="call-ui__participant-list" data-bind="foreach: {data: users, as: 'user', noChildContext: true}, fadingscrollbar" data-uie-name="list-call-ui-participants">
-              <participant-item params="participant: user, hideInfo: true, showCamera: userHasCamera(user), selfInTeam: $parent.selfInTeam, isSelfVerified: isSelfVerified" data-bind="css: {'no-underline': true}"></participant-item>
+          <div class="call-ui__participant-list" data-bind="foreach: {data: participants, as: 'participant', noChildContext: true}, fadingscrollbar" data-uie-name="list-call-ui-participants">
+            <participant-item params="participant: participant.user, hideInfo: true, callParticipant: participant, selfInTeam: $parent.selfInTeam, isSelfVerified: isSelfVerified, external: teamRepository.isExternal(participant.user.id)" data-bind="css: {'no-underline': true}"></participant-item>
           </div>
         </div>
 

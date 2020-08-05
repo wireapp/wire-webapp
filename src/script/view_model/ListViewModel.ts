@@ -17,7 +17,7 @@
  *
  */
 
-import {CALL_TYPE} from '@wireapp/avs';
+import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
 import {amplify} from 'amplify';
@@ -40,6 +40,7 @@ import {Shortcut} from '../ui/Shortcut';
 import {ShortcutType} from '../ui/ShortcutType';
 import {ContentViewModel} from './ContentViewModel';
 import {DefaultLabelIds} from '../conversation/ConversationLabelRepository';
+import {ModalsViewModel} from './ModalsViewModel';
 import {PanelViewModel} from './PanelViewModel';
 import type {MainViewModel} from './MainViewModel';
 import type {CallingRepository} from '../calling/CallingRepository';
@@ -193,7 +194,12 @@ export class ListViewModel {
       repositories.user,
     );
     this.takeover = new TakeoverViewModel(this, repositories.user, repositories.conversation);
-    this.temporaryGuest = new TemporaryGuestViewModel(mainViewModel, repositories.user, repositories.calling);
+    this.temporaryGuest = new TemporaryGuestViewModel(
+      mainViewModel,
+      repositories.user,
+      repositories.calling,
+      repositories.team,
+    );
 
     this._initSubscriptions();
 
@@ -214,10 +220,20 @@ export class ListViewModel {
     amplify.subscribe(WebAppEvents.SHORTCUT.SILENCE, this.changeNotificationSetting); // todo: deprecated - remove when user base of wrappers version >= 3.4 is large enough
   };
 
-  answerCall = (conversationEntity: Conversation) => {
+  answerCall = (conversationEntity: Conversation): void => {
     const call = this.callingRepository.findCall(conversationEntity.id);
-    if (call) {
-      const callType = call.selfParticipant.sharesCamera() ? call.initialType : CALL_TYPE.NORMAL;
+    if (!call) {
+      return;
+    }
+    if (call.conversationType === CONV_TYPE.CONFERENCE && !this.callingRepository.supportsConferenceCalling) {
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+        text: {
+          message: `${t('modalConferenceCallNotSupportedMessage')} ${t('modalConferenceCallNotSupportedJoinMessage')}`,
+          title: t('modalConferenceCallNotSupportedHeadline'),
+        },
+      });
+    } else {
+      const callType = call.getSelfParticipant().sharesCamera() ? call.initialType : CALL_TYPE.NORMAL;
       this.callingRepository.answerCall(call, callType);
     }
   };

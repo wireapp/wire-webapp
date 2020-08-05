@@ -215,10 +215,16 @@ export class ContentViewModel {
       repositories.team,
       repositories.user,
     );
-    this.preferencesAV = new PreferencesAVViewModel(repositories.media, repositories.user, {
-      replaceActiveMediaSource: repositories.calling.changeMediaSource.bind(repositories.calling),
-      stopActiveMediaSource: repositories.calling.stopMediaSource.bind(repositories.calling),
-    });
+    this.preferencesAV = new PreferencesAVViewModel(
+      repositories.media,
+      repositories.user,
+      repositories.properties,
+      repositories.calling,
+      {
+        replaceActiveMediaSource: repositories.calling.changeMediaSource.bind(repositories.calling),
+        stopActiveMediaSource: repositories.calling.stopMediaSource.bind(repositories.calling),
+      },
+    );
     this.preferencesDeviceDetails = new PreferencesDeviceDetailsViewModel(
       mainViewModel,
       repositories.client,
@@ -233,7 +239,6 @@ export class ContentViewModel {
       repositories.user,
     );
     this.preferencesOptions = new PreferencesOptionsViewModel(
-      repositories.calling,
       repositories.properties,
       repositories.team,
       repositories.user,

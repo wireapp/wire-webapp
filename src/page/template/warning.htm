@@ -21,7 +21,10 @@
 
       <!-- ko if: visibleWarning() === type.REQUEST_MICROPHONE -->
         <div class="warning-bar warning-bar-feature">
-          <div class="warning-bar-message" data-bind="html: t('warningPermissionRequestMicrophone', {}, {'icon': '<span class=\'warning-bar-icon icon-microphone\'></span>'})"></div>
+          <div class="warning-bar-message">
+            <mic-on-icon class="warning-bar-icon"></mic-on-icon>
+            <span data-bind="html: t('warningPermissionRequestMicrophone',{},{icon: ''})"></span>
+          </div>
           <span class="warning-bar-close icon-close button-round button-round-dark" data-bind="click: closeWarning"></span>
         </div>
       <!-- /ko -->
