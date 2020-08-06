@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-avs/compare/@wireapp/bot-handler-avs@0.2.4...@wireapp/bot-handler-avs@0.2.5) (2020-08-06)
+
+
+### Bug Fixes
+
+* **bot-handler-avs:** Add compatibility with Node.js 14 ([#3158](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-avs/issues/3158)) ([a1f81ff](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-avs/commit/a1f81ff4475db4410ba0ca7ca76b45aa97f3bbdb))
+
+
+
+
+
 ## [0.2.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-avs/compare/@wireapp/bot-handler-avs@0.2.3...@wireapp/bot-handler-avs@0.2.4) (2020-08-04)
 
 **Note:** Version bump only for package @wireapp/bot-handler-avs

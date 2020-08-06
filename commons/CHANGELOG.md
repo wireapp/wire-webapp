@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.7.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@3.6.3...@wireapp/commons@3.7.0) (2020-08-06)
+
+
+### Features
+
+* **commons:** Add handle validation ([#3160](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/issues/3160)) ([49eb79e](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/commit/49eb79e0ae9e8d16f1bf6f40afd179c94537c069))
+
+
+
+
+
 ## [3.6.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@3.6.2...@wireapp/commons@3.6.3) (2020-07-30)
 
 **Note:** Version bump only for package @wireapp/commons
