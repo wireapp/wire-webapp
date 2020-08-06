@@ -66,8 +66,8 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
     const localEmail = email.trim();
     if (isValidEmail(localEmail)) {
       loginData.email = localEmail;
-    } else if (isValidUsername(localEmail)) {
-      loginData.handle = localEmail.replace('@', '');
+    } else if (isValidUsername(localEmail.toLowerCase())) {
+      loginData.handle = localEmail.replace('@', '').toLowerCase();
     } else if (Config.getConfig().FEATURE.ENABLE_PHONE_LOGIN && isValidPhoneNumber(localEmail)) {
       loginData.phone = localEmail;
     }
