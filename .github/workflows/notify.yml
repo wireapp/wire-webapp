@@ -2,7 +2,8 @@ name: Notify About AVS Deployments On Push
 
 on:
   push:
-    branches: [avs]
+    branches:
+      - avs
 
 jobs:
   send_notification:
