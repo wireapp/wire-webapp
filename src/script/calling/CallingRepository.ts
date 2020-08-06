@@ -654,10 +654,10 @@ export class CallingRepository {
     this.wCall.reject(this.wUser, conversationId);
   }
 
-  leaveCall(conversationId: ConversationId): void {
+  leaveCall = (conversationId: ConversationId): void => {
     delete this.poorCallQualityUsers[conversationId];
     this.wCall.end(this.wUser, conversationId);
-  }
+  };
 
   muteCall(conversationId: ConversationId, shouldMute: boolean): void {
     this.wCall.setMute(this.wUser, shouldMute ? 1 : 0);
