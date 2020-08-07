@@ -17,11 +17,11 @@
  *
  */
 
+import {CONVERSATION_TYPE} from '@wireapp/api-client/dist/conversation';
 import {noop} from 'Util/util';
 
 import {ConversationDetailsViewModel} from 'src/script/view_model/panel/ConversationDetailsViewModel';
 import {Conversation} from 'src/script/entity/Conversation';
-import {ConversationType} from 'src/script/conversation/ConversationType';
 import {TestFactory} from '../../../helper/TestFactory';
 
 describe('ConversationDetailsViewModel', () => {
@@ -55,22 +55,22 @@ describe('ConversationDetailsViewModel', () => {
 
       const tests = [
         {
-          conversationType: ConversationType.ONE2ONE,
+          conversationType: CONVERSATION_TYPE.ONE_TO_ONE,
           expected: ['go-create-group', 'do-archive', 'do-clear', 'do-block'],
           permission: {canCreateGroupConversation: () => true},
         },
         {
-          conversationType: ConversationType.ONE2ONE,
+          conversationType: CONVERSATION_TYPE.ONE_TO_ONE,
           expected: ['do-archive', 'do-clear', 'do-block'],
           permission: {canCreateGroupConversation: () => false},
         },
         {
-          conversationType: ConversationType.GROUP,
+          conversationType: CONVERSATION_TYPE.REGULAR,
           expected: ['do-archive', 'do-clear', 'do-leave'],
           permission: {canCreateGroupConversation: () => true},
         },
         {
-          conversationType: ConversationType.CONNECT,
+          conversationType: CONVERSATION_TYPE.CONNECT,
           expected: ['do-archive', 'do-cancel-request', 'do-block'],
           permission: {canCreateGroupConversation: () => true},
         },
@@ -99,22 +99,22 @@ describe('ConversationDetailsViewModel', () => {
 
       const tests = [
         {
-          conversationType: ConversationType.ONE2ONE,
+          conversationType: CONVERSATION_TYPE.ONE_TO_ONE,
           expected: ['go-create-group', 'do-archive', 'do-clear', 'do-block'],
           permission: {canCreateGroupConversation: () => true},
         },
         {
-          conversationType: ConversationType.ONE2ONE,
+          conversationType: CONVERSATION_TYPE.ONE_TO_ONE,
           expected: ['do-archive', 'do-clear', 'do-block'],
           permission: {canCreateGroupConversation: () => false},
         },
         {
-          conversationType: ConversationType.GROUP,
+          conversationType: CONVERSATION_TYPE.REGULAR,
           expected: ['do-archive', 'do-clear', 'do-leave', 'do-delete'],
           permission: {canCreateGroupConversation: () => true},
         },
         {
-          conversationType: ConversationType.CONNECT,
+          conversationType: CONVERSATION_TYPE.CONNECT,
           expected: ['do-archive', 'do-cancel-request', 'do-block'],
           permission: {canCreateGroupConversation: () => true},
         },

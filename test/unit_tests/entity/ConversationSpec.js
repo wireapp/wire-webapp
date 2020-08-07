@@ -19,6 +19,7 @@
 
 import 'src/script/localization/Localizer';
 import {createRandomUuid} from 'Util/util';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/dist/conversation';
 
 import {Conversation} from 'src/script/entity/Conversation';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
@@ -31,7 +32,6 @@ import {MemberMessage} from 'src/script/entity/message/MemberMessage';
 
 import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
 import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
-import {ConversationType} from 'src/script/conversation/ConversationType';
 
 import {StatusType} from 'src/script/message/StatusType';
 import {CALL_MESSAGE_TYPE} from 'src/script/message/CallMessageType';
@@ -60,28 +60,28 @@ describe('Conversation', () => {
     beforeEach(() => (conversation_et = new Conversation()));
 
     it('should return the expected value for personal conversations', () => {
-      conversation_et.type(ConversationType.CONNECT);
+      conversation_et.type(CONVERSATION_TYPE.CONNECT);
 
       expect(conversation_et.isGroup()).toBeFalsy();
       expect(conversation_et.is1to1()).toBeFalsy();
       expect(conversation_et.isRequest()).toBeTruthy();
       expect(conversation_et.isSelf()).toBeFalsy();
 
-      conversation_et.type(ConversationType.ONE2ONE);
+      conversation_et.type(CONVERSATION_TYPE.ONE_TO_ONE);
 
       expect(conversation_et.isGroup()).toBeFalsy();
       expect(conversation_et.is1to1()).toBeTruthy();
       expect(conversation_et.isRequest()).toBeFalsy();
       expect(conversation_et.isSelf()).toBeFalsy();
 
-      conversation_et.type(ConversationType.SELF);
+      conversation_et.type(CONVERSATION_TYPE.SELF);
 
       expect(conversation_et.isGroup()).toBeFalsy();
       expect(conversation_et.is1to1()).toBeFalsy();
       expect(conversation_et.isRequest()).toBeFalsy();
       expect(conversation_et.isSelf()).toBeTruthy();
 
-      conversation_et.type(ConversationType.GROUP);
+      conversation_et.type(CONVERSATION_TYPE.REGULAR);
 
       expect(conversation_et.isGroup()).toBeTruthy();
       expect(conversation_et.is1to1()).toBeFalsy();
@@ -92,28 +92,28 @@ describe('Conversation', () => {
     it('should return the expected value for team conversations', () => {
       conversation_et.team_id = createRandomUuid();
 
-      conversation_et.type(ConversationType.CONNECT);
+      conversation_et.type(CONVERSATION_TYPE.CONNECT);
 
       expect(conversation_et.isGroup()).toBeFalsy();
       expect(conversation_et.is1to1()).toBeFalsy();
       expect(conversation_et.isRequest()).toBeTruthy();
       expect(conversation_et.isSelf()).toBeFalsy();
 
-      conversation_et.type(ConversationType.ONE2ONE);
+      conversation_et.type(CONVERSATION_TYPE.ONE_TO_ONE);
 
       expect(conversation_et.isGroup()).toBeFalsy();
       expect(conversation_et.is1to1()).toBeTruthy();
       expect(conversation_et.isRequest()).toBeFalsy();
       expect(conversation_et.isSelf()).toBeFalsy();
 
-      conversation_et.type(ConversationType.SELF);
+      conversation_et.type(CONVERSATION_TYPE.SELF);
 
       expect(conversation_et.isGroup()).toBeFalsy();
       expect(conversation_et.is1to1()).toBeFalsy();
       expect(conversation_et.isRequest()).toBeFalsy();
       expect(conversation_et.isSelf()).toBeTruthy();
 
-      conversation_et.type(ConversationType.GROUP);
+      conversation_et.type(CONVERSATION_TYPE.REGULAR);
 
       expect(conversation_et.isGroup()).toBeTruthy();
       expect(conversation_et.is1to1()).toBeFalsy();
@@ -121,7 +121,7 @@ describe('Conversation', () => {
       expect(conversation_et.isSelf()).toBeFalsy();
 
       conversation_et.participating_user_ids.push(createRandomUuid());
-      conversation_et.type(ConversationType.GROUP);
+      conversation_et.type(CONVERSATION_TYPE.REGULAR);
 
       expect(conversation_et.isGroup()).toBeFalsy();
       expect(conversation_et.is1to1()).toBeTruthy();
@@ -129,7 +129,7 @@ describe('Conversation', () => {
       expect(conversation_et.isSelf()).toBeFalsy();
 
       conversation_et.participating_user_ids.push(createRandomUuid());
-      conversation_et.type(ConversationType.GROUP);
+      conversation_et.type(CONVERSATION_TYPE.REGULAR);
 
       expect(conversation_et.isGroup()).toBeTruthy();
       expect(conversation_et.is1to1()).toBeFalsy();
@@ -464,21 +464,21 @@ describe('Conversation', () => {
     it('displays a name if the conversation is a 1:1 conversation or a connection request', () => {
       other_user.name(window.entities.user.jane_roe.name);
       conversation_et.participating_user_ets.push(other_user);
-      conversation_et.type(ConversationType.ONE2ONE);
+      conversation_et.type(CONVERSATION_TYPE.ONE_TO_ONE);
 
       expect(conversation_et.display_name()).toBe(conversation_et.participating_user_ets()[0].name());
 
-      conversation_et.type(ConversationType.CONNECT);
+      conversation_et.type(CONVERSATION_TYPE.CONNECT);
 
       expect(conversation_et.display_name()).toBe(conversation_et.participating_user_ets()[0].name());
     });
 
     it('displays a fallback if no user name has been set', () => {
-      conversation_et.type(ConversationType.ONE2ONE);
+      conversation_et.type(CONVERSATION_TYPE.ONE_TO_ONE);
 
       expect(conversation_et.display_name()).toBe('…');
 
-      conversation_et.type(ConversationType.CONNECT);
+      conversation_et.type(CONVERSATION_TYPE.CONNECT);
 
       expect(conversation_et.display_name()).toBe('…');
     });
@@ -489,7 +489,7 @@ describe('Conversation', () => {
       other_user.name(window.entities.user.jane_roe.name);
       conversation_et.participating_user_ets.push(other_user);
       conversation_et.participating_user_ets.push(third_user);
-      conversation_et.type(ConversationType.GROUP);
+      conversation_et.type(CONVERSATION_TYPE.REGULAR);
       const expected_display_name = `${conversation_et
         .participating_user_ets()[0]
         .name()}, ${conversation_et.participating_user_ets()[1].name()}`;
@@ -498,14 +498,14 @@ describe('Conversation', () => {
     });
 
     it('displays "Empty Conversation" if no other participants are in the conversation', () => {
-      conversation_et.type(ConversationType.GROUP);
+      conversation_et.type(CONVERSATION_TYPE.REGULAR);
 
       expect(conversation_et.display_name()).toBe(z.string.conversationsEmptyConversation);
     });
 
     it('displays a fallback if no user name has been set for a group conversation', () => {
       const user = new User(createRandomUuid());
-      conversation_et.type(ConversationType.GROUP);
+      conversation_et.type(CONVERSATION_TYPE.REGULAR);
       conversation_et.participating_user_ids.push(other_user.id);
       conversation_et.participating_user_ids.push(user.id);
 
@@ -513,7 +513,7 @@ describe('Conversation', () => {
     });
 
     it('displays the conversation name for a self conversation', () => {
-      conversation_et.type(ConversationType.SELF);
+      conversation_et.type(CONVERSATION_TYPE.SELF);
 
       expect(conversation_et.display_name()).toBe('…');
 
@@ -625,11 +625,11 @@ describe('Conversation', () => {
       const userEntity = new User(createRandomUuid());
       conversation_et.participating_user_ets.push(userEntity);
 
-      conversation_et.type(ConversationType.ONE2ONE);
+      conversation_et.type(CONVERSATION_TYPE.ONE_TO_ONE);
 
       expect(conversation_et.hasGuest()).toBe(false);
 
-      conversation_et.type(ConversationType.GROUP);
+      conversation_et.type(CONVERSATION_TYPE.REGULAR);
 
       expect(conversation_et.hasGuest()).toBe(false);
 
@@ -638,21 +638,21 @@ describe('Conversation', () => {
       secondUserEntity.isGuest(true);
       conversation_et.participating_user_ets.push(secondUserEntity);
 
-      conversation_et.type(ConversationType.ONE2ONE);
+      conversation_et.type(CONVERSATION_TYPE.ONE_TO_ONE);
 
       expect(conversation_et.hasGuest()).toBe(false);
 
-      conversation_et.type(ConversationType.GROUP);
+      conversation_et.type(CONVERSATION_TYPE.REGULAR);
 
       expect(conversation_et.hasGuest()).toBe(true);
 
       // Is false for conversations containing a guest if the self user is a personal account
       selfUserEntity.inTeam(false);
-      conversation_et.type(ConversationType.ONE2ONE);
+      conversation_et.type(CONVERSATION_TYPE.ONE_TO_ONE);
 
       expect(conversation_et.hasGuest()).toBe(false);
 
-      conversation_et.type(ConversationType.GROUP);
+      conversation_et.type(CONVERSATION_TYPE.REGULAR);
 
       expect(conversation_et.hasGuest()).toBe(false);
     });
@@ -665,11 +665,11 @@ describe('Conversation', () => {
       conversation_et = new Conversation(createRandomUuid());
       conversation_et.participating_user_ets.push(userEntity);
 
-      conversation_et.type(ConversationType.ONE2ONE);
+      conversation_et.type(CONVERSATION_TYPE.ONE_TO_ONE);
 
       expect(conversation_et.hasService()).toBe(false);
 
-      conversation_et.type(ConversationType.GROUP);
+      conversation_et.type(CONVERSATION_TYPE.REGULAR);
 
       expect(conversation_et.hasService()).toBe(false);
 
@@ -677,11 +677,11 @@ describe('Conversation', () => {
       secondUserEntity.isService = true;
       conversation_et.participating_user_ets.push(secondUserEntity);
 
-      conversation_et.type(ConversationType.ONE2ONE);
+      conversation_et.type(CONVERSATION_TYPE.ONE_TO_ONE);
 
       expect(conversation_et.hasService()).toBe(true);
 
-      conversation_et.type(ConversationType.GROUP);
+      conversation_et.type(CONVERSATION_TYPE.REGULAR);
 
       expect(conversation_et.hasService()).toBe(true);
     });

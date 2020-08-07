@@ -1125,7 +1125,7 @@ export class ConversationRepository {
         conversationEntity.connection(connectionEntity);
 
         if (connectionEntity.isConnected()) {
-          conversationEntity.type(CONVERSATION_TYPE.ONE2ONE);
+          conversationEntity.type(CONVERSATION_TYPE.ONE_TO_ONE);
         }
 
         this.updateParticipatingUserEntities(conversationEntity).then(updatedConversationEntity => {

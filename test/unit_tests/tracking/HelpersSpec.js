@@ -18,26 +18,26 @@
  */
 
 import {createRandomUuid} from 'Util/util';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/dist/conversation';
 
 import {Conversation} from 'src/script/entity/Conversation';
-import {ConversationType as ConversationTypeAttribute} from 'src/script/tracking/attribute';
+import {ConversationType} from 'src/script/tracking/attribute';
 import * as trackingHelpers from 'src/script/tracking/Helpers';
-import {ConversationType} from 'src/script/conversation/ConversationType';
 
 describe('trackingHelpers', () => {
   describe('getConversationType', () => {
     it('returns correct type for one on one conversation', () => {
       const conversation_et = new Conversation(createRandomUuid());
-      conversation_et.type(ConversationType.ONE2ONE);
+      conversation_et.type(CONVERSATION_TYPE.ONE_TO_ONE);
 
-      expect(trackingHelpers.getConversationType(conversation_et)).toBe(ConversationTypeAttribute.ONE_TO_ONE);
+      expect(trackingHelpers.getConversationType(conversation_et)).toBe(ConversationType.ONE_TO_ONE);
     });
 
     it('returns correct type for group conversation', () => {
       const conversation_et = new Conversation(createRandomUuid());
-      conversation_et.type(ConversationType.GROUP);
+      conversation_et.type(CONVERSATION_TYPE.REGULAR);
 
-      expect(trackingHelpers.getConversationType(conversation_et)).toBe(ConversationTypeAttribute.GROUP);
+      expect(trackingHelpers.getConversationType(conversation_et)).toBe(ConversationType.GROUP);
     });
 
     it('returns undefined if type cannot be determined', () => {
