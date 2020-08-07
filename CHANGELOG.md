@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.21.7](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.21.6...@wireapp/api-client@11.21.7) (2020-08-07)
+
+
+### Bug Fixes
+
+* **api-client:** Add missing PROPERTIES_DELETE to UserEvent ([4d1ea66](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/4d1ea66d480d989ac248401cfe40d98bd1babfcc))
+
+
+
+
+
 ## [11.21.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.21.5...@wireapp/api-client@11.21.6) (2020-08-06)
 
 **Note:** Version bump only for package @wireapp/api-client
