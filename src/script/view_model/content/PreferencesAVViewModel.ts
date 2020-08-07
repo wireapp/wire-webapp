@@ -37,8 +37,8 @@ import {MediaConstraintsHandler} from '../../media/MediaConstraintsHandler';
 import {UserRepository} from '../../user/UserRepository';
 import {Call} from '../../calling/Call';
 import {DeviceIds, Devices, DeviceSupport, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
-import {CallingRepository} from 'src/script/calling/CallingRepository';
-import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
+import {CallingRepository} from '../../calling/CallingRepository';
+import {PropertiesRepository} from '../../properties/PropertiesRepository';
 
 type MediaSourceChanged = (mediaStream: MediaStream, mediaType: MediaType, call?: Call) => void;
 type WillChangeMediaSource = (mediaType: MediaType) => boolean;
@@ -343,7 +343,7 @@ export class PreferencesAVViewModel {
 */
   updateProperties = ({settings}: WebappProperties): void => {
     this.optionVbrEncoding(settings.call.enable_vbr_encoding);
-    this.optionSftCalling(settings.call.enable_sft_calling);
+    this.optionSftCalling(this.supportsConferenceCalling && settings.call.enable_sft_calling);
   };
 
   saveCallLogs(): number | void {
