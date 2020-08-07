@@ -168,10 +168,20 @@ export class Account extends EventEmitter {
     return context;
   }
 
-  public async init(clientType: ClientType, cookie?: Cookie): Promise<Context> {
+  public async init(clientType: ClientType, cookie?: Cookie, initializedStoreEngine?: CRUDEngine): Promise<Context> {
     const context = await this.apiClient.init(clientType, cookie);
-    const storeEngine = await this.initEngine(context);
-    await this.initServices(storeEngine);
+    if (initializedStoreEngine) {
+      this.storeEngine = initializedStoreEngine;
+      this.logger.log(`Initialized store with existing engine "${this.storeEngine.storeName}".`);
+    } else {
+      this.storeEngine = await this.initEngine(context);
+    }
+    await this.initServices(this.storeEngine);
+    if (initializedStoreEngine) {
+      await this.initClient({
+        clientType,
+      });
+    }
     return context;
   }
 
@@ -207,13 +217,23 @@ export class Account extends EventEmitter {
     };
   }
 
-  public async login(loginData: LoginData, initClient: boolean = true, clientInfo?: ClientInfo): Promise<Context> {
+  public async login(
+    loginData: LoginData,
+    initClient: boolean = true,
+    clientInfo?: ClientInfo,
+    initializedStoreEngine?: CRUDEngine,
+  ): Promise<Context> {
     this.resetContext();
     LoginSanitizer.removeNonPrintableCharacters(loginData);
 
     const context = await this.apiClient.login(loginData);
-    const storeEngine = await this.initEngine(context);
-    await this.initServices(storeEngine);
+    if (initializedStoreEngine) {
+      this.storeEngine = initializedStoreEngine;
+      this.logger.log(`Initialized store with existing engine "${this.storeEngine.storeName}".`);
+    } else {
+      this.storeEngine = await this.initEngine(context);
+    }
+    await this.initServices(this.storeEngine);
 
     if (initClient) {
       await this.initClient(loginData, clientInfo);
@@ -243,7 +263,7 @@ export class Account extends EventEmitter {
       const notFoundOnBackend = error.response?.status === StatusCode.NOT_FOUND;
 
       if (notFoundInDatabase) {
-        this.logger.log('Could not find valid client in database');
+        this.logger.log(`Could not find valid client in database "${this.storeEngine?.storeName}".`);
         return this.registerClient(loginData, clientInfo);
       }
 

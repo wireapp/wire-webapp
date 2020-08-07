@@ -129,10 +129,10 @@ export class Bot {
         throw new Error('Store engine not provided');
       }
       const cookie = await this.getCookie(storeEngine);
-      await this.account.init(this.config.clientType, cookie);
+      await this.account.init(this.config.clientType, cookie, storeEngine);
     } catch (error) {
       this.logger.warn('Failed to init account from cookie', error);
-      await this.account.login(login);
+      await this.account.login(login, true, undefined, storeEngine);
     }
 
     await this.account.listen();
