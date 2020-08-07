@@ -40,6 +40,7 @@ export enum USER_EVENT {
   LEGAL_HOLD_DISABLE = 'user.legalhold-disable',
   LEGAL_HOLD_ENABLE = 'user.legalhold-enable',
   LEGAL_HOLD_REQUEST = 'user.legalhold-request',
+  PROPERTIES_DELETE = 'user.properties-delete',
   PROPERTIES_SET = 'user.properties-set',
   PUSH_REMOVE = 'user.push-remove',
   UPDATE = 'user.update',
