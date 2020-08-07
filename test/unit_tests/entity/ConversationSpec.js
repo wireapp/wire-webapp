@@ -17,6 +17,8 @@
  *
  */
 
+import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
+
 import 'src/script/localization/Localizer';
 import {createRandomUuid} from 'Util/util';
 
@@ -36,7 +38,6 @@ import {ConversationType} from 'src/script/conversation/ConversationType';
 import {StatusType} from 'src/script/message/StatusType';
 import {CALL_MESSAGE_TYPE} from 'src/script/message/CallMessageType';
 
-import {BackendEvent} from 'src/script/event/Backend';
 import {ConnectionMapper} from 'src/script/connection/ConnectionMapper';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {MentionEntity} from 'src/script/message/MentionEntity';
@@ -983,7 +984,7 @@ describe('Conversation', () => {
       conversationEntity.messages_unordered.removeAll();
 
       const memberLeaveMessage = new MemberMessage();
-      memberLeaveMessage.type = BackendEvent.CONVERSATION.MEMBER_LEAVE;
+      memberLeaveMessage.type = CONVERSATION_EVENT.MEMBER_LEAVE;
       memberLeaveMessage.timestamp(timestamp + 100);
       conversationEntity.messages_unordered.push(memberLeaveMessage);
 
@@ -1000,13 +1001,13 @@ describe('Conversation', () => {
 
       expect(conversationEntity.shouldUnarchive()).toBe(false);
       const memberJoinMessage = new MemberMessage();
-      memberJoinMessage.type = BackendEvent.CONVERSATION.MEMBER_JOIN;
+      memberJoinMessage.type = CONVERSATION_EVENT.MEMBER_JOIN;
       memberJoinMessage.timestamp(timestamp + 200);
       conversationEntity.messages_unordered.push(memberJoinMessage);
 
       expect(conversationEntity.shouldUnarchive()).toBe(false);
       const selfJoinMessage = new MemberMessage();
-      selfJoinMessage.type = BackendEvent.CONVERSATION.MEMBER_JOIN;
+      selfJoinMessage.type = CONVERSATION_EVENT.MEMBER_JOIN;
       selfJoinMessage.userIds.push(selfUserEntity.id);
       selfJoinMessage.timestamp(timestamp + 200);
       conversationEntity.messages_unordered.push(selfJoinMessage);

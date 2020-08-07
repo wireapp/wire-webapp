@@ -18,6 +18,8 @@
  */
 
 import {ConnectionStatus} from '@wireapp/api-client/dist/connection';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
+import {CONVERSATION_ACCESS} from '@wireapp/api-client/dist/conversation';
 import {Confirmation, GenericMessage, LegalHoldStatus, Text} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import * as HTTP_STATUS from 'http-status-codes';
@@ -31,7 +33,6 @@ import {Message} from 'src/script/entity/message/Message';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 
 import {ClientEvent} from 'src/script/event/Client';
-import {BackendEvent} from 'src/script/event/Backend';
 import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
 import {EventRepository} from 'src/script/event/EventRepository';
 import {ClientEntity} from 'src/script/client/ClientEntity';
@@ -41,7 +42,6 @@ import {ConversationType} from 'src/script/conversation/ConversationType';
 import {EventBuilder} from 'src/script/conversation/EventBuilder';
 import {ConversationStatus} from 'src/script/conversation/ConversationStatus';
 import {ACCESS_ROLE} from 'src/script/conversation/AccessRole';
-import {ACCESS_MODE} from 'src/script/conversation/AccessMode';
 import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
 import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
 import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
@@ -271,7 +271,7 @@ describe('ConversationRepository', () => {
       testFactory.user_repository.users.push(conversationPartner);
 
       const conversationJsonFromDb = {
-        accessModes: [ACCESS_MODE.INVITE, ACCESS_MODE.CODE],
+        accessModes: [CONVERSATION_ACCESS.INVITE, CONVERSATION_ACCESS.CODE],
         accessRole: ACCESS_ROLE.NON_ACTIVATED,
         archived_state: false,
         archived_timestamp: 0,
@@ -864,7 +864,7 @@ describe('ConversationRepository', () => {
         spyOn(testFactory.conversation_repository, 'save_conversation').and.returnValue(false);
 
         conversationId = createRandomUuid();
-        createEvent = {conversation: conversationId, data: {}, type: BackendEvent.CONVERSATION.CREATE};
+        createEvent = {conversation: conversationId, data: {}, type: CONVERSATION_EVENT.CREATE};
       });
 
       it('should process create event for a new conversation created locally', () => {

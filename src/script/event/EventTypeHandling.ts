@@ -17,7 +17,7 @@
  *
  */
 
-import {BackendEvent} from './Backend';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
 import {ClientEvent} from './Client';
 
 export const EventTypeHandling = {
@@ -28,13 +28,13 @@ export const EventTypeHandling = {
     ClientEvent.CONVERSATION.LOCATION,
     ClientEvent.CONVERSATION.MESSAGE_ADD,
   ],
-  IGNORE: [BackendEvent.CONVERSATION.TYPING],
+  IGNORE: [CONVERSATION_EVENT.TYPING],
   STORE: [
-    BackendEvent.CONVERSATION.MEMBER_JOIN,
-    BackendEvent.CONVERSATION.MEMBER_LEAVE,
-    BackendEvent.CONVERSATION.MESSAGE_TIMER_UPDATE,
-    BackendEvent.CONVERSATION.RECEIPT_MODE_UPDATE,
-    BackendEvent.CONVERSATION.RENAME,
+    CONVERSATION_EVENT.MEMBER_JOIN,
+    CONVERSATION_EVENT.MEMBER_LEAVE,
+    CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE,
+    CONVERSATION_EVENT.RECEIPT_MODE_UPDATE,
+    CONVERSATION_EVENT.RENAME,
     ClientEvent.CONVERSATION.ASSET_ADD,
     ClientEvent.CONVERSATION.COMPOSITE_MESSAGE_ADD,
     ClientEvent.CONVERSATION.DELETE_EVERYWHERE,
