@@ -23,6 +23,7 @@ import {Availability, Confirmation, LegalHoldStatus} from '@wireapp/protocol-mes
 import {debounce, Cancelable} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {STATE as CALL_STATE} from '@wireapp/avs';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/dist/conversation';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
@@ -30,7 +31,6 @@ import {truncate} from 'Util/StringUtil';
 
 import {ACCESS_STATE} from '../conversation/AccessState';
 import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
-import {ConversationType} from '../conversation/ConversationType';
 import {ConversationStatus} from '../conversation/ConversationStatus';
 import {ConversationRepository} from '../conversation/ConversationRepository';
 import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
@@ -87,7 +87,7 @@ interface SerializedConversation {
   receipt_mode: Confirmation.Type;
   status: ConversationStatus;
   team_id: string;
-  type: ConversationType;
+  type: CONVERSATION_TYPE;
   verification_state: ConversationVerificationState;
 }
 
@@ -161,7 +161,7 @@ export class Conversation {
   showNotificationsNothing: ko.PureComputed<boolean>;
   status: ko.Observable<ConversationStatus>;
   team_id: string;
-  type: ko.Observable<ConversationType>;
+  type: ko.Observable<CONVERSATION_TYPE>;
   unreadState: ko.PureComputed<UnreadState>;
   verification_state: ko.Observable<ConversationVerificationState>;
   withAllTeamMembers: ko.Observable<User[]>;
@@ -204,20 +204,20 @@ export class Conversation {
     this.withAllTeamMembers = ko.observable(undefined);
 
     this.isTeam1to1 = ko.pureComputed(() => {
-      const isGroupConversation = this.type() === ConversationType.GROUP;
+      const isGroupConversation = this.type() === CONVERSATION_TYPE.REGULAR;
       const hasOneParticipant = this.participating_user_ids().length === 1;
       return isGroupConversation && hasOneParticipant && this.team_id && !this.name();
     });
     this.isGroup = ko.pureComputed(() => {
-      const isGroupConversation = this.type() === ConversationType.GROUP;
+      const isGroupConversation = this.type() === CONVERSATION_TYPE.REGULAR;
       return isGroupConversation && !this.isTeam1to1();
     });
     this.is1to1 = ko.pureComputed(() => {
-      const is1to1Conversation = this.type() === ConversationType.ONE2ONE;
+      const is1to1Conversation = this.type() === CONVERSATION_TYPE.ONE_TO_ONE;
       return is1to1Conversation || this.isTeam1to1();
     });
-    this.isRequest = ko.pureComputed(() => this.type() === ConversationType.CONNECT);
-    this.isSelf = ko.pureComputed(() => this.type() === ConversationType.SELF);
+    this.isRequest = ko.pureComputed(() => this.type() === CONVERSATION_TYPE.CONNECT);
+    this.isSelf = ko.pureComputed(() => this.type() === CONVERSATION_TYPE.SELF);
 
     this.hasGuest = ko.pureComputed(() => {
       const hasGuestUser = this.participating_user_ets().some(userEntity => userEntity.isGuest());

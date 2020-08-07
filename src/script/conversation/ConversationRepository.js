@@ -44,6 +44,7 @@ import {DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/di
 import {ReactionType} from '@wireapp/core/dist/conversation';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import * as HTTP_STATUS from 'http-status-codes';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/dist/conversation';
 
 import {getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -79,7 +80,6 @@ import {Message} from '../entity/message/Message';
 import * as trackingHelpers from '../tracking/Helpers';
 
 import {ConversationMapper} from './ConversationMapper';
-import {ConversationType} from './ConversationType';
 import {ConversationStateHandler} from './ConversationStateHandler';
 import {EventInfoEntity} from './EventInfoEntity';
 import {EventMapper} from './EventMapper';
@@ -1125,7 +1125,7 @@ export class ConversationRepository {
         conversationEntity.connection(connectionEntity);
 
         if (connectionEntity.isConnected()) {
-          conversationEntity.type(ConversationType.ONE2ONE);
+          conversationEntity.type(CONVERSATION_TYPE.ONE2ONE);
         }
 
         this.updateParticipatingUserEntities(conversationEntity).then(updatedConversationEntity => {
