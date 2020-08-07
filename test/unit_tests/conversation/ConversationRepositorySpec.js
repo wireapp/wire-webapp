@@ -19,7 +19,7 @@
 
 import {ConnectionStatus} from '@wireapp/api-client/dist/connection';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
-import {CONVERSATION_ACCESS} from '@wireapp/api-client/dist/conversation';
+import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE} from '@wireapp/api-client/dist/conversation';
 import {Confirmation, GenericMessage, LegalHoldStatus, Text} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import * as HTTP_STATUS from 'http-status-codes';
@@ -41,7 +41,6 @@ import {EventInfoEntity} from 'src/script/conversation/EventInfoEntity';
 import {ConversationType} from 'src/script/conversation/ConversationType';
 import {EventBuilder} from 'src/script/conversation/EventBuilder';
 import {ConversationStatus} from 'src/script/conversation/ConversationStatus';
-import {ACCESS_ROLE} from 'src/script/conversation/AccessRole';
 import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
 import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
 import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
@@ -272,7 +271,7 @@ describe('ConversationRepository', () => {
 
       const conversationJsonFromDb = {
         accessModes: [CONVERSATION_ACCESS.INVITE, CONVERSATION_ACCESS.CODE],
-        accessRole: ACCESS_ROLE.NON_ACTIVATED,
+        accessRole: CONVERSATION_ACCESS_ROLE.NON_ACTIVATED,
         archived_state: false,
         archived_timestamp: 0,
         cleared_timestamp: 0,
