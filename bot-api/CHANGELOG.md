@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.10.28](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@7.10.27...@wireapp/bot-api@7.10.28) (2020-08-07)
+
+
+### Bug Fixes
+
+* **bot-api,core:** Don't re-init an initialized store engine ([#3163](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/issues/3163)) ([59121d2](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/commit/59121d2e45ec371f219f7f65241bd2c6224d7577))
+
+
+
+
+
 ## [7.10.27](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@7.10.26...@wireapp/bot-api@7.10.27) (2020-08-06)
 
 **Note:** Version bump only for package @wireapp/bot-api
