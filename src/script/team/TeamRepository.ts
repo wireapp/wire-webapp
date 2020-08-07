@@ -279,6 +279,7 @@ export class TeamRepository {
 
       const accountInfo = {
         accentID: this.selfUser().accent_id(),
+        availability: this.selfUser().availability(),
         name: this.teamName(),
         picture: imageDataUrl,
         teamID: this.team() ? this.team().id : undefined,

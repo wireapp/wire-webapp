@@ -388,6 +388,7 @@ export class UserRepository {
       this.logger.log(`Availability was changed from '${oldAvailabilityValue}' to '${newAvailabilityValue}'`);
       this.self().availability(availability);
       this._trackAvailability(availability, method);
+      amplify.publish(WebAppEvents.TEAM.UPDATE_INFO);
       showAvailabilityModal(availability);
     } else {
       this.logger.log(`Availability was again set to '${newAvailabilityValue}'`);
