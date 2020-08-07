@@ -456,6 +456,25 @@ export class CallingRepository {
   // Inbound call events
   //##############################################################################
 
+  private async verificationPromise(conversationId: string, userId: string, isResponse: boolean): Promise<boolean> {
+    const recipients = await this.conversationRepository.create_recipients(conversationId, false, [userId]);
+    const eventInfoEntity = new EventInfoEntity(undefined, conversationId, {recipients});
+    eventInfoEntity.setType(GENERIC_MESSAGE_TYPE.CALLING);
+    const consentType = isResponse
+      ? ConversationRepository.CONSENT_TYPE.INCOMING_CALL
+      : ConversationRepository.CONSENT_TYPE.OUTGOING_CALL;
+    return this.conversationRepository.grantMessage(eventInfoEntity, consentType);
+  }
+
+  private abortCall(conversationId: string): void {
+    const call = this.findCall(conversationId);
+    if (call) {
+      // we flag the call in order to prevent sending further messages
+      call.blockMessages = true;
+    }
+    this.leaveCall(conversationId);
+  }
+
   /**
    * Handle incoming calling events from backend.
    *
@@ -468,7 +487,8 @@ export class CallingRepository {
     const toSecond = (timestamp: number) => Math.floor(timestamp / 1000);
     const contentStr = JSON.stringify(content);
 
-    let validatedPromise = Promise.resolve('default');
+    let validatedPromise = Promise.resolve(true);
+
     switch (content.type) {
       case CALL_MESSAGE_TYPE.GROUP_LEAVE: {
         const isAnotherSelfClient = userId === this.selfUser.id && clientId !== this.selfClientId;
@@ -483,22 +503,15 @@ export class CallingRepository {
         }
         break;
       }
-      case CALL_MESSAGE_TYPE.SETUP:
-      case CALL_MESSAGE_TYPE.CONFKEY:
-      case CALL_MESSAGE_TYPE.GROUP_START: {
+      case CALL_MESSAGE_TYPE.CONFKEY: {
         if (source !== EventRepository.SOURCE.STREAM) {
-          const recipients = await this.conversationRepository.create_recipients(conversationId, false, [userId]);
-          const eventInfoEntity = new EventInfoEntity(undefined, conversationId, {recipients});
-          eventInfoEntity.setType(GENERIC_MESSAGE_TYPE.CALLING);
-          const consentType = ConversationRepository.CONSENT_TYPE.INCOMING_CALL;
-          validatedPromise = this.conversationRepository.grantMessage(eventInfoEntity, consentType);
+          validatedPromise = this.verificationPromise(conversationId, userId, true);
         }
-
         break;
       }
     }
 
-    await validatedPromise.catch(() => this.leaveCall(conversationId));
+    await validatedPromise.catch(() => this.abortCall(conversationId));
 
     const res = this.wCall.recvMsg(
       this.wUser,
@@ -794,27 +807,30 @@ export class CallingRepository {
     if (call?.blockMessages) {
       return 0;
     }
+    const {type, resp} = JSON.parse(payload);
+    const needsVerification = [CALL_MESSAGE_TYPE.SETUP, CALL_MESSAGE_TYPE.GROUP_START].includes(type);
+    const validationPromise = needsVerification
+      ? this.verificationPromise(conversationId, userId, resp)
+      : Promise.resolve(true);
+    validationPromise
+      .then(() => {
+        let options: MessageSendingOptions;
 
-    let options: MessageSendingOptions;
+        if (typeof targets === 'string') {
+          const parsedTargets: SendMessageTarget = JSON.parse(targets);
+          const recipients = this.mapTargets(parsedTargets);
+          options = {
+            nativePush: true,
+            precondition: true,
+            recipients,
+          };
+        }
 
-    if (typeof targets === 'string') {
-      const parsedTargets: SendMessageTarget = JSON.parse(targets);
-      const recipients = this.mapTargets(parsedTargets);
-      options = {
-        nativePush: true,
-        precondition: true,
-        recipients,
-      };
-    }
+        const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId, options);
+        return this.conversationRepository.sendCallingMessage(eventInfoEntity, conversationId);
+      })
+      .catch(() => this.abortCall(conversationId));
 
-    const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId, options);
-    this.conversationRepository.sendCallingMessage(eventInfoEntity, conversationId).catch(() => {
-      if (call) {
-        // we flag the call in order to prevent sending further messages
-        call.blockMessages = true;
-      }
-      this.leaveCall(conversationId);
-    });
     return 0;
   };
 
