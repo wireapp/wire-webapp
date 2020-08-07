@@ -2118,7 +2118,7 @@ export class ConversationRepository {
             this.expectReadReceipt(conversationEntity),
             conversationEntity.legalHoldStatus(),
           );
-          genericMessage[GENERIC_MESSAGE_TYPE.TEXT] = protoText;
+          genericMessage[GENERIC_MESSAGE_TYPE.EPHEMERAL][GENERIC_MESSAGE_TYPE.TEXT] = protoText;
 
           return this.getMessageInConversationById(conversationEntity, messageId);
         }
