@@ -1,0 +1,41 @@
+{
+  "dependencies": {
+    "wizardy": "0.2.6"
+  },
+  "devDependencies": {
+    "@types/jasmine": "3.5.10",
+    "@types/node": "~12",
+    "@wireapp/bot-api": "7.10.29",
+    "cross-env": "7.0.2",
+    "dotenv-defaults": "2.0.0",
+    "jasmine": "3.5.0",
+    "rimraf": "3.0.2",
+    "ts-node": "8.6.2",
+    "typescript": "3.9.2"
+  },
+  "files": [
+    "dist",
+    "!dist/demo"
+  ],
+  "license": "GPL-3.0",
+  "main": "dist/WizardHandler.js",
+  "name": "@wireapp/bot-handler-wizard",
+  "peerDependencies": {
+    "@wireapp/bot-api": "7.x.x"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-wizard",
+  "scripts": {
+    "build": "yarn build:node",
+    "build:node": "tsc",
+    "clean": "rimraf dist",
+    "demo:setup": "cross-env NODE_DEBUG=@wireapp/* ts-node ./src/demo/setup.ts",
+    "dist": "yarn clean && yarn build",
+    "test": "yarn test:node",
+    "test:node": "tsc --noEmit",
+    "test:project": "yarn dist && yarn test"
+  },
+  "version": "0.0.0"
+}
