@@ -46,7 +46,7 @@ export class WizardHandler<P> extends MessageHandler {
       return this.wizards[id];
     }
     const wizard = new Wizardy();
-    wizard.on(Wizardy.TOPIC.END, (answers: P) => {
+    wizard.on(Wizardy.TOPIC.END, (answers: any) => {
       this.onFinish(answers, conversationId, userId);
       const id = this.getId(conversationId, userId);
       delete this.wizards[id];
