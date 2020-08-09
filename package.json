@@ -46,7 +46,7 @@
     "underscore": "1.10.2",
     "url-search-params-polyfill": "8.1.0",
     "use-react-router": "1.0.7",
-    "uuidjs": "4.2.5",
+    "uuidjs": "4.2.6",
     "webrtc-adapter": "6.4.8"
   },
   "devDependencies": {
