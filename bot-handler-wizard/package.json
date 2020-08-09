@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "wizardy": "0.2.6"
+    "wizardy": "0.3.0"
   },
   "devDependencies": {
     "@types/jasmine": "3.5.10",
