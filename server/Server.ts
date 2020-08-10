@@ -201,6 +201,7 @@ class Server {
     this.app.locals.config = {
       APP_BASE: this.config.SERVER.APP_BASE,
       BRAND_NAME: this.config.CLIENT.BRAND_NAME,
+      CHROME_ORIGIN_TRIAL_TOKEN: this.config.CLIENT.CHROME_ORIGIN_TRIAL_TOKEN,
       OPEN_GRAPH: this.config.SERVER.OPEN_GRAPH,
       VERSION: this.config.CLIENT.VERSION,
     };
