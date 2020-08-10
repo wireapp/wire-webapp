@@ -2120,7 +2120,11 @@ export class ConversationRepository {
             this.expectReadReceipt(conversationEntity),
             conversationEntity.legalHoldStatus(),
           );
-          genericMessage[GENERIC_MESSAGE_TYPE.EPHEMERAL][GENERIC_MESSAGE_TYPE.TEXT] = protoText;
+          if (genericMessage[GENERIC_MESSAGE_TYPE.EPHEMERAL]) {
+            genericMessage[GENERIC_MESSAGE_TYPE.EPHEMERAL][GENERIC_MESSAGE_TYPE.TEXT] = protoText;
+          } else {
+            genericMessage[GENERIC_MESSAGE_TYPE.TEXT] = protoText;
+          }
 
           return this.getMessageInConversationById(conversationEntity, messageId);
         }
