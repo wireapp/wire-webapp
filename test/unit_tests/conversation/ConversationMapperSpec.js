@@ -17,12 +17,12 @@
  *
  */
 
+import {CONVERSATION_TYPE} from '@wireapp/api-client/dist/conversation';
 import {createRandomUuid} from 'Util/util';
 
 import {Conversation} from 'src/script/entity/Conversation';
 import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
 import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
-import {ConversationType} from 'src/script/conversation/ConversationType';
 import {ConversationStatus} from 'src/script/conversation/ConversationStatus';
 import {BaseError} from 'src/script/error/BaseError';
 import {ConversationError} from 'src/script/error/ConversationError';
@@ -74,7 +74,7 @@ describe('Conversation Mapper', () => {
       expect(conversation_et.name()).toBe(conversation.name);
       expect(conversation_et.mutedState()).toBe(false);
       expect(conversation_et.team_id).toEqual(conversation.team);
-      expect(conversation_et.type()).toBe(ConversationType.GROUP);
+      expect(conversation_et.type()).toBe(CONVERSATION_TYPE.REGULAR);
 
       const expectedMutedTimestamp = new Date(conversation.members.self.otr_muted_ref).getTime();
 

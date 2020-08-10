@@ -18,6 +18,7 @@
  */
 
 import {amplify} from 'amplify';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/dist/conversation';
 import {Availability} from '@wireapp/protocol-messaging';
 import {NotificationPreference} from '@wireapp/api-client/dist/user/data';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
@@ -46,7 +47,6 @@ import {TERMINATION_REASON} from 'src/script/calling/enum/TerminationReason';
 import {NotificationRepository} from 'src/script/notification/NotificationRepository';
 import {PermissionStatusState} from 'src/script/permission/PermissionStatusState';
 import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
-import {ConversationType} from 'src/script/conversation/ConversationType';
 import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
 
 import {CallMessage} from 'src/script/entity/message/CallMessage';
@@ -387,7 +387,7 @@ describe('NotificationRepository', () => {
       });
 
       it('in a 1:1 conversation', () => {
-        conversation_et.type(ConversationType.ONE2ONE);
+        conversation_et.type(CONVERSATION_TYPE.ONE_TO_ONE);
         return verify_notification(conversation_et, message_et, expected_body);
       });
 
@@ -407,7 +407,7 @@ describe('NotificationRepository', () => {
       });
 
       it('in a 1:1 conversation', () => {
-        conversation_et.type(ConversationType.ONE2ONE);
+        conversation_et.type(CONVERSATION_TYPE.ONE_TO_ONE);
         return verify_notification(conversation_et, message_et, expected_body);
       });
 
@@ -433,7 +433,7 @@ describe('NotificationRepository', () => {
       });
 
       it('in a 1:1 conversation', () => {
-        conversation_et.type(ConversationType.ONE2ONE);
+        conversation_et.type(CONVERSATION_TYPE.ONE_TO_ONE);
         return verify_notification(conversation_et, message_et, expected_body);
       });
 
@@ -461,7 +461,7 @@ describe('NotificationRepository', () => {
       });
 
       it('in a 1:1 conversation', () => {
-        conversation_et.type(ConversationType.ONE2ONE);
+        conversation_et.type(CONVERSATION_TYPE.ONE_TO_ONE);
         return verify_notification(conversation_et, message_et, expected_body);
       });
 
@@ -489,7 +489,7 @@ describe('NotificationRepository', () => {
       });
 
       it('in a 1:1 conversation', () => {
-        conversation_et.type(ConversationType.ONE2ONE);
+        conversation_et.type(CONVERSATION_TYPE.ONE_TO_ONE);
         return verify_notification(conversation_et, message_et, expected_body);
       });
 
@@ -671,7 +671,7 @@ describe('NotificationRepository', () => {
     const expected_title = '…';
 
     beforeEach(() => {
-      conversation_et.type(ConversationType.ONE2ONE);
+      conversation_et.type(CONVERSATION_TYPE.ONE_TO_ONE);
 
       const connectionMapper = new ConnectionMapper();
       connectionEntity = connectionMapper.mapConnectionFromJson(entities.connection);
@@ -715,7 +715,7 @@ describe('NotificationRepository', () => {
     });
 
     it('in a 1:1 conversation', () => {
-      conversation_et.type(ConversationType.ONE2ONE);
+      conversation_et.type(CONVERSATION_TYPE.ONE_TO_ONE);
       return verify_notification(conversation_et, message_et, expected_body);
     });
 
