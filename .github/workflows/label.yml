@@ -1,0 +1,21 @@
+name: Label PR
+
+on:
+  pull_request:
+    types:
+      - opened
+
+jobs:
+  # Automatically labels based on files changed
+  label:
+    name: Label PR
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get commit message
+        id: commit
+        run: |
+          COMMIT_MESSAGE=$(git log --format=%B -n 1 ${{github.event.after}})
+          echo "::set-env name=COMMIT_MESSAGE::${COMMIT_MESSAGE}"
+      - uses: srvaroa/labeler@v0.3
+        env:
+          GITHUB_TOKEN: ${{secrets.GH_TOKEN }}
