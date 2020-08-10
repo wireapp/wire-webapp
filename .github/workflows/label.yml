@@ -2,7 +2,8 @@ name: Label PR
 
 on:
   pull_request:
-    types: [opened, edited]
+    types:
+      - opened
 
 jobs:
   # Automatically labels based on files changed
