@@ -10992,10 +10992,10 @@ react-intl-po@2.2.2:
     po2json "^0.4.5"
     ramda "^0.25.0"
 
-react-intl@5.4.5:
-  version "5.4.5"
-  resolved "https://registry.yarnpkg.com/react-intl/-/react-intl-5.4.5.tgz#5f81241d01da3a7a3133931606594bcea1783e74"
-  integrity sha512-XFs4Q70p17AVSLYBMopgNtWe537+U6SuXM1is7b9ThqZnZkAXqhJcXUA/0OsDFSIDilQ82NvVO1NAgEBXkRBFQ==
+react-intl@5.4.6:
+  version "5.4.6"
+  resolved "https://registry.yarnpkg.com/react-intl/-/react-intl-5.4.6.tgz#4d9b996eb15932448727abf853e4192fa0ce063a"
+  integrity sha512-PaQrHLBvzmfGsIDXK7ONcaMn0V/Ijzy77AFi3/y3rPYMg9IjJr8w6bsKQGzuLtOAxJawY6L60tBWSg8db4XXPA==
   dependencies:
     "@formatjs/intl-datetimeformat" "^2.3.0"
     "@formatjs/intl-displaynames" "^3.1.7"
