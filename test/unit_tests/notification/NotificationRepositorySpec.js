@@ -21,6 +21,7 @@ import {amplify} from 'amplify';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/dist/conversation';
 import {Availability} from '@wireapp/protocol-messaging';
 import {NotificationPreference} from '@wireapp/api-client/dist/user/data';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {t} from 'Util/LocalizerUtil';
@@ -46,7 +47,6 @@ import {TERMINATION_REASON} from 'src/script/calling/enum/TerminationReason';
 import {NotificationRepository} from 'src/script/notification/NotificationRepository';
 import {PermissionStatusState} from 'src/script/permission/PermissionStatusState';
 import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
-import {BackendEvent} from 'src/script/event/Backend';
 import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
 
 import {CallMessage} from 'src/script/entity/message/CallMessage';
@@ -544,7 +544,7 @@ describe('NotificationRepository', () => {
       conversation_et.from = payload.users.get.one[0].id;
       message_et = new MemberMessage();
       message_et.user(user_et);
-      message_et.type = BackendEvent.CONVERSATION.CREATE;
+      message_et.type = CONVERSATION_EVENT.CREATE;
       message_et.memberMessageType = SystemMessageType.CONVERSATION_CREATE;
 
       const expected_body = `${user_et.name()} started a conversation`;
@@ -589,7 +589,7 @@ describe('NotificationRepository', () => {
 
     describe('if people are added', () => {
       beforeEach(() => {
-        message_et.type = BackendEvent.CONVERSATION.MEMBER_JOIN;
+        message_et.type = CONVERSATION_EVENT.MEMBER_JOIN;
 
         const titleLength = NotificationRepository.CONFIG.TITLE_LENGTH;
         const titleText = `${message_et.user().name()} in ${conversation_et.display_name()}`;
@@ -624,7 +624,7 @@ describe('NotificationRepository', () => {
 
     describe('if people are removed', () => {
       beforeEach(() => {
-        message_et.type = BackendEvent.CONVERSATION.MEMBER_LEAVE;
+        message_et.type = CONVERSATION_EVENT.MEMBER_LEAVE;
         const titleLength = NotificationRepository.CONFIG.TITLE_LENGTH;
         const titleText = `${message_et.user().name()} in ${conversation_et.display_name()}`;
 

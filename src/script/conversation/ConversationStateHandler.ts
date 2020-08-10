@@ -18,13 +18,13 @@
  */
 
 import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE} from '@wireapp/api-client/dist/conversation';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import * as HTTP_STATUS from 'http-status-codes';
 
 import {t} from 'Util/LocalizerUtil';
 
-import {BackendEvent} from '../event/Backend';
 import {EventName} from '../tracking/EventName';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 
@@ -41,9 +41,9 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
   constructor(conversationService: ConversationService, conversationMapper: ConversationMapper) {
     super();
     const eventHandlingConfig: EventHandlingConfig = {
-      [BackendEvent.CONVERSATION.ACCESS_UPDATE]: this._mapConversationAccessState.bind(this),
-      [BackendEvent.CONVERSATION.CODE_DELETE]: this._resetConversationAccessCode.bind(this),
-      [BackendEvent.CONVERSATION.CODE_UPDATE]: this._updateConversationAccessCode.bind(this),
+      [CONVERSATION_EVENT.ACCESS_UPDATE]: this._mapConversationAccessState.bind(this),
+      [CONVERSATION_EVENT.CODE_DELETE]: this._resetConversationAccessCode.bind(this),
+      [CONVERSATION_EVENT.CODE_UPDATE]: this._updateConversationAccessCode.bind(this),
     };
     this.setEventHandlingConfig(eventHandlingConfig);
     this.conversationMapper = conversationMapper;

@@ -18,10 +18,10 @@
  */
 
 import ko from 'knockout';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
 
 import {t} from 'Util/LocalizerUtil';
 
-import {BackendEvent} from '../../event/Backend';
 import {SystemMessageType} from '../../message/SystemMessageType';
 import {SystemMessage} from './SystemMessage';
 
@@ -31,7 +31,7 @@ export class ReceiptModeUpdateMessage extends SystemMessage {
   constructor(isReceiptEnabled: boolean) {
     super();
 
-    this.type = BackendEvent.CONVERSATION.RECEIPT_MODE_UPDATE;
+    this.type = CONVERSATION_EVENT.RECEIPT_MODE_UPDATE;
     this.system_message_type = SystemMessageType.CONVERSATION_RECEIPT_MODE_UPDATE;
 
     this.caption = ko.pureComputed(() => {

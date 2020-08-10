@@ -24,7 +24,7 @@ import {
   PublicClient,
   RegisteredClient,
 } from '@wireapp/api-client/dist/client/';
-import type {UserClientAddEvent, UserClientRemoveEvent} from '@wireapp/api-client/dist/event';
+import {USER_EVENT, UserClientAddEvent, UserClientRemoveEvent} from '@wireapp/api-client/dist/event';
 import {amplify} from 'amplify';
 import platform from 'platform';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -39,7 +39,6 @@ import {murmurhash3} from 'Util/util';
 import type {ClientKeys} from '../cryptography/CryptographyRepository';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {Config} from '../Config';
-import {BackendEvent} from '../event/Backend';
 import {StorageKey} from '../storage/StorageKey';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 
@@ -698,12 +697,12 @@ export class ClientRepository {
   onUserEvent(eventJson: any): void {
     const type = eventJson.type;
 
-    const isClientAdd = type === BackendEvent.USER.CLIENT_ADD;
+    const isClientAdd = type === USER_EVENT.CLIENT_ADD;
     if (isClientAdd) {
       return this.onClientAdd(eventJson);
     }
 
-    const isClientRemove = type === BackendEvent.USER.CLIENT_REMOVE;
+    const isClientRemove = type === USER_EVENT.CLIENT_REMOVE;
     if (isClientRemove) {
       this.onClientRemove(eventJson);
     }

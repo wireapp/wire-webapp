@@ -23,6 +23,7 @@ import type {BackendError} from '@wireapp/api-client/dist/http';
 import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
 import type {User as APIClientUser} from '@wireapp/api-client/dist/user';
 import {ConsentType, Self as APIClientSelf} from '@wireapp/api-client/dist/self';
+import {USER_EVENT} from '@wireapp/api-client/dist/event';
 import {UserAsset as APIClientUserAsset, UserAssetType as APIClientUserAssetType} from '@wireapp/api-client/dist/user';
 import {amplify} from 'amplify';
 import ko from 'knockout';
@@ -42,7 +43,6 @@ import {UNSPLASH_URL} from '../externalRoute';
 import {mapProfileAssetsV1} from '../assets/AssetMapper';
 import {User} from '../entity/User';
 
-import {BackendEvent} from '../event/Backend';
 import {ClientEvent} from '../event/Client';
 import {EventRepository} from '../event/EventRepository';
 import type {EventSource} from '../event/EventSource';
@@ -182,20 +182,20 @@ export class UserRepository {
     this.logger.info(`»» User Event: '${type}' (Source: ${source})`, logObject);
 
     switch (type) {
-      case BackendEvent.USER.DELETE:
+      case USER_EVENT.DELETE:
         this.userDelete(eventJson);
         break;
-      case BackendEvent.USER.UPDATE:
+      case USER_EVENT.UPDATE:
         this.userUpdate(eventJson);
         break;
       case ClientEvent.USER.AVAILABILITY:
         this.onUserAvailability(eventJson);
         break;
-      case BackendEvent.USER.LEGAL_HOLD_REQUEST: {
+      case USER_EVENT.LEGAL_HOLD_REQUEST: {
         this.onLegalHoldRequest(eventJson);
         break;
       }
-      case BackendEvent.USER.LEGAL_HOLD_DISABLED: {
+      case USER_EVENT.LEGAL_HOLD_DISABLE: {
         this.onLegalHoldRequestCanceled(eventJson);
         break;
       }
@@ -204,10 +204,10 @@ export class UserRepository {
     // Note: We initially fetch the user properties in the properties repository, so we are not interested in updates to it from the notification stream.
     if (source === EventRepository.SOURCE.WEB_SOCKET) {
       switch (type) {
-        case BackendEvent.USER.PROPERTIES_DELETE:
+        case USER_EVENT.PROPERTIES_DELETE:
           this.propertyRepository.deleteProperty(eventJson.key);
           break;
-        case BackendEvent.USER.PROPERTIES_SET:
+        case USER_EVENT.PROPERTIES_SET:
           this.propertyRepository.setProperty(eventJson.key, eventJson.value);
           break;
       }

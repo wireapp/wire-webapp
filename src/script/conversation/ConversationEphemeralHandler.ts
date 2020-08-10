@@ -20,6 +20,7 @@
 import ko from 'knockout';
 import {Article, LinkPreview} from '@wireapp/protocol-messaging';
 import type {ConversationMessageTimerUpdateEvent} from '@wireapp/api-client/dist/event';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -29,7 +30,6 @@ import {obfuscate} from 'Util/StringUtil';
 
 import {EphemeralStatusType} from '../message/EphemeralStatusType';
 import {StatusType} from '../message/StatusType';
-import {BackendEvent} from '../event/Backend';
 import {Text} from '../entity/message/Text';
 import {AbstractConversationEventHandler} from './AbstractConversationEventHandler';
 import type {EventService} from '../event/EventService';
@@ -75,7 +75,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
     this.eventService = eventService;
 
     this.setEventHandlingConfig({
-      [BackendEvent.CONVERSATION.MESSAGE_TIMER_UPDATE]: this._updateEphemeralTimer.bind(this),
+      [CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE]: this._updateEphemeralTimer.bind(this),
     });
 
     this.checkMessageTimer = this.checkMessageTimer.bind(this);

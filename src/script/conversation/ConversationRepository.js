@@ -40,11 +40,16 @@ import {
 import {flatten} from 'underscore';
 import {ConnectionStatus} from '@wireapp/api-client/dist/connection';
 import {RequestCancellationError} from '@wireapp/api-client/dist/user';
-import {DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/dist/conversation';
 import {ReactionType} from '@wireapp/core/dist/conversation';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import * as HTTP_STATUS from 'http-status-codes';
-import {CONVERSATION_TYPE} from '@wireapp/api-client/dist/conversation';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
+import {
+  DefaultConversationRoleName as DefaultRole,
+  CONVERSATION_ACCESS_ROLE,
+  CONVERSATION_ACCESS,
+  CONVERSATION_TYPE,
+} from '@wireapp/api-client/dist/conversation';
 
 import {getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -69,7 +74,6 @@ import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 
 import {ClientEvent} from '../event/Client';
 import {EventTypeHandling} from '../event/EventTypeHandling';
-import {BackendEvent} from '../event/Backend';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {EventRepository} from '../event/EventRepository';
 import {EventBuilder} from '../conversation/EventBuilder';
@@ -83,8 +87,6 @@ import {ConversationMapper} from './ConversationMapper';
 import {ConversationStateHandler} from './ConversationStateHandler';
 import {EventInfoEntity} from './EventInfoEntity';
 import {EventMapper} from './EventMapper';
-import {ACCESS_MODE} from './AccessMode';
-import {ACCESS_ROLE} from './AccessRole';
 import {ACCESS_STATE} from './AccessState';
 import {ConversationStatus} from './ConversationStatus';
 import {ConversationVerificationState} from './ConversationVerificationState';
@@ -397,14 +399,14 @@ export class ConversationRepository {
         switch (accessState) {
           case ACCESS_STATE.TEAM.GUEST_ROOM:
             accessPayload = {
-              access: [ACCESS_MODE.INVITE, ACCESS_MODE.CODE],
-              access_role: ACCESS_ROLE.NON_ACTIVATED,
+              access: [CONVERSATION_ACCESS.INVITE, CONVERSATION_ACCESS.CODE],
+              access_role: CONVERSATION_ACCESS_ROLE.NON_ACTIVATED,
             };
             break;
           case ACCESS_STATE.TEAM.TEAM_ONLY:
             accessPayload = {
-              access: [ACCESS_MODE.INVITE],
-              access_role: ACCESS_ROLE.TEAM,
+              access: [CONVERSATION_ACCESS.INVITE],
+              access_role: CONVERSATION_ACCESS_ROLE.TEAM,
             };
             break;
           default:
@@ -3137,10 +3139,7 @@ export class ConversationRepository {
 
     const inSelfConversation = conversationId === this.self_conversation() && this.self_conversation().id;
     if (inSelfConversation) {
-      const typesInSelfConversation = [
-        BackendEvent.CONVERSATION.MEMBER_UPDATE,
-        ClientEvent.CONVERSATION.MESSAGE_HIDDEN,
-      ];
+      const typesInSelfConversation = [CONVERSATION_EVENT.MEMBER_UPDATE, ClientEvent.CONVERSATION.MESSAGE_HIDDEN];
 
       const isExpectedType = typesInSelfConversation.includes(type);
       if (!isExpectedType) {
@@ -3153,7 +3152,7 @@ export class ConversationRepository {
       }
     }
 
-    const isConversationCreate = type === BackendEvent.CONVERSATION.CREATE;
+    const isConversationCreate = type === CONVERSATION_EVENT.CREATE;
     const onEventPromise = isConversationCreate ? Promise.resolve() : this.get_conversation_by_id(conversationId);
     let previouslyArchived;
 
@@ -3219,8 +3218,8 @@ export class ConversationRepository {
 
       if (isFromUnknownUser) {
         const membersUpdateMessages = [
-          BackendEvent.CONVERSATION.MEMBER_LEAVE,
-          BackendEvent.CONVERSATION.MEMBER_JOIN,
+          CONVERSATION_EVENT.MEMBER_LEAVE,
+          CONVERSATION_EVENT.MEMBER_JOIN,
           ClientEvent.CONVERSATION.TEAM_MEMBER_LEAVE,
         ];
         const isMembersUpdateEvent = membersUpdateMessages.includes(eventJson.type);
@@ -3299,23 +3298,23 @@ export class ConversationRepository {
    */
   _reactToConversationEvent(conversationEntity, eventJson, eventSource) {
     switch (eventJson.type) {
-      case BackendEvent.CONVERSATION.CREATE:
+      case CONVERSATION_EVENT.CREATE:
         return this._onCreate(eventJson, eventSource);
 
-      case BackendEvent.CONVERSATION.DELETE:
+      case CONVERSATION_EVENT.DELETE:
         return this.deleteConversationLocally(eventJson.conversation);
 
-      case BackendEvent.CONVERSATION.MEMBER_JOIN:
+      case CONVERSATION_EVENT.MEMBER_JOIN:
         return this._onMemberJoin(conversationEntity, eventJson);
 
-      case BackendEvent.CONVERSATION.MEMBER_LEAVE:
+      case CONVERSATION_EVENT.MEMBER_LEAVE:
       case ClientEvent.CONVERSATION.TEAM_MEMBER_LEAVE:
         return this._onMemberLeave(conversationEntity, eventJson);
 
-      case BackendEvent.CONVERSATION.MEMBER_UPDATE:
+      case CONVERSATION_EVENT.MEMBER_UPDATE:
         return this._onMemberUpdate(conversationEntity, eventJson);
 
-      case BackendEvent.CONVERSATION.RENAME:
+      case CONVERSATION_EVENT.RENAME:
         return this._onRename(conversationEntity, eventJson);
 
       case ClientEvent.CONVERSATION.ASSET_ADD:
@@ -3336,7 +3335,7 @@ export class ConversationRepository {
       case ClientEvent.CONVERSATION.REACTION:
         return this._onReaction(conversationEntity, eventJson);
 
-      case BackendEvent.CONVERSATION.RECEIPT_MODE_UPDATE:
+      case CONVERSATION_EVENT.RECEIPT_MODE_UPDATE:
         return this._onReceiptModeChanged(conversationEntity, eventJson);
 
       case ClientEvent.CONVERSATION.BUTTON_ACTION_CONFIRMATION:
@@ -3350,7 +3349,7 @@ export class ConversationRepository {
         }
         return this._addEventToConversation(conversationEntity, eventJson);
 
-      case BackendEvent.CONVERSATION.MESSAGE_TIMER_UPDATE:
+      case CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE:
       case ClientEvent.CONVERSATION.COMPOSITE_MESSAGE_ADD:
       case ClientEvent.CONVERSATION.DELETE_EVERYWHERE:
       case ClientEvent.CONVERSATION.FILE_TYPE_RESTRICTED:
