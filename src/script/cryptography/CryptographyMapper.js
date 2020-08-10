@@ -17,6 +17,7 @@
  *
  */
 
+import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
 import {Availability, Confirmation, GenericMessage, LinkPreview, Mention, Quote} from '@wireapp/protocol-messaging';
 
 import {getLogger} from 'Util/Logger';
@@ -27,7 +28,6 @@ import {decryptAesAsset} from '../assets/AssetCrypto';
 import {AssetTransferState} from '../assets/AssetTransferState';
 
 import {ClientEvent} from '../event/Client';
-import {BackendEvent} from '../event/Backend';
 import {StatusType} from '../message/StatusType';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
@@ -50,7 +50,7 @@ export class CryptographyMapper {
    * Maps a generic message into an event in JSON.
    *
    * @param {GenericMessage} genericMessage Received ProtoBuffer message
-   * @param {Object} event Event of BackendEvent.CONVERSATION.OTR-ASSET-ADD or BackendEvent.CONVERSATION.OTR-MESSAGE-ADD
+   * @param {Object} event Event of CONVERSATION_EVENT.OTR-ASSET-ADD or CONVERSATION_EVENT.OTR-MESSAGE-ADD
    * @returns {Promise} Resolves with the mapped event
    */
   async mapGenericMessage(genericMessage, event) {
@@ -325,7 +325,7 @@ export class CryptographyMapper {
         cleared_timestamp: cleared.clearedTimestamp.toString(),
         conversationId: cleared.conversationId,
       },
-      type: BackendEvent.CONVERSATION.MEMBER_UPDATE,
+      type: CONVERSATION_EVENT.MEMBER_UPDATE,
     };
   }
 
@@ -456,7 +456,7 @@ export class CryptographyMapper {
         conversationId: lastRead.conversationId,
         last_read_timestamp: lastRead.lastReadTimestamp.toString(),
       },
-      type: BackendEvent.CONVERSATION.MEMBER_UPDATE,
+      type: CONVERSATION_EVENT.MEMBER_UPDATE,
     };
   }
 

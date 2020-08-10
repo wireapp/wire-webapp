@@ -17,6 +17,7 @@
  *
  */
 
+import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
 import {LinkPreview, Mention} from '@wireapp/protocol-messaging';
 
 import {getLogger} from 'Util/Logger';
@@ -44,7 +45,6 @@ import {LinkPreview as LinkPreviewEntity} from '../entity/message/LinkPreview';
 
 import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
 import {ClientEvent} from '../event/Client';
-import {BackendEvent} from '../event/Backend';
 import {AssetRemoteData} from '../assets/AssetRemoteData';
 
 import {SystemMessageType} from '../message/SystemMessageType';
@@ -195,27 +195,27 @@ export class EventMapper {
     let messageEntity;
 
     switch (event.type) {
-      case BackendEvent.CONVERSATION.MEMBER_JOIN: {
+      case CONVERSATION_EVENT.MEMBER_JOIN: {
         messageEntity = this._mapEventMemberJoin(event, conversationEntity);
         break;
       }
 
-      case BackendEvent.CONVERSATION.MEMBER_LEAVE: {
+      case CONVERSATION_EVENT.MEMBER_LEAVE: {
         messageEntity = this._mapEventMemberLeave(event);
         break;
       }
 
-      case BackendEvent.CONVERSATION.RECEIPT_MODE_UPDATE: {
+      case CONVERSATION_EVENT.RECEIPT_MODE_UPDATE: {
         messageEntity = this._mapEventReceiptModeUpdate(event);
         break;
       }
 
-      case BackendEvent.CONVERSATION.MESSAGE_TIMER_UPDATE: {
+      case CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE: {
         messageEntity = this._mapEventMessageTimerUpdate(event);
         break;
       }
 
-      case BackendEvent.CONVERSATION.RENAME: {
+      case CONVERSATION_EVENT.RENAME: {
         messageEntity = this._mapEventRename(event);
         break;
       }
