@@ -393,7 +393,7 @@ export class CallingRepository {
 
   private async warmupMediaStreams(call: Call, audio: boolean, camera: boolean): Promise<boolean> {
     // if it's a video call we query the video user media in order to display the video preview
-    const isGroup = call.conversationType === CONV_TYPE.GROUP;
+    const isGroup = [CONV_TYPE.CONFERENCE, CONV_TYPE.GROUP].includes(call.conversationType);
     try {
       const mediaStream = await this.getMediaStream({audio, camera}, isGroup);
       if (call.state() !== CALL_STATE.NONE) {
@@ -595,7 +595,8 @@ export class CallingRepository {
   ): Promise<void | Call> {
     try {
       await this.checkConcurrentJoinedCall(conversationId, CALL_STATE.OUTGOING);
-
+      conversationType =
+        conversationType === CONV_TYPE.GROUP && this.useSftCalling() ? CONV_TYPE.CONFERENCE : conversationType;
       const rejectedCallInConversation = this.findCall(conversationId);
       if (rejectedCallInConversation) {
         // if there is a rejected call, we can remove it from the store
@@ -606,14 +607,12 @@ export class CallingRepository {
       const call = new Call(this.selfUser.id, conversationId, conversationType, selfParticipant, callType);
       this.storeCall(call);
       const loadPreviewPromise =
-        conversationType === CONV_TYPE.GROUP && callType === CALL_TYPE.VIDEO
+        [CONV_TYPE.CONFERENCE, CONV_TYPE.GROUP].includes(conversationType) && callType === CALL_TYPE.VIDEO
           ? this.warmupMediaStreams(call, true, true)
           : Promise.resolve(true);
       const success = await loadPreviewPromise;
       if (success) {
-        const conferenceCall =
-          conversationType === CONV_TYPE.GROUP && this.useSftCalling() ? CONV_TYPE.CONFERENCE : conversationType;
-        this.wCall.start(this.wUser, conversationId, callType, conferenceCall, this.cbrEncoding());
+        this.wCall.start(this.wUser, conversationId, callType, conversationType, this.cbrEncoding());
       } else {
         this.showNoCameraModal();
         this.removeCall(call);
@@ -1034,7 +1033,7 @@ export class CallingRepository {
         window.setTimeout(() => resolve(selfParticipant.getMediaStream()), 0);
       });
     }
-    const isGroup = call.conversationType === CONV_TYPE.GROUP;
+    const isGroup = [CONV_TYPE.CONFERENCE, CONV_TYPE.GROUP].includes(call.conversationType);
     this.mediaStreamQuery = (async () => {
       try {
         const mediaStream = await this.getMediaStream(missingStreams, isGroup);
