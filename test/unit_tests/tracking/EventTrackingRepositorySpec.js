@@ -36,9 +36,7 @@ describe('EventTrackingRepository', () => {
       spyOn(testFactory.tracking_repository, 'subscribeToProductEvents').and.callThrough();
 
       const properties = {
-        contact_import: {
-          macos: undefined,
-        },
+        contact_import: {},
         enable_debugging: false,
         settings: {
           emoji: {

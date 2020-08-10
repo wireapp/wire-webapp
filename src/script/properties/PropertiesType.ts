@@ -17,10 +17,6 @@
  *
  */
 
-enum CONTACT_IMPORT {
-  MACOS = 'contact_import.macos',
-}
-
 enum EMOJI {
   REPLACE_INLINE = 'settings.emoji.replace_inline',
 }
@@ -47,13 +43,10 @@ enum PROPERTIES {
   VERSION = 'version',
 }
 
-const PROPERTIES_TYPE = {
+export const PROPERTIES_TYPE = {
   ...PROPERTIES,
   CALL,
-  CONTACT_IMPORT,
   EMOJI,
   INTERFACE,
   PREVIEWS,
 };
-
-export {PROPERTIES_TYPE};
