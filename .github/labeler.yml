@@ -1,7 +1,7 @@
 'type: refactoring 🛠':
   title: '^refactor(\(.+\))?:.*'
 'type: bug / fix 🐞':
-  title: '^fix(\(.+\))?:.*'
+  title: '^(run)?fix(\(.+\))?:.*'
 'type: chore 🧹':
   title: '^chore(\(.+\))?:.*'
 'type: documentation 📋':
