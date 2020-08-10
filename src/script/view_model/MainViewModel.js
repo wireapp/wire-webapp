@@ -98,6 +98,7 @@ export class MainViewModel {
       repositories.media.devicesHandler,
       repositories.media.streamHandler,
       repositories.permission,
+      repositories.team,
       this.selfUser,
       this.multitasking,
     );

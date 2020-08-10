@@ -69,7 +69,7 @@ export class TeamRepository {
   private readonly logger: Logger;
   private readonly memberInviters: ko.Observable<any>;
   private readonly memberRoles: ko.Observable<any>;
-  private readonly supportsLegalHold: ko.Observable<boolean>;
+  public readonly supportsLegalHold: ko.Observable<boolean>;
   private readonly teamMapper: TeamMapper;
   readonly teamMembers: ko.PureComputed<User[]>;
   public readonly teamName: ko.PureComputed<string>;
@@ -275,6 +275,7 @@ export class TeamRepository {
 
       const accountInfo = {
         accentID: this.selfUser().accent_id(),
+        availability: this.selfUser().availability(),
         name: this.teamName(),
         picture: imageDataUrl,
         teamID: this.team() ? this.team().id : undefined,

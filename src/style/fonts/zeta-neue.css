@@ -123,9 +123,6 @@
 .icon-speaker:before {
   content: "\e158";
 }
-.icon-microphone:before {
-  content: "\e160";
-}
 .icon-silence:before {
   content: "\e162";
 }

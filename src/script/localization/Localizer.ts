@@ -81,12 +81,12 @@ setStrings(strings);
 (function setAppLocale() {
   const queryParam = getParameter(URLParameter.LOCALE);
   const currentBrowserLocale = navigator.language.substr(0, 2) as LocaleType;
-  const storedLocale = loadValue<LocaleType>(StorageKey.LOCALIZATION.LOCALE);
 
   if (queryParam) {
     storeValue(StorageKey.LOCALIZATION.LOCALE, queryParam);
   }
 
+  const storedLocale = loadValue<LocaleType>(StorageKey.LOCALIZATION.LOCALE);
   const locale: LocaleType = storedLocale || currentBrowserLocale || (DEFAULT_LOCALE as LocaleType);
   setLocale(locale);
   setDateLocale(locale);

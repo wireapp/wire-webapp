@@ -28,8 +28,6 @@ import {Logger, getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {truncate} from 'Util/StringUtil';
 
-import {Config} from '../Config';
-
 import {ACCESS_STATE} from '../conversation/AccessState';
 import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
 import {ConversationType} from '../conversation/ConversationType';
@@ -47,6 +45,7 @@ import type {ContentMessage} from './message/ContentMessage';
 import type {MemberMessage} from './message/MemberMessage';
 import type {Message} from './message/Message';
 import type {SystemMessage} from './message/SystemMessage';
+import {Config} from '../Config';
 import type {Call} from '../calling/Call';
 
 interface UnreadState {
@@ -898,9 +897,11 @@ export class Conversation {
     return userEntities.filter(userEntity => !userEntity.is_verified());
   }
 
-  supportsVideoCall(): boolean {
+  supportsVideoCall(sftEnabled = true): boolean {
     const participantCount = this.getNumberOfParticipants(true, false);
-    const passesParticipantLimit = participantCount <= Config.getConfig().MAX_VIDEO_PARTICIPANTS;
+    const config = Config.getConfig();
+    const passesParticipantLimit =
+      participantCount <= (sftEnabled ? config.MAX_SFT_VIDEO_PARTICIPANTS : config.MAX_VIDEO_PARTICIPANTS);
     return passesParticipantLimit;
   }
 
@@ -908,7 +909,7 @@ export class Conversation {
     return this.getLastMessage()?.timestamp() ? this.getLastMessage().timestamp() >= this.last_event_timestamp() : true;
   };
 
-  hasActiveCall = (): boolean => [CALL_STATE.INCOMING, CALL_STATE.MEDIA_ESTAB].includes(this.call()?.state());
+  hasActiveCall = (): boolean => this.call()?.state() === CALL_STATE.MEDIA_ESTAB;
 
   serialize(): SerializedConversation {
     return {

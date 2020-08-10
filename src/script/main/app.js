@@ -290,6 +290,7 @@ class App {
       this.apiClient,
       repositories.conversation,
       repositories.event,
+      repositories.user,
       repositories.media.streamHandler,
       serverTimeHandler,
     );
@@ -307,6 +308,7 @@ class App {
     );
     repositories.preferenceNotification = new PreferenceNotificationRepository(repositories.user.self);
 
+    repositories.conversation.leaveCall = repositories.calling.leaveCall;
     return repositories;
   }
 
