@@ -286,9 +286,6 @@ export class PropertiesRepository {
 
   private publishPropertyUpdate(propertiesType: string, updatedPreference: any): void {
     switch (propertiesType) {
-      case PROPERTIES_TYPE.CONTACT_IMPORT.MACOS:
-        amplify.publish(WebAppEvents.PROPERTIES.UPDATE.CONTACTS, updatedPreference);
-        break;
       case PROPERTIES_TYPE.INTERFACE.THEME:
         amplify.publish(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, updatedPreference);
         break;
