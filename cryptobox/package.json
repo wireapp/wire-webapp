@@ -25,7 +25,7 @@
     "rimraf": "3.0.2",
     "typescript": "3.9.2",
     "uuidjs": "4.2.5",
-    "webpack": "4.43.0",
+    "webpack": "4.44.1",
     "webpack-cli": "3.3.12"
   },
   "files": [

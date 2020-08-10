@@ -16,7 +16,7 @@
     "karma-spec-reporter": "0.0.32",
     "rimraf": "3.0.2",
     "typescript": "3.9.2",
-    "webpack": "4.43.0",
+    "webpack": "4.44.1",
     "webpack-cli": "3.3.12"
   },
   "description": "A Promise-based dynamic priority queue runner.",

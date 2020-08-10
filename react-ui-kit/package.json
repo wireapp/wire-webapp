@@ -32,7 +32,7 @@
     "react-test-renderer": "16.13.1",
     "rimraf": "3.0.2",
     "typescript": "3.9.2",
-    "webpack": "4.43.0",
+    "webpack": "4.44.1",
     "webpack-cli": "3.3.12",
     "webpack-env": "0.8.0"
   },

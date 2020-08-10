@@ -14,7 +14,7 @@
     "rimraf": "3.0.2",
     "ts-node": "8.6.2",
     "typescript": "3.9.2",
-    "webpack": "4.43.0",
+    "webpack": "4.44.1",
     "webpack-cli": "3.3.12"
   },
   "description": "Provides a storage wrapper API to unify access to different storage technologies.",
