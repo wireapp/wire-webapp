@@ -8,6 +8,7 @@ export interface ServerConfig {
     BACKEND_REST: string;
     BACKEND_WS: string;
     BRAND_NAME: string;
+    CHROME_ORIGIN_TRIAL_TOKEN: string;
     COUNTLY_API_KEY: string;
     ENVIRONMENT: string;
     FEATURE: {

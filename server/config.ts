@@ -127,6 +127,7 @@ const config: ServerConfig = {
     BACKEND_REST: process.env.BACKEND_REST,
     BACKEND_WS: process.env.BACKEND_WS,
     BRAND_NAME: process.env.BRAND_NAME,
+    CHROME_ORIGIN_TRIAL_TOKEN: process.env.CHROME_ORIGIN_TRIAL_TOKEN,
     COUNTLY_API_KEY: process.env.COUNTLY_API_KEY,
     ENVIRONMENT: nodeEnvironment,
     FEATURE: {
