@@ -374,10 +374,10 @@
     "@types/express-serve-static-core" "*"
     "@types/mime" "*"
 
-"@wireapp/commons@3.6.3":
-  version "3.6.3"
-  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-3.6.3.tgz#d02701ce7edb39e9e5ed37044c66c2af2947e976"
-  integrity sha512-UcEcTz+BkW5QD2yH3KPYX6QQa7BG4hyIBK9/aBb6ZtCu7YeaA5OUZkcf/Qh8trIASMCr/PM1x6MEpNwN3lpmiA==
+"@wireapp/commons@3.7.1":
+  version "3.7.1"
+  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-3.7.1.tgz#1158ffda706a8d30b0f3420ce608816c58c63d1b"
+  integrity sha512-l1apgc0fuS9iVQ4V7am1io43W2+kGkVT2du7bpu/5XypMsGviccwGX0u+3QJSK6WXvyxDTFg4gqI2290jU5R9w==
   dependencies:
     "@types/fs-extra" "8.1.0"
     "@types/node" "~12"
@@ -385,7 +385,7 @@
     ansi-regex "5.0.0"
     fs-extra "9.0.1"
     logdown "3.3.1"
-    platform "1.3.5"
+    platform "1.3.6"
     url-search-params-polyfill "8.1.0"
 
 accepts@~1.3.7:
@@ -2837,10 +2837,10 @@ pkg-dir@^4.1.0:
   dependencies:
     find-up "^4.0.0"
 
-platform@1.3.5:
-  version "1.3.5"
-  resolved "https://registry.yarnpkg.com/platform/-/platform-1.3.5.tgz#fb6958c696e07e2918d2eeda0f0bc9448d733444"
-  integrity sha512-TuvHS8AOIZNAlE77WUDiR4rySV/VMptyMfcfeoMgs4P8apaZM3JrnbzBiixKUv+XR6i+BXrQh8WAnjaSPFO65Q==
+platform@1.3.6:
+  version "1.3.6"
+  resolved "https://registry.yarnpkg.com/platform/-/platform-1.3.6.tgz#48b4ce983164b209c2d45a107adb31f473a6e7a7"
+  integrity sha512-fnWVljUchTro6RiCFvCXBbNhJc2NijN7oIQxbwsyL0buWJPG85v81ehlHI9fXrJsMNgTofEoWIQeClKpgxFLrg==
 
 pm2-axon-rpc@0.5.1, pm2-axon-rpc@^0.5.0:
   version "0.5.1"
