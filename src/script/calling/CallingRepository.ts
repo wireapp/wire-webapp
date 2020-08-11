@@ -262,10 +262,10 @@ export class CallingRepository {
         userA === userB && clientA === clientB;
 
       const fromClientList = (clientList: ClientListEntry[]): UserClients =>
-        clientList.reduce((acc, [userId, clientId]) => {
+        clientList.reduce<UserClients>((acc, [userId, clientId]) => {
           const currentClients = acc[userId] || [];
           return {...acc, [userId]: [...currentClients, clientId]};
-        }, {} as UserClients);
+        }, {});
       const localClientList = makeClientList(localClients);
       const remoteClientList = makeClientList(mismatch.missing);
       const missingClients = remoteClientList.filter(
