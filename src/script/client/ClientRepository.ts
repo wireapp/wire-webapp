@@ -722,8 +722,8 @@ export class ClientRepository {
    * @param JSON data of 'user.client-remove' event
    * @returns Resolves when the event has been handled
    */
-  async onClientRemove(eventJson: UserClientRemoveEvent = {} as any): Promise<void> {
-    const clientId = eventJson.client ? eventJson.client.id : undefined;
+  async onClientRemove(eventJson?: UserClientRemoveEvent): Promise<void> {
+    const clientId = eventJson?.client ? eventJson.client.id : undefined;
     if (!clientId) {
       return;
     }
