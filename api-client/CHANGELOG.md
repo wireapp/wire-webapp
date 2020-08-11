@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.23.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.22.0...@wireapp/api-client@11.23.0) (2020-08-11)
+
+
+### Features
+
+* **api-client:** Remove `ignore_missing` URL parameter (BREAKING) ([#3173](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3173)) ([d0bc8fb](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/d0bc8fb3b8004b6a439d71875478e535ed964cb4))
+
+
+
+
+
 # [11.22.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.21.8...@wireapp/api-client@11.22.0) (2020-08-11)
 
 

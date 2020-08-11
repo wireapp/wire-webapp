@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [16.11.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@16.10.30...@wireapp/core@16.11.0) (2020-08-11)
+
+
+### Features
+
+* **api-client:** Remove `ignore_missing` URL parameter (BREAKING) ([#3173](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/3173)) ([d0bc8fb](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/d0bc8fb3b8004b6a439d71875478e535ed964cb4))
+
+
+
+
+
 ## [16.10.30](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@16.10.29...@wireapp/core@16.10.30) (2020-08-11)
 
 **Note:** Version bump only for package @wireapp/core
