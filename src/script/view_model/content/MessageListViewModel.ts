@@ -410,12 +410,12 @@ export class MessageListViewModel {
       this.conversation(),
       MessageCategory.IMAGE,
     );
-    const messageEntitys = items.filter(
+    const messageEntities = items.filter(
       item => item.category & MessageCategory.IMAGE && !(item.category & MessageCategory.GIF),
     );
-    const [image_messageEntity] = messageEntitys.filter(item => item.id === messageEntity.id);
+    const [imageMessageEntity] = messageEntities.filter(item => item.id === messageEntity.id);
 
-    amplify.publish(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, image_messageEntity || messageEntity, messageEntitys);
+    amplify.publish(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, imageMessageEntity || messageEntity, messageEntities);
   };
 
   get_timestamp_class = (messageEntity: ContentMessage): string => {
