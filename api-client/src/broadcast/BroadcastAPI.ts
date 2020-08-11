@@ -37,13 +37,15 @@ export class BroadcastAPI {
    * @param ignoreMissing Whether to report missing clients or not:
    * `false`: Report about all missing clients
    * `true`: Ignore all missing clients and force sending
+   * Array: User IDs specifying which user IDs are allowed to have
+   * missing clients
    * `undefined`: Default to setting of `report_missing` in `NewOTRMessage`
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/tab.html#!/postOtrBroadcast
    */
   public async postBroadcastMessage(
     clientId: string,
     messageData: NewOTRMessage,
-    ignoreMissing?: boolean,
+    ignoreMissing?: boolean | string[],
   ): Promise<ClientMismatch> {
     if (!clientId) {
       throw new ValidationError('Unable to send OTR message without client ID.');
@@ -55,8 +57,15 @@ export class BroadcastAPI {
       url: BroadcastAPI.URL.BROADCAST,
     };
 
-    if (typeof ignoreMissing === 'boolean') {
-      config.params = {ignore_missing: ignoreMissing};
+    if (typeof ignoreMissing !== 'undefined') {
+      const ignore_missing = Array.isArray(ignoreMissing) ? ignoreMissing.join(',') : ignoreMissing;
+      config.params = {ignore_missing};
+      // `ignore_missing` takes precedence on the server so we can remove
+      // `report_missing` to save some bandwidth.
+      delete messageData.report_missing;
+    } else if (typeof messageData.report_missing === 'undefined') {
+      // both `ignore_missing` and `report_missing` are undefined
+      config.params = {ignore_missing: !!messageData.data};
     }
 
     const response =

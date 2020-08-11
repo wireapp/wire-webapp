@@ -63,11 +63,12 @@ export class BroadcastService {
     sendingClientId: string,
     recipients: OTRRecipients,
     plainTextArray: Uint8Array,
-    data?: any,
+    data?: Uint8Array | string,
   ): Promise<void> {
     const message: NewOTRMessage = {
       data,
       recipients,
+      report_missing: Object.keys(recipients),
       sender: sendingClientId,
     };
     try {

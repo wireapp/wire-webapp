@@ -215,9 +215,7 @@ export class ConversationService {
      * missing clients. We have to ignore missing clients because there can be the case that there are clients that
      * don't provide PreKeys (clients from the Pre-E2EE era).
      */
-    await this.apiClient.conversation.api.postOTRMessage(sendingClientId, conversationId, message, {
-      ignore_missing: true,
-    });
+    await this.apiClient.conversation.api.postOTRMessage(sendingClientId, conversationId, message, true);
   }
 
   // TODO: Move this to a generic "message sending class" and make it private.
