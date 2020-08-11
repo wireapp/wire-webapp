@@ -202,7 +202,6 @@ export class EventTrackingRepository {
   }
 
   private unsubscribeFromProductTrackingEvents(): void {
-    amplify.unsubscribeAll(WebAppEvents.ANALYTICS.SUPER_PROPERTY);
     amplify.unsubscribeAll(WebAppEvents.ANALYTICS.EVENT);
   }
 

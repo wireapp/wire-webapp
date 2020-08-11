@@ -306,12 +306,16 @@ export class ConversationService {
   post_encrypted_message(
     conversationId: string,
     payload: NewOTRMessage,
-    precondition_option: true | string[],
+    preconditionOption: true | string[],
   ): Promise<ClientMismatch> {
-    return this.apiClient.conversation.api.postOTRMessage(payload.sender, conversationId, payload, {
-      ignore_missing: precondition_option === true ? true : undefined,
-      report_missing: Array.isArray(precondition_option) ? precondition_option.join(',') : undefined,
-    });
+    const reportMissing = Array.isArray(preconditionOption) ? preconditionOption : undefined;
+    const ignoreMissing = preconditionOption === true ? true : undefined;
+
+    if (reportMissing) {
+      payload.report_missing = reportMissing;
+    }
+
+    return this.apiClient.conversation.api.postOTRMessage(payload.sender, conversationId, payload, ignoreMissing);
   }
 
   /**
