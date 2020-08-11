@@ -1112,10 +1112,10 @@
   resolved "https://registry.yarnpkg.com/@emotion/weak-memoize/-/weak-memoize-0.2.5.tgz#8eed982e2ee6f7f4e44c253e12962980791efd46"
   integrity sha512-6U71C2Wp7r5XtFtQzYrW5iKFT67OixrSxjI4MptCHzdSVlgabczzqLe0ZSgnub/5Kp4hSbpDB1tMytZY9pwxxA==
 
-"@formatjs/intl-datetimeformat@^2.3.0":
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/@formatjs/intl-datetimeformat/-/intl-datetimeformat-2.3.0.tgz#a0e58135164f9c23db451ea0cc48c9eed0268152"
-  integrity sha512-wPlVtqPJjXyEIHO05JZ8G+t9fV00ho2cL8BCaDlT8vJQ1V2fnBp3cx7jlKpKCV7wNZm3yEebTATv0e0T3WisWw==
+"@formatjs/intl-datetimeformat@^2.3.1":
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/@formatjs/intl-datetimeformat/-/intl-datetimeformat-2.3.1.tgz#dd5c4cb33cee812df42dd286e88ae662743a8679"
+  integrity sha512-i1H3hflcILP40ETiaaWcmLOdkt/iDbfn/2Z8aCWss/IgP2b7r/mCXbgaRJh1dh6pCpmbLp5g4lpIrkvUKuhUtA==
   dependencies:
     "@formatjs/intl-getcanonicallocales" "^1.3.1"
     "@formatjs/intl-utils" "^3.8.2"
@@ -10958,12 +10958,12 @@ react-intl-po@2.2.2:
     po2json "^0.4.5"
     ramda "^0.25.0"
 
-react-intl@5.4.6:
-  version "5.4.6"
-  resolved "https://registry.yarnpkg.com/react-intl/-/react-intl-5.4.6.tgz#4d9b996eb15932448727abf853e4192fa0ce063a"
-  integrity sha512-PaQrHLBvzmfGsIDXK7ONcaMn0V/Ijzy77AFi3/y3rPYMg9IjJr8w6bsKQGzuLtOAxJawY6L60tBWSg8db4XXPA==
+react-intl@5.4.7:
+  version "5.4.7"
+  resolved "https://registry.yarnpkg.com/react-intl/-/react-intl-5.4.7.tgz#a9d52e8d39b4d1a71178b6d71c434c2c0d8448b2"
+  integrity sha512-oiR/w6KdVTFGa2LlycQYfumbbE0/YRymhmvj8diGYo3vvDjlZjjB1V/bzaGNWPhbNWwJXeMH+WHVylATHMCYbQ==
   dependencies:
-    "@formatjs/intl-datetimeformat" "^2.3.0"
+    "@formatjs/intl-datetimeformat" "^2.3.1"
     "@formatjs/intl-displaynames" "^3.1.7"
     "@formatjs/intl-listformat" "^4.0.0"
     "@formatjs/intl-numberformat" "^5.3.3"
