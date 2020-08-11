@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.22.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.21.8...@wireapp/api-client@11.22.0) (2020-08-11)
+
+
+### Features
+
+* **api-client:** Remove last bits of contact import ([#3171](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3171)) ([4156399](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/4156399723a4f0f8f600596765e53feec7cc4fc6))
+
+
+
+
+
 ## [11.21.8](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.21.7...@wireapp/api-client@11.21.8) (2020-08-09)
 
 **Note:** Version bump only for package @wireapp/api-client
