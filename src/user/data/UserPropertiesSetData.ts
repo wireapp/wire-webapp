@@ -32,10 +32,6 @@ export enum NotificationPreference {
 
 export interface WebappProperties {
   [property_key: string]: any;
-  contact_import: {
-    google?: number;
-    macos?: number;
-  };
   enable_debugging: boolean;
   settings: {
     call: {
