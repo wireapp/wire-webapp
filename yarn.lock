@@ -1162,10 +1162,10 @@
   dependencies:
     emojis-list "^3.0.0"
 
-"@formatjs/ts-transformer@^2.5.1":
-  version "2.5.1"
-  resolved "https://registry.yarnpkg.com/@formatjs/ts-transformer/-/ts-transformer-2.5.1.tgz#4f8b6abf9bcd0b22b2b325cf9162160da1b2673e"
-  integrity sha512-2yiXepJNI+CT+dcLH5Qvn47DUj/cs/JhOpAo8+60WjXPN98XeUBAKtjoYnbWc0SnYrBh6mGMLqTOgWR+2680fQ==
+"@formatjs/ts-transformer@^2.6.0":
+  version "2.6.0"
+  resolved "https://registry.yarnpkg.com/@formatjs/ts-transformer/-/ts-transformer-2.6.0.tgz#b45fb9a6fd35cbd600e3dbd44e106f2327d4c0cc"
+  integrity sha512-XAkRDd0q5HkfbNIlVHIKV6BUMwRZr8kbYsdh3uPlmyApNmdVVzYCM8urxuAJ1imKArwOTF9rC5SLaI9AZwA0rg==
   dependencies:
     typescript "^3.8"
 
@@ -1518,13 +1518,6 @@
   version "8.1.0"
   resolved "https://registry.yarnpkg.com/@types/fs-extra/-/fs-extra-8.1.0.tgz#1114834b53c3914806cd03b3304b37b3bd221a4d"
   integrity sha512-UoOfVEzAUpeSPmjm7h1uk5MH6KZma2z2O7a75onTGjnNvAvMVrPzPL/vBbT65iIGHWj6rokwfmYcmxmlSf2uwg==
-  dependencies:
-    "@types/node" "*"
-
-"@types/fs-extra@^9.0.1":
-  version "9.0.1"
-  resolved "https://registry.yarnpkg.com/@types/fs-extra/-/fs-extra-9.0.1.tgz#91c8fc4c51f6d5dbe44c2ca9ab09310bd00c7918"
-  integrity sha512-B42Sxuaz09MhC3DDeW5kubRcQ5by4iuVQ0cRRWM2lggLzAa/KVom0Aft/208NgMvNQQZ86s5rVcqDdn/SH0/mg==
   dependencies:
     "@types/node" "*"
 
@@ -2891,19 +2884,17 @@ babel-plugin-macros@^2.0.0:
     cosmiconfig "^5.2.0"
     resolve "^1.10.0"
 
-babel-plugin-react-intl@7.9.2:
-  version "7.9.2"
-  resolved "https://registry.yarnpkg.com/babel-plugin-react-intl/-/babel-plugin-react-intl-7.9.2.tgz#485931003230d2d3dd457858d1b7fa5b39fb4fbf"
-  integrity sha512-Ny8A6iwz09I+w68t75JK/TNyZ1fD+TD87mPH+0PIr4F0ABIs5MSA8C/TaXjTCir4klGYK/I2lqwNYi7LfWxreg==
+babel-plugin-react-intl@8.0.0:
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/babel-plugin-react-intl/-/babel-plugin-react-intl-8.0.0.tgz#39eb73ec5c95d9f438ef76622df6838c686418f3"
+  integrity sha512-KxNDDvZPXDN+EHRIb56l05pVoV0rzbFZY2UXABtUoIt+2tdG5r9gohWfV1VMueb3ockXf/AckpyhbfPMvqSdJg==
   dependencies:
     "@babel/core" "^7.9.0"
     "@babel/helper-plugin-utils" "^7.8.3"
     "@babel/types" "^7.9.5"
-    "@formatjs/ts-transformer" "^2.5.1"
+    "@formatjs/ts-transformer" "^2.6.0"
     "@types/babel__core" "^7.1.7"
-    "@types/fs-extra" "^9.0.1"
     "@types/schema-utils" "^2.4.0"
-    fs-extra "^9.0.0"
     intl-messageformat-parser "^5.3.7"
     schema-utils "^2.6.6"
 
