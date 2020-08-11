@@ -442,7 +442,7 @@ export class MessageListViewModel {
     return '';
   };
 
-  should_hide_user_avatar = (message_et: ContentMessage): boolean => {
+  shouldHideUserAvatar = (message_et: ContentMessage): boolean => {
     // @todo avoid double check
     if (this.get_timestamp_class(message_et)) {
       return false;
@@ -456,17 +456,17 @@ export class MessageListViewModel {
     return last_message && last_message.is_content() && last_message.user().id === message_et.user().id;
   };
 
-  is_last_delivered_message = (message_et: Message): boolean => {
+  isLastDeliveredMessage = (message_et: Message): boolean => {
     return this.conversation().getLastDeliveredMessage() === message_et;
   };
 
-  click_on_cancel_request = (messageEntity: MemberMessage): void => {
+  clickOnCancelRequest = (messageEntity: MemberMessage): void => {
     const conversationEntity = this.conversationRepository.active_conversation();
     const nextConversationEntity = this.conversationRepository.get_next_conversation(conversationEntity);
     this.actionsViewModel.cancelConnectionRequest(messageEntity.otherUser(), true, nextConversationEntity);
   };
 
-  click_on_like = (message_et: Message): void => {
+  clickOnLike = (message_et: Message): void => {
     this.conversationRepository.toggle_like(this.conversation(), message_et);
   };
 
