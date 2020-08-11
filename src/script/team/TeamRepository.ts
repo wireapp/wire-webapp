@@ -46,7 +46,6 @@ import {roleFromTeamPermissions, ROLE} from '../user/UserPermission';
 
 import {IntegrationMapper} from '../integration/IntegrationMapper';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
-import {SuperProperty} from '../tracking/SuperProperty';
 import {User} from '../entity/User';
 import {TeamService} from './TeamService';
 import {ROLE as TEAM_ROLE} from '../user/UserPermission';

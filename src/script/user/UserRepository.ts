@@ -50,7 +50,6 @@ import type {EventSource} from '../event/EventSource';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 import {EventName} from '../tracking/EventName';
-import {SuperProperty} from '../tracking/SuperProperty';
 
 import {
   HIDE_REQUEST_MODAL,
