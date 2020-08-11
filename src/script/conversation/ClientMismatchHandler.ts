@@ -91,7 +91,9 @@ export class ClientMismatchHandler {
     }
     this.logger.debug(`Message contains deleted clients of '${Object.keys(recipients).length}' users`, recipients);
     const removeDeletedClient = async (userId: string, clientId: string): Promise<void> => {
-      delete payload.recipients[userId][clientId];
+      if (payload.recipients?.[userId]) {
+        delete payload.recipients[userId][clientId];
+      }
       await this.userRepository.removeClientFromUser(userId, clientId);
     };
     await this.removePayload(recipients, removeDeletedClient, payload, conversationEntity);
