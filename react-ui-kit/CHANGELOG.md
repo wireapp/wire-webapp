@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.37.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.36.4...@wireapp/react-ui-kit@7.37.0) (2020-08-12)
+
+
+### Features
+
+* **react-ui-kit:** Remove uppercase textTransform from error message component ([#3177](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/3177)) ([0a3f6e1](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/0a3f6e1af582f3a79d82571b9f05e805fd31c173))
+
+
+
+
+
 ## [7.36.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.36.3...@wireapp/react-ui-kit@7.36.4) (2020-08-11)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit

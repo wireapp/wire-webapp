@@ -65,5 +65,5 @@
     "test:update": "yarn test --updateSnapshot",
     "test:project": "yarn dist && yarn test"
   },
-  "version": "7.36.4"
+  "version": "7.37.0"
 }
