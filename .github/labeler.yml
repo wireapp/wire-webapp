@@ -10,3 +10,10 @@
   title: '^feat(\(.+\))?:.*'
 'type: test 👷':
   title: '^test(\(.+\))?:.*'
+
+'comp: calling':
+  files:
+    - 'src/script/calling/.*'
+'comp: preferences':
+  files:
+    - 'src/script/properties/.*'
