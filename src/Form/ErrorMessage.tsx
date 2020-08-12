@@ -27,7 +27,7 @@ type ErrorMessageProps<T = HTMLSpanElement> = TextProps<T>;
 
 export const errorMessageStyle: <T>(theme: Theme, props: ErrorMessageProps<T>) => ObjectInterpolation<undefined> = (
   theme,
-  {bold = true, center = true, color = COLOR.RED, fontSize = '11px', textTransform = 'uppercase', ...props},
+  {bold = false, center = true, color = COLOR.RED, fontSize = '11px', textTransform = 'none', ...props},
 ) => ({
   ...textStyle(theme, {bold, center, color, fontSize, textTransform, ...props}),
   a: {
