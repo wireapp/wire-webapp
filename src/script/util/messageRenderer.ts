@@ -65,7 +65,7 @@ markdownit.renderer.rules.paragraph_open = (tokens, idx) => {
     .find(({map}) => map?.length);
   const previousPosition = previousWithMap ? previousWithMap.map[1] - 1 : 0;
   const count = position - previousPosition;
-  return '<br>'.repeat(count);
+  return '<br>'.repeat(Math.max(count, 0));
 };
 markdownit.renderer.rules.paragraph_close = () => '';
 
