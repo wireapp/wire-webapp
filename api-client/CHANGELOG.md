@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.24.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.23.0...@wireapp/api-client@11.24.0) (2020-08-12)
+
+
+### Features
+
+* **api-client,bot-api,core:** Send messages to specific clients only ([#3175](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3175)) ([4ef1edd](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/4ef1eddb1bc906552486a3680107ee00a8c8715e))
+
+
+
+
+
 # [11.23.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.22.0...@wireapp/api-client@11.23.0) (2020-08-11)
 
 
