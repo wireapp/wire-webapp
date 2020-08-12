@@ -18,6 +18,8 @@
  */
 
 export interface PreKey {
+  /** The PreKey ID */
   id: number;
+  /** The PreKey data */
   key: string;
 }
