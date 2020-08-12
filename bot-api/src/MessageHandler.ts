@@ -22,7 +22,7 @@ import {CONVERSATION_TYPING} from '@wireapp/api-client/dist/conversation/data';
 import {ConversationEvent, TeamEvent, UserEvent} from '@wireapp/api-client/dist/event';
 import {User} from '@wireapp/api-client/dist/user/';
 import {Account} from '@wireapp/core';
-import {PayloadBundle, ReactionType} from '@wireapp/core/dist/conversation/';
+import {PayloadBundle, ReactionType, UserClientsMap} from '@wireapp/core/dist/conversation/';
 import {
   ButtonActionConfirmationContent,
   CallingContent,
@@ -96,31 +96,49 @@ export abstract class MessageHandler {
     }
   }
 
-  async sendCall(conversationId: string, content: CallingContent): Promise<void> {
+  /**
+   * @param userIds Only send message to specified user IDs or to certain clients of specified user IDs
+   */
+  async sendCall(conversationId: string, content: CallingContent, userIds?: string[] | UserClientsMap): Promise<void> {
     if (this.account?.service) {
       const callPayload = this.account.service.conversation.messageBuilder.createCall(conversationId, content);
-      await this.account.service.conversation.send(callPayload);
+      await this.account.service.conversation.send(callPayload, userIds);
     }
   }
 
-  async sendPoll(conversationId: string, text: string, buttons: string[]): Promise<void> {
+  /**
+   * @param userIds Only send message to specified user IDs or to certain clients of specified user IDs
+   */
+  async sendPoll(
+    conversationId: string,
+    text: string,
+    buttons: string[],
+    userIds?: string[] | UserClientsMap,
+  ): Promise<void> {
     if (this.account?.service) {
       const message = this.account.service.conversation.messageBuilder
         .createComposite(conversationId)
         .addText(Text.create({content: text}));
       buttons.forEach(button => message.addButton(button));
-      await this.account.service.conversation.send(message.build());
+      await this.account.service.conversation.send(message.build(), userIds);
     }
   }
 
-  async sendConfirmation(conversationId: string, firstMessageId: string): Promise<void> {
+  /**
+   * @param userIds Only send message to specified user IDs or to certain clients of specified user IDs
+   */
+  async sendConfirmation(
+    conversationId: string,
+    firstMessageId: string,
+    userIds?: string[] | UserClientsMap,
+  ): Promise<void> {
     if (this.account?.service) {
       const confirmationPayload = this.account.service.conversation.messageBuilder.createConfirmation(
         conversationId,
         firstMessageId,
         Confirmation.Type.DELIVERED,
       );
-      await this.account.service.conversation.send(confirmationPayload);
+      await this.account.service.conversation.send(confirmationPayload, userIds);
     }
   }
 
@@ -140,13 +158,16 @@ export abstract class MessageHandler {
     }
   }
 
+  /**
+   * @param userIds Only send message to specified user IDs or to certain clients of specified user IDs
+   */
   async sendEditedText(
     conversationId: string,
     originalMessageId: string,
     newMessageText: string,
     newMentions?: MentionContent[],
     newLinkPreview?: LinkPreviewContent,
-    userIds?: string[],
+    userIds?: string[] | UserClientsMap,
   ): Promise<void> {
     if (this.account?.service) {
       const editedPayload = this.account.service.conversation.messageBuilder
@@ -171,13 +192,21 @@ export abstract class MessageHandler {
     }
   }
 
-  async sendFile(conversationId: string, file: FileContent, metadata: FileMetaDataContent): Promise<void> {
+  /**
+   * @param userIds Only send message to specified user IDs or to certain clients of specified user IDs
+   */
+  async sendFile(
+    conversationId: string,
+    file: FileContent,
+    metadata: FileMetaDataContent,
+    userIds?: string[] | UserClientsMap,
+  ): Promise<void> {
     if (this.account?.service) {
       const metadataPayload = this.account.service.conversation.messageBuilder.createFileMetadata(
         conversationId,
         metadata,
       );
-      await this.account.service.conversation.send(metadataPayload);
+      await this.account.service.conversation.send(metadataPayload, userIds);
 
       try {
         const filePayload = await this.account.service.conversation.messageBuilder.createFileData(
@@ -185,69 +214,106 @@ export abstract class MessageHandler {
           file,
           metadataPayload.id,
         );
-        await this.account.service.conversation.send(filePayload);
+        await this.account.service.conversation.send(filePayload, userIds);
       } catch (error) {
         const abortPayload = await this.account.service.conversation.messageBuilder.createFileAbort(
           conversationId,
           Asset.NotUploaded.FAILED,
           metadataPayload.id,
         );
-        await this.account.service.conversation.send(abortPayload);
+        await this.account.service.conversation.send(abortPayload, userIds);
       }
     }
   }
 
-  async sendImage(conversationId: string, image: ImageContent): Promise<void> {
+  /**
+   * @param userIds Only send message to specified user IDs or to certain clients of specified user IDs
+   */
+  async sendImage(conversationId: string, image: ImageContent, userIds?: string[] | UserClientsMap): Promise<void> {
     if (this.account?.service) {
       const imagePayload = await this.account.service.conversation.messageBuilder.createImage(conversationId, image);
-      await this.account.service.conversation.send(imagePayload);
+      await this.account.service.conversation.send(imagePayload, userIds);
     }
   }
 
-  async sendLocation(conversationId: string, location: LocationContent): Promise<void> {
+  /**
+   * @param userIds Only send message to specified user IDs or to certain clients of specified user IDs
+   */
+  async sendLocation(
+    conversationId: string,
+    location: LocationContent,
+    userIds?: string[] | UserClientsMap,
+  ): Promise<void> {
     if (this.account?.service) {
       const locationPayload = this.account.service.conversation.messageBuilder.createLocation(conversationId, location);
-      await this.account.service.conversation.send(locationPayload);
+      await this.account.service.conversation.send(locationPayload, userIds);
     }
   }
 
-  async sendPing(conversationId: string): Promise<void> {
+  /**
+   * @param userIds Only send message to specified user IDs or to certain clients of specified user IDs
+   */
+  async sendPing(conversationId: string, userIds?: string[] | UserClientsMap): Promise<void> {
     if (this.account?.service) {
       const pingPayload = this.account.service.conversation.messageBuilder.createPing(conversationId);
-      await this.account.service.conversation.send(pingPayload);
+      await this.account.service.conversation.send(pingPayload, userIds);
     }
   }
 
-  async sendReaction(conversationId: string, originalMessageId: string, type: ReactionType): Promise<void> {
+  /**
+   * @param userIds Only send message to specified user IDs or to certain clients of specified user IDs
+   */
+  async sendReaction(
+    conversationId: string,
+    originalMessageId: string,
+    type: ReactionType,
+    userIds?: string[] | UserClientsMap,
+  ): Promise<void> {
     if (this.account?.service) {
       const reactionPayload = this.account.service.conversation.messageBuilder.createReaction(conversationId, {
         originalMessageId,
         type,
       });
-      await this.account.service.conversation.send(reactionPayload);
+      await this.account.service.conversation.send(reactionPayload, userIds);
     }
   }
 
-  async sendQuote(conversationId: string, quotedMessage: QuotableMessage, text: string): Promise<void> {
+  async sendQuote(
+    conversationId: string,
+    quotedMessage: QuotableMessage,
+    text: string,
+    userIds?: string[] | UserClientsMap,
+  ): Promise<void> {
     if (this.account?.service) {
       const replyPayload = this.account.service.conversation.messageBuilder
         .createText(conversationId, text)
         .withQuote(quotedMessage)
         .build();
-      await this.account.service.conversation.send(replyPayload);
+      await this.account.service.conversation.send(replyPayload, userIds);
     }
   }
 
-  sendReply(conversationId: string, quotedMessage: QuotableMessage, text: string): Promise<void> {
+  /**
+   * @param userIds Only send message to specified user IDs or to certain clients of specified user IDs
+   */
+  sendReply(
+    conversationId: string,
+    quotedMessage: QuotableMessage,
+    text: string,
+    userIds?: string[] | UserClientsMap,
+  ): Promise<void> {
     return this.sendQuote(conversationId, quotedMessage, text);
   }
 
+  /**
+   * @param userIds Only send message to specified user IDs or to certain clients of specified user IDs
+   */
   async sendText(
     conversationId: string,
     text: string,
     mentions?: MentionContent[],
     linkPreview?: LinkPreviewContent,
-    userIds?: string[],
+    userIds?: string[] | UserClientsMap,
   ): Promise<void> {
     if (this.account?.service) {
       const payload = this.account.service.conversation.messageBuilder

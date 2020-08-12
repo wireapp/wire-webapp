@@ -20,6 +20,8 @@
 import {ClientPreKey} from '../auth/';
 
 export interface PreKeyBundle {
+  /** PreKeys of all clients */
   clients: ClientPreKey[];
+  /** The user ID */
   user: string;
 }

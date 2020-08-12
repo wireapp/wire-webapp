@@ -77,7 +77,7 @@ export class ChangelogBot {
     for (const conversationId of conversationIds) {
       if (conversationId) {
         logger.log(`Sending message to conversation "${conversationId}" ...`);
-        const textPayload = await account.service.conversation.messageBuilder
+        const textPayload = account.service.conversation.messageBuilder
           .createText(conversationId, this.message)
           .build();
         await account.service.conversation.send(textPayload);

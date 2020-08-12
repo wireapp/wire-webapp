@@ -102,7 +102,7 @@ describe('MessageHandler', () => {
         metadataPayload.id,
       );
       expect(mainHandler.account.service.conversation.messageBuilder.createFileAbort).not.toHaveBeenCalled();
-      expect(mainHandler.account.service.conversation.send).toHaveBeenCalledWith(filePayload);
+      expect(mainHandler.account.service.conversation.send).toHaveBeenCalledWith(filePayload, undefined);
     });
 
     it('sends the correct data if uploading fails', async () => {
@@ -137,7 +137,7 @@ describe('MessageHandler', () => {
         file,
         metadataPayload.id,
       );
-      expect(mainHandler.account.service.conversation.send).toHaveBeenCalledWith(abortPayload);
+      expect(mainHandler.account.service.conversation.send).toHaveBeenCalledWith(abortPayload, undefined);
     });
   });
 

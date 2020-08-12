@@ -21,7 +21,7 @@ import {APIClient} from '@wireapp/api-client';
 import {ClientType} from '@wireapp/api-client/dist/client/';
 import {ConversationEvent, TeamEvent, UserEvent} from '@wireapp/api-client/dist/event';
 import {Account} from '@wireapp/core';
-import {PayloadBundle, PayloadBundleType} from '@wireapp/core/dist/conversation/';
+import {PayloadBundle, PayloadBundleType, UserClientsMap} from '@wireapp/core/dist/conversation/';
 import {CRUDEngine} from '@wireapp/store-engine';
 import logdown from 'logdown';
 import UUID from 'uuidjs';
@@ -77,12 +77,13 @@ export class Bot {
     return this.config.owners.length === 0 ? true : this.config.owners.includes(userId);
   }
 
-  public async sendText(conversationId: string, message: string): Promise<void> {
+  /**
+   * @param userIds Only send message to specified user IDs or to certain clients of specified user IDs
+   */
+  public async sendText(conversationId: string, message: string, userIds?: string[] | UserClientsMap): Promise<void> {
     if (this.account?.service) {
-      const textPayload = await this.account.service.conversation.messageBuilder
-        .createText(conversationId, message)
-        .build();
-      await this.account.service.conversation.send(textPayload);
+      const textPayload = this.account.service.conversation.messageBuilder.createText(conversationId, message).build();
+      await this.account.service.conversation.send(textPayload, userIds);
     }
   }
 
