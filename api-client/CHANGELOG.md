@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.25.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.24.0...@wireapp/api-client@11.25.0) (2020-08-12)
+
+
+### Features
+
+* **api-client:** Emit logout event on invalid token/missing cookie from HttpClient ([#3178](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3178)) ([20e9bbc](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/20e9bbc6bd4eff27a3b633be259add1cd2087303))
+
+
+
+
+
 # [11.24.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.23.0...@wireapp/api-client@11.24.0) (2020-08-12)
 
 
