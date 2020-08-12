@@ -277,7 +277,8 @@ export class TeamRepository {
 
       const accountInfo: AccountInfo = {
         accentID: this.selfUser().accent_id(),
-        availability: this.selfUser().availability(),
+        // Deactivated until wrapper supports this
+        // availability: this.selfUser().availability(),
         name: this.teamName(),
         picture: imageDataUrl?.toString(),
         teamID: this.team() ? this.team().id : undefined,
