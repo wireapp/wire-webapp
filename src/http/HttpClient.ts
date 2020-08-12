@@ -22,17 +22,19 @@ import {PriorityQueue} from '@wireapp/priority-queue';
 import axios, {AxiosError, AxiosRequestConfig, AxiosResponse} from 'axios';
 import {EventEmitter} from 'events';
 import logdown from 'logdown';
-import {AccessTokenData, AccessTokenStore, AuthAPI} from '../auth/';
+import {AccessTokenData, AccessTokenStore, AuthAPI, InvalidTokenError, MissingCookieError} from '../auth/';
 import {BackendErrorMapper, ConnectionState, ContentType, NetworkError, StatusCode} from '../http/';
 import {ObfuscationUtil} from '../obfuscation/';
 import {sendRequestWithCookie} from '../shims/node/cookie';
 
 enum TOPIC {
   ON_CONNECTION_STATE_CHANGE = 'HttpClient.TOPIC.ON_CONNECTION_STATE_CHANGE',
+  ON_INVALID_TOKEN = 'HttpClient.TOPIC.ON_INVALID_TOKEN',
 }
 
 export interface HttpClient {
   on(event: TOPIC.ON_CONNECTION_STATE_CHANGE, listener: (state: ConnectionState) => void): this;
+  on(event: TOPIC.ON_INVALID_TOKEN, listener: (error: InvalidTokenError | MissingCookieError) => void): this;
 }
 
 export class HttpClient extends EventEmitter {
@@ -129,6 +131,14 @@ export class HttpClient extends EventEmitter {
 
         if (isBackendError) {
           error = BackendErrorMapper.map(errorData);
+          if (error instanceof InvalidTokenError || error instanceof MissingCookieError) {
+            // On invalid cookie the application is supposed to logout.
+            this.logger.warn(
+              `[HTTP Client] Cannot renew access token because cookie/token is invalid: ${error.message}`,
+              error,
+            );
+            this.emit(HttpClient.TOPIC.ON_INVALID_TOKEN, error);
+          }
         } else {
           const isUnauthorized = errorStatus === StatusCode.UNAUTHORIZED;
           const hasAccessToken = !!this.accessTokenStore?.accessToken;

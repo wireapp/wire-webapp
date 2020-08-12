@@ -31,6 +31,7 @@ import {
   InvalidTokenError,
   LoginData,
   RegisterData,
+  MissingCookieError,
 } from './auth/';
 import {CookieStore} from './auth/CookieStore';
 import {BroadcastAPI} from './broadcast/';
@@ -137,11 +138,12 @@ export class APIClient extends EventEmitter {
     const httpClient = new HttpClient(this.config.urls.rest, this.accessTokenStore);
     const webSocket = new WebSocketClient(this.config.urls.ws, httpClient);
 
-    webSocket.on(WebSocketClient.TOPIC.ON_INVALID_TOKEN, async error => {
-      this.logger.warn(`Cannot renew access token because cookie is invalid: ${error.message}`, error);
+    const onInvalidCredentials = async (error: InvalidTokenError | MissingCookieError) => {
       await this.logout();
       this.emit(APIClient.TOPIC.ON_LOGOUT, error);
-    });
+    };
+    webSocket.on(WebSocketClient.TOPIC.ON_INVALID_TOKEN, onInvalidCredentials);
+    httpClient.on(HttpClient.TOPIC.ON_INVALID_TOKEN, onInvalidCredentials);
 
     this.transport = {
       http: httpClient,
