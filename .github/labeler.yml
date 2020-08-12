@@ -17,3 +17,7 @@
 'comp: preferences':
   files:
     - 'src/script/properties/.*'
+'comp: infrastructure':
+  files:
+    - '.elasticbeanstalk'
+    - '.github/.*'
