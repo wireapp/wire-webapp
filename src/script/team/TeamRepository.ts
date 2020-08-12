@@ -22,6 +22,7 @@ import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import type {ConversationRolesList} from '@wireapp/api-client/dist/conversation/ConversationRole';
 import type {TeamData} from '@wireapp/api-client/dist/team/team/TeamData';
+import {Availability} from '@wireapp/protocol-messaging';
 import {TEAM_EVENT} from '@wireapp/api-client/dist/event/TeamEvent';
 import type {
   TeamConversationDeleteEvent,
@@ -57,8 +58,9 @@ import {AssetRepository} from '../assets/AssetRepository';
 
 export interface AccountInfo {
   accentID: number;
+  availability?: Availability.Type;
   name: string;
-  picture?: string | ArrayBuffer;
+  picture?: string;
   teamID?: string;
   teamRole: TEAM_ROLE;
   userID: string;
@@ -273,11 +275,11 @@ export class TeamRepository {
         imageDataUrl = imageBlob ? await loadDataUrl(imageBlob) : undefined;
       }
 
-      const accountInfo = {
+      const accountInfo: AccountInfo = {
         accentID: this.selfUser().accent_id(),
         availability: this.selfUser().availability(),
         name: this.teamName(),
-        picture: imageDataUrl,
+        picture: imageDataUrl?.toString(),
         teamID: this.team() ? this.team().id : undefined,
         teamRole: this.selfUser().teamRole(),
         userID: this.selfUser().id,
