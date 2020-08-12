@@ -91,6 +91,9 @@ import {
   TextMessage,
 } from './message/OtrMessage';
 
+/** A map of the format `{ UserId: [clientId, ...] }` */
+export type UserClientsMap = Record<string, string[]>;
+
 export class ConversationService {
   public readonly messageTimer: MessageTimer;
   public readonly messageBuilder: MessageBuilder;
@@ -118,18 +121,36 @@ export class ConversationService {
     return genericMessage;
   }
 
-  private async getPreKeyBundle(conversationId: string, userIds?: string[]): Promise<UserPreKeyBundleMap> {
+  private async getPreKeyBundle(
+    conversationId: string,
+    userIds?: string[] | UserClientsMap,
+  ): Promise<UserPreKeyBundleMap> {
     const conversation = await this.apiClient.conversation.api.getConversation(conversationId);
-    const members = userIds?.length ? userIds.map(id => ({id})) : conversation.members.others;
-    const preKeys = await Promise.all(members.map(member => this.apiClient.user.api.getUserPreKeys(member.id)));
 
-    /**
-     * If you are sending a message to a selection of users, you have to include yourself in the list of users if you
-     * want to sync a message also to your other clients.
-     */
-    if (!userIds) {
-      const selfPreKey = await this.apiClient.user.api.getUserPreKeys(conversation.members.self.id);
-      preKeys.push(selfPreKey);
+    let members: string[];
+
+    if (userIds && Array.isArray(userIds) && userIds.length) {
+      members = userIds;
+    } else if (userIds) {
+      members = Object.keys(userIds);
+    } else {
+      /*
+       * If you are sending a message to a conversation, you have to include
+       * yourself in the list of users if you want to sync a message also to your
+       * other clients.
+       */
+      members = conversation.members.others.map(member => member.id).concat(conversation.members.self.id);
+    }
+
+    let preKeys = await Promise.all(members.map(member => this.apiClient.user.api.getUserPreKeys(member)));
+
+    if (userIds && !Array.isArray(userIds)) {
+      preKeys = preKeys.map(preKey => {
+        if (preKey.user in userIds) {
+          preKey.clients = preKey.clients.filter(client => userIds[preKey.user].includes(client.client));
+        }
+        return preKey;
+      });
     }
 
     return preKeys.reduce((bundleMap: UserPreKeyBundleMap, bundle) => {
@@ -177,7 +198,7 @@ export class ConversationService {
     sendingClientId: string,
     conversationId: string,
     genericMessage: GenericMessage,
-    userIds?: string[],
+    userIds?: string[] | UserClientsMap,
   ): Promise<void> {
     const plainTextArray = GenericMessage.encode(genericMessage).finish();
     const preKeyBundles = await this.getPreKeyBundle(conversationId, userIds);
@@ -260,7 +281,10 @@ export class ConversationService {
     throw error;
   }
 
-  private async sendButtonAction(payloadBundle: ButtonActionMessage, userIds?: string[]): Promise<ButtonActionMessage> {
+  private async sendButtonAction(
+    payloadBundle: ButtonActionMessage,
+    userIds?: string[] | UserClientsMap,
+  ): Promise<ButtonActionMessage> {
     const genericMessage = GenericMessage.create({
       [GenericMessageType.BUTTON_ACTION]: ButtonAction.create(payloadBundle.content),
       messageId: payloadBundle.id,
@@ -282,7 +306,7 @@ export class ConversationService {
 
   private async sendButtonActionConfirmation(
     payloadBundle: ButtonActionConfirmationMessage,
-    userIds?: string[],
+    userIds?: string[] | UserClientsMap,
   ): Promise<ButtonActionConfirmationMessage> {
     const genericMessage = GenericMessage.create({
       [GenericMessageType.BUTTON_ACTION_CONFIRMATION]: ButtonActionConfirmation.create(payloadBundle.content),
@@ -303,7 +327,10 @@ export class ConversationService {
     };
   }
 
-  private async sendComposite(payloadBundle: CompositeMessage, userIds?: string[]): Promise<CompositeMessage> {
+  private async sendComposite(
+    payloadBundle: CompositeMessage,
+    userIds?: string[] | UserClientsMap,
+  ): Promise<CompositeMessage> {
     const genericMessage = GenericMessage.create({
       [GenericMessageType.COMPOSITE]: Composite.create(payloadBundle.content),
       messageId: payloadBundle.id,
@@ -323,7 +350,10 @@ export class ConversationService {
     };
   }
 
-  private async sendConfirmation(payloadBundle: ConfirmationMessage, userIds?: string[]): Promise<ConfirmationMessage> {
+  private async sendConfirmation(
+    payloadBundle: ConfirmationMessage,
+    userIds?: string[] | UserClientsMap,
+  ): Promise<ConfirmationMessage> {
     const content = Confirmation.create(payloadBundle.content);
 
     const genericMessage = GenericMessage.create({
@@ -345,7 +375,10 @@ export class ConversationService {
     };
   }
 
-  private async sendEditedText(payloadBundle: EditedTextMessage, userIds?: string[]): Promise<EditedTextMessage> {
+  private async sendEditedText(
+    payloadBundle: EditedTextMessage,
+    userIds?: string[] | UserClientsMap,
+  ): Promise<EditedTextMessage> {
     const editedMessage = MessageEdit.create({
       replacingMessageId: payloadBundle.content.originalMessageId,
       text: MessageToProtoMapper.mapText(payloadBundle),
@@ -370,7 +403,10 @@ export class ConversationService {
     };
   }
 
-  private async sendFileData(payloadBundle: FileAssetMessage, userIds?: string[]): Promise<FileAssetMessage> {
+  private async sendFileData(
+    payloadBundle: FileAssetMessage,
+    userIds?: string[] | UserClientsMap,
+  ): Promise<FileAssetMessage> {
     if (!payloadBundle.content) {
       throw new Error('No content for sendFileData provided.');
     }
@@ -418,7 +454,7 @@ export class ConversationService {
 
   private async sendFileMetaData(
     payloadBundle: FileAssetMetaDataMessage,
-    userIds?: string[],
+    userIds?: string[] | UserClientsMap,
   ): Promise<FileAssetMetaDataMessage> {
     if (!payloadBundle.content) {
       throw new Error('No content for sendFileMetaData provided.');
@@ -466,7 +502,7 @@ export class ConversationService {
 
   private async sendFileAbort(
     payloadBundle: FileAssetAbortMessage,
-    userIds?: string[],
+    userIds?: string[] | UserClientsMap,
   ): Promise<FileAssetAbortMessage> {
     if (!payloadBundle.content) {
       throw new Error('No content for sendFileAbort provided.');
@@ -506,7 +542,10 @@ export class ConversationService {
     };
   }
 
-  private async sendImage(payloadBundle: ImageAssetMessageOutgoing, userIds?: string[]): Promise<ImageAssetMessage> {
+  private async sendImage(
+    payloadBundle: ImageAssetMessageOutgoing,
+    userIds?: string[] | UserClientsMap,
+  ): Promise<ImageAssetMessage> {
     if (!payloadBundle.content) {
       throw new Error('No content for sendImage provided.');
     }
@@ -566,7 +605,10 @@ export class ConversationService {
     };
   }
 
-  private async sendLocation(payloadBundle: LocationMessage, userIds?: string[]): Promise<LocationMessage> {
+  private async sendLocation(
+    payloadBundle: LocationMessage,
+    userIds?: string[] | UserClientsMap,
+  ): Promise<LocationMessage> {
     const {expectsReadConfirmation, latitude, legalHoldStatus, longitude, name, zoom} = payloadBundle.content;
 
     const locationMessage = Location.create({
@@ -602,7 +644,7 @@ export class ConversationService {
     };
   }
 
-  private async sendKnock(payloadBundle: PingMessage, userIds?: string[]): Promise<PingMessage> {
+  private async sendKnock(payloadBundle: PingMessage, userIds?: string[] | UserClientsMap): Promise<PingMessage> {
     const content = Knock.create(payloadBundle.content);
 
     let genericMessage = GenericMessage.create({
@@ -630,7 +672,10 @@ export class ConversationService {
     };
   }
 
-  private async sendReaction(payloadBundle: ReactionMessage, userIds?: string[]): Promise<ReactionMessage> {
+  private async sendReaction(
+    payloadBundle: ReactionMessage,
+    userIds?: string[] | UserClientsMap,
+  ): Promise<ReactionMessage> {
     const {legalHoldStatus, originalMessageId, type} = payloadBundle.content;
 
     const reaction = Reaction.create({
@@ -658,7 +703,10 @@ export class ConversationService {
     };
   }
 
-  private async sendSessionReset(payloadBundle: ResetSessionMessage, userIds?: string[]): Promise<ResetSessionMessage> {
+  private async sendSessionReset(
+    payloadBundle: ResetSessionMessage,
+    userIds?: string[] | UserClientsMap,
+  ): Promise<ResetSessionMessage> {
     const sessionReset = GenericMessage.create({
       [GenericMessageType.CLIENT_ACTION]: ClientAction.RESET_SESSION,
       messageId: payloadBundle.id,
@@ -673,7 +721,7 @@ export class ConversationService {
     };
   }
 
-  private async sendCall(payloadBundle: CallMessage, userIds?: string[]): Promise<CallMessage> {
+  private async sendCall(payloadBundle: CallMessage, userIds?: string[] | UserClientsMap): Promise<CallMessage> {
     const callMessage = Calling.create({
       content: payloadBundle.content,
     });
@@ -697,7 +745,7 @@ export class ConversationService {
     };
   }
 
-  private async sendText(payloadBundle: TextMessage, userIds?: string[]): Promise<TextMessage> {
+  private async sendText(payloadBundle: TextMessage, userIds?: string[] | UserClientsMap): Promise<TextMessage> {
     let genericMessage = GenericMessage.create({
       messageId: payloadBundle.id,
       [GenericMessageType.TEXT]: MessageToProtoMapper.mapText(payloadBundle),
@@ -793,7 +841,7 @@ export class ConversationService {
   public async deleteMessageEveryone(
     conversationId: string,
     messageIdToDelete: string,
-    userIds?: string[],
+    userIds?: string[] | UserClientsMap,
   ): Promise<DeleteMessage> {
     const messageId = MessageBuilder.createId();
 
@@ -904,10 +952,10 @@ export class ConversationService {
 
   /**
    * @param payloadBundle Outgoing message
-   * @param userIds Only send message to specified user IDs
+   * @param userIds Only send message to specified user IDs or to certain clients of specified user IDs
    * @returns Sent message
    */
-  public async send(payloadBundle: OtrMessage, userIds?: string[]) {
+  public async send(payloadBundle: OtrMessage, userIds?: string[] | UserClientsMap) {
     switch (payloadBundle.type) {
       case PayloadBundleType.ASSET:
         return this.sendFileData(payloadBundle, userIds);
