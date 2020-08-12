@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "@types/webrtc": "0.0.26",
-    "@wireapp/avs": "6.0.46",
+    "@wireapp/avs": "6.2.20",
     "wrtc": "0.4.6"
   },
   "description": "Adds audio/video/signaling (AVS) functionality for Wire bots.",
