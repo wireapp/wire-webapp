@@ -14,7 +14,7 @@
     "!dist/demo"
   ],
   "license": "GPL-3.0",
-  "main": "dist/DebugHandler.js",
+  "main": "dist/index.js",
   "name": "@wireapp/bot-handler-debug",
   "peerDependencies": {
     "@wireapp/bot-api": "7.x.x"
