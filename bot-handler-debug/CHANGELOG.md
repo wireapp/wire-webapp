@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-debug/compare/@wireapp/bot-handler-debug@0.2.32...@wireapp/bot-handler-debug@0.3.0) (2020-08-13)
+
+
+### Features
+
+* **bot-handler-debug:** Automatically accept connection requests ([#3181](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-debug/issues/3181)) ([adecbf6](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-debug/commit/adecbf607e88d59ab5d5e74a55f81c4ecbb63598))
+
+
+
+
+
 ## [0.2.32](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-debug/compare/@wireapp/bot-handler-debug@0.2.31...@wireapp/bot-handler-debug@0.2.32) (2020-08-13)
 
 
