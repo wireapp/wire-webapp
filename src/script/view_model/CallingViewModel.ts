@@ -208,7 +208,7 @@ export class CallingViewModel {
       toggleMute: (call: Call, muteState: boolean) => {
         this.callingRepository.muteCall(call.conversationId, muteState);
       },
-      toggleScreenshare: (call: Call) => {
+      toggleScreenshare: (call: Call): void => {
         if (call.getSelfParticipant().sharesScreen()) {
           return this.callingRepository.toggleScreenshare(call);
         }
@@ -231,7 +231,12 @@ export class CallingViewModel {
         };
 
         this.mediaStreamHandler.selectScreenToShare(showScreenSelection).then(() => {
-          this.multitasking.isMinimized(true);
+          if (
+            [CALL_TYPE.NORMAL, CALL_TYPE.FORCED_AUDIO].includes(call.initialType) ||
+            (call.initialType === CALL_TYPE.VIDEO && !this.multitasking.isMinimized())
+          ) {
+            this.multitasking.isMinimized(true);
+          }
           return this.callingRepository.toggleScreenshare(call);
         });
       },
