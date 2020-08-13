@@ -139,8 +139,12 @@ export class APIClient extends EventEmitter {
     const webSocket = new WebSocketClient(this.config.urls.ws, httpClient);
 
     const onInvalidCredentials = async (error: InvalidTokenError | MissingCookieError) => {
-      await this.logout();
-      this.emit(APIClient.TOPIC.ON_LOGOUT, error);
+      try {
+        await this.logout();
+      } finally {
+        // Send a logout event to the application even if a logout REST call fails
+        this.emit(APIClient.TOPIC.ON_LOGOUT, error);
+      }
     };
     webSocket.on(WebSocketClient.TOPIC.ON_INVALID_TOKEN, onInvalidCredentials);
     httpClient.on(HttpClient.TOPIC.ON_INVALID_TOKEN, onInvalidCredentials);
