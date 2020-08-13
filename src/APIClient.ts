@@ -75,7 +75,9 @@ const defaultConfig: Config = {
 
 export interface APIClient {
   on(event: TOPIC.ON_LOGOUT, listener: (error: InvalidTokenError) => void): this;
+
   on(event: TOPIC.COOKIE_REFRESH, listener: (cookie?: Cookie) => void): this;
+
   on(event: TOPIC.ACCESS_TOKEN_REFRESH, listener: (accessToken: AccessTokenData) => void): this;
 }
 
@@ -140,9 +142,9 @@ export class APIClient extends EventEmitter {
 
     const onInvalidCredentials = async (error: InvalidTokenError | MissingCookieError) => {
       try {
-        await this.logout();
+        await this.logout({skipLogoutRequest: true});
       } finally {
-        // Send a logout event to the application even if a logout REST call fails
+        // Send a guaranteed logout event to the application so that the UI can respond
         this.emit(APIClient.TOPIC.ON_LOGOUT, error);
       }
     };
@@ -236,7 +238,7 @@ export class APIClient extends EventEmitter {
 
   public async login(loginData: LoginData): Promise<Context> {
     if (this.context) {
-      await this.logout({ignoreError: true});
+      await this.logout();
     }
 
     const accessToken = await this.auth.api.postLogin(loginData);
@@ -253,7 +255,7 @@ export class APIClient extends EventEmitter {
 
   public async register(userAccount: RegisterData, clientType: ClientType = ClientType.PERMANENT): Promise<Context> {
     if (this.context) {
-      await this.logout({ignoreError: true});
+      await this.logout();
     }
 
     const user = await this.auth.api.postRegister(userAccount);
@@ -263,20 +265,17 @@ export class APIClient extends EventEmitter {
     return this.init(clientType, CookieStore.getCookie());
   }
 
-  public async logout(options = {ignoreError: false}): Promise<void> {
+  public async logout(options: {skipLogoutRequest: boolean} = {skipLogoutRequest: false}): Promise<void> {
     try {
       this.disconnect('Closed by client logout');
-      await this.auth.api.postLogout();
-    } catch (error) {
-      if (options.ignoreError === true) {
-        this.logger.error(error);
-      } else {
-        throw error;
+      if (!options.skipLogoutRequest) {
+        await this.auth.api.postLogout();
       }
-    } finally {
-      CookieStore.deleteCookie();
+    } catch (error) {
+      this.logger.error(error);
     }
 
+    CookieStore.deleteCookie();
     await this.accessTokenStore.delete();
     delete this.context;
   }
