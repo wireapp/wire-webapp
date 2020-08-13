@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.25.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.25.2...@wireapp/api-client@11.25.3) (2020-08-13)
+
+
+### Bug Fixes
+
+* **api-client:** Skip logout REST request when credentials are invalid (WEBAPP-7041) ([#3182](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3182)) ([51e0fa1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/51e0fa1f4f640cbda54a0b2ef7d961e851ce66de))
+
+
+
+
+
 ## [11.25.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.25.1...@wireapp/api-client@11.25.2) (2020-08-13)
 
 
