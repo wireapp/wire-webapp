@@ -66,6 +66,7 @@ export class Configuration {
     TERMS_OF_USE_PERSONAL: 'https://wire-website-staging.zinfra.io/legal/terms/personal',
     TERMS_OF_USE_TEAMS: 'https://wire-website-staging.zinfra.io/legal/terms/teams',
     WEBSITE_BASE: 'https://wire.com',
+    WHATS_NEW: 'https://medium.com/wire-news/webapp-updates/home',
   };
   readonly VERSION = env.VERSION || '0.0.0';
   readonly WEBSITE_LABEL = env.WEBSITE_LABEL;

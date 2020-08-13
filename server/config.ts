@@ -178,6 +178,7 @@ const config: ServerConfig = {
       TERMS_OF_USE_PERSONAL: process.env.URL_TERMS_OF_USE_PERSONAL,
       TERMS_OF_USE_TEAMS: process.env.URL_TERMS_OF_USE_TEAMS,
       WEBSITE_BASE: process.env.URL_WEBSITE_BASE,
+      WHATS_NEW: process.env.URL_WHATS_NEW,
     },
     VERSION: readFile(VERSION_FILE, '0.0.0'),
     WEBSITE_LABEL: process.env.WEBSITE_LABEL,
