@@ -18,7 +18,7 @@
  */
 
 import {MessageHandler} from '@wireapp/bot-api';
-import {PayloadBundle, PayloadBundleSource} from '@wireapp/core/dist/conversation/';
+import {PayloadBundle, PayloadBundleSource, PayloadBundleType} from '@wireapp/core/dist/conversation/';
 import {Prompt, Wizardy} from 'wizardy';
 import {QuotableMessage} from '@wireapp/core/dist/conversation/message/OtrMessage';
 import {TextContent} from '@wireapp/core/dist/conversation/content';
@@ -66,9 +66,12 @@ export class WizardHandler<P> extends MessageHandler {
       return;
     }
 
-    const text = (payload.content as TextContent).text;
-    const hasInput = text && text.length > 0;
-    if (!hasInput) {
+    if (payload.type !== PayloadBundleType.TEXT) {
+      return;
+    }
+
+    const text = (payload.content as TextContent).text.trim();
+    if (text.length === 0) {
       return;
     }
 

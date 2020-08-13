@@ -43,7 +43,7 @@ export class UptimeHandler extends MessageHandler {
     switch (payload.type) {
       case PayloadBundleType.TEXT: {
         const content = payload.content as TextContent;
-        if (content.text === '/uptime') {
+        if (content.text.trim() === '/uptime') {
           const upTime = UptimeHandler.getUptime();
           await this.sendReply(payload.conversation, payload as QuotableMessage, `Running since: ${upTime}`);
         }

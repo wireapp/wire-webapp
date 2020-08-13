@@ -33,7 +33,7 @@ export class DebugHandler extends MessageHandler {
         const quotedMessage = payload as QuotableMessage;
         const conversationId = payload.conversation;
 
-        switch (text) {
+        switch (text.trim()) {
           case '/conversation':
             const conversationText = `The ID of this conversation is "${payload.conversation}".`;
             await this.sendText(conversationId, conversationText);
