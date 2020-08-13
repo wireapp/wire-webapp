@@ -37,5 +37,5 @@
     "test:node": "tsc --noEmit",
     "test:project": "yarn dist && yarn test"
   },
-  "version": "0.2.6"
+  "version": "0.2.7"
 }

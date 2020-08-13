@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.7](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-wizard/compare/@wireapp/bot-handler-wizard@0.2.6...@wireapp/bot-handler-wizard@0.2.7) (2020-08-13)
+
+
+### Bug Fixes
+
+* **bot-handler-debug,bot-handler-uptime,bot-handler-wizard:** Trim text before evaluating commands ([#3180](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-wizard/issues/3180)) ([11bbc1b](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-wizard/commit/11bbc1b9431f70e50e3dc47445ac83231cd923ae))
+
+
+
+
+
 ## [0.2.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-wizard/compare/@wireapp/bot-handler-wizard@0.2.5...@wireapp/bot-handler-wizard@0.2.6) (2020-08-13)
 
 **Note:** Version bump only for package @wireapp/bot-handler-wizard

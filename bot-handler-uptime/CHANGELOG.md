@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.32](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-uptime/compare/@wireapp/bot-handler-uptime@0.1.31...@wireapp/bot-handler-uptime@0.1.32) (2020-08-13)
+
+
+### Bug Fixes
+
+* **bot-handler-debug,bot-handler-uptime,bot-handler-wizard:** Trim text before evaluating commands ([#3180](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-uptime/issues/3180)) ([11bbc1b](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-uptime/commit/11bbc1b9431f70e50e3dc47445ac83231cd923ae))
+
+
+
+
+
 ## [0.1.31](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-uptime/compare/@wireapp/bot-handler-uptime@0.1.30...@wireapp/bot-handler-uptime@0.1.31) (2020-08-13)
 
 **Note:** Version bump only for package @wireapp/bot-handler-uptime
