@@ -51,6 +51,7 @@ export interface ServerConfig {
       TERMS_OF_USE_PERSONAL: string;
       TERMS_OF_USE_TEAMS: string;
       WEBSITE_BASE: string;
+      WHATS_NEW: string;
     };
     VERSION: string;
     WEBSITE_LABEL: string;

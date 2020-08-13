@@ -45,28 +45,7 @@ export class Configuration {
   readonly MAX_SFT_VIDEO_PARTICIPANTS = env.MAX_VIDEO_PARTICIPANTS || 4;
   readonly MAX_VIDEO_PARTICIPANTS = Math.min(4, this.MAX_SFT_VIDEO_PARTICIPANTS);
   readonly NEW_PASSWORD_MINIMUM_LENGTH = env.NEW_PASSWORD_MINIMUM_LENGTH || ValidationUtil.DEFAULT_PASSWORD_MIN_LENGTH;
-  readonly URL = env.URL || {
-    ACCOUNT_BASE: 'https://account.wire.com',
-    MOBILE_BASE: '',
-    PRIVACY_POLICY: 'https://wire-website-staging.zinfra.io/security',
-    SUPPORT: {
-      BUG_REPORT: 'https://support.wire.com/new?ticket_form_id=101615',
-      CALLING: 'https://support.wire.com/hc/articles/202969412',
-      CAMERA_ACCESS_DENIED: 'https://support.wire.com/hc/articles/202935412',
-      CONTACT: 'https://support.wire.com/new',
-      DEVICE_ACCESS_DENIED: 'https://support.wire.com/hc/articles/213512545',
-      DEVICE_NOT_FOUND: 'https://support.wire.com/hc/articles/202970662',
-      EMAIL_EXISTS: 'https://support.wire.com/hc/articles/115004082129',
-      HISTORY: 'https://support.wire.com/hc/articles/207834645',
-      INDEX: 'https://support.wire.com/',
-      MICROPHONE_ACCESS_DENIED: 'https://support.wire.com/hc/articles/202590081',
-      SCREEN_ACCESS_DENIED: 'https://support.wire.com/hc/articles/202935412',
-    },
-    TEAMS_BASE: 'https://teams.wire.com',
-    TERMS_OF_USE_PERSONAL: 'https://wire-website-staging.zinfra.io/legal/terms/personal',
-    TERMS_OF_USE_TEAMS: 'https://wire-website-staging.zinfra.io/legal/terms/teams',
-    WEBSITE_BASE: 'https://wire.com',
-  };
+  readonly URL = env.URL;
   readonly VERSION = env.VERSION || '0.0.0';
   readonly WEBSITE_LABEL = env.WEBSITE_LABEL;
 
