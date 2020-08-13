@@ -231,6 +231,7 @@ export class CallingViewModel {
         };
 
         this.mediaStreamHandler.selectScreenToShare(showScreenSelection).then(() => {
+          this.multitasking.isMinimized(true);
           return this.callingRepository.toggleScreenshare(call);
         });
       },
