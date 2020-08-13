@@ -21,7 +21,7 @@ import axios, {AxiosError} from 'axios';
 import type {APIClient} from '@wireapp/api-client';
 import type {WebappProperties} from '@wireapp/api-client/dist/user/data';
 import type {CallConfigData} from '@wireapp/api-client/dist/account/CallConfigData';
-import type {NewOTRMessage, ClientMismatch, UserClients} from '@wireapp/api-client/dist/conversation';
+import type {ClientMismatch, UserClients} from '@wireapp/api-client/dist/conversation';
 import {
   CALL_TYPE,
   CONV_TYPE,
@@ -287,12 +287,7 @@ export class CallingRepository {
       });
       const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId);
       eventInfoEntity.setType(GENERIC_MESSAGE_TYPE.CALLING);
-      const payload: NewOTRMessage = {
-        native_push: true,
-        recipients: {},
-        sender: this.selfClientId,
-      };
-      await this.conversationRepository.clientMismatchHandler.onClientMismatch(eventInfoEntity, localMismatch, payload);
+      await this.conversationRepository.clientMismatchHandler.onClientMismatch(eventInfoEntity, localMismatch);
 
       type Clients = {clientid: string; userid: string}[];
 
