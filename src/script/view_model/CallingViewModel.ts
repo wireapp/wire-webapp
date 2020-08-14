@@ -231,10 +231,9 @@ export class CallingViewModel {
         };
 
         this.mediaStreamHandler.selectScreenToShare(showScreenSelection).then(() => {
-          if (
-            [CALL_TYPE.NORMAL, CALL_TYPE.FORCED_AUDIO].includes(call.initialType) ||
-            (call.initialType === CALL_TYPE.VIDEO && !this.multitasking.isMinimized())
-          ) {
+          const isAudioCall = [CALL_TYPE.NORMAL, CALL_TYPE.FORCED_AUDIO].includes(call.initialType);
+          const isFullScreenVideoCall = call.initialType === CALL_TYPE.VIDEO && !this.multitasking.isMinimized();
+          if (isAudioCall || isFullScreenVideoCall) {
             this.multitasking.isMinimized(true);
           }
           return this.callingRepository.toggleScreenshare(call);
