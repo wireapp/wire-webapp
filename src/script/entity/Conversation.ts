@@ -67,7 +67,7 @@ enum TIMESTAMP_TYPE {
   MUTED = 'mutedTimestamp',
 }
 
-interface SerializedConversation {
+export interface SerializedConversation {
   archived_state: boolean;
   archived_timestamp: number;
   cleared_timestamp: number;
@@ -92,79 +92,80 @@ interface SerializedConversation {
 }
 
 export class Conversation {
-  accessCode: ko.Observable<string>;
-  accessState: ko.Observable<string>;
-  archivedState: ko.Observable<boolean>;
-  archivedTimestamp: ko.Observable<number>;
-  availabilityOfUser: ko.PureComputed<Availability.Type>;
-  blockLegalHoldMessage: boolean;
-  call: ko.Observable<Call>;
-  cleared_timestamp: ko.Observable<number>;
-  connection: ko.Observable<ConnectionEntity>;
-  creator: string;
-  display_name: ko.PureComputed<string>;
-  firstUserEntity: ko.PureComputed<User>;
-  globalMessageTimer: ko.Observable<number>;
-  hasAdditionalMessages: ko.Observable<boolean>;
-  hasCreationMessage: boolean;
-  hasGlobalMessageTimer: ko.PureComputed<boolean>;
-  hasGuest: ko.PureComputed<boolean>;
-  hasLegalHold: ko.Computed<boolean>;
-  hasService: ko.PureComputed<boolean>;
-  hasUnread: ko.PureComputed<boolean>;
-  id: string;
-  incomingMessages: ko.ObservableArray<ContentMessage>;
-  inTeam: ko.PureComputed<boolean>;
-  is_archived: ko.Observable<boolean>;
-  is_cleared: ko.PureComputed<boolean>;
-  is_loaded: ko.Observable<boolean>;
-  is_pending: ko.Observable<boolean>;
-  is_verified: ko.PureComputed<boolean>;
-  is1to1: ko.PureComputed<boolean>;
-  isActiveParticipant: ko.PureComputed<boolean>;
-  isClearable: ko.PureComputed<boolean>;
-  isCreatedBySelf: ko.PureComputed<boolean>;
-  isGroup: ko.PureComputed<boolean>;
-  isGuest: ko.Observable<boolean>;
-  isGuestRoom: ko.PureComputed<boolean>;
-  isLeavable: ko.PureComputed<boolean>;
-  isManaged: boolean;
-  isMutable: ko.PureComputed<boolean>;
-  isRequest: ko.PureComputed<boolean>;
-  isSelf: ko.PureComputed<boolean>;
-  isTeam1to1: ko.PureComputed<boolean>;
-  isTeamOnly: ko.PureComputed<boolean>;
-  last_event_timestamp: ko.Observable<number>;
-  last_read_timestamp: ko.Observable<number>;
-  last_server_timestamp: ko.Observable<number>;
-  legalHoldStatus: ko.Observable<LegalHoldStatus>;
-  localMessageTimer: ko.Observable<number>;
-  logger: Logger;
-  messages_unordered: ko.ObservableArray<ContentMessage | MemberMessage>;
-  messages_visible: ko.PureComputed<(ContentMessage | MemberMessage)[]>;
-  messages: ko.PureComputed<(ContentMessage | MemberMessage)[]>;
-  messageTimer: ko.PureComputed<number>;
-  mutedState: ko.Observable<number>;
-  mutedTimestamp: ko.Observable<number>;
-  name: ko.Observable<string>;
-  notificationState: ko.PureComputed<number>;
-  participating_user_ets: ko.ObservableArray<User>;
-  participating_user_ids: ko.ObservableArray<string>;
-  publishPersistState: (() => void) & Cancelable;
-  receiptMode: ko.Observable<Confirmation.Type>;
-  removed_from_conversation?: ko.PureComputed<boolean>;
-  roles: ko.Observable<Record<string, string>>;
-  selfUser: ko.Observable<User>;
-  shouldPersistStateChanges: boolean;
-  showNotificationsEverything: ko.PureComputed<boolean>;
-  showNotificationsMentionsAndReplies: ko.PureComputed<boolean>;
-  showNotificationsNothing: ko.PureComputed<boolean>;
-  status: ko.Observable<ConversationStatus>;
-  team_id: string;
-  type: ko.Observable<CONVERSATION_TYPE>;
-  unreadState: ko.PureComputed<UnreadState>;
-  verification_state: ko.Observable<ConversationVerificationState>;
-  withAllTeamMembers: ko.Observable<User[]>;
+  private readonly accessState: ko.Observable<string>;
+  public readonly accessCode: ko.Observable<string>;
+  private readonly archivedState: ko.Observable<boolean>;
+  public readonly archivedTimestamp: ko.Observable<number>;
+  public readonly availabilityOfUser: ko.PureComputed<Availability.Type>;
+  public blockLegalHoldMessage: boolean;
+  public readonly call: ko.Observable<Call>;
+  public readonly cleared_timestamp: ko.Observable<number>;
+  public readonly connection: ko.Observable<ConnectionEntity>;
+  public readonly creator: string;
+  public readonly display_name: ko.PureComputed<string>;
+  public readonly firstUserEntity: ko.PureComputed<User>;
+  public readonly globalMessageTimer: ko.Observable<number>;
+  public readonly hasAdditionalMessages: ko.Observable<boolean>;
+  public hasCreationMessage: boolean;
+  public readonly hasGlobalMessageTimer: ko.PureComputed<boolean>;
+  public readonly hasGuest: ko.PureComputed<boolean>;
+  public readonly hasLegalHold: ko.Computed<boolean>;
+  public readonly hasService: ko.PureComputed<boolean>;
+  public readonly hasUnread: ko.PureComputed<boolean>;
+  public readonly id: string;
+  private readonly incomingMessages: ko.ObservableArray<ContentMessage | MemberMessage>;
+  public readonly inTeam: ko.PureComputed<boolean>;
+  public readonly is_archived: ko.Observable<boolean>;
+  public readonly is_cleared: ko.PureComputed<boolean>;
+  public readonly is_loaded: ko.Observable<boolean>;
+  public readonly is_pending: ko.Observable<boolean>;
+  public readonly is_verified: ko.PureComputed<boolean>;
+  public readonly is1to1: ko.PureComputed<boolean>;
+  public readonly isActiveParticipant: ko.PureComputed<boolean>;
+  public readonly isClearable: ko.PureComputed<boolean>;
+  public readonly isCreatedBySelf: ko.PureComputed<boolean>;
+  public readonly isGroup: ko.PureComputed<boolean>;
+  public readonly isGuest: ko.Observable<boolean>;
+  public readonly isGuestRoom: ko.PureComputed<boolean>;
+  public readonly isLeavable: ko.PureComputed<boolean>;
+  private readonly isManaged: boolean;
+  public readonly isMutable: ko.PureComputed<boolean>;
+  public readonly isRequest: ko.PureComputed<boolean>;
+  public readonly isSelf: ko.PureComputed<boolean>;
+  private readonly isTeam1to1: ko.PureComputed<boolean>;
+  public readonly isTeamOnly: ko.PureComputed<boolean>;
+  public readonly last_event_timestamp: ko.Observable<number>;
+  public readonly last_read_timestamp: ko.Observable<number>;
+  private readonly last_server_timestamp: ko.Observable<number>;
+  public readonly legalHoldStatus: ko.Observable<LegalHoldStatus>;
+  private readonly localMessageTimer: ko.Observable<number>;
+  private readonly logger: Logger;
+  private readonly messages_unordered: ko.ObservableArray<Message | ContentMessage | MemberMessage>;
+  private readonly messages_visible: ko.PureComputed<(ContentMessage | MemberMessage)[]>;
+  public readonly messages: ko.PureComputed<(Message | ContentMessage | MemberMessage)[]>;
+  public readonly messageTimer: ko.PureComputed<number>;
+  private readonly mutedState: ko.Observable<number>;
+  private readonly mutedTimestamp: ko.Observable<number>;
+  public readonly name: ko.Observable<string>;
+  public needsLegalHoldApproval: boolean;
+  private readonly notificationState: ko.PureComputed<number>;
+  public readonly participating_user_ets: ko.ObservableArray<User>;
+  public readonly participating_user_ids: ko.ObservableArray<string>;
+  private readonly publishPersistState: (() => void) & Cancelable;
+  public readonly receiptMode: ko.Observable<Confirmation.Type>;
+  public readonly removed_from_conversation?: ko.PureComputed<boolean>;
+  public readonly roles: ko.Observable<Record<string, string>>;
+  public readonly selfUser: ko.Observable<User>;
+  private shouldPersistStateChanges: boolean;
+  public readonly showNotificationsEverything: ko.PureComputed<boolean>;
+  private readonly showNotificationsMentionsAndReplies: ko.PureComputed<boolean>;
+  public readonly showNotificationsNothing: ko.PureComputed<boolean>;
+  public readonly status: ko.Observable<ConversationStatus>;
+  public readonly team_id: string;
+  public readonly type: ko.Observable<CONVERSATION_TYPE>;
+  private readonly unreadState: ko.PureComputed<UnreadState>;
+  public readonly verification_state: ko.Observable<ConversationVerificationState>;
+  public readonly withAllTeamMembers: ko.Observable<boolean>;
 
   static get TIMESTAMP_TYPE(): typeof TIMESTAMP_TYPE {
     return TIMESTAMP_TYPE;
@@ -201,7 +202,7 @@ export class Conversation {
     this.inTeam = ko.pureComputed(() => this.team_id && !this.isGuest());
     this.isGuestRoom = ko.pureComputed(() => this.accessState() === ACCESS_STATE.TEAM.GUEST_ROOM);
     this.isTeamOnly = ko.pureComputed(() => this.accessState() === ACCESS_STATE.TEAM.TEAM_ONLY);
-    this.withAllTeamMembers = ko.observable(undefined);
+    this.withAllTeamMembers = ko.observable(false);
 
     this.isTeam1to1 = ko.pureComputed(() => {
       const isGroupConversation = this.type() === CONVERSATION_TYPE.REGULAR;
@@ -600,10 +601,11 @@ export class Conversation {
    * @param messageEntity Message entity to be added to the conversation.
    * @returns If a message was replaced in the conversation
    */
-  add_message(messageEntity: ContentMessage): boolean | void {
+  add_message(messageEntity: Message | ContentMessage | MemberMessage): boolean | void {
     if (messageEntity) {
       const messageWithLinkPreview = () => this._findDuplicate(messageEntity.id, messageEntity.from);
-      const editedMessage = () => this._findDuplicate(messageEntity.replacing_message_id, messageEntity.from);
+      const editedMessage = () =>
+        this._findDuplicate((messageEntity as ContentMessage).replacing_message_id, messageEntity.from);
       const alreadyAdded = messageWithLinkPreview() || editedMessage();
       if (alreadyAdded) {
         return false;
@@ -797,7 +799,10 @@ export class Conversation {
    * @param message_et Message to be added to conversation
    * @param forceUpdate set the timestamp regardless of previous timestamp value (no checks)
    */
-  private updateTimestamps(message_et?: ContentMessage, forceUpdate: boolean = false): void {
+  updateTimestamps(
+    message_et?: Message | ContentMessage | MemberMessage | SystemMessage,
+    forceUpdate: boolean = false,
+  ): void {
     if (message_et) {
       const timestamp = message_et.timestamp();
       if (timestamp <= this.last_server_timestamp()) {
@@ -813,21 +818,21 @@ export class Conversation {
     }
   }
 
-  get_all_messages(): (ContentMessage | MemberMessage | SystemMessage)[] {
+  get_all_messages(): (Message | ContentMessage | MemberMessage | SystemMessage)[] {
     return this.messages();
   }
 
   /**
    * Get the first message of the conversation.
    */
-  getFirstMessage(): ContentMessage | MemberMessage | SystemMessage | undefined {
+  getFirstMessage(): Message | ContentMessage | MemberMessage | SystemMessage | undefined {
     return this.messages()[0];
   }
 
   /**
    * Get the last message of the conversation.
    */
-  getLastMessage(): ContentMessage | MemberMessage | SystemMessage | undefined {
+  getLastMessage(): Message | ContentMessage | MemberMessage | SystemMessage | undefined {
     return this.messages()[this.messages().length - 1];
   }
 
@@ -846,7 +851,7 @@ export class Conversation {
   /**
    * Get the last text message that was added by self user.
    */
-  get_last_editable_message(): ContentMessage | MemberMessage | SystemMessage | void {
+  get_last_editable_message(): Message | ContentMessage | MemberMessage | SystemMessage | void {
     const messages = this.messages();
     for (let index = messages.length - 1; index >= 0; index--) {
       const message_et = messages[index];
@@ -859,7 +864,8 @@ export class Conversation {
   /**
    * Get the last delivered message.
    */
-  getLastDeliveredMessage(): ContentMessage | MemberMessage | SystemMessage | undefined {
+  getLastDeliveredMessage(): 
+  Message | ContentMessage | MemberMessage | SystemMessage | undefined {
     return this.messages()
       .slice()
       .reverse()
@@ -875,7 +881,7 @@ export class Conversation {
    *
    * @param messageId ID of message to be retrieved
    */
-  getMessage(messageId: string): ContentMessage | MemberMessage | SystemMessage | undefined {
+  getMessage(messageId: string): Message | ContentMessage | MemberMessage | SystemMessage | undefined {
     return this.messages().find(messageEntity => messageEntity.id === messageId);
   }
 

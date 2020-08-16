@@ -34,6 +34,13 @@ import type {CallMessage} from './CallMessage';
 import type {ContentMessage} from './ContentMessage';
 import type {FileAsset} from './FileAsset';
 import type {CompositeMessage} from './CompositeMessage';
+import {MemberMessage} from './MemberMessage';
+import {SystemMessage} from './SystemMessage';
+import {VerificationMessage} from './VerificationMessage';
+import {LegalHoldMessage} from './LegalHoldMessage';
+import {DecryptErrorMessage} from './DecryptErrorMessage';
+import {PingMessage} from './PingMessage';
+import {LinkPreview} from './LinkPreview';
 
 export interface ReadReceipt {
   time: string;
@@ -70,6 +77,7 @@ export class Message {
   public readReceipts: ko.ObservableArray<ReadReceipt>;
   public super_type: SuperType;
   public type: string;
+  reaction: any;
 
   /**
    * Sort messages by timestamp
@@ -248,7 +256,7 @@ export class Message {
     return this.is_content() && this.was_edited();
   }
 
-  isLinkPreview(): boolean {
+  isLinkPreview(): this is LinkPreview {
     return (
       this.has_asset_text() &&
       ((this as unknown) as ContentMessage)
@@ -261,7 +269,7 @@ export class Message {
    * Check if message is a member message.
    * @returns Is message of type member
    */
-  isMember(): boolean {
+  isMember(): this is MemberMessage {
     return this.super_type === SuperType.MEMBER;
   }
 
@@ -269,7 +277,7 @@ export class Message {
    * Check if message is a ping message.
    * @returns Is message of type ping
    */
-  is_ping(): boolean {
+  is_ping(): this is PingMessage {
     return this.super_type === SuperType.PING;
   }
 
@@ -277,7 +285,7 @@ export class Message {
    * Check if message is a system message.
    * @returns Is message of type system
    */
-  is_system(): boolean {
+  is_system(): this is SystemMessage {
     return this.super_type === SuperType.SYSTEM;
   }
 
@@ -285,7 +293,7 @@ export class Message {
    * Check if message is an undecryptable message.
    * @returns Is message unable to decrypt
    */
-  is_unable_to_decrypt(): boolean {
+  is_unable_to_decrypt(): this is DecryptErrorMessage {
     return this.super_type === SuperType.UNABLE_TO_DECRYPT;
   }
 
@@ -293,11 +301,11 @@ export class Message {
    * Check if message is a verification message.
    * @returns Is message of type verification
    */
-  is_verification(): boolean {
+  is_verification(): this is VerificationMessage {
     return this.super_type === SuperType.VERIFICATION;
   }
 
-  isLegalHold(): boolean {
+  isLegalHold(): this is LegalHoldMessage {
     return this.super_type === SuperType.LEGALHOLD;
   }
 

@@ -23,7 +23,7 @@ import {Recipients} from '../cryptography/CryptographyRepository';
 
 export interface MessageSendingOptions {
   /** Send native push notification for message. Default is `true`. */
-  nativePush?: string[] | boolean;
+  nativePush?: boolean;
   /**
    * Level that backend checks for missing clients. Default is `false`.
    *
