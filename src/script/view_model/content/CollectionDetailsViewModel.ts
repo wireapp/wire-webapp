@@ -67,7 +67,7 @@ export class CollectionDetailsViewModel {
   }
 
   itemAdded(messageEntity: ContentMessage) {
-    const isCurrentConversation = this.conversationEntity().id === messageEntity.conversation_id;
+    const isCurrentConversation = this.conversationEntity().id === messageEntity.conversationId;
     if (isCurrentConversation) {
       switch (this.template()) {
         case 'images': {
@@ -111,7 +111,7 @@ export class CollectionDetailsViewModel {
   }
 
   messageRemoved(messageEntity: ContentMessage) {
-    this.itemRemoved(messageEntity.id, messageEntity.conversation_id);
+    this.itemRemoved(messageEntity.id, messageEntity.conversationId);
   }
 
   removedFromView() {

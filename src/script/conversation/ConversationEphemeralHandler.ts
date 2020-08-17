@@ -149,9 +149,9 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
 
     const isExpired = !!(await this._updateTimedMessage(messageEntity));
     if (!isExpired) {
-      const {id, conversation_id: conversationId} = messageEntity;
+      const {id, conversationId: conversationId} = messageEntity;
       const matchingMessageEntity = this.timedMessages().find(timedMessageEntity => {
-        const {conversation_id: timedConversationId, id: timedMessageId} = timedMessageEntity;
+        const {conversationId: timedConversationId, id: timedMessageId} = timedMessageEntity;
         return timedMessageId === id && timedConversationId === conversationId;
       });
 
@@ -303,8 +303,8 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
     if (expiredMessages.length !== 0) {
       this.timedMessages.remove(messageEntity => {
         for (const expiredMessage of expiredMessages) {
-          const {conversation_id: conversationId, id: messageId} = expiredMessage;
-          const isExpiredMessage = messageEntity.id === messageId && messageEntity.conversation_id === conversationId;
+          const {conversationId: conversationId, id: messageId} = expiredMessage;
+          const isExpiredMessage = messageEntity.id === messageId && messageEntity.conversationId === conversationId;
           if (isExpiredMessage) {
             return true;
           }

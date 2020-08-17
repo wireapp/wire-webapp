@@ -63,7 +63,7 @@ export class ImageDetailViewViewModel {
     this.messageEntity = ko.observable();
     this.messageEntity.subscribe(messageEntity => {
       if (messageEntity) {
-        const conversationId = messageEntity.conversation_id;
+        const conversationId = messageEntity.conversationId;
         const isExpectedId = this.conversationEntity() ? conversationId === this.conversationEntity().id : false;
         if (!isExpectedId) {
           this.conversationRepository
@@ -138,14 +138,14 @@ export class ImageDetailViewViewModel {
   };
 
   messageAdded = (messageEntity: ContentMessage) => {
-    const isCurrentConversation = this.conversationEntity().id === messageEntity.conversation_id;
+    const isCurrentConversation = this.conversationEntity().id === messageEntity.conversationId;
     if (isCurrentConversation) {
       this.items.push(messageEntity);
     }
   };
 
   messageExpired = (messageEntity: ContentMessage) => {
-    this.messageRemoved(messageEntity.id, messageEntity.conversation_id);
+    this.messageRemoved(messageEntity.id, messageEntity.conversationId);
   };
 
   messageRemoved = (messageId: string, conversationId: string) => {

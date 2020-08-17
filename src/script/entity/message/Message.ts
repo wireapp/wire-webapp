@@ -45,7 +45,7 @@ export class Message {
   public readonly visible: ko.Observable<boolean>;
   protected readonly affectOrder: ko.Observable<boolean>;
   public category?: MessageCategory;
-  public conversation_id: string;
+  public conversationId: string;
   public readonly status: ko.Observable<StatusType>;
   public readonly accent_color: ko.PureComputed<string>;
   public readonly ephemeral_expires: ko.Observable<boolean | number | string>;
@@ -108,7 +108,7 @@ export class Message {
 
     this.readReceipts = ko.observableArray([]);
 
-    this.conversation_id = '';
+    this.conversationId = '';
     this.expectsReadConfirmation = false;
     this.from = '';
     this.fromClientId = '';

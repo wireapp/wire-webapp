@@ -789,7 +789,7 @@ export class InputBarViewModel {
     return !replyMessageEntity
       ? Promise.resolve()
       : this.eventRepository
-          .loadEvent(replyMessageEntity.conversation_id, replyMessageEntity.id)
+          .loadEvent(replyMessageEntity.conversationId, replyMessageEntity.id)
           .then(MessageHasher.hashEvent)
           .then((messageHash: ArrayBuffer) => {
             return new QuoteEntity({

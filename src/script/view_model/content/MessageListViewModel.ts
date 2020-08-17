@@ -499,7 +499,7 @@ export class MessageListViewModel {
     };
 
     const startTimer = async () => {
-      if (messageEntity.conversation_id === conversationEntity.id) {
+      if (messageEntity.conversationId === conversationEntity.id) {
         await this.conversationRepository.checkMessageTimer(messageEntity);
       }
     };

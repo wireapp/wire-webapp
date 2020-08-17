@@ -81,7 +81,7 @@ export class CollectionViewModel {
   }
 
   itemAdded(messageEntity: ContentMessage) {
-    const isCurrentConversation = this.conversationEntity().id === messageEntity.conversation_id;
+    const isCurrentConversation = this.conversationEntity().id === messageEntity.conversationId;
     if (isCurrentConversation) {
       this._populateItems([messageEntity]);
     }
@@ -96,7 +96,7 @@ export class CollectionViewModel {
   }
 
   messageRemoved(messageEntity: ContentMessage) {
-    this.itemRemoved(messageEntity.id, messageEntity.conversation_id);
+    this.itemRemoved(messageEntity.id, messageEntity.conversationId);
   }
 
   removedFromView() {
