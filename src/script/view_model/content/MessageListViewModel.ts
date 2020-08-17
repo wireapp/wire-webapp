@@ -383,11 +383,11 @@ export class MessageListViewModel {
   onSessionResetClick = async (messageEntity: DecryptErrorMessage): Promise<void> => {
     const resetProgress = () =>
       window.setTimeout(() => {
-        messageEntity.is_resetting_session(false);
+        messageEntity.isResettingSession(false);
         amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.SESSION_RESET);
       }, MotionDuration.LONG);
 
-    messageEntity.is_resetting_session(true);
+    messageEntity.isResettingSession(true);
     try {
       await this.conversationRepository.reset_session(
         messageEntity.from,

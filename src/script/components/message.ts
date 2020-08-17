@@ -498,9 +498,9 @@ const unableToDecryptTemplate: string = `
     <div class="message-header-decrypt-error-label" data-bind="html: message.htmlErrorMessage()"></div>
     <!-- ko if: message.is_recoverable -->
       <div class="message-header-decrypt-reset-session">
-        <loading-icon class="accent-fill" data-bind="style : {visibility : message.is_resetting_session() ? 'visible' : 'hidden'}" data-uie-name="status-loading"></loading-icon>
+        <loading-icon class="accent-fill" data-bind="style : {visibility : message.isResettingSession() ? 'visible' : 'hidden'}" data-uie-name="status-loading"></loading-icon>
         <span class="message-header-decrypt-reset-session-action button-label accent-text"
-              data-bind="click: () => onClickResetSession(message), text: t('conversationUnableToDecryptResetSession'), style : {visibility : !message.is_resetting_session() ? 'visible' : 'hidden'}"></span>
+              data-bind="click: () => onClickResetSession(message), text: t('conversationUnableToDecryptResetSession'), style : {visibility : !message.isResettingSession() ? 'visible' : 'hidden'}"></span>
       </div>
     <!-- /ko -->
   </div>
@@ -550,10 +550,10 @@ const deleteTemplate: string = `
     </div>
     <div class="message-header-label">
       <span class="message-header-label-sender" data-bind='text: message.unsafeSenderName()'></span>
-      <span class="message-header-label-icon icon-trash" data-bind="attr: {title: message.display_deleted_timestamp()}"></span>
+      <span class="message-header-label-icon icon-trash" data-bind="attr: {title: message.displayDeletedTimestamp()}"></span>
     </div>
     <div class="message-body-actions message-body-actions-large">
-      <time class="time with-tooltip with-tooltip--top with-tooltip--time" data-bind="text: message.display_deleted_timestamp(), attr: {'data-timestamp': message.deleted_timestamp, 'data-uie-uid': message.id, 'data-tooltip': message.displayTimestampLong()}, showAllTimestamps" data-uie-name="item-message-delete-timestamp"></time>
+      <time class="time with-tooltip with-tooltip--top with-tooltip--time" data-bind="text: message.displayDeletedTimestamp(), attr: {'data-timestamp': message.deleted_timestamp, 'data-uie-uid': message.id, 'data-tooltip': message.displayTimestampLong()}, showAllTimestamps" data-uie-name="item-message-delete-timestamp"></time>
     </div>
   </div>
   `;
@@ -610,10 +610,10 @@ const verificationTemplate: string = `
 const callTemplate: string = `
   <div class="message-header">
     <div class="message-header-icon message-header-icon--svg">
-      <!-- ko if: message.was_completed() -->
+      <!-- ko if: message.wasCompleted() -->
         <div class="svg-green"><pickup-icon></pickup-icon></div>
       <!-- /ko -->
-      <!-- ko if: !message.was_completed() -->
+      <!-- ko if: !message.wasCompleted() -->
         <div class="svg-red"><hangup-icon></hangup-icon></div>
       <!-- /ko -->
     </div>

@@ -35,7 +35,7 @@ export class DecryptErrorMessage extends Message {
   public readonly htmlCaption: ko.PureComputed<string>;
   public readonly htmlErrorMessage: ko.PureComputed<string>;
   public readonly is_recoverable: ko.PureComputed<boolean>;
-  public readonly is_resetting_session: ko.Observable<boolean>;
+  public readonly isResettingSession: ko.Observable<boolean>;
   public readonly link: ko.PureComputed<string>;
 
   static get REMOTE_IDENTITY_CHANGED_ERROR() {
@@ -72,7 +72,7 @@ export class DecryptErrorMessage extends Message {
     this.is_remote_identity_changed = ko.pureComputed(() => {
       return this.error_code.toString() === DecryptErrorMessage.REMOTE_IDENTITY_CHANGED_ERROR;
     });
-    this.is_resetting_session = ko.observable(false);
+    this.isResettingSession = ko.observable(false);
 
     this.error_message = ko.pureComputed(() => {
       const parts = [];

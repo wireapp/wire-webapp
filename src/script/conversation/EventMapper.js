@@ -666,7 +666,7 @@ export class EventMapper {
 
     if (typeof eventData.duration !== 'undefined') {
       // new message format, including duration
-      messageEntity.visible(!messageEntity.was_completed());
+      messageEntity.visible(!messageEntity.wasCompleted());
     } else {
       // legacy format that we still need to map (no migration)
       messageEntity.visible(messageEntity.finished_reason === TERMINATION_REASON.MISSED);

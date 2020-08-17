@@ -376,7 +376,7 @@ export class Conversation {
             break;
           }
 
-          const isMissedCall = messageEntity.isCall() && !messageEntity.was_completed();
+          const isMissedCall = messageEntity.isCall() && !messageEntity.wasCompleted();
           const isPing = messageEntity.isPing();
           const isMessage = messageEntity.isContent();
           const isSelfMentioned =
