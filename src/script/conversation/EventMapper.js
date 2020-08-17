@@ -340,9 +340,9 @@ export class EventMapper {
       messageEntity.reactions(event.reactions || {});
     }
 
-    if (event.ephemeralExpires) {
-      messageEntity.ephemeralExpires(event.ephemeralExpires);
-      messageEntity.ephemeralStarted(Number(event.ephemeralStarted) || 0);
+    if (event.ephemeral_expires) {
+      messageEntity.ephemeral_expires(event.ephemeral_expires);
+      messageEntity.ephemeral_started(Number(event.ephemeral_started) || 0);
     }
 
     if (isNaN(messageEntity.timestamp())) {

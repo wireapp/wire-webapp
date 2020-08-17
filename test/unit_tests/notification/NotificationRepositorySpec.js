@@ -512,7 +512,7 @@ describe('NotificationRepository', () => {
 
     describe('for ephemeral messages', () => {
       beforeEach(() => {
-        message_et.ephemeralExpires(5000);
+        message_et.ephemeral_expires(5000);
       });
 
       it('that contains text', () => {
@@ -724,7 +724,7 @@ describe('NotificationRepository', () => {
     });
 
     it('as an ephemeral message', () => {
-      message_et.ephemeralExpires(5000);
+      message_et.ephemeral_expires(5000);
       return verify_notification_ephemeral(conversation_et, message_et);
     });
   });

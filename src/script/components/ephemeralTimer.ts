@@ -28,8 +28,8 @@ class EphemeralTimer {
   duration: number;
 
   constructor({message: messageEntity}: EphemeralTimerParams) {
-    this.started = messageEntity.ephemeralStarted();
-    this.duration = ((messageEntity.ephemeralExpires() as number) - this.started) / 1000;
+    this.started = messageEntity.ephemeral_started();
+    this.duration = ((messageEntity.ephemeral_expires() as number) - this.started) / 1000;
   }
 
   setAnimationDelay(_: unknown, event: Event) {

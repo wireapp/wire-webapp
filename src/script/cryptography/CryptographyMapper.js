@@ -370,7 +370,7 @@ export class CryptographyMapper {
     genericMessage.ephemeral.messageId = genericMessage.messageId;
 
     const embeddedMessage = await this._mapGenericMessage(genericMessage.ephemeral, event);
-    embeddedMessage.ephemeralExpires = ConversationEphemeralHandler.validateTimer(messageTimer);
+    embeddedMessage.ephemeral_expires = ConversationEphemeralHandler.validateTimer(messageTimer);
 
     return embeddedMessage;
   }

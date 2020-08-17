@@ -3037,7 +3037,7 @@ export class ConversationRepository {
 
     return Promise.resolve()
       .then(() => {
-        if (!messageEntity.user().isMe && !messageEntity.ephemeralExpires()) {
+        if (!messageEntity.user().isMe && !messageEntity.ephemeral_expires()) {
           throw new ConversationError(ConversationError.TYPE.WRONG_USER, ConversationError.MESSAGE.WRONG_USER);
         }
 
@@ -3800,7 +3800,7 @@ export class ConversationRepository {
 
     return this.getMessageInConversationById(conversationEntity, eventData.message_id)
       .then(deletedMessageEntity => {
-        if (deletedMessageEntity.ephemeralExpires()) {
+        if (deletedMessageEntity.ephemeral_expires()) {
           return;
         }
 

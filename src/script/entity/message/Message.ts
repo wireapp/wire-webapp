@@ -43,14 +43,14 @@ export interface ReadReceipt {
 export class Message {
   private messageTimerStarted: boolean;
   public readonly visible: ko.Observable<boolean>;
-  protected readonly affect_order: ko.Observable<boolean>;
+  protected readonly affectOrder: ko.Observable<boolean>;
   public category?: MessageCategory;
   public conversation_id: string;
   public readonly status: ko.Observable<StatusType>;
   public readonly accent_color: ko.PureComputed<string>;
-  public readonly ephemeralExpires: ko.Observable<boolean | number | string>;
+  public readonly ephemeral_expires: ko.Observable<boolean | number | string>;
   public readonly ephemeralRemaining: ko.Observable<number>;
-  public readonly ephemeralStarted: ko.Observable<number>;
+  public readonly ephemeral_started: ko.Observable<number>;
   public readonly ephemeralCaption: ko.PureComputed<string>;
   public readonly ephemeralDuration: ko.Observable<number>;
   public readonly ephemeralStatus: ko.Computed<EphemeralStatusType>;
@@ -63,7 +63,7 @@ export class Message {
   public readonly legalHoldStatus?: LegalHoldStatus;
   public primary_key?: string;
   public readonly timestamp: ko.Observable<number>;
-  public readonly timestamp_affects_order: ko.PureComputed<boolean>;
+  public readonly timestampAffectsOrder: ko.PureComputed<boolean>;
   public readonly unsafeSenderName: ko.PureComputed<string>;
   public readonly user: ko.Observable<User>;
   public version: number;
@@ -80,20 +80,20 @@ export class Message {
     });
     this.ephemeralDuration = ko.observable(0);
     this.ephemeralRemaining = ko.observable(0);
-    this.ephemeralExpires = ko.observable(false);
-    this.ephemeralStarted = ko.observable(0);
+    this.ephemeral_expires = ko.observable(false);
+    this.ephemeral_started = ko.observable(0);
     this.ephemeralStatus = ko.computed(() => {
-      const isExpired = this.ephemeralExpires() === true;
+      const isExpired = this.ephemeral_expires() === true;
       if (isExpired) {
         return EphemeralStatusType.TIMED_OUT;
       }
 
-      if (typeof this.ephemeralExpires() === 'number') {
+      if (typeof this.ephemeral_expires() === 'number') {
         return EphemeralStatusType.INACTIVE;
       }
 
-      if (typeof this.ephemeralExpires() === 'string') {
-        const isExpiring = Date.now() >= this.ephemeralExpires();
+      if (typeof this.ephemeral_expires() === 'string') {
+        const isExpiring = Date.now() >= this.ephemeral_expires();
         return isExpiring ? EphemeralStatusType.TIMED_OUT : EphemeralStatusType.ACTIVE;
       }
 
@@ -120,9 +120,9 @@ export class Message {
     this.version = 1;
     this.visible = ko.observable(true);
 
-    this.affect_order = ko.observable(true);
+    this.affectOrder = ko.observable(true);
     this.timestamp = ko.observable(Date.now());
-    this.timestamp_affects_order = ko.pureComputed(() => this.visible() && this.affect_order());
+    this.timestampAffectsOrder = ko.pureComputed(() => this.visible() && this.affectOrder());
 
     // MessageCategory
     this.category = undefined;
@@ -303,14 +303,14 @@ export class Message {
    * @returns `true`, if message is ephemeral, `false` otherwise.
    */
   isEphemeral(): boolean {
-    return this.ephemeralExpires() !== false;
+    return this.ephemeral_expires() !== false;
   }
 
   /**
    * Check if ephemeral message is expired.
    * @returns `true`, if message expired, `false` otherwise.
    */
-  isExpired = (): boolean => this.ephemeralExpires() === true;
+  isExpired = (): boolean => this.ephemeral_expires() === true;
 
   /**
    * Check if message has an unavailable (uploading or failed) asset.
@@ -366,12 +366,12 @@ export class Message {
 
     if (this.ephemeralStatus() === EphemeralStatusType.INACTIVE) {
       const startingTimestamp = this.user().isMe ? Math.min(this.timestamp() + timeOffset, Date.now()) : Date.now();
-      const expirationTimestamp = `${startingTimestamp + Number(this.ephemeralExpires())}`;
-      this.ephemeralExpires(expirationTimestamp);
-      this.ephemeralStarted(startingTimestamp);
+      const expirationTimestamp = `${startingTimestamp + Number(this.ephemeral_expires())}`;
+      this.ephemeral_expires(expirationTimestamp);
+      this.ephemeral_started(startingTimestamp);
     }
 
-    const remainingTime = Number(this.ephemeralExpires()) - this.ephemeralStarted();
+    const remainingTime = Number(this.ephemeral_expires()) - this.ephemeral_started();
     this.ephemeralRemaining(remainingTime);
     this.messageTimerStarted = true;
   };

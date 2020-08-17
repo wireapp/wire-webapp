@@ -801,7 +801,7 @@ export class Conversation {
     if (message_et) {
       const timestamp = message_et.timestamp();
       if (timestamp <= this.last_server_timestamp()) {
-        if (message_et.timestamp_affects_order()) {
+        if (message_et.timestampAffectsOrder()) {
           this.setTimestamp(timestamp, TIMESTAMP_TYPE.LAST_EVENT, forceUpdate);
 
           const from_self = message_et.user()?.isMe;

@@ -131,8 +131,8 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
         messageEntity.startMessageTimer(timeOffset);
 
         const changes = {
-          ephemeralExpires: messageEntity.ephemeralExpires(),
-          ephemeralStarted: Number(messageEntity.ephemeralStarted()),
+          ephemeral_expires: messageEntity.ephemeral_expires(),
+          ephemeral_started: Number(messageEntity.ephemeral_started()),
         };
 
         this.eventService.updateEvent(messageEntity.primary_key, changes);
@@ -173,7 +173,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
   }
 
   _obfuscateAssetMessage(messageEntity: ContentMessage) {
-    messageEntity.ephemeralExpires(true);
+    messageEntity.ephemeral_expires(true);
 
     const assetEntity = messageEntity.get_first_asset();
     const changes = {
@@ -181,7 +181,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
         content_type: assetEntity.file_type,
         meta: {},
       },
-      ephemeralExpires: true,
+      ephemeral_expires: true,
     };
 
     this.eventService.updateEvent(messageEntity.primary_key, changes);
@@ -189,7 +189,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
   }
 
   _obfuscateImageMessage(messageEntity: ContentMessage): void {
-    messageEntity.ephemeralExpires(true);
+    messageEntity.ephemeral_expires(true);
 
     const assetEntity = messageEntity.get_first_asset();
     const changes = {
@@ -200,7 +200,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
           width: (assetEntity as any).width,
         },
       },
-      ephemeralExpires: true,
+      ephemeral_expires: true,
     };
 
     this.eventService.updateEvent(messageEntity.primary_key, changes);
@@ -220,7 +220,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
   }
 
   async _obfuscateTextMessage(messageEntity: ContentMessage): Promise<void> {
-    messageEntity.ephemeralExpires(true);
+    messageEntity.ephemeral_expires(true);
 
     const assetEntity = messageEntity.get_first_asset() as Text;
     const obfuscatedAsset = new Text(messageEntity.id);
@@ -248,7 +248,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
         content: obfuscatedAsset.text,
         previews: obfuscatedPreviews,
       },
-      ephemeralExpires: true,
+      ephemeral_expires: true,
     };
 
     this.eventService.updateEvent(messageEntity.primary_key, changes);
@@ -282,8 +282,8 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
   }
 
   async _updateTimedMessage(messageEntity: ContentMessage): Promise<ContentMessage | void> {
-    if (typeof messageEntity.ephemeralExpires() === 'string') {
-      const remainingTime = Math.max(0, (messageEntity.ephemeralExpires() as number) - Date.now());
+    if (typeof messageEntity.ephemeral_expires() === 'string') {
+      const remainingTime = Math.max(0, (messageEntity.ephemeral_expires() as number) - Date.now());
       messageEntity.ephemeralRemaining(remainingTime);
 
       const isExpired = remainingTime === 0;

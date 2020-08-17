@@ -207,10 +207,10 @@ describe('Conversation', () => {
         expect(conversation_et.last_event_timestamp()).toBe(second_timestamp);
       });
 
-      it('and adding a message should not update it if affect_order is false', () => {
+      it('and adding a message should not update it if affectOrder is false', () => {
         const message_et = new Message(createRandomUuid());
         message_et.timestamp(second_timestamp);
-        message_et.affect_order(false);
+        message_et.affectOrder(false);
 
         conversation_et.last_event_timestamp(first_timestamp);
         conversation_et.last_server_timestamp(second_timestamp);
@@ -436,7 +436,7 @@ describe('Conversation', () => {
       ephemeral_message_et.add_asset(new Text());
       ephemeral_message_et.id = createRandomUuid();
       ephemeral_message_et.user(self_user_et);
-      ephemeral_message_et.ephemeralExpires(true);
+      ephemeral_message_et.ephemeral_expires(true);
       conversation_et.add_message(ephemeral_message_et);
 
       expect(conversation_et.get_last_editable_message()).toBeDefined();

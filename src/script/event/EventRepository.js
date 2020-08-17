@@ -865,8 +865,8 @@ export class EventRepository {
     return {
       ...newEvent,
       category: categoryFromEvent(newEvent),
-      ephemeralExpires: originalEvent.ephemeralExpires,
-      ephemeralStarted: originalEvent.ephemeralStarted,
+      ephemeral_expires: originalEvent.ephemeral_expires,
+      ephemeral_started: originalEvent.ephemeral_started,
       ephemeral_time: originalEvent.ephemeral_time,
       server_time: newEvent.time,
       time: originalEvent.time,

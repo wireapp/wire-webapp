@@ -1023,7 +1023,7 @@ describe('ConversationRepository', () => {
         spyOn(testFactory.event_service, 'deleteEvent');
         const other_user_id = createRandomUuid();
         message_et.from = other_user_id;
-        message_et.ephemeralExpires(true);
+        message_et.ephemeral_expires(true);
 
         const message_delete_event = {
           conversation: conversation_et.id,

@@ -47,7 +47,7 @@ export class VerificationMessage extends Message {
     super();
 
     this.superType = SuperType.VERIFICATION;
-    this.affect_order(false);
+    this.affectOrder(false);
     this.verificationMessageType = ko.observable();
 
     this.userEntities = ko.observableArray();

@@ -24,6 +24,6 @@ export class MissedMessage extends Message {
   constructor() {
     super();
     this.superType = SuperType.MISSED;
-    this.affect_order(false);
+    this.affectOrder(false);
   }
 }
