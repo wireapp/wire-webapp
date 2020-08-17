@@ -238,7 +238,7 @@ const _getStateGroupActivity = {
     }
 
     const isConversationRename =
-      lastMessageEntity.isSystem() && (lastMessageEntity as SystemMessage).is_conversation_rename();
+      lastMessageEntity.isSystem() && (lastMessageEntity as SystemMessage).isConversationRename();
     if (isConversationRename) {
       return t('conversationsSecondaryLineRenamed', lastMessageEntity.user().name());
     }
