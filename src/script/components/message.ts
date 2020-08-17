@@ -528,7 +528,7 @@ const systemTemplate: string = `
 const pingTemplate: string = `
   <div class="message-header">
     <div class="message-header-icon">
-      <div class="icon-ping" data-bind="css: message.get_icon_classes"></div>
+      <div class="icon-ping" data-bind="css: message.getIconClasses"></div>
     </div>
     <div class="message-header-label" data-bind="attr: {title: message.ephemeralCaption()}, css: {'ephemeral-message-obfuscated': message.isObfuscated()}">
       <span class="message-header-label__multiline">
