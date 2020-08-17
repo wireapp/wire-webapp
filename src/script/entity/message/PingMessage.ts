@@ -26,7 +26,7 @@ import {Message} from './Message';
 
 export class PingMessage extends Message {
   public readonly caption: ko.PureComputed<string>;
-  public readonly get_icon_classes: ko.PureComputed<string>;
+  public readonly getIconClasses: ko.PureComputed<string>;
 
   constructor() {
     super();
@@ -34,7 +34,7 @@ export class PingMessage extends Message {
 
     this.caption = ko.pureComputed(() => (this.user().isMe ? t('conversationPingYou') : t('conversationPing')));
 
-    this.get_icon_classes = ko.pureComputed(() => {
+    this.getIconClasses = ko.pureComputed(() => {
       const show_ping_animation = Date.now() - this.timestamp() < 2000;
       let css_classes = this.accent_color();
       if (show_ping_animation) {

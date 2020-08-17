@@ -21,7 +21,7 @@ import ko from 'knockout';
 import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {getUserName} from 'Util/SanitizationUtil';
-import {TIME_IN_MILLIS, formatDurationCaption, formatTimeShort, fromUnixTime} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS, formatDurationCaption, formatTimeShort, formatDateNumeral, fromUnixTime} from 'Util/TimeUtil';
 
 import {AssetTransferState} from '../../assets/AssetTransferState';
 import {AssetType} from '../../assets/AssetType';
@@ -51,7 +51,7 @@ export class Message {
   public readonly ephemeral_expires: ko.Observable<boolean | number | string>;
   public readonly ephemeral_remaining: ko.Observable<number>;
   public readonly ephemeral_started: ko.Observable<number>;
-  public readonly ephemeral_caption: ko.PureComputed<string>;
+  public readonly ephemeralCaption: ko.PureComputed<string>;
   public readonly ephemeral_duration: ko.Observable<number>;
   public readonly ephemeral_status: ko.Computed<EphemeralStatusType>;
   public readonly expectsReadConfirmation: boolean;
@@ -83,7 +83,7 @@ export class Message {
   constructor(id: string = '0', super_type?: SuperType) {
     this.id = id;
     this.super_type = super_type;
-    this.ephemeral_caption = ko.pureComputed(() => {
+    this.ephemeralCaption = ko.pureComputed(() => {
       const remainingTime = this.ephemeral_remaining();
       return remainingTime ? formatDurationCaption(remainingTime) : '';
     });
@@ -144,9 +144,14 @@ export class Message {
     this.accent_color = ko.pureComputed(() => `accent-color-${this.user().accent_id()}`);
   }
 
-  display_timestamp_short = (): string => {
+  displayTimestampShort = (): string => {
     const date = fromUnixTime(this.timestamp() / TIME_IN_MILLIS.SECOND);
     return formatTimeShort(date);
+  };
+
+  displayTimestampLong = (): string => {
+    const date = fromUnixTime(this.timestamp() / TIME_IN_MILLIS.SECOND);
+    return formatDateNumeral(date);
   };
 
   equals = (messageEntity?: Message) => (messageEntity && this.id ? this.id === messageEntity.id : false);

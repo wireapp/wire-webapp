@@ -52,7 +52,7 @@ export class CallMessage extends Message {
     return this.call_message_type === CALL_MESSAGE_TYPE.DEACTIVATED;
   }
 
-  was_completed(): boolean {
+  wasCompleted(): boolean {
     return this.duration > 0;
   }
 }
