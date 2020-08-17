@@ -24,7 +24,7 @@
             <span data-bind="text: t('conversationContextMenuReply')"></span>
           </span>
         <!-- /ko -->
-        <!-- ko if: messageEntity().is_downloadable() -->
+        <!-- ko if: messageEntity().isDownloadable() -->
           <span class="detail-view-action-button" data-bind="click: clickOnDownload" data-uie-name="do-download-fullscreen-picture">
             <span class="icon-download"></span>
             <span data-bind="text: t('conversationContextMenuDownload')"></span>

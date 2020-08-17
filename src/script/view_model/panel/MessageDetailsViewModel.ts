@@ -141,7 +141,7 @@ export class MessageDetailsViewModel extends BasePanelViewModel {
         return false;
       }
       const isPing = this.message()?.superType === SuperType.PING;
-      const isEphemeral = this.message()?.is_ephemeral();
+      const isEphemeral = this.message()?.isEphemeral();
       return !isPing && !isEphemeral;
     });
 

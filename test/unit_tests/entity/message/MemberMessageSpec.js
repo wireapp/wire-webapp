@@ -84,7 +84,7 @@ describe('Member Message', () => {
     });
   });
 
-  describe('is_deletable', () => {
+  describe('isDeletable', () => {
     let message_et = null;
 
     beforeEach(() => {
@@ -94,14 +94,14 @@ describe('Member Message', () => {
     it('should be deletable when message is not sending', () => {
       message_et.assets.push(new Text());
 
-      expect(message_et.is_deletable()).toBe(true);
+      expect(message_et.isDeletable()).toBe(true);
     });
 
     it('should not be deletable while message is sending', () => {
       message_et.assets.push(new Text());
       message_et.status(StatusType.SENDING);
 
-      expect(message_et.is_deletable()).toBe(false);
+      expect(message_et.isDeletable()).toBe(false);
     });
 
     it('should not be deletable when message is a file and uploading or downloading', () => {
@@ -109,11 +109,11 @@ describe('Member Message', () => {
       file_et.status(AssetTransferState.UPLOADING);
       message_et.assets.push(file_et);
 
-      expect(message_et.is_deletable()).toBe(false);
+      expect(message_et.isDeletable()).toBe(false);
     });
   });
 
-  describe('has_asset_file', () => {
+  describe('hasAssetFile', () => {
     let message_et = null;
 
     beforeEach(() => {
@@ -121,19 +121,19 @@ describe('Member Message', () => {
     });
 
     it('should return false by default', () => {
-      expect(message_et.has_asset_file()).toBeFalsy();
+      expect(message_et.hasAssetFile()).toBeFalsy();
     });
 
     it('should return false for Text asset', () => {
       message_et.assets.push(new Text());
 
-      expect(message_et.has_asset_file()).toBeFalsy();
+      expect(message_et.hasAssetFile()).toBeFalsy();
     });
 
     it('should return true for FileAsset asset', () => {
       message_et.assets.push(new FileAsset());
 
-      expect(message_et.has_asset_file()).toBeTruthy();
+      expect(message_et.hasAssetFile()).toBeTruthy();
     });
   });
 });

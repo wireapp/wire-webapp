@@ -178,7 +178,7 @@ class Message {
     this.EphemeralStatusType = EphemeralStatusType;
     this.StatusType = StatusType;
 
-    if (message.has_asset_text()) {
+    if (message.hasAssetText()) {
       // add a listener to any changes to the assets. This will warn the parent that the message has changed
       this.assetSubscription = message.assets.subscribe(onContentUpdated);
       // also listen for link previews on a single Text entity
@@ -216,14 +216,14 @@ class Message {
       const entries: ContextMenuEntry[] = [];
 
       const canDelete =
-        messageEntity.user().isMe && !this.conversation().removed_from_conversation() && messageEntity.is_deletable();
+        messageEntity.user().isMe && !this.conversation().removed_from_conversation() && messageEntity.isDeletable();
 
       const hasDetails =
         !this.conversation().is1to1() &&
-        !messageEntity.is_ephemeral() &&
+        !messageEntity.isEphemeral() &&
         !this.conversation().removed_from_conversation();
 
-      if (messageEntity.is_downloadable()) {
+      if (messageEntity.isDownloadable()) {
         entries.push({
           click: () => messageEntity.download(container.resolve(AssetRepository)),
           label: t('conversationContextMenuDownload'),
@@ -239,7 +239,7 @@ class Message {
         });
       }
 
-      if (messageEntity.is_editable() && !this.conversation().removed_from_conversation()) {
+      if (messageEntity.isEditable() && !this.conversation().removed_from_conversation()) {
         entries.push({
           click: () => amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.EDIT, messageEntity),
           label: t('conversationContextMenuEdit'),
@@ -267,7 +267,7 @@ class Message {
         });
       }
 
-      if (messageEntity.is_deletable()) {
+      if (messageEntity.isDeletable()) {
         entries.push({
           click: () => this.actionsViewModel.deleteMessage(this.conversation(), messageEntity),
           label: t('conversationContextMenuDelete'),

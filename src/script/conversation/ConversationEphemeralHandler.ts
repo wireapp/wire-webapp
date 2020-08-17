@@ -208,11 +208,11 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
   }
 
   async _obfuscateMessage(messageEntity: ContentMessage): Promise<void> {
-    if (messageEntity.has_asset_text()) {
+    if (messageEntity.hasAssetText()) {
       await this._obfuscateTextMessage(messageEntity);
-    } else if (messageEntity.has_asset()) {
+    } else if (messageEntity.hasAsset()) {
       this._obfuscateAssetMessage(messageEntity);
-    } else if (messageEntity.has_asset_image()) {
+    } else if (messageEntity.hasAssetImage()) {
       this._obfuscateImageMessage(messageEntity);
     } else {
       this.logger.warn(`Ephemeral message of unsupported type: ${messageEntity.type}`, messageEntity);
@@ -256,7 +256,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
   }
 
   async _timeoutEphemeralMessage(messageEntity: ContentMessage): Promise<void> {
-    if (!messageEntity.is_expired()) {
+    if (!messageEntity.isExpired()) {
       if (messageEntity.user().isMe) {
         await this._obfuscateMessage(messageEntity);
       }

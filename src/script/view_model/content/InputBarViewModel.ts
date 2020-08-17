@@ -514,7 +514,7 @@ export class InputBarViewModel {
   };
 
   editMessage = (messageEntity: ContentMessage): void => {
-    if (messageEntity?.is_editable() && messageEntity !== this.editMessageEntity()) {
+    if (messageEntity?.isEditable() && messageEntity !== this.editMessageEntity()) {
       this.cancelMessageReply();
       this.cancelMessageEditing();
       this.editMessageEntity(messageEntity);

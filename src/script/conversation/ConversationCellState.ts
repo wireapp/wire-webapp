@@ -67,7 +67,7 @@ const _accumulateSummary = (conversationEntity: Conversation, prioritizeMentionA
       const [replyMessageEntity] = unreadSelfReplies;
       const messageEntity = mentionMessageEntity || replyMessageEntity;
 
-      if (messageEntity.is_ephemeral()) {
+      if (messageEntity.isEphemeral()) {
         let summary;
 
         if (hasSingleMention) {
@@ -238,7 +238,7 @@ const _getStateGroupActivity = {
     }
 
     const isConversationRename =
-      lastMessageEntity.is_system() && (lastMessageEntity as SystemMessage).is_conversation_rename();
+      lastMessageEntity.isSystem() && (lastMessageEntity as SystemMessage).is_conversation_rename();
     if (isConversationRename) {
       return t('conversationsSecondaryLineRenamed', lastMessageEntity.user().name());
     }
@@ -255,7 +255,7 @@ const _getStateGroupActivity = {
   },
   match: (conversationEntity: Conversation) => {
     const lastMessageEntity = conversationEntity.getLastMessage();
-    const isExpectedType = lastMessageEntity ? lastMessageEntity.isMember() || lastMessageEntity.is_system() : false;
+    const isExpectedType = lastMessageEntity ? lastMessageEntity.isMember() || lastMessageEntity.isSystem() : false;
     const unreadEvents = conversationEntity.unreadState().allEvents;
 
     return conversationEntity.isGroup() && unreadEvents.length > 0 && isExpectedType;
@@ -311,11 +311,11 @@ const _getStateUnreadMessage = {
     for (const messageEntity of unreadMessages) {
       let string;
 
-      if (messageEntity.is_ping()) {
+      if (messageEntity.isPing()) {
         string = t('notificationPing');
-      } else if (messageEntity.has_asset_text()) {
+      } else if (messageEntity.hasAssetText()) {
         string = true;
-      } else if (messageEntity.has_asset()) {
+      } else if (messageEntity.hasAsset()) {
         const assetEntity = messageEntity.get_first_asset();
         const isUploaded = (assetEntity as FileAsset).status() === AssetTransferState.UPLOADED;
 
@@ -328,14 +328,14 @@ const _getStateUnreadMessage = {
             string = t('notificationSharedFile');
           }
         }
-      } else if (messageEntity.has_asset_location()) {
+      } else if (messageEntity.hasAssetLocation()) {
         string = t('notificationSharedLocation');
-      } else if (messageEntity.has_asset_image()) {
+      } else if (messageEntity.hasAssetImage()) {
         string = t('notificationAssetAdd');
       }
 
       if (!!string) {
-        if (messageEntity.is_ephemeral()) {
+        if (messageEntity.isEphemeral()) {
           return conversationEntity.isGroup()
             ? t('conversationsSecondaryLineEphemeralMessageGroup')
             : t('conversationsSecondaryLineEphemeralMessage');

@@ -121,7 +121,7 @@ export class CollectionViewModel {
 
   _populateItems(messageEntities: ContentMessage[]) {
     messageEntities.forEach((messageEntity: ContentMessage) => {
-      if (!messageEntity.is_expired()) {
+      if (!messageEntity.isExpired()) {
         // TODO: create binary map helper
         const isImage = messageEntity.category & MessageCategory.IMAGE;
         const isGif = messageEntity.category & MessageCategory.GIF;

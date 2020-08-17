@@ -135,7 +135,7 @@ export class EventMapper {
       originalEntity.quote(new QuoteEntity({error, messageId, userId}));
     }
 
-    if (id !== originalEntity.id && originalEntity.has_asset_text()) {
+    if (id !== originalEntity.id && originalEntity.hasAssetText()) {
       originalEntity.assets.removeAll();
       const textAsset = await this._mapAssetText(eventData);
       originalEntity.assets.push(textAsset);
@@ -172,7 +172,7 @@ export class EventMapper {
 
     originalEntity.id = id;
 
-    if (originalEntity.is_content() || originalEntity.is_ping()) {
+    if (originalEntity.isContent() || originalEntity.isPing()) {
       originalEntity.status(event.status || StatusType.SENT);
     }
 
@@ -328,7 +328,7 @@ export class EventMapper {
       messageEntity.legalHoldStatus = data.legal_hold_status;
     }
 
-    if (messageEntity.is_content() || messageEntity.is_ping()) {
+    if (messageEntity.isContent() || messageEntity.isPing()) {
       messageEntity.status(event.status || StatusType.SENT);
     }
 

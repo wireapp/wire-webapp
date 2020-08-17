@@ -43,7 +43,7 @@ export class Asset {
     this.type = '';
   }
 
-  is_downloadable(): boolean {
+  isDownloadable(): boolean {
     return this.is_audio() || this.is_file() || this.is_video() || this.is_image();
   }
 

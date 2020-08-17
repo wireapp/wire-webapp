@@ -2523,7 +2523,7 @@ export class ConversationRepository {
         }
       }
       this.checkMessageTimer(messageEntity);
-      if (EventTypeHandling.STORE.includes(messageEntity.type) || messageEntity.has_asset_image()) {
+      if (EventTypeHandling.STORE.includes(messageEntity.type) || messageEntity.hasAssetImage()) {
         return this.eventService.updateEvent(messageEntity.primary_key, changes);
       }
     } catch (error) {
@@ -3880,7 +3880,7 @@ export class ConversationRepository {
 
     return this.getMessageInConversationById(conversationEntity, messageId)
       .then(messageEntity => {
-        if (!messageEntity || !messageEntity.is_content()) {
+        if (!messageEntity || !messageEntity.isContent()) {
           const type = messageEntity ? messageEntity.type : 'unknown';
 
           const log = `Cannot react to '${type}' message '${messageId}' in conversation '${conversationId}'`;
@@ -3965,10 +3965,10 @@ export class ConversationRepository {
 
   handleMessageExpiration(messageEntity) {
     amplify.publish(WebAppEvents.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, messageEntity);
-    const shouldDeleteMessage = !messageEntity.user().isMe || messageEntity.is_ping();
+    const shouldDeleteMessage = !messageEntity.user().isMe || messageEntity.isPing();
     if (shouldDeleteMessage) {
       this.get_conversation_by_id(messageEntity.conversation_id).then(conversationEntity => {
-        const isPingFromSelf = messageEntity.user().isMe && messageEntity.is_ping();
+        const isPingFromSelf = messageEntity.user().isMe && messageEntity.isPing();
         const deleteForSelf = isPingFromSelf || conversationEntity.removed_from_conversation();
         if (deleteForSelf) {
           return this.deleteMessage(conversationEntity, messageEntity);
@@ -4102,7 +4102,7 @@ export class ConversationRepository {
         });
       }
 
-      if (messageEntity.is_content()) {
+      if (messageEntity.isContent()) {
         const userIds = Object.keys(messageEntity.reactions());
 
         messageEntity.reactions_user_ets.removeAll();
@@ -4192,13 +4192,13 @@ export class ConversationRepository {
    */
   update_message_as_upload_failed(message_et, reason = AssetTransferState.UPLOAD_FAILED) {
     if (message_et) {
-      if (!message_et.is_content()) {
+      if (!message_et.isContent()) {
         throw new Error(`Tried to update wrong message type as upload failed '${message_et.superType}'`);
       }
 
       const asset_et = message_et.get_first_asset();
       if (asset_et) {
-        if (!asset_et.is_downloadable()) {
+        if (!asset_et.isDownloadable()) {
           throw new Error(`Tried to update message with wrong asset type as upload failed '${asset_et.type}'`);
         }
 
@@ -4308,7 +4308,7 @@ export class ConversationRepository {
         action: actionType,
         conversation_type: trackingHelpers.getConversationType(conversationEntity),
         ephemeral_time: isEphemeral ? messageTimer : undefined,
-        is_ephemeral: isEphemeral,
+        isEphemeral: isEphemeral,
         is_global_ephemeral: !!conversationEntity.globalMessageTimer(),
         mention_num: numberOfMentions,
         with_service: conversationEntity.hasService(),

@@ -376,9 +376,9 @@ export class Conversation {
             break;
           }
 
-          const isMissedCall = messageEntity.is_call() && !messageEntity.was_completed();
-          const isPing = messageEntity.is_ping();
-          const isMessage = messageEntity.is_content();
+          const isMissedCall = messageEntity.isCall() && !messageEntity.was_completed();
+          const isPing = messageEntity.isPing();
+          const isMessage = messageEntity.isContent();
           const isSelfMentioned =
             isMessage && this.selfUser() && (messageEntity as ContentMessage).isUserMentioned(this.selfUser().id);
           const isSelfQuoted =
@@ -743,7 +743,7 @@ export class Conversation {
         return false;
       }
 
-      const isCallActivation = messageEntity.is_call() && messageEntity.is_activation();
+      const isCallActivation = messageEntity.isCall() && messageEntity.is_activation();
       const isMemberJoin = messageEntity.isMember() && (messageEntity as MemberMessage).isMemberJoin();
       const wasSelfUserAdded = isMemberJoin && (messageEntity as MemberMessage).isUserAffected(this.selfUser().id);
 
@@ -850,7 +850,7 @@ export class Conversation {
     const messages = this.messages();
     for (let index = messages.length - 1; index >= 0; index--) {
       const message_et = messages[index];
-      if (message_et.is_editable()) {
+      if (message_et.isEditable()) {
         return message_et;
       }
     }

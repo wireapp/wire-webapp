@@ -402,7 +402,7 @@ export class MessageListViewModel {
   };
 
   show_detail = async (messageEntity: Message, event: MouseEvent): Promise<void> => {
-    if (messageEntity.is_expired() || $(event.currentTarget).hasClass('image-asset--no-image')) {
+    if (messageEntity.isExpired() || $(event.currentTarget).hasClass('image-asset--no-image')) {
       return;
     }
 
@@ -420,7 +420,7 @@ export class MessageListViewModel {
 
   get_timestamp_class = (messageEntity: ContentMessage): string => {
     const previousMessage = this.conversation().get_previous_message(messageEntity);
-    if (!previousMessage || messageEntity.is_call()) {
+    if (!previousMessage || messageEntity.isCall()) {
       return '';
     }
 
@@ -452,12 +452,12 @@ export class MessageListViewModel {
       return false;
     }
 
-    if (messageEntity.is_content() && messageEntity.replacing_message_id) {
+    if (messageEntity.isContent() && messageEntity.replacing_message_id) {
       return false;
     }
 
     const last_message = this.conversation().get_previous_message(messageEntity);
-    return last_message && last_message.is_content() && last_message.user().id === messageEntity.user().id;
+    return last_message && last_message.isContent() && last_message.user().id === messageEntity.user().id;
   };
 
   isLastDeliveredMessage = (messageEntity: Message): boolean => {
@@ -482,7 +482,7 @@ export class MessageListViewModel {
     const messageTimestamp = messageEntity.timestamp();
     const callbacks: Function[] = [];
 
-    if (!messageEntity.is_ephemeral()) {
+    if (!messageEntity.isEphemeral()) {
       const isCreationMessage = messageEntity.isMember() && messageEntity.isCreation();
       if (conversationEntity.is1to1() && isCreationMessage) {
         this.integrationRepository.addProviderNameToParticipant(messageEntity.otherUser());
@@ -504,7 +504,7 @@ export class MessageListViewModel {
       }
     };
 
-    if (messageEntity.is_ephemeral()) {
+    if (messageEntity.isEphemeral()) {
       callbacks.push(startTimer);
     }
 

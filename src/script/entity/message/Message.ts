@@ -71,15 +71,6 @@ export class Message {
   public superType: SuperType;
   public type: string;
 
-  /**
-   * Sort messages by timestamp
-   * @param message_ets Message entities
-   * @returns Sorted message entities
-   */
-  static sort_by_timestamp(message_ets: Message[]): Message[] {
-    return message_ets.sort((m1, m2) => m1.timestamp() - m2.timestamp());
-  }
-
   constructor(id: string = '0', superType?: SuperType) {
     this.id = id;
     this.superType = superType;
@@ -112,7 +103,7 @@ export class Message {
     this.isObfuscated = ko.pureComputed(() => {
       const messageIsAtLeastSent = this.status() > StatusType.SENDING;
       const isEphemeralInactive = this.ephemeralStatus() === EphemeralStatusType.INACTIVE;
-      return messageIsAtLeastSent && (isEphemeralInactive || this.is_expired());
+      return messageIsAtLeastSent && (isEphemeralInactive || this.isExpired());
     });
 
     this.readReceipts = ko.observableArray([]);
@@ -160,47 +151,47 @@ export class Message {
    * Check if message contains an asset of type file.
    * @returns Message contains any file type asset
    */
-  has_asset(): boolean {
-    return this.is_content() ? this.assets().some(assetEntity => assetEntity.type === AssetType.FILE) : false;
+  hasAsset(): boolean {
+    return this.isContent() ? this.assets().some(assetEntity => assetEntity.type === AssetType.FILE) : false;
   }
 
   /**
    * Check if message contains a file asset.
    * @returns Message contains a file
    */
-  has_asset_file(): boolean {
-    return this.is_content() ? this.assets().some(assetEntity => assetEntity.is_file()) : false;
+  hasAssetFile(): boolean {
+    return this.isContent() ? this.assets().some(assetEntity => assetEntity.is_file()) : false;
   }
 
   /**
    * Check if message contains any image asset.
    * @returns Message contains any image
    */
-  has_asset_image(): boolean {
-    return this.is_content() ? this.assets().some(assetEntity => assetEntity.is_image()) : false;
+  hasAssetImage(): boolean {
+    return this.isContent() ? this.assets().some(assetEntity => assetEntity.is_image()) : false;
   }
 
   /**
    * Check if message contains a location asset.
    * @returns Message contains a location
    */
-  has_asset_location(): boolean {
-    return this.is_content() ? this.assets().some(assetEntity => assetEntity.is_location()) : false;
+  hasAssetLocation(): boolean {
+    return this.isContent() ? this.assets().some(assetEntity => assetEntity.is_location()) : false;
   }
 
   /**
    * Check if message contains a text asset.
    * @returns Message contains text
    */
-  has_asset_text(): boolean {
-    return this.is_content() ? this.assets().some(assetEntity => assetEntity.is_text()) : false;
+  hasAssetText(): boolean {
+    return this.isContent() ? this.assets().some(assetEntity => assetEntity.is_text()) : false;
   }
 
   /**
    * Check if message is a call message.
    * @returns Is message of type call
    */
-  is_call(): this is CallMessage {
+  isCall(): this is CallMessage {
     return this.superType === SuperType.CALL;
   }
 
@@ -208,19 +199,19 @@ export class Message {
    * Check if message is a content message.
    * @returns Is message of type content
    */
-  is_content(): this is ContentMessage {
+  isContent(): this is ContentMessage {
     return this.superType === SuperType.CONTENT;
   }
 
   isComposite(): this is CompositeMessage {
-    return this.is_content() && this.hasOwnProperty('selectedButtonId');
+    return this.isContent() && this.hasOwnProperty('selectedButtonId');
   }
 
   /**
    * Check if message can be deleted.
    * @returns `true`, if message is deletable, `false` otherwise.
    */
-  is_deletable(): boolean {
+  isDeletable(): boolean {
     return !this.hasUnavailableAsset(false) && !this.isComposite() && this.status() !== StatusType.SENDING;
   }
 
@@ -228,7 +219,7 @@ export class Message {
    * Check if the message content can be downloaded.
    * @returns `true`, if the message has downloadable content, `false` otherwise.
    */
-  is_downloadable(): boolean {
+  isDownloadable(): boolean {
     const isExpiredEphemeral = this.ephemeralStatus() === EphemeralStatusType.TIMED_OUT;
     if (isExpiredEphemeral) {
       return false;
@@ -238,7 +229,7 @@ export class Message {
       return false;
     }
 
-    if (this.is_content()) {
+    if (this.isContent()) {
       const assetEntity = this.get_first_asset();
 
       if (assetEntity && typeof (assetEntity as FileAsset).original_resource === 'function') {
@@ -250,12 +241,12 @@ export class Message {
   }
 
   isEdited(): boolean {
-    return this.is_content() && this.was_edited();
+    return this.isContent() && this.was_edited();
   }
 
   isLinkPreview(): boolean {
     return (
-      this.has_asset_text() &&
+      this.hasAssetText() &&
       ((this as unknown) as ContentMessage)
         .assets()
         .some(assetEntity => assetEntity.is_text() && assetEntity.previews().length)
@@ -274,7 +265,7 @@ export class Message {
    * Check if message is a ping message.
    * @returns Is message of type ping
    */
-  is_ping(): boolean {
+  isPing(): boolean {
     return this.superType === SuperType.PING;
   }
 
@@ -282,24 +273,8 @@ export class Message {
    * Check if message is a system message.
    * @returns Is message of type system
    */
-  is_system(): boolean {
+  isSystem(): boolean {
     return this.superType === SuperType.SYSTEM;
-  }
-
-  /**
-   * Check if message is an undecryptable message.
-   * @returns Is message unable to decrypt
-   */
-  is_unable_to_decrypt(): boolean {
-    return this.superType === SuperType.UNABLE_TO_DECRYPT;
-  }
-
-  /**
-   * Check if message is a verification message.
-   * @returns Is message of type verification
-   */
-  is_verification(): boolean {
-    return this.superType === SuperType.VERIFICATION;
   }
 
   isLegalHold(): boolean {
@@ -312,22 +287,22 @@ export class Message {
    */
 
   isCopyable(): boolean {
-    return this.has_asset_text() && !this.isComposite() && (!this.is_ephemeral() || this.user().isMe);
+    return this.hasAssetText() && !this.isComposite() && (!this.isEphemeral() || this.user().isMe);
   }
 
   /**
    * Check if message can be edited.
    * @returns `true`, if message can be edited, `false` otherwise.
    */
-  is_editable(): boolean {
-    return this.has_asset_text() && this.user().isMe && !this.is_ephemeral();
+  isEditable(): boolean {
+    return this.hasAssetText() && this.user().isMe && !this.isEphemeral();
   }
 
   /**
    * Check if message is ephemeral.
    * @returns `true`, if message is ephemeral, `false` otherwise.
    */
-  is_ephemeral(): boolean {
+  isEphemeral(): boolean {
     return this.ephemeralExpires() !== false;
   }
 
@@ -335,14 +310,14 @@ export class Message {
    * Check if ephemeral message is expired.
    * @returns `true`, if message expired, `false` otherwise.
    */
-  is_expired = (): boolean => this.ephemeralExpires() === true;
+  isExpired = (): boolean => this.ephemeralExpires() === true;
 
   /**
    * Check if message has an unavailable (uploading or failed) asset.
    * @returns `true`, if an asset is unavailable, `false` otherwise.
    */
   hasUnavailableAsset(includeFailedState = true): boolean {
-    if (this.has_asset()) {
+    if (this.hasAsset()) {
       return ((this as unknown) as ContentMessage).assets().some(asset => {
         const unavailableStatus = [AssetTransferState.UPLOAD_PENDING, AssetTransferState.UPLOADING];
         if (includeFailedState) {
@@ -361,9 +336,9 @@ export class Message {
    */
   isReactable(): boolean {
     return (
-      this.is_content() &&
+      this.isContent() &&
       !this.isComposite() &&
-      !this.is_ephemeral() &&
+      !this.isEphemeral() &&
       this.status() !== StatusType.SENDING &&
       !this.hasUnavailableAsset()
     );
@@ -375,9 +350,9 @@ export class Message {
    */
   isReplyable(): boolean {
     return (
-      this.is_content() &&
+      this.isContent() &&
       !this.isComposite() &&
-      !this.is_ephemeral() &&
+      !this.isEphemeral() &&
       this.status() !== StatusType.SENDING &&
       !this.hasUnavailableAsset()
     );
@@ -400,20 +375,4 @@ export class Message {
     this.ephemeralRemaining(remainingTime);
     this.messageTimerStarted = true;
   };
-
-  /**
-   * Update the status of a message.
-   * @param updated_status New status of message
-   * @returns Returns the new status on a successful update, otherwise "false"
-   */
-  update_status(updated_status: StatusType): StatusType | false {
-    if (this.status() >= StatusType.SENT) {
-      if (updated_status > this.status()) {
-        return this.status(updated_status);
-      }
-    } else if (this.status() !== updated_status) {
-      return this.status(updated_status);
-    }
-    return false;
-  }
 }

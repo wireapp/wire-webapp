@@ -58,13 +58,13 @@ class LinkPreviewAssetComponent {
     this.isTweet = isTypeTweet && isTweetUrl(this.preview.url);
     this.author = this.isTweet ? this.preview.meta_data.author.substring(0, 20) : '';
 
-    if (!this.messageEntity.is_expired()) {
+    if (!this.messageEntity.isExpired()) {
       this.element.addEventListener('click', this.onClick);
     }
   }
 
   onClick = () => {
-    if (!this.messageEntity.is_expired()) {
+    if (!this.messageEntity.isExpired()) {
       safeWindowOpen(this.preview.url);
     }
   };
