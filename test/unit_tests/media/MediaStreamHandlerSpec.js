@@ -28,17 +28,17 @@ describe('MediaStreamHandler', () => {
   });
 
   describe('requestMediaStream', () => {
-    it('request audio stream', () => {
+    it('requests audio streams', () => {
       spyOn(window.navigator.mediaDevices, 'getUserMedia').and.returnValue(Promise.resolve(new MediaStream()));
 
       return streamHandler.requestMediaStream(true, false, false, true).then(() => {
         expect(window.navigator.mediaDevices.getUserMedia).toHaveBeenCalledWith(
-          jasmine.objectContaining({audio: true, video: undefined}),
+          jasmine.objectContaining({audio: {autoGainControl: false}, video: undefined}),
         );
       });
     });
 
-    it('request video stream', () => {
+    it('requests video streams', () => {
       spyOn(window.navigator.mediaDevices, 'getUserMedia').and.returnValue(Promise.resolve(new MediaStream()));
 
       return streamHandler.requestMediaStream(false, true, false, true).then(() => {
@@ -48,12 +48,12 @@ describe('MediaStreamHandler', () => {
       });
     });
 
-    it('request audio and video stream', () => {
+    it('requests audio and video streams', () => {
       spyOn(window.navigator.mediaDevices, 'getUserMedia').and.returnValue(Promise.resolve(new MediaStream()));
 
       return streamHandler.requestMediaStream(true, true, false, true).then(() => {
         expect(window.navigator.mediaDevices.getUserMedia).toHaveBeenCalledWith(
-          jasmine.objectContaining({audio: true, video: jasmine.any(Object)}),
+          jasmine.objectContaining({audio: {autoGainControl: false}, video: jasmine.any(Object)}),
         );
       });
     });
