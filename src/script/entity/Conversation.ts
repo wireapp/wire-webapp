@@ -898,11 +898,11 @@ export class Conversation {
   }
 
   supportsVideoCall(sftEnabled: boolean): boolean {
-    const participantCount = this.getNumberOfParticipants(true, false);
-    const config = Config.getConfig();
     if (sftEnabled) {
       return true;
     }
+    const participantCount = this.getNumberOfParticipants(true, false);
+    const config = Config.getConfig();
     return participantCount <= config.MAX_VIDEO_PARTICIPANTS;
   }
 
