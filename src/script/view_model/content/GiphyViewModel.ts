@@ -137,7 +137,9 @@ export class GiphyViewModel {
     this._getRandomGif();
 
     if (!this.modal) {
-      this.modal = new Modal('#giphy-modal');
+      this.modal = new Modal('#giphy-modal', () => {
+        this.modal = undefined;
+      });
     }
 
     this.modal.show();
