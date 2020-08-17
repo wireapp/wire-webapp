@@ -51,7 +51,7 @@ export class Message {
   public readonly ephemeral_expires: ko.Observable<boolean | number | string>;
   public readonly ephemeral_remaining: ko.Observable<number>;
   public readonly ephemeral_started: ko.Observable<number>;
-  public readonly ephemeralCaption: ko.PureComputed<string>;
+  public readonly ephemeral_caption: ko.PureComputed<string>;
   public readonly ephemeral_duration: ko.Observable<number>;
   public readonly ephemeral_status: ko.Computed<EphemeralStatusType>;
   public readonly expectsReadConfirmation: boolean;
@@ -83,7 +83,7 @@ export class Message {
   constructor(id: string = '0', super_type?: SuperType) {
     this.id = id;
     this.super_type = super_type;
-    this.ephemeralCaption = ko.pureComputed(() => {
+    this.ephemeral_caption = ko.pureComputed(() => {
       const remainingTime = this.ephemeral_remaining();
       return remainingTime ? formatDurationCaption(remainingTime) : '';
     });

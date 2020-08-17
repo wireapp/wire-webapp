@@ -392,7 +392,7 @@ const normalTemplate: string = `
       "></message-quote>
   <!-- /ko -->
 
-  <div class="message-body" data-bind="attr: {'title': message.ephemeralCaption()}">
+  <div class="message-body" data-bind="attr: {'title': message.ephemeral_caption()}">
     <!-- ko if: message.ephemeral_status() === EphemeralStatusType.ACTIVE -->
       <ephemeral-timer class="message-ephemeral-timer" params="message: message"></ephemeral-timer>
     <!-- /ko -->
@@ -440,7 +440,7 @@ const normalTemplate: string = `
         <span class="context-menu icon-more font-size-xs" data-bind="click: (data, event) => showContextMenu(event)"></span>
       <!-- /ko -->
       <!-- ko if: message.ephemeral_status() === EphemeralStatusType.ACTIVE -->
-        <time class="time" data-bind="text: message.displayTimestampShort(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id, 'title': message.ephemeralCaption()}, showAllTimestamps"></time>
+        <time class="time" data-bind="text: message.displayTimestampShort(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id, 'title': message.ephemeral_caption()}, showAllTimestamps"></time>
       <!-- /ko -->
       <!-- ko ifnot: message.ephemeral_status() === EphemeralStatusType.ACTIVE -->
         <time class="time with-tooltip with-tooltip--top with-tooltip--time" data-bind="text: message.displayTimestampShort(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id, 'data-tooltip': message.displayTimestampLong()}, showAllTimestamps"></time>
@@ -530,7 +530,7 @@ const pingTemplate: string = `
     <div class="message-header-icon">
       <div class="icon-ping" data-bind="css: message.getIconClasses"></div>
     </div>
-    <div class="message-header-label" data-bind="attr: {title: message.ephemeralCaption()}, css: {'ephemeral-message-obfuscated': message.isObfuscated()}">
+    <div class="message-header-label" data-bind="attr: {title: message.ephemeral_caption()}, css: {'ephemeral-message-obfuscated': message.isObfuscated()}">
       <span class="message-header-label__multiline">
         <span class="message-header-sender-name" data-bind='text: message.unsafeSenderName()'></span>
         <span class="ellipsis" data-bind="text: message.caption"></span>
