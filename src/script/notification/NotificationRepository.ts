@@ -224,7 +224,7 @@ export class NotificationRepository {
 
     const isUserBusy = this.selfUser().availability() === Availability.Type.BUSY;
     const isSelfMentionOrReply = messageEntity.is_content() && messageEntity.isUserTargeted(this.selfUser().id);
-    const isCallMessage = messageEntity.super_type === SuperType.CALL;
+    const isCallMessage = messageEntity.superType === SuperType.CALL;
 
     if (isUserBusy && !isSelfMentionOrReply && !isCallMessage && !isComposite) {
       return Promise.resolve();
@@ -537,7 +537,7 @@ export class NotificationRepository {
     messageEntity: Message | CallMessage | ContentMessage | MemberMessage,
     conversationEntity: Conversation,
   ): string | void {
-    switch (messageEntity.super_type) {
+    switch (messageEntity.superType) {
       case SuperType.CALL:
         return this.createBodyCall(messageEntity as CallMessage);
       case SuperType.CONTENT:
@@ -738,7 +738,7 @@ export class NotificationRepository {
     const shouldPlaySound = !muteSound && !isFromSelf;
 
     if (shouldPlaySound) {
-      switch (messageEntity.super_type) {
+      switch (messageEntity.superType) {
         case SuperType.CONTENT: {
           amplify.publish(WebAppEvents.AUDIO.PLAY, AudioType.NEW_MESSAGE);
           break;
@@ -896,7 +896,7 @@ export class NotificationRepository {
       return false;
     }
 
-    const isEventTypeToNotify = NotificationRepository.EVENTS_TO_NOTIFY.includes(messageEntity.super_type);
+    const isEventTypeToNotify = NotificationRepository.EVENTS_TO_NOTIFY.includes(messageEntity.superType);
     const isEventToNotify = isEventTypeToNotify && !messageEntity.isEdited() && !messageEntity.isLinkPreview();
 
     if (conversationEntity.showNotificationsEverything()) {
@@ -904,7 +904,7 @@ export class NotificationRepository {
     }
 
     const isSelfMentionOrReply = messageEntity.is_content() && messageEntity.isUserTargeted(userId);
-    const isCallMessage = messageEntity.super_type === SuperType.CALL;
+    const isCallMessage = messageEntity.superType === SuperType.CALL;
     return isEventToNotify && (isCallMessage || isSelfMentionOrReply);
   }
 }

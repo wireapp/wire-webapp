@@ -51,7 +51,7 @@ describe('Message Entities', () => {
     it('ephemeral message with image asset should be downloadable', () => {
       message_et = new ContentMessage();
       message_et.assets.push(new MediumImage());
-      message_et.ephemeral_expires(12312123);
+      message_et.ephemeralExpires(12312123);
 
       expect(message_et.is_downloadable()).toBeTruthy();
     });
@@ -59,7 +59,7 @@ describe('Message Entities', () => {
     it('expired ephemeral message with image asset should not be downloadable', () => {
       message_et = new ContentMessage();
       message_et.assets.push(new MediumImage());
-      message_et.ephemeral_expires(true);
+      message_et.ephemeralExpires(true);
 
       expect(message_et.is_downloadable()).toBeFalsy();
     });
@@ -109,7 +109,7 @@ describe('Message Entities', () => {
 
       it('isObfuscated returns false if it is ephemeral and still sending', () => {
         message_et.status(StatusType.SENDING);
-        message_et.ephemeral_expires(12312123);
+        message_et.ephemeralExpires(12312123);
 
         expect(message_et.isObfuscated()).toBeFalsy();
       });

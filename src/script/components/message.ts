@@ -392,8 +392,8 @@ const normalTemplate: string = `
       "></message-quote>
   <!-- /ko -->
 
-  <div class="message-body" data-bind="attr: {'title': message.ephemeral_caption()}">
-    <!-- ko if: message.ephemeral_status() === EphemeralStatusType.ACTIVE -->
+  <div class="message-body" data-bind="attr: {'title': message.ephemeralCaption()}">
+    <!-- ko if: message.ephemeralStatus() === EphemeralStatusType.ACTIVE -->
       <ephemeral-timer class="message-ephemeral-timer" params="message: message"></ephemeral-timer>
     <!-- /ko -->
 
@@ -439,10 +439,10 @@ const normalTemplate: string = `
       <!-- ko if: contextMenuEntries().length > 0 -->
         <span class="context-menu icon-more font-size-xs" data-bind="click: (data, event) => showContextMenu(event)"></span>
       <!-- /ko -->
-      <!-- ko if: message.ephemeral_status() === EphemeralStatusType.ACTIVE -->
-        <time class="time" data-bind="text: message.displayTimestampShort(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id, 'title': message.ephemeral_caption()}, showAllTimestamps"></time>
+      <!-- ko if: message.ephemeralStatus() === EphemeralStatusType.ACTIVE -->
+        <time class="time" data-bind="text: message.displayTimestampShort(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id, 'title': message.ephemeralCaption()}, showAllTimestamps"></time>
       <!-- /ko -->
-      <!-- ko ifnot: message.ephemeral_status() === EphemeralStatusType.ACTIVE -->
+      <!-- ko ifnot: message.ephemeralStatus() === EphemeralStatusType.ACTIVE -->
         <time class="time with-tooltip with-tooltip--top with-tooltip--time" data-bind="text: message.displayTimestampShort(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id, 'data-tooltip': message.displayTimestampLong()}, showAllTimestamps"></time>
       <!-- /ko -->
       ${receiptStatusTemplate}
@@ -530,7 +530,7 @@ const pingTemplate: string = `
     <div class="message-header-icon">
       <div class="icon-ping" data-bind="css: message.get_icon_classes"></div>
     </div>
-    <div class="message-header-label" data-bind="attr: {title: message.ephemeral_caption()}, css: {'ephemeral-message-obfuscated': message.isObfuscated()}">
+    <div class="message-header-label" data-bind="attr: {title: message.ephemeralCaption()}, css: {'ephemeral-message-obfuscated': message.isObfuscated()}">
       <span class="message-header-label__multiline">
         <span class="message-header-sender-name" data-bind='text: message.unsafeSenderName()'></span>
         <span class="ellipsis" data-bind="text: message.caption"></span>
@@ -716,34 +716,34 @@ const memberTemplate: string = `
 
 ko.components.register('message', {
   template: `
-    <!-- ko if: message.super_type === 'normal' -->
+    <!-- ko if: message.superType === 'normal' -->
       ${normalTemplate}
     <!-- /ko -->
-    <!-- ko if: message.super_type === 'missed' -->
+    <!-- ko if: message.superType === 'missed' -->
       ${missedTemplate}
     <!-- /ko -->
-    <!-- ko if: message.super_type === 'unable-to-decrypt' -->
+    <!-- ko if: message.superType === 'unable-to-decrypt' -->
       ${unableToDecryptTemplate}
     <!-- /ko -->
-    <!-- ko if: message.super_type === 'verification' -->
+    <!-- ko if: message.superType === 'verification' -->
       ${verificationTemplate}
     <!-- /ko -->
-    <!-- ko if: message.super_type === 'delete' -->
+    <!-- ko if: message.superType === 'delete' -->
       ${deleteTemplate}
     <!-- /ko -->
-    <!-- ko if: message.super_type === 'call' -->
+    <!-- ko if: message.superType === 'call' -->
       ${callTemplate}
     <!-- /ko -->
-    <!-- ko if: message.super_type === 'system' -->
+    <!-- ko if: message.superType === 'system' -->
       ${systemTemplate}
     <!-- /ko -->
-    <!-- ko if: message.super_type === 'member' -->
+    <!-- ko if: message.superType === 'member' -->
       ${memberTemplate}
     <!-- /ko -->
-    <!-- ko if: message.super_type === 'ping' -->
+    <!-- ko if: message.superType === 'ping' -->
       ${pingTemplate}
     <!-- /ko -->
-    <!-- ko if: message.super_type === 'file-type-restricted' -->
+    <!-- ko if: message.superType === 'file-type-restricted' -->
       ${fileTypeRestrictedTemplate}
     <!-- /ko -->
     <!-- ko if: message.isLegalHold() -->

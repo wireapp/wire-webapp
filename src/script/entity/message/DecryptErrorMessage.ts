@@ -44,7 +44,7 @@ export class DecryptErrorMessage extends Message {
 
   constructor() {
     super();
-    this.super_type = SuperType.UNABLE_TO_DECRYPT;
+    this.superType = SuperType.UNABLE_TO_DECRYPT;
 
     this.error_code = '';
     this.client_id = '';

@@ -29,7 +29,7 @@ export class DeleteMessage extends Message {
   constructor() {
     super();
 
-    this.super_type = SuperType.DELETE;
+    this.superType = SuperType.DELETE;
     this.deleted_timestamp = null;
   }
 

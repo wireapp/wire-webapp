@@ -23,7 +23,7 @@ import {Message} from './Message';
 export class MissedMessage extends Message {
   constructor() {
     super();
-    this.super_type = SuperType.MISSED;
+    this.superType = SuperType.MISSED;
     this.affect_order(false);
   }
 }

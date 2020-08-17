@@ -51,7 +51,7 @@ export class ContentMessage extends Message {
     super(id);
 
     this.assets = ko.observableArray([]);
-    this.super_type = SuperType.CONTENT;
+    this.superType = SuperType.CONTENT;
     this.replacing_message_id = null;
     this.edited_timestamp = ko.observable(null);
 

@@ -436,7 +436,7 @@ describe('Conversation', () => {
       ephemeral_message_et.add_asset(new Text());
       ephemeral_message_et.id = createRandomUuid();
       ephemeral_message_et.user(self_user_et);
-      ephemeral_message_et.ephemeral_expires(true);
+      ephemeral_message_et.ephemeralExpires(true);
       conversation_et.add_message(ephemeral_message_et);
 
       expect(conversation_et.get_last_editable_message()).toBeDefined();

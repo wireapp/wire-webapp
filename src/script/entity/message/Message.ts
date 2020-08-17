@@ -48,12 +48,12 @@ export class Message {
   public conversation_id: string;
   public readonly status: ko.Observable<StatusType>;
   public readonly accent_color: ko.PureComputed<string>;
-  public readonly ephemeral_expires: ko.Observable<boolean | number | string>;
-  public readonly ephemeral_remaining: ko.Observable<number>;
-  public readonly ephemeral_started: ko.Observable<number>;
-  public readonly ephemeral_caption: ko.PureComputed<string>;
-  public readonly ephemeral_duration: ko.Observable<number>;
-  public readonly ephemeral_status: ko.Computed<EphemeralStatusType>;
+  public readonly ephemeralExpires: ko.Observable<boolean | number | string>;
+  public readonly ephemeralRemaining: ko.Observable<number>;
+  public readonly ephemeralStarted: ko.Observable<number>;
+  public readonly ephemeralCaption: ko.PureComputed<string>;
+  public readonly ephemeralDuration: ko.Observable<number>;
+  public readonly ephemeralStatus: ko.Computed<EphemeralStatusType>;
   public readonly expectsReadConfirmation: boolean;
   public from: string;
   public fromClientId: string;
@@ -68,7 +68,7 @@ export class Message {
   public readonly user: ko.Observable<User>;
   public version: number;
   public readReceipts: ko.ObservableArray<ReadReceipt>;
-  public super_type: SuperType;
+  public superType: SuperType;
   public type: string;
 
   /**
@@ -80,29 +80,29 @@ export class Message {
     return message_ets.sort((m1, m2) => m1.timestamp() - m2.timestamp());
   }
 
-  constructor(id: string = '0', super_type?: SuperType) {
+  constructor(id: string = '0', superType?: SuperType) {
     this.id = id;
-    this.super_type = super_type;
-    this.ephemeral_caption = ko.pureComputed(() => {
-      const remainingTime = this.ephemeral_remaining();
+    this.superType = superType;
+    this.ephemeralCaption = ko.pureComputed(() => {
+      const remainingTime = this.ephemeralRemaining();
       return remainingTime ? formatDurationCaption(remainingTime) : '';
     });
-    this.ephemeral_duration = ko.observable(0);
-    this.ephemeral_remaining = ko.observable(0);
-    this.ephemeral_expires = ko.observable(false);
-    this.ephemeral_started = ko.observable(0);
-    this.ephemeral_status = ko.computed(() => {
-      const isExpired = this.ephemeral_expires() === true;
+    this.ephemeralDuration = ko.observable(0);
+    this.ephemeralRemaining = ko.observable(0);
+    this.ephemeralExpires = ko.observable(false);
+    this.ephemeralStarted = ko.observable(0);
+    this.ephemeralStatus = ko.computed(() => {
+      const isExpired = this.ephemeralExpires() === true;
       if (isExpired) {
         return EphemeralStatusType.TIMED_OUT;
       }
 
-      if (typeof this.ephemeral_expires() === 'number') {
+      if (typeof this.ephemeralExpires() === 'number') {
         return EphemeralStatusType.INACTIVE;
       }
 
-      if (typeof this.ephemeral_expires() === 'string') {
-        const isExpiring = Date.now() >= this.ephemeral_expires();
+      if (typeof this.ephemeralExpires() === 'string') {
+        const isExpiring = Date.now() >= this.ephemeralExpires();
         return isExpiring ? EphemeralStatusType.TIMED_OUT : EphemeralStatusType.ACTIVE;
       }
 
@@ -111,7 +111,7 @@ export class Message {
 
     this.isObfuscated = ko.pureComputed(() => {
       const messageIsAtLeastSent = this.status() > StatusType.SENDING;
-      const isEphemeralInactive = this.ephemeral_status() === EphemeralStatusType.INACTIVE;
+      const isEphemeralInactive = this.ephemeralStatus() === EphemeralStatusType.INACTIVE;
       return messageIsAtLeastSent && (isEphemeralInactive || this.is_expired());
     });
 
@@ -201,7 +201,7 @@ export class Message {
    * @returns Is message of type call
    */
   is_call(): this is CallMessage {
-    return this.super_type === SuperType.CALL;
+    return this.superType === SuperType.CALL;
   }
 
   /**
@@ -209,7 +209,7 @@ export class Message {
    * @returns Is message of type content
    */
   is_content(): this is ContentMessage {
-    return this.super_type === SuperType.CONTENT;
+    return this.superType === SuperType.CONTENT;
   }
 
   isComposite(): this is CompositeMessage {
@@ -229,7 +229,7 @@ export class Message {
    * @returns `true`, if the message has downloadable content, `false` otherwise.
    */
   is_downloadable(): boolean {
-    const isExpiredEphemeral = this.ephemeral_status() === EphemeralStatusType.TIMED_OUT;
+    const isExpiredEphemeral = this.ephemeralStatus() === EphemeralStatusType.TIMED_OUT;
     if (isExpiredEphemeral) {
       return false;
     }
@@ -267,7 +267,7 @@ export class Message {
    * @returns Is message of type member
    */
   isMember(): boolean {
-    return this.super_type === SuperType.MEMBER;
+    return this.superType === SuperType.MEMBER;
   }
 
   /**
@@ -275,7 +275,7 @@ export class Message {
    * @returns Is message of type ping
    */
   is_ping(): boolean {
-    return this.super_type === SuperType.PING;
+    return this.superType === SuperType.PING;
   }
 
   /**
@@ -283,7 +283,7 @@ export class Message {
    * @returns Is message of type system
    */
   is_system(): boolean {
-    return this.super_type === SuperType.SYSTEM;
+    return this.superType === SuperType.SYSTEM;
   }
 
   /**
@@ -291,7 +291,7 @@ export class Message {
    * @returns Is message unable to decrypt
    */
   is_unable_to_decrypt(): boolean {
-    return this.super_type === SuperType.UNABLE_TO_DECRYPT;
+    return this.superType === SuperType.UNABLE_TO_DECRYPT;
   }
 
   /**
@@ -299,11 +299,11 @@ export class Message {
    * @returns Is message of type verification
    */
   is_verification(): boolean {
-    return this.super_type === SuperType.VERIFICATION;
+    return this.superType === SuperType.VERIFICATION;
   }
 
   isLegalHold(): boolean {
-    return this.super_type === SuperType.LEGALHOLD;
+    return this.superType === SuperType.LEGALHOLD;
   }
 
   /**
@@ -328,14 +328,14 @@ export class Message {
    * @returns `true`, if message is ephemeral, `false` otherwise.
    */
   is_ephemeral(): boolean {
-    return this.ephemeral_expires() !== false;
+    return this.ephemeralExpires() !== false;
   }
 
   /**
    * Check if ephemeral message is expired.
    * @returns `true`, if message expired, `false` otherwise.
    */
-  is_expired = (): boolean => this.ephemeral_expires() === true;
+  is_expired = (): boolean => this.ephemeralExpires() === true;
 
   /**
    * Check if message has an unavailable (uploading or failed) asset.
@@ -389,15 +389,15 @@ export class Message {
       return;
     }
 
-    if (this.ephemeral_status() === EphemeralStatusType.INACTIVE) {
+    if (this.ephemeralStatus() === EphemeralStatusType.INACTIVE) {
       const startingTimestamp = this.user().isMe ? Math.min(this.timestamp() + timeOffset, Date.now()) : Date.now();
-      const expirationTimestamp = `${startingTimestamp + Number(this.ephemeral_expires())}`;
-      this.ephemeral_expires(expirationTimestamp);
-      this.ephemeral_started(startingTimestamp);
+      const expirationTimestamp = `${startingTimestamp + Number(this.ephemeralExpires())}`;
+      this.ephemeralExpires(expirationTimestamp);
+      this.ephemeralStarted(startingTimestamp);
     }
 
-    const remainingTime = Number(this.ephemeral_expires()) - this.ephemeral_started();
-    this.ephemeral_remaining(remainingTime);
+    const remainingTime = Number(this.ephemeralExpires()) - this.ephemeralStarted();
+    this.ephemeralRemaining(remainingTime);
     this.messageTimerStarted = true;
   };
 

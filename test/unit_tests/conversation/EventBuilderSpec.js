@@ -47,7 +47,7 @@ describe('EventBuilder', () => {
 
     return event_mapper.mapJsonEvent(event, conversation_et).then(messageEntity => {
       expect(messageEntity).toBeDefined();
-      expect(messageEntity.super_type).toBe(SuperType.VERIFICATION);
+      expect(messageEntity.superType).toBe(SuperType.VERIFICATION);
       expect(messageEntity.verificationMessageType()).toBe(VerificationMessageType.VERIFIED);
       expect(messageEntity.from).toBe(conversation_et.selfUser().id);
       expect(messageEntity.conversation_id).toBe(conversation_et.id);
@@ -60,7 +60,7 @@ describe('EventBuilder', () => {
 
     return event_mapper.mapJsonEvent(event, conversation_et).then(messageEntity => {
       expect(messageEntity).toBeDefined();
-      expect(messageEntity.super_type).toBe(SuperType.VERIFICATION);
+      expect(messageEntity.superType).toBe(SuperType.VERIFICATION);
       expect(messageEntity.verificationMessageType()).toBe(VerificationMessageType.NEW_DEVICE);
       expect(messageEntity.from).toBe(conversation_et.selfUser().id);
       expect(messageEntity.conversation_id).toBe(conversation_et.id);
@@ -73,7 +73,7 @@ describe('EventBuilder', () => {
 
     return event_mapper.mapJsonEvent(event, conversation_et).then(messageEntity => {
       expect(messageEntity).toBeDefined();
-      expect(messageEntity.super_type).toBe(SuperType.MISSED);
+      expect(messageEntity.superType).toBe(SuperType.MISSED);
       expect(messageEntity.from).toBe(conversation_et.selfUser().id);
       expect(messageEntity.conversation_id).toBe(conversation_et.id);
     });

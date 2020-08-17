@@ -30,7 +30,7 @@ export class PingMessage extends Message {
 
   constructor() {
     super();
-    this.super_type = SuperType.PING;
+    this.superType = SuperType.PING;
 
     this.caption = ko.pureComputed(() => (this.user().isMe ? t('conversationPingYou') : t('conversationPing')));
 

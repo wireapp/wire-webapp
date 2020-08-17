@@ -26,7 +26,7 @@ export class SystemMessage extends Message {
 
   constructor() {
     super();
-    this.super_type = SuperType.SYSTEM;
+    this.superType = SuperType.SYSTEM;
     this.system_message_type = SystemMessageType.NORMAL;
   }
 

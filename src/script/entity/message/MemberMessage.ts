@@ -61,7 +61,7 @@ export class MemberMessage extends SystemMessage {
   constructor() {
     super();
 
-    this.super_type = SuperType.MEMBER;
+    this.superType = SuperType.MEMBER;
     this.memberMessageType = SystemMessageType.NORMAL;
 
     this.userEntities = ko.observableArray();

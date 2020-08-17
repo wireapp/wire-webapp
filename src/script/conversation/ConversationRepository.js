@@ -3037,7 +3037,7 @@ export class ConversationRepository {
 
     return Promise.resolve()
       .then(() => {
-        if (!messageEntity.user().isMe && !messageEntity.ephemeral_expires()) {
+        if (!messageEntity.user().isMe && !messageEntity.ephemeralExpires()) {
           throw new ConversationError(ConversationError.TYPE.WRONG_USER, ConversationError.MESSAGE.WRONG_USER);
         }
 
@@ -3800,7 +3800,7 @@ export class ConversationRepository {
 
     return this.getMessageInConversationById(conversationEntity, eventData.message_id)
       .then(deletedMessageEntity => {
-        if (deletedMessageEntity.ephemeral_expires()) {
+        if (deletedMessageEntity.ephemeralExpires()) {
           return;
         }
 
@@ -4193,7 +4193,7 @@ export class ConversationRepository {
   update_message_as_upload_failed(message_et, reason = AssetTransferState.UPLOAD_FAILED) {
     if (message_et) {
       if (!message_et.is_content()) {
-        throw new Error(`Tried to update wrong message type as upload failed '${message_et.super_type}'`);
+        throw new Error(`Tried to update wrong message type as upload failed '${message_et.superType}'`);
       }
 
       const asset_et = message_et.get_first_asset();

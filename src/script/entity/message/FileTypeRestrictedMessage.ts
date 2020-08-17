@@ -26,7 +26,7 @@ export class FileTypeRestrictedMessage extends Message {
   public caption: string;
   constructor(isIncoming: boolean, name: string, fileExt: string, timestamp: number) {
     super();
-    this.super_type = SuperType.FILE_TYPE_RESTRICTED;
+    this.superType = SuperType.FILE_TYPE_RESTRICTED;
     this.timestamp(timestamp);
     this.caption = isIncoming ? t('fileTypeRestrictedIncoming', name) : t('fileTypeRestrictedOutgoing', fileExt);
   }

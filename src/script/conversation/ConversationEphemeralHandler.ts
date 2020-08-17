@@ -116,7 +116,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
       return;
     }
 
-    switch (messageEntity.ephemeral_status()) {
+    switch (messageEntity.ephemeralStatus()) {
       case EphemeralStatusType.TIMED_OUT: {
         await this._timeoutEphemeralMessage(messageEntity);
         break;
@@ -131,8 +131,8 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
         messageEntity.startMessageTimer(timeOffset);
 
         const changes = {
-          ephemeral_expires: messageEntity.ephemeral_expires(),
-          ephemeral_started: Number(messageEntity.ephemeral_started()),
+          ephemeralExpires: messageEntity.ephemeralExpires(),
+          ephemeralStarted: Number(messageEntity.ephemeralStarted()),
         };
 
         this.eventService.updateEvent(messageEntity.primary_key, changes);
@@ -142,7 +142,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
   }
 
   async validateMessage(messageEntity: ContentMessage): Promise<Message | void> {
-    const isEphemeralMessage = messageEntity.ephemeral_status() !== EphemeralStatusType.NONE;
+    const isEphemeralMessage = messageEntity.ephemeralStatus() !== EphemeralStatusType.NONE;
     if (!isEphemeralMessage) {
       return messageEntity;
     }
@@ -173,7 +173,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
   }
 
   _obfuscateAssetMessage(messageEntity: ContentMessage) {
-    messageEntity.ephemeral_expires(true);
+    messageEntity.ephemeralExpires(true);
 
     const assetEntity = messageEntity.get_first_asset();
     const changes = {
@@ -181,7 +181,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
         content_type: assetEntity.file_type,
         meta: {},
       },
-      ephemeral_expires: true,
+      ephemeralExpires: true,
     };
 
     this.eventService.updateEvent(messageEntity.primary_key, changes);
@@ -189,7 +189,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
   }
 
   _obfuscateImageMessage(messageEntity: ContentMessage): void {
-    messageEntity.ephemeral_expires(true);
+    messageEntity.ephemeralExpires(true);
 
     const assetEntity = messageEntity.get_first_asset();
     const changes = {
@@ -200,7 +200,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
           width: (assetEntity as any).width,
         },
       },
-      ephemeral_expires: true,
+      ephemeralExpires: true,
     };
 
     this.eventService.updateEvent(messageEntity.primary_key, changes);
@@ -220,7 +220,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
   }
 
   async _obfuscateTextMessage(messageEntity: ContentMessage): Promise<void> {
-    messageEntity.ephemeral_expires(true);
+    messageEntity.ephemeralExpires(true);
 
     const assetEntity = messageEntity.get_first_asset() as Text;
     const obfuscatedAsset = new Text(messageEntity.id);
@@ -248,7 +248,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
         content: obfuscatedAsset.text,
         previews: obfuscatedPreviews,
       },
-      ephemeral_expires: true,
+      ephemeralExpires: true,
     };
 
     this.eventService.updateEvent(messageEntity.primary_key, changes);
@@ -282,9 +282,9 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
   }
 
   async _updateTimedMessage(messageEntity: ContentMessage): Promise<ContentMessage | void> {
-    if (typeof messageEntity.ephemeral_expires() === 'string') {
-      const remainingTime = Math.max(0, (messageEntity.ephemeral_expires() as number) - Date.now());
-      messageEntity.ephemeral_remaining(remainingTime);
+    if (typeof messageEntity.ephemeralExpires() === 'string') {
+      const remainingTime = Math.max(0, (messageEntity.ephemeralExpires() as number) - Date.now());
+      messageEntity.ephemeralRemaining(remainingTime);
 
       const isExpired = remainingTime === 0;
       if (isExpired) {

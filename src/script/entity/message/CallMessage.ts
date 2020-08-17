@@ -34,7 +34,7 @@ export class CallMessage extends Message {
 
   constructor(type: CALL_MESSAGE_TYPE, reason?: TERMINATION_REASON, duration: number = 0) {
     super();
-    this.super_type = SuperType.CALL;
+    this.superType = SuperType.CALL;
     this.call_message_type = type;
     this.finished_reason = reason;
     this.duration = duration;

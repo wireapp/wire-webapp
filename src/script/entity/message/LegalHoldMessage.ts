@@ -28,7 +28,7 @@ import {Message} from './Message';
 export class LegalHoldMessage extends Message {
   constructor(public legalHoldStatus: LegalHoldStatus, timestamp: number) {
     super();
-    this.super_type = SuperType.LEGALHOLD;
+    this.superType = SuperType.LEGALHOLD;
     this.timestamp(timestamp);
   }
 
