@@ -528,7 +528,7 @@ const systemTemplate: string = `
 const pingTemplate: string = `
   <div class="message-header">
     <div class="message-header-icon">
-      <div class="icon-ping" data-bind="css: message.getIconClasses"></div>
+      <div class="icon-ping" data-bind="css: message.get_icon_classes"></div>
     </div>
     <div class="message-header-label" data-bind="attr: {title: message.ephemeral_caption()}, css: {'ephemeral-message-obfuscated': message.isObfuscated()}">
       <span class="message-header-label__multiline">
@@ -610,10 +610,10 @@ const verificationTemplate: string = `
 const callTemplate: string = `
   <div class="message-header">
     <div class="message-header-icon message-header-icon--svg">
-      <!-- ko if: message.wasCompleted() -->
+      <!-- ko if: message.was_completed() -->
         <div class="svg-green"><pickup-icon></pickup-icon></div>
       <!-- /ko -->
-      <!-- ko if: !message.wasCompleted() -->
+      <!-- ko if: !message.was_completed() -->
         <div class="svg-red"><hangup-icon></hangup-icon></div>
       <!-- /ko -->
     </div>
