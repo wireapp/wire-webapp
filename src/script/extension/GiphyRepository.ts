@@ -29,7 +29,7 @@ export interface Gif {
 export interface RandomGifOptions {
   /** How many retries to get the correct size. Default is `3`. */
   maxRetries?: number;
-  /** Maximum GIF size in bytes. Default is 3 Megabytes. */
+  /** Maximum GIF size in bytes. */
   maxSize?: number;
   /** Search query term or phrase */
   tag: string;
