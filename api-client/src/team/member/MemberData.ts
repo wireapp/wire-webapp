@@ -22,7 +22,7 @@ import {PermissionsData} from './PermissionsData';
 
 export interface MemberData {
   /** Timestamp of invitation creation. */
-  created_at?: Date;
+  created_at?: string;
   /** ID of the inviting user. */
   created_by?: string;
   legalhold_status?: LegalHoldMemberStatus;
