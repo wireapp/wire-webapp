@@ -245,7 +245,7 @@ export class GroupCreationViewModel {
     this.accessState(ACCESS_STATE.TEAM.GUEST_ROOM);
   };
 
-  _trackGroupCreation = (conversationEntity: Conversation): void => {
+  _trackGroupCreation = (conversationEntity?: Conversation): void => {
     if (!conversationEntity) {
       return;
     }

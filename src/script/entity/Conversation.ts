@@ -92,12 +92,23 @@ export interface SerializedConversation {
 }
 
 export class Conversation {
-  private readonly accessState: ko.Observable<string>;
-  public readonly accessCode: ko.Observable<string>;
   private readonly archivedState: ko.Observable<boolean>;
+  private readonly incomingMessages: ko.ObservableArray<Message | ContentMessage | MemberMessage>;
+  private readonly isManaged: boolean;
+  private readonly isTeam1to1: ko.PureComputed<boolean>;
+  private readonly last_server_timestamp: ko.Observable<number>;
+  private readonly logger: Logger;
+  private readonly mutedState: ko.Observable<number>;
+  private readonly mutedTimestamp: ko.Observable<number>;
+  private readonly publishPersistState: (() => void) & Cancelable;
+  private shouldPersistStateChanges: boolean;
+  public blockLegalHoldMessage: boolean;
+  public hasCreationMessage: boolean;
+  public needsLegalHoldApproval: boolean;
+  public readonly accessCode: ko.Observable<string>;
+  public readonly accessState: ko.Observable<string>;
   public readonly archivedTimestamp: ko.Observable<number>;
   public readonly availabilityOfUser: ko.PureComputed<Availability.Type>;
-  public blockLegalHoldMessage: boolean;
   public readonly call: ko.Observable<Call>;
   public readonly cleared_timestamp: ko.Observable<number>;
   public readonly connection: ko.Observable<ConnectionEntity>;
@@ -106,14 +117,12 @@ export class Conversation {
   public readonly firstUserEntity: ko.PureComputed<User>;
   public readonly globalMessageTimer: ko.Observable<number>;
   public readonly hasAdditionalMessages: ko.Observable<boolean>;
-  public hasCreationMessage: boolean;
   public readonly hasGlobalMessageTimer: ko.PureComputed<boolean>;
   public readonly hasGuest: ko.PureComputed<boolean>;
   public readonly hasLegalHold: ko.Computed<boolean>;
   public readonly hasService: ko.PureComputed<boolean>;
   public readonly hasUnread: ko.PureComputed<boolean>;
   public readonly id: string;
-  private readonly incomingMessages: ko.ObservableArray<ContentMessage | MemberMessage>;
   public readonly inTeam: ko.PureComputed<boolean>;
   public readonly is_archived: ko.Observable<boolean>;
   public readonly is_cleared: ko.PureComputed<boolean>;
@@ -128,42 +137,33 @@ export class Conversation {
   public readonly isGuest: ko.Observable<boolean>;
   public readonly isGuestRoom: ko.PureComputed<boolean>;
   public readonly isLeavable: ko.PureComputed<boolean>;
-  private readonly isManaged: boolean;
   public readonly isMutable: ko.PureComputed<boolean>;
   public readonly isRequest: ko.PureComputed<boolean>;
   public readonly isSelf: ko.PureComputed<boolean>;
-  private readonly isTeam1to1: ko.PureComputed<boolean>;
   public readonly isTeamOnly: ko.PureComputed<boolean>;
   public readonly last_event_timestamp: ko.Observable<number>;
   public readonly last_read_timestamp: ko.Observable<number>;
-  private readonly last_server_timestamp: ko.Observable<number>;
   public readonly legalHoldStatus: ko.Observable<LegalHoldStatus>;
-  private readonly localMessageTimer: ko.Observable<number>;
-  private readonly logger: Logger;
-  private readonly messages_unordered: ko.ObservableArray<Message | ContentMessage | MemberMessage>;
-  private readonly messages_visible: ko.PureComputed<(ContentMessage | MemberMessage)[]>;
+  public readonly localMessageTimer: ko.Observable<number>;
+  public readonly messages_unordered: ko.ObservableArray<Message | ContentMessage | MemberMessage>;
+  public readonly messages_visible: ko.PureComputed<(Message | ContentMessage | MemberMessage)[]>;
   public readonly messages: ko.PureComputed<(Message | ContentMessage | MemberMessage)[]>;
   public readonly messageTimer: ko.PureComputed<number>;
-  private readonly mutedState: ko.Observable<number>;
-  private readonly mutedTimestamp: ko.Observable<number>;
   public readonly name: ko.Observable<string>;
-  public needsLegalHoldApproval: boolean;
-  private readonly notificationState: ko.PureComputed<number>;
+  public readonly notificationState: ko.PureComputed<number>;
   public readonly participating_user_ets: ko.ObservableArray<User>;
   public readonly participating_user_ids: ko.ObservableArray<string>;
-  private readonly publishPersistState: (() => void) & Cancelable;
   public readonly receiptMode: ko.Observable<Confirmation.Type>;
   public readonly removed_from_conversation?: ko.PureComputed<boolean>;
   public readonly roles: ko.Observable<Record<string, string>>;
   public readonly selfUser: ko.Observable<User>;
-  private shouldPersistStateChanges: boolean;
   public readonly showNotificationsEverything: ko.PureComputed<boolean>;
-  private readonly showNotificationsMentionsAndReplies: ko.PureComputed<boolean>;
+  public readonly showNotificationsMentionsAndReplies: ko.PureComputed<boolean>;
   public readonly showNotificationsNothing: ko.PureComputed<boolean>;
   public readonly status: ko.Observable<ConversationStatus>;
   public readonly team_id: string;
   public readonly type: ko.Observable<CONVERSATION_TYPE>;
-  private readonly unreadState: ko.PureComputed<UnreadState>;
+  public readonly unreadState: ko.PureComputed<UnreadState>;
   public readonly verification_state: ko.Observable<ConversationVerificationState>;
   public readonly withAllTeamMembers: ko.Observable<boolean>;
 
@@ -759,7 +759,7 @@ export class Conversation {
    * @param messageEntity Message entity to be added to the conversation
    * @returns Message if it is not a duplicate
    */
-  private _checkForDuplicate(messageEntity: ContentMessage): ContentMessage | void {
+  private _checkForDuplicate(messageEntity: ContentMessage): ContentMessage | undefined {
     if (messageEntity) {
       const existingMessageEntity = this._findDuplicate(messageEntity.id, messageEntity.from);
       if (existingMessageEntity) {
@@ -769,11 +769,12 @@ export class Conversation {
       }
       return messageEntity;
     }
+    return undefined;
   }
 
-  private _findDuplicate(): void;
-  private _findDuplicate(messageId: string, from: string): ContentMessage | MemberMessage;
-  private _findDuplicate(messageId?: string, from?: string): void | ContentMessage | MemberMessage {
+  private _findDuplicate(): undefined;
+  private _findDuplicate(messageId: string, from: string): Message | ContentMessage | MemberMessage;
+  private _findDuplicate(messageId?: string, from?: string): Message | ContentMessage | MemberMessage | undefined {
     if (messageId) {
       return this.messages_unordered().find(messageEntity => {
         const sameId = messageEntity.id === messageId;
@@ -781,6 +782,7 @@ export class Conversation {
         return sameId && sameSender;
       });
     }
+    return undefined;
   }
 
   update_timestamp_server(time: number, is_backend_timestamp: boolean = false): void {
@@ -840,18 +842,21 @@ export class Conversation {
    * Get the message before a given message.
    * @param message_et Message to look up from
    */
-  get_previous_message(message_et: ContentMessage): ContentMessage | MemberMessage | SystemMessage | void {
+  get_previous_message(
+    message_et: ContentMessage,
+  ): Message | ContentMessage | MemberMessage | SystemMessage | undefined {
     const messages_visible = this.messages_visible();
     const message_index = messages_visible.indexOf(message_et);
     if (message_index > 0) {
       return messages_visible[message_index - 1];
     }
+    return undefined;
   }
 
   /**
    * Get the last text message that was added by self user.
    */
-  get_last_editable_message(): Message | ContentMessage | MemberMessage | SystemMessage | void {
+  get_last_editable_message(): Message | ContentMessage | MemberMessage | SystemMessage | undefined {
     const messages = this.messages();
     for (let index = messages.length - 1; index >= 0; index--) {
       const message_et = messages[index];
@@ -859,13 +864,13 @@ export class Conversation {
         return message_et;
       }
     }
+    return undefined;
   }
 
   /**
    * Get the last delivered message.
    */
-  getLastDeliveredMessage(): 
-  Message | ContentMessage | MemberMessage | SystemMessage | undefined {
+  getLastDeliveredMessage(): Message | ContentMessage | MemberMessage | SystemMessage | undefined {
     return this.messages()
       .slice()
       .reverse()

@@ -19,7 +19,7 @@
 
 import ko from 'knockout';
 import {amplify} from 'amplify';
-import {Confirmation} from '@wireapp/protocol-messaging';
+import {RECEIPT_MODE} from '@wireapp/api-client/dist/conversation/data/';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Logger, getLogger} from 'Util/Logger';
@@ -463,8 +463,8 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     }
   }
 
-  updateConversationReceiptMode = (conversationEntity: Conversation, receiptMode: Confirmation.Type): void => {
-    this.conversationRepository.updateConversationReceiptMode(conversationEntity, receiptMode);
+  updateConversationReceiptMode = (conversationEntity: Conversation, receiptMode: RECEIPT_MODE): void => {
+    this.conversationRepository.updateConversationReceiptMode(conversationEntity, {receipt_mode: receiptMode});
   };
 
   initView(): void {
