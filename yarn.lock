@@ -1162,11 +1162,12 @@
   dependencies:
     emojis-list "^3.0.0"
 
-"@formatjs/ts-transformer@^2.5.1":
-  version "2.5.1"
-  resolved "https://registry.yarnpkg.com/@formatjs/ts-transformer/-/ts-transformer-2.5.1.tgz#4f8b6abf9bcd0b22b2b325cf9162160da1b2673e"
-  integrity sha512-2yiXepJNI+CT+dcLH5Qvn47DUj/cs/JhOpAo8+60WjXPN98XeUBAKtjoYnbWc0SnYrBh6mGMLqTOgWR+2680fQ==
+"@formatjs/ts-transformer@^2.7.3":
+  version "2.7.3"
+  resolved "https://registry.yarnpkg.com/@formatjs/ts-transformer/-/ts-transformer-2.7.3.tgz#0c2f2dd315d53b24701b9af550c78545c25f6f4f"
+  integrity sha512-wRFCWrL8ToaxUnm9rpPDDJ/I99VCCa1Ycj3bS7Uu86LObHs4kDgmc8CPiw7bBDEiPb/ZVwbpI2POXx+XCOU8rw==
   dependencies:
+    intl-messageformat-parser "^5.4.2"
     typescript "^3.8"
 
 "@hapi/address@2.x.x":
@@ -1518,13 +1519,6 @@
   version "8.1.0"
   resolved "https://registry.yarnpkg.com/@types/fs-extra/-/fs-extra-8.1.0.tgz#1114834b53c3914806cd03b3304b37b3bd221a4d"
   integrity sha512-UoOfVEzAUpeSPmjm7h1uk5MH6KZma2z2O7a75onTGjnNvAvMVrPzPL/vBbT65iIGHWj6rokwfmYcmxmlSf2uwg==
-  dependencies:
-    "@types/node" "*"
-
-"@types/fs-extra@^9.0.1":
-  version "9.0.1"
-  resolved "https://registry.yarnpkg.com/@types/fs-extra/-/fs-extra-9.0.1.tgz#91c8fc4c51f6d5dbe44c2ca9ab09310bd00c7918"
-  integrity sha512-B42Sxuaz09MhC3DDeW5kubRcQ5by4iuVQ0cRRWM2lggLzAa/KVom0Aft/208NgMvNQQZ86s5rVcqDdn/SH0/mg==
   dependencies:
     "@types/node" "*"
 
@@ -2891,20 +2885,18 @@ babel-plugin-macros@^2.0.0:
     cosmiconfig "^5.2.0"
     resolve "^1.10.0"
 
-babel-plugin-react-intl@7.9.2:
-  version "7.9.2"
-  resolved "https://registry.yarnpkg.com/babel-plugin-react-intl/-/babel-plugin-react-intl-7.9.2.tgz#485931003230d2d3dd457858d1b7fa5b39fb4fbf"
-  integrity sha512-Ny8A6iwz09I+w68t75JK/TNyZ1fD+TD87mPH+0PIr4F0ABIs5MSA8C/TaXjTCir4klGYK/I2lqwNYi7LfWxreg==
+babel-plugin-react-intl@8.1.3:
+  version "8.1.3"
+  resolved "https://registry.yarnpkg.com/babel-plugin-react-intl/-/babel-plugin-react-intl-8.1.3.tgz#ed3cab7f919a8f836056cd3267270dcaeb447cff"
+  integrity sha512-OJeJO52jVNP0ha5np5BVW8ZZnRlsU+voKHj+I2a65rPxTJ5Y7nd1SEsUn5SWlcbxrG7TPHJ+xK8MFt7c23YfzQ==
   dependencies:
     "@babel/core" "^7.9.0"
     "@babel/helper-plugin-utils" "^7.8.3"
     "@babel/types" "^7.9.5"
-    "@formatjs/ts-transformer" "^2.5.1"
+    "@formatjs/ts-transformer" "^2.7.3"
     "@types/babel__core" "^7.1.7"
-    "@types/fs-extra" "^9.0.1"
     "@types/schema-utils" "^2.4.0"
-    fs-extra "^9.0.0"
-    intl-messageformat-parser "^5.3.7"
+    intl-messageformat-parser "^5.4.2"
     schema-utils "^2.6.6"
 
 babel-plugin-syntax-jsx@^6.18.0:
@@ -6165,7 +6157,7 @@ fs-exists-sync@^0.1.0:
   resolved "https://registry.yarnpkg.com/fs-exists-sync/-/fs-exists-sync-0.1.0.tgz#982d6893af918e72d08dec9e8673ff2b5a8d6add"
   integrity sha1-mC1ok6+RjnLQjeyehnP/K1qNat0=
 
-fs-extra@9.0.1, fs-extra@^9.0.0, fs-extra@^9.0.1:
+fs-extra@9.0.1, fs-extra@^9.0.1:
   version "9.0.1"
   resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-9.0.1.tgz#910da0062437ba4c39fedd863f1675ccfefcb9fc"
   integrity sha512-h2iAoN838FqAFJY2/qVpzFXy+EBxfVE220PalAqQLDVsFOHLJrZvut5puAbCdNv6WJk+B8ihI+k0c7JK5erwqQ==
@@ -7253,7 +7245,7 @@ interpret@~1.1.0:
   resolved "https://registry.yarnpkg.com/interpret/-/interpret-1.1.0.tgz#7ed1b1410c6a0e0f78cf95d3b8440c63f78b8614"
   integrity sha1-ftGxQQxqDg94z5XTuEQMY/eLhhQ=
 
-intl-messageformat-parser@^5.3.7, intl-messageformat-parser@^5.4.2:
+intl-messageformat-parser@^5.4.2:
   version "5.4.2"
   resolved "https://registry.yarnpkg.com/intl-messageformat-parser/-/intl-messageformat-parser-5.4.2.tgz#d8b106458798ccd81e79d8d52c6f97f3a4124356"
   integrity sha512-VHu6UWgWLJykaSeI1M2DpZMVRLuGCOV91i5I81xnJuAI0MKHP7ZJ3my5naOQkzG10ris3hBr+o5RElF1wQ5IXA==
