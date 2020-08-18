@@ -37,7 +37,7 @@ import {AuthActionCreator} from './creator/';
 import {LabeledError} from './LabeledError';
 import {LocalStorageAction, LocalStorageKey} from './LocalStorageAction';
 
-type LoginLifecycleFunction = (dispatch: ThunkDispatch, getState: () => RootState, global: Api) => Promise<any>;
+type LoginLifecycleFunction = (dispatch: ThunkDispatch, getState: () => RootState, global: Api) => Promise<void>;
 
 export class AuthAction {
   doFlushDatabase = (): ThunkAction => {
@@ -58,8 +58,9 @@ export class AuthAction {
   doLoginAndJoin = (loginData: LoginData, key: string, code: string, uri?: string): ThunkAction => {
     const onBeforeLogin: LoginLifecycleFunction = async (dispatch, getState, {actions: {authAction}}) =>
       dispatch(authAction.doSilentLogout());
-    const onAfterLogin: LoginLifecycleFunction = async (dispatch, getState, {actions: {conversationAction}}) =>
-      dispatch(conversationAction.doJoinConversationByCode(key, code, uri));
+    const onAfterLogin: LoginLifecycleFunction = async (dispatch, getState, {actions: {conversationAction}}) => {
+      await dispatch(conversationAction.doJoinConversationByCode(key, code, uri));
+    };
 
     return this.doLoginPlain(loginData, onBeforeLogin, onAfterLogin);
   };
