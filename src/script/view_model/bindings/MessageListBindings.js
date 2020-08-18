@@ -182,7 +182,7 @@ ko.bindingHandlers.relative_timestamp = (function () {
   // timestamp that should be updated
   const timestamps = [];
 
-  const calculate_timestamp = (date, isDay) => {
+  const calculateTimestamp = (date, isDay) => {
     if (isYoungerThan2Minutes(date)) {
       return t('conversationJustNow');
     }
@@ -216,7 +216,7 @@ ko.bindingHandlers.relative_timestamp = (function () {
   const calculate = function (element, timestamp, isDay) {
     timestamp = window.parseInt(timestamp);
     const date = fromUnixTime(timestamp / TIME_IN_MILLIS.SECOND);
-    return (element.textContent = calculate_timestamp(date, isDay));
+    return (element.textContent = calculateTimestamp(date, isDay));
   };
 
   return {
