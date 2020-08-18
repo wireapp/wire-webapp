@@ -42,7 +42,7 @@ const markdownit = new MarkdownIt('zero', {
   html: false,
   langPrefix: 'lang-',
   linkify: true,
-}).enable(['autolink', 'backticks', 'code', 'emphasis', 'fence', 'heading', 'link', 'linkify', 'newline']);
+}).enable(['autolink', 'backticks', 'code', 'emphasis', 'escape', 'fence', 'heading', 'link', 'linkify', 'newline']);
 
 const originalFenceRule = markdownit.renderer.rules.fence;
 
