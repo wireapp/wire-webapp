@@ -903,12 +903,13 @@ export class Conversation {
     return userEntities.filter(userEntity => !userEntity.is_verified());
   }
 
-  supportsVideoCall(sftEnabled = true): boolean {
+  supportsVideoCall(sftEnabled: boolean): boolean {
+    if (sftEnabled) {
+      return true;
+    }
     const participantCount = this.getNumberOfParticipants(true, false);
     const config = Config.getConfig();
-    const passesParticipantLimit =
-      participantCount <= (sftEnabled ? config.MAX_SFT_VIDEO_PARTICIPANTS : config.MAX_VIDEO_PARTICIPANTS);
-    return passesParticipantLimit;
+    return participantCount <= config.MAX_VIDEO_PARTICIPANTS;
   }
 
   isShowingLastReceivedMessage = (): boolean => {
