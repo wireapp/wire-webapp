@@ -185,22 +185,22 @@ describe('APIClient', () => {
       spyOn(client.auth.api, 'postLogout').and.returnValue(Promise.reject(testError));
       spyOn(client, 'disconnect').and.returnValue();
       spyOn(client['accessTokenStore'], 'delete').and.returnValue(Promise.resolve(undefined));
-      spyOn(client['logger'], 'error').and.returnValue();
+      spyOn(client['logger'], 'warn').and.returnValue();
 
       await client.logout();
-      expect(client['logger'].error).toHaveBeenCalledWith(testError);
+      expect(client['logger'].warn).toHaveBeenCalledWith(testError);
     });
 
-    it('skip request when told to', async () => {
+    it('skips request when told to', async () => {
       const client = new APIClient();
 
       spyOn(client.auth.api, 'postLogout');
       spyOn(client, 'disconnect').and.returnValue();
       spyOn(client['accessTokenStore'], 'delete').and.returnValue(Promise.resolve(undefined));
-      spyOn(client['logger'], 'error').and.returnValue();
+      spyOn(client['logger'], 'warn').and.returnValue();
 
       await client.logout({skipLogoutRequest: true});
-      expect(client['logger'].error).not.toHaveBeenCalled();
+      expect(client['logger'].warn).not.toHaveBeenCalled();
     });
   });
 
