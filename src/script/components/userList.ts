@@ -182,9 +182,9 @@ ko.components.register('user-list', {
     /**
      * Try to load additional members from the backend.
      * This is needed for large teams (>= 2000 members)
-     **/
+     */
     async function fetchMembersFromBackend(query: string, isHandle: boolean, ignoreMembers: User[]) {
-      const resultUsers: User[] = await searchRepository.search_by_name(query, isHandle);
+      const resultUsers = await searchRepository.search_by_name(query, isHandle);
       const selfTeamId = teamRepository.selfUser().teamId;
       const foundMembers = resultUsers.filter(user => user.teamId === selfTeamId);
       const ignoreIds = ignoreMembers.map(member => member.id);
@@ -198,7 +198,7 @@ ko.components.register('user-list', {
     // Filter all list items if a filter is provided
     const filteredUserEntities = ko.pureComputed(() => {
       const connectedUsers = conversationRepository.connectedUsers();
-      let resultUsers: User[] = userEntities();
+      let resultUsers = userEntities();
       const normalizedQuery = SearchRepository.normalizeQuery(filter());
       if (normalizedQuery) {
         const trimmedQuery = filter().trim();
@@ -215,7 +215,7 @@ ko.components.register('user-list', {
             teamRepository.isSelfConnectedTo(user.id) ||
             user.username() === normalizedQuery,
         );
-        if (!skipSearch) {
+        if (!skipSearch && this.selfInTeam) {
           fetchMembersFromBackend(trimmedQuery, isHandle, resultUsers);
         }
       } else {
