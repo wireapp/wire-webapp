@@ -34,6 +34,7 @@ import {
   fromNowLocale,
   formatLocale,
   formatDayMonth,
+  isThisYear,
 } from 'Util/TimeUtil';
 import {isArrowKey, isPageUpDownKey, isMetaKey, isPasteAction} from 'Util/KeyboardUtil';
 import {noop} from 'Util/util';
@@ -204,8 +205,9 @@ ko.bindingHandlers.relative_timestamp = (function () {
 
     const weekDay = formatLocale(date, 'EEEE');
     const dayMonth = formatDayMonth(date);
+    const year = isThisYear(date) ? '' : ` ${date.getFullYear()}`;
     const time = formatTimeShort(date);
-    return isDay ? `${weekDay}, ${dayMonth}, ${time}` : `${dayMonth}, ${time}`;
+    return isDay ? `${weekDay}, ${dayMonth}${year}, ${time}` : `${dayMonth}${year}, ${time}`;
   };
 
   // should be fine to update every minute
