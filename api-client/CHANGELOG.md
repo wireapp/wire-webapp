@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.25.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.25.4...@wireapp/api-client@11.25.5) (2020-08-18)
+
+
+### Bug Fixes
+
+* **api-client:** Display logout error as warning ([#3186](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3186)) ([93fb973](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/93fb9734747c56c51875d30cf562bee164b3ea14))
+
+
+
+
+
 ## [11.25.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.25.3...@wireapp/api-client@11.25.4) (2020-08-17)
 
 
