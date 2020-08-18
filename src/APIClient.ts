@@ -272,7 +272,7 @@ export class APIClient extends EventEmitter {
         await this.auth.api.postLogout();
       }
     } catch (error) {
-      this.logger.error(error);
+      this.logger.warn(error);
     }
 
     CookieStore.deleteCookie();
