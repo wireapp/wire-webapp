@@ -62,6 +62,10 @@
   line-height: @line-height-sm;
 }
 
+.preferences-detail-bold {
+  font-weight: @font-weight-bold;
+}
+
 .preferences-detail-emoji {
   display: flex;
   align-items: center;
@@ -99,6 +103,14 @@
 .preferences-option {
   display: flex;
   margin-bottom: 16px;
+
+  input:disabled {
+    &,
+    & + label {
+      cursor: default;
+      opacity: 0.5;
+    }
+  }
 }
 
 .preferences-option-pointer {

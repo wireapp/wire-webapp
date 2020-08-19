@@ -28,6 +28,7 @@ import {errors as ProteusErrors, keys as ProteusKeys} from '@wireapp/proteus';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import type {PreKey as BackendPreKey} from '@wireapp/api-client/dist/auth/';
+import * as HTTP_STATUS from 'http-status-codes';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {arrayToBase64, base64ToArray, zeroPadding} from 'Util/util';
@@ -36,12 +37,14 @@ import {CryptographyMapper} from './CryptographyMapper';
 import {Config} from '../Config';
 import {EventName} from '../tracking/EventName';
 import {ClientEntity} from '../client/ClientEntity';
-import {BackendClientError} from '../error/BackendClientError';
 import {CryptographyError} from '../error/CryptographyError';
 import {UserError} from '../error/UserError';
 import type {CryptographyService} from './CryptographyService';
 import type {StorageRepository, EventRecord} from '../storage';
 import {EventBuilder} from '../conversation/EventBuilder';
+import {RaygunStatic} from 'raygun4js';
+
+declare const Raygun: RaygunStatic;
 
 export interface SignalingKeys {
   enckey: string;
@@ -167,7 +170,7 @@ export class CryptographyRepository {
       .getUserPreKeyByIds(userId, clientId)
       .then(response => response.prekey)
       .catch(error => {
-        const isNotFound = error.code === BackendClientError.STATUS_CODE.NOT_FOUND;
+        const isNotFound = error.code === HTTP_STATUS.NOT_FOUND;
         if (isNotFound) {
           throw new UserError(UserError.TYPE.PRE_KEY_NOT_FOUND, UserError.MESSAGE.PRE_KEY_NOT_FOUND);
         }
@@ -184,7 +187,7 @@ export class CryptographyRepository {
    */
   getUsersPreKeys(recipients: UserClients): Promise<UserPreKeyBundleMap> {
     return this.cryptographyService.getUsersPreKeys(recipients).catch(error => {
-      const isNotFound = error.code === BackendClientError.STATUS_CODE.NOT_FOUND;
+      const isNotFound = error.code === HTTP_STATUS.NOT_FOUND;
       if (isNotFound) {
         throw new UserError(UserError.TYPE.PRE_KEY_NOT_FOUND, UserError.MESSAGE.PRE_KEY_NOT_FOUND);
       }
@@ -328,7 +331,7 @@ export class CryptographyRepository {
   ): Promise<CryptoboxSession | void> {
     try {
       if (!preKey) {
-        window.Raygun.send(new Error('Failed to create session: No pre-key found'));
+        Raygun.send(new Error('Failed to create session: No pre-key found'));
         this.logger.warn(`No pre-key for user '${userId}' ('${clientId}') found. The client might have been deleted.`);
       } else {
         this.logger.log(`Initializing session with user '${userId}' (${clientId}) with pre-key ID '${preKey.id}'.`);
@@ -337,7 +340,7 @@ export class CryptographyRepository {
         return this.cryptobox.session_from_prekey(sessionId, preKeyArray.buffer);
       }
     } catch (error) {
-      window.Raygun.send(new Error(`Failed to create session: ${error.message}`));
+      Raygun.send(new Error(`Failed to create session: ${error.message}`));
       const message = `Pre-key for user '${userId}' ('${clientId}') invalid. Skipping encryption: ${error.message}`;
       this.logger.warn(message, error);
     }
@@ -544,6 +547,6 @@ export class CryptographyRepository {
 
     const raygunError = new Error(`Decryption failed: ${(error as AxiosError).code || error.message}`);
     raygunError.stack = error.stack;
-    window.Raygun.send(raygunError, customData);
+    Raygun.send(raygunError, customData);
   }
 }

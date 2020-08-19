@@ -18,6 +18,7 @@
  */
 
 import type {ChangePassword, ConsentType, Self} from '@wireapp/api-client/dist/self';
+import * as HTTP_STATUS from 'http-status-codes';
 
 import {Environment} from 'Util/Environment';
 import {getLogger} from 'Util/Logger';
@@ -133,7 +134,7 @@ export class SelfAction {
         dispatch(SelfActionCreator.successfulSetPasswordState({hasPassword: true}));
         return true;
       } catch (error) {
-        if (error.response?.status === 404) {
+        if (error.response?.status === HTTP_STATUS.NOT_FOUND) {
           dispatch(SelfActionCreator.successfulSetPasswordState({hasPassword: false}));
           return false;
         }

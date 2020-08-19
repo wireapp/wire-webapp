@@ -1,0 +1,23 @@
+'type: refactoring 🛠':
+  title: '^refactor(\(.+\))?:.*'
+'type: bug / fix 🐞':
+  title: '^(run)?fix(\(.+\))?:.*'
+'type: chore 🧹':
+  title: '^chore(\(.+\))?:.*'
+'type: documentation 📋':
+  title: '^docs(\(.+\))?:.*'
+'type: feature / request ✨':
+  title: '^feat(\(.+\))?:.*'
+'type: test 👷':
+  title: '^test(\(.+\))?:.*'
+
+'comp: calling':
+  files:
+    - 'src/script/calling/.*'
+'comp: preferences':
+  files:
+    - 'src/script/properties/.*'
+'comp: infrastructure':
+  files:
+    - '.elasticbeanstalk'
+    - '.github/.*'

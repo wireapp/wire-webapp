@@ -1,0 +1,14 @@
+name: Label PR
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  label:
+    name: Label PR based on title
+    runs-on: ubuntu-latest
+    steps:
+      - uses: srvaroa/labeler@v0.3
+        env:
+          GITHUB_TOKEN: ${{secrets.GH_TOKEN}}

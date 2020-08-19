@@ -18,6 +18,7 @@
  */
 
 import {container} from 'tsyringe';
+import * as HTTP_STATUS from 'http-status-codes';
 
 import {GiphyRepository} from 'src/script/extension/GiphyRepository';
 import {GiphyService} from 'src/script/extension/GiphyService';
@@ -41,7 +42,7 @@ describe('Giphy Repository', () => {
 
     const randomFooGif = `${Config.getConfig().BACKEND_REST}/proxy/giphy/v1/gifs/random?tag=foo`;
     server.respondWith('GET', randomFooGif, [
-      200,
+      HTTP_STATUS.OK,
       {'Content-Type': 'application/json'},
       JSON.stringify({
         data: {
@@ -69,13 +70,13 @@ describe('Giphy Repository', () => {
           type: 'gif',
           url: 'http://giphy.com/gifs/big-thank-indulging-GKLmFicoabZrW',
         },
-        meta: {msg: 'OK', status: 200},
+        meta: {msg: 'OK', status: HTTP_STATUS.OK},
       }),
     ]);
 
     const randomFooGifData = `${Config.getConfig().BACKEND_REST}/proxy/giphy/v1/gifs/GKLmFicoabZrW`;
     server.respondWith('GET', randomFooGifData, [
-      200,
+      HTTP_STATUS.OK,
       {'Content-Type': 'application/json'},
       JSON.stringify({
         data: {
@@ -204,7 +205,7 @@ describe('Giphy Repository', () => {
           url: 'https://giphy.com/gifs/big-thank-indulging-GKLmFicoabZrW',
           username: '',
         },
-        meta: {msg: 'OK', status: 200},
+        meta: {msg: 'OK', status: HTTP_STATUS.OK},
       }),
     ]);
     server.autoRespond = true;

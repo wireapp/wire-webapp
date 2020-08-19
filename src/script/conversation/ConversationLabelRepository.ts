@@ -19,6 +19,7 @@
 
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {USER_EVENT} from '@wireapp/api-client/dist/event';
 import ko from 'knockout';
 
 import {t} from 'Util/LocalizerUtil';
@@ -26,7 +27,6 @@ import {Logger, getLogger} from 'Util/Logger';
 import {createRandomUuid} from 'Util/util';
 
 import type {Conversation} from '../entity/Conversation';
-import {BackendEvent} from '../event/Backend';
 import type {PropertiesService} from '../properties/PropertiesService';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 
@@ -143,7 +143,7 @@ export class ConversationLabelRepository {
   };
 
   onUserEvent = (event: any) => {
-    if (event.type === BackendEvent.USER.PROPERTIES_SET && event.key === propertiesKey) {
+    if (event.type === USER_EVENT.PROPERTIES_SET && event.key === propertiesKey) {
       this.unmarshal(event.value);
     }
   };

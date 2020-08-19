@@ -19,6 +19,7 @@
 
 import ko from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
 
 import {t} from 'Util/LocalizerUtil';
 
@@ -27,23 +28,27 @@ import {Config} from '../Config';
 import 'Components/loadingBar';
 
 export class LoadingViewModel {
+  loadingMessage: ko.Observable<string>;
+  loadingProgress: ko.Observable<number>;
+  element: HTMLElement;
+
   constructor() {
     this.loadingMessage = ko.observable('');
     this.loadingProgress = ko.observable(0);
-    amplify.subscribe(WebAppEvents.APP.UPDATE_PROGRESS, this.updateProgress.bind(this));
+    amplify.subscribe(WebAppEvents.APP.UPDATE_PROGRESS, this.updateProgress);
 
     const elementId = 'loading-screen';
     this.element = document.getElementById(elementId);
     ko.applyBindings(this, this.element);
   }
 
-  removeFromView() {
+  removeFromView = () => {
     ko.cleanNode(this.element);
     this.element.remove();
     amplify.unsubscribeAll(WebAppEvents.APP.UPDATE_PROGRESS);
-  }
+  };
 
-  updateProgress(progress = 0, message, replaceContent) {
+  updateProgress = (progress = 0, message: string, replaceContent: {handled: number; total: number}) => {
     const hasProgressIncreased = progress > this.loadingProgress();
     progress = hasProgressIncreased ? progress : this.loadingProgress() + 0.01;
     this.loadingProgress(progress);
@@ -60,8 +65,8 @@ export class LoadingViewModel {
           }
 
           const substitutes = {
-            number1: replaceContent.handled,
-            number2: replaceContent.total,
+            number1: replaceContent.handled.toString(),
+            number2: replaceContent.total.toString(),
           };
 
           const handlingProgress = t('initProgress', substitutes);
@@ -75,5 +80,5 @@ export class LoadingViewModel {
 
       this.loadingMessage(updatedLoadingMessage);
     }
-  }
+  };
 }

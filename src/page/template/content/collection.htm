@@ -49,7 +49,7 @@
           <!-- ko if: audio().length -->
             <section class="collection-section" data-bind="attr: {'data-uie-collection-size': audio().length}" data-uie-name="collection-section-audio">
               <header>
-                <span class="collection-header-icon icon-microphone"></span>
+                <mic-on-icon class="collection-header-icon"></mic-on-icon>
                 <span class="label-bold-xs" data-bind="text: t('collectionSectionAudio')"></span>
                 <!-- ko if: audio().length > 4 -->
                   <span class="collection-header-all accent-text" data-bind="click: function() { clickOnSection('audio', audio()) }"><span data-bind="html: t('collectionShowAll', audio().length)" data-uie-name="collection-show-all"></span>&nbsp;<span class="icon-forward font-size-xxs"></span></span>

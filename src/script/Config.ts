@@ -42,7 +42,8 @@ export class Configuration {
   readonly ENVIRONMENT = env.ENVIRONMENT || 'production';
   readonly FEATURE = env.FEATURE;
   readonly MAX_GROUP_PARTICIPANTS = env.MAX_GROUP_PARTICIPANTS || 500;
-  readonly MAX_VIDEO_PARTICIPANTS = env.MAX_VIDEO_PARTICIPANTS || 4;
+  readonly MAX_SFT_VIDEO_PARTICIPANTS = env.MAX_VIDEO_PARTICIPANTS || 4;
+  readonly MAX_VIDEO_PARTICIPANTS = Math.min(4, this.MAX_SFT_VIDEO_PARTICIPANTS);
   readonly NEW_PASSWORD_MINIMUM_LENGTH = env.NEW_PASSWORD_MINIMUM_LENGTH || ValidationUtil.DEFAULT_PASSWORD_MIN_LENGTH;
   readonly URL = env.URL || {
     ACCOUNT_BASE: 'https://account.wire.com',
@@ -65,6 +66,7 @@ export class Configuration {
     TERMS_OF_USE_PERSONAL: 'https://wire-website-staging.zinfra.io/legal/terms/personal',
     TERMS_OF_USE_TEAMS: 'https://wire-website-staging.zinfra.io/legal/terms/teams',
     WEBSITE_BASE: 'https://wire.com',
+    WHATS_NEW: 'https://medium.com/wire-news/webapp-updates/home',
   };
   readonly VERSION = env.VERSION || '0.0.0';
   readonly WEBSITE_LABEL = env.WEBSITE_LABEL;

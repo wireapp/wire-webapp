@@ -18,7 +18,15 @@
       <!-- ko if: stateIsParticipants() -->
         <div class="group-creation__list" data-bind="fadingscrollbar">
           <!-- ko if: contacts().length -->
-            <user-list class="group-creation-modal-participants-list user-list-light" params="user: contacts, filter: participantsInput, selected: selectedContacts, searchRepository: searchRepository, teamRepository: teamRepository, conversationRepository: conversationRepository, noUnderline: true"></user-list>
+            <user-list class="group-creation-modal-participants-list user-list-light" params="
+              user: contacts,
+              filter: participantsInput,
+              selected: selectedContacts,
+              searchRepository: searchRepository,
+              teamRepository: teamRepository,
+              conversationRepository: conversationRepository,
+              noUnderline: true
+            "></user-list>
           <!-- /ko -->
         </div>
       <!-- /ko -->

@@ -18,18 +18,19 @@
  */
 
 import {STATE as CALL_STATE} from '@wireapp/avs';
-import {instantiateComponent} from '../../../helper/knockoutHelpers';
+import {createRandomUuid} from 'Util/util';
 
+import {instantiateComponent} from '../../../helper/knockoutHelpers';
 import {Call} from 'src/script/calling/Call';
 import {Participant} from 'src/script/calling/Participant';
 import {Conversation} from 'src/script/entity/Conversation';
 import 'src/script/components/list/conversationListCallingCell';
 import {User} from 'src/script/entity/User';
 
-function createCall(state) {
-  const call = new Call();
+function createCall(state, selfUser = new User(createRandomUuid())) {
+  const selfParticipant = new Participant(selfUser);
+  const call = new Call('', '', undefined, selfParticipant);
   call.state(state);
-  call.selfParticipant = new Participant('selfId');
   return call;
 }
 
@@ -85,11 +86,14 @@ describe('conversationListCallingCell', () => {
   it('displays the running time of an ongoing call', () => {
     const conversation = new Conversation();
     spyOn(conversation, 'supportsVideoCall').and.returnValue(true);
-    const selfUserEntity = new User('selfId');
+    const selfUserEntity = new User(createRandomUuid());
     selfUserEntity.isMe = true;
     conversation.selfUser(selfUserEntity);
-    const call = createCall(CALL_STATE.MEDIA_ESTAB);
-    const params = {...defaultParams, call, conversation: () => conversation};
+    const call = createCall(CALL_STATE.MEDIA_ESTAB, selfUserEntity);
+    const mockedTeamRepository = {
+      isExternal: () => false,
+    };
+    const params = {...defaultParams, call, conversation: () => conversation, teamRepository: mockedTeamRepository};
     return instantiateComponent('conversation-list-calling-cell', params).then(domContainer => {
       call.startedAt(Date.now());
       const callDurationElement = domContainer.querySelector('[data-uie-name=call-duration]');

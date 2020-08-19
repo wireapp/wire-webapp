@@ -17,6 +17,8 @@
  *
  */
 
+import * as HTTP_STATUS from 'http-status-codes';
+
 import {actionRoot} from '.';
 import {mockStoreFactory} from '../../util/test/mockStoreFactory';
 import {ClientActionCreator} from '../action/creator/';
@@ -44,7 +46,7 @@ describe('ClientAction', () => {
 
   it('handles failed fetch of all self clients', async () => {
     const backendError = new Error() as any;
-    backendError.code = 403;
+    backendError.code = HTTP_STATUS.FORBIDDEN;
     backendError.label = 'invalid-credentials';
     backendError.message = 'Authentication failed.';
     const mockedActions = {};
@@ -99,7 +101,7 @@ describe('ClientAction', () => {
     const clientId = 'clientId';
     const password = 'password';
     const backendError = new Error() as any;
-    backendError.code = 403;
+    backendError.code = HTTP_STATUS.FORBIDDEN;
     backendError.label = 'invalid-credentials';
     backendError.message = 'Authentication failed.';
     const mockedActions = {};

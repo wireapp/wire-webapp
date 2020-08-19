@@ -29,9 +29,11 @@ import {ServiceEntity} from '../../integration/ServiceEntity';
 import {viewportObserver} from '../../ui/viewportObserver';
 
 import 'Components/availabilityState';
+import {Participant} from '../../calling/Participant';
 
 interface ParticipantItemParams {
   badge: boolean;
+  callParticipant?: Participant;
   canSelect: boolean;
   customInfo: string;
   external: boolean;
@@ -41,13 +43,13 @@ interface ParticipantItemParams {
   mode: UserlistMode;
   participant: User | ServiceEntity;
   selfInTeam: boolean;
-  showCamera: boolean;
 }
 
 class ParticipantItem {
   avatarSize: string;
   badge: boolean;
   canSelect: boolean;
+  callParticipant?: Participant;
   contentInfo: string | ko.Observable<string>;
   external: boolean;
   hasUsernameInfo: boolean;
@@ -62,7 +64,6 @@ class ParticipantItem {
   participant: User | ServiceEntity;
   selfInTeam: boolean;
   selfString: string;
-  showCamera: boolean;
 
   constructor(
     {
@@ -71,7 +72,7 @@ class ParticipantItem {
       mode = UserlistMode.DEFAULT,
       canSelect,
       isSelected,
-      showCamera,
+      callParticipant,
       customInfo,
       hideInfo,
       selfInTeam,
@@ -95,7 +96,8 @@ class ParticipantItem {
 
     this.canSelect = canSelect;
     this.isSelected = isSelected;
-    this.showCamera = showCamera;
+    this.callParticipant = ko.unwrap(callParticipant);
+
     this.external = external;
     const hasCustomInfo = !!customInfo;
 
@@ -161,21 +163,35 @@ ko.components.register('participant-item', {
             <!-- /ko -->
           </div>
         </div>
+        
+        <!-- ko if: callParticipant -->
+          <!-- ko if: callParticipant.sharesCamera() -->
+            <camera-icon data-uie-name="status-video"></camera-icon>
+          <!-- /ko -->
 
-        <!-- ko if: isUser && isSelfVerified() && participant.is_verified() -->
-          <verified-icon data-uie-name="status-verified"></verified-icon>
+          <!-- ko if: callParticipant.sharesScreen() -->
+            <screenshare-icon data-uie-name="status-screenshare"></screenshare-icon>
+          <!-- /ko -->
+
+          <!-- ko ifnot: callParticipant.isMuted() -->
+            <mic-on-icon data-uie-name="status-audio-on"></mic-on-icon>
+          <!-- /ko -->
+
+          <!-- ko if: callParticipant.isMuted() -->
+            <mic-off-icon data-uie-name="status-audio-off"></mic-off-icon>
+          <!-- /ko -->
         <!-- /ko -->
 
         <!-- ko if: isUser && !isOthersMode && participant.isGuest() -->
-          <guest-icon class="participant-item-guest-indicator" data-uie-name="status-guest"></guest-icon>
+          <guest-icon data-uie-name="status-guest"></guest-icon>
         <!-- /ko -->
 
         <!-- ko if: external -->
           <partner-icon data-uie-name="status-external"></partner-icon>
         <!-- /ko -->
 
-        <!-- ko if: showCamera -->
-          <camera-icon data-uie-name="status-video"></camera-icon>
+        <!-- ko if: isUser && isSelfVerified() && participant.is_verified() -->
+          <verified-icon data-uie-name="status-verified"></verified-icon>
         <!-- /ko -->
 
         <!-- ko if: canSelect -->

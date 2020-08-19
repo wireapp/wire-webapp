@@ -12,7 +12,7 @@
         <!-- /ko -->
         <div class="preferences-option" data-bind="css: {'preferences-av-select-disabled': hasNoneOrOneAudioInput() || isRequestingAudio()}">
           <div class="preferences-option-icon preferences-av-select-icon">
-            <div class="icon-microphone"></div>
+            <mic-on-icon></mic-on-icon>
           </div>
           <div class="input-select">
             <select class="preferences-av-select" name="select"
@@ -110,5 +110,41 @@
       </section>
     <!-- /ko -->
 
+    <section class="preferences-section">
+      <header class="preferences-header" data-bind="text: t('preferencesOptionsCall')"></header>
+      <div class="preferences-option">
+        <div class="preferences-option-icon checkbox accent-text" data-bind="attr: {'data-uie-value': optionVbrEncoding}" data-uie-name="status-preference-vbr-encoding">
+          <input type="checkbox" id="vbr-encoding-checkbox" data-bind="checked: optionVbrEncoding">
+          <label class="preferences-options-checkbox-label" for="vbr-encoding-checkbox" data-bind="text: t('preferencesOptionsEnableVbrCheckbox')"></label>
+        </div>
+      </div>
+      <div class="preferences-detail" data-bind="text: t('preferencesOptionsEnableVbrDetails')"></div>
+    </section>
+
+    <!-- ko if: callingRepository.supportsCalling -->
+      <section class="preferences-section">
+        <header class="preferences-header" data-bind="text: t('preferencesOptionsCallLogs')"></header>
+        <div class="preferences-option">
+          <div class="preferences-link accent-text" data-bind="click: saveCallLogs, text: t('preferencesOptionsCallLogsGet')" data-uie-name="get-call-logs"></div>
+        </div>
+        <div class="preferences-detail" data-bind="text: t('preferencesOptionsCallLogsDetail', brandName)"></div>
+      </section>
+    <!-- /ko -->
+
+    <section class="preferences-section">
+      <header class="preferences-header" data-bind="text: t('preferencesOptionsEnableBetaProgramConferenceCalls')"></header>
+      <div class="preferences-option">
+        <div class="preferences-option-icon checkbox accent-text" data-bind="attr: {'data-uie-value': optionSftCalling}" data-uie-name="status-preference-beta-program">
+          <input type="checkbox" id="beta-program-checkbox" data-bind="checked: optionSftCalling, enable: supportsConferenceCalling">
+          <label class="preferences-options-checkbox-label" for="beta-program-checkbox" data-bind="text: t('preferencesOptionsEnableBetaProgramCheckbox')"></label>
+        </div>
+      </div>
+      <div class="preferences-detail">
+        <span data-bind="text: t('preferencesOptionsEnableBetaProgramDetails')"></span>
+        <!-- ko ifnot: supportsConferenceCalling -->
+          <span class="preferences-detail-bold" data-bind="text: t('preferencesOptionsEnableBetaProgramDetailsDisabled')"></span>
+        <!-- /ko -->  
+      </div>
+    </section>
   </div>
 </div>

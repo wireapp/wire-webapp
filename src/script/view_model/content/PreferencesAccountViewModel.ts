@@ -22,13 +22,15 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {WebappProperties} from '@wireapp/api-client/dist/user/data';
+import type {RichInfoField} from '@wireapp/api-client/dist/user/RichInfo';
+import {ChangeEvent} from 'react';
+import * as HTTP_STATUS from 'http-status-codes';
+
 import {t} from 'Util/LocalizerUtil';
 import {isTemporaryClientAndNonPersistent, validateProfileImageResolution} from 'Util/util';
 import {Environment} from 'Util/Environment';
 import {isKey, KEY} from 'Util/KeyboardUtil';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
-import type {RichInfoField} from '@wireapp/api-client/dist/user/RichInfo';
-import {ChangeEvent} from 'react';
 
 import {PreferenceNotificationRepository, Notification} from '../../notification/PreferenceNotificationRepository';
 import {getAccountPagesUrl, getCreateTeamUrl, getManageTeamUrl, URL_PATH} from '../../externalRoute';
@@ -266,7 +268,7 @@ export class PreferencesAccountViewModel {
       });
     } catch (error) {
       this.logger.warn('Failed to send reset email request', error);
-      if (error.code === 400) {
+      if (error.code === HTTP_STATUS.BAD_REQUEST) {
         amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
           text: {
             message: t('modalPreferencesAccountEmailInvalidMessage'),
@@ -274,7 +276,7 @@ export class PreferencesAccountViewModel {
           },
         });
       }
-      if (error.code === 409) {
+      if (error.code === HTTP_STATUS.CONFLICT) {
         amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
           text: {
             message: t('modalPreferencesAccountEmailTakenMessage'),

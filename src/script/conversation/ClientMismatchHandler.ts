@@ -59,7 +59,7 @@ export class ClientMismatchHandler {
   async onClientMismatch(
     eventInfoEntity: EventInfoEntity,
     clientMismatch: ClientMismatch,
-    payload: NewOTRMessage,
+    payload?: NewOTRMessage,
   ): Promise<NewOTRMessage> {
     const {deleted, missing, redundant} = clientMismatch;
     // Note: Broadcast messages have an empty conversation ID
@@ -67,9 +67,9 @@ export class ClientMismatchHandler {
       eventInfoEntity.conversationId !== ''
         ? await this.conversationRepository.get_conversation_by_id(eventInfoEntity.conversationId)
         : undefined;
-    await this.handleRedundant(redundant, payload, conversationEntity);
-    await this.handleDeleted(deleted, payload, conversationEntity);
-    return this.handleMissing(missing, payload, conversationEntity, eventInfoEntity);
+    await this.handleRedundant(redundant, conversationEntity, payload);
+    await this.handleDeleted(deleted, conversationEntity, payload);
+    return this.handleMissing(missing, eventInfoEntity, conversationEntity, payload);
   }
 
   /**
@@ -83,18 +83,22 @@ export class ClientMismatchHandler {
    */
   private async handleDeleted(
     recipients: UserClients,
-    payload: NewOTRMessage,
     conversationEntity?: Conversation,
+    payload?: NewOTRMessage,
   ): Promise<void> {
     if (Object.entries(recipients).length === 0) {
       return;
     }
     this.logger.debug(`Message contains deleted clients of '${Object.keys(recipients).length}' users`, recipients);
     const removeDeletedClient = async (userId: string, clientId: string): Promise<void> => {
-      delete payload.recipients[userId][clientId];
+      if (payload?.recipients?.[userId]) {
+        delete payload.recipients[userId][clientId];
+      }
       await this.userRepository.removeClientFromUser(userId, clientId);
     };
-    await this.removePayload(recipients, removeDeletedClient, payload, conversationEntity);
+    if (payload) {
+      await this.removePayload(recipients, removeDeletedClient, conversationEntity, payload);
+    }
   }
 
   /**
@@ -108,9 +112,9 @@ export class ClientMismatchHandler {
    */
   private async handleMissing(
     recipients: UserClients,
-    payload: NewOTRMessage,
-    conversationEntity: Conversation = undefined,
     eventInfoEntity: EventInfoEntity,
+    conversationEntity?: Conversation,
+    payload?: NewOTRMessage,
   ): Promise<NewOTRMessage> {
     const missingUserIds = Object.keys(recipients);
 
@@ -131,8 +135,6 @@ export class ClientMismatchHandler {
       }
     }
 
-    const newPayload = await this.cryptographyRepository.encryptGenericMessage(recipients, genericMessage, payload);
-
     await Promise.all(
       missingUserIds.map(userId => {
         return this.userRepository.getClientsByUserId(userId, false).then(clients => {
@@ -143,7 +145,10 @@ export class ClientMismatchHandler {
 
     this.conversationRepository.verificationStateHandler.onClientsAdded(missingUserIds);
 
-    return newPayload;
+    if (payload) {
+      return this.cryptographyRepository.encryptGenericMessage(recipients, genericMessage, payload);
+    }
+    return undefined;
   }
 
   /**
@@ -159,17 +164,19 @@ export class ClientMismatchHandler {
    */
   private async handleRedundant(
     recipients: UserClients,
-    payload: NewOTRMessage,
     conversationEntity?: Conversation,
+    payload?: NewOTRMessage,
   ): Promise<void> {
     if (Object.entries(recipients).length === 0) {
       return;
     }
     this.logger.debug(`Message contains redundant clients of '${Object.keys(recipients).length}' users`, recipients);
-    const removeRedundantClient = (userId: string, clientId: string) => {
-      delete payload.recipients[userId][clientId];
-    };
-    await this.removePayload(recipients, removeRedundantClient, payload, conversationEntity);
+    if (payload?.recipients) {
+      const removeRedundantClient = (userId: string, clientId: string) => {
+        delete payload.recipients[userId][clientId];
+      };
+      await this.removePayload(recipients, removeRedundantClient, conversationEntity, payload);
+    }
   }
 
   /**
@@ -183,8 +190,8 @@ export class ClientMismatchHandler {
   async removePayload(
     recipients: UserClients,
     clientFn: (userId: string, clientId: string) => void | Promise<void>,
-    payload: NewOTRMessage,
     conversationEntity?: Conversation,
+    payload?: NewOTRMessage,
   ): Promise<void> {
     const removeDeletedUser = async (userId: string): Promise<void> => {
       const clientIdsOfUser = Object.keys(payload.recipients[userId]);

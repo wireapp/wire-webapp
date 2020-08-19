@@ -35,6 +35,7 @@ import {
   Text,
 } from '@wireapp/protocol-messaging';
 import {isObject} from 'underscore';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
 import {ReactionType} from '@wireapp/core/dist/conversation';
 
 import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
@@ -42,7 +43,6 @@ import {CryptographyMapper} from 'src/script/cryptography/CryptographyMapper';
 import {arrayToBase64, createRandomUuid} from 'Util/util';
 import {encryptAesAsset} from 'src/script/assets/AssetCrypto';
 import {ClientEvent} from 'src/script/event/Client';
-import {BackendEvent} from 'src/script/event/Backend';
 import {PROTO_MESSAGE_TYPE} from 'src/script/cryptography/ProtoMessageType';
 import {CryptographyError} from 'src/script/error/CryptographyError';
 
@@ -276,7 +276,7 @@ describe('CryptographyMapper', () => {
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
         expect(isObject(event_json)).toBeTruthy();
-        expect(event_json.type).toBe(BackendEvent.CONVERSATION.MEMBER_UPDATE);
+        expect(event_json.type).toBe(CONVERSATION_EVENT.MEMBER_UPDATE);
         expect(event_json.conversation).toBe(event.conversation);
         expect(event_json.from).toBe(event.from);
         expect(event_json.time).toBe(event.time);
@@ -532,7 +532,7 @@ describe('CryptographyMapper', () => {
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
         expect(isObject(event_json)).toBeTruthy();
-        expect(event_json.type).toBe(BackendEvent.CONVERSATION.MEMBER_UPDATE);
+        expect(event_json.type).toBe(CONVERSATION_EVENT.MEMBER_UPDATE);
         expect(event_json.conversation).toBe(event.conversation);
         expect(event_json.from).toBe(event.from);
         expect(event_json.time).toBe(event.time);

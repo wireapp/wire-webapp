@@ -30,6 +30,7 @@ import type {CallingRepository} from '../../calling/CallingRepository';
 import type {UserRepository} from '../../user/UserRepository';
 import type {CallingViewModel} from '../CallingViewModel';
 import type {User} from '../../entity/User';
+import type {TeamRepository} from 'src/script/team/TeamRepository';
 
 class TemporaryGuestViewModel {
   readonly multitasking: {
@@ -45,6 +46,7 @@ class TemporaryGuestViewModel {
     mainViewModel: MainViewModel,
     private readonly userRepository: UserRepository,
     readonly callingRepository: CallingRepository,
+    readonly teamRepository: TeamRepository,
   ) {
     this.multitasking = mainViewModel.multitasking;
     this.callingViewModel = mainViewModel.calling;

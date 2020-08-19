@@ -204,11 +204,9 @@ export class MessageListViewModel {
       true,
     );
 
-    if (messageEntity) {
-      this.conversationRepository.getMessagesWithOffset(_conversationEntity, messageEntity);
-    } else {
-      this.conversationRepository.getPrecedingMessages(_conversationEntity);
-    }
+    return messageEntity
+      ? this.conversationRepository.getMessagesWithOffset(_conversationEntity, messageEntity)
+      : this.conversationRepository.getPrecedingMessages(_conversationEntity);
   };
 
   private readonly isLastReceivedMessage = (messageEntity: Message, conversationEntity: Conversation): boolean => {
@@ -382,25 +380,29 @@ export class MessageListViewModel {
     this.mainViewModel.panel.togglePanel(panelId, params);
   };
 
-  on_session_reset_click = async (message_et: DecryptErrorMessage): Promise<void> => {
-    const reset_progress = () =>
+  onSessionResetClick = async (messageEntity: DecryptErrorMessage): Promise<void> => {
+    const resetProgress = () =>
       window.setTimeout(() => {
-        message_et.is_resetting_session(false);
+        messageEntity.is_resetting_session(false);
         amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.SESSION_RESET);
       }, MotionDuration.LONG);
 
-    message_et.is_resetting_session(true);
+    messageEntity.is_resetting_session(true);
     try {
-      await this.conversationRepository.reset_session(message_et.from, message_et.client_id, this.conversation().id);
-      reset_progress();
+      await this.conversationRepository.reset_session(
+        messageEntity.from,
+        messageEntity.client_id,
+        this.conversation().id,
+      );
+      resetProgress();
     } catch (error) {
       this.logger.warn('Error while trying to reset_session', error);
-      reset_progress();
+      resetProgress();
     }
   };
 
-  show_detail = async (message_et: Message, event: MouseEvent): Promise<void> => {
-    if (message_et.is_expired() || $(event.currentTarget).hasClass('image-asset--no-image')) {
+  show_detail = async (messageEntity: Message, event: MouseEvent): Promise<void> => {
+    if (messageEntity.is_expired() || $(event.currentTarget).hasClass('image-asset--no-image')) {
       return;
     }
 
@@ -408,12 +410,12 @@ export class MessageListViewModel {
       this.conversation(),
       MessageCategory.IMAGE,
     );
-    const message_ets = items.filter(
+    const messageEntities = items.filter(
       item => item.category & MessageCategory.IMAGE && !(item.category & MessageCategory.GIF),
     );
-    const [image_message_et] = message_ets.filter(item => item.id === message_et.id);
+    const [imageMessageEntity] = messageEntities.filter(item => item.id === messageEntity.id);
 
-    amplify.publish(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, image_message_et || message_et, message_ets);
+    amplify.publish(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, imageMessageEntity || messageEntity, messageEntities);
   };
 
   get_timestamp_class = (messageEntity: ContentMessage): string => {
@@ -444,32 +446,32 @@ export class MessageListViewModel {
     return '';
   };
 
-  should_hide_user_avatar = (message_et: ContentMessage): boolean => {
+  shouldHideUserAvatar = (messageEntity: ContentMessage): boolean => {
     // @todo avoid double check
-    if (this.get_timestamp_class(message_et)) {
+    if (this.get_timestamp_class(messageEntity)) {
       return false;
     }
 
-    if (message_et.is_content() && message_et.replacing_message_id) {
+    if (messageEntity.is_content() && messageEntity.replacing_message_id) {
       return false;
     }
 
-    const last_message = this.conversation().get_previous_message(message_et);
-    return last_message && last_message.is_content() && last_message.user().id === message_et.user().id;
+    const last_message = this.conversation().get_previous_message(messageEntity);
+    return last_message && last_message.is_content() && last_message.user().id === messageEntity.user().id;
   };
 
-  is_last_delivered_message = (message_et: Message): boolean => {
-    return this.conversation().getLastDeliveredMessage() === message_et;
+  isLastDeliveredMessage = (messageEntity: Message): boolean => {
+    return this.conversation().getLastDeliveredMessage() === messageEntity;
   };
 
-  click_on_cancel_request = (messageEntity: MemberMessage): void => {
+  clickOnCancelRequest = (messageEntity: MemberMessage): void => {
     const conversationEntity = this.conversationRepository.active_conversation();
     const nextConversationEntity = this.conversationRepository.get_next_conversation(conversationEntity);
     this.actionsViewModel.cancelConnectionRequest(messageEntity.otherUser(), true, nextConversationEntity);
   };
 
-  click_on_like = (message_et: Message): void => {
-    this.conversationRepository.toggle_like(this.conversation(), message_et);
+  clickOnLike = (messageEntity: Message): void => {
+    this.conversationRepository.toggle_like(this.conversation(), messageEntity);
   };
 
   clickOnInvitePeople = (): void => {

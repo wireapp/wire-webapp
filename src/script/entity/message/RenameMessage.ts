@@ -18,10 +18,10 @@
  */
 
 import ko from 'knockout';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
 
 import {t} from 'Util/LocalizerUtil';
 
-import {BackendEvent} from '../../event/Backend';
 import {SystemMessageType} from '../../message/SystemMessageType';
 import {SystemMessage} from './SystemMessage';
 
@@ -33,7 +33,7 @@ export class RenameMessage extends SystemMessage {
   constructor() {
     super();
 
-    this.type = BackendEvent.CONVERSATION.RENAME;
+    this.type = CONVERSATION_EVENT.RENAME;
     this.system_message_type = SystemMessageType.CONVERSATION_RENAME;
     this.name = '';
 

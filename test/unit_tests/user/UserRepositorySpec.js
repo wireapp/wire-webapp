@@ -18,6 +18,7 @@
  */
 
 import {Confirmation} from '@wireapp/protocol-messaging';
+import * as HTTP_STATUS from 'http-status-codes';
 
 import {ConsentValue} from 'src/script/user/ConsentValue';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
@@ -250,7 +251,7 @@ describe('UserRepository', () => {
       it('resolves with username when username is not taken', () => {
         const usernames = ['john_doe'];
         server.respondWith('POST', `${Config.getConfig().BACKEND_REST}/users/handles`, [
-          200,
+          HTTP_STATUS.OK,
           {'Content-Type': 'application/json'},
           JSON.stringify(usernames),
         ]);
@@ -263,7 +264,7 @@ describe('UserRepository', () => {
       it('rejects when username is taken', () => {
         const usernames = ['john_doe'];
         server.respondWith('POST', `${Config.getConfig().BACKEND_REST}/users/handles`, [
-          200,
+          HTTP_STATUS.OK,
           {'Content-Type': 'application/json'},
           JSON.stringify([]),
         ]);
@@ -277,7 +278,11 @@ describe('UserRepository', () => {
     describe('verify_username', () => {
       it('resolves with username when username is not taken', () => {
         const username = 'john_doe';
-        server.respondWith('HEAD', `${Config.getConfig().BACKEND_REST}/users/handles/${username}`, [404, {}, '']);
+        server.respondWith('HEAD', `${Config.getConfig().BACKEND_REST}/users/handles/${username}`, [
+          HTTP_STATUS.NOT_FOUND,
+          {},
+          '',
+        ]);
 
         return testFactory.user_repository.verifyUsername(username).then(_username => {
           expect(_username).toBe(username);
@@ -286,7 +291,11 @@ describe('UserRepository', () => {
 
       it('rejects when username is taken', done => {
         const username = 'john_doe';
-        server.respondWith('HEAD', `${Config.getConfig().BACKEND_REST}/users/handles/${username}`, [200, {}, '']);
+        server.respondWith('HEAD', `${Config.getConfig().BACKEND_REST}/users/handles/${username}`, [
+          HTTP_STATUS.OK,
+          {},
+          '',
+        ]);
 
         testFactory.user_repository
           .verifyUsername(username)

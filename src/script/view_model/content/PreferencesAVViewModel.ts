@@ -18,7 +18,17 @@
  */
 
 import ko from 'knockout';
+import {amplify} from 'amplify';
 import {getLogger, Logger} from 'Util/Logger';
+import {WebappProperties} from '@wireapp/api-client/dist/user/data';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
+import {t} from 'Util/LocalizerUtil';
+import {getCurrentDate} from 'Util/TimeUtil';
+import {downloadBlob} from 'Util/util';
+
+import {ModalsViewModel} from '../ModalsViewModel';
+import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 import {Config, Configuration} from '../../Config';
 import {MediaType} from '../../media/MediaType';
 import {MediaRepository} from '../../media/MediaRepository';
@@ -27,6 +37,8 @@ import {MediaConstraintsHandler} from '../../media/MediaConstraintsHandler';
 import {UserRepository} from '../../user/UserRepository';
 import {Call} from '../../calling/Call';
 import {DeviceIds, Devices, DeviceSupport, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
+import {CallingRepository} from '../../calling/CallingRepository';
+import {PropertiesRepository} from '../../properties/PropertiesRepository';
 
 type MediaSourceChanged = (mediaStream: MediaStream, mediaType: MediaType, call?: Call) => void;
 type WillChangeMediaSource = (mediaType: MediaType) => boolean;
@@ -60,7 +72,11 @@ export class PreferencesAVViewModel {
   replaceActiveMediaSource: MediaSourceChanged;
   stopActiveMediaSource: WillChangeMediaSource;
   streamHandler: MediaStreamHandler;
-  userRepository: UserRepository;
+  videoMediaStream: ko.PureComputed<MediaStream>;
+  willChangeMediaSource: WillChangeMediaSource;
+  optionVbrEncoding: ko.Observable<boolean>;
+  optionSftCalling: ko.Observable<boolean>;
+  supportsConferenceCalling: boolean;
 
   static get CONFIG() {
     return {
@@ -70,16 +86,22 @@ export class PreferencesAVViewModel {
         LEVEL_ADJUSTMENT: 0.075,
         SMOOTHING_TIME_CONSTANT: 0.2,
       },
+      MINIMUM_CALL_LOG_LENGTH: 16,
+      OBFUSCATION_TRUNCATE_TO: 4,
     };
   }
 
-  constructor(mediaRepository: MediaRepository, userRepository: UserRepository, callbacks: CallBacksType) {
+  constructor(
+    mediaRepository: MediaRepository,
+    private readonly userRepository: UserRepository,
+    private readonly propertiesRepository: PropertiesRepository,
+    private readonly callingRepository: CallingRepository,
+    callbacks: CallBacksType,
+  ) {
     this.stopActiveMediaSource = callbacks.stopActiveMediaSource;
     this.replaceActiveMediaSource = callbacks.replaceActiveMediaSource;
 
     this.logger = getLogger('PreferencesAVViewModel');
-
-    this.userRepository = userRepository;
 
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
 
@@ -100,6 +122,7 @@ export class PreferencesAVViewModel {
     this.hasVideoTrack = ko.observable(false);
     this.hasNoneOrOneAudioInput = ko.pureComputed(() => this.availableDevices.audioInput().length < 2);
     this.hasNoneOrOneVideoInput = ko.pureComputed(() => this.availableDevices.videoInput().length < 2);
+    this.supportsConferenceCalling = callingRepository.supportsConferenceCalling;
 
     const selfUser = this.userRepository.self;
     this.isTemporaryGuest = ko.pureComputed(() => selfUser() && selfUser().isTemporaryGuest());
@@ -111,6 +134,18 @@ export class PreferencesAVViewModel {
 
     this.brandName = this.Config.BRAND_NAME;
 
+    this.optionVbrEncoding = ko.observable(false);
+    this.optionVbrEncoding.subscribe(vbrEncoding => {
+      this.propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.ENABLE_VBR_ENCODING, vbrEncoding);
+    });
+
+    this.optionSftCalling = ko.observable(false);
+    this.optionSftCalling.subscribe(enableSftCalling => {
+      this.propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.ENABLE_SFT_CALLING, enableSftCalling);
+    });
+
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, this.updateProperties.bind(this));
+    this.updateProperties(this.propertiesRepository.properties);
     this.isRequestingAudio = ko.observable(false);
     this.isRequestingVideo = ko.observable(false);
   }
@@ -196,7 +231,7 @@ export class PreferencesAVViewModel {
     await this.initiateDevices(mediaType);
   }
 
-  private async releaseDevices(mediaType: MediaType): Promise<void> {
+  async releaseDevices(mediaType: MediaType): Promise<void> {
     if (mediaType === MediaType.AUDIO || mediaType === MediaType.AUDIO_VIDEO) {
       await this.releaseAudioMeter();
     }
@@ -297,5 +332,41 @@ export class PreferencesAVViewModel {
       this.audioSource.disconnect();
       this.audioSource = undefined;
     }
+  }
+  /*
+  private releaseMediaStream(): void {
+    if (this.mediaStream()) {
+      this.streamHandler.releaseTracksFromStream(this.mediaStream(), this.currentMediaType);
+      this.mediaStream(undefined);
+    }
+  }
+*/
+  updateProperties = ({settings}: WebappProperties): void => {
+    this.optionVbrEncoding(settings.call.enable_vbr_encoding);
+    this.optionSftCalling(this.supportsConferenceCalling && settings.call.enable_sft_calling);
+  };
+
+  saveCallLogs(): number | void {
+    const messageLog = this.callingRepository.getCallLog();
+    // Very short logs will not contain useful information
+    const logExceedsMinimumLength = messageLog.length > PreferencesAVViewModel.CONFIG.MINIMUM_CALL_LOG_LENGTH;
+    if (logExceedsMinimumLength) {
+      const callLog = [messageLog.join('\r\n')];
+      const blob = new Blob(callLog, {type: 'text/plain;charset=utf-8'});
+
+      const selfUserId = this.userRepository.self().id;
+      const truncatedId = selfUserId.substr(0, PreferencesAVViewModel.CONFIG.OBFUSCATION_TRUNCATE_TO);
+      const sanitizedBrandName = Config.getConfig().BRAND_NAME.replace(/[^A-Za-z0-9_]/g, '');
+      const filename = `${sanitizedBrandName}-${truncatedId}-Calling_${getCurrentDate()}.log`;
+
+      return downloadBlob(blob, filename);
+    }
+
+    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+      text: {
+        message: t('modalCallEmptyLogMessage'),
+        title: t('modalCallEmptyLogHeadline'),
+      },
+    });
   }
 }

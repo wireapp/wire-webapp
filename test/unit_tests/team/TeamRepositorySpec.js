@@ -17,6 +17,8 @@
  *
  */
 
+import * as HTTP_STATUS from 'http-status-codes';
+
 import {Config} from 'src/script/Config';
 import {TestFactory} from '../../helper/TestFactory';
 
@@ -63,13 +65,13 @@ describe('TeamRepository', () => {
     server.autoRespond = true;
 
     server.respondWith('GET', `${Config.getConfig().BACKEND_REST}/teams`, [
-      200,
+      HTTP_STATUS.OK,
       {'Content-Type': 'application/json'},
       JSON.stringify(teams_data),
     ]);
 
     server.respondWith('GET', `${Config.getConfig().BACKEND_REST}/teams/${team_metadata.id}/members`, [
-      200,
+      HTTP_STATUS.OK,
       {'Content-Type': 'application/json'},
       JSON.stringify(team_members),
     ]);
@@ -77,13 +79,13 @@ describe('TeamRepository', () => {
     server.respondWith(
       'POST',
       `${Config.getConfig().BACKEND_REST}/teams/${team_metadata.id}/get-members-by-ids-using-post`,
-      [200, {'Content-Type': 'application/json'}, JSON.stringify(team_members)],
+      [HTTP_STATUS.OK, {'Content-Type': 'application/json'}, JSON.stringify(team_members)],
     );
 
     server.respondWith(
       'GET',
       `${Config.getConfig().BACKEND_REST}/users?ids=${team_members.members.map(member => member.user).join(',')}`,
-      [200, {'Content-Type': 'application/json'}, ''],
+      [HTTP_STATUS.OK, {'Content-Type': 'application/json'}, ''],
     );
   });
 
