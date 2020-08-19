@@ -2048,10 +2048,10 @@
     tough-cookie "4.0.0"
     ws "7.3.1"
 
-"@wireapp/avs@6.2.27":
-  version "6.2.27"
-  resolved "https://registry.yarnpkg.com/@wireapp/avs/-/avs-6.2.27.tgz#8490aa381a638d8b912900b1f0981ac4979930a1"
-  integrity sha512-9raBm2GQ7H3+B8cx+c/wVbiH6svUv4A4Mfus7l/ENCwE8FTbiFv9zfrjVm/Y94vlcBlPoH+nICrUdT2AfwPCVg==
+"@wireapp/avs@6.2.28":
+  version "6.2.28"
+  resolved "https://registry.yarnpkg.com/@wireapp/avs/-/avs-6.2.28.tgz#8c42005b3af3f4a51011bc3d6c93add9bca5d85f"
+  integrity sha512-InSOI4g16H4mNtgkrrEdy/rvAix1GAHDOhra17r3XtZNzrsPPSNUALdqpV/rE9V3RvoAWWnjsX/Iu7jbVByDjQ==
 
 "@wireapp/cbor@4.6.11":
   version "4.6.11"
@@ -2199,10 +2199,10 @@
   dependencies:
     "@types/node" "~12"
 
-"@wireapp/webapp-events@0.5.1":
-  version "0.5.1"
-  resolved "https://registry.yarnpkg.com/@wireapp/webapp-events/-/webapp-events-0.5.1.tgz#4fb8f6ac2641b82fa3ebe5016470e86280c03b31"
-  integrity sha512-qiOrTo2duUulGPfi4UcJmp8KupY556+a0A5fX5+MnKUdkbCm4JobYsa0DQAUNBYIp5NOgxEg4M0brUPP7VLRCw==
+"@wireapp/webapp-events@0.5.3":
+  version "0.5.3"
+  resolved "https://registry.yarnpkg.com/@wireapp/webapp-events/-/webapp-events-0.5.3.tgz#bc542f2d95f408dbb0411207292c47e5402e788d"
+  integrity sha512-h/2z5leYNi5Fq+hJx8/4jeTodBFK6CMYlzcqf6HVlgToGgDr/RCfRGnU4LdBE+ldPqw0UWjfm4g6WflLttjpWg==
 
 "@wireapp/websql@0.0.17":
   version "0.0.17"
