@@ -5,16 +5,17 @@
     "typescript": "3.9.2"
   },
   "files": [
-    "dist"
+    "src",
+    "!src/**/*.ts"
   ],
   "license": "GPL-3.0",
-  "main": "dist/index.js",
+  "main": "src/index",
   "name": "@wireapp/webapp-events",
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/webapp-events",
   "scripts": {
     "build": "tsc",
     "build:node": "tsc",
-    "clean": "rimraf .nyc_output coverage dist",
+    "clean": "rimraf .nyc_output coverage src/**/*{.js,.js.map,.d.ts}",
     "dist": "yarn clean && yarn build",
     "test": "exit 0"
   },
