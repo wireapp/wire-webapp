@@ -113,8 +113,12 @@ export class ModalsViewModel {
   inputFocus: ko.Observable<boolean>;
   content: ko.Observable<Content>;
   state: ko.Observable<string>;
-  currentId: ko.Observable<any>;
-  queue: any[];
+  currentId: ko.Observable<string>;
+  queue: {
+    id: string;
+    options: ModalOptions;
+    type: string;
+  }[];
   errorMessage: ko.Observable<string>;
   actionEnabled: ko.PureComputed<boolean>;
 
