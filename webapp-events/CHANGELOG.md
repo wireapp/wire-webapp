@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/webapp-events/compare/@wireapp/webapp-events@0.5.2...@wireapp/webapp-events@0.5.3) (2020-08-19)
+
+
+### Bug Fixes
+
+* **webapp-events:** Upload TypeScript definition files to npmjs ([#3189](https://github.com/wireapp/wire-web-packages/tree/master/packages/webapp-events/issues/3189)) ([26c9e85](https://github.com/wireapp/wire-web-packages/tree/master/packages/webapp-events/commit/26c9e85e0152afea6c2816d5bdba761148a3ab1a))
+
+
+
+
+
 ## 0.5.2 (2020-08-19)
 
 **Note:** Version bump only for package @wireapp/webapp-events
