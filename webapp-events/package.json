@@ -5,8 +5,8 @@
     "typescript": "3.9.2"
   },
   "files": [
-    "src",
-    "!src/**/*.ts"
+    "src/**/*.js*",
+    "src/**/*.d.ts"
   ],
   "license": "GPL-3.0",
   "main": "src/index",
