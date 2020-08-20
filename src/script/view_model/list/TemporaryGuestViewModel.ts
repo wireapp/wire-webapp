@@ -33,7 +33,7 @@ import type {User} from '../../entity/User';
 import type {TeamRepository} from 'src/script/team/TeamRepository';
 import type {Multitasking} from '../../notification/NotificationRepository';
 
-class TemporaryGuestViewModel {
+export class TemporaryGuestViewModel {
   readonly multitasking: Multitasking;
   readonly callingViewModel: CallingViewModel;
   readonly selfUser: ko.Observable<User>;
@@ -73,5 +73,3 @@ class TemporaryGuestViewModel {
     return true;
   };
 }
-
-export {TemporaryGuestViewModel};
