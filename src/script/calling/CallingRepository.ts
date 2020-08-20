@@ -652,7 +652,7 @@ export class CallingRepository {
       this.screenMediaStream = mediaStream;
       this.wCall.setVideoSendState(this.wUser, call.conversationId, VIDEO_STATE.SCREENSHARE);
     } catch (error) {
-      this.logger.info('BARDIA3 Failed to get screen sharing stream', error);
+      this.logger.info('Failed to get screen sharing stream', error);
     }
   };
 
