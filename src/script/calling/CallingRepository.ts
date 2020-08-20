@@ -649,7 +649,6 @@ export class CallingRepository {
       mediaStream.getVideoTracks()[0].onended = () => {
         this.wCall.setVideoSendState(this.wUser, call.conversationId, VIDEO_STATE.STOPPED);
       };
-      // selfParticipant.updateMediaStream(mediaStream);
       this.screenMediaStream = mediaStream;
       this.wCall.setVideoSendState(this.wUser, call.conversationId, VIDEO_STATE.SCREENSHARE);
     } catch (error) {
