@@ -18,7 +18,7 @@
  */
 
 import ko from 'knockout';
-
+import {container} from 'tsyringe';
 import 'jquery-mousewheel';
 
 import {t} from 'Util/LocalizerUtil';
@@ -34,37 +34,37 @@ import {
   fromNowLocale,
   formatLocale,
   formatDayMonth,
+  FnDate,
 } from 'Util/TimeUtil';
 import {isArrowKey, isPageUpDownKey, isMetaKey, isPasteAction} from 'Util/KeyboardUtil';
 import {noop} from 'Util/util';
 
 import {viewportObserver} from '../../ui/viewportObserver';
-import {container} from 'tsyringe';
 import {AssetRepository} from '../../assets/AssetRepository';
 
 /**
  * Focus input field when user starts typing if no other input field or textarea is selected.
  */
 ko.bindingHandlers.focus_on_keydown = {
-  init(element, valueAccessor, allBindings, data, context) {
+  init(element, _valueAccessor, _allBindings, _data, context) {
     return ko.applyBindingsToNode(
-      window,
+      window as any,
       {
         event: {
-          keydown(_data, jquery_event) {
+          keydown(_data: unknown, jquery_event: JQuery.Event<HTMLElement, KeyboardEvent>) {
             if ($('.detail-view').hasClass('modal-show')) {
               return false;
             }
 
-            const keyboard_event = jquery_event.originalEvent || jquery_event;
-            // check for activeElement needed, cause in IE11 i could be undefined under some circumstances
+            const keyboard_event = (jquery_event.originalEvent || jquery_event) as KeyboardEvent;
+            // check for activeElement needed, because in IE11 it could be undefined under some circumstances
             const active_element_is_input =
               document.activeElement && ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName);
             const is_arrow_key = isArrowKey(keyboard_event);
             const is_pageupdown_key = isPageUpDownKey(keyboard_event);
 
             if (is_pageupdown_key) {
-              document.activeElement.blur();
+              (document.activeElement as HTMLElement).blur();
             } else if (!active_element_is_input && !is_arrow_key) {
               if (!isMetaKey(keyboard_event) || isPasteAction(keyboard_event)) {
                 element.focus();
@@ -85,7 +85,7 @@ ko.bindingHandlers.focus_on_keydown = {
  */
 ko.bindingHandlers.showAllTimestamps = {
   init(element) {
-    const toggleShowTimeStamp = force => {
+    const toggleShowTimeStamp = (force?: boolean) => {
       const times = document.querySelectorAll('.time');
       times.forEach(time => time.classList.toggle('show-timestamp', force));
     };
@@ -96,11 +96,14 @@ ko.bindingHandlers.showAllTimestamps = {
 };
 
 ko.bindingHandlers.infinite_scroll = {
-  init(scrollingElement, params) {
+  init(
+    scrollingElement: HTMLElement,
+    params: () => {onHitBottom: () => void; onHitTop: () => void; onInit: (element: HTMLElement) => void},
+  ) {
     const {onHitTop, onHitBottom, onInit} = params();
     onInit(scrollingElement);
 
-    const onScroll = ({target: element}) => {
+    const onScroll = ({target: element}: Event & {target: HTMLElement}) => {
       // On some HiDPI screens scrollTop returns a floating point number instead of an integer
       // https://github.com/jquery/api.jquery.com/issues/608
       const scrollPosition = Math.ceil(element.scrollTop);
@@ -115,13 +118,13 @@ ko.bindingHandlers.infinite_scroll = {
       }
     };
 
-    const onMouseWheel = ({currentTarget: element}) => {
+    const onMouseWheel = ({currentTarget: element}: {currentTarget: HTMLElement}) => {
       const isScrollable = element.scrollHeight > element.clientHeight;
       if (isScrollable) {
         // if the element is scrollable, the scroll event will take the relay
         return true;
       }
-      const isScrollingUp = event.deltaY > 0;
+      const isScrollingUp = (event as any).deltaY > 0;
       if (isScrollingUp) {
         return onHitTop();
       }
@@ -151,7 +154,7 @@ ko.bindingHandlers.background_image = {
     }
 
     const imageElement = $(element).find('img');
-    let objectUrl;
+    let objectUrl: string;
 
     const loadImage = () => {
       assetRepository
@@ -179,9 +182,9 @@ ko.bindingHandlers.background_image = {
  */
 ko.bindingHandlers.relative_timestamp = (function () {
   // timestamp that should be updated
-  const timestamps = [];
+  const timestamps: (() => void)[] = [];
 
-  const calculate_timestamp = (date, isDay) => {
+  const calculate_timestamp = (date: FnDate, isDay?: boolean) => {
     if (isYoungerThan2Minutes(date)) {
       return t('conversationJustNow');
     }
@@ -211,14 +214,14 @@ ko.bindingHandlers.relative_timestamp = (function () {
   // should be fine to update every minute
   window.setInterval(() => timestamps.map(timestamp_func => timestamp_func()), TIME_IN_MILLIS.MINUTE);
 
-  const calculate = function (element, timestamp, isDay) {
-    timestamp = window.parseInt(timestamp);
-    const date = fromUnixTime(timestamp / TIME_IN_MILLIS.SECOND);
+  const calculate = function (element: HTMLElement, timestamp: number | string, isDay?: boolean) {
+    const parsedDimestamp = window.parseInt(timestamp.toString());
+    const date = fromUnixTime(parsedDimestamp / TIME_IN_MILLIS.SECOND);
     return (element.textContent = calculate_timestamp(date, isDay));
   };
 
   return {
-    init(element, valueAccessor, allBindings) {
+    init(element: HTMLElement, valueAccessor: ko.Observable<number>, allBindings: ko.AllBindings) {
       const timestamp_func = function () {
         calculate(element, valueAccessor(), allBindings.get('relative_timestamp_day'));
       };
