@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.25.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.25.5...@wireapp/api-client@11.25.6) (2020-08-20)
+
+
+### Bug Fixes
+
+* **api-client:** Don't mix up isSynchronousRequest with tokenAsParam ([#3190](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3190)) ([22b3d5a](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/22b3d5a882e963d56fd732ddfeedd7e42a2de0d6))
+
+
+
+
+
 ## [11.25.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.25.4...@wireapp/api-client@11.25.5) (2020-08-18)
 
 
