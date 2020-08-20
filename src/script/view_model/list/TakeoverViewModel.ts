@@ -29,7 +29,7 @@ import type {ConversationRepository} from '../../conversation/ConversationReposi
 import type {ListViewModel} from '../ListViewModel';
 import type {User} from '../../entity/User';
 
-class TakeoverViewModel {
+export class TakeoverViewModel {
   readonly brandName: string;
   readonly supportUsernameUrl: string;
   readonly name: ko.PureComputed<string>;
@@ -73,5 +73,3 @@ class TakeoverViewModel {
     }
   };
 }
-
-export {TakeoverViewModel};

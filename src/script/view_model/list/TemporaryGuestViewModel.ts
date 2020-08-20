@@ -31,13 +31,10 @@ import type {UserRepository} from '../../user/UserRepository';
 import type {CallingViewModel} from '../CallingViewModel';
 import type {User} from '../../entity/User';
 import type {TeamRepository} from 'src/script/team/TeamRepository';
+import type {Multitasking} from '../../notification/NotificationRepository';
 
 class TemporaryGuestViewModel {
-  readonly multitasking: {
-    autoMinimize: ko.Observable<boolean>;
-    isMinimized: ko.Observable<boolean>;
-    resetMinimize: ko.Observable<boolean>;
-  };
+  readonly multitasking: Multitasking;
   readonly callingViewModel: CallingViewModel;
   readonly selfUser: ko.Observable<User>;
   readonly isAccountCreationEnabled: boolean;
