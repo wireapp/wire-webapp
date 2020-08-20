@@ -47,10 +47,9 @@ export class GiphyRepository {
   private currentOffset: number;
 
   static CONFIG = {
-    // 3MB
     MAX_RESULTS: 6,
-
     MAX_RETRIES: 3,
+    // 3MB
     MAX_SIZE: 3 * 1024 * 1024,
   };
 
