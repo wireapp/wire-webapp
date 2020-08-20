@@ -896,6 +896,12 @@ export class CallingRepository {
     const selfParticipant = call.getSelfParticipant();
     selfParticipant.releaseMediaStream();
     selfParticipant.videoState(VIDEO_STATE.STOPPED);
+    if (this.screenMediaStream) {
+      this.screenMediaStream.getTracks().forEach(track => {
+        track.stop();
+        this.screenMediaStream.removeTrack(track);
+      });
+    }
     call.reason(reason);
   };
 
@@ -1045,7 +1051,7 @@ export class CallingRepository {
     const isGroup = [CONV_TYPE.CONFERENCE, CONV_TYPE.GROUP].includes(call.conversationType);
     this.mediaStreamQuery = (async () => {
       try {
-        if (missingStreams.screen) {
+        if (missingStreams.screen && this.screenMediaStream) {
           return this.screenMediaStream;
         }
         const mediaStream = await this.getMediaStream(missingStreams, isGroup);
