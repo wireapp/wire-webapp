@@ -200,7 +200,7 @@ export class HttpClient extends EventEmitter {
       ...config.headers,
       'Content-Type': ContentType.APPLICATION_JSON,
     };
-    return this.sendRequest<T>(config, isSynchronousRequest);
+    return this.sendRequest<T>(config, false, isSynchronousRequest);
   }
 
   public sendXML<T>(config: AxiosRequestConfig, isSynchronousRequest: boolean = false): Promise<AxiosResponse<T>> {
@@ -208,7 +208,7 @@ export class HttpClient extends EventEmitter {
       ...config.headers,
       'Content-Type': ContentType.APPLICATION_XML,
     };
-    return this.sendRequest<T>(config, isSynchronousRequest);
+    return this.sendRequest<T>(config, false, isSynchronousRequest);
   }
 
   public sendProtocolBuffer<T>(
@@ -219,6 +219,6 @@ export class HttpClient extends EventEmitter {
       ...config.headers,
       'Content-Type': ContentType.APPLICATION_PROTOBUF,
     };
-    return this.sendRequest<T>(config, isSynchronousRequest);
+    return this.sendRequest<T>(config, false, isSynchronousRequest);
   }
 }
