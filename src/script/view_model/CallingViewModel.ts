@@ -208,7 +208,7 @@ export class CallingViewModel {
       toggleMute: (call: Call, muteState: boolean) => {
         this.callingRepository.muteCall(call.conversationId, muteState);
       },
-      toggleScreenshare: (call: Call): Promise<void> | void => {
+      toggleScreenshare: async (call: Call): Promise<void> => {
         if (call.getSelfParticipant().sharesScreen()) {
           return this.callingRepository.toggleScreenshare(call);
         }
