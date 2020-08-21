@@ -105,7 +105,6 @@ export class CallingRepository {
   public readonly useSftCalling: ko.Observable<boolean>;
   private readonly acceptedVersionWarnings: ko.ObservableArray<string>;
   private readonly acceptVersionWarning: (conversationId: string) => void;
-  private screenMediaStream: MediaStream;
 
   static get CONFIG() {
     return {
@@ -637,24 +636,11 @@ export class CallingRepository {
   /**
    * Toggles screenshare ON and OFF for the given call (does not switch between different screens)
    */
-  toggleScreenshare = async (call: Call): Promise<void> => {
+  toggleScreenshare(call: Call): void {
     const selfParticipant = call.getSelfParticipant();
-    if (selfParticipant.sharesScreen()) {
-      return this.wCall.setVideoSendState(this.wUser, call.conversationId, VIDEO_STATE.STOPPED);
-    }
-    try {
-      const isGroup = [CONV_TYPE.CONFERENCE, CONV_TYPE.GROUP].includes(call.conversationType);
-      const mediaStream = await this.getMediaStream({audio: true, screen: true}, isGroup);
-      // https://stackoverflow.com/a/25179198/451634
-      mediaStream.getVideoTracks()[0].onended = () => {
-        this.wCall.setVideoSendState(this.wUser, call.conversationId, VIDEO_STATE.STOPPED);
-      };
-      this.screenMediaStream = mediaStream;
-      this.wCall.setVideoSendState(this.wUser, call.conversationId, VIDEO_STATE.SCREENSHARE);
-    } catch (error) {
-      this.logger.info('Failed to get screen sharing stream', error);
-    }
-  };
+    const newState = selfParticipant.sharesScreen() ? VIDEO_STATE.STOPPED : VIDEO_STATE.SCREENSHARE;
+    this.wCall.setVideoSendState(this.wUser, call.conversationId, newState);
+  }
 
   async answerCall(call: Call, callType: CALL_TYPE): Promise<void> {
     try {
@@ -896,12 +882,6 @@ export class CallingRepository {
     const selfParticipant = call.getSelfParticipant();
     selfParticipant.releaseMediaStream();
     selfParticipant.videoState(VIDEO_STATE.STOPPED);
-    if (this.screenMediaStream) {
-      this.screenMediaStream.getTracks().forEach(track => {
-        track.stop();
-        this.screenMediaStream.removeTrack(track);
-      });
-    }
     call.reason(reason);
   };
 
@@ -1051,12 +1031,15 @@ export class CallingRepository {
     const isGroup = [CONV_TYPE.CONFERENCE, CONV_TYPE.GROUP].includes(call.conversationType);
     this.mediaStreamQuery = (async () => {
       try {
-        if (missingStreams.screen && this.screenMediaStream) {
-          return this.screenMediaStream;
-        }
         const mediaStream = await this.getMediaStream(missingStreams, isGroup);
         this.mediaStreamQuery = undefined;
         const newStream = selfParticipant.updateMediaStream(mediaStream);
+        if (missingStreams.screen) {
+          // https://stackoverflow.com/a/25179198/451634
+          newStream.getVideoTracks()[0].onended = () => {
+            this.toggleScreenshare(call);
+          };
+        }
         return newStream;
       } catch (error) {
         this.mediaStreamQuery = undefined;
