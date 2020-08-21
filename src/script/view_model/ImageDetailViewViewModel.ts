@@ -20,27 +20,38 @@
 import {iterateItem} from 'Util/ArrayUtil';
 import {KEY} from 'Util/KeyboardUtil';
 import {formatLocale} from 'Util/TimeUtil';
+import ko from 'knockout';
+import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {Modal} from '../ui/Modal';
+import type {MainViewModel} from './MainViewModel';
+import type {ConversationRepository} from '../conversation/ConversationRepository';
+import type {AssetRepository} from '../assets/AssetRepository';
+import type {ActionsViewModel} from './ActionsViewModel';
+import type {Conversation} from '../entity/Conversation';
+import type {ContentMessage} from '../entity/message/ContentMessage';
+import type {MediumImage} from '../entity/message/MediumImage';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
+export class ImageDetailViewViewModel {
+  elementId: 'detail-view';
+  actionsViewModel: ActionsViewModel;
+  source: string;
+  imageModal: Modal;
+  imageSrc: ko.Observable<string>;
+  imageVisible: ko.Observable<boolean>;
+  conversationEntity: ko.Observable<Conversation>;
+  items: ko.ObservableArray<ContentMessage>;
+  messageEntity: ko.Observable<ContentMessage>;
 
-z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
-  constructor(mainViewModel, repositories) {
-    this.beforeHideCallback = this.beforeHideCallback.bind(this);
-    this.hideCallback = this.hideCallback.bind(this);
-    this.messageAdded = this.messageAdded.bind(this);
-    this.messageExpired = this.messageExpired.bind(this);
-    this.messageRemoved = this.messageRemoved.bind(this);
-
+  constructor(
+    mainViewModel: MainViewModel,
+    private readonly conversationRepository: ConversationRepository,
+    private readonly assetRepository: AssetRepository,
+  ) {
     this.elementId = 'detail-view';
-    this.mainViewModel = mainViewModel;
-    this.conversationRepository = repositories.conversation;
-    this.assetRepository = repositories.asset;
 
-    this.actionsViewModel = this.mainViewModel.actions;
+    this.actionsViewModel = mainViewModel.actions;
     this.source = undefined;
 
     this.imageModal = undefined;
@@ -62,16 +73,16 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
       }
     });
 
-    amplify.subscribe(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, this.show.bind(this));
+    amplify.subscribe(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, this.show);
 
     ko.applyBindings(this, document.getElementById(this.elementId));
   }
 
-  beforeHideCallback() {
+  beforeHideCallback = () => {
     this.imageVisible(false);
-  }
+  };
 
-  hideCallback() {
+  hideCallback = () => {
     $(document).off('keydown.lightbox');
     window.URL.revokeObjectURL(this.imageSrc());
 
@@ -83,9 +94,9 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
     amplify.unsubscribe(WebAppEvents.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageExpired);
     amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.ADDED, this.messageAdded);
     amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, this.messageRemoved);
-  }
+  };
 
-  show(messageEntity, messageEntities, source) {
+  show = (messageEntity: ContentMessage, messageEntities: ContentMessage[], source: string) => {
     this.items(messageEntities);
     this.messageEntity(messageEntity);
     this.source = source;
@@ -100,7 +111,7 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
 
     this.imageModal.show();
 
-    this._loadImage();
+    this.loadImage();
     $(document).on('keydown.lightbox', keyboardEvent => {
       switch (keyboardEvent.key) {
         case KEY.ESC: {
@@ -110,13 +121,13 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
 
         case KEY.ARROW_DOWN:
         case KEY.ARROW_RIGHT: {
-          this.clickOnShowNext(this, keyboardEvent);
+          this.clickOnShowNext(this, (keyboardEvent as unknown) as MouseEvent);
           break;
         }
 
         case KEY.ARROW_LEFT:
         case KEY.ARROW_UP: {
-          this.clickOnShowPrevious(this, keyboardEvent);
+          this.clickOnShowPrevious(this, (keyboardEvent as unknown) as MouseEvent);
           break;
         }
 
@@ -124,20 +135,20 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
           break;
       }
     });
-  }
+  };
 
-  messageAdded(messageEntity) {
-    const isCurrentConversation = this.conversationEntity().id === messageEntity.conversation;
+  messageAdded = (messageEntity: ContentMessage) => {
+    const isCurrentConversation = this.conversationEntity().id === messageEntity.conversation_id;
     if (isCurrentConversation) {
       this.items.push(messageEntity);
     }
-  }
+  };
 
-  messageExpired(messageEntity) {
+  messageExpired = (messageEntity: ContentMessage) => {
     this.messageRemoved(messageEntity.id, messageEntity.conversation_id);
-  }
+  };
 
-  messageRemoved(messageId, conversationId) {
+  messageRemoved = (messageId: string, conversationId: string) => {
     const isCurrentConversation = this.conversationEntity().id === conversationId;
     if (isCurrentConversation) {
       const isVisibleMessage = this.messageEntity().id === messageId;
@@ -147,56 +158,56 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
 
       this.items.remove(messageEntity => messageEntity.id === messageId);
     }
-  }
+  };
 
-  formatTimestamp(timestamp) {
+  formatTimestamp = (timestamp: number) => {
     return formatLocale(timestamp, 'P p');
-  }
+  };
 
-  _loadImage() {
+  private readonly loadImage = () => {
     this.imageVisible(false);
-    this.assetRepository.load(this.messageEntity().get_first_asset().resource()).then(blob => {
+    this.assetRepository.load((this.messageEntity().get_first_asset() as MediumImage).resource()).then(blob => {
       if (blob) {
         this.imageSrc(window.URL.createObjectURL(blob));
         this.imageVisible(true);
       }
     });
-  }
+  };
 
-  clickOnClose() {
+  clickOnClose = () => {
     this.imageModal.hide();
-  }
+  };
 
-  clickOnDownload() {
+  clickOnDownload = () => {
     this.messageEntity().download(this.assetRepository);
-  }
+  };
 
-  clickOnLike() {
+  clickOnLike = () => {
     this.conversationRepository.toggle_like(this.conversationEntity(), this.messageEntity());
-  }
+  };
 
-  clickOnReply() {
+  clickOnReply = () => {
     amplify.publish(WebAppEvents.CONVERSATION.SHOW, this.conversationEntity());
     amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REPLY, this.messageEntity());
     this.imageModal.hide();
-  }
+  };
 
-  clickOnShowNext(imageDetailViewViewModel, event) {
+  clickOnShowNext = (imageDetailViewViewModel: unknown, event: MouseEvent) => {
     event.stopPropagation();
-    this._iterateImage(true);
-  }
+    this.iterateImage(true);
+  };
 
-  clickOnShowPrevious(imageDetailViewViewModel, event) {
+  clickOnShowPrevious = (imageDetailViewViewModel: unknown, event: MouseEvent) => {
     event.stopPropagation();
-    this._iterateImage(false);
-  }
+    this.iterateImage(false);
+  };
 
-  _iterateImage(reverse) {
+  private readonly iterateImage = (reverse: boolean) => {
     const messageEntity = iterateItem(this.items(), this.messageEntity(), reverse);
 
     if (messageEntity) {
       this.messageEntity(messageEntity);
-      this._loadImage();
+      this.loadImage();
     }
-  }
-};
+  };
+}

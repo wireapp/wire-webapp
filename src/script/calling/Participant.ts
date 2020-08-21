@@ -19,20 +19,32 @@
 
 import {VIDEO_STATE} from '@wireapp/avs';
 import ko from 'knockout';
+import {User} from '../entity/User';
 
 export type UserId = string;
 export type ClientId = string;
 
+export enum VideoFillMode {
+  UNSET,
+  CONTAIN,
+  COVER,
+}
+
 export class Participant {
+  // Video
   public videoState: ko.Observable<number>;
   public videoStream: ko.Observable<MediaStream | undefined>;
-  public audioStream: ko.Observable<MediaStream | undefined>;
   public hasActiveVideo: ko.PureComputed<boolean>;
+  public hasPausedVideo: ko.PureComputed<boolean>;
   public sharesScreen: ko.PureComputed<boolean>;
   public sharesCamera: ko.PureComputed<boolean>;
-  public hasPausedVideo: ko.PureComputed<boolean>;
 
-  constructor(public userId: UserId, public clientId: ClientId) {
+  // Audio
+  public audioStream: ko.Observable<MediaStream | undefined>;
+  public isMuted: ko.Observable<boolean>;
+  public videoFillMode: ko.Observable<VideoFillMode>;
+
+  constructor(public user: User, public clientId: ClientId) {
     this.videoState = ko.observable(VIDEO_STATE.STOPPED);
     this.hasActiveVideo = ko.pureComputed(() => {
       return (this.sharesCamera() || this.sharesScreen()) && !!this.videoStream();
@@ -48,7 +60,11 @@ export class Participant {
     });
     this.videoStream = ko.observable();
     this.audioStream = ko.observable();
+    this.isMuted = ko.observable(false);
+    this.videoFillMode = ko.observable(VideoFillMode.UNSET);
   }
+
+  doesMatchIds = (userId: UserId, clientId: ClientId): boolean => userId === this.user.id && clientId === this.clientId;
 
   setAudioStream(audioStream: MediaStream): void {
     this.releaseStream(this.audioStream());

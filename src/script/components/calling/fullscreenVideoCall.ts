@@ -17,7 +17,7 @@
  *
  */
 
-import {CALL_TYPE} from '@wireapp/avs';
+import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
@@ -102,8 +102,8 @@ export class FullscreenVideoCalling {
     this.HIDE_CONTROLS_TIMEOUT = FullscreenVideoCalling.CONFIG.HIDE_CONTROLS_TIMEOUT;
 
     this.canShareScreen = canShareScreen;
-    this.selfSharesScreen = call.selfParticipant.sharesScreen;
-    this.selfSharesCamera = call.selfParticipant.sharesCamera;
+    this.selfSharesScreen = call.getSelfParticipant().sharesScreen;
+    this.selfSharesCamera = call.getSelfParticipant().sharesCamera;
     this.currentCameraDevice = mediaDevicesHandler.currentDeviceId.videoInput;
     this.currentScreenDevice = mediaDevicesHandler.currentDeviceId.screenInput;
 
@@ -122,7 +122,10 @@ export class FullscreenVideoCalling {
     });
 
     this.showToggleVideo = ko.pureComputed(() => {
-      return this.call.initialType === CALL_TYPE.VIDEO || conversation().supportsVideoCall();
+      return (
+        this.call.initialType === CALL_TYPE.VIDEO ||
+        conversation().supportsVideoCall(call.conversationType === CONV_TYPE.CONFERENCE)
+      );
     });
 
     this.callDuration = ko.observable();
@@ -185,7 +188,7 @@ ko.components.register('fullscreen-video-call', {
   template: `
 <div id="video-calling" data-bind="hide_controls: {timeout: HIDE_CONTROLS_TIMEOUT, skipClass: 'video-controls__button'}" class="video-calling">
   <div id="video-element-remote" class="video-element-remote">
-    <group-video-grid params="grid: videoGrid, muted: isMuted, selfUserId: call.selfParticipant.userId"></group-video-grid>
+    <group-video-grid params="grid: videoGrid, muted: isMuted, selfParticipant: call.getSelfParticipant()"></group-video-grid>
   </div>
 
   <!-- ko if: !isChoosingScreen() -->
@@ -216,7 +219,7 @@ ko.components.register('fullscreen-video-call', {
         <div class="video-controls__button"
             data-bind="click: () => callActions.toggleMute(call, !isMuted()), css: {'video-controls__button--active': isMuted()}, attr: {'data-uie-value': !isMuted() ? 'inactive' : 'active'}"
             data-uie-name="do-call-controls-video-call-mute">
-          <micoff-icon></micoff-icon>
+          <mic-off-icon></mic-off-icon>
           <div class="video-controls__button__label" data-bind="text: t('videoCallOverlayMute')"></div>
         </div>
 

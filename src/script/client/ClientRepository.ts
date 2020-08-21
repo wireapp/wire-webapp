@@ -24,10 +24,11 @@ import {
   PublicClient,
   RegisteredClient,
 } from '@wireapp/api-client/dist/client/';
-import type {UserClientAddEvent, UserClientRemoveEvent} from '@wireapp/api-client/dist/event';
+import {USER_EVENT, UserClientAddEvent, UserClientRemoveEvent} from '@wireapp/api-client/dist/event';
 import {amplify} from 'amplify';
 import platform from 'platform';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import * as HTTP_STATUS from 'http-status-codes';
 
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
@@ -38,7 +39,6 @@ import {murmurhash3} from 'Util/util';
 import type {ClientKeys} from '../cryptography/CryptographyRepository';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {Config} from '../Config';
-import {BackendEvent} from '../event/Backend';
 import {StorageKey} from '../storage/StorageKey';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 
@@ -138,7 +138,7 @@ export class ClientRepository {
   getClientByIdFromBackend(clientId: string): Promise<RegisteredClient> {
     return this.clientService.getClientById(clientId).catch(error => {
       const status = error.response?.status;
-      const clientNotFoundBackend = status === BackendClientError.STATUS_CODE.NOT_FOUND;
+      const clientNotFoundBackend = status === HTTP_STATUS.NOT_FOUND;
       if (clientNotFoundBackend) {
         this.logger.warn(`Local client '${clientId}' no longer exists on the backend`, error);
         throw new ClientError(ClientError.TYPE.NO_VALID_CLIENT, ClientError.MESSAGE.NO_VALID_CLIENT);
@@ -697,12 +697,12 @@ export class ClientRepository {
   onUserEvent(eventJson: any): void {
     const type = eventJson.type;
 
-    const isClientAdd = type === BackendEvent.USER.CLIENT_ADD;
+    const isClientAdd = type === USER_EVENT.CLIENT_ADD;
     if (isClientAdd) {
       return this.onClientAdd(eventJson);
     }
 
-    const isClientRemove = type === BackendEvent.USER.CLIENT_REMOVE;
+    const isClientRemove = type === USER_EVENT.CLIENT_REMOVE;
     if (isClientRemove) {
       this.onClientRemove(eventJson);
     }
@@ -722,8 +722,8 @@ export class ClientRepository {
    * @param JSON data of 'user.client-remove' event
    * @returns Resolves when the event has been handled
    */
-  async onClientRemove(eventJson: UserClientRemoveEvent = {} as any): Promise<void> {
-    const clientId = eventJson.client ? eventJson.client.id : undefined;
+  async onClientRemove(eventJson?: UserClientRemoveEvent): Promise<void> {
+    const clientId = eventJson?.client ? eventJson.client.id : undefined;
     if (!clientId) {
       return;
     }

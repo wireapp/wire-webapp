@@ -29,6 +29,7 @@ import {CallingViewModel} from './CallingViewModel';
 import {ActionsViewModel} from './ActionsViewModel';
 import {ListViewModel} from './ListViewModel';
 import {FaviconViewModel} from './FaviconViewModel';
+import {ImageDetailViewViewModel} from './ImageDetailViewViewModel';
 
 export class MainViewModel {
   static get CONFIG() {
@@ -80,7 +81,14 @@ export class MainViewModel {
 
     this.isPanelOpen = ko.observable(false);
 
-    this.actions = new ActionsViewModel(this, repositories);
+    this.actions = new ActionsViewModel(
+      this,
+      repositories.client,
+      repositories.connection,
+      repositories.conversation,
+      repositories.integration,
+      repositories.user,
+    );
 
     this.panel = new z.viewModel.PanelViewModel(this, repositories);
     this.calling = new CallingViewModel(
@@ -90,13 +98,14 @@ export class MainViewModel {
       repositories.media.devicesHandler,
       repositories.media.streamHandler,
       repositories.permission,
+      repositories.team,
       this.selfUser,
       this.multitasking,
     );
     this.content = new ContentViewModel(this, repositories);
     this.list = new ListViewModel(this, repositories);
 
-    this.lightbox = new z.viewModel.ImageDetailViewViewModel(this, repositories);
+    this.lightbox = new ImageDetailViewViewModel(this, repositories.conversation, repositories.asset);
     this.title = new WindowTitleViewModel(this, repositories.user, repositories.conversation);
     this.favicon = new FaviconViewModel(amplify);
     this.warnings = new WarningsViewModel();

@@ -23,12 +23,14 @@ import type {BackendError} from '@wireapp/api-client/dist/http';
 import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
 import type {User as APIClientUser} from '@wireapp/api-client/dist/user';
 import {ConsentType, Self as APIClientSelf} from '@wireapp/api-client/dist/self';
+import {USER_EVENT} from '@wireapp/api-client/dist/event';
 import {UserAsset as APIClientUserAsset, UserAssetType as APIClientUserAssetType} from '@wireapp/api-client/dist/user';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {flatten} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import type {AxiosError} from 'axios';
+import * as HTTP_STATUS from 'http-status-codes';
 
 import {chunk, partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -41,7 +43,6 @@ import {UNSPLASH_URL} from '../externalRoute';
 import {mapProfileAssetsV1} from '../assets/AssetMapper';
 import {User} from '../entity/User';
 
-import {BackendEvent} from '../event/Backend';
 import {ClientEvent} from '../event/Client';
 import {EventRepository} from '../event/EventRepository';
 import type {EventSource} from '../event/EventSource';
@@ -49,7 +50,6 @@ import type {EventSource} from '../event/EventSource';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 import {EventName} from '../tracking/EventName';
-import {SuperProperty} from '../tracking/SuperProperty';
 
 import {
   HIDE_REQUEST_MODAL,
@@ -69,7 +69,6 @@ import {ClientMapper} from '../client/ClientMapper';
 import type {ClientRepository} from '../client/ClientRepository';
 import {Config} from '../Config';
 import type {ConnectionEntity} from '../connection/ConnectionEntity';
-import {BackendClientError} from '../error/BackendClientError';
 import type {PropertiesRepository} from '../properties/PropertiesRepository';
 import type {SelfService} from '../self/SelfService';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
@@ -159,9 +158,6 @@ export class UserRepository {
       const contacts = this.isTeam() ? this.teamUsers() : this.connected_users();
       return contacts.filter(user_et => !user_et.isService).length;
     });
-    this.number_of_contacts.subscribe(number_of_contacts => {
-      amplify.publish(WebAppEvents.ANALYTICS.SUPER_PROPERTY, SuperProperty.CONTACTS, number_of_contacts);
-    });
 
     amplify.subscribe(WebAppEvents.CLIENT.ADD, this.addClientToUser.bind(this));
     amplify.subscribe(WebAppEvents.CLIENT.REMOVE, this.removeClientFromUser.bind(this));
@@ -182,20 +178,20 @@ export class UserRepository {
     this.logger.info(`»» User Event: '${type}' (Source: ${source})`, logObject);
 
     switch (type) {
-      case BackendEvent.USER.DELETE:
+      case USER_EVENT.DELETE:
         this.userDelete(eventJson);
         break;
-      case BackendEvent.USER.UPDATE:
+      case USER_EVENT.UPDATE:
         this.userUpdate(eventJson);
         break;
       case ClientEvent.USER.AVAILABILITY:
         this.onUserAvailability(eventJson);
         break;
-      case BackendEvent.USER.LEGAL_HOLD_REQUEST: {
+      case USER_EVENT.LEGAL_HOLD_REQUEST: {
         this.onLegalHoldRequest(eventJson);
         break;
       }
-      case BackendEvent.USER.LEGAL_HOLD_DISABLED: {
+      case USER_EVENT.LEGAL_HOLD_DISABLE: {
         this.onLegalHoldRequestCanceled(eventJson);
         break;
       }
@@ -204,10 +200,10 @@ export class UserRepository {
     // Note: We initially fetch the user properties in the properties repository, so we are not interested in updates to it from the notification stream.
     if (source === EventRepository.SOURCE.WEB_SOCKET) {
       switch (type) {
-        case BackendEvent.USER.PROPERTIES_DELETE:
+        case USER_EVENT.PROPERTIES_DELETE:
           this.propertyRepository.deleteProperty(eventJson.key);
           break;
-        case BackendEvent.USER.PROPERTIES_SET:
+        case USER_EVENT.PROPERTIES_SET:
           this.propertyRepository.setProperty(eventJson.key, eventJson.value);
           break;
       }
@@ -388,6 +384,7 @@ export class UserRepository {
       this.logger.log(`Availability was changed from '${oldAvailabilityValue}' to '${newAvailabilityValue}'`);
       this.self().availability(availability);
       this._trackAvailability(availability, method);
+      amplify.publish(WebAppEvents.TEAM.UPDATE_INFO);
       showAvailabilityModal(availability);
     } else {
       this.logger.log(`Availability was again set to '${newAvailabilityValue}'`);
@@ -487,8 +484,8 @@ export class UserRepository {
         .getUsers(chunkOfUserIds)
         .then(response => (response ? this.userMapper.mapUsersFromJson(response) : []))
         .catch((error: AxiosError | BackendError) => {
-          const isNotFound = (error as AxiosError).response?.status === BackendClientError.STATUS_CODE.NOT_FOUND;
-          const isBadRequest = (error as BackendError).code === BackendClientError.STATUS_CODE.BAD_REQUEST;
+          const isNotFound = (error as AxiosError).response?.status === HTTP_STATUS.NOT_FOUND;
+          const isBadRequest = (error as BackendError).code === HTTP_STATUS.BAD_REQUEST;
           if (isNotFound || isBadRequest) {
             return [];
           }
@@ -580,7 +577,7 @@ export class UserRepository {
       return user_id;
     } catch (axiosError) {
       const error = axiosError.response || axiosError;
-      if (error.status !== BackendClientError.STATUS_CODE.NOT_FOUND) {
+      if (error.status !== HTTP_STATUS.NOT_FOUND) {
         throw error;
       }
     }
@@ -740,7 +737,7 @@ export class UserRepository {
         this.self().username(valid_suggestions[0]);
       })
       .catch(error => {
-        if (error.code === BackendClientError.STATUS_CODE.NOT_FOUND) {
+        if (error.code === HTTP_STATUS.NOT_FOUND) {
           this.should_set_username = false;
         }
 
@@ -760,9 +757,7 @@ export class UserRepository {
           return this.userUpdate({user: {handle: username, id: this.self().id}});
         })
         .catch(({code: error_code}) => {
-          if (
-            [BackendClientError.STATUS_CODE.CONFLICT, BackendClientError.STATUS_CODE.BAD_REQUEST].includes(error_code)
-          ) {
+          if ([HTTP_STATUS.CONFLICT, HTTP_STATUS.BAD_REQUEST].includes(error_code)) {
             throw new UserError(UserError.TYPE.USERNAME_TAKEN, UserError.MESSAGE.USERNAME_TAKEN);
           }
           throw new UserError(UserError.TYPE.REQUEST_FAILURE, UserError.MESSAGE.REQUEST_FAILURE);
@@ -790,10 +785,10 @@ export class UserRepository {
       .checkUserHandle(username)
       .catch(error => {
         const error_code = error.response?.status;
-        if (error_code === BackendClientError.STATUS_CODE.NOT_FOUND) {
+        if (error_code === HTTP_STATUS.NOT_FOUND) {
           return username;
         }
-        if (error_code === BackendClientError.STATUS_CODE.BAD_REQUEST) {
+        if (error_code === HTTP_STATUS.BAD_REQUEST) {
           throw new UserError(UserError.TYPE.USERNAME_TAKEN, UserError.MESSAGE.USERNAME_TAKEN);
         }
         throw new UserError(UserError.TYPE.REQUEST_FAILURE, UserError.MESSAGE.REQUEST_FAILURE);

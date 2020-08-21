@@ -19,6 +19,7 @@
 
 import {LegalHoldMemberStatus} from '@wireapp/api-client/dist/team/legalhold';
 import {amplify} from 'amplify';
+import * as HTTP_STATUS from 'http-status-codes';
 
 import ko from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -33,7 +34,6 @@ import type {Conversation} from 'src/script/entity/Conversation';
 import type {User} from 'src/script/entity/User';
 import type {TeamRepository} from 'src/script/team/TeamRepository';
 import type {UserRepository} from 'src/script/user/UserRepository';
-import {BackendClientError} from '../../error/BackendClientError';
 
 export const SHOW_REQUEST_MODAL = 'LegalHold.showRequestModal';
 export const HIDE_REQUEST_MODAL = 'LegalHold.hideRequestModal';
@@ -178,11 +178,11 @@ export class LegalHoldModalViewModel {
       amplify.publish(WebAppEvents.USER.CLIENT_ADDED, selfUser.id);
     } catch ({code, message}) {
       switch (code) {
-        case BackendClientError.STATUS_CODE.BAD_REQUEST: {
+        case HTTP_STATUS.BAD_REQUEST: {
           this.requestError(t('BackendError.LABEL.BAD_REQUEST'));
           break;
         }
-        case BackendClientError.STATUS_CODE.FORBIDDEN: {
+        case HTTP_STATUS.FORBIDDEN: {
           this.requestError(t('BackendError.LABEL.ACCESS_DENIED'));
           break;
         }

@@ -24,8 +24,9 @@ import type {Account} from '@wireapp/core';
 import type {CRUDEngine} from '@wireapp/store-engine';
 import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
 import {LowDiskSpaceError} from '@wireapp/store-engine/dist/commonjs/engine/error/';
+import * as HTTP_STATUS from 'http-status-codes';
 
-import {isTemporaryClientAndNonPersistent, noop} from 'Util/util';
+import {isTemporaryClientAndNonPersistent} from 'Util/util';
 import {currentCurrency, currentLanguage} from '../../localeConfig';
 import {provideTemporaryAndNonPersistentEngine} from '../../StoreEngineProvider';
 import type {Api, RootState, ThunkAction, ThunkDispatch} from '../reducer';
@@ -36,7 +37,7 @@ import {AuthActionCreator} from './creator/';
 import {LabeledError} from './LabeledError';
 import {LocalStorageAction, LocalStorageKey} from './LocalStorageAction';
 
-type LoginLifecycleFunction = (dispatch: ThunkDispatch, getState: () => RootState, global: Api) => void;
+type LoginLifecycleFunction = (dispatch: ThunkDispatch, getState: () => RootState, global: Api) => Promise<void>;
 
 export class AuthAction {
   doFlushDatabase = (): ThunkAction => {
@@ -49,24 +50,25 @@ export class AuthAction {
   };
 
   doLogin = (loginData: LoginData): ThunkAction => {
-    const onBeforeLogin: LoginLifecycleFunction = (dispatch, getState, {actions: {authAction}}) =>
+    const onBeforeLogin: LoginLifecycleFunction = async (dispatch, getState, {actions: {authAction}}) =>
       dispatch(authAction.doSilentLogout());
     return this.doLoginPlain(loginData, onBeforeLogin);
   };
 
   doLoginAndJoin = (loginData: LoginData, key: string, code: string, uri?: string): ThunkAction => {
-    const onBeforeLogin: LoginLifecycleFunction = (dispatch, getState, {actions: {authAction}}) =>
+    const onBeforeLogin: LoginLifecycleFunction = async (dispatch, getState, {actions: {authAction}}) =>
       dispatch(authAction.doSilentLogout());
-    const onAfterLogin: LoginLifecycleFunction = (dispatch, getState, {actions: {conversationAction}}) =>
-      dispatch(conversationAction.doJoinConversationByCode(key, code, uri));
+    const onAfterLogin: LoginLifecycleFunction = async (dispatch, getState, {actions: {conversationAction}}) => {
+      await dispatch(conversationAction.doJoinConversationByCode(key, code, uri));
+    };
 
     return this.doLoginPlain(loginData, onBeforeLogin, onAfterLogin);
   };
 
   doLoginPlain = (
     loginData: LoginData,
-    onBeforeLogin: LoginLifecycleFunction = noop,
-    onAfterLogin: LoginLifecycleFunction = noop,
+    onBeforeLogin: LoginLifecycleFunction = async () => {},
+    onAfterLogin: LoginLifecycleFunction = async () => {},
   ): ThunkAction => {
     return async (dispatch, getState, global) => {
       const {
@@ -75,7 +77,7 @@ export class AuthAction {
       } = global;
       dispatch(AuthActionCreator.startLogin());
       try {
-        onBeforeLogin(dispatch, getState, global);
+        await onBeforeLogin(dispatch, getState, global);
         if (isTemporaryClientAndNonPersistent(loginData.clientType === ClientType.PERMANENT)) {
           (core as any).storeEngineProvider = provideTemporaryAndNonPersistentEngine;
         }
@@ -85,7 +87,7 @@ export class AuthAction {
           cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: global.getConfig().APP_INSTANCE_ID}),
         );
         await dispatch(selfAction.fetchSelf());
-        onAfterLogin(dispatch, getState, global);
+        await onAfterLogin(dispatch, getState, global);
         await dispatch(
           clientAction.doInitializeClient(
             loginData.clientType,
@@ -152,13 +154,19 @@ export class AuthAction {
     return async (dispatch, getState, {apiClient}) => {
       const mapError = (error: any) => {
         const statusCode = error?.response?.status;
-        if (statusCode === 404) {
-          return new BackendError({code: 404, label: BackendError.SSO_ERRORS.SSO_NOT_FOUND});
+        if (statusCode === HTTP_STATUS.NOT_FOUND) {
+          return new BackendError({code: HTTP_STATUS.NOT_FOUND, label: BackendError.SSO_ERRORS.SSO_NOT_FOUND});
         }
-        if (statusCode >= 500) {
-          return new BackendError({code: 500, label: BackendError.SSO_ERRORS.SSO_SERVER_ERROR});
+        if (statusCode >= HTTP_STATUS.INTERNAL_SERVER_ERROR) {
+          return new BackendError({
+            code: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+            label: BackendError.SSO_ERRORS.SSO_SERVER_ERROR,
+          });
         }
-        return new BackendError({code: 500, label: BackendError.SSO_ERRORS.SSO_GENERIC_ERROR});
+        return new BackendError({
+          code: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+          label: BackendError.SSO_ERRORS.SSO_GENERIC_ERROR,
+        });
       };
 
       try {

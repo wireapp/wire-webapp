@@ -18,11 +18,11 @@
  */
 
 import type {LegalHoldStatus} from '@wireapp/api-client/dist/team/legalhold';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
 import type {REASON as AVS_REASON} from '@wireapp/avs';
 
 import {createRandomUuid} from 'Util/util';
 
-import {BackendEvent} from '../event/Backend';
 import {CALL, CONVERSATION, ClientEvent} from '../event/Client';
 
 import type {Call as CallEntity} from '../calling/Call';
@@ -277,7 +277,7 @@ export const EventBuilder = {
       },
       from: sender,
       time: isoDate,
-      type: BackendEvent.CONVERSATION.MEMBER_JOIN,
+      type: CONVERSATION_EVENT.MEMBER_JOIN,
     };
   },
 
@@ -294,7 +294,7 @@ export const EventBuilder = {
       },
       from: removedBySelfUser ? conversationEntity.selfUser().id : userId,
       time: conversationEntity.get_next_iso_date(currentTimestamp),
-      type: BackendEvent.CONVERSATION.MEMBER_LEAVE,
+      type: CONVERSATION_EVENT.MEMBER_LEAVE,
     };
   },
 
