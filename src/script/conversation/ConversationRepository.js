@@ -48,6 +48,7 @@ import {
   DefaultConversationRoleName as DefaultRole,
   CONVERSATION_ACCESS_ROLE,
   CONVERSATION_ACCESS,
+  CONVERSATION_TYPE,
 } from '@wireapp/api-client/dist/conversation';
 
 import {getLogger} from 'Util/Logger';
@@ -83,7 +84,6 @@ import {Message} from '../entity/message/Message';
 import * as trackingHelpers from '../tracking/Helpers';
 
 import {ConversationMapper} from './ConversationMapper';
-import {ConversationType} from './ConversationType';
 import {ConversationStateHandler} from './ConversationStateHandler';
 import {EventInfoEntity} from './EventInfoEntity';
 import {EventMapper} from './EventMapper';
@@ -1128,7 +1128,7 @@ export class ConversationRepository {
         conversationEntity.connection(connectionEntity);
 
         if (connectionEntity.isConnected()) {
-          conversationEntity.type(ConversationType.ONE2ONE);
+          conversationEntity.type(CONVERSATION_TYPE.ONE_TO_ONE);
         }
 
         this.updateParticipatingUserEntities(conversationEntity).then(updatedConversationEntity => {
@@ -2121,7 +2121,11 @@ export class ConversationRepository {
             this.expectReadReceipt(conversationEntity),
             conversationEntity.legalHoldStatus(),
           );
-          genericMessage[GENERIC_MESSAGE_TYPE.EPHEMERAL][GENERIC_MESSAGE_TYPE.TEXT] = protoText;
+          if (genericMessage[GENERIC_MESSAGE_TYPE.EPHEMERAL]) {
+            genericMessage[GENERIC_MESSAGE_TYPE.EPHEMERAL][GENERIC_MESSAGE_TYPE.TEXT] = protoText;
+          } else {
+            genericMessage[GENERIC_MESSAGE_TYPE.TEXT] = protoText;
+          }
 
           return this.getMessageInConversationById(conversationEntity, messageId);
         }

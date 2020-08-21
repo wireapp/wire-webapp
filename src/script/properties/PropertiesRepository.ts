@@ -65,9 +65,7 @@ export class PropertiesRepository {
     this.logger = getLogger('PropertiesRepository');
 
     this.properties = {
-      contact_import: {
-        macos: undefined,
-      },
+      contact_import: {},
       enable_debugging: false,
       settings: {
         call: {
@@ -200,17 +198,7 @@ export class PropertiesRepository {
     return this.properties;
   }
 
-  savePreference(propertiesType: string, updatedPreference: any): void {
-    if (updatedPreference === undefined) {
-      switch (propertiesType) {
-        case PROPERTIES_TYPE.CONTACT_IMPORT.MACOS:
-          updatedPreference = Date.now();
-          break;
-        default:
-          updatedPreference = true;
-      }
-    }
-
+  savePreference(propertiesType: string, updatedPreference: any = true): void {
     if (updatedPreference !== this.getPreference(propertiesType)) {
       this.setPreference(propertiesType, updatedPreference);
 
@@ -286,9 +274,6 @@ export class PropertiesRepository {
 
   private publishPropertyUpdate(propertiesType: string, updatedPreference: any): void {
     switch (propertiesType) {
-      case PROPERTIES_TYPE.CONTACT_IMPORT.MACOS:
-        amplify.publish(WebAppEvents.PROPERTIES.UPDATE.CONTACTS, updatedPreference);
-        break;
       case PROPERTIES_TYPE.INTERFACE.THEME:
         amplify.publish(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, updatedPreference);
         break;

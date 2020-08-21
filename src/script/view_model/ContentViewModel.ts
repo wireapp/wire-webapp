@@ -312,14 +312,8 @@ export class ContentViewModel {
    *
    * @param conversation Conversation entity or conversation ID
    * @param options State to open conversation in
-   * @param options.exposeMessage Scroll to message and highlight it
-   * @param options.openFirstSelfMention Open first self mention instead of passed message
-   * @param options.openNotificationSettings Open notification settings of conversation
    */
-  showConversation = (
-    conversation: Conversation | string,
-    options: ShowConversationOptions = {} as ShowConversationOptions,
-  ) => {
+  showConversation = (conversation: Conversation | string, options: ShowConversationOptions = {}) => {
     const {
       exposeMessage: exposeMessageEntity,
       openFirstSelfMention = false,

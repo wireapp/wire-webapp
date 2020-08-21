@@ -158,6 +158,7 @@ export class UserRepository {
       const contacts = this.isTeam() ? this.teamUsers() : this.connected_users();
       return contacts.filter(user_et => !user_et.isService).length;
     });
+
     amplify.subscribe(WebAppEvents.CLIENT.ADD, this.addClientToUser.bind(this));
     amplify.subscribe(WebAppEvents.CLIENT.REMOVE, this.removeClientFromUser.bind(this));
     amplify.subscribe(WebAppEvents.CLIENT.UPDATE, this.updateClientsFromUser.bind(this));

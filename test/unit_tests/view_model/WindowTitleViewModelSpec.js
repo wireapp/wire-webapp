@@ -19,6 +19,7 @@
 
 import ko from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/dist/conversation';
 
 import {t, setStrings} from 'Util/LocalizerUtil';
 import {createRandomUuid} from 'Util/util';
@@ -30,7 +31,6 @@ import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {User} from 'src/script/entity/User';
 
 import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
-import {ConversationType} from 'src/script/conversation/ConversationType';
 import {WindowTitleViewModel} from 'src/script/view_model/WindowTitleViewModel';
 import {ContentViewModel} from 'src/script/view_model/ContentViewModel';
 import {TestFactory} from '../../helper/TestFactory';
@@ -72,7 +72,7 @@ describe('WindowTitleViewModel', () => {
     it('sets the name of the conversation (when the conversation is selected)', () => {
       const selected_conversation = new Conversation(createRandomUuid());
       selected_conversation.name('Selected Conversation');
-      selected_conversation.type(ConversationType.GROUP);
+      selected_conversation.type(CONVERSATION_TYPE.REGULAR);
       title_view_model.conversationRepository.active_conversation(selected_conversation);
 
       const expected_title = `${selected_conversation.name()} · ${suffix}`;
@@ -89,7 +89,7 @@ describe('WindowTitleViewModel', () => {
       const conversationEntity = new Conversation(createRandomUuid());
       conversationEntity.add_message(message);
       conversationEntity.name('Birthday Bash');
-      conversationEntity.type(ConversationType.GROUP);
+      conversationEntity.type(CONVERSATION_TYPE.REGULAR);
       conversationEntity.selfUser(new User(createRandomUuid()));
 
       title_view_model.conversationRepository.conversations_unarchived.push(conversationEntity);
@@ -107,14 +107,14 @@ describe('WindowTitleViewModel', () => {
 
       const selected_conversation = new Conversation(createRandomUuid());
       selected_conversation.name('Selected Conversation');
-      selected_conversation.type(ConversationType.GROUP);
+      selected_conversation.type(CONVERSATION_TYPE.REGULAR);
       selected_conversation.selfUser(selfUserEntity);
       title_view_model.conversationRepository.active_conversation(selected_conversation);
 
       const muted_conversation = new Conversation(createRandomUuid());
       muted_conversation.mutedState(NOTIFICATION_STATE.NOTHING);
       muted_conversation.name('Muted Conversation');
-      muted_conversation.type(ConversationType.GROUP);
+      muted_conversation.type(CONVERSATION_TYPE.REGULAR);
       muted_conversation.selfUser(selfUserEntity);
 
       // Add conversations to conversation repository
@@ -254,7 +254,7 @@ describe('WindowTitleViewModel', () => {
       const conversationEntity = new Conversation(createRandomUuid());
       conversationEntity.add_message(contentMessage);
       conversationEntity.name('Birthday Bash');
-      conversationEntity.type(ConversationType.GROUP);
+      conversationEntity.type(CONVERSATION_TYPE.REGULAR);
       conversationEntity.selfUser(new User(createRandomUuid()));
 
       amplify.subscribe(WebAppEvents.LIFECYCLE.UNREAD_COUNT, badgeCount => {

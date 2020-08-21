@@ -34,18 +34,18 @@ import {Text as TextAsset} from './Text';
 import {AssetRepository} from '../../assets/AssetRepository';
 
 export class ContentMessage extends Message {
-  readonly edited_timestamp: ko.Observable<number>;
   private readonly isLikedProvisional: ko.Observable<boolean>;
-  public readonly quote: ko.Observable<QuoteEntity>;
   private readonly reactions_user_ets: ko.ObservableArray<User>;
-  readonly reactions: ko.Observable<{[userId: string]: string}>;
   public readonly assets: ko.ObservableArray<Asset | FileAsset | TextAsset | MediumImage>;
   public readonly is_liked: ko.PureComputed<boolean>;
   public readonly like_caption: ko.PureComputed<string>;
   public readonly other_likes: ko.PureComputed<User[]>;
+  public readonly quote: ko.Observable<QuoteEntity>;
   public readonly reactions_user_ids: ko.PureComputed<string>;
   public readonly was_edited: ko.PureComputed<boolean>;
   public replacing_message_id: null | string;
+  readonly edited_timestamp: ko.Observable<number>;
+  readonly reactions: ko.Observable<{[userId: string]: string}>;
 
   constructor(id: string) {
     super(id);

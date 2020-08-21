@@ -117,10 +117,10 @@ export class MessageDetailsViewModel extends BasePanelViewModel {
     this.receipts.subscribe(receipts => {
       const userIds = receipts.map(({userId}) => userId);
       userRepository.getUsersById(userIds).then((users: User[]) => this.receiptUsers(users.sort(sortUsers)));
-      const receiptTimes = receipts.reduce((times, {userId, time}) => {
+      const receiptTimes = receipts.reduce<Record<string, string>>((times, {userId, time}) => {
         times[userId] = formatTime(time);
         return times;
-      }, {} as Record<string, string>);
+      }, {});
       this.receiptTimes(receiptTimes);
     });
 
