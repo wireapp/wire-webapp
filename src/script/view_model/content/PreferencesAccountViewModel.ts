@@ -64,6 +64,7 @@ import {ConversationRepository} from '../../conversation/ConversationRepository'
 import {TeamRepository} from '../../team/TeamRepository';
 import {AccentColorID} from '@wireapp/commons/dist/commonjs/util/AccentColor';
 import {TeamEntity} from '../../team/TeamEntity';
+import type {ClientEntity} from 'src/script/client/ClientEntity';
 
 export class PreferencesAccountViewModel {
   logger: Logger;
@@ -310,7 +311,7 @@ export class PreferencesAccountViewModel {
         modals.showModal(
           ModalsViewModel.TYPE.ACCOUNT_NEW_DEVICES,
           {
-            data: aggregatedNotifications.map(notification => notification.data),
+            data: aggregatedNotifications.map(notification => notification.data) as ClientEntity[],
             preventClose: true,
             secondaryAction: {
               action: () => {
@@ -327,7 +328,7 @@ export class PreferencesAccountViewModel {
         modals.showModal(
           ModalsViewModel.TYPE.ACCOUNT_READ_RECEIPTS_CHANGED,
           {
-            data: aggregatedNotifications.pop().data,
+            data: aggregatedNotifications.pop().data as boolean,
             preventClose: true,
           },
           undefined,
