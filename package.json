@@ -140,7 +140,7 @@
     "karma-coverage": "2.0.3",
     "karma-coverage-istanbul-reporter": "3.0.3",
     "karma-jasmine": "3.3.1",
-    "karma-sourcemap-loader": "0.3.7",
+    "karma-sourcemap-loader": "0.3.8",
     "karma-spec-reporter": "0.0.32",
     "karma-webpack": "4.0.2",
     "less": "3.12.2",
