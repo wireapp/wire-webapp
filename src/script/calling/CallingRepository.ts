@@ -636,11 +636,27 @@ export class CallingRepository {
   /**
    * Toggles screenshare ON and OFF for the given call (does not switch between different screens)
    */
-  toggleScreenshare(call: Call): void {
+  toggleScreenshare = async (call: Call): Promise<void> => {
     const selfParticipant = call.getSelfParticipant();
-    const newState = selfParticipant.sharesScreen() ? VIDEO_STATE.STOPPED : VIDEO_STATE.SCREENSHARE;
-    this.wCall.setVideoSendState(this.wUser, call.conversationId, newState);
-  }
+    if (selfParticipant.sharesScreen()) {
+      selfParticipant.videoState(VIDEO_STATE.STOPPED);
+      return this.wCall.setVideoSendState(this.wUser, call.conversationId, VIDEO_STATE.STOPPED);
+    }
+    try {
+      const isGroup = [CONV_TYPE.CONFERENCE, CONV_TYPE.GROUP].includes(call.conversationType);
+      const mediaStream = await this.getMediaStream({audio: true, screen: true}, isGroup);
+      // https://stackoverflow.com/a/25179198/451634
+      mediaStream.getVideoTracks()[0].onended = () => {
+        this.wCall.setVideoSendState(this.wUser, call.conversationId, VIDEO_STATE.STOPPED);
+      };
+      const selfParticipant = call.getSelfParticipant();
+      selfParticipant.videoState(VIDEO_STATE.SCREENSHARE);
+      selfParticipant.updateMediaStream(mediaStream);
+      this.wCall.setVideoSendState(this.wUser, call.conversationId, VIDEO_STATE.SCREENSHARE);
+    } catch (error) {
+      this.logger.info('Failed to get screen sharing stream', error);
+    }
+  };
 
   async answerCall(call: Call, callType: CALL_TYPE): Promise<void> {
     try {
@@ -1031,15 +1047,12 @@ export class CallingRepository {
     const isGroup = [CONV_TYPE.CONFERENCE, CONV_TYPE.GROUP].includes(call.conversationType);
     this.mediaStreamQuery = (async () => {
       try {
+        if (missingStreams.screen && selfParticipant.sharesScreen()) {
+          return selfParticipant.getMediaStream();
+        }
         const mediaStream = await this.getMediaStream(missingStreams, isGroup);
         this.mediaStreamQuery = undefined;
         const newStream = selfParticipant.updateMediaStream(mediaStream);
-        if (missingStreams.screen) {
-          // https://stackoverflow.com/a/25179198/451634
-          newStream.getVideoTracks()[0].onended = () => {
-            this.toggleScreenshare(call);
-          };
-        }
         return newStream;
       } catch (error) {
         this.mediaStreamQuery = undefined;
@@ -1094,7 +1107,11 @@ export class CallingRepository {
     const call = this.findCall(conversationId);
     if (call) {
       const selfParticipant = call.getSelfParticipant();
-      if (call.state() === CALL_STATE.MEDIA_ESTAB && selfParticipant.doesMatchIds(userId, clientId)) {
+      if (
+        call.state() === CALL_STATE.MEDIA_ESTAB &&
+        selfParticipant.doesMatchIds(userId, clientId) &&
+        !selfParticipant.sharesScreen()
+      ) {
         selfParticipant.releaseVideoStream();
       }
       call
