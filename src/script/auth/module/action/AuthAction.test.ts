@@ -20,7 +20,7 @@
 import type {APIClient} from '@wireapp/api-client';
 import {ClientType} from '@wireapp/api-client/dist/client';
 import type {TypeUtil} from '@wireapp/commons';
-import * as HTTP_STATUS from 'http-status-codes';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {mockStoreFactory} from '../../util/test/mockStoreFactory';
 import {actionRoot} from './';

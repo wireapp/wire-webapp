@@ -25,7 +25,7 @@ import * as http from 'http';
 import * as https from 'https';
 import * as path from 'path';
 import * as fs from 'fs';
-import * as HTTP_STATUS from 'http-status-codes';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {HealthCheckRoute} from './routes/_health/HealthRoute';
 import {AppleAssociationRoute} from './routes/appleassociation/AppleAssociationRoute';

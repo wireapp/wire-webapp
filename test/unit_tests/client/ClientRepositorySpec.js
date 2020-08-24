@@ -18,7 +18,7 @@
  */
 
 import {ClientType} from '@wireapp/api-client/dist/client/';
-import * as HTTP_STATUS from 'http-status-codes';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {User} from 'src/script/entity/User';
 import {Environment} from 'src/script/util/Environment';

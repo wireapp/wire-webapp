@@ -30,7 +30,7 @@ import ko from 'knockout';
 import {flatten} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import type {AxiosError} from 'axios';
-import * as HTTP_STATUS from 'http-status-codes';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {chunk, partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
