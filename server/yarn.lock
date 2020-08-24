@@ -2874,10 +2874,10 @@ pm2-multimeter@^0.1.2:
   dependencies:
     charm "~0.1.1"
 
-pm2@4.4.0:
-  version "4.4.0"
-  resolved "https://registry.yarnpkg.com/pm2/-/pm2-4.4.0.tgz#85ad86da2d3c6618881714e885c85a96d77ee379"
-  integrity sha512-uEY3ShP5O5d7VBx4r0QhVjWAgjyhazenIl0fhxyVr+aDMWSa3hpD5RpvkGJMiX8z3nDrBBWCSU7TYth1sdbJkA==
+pm2@4.4.1:
+  version "4.4.1"
+  resolved "https://registry.yarnpkg.com/pm2/-/pm2-4.4.1.tgz#a96bf6d4c75cf97612de5940835e792899845b54"
+  integrity sha512-ece2zqVvSg29tIGdznKqk07IwVaO4mX7zLBMVxbJQMfvxpQUotLLERDW0v/RYMHtzj1bX8MLsDUsmPiIbEszKg==
   dependencies:
     "@pm2/agent" "~1.0.2"
     "@pm2/io" "~4.3.5"
