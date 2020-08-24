@@ -485,7 +485,7 @@ export class UserRepository {
         .then(response => (response ? this.userMapper.mapUsersFromJson(response) : []))
         .catch((error: AxiosError | BackendError) => {
           const isNotFound = (error as AxiosError).response?.status === HTTP_STATUS.NOT_FOUND;
-          const isBadRequest = (error as BackendError).code === HTTP_STATUS.BAD_REQUEST;
+          const isBadRequest = Number((error as BackendError).code) === HTTP_STATUS.BAD_REQUEST;
           if (isNotFound || isBadRequest) {
             return [];
           }
