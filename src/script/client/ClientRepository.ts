@@ -29,7 +29,7 @@ import {USER_EVENT, UserClientAddEvent, UserClientRemoveEvent} from '@wireapp/ap
 import {amplify} from 'amplify';
 import platform from 'platform';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import * as HTTP_STATUS from 'http-status-codes';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';

@@ -20,7 +20,7 @@
 import ko from 'knockout';
 import {Asset} from '@wireapp/protocol-messaging';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
-import * as HTTP_STATUS from 'http-status-codes';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {Environment} from 'Util/Environment';
 import {Logger, getLogger} from 'Util/Logger';

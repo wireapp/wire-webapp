@@ -35,6 +35,7 @@ import {
   formatLocale,
   formatDayMonth,
   FnDate,
+  isThisYear,
 } from 'Util/TimeUtil';
 import {isArrowKey, isPageUpDownKey, isMetaKey, isPasteAction} from 'Util/KeyboardUtil';
 import {noop} from 'Util/util';
@@ -184,7 +185,7 @@ ko.bindingHandlers.relative_timestamp = (function () {
   // timestamp that should be updated
   const timestamps: (() => void)[] = [];
 
-  const calculate_timestamp = (date: FnDate, isDay?: boolean) => {
+  const calculateTimestamp = (date: FnDate, isDay?: boolean) => {
     if (isYoungerThan2Minutes(date)) {
       return t('conversationJustNow');
     }
@@ -207,17 +208,18 @@ ko.bindingHandlers.relative_timestamp = (function () {
 
     const weekDay = formatLocale(date, 'EEEE');
     const dayMonth = formatDayMonth(date);
+    const year = isThisYear(date) ? '' : ` ${new Date(date).getFullYear()}`;
     const time = formatTimeShort(date);
-    return isDay ? `${weekDay}, ${dayMonth}, ${time}` : `${dayMonth}, ${time}`;
+    return isDay ? `${weekDay}, ${dayMonth}${year}, ${time}` : `${dayMonth}${year}, ${time}`;
   };
 
   // should be fine to update every minute
   window.setInterval(() => timestamps.map(timestamp_func => timestamp_func()), TIME_IN_MILLIS.MINUTE);
 
   const calculate = function (element: HTMLElement, timestamp: number | string, isDay?: boolean) {
-    const parsedDimestamp = window.parseInt(timestamp.toString());
-    const date = fromUnixTime(parsedDimestamp / TIME_IN_MILLIS.SECOND);
-    return (element.textContent = calculate_timestamp(date, isDay));
+    const parsedTimestamp = window.parseInt(timestamp.toString());
+    const date = fromUnixTime(parsedTimestamp / TIME_IN_MILLIS.SECOND);
+    return (element.textContent = calculateTimestamp(date, isDay));
   };
 
   return {
