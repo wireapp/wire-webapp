@@ -19,12 +19,7 @@
 
 import {isObject} from 'underscore';
 import ko from 'knockout';
-import {
-  CONVERSATION_ACCESS_ROLE,
-  CONVERSATION_ACCESS,
-  CONVERSATION_TYPE,
-  Conversation as BackendConversation,
-} from '@wireapp/api-client/dist/conversation';
+import {CONVERSATION_ACCESS_ROLE, CONVERSATION_ACCESS, CONVERSATION_TYPE} from '@wireapp/api-client/dist/conversation';
 
 import {ACCESS_STATE} from './AccessState';
 import {NOTIFICATION_STATE} from './NotificationSetting';

@@ -17,7 +17,7 @@
  *
  */
 
-import type {LegalHoldStatus} from '@wireapp/protocol-messaging';;
+import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
 import type {REASON as AVS_REASON} from '@wireapp/avs';
 
@@ -36,8 +36,8 @@ import type {User} from '../entity/User';
 export interface BaseEvent {
   conversation: string;
   from: string;
+  id?: string;
   time: string;
-  id?: string
 }
 
 export interface ConversationEvent<T> extends BaseEvent {

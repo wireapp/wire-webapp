@@ -29,7 +29,10 @@ import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {OPEN_CONVERSATION_DETAILS} from '../view_model/PanelViewModel';
 import {ConversationError} from '../error/ConversationError';
 
-export const showLegalHoldWarning = (conversationEntity: Conversation, verifyDevices: boolean = false): Promise<boolean> => {
+export const showLegalHoldWarning = (
+  conversationEntity: Conversation,
+  verifyDevices: boolean = false,
+): Promise<boolean> => {
   return new Promise((resolve, reject) => {
     const secondaryAction = [
       {
