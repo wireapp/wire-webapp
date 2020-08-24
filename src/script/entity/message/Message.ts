@@ -50,35 +50,35 @@ export interface ReadReceipt {
 
 export class Message {
   private messageTimerStarted: boolean;
-  public readonly visible: ko.Observable<boolean>;
   protected readonly affect_order: ko.Observable<boolean>;
   public category?: MessageCategory;
   public conversation_id: string;
-  public readonly status: ko.Observable<StatusType>;
+  public from: string;
+  public fromClientId: string;
+  public id: string;
+  public primary_key?: string;
+  public reaction: ReactionType;
   public readonly accent_color: ko.PureComputed<string>;
+  public readonly ephemeral_caption: ko.PureComputed<string>;
+  public readonly ephemeral_duration: ko.Observable<number>;
   public readonly ephemeral_expires: ko.Observable<boolean | number | string>;
   public readonly ephemeral_remaining: ko.Observable<number>;
   public readonly ephemeral_started: ko.Observable<number>;
-  public readonly ephemeral_caption: ko.PureComputed<string>;
-  public readonly ephemeral_duration: ko.Observable<number>;
   public readonly ephemeral_status: ko.Computed<EphemeralStatusType>;
   public readonly expectsReadConfirmation: boolean;
-  public from: string;
-  public fromClientId: string;
   public readonly headerSenderName: ko.PureComputed<string>;
-  public id: string;
   public readonly isObfuscated: ko.PureComputed<boolean>;
   public readonly legalHoldStatus?: LegalHoldStatus;
-  public primary_key?: string;
-  public readonly timestamp: ko.Observable<number>;
+  public readonly status: ko.Observable<StatusType>;
   public readonly timestamp_affects_order: ko.PureComputed<boolean>;
+  public readonly timestamp: ko.Observable<number>;
   public readonly unsafeSenderName: ko.PureComputed<string>;
   public readonly user: ko.Observable<User>;
-  public version: number;
+  public readonly visible: ko.Observable<boolean>;
   public readReceipts: ko.ObservableArray<ReadReceipt>;
   public super_type: SuperType;
   public type: string;
-  public reaction: ReactionType;
+  public version: number;
 
   /**
    * Sort messages by timestamp

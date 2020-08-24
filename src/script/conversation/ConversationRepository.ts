@@ -175,7 +175,6 @@ export class ConversationRepository {
   private readonly event_mapper: EventMapper;
   private readonly eventService: EventService;
   private readonly fetching_conversations: Record<string, FetchPromise[]>;
-  public readonly filtered_conversations: ko.PureComputed<Conversation[]>;
   private readonly leaveCall: (conversationId: string) => void;
   private readonly logger: Logger;
   private readonly receiving_queue: PromiseQueue;
@@ -189,6 +188,7 @@ export class ConversationRepository {
   public readonly conversations_archived: ko.ObservableArray<Conversation>;
   public readonly conversations_unarchived: ko.ObservableArray<Conversation>;
   public readonly conversations: ko.ObservableArray<Conversation>;
+  public readonly filtered_conversations: ko.PureComputed<Conversation[]>;
   public readonly isTeam: ko.PureComputed<boolean>;
   public readonly self_conversation: ko.PureComputed<Conversation>;
   public readonly selfUser: ko.Observable<User>;
