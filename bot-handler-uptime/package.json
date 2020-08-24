@@ -5,7 +5,7 @@
     "moment-duration-format": "2.3.2"
   },
   "devDependencies": {
-    "@types/jasmine": "3.5.10",
+    "@types/jasmine": "3.5.13",
     "@types/node": "~12",
     "@wireapp/bot-api": "7.11.7",
     "jasmine": "3.5.0",

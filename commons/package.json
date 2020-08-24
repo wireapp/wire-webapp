@@ -10,7 +10,7 @@
     "url-search-params-polyfill": "8.1.0"
   },
   "devDependencies": {
-    "@types/jasmine": "3.5.10",
+    "@types/jasmine": "3.5.13",
     "@types/karma": "4.4.0",
     "jasmine": "3.5.0",
     "karma": "5.1.0",
