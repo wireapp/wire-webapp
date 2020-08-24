@@ -331,8 +331,7 @@ export class MessageListViewModel {
       if (!this.isLastReceivedMessage(lastMessage, this.conversation())) {
         // if the last loaded message is not the last of the conversation, we load the subsequent messages
         this.conversationRepository.getSubsequentMessages(this.conversation(), lastMessage as ContentMessage, 0);
-      }
-      if (document.hasFocus()) {
+      } else if (document.hasFocus()) {
         // if the message is the last of the conversation and the app is in the foreground, then we update the last read timestamp of the conversation
         this.updateConversationLastRead(this.conversation(), lastMessage);
       }

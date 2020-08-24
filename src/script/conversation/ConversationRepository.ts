@@ -38,6 +38,7 @@ import {
   Reaction,
   Text,
   Asset as ProtobufAsset,
+  LinkPreview,
 } from '@wireapp/protocol-messaging';
 import {flatten} from 'underscore';
 import {ConnectionStatus} from '@wireapp/api-client/dist/connection';
@@ -164,7 +165,7 @@ type EntityObject = {conversationEntity: Conversation; messageEntity: ContentMes
 
 export class ConversationRepository {
   private init_handled: number;
-  private init_promise: any;
+  private init_promise?: {reject_fn: (reason?: any) => void; resolve_fn: (value?: unknown) => void};
   private init_total: number;
   private readonly block_event_handling: ko.Observable<boolean>;
   private readonly conversationMapper: ConversationMapper;
@@ -1092,7 +1093,7 @@ export class ConversationRepository {
    * @param {string} message_id Message ID
    * @returns {Promise} Resolves with `true` if message is marked as read
    */
-  isMessageRead(conversation_id: any, message_id: string) {
+  isMessageRead(conversation_id: string, message_id: string) {
     if (!conversation_id || !message_id) {
       return Promise.resolve(false);
     }
@@ -1199,9 +1200,9 @@ export class ConversationRepository {
    * Maps user connections to the corresponding conversations.
    * @param {Array<ConnectionEntity>} connectionEntities Connections entities
    */
-  map_connections(connectionEntities: any[]) {
+  map_connections(connectionEntities: ConnectionEntity[]) {
     this.logger.info(`Mapping '${connectionEntities.length}' user connection(s) to conversations`, connectionEntities);
-    connectionEntities.map((connectionEntity: any) => this.map_connection(connectionEntity));
+    connectionEntities.map(connectionEntity => this.map_connection(connectionEntity));
   }
 
   /**
@@ -1366,7 +1367,7 @@ export class ConversationRepository {
       .catch(error => this._handleAddToConversationError(error, conversationEntity, userIds));
   }
 
-  addMissingMember(conversationEntity: Conversation, userIds: any[], timestamp: number) {
+  addMissingMember(conversationEntity: Conversation, userIds: string[], timestamp: number) {
     const [sender] = userIds;
     const event = EventBuilder.buildMemberJoin(conversationEntity, sender, userIds, timestamp);
     return this.eventRepository.injectEvent(event, EventRepository.SOURCE.INJECTED);
@@ -2010,7 +2011,7 @@ export class ConversationRepository {
    */
   send_asset_upload_failed(
     conversationEntity: Conversation,
-    messageId: any,
+    messageId: string,
     reason = ProtobufAsset.NotUploaded.FAILED,
   ) {
     const wasCancelled = reason === ProtobufAsset.NotUploaded.CANCELLED;
@@ -2203,7 +2204,7 @@ export class ConversationRepository {
    * @param {number} zoom Zoom factor for the map (Google Maps)
    * @returns {Promise} Resolves after sending the location
    */
-  sendLocation(conversationEntity: Conversation, longitude: any, latitude: any, name: any, zoom: any) {
+  sendLocation(conversationEntity: Conversation, longitude: number, latitude: number, name: string, zoom: number) {
     const protoLocation = new Location({
       expectsReadConfirmation: this.expectReadReceipt(conversationEntity),
       latitude,
@@ -2411,9 +2412,9 @@ export class ConversationRepository {
     textMessage: string,
     mentionEntities: MentionEntity[],
     quoteEntity: QuoteEntity,
-    linkPreviews: any[],
+    linkPreviews: LinkPreview[],
     expectsReadConfirmation: boolean,
-    legalHoldStatus: any,
+    legalHoldStatus: LegalHoldStatus,
   ) {
     const protoText = new Text({content: textMessage, expectsReadConfirmation, legalHoldStatus});
 
@@ -3242,12 +3243,10 @@ export class ConversationRepository {
 
         return conversationEntity;
       })
-      .then((conversationEntity: any) => this._checkLegalHoldStatus(conversationEntity, eventJson))
-      .then((conversationEntity: any) =>
-        this._checkConversationParticipants(conversationEntity, eventJson, eventSource),
-      )
-      .then((conversationEntity: any) => this._triggerFeatureEventHandlers(conversationEntity, eventJson))
-      .then((conversationEntity: any) => this._reactToConversationEvent(conversationEntity, eventJson, eventSource))
+      .then(conversationEntity => this._checkLegalHoldStatus(conversationEntity, eventJson))
+      .then(conversationEntity => this._checkConversationParticipants(conversationEntity, eventJson, eventSource))
+      .then(conversationEntity => this._triggerFeatureEventHandlers(conversationEntity, eventJson))
+      .then(conversationEntity => this._reactToConversationEvent(conversationEntity, eventJson, eventSource))
       .then((entityObject = {}) => this._handleConversationNotification(entityObject, eventSource, previouslyArchived))
       .catch((error: BaseError) => {
         const ignoredErrorTypes: string[] = [
@@ -3375,7 +3374,7 @@ export class ConversationRepository {
    * @param {EventRepository.SOURCE} eventSource Source of event
    * @returns {Promise<any>} Resolves when the event has been treated
    */
-  private _reactToConversationEvent(conversationEntity: any, eventJson: EventJson, eventSource: EventSource) {
+  private _reactToConversationEvent(conversationEntity: Conversation, eventJson: EventJson, eventSource: EventSource) {
     switch (eventJson.type) {
       case CONVERSATION_EVENT.CREATE:
         return this._onCreate(eventJson, eventSource);
@@ -4192,7 +4191,7 @@ export class ConversationRepository {
    * Cancel asset upload.
    * @param {string} messageId Id of the message which upload has been cancelled
    */
-  cancel_asset_upload(messageId: any) {
+  cancel_asset_upload(messageId: string) {
     this.send_asset_upload_failed(this.active_conversation(), messageId, ProtobufAsset.NotUploaded.CANCELLED);
   }
 
@@ -4295,7 +4294,11 @@ export class ConversationRepository {
    * @param {Object} event_json Uploaded asset event information
    * @returns {Promise} Resolve when message was updated
    */
-  update_message_as_upload_complete(conversationEntity: Conversation, message_et: ContentMessage, event_json: any) {
+  update_message_as_upload_complete(
+    conversationEntity: Conversation,
+    message_et: ContentMessage,
+    event_json: EventJson,
+  ) {
     const {id, key, otr_key, sha256, token} = event_json.data;
     const asset_et = message_et.get_first_asset() as FileAsset;
 
