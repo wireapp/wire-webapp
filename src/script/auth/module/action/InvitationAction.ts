@@ -19,7 +19,7 @@
 
 import type {NewTeamInvitation} from '@wireapp/api-client/dist/team';
 import {Role} from '@wireapp/api-client/dist/team/member';
-import * as HTTP_STATUS from 'http-status-codes';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import type {ThunkAction} from '../reducer';
 import * as InviteSelector from '../selector/InviteSelector';

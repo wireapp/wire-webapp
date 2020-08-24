@@ -24,7 +24,7 @@ import ko from 'knockout';
 import {WebappProperties} from '@wireapp/api-client/dist/user/data';
 import type {RichInfoField} from '@wireapp/api-client/dist/user/RichInfo';
 import {ChangeEvent} from 'react';
-import * as HTTP_STATUS from 'http-status-codes';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {t} from 'Util/LocalizerUtil';
 import {isTemporaryClientAndNonPersistent, validateProfileImageResolution} from 'Util/util';
