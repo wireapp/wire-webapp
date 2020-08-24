@@ -20,3 +20,7 @@ assignees: ''
 ## Which browser are you using?
 
 <!--- Please copy & paste the user agent which is shown to you here: http://whatsmyuseragent.org/ -->
+
+## Installed browser addons
+
+<!--- If you installed additional browser plugins, please list them. You can look them up here: chrome://extensions/ -->
