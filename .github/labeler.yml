@@ -23,7 +23,10 @@
   size-below: 300
 'size: l':
   size-above: 299
-  size-below: 1000
+  size-below: 500
+'size: xl':
+  size-above: 499
+  size-below: 2000
 'size: xxl':
   size-above: 1999
 
