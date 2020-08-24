@@ -19,6 +19,7 @@
 
 import ko from 'knockout';
 import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
+import type {ReactionType} from '@wireapp/core/dist/conversation';
 
 import {getUserName} from 'Util/SanitizationUtil';
 import {TIME_IN_MILLIS, formatDurationCaption, formatTimeShort, formatDateNumeral, fromUnixTime} from 'Util/TimeUtil';
@@ -77,7 +78,7 @@ export class Message {
   public readReceipts: ko.ObservableArray<ReadReceipt>;
   public super_type: SuperType;
   public type: string;
-  reaction: any;
+  public reaction: ReactionType;
 
   /**
    * Sort messages by timestamp
