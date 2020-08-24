@@ -11,7 +11,7 @@ assignees: ''
 - [ ] Wire Personal Account
 - [ ] [Wire Pro Account](https://wire.com/products/pro-secure-team-collaboration/)
 - [ ] [Wire Enterprise Account](https://wire.com/products/enterprise-collaboration/)
-- [ ]  [Wire Red Account](https://wire.com/products/red-crisis-communication-software/)
+- [ ] [Wire Red Account](https://wire.com/products/red-crisis-communication-software/)
 
 ## What steps will reproduce the problem?
 
