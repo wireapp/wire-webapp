@@ -34,7 +34,6 @@ import {
   fromNowLocale,
   formatLocale,
   formatDayMonth,
-  FnDate,
   isThisYear,
 } from 'Util/TimeUtil';
 import {isArrowKey, isPageUpDownKey, isMetaKey, isPasteAction} from 'Util/KeyboardUtil';
@@ -185,7 +184,7 @@ ko.bindingHandlers.relative_timestamp = (function () {
   // timestamp that should be updated
   const timestamps: (() => void)[] = [];
 
-  const calculateTimestamp = (date: FnDate, isDay?: boolean) => {
+  const calculateTimestamp = (date: Date, isDay?: boolean) => {
     if (isYoungerThan2Minutes(date)) {
       return t('conversationJustNow');
     }
@@ -208,7 +207,7 @@ ko.bindingHandlers.relative_timestamp = (function () {
 
     const weekDay = formatLocale(date, 'EEEE');
     const dayMonth = formatDayMonth(date);
-    const year = isThisYear(date) ? '' : ` ${new Date(date).getFullYear()}`;
+    const year = isThisYear(date) ? '' : ` ${date.getFullYear()}`;
     const time = formatTimeShort(date);
     return isDay ? `${weekDay}, ${dayMonth}${year}, ${time}` : `${dayMonth}${year}, ${time}`;
   };
