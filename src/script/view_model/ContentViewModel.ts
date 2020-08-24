@@ -51,46 +51,11 @@ import {PreferencesDeviceDetailsViewModel} from './content/PreferencesDeviceDeta
 import {InputBarViewModel} from './content/InputBarViewModel';
 import {MediaType} from '../media/MediaType';
 import {PanelViewModel} from './PanelViewModel';
-import type {MainViewModel} from './MainViewModel';
-import type {AssetRepository} from '../assets/AssetRepository';
-import type {ClientRepository} from '../client/ClientRepository';
+import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
-import type {CryptographyRepository} from '../cryptography/CryptographyRepository';
-import type {EventRepository} from '../event/EventRepository';
-import type {GiphyRepository} from '../extension/GiphyRepository';
-import type {IntegrationRepository} from '../integration/IntegrationRepository';
-import type {MediaRepository} from '../media/MediaRepository';
-import type {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
-import type {PropertiesRepository} from '../properties/PropertiesRepository';
-import type {SearchRepository} from '../search/SearchRepository';
-import type {ServerTimeHandler} from '../time/serverTimeHandler';
-import type {StorageRepository} from '../storage';
-import type {TeamRepository} from '../team/TeamRepository';
-import type {BackupRepository} from '../backup/BackupRepository';
-import type {CallingRepository} from '../calling/CallingRepository';
 import type {UserRepository} from '../user/UserRepository';
 import type {Conversation} from '../entity/Conversation';
 import type {Message} from '../entity/message/Message';
-
-interface Repositories {
-  asset: AssetRepository;
-  backup: BackupRepository;
-  calling: CallingRepository;
-  client: ClientRepository;
-  conversation: ConversationRepository;
-  cryptography: CryptographyRepository;
-  event: EventRepository;
-  giphy: GiphyRepository;
-  integration: IntegrationRepository;
-  media: MediaRepository;
-  preferenceNotification: PreferenceNotificationRepository;
-  properties: PropertiesRepository;
-  search: SearchRepository;
-  serverTime: ServerTimeHandler;
-  storage: StorageRepository;
-  team: TeamRepository;
-  user: UserRepository;
-}
 
 interface ShowConversationOptions {
   exposeMessage?: Message;
@@ -99,36 +64,36 @@ interface ShowConversationOptions {
 }
 
 export class ContentViewModel {
-  elementId: string;
-  mainViewModel: MainViewModel;
-  conversationRepository: ConversationRepository;
-  userRepository: UserRepository;
-  logger: Logger;
-  state: ko.Observable<string>;
-  collectionDetails: CollectionDetailsViewModel;
   collection: CollectionViewModel;
+  collectionDetails: CollectionDetailsViewModel;
   connectRequests: ConnectRequestsViewModel;
+  conversationRepository: ConversationRepository;
+  elementId: string;
   emojiInput: EmojiInputViewModel;
   giphy: GiphyViewModel;
-  inputBar: InputBarViewModel;
   groupCreation: GroupCreationViewModel;
-  userModal: UserModalViewModel;
-  serviceModal: ServiceModalViewModel;
+  historyExport: HistoryExportViewModel;
+  historyImport: HistoryImportViewModel;
+  inputBar: InputBarViewModel;
   inviteModal: InviteModalViewModel;
   legalHoldModal: LegalHoldModalViewModel;
+  logger: Logger;
+  mainViewModel: MainViewModel;
   messageList: MessageListViewModel;
-  titleBar: TitleBarViewModel;
   preferencesAbout: PreferencesAboutViewModel;
   preferencesAccount: PreferencesAccountViewModel;
   preferencesAV: PreferencesAVViewModel;
   preferencesDeviceDetails: PreferencesDeviceDetailsViewModel;
   preferencesDevices: PreferencesDevicesViewModel;
   preferencesOptions: PreferencesOptionsViewModel;
-  historyExport: HistoryExportViewModel;
-  historyImport: HistoryImportViewModel;
-  previousState: string;
   previousConversation: Conversation;
+  previousState: string;
+  serviceModal: ServiceModalViewModel;
+  state: ko.Observable<string>;
   State: typeof ContentViewModel.STATE;
+  titleBar: TitleBarViewModel;
+  userModal: UserModalViewModel;
+  userRepository: UserRepository;
 
   static get STATE() {
     return {
@@ -148,7 +113,7 @@ export class ContentViewModel {
     };
   }
 
-  constructor(mainViewModel: MainViewModel, repositories: Repositories) {
+  constructor(mainViewModel: MainViewModel, repositories: ViewModelRepositories) {
     this.elementId = 'center-column';
     this.mainViewModel = mainViewModel;
     this.conversationRepository = repositories.conversation;
