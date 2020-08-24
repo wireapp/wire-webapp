@@ -33,7 +33,7 @@ import {TypeUtil} from '@wireapp/commons';
 import {ThunkDispatch} from 'redux-thunk';
 import {AnyAction} from 'redux';
 import {History} from 'history';
-import * as HTTP_STATUS from 'http-status-codes';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 class CheckPasswordPage {
   private readonly driver: ReactWrapper;
