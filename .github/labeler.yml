@@ -26,9 +26,9 @@
   size-below: 500
 'size: xl':
   size-above: 499
-  size-below: 2000
+  size-below: 1000
 'size: xxl':
-  size-above: 1999
+  size-above: 999
 
 # Components
 'comp: calling':
