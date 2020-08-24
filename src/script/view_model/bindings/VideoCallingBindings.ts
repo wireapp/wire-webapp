@@ -17,9 +17,11 @@
  *
  */
 
+import ko from 'knockout';
+
 // http://stackoverflow.com/questions/28762211/unable-to-mute-html5-video-tag-in-firefox
 ko.bindingHandlers.muteMediaElement = {
-  update(element, valueAccessor) {
+  update(element: HTMLMediaElement, valueAccessor: ko.Observable<MediaStream>) {
     if (valueAccessor()) {
       element.muted = true;
     }
@@ -27,7 +29,7 @@ ko.bindingHandlers.muteMediaElement = {
 };
 
 ko.bindingHandlers.sourceStream = {
-  update(element, valueAccessor) {
+  update(element: HTMLMediaElement, valueAccessor: ko.Observable<MediaStream>) {
     const stream = valueAccessor();
     if (stream) {
       element.srcObject = stream;

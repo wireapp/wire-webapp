@@ -17,6 +17,7 @@
  *
  */
 
+import ko from 'knockout';
 import {
   ClientClassification,
   ClientType,

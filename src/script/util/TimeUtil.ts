@@ -60,7 +60,7 @@ import {
 import {t} from './LocalizerUtil';
 import {zeroPadding} from './util';
 
-type FnDate = number | Date;
+export type FnDate = number | Date;
 
 interface DiscreteTimeUnit {
   longUnit: string;
