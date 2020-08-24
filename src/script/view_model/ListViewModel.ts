@@ -42,14 +42,9 @@ import {ContentViewModel} from './ContentViewModel';
 import {DefaultLabelIds} from '../conversation/ConversationLabelRepository';
 import {ModalsViewModel} from './ModalsViewModel';
 import {PanelViewModel} from './PanelViewModel';
-import type {MainViewModel} from './MainViewModel';
+import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 import type {CallingRepository} from '../calling/CallingRepository';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
-import type {EventRepository} from '../event/EventRepository';
-import type {IntegrationRepository} from '../integration/IntegrationRepository';
-import type {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
-import type {PropertiesRepository} from '../properties/PropertiesRepository';
-import type {SearchRepository} from '../search/SearchRepository';
 import type {TeamRepository} from '../team/TeamRepository';
 import type {UserRepository} from '../user/UserRepository';
 import type {ActionsViewModel} from './ActionsViewModel';
@@ -57,18 +52,6 @@ import type {Conversation} from '../entity/Conversation';
 import type {ClientEntity} from '../client/ClientEntity';
 import type {User} from '../entity/User';
 import type {AssetRemoteData} from '../assets/AssetRemoteData';
-
-interface Repositories {
-  calling: CallingRepository;
-  conversation: ConversationRepository;
-  event: EventRepository;
-  integration: IntegrationRepository;
-  preferenceNotification: PreferenceNotificationRepository;
-  properties: PropertiesRepository;
-  search: SearchRepository;
-  team: TeamRepository;
-  user: UserRepository;
-}
 
 export class ListViewModel {
   readonly preferences: PreferencesListViewModel;
@@ -113,7 +96,7 @@ export class ListViewModel {
     };
   }
 
-  constructor(mainViewModel: MainViewModel, repositories: Repositories) {
+  constructor(mainViewModel: MainViewModel, repositories: ViewModelRepositories) {
     this.elementId = 'left-column';
     this.conversationRepository = repositories.conversation;
     this.callingRepository = repositories.calling;

@@ -21,7 +21,7 @@ import ko from 'knockout';
 import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {getUserName} from 'Util/SanitizationUtil';
-import {TIME_IN_MILLIS, formatDurationCaption, formatTimeShort, fromUnixTime} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS, formatDurationCaption, formatTimeShort, formatDateNumeral, fromUnixTime} from 'Util/TimeUtil';
 
 import {AssetTransferState} from '../../assets/AssetTransferState';
 import {AssetType} from '../../assets/AssetType';
@@ -152,9 +152,14 @@ export class Message {
     this.accent_color = ko.pureComputed(() => `accent-color-${this.user().accent_id()}`);
   }
 
-  display_timestamp_short = (): string => {
+  displayTimestampShort = (): string => {
     const date = fromUnixTime(this.timestamp() / TIME_IN_MILLIS.SECOND);
     return formatTimeShort(date);
+  };
+
+  displayTimestampLong = (): string => {
+    const date = fromUnixTime(this.timestamp() / TIME_IN_MILLIS.SECOND);
+    return formatDateNumeral(date);
   };
 
   equals = (messageEntity?: Message) => (messageEntity && this.id ? this.id === messageEntity.id : false);

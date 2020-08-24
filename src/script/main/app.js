@@ -831,7 +831,7 @@ class App {
 
     if (App.CONFIG.SIGN_OUT_REASONS.IMMEDIATE.includes(signOutReason)) {
       try {
-        _logout();
+        return _logout();
       } catch (error) {
         this.logger.error(`Logout triggered by '${signOutReason}' and errored: ${error.message}.`);
         _redirectToLogin();

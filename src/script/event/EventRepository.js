@@ -20,7 +20,7 @@
 import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {USER_EVENT} from '@wireapp/api-client/dist/event';
-import * as HTTP_STATUS from 'http-status-codes';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
 
 import {getLogger} from 'Util/Logger';

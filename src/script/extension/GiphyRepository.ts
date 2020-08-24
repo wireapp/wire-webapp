@@ -47,9 +47,10 @@ export class GiphyRepository {
   private currentOffset: number;
 
   static CONFIG = {
+    MAX_RESULTS: 6,
     MAX_RETRIES: 3,
-    MAX_SIZE: 3 * 1024 * 1024, // 3MB
-    NUMBER_OF_RESULTS: 6,
+    // 3MB
+    MAX_SIZE: 3 * 1024 * 1024,
   };
 
   constructor(giphyService: GiphyService) {
@@ -105,7 +106,7 @@ export class GiphyRepository {
    */
   async getGifs(query: string, options?: GetGifOptions): Promise<Gif[]> {
     options = {
-      maxResults: GiphyRepository.CONFIG.NUMBER_OF_RESULTS,
+      maxResults: GiphyRepository.CONFIG.MAX_RESULTS,
       maxSize: GiphyRepository.CONFIG.MAX_SIZE,
       ...options,
     };
@@ -129,7 +130,7 @@ export class GiphyRepository {
 
       const result = [];
 
-      for (const {images, url} of gifs.slice(0, options.maxResults)) {
+      for (const {images, url} of gifs) {
         const staticGif = images.fixed_width_still;
         const animatedGif = images.downsized;
         const exceedsMaxSize = parseInt(animatedGif.size, 10) > options.maxSize;
@@ -140,6 +141,10 @@ export class GiphyRepository {
             static: staticGif.url,
             url,
           });
+        }
+
+        if (result.length === options.maxResults) {
+          break;
         }
       }
 

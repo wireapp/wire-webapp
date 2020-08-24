@@ -18,7 +18,7 @@
  */
 
 import {container} from 'tsyringe';
-import * as HTTP_STATUS from 'http-status-codes';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {GiphyRepository} from 'src/script/extension/GiphyRepository';
 import {GiphyService} from 'src/script/extension/GiphyService';

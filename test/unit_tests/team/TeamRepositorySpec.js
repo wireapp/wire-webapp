@@ -17,7 +17,7 @@
  *
  */
 
-import * as HTTP_STATUS from 'http-status-codes';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {Config} from 'src/script/Config';
 import {TestFactory} from '../../helper/TestFactory';
