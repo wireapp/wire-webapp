@@ -8,6 +8,8 @@ export interface ServerConfig {
     BACKEND_REST: string;
     BACKEND_WS: string;
     BRAND_NAME: string;
+    CHROME_ORIGIN_TRIAL_TOKEN: string;
+    COUNTLY_API_KEY: string;
     ENVIRONMENT: string;
     FEATURE: {
       ALLOWED_FILE_UPLOAD_EXTENSIONS: string[];
@@ -49,6 +51,7 @@ export interface ServerConfig {
       TERMS_OF_USE_PERSONAL: string;
       TERMS_OF_USE_TEAMS: string;
       WEBSITE_BASE: string;
+      WHATS_NEW: string;
     };
     VERSION: string;
     WEBSITE_LABEL: string;

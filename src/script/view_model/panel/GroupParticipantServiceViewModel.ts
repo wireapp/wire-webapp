@@ -25,12 +25,13 @@ import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
 import type {ServiceEntity} from '../../integration/ServiceEntity';
 import type {ActionsViewModel} from '../ActionsViewModel';
 import type {IntegrationRepository} from '../../integration/IntegrationRepository';
+import type {User} from '../../entity/User';
 
 export class GroupParticipantServiceViewModel extends BasePanelViewModel {
   integrationRepository: IntegrationRepository;
   actionsViewModel: ActionsViewModel;
   logger: Logger;
-  selectedParticipant: ko.Observable<ServiceEntity>;
+  selectedParticipant: ko.Observable<User>;
   selectedService: ko.Observable<ServiceEntity>;
   isAddMode: ko.Observable<boolean>;
   conversationInTeam: ko.PureComputed<boolean>;
@@ -93,15 +94,15 @@ export class GroupParticipantServiceViewModel extends BasePanelViewModel {
     this.onGoBack();
   }
 
-  initView({entity: service, addMode = false}: {addMode: boolean; entity: ServiceEntity}): void {
-    const serviceEntity = ko.unwrap(service);
+  initView({entity: user, addMode = false}: {addMode: boolean; entity: User}): void {
+    const serviceEntity = ko.unwrap(user);
     this.selectedParticipant(serviceEntity);
     this.selectedService(undefined);
     this.isAddMode(addMode);
     this._showService(this.selectedParticipant());
   }
 
-  _showService = async (entity: ServiceEntity): Promise<void> => {
+  _showService = async (entity: User): Promise<void> => {
     const serviceEntity = await this.integrationRepository.getServiceFromUser(entity);
     this.selectedService(serviceEntity);
     this.integrationRepository.addProviderNameToParticipant(serviceEntity);

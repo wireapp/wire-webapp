@@ -19,6 +19,7 @@
 
 import * as express from 'express';
 import * as logdown from 'logdown';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {formatDate} from '../../util/TimeUtil';
 
@@ -32,7 +33,7 @@ const logger = logdown('@wireapp/wire-webapp/routes/error/errorRoutes', {
 const InternalErrorRoute = (): express.ErrorRequestHandler => (err, req, res) => {
   logger.error(`[${formatDate()}] ${err.stack}`);
   const error = {
-    code: 500,
+    code: HTTP_STATUS.INTERNAL_SERVER_ERROR,
     message: 'Internal server error',
     stack: err.stack,
   };
@@ -50,7 +51,7 @@ const InternalErrorRoute = (): express.ErrorRequestHandler => (err, req, res) =>
 const NotFoundRoute = () =>
   router.get('*', (req, res) => {
     const error = {
-      code: 404,
+      code: HTTP_STATUS.NOT_FOUND,
       message: 'Not found',
     };
     const request = {

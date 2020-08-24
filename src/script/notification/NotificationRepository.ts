@@ -64,6 +64,7 @@ import {container} from 'tsyringe';
 export interface Multitasking {
   autoMinimize?: ko.Observable<boolean>;
   isMinimized: ko.Observable<boolean> | (() => false);
+  resetMinimize?: ko.Observable<boolean>;
 }
 
 interface ContentViewModelState {
@@ -798,7 +799,7 @@ export class NotificationRepository {
       : false;
     const inConversationView = this.contentViewModelState.state() === ContentViewModel.STATE.CONVERSATION;
     const inMaximizedCall =
-      this.callingRepository.joinedCall() && !this.contentViewModelState.multitasking.isMinimized();
+      !!this.callingRepository.joinedCall() && !this.contentViewModelState.multitasking.isMinimized();
 
     const activeConversation = document.hasFocus() && inConversationView && inActiveConversation && !inMaximizedCall;
     const messageFromSelf = messageEntity.user().isMe;
@@ -819,10 +820,6 @@ export class NotificationRepository {
    * Sending the notification.
    *
    * @param notificationContent Content of notification
-   * @param notificationContent.title Title of notification
-   * @param notificationContent.options Notification options
-   * @param notificationContent.trigger Function to be called on notification click
-   * @param notificationContent.timeout Timeout after which notification is closed
    * @returns No return value
    */
   private showNotification(notificationContent: NotificationContent): void {
@@ -834,16 +831,12 @@ export class NotificationRepository {
    * Sending the browser notification.
    *
    * @param notificationContent Content of notification
-   * @param notificationContent.title Notification title
-   * @param notificationContent.options Notification options
-   * @param notificationContent.trigger Function to be triggered on click [Function] trigger
-   * @param notificationContent.timeout Timeout for notification
    * @param No return value
    */
   private showNotificationInBrowser(notificationContent: NotificationContent): void {
     /*
-     * @note Notification.data is only supported on Chrome
-     * @see https://developer.mozilla.org/en-US/docs/Web/API/Notification/data
+     * Note: Notification.data is only supported on Chrome.
+     * See https://developer.mozilla.org/en-US/docs/Web/API/Notification/data
      */
     this.removeReadNotifications();
     const notification = new window.Notification(notificationContent.title, notificationContent.options);

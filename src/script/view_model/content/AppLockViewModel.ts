@@ -23,6 +23,7 @@ import ko from 'knockout';
 import sodium from 'libsodium-wrappers-sumo';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {UrlUtil} from '@wireapp/commons';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {t} from 'Util/LocalizerUtil';
 import {afterRender} from 'Util/util';
@@ -273,7 +274,7 @@ export class AppLockViewModel {
       amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, true);
     } catch ({code, message}) {
       this.isLoading(false);
-      if ([400, 401, 403].includes(code)) {
+      if ([HTTP_STATUS.BAD_REQUEST, HTTP_STATUS.UNAUTHORIZED, HTTP_STATUS.FORBIDDEN].includes(code)) {
         return this.wipeError(t('modalAppLockWipePasswordError'));
       }
       this.wipeError(message);

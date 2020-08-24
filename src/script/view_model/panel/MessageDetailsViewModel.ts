@@ -35,7 +35,7 @@ import type {MemberMessage} from '../../entity/message/MemberMessage';
 
 export class MessageDetailsViewModel extends BasePanelViewModel {
   conversationRepository: ConversationRepository;
-  editedFooter: ko.PureComputed<string>;
+  editedFooter: ko.PureComputed<string | undefined>;
   isReceiptsOpen: ko.Observable<boolean>;
   likes: ko.PureComputed<string[]>;
   likesTitle: ko.PureComputed<string>;
@@ -109,7 +109,7 @@ export class MessageDetailsViewModel extends BasePanelViewModel {
     this.receiptTimes = ko.observable({});
     this.likeUsers = ko.observableArray();
 
-    this.receipts = ko.pureComputed(() => (this.message() && this.message().readReceipts()) || []);
+    this.receipts = ko.pureComputed(() => (!!this.message() && this.message().readReceipts()) || []);
 
     const sortUsers = (userA: User, userB: User): number =>
       userA.name().localeCompare(userB.name(), undefined, {sensitivity: 'base'});
@@ -117,10 +117,10 @@ export class MessageDetailsViewModel extends BasePanelViewModel {
     this.receipts.subscribe(receipts => {
       const userIds = receipts.map(({userId}) => userId);
       userRepository.getUsersById(userIds).then((users: User[]) => this.receiptUsers(users.sort(sortUsers)));
-      const receiptTimes = receipts.reduce((times, {userId, time}) => {
+      const receiptTimes = receipts.reduce<Record<string, string>>((times, {userId, time}) => {
         times[userId] = formatTime(time);
         return times;
-      }, {} as Record<string, string>);
+      }, {});
       this.receiptTimes(receiptTimes);
     });
 
@@ -131,7 +131,7 @@ export class MessageDetailsViewModel extends BasePanelViewModel {
     const formatUserCount = (users: User[]): string => (users.length ? ` (${users.length})` : '');
 
     this.supportsReceipts = ko.pureComputed(() => {
-      const isMe = this.message() && this.message().user().isMe;
+      const isMe = !!this.message() && this.message().user().isMe;
       const isTeamConversation = !!this.activeConversation().team_id;
       return isMe && isTeamConversation;
     });
@@ -140,13 +140,13 @@ export class MessageDetailsViewModel extends BasePanelViewModel {
       if (!this.message()) {
         return false;
       }
-      const isPing = this.message().super_type === SuperType.PING;
-      const isEphemeral = this.message().is_ephemeral();
+      const isPing = this.message()?.super_type === SuperType.PING;
+      const isEphemeral = this.message()?.is_ephemeral();
       return !isPing && !isEphemeral;
     });
 
     this.likes = ko.pureComputed(() => {
-      const reactions = this.supportsLikes() && (this.message() as ContentMessage).reactions();
+      const reactions = this.supportsLikes() && (this.message() as ContentMessage)?.reactions();
       return reactions ? Object.keys(reactions) : [];
     });
 
@@ -157,7 +157,7 @@ export class MessageDetailsViewModel extends BasePanelViewModel {
     this.receiptsTitle = ko.pureComputed(() => {
       return t(
         'messageDetailsTitleReceipts',
-        this.message().expectsReadConfirmation ? formatUserCount(this.receiptUsers()) : '',
+        this.message()?.expectsReadConfirmation ? formatUserCount(this.receiptUsers()) : '',
       );
     });
 
@@ -169,7 +169,7 @@ export class MessageDetailsViewModel extends BasePanelViewModel {
 
     this.editedFooter = ko.pureComputed(() => {
       return (
-        (this.message() as ContentMessage)?.edited_timestamp?.() &&
+        !!(this.message() as ContentMessage)?.edited_timestamp?.() &&
         formatTime((this.message() as ContentMessage).edited_timestamp())
       );
     });

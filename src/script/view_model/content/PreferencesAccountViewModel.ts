@@ -22,13 +22,15 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {WebappProperties} from '@wireapp/api-client/dist/user/data';
+import type {RichInfoField} from '@wireapp/api-client/dist/user/RichInfo';
+import {ChangeEvent} from 'react';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+
 import {t} from 'Util/LocalizerUtil';
 import {isTemporaryClientAndNonPersistent, validateProfileImageResolution} from 'Util/util';
 import {Environment} from 'Util/Environment';
 import {isKey, KEY} from 'Util/KeyboardUtil';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
-import type {RichInfoField} from '@wireapp/api-client/dist/user/RichInfo';
-import {ChangeEvent} from 'react';
 
 import {PreferenceNotificationRepository, Notification} from '../../notification/PreferenceNotificationRepository';
 import {getAccountPagesUrl, getCreateTeamUrl, getManageTeamUrl, URL_PATH} from '../../externalRoute';
@@ -62,6 +64,7 @@ import {ConversationRepository} from '../../conversation/ConversationRepository'
 import {TeamRepository} from '../../team/TeamRepository';
 import {AccentColorID} from '@wireapp/commons/dist/commonjs/util/AccentColor';
 import {TeamEntity} from '../../team/TeamEntity';
+import type {ClientEntity} from 'src/script/client/ClientEntity';
 
 export class PreferencesAccountViewModel {
   logger: Logger;
@@ -71,6 +74,7 @@ export class PreferencesAccountViewModel {
   isActivatedAccount: ko.PureComputed<boolean>;
   selfUser: ko.Observable<User>;
   name: ko.PureComputed<string>;
+  email: ko.PureComputed<string>;
   availability: ko.PureComputed<Availability.Type>;
   availabilityLabel: ko.PureComputed<string>;
   username: ko.PureComputed<string>;
@@ -132,6 +136,7 @@ export class PreferencesAccountViewModel {
     this.UserNameState = PreferencesAccountViewModel.USERNAME_STATE;
 
     this.name = ko.pureComputed(() => this.selfUser().name());
+    this.email = ko.pureComputed(() => this.selfUser().email());
     this.availability = ko.pureComputed(() => this.selfUser().availability());
 
     this.availabilityLabel = ko.pureComputed(() => {
@@ -250,6 +255,40 @@ export class PreferencesAccountViewModel {
     }
   };
 
+  changeEmail = async (data: unknown, event: ChangeEvent<HTMLInputElement>): Promise<void> => {
+    try {
+      const enteredEmail = event.target.value;
+
+      await this.userRepository.changeEmail(enteredEmail);
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+        text: {
+          message: t('authPostedResendDetail'),
+          title: t('modalPreferencesAccountEmailHeadline'),
+        },
+      });
+    } catch (error) {
+      this.logger.warn('Failed to send reset email request', error);
+      if (error.code === HTTP_STATUS.BAD_REQUEST) {
+        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+          text: {
+            message: t('modalPreferencesAccountEmailInvalidMessage'),
+            title: t('modalPreferencesAccountEmailErrorHeadline'),
+          },
+        });
+      }
+      if (error.code === HTTP_STATUS.CONFLICT) {
+        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+          text: {
+            message: t('modalPreferencesAccountEmailTakenMessage'),
+            title: t('modalPreferencesAccountEmailErrorHeadline'),
+          },
+        });
+      }
+    } finally {
+      event.target.blur();
+    }
+  };
+
   checkUsernameInput = (username: string, keyboardEvent: KeyboardEvent) => {
     if (isKey(keyboardEvent, KEY.BACKSPACE)) {
       return true;
@@ -272,7 +311,7 @@ export class PreferencesAccountViewModel {
         modals.showModal(
           ModalsViewModel.TYPE.ACCOUNT_NEW_DEVICES,
           {
-            data: aggregatedNotifications.map(notification => notification.data),
+            data: aggregatedNotifications.map(notification => notification.data) as ClientEntity[],
             preventClose: true,
             secondaryAction: {
               action: () => {
@@ -289,7 +328,7 @@ export class PreferencesAccountViewModel {
         modals.showModal(
           ModalsViewModel.TYPE.ACCOUNT_READ_RECEIPTS_CHANGED,
           {
-            data: aggregatedNotifications.pop().data,
+            data: aggregatedNotifications.pop().data as boolean,
             preventClose: true,
           },
           undefined,
@@ -396,6 +435,10 @@ export class PreferencesAccountViewModel {
     if (!this.nameSaved()) {
       this.name.notifySubscribers();
     }
+  };
+
+  resetEmailInput = (): void => {
+    this.email.notifySubscribers();
   };
 
   resetUsernameInput = (): void => {

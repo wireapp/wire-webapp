@@ -32,30 +32,39 @@ participant-item {
     opacity: 0.06;
   }
 
+  mic-off-icon,
+  mic-on-icon,
   verified-icon,
   guest-icon,
   disclose-icon,
+  camera-icon,
+  screenshare-icon,
   partner-icon {
     display: flex;
-    margin-left: 12px;
-  }
-
-  verified-icon + guest-icon,
-  verified-icon + camera-icon,
-  verified-icon + partner-icon,
-  partner-icon + camera-icon,
-  guest-icon + camera-icon {
     margin-left: 16px;
   }
 
-  guest-icon,
-  partner-icon {
-    fill: currentColor;
-    opacity: 0.48;
+  camera-icon svg {
+    width: 12px !important;
+    height: 9px;
   }
 
+  mic-off-icon,
+  mic-on-icon,
+  screenshare-icon {
+    svg {
+      height: 12px;
+    }
+  }
+
+  mic-off-icon,
+  mic-on-icon,
+  guest-icon,
+  partner-icon,
+  screenshare-icon,
   camera-icon {
-    animation: camera-pulse 1s alternate ease-in-out infinite;
+    fill: currentColor;
+    opacity: 0.48;
   }
 
   disclose-icon {
@@ -172,14 +181,5 @@ participant-item {
   }
   100% {
     background-color: var(--background-fade-8);
-  }
-}
-
-@keyframes camera-pulse {
-  0% {
-    opacity: 0.32;
-  }
-  100% {
-    opacity: 0.72;
   }
 }

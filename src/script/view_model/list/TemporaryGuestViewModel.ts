@@ -18,41 +18,44 @@
  */
 
 import {WebAppEvents} from '@wireapp/webapp-events';
+import ko from 'knockout';
+import {amplify} from 'amplify';
 
-import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 
 import {ModalsViewModel} from '../ModalsViewModel';
 import {Config} from '../../Config';
+import type {MainViewModel} from '../MainViewModel';
+import type {CallingRepository} from '../../calling/CallingRepository';
+import type {UserRepository} from '../../user/UserRepository';
+import type {CallingViewModel} from '../CallingViewModel';
+import type {User} from '../../entity/User';
+import type {TeamRepository} from 'src/script/team/TeamRepository';
+import type {Multitasking} from '../../notification/NotificationRepository';
 
-class TemporaryGuestViewModel {
-  /**
-   * View model for the temporary guest experience.
-   *
-   * @param {MainViewModel} mainViewModel Main view model
-   * @param {z.viewModel.ListViewModel} listViewModel List view model
-   * @param {Object} repositories Object containing all repositories
-   */
-  constructor(mainViewModel, listViewModel, repositories) {
-    this.conversationRepository = repositories.conversation;
-    this.userRepository = repositories.user;
-    this.callingRepository = repositories.calling;
-    this.multitasking = mainViewModel.content.multitasking;
-    this.permissionRepository = repositories.permission;
-    this.videoGridRepository = repositories.videoGrid;
+export class TemporaryGuestViewModel {
+  readonly multitasking: Multitasking;
+  readonly callingViewModel: CallingViewModel;
+  readonly selfUser: ko.Observable<User>;
+  readonly isAccountCreationEnabled: boolean;
+
+  constructor(
+    mainViewModel: MainViewModel,
+    private readonly userRepository: UserRepository,
+    readonly callingRepository: CallingRepository,
+    readonly teamRepository: TeamRepository,
+  ) {
+    this.multitasking = mainViewModel.multitasking;
     this.callingViewModel = mainViewModel.calling;
-
-    this.logger = getLogger('TemporaryGuestViewModel');
-
     this.selfUser = this.userRepository.self;
     this.isAccountCreationEnabled = Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION;
   }
 
-  clickOnPreferencesButton() {
+  clickOnPreferencesButton = (): void => {
     amplify.publish(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT);
-  }
+  };
 
-  clickToCreateAccount() {
+  clickToCreateAccount = (): void => {
     amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
       preventClose: true,
       primaryAction: {
@@ -64,11 +67,9 @@ class TemporaryGuestViewModel {
         title: t('modalAccountCreateHeadline'),
       },
     });
-  }
+  };
 
-  isSelectedConversation() {
+  isSelectedConversation = (): true => {
     return true;
-  }
+  };
 }
-
-export {TemporaryGuestViewModel};

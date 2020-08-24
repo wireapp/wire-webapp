@@ -18,6 +18,7 @@
  */
 
 import {ClientType} from '@wireapp/api-client/dist/client/';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {User} from 'src/script/entity/User';
 import {Environment} from 'src/script/util/Environment';
@@ -105,7 +106,7 @@ describe('ClientRepository', () => {
         Promise.resolve(ClientRepository.PRIMARY_KEY_CURRENT_CLIENT),
       );
       const backendError = new Error();
-      backendError.code = 404;
+      backendError.code = HTTP_STATUS.NOT_FOUND;
       spyOn(clientService, 'getClientById').and.returnValue(Promise.reject(backendError));
 
       return testFactory.client_repository
@@ -122,7 +123,7 @@ describe('ClientRepository', () => {
       spyOn(clientService, 'loadClientFromDb').and.returnValue(Promise.resolve(clientPayloadDatabase));
       spyOn(testFactory.storage_service, 'deleteDatabase').and.returnValue(Promise.resolve(true));
       const backendError = new Error();
-      backendError.response = {status: 404};
+      backendError.response = {status: HTTP_STATUS.NOT_FOUND};
       spyOn(clientService, 'getClientById').and.returnValue(Promise.reject(backendError));
 
       return testFactory.client_repository

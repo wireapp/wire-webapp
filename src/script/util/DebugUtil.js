@@ -20,6 +20,7 @@
 import $ from 'jquery';
 import sodium from 'libsodium-wrappers-sumo';
 import Dexie from 'dexie';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
 import {util as ProteusUtil} from '@wireapp/proteus';
 
 import {getLogger} from 'Util/Logger';
@@ -27,7 +28,6 @@ import {getLogger} from 'Util/Logger';
 import {checkVersion} from '../lifecycle/newVersionHandler';
 import {downloadFile} from './util';
 
-import {BackendEvent} from '../event/Backend';
 import {StorageSchemata} from '../storage/StorageSchemata';
 import {EventRepository} from '../event/EventRepository';
 
@@ -134,7 +134,7 @@ export class DebugUtil {
     const clientId = this.clientRepository.currentClient().id;
     const userId = this.userRepository.self().id;
 
-    const isOTRMessage = notification => notification.type === BackendEvent.CONVERSATION.OTR_MESSAGE_ADD;
+    const isOTRMessage = notification => notification.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD;
     const isInCurrentConversation = notification => notification.conversation === conversationId;
     const wasSentByOurCurrentClient = notification =>
       notification.from === userId && notification.data && notification.data.sender === clientId;
@@ -327,7 +327,7 @@ export class DebugUtil {
       .then(({notifications}) => {
         this.logger.info(`Fetched "${notifications.length}" notifications for client "${clientId}".`, notifications);
 
-        const isOTRMessage = notification => notification.type === BackendEvent.CONVERSATION.OTR_MESSAGE_ADD;
+        const isOTRMessage = notification => notification.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD;
         const isInCurrentConversation = notification => notification.conversation === conversationId;
 
         return notifications

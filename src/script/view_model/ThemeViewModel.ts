@@ -18,7 +18,10 @@
  */
 
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
+import type {PropertiesRepository} from '../properties/PropertiesRepository';
+import type {WebappProperties} from '@wireapp/api-client/dist/user/data';
 
 const THEMES_CLASS_PREFIX = 'theme-';
 
@@ -28,16 +31,16 @@ export const THEMES = {
 };
 
 export class ThemeViewModel {
-  constructor(propertiesRepository) {
+  constructor(propertiesRepository: PropertiesRepository) {
     this.setTheme(propertiesRepository.getPreference(PROPERTIES_TYPE.INTERFACE.THEME));
 
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, this.setTheme);
-    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, properties =>
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, (properties: WebappProperties) =>
       this.setTheme(properties.settings.interface.theme),
     );
   }
 
-  setTheme = newTheme => {
+  private readonly setTheme = (newTheme: 'dark' | 'default') => {
     const classes = document.body.className
       .split(' ')
       .filter(elementClass => !elementClass.startsWith(THEMES_CLASS_PREFIX))

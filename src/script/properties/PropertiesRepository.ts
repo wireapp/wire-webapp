@@ -17,6 +17,7 @@
  *
  */
 
+import ko from 'knockout';
 import {amplify} from 'amplify';
 import {Confirmation} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -65,12 +66,11 @@ export class PropertiesRepository {
     this.logger = getLogger('PropertiesRepository');
 
     this.properties = {
-      contact_import: {
-        macos: undefined,
-      },
+      contact_import: {},
       enable_debugging: false,
       settings: {
         call: {
+          enable_sft_calling: false,
           enable_vbr_encoding: true,
         },
         emoji: {
@@ -199,17 +199,7 @@ export class PropertiesRepository {
     return this.properties;
   }
 
-  savePreference(propertiesType: string, updatedPreference: any): void {
-    if (updatedPreference === undefined) {
-      switch (propertiesType) {
-        case PROPERTIES_TYPE.CONTACT_IMPORT.MACOS:
-          updatedPreference = Date.now();
-          break;
-        default:
-          updatedPreference = true;
-      }
-    }
-
+  savePreference(propertiesType: string, updatedPreference: any = true): void {
     if (updatedPreference !== this.getPreference(propertiesType)) {
       this.setPreference(propertiesType, updatedPreference);
 
@@ -285,9 +275,6 @@ export class PropertiesRepository {
 
   private publishPropertyUpdate(propertiesType: string, updatedPreference: any): void {
     switch (propertiesType) {
-      case PROPERTIES_TYPE.CONTACT_IMPORT.MACOS:
-        amplify.publish(WebAppEvents.PROPERTIES.UPDATE.CONTACTS, updatedPreference);
-        break;
       case PROPERTIES_TYPE.INTERFACE.THEME:
         amplify.publish(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, updatedPreference);
         break;
@@ -314,6 +301,9 @@ export class PropertiesRepository {
         break;
       case PROPERTIES_TYPE.CALL.ENABLE_VBR_ENCODING:
         amplify.publish(WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_VBR_ENCODING, updatedPreference);
+        break;
+      case PROPERTIES_TYPE.CALL.ENABLE_SFT_CALLING:
+        amplify.publish(WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_SFT_CALLING, updatedPreference);
         break;
       default:
         throw new Error(`Failed to update preference of unhandled type '${propertiesType}'`);

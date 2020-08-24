@@ -22,16 +22,15 @@ import ko from 'knockout';
 import {Availability, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {debounce, Cancelable} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {STATE as CALL_STATE} from '@wireapp/avs';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/dist/conversation';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {truncate} from 'Util/StringUtil';
 
-import {Config} from '../Config';
-
 import {ACCESS_STATE} from '../conversation/AccessState';
 import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
-import {ConversationType} from '../conversation/ConversationType';
 import {ConversationStatus} from '../conversation/ConversationStatus';
 import {ConversationRepository} from '../conversation/ConversationRepository';
 import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
@@ -46,6 +45,8 @@ import type {ContentMessage} from './message/ContentMessage';
 import type {MemberMessage} from './message/MemberMessage';
 import type {Message} from './message/Message';
 import type {SystemMessage} from './message/SystemMessage';
+import {Config} from '../Config';
+import type {Call} from '../calling/Call';
 
 interface UnreadState {
   allEvents: Message[];
@@ -86,7 +87,7 @@ interface SerializedConversation {
   receipt_mode: Confirmation.Type;
   status: ConversationStatus;
   team_id: string;
-  type: ConversationType;
+  type: CONVERSATION_TYPE;
   verification_state: ConversationVerificationState;
 }
 
@@ -97,6 +98,7 @@ export class Conversation {
   archivedTimestamp: ko.Observable<number>;
   availabilityOfUser: ko.PureComputed<Availability.Type>;
   blockLegalHoldMessage: boolean;
+  call: ko.Observable<Call>;
   cleared_timestamp: ko.Observable<number>;
   connection: ko.Observable<ConnectionEntity>;
   creator: string;
@@ -159,7 +161,7 @@ export class Conversation {
   showNotificationsNothing: ko.PureComputed<boolean>;
   status: ko.Observable<ConversationStatus>;
   team_id: string;
-  type: ko.Observable<ConversationType>;
+  type: ko.Observable<CONVERSATION_TYPE>;
   unreadState: ko.PureComputed<UnreadState>;
   verification_state: ko.Observable<ConversationVerificationState>;
   withAllTeamMembers: ko.Observable<User[]>;
@@ -202,20 +204,20 @@ export class Conversation {
     this.withAllTeamMembers = ko.observable(undefined);
 
     this.isTeam1to1 = ko.pureComputed(() => {
-      const isGroupConversation = this.type() === ConversationType.GROUP;
+      const isGroupConversation = this.type() === CONVERSATION_TYPE.REGULAR;
       const hasOneParticipant = this.participating_user_ids().length === 1;
       return isGroupConversation && hasOneParticipant && this.team_id && !this.name();
     });
     this.isGroup = ko.pureComputed(() => {
-      const isGroupConversation = this.type() === ConversationType.GROUP;
+      const isGroupConversation = this.type() === CONVERSATION_TYPE.REGULAR;
       return isGroupConversation && !this.isTeam1to1();
     });
     this.is1to1 = ko.pureComputed(() => {
-      const is1to1Conversation = this.type() === ConversationType.ONE2ONE;
+      const is1to1Conversation = this.type() === CONVERSATION_TYPE.ONE_TO_ONE;
       return is1to1Conversation || this.isTeam1to1();
     });
-    this.isRequest = ko.pureComputed(() => this.type() === ConversationType.CONNECT);
-    this.isSelf = ko.pureComputed(() => this.type() === ConversationType.SELF);
+    this.isRequest = ko.pureComputed(() => this.type() === CONVERSATION_TYPE.CONNECT);
+    this.isSelf = ko.pureComputed(() => this.type() === CONVERSATION_TYPE.SELF);
 
     this.hasGuest = ko.pureComputed(() => {
       const hasGuestUser = this.participating_user_ets().some(userEntity => userEntity.isGuest());
@@ -243,6 +245,8 @@ export class Conversation {
     this.last_read_timestamp = ko.observable(0);
     this.last_server_timestamp = ko.observable(0);
     this.mutedTimestamp = ko.observable(0);
+
+    this.call = ko.observable(null);
 
     // Conversation states for view
     this.notificationState = ko.pureComputed(() => {
@@ -893,15 +897,20 @@ export class Conversation {
     return userEntities.filter(userEntity => !userEntity.is_verified());
   }
 
-  supportsVideoCall(): boolean {
+  supportsVideoCall(sftEnabled: boolean): boolean {
+    if (sftEnabled) {
+      return true;
+    }
     const participantCount = this.getNumberOfParticipants(true, false);
-    const passesParticipantLimit = participantCount <= Config.getConfig().MAX_VIDEO_PARTICIPANTS;
-    return passesParticipantLimit;
+    const config = Config.getConfig();
+    return participantCount <= config.MAX_VIDEO_PARTICIPANTS;
   }
 
   isShowingLastReceivedMessage = (): boolean => {
     return this.getLastMessage()?.timestamp() ? this.getLastMessage().timestamp() >= this.last_event_timestamp() : true;
   };
+
+  hasActiveCall = (): boolean => this.call()?.state() === CALL_STATE.MEDIA_ESTAB;
 
   serialize(): SerializedConversation {
     return {

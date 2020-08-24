@@ -127,6 +127,8 @@ const config: ServerConfig = {
     BACKEND_REST: process.env.BACKEND_REST,
     BACKEND_WS: process.env.BACKEND_WS,
     BRAND_NAME: process.env.BRAND_NAME,
+    CHROME_ORIGIN_TRIAL_TOKEN: process.env.CHROME_ORIGIN_TRIAL_TOKEN,
+    COUNTLY_API_KEY: process.env.COUNTLY_API_KEY,
     ENVIRONMENT: nodeEnvironment,
     FEATURE: {
       ALLOWED_FILE_UPLOAD_EXTENSIONS: (process.env.FEATURE_ALLOWED_FILE_UPLOAD_EXTENSIONS || '*')
@@ -176,6 +178,7 @@ const config: ServerConfig = {
       TERMS_OF_USE_PERSONAL: process.env.URL_TERMS_OF_USE_PERSONAL,
       TERMS_OF_USE_TEAMS: process.env.URL_TERMS_OF_USE_TEAMS,
       WEBSITE_BASE: process.env.URL_WEBSITE_BASE,
+      WHATS_NEW: process.env.URL_WHATS_NEW,
     },
     VERSION: readFile(VERSION_FILE, '0.0.0'),
     WEBSITE_LABEL: process.env.WEBSITE_LABEL,

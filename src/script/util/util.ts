@@ -22,8 +22,7 @@ import type {ObservableArray} from 'knockout';
 import sodium from 'libsodium-wrappers-sumo';
 import UUID from 'uuidjs';
 import {UrlUtil} from '@wireapp/commons';
-
-import {partition} from 'Util/ArrayUtil';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {QUERY_KEY} from '../auth/route';
 import {Config} from '../Config';
@@ -120,7 +119,7 @@ export const loadUrlBuffer = (
     xhr.responseType = 'arraybuffer';
 
     xhr.onload = () => {
-      const isStatusOK = xhr.status === 200;
+      const isStatusOK = xhr.status === HTTP_STATUS.OK;
       return isStatusOK
         ? resolve({buffer: xhr.response, mimeType: xhr.getResponseHeader('content-type')})
         : reject(new Error(xhr.status.toString(10)));
@@ -178,35 +177,6 @@ export const trimFileExtension = (filename: string): string => {
 
   return '';
 };
-
-export const allowedImageTypes = ['image/bmp', 'image/gif', 'image/jpeg', 'image/jpg', 'image/png', '.jpg-large'];
-
-export const allowsAllFiles = (): boolean => {
-  const allowedExtentions = Config.getConfig().FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS;
-  return allowedExtentions.some(extension => ['*', '.*', '*.*'].includes(extension));
-};
-
-export const hasAllowedExtension = (fileName: string): boolean => {
-  const allowedExtentions = Config.getConfig().FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS;
-
-  // Creates a regex like this: (\.txt|\.pdf)$
-  const fileExtRegex = new RegExp(`(\\${allowedExtentions.join('|\\')})$`);
-  return fileExtRegex.test(fileName.toLowerCase());
-};
-
-export const isAllowedFile = (name: string, type: string): boolean => {
-  const [imageFileExtensions, imageContentTypes] = partition(allowedImageTypes, allowedImageType =>
-    allowedImageType.startsWith('.'),
-  );
-  if (imageContentTypes.includes(type)) {
-    return true;
-  }
-  const allowedExtentions = [...imageFileExtensions, ...Config.getConfig().FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS];
-  const fileExtRegex = new RegExp(`(\\${allowedExtentions.join('|\\')})$`);
-  return fileExtRegex.test(name.toLowerCase());
-};
-
-export const getFileExtensionOrName = (fileName: string): string => fileName.match(/(\.?[^.]*)$/)[0];
 
 export const formatBytes = (bytes: number, decimals: number = 1): string => {
   if (bytes === 0) {
