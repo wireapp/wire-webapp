@@ -4,10 +4,10 @@ about: Create a bug report to help us fixing defects
 title: ''
 labels: "type: bug / fix \U0001F41E"
 assignees: ''
-
 ---
 
 ## Your Account Type
+
 - [ ] Wire Personal Account
 - [ ] [Wire Pro Account](https://wire.com/products/pro-secure-team-collaboration/)
 - [ ] [Wire Enterprise Account](https://wire.com/products/enterprise-collaboration/)
