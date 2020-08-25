@@ -129,6 +129,7 @@ import * as LegalHoldEvaluator from '../legal-hold/LegalHoldEvaluator';
 import {DeleteConversationMessage} from '../entity/message/DeleteConversationMessage';
 import {ConversationRoleRepository} from './ConversationRoleRepository';
 import {ConversationError} from '../error/ConversationError';
+import {Segmantation} from '../tracking/Segmentation';
 import {ConversationService} from './ConversationService';
 import {AssetRepository} from '../assets/AssetRepository';
 import {ClientRepository} from '../client/ClientRepository';
@@ -4322,12 +4323,10 @@ export class ConversationRepository {
    * @param callMessageEntity Optional call message
    */
   private _trackContributed(conversationEntity: Conversation, genericMessage: GenericMessage) {
-    let messageTimer;
     const isEphemeral = genericMessage.content === GENERIC_MESSAGE_TYPE.EPHEMERAL;
 
     if (isEphemeral) {
       genericMessage = genericMessage.ephemeral as any;
-      messageTimer = (genericMessage as any)[PROTO_MESSAGE_TYPE.EPHEMERAL_EXPIRATION] / TIME_IN_MILLIS.SECOND;
     }
 
     const messageContentType = genericMessage.content;
@@ -4352,6 +4351,11 @@ export class ConversationRepository {
         break;
       }
 
+      case 'reaction': {
+        actionType = 'like';
+        break;
+      }
+
       case 'text': {
         const protoText = genericMessage.text;
         const length = protoText[PROTO_MESSAGE_TYPE.LINK_PREVIEWS].length;
@@ -4365,24 +4369,22 @@ export class ConversationRepository {
       default:
         break;
     }
-
     if (actionType) {
-      let attributes = {
-        action: actionType,
-        conversation_type: trackingHelpers.getConversationType(conversationEntity),
-        ephemeral_time: isEphemeral ? messageTimer : undefined,
-        is_ephemeral: isEphemeral,
-        is_global_ephemeral: !!conversationEntity.globalMessageTimer(),
-        mention_num: numberOfMentions,
-        with_service: conversationEntity.hasService(),
+      const guests = conversationEntity.participating_user_ets().filter(user => user.isGuest()).length;
+      let segmentations = {
+        [Segmantation.CONVERSATION.GUESTS]: guests,
+        [Segmantation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
+        [Segmantation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
+        [Segmantation.MESSAGE.ACTION]: actionType,
+        [Segmantation.MESSAGE.IS_REPLY]: !!genericMessage.text?.quote,
+        [Segmantation.MESSAGE.MENTION]: numberOfMentions,
       };
-
       const isTeamConversation = !!conversationEntity.team_id;
       if (isTeamConversation) {
-        attributes = {...attributes, ...trackingHelpers.getGuestAttributes(conversationEntity)};
+        segmentations = {...segmentations, ...trackingHelpers.getGuestAttributes(conversationEntity)};
       }
 
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CONTRIBUTED, attributes);
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CONTRIBUTED, segmentations);
     }
   }
 }

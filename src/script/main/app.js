@@ -239,7 +239,7 @@ class App {
     );
     repositories.search = new SearchRepository(new SearchService(this.apiClient), repositories.user);
     repositories.team = new TeamRepository(new TeamService(this.apiClient), repositories.user, repositories.asset);
-    repositories.eventTracker = new EventTrackingRepository(repositories.team, repositories.user);
+    repositories.eventTracker = new EventTrackingRepository(repositories.user);
 
     repositories.conversation = new ConversationRepository(
       this.service.conversation,
@@ -392,21 +392,21 @@ class App {
       await checkIndexedDb();
       this._registerSingleInstance();
       loadingView.updateProgress(2.5);
-      telemetry.time_step(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
+      telemetry.timeStep(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
       await authRepository.init();
       await this._initiateSelfUser();
       loadingView.updateProgress(5, t('initReceivedSelfUser', userRepository.self().name()));
-      telemetry.time_step(AppInitTimingsStep.RECEIVED_SELF_USER);
+      telemetry.timeStep(AppInitTimingsStep.RECEIVED_SELF_USER);
       const clientEntity = await this._initiateSelfUserClients();
       const selfUser = userRepository.self();
       callingRepository.initAvs(selfUser, clientEntity.id);
       loadingView.updateProgress(7.5, t('initValidatedClient'));
-      telemetry.time_step(AppInitTimingsStep.VALIDATED_CLIENT);
-      telemetry.add_statistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity.type);
+      telemetry.timeStep(AppInitTimingsStep.VALIDATED_CLIENT);
+      telemetry.addStatistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity.type);
 
       await cryptographyRepository.initCryptobox();
       loadingView.updateProgress(10);
-      telemetry.time_step(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
+      telemetry.timeStep(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
       await teamRepository.initTeam();
 
@@ -415,9 +415,9 @@ class App {
       const connectionEntities = await connectionRepository.getConnections();
       loadingView.updateProgress(25, t('initReceivedUserData'));
 
-      telemetry.time_step(AppInitTimingsStep.RECEIVED_USER_DATA);
-      telemetry.add_statistic(AppInitStatisticsValue.CONVERSATIONS, conversationEntities.length, 50);
-      telemetry.add_statistic(AppInitStatisticsValue.CONNECTIONS, connectionEntities.length, 50);
+      telemetry.timeStep(AppInitTimingsStep.RECEIVED_USER_DATA);
+      telemetry.addStatistic(AppInitStatisticsValue.CONVERSATIONS, conversationEntities.length, 50);
+      telemetry.addStatistic(AppInitStatisticsValue.CONNECTIONS, connectionEntities.length, 50);
 
       conversationRepository.map_connections(connectionRepository.connectionEntities());
       this._subscribeToUnloadEvents();
@@ -428,8 +428,8 @@ class App {
 
       const notificationsCount = await eventRepository.initializeFromStream();
 
-      telemetry.time_step(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
-      telemetry.add_statistic(AppInitStatisticsValue.NOTIFICATIONS, notificationsCount, 100);
+      telemetry.timeStep(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
+      telemetry.addStatistic(AppInitStatisticsValue.NOTIFICATIONS, notificationsCount, 100);
 
       eventTrackerRepository.init(propertiesRepository.properties.settings.privacy.improve_wire);
       await conversationRepository.initialize_conversations();
@@ -440,8 +440,8 @@ class App {
 
       loadingView.updateProgress(99);
 
-      telemetry.add_statistic(AppInitStatisticsValue.CLIENTS, clientEntities.length);
-      telemetry.time_step(AppInitTimingsStep.APP_PRE_LOADED);
+      telemetry.addStatistic(AppInitStatisticsValue.CLIENTS, clientEntities.length);
+      telemetry.timeStep(AppInitTimingsStep.APP_PRE_LOADED);
 
       userRepository.self().devices(clientEntities);
       this.logger.info('App pre-loading completed');
@@ -449,7 +449,7 @@ class App {
       await conversationRepository.updateConversationsOnAppInit();
       await conversationRepository.conversationLabelRepository.loadLabels();
 
-      telemetry.time_step(AppInitTimingsStep.APP_LOADED);
+      telemetry.timeStep(AppInitTimingsStep.APP_LOADED);
       this._showInterface();
       this.applock = new AppLockViewModel(clientRepository, userRepository.self);
 
@@ -458,7 +458,7 @@ class App {
       amplify.publish(WebAppEvents.LIFECYCLE.LOADED);
       modals.ready();
       showInitialModal(userRepository.self().availability());
-      telemetry.time_step(AppInitTimingsStep.UPDATED_CONVERSATIONS);
+      telemetry.timeStep(AppInitTimingsStep.UPDATED_CONVERSATIONS);
       if (userRepository.isActivatedAccount()) {
         // start regularly polling the server to check if there is a new version of Wire
         startNewVersionPolling(Environment.version(false, true), this.update.bind(this));

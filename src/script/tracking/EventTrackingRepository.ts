@@ -17,24 +17,19 @@
  *
  */
 
-import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
-
+import {amplify} from 'amplify';
+import {RaygunStatic} from 'raygun4js';
 import {Environment} from 'Util/Environment';
 import {getLogger, Logger} from 'Util/Logger';
 import {includesString} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {getParameter} from 'Util/UrlUtil';
-
+import {createRandomUuid} from 'Util/util';
 import {URLParameter} from '../auth/URLParameter';
-
-import type {TeamRepository} from '../team/TeamRepository';
 import type {UserRepository} from '../user/UserRepository';
 import {EventName} from './EventName';
-import * as trackingHelpers from './Helpers';
-import {SuperProperty} from './SuperProperty';
-import {RaygunStatic} from 'raygun4js';
-import {createRandomUuid} from 'Util/util';
+import {UserData} from './UserData';
 
 declare const Raygun: RaygunStatic;
 
@@ -45,7 +40,6 @@ export class EventTrackingRepository {
   private lastReportTimestamp?: number;
   private privacyPreference?: boolean;
   private readonly logger: Logger;
-  private readonly teamRepository: TeamRepository;
   private readonly userRepository: UserRepository;
   isErrorReportingActivated: boolean;
 
@@ -58,16 +52,14 @@ export class EventTrackingRepository {
       USER_ANALYTICS: {
         API_KEY: window.wire.env.ANALYTICS_API_KEY,
         CLIENT_TYPE: 'desktop',
-        DISABLED_DOMAINS: ['localhost', 'zinfra.io'],
-        DISABLED_EVENTS: [EventName.TELEMETRY.APP_INITIALIZATION],
+        DISABLED_DOMAINS: ['localhost'],
       },
     };
   }
 
-  constructor(teamRepository: TeamRepository, userRepository: UserRepository) {
+  constructor(userRepository: UserRepository) {
     this.logger = getLogger('EventTrackingRepository');
 
-    this.teamRepository = teamRepository;
     this.userRepository = userRepository;
 
     this.lastReportTimestamp = undefined;
@@ -78,7 +70,7 @@ export class EventTrackingRepository {
   }
 
   async init(privacyPreference: boolean): Promise<void> {
-    this.privacyPreference = privacyPreference;
+    this.privacyPreference = privacyPreference || this.userRepository.isTeam();
     this.logger.info(`Initialize analytics and error reporting: ${this.privacyPreference}`);
 
     if (this.privacyPreference) {
@@ -92,7 +84,6 @@ export class EventTrackingRepository {
     const hasPreferenceChanged = privacyPreference !== this.privacyPreference;
     if (hasPreferenceChanged) {
       this.privacyPreference = privacyPreference;
-
       return this.privacyPreference ? this.enableServices(true) : this.disableServices();
     }
   };
@@ -121,8 +112,9 @@ export class EventTrackingRepository {
   }
 
   private async startProductReporting(): Promise<void> {
-    // Info: Always deactivate product reporting for now.
-    return;
+    if (!window.wire.env.COUNTLY_API_KEY) {
+      return;
+    }
     this.isProductReportingActivated = true;
 
     Countly.init({
@@ -157,8 +149,8 @@ export class EventTrackingRepository {
   }
 
   private subscribeToProductEvents(): void {
-    amplify.subscribe(WebAppEvents.ANALYTICS.EVENT, this, (eventName: string, attributes?: any) => {
-      this.trackProductReportingEvent(eventName, attributes);
+    amplify.subscribe(WebAppEvents.ANALYTICS.EVENT, this, (eventName: string, segmentations?: any) => {
+      this.trackProductReportingEvent(eventName, segmentations);
     });
 
     amplify.subscribe(WebAppEvents.LIFECYCLE.SIGNED_OUT, this.stopProductReportingSession.bind(this));
@@ -167,35 +159,22 @@ export class EventTrackingRepository {
   private startProductReportingSession(): void {
     if (this.isProductReportingActivated === true) {
       Countly.begin_session();
-
-      this._setSuperProperty(SuperProperty.APP, EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE);
-      this._setSuperProperty(SuperProperty.APP_VERSION, Environment.version(false));
-      this._setSuperProperty(SuperProperty.DESKTOP_APP, trackingHelpers.getPlatform());
-      if (Environment.desktop) {
-        this._setSuperProperty(SuperProperty.WRAPPER_VERSION, Environment.version(true));
-      }
-
-      if (this.userRepository) {
-        this._setSuperProperty(SuperProperty.CONTACTS, this.userRepository.number_of_contacts());
-        this._setSuperProperty(SuperProperty.TEAM.IN_TEAM, this.teamRepository.isTeam());
-        this._setSuperProperty(SuperProperty.TEAM.SIZE, this.teamRepository.teamSize());
-      }
     }
   }
 
-  private _setSuperProperty(superPropertyName: string, value: any): void {
-    // Set property on provider API
-    this.logger.info(`Set super property '${superPropertyName}' to value '${value}'`);
-  }
-
-  private trackProductReportingEvent(eventName: string, attributes?: any): void {
+  private trackProductReportingEvent(eventName: string, segmentations?: any): void {
     if (this.isProductReportingActivated === true) {
+      Countly.userData.set(UserData.APP, EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE);
+      Countly.userData.set(UserData.APP_VERSION, Environment.version(false));
+      Countly.userData.set(UserData.IS_TEAM, this.userRepository.isTeam());
+      Countly.userData.set(UserData.CONTACTS, this.userRepository.number_of_contacts());
+      Countly.userData.set(UserData.TEAM_SIZE, this.userRepository.teamMembers().length);
+      Countly.userData.save();
+
       Countly.add_event({
         key: eventName,
         segmentation: {
-          ...attributes,
-          [SuperProperty.APP]: EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE,
-          [SuperProperty.APP_VERSION]: Environment.version(false),
+          ...segmentations,
         },
       });
     }

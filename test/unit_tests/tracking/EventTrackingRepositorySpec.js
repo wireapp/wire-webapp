@@ -108,14 +108,17 @@ describe('EventTrackingRepository', () => {
 
     xit('allows additional parameters for events', () => {
       const event_name = 'Article View';
-      const attributes = {
+      const segmentations = {
         'Page Name': 'Baseball Headlines',
         Section: 'Sports',
       };
 
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, event_name, attributes);
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, event_name, segmentations);
 
-      expect(testFactory.tracking_repository.trackProductReportingEvent).toHaveBeenCalledWith(event_name, attributes);
+      expect(testFactory.tracking_repository.trackProductReportingEvent).toHaveBeenCalledWith(
+        event_name,
+        segmentations,
+      );
     });
   });
 
