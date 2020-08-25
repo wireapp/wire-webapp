@@ -19,34 +19,20 @@
 
 import ko from 'knockout';
 
-import type {ConversationRepository} from '../../conversation/ConversationRepository';
 import type {Conversation} from '../../entity/Conversation';
 import type {User} from '../../entity/User';
 import type {ServiceEntity} from '../../integration/ServiceEntity';
-import type {SearchRepository} from '../../search/SearchRepository';
-import type {TeamRepository} from '../../team/TeamRepository';
-import type {ClientRepository} from '../../client/ClientRepository';
-import type {CryptographyRepository} from '../../cryptography/CryptographyRepository';
-import type {UserRepository} from '../../user/UserRepository';
 import type {MainViewModel} from '../MainViewModel';
-import type {IntegrationRepository} from '../../integration/IntegrationRepository';
+import type {PanelRepositories, PanelParams} from '../PanelViewModel';
 
 export interface PanelViewModelProps {
-  isVisible: ko.Observable<boolean>;
+  isVisible: ko.PureComputed<boolean>;
   mainViewModel: MainViewModel;
   navigateTo: (target: string, params?: {addMode?: boolean; entity?: User | ServiceEntity}) => void;
   onClose: () => void;
   onGoBack: () => void;
   onGoToRoot: () => void;
-  repositories: {
-    client: ClientRepository;
-    conversation: ConversationRepository;
-    cryptography: CryptographyRepository;
-    integration: IntegrationRepository;
-    search: SearchRepository;
-    team: TeamRepository;
-    user: UserRepository;
-  };
+  repositories: PanelRepositories;
 }
 
 export class BasePanelViewModel {
@@ -54,7 +40,7 @@ export class BasePanelViewModel {
   onGoBack: () => void;
   onGoToRoot: () => void;
   navigateTo: PanelViewModelProps['navigateTo'];
-  isVisible: ko.Observable<boolean>;
+  isVisible: ko.PureComputed<boolean>;
   activeConversation: ko.Observable<Conversation>;
   constructor({isVisible, navigateTo, onClose, onGoBack, onGoToRoot, repositories}: PanelViewModelProps) {
     this.onClose = onClose;
@@ -67,7 +53,7 @@ export class BasePanelViewModel {
     this.activeConversation = repositories.conversation.active_conversation;
   }
 
-  initView(_: unknown): void {}
+  initView(params?: PanelParams): void {}
 
   getElementId(): string {
     return 'conversation-details';

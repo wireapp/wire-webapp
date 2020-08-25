@@ -39,6 +39,7 @@ import type {TeamRepository} from 'src/script/team/TeamRepository';
 import type {UserRepository} from 'src/script/user/UserRepository';
 import type {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import type {User} from 'src/script/entity/User';
+import {PanelViewModel} from '../PanelViewModel';
 
 export class AddParticipantsViewModel extends BasePanelViewModel {
   conversationRepository: ConversationRepository;
@@ -162,7 +163,7 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
 
   clickOnSelectService(serviceEntity: ServiceEntity): void {
     this.selectedService(serviceEntity);
-    this.navigateTo(z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE, {
+    this.navigateTo(PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE, {
       addMode: true,
       entity: serviceEntity,
     });

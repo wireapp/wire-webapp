@@ -26,6 +26,7 @@ import type {User} from '../../entity/User';
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
 import type {ClientRepository} from '../../client/ClientRepository';
 import type {CryptographyRepository} from '../../cryptography/CryptographyRepository';
+import {PanelParams} from '../PanelViewModel';
 
 export class ParticipantDevicesViewModel extends BasePanelViewModel {
   clientRepository: ClientRepository;
@@ -64,8 +65,8 @@ export class ParticipantDevicesViewModel extends BasePanelViewModel {
     this.onGoBack();
   }
 
-  initView({entity: userEntity}: {entity: User}): void {
-    this.userEntity(userEntity);
+  initView({entity: userEntity}: PanelParams): void {
+    this.userEntity(userEntity as User);
     this.userDevicesHistory = makeUserDevicesHistory();
   }
 }

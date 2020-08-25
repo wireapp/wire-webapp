@@ -32,6 +32,7 @@ import type {TeamRepository} from '../../team/TeamRepository';
 import type {User} from '../../entity/User';
 import type {ContentMessage} from '../../entity/message/ContentMessage';
 import type {MemberMessage} from '../../entity/message/MemberMessage';
+import {PanelParams} from '../PanelViewModel';
 
 export class MessageDetailsViewModel extends BasePanelViewModel {
   conversationRepository: ConversationRepository;
@@ -197,7 +198,7 @@ export class MessageDetailsViewModel extends BasePanelViewModel {
     return this.messageId();
   }
 
-  initView({entity: {id}, showLikes}: {entity: Message; showLikes: boolean}): void {
+  initView({entity: {id}, showLikes}: PanelParams): void {
     this.isReceiptsOpen(!showLikes);
     this.messageId(id);
   }

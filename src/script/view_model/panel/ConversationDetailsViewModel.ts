@@ -44,6 +44,7 @@ import type {Conversation} from '../../entity/Conversation';
 
 import 'Components/receiptModeToggle';
 import 'Components/panel/panelActions';
+import {PanelViewModel} from '../PanelViewModel';
 
 export class ConversationDetailsViewModel extends BasePanelViewModel {
   conversationRepository: ConversationRepository;
@@ -368,11 +369,11 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
   }
 
   clickOnAddParticipants(): void {
-    this.navigateTo(z.viewModel.PanelViewModel.STATE.ADD_PARTICIPANTS);
+    this.navigateTo(PanelViewModel.STATE.ADD_PARTICIPANTS);
   }
 
   clickOnShowAll(): void {
-    this.navigateTo(z.viewModel.PanelViewModel.STATE.CONVERSATION_PARTICIPANTS);
+    this.navigateTo(PanelViewModel.STATE.CONVERSATION_PARTICIPANTS);
   }
 
   clickOnCreateGroup(): void {
@@ -380,27 +381,27 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
   }
 
   clickOnDevices(): void {
-    this.navigateTo(z.viewModel.PanelViewModel.STATE.PARTICIPANT_DEVICES, {entity: this.firstParticipant()});
+    this.navigateTo(PanelViewModel.STATE.PARTICIPANT_DEVICES, {entity: this.firstParticipant()});
   }
 
   clickOnGuestOptions(): void {
-    this.navigateTo(z.viewModel.PanelViewModel.STATE.GUEST_OPTIONS);
+    this.navigateTo(PanelViewModel.STATE.GUEST_OPTIONS);
   }
 
   clickOnTimedMessages(): void {
-    this.navigateTo(z.viewModel.PanelViewModel.STATE.TIMED_MESSAGES);
+    this.navigateTo(PanelViewModel.STATE.TIMED_MESSAGES);
   }
 
   clickOnNotifications(): void {
-    this.navigateTo(z.viewModel.PanelViewModel.STATE.NOTIFICATIONS);
+    this.navigateTo(PanelViewModel.STATE.NOTIFICATIONS);
   }
 
   clickOnShowUser(userEntity: User): void {
-    this.navigateTo(z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_USER, {entity: userEntity});
+    this.navigateTo(PanelViewModel.STATE.GROUP_PARTICIPANT_USER, {entity: userEntity});
   }
 
   clickOnShowService(serviceEntity: ServiceEntity): void {
-    this.navigateTo(z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE, {entity: serviceEntity});
+    this.navigateTo(PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE, {entity: serviceEntity});
   }
 
   clickToArchive(): void {
