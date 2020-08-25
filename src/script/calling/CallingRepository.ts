@@ -676,7 +676,7 @@ export class CallingRepository {
       this.logger.info('Failed to get screen sharing stream', error);
     }
   };
-  F;
+
   async answerCall(call: Call, callType: CALL_TYPE): Promise<void> {
     try {
       await this.checkConcurrentJoinedCall(call.conversationId, CALL_STATE.INCOMING);

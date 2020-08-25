@@ -4323,12 +4323,10 @@ export class ConversationRepository {
    * @param callMessageEntity Optional call message
    */
   private _trackContributed(conversationEntity: Conversation, genericMessage: GenericMessage) {
-    let messageTimer;
     const isEphemeral = genericMessage.content === GENERIC_MESSAGE_TYPE.EPHEMERAL;
 
     if (isEphemeral) {
       genericMessage = genericMessage.ephemeral as any;
-      messageTimer = (genericMessage as any)[PROTO_MESSAGE_TYPE.EPHEMERAL_EXPIRATION] / TIME_IN_MILLIS.SECOND;
     }
 
     const messageContentType = genericMessage.content;
