@@ -32,6 +32,7 @@ import type {UserRepository} from '../user/UserRepository';
 import {EventName} from './EventName';
 import {RaygunStatic} from 'raygun4js';
 import {UserData} from './UserData';
+import {createRandomUuid} from 'Util/util';
 
 declare const Raygun: RaygunStatic;
 
@@ -114,18 +115,15 @@ export class EventTrackingRepository {
   }
 
   private async startProductReporting(): Promise<void> {
-    // Info: Always deactivate product reporting for now.
+    if (!window.wire.env.COUNTLY_API_KEY) {
+      return;
+    }
     this.isProductReportingActivated = true;
-    const encoder = new TextEncoder();
-    const user_id = (await this.userRepository.getSelf()).id;
-    const data = encoder.encode(user_id);
-    const digest = await window.crypto.subtle.digest('SHA-256', data);
-    const hash = bytesToHex([...new Uint8Array(digest)]);
 
     Countly.init({
       app_key: window.wire.env.COUNTLY_API_KEY,
       debug: !Environment.frontend.isProduction(),
-      device_id: hash,
+      device_id: createRandomUuid(),
       url: 'https://wire.count.ly/',
       use_session_cookie: false,
     });
