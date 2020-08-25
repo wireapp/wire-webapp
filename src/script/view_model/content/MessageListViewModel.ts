@@ -41,7 +41,6 @@ import {User} from '../../entity/User';
 import {DecryptErrorMessage} from '../../entity/message/DecryptErrorMessage';
 import {Message} from '../../entity/message/Message';
 import {Text} from '../../entity/message/Text';
-import {Participant} from '../../calling/Participant';
 import {MainViewModel} from '../MainViewModel';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
 import {IntegrationRepository} from '../../integration/IntegrationRepository';
@@ -598,14 +597,14 @@ export class MessageListViewModel {
     return true;
   };
 
-  showParticipants = (participants: Participant[]): void => {
-    this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.CONVERSATION_PARTICIPANTS, participants);
+  showParticipants = (participants: User[]): void => {
+    this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.CONVERSATION_PARTICIPANTS, {highlighted: participants});
   };
 
   showMessageDetails = (view: {message: {id: string}}, showLikes: boolean): void => {
     if (!this.conversation().is1to1()) {
       this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.MESSAGE_DETAILS, {
-        entity: {id: view.message.id},
+        entity: {id: view.message.id} as Message,
         showLikes,
       });
     }

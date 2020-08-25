@@ -26,6 +26,8 @@ import type {User} from '../../entity/User';
 import {MotionDuration} from '../../motion/MotionDuration';
 import type {SearchRepository} from '../../search/SearchRepository';
 import type {TeamRepository} from '../../team/TeamRepository';
+import {PanelViewModel} from '../PanelViewModel';
+import type {PanelParams} from '../PanelViewModel';
 import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
 
 export class ConversationParticipantsViewModel extends BasePanelViewModel {
@@ -70,11 +72,11 @@ export class ConversationParticipantsViewModel extends BasePanelViewModel {
   }
 
   clickOnShowUser(userEntity: User): void {
-    this.navigateTo(z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_USER, {entity: userEntity});
+    this.navigateTo(PanelViewModel.STATE.GROUP_PARTICIPANT_USER, {entity: userEntity});
   }
 
-  initView(highlightedUsers: User[] = []): void {
+  initView({highlighted}: PanelParams): void {
     this.searchInput('');
-    this.highlightedUsers(highlightedUsers);
+    this.highlightedUsers(highlighted);
   }
 }
