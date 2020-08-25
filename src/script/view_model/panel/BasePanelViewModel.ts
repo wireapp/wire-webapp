@@ -22,8 +22,8 @@ import ko from 'knockout';
 import type {Conversation} from '../../entity/Conversation';
 import type {User} from '../../entity/User';
 import type {ServiceEntity} from '../../integration/ServiceEntity';
-import type {MainViewModel} from '../MainViewModel';
-import type {PanelRepositories, PanelParams} from '../PanelViewModel';
+import type {MainViewModel, ViewModelRepositories} from '../MainViewModel';
+import type {PanelParams} from '../PanelViewModel';
 
 export interface PanelViewModelProps {
   isVisible: ko.PureComputed<boolean>;
@@ -32,7 +32,7 @@ export interface PanelViewModelProps {
   onClose: () => void;
   onGoBack: () => void;
   onGoToRoot: () => void;
-  repositories: PanelRepositories;
+  repositories: ViewModelRepositories;
 }
 
 export class BasePanelViewModel {

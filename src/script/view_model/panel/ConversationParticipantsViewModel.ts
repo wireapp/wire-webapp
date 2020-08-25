@@ -26,7 +26,8 @@ import type {User} from '../../entity/User';
 import {MotionDuration} from '../../motion/MotionDuration';
 import type {SearchRepository} from '../../search/SearchRepository';
 import type {TeamRepository} from '../../team/TeamRepository';
-import {PanelViewModel, PanelParams} from '../PanelViewModel';
+import {PanelViewModel} from '../PanelViewModel';
+import type {PanelParams} from '../PanelViewModel';
 import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
 
 export class ConversationParticipantsViewModel extends BasePanelViewModel {

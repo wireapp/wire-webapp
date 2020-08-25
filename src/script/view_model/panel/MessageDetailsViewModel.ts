@@ -32,7 +32,7 @@ import type {TeamRepository} from '../../team/TeamRepository';
 import type {User} from '../../entity/User';
 import type {ContentMessage} from '../../entity/message/ContentMessage';
 import type {MemberMessage} from '../../entity/message/MemberMessage';
-import {PanelParams} from '../PanelViewModel';
+import type {PanelParams} from '../PanelViewModel';
 
 export class MessageDetailsViewModel extends BasePanelViewModel {
   conversationRepository: ConversationRepository;

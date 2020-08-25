@@ -22,13 +22,7 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import type {SearchRepository} from '../search/SearchRepository';
-import type {TeamRepository} from '../team/TeamRepository';
-import type {ClientRepository} from '../client/ClientRepository';
-import type {CryptographyRepository} from '../cryptography/CryptographyRepository';
-import type {UserRepository} from '../user/UserRepository';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
-import type {IntegrationRepository} from '../integration/IntegrationRepository';
 
 import {AddParticipantsViewModel} from './panel/AddParticipantsViewModel';
 import {ConversationDetailsViewModel} from './panel/ConversationDetailsViewModel';
@@ -42,23 +36,13 @@ import {ParticipantDevicesViewModel} from './panel/ParticipantDevicesViewModel';
 import {TimedMessagesViewModel} from './panel/TimedMessagesViewModel';
 import {MotionDuration} from '../motion/MotionDuration';
 import {ContentViewModel} from './ContentViewModel';
-import {MainViewModel} from './MainViewModel';
+import {MainViewModel, ViewModelRepositories} from './MainViewModel';
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 import {Message} from '../entity/message/Message';
 import {BasePanelViewModel} from './panel/BasePanelViewModel';
 
 export const OPEN_CONVERSATION_DETAILS = 'PanelViewModel.OPEN_CONVERSATION_DETAILS';
-
-export type PanelRepositories = {
-  client: ClientRepository;
-  conversation: ConversationRepository;
-  cryptography: CryptographyRepository;
-  integration: IntegrationRepository;
-  search: SearchRepository;
-  team: TeamRepository;
-  user: UserRepository;
-};
 
 export type PanelParams = {
   addMode?: boolean;
@@ -69,7 +53,7 @@ export type PanelParams = {
 
 export class PanelViewModel {
   mainViewModel: MainViewModel;
-  repositories: PanelRepositories;
+  repositories: ViewModelRepositories;
   elementId: string;
   conversationRepository: ConversationRepository;
   conversationEntity: ko.Observable<Conversation>;
@@ -125,10 +109,8 @@ export class PanelViewModel {
 
   /**
    * View model for the details column.
-   * @param {MainViewModel} mainViewModel Main view model
-   * @param {Object} repositories Object containing all repositories
    */
-  constructor(mainViewModel: MainViewModel, repositories: PanelRepositories) {
+  constructor(mainViewModel: MainViewModel, repositories: ViewModelRepositories) {
     this.elementId = 'right-column';
     this.repositories = repositories;
     this.conversationRepository = repositories.conversation;
@@ -157,10 +139,6 @@ export class PanelViewModel {
    * Else the panels opens on the given state.
    *
    * Note: panels that are toggled are not counted in the state history.
-   *
-   * @param {string} state the new state to navigate to.
-   * @param {Object} params params to give to the new view.
-   * @returns {void} nothing returned
    */
   togglePanel(state: string, params: PanelParams): void {
     const isStateChange = this.state() !== state;
@@ -177,12 +155,10 @@ export class PanelViewModel {
 
   /**
    * Graciously closes the current opened panel.
-   *
-   * @returns {void} nothing returned
    */
   async closePanel(): Promise<boolean> {
     if (this.isAnimating()) {
-      return Promise.resolve(false);
+      return false;
     }
 
     this.isAnimating(true);
@@ -193,10 +169,6 @@ export class PanelViewModel {
 
   /**
    * Will navigate from the current state to the new state.
-   *
-   * @param {string} newState the new state to navigate to.
-   * @param {Object} params params to give to the new view.
-   * @returns {void} nothing returned.
    */
   _navigateTo(newState: string, params: PanelParams): void {
     this._switchState(newState, this.state(), params);
@@ -313,6 +285,6 @@ export class PanelViewModel {
       element?.classList.add('panel__page--visible');
       return element;
     }
-    return null;
+    return undefined;
   }
 }

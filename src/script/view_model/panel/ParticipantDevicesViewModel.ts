@@ -26,7 +26,7 @@ import type {User} from '../../entity/User';
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
 import type {ClientRepository} from '../../client/ClientRepository';
 import type {CryptographyRepository} from '../../cryptography/CryptographyRepository';
-import {PanelParams} from '../PanelViewModel';
+import type {PanelParams} from '../PanelViewModel';
 
 export class ParticipantDevicesViewModel extends BasePanelViewModel {
   clientRepository: ClientRepository;

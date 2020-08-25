@@ -26,7 +26,7 @@ import type {ServiceEntity} from '../../integration/ServiceEntity';
 import type {ActionsViewModel} from '../ActionsViewModel';
 import type {IntegrationRepository} from '../../integration/IntegrationRepository';
 import type {User} from '../../entity/User';
-import {PanelParams} from '../PanelViewModel';
+import type {PanelParams} from '../PanelViewModel';
 
 export class GroupParticipantServiceViewModel extends BasePanelViewModel {
   integrationRepository: IntegrationRepository;

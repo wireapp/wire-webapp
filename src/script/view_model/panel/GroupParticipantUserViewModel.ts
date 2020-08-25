@@ -35,7 +35,8 @@ import type {ActionsViewModel} from '../ActionsViewModel';
 import type {TeamRepository} from '../../team/TeamRepository';
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
 import type {User} from '../../entity/User';
-import {PanelParams, PanelViewModel} from '../PanelViewModel';
+import {PanelViewModel} from '../PanelViewModel';
+import type {PanelParams} from '../PanelViewModel';
 import {ClientEvent} from '../../event/Client';
 import type {MemberLeaveEvent} from '../../conversation/EventBuilder';
 
