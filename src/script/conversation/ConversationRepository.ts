@@ -39,6 +39,7 @@ import {
   Text,
   Asset as ProtobufAsset,
   LinkPreview,
+  IEphemeral,
 } from '@wireapp/protocol-messaging';
 import {flatten} from 'underscore';
 import {ConnectionStatus} from '@wireapp/api-client/dist/connection';
@@ -80,9 +81,6 @@ import {
 } from 'Util/StringUtil';
 
 import {encryptAesAsset} from '../assets/AssetCrypto';
-
-import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
-import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 
 import {ClientEvent} from '../event/Client';
 import {EventTypeHandling} from '../event/EventTypeHandling';
@@ -1255,7 +1253,7 @@ export class ConversationRepository {
       lastReadTimestamp: timestamp,
     });
     const genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.LAST_READ]: protoLastRead,
+      lastRead: protoLastRead,
       messageId: createRandomUuid(),
     });
 
@@ -1470,7 +1468,7 @@ export class ConversationRepository {
         conversationId: conversationEntity.id,
       });
       const genericMessage = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.CLEARED]: protoCleared,
+        cleared: protoCleared,
         messageId: createRandomUuid(),
       });
 
@@ -1876,7 +1874,7 @@ export class ConversationRepository {
       referenceMessageId: messageEntity.id,
     });
     const genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.BUTTON_ACTION]: protoButtonAction,
+      buttonAction: protoButtonAction,
       messageId: createRandomUuid(),
     });
     this.messageSender.queueMessage(async () => {
@@ -1911,9 +1909,9 @@ export class ConversationRepository {
 
         return this.assetRepository.uploadFile(messageId, file, options, asImage);
       })
-      .then(asset => {
+      .then(protoAsset => {
         genericMessage = new GenericMessage({
-          [GENERIC_MESSAGE_TYPE.ASSET]: asset,
+          asset: protoAsset,
           messageId,
         });
 
@@ -1973,13 +1971,12 @@ export class ConversationRepository {
       }
 
       const protoAsset = new Asset({
-        [PROTO_MESSAGE_TYPE.ASSET_ORIGINAL]: assetOriginal,
-        [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: this.expectReadReceipt(conversationEntity),
-        [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: conversationEntity.legalHoldStatus(),
+        expectsReadConfirmation: this.expectReadReceipt(conversationEntity),
+        legalHoldStatus: conversationEntity.legalHoldStatus(),
+        original: assetOriginal,
       });
-      const asset = protoAsset;
       let genericMessage = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.ASSET]: asset,
+        asset: protoAsset,
         messageId: createRandomUuid(),
       });
 
@@ -2014,13 +2011,13 @@ export class ConversationRepository {
     const wasCancelled = reason === ProtobufAsset.NotUploaded.CANCELLED;
     const protoReason = wasCancelled ? Asset.NotUploaded.CANCELLED : Asset.NotUploaded.FAILED;
     const protoAsset = new Asset({
-      [PROTO_MESSAGE_TYPE.ASSET_NOT_UPLOADED]: protoReason,
-      [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: this.expectReadReceipt(conversationEntity),
-      [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: conversationEntity.legalHoldStatus(),
+      expectsReadConfirmation: this.expectReadReceipt(conversationEntity),
+      legalHoldStatus: conversationEntity.legalHoldStatus(),
+      notUploaded: protoReason,
     });
 
     const generic_message = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.ASSET]: protoAsset,
+      asset: protoAsset,
       messageId,
     });
 
@@ -2064,7 +2061,7 @@ export class ConversationRepository {
       type,
     });
     const genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.CONFIRMATION]: protoConfirmation,
+      confirmation: protoConfirmation,
       messageId: createRandomUuid(),
     });
 
@@ -2105,13 +2102,13 @@ export class ConversationRepository {
    */
   sendKnock(conversationEntity: Conversation) {
     const protoKnock = new Knock({
-      [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: this.expectReadReceipt(conversationEntity),
-      [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: conversationEntity.legalHoldStatus(),
+      expectsReadConfirmation: this.expectReadReceipt(conversationEntity),
       hotKnock: false,
+      legalHoldStatus: conversationEntity.legalHoldStatus(),
     });
 
     let genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.KNOCK]: protoKnock,
+      knock: protoKnock,
       messageId: createRandomUuid(),
     });
 
@@ -2159,10 +2156,10 @@ export class ConversationRepository {
           this.expectReadReceipt(conversationEntity),
           conversationEntity.legalHoldStatus(),
         );
-        if (genericMessage[GENERIC_MESSAGE_TYPE.EPHEMERAL]) {
-          genericMessage[GENERIC_MESSAGE_TYPE.EPHEMERAL][GENERIC_MESSAGE_TYPE.TEXT] = protoText;
+        if (genericMessage.ephemeral) {
+          genericMessage.ephemeral.text = protoText;
         } else {
-          genericMessage[GENERIC_MESSAGE_TYPE.TEXT] = protoText;
+          genericMessage.text = protoText;
         }
 
         messageEntity = (await this.getMessageInConversationById(conversationEntity, messageId)) as ContentMessage;
@@ -2211,7 +2208,7 @@ export class ConversationRepository {
       zoom,
     });
     const genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.LOCATION]: protoLocation,
+      location: protoLocation,
       messageId: createRandomUuid(),
     });
 
@@ -2257,7 +2254,7 @@ export class ConversationRepository {
     );
     const protoMessageEdit = new MessageEdit({replacingMessageId: originalMessageEntity.id, text: protoText});
     const genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.EDITED]: protoMessageEdit,
+      edited: protoMessageEdit,
       messageId,
     });
 
@@ -2298,8 +2295,8 @@ export class ConversationRepository {
   sendReaction(conversationEntity: Conversation, messageEntity: Message, reaction: ReactionType) {
     const protoReaction = new Reaction({emoji: reaction, messageId: messageEntity.id});
     const genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.REACTION]: protoReaction,
       messageId: createRandomUuid(),
+      reaction: protoReaction,
     });
 
     return this._send_and_inject_generic_message(conversationEntity, genericMessage);
@@ -2319,7 +2316,7 @@ export class ConversationRepository {
    */
   async sendSessionReset(userId: string, clientId: string, conversationId: string): Promise<ClientMismatch> {
     const genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.CLIENT_ACTION]: ClientAction.RESET_SESSION,
+      clientAction: ClientAction.RESET_SESSION,
       messageId: createRandomUuid(),
     });
 
@@ -2366,8 +2363,8 @@ export class ConversationRepository {
       conversationEntity.legalHoldStatus(),
     );
     let genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.TEXT]: protoText,
       messageId,
+      text: protoText,
     });
 
     if (conversationEntity.messageTimer()) {
@@ -2433,18 +2430,18 @@ export class ConversationRepository {
         })
         .map(mentionEntity => mentionEntity.toProto());
 
-      protoText[PROTO_MESSAGE_TYPE.MENTIONS] = protoMentions;
+      protoText.mentions = protoMentions;
     }
 
     if (quoteEntity) {
       const protoQuote = quoteEntity.toProto();
       this.logger.debug(`Adding quote to message '${messageId}'`, protoQuote);
-      protoText[PROTO_MESSAGE_TYPE.QUOTE] = protoQuote;
+      protoText.quote = protoQuote;
     }
 
     if (linkPreviews && linkPreviews.length) {
       this.logger.debug(`Adding link preview to message '${messageId}'`, linkPreviews);
-      protoText[PROTO_MESSAGE_TYPE.LINK_PREVIEWS] = linkPreviews;
+      protoText.linkPreview = linkPreviews;
     }
 
     return protoText;
@@ -2462,11 +2459,11 @@ export class ConversationRepository {
 
     const protoEphemeral = new Ephemeral({
       [genericMessage.content]: genericMessage[genericMessage.content],
-      [PROTO_MESSAGE_TYPE.EPHEMERAL_EXPIRATION]: ephemeralExpiration,
+      expireAfterMillis: ephemeralExpiration,
     });
 
     genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.EPHEMERAL]: protoEphemeral,
+      ephemeral: protoEphemeral,
       messageId: genericMessage.messageId,
     });
 
@@ -2526,10 +2523,9 @@ export class ConversationRepository {
       genericMessage,
       optimisticEvent,
     );
-    const {KNOCK: TYPE_KNOCK, EPHEMERAL: TYPE_EPHEMERAL} = GENERIC_MESSAGE_TYPE;
-    const isPing = (message: GenericMessage) => message.content === TYPE_KNOCK;
+    const isPing = (message: GenericMessage) => message.content === 'knock';
     const isEphemeralPing = (message: GenericMessage) =>
-      message.content === TYPE_EPHEMERAL && isPing((message.ephemeral as unknown) as GenericMessage);
+      message.content === 'ephemeral' && isPing((message.ephemeral as unknown) as GenericMessage);
     const shouldPlayPingAudio = isPing(genericMessage) || isEphemeralPing(genericMessage);
     if (shouldPlayPingAudio) {
       amplify.publish(WebAppEvents.AUDIO.PLAY, AudioType.OUTGOING_PING);
@@ -2600,7 +2596,7 @@ export class ConversationRepository {
       const externalMessage = new External({otrKey: keyBytes, sha256});
 
       const genericMessageExternal = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.EXTERNAL]: externalMessage,
+        external: externalMessage,
         messageId: createRandomUuid(),
       });
 
@@ -2664,7 +2660,7 @@ export class ConversationRepository {
     const messageId = genericMessage.messageId;
     let messageType = eventInfoEntity.getType();
 
-    if (messageType === GENERIC_MESSAGE_TYPE.CONFIRMATION) {
+    if (messageType === 'confirmation') {
       messageType += ` (type: "${eventInfoEntity.genericMessage.confirmation.type}")`;
     }
 
@@ -2811,6 +2807,11 @@ export class ConversationRepository {
     await this.eventRepository.injectEvent(legalHoldUpdateMessage);
   }
 
+  private isLegalHoldMessageType(genericMessage?: GenericMessage): boolean {
+    const legalHoldMessageTypes: string[] = ['asset', 'edited', 'image', 'text'];
+    return genericMessage && legalHoldMessageTypes.includes(genericMessage.content);
+  }
+
   async injectFileTypeRestrictedMessage(
     conversation: Conversation,
     user: User,
@@ -2828,6 +2829,9 @@ export class ConversationRepository {
     skipLegalHold = false,
   ): Promise<boolean> {
     const messageType = eventInfoEntity.getType();
+    if (!messageType) {
+      return false;
+    }
     const allowedMessageTypes = ['cleared', 'clientAction', 'confirmation', 'deleted', 'lastRead'];
     if (allowedMessageTypes.includes(messageType)) {
       return false;
@@ -2857,26 +2861,26 @@ export class ConversationRepository {
       }
     }
 
-    const isMessageEdit = messageType === GENERIC_MESSAGE_TYPE.EDITED;
+    const isEditMessage = messageType === 'edited';
+    const isCallingMessage = messageType === 'calling';
 
-    const isCallingMessage = messageType === GENERIC_MESSAGE_TYPE.CALLING;
     const consentType = isCallingMessage
       ? ConversationRepository.CONSENT_TYPE.OUTGOING_CALL
       : ConversationRepository.CONSENT_TYPE.MESSAGE;
 
     // Legal Hold
-    if (!skipLegalHold) {
+    if (!skipLegalHold && this.isLegalHoldMessageType(eventInfoEntity.genericMessage)) {
       const conversationEntity = this.find_conversation_by_id(eventInfoEntity.conversationId);
       const localLegalHoldStatus = conversationEntity.legalHoldStatus();
-      await this.updateAllClients(conversationEntity, !isMessageEdit);
+      await this.updateAllClients(conversationEntity, !isEditMessage);
       const updatedLocalLegalHoldStatus = conversationEntity.legalHoldStatus();
 
       const {genericMessage} = eventInfoEntity;
-      (genericMessage as any)[messageType][PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS] = updatedLocalLegalHoldStatus;
+      (genericMessage[messageType] as Text).legalHoldStatus = updatedLocalLegalHoldStatus;
 
       const haveNewClientsChangeLegalHoldStatus = localLegalHoldStatus !== updatedLocalLegalHoldStatus;
 
-      if (!isMessageEdit && haveNewClientsChangeLegalHoldStatus) {
+      if (!isEditMessage && haveNewClientsChangeLegalHoldStatus) {
         const {conversationId, timestamp: numericTimestamp} = eventInfoEntity;
         await this.injectLegalHoldMessage({
           beforeTimestamp: true,
@@ -2902,21 +2906,14 @@ export class ConversationRepository {
     shouldShowLegalHoldWarning = false,
   ): Promise<boolean> {
     const conversationEntity = await this.get_conversation_by_id(eventInfoEntity.conversationId);
-    const legalHoldMessageTypes: string[] = [
-      GENERIC_MESSAGE_TYPE.ASSET,
-      GENERIC_MESSAGE_TYPE.EDITED,
-      GENERIC_MESSAGE_TYPE.IMAGE,
-      GENERIC_MESSAGE_TYPE.TEXT,
-    ];
-    const isLegalHoldMessageType =
-      eventInfoEntity.genericMessage && legalHoldMessageTypes.includes(eventInfoEntity.genericMessage.content);
     const verificationState = conversationEntity.verification_state();
     const conversationDegraded = verificationState === ConversationVerificationState.DEGRADED;
     if (conversationEntity.needsLegalHoldApproval) {
       conversationEntity.needsLegalHoldApproval = false;
       return showLegalHoldWarning(conversationEntity, conversationDegraded);
     } else if (shouldShowLegalHoldWarning) {
-      conversationEntity.needsLegalHoldApproval = !this.selfUser().isOnLegalHold() && isLegalHoldMessageType;
+      conversationEntity.needsLegalHoldApproval =
+        !this.selfUser().isOnLegalHold() && this.isLegalHoldMessageType(eventInfoEntity.genericMessage);
     }
     if (!conversationDegraded) {
       return false;
@@ -3110,7 +3107,7 @@ export class ConversationRepository {
 
         const protoMessageDelete = new MessageDelete({messageId});
         const genericMessage = new GenericMessage({
-          [GENERIC_MESSAGE_TYPE.DELETED]: protoMessageDelete,
+          deleted: protoMessageDelete,
           messageId: createRandomUuid(),
         });
 
@@ -3153,7 +3150,7 @@ export class ConversationRepository {
           messageId: messageEntity.id,
         });
         const genericMessage = new GenericMessage({
-          [GENERIC_MESSAGE_TYPE.HIDDEN]: protoMessageHide,
+          hidden: protoMessageHide,
           messageId: createRandomUuid(),
         });
 
@@ -4322,12 +4319,14 @@ export class ConversationRepository {
    * @param callMessageEntity Optional call message
    */
   private _trackContributed(conversationEntity: Conversation, genericMessage: GenericMessage) {
-    let messageTimer;
-    const isEphemeral = genericMessage.content === GENERIC_MESSAGE_TYPE.EPHEMERAL;
+    let messageTimer: number;
+    const isEphemeral = genericMessage.content === 'ephemeral';
+
+    let unpackedMessage: GenericMessage | IEphemeral;
 
     if (isEphemeral) {
-      genericMessage = genericMessage.ephemeral as any;
-      messageTimer = (genericMessage as any)[PROTO_MESSAGE_TYPE.EPHEMERAL_EXPIRATION] / TIME_IN_MILLIS.SECOND;
+      unpackedMessage = genericMessage.ephemeral;
+      messageTimer = Number(unpackedMessage.expireAfterMillis) / TIME_IN_MILLIS.SECOND;
     }
 
     const messageContentType = genericMessage.content;
@@ -4335,7 +4334,7 @@ export class ConversationRepository {
     let numberOfMentions;
     switch (messageContentType) {
       case 'asset': {
-        const protoAsset = genericMessage.asset;
+        const protoAsset = unpackedMessage.asset;
         if (protoAsset.original) {
           actionType = protoAsset.original.image ? 'photo' : 'file';
         }
@@ -4353,8 +4352,8 @@ export class ConversationRepository {
       }
 
       case 'text': {
-        const protoText = genericMessage.text;
-        const length = protoText[PROTO_MESSAGE_TYPE.LINK_PREVIEWS].length;
+        const protoText = unpackedMessage.text;
+        const length = protoText.linkPreview?.length;
         if (!length) {
           actionType = 'text';
           numberOfMentions = protoText.mentions.length;

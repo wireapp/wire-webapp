@@ -29,7 +29,6 @@ import {getLogger, Logger} from 'Util/Logger';
 
 import {getFirstLinkWithOffset} from './LinkPreviewHelpers';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
-import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {isBlacklisted} from './LinkPreviewBlackList';
 import {buildFromOpenGraphData} from './LinkPreviewProtoBuilder';
 import {LinkPreviewError} from '../error/LinkPreviewError';
@@ -132,8 +131,8 @@ export class LinkPreviewRepository {
     if (openGraphImage?.data) {
       try {
         const asset = await this._uploadPreviewImage(openGraphImage.data);
-        linkPreview.article[PROTO_MESSAGE_TYPE.LINK_PREVIEW_IMAGE] = asset; // deprecated
-        linkPreview[PROTO_MESSAGE_TYPE.LINK_PREVIEW_IMAGE] = asset;
+        linkPreview.article.image = asset; // deprecated
+        linkPreview.image = asset;
       } catch (error) {
         this.logger.error(error);
       }

@@ -26,11 +26,8 @@ import {base64ToArray, arrayToBase64, createRandomUuid} from 'Util/util';
 
 import {decryptAesAsset} from '../assets/AssetCrypto';
 import {AssetTransferState} from '../assets/AssetTransferState';
-
 import {ClientEvent} from '../event/Client';
 import {StatusType} from '../message/StatusType';
-import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
-import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 import {ConversationEphemeralHandler} from '../conversation/ConversationEphemeralHandler';
 import {CryptographyError} from '../error/CryptographyError';
 
@@ -68,97 +65,104 @@ export class CryptographyMapper {
     return this._mapGenericMessage(genericMessage, event);
   }
 
+  /**
+   * Maps a generic message into an event in JSON.
+   *
+   * @param {GenericMessage} genericMessage Received ProtoBuffer message
+   * @param {Object} event Event of CONVERSATION_EVENT.OTR-ASSET-ADD or CONVERSATION_EVENT.OTR-MESSAGE-ADD
+   * @returns {Promise} Resolves with the mapped event
+   */
   async _mapGenericMessage(genericMessage, event) {
     let specificContent;
 
     switch (genericMessage.content) {
-      case GENERIC_MESSAGE_TYPE.ASSET: {
+      case 'asset': {
         const mappedAsset = this._mapAsset(genericMessage.asset);
         specificContent = addMetadata(mappedAsset, genericMessage.asset);
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.AVAILABILITY: {
+      case 'availability': {
         specificContent = this._mapAvailability(genericMessage.availability);
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.CALLING: {
+      case 'calling': {
         specificContent = this._mapCalling(genericMessage.calling, event.data);
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.CLEARED: {
+      case 'cleared': {
         specificContent = this._mapCleared(genericMessage.cleared);
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.CONFIRMATION: {
+      case 'confirmation': {
         specificContent = this._mapConfirmation(genericMessage.confirmation);
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.DELETED: {
+      case 'deleted': {
         specificContent = this._mapDeleted(genericMessage.deleted);
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.EDITED: {
+      case 'edited': {
         specificContent = await this._mapEdited(genericMessage.edited, genericMessage.messageId);
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.EPHEMERAL: {
+      case 'ephemeral': {
         specificContent = await this._mapEphemeral(genericMessage, event);
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.HIDDEN: {
+      case 'hidden': {
         specificContent = this._mapHidden(genericMessage.hidden);
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.IMAGE: {
+      case 'image': {
         const mappedImage = this._mapImage(genericMessage.image, event.data.id);
         specificContent = addMetadata(mappedImage, genericMessage.image);
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.KNOCK: {
+      case 'knock': {
         const mappedKnock = this._mapKnock(genericMessage.knock);
         specificContent = addMetadata(mappedKnock, genericMessage.knock);
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.LAST_READ: {
+      case 'lastRead': {
         specificContent = this._mapLastRead(genericMessage.lastRead);
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.LOCATION: {
+      case 'location': {
         const mappedLocation = this._mapLocation(genericMessage.location);
         specificContent = addMetadata(mappedLocation, genericMessage.location);
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.REACTION: {
+      case 'reaction': {
         specificContent = this._mapReaction(genericMessage.reaction);
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.TEXT: {
+      case 'text': {
         const mappedText = await this._mapText(genericMessage.text);
         specificContent = addMetadata(mappedText, genericMessage.text);
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.COMPOSITE_MESSAGE: {
+      case 'composite': {
         const mappedComposite = await this._mapComposite(genericMessage.composite);
         specificContent = addMetadata(mappedComposite, genericMessage.composite);
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.BUTTON_ACTION_CONFIRMATION: {
+      case 'buttonActionConfirmation': {
         specificContent = this._mapButtonActionConfirmation(genericMessage.buttonActionConfirmation);
         break;
       }
@@ -182,10 +186,15 @@ export class CryptographyMapper {
     return {...genericContent, ...specificContent};
   }
 
+  // eslint-disable-next-line valid-jsdoc
+  /**
+   * @typedef {import('@wireapp/protocol-messaging').Composite} Composite
+   * @param {Composite} composite The composite message
+   */
   async _mapComposite(composite) {
     const items = await Promise.all(
       composite.items.map(async item => {
-        if (item.content !== GENERIC_MESSAGE_TYPE.TEXT) {
+        if (item.content !== 'text') {
           return item;
         }
         const {mentions: protoMentions, content} = item.text;
@@ -366,7 +375,7 @@ export class CryptographyMapper {
   }
 
   async _mapEphemeral(genericMessage, event) {
-    const messageTimer = genericMessage.ephemeral[PROTO_MESSAGE_TYPE.EPHEMERAL_EXPIRATION];
+    const messageTimer = genericMessage.ephemeral.expireAfterMillis;
     genericMessage.ephemeral.messageId = genericMessage.messageId;
 
     const embeddedMessage = await this._mapGenericMessage(genericMessage.ephemeral, event);
@@ -487,7 +496,7 @@ export class CryptographyMapper {
   async _mapText(text) {
     const {mentions: protoMentions, quote: protoQuote} = text;
 
-    const protoLinkPreviews = text[PROTO_MESSAGE_TYPE.LINK_PREVIEWS];
+    const protoLinkPreviews = text.linkPreview;
 
     if (protoMentions && protoMentions.length > CryptographyMapper.CONFIG.MAX_MENTIONS_PER_MESSAGE) {
       this.logger.warn(`Message contains '${protoMentions.length}' mentions exceeding limit`, text);

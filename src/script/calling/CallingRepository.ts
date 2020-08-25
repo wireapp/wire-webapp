@@ -49,7 +49,6 @@ import {Logger, getLogger} from 'Util/Logger';
 import {createRandomUuid} from 'Util/util';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {Config} from '../Config';
-import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
@@ -282,11 +281,11 @@ export class CallingRepository {
       };
 
       const genericMessage = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.CALLING]: new Calling({content: ''}),
+        calling: new Calling({content: ''}),
         messageId: createRandomUuid(),
       });
       const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId);
-      eventInfoEntity.setType(GENERIC_MESSAGE_TYPE.CALLING);
+      eventInfoEntity.setType('calling');
       await this.conversationRepository.clientMismatchHandler.onClientMismatch(eventInfoEntity, localMismatch);
 
       type Clients = {clientid: string; userid: string}[];
@@ -454,7 +453,7 @@ export class CallingRepository {
   private async verificationPromise(conversationId: string, userId: string, isResponse: boolean): Promise<boolean> {
     const recipients = await this.conversationRepository.create_recipients(conversationId, false, [userId]);
     const eventInfoEntity = new EventInfoEntity(undefined, conversationId, {recipients});
-    eventInfoEntity.setType(GENERIC_MESSAGE_TYPE.CALLING);
+    eventInfoEntity.setType('calling');
     const consentType = isResponse
       ? ConversationRepository.CONSENT_TYPE.INCOMING_CALL
       : ConversationRepository.CONSENT_TYPE.OUTGOING_CALL;
@@ -810,7 +809,7 @@ export class CallingRepository {
   ): number => {
     const protoCalling = new Calling({content: payload});
     const genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.CALLING]: protoCalling,
+      calling: protoCalling,
       messageId: createRandomUuid(),
     });
     const call = this.findCall(conversationId);

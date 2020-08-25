@@ -20,7 +20,6 @@
 import {Mention} from '@wireapp/protocol-messaging';
 
 import {isUUID} from 'Util/ValidationUtil';
-import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 
 export enum ERROR {
   INVALID_LENGTH = 'Invalid mention: Invalid length',
@@ -38,19 +37,19 @@ export class MentionEntity {
   static ERROR = ERROR;
   startIndex: number;
   length: number;
-  type: PROTO_MESSAGE_TYPE;
+  type: string;
   userId: string;
 
   constructor(startIndex: number, length: number, userId: string) {
     this.startIndex = startIndex;
     this.length = length;
-    this.type = PROTO_MESSAGE_TYPE.MENTION_TYPE_USER_ID;
+    this.type = 'userId';
 
     this.userId = userId;
   }
 
   targetsUser(userId: string): boolean {
-    const isTypeUserId = this.type === PROTO_MESSAGE_TYPE.MENTION_TYPE_USER_ID;
+    const isTypeUserId = this.type === 'userId';
     return isTypeUserId && this.userId === userId;
   }
 
@@ -124,9 +123,9 @@ export class MentionEntity {
 
   toProto(): Mention {
     const protoMention = new Mention({length: this.length, start: this.startIndex});
-    const isUserIdMention = this.type === PROTO_MESSAGE_TYPE.MENTION_TYPE_USER_ID;
+    const isUserIdMention = this.type === 'userId';
     if (isUserIdMention) {
-      protoMention[PROTO_MESSAGE_TYPE.MENTION_TYPE_USER_ID] = this.userId;
+      protoMention.userId = this.userId;
     }
     return protoMention;
   }

@@ -29,7 +29,6 @@ import {loadFileBuffer, loadImage, downloadBlob} from 'Util/util';
 import {WebWorker} from 'Util/worker';
 import {AssetOptions, AssetRetentionPolicy} from '@wireapp/api-client/dist/asset';
 import {Conversation} from '../entity/Conversation';
-import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {encryptAesAsset, EncryptedAsset, decryptAesAsset} from './AssetCrypto';
 import {AssetUploadData} from '@wireapp/api-client/dist/asset';
 import {AssetRemoteData} from './AssetRemoteData';
@@ -288,9 +287,9 @@ export class AssetRepository {
       sha256: new Uint8Array(encryptedAsset.sha256),
     });
     const protoAsset = new Asset({
-      [PROTO_MESSAGE_TYPE.ASSET_UPLOADED]: assetRemoteData,
-      [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: options.expectsReadConfirmation,
-      [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: options.legalHoldStatus,
+      expectsReadConfirmation: options.expectsReadConfirmation,
+      legalHoldStatus: options.legalHoldStatus,
+      uploaded: assetRemoteData,
     });
     return protoAsset;
   }
@@ -306,7 +305,7 @@ export class AssetRepository {
       mimeType: imageType,
       size: compressedBytes.length,
     });
-    protoAsset[PROTO_MESSAGE_TYPE.ASSET_ORIGINAL] = imageAsset;
+    protoAsset.original = imageAsset;
     return protoAsset;
   }
 

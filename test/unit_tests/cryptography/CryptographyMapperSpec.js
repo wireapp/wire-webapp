@@ -38,12 +38,10 @@ import {isObject} from 'underscore';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
 import {ReactionType} from '@wireapp/core/dist/conversation';
 
-import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 import {CryptographyMapper} from 'src/script/cryptography/CryptographyMapper';
 import {arrayToBase64, createRandomUuid} from 'Util/util';
 import {encryptAesAsset} from 'src/script/assets/AssetCrypto';
 import {ClientEvent} from 'src/script/event/Client';
-import {PROTO_MESSAGE_TYPE} from 'src/script/cryptography/ProtoMessageType';
 import {CryptographyError} from 'src/script/error/CryptographyError';
 
 describe('CryptographyMapper', () => {
@@ -75,10 +73,10 @@ describe('CryptographyMapper', () => {
         name: original.name,
         size: original.size,
       });
-      const asset = new Asset({original: original_asset});
+      const protoAsset = new Asset({original: original_asset});
 
       const generic_message = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.ASSET]: asset,
+        asset: protoAsset,
         messageId: createRandomUuid(),
       });
 
@@ -106,10 +104,10 @@ describe('CryptographyMapper', () => {
         name: 'foo.mp3',
         size: 1024,
       });
-      const asset = new Asset({original: original_asset});
+      const protoAsset = new Asset({original: original_asset});
 
       const generic_message = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.ASSET]: asset,
+        asset: protoAsset,
         messageId: createRandomUuid(),
       });
 
@@ -145,10 +143,10 @@ describe('CryptographyMapper', () => {
         otrKey: uploaded.otr_key,
         sha256: uploaded.sha256,
       });
-      const asset = new Asset({uploaded: uploaded_asset});
+      const protoAsset = new Asset({uploaded: uploaded_asset});
 
       const generic_message = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.ASSET]: asset,
+        asset: protoAsset,
         messageId: createRandomUuid(),
       });
 
@@ -167,10 +165,10 @@ describe('CryptographyMapper', () => {
     });
 
     it('resolves with a mapped cancelled upload asset message', () => {
-      const asset = new Asset({notUploaded: Asset.NotUploaded.CANCELLED});
+      const protoAsset = new Asset({notUploaded: Asset.NotUploaded.CANCELLED});
 
       const generic_message = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.ASSET]: asset,
+        asset: protoAsset,
         messageId: createRandomUuid(),
       });
 
@@ -186,12 +184,12 @@ describe('CryptographyMapper', () => {
     });
 
     it('resolves with a mapped failed upload asset message', () => {
-      const asset = new Asset({
+      const protoAsset = new Asset({
         notUploaded: Asset.NotUploaded.FAILED,
       });
 
       const generic_message = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.ASSET]: asset,
+        asset: protoAsset,
         messageId: createRandomUuid(),
       });
 
@@ -221,12 +219,12 @@ describe('CryptographyMapper', () => {
         remote: remote_data,
       });
 
-      const asset = new Asset({
+      const protoAsset = new Asset({
         preview: preview_asset,
       });
 
       const generic_message = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.ASSET]: asset,
+        asset: protoAsset,
         messageId: createRandomUuid(),
       });
 
@@ -243,10 +241,10 @@ describe('CryptographyMapper', () => {
     });
 
     it('resolves with a mapped availability message', () => {
-      const availability = new Availability({type: Availability.Type.AVAILABLE});
+      const protoAvailability = new Availability({type: Availability.Type.AVAILABLE});
 
       const generic_message = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.AVAILABILITY]: availability,
+        availability: protoAvailability,
         messageId: createRandomUuid(),
       });
 
@@ -270,7 +268,7 @@ describe('CryptographyMapper', () => {
         conversationId: conversation_id,
       });
       const generic_message = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.CLEARED]: cleared,
+        cleared: cleared,
         messageId: createRandomUuid(),
       });
 
@@ -294,7 +292,7 @@ describe('CryptographyMapper', () => {
         messageId: message_id,
       });
       const generic_message = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.HIDDEN]: message_hide,
+        hidden: message_hide,
         messageId: createRandomUuid(),
       });
 
@@ -313,7 +311,7 @@ describe('CryptographyMapper', () => {
     it('resolves with a mapped deleted message', () => {
       const message_id = createRandomUuid();
       const generic_message = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.DELETED]: new MessageDelete({messageId: message_id}),
+        deleted: new MessageDelete({messageId: message_id}),
         messageId: createRandomUuid(),
       });
 
@@ -350,7 +348,7 @@ describe('CryptographyMapper', () => {
         width: image.width,
       });
       const generic_message = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.IMAGE]: image_asset,
+        image: image_asset,
         messageId: createRandomUuid(),
       });
 
@@ -389,13 +387,13 @@ describe('CryptographyMapper', () => {
         sha256: new Uint8Array([3, 4]),
       });
 
-      const asset = new Asset({
+      const protoAsset = new Asset({
         original: original,
         uploaded: remote_data,
       });
 
       const generic_message = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.ASSET]: asset,
+        asset: protoAsset,
         messageId: createRandomUuid(),
       });
 
@@ -437,7 +435,7 @@ describe('CryptographyMapper', () => {
         width: image.width,
       });
       const generic_message = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.IMAGE]: image_asset,
+        image: image_asset,
         messageId: createRandomUuid(),
       });
 
@@ -462,7 +460,7 @@ describe('CryptographyMapper', () => {
 
     it('rejects with an error for a preview image message', done => {
       const generic_message = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.IMAGE]: new ImageAsset({tag: 'preview'}),
+        image: new ImageAsset({tag: 'preview'}),
         messageId: createRandomUuid(),
       });
 
@@ -478,7 +476,7 @@ describe('CryptographyMapper', () => {
 
     it('resolves with a mapped knock message', () => {
       const generic_message = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.KNOCK]: new Knock({hotKnock: false}),
+        knock: new Knock({hotKnock: false}),
         messageId: createRandomUuid(),
       });
 
@@ -505,13 +503,13 @@ describe('CryptographyMapper', () => {
       };
 
       const protoKnock = new Knock({
-        [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: false,
-        [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: expectedLegalHoldStatus,
+        expectsReadConfirmation: false,
         hotKnock: false,
+        legalHoldStatus: expectedLegalHoldStatus,
       });
 
       const genericMessage = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.KNOCK]: protoKnock,
+        knock: protoKnock,
         messageId: createRandomUuid(),
       });
 
@@ -522,11 +520,11 @@ describe('CryptographyMapper', () => {
 
     it('resolves with a mapped last read message', () => {
       const date = Date.now().toString();
-      const conversation_id = createRandomUuid();
+      const conversationId = createRandomUuid();
 
-      const last_read = new LastRead({conversationId: conversation_id, lastReadTimestamp: date});
+      const protoLastRead = new LastRead({conversationId: conversationId, lastReadTimestamp: date});
       const generic_message = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.LAST_READ]: last_read,
+        lastRead: protoLastRead,
         messageId: createRandomUuid(),
       });
 
@@ -537,7 +535,7 @@ describe('CryptographyMapper', () => {
         expect(event_json.from).toBe(event.from);
         expect(event_json.time).toBe(event.time);
         expect(event_json.id).toBe(generic_message.messageId);
-        expect(event_json.data.conversationId).toBe(conversation_id);
+        expect(event_json.data.conversationId).toBe(conversationId);
         expect(event_json.data.last_read_timestamp).toBe(date);
       });
     });
@@ -550,8 +548,8 @@ describe('CryptographyMapper', () => {
         messageId,
       });
       const generic_message = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.REACTION]: reaction,
         messageId,
+        reaction: reaction,
       });
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
@@ -568,8 +566,8 @@ describe('CryptographyMapper', () => {
 
     it('resolves with a mapped text message', () => {
       const generic_message = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: 'Unit test'}),
         messageId: createRandomUuid(),
+        text: new Text({content: 'Unit test'}),
       });
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
@@ -596,10 +594,10 @@ describe('CryptographyMapper', () => {
 
     it('can map a text wrapped inside an external message', async () => {
       const plaintext = 'Test';
-      const text = new Text({content: plaintext});
+      const protoText = new Text({content: plaintext});
       const generic_message = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.TEXT]: text,
         messageId: createRandomUuid(),
+        text: protoText,
       });
 
       const encryptedAsset = await encryptAesAsset(GenericMessage.encode(generic_message).finish());
@@ -646,14 +644,14 @@ describe('CryptographyMapper', () => {
     });
 
     it('resolves with a mapped location message', () => {
-      const location = new Location({
+      const protoLocation = new Location({
         latitude: 13.409779,
         longitude: 52.520645,
         name: 'Berlin',
         zoom: 1,
       });
       const generic_message = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.LOCATION]: location,
+        location: protoLocation,
         messageId: createRandomUuid(),
       });
 
@@ -678,6 +676,7 @@ describe('CryptographyMapper', () => {
         emoji: ReactionType.LIKE,
         messageId,
       });
+
       const generic_message = new GenericMessage({
         messageId,
         reaction,
@@ -703,9 +702,9 @@ describe('CryptographyMapper', () => {
         version: '3.0',
       };
 
-      const calling = new Calling({content: JSON.stringify(content_message)});
+      const protoCalling = new Calling({content: JSON.stringify(content_message)});
       const generic_message = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.CALLING]: calling,
+        calling: protoCalling,
         messageId: createRandomUuid(),
       });
 

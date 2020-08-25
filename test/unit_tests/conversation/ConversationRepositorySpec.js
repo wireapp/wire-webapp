@@ -27,7 +27,6 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {createRandomUuid} from 'Util/util';
 
-import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {Message} from 'src/script/entity/message/Message';
@@ -1204,12 +1203,12 @@ describe('ConversationRepository', () => {
       return testFactory.conversation_repository
         .save_conversation(largeConversationEntity)
         .then(() => {
-          const text = new Text({
+          const protoText = new Text({
             content:
               'massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message',
           });
           const genericMessage = new GenericMessage({
-            [GENERIC_MESSAGE_TYPE.TEXT]: text,
+            text: protoText,
             messageId: createRandomUuid(),
           });
 
@@ -1229,7 +1228,7 @@ describe('ConversationRepository', () => {
         .save_conversation(smallConversationEntity)
         .then(() => {
           const genericMessage = new GenericMessage({
-            [GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: 'Test'}),
+            text: new Text({content: 'Test'}),
             messageId: createRandomUuid(),
           });
 
@@ -1259,11 +1258,11 @@ describe('ConversationRepository', () => {
       spyOn(conversationRepository.conversation_service, 'post_encrypted_message').and.returnValue(Promise.resolve({}));
       spyOn(conversationRepository.conversationMapper, 'mapConversations').and.returnValue(conversationPromise);
       spyOn(conversationRepository.cryptography_repository, 'encryptGenericMessage').and.callFake(
-        (conversationId, genericMessage) => {
+        (_conversationId, genericMessage) => {
           const {content, ephemeral} = genericMessage;
 
-          expect(content).toBe(GENERIC_MESSAGE_TYPE.EPHEMERAL);
-          expect(ephemeral.content).toBe(GENERIC_MESSAGE_TYPE.TEXT);
+          expect(content).toBe('ephemeral');
+          expect(ephemeral.content).toBe('text');
           expect(ephemeral.expireAfterMillis.toString()).toBe(expectedValues.shift());
           return Promise.resolve({
             recipients: {},

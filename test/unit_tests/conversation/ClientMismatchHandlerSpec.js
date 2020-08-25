@@ -18,7 +18,6 @@
  */
 
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
-import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 
 import {createRandomUuid} from 'Util/util';
 
@@ -51,8 +50,8 @@ describe('ClientMismatchHandler', () => {
 
     beforeAll(() => {
       genericMessage = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: 'Test'}),
         messageId: createRandomUuid(),
+        text: new Text({content: 'Test'}),
       });
 
       johnDoe = {

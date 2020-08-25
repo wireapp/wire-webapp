@@ -24,7 +24,6 @@ import {GenericMessage, Text} from '@wireapp/protocol-messaging';
 
 import {arrayToBase64, createRandomUuid} from 'Util/util';
 
-import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 import {ClientEvent} from 'src/script/event/Client';
 import {TestFactory} from '../../helper/TestFactory';
 import {CryptographyError} from 'src/script/error/CryptographyError';
@@ -82,8 +81,8 @@ describe('CryptographyRepository', () => {
       );
 
       const generic_message = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: 'Unit test'}),
         messageId: createRandomUuid(),
+        text: new Text({content: 'Unit test'}),
       });
 
       const recipients = {
@@ -172,8 +171,8 @@ describe('CryptographyRepository', () => {
       const plainText = 'Hello, Alice!';
 
       const genericMessage = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: plainText}),
         messageId: createRandomUuid(),
+        text: new Text({content: plainText}),
       });
 
       const cipherText = await bob.encrypt(

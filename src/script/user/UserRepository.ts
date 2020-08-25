@@ -48,7 +48,6 @@ import {EventRepository} from '../event/EventRepository';
 import type {EventSource} from '../event/EventSource';
 
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
-import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 import {EventName} from '../tracking/EventName';
 
 import {
@@ -392,7 +391,7 @@ export class UserRepository {
 
     const protoAvailability = new Availability({type: protoFromType(availability)});
     const genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.AVAILABILITY]: protoAvailability,
+      availability: protoAvailability,
       messageId: createRandomUuid(),
     });
 

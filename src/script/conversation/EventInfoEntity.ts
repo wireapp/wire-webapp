@@ -18,7 +18,6 @@
  */
 
 import type {GenericMessage, IGenericMessage} from '@wireapp/protocol-messaging';
-import type {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 import {Recipients} from '../cryptography/CryptographyRepository';
 
 export interface MessageSendingOptions {
@@ -39,7 +38,7 @@ export interface MessageSendingOptions {
 export class EventInfoEntity {
   options: MessageSendingOptions;
   public readonly genericMessage: GenericMessage;
-  private type?: GENERIC_MESSAGE_TYPE;
+  private type?: keyof Omit<IGenericMessage, 'messageId'>;
   public readonly conversationId: string;
   public timestamp?: number;
 
@@ -57,7 +56,7 @@ export class EventInfoEntity {
     this.options.precondition = true;
   }
 
-  getType(): GENERIC_MESSAGE_TYPE | keyof Omit<IGenericMessage, 'messageId'> | '' {
+  getType(): keyof Omit<IGenericMessage, 'messageId'> | '' {
     return this.type || (this.genericMessage && this.genericMessage.content);
   }
 
@@ -65,7 +64,7 @@ export class EventInfoEntity {
     this.timestamp = new Date(time).getTime();
   }
 
-  setType(type: GENERIC_MESSAGE_TYPE): void {
+  setType(type: keyof Omit<IGenericMessage, 'messageId'>): void {
     this.type = type;
   }
 

@@ -26,7 +26,6 @@ import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/dist/event';
 
 import {createRandomUuid, arrayToBase64} from 'Util/util';
 
-import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 import {ClientEvent} from 'src/script/event/Client';
 import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
 import {EventRepository} from 'src/script/event/EventRepository';
@@ -50,8 +49,8 @@ async function createEncodedCiphertext(
   await sender.create();
 
   const genericMessage = new GenericMessage({
-    [GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: text}),
     messageId: createRandomUuid(),
+    text: new Text({content: text}),
   });
 
   const sessionId = `from-${sender.identity.public_key.fingerprint()}-to-${preKey.key_pair.public_key.fingerprint()}`;

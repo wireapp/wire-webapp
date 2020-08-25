@@ -29,7 +29,6 @@ import {t} from 'Util/LocalizerUtil';
 
 import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
 import {AssetTransferState} from '../assets/AssetTransferState';
-
 import {EVENT_TYPE} from './EventType';
 import {ClientEvent} from './Client';
 import {EventTypeHandling} from './EventTypeHandling';

@@ -22,7 +22,6 @@ import {GenericMessage, LegalHoldStatus, Text} from '@wireapp/protocol-messaging
 import {createRandomUuid} from 'Util/util';
 
 import {CryptographyMapper} from '../cryptography/CryptographyMapper';
-import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 import {ClientEvent} from '../event/Client';
 import {StatusType} from '../message/StatusType';
 import * as LegalHoldEvaluator from './LegalHoldEvaluator';
@@ -37,12 +36,12 @@ describe('LegalHoldEvaluator', () => {
 
     it('knows when a message has legal hold enabled', async () => {
       const legalHoldFlagOn = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.TEXT]: Text.create({
+        messageId: createRandomUuid(),
+        text: Text.create({
           content: 'TEST',
           expectsReadConfirmation: false,
           legalHoldStatus: LegalHoldStatus.ENABLED,
         }),
-        messageId: createRandomUuid(),
       });
 
       const event: Object = {
@@ -64,12 +63,12 @@ describe('LegalHoldEvaluator', () => {
 
     it('knows when a message has legal hold disabled', async () => {
       const legalHoldFlagOff = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.TEXT]: Text.create({
+        messageId: createRandomUuid(),
+        text: Text.create({
           content: 'TEST',
           expectsReadConfirmation: false,
           legalHoldStatus: LegalHoldStatus.DISABLED,
         }),
-        messageId: createRandomUuid(),
       });
 
       const event: Object = {
@@ -91,11 +90,11 @@ describe('LegalHoldEvaluator', () => {
 
     it('knows when a message is missing a legal hold flag', async () => {
       const legalHoldFlagMissing = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.TEXT]: Text.create({
+        messageId: createRandomUuid(),
+        text: Text.create({
           content: 'TEST',
           expectsReadConfirmation: false,
         }),
-        messageId: createRandomUuid(),
       });
 
       const event: Object = {

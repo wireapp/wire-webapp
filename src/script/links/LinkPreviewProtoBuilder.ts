@@ -26,7 +26,6 @@ import {truncate} from 'Util/StringUtil';
 import {isTweetUrl} from 'Util/ValidationUtil';
 
 import {Config} from '../Config';
-import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 
 /**
  * Create Protocol Buffers message for link previews.
@@ -72,8 +71,8 @@ export const buildFromOpenGraphData = (data: OpenGraphData, link: string, offset
     const username = deArrayify(dataUrl).match(/com\/([^/]*)\//)[1];
     const protoTweet = new Tweet({author, username});
 
-    protoLinkPreview[PROTO_MESSAGE_TYPE.TWEET] = protoTweet;
-    protoLinkPreview[PROTO_MESSAGE_TYPE.LINK_PREVIEW_TITLE] = truncatedDescription;
+    protoLinkPreview.tweet = protoTweet;
+    protoLinkPreview.title = truncatedDescription;
   }
 
   return protoLinkPreview;
