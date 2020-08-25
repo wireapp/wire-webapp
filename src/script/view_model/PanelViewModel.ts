@@ -36,17 +36,18 @@ import {ParticipantDevicesViewModel} from './panel/ParticipantDevicesViewModel';
 import {TimedMessagesViewModel} from './panel/TimedMessagesViewModel';
 import {MotionDuration} from '../motion/MotionDuration';
 import {ContentViewModel} from './ContentViewModel';
-import {MainViewModel, ViewModelRepositories} from './MainViewModel';
-import {Conversation} from '../entity/Conversation';
-import {User} from '../entity/User';
-import {Message} from '../entity/message/Message';
-import {BasePanelViewModel} from './panel/BasePanelViewModel';
+import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
+import type {Conversation} from '../entity/Conversation';
+import type {User} from '../entity/User';
+import type {Message} from '../entity/message/Message';
+import type {BasePanelViewModel} from './panel/BasePanelViewModel';
+import type {ServiceEntity} from '../integration/ServiceEntity';
 
 export const OPEN_CONVERSATION_DETAILS = 'PanelViewModel.OPEN_CONVERSATION_DETAILS';
 
 export type PanelParams = {
   addMode?: boolean;
-  entity?: User | Message;
+  entity?: User | Message | ServiceEntity;
   highlighted?: User[];
   showLikes?: boolean;
 };
@@ -57,13 +58,14 @@ export class PanelViewModel {
   elementId: string;
   conversationRepository: ConversationRepository;
   conversationEntity: ko.Observable<Conversation>;
-  stateHistory: any[];
+  stateHistory: {params?: PanelParams; state: string}[];
   isAnimating: ko.Observable<boolean>;
   isVisible: ko.PureComputed<boolean>;
   exitingState: ko.Observable<string>;
   state: ko.Observable<string>;
   subViews: Record<string, BasePanelViewModel>;
   STATE: Record<string, string>;
+
   static get STATE() {
     return {
       ADD_PARTICIPANTS: 'PanelViewModel.STATE.ADD_PARTICIPANTS',
@@ -97,10 +99,10 @@ export class PanelViewModel {
       subViews[state] = new viewModel({
         isVisible: ko.pureComputed(this._isStateVisible.bind(this, state)),
         mainViewModel: this.mainViewModel,
-        navigateTo: this._navigateTo.bind(this),
-        onClose: this.closePanel.bind(this),
-        onGoBack: this._goBack.bind(this),
-        onGoToRoot: this._goToRoot.bind(this),
+        navigateTo: this._navigateTo,
+        onClose: this.closePanel,
+        onGoBack: this._goBack,
+        onGoToRoot: this._goToRoot,
         repositories: this.repositories,
       });
       return subViews;
@@ -124,12 +126,12 @@ export class PanelViewModel {
     this.isVisible = ko.pureComputed(() => this.state() !== null);
     this.exitingState = ko.observable(undefined);
 
-    this.conversationEntity.subscribe(this._forceClosePanel.bind(this), null, 'beforeChange');
+    this.conversationEntity.subscribe(this._forceClosePanel, null, 'beforeChange');
     this.subViews = this.buildSubViews();
     this.STATE = PanelViewModel.STATE;
 
-    amplify.subscribe(WebAppEvents.CONTENT.SWITCH, this._switchContent.bind(this));
-    amplify.subscribe(OPEN_CONVERSATION_DETAILS, this._goToRoot.bind(this));
+    amplify.subscribe(WebAppEvents.CONTENT.SWITCH, this._switchContent);
+    amplify.subscribe(OPEN_CONVERSATION_DETAILS, this._goToRoot);
     ko.applyBindings(this, document.getElementById(this.elementId));
   }
 
@@ -140,7 +142,7 @@ export class PanelViewModel {
    *
    * Note: panels that are toggled are not counted in the state history.
    */
-  togglePanel(state: string, params: PanelParams): void {
+  togglePanel = (state: string, params: PanelParams): void => {
     const isStateChange = this.state() !== state;
     if (!isStateChange) {
       const currentInstance = this.subViews[state];
@@ -151,12 +153,12 @@ export class PanelViewModel {
       }
     }
     this._openPanel(state, params);
-  }
+  };
 
   /**
    * Graciously closes the current opened panel.
    */
-  async closePanel(): Promise<boolean> {
+  private readonly closePanel = async (): Promise<boolean> => {
     if (this.isAnimating()) {
       return false;
     }
@@ -165,55 +167,55 @@ export class PanelViewModel {
     await this.mainViewModel.closePanel();
     this._resetState();
     return true;
-  }
+  };
 
   /**
    * Will navigate from the current state to the new state.
    */
-  _navigateTo(newState: string, params: PanelParams): void {
+  private readonly _navigateTo = (newState: string, params: PanelParams): void => {
     this._switchState(newState, this.state(), params);
     this.stateHistory.push({params, state: newState});
-  }
+  };
 
-  _forceClosePanel(): void {
+  private readonly _forceClosePanel = (): void => {
     if (this.isVisible()) {
       this.mainViewModel.closePanelImmediately();
       this._resetState();
     }
-  }
+  };
 
-  _resetState(): void {
+  private readonly _resetState = (): void => {
     this.isAnimating(false);
     this._hidePanel(this.state(), true);
     this.state(null);
     this.stateHistory = [];
-  }
+  };
 
-  _isStateVisible(state: string): boolean {
+  private readonly _isStateVisible = (state: string): boolean => {
     const isStateActive = this.state() === state;
     const isStateExiting = this.exitingState() === state;
     return (isStateExiting || isStateActive) && this.isVisible();
-  }
+  };
 
-  _goBack(): void {
+  private readonly _goBack = (): void => {
     this.stateHistory.pop();
     const toHistory = this.stateHistory[this.stateHistory.length - 1];
     const {state, params} = toHistory;
     this._switchState(state, this.state(), params, true);
-  }
+  };
 
-  _goToRoot(): void {
+  private readonly _goToRoot = (): void => {
     this._openPanel(PanelViewModel.STATE.CONVERSATION_DETAILS, undefined, true);
-  }
+  };
 
-  _switchContent(newContentState: string): void {
+  private readonly _switchContent = (newContentState: string): void => {
     const stateIsCollection = newContentState === ContentViewModel.STATE.COLLECTION;
     if (stateIsCollection) {
       this._forceClosePanel();
     }
-  }
+  };
 
-  _switchState(toState: string, fromState: string, params: PanelParams, fromLeft = false): void {
+  private readonly _switchState = (toState: string, fromState: string, params: PanelParams, fromLeft = false): void => {
     const toViewModel = this.subViews[toState];
     const fromViewModel = this.subViews[fromState];
     toViewModel.initView(params);
@@ -248,9 +250,9 @@ export class PanelViewModel {
       toPanel?.classList.remove('panel__page--move-in--left', 'panel__page--move-in--right');
       this._hidePanel(fromState);
     }, MotionDuration.MEDIUM);
-  }
+  };
 
-  _hidePanel(state: string, forceInvisible = false): void {
+  private readonly _hidePanel = (state: string, forceInvisible = false): void => {
     if (!this.subViews[state]) {
       return;
     }
@@ -262,9 +264,9 @@ export class PanelViewModel {
     if (this.state() !== state || forceInvisible) {
       exitPanel?.classList.remove('panel__page--visible');
     }
-  }
+  };
 
-  _openPanel(newState: string, params: PanelParams, overrideAnimating = false): void {
+  private readonly _openPanel = (newState: string, params: PanelParams, overrideAnimating = false): void => {
     if (!this.isAnimating() || overrideAnimating) {
       this._hidePanel(this.state(), true);
       const rootState = PanelViewModel.STATE.CONVERSATION_DETAILS;
@@ -274,9 +276,9 @@ export class PanelViewModel {
       this._switchState(newState, null, params, true);
       this.mainViewModel.openPanel().then(() => this.isAnimating(false));
     }
-  }
+  };
 
-  _showPanel(newPanelState: string): Element {
+  private readonly _showPanel = (newPanelState: string): Element => {
     this.state(newPanelState);
 
     const panelStateElementId = this.subViews[newPanelState].getElementId();
@@ -286,5 +288,5 @@ export class PanelViewModel {
       return element;
     }
     return undefined;
-  }
+  };
 }
