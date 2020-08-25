@@ -17,22 +17,19 @@
  *
  */
 
-import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
-
+import {amplify} from 'amplify';
+import {RaygunStatic} from 'raygun4js';
 import {Environment} from 'Util/Environment';
 import {getLogger, Logger} from 'Util/Logger';
-import {includesString, bytesToHex} from 'Util/StringUtil';
+import {includesString} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {getParameter} from 'Util/UrlUtil';
-
+import {createRandomUuid} from 'Util/util';
 import {URLParameter} from '../auth/URLParameter';
-
 import type {UserRepository} from '../user/UserRepository';
 import {EventName} from './EventName';
-import {RaygunStatic} from 'raygun4js';
 import {UserData} from './UserData';
-import {createRandomUuid} from 'Util/util';
 
 declare const Raygun: RaygunStatic;
 
