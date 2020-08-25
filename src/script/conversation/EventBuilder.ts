@@ -17,7 +17,7 @@
  *
  */
 
-import type {LegalHoldStatus} from '@wireapp/api-client/dist/team/legalhold';
+import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
 import type {REASON as AVS_REASON} from '@wireapp/avs';
 
@@ -36,6 +36,7 @@ import type {User} from '../entity/User';
 export interface BaseEvent {
   conversation: string;
   from: string;
+  id?: string;
   time: string;
 }
 
@@ -72,10 +73,11 @@ export interface VoiceChannelActivateEvent extends BaseEvent {
 }
 
 export type AllVerifiedEvent = ConversationEvent<{type: VerificationMessageType}>;
-export type AssetAddEvent = Omit<ConversationEvent<any>, 'id'> & {status: StatusType};
+export type AssetAddEvent = Omit<ConversationEvent<any>, 'id'> &
+  Partial<Pick<ConversationEvent<any>, 'id'>> & {status: StatusType};
 export type DegradedMessageEvent = ConversationEvent<{type: VerificationMessageType; userIds: string[]}>;
 export type DeleteEvent = ConversationEvent<{deleted_time: number}>;
-export type GroupCreationEvent = ConversationEvent<{allTeamMembers: User[]; name: string; userIds: string[]}>;
+export type GroupCreationEvent = ConversationEvent<{allTeamMembers: boolean; name: string; userIds: string[]}>;
 export type LegalHoldMessageEvent = ConversationEvent<{legal_hold_status: LegalHoldStatus}>;
 export type MemberJoinEvent = BackendEventMessage<{user_ids: string[]}>;
 export type MemberLeaveEvent = BackendEventMessage<{user_ids: string[]}>;
@@ -89,9 +91,9 @@ export type VoiceChannelDeactivateEvent = ConversationEvent<{duration: number; r
 export type FileTypeRestrictedEvent = ConversationEvent<{fileExt: string; isIncoming: boolean; name: string}>;
 
 export const EventBuilder = {
-  build1to1Creation(conversationEntity: Conversation, timestamp: number): OneToOneCreationEvent {
+  build1to1Creation(conversationEntity: Conversation, timestamp: number = 0): OneToOneCreationEvent {
     const {creator: creatorId, id} = conversationEntity;
-    const isoDate = new Date(timestamp || 0).toISOString();
+    const isoDate = new Date(timestamp).toISOString();
 
     return {
       conversation: id,

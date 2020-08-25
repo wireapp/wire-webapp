@@ -40,7 +40,7 @@ export class MessageDetailsViewModel extends BasePanelViewModel {
   likes: ko.PureComputed<string[]>;
   likesTitle: ko.PureComputed<string>;
   likeUsers: ko.ObservableArray<User>;
-  message: ko.PureComputed<ContentMessage | MemberMessage | undefined>;
+  message: ko.PureComputed<Message | ContentMessage | MemberMessage | undefined>;
   messageId: ko.Observable<string>;
   panelTitle: ko.PureComputed<string>;
   receipts: ko.PureComputed<ReadReceipt[]>;

@@ -389,7 +389,7 @@ export class EventService {
   /**
    * Update an event in the database and checks that the update is sequential.
    *
-   * @param {number} primaryKey Event primary key
+   * @param {number|string} primaryKey Event primary key
    * @param {Object} [changes={}] Changes to update message with
    * @returns {Promise<Event>} Resolves when the message was updated in database
    */

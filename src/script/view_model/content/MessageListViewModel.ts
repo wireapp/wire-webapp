@@ -197,7 +197,7 @@ export class MessageListViewModel {
   private readonly loadConversation = async (
     conversationEntity: Conversation,
     messageEntity: Message,
-  ): Promise<void> => {
+  ): Promise<ContentMessage[]> => {
     const _conversationEntity = await this.conversationRepository.updateParticipatingUserEntities(
       conversationEntity,
       false,
@@ -272,7 +272,7 @@ export class MessageListViewModel {
   };
 
   private readonly scrollAddedMessagesIntoView = (
-    changedMessages: ko.utils.ArrayChanges<ContentMessage | MemberMessage>,
+    changedMessages: ko.utils.ArrayChanges<Message | ContentMessage | MemberMessage>,
     shouldStickToBottom: boolean,
   ) => {
     const messages_container = this.getMessagesContainer();
@@ -330,9 +330,8 @@ export class MessageListViewModel {
     if (lastMessage) {
       if (!this.isLastReceivedMessage(lastMessage, this.conversation())) {
         // if the last loaded message is not the last of the conversation, we load the subsequent messages
-        return this.conversationRepository.getSubsequentMessages(this.conversation(), lastMessage, false);
-      }
-      if (document.hasFocus()) {
+        this.conversationRepository.getSubsequentMessages(this.conversation(), lastMessage as ContentMessage, 0);
+      } else if (document.hasFocus()) {
         // if the message is the last of the conversation and the app is in the foreground, then we update the last read timestamp of the conversation
         this.updateConversationLastRead(this.conversation(), lastMessage);
       }
@@ -470,7 +469,7 @@ export class MessageListViewModel {
     this.actionsViewModel.cancelConnectionRequest(messageEntity.otherUser(), true, nextConversationEntity);
   };
 
-  clickOnLike = (messageEntity: Message): void => {
+  clickOnLike = (messageEntity: ContentMessage): void => {
     this.conversationRepository.toggle_like(this.conversation(), messageEntity);
   };
 
@@ -478,14 +477,17 @@ export class MessageListViewModel {
     this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.GUEST_OPTIONS, undefined);
   };
 
-  getInViewportCallback = (conversationEntity: Conversation, messageEntity: MemberMessage): Function | null => {
+  getInViewportCallback = (
+    conversationEntity: Conversation,
+    messageEntity: MemberMessage | ContentMessage,
+  ): Function | null => {
     const messageTimestamp = messageEntity.timestamp();
     const callbacks: Function[] = [];
 
     if (!messageEntity.is_ephemeral()) {
       const isCreationMessage = messageEntity.isMember() && messageEntity.isCreation();
       if (conversationEntity.is1to1() && isCreationMessage) {
-        this.integrationRepository.addProviderNameToParticipant(messageEntity.otherUser());
+        this.integrationRepository.addProviderNameToParticipant((messageEntity as MemberMessage).otherUser());
       }
     }
 
@@ -500,7 +502,7 @@ export class MessageListViewModel {
 
     const startTimer = async () => {
       if (messageEntity.conversation_id === conversationEntity.id) {
-        await this.conversationRepository.checkMessageTimer(messageEntity);
+        this.conversationRepository.checkMessageTimer(messageEntity as ContentMessage);
       }
     };
 

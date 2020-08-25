@@ -115,7 +115,7 @@ export class CollectionViewModel {
 
       this.conversationRepository
         .get_events_for_category(conversationEntity, MessageCategory.LINK_PREVIEW)
-        .then(messageEntities => this._populateItems(messageEntities));
+        .then(messageEntities => this._populateItems(messageEntities as ContentMessage[]));
     }
   }
 
