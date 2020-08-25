@@ -1,4 +1,4 @@
-<div id="notification-settings" class="panel__page notification-settings" data-bind="with: $root.subViews[z.viewModel.PanelViewModel.STATE.NOTIFICATIONS]">
+<div id="notification-settings" class="panel__page notification-settings" data-bind="with: $root.subViews[$root.STATE.NOTIFICATIONS]">
   <!-- ko if: isVisible() -->
     <div class="panel__header">
       <arrow-left-icon class="icon-button" data-bind="clickOrDrag: onGoBack" data-uie-name="go-back-notification-options"></arrow-left-icon>
