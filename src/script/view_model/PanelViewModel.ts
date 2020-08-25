@@ -158,7 +158,7 @@ export class PanelViewModel {
   /**
    * Graciously closes the current opened panel.
    */
-  private readonly closePanel = async (): Promise<boolean> => {
+  closePanel = async (): Promise<boolean> => {
     if (this.isAnimating()) {
       return false;
     }
