@@ -17,19 +17,23 @@
  *
  */
 
+import ko from 'knockout';
+import {amplify} from 'amplify';
 import {throttle} from 'underscore';
 import {isScrollable, isScrolledBottom, isScrolledTop} from 'Util/scroll-helpers';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
+import type {Conversation} from '../../entity/Conversation';
 
 // show scroll borders
 ko.bindingHandlers.bordered_list = (function () {
-  const calculate_borders = throttle(element => {
+  const calculate_borders = throttle((element: HTMLElement) => {
     if (element) {
       window.requestAnimationFrame(() => {
         const list_column = $(element).parent();
         if (element.offsetHeight <= 0 || !isScrollable(element)) {
-          return list_column.removeClass('left-list-center-border-bottom conversations-center-border-top');
+          list_column.removeClass('left-list-center-border-bottom conversations-center-border-top');
+          return;
         }
 
         list_column.toggleClass('left-list-center-border-top', !isScrolledTop(element));
@@ -39,16 +43,16 @@ ko.bindingHandlers.bordered_list = (function () {
   }, 100);
 
   return {
-    init(element) {
+    init(element: HTMLElement) {
       element.addEventListener('scroll', () => calculate_borders(element));
       $('.left').on('click', () => calculate_borders(element));
       $(window).on('resize', () => calculate_borders(element));
       amplify.subscribe(WebAppEvents.LIFECYCLE.LOADED, () => calculate_borders(element));
     },
 
-    update(element, valueAccessor) {
+    update(element: HTMLElement, valueAccessor: ko.PureComputed<string> | ko.ObservableArray<Conversation>) {
       ko.unwrap(valueAccessor());
-      calculate_borders($(element));
+      calculate_borders($(element) as any);
     },
   };
 })();

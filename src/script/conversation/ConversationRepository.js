@@ -42,7 +42,7 @@ import {ConnectionStatus} from '@wireapp/api-client/dist/connection';
 import {RequestCancellationError} from '@wireapp/api-client/dist/user';
 import {ReactionType} from '@wireapp/core/dist/conversation';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import * as HTTP_STATUS from 'http-status-codes';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
 import {
   DefaultConversationRoleName as DefaultRole,

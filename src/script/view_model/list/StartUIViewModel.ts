@@ -46,7 +46,7 @@ import type {ActionsViewModel} from '../ActionsViewModel';
 import type {ServiceEntity} from '../../integration/ServiceEntity';
 import type {Conversation} from '../../entity/Conversation';
 
-class StartUIViewModel {
+export class StartUIViewModel {
   readonly brandName: string;
   readonly UserlistMode: typeof UserlistMode;
   readonly teamName: ko.PureComputed<string>;
@@ -441,5 +441,3 @@ class StartUIViewModel {
     }
   };
 }
-
-export {StartUIViewModel};

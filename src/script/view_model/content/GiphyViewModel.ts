@@ -21,6 +21,7 @@ import {getLogger, Logger} from 'Util/Logger';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {Modal} from '../../ui/Modal';
 import {GiphyRepository, Gif} from '../../extension/GiphyRepository';
 
@@ -28,6 +29,7 @@ enum GiphyState {
   DEFAULT = '',
   ERROR = 'GiphyViewModel.STATE.ERROR',
   LOADING = 'GiphyViewModel.STATE.LOADING',
+  NO_SEARCH_RESULT = 'GiphyViewModel.STATE.NO_SEARCH_RESULT',
   RESULT = 'GiphyViewModel.STATE.RESULT',
   RESULTS = 'GiphyViewModel.STATE.RESULTS',
 }
@@ -37,14 +39,15 @@ export class GiphyViewModel {
   private modal: Modal;
   private readonly state: ko.Observable<GiphyState>;
   private readonly query: ko.Observable<string>;
-  gif: ko.Observable<Gif>;
-  gifs: ko.ObservableArray<Gif>;
-  selectedGif: ko.Observable<Gif>;
-  isStateError: ko.PureComputed<boolean>;
-  isStateLoading: ko.PureComputed<boolean>;
-  isStateResult: ko.PureComputed<boolean>;
-  isStateResults: ko.PureComputed<boolean>;
-  isResultState: ko.PureComputed<boolean>;
+  public gif: ko.Observable<Gif>;
+  public gifs: ko.ObservableArray<Gif>;
+  public selectedGif: ko.Observable<Gif>;
+  public isStateError: ko.PureComputed<boolean>;
+  public isStateLoading: ko.PureComputed<boolean>;
+  public isStateResult: ko.PureComputed<boolean>;
+  public isStateResults: ko.PureComputed<boolean>;
+  public isResultState: ko.PureComputed<boolean>;
+  public isStateNoSearchResults: ko.PureComputed<boolean>;
 
   constructor(private readonly giphyRepository: GiphyRepository) {
     this.logger = getLogger('GiphyViewModel');
@@ -62,10 +65,11 @@ export class GiphyViewModel {
     // GIF selected by user or single GIF when in single GIF view
     this.selectedGif = ko.observable();
 
-    this.isStateError = ko.pureComputed(() => this.state() === GiphyState.ERROR);
+    this.isStateError = ko.pureComputed(() => [GiphyState.ERROR, GiphyState.NO_SEARCH_RESULT].includes(this.state()));
     this.isStateLoading = ko.pureComputed(() => this.state() === GiphyState.LOADING);
     this.isStateResult = ko.pureComputed(() => this.state() === GiphyState.RESULT);
     this.isStateResults = ko.pureComputed(() => this.state() === GiphyState.RESULTS);
+    this.isStateNoSearchResults = ko.pureComputed(() => this.state() === GiphyState.NO_SEARCH_RESULT);
 
     this.isResultState = ko.pureComputed(() => {
       return [GiphyState.RESULT, GiphyState.RESULTS].includes(this.state());
@@ -137,7 +141,9 @@ export class GiphyViewModel {
     this._getRandomGif();
 
     if (!this.modal) {
-      this.modal = new Modal('#giphy-modal');
+      this.modal = new Modal('#giphy-modal', () => {
+        this.modal = undefined;
+      });
     }
 
     this.modal.show();
@@ -179,6 +185,10 @@ export class GiphyViewModel {
 
     try {
       const gifs = await this.giphyRepository.getGifs(this.query());
+      if (gifs.length === 0) {
+        this.state(GiphyState.NO_SEARCH_RESULT);
+        return;
+      }
       this.gifs(gifs);
       if (gifs.length === 1) {
         this.selectedGif(gifs[0]);

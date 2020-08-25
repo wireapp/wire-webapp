@@ -23,7 +23,7 @@ import ko from 'knockout';
 import sodium from 'libsodium-wrappers-sumo';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {UrlUtil} from '@wireapp/commons';
-import * as HTTP_STATUS from 'http-status-codes';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {t} from 'Util/LocalizerUtil';
 import {afterRender} from 'Util/util';

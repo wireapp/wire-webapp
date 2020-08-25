@@ -17,6 +17,7 @@
  *
  */
 
+import ko from 'knockout';
 import {ClientClassification} from '@wireapp/api-client/dist/client';
 
 import type {ClientEntity} from '../client/ClientEntity';

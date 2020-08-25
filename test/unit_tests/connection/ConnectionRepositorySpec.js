@@ -19,7 +19,7 @@
 
 import {ConnectionStatus} from '@wireapp/api-client/dist/connection';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import * as HTTP_STATUS from 'http-status-codes';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {createRandomUuid} from 'Util/util';
 
