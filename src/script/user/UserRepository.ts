@@ -30,7 +30,7 @@ import ko from 'knockout';
 import {flatten} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import type {AxiosError} from 'axios';
-import * as HTTP_STATUS from 'http-status-codes';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {chunk, partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -85,10 +85,10 @@ export class UserRepository {
   teamMembers: ko.PureComputed<User[]>;
   /** Note: this does not include the self user */
   teamUsers: ko.PureComputed<User[]>;
-  private readonly directlyConnectedUsers: ko.PureComputed<User[]>;
+  public directlyConnectedUsers: ko.PureComputed<User[]>;
   private readonly userMapper: UserMapper;
   private readonly userService: UserService;
-  private readonly users: ko.ObservableArray<User>;
+  public readonly users: ko.ObservableArray<User>;
   public should_set_username: boolean;
   readonly connect_requests: ko.PureComputed<User[]>;
   readonly isActivatedAccount: ko.PureComputed<boolean>;
@@ -485,7 +485,7 @@ export class UserRepository {
         .then(response => (response ? this.userMapper.mapUsersFromJson(response) : []))
         .catch((error: AxiosError | BackendError) => {
           const isNotFound = (error as AxiosError).response?.status === HTTP_STATUS.NOT_FOUND;
-          const isBadRequest = (error as BackendError).code === HTTP_STATUS.BAD_REQUEST;
+          const isBadRequest = Number((error as BackendError).code) === HTTP_STATUS.BAD_REQUEST;
           if (isNotFound || isBadRequest) {
             return [];
           }

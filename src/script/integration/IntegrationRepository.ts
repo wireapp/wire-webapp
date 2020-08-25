@@ -17,6 +17,7 @@
  *
  */
 
+import ko from 'knockout';
 import {amplify} from 'amplify';
 import type {Observable, ObservableArray, PureComputed} from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';

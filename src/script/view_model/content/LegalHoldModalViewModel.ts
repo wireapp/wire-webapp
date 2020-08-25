@@ -19,7 +19,7 @@
 
 import {LegalHoldMemberStatus} from '@wireapp/api-client/dist/team/legalhold';
 import {amplify} from 'amplify';
-import * as HTTP_STATUS from 'http-status-codes';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import ko from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';

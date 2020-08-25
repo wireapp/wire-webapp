@@ -289,13 +289,12 @@ export class TestFactory {
       this.connection_repository,
       this.cryptography_repository,
       this.event_repository,
-      undefined,
       new LinkPreviewRepository(assetRepository, propertiesRepository),
-      new MessageSender(),
-      serverTimeHandler,
       this.team_repository,
       this.user_repository,
       this.propertyRepository,
+      new MessageSender(),
+      serverTimeHandler,
     );
 
     return this.conversation_repository;

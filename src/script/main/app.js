@@ -248,13 +248,12 @@ class App {
       repositories.connection,
       repositories.cryptography,
       repositories.event,
-      repositories.giphy,
       new LinkPreviewRepository(repositories.asset, repositories.properties),
-      sendingMessageQueue,
-      serverTimeHandler,
       repositories.team,
       repositories.user,
       repositories.properties,
+      sendingMessageQueue,
+      serverTimeHandler,
     );
 
     const serviceMiddleware = new ServiceMiddleware(repositories.conversation, repositories.user);
@@ -832,7 +831,7 @@ class App {
 
     if (App.CONFIG.SIGN_OUT_REASONS.IMMEDIATE.includes(signOutReason)) {
       try {
-        _logout();
+        return _logout();
       } catch (error) {
         this.logger.error(`Logout triggered by '${signOutReason}' and errored: ${error.message}.`);
         _redirectToLogin();

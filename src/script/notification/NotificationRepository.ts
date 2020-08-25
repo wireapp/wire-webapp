@@ -64,6 +64,7 @@ import {container} from 'tsyringe';
 export interface Multitasking {
   autoMinimize?: ko.Observable<boolean>;
   isMinimized: ko.Observable<boolean> | (() => false);
+  resetMinimize?: ko.Observable<boolean>;
 }
 
 interface ContentViewModelState {

@@ -45,7 +45,7 @@ import type {
 
 import {Logger, getLogger} from 'Util/Logger';
 
-import type {Conversation as ConversationEntity} from '../entity/Conversation';
+import type {Conversation as ConversationEntity, SerializedConversation} from '../entity/Conversation';
 import type {EventService} from '../event/EventService';
 import {MessageCategory} from '../message/MessageCategory';
 import {search as fullTextSearch} from '../search/FullTextSearch';
@@ -306,7 +306,7 @@ export class ConversationService {
   post_encrypted_message(
     conversationId: string,
     payload: NewOTRMessage,
-    preconditionOption: true | string[],
+    preconditionOption?: boolean | string[],
   ): Promise<ClientMismatch> {
     const reportMissing = Array.isArray(preconditionOption) ? preconditionOption : undefined;
     const ignoreMissing = preconditionOption === true ? true : undefined;
@@ -395,9 +395,11 @@ export class ConversationService {
    * @param conversations Conversation entity
    * @returns Resolves with a list of conversation records
    */
-  async save_conversations_in_db(conversations: ConversationEntity[]): Promise<ConversationEntity[]> {
+  async save_conversations_in_db(
+    conversations: ConversationEntity[] | SerializedConversation[],
+  ): Promise<ConversationEntity[] | SerializedConversation[]> {
     if (this.storageService.db) {
-      const keys = conversations.map(conversation => conversation.id);
+      const keys = (conversations as ConversationEntity[]).map(conversation => conversation.id);
       await this.storageService.db.table(StorageSchemata.OBJECT_STORE.CONVERSATIONS).bulkPut(conversations, keys);
     } else {
       for (const conversation of conversations) {

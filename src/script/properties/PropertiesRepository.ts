@@ -17,6 +17,7 @@
  *
  */
 
+import ko from 'knockout';
 import {amplify} from 'amplify';
 import {Confirmation} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -52,7 +53,7 @@ export class PropertiesRepository {
   }
 
   private readonly logger: Logger;
-  private readonly propertiesService: PropertiesService;
+  public readonly propertiesService: PropertiesService;
   public readonly receiptMode: ko.Observable<Confirmation.Type>;
   private readonly selfService: SelfService;
   private readonly selfUser: ko.Observable<User>;

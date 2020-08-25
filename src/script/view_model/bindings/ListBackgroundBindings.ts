@@ -17,12 +17,15 @@
  *
  */
 
-import {alias} from 'Util/util';
 import {container} from 'tsyringe';
+import ko from 'knockout';
+
+import {alias} from 'Util/util';
 import {AssetRepository} from '../../assets/AssetRepository';
+import type {AssetRemoteData} from '../../assets/AssetRemoteData';
 
 ko.bindingHandlers.switchBackground = (() => ({
-  update(element, valueAccessor) {
+  update(element: HTMLElement, valueAccessor: ko.PureComputed<AssetRemoteData | void>) {
     const imageResource = ko.unwrap(valueAccessor());
 
     if (imageResource) {
@@ -42,7 +45,7 @@ ko.bindingHandlers.switchBackground = (() => ({
               .css({'background-image': `url(${window.URL.createObjectURL(blob)})`});
           }
         })
-        .then(() => backgroundNext.css({opacity: '1'}).one(alias.animationend, backgroundLast.remove));
+        .then(() => backgroundNext.css({opacity: '1'}).one(alias.animationend, backgroundLast.remove as any));
     }
   },
 }))();

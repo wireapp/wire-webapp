@@ -319,17 +319,17 @@
   dependencies:
     handlebars "^4.1.0"
 
-"@types/helmet@0.0.47":
-  version "0.0.47"
-  resolved "https://registry.yarnpkg.com/@types/helmet/-/helmet-0.0.47.tgz#ec5161541b649142205b7c558bca14801c5ce129"
-  integrity sha512-TcHA/djjdUtrMtq/QAayVLrsgjNNZ1Uhtz0KhfH01mrmjH44E54DA1A0HNbwW0H/NBFqV+tGMo85ACuEhMXcdg==
+"@types/helmet@0.0.48":
+  version "0.0.48"
+  resolved "https://registry.yarnpkg.com/@types/helmet/-/helmet-0.0.48.tgz#e754399d2f4672ba63962e8490efd3edd31d9799"
+  integrity sha512-C7MpnvSDrunS1q2Oy1VWCY7CDWHozqSnM8P4tFeRTuzwqni+PYOjEredwcqWG+kLpYcgLsgcY3orHB54gbx2Jw==
   dependencies:
     "@types/express" "*"
 
-"@types/jasmine@3.5.12":
-  version "3.5.12"
-  resolved "https://registry.yarnpkg.com/@types/jasmine/-/jasmine-3.5.12.tgz#5c378c1545cdc7cb339cff5578f854b6d1e0a17d"
-  integrity sha512-vJaQ58oceFao+NzpKNqLOWwHPsqA7YEhKv+mOXvYU4/qh+BfVWIxaBtL0Ck5iCS67yOkNwGkDCrzepnzIWF+7g==
+"@types/jasmine@3.5.13":
+  version "3.5.13"
+  resolved "https://registry.yarnpkg.com/@types/jasmine/-/jasmine-3.5.13.tgz#f5d34d7f9d0ad15e7c17adbaf1ebfaca68a60f73"
+  integrity sha512-bVSrTEWdCNH2RHN+E0QlEr4pGPMRA6puKOmL/X13ZeZmUS0q12ZR1rkB9PVvJSX0zi/OXrMDNvUai+PC380+rQ==
 
 "@types/mime@*":
   version "2.0.1"
@@ -1794,10 +1794,10 @@ http-proxy-agent@^2.1.0:
     agent-base "4"
     debug "3.1.0"
 
-http-status-codes@1.4.0:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/http-status-codes/-/http-status-codes-1.4.0.tgz#6e4c15d16ff3a9e2df03b89f3a55e1aae05fb477"
-  integrity sha512-JrT3ua+WgH8zBD3HEJYbeEgnuQaAnUeRRko/YojPAJjGmIfGD3KPU/asLdsLwKjfxOmQe5nXMQ0pt/7MyapVbQ==
+http-status-codes@2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/http-status-codes/-/http-status-codes-2.1.1.tgz#1e8fc7358055135518c1dced00362fd3c1f4f606"
+  integrity sha512-MPKYOEXZw8MzXml8XF8UBWzWGuO60ZKXBDCGwxPJmRZJW3eTUsLgB+O+jtlPB8ZOVSUs1vjcrxtitJghYzxtHQ==
 
 https-proxy-agent@^2.2.1:
   version "2.2.4"
@@ -2874,10 +2874,10 @@ pm2-multimeter@^0.1.2:
   dependencies:
     charm "~0.1.1"
 
-pm2@4.4.0:
-  version "4.4.0"
-  resolved "https://registry.yarnpkg.com/pm2/-/pm2-4.4.0.tgz#85ad86da2d3c6618881714e885c85a96d77ee379"
-  integrity sha512-uEY3ShP5O5d7VBx4r0QhVjWAgjyhazenIl0fhxyVr+aDMWSa3hpD5RpvkGJMiX8z3nDrBBWCSU7TYth1sdbJkA==
+pm2@4.4.1:
+  version "4.4.1"
+  resolved "https://registry.yarnpkg.com/pm2/-/pm2-4.4.1.tgz#a96bf6d4c75cf97612de5940835e792899845b54"
+  integrity sha512-ece2zqVvSg29tIGdznKqk07IwVaO4mX7zLBMVxbJQMfvxpQUotLLERDW0v/RYMHtzj1bX8MLsDUsmPiIbEszKg==
   dependencies:
     "@pm2/agent" "~1.0.2"
     "@pm2/io" "~4.3.5"
@@ -3590,10 +3590,10 @@ toidentifier@1.0.0:
   resolved "https://registry.yarnpkg.com/toidentifier/-/toidentifier-1.0.0.tgz#7e1be3470f1e77948bc43d94a3c8f4d7752ba553"
   integrity sha512-yaOH/Pk/VEhBWWTlhI+qXxDFXlejDGcQipMlyxda9nthulaxLZUNcUqFxokp0vcYnvteJln5FNQDRrxj3YcbVw==
 
-ts-node@8.10.2:
-  version "8.10.2"
-  resolved "https://registry.yarnpkg.com/ts-node/-/ts-node-8.10.2.tgz#eee03764633b1234ddd37f8db9ec10b75ec7fb8d"
-  integrity sha512-ISJJGgkIpDdBhWVu3jufsWpK3Rzo7bdiIXJjQc0ynKxVOVcg2oIrf2H2cejminGrptVc6q6/uynAHNCuWGbpVA==
+ts-node@9.0.0:
+  version "9.0.0"
+  resolved "https://registry.yarnpkg.com/ts-node/-/ts-node-9.0.0.tgz#e7699d2a110cc8c0d3b831715e417688683460b3"
+  integrity sha512-/TqB4SnererCDR/vb4S/QvSZvzQMJN8daAslg7MeaiHvD8rDZsSfXmNeNumyZZzMned72Xoq/isQljYSt8Ynfg==
   dependencies:
     arg "^4.1.0"
     diff "^4.0.1"
@@ -3638,10 +3638,10 @@ typedarray-to-buffer@^3.1.5:
   dependencies:
     is-typedarray "^1.0.0"
 
-typescript@3.9.7:
-  version "3.9.7"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.9.7.tgz#98d600a5ebdc38f40cb277522f12dc800e9e25fa"
-  integrity sha512-BLbiRkiBzAwsjut4x/dsibSTB6yWpwT5qWmC2OfuCg3GgVQCSgMs4vEctYPhsaGtd0AeuuHMkjZ2h2WG8MSzRw==
+typescript@4.0.2:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.0.2.tgz#7ea7c88777c723c681e33bf7988be5d008d05ac2"
+  integrity sha512-e4ERvRV2wb+rRZ/IQeb3jm2VxBsirQLpQhdxplZ2MEzGvDkkMmPglecnNDfSUBivMjP93vRbngYYDQqQ/78bcQ==
 
 typpy@2.3.11:
   version "2.3.11"
