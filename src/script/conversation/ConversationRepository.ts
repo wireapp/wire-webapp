@@ -39,7 +39,6 @@ import {
   Text,
   Asset as ProtobufAsset,
   LinkPreview,
-  IEphemeral,
 } from '@wireapp/protocol-messaging';
 import {flatten} from 'underscore';
 import {ConnectionStatus} from '@wireapp/api-client/dist/connection';
@@ -4322,14 +4321,14 @@ export class ConversationRepository {
     let messageTimer: number;
     const isEphemeral = genericMessage.content === 'ephemeral';
 
-    let unpackedMessage: GenericMessage | IEphemeral;
+    let unpackedMessage: GenericMessage | Ephemeral;
 
     if (isEphemeral) {
-      unpackedMessage = genericMessage.ephemeral;
+      unpackedMessage = genericMessage.ephemeral as Ephemeral;
       messageTimer = Number(unpackedMessage.expireAfterMillis) / TIME_IN_MILLIS.SECOND;
     }
 
-    const messageContentType = genericMessage.content;
+    const messageContentType = (genericMessage.ephemeral as Ephemeral)?.content;
     let actionType;
     let numberOfMentions;
     switch (messageContentType) {
