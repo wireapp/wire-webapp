@@ -45,7 +45,7 @@ import type {GiphyRepository} from '../extension/GiphyRepository';
 import type {IntegrationRepository} from '../integration/IntegrationRepository';
 import type {MediaRepository} from '../media/MediaRepository';
 import type {Multitasking, NotificationRepository} from '../notification/NotificationRepository';
-import type {PanelViewModel} from './PanelViewModel';
+import {PanelViewModel} from './PanelViewModel';
 import type {PermissionRepository} from '../permission/PermissionRepository';
 import type {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
 import type {PropertiesRepository} from '../properties/PropertiesRepository';
@@ -162,7 +162,7 @@ export class MainViewModel {
       repositories.user,
     );
 
-    this.panel = new z.viewModel.PanelViewModel(this, repositories);
+    this.panel = new PanelViewModel(this, repositories);
     this.calling = new CallingViewModel(
       repositories.calling,
       repositories.conversation,

@@ -67,9 +67,9 @@ export interface AccountInfo {
 }
 
 export class TeamRepository {
-  private readonly isTeamDeleted: ko.Observable<boolean>;
+  public readonly isTeamDeleted: ko.Observable<boolean>;
   private readonly logger: Logger;
-  private readonly memberInviters: ko.Observable<any>;
+  public readonly memberInviters: ko.Observable<any>;
   private readonly memberRoles: ko.Observable<any>;
   public readonly supportsLegalHold: ko.Observable<boolean>;
   private readonly teamMapper: TeamMapper;

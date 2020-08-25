@@ -549,7 +549,7 @@ export class EventRepository {
    * @note Don't add unable to decrypt to self conversation
    *
    * @param {Object} event Event payload to be injected
-   * @param {EventRepository.SOURCE} [source=EventRepository.SOURCE.INJECTED] Source of injection
+   * @param {string} [source=EventRepository.SOURCE.INJECTED] Source of injection
    * @returns {Promise<Event>} Resolves when the event has been processed
    */
   injectEvent(event, source = EventRepository.SOURCE.INJECTED) {

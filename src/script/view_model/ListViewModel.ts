@@ -74,7 +74,7 @@ export class ListViewModel {
   private readonly isProAccount: ko.PureComputed<boolean>;
   private readonly selfUser: ko.Observable<User>;
   private readonly modal: ko.Observable<string>;
-  private readonly visibleListItems: ko.PureComputed<string[]>;
+  private readonly visibleListItems: ko.PureComputed<(string | Conversation)[]>;
   private readonly archive: ArchiveViewModel;
   private readonly conversations: ConversationListViewModel;
   private readonly start: StartUIViewModel;
@@ -143,7 +143,7 @@ export class ListViewModel {
       }
 
       const hasConnectRequests = !!this.userRepository.connect_requests().length;
-      const states = hasConnectRequests ? [ContentViewModel.STATE.CONNECTION_REQUESTS] : [];
+      const states: (string | Conversation)[] = hasConnectRequests ? [ContentViewModel.STATE.CONNECTION_REQUESTS] : [];
       return states.concat(this.conversationRepository.conversations_unarchived());
     });
 
@@ -268,7 +268,7 @@ export class ListViewModel {
       activePreference = ContentViewModel.STATE.PREFERENCES_DEVICES;
     }
 
-    const nextPreference = iterateItem(this.visibleListItems(), activePreference, reverse);
+    const nextPreference = iterateItem(this.visibleListItems(), activePreference, reverse) as string;
     if (nextPreference) {
       this.contentViewModel.switchContent(nextPreference);
     }

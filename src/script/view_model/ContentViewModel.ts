@@ -296,7 +296,7 @@ export class ContentViewModel {
     }
 
     const conversationPromise = isConversation
-      ? Promise.resolve(conversation)
+      ? Promise.resolve(conversation as Conversation)
       : this.conversationRepository.get_conversation_by_id(conversation as string);
 
     conversationPromise

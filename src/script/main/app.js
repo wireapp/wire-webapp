@@ -248,13 +248,12 @@ class App {
       repositories.connection,
       repositories.cryptography,
       repositories.event,
-      repositories.giphy,
       new LinkPreviewRepository(repositories.asset, repositories.properties),
-      sendingMessageQueue,
-      serverTimeHandler,
       repositories.team,
       repositories.user,
       repositories.properties,
+      sendingMessageQueue,
+      serverTimeHandler,
     );
 
     const serviceMiddleware = new ServiceMiddleware(repositories.conversation, repositories.user);

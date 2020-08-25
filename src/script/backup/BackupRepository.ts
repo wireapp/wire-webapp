@@ -26,7 +26,7 @@ import {Logger, getLogger} from 'Util/Logger';
 import type {ClientRepository} from '../client/ClientRepository';
 import type {ConnectionRepository} from '../connection/ConnectionRepository';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
-import type {Conversation} from '../entity/Conversation';
+import type {Conversation, SerializedConversation} from '../entity/Conversation';
 import {ClientEvent} from '../event/Client';
 import {StorageSchemata} from '../storage/StorageSchemata';
 import type {UserRepository} from '../user/UserRepository';
@@ -285,7 +285,7 @@ export class BackupRepository {
 
     const entityChunks = chunk(conversationEntities, BackupService.CONFIG.BATCH_SIZE);
 
-    const importConversationChunk = async (conversationChunk: Conversation[]): Promise<void> => {
+    const importConversationChunk = async (conversationChunk: SerializedConversation[]): Promise<void> => {
       const importedConversationEntities = await this.conversationRepository.updateConversationStates(
         conversationChunk,
       );

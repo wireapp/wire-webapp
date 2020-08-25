@@ -81,6 +81,7 @@ import {ConversationError} from '../error/ConversationError';
  * @property {boolean=} otr_muted
  * @property {string=} otr_muted_ref
  * @property {boolean=} muted_state
+ * @property {number=} receipt_mode
  * @property {number=} status
  * @property {number=} verification_state
  */
@@ -96,7 +97,7 @@ export class ConversationMapper {
   /**
    * Converts JSON conversations into conversation entities.
    *
-   * @param {Array} conversationsData Conversation data
+   * @param {Array<BackendConversation>} conversationsData Conversation data
    * @param {number} [timestamp=1] Initial timestamp for conversation
    * @returns {Array<Conversation>} Mapped conversation entities
    */

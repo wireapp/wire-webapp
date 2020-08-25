@@ -315,14 +315,14 @@ export class ActionsViewModel {
       .then(conversationEntity => this.openConversation(conversationEntity));
   };
 
-  openGroupConversation = (conversationEntity: Conversation): Promise<void> => {
+  openGroupConversation = (conversationEntity?: Conversation): Promise<void> => {
     if (!conversationEntity) {
       return Promise.reject();
     }
     return Promise.resolve().then(() => this.openConversation(conversationEntity));
   };
 
-  private readonly openConversation = (conversationEntity: Conversation): void => {
+  private readonly openConversation = (conversationEntity?: Conversation): void => {
     if (conversationEntity) {
       if (conversationEntity.is_archived()) {
         this.conversationRepository.unarchiveConversation(conversationEntity, true);

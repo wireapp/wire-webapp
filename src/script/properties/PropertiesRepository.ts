@@ -53,7 +53,7 @@ export class PropertiesRepository {
   }
 
   private readonly logger: Logger;
-  private readonly propertiesService: PropertiesService;
+  public readonly propertiesService: PropertiesService;
   public readonly receiptMode: ko.Observable<Confirmation.Type>;
   private readonly selfService: SelfService;
   private readonly selfUser: ko.Observable<User>;
