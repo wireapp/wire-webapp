@@ -25,7 +25,7 @@ import * as http from 'http';
 import * as https from 'https';
 import * as path from 'path';
 import * as fs from 'fs';
-import * as HTTP_STATUS from 'http-status-codes';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {HealthCheckRoute} from './routes/_health/HealthRoute';
 import {AppleAssociationRoute} from './routes/appleassociation/AppleAssociationRoute';
@@ -201,6 +201,7 @@ class Server {
     this.app.locals.config = {
       APP_BASE: this.config.SERVER.APP_BASE,
       BRAND_NAME: this.config.CLIENT.BRAND_NAME,
+      CHROME_ORIGIN_TRIAL_TOKEN: this.config.CLIENT.CHROME_ORIGIN_TRIAL_TOKEN,
       OPEN_GRAPH: this.config.SERVER.OPEN_GRAPH,
       VERSION: this.config.CLIENT.VERSION,
     };

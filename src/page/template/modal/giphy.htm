@@ -4,10 +4,10 @@
       <!-- ko if: isStateResult() -->
         <span class="button-icon icon-grid" data-bind="click: clickOnGrid"></span>
       <!-- /ko -->
-      <!-- ko if: isStateResults() -->
+      <!-- ko if: isStateResults() || isStateNoSearchResults() -->
         <span class="button-icon icon-back" data-bind="click: clickOnBack" data-uie-name="do-close"></span>
       <!-- /ko -->
-      <!-- ko ifnot: isResultState() -->
+      <!-- ko ifnot: isResultState() || isStateNoSearchResults() -->
         <span class="giphy-modal-header-button"></span>
       <!-- /ko -->
       <span class="label-xs" data-bind="text: query" data-uie-name="giphy-query"></span>

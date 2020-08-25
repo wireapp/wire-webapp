@@ -19,11 +19,10 @@
 
 import {isObject} from 'underscore';
 import ko from 'knockout';
-import {CONVERSATION_ACCESS_ROLE, CONVERSATION_ACCESS} from '@wireapp/api-client/dist/conversation';
+import {CONVERSATION_ACCESS_ROLE, CONVERSATION_ACCESS, CONVERSATION_TYPE} from '@wireapp/api-client/dist/conversation';
 
 import {ACCESS_STATE} from './AccessState';
 import {NOTIFICATION_STATE} from './NotificationSetting';
-import {ConversationType} from './ConversationType';
 import {ConversationStatus} from './ConversationStatus';
 import {Conversation} from '../entity/Conversation';
 import {BaseError} from '../error/BaseError';
@@ -377,7 +376,7 @@ export class ConversationMapper {
 
       const mergedConversation = {...localConversationData, ...updates};
 
-      const isGroup = type === ConversationType.GROUP;
+      const isGroup = type === CONVERSATION_TYPE.REGULAR;
       const noOthers = !mergedConversation.others || !mergedConversation.others.length;
       if (isGroup || noOthers) {
         mergedConversation.others = othersStates

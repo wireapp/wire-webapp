@@ -17,6 +17,7 @@
  *
  */
 
+import ko from 'knockout';
 import {
   ClientClassification,
   ClientType,
@@ -28,7 +29,7 @@ import {USER_EVENT, UserClientAddEvent, UserClientRemoveEvent} from '@wireapp/ap
 import {amplify} from 'amplify';
 import platform from 'platform';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import * as HTTP_STATUS from 'http-status-codes';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
@@ -722,8 +723,8 @@ export class ClientRepository {
    * @param JSON data of 'user.client-remove' event
    * @returns Resolves when the event has been handled
    */
-  async onClientRemove(eventJson: UserClientRemoveEvent = {} as any): Promise<void> {
-    const clientId = eventJson.client ? eventJson.client.id : undefined;
+  async onClientRemove(eventJson?: UserClientRemoveEvent): Promise<void> {
+    const clientId = eventJson?.client ? eventJson.client.id : undefined;
     if (!clientId) {
       return;
     }

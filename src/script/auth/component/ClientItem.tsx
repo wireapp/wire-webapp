@@ -190,7 +190,10 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
   return (
     <ContainerXS>
       <ContainerXS
-        style={{
+        css={{
+          ['&:focus-within']: {
+            boxShadow: `0 0 0 1px ${COLOR.BLUE}`,
+          },
           backgroundColor: selected ? 'white' : '',
           borderRadius: '4px',
           transition: 'background-color .35s linear',
@@ -235,7 +238,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
         {requirePassword && (isSelected || isAnimating) && (
           <ContainerXS style={{maxHeight: `${height}px`, overflow: 'hidden', padding: `${paddingHorizontal}px 0`}}>
             <Form>
-              <InputSubmitCombo style={{background: 'transparent', marginBottom: '0'}}>
+              <InputSubmitCombo style={{background: 'transparent', boxShadow: 'none', marginBottom: '0'}}>
                 <Input
                   autoComplete="section-login password"
                   autoFocus

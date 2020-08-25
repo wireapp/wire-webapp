@@ -22,7 +22,7 @@ import type {ObservableArray} from 'knockout';
 import sodium from 'libsodium-wrappers-sumo';
 import UUID from 'uuidjs';
 import {UrlUtil} from '@wireapp/commons';
-import * as HTTP_STATUS from 'http-status-codes';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {QUERY_KEY} from '../auth/route';
 import {Config} from '../Config';

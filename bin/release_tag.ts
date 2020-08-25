@@ -17,6 +17,8 @@
  *
  */
 
+/* eslint-disable no-unused-expressions */
+
 import {APIClient} from '@wireapp/api-client';
 import {ClientType} from '@wireapp/api-client/dist/client';
 import {Account} from '@wireapp/core';
@@ -39,6 +41,7 @@ let commitId = process.argv[3];
 let target = '';
 let commitMessage = '';
 let branch = '';
+const isDryRun = process.argv.includes('--dry-run');
 
 const logger = logdown(filename, {
   logger: console,
@@ -47,6 +50,8 @@ const logger = logdown(filename, {
 logger.state.isEnabled = true;
 
 const exec = (command: string): string => execSync(command, {stdio: 'pipe'}).toString().trim();
+
+isDryRun && logger.info('Note: Dry run enabled.');
 
 switch (firstArgument) {
   case '--help':
@@ -158,6 +163,9 @@ const sendRandomGif = async (account: Account, conversationId: string, query: st
 const announceRelease = async (tagName: string, commitId: string): Promise<void> => {
   const {WIRE_EMAIL, WIRE_PASSWORD, WIRE_CONVERSATION} = process.env;
   if (WIRE_EMAIL && WIRE_PASSWORD && WIRE_CONVERSATION) {
+    if (isDryRun) {
+      return;
+    }
     const apiClient = new APIClient({urls: APIClient.BACKEND.PRODUCTION});
     const account = new Account(apiClient);
     await account.login({
@@ -181,12 +189,13 @@ const announceRelease = async (tagName: string, commitId: string): Promise<void>
   );
   if (answer === 'yes') {
     logger.info(`Creating tag "${tagName}" ...`);
-    exec(`git tag ${tagName} ${commitId}`);
+    !isDryRun && exec(`git tag ${tagName} ${commitId}`);
 
     logger.info(`Pushing "${tagName}" to "${origin}" ...`);
-    exec(`git push ${origin} ${tagName}`);
+    !isDryRun && exec(`git push ${origin} ${tagName}`);
 
     try {
+      logger.info(`Announcing release of "${tagName}" ...`);
       await announceRelease(tagName, commitId);
     } catch (error) {
       logger.error(error);

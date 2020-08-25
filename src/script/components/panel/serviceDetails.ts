@@ -17,6 +17,7 @@
  *
  */
 
+import ko from 'knockout';
 import {ParticipantAvatar} from 'Components/participantAvatar';
 import type {ServiceEntity} from '../../integration/ServiceEntity';
 

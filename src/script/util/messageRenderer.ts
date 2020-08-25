@@ -42,7 +42,7 @@ const markdownit = new MarkdownIt('zero', {
   html: false,
   langPrefix: 'lang-',
   linkify: true,
-}).enable(['autolink', 'backticks', 'code', 'emphasis', 'fence', 'link', 'linkify', 'newline', 'heading']);
+}).enable(['autolink', 'backticks', 'code', 'emphasis', 'escape', 'fence', 'heading', 'link', 'linkify', 'newline']);
 
 const originalFenceRule = markdownit.renderer.rules.fence;
 
@@ -65,7 +65,7 @@ markdownit.renderer.rules.paragraph_open = (tokens, idx) => {
     .find(({map}) => map?.length);
   const previousPosition = previousWithMap ? previousWithMap.map[1] - 1 : 0;
   const count = position - previousPosition;
-  return '<br>'.repeat(count);
+  return '<br>'.repeat(Math.max(count, 0));
 };
 markdownit.renderer.rules.paragraph_close = () => '';
 

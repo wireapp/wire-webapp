@@ -42,12 +42,13 @@ import {ConnectionStatus} from '@wireapp/api-client/dist/connection';
 import {RequestCancellationError} from '@wireapp/api-client/dist/user';
 import {ReactionType} from '@wireapp/core/dist/conversation';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import * as HTTP_STATUS from 'http-status-codes';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
 import {
   DefaultConversationRoleName as DefaultRole,
   CONVERSATION_ACCESS_ROLE,
   CONVERSATION_ACCESS,
+  CONVERSATION_TYPE,
 } from '@wireapp/api-client/dist/conversation';
 
 import {getLogger} from 'Util/Logger';
@@ -83,7 +84,6 @@ import {Message} from '../entity/message/Message';
 import * as trackingHelpers from '../tracking/Helpers';
 
 import {ConversationMapper} from './ConversationMapper';
-import {ConversationType} from './ConversationType';
 import {ConversationStateHandler} from './ConversationStateHandler';
 import {EventInfoEntity} from './EventInfoEntity';
 import {EventMapper} from './EventMapper';
@@ -1128,7 +1128,7 @@ export class ConversationRepository {
         conversationEntity.connection(connectionEntity);
 
         if (connectionEntity.isConnected()) {
-          conversationEntity.type(ConversationType.ONE2ONE);
+          conversationEntity.type(CONVERSATION_TYPE.ONE_TO_ONE);
         }
 
         this.updateParticipatingUserEntities(conversationEntity).then(updatedConversationEntity => {
@@ -2121,7 +2121,11 @@ export class ConversationRepository {
             this.expectReadReceipt(conversationEntity),
             conversationEntity.legalHoldStatus(),
           );
-          genericMessage[GENERIC_MESSAGE_TYPE.EPHEMERAL][GENERIC_MESSAGE_TYPE.TEXT] = protoText;
+          if (genericMessage[GENERIC_MESSAGE_TYPE.EPHEMERAL]) {
+            genericMessage[GENERIC_MESSAGE_TYPE.EPHEMERAL][GENERIC_MESSAGE_TYPE.TEXT] = protoText;
+          } else {
+            genericMessage[GENERIC_MESSAGE_TYPE.TEXT] = protoText;
+          }
 
           return this.getMessageInConversationById(conversationEntity, messageId);
         }
@@ -4256,12 +4260,10 @@ export class ConversationRepository {
    * @returns {undefined} No return value
    */
   _trackContributed(conversationEntity, genericMessage, callMessageEntity) {
-    let messageTimer;
     const isEphemeral = genericMessage.content === GENERIC_MESSAGE_TYPE.EPHEMERAL;
 
     if (isEphemeral) {
       genericMessage = genericMessage.ephemeral;
-      messageTimer = genericMessage[PROTO_MESSAGE_TYPE.EPHEMERAL_EXPIRATION] / TIME_IN_MILLIS.SECOND;
     }
 
     const messageContentType = genericMessage.content;
@@ -4306,18 +4308,11 @@ export class ConversationRepository {
     }
     if (actionType) {
       const guests = conversationEntity.participating_user_ets().filter(user => user.isGuest()).length;
-      const wirelessGuests = conversationEntity.participating_user_ets().filter(user => user.isTemporaryGuest()).length;
       let segmentations = {
-        [Segmantation.CONVERSATION.ALLOW_GUESTS]: conversationEntity.isGuestRoom(),
-        [Segmantation.CONVERSATION.EPHEMERAL_MESSAGE]: !!conversationEntity.globalMessageTimer(),
         [Segmantation.CONVERSATION.GUESTS]: guests,
-        [Segmantation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
         [Segmantation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
         [Segmantation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
-        [Segmantation.CONVERSATION.WIRELESS_GUESTS]: wirelessGuests,
         [Segmantation.MESSAGE.ACTION]: actionType,
-        [Segmantation.MESSAGE.EPHEMERAL_EXPIRATION]: isEphemeral ? messageTimer : undefined,
-        [Segmantation.MESSAGE.IS_EPHEMERAL_MESSAGE]: isEphemeral,
         [Segmantation.MESSAGE.IS_REPLY]: !!genericMessage.text?.quote,
         [Segmantation.MESSAGE.MENTION]: numberOfMentions,
       };

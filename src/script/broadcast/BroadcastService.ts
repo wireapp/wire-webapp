@@ -40,7 +40,9 @@ export class BroadcastService {
     const reportMissing = Array.isArray(preconditionOption) ? preconditionOption : undefined;
     const ignoreMissing = preconditionOption === true ? true : undefined;
 
-    payload.report_missing = reportMissing;
+    if (reportMissing) {
+      payload.report_missing = reportMissing;
+    }
 
     return this.apiClient.broadcast.api.postBroadcastMessage(payload.sender, payload, ignoreMissing);
   }
