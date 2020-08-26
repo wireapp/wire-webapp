@@ -532,14 +532,16 @@ export class ConversationRepository {
       this.conversation_service.load_conversation_states_from_db(),
       remoteConversationsPromise,
     ]);
+    let conversationsData: any[];
     if (!remoteConversations.length) {
-      return localConversations;
+      conversationsData = localConversations;
+    } else {
+      const data = this.conversationMapper.mergeConversation(
+        localConversations,
+        remoteConversations,
+      ) as SerializedConversation[];
+      conversationsData = (await this.conversation_service.save_conversations_in_db(data)) as any[];
     }
-    const data = this.conversationMapper.mergeConversation(
-      localConversations,
-      remoteConversations,
-    ) as SerializedConversation[];
-    const conversationsData = (await this.conversation_service.save_conversations_in_db(data)) as any[];
     const conversationEntities = this.mapConversations(conversationsData) as Conversation[];
     this.save_conversations(conversationEntities);
     return this.conversations();
