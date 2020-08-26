@@ -26,8 +26,9 @@ import {container} from 'tsyringe';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import {RaygunStatic} from 'raygun4js';
+import type {SQLeetEngine} from '@wireapp/store-engine-sqleet';
 
-import {getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {checkIndexedDb, createRandomUuid, isTemporaryClientAndNonPersistent} from 'Util/util';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -125,7 +126,6 @@ import {AccessTokenError, ACCESS_TOKEN_ERROR_TYPE} from '../error/AccessTokenErr
 import {ClientError} from '../error/ClientError';
 import {AuthError} from '../error/AuthError';
 import {AssetRepository} from '../assets/AssetRepository';
-import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
 import {DebugUtil} from 'Util/DebugUtil';
 import type {BaseError} from '../error/BaseError';
 import type {User} from '../entity/User';
@@ -147,7 +147,7 @@ function doRedirect(signOutReason: SIGN_OUT_REASON) {
 class App {
   apiClient: APIClient;
   backendClient: BackendClient;
-  logger: any;
+  logger: Logger;
   appContainer: HTMLElement;
   service: {
     asset: AssetService;
@@ -160,7 +160,7 @@ class App {
   };
   repository: ViewModelRepositories = {} as ViewModelRepositories;
   debug: DebugUtil;
-  util: {debug: any};
+  util: {debug: DebugUtil};
   singleInstanceHandler: SingleInstanceHandler;
   applock: AppLockViewModel;
 
@@ -418,7 +418,7 @@ class App {
         properties: propertiesRepository,
         team: teamRepository,
         user: userRepository,
-      }: Record<string, any> = this.repository;
+      } = this.repository;
       await checkIndexedDb();
       this._registerSingleInstance();
       loadingView.updateProgress(2.5);
