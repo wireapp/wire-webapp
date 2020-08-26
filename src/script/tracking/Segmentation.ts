@@ -28,6 +28,11 @@ export const Segmantation = {
     SETUP_TIME: 'call_setup_time',
     VIDEO: 'call_video',
   },
+  COMMON: {
+    APP: 'user.app',
+    APP_VERSION: 'user.app_version',
+    DESKTOP_APP: 'user.desktop_app',
+  },
   CONVERSATION: {
     ALLOW_GUESTS: 'conversation_allow_guests',
     EPHEMERAL_MESSAGE: 'conversation_ephemeral_message',
