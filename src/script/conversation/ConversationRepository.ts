@@ -161,7 +161,7 @@ declare const Raygun: RaygunStatic;
 type ConversationEvent = {conversation: string; id: string};
 type ConversationDBChange = {obj: ConversationEvent; oldObj: ConversationEvent};
 type FetchPromise = {reject_fn: (error: ConversationError) => void; resolve_fn: (conversation: Conversation) => void};
-type EventJson = any;
+export type EventJson = any;
 type EntityObject = {conversationEntity: Conversation; messageEntity: ContentMessage};
 
 export class ConversationRepository {
