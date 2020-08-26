@@ -75,7 +75,7 @@ export class ConversationParticipantsViewModel extends BasePanelViewModel {
     this.navigateTo(PanelViewModel.STATE.GROUP_PARTICIPANT_USER, {entity: userEntity});
   }
 
-  initView({highlighted}: PanelParams): void {
+  initView({highlighted}: PanelParams = {highlighted: []}): void {
     this.searchInput('');
     this.highlightedUsers(highlighted);
   }
