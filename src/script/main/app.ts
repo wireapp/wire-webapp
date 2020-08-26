@@ -24,8 +24,11 @@ import ko from 'knockout';
 import platform from 'platform';
 import {container} from 'tsyringe';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
+import {RaygunStatic} from 'raygun4js';
+import type {SQLeetEngine} from '@wireapp/store-engine-sqleet';
 
-import {getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {checkIndexedDb, createRandomUuid, isTemporaryClientAndNonPersistent} from 'Util/util';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -50,7 +53,6 @@ import {IntegrationRepository} from '../integration/IntegrationRepository';
 import {IntegrationService} from '../integration/IntegrationService';
 import {StorageRepository} from '../storage/StorageRepository';
 import {StorageKey} from '../storage/StorageKey';
-import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 import {EventTrackingRepository} from '../tracking/EventTrackingRepository';
 import {ConnectionRepository} from '../connection/ConnectionRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
@@ -73,7 +75,7 @@ import {SingleInstanceHandler} from './SingleInstanceHandler';
 import {AppInitStatisticsValue} from '../telemetry/app_init/AppInitStatisticsValue';
 import {AppInitTimingsStep} from '../telemetry/app_init/AppInitTimingsStep';
 import {AppInitTelemetry} from '../telemetry/app_init/AppInitTelemetry';
-import {MainViewModel} from '../view_model/MainViewModel';
+import {MainViewModel, ViewModelRepositories} from '../view_model/MainViewModel';
 import {ThemeViewModel} from '../view_model/ThemeViewModel';
 import {WindowHandler} from '../ui/WindowHandler';
 
@@ -120,12 +122,17 @@ import {ConnectionService} from '../connection/ConnectionService';
 import {TeamService} from '../team/TeamService';
 import {SearchService} from '../search/SearchService';
 import {CryptographyService} from '../cryptography/CryptographyService';
-import {AccessTokenError} from '../error/AccessTokenError';
+import {AccessTokenError, ACCESS_TOKEN_ERROR_TYPE} from '../error/AccessTokenError';
 import {ClientError} from '../error/ClientError';
 import {AuthError} from '../error/AuthError';
 import {AssetRepository} from '../assets/AssetRepository';
+import {DebugUtil} from 'Util/DebugUtil';
+import type {BaseError} from '../error/BaseError';
+import type {User} from '../entity/User';
 
-function doRedirect(signOutReason) {
+declare const Raygun: RaygunStatic;
+
+function doRedirect(signOutReason: SIGN_OUT_REASON) {
   let url = `/auth/${location.search}`;
 
   const isImmediateSignOutReason = App.CONFIG.SIGN_OUT_REASONS.IMMEDIATE.includes(signOutReason);
@@ -138,6 +145,25 @@ function doRedirect(signOutReason) {
 }
 
 class App {
+  apiClient: APIClient;
+  backendClient: BackendClient;
+  logger: Logger;
+  appContainer: HTMLElement;
+  service: {
+    asset: AssetService;
+    conversation: ConversationService;
+    event: EventService | EventServiceNoCompound;
+    integration: IntegrationService;
+    notification: NotificationService;
+    storage: StorageService;
+    webSocket: WebSocketService;
+  };
+  repository: ViewModelRepositories = {} as ViewModelRepositories;
+  debug: DebugUtil;
+  util: {debug: DebugUtil};
+  singleInstanceHandler: SingleInstanceHandler;
+  applock: AppLockViewModel;
+
   static get CONFIG() {
     return {
       COOKIES_CHECK: {
@@ -162,7 +188,12 @@ class App {
    * @param {Element} appContainer DOM element that will hold the app
    * @param {SQLeetEngine} [encryptedEngine] Encrypted database handler
    */
-  constructor(apiClient, backendClient, appContainer, encryptedEngine) {
+  constructor(
+    apiClient: APIClient,
+    backendClient: BackendClient,
+    appContainer: HTMLElement,
+    encryptedEngine?: SQLeetEngine,
+  ) {
     this.apiClient = apiClient;
     this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () => this.logout(SIGN_OUT_REASON.NOT_SIGNED_IN, false));
     this.backendClient = backendClient;
@@ -199,7 +230,7 @@ class App {
    * @returns {Object} All repositories
    */
   _setupRepositories() {
-    const repositories = {};
+    const repositories: ViewModelRepositories = {} as ViewModelRepositories;
     const selfService = new SelfService(this.apiClient);
     const sendingMessageQueue = new MessageSender();
 
@@ -283,7 +314,6 @@ class App {
       repositories.conversation,
       repositories.cryptography,
       sendingMessageQueue,
-      repositories.user,
     );
     repositories.calling = new CallingRepository(
       this.apiClient,
@@ -316,7 +346,7 @@ class App {
    * @param {SQLeetEngine} [encryptedEngine] Encrypted database handler
    * @returns {Object} All services
    */
-  _setupServices(encryptedEngine) {
+  _setupServices(encryptedEngine: SQLeetEngine) {
     const storageService = new StorageService(encryptedEngine);
     const eventService = Environment.browser.edge
       ? new EventServiceNoCompound(storageService)
@@ -340,7 +370,7 @@ class App {
   _subscribeToEvents() {
     amplify.subscribe(WebAppEvents.LIFECYCLE.REFRESH, this.refresh.bind(this));
     amplify.subscribe(WebAppEvents.LIFECYCLE.SIGN_OUT, this.logout.bind(this));
-    amplify.subscribe(WebAppEvents.CONNECTION.ACCESS_TOKEN.RENEW, async source => {
+    amplify.subscribe(WebAppEvents.CONNECTION.ACCESS_TOKEN.RENEW, async (source: string) => {
       this.logger.info(`Access token refresh triggered by "${source}"...`);
       const apiClient = container.resolve(APIClientSingleton).getClient();
       try {
@@ -507,7 +537,7 @@ class App {
     amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.NO_INTERNET);
   }
 
-  _appInitFailure(error, isReload) {
+  _appInitFailure(error: BaseError, isReload: boolean) {
     let logMessage = `Could not initialize app version '${Environment.version(false)}'`;
     if (Environment.desktop) {
       logMessage += ` - Electron '${platform.os.family}' '${Environment.version()}'`;
@@ -528,7 +558,7 @@ class App {
     if (isReload) {
       const isSessionExpired = [AccessTokenError.TYPE.REQUEST_FORBIDDEN, AccessTokenError.TYPE.NOT_FOUND_IN_CACHE];
 
-      if (isSessionExpired.includes(type)) {
+      if (isSessionExpired.includes(type as ACCESS_TOKEN_ERROR_TYPE)) {
         this.logger.warn(`Session expired on page reload: ${message}`, error);
         return this._redirectToLogin(SIGN_OUT_REASON.SESSION_EXPIRED);
       }
@@ -582,7 +612,7 @@ class App {
    * @param {User} userEntity Self user entity
    * @returns {User} Checked user entity
    */
-  _checkUserInformation(userEntity) {
+  _checkUserInformation(userEntity: User) {
     if (userEntity.hasActivatedIdentity()) {
       if (!userEntity.mediumPictureResource()) {
         this.repository.user.setDefaultPicture();
@@ -761,7 +791,7 @@ class App {
    * @param {boolean} clearData Keep data in database
    * @returns {undefined} No return value
    */
-  logout(signOutReason, clearData) {
+  logout(signOutReason: SIGN_OUT_REASON, clearData: boolean): Promise<void> | void {
     const _redirectToLogin = () => {
       amplify.publish(WebAppEvents.LIFECYCLE.SIGNED_OUT, clearData);
       this._redirectToLogin(signOutReason);
@@ -850,7 +880,7 @@ class App {
    * Refresh the web app or desktop wrapper
    * @returns {undefined} No return value
    */
-  refresh() {
+  refresh(): void | boolean {
     this.logger.info('Refresh to update started');
     if (Environment.desktop) {
       // if we are in a desktop env, we just warn the wrapper that we need to reload. It then decide what should be done
@@ -874,7 +904,7 @@ class App {
    * @param {SIGN_OUT_REASON} signOutReason Redirect triggered by session expiration
    * @returns {undefined} No return value
    */
-  _redirectToLogin(signOutReason) {
+  _redirectToLogin(signOutReason: SIGN_OUT_REASON) {
     this.logger.info(`Redirecting to login after connectivity verification. Reason: ${signOutReason}`);
     this.backendClient.executeOnConnectivity(BackendClient.CONNECTIVITY_CHECK_TRIGGER.LOGIN_REDIRECT).then(() => {
       const isTemporaryGuestReason = App.CONFIG.SIGN_OUT_REASONS.TEMPORARY_GUEST.includes(signOutReason);
@@ -890,32 +920,6 @@ class App {
   //##############################################################################
   // Debugging
   //##############################################################################
-
-  /**
-   * Disable debugging on any environment.
-   * @returns {undefined} No return value
-   */
-  disableDebugging() {
-    Config.getConfig().LOGGER.OPTIONS.domains['app.wire.com'] = () => 0;
-    this.repository.properties.savePreference(PROPERTIES_TYPE.ENABLE_DEBUGGING, false);
-  }
-
-  /**
-   * Enable debugging on any environment.
-   * @returns {undefined} No return value
-   */
-  enableDebugging() {
-    Config.getConfig().LOGGER.OPTIONS.domains['app.wire.com'] = () => 300;
-    this.repository.properties.savePreference(PROPERTIES_TYPE.ENABLE_DEBUGGING, true);
-  }
-
-  /**
-   * Report call telemetry to Raygun for analysis.
-   * @returns {undefined} No return value
-   */
-  reportCall() {
-    this.repository.calling.reportCall();
-  }
 
   _publishGlobals() {
     window.z.userPermission = ko.observable({});
@@ -941,14 +945,14 @@ $(async () => {
       restUrl: Config.getConfig().BACKEND_REST,
       webSocketUrl: Config.getConfig().BACKEND_WS,
     });
-    const shouldPersist = loadValue(StorageKey.AUTH.PERSIST);
+    const shouldPersist = loadValue<boolean>(StorageKey.AUTH.PERSIST);
     if (shouldPersist === undefined) {
       doRedirect(SIGN_OUT_REASON.NOT_SIGNED_IN);
     } else if (isTemporaryClientAndNonPersistent(shouldPersist)) {
       const engine = await StorageService.getUninitializedEngine();
-      wire.app = new App(apiClient, backendClient, appContainer, engine);
+      window.wire.app = new App(apiClient, backendClient, appContainer, engine);
     } else {
-      wire.app = new App(apiClient, backendClient, appContainer);
+      window.wire.app = new App(apiClient, backendClient, appContainer);
     }
   }
 });

@@ -156,7 +156,10 @@ export class NotificationRepository {
     Object.assign(Environment, data);
   }
 
-  setContentViewModelStates(state: () => string, multitasking: {isMinimized: () => false}): void {
+  setContentViewModelStates(
+    state: () => string,
+    multitasking: {isMinimized: ko.Observable<boolean> | (() => false)},
+  ): void {
     this.contentViewModelState = {multitasking, state};
   }
 
