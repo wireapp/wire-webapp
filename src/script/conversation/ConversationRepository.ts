@@ -176,7 +176,7 @@ export class ConversationRepository {
   private readonly event_mapper: EventMapper;
   private readonly eventService: EventService;
   private readonly fetching_conversations: Record<string, FetchPromise[]>;
-  private readonly leaveCall: (conversationId: string) => void;
+  public leaveCall: (conversationId: string) => void;
   private readonly logger: Logger;
   private readonly receiving_queue: PromiseQueue;
   private readonly sorted_conversations: ko.PureComputed<Conversation[]>;
