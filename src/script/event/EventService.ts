@@ -44,7 +44,6 @@ export class EventService {
    * @param {StorageService} storageService Service for all storage interactions
    */
   constructor(private readonly storageService: StorageService) {
-    // this.storageService = storageService;
     this.logger = getLogger('EventService');
   }
 
