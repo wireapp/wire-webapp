@@ -300,7 +300,7 @@ export class EventService {
    * @param {Object} event JSON event to be stored
    * @returns {Promise<EventJson>} Resolves with the stored record
    */
-  async saveEvent(event: {category: MessageCategory | void; primary_key: string}) {
+  async saveEvent(event: EventJson) {
     event.category = categoryFromEvent(event);
     event.primary_key = await this.storageService.save(StorageSchemata.OBJECT_STORE.EVENTS, undefined, event);
     if (this.storageService.isTemporaryAndNonPersistent) {
