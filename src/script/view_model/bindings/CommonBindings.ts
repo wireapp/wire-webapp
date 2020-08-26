@@ -347,10 +347,6 @@ ko.bindingHandlers.load_image_on_hover = {
 
 /**
  * Will only fire once when the value has changed.
- * @param {*} handler Handler
- * @param {ko.observable} owner Subscription owner
- * @param {string} eventName Event name
- * @returns {undefined} No return value
  */
 (ko.subscribable.fn as any).subscribe_once = function (
   handler: (value: unknown) => void,
@@ -370,8 +366,6 @@ ko.bindingHandlers.load_image_on_hover = {
 /**
  * Subscribe to changes and receive the new and the old value
  * https://github.com/knockout/knockout/issues/914#issuecomment-66697321
- * @param {function} handler Handler
- * @returns {ko.subscription} knockout subscription
  */
 (ko.subscribable.fn as any).subscribeChanged = function (handler: (latestValue: unknown, oldValue: unknown) => void) {
   let savedValue = this.peek();
