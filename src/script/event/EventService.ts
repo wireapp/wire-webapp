@@ -255,7 +255,7 @@ export class EventService {
     toDate: Date,
     limit: number,
     includes: {includeFrom: boolean; includeTo: boolean},
-  ): Promise<Event[] | Dexie.Collection<any, any>> {
+  ): Promise<EventJson[] | Dexie.Collection<any, any>> {
     const {includeFrom, includeTo} = includes;
     if (!(toDate instanceof Date) || !(fromDate instanceof Date)) {
       const errorMessage = `Lower bound (${typeof toDate}) and upper bound (${typeof fromDate}) must be of type 'Date'.`;
