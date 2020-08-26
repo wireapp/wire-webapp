@@ -250,7 +250,7 @@ ko.bindingHandlers.scrollSync = {
  */
 ko.bindingHandlers.enter = {
   init(element, valueAccessor, _allBindings, data, context) {
-    const wrapper = (_data: unknown, event: KOEvent<KeyboardEvent>) => {
+    function wrapper(_data: unknown, event: KOEvent<KeyboardEvent>) {
       const keyboardEvent = event.originalEvent || ((event as unknown) as KeyboardEvent);
 
       if (isEnterKey(keyboardEvent) && !keyboardEvent.shiftKey && !keyboardEvent.altKey) {
@@ -261,7 +261,7 @@ ko.bindingHandlers.enter = {
         }
       }
       return true;
-    };
+    }
 
     return ko.applyBindingsToNode(
       element,
@@ -280,7 +280,7 @@ ko.bindingHandlers.enter = {
  */
 ko.bindingHandlers.file_select = {
   init(element, valueAccessor, _allBindings, _data, context) {
-    const wrapper = (_: unknown, event: KOEvent<InputEvent>) => {
+    function wrapper(_: unknown, event: KOEvent<InputEvent>) {
       if ((event.target as HTMLInputElement).files.length > 0) {
         valueAccessor().call(this, (event.target as HTMLInputElement).files);
 
@@ -290,7 +290,7 @@ ko.bindingHandlers.file_select = {
           $(event.target).val(null);
         }, TIME_IN_MILLIS.SECOND);
       }
-    };
+    }
 
     return ko.applyBindingsToNode(
       element,
@@ -331,13 +331,13 @@ ko.bindingHandlers.load_image_on_hover = {
     if (animated_gif) {
       let image: HTMLImageElement = undefined;
       hoverable_item
-        .on('mouseover', () => {
+        .on('mouseover', function () {
           const item = $(this);
           image = new Image();
           image.onload = () => item.css({backgroundImage: `url(${animated_gif})`});
           image.src = animated_gif;
         })
-        .on('mouseout', () => {
+        .on('mouseout', function () {
           image.onload = undefined;
           $(this).css({backgroundImage: `url(${static_image})`});
         });
