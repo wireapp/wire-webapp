@@ -277,14 +277,16 @@ export class TeamRepository {
 
       const accountInfo: AccountInfo = {
         accentID: this.selfUser().accent_id(),
-        // TODO: Deactivated until wrapper supports this
-        // availability: this.selfUser().availability(),
         name: this.teamName(),
         picture: imageDataUrl?.toString(),
         teamID: this.team() ? this.team().id : undefined,
         teamRole: this.selfUser().teamRole(),
         userID: this.selfUser().id,
       };
+
+      if (Environment.version(true).startsWith('3.2')) {
+        accountInfo.availability = this.selfUser().availability();
+      }
 
       this.logger.info('Publishing account info', accountInfo);
       amplify.publish(WebAppEvents.TEAM.INFO, accountInfo);
