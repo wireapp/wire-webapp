@@ -124,15 +124,13 @@
         <hr class="preferences-separator">
         <header class="preferences-header" data-bind="text: t('preferencesAccountData')"></header>
 
-        <!-- ko if: canSendAnalytics() -->
-          <div class="preferences-option">
-            <div class="preferences-option-icon checkbox accent-text" data-bind="attr: {'data-uie-value': optionPrivacy}" data-uie-name="status-preference-privacy">
-              <input type="checkbox" id="privacy-checkbox" data-bind="checked: optionPrivacy">
-              <label class="preferences-options-checkbox-label" for="privacy-checkbox" data-bind="text: t('preferencesAccountDataCheckbox')"></label>
-            </div>
+        <div class="preferences-option">
+          <div class="preferences-option-icon checkbox accent-text" data-bind="attr: {'data-uie-value': optionPrivacy}" data-uie-name="status-preference-privacy">
+            <input type="checkbox" id="privacy-checkbox" data-bind="checked: optionPrivacy">
+            <label class="preferences-options-checkbox-label" for="privacy-checkbox" data-bind="text: t('preferencesAccountDataCheckbox')"></label>
           </div>
-          <div class="preferences-detail" data-bind="text: t('preferencesAccountDataDetail', brandName)"></div>
-        <!-- /ko -->
+        </div>
+        <div class="preferences-detail" data-bind="text: t('preferencesAccountDataDetail', brandName)"></div>
 
         <!-- ko if: isActivatedAccount() -->
           <div class="preferences-option">
