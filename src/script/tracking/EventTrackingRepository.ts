@@ -165,8 +165,6 @@ export class EventTrackingRepository {
 
   private trackProductReportingEvent(eventName: string, segmentations?: any): void {
     if (this.isProductReportingActivated === true) {
-      Countly.userData.set(UserData.APP, EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE);
-      Countly.userData.set(UserData.APP_VERSION, Environment.version(false));
       Countly.userData.set(UserData.IS_TEAM, this.userRepository.isTeam());
       Countly.userData.set(UserData.CONTACTS, this.userRepository.number_of_contacts());
       Countly.userData.set(UserData.TEAM_SIZE, this.userRepository.teamMembers().length);
