@@ -945,7 +945,7 @@ $(async () => {
       restUrl: Config.getConfig().BACKEND_REST,
       webSocketUrl: Config.getConfig().BACKEND_WS,
     });
-    const shouldPersist: boolean = loadValue(StorageKey.AUTH.PERSIST);
+    const shouldPersist = loadValue<boolean>(StorageKey.AUTH.PERSIST);
     if (shouldPersist === undefined) {
       doRedirect(SIGN_OUT_REASON.NOT_SIGNED_IN);
     } else if (isTemporaryClientAndNonPersistent(shouldPersist)) {
