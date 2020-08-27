@@ -30,6 +30,7 @@ import {URLParameter} from '../auth/URLParameter';
 import type {UserRepository} from '../user/UserRepository';
 import {EventName} from './EventName';
 import {UserData} from './UserData';
+import {Segmantation} from './Segmentation';
 
 declare const Raygun: RaygunStatic;
 
@@ -164,8 +165,6 @@ export class EventTrackingRepository {
 
   private trackProductReportingEvent(eventName: string, segmentations?: any): void {
     if (this.isProductReportingActivated === true) {
-      Countly.userData.set(UserData.APP, EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE);
-      Countly.userData.set(UserData.APP_VERSION, Environment.version(false));
       Countly.userData.set(UserData.IS_TEAM, this.userRepository.isTeam());
       Countly.userData.set(UserData.CONTACTS, this.userRepository.number_of_contacts());
       Countly.userData.set(UserData.TEAM_SIZE, this.userRepository.teamMembers().length);
@@ -174,6 +173,8 @@ export class EventTrackingRepository {
       Countly.add_event({
         key: eventName,
         segmentation: {
+          [Segmantation.COMMON.APP]: EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE,
+          [Segmantation.COMMON.APP_VERSION]: Environment.version(false),
           ...segmentations,
         },
       });

@@ -97,7 +97,6 @@ export class PreferencesAccountViewModel {
   createTeamUrl: string;
   isTemporaryAndNonPersistent: boolean;
   isConsentCheckEnabled: () => boolean;
-  canSendAnalytics: () => boolean;
   canEditProfile: (user: User) => boolean;
   Config: typeof PreferencesAccountViewModel.CONFIG;
   UserNameState: typeof PreferencesAccountViewModel.USERNAME_STATE;
@@ -181,7 +180,6 @@ export class PreferencesAccountViewModel {
 
     this.isTemporaryAndNonPersistent = isTemporaryClientAndNonPersistent(loadValue(StorageKey.AUTH.PERSIST));
     this.isConsentCheckEnabled = () => Config.getConfig().FEATURE.CHECK_CONSENT;
-    this.canSendAnalytics = () => this.userRepository.isTeam();
     this.canEditProfile = user => user.managedBy() === User.CONFIG.MANAGED_BY.WIRE;
 
     this.updateProperties(this.propertiesRepository.properties);
