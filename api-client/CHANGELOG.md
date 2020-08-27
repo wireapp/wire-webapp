@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.25.7](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.25.6...@wireapp/api-client@11.25.7) (2020-08-27)
+
+
+### Bug Fixes
+
+* **api-client:** Refresh access token on 403 token expired error ([#3199](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3199)) ([11d8098](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/11d8098c6f77134d7c8be07f4d8e2931c7841424))
+
+
+
+
+
 ## [11.25.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.25.5...@wireapp/api-client@11.25.6) (2020-08-20)
 
 
