@@ -21,6 +21,7 @@ import axios from 'axios';
 
 import {HttpClient} from './HttpClient';
 import {StatusCode} from './StatusCode';
+import {BackendErrorLabel} from './BackendErrorLabel';
 
 describe('HttpClient', () => {
   describe('"_sendRequest"', () => {
@@ -47,7 +48,7 @@ describe('HttpClient', () => {
       await client._sendRequest({});
     });
 
-    it('does not retry on 403 forbidden error', async () => {
+    it('retries on 403 token expired error', async () => {
       const mockedAccessTokenStore: any = {
         accessToken: {
           access_token:
@@ -57,8 +58,36 @@ describe('HttpClient', () => {
           user: 'aaf9a833-ef30-4c22-86a0-9adc8a15b3b4',
         },
       };
-      const errorMessage = 'cookie invalid';
 
+      const client = new HttpClient('https://test.zinfra.io', mockedAccessTokenStore);
+      const requestSpy = spyOn(axios, 'request');
+      requestSpy.and.returnValue(
+        // eslint-disable-next-line prefer-promise-reject-errors
+        Promise.reject({
+          response: {
+            data: {code: StatusCode.FORBIDDEN, label: BackendErrorLabel.INVALID_CREDENTIALS, message: 'Token expired'},
+            status: StatusCode.FORBIDDEN,
+          },
+        }),
+      );
+      client.refreshAccessToken = () => {
+        requestSpy.and.returnValue(Promise.resolve());
+        return Promise.resolve(mockedAccessTokenStore.accessToken.access_token);
+      };
+
+      await client._sendRequest({});
+    });
+
+    it('does not retry on 403 invalid token', async () => {
+      const mockedAccessTokenStore: any = {
+        accessToken: {
+          access_token:
+            'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ==.v=1.k=1.d=1498600993.t=a.l=.u=aaf9a833-ef30-4c22-86a0-9adc8a15b3b4.c=15037015562284012115',
+          expires_in: 900,
+          token_type: 'Bearer',
+          user: 'aaf9a833-ef30-4c22-86a0-9adc8a15b3b4',
+        },
+      };
       const client = new HttpClient('https://test.zinfra.io', mockedAccessTokenStore);
       spyOn(axios, 'request').and.returnValue(
         // eslint-disable-next-line prefer-promise-reject-errors
@@ -66,8 +95,8 @@ describe('HttpClient', () => {
           response: {
             data: {
               code: StatusCode.FORBIDDEN,
-              label: 'invalid-credentials',
-              message: errorMessage,
+              label: BackendErrorLabel.INVALID_CREDENTIALS,
+              message: 'Invalid token',
             },
             status: StatusCode.FORBIDDEN,
           },
@@ -81,8 +110,44 @@ describe('HttpClient', () => {
         await client._sendRequest({});
         fail();
       } catch (error) {
-        expect(error.message).toBe(errorMessage);
+        expect(error.message).toBe('Authentication failed because the token is invalid.');
       }
     });
+  });
+
+  it('does not retry on 403 missing cookie', async () => {
+    const mockedAccessTokenStore: any = {
+      accessToken: {
+        access_token:
+          'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ==.v=1.k=1.d=1498600993.t=a.l=.u=aaf9a833-ef30-4c22-86a0-9adc8a15b3b4.c=15037015562284012115',
+        expires_in: 900,
+        token_type: 'Bearer',
+        user: 'aaf9a833-ef30-4c22-86a0-9adc8a15b3b4',
+      },
+    };
+    const client = new HttpClient('https://test.zinfra.io', mockedAccessTokenStore);
+    spyOn(axios, 'request').and.returnValue(
+      // eslint-disable-next-line prefer-promise-reject-errors
+      Promise.reject({
+        response: {
+          data: {
+            code: StatusCode.FORBIDDEN,
+            label: BackendErrorLabel.INVALID_CREDENTIALS,
+            message: 'Missing cookie',
+          },
+          status: StatusCode.FORBIDDEN,
+        },
+      }),
+    );
+    client.refreshAccessToken = () => {
+      return Promise.reject(new Error('Should not refresh access token'));
+    };
+
+    try {
+      await client._sendRequest({});
+      fail();
+    } catch (error) {
+      expect(error.message).toBe('Authentication failed because the cookie is missing.');
+    }
   });
 });
