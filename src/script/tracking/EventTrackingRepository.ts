@@ -178,7 +178,6 @@ export class EventTrackingRepository {
           ...segmentations,
         },
       });
-      console.info('### Countly ###', eventName, segmentations);
     }
   }
 
