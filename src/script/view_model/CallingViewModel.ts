@@ -159,7 +159,7 @@ export class CallingViewModel {
         [Segmantation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
         [Segmantation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
         [Segmantation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
-        [Segmantation.CONVERSATION.WIRELESS_GUESTS]: wirelessGuests,
+        [Segmantation.CONVERSATION.GUESTS_WIRELESS]: wirelessGuests,
       };
 
       amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.INITIATED_CALL, segmentations);
@@ -187,7 +187,7 @@ export class CallingViewModel {
         [Segmantation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
         [Segmantation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
         [Segmantation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
-        [Segmantation.CONVERSATION.WIRELESS_GUESTS]: wirelessGuests,
+        [Segmantation.CONVERSATION.GUESTS_WIRELESS]: wirelessGuests,
       };
       amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.RECIEVED_CALL, segmentations);
     });

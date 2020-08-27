@@ -37,10 +37,10 @@ export const Segmantation = {
     ALLOW_GUESTS: 'conversation_allow_guests',
     EPHEMERAL_MESSAGE: 'conversation_ephemeral_message',
     GUESTS: 'conversation_guests',
+    GUESTS_WIRELESS: 'conversation_guests_wireless',
     SERVICES: 'conversation_services',
     SIZE: 'conversation_size',
     TYPE: 'conversation_type',
-    WIRELESS_GUESTS: 'conversation_wireless_guests',
   },
   MESSAGE: {
     ACTION: 'message_action',

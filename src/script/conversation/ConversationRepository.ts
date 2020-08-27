@@ -4344,7 +4344,7 @@ export class ConversationRepository {
       }
 
       case 'image': {
-        actionType = 'photo';
+        actionType = 'image';
         break;
       }
 
