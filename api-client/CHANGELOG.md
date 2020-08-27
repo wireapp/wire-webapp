@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.25.8](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.25.7...@wireapp/api-client@11.25.8) (2020-08-27)
+
+**Note:** Version bump only for package @wireapp/api-client
+
+
+
+
+
 ## [11.25.7](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.25.6...@wireapp/api-client@11.25.7) (2020-08-27)
 
 
