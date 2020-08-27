@@ -648,7 +648,6 @@ export class CallingRepository {
       const guests = conversationEntity.participating_user_ets().filter(user => user.isGuest()).length;
       const wirelessGuests = conversationEntity.participating_user_ets().filter(user => user.isTemporaryGuest()).length;
       const segmentations = {
-        [Segmantation.CONVERSATION.ALLOW_GUESTS]: conversationEntity.isGuestRoom(),
         [Segmantation.CONVERSATION.GUESTS]: guests,
         [Segmantation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
         [Segmantation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
@@ -930,7 +929,6 @@ export class CallingRepository {
       [Segmantation.CALL.SCREEN_SHARE]: '',
       [Segmantation.CALL.SETUP_TIME]: '',
       [Segmantation.CALL.VIDEO]: call.initialType === CALL_TYPE.VIDEO,
-      [Segmantation.CONVERSATION.ALLOW_GUESTS]: conversationEntity.isGuestRoom(),
       [Segmantation.CONVERSATION.EPHEMERAL_MESSAGE]: !!conversationEntity.globalMessageTimer(),
       [Segmantation.CONVERSATION.GUESTS]: guests,
       [Segmantation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
