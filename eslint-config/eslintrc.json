@@ -29,9 +29,10 @@
   },
   "plugins": ["@typescript-eslint", "jsdoc", "no-unsanitized", "prettier", "react", "react-hooks", "sort-keys-fix", "typescript-sort-keys"],
   "rules": {
+    "constructor-super": "error",
     "curly": "error",
     "id-length": "error",
-    "constructor-super": "error",
+    "no-cond-assign": "error",
     "no-console": [
       "error",
       {
@@ -53,12 +54,12 @@
     "no-restricted-globals": [
       "warn",
       {
-        "name": "fit",
-        "message": "Do not commit `fit`. Use `it` instead."
+        "message": "Do not commit `fit`. Use `it` instead.",
+        "name": "fit"
       },
       {
-        "name": "fdescribe",
-        "message": "Do not commit `fdescribe`. Use `describe` instead."
+        "message": "Do not commit `fdescribe`. Use `describe` instead.",
+        "name": "fdescribe"
       }
     ],
     "no-return-await": "error",
@@ -90,8 +91,20 @@
     "sort-keys-fix/sort-keys-fix": "error",
     "sort-vars": "error",
     "strict": ["error", "global"],
-    "typescript-sort-keys/interface": ["warn", "asc", {"caseSensitive": false}],
-    "typescript-sort-keys/string-enum": ["warn", "asc", {"caseSensitive": false}],
+    "typescript-sort-keys/interface": [
+      "warn",
+      "asc",
+      {
+        "caseSensitive": false
+      }
+    ],
+    "typescript-sort-keys/string-enum": [
+      "warn",
+      "asc",
+      {
+        "caseSensitive": false
+      }
+    ],
     "valid-jsdoc": [
       "error",
       {
