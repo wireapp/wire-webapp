@@ -170,14 +170,18 @@ export class EventTrackingRepository {
       Countly.userData.set(UserData.TEAM_SIZE, this.userRepository.teamMembers().length);
       Countly.userData.save();
 
+      const segmentation = {
+        [Segmantation.COMMON.APP]: EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE,
+        [Segmantation.COMMON.APP_VERSION]: Environment.version(false),
+        ...segmentations,
+      };
+
       Countly.add_event({
         key: eventName,
-        segmentation: {
-          [Segmantation.COMMON.APP]: EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE,
-          [Segmantation.COMMON.APP_VERSION]: Environment.version(false),
-          ...segmentations,
-        },
+        segmentation,
       });
+
+      this.logger.info(`Reporting product event ${eventName}@${JSON.stringify(segmentation)}`);
     }
   }
 
