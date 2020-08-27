@@ -142,7 +142,11 @@ export class HttpClient extends EventEmitter {
         const isExpiredTokenError = error instanceof TokenExpiredError;
         const isUnauthorized = errorStatus === StatusCode.UNAUTHORIZED;
         const hasAccessToken = !!this.accessTokenStore?.accessToken;
+
         if ((isExpiredTokenError || isUnauthorized) && hasAccessToken && firstTry) {
+          this.logger.warn(
+            `Access token refresh triggered (isExpiredTokenError: ${isExpiredTokenError}, isUnauthorized: ${isUnauthorized}) for "${config.method}" request to "${config.url}".`,
+          );
           await this.refreshAccessToken();
           return this._sendRequest<T>(config, tokenAsParam, false);
         }
@@ -150,7 +154,7 @@ export class HttpClient extends EventEmitter {
         if (error instanceof InvalidTokenError || error instanceof MissingCookieError) {
           // On invalid cookie the application is supposed to logout.
           this.logger.warn(
-            `[HTTP Client] Cannot renew access token because cookie/token is invalid: ${error.message}`,
+            `Cannot renew access token for "${config.method}" request to "${config.url}" because cookie/token is invalid: ${error.message}`,
             error,
           );
           this.emit(HttpClient.TOPIC.ON_INVALID_TOKEN, error);
