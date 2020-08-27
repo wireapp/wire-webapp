@@ -24,7 +24,7 @@ export enum PaymentStatus {
   ACTIVE = 'active',
   CANCELED = 'canceled',
   PAST_DUE = 'past_due',
-  TRAILING = 'trialing',
+  TRIALING = 'trialing',
   UNPAID = 'unpaid',
 }
 
