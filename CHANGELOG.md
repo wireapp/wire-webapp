@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.25.9](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.25.8...@wireapp/api-client@11.25.9) (2020-08-27)
+
+
+### Bug Fixes
+
+* **api-client:** Fix PaymentStatus enum typo ([#3202](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3202)) ([b66c9e0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/b66c9e0fb96b19a003ec01074280c32002a450d5))
+
+
+
+
+
 ## [11.25.8](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.25.7...@wireapp/api-client@11.25.8) (2020-08-27)
 
 **Note:** Version bump only for package @wireapp/api-client
