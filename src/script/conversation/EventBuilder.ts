@@ -37,7 +37,7 @@ export interface BaseEvent {
   conversation: string;
   from: string;
   id?: string;
-  time: string;
+  time: string | number;
 }
 
 export interface ConversationEvent<T> extends BaseEvent {
@@ -321,7 +321,11 @@ export const EventBuilder = {
     };
   },
 
-  buildTeamMemberLeave(conversationEntity: Conversation, userEntity: User, isoDate: string): TeamMemberLeaveEvent {
+  buildTeamMemberLeave(
+    conversationEntity: Conversation,
+    userEntity: User,
+    isoDate: string | number,
+  ): TeamMemberLeaveEvent {
     return {
       conversation: conversationEntity.id,
       data: {
