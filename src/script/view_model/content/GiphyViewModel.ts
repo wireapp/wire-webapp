@@ -40,8 +40,8 @@ export class GiphyViewModel {
   private readonly state: ko.Observable<GiphyState>;
   private readonly query: ko.Observable<string>;
   private readonly currentGif: ko.Observable<Gif>;
-  public gifs: ko.ObservableArray<Gif>;
-  public selectedGif: ko.Observable<Gif>;
+  private readonly gifs: ko.ObservableArray<Gif>;
+  private readonly selectedGif: ko.Observable<Gif>;
   public isStateError: ko.PureComputed<boolean>;
   public isStateLoading: ko.PureComputed<boolean>;
   public isStateResult: ko.PureComputed<boolean>;
