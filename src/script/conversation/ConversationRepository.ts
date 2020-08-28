@@ -2564,10 +2564,11 @@ export class ConversationRepository {
     try {
       const messageEntity = await this.getMessageInConversationById(conversationEntity, eventJson.id);
       messageEntity.status(StatusType.SENT);
-      const changes = {status: StatusType.SENT, time: isoDate};
+      const changes: {status: StatusType; time?: string | number | Date} = {status: StatusType.SENT};
       if (isoDate) {
         const timestamp = new Date(isoDate).getTime();
         if (!isNaN(timestamp)) {
+          changes.time = isoDate;
           messageEntity.timestamp(timestamp);
           conversationEntity.update_timestamp_server(timestamp, true);
           conversationEntity.updateTimestamps(messageEntity);
