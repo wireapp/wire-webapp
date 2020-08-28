@@ -31,11 +31,11 @@ import {isEnterKey} from 'Util/KeyboardUtil';
 import {overlayedObserver} from '../../ui/overlayedObserver';
 import {viewportObserver} from '../../ui/viewportObserver';
 
+type KOEvent<T = Event> = JQuery.Event & {currentTarget: Element; originalEvent: T};
+
 /**
  * Use it on the drop area.
  */
-type KOEvent<T = Event> = JQuery.Event & {currentTarget: Element; originalEvent: T};
-
 ko.bindingHandlers.drop_file = {
   init(element, valueAccessor, _allBindings, _data, context) {
     const onDragLeave = (_: unknown, event: KOEvent) => event.currentTarget.classList.remove('drag-hover');
