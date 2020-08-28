@@ -30,7 +30,7 @@ import {URLParameter} from '../auth/URLParameter';
 import type {UserRepository} from '../user/UserRepository';
 import {EventName} from './EventName';
 import {UserData} from './UserData';
-import {Segmantation} from './Segmentation';
+import {Segmentation} from './Segmentation';
 
 declare const Raygun: RaygunStatic;
 
@@ -173,8 +173,8 @@ export class EventTrackingRepository {
       Countly.add_event({
         key: eventName,
         segmentation: {
-          [Segmantation.COMMON.APP]: EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE,
-          [Segmantation.COMMON.APP_VERSION]: Environment.version(false),
+          [Segmentation.COMMON.APP]: EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE,
+          [Segmentation.COMMON.APP_VERSION]: Environment.version(false),
           ...segmentations,
         },
       });

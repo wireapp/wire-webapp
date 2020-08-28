@@ -17,7 +17,7 @@
  *
  */
 
-export const Segmantation = {
+export const Segmentation = {
   CALL: {
     AV_SWITCH_TOGGLE: 'call_av_switch_toggle',
     DIRECTION: 'call_direction',
@@ -29,9 +29,9 @@ export const Segmantation = {
     VIDEO: 'call_video',
   },
   COMMON: {
-    APP: 'user.app',
-    APP_VERSION: 'user.app_version',
-    DESKTOP_APP: 'user.desktop_app',
+    APP: 'user_app',
+    APP_VERSION: 'user_app_version',
+    DESKTOP_APP: 'user_desktop_app',
   },
   CONVERSATION: {
     ALLOW_GUESTS: 'conversation_allow_guests',
