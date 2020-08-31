@@ -68,7 +68,7 @@ export class EventService {
     if (!conversationId || !eventIds) {
       this.logger.error(`Cannot get events '${eventIds}' in conversation '${conversationId}' without IDs`);
       throw new ConversationError(
-        BaseError.TYPE.MISSING_PARAMETER as BASE_ERROR_TYPE,
+        BASE_ERROR_TYPE.MISSING_PARAMETER,
         BaseError.MESSAGE.MISSING_PARAMETER,
       );
     }
