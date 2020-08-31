@@ -352,7 +352,8 @@ export class EventService {
   async updateEventAsUploadSucceeded(primaryKey: string, event: Object): Promise<void> {
     const record = await this.storageService.load(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey);
     if (!record) {
-      return this.logger.warn('Did not find message to update asset (uploaded)', primaryKey);
+      this.logger.warn('Did not find message to update asset (uploaded)', primaryKey);
+      return;
     }
     const assetData = event.data;
     record.data.id = assetData.id;
