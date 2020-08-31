@@ -61,9 +61,8 @@ export class EventService {
   /**
    * Load events from database.
    *
-   * @param {string} conversationId ID of conversation
-   * @param {string[]} eventIds ID of events to retrieve
-   * @returns {Promise<Object[]>} Resolves with the stored records
+   * @param conversationId ID of conversation
+   * @param eventIds ID of events to retrieve
    */
   async loadEvents(conversationId: string, eventIds: string[]): Promise<DBEvents> {
     if (!conversationId || !eventIds) {
@@ -193,11 +192,10 @@ export class EventService {
   /**
    * Load events starting from the fromDate going back in history until either limit or toDate is reached.
    *
-   * @param {string} conversationId ID of conversation
-   * @param {Date} [fromDate=new Date(0)] Load from this date (included)
-   * @param {Date} [toDate=new Date()] Load until this date (excluded)
-   * @param {number} [limit=Number.MAX_SAFE_INTEGER] Amount of events to load
-   * @returns {Promise} Resolves with the retrieved records
+   * @param conversationId ID of conversation
+   * @param fromDate Load from this date (included)
+   * @param toDate Load until this date (excluded)
+   * @param limit Amount of events to load
    */
   async loadPrecedingEvents(
     conversationId: string,
