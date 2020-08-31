@@ -41,7 +41,7 @@ export class EventServiceNoCompound extends EventService {
    * @param category Will be used as lower bound
    * @returns Resolves with matching events
    */
-  async loadEventsWithCategory(conversationId: string, category: MessageCategory) {
+  async loadEventsWithCategory(conversationId: string, category: MessageCategory): Promise<DBEvent[]> {
     let events: DBEvent[];
 
     if (this.storageService.db) {
@@ -64,7 +64,7 @@ export class EventServiceNoCompound extends EventService {
     toDate: Date,
     limit: number,
     includes: Includes,
-  ) {
+  ): Promise<DBEvent[]> {
     const fromCompareFunction: DateComparator = includes.includeFrom
       ? (date, timestamp) => timestamp >= date
       : (date, timestamp) => timestamp > date;
