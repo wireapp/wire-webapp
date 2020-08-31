@@ -1637,7 +1637,7 @@ export class ConversationRepository {
         return conversationInTeam && userIsParticipant && !conversationEntity.removed_from_conversation();
       })
       .forEach(conversationEntity => {
-        const leaveEvent = EventBuilder.buildTeamMemberLeave(conversationEntity, userEntity, isoDate.toString(10));
+        const leaveEvent = EventBuilder.buildTeamMemberLeave(conversationEntity, userEntity, isoDate);
         this.eventRepository.injectEvent(leaveEvent);
       });
     userEntity.isDeleted = true;
@@ -2564,10 +2564,11 @@ export class ConversationRepository {
     try {
       const messageEntity = await this.getMessageInConversationById(conversationEntity, eventJson.id);
       messageEntity.status(StatusType.SENT);
-      const changes = {status: StatusType.SENT, time: isoDate};
+      const changes: {status: StatusType; time?: string | number | Date} = {status: StatusType.SENT};
       if (isoDate) {
         const timestamp = new Date(isoDate).getTime();
         if (!isNaN(timestamp)) {
+          changes.time = isoDate;
           messageEntity.timestamp(timestamp);
           conversationEntity.update_timestamp_server(timestamp, true);
           conversationEntity.updateTimestamps(messageEntity);
@@ -4056,7 +4057,7 @@ export class ConversationRepository {
   private async _initMessageEntity(conversationEntity: Conversation, eventJson: Object): Promise<Message> {
     const messageEntity = await this.event_mapper.mapJsonEvent(eventJson, conversationEntity);
     // eslint-disable-next-line no-return-await
-    return await this._updateMessageUserEntities(messageEntity);
+    return this._updateMessageUserEntities(messageEntity);
   }
 
   private async _replaceMessageInConversation(conversationEntity: Conversation, eventId: string, newData: Object) {
