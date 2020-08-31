@@ -38,8 +38,8 @@ export class EventServiceNoCompound extends EventService {
    * Get events with given category.
    *
    * @param conversationId ID of conversation to add users to
-   * @param {MessageCategory} category Will be used as lower bound
-   * @returns {Promise} Resolves with matching events
+   * @param category Will be used as lower bound
+   * @returns Resolves with matching events
    */
   async loadEventsWithCategory(conversationId: string, category: MessageCategory) {
     let events: DBEvent[];
