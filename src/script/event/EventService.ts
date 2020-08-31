@@ -363,7 +363,8 @@ export class EventService {
     record.data.token = assetData.token;
     record.status = StatusType.SENT;
     await this.replaceEvent(record);
-    return this.logger.info('Updated asset message_et (uploaded)', primaryKey);
+    this.logger.info('Updated asset message_et (uploaded)', primaryKey);
+    return;
   }
 
   /**
