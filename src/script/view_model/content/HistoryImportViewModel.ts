@@ -25,6 +25,7 @@ import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {loadFileBuffer} from 'Util/util';
 import {WebWorker} from 'Util/worker';
+import 'Components/loadingBar';
 
 import {Config} from '../../Config';
 import {MotionDuration} from '../../motion/MotionDuration';
@@ -32,8 +33,8 @@ import {EventName} from '../../tracking/EventName';
 import {ContentViewModel} from '../ContentViewModel';
 import {CancelError, DifferentAccountError, ImportError, IncompatibleBackupError} from '../../backup/Error';
 
-import 'Components/loadingBar';
-import {BackupRepository} from 'src/script/backup/BackupRepository';
+import {BackupRepository} from '../../backup/BackupRepository';
+import {TIME_IN_MILLIS, formatDuration} from '../../util/TimeUtil';
 
 export class HistoryImportViewModel {
   private readonly logger: Logger;
@@ -119,11 +120,16 @@ export class HistoryImportViewModel {
     const worker = new WebWorker('worker/jszip-worker.js');
 
     try {
-      const files: Record<string, Uint8Array> = await worker.post(fileBuffer);
+      const unzipTimeStart = performance.now();
+      const files = await worker.post<Record<string, Uint8Array>>(fileBuffer);
+      const unzipTimeEnd = performance.now();
       if (files.error) {
         throw new ImportError((files.error as unknown) as string);
       }
-      this.logger.log('Unzipped files for history import', files);
+      const unzipTimeSeconds = Math.round(unzipTimeEnd - unzipTimeStart);
+      const unzipTimeFormatted = formatDuration(unzipTimeSeconds);
+
+      this.logger.log(`Unzipped files for history import (took ${unzipTimeFormatted.text}).`, files);
       await this.backupRepository.importHistory(files, this.onInit, this.onProgress);
       this.onSuccess();
     } catch (error) {
