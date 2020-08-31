@@ -7079,10 +7079,10 @@ http-signature@~1.2.0:
     jsprim "^1.2.2"
     sshpk "^1.7.0"
 
-http-status-codes@2.1.1:
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/http-status-codes/-/http-status-codes-2.1.1.tgz#1e8fc7358055135518c1dced00362fd3c1f4f606"
-  integrity sha512-MPKYOEXZw8MzXml8XF8UBWzWGuO60ZKXBDCGwxPJmRZJW3eTUsLgB+O+jtlPB8ZOVSUs1vjcrxtitJghYzxtHQ==
+http-status-codes@2.1.2:
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/http-status-codes/-/http-status-codes-2.1.2.tgz#dc5b7ccd72fb383d1d7c21adbbddc3b125f6a5b7"
+  integrity sha512-zpZ1nBcoR0j1FLQ7xbXXBy1z/yUfAi+0a5IZBoZnmOseYkaljdzQ17ZeVXFlK23IbLxMJn6aWI0uU92DQQrG0g==
 
 https-browserify@^1.0.0:
   version "1.0.0"
