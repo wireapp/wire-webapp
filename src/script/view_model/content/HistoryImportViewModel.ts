@@ -34,7 +34,7 @@ import {ContentViewModel} from '../ContentViewModel';
 import {CancelError, DifferentAccountError, ImportError, IncompatibleBackupError} from '../../backup/Error';
 
 import {BackupRepository} from '../../backup/BackupRepository';
-import {TIME_IN_MILLIS, formatDuration} from '../../util/TimeUtil';
+import {formatDuration} from '../../util/TimeUtil';
 
 export class HistoryImportViewModel {
   private readonly logger: Logger;
