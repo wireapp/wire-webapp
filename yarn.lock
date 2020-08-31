@@ -2162,10 +2162,10 @@
     bazinga64 "5.7.10"
     logdown "3.3.1"
 
-"@wireapp/eslint-config@1.7.1":
-  version "1.7.1"
-  resolved "https://registry.yarnpkg.com/@wireapp/eslint-config/-/eslint-config-1.7.1.tgz#89359716f62194926d96c8c7f12c3642c031a881"
-  integrity sha512-IM+ro90oQh8DIkqus9eA8Cl+T6b3wZ7x3JMuN2S3srHtuWep1qcJH9NcXcpUE2+18+M5Yid/IYLUdEGQVCTBPQ==
+"@wireapp/eslint-config@1.8.0":
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/eslint-config/-/eslint-config-1.8.0.tgz#3585f79681bfd3b32c8415c59fc1c2b77329aa98"
+  integrity sha512-hrDDGr0VFZXqsjYSigwNTVGvhuzUZk0pa0l2ewaY7yeqvCe0d656VeVdTAFBLOGCx+arpcwSQI50msZja6M0/A==
 
 "@wireapp/lru-cache@3.7.0":
   version "3.7.0"
