@@ -27,10 +27,12 @@ import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {getParameter} from 'Util/UrlUtil';
 import {createRandomUuid} from 'Util/util';
 import {URLParameter} from '../auth/URLParameter';
-import type {UserRepository} from '../user/UserRepository';
+import {ROLE as TEAM_ROLE} from '../user/UserPermission';
 import {EventName} from './EventName';
 import {UserData} from './UserData';
-import {Segmantation} from './Segmentation';
+import {Segmentation} from './Segmentation';
+import {getPlatform} from './Helpers';
+import type {UserRepository} from '../user/UserRepository';
 
 declare const Raygun: RaygunStatic;
 
@@ -163,22 +165,40 @@ export class EventTrackingRepository {
     }
   }
 
+  private getUserType(): 'member' | 'external' | 'wireless' {
+    if (this.userRepository.self().teamRole() === TEAM_ROLE.PARTNER) {
+      return 'external';
+    }
+
+    if (this.userRepository.self().isGuest()) {
+      return 'wireless';
+    }
+
+    return 'member';
+  }
+
   private trackProductReportingEvent(eventName: string, segmentations?: any): void {
     if (this.isProductReportingActivated === true) {
       Countly.userData.set(UserData.IS_TEAM, this.userRepository.isTeam());
       Countly.userData.set(UserData.CONTACTS, this.userRepository.number_of_contacts());
       Countly.userData.set(UserData.TEAM_SIZE, this.userRepository.teamMembers().length);
+      Countly.userData.set(UserData.USER_TYPE, this.getUserType());
       Countly.userData.save();
 
       const segmentation = {
-        [Segmantation.COMMON.APP]: EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE,
-        [Segmantation.COMMON.APP_VERSION]: Environment.version(false),
+        [Segmentation.COMMON.APP]: EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE,
+        [Segmentation.COMMON.APP_VERSION]: Environment.version(false),
         ...segmentations,
       };
 
       Countly.add_event({
         key: eventName,
-        segmentation,
+        segmentation: {
+          [Segmentation.COMMON.APP]: EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE,
+          [Segmentation.COMMON.APP_VERSION]: Environment.version(false),
+          [Segmentation.COMMON.DESKTOP_APP]: getPlatform(),
+          ...segmentations,
+        },
       });
 
       this.logger.info(`Reporting product event ${eventName}@${JSON.stringify(segmentation)}`);
