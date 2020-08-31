@@ -104,7 +104,7 @@ export class EventServiceNoCompound extends EventService {
           toCompareFunction(toDate, timestamp)
         );
       })
-      .sort()
+      .sort((a, b) => a.conversation.localeCompare(b.conversation))
       .slice(0, limit);
   }
 }
