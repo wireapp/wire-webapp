@@ -18,8 +18,6 @@
  */
 
 import ko from 'knockout';
-import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
@@ -28,8 +26,6 @@ import {sortUsersByPriority} from 'Util/StringUtil';
 
 import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
 import {getManageServicesUrl} from '../../externalRoute';
-import * as trackingHelpers from '../../tracking/Helpers';
-import {EventName} from '../../tracking/EventName';
 import {MotionDuration} from '../../motion/MotionDuration';
 
 import type {ConversationRepository} from 'src/script/conversation/ConversationRepository';

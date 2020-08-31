@@ -26,13 +26,10 @@ import {t} from 'Util/LocalizerUtil';
 import {onEscKey, offEscKey} from 'Util/KeyboardUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
-import * as trackingHelpers from '../../tracking/Helpers';
-import {EventName} from '../../tracking/EventName';
 import {ACCESS_STATE, TEAM} from '../../conversation/AccessState';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
 import {TeamRepository} from '../../team/TeamRepository';
 import {UserRepository} from '../../user/UserRepository';
-import {Conversation} from '../../entity/Conversation';
 import {User} from '../../entity/User';
 import {SearchRepository} from '../../search/SearchRepository';
 
@@ -43,7 +40,6 @@ export class GroupCreationViewModel {
   isShown: ko.Observable<boolean>;
   state: ko.Observable<string>;
   private isCreatingConversation: boolean;
-  private groupCreationSource: GroupCreationSource;
   nameError: ko.Observable<string>;
   nameInput: ko.Observable<string>;
   selectedContacts: ko.ObservableArray<User>;

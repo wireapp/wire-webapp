@@ -25,7 +25,6 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {t} from 'Util/LocalizerUtil';
 
-import {EventName} from '../tracking/EventName';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 
 import type {Conversation} from '../entity/Conversation';

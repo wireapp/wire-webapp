@@ -28,7 +28,6 @@ import {getParameter} from 'Util/UrlUtil';
 import {createRandomUuid} from 'Util/util';
 import {URLParameter} from '../auth/URLParameter';
 import type {UserRepository} from '../user/UserRepository';
-import {EventName} from './EventName';
 import {UserData} from './UserData';
 import {Segmantation} from './Segmentation';
 

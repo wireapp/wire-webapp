@@ -29,7 +29,6 @@ import {Config} from '../../Config';
 import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
 import {ModalsViewModel} from '../ModalsViewModel';
 import {ACCESS_STATE} from '../../conversation/AccessState';
-import {EventName} from '../../tracking/EventName';
 import type {ConversationStateHandler} from '../../conversation/ConversationStateHandler';
 import type {Conversation} from '../../entity/Conversation';
 

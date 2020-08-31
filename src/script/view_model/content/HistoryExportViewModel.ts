@@ -26,7 +26,6 @@ import {downloadBlob} from 'Util/util';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 
-import {EventName} from '../../tracking/EventName';
 import {ContentViewModel} from '../ContentViewModel';
 import {Config} from '../../Config';
 

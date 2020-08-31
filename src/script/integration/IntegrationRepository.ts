@@ -31,7 +31,6 @@ import type {ConversationRepository} from '../conversation/ConversationRepositor
 import type {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';
 import type {TeamRepository} from '../team/TeamRepository';
-import {EventName} from '../tracking/EventName';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {IntegrationMapper} from './IntegrationMapper';
 import type {IntegrationService} from './IntegrationService';

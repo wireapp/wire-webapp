@@ -33,7 +33,6 @@ import {User} from '../../entity/User';
 import {generatePermissionHelpers} from '../../user/UserPermission';
 import {validateHandle} from '../../user/UserHandleGenerator';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {EventName} from '../../tracking/EventName';
 import {SearchRepository} from '../../search/SearchRepository';
 import {sortByPriority} from 'Util/StringUtil';
 import {ListViewModel} from '../ListViewModel';

@@ -48,7 +48,6 @@ import {nameFromType} from '../../user/AvailabilityMapper';
 import {ParticipantAvatar} from 'Components/participantAvatar';
 import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
 import {MotionDuration} from '../../motion/MotionDuration';
-import {EventName} from '../../tracking/EventName';
 import {ContentViewModel} from '../ContentViewModel';
 import {Logger} from '@wireapp/commons';
 import {getLogger} from 'Util/Logger';

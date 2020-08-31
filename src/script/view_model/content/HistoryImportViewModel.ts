@@ -28,7 +28,6 @@ import {WebWorker} from 'Util/worker';
 
 import {Config} from '../../Config';
 import {MotionDuration} from '../../motion/MotionDuration';
-import {EventName} from '../../tracking/EventName';
 import {ContentViewModel} from '../ContentViewModel';
 import {CancelError, DifferentAccountError, ImportError, IncompatibleBackupError} from '../../backup/Error';
 
