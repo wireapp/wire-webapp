@@ -12,7 +12,7 @@
     "amplify": "git+https://git@github.com/wireapp/amplify",
     "core-js": "2.6.10",
     "countly-sdk-web": "20.4.0",
-    "date-fns": "2.15.0",
+    "date-fns": "2.16.0",
     "dexie-batch": "0.4.2",
     "highlight.js": "10.1.2",
     "http-status-codes": "2.1.1",
