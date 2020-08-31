@@ -37,7 +37,7 @@ export class EventServiceNoCompound extends EventService {
   /**
    * Get events with given category.
    *
-   * @param conversationId ID of conversation to add users to
+   * @param conversationId ID of conversation to load events from
    * @param category Will be used as lower bound
    * @returns Resolves with matching events
    */
