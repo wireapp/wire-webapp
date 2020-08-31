@@ -19,7 +19,7 @@
 
 import type {APIClient} from '@wireapp/api-client';
 
-class PropertiesService {
+export class PropertiesService {
   private readonly apiClient: APIClient;
 
   constructor(apiClient: APIClient) {
@@ -51,5 +51,3 @@ class PropertiesService {
     return this.apiClient.user.api.putProperty<T>(key, properties);
   }
 }
-
-export {PropertiesService};

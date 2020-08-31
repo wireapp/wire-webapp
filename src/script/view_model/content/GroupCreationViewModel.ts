@@ -245,7 +245,7 @@ export class GroupCreationViewModel {
     this.accessState(ACCESS_STATE.TEAM.GUEST_ROOM);
   };
 
-  _trackGroupCreation = (conversationEntity: Conversation): void => {
+  _trackGroupCreation = (conversationEntity?: Conversation): void => {
     if (!conversationEntity) {
       return;
     }
@@ -254,7 +254,7 @@ export class GroupCreationViewModel {
   };
 
   _trackGroupCreationSucceeded = (conversationEntity: Conversation): void => {
-    const attributes: {
+    const segmentations: {
       is_allow_guests?: boolean;
       method: GroupCreationSource;
       with_participants: boolean;
@@ -265,15 +265,15 @@ export class GroupCreationViewModel {
 
     const isTeamConversation = !!conversationEntity.team_id;
     if (isTeamConversation) {
-      attributes.is_allow_guests = !conversationEntity.isTeamOnly();
+      segmentations.is_allow_guests = !conversationEntity.isTeamOnly();
     }
 
     const eventName = EventName.CONVERSATION.GROUP_CREATION_SUCCEEDED;
-    amplify.publish(WebAppEvents.ANALYTICS.EVENT, eventName, attributes);
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, eventName, segmentations);
   };
 
   _trackAddParticipants = (conversationEntity: Conversation): void => {
-    let attributes: {
+    let segmentations: {
       guest_num?: number;
       is_allow_guests?: boolean;
       method: GroupCreationSource;
@@ -288,8 +288,8 @@ export class GroupCreationViewModel {
     if (isTeamConversation) {
       const participants = trackingHelpers.getParticipantTypes(conversationEntity.participating_user_ets(), true);
 
-      attributes = {
-        ...attributes,
+      segmentations = {
+        ...segmentations,
         guest_num: participants.guests,
         is_allow_guests: conversationEntity.isGuestRoom(),
         temporary_guest_num: participants.temporaryGuests,
@@ -297,6 +297,6 @@ export class GroupCreationViewModel {
       };
     }
 
-    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CONVERSATION.ADD_PARTICIPANTS, attributes);
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CONVERSATION.ADD_PARTICIPANTS, segmentations);
   };
 }

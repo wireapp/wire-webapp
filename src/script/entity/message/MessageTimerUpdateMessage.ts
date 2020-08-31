@@ -18,12 +18,12 @@
  */
 
 import ko from 'knockout';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
 
 import {t} from 'Util/LocalizerUtil';
 import {formatDuration} from 'Util/TimeUtil';
 
 import {ConversationEphemeralHandler} from '../../conversation/ConversationEphemeralHandler';
-import {BackendEvent} from '../../event/Backend';
 import {SystemMessageType} from '../../message/SystemMessageType';
 import {SystemMessage} from './SystemMessage';
 
@@ -34,7 +34,7 @@ export class MessageTimerUpdateMessage extends SystemMessage {
   constructor(messageTimer: number) {
     super();
 
-    this.type = BackendEvent.CONVERSATION.MESSAGE_TIMER_UPDATE;
+    this.type = CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE;
     this.system_message_type = SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE;
 
     this.message_timer = ConversationEphemeralHandler.validateTimer(messageTimer);

@@ -20,13 +20,13 @@
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {groupBy} from 'underscore';
+import {USER_EVENT} from '@wireapp/api-client/dist/event';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {loadValue, resetStoreValue, storeValue} from 'Util/StorageUtil';
 
 import type {ClientEntity} from '../client/ClientEntity';
 import type {User} from '../entity/User';
-import {BackendEvent} from '../event/Backend';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 
 export interface Notification {
@@ -43,7 +43,7 @@ interface GroupedNotifications {
  * Take care of storing and keeping track of all the notifications relative to the user preferences (read receipts config, active devices ...)
  */
 export class PreferenceNotificationRepository {
-  private readonly notifications: ko.ObservableArray<Notification>;
+  public readonly notifications: ko.ObservableArray<Notification>;
 
   static get CONFIG() {
     return {
@@ -111,7 +111,7 @@ export class PreferenceNotificationRepository {
   }
 
   onUserEvent(event: any): void {
-    if (event.type === BackendEvent.USER.PROPERTIES_DELETE || event.type === BackendEvent.USER.PROPERTIES_SET) {
+    if (event.type === USER_EVENT.PROPERTIES_DELETE || event.type === USER_EVENT.PROPERTIES_SET) {
       if (event.key === PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key) {
         const defaultValue = !!PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.defaultValue;
         this.notifications.push({

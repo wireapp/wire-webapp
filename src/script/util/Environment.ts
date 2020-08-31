@@ -80,7 +80,6 @@ const isProduction = (): boolean => {
   return isProductionHost;
 };
 
-const _supportsAudioOutputSelection = (): boolean => _isChrome();
 const _supportsCalling = (): boolean => {
   if (!_supportsMediaDevices()) {
     return false;
@@ -137,7 +136,6 @@ export const Environment = {
     name: platform.name,
     opera: _isOpera(),
     supports: {
-      audioOutputSelection: _supportsAudioOutputSelection(),
       calling: _supportsCalling(),
       clipboard: _supportsClipboard(),
       indexedDb: _supportsIndexedDb(),

@@ -17,8 +17,10 @@
  *
  */
 
+import ko from 'knockout';
 import {Asset} from '@wireapp/protocol-messaging';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {Environment} from 'Util/Environment';
 import {Logger, getLogger} from 'Util/Logger';
@@ -32,7 +34,6 @@ import {encryptAesAsset, EncryptedAsset, decryptAesAsset} from './AssetCrypto';
 import {AssetUploadData} from '@wireapp/api-client/dist/asset';
 import {AssetRemoteData} from './AssetRemoteData';
 import {getAssetUrl, setAssetUrl} from './AssetURLCache';
-import {BackendClientError} from '../error/BackendClientError';
 import {ValidationUtilError} from 'Util/ValidationUtil';
 import {singleton, container} from 'tsyringe';
 import type {User} from '../entity/User';
@@ -97,8 +98,8 @@ export class AssetRepository {
       return new Blob([new Uint8Array(plaintext)], {type: mimeType});
     } catch (error) {
       const errorMessage = error?.message || '';
-      const isAssetNotFound = errorMessage.endsWith(BackendClientError.STATUS_CODE.NOT_FOUND);
-      const isServerError = errorMessage.endsWith(BackendClientError.STATUS_CODE.INTERNAL_SERVER_ERROR);
+      const isAssetNotFound = errorMessage.endsWith(HTTP_STATUS.NOT_FOUND);
+      const isServerError = errorMessage.endsWith(HTTP_STATUS.INTERNAL_SERVER_ERROR);
 
       const isExpectedError = isAssetNotFound || isServerError;
       if (!isExpectedError) {

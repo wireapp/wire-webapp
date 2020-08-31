@@ -17,10 +17,11 @@
  *
  */
 
+import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
+
 import {getLogger} from 'Util/Logger';
 
 import {ClientEvent} from '../Client';
-import {BackendEvent} from '../Backend';
 
 export class ServiceMiddleware {
   /**
@@ -40,7 +41,7 @@ export class ServiceMiddleware {
       case ClientEvent.CONVERSATION.ONE2ONE_CREATION:
         return this._process1To1ConversationCreationEvent(event);
 
-      case BackendEvent.CONVERSATION.MEMBER_JOIN:
+      case CONVERSATION_EVENT.MEMBER_JOIN:
         return this._processMemberJoinEvent(event);
 
       default:

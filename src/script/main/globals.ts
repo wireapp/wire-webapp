@@ -20,7 +20,6 @@
 import {amplify} from 'amplify';
 import jQuery from 'jquery';
 import ko from 'knockout';
-import type {RaygunStatic} from 'raygun4js';
 import 'raygun4js/dist/raygun.vanilla';
 import type {t} from 'Util/LocalizerUtil';
 
@@ -65,15 +64,7 @@ import '../view_model/bindings/ConversationListBindings';
 import '../view_model/bindings/ListBackgroundBindings';
 import '../view_model/bindings/MessageListBindings';
 import '../view_model/bindings/VideoCallingBindings';
-import '../view_model/content/InputBarViewModel';
-import '../view_model/content/PreferencesAboutViewModel';
-import '../view_model/content/PreferencesDeviceDetailsViewModel';
-import '../view_model/content/PreferencesDevicesViewModel';
-import '../view_model/content/TitleBarViewModel';
-import '../view_model/FaviconViewModel';
-import '../view_model/ImageDetailViewViewModel';
-import '../view_model/ListViewModel';
-import '../view_model/LoadingViewModel';
+
 import '../view_model/MainViewModel';
 import '../view_model/PanelViewModel';
 
@@ -83,7 +74,6 @@ declare global {
     amplify: amplify.Static;
     jQuery: typeof jQuery;
     ko: typeof ko;
-    Raygun: RaygunStatic;
     t: typeof t;
     wire: {
       app: {
@@ -100,6 +90,8 @@ declare global {
         BACKEND_REST: string;
         BACKEND_WS: string;
         BRAND_NAME: string;
+        CHROME_ORIGIN_TRIAL_TOKEN: string;
+        COUNTLY_API_KEY: string;
         ENVIRONMENT: string;
         FEATURE: {
           ALLOWED_FILE_UPLOAD_EXTENSIONS: string[];
@@ -117,6 +109,7 @@ declare global {
           SHOW_LOADING_INFORMATION: boolean;
         };
         MAX_GROUP_PARTICIPANTS: number;
+        MAX_SFT_VIDEO_PARTICIPANTS: number;
         MAX_VIDEO_PARTICIPANTS: number;
         NEW_PASSWORD_MINIMUM_LENGTH: number;
         RAYGUN_API_KEY: string;
@@ -141,6 +134,7 @@ declare global {
           TERMS_OF_USE_PERSONAL: string;
           TERMS_OF_USE_TEAMS: string;
           WEBSITE_BASE: string;
+          WHATS_NEW: string;
         };
         VERSION: string;
         WEBSITE_LABEL: string;

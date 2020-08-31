@@ -62,27 +62,6 @@ export class BackendClientError extends BaseError {
     };
   }
 
-  static get STATUS_CODE() {
-    return {
-      ACCEPTED: 202,
-      BAD_GATEWAY: 502,
-      BAD_REQUEST: 400,
-      CONFLICT: 409,
-      CONNECTIVITY_PROBLEM: 0,
-      CREATED: 201,
-      FORBIDDEN: 403,
-      INTERNAL_SERVER_ERROR: 500,
-      NOT_FOUND: 404,
-      NO_CONTENT: 204,
-      OK: 200,
-      PRECONDITION_FAILED: 412,
-      REQUEST_TIMEOUT: 408,
-      REQUEST_TOO_LARGE: 413,
-      TOO_MANY_REQUESTS: 429,
-      UNAUTHORIZED: 401,
-    };
-  }
-
   static get TYPE() {
     return {
       GENERIC: 'GENERIC',

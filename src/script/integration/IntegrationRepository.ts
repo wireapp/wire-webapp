@@ -17,6 +17,7 @@
  *
  */
 
+import ko from 'knockout';
 import {amplify} from 'amplify';
 import type {Observable, ObservableArray, PureComputed} from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -116,14 +117,14 @@ export class IntegrationRepository {
 
     return this.conversationRepository.addService(conversationEntity, providerId, serviceId).then(event => {
       if (event) {
-        const attributes = {
+        const segmentations = {
           conversation_size: conversationEntity.getNumberOfParticipants(true, false),
           method: method,
           service_id: serviceId,
           services_size: conversationEntity.getNumberOfServices(),
         };
 
-        amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.INTEGRATION.ADDED_SERVICE, attributes);
+        amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.INTEGRATION.ADDED_SERVICE, segmentations);
       }
 
       return event;
@@ -243,8 +244,8 @@ export class IntegrationRepository {
 
     return this.conversationRepository.removeService(conversationEntity, userId).then(event => {
       if (event) {
-        const attributes = {service_id: serviceId};
-        amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.INTEGRATION.REMOVED_SERVICE, attributes);
+        const segmentations = {service_id: serviceId};
+        amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.INTEGRATION.REMOVED_SERVICE, segmentations);
         return event;
       }
     });

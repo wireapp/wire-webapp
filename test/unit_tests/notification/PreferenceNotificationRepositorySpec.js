@@ -19,10 +19,10 @@
 
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {USER_EVENT} from '@wireapp/api-client/dist/event';
 
 import {PreferenceNotificationRepository} from 'src/script/notification/PreferenceNotificationRepository';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
-import {BackendEvent} from 'src/script/event/Backend';
 import {createRandomUuid} from 'Util/util';
 
 describe('PreferenceNotificationRepository', () => {
@@ -47,7 +47,7 @@ describe('PreferenceNotificationRepository', () => {
 
     amplify.publish(WebAppEvents.USER.EVENT_FROM_BACKEND, {
       key: PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key,
-      type: BackendEvent.USER.PROPERTIES_SET,
+      type: USER_EVENT.PROPERTIES_SET,
       value: true,
     });
 

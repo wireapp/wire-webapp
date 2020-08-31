@@ -18,6 +18,7 @@
  */
 
 import type {Self} from '@wireapp/api-client/dist/self';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {actionRoot} from '.';
 import {mockStoreFactory} from '../../util/test/mockStoreFactory';
@@ -98,7 +99,7 @@ describe('SelfAction', () => {
 
   it('fetches the set password state', async () => {
     const mockedApiClient = {
-      self: {api: {headPassword: () => Promise.resolve({status: 200})}},
+      self: {api: {headPassword: () => Promise.resolve({status: HTTP_STATUS.OK})}},
     };
 
     const store = mockStoreFactory({
@@ -114,7 +115,7 @@ describe('SelfAction', () => {
 
   it('fetches the unset password state', async () => {
     const mockedApiClient = {
-      self: {api: {headPassword: () => Promise.reject({response: {status: 404}})}},
+      self: {api: {headPassword: () => Promise.reject({response: {status: HTTP_STATUS.NOT_FOUND}})}},
     };
 
     const store = mockStoreFactory({
@@ -129,7 +130,7 @@ describe('SelfAction', () => {
   });
 
   it('handles failed password check', async () => {
-    const error = ({response: {status: 400}} as unknown) as Error;
+    const error = ({response: {status: HTTP_STATUS.BAD_REQUEST}} as unknown) as Error;
     const mockedApiClient = {
       self: {api: {headPassword: () => Promise.reject(error)}},
     };

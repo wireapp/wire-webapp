@@ -17,13 +17,13 @@
  *
  */
 
+import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
 import ko from 'knockout';
 
 import {Declension, joinNames, t} from 'Util/LocalizerUtil';
 import {getUserName} from 'Util/SanitizationUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 
-import {BackendEvent} from '../../event/Backend';
 import {ClientEvent} from '../../event/Client';
 import {SuperType} from '../../message/SuperType';
 import {SystemMessageType} from '../../message/SystemMessageType';
@@ -37,7 +37,7 @@ export class MemberMessage extends SystemMessage {
   private readonly hiddenUserCount: ko.PureComputed<number>;
   private readonly joinedUserEntities: ko.PureComputed<User[]>;
   public readonly name: ko.Observable<string>;
-  private readonly otherUser: ko.PureComputed<User>;
+  public readonly otherUser: ko.PureComputed<User>;
   private readonly senderName: ko.PureComputed<string>;
   private readonly showNamedCreation: ko.PureComputed<boolean>;
   private readonly visibleUsers: ko.Observable<User[]>;
@@ -74,7 +74,7 @@ export class MemberMessage extends SystemMessage {
     this.visibleUsers = ko.observable([]);
     this.hiddenUserCount = ko.pureComputed(() => this.joinedUserEntities().length - this.visibleUsers().length);
     this.highlightedUsers = ko.pureComputed(() => {
-      return this.type === BackendEvent.CONVERSATION.MEMBER_JOIN ? this.joinedUserEntities() : [];
+      return this.type === CONVERSATION_EVENT.MEMBER_JOIN ? this.joinedUserEntities() : [];
     });
 
     this.hasUsers = ko.pureComputed(() => !!this.userEntities().length);
@@ -184,7 +184,7 @@ export class MemberMessage extends SystemMessage {
       }
 
       switch (this.type) {
-        case BackendEvent.CONVERSATION.MEMBER_JOIN: {
+        case CONVERSATION_EVENT.MEMBER_JOIN: {
           const senderJoined = this.otherUser().id === this.user().id;
           if (senderJoined) {
             return this.user().isMe
@@ -206,7 +206,7 @@ export class MemberMessage extends SystemMessage {
             : t('conversationMemberJoined', {name, users: accusativeUsers}, replaceShowMore);
         }
 
-        case BackendEvent.CONVERSATION.MEMBER_LEAVE: {
+        case CONVERSATION_EVENT.MEMBER_LEAVE: {
           const temporaryGuestRemoval = this.otherUser().isMe && this.otherUser().isTemporaryGuest();
           if (temporaryGuestRemoval) {
             return t('temporaryGuestLeaveMessage');
@@ -292,11 +292,11 @@ export class MemberMessage extends SystemMessage {
   }
 
   isMemberJoin(): boolean {
-    return this.type === BackendEvent.CONVERSATION.MEMBER_JOIN;
+    return this.type === CONVERSATION_EVENT.MEMBER_JOIN;
   }
 
   isMemberLeave(): boolean {
-    return this.type === BackendEvent.CONVERSATION.MEMBER_LEAVE;
+    return this.type === CONVERSATION_EVENT.MEMBER_LEAVE;
   }
 
   isTeamMemberLeave(): boolean {

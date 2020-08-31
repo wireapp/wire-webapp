@@ -38,6 +38,7 @@ import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 import useReactRouter from 'use-react-router';
 import {getLogger} from 'Util/Logger';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {Config} from '../../Config';
 import {ssoLoginStrings} from '../../strings';
@@ -87,7 +88,7 @@ const SingleSignOn = ({hasDefaultSSOCode}: Props & ConnectedProps & DispatchProp
           ssoWindowRef.current.close();
           return reject(
             new BackendError({
-              code: 500,
+              code: HTTP_STATUS.INTERNAL_SERVER_ERROR,
               label: BackendError.LABEL.SSO_GENERIC_ERROR,
               message: `Origin "${event.origin}" of event "${serializedEvent}" not matching "${
                 Config.getConfig().BACKEND_REST
@@ -109,7 +110,7 @@ const SingleSignOn = ({hasDefaultSSOCode}: Props & ConnectedProps & DispatchProp
             ssoWindowRef.current.close();
             return reject(
               new BackendError({
-                code: 401,
+                code: HTTP_STATUS.UNAUTHORIZED,
                 label: event.data.payload.label || BackendError.LABEL.SSO_GENERIC_ERROR,
                 message: `Authentication error: "${JSON.stringify(event.data.payload)}"`,
               }),

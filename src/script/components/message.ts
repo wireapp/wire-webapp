@@ -26,7 +26,7 @@ import {includesOnlyEmojis} from 'Util/EmojiUtil';
 import {formatDateNumeral, formatTimeShort} from 'Util/TimeUtil';
 
 import {EphemeralStatusType} from '../message/EphemeralStatusType';
-import {Context} from '../ui/ContextMenu';
+import {Context, ContextMenuEntry} from '../ui/ContextMenu';
 import type {ContentMessage} from '../entity/message/ContentMessage';
 
 import {SystemMessageType} from '../message/SystemMessageType';
@@ -84,6 +84,7 @@ class Message {
   accentColor: ko.PureComputed<string>;
   actionsViewModel: ActionsViewModel;
   assetSubscription: ko.Subscription;
+  contextMenuEntries: ko.PureComputed<ContextMenuEntry[]>;
   conversation: ko.Observable<Conversation>;
   conversationRepository: ConversationRepository;
   EphemeralStatusType: typeof EphemeralStatusType;
@@ -209,6 +210,79 @@ class Message {
       const is1to1 = this.conversation().is1to1();
       return is1to1 ? formatTimeShort(receipts[0].time) : receipts.length.toString(10);
     });
+
+    this.contextMenuEntries = ko.pureComputed(() => {
+      const messageEntity = this.message;
+      const entries: ContextMenuEntry[] = [];
+
+      const canDelete =
+        messageEntity.user().isMe && !this.conversation().removed_from_conversation() && messageEntity.is_deletable();
+
+      const hasDetails =
+        !this.conversation().is1to1() &&
+        !messageEntity.is_ephemeral() &&
+        !this.conversation().removed_from_conversation();
+
+      if (messageEntity.is_downloadable()) {
+        entries.push({
+          click: () => messageEntity.download(container.resolve(AssetRepository)),
+          label: t('conversationContextMenuDownload'),
+        });
+      }
+
+      if (messageEntity.isReactable() && !this.conversation().removed_from_conversation()) {
+        const label = messageEntity.is_liked() ? t('conversationContextMenuUnlike') : t('conversationContextMenuLike');
+
+        entries.push({
+          click: () => this.onLike(messageEntity, false),
+          label,
+        });
+      }
+
+      if (messageEntity.is_editable() && !this.conversation().removed_from_conversation()) {
+        entries.push({
+          click: () => amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.EDIT, messageEntity),
+          label: t('conversationContextMenuEdit'),
+        });
+      }
+
+      if (messageEntity.isReplyable() && !this.conversation().removed_from_conversation()) {
+        entries.push({
+          click: () => amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REPLY, messageEntity),
+          label: t('conversationContextMenuReply'),
+        });
+      }
+
+      if (messageEntity.isCopyable()) {
+        entries.push({
+          click: () => messageEntity.copy(),
+          label: t('conversationContextMenuCopy'),
+        });
+      }
+
+      if (hasDetails) {
+        entries.push({
+          click: () => this.onClickReceipts(this),
+          label: t('conversationContextMenuDetails'),
+        });
+      }
+
+      if (messageEntity.is_deletable()) {
+        entries.push({
+          click: () => this.actionsViewModel.deleteMessage(this.conversation(), messageEntity),
+          label: t('conversationContextMenuDelete'),
+        });
+      }
+
+      if (canDelete) {
+        entries.push({
+          click: () => this.actionsViewModel.deleteMessageEveryone(this.conversation(), messageEntity),
+          label: t('conversationContextMenuDeleteEveryone'),
+        });
+      }
+
+      return entries;
+    });
   }
 
   dispose = () => {
@@ -250,73 +324,8 @@ class Message {
     amplify.publish(SHOW_LEGAL_HOLD_MODAL, this.conversationRepository.active_conversation());
   };
 
-  showContextMenu(messageEntity: ContentMessage, event: MouseEvent) {
-    const entries = [];
-
-    if (messageEntity.is_downloadable()) {
-      entries.push({
-        click: () => messageEntity.download(container.resolve(AssetRepository)),
-        label: t('conversationContextMenuDownload'),
-      });
-    }
-
-    if (messageEntity.isReactable() && !this.conversation().removed_from_conversation()) {
-      const label = messageEntity.is_liked() ? t('conversationContextMenuUnlike') : t('conversationContextMenuLike');
-
-      entries.push({
-        click: () => this.onLike(messageEntity, false),
-        label,
-      });
-    }
-
-    if (messageEntity.is_editable() && !this.conversation().removed_from_conversation()) {
-      entries.push({
-        click: () => amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.EDIT, messageEntity),
-        label: t('conversationContextMenuEdit'),
-      });
-    }
-
-    if (messageEntity.isReplyable() && !this.conversation().removed_from_conversation()) {
-      entries.push({
-        click: () => amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REPLY, messageEntity),
-        label: t('conversationContextMenuReply'),
-      });
-    }
-
-    if (messageEntity.isCopyable()) {
-      entries.push({
-        click: () => messageEntity.copy(),
-        label: t('conversationContextMenuCopy'),
-      });
-    }
-
-    if (
-      !this.conversation().is1to1() &&
-      !messageEntity.is_ephemeral() &&
-      !this.conversation().removed_from_conversation()
-    ) {
-      entries.push({
-        click: () => this.onClickReceipts(this),
-        label: t('conversationContextMenuDetails'),
-      });
-    }
-
-    if (messageEntity.is_deletable()) {
-      entries.push({
-        click: () => this.actionsViewModel.deleteMessage(this.conversation(), messageEntity),
-        label: t('conversationContextMenuDelete'),
-      });
-    }
-
-    const canDelete =
-      messageEntity.user().isMe && !this.conversation().removed_from_conversation() && messageEntity.is_deletable();
-    if (canDelete) {
-      entries.push({
-        click: () => this.actionsViewModel.deleteMessageEveryone(this.conversation(), messageEntity),
-        label: t('conversationContextMenuDeleteEveryone'),
-      });
-    }
-
+  showContextMenu(event: MouseEvent) {
+    const entries = this.contextMenuEntries();
     Context.from(event, entries, 'message-options-menu');
   }
 
@@ -332,7 +341,7 @@ class Message {
   }
 }
 
-// if this is not explicitely defined as string,
+// If this is not explicitly defined as string,
 // TS will define this as the string's content.
 const receiptStatusTemplate: string = `
   <!-- ko if: isLastDeliveredMessage() && readReceiptText() === '' -->
@@ -404,7 +413,7 @@ const normalTemplate: string = `
         <video-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired icon-movie': message.isObfuscated()}" params="message: message"></video-asset>
       <!-- /ko -->
       <!-- ko if: asset.is_audio() -->
-        <audio-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired icon-microphone': message.isObfuscated()}" params="message: message"></audio-asset>
+        <audio-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired': message.isObfuscated()}" params="message: message"></audio-asset>
       <!-- /ko -->
       <!-- ko if: asset.is_file() -->
         <file-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired icon-file': message.isObfuscated()}" params="message: message"></file-asset>
@@ -427,12 +436,14 @@ const normalTemplate: string = `
     <!-- /ko -->
 
     <div class="message-body-actions">
-      <span class="context-menu icon-more font-size-xs" data-bind="click: (data, event) => showContextMenu(message, event)"></span>
+      <!-- ko if: contextMenuEntries().length > 0 -->
+        <span class="context-menu icon-more font-size-xs" data-bind="click: (data, event) => showContextMenu(event)"></span>
+      <!-- /ko -->
       <!-- ko if: message.ephemeral_status() === EphemeralStatusType.ACTIVE -->
-        <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id, 'title': message.ephemeral_caption()}, showAllTimestamps"></time>
+        <time class="time" data-bind="text: message.displayTimestampShort(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id, 'title': message.ephemeral_caption()}, showAllTimestamps"></time>
       <!-- /ko -->
       <!-- ko ifnot: message.ephemeral_status() === EphemeralStatusType.ACTIVE -->
-        <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id}, showAllTimestamps"></time>
+        <time class="time with-tooltip with-tooltip--top with-tooltip--time" data-bind="text: message.displayTimestampShort(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id, 'data-tooltip': message.displayTimestampLong()}, showAllTimestamps"></time>
       <!-- /ko -->
       ${receiptStatusTemplate}
     </div>
@@ -459,6 +470,15 @@ const missedTemplate: string = `
       <span class="icon-sysmsg-error text-red"></span>
     </div>
     <div class="message-header-label" data-bind="text: t('conversationMissedMessages')"></div>
+  </div>
+  `;
+
+const fileTypeRestrictedTemplate: string = `
+  <div class="message-header">
+    <div class="message-header-icon">
+      <span class="icon-sysmsg-error text-red"></span>
+    </div>
+    <div class="message-header-label" data-bind="html: message.caption"></div>
   </div>
   `;
 
@@ -499,7 +519,7 @@ const systemTemplate: string = `
       <hr class="message-header-line" />
     </div>
     <div class="message-body-actions">
-      <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}, showAllTimestamps"></time>
+      <time class="time with-tooltip with-tooltip--top with-tooltip--time" data-bind="text: message.displayTimestampShort(), attr: {'data-timestamp': message.timestamp, 'data-tooltip': message.displayTimestampLong()}, showAllTimestamps"></time>
     </div>
   </div>
   <div class="message-body font-weight-bold" data-bind="text: message.name"></div>
@@ -517,7 +537,7 @@ const pingTemplate: string = `
       </span>
     </div>
     <div class="message-body-actions">
-      <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}, showAllTimestamps"></time>
+      <time class="time with-tooltip with-tooltip--top with-tooltip--time" data-bind="text: message.displayTimestampShort(), attr: {'data-timestamp': message.timestam, 'data-tooltip': message.displayTimestampLong()}, showAllTimestamps"></time>
       ${receiptStatusTemplate}
     </div>
   </div>
@@ -533,7 +553,7 @@ const deleteTemplate: string = `
       <span class="message-header-label-icon icon-trash" data-bind="attr: {title: message.display_deleted_timestamp()}"></span>
     </div>
     <div class="message-body-actions message-body-actions-large">
-      <time class="time" data-bind="text: message.display_deleted_timestamp(), attr: {'data-timestamp': message.deleted_timestamp, 'data-uie-uid': message.id}, showAllTimestamps" data-uie-name="item-message-delete-timestamp"></time>
+      <time class="time with-tooltip with-tooltip--top with-tooltip--time" data-bind="text: message.display_deleted_timestamp(), attr: {'data-timestamp': message.deleted_timestamp, 'data-uie-uid': message.id, 'data-tooltip': message.displayTimestampLong()}, showAllTimestamps" data-uie-name="item-message-delete-timestamp"></time>
     </div>
   </div>
   `;
@@ -602,7 +622,7 @@ const callTemplate: string = `
       <span class="ellipsis" data-bind="text: message.caption()"></span>
     </div>
     <div class="message-body-actions">
-      <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}, showAllTimestamps"></time>
+      <time class="time with-tooltip with-tooltip--top with-tooltip--time" data-bind="text: message.displayTimestampShort(), attr: {'data-timestamp': message.timestamp, 'data-tooltip': message.displayTimestampLong()}, showAllTimestamps"></time>
     </div>
   </div>
   `;
@@ -652,7 +672,7 @@ const memberTemplate: string = `
         </div>
         <!-- ko if: message.isMemberChange() -->
           <div class="message-body-actions">
-            <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}, showAllTimestamps"></time>
+            <time class="time with-tooltip with-tooltip--top with-tooltip--time" data-bind="text: message.displayTimestampShort(), attr: {'data-timestamp': message.timestamp, 'data-tooltip': message.displayTimestampLong()}, showAllTimestamps"></time>
           </div>
         <!-- /ko -->
       </div>
@@ -722,6 +742,9 @@ ko.components.register('message', {
     <!-- /ko -->
     <!-- ko if: message.super_type === 'ping' -->
       ${pingTemplate}
+    <!-- /ko -->
+    <!-- ko if: message.super_type === 'file-type-restricted' -->
+      ${fileTypeRestrictedTemplate}
     <!-- /ko -->
     <!-- ko if: message.isLegalHold() -->
       ${legalHoldTemplate}

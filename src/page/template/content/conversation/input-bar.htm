@@ -33,7 +33,7 @@
 
             <!-- ko if: replyAsset().is_audio()-->
               <div class="input-bar__reply__message" data-uie-name="media-audio-reply-box">
-                <audio-icon class="input-bar__reply__icon"></audio-icon>
+                <mic-on-icon class="input-bar__reply__icon"></mic-on-icon>
                 <span data-bind="text: t('replyAudioMessage')"></span>
               </div>
             <!-- /ko -->
@@ -61,7 +61,7 @@
     <!-- ko if: conversationEntity() && !conversationEntity().connection().isOutgoingRequest() -->
       <div class="controls-left">
         <!-- ko if: input().length -->
-          <participant-avatar class="cursor-default" params="participant: selfUser, size: ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
+          <participant-avatar class="cursor-default" params="participant: selfUser, size: participantAvatarSize"></participant-avatar>
         <!-- /ko -->
       </div>
 
@@ -101,12 +101,12 @@
 
               <label id="conversation-input-bar-photo" class="controls-right-button button-icon-large">
                 <image-icon></image-icon>
-                <input data-bind="attr: {accept: z.viewModel.content.InputBarViewModel.CONFIG.IMAGE.FILE_TYPES.join(',')}, file_select: uploadImages" type="file" multiple="multiple" data-uie-name="do-share-image"/>
+                <input data-bind="attr: {accept: allowedImageTypes}, file_select: uploadImages" type="file" multiple="multiple" data-uie-name="do-share-image"/>
               </label>
 
               <label id="conversation-input-bar-files" class="controls-right-button button-icon-large" data-bind="attr: {title: t('tooltipConversationFile')}">
                 <attachment-icon></attachment-icon>
-                <input data-bind="attr: {accept: z.viewModel.content.InputBarViewModel.CONFIG.FILES.ALLOWED_FILE_UPLOAD_EXTENSIONS.join(',')}, file_select: uploadFiles" type="file" multiple="multiple" data-uie-name="do-share-file"/>
+                <input data-bind="attr: {accept: allowedFileTypes}, file_select: uploadFiles" type="file" multiple="multiple" data-uie-name="do-share-file"/>
               </label>
 
               <span class="controls-right-button button-icon-large"

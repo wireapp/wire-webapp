@@ -19,6 +19,9 @@
 
 import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {USER_EVENT} from '@wireapp/api-client/dist/event';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
 
 import {getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -30,11 +33,9 @@ import {AssetTransferState} from '../assets/AssetTransferState';
 import {EVENT_TYPE} from './EventType';
 import {ClientEvent} from './Client';
 import {EventTypeHandling} from './EventTypeHandling';
-import {BackendEvent} from './Backend';
 import {NOTIFICATION_HANDLING_STATE} from './NotificationHandlingState';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {categoryFromEvent} from '../message/MessageCategorization';
-import {BackendClientError} from '../error/BackendClientError';
 import {EventSource} from './EventSource';
 import {EventValidation} from './EventValidation';
 import {validateEvent} from './EventValidator';
@@ -304,7 +305,7 @@ export class EventRepository {
           return _gotNotifications(errorResponse);
         }
 
-        const isNotFound = errorResponse.response?.status === BackendClientError.STATUS_CODE.NOT_FOUND;
+        const isNotFound = errorResponse.response?.status === HTTP_STATUS.NOT_FOUND;
         if (isNotFound) {
           this.logger.info(`No notifications found since '${notificationId}'`, errorResponse);
           return reject(new EventError(EventError.TYPE.NO_NOTIFICATIONS, EventError.MESSAGE.NO_NOTIFICATIONS));
@@ -429,12 +430,12 @@ export class EventRepository {
       return eventDate;
     }
 
-    const isTypeUserClientAdd = eventType === BackendEvent.USER.CLIENT_ADD;
+    const isTypeUserClientAdd = eventType === USER_EVENT.CLIENT_ADD;
     if (isTypeUserClientAdd) {
       return client.time;
     }
 
-    const isTypeUserConnection = eventType === BackendEvent.USER.CONNECTION;
+    const isTypeUserConnection = eventType === USER_EVENT.CONNECTION;
     if (isTypeUserConnection) {
       return connection.lastUpdate;
     }
@@ -548,7 +549,7 @@ export class EventRepository {
    * @note Don't add unable to decrypt to self conversation
    *
    * @param {Object} event Event payload to be injected
-   * @param {EventRepository.SOURCE} [source=EventRepository.SOURCE.INJECTED] Source of injection
+   * @param {string} [source=EventRepository.SOURCE.INJECTED] Source of injection
    * @returns {Promise<Event>} Resolves when the event has been processed
    */
   injectEvent(event, source = EventRepository.SOURCE.INJECTED) {
@@ -642,7 +643,7 @@ export class EventRepository {
    * @returns {Promise} Resolves with the saved record or `true` if the event was skipped
    */
   async processEvent(event, source) {
-    const isEncryptedEvent = event.type === BackendEvent.CONVERSATION.OTR_MESSAGE_ADD;
+    const isEncryptedEvent = event.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD;
     if (isEncryptedEvent) {
       event = await this.cryptographyRepository.handleEncryptedEvent(event);
     }

@@ -20,6 +20,7 @@
 import type {APIClient} from '@wireapp/api-client';
 import {ClientType} from '@wireapp/api-client/dist/client';
 import type {TypeUtil} from '@wireapp/commons';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {mockStoreFactory} from '../../util/test/mockStoreFactory';
 import {actionRoot} from './';
@@ -133,7 +134,7 @@ describe('AuthAction', () => {
   it('handles failed authentication', async () => {
     const email = 'test@example.com';
     const backendError = new Error() as any;
-    backendError.code = 403;
+    backendError.code = HTTP_STATUS.FORBIDDEN;
     backendError.label = 'invalid-credentials';
     backendError.message = 'Authentication failed.';
     const spies = {
@@ -169,7 +170,7 @@ describe('AuthAction', () => {
 
   it('handles failed logout', async () => {
     const backendError = new Error() as any;
-    backendError.code = 403;
+    backendError.code = HTTP_STATUS.FORBIDDEN;
     backendError.label = 'invalid-credentials';
     backendError.message = 'Missing token';
     const mockedCore = {
@@ -248,8 +249,11 @@ describe('AuthAction', () => {
   });
 
   it('handles failed request for phone login code (not found)', async () => {
-    const error = {response: {status: 404}};
-    const expectedNotFoundError = new BackendError({code: 404, label: BackendError.SSO_ERRORS.SSO_NOT_FOUND});
+    const error = {response: {status: HTTP_STATUS.NOT_FOUND}};
+    const expectedNotFoundError = new BackendError({
+      code: HTTP_STATUS.NOT_FOUND,
+      label: BackendError.SSO_ERRORS.SSO_NOT_FOUND,
+    });
     const ssoCode = 'wire-uuid';
     const mockedApiClient = {
       auth: {
@@ -270,8 +274,11 @@ describe('AuthAction', () => {
   });
 
   it('handles failed request for phone login code (server error)', async () => {
-    const error = {response: {status: 500}};
-    const expectedServerError = new BackendError({code: 500, label: BackendError.SSO_ERRORS.SSO_SERVER_ERROR});
+    const error = {response: {status: HTTP_STATUS.INTERNAL_SERVER_ERROR}};
+    const expectedServerError = new BackendError({
+      code: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      label: BackendError.SSO_ERRORS.SSO_SERVER_ERROR,
+    });
     const ssoCode = 'wire-uuid';
     const mockedApiClient = {
       auth: {
@@ -292,8 +299,11 @@ describe('AuthAction', () => {
   });
 
   it('handles failed request for phone login code (generic error)', async () => {
-    const error = {response: {status: 403}};
-    const expectedGenericError = new BackendError({code: 500, label: BackendError.SSO_ERRORS.SSO_GENERIC_ERROR});
+    const error = {response: {status: HTTP_STATUS.FORBIDDEN}};
+    const expectedGenericError = new BackendError({
+      code: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      label: BackendError.SSO_ERRORS.SSO_GENERIC_ERROR,
+    });
     const ssoCode = 'wire-uuid';
     const mockedApiClient = {
       auth: {

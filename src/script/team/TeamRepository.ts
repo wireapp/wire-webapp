@@ -22,6 +22,7 @@ import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import type {ConversationRolesList} from '@wireapp/api-client/dist/conversation/ConversationRole';
 import type {TeamData} from '@wireapp/api-client/dist/team/team/TeamData';
+import {Availability} from '@wireapp/protocol-messaging';
 import {TEAM_EVENT} from '@wireapp/api-client/dist/event/TeamEvent';
 import type {
   TeamConversationDeleteEvent,
@@ -46,7 +47,6 @@ import {roleFromTeamPermissions, ROLE} from '../user/UserPermission';
 
 import {IntegrationMapper} from '../integration/IntegrationMapper';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
-import {SuperProperty} from '../tracking/SuperProperty';
 import {User} from '../entity/User';
 import {TeamService} from './TeamService';
 import {ROLE as TEAM_ROLE} from '../user/UserPermission';
@@ -58,19 +58,20 @@ import {AssetRepository} from '../assets/AssetRepository';
 
 export interface AccountInfo {
   accentID: number;
+  availability?: Availability.Type;
   name: string;
-  picture?: string | ArrayBuffer;
+  picture?: string;
   teamID?: string;
   teamRole: TEAM_ROLE;
   userID: string;
 }
 
 export class TeamRepository {
-  private readonly isTeamDeleted: ko.Observable<boolean>;
+  public readonly isTeamDeleted: ko.Observable<boolean>;
   private readonly logger: Logger;
-  private readonly memberInviters: ko.Observable<any>;
+  public readonly memberInviters: ko.Observable<any>;
   private readonly memberRoles: ko.Observable<any>;
-  private readonly supportsLegalHold: ko.Observable<boolean>;
+  public readonly supportsLegalHold: ko.Observable<boolean>;
   private readonly teamMapper: TeamMapper;
   readonly teamMembers: ko.PureComputed<User[]>;
   public readonly teamName: ko.PureComputed<string>;
@@ -119,9 +120,6 @@ export class TeamRepository {
     this.supportsLegalHold = ko.observable(false);
 
     this.teamMembers.subscribe(() => this.userRepository.mapGuestStatus());
-    this.teamSize.subscribe(teamSize => {
-      amplify.publish(WebAppEvents.ANALYTICS.SUPER_PROPERTY, SuperProperty.TEAM.SIZE, teamSize);
-    });
 
     this.userRepository.isTeam = this.isTeam;
     this.userRepository.teamMembers = this.teamMembers;
@@ -277,10 +275,12 @@ export class TeamRepository {
         imageDataUrl = imageBlob ? await loadDataUrl(imageBlob) : undefined;
       }
 
-      const accountInfo = {
+      const accountInfo: AccountInfo = {
         accentID: this.selfUser().accent_id(),
+        // TODO: Deactivated until wrapper supports this
+        // availability: this.selfUser().availability(),
         name: this.teamName(),
-        picture: imageDataUrl,
+        picture: imageDataUrl?.toString(),
         teamID: this.team() ? this.team().id : undefined,
         teamRole: this.selfUser().teamRole(),
         userID: this.selfUser().id,

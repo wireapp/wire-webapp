@@ -138,7 +138,7 @@
     .participant-item {
       height: 40px;
       cursor: default;
-      fill: var(--background);
+      fill: var(--background-fade-48);
       pointer-events: none;
 
       &__image {
@@ -165,7 +165,7 @@
       }
 
       camera-icon svg {
-        width: 12px;
+        width: 16px;
       }
     }
   }
@@ -199,8 +199,6 @@ conversation-list-calling-cell {
   flex-shrink: 0;
   margin: 0 16px 16px;
   animation: show-call-ui @animation-timing-fast ease-in-out 0s 1;
-  background-color: var(--app-bg-secondary);
-  border-radius: 8px;
 
   &.dark-bg {
     color: var(--app-bg-secondary);
@@ -242,12 +240,26 @@ conversation-list-calling-cell {
   group-video-grid {
     height: 168px;
   }
+
+  .conversation-list-calling-cell__conference-banner {
+    .label-bold-xs;
+    margin: 16px 16px 0;
+    background-color: var(--accent-color);
+    border-radius: 8px;
+    line-height: @line-height-sm;
+    text-align: center;
+  }
 }
 
 conversation-list-calling-cell:first-of-type {
   &::before {
     top: -40px;
   }
+}
+
+.conversation-list-calling-cell-background {
+  background-color: var(--app-bg-secondary);
+  border-radius: 8px;
 }
 
 .conversation-list-calling-cell {

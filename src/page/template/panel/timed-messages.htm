@@ -1,4 +1,4 @@
-<div id="timed-messages" class="panel__page timed-messages" data-bind="with: $root.subViews[z.viewModel.PanelViewModel.STATE.TIMED_MESSAGES]">
+<div id="timed-messages" class="panel__page timed-messages" data-bind="with: $root.subViews[$root.STATE.TIMED_MESSAGES]">
   <!-- ko if: isVisible() -->
     <div class="panel__header">
       <arrow-left-icon class="icon-button" data-bind="clickOrDrag: onGoBack" data-uie-name="go-back-timed-messages-options"></arrow-left-icon>

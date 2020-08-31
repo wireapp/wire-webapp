@@ -17,15 +17,10 @@
  *
  */
 
-import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {Logger, getLogger} from 'Util/Logger';
-import {Environment} from 'Util/Environment';
 
 import {AppInitStatistics, AppStatistics} from './AppInitStatistics';
-import {AppInitTimings, AppTimings} from './AppInitTimings';
-import {EventName} from '../../tracking/EventName';
+import {AppInitTimings} from './AppInitTimings';
 import type {AppInitStatisticsValue} from './AppInitStatisticsValue';
 import type {AppInitTimingsStep} from './AppInitTimingsStep';
 
@@ -40,39 +35,31 @@ export class AppInitTelemetry {
     this.statistics = new AppInitStatistics();
   }
 
-  add_statistic(statistic: AppInitStatisticsValue, value: string | number, bucket_size: number): void {
+  addStatistic(statistic: AppInitStatisticsValue, value: string | number, bucket_size?: number): void {
     this.statistics.add(statistic, value, bucket_size);
   }
 
-  get_statistics(): AppStatistics {
+  getStatistics(): AppStatistics {
     return this.statistics.get();
   }
 
-  get_timings(): AppTimings {
-    return this.timings.get();
-  }
-
-  log_statistics(): void {
+  logStatistics(): void {
     this.statistics.log();
   }
 
-  log_timings(): void {
+  logTimings(): void {
     this.timings.log();
   }
 
   report(): void {
-    const statistics = this.get_statistics();
-
-    statistics.loading_time = this.timings.get_app_load();
-    statistics.app_version = Environment.version(false);
-    this.logger.info(`App version '${statistics.app_version}' initialized within ${statistics.loading_time}s`);
-    this.log_statistics();
-    this.log_timings();
-
-    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.TELEMETRY.APP_INITIALIZATION, statistics);
+    const segmentations = this.getStatistics();
+    segmentations.loading_time = this.timings.getAppLoad();
+    this.logger.info(`App version '${segmentations.app_version}' initialized within ${segmentations.loading_time}s`);
+    this.logStatistics();
+    this.logTimings();
   }
 
-  time_step(step: AppInitTimingsStep): void {
-    return this.timings.time_step(step);
+  timeStep(step: AppInitTimingsStep): void {
+    return this.timings.timeStep(step);
   }
 }

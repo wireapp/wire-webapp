@@ -17,6 +17,7 @@
  *
  */
 
+import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
 import {LinkPreview, Mention} from '@wireapp/protocol-messaging';
 
 import {getLogger} from 'Util/Logger';
@@ -44,7 +45,6 @@ import {LinkPreview as LinkPreviewEntity} from '../entity/message/LinkPreview';
 
 import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
 import {ClientEvent} from '../event/Client';
-import {BackendEvent} from '../event/Backend';
 import {AssetRemoteData} from '../assets/AssetRemoteData';
 
 import {SystemMessageType} from '../message/SystemMessageType';
@@ -56,6 +56,7 @@ import {MentionEntity} from '../message/MentionEntity';
 import {LegalHoldMessage} from '../entity/message/LegalHoldMessage';
 import {CompositeMessage} from '../entity/message/CompositeMessage';
 import {ConversationError} from '../error/ConversationError';
+import {FileTypeRestrictedMessage} from '../entity/message/FileTypeRestrictedMessage';
 
 // Event Mapper to convert all server side JSON events into core entities.
 export class EventMapper {
@@ -98,24 +99,22 @@ export class EventMapper {
    * @returns {Promise} Resolves with the mapped message entity
    */
   mapJsonEvent(event, conversationEntity) {
-    return Promise.resolve()
-      .then(() => this._mapJsonEvent(event, conversationEntity))
-      .catch(error => {
-        const isMessageNotFound = error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
-        if (isMessageNotFound) {
-          throw error;
-        }
-        const errorMessage = `Failure while mapping events. Affected '${event.type}' event: ${error.message}`;
-        this.logger.error(errorMessage, {error, event});
+    return this._mapJsonEvent(event, conversationEntity).catch(error => {
+      const isMessageNotFound = error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
+      if (isMessageNotFound) {
+        throw error;
+      }
+      const errorMessage = `Failure while mapping events. Affected '${event.type}' event: ${error.message}`;
+      this.logger.error(errorMessage, {error, event});
 
-        const customData = {eventTime: new Date(event.time).toISOString(), eventType: event.type};
-        Raygun.send(new Error(errorMessage), customData);
+      const customData = {eventTime: new Date(event.time).toISOString(), eventType: event.type};
+      Raygun.send(new Error(errorMessage), customData);
 
-        throw new ConversationError(
-          ConversationError.TYPE.MESSAGE_NOT_FOUND,
-          ConversationError.MESSAGE.MESSAGE_NOT_FOUND,
-        );
-      });
+      throw new ConversationError(
+        ConversationError.TYPE.MESSAGE_NOT_FOUND,
+        ConversationError.MESSAGE.MESSAGE_NOT_FOUND,
+      );
+    });
   }
 
   /**
@@ -194,27 +193,27 @@ export class EventMapper {
     let messageEntity;
 
     switch (event.type) {
-      case BackendEvent.CONVERSATION.MEMBER_JOIN: {
+      case CONVERSATION_EVENT.MEMBER_JOIN: {
         messageEntity = this._mapEventMemberJoin(event, conversationEntity);
         break;
       }
 
-      case BackendEvent.CONVERSATION.MEMBER_LEAVE: {
+      case CONVERSATION_EVENT.MEMBER_LEAVE: {
         messageEntity = this._mapEventMemberLeave(event);
         break;
       }
 
-      case BackendEvent.CONVERSATION.RECEIPT_MODE_UPDATE: {
+      case CONVERSATION_EVENT.RECEIPT_MODE_UPDATE: {
         messageEntity = this._mapEventReceiptModeUpdate(event);
         break;
       }
 
-      case BackendEvent.CONVERSATION.MESSAGE_TIMER_UPDATE: {
+      case CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE: {
         messageEntity = this._mapEventMessageTimerUpdate(event);
         break;
       }
 
-      case BackendEvent.CONVERSATION.RENAME: {
+      case CONVERSATION_EVENT.RENAME: {
         messageEntity = this._mapEventRename(event);
         break;
       }
@@ -294,6 +293,11 @@ export class EventMapper {
 
       case ClientEvent.CONVERSATION.VOICE_CHANNEL_DEACTIVATE: {
         messageEntity = this._mapEventVoiceChannelDeactivate(event);
+        break;
+      }
+
+      case ClientEvent.CONVERSATION.FILE_TYPE_RESTRICTED: {
+        messageEntity = this._mapFileTypeRestricted(event);
         break;
       }
 
@@ -863,6 +867,14 @@ export class EventMapper {
     }
 
     return assetEntity;
+  }
+
+  _mapFileTypeRestricted(event) {
+    const {
+      data: {isIncoming, name, fileExt},
+      time,
+    } = event;
+    return new FileTypeRestrictedMessage(isIncoming, name, fileExt, time);
   }
 }
 

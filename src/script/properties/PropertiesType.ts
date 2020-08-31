@@ -17,15 +17,12 @@
  *
  */
 
-enum CONTACT_IMPORT {
-  MACOS = 'contact_import.macos',
-}
-
 enum EMOJI {
   REPLACE_INLINE = 'settings.emoji.replace_inline',
 }
 
 enum CALL {
+  ENABLE_SFT_CALLING = 'settings.call.enable_sft_calling',
   ENABLE_VBR_ENCODING = 'settings.call.enable_vbr_encoding',
 }
 
@@ -46,13 +43,10 @@ enum PROPERTIES {
   VERSION = 'version',
 }
 
-const PROPERTIES_TYPE = {
+export const PROPERTIES_TYPE = {
   ...PROPERTIES,
   CALL,
-  CONTACT_IMPORT,
   EMOJI,
   INTERFACE,
   PREVIEWS,
 };
-
-export {PROPERTIES_TYPE};

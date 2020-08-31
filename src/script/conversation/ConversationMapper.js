@@ -19,12 +19,10 @@
 
 import {isObject} from 'underscore';
 import ko from 'knockout';
+import {CONVERSATION_ACCESS_ROLE, CONVERSATION_ACCESS, CONVERSATION_TYPE} from '@wireapp/api-client/dist/conversation';
 
-import {ACCESS_MODE} from './AccessMode';
-import {ACCESS_ROLE} from './AccessRole';
 import {ACCESS_STATE} from './AccessState';
 import {NOTIFICATION_STATE} from './NotificationSetting';
-import {ConversationType} from './ConversationType';
 import {ConversationStatus} from './ConversationStatus';
 import {Conversation} from '../entity/Conversation';
 import {BaseError} from '../error/BaseError';
@@ -83,6 +81,7 @@ import {ConversationError} from '../error/ConversationError';
  * @property {boolean=} otr_muted
  * @property {string=} otr_muted_ref
  * @property {boolean=} muted_state
+ * @property {number=} receipt_mode
  * @property {number=} status
  * @property {number=} verification_state
  */
@@ -98,7 +97,7 @@ export class ConversationMapper {
   /**
    * Converts JSON conversations into conversation entities.
    *
-   * @param {Array} conversationsData Conversation data
+   * @param {Array<BackendConversation>} conversationsData Conversation data
    * @param {number} [timestamp=1] Initial timestamp for conversation
    * @returns {Array<Conversation>} Mapped conversation entities
    */
@@ -378,7 +377,7 @@ export class ConversationMapper {
 
       const mergedConversation = {...localConversationData, ...updates};
 
-      const isGroup = type === ConversationType.GROUP;
+      const isGroup = type === CONVERSATION_TYPE.REGULAR;
       const noOthers = !mergedConversation.others || !mergedConversation.others.length;
       if (isGroup || noOthers) {
         mergedConversation.others = othersStates
@@ -441,9 +440,9 @@ export class ConversationMapper {
         return conversationEntity.accessState(ACCESS_STATE.TEAM.ONE2ONE);
       }
 
-      const isTeamRole = accessRole === ACCESS_ROLE.TEAM;
+      const isTeamRole = accessRole === CONVERSATION_ACCESS_ROLE.TEAM;
 
-      const includesInviteMode = accessModes.includes(ACCESS_MODE.INVITE);
+      const includesInviteMode = accessModes.includes(CONVERSATION_ACCESS.INVITE);
       const isInviteModeOnly = includesInviteMode && accessModes.length === 1;
 
       const isTeamOnlyMode = isTeamRole && isInviteModeOnly;
@@ -451,9 +450,9 @@ export class ConversationMapper {
         return conversationEntity.accessState(ACCESS_STATE.TEAM.TEAM_ONLY);
       }
 
-      const isNonVerifiedRole = accessRole === ACCESS_ROLE.NON_ACTIVATED;
+      const isNonVerifiedRole = accessRole === CONVERSATION_ACCESS_ROLE.NON_ACTIVATED;
 
-      const includesCodeMode = accessModes.includes(ACCESS_MODE.CODE);
+      const includesCodeMode = accessModes.includes(CONVERSATION_ACCESS.CODE);
       const isExpectedModes = includesCodeMode && includesInviteMode && accessModes.length === 2;
 
       const isGuestRoomMode = isNonVerifiedRole && isExpectedModes;

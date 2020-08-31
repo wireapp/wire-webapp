@@ -32,6 +32,12 @@ import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 import {TestFactory} from '../../helper/TestFactory';
 import {createRandomUuid} from 'Util/util';
 
+const createSelfParticipant = () => {
+  const selfUser = new User();
+  selfUser.isMe = true;
+  return new Participant(selfUser);
+};
+
 describe('CallingRepository', () => {
   const testFactory = new TestFactory();
   let callingRepository;
@@ -117,13 +123,13 @@ describe('CallingRepository', () => {
   });
 
   describe('getCallMediaStream', () => {
-    it('return cached mediastream for self user if set', () => {
-      const call = new Call();
+    it('returns cached mediastream for self user if set', () => {
+      const selfParticipant = createSelfParticipant();
+      const call = new Call('', '', undefined, selfParticipant);
       const audioTrack = silence();
       const selfMediaStream = new MediaStream([audioTrack]);
-      call.selfParticipant = new Participant();
-      call.selfParticipant.audioStream(selfMediaStream);
-      spyOn(call.selfParticipant, 'getMediaStream').and.callThrough();
+      selfParticipant.audioStream(selfMediaStream);
+      spyOn(selfParticipant, 'getMediaStream').and.callThrough();
       spyOn(callingRepository, 'findCall').and.returnValue(call);
 
       const queries = [1, 2, 3, 4].map(() => {
@@ -132,15 +138,15 @@ describe('CallingRepository', () => {
         });
       });
       return Promise.all(queries).then(() => {
-        expect(call.selfParticipant.getMediaStream).toHaveBeenCalledTimes(queries.length);
+        expect(selfParticipant.getMediaStream).toHaveBeenCalledTimes(queries.length);
       });
     });
 
     it('ask only once for mediastream when queried multiple times', () => {
-      const call = new Call();
+      const selfParticipant = createSelfParticipant();
+      const call = new Call('', '', undefined, selfParticipant);
       const audioTrack = silence();
       const selfMediaStream = new MediaStream([audioTrack]);
-      call.selfParticipant = new Participant();
       spyOn(callingRepository.mediaStreamHandler, 'requestMediaStream').and.returnValue(
         Promise.resolve(selfMediaStream),
       );
@@ -159,7 +165,7 @@ describe('CallingRepository', () => {
 
   describe('stopMediaSource', () => {
     it('release media streams', () => {
-      const selfParticipant = new Participant();
+      const selfParticipant = createSelfParticipant();
       spyOn(selfParticipant, 'releaseAudioStream');
       spyOn(selfParticipant, 'releaseVideoStream');
       const call = new Call('', '', 0, selfParticipant, 0);
@@ -173,27 +179,6 @@ describe('CallingRepository', () => {
 
       expect(selfParticipant.releaseAudioStream).toHaveBeenCalledTimes(1);
       expect(selfParticipant.releaseVideoStream).toHaveBeenCalledTimes(1);
-    });
-  });
-
-  describe('changeMediaSource', () => {
-    it('changes active call sent media streams', () => {
-      spyOn(callingRepository.wCall, 'replaceTrack');
-      const selfParticipant = new Participant();
-      spyOn(selfParticipant, 'releaseStream');
-      spyOn(selfParticipant, 'sharesCamera').and.returnValue(true);
-      const call = new Call('', '', 0, selfParticipant, 0);
-      const newMediaStream = new MediaStream();
-
-      callingRepository.changeMediaSource(newMediaStream, MediaType.AUDIO, call);
-
-      expect(selfParticipant.releaseStream).toHaveBeenCalledTimes(1);
-      expect(callingRepository.wCall.replaceTrack).toHaveBeenCalledTimes(1);
-
-      callingRepository.changeMediaSource(newMediaStream, MediaType.VIDEO, call);
-
-      expect(selfParticipant.releaseStream).toHaveBeenCalledTimes(2);
-      expect(callingRepository.wCall.replaceTrack).toHaveBeenCalledTimes(2);
     });
   });
 
@@ -235,7 +220,7 @@ describe('CallingRepository', () => {
   });
 });
 
-describe('e2e audio call', () => {
+xdescribe('e2e audio call', () => {
   const conversationRepository = {
     find_conversation_by_id: () => new Conversation(),
     grantMessage: () => Promise.resolve(true),

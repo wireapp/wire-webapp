@@ -289,13 +289,12 @@ export class TestFactory {
       this.connection_repository,
       this.cryptography_repository,
       this.event_repository,
-      undefined,
       new LinkPreviewRepository(assetRepository, propertiesRepository),
-      new MessageSender(),
-      serverTimeHandler,
       this.team_repository,
       this.user_repository,
       this.propertyRepository,
+      new MessageSender(),
+      serverTimeHandler,
     );
 
     return this.conversation_repository;
@@ -309,6 +308,7 @@ export class TestFactory {
     this.calling_repository = new CallingRepository(
       container.resolve(APIClientSingleton).getClient(),
       this.conversation_repository,
+      this.user_repository,
       this.event_repository,
       new MediaRepository(new PermissionRepository()).streamHandler,
       serverTimeHandler,

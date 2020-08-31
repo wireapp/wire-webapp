@@ -45,7 +45,7 @@ import type {
 
 import {Logger, getLogger} from 'Util/Logger';
 
-import type {Conversation as ConversationEntity} from '../entity/Conversation';
+import type {Conversation as ConversationEntity, SerializedConversation} from '../entity/Conversation';
 import type {EventService} from '../event/EventService';
 import {MessageCategory} from '../message/MessageCategory';
 import {search as fullTextSearch} from '../search/FullTextSearch';
@@ -301,20 +301,21 @@ export class ConversationService {
    *
    * @param conversationId ID of conversation to send message in
    * @param payload Payload to be posted
-   * @param payload.recipients Map with per-recipient data
-   * @param payload.sender Client ID of the sender
-   * @param precondition_option Level that backend checks for missing clients
    * @returns Promise that resolves when the message was sent
    */
   post_encrypted_message(
     conversationId: string,
     payload: NewOTRMessage,
-    precondition_option: true | string[],
+    preconditionOption?: boolean | string[],
   ): Promise<ClientMismatch> {
-    return this.apiClient.conversation.api.postOTRMessage(payload.sender, conversationId, payload, {
-      ignore_missing: precondition_option === true ? true : undefined,
-      report_missing: Array.isArray(precondition_option) ? precondition_option.join(',') : undefined,
-    });
+    const reportMissing = Array.isArray(preconditionOption) ? preconditionOption : undefined;
+    const ignoreMissing = preconditionOption === true ? true : undefined;
+
+    if (reportMissing) {
+      payload.report_missing = reportMissing;
+    }
+
+    return this.apiClient.conversation.api.postOTRMessage(payload.sender, conversationId, payload, ignoreMissing);
   }
 
   /**
@@ -394,9 +395,11 @@ export class ConversationService {
    * @param conversations Conversation entity
    * @returns Resolves with a list of conversation records
    */
-  async save_conversations_in_db(conversations: ConversationEntity[]): Promise<ConversationEntity[]> {
+  async save_conversations_in_db(
+    conversations: ConversationEntity[] | SerializedConversation[],
+  ): Promise<ConversationEntity[] | SerializedConversation[]> {
     if (this.storageService.db) {
-      const keys = conversations.map(conversation => conversation.id);
+      const keys = (conversations as ConversationEntity[]).map(conversation => conversation.id);
       await this.storageService.db.table(StorageSchemata.OBJECT_STORE.CONVERSATIONS).bulkPut(conversations, keys);
     } else {
       for (const conversation of conversations) {

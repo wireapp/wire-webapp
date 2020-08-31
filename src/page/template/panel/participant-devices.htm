@@ -1,4 +1,4 @@
-<div id="participant-devices" class="panel__page participant-devices" data-bind="with: $root.subViews[z.viewModel.PanelViewModel.STATE.PARTICIPANT_DEVICES]">
+<div id="participant-devices" class="panel__page participant-devices" data-bind="with: $root.subViews[$root.STATE.PARTICIPANT_DEVICES]">
   <!-- ko if: isVisible() -->
     <div class="panel__header">
       <arrow-left-icon class="icon-button" data-bind="clickOrDrag: clickOnBack" data-uie-name="go-back-participant-devices"></arrow-left-icon>

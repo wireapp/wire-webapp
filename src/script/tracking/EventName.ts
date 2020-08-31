@@ -21,6 +21,14 @@
  * Definition of events used for user analytics (defined by Business Intelligence Team)
  */
 export const EventName = {
+  CALLING: {
+    ENDED_CALL: 'calling.ended_call',
+    ESTABLISHED_CALL: 'calling.established_call',
+    INITIATED_CALL: 'calling.initiated_call',
+    JOINED_CALL: 'calling.joined_call',
+    RECIEVED_CALL: 'calling.received_call',
+    SCREEN_SHARE: 'calling.screen_share',
+  },
   CONTRIBUTED: 'contributed',
   CONVERSATION: {
     ADD_PARTICIPANTS: 'conversation.add_participants',
@@ -53,8 +61,5 @@ export const EventName = {
     OPENED_MANAGE_TEAM: 'settings.opened_manage_team',
     OPTED_IN_TRACKING: 'settings.opted_in_tracking',
     OPTED_OUT_TRACKING: 'settings.opted_out_tracking',
-  },
-  TELEMETRY: {
-    APP_INITIALIZATION: 'telemetry.app_initialization',
   },
 };

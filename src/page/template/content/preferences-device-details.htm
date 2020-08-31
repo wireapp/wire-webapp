@@ -30,13 +30,13 @@
     <section class="preferences-section">
       <div class="preferences-info" data-bind="text: t('preferencesDevicesSessionDetail')"></div>
       <div class="preferences-devices-session" data-uie-name="preferences-device-details-session">
-        <!-- ko if: sessionResetState() === z.viewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET -->
+        <!-- ko if: sessionResetState() === SessionResetState.RESET -->
           <button class="preferences-button button button-small button-fluid" data-bind="click: clickOnResetSession, text: t('preferencesDevicesSessionReset')" data-uie-name="do-session-reset"></button>
         <!-- /ko -->
-        <!-- ko if: sessionResetState() === z.viewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.ONGOING -->
+        <!-- ko if: sessionResetState() === SessionResetState.ONGOING -->
           <div class="preferences-devices-session-reset" data-bind="text: t('preferencesDevicesSessionOngoing')"></div>
         <!-- /ko -->
-        <!-- ko if: sessionResetState() === z.viewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.CONFIRMATION -->
+        <!-- ko if: sessionResetState() === SessionResetState.CONFIRMATION -->
           <div class="preferences-devices-session-confirmation accent-text" data-bind="text: t('preferencesDevicesSessionConfirmation')"></div>
         <!-- /ko -->
       </div>

@@ -18,66 +18,41 @@
  */
 
 import ko from 'knockout';
+import {CONV_TYPE} from '@wireapp/avs';
 
-import {getDifference} from 'Util/ArrayUtil';
-import type {Participant, UserId} from '../calling/Participant';
+import {sortUsersByPriority} from 'Util/StringUtil';
 
-let baseGrid: string[] = ['', '', '', ''];
+import type {Participant} from '../calling/Participant';
+import {Call} from './Call';
 
 export interface Grid {
-  grid: (Participant | null)[];
+  grid: Participant[];
   hasRemoteVideo: boolean;
   thumbnail: Participant | null;
 }
 
-/**
- * Will compute the next grid layout according to the previous state and the new array of streams
- * The grid will fill according to this pattern
- * - 1 stream : [id, '', '', '']
- * - 2 streams: [id, '', id, '']
- * - 3 streams: [id, '', id, id]
- * - 3 streams: [id, id, '', id]
- * - 4 streams: [id, id, id, id]
- */
-function computeGrid(previousGrid: string[], participants: Participant[]): string[] {
-  const previousStreamIds = previousGrid.filter(streamId => streamId !== '');
-  const currentStreamIds = participants.map(participant => participant.userId);
-
-  const addedStreamIds = getDifference(previousStreamIds, currentStreamIds);
-
-  const filteredGrid = previousGrid.map(id => (currentStreamIds.includes(id) ? id : ''));
-
-  const streamIds = filteredGrid.filter(streamId => streamId !== '');
-  // Add the new streams at the end
-  const newStreamsIds = streamIds.concat(addedStreamIds);
-  return newStreamsIds.length === 2
-    ? [newStreamsIds[0], '', newStreamsIds[1], '']
-    : [newStreamsIds[0] || '', newStreamsIds[3] || '', newStreamsIds[1] || '', newStreamsIds[2] || ''];
-}
-
-export function getGrid(
-  participants: ko.Observable<Participant[]>,
-  selfParticipant: Participant,
-): ko.PureComputed<Grid> {
+export function getGrid(call: Call): ko.PureComputed<Grid> {
+  const showThumbnail = call.conversationType === CONV_TYPE.ONEONONE;
   return ko.pureComputed(() => {
     let inGridParticipants: Participant[];
     let thumbnailParticipant: Participant | null;
-    const remoteVideoParticipants = participants().filter(participant => participant.hasActiveVideo());
-    if (remoteVideoParticipants.length === 1) {
+    const selfParticipant = call.getSelfParticipant();
+    const remoteVideoParticipants = call
+      .getRemoteParticipants()
+      .filter(participant => participant.hasActiveVideo())
+      .sort((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user));
+    if (showThumbnail && remoteVideoParticipants.length === 1) {
       inGridParticipants = remoteVideoParticipants;
-      thumbnailParticipant = selfParticipant.hasActiveVideo() ? selfParticipant : null;
+      thumbnailParticipant = selfParticipant?.hasActiveVideo() ? selfParticipant : null;
     } else {
-      inGridParticipants = selfParticipant.hasActiveVideo()
-        ? remoteVideoParticipants.concat(selfParticipant)
+      inGridParticipants = selfParticipant?.hasActiveVideo()
+        ? [selfParticipant, ...remoteVideoParticipants]
         : remoteVideoParticipants;
       thumbnailParticipant = null;
     }
-    baseGrid = computeGrid(baseGrid, inGridParticipants);
 
     return {
-      grid: baseGrid.map((userId: UserId) => {
-        return inGridParticipants.find(participant => participant.userId === userId) || null;
-      }),
+      grid: inGridParticipants,
       hasRemoteVideo: remoteVideoParticipants.length > 0,
       thumbnail: thumbnailParticipant,
     };

@@ -17,9 +17,10 @@
  *
  */
 
+import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
+
 import {Conversation} from 'src/script/entity/Conversation';
 import {ClientEvent} from 'src/script/event/Client';
-import {BackendEvent} from 'src/script/event/Backend';
 import {ServiceMiddleware} from 'src/script/event/preprocessor/ServiceMiddleware';
 import {TestFactory} from '../../../helper/TestFactory';
 
@@ -40,7 +41,7 @@ describe('ServiceMiddleware', () => {
           data: {
             user_ids: ['not-a-service', 'a-service'],
           },
-          type: BackendEvent.CONVERSATION.MEMBER_JOIN,
+          type: CONVERSATION_EVENT.MEMBER_JOIN,
         };
 
         const userEntities = [{}, {isService: true}];
@@ -56,7 +57,7 @@ describe('ServiceMiddleware', () => {
           data: {
             user_ids: ['self-id'],
           },
-          type: BackendEvent.CONVERSATION.MEMBER_JOIN,
+          type: CONVERSATION_EVENT.MEMBER_JOIN,
         };
 
         spyOn(testFactory.user_repository, 'self').and.returnValue({id: 'self-id'});
@@ -77,7 +78,7 @@ describe('ServiceMiddleware', () => {
           data: {
             user_ids: ['not-a-service', 'another-not-a-service'],
           },
-          type: BackendEvent.CONVERSATION.MEMBER_JOIN,
+          type: CONVERSATION_EVENT.MEMBER_JOIN,
         };
 
         spyOn(testFactory.user_repository, 'getUsersById').and.returnValue(Promise.resolve([{}, {}]));
