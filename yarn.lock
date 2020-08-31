@@ -2068,20 +2068,6 @@
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-4.6.12.tgz#558630e45aa137c1085f487127dbc0a0b8eea85a"
   integrity sha512-XYlPV8FoiWH57j+RztOe8BgPkvJKoggW17GfxsatDI5Hx5HVIsGONd/AARVjHbznGLtl0Dtsal4iy6eeJKiB+g==
 
-"@wireapp/commons@3.7.1":
-  version "3.7.1"
-  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-3.7.1.tgz#1158ffda706a8d30b0f3420ce608816c58c63d1b"
-  integrity sha512-l1apgc0fuS9iVQ4V7am1io43W2+kGkVT2du7bpu/5XypMsGviccwGX0u+3QJSK6WXvyxDTFg4gqI2290jU5R9w==
-  dependencies:
-    "@types/fs-extra" "8.1.0"
-    "@types/node" "~12"
-    "@types/platform" "1.3.2"
-    ansi-regex "5.0.0"
-    fs-extra "9.0.1"
-    logdown "3.3.1"
-    platform "1.3.6"
-    url-search-params-polyfill "8.1.0"
-
 "@wireapp/commons@3.7.2":
   version "3.7.2"
   resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-3.7.2.tgz#c34aaca916eb8b1817c8502885bda9164b9a5da8"
@@ -3055,11 +3041,6 @@ base@^0.11.1:
     isobject "^3.0.1"
     mixin-deep "^1.2.0"
     pascalcase "^0.1.1"
-
-bazinga64@5.7.11:
-  version "5.7.11"
-  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.7.11.tgz#94d129e98fcd2d31531cc03a9fb9a731a598aec2"
-  integrity sha512-u4DKSLiKHFVQRMFo701k+Y+BabKyNROHU3fLdNchTXdrsqmbVsiD18oSnZJdOQU9sy+dzmWvVdmg3wL2iS8cGw==
 
 bazinga64@5.7.11:
   version "5.7.11"
