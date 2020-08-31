@@ -431,7 +431,7 @@ export class EventService {
 
       if (this.storageService.db) {
         // Create a DB transaction to avoid concurrent sequential update.
-        // TODO: the second parameter of the transaction seems wrong, exie actually wants something of type `Dexie.Table` here
+        // TODO: the second parameter of the transaction seems wrong, Dexie actually wants something of type `Dexie.Table` here
         return this.storageService.db.transaction('rw', StorageSchemata.OBJECT_STORE.EVENTS as any, () => {
           return this.storageService.load(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey).then(record => {
             if (!record) {
