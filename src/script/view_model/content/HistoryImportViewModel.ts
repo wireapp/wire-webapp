@@ -126,8 +126,8 @@ export class HistoryImportViewModel {
       if (files.error) {
         throw new ImportError((files.error as unknown) as string);
       }
-      const unzipTimeSeconds = Math.round(unzipTimeEnd - unzipTimeStart);
-      const unzipTimeFormatted = formatDuration(unzipTimeSeconds);
+      const unzipTimeMillis = Math.round(unzipTimeEnd - unzipTimeStart);
+      const unzipTimeFormatted = formatDuration(unzipTimeMillis);
 
       this.logger.log(`Unzipped files for history import (took ${unzipTimeFormatted.text}).`, files);
       await this.backupRepository.importHistory(files, this.onInit, this.onProgress);
