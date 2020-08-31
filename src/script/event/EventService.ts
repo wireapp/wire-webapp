@@ -422,7 +422,7 @@ export class EventService {
    * @param primaryKey Event primary key
    * @param changes Changes to update message with
    */
-  async updateEventSequentially(primaryKey: string, changes = {}): Promise<number> {
+  async updateEventSequentially(primaryKey: string, changes: Object = {}): Promise<number> {
     return Promise.resolve().then(() => {
       const hasVersionedChanges = !!changes.version;
       if (!hasVersionedChanges) {
