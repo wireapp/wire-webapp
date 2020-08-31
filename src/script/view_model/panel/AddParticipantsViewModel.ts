@@ -177,7 +177,6 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
   clickOpenManageServices(): void {
     if (this.manageServicesUrl) {
       safeWindowOpen(this.manageServicesUrl);
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.SETTINGS.OPENED_MANAGE_TEAM);
     }
   }
 
@@ -201,30 +200,5 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
     const userEntities = this.selectedContacts().slice();
 
     await this.conversationRepository.addMembers(activeConversation, userEntities);
-    let segmentations: {
-      guest_num?: number;
-      is_allow_guests?: boolean;
-      method: string;
-      temporary_guest_num?: number;
-      user_num: number;
-    } = {
-      method: 'add',
-      user_num: userEntities.length,
-    };
-
-    const isTeamConversation = !!this.activeConversation().team_id;
-    if (isTeamConversation) {
-      const participants = trackingHelpers.getParticipantTypes(userEntities, false);
-
-      segmentations = {
-        ...segmentations,
-        guest_num: participants.guests,
-        is_allow_guests: activeConversation.isGuestRoom(),
-        temporary_guest_num: participants.temporaryGuests,
-        user_num: participants.users,
-      };
-    }
-
-    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CONVERSATION.ADD_PARTICIPANTS, segmentations);
   }
 }

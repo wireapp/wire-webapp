@@ -78,9 +78,6 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
               if (changeToTeamOnly) {
                 conversationEntity.accessCode(undefined);
               }
-
-              const attribute = {is_allow_guests: changeToGuestRoom};
-              amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.GUEST_ROOMS.ALLOW_GUESTS, attribute);
             })
             .catch(() => {
               const messageString = changeToGuestRoom
@@ -116,7 +113,6 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
         const accessCode = response && response.data;
         if (accessCode) {
           this.conversationMapper.mapAccessCode(conversationEntity, accessCode);
-          amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.GUEST_ROOMS.LINK_CREATED);
         }
       })
       .catch(() => this._showModal(t('modalConversationGuestOptionsRequestCodeMessage')));
@@ -127,7 +123,6 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
       .deleteConversationCode(conversationEntity.id)
       .then(() => {
         conversationEntity.accessCode(undefined);
-        amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.GUEST_ROOMS.LINK_REVOKED);
       })
       .catch(() => this._showModal(t('modalConversationGuestOptionsRevokeCodeMessage')));
   }

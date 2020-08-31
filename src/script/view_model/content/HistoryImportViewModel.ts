@@ -144,7 +144,6 @@ export class HistoryImportViewModel {
   onSuccess = (): void => {
     this.error(null);
     this.state(HistoryImportViewModel.STATE.DONE);
-    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.HISTORY.RESTORE_SUCCEEDED);
     window.setTimeout(this.dismissImport, MotionDuration.X_LONG * 2);
   };
 
@@ -163,6 +162,5 @@ export class HistoryImportViewModel {
     }
     this.error(error);
     this.logger.error(`Failed to import history: ${error.message}`, error);
-    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.HISTORY.RESTORE_FAILED);
   };
 }

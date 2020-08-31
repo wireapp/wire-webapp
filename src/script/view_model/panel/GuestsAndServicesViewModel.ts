@@ -80,7 +80,6 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
     if (!this.isLinkCopied() && this.activeConversation()) {
       await copyText(this.activeConversation().accessCode());
       this.isLinkCopied(true);
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.GUEST_ROOMS.LINK_COPIED);
       window.setTimeout(() => this.isLinkCopied(false), GuestsAndServicesViewModel.CONFIG.CONFIRM_DURATION);
     }
   };

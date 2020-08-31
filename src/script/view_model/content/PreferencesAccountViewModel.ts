@@ -415,7 +415,6 @@ export class PreferencesAccountViewModel {
   clickOpenManageTeam = (): void => {
     if (this.manageTeamUrl) {
       safeWindowOpen(this.manageTeamUrl);
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.SETTINGS.OPENED_MANAGE_TEAM);
     }
   };
 

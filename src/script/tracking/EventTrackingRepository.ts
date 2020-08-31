@@ -93,15 +93,11 @@ export class EventTrackingRepository {
     this.startErrorReporting();
     if (this.isDomainAllowedForAnalytics()) {
       await this.startProductReporting();
-      if (isOptIn) {
-        this.trackProductReportingEvent(EventName.SETTINGS.OPTED_IN_TRACKING);
-      }
     }
   }
 
   private disableServices(): void {
     this.stopErrorReporting();
-    this.trackProductReportingEvent(EventName.SETTINGS.OPTED_OUT_TRACKING);
     this.stopProductReporting();
   }
 

@@ -137,7 +137,6 @@ export class HistoryExportViewModel {
 
     this.dismissExport();
     downloadBlob(this.archiveBlob(), filename, 'application/octet-stream');
-    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.HISTORY.BACKUP_SUCCEEDED);
   };
 
   onCancel = (): void => {
@@ -156,7 +155,6 @@ export class HistoryExportViewModel {
     }
     this.hasError(true);
     this.logger.error(`Failed to export history: ${error.message}`, error);
-    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.HISTORY.BACKUP_FAILED);
   };
 
   onSuccess = (archiveBlob: Blob): void => {

@@ -115,20 +115,7 @@ export class IntegrationRepository {
     const {id: serviceId, name, providerId} = serviceEntity;
     this.logger.info(`Adding service '${name}' to conversation '${conversationEntity.id}'`, serviceEntity);
 
-    return this.conversationRepository.addService(conversationEntity, providerId, serviceId).then(event => {
-      if (event) {
-        const segmentations = {
-          conversation_size: conversationEntity.getNumberOfParticipants(true, false),
-          method: method,
-          service_id: serviceId,
-          services_size: conversationEntity.getNumberOfServices(),
-        };
-
-        amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.INTEGRATION.ADDED_SERVICE, segmentations);
-      }
-
-      return event;
-    });
+    return this.conversationRepository.addService(conversationEntity, providerId, serviceId);
   }
 
   /**
@@ -240,15 +227,9 @@ export class IntegrationRepository {
    * @param userEntity Service user to be removed from the conversation
    */
   removeService(conversationEntity: Conversation, userEntity: User): Promise<any> {
-    const {id: userId, serviceId} = userEntity;
+    const {id: userId} = userEntity;
 
-    return this.conversationRepository.removeService(conversationEntity, userId).then(event => {
-      if (event) {
-        const segmentations = {service_id: serviceId};
-        amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.INTEGRATION.REMOVED_SERVICE, segmentations);
-        return event;
-      }
-    });
+    return this.conversationRepository.removeService(conversationEntity, userId);
   }
 
   searchForServices(query: string, queryObservable: Observable<string>): Promise<void> {

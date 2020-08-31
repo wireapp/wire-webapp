@@ -382,7 +382,6 @@ export class UserRepository {
       const oldAvailabilityValue = valueFromType(this.self().availability());
       this.logger.log(`Availability was changed from '${oldAvailabilityValue}' to '${newAvailabilityValue}'`);
       this.self().availability(availability);
-      this._trackAvailability(availability, method);
       amplify.publish(WebAppEvents.TEAM.UPDATE_INFO);
       showAvailabilityModal(availability);
     } else {
@@ -436,18 +435,6 @@ export class UserRepository {
       last_prekey,
     );
     amplify.publish(SHOW_REQUEST_MODAL, fingerprint);
-  }
-
-  /**
-   * Track availability action.
-   *
-   * @param method Method used for availability change
-   */
-  _trackAvailability(availability: Availability.Type, method: string): void {
-    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.SETTINGS.CHANGED_STATUS, {
-      method,
-      status: valueFromType(availability),
-    });
   }
 
   /**
