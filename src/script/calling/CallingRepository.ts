@@ -921,7 +921,7 @@ export class CallingRepository {
     const guests = conversationEntity.participating_user_ets().filter(user => user.isGuest()).length;
     const wirelessGuests = conversationEntity.participating_user_ets().filter(user => user.isTemporaryGuest()).length;
     const segmentations = {
-      [Segmentation.CALL.AV_SWITCH_TOGGLE]: '',
+      [Segmentation.CALL.AV_SWITCH_TOGGLE]: call.analyticsAvSwitchToggle,
       [Segmentation.CALL.DIRECTION]: call.state(),
       [Segmentation.CALL.DURATION]: '',
       [Segmentation.CALL.END_REASON]: reason,
@@ -1176,20 +1176,24 @@ export class CallingRepository {
     state: number,
   ) => {
     const call = this.findCall(conversationId);
-    if (call) {
-      const selfParticipant = call.getSelfParticipant();
-      if (
-        call.state() === CALL_STATE.MEDIA_ESTAB &&
-        selfParticipant.doesMatchIds(userId, clientId) &&
-        !selfParticipant.sharesScreen()
-      ) {
-        selfParticipant.releaseVideoStream();
-      }
-      call
-        .participants()
-        .filter(participant => participant.doesMatchIds(userId, clientId))
-        .forEach(participant => participant.videoState(state));
+    if (!call) {
+      return;
     }
+    if (state === VIDEO_STATE.STARTED) {
+      call.analyticsAvSwitchToggle = true;
+    }
+    const selfParticipant = call.getSelfParticipant();
+    if (
+      call.state() === CALL_STATE.MEDIA_ESTAB &&
+      selfParticipant.doesMatchIds(userId, clientId) &&
+      !selfParticipant.sharesScreen()
+    ) {
+      selfParticipant.releaseVideoStream();
+    }
+    call
+      .participants()
+      .filter(participant => participant.doesMatchIds(userId, clientId))
+      .forEach(participant => participant.videoState(state));
   };
 
   /**
