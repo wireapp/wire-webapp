@@ -1045,10 +1045,10 @@
     "@emotion/utils" "0.11.3"
     "@emotion/weak-memoize" "0.2.5"
 
-"@emotion/core@10.0.28":
-  version "10.0.28"
-  resolved "https://registry.yarnpkg.com/@emotion/core/-/core-10.0.28.tgz#bb65af7262a234593a9e952c041d0f1c9b9bef3d"
-  integrity sha512-pH8UueKYO5jgg0Iq+AmCLxBsvuGtvlmiDCOuv8fGNYn3cowFpLN98L8zO56U0H1PjDIyAlXymgL3Wu7u7v6hbA==
+"@emotion/core@10.0.35":
+  version "10.0.35"
+  resolved "https://registry.yarnpkg.com/@emotion/core/-/core-10.0.35.tgz#513fcf2e22cd4dfe9d3894ed138c9d7a859af9b3"
+  integrity sha512-sH++vJCdk025fBlRZSAhkRlSUoqSqgCzYf5fMOmqqi3bM6how+sQpg3hkgJonj8GxXM4WbD7dRO+4tegDB9fUw==
   dependencies:
     "@babel/runtime" "^7.5.5"
     "@emotion/cache" "^10.0.27"
@@ -2206,14 +2206,14 @@
   dependencies:
     protobufjs "6.8.8"
 
-"@wireapp/react-ui-kit@7.36.3":
-  version "7.36.3"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-7.36.3.tgz#aafae63c7d147673f0619e5dbe119ac8a1cad09f"
-  integrity sha512-Pm+wluKORsiRJsX2GH1az+q2RrmwfwGL9wLIQb970mWj52SS5Uu7dSzZms07C4MBbtacrfY/CpjYY6YOuuEe1g==
+"@wireapp/react-ui-kit@7.37.1":
+  version "7.37.1"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-7.37.1.tgz#e551e34cd933bc027eea34a2038ed12f6bf006b8"
+  integrity sha512-Hfr//pwatCsmD2vtdRn3wWgbTIJ+KMcm5BA78+Wf6cgNAx+17zlherggksRbTmTO2WX0aFUYAw2zGTSZJYe8BQ==
   dependencies:
-    "@emotion/core" "10.0.28"
+    "@emotion/core" "10.0.35"
     "@types/color" "3.0.1"
-    bazinga64 "5.7.9"
+    bazinga64 "5.7.11"
     color "3.1.2"
     emotion-normalize "10.1.0"
     emotion-theming "10.0.27"
@@ -3084,10 +3084,10 @@ bazinga64@5.7.10:
   resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.7.10.tgz#fd36b91bd7e0c4c3446126bd8a9090ae6d2a8a85"
   integrity sha512-BYyK3W4P70TDycr+aNJLoNWJDcMVG1+QshHx7HUsx+sg1DOop59iaZPD7FYtYRqI9YzNU0A7uauCwc5EC1a7ZA==
 
-bazinga64@5.7.9:
-  version "5.7.9"
-  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.7.9.tgz#2174990bcd63e4f1787540d71033edbad5680aea"
-  integrity sha512-o73icT3wpgLkSmsDHRgG+ht01cJAsmPioa6MzMAnFZqOWmmMkSMP8YM8OQICRWM+UVNhMGPbIuoIafZJeR7HXg==
+bazinga64@5.7.11:
+  version "5.7.11"
+  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.7.11.tgz#94d129e98fcd2d31531cc03a9fb9a731a598aec2"
+  integrity sha512-u4DKSLiKHFVQRMFo701k+Y+BabKyNROHU3fLdNchTXdrsqmbVsiD18oSnZJdOQU9sy+dzmWvVdmg3wL2iS8cGw==
 
 bcrypt-pbkdf@^1.0.0:
   version "1.0.2"
