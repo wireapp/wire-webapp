@@ -39,7 +39,7 @@ interface DatabaseListener {
   type: DEXIE_CRUD_EVENT;
 }
 
-type DatabaseListenerCallback = (changes: {obj: Object; oldObj: Object}) => void;
+export type DatabaseListenerCallback = (changes: {obj: Object; oldObj: Object}) => void;
 
 // @see https://dexie.org/docs/Observable/Dexie.Observable
 type DexieObservable = {_dbSchema?: Object};
