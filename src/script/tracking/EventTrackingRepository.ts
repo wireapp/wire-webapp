@@ -75,8 +75,15 @@ export class EventTrackingRepository {
     }
   }
 
-  async init(telemetrySharing: boolean): Promise<void> {
-    const enableTelemetrySharing = telemetrySharing || this.userRepository.isTeam();
+  async init(telemetrySharing: boolean | undefined): Promise<void> {
+    const isTeam = this.userRepository.isTeam();
+    if (!isTeam) {
+      return; // Countly should not be enabled for non-team users
+    }
+    let enableTelemetrySharing = true;
+    if (typeof telemetrySharing === 'boolean') {
+      enableTelemetrySharing = telemetrySharing;
+    }
     this.logger.info(`Initialize analytics and error reporting: ${enableTelemetrySharing}`);
 
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.TELEMETRY_SHARING, this.toggleCountly);
