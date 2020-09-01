@@ -4364,8 +4364,11 @@ export class ConversationRepository {
       const guests = conversationEntity.participating_user_ets().filter(user => user.isGuest()).length;
       let segmentations = {
         [Segmentation.CONVERSATION.GUESTS]: guests,
+        [Segmentation.CONVERSATION.GUESTS_PRO]: '',
+        [Segmentation.CONVERSATION.GUESTS_WIRELESS]: '',
         [Segmentation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
         [Segmentation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
+        [Segmentation.CONVERSATION.SERVICES]: '',
         [Segmentation.MESSAGE.ACTION]: actionType,
         [Segmentation.MESSAGE.IS_REPLY]: !!genericMessage.text?.quote,
         [Segmentation.MESSAGE.MENTION]: numberOfMentions,
