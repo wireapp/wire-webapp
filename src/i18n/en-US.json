@@ -785,6 +785,8 @@
   "preferencesAccountData": "Data usage permissions",
   "preferencesAccountDataCheckbox": "Send anonymous data",
   "preferencesAccountDataDetail": "Help make {{brandName}} better by sending anonymous usage and crash reports.",
+  "preferencesAccountDataTelemetry": "Share anonymous telemetry data with Wire to help make wire better",
+  "preferencesAccountDataTelemetryCheckbox": "Telemetry sharing",
   "preferencesAccountDelete": "Delete account",
   "preferencesAccountEmailPlaceholder": "Your email address",
   "preferencesAccountInfo": "Info",

@@ -89,7 +89,7 @@ export class EventTrackingRepository {
     }
   }
 
-  async init(privacyPreference: boolean): Promise<void> {
+  async init(privacyPreference: boolean, telemetrySharing: boolean): Promise<void> {
     this.privacyPreference = privacyPreference || this.userRepository.isTeam();
     this.logger.info(`Initialize analytics and error reporting: ${this.privacyPreference}`);
 
@@ -98,7 +98,19 @@ export class EventTrackingRepository {
     }
 
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.PRIVACY, this.updatePrivacyPreference);
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.TELEMETRY_SHARING, this.toggleCountly);
+    this.toggleCountly(telemetrySharing);
   }
+
+  private readonly toggleCountly = async (isEnabled: boolean) => {
+    if (isEnabled && this.isDomainAllowedForAnalytics()) {
+      await this.startProductReporting();
+      this.trackProductReportingEvent(EventName.SETTINGS.OPTED_IN_TRACKING);
+    } else {
+      this.trackProductReportingEvent(EventName.SETTINGS.OPTED_OUT_TRACKING);
+      this.stopProductReporting();
+    }
+  };
 
   private readonly updatePrivacyPreference = async (privacyPreference: boolean): Promise<void> => {
     const hasPreferenceChanged = privacyPreference !== this.privacyPreference;
@@ -110,18 +122,10 @@ export class EventTrackingRepository {
 
   private async enableServices(isOptIn = false): Promise<void> {
     this.startErrorReporting();
-    if (this.isDomainAllowedForAnalytics()) {
-      await this.startProductReporting();
-      if (isOptIn) {
-        this.trackProductReportingEvent(EventName.SETTINGS.OPTED_IN_TRACKING);
-      }
-    }
   }
 
   private disableServices(): void {
     this.stopErrorReporting();
-    this.trackProductReportingEvent(EventName.SETTINGS.OPTED_OUT_TRACKING);
-    this.stopProductReporting();
   }
 
   private stopProductReporting(): void {
@@ -132,7 +136,7 @@ export class EventTrackingRepository {
   }
 
   private async startProductReporting(): Promise<void> {
-    if (!window.wire.env.COUNTLY_API_KEY) {
+    if (!window.wire.env.COUNTLY_API_KEY || this.isProductReportingActivated) {
       return;
     }
     this.isProductReportingActivated = true;

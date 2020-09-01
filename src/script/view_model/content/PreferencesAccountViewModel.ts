@@ -88,6 +88,7 @@ export class PreferencesAccountViewModel {
   team: ko.Observable<TeamEntity>;
   teamName: ko.PureComputed<string>;
   optionPrivacy: ko.Observable<boolean>;
+  optionTelemetrySharing: ko.Observable<boolean>;
   optionReadReceipts: ko.Observable<Confirmation.Type>;
   optionMarketingConsent: ko.Observable<boolean | ConsentValue>;
   optionResetAppLock: boolean;
@@ -166,6 +167,11 @@ export class PreferencesAccountViewModel {
     this.optionPrivacy = ko.observable();
     this.optionPrivacy.subscribe(privacyPreference => {
       this.propertiesRepository.savePreference(PROPERTIES_TYPE.PRIVACY, privacyPreference);
+    });
+
+    this.optionTelemetrySharing = ko.observable();
+    this.optionTelemetrySharing.subscribe(privacyPreference => {
+      this.propertiesRepository.savePreference(PROPERTIES_TYPE.TELEMETRY_SHARING, privacyPreference);
     });
 
     this.optionReadReceipts = this.propertiesRepository.receiptMode;
@@ -545,5 +551,6 @@ export class PreferencesAccountViewModel {
 
   updateProperties = ({settings}: WebappProperties): void => {
     this.optionPrivacy(settings.privacy.improve_wire);
+    this.optionTelemetrySharing(settings.privacy.telemetry_sharing);
   };
 }
