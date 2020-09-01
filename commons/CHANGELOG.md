@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.8.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@3.7.2...@wireapp/commons@3.8.0) (2020-09-01)
+
+
+### Features
+
+* **commons:** Add feature detections to Runtime ([#3209](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/issues/3209)) ([34e2eaf](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/commit/34e2eaf81f144d68951bc2abb3de213c11b0027c))
+
+
+
+
+
 ## [3.7.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@3.7.1...@wireapp/commons@3.7.2) (2020-08-27)
 
 **Note:** Version bump only for package @wireapp/commons
