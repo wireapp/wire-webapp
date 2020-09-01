@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.26.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.25.9...@wireapp/api-client@11.26.0) (2020-09-01)
+
+
+### Features
+
+* **api-client:** Add telemetry sharing to webapp properties ([#3207](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3207)) ([41b18e0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/41b18e04e2c2d92d360b544fb07845d50fcb2834))
+
+
+
+
+
 ## [11.25.9](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.25.8...@wireapp/api-client@11.25.9) (2020-08-27)
 
 
