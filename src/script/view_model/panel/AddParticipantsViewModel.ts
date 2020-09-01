@@ -18,8 +18,6 @@
  */
 
 import ko from 'knockout';
-import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
@@ -28,8 +26,6 @@ import {sortUsersByPriority} from 'Util/StringUtil';
 
 import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
 import {getManageServicesUrl} from '../../externalRoute';
-import * as trackingHelpers from '../../tracking/Helpers';
-import {EventName} from '../../tracking/EventName';
 import {MotionDuration} from '../../motion/MotionDuration';
 
 import type {ConversationRepository} from 'src/script/conversation/ConversationRepository';
@@ -177,7 +173,6 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
   clickOpenManageServices(): void {
     if (this.manageServicesUrl) {
       safeWindowOpen(this.manageServicesUrl);
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.SETTINGS.OPENED_MANAGE_TEAM);
     }
   }
 
@@ -201,30 +196,5 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
     const userEntities = this.selectedContacts().slice();
 
     await this.conversationRepository.addMembers(activeConversation, userEntities);
-    let segmentations: {
-      guest_num?: number;
-      is_allow_guests?: boolean;
-      method: string;
-      temporary_guest_num?: number;
-      user_num: number;
-    } = {
-      method: 'add',
-      user_num: userEntities.length,
-    };
-
-    const isTeamConversation = !!this.activeConversation().team_id;
-    if (isTeamConversation) {
-      const participants = trackingHelpers.getParticipantTypes(userEntities, false);
-
-      segmentations = {
-        ...segmentations,
-        guest_num: participants.guests,
-        is_allow_guests: activeConversation.isGuestRoom(),
-        temporary_guest_num: participants.temporaryGuests,
-        user_num: participants.users,
-      };
-    }
-
-    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CONVERSATION.ADD_PARTICIPANTS, segmentations);
   }
 }
