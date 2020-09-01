@@ -31,7 +31,7 @@ import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
-import {isDesktopApp, isMacOS} from '../Runtime';
+import {Runtime} from '@wireapp/commons';
 import Page from './Page';
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {}
@@ -39,7 +39,7 @@ interface Props extends React.HTMLAttributes<HTMLDivElement> {}
 const CreatePersonalAccount = ({isPersonalFlow, enterPersonalCreationFlow}: Props & ConnectedProps & DispatchProps) => {
   const {history} = useReactRouter();
   const {formatMessage: _} = useIntl();
-  const isMacOsWrapper = isDesktopApp() && isMacOS();
+  const isMacOsWrapper = Runtime.isDesktopApp() && Runtime.isMacOS();
   React.useEffect(() => {
     enterPersonalCreationFlow();
   }, []);

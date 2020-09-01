@@ -40,7 +40,7 @@ import {Config} from '../../Config';
 import {setAccountTypeStrings} from '../../strings';
 import RouterLink from '../component/RouterLink';
 import {ROUTE} from '../route';
-import {isDesktopApp, isMacOS} from '../Runtime';
+import {Runtime} from '@wireapp/commons';
 import {pathWithParams} from '../util/urlUtil';
 import Page from './Page';
 
@@ -49,7 +49,7 @@ interface Props extends React.HTMLProps<HTMLDivElement> {}
 const SetAccountType = ({}: Props) => {
   const {formatMessage: _} = useIntl();
   const {history} = useReactRouter();
-  const isMacOsWrapper = isDesktopApp() && isMacOS();
+  const isMacOsWrapper = Runtime.isDesktopApp() && Runtime.isMacOS();
 
   const backArrow = (
     <RouterLink to={ROUTE.INDEX} data-uie-name="go-index">

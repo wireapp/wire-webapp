@@ -17,8 +17,7 @@
  *
  */
 
-import platform from 'platform';
-
+import {Runtime} from '@wireapp/commons';
 import {BackendEnvironment} from '../service/BackendEnvironment';
 
 const APP_ENV = {
@@ -27,52 +26,22 @@ const APP_ENV = {
   VIRTUAL_HOST: 'wire.ms', // The domain "wire.ms" is our virtual host for testing contact uploads
 };
 
-const BROWSER_NAME = {
-  CHROME: 'Chrome',
-  EDGE: 'Microsoft Edge',
-  ELECTRON: 'Electron',
-  FIREFOX: 'Firefox',
-  OPERA: 'Opera',
-  WIRE: 'Wire',
-};
-
-const PLATFORM_NAME = {
-  MACINTOSH: 'Mac',
-  WINDOWS: 'Win',
-};
-
-const _getAppVersion = (): string => {
+const getAppVersion = (): string => {
   const versionElement = document.head.querySelector("[property='wire:version']");
   const hasVersion = versionElement && versionElement.hasAttribute('version');
   return hasVersion ? versionElement.getAttribute('version').trim() : '';
 };
 
-const _getElectronVersion = (userAgent: string): string => {
+const getElectronVersion = (userAgent: string): string => {
   // [match, app, version]
   const [, , electronVersion] = /(Wire|WireInternal)\/(\S+)/.exec(userAgent) || [];
   return electronVersion;
 };
 
-const _getFormattedAppVersion = (): string => {
-  const [year, month, day, hour, minute] = _getAppVersion().split('-');
+const getFormattedAppVersion = (): string => {
+  const [year, month, day, hour, minute] = getAppVersion().split('-');
   return `${year}.${month}.${day}.${hour}${minute}`;
 };
-
-const _getVersion = (): number => {
-  const browserVersion = platform.version || '';
-  const [majorVersion] = browserVersion.split('.');
-  return window.parseInt(majorVersion, 10);
-};
-
-const _isChrome = (): boolean => platform.name === BROWSER_NAME.CHROME || _isElectron();
-const _isDesktop = (): boolean => _isElectron() && platform.ua.includes(BROWSER_NAME.WIRE);
-const _isEdge = (): boolean => platform.name === BROWSER_NAME.EDGE;
-const _isElectron = (): boolean => platform.name === BROWSER_NAME.ELECTRON;
-const _isFirefox = (): boolean => platform.name === BROWSER_NAME.FIREFOX;
-const _isOpera = (): boolean => platform.name === BROWSER_NAME.OPERA;
-
-const _isMac = (): boolean => platform.ua.includes(PLATFORM_NAME.MACINTOSH);
-const _isWindows = (): boolean => platform.os.family && platform.os.family.includes(PLATFORM_NAME.WINDOWS);
 
 const isLocalhost = (): boolean => [APP_ENV.LOCALHOST, APP_ENV.VIRTUAL_HOST].includes(window.location.hostname);
 const isProduction = (): boolean => {
@@ -80,49 +49,10 @@ const isProduction = (): boolean => {
   return isProductionHost;
 };
 
-const _supportsCalling = (): boolean => {
-  if (!_supportsMediaDevices()) {
-    return false;
-  }
-
-  if (window.WebSocket === undefined) {
-    return false;
-  }
-
-  return _isEdge() ? false : _isChrome() || _isFirefox() || _isOpera();
-};
-
-const _supportsClipboard = (): boolean => !!navigator.clipboard;
-const _supportsIndexedDb = (): boolean => {
-  try {
-    return !!window.indexedDB;
-  } catch (error) {
-    return false;
-  }
-};
-const _supportsMediaDevices = (): boolean => !!navigator.mediaDevices && !!navigator.mediaDevices.getUserMedia;
-
-const _supportsPermissions = (): boolean => !!navigator.permissions;
-
-const _supportsNotifications = (): boolean => {
-  const notificationNotSupported = window.Notification === undefined;
-  if (notificationNotSupported) {
-    return false;
-  }
-
-  const requestPermissionNotSupported = window.Notification.requestPermission === undefined;
-  return requestPermissionNotSupported ? false : document.visibilityState !== undefined;
-};
-const _supportsScreenSharing = (): boolean => {
-  const hasScreenCaptureAPI =
-    window.desktopCapturer || (_supportsMediaDevices() && navigator.mediaDevices.getDisplayMedia);
-  return hasScreenCaptureAPI || _isFirefox();
-};
-
 // add body information
-const _osCssClass = _isMac() ? 'os-mac' : 'os-pc';
-const _platformCssClass = _isElectron() ? 'platform-electron' : 'platform-web';
-document.body.classList.add(_osCssClass, _platformCssClass);
+const osCssClass = Runtime.isMacOS() ? 'os-mac' : 'os-pc';
+const platformCssClass = Runtime.isElectron() ? 'platform-electron' : 'platform-web';
+document.body.classList.add(osCssClass, platformCssClass);
 
 export const Environment = {
   backend: {
@@ -130,34 +60,35 @@ export const Environment = {
   },
 
   browser: {
-    chrome: _isChrome(),
-    edge: _isEdge(),
-    firefox: _isFirefox(),
-    name: platform.name,
-    opera: _isOpera(),
+    chrome: Runtime.isChrome() || Runtime.isElectron(),
+    edge: Runtime.isEdge(),
+    firefox: Runtime.isFirefox(),
+    name: Runtime.getPlatform(),
+    opera: Runtime.isOpera(),
     supports: {
-      calling: _supportsCalling(),
-      clipboard: _supportsClipboard(),
-      indexedDb: _supportsIndexedDb(),
-      mediaDevices: _supportsMediaDevices(),
-      notifications: _supportsNotifications(),
-      permissions: _supportsPermissions(),
-      screenSharing: _supportsScreenSharing(),
+      calling: Runtime.isSupportingLegacyCalling(),
+      clipboard: Runtime.isSupportingClipboard(),
+      conferenceCalling: Runtime.isSupportingConferenceCalling(),
+      indexedDb: Runtime.isSupportingIndexedDb(),
+      mediaDevices: Runtime.isSupportingUserMedia(),
+      notifications: Runtime.isSupportingNotifications(),
+      permissions: Runtime.isSupportingPermissions(),
+      screenSharing: Runtime.isSupportingScreensharing(),
     },
-    version: _getVersion(),
+    version: Runtime.getBrowserVersion().major,
   },
-  desktop: _isDesktop(),
-  electron: _isElectron(),
-  electronVersion: _getElectronVersion,
+  desktop: Runtime.isDesktopApp(),
+  electron: Runtime.isElectron(),
+  electronVersion: getElectronVersion,
   frontend: {
     isLocalhost,
     isProduction,
   },
 
   os: {
-    linux: !_isMac() && !_isWindows(),
-    mac: _isMac(),
-    win: _isWindows(),
+    linux: !Runtime.isMacOS() && !Runtime.isWindows(),
+    mac: Runtime.isMacOS(),
+    win: Runtime.isWindows(),
   },
 
   version: (showWrapperVersion = true, doNotFormat = false): string => {
@@ -166,11 +97,11 @@ export const Environment = {
     }
 
     if (doNotFormat) {
-      return _getAppVersion();
+      return getAppVersion();
     }
 
-    const electronVersion = _getElectronVersion(platform.ua);
+    const electronVersion = getElectronVersion(Runtime.getUserAgent());
     const showElectronVersion = electronVersion && showWrapperVersion;
-    return showElectronVersion ? electronVersion : _getFormattedAppVersion();
+    return showElectronVersion ? electronVersion : getFormattedAppVersion();
   },
 };
