@@ -218,8 +218,8 @@ export class AssetRepository {
     previewImageKey: string;
   }> {
     const [{compressedBytes: previewImageBytes}, {compressedBytes: mediumImageBytes}] = await Promise.all([
-      this.compressProfileImage(image),
-      this.compressImage(image),
+      this.compressImageWithWorker(image),
+      this.compressImageWithWorker(image, true),
     ]);
 
     const options: AssetUploadOptions = {
@@ -240,23 +240,18 @@ export class AssetRepository {
     };
   }
 
-  private compressProfileImage(image: File | Blob): Promise<CompressedImage> {
-    return this.compressImageWithWorker('worker/profile-image-worker.js', image);
-  }
-
-  compressImage(image: File | Blob): Promise<CompressedImage> {
-    return this.compressImageWithWorker('worker/image-worker.js', image);
-  }
-
-  private async compressImageWithWorker(pathToWorkerFile: string, image: File | Blob): Promise<CompressedImage> {
+  private async compressImageWithWorker(
+    image: File | Blob,
+    profileImageSize: boolean = false,
+  ): Promise<CompressedImage> {
     const skipCompression = image.type === 'image/gif';
     const buffer = await loadFileBuffer(image);
     let compressedBytes: ArrayBuffer;
     if (skipCompression === true) {
       compressedBytes = new Uint8Array(buffer as ArrayBuffer);
     } else {
-      const worker = new WebWorker(pathToWorkerFile);
-      compressedBytes = await worker.post(buffer);
+      const worker = new WebWorker('/image-worker.js');
+      compressedBytes = await worker.post({buffer, profileImageSize});
     }
     const compressedImage = await loadImage(new Blob([compressedBytes], {type: image.type}));
     return {
@@ -334,7 +329,7 @@ export class AssetRepository {
       .then(async uploadedAsset => {
         const protoAsset = this.buildProtoAsset(encryptedAsset, uploadedAsset, options);
         if (isImage === true) {
-          const imageMeta = await this.compressImage(file);
+          const imageMeta = await this.compressImageWithWorker(file);
           return this.attachImageData(protoAsset, imageMeta, file.type);
         }
         return protoAsset;

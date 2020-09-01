@@ -1,14 +1,20 @@
 importScripts('jimp.min.js');
 
-const MAX_SIZE = 1448;
-const MAX_FILE_SIZE = 310 * 1024;
-const COMPRESSION = 80;
+self.addEventListener('message', event => {
+  let MAX_SIZE = 1448;
+  let MAX_FILE_SIZE = 310 * 1024;
+  let COMPRESSION = 80;
 
-self.addEventListener('message', event =>
+  if (event.data.profileImageSize) {
+    MAX_SIZE = 280;
+    MAX_FILE_SIZE = 1024 * 1024;
+    COMPRESSION = 80;
+  }
 
-  Jimp.read(event.data).then((image) => {
-
-    if ((image.bitmap.width > MAX_SIZE) || (image.bitmap.height > MAX_SIZE)) {
+  Jimp.read(event.data.buffer).then(image => {
+    if (event.data.profileImageSize) {
+      image.cover(MAX_SIZE, MAX_SIZE);
+    } else if (image.bitmap.width > MAX_SIZE || image.bitmap.height > MAX_SIZE) {
       image.scaleToFit(MAX_SIZE, MAX_SIZE);
     }
 
@@ -16,9 +22,9 @@ self.addEventListener('message', event =>
       image.quality(COMPRESSION);
     }
 
-    return image.getBuffer(Jimp.AUTO, (err, src) => {
+    return image.getBuffer(Jimp.AUTO, (_error, src) => {
       self.postMessage(src);
       return self.close();
     });
-  })
-);
+  });
+});
