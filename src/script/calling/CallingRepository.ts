@@ -693,7 +693,6 @@ export class CallingRepository {
       const segmentations = {
         [Segmentation.CALL.DIRECTION]: call.state(),
         [Segmentation.CALL.VIDEO]: callType === CALL_TYPE.VIDEO,
-        [Segmentation.CONVERSATION.EPHEMERAL_MESSAGE]: !!conversationEntity.globalMessageTimer(),
         [Segmentation.CONVERSATION.GUESTS]: guests,
         [Segmentation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
         [Segmentation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
@@ -930,7 +929,6 @@ export class CallingRepository {
       [Segmentation.CALL.SCREEN_SHARE]: '',
       [Segmentation.CALL.SETUP_TIME]: '',
       [Segmentation.CALL.VIDEO]: call.initialType === CALL_TYPE.VIDEO,
-      [Segmentation.CONVERSATION.EPHEMERAL_MESSAGE]: !!conversationEntity.globalMessageTimer(),
       [Segmentation.CONVERSATION.GUESTS]: guests,
       [Segmentation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
       [Segmentation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
@@ -1019,7 +1017,6 @@ export class CallingRepository {
           [Segmentation.CALL.DIRECTION]: call.state(),
           [Segmentation.CALL.SETUP_TIME]: '',
           [Segmentation.CALL.VIDEO]: call.initialType === CALL_TYPE.VIDEO,
-          [Segmentation.CONVERSATION.EPHEMERAL_MESSAGE]: !!conversationEntity.globalMessageTimer(),
           [Segmentation.CONVERSATION.GUESTS]: guests,
           [Segmentation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
           [Segmentation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,

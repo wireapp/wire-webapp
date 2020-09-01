@@ -154,7 +154,6 @@ export class CallingViewModel {
       const wirelessGuests = conversationEntity.participating_user_ets().filter(user => user.isTemporaryGuest()).length;
       const segmentations = {
         [Segmentation.CALL.VIDEO]: callType === CALL_TYPE.VIDEO,
-        [Segmentation.CONVERSATION.EPHEMERAL_MESSAGE]: !!conversationEntity.globalMessageTimer(),
         [Segmentation.CONVERSATION.GUESTS]: guests,
         [Segmentation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
         [Segmentation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
@@ -182,7 +181,6 @@ export class CallingViewModel {
       const wirelessGuests = conversationEntity.participating_user_ets().filter(user => user.isTemporaryGuest()).length;
       const segmentations = {
         [Segmentation.CALL.VIDEO]: call.initialType === CALL_TYPE.VIDEO,
-        [Segmentation.CONVERSATION.EPHEMERAL_MESSAGE]: !!conversationEntity.globalMessageTimer(),
         [Segmentation.CONVERSATION.GUESTS]: guests,
         [Segmentation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
         [Segmentation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
