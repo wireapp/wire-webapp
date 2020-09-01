@@ -586,7 +586,7 @@ export class MessageListViewModel {
 
     const hasMentions = messageEntity instanceof Text && messageEntity.mentions().length;
     const mentionElement = hasMentions && (event.target as HTMLElement).closest<HTMLSpanElement>('.message-mention');
-    const userId = mentionElement?.dataset.userId;
+    const userId = mentionElement?.dataset?.userId;
 
     if (userId) {
       (async () => {
