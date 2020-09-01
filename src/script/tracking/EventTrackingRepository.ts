@@ -33,6 +33,7 @@ import {UserData} from './UserData';
 import {Segmentation} from './Segmentation';
 import {getPlatform} from './Helpers';
 import type {UserRepository} from '../user/UserRepository';
+import {loadValue, storeValue} from 'Util/StorageUtil';
 
 declare const Raygun: RaygunStatic;
 
@@ -42,6 +43,7 @@ export class EventTrackingRepository {
   private isProductReportingActivated: boolean;
   private lastReportTimestamp?: number;
   private privacyPreference?: boolean;
+  private readonly countlyDeviceId: string;
   private readonly logger: Logger;
   private readonly userRepository: UserRepository;
   isErrorReportingActivated: boolean;
@@ -55,6 +57,7 @@ export class EventTrackingRepository {
       USER_ANALYTICS: {
         API_KEY: window.wire.env.ANALYTICS_API_KEY,
         CLIENT_TYPE: 'desktop',
+        COUNTLY_DEVICE_ID_LOCAL_STORAGE_KEY: 'COUNTLY_DEVICE_ID',
         DISABLED_DOMAINS: ['localhost'],
       },
     };
@@ -70,6 +73,20 @@ export class EventTrackingRepository {
 
     this.isErrorReportingActivated = false;
     this.isProductReportingActivated = false;
+
+    const previousCountlyDeviceId = loadValue<string>(
+      EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_DEVICE_ID_LOCAL_STORAGE_KEY,
+    );
+
+    if (previousCountlyDeviceId) {
+      this.countlyDeviceId = previousCountlyDeviceId;
+    } else {
+      this.countlyDeviceId = createRandomUuid();
+      storeValue(
+        EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_DEVICE_ID_LOCAL_STORAGE_KEY,
+        this.countlyDeviceId,
+      );
+    }
   }
 
   async init(privacyPreference: boolean): Promise<void> {
@@ -123,7 +140,7 @@ export class EventTrackingRepository {
     Countly.init({
       app_key: window.wire.env.COUNTLY_API_KEY,
       debug: !Environment.frontend.isProduction(),
-      device_id: createRandomUuid(),
+      device_id: this.countlyDeviceId,
       url: 'https://wire.count.ly/',
       use_session_cookie: false,
     });
