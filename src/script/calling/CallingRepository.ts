@@ -65,6 +65,9 @@ import {Call, ConversationId} from './Call';
 import {ClientId, Participant, UserId} from './Participant';
 import type {Recipients} from '../cryptography/CryptographyRepository';
 import type {Conversation} from '../entity/Conversation';
+import {EventName} from '../tracking/EventName';
+import {Segmentation} from '../tracking/Segmentation';
+import * as trackingHelpers from '../tracking/Helpers';
 import {UserRepository} from '../user/UserRepository';
 import {flatten} from 'Util/ArrayUtil';
 import {QUERY_KEY} from '../auth/route';
@@ -640,6 +643,21 @@ export class CallingRepository {
     const selfParticipant = call.getSelfParticipant();
     if (selfParticipant.sharesScreen()) {
       selfParticipant.videoState(VIDEO_STATE.STOPPED);
+
+      const conversationEntity = this.conversationRepository.find_conversation_by_id(call.conversationId);
+      const guests = conversationEntity.participating_user_ets().filter(user => user.isGuest()).length;
+      const wirelessGuests = conversationEntity.participating_user_ets().filter(user => user.isTemporaryGuest()).length;
+      const segmentations = {
+        [Segmentation.CONVERSATION.GUESTS]: guests,
+        [Segmentation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
+        [Segmentation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
+        [Segmentation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
+        [Segmentation.CONVERSATION.GUESTS_WIRELESS]: wirelessGuests,
+        [Segmentation.SCREEN_SHARE.DIRECTION]: '',
+        [Segmentation.SCREEN_SHARE.DURATION]: '',
+      };
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.SCREEN_SHARE, segmentations);
+
       return this.wCall.setVideoSendState(this.wUser, call.conversationId, VIDEO_STATE.STOPPED);
     }
     try {
@@ -667,7 +685,22 @@ export class CallingRepository {
         call.getSelfParticipant().releaseVideoStream();
       }
       await this.warmupMediaStreams(call, true, isVideoCall);
+      await this.pushClients(call.conversationId);
       this.wCall.answer(this.wUser, call.conversationId, callType, this.cbrEncoding());
+      const conversationEntity = this.conversationRepository.find_conversation_by_id(call.conversationId);
+      const guests = conversationEntity.participating_user_ets().filter(user => user.isGuest()).length;
+      const wirelessGuests = conversationEntity.participating_user_ets().filter(user => user.isTemporaryGuest()).length;
+      const segmentations = {
+        [Segmentation.CALL.DIRECTION]: call.state(),
+        [Segmentation.CALL.VIDEO]: callType === CALL_TYPE.VIDEO,
+        [Segmentation.CONVERSATION.GUESTS]: guests,
+        [Segmentation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
+        [Segmentation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
+        [Segmentation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
+        [Segmentation.CONVERSATION.GUESTS_WIRELESS]: wirelessGuests,
+      };
+
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.JOINED_CALL, segmentations);
     } catch (_) {
       this.rejectCall(call.conversationId);
     }
@@ -883,6 +916,26 @@ export class CallingRepository {
       return;
     }
     const stillActiveState = [REASON.STILL_ONGOING, REASON.ANSWERED_ELSEWHERE];
+
+    const conversationEntity = this.conversationRepository.find_conversation_by_id(call.conversationId);
+    const guests = conversationEntity.participating_user_ets().filter(user => user.isGuest()).length;
+    const wirelessGuests = conversationEntity.participating_user_ets().filter(user => user.isTemporaryGuest()).length;
+    const segmentations = {
+      [Segmentation.CALL.AV_SWITCH_TOGGLE]: call.analyticsAvSwitchToggle,
+      [Segmentation.CALL.DIRECTION]: call.state(),
+      [Segmentation.CALL.DURATION]: '',
+      [Segmentation.CALL.END_REASON]: reason,
+      [Segmentation.CALL.PARTICIPANTS]: call.participants().length,
+      [Segmentation.CALL.SCREEN_SHARE]: '',
+      [Segmentation.CALL.SETUP_TIME]: '',
+      [Segmentation.CALL.VIDEO]: call.initialType === CALL_TYPE.VIDEO,
+      [Segmentation.CONVERSATION.GUESTS]: guests,
+      [Segmentation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
+      [Segmentation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
+      [Segmentation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
+      [Segmentation.CONVERSATION.GUESTS_WIRELESS]: wirelessGuests,
+    };
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.ENDED_CALL, segmentations);
     if (!stillActiveState.includes(reason)) {
       this.injectDeactivateEvent(
         call.conversationId,
@@ -956,6 +1009,22 @@ export class CallingRepository {
 
     switch (state) {
       case CALL_STATE.MEDIA_ESTAB:
+        const conversationEntity = this.conversationRepository.find_conversation_by_id(call.conversationId);
+        const guests = conversationEntity.participating_user_ets().filter(user => user.isGuest()).length;
+        const wirelessGuests = conversationEntity.participating_user_ets().filter(user => user.isTemporaryGuest())
+          .length;
+        const segmentations = {
+          [Segmentation.CALL.DIRECTION]: call.state(),
+          [Segmentation.CALL.SETUP_TIME]: '',
+          [Segmentation.CALL.VIDEO]: call.initialType === CALL_TYPE.VIDEO,
+          [Segmentation.CONVERSATION.GUESTS]: guests,
+          [Segmentation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
+          [Segmentation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
+          [Segmentation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
+          [Segmentation.CONVERSATION.GUESTS_WIRELESS]: wirelessGuests,
+        };
+
+        amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.ESTABLISHED_CALL, segmentations);
         call.startedAt(Date.now());
         break;
     }
@@ -1105,20 +1174,24 @@ export class CallingRepository {
     state: number,
   ) => {
     const call = this.findCall(conversationId);
-    if (call) {
-      const selfParticipant = call.getSelfParticipant();
-      if (
-        call.state() === CALL_STATE.MEDIA_ESTAB &&
-        selfParticipant.doesMatchIds(userId, clientId) &&
-        !selfParticipant.sharesScreen()
-      ) {
-        selfParticipant.releaseVideoStream();
-      }
-      call
-        .participants()
-        .filter(participant => participant.doesMatchIds(userId, clientId))
-        .forEach(participant => participant.videoState(state));
+    if (!call) {
+      return;
     }
+    if (state === VIDEO_STATE.STARTED) {
+      call.analyticsAvSwitchToggle = true;
+    }
+    const selfParticipant = call.getSelfParticipant();
+    if (
+      call.state() === CALL_STATE.MEDIA_ESTAB &&
+      selfParticipant.doesMatchIds(userId, clientId) &&
+      !selfParticipant.sharesScreen()
+    ) {
+      selfParticipant.releaseVideoStream();
+    }
+    call
+      .participants()
+      .filter(participant => participant.doesMatchIds(userId, clientId))
+      .forEach(participant => participant.videoState(state));
   };
 
   /**

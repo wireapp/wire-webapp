@@ -48,7 +48,7 @@ export class LoadingViewModel {
     amplify.unsubscribeAll(WebAppEvents.APP.UPDATE_PROGRESS);
   };
 
-  updateProgress = (progress = 0, message: string, replaceContent: {handled: number; total: number}) => {
+  updateProgress = (progress = 0, message?: string, replaceContent?: {handled: number; total: number}) => {
     const hasProgressIncreased = progress > this.loadingProgress();
     progress = hasProgressIncreased ? progress : this.loadingProgress() + 0.01;
     this.loadingProgress(progress);

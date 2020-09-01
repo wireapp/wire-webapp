@@ -17,17 +17,9 @@
  *
  */
 
-/**
- * Enumeration of properties that should get send with every user tracking call.
- */
-export const SuperProperty = {
-  APP: 'app',
-  APP_VERSION: 'app_version',
-  CONTACTS: 'contacts',
-  DESKTOP_APP: 'desktop_app',
-  TEAM: {
-    IN_TEAM: 'team.in_team',
-    SIZE: 'team.size',
-  },
-  WRAPPER_VERSION: 'wrapper_version',
+export const UserData = {
+  CONTACTS: 'user.contacts',
+  IS_TEAM: 'team.is_team',
+  TEAM_SIZE: 'team.team_size',
+  USER_TYPE: 'team.user_type',
 };

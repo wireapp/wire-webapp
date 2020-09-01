@@ -103,33 +103,44 @@ export class PropertiesRepository {
   checkPrivacyPermission(): Promise<void> {
     const isCheckConsentDisabled = !Config.getConfig().FEATURE.CHECK_CONSENT;
     const isPrivacyPreferenceSet = this.getPreference(PROPERTIES_TYPE.PRIVACY) !== undefined;
+    const isTeamAccount = this.selfUser().inTeam();
+    const enablePrivacy = () => {
+      this.savePreference(PROPERTIES_TYPE.PRIVACY, true);
+      this.publishProperties();
+    };
 
-    return isCheckConsentDisabled || isPrivacyPreferenceSet
-      ? Promise.resolve()
-      : new Promise(resolve => {
-          amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
-            preventClose: true,
-            primaryAction: {
-              action: () => {
-                this.savePreference(PROPERTIES_TYPE.PRIVACY, true);
-                this.publishProperties();
-                resolve();
-              },
-              text: t('modalImproveWireAction'),
-            },
-            secondaryAction: {
-              action: () => {
-                this.savePreference(PROPERTIES_TYPE.PRIVACY, false);
-                resolve();
-              },
-              text: t('modalImproveWireSecondary'),
-            },
-            text: {
-              message: t('modalImproveWireMessage', Config.getConfig().BRAND_NAME),
-              title: t('modalImproveWireHeadline', Config.getConfig().BRAND_NAME),
-            },
-          });
-        });
+    if (isCheckConsentDisabled || isPrivacyPreferenceSet) {
+      return Promise.resolve();
+    }
+
+    if (isTeamAccount) {
+      enablePrivacy();
+      return Promise.resolve();
+    }
+
+    return new Promise(resolve => {
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+        preventClose: true,
+        primaryAction: {
+          action: () => {
+            enablePrivacy();
+            resolve();
+          },
+          text: t('modalImproveWireAction'),
+        },
+        secondaryAction: {
+          action: () => {
+            this.savePreference(PROPERTIES_TYPE.PRIVACY, false);
+            resolve();
+          },
+          text: t('modalImproveWireSecondary'),
+        },
+        text: {
+          message: t('modalImproveWireMessage', Config.getConfig().BRAND_NAME),
+          title: t('modalImproveWireHeadline', Config.getConfig().BRAND_NAME),
+        },
+      });
+    });
   }
 
   getPreference(propertiesType: string): any {
@@ -295,6 +306,9 @@ export class PropertiesRepository {
         break;
       case PROPERTIES_TYPE.PRIVACY:
         amplify.publish(WebAppEvents.PROPERTIES.UPDATE.PRIVACY, updatedPreference);
+        break;
+      case PROPERTIES_TYPE.TELEMETRY_SHARING:
+        amplify.publish(WebAppEvents.PROPERTIES.UPDATE.TELEMETRY_SHARING, updatedPreference);
         break;
       case PROPERTIES_TYPE.SOUND_ALERTS:
         amplify.publish(WebAppEvents.PROPERTIES.UPDATE.SOUND_ALERTS, updatedPreference);

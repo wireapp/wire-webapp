@@ -48,7 +48,6 @@ import {nameFromType} from '../../user/AvailabilityMapper';
 import {ParticipantAvatar} from 'Components/participantAvatar';
 import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
 import {MotionDuration} from '../../motion/MotionDuration';
-import {EventName} from '../../tracking/EventName';
 import {ContentViewModel} from '../ContentViewModel';
 import {Logger} from '@wireapp/commons';
 import {getLogger} from 'Util/Logger';
@@ -88,6 +87,7 @@ export class PreferencesAccountViewModel {
   team: ko.Observable<TeamEntity>;
   teamName: ko.PureComputed<string>;
   optionPrivacy: ko.Observable<boolean>;
+  optionTelemetrySharing: ko.Observable<boolean>;
   optionReadReceipts: ko.Observable<Confirmation.Type>;
   optionMarketingConsent: ko.Observable<boolean | ConsentValue>;
   optionResetAppLock: boolean;
@@ -166,6 +166,11 @@ export class PreferencesAccountViewModel {
     this.optionPrivacy = ko.observable();
     this.optionPrivacy.subscribe(privacyPreference => {
       this.propertiesRepository.savePreference(PROPERTIES_TYPE.PRIVACY, privacyPreference);
+    });
+
+    this.optionTelemetrySharing = ko.observable();
+    this.optionTelemetrySharing.subscribe(privacyPreference => {
+      this.propertiesRepository.savePreference(PROPERTIES_TYPE.TELEMETRY_SHARING, privacyPreference);
     });
 
     this.optionReadReceipts = this.propertiesRepository.receiptMode;
@@ -415,7 +420,6 @@ export class PreferencesAccountViewModel {
   clickOpenManageTeam = (): void => {
     if (this.manageTeamUrl) {
       safeWindowOpen(this.manageTeamUrl);
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.SETTINGS.OPENED_MANAGE_TEAM);
     }
   };
 
@@ -545,5 +549,6 @@ export class PreferencesAccountViewModel {
 
   updateProperties = ({settings}: WebappProperties): void => {
     this.optionPrivacy(settings.privacy.improve_wire);
+    this.optionTelemetrySharing(settings.privacy.telemetry_sharing);
   };
 }

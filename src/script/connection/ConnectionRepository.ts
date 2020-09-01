@@ -39,9 +39,6 @@ import type {ConnectionEntity} from './ConnectionEntity';
 import {ConnectionMapper} from './ConnectionMapper';
 import type {ConnectionService} from './ConnectionService';
 import {ConnectionError} from '../error/ConnectionError';
-import {RaygunStatic} from 'raygun4js';
-
-declare const Raygun: RaygunStatic;
 
 export class ConnectionRepository {
   private readonly connectionService: ConnectionService;
@@ -308,14 +305,6 @@ export class ConnectionRepository {
       .catch(error => {
         const logMessage = `Connection change from '${currentStatus}' to '${connectionStatus}' failed`;
         this.logger.error(`${logMessage} for '${userEntity.id}' failed: ${error.message}`, error);
-
-        const customData = {
-          currentStatus,
-          newStatus: connectionStatus,
-          serverError: error,
-        };
-
-        Raygun.send(new Error(logMessage), customData);
       });
   }
 

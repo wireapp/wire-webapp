@@ -11,6 +11,7 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "jsx": "react",
+    "module": "esnext",
     "lib": ["dom", "esnext"],
     "moduleResolution": "node",
     "noEmitOnError": true,

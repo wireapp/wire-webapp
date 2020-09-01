@@ -49,7 +49,6 @@ import type {EventSource} from '../event/EventSource';
 
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
-import {EventName} from '../tracking/EventName';
 
 import {
   HIDE_REQUEST_MODAL,
@@ -158,7 +157,6 @@ export class UserRepository {
       const contacts = this.isTeam() ? this.teamUsers() : this.connected_users();
       return contacts.filter(user_et => !user_et.isService).length;
     });
-
     amplify.subscribe(WebAppEvents.CLIENT.ADD, this.addClientToUser.bind(this));
     amplify.subscribe(WebAppEvents.CLIENT.REMOVE, this.removeClientFromUser.bind(this));
     amplify.subscribe(WebAppEvents.CLIENT.UPDATE, this.updateClientsFromUser.bind(this));
@@ -383,7 +381,6 @@ export class UserRepository {
       const oldAvailabilityValue = valueFromType(this.self().availability());
       this.logger.log(`Availability was changed from '${oldAvailabilityValue}' to '${newAvailabilityValue}'`);
       this.self().availability(availability);
-      this._trackAvailability(availability, method);
       amplify.publish(WebAppEvents.TEAM.UPDATE_INFO);
       showAvailabilityModal(availability);
     } else {
@@ -437,18 +434,6 @@ export class UserRepository {
       last_prekey,
     );
     amplify.publish(SHOW_REQUEST_MODAL, fingerprint);
-  }
-
-  /**
-   * Track availability action.
-   *
-   * @param method Method used for availability change
-   */
-  _trackAvailability(availability: Availability.Type, method: string): void {
-    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.SETTINGS.CHANGED_STATUS, {
-      method,
-      status: valueFromType(availability),
-    });
   }
 
   /**
