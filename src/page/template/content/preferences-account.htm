@@ -132,13 +132,15 @@
         </div>
         <div class="preferences-detail" data-bind="text: t('preferencesAccountDataDetail', brandName)"></div>
 
-        <div class="preferences-option">
-          <div class="preferences-option-icon checkbox accent-text" data-bind="attr: {'data-uie-value': optionTelemetrySharing}" data-uie-name="status-preference-telemetry">
-            <input type="checkbox" id="telemetry-checkbox" data-bind="checked: optionTelemetrySharing">
-            <label class="preferences-options-checkbox-label" for="telemetry-checkbox" data-bind="text: t('preferencesAccountDataTelemetryCheckbox')"></label>
+        <!-- ko if: isTeam() -->
+          <div class="preferences-option">
+            <div class="preferences-option-icon checkbox accent-text" data-bind="attr: {'data-uie-value': optionTelemetrySharing}" data-uie-name="status-preference-telemetry">
+              <input type="checkbox" id="telemetry-checkbox" data-bind="checked: optionTelemetrySharing">
+              <label class="preferences-options-checkbox-label" for="telemetry-checkbox" data-bind="text: t('preferencesAccountDataTelemetryCheckbox')"></label>
+            </div>
           </div>
-        </div>
-        <div class="preferences-detail" data-bind="text: t('preferencesAccountDataTelemetry', brandName)"></div>
+          <div class="preferences-detail" data-bind="text: t('preferencesAccountDataTelemetry', brandName)"></div>
+        <!-- /ko -->
 
         <!-- ko if: isActivatedAccount() -->
           <div class="preferences-option">
