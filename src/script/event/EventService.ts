@@ -66,10 +66,7 @@ export class EventService {
   async loadEvents(conversationId: string, eventIds: string[]): Promise<DBEvents> {
     if (!conversationId || !eventIds) {
       this.logger.error(`Cannot get events '${eventIds}' in conversation '${conversationId}' without IDs`);
-      throw new ConversationError(
-        BaseError.TYPE.MISSING_PARAMETER as BASE_ERROR_TYPE,
-        BaseError.MESSAGE.MISSING_PARAMETER,
-      );
+      throw new ConversationError(BASE_ERROR_TYPE.MISSING_PARAMETER, BaseError.MESSAGE.MISSING_PARAMETER);
     }
 
     try {
@@ -105,10 +102,7 @@ export class EventService {
   async loadEvent(conversationId: string, eventId: string): Promise<EventRecord> {
     if (!conversationId || !eventId) {
       this.logger.error(`Cannot get event '${eventId}' in conversation '${conversationId}' without IDs`);
-      throw new ConversationError(
-        BaseError.TYPE.MISSING_PARAMETER as BASE_ERROR_TYPE,
-        BaseError.MESSAGE.MISSING_PARAMETER,
-      );
+      throw new ConversationError(BASE_ERROR_TYPE.MISSING_PARAMETER, BaseError.MESSAGE.MISSING_PARAMETER);
     }
 
     try {
@@ -351,7 +345,8 @@ export class EventService {
   async updateEventAsUploadSucceeded(primaryKey: string, event: EventRecord): Promise<void> {
     const record = await this.storageService.load<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey);
     if (!record) {
-      return this.logger.warn('Did not find message to update asset (uploaded)', primaryKey);
+      this.logger.warn('Did not find message to update asset (uploaded)', primaryKey);
+      return;
     }
     const assetData = event.data;
     record.data.id = assetData.id;
@@ -362,7 +357,7 @@ export class EventService {
     record.data.token = assetData.token;
     record.status = StatusType.SENT;
     await this.replaceEvent(record);
-    return this.logger.info('Updated asset message_et (uploaded)', primaryKey);
+    this.logger.info('Updated asset message_et (uploaded)', primaryKey);
   }
 
   /**
