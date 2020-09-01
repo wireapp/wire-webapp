@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.6.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/webapp-events/compare/@wireapp/webapp-events@0.5.3...@wireapp/webapp-events@0.6.0) (2020-09-01)
+
+
+### Features
+
+* **webapp-events:** Add telemetry sharing update event ([#3208](https://github.com/wireapp/wire-web-packages/tree/master/packages/webapp-events/issues/3208)) ([d094c3c](https://github.com/wireapp/wire-web-packages/tree/master/packages/webapp-events/commit/d094c3ce8e3af354f830a3040598a550462b17a5))
+
+
+
+
+
 ## [0.5.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/webapp-events/compare/@wireapp/webapp-events@0.5.2...@wireapp/webapp-events@0.5.3) (2020-08-19)
 
 
