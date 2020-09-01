@@ -48,7 +48,6 @@ import {nameFromType} from '../../user/AvailabilityMapper';
 import {ParticipantAvatar} from 'Components/participantAvatar';
 import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
 import {MotionDuration} from '../../motion/MotionDuration';
-import {EventName} from '../../tracking/EventName';
 import {ContentViewModel} from '../ContentViewModel';
 import {Logger} from '@wireapp/commons';
 import {getLogger} from 'Util/Logger';
@@ -421,7 +420,6 @@ export class PreferencesAccountViewModel {
   clickOpenManageTeam = (): void => {
     if (this.manageTeamUrl) {
       safeWindowOpen(this.manageTeamUrl);
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.SETTINGS.OPENED_MANAGE_TEAM);
     }
   };
 

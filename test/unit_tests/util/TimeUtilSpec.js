@@ -76,6 +76,12 @@ describe('TimeUtil', () => {
         text: `15 ${t('ephemeralUnitsSeconds')}`,
         value: 15,
       });
+
+      expect(formatDuration(800)).toEqual({
+        symbol: 's',
+        text: `0 ${t('ephemeralUnitsSeconds')}`,
+        value: 0,
+      });
     });
 
     it('formats durations in minutes', () => {

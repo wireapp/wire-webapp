@@ -29,12 +29,6 @@ module.exports = {
     '@babel/plugin-proposal-class-properties',
     '@babel/plugin-proposal-nullish-coalescing-operator',
     '@babel/plugin-proposal-optional-chaining',
-    [
-      'react-intl',
-      {
-        messagesDir: './temp/i18n',
-      },
-    ],
     '@babel/plugin-syntax-dynamic-import',
   ],
   presets: [

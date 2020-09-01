@@ -97,7 +97,7 @@
     "autoprefixer": "9.8.6",
     "babel-eslint": "10.1.0",
     "babel-loader": "8.1.0",
-    "babel-plugin-react-intl": "7.9.2",
+    "babel-plugin-react-intl": "8.1.11",
     "concurrently": "5.3.0",
     "cross-env": "7.0.2",
     "cspell": "4.1.0",

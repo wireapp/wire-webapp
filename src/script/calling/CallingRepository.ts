@@ -685,6 +685,7 @@ export class CallingRepository {
         call.getSelfParticipant().releaseVideoStream();
       }
       await this.warmupMediaStreams(call, true, isVideoCall);
+      await this.pushClients(call.conversationId);
       this.wCall.answer(this.wUser, call.conversationId, callType, this.cbrEncoding());
       const conversationEntity = this.conversationRepository.find_conversation_by_id(call.conversationId);
       const guests = conversationEntity.participating_user_ets().filter(user => user.isGuest()).length;
