@@ -32,22 +32,21 @@ import {StorageSchemata} from '../storage/StorageSchemata';
 import {BaseError, BASE_ERROR_TYPE} from '../error/BaseError';
 import {ConversationError} from '../error/ConversationError';
 import {StorageError} from '../error/StorageError';
-import {StorageService, DatabaseListenerCallback} from '../storage';
+import {StorageService, DatabaseListenerCallback, EventRecord} from '../storage';
 
 declare const Raygun: RaygunStatic;
 
 export type Includes = {includeFrom: boolean; includeTo: boolean};
-export type DBEventObject = {category: MessageCategory; conversation: string; id: string; time: string};
 type DexieCollection = Dexie.Collection<any, any>;
-export type DBEvents = DexieCollection | DBEventObject[];
+export type DBEvents = DexieCollection | EventRecord[];
 
 export const eventTimeToDate = (time: string) => new Date(time) || new Date(parseInt(time, 10));
 
-export const compareEventsByConversation = (eventA: DBEventObject, eventB: DBEventObject) =>
+export const compareEventsByConversation = (eventA: EventRecord, eventB: EventRecord) =>
   eventA.conversation.localeCompare(eventB.conversation);
 
-export const compareEventsById = (eventA: DBEventObject, eventB: DBEventObject) => eventA.id.localeCompare(eventB.id);
-export const compareEventsByTime = (eventA: DBEventObject, eventB: DBEventObject) =>
+export const compareEventsById = (eventA: EventRecord, eventB: EventRecord) => eventA.id.localeCompare(eventB.id);
+export const compareEventsByTime = (eventA: EventRecord, eventB: EventRecord) =>
   eventTimeToDate(eventA.time).getTime() - eventTimeToDate(eventB.time).getTime();
 
 /** Handles all databases interactions related to events */
@@ -84,7 +83,7 @@ export class EventService {
         return events;
       }
 
-      const records = (await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS)) as DBEventObject[];
+      const records = (await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS)) as EventRecord[];
       return records
         .filter(record => record.conversation === conversationId && eventIds.includes(record.id))
         .sort(compareEventsById);
@@ -103,7 +102,7 @@ export class EventService {
    * @param conversationId ID of conversation
    * @param eventId ID of event to retrieve
    */
-  async loadEvent(conversationId: string, eventId: string): Promise<DBEventObject> {
+  async loadEvent(conversationId: string, eventId: string): Promise<EventRecord> {
     if (!conversationId || !eventId) {
       this.logger.error(`Cannot get event '${eventId}' in conversation '${conversationId}' without IDs`);
       throw new ConversationError(
@@ -123,7 +122,7 @@ export class EventService {
         return entry;
       }
 
-      const records = (await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS)) as DBEventObject[];
+      const records = (await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS)) as EventRecord[];
       return records
         .filter(record => record.id === eventId && record.conversation === conversationId)
         .sort(compareEventsById)
@@ -156,7 +155,7 @@ export class EventService {
       return events;
     }
 
-    const records = (await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS)) as DBEventObject[];
+    const records = (await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS)) as EventRecord[];
     return records
       .filter(
         record =>
@@ -176,7 +175,7 @@ export class EventService {
       return events;
     }
 
-    const records = (await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS)) as DBEventObject[];
+    const records = (await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS)) as EventRecord[];
     return records
       .filter(record => {
         return (
@@ -212,7 +211,7 @@ export class EventService {
       const events = await this._loadEventsInDateRange(conversationId, fromDate, toDate, limit, includeParams);
       return this.storageService.db
         ? (events as Dexie.Collection<any, any>).reverse().sortBy('time')
-        : (events as DBEventObject[]).reverse().sort(compareEventsByTime);
+        : (events as EventRecord[]).reverse().sort(compareEventsByTime);
     } catch (error) {
       const message = `Failed to load events for conversation '${conversationId}' from database: '${error.message}'`;
       this.logger.error(message);
@@ -247,7 +246,7 @@ export class EventService {
     const events = await this._loadEventsInDateRange(conversationId, fromDate, toDate, limit, includeParams);
     return this.storageService.db
       ? (events as DexieCollection).sortBy('time')
-      : (events as DBEventObject[]).sort(compareEventsByTime);
+      : (events as EventRecord[]).sort(compareEventsByTime);
   }
 
   /**
@@ -290,7 +289,7 @@ export class EventService {
       return events;
     }
 
-    const records = (await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS)) as DBEventObject[];
+    const records = (await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS)) as EventRecord[];
     return records
       .filter(record => {
         const recordDate = eventTimeToDate(record.time).getTime();
@@ -349,8 +348,8 @@ export class EventService {
    * @param primaryKey Primary key used to find an event in the database
    * @param event Updated event asset data
    */
-  async updateEventAsUploadSucceeded(primaryKey: string, event: Object): Promise<void> {
-    const record = await this.storageService.load(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey);
+  async updateEventAsUploadSucceeded(primaryKey: string, event: EventRecord): Promise<void> {
+    const record = await this.storageService.load<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey);
     if (!record) {
       return this.logger.warn('Did not find message to update asset (uploaded)', primaryKey);
     }
@@ -372,8 +371,8 @@ export class EventService {
    * @param primaryKey Primary key used to find an event in the database
    * @param reason Failure reason
    */
-  async updateEventAsUploadFailed(primaryKey: string, reason: string): Promise<DBEventObject | void> {
-    const record = (await this.storageService.load(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey)) as DBEventObject;
+  async updateEventAsUploadFailed(primaryKey: string, reason: string): Promise<EventRecord | void> {
+    const record = (await this.storageService.load(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey)) as EventRecord;
     if (!record) {
       this.logger.warn('Did not find message to update asset (failed)', primaryKey);
       return;
@@ -392,7 +391,7 @@ export class EventService {
    * @param primaryKey event's primary key
    * @param updates Updates to perform on the message.
    */
-  updateEvent(primaryKey: string, updates: Object): Promise<any> {
+  updateEvent(primaryKey: string, updates: any): Promise<any> {
     return Promise.resolve(primaryKey).then(key => {
       const hasChanges = updates && !!Object.keys(updates).length;
       if (!hasChanges) {
@@ -420,7 +419,7 @@ export class EventService {
    * @param primaryKey Event primary key
    * @param changes Changes to update message with
    */
-  async updateEventSequentially(primaryKey: string, changes = {}): Promise<number> {
+  async updateEventSequentially(primaryKey: string, changes: Partial<EventRecord> = {}): Promise<number> {
     return Promise.resolve().then(() => {
       const hasVersionedChanges = !!changes.version;
       if (!hasVersionedChanges) {
@@ -429,32 +428,34 @@ export class EventService {
 
       if (this.storageService.db) {
         // Create a DB transaction to avoid concurrent sequential update.
-        // TODO: the second parameter of the transaction seems wrong, exie actually wants something of type `Dexie.Table` here
-        return this.storageService.db.transaction('rw', StorageSchemata.OBJECT_STORE.EVENTS as any, () => {
-          return this.storageService.load(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey).then(record => {
+        // TODO: The Dexie typing is wrong here, as it indeed does accept the table name as a string as the second parameter
+        return this.storageService.db.transaction(
+          'rw',
+          // @ts-ignore: Wrong typing in Dexie
+          StorageSchemata.OBJECT_STORE.EVENTS,
+          async () => {
+            const record = (await this.storageService.load(
+              StorageSchemata.OBJECT_STORE.EVENTS,
+              primaryKey,
+            )) as EventRecord;
             if (!record) {
               throw new StorageError(StorageError.TYPE.NOT_FOUND, StorageError.MESSAGE.NOT_FOUND);
             }
-
             const databaseVersion = record.version || 1;
-
             const isSequentialUpdate = changes.version === databaseVersion + 1;
             if (isSequentialUpdate) {
               return this.storageService.update(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey, changes);
             }
-
             const logMessage = 'Failed sequential database update';
             const logObject = {
               databaseVersion: databaseVersion,
               updateVersion: changes.version,
             };
-
             this.logger.error(logMessage, logObject);
-
             Raygun.send(new Error(logMessage), logObject);
             throw new StorageError(StorageError.TYPE.NON_SEQUENTIAL_UPDATE, StorageError.MESSAGE.NON_SEQUENTIAL_UPDATE);
-          });
-        });
+          },
+        );
       }
       return this.storageService.update(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey, changes);
     });

@@ -322,9 +322,9 @@ export class ConversationMapper {
   /**
    * Merge local database records with remote backend payload.
    *
-   * @param {Array<Object>} localConversations Database records
-   * @param {Array<Object>} remoteConversations Backend payload
-   * @returns {Array<Object>} Merged conversation data
+   * @param {Array<SerializedConversation>} localConversations Database records
+   * @param {Array<SerializedConversation>} remoteConversations Backend payload
+   * @returns {Array<SerializedConversation>} Merged conversation data
    */
   mergeConversation(localConversations, remoteConversations) {
     localConversations = localConversations.filter(conversationData => conversationData);

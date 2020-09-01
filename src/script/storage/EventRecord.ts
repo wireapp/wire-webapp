@@ -21,11 +21,14 @@ export interface EventRecord {
   category: number;
   conversation: string;
   data: any;
+  edited_time?: string;
   from: string;
   from_client_id?: string;
   id: string;
   primary_key: number;
+  reactions: Record<string, string>;
   status?: number;
   time: string;
   type: string;
+  version?: number;
 }
