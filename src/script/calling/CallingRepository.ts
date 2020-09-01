@@ -415,9 +415,7 @@ export class CallingRepository {
    * @see https://www.chromestatus.com/feature/6321945865879552
    */
   get supportsConferenceCalling(): boolean {
-    const supportsEncodedStreams = RTCRtpSender.prototype.hasOwnProperty('createEncodedStreams');
-    const supportsEncodedVideoStreams = RTCRtpSender.prototype.hasOwnProperty('createEncodedVideoStreams');
-    return supportsEncodedStreams || supportsEncodedVideoStreams;
+    return Environment.browser.supports.conferenceCalling;
   }
 
   /**

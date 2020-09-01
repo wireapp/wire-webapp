@@ -25,7 +25,7 @@ import {Config} from '../../Config';
 import {unsupportedJoinStrings, unsupportedStrings} from '../../strings';
 import {RootState} from '../module/reducer';
 import * as RuntimeSelector from '../module/selector/RuntimeSelector';
-import {isMobileOs} from '../Runtime';
+import {Runtime} from '@wireapp/commons';
 import WirelessContainer from './WirelessContainer';
 
 interface UnsupportedProps extends React.HTMLProps<HTMLDivElement> {
@@ -75,7 +75,7 @@ export const UnsupportedBrowser = ({
               }}
             />
           </H2>
-          {isTemporaryGuest && isMobileOs() ? (
+          {isTemporaryGuest && Runtime.isMobileOS() ? (
             <H3 style={{marginBottom: '10px'}}>
               <FormattedMessage {...unsupportedJoinStrings.unsupportedJoinMobileSubhead} />
             </H3>

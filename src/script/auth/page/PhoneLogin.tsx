@@ -51,7 +51,7 @@ import {ValidationError} from '../module/action/ValidationError';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
-import {isDesktopApp} from '../Runtime';
+import {Runtime} from '@wireapp/commons';
 import {isValidationError, parseError, parseValidationErrors} from '../util/errorUtil';
 import Page from './Page';
 
@@ -134,7 +134,7 @@ const PhoneLogin = ({
                   ) : (
                     parseError(error)
                   )}
-                  {!isDesktopApp() && (
+                  {!Runtime.isDesktopApp() && (
                     <Checkbox
                       tabIndex={4}
                       onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
