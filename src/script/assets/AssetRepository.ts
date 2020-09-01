@@ -241,11 +241,11 @@ export class AssetRepository {
   }
 
   private compressProfileImage(image: File | Blob): Promise<CompressedImage> {
-    return this.compressImageWithWorker('worker/profile-image-worker.js', image);
+    return this.compressImageWithWorker('/worker/profile-image-worker.js', image);
   }
 
   compressImage(image: File | Blob): Promise<CompressedImage> {
-    return this.compressImageWithWorker('worker/image-worker.js', image);
+    return this.compressImageWithWorker('/worker/image-worker.js', image);
   }
 
   private async compressImageWithWorker(pathToWorkerFile: string, image: File | Blob): Promise<CompressedImage> {
