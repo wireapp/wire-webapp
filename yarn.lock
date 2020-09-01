@@ -1663,11 +1663,6 @@
   resolved "https://registry.yarnpkg.com/@types/q/-/q-1.5.2.tgz#690a1475b84f2a884fd07cd797c00f5f31356ea8"
   integrity sha512-ce5d3q03Ex0sy4R14722Rmt6MT07Ua+k4FwDfdcToYJcMKNtRVQvJ6JCAPdAmAnbRb6CsX6aYb9m96NGod9uTw==
 
-"@types/raygun4js@2.13.6":
-  version "2.13.6"
-  resolved "https://registry.yarnpkg.com/@types/raygun4js/-/raygun4js-2.13.6.tgz#18732844f50dae31ff6695eb7056d589ab15ddf4"
-  integrity sha512-NaVr7xYVXW9EtneBVpWBbxuzr50/2fidYyHUDOHrvD/qH+poip804LlwB0rTxh6cy17F0huhtRnyBW45Ic0Vkg==
-
 "@types/react-dom@16.9.8":
   version "16.9.8"
   resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-16.9.8.tgz#fe4c1e11dfc67155733dfa6aa65108b4971cb423"
@@ -10940,11 +10935,6 @@ raw-body@~1.1.0:
   dependencies:
     bytes "1"
     string_decoder "0.10"
-
-raygun4js@2.20.1:
-  version "2.20.1"
-  resolved "https://registry.yarnpkg.com/raygun4js/-/raygun4js-2.20.1.tgz#189422d6a3cc7af40ff07d08f232e83e0a7948a0"
-  integrity sha512-E4szfGuQu746FX7k/L+Q1CoDbKi7d/xwR/ZGxKVyvlryUL7Ovl3BhFG8zsMAfphGk71Nh0tlPxLsxYBOUNEHWQ==
 
 rc@^1.2.7:
   version "1.2.8"

@@ -150,13 +150,10 @@ import {QuoteEntity} from '../message/QuoteEntity';
 import {CompositeMessage} from '../entity/message/CompositeMessage';
 import {EventSource} from '../event/EventSource';
 import {MemberMessage} from '../entity/message/MemberMessage';
-import {RaygunStatic} from 'raygun4js';
 import {MentionEntity} from '../message/MentionEntity';
 import {AudioMetaData, VideoMetaData, ImageMetaData} from '@wireapp/core/dist/conversation/content';
 import {FileAsset} from '../entity/message/FileAsset';
 import {Text as TextAsset} from '../entity/message/Text';
-
-declare const Raygun: RaygunStatic;
 
 type ConversationEvent = {conversation: string; id: string};
 type ConversationDBChange = {obj: ConversationEvent; oldObj: ConversationEvent};
@@ -1271,7 +1268,6 @@ export class ConversationRepository {
       .catch(error => {
         const errorMessage = 'Failed to update last read timestamp';
         this.logger.error(`${errorMessage}: ${error.message}`, error);
-        Raygun.send(new Error(errorMessage), {label: error.label, message: error.message});
       });
   }
 
@@ -2958,14 +2954,6 @@ export class ConversationRepository {
               this.logger.error(log);
 
               const error = new Error('Failed to grant outgoing message');
-              const customData = {
-                consentType,
-                messageType: type,
-                participants: conversationEntity.getNumberOfParticipants(false),
-                verificationState,
-              };
-
-              Raygun.send(error, customData);
 
               reject(error);
             }
