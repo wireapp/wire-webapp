@@ -28,7 +28,6 @@ import {getParameter} from 'Util/UrlUtil';
 import {createRandomUuid} from 'Util/util';
 import {URLParameter} from '../auth/URLParameter';
 import type {UserRepository} from '../user/UserRepository';
-import {EventName} from './EventName';
 import {UserData} from './UserData';
 import {Segmantation} from './Segmentation';
 
@@ -93,15 +92,11 @@ export class EventTrackingRepository {
     this.startErrorReporting();
     if (this.isDomainAllowedForAnalytics()) {
       await this.startProductReporting();
-      if (isOptIn) {
-        this.trackProductReportingEvent(EventName.SETTINGS.OPTED_IN_TRACKING);
-      }
     }
   }
 
   private disableServices(): void {
     this.stopErrorReporting();
-    this.trackProductReportingEvent(EventName.SETTINGS.OPTED_OUT_TRACKING);
     this.stopProductReporting();
   }
 
