@@ -52,6 +52,7 @@ export interface WebappProperties {
     privacy: {
       improve_wire?: boolean;
       report_errors?: boolean;
+      telemetry_sharing?: boolean;
     };
     sound: {
       alerts: AudioPreference;
