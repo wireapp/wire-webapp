@@ -20,7 +20,6 @@
 import {amplify} from 'amplify';
 import jQuery from 'jquery';
 import ko from 'knockout';
-import 'raygun4js/dist/raygun.vanilla';
 import type {t} from 'Util/LocalizerUtil';
 
 import type {AssetService} from '../assets/AssetService';
@@ -112,7 +111,6 @@ declare global {
         MAX_SFT_VIDEO_PARTICIPANTS: number;
         MAX_VIDEO_PARTICIPANTS: number;
         NEW_PASSWORD_MINIMUM_LENGTH: number;
-        RAYGUN_API_KEY: string;
         URL: {
           ACCOUNT_BASE: string;
           MOBILE_BASE: string;
