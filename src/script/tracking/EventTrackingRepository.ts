@@ -76,6 +76,9 @@ export class EventTrackingRepository {
   }
 
   async init(telemetrySharing: boolean): Promise<void> {
+    if (!this.userRepository.isTeam()) {
+      return; // Countly should not be enabled for non-team users
+    }
     const enableTelemetrySharing = telemetrySharing || this.userRepository.isTeam();
     this.logger.info(`Initialize analytics and error reporting: ${enableTelemetrySharing}`);
 
