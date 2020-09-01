@@ -36,18 +36,18 @@ import {BackupRepository} from '../../backup/BackupRepository';
 import {formatDuration} from '../../util/TimeUtil';
 
 export class HistoryImportViewModel {
-  private readonly logger: Logger;
   private readonly error: ko.Observable<Error>;
+  private readonly logger: Logger;
+  private readonly numberOfProcessedRecords: ko.Observable<number>;
+  private readonly numberOfRecords: ko.Observable<number>;
+  private readonly state: ko.Observable<string>;
   errorHeadline: ko.Observable<string>;
   errorSecondary: ko.Observable<string>;
-  private readonly state: ko.Observable<string>;
-  isPreparing: ko.PureComputed<boolean>;
-  isImporting: ko.PureComputed<boolean>;
   isDone: ko.PureComputed<boolean>;
-  private readonly numberOfRecords: ko.Observable<number>;
-  private readonly numberOfProcessedRecords: ko.Observable<number>;
-  loadingProgress: ko.PureComputed<number>;
+  isImporting: ko.PureComputed<boolean>;
+  isPreparing: ko.PureComputed<boolean>;
   loadingMessage: ko.PureComputed<string>;
+  loadingProgress: ko.PureComputed<number>;
 
   static get STATE() {
     return {
@@ -116,7 +116,7 @@ export class HistoryImportViewModel {
     this.state(HistoryImportViewModel.STATE.PREPARING);
     this.error(null);
     const fileBuffer = await loadFileBuffer(file);
-    const worker = new WebWorker('worker/jszip-worker.js');
+    const worker = new WebWorker('worker/jszip-unpack-worker.js');
 
     try {
       const unzipTimeStart = performance.now();
@@ -128,10 +128,14 @@ export class HistoryImportViewModel {
       const unzipTimeMillis = Math.round(unzipTimeEnd - unzipTimeStart);
       const unzipTimeFormatted = formatDuration(unzipTimeMillis);
 
-      this.logger.log(`Unzipped files for history import (took ${unzipTimeFormatted.text}).`, files);
+      this.logger.log(
+        `Unzipped '${Object.keys(files).length}' files for history import (took ${unzipTimeFormatted.text}).`,
+        files,
+      );
       await this.backupRepository.importHistory(files, this.onInit, this.onProgress);
       this.onSuccess();
     } catch (error) {
+      console.error(error);
       this.onError(error);
     }
   };

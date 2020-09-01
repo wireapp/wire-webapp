@@ -128,7 +128,7 @@ export class BackupRepository {
 
     try {
       const exportedData = await this._exportHistory(progressCallback);
-      return this.compressHistoryFiles(exportedData);
+      return await this.compressHistoryFiles(exportedData);
     } catch (error) {
       this.logger.error(`Could not export history: ${error.message}`, error);
       const isCancelError = error instanceof CancelError;
