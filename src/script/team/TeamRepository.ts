@@ -284,7 +284,9 @@ export class TeamRepository {
         userID: this.selfUser().id,
       };
 
-      if (Environment.version(true).startsWith('3.2')) {
+      const [majorVersion, minorVersion] = (Environment.version(true) || '').split('.');
+
+      if (Number(majorVersion) >= 3 && Number(minorVersion) >= 20) {
         accountInfo.availability = this.selfUser().availability();
       }
 
