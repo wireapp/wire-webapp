@@ -19,26 +19,20 @@
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
-import {RaygunStatic} from 'raygun4js';
 import {Environment} from 'Util/Environment';
 import {getLogger, Logger} from 'Util/Logger';
 import {includesString} from 'Util/StringUtil';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {getParameter} from 'Util/UrlUtil';
 import {createRandomUuid} from 'Util/util';
 import {URLParameter} from '../auth/URLParameter';
 import type {UserRepository} from '../user/UserRepository';
-import {EventName} from './EventName';
 import {UserData} from './UserData';
 import {Segmantation} from './Segmentation';
-
-declare const Raygun: RaygunStatic;
 
 const Countly = require('countly-sdk-web');
 
 export class EventTrackingRepository {
   private isProductReportingActivated: boolean;
-  private lastReportTimestamp?: number;
   private privacyPreference?: boolean;
   private readonly logger: Logger;
   private readonly userRepository: UserRepository;
@@ -46,10 +40,6 @@ export class EventTrackingRepository {
 
   static get CONFIG() {
     return {
-      ERROR_REPORTING: {
-        API_KEY: window.wire.env.RAYGUN_API_KEY,
-        REPORTING_THRESHOLD: TIME_IN_MILLIS.MINUTE,
-      },
       USER_ANALYTICS: {
         API_KEY: window.wire.env.ANALYTICS_API_KEY,
         CLIENT_TYPE: 'desktop',
@@ -63,7 +53,6 @@ export class EventTrackingRepository {
 
     this.userRepository = userRepository;
 
-    this.lastReportTimestamp = undefined;
     this.privacyPreference = undefined;
 
     this.isErrorReportingActivated = false;
@@ -90,18 +79,12 @@ export class EventTrackingRepository {
   };
 
   private async enableServices(isOptIn = false): Promise<void> {
-    this.startErrorReporting();
     if (this.isDomainAllowedForAnalytics()) {
       await this.startProductReporting();
-      if (isOptIn) {
-        this.trackProductReportingEvent(EventName.SETTINGS.OPTED_IN_TRACKING);
-      }
     }
   }
 
   private disableServices(): void {
-    this.stopErrorReporting();
-    this.trackProductReportingEvent(EventName.SETTINGS.OPTED_OUT_TRACKING);
     this.stopProductReporting();
   }
 
@@ -187,64 +170,5 @@ export class EventTrackingRepository {
 
   private unsubscribeFromProductTrackingEvents(): void {
     amplify.unsubscribeAll(WebAppEvents.ANALYTICS.EVENT);
-  }
-
-  /**
-   * Checks if a Raygun payload should be reported.
-   *
-   * @see https://github.com/MindscapeHQ/raygun4js#onbeforesend
-   * @param raygunPayload Error payload about to be send
-   * @returns Payload if error will be reported, otherwise `false`
-   */
-  private checkErrorPayload<T extends object>(raygunPayload: T): T | false {
-    if (!this.lastReportTimestamp) {
-      this.lastReportTimestamp = Date.now();
-      return raygunPayload;
-    }
-
-    const timeSinceLastReport = Date.now() - this.lastReportTimestamp;
-    if (timeSinceLastReport > EventTrackingRepository.CONFIG.ERROR_REPORTING.REPORTING_THRESHOLD) {
-      this.lastReportTimestamp = Date.now();
-      return raygunPayload;
-    }
-
-    return false;
-  }
-
-  private stopErrorReporting(): void {
-    this.logger.debug('Disabling Raygun error reporting');
-    this.isErrorReportingActivated = false;
-    Raygun.detach();
-    Raygun.init(EventTrackingRepository.CONFIG.ERROR_REPORTING.API_KEY, {disableErrorTracking: true});
-  }
-
-  private startErrorReporting(): void {
-    this.logger.debug('Enabling Raygun error reporting');
-    this.isErrorReportingActivated = true;
-
-    const options = {
-      debugMode: !Environment.frontend.isProduction(),
-      disableErrorTracking: false,
-      excludedHostnames: ['localhost', 'wire.ms'],
-      ignore3rdPartyErrors: true,
-      ignoreAjaxAbort: true,
-      ignoreAjaxError: true,
-    };
-
-    Raygun.init(EventTrackingRepository.CONFIG.ERROR_REPORTING.API_KEY, options).attach();
-    Raygun.disableAutoBreadcrumbs();
-
-    /*
-     * Adding a version to the Raygun reports to identify which version of the WebApp ran into the issue.
-     * @note We cannot use our own version string as it has to be in a certain format
-     * @see https://github.com/MindscapeHQ/raygun4js#version-filtering
-     */
-    if (!Environment.frontend.isLocalhost()) {
-      Raygun.setVersion(Environment.version(false));
-    }
-    if (Environment.desktop) {
-      Raygun.withCustomData({electron_version: Environment.version(true)});
-    }
-    Raygun.onBeforeSend(this.checkErrorPayload.bind(this));
   }
 }

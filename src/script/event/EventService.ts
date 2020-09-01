@@ -17,7 +17,6 @@
  *
  */
 
-import {RaygunStatic} from 'raygun4js';
 import type {Dexie} from 'dexie';
 
 import {getLogger, Logger} from 'Util/Logger';
@@ -33,8 +32,6 @@ import {BaseError, BASE_ERROR_TYPE} from '../error/BaseError';
 import {ConversationError} from '../error/ConversationError';
 import {StorageError} from '../error/StorageError';
 import {StorageService, DatabaseListenerCallback, EventRecord} from '../storage';
-
-declare const Raygun: RaygunStatic;
 
 export type Includes = {includeFrom: boolean; includeTo: boolean};
 type DexieCollection = Dexie.Collection<any, any>;
@@ -447,7 +444,6 @@ export class EventService {
               updateVersion: changes.version,
             };
             this.logger.error(logMessage, logObject);
-            Raygun.send(new Error(logMessage), logObject);
             throw new StorageError(StorageError.TYPE.NON_SEQUENTIAL_UPDATE, StorageError.MESSAGE.NON_SEQUENTIAL_UPDATE);
           },
         );

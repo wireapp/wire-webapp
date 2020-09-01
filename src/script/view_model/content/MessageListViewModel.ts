@@ -48,6 +48,7 @@ import {ServerTimeHandler} from '../../time/serverTimeHandler';
 import {UserRepository} from '../../user/UserRepository';
 import {ActionsViewModel} from '../ActionsViewModel';
 import {PanelViewModel} from '../PanelViewModel';
+
 /*
  * Message list rendering view model.
  *
@@ -58,7 +59,7 @@ export class MessageListViewModel {
   private readonly logger: Logger;
   readonly actionsViewModel: ActionsViewModel;
   readonly selfUser: ko.Observable<User>;
-  readonly focusedMessage: ko.Observable<any>;
+  readonly focusedMessage: ko.Observable<string>;
   readonly conversation: ko.Observable<Conversation>;
   readonly verticallyCenterMessage: ko.PureComputed<boolean>;
   private readonly conversationLoaded: ko.Observable<boolean>;
@@ -553,13 +554,19 @@ export class MessageListViewModel {
     }
   };
 
-  handleClickOnMessage = (messageEntity: ContentMessage | Text, event: MouseEvent) => {
-    const emailTarget: HTMLAnchorElement = (event.target as HTMLElement).closest('[data-email-link]');
+  handleClickOnMessage = (messageEntity: ContentMessage | Text, event: MouseEvent): boolean => {
+    if (event.which === 3) {
+      // Default browser behavior on right click
+      return true;
+    }
+
+    const emailTarget = (event.target as HTMLElement).closest<HTMLAnchorElement>('[data-email-link]');
     if (emailTarget) {
       safeMailOpen(emailTarget.href);
       return false;
     }
-    const linkTarget: HTMLAnchorElement = (event.target as HTMLElement).closest('[data-md-link]');
+
+    const linkTarget = (event.target as HTMLElement).closest<HTMLAnchorElement>('[data-md-link]');
     if (linkTarget) {
       const href = linkTarget.href;
       amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
@@ -576,9 +583,10 @@ export class MessageListViewModel {
       });
       return false;
     }
+
     const hasMentions = messageEntity instanceof Text && messageEntity.mentions().length;
-    const mentionElement = hasMentions && (event.target as HTMLElement).closest('.message-mention');
-    const userId = mentionElement && (mentionElement as any).dataset.userId;
+    const mentionElement = hasMentions && (event.target as HTMLElement).closest<HTMLSpanElement>('.message-mention');
+    const userId = mentionElement?.dataset?.userId;
 
     if (userId) {
       (async () => {

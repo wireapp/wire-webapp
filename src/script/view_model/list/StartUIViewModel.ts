@@ -33,7 +33,6 @@ import {User} from '../../entity/User';
 import {generatePermissionHelpers} from '../../user/UserPermission';
 import {validateHandle} from '../../user/UserHandleGenerator';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {EventName} from '../../tracking/EventName';
 import {SearchRepository} from '../../search/SearchRepository';
 import {sortByPriority} from 'Util/StringUtil';
 import {ListViewModel} from '../ListViewModel';
@@ -245,7 +244,6 @@ export class StartUIViewModel {
   clickOnCreateGuestRoom = (): void => {
     this.conversationRepository.createGuestRoom().then(conversationEntity => {
       amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.GUEST_ROOMS.GUEST_ROOM_CREATION);
     });
   };
 
@@ -254,13 +252,11 @@ export class StartUIViewModel {
       return;
     }
     safeWindowOpen(this.manageTeamUrl);
-    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.SETTINGS.OPENED_MANAGE_TEAM);
   };
 
   clickOpenManageServices = () => {
     if (this.manageServicesUrl) {
       safeWindowOpen(this.manageServicesUrl);
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.SETTINGS.OPENED_MANAGE_TEAM);
     }
   };
 

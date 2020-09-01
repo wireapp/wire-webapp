@@ -156,7 +156,6 @@ const config: ServerConfig = {
     MAX_VIDEO_PARTICIPANTS: (process.env.MAX_VIDEO_PARTICIPANTS && Number(process.env.MAX_VIDEO_PARTICIPANTS)) || 4,
     NEW_PASSWORD_MINIMUM_LENGTH:
       (process.env.NEW_PASSWORD_MINIMUM_LENGTH && Number(process.env.NEW_PASSWORD_MINIMUM_LENGTH)) || 8,
-    RAYGUN_API_KEY: process.env.RAYGUN_API_KEY,
     URL: {
       ACCOUNT_BASE: process.env.URL_ACCOUNT_BASE,
       MOBILE_BASE: process.env.URL_MOBILE_BASE,
