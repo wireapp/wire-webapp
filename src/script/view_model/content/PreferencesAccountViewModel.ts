@@ -488,7 +488,7 @@ export class PreferencesAccountViewModel {
     }
   };
 
-  shouldFocusUsername = (): boolean => this.userRepository.should_set_username;
+  shouldFocusUsername = (): boolean => this.userRepository.shouldSetUsername;
 
   verifyUsername = (username: string, event: ChangeEvent<HTMLInputElement>): void => {
     const enteredUsername = event.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '');

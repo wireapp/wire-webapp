@@ -112,7 +112,7 @@ export class TeamRepository {
     this.teamSize = ko.pureComputed(() => (this.isTeam() ? this.teamMembers().length + 1 : 0));
     this.teamUsers = ko.pureComputed(() => {
       return this.teamMembers()
-        .concat(this.userRepository.connected_users())
+        .concat(this.userRepository.connectedUsers())
         .filter((item, index, array) => array.indexOf(item) === index)
         .sort(sortUsersByPriority);
     });
