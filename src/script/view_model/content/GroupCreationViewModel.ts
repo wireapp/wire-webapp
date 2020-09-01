@@ -40,6 +40,7 @@ export class GroupCreationViewModel {
   isShown: ko.Observable<boolean>;
   state: ko.Observable<string>;
   private isCreatingConversation: boolean;
+  private groupCreationSource: GroupCreationSource;
   nameError: ko.Observable<string>;
   nameInput: ko.Observable<string>;
   selectedContacts: ko.ObservableArray<User>;
