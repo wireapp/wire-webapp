@@ -43,7 +43,7 @@ export class Runtime {
   }
 
   public static getOSFamily(): OperatingSystem {
-    const family = Runtime.getOS().family.toLowerCase();
+    const family = Runtime.getOS().family?.toLowerCase();
     if (family.includes('windows')) {
       return OperatingSystem.WINDOWS;
     }
@@ -95,6 +95,80 @@ export class Runtime {
       ...platform.os,
     };
   }
+
+  public static isSupportingWebSockets = (): boolean => {
+    try {
+      return 'WebSocket' in window;
+    } catch (error) {
+      return false;
+    }
+  };
+
+  public static isSupportingClipboard = (): boolean => !!navigator.clipboard;
+  public static isSupportingIndexedDb = (): boolean => {
+    try {
+      return !!window.indexedDB;
+    } catch (error) {
+      return false;
+    }
+  };
+
+  public static isSupportingLegacyCalling = (): boolean => {
+    if (
+      !Runtime.isSupportingRTCPeerConnection() ||
+      !Runtime.isSupportingRTCDataChannel() ||
+      !Runtime.isSupportingUserMedia() ||
+      !Runtime.isSupportingWebSockets()
+    ) {
+      return false;
+    }
+    return true;
+  };
+
+  public static isSupportingConferenceCalling = (): boolean => {
+    if (!Runtime.isSupportingLegacyCalling() || !Runtime.isSupportingRTCInjectableStreams()) {
+      return false;
+    }
+    return true;
+  };
+
+  public static isSupportingRTCPeerConnection = (): boolean => 'RTCPeerConnection' in window;
+  public static isSupportingRTCDataChannel = (): boolean => {
+    if (!Runtime.isSupportingRTCPeerConnection()) {
+      return false;
+    }
+
+    const peerConnection = new RTCPeerConnection(undefined);
+    return 'createDataChannel' in peerConnection;
+  };
+  public static isSupportingRTCInjectableStreams = (): boolean => {
+    const isSupportingEncodedStreams = RTCRtpSender.prototype.hasOwnProperty('createEncodedStreams');
+    const isSupportingEncodedVideoStreams = RTCRtpSender.prototype.hasOwnProperty('createEncodedVideoStreams');
+    return isSupportingEncodedStreams || isSupportingEncodedVideoStreams;
+  };
+  public static isSupportingUserMedia = (): boolean =>
+    'mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices;
+  public static isSupportingDisplayMedia = (): boolean =>
+    'mediaDevices' in navigator && 'getDisplayMedia' in navigator.mediaDevices;
+
+  public static isSupportingScreensharing = (): boolean => {
+    const hasScreenCaptureAPI =
+      !!((window as unknown) as any).desktopCapturer ||
+      (Runtime.isSupportingUserMedia() && Runtime.isSupportingDisplayMedia());
+    return hasScreenCaptureAPI || Runtime.isFirefox();
+  };
+
+  public static isSupportingPermissions = (): boolean => !!navigator.permissions;
+
+  public static isSupportingNotifications = (): boolean => {
+    const notificationNotSupported = window.Notification === undefined;
+    if (notificationNotSupported) {
+      return false;
+    }
+
+    const requestPermissionNotSupported = window.Notification.requestPermission === undefined;
+    return requestPermissionNotSupported ? false : document.visibilityState !== undefined;
+  };
 
   public static isChrome(): boolean {
     return Runtime.getBrowserName() === BROWSER.CHROME;
