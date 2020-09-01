@@ -35,7 +35,6 @@ export const Segmantation = {
   },
   CONVERSATION: {
     ALLOW_GUESTS: 'conversation_allow_guests',
-    EPHEMERAL_MESSAGE: 'conversation_ephemeral_message',
     GUESTS: 'conversation_guests',
     SERVICES: 'conversation_services',
     SIZE: 'conversation_size',
