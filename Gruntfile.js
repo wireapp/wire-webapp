@@ -96,7 +96,7 @@ module.exports = grunt => {
       user = user.substr(0, user.indexOf(' ')).toLowerCase();
     }
 
-    let version = format(new Date(), 'yyyy-MM-dd-HH-mm');
+    let version = format(new Date(), 'yyyy.MM.dd.HH.mm');
 
     if (user) {
       version = `${version}-${user}`;

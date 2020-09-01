@@ -25,7 +25,6 @@ import platform from 'platform';
 import {container} from 'tsyringe';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
-import {RaygunStatic} from 'raygun4js';
 import type {SQLeetEngine} from '@wireapp/store-engine-sqleet';
 
 import {getLogger, Logger} from 'Util/Logger';
@@ -129,8 +128,6 @@ import {AssetRepository} from '../assets/AssetRepository';
 import {DebugUtil} from 'Util/DebugUtil';
 import type {BaseError} from '../error/BaseError';
 import type {User} from '../entity/User';
-
-declare const Raygun: RaygunStatic;
 
 function doRedirect(signOutReason: SIGN_OUT_REASON) {
   let url = `/auth/${location.search}`;
@@ -461,7 +458,7 @@ class App {
       telemetry.timeStep(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
       telemetry.addStatistic(AppInitStatisticsValue.NOTIFICATIONS, notificationsCount, 100);
 
-      eventTrackerRepository.init(propertiesRepository.properties.settings.privacy.improve_wire);
+      eventTrackerRepository.init(propertiesRepository.properties.settings.privacy.telemetry_sharing);
       await conversationRepository.initialize_conversations();
       loadingView.updateProgress(97.5, t('initUpdatedFromNotifications', Config.getConfig().BRAND_NAME));
 
@@ -594,8 +591,6 @@ class App {
           const isAccessTokenError = error instanceof AccessTokenError;
           if (isAccessTokenError) {
             this.logger.error(`Could not get access token: ${error.message}. Logging out user.`, error);
-          } else {
-            Raygun.send(error);
           }
 
           return this.logout(SIGN_OUT_REASON.APP_INIT, false);

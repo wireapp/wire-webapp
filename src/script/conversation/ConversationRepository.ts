@@ -129,7 +129,7 @@ import * as LegalHoldEvaluator from '../legal-hold/LegalHoldEvaluator';
 import {DeleteConversationMessage} from '../entity/message/DeleteConversationMessage';
 import {ConversationRoleRepository} from './ConversationRoleRepository';
 import {ConversationError} from '../error/ConversationError';
-import {Segmantation} from '../tracking/Segmentation';
+import {Segmentation} from '../tracking/Segmentation';
 import {ConversationService} from './ConversationService';
 import {AssetRepository} from '../assets/AssetRepository';
 import {ClientRepository} from '../client/ClientRepository';
@@ -150,13 +150,10 @@ import {QuoteEntity} from '../message/QuoteEntity';
 import {CompositeMessage} from '../entity/message/CompositeMessage';
 import {EventSource} from '../event/EventSource';
 import {MemberMessage} from '../entity/message/MemberMessage';
-import {RaygunStatic} from 'raygun4js';
 import {MentionEntity} from '../message/MentionEntity';
 import {AudioMetaData, VideoMetaData, ImageMetaData} from '@wireapp/core/dist/conversation/content';
 import {FileAsset} from '../entity/message/FileAsset';
 import {Text as TextAsset} from '../entity/message/Text';
-
-declare const Raygun: RaygunStatic;
 
 type ConversationEvent = {conversation: string; id: string};
 type ConversationDBChange = {obj: ConversationEvent; oldObj: ConversationEvent};
@@ -1271,7 +1268,6 @@ export class ConversationRepository {
       .catch(error => {
         const errorMessage = 'Failed to update last read timestamp';
         this.logger.error(`${errorMessage}: ${error.message}`, error);
-        Raygun.send(new Error(errorMessage), {label: error.label, message: error.message});
       });
   }
 
@@ -2958,14 +2954,6 @@ export class ConversationRepository {
               this.logger.error(log);
 
               const error = new Error('Failed to grant outgoing message');
-              const customData = {
-                consentType,
-                messageType: type,
-                participants: conversationEntity.getNumberOfParticipants(false),
-                verificationState,
-              };
-
-              Raygun.send(error, customData);
 
               reject(error);
             }
@@ -4345,7 +4333,7 @@ export class ConversationRepository {
       }
 
       case 'image': {
-        actionType = 'photo';
+        actionType = 'image';
         break;
       }
 
@@ -4375,12 +4363,12 @@ export class ConversationRepository {
     if (actionType) {
       const guests = conversationEntity.participating_user_ets().filter(user => user.isGuest()).length;
       let segmentations = {
-        [Segmantation.CONVERSATION.GUESTS]: guests,
-        [Segmantation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
-        [Segmantation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
-        [Segmantation.MESSAGE.ACTION]: actionType,
-        [Segmantation.MESSAGE.IS_REPLY]: !!genericMessage.text?.quote,
-        [Segmantation.MESSAGE.MENTION]: numberOfMentions,
+        [Segmentation.CONVERSATION.GUESTS]: guests,
+        [Segmentation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
+        [Segmentation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
+        [Segmentation.MESSAGE.ACTION]: actionType,
+        [Segmentation.MESSAGE.IS_REPLY]: !!genericMessage.text?.quote,
+        [Segmentation.MESSAGE.MENTION]: numberOfMentions,
       };
       const isTeamConversation = !!conversationEntity.team_id;
       if (isTeamConversation) {

@@ -1663,11 +1663,6 @@
   resolved "https://registry.yarnpkg.com/@types/q/-/q-1.5.2.tgz#690a1475b84f2a884fd07cd797c00f5f31356ea8"
   integrity sha512-ce5d3q03Ex0sy4R14722Rmt6MT07Ua+k4FwDfdcToYJcMKNtRVQvJ6JCAPdAmAnbRb6CsX6aYb9m96NGod9uTw==
 
-"@types/raygun4js@2.13.6":
-  version "2.13.6"
-  resolved "https://registry.yarnpkg.com/@types/raygun4js/-/raygun4js-2.13.6.tgz#18732844f50dae31ff6695eb7056d589ab15ddf4"
-  integrity sha512-NaVr7xYVXW9EtneBVpWBbxuzr50/2fidYyHUDOHrvD/qH+poip804LlwB0rTxh6cy17F0huhtRnyBW45Ic0Vkg==
-
 "@types/react-dom@16.9.8":
   version "16.9.8"
   resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-16.9.8.tgz#fe4c1e11dfc67155733dfa6aa65108b4971cb423"
@@ -2014,10 +2009,10 @@
   resolved "https://registry.yarnpkg.com/@wireapp/antiscroll-2/-/antiscroll-2-1.0.2.tgz#71a78d294ee0c88f42d50477ab61fa39272f5bca"
   integrity sha512-9KeB3yh9k01PjpuuRQsve4yY3+OVS2/hp9j+N13Is5wYCZRkUzZVCs8w9CyA/C6J5o9ukH0EzT7uurysWuhn/A==
 
-"@wireapp/api-client@11.25.9":
-  version "11.25.9"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-11.25.9.tgz#14a44666fff5d8d12fb69e249122d24f334025a1"
-  integrity sha512-9cIs1xEE+cOnWtKdDfefCvxK93+RLSNeiekeMyDPwlDWEZTnjFwh4YaCIoWaZAMC02vHoBISp+k/Ey83BYl5Yg==
+"@wireapp/api-client@11.26.0":
+  version "11.26.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-11.26.0.tgz#d870c557fece0549c837971880a1dba920df2e02"
+  integrity sha512-qxxSEk4fe9joHkG5+hv2MQ4LLclqyqRBefcmshYiYX7yj81sRK1Jz9r0yJMJttvIdD6ordd93swDXNxYjKsarQ==
   dependencies:
     "@types/node" "~12"
     "@types/spark-md5" "3.0.2"
@@ -2068,14 +2063,14 @@
     logdown "3.3.1"
     rimraf "3.0.2"
 
-"@wireapp/core@16.12.10":
-  version "16.12.10"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-16.12.10.tgz#83bef1671655727dd51ff453cdf5de030f1d96f1"
-  integrity sha512-qpp0V0oPMiv3G8OCYQGy5Jyndu2uUYAZnhnLZeP7gqdor0tV5h5WSB4p9IBuBBTZKAF2owNkvu/C3PuWCe9swg==
+"@wireapp/core@16.12.11":
+  version "16.12.11"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-16.12.11.tgz#0111a7acde17bdbc366c86c6a9e8c8c1f6e056eb"
+  integrity sha512-e2jJ9yGnY7iOs0ySL16FvTARACM2SnIex0A8k+9kza4DgyeEFPL5287qqxz0/DFO9bSV7jFRimOHmfnxYFA4+w==
   dependencies:
     "@types/long" "4.0.1"
     "@types/node" "~12"
-    "@wireapp/api-client" "11.25.9"
+    "@wireapp/api-client" "11.26.0"
     "@wireapp/cryptobox" "12.2.23"
     "@wireapp/protocol-messaging" "1.25.4"
     "@wireapp/store-engine" "4.5.10"
@@ -2182,10 +2177,10 @@
   dependencies:
     "@types/node" "~12"
 
-"@wireapp/webapp-events@0.5.3":
-  version "0.5.3"
-  resolved "https://registry.yarnpkg.com/@wireapp/webapp-events/-/webapp-events-0.5.3.tgz#bc542f2d95f408dbb0411207292c47e5402e788d"
-  integrity sha512-h/2z5leYNi5Fq+hJx8/4jeTodBFK6CMYlzcqf6HVlgToGgDr/RCfRGnU4LdBE+ldPqw0UWjfm4g6WflLttjpWg==
+"@wireapp/webapp-events@0.6.0":
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/webapp-events/-/webapp-events-0.6.0.tgz#1b694b02828367b94d3f023c9dc6828382a6fed6"
+  integrity sha512-2j0JFyNg/EcFjBzZvfSwfXbeQvCDQo8G2IN17G1WsErrnepcDaGqaVtVd7FBCUjliHxd8E6J90g2eUrbvsUIDA==
 
 "@wireapp/websql@0.0.17":
   version "0.0.17"
@@ -10940,11 +10935,6 @@ raw-body@~1.1.0:
   dependencies:
     bytes "1"
     string_decoder "0.10"
-
-raygun4js@2.20.1:
-  version "2.20.1"
-  resolved "https://registry.yarnpkg.com/raygun4js/-/raygun4js-2.20.1.tgz#189422d6a3cc7af40ff07d08f232e83e0a7948a0"
-  integrity sha512-E4szfGuQu746FX7k/L+Q1CoDbKi7d/xwR/ZGxKVyvlryUL7Ovl3BhFG8zsMAfphGk71Nh0tlPxLsxYBOUNEHWQ==
 
 rc@^1.2.7:
   version "1.2.8"

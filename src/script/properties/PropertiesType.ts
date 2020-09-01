@@ -40,6 +40,7 @@ enum PROPERTIES {
   NOTIFICATIONS = 'settings.notifications',
   PRIVACY = 'settings.privacy.improve_wire',
   SOUND_ALERTS = 'settings.sound.alerts',
+  TELEMETRY_SHARING = 'settings.privacy.telemetry_sharing',
   VERSION = 'version',
 }
 
