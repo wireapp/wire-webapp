@@ -307,6 +307,9 @@ export class PropertiesRepository {
       case PROPERTIES_TYPE.PRIVACY:
         amplify.publish(WebAppEvents.PROPERTIES.UPDATE.PRIVACY, updatedPreference);
         break;
+      case PROPERTIES_TYPE.TELEMETRY_SHARING:
+        amplify.publish(WebAppEvents.PROPERTIES.UPDATE.TELEMETRY_SHARING, updatedPreference);
+        break;
       case PROPERTIES_TYPE.SOUND_ALERTS:
         amplify.publish(WebAppEvents.PROPERTIES.UPDATE.SOUND_ALERTS, updatedPreference);
         break;

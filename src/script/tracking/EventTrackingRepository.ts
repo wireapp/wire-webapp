@@ -30,12 +30,13 @@ import {UserData} from './UserData';
 import {Segmentation} from './Segmentation';
 import {getPlatform} from './Helpers';
 import type {UserRepository} from '../user/UserRepository';
+import {loadValue, storeValue} from 'Util/StorageUtil';
 
 const Countly = require('countly-sdk-web');
 
 export class EventTrackingRepository {
   private isProductReportingActivated: boolean;
-  private privacyPreference?: boolean;
+  private readonly countlyDeviceId: string;
   private readonly logger: Logger;
   private readonly userRepository: UserRepository;
   isErrorReportingActivated: boolean;
@@ -45,6 +46,7 @@ export class EventTrackingRepository {
       USER_ANALYTICS: {
         API_KEY: window.wire.env.ANALYTICS_API_KEY,
         CLIENT_TYPE: 'desktop',
+        COUNTLY_DEVICE_ID_LOCAL_STORAGE_KEY: 'COUNTLY_DEVICE_ID',
         DISABLED_DOMAINS: ['localhost'],
       },
     };
@@ -55,40 +57,39 @@ export class EventTrackingRepository {
 
     this.userRepository = userRepository;
 
-    this.privacyPreference = undefined;
-
     this.isErrorReportingActivated = false;
     this.isProductReportingActivated = false;
-  }
 
-  async init(privacyPreference: boolean): Promise<void> {
-    this.privacyPreference = privacyPreference || this.userRepository.isTeam();
-    this.logger.info(`Initialize analytics and error reporting: ${this.privacyPreference}`);
+    const previousCountlyDeviceId = loadValue<string>(
+      EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_DEVICE_ID_LOCAL_STORAGE_KEY,
+    );
 
-    if (this.privacyPreference) {
-      this.enableServices(false);
+    if (previousCountlyDeviceId) {
+      this.countlyDeviceId = previousCountlyDeviceId;
+    } else {
+      this.countlyDeviceId = createRandomUuid();
+      storeValue(
+        EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_DEVICE_ID_LOCAL_STORAGE_KEY,
+        this.countlyDeviceId,
+      );
     }
-
-    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.PRIVACY, this.updatePrivacyPreference);
   }
 
-  private readonly updatePrivacyPreference = async (privacyPreference: boolean): Promise<void> => {
-    const hasPreferenceChanged = privacyPreference !== this.privacyPreference;
-    if (hasPreferenceChanged) {
-      this.privacyPreference = privacyPreference;
-      return this.privacyPreference ? this.enableServices(true) : this.disableServices();
+  async init(telemetrySharing: boolean): Promise<void> {
+    const enableTelemetrySharing = telemetrySharing || this.userRepository.isTeam();
+    this.logger.info(`Initialize analytics and error reporting: ${enableTelemetrySharing}`);
+
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.TELEMETRY_SHARING, this.toggleCountly);
+    this.toggleCountly(telemetrySharing);
+  }
+
+  private readonly toggleCountly = (isEnabled: boolean) => {
+    if (isEnabled && this.isDomainAllowedForAnalytics()) {
+      this.startProductReporting();
+    } else {
+      this.stopProductReporting();
     }
   };
-
-  private async enableServices(isOptIn = false): Promise<void> {
-    if (this.isDomainAllowedForAnalytics()) {
-      await this.startProductReporting();
-    }
-  }
-
-  private disableServices(): void {
-    this.stopProductReporting();
-  }
 
   private stopProductReporting(): void {
     this.logger.debug('Analytics was disabled due to user preferences');
@@ -98,7 +99,7 @@ export class EventTrackingRepository {
   }
 
   private async startProductReporting(): Promise<void> {
-    if (!window.wire.env.COUNTLY_API_KEY) {
+    if (!window.wire.env.COUNTLY_API_KEY || this.isProductReportingActivated) {
       return;
     }
     this.isProductReportingActivated = true;
@@ -106,7 +107,7 @@ export class EventTrackingRepository {
     Countly.init({
       app_key: window.wire.env.COUNTLY_API_KEY,
       debug: !Environment.frontend.isProduction(),
-      device_id: createRandomUuid(),
+      device_id: this.countlyDeviceId,
       url: 'https://wire.count.ly/',
       use_session_cookie: false,
     });

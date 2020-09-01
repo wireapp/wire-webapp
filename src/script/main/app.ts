@@ -458,7 +458,7 @@ class App {
       telemetry.timeStep(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
       telemetry.addStatistic(AppInitStatisticsValue.NOTIFICATIONS, notificationsCount, 100);
 
-      eventTrackerRepository.init(propertiesRepository.properties.settings.privacy.improve_wire);
+      eventTrackerRepository.init(propertiesRepository.properties.settings.privacy.telemetry_sharing);
       await conversationRepository.initialize_conversations();
       loadingView.updateProgress(97.5, t('initUpdatedFromNotifications', Config.getConfig().BRAND_NAME));
 
