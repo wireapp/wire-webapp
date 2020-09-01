@@ -187,6 +187,7 @@ export const WebAppEvents = {
       },
       PRIVACY: 'wire.webapp.properties.update.privacy',
       SOUND_ALERTS: 'wire.webapp.properties.update.sound_alerts',
+      TELEMETRY_SHARING: 'wire.webapp.properties.update.telemetry_sharing',
     },
     UPDATED: 'wire.webapp.properties.updated',
   },
