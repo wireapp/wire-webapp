@@ -43,7 +43,6 @@ import {UrlUtil} from '@wireapp/commons';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import 'webrtc-adapter';
-import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
 import {createRandomUuid} from 'Util/util';
@@ -71,6 +70,7 @@ import * as trackingHelpers from '../tracking/Helpers';
 import {UserRepository} from '../user/UserRepository';
 import {flatten} from 'Util/ArrayUtil';
 import {QUERY_KEY} from '../auth/route';
+import {Runtime} from '@wireapp/commons';
 
 interface MediaStreamQuery {
   audio?: boolean;
@@ -211,7 +211,7 @@ export class CallingRepository {
       this.callLog.push(`${new Date().toISOString()} [${logLevels[level]}] ${trimmedMessage}`);
     });
 
-    const avsEnv = Environment.browser.firefox ? AVS_ENV.FIREFOX : AVS_ENV.DEFAULT;
+    const avsEnv = Runtime.isFirefox() ? AVS_ENV.FIREFOX : AVS_ENV.DEFAULT;
     wCall.init(avsEnv);
     wCall.setUserMediaHandler(this.getCallMediaStream);
     wCall.setMediaStreamHandler(this.updateParticipantStream);
@@ -415,7 +415,7 @@ export class CallingRepository {
    * @see https://www.chromestatus.com/feature/6321945865879552
    */
   get supportsConferenceCalling(): boolean {
-    return Environment.browser.supports.conferenceCalling;
+    return Runtime.isSupportingConferenceCalling();
   }
 
   /**
@@ -423,7 +423,7 @@ export class CallingRepository {
    * @returns `true` if calling is supported
    */
   get supportsCalling(): boolean {
-    return Environment.browser.supports.calling;
+    return Runtime.isSupportingLegacyCalling();
   }
 
   /**
@@ -431,7 +431,7 @@ export class CallingRepository {
    * @returns `true` if screen sharing is supported
    */
   get supportsScreenSharing(): boolean {
-    return Environment.browser.supports.screenSharing;
+    return Runtime.isSupportingScreensharing();
   }
 
   /**
@@ -901,7 +901,7 @@ export class CallingRepository {
 
   private readonly requestConfig = () => {
     (async () => {
-      const limit = Environment.browser.firefox ? CallingRepository.CONFIG.MAX_FIREFOX_TURN_COUNT : undefined;
+      const limit = Runtime.isFirefox() ? CallingRepository.CONFIG.MAX_FIREFOX_TURN_COUNT : undefined;
       try {
         const config = await this.fetchConfig(limit);
         this.wCall.configUpdate(this.wUser, 0, JSON.stringify(config));

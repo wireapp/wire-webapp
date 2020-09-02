@@ -25,11 +25,11 @@ import '@wireapp/antiscroll-2/dist/antiscroll-2';
 
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {stripUrlWrapper} from 'Util/util';
-import {Environment} from 'Util/Environment';
 import {isEnterKey} from 'Util/KeyboardUtil';
 
 import {overlayedObserver} from '../../ui/overlayedObserver';
 import {viewportObserver} from '../../ui/viewportObserver';
+import {Runtime} from '@wireapp/commons';
 
 /**
  * Use it on the drop area.
@@ -507,7 +507,7 @@ ko.bindingHandlers.simplebar = {
 
 ko.bindingHandlers.electron_remove = {
   init(element) {
-    if (Environment.electron) {
+    if (Runtime.isDesktopApp()) {
       $(element).remove();
     }
   },
@@ -643,7 +643,7 @@ ko.bindingHandlers.tooltip = {
  */
 ko.bindingHandlers.clickOrDrag = {
   init(element, valueAccessor, allBindings, viewModel, bindingContext) {
-    const isMacDesktop = Environment.electron && Environment.os.mac;
+    const isMacDesktop = Runtime.isDesktopApp() && Runtime.isMacOS();
     const context = bindingContext.$data;
     const callback = valueAccessor().bind(context, context);
     if (!isMacDesktop) {
