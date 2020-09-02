@@ -4368,7 +4368,7 @@ export class ConversationRepository {
         [Segmentation.CONVERSATION.GUESTS_WIRELESS]: '',
         [Segmentation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
         [Segmentation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
-        [Segmentation.CONVERSATION.SERVICES]: '',
+        [Segmentation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
         [Segmentation.MESSAGE.ACTION]: actionType,
         [Segmentation.MESSAGE.IS_REPLY]: !!genericMessage.text?.quote,
         [Segmentation.MESSAGE.MENTION]: numberOfMentions,
