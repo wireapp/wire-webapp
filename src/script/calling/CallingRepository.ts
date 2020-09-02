@@ -921,7 +921,7 @@ export class CallingRepository {
     const segmentations = {
       [Segmentation.CALL.AV_SWITCH_TOGGLE]: call.analyticsAvSwitchToggle,
       [Segmentation.CALL.DIRECTION]: call.state(),
-      [Segmentation.CALL.DURATION]: '',
+      [Segmentation.CALL.DURATION]: Math.ceil((Date.now() - call.startedAt()) / 5000) * 5,
       [Segmentation.CALL.END_REASON]: reason,
       [Segmentation.CALL.PARTICIPANTS]: call.participants().length,
       [Segmentation.CALL.SCREEN_SHARE]: '',
