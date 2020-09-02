@@ -4373,7 +4373,7 @@ export class ConversationRepository {
         [Segmentation.CONVERSATION.GUESTS]: guests,
         [Segmentation.CONVERSATION.GUESTS_PRO]: guestsPro,
         [Segmentation.CONVERSATION.GUESTS_WIRELESS]: guestsWireless,
-        [Segmentation.CONVERSATION.SIZE]: c,
+        [Segmentation.CONVERSATION.SIZE]: participants.length,
         [Segmentation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
         [Segmentation.CONVERSATION.SERVICES]: services,
         [Segmentation.MESSAGE.ACTION]: actionType,
