@@ -150,15 +150,18 @@ export class CallingViewModel {
     };
 
     const startCall = (conversationEntity: Conversation, callType: CALL_TYPE): void => {
-      const guests = conversationEntity.participating_user_ets().filter(user => user.isGuest()).length;
-      const wirelessGuests = conversationEntity.participating_user_ets().filter(user => user.isTemporaryGuest()).length;
+      const participants = conversationEntity.participating_user_ets();
+      const guests = participants.filter(user => user.isGuest()).length;
+      const guestsWireless = participants.filter(user => user.isTemporaryGuest()).length;
+      const services = participants.filter(user => user.isService).length;
+
       const segmentations = {
         [Segmentation.CALL.VIDEO]: callType === CALL_TYPE.VIDEO,
         [Segmentation.CONVERSATION.GUESTS]: guests,
-        [Segmentation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
-        [Segmentation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
+        [Segmentation.CONVERSATION.SERVICES]: services,
+        [Segmentation.CONVERSATION.SIZE]: participants.length,
         [Segmentation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
-        [Segmentation.CONVERSATION.GUESTS_WIRELESS]: wirelessGuests,
+        [Segmentation.CONVERSATION.GUESTS_WIRELESS]: guestsWireless,
       };
 
       amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.INITIATED_CALL, segmentations);
@@ -177,15 +180,18 @@ export class CallingViewModel {
         ring(call);
       }
       const conversationEntity = this.conversationRepository.find_conversation_by_id(call.conversationId);
-      const guests = conversationEntity.participating_user_ets().filter(user => user.isGuest()).length;
-      const wirelessGuests = conversationEntity.participating_user_ets().filter(user => user.isTemporaryGuest()).length;
+      const participants = conversationEntity.participating_user_ets();
+      const guests = participants.filter(user => user.isGuest()).length;
+      const guestsWireless = participants.filter(user => user.isTemporaryGuest()).length;
+      const services = participants.filter(user => user.isService).length;
+
       const segmentations = {
         [Segmentation.CALL.VIDEO]: call.initialType === CALL_TYPE.VIDEO,
         [Segmentation.CONVERSATION.GUESTS]: guests,
-        [Segmentation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
-        [Segmentation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
+        [Segmentation.CONVERSATION.SERVICES]: services,
+        [Segmentation.CONVERSATION.SIZE]: participants.length,
         [Segmentation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
-        [Segmentation.CONVERSATION.GUESTS_WIRELESS]: wirelessGuests,
+        [Segmentation.CONVERSATION.GUESTS_WIRELESS]: guestsWireless,
       };
       amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.RECIEVED_CALL, segmentations);
     });
