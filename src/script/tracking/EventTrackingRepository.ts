@@ -25,15 +25,18 @@ import {includesString} from 'Util/StringUtil';
 import {getParameter} from 'Util/UrlUtil';
 import {createRandomUuid} from 'Util/util';
 import {URLParameter} from '../auth/URLParameter';
-import type {UserRepository} from '../user/UserRepository';
+import {ROLE as TEAM_ROLE} from '../user/UserPermission';
 import {UserData} from './UserData';
-import {Segmantation} from './Segmentation';
+import {Segmentation} from './Segmentation';
+import {getPlatform} from './Helpers';
+import type {UserRepository} from '../user/UserRepository';
+import {loadValue, storeValue} from 'Util/StorageUtil';
 
 const Countly = require('countly-sdk-web');
 
 export class EventTrackingRepository {
   private isProductReportingActivated: boolean;
-  private privacyPreference?: boolean;
+  private readonly countlyDeviceId: string;
   private readonly logger: Logger;
   private readonly userRepository: UserRepository;
   isErrorReportingActivated: boolean;
@@ -43,6 +46,7 @@ export class EventTrackingRepository {
       USER_ANALYTICS: {
         API_KEY: window.wire.env.ANALYTICS_API_KEY,
         CLIENT_TYPE: 'desktop',
+        COUNTLY_DEVICE_ID_LOCAL_STORAGE_KEY: 'COUNTLY_DEVICE_ID',
         DISABLED_DOMAINS: ['localhost'],
       },
     };
@@ -53,40 +57,46 @@ export class EventTrackingRepository {
 
     this.userRepository = userRepository;
 
-    this.privacyPreference = undefined;
-
     this.isErrorReportingActivated = false;
     this.isProductReportingActivated = false;
-  }
 
-  async init(privacyPreference: boolean): Promise<void> {
-    this.privacyPreference = privacyPreference || this.userRepository.isTeam();
-    this.logger.info(`Initialize analytics and error reporting: ${this.privacyPreference}`);
+    const previousCountlyDeviceId = loadValue<string>(
+      EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_DEVICE_ID_LOCAL_STORAGE_KEY,
+    );
 
-    if (this.privacyPreference) {
-      this.enableServices(false);
+    if (previousCountlyDeviceId) {
+      this.countlyDeviceId = previousCountlyDeviceId;
+    } else {
+      this.countlyDeviceId = createRandomUuid();
+      storeValue(
+        EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_DEVICE_ID_LOCAL_STORAGE_KEY,
+        this.countlyDeviceId,
+      );
     }
-
-    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.PRIVACY, this.updatePrivacyPreference);
   }
 
-  private readonly updatePrivacyPreference = async (privacyPreference: boolean): Promise<void> => {
-    const hasPreferenceChanged = privacyPreference !== this.privacyPreference;
-    if (hasPreferenceChanged) {
-      this.privacyPreference = privacyPreference;
-      return this.privacyPreference ? this.enableServices(true) : this.disableServices();
+  async init(telemetrySharing: boolean | undefined): Promise<void> {
+    const isTeam = this.userRepository.isTeam();
+    if (!isTeam) {
+      return; // Countly should not be enabled for non-team users
+    }
+    let enableTelemetrySharing = true;
+    if (typeof telemetrySharing === 'boolean') {
+      enableTelemetrySharing = telemetrySharing;
+    }
+    this.logger.info(`Initialize analytics and error reporting: ${enableTelemetrySharing}`);
+
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.TELEMETRY_SHARING, this.toggleCountly);
+    this.toggleCountly(telemetrySharing);
+  }
+
+  private readonly toggleCountly = (isEnabled: boolean) => {
+    if (isEnabled && this.isDomainAllowedForAnalytics()) {
+      this.startProductReporting();
+    } else {
+      this.stopProductReporting();
     }
   };
-
-  private async enableServices(isOptIn = false): Promise<void> {
-    if (this.isDomainAllowedForAnalytics()) {
-      await this.startProductReporting();
-    }
-  }
-
-  private disableServices(): void {
-    this.stopProductReporting();
-  }
 
   private stopProductReporting(): void {
     this.logger.debug('Analytics was disabled due to user preferences');
@@ -96,7 +106,7 @@ export class EventTrackingRepository {
   }
 
   private async startProductReporting(): Promise<void> {
-    if (!window.wire.env.COUNTLY_API_KEY) {
+    if (!window.wire.env.COUNTLY_API_KEY || this.isProductReportingActivated) {
       return;
     }
     this.isProductReportingActivated = true;
@@ -104,7 +114,7 @@ export class EventTrackingRepository {
     Countly.init({
       app_key: window.wire.env.COUNTLY_API_KEY,
       debug: !Environment.frontend.isProduction(),
-      device_id: createRandomUuid(),
+      device_id: this.countlyDeviceId,
       url: 'https://wire.count.ly/',
       use_session_cookie: false,
     });
@@ -146,22 +156,40 @@ export class EventTrackingRepository {
     }
   }
 
+  private getUserType(): 'member' | 'external' | 'wireless' {
+    if (this.userRepository.self().teamRole() === TEAM_ROLE.PARTNER) {
+      return 'external';
+    }
+
+    if (this.userRepository.self().isGuest()) {
+      return 'wireless';
+    }
+
+    return 'member';
+  }
+
   private trackProductReportingEvent(eventName: string, segmentations?: any): void {
     if (this.isProductReportingActivated === true) {
       Countly.userData.set(UserData.IS_TEAM, this.userRepository.isTeam());
       Countly.userData.set(UserData.CONTACTS, this.userRepository.number_of_contacts());
       Countly.userData.set(UserData.TEAM_SIZE, this.userRepository.teamMembers().length);
+      Countly.userData.set(UserData.USER_TYPE, this.getUserType());
       Countly.userData.save();
 
       const segmentation = {
-        [Segmantation.COMMON.APP]: EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE,
-        [Segmantation.COMMON.APP_VERSION]: Environment.version(false),
+        [Segmentation.COMMON.APP]: EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE,
+        [Segmentation.COMMON.APP_VERSION]: Environment.version(false),
         ...segmentations,
       };
 
       Countly.add_event({
         key: eventName,
-        segmentation,
+        segmentation: {
+          [Segmentation.COMMON.APP]: EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE,
+          [Segmentation.COMMON.APP_VERSION]: Environment.version(false),
+          [Segmentation.COMMON.DESKTOP_APP]: getPlatform(),
+          ...segmentations,
+        },
       });
 
       this.logger.info(`Reporting product event ${eventName}@${JSON.stringify(segmentation)}`);
