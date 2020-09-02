@@ -52,7 +52,7 @@ import * as AuthSelector from '../module/selector/AuthSelector';
 import * as ConversationSelector from '../module/selector/ConversationSelector';
 import * as SelfSelector from '../module/selector/SelfSelector';
 import {QUERY_KEY, ROUTE} from '../route';
-import {isPwaSupportedBrowser} from '../Runtime';
+import {Runtime} from '@wireapp/commons';
 import * as AccentColor from '../util/AccentColor';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import * as StringUtil from '../util/stringUtil';
@@ -86,6 +86,10 @@ const ConversationJoin = ({
   const [isValidLink, setIsValidLink] = useState(true);
   const [isValidName, setIsValidName] = useState(true);
   const [showCookiePolicyBanner, setShowCookiePolicyBanner] = useState(true);
+
+  const isPwaSupportedBrowser = () => {
+    return Runtime.isMobileOS() || Runtime.isSafari();
+  };
 
   useEffect(() => {
     const localConversationCode = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_CODE);

@@ -87,6 +87,7 @@ export class PropertiesRepository {
         privacy: {
           improve_wire: undefined,
           report_errors: undefined,
+          telemetry_sharing: undefined,
         },
         sound: {
           alerts: AudioPreference.ALL,
@@ -103,11 +104,17 @@ export class PropertiesRepository {
   checkPrivacyPermission(): Promise<void> {
     const isCheckConsentDisabled = !Config.getConfig().FEATURE.CHECK_CONSENT;
     const isPrivacyPreferenceSet = this.getPreference(PROPERTIES_TYPE.PRIVACY) !== undefined;
+    const isTelemetryPreferenceSet = this.getPreference(PROPERTIES_TYPE.TELEMETRY_SHARING) !== undefined;
     const isTeamAccount = this.selfUser().inTeam();
     const enablePrivacy = () => {
       this.savePreference(PROPERTIES_TYPE.PRIVACY, true);
       this.publishProperties();
     };
+
+    if (!isTelemetryPreferenceSet && isTeamAccount) {
+      this.savePreference(PROPERTIES_TYPE.TELEMETRY_SHARING, true);
+      this.publishProperties();
+    }
 
     if (isCheckConsentDisabled || isPrivacyPreferenceSet) {
       return Promise.resolve();
@@ -306,6 +313,9 @@ export class PropertiesRepository {
         break;
       case PROPERTIES_TYPE.PRIVACY:
         amplify.publish(WebAppEvents.PROPERTIES.UPDATE.PRIVACY, updatedPreference);
+        break;
+      case PROPERTIES_TYPE.TELEMETRY_SHARING:
+        amplify.publish(WebAppEvents.PROPERTIES.UPDATE.TELEMETRY_SHARING, updatedPreference);
         break;
       case PROPERTIES_TYPE.SOUND_ALERTS:
         amplify.publish(WebAppEvents.PROPERTIES.UPDATE.SOUND_ALERTS, updatedPreference);

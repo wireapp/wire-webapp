@@ -157,7 +157,6 @@ export class CallingViewModel {
 
       const segmentations = {
         [Segmentation.CALL.VIDEO]: callType === CALL_TYPE.VIDEO,
-        [Segmentation.CONVERSATION.EPHEMERAL_MESSAGE]: !!conversationEntity.globalMessageTimer(),
         [Segmentation.CONVERSATION.GUESTS]: guests,
         [Segmentation.CONVERSATION.SERVICES]: services,
         [Segmentation.CONVERSATION.SIZE]: participants.length,
@@ -188,7 +187,6 @@ export class CallingViewModel {
 
       const segmentations = {
         [Segmentation.CALL.VIDEO]: call.initialType === CALL_TYPE.VIDEO,
-        [Segmentation.CONVERSATION.EPHEMERAL_MESSAGE]: !!conversationEntity.globalMessageTimer(),
         [Segmentation.CONVERSATION.GUESTS]: guests,
         [Segmentation.CONVERSATION.SERVICES]: services,
         [Segmentation.CONVERSATION.SIZE]: participants.length,

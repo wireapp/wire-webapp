@@ -415,9 +415,7 @@ export class CallingRepository {
    * @see https://www.chromestatus.com/feature/6321945865879552
    */
   get supportsConferenceCalling(): boolean {
-    const supportsEncodedStreams = RTCRtpSender.prototype.hasOwnProperty('createEncodedStreams');
-    const supportsEncodedVideoStreams = RTCRtpSender.prototype.hasOwnProperty('createEncodedVideoStreams');
-    return supportsEncodedStreams || supportsEncodedVideoStreams;
+    return Environment.browser.supports.conferenceCalling;
   }
 
   /**
@@ -699,7 +697,6 @@ export class CallingRepository {
       const segmentations = {
         [Segmentation.CALL.DIRECTION]: call.state(),
         [Segmentation.CALL.VIDEO]: callType === CALL_TYPE.VIDEO,
-        [Segmentation.CONVERSATION.EPHEMERAL_MESSAGE]: !!conversationEntity.globalMessageTimer(),
         [Segmentation.CONVERSATION.GUESTS]: guests,
         [Segmentation.CONVERSATION.SERVICES]: services,
         [Segmentation.CONVERSATION.SIZE]: participants.length,
@@ -939,7 +936,6 @@ export class CallingRepository {
       [Segmentation.CALL.SCREEN_SHARE]: '',
       [Segmentation.CALL.SETUP_TIME]: '',
       [Segmentation.CALL.VIDEO]: call.initialType === CALL_TYPE.VIDEO,
-      [Segmentation.CONVERSATION.EPHEMERAL_MESSAGE]: !!conversationEntity.globalMessageTimer(),
       [Segmentation.CONVERSATION.GUESTS]: guests,
       [Segmentation.CONVERSATION.SERVICES]: services,
       [Segmentation.CONVERSATION.SIZE]: participants.length,
@@ -1030,7 +1026,6 @@ export class CallingRepository {
           [Segmentation.CALL.DIRECTION]: call.state(),
           [Segmentation.CALL.SETUP_TIME]: '',
           [Segmentation.CALL.VIDEO]: call.initialType === CALL_TYPE.VIDEO,
-          [Segmentation.CONVERSATION.EPHEMERAL_MESSAGE]: !!conversationEntity.globalMessageTimer(),
           [Segmentation.CONVERSATION.GUESTS]: guests,
           [Segmentation.CONVERSATION.SERVICES]: services,
           [Segmentation.CONVERSATION.SIZE]: participants.length,
