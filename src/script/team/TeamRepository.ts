@@ -35,7 +35,6 @@ import type {
 } from '@wireapp/api-client/dist/event';
 
 import {Logger, getLogger} from 'Util/Logger';
-import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
 import {loadDataUrl} from 'Util/util';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -55,6 +54,7 @@ import {EventRepository} from '../event/EventRepository';
 import {TeamMemberEntity} from './TeamMemberEntity';
 import {ServiceEntity} from '../integration/ServiceEntity';
 import {AssetRepository} from '../assets/AssetRepository';
+import {Runtime} from '@wireapp/commons';
 
 export interface AccountInfo {
   accentID: number;
@@ -265,7 +265,7 @@ export class TeamRepository {
 
   async sendAccountInfo(isDesktop: true): Promise<AccountInfo>;
   async sendAccountInfo(isDesktop?: false): Promise<void>;
-  async sendAccountInfo(isDesktop = Environment.desktop): Promise<AccountInfo | void> {
+  async sendAccountInfo(isDesktop = Runtime.isDesktopApp()): Promise<AccountInfo | void> {
     if (isDesktop) {
       const imageResource = this.isTeam() ? this.team().getIconResource() : this.selfUser().previewPictureResource();
       let imageDataUrl;

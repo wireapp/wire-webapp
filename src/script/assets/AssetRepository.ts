@@ -22,7 +22,6 @@ import {Asset} from '@wireapp/protocol-messaging';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
-import {Environment} from 'Util/Environment';
 import {Logger, getLogger} from 'Util/Logger';
 import {AssetService} from './AssetService';
 import {loadFileBuffer, loadImage, downloadBlob} from 'Util/util';
@@ -66,10 +65,6 @@ export class AssetRepository {
   constructor() {
     this.assetService = container.resolve(AssetService);
     this.logger = getLogger('AssetRepository');
-  }
-
-  __test__assignEnvironment(data: any): void {
-    Object.assign(Environment, data);
   }
 
   getObjectUrl(asset: AssetRemoteData): Promise<string> {

@@ -49,48 +49,15 @@ const isProduction = (): boolean => {
   return isProductionHost;
 };
 
-// add body information
-const osCssClass = Runtime.isMacOS() ? 'os-mac' : 'os-pc';
-const platformCssClass = Runtime.isElectron() ? 'platform-electron' : 'platform-web';
-document.body.classList.add(osCssClass, platformCssClass);
-
 export const Environment = {
   backend: {
     current: undefined as any,
   },
-
-  browser: {
-    chrome: Runtime.isChrome() || Runtime.isElectron(),
-    edge: Runtime.isEdge(),
-    firefox: Runtime.isFirefox(),
-    name: Runtime.getPlatform(),
-    opera: Runtime.isOpera(),
-    supports: {
-      calling: Runtime.isSupportingLegacyCalling(),
-      clipboard: Runtime.isSupportingClipboard(),
-      conferenceCalling: Runtime.isSupportingConferenceCalling(),
-      indexedDb: Runtime.isSupportingIndexedDb(),
-      mediaDevices: Runtime.isSupportingUserMedia(),
-      notifications: Runtime.isSupportingNotifications(),
-      permissions: Runtime.isSupportingPermissions(),
-      screenSharing: Runtime.isSupportingScreensharing(),
-    },
-    version: Runtime.getBrowserVersion().major,
-  },
-  desktop: Runtime.isDesktopApp(),
-  electron: Runtime.isElectron(),
   electronVersion: getElectronVersion,
   frontend: {
     isLocalhost,
     isProduction,
   },
-
-  os: {
-    linux: !Runtime.isMacOS() && !Runtime.isWindows(),
-    mac: Runtime.isMacOS(),
-    win: Runtime.isWindows(),
-  },
-
   version: (showWrapperVersion = true, doNotFormat = false): string => {
     if (Environment.frontend.isLocalhost()) {
       return 'dev';

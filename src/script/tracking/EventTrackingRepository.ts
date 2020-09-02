@@ -28,9 +28,9 @@ import {URLParameter} from '../auth/URLParameter';
 import {ROLE as TEAM_ROLE} from '../user/UserPermission';
 import {UserData} from './UserData';
 import {Segmentation} from './Segmentation';
-import {getPlatform} from './Helpers';
 import type {UserRepository} from '../user/UserRepository';
 import {loadValue, storeValue} from 'Util/StorageUtil';
+import {getPlatform} from './Helpers';
 
 const Countly = require('countly-sdk-web');
 
