@@ -17,6 +17,7 @@
  *
  */
 
+import ko from 'knockout';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
 
 import 'src/script/localization/Localizer';
@@ -1053,7 +1054,7 @@ describe('Conversation', () => {
       const conversation_mapper = new ConversationMapper();
       const [new_conversation] = conversation_mapper.mapConversations([payload_conversation]);
       new_conversation.connection(connectionEntity);
-
+      ko.tasks.runEarly();
       expect(new_conversation.participating_user_ids().length).toBe(1);
       expect(new_conversation.participating_user_ids()[0]).toBe(connector_user_id);
     });

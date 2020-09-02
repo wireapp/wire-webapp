@@ -16,6 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+import ko from 'knockout';
 
 import {instantiateComponent} from '../../helper/knockoutHelpers';
 
@@ -31,6 +32,7 @@ describe('read-receipt-toggle', () => {
       expect(toggle.checked).toBe(false);
 
       viewModel.conversation.receiptMode(1);
+      ko.tasks.runEarly();
 
       expect(toggle.checked).toBe(true);
     });

@@ -96,6 +96,8 @@ describe('conversationListCallingCell', () => {
     const params = {...defaultParams, call, conversation: () => conversation, teamRepository: mockedTeamRepository};
     return instantiateComponent('conversation-list-calling-cell', params).then(domContainer => {
       call.startedAt(Date.now());
+      ko.tasks.runEarly();
+
       const callDurationElement = domContainer.querySelector('[data-uie-name=call-duration]');
 
       expect(callDurationElement).not.toBe(null);
@@ -103,6 +105,7 @@ describe('conversationListCallingCell', () => {
 
       jasmine.clock().mockDate(10000);
       jasmine.clock().tick(10000);
+      ko.tasks.runEarly();
 
       expect(callDurationElement.innerText).toBe('00:10');
     });

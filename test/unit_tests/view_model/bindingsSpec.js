@@ -75,7 +75,9 @@ describe('ko.bindingHandlers', () => {
     it('handler is only called once', () => {
       observable.subscribe_once(handler.callback);
       observable(true);
+      ko.tasks.runEarly();
       observable(false);
+      ko.tasks.runEarly();
 
       expect(handler.callback).toHaveBeenCalled();
       expect(handler.callback.calls.count()).toEqual(1);

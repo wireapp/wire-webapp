@@ -67,6 +67,7 @@ import {TeamService} from 'src/script/team/TeamService';
 import {SearchService} from 'src/script/search/SearchService';
 import {AssetRepository} from '../../src/script/assets/AssetRepository';
 
+ko.options.deferUpdates = true;
 export class TestFactory {
   /**
    * @returns {Promise<AuthRepository>} The authentication repository.

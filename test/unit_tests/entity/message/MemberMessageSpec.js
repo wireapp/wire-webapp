@@ -17,6 +17,8 @@
  *
  */
 
+import ko from 'knockout';
+
 import {createRandomUuid} from 'Util/util';
 import 'src/script/localization/Localizer';
 
@@ -41,6 +43,7 @@ describe('Member Message', () => {
       const user_a = new User(createRandomUuid());
       user_a.name('John');
       message_et.userEntities.push(user_a);
+      ko.tasks.runEarly();
 
       expect(message_et.generateNameString()).toBe('[bold]John[/bold]');
     });
@@ -51,6 +54,7 @@ describe('Member Message', () => {
       const user_b = new User(createRandomUuid());
       user_b.name('Jim');
       message_et.userEntities.push(user_a, user_b);
+      ko.tasks.runEarly();
 
       expect(message_et.generateNameString()).toBe('[bold]Jim[/bold] and [bold]John[/bold]');
     });
@@ -63,6 +67,7 @@ describe('Member Message', () => {
       const user_c = new User(createRandomUuid());
       user_c.name('Jill');
       message_et.userEntities.push(user_a, user_b, user_c);
+      ko.tasks.runEarly();
 
       expect(message_et.generateNameString()).toBe('[bold]Jill[/bold], [bold]Jim[/bold], and [bold]John[/bold]');
     });
@@ -79,6 +84,7 @@ describe('Member Message', () => {
       const user_c = new User(createRandomUuid());
       user_c.name('Jill');
       message_et.userEntities.push(user_sender, user_a, user_b, user_c);
+      ko.tasks.runEarly();
 
       expect(message_et.generateNameString()).toBe('[bold]Jill[/bold], [bold]Jim[/bold], and [bold]John[/bold]');
     });

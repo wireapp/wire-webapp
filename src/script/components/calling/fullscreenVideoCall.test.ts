@@ -66,11 +66,11 @@ describe('fullscreenVideoCall', () => {
 
   it('shows the calling timer', () => {
     call.startedAt(Date.now());
-
+    ko.tasks.runEarly();
     expect((domContainer.querySelector('.video-timer') as HTMLElement).innerText).toBe('00:00');
     jasmine.clock().mockDate();
     jasmine.clock().tick(1001);
-
+    ko.tasks.runEarly();
     expect((domContainer.querySelector('.video-timer') as HTMLElement).innerText).toBe('00:01');
   });
 });

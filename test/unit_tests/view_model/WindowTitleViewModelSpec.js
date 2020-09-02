@@ -240,6 +240,7 @@ describe('WindowTitleViewModel', () => {
 
       tests.forEach(({connections, expected}) => {
         title_view_model.userRepository.connect_requests(connections);
+        ko.tasks.runEarly();
         jasmine.clock().tick(WindowTitleViewModel.TITLE_DEBOUNCE);
 
         expect(window.document.title).toBe(expected);

@@ -17,6 +17,8 @@
  *
  */
 
+import ko from 'knockout';
+
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {FaviconViewModel} from 'src/script/view_model/FaviconViewModel';
 
@@ -66,6 +68,7 @@ describe('FaviconViewModel', () => {
 
       tests.forEach(({faviconName, unreadCount}) => {
         faviconViewModel.unreadCount(unreadCount);
+        ko.tasks.runEarly();
         const faviconLink = document.querySelector('link[rel*=icon]');
 
         expect(faviconLink.href).toContain(faviconName);

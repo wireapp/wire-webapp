@@ -102,7 +102,7 @@ export class AppLockViewModel {
 
     this.isVisible.subscribe(isVisible => {
       const app: HTMLDivElement = window.document.querySelector('#app');
-      app.style.setProperty('filter', isVisible ? 'blur(100px)' : '', 'important');
+      app?.style.setProperty('filter', isVisible ? 'blur(100px)' : '', 'important');
     });
 
     this.unfocusTimeout = Config.getConfig().FEATURE.APPLOCK_UNFOCUS_TIMEOUT * 1000;

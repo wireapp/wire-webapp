@@ -17,6 +17,7 @@
  *
  */
 
+import ko from 'knockout';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {USER_EVENT} from '@wireapp/api-client/dist/event';
@@ -91,6 +92,7 @@ describe('PreferenceNotificationRepository', () => {
     amplify.store.calls.reset();
     notifications.forEach((notification, index) => {
       preferenceNotificationRepository.notifications.push(notification);
+      ko.tasks.runEarly();
 
       expect(amplify.store).toHaveBeenCalledTimes(index + 1);
     });

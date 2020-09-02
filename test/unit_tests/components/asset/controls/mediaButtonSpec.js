@@ -57,11 +57,13 @@ describe('media-button', () => {
       expect(params.pause).toHaveBeenCalledTimes(1);
 
       videoElement.dispatchEvent(new Event('playing'));
+      ko.tasks.runEarly();
 
       expect(playButton.style.display).toBe('none');
       expect(pauseButton.style.display).toBe('');
 
       videoElement.dispatchEvent(new Event('pause'));
+      ko.tasks.runEarly();
 
       expect(playButton.style.display).toBe('');
       expect(pauseButton.style.display).toBe('none');
