@@ -77,17 +77,15 @@ export class TitleBarViewModel {
     });
 
     this.badgeLabelCopy = ko.pureComputed(() => {
-      let string;
-
-      if (this.conversationEntity().hasGuest()) {
-        string = this.conversationEntity().hasService()
+      if (this.conversationEntity()?.hasGuest()) {
+        return this.conversationEntity().hasService()
           ? t('guestRoomConversationBadgeGuestAndService')
           : t('guestRoomConversationBadge');
-      } else if (this.conversationEntity().hasService()) {
-        string = t('guestRoomConversationBadgeService');
+      } else if (this.conversationEntity()?.hasService()) {
+        return t('guestRoomConversationBadgeService');
       }
 
-      return string || '';
+      return '';
     });
 
     this.showCallControls = ko.pureComputed(() => {

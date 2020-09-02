@@ -272,7 +272,7 @@ export class InputBarViewModel {
         return availabilityStrings[userEntity.availability()];
       }
 
-      const string = this.conversationEntity().messageTimer()
+      const string = this.conversationEntity()?.messageTimer()
         ? t('tooltipConversationEphemeral')
         : t('tooltipConversationInputPlaceholder');
 
@@ -321,8 +321,8 @@ export class InputBarViewModel {
     });
 
     this.hasLocalEphemeralTimer = ko.pureComputed(() => {
-      const conversationEntity = this.conversationEntity();
-      return conversationEntity.localMessageTimer() && !conversationEntity.hasGlobalMessageTimer();
+      const conversation = this.conversationEntity();
+      return conversation && conversation.localMessageTimer() && !conversation.hasGlobalMessageTimer();
     });
 
     this.conversationEntity.subscribe(this.loadInitialStateForConversation);

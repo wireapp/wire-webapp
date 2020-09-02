@@ -32,23 +32,21 @@ interface MessageTimerButtonParams {
 
 class MessageTimerButton {
   conversationEntity: ko.Observable<Conversation>;
-  hasMessageTimer: ko.PureComputed<any>;
-  isTimerDisabled: ko.PureComputed<any>;
+  hasMessageTimer: ko.PureComputed<boolean>;
+  isTimerDisabled: ko.PureComputed<boolean>;
   duration: ko.PureComputed<DurationUnit | {}>;
 
   constructor(params: MessageTimerButtonParams) {
     this.conversationEntity = params.conversation;
-    this.hasMessageTimer = ko.pureComputed(() => {
-      return this.conversationEntity() ? this.conversationEntity().messageTimer() : false;
-    });
-    this.isTimerDisabled = ko.pureComputed(() => this.conversationEntity().hasGlobalMessageTimer());
+    this.hasMessageTimer = ko.pureComputed(() => !!this.conversationEntity()?.messageTimer());
+    this.isTimerDisabled = ko.pureComputed(() => !!this.conversationEntity()?.hasGlobalMessageTimer());
     this.duration = ko.pureComputed(() => {
       return this.hasMessageTimer() ? formatDuration(this.conversationEntity().messageTimer()) : {};
     });
   }
 
   /** Click on ephemeral button */
-  onClick(_: unknown, event: MouseEvent): void {
+  onClick(_: MessageTimerButton, event: MouseEvent): void {
     if (this.isTimerDisabled()) {
       return event.preventDefault();
     }

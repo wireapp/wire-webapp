@@ -930,6 +930,7 @@ class App {
 //##############################################################################
 
 $(async () => {
+  ko.options.deferUpdates = true;
   enableLogging(Config.getConfig().FEATURE.ENABLE_DEBUG);
   exposeWrapperGlobals();
   const appContainer = document.getElementById('wire-main');
