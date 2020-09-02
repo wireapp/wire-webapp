@@ -177,8 +177,6 @@ export function authReducer(state: AuthState = initialAuthState, action: AppActi
       return {
         ...state,
         error: null,
-        fetched: false,
-        fetching: false,
         isAuthenticated: false,
       };
     }
