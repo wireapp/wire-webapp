@@ -4362,10 +4362,11 @@ export class ConversationRepository {
     }
     if (actionType) {
       const guests = conversationEntity.participating_user_ets().filter(user => user.isGuest()).length;
+      const guestsWireless = conversationEntity.participating_user_ets().filter(user => user.isTemporaryGuest()).length;
       let segmentations = {
         [Segmentation.CONVERSATION.GUESTS]: guests,
         [Segmentation.CONVERSATION.GUESTS_PRO]: '',
-        [Segmentation.CONVERSATION.GUESTS_WIRELESS]: '',
+        [Segmentation.CONVERSATION.GUESTS_WIRELESS]: guestsWireless,
         [Segmentation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
         [Segmentation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
         [Segmentation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
