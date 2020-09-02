@@ -243,6 +243,8 @@ export class PanelViewModel {
     const fromPanel = document.querySelector(`#${fromViewModel.getElementId()}`);
     const toPanel = this._showPanel(toState);
 
+    ko.tasks.runEarly();
+
     toPanel?.classList.add(`panel__page--move-in${fromLeft ? '--left' : '--right'}`);
     fromPanel?.classList.add(`panel__page--move-out${fromLeft ? '--left' : '--right'}`);
 
