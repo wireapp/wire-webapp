@@ -32,12 +32,13 @@ export enum VideoFillMode {
 
 export class Participant {
   // Video
-  public videoState: ko.Observable<number>;
+  public videoState: ko.Observable<VIDEO_STATE>;
   public videoStream: ko.Observable<MediaStream | undefined>;
   public hasActiveVideo: ko.PureComputed<boolean>;
   public hasPausedVideo: ko.PureComputed<boolean>;
   public sharesScreen: ko.PureComputed<boolean>;
   public sharesCamera: ko.PureComputed<boolean>;
+  public startedScreenSharingAt: ko.Observable<number>;
 
   // Audio
   public audioStream: ko.Observable<MediaStream | undefined>;
@@ -60,6 +61,7 @@ export class Participant {
     });
     this.videoStream = ko.observable();
     this.audioStream = ko.observable();
+    this.startedScreenSharingAt = ko.observable();
     this.isMuted = ko.observable(false);
     this.videoFillMode = ko.observable(VideoFillMode.UNSET);
   }
