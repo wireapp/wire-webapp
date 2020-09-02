@@ -4366,12 +4366,8 @@ export class ConversationRepository {
       const guests = participants.filter(user => user.isGuest()).length;
       const guestsWireless = participants.filter(user => user.isTemporaryGuest()).length;
       // guests that are from a different team
-      const guestsPro = participants.filter(user => {
-        if (user.teamId && user.teamId !== selfUserTeamId) {
-          return true;
-        }
-        return false;
-      }).length;
+      const guestsPro = participants.filter(user => !!user.teamId && user.teamId !== selfUserTeamId).length;
+
       let segmentations = {
         [Segmentation.CONVERSATION.GUESTS]: guests,
         [Segmentation.CONVERSATION.GUESTS_PRO]: guestsPro,
