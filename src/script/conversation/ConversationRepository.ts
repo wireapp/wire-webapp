@@ -4367,14 +4367,15 @@ export class ConversationRepository {
       const guestsWireless = participants.filter(user => user.isTemporaryGuest()).length;
       // guests that are from a different team
       const guestsPro = participants.filter(user => !!user.teamId && user.teamId !== selfUserTeamId).length;
+      const services = participants.filter(user => user.isService).length;
 
       let segmentations = {
         [Segmentation.CONVERSATION.GUESTS]: guests,
         [Segmentation.CONVERSATION.GUESTS_PRO]: guestsPro,
         [Segmentation.CONVERSATION.GUESTS_WIRELESS]: guestsWireless,
-        [Segmentation.CONVERSATION.SIZE]: participants.length,
+        [Segmentation.CONVERSATION.SIZE]: c,
         [Segmentation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
-        [Segmentation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
+        [Segmentation.CONVERSATION.SERVICES]: services,
         [Segmentation.MESSAGE.ACTION]: actionType,
         [Segmentation.MESSAGE.IS_REPLY]: !!genericMessage.text?.quote,
         [Segmentation.MESSAGE.MENTION]: numberOfMentions,
