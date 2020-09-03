@@ -349,7 +349,7 @@ export class CryptographyRepository {
     const cipherPayloadPromises = Object.entries(recipients).reduce<Promise<EncryptedPayload>[]>(
       (accumulator, [userId, clientIds]) => {
         if (clientIds && clientIds.length) {
-          messagePayload.recipients[userId] = messagePayload.recipients[userId] || {};
+          messagePayload.recipients[userId] ||= {};
           clientIds.forEach(clientId => {
             const sessionId = this.constructSessionId(userId, clientId);
             const encryptionPromise = this.encryptPayloadForSession(sessionId, genericMessage);
@@ -405,7 +405,7 @@ export class CryptographyRepository {
       if (cipherText) {
         messagePayload.recipients[userId][clientId] = cipherText;
       } else {
-        missingRecipients[userId] = missingRecipients[userId] || [];
+        missingRecipients[userId] ||= [];
         missingRecipients[userId].push(clientId);
       }
     });
