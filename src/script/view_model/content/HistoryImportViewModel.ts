@@ -31,23 +31,22 @@ import {Config} from '../../Config';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {ContentViewModel} from '../ContentViewModel';
 import {CancelError, DifferentAccountError, ImportError, IncompatibleBackupError} from '../../backup/Error';
-
 import {BackupRepository} from '../../backup/BackupRepository';
 import {formatDuration} from '../../util/TimeUtil';
 
 export class HistoryImportViewModel {
   private readonly error: ko.Observable<Error>;
+  private readonly errorHeadline: ko.Observable<string>;
+  private readonly errorSecondary: ko.Observable<string>;
+  private readonly loadingProgress: ko.PureComputed<number>;
   private readonly logger: Logger;
   private readonly numberOfProcessedRecords: ko.Observable<number>;
   private readonly numberOfRecords: ko.Observable<number>;
   private readonly state: ko.Observable<string>;
-  errorHeadline: ko.Observable<string>;
-  errorSecondary: ko.Observable<string>;
-  isDone: ko.PureComputed<boolean>;
-  isImporting: ko.PureComputed<boolean>;
-  isPreparing: ko.PureComputed<boolean>;
-  loadingMessage: ko.PureComputed<string>;
-  loadingProgress: ko.PureComputed<number>;
+  readonly isDone: ko.PureComputed<boolean>;
+  readonly isImporting: ko.PureComputed<boolean>;
+  readonly isPreparing: ko.PureComputed<boolean>;
+  readonly loadingMessage: ko.PureComputed<string>;
 
   static get STATE() {
     return {
@@ -135,7 +134,6 @@ export class HistoryImportViewModel {
       await this.backupRepository.importHistory(files, this.onInit, this.onProgress);
       this.onSuccess();
     } catch (error) {
-      console.error(error);
       this.onError(error);
     }
   };
