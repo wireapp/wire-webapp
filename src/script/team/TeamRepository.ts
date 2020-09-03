@@ -35,10 +35,10 @@ import type {
 } from '@wireapp/api-client/dist/event';
 
 import {Logger, getLogger} from 'Util/Logger';
-import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
 import {loadDataUrl} from 'Util/util';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {Environment} from 'Util/Environment';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
 import {TeamMapper} from './TeamMapper';
@@ -55,6 +55,7 @@ import {EventRepository} from '../event/EventRepository';
 import {TeamMemberEntity} from './TeamMemberEntity';
 import {ServiceEntity} from '../integration/ServiceEntity';
 import {AssetRepository} from '../assets/AssetRepository';
+import {Runtime} from '@wireapp/commons';
 
 export interface AccountInfo {
   accentID: number;
@@ -112,7 +113,7 @@ export class TeamRepository {
     this.teamSize = ko.pureComputed(() => (this.isTeam() ? this.teamMembers().length + 1 : 0));
     this.teamUsers = ko.pureComputed(() => {
       return this.teamMembers()
-        .concat(this.userRepository.connected_users())
+        .concat(this.userRepository.connectedUsers())
         .filter((item, index, array) => array.indexOf(item) === index)
         .sort(sortUsersByPriority);
     });
@@ -265,7 +266,7 @@ export class TeamRepository {
 
   async sendAccountInfo(isDesktop: true): Promise<AccountInfo>;
   async sendAccountInfo(isDesktop?: false): Promise<void>;
-  async sendAccountInfo(isDesktop = Environment.desktop): Promise<AccountInfo | void> {
+  async sendAccountInfo(isDesktop = Runtime.isDesktopApp()): Promise<AccountInfo | void> {
     if (isDesktop) {
       const imageResource = this.isTeam() ? this.team().getIconResource() : this.selfUser().previewPictureResource();
       let imageDataUrl;
@@ -277,14 +278,18 @@ export class TeamRepository {
 
       const accountInfo: AccountInfo = {
         accentID: this.selfUser().accent_id(),
-        // TODO: Deactivated until wrapper supports this
-        // availability: this.selfUser().availability(),
         name: this.teamName(),
         picture: imageDataUrl?.toString(),
         teamID: this.team() ? this.team().id : undefined,
         teamRole: this.selfUser().teamRole(),
         userID: this.selfUser().id,
       };
+
+      const [majorVersion, minorVersion] = (Environment.version(true) || '').split('.');
+
+      if (Number(majorVersion) >= 3 && Number(minorVersion) >= 20) {
+        accountInfo.availability = this.selfUser().availability();
+      }
 
       this.logger.info('Publishing account info', accountInfo);
       amplify.publish(WebAppEvents.TEAM.INFO, accountInfo);

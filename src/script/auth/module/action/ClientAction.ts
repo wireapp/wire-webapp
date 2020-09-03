@@ -78,7 +78,7 @@ export class ClientAction {
     const deviceLabel = `${Runtime.getOS()}${Runtime.getOS().version ? ` ${Runtime.getOS().version}` : ''}`;
     let deviceModel = StringUtil.capitalize(Runtime.getBrowserName());
 
-    if (Runtime.isElectron()) {
+    if (Runtime.isDesktopApp()) {
       if (Runtime.isMacOS()) {
         deviceModel = 'Wire macOS';
       } else if (Runtime.isWindows()) {

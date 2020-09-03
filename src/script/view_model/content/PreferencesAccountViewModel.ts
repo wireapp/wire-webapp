@@ -28,7 +28,6 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {t} from 'Util/LocalizerUtil';
 import {isTemporaryClientAndNonPersistent, validateProfileImageResolution} from 'Util/util';
-import {Environment} from 'Util/Environment';
 import {isKey, KEY} from 'Util/KeyboardUtil';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 
@@ -49,7 +48,7 @@ import {ParticipantAvatar} from 'Components/participantAvatar';
 import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {ContentViewModel} from '../ContentViewModel';
-import {Logger} from '@wireapp/commons';
+import {Logger, Runtime} from '@wireapp/commons';
 import {getLogger} from 'Util/Logger';
 
 import 'Components/availabilityState';
@@ -127,7 +126,7 @@ export class PreferencesAccountViewModel {
   ) {
     this.logger = getLogger('PreferencesAccountViewModel');
     this.fileExtension = HistoryExportViewModel.CONFIG.FILE_EXTENSION;
-    this.isDesktop = Environment.desktop;
+    this.isDesktop = Runtime.isDesktopApp();
     this.brandName = Config.getConfig().BRAND_NAME;
 
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
@@ -179,7 +178,7 @@ export class PreferencesAccountViewModel {
     this.optionResetAppLock = isAppLockEnabled();
     this.ParticipantAvatar = ParticipantAvatar;
 
-    this.isMacOsWrapper = Environment.electron && Environment.os.mac;
+    this.isMacOsWrapper = Runtime.isDesktopApp() && Runtime.isMacOS();
     this.manageTeamUrl = getManageTeamUrl('client_settings');
     this.createTeamUrl = getCreateTeamUrl('client');
 
@@ -488,7 +487,7 @@ export class PreferencesAccountViewModel {
     }
   };
 
-  shouldFocusUsername = (): boolean => this.userRepository.should_set_username;
+  shouldFocusUsername = (): boolean => this.userRepository.shouldSetUsername;
 
   verifyUsername = (username: string, event: ChangeEvent<HTMLInputElement>): void => {
     const enteredUsername = event.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '');

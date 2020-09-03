@@ -21,10 +21,10 @@ import {amplify} from 'amplify';
 import keyboardJS from 'keyboardjs';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {Environment} from 'Util/Environment';
 import {capitalizeFirstChar, includesString} from 'Util/StringUtil';
 
 import {ShortcutType} from './ShortcutType';
+import {Runtime} from '@wireapp/commons';
 
 interface Shortcut {
   event: string;
@@ -176,7 +176,6 @@ const _registerEvent = (platformSpecificShortcut: string, event: string): void =
 };
 
 export const Shortcut = {
-  __test__assignEnvironment: (data: any): void => Object.assign(Environment, data),
   getBeautifiedShortcutMac: (shortcut: string): string => {
     return shortcut
       .replace(/\+/g, '')
@@ -199,14 +198,14 @@ export const Shortcut = {
   },
 
   getShortcut: (shortcutName: string): string => {
-    const platform = Environment.desktop ? 'electron' : 'webapp';
+    const platform = Runtime.isDesktopApp() ? 'electron' : 'webapp';
     const platformShortcuts = SHORTCUT_MAP[shortcutName].shortcut[platform];
-    return Environment.os.mac ? platformShortcuts.macos : platformShortcuts.pc;
+    return Runtime.isMacOS() ? platformShortcuts.macos : platformShortcuts.pc;
   },
 
   getShortcutTooltip: (shortcutName: string): string => {
     const shortcut = Shortcut.getShortcut(shortcutName);
-    return Environment.os.mac
+    return Runtime.isMacOS()
       ? Shortcut.getBeautifiedShortcutMac(shortcut)
       : Shortcut.getBeautifiedShortcutWin(shortcut);
   },
@@ -214,7 +213,7 @@ export const Shortcut = {
   init: (): void => {
     for (const shortcut in SHORTCUT_MAP) {
       const shortcutData = SHORTCUT_MAP[shortcut];
-      const isMenuShortcut = Environment.desktop && shortcutData.shortcut.electron.menu;
+      const isMenuShortcut = Runtime.isDesktopApp() && shortcutData.shortcut.electron.menu;
 
       if (!isMenuShortcut) {
         _registerEvent(Shortcut.getShortcut(shortcut), shortcutData.event);

@@ -215,7 +215,7 @@ describe('WindowTitleViewModel', () => {
 
     it('shows the number of connection requests when viewing the inbox', () => {
       title_view_model.contentState(ContentViewModel.STATE.CONNECTION_REQUESTS);
-      title_view_model.userRepository.connect_requests = ko.observableArray([]);
+      title_view_model.userRepository.connectRequests = ko.observableArray([]);
 
       const firstConnectedUser = new User(createRandomUuid());
       const secondConnectedUser = new User(createRandomUuid());
@@ -239,7 +239,7 @@ describe('WindowTitleViewModel', () => {
       title_view_model.initiateTitleUpdates();
 
       tests.forEach(({connections, expected}) => {
-        title_view_model.userRepository.connect_requests(connections);
+        title_view_model.userRepository.connectRequests(connections);
         ko.tasks.runEarly();
         jasmine.clock().tick(WindowTitleViewModel.TITLE_DEBOUNCE);
 

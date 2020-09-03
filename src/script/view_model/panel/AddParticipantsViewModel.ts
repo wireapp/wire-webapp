@@ -123,7 +123,7 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
       if (this.isTeam()) {
         userEntities = this.isTeamOnly() ? this.teamMembers().sort(sortUsersByPriority) : this.teamUsers();
       } else {
-        userEntities = this.userRepository.connected_users();
+        userEntities = this.userRepository.connectedUsers();
       }
 
       return userEntities.filter(userEntity => {

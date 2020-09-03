@@ -19,8 +19,8 @@
 
 import Cookies from 'js-cookie';
 
-import {Environment} from 'Util/Environment';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {Runtime} from '@wireapp/commons';
 
 let checkIntervalId = 0;
 
@@ -107,7 +107,7 @@ export class SingleInstanceHandler {
   }
 
   private _isSingleRunningInstance(): boolean {
-    if (Environment.electron) {
+    if (Runtime.isDesktopApp()) {
       return true;
     }
     const singleInstanceCookie = Cookies.getJSON(CONFIG.COOKIE_NAME);
