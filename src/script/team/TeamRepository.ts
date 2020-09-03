@@ -38,6 +38,7 @@ import {Logger, getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {loadDataUrl} from 'Util/util';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {Environment} from 'Util/Environment';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
 import {TeamMapper} from './TeamMapper';
