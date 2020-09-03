@@ -120,7 +120,7 @@ export class ClientRepository {
       for (const client of clients) {
         const {userId} = ClientEntity.dismantleUserClientId(client.meta.primary_key);
         if (userId && !skippedUserIds.includes(userId)) {
-          recipients[userId] = recipients[userId] || [];
+          recipients[userId] ||= [];
           recipients[userId].push(ClientMapper.mapClient(client, false));
         }
       }
