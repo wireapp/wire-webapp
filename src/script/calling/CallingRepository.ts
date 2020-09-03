@@ -918,7 +918,6 @@ export class CallingRepository {
       [Segmentation.CALL.END_REASON]: reason,
       [Segmentation.CALL.PARTICIPANTS]: call.participants().length,
       [Segmentation.CALL.SCREEN_SHARE]: call.analyticsScreenSharing,
-      [Segmentation.CALL.SETUP_TIME]: '',
       [Segmentation.CALL.VIDEO]: call.initialType === CALL_TYPE.VIDEO,
       [Segmentation.CONVERSATION.GUESTS]: guests,
       [Segmentation.CONVERSATION.SERVICES]: services,
@@ -1020,7 +1019,6 @@ export class CallingRepository {
 
         const segmentations = {
           [Segmentation.CALL.DIRECTION]: call.state(),
-          [Segmentation.CALL.SETUP_TIME]: '',
           [Segmentation.CALL.VIDEO]: call.initialType === CALL_TYPE.VIDEO,
           [Segmentation.CONVERSATION.GUESTS]: guests,
           [Segmentation.CONVERSATION.SERVICES]: services,
