@@ -4361,11 +4361,21 @@ export class ConversationRepository {
         break;
     }
     if (actionType) {
-      const guests = conversationEntity.participating_user_ets().filter(user => user.isGuest()).length;
+      const selfUserTeamId = this.selfUser().teamId;
+      const participants = conversationEntity.participating_user_ets();
+      const guests = participants.filter(user => user.isGuest()).length;
+      const guestsWireless = participants.filter(user => user.isTemporaryGuest()).length;
+      // guests that are from a different team
+      const guestsPro = participants.filter(user => !!user.teamId && user.teamId !== selfUserTeamId).length;
+      const services = participants.filter(user => user.isService).length;
+
       let segmentations = {
         [Segmentation.CONVERSATION.GUESTS]: guests,
-        [Segmentation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
+        [Segmentation.CONVERSATION.GUESTS_PRO]: guestsPro,
+        [Segmentation.CONVERSATION.GUESTS_WIRELESS]: guestsWireless,
+        [Segmentation.CONVERSATION.SIZE]: participants.length,
         [Segmentation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
+        [Segmentation.CONVERSATION.SERVICES]: services,
         [Segmentation.MESSAGE.ACTION]: actionType,
         [Segmentation.MESSAGE.IS_REPLY]: !!genericMessage.text?.quote,
         [Segmentation.MESSAGE.MENTION]: numberOfMentions,

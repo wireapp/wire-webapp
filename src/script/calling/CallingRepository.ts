@@ -609,6 +609,9 @@ export class CallingRepository {
       const success = await loadPreviewPromise;
       if (success) {
         this.wCall.start(this.wUser, conversationId, callType, conversationType, this.cbrEncoding());
+        this.sendCallingEvent(EventName.CALLING.INITIATED_CALL, call, {
+          [Segmentation.CALL.VIDEO]: callType === CALL_TYPE.VIDEO,
+        });
       } else {
         this.showNoCameraModal();
         this.removeCall(call);
@@ -641,21 +644,11 @@ export class CallingRepository {
     const selfParticipant = call.getSelfParticipant();
     if (selfParticipant.sharesScreen()) {
       selfParticipant.videoState(VIDEO_STATE.STOPPED);
-
-      const conversationEntity = this.conversationRepository.find_conversation_by_id(call.conversationId);
-      const guests = conversationEntity.participating_user_ets().filter(user => user.isGuest()).length;
-      const wirelessGuests = conversationEntity.participating_user_ets().filter(user => user.isTemporaryGuest()).length;
-      const segmentations = {
-        [Segmentation.CONVERSATION.GUESTS]: guests,
-        [Segmentation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
-        [Segmentation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
-        [Segmentation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
-        [Segmentation.CONVERSATION.GUESTS_WIRELESS]: wirelessGuests,
-        [Segmentation.SCREEN_SHARE.DIRECTION]: '',
-        [Segmentation.SCREEN_SHARE.DURATION]: '',
-      };
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.SCREEN_SHARE, segmentations);
-
+      this.sendCallingEvent(EventName.CALLING.SCREEN_SHARE, call, {
+        [Segmentation.SCREEN_SHARE.DIRECTION]: 'outgoing',
+        [Segmentation.SCREEN_SHARE.DURATION]:
+          Math.ceil((Date.now() - selfParticipant.startedScreenSharingAt()) / 5000) * 5,
+      });
       return this.wCall.setVideoSendState(this.wUser, call.conversationId, VIDEO_STATE.STOPPED);
     }
     try {
@@ -669,6 +662,7 @@ export class CallingRepository {
       selfParticipant.videoState(VIDEO_STATE.SCREENSHARE);
       selfParticipant.updateMediaStream(mediaStream);
       this.wCall.setVideoSendState(this.wUser, call.conversationId, VIDEO_STATE.SCREENSHARE);
+      selfParticipant.startedScreenSharingAt(Date.now());
     } catch (error) {
       this.logger.info('Failed to get screen sharing stream', error);
     }
@@ -685,20 +679,11 @@ export class CallingRepository {
       await this.warmupMediaStreams(call, true, isVideoCall);
       await this.pushClients(call.conversationId);
       this.wCall.answer(this.wUser, call.conversationId, callType, this.cbrEncoding());
-      const conversationEntity = this.conversationRepository.find_conversation_by_id(call.conversationId);
-      const guests = conversationEntity.participating_user_ets().filter(user => user.isGuest()).length;
-      const wirelessGuests = conversationEntity.participating_user_ets().filter(user => user.isTemporaryGuest()).length;
-      const segmentations = {
+
+      this.sendCallingEvent(EventName.CALLING.JOINED_CALL, call, {
         [Segmentation.CALL.DIRECTION]: call.state(),
         [Segmentation.CALL.VIDEO]: callType === CALL_TYPE.VIDEO,
-        [Segmentation.CONVERSATION.GUESTS]: guests,
-        [Segmentation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
-        [Segmentation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
-        [Segmentation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
-        [Segmentation.CONVERSATION.GUESTS_WIRELESS]: wirelessGuests,
-      };
-
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.JOINED_CALL, segmentations);
+      });
     } catch (_) {
       this.rejectCall(call.conversationId);
     }
@@ -915,25 +900,32 @@ export class CallingRepository {
     }
     const stillActiveState = [REASON.STILL_ONGOING, REASON.ANSWERED_ELSEWHERE];
 
-    const conversationEntity = this.conversationRepository.find_conversation_by_id(call.conversationId);
-    const guests = conversationEntity.participating_user_ets().filter(user => user.isGuest()).length;
-    const wirelessGuests = conversationEntity.participating_user_ets().filter(user => user.isTemporaryGuest()).length;
-    const segmentations = {
+    this.sendCallingEvent(EventName.CALLING.ENDED_CALL, call, {
       [Segmentation.CALL.AV_SWITCH_TOGGLE]: call.analyticsAvSwitchToggle,
       [Segmentation.CALL.DIRECTION]: call.state(),
-      [Segmentation.CALL.DURATION]: '',
+      [Segmentation.CALL.DURATION]: Math.ceil((Date.now() - call.startedAt()) / 5000) * 5,
       [Segmentation.CALL.END_REASON]: reason,
       [Segmentation.CALL.PARTICIPANTS]: call.participants().length,
-      [Segmentation.CALL.SCREEN_SHARE]: '',
-      [Segmentation.CALL.SETUP_TIME]: '',
+      [Segmentation.CALL.SCREEN_SHARE]: call.analyticsScreenSharing,
       [Segmentation.CALL.VIDEO]: call.initialType === CALL_TYPE.VIDEO,
-      [Segmentation.CONVERSATION.GUESTS]: guests,
-      [Segmentation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
-      [Segmentation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
-      [Segmentation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
-      [Segmentation.CONVERSATION.GUESTS_WIRELESS]: wirelessGuests,
-    };
-    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.ENDED_CALL, segmentations);
+    });
+
+    const selfParticipant = call.getSelfParticipant();
+    /**
+     * Handle case where user hangs up the call directly
+     * and skips clicking on stop screen share
+     */
+    call.participants().forEach(participant => {
+      if (participant.videoState() === VIDEO_STATE.SCREENSHARE && participant.startedScreenSharingAt() > 0) {
+        const isSameUser = selfParticipant.doesMatchIds(participant.user.id, participant.clientId);
+        this.sendCallingEvent(EventName.CALLING.SCREEN_SHARE, call, {
+          [Segmentation.SCREEN_SHARE.DIRECTION]: isSameUser ? 'outgoing' : 'incoming',
+          [Segmentation.SCREEN_SHARE.DURATION]:
+            Math.ceil((Date.now() - participant.startedScreenSharingAt()) / 5000) * 5,
+        });
+      }
+    });
+
     if (!stillActiveState.includes(reason)) {
       this.injectDeactivateEvent(
         call.conversationId,
@@ -946,7 +938,6 @@ export class CallingRepository {
       this.removeCall(call);
       return;
     }
-    const selfParticipant = call.getSelfParticipant();
     selfParticipant.releaseMediaStream();
     selfParticipant.videoState(VIDEO_STATE.STOPPED);
     call.reason(reason);
@@ -1007,22 +998,10 @@ export class CallingRepository {
 
     switch (state) {
       case CALL_STATE.MEDIA_ESTAB:
-        const conversationEntity = this.conversationRepository.find_conversation_by_id(call.conversationId);
-        const guests = conversationEntity.participating_user_ets().filter(user => user.isGuest()).length;
-        const wirelessGuests = conversationEntity.participating_user_ets().filter(user => user.isTemporaryGuest())
-          .length;
-        const segmentations = {
+        this.sendCallingEvent(EventName.CALLING.ESTABLISHED_CALL, call, {
           [Segmentation.CALL.DIRECTION]: call.state(),
-          [Segmentation.CALL.SETUP_TIME]: '',
           [Segmentation.CALL.VIDEO]: call.initialType === CALL_TYPE.VIDEO,
-          [Segmentation.CONVERSATION.GUESTS]: guests,
-          [Segmentation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
-          [Segmentation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
-          [Segmentation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
-          [Segmentation.CONVERSATION.GUESTS_WIRELESS]: wirelessGuests,
-        };
-
-        amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.ESTABLISHED_CALL, segmentations);
+        });
         call.startedAt(Date.now());
         break;
     }
@@ -1169,27 +1148,61 @@ export class CallingRepository {
     conversationId: ConversationId,
     userId: UserId,
     clientId: ClientId,
-    state: number,
+    state: VIDEO_STATE,
   ) => {
     const call = this.findCall(conversationId);
     if (!call) {
       return;
     }
+    const participant = call.getParticipant(userId, clientId);
+    const selfParticipant = call.getSelfParticipant();
+    const isSameUser = selfParticipant.doesMatchIds(userId, clientId);
+
+    // user has just started to share their screen
+    if (participant.videoState() !== VIDEO_STATE.SCREENSHARE && state === VIDEO_STATE.SCREENSHARE) {
+      participant.startedScreenSharingAt(Date.now());
+    }
+
+    // user has stopped sharing their screen
+    if (participant.videoState() === VIDEO_STATE.SCREENSHARE && state !== VIDEO_STATE.SCREENSHARE) {
+      this.sendCallingEvent(EventName.CALLING.SCREEN_SHARE, call, {
+        [Segmentation.SCREEN_SHARE.DIRECTION]: isSameUser ? 'outgoing' : 'incoming',
+        [Segmentation.SCREEN_SHARE.DURATION]: Math.ceil((Date.now() - participant.startedScreenSharingAt()) / 5000) * 5,
+      });
+    }
+
     if (state === VIDEO_STATE.STARTED) {
       call.analyticsAvSwitchToggle = true;
     }
-    const selfParticipant = call.getSelfParticipant();
-    if (
-      call.state() === CALL_STATE.MEDIA_ESTAB &&
-      selfParticipant.doesMatchIds(userId, clientId) &&
-      !selfParticipant.sharesScreen()
-    ) {
+
+    if (state === VIDEO_STATE.SCREENSHARE) {
+      call.analyticsScreenSharing = true;
+    }
+
+    if (call.state() === CALL_STATE.MEDIA_ESTAB && isSameUser && !selfParticipant.sharesScreen()) {
       selfParticipant.releaseVideoStream();
     }
+
     call
       .participants()
       .filter(participant => participant.doesMatchIds(userId, clientId))
       .forEach(participant => participant.videoState(state));
+  };
+
+  private readonly sendCallingEvent = (eventName: string, call: Call, customSegmentations: Record<string, any>) => {
+    const conversationEntity = this.conversationRepository.find_conversation_by_id(call.conversationId);
+    const participants = conversationEntity.participating_user_ets();
+    const guests = participants.filter(user => user.isGuest()).length;
+    const guestsWireless = participants.filter(user => user.isTemporaryGuest()).length;
+    const segmentations = {
+      [Segmentation.CONVERSATION.GUESTS]: guests,
+      [Segmentation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
+      [Segmentation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
+      [Segmentation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
+      [Segmentation.CONVERSATION.GUESTS_WIRELESS]: guestsWireless,
+      ...customSegmentations,
+    };
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, eventName, segmentations);
   };
 
   /**
