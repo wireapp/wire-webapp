@@ -28,7 +28,7 @@ import {bindActionCreators} from '../module/reducer';
 import Page from './Page';
 import {QUERY_KEY} from '../route';
 import {actionRoot} from '../module/action';
-import {isDesktopApp} from '../Runtime';
+import {Runtime} from '@wireapp/commons';
 import SVGProvider from '../util/SVGProvider';
 import {customEnvRedirectStrings} from '../../strings';
 import {afterRender} from 'Util/util';
@@ -49,7 +49,7 @@ const CustomEnvironmentRedirect = ({doNavigate, doSendNavigationEvent}: Dispatch
     let redirectTimeoutId: number;
     if (destinationUrl) {
       redirectTimeoutId = window.setTimeout(() => {
-        if (isDesktopApp()) {
+        if (Runtime.isDesktopApp()) {
           doSendNavigationEvent(destinationUrl).catch(console.error);
         } else {
           doNavigate(destinationUrl);

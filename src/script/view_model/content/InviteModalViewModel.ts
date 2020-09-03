@@ -19,11 +19,11 @@
 
 import ko from 'knockout';
 
-import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
 
 import {Config} from '../../Config';
 import type {UserRepository} from '../../user/UserRepository';
+import {Runtime} from '@wireapp/commons';
 
 export class InviteModalViewModel {
   inviteMessage: ko.PureComputed<string>;
@@ -48,7 +48,7 @@ export class InviteModalViewModel {
 
     this.inviteMessageSelected = ko.observable(false);
     this.inviteHint = ko.pureComputed(() => {
-      const metaKey = Environment.os.mac ? t('inviteMetaKeyMac') : t('inviteMetaKeyPc');
+      const metaKey = Runtime.isMacOS() ? t('inviteMetaKeyMac') : t('inviteMetaKeyPc');
 
       return this.inviteMessageSelected() ? t('inviteHintSelected', metaKey) : t('inviteHintUnselected', metaKey);
     });

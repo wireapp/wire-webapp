@@ -128,6 +128,7 @@ import {AssetRepository} from '../assets/AssetRepository';
 import {DebugUtil} from 'Util/DebugUtil';
 import type {BaseError} from '../error/BaseError';
 import type {User} from '../entity/User';
+import {Runtime} from '@wireapp/commons';
 
 function doRedirect(signOutReason: SIGN_OUT_REASON) {
   let url = `/auth/${location.search}`;
@@ -345,7 +346,7 @@ class App {
    */
   _setupServices(encryptedEngine: SQLeetEngine) {
     const storageService = new StorageService(encryptedEngine);
-    const eventService = Environment.browser.edge
+    const eventService = Runtime.isEdge()
       ? new EventServiceNoCompound(storageService)
       : new EventService(storageService);
 
@@ -396,6 +397,11 @@ class App {
    * @returns {undefined} No return value
    */
   async initApp() {
+    // add body information
+    const osCssClass = Runtime.isMacOS() ? 'os-mac' : 'os-pc';
+    const platformCssClass = Runtime.isDesktopApp() ? 'platform-electron' : 'platform-web';
+    document.body.classList.add(osCssClass, platformCssClass);
+
     const isReload = this._isReload();
     this.logger.debug(`App init starts (isReload: '${isReload}')`);
     new ThemeViewModel(this.repository.properties);
@@ -536,7 +542,7 @@ class App {
 
   _appInitFailure(error: BaseError, isReload: boolean) {
     let logMessage = `Could not initialize app version '${Environment.version(false)}'`;
-    if (Environment.desktop) {
+    if (Runtime.isDesktopApp()) {
       logMessage += ` - Electron '${platform.os.family}' '${Environment.version()}'`;
     }
     this.logger.warn(`${logMessage}: ${error.message}`, {error});
@@ -721,7 +727,7 @@ class App {
       mainView.list.showTakeover();
     } else if (conversationEntity) {
       mainView.content.showConversation(conversationEntity);
-    } else if (this.repository.user.connect_requests().length) {
+    } else if (this.repository.user.connectRequests().length) {
       amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.CONNECTION_REQUESTS);
     }
 
@@ -877,7 +883,7 @@ class App {
    */
   refresh(): void | boolean {
     this.logger.info('Refresh to update started');
-    if (Environment.desktop) {
+    if (Runtime.isDesktopApp()) {
       // if we are in a desktop env, we just warn the wrapper that we need to reload. It then decide what should be done
       return amplify.publish(WebAppEvents.LIFECYCLE.RESTART);
     }

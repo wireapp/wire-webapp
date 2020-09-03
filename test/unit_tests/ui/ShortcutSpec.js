@@ -17,9 +17,9 @@
  *
  */
 
-import {Environment} from 'src/script/util/Environment';
 import {Shortcut} from 'src/script/ui/Shortcut';
 import {ShortcutType} from 'src/script/ui/ShortcutType';
+import {Runtime} from '@wireapp/commons';
 
 describe('Shortcut', () => {
   const map = Shortcut.shortcutMap;
@@ -27,21 +27,18 @@ describe('Shortcut', () => {
   describe('getShortcut', () => {
     describe('webapp', () => {
       beforeEach(() => {
-        Environment.electron = false;
-        Shortcut.__test__assignEnvironment(Environment);
+        spyOn(Runtime, 'isDesktopApp').and.returnValue(false);
       });
 
       it('can get shortcut for mac', () => {
-        Environment.os.mac = true;
-        Shortcut.__test__assignEnvironment(Environment);
+        spyOn(Runtime, 'isMacOS').and.returnValue(true);
         const mac_shortcut = Shortcut.getShortcut(ShortcutType.ADD_PEOPLE);
 
         expect(mac_shortcut).toBe(map[ShortcutType.ADD_PEOPLE].shortcut.webapp.macos);
       });
 
       it('can get shortcut for pc', () => {
-        Environment.os.mac = false;
-        Shortcut.__test__assignEnvironment(Environment);
+        spyOn(Runtime, 'isMacOS').and.returnValue(false);
         const pc_shortcut = Shortcut.getShortcut(ShortcutType.ADD_PEOPLE);
 
         expect(pc_shortcut).toBe(map[ShortcutType.ADD_PEOPLE].shortcut.webapp.pc);
@@ -50,21 +47,18 @@ describe('Shortcut', () => {
 
     describe('electron', () => {
       beforeEach(() => {
-        Environment.electron = true;
-        Shortcut.__test__assignEnvironment(Environment);
+        spyOn(Runtime, 'isDesktopApp').and.returnValue(true);
       });
 
       it('can get shortcut for electron mac', () => {
-        Environment.os.mac = true;
-        Shortcut.__test__assignEnvironment(Environment);
+        spyOn(Runtime, 'isMacOS').and.returnValue(true);
         const mac_shortcut = Shortcut.getShortcut(ShortcutType.ADD_PEOPLE);
 
         expect(mac_shortcut).toBe(map[ShortcutType.ADD_PEOPLE].shortcut.electron.macos);
       });
 
       it('can get shortcut for electron pc', () => {
-        Environment.os.mac = false;
-        Shortcut.__test__assignEnvironment(Environment);
+        spyOn(Runtime, 'isMacOS').and.returnValue(false);
         const pc_shortcut = Shortcut.getShortcut(ShortcutType.ADD_PEOPLE);
 
         expect(pc_shortcut).toBe(map[ShortcutType.ADD_PEOPLE].shortcut.electron.pc);
@@ -75,21 +69,18 @@ describe('Shortcut', () => {
   describe('getShortcutTooltip', () => {
     describe('webapp', () => {
       beforeEach(() => {
-        Environment.electron = false;
-        Shortcut.__test__assignEnvironment(Environment);
+        spyOn(Runtime, 'isDesktopApp').and.returnValue(false);
       });
 
       it('can create a beautified tooltip for webapp mac', () => {
-        Environment.os.mac = true;
-        Shortcut.__test__assignEnvironment(Environment);
+        spyOn(Runtime, 'isMacOS').and.returnValue(true);
         const mac_shortcut = Shortcut.getShortcutTooltip(ShortcutType.ADD_PEOPLE);
 
         expect(mac_shortcut).toBe('⌘⇧K');
       });
 
       it('can create a beautified tooltip for webapp pc', () => {
-        Environment.os.mac = false;
-        Shortcut.__test__assignEnvironment(Environment);
+        spyOn(Runtime, 'isMacOS').and.returnValue(false);
         const pc_shortcut = Shortcut.getShortcutTooltip(ShortcutType.ADD_PEOPLE);
 
         expect(pc_shortcut).toBe('Ctrl + Shift + K');
@@ -98,21 +89,18 @@ describe('Shortcut', () => {
 
     describe('electron', () => {
       beforeEach(() => {
-        Environment.electron = true;
-        Shortcut.__test__assignEnvironment(Environment);
+        spyOn(Runtime, 'isDesktopApp').and.returnValue(true);
       });
 
       it('can create a beautified tooltip for webapp mac', () => {
-        Environment.os.mac = true;
-        Shortcut.__test__assignEnvironment(Environment);
+        spyOn(Runtime, 'isMacOS').and.returnValue(true);
         const mac_shortcut = Shortcut.getShortcutTooltip(ShortcutType.ADD_PEOPLE);
 
         expect(mac_shortcut).toBe('⌘⇧K');
       });
 
       it('can create a beautified tooltip for webapp pc', () => {
-        Environment.os.mac = false;
-        Shortcut.__test__assignEnvironment(Environment);
+        spyOn(Runtime, 'isMacOS').and.returnValue(false);
         const pc_shortcut = Shortcut.getShortcutTooltip(ShortcutType.ADD_PEOPLE);
 
         expect(pc_shortcut).toBe('Ctrl + Shift + K');

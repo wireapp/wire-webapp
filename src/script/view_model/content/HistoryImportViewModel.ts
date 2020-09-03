@@ -116,7 +116,7 @@ export class HistoryImportViewModel {
     this.state(HistoryImportViewModel.STATE.PREPARING);
     this.error(null);
     const fileBuffer = await loadFileBuffer(file);
-    const worker = new WebWorker('worker/jszip-unpack-worker.js');
+    const worker = new WebWorker('/worker/jszip-unpack-worker.js');
 
     try {
       const unzipTimeStart = performance.now();

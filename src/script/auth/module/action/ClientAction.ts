@@ -20,7 +20,7 @@
 import {ClientClassification, ClientType, RegisteredClient} from '@wireapp/api-client/dist/client/index';
 import type {ClientInfo} from '@wireapp/core/dist/client/';
 
-import * as Runtime from '../../Runtime';
+import {Runtime} from '@wireapp/commons';
 import * as StringUtil from '../../util/stringUtil';
 import type {ThunkAction} from '../reducer';
 import {ClientActionCreator} from './creator/';
@@ -75,10 +75,10 @@ export class ClientAction {
     if (clientType === ClientType.NONE) {
       return undefined;
     }
-    const deviceLabel = `${Runtime.getOsFamily()}${Runtime.getOs().version ? ` ${Runtime.getOs().version}` : ''}`;
+    const deviceLabel = `${Runtime.getOS()}${Runtime.getOS().version ? ` ${Runtime.getOS().version}` : ''}`;
     let deviceModel = StringUtil.capitalize(Runtime.getBrowserName());
 
-    if (Runtime.isElectron()) {
+    if (Runtime.isDesktopApp()) {
       if (Runtime.isMacOS()) {
         deviceModel = 'Wire macOS';
       } else if (Runtime.isWindows()) {

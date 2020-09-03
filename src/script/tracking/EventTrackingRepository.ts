@@ -28,9 +28,9 @@ import {URLParameter} from '../auth/URLParameter';
 import {ROLE as TEAM_ROLE} from '../user/UserPermission';
 import {UserData} from './UserData';
 import {Segmentation} from './Segmentation';
-import {getPlatform} from './Helpers';
 import type {UserRepository} from '../user/UserRepository';
 import {loadValue, storeValue} from 'Util/StorageUtil';
+import {getPlatform} from './Helpers';
 
 const Countly = require('countly-sdk-web');
 
@@ -75,8 +75,15 @@ export class EventTrackingRepository {
     }
   }
 
-  async init(telemetrySharing: boolean): Promise<void> {
-    const enableTelemetrySharing = telemetrySharing || this.userRepository.isTeam();
+  async init(telemetrySharing: boolean | undefined): Promise<void> {
+    const isTeam = this.userRepository.isTeam();
+    if (!isTeam) {
+      return; // Countly should not be enabled for non-team users
+    }
+    let enableTelemetrySharing = true;
+    if (typeof telemetrySharing === 'boolean') {
+      enableTelemetrySharing = telemetrySharing;
+    }
     this.logger.info(`Initialize analytics and error reporting: ${enableTelemetrySharing}`);
 
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.TELEMETRY_SHARING, this.toggleCountly);
@@ -164,7 +171,7 @@ export class EventTrackingRepository {
   private trackProductReportingEvent(eventName: string, segmentations?: any): void {
     if (this.isProductReportingActivated === true) {
       Countly.userData.set(UserData.IS_TEAM, this.userRepository.isTeam());
-      Countly.userData.set(UserData.CONTACTS, this.userRepository.number_of_contacts());
+      Countly.userData.set(UserData.CONTACTS, this.userRepository.numberOfContacts());
       Countly.userData.set(UserData.TEAM_SIZE, this.userRepository.teamMembers().length);
       Countly.userData.set(UserData.USER_TYPE, this.getUserType());
       Countly.userData.save();
