@@ -609,6 +609,9 @@ export class CallingRepository {
       const success = await loadPreviewPromise;
       if (success) {
         this.wCall.start(this.wUser, conversationId, callType, conversationType, this.cbrEncoding());
+        this.sendCallingEvent(EventName.CALLING.INITIATED_CALL, call, {
+          [Segmentation.CALL.VIDEO]: callType === CALL_TYPE.VIDEO,
+        });
       } else {
         this.showNoCameraModal();
         this.removeCall(call);
