@@ -252,8 +252,8 @@ export class ParticipantAvatar {
       _loadAvatarPicture();
     };
 
-    const _loadAvatarPictureIfVisible = () => {
-      if (this.avatarEnteredViewport) {
+    const _loadAvatarPictureIfVisible = (param: User | AssetRemoteData) => {
+      if (param && this.avatarEnteredViewport) {
         _loadAvatarPicture();
       }
     };
