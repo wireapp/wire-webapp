@@ -43,7 +43,6 @@ import {UrlUtil} from '@wireapp/commons';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import 'webrtc-adapter';
-import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
 import {createRandomUuid} from 'Util/util';
@@ -66,11 +65,12 @@ import {ClientId, Participant, UserId} from './Participant';
 import type {Recipients} from '../cryptography/CryptographyRepository';
 import type {Conversation} from '../entity/Conversation';
 import {EventName} from '../tracking/EventName';
-import {Segmantation} from '../tracking/Segmentation';
+import {Segmentation} from '../tracking/Segmentation';
 import * as trackingHelpers from '../tracking/Helpers';
 import {UserRepository} from '../user/UserRepository';
 import {flatten} from 'Util/ArrayUtil';
 import {QUERY_KEY} from '../auth/route';
+import {Runtime} from '@wireapp/commons';
 
 interface MediaStreamQuery {
   audio?: boolean;
@@ -211,7 +211,7 @@ export class CallingRepository {
       this.callLog.push(`${new Date().toISOString()} [${logLevels[level]}] ${trimmedMessage}`);
     });
 
-    const avsEnv = Environment.browser.firefox ? AVS_ENV.FIREFOX : AVS_ENV.DEFAULT;
+    const avsEnv = Runtime.isFirefox() ? AVS_ENV.FIREFOX : AVS_ENV.DEFAULT;
     wCall.init(avsEnv);
     wCall.setUserMediaHandler(this.getCallMediaStream);
     wCall.setMediaStreamHandler(this.updateParticipantStream);
@@ -415,9 +415,7 @@ export class CallingRepository {
    * @see https://www.chromestatus.com/feature/6321945865879552
    */
   get supportsConferenceCalling(): boolean {
-    const supportsEncodedStreams = RTCRtpSender.prototype.hasOwnProperty('createEncodedStreams');
-    const supportsEncodedVideoStreams = RTCRtpSender.prototype.hasOwnProperty('createEncodedVideoStreams');
-    return supportsEncodedStreams || supportsEncodedVideoStreams;
+    return Runtime.isSupportingConferenceCalling();
   }
 
   /**
@@ -425,7 +423,7 @@ export class CallingRepository {
    * @returns `true` if calling is supported
    */
   get supportsCalling(): boolean {
-    return Environment.browser.supports.calling;
+    return Runtime.isSupportingLegacyCalling();
   }
 
   /**
@@ -433,7 +431,7 @@ export class CallingRepository {
    * @returns `true` if screen sharing is supported
    */
   get supportsScreenSharing(): boolean {
-    return Environment.browser.supports.screenSharing;
+    return Runtime.isSupportingScreensharing();
   }
 
   /**
@@ -648,14 +646,13 @@ export class CallingRepository {
       const guests = conversationEntity.participating_user_ets().filter(user => user.isGuest()).length;
       const wirelessGuests = conversationEntity.participating_user_ets().filter(user => user.isTemporaryGuest()).length;
       const segmentations = {
-        [Segmantation.CONVERSATION.ALLOW_GUESTS]: conversationEntity.isGuestRoom(),
-        [Segmantation.CONVERSATION.GUESTS]: guests,
-        [Segmantation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
-        [Segmantation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
-        [Segmantation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
-        [Segmantation.CONVERSATION.WIRELESS_GUESTS]: wirelessGuests,
-        [Segmantation.SCREEN_SHARE.DIRECTION]: '',
-        [Segmantation.SCREEN_SHARE.DURATION]: '',
+        [Segmentation.CONVERSATION.GUESTS]: guests,
+        [Segmentation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
+        [Segmentation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
+        [Segmentation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
+        [Segmentation.CONVERSATION.GUESTS_WIRELESS]: wirelessGuests,
+        [Segmentation.SCREEN_SHARE.DIRECTION]: '',
+        [Segmentation.SCREEN_SHARE.DURATION]: '',
       };
       amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.SCREEN_SHARE, segmentations);
 
@@ -692,14 +689,13 @@ export class CallingRepository {
       const guests = conversationEntity.participating_user_ets().filter(user => user.isGuest()).length;
       const wirelessGuests = conversationEntity.participating_user_ets().filter(user => user.isTemporaryGuest()).length;
       const segmentations = {
-        [Segmantation.CALL.DIRECTION]: call.state(),
-        [Segmantation.CALL.VIDEO]: callType === CALL_TYPE.VIDEO,
-        [Segmantation.CONVERSATION.EPHEMERAL_MESSAGE]: !!conversationEntity.globalMessageTimer(),
-        [Segmantation.CONVERSATION.GUESTS]: guests,
-        [Segmantation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
-        [Segmantation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
-        [Segmantation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
-        [Segmantation.CONVERSATION.WIRELESS_GUESTS]: wirelessGuests,
+        [Segmentation.CALL.DIRECTION]: call.state(),
+        [Segmentation.CALL.VIDEO]: callType === CALL_TYPE.VIDEO,
+        [Segmentation.CONVERSATION.GUESTS]: guests,
+        [Segmentation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
+        [Segmentation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
+        [Segmentation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
+        [Segmentation.CONVERSATION.GUESTS_WIRELESS]: wirelessGuests,
       };
 
       amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.JOINED_CALL, segmentations);
@@ -899,7 +895,7 @@ export class CallingRepository {
 
   private readonly requestConfig = () => {
     (async () => {
-      const limit = Environment.browser.firefox ? CallingRepository.CONFIG.MAX_FIREFOX_TURN_COUNT : undefined;
+      const limit = Runtime.isFirefox() ? CallingRepository.CONFIG.MAX_FIREFOX_TURN_COUNT : undefined;
       try {
         const config = await this.fetchConfig(limit);
         this.wCall.configUpdate(this.wUser, 0, JSON.stringify(config));
@@ -923,21 +919,19 @@ export class CallingRepository {
     const guests = conversationEntity.participating_user_ets().filter(user => user.isGuest()).length;
     const wirelessGuests = conversationEntity.participating_user_ets().filter(user => user.isTemporaryGuest()).length;
     const segmentations = {
-      [Segmantation.CALL.AV_SWITCH_TOGGLE]: '',
-      [Segmantation.CALL.DIRECTION]: call.state(),
-      [Segmantation.CALL.DURATION]: '',
-      [Segmantation.CALL.END_REASON]: reason,
-      [Segmantation.CALL.PARTICIPANTS]: call.participants().length,
-      [Segmantation.CALL.SCREEN_SHARE]: '',
-      [Segmantation.CALL.SETUP_TIME]: '',
-      [Segmantation.CALL.VIDEO]: call.initialType === CALL_TYPE.VIDEO,
-      [Segmantation.CONVERSATION.ALLOW_GUESTS]: conversationEntity.isGuestRoom(),
-      [Segmantation.CONVERSATION.EPHEMERAL_MESSAGE]: !!conversationEntity.globalMessageTimer(),
-      [Segmantation.CONVERSATION.GUESTS]: guests,
-      [Segmantation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
-      [Segmantation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
-      [Segmantation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
-      [Segmantation.CONVERSATION.WIRELESS_GUESTS]: wirelessGuests,
+      [Segmentation.CALL.AV_SWITCH_TOGGLE]: call.analyticsAvSwitchToggle,
+      [Segmentation.CALL.DIRECTION]: call.state(),
+      [Segmentation.CALL.DURATION]: '',
+      [Segmentation.CALL.END_REASON]: reason,
+      [Segmentation.CALL.PARTICIPANTS]: call.participants().length,
+      [Segmentation.CALL.SCREEN_SHARE]: '',
+      [Segmentation.CALL.SETUP_TIME]: '',
+      [Segmentation.CALL.VIDEO]: call.initialType === CALL_TYPE.VIDEO,
+      [Segmentation.CONVERSATION.GUESTS]: guests,
+      [Segmentation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
+      [Segmentation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
+      [Segmentation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
+      [Segmentation.CONVERSATION.GUESTS_WIRELESS]: wirelessGuests,
     };
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.ENDED_CALL, segmentations);
     if (!stillActiveState.includes(reason)) {
@@ -1018,15 +1012,14 @@ export class CallingRepository {
         const wirelessGuests = conversationEntity.participating_user_ets().filter(user => user.isTemporaryGuest())
           .length;
         const segmentations = {
-          [Segmantation.CALL.DIRECTION]: call.state(),
-          [Segmantation.CALL.SETUP_TIME]: '',
-          [Segmantation.CALL.VIDEO]: call.initialType === CALL_TYPE.VIDEO,
-          [Segmantation.CONVERSATION.EPHEMERAL_MESSAGE]: !!conversationEntity.globalMessageTimer(),
-          [Segmantation.CONVERSATION.GUESTS]: guests,
-          [Segmantation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
-          [Segmantation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
-          [Segmantation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
-          [Segmantation.CONVERSATION.WIRELESS_GUESTS]: wirelessGuests,
+          [Segmentation.CALL.DIRECTION]: call.state(),
+          [Segmentation.CALL.SETUP_TIME]: '',
+          [Segmentation.CALL.VIDEO]: call.initialType === CALL_TYPE.VIDEO,
+          [Segmentation.CONVERSATION.GUESTS]: guests,
+          [Segmentation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
+          [Segmentation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
+          [Segmentation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
+          [Segmentation.CONVERSATION.GUESTS_WIRELESS]: wirelessGuests,
         };
 
         amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.ESTABLISHED_CALL, segmentations);
@@ -1179,20 +1172,24 @@ export class CallingRepository {
     state: number,
   ) => {
     const call = this.findCall(conversationId);
-    if (call) {
-      const selfParticipant = call.getSelfParticipant();
-      if (
-        call.state() === CALL_STATE.MEDIA_ESTAB &&
-        selfParticipant.doesMatchIds(userId, clientId) &&
-        !selfParticipant.sharesScreen()
-      ) {
-        selfParticipant.releaseVideoStream();
-      }
-      call
-        .participants()
-        .filter(participant => participant.doesMatchIds(userId, clientId))
-        .forEach(participant => participant.videoState(state));
+    if (!call) {
+      return;
     }
+    if (state === VIDEO_STATE.STARTED) {
+      call.analyticsAvSwitchToggle = true;
+    }
+    const selfParticipant = call.getSelfParticipant();
+    if (
+      call.state() === CALL_STATE.MEDIA_ESTAB &&
+      selfParticipant.doesMatchIds(userId, clientId) &&
+      !selfParticipant.sharesScreen()
+    ) {
+      selfParticipant.releaseVideoStream();
+    }
+    call
+      .participants()
+      .filter(participant => participant.doesMatchIds(userId, clientId))
+      .forEach(participant => participant.videoState(state));
   };
 
   /**

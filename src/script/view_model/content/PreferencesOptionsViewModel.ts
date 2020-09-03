@@ -22,8 +22,6 @@ import {amplify} from 'amplify';
 import {AudioPreference, WebappProperties, NotificationPreference} from '@wireapp/api-client/dist/user/data';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {Environment} from 'Util/Environment';
-
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 import {Config} from '../../Config';
 import {THEMES as ThemeViewModelThemes} from '../ThemeViewModel';
@@ -34,7 +32,6 @@ import {UserRepository} from 'src/script/user/UserRepository';
 export class PreferencesOptionsViewModel {
   isActivatedAccount: ko.PureComputed<boolean>;
   isTeam: ko.PureComputed<boolean>;
-  Environment: typeof Environment;
   optionAudio: ko.Observable<AudioPreference>;
   optionDarkMode: ko.Observable<boolean>;
   optionReplaceInlineEmoji: ko.Observable<boolean>;
@@ -50,7 +47,6 @@ export class PreferencesOptionsViewModel {
   ) {
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
     this.isTeam = this.teamRepository.isTeam;
-    this.Environment = Environment;
 
     this.optionAudio = ko.observable();
     this.optionAudio.subscribe(audioPreference => {

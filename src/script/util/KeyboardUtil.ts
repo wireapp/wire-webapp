@@ -17,13 +17,13 @@
  *
  */
 
-import {Environment} from './Environment';
+import {Runtime} from '@wireapp/commons';
 
 export const KEY = {
-  ARROW_DOWN: Environment.browser.edge ? 'Down' : 'ArrowDown',
-  ARROW_LEFT: Environment.browser.edge ? 'Left' : 'ArrowLeft',
-  ARROW_RIGHT: Environment.browser.edge ? 'Right' : 'ArrowRight',
-  ARROW_UP: Environment.browser.edge ? 'Up' : 'ArrowUp',
+  ARROW_DOWN: Runtime.isEdge() ? 'Down' : 'ArrowDown',
+  ARROW_LEFT: Runtime.isEdge() ? 'Left' : 'ArrowLeft',
+  ARROW_RIGHT: Runtime.isEdge() ? 'Right' : 'ArrowRight',
+  ARROW_UP: Runtime.isEdge() ? 'Up' : 'ArrowUp',
   BACKSPACE: 'Backspace',
   DELETE: 'Delete',
   ENTER: 'Enter',

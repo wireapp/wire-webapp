@@ -239,7 +239,7 @@ export class ContentViewModel {
       }
     });
 
-    this.userRepository.connect_requests.subscribe(requests => {
+    this.userRepository.connectRequests.subscribe(requests => {
       const isStateRequests = this.state() === ContentViewModel.STATE.CONNECTION_REQUESTS;
       if (isStateRequests && !requests.length) {
         this.showConversation(this.conversationRepository.getMostRecentConversation());
@@ -397,7 +397,7 @@ export class ContentViewModel {
   private readonly checkContentAvailability = (state: string) => {
     const isStateRequests = state === ContentViewModel.STATE.CONNECTION_REQUESTS;
     if (isStateRequests) {
-      const hasConnectRequests = !!this.userRepository.connect_requests().length;
+      const hasConnectRequests = !!this.userRepository.connectRequests().length;
       if (!hasConnectRequests) {
         return ContentViewModel.STATE.WATERMARK;
       }

@@ -24,7 +24,6 @@ import {amplify} from 'amplify';
 
 import {t} from 'Util/LocalizerUtil';
 import {iterateItem} from 'Util/ArrayUtil';
-import {Environment} from 'Util/Environment';
 import {isEscapeKey} from 'Util/KeyboardUtil';
 
 import {ArchiveViewModel} from './list/ArchiveViewModel';
@@ -52,6 +51,7 @@ import type {Conversation} from '../entity/Conversation';
 import type {ClientEntity} from '../client/ClientEntity';
 import type {User} from '../entity/User';
 import type {AssetRemoteData} from '../assets/AssetRemoteData';
+import {Runtime} from '@wireapp/commons';
 
 export class ListViewModel {
   readonly preferences: PreferencesListViewModel;
@@ -135,14 +135,14 @@ export class ListViewModel {
           ContentViewModel.STATE.PREFERENCES_AV,
         ];
 
-        if (!Environment.desktop) {
+        if (!Runtime.isDesktopApp()) {
           preferenceItems.push(ContentViewModel.STATE.PREFERENCES_ABOUT);
         }
 
         return preferenceItems;
       }
 
-      const hasConnectRequests = !!this.userRepository.connect_requests().length;
+      const hasConnectRequests = !!this.userRepository.connectRequests().length;
       const states: (string | Conversation)[] = hasConnectRequests ? [ContentViewModel.STATE.CONNECTION_REQUESTS] : [];
       return states.concat(this.conversationRepository.conversations_unarchived());
     });

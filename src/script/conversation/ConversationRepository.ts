@@ -129,7 +129,7 @@ import * as LegalHoldEvaluator from '../legal-hold/LegalHoldEvaluator';
 import {DeleteConversationMessage} from '../entity/message/DeleteConversationMessage';
 import {ConversationRoleRepository} from './ConversationRoleRepository';
 import {ConversationError} from '../error/ConversationError';
-import {Segmantation} from '../tracking/Segmentation';
+import {Segmentation} from '../tracking/Segmentation';
 import {ConversationService} from './ConversationService';
 import {AssetRepository} from '../assets/AssetRepository';
 import {ClientRepository} from '../client/ClientRepository';
@@ -4333,7 +4333,7 @@ export class ConversationRepository {
       }
 
       case 'image': {
-        actionType = 'photo';
+        actionType = 'image';
         break;
       }
 
@@ -4363,12 +4363,12 @@ export class ConversationRepository {
     if (actionType) {
       const guests = conversationEntity.participating_user_ets().filter(user => user.isGuest()).length;
       let segmentations = {
-        [Segmantation.CONVERSATION.GUESTS]: guests,
-        [Segmantation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
-        [Segmantation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
-        [Segmantation.MESSAGE.ACTION]: actionType,
-        [Segmantation.MESSAGE.IS_REPLY]: !!genericMessage.text?.quote,
-        [Segmantation.MESSAGE.MENTION]: numberOfMentions,
+        [Segmentation.CONVERSATION.GUESTS]: guests,
+        [Segmentation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
+        [Segmentation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
+        [Segmentation.MESSAGE.ACTION]: actionType,
+        [Segmentation.MESSAGE.IS_REPLY]: !!genericMessage.text?.quote,
+        [Segmentation.MESSAGE.MENTION]: numberOfMentions,
       };
       const isTeamConversation = !!conversationEntity.team_id;
       if (isTeamConversation) {
