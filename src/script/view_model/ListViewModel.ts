@@ -142,7 +142,7 @@ export class ListViewModel {
         return preferenceItems;
       }
 
-      const hasConnectRequests = !!this.userRepository.connect_requests().length;
+      const hasConnectRequests = !!this.userRepository.connectRequests().length;
       const states: (string | Conversation)[] = hasConnectRequests ? [ContentViewModel.STATE.CONNECTION_REQUESTS] : [];
       return states.concat(this.conversationRepository.conversations_unarchived());
     });

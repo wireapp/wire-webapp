@@ -727,7 +727,7 @@ class App {
       mainView.list.showTakeover();
     } else if (conversationEntity) {
       mainView.content.showConversation(conversationEntity);
-    } else if (this.repository.user.connect_requests().length) {
+    } else if (this.repository.user.connectRequests().length) {
       amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.CONNECTION_REQUESTS);
     }
 
