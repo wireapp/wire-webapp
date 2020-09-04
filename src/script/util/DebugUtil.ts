@@ -58,9 +58,9 @@ export class DebugUtil {
   /** Used by QA test automation. */
   public readonly userRepository: UserRepository;
   /** Used by QA test automation. */
-  public $: JQueryStatic;
+  public readonly $: JQueryStatic;
   /** Used by QA test automation. */
-  public Dexie: typeof Dexie;
+  public readonly Dexie: typeof Dexie;
 
   constructor(repositories: ViewModelRepositories) {
     this.$ = $;
