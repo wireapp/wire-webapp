@@ -1328,6 +1328,7 @@ export class ConversationRepository {
    */
   async updateParticipatingUserEntities(conversationEntity?: Conversation, offline = false, updateGuests = false) {
     if (conversationEntity) {
+      ko.tasks.runEarly();
       const userEntities = await this.userRepository.getUsersById(conversationEntity.participating_user_ids(), offline);
       userEntities.sort(sortUsersByPriority);
       conversationEntity.participating_user_ets(userEntities);

@@ -228,6 +228,7 @@ export class ContentViewModel {
           this.preferencesAV.updateMediaStreamTrack(MediaType.AUDIO_VIDEO);
           break;
         case ContentViewModel.STATE.PREFERENCES_DEVICES:
+          this.preferencesAccount.popNotification();
           this.preferencesDevices.updateDeviceInfo();
           break;
         case ContentViewModel.STATE.COLLECTION:

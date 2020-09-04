@@ -186,7 +186,7 @@ export class Conversation {
     this.is_loaded = ko.observable(false);
     this.is_pending = ko.observable(false);
 
-    this.participating_user_ets = ko.observableArray([]); // Does not include self user
+    this.participating_user_ets = ko.observableArray([]).extend({notify: 'always'}); // Does not include self user
     this.participating_user_ids = ko.observableArray([]); // Does not include self user
     this.selfUser = ko.observable();
     this.roles = ko.observable({});

@@ -211,6 +211,7 @@ export class GroupCreationViewModel {
     const nameTooShort = !trimmedNameInput.length;
 
     this.nameInput(trimmedNameInput.slice(0, this.maxNameLength));
+    ko.tasks.runEarly();
     if (nameTooLong) {
       return this.nameError(t('groupCreationPreferencesErrorNameLong'));
     }
