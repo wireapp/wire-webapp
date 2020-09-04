@@ -71,6 +71,7 @@ import {UserRepository} from '../user/UserRepository';
 import {flatten} from 'Util/ArrayUtil';
 import {QUERY_KEY} from '../auth/route';
 import {Runtime} from '@wireapp/commons';
+import {roundLogarithmic} from 'Util/NumberUtil';
 
 interface MediaStreamQuery {
   audio?: boolean;
@@ -983,6 +984,9 @@ export class CallingRepository {
 
     this.storeCall(call);
     this.incomingCallCallback(call);
+    this.sendCallingEvent(EventName.CALLING.RECIEVED_CALL, call, {
+      [Segmentation.CALL.VIDEO]: call.initialType === CALL_TYPE.VIDEO,
+    });
   };
 
   private readonly updateCallState = (conversationId: ConversationId, state: number) => {
@@ -1195,14 +1199,17 @@ export class CallingRepository {
   private readonly sendCallingEvent = (eventName: string, call: Call, customSegmentations: Record<string, any>) => {
     const conversationEntity = this.conversationRepository.find_conversation_by_id(call.conversationId);
     const participants = conversationEntity.participating_user_ets();
+    const selfUserTeamId = call.getSelfParticipant().user.id;
     const guests = participants.filter(user => user.isGuest()).length;
     const guestsWireless = participants.filter(user => user.isTemporaryGuest()).length;
+    const guestsPro = participants.filter(user => !!user.teamId && user.teamId !== selfUserTeamId).length;
     const segmentations = {
-      [Segmentation.CONVERSATION.GUESTS]: guests,
-      [Segmentation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
-      [Segmentation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
+      [Segmentation.CONVERSATION.GUESTS]: roundLogarithmic(guests, 6),
+      [Segmentation.CONVERSATION.GUESTS_PRO]: roundLogarithmic(guestsPro, 6),
+      [Segmentation.CONVERSATION.GUESTS_WIRELESS]: roundLogarithmic(guestsWireless, 6),
+      [Segmentation.CONVERSATION.SERVICES]: roundLogarithmic(conversationEntity.servicesCount(), 6),
+      [Segmentation.CONVERSATION.SIZE]: roundLogarithmic(conversationEntity.participating_user_ets().length, 6),
       [Segmentation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
-      [Segmentation.CONVERSATION.GUESTS_WIRELESS]: guestsWireless,
       ...customSegmentations,
     };
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, eventName, segmentations);

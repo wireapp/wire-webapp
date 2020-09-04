@@ -32,6 +32,7 @@ import type {UserRepository} from '../user/UserRepository';
 import {loadValue, storeValue} from 'Util/StorageUtil';
 import {getPlatform} from './Helpers';
 import {Config} from '../Config';
+import {roundLogarithmic} from 'Util/NumberUtil';
 
 const Countly = require('countly-sdk-web');
 
@@ -172,7 +173,7 @@ export class EventTrackingRepository {
   private trackProductReportingEvent(eventName: string, customSegmentations?: any): void {
     if (this.isProductReportingActivated === true) {
       Countly.userData.set(UserData.IS_TEAM, this.userRepository.isTeam());
-      Countly.userData.set(UserData.CONTACTS, this.userRepository.numberOfContacts());
+      Countly.userData.set(UserData.CONTACTS, roundLogarithmic(this.userRepository.numberOfContacts(), 6));
       Countly.userData.set(UserData.TEAM_SIZE, this.userRepository.teamMembers().length);
       Countly.userData.set(UserData.USER_TYPE, this.getUserType());
       Countly.userData.save();
