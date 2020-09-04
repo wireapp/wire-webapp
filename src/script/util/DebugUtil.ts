@@ -181,7 +181,7 @@ export class DebugUtil {
       .then(({message, notifications}: {message: ContentMessage; notifications: Notification[]}) => {
         const dateTime = new Date(message.timestamp());
         return notifications
-          .reduce((accumulator, notification) => accumulator.concat(notification.payload), [])
+          .flatMap(({payload}) => payload)
           .filter(event => {
             return (
               isOTRMessage(event) &&
