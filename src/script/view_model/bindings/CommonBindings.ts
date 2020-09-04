@@ -515,7 +515,7 @@ ko.bindingHandlers.electron_remove = {
 };
 
 ko.bindingHandlers.visibility = (function () {
-  const setVisibility = (element: any, valueAccessor: () => boolean) => {
+  const setVisibility = (element: Element, valueAccessor: () => boolean) => {
     const hidden = ko.unwrap(valueAccessor());
     $(element).css('visibility', hidden ? 'visible' : 'hidden');
   };
