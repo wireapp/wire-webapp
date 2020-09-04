@@ -1165,6 +1165,9 @@ export class CallingRepository {
 
     // user has stopped sharing their screen
     if (participant.videoState() === VIDEO_STATE.SCREENSHARE && state !== VIDEO_STATE.SCREENSHARE) {
+      if (isSameUser) {
+        selfParticipant.releaseVideoStream();
+      }
       this.sendCallingEvent(EventName.CALLING.SCREEN_SHARE, call, {
         [Segmentation.SCREEN_SHARE.DIRECTION]: isSameUser ? 'outgoing' : 'incoming',
         [Segmentation.SCREEN_SHARE.DURATION]: Math.ceil((Date.now() - participant.startedScreenSharingAt()) / 5000) * 5,
