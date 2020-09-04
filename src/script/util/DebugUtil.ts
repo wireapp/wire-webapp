@@ -26,7 +26,7 @@ import {checkVersion} from '../lifecycle/newVersionHandler';
 import {downloadFile} from './util';
 import {StorageSchemata} from '../storage/StorageSchemata';
 import {EventRepository} from '../event/EventRepository';
-import type {Notification, NotificationList} from '@wireapp/api-client/dist/notification/';
+import type {Notification} from '@wireapp/api-client/dist/notification/';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
 import {CallingRepository} from '../calling/CallingRepository';
 import {ClientRepository} from '../client/ClientRepository';
@@ -35,7 +35,6 @@ import {ConnectionRepository} from '../connection/ConnectionRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {EventRecord, StorageRepository} from '../storage';
 import {UserRepository} from '../user/UserRepository';
-import {ContentMessage} from '../entity/message/ContentMessage';
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 import {UserId} from '../calling/Participant';
@@ -86,27 +85,24 @@ export class DebugUtil {
   }
 
   /** Used by QA test automation. */
-  breakSession(userId: string, clientId: string): Promise<void> {
+  async breakSession(userId: string, clientId: string): Promise<void> {
     const sessionId = `${userId}@${clientId}`;
     const cryptobox = this.cryptographyRepository.cryptobox;
-    return cryptobox
-      .session_load(sessionId)
-      .then(cryptoboxSession => {
-        cryptoboxSession.session.session_states = {};
+    const cryptoboxSession = await cryptobox.session_load(sessionId);
+    cryptoboxSession.session.session_states = {};
 
-        const record = {
-          created: Date.now(),
-          id: sessionId,
-          serialised: cryptoboxSession.session.serialise(),
-          version: 'broken_by_qa',
-        };
+    const record = {
+      created: Date.now(),
+      id: sessionId,
+      serialised: cryptoboxSession.session.serialise(),
+      version: 'broken_by_qa',
+    };
 
-        cryptobox['cachedSessions'].set(sessionId, cryptoboxSession);
+    cryptobox['cachedSessions'].set(sessionId, cryptoboxSession);
 
-        const sessionStoreName = StorageSchemata.OBJECT_STORE.SESSIONS;
-        return this.storageRepository.storageService.update(sessionStoreName, sessionId, record);
-      })
-      .then(() => this.logger.log(`Corrupted Session ID '${sessionId}'`));
+    const sessionStoreName = StorageSchemata.OBJECT_STORE.SESSIONS;
+    await this.storageRepository.storageService.update(sessionStoreName, sessionId, record);
+    this.logger.log(`Corrupted Session ID '${sessionId}'`);
   }
 
   /** Used by QA test automation. */
@@ -149,12 +145,10 @@ export class DebugUtil {
     return [];
   }
 
-  haveISentThisMessageToMyOtherClients(
+  async haveISentThisMessageToMyOtherClients(
     messageId: string,
     conversationId: string = this.conversationRepository.active_conversation().id,
   ): Promise<void> {
-    let recipients: string[] = [];
-
     const clientId = this.clientRepository.currentClient().id;
     const userId = this.userRepository.self().id;
 
@@ -164,81 +158,60 @@ export class DebugUtil {
       notification.from === userId && notification.data && notification.data.sender === clientId;
     const hasExpectedTimestamp = (notification: ConversationOtrMessageAddEvent, dateTime: Date) =>
       notification.time === dateTime.toISOString();
-
-    return this.conversationRepository
-      .get_conversation_by_id(conversationId)
-      .then(conversation => {
-        return this.conversationRepository.getMessageInConversationById(conversation, messageId);
-      })
-      .then(message => {
-        return this.eventRepository.notificationService
-          .getNotifications(undefined, undefined, EventRepository.CONFIG.NOTIFICATION_BATCHES.MAX)
-          .then(({notifications}: NotificationList) => ({
-            message,
-            notifications,
-          }));
-      })
-      .then(({message, notifications}: {message: ContentMessage; notifications: Notification[]}) => {
-        const dateTime = new Date(message.timestamp());
-        return notifications
-          .flatMap(({payload}) => payload)
-          .filter(event => {
-            return (
-              isOTRMessage(event) &&
-              isInCurrentConversation(event) &&
-              wasSentByOurCurrentClient(event) &&
-              hasExpectedTimestamp(event, dateTime)
-            );
-          });
-      })
-      .then(filteredEvents => {
-        recipients = filteredEvents.map(event => event.data.recipient);
-        return this.clientRepository.getClientsForSelf();
-      })
-      .then(selfClients => {
-        const selfClientIds = selfClients.map(client => client.id);
-        const missingClients = selfClientIds.filter(id => recipients.includes(id));
-        const logMessage = missingClients.length
-          ? `Message was sent to all other "${selfClients.length}" clients.`
-          : `Message was NOT sent to the following own clients: ${missingClients.join(',')}`;
-        this.logger.info(logMessage);
-      })
-      .catch(error => this.logger.info(`Message was not sent to other clients. Reason: ${error.message}`, error));
+    const conversation = await this.conversationRepository.get_conversation_by_id(conversationId);
+    const message = await this.conversationRepository.getMessageInConversationById(conversation, messageId);
+    const notificationList = await this.eventRepository.notificationService.getNotifications(
+      undefined,
+      undefined,
+      EventRepository.CONFIG.NOTIFICATION_BATCHES.MAX,
+    );
+    const dateTime = new Date(message.timestamp());
+    const filteredEvents: ConversationOtrMessageAddEvent[] = notificationList.notifications
+      .flatMap((notification: Notification) => notification.payload)
+      .filter((event: ConversationOtrMessageAddEvent) => {
+        return (
+          isOTRMessage(event) &&
+          isInCurrentConversation(event) &&
+          wasSentByOurCurrentClient(event) &&
+          hasExpectedTimestamp(event, dateTime)
+        );
+      });
+    const recipients = filteredEvents.map(event => event.data.recipient);
+    const selfClients = await this.clientRepository.getClientsForSelf();
+    const selfClientIds = selfClients.map(client => client.id);
+    const missingClients = selfClientIds.filter(id => recipients.includes(id));
+    const logMessage = missingClients.length
+      ? `Message was sent to all other "${selfClients.length}" clients.`
+      : `Message was NOT sent to the following own clients: ${missingClients.join(',')}`;
+    this.logger.info(logMessage);
   }
 
-  getEventInfo(
+  async getEventInfo(
     event: ConversationEvent,
-  ): Promise<{conversation?: Conversation; event: ConversationEvent; user?: User}> {
-    const debugInformation: {conversation?: Conversation; event: ConversationEvent; user?: User} = {
-      conversation: undefined,
+  ): Promise<{conversation: Conversation; event: ConversationEvent; user: User}> {
+    const conversation = await this.conversationRepository.get_conversation_by_id(event.conversation);
+    const user = await this.userRepository.getUserById(event.from);
+
+    const debugInformation = {
+      conversation,
       event,
-      user: undefined,
+      user,
     };
 
-    return this.conversationRepository
-      .get_conversation_by_id(event.conversation)
-      .then((conversation_et: Conversation) => {
-        debugInformation.conversation = conversation_et;
-        return this.userRepository.getUserById(event.from);
-      })
-      .then(user_et => {
-        debugInformation.user = user_et;
-        const logMessage = `Hey ${this.userRepository.self().name()}, this is for you:`;
-        this.logger.warn(logMessage, debugInformation);
-        this.logger.warn(`Conversation: ${debugInformation.conversation.name()}`, debugInformation.conversation);
-        this.logger.warn(`From: ${debugInformation.user.name()}`, debugInformation.user);
-        return debugInformation;
-      });
+    const logMessage = `Hey ${this.userRepository.self().name()}, this is for you:`;
+    this.logger.warn(logMessage, debugInformation);
+    this.logger.warn(`Conversation: ${debugInformation.conversation.name()}`, debugInformation.conversation);
+    this.logger.warn(`From: ${debugInformation.user.name()}`, debugInformation.user);
+
+    return debugInformation;
   }
 
-  exportCryptobox(): void {
+  async exportCryptobox(): Promise<void> {
     const clientId = this.clientRepository.currentClient().id;
     const userId = this.userRepository.self().id;
     const fileName = `cryptobox-${userId}-${clientId}.json`;
-
-    this.cryptographyRepository.cryptobox
-      .serialize()
-      .then(cryptobox => downloadText(JSON.stringify(cryptobox), fileName));
+    const cryptobox = await this.cryptographyRepository.cryptobox.serialize();
+    downloadText(JSON.stringify(cryptobox), fileName);
   }
 
   /** Used by QA test automation. */
