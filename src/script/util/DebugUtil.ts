@@ -17,32 +17,56 @@
  *
  */
 
-import $ from 'jquery';
-import sodium from 'libsodium-wrappers-sumo';
-import Dexie from 'dexie';
+import type {BackendEvent, ConversationEvent, ConversationOtrMessageAddEvent} from '@wireapp/api-client/dist/event';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
 import {util as ProteusUtil} from '@wireapp/proteus';
-
-import {getLogger} from 'Util/Logger';
-
+import {getLogger, Logger} from 'Util/Logger';
+import Dexie from 'dexie';
 import {checkVersion} from '../lifecycle/newVersionHandler';
 import {downloadFile} from './util';
-
 import {StorageSchemata} from '../storage/StorageSchemata';
 import {EventRepository} from '../event/EventRepository';
+import type {Notification, NotificationList} from '@wireapp/api-client/dist/notification/';
+import {ViewModelRepositories} from '../view_model/MainViewModel';
+import {CallingRepository} from '../calling/CallingRepository';
+import {ClientRepository} from '../client/ClientRepository';
+import {ConversationRepository} from '../conversation/ConversationRepository';
+import {ConnectionRepository} from '../connection/ConnectionRepository';
+import {CryptographyRepository} from '../cryptography/CryptographyRepository';
+import {EventRecord, StorageRepository} from '../storage';
+import {UserRepository} from '../user/UserRepository';
+import {ContentMessage} from '../entity/message/ContentMessage';
+import {Conversation} from '../entity/Conversation';
+import {User} from '../entity/User';
+import {UserId} from '../calling/Participant';
 
-import {h as createElement, init as snabbdomInit} from 'snabbdom';
-import style from 'snabbdom/modules/style';
-
-function downloadText(text, filename = 'default.txt') {
+function downloadText(text: string, filename: string = 'default.txt'): number {
   const url = `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`;
   return downloadFile(url, filename);
 }
 
 export class DebugUtil {
-  constructor(repositories) {
-    const {calling, client, connection, conversation, cryptography, event, user, storage} = repositories;
+  private readonly logger: Logger;
+  private readonly callingRepository: CallingRepository;
+  private readonly clientRepository: ClientRepository;
+  private readonly connectionRepository: ConnectionRepository;
+  /** Used by QA test automation. */
+  public readonly conversationRepository: ConversationRepository;
+  private readonly cryptographyRepository: CryptographyRepository;
+  private readonly eventRepository: EventRepository;
+  private readonly storageRepository: StorageRepository;
+  /** Used by QA test automation. */
+  public readonly userRepository: UserRepository;
+  /** Used by QA test automation. */
+  public $: JQueryStatic;
+  /** Used by QA test automation. */
+  public Dexie: typeof Dexie;
 
+  constructor(repositories: ViewModelRepositories) {
+    this.$ = $;
+    this.Dexie = Dexie;
+
+    const {calling, client, connection, conversation, cryptography, event, user, storage} = repositories;
     this.callingRepository = calling;
     this.clientRepository = client;
     this.conversationRepository = conversation;
@@ -51,21 +75,18 @@ export class DebugUtil {
     this.eventRepository = event;
     this.storageRepository = storage;
     this.userRepository = user;
-    this.$ = $;
-    this.sodium = sodium;
-    this.Dexie = Dexie;
 
     this.logger = getLogger('DebugUtil');
-
-    this.liveCallingStatsInterval = undefined;
   }
 
-  blockAllConnections() {
+  /** Used by QA test automation. */
+  blockAllConnections(): Promise<void[]> {
     const blockUsers = this.userRepository.users().map(userEntity => this.connectionRepository.blockUser(userEntity));
     return Promise.all(blockUsers);
   }
 
-  breakSession(userId, clientId) {
+  /** Used by QA test automation. */
+  breakSession(userId: string, clientId: string): Promise<void> {
     const sessionId = `${userId}@${clientId}`;
     const cryptobox = this.cryptographyRepository.cryptobox;
     return cryptobox
@@ -80,7 +101,7 @@ export class DebugUtil {
           version: 'broken_by_qa',
         };
 
-        cryptobox.cachedSessions.set(sessionId, cryptoboxSession);
+        cryptobox['cachedSessions'].set(sessionId, cryptoboxSession);
 
         const sessionStoreName = StorageSchemata.OBJECT_STORE.SESSIONS;
         return this.storageRepository.storageService.update(sessionStoreName, sessionId, record);
@@ -88,16 +109,15 @@ export class DebugUtil {
       .then(() => this.logger.log(`Corrupted Session ID '${sessionId}'`));
   }
 
-  triggerVersionCheck(baseVersion) {
+  /** Used by QA test automation. */
+  triggerVersionCheck(baseVersion: string): Promise<string | void> {
     return checkVersion(baseVersion);
   }
 
   /**
-   * Will allow the webapp to generate fake link previews when sending a link in a message.
-   *
-   * @returns {void} - returns nothing
+   * Used by QA test automation: Will allow the webapp to generate fake link previews when sending a link in a message.
    */
-  enableLinkPreviews() {
+  enableLinkPreviews(): void {
     /*
      * To allow the LinkPreviewRepository to generate link previews, we need to expose a fake 'openGraphAsync' method.
      * This function is normally exposed by the desktop wrapper
@@ -114,30 +134,36 @@ export class DebugUtil {
     };
   }
 
-  getLastMessagesFromDatabase(amount = 10, conversationId = this.conversationRepository.active_conversation().id) {
-    if (this.storageService.db) {
-      return this.storageRepository.storageService.db.events.toArray(records => {
-        const messages = records.filter(events => events.conversation === conversationId);
-        return messages.slice(amount * -1).reverse();
-      });
+  getLastMessagesFromDatabase(
+    amount = 10,
+    conversationId = this.conversationRepository.active_conversation().id,
+  ): EventRecord[] {
+    if (this.storageRepository.storageService.db) {
+      return this.storageRepository.storageService.db[StorageSchemata.OBJECT_STORE.EVENTS].toArray(
+        (records: EventRecord[]) => {
+          const messages = records.filter((event: EventRecord) => event.conversation === conversationId);
+          return messages.slice(amount * -1).reverse();
+        },
+      );
     }
     return [];
   }
 
   haveISentThisMessageToMyOtherClients(
-    messageId,
-    conversationId = this.conversationRepository.active_conversation().id,
-  ) {
-    let recipients = [];
+    messageId: string,
+    conversationId: string = this.conversationRepository.active_conversation().id,
+  ): Promise<void> {
+    let recipients: string[] = [];
 
     const clientId = this.clientRepository.currentClient().id;
     const userId = this.userRepository.self().id;
 
-    const isOTRMessage = notification => notification.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD;
-    const isInCurrentConversation = notification => notification.conversation === conversationId;
-    const wasSentByOurCurrentClient = notification =>
+    const isOTRMessage = (notification: BackendEvent) => notification.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD;
+    const isInCurrentConversation = (notification: ConversationEvent) => notification.conversation === conversationId;
+    const wasSentByOurCurrentClient = (notification: ConversationOtrMessageAddEvent) =>
       notification.from === userId && notification.data && notification.data.sender === clientId;
-    const hasExpectedTimestamp = (notification, dateTime) => notification.time === dateTime.toISOString();
+    const hasExpectedTimestamp = (notification: ConversationOtrMessageAddEvent, dateTime: Date) =>
+      notification.time === dateTime.toISOString();
 
     return this.conversationRepository
       .get_conversation_by_id(conversationId)
@@ -147,12 +173,12 @@ export class DebugUtil {
       .then(message => {
         return this.eventRepository.notificationService
           .getNotifications(undefined, undefined, EventRepository.CONFIG.NOTIFICATION_BATCHES.MAX)
-          .then(({notifications}) => ({
+          .then(({notifications}: NotificationList) => ({
             message,
             notifications,
           }));
       })
-      .then(({message, notifications}) => {
+      .then(({message, notifications}: {message: ContentMessage; notifications: Notification[]}) => {
         const dateTime = new Date(message.timestamp());
         return notifications
           .reduce((accumulator, notification) => accumulator.concat(notification.payload), [])
@@ -180,12 +206,18 @@ export class DebugUtil {
       .catch(error => this.logger.info(`Message was not sent to other clients. Reason: ${error.message}`, error));
   }
 
-  getEventInfo(event) {
-    const debugInformation = {event};
+  getEventInfo(
+    event: ConversationEvent,
+  ): Promise<{conversation?: Conversation; event: ConversationEvent; user?: User}> {
+    const debugInformation: {conversation?: Conversation; event: ConversationEvent; user?: User} = {
+      conversation: undefined,
+      event,
+      user: undefined,
+    };
 
     return this.conversationRepository
       .get_conversation_by_id(event.conversation)
-      .then(conversation_et => {
+      .then((conversation_et: Conversation) => {
         debugInformation.conversation = conversation_et;
         return this.userRepository.getUserById(event.from);
       })
@@ -199,7 +231,7 @@ export class DebugUtil {
       });
   }
 
-  exportCryptobox() {
+  exportCryptobox(): void {
     const clientId = this.clientRepository.currentClient().id;
     const userId = this.userRepository.self().id;
     const fileName = `cryptobox-${userId}-${clientId}.json`;
@@ -209,140 +241,17 @@ export class DebugUtil {
       .then(cryptobox => downloadText(JSON.stringify(cryptobox), fileName));
   }
 
-  getNotificationFromStream(notificationId, notificationIdSince) {
-    const clientId = this.clientRepository.currentClient().id;
-
-    const _gotNotifications = ({hasMore, notifications}) => {
-      const matchingNotifications = notifications.filter(notification => notification.id === notificationId);
-      if (matchingNotifications.length) {
-        return matchingNotifications[0];
-      }
-
-      if (hasMore) {
-        const lastNotification = notifications[notifications.length - 1];
-        return this.getNotificationFromStream(notificationId, lastNotification.id);
-      }
-      this.logger.log(`Notification '${notificationId}' was not found in encrypted notification stream`);
-    };
-
-    return wire.app.service.notification.getNotifications(clientId, notificationIdSince, 10000).then(_gotNotifications);
-  }
-
-  getNotificationsFromStream(remoteUserId, remoteClientId, matchingNotifications = [], notificationIdSince) {
-    const localClientId = this.clientRepository.currentClient().id;
-    const localUserId = this.userRepository.self().id;
-
-    const _gotNotifications = ({hasMore, notifications}) => {
-      const additionalNotifications = !remoteUserId
-        ? notifications
-        : notifications.filter(notification => {
-            const payload = notification.payload;
-            for (const {data, from} of payload) {
-              if (data && [localUserId, remoteUserId].includes(from)) {
-                const {sender, recipient} = data;
-                const incoming_event = sender === remoteClientId && recipient === localClientId;
-                const outgoing_event = sender === localClientId && recipient === remoteClientId;
-                return incoming_event || outgoing_event;
-              }
-            }
-            return false;
-          });
-
-      matchingNotifications = matchingNotifications.concat(additionalNotifications);
-
-      if (hasMore) {
-        const lastNotification = notifications[notifications.length - 1];
-        return this.getNotificationsFromStream(
-          remoteUserId,
-          remoteClientId,
-          matchingNotifications,
-          lastNotification.id,
-        );
-      }
-
-      const logMessage = remoteUserId
-        ? `Found '${matchingNotifications.length}' notifications between '${localClientId}' and '${remoteClientId}'`
-        : `Found '${matchingNotifications.length}' notifications`;
-
-      this.logger.log(logMessage, matchingNotifications);
-
-      return matchingNotifications;
-    };
-
-    const clientScope = remoteUserId === localUserId ? undefined : localClientId;
-    return wire.app.service.notification
-      .getNotifications(clientScope, notificationIdSince, 10000)
-      .then(_gotNotifications);
-  }
-
-  getObjectsForDecryptionErrors(sessionId, notificationId) {
-    return Promise.all([
-      this.getNotificationFromStream(notificationId.toLowerCase()),
-      this.getSerialisedIdentity(),
-      this.getSerialisedSession(sessionId.toLowerCase()),
-    ]).then(resolveArray => {
-      return JSON.stringify({
-        identity: resolveArray[1],
-        notification: resolveArray[0],
-        session: resolveArray[2],
-      });
-    });
-  }
-
-  getInfoForClientDecryptionErrors(remoteUserId, remoteClientId) {
-    return Promise.all([
-      this.getNotificationsFromStream(remoteUserId, remoteClientId),
-      this.getSerialisedIdentity(),
-      this.getSerialisedSession(`${remoteUserId}@${remoteClientId}`),
-    ]).then(resolveArray => {
-      return JSON.stringify({
-        identity: resolveArray[1],
-        notifications: resolveArray[0],
-        session: resolveArray[2],
-      });
-    });
-  }
-
-  /**
-   * @returns {Promise<boolean>} `true` if libsodium is using WebAssembly
-   */
-  isLibsodiumUsingWASM() {
+  /** Used by QA test automation. */
+  isLibsodiumUsingWASM(): Promise<boolean> {
     return ProteusUtil.WASMUtil.isUsingWASM();
   }
 
-  /**
-   * Return the whole call log as string
-   * @returns {string} The call log
-   */
-  getCallingLogs() {
-    return this.callingRepository.callLog.join('\n');
+  /** Used by QA test automation. */
+  getCallingLogs(): string {
+    return this.callingRepository['callLog'].join('\n');
   }
 
-  reprocessNotificationStream(conversationId = this.conversationRepository.active_conversation().id) {
-    const clientId = this.clientRepository.currentClient().id;
-
-    return this.eventRepository.notificationService
-      .getNotifications(clientId, undefined, EventRepository.CONFIG.NOTIFICATION_BATCHES.MAX)
-      .then(({notifications}) => {
-        this.logger.info(`Fetched "${notifications.length}" notifications for client "${clientId}".`, notifications);
-
-        const isOTRMessage = notification => notification.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD;
-        const isInCurrentConversation = notification => notification.conversation === conversationId;
-
-        return notifications
-          .map(notification => notification.payload)
-          .reduce((accumulator, payload) => accumulator.concat(payload))
-          .filter(notification => {
-            return isOTRMessage(notification) && isInCurrentConversation(notification);
-          });
-      })
-      .then(events => {
-        this.logger.info(`Reprocessing "${events.length}" OTR messages...`);
-        events.forEach(event => this.eventRepository.processEvent(event, EventRepository.SOURCE.STREAM));
-      });
-  }
-
-  getActiveCallStats() {
+  getActiveCallStats(): Promise<{stats: RTCStatsReport; userid: UserId}[]> {
     const activeCall = this.callingRepository.joinedCall();
     if (!activeCall) {
       throw new Error('no active call found');
@@ -350,7 +259,8 @@ export class DebugUtil {
     return this.callingRepository.getStats(activeCall.conversationId);
   }
 
-  enableFakeMediaDevices() {
+  /** Used by QA test automation. */
+  enableFakeMediaDevices(): void {
     const cameras = [
       {deviceId: 'ff0000', groupId: 'fakeCamera1', kind: 'videoinput', label: 'Red cam'},
       {deviceId: '00ff00', groupId: 'fakeCamera2', kind: 'videoinput', label: 'Green cam'},
@@ -360,20 +270,24 @@ export class DebugUtil {
       {deviceId: '440', groupId: 'fakeMic1', kind: 'audioinput', label: 'First mic'},
       {deviceId: '100', groupId: 'fakeMic2', kind: 'audioinput', label: 'Second mic'},
     ];
-    navigator.mediaDevices.enumerateDevices = () => Promise.resolve(cameras.concat(microphones));
+    navigator.mediaDevices.enumerateDevices = () => Promise.resolve(cameras.concat(microphones) as MediaDeviceInfo[]);
 
-    navigator.mediaDevices.getUserMedia = constraints => {
-      const audio = constraints.audio ? generateAudioTrack(constraints.audio) : [];
-      const video = constraints.video ? generateVideoTrack(constraints.video) : [];
+    navigator.mediaDevices.getUserMedia = (constraints: MediaStreamConstraints) => {
+      const audio = (constraints.audio as MediaTrackConstraints)
+        ? generateAudioTrack(constraints.audio as MediaTrackConstraints)
+        : [];
+      const video = (constraints.video as MediaTrackConstraints)
+        ? generateVideoTrack(constraints.video as MediaTrackConstraints)
+        : [];
       return Promise.resolve(new MediaStream(audio.concat(video)));
     };
 
-    function generateAudioTrack(constraints) {
-      const hz = (constraints.deviceId || {}).exact || microphones[0].deviceId;
+    function generateAudioTrack(constraints: MediaTrackConstraints): MediaStreamTrack[] {
+      const hz = constraints.deviceId || microphones[0].deviceId;
       const context = new window.AudioContext();
       const osc = context.createOscillator(); // instantiate an oscillator
       osc.type = 'sine'; // this is the default - also square, sawtooth, triangle
-      osc.frequency.value = parseInt(hz, 10); // Hz
+      osc.frequency.value = parseInt(`${hz}`, 10); // Hz
       const dest = context.createMediaStreamDestination();
       osc.connect(dest); // connect it to the destination
       osc.start(0);
@@ -381,8 +295,8 @@ export class DebugUtil {
       return dest.stream.getAudioTracks();
     }
 
-    function generateVideoTrack(constraints) {
-      const color = (constraints.deviceId || {}).exact || cameras[0].deviceId;
+    function generateVideoTrack(constraints: MediaTrackConstraints): MediaStreamTrack[] {
+      const color = constraints.deviceId || cameras[0].deviceId;
       const width = 300;
       const height = 240;
       const canvas = document.createElement('canvas');
@@ -392,96 +306,14 @@ export class DebugUtil {
       setInterval(() => {
         ctx.fillStyle = `#${color}`;
         ctx.fillRect(0, 0, width, height);
-        ctx.fillStyle = '#000';
+        ctx.fillStyle = '#000000';
         ctx.fillRect(0, 0, Math.random() * 10, Math.random() * 10);
       }, 500);
-      const stream = canvas.captureStream(25);
+      // Typings missing for: https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/captureStream
+      const stream = (canvas as any).captureStream(25);
       return stream.getVideoTracks();
     }
 
-    navigator.mediaDevices.ondevicechange();
-  }
-
-  toggleLiveCallingStats() {
-    const containerId = 'live-calling-stats';
-    const containerElement = document.getElementById(containerId);
-    if (containerElement) {
-      clearInterval(this.liveCallingStatsInterval);
-      document.body.removeChild(containerElement);
-      return;
-    }
-    const statsDomElement = document.createElement('div');
-    statsDomElement.id = containerId;
-    document.body.appendChild(statsDomElement);
-    const patch = snabbdomInit([style]);
-    let vdom = createElement('div');
-    patch(statsDomElement, vdom);
-
-    const renderStats = async participantsStats => {
-      return Promise.all(
-        participantsStats.map(async participantStats => {
-          const rawStats = [];
-          participantStats.stats.forEach(stats => {
-            if (
-              (stats.kind === 'audio' || stats.kind === 'video') &&
-              (stats.packetsReceived || stats.packetsSent) &&
-              !stats.id.includes('rtcp')
-            ) {
-              rawStats.push(stats);
-            }
-          });
-
-          const groupedStats = rawStats.reduce((groups, stats) => {
-            groups.sent = groups.sent || [];
-            groups.received = groups.received || [];
-            if (stats.packetsSent) {
-              groups.sent.push(createElement('li', `🡅 ${stats.kind}: ${stats.packetsSent} packets`));
-            } else {
-              groups.received.push(createElement('li', `🡇 ${stats.kind}: ${stats.packetsReceived} packets`));
-            }
-            return groups;
-          }, {});
-
-          const user = await this.userRepository.getUserById(participantStats.userid);
-
-          return createElement('div', [
-            createElement('div', [createElement('strong', user.name())]),
-            createElement('ul', groupedStats.sent.concat(groupedStats.received)),
-          ]);
-        }),
-      ).then(elements => {
-        return createElement(
-          `div#${containerId}`,
-          {
-            style: {
-              backgroundColor: 'black',
-              color: '#00fb00',
-              padding: '1em',
-              position: 'absolute',
-              right: '0',
-              top: '0',
-            },
-          },
-          elements,
-        );
-      });
-    };
-
-    const renderFrame = async () => {
-      const participantsStats = await this.getActiveCallStats();
-      const newVdom = await renderStats(participantsStats);
-      vdom = patch(vdom, newVdom);
-    };
-
-    ko.computed(() => {
-      const call = this.callingRepository.joinedCall();
-      if (call) {
-        renderFrame();
-        this.liveCallingStatsInterval = setInterval(renderFrame, 500);
-      } else {
-        vdom = patch(vdom, createElement('div'));
-        clearInterval(this.liveCallingStatsInterval);
-      }
-    });
+    navigator.mediaDevices.ondevicechange(null);
   }
 }
