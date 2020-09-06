@@ -158,7 +158,7 @@
     "sinon": "9.0.3",
     "snabbdom": "0.7.4",
     "sort-json": "2.0.0",
-    "stylelint": "13.6.1",
+    "stylelint": "13.7.0",
     "stylelint-config-idiomatic-order": "8.1.0",
     "stylelint-config-prettier": "8.0.2",
     "svg-inline-loader": "0.8.2",
