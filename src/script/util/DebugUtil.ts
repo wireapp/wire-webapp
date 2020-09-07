@@ -246,17 +246,19 @@ export class DebugUtil {
     navigator.mediaDevices.enumerateDevices = () => Promise.resolve(cameras.concat(microphones) as MediaDeviceInfo[]);
 
     navigator.mediaDevices.getUserMedia = (constraints: MediaStreamConstraints) => {
-      const audio = (constraints.audio as MediaTrackConstraints)
-        ? generateAudioTrack(constraints.audio as MediaTrackConstraints)
-        : [];
-      const video = (constraints.video as MediaTrackConstraints)
-        ? generateVideoTrack(constraints.video as MediaTrackConstraints)
-        : [];
+      const audioSet = constraints.audio as MediaTrackConstraintSet;
+      const audio = audioSet ? generateAudioTrack(audioSet) : [];
+
+      const videoSet = constraints.video as MediaTrackConstraintSet;
+      const video = videoSet ? generateVideoTrack(videoSet) : [];
+
       return Promise.resolve(new MediaStream(audio.concat(video)));
     };
 
-    function generateAudioTrack(constraints: any): MediaStreamTrack[] {
-      const hz = (constraints.deviceId || {}).exact || microphones[0].deviceId;
+    function generateAudioTrack(constraints: MediaTrackConstraintSet): MediaStreamTrack[] {
+      const constrainMatchMock = {exact: undefined} as ConstrainDOMStringParameters;
+      const constrainMatch = (constraints.deviceId as ConstrainDOMStringParameters) || constrainMatchMock;
+      const hz = (constrainMatch.exact as string) || microphones[0].deviceId;
       const context = new window.AudioContext();
       const osc = context.createOscillator(); // instantiate an oscillator
       osc.type = 'sine'; // this is the default - also square, sawtooth, triangle
@@ -268,8 +270,10 @@ export class DebugUtil {
       return dest.stream.getAudioTracks();
     }
 
-    function generateVideoTrack(constraints: any): MediaStreamTrack[] {
-      const color = (constraints.deviceId || {}).exact || cameras[0].deviceId;
+    function generateVideoTrack(constraints: MediaTrackConstraintSet): MediaStreamTrack[] {
+      const constrainMatchMock = {exact: undefined} as ConstrainDOMStringParameters;
+      const constrainMatch = (constraints.deviceId as ConstrainDOMStringParameters) || constrainMatchMock;
+      const color = (constrainMatch.exact as string) || cameras[0].deviceId;
       const width = 300;
       const height = 240;
       const canvas = document.createElement('canvas');
