@@ -320,8 +320,8 @@ export class EventService {
    *
    * @param event JSON event to be stored
    */
-  async replaceEvent(event: any): Promise<any> {
-    await this.storageService.update(StorageSchemata.OBJECT_STORE.EVENTS, event.primary_key, event);
+  async replaceEvent(event: EventRecord): Promise<EventRecord> {
+    await this.storageService.update(StorageSchemata.OBJECT_STORE.EVENTS, event.primary_key.toString(), event);
     return event;
   }
 
