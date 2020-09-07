@@ -154,6 +154,7 @@ import {MentionEntity} from '../message/MentionEntity';
 import {AudioMetaData, VideoMetaData, ImageMetaData} from '@wireapp/core/dist/conversation/content';
 import {FileAsset} from '../entity/message/FileAsset';
 import {Text as TextAsset} from '../entity/message/Text';
+import {roundLogarithmic} from 'Util/NumberUtil';
 import type {EventRecord} from '../storage';
 
 type ConversationEvent = {conversation: string; id: string};
@@ -4384,12 +4385,12 @@ export class ConversationRepository {
       const services = participants.filter(user => user.isService).length;
 
       let segmentations = {
-        [Segmentation.CONVERSATION.GUESTS]: guests,
-        [Segmentation.CONVERSATION.GUESTS_PRO]: guestsPro,
-        [Segmentation.CONVERSATION.GUESTS_WIRELESS]: guestsWireless,
-        [Segmentation.CONVERSATION.SIZE]: participants.length,
+        [Segmentation.CONVERSATION.GUESTS]: roundLogarithmic(guests, 6),
+        [Segmentation.CONVERSATION.GUESTS_PRO]: roundLogarithmic(guestsPro, 6),
+        [Segmentation.CONVERSATION.GUESTS_WIRELESS]: roundLogarithmic(guestsWireless, 6),
+        [Segmentation.CONVERSATION.SIZE]: roundLogarithmic(participants.length, 6),
         [Segmentation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
-        [Segmentation.CONVERSATION.SERVICES]: services,
+        [Segmentation.CONVERSATION.SERVICES]: roundLogarithmic(services, 6),
         [Segmentation.MESSAGE.ACTION]: actionType,
         [Segmentation.MESSAGE.IS_REPLY]: !!genericMessage.text?.quote,
         [Segmentation.MESSAGE.MENTION]: numberOfMentions,
