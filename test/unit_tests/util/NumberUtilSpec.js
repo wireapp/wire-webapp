@@ -74,7 +74,7 @@ describe('NumberUtil', () => {
   });
 
   describe('roundLogarithmic', () => {
-    it('returns rounds zero to zero with any factor', () => {
+    it('rounds zero to zero with any factor', () => {
       expect(roundLogarithmic(0, 1)).toBe(0);
       expect(roundLogarithmic(0, 2)).toBe(0);
       expect(roundLogarithmic(0, 3)).toBe(0);
