@@ -31,26 +31,29 @@ import {overlayedObserver} from '../../ui/overlayedObserver';
 import {viewportObserver} from '../../ui/viewportObserver';
 import {Runtime} from '@wireapp/commons';
 
+type KOEvent<T = Event> = JQuery.Event & {currentTarget: Element; originalEvent: T};
+
 /**
  * Use it on the drop area.
  */
 ko.bindingHandlers.drop_file = {
-  init(element, valueAccessor, allBindings, data, context) {
-    const onDragLeave = (_data, event) => event.currentTarget.classList.remove('drag-hover');
+  init(element, valueAccessor, _allBindings, _data, context) {
+    const onDragLeave = (_: unknown, event: KOEvent) => event.currentTarget.classList.remove('drag-hover');
 
-    const onDragOver = (_data, event) => {
+    const onDragOver = (_: unknown, event: KOEvent<DragEvent>) => {
       event.preventDefault();
       event.originalEvent.dataTransfer.dropEffect = 'copy';
       event.currentTarget.classList.add('drag-hover');
     };
 
-    const onDrop = (_data, event) => {
+    const onDrop = (_: unknown, event: KOEvent<DragEvent> | DragEvent) => {
       event.preventDefault();
-      event.currentTarget.classList.remove('drag-hover');
+      (event.currentTarget as Element).classList.remove('drag-hover');
 
-      const {dataTransfer, originalEvent} = event;
-      const eventDataTransfer = dataTransfer || (originalEvent && originalEvent.dataTransfer) || {};
-      const files = eventDataTransfer.files || [];
+      const {originalEvent} = event as KOEvent<DragEvent>;
+      const {dataTransfer} = event as DragEvent;
+      const eventDataTransfer = dataTransfer || originalEvent?.dataTransfer || {};
+      const files = (eventDataTransfer as DataTransfer).files || new FileList();
 
       if (files.length > 0) {
         valueAccessor()(files);
@@ -75,10 +78,10 @@ ko.bindingHandlers.drop_file = {
  * Capture pasted files.
  */
 ko.bindingHandlers.paste_file = {
-  init(element, valueAccessor, allBindings, data, context) {
-    const onPaste = (_data, event) => {
+  init(_element, valueAccessor, _allBindings, _data, context) {
+    const onPaste = (_: unknown, event: KOEvent<ClipboardEvent>) => {
       const clipboardData = event.originalEvent.clipboardData;
-      const items = [].slice.call(clipboardData.items || clipboardData.files);
+      const items: (DataTransferItem | File)[] = [].slice.call(clipboardData.items || clipboardData.files);
 
       // MS Word for Mac not only puts the copied text into the clipboard
       // but also a rendered PNG representation of that text.
@@ -91,8 +94,8 @@ ko.bindingHandlers.paste_file = {
       }
 
       const files = items
-        .filter(item => item.kind === 'file')
-        .map(item => new Blob([item.getAsFile()], {type: item.type}))
+        .filter(item => (item as DataTransferItem).kind === 'file')
+        .map(item => new Blob([(item as DataTransferItem).getAsFile()], {type: item.type}))
         .filter(item => item && item.size !== 4); // Pasted files result in 4 byte blob (OSX)
 
       if (files.length > 0) {
@@ -103,7 +106,7 @@ ko.bindingHandlers.paste_file = {
     };
 
     ko.applyBindingsToNode(
-      window,
+      window.document,
       {
         event: {
           paste: onPaste,
@@ -119,13 +122,13 @@ ko.bindingHandlers.paste_file = {
  * @note If a child element is listening to drag events, than this will be triggered after
  */
 ko.bindingHandlers.ignore_drop_file = {
-  init(element, valueAccessor, allBindings, data, context) {
+  init(element, _valueAccessor, _allBindings, _data, context) {
     ko.applyBindingsToNode(
       element,
       {
         event: {
-          dragover: (_data, event) => event.preventDefault(),
-          drop: (_data, event) => event.preventDefault(),
+          dragover: (_: unknown, event: KOEvent<DragEvent>) => event.preventDefault(),
+          drop: (_: unknown, event: KOEvent<DragEvent>) => event.preventDefault(),
         },
       },
       context,
@@ -149,13 +152,13 @@ ko.virtualElements.allowedBindings.stopBinding = true;
  * Resize textarea according to the containing text.
  */
 ko.bindingHandlers.resize = {
-  init(element, valueAccessor, allBindings, data, context) {
+  init(element, valueAccessor, _allBindings, _data, context) {
     const params = ko.unwrap(valueAccessor()) || {};
 
     let lastHeight = element.scrollHeight;
 
-    const resizeTextarea = (textareaElement => {
-      textareaElement.style.height = 0;
+    const resizeTextarea = ((textareaElement: HTMLTextAreaElement) => {
+      textareaElement.style.height = '0';
       const newStyleHeight = `${textareaElement.scrollHeight}px`;
       textareaElement.style.height = newStyleHeight;
 
@@ -246,19 +249,19 @@ ko.bindingHandlers.scrollSync = {
  * Register on enter key pressed.
  */
 ko.bindingHandlers.enter = {
-  init(element, valueAccessor, allBindings, data, context) {
-    const wrapper = function (_data, jquery_event) {
-      const keyboard_event = jquery_event.originalEvent || jquery_event;
+  init(element, valueAccessor, _allBindings, data, context) {
+    function wrapper(_data: unknown, event: KOEvent<KeyboardEvent>) {
+      const keyboardEvent = event.originalEvent || ((event as unknown) as KeyboardEvent);
 
-      if (isEnterKey(keyboard_event) && !keyboard_event.shiftKey && !keyboard_event.altKey) {
+      if (isEnterKey(keyboardEvent) && !keyboardEvent.shiftKey && !keyboardEvent.altKey) {
         const callback = valueAccessor();
         if (typeof callback === 'function') {
-          callback.call(this, data, keyboard_event);
+          callback.call(this, data, keyboardEvent);
           return false;
         }
       }
       return true;
-    };
+    }
 
     return ko.applyBindingsToNode(
       element,
@@ -276,10 +279,10 @@ ko.bindingHandlers.enter = {
  * Binding for <input type="file" data-bind="fileSelect: on_file_select">.
  */
 ko.bindingHandlers.file_select = {
-  init(element, valueAccessor, allBindings, data, context) {
-    const wrapper = function (_data, event) {
-      if (event.target.files.length > 0) {
-        valueAccessor().call(this, event.target.files);
+  init(element, valueAccessor, _allBindings, _data, context) {
+    function wrapper(_: unknown, event: KOEvent<InputEvent>) {
+      if ((event.target as HTMLInputElement).files.length > 0) {
+        valueAccessor().call(this, (event.target as HTMLInputElement).files);
 
         // http://stackoverflow.com/a/12102992/4453133
         // wait before clearing to fix autotests
@@ -287,14 +290,14 @@ ko.bindingHandlers.file_select = {
           $(event.target).val(null);
         }, TIME_IN_MILLIS.SECOND);
       }
-    };
+    }
 
     return ko.applyBindingsToNode(
       element,
       {
         event: {
           change: wrapper,
-          focus(_data, event) {
+          focus(_data: unknown, event: KOEvent) {
             return $(event.target).blur();
           },
         },
@@ -326,7 +329,7 @@ ko.bindingHandlers.load_image_on_hover = {
     const animated_gif = hoverable_item.data('hover');
 
     if (animated_gif) {
-      let image = undefined;
+      let image: HTMLImageElement = undefined;
       hoverable_item
         .on('mouseover', function () {
           const item = $(this);
@@ -344,14 +347,14 @@ ko.bindingHandlers.load_image_on_hover = {
 
 /**
  * Will only fire once when the value has changed.
- * @param {*} handler Handler
- * @param {ko.observable} owner Subscription owner
- * @param {string} eventName Event name
- * @returns {undefined} No return value
  */
-ko.subscribable.fn.subscribe_once = function (handler, owner, eventName) {
+(ko.subscribable.fn as any).subscribe_once = function (
+  handler: (value: unknown) => void,
+  owner: ko.Observable,
+  eventName: string,
+) {
   const subscription = this.subscribe(
-    newValue => {
+    (newValue: unknown) => {
       subscription.dispose();
       handler(newValue);
     },
@@ -363,12 +366,10 @@ ko.subscribable.fn.subscribe_once = function (handler, owner, eventName) {
 /**
  * Subscribe to changes and receive the new and the old value
  * https://github.com/knockout/knockout/issues/914#issuecomment-66697321
- * @param {function} handler Handler
- * @returns {ko.subscription} knockout subscription
  */
-ko.subscribable.fn.subscribeChanged = function (handler) {
+(ko.subscribable.fn as any).subscribeChanged = function (handler: (latestValue: unknown, oldValue: unknown) => void) {
   let savedValue = this.peek();
-  return this.subscribe(latestValue => {
+  return this.subscribe((latestValue: unknown) => {
     const oldValue = savedValue;
     savedValue = latestValue;
     handler(latestValue, oldValue);
@@ -378,7 +379,7 @@ ko.subscribable.fn.subscribeChanged = function (handler) {
 ko.bindingHandlers.fadingscrollbar = {
   init(element) {
     const animationSpeed = 12;
-    function parseColor(color) {
+    function parseColor(color: string) {
       const ctx = document.createElement('canvas').getContext('2d');
       ctx.fillStyle = color;
       ctx.fillRect(0, 0, 1, 1);
@@ -390,7 +391,7 @@ ko.bindingHandlers.fadingscrollbar = {
     let state = 'idle';
     let animating = false;
 
-    function setAnimationState(newState) {
+    function setAnimationState(newState: string) {
       state = newState;
       if (!animating) {
         animate();
@@ -414,7 +415,7 @@ ko.bindingHandlers.fadingscrollbar = {
       window.requestAnimationFrame(animate);
     }
 
-    const fadeStep = delta => {
+    const fadeStep = (delta: number) => {
       const initialAlpha = initialColor[3];
       const currentAlpha = currentColor[3];
       const hasAppeared = delta > 0 && currentAlpha >= initialAlpha;
@@ -453,8 +454,8 @@ ko.bindingHandlers.fadingscrollbar = {
  */
 ko.bindingHandlers.antiscroll = {
   init(element, valueAccessor) {
-    let trigger_subscription;
-    $(element).antiscroll({
+    let trigger_subscription: ko.Subscription;
+    ($(element) as any).antiscroll({
       autoHide: true,
       autoWrap: true,
       debug: false,
@@ -514,9 +515,9 @@ ko.bindingHandlers.electron_remove = {
 };
 
 ko.bindingHandlers.visibility = (function () {
-  const setVisibility = function (element, valueAccessor) {
+  const setVisibility = (element: Element, valueAccessor: () => boolean) => {
     const hidden = ko.unwrap(valueAccessor());
-    return $(element).css('visibility', hidden ? 'visible' : 'hidden');
+    $(element).css('visibility', hidden ? 'visible' : 'hidden');
   };
   return {
     init: setVisibility,
@@ -530,7 +531,7 @@ ko.bindingHandlers.visibility = (function () {
 ko.bindingHandlers.hide_controls = {
   init(element, valueAccessor) {
     const {timeout = valueAccessor(), skipClass} = valueAccessor();
-    let hide_timeout = undefined;
+    let hide_timeout: number = undefined;
     const startTimer = () => {
       hide_timeout = window.setTimeout(() => {
         element.classList.add('hide-controls');
@@ -547,17 +548,17 @@ ko.bindingHandlers.hide_controls = {
       }
     };
 
-    element.onmousemove = function ({target}) {
+    element.onmousemove = function ({target}: MouseEvent) {
       window.clearTimeout(hide_timeout);
 
       element.classList.remove('hide-controls');
 
-      let node = target;
+      let node = target as Element;
       while (node && node !== element) {
         if (node.classList.contains(skipClass)) {
           return;
         }
-        node = node.parentNode;
+        node = node.parentNode as Element;
       }
       startTimer();
     };
@@ -570,7 +571,7 @@ ko.bindingHandlers.hide_controls = {
  * Element is added to view.
  */
 ko.bindingHandlers.added_to_view = {
-  init(element, valueAccessor) {
+  init(_element, valueAccessor) {
     const callback = valueAccessor();
     callback();
   },
@@ -612,7 +613,7 @@ ko.bindingHandlers.in_viewport = {
 
     viewportObserver.trackElement(
       element,
-      isInViewport => {
+      (isInViewport: boolean) => {
         inViewport = isInViewport;
         triggerCallbackIfVisible();
       },
@@ -655,14 +656,14 @@ ko.bindingHandlers.clickOrDrag = {
     let startX = 0;
     let startY = 0;
 
-    element.addEventListener('mousedown', ({screenX, screenY}) => {
+    element.addEventListener('mousedown', ({screenX, screenY}: MouseEvent) => {
       isDragging = true;
       isMoved = false;
       startX = screenX;
       startY = screenY;
     });
 
-    element.addEventListener('mousemove', ({screenX, screenY}) => {
+    element.addEventListener('mousemove', ({screenX, screenY}: MouseEvent) => {
       if (isDragging && !isMoved) {
         const diffX = Math.abs(startX - screenX);
         const diffY = Math.abs(startY - screenY);
@@ -672,7 +673,7 @@ ko.bindingHandlers.clickOrDrag = {
       }
     });
 
-    element.addEventListener('mouseup', event => {
+    element.addEventListener('mouseup', (event: MouseEvent) => {
       if (!isMoved) {
         callback(event);
       }
