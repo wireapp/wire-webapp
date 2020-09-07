@@ -300,7 +300,7 @@ export class EventService {
    *
    * @param event JSON event to be stored
    */
-  async saveEvent(event: any): Promise<any> {
+  async saveEvent(event: EventRecord): Promise<EventRecord> {
     event.category = categoryFromEvent(event);
     event.primary_key = await this.storageService.save(StorageSchemata.OBJECT_STORE.EVENTS, undefined, event);
     if (this.storageService.isTemporaryAndNonPersistent) {
@@ -320,7 +320,7 @@ export class EventService {
    *
    * @param event JSON event to be stored
    */
-  async replaceEvent(event: any): Promise<any> {
+  async replaceEvent(event: EventRecord): Promise<EventRecord> {
     await this.storageService.update(StorageSchemata.OBJECT_STORE.EVENTS, event.primary_key, event);
     return event;
   }

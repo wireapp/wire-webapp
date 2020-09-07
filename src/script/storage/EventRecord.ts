@@ -17,6 +17,11 @@
  *
  */
 
+export interface ReadReceipt {
+  time: string;
+  userId: string;
+}
+
 export interface EventRecord {
   category: number;
   conversation: string;
@@ -25,8 +30,9 @@ export interface EventRecord {
   from: string;
   from_client_id?: string;
   id: string;
-  primary_key: number;
+  primary_key: string;
   reactions: Record<string, string>;
+  read_receipts?: ReadReceipt[];
   status?: number;
   time: string;
   type: string;
