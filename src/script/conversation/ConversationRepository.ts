@@ -4349,6 +4349,8 @@ export class ConversationRepository {
             actionType = 'audio';
           } else if (!!protoAsset.original.video) {
             actionType = 'video';
+          } else {
+            actionType = 'file';
           }
         }
         break;
