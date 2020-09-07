@@ -77,6 +77,7 @@ export class QuotedMessageMiddleware {
     if (!originalEvent) {
       return event;
     }
+
     this.logger.info(`Updating '${replies.length}' replies to updated message '${originalMessageId}'`);
     replies.forEach(reply => {
       reply.data.quote.message_id = event.id;
