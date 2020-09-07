@@ -47,6 +47,11 @@ export class Call {
     set to true if anyone has shared their screen during a call
   */
   public analyticsScreenSharing: boolean = false;
+  /**
+    Used for analytics,
+    Maximum number of people joined in a call
+  */
+  public analyticsMaximumParticipants: number = 0;
 
   constructor(
     initiator: UserId,

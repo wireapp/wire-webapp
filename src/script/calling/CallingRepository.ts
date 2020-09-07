@@ -905,7 +905,7 @@ export class CallingRepository {
       [Segmentation.CALL.DIRECTION]: call.state(),
       [Segmentation.CALL.DURATION]: Math.ceil((Date.now() - call.startedAt()) / 5000) * 5,
       [Segmentation.CALL.END_REASON]: reason,
-      [Segmentation.CALL.PARTICIPANTS]: call.participants().length,
+      [Segmentation.CALL.PARTICIPANTS]: call.analyticsMaximumParticipants,
       [Segmentation.CALL.SCREEN_SHARE]: call.analyticsScreenSharing,
       [Segmentation.CALL.VIDEO]: call.initialType === CALL_TYPE.VIDEO,
     });
@@ -1022,6 +1022,10 @@ export class CallingRepository {
 
     newMembers.forEach(participant => call.participants.unshift(participant));
     removedMembers.forEach(participant => call.participants.remove(participant));
+
+    if (call.participants().length > call.analyticsMaximumParticipants) {
+      call.analyticsMaximumParticipants = call.participants.length;
+    }
   }
 
   private readonly handleCallParticipantChanges = (conversationId: ConversationId, membersJson: string) => {
