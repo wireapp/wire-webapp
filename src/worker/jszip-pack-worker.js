@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2020 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,19 +17,31 @@
  *
  */
 
-export class WebWorker {
-  private readonly uri: string;
+/**
+ * @typedef {Record<string, Uint8Array>} Files
+ * @typedef {import('jszip')} JSZip
+ */
 
-  constructor(uri: string) {
-    this.uri = uri;
+importScripts('jszip.min.js');
+
+self.addEventListener('message', async event => {
+  try {
+    /** @type {JSZip} */
+    const zip = new JSZip();
+
+    /** @type {Files} */
+    const files = event.data;
+
+    for (const fileName in files) {
+      zip.file(fileName, files[fileName], {binary: true});
+    }
+
+    const array = await zip.generateAsync({compression: 'DEFLATE', type: 'uint8array'});
+
+    self.postMessage(array);
+  } catch (error) {
+    self.postMessage({error: error.message});
   }
 
-  post<T>(data: string | ArrayBuffer | Record<string, any>): Promise<T> {
-    return new Promise((resolve, reject) => {
-      const worker = new Worker(this.uri);
-      worker.onmessage = event => resolve(event.data);
-      worker.onerror = error => reject(error);
-      worker.postMessage(data);
-    });
-  }
-}
+  return self.close();
+});

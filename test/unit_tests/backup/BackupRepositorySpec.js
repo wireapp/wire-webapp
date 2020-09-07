@@ -46,7 +46,8 @@ const messages = [
 
 describe('BackupRepository', () => {
   const testFactory = new TestFactory();
-  let backupRepository = undefined;
+  /** @type {BackupRepository} */
+  let backupRepository;
 
   beforeEach(async () => {
     jasmine.clock().install();
@@ -86,7 +87,8 @@ describe('BackupRepository', () => {
     afterEach(() => testFactory.storage_service.clearStores());
 
     it('generates an archive of the database', async () => {
-      const zip = await backupRepository.generateHistory(noop);
+      const blob = await backupRepository.generateHistory(noop);
+      const zip = await new JSZip().loadAsync(blob);
       const zipFilenames = Object.keys(zip.files);
       Object.values(BackupRepository.CONFIG.FILENAME).forEach(filename => expect(zipFilenames).toContain(filename));
 
@@ -106,9 +108,10 @@ describe('BackupRepository', () => {
       };
 
       await testFactory.storage_service.save(StorageSchemata.OBJECT_STORE.EVENTS, undefined, verificationEvent);
-      const zip = await backupRepository.generateHistory(noop);
+      const blob = await backupRepository.generateHistory(noop);
+      const zip = await new JSZip().loadAsync(blob);
 
-      const eventsStr = await zip.files[`${StorageSchemata.OBJECT_STORE.EVENTS}.json`].async('string');
+      const eventsStr = await zip.files[BackupRepository.CONFIG.FILENAME.EVENTS].async('string');
       const events = JSON.parse(eventsStr);
       expect(events).not.toContain(verificationEvent);
       expect(events.length).toBe(messages.length);
