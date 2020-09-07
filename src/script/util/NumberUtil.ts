@@ -40,7 +40,7 @@ export const rootMeanSquare = (floatArray: number[] | Float32Array): number => {
 };
 
 /**
- * The rounding is logarithmic, meaning that small numbers will on be slightly
+ * The rounding is logarithmic, meaning that small numbers will be slightly
  * rounded (if at all) whereas larger numbers will be rounded more.
  * This kind of rounding is roughly equivalent to having buckets with increasing size.
  * @param exactValue number to be rounded
