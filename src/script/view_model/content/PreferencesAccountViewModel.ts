@@ -99,6 +99,7 @@ export class PreferencesAccountViewModel {
   canEditProfile: (user: User) => boolean;
   Config: typeof PreferencesAccountViewModel.CONFIG;
   UserNameState: typeof PreferencesAccountViewModel.USERNAME_STATE;
+  isCountlyEnabled: boolean = false;
 
   static get CONFIG() {
     return {
@@ -128,6 +129,7 @@ export class PreferencesAccountViewModel {
     this.fileExtension = HistoryExportViewModel.CONFIG.FILE_EXTENSION;
     this.isDesktop = Runtime.isDesktopApp();
     this.brandName = Config.getConfig().BRAND_NAME;
+    this.isCountlyEnabled = !!Config.getConfig().COUNTLY_API_KEY;
 
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
     this.selfUser = this.userRepository.self;
