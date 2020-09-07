@@ -29,9 +29,9 @@ import {Config} from '../Config';
 import type {Conversation} from '../entity/Conversation';
 import {StorageKey} from '../storage/StorageKey';
 
-import {Environment} from './Environment';
 import {loadValue} from './StorageUtil';
 import {AuthError} from '../error/AuthError';
+import {Runtime} from '@wireapp/commons';
 
 export const isTemporaryClientAndNonPersistent = (persist: boolean): boolean => {
   if (persist === undefined) {
@@ -51,15 +51,13 @@ export const checkIndexedDb = (): Promise<void> => {
     return Promise.resolve();
   }
 
-  if (!Environment.browser.supports.indexedDb) {
-    const errorType = Environment.browser.edge ? AuthError.TYPE.PRIVATE_MODE : AuthError.TYPE.INDEXED_DB_UNSUPPORTED;
-    const errorMessage = Environment.browser.edge
-      ? AuthError.MESSAGE.PRIVATE_MODE
-      : AuthError.MESSAGE.INDEXED_DB_UNSUPPORTED;
+  if (!Runtime.isSupportingIndexedDb()) {
+    const errorType = Runtime.isEdge() ? AuthError.TYPE.PRIVATE_MODE : AuthError.TYPE.INDEXED_DB_UNSUPPORTED;
+    const errorMessage = Runtime.isEdge() ? AuthError.MESSAGE.PRIVATE_MODE : AuthError.MESSAGE.INDEXED_DB_UNSUPPORTED;
     return Promise.reject(new AuthError(errorType, errorMessage));
   }
 
-  if (Environment.browser.firefox) {
+  if (Runtime.isFirefox()) {
     let dbOpenRequest: IDBOpenDBRequest;
 
     try {

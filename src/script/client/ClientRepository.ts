@@ -51,6 +51,7 @@ import type {CryptographyRepository, SignalingKeys} from '../cryptography/Crypto
 import type {User} from '../entity/User';
 import {BackendClientError} from '../error/BackendClientError';
 import {ClientError} from '../error/ClientError';
+import {Runtime} from '@wireapp/commons';
 
 export class ClientRepository {
   readonly clientService: ClientService;
@@ -91,10 +92,6 @@ export class ClientRepository {
     this.logger.info(`Initialized repository with user ID '${this.selfUser().id}'`);
   }
 
-  __test__assignEnvironment(data: any): void {
-    Object.assign(Environment, data);
-  }
-
   //##############################################################################
   // Service interactions
   //##############################################################################
@@ -123,7 +120,7 @@ export class ClientRepository {
       for (const client of clients) {
         const {userId} = ClientEntity.dismantleUserClientId(client.meta.primary_key);
         if (userId && !skippedUserIds.includes(userId)) {
-          recipients[userId] = recipients[userId] || [];
+          recipients[userId] ||= [];
           recipients[userId].push(ClientMapper.mapClient(client, false));
         }
       }
@@ -372,11 +369,11 @@ export class ClientRepository {
 
     let deviceModel = platform.name;
 
-    if (Environment.desktop) {
+    if (Runtime.isDesktopApp()) {
       let modelString;
-      if (Environment.os.mac) {
+      if (Runtime.isMacOS()) {
         modelString = t('wireMacos', Config.getConfig().BRAND_NAME);
-      } else if (Environment.os.win) {
+      } else if (Runtime.isWindows()) {
         modelString = t('wireWindows', Config.getConfig().BRAND_NAME);
       } else {
         modelString = t('wireLinux', Config.getConfig().BRAND_NAME);
@@ -450,7 +447,7 @@ export class ClientRepository {
     }
     const isPermanent = loadValue(StorageKey.AUTH.PERSIST);
     const type = isPermanent ? ClientType.PERMANENT : ClientType.TEMPORARY;
-    return Environment.electron ? ClientType.PERMANENT : type;
+    return Runtime.isDesktopApp() ? ClientType.PERMANENT : type;
   }
 
   //##############################################################################
@@ -564,7 +561,7 @@ export class ClientRepository {
     if (!this.currentClient()) {
       throw new ClientError(ClientError.TYPE.CLIENT_NOT_SET, ClientError.MESSAGE.CLIENT_NOT_SET);
     }
-    return Environment.electron || this.currentClient().isPermanent();
+    return Runtime.isDesktopApp() || this.currentClient().isPermanent();
   }
 
   /**

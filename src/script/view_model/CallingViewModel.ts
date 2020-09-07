@@ -45,7 +45,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {ModalsViewModel} from './ModalsViewModel';
 import {t} from 'Util/LocalizerUtil';
 import {EventName} from '../tracking/EventName';
-import {Segmantation} from '../tracking/Segmentation';
+import {Segmentation} from '../tracking/Segmentation';
 
 export interface CallActions {
   answer: (call: Call) => void;
@@ -150,16 +150,18 @@ export class CallingViewModel {
     };
 
     const startCall = (conversationEntity: Conversation, callType: CALL_TYPE): void => {
-      const guests = conversationEntity.participating_user_ets().filter(user => user.isGuest()).length;
-      const wirelessGuests = conversationEntity.participating_user_ets().filter(user => user.isTemporaryGuest()).length;
+      const participants = conversationEntity.participating_user_ets();
+      const guests = participants.filter(user => user.isGuest()).length;
+      const guestsWireless = participants.filter(user => user.isTemporaryGuest()).length;
+      const services = participants.filter(user => user.isService).length;
+
       const segmentations = {
-        [Segmantation.CALL.VIDEO]: callType === CALL_TYPE.VIDEO,
-        [Segmantation.CONVERSATION.EPHEMERAL_MESSAGE]: !!conversationEntity.globalMessageTimer(),
-        [Segmantation.CONVERSATION.GUESTS]: guests,
-        [Segmantation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
-        [Segmantation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
-        [Segmantation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
-        [Segmantation.CONVERSATION.WIRELESS_GUESTS]: wirelessGuests,
+        [Segmentation.CALL.VIDEO]: callType === CALL_TYPE.VIDEO,
+        [Segmentation.CONVERSATION.GUESTS]: guests,
+        [Segmentation.CONVERSATION.SERVICES]: services,
+        [Segmentation.CONVERSATION.SIZE]: participants.length,
+        [Segmentation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
+        [Segmentation.CONVERSATION.GUESTS_WIRELESS]: guestsWireless,
       };
 
       amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.INITIATED_CALL, segmentations);
@@ -178,16 +180,18 @@ export class CallingViewModel {
         ring(call);
       }
       const conversationEntity = this.conversationRepository.find_conversation_by_id(call.conversationId);
-      const guests = conversationEntity.participating_user_ets().filter(user => user.isGuest()).length;
-      const wirelessGuests = conversationEntity.participating_user_ets().filter(user => user.isTemporaryGuest()).length;
+      const participants = conversationEntity.participating_user_ets();
+      const guests = participants.filter(user => user.isGuest()).length;
+      const guestsWireless = participants.filter(user => user.isTemporaryGuest()).length;
+      const services = participants.filter(user => user.isService).length;
+
       const segmentations = {
-        [Segmantation.CALL.VIDEO]: call.initialType === CALL_TYPE.VIDEO,
-        [Segmantation.CONVERSATION.EPHEMERAL_MESSAGE]: !!conversationEntity.globalMessageTimer(),
-        [Segmantation.CONVERSATION.GUESTS]: guests,
-        [Segmantation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
-        [Segmantation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
-        [Segmantation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
-        [Segmantation.CONVERSATION.WIRELESS_GUESTS]: wirelessGuests,
+        [Segmentation.CALL.VIDEO]: call.initialType === CALL_TYPE.VIDEO,
+        [Segmentation.CONVERSATION.GUESTS]: guests,
+        [Segmentation.CONVERSATION.SERVICES]: services,
+        [Segmentation.CONVERSATION.SIZE]: participants.length,
+        [Segmentation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
+        [Segmentation.CONVERSATION.GUESTS_WIRELESS]: guestsWireless,
       };
       amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.RECIEVED_CALL, segmentations);
     });

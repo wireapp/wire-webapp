@@ -50,7 +50,8 @@ enum DEXIE_CRUD_EVENT {
 }
 
 export class StorageService {
-  public db?: Dexie & DexieObservable;
+  // Quickfix to use table name index; can be removed once we have proper db instance typings: https://dexie.org/docs/Typescript#create-a-subclass
+  public db?: Dexie & DexieObservable & {[tableName: string]: any};
   private readonly hasHookSupport: boolean;
   private readonly dbListeners: DatabaseListener[];
   private readonly engine: CRUDEngine;

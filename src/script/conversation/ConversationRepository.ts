@@ -129,7 +129,7 @@ import * as LegalHoldEvaluator from '../legal-hold/LegalHoldEvaluator';
 import {DeleteConversationMessage} from '../entity/message/DeleteConversationMessage';
 import {ConversationRoleRepository} from './ConversationRoleRepository';
 import {ConversationError} from '../error/ConversationError';
-import {Segmantation} from '../tracking/Segmentation';
+import {Segmentation} from '../tracking/Segmentation';
 import {ConversationService} from './ConversationService';
 import {AssetRepository} from '../assets/AssetRepository';
 import {ClientRepository} from '../client/ClientRepository';
@@ -150,13 +150,10 @@ import {QuoteEntity} from '../message/QuoteEntity';
 import {CompositeMessage} from '../entity/message/CompositeMessage';
 import {EventSource} from '../event/EventSource';
 import {MemberMessage} from '../entity/message/MemberMessage';
-import {RaygunStatic} from 'raygun4js';
 import {MentionEntity} from '../message/MentionEntity';
 import {AudioMetaData, VideoMetaData, ImageMetaData} from '@wireapp/core/dist/conversation/content';
 import {FileAsset} from '../entity/message/FileAsset';
 import {Text as TextAsset} from '../entity/message/Text';
-
-declare const Raygun: RaygunStatic;
 
 type ConversationEvent = {conversation: string; id: string};
 type ConversationDBChange = {obj: ConversationEvent; oldObj: ConversationEvent};
@@ -176,7 +173,7 @@ export class ConversationRepository {
   private readonly event_mapper: EventMapper;
   private readonly eventService: EventService;
   private readonly fetching_conversations: Record<string, FetchPromise[]>;
-  private readonly leaveCall: (conversationId: string) => void;
+  public leaveCall: (conversationId: string) => void;
   private readonly logger: Logger;
   private readonly receiving_queue: PromiseQueue;
   private readonly sorted_conversations: ko.PureComputed<Conversation[]>;
@@ -532,14 +529,16 @@ export class ConversationRepository {
       this.conversation_service.load_conversation_states_from_db(),
       remoteConversationsPromise,
     ]);
+    let conversationsData: any[];
     if (!remoteConversations.length) {
-      return localConversations;
+      conversationsData = localConversations;
+    } else {
+      const data = this.conversationMapper.mergeConversation(
+        localConversations,
+        remoteConversations,
+      ) as SerializedConversation[];
+      conversationsData = (await this.conversation_service.save_conversations_in_db(data)) as any[];
     }
-    const data = this.conversationMapper.mergeConversation(
-      localConversations,
-      remoteConversations,
-    ) as SerializedConversation[];
-    const conversationsData = (await this.conversation_service.save_conversations_in_db(data)) as any[];
     const conversationEntities = this.mapConversations(conversationsData) as Conversation[];
     this.save_conversations(conversationEntities);
     return this.conversations();
@@ -1269,7 +1268,6 @@ export class ConversationRepository {
       .catch(error => {
         const errorMessage = 'Failed to update last read timestamp';
         this.logger.error(`${errorMessage}: ${error.message}`, error);
-        Raygun.send(new Error(errorMessage), {label: error.label, message: error.message});
       });
   }
 
@@ -1635,7 +1633,7 @@ export class ConversationRepository {
         return conversationInTeam && userIsParticipant && !conversationEntity.removed_from_conversation();
       })
       .forEach(conversationEntity => {
-        const leaveEvent = EventBuilder.buildTeamMemberLeave(conversationEntity, userEntity, isoDate.toString(10));
+        const leaveEvent = EventBuilder.buildTeamMemberLeave(conversationEntity, userEntity, isoDate);
         this.eventRepository.injectEvent(leaveEvent);
       });
     userEntity.isDeleted = true;
@@ -2562,10 +2560,11 @@ export class ConversationRepository {
     try {
       const messageEntity = await this.getMessageInConversationById(conversationEntity, eventJson.id);
       messageEntity.status(StatusType.SENT);
-      const changes = {status: StatusType.SENT, time: isoDate};
+      const changes: {status: StatusType; time?: string | number | Date} = {status: StatusType.SENT};
       if (isoDate) {
         const timestamp = new Date(isoDate).getTime();
         if (!isNaN(timestamp)) {
+          changes.time = isoDate;
           messageEntity.timestamp(timestamp);
           conversationEntity.update_timestamp_server(timestamp, true);
           conversationEntity.updateTimestamps(messageEntity);
@@ -2925,7 +2924,7 @@ export class ConversationRepository {
     return new Promise((resolve, reject) => {
       let sendAnyway = false;
 
-      userIds = userIds || conversationEntity.getUsersWithUnverifiedClients().map(userEntity => userEntity.id);
+      userIds ||= conversationEntity.getUsersWithUnverifiedClients().map(userEntity => userEntity.id);
 
       return this.userRepository
         .getUsersById(userIds)
@@ -2955,14 +2954,6 @@ export class ConversationRepository {
               this.logger.error(log);
 
               const error = new Error('Failed to grant outgoing message');
-              const customData = {
-                consentType,
-                messageType: type,
-                participants: conversationEntity.getNumberOfParticipants(false),
-                verificationState,
-              };
-
-              Raygun.send(error, customData);
 
               reject(error);
             }
@@ -4054,7 +4045,7 @@ export class ConversationRepository {
   private async _initMessageEntity(conversationEntity: Conversation, eventJson: Object): Promise<Message> {
     const messageEntity = await this.event_mapper.mapJsonEvent(eventJson, conversationEntity);
     // eslint-disable-next-line no-return-await
-    return await this._updateMessageUserEntities(messageEntity);
+    return this._updateMessageUserEntities(messageEntity);
   }
 
   private async _replaceMessageInConversation(conversationEntity: Conversation, eventId: string, newData: Object) {
@@ -4342,7 +4333,7 @@ export class ConversationRepository {
       }
 
       case 'image': {
-        actionType = 'photo';
+        actionType = 'image';
         break;
       }
 
@@ -4370,14 +4361,24 @@ export class ConversationRepository {
         break;
     }
     if (actionType) {
-      const guests = conversationEntity.participating_user_ets().filter(user => user.isGuest()).length;
+      const selfUserTeamId = this.selfUser().teamId;
+      const participants = conversationEntity.participating_user_ets();
+      const guests = participants.filter(user => user.isGuest()).length;
+      const guestsWireless = participants.filter(user => user.isTemporaryGuest()).length;
+      // guests that are from a different team
+      const guestsPro = participants.filter(user => !!user.teamId && user.teamId !== selfUserTeamId).length;
+      const services = participants.filter(user => user.isService).length;
+
       let segmentations = {
-        [Segmantation.CONVERSATION.GUESTS]: guests,
-        [Segmantation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
-        [Segmantation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
-        [Segmantation.MESSAGE.ACTION]: actionType,
-        [Segmantation.MESSAGE.IS_REPLY]: !!genericMessage.text?.quote,
-        [Segmantation.MESSAGE.MENTION]: numberOfMentions,
+        [Segmentation.CONVERSATION.GUESTS]: guests,
+        [Segmentation.CONVERSATION.GUESTS_PRO]: guestsPro,
+        [Segmentation.CONVERSATION.GUESTS_WIRELESS]: guestsWireless,
+        [Segmentation.CONVERSATION.SIZE]: participants.length,
+        [Segmentation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
+        [Segmentation.CONVERSATION.SERVICES]: services,
+        [Segmentation.MESSAGE.ACTION]: actionType,
+        [Segmentation.MESSAGE.IS_REPLY]: !!genericMessage.text?.quote,
+        [Segmentation.MESSAGE.MENTION]: numberOfMentions,
       };
       const isTeamConversation = !!conversationEntity.team_id;
       if (isTeamConversation) {

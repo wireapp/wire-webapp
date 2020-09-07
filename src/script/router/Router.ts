@@ -19,7 +19,7 @@
 
 import switchPath from 'switch-path';
 
-export type Routes = Record<string, (() => void) | null>;
+export type Routes = Record<string, ((x: any) => void) | null>;
 
 export class Router {
   private readonly parseRoute: () => any;

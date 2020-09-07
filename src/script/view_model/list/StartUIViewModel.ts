@@ -33,7 +33,6 @@ import {User} from '../../entity/User';
 import {generatePermissionHelpers} from '../../user/UserPermission';
 import {validateHandle} from '../../user/UserHandleGenerator';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {EventName} from '../../tracking/EventName';
 import {SearchRepository} from '../../search/SearchRepository';
 import {sortByPriority} from 'Util/StringUtil';
 import {ListViewModel} from '../ListViewModel';
@@ -162,7 +161,7 @@ export class StartUIViewModel {
         return teamUsersWithoutPartners;
       }
 
-      return this.userRepository.connected_users();
+      return this.userRepository.connectedUsers();
     });
 
     this.matchedUsers = ko.observableArray([]);
@@ -245,7 +244,6 @@ export class StartUIViewModel {
   clickOnCreateGuestRoom = (): void => {
     this.conversationRepository.createGuestRoom().then(conversationEntity => {
       amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.GUEST_ROOMS.GUEST_ROOM_CREATION);
     });
   };
 
@@ -254,13 +252,11 @@ export class StartUIViewModel {
       return;
     }
     safeWindowOpen(this.manageTeamUrl);
-    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.SETTINGS.OPENED_MANAGE_TEAM);
   };
 
   clickOpenManageServices = () => {
     if (this.manageServicesUrl) {
       safeWindowOpen(this.manageServicesUrl);
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.SETTINGS.OPENED_MANAGE_TEAM);
     }
   };
 
@@ -386,7 +382,7 @@ export class StartUIViewModel {
     const trimmedQuery = query.trim();
     const isHandle = trimmedQuery.startsWith('@') && validateHandle(normalizedQuery);
 
-    const allLocalUsers = this.isTeam() ? this.teamRepository.teamUsers() : this.userRepository.connected_users();
+    const allLocalUsers = this.isTeam() ? this.teamRepository.teamUsers() : this.userRepository.connectedUsers();
 
     const localSearchSources = this.showOnlyConnectedUsers()
       ? this.conversationRepository.connectedUsers()

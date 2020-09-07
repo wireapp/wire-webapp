@@ -35,7 +35,7 @@ export class AppInitTelemetry {
     this.statistics = new AppInitStatistics();
   }
 
-  addStatistic(statistic: AppInitStatisticsValue, value: string | number, bucket_size: number): void {
+  addStatistic(statistic: AppInitStatisticsValue, value: string | number, bucket_size?: number): void {
     this.statistics.add(statistic, value, bucket_size);
   }
 

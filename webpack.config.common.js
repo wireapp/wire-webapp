@@ -29,7 +29,7 @@ const srcScript = path.resolve(SRC_PATH, 'script');
 module.exports = {
   devtool: 'source-map',
   entry: {
-    app: path.resolve(srcScript, 'main/app.js'),
+    app: path.resolve(srcScript, 'main/app.ts'),
     auth: path.resolve(auth, 'main.tsx'),
   },
   externals: {

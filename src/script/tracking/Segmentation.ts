@@ -17,7 +17,7 @@
  *
  */
 
-export const Segmantation = {
+export const Segmentation = {
   CALL: {
     AV_SWITCH_TOGGLE: 'call_av_switch_toggle',
     DIRECTION: 'call_direction',
@@ -28,14 +28,19 @@ export const Segmantation = {
     SETUP_TIME: 'call_setup_time',
     VIDEO: 'call_video',
   },
+  COMMON: {
+    APP: 'user_app',
+    APP_VERSION: 'user_app_version',
+    DESKTOP_APP: 'user_desktop_app',
+  },
   CONVERSATION: {
     ALLOW_GUESTS: 'conversation_allow_guests',
-    EPHEMERAL_MESSAGE: 'conversation_ephemeral_message',
     GUESTS: 'conversation_guests',
+    GUESTS_PRO: 'conversation_guests_pro',
+    GUESTS_WIRELESS: 'conversation_guests_wireless',
     SERVICES: 'conversation_services',
     SIZE: 'conversation_size',
     TYPE: 'conversation_type',
-    WIRELESS_GUESTS: 'conversation_wireless_guests',
   },
   MESSAGE: {
     ACTION: 'message_action',

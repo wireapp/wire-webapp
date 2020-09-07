@@ -30,36 +30,7 @@ export const EventName = {
     SCREEN_SHARE: 'calling.screen_share',
   },
   CONTRIBUTED: 'contributed',
-  CONVERSATION: {
-    ADD_PARTICIPANTS: 'conversation.add_participants',
-    GROUP_CREATION_SUCCEEDED: 'conversation.group_creation_succeeded',
-    OPENED_GROUP_CREATION: 'conversation.opened_group_creation',
-    OPENED_SELECT_PARTICIPANTS: 'conversation.opened_select_participants',
-  },
   E2EE: {
     FAILED_MESSAGE_DECRYPTION: 'e2ee.failed_message_decryption',
-  },
-  GUEST_ROOMS: {
-    ALLOW_GUESTS: 'guest_rooms.allow_guests',
-    GUEST_ROOM_CREATION: 'guest_rooms.guest_room_creation',
-    LINK_COPIED: 'guest_rooms.link_copied',
-    LINK_CREATED: 'guest_rooms.link_created',
-    LINK_REVOKED: 'guest_rooms.link_revoked',
-  },
-  HISTORY: {
-    BACKUP_FAILED: 'history.backup_failed',
-    BACKUP_SUCCEEDED: 'history.backup_succeeded',
-    RESTORE_FAILED: 'history.restore_failed',
-    RESTORE_SUCCEEDED: 'history.restore_succeeded',
-  },
-  INTEGRATION: {
-    ADDED_SERVICE: 'integration.added_service',
-    REMOVED_SERVICE: 'integration.removed_service',
-  },
-  SETTINGS: {
-    CHANGED_STATUS: 'settings.changed_status',
-    OPENED_MANAGE_TEAM: 'settings.opened_manage_team',
-    OPTED_IN_TRACKING: 'settings.opted_in_tracking',
-    OPTED_OUT_TRACKING: 'settings.opted_out_tracking',
   },
 };

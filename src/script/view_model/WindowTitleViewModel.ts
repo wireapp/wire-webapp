@@ -62,7 +62,7 @@ export class WindowTitleViewModel {
 
     ko.computed(() => {
       if (this.updateWindowTitle()) {
-        const connectionRequests = this.userRepository.connect_requests().length;
+        const connectionRequests = this.userRepository.connectRequests().length;
 
         const unreadConversations = this.conversationRepository
           .conversations_unarchived()

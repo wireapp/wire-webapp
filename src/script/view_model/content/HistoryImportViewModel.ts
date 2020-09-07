@@ -25,15 +25,15 @@ import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {loadFileBuffer} from 'Util/util';
 import {WebWorker} from 'Util/worker';
+import 'Components/loadingBar';
 
 import {Config} from '../../Config';
 import {MotionDuration} from '../../motion/MotionDuration';
-import {EventName} from '../../tracking/EventName';
 import {ContentViewModel} from '../ContentViewModel';
 import {CancelError, DifferentAccountError, ImportError, IncompatibleBackupError} from '../../backup/Error';
 
-import 'Components/loadingBar';
-import {BackupRepository} from 'src/script/backup/BackupRepository';
+import {BackupRepository} from '../../backup/BackupRepository';
+import {formatDuration} from '../../util/TimeUtil';
 
 export class HistoryImportViewModel {
   private readonly logger: Logger;
@@ -116,14 +116,19 @@ export class HistoryImportViewModel {
     this.state(HistoryImportViewModel.STATE.PREPARING);
     this.error(null);
     const fileBuffer = await loadFileBuffer(file);
-    const worker = new WebWorker('worker/jszip-worker.js');
+    const worker = new WebWorker('/worker/jszip-worker.js');
 
     try {
-      const files: Record<string, Uint8Array> = await worker.post(fileBuffer);
+      const unzipTimeStart = performance.now();
+      const files = await worker.post<Record<string, Uint8Array>>(fileBuffer);
+      const unzipTimeEnd = performance.now();
       if (files.error) {
         throw new ImportError((files.error as unknown) as string);
       }
-      this.logger.log('Unzipped files for history import', files);
+      const unzipTimeMillis = Math.round(unzipTimeEnd - unzipTimeStart);
+      const unzipTimeFormatted = formatDuration(unzipTimeMillis);
+
+      this.logger.log(`Unzipped files for history import (took ${unzipTimeFormatted.text}).`, files);
       await this.backupRepository.importHistory(files, this.onInit, this.onProgress);
       this.onSuccess();
     } catch (error) {
@@ -144,7 +149,6 @@ export class HistoryImportViewModel {
   onSuccess = (): void => {
     this.error(null);
     this.state(HistoryImportViewModel.STATE.DONE);
-    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.HISTORY.RESTORE_SUCCEEDED);
     window.setTimeout(this.dismissImport, MotionDuration.X_LONG * 2);
   };
 
@@ -163,6 +167,5 @@ export class HistoryImportViewModel {
     }
     this.error(error);
     this.logger.error(`Failed to import history: ${error.message}`, error);
-    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.HISTORY.RESTORE_FAILED);
   };
 }

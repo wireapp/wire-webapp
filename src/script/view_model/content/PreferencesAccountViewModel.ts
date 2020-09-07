@@ -28,7 +28,6 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {t} from 'Util/LocalizerUtil';
 import {isTemporaryClientAndNonPersistent, validateProfileImageResolution} from 'Util/util';
-import {Environment} from 'Util/Environment';
 import {isKey, KEY} from 'Util/KeyboardUtil';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 
@@ -48,9 +47,8 @@ import {nameFromType} from '../../user/AvailabilityMapper';
 import {ParticipantAvatar} from 'Components/participantAvatar';
 import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
 import {MotionDuration} from '../../motion/MotionDuration';
-import {EventName} from '../../tracking/EventName';
 import {ContentViewModel} from '../ContentViewModel';
-import {Logger} from '@wireapp/commons';
+import {Logger, Runtime} from '@wireapp/commons';
 import {getLogger} from 'Util/Logger';
 
 import 'Components/availabilityState';
@@ -88,6 +86,7 @@ export class PreferencesAccountViewModel {
   team: ko.Observable<TeamEntity>;
   teamName: ko.PureComputed<string>;
   optionPrivacy: ko.Observable<boolean>;
+  optionTelemetrySharing: ko.Observable<boolean>;
   optionReadReceipts: ko.Observable<Confirmation.Type>;
   optionMarketingConsent: ko.Observable<boolean | ConsentValue>;
   optionResetAppLock: boolean;
@@ -97,7 +96,6 @@ export class PreferencesAccountViewModel {
   createTeamUrl: string;
   isTemporaryAndNonPersistent: boolean;
   isConsentCheckEnabled: () => boolean;
-  canSendAnalytics: () => boolean;
   canEditProfile: (user: User) => boolean;
   Config: typeof PreferencesAccountViewModel.CONFIG;
   UserNameState: typeof PreferencesAccountViewModel.USERNAME_STATE;
@@ -128,7 +126,7 @@ export class PreferencesAccountViewModel {
   ) {
     this.logger = getLogger('PreferencesAccountViewModel');
     this.fileExtension = HistoryExportViewModel.CONFIG.FILE_EXTENSION;
-    this.isDesktop = Environment.desktop;
+    this.isDesktop = Runtime.isDesktopApp();
     this.brandName = Config.getConfig().BRAND_NAME;
 
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
@@ -169,19 +167,23 @@ export class PreferencesAccountViewModel {
       this.propertiesRepository.savePreference(PROPERTIES_TYPE.PRIVACY, privacyPreference);
     });
 
+    this.optionTelemetrySharing = ko.observable();
+    this.optionTelemetrySharing.subscribe(privacyPreference => {
+      this.propertiesRepository.savePreference(PROPERTIES_TYPE.TELEMETRY_SHARING, privacyPreference);
+    });
+
     this.optionReadReceipts = this.propertiesRepository.receiptMode;
     this.optionMarketingConsent = this.propertiesRepository.marketingConsent;
 
     this.optionResetAppLock = isAppLockEnabled();
     this.ParticipantAvatar = ParticipantAvatar;
 
-    this.isMacOsWrapper = Environment.electron && Environment.os.mac;
+    this.isMacOsWrapper = Runtime.isDesktopApp() && Runtime.isMacOS();
     this.manageTeamUrl = getManageTeamUrl('client_settings');
     this.createTeamUrl = getCreateTeamUrl('client');
 
     this.isTemporaryAndNonPersistent = isTemporaryClientAndNonPersistent(loadValue(StorageKey.AUTH.PERSIST));
     this.isConsentCheckEnabled = () => Config.getConfig().FEATURE.CHECK_CONSENT;
-    this.canSendAnalytics = () => this.userRepository.isTeam();
     this.canEditProfile = user => user.managedBy() === User.CONFIG.MANAGED_BY.WIRE;
 
     this.updateProperties(this.propertiesRepository.properties);
@@ -417,7 +419,6 @@ export class PreferencesAccountViewModel {
   clickOpenManageTeam = (): void => {
     if (this.manageTeamUrl) {
       safeWindowOpen(this.manageTeamUrl);
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.SETTINGS.OPENED_MANAGE_TEAM);
     }
   };
 
@@ -486,7 +487,7 @@ export class PreferencesAccountViewModel {
     }
   };
 
-  shouldFocusUsername = (): boolean => this.userRepository.should_set_username;
+  shouldFocusUsername = (): boolean => this.userRepository.shouldSetUsername;
 
   verifyUsername = (username: string, event: ChangeEvent<HTMLInputElement>): void => {
     const enteredUsername = event.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '');
@@ -547,5 +548,6 @@ export class PreferencesAccountViewModel {
 
   updateProperties = ({settings}: WebappProperties): void => {
     this.optionPrivacy(settings.privacy.improve_wire);
+    this.optionTelemetrySharing(settings.privacy.telemetry_sharing);
   };
 }

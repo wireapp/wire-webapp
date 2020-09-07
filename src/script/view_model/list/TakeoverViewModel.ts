@@ -63,7 +63,7 @@ export class TakeoverViewModel {
         return amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
       }
 
-      if (this.userRepository.connect_requests().length) {
+      if (this.userRepository.connectRequests().length) {
         amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.CONNECTION_REQUESTS);
       }
     } catch (error) {
