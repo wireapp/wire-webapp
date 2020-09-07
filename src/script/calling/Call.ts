@@ -38,15 +38,17 @@ export class Call {
   public readonly isCbrEnabled: ko.Observable<boolean>;
   public blockMessages: boolean = false;
   /**
-    Used for analytics,
-    set to true if anyone has enabled their video during a call
-  */
+   * set to true if anyone has enabled their video during a call (used for analytics)
+   */
   public analyticsAvSwitchToggle: boolean = false;
   /**
-    Used for analytics,
-    set to true if anyone has shared their screen during a call
-  */
+   * set to true if anyone has shared their screen during a call (used for analytics)
+   */
   public analyticsScreenSharing: boolean = false;
+  /**
+   * Maximum number of people joined in a call (used for analytics)
+   */
+  public analyticsMaximumParticipants: number = 0;
 
   constructor(
     initiator: UserId,
