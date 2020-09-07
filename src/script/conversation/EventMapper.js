@@ -92,7 +92,7 @@ export class EventMapper {
   /**
    * Convert JSON event into a message entity.
    *
-   * @param {Object} event Event data
+   * @param {EventRecord} event Event data
    * @param {Conversation} conversationEntity Conversation entity the event belong to
    * @returns {Promise} Resolves with the mapped message entity
    */
@@ -117,7 +117,7 @@ export class EventMapper {
    * Will try to do as little updates as possible to avoid to many observable emission.
    *
    * @param {Message} originalEntity the original message to update
-   * @param {Object} event new json data to feed into the entity
+   * @param {EventRecord} event new json data to feed into the entity
    * @returns {Promise<Message>} - the updated message entity
    */
   async updateMessageEvent(originalEntity, event) {

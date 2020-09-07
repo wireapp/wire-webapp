@@ -31,23 +31,22 @@ import {Config} from '../../Config';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {ContentViewModel} from '../ContentViewModel';
 import {CancelError, DifferentAccountError, ImportError, IncompatibleBackupError} from '../../backup/Error';
-
 import {BackupRepository} from '../../backup/BackupRepository';
 import {formatDuration} from '../../util/TimeUtil';
 
 export class HistoryImportViewModel {
-  private readonly logger: Logger;
   private readonly error: ko.Observable<Error>;
-  errorHeadline: ko.Observable<string>;
-  errorSecondary: ko.Observable<string>;
-  private readonly state: ko.Observable<string>;
-  isPreparing: ko.PureComputed<boolean>;
-  isImporting: ko.PureComputed<boolean>;
-  isDone: ko.PureComputed<boolean>;
-  private readonly numberOfRecords: ko.Observable<number>;
+  private readonly errorHeadline: ko.Observable<string>;
+  private readonly errorSecondary: ko.Observable<string>;
+  private readonly loadingProgress: ko.PureComputed<number>;
+  private readonly logger: Logger;
   private readonly numberOfProcessedRecords: ko.Observable<number>;
-  loadingProgress: ko.PureComputed<number>;
-  loadingMessage: ko.PureComputed<string>;
+  private readonly numberOfRecords: ko.Observable<number>;
+  private readonly state: ko.Observable<string>;
+  readonly isDone: ko.PureComputed<boolean>;
+  readonly isImporting: ko.PureComputed<boolean>;
+  readonly isPreparing: ko.PureComputed<boolean>;
+  readonly loadingMessage: ko.PureComputed<string>;
 
   static get STATE() {
     return {
@@ -116,7 +115,7 @@ export class HistoryImportViewModel {
     this.state(HistoryImportViewModel.STATE.PREPARING);
     this.error(null);
     const fileBuffer = await loadFileBuffer(file);
-    const worker = new WebWorker('/worker/jszip-worker.js');
+    const worker = new WebWorker('/worker/jszip-unpack-worker.js');
 
     try {
       const unzipTimeStart = performance.now();
@@ -128,7 +127,10 @@ export class HistoryImportViewModel {
       const unzipTimeMillis = Math.round(unzipTimeEnd - unzipTimeStart);
       const unzipTimeFormatted = formatDuration(unzipTimeMillis);
 
-      this.logger.log(`Unzipped files for history import (took ${unzipTimeFormatted.text}).`, files);
+      this.logger.log(
+        `Unzipped '${Object.keys(files).length}' files for history import (took ${unzipTimeFormatted.text}).`,
+        files,
+      );
       await this.backupRepository.importHistory(files, this.onInit, this.onProgress);
       this.onSuccess();
     } catch (error) {
