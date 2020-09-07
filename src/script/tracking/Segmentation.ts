@@ -29,9 +29,9 @@ export const Segmentation = {
     VIDEO: 'call_video',
   },
   COMMON: {
-    APP: 'app_name',
-    APP_VERSION: 'app_version',
-    DESKTOP_APP: 'app_desktop_app',
+    APP: 'user_app',
+    APP_VERSION: 'user_app_version',
+    DESKTOP_APP: 'user_desktop_app',
   },
   CONVERSATION: {
     ALLOW_GUESTS: 'conversation_allow_guests',
