@@ -46,6 +46,6 @@ export const rootMeanSquare = (floatArray: number[] | Float32Array): number => {
  * @param exactValue number to be rounded
  * @param factor determines by how much the value is rounded
  */
-export const roundLogarithmic = (exactValue: number, factor: number) => {
+export const roundLogarithmic = (exactValue: number, factor: number): number => {
   return Math.ceil(2 ** (Math.floor(factor * Math.log2(exactValue)) / factor));
 };
