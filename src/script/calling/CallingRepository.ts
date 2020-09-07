@@ -682,7 +682,7 @@ export class CallingRepository {
       this.wCall.answer(this.wUser, call.conversationId, callType, this.cbrEncoding());
 
       this.sendCallingEvent(EventName.CALLING.JOINED_CALL, call, {
-        [Segmentation.CALL.DIRECTION]: call.state(),
+        [Segmentation.CALL.DIRECTION]: this.getCallDirection(call),
         [Segmentation.CALL.VIDEO]: callType === CALL_TYPE.VIDEO,
       });
     } catch (_) {
@@ -903,7 +903,7 @@ export class CallingRepository {
 
     this.sendCallingEvent(EventName.CALLING.ENDED_CALL, call, {
       [Segmentation.CALL.AV_SWITCH_TOGGLE]: call.analyticsAvSwitchToggle,
-      [Segmentation.CALL.DIRECTION]: call.state(),
+      [Segmentation.CALL.DIRECTION]: this.getCallDirection(call),
       [Segmentation.CALL.DURATION]: Math.ceil((Date.now() - call.startedAt()) / 5000) * 5,
       [Segmentation.CALL.END_REASON]: reason,
       [Segmentation.CALL.PARTICIPANTS]: call.analyticsMaximumParticipants,
@@ -1003,12 +1003,16 @@ export class CallingRepository {
     switch (state) {
       case CALL_STATE.MEDIA_ESTAB:
         this.sendCallingEvent(EventName.CALLING.ESTABLISHED_CALL, call, {
-          [Segmentation.CALL.DIRECTION]: call.state(),
+          [Segmentation.CALL.DIRECTION]: this.getCallDirection(call),
           [Segmentation.CALL.VIDEO]: call.initialType === CALL_TYPE.VIDEO,
         });
         call.startedAt(Date.now());
         break;
     }
+  };
+
+  private readonly getCallDirection = (call: Call): 'incoming' | 'outgoing' => {
+    return call.initiator === call.getSelfParticipant().user.id ? 'outgoing' : 'incoming';
   };
 
   private updateParticipantMutedState(call: Call, members: WcallMember[]): void {
