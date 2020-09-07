@@ -4344,11 +4344,9 @@ export class ConversationRepository {
         if (protoAsset.original) {
           if (!!protoAsset.original.image) {
             actionType = 'photo';
-          }
-          if (!!protoAsset.original.audio) {
+          } else if (!!protoAsset.original.audio) {
             actionType = 'audio';
-          }
-          if (!!protoAsset.original.video) {
+          } else if (!!protoAsset.original.video) {
             actionType = 'video';
           }
         }
