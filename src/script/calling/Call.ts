@@ -48,9 +48,8 @@ export class Call {
   */
   public analyticsScreenSharing: boolean = false;
   /**
-    Used for analytics,
-    Maximum number of people joined in a call
-  */
+   * Maximum number of people joined in a call (used for analytics)
+   */
   public analyticsMaximumParticipants: number = 0;
 
   constructor(
