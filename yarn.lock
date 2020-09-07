@@ -1167,10 +1167,10 @@
     intl-messageformat "^9.3.6"
     intl-messageformat-parser "^6.0.5"
 
-"@formatjs/ts-transformer@^2.8.0":
-  version "2.8.0"
-  resolved "https://registry.yarnpkg.com/@formatjs/ts-transformer/-/ts-transformer-2.8.0.tgz#a301306ed54990f7b1c1f5a02d47abe9b21bac65"
-  integrity sha512-4F5iUgPmMP1QmzntahdtNepdgwr2Y3f2O/kZprRzPF+fWPI4P+f9PNORdRB35eWZjG66bZ1vs/SPPZnqW/Ruaw==
+"@formatjs/ts-transformer@^2.9.0":
+  version "2.9.0"
+  resolved "https://registry.yarnpkg.com/@formatjs/ts-transformer/-/ts-transformer-2.9.0.tgz#582f8c54bc5888044f3e848163411dabca130aff"
+  integrity sha512-H6skH+McG2OoUL3nc6Eas/5IunM8hk7uDU5Ak/qtNtvsehOH8g030LaFaMxw28BWq2vBipGAPlyyz/KTvO8fPw==
   dependencies:
     intl-messageformat-parser "^6.0.5"
     typescript "^4.0"
@@ -2910,15 +2910,15 @@ babel-plugin-macros@^2.0.0:
     cosmiconfig "^5.2.0"
     resolve "^1.10.0"
 
-babel-plugin-react-intl@8.1.11:
-  version "8.1.11"
-  resolved "https://registry.yarnpkg.com/babel-plugin-react-intl/-/babel-plugin-react-intl-8.1.11.tgz#ea1976e8c8195bfaf125eb7f9d65930f93a5f0fd"
-  integrity sha512-wcO43FLJs7WCClrpkYblsDM1OIii8qCs4zoSBHP4QYvSqo1WEahZv2usfBo/hkEMbjByMDrcBU6HMQF9BmTYrA==
+babel-plugin-react-intl@8.2.0:
+  version "8.2.0"
+  resolved "https://registry.yarnpkg.com/babel-plugin-react-intl/-/babel-plugin-react-intl-8.2.0.tgz#84a0e05e38241e21d264e1586a801af0c8216dd0"
+  integrity sha512-cOa86o0ve+FZ3qAroB7MK1Vr5Tpax4lUfzZcu5FjEIdfp93cal+77E5HPlEqgSB5wi+1mduOWICBQ0/XTvGMvA==
   dependencies:
     "@babel/core" "^7.9.0"
     "@babel/helper-plugin-utils" "^7.8.3"
     "@babel/types" "^7.9.5"
-    "@formatjs/ts-transformer" "^2.8.0"
+    "@formatjs/ts-transformer" "^2.9.0"
     "@types/babel__core" "^7.1.7"
     "@types/schema-utils" "^2.4.0"
     intl-messageformat-parser "^6.0.5"
