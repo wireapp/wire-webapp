@@ -4342,7 +4342,15 @@ export class ConversationRepository {
       case 'asset': {
         const protoAsset = genericMessage.asset;
         if (protoAsset.original) {
-          actionType = protoAsset.original.image ? 'photo' : 'file';
+          if (!!protoAsset.original.image) {
+            actionType = 'photo';
+          }
+          if (!!protoAsset.original.audio) {
+            actionType = 'audio';
+          }
+          if (!!protoAsset.original.video) {
+            actionType = 'video';
+          }
         }
         break;
       }
