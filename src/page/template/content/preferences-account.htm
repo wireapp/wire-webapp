@@ -132,7 +132,7 @@
         </div>
         <div class="preferences-detail" data-bind="text: t('preferencesAccountDataDetail', brandName)"></div>
 
-        <!-- ko if: isTeam() -->
+        <!-- ko if: isTeam() && isCountlyEnabled -->
           <div class="preferences-option">
             <div class="preferences-option-icon checkbox accent-text" data-bind="attr: {'data-uie-value': optionTelemetrySharing}" data-uie-name="status-preference-telemetry">
               <input type="checkbox" id="telemetry-checkbox" data-bind="checked: optionTelemetrySharing">
