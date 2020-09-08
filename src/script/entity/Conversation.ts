@@ -80,11 +80,11 @@ export interface SerializedConversation {
   last_read_timestamp: number;
   last_server_timestamp: number;
   legal_hold_status: LegalHoldStatus;
-  muted_state: number;
+  muted_state: boolean | number;
   muted_timestamp: number;
   name: string;
   others: string[];
-  receipt_mode: Confirmation.Type;
+  receipt_mode?: Confirmation.Type;
   status: ConversationStatus;
   team_id: string;
   type: CONVERSATION_TYPE;
@@ -92,6 +92,7 @@ export interface SerializedConversation {
 }
 
 export class Conversation {
+  [key: string]: any;
   public readonly archivedState: ko.Observable<boolean>;
   private readonly incomingMessages: ko.ObservableArray<Message | ContentMessage | MemberMessage>;
   private readonly isManaged: boolean;

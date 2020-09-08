@@ -21,6 +21,7 @@ import {isObject} from 'underscore';
 import ko from 'knockout';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {
+  ConversationCode,
   DefaultConversationRoleName,
   CONVERSATION_ACCESS,
   CONVERSATION_ACCESS_ROLE,
@@ -29,7 +30,7 @@ import {
 import {ACCESS_STATE} from './AccessState';
 import {NOTIFICATION_STATE} from './NotificationSetting';
 import {ConversationStatus} from './ConversationStatus';
-import {Conversation} from '../entity/Conversation';
+import {Conversation, SerializedConversation} from '../entity/Conversation';
 import {BASE_ERROR_TYPE, BaseError} from '../error/BaseError';
 import {ConversationError} from '../error/ConversationError';
 import {Conversation as ConversationBackendData} from '@wireapp/api-client/dist/conversation/';
@@ -57,22 +58,14 @@ export interface SelfStatusUpdateDatabaseData {
   verification_state: number;
 }
 
-export type ConversationDatabaseData = Partial<ConversationBackendData> & {
-  accessModes: CONVERSATION_ACCESS[];
-  accessRole: CONVERSATION_ACCESS_ROLE;
-  archived_state: boolean;
-  archived_timestamp: number;
-  is_guest: boolean;
-  last_event_timestamp: number;
-  last_server_timestamp: number;
-  muted_state: boolean | number;
-  muted_timestamp: number;
-  others: string[];
-  receipt_mode?: number;
-  roles: {[userId: string]: DefaultConversationRoleName | string};
-  status: ConversationStatus;
-  team_id: string;
-};
+export type ConversationDatabaseData = SerializedConversation &
+  Partial<ConversationBackendData> & {
+    accessModes: CONVERSATION_ACCESS[];
+    accessRole: CONVERSATION_ACCESS_ROLE;
+    roles: {[userId: string]: DefaultConversationRoleName | string};
+    status: ConversationStatus;
+    team_id: string;
+  };
 
 export class ConversationMapper {
   mapConversations(conversationsData: ConversationDatabaseData[], timestamp: number = 1): Conversation[] {
@@ -108,7 +101,7 @@ export class ConversationMapper {
 
   updateSelfStatus(
     conversationEntity: Conversation,
-    selfState: SelfStatusUpdateDatabaseData,
+    selfState: Partial<SelfStatusUpdateDatabaseData>,
     disablePersistence: boolean = false,
   ): Conversation {
     if (disablePersistence) {
@@ -375,7 +368,7 @@ export class ConversationMapper {
     );
   }
 
-  mapAccessCode(conversationEntity: Conversation, accessCode: {code: string; key: string; uri: string}): void {
+  mapAccessCode(conversationEntity: Conversation, accessCode: ConversationCode): void {
     const isTeamConversation = conversationEntity && conversationEntity.team_id;
 
     if (accessCode.uri && isTeamConversation) {
