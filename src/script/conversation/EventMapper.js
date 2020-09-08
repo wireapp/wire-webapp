@@ -83,8 +83,6 @@ export class EventMapper {
         } catch (error) {
           const errorMessage = `Failure while mapping events. Affected '${event.type}' event: ${error.message}`;
           this.logger.error(errorMessage, {error, event});
-          const customData = {eventTime: new Date(event.time).toISOString(), eventType: event.type};
-          Raygun.send(new Error(errorMessage), customData);
         }
       }),
     );
@@ -94,29 +92,24 @@ export class EventMapper {
   /**
    * Convert JSON event into a message entity.
    *
-   * @param {Object} event Event data
+   * @param {EventRecord} event Event data
    * @param {Conversation} conversationEntity Conversation entity the event belong to
    * @returns {Promise} Resolves with the mapped message entity
    */
   mapJsonEvent(event, conversationEntity) {
-    return Promise.resolve()
-      .then(() => this._mapJsonEvent(event, conversationEntity))
-      .catch(error => {
-        const isMessageNotFound = error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
-        if (isMessageNotFound) {
-          throw error;
-        }
-        const errorMessage = `Failure while mapping events. Affected '${event.type}' event: ${error.message}`;
-        this.logger.error(errorMessage, {error, event});
+    return this._mapJsonEvent(event, conversationEntity).catch(error => {
+      const isMessageNotFound = error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
+      if (isMessageNotFound) {
+        throw error;
+      }
+      const errorMessage = `Failure while mapping events. Affected '${event.type}' event: ${error.message}`;
+      this.logger.error(errorMessage, {error, event});
 
-        const customData = {eventTime: new Date(event.time).toISOString(), eventType: event.type};
-        Raygun.send(new Error(errorMessage), customData);
-
-        throw new ConversationError(
-          ConversationError.TYPE.MESSAGE_NOT_FOUND,
-          ConversationError.MESSAGE.MESSAGE_NOT_FOUND,
-        );
-      });
+      throw new ConversationError(
+        ConversationError.TYPE.MESSAGE_NOT_FOUND,
+        ConversationError.MESSAGE.MESSAGE_NOT_FOUND,
+      );
+    });
   }
 
   /**
@@ -124,7 +117,7 @@ export class EventMapper {
    * Will try to do as little updates as possible to avoid to many observable emission.
    *
    * @param {Message} originalEntity the original message to update
-   * @param {Object} event new json data to feed into the entity
+   * @param {EventRecord} event new json data to feed into the entity
    * @returns {Promise<Message>} - the updated message entity
    */
   async updateMessageEvent(originalEntity, event) {

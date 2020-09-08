@@ -123,6 +123,7 @@
       <section class="preferences-section preferences-section-data-usage">
         <hr class="preferences-separator">
         <header class="preferences-header" data-bind="text: t('preferencesAccountData')"></header>
+
         <div class="preferences-option">
           <div class="preferences-option-icon checkbox accent-text" data-bind="attr: {'data-uie-value': optionPrivacy}" data-uie-name="status-preference-privacy">
             <input type="checkbox" id="privacy-checkbox" data-bind="checked: optionPrivacy">
@@ -130,6 +131,16 @@
           </div>
         </div>
         <div class="preferences-detail" data-bind="text: t('preferencesAccountDataDetail', brandName)"></div>
+
+        <!-- ko if: isTeam() && isCountlyEnabled -->
+          <div class="preferences-option">
+            <div class="preferences-option-icon checkbox accent-text" data-bind="attr: {'data-uie-value': optionTelemetrySharing}" data-uie-name="status-preference-telemetry">
+              <input type="checkbox" id="telemetry-checkbox" data-bind="checked: optionTelemetrySharing">
+              <label class="preferences-options-checkbox-label" for="telemetry-checkbox" data-bind="text: t('preferencesAccountDataTelemetryCheckbox')"></label>
+            </div>
+          </div>
+          <div class="preferences-detail" data-bind="text: t('preferencesAccountDataTelemetry', brandName)"></div>
+        <!-- /ko -->
 
         <!-- ko if: isActivatedAccount() -->
           <div class="preferences-option">

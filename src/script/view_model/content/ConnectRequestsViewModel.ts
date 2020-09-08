@@ -17,6 +17,7 @@
  *
  */
 
+import ko from 'knockout';
 import {scrollToBottom} from 'Util/scroll-helpers';
 import {isLastItem} from 'Util/ArrayUtil';
 
@@ -34,7 +35,7 @@ export class ConnectRequestsViewModel {
 
   constructor(private readonly mainViewModel: MainViewModel, private readonly userRepository: UserRepository) {
     this.actionsViewModel = this.mainViewModel.actions;
-    this.connectRequests = this.userRepository.connect_requests;
+    this.connectRequests = this.userRepository.connectRequests;
     this.ParticipantAvatar = ParticipantAvatar;
 
     this.shouldUpdateScrollbar = ko.computed(() => this.connectRequests()).extend({notify: 'always', rateLimit: 500});

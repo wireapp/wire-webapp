@@ -17,6 +17,7 @@
  *
  */
 
+import ko from 'knockout';
 import {amplify} from 'amplify';
 import {Confirmation} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -52,7 +53,7 @@ export class PropertiesRepository {
   }
 
   private readonly logger: Logger;
-  private readonly propertiesService: PropertiesService;
+  public readonly propertiesService: PropertiesService;
   public readonly receiptMode: ko.Observable<Confirmation.Type>;
   private readonly selfService: SelfService;
   private readonly selfUser: ko.Observable<User>;
@@ -86,6 +87,7 @@ export class PropertiesRepository {
         privacy: {
           improve_wire: undefined,
           report_errors: undefined,
+          telemetry_sharing: undefined,
         },
         sound: {
           alerts: AudioPreference.ALL,
@@ -102,33 +104,49 @@ export class PropertiesRepository {
   checkPrivacyPermission(): Promise<void> {
     const isCheckConsentDisabled = !Config.getConfig().FEATURE.CHECK_CONSENT;
     const isPrivacyPreferenceSet = this.getPreference(PROPERTIES_TYPE.PRIVACY) !== undefined;
+    const isTelemetryPreferenceSet = this.getPreference(PROPERTIES_TYPE.TELEMETRY_SHARING) !== undefined;
+    const isTeamAccount = this.selfUser().inTeam();
+    const enablePrivacy = () => {
+      this.savePreference(PROPERTIES_TYPE.PRIVACY, true);
+      this.publishProperties();
+    };
 
-    return isCheckConsentDisabled || isPrivacyPreferenceSet
-      ? Promise.resolve()
-      : new Promise(resolve => {
-          amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
-            preventClose: true,
-            primaryAction: {
-              action: () => {
-                this.savePreference(PROPERTIES_TYPE.PRIVACY, true);
-                this.publishProperties();
-                resolve();
-              },
-              text: t('modalImproveWireAction'),
-            },
-            secondaryAction: {
-              action: () => {
-                this.savePreference(PROPERTIES_TYPE.PRIVACY, false);
-                resolve();
-              },
-              text: t('modalImproveWireSecondary'),
-            },
-            text: {
-              message: t('modalImproveWireMessage', Config.getConfig().BRAND_NAME),
-              title: t('modalImproveWireHeadline', Config.getConfig().BRAND_NAME),
-            },
-          });
-        });
+    if (!isTelemetryPreferenceSet && isTeamAccount) {
+      this.savePreference(PROPERTIES_TYPE.TELEMETRY_SHARING, true);
+      this.publishProperties();
+    }
+
+    if (isCheckConsentDisabled || isPrivacyPreferenceSet) {
+      return Promise.resolve();
+    }
+
+    if (isTeamAccount) {
+      return Promise.resolve();
+    }
+
+    return new Promise(resolve => {
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+        preventClose: true,
+        primaryAction: {
+          action: () => {
+            enablePrivacy();
+            resolve();
+          },
+          text: t('modalImproveWireAction'),
+        },
+        secondaryAction: {
+          action: () => {
+            this.savePreference(PROPERTIES_TYPE.PRIVACY, false);
+            resolve();
+          },
+          text: t('modalImproveWireSecondary'),
+        },
+        text: {
+          message: t('modalImproveWireMessage', Config.getConfig().BRAND_NAME),
+          title: t('modalImproveWireHeadline', Config.getConfig().BRAND_NAME),
+        },
+      });
+    });
   }
 
   getPreference(propertiesType: string): any {
@@ -294,6 +312,9 @@ export class PropertiesRepository {
         break;
       case PROPERTIES_TYPE.PRIVACY:
         amplify.publish(WebAppEvents.PROPERTIES.UPDATE.PRIVACY, updatedPreference);
+        break;
+      case PROPERTIES_TYPE.TELEMETRY_SHARING:
+        amplify.publish(WebAppEvents.PROPERTIES.UPDATE.TELEMETRY_SHARING, updatedPreference);
         break;
       case PROPERTIES_TYPE.SOUND_ALERTS:
         amplify.publish(WebAppEvents.PROPERTIES.UPDATE.SOUND_ALERTS, updatedPreference);

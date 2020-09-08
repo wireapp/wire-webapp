@@ -36,6 +36,7 @@ import type {TeamRepository} from '../../team/TeamRepository';
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
 import type {User} from '../../entity/User';
 import {PanelViewModel} from '../PanelViewModel';
+import type {PanelParams} from '../PanelViewModel';
 import {ClientEvent} from '../../event/Client';
 import type {MemberLeaveEvent} from '../../conversation/EventBuilder';
 
@@ -126,7 +127,8 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
     this.navigateTo(PanelViewModel.STATE.PARTICIPANT_DEVICES, {entity: this.selectedParticipant()});
   }
 
-  initView({entity: userEntity}: {entity: User}): void {
+  initView({entity: userEntity}: PanelParams): void {
+    userEntity = userEntity as User;
     if (userEntity.isDeleted) {
       return this.onGoToRoot();
     }

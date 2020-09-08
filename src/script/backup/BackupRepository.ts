@@ -18,7 +18,6 @@
  */
 
 import type Dexie from 'dexie';
-import JSZip from 'jszip';
 
 import {chunk} from 'Util/ArrayUtil';
 import {Logger, getLogger} from 'Util/Logger';
@@ -26,11 +25,12 @@ import {Logger, getLogger} from 'Util/Logger';
 import type {ClientRepository} from '../client/ClientRepository';
 import type {ConnectionRepository} from '../connection/ConnectionRepository';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
-import type {Conversation} from '../entity/Conversation';
+import type {Conversation, SerializedConversation} from '../entity/Conversation';
 import {ClientEvent} from '../event/Client';
 import {StorageSchemata} from '../storage/StorageSchemata';
 import type {UserRepository} from '../user/UserRepository';
 import {BackupService} from './BackupService';
+import {WebWorker} from '../util/worker';
 import {
   CancelError,
   DifferentAccountError,
@@ -123,12 +123,12 @@ export class BackupRepository {
    * @param progressCallback called on every step of the export
    * @returns The promise that contains all the exported tables
    */
-  public async generateHistory(progressCallback: (tableRows: number) => void): Promise<JSZip> {
+  public async generateHistory(progressCallback: (tableRows: number) => void): Promise<Blob> {
     this.isCanceled = false;
 
     try {
       const exportedData = await this._exportHistory(progressCallback);
-      return this.compressHistoryFiles(exportedData);
+      return await this.compressHistoryFiles(exportedData);
     } catch (error) {
       this.logger.error(`Could not export history: ${error.message}`, error);
       const isCancelError = error instanceof CancelError;
@@ -201,23 +201,27 @@ export class BackupRepository {
     return [].concat(...tableData);
   }
 
-  private compressHistoryFiles(exportedData: Record<string, any>): JSZip {
+  private async compressHistoryFiles(exportedData: Record<string, any>): Promise<Blob> {
     const metaData = this.createMetaData();
-    const zip = new JSZip();
 
-    // first write the metadata file
+    const files: Record<string, Uint8Array> = {};
+
     const stringifiedMetadata = JSON.stringify(metaData, null, 2);
     const encodedMetadata = new TextEncoder().encode(stringifiedMetadata);
-    zip.file(BackupRepository.CONFIG.FILENAME.METADATA, encodedMetadata, {binary: true});
 
-    // then all the other tables
-    Object.keys(exportedData).forEach(tableName => {
+    for (const tableName in exportedData) {
       const stringifiedData = JSON.stringify(exportedData[tableName]);
       const encodedData = new TextEncoder().encode(stringifiedData);
-      zip.file(`${tableName}.json`, encodedData, {binary: true});
-    });
+      const fileName = `${tableName}.json`;
+      files[fileName] = encodedData;
+    }
 
-    return zip;
+    files[BackupRepository.CONFIG.FILENAME.METADATA] = encodedMetadata;
+
+    const worker = new WebWorker('worker/jszip-pack-worker.js');
+
+    const array = await worker.post<Uint8Array>(files);
+    return new Blob([array], {type: 'application/zip'});
   }
 
   public getBackupInitData(): Promise<number> {
@@ -285,7 +289,7 @@ export class BackupRepository {
 
     const entityChunks = chunk(conversationEntities, BackupService.CONFIG.BATCH_SIZE);
 
-    const importConversationChunk = async (conversationChunk: Conversation[]): Promise<void> => {
+    const importConversationChunk = async (conversationChunk: SerializedConversation[]): Promise<void> => {
       const importedConversationEntities = await this.conversationRepository.updateConversationStates(
         conversationChunk,
       );

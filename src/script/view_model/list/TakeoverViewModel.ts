@@ -29,7 +29,7 @@ import type {ConversationRepository} from '../../conversation/ConversationReposi
 import type {ListViewModel} from '../ListViewModel';
 import type {User} from '../../entity/User';
 
-class TakeoverViewModel {
+export class TakeoverViewModel {
   readonly brandName: string;
   readonly supportUsernameUrl: string;
   readonly name: ko.PureComputed<string>;
@@ -63,7 +63,7 @@ class TakeoverViewModel {
         return amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
       }
 
-      if (this.userRepository.connect_requests().length) {
+      if (this.userRepository.connectRequests().length) {
         amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.CONNECTION_REQUESTS);
       }
     } catch (error) {
@@ -73,5 +73,3 @@ class TakeoverViewModel {
     }
   };
 }
-
-export {TakeoverViewModel};

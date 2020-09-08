@@ -28,7 +28,7 @@ import {errors as ProteusErrors, keys as ProteusKeys} from '@wireapp/proteus';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import type {PreKey as BackendPreKey} from '@wireapp/api-client/dist/auth/';
-import * as HTTP_STATUS from 'http-status-codes';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {arrayToBase64, base64ToArray, zeroPadding} from 'Util/util';
@@ -42,9 +42,6 @@ import {UserError} from '../error/UserError';
 import type {CryptographyService} from './CryptographyService';
 import type {StorageRepository, EventRecord} from '../storage';
 import {EventBuilder} from '../conversation/EventBuilder';
-import {RaygunStatic} from 'raygun4js';
-
-declare const Raygun: RaygunStatic;
 
 export interface SignalingKeys {
   enckey: string;
@@ -331,7 +328,6 @@ export class CryptographyRepository {
   ): Promise<CryptoboxSession | void> {
     try {
       if (!preKey) {
-        Raygun.send(new Error('Failed to create session: No pre-key found'));
         this.logger.warn(`No pre-key for user '${userId}' ('${clientId}') found. The client might have been deleted.`);
       } else {
         this.logger.log(`Initializing session with user '${userId}' (${clientId}) with pre-key ID '${preKey.id}'.`);
@@ -340,7 +336,6 @@ export class CryptographyRepository {
         return this.cryptobox.session_from_prekey(sessionId, preKeyArray.buffer);
       }
     } catch (error) {
-      Raygun.send(new Error(`Failed to create session: ${error.message}`));
       const message = `Pre-key for user '${userId}' ('${clientId}') invalid. Skipping encryption: ${error.message}`;
       this.logger.warn(message, error);
     }
@@ -354,7 +349,7 @@ export class CryptographyRepository {
     const cipherPayloadPromises = Object.entries(recipients).reduce<Promise<EncryptedPayload>[]>(
       (accumulator, [userId, clientIds]) => {
         if (clientIds && clientIds.length) {
-          messagePayload.recipients[userId] = messagePayload.recipients[userId] || {};
+          messagePayload.recipients[userId] ||= {};
           clientIds.forEach(clientId => {
             const sessionId = this.constructSessionId(userId, clientId);
             const encryptionPromise = this.encryptPayloadForSession(sessionId, genericMessage);
@@ -410,7 +405,7 @@ export class CryptographyRepository {
       if (cipherText) {
         messagePayload.recipients[userId][clientId] = cipherText;
       } else {
-        missingRecipients[userId] = missingRecipients[userId] || [];
+        missingRecipients[userId] ||= [];
         missingRecipients[userId].push(clientId);
       }
     });
@@ -526,7 +521,7 @@ export class CryptographyRepository {
   }
 
   /**
-   * Report decryption error to Localytics and stack traces to Raygun.
+   * Report decryption error to Countly.
    *
    * @param Error error Error from event decryption
    */
@@ -537,16 +532,5 @@ export class CryptographyRepository {
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.E2EE.FAILED_MESSAGE_DECRYPTION, {
       cause: (error as AxiosError).code || error.message,
     });
-
-    const customData = {
-      clientLocalClass: this.currentClient().class,
-      clientLocalType: this.currentClient().type,
-      errorCode: (error as AxiosError).code,
-      eventType: eventType,
-    };
-
-    const raygunError = new Error(`Decryption failed: ${(error as AxiosError).code || error.message}`);
-    raygunError.stack = error.stack;
-    Raygun.send(raygunError, customData);
   }
 }

@@ -38,3 +38,14 @@ export const rootMeanSquare = (floatArray: number[] | Float32Array): number => {
   const sum = (floatArray as number[]).reduce((power, number) => power + number ** 2, 0);
   return Math.sqrt(sum) / floatArray.length;
 };
+
+/**
+ * The rounding is logarithmic, meaning that small numbers will be slightly
+ * rounded (if at all) whereas larger numbers will be rounded more.
+ * This kind of rounding is roughly equivalent to having buckets with increasing size.
+ * @param exactValue number to be rounded
+ * @param factor determines by how much the value is rounded
+ */
+export const roundLogarithmic = (exactValue: number, factor: number): number => {
+  return Math.ceil(2 ** (Math.floor(factor * Math.log2(exactValue)) / factor));
+};

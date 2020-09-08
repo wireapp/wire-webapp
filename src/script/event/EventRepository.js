@@ -20,7 +20,7 @@
 import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {USER_EVENT} from '@wireapp/api-client/dist/event';
-import * as HTTP_STATUS from 'http-status-codes';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
 
 import {getLogger} from 'Util/Logger';
@@ -548,8 +548,8 @@ export class EventRepository {
    * Inject event into a conversation.
    * @note Don't add unable to decrypt to self conversation
    *
-   * @param {Object} event Event payload to be injected
-   * @param {EventRepository.SOURCE} [source=EventRepository.SOURCE.INJECTED] Source of injection
+   * @param {ConversationEvent} event Event payload to be injected
+   * @param {string} [source=EventRepository.SOURCE.INJECTED] Source of injection
    * @returns {Promise<Event>} Resolves when the event has been processed
    */
   injectEvent(event, source = EventRepository.SOURCE.INJECTED) {

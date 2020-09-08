@@ -26,12 +26,14 @@ import {formatLocale} from 'Util/TimeUtil';
 
 import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
 import {SuperType} from '../../message/SuperType';
-import type {Message, ReadReceipt} from '../../entity/message/Message';
+import type {Message} from '../../entity/message/Message';
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
 import type {TeamRepository} from '../../team/TeamRepository';
 import type {User} from '../../entity/User';
 import type {ContentMessage} from '../../entity/message/ContentMessage';
 import type {MemberMessage} from '../../entity/message/MemberMessage';
+import type {PanelParams} from '../PanelViewModel';
+import type {ReadReceipt} from '../../storage/EventRecord';
 
 export class MessageDetailsViewModel extends BasePanelViewModel {
   conversationRepository: ConversationRepository;
@@ -40,7 +42,7 @@ export class MessageDetailsViewModel extends BasePanelViewModel {
   likes: ko.PureComputed<string[]>;
   likesTitle: ko.PureComputed<string>;
   likeUsers: ko.ObservableArray<User>;
-  message: ko.PureComputed<ContentMessage | MemberMessage | undefined>;
+  message: ko.PureComputed<Message | ContentMessage | MemberMessage | undefined>;
   messageId: ko.Observable<string>;
   panelTitle: ko.PureComputed<string>;
   receipts: ko.PureComputed<ReadReceipt[]>;
@@ -197,7 +199,7 @@ export class MessageDetailsViewModel extends BasePanelViewModel {
     return this.messageId();
   }
 
-  initView({entity: {id}, showLikes}: {entity: Message; showLikes: boolean}): void {
+  initView({entity: {id}, showLikes}: PanelParams): void {
     this.isReceiptsOpen(!showLikes);
     this.messageId(id);
   }

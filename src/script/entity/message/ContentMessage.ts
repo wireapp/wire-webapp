@@ -35,7 +35,7 @@ import {AssetRepository} from '../../assets/AssetRepository';
 
 export class ContentMessage extends Message {
   private readonly isLikedProvisional: ko.Observable<boolean>;
-  private readonly reactions_user_ets: ko.ObservableArray<User>;
+  public readonly reactions_user_ets: ko.ObservableArray<User>;
   public readonly assets: ko.ObservableArray<Asset | FileAsset | TextAsset | MediumImage>;
   public readonly is_liked: ko.PureComputed<boolean>;
   public readonly like_caption: ko.PureComputed<string>;

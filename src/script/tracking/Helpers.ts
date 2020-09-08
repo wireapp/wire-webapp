@@ -17,11 +17,10 @@
  *
  */
 
-import {Environment} from 'Util/Environment';
-
 import {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';
-import {ConversationType, PlatformType, UserType} from './attribute';
+import {ConversationType, UserType, PlatformType} from './attribute';
+import {Runtime} from '@wireapp/commons';
 
 /**
  * Get corresponding tracking attribute for conversation type.
@@ -83,12 +82,12 @@ export function getParticipantTypes(
  * @returns Mapped platform type
  */
 export function getPlatform(): PlatformType {
-  if (!Environment.desktop) {
+  if (!Runtime.isDesktopApp()) {
     return PlatformType.BROWSER_APP;
   }
 
-  if (Environment.os.win) {
+  if (Runtime.isWindows()) {
     return PlatformType.DESKTOP_WINDOWS;
   }
-  return Environment.os.mac ? PlatformType.DESKTOP_MACOS : PlatformType.DESKTOP_LINUX;
+  return Runtime.isMacOS() ? PlatformType.DESKTOP_MACOS : PlatformType.DESKTOP_LINUX;
 }

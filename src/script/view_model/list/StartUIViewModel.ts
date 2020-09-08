@@ -33,7 +33,6 @@ import {User} from '../../entity/User';
 import {generatePermissionHelpers} from '../../user/UserPermission';
 import {validateHandle} from '../../user/UserHandleGenerator';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {EventName} from '../../tracking/EventName';
 import {SearchRepository} from '../../search/SearchRepository';
 import {sortByPriority} from 'Util/StringUtil';
 import {ListViewModel} from '../ListViewModel';
@@ -46,7 +45,7 @@ import type {ActionsViewModel} from '../ActionsViewModel';
 import type {ServiceEntity} from '../../integration/ServiceEntity';
 import type {Conversation} from '../../entity/Conversation';
 
-class StartUIViewModel {
+export class StartUIViewModel {
   readonly brandName: string;
   readonly UserlistMode: typeof UserlistMode;
   readonly teamName: ko.PureComputed<string>;
@@ -162,7 +161,7 @@ class StartUIViewModel {
         return teamUsersWithoutPartners;
       }
 
-      return this.userRepository.connected_users();
+      return this.userRepository.connectedUsers();
     });
 
     this.matchedUsers = ko.observableArray([]);
@@ -245,7 +244,6 @@ class StartUIViewModel {
   clickOnCreateGuestRoom = (): void => {
     this.conversationRepository.createGuestRoom().then(conversationEntity => {
       amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.GUEST_ROOMS.GUEST_ROOM_CREATION);
     });
   };
 
@@ -254,13 +252,11 @@ class StartUIViewModel {
       return;
     }
     safeWindowOpen(this.manageTeamUrl);
-    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.SETTINGS.OPENED_MANAGE_TEAM);
   };
 
   clickOpenManageServices = () => {
     if (this.manageServicesUrl) {
       safeWindowOpen(this.manageServicesUrl);
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.SETTINGS.OPENED_MANAGE_TEAM);
     }
   };
 
@@ -386,7 +382,7 @@ class StartUIViewModel {
     const trimmedQuery = query.trim();
     const isHandle = trimmedQuery.startsWith('@') && validateHandle(normalizedQuery);
 
-    const allLocalUsers = this.isTeam() ? this.teamRepository.teamUsers() : this.userRepository.connected_users();
+    const allLocalUsers = this.isTeam() ? this.teamRepository.teamUsers() : this.userRepository.connectedUsers();
 
     const localSearchSources = this.showOnlyConnectedUsers()
       ? this.conversationRepository.connectedUsers()
@@ -441,5 +437,3 @@ class StartUIViewModel {
     }
   };
 }
-
-export {StartUIViewModel};

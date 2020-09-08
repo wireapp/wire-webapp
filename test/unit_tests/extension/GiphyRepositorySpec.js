@@ -18,7 +18,7 @@
  */
 
 import {container} from 'tsyringe';
-import * as HTTP_STATUS from 'http-status-codes';
+import {StatusCodes as HTTP_STATUS, ReasonPhrases as HTTP_MESSAGE} from 'http-status-codes';
 
 import {GiphyRepository} from 'src/script/extension/GiphyRepository';
 import {GiphyService} from 'src/script/extension/GiphyService';
@@ -70,7 +70,7 @@ describe('Giphy Repository', () => {
           type: 'gif',
           url: 'http://giphy.com/gifs/big-thank-indulging-GKLmFicoabZrW',
         },
-        meta: {msg: 'OK', status: HTTP_STATUS.OK},
+        meta: {msg: HTTP_MESSAGE.OK, status: HTTP_STATUS.OK},
       }),
     ]);
 
@@ -205,7 +205,7 @@ describe('Giphy Repository', () => {
           url: 'https://giphy.com/gifs/big-thank-indulging-GKLmFicoabZrW',
           username: '',
         },
-        meta: {msg: 'OK', status: HTTP_STATUS.OK},
+        meta: {msg: HTTP_MESSAGE.OK, status: HTTP_STATUS.OK},
       }),
     ]);
     server.autoRespond = true;

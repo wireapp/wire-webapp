@@ -17,15 +17,15 @@
  *
  */
 
-import {Environment} from 'Util/Environment';
 import ko from 'knockout';
 
 import {ContentViewModel} from '../ContentViewModel';
 import {ListViewModel} from '../ListViewModel';
 import type {UserRepository} from 'src/script/user/UserRepository';
 import type {CallingRepository} from 'src/script/calling/CallingRepository';
+import {Runtime} from '@wireapp/commons';
 
-class PreferencesListViewModel {
+export class PreferencesListViewModel {
   contentState: ko.Observable<string>;
   isActivatedAccount: ko.PureComputed<boolean>;
   isDesktop: boolean;
@@ -48,7 +48,7 @@ class PreferencesListViewModel {
     this.contentViewModel = contentViewModel;
     this.contentState = this.contentViewModel.state;
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
-    this.isDesktop = Environment.desktop;
+    this.isDesktop = Runtime.isDesktopApp();
 
     this.supportsCalling = callingRepository.supportsCalling;
 
@@ -100,5 +100,3 @@ class PreferencesListViewModel {
     this.contentViewModel.switchContent(newContentState);
   };
 }
-
-export {PreferencesListViewModel};

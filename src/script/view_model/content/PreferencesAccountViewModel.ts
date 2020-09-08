@@ -24,11 +24,10 @@ import ko from 'knockout';
 import {WebappProperties} from '@wireapp/api-client/dist/user/data';
 import type {RichInfoField} from '@wireapp/api-client/dist/user/RichInfo';
 import {ChangeEvent} from 'react';
-import * as HTTP_STATUS from 'http-status-codes';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {t} from 'Util/LocalizerUtil';
 import {isTemporaryClientAndNonPersistent, validateProfileImageResolution} from 'Util/util';
-import {Environment} from 'Util/Environment';
 import {isKey, KEY} from 'Util/KeyboardUtil';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 
@@ -48,9 +47,8 @@ import {nameFromType} from '../../user/AvailabilityMapper';
 import {ParticipantAvatar} from 'Components/participantAvatar';
 import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
 import {MotionDuration} from '../../motion/MotionDuration';
-import {EventName} from '../../tracking/EventName';
 import {ContentViewModel} from '../ContentViewModel';
-import {Logger} from '@wireapp/commons';
+import {Logger, Runtime} from '@wireapp/commons';
 import {getLogger} from 'Util/Logger';
 
 import 'Components/availabilityState';
@@ -64,6 +62,7 @@ import {ConversationRepository} from '../../conversation/ConversationRepository'
 import {TeamRepository} from '../../team/TeamRepository';
 import {AccentColorID} from '@wireapp/commons/dist/commonjs/util/AccentColor';
 import {TeamEntity} from '../../team/TeamEntity';
+import type {ClientEntity} from 'src/script/client/ClientEntity';
 
 export class PreferencesAccountViewModel {
   logger: Logger;
@@ -87,6 +86,7 @@ export class PreferencesAccountViewModel {
   team: ko.Observable<TeamEntity>;
   teamName: ko.PureComputed<string>;
   optionPrivacy: ko.Observable<boolean>;
+  optionTelemetrySharing: ko.Observable<boolean>;
   optionReadReceipts: ko.Observable<Confirmation.Type>;
   optionMarketingConsent: ko.Observable<boolean | ConsentValue>;
   optionResetAppLock: boolean;
@@ -99,6 +99,7 @@ export class PreferencesAccountViewModel {
   canEditProfile: (user: User) => boolean;
   Config: typeof PreferencesAccountViewModel.CONFIG;
   UserNameState: typeof PreferencesAccountViewModel.USERNAME_STATE;
+  isCountlyEnabled: boolean = false;
 
   static get CONFIG() {
     return {
@@ -126,8 +127,9 @@ export class PreferencesAccountViewModel {
   ) {
     this.logger = getLogger('PreferencesAccountViewModel');
     this.fileExtension = HistoryExportViewModel.CONFIG.FILE_EXTENSION;
-    this.isDesktop = Environment.desktop;
+    this.isDesktop = Runtime.isDesktopApp();
     this.brandName = Config.getConfig().BRAND_NAME;
+    this.isCountlyEnabled = !!Config.getConfig().COUNTLY_API_KEY;
 
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
     this.selfUser = this.userRepository.self;
@@ -167,13 +169,18 @@ export class PreferencesAccountViewModel {
       this.propertiesRepository.savePreference(PROPERTIES_TYPE.PRIVACY, privacyPreference);
     });
 
+    this.optionTelemetrySharing = ko.observable();
+    this.optionTelemetrySharing.subscribe(privacyPreference => {
+      this.propertiesRepository.savePreference(PROPERTIES_TYPE.TELEMETRY_SHARING, privacyPreference);
+    });
+
     this.optionReadReceipts = this.propertiesRepository.receiptMode;
     this.optionMarketingConsent = this.propertiesRepository.marketingConsent;
 
     this.optionResetAppLock = isAppLockEnabled();
     this.ParticipantAvatar = ParticipantAvatar;
 
-    this.isMacOsWrapper = Environment.electron && Environment.os.mac;
+    this.isMacOsWrapper = Runtime.isDesktopApp() && Runtime.isMacOS();
     this.manageTeamUrl = getManageTeamUrl('client_settings');
     this.createTeamUrl = getCreateTeamUrl('client');
 
@@ -310,7 +317,7 @@ export class PreferencesAccountViewModel {
         modals.showModal(
           ModalsViewModel.TYPE.ACCOUNT_NEW_DEVICES,
           {
-            data: aggregatedNotifications.map(notification => notification.data),
+            data: aggregatedNotifications.map(notification => notification.data) as ClientEntity[],
             preventClose: true,
             secondaryAction: {
               action: () => {
@@ -327,7 +334,7 @@ export class PreferencesAccountViewModel {
         modals.showModal(
           ModalsViewModel.TYPE.ACCOUNT_READ_RECEIPTS_CHANGED,
           {
-            data: aggregatedNotifications.pop().data,
+            data: aggregatedNotifications.pop().data as boolean,
             preventClose: true,
           },
           undefined,
@@ -414,7 +421,6 @@ export class PreferencesAccountViewModel {
   clickOpenManageTeam = (): void => {
     if (this.manageTeamUrl) {
       safeWindowOpen(this.manageTeamUrl);
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.SETTINGS.OPENED_MANAGE_TEAM);
     }
   };
 
@@ -483,7 +489,7 @@ export class PreferencesAccountViewModel {
     }
   };
 
-  shouldFocusUsername = (): boolean => this.userRepository.should_set_username;
+  shouldFocusUsername = (): boolean => this.userRepository.shouldSetUsername;
 
   verifyUsername = (username: string, event: ChangeEvent<HTMLInputElement>): void => {
     const enteredUsername = event.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '');
@@ -544,5 +550,6 @@ export class PreferencesAccountViewModel {
 
   updateProperties = ({settings}: WebappProperties): void => {
     this.optionPrivacy(settings.privacy.improve_wire);
+    this.optionTelemetrySharing(settings.privacy.telemetry_sharing);
   };
 }

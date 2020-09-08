@@ -24,7 +24,6 @@ import {amplify} from 'amplify';
 
 import {t} from 'Util/LocalizerUtil';
 import {iterateItem} from 'Util/ArrayUtil';
-import {Environment} from 'Util/Environment';
 import {isEscapeKey} from 'Util/KeyboardUtil';
 
 import {ArchiveViewModel} from './list/ArchiveViewModel';
@@ -42,14 +41,9 @@ import {ContentViewModel} from './ContentViewModel';
 import {DefaultLabelIds} from '../conversation/ConversationLabelRepository';
 import {ModalsViewModel} from './ModalsViewModel';
 import {PanelViewModel} from './PanelViewModel';
-import type {MainViewModel} from './MainViewModel';
+import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 import type {CallingRepository} from '../calling/CallingRepository';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
-import type {EventRepository} from '../event/EventRepository';
-import type {IntegrationRepository} from '../integration/IntegrationRepository';
-import type {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
-import type {PropertiesRepository} from '../properties/PropertiesRepository';
-import type {SearchRepository} from '../search/SearchRepository';
 import type {TeamRepository} from '../team/TeamRepository';
 import type {UserRepository} from '../user/UserRepository';
 import type {ActionsViewModel} from './ActionsViewModel';
@@ -57,18 +51,7 @@ import type {Conversation} from '../entity/Conversation';
 import type {ClientEntity} from '../client/ClientEntity';
 import type {User} from '../entity/User';
 import type {AssetRemoteData} from '../assets/AssetRemoteData';
-
-interface Repositories {
-  calling: CallingRepository;
-  conversation: ConversationRepository;
-  event: EventRepository;
-  integration: IntegrationRepository;
-  preferenceNotification: PreferenceNotificationRepository;
-  properties: PropertiesRepository;
-  search: SearchRepository;
-  team: TeamRepository;
-  user: UserRepository;
-}
+import {Runtime} from '@wireapp/commons';
 
 export class ListViewModel {
   readonly preferences: PreferencesListViewModel;
@@ -91,7 +74,7 @@ export class ListViewModel {
   private readonly isProAccount: ko.PureComputed<boolean>;
   private readonly selfUser: ko.Observable<User>;
   private readonly modal: ko.Observable<string>;
-  private readonly visibleListItems: ko.PureComputed<string[]>;
+  private readonly visibleListItems: ko.PureComputed<(string | Conversation)[]>;
   private readonly archive: ArchiveViewModel;
   private readonly conversations: ConversationListViewModel;
   private readonly start: StartUIViewModel;
@@ -113,7 +96,7 @@ export class ListViewModel {
     };
   }
 
-  constructor(mainViewModel: MainViewModel, repositories: Repositories) {
+  constructor(mainViewModel: MainViewModel, repositories: ViewModelRepositories) {
     this.elementId = 'left-column';
     this.conversationRepository = repositories.conversation;
     this.callingRepository = repositories.calling;
@@ -152,15 +135,15 @@ export class ListViewModel {
           ContentViewModel.STATE.PREFERENCES_AV,
         ];
 
-        if (!Environment.desktop) {
+        if (!Runtime.isDesktopApp()) {
           preferenceItems.push(ContentViewModel.STATE.PREFERENCES_ABOUT);
         }
 
         return preferenceItems;
       }
 
-      const hasConnectRequests = !!this.userRepository.connect_requests().length;
-      const states = hasConnectRequests ? [ContentViewModel.STATE.CONNECTION_REQUESTS] : [];
+      const hasConnectRequests = !!this.userRepository.connectRequests().length;
+      const states: (string | Conversation)[] = hasConnectRequests ? [ContentViewModel.STATE.CONNECTION_REQUESTS] : [];
       return states.concat(this.conversationRepository.conversations_unarchived());
     });
 
@@ -285,7 +268,7 @@ export class ListViewModel {
       activePreference = ContentViewModel.STATE.PREFERENCES_DEVICES;
     }
 
-    const nextPreference = iterateItem(this.visibleListItems(), activePreference, reverse);
+    const nextPreference = iterateItem(this.visibleListItems(), activePreference, reverse) as string;
     if (nextPreference) {
       this.contentViewModel.switchContent(nextPreference);
     }

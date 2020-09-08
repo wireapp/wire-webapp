@@ -18,17 +18,13 @@
  */
 
 import ko from 'knockout';
+import {Confirmation} from '@wireapp/protocol-messaging';
 
 import type {Conversation} from '../entity/Conversation';
 
 interface ReceiptModeToggleParams {
   conversation: ko.Observable<Conversation>;
-  onReceiptModeChanged: (
-    conversation: Conversation,
-    data: {
-      receipt_mode: 1 | 0;
-    },
-  ) => void;
+  onReceiptModeChanged: (conversation: Conversation, receiptMode: Confirmation.Type) => void;
 }
 
 class ReceiptModeToggle {
@@ -37,11 +33,11 @@ class ReceiptModeToggle {
   constructor(params: ReceiptModeToggleParams) {
     this.conversation = ko.unwrap(params.conversation);
     this.updateValue = (_data: unknown, event: Event) => {
-      const intValue = (event.target as HTMLInputElement).checked ? 1 : 0;
-      this.conversation.receiptMode(intValue);
-      params.onReceiptModeChanged(this.conversation, {
-        receipt_mode: intValue,
-      });
+      const receiptMode = (event.target as HTMLInputElement).checked
+        ? Confirmation.Type.READ
+        : Confirmation.Type.DELIVERED;
+      this.conversation.receiptMode(receiptMode);
+      params.onReceiptModeChanged(this.conversation, receiptMode);
     };
   }
 }

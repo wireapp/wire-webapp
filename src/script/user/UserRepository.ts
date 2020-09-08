@@ -30,7 +30,7 @@ import ko from 'knockout';
 import {flatten} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import type {AxiosError} from 'axios';
-import * as HTTP_STATUS from 'http-status-codes';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {chunk, partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -38,19 +38,16 @@ import {Logger, getLogger} from 'Util/Logger';
 import {sortUsersByPriority} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {createRandomUuid, loadUrlBlob} from 'Util/util';
-import {UNSPLASH_URL} from '../externalRoute';
 
+import {UNSPLASH_URL} from '../externalRoute';
 import {mapProfileAssetsV1} from '../assets/AssetMapper';
 import {User} from '../entity/User';
 
 import {ClientEvent} from '../event/Client';
 import {EventRepository} from '../event/EventRepository';
 import type {EventSource} from '../event/EventSource';
-
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
-import {EventName} from '../tracking/EventName';
-
 import {
   HIDE_REQUEST_MODAL,
   SHOW_LEGAL_HOLD_MODAL,
@@ -62,7 +59,6 @@ import {ConsentValue} from './ConsentValue';
 import {createSuggestions} from './UserHandleGenerator';
 import {UserMapper} from './UserMapper';
 import type {UserService} from './UserService';
-
 import {AssetRepository} from '../assets/AssetRepository';
 import {ClientEntity} from '../client/ClientEntity';
 import {ClientMapper} from '../client/ClientMapper';
@@ -77,25 +73,25 @@ import {UserError} from '../error/UserError';
 export class UserRepository {
   private readonly assetRepository: AssetRepository;
   private readonly clientRepository: ClientRepository;
-  readonly connected_users: ko.PureComputed<User[]>;
-  isTeam: ko.Observable<boolean> | ko.PureComputed<boolean>;
   private readonly logger: Logger;
   private readonly propertyRepository: PropertiesRepository;
   private readonly selfService: SelfService;
-  teamMembers: ko.PureComputed<User[]>;
-  /** Note: this does not include the self user */
-  teamUsers: ko.PureComputed<User[]>;
-  private readonly directlyConnectedUsers: ko.PureComputed<User[]>;
   private readonly userMapper: UserMapper;
   private readonly userService: UserService;
-  private readonly users: ko.ObservableArray<User>;
-  public should_set_username: boolean;
-  readonly connect_requests: ko.PureComputed<User[]>;
-  readonly isActivatedAccount: ko.PureComputed<boolean>;
-  readonly isTemporaryGuest: ko.PureComputed<boolean>;
-  readonly number_of_contacts: ko.PureComputed<number>;
-  readonly self: ko.Observable<User>;
-  getTeamMembersFromUsers: (users: User[]) => Promise<void>;
+  public directlyConnectedUsers: ko.PureComputed<User[]>;
+  public getTeamMembersFromUsers: (users: User[]) => Promise<void>;
+  public isTeam: ko.Observable<boolean> | ko.PureComputed<boolean>;
+  public readonly connectedUsers: ko.PureComputed<User[]>;
+  public readonly users: ko.ObservableArray<User>;
+  public shouldSetUsername: boolean;
+  public teamMembers: ko.PureComputed<User[]>;
+  /** Note: this does not include the self user */
+  public teamUsers: ko.PureComputed<User[]>;
+  public readonly connectRequests: ko.PureComputed<User[]>;
+  public readonly isActivatedAccount: ko.PureComputed<boolean>;
+  public readonly isTemporaryGuest: ko.PureComputed<boolean>;
+  public readonly numberOfContacts: ko.PureComputed<number>;
+  public readonly self: ko.Observable<User>;
 
   static get CONFIG() {
     return {
@@ -126,21 +122,19 @@ export class UserRepository {
     this.userService = userService;
 
     this.userMapper = new UserMapper(serverTimeHandler);
-    this.should_set_username = false;
+    this.shouldSetUsername = false;
 
     this.self = ko.observable();
     this.users = ko.observableArray([]);
 
-    this.connect_requests = ko
-      .pureComputed(() => {
-        return this.users().filter(user_et => user_et.isIncomingRequest());
-      })
+    this.connectRequests = ko
+      .pureComputed(() => this.users().filter(userEntity => userEntity.isIncomingRequest()))
       .extend({rateLimit: 50});
 
-    this.connected_users = ko
+    this.connectedUsers = ko
       .pureComputed(() => {
         return this.users()
-          .filter(user_et => user_et.isConnected())
+          .filter(userEntity => userEntity.isConnected())
           .sort(sortUsersByPriority);
       })
       .extend({rateLimit: TIME_IN_MILLIS.SECOND});
@@ -154,11 +148,10 @@ export class UserRepository {
     this.getTeamMembersFromUsers = async (_: User[]) => undefined;
     this.directlyConnectedUsers = ko.pureComputed((): User[] => []);
 
-    this.number_of_contacts = ko.pureComputed(() => {
-      const contacts = this.isTeam() ? this.teamUsers() : this.connected_users();
-      return contacts.filter(user_et => !user_et.isService).length;
+    this.numberOfContacts = ko.pureComputed(() => {
+      const contacts = this.isTeam() ? this.teamUsers() : this.connectedUsers();
+      return contacts.filter(userEntity => !userEntity.isService).length;
     });
-
     amplify.subscribe(WebAppEvents.CLIENT.ADD, this.addClientToUser.bind(this));
     amplify.subscribe(WebAppEvents.CLIENT.REMOVE, this.removeClientFromUser.bind(this));
     amplify.subscribe(WebAppEvents.CLIENT.UPDATE, this.updateClientsFromUser.bind(this));
@@ -218,7 +211,10 @@ export class UserRepository {
         this.logger.log(`Loaded state of '${users.length}' users from database`, users);
 
         await Promise.all(
-          users.map(user => this.getUserById(user.id).then(userEntity => userEntity.availability(user.availability))),
+          users.map(async user => {
+            const userEntity = await this.getUserById(user.id);
+            userEntity.availability(user.availability);
+          }),
         );
       }
 
@@ -272,56 +268,47 @@ export class UserRepository {
   /**
    * Event to update the matching user.
    */
-  userUpdate({user}: {user: Partial<APIClientUser>}): Promise<User> {
+  async userUpdate({user}: {user: Partial<APIClientUser>}): Promise<User> {
     const isSelfUser = user.id === this.self().id;
-    const userPromise = isSelfUser ? Promise.resolve(this.self()) : this.getUserById(user.id);
-    return userPromise.then(user_et => {
-      this.userMapper.updateUserFromObject(user_et, user);
-
-      if (isSelfUser) {
-        amplify.publish(WebAppEvents.TEAM.UPDATE_INFO);
-      }
-
-      return user_et;
-    });
+    const userEntity = isSelfUser ? this.self() : await this.getUserById(user.id);
+    this.userMapper.updateUserFromObject(userEntity, user);
+    if (isSelfUser) {
+      amplify.publish(WebAppEvents.TEAM.UPDATE_INFO);
+    }
+    return userEntity;
   }
 
   /**
    * Update users matching the given connections.
    */
-  updateUsersFromConnections(connectionEntities: ConnectionEntity[]): Promise<User[]> {
+  async updateUsersFromConnections(connectionEntities: ConnectionEntity[]): Promise<User[]> {
     const userIds = connectionEntities.map(connectionEntity => connectionEntity.userId);
-    return this.getUsersById(userIds).then(userEntities => {
-      userEntities.forEach(userEntity => {
-        const connectionEntity = connectionEntities.find(({userId}) => userId === userEntity.id);
-        userEntity.connection(connectionEntity);
-      });
-      return this._assignAllClients();
+    const userEntities = await this.getUsersById(userIds);
+    userEntities.forEach(userEntity => {
+      const connectionEntity_1 = connectionEntities.find(({userId}) => userId === userEntity.id);
+      userEntity.connection(connectionEntity_1);
     });
+    return this.assignAllClients();
   }
 
   /**
    * Assign all locally stored clients to the users.
    * @returns Resolves with all user entities where client entities have been assigned to.
    */
-  private _assignAllClients(): Promise<User[]> {
-    return this.clientRepository.getAllClientsFromDb().then(recipients => {
-      const userIds = Object.keys(recipients);
-      this.logger.info(`Found locally stored clients for '${userIds.length}' users`, recipients);
-
-      return this.getUsersById(userIds).then(userEntities => {
-        userEntities.forEach(userEntity => {
-          const clientEntities = recipients[userEntity.id];
-          const tooManyClients = clientEntities.length > 8;
-          if (tooManyClients) {
-            this.logger.warn(`Found '${clientEntities.length}' clients for '${userEntity.name()}'`, clientEntities);
-          }
-          userEntity.devices(clientEntities);
-        });
-
-        return userEntities;
-      });
+  private async assignAllClients(): Promise<User[]> {
+    const recipients = await this.clientRepository.getAllClientsFromDb();
+    const userIds = Object.keys(recipients);
+    this.logger.info(`Found locally stored clients for '${userIds.length}' users`, recipients);
+    const userEntities = await this.getUsersById(userIds);
+    userEntities.forEach(userEntity => {
+      const clientEntities = recipients[userEntity.id];
+      const tooManyClients = clientEntities.length > 8;
+      if (tooManyClients) {
+        this.logger.warn(`Found '${clientEntities.length}' clients for '${userEntity.name()}'`, clientEntities);
+      }
+      userEntity.devices(clientEntities);
     });
+    return userEntities;
   }
 
   /**
@@ -329,50 +316,42 @@ export class UserRepository {
    *
    * @returns Resolves with `true` when a client has been added
    */
-  addClientToUser(userId: string, clientPayload: object, publishClient: boolean = false): Promise<boolean> {
-    return this.getUserById(userId).then(userEntity => {
-      const clientEntity = ClientMapper.mapClient(clientPayload, userEntity.isMe);
-      const wasClientAdded = userEntity.addClient(clientEntity);
-
-      if (wasClientAdded) {
-        return this.clientRepository.saveClientInDb(userId, clientEntity.toJson()).then(() => {
-          if (clientEntity.isLegalHold()) {
-            amplify.publish(WebAppEvents.USER.LEGAL_HOLD_ACTIVATED, userId);
-            const isSelfUser = userId === this.self().id;
-            if (isSelfUser) {
-              amplify.publish(SHOW_LEGAL_HOLD_MODAL);
-            }
-          } else if (publishClient) {
-            amplify.publish(WebAppEvents.USER.CLIENT_ADDED, userId, clientEntity);
-          }
-          return wasClientAdded;
-        });
+  async addClientToUser(userId: string, clientPayload: object, publishClient: boolean = false): Promise<boolean> {
+    const userEntity = await this.getUserById(userId);
+    const clientEntity = ClientMapper.mapClient(clientPayload, userEntity.isMe);
+    const wasClientAdded = userEntity.addClient(clientEntity);
+    if (wasClientAdded) {
+      await this.clientRepository.saveClientInDb(userId, clientEntity.toJson());
+      if (clientEntity.isLegalHold()) {
+        amplify.publish(WebAppEvents.USER.LEGAL_HOLD_ACTIVATED, userId);
+        const isSelfUser = userId === this.self().id;
+        if (isSelfUser) {
+          amplify.publish(SHOW_LEGAL_HOLD_MODAL);
+        }
+      } else if (publishClient) {
+        amplify.publish(WebAppEvents.USER.CLIENT_ADDED, userId, clientEntity);
       }
-
-      return wasClientAdded;
-    });
+    }
+    return wasClientAdded;
   }
 
   /**
    * Removes a stored client and the session connected with it.
    */
-  removeClientFromUser(user_id: string, client_id: string): Promise<void> {
-    return this.clientRepository
-      .removeClient(user_id, client_id)
-      .then(() => this.getUserById(user_id))
-      .then(user_et => {
-        user_et.remove_client(client_id);
-        amplify.publish(WebAppEvents.USER.CLIENT_REMOVED, user_id, client_id);
-      });
+  async removeClientFromUser(userId: string, clientId: string): Promise<void> {
+    await this.clientRepository.removeClient(userId, clientId);
+    const userEntity = await this.getUserById(userId);
+    userEntity.remove_client(clientId);
+    amplify.publish(WebAppEvents.USER.CLIENT_REMOVED, userId, clientId);
   }
 
   /**
    * Update clients for given user.
    */
-  updateClientsFromUser(user_id: string, client_ets: ClientEntity[]): void {
-    this.getUserById(user_id).then(user_et => {
-      user_et.devices(client_ets);
-      amplify.publish(WebAppEvents.USER.CLIENTS_UPDATED, user_id, client_ets);
+  updateClientsFromUser(userId: string, clientEntities: ClientEntity[]): void {
+    this.getUserById(userId).then(userEntity => {
+      userEntity.devices(clientEntities);
+      amplify.publish(WebAppEvents.USER.CLIENTS_UPDATED, userId, clientEntities);
     });
   }
 
@@ -383,7 +362,6 @@ export class UserRepository {
       const oldAvailabilityValue = valueFromType(this.self().availability());
       this.logger.log(`Availability was changed from '${oldAvailabilityValue}' to '${newAvailabilityValue}'`);
       this.self().availability(availability);
-      this._trackAvailability(availability, method);
       amplify.publish(WebAppEvents.TEAM.UPDATE_INFO);
       showAvailabilityModal(availability);
     } else {
@@ -440,33 +418,24 @@ export class UserRepository {
   }
 
   /**
-   * Track availability action.
-   *
-   * @param method Method used for availability change
-   */
-  _trackAvailability(availability: Availability.Type, method: string): void {
-    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.SETTINGS.CHANGED_STATUS, {
-      method,
-      status: valueFromType(availability),
-    });
-  }
-
-  /**
    * Request account deletion.
    * @returns Resolves when account deletion process has been initiated
    */
-  deleteMe(): Promise<void> {
-    return this.selfService
-      .deleteSelf()
-      .then(() => this.logger.info('Account deletion initiated'))
-      .catch(error => this.logger.error(`Unable to delete self: ${error}`));
+  async deleteMe(): Promise<void> {
+    try {
+      await this.selfService.deleteSelf();
+      this.logger.info('Account deletion initiated');
+    } catch (error) {
+      this.logger.error(`Unable to delete self: ${error}`);
+    }
   }
 
   /**
    * Get a user from the backend.
    */
-  _fetchUserById(userId: string): Promise<User> {
-    return this.fetchUsersById([userId]).then(([userEntity]) => userEntity);
+  private async fetchUserById(userId: string): Promise<User> {
+    const [userEntity] = await this.fetchUsersById([userId]);
+    return userEntity;
   }
 
   /**
@@ -476,25 +445,25 @@ export class UserRepository {
     userIds = userIds.filter(userId => !!userId);
 
     if (!userIds.length) {
-      return Promise.resolve([]);
+      return [];
     }
 
-    const _getUsers = (chunkOfUserIds: string[]): Promise<User[]> => {
-      return this.userService
-        .getUsers(chunkOfUserIds)
-        .then(response => (response ? this.userMapper.mapUsersFromJson(response) : []))
-        .catch((error: AxiosError | BackendError) => {
-          const isNotFound = (error as AxiosError).response?.status === HTTP_STATUS.NOT_FOUND;
-          const isBadRequest = (error as BackendError).code === HTTP_STATUS.BAD_REQUEST;
-          if (isNotFound || isBadRequest) {
-            return [];
-          }
-          throw error;
-        });
+    const getUsers = async (chunkOfUserIds: string[]): Promise<User[]> => {
+      try {
+        const response = await this.userService.getUsers(chunkOfUserIds);
+        return response ? this.userMapper.mapUsersFromJson(response) : [];
+      } catch (error) {
+        const isNotFound = (error as AxiosError).response?.status === HTTP_STATUS.NOT_FOUND;
+        const isBadRequest = Number((error as BackendError).code) === HTTP_STATUS.BAD_REQUEST;
+        if (isNotFound || isBadRequest) {
+          return [];
+        }
+        throw error;
+      }
     };
 
     const chunksOfUserIds = chunk(userIds, Config.getConfig().MAXIMUM_USERS_PER_REQUEST) as string[][];
-    const resolveArray = await Promise.all(chunksOfUserIds.map(chunkOfUserIds_2 => _getUsers(chunkOfUserIds_2)));
+    const resolveArray = await Promise.all(chunksOfUserIds.map(userChunk => getUsers(userChunk)));
     const newUserEntities = flatten(resolveArray);
     if (this.isTeam()) {
       this.mapGuestStatus(newUserEntities);
@@ -503,7 +472,7 @@ export class UserRepository {
     // If there is a difference then we most likely have a case with a suspended user
     const isAllUserIds = userIds.length === fetchedUserEntities.length;
     if (!isAllUserIds) {
-      fetchedUserEntities = this._add_suspended_users(userIds, fetchedUserEntities);
+      fetchedUserEntities = this.addSuspendedUsers(userIds, fetchedUserEntities);
     }
     await this.getTeamMembersFromUsers(fetchedUserEntities);
     return fetchedUserEntities;
@@ -519,26 +488,25 @@ export class UserRepository {
   /**
    * Get self user from backend.
    */
-  getSelf(): Promise<User> {
-    return this.selfService
-      .getSelf()
-      .then(userData => this._upgradePictureAsset(userData))
-      .then(response => this.userMapper.mapSelfUserFromJson(response))
-      .then(userEntity => {
-        this.saveUser(userEntity, true);
-        return this.initMarketingConsent().then(() => userEntity);
-      })
-      .catch(error => {
-        this.logger.error(`Unable to load self user: ${error.message || error}`, [error]);
-        throw error;
-      });
+  async getSelf(): Promise<User> {
+    try {
+      const userData = await this.selfService.getSelf();
+      const response = this.upgradePictureAsset(userData);
+      const userEntity = this.userMapper.mapSelfUserFromJson(response);
+      this.saveUser(userEntity, true);
+      await this.initMarketingConsent();
+      return userEntity;
+    } catch (error) {
+      this.logger.error(`Unable to load self user: ${error.message || error}`, [error]);
+      throw error;
+    }
   }
 
   /**
    * Detects if the user has a profile picture that uses the outdated picture API.
    * Will migrate the picture to the newer assets API if so.
    */
-  private _upgradePictureAsset(userData: APIClientSelf): APIClientSelf {
+  private upgradePictureAsset(userData: APIClientSelf): APIClientSelf {
     const hasPicture = userData.picture.length;
     const hasAsset = userData.assets.length;
 
@@ -558,23 +526,27 @@ export class UserRepository {
   /**
    * Check for user locally and fetch it from the server otherwise.
    */
-  getUserById(user_id: string): Promise<User> {
-    const user = this.findUserById(user_id);
-    return user
-      ? Promise.resolve(user)
-      : this._fetchUserById(user_id).catch(error => {
-          const isNotFound = error.type === UserError.TYPE.USER_NOT_FOUND;
-          if (!isNotFound) {
-            this.logger.warn(`Failed to find user with ID '${user_id}': ${error.message}`, error);
-          }
-          throw error;
-        });
+  async getUserById(userId: string): Promise<User> {
+    let user = this.findUserById(userId);
+    if (!user) {
+      try {
+        user = await this.fetchUserById(userId);
+      } catch (error) {
+        const isNotFound = error.type === UserError.TYPE.USER_NOT_FOUND;
+        if (!isNotFound) {
+          this.logger.warn(`Failed to find user with ID '${userId}': ${error.message}`, error);
+        }
+        throw error;
+      }
+    }
+
+    return user;
   }
 
   async getUserIdByHandle(handle: string): Promise<void | string> {
     try {
-      const {user: user_id} = await this.userService.getUserByHandle(handle.toLowerCase());
-      return user_id;
+      const {user: userId} = await this.userService.getUserByHandle(handle.toLowerCase());
+      return userId;
     } catch (axiosError) {
       const error = axiosError.response || axiosError;
       if (error.status !== HTTP_STATUS.NOT_FOUND) {
@@ -585,32 +557,28 @@ export class UserRepository {
 
   /**
    * Check for users locally and fetch them from the server otherwise.
-   * @param user_ids List of user ID
+   * @param userIds List of user ID
    * @param offline Should we only look for cached contacts
    */
-  getUsersById(user_ids: string[] = [], offline: boolean = false): Promise<User[]> {
-    if (!user_ids.length) {
-      return Promise.resolve([]);
+  async getUsersById(userIds: string[] = [], offline: boolean = false): Promise<User[]> {
+    if (!userIds.length) {
+      return [];
     }
 
-    const _find_user = (user_id: string): string | User => {
-      return this.findUserById(user_id) || user_id;
-    };
+    const findUsers = userIds.map(userId => this.findUserById(userId) || userId);
 
-    const findUsers = user_ids.map(user_id => _find_user(user_id));
+    const resolveArray = await Promise.all(findUsers);
+    const [knownUserEntities, unknownUserIds] = partition(resolveArray, item => typeof item !== 'string') as [
+      User[],
+      string[],
+    ];
 
-    return Promise.all(findUsers).then(resolveArray => {
-      const [knownUserEts, unknownUserIds] = partition(resolveArray, item => typeof item !== 'string') as [
-        User[],
-        string[],
-      ];
+    if (offline || !unknownUserIds.length) {
+      return knownUserEntities;
+    }
 
-      if (offline || !unknownUserIds.length) {
-        return knownUserEts;
-      }
-
-      return this.fetchUsersById(unknownUserIds).then(userEts => knownUserEts.concat(userEts));
-    });
+    const userEntities = await this.fetchUsersById(unknownUserIds);
+    return knownUserEntities.concat(userEntities);
   }
 
   getUserFromBackend(userId: string): Promise<APIClientUser> {
@@ -622,39 +590,39 @@ export class UserRepository {
   }
 
   /**
-   * Is the user the logged in user.
+   * Is the user the logged in user?
    */
-  isMe(user_id: User | string): boolean {
-    if (typeof user_id !== 'string') {
-      user_id = user_id.id;
+  isMe(userId: User | string): boolean {
+    if (typeof userId !== 'string') {
+      userId = userId.id;
     }
-    return this.self().id === user_id;
+    return this.self().id === userId;
   }
 
   /**
-   * Is the user the logged in user.
+   * Is the user the logged in user?
    * @param isMe `true` if self user
    */
-  saveUser(user_et: User, isMe: boolean = false): User {
-    const user = this.findUserById(user_et.id);
+  saveUser(userEntity: User, isMe: boolean = false): User {
+    const user = this.findUserById(userEntity.id);
     if (!user) {
       if (isMe) {
-        user_et.isMe = true;
-        this.self(user_et);
+        userEntity.isMe = true;
+        this.self(userEntity);
       }
-      this.users.push(user_et);
+      this.users.push(userEntity);
     }
-    return user_et;
+    return userEntity;
   }
 
   /**
    * Save multiple users at once.
    * @returns Resolves with users passed as parameter
    */
-  saveUsers(user_ets: User[]): User[] {
-    const newUsers = user_ets.filter(user_et => !this.findUserById(user_et.id));
+  saveUsers(userEntities: User[]): User[] {
+    const newUsers = userEntities.filter(userEntity => !this.findUserById(userEntity.id));
     this.users.push(...newUsers);
-    return user_ets;
+    return userEntities;
   }
 
   /**
@@ -676,11 +644,11 @@ export class UserRepository {
    * Add user entities for suspended users.
    * @returns User entities
    */
-  private _add_suspended_users(userIds: string[], userEntities: User[]): User[] {
+  private addSuspendedUsers(userIds: string[], userEntities: User[]): User[] {
     for (const userId of userIds) {
-      const matching_userIds = userEntities.find(user_et => user_et.id === userId);
+      const matchingUserIds = userEntities.find(userEntity => userEntity.id === userId);
 
-      if (!matching_userIds) {
+      if (!matchingUserIds) {
         const userEntity = new User(userId);
         userEntity.isDeleted = true;
         userEntity.name(t('nonexistentUser'));
@@ -693,21 +661,21 @@ export class UserRepository {
   /**
    * Change the accent color.
    */
-  changeAccentColor(accent_id: AccentColor.AccentColorID): Promise<User> {
-    return this.selfService
-      .putSelf({accent_id} as any)
-      .then(() => this.userUpdate({user: {accent_id, id: this.self().id}}));
+  async changeAccentColor(accentId: AccentColor.AccentColorID): Promise<User> {
+    await this.selfService.putSelf({accent_id: accentId} as any);
+    return this.userUpdate({user: {accent_id: accentId, id: this.self().id}});
   }
 
   /**
    * Change name.
    */
-  changeName(name: string): Promise<User> {
+  async changeName(name: string): Promise<User> {
     if (name.length >= UserRepository.CONFIG.MINIMUM_NAME_LENGTH) {
-      return this.selfService.putSelf({name}).then(() => this.userUpdate({user: {id: this.self().id, name}}));
+      await this.selfService.putSelf({name});
+      return this.userUpdate({user: {id: this.self().id, name}});
     }
 
-    return Promise.reject(new UserError(UserError.TYPE.INVALID_UPDATE, UserError.MESSAGE.INVALID_UPDATE));
+    throw new UserError(UserError.TYPE.INVALID_UPDATE, UserError.MESSAGE.INVALID_UPDATE);
   }
 
   async changeEmail(email: string): Promise<void> {
@@ -718,53 +686,45 @@ export class UserRepository {
    * Whether the user needs to set a username.
    */
   shouldChangeUsername(): boolean {
-    return this.should_set_username;
+    return this.shouldSetUsername;
   }
 
   /**
    * Tries to generate a username suggestion.
    */
-  getUsernameSuggestion(): Promise<void> {
-    let suggestions = null;
+  async getUsernameSuggestion(): Promise<void> {
+    try {
+      const suggestions = createSuggestions(this.self().name());
+      const validSuggestions = await this.verifyUsernames(suggestions);
+      this.shouldSetUsername = true;
+      this.self().username(validSuggestions[0]);
+    } catch (error) {
+      if (error.code === HTTP_STATUS.NOT_FOUND) {
+        this.shouldSetUsername = false;
+      }
 
-    return Promise.resolve()
-      .then(() => {
-        suggestions = createSuggestions(this.self().name());
-        return this.verifyUsernames(suggestions);
-      })
-      .then(valid_suggestions => {
-        this.should_set_username = true;
-        this.self().username(valid_suggestions[0]);
-      })
-      .catch(error => {
-        if (error.code === HTTP_STATUS.NOT_FOUND) {
-          this.should_set_username = false;
-        }
-
-        throw error;
-      });
+      throw error;
+    }
   }
 
   /**
    * Change username.
    */
-  changeUsername(username: string): Promise<User> {
+  async changeUsername(username: string): Promise<User> {
     if (username.length >= UserRepository.CONFIG.MINIMUM_USERNAME_LENGTH) {
-      return this.selfService
-        .putSelfHandle(username)
-        .then(() => {
-          this.should_set_username = false;
-          return this.userUpdate({user: {handle: username, id: this.self().id}});
-        })
-        .catch(({code: error_code}) => {
-          if ([HTTP_STATUS.CONFLICT, HTTP_STATUS.BAD_REQUEST].includes(error_code)) {
-            throw new UserError(UserError.TYPE.USERNAME_TAKEN, UserError.MESSAGE.USERNAME_TAKEN);
-          }
-          throw new UserError(UserError.TYPE.REQUEST_FAILURE, UserError.MESSAGE.REQUEST_FAILURE);
-        });
+      try {
+        await this.selfService.putSelfHandle(username);
+        this.shouldSetUsername = false;
+        return this.userUpdate({user: {handle: username, id: this.self().id}});
+      } catch ({code: errorCode}) {
+        if ([HTTP_STATUS.CONFLICT, HTTP_STATUS.BAD_REQUEST].includes(errorCode)) {
+          throw new UserError(UserError.TYPE.USERNAME_TAKEN, UserError.MESSAGE.USERNAME_TAKEN);
+        }
+        throw new UserError(UserError.TYPE.REQUEST_FAILURE, UserError.MESSAGE.REQUEST_FAILURE);
+      }
     }
 
-    return Promise.reject(new UserError(UserError.TYPE.INVALID_UPDATE, UserError.MESSAGE.INVALID_UPDATE));
+    throw new UserError(UserError.TYPE.INVALID_UPDATE, UserError.MESSAGE.INVALID_UPDATE);
   }
 
   /**
@@ -780,52 +740,48 @@ export class UserRepository {
    * Verify a username against the backend.
    * @returns Username which is not taken.
    */
-  verifyUsername(username: string): Promise<string> {
-    return this.userService
-      .checkUserHandle(username)
-      .catch(error => {
-        const error_code = error.response?.status;
-        if (error_code === HTTP_STATUS.NOT_FOUND) {
-          return username;
-        }
-        if (error_code === HTTP_STATUS.BAD_REQUEST) {
-          throw new UserError(UserError.TYPE.USERNAME_TAKEN, UserError.MESSAGE.USERNAME_TAKEN);
-        }
-        throw new UserError(UserError.TYPE.REQUEST_FAILURE, UserError.MESSAGE.REQUEST_FAILURE);
-      })
-      .then(verified_username => {
-        if (verified_username) {
-          return verified_username;
-        }
+  async verifyUsername(username: string): Promise<string> {
+    try {
+      await this.userService.checkUserHandle(username);
+      throw new UserError(UserError.TYPE.USERNAME_TAKEN, UserError.MESSAGE.USERNAME_TAKEN);
+    } catch (error) {
+      const errorCode = error.response?.status;
+
+      if (errorCode === HTTP_STATUS.NOT_FOUND) {
+        return username;
+      }
+
+      if (errorCode === HTTP_STATUS.BAD_REQUEST) {
         throw new UserError(UserError.TYPE.USERNAME_TAKEN, UserError.MESSAGE.USERNAME_TAKEN);
-      });
+      }
+
+      throw new UserError(UserError.TYPE.REQUEST_FAILURE, UserError.MESSAGE.REQUEST_FAILURE);
+    }
   }
 
   /**
    * Change the profile image.
    */
-  changePicture(picture: Blob): Promise<User> {
-    return this.assetRepository
-      .uploadProfileImage(picture)
-      .then(({previewImageKey, mediumImageKey}) => {
-        const assets: APIClientUserAsset[] = [
-          {key: previewImageKey, size: APIClientUserAssetType.PREVIEW, type: 'image'},
-          {key: mediumImageKey, size: APIClientUserAssetType.COMPLETE, type: 'image'},
-        ];
-        return this.selfService
-          .putSelf({assets, picture: []} as any)
-          .then(() => this.userUpdate({user: {assets, id: this.self().id}}));
-      })
-      .catch(error => {
-        throw new Error(`Error during profile image upload: ${error.message || error.code || error}`);
-      });
+  async changePicture(picture: Blob): Promise<User> {
+    try {
+      const {previewImageKey, mediumImageKey} = await this.assetRepository.uploadProfileImage(picture);
+      const assets: APIClientUserAsset[] = [
+        {key: previewImageKey, size: APIClientUserAssetType.PREVIEW, type: 'image'},
+        {key: mediumImageKey, size: APIClientUserAssetType.COMPLETE, type: 'image'},
+      ];
+      await this.selfService.putSelf({assets, picture: []} as any);
+      return await this.userUpdate({user: {assets, id: this.self().id}});
+    } catch (error) {
+      throw new Error(`Error during profile image upload: ${error.message || error.code || error}`);
+    }
   }
 
   /**
    * Set the user's default profile image.
    */
-  setDefaultPicture(): Promise<User> {
-    return loadUrlBlob(UNSPLASH_URL).then(blob => this.changePicture(blob));
+  async setDefaultPicture(): Promise<User> {
+    const blob = await loadUrlBlob(UNSPLASH_URL);
+    return this.changePicture(blob);
   }
 
   mapGuestStatus(userEntities = this.users()): void {
@@ -840,31 +796,30 @@ export class UserRepository {
     });
   }
 
-  initMarketingConsent(): Promise<void> {
+  async initMarketingConsent(): Promise<void> {
     if (!Config.getConfig().FEATURE.CHECK_CONSENT) {
       this.logger.warn(
         `Consent check feature is disabled. Defaulting to '${this.propertyRepository.marketingConsent()}'`,
       );
-      return Promise.resolve();
+      return;
     }
-    return this.selfService
-      .getSelfConsent()
-      .then(consents => {
-        for (const {type: consentType, value: consentValue} of consents) {
-          const isMarketingConsent = consentType === ConsentType.MARKETING;
-          if (isMarketingConsent) {
-            const hasGivenConsent = consentValue === ConsentValue.GIVEN;
-            this.propertyRepository.marketingConsent(hasGivenConsent);
 
-            this.logger.log(`Marketing consent retrieved as '${consentValue}'`);
-            return;
-          }
+    try {
+      const consents = await this.selfService.getSelfConsent();
+      for (const {type: consentType, value: consentValue} of consents) {
+        const isMarketingConsent = consentType === ConsentType.MARKETING;
+        if (isMarketingConsent) {
+          const hasGivenConsent = consentValue === ConsentValue.GIVEN;
+          this.propertyRepository.marketingConsent(hasGivenConsent);
+
+          this.logger.log(`Marketing consent retrieved as '${consentValue}'`);
+          return;
         }
+      }
 
-        this.logger.log(`Marketing consent not set. Defaulting to '${this.propertyRepository.marketingConsent()}'`);
-      })
-      .catch(error => {
-        this.logger.warn(`Failed to retrieve marketing consent: ${error.message || error.code}`, error);
-      });
+      this.logger.log(`Marketing consent not set. Defaulting to '${this.propertyRepository.marketingConsent()}'`);
+    } catch (error) {
+      this.logger.warn(`Failed to retrieve marketing consent: ${error.message || error.code}`, error);
+    }
   }
 }

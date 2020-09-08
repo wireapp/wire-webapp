@@ -60,7 +60,7 @@ import {
 import {t} from './LocalizerUtil';
 import {zeroPadding} from './util';
 
-type FnDate = number | Date;
+export type FnDate = number | Date;
 
 interface DiscreteTimeUnit {
   longUnit: string;
@@ -189,6 +189,17 @@ const mapUnits = (duration: number, rounded: boolean): DiscreteTimeUnit[] => {
 export const formatDuration = (duration: number): DurationUnit => {
   const mappedUnits = mapUnits(duration, true);
   const firstNonZeroUnit = mappedUnits.find(unit => unit.value > 0);
+
+  if (!firstNonZeroUnit) {
+    const seconds = durationUnits().pop();
+
+    return {
+      symbol: seconds.symbol,
+      text: `0 ${seconds.plural}`,
+      value: 0,
+    };
+  }
+
   return {
     symbol: firstNonZeroUnit.symbol,
     text: `${firstNonZeroUnit.value} ${firstNonZeroUnit.longUnit}`,

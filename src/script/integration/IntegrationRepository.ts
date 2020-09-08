@@ -17,6 +17,7 @@
  *
  */
 
+import ko from 'knockout';
 import {amplify} from 'amplify';
 import type {Observable, ObservableArray, PureComputed} from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -30,7 +31,6 @@ import type {ConversationRepository} from '../conversation/ConversationRepositor
 import type {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';
 import type {TeamRepository} from '../team/TeamRepository';
-import {EventName} from '../tracking/EventName';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {IntegrationMapper} from './IntegrationMapper';
 import type {IntegrationService} from './IntegrationService';
@@ -114,20 +114,7 @@ export class IntegrationRepository {
     const {id: serviceId, name, providerId} = serviceEntity;
     this.logger.info(`Adding service '${name}' to conversation '${conversationEntity.id}'`, serviceEntity);
 
-    return this.conversationRepository.addService(conversationEntity, providerId, serviceId).then(event => {
-      if (event) {
-        const attributes = {
-          conversation_size: conversationEntity.getNumberOfParticipants(true, false),
-          method: method,
-          service_id: serviceId,
-          services_size: conversationEntity.getNumberOfServices(),
-        };
-
-        amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.INTEGRATION.ADDED_SERVICE, attributes);
-      }
-
-      return event;
-    });
+    return this.conversationRepository.addService(conversationEntity, providerId, serviceId);
   }
 
   /**
@@ -239,15 +226,9 @@ export class IntegrationRepository {
    * @param userEntity Service user to be removed from the conversation
    */
   removeService(conversationEntity: Conversation, userEntity: User): Promise<any> {
-    const {id: userId, serviceId} = userEntity;
+    const {id: userId} = userEntity;
 
-    return this.conversationRepository.removeService(conversationEntity, userId).then(event => {
-      if (event) {
-        const attributes = {service_id: serviceId};
-        amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.INTEGRATION.REMOVED_SERVICE, attributes);
-        return event;
-      }
-    });
+    return this.conversationRepository.removeService(conversationEntity, userId);
   }
 
   searchForServices(query: string, queryObservable: Observable<string>): Promise<void> {

@@ -55,7 +55,7 @@ import {ValidationError} from '../module/action/ValidationError';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {QUERY_KEY, ROUTE} from '../route';
-import {isDesktopApp} from '../Runtime';
+import {Runtime} from '@wireapp/commons';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {UrlUtil} from '@wireapp/commons';
 import * as URLUtil from '../util/urlUtil';
@@ -225,7 +225,7 @@ const Login = ({
                   ) : (
                     <div style={{marginTop: '4px'}}>&nbsp;</div>
                   )}
-                  {!isDesktopApp() && (
+                  {!Runtime.isDesktopApp() && (
                     <Checkbox
                       tabIndex={3}
                       onChange={(event: React.ChangeEvent<HTMLInputElement>) => {

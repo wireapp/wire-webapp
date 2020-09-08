@@ -17,17 +17,22 @@
  *
  */
 
-/**
- * Enumeration of properties that should get send with every user tracking call.
- */
-export const SuperProperty = {
-  APP: 'app',
-  APP_VERSION: 'app_version',
-  CONTACTS: 'contacts',
-  DESKTOP_APP: 'desktop_app',
-  TEAM: {
-    IN_TEAM: 'team.in_team',
-    SIZE: 'team.size',
+import ko from 'knockout';
+
+// http://stackoverflow.com/questions/28762211/unable-to-mute-html5-video-tag-in-firefox
+ko.bindingHandlers.muteMediaElement = {
+  update(element: HTMLMediaElement, valueAccessor: ko.Observable<MediaStream>) {
+    if (valueAccessor()) {
+      element.muted = true;
+    }
   },
-  WRAPPER_VERSION: 'wrapper_version',
+};
+
+ko.bindingHandlers.sourceStream = {
+  update(element: HTMLMediaElement, valueAccessor: ko.Observable<MediaStream>) {
+    const stream = valueAccessor();
+    if (stream) {
+      element.srcObject = stream;
+    }
+  },
 };

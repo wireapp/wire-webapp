@@ -39,7 +39,7 @@ interface DatabaseListener {
   type: DEXIE_CRUD_EVENT;
 }
 
-type DatabaseListenerCallback = (changes: {obj: Object; oldObj: Object}) => void;
+export type DatabaseListenerCallback = (changes: {obj: Object; oldObj: Object}) => void;
 
 // @see https://dexie.org/docs/Observable/Dexie.Observable
 type DexieObservable = {_dbSchema?: Object};
@@ -50,7 +50,8 @@ enum DEXIE_CRUD_EVENT {
 }
 
 export class StorageService {
-  public db?: Dexie & DexieObservable;
+  // Quickfix to use table name index; can be removed once we have proper db instance typings: https://dexie.org/docs/Typescript#create-a-subclass
+  public db?: Dexie & DexieObservable & {[tableName: string]: any};
   private readonly hasHookSupport: boolean;
   private readonly dbListeners: DatabaseListener[];
   private readonly engine: CRUDEngine;

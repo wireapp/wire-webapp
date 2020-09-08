@@ -18,7 +18,7 @@
  */
 
 import {Confirmation} from '@wireapp/protocol-messaging';
-import * as HTTP_STATUS from 'http-status-codes';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {ConsentValue} from 'src/script/user/ConsentValue';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
@@ -212,16 +212,16 @@ describe('UserRepository', () => {
       });
     });
 
-    describe('_assignAllClients', () => {
-      let user_jane_roe = null;
-      let user_john_doe = null;
+    describe('ssignAllClients', () => {
+      let userJaneRoe = null;
+      let userJohnDoe = null;
 
       beforeEach(() => {
         testFactory.user_repository.users.removeAll();
-        user_jane_roe = new User(entities.user.jane_roe.id);
-        user_john_doe = new User(entities.user.john_doe.id);
+        userJaneRoe = new User(entities.user.jane_roe.id);
+        userJohnDoe = new User(entities.user.john_doe.id);
 
-        testFactory.user_repository.saveUsers([user_jane_roe, user_john_doe]);
+        testFactory.user_repository.saveUsers([userJaneRoe, userJohnDoe]);
         const permanent_client = ClientMapper.mapClient(entities.clients.john_doe.permanent);
         const plain_client = ClientMapper.mapClient(entities.clients.jane_roe.plain);
         const temporary_client = ClientMapper.mapClient(entities.clients.john_doe.temporary);
@@ -236,13 +236,13 @@ describe('UserRepository', () => {
       afterEach(() => testFactory.user_repository.users.removeAll());
 
       it('assigns all available clients to the users', () => {
-        return testFactory.user_repository._assignAllClients().then(() => {
+        return testFactory.user_repository.assignAllClients().then(() => {
           expect(testFactory.client_repository.getAllClientsFromDb).toHaveBeenCalled();
-          expect(user_jane_roe.devices().length).toBe(1);
-          expect(user_jane_roe.devices()[0].id).toBe(entities.clients.jane_roe.plain.id);
-          expect(user_john_doe.devices().length).toBe(2);
-          expect(user_john_doe.devices()[0].id).toBe(entities.clients.john_doe.permanent.id);
-          expect(user_john_doe.devices()[1].id).toBe(entities.clients.john_doe.temporary.id);
+          expect(userJaneRoe.devices().length).toBe(1);
+          expect(userJaneRoe.devices()[0].id).toBe(entities.clients.jane_roe.plain.id);
+          expect(userJohnDoe.devices().length).toBe(2);
+          expect(userJohnDoe.devices()[0].id).toBe(entities.clients.john_doe.permanent.id);
+          expect(userJohnDoe.devices()[1].id).toBe(entities.clients.john_doe.temporary.id);
         });
       });
     });

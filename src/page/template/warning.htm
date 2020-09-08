@@ -85,18 +85,18 @@
 
       <!-- ko if: visibleWarning() === type.UNSUPPORTED_INCOMING_CALL -->
         <div class="warning-bar warning-bar-feature">
-          <!-- ko ifnot: browser.chrome -->
+          <!-- ko ifnot: Runtime.isChrome() -->
             <div class="warning-bar-message">
               <span data-bind="text: t('warningCallUnsupportedIncoming', name())"></span>&nbsp;<a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="attr: {href: Config.URL.SUPPORT.CALLING}, text: t('warningLearnMore')"></a>
             </div>
           <!-- /ko -->
-          <!-- ko if: browser.chrome -->
-            <!-- ko if: isDesktop -->
+          <!-- ko if: Runtime.isChrome() -->
+            <!-- ko if: Runtime.isDesktopApp() -->
               <div class="warning-bar-message">
                 <span data-bind="text: t('warningCallIssues', brandName)"></span>&nbsp;<a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="attr: {href: window.wire.env.APP_BASE}, text: t('wire_for_web', brandName)"></a>
               </div>
             <!-- /ko -->
-            <!-- ko ifnot: isDesktop -->
+            <!-- ko ifnot: Runtime.isDesktopApp() -->
               <div class="warning-bar-message">
                 <span data-bind="text: t('warningCallUpgradeBrowser')"></span>
               </div>
@@ -108,18 +108,18 @@
 
       <!-- ko if: visibleWarning() === type.UNSUPPORTED_OUTGOING_CALL -->
         <div class="warning-bar warning-bar-feature">
-          <!-- ko ifnot: browser.chrome -->
+          <!-- ko ifnot: Runtime.isChrome() -->
             <div class="warning-bar-message">
               <span data-bind="text: t('warningCallUnsupportedOutgoing')"></span>&nbsp;<a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="attr: {href: Config.URL.SUPPORT.CALLING}, text: t('warningLearnMore')"></a>
             </div>
           <!-- /ko -->
-          <!-- ko if: browser.chrome -->
-            <!-- ko if: isDesktop -->
+          <!-- ko if: Runtime.isChrome() -->
+            <!-- ko if: Runtime.isDesktopApp() -->
               <div class="warning-bar-message">
                 <span data-bind="text: t('warningCallIssues', brandName)"></span>&nbsp;<a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="attr: {href: window.wire.env.APP_BASE}, text: t('wire_for_web', brandName)"></a>
               </div>
             <!-- /ko -->
-            <!-- ko ifnot: isDesktop -->
+            <!-- ko ifnot: Runtime.isDesktopApp() -->
               <div class="warning-bar-message">
                 <span data-bind="text: t('warningCallUpgradeBrowser')"></span>
               </div>

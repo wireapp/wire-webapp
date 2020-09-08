@@ -19,9 +19,10 @@
 
 import ko from 'knockout';
 import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
+import type {ReactionType} from '@wireapp/core/dist/conversation';
 
 import {getUserName} from 'Util/SanitizationUtil';
-import {TIME_IN_MILLIS, formatDurationCaption, formatTimeShort, fromUnixTime} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS, formatDurationCaption, formatTimeShort, formatDateNumeral, fromUnixTime} from 'Util/TimeUtil';
 
 import {AssetTransferState} from '../../assets/AssetTransferState';
 import {AssetType} from '../../assets/AssetType';
@@ -34,42 +35,46 @@ import type {CallMessage} from './CallMessage';
 import type {ContentMessage} from './ContentMessage';
 import type {FileAsset} from './FileAsset';
 import type {CompositeMessage} from './CompositeMessage';
-
-export interface ReadReceipt {
-  time: string;
-  userId: string;
-}
+import type {MemberMessage} from './MemberMessage';
+import type {SystemMessage} from './SystemMessage';
+import type {VerificationMessage} from './VerificationMessage';
+import type {LegalHoldMessage} from './LegalHoldMessage';
+import type {DecryptErrorMessage} from './DecryptErrorMessage';
+import type {PingMessage} from './PingMessage';
+import type {LinkPreview} from './LinkPreview';
+import type {ReadReceipt} from '../../storage/EventRecord';
 
 export class Message {
   private messageTimerStarted: boolean;
-  public readonly visible: ko.Observable<boolean>;
   protected readonly affect_order: ko.Observable<boolean>;
   public category?: MessageCategory;
   public conversation_id: string;
-  public readonly status: ko.Observable<StatusType>;
+  public from: string;
+  public fromClientId: string;
+  public id: string;
+  public primary_key?: string;
+  public reaction: ReactionType;
   public readonly accent_color: ko.PureComputed<string>;
+  public readonly ephemeral_caption: ko.PureComputed<string>;
+  public readonly ephemeral_duration: ko.Observable<number>;
   public readonly ephemeral_expires: ko.Observable<boolean | number | string>;
   public readonly ephemeral_remaining: ko.Observable<number>;
   public readonly ephemeral_started: ko.Observable<number>;
-  public readonly ephemeral_caption: ko.PureComputed<string>;
-  public readonly ephemeral_duration: ko.Observable<number>;
   public readonly ephemeral_status: ko.Computed<EphemeralStatusType>;
   public readonly expectsReadConfirmation: boolean;
-  public from: string;
-  public fromClientId: string;
   public readonly headerSenderName: ko.PureComputed<string>;
-  public id: string;
   public readonly isObfuscated: ko.PureComputed<boolean>;
   public readonly legalHoldStatus?: LegalHoldStatus;
-  public primary_key?: string;
-  public readonly timestamp: ko.Observable<number>;
+  public readonly status: ko.Observable<StatusType>;
   public readonly timestamp_affects_order: ko.PureComputed<boolean>;
+  public readonly timestamp: ko.Observable<number>;
   public readonly unsafeSenderName: ko.PureComputed<string>;
   public readonly user: ko.Observable<User>;
-  public version: number;
+  public readonly visible: ko.Observable<boolean>;
   public readReceipts: ko.ObservableArray<ReadReceipt>;
   public super_type: SuperType;
   public type: string;
+  public version: number;
 
   /**
    * Sort messages by timestamp
@@ -144,9 +149,14 @@ export class Message {
     this.accent_color = ko.pureComputed(() => `accent-color-${this.user().accent_id()}`);
   }
 
-  display_timestamp_short = (): string => {
+  displayTimestampShort = (): string => {
     const date = fromUnixTime(this.timestamp() / TIME_IN_MILLIS.SECOND);
     return formatTimeShort(date);
+  };
+
+  displayTimestampLong = (): string => {
+    const date = fromUnixTime(this.timestamp() / TIME_IN_MILLIS.SECOND);
+    return formatDateNumeral(date);
   };
 
   equals = (messageEntity?: Message) => (messageEntity && this.id ? this.id === messageEntity.id : false);
@@ -248,7 +258,7 @@ export class Message {
     return this.is_content() && this.was_edited();
   }
 
-  isLinkPreview(): boolean {
+  isLinkPreview(): this is LinkPreview {
     return (
       this.has_asset_text() &&
       ((this as unknown) as ContentMessage)
@@ -261,7 +271,7 @@ export class Message {
    * Check if message is a member message.
    * @returns Is message of type member
    */
-  isMember(): boolean {
+  isMember(): this is MemberMessage {
     return this.super_type === SuperType.MEMBER;
   }
 
@@ -269,7 +279,7 @@ export class Message {
    * Check if message is a ping message.
    * @returns Is message of type ping
    */
-  is_ping(): boolean {
+  is_ping(): this is PingMessage {
     return this.super_type === SuperType.PING;
   }
 
@@ -277,7 +287,7 @@ export class Message {
    * Check if message is a system message.
    * @returns Is message of type system
    */
-  is_system(): boolean {
+  is_system(): this is SystemMessage {
     return this.super_type === SuperType.SYSTEM;
   }
 
@@ -285,7 +295,7 @@ export class Message {
    * Check if message is an undecryptable message.
    * @returns Is message unable to decrypt
    */
-  is_unable_to_decrypt(): boolean {
+  is_unable_to_decrypt(): this is DecryptErrorMessage {
     return this.super_type === SuperType.UNABLE_TO_DECRYPT;
   }
 
@@ -293,11 +303,11 @@ export class Message {
    * Check if message is a verification message.
    * @returns Is message of type verification
    */
-  is_verification(): boolean {
+  is_verification(): this is VerificationMessage {
     return this.super_type === SuperType.VERIFICATION;
   }
 
-  isLegalHold(): boolean {
+  isLegalHold(): this is LegalHoldMessage {
     return this.super_type === SuperType.LEGALHOLD;
   }
 

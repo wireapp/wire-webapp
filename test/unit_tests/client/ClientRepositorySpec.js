@@ -18,16 +18,16 @@
  */
 
 import {ClientType} from '@wireapp/api-client/dist/client/';
-import * as HTTP_STATUS from 'http-status-codes';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {User} from 'src/script/entity/User';
-import {Environment} from 'src/script/util/Environment';
 
 import {ClientRepository} from 'src/script/client/ClientRepository';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {ClientMapper} from 'src/script/client/ClientMapper';
 import {ClientError} from 'src/script/error/ClientError';
 import {TestFactory} from '../../helper/TestFactory';
+import {Runtime} from '@wireapp/commons';
 
 describe('ClientRepository', () => {
   const testFactory = new TestFactory();
@@ -174,8 +174,8 @@ describe('ClientRepository', () => {
 
   describe('isCurrentClientPermanent', () => {
     beforeEach(() => {
-      Environment.electron = false;
-      testFactory.client_repository.__test__assignEnvironment(Environment);
+      jasmine.getEnv().allowRespy(true);
+      spyOn(Runtime, 'isDesktopApp').and.returnValue(false);
       testFactory.client_repository.currentClient(undefined);
     });
 
@@ -183,8 +183,7 @@ describe('ClientRepository', () => {
       const clientPayload = {type: ClientType.PERMANENT};
       const clientEntity = ClientMapper.mapClient(clientPayload, true);
       testFactory.client_repository.currentClient(clientEntity);
-      Environment.electron = true;
-      testFactory.client_repository.__test__assignEnvironment(Environment);
+      spyOn(Runtime, 'isDesktopApp').and.returnValue(true);
       const isPermanent = testFactory.client_repository.isCurrentClientPermanent();
 
       expect(isPermanent).toBeTruthy();
@@ -194,16 +193,14 @@ describe('ClientRepository', () => {
       const clientPayload = {type: ClientType.TEMPORARY};
       const clientEntity = ClientMapper.mapClient(clientPayload, true);
       testFactory.client_repository.currentClient(clientEntity);
-      Environment.electron = true;
-      testFactory.client_repository.__test__assignEnvironment(Environment);
+      spyOn(Runtime, 'isDesktopApp').and.returnValue(true);
       const isPermanent = testFactory.client_repository.isCurrentClientPermanent();
 
       expect(isPermanent).toBeTruthy();
     });
 
     it('throws an error on Electron if no current client', () => {
-      Environment.electron = true;
-      testFactory.client_repository.__test__assignEnvironment(Environment);
+      spyOn(Runtime, 'isDesktopApp').and.returnValue(true);
       const functionCall = () => testFactory.client_repository.isCurrentClientPermanent();
 
       expect(functionCall).toThrowError(ClientError, ClientError.MESSAGE.CLIENT_NOT_SET);

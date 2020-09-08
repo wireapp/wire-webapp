@@ -19,6 +19,7 @@
 
 import {CALL_TYPE, CONV_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {Availability} from '@wireapp/protocol-messaging';
+import {amplify} from 'amplify';
 import ko from 'knockout';
 
 import {getLogger, Logger} from 'Util/Logger';
@@ -39,7 +40,6 @@ import type {Multitasking} from '../notification/NotificationRepository';
 import type {TeamRepository} from '../team/TeamRepository';
 
 import 'Components/calling/chooseScreen';
-import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {ModalsViewModel} from './ModalsViewModel';
 import {t} from 'Util/LocalizerUtil';
@@ -208,7 +208,7 @@ export class CallingViewModel {
       toggleMute: (call: Call, muteState: boolean) => {
         this.callingRepository.muteCall(call.conversationId, muteState);
       },
-      toggleScreenshare: (call: Call): void => {
+      toggleScreenshare: async (call: Call): Promise<void> => {
         if (call.getSelfParticipant().sharesScreen()) {
           return this.callingRepository.toggleScreenshare(call);
         }

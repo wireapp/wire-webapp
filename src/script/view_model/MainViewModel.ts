@@ -17,12 +17,13 @@
  *
  */
 
-import {getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 import {afterRender} from 'Util/util';
 import {amplify} from 'amplify';
+import ko from 'knockout';
 
 import {WindowTitleViewModel} from './WindowTitleViewModel';
-import {modals} from './ModalsViewModel';
+import {modals, ModalsViewModel} from './ModalsViewModel';
 import {WarningsViewModel} from './WarningsViewModel';
 import {ContentViewModel} from './ContentViewModel';
 import {CallingViewModel} from './CallingViewModel';
@@ -31,7 +32,78 @@ import {ListViewModel} from './ListViewModel';
 import {FaviconViewModel} from './FaviconViewModel';
 import {ImageDetailViewViewModel} from './ImageDetailViewViewModel';
 
+import type {AssetRepository} from '../assets/AssetRepository';
+import type {AudioRepository} from '../audio/AudioRepository';
+import type {BackupRepository} from '../backup/BackupRepository';
+import type {CallingRepository} from '../calling/CallingRepository';
+import type {ClientRepository} from '../client/ClientRepository';
+import type {ConnectionRepository} from '../connection/ConnectionRepository';
+import type {ConversationRepository} from '../conversation/ConversationRepository';
+import type {CryptographyRepository} from '../cryptography/CryptographyRepository';
+import type {EventRepository} from '../event/EventRepository';
+import type {GiphyRepository} from '../extension/GiphyRepository';
+import type {IntegrationRepository} from '../integration/IntegrationRepository';
+import type {MediaRepository} from '../media/MediaRepository';
+import type {Multitasking, NotificationRepository} from '../notification/NotificationRepository';
+import {PanelViewModel} from './PanelViewModel';
+import type {PermissionRepository} from '../permission/PermissionRepository';
+import type {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
+import type {PropertiesRepository} from '../properties/PropertiesRepository';
+import type {SearchRepository} from '../search/SearchRepository';
+import type {ServerTimeHandler} from '../time/serverTimeHandler';
+import type {StorageRepository} from '../storage';
+import type {TeamRepository} from '../team/TeamRepository';
+import type {User} from '../entity/User';
+import type {UserRepository} from '../user/UserRepository';
+import type {AuthRepository} from '../auth/AuthRepository';
+import type {BroadcastRepository} from '../broadcast/BroadcastRepository';
+import type {EventTrackingRepository} from '../tracking/EventTrackingRepository';
+
+export interface ViewModelRepositories {
+  asset: AssetRepository;
+  audio: AudioRepository;
+  auth: AuthRepository;
+  backup: BackupRepository;
+  broadcast: BroadcastRepository;
+  calling: CallingRepository;
+  client: ClientRepository;
+  connection: ConnectionRepository;
+  conversation: ConversationRepository;
+  cryptography: CryptographyRepository;
+  event: EventRepository;
+  eventTracker: EventTrackingRepository;
+  giphy: GiphyRepository;
+  integration: IntegrationRepository;
+  media: MediaRepository;
+  notification: NotificationRepository;
+  permission: PermissionRepository;
+  preferenceNotification: PreferenceNotificationRepository;
+  properties: PropertiesRepository;
+  search: SearchRepository;
+  serverTime: ServerTimeHandler;
+  storage: StorageRepository;
+  team: TeamRepository;
+  user: UserRepository;
+}
+
 export class MainViewModel {
+  actions: ActionsViewModel;
+  calling: CallingViewModel;
+  content: ContentViewModel;
+  favicon: FaviconViewModel;
+  isPanelOpen: ko.Observable<boolean>;
+  lightbox: ImageDetailViewViewModel;
+  list: ListViewModel;
+  logger: Logger;
+  mainClasses: ko.PureComputed<string | undefined>;
+  modals: ModalsViewModel;
+  multitasking: Multitasking;
+  panel: PanelViewModel;
+  selfUser: ko.Observable<User>;
+  title: WindowTitleViewModel;
+  userRepository: UserRepository;
+  warnings: WarningsViewModel;
+
   static get CONFIG() {
     return {
       PANEL: {
@@ -65,7 +137,7 @@ export class MainViewModel {
     };
   }
 
-  constructor(repositories) {
+  constructor(repositories: ViewModelRepositories) {
     this.userRepository = repositories.user;
     this.logger = getLogger('MainViewModel');
 
@@ -90,7 +162,7 @@ export class MainViewModel {
       repositories.user,
     );
 
-    this.panel = new z.viewModel.PanelViewModel(this, repositories);
+    this.panel = new PanelViewModel(this, repositories);
     this.calling = new CallingViewModel(
       repositories.calling,
       repositories.conversation,
@@ -115,6 +187,7 @@ export class MainViewModel {
         // deprecated - still used on input control hover
         return `main-accent-color-${this.selfUser().accent_id()} show`;
       }
+      return undefined;
     });
 
     // Prevent Chrome (and Electron) from pushing the content out of the
@@ -122,22 +195,22 @@ export class MainViewModel {
     document.addEventListener('scroll', () => window.scrollTo(0, 0));
   }
 
-  openPanel() {
+  openPanel(): Promise<void> {
     return this.togglePanel(MainViewModel.PANEL_STATE.OPEN);
   }
 
-  closePanel() {
+  closePanel(): Promise<void> {
     return this.togglePanel(MainViewModel.PANEL_STATE.CLOSED);
   }
 
-  closePanelImmediately() {
+  closePanelImmediately(): void {
     document.querySelector('#app').classList.remove('app--panel-open');
     this.isPanelOpen(false);
   }
 
-  togglePanel = forceState => {
-    const app = document.querySelector('#app');
-    const panel = document.querySelector('.right-column');
+  togglePanel = (forceState: string): Promise<void> => {
+    const app = document.querySelector<HTMLElement>('#app');
+    const panel = document.querySelector<HTMLElement>('.right-column');
 
     const isPanelOpen = app.classList.contains('app--panel-open');
     const isAlreadyClosed = forceState === MainViewModel.PANEL_STATE.CLOSED && !isPanelOpen;
@@ -148,8 +221,8 @@ export class MainViewModel {
       return Promise.resolve();
     }
 
-    const titleBar = document.querySelector('#conversation-title-bar');
-    const input = document.querySelector('#conversation-input-bar');
+    const titleBar = document.querySelector<HTMLElement>('#conversation-title-bar');
+    const input = document.querySelector<HTMLElement>('#conversation-input-bar');
 
     const isNarrowScreen = app.offsetWidth < MainViewModel.CONFIG.PANEL.BREAKPOINT;
 
@@ -157,14 +230,14 @@ export class MainViewModel {
     const centerWidthOpen = centerWidthClose - MainViewModel.CONFIG.PANEL.WIDTH;
 
     return new Promise(resolve => {
-      const transitionEndHandler = event => {
+      const transitionEndHandler = (event: Event) => {
         if (event.target === panel) {
           panel.removeEventListener('transitionend', transitionEndHandler);
           this._clearStyles(panel, ['width', 'transform', 'position', 'right', 'transition']);
           this._clearStyles(titleBar, ['width', 'transition']);
           this._clearStyles(input, ['width', 'transition']);
 
-          const overlay = document.querySelector('.center-column__overlay');
+          const overlay = document.querySelector<HTMLElement>('.center-column__overlay');
           if (isPanelOpen) {
             app.classList.remove('app--panel-open');
             this.isPanelOpen(false);
@@ -220,19 +293,19 @@ export class MainViewModel {
     });
   };
 
-  _applyStyle(element, style) {
+  private _applyStyle(element: HTMLElement, style: Record<string, string>): void {
     if (element) {
-      Object.entries(style).forEach(([key, styleValue]) => (element.style[key] = styleValue));
+      Object.entries(style).forEach(([key, styleValue]) => (element.style[key as any] = styleValue));
     }
   }
 
-  _clearStyles(element, styles) {
+  private _clearStyles(element: HTMLElement, styles: string[]): void {
     if (element) {
-      styles.forEach(key => (element.style[key] = ''));
+      styles.forEach(key => (element.style[key as any] = ''));
     }
   }
 
-  closePanelOnClick = () => {
+  closePanelOnClick = (): void => {
     this.panel.closePanel();
   };
 }

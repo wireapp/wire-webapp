@@ -26,7 +26,6 @@ import {downloadBlob} from 'Util/util';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 
-import {EventName} from '../../tracking/EventName';
 import {ContentViewModel} from '../ContentViewModel';
 import {Config} from '../../Config';
 
@@ -119,9 +118,7 @@ export class HistoryExportViewModel {
 
       this.numberOfRecords(numberOfRecords);
       this.numberOfProcessedRecords(0);
-      const archive = await this.backupRepository.generateHistory(this.onProgress);
-      this.state(HistoryExportViewModel.STATE.COMPRESSING);
-      const archiveBlob = await archive.generateAsync({compression: 'DEFLATE', type: 'blob'});
+      const archiveBlob = await this.backupRepository.generateHistory(this.onProgress.bind(this));
       this.onSuccess(archiveBlob);
       this.logger.log(`Completed export of '${numberOfRecords}' records from history`);
     } catch (error) {
@@ -137,7 +134,6 @@ export class HistoryExportViewModel {
 
     this.dismissExport();
     downloadBlob(this.archiveBlob(), filename, 'application/octet-stream');
-    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.HISTORY.BACKUP_SUCCEEDED);
   };
 
   onCancel = (): void => {
@@ -156,7 +152,6 @@ export class HistoryExportViewModel {
     }
     this.hasError(true);
     this.logger.error(`Failed to export history: ${error.message}`, error);
-    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.HISTORY.BACKUP_FAILED);
   };
 
   onSuccess = (archiveBlob: Blob): void => {

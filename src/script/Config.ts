@@ -39,6 +39,7 @@ export class Configuration {
   readonly BACKEND_REST = env.BACKEND_REST || 'https://prod-nginz-https.wire.com';
   readonly BACKEND_WS = env.BACKEND_WS || 'wss://prod-nginz-ssl.wire.com';
   readonly BRAND_NAME = env.BRAND_NAME || 'Wire';
+  readonly COUNTLY_API_KEY = env.COUNTLY_API_KEY;
   readonly ENVIRONMENT = env.ENVIRONMENT || 'production';
   readonly FEATURE = env.FEATURE;
   readonly MAX_GROUP_PARTICIPANTS = env.MAX_GROUP_PARTICIPANTS || 500;

@@ -81,6 +81,7 @@ import {ConversationError} from '../error/ConversationError';
  * @property {boolean=} otr_muted
  * @property {string=} otr_muted_ref
  * @property {boolean=} muted_state
+ * @property {number=} receipt_mode
  * @property {number=} status
  * @property {number=} verification_state
  */
@@ -96,7 +97,7 @@ export class ConversationMapper {
   /**
    * Converts JSON conversations into conversation entities.
    *
-   * @param {Array} conversationsData Conversation data
+   * @param {Array<BackendConversation>} conversationsData Conversation data
    * @param {number} [timestamp=1] Initial timestamp for conversation
    * @returns {Array<Conversation>} Mapped conversation entities
    */
@@ -321,9 +322,9 @@ export class ConversationMapper {
   /**
    * Merge local database records with remote backend payload.
    *
-   * @param {Array<Object>} localConversations Database records
-   * @param {Array<Object>} remoteConversations Backend payload
-   * @returns {Array<Object>} Merged conversation data
+   * @param {Array<SerializedConversation>} localConversations Database records
+   * @param {Array<SerializedConversation>} remoteConversations Backend payload
+   * @returns {Array<SerializedConversation>} Merged conversation data
    */
   mergeConversation(localConversations, remoteConversations) {
     localConversations = localConversations.filter(conversationData => conversationData);

@@ -26,6 +26,7 @@ import type {ServiceEntity} from '../../integration/ServiceEntity';
 import type {ActionsViewModel} from '../ActionsViewModel';
 import type {IntegrationRepository} from '../../integration/IntegrationRepository';
 import type {User} from '../../entity/User';
+import type {PanelParams} from '../PanelViewModel';
 
 export class GroupParticipantServiceViewModel extends BasePanelViewModel {
   integrationRepository: IntegrationRepository;
@@ -94,8 +95,8 @@ export class GroupParticipantServiceViewModel extends BasePanelViewModel {
     this.onGoBack();
   }
 
-  initView({entity: user, addMode = false}: {addMode: boolean; entity: User}): void {
-    const serviceEntity = ko.unwrap(user);
+  initView({entity: user, addMode = false}: PanelParams): void {
+    const serviceEntity = ko.unwrap(user as User);
     this.selectedParticipant(serviceEntity);
     this.selectedService(undefined);
     this.isAddMode(addMode);

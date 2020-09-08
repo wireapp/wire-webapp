@@ -27,7 +27,7 @@ module.exports = {
   ...commonConfig,
   entry: {
     ...commonConfig.entry,
-    app: ['webpack-hot-middleware/client?reload=true', path.resolve(__dirname, srcScript, 'main/app.js')],
+    app: ['webpack-hot-middleware/client?reload=true', path.resolve(__dirname, srcScript, 'main/app.ts')],
     auth: [
       'webpack-hot-middleware/client',
       'react-hot-loader/patch',
