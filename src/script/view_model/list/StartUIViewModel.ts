@@ -161,7 +161,7 @@ export class StartUIViewModel {
         return teamUsersWithoutPartners;
       }
 
-      return this.userRepository.connected_users();
+      return this.userRepository.connectedUsers();
     });
 
     this.matchedUsers = ko.observableArray([]);
@@ -382,7 +382,7 @@ export class StartUIViewModel {
     const trimmedQuery = query.trim();
     const isHandle = trimmedQuery.startsWith('@') && validateHandle(normalizedQuery);
 
-    const allLocalUsers = this.isTeam() ? this.teamRepository.teamUsers() : this.userRepository.connected_users();
+    const allLocalUsers = this.isTeam() ? this.teamRepository.teamUsers() : this.userRepository.connectedUsers();
 
     const localSearchSources = this.showOnlyConnectedUsers()
       ? this.conversationRepository.connectedUsers()

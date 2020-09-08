@@ -20,7 +20,6 @@
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {Environment} from 'Util/Environment';
 import {Logger, getLogger} from 'Util/Logger';
 
 import {MediaError} from '../error/MediaError';
@@ -33,6 +32,7 @@ import {MediaConstraintsHandler, ScreensharingMethods} from './MediaConstraintsH
 import type {MEDIA_STREAM_ERROR} from './MediaStreamError';
 import {MEDIA_STREAM_ERROR_TYPES} from './MediaStreamErrorTypes';
 import {MediaType} from './MediaType';
+import {Runtime} from '@wireapp/commons';
 
 declare global {
   interface MediaDevices {
@@ -61,7 +61,7 @@ export class MediaStreamHandler {
       this.screensharingMethod = ScreensharingMethods.DESKTOP_CAPTURER;
     } else if (!!navigator.mediaDevices?.getDisplayMedia) {
       this.screensharingMethod = ScreensharingMethods.DISPLAY_MEDIA;
-    } else if (Environment.browser.firefox) {
+    } else if (Runtime.isFirefox()) {
       this.screensharingMethod = ScreensharingMethods.USER_MEDIA;
     }
   }
@@ -149,7 +149,7 @@ export class MediaStreamHandler {
 
     this.logger.info('Requesting MediaStream', mediaConstraints);
 
-    const willPromptForPermission = !hasPermission && !Environment.desktop;
+    const willPromptForPermission = !hasPermission && !Runtime.isDesktopApp();
     if (willPromptForPermission) {
       this.schedulePermissionHint(audio, video, screen);
     }
@@ -235,7 +235,7 @@ export class MediaStreamHandler {
   }
 
   private hidePermissionRequestHint(audio: boolean, video: boolean, screen: boolean): void {
-    if (!Environment.electron) {
+    if (!Runtime.isDesktopApp()) {
       const warningType = this.selectPermissionRequestWarningType(audio, video, screen);
       amplify.publish(WebAppEvents.WARNING.DISMISS, warningType);
     }
@@ -262,7 +262,7 @@ export class MediaStreamHandler {
   }
 
   private showPermissionRequestHint(audio: boolean, video: boolean, screen: boolean): void {
-    if (!Environment.electron) {
+    if (!Runtime.isDesktopApp()) {
       const warningType = this.selectPermissionRequestWarningType(audio, video, screen);
       amplify.publish(WebAppEvents.WARNING.SHOW, warningType);
     }

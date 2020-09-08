@@ -330,7 +330,7 @@ export class MessageListViewModel {
     if (lastMessage) {
       if (!this.isLastReceivedMessage(lastMessage, this.conversation())) {
         // if the last loaded message is not the last of the conversation, we load the subsequent messages
-        this.conversationRepository.getSubsequentMessages(this.conversation(), lastMessage as ContentMessage, 0);
+        this.conversationRepository.getSubsequentMessages(this.conversation(), lastMessage as ContentMessage);
       } else if (document.hasFocus()) {
         // if the message is the last of the conversation and the app is in the foreground, then we update the last read timestamp of the conversation
         this.updateConversationLastRead(this.conversation(), lastMessage);
@@ -585,8 +585,10 @@ export class MessageListViewModel {
     }
 
     const hasMentions = messageEntity instanceof Text && messageEntity.mentions().length;
-    const mentionElement = hasMentions && (event.target as HTMLElement).closest<HTMLSpanElement>('.message-mention');
-    const userId = mentionElement?.dataset?.userId;
+    const mentionElement = hasMentions
+      ? (event.target as HTMLElement).closest<HTMLSpanElement>('.message-mention')
+      : undefined;
+    const userId = mentionElement?.dataset.userId;
 
     if (userId) {
       (async () => {

@@ -154,9 +154,11 @@ import {MentionEntity} from '../message/MentionEntity';
 import {AudioMetaData, VideoMetaData, ImageMetaData} from '@wireapp/core/dist/conversation/content';
 import {FileAsset} from '../entity/message/FileAsset';
 import {Text as TextAsset} from '../entity/message/Text';
+import {roundLogarithmic} from 'Util/NumberUtil';
+import type {EventRecord} from '../storage';
 
 type ConversationEvent = {conversation: string; id: string};
-type ConversationDBChange = {obj: ConversationEvent; oldObj: ConversationEvent};
+type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
 type FetchPromise = {reject_fn: (error: ConversationError) => void; resolve_fn: (conversation: Conversation) => void};
 type EventJson = any;
 type EntityObject = {conversationEntity: Conversation; messageEntity: ContentMessage};
@@ -533,10 +535,7 @@ export class ConversationRepository {
     if (!remoteConversations.length) {
       conversationsData = localConversations;
     } else {
-      const data = this.conversationMapper.mergeConversation(
-        localConversations,
-        remoteConversations,
-      ) as SerializedConversation[];
+      const data = this.conversationMapper.mergeConversation(localConversations, remoteConversations);
       conversationsData = (await this.conversation_service.save_conversations_in_db(data)) as any[];
     }
     const conversationEntities = this.mapConversations(conversationsData) as Conversation[];
@@ -618,7 +617,7 @@ export class ConversationRepository {
    * @param conversationEntity Respective conversation
    * @returns Resolves with the messages
    */
-  getPrecedingMessages(conversationEntity: Conversation) {
+  async getPrecedingMessages(conversationEntity: Conversation) {
     conversationEntity.is_pending(true);
 
     const firstMessageEntity = conversationEntity.getFirstMessage();
@@ -626,16 +625,18 @@ export class ConversationRepository {
       ? new Date(firstMessageEntity.timestamp())
       : new Date(conversationEntity.get_latest_timestamp(this.serverTimeHandler.toServerTimestamp()) + 1);
 
-    return this.eventService
-      .loadPrecedingEvents(conversationEntity.id, new Date(0), upperBound, Config.getConfig().MESSAGES_FETCH_LIMIT)
-      .then(events => this._addPrecedingEventsToConversation(events, conversationEntity))
-      .then(mappedMessageEntities => {
-        conversationEntity.is_pending(false);
-        return mappedMessageEntities;
-      });
+    const events = (await this.eventService.loadPrecedingEvents(
+      conversationEntity.id,
+      new Date(0),
+      upperBound,
+      Config.getConfig().MESSAGES_FETCH_LIMIT,
+    )) as EventRecord[];
+    const mappedMessageEntities = await this._addPrecedingEventsToConversation(events, conversationEntity);
+    conversationEntity.is_pending(false);
+    return mappedMessageEntities;
   }
 
-  private _addPrecedingEventsToConversation(events: any[], conversationEntity: Conversation) {
+  private _addPrecedingEventsToConversation(events: EventRecord[], conversationEntity: Conversation) {
     const hasAdditionalMessages = events.length === Config.getConfig().MESSAGES_FETCH_LIMIT;
 
     return this._addEventsToConversation(events, conversationEntity).then(mappedMessageEntities => {
@@ -696,50 +697,58 @@ export class ConversationRepository {
    * @param conversationEntity Conversation entity
    * @param messageEntity Message entity
    * @param padding=30 Number of messages to load around the targeted message
-   * @returns Resolves with the message
+   * @returns Resolves with the messages
    */
-  getMessagesWithOffset(conversationEntity: Conversation, messageEntity: Message, padding = 30) {
+  async getMessagesWithOffset(
+    conversationEntity: Conversation,
+    messageEntity: Message,
+    padding = 30,
+  ): Promise<ContentMessage[]> {
     const messageDate = new Date(messageEntity.timestamp());
     const conversationId = conversationEntity.id;
 
     conversationEntity.is_pending(true);
 
-    return this.eventService
-      .loadPrecedingEvents(conversationId, new Date(0), messageDate, Math.floor(padding / 2))
-      .then(precedingMessages => {
-        return this.eventService
-          .loadFollowingEvents(conversationEntity.id, messageDate, padding - precedingMessages.length)
-          .then(followingMessages => precedingMessages.concat(followingMessages));
-      })
-      .then(messages => this._addEventsToConversation(messages, conversationEntity))
-      .then(mappedMessageEntities => {
-        conversationEntity.is_pending(false);
-        return mappedMessageEntities;
-      });
+    const precedingMessages = (await this.eventService.loadPrecedingEvents(
+      conversationId,
+      new Date(0),
+      messageDate,
+      Math.floor(padding / 2),
+    )) as EventRecord[];
+    const followingMessages = (await this.eventService.loadFollowingEvents(
+      conversationEntity.id,
+      messageDate,
+      padding - precedingMessages.length,
+    )) as EventRecord[];
+    const messages = precedingMessages.concat(followingMessages);
+    const mappedMessageEntities = await this._addEventsToConversation(messages, conversationEntity);
+    conversationEntity.is_pending(false);
+    return mappedMessageEntities;
   }
 
   /**
    * Get subsequent messages starting with the given message.
    * @returns Resolves with the messages
    */
-  getSubsequentMessages(conversationEntity: Conversation, messageEntity: ContentMessage, includeMessages: number) {
+  async getSubsequentMessages(conversationEntity: Conversation, messageEntity: ContentMessage) {
     const messageDate = new Date(messageEntity.timestamp());
     conversationEntity.is_pending(true);
 
-    return this.eventService
-      .loadFollowingEvents(conversationEntity.id, messageDate, Config.getConfig().MESSAGES_FETCH_LIMIT, includeMessages)
-      .then(events => this._addEventsToConversation(events, conversationEntity, false))
-      .then(mappedMessageEntities => {
-        conversationEntity.is_pending(false);
-        return mappedMessageEntities;
-      });
+    const events = (await this.eventService.loadFollowingEvents(
+      conversationEntity.id,
+      messageDate,
+      Config.getConfig().MESSAGES_FETCH_LIMIT,
+    )) as EventRecord[];
+    const mappedMessageEntities = await this._addEventsToConversation(events, conversationEntity, false);
+    conversationEntity.is_pending(false);
+    return mappedMessageEntities;
   }
 
   /**
    * Get messages for given category. Category param acts as lower bound.
    */
   async get_events_for_category(conversationEntity: Conversation, category = MessageCategory.NONE): Promise<Message[]> {
-    const events = await this.eventService.loadEventsWithCategory(conversationEntity.id, category);
+    const events = (await this.eventService.loadEventsWithCategory(conversationEntity.id, category)) as EventRecord[];
     const messageEntities = (await this.event_mapper.mapJsonEvents(events, conversationEntity)) as Message[];
     return this._updateMessagesUserEntities(messageEntities);
   }
@@ -767,7 +776,7 @@ export class ConversationRepository {
    *
    * @param conversationEntity Conversation to start from
    */
-  private _get_unread_events(conversationEntity: Conversation) {
+  private async _get_unread_events(conversationEntity: Conversation): Promise<void> {
     const first_message = conversationEntity.getFirstMessage();
     const lower_bound = new Date(conversationEntity.last_read_timestamp());
     const upper_bound = first_message
@@ -777,19 +786,20 @@ export class ConversationRepository {
     if (lower_bound < upper_bound) {
       conversationEntity.is_pending(true);
 
-      return this.eventService
-        .loadPrecedingEvents(conversationEntity.id, lower_bound, upper_bound)
-        .then(events => {
-          if (events.length) {
-            this._addEventsToConversation(events, conversationEntity);
-          }
-          conversationEntity.is_pending(false);
-        })
-        .catch(error => {
-          this.logger.info(`Could not load unread events for conversation: ${conversationEntity.id}`, error);
-        });
+      try {
+        const events = (await this.eventService.loadPrecedingEvents(
+          conversationEntity.id,
+          lower_bound,
+          upper_bound,
+        )) as EventRecord[];
+        if (events.length) {
+          this._addEventsToConversation(events, conversationEntity);
+        }
+      } catch (error) {
+        this.logger.info(`Could not load unread events for conversation: ${conversationEntity.id}`, error);
+      }
+      conversationEntity.is_pending(false);
     }
-    return undefined;
   }
 
   /**
@@ -2924,7 +2934,7 @@ export class ConversationRepository {
     return new Promise((resolve, reject) => {
       let sendAnyway = false;
 
-      userIds = userIds || conversationEntity.getUsersWithUnverifiedClients().map(userEntity => userEntity.id);
+      userIds ||= conversationEntity.getUsersWithUnverifiedClients().map(userEntity => userEntity.id);
 
       return this.userRepository
         .getUsersById(userIds)
@@ -3105,7 +3115,7 @@ export class ConversationRepository {
           [GENERIC_MESSAGE_TYPE.DELETED]: protoMessageDelete,
           messageId: createRandomUuid(),
         });
-
+        this._trackContributed(conversationEntity, genericMessage);
         return this.messageSender.queueMessage(() => {
           const userIds = Array.isArray(precondition) ? precondition : undefined;
           return this.create_recipients(conversationId, false, userIds).then(recipients => {
@@ -3150,6 +3160,7 @@ export class ConversationRepository {
         });
 
         const eventInfoEntity = new EventInfoEntity(genericMessage, this.self_conversation().id);
+        this._trackContributed(conversationEntity, eventInfoEntity.genericMessage);
         return this.sendGenericMessageToConversation(eventInfoEntity);
       })
       .then(() => {
@@ -3235,8 +3246,13 @@ export class ConversationRepository {
       .then(conversationEntity => this._checkLegalHoldStatus(conversationEntity, eventJson))
       .then(conversationEntity => this._checkConversationParticipants(conversationEntity, eventJson, eventSource))
       .then(conversationEntity => this._triggerFeatureEventHandlers(conversationEntity, eventJson))
-      .then(conversationEntity => this._reactToConversationEvent(conversationEntity, eventJson, eventSource))
-      .then((entityObject = {}) => this._handleConversationNotification(entityObject, eventSource, previouslyArchived))
+      .then(
+        conversationEntity =>
+          this._reactToConversationEvent(conversationEntity, eventJson, eventSource) as EntityObject,
+      )
+      .then((entityObject = {} as EntityObject) =>
+        this._handleConversationNotification(entityObject as EntityObject, eventSource, previouslyArchived),
+      )
       .catch((error: BaseError) => {
         const ignoredErrorTypes: string[] = [
           ConversationError.TYPE.MESSAGE_NOT_FOUND,
@@ -4048,7 +4064,7 @@ export class ConversationRepository {
     return this._updateMessageUserEntities(messageEntity);
   }
 
-  private async _replaceMessageInConversation(conversationEntity: Conversation, eventId: string, newData: Object) {
+  private async _replaceMessageInConversation(conversationEntity: Conversation, eventId: string, newData: EventRecord) {
     const originalMessage = conversationEntity.getMessage(eventId);
     if (!originalMessage) {
       return undefined;
@@ -4087,7 +4103,7 @@ export class ConversationRepository {
    * @param prepend=true Should existing messages be prepended
    * @returns Resolves with an array of mapped messages
    */
-  private async _addEventsToConversation(events: EventJson[], conversationEntity: Conversation, prepend = true) {
+  private async _addEventsToConversation(events: EventRecord[], conversationEntity: Conversation, prepend = true) {
     const mappedEvents = await this.event_mapper.mapJsonEvents(events, conversationEntity);
     const updatedEvents = (await this._updateMessagesUserEntities(mappedEvents)) as ContentMessage[];
     const validatedMessages = (await this.ephemeralHandler.validateMessages(updatedEvents)) as ContentMessage[];
@@ -4327,7 +4343,15 @@ export class ConversationRepository {
       case 'asset': {
         const protoAsset = genericMessage.asset;
         if (protoAsset.original) {
-          actionType = protoAsset.original.image ? 'photo' : 'file';
+          if (!!protoAsset.original.image) {
+            actionType = 'photo';
+          } else if (!!protoAsset.original.audio) {
+            actionType = 'audio';
+          } else if (!!protoAsset.original.video) {
+            actionType = 'video';
+          } else {
+            actionType = 'file';
+          }
         }
         break;
       }
@@ -4357,15 +4381,29 @@ export class ConversationRepository {
         break;
       }
 
+      case 'deleted': {
+        actionType = 'delete';
+      }
+
       default:
         break;
     }
     if (actionType) {
-      const guests = conversationEntity.participating_user_ets().filter(user => user.isGuest()).length;
+      const selfUserTeamId = this.selfUser().teamId;
+      const participants = conversationEntity.participating_user_ets();
+      const guests = participants.filter(user => user.isGuest()).length;
+      const guestsWireless = participants.filter(user => user.isTemporaryGuest()).length;
+      // guests that are from a different team
+      const guestsPro = participants.filter(user => !!user.teamId && user.teamId !== selfUserTeamId).length;
+      const services = participants.filter(user => user.isService).length;
+
       let segmentations = {
-        [Segmentation.CONVERSATION.GUESTS]: guests,
-        [Segmentation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
+        [Segmentation.CONVERSATION.GUESTS]: roundLogarithmic(guests, 6),
+        [Segmentation.CONVERSATION.GUESTS_PRO]: roundLogarithmic(guestsPro, 6),
+        [Segmentation.CONVERSATION.GUESTS_WIRELESS]: roundLogarithmic(guestsWireless, 6),
+        [Segmentation.CONVERSATION.SIZE]: roundLogarithmic(participants.length, 6),
         [Segmentation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
+        [Segmentation.CONVERSATION.SERVICES]: roundLogarithmic(services, 6),
         [Segmentation.MESSAGE.ACTION]: actionType,
         [Segmentation.MESSAGE.IS_REPLY]: !!genericMessage.text?.quote,
         [Segmentation.MESSAGE.MENTION]: numberOfMentions,

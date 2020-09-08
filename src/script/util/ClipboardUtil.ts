@@ -17,10 +17,10 @@
  *
  */
 
-import {Environment} from './Environment';
+import {Runtime} from '@wireapp/commons';
 
 export function copyText(text: string): Promise<void> {
-  if (Environment.browser.supports.clipboard) {
+  if (Runtime.isSupportingClipboard()) {
     return navigator.clipboard.writeText(text);
   }
 

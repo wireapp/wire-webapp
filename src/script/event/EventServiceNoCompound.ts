@@ -17,14 +17,19 @@
  *
  */
 
-import {EventService} from './EventService';
+import {
+  EventService,
+  Includes,
+  DBEvents,
+  eventTimeToDate,
+  compareEventsByTime,
+  compareEventsByConversation,
+} from './EventService';
 import {StorageSchemata} from '../storage/StorageSchemata';
-import {StorageService} from '../storage';
+import {EventRecord, StorageService} from '../storage';
 import {MessageCategory} from '../message/MessageCategory';
 
 // TODO: These types should be moved to a more appropriate place (e.g. EventService) once it has been migrated to TS
-type DBEvent = {category: MessageCategory; conversation: string; time: number};
-type Includes = {includeFrom: boolean; includeTo: boolean};
 type DateComparator = (dateA: Date, dateB: Date) => boolean;
 
 // TODO: This function can be removed once Microsoft Edge's IndexedDB supports compound indices:
@@ -41,8 +46,8 @@ export class EventServiceNoCompound extends EventService {
    * @param category Will be used as lower bound
    * @returns Resolves with matching events
    */
-  async loadEventsWithCategory(conversationId: string, category: MessageCategory): Promise<DBEvent[]> {
-    let events: DBEvent[];
+  async loadEventsWithCategory(conversationId: string, category: MessageCategory): Promise<DBEvents> {
+    let events: DBEvents;
 
     if (this.storageService.db) {
       events = await this.storageService.db
@@ -51,11 +56,11 @@ export class EventServiceNoCompound extends EventService {
         .equals(conversationId)
         .sortBy('time');
     } else {
-      const records: DBEvent[] = await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS);
-      events = records.filter(record => record.conversation === conversationId).sort((a, b) => a.time - b.time);
+      const records = (await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS)) as EventRecord[];
+      events = records.filter(record => record.conversation === conversationId).sort(compareEventsByTime);
     }
 
-    return events.filter(record => record.category >= category);
+    return (events as EventRecord[]).filter(record => record.category >= category);
   }
 
   async _loadEventsInDateRange(
@@ -64,7 +69,7 @@ export class EventServiceNoCompound extends EventService {
     toDate: Date,
     limit: number,
     includes: Includes,
-  ): Promise<DBEvent[]> {
+  ): Promise<DBEvents> {
     const fromCompareFunction: DateComparator = includes.includeFrom
       ? (date, timestamp) => timestamp >= date
       : (date, timestamp) => timestamp > date;
@@ -87,24 +92,24 @@ export class EventServiceNoCompound extends EventService {
         .table(StorageSchemata.OBJECT_STORE.EVENTS)
         .where('conversation')
         .equals(conversationId)
-        .and((record: DBEvent) => {
-          const timestamp = new Date(record.time);
+        .and((record: EventRecord) => {
+          const timestamp = eventTimeToDate(record.time);
           return fromCompareFunction(fromDate, timestamp) && toCompareFunction(toDate, timestamp);
         })
         .limit(limit);
     }
 
-    const records: DBEvent[] = await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS);
+    const records = (await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS)) as EventRecord[];
     return records
       .filter(record => {
-        const timestamp = new Date(record.time);
+        const timestamp = eventTimeToDate(record.time);
         return (
           record.conversation === conversationId &&
           fromCompareFunction(fromDate, timestamp) &&
           toCompareFunction(toDate, timestamp)
         );
       })
-      .sort((a, b) => a.conversation.localeCompare(b.conversation))
+      .sort(compareEventsByConversation)
       .slice(0, limit);
   }
 }

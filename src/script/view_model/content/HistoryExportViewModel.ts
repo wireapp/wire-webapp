@@ -118,9 +118,7 @@ export class HistoryExportViewModel {
 
       this.numberOfRecords(numberOfRecords);
       this.numberOfProcessedRecords(0);
-      const archive = await this.backupRepository.generateHistory(this.onProgress);
-      this.state(HistoryExportViewModel.STATE.COMPRESSING);
-      const archiveBlob = await archive.generateAsync({compression: 'DEFLATE', type: 'blob'});
+      const archiveBlob = await this.backupRepository.generateHistory(this.onProgress.bind(this));
       this.onSuccess(archiveBlob);
       this.logger.log(`Completed export of '${numberOfRecords}' records from history`);
     } catch (error) {

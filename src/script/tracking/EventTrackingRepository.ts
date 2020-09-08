@@ -28,9 +28,11 @@ import {URLParameter} from '../auth/URLParameter';
 import {ROLE as TEAM_ROLE} from '../user/UserPermission';
 import {UserData} from './UserData';
 import {Segmentation} from './Segmentation';
-import {getPlatform} from './Helpers';
 import type {UserRepository} from '../user/UserRepository';
 import {loadValue, storeValue} from 'Util/StorageUtil';
+import {getPlatform} from './Helpers';
+import {Config} from '../Config';
+import {roundLogarithmic} from 'Util/NumberUtil';
 
 const Countly = require('countly-sdk-web');
 
@@ -168,28 +170,24 @@ export class EventTrackingRepository {
     return 'member';
   }
 
-  private trackProductReportingEvent(eventName: string, segmentations?: any): void {
+  private trackProductReportingEvent(eventName: string, customSegmentations?: any): void {
     if (this.isProductReportingActivated === true) {
       Countly.userData.set(UserData.IS_TEAM, this.userRepository.isTeam());
-      Countly.userData.set(UserData.CONTACTS, this.userRepository.number_of_contacts());
+      Countly.userData.set(UserData.CONTACTS, roundLogarithmic(this.userRepository.numberOfContacts(), 6));
       Countly.userData.set(UserData.TEAM_SIZE, this.userRepository.teamMembers().length);
       Countly.userData.set(UserData.USER_TYPE, this.getUserType());
       Countly.userData.save();
 
       const segmentation = {
         [Segmentation.COMMON.APP]: EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE,
-        [Segmentation.COMMON.APP_VERSION]: Environment.version(false),
-        ...segmentations,
+        [Segmentation.COMMON.APP_VERSION]: Config.getConfig().VERSION,
+        [Segmentation.COMMON.DESKTOP_APP]: getPlatform(),
+        ...customSegmentations,
       };
 
       Countly.add_event({
         key: eventName,
-        segmentation: {
-          [Segmentation.COMMON.APP]: EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE,
-          [Segmentation.COMMON.APP_VERSION]: Environment.version(false),
-          [Segmentation.COMMON.DESKTOP_APP]: getPlatform(),
-          ...segmentations,
-        },
+        segmentation,
       });
 
       this.logger.info(`Reporting product event ${eventName}@${JSON.stringify(segmentation)}`);

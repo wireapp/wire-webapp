@@ -19,7 +19,7 @@
 
 import 'url-search-params-polyfill';
 
-import {Environment} from 'Util/Environment';
+import {Runtime} from '@wireapp/commons';
 import {formatString} from 'Util/StringUtil';
 
 interface IFrameOptions {
@@ -58,7 +58,7 @@ const _createIFrameContainer = (options?: Partial<IFrameOptions>): string => {
     options.class = 'iframe-container';
   }
 
-  if (Environment.desktop) {
+  if (Runtime.isDesktopApp()) {
     options.allowfullscreen = '';
   }
 

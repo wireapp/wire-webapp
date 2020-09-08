@@ -47,7 +47,7 @@ import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import {QUERY_KEY, ROUTE} from '../route';
-import {isDesktopApp} from '../Runtime';
+import {Runtime} from '@wireapp/commons';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {Redirect} from 'react-router';
 import {getSearchParams} from '../util/urlUtil';
@@ -302,7 +302,7 @@ const SingleSignOnForm = ({
       ) : (
         <span style={{marginBottom: '4px'}}>&nbsp;</span>
       )}
-      {!isDesktopApp() && (
+      {!Runtime.isDesktopApp() && (
         <Checkbox
           tabIndex={3}
           onChange={(event: React.ChangeEvent<HTMLInputElement>) =>

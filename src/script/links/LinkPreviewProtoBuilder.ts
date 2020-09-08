@@ -41,7 +41,7 @@ export const buildFromOpenGraphData = (data: OpenGraphData, link: string, offset
     return;
   }
 
-  data.url = data.url || link;
+  data.url ||= link;
 
   if (!data.title || !data.url) {
     return;

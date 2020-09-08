@@ -19,11 +19,11 @@
 
 import ko from 'knockout';
 
-import {Environment} from 'Util/Environment';
 import {Logger, getLogger} from 'Util/Logger';
 import {loadValue, storeValue} from 'Util/StorageUtil';
 
 import {MediaDeviceType} from './MediaDeviceType';
+import {Runtime} from '@wireapp/commons';
 
 declare global {
   interface Window {
@@ -140,7 +140,7 @@ export class MediaDevicesHandler {
    * Initialize the list of MediaDevices and subscriptions.
    */
   private initializeMediaDevices(): void {
-    if (Environment.browser.supports.mediaDevices) {
+    if (Runtime.isSupportingUserMedia()) {
       this.refreshMediaDevices().then(() => {
         this.subscribeToObservables();
         this.subscribeToDevices();

@@ -102,7 +102,7 @@ export class GroupCreationViewModel {
     this.contacts = ko.pureComputed(() => {
       if (this.showContacts()) {
         if (!this.isTeam()) {
-          return this.userRepository.connected_users();
+          return this.userRepository.connectedUsers();
         }
 
         if (this.isGuestRoom()) {

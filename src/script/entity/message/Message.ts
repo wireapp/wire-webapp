@@ -35,18 +35,14 @@ import type {CallMessage} from './CallMessage';
 import type {ContentMessage} from './ContentMessage';
 import type {FileAsset} from './FileAsset';
 import type {CompositeMessage} from './CompositeMessage';
-import {MemberMessage} from './MemberMessage';
-import {SystemMessage} from './SystemMessage';
-import {VerificationMessage} from './VerificationMessage';
-import {LegalHoldMessage} from './LegalHoldMessage';
-import {DecryptErrorMessage} from './DecryptErrorMessage';
-import {PingMessage} from './PingMessage';
-import {LinkPreview} from './LinkPreview';
-
-export interface ReadReceipt {
-  time: string;
-  userId: string;
-}
+import type {MemberMessage} from './MemberMessage';
+import type {SystemMessage} from './SystemMessage';
+import type {VerificationMessage} from './VerificationMessage';
+import type {LegalHoldMessage} from './LegalHoldMessage';
+import type {DecryptErrorMessage} from './DecryptErrorMessage';
+import type {PingMessage} from './PingMessage';
+import type {LinkPreview} from './LinkPreview';
+import type {ReadReceipt} from '../../storage/EventRecord';
 
 export class Message {
   private messageTimerStarted: boolean;
