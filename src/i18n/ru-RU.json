@@ -172,7 +172,7 @@
   "callNoCameraAccess": "Нет доступа к камере",
   "callParticipants": "{{number}} участников",
   "callStateCbr": "Постоянный битрейт",
-  "callStateConferenceCall": "Conference calling",
+  "callStateConferenceCall": "Групповой вызов",
   "callStateConnecting": "Подключение…",
   "callStateIncoming": "Вызывает…",
   "callStateIncomingGroup": "{{user}} вызывает",

@@ -172,7 +172,7 @@
   "callNoCameraAccess": "Appareil photo indisponible",
   "callParticipants": "{{number}} sur l’appel",
   "callStateCbr": "Débit constant (CBR)",
-  "callStateConferenceCall": "Conference calling",
+  "callStateConferenceCall": "Conférence téléphonique",
   "callStateConnecting": "Connexion…",
   "callStateIncoming": "Appel…",
   "callStateIncomingGroup": "{{user}} appelle",
