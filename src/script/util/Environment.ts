@@ -28,25 +28,23 @@ const APP_ENV = {
 
 const getAppVersion = (): string => {
   const versionElement = document.head.querySelector("[property='wire:version']");
-  const hasVersion = versionElement && versionElement.hasAttribute('version');
-  return hasVersion ? versionElement.getAttribute('version').trim() : '';
+  return versionElement?.getAttribute('version').trim() || '';
 };
 
 const getElectronVersion = (userAgent: string): string => {
-  // [match, app, version]
-  const [, , electronVersion] = /(Wire|WireInternal)\/(\S+)/.exec(userAgent) || [];
+  // [match, version]
+  const [, electronVersion] = /Wire(?:Internal)?\/(\S+)/.exec(userAgent) || [];
   return electronVersion;
 };
 
 const getFormattedAppVersion = (): string => {
-  const [year, month, day, hour, minute] = getAppVersion().split('-');
-  return `${year}.${month}.${day}.${hour}${minute}`;
+  const [year, month, day, hour, minute] = getAppVersion().split('.');
+  return `${year}.${month}.${day}.${hour}.${minute}`;
 };
 
 const isLocalhost = (): boolean => [APP_ENV.LOCALHOST, APP_ENV.VIRTUAL_HOST].includes(window.location.hostname);
 const isProduction = (): boolean => {
-  const isProductionHost = window.wire.env.ENVIRONMENT === BackendEnvironment.PRODUCTION;
-  return isProductionHost;
+  return window.wire.env.ENVIRONMENT === BackendEnvironment.PRODUCTION;
 };
 
 export const Environment = {
