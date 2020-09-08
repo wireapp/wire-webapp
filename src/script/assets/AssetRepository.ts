@@ -237,7 +237,7 @@ export class AssetRepository {
 
   private async compressImageWithWorker(
     image: File | Blob,
-    profileImageSize: boolean = false,
+    useProfileImageSize: boolean = false,
   ): Promise<CompressedImage> {
     const skipCompression = image.type === 'image/gif';
     const buffer = await loadFileBuffer(image);
@@ -246,7 +246,7 @@ export class AssetRepository {
       compressedBytes = new Uint8Array(buffer as ArrayBuffer);
     } else {
       const worker = new WebWorker('/image-worker.js');
-      compressedBytes = await worker.post({buffer, profileImageSize});
+      compressedBytes = await worker.post({data: buffer, useProfileImageSize});
     }
     const compressedImage = await loadImage(new Blob([compressedBytes], {type: image.type}));
     return {

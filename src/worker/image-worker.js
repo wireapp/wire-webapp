@@ -5,14 +5,14 @@ self.addEventListener('message', event => {
   let MAX_FILE_SIZE = 310 * 1024;
   let COMPRESSION = 80;
 
-  if (event.data.profileImageSize) {
+  if (event.data.useProfileImageSize) {
     MAX_SIZE = 280;
     MAX_FILE_SIZE = 1024 * 1024;
     COMPRESSION = 80;
   }
 
   Jimp.read(event.data.buffer).then(image => {
-    if (event.data.profileImageSize) {
+    if (event.data.useProfileImageSize) {
       image.cover(MAX_SIZE, MAX_SIZE);
     } else if (image.bitmap.width > MAX_SIZE || image.bitmap.height > MAX_SIZE) {
       image.scaleToFit(MAX_SIZE, MAX_SIZE);
