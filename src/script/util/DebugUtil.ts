@@ -246,21 +246,23 @@ export class DebugUtil {
     navigator.mediaDevices.enumerateDevices = () => Promise.resolve(cameras.concat(microphones) as MediaDeviceInfo[]);
 
     navigator.mediaDevices.getUserMedia = (constraints: MediaStreamConstraints) => {
-      const audio = (constraints.audio as MediaTrackConstraints)
-        ? generateAudioTrack(constraints.audio as MediaTrackConstraints)
-        : [];
-      const video = (constraints.video as MediaTrackConstraints)
-        ? generateVideoTrack(constraints.video as MediaTrackConstraints)
-        : [];
+      const audioSet = constraints.audio as MediaTrackConstraintSet;
+      const audio = audioSet ? generateAudioTrack(audioSet) : [];
+
+      const videoSet = constraints.video as MediaTrackConstraintSet;
+      const video = videoSet ? generateVideoTrack(videoSet) : [];
+
       return Promise.resolve(new MediaStream(audio.concat(video)));
     };
 
-    function generateAudioTrack(constraints: MediaTrackConstraints): MediaStreamTrack[] {
-      const hz = constraints.deviceId || microphones[0].deviceId;
+    function generateAudioTrack(constraints: MediaTrackConstraintSet): MediaStreamTrack[] {
+      const constrainMatchMock = {exact: undefined} as ConstrainDOMStringParameters;
+      const constrainMatch = (constraints.deviceId as ConstrainDOMStringParameters) || constrainMatchMock;
+      const hz = (constrainMatch.exact as string) || microphones[0].deviceId;
       const context = new window.AudioContext();
       const osc = context.createOscillator(); // instantiate an oscillator
       osc.type = 'sine'; // this is the default - also square, sawtooth, triangle
-      osc.frequency.value = parseInt(`${hz}`, 10); // Hz
+      osc.frequency.value = parseInt(hz, 10); // Hz
       const dest = context.createMediaStreamDestination();
       osc.connect(dest); // connect it to the destination
       osc.start(0);
@@ -268,8 +270,10 @@ export class DebugUtil {
       return dest.stream.getAudioTracks();
     }
 
-    function generateVideoTrack(constraints: MediaTrackConstraints): MediaStreamTrack[] {
-      const color = constraints.deviceId || cameras[0].deviceId;
+    function generateVideoTrack(constraints: MediaTrackConstraintSet): MediaStreamTrack[] {
+      const constrainMatchMock = {exact: undefined} as ConstrainDOMStringParameters;
+      const constrainMatch = (constraints.deviceId as ConstrainDOMStringParameters) || constrainMatchMock;
+      const color = (constrainMatch.exact as string) || cameras[0].deviceId;
       const width = 300;
       const height = 240;
       const canvas = document.createElement('canvas');
@@ -279,7 +283,7 @@ export class DebugUtil {
       setInterval(() => {
         ctx.fillStyle = `#${color}`;
         ctx.fillRect(0, 0, width, height);
-        ctx.fillStyle = '#000000';
+        ctx.fillStyle = '#000';
         ctx.fillRect(0, 0, Math.random() * 10, Math.random() * 10);
       }, 500);
       // Typings missing for: https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/captureStream
