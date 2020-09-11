@@ -1,6 +1,10 @@
 importScripts('jimp.min.js');
 
-self.addEventListener('message', event => {
+/**
+ * @typedef {{buffer: ArrayBuffer, useProfileImageSize?: boolean}} Data
+ */
+
+self.addEventListener('message', (/** @type {MessageEvent<Data>} */ event) => {
   let MAX_SIZE = 1448;
   let MAX_FILE_SIZE = 310 * 1024;
   let COMPRESSION = 80;
