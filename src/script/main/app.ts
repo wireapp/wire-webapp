@@ -180,11 +180,10 @@ class App {
   }
 
   /**
-   * Construct a new app.
-   * @param {APIClient} apiClient Configured backend client
-   * @param {BackendClient} backendClient Configured backend client
-   * @param {Element} appContainer DOM element that will hold the app
-   * @param {SQLeetEngine} [encryptedEngine] Encrypted database handler
+   * @param apiClient Configured backend client
+   * @param backendClient Configured backend client
+   * @param appContainer DOM element that will hold the app
+   * @param encryptedEngine Encrypted database handler
    */
   constructor(
     apiClient: APIClient,
@@ -225,9 +224,9 @@ class App {
 
   /**
    * Create all app repositories.
-   * @returns {Object} All repositories
+   * @returns All repositories
    */
-  _setupRepositories() {
+  private _setupRepositories() {
     const repositories: ViewModelRepositories = {} as ViewModelRepositories;
     const selfService = new SelfService(this.apiClient);
     const sendingMessageQueue = new MessageSender();
@@ -341,10 +340,10 @@ class App {
 
   /**
    * Create all app services.
-   * @param {SQLeetEngine} [encryptedEngine] Encrypted database handler
-   * @returns {Object} All services
+   * @param Encrypted database handler
+   * @returns All services
    */
-  _setupServices(encryptedEngine: SQLeetEngine) {
+  private _setupServices(encryptedEngine: SQLeetEngine) {
     const storageService = new StorageService(encryptedEngine);
     const eventService = Runtime.isEdge()
       ? new EventServiceNoCompound(storageService)
@@ -363,9 +362,9 @@ class App {
 
   /**
    * Subscribe to amplify events.
-   * @returns {undefined} No return value
+   * @returns No return value
    */
-  _subscribeToEvents() {
+  private _subscribeToEvents() {
     amplify.subscribe(WebAppEvents.LIFECYCLE.REFRESH, this.refresh.bind(this));
     amplify.subscribe(WebAppEvents.LIFECYCLE.SIGN_OUT, this.logout.bind(this));
     amplify.subscribe(WebAppEvents.CONNECTION.ACCESS_TOKEN.RENEW, async (source: string) => {
@@ -393,8 +392,8 @@ class App {
    *   Any failure in the Promise chain will result in a logout.
    * @todo Check if we really need to logout the user in all these error cases or how to recover from them
    *
-   * @param {boolean} [isReload=_isReload()] App init after page reload
-   * @returns {undefined} No return value
+   * @param App init after page reload
+   * @returns No return value
    */
   async initApp() {
     // add body information
@@ -507,9 +506,8 @@ class App {
 
   /**
    * Initialize ServiceWorker if supported.
-   * @returns {undefined} No return value
    */
-  initServiceWorker() {
+  initServiceWorker(): void {
     if (navigator.serviceWorker) {
       navigator.serviceWorker
         .register(`/sw.js?${Environment.version(false)}`)
@@ -519,9 +517,8 @@ class App {
 
   /**
    * Behavior when internet connection is re-established.
-   * @returns {undefined} No return value
    */
-  onInternetConnectionGained() {
+  onInternetConnectionGained(): void {
     this.logger.info('Internet connection regained. Re-establishing WebSocket connection...');
     this.backendClient.executeOnConnectivity(BackendClient.CONNECTIVITY_CHECK_TRIGGER.CONNECTION_REGAINED).then(() => {
       amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.NO_INTERNET);
@@ -532,15 +529,14 @@ class App {
 
   /**
    * Reflect internet connection loss in the UI.
-   * @returns {undefined} No return value
    */
-  onInternetConnectionLost() {
+  onInternetConnectionLost(): void {
     this.logger.warn('Internet connection lost');
     this.repository.event.disconnectWebSocket(WebSocketService.CHANGE_TRIGGER.OFFLINE);
     amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.NO_INTERNET);
   }
 
-  _appInitFailure(error: BaseError, isReload: boolean) {
+  private _appInitFailure(error: BaseError, isReload: boolean) {
     let logMessage = `Could not initialize app version '${Environment.version(false)}'`;
     if (Runtime.isDesktopApp()) {
       logMessage += ` - Electron '${platform.os.family}' '${Environment.version()}'`;
@@ -610,10 +606,10 @@ class App {
 
   /**
    * Check whether we need to set different user information (picture, username).
-   * @param {User} userEntity Self user entity
-   * @returns {User} Checked user entity
+   * @param userEntity Self user entity
+   * @returns Checked user entity
    */
-  _checkUserInformation(userEntity: User) {
+  private _checkUserInformation(userEntity: User) {
     if (userEntity.hasActivatedIdentity()) {
       if (!userEntity.mediumPictureResource()) {
         this.repository.user.setDefaultPicture();
@@ -628,7 +624,7 @@ class App {
 
   /**
    * Initiate the self user by getting it from the backend.
-   * @returns {Promise<User>} Resolves with the self user entity
+   * @returns Resolves with the self user entity
    */
   async _initiateSelfUser() {
     const userEntity = await this.repository.user.getSelf();
@@ -644,18 +640,18 @@ class App {
     }
 
     await this.service.storage.init(userEntity.id);
-    await this.repository.client.init(userEntity);
+    this.repository.client.init(userEntity);
     await this.repository.properties.init(userEntity);
-    await this._checkUserInformation(userEntity);
+    this._checkUserInformation(userEntity);
 
     return userEntity;
   }
 
   /**
    * Initiate the current client of the self user.
-   * @returns {Promise<Client>} Resolves with the local client entity
+   * @returns Resolves with the local client entity
    */
-  _initiateSelfUserClients() {
+  private _initiateSelfUserClients() {
     return this.repository.client
       .getValidLocalClient()
       .then(clientObservable => {
@@ -668,19 +664,15 @@ class App {
 
   /**
    * Handle URL params.
-   * @private
-   * @returns {undefined} No return value
    */
-  _handleUrlParams() {
+  private _handleUrlParams(): void {
     // Currently no URL params to be handled
   }
 
   /**
    * Check whether the page has been reloaded.
-   * @private
-   * @returns {boolean} `true` if it is a page refresh
    */
-  _isReload() {
+  private _isReload() {
     const NAVIGATION_TYPE_RELOAD = 1;
     return window.performance.navigation.type === NAVIGATION_TYPE_RELOAD;
   }
@@ -691,9 +683,9 @@ class App {
 
   /**
    * Check that this is the single instance tab of the app.
-   * @returns {void} Resolves when page is the first tab
+   * @returns Resolves when page is the first tab
    */
-  _registerSingleInstance() {
+  private _registerSingleInstance(): void {
     const instanceId = createRandomUuid();
 
     if (this.singleInstanceHandler.registerInstance(instanceId)) {
@@ -702,7 +694,7 @@ class App {
     throw new AuthError(AuthError.TYPE.MULTIPLE_TABS, AuthError.MESSAGE.MULTIPLE_TABS);
   }
 
-  _registerSingleInstanceCleaning() {
+  private _registerSingleInstanceCleaning() {
     $(window).on('beforeunload', () => {
       this.singleInstanceHandler.deregisterInstance();
     });
@@ -710,9 +702,8 @@ class App {
 
   /**
    * Hide the loading spinner and show the application UI.
-   * @returns {undefined} No return value
    */
-  _showInterface() {
+  private _showInterface() {
     const mainView = new MainViewModel(this.repository);
     ko.applyBindings(mainView, this.appContainer);
 
@@ -748,9 +739,8 @@ class App {
 
   /**
    * Subscribe to 'beforeunload' to stop calls and disconnect the WebSocket.
-   * @returns {undefined} No return value
    */
-  _subscribeToUnloadEvents() {
+  private _subscribeToUnloadEvents(): void {
     $(window).on('unload', () => {
       this.logger.info("'window.onunload' was triggered, so we will disconnect from the backend.");
       this.repository.event.disconnectWebSocket(WebSocketService.CHANGE_TRIGGER.PAGE_NAVIGATION);
@@ -773,9 +763,8 @@ class App {
 
   /**
    * Subscribe to 'navigator.onLine' related events.
-   * @returns {undefined} No return value
    */
-  _watchOnlineStatus() {
+  private _watchOnlineStatus(): void {
     this.logger.info('Watching internet connectivity status');
     $(window).on('offline', this.onInternetConnectionLost.bind(this));
     $(window).on('online', this.onInternetConnectionGained.bind(this));
@@ -788,9 +777,8 @@ class App {
   /**
    * Logs the user out on the backend and deletes cached data.
    *
-   * @param {SIGN_OUT_REASON} signOutReason Cause for logout
-   * @param {boolean} clearData Keep data in database
-   * @returns {undefined} No return value
+   * @param signOutReason Cause for logout
+   * @param clearData Keep data in database
    */
   logout(signOutReason: SIGN_OUT_REASON, clearData: boolean): Promise<void> | void {
     const _redirectToLogin = () => {
@@ -879,13 +867,13 @@ class App {
 
   /**
    * Refresh the web app or desktop wrapper
-   * @returns {undefined} No return value
    */
-  refresh(): void | boolean {
+  refresh(): void {
     this.logger.info('Refresh to update started');
     if (Runtime.isDesktopApp()) {
       // if we are in a desktop env, we just warn the wrapper that we need to reload. It then decide what should be done
-      return amplify.publish(WebAppEvents.LIFECYCLE.RESTART);
+      amplify.publish(WebAppEvents.LIFECYCLE.RESTART);
+      return;
     }
 
     window.location.reload();
@@ -894,18 +882,16 @@ class App {
 
   /**
    * Notify about found update
-   * @returns {undefined} No return value
    */
-  update() {
+  update(): void {
     amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.LIFECYCLE_UPDATE);
   }
 
   /**
    * Redirect to the login page after internet connectivity has been verified.
-   * @param {SIGN_OUT_REASON} signOutReason Redirect triggered by session expiration
-   * @returns {undefined} No return value
+   * @param signOutReason Redirect triggered by session expiration
    */
-  _redirectToLogin(signOutReason: SIGN_OUT_REASON) {
+  private _redirectToLogin(signOutReason: SIGN_OUT_REASON): void {
     this.logger.info(`Redirecting to login after connectivity verification. Reason: ${signOutReason}`);
     this.backendClient.executeOnConnectivity(BackendClient.CONNECTIVITY_CHECK_TRIGGER.LOGIN_REDIRECT).then(() => {
       const isTemporaryGuestReason = App.CONFIG.SIGN_OUT_REASONS.TEMPORARY_GUEST.includes(signOutReason);
@@ -922,7 +908,7 @@ class App {
   // Debugging
   //##############################################################################
 
-  _publishGlobals() {
+  private _publishGlobals() {
     window.z.userPermission = ko.observable({});
     ko.pureComputed(() => {
       const selfUser = this.repository.user.self();

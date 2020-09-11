@@ -133,9 +133,8 @@ export class WarningsViewModel {
   /**
    * Close warning.
    * @note Used to close a warning banner by clicking the close button
-   * @returns {undefined} No return value
    */
-  closeWarning = () => {
+  closeWarning = (): void => {
     const warningToClose = this.visibleWarning();
     this.dismissWarning(warningToClose);
 

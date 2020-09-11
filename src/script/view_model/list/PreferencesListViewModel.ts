@@ -96,7 +96,7 @@ export class PreferencesListViewModel {
     this._switchContent(ContentViewModel.STATE.PREFERENCES_OPTIONS);
   };
 
-  _switchContent = (newContentState: string): void => {
+  private readonly _switchContent = (newContentState: string): void => {
     this.contentViewModel.switchContent(newContentState);
   };
 }
