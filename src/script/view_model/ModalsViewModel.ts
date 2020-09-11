@@ -62,10 +62,14 @@ interface Text {
 interface ModalOptions {
   close?: Function;
   closeOnConfirm?: boolean;
+  /** Content needed for visualization on modal */
   data?: ClientEntity[] | boolean;
   hideSecondary?: boolean;
+  /** Set to `true` to disable autoclose behavior */
   preventClose?: boolean;
+  /** Called when action in modal is triggered */
   primaryAction?: Action;
+  /** Called when secondary action in modal is triggered */
   secondaryAction?: Action;
   showClose?: boolean;
   text?: Text;
@@ -174,16 +178,10 @@ export class ModalsViewModel {
   /**
    * Show modal
    *
-   * @param {ModalsViewModel.TYPE} type Indicates which modal to show
-   * @param {Object} [options={}] Information to configure modal
-   * @param {Object} options.data Content needed for visualization on modal
-   * @param {Function} options.action Called when action in modal is triggered
-   * @param {boolean} [options.preventClose] Set to `true` to disable autoclose behavior
-   * @param {Function} options.secondary Called when secondary action in modal is triggered
-   * @param {string} [id] The optional ID of ther modal to prevent multiple instances
-   * @returns {undefined} No return value
+   * @param type Indicates which modal to show
+   * @param id The optional ID of another modal to prevent multiple instances
    */
-  _showModal = (type: string, options: ModalOptions = {} as ModalOptions, id: string) => {
+  private readonly _showModal = (type: string, options: ModalOptions = {} as ModalOptions, id?: string): void => {
     if (!Object.values(Types).includes(type)) {
       return this.logger.warn(`Modal of type '${type}' is not supported`);
     }

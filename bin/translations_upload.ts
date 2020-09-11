@@ -17,10 +17,10 @@
  *
  */
 
-const {join, resolve} = require('path');
+const path = require('path');
 const {execSync} = require('child_process');
 
-const root = resolve(__dirname, '..');
-const config = join(root, 'crowdin.yaml');
-const identity = join(root, 'keys', 'crowdin.yaml');
+const root = path.resolve(__dirname, '..');
+const config = path.join(root, 'crowdin.yaml');
+const identity = path.join(root, 'keys/crowdin.yaml');
 execSync(`crowdin upload sources --config="${config}" --identity="${identity}"`, {stdio: [0, 1]});

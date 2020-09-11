@@ -36,7 +36,7 @@ class AudioSeekBarComponent {
   element: HTMLElement;
   loudness: number[];
   levels: HTMLSpanElement[];
-  _onResizeFired: () => void;
+  private readonly _onResizeFired: () => void;
 
   constructor(params: Params, element: HTMLElement) {
     this.audioElement = params.src;
@@ -72,7 +72,7 @@ class AudioSeekBarComponent {
     window.addEventListener('resize', this._onResizeFired);
   }
 
-  _renderLevels(): void {
+  private _renderLevels(): void {
     const numberOfLevelsFitOnScreen = Math.floor(this.element.clientWidth / 3); // 2px + 1px
     const scaledLoudness = interpolate(this.loudness, numberOfLevelsFitOnScreen);
     this.element.innerHTML = '';
@@ -85,13 +85,13 @@ class AudioSeekBarComponent {
     });
   }
 
-  _normalizeLoudness(loudness: number[], max: number): number[] {
+  private _normalizeLoudness(loudness: number[], max: number): number[] {
     const peak = Math.max(...loudness);
     const scale = max / peak;
     return peak > max ? loudness.map(level => level * scale) : loudness;
   }
 
-  _onLevelClick = (event: JQueryMouseEventObject): void => {
+  private readonly _onLevelClick = (event: JQueryMouseEventObject): void => {
     const mouse_x = event.pageX - event.currentTarget.getBoundingClientRect().left;
     const calculatedTime = (this.audioElement.duration * mouse_x) / event.currentTarget.clientWidth;
     const currentTime = isNaN(calculatedTime) ? 0 : calculatedTime;
@@ -100,12 +100,12 @@ class AudioSeekBarComponent {
     this._onTimeUpdate();
   };
 
-  _onTimeUpdate = (): void => {
+  private readonly _onTimeUpdate = (): void => {
     const index = Math.floor((this.audioElement.currentTime / this.audioElement.duration) * this.levels.length);
     this.levels.forEach((level, levelIndex) => level.classList.toggle('active', levelIndex <= index));
   };
 
-  _onAudioEnded = (): void => this.levels.forEach(level => level.classList.remove('active'));
+  private readonly _onAudioEnded = (): void => this.levels.forEach(level => level.classList.remove('active'));
 
   dispose = (): void => {
     this.audioElement.removeEventListener('ended', this._onAudioEnded);

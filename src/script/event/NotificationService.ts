@@ -120,7 +120,7 @@ export class NotificationService {
 
   /**
    * Load missed ID from persistent storage.
-   * @returns {Promise} Resolves with the stored missed ID.
+   * @returns Resolves with the stored missed ID.
    */
   getMissedIdFromDb(): Promise<string | undefined> {
     return this.storageService

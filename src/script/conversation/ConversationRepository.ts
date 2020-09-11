@@ -4032,7 +4032,7 @@ export class ConversationRepository {
    *
    * @param conversationEntity Conversation entity that will be renamed
    * @param eventJson JSON data of 'conversation.receipt-mode-update' event
-   * @returns>} Resolves when the event was handled
+   * @returns Resolves when the event was handled
    */
   private _onReceiptModeChanged(conversationEntity: Conversation, eventJson: EventJson) {
     return this._addEventToConversation(conversationEntity, eventJson).then(({messageEntity}) => {

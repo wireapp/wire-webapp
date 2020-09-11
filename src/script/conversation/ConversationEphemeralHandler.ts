@@ -172,7 +172,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
     return validatedMessages.filter(messageEntity => !!messageEntity) as Message[];
   }
 
-  _obfuscateAssetMessage(messageEntity: ContentMessage) {
+  private _obfuscateAssetMessage(messageEntity: ContentMessage) {
     messageEntity.ephemeral_expires(true);
 
     const assetEntity = messageEntity.get_first_asset();
@@ -188,7 +188,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
     this.logger.info(`Obfuscated asset message '${messageEntity.id}'`);
   }
 
-  _obfuscateImageMessage(messageEntity: ContentMessage): void {
+  private _obfuscateImageMessage(messageEntity: ContentMessage): void {
     messageEntity.ephemeral_expires(true);
 
     const assetEntity = messageEntity.get_first_asset();
