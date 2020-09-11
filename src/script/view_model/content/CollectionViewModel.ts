@@ -119,7 +119,7 @@ export class CollectionViewModel {
     }
   }
 
-  _populateItems(messageEntities: ContentMessage[]) {
+  private _populateItems(messageEntities: ContentMessage[]) {
     messageEntities.forEach((messageEntity: ContentMessage) => {
       if (!messageEntity.is_expired()) {
         // TODO: create binary map helper

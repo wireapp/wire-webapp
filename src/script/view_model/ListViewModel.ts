@@ -189,7 +189,7 @@ export class ListViewModel {
     ko.applyBindings(this, document.getElementById(this.elementId));
   }
 
-  _initSubscriptions = () => {
+  private readonly _initSubscriptions = () => {
     amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, this.openConversations);
     amplify.subscribe(WebAppEvents.LIFECYCLE.LOADED, () => this.webappLoaded(true));
     amplify.subscribe(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT, this.openPreferencesAccount);

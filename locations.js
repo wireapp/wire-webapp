@@ -17,10 +17,10 @@
  *
  */
 
-const {resolve} = require('path');
+const path = require('path');
 
 module.exports = {
-  DIST_PATH: resolve(__dirname, 'server/dist'),
-  ROOT_PATH: resolve(__dirname),
-  SRC_PATH: resolve(__dirname, 'src'),
+  DIST_PATH: path.resolve(__dirname, 'server/dist'),
+  ROOT_PATH: path.resolve(__dirname),
+  SRC_PATH: path.resolve(__dirname, 'src'),
 };

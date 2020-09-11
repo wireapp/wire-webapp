@@ -566,7 +566,7 @@ export class ClientRepository {
 
   /**
    * Update clients of the self user.
-   * @returns {Promise} Resolves when the clients have been updated
+   * @returns Resolves when the clients have been updated
    */
   updateClientsForSelf(): Promise<ClientEntity[]> {
     return this.clientService
@@ -668,7 +668,7 @@ export class ClientRepository {
    *
    * @param userId User ID to be checked
    * @param clientId ID of client to be checked
-   * @returnsIs the client the current local client
+   * @returns Is the client the current local client
    */
   private isCurrentClient(userId: string, clientId: string): boolean {
     if (!this.currentClient()) {

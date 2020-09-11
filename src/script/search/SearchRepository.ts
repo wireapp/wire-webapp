@@ -120,7 +120,7 @@ export class SearchRepository {
       .map(result => result.user);
   }
 
-  _matches(term: string, termSlug: string, excludedChars?: Record<string, string>, value?: string): number {
+  private _matches(term: string, termSlug: string, excludedChars?: Record<string, string>, value?: string): number {
     const isStrictMatch = (value || '').toLowerCase().startsWith(term.toLowerCase());
     if (isStrictMatch) {
       // if the pattern matches the raw text, give the maximum value to the match

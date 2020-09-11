@@ -103,7 +103,7 @@ export class GroupParticipantServiceViewModel extends BasePanelViewModel {
     this._showService(this.selectedParticipant());
   }
 
-  _showService = async (entity: User): Promise<void> => {
+  private readonly _showService = async (entity: User): Promise<void> => {
     const serviceEntity = await this.integrationRepository.getServiceFromUser(entity);
     this.selectedService(serviceEntity);
     this.integrationRepository.addProviderNameToParticipant(serviceEntity);

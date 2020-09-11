@@ -474,9 +474,6 @@ export class CallingRepository {
 
   /**
    * Handle incoming calling events from backend.
-   *
-   * @param {Object} event Event payload
-   * @param {EventRepository.SOURCE} source Source of event
    */
   async onCallEvent(event: any, source: string): Promise<void> {
     const {content, conversation: conversationId, from: userId, sender: clientId, time} = event;
@@ -1086,7 +1083,7 @@ export class CallingRepository {
     );
 
     const queryLog = Object.entries(query)
-      .filter(([type, needed]) => needed)
+      .filter(([_type, needed]) => needed)
       .map(([type]) => (missingStreams[type as keyof MediaStreamQuery] ? type : `${type} (from cache)`))
       .join(', ');
     this.logger.debug(`mediaStream requested: ${queryLog}`);
@@ -1095,10 +1092,10 @@ export class CallingRepository {
       // we have everything in cache, just return the participant's stream
       return new Promise(resolve => {
         /*
-          There is a bug in Chrome (from version 73, the version where it's fixed is unknown).
-          This bug crashes the browser if the mediaStream is returned right away (probably some race condition in Chrome internal code)
-          The timeout(0) fixes this issue.
-        */
+         * There is a bug in Chrome (from version 73, the version where it's fixed is unknown).
+         * This bug crashes the browser if the mediaStream is returned right away (probably some race condition in Chrome internal code)
+         * The timeout(0) fixes this issue.
+         */
         window.setTimeout(() => resolve(selfParticipant.getMediaStream()), 0);
       });
     }

@@ -126,20 +126,20 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
       .catch(() => this._showModal(t('modalConversationGuestOptionsRevokeCodeMessage')));
   }
 
-  _mapConversationAccessState(conversationEntity: Conversation, eventJson: any): void {
+  private _mapConversationAccessState(conversationEntity: Conversation, eventJson: any): void {
     const {access: accessModes, access_role: accessRole} = eventJson.data;
     this.conversationMapper.mapAccessState(conversationEntity, accessModes, accessRole);
   }
 
-  _resetConversationAccessCode(conversationEntity: Conversation): void {
+  private _resetConversationAccessCode(conversationEntity: Conversation): void {
     conversationEntity.accessCode(undefined);
   }
 
-  _updateConversationAccessCode(conversationEntity: Conversation, eventJson: any): void {
+  private _updateConversationAccessCode(conversationEntity: Conversation, eventJson: any): void {
     this.conversationMapper.mapAccessCode(conversationEntity, eventJson.data);
   }
 
-  _showModal(message: string): void {
+  private _showModal(message: string): void {
     const modalOptions = {text: {message}};
     amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
   }

@@ -486,12 +486,12 @@ export class Conversation {
     this._initSubscriptions();
   }
 
-  _isInitialized() {
+  private _isInitialized() {
     const hasMappedUsers = this.participating_user_ets().length || !this.participating_user_ids().length;
     return Boolean(this.selfUser() && hasMappedUsers);
   }
 
-  _initSubscriptions() {
+  private _initSubscriptions() {
     [
       this.archivedState,
       this.archivedTimestamp,
@@ -595,7 +595,7 @@ export class Conversation {
    * @param updatedTimestamp Timestamp from update
    * @returns Updated timestamp or `false` if not increased
    */
-  _incrementTimeOnly(currentTimestamp: number, updatedTimestamp: number): number | false {
+  private _incrementTimeOnly(currentTimestamp: number, updatedTimestamp: number): number | false {
     const timestampIncreased = updatedTimestamp > currentTimestamp;
     return timestampIncreased ? updatedTimestamp : false;
   }
