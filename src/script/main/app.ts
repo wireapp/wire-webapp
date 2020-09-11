@@ -494,7 +494,7 @@ class App {
       telemetry.timeStep(AppInitTimingsStep.UPDATED_CONVERSATIONS);
       if (userRepository.isActivatedAccount()) {
         // start regularly polling the server to check if there is a new version of Wire
-        startNewVersionPolling(Environment.version(false, true), this.update.bind(this));
+        startNewVersionPolling(Environment.version(false), this.update.bind(this));
       }
       audioRepository.init(true);
       conversationRepository.cleanup_conversations();
