@@ -47,13 +47,9 @@ export const Environment = {
     isLocalhost,
     isProduction,
   },
-  version: (showWrapperVersion = true, doNotFormat = false): string => {
+  version: (showWrapperVersion = true): string => {
     if (Environment.frontend.isLocalhost()) {
       return 'dev';
-    }
-
-    if (doNotFormat) {
-      return Config.getConfig().VERSION;
     }
 
     const electronVersion = getElectronVersion(Runtime.getUserAgent());
