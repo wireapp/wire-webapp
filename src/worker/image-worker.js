@@ -5,14 +5,13 @@ importScripts('jimp.min.js');
  */
 
 self.addEventListener('message', (/** @type {MessageEvent<Data>} */ event) => {
+  const COMPRESSION = 80;
   let MAX_SIZE = 1448;
   let MAX_FILE_SIZE = 310 * 1024;
-  let COMPRESSION = 80;
 
   if (event.data.useProfileImageSize) {
     MAX_SIZE = 280;
     MAX_FILE_SIZE = 1024 * 1024;
-    COMPRESSION = 80;
   }
 
   Jimp.read(event.data.buffer).then(image => {
