@@ -131,7 +131,7 @@ export class CryptographyRepository {
 
   /**
    * Get the fingerprint of the local identity.
-   * @returns {string} Fingerprint of local identity public key
+   * @returns Fingerprint of local identity public key
    */
   getLocalFingerprint() {
     return this.formatFingerprint(this.cryptobox.identity.public_key.fingerprint());
@@ -179,8 +179,8 @@ export class CryptographyRepository {
 
   /**
    * Get a pre-key for each client in the user client map.
-   * @param {Object} recipients User client map to request pre-keys for
-   * @returns {Promise} Resolves with a map of pre-keys for the requested clients
+   * @param recipients User client map to request pre-keys for
+   * @returns Resolves with a map of pre-keys for the requested clients
    */
   getUsersPreKeys(recipients: UserClients): Promise<UserPreKeyBundleMap> {
     return this.cryptographyService.getUsersPreKeys(recipients).catch(error => {
@@ -221,9 +221,9 @@ export class CryptographyRepository {
    * Construct a session ID.
    *
    * @todo Make public
-   * @param {string} userId User ID for the remote participant
-   * @param {string} clientId Client ID of the remote participant
-   * @returns {string} Session ID
+   * @param userId User ID for the remote participant
+   * @param clientId Client ID of the remote participant
+   * @returns Session ID
    */
   private constructSessionId(userId: string, clientId: string): string {
     return `${userId}@${clientId}`;
@@ -349,7 +349,7 @@ export class CryptographyRepository {
     const cipherPayloadPromises = Object.entries(recipients).reduce<Promise<EncryptedPayload>[]>(
       (accumulator, [userId, clientIds]) => {
         if (clientIds && clientIds.length) {
-          messagePayload.recipients[userId] = messagePayload.recipients[userId] || {};
+          messagePayload.recipients[userId] ||= {};
           clientIds.forEach(clientId => {
             const sessionId = this.constructSessionId(userId, clientId);
             const encryptionPromise = this.encryptPayloadForSession(sessionId, genericMessage);
@@ -405,7 +405,7 @@ export class CryptographyRepository {
       if (cipherText) {
         messagePayload.recipients[userId][clientId] = cipherText;
       } else {
-        missingRecipients[userId] = missingRecipients[userId] || [];
+        missingRecipients[userId] ||= [];
         missingRecipients[userId].push(clientId);
       }
     });

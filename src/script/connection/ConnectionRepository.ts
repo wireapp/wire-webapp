@@ -278,13 +278,12 @@ export class ConnectionRepository {
 
   /**
    * Update the status of a connection.
-   * @private
    * @param userEntity User to update connection with
    * @param connectionStatus Connection status
    * @param showConversation Show conversation on success
    * @returns Promise that resolves when the connection status was updated
    */
-  _updateStatus(userEntity: User, connectionStatus: ConnectionStatus, showConversation = false): Promise<void> {
+  private _updateStatus(userEntity: User, connectionStatus: ConnectionStatus, showConversation = false): Promise<void> {
     if (!userEntity || !connectionStatus) {
       this.logger.error('Missing parameter to update connection');
       return Promise.reject(new ConnectionError(BaseError.TYPE.MISSING_PARAMETER, BaseError.MESSAGE.MISSING_PARAMETER));
@@ -316,7 +315,11 @@ export class ConnectionRepository {
    * @param previousStatus Previous connection status
    * @returns No return value
    */
-  _sendNotification(connectionEntity: ConnectionEntity, source: EventSource, previousStatus: ConnectionStatus): void {
+  private _sendNotification(
+    connectionEntity: ConnectionEntity,
+    source: EventSource,
+    previousStatus: ConnectionStatus,
+  ): void {
     // We accepted the connection request or unblocked the user
     const expectedPreviousStatus = [ConnectionStatus.BLOCKED, ConnectionStatus.PENDING];
     const wasExpectedPreviousStatus = expectedPreviousStatus.includes(previousStatus);

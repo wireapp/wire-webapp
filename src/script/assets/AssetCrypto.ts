@@ -63,18 +63,12 @@ export const encryptAesAsset = async (plaintext: ArrayBuffer): Promise<Encrypted
   return {cipherText: ivCipherText.buffer, keyBytes: keyBytes, sha256: digest};
 };
 
-/**
- * @private
- */
 const equalHashes = (bufferA: ArrayBuffer, bufferB: ArrayBuffer): boolean => {
   const arrayA = new Uint32Array(bufferA);
   const arrayB = new Uint32Array(bufferB);
   return arrayA.length === arrayB.length && arrayA.every((value, index) => value === arrayB[index]);
 };
 
-/**
- * @private
- */
 const generateRandomBytes = (length: number): Uint8Array => {
   const getRandomValue = () => {
     const buffer = new Uint32Array(1);

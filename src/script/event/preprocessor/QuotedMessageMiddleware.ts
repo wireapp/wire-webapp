@@ -19,22 +19,20 @@
 
 import {Quote} from '@wireapp/protocol-messaging';
 
-import {getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 import {base64ToArray} from 'Util/util';
 
 import {ClientEvent} from '../Client';
 import {QuoteEntity} from '../../message/QuoteEntity';
 import {MessageHasher} from '../../message/MessageHasher';
+import type {EventService} from '../EventService';
+import {EventRecord} from '../../storage/EventRecord';
 
 export class QuotedMessageMiddleware {
-  /**
-   * Construct a new QuotedMessageMiddleware.
-   * This class is responsible for parsing incoming text messages that contains quoted messages.
-   * It will handle validating the quote and adding metadata to the event.
-   *
-   * @param {EventService} eventService Repository that handles events
-   */
-  constructor(eventService) {
+  private readonly eventService: EventService;
+  private readonly logger: Logger;
+
+  constructor(eventService: EventService) {
     this.eventService = eventService;
     this.logger = getLogger('QuotedMessageMiddleware');
   }
@@ -43,10 +41,10 @@ export class QuotedMessageMiddleware {
    * Handles validation of the event if it contains a quote.
    * If the event does contain a quote, will also decorate the event with some metadata regarding the quoted message
    *
-   * @param {Object} event event in the DB format
-   * @returns {Object} event - the original event if no quote is found (or does not validate). The decorated event if the quote is valid
+   * @param event event in the DB format
+   * @returns the original event if no quote is found (or does not validate). The decorated event if the quote is valid
    */
-  processEvent(event) {
+  processEvent(event: EventRecord): Promise<EventRecord> {
     switch (event.type) {
       case ClientEvent.CONVERSATION.MESSAGE_ADD:
         if (event.data.replacing_message_id) {
@@ -62,39 +60,35 @@ export class QuotedMessageMiddleware {
     }
   }
 
-  _handleDeleteEvent(event) {
+  private async _handleDeleteEvent(event: EventRecord): Promise<EventRecord> {
     const originalMessageId = event.data.message_id;
-    return this._findRepliesToMessage(event.conversation, originalMessageId).then(({replies}) => {
-      this.logger.info(`Invalidating '${replies.length}' replies to deleted message '${originalMessageId}'`);
-      replies.forEach(reply => {
-        reply.data.quote = {error: {type: QuoteEntity.ERROR.MESSAGE_NOT_FOUND}};
-        this.eventService.replaceEvent(reply);
-      });
-      return event;
+    const {replies} = await this._findRepliesToMessage(event.conversation, originalMessageId);
+    this.logger.info(`Invalidating '${replies.length}' replies to deleted message '${originalMessageId}'`);
+    replies.forEach(reply => {
+      reply.data.quote = {error: {type: QuoteEntity.ERROR.MESSAGE_NOT_FOUND}};
+      this.eventService.replaceEvent(reply);
     });
+    return event;
   }
 
-  _handleEditEvent(event) {
+  private async _handleEditEvent(event: EventRecord): Promise<EventRecord> {
     const originalMessageId = event.data.replacing_message_id;
-    return this._findRepliesToMessage(event.conversation, originalMessageId).then(({originalEvent, replies}) => {
-      if (!originalEvent) {
-        return event;
-      }
+    const {originalEvent, replies} = await this._findRepliesToMessage(event.conversation, originalMessageId);
+    if (!originalEvent) {
+      return event;
+    }
 
-      this.logger.info(`Updating '${replies.length}' replies to updated message '${originalMessageId}'`);
-
-      replies.forEach(reply => {
-        reply.data.quote.message_id = event.id;
-        // we want to update the messages quoting the original message later, thus the timeout
-        setTimeout(() => this.eventService.replaceEvent(reply));
-      });
-
-      const decoratedData = {...event.data, quote: originalEvent.data.quote};
-      return {...event, data: decoratedData};
+    this.logger.info(`Updating '${replies.length}' replies to updated message '${originalMessageId}'`);
+    replies.forEach(reply => {
+      reply.data.quote.message_id = event.id;
+      // we want to update the messages quoting the original message later, thus the timeout
+      setTimeout(() => this.eventService.replaceEvent(reply));
     });
+    const decoratedData = {...event.data, quote: originalEvent.data.quote};
+    return {...event, data: decoratedData};
   }
 
-  async _handleAddEvent(event) {
+  private async _handleAddEvent(event: EventRecord): Promise<EventRecord> {
     const rawQuote = event.data && event.data.quote;
 
     if (!rawQuote) {
@@ -143,7 +137,10 @@ export class QuotedMessageMiddleware {
     return {...event, data: decoratedData};
   }
 
-  async _findRepliesToMessage(conversationId, messageId) {
+  private async _findRepliesToMessage(
+    conversationId: string,
+    messageId: string,
+  ): Promise<{originalEvent?: EventRecord; replies: EventRecord[]}> {
     const originalEvent = await this.eventService.loadEvent(conversationId, messageId);
 
     if (!originalEvent) {

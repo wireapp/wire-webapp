@@ -157,6 +157,7 @@ export class Conversation {
   public readonly removed_from_conversation?: ko.PureComputed<boolean>;
   public readonly roles: ko.Observable<Record<string, string>>;
   public readonly selfUser: ko.Observable<User>;
+  public readonly servicesCount: ko.PureComputed<number>;
   public readonly showNotificationsEverything: ko.PureComputed<boolean>;
   public readonly showNotificationsMentionsAndReplies: ko.PureComputed<boolean>;
   public readonly showNotificationsNothing: ko.PureComputed<boolean>;
@@ -225,6 +226,9 @@ export class Conversation {
       return hasGuestUser && this.isGroup() && this.selfUser()?.inTeam();
     });
     this.hasService = ko.pureComputed(() => this.participating_user_ets().some(userEntity => userEntity.isService));
+    this.servicesCount = ko.pureComputed(
+      () => this.participating_user_ets().filter(userEntity => userEntity.isService).length,
+    );
 
     // in case this is a one2one conversation this is the connection to that user
     this.connection = ko.observable(new ConnectionEntity());
@@ -482,12 +486,12 @@ export class Conversation {
     this._initSubscriptions();
   }
 
-  _isInitialized() {
+  private _isInitialized() {
     const hasMappedUsers = this.participating_user_ets().length || !this.participating_user_ids().length;
     return Boolean(this.selfUser() && hasMappedUsers);
   }
 
-  _initSubscriptions() {
+  private _initSubscriptions() {
     [
       this.archivedState,
       this.archivedTimestamp,
@@ -591,7 +595,7 @@ export class Conversation {
    * @param updatedTimestamp Timestamp from update
    * @returns Updated timestamp or `false` if not increased
    */
-  _incrementTimeOnly(currentTimestamp: number, updatedTimestamp: number): number | false {
+  private _incrementTimeOnly(currentTimestamp: number, updatedTimestamp: number): number | false {
     const timestampIncreased = updatedTimestamp > currentTimestamp;
     return timestampIncreased ? updatedTimestamp : false;
   }

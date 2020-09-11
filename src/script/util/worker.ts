@@ -24,7 +24,7 @@ export class WebWorker {
     this.uri = uri;
   }
 
-  post<T>(data: string | ArrayBuffer): Promise<T> {
+  post<T>(data: string | ArrayBuffer | Record<string, any>): Promise<T> {
     return new Promise((resolve, reject) => {
       const worker = new Worker(this.uri);
       worker.onmessage = event => resolve(event.data);

@@ -17,7 +17,7 @@
  *
  */
 
-import {inRange, capToByte, clamp, getRandomNumber, rootMeanSquare} from 'Util/NumberUtil';
+import {inRange, capToByte, clamp, getRandomNumber, rootMeanSquare, roundLogarithmic} from 'Util/NumberUtil';
 
 describe('NumberUtil', () => {
   describe('inRange', () => {
@@ -70,6 +70,29 @@ describe('NumberUtil', () => {
   describe('rootMeanSquare', () => {
     it('returns the root mean square of an array of numbers', () => {
       expect(rootMeanSquare([1, 2, 3, 4, 5, 6, 7])).toBeCloseTo(1.69);
+    });
+  });
+
+  describe('roundLogarithmic', () => {
+    it('rounds zero to zero with any factor', () => {
+      expect(roundLogarithmic(0, 1)).toBe(0);
+      expect(roundLogarithmic(0, 2)).toBe(0);
+      expect(roundLogarithmic(0, 3)).toBe(0);
+      expect(roundLogarithmic(0, 4)).toBe(0);
+      expect(roundLogarithmic(0, 5)).toBe(0);
+      expect(roundLogarithmic(0, 6)).toBe(0);
+    });
+
+    it('returns correct logarithmic rounded number', () => {
+      expect(roundLogarithmic(1, 2)).toBe(1);
+      expect(roundLogarithmic(2, 2)).toBe(2);
+      expect(roundLogarithmic(3, 2)).toBe(3);
+      expect(roundLogarithmic(4, 2)).toBe(4);
+      expect(roundLogarithmic(5, 2)).toBe(4);
+      expect(roundLogarithmic(6, 2)).toBe(6);
+      expect(roundLogarithmic(7, 2)).toBe(6);
+      expect(roundLogarithmic(362, 2)).toBe(256);
+      expect(roundLogarithmic(500, 2)).toBe(363);
     });
   });
 });

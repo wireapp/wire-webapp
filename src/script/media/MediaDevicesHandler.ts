@@ -280,7 +280,6 @@ export class MediaDevicesHandler {
 
   /**
    * Remove all known MediaDevices from the lists.
-   * @private
    */
   private removeAllDevices(): void {
     this.availableDevices.audioInput.removeAll();

@@ -4,7 +4,7 @@
   "main": "dist/index.js",
   "license": "GPL-3.0",
   "dependencies": {
-    "@wireapp/commons": "3.7.2",
+    "@wireapp/commons": "3.8.0",
     "dotenv": "8.2.0",
     "dotenv-extended": "2.8.0",
     "express": "4.17.1",
@@ -21,7 +21,7 @@
     "pm2": "4.4.1"
   },
   "devDependencies": {
-    "@types/express": "4.17.7",
+    "@types/express": "4.17.8",
     "@types/express-sitemap-xml": "1.1.0",
     "@types/express-useragent": "1.0.0",
     "@types/fs-extra": "8.1.1",

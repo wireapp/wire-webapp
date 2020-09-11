@@ -121,7 +121,6 @@ export class PropertiesRepository {
     }
 
     if (isTeamAccount) {
-      enablePrivacy();
       return Promise.resolve();
     }
 

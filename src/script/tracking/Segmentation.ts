@@ -29,13 +29,14 @@ export const Segmentation = {
     VIDEO: 'call_video',
   },
   COMMON: {
-    APP: 'user_app',
-    APP_VERSION: 'user_app_version',
-    DESKTOP_APP: 'user_desktop_app',
+    APP: 'app_name',
+    APP_VERSION: 'app_version',
+    DESKTOP_APP: 'app_desktop_app',
   },
   CONVERSATION: {
     ALLOW_GUESTS: 'conversation_allow_guests',
     GUESTS: 'conversation_guests',
+    GUESTS_PRO: 'conversation_guests_pro',
     GUESTS_WIRELESS: 'conversation_guests_wireless',
     SERVICES: 'conversation_services',
     SIZE: 'conversation_size',

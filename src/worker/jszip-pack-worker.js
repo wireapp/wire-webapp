@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2019 Wire Swiss GmbH
+ * Copyright (C) 2020 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,23 +17,31 @@
  *
  */
 
-import {WebAppEvents} from '@wireapp/webapp-events';
+/**
+ * @typedef {Record<string, Uint8Array>} Files
+ * @typedef {import('jszip')} JSZip
+ */
 
-import {ROLE} from '../user/UserPermission';
-import {Environment} from './Environment';
-import {Runtime} from '@wireapp/commons';
+importScripts('jszip.min.js');
 
-export function exposeWrapperGlobals(): void {
-  if (Runtime.isDesktopApp()) {
-    window.z ||= {};
+self.addEventListener('message', async event => {
+  try {
+    /** @type {JSZip} */
+    const zip = new JSZip();
 
-    window.z.event ||= {};
-    window.z.event.WebApp = WebAppEvents;
+    /** @type {Files} */
+    const files = event.data;
 
-    window.z.util ||= {};
-    window.z.util.Environment = Environment;
+    for (const fileName in files) {
+      zip.file(fileName, files[fileName], {binary: true});
+    }
 
-    window.z.team ||= {};
-    window.z.team.ROLE = ROLE;
+    const array = await zip.generateAsync({compression: 'DEFLATE', type: 'uint8array'});
+
+    self.postMessage(array);
+  } catch (error) {
+    self.postMessage({error: error.message});
   }
-}
+
+  return self.close();
+});

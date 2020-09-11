@@ -54,7 +54,7 @@ export class Modal {
     }
   };
 
-  _hide = (): void => {
+  private readonly _hide = (): void => {
     if (this.autoclose) {
       this.hide();
     }

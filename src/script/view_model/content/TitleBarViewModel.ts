@@ -131,7 +131,7 @@ export class TitleBarViewModel {
     this._startCall(conversationEntity, CALL_TYPE.VIDEO);
   };
 
-  _startCall = (conversationEntity: Conversation, callType: CALL_TYPE): void => {
+  private readonly _startCall = (conversationEntity: Conversation, callType: CALL_TYPE): void => {
     const convType = conversationEntity.isGroup() ? CONV_TYPE.GROUP : CONV_TYPE.ONEONONE;
     this.callingRepository.startCall(conversationEntity.id, convType, callType);
   };

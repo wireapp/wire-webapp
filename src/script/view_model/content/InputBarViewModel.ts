@@ -337,7 +337,7 @@ export class InputBarViewModel {
     this._initSubscriptions();
   }
 
-  _initSubscriptions = (): void => {
+  private readonly _initSubscriptions = (): void => {
     amplify.subscribe(WebAppEvents.CONVERSATION.IMAGE.SEND, this.uploadImages);
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.EDIT, this.editMessage);
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REPLY, this.replyMessage);
@@ -377,7 +377,7 @@ export class InputBarViewModel {
     }
   };
 
-  _saveDraftState = async (
+  private readonly _saveDraftState = async (
     conversationEntity: Conversation,
     text: string,
     mentions: MentionEntity[],
@@ -396,11 +396,11 @@ export class InputBarViewModel {
     });
   };
 
-  _generateStorageKey = (conversationEntity: Conversation): string => {
+  private readonly _generateStorageKey = (conversationEntity: Conversation): string => {
     return `${StorageKey.CONVERSATION.INPUT}|${conversationEntity.id}`;
   };
 
-  _loadDraftState = async (conversationEntity: Conversation): Promise<DraftMessage> => {
+  private readonly _loadDraftState = async (conversationEntity: Conversation): Promise<DraftMessage> => {
     const storageKey = this._generateStorageKey(conversationEntity);
     const storageValue = await this.storageRepository.storageService.loadFromSimpleStorage<Draft>(storageKey);
 
@@ -434,12 +434,12 @@ export class InputBarViewModel {
     return draftMessage;
   };
 
-  _resetDraftState = (): void => {
+  private readonly _resetDraftState = (): void => {
     this.currentMentions.removeAll();
     this.input('');
   };
 
-  _createMentionEntity = (userEntity: User): MentionEntity => {
+  private readonly _createMentionEntity = (userEntity: User): MentionEntity => {
     const mentionLength = userEntity.name().length + 1;
     return new MentionEntity(this.editedMention().startIndex, mentionLength, userEntity.id);
   };
@@ -785,7 +785,7 @@ export class InputBarViewModel {
     });
   };
 
-  _generateQuote = (replyMessageEntity: ContentMessage): Promise<QuoteEntity> => {
+  private readonly _generateQuote = (replyMessageEntity: ContentMessage): Promise<QuoteEntity> => {
     return !replyMessageEntity
       ? Promise.resolve()
       : this.eventRepository
@@ -892,7 +892,7 @@ export class InputBarViewModel {
     }
   };
 
-  _isHittingUploadLimit = (files: File[]): boolean => {
+  private readonly _isHittingUploadLimit = (files: File[]): boolean => {
     const concurrentUploadLimit = InputBarViewModel.CONFIG.ASSETS.CONCURRENT_UPLOAD_LIMIT;
     const concurrentUploads = files.length + this.assetRepository.getNumberOfOngoingUploads();
     const isHittingUploadLimit = concurrentUploads > InputBarViewModel.CONFIG.ASSETS.CONCURRENT_UPLOAD_LIMIT;
@@ -911,7 +911,7 @@ export class InputBarViewModel {
     return isHittingUploadLimit;
   };
 
-  _moveCursorToEnd = (): void => {
+  private readonly _moveCursorToEnd = (): void => {
     afterRender(() => {
       if (this.textarea) {
         const endPosition = this.textarea.value.length;
@@ -921,7 +921,7 @@ export class InputBarViewModel {
     });
   };
 
-  _showUploadWarning = (image: File): void => {
+  private readonly _showUploadWarning = (image: File): void => {
     const isGif = image.type === 'image/gif';
     const maxSize = Config.getConfig().MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024;
     const message = isGif ? t('modalGifTooLargeMessage', maxSize) : t('modalPictureTooLargeMessage', maxSize);

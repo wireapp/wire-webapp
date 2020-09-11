@@ -299,7 +299,7 @@ const testEventServiceClass = (testedServiceName, className) => {
     });
 
     describe('saveEvent', () => {
-      /* eslint-disable sort-keys-fix/sort-keys-fix*/
+      /* eslint-disable sort-keys-fix/sort-keys-fix */
       const newEvent = {
         conversation: conversationId,
         id: '4af67f76-09f9-4831-b3a4-9df877b8c29a',
@@ -307,7 +307,7 @@ const testEventServiceClass = (testedServiceName, className) => {
         time: '2016-08-04T13:27:58.993Z',
         type: 'conversation.message-add',
       };
-      /* eslint-enable sort-keys-fix/sort-keys-fix*/
+      /* eslint-enable sort-keys-fix/sort-keys-fix */
 
       it('save event in the database', () => {
         spyOn(testFactory.storage_service, 'save').and.callFake(event => Promise.resolve(event));
@@ -320,7 +320,7 @@ const testEventServiceClass = (testedServiceName, className) => {
     });
 
     describe('replaceEvent', () => {
-      /* eslint-disable sort-keys-fix/sort-keys-fix*/
+      /* eslint-disable sort-keys-fix/sort-keys-fix */
       const updatedEvent = {
         conversation: conversationId,
         id: '4af67f76-09f9-4831-b3a4-9df877b8c29a',
@@ -330,9 +330,9 @@ const testEventServiceClass = (testedServiceName, className) => {
         type: 'conversation.message-add',
         primary_key: 12,
       };
-      /* eslint-enable sort-keys-fix/sort-keys-fix*/
+      /* eslint-enable sort-keys-fix/sort-keys-fix */
 
-      it('update event in the database', () => {
+      it('updates an event in the database', () => {
         spyOn(testFactory.storage_service, 'update').and.callFake(event => Promise.resolve(event));
 
         return testFactory[testedServiceName].replaceEvent(updatedEvent).then(event => {
@@ -342,7 +342,7 @@ const testEventServiceClass = (testedServiceName, className) => {
     });
 
     describe('updateEventAsUploadSucceeded', () => {
-      /* eslint-disable sort-keys-fix/sort-keys-fix*/
+      /* eslint-disable sort-keys-fix/sort-keys-fix */
       it("doesn't do anything if initial event is not found", () => {
         spyOn(testFactory.storage_service, 'load').and.returnValue(Promise.resolve(undefined));
         spyOn(testFactory.storage_service, 'update');
@@ -379,7 +379,7 @@ const testEventServiceClass = (testedServiceName, className) => {
     });
 
     describe('updateEventAsUploadFailed', () => {
-      /* eslint-disable sort-keys-fix/sort-keys-fix*/
+      /* eslint-disable sort-keys-fix/sort-keys-fix */
       it("doesn't do anything if initial event is not found", () => {
         spyOn(testFactory.storage_service, 'load').and.returnValue(Promise.resolve(undefined));
         spyOn(testFactory.storage_service, 'update');
