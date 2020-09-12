@@ -67,7 +67,7 @@
   "accountForm.emailTeamPlaceholder": "you@yourcompany.com",
   "accountForm.namePlaceholder": "Имя",
   "accountForm.passwordHelp": "Используйте как минимум {minPasswordLength} символов, включая одну строчную букву, одну заглавную букву, цифру и специальный символ.",
-  "accountForm.passwordPlaceholder": "Пароль (минимум 8 символов)",
+  "accountForm.passwordPlaceholder": "Пароль (минимум {minPasswordLength} символов)",
   "accountForm.submitButton": "Вперед",
   "accountForm.terms": "Я принимаю <terms>условия и положения</terms>",
   "accountForm.termsAndPrivacyPolicy": "Я принимаю <privacypolicy>политику конфиденциальности</privacypolicy> и <terms>условия и положения</terms>",
