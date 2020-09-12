@@ -53,7 +53,7 @@
   "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": "Пожалуйста, введите правильный email",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Введите имя длиной не менее 2 символов",
   "ValidationError.FIELD.NAME.VALUE_MISSING": "Введите имя длиной не менее 2 символов",
-  "ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH": "Введите пароль длиной не менее {minPasswordLength} символов",
+  "ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH": "Введите пароль длиной не менее {minPasswordLength} символов, содержащий заглавные и строчные буквы, цифры и специальные символы",
   "ValidationError.FIELD.PASSWORD_LOGIN.PATTERN_MISMATCH": "Неправильный пароль. Пожалуйста, попробуйте еще раз.",
   "ValidationError.FIELD.SSO_CODE.PATTERN_MISMATCH": "Пожалуйста, введите действительный код доступа SSO",
   "ValidationError.FIELD.SSO_EMAIL_CODE.PATTERN_MISMATCH": "Пожалуйста, введите действительный email или код SSO",
