@@ -1133,6 +1133,11 @@
   resolved "https://registry.yarnpkg.com/@formatjs/ecma402-abstract/-/ecma402-abstract-1.2.0.tgz#5b03ba4931436070ad926d1b2e89bf07edc5ea5b"
   integrity sha512-jc1bZHhIE1YI0HnZIZcdlKpF4wle2pkgQpzXHDoyy4bUqzBSvDqktnF26hOkyA04KD4wqd61gkuTvRrHMmroAg==
 
+"@formatjs/ecma402-abstract@^1.2.1":
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/@formatjs/ecma402-abstract/-/ecma402-abstract-1.2.1.tgz#ad966998d7f0e96fca4bdc5de0ca28d02f371279"
+  integrity sha512-LvbwgHxprafjceDfOC7yMl4sP5al71rAWahXk3qug5bV020aCq64WjqAo+zNnkIJk8hqK2pFKnNdDsT58HZJQw==
+
 "@formatjs/intl-displaynames@^3.3.6":
   version "3.3.6"
   resolved "https://registry.yarnpkg.com/@formatjs/intl-displaynames/-/intl-displaynames-3.3.6.tgz#2b5c938ea1cd38e859f2d716ea317feccbbd8896"
@@ -1167,12 +1172,12 @@
     intl-messageformat "^9.3.6"
     intl-messageformat-parser "^6.0.5"
 
-"@formatjs/ts-transformer@^2.9.0":
-  version "2.9.0"
-  resolved "https://registry.yarnpkg.com/@formatjs/ts-transformer/-/ts-transformer-2.9.0.tgz#582f8c54bc5888044f3e848163411dabca130aff"
-  integrity sha512-H6skH+McG2OoUL3nc6Eas/5IunM8hk7uDU5Ak/qtNtvsehOH8g030LaFaMxw28BWq2vBipGAPlyyz/KTvO8fPw==
+"@formatjs/ts-transformer@^2.10.0":
+  version "2.10.0"
+  resolved "https://registry.yarnpkg.com/@formatjs/ts-transformer/-/ts-transformer-2.10.0.tgz#06f292b6cbcea661e2cecf7b8945ac59f21b7c93"
+  integrity sha512-ff+gIzsbd5WEm6mLn1x0A1gD4oJomst8pF7NEjrI0Egn+82v8PEEZeYrsGjUzRt3jyOaRguQUYJGHiw+5d84dQ==
   dependencies:
-    intl-messageformat-parser "^6.0.5"
+    intl-messageformat-parser "^6.0.6"
     typescript "^4.0"
 
 "@hapi/address@2.x.x":
@@ -2905,18 +2910,18 @@ babel-plugin-macros@^2.0.0:
     cosmiconfig "^5.2.0"
     resolve "^1.10.0"
 
-babel-plugin-react-intl@8.2.0:
-  version "8.2.0"
-  resolved "https://registry.yarnpkg.com/babel-plugin-react-intl/-/babel-plugin-react-intl-8.2.0.tgz#84a0e05e38241e21d264e1586a801af0c8216dd0"
-  integrity sha512-cOa86o0ve+FZ3qAroB7MK1Vr5Tpax4lUfzZcu5FjEIdfp93cal+77E5HPlEqgSB5wi+1mduOWICBQ0/XTvGMvA==
+babel-plugin-react-intl@8.2.2:
+  version "8.2.2"
+  resolved "https://registry.yarnpkg.com/babel-plugin-react-intl/-/babel-plugin-react-intl-8.2.2.tgz#fcaab15a4f481f64405795a915cce7fab520dc6d"
+  integrity sha512-lFq03ZdEX8ggSCKAxVCJKwFE+m9VhpGEK/Q0P7lAPfdYUTNlT5abirDOV3kolrZ9keqlYY00B+4hPUQoHpPVrw==
   dependencies:
     "@babel/core" "^7.9.0"
     "@babel/helper-plugin-utils" "^7.8.3"
     "@babel/types" "^7.9.5"
-    "@formatjs/ts-transformer" "^2.9.0"
+    "@formatjs/ts-transformer" "^2.10.0"
     "@types/babel__core" "^7.1.7"
     "@types/schema-utils" "^2.4.0"
-    intl-messageformat-parser "^6.0.5"
+    intl-messageformat-parser "^6.0.6"
     schema-utils "^2.6.6"
 
 babel-plugin-syntax-jsx@^6.18.0:
@@ -7280,12 +7285,12 @@ interpret@~1.1.0:
   resolved "https://registry.yarnpkg.com/interpret/-/interpret-1.1.0.tgz#7ed1b1410c6a0e0f78cf95d3b8440c63f78b8614"
   integrity sha1-ftGxQQxqDg94z5XTuEQMY/eLhhQ=
 
-intl-messageformat-parser@^6.0.5:
-  version "6.0.5"
-  resolved "https://registry.yarnpkg.com/intl-messageformat-parser/-/intl-messageformat-parser-6.0.5.tgz#098b052ac2714101b4da06fd45d68199d3abd131"
-  integrity sha512-4aO/RTUtzWiV/naqif4ubwz8P7THOxhraN6XmQpgXj4mdGjtPNO2j3vKlEDgAvv4BEi12R/JCHfLf7SUyfPKog==
+intl-messageformat-parser@^6.0.5, intl-messageformat-parser@^6.0.6:
+  version "6.0.6"
+  resolved "https://registry.yarnpkg.com/intl-messageformat-parser/-/intl-messageformat-parser-6.0.6.tgz#c06c79c534612808e1f3c39288a3c009fb1ff7cd"
+  integrity sha512-XPAgYvCTSwgr92zzy5sfaglUu4uKjIWXHNTenEQRTo5t3o2TGxuPYPruxZqnvSLgnlAegiT/hBemmPcnFPNjAg==
   dependencies:
-    "@formatjs/ecma402-abstract" "^1.2.0"
+    "@formatjs/ecma402-abstract" "^1.2.1"
 
 intl-messageformat@^9.3.6:
   version "9.3.6"
