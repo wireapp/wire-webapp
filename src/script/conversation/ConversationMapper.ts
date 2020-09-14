@@ -288,7 +288,7 @@ export class ConversationMapper {
         } = remoteConversationData;
         const {others: othersStates, self: selfState} = members;
 
-        const updates: {[index: string]: any} = {
+        const updates: Record<string, any> = {
           accessModes: access,
           accessRole: access_role,
           creator,
