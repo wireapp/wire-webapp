@@ -404,7 +404,7 @@ export class EventMapper {
    * @param eventData Message data
    * @returns Delete message entity
    */
-  _mapEventDeleteEverywhere({data: eventData}: EventRecord) {
+  private _mapEventDeleteEverywhere({data: eventData}: EventRecord) {
     const messageEntity = new DeleteMessage();
     messageEntity.deleted_timestamp = new Date(eventData.deleted_time).getTime();
     return messageEntity;
