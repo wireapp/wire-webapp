@@ -24,7 +24,7 @@
     "karma-spec-reporter": "0.0.32",
     "rimraf": "3.0.2",
     "typescript": "3.9.2",
-    "uuidjs": "4.2.5",
+    "uuidjs": "4.2.6",
     "webpack": "4.44.1",
     "webpack-cli": "3.3.12"
   },
