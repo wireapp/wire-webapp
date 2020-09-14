@@ -95,7 +95,7 @@ import {Message} from '../entity/message/Message';
 
 import * as trackingHelpers from '../tracking/Helpers';
 
-import {ConversationMapper} from './ConversationMapper';
+import {ConversationMapper, ConversationDatabaseData} from './ConversationMapper';
 import {ConversationStateHandler} from './ConversationStateHandler';
 import {EventInfoEntity} from './EventInfoEntity';
 import {EventMapper} from './EventMapper';
@@ -528,7 +528,7 @@ export class ConversationRepository {
     });
 
     const [localConversations, remoteConversations] = await Promise.all([
-      this.conversation_service.load_conversation_states_from_db(),
+      this.conversation_service.load_conversation_states_from_db<ConversationDatabaseData>(),
       remoteConversationsPromise,
     ]);
     let conversationsData: any[];
@@ -1225,7 +1225,10 @@ export class ConversationRepository {
     initialTimestamp = this.getLatestEventTimestamp(),
   ) {
     const conversationsData: BackendConversation[] = Array.isArray(payload) ? payload : [payload];
-    const entities = this.conversationMapper.mapConversations(conversationsData, initialTimestamp);
+    const entities = this.conversationMapper.mapConversations(
+      conversationsData as ConversationDatabaseData[],
+      initialTimestamp,
+    );
     entities.forEach(conversationEntity => {
       this._mapGuestStatusSelf(conversationEntity);
       conversationEntity.selfUser(this.selfUser());

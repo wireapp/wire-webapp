@@ -80,11 +80,11 @@ export interface SerializedConversation {
   last_read_timestamp: number;
   last_server_timestamp: number;
   legal_hold_status: LegalHoldStatus;
-  muted_state: number;
+  muted_state: boolean | number;
   muted_timestamp: number;
   name: string;
   others: string[];
-  receipt_mode: Confirmation.Type;
+  receipt_mode?: Confirmation.Type;
   status: ConversationStatus;
   team_id: string;
   type: CONVERSATION_TYPE;
@@ -92,13 +92,14 @@ export interface SerializedConversation {
 }
 
 export class Conversation {
-  private readonly archivedState: ko.Observable<boolean>;
+  [key: string]: any;
+  public readonly archivedState: ko.Observable<boolean>;
   private readonly incomingMessages: ko.ObservableArray<Message | ContentMessage | MemberMessage>;
   private readonly isManaged: boolean;
   private readonly isTeam1to1: ko.PureComputed<boolean>;
-  private readonly last_server_timestamp: ko.Observable<number>;
+  public readonly last_server_timestamp: ko.Observable<number>;
   private readonly logger: Logger;
-  private readonly mutedState: ko.Observable<number>;
+  public readonly mutedState: ko.Observable<number>;
   private readonly mutedTimestamp: ko.Observable<number>;
   private readonly publishPersistState: (() => void) & Cancelable;
   private shouldPersistStateChanges: boolean;
@@ -112,7 +113,7 @@ export class Conversation {
   public readonly call: ko.Observable<Call>;
   public readonly cleared_timestamp: ko.Observable<number>;
   public readonly connection: ko.Observable<ConnectionEntity>;
-  public readonly creator: string;
+  public creator: string;
   public readonly display_name: ko.PureComputed<string>;
   public readonly firstUserEntity: ko.PureComputed<User>;
   public readonly globalMessageTimer: ko.Observable<number>;
@@ -162,7 +163,7 @@ export class Conversation {
   public readonly showNotificationsMentionsAndReplies: ko.PureComputed<boolean>;
   public readonly showNotificationsNothing: ko.PureComputed<boolean>;
   public readonly status: ko.Observable<ConversationStatus>;
-  public readonly team_id: string;
+  public team_id: string;
   public readonly type: ko.Observable<CONVERSATION_TYPE>;
   public readonly unreadState: ko.PureComputed<UnreadState>;
   public readonly verification_state: ko.Observable<ConversationVerificationState>;
