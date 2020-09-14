@@ -496,7 +496,7 @@ export class EventMapper {
    * @param eventData Message data
    * @returns Member message entity
    */
-  _mapEventMemberLeave({data: eventData}: EventRecord) {
+  private _mapEventMemberLeave({data: eventData}: EventRecord) {
     const messageEntity = new MemberMessage();
     messageEntity.userIds(eventData.user_ids);
     return messageEntity;
