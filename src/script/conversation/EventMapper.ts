@@ -526,7 +526,7 @@ export class EventMapper {
     return messageEntity;
   }
 
-  async _mapEventCompositeMessageAdd(event: EventRecord) {
+  private async _mapEventCompositeMessageAdd(event: EventRecord) {
     const {data: eventData} = event;
     const messageEntity = new CompositeMessage();
     const assets: (Asset | FileAsset | Text | MediumImage)[] = await Promise.all(
