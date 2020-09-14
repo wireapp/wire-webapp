@@ -367,7 +367,7 @@ export class EventMapper {
    * @param eventData Message data
    * @returns Member message entity
    */
-  _mapEvent1to1Creation({data: eventData}: EventRecord) {
+  private _mapEvent1to1Creation({data: eventData}: EventRecord) {
     const {has_service: hasService, userIds} = eventData;
 
     const messageEntity = new MemberMessage();
