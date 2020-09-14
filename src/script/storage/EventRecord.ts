@@ -24,17 +24,27 @@ export interface ReadReceipt {
 
 export interface EventRecord {
   category: number;
+  content?: string;
   conversation: string;
   data: any;
   edited_time?: string;
+  ephemeral_expires?: boolean;
+  ephemeral_started?: string;
+  error_code?: string;
   from: string;
   from_client_id?: string;
   id: string;
+  mentions?: string[];
+  message?: string;
+  previews?: string[];
   primary_key: string;
   reactions: Record<string, string>;
   read_receipts?: ReadReceipt[];
+  selected_button_id?: string;
   status?: number;
   time: string;
+  timestamp?: number;
   type: string;
   version?: number;
+  waiting_button_id?: string;
 }

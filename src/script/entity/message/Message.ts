@@ -61,10 +61,10 @@ export class Message {
   public readonly ephemeral_remaining: ko.Observable<number>;
   public readonly ephemeral_started: ko.Observable<number>;
   public readonly ephemeral_status: ko.Computed<EphemeralStatusType>;
-  public readonly expectsReadConfirmation: boolean;
+  public expectsReadConfirmation: boolean;
   public readonly headerSenderName: ko.PureComputed<string>;
   public readonly isObfuscated: ko.PureComputed<boolean>;
-  public readonly legalHoldStatus?: LegalHoldStatus;
+  public legalHoldStatus?: LegalHoldStatus;
   public readonly status: ko.Observable<StatusType>;
   public readonly timestamp_affects_order: ko.PureComputed<boolean>;
   public readonly timestamp: ko.Observable<number>;

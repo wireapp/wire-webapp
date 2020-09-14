@@ -29,6 +29,7 @@ export class MediumImage extends FileAsset {
   public readonly correlation_id: string;
   public height: string;
   public width: string;
+  public ratio: number;
 
   constructor(id: string) {
     super(id);
