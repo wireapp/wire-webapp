@@ -388,7 +388,7 @@ export class EventMapper {
    * @param event Message data
    * @returns Content message entity
    */
-  _mapEventAssetAdd(event: EventRecord) {
+  private _mapEventAssetAdd(event: EventRecord) {
     const messageEntity = new ContentMessage();
 
     const assetEntity = this._mapAsset(event);
