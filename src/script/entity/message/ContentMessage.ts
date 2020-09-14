@@ -47,7 +47,7 @@ export class ContentMessage extends Message {
   readonly edited_timestamp: ko.Observable<number>;
   readonly reactions: ko.Observable<{[userId: string]: string}>;
 
-  constructor(id: string) {
+  constructor(id?: string) {
     super(id);
 
     this.assets = ko.observableArray([]);

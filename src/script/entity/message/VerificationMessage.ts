@@ -31,8 +31,8 @@ import {Message} from './Message';
 
 export class VerificationMessage extends Message {
   private readonly userEntities: ko.ObservableArray<User>;
-  private readonly userIds: ko.ObservableArray<string>;
-  private readonly verificationMessageType: ko.Observable<VerificationMessageType>;
+  public userIds: ko.ObservableArray<string>;
+  public verificationMessageType: ko.Observable<VerificationMessageType>;
   public readonly captionNewDevice: ko.PureComputed<string>;
   public readonly captionStartedUsing: ko.PureComputed<string>;
   public readonly captionUnverifiedDevice: ko.PureComputed<string>;
