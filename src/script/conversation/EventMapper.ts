@@ -460,7 +460,7 @@ export class EventMapper {
    * @param conversationEntity Conversation entity the event belong to
    * @returns Member message entity
    */
-  _mapEventMemberJoin(event: EventRecord, conversationEntity: Conversation) {
+  private _mapEventMemberJoin(event: EventRecord, conversationEntity: Conversation) {
     const {data: eventData, from: sender} = event;
     const {has_service: hasService, user_ids: userIds} = eventData;
 
