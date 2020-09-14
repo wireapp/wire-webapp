@@ -3,7 +3,7 @@
     "copy-config": "dist/cli.js"
   },
   "dependencies": {
-    "axios": "0.19.2",
+    "axios": "0.20.0",
     "copy": "0.3.2",
     "cosmiconfig": "7.0.0",
     "fs-extra": "9.0.1",
