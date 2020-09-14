@@ -13,7 +13,7 @@
     "hash.js": "1.1.7",
     "logdown": "3.3.1",
     "protobufjs": "6.10.1",
-    "uuidjs": "4.2.5"
+    "uuidjs": "4.2.6"
   },
   "devDependencies": {
     "@types/faker": "4.1.12",
