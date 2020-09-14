@@ -33,7 +33,7 @@ const getAppVersion = (): string => {
 
 const getElectronVersion = (userAgent: string): string => {
   // [match, version]
-  const [, electronVersion] = /Wire(?:Internal)?\/(\S+)/.exec(userAgent) || [];
+  const [, electronVersion] = /Wire(?:Internal)?\/(\S+)/i.exec(userAgent) || [];
   return electronVersion;
 };
 
