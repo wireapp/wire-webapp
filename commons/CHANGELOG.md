@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.8.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@3.8.0...@wireapp/commons@3.8.1) (2020-09-14)
+
+**Note:** Version bump only for package @wireapp/commons
+
+
+
+
+
 # [3.8.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@3.7.2...@wireapp/commons@3.8.0) (2020-09-01)
 
 

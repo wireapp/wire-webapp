@@ -2,10 +2,10 @@
   "dependencies": {
     "@types/node": "~12",
     "@wireapp/lru-cache": "3.7.1",
-    "@wireapp/priority-queue": "1.6.7",
-    "@wireapp/proteus": "9.8.15",
+    "@wireapp/priority-queue": "1.6.8",
+    "@wireapp/proteus": "9.8.16",
     "@wireapp/store-engine": "4.5.10",
-    "bazinga64": "5.7.11",
+    "bazinga64": "5.7.12",
     "logdown": "3.3.1"
   },
   "description": "High-level API with persistent storage for Proteus.",
@@ -45,5 +45,5 @@
     "test:project": "yarn dist && yarn test",
     "test:node": "cross-env NODE_DEBUG=@wireapp/cryptobox* jasmine --config=test/jasmine.node.json"
   },
-  "version": "12.2.23"
+  "version": "12.2.24"
 }
