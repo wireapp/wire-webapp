@@ -61,7 +61,7 @@
     "@hot-loader/react-dom": "16.13.0",
     "@types/adm-zip": "0.4.33",
     "@types/dexie-batch": "0.4.1",
-    "@types/enzyme": "3.10.5",
+    "@types/enzyme": "3.10.6",
     "@types/faker": "5.1.0",
     "@types/generate-changelog": "1.8.0",
     "@types/highlight.js": "9.12.4",
