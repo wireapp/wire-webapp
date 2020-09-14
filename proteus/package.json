@@ -6,7 +6,7 @@
     "@types/node": "~12",
     "@wireapp/cbor": "4.6.12",
     "ed2curve": "0.3.0",
-    "libsodium-wrappers-sumo": "0.7.6"
+    "libsodium-wrappers-sumo": "0.7.8"
   },
   "description": "Axolotl protocol implementation for JavaScript.",
   "devDependencies": {
