@@ -437,7 +437,7 @@ export class EventMapper {
    * @param eventData Message data
    * @returns Location message entity
    */
-  _mapEventLocation({data: eventData}: EventRecord) {
+  private _mapEventLocation({data: eventData}: EventRecord) {
     const location = eventData.location;
     const messageEntity = new ContentMessage();
     const assetEntity = new Location();
