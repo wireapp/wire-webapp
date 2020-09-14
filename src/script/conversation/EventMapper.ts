@@ -417,7 +417,7 @@ export class EventMapper {
    * @param eventData Message data
    * @returns Member message entity
    */
-  _mapEventGroupCreation({data: eventData}: EventRecord) {
+  private _mapEventGroupCreation({data: eventData}: EventRecord) {
     const messageEntity = new MemberMessage();
     messageEntity.memberMessageType = SystemMessageType.CONVERSATION_CREATE;
     messageEntity.name(eventData.name || '');
