@@ -364,6 +364,7 @@ export class InputBarViewModel {
     if (conversationEntity) {
       const previousSessionData = await this._loadDraftState(conversationEntity);
       this.input(previousSessionData.text);
+      ko.tasks.runEarly();
       this.currentMentions(previousSessionData.mentions);
       this.updateSelectionState();
 
@@ -455,6 +456,7 @@ export class InputBarViewModel {
 
     // insert the mention in between
     this.input(`${beforeMentionPartial}@${userEntity.name()} ${afterMentionPartial}`);
+    ko.tasks.runEarly();
 
     this.currentMentions.push(mentionEntity);
     this.currentMentions.sort((mentionA, mentionB) => mentionA.startIndex - mentionB.startIndex);
@@ -519,6 +521,7 @@ export class InputBarViewModel {
       this.cancelMessageEditing();
       this.editMessageEntity(messageEntity);
       this.input((messageEntity.get_first_asset() as Text).text);
+      ko.tasks.runEarly();
       const newMentions = (messageEntity.get_first_asset() as Text).mentions().slice();
       this.currentMentions(newMentions);
 
