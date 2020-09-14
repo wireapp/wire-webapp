@@ -37,8 +37,8 @@ export interface OS {
 }
 
 export class Runtime {
-  public static getPlatform(): Platform {
-    const unsetPlatform: Platform = ({} as unknown) as Platform;
+  public static getPlatform(): typeof platform {
+    const unsetPlatform = ({} as unknown) as typeof platform;
     return platform || unsetPlatform;
   }
 
@@ -59,6 +59,9 @@ export class Runtime {
     return OperatingSystem.LINUX;
   }
 
+  /**
+   * NOTE: This converts the browser name to lowercase.
+   */
   public static getBrowserName(): string {
     return (Runtime.getPlatform().name || UNKNOWN_PROPERTY).toLowerCase();
   }
@@ -68,6 +71,9 @@ export class Runtime {
     return {major: parseInt(majorVersion, 10), minor: parseInt(minorVersion, 10)};
   }
 
+  /**
+   * NOTE: This converts the User-Agent to lowercase.
+   */
   public static getUserAgent(): string {
     return (Runtime.getPlatform().ua || UNKNOWN_PROPERTY).toLowerCase();
   }
@@ -104,7 +110,10 @@ export class Runtime {
     }
   };
 
-  public static isSupportingClipboard = (): boolean => !!navigator.clipboard;
+  public static isSupportingClipboard = (): boolean => {
+    return !!navigator.clipboard;
+  };
+
   public static isSupportingIndexedDb = (): boolean => {
     try {
       return !!window.indexedDB;
@@ -133,6 +142,7 @@ export class Runtime {
   };
 
   public static isSupportingRTCPeerConnection = (): boolean => 'RTCPeerConnection' in window;
+
   public static isSupportingRTCDataChannel = (): boolean => {
     if (!Runtime.isSupportingRTCPeerConnection()) {
       return false;
@@ -141,15 +151,20 @@ export class Runtime {
     const peerConnection = new RTCPeerConnection(undefined);
     return 'createDataChannel' in peerConnection;
   };
+
   public static isSupportingRTCInjectableStreams = (): boolean => {
     const isSupportingEncodedStreams = RTCRtpSender.prototype.hasOwnProperty('createEncodedStreams');
     const isSupportingEncodedVideoStreams = RTCRtpSender.prototype.hasOwnProperty('createEncodedVideoStreams');
     return isSupportingEncodedStreams || isSupportingEncodedVideoStreams;
   };
-  public static isSupportingUserMedia = (): boolean =>
-    'mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices;
-  public static isSupportingDisplayMedia = (): boolean =>
-    'mediaDevices' in navigator && 'getDisplayMedia' in navigator.mediaDevices;
+
+  public static isSupportingUserMedia = (): boolean => {
+    return 'mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices;
+  };
+
+  public static isSupportingDisplayMedia = (): boolean => {
+    return 'mediaDevices' in navigator && 'getDisplayMedia' in navigator.mediaDevices;
+  };
 
   public static isSupportingScreensharing = (): boolean => {
     const hasScreenCaptureAPI =
