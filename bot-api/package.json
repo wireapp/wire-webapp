@@ -6,7 +6,7 @@
   },
   "devDependencies": {
     "cross-env": "7.0.2",
-    "dotenv-defaults": "2.0.0",
+    "dotenv-defaults": "2.0.1",
     "jasmine": "3.5.0",
     "rimraf": "3.0.2",
     "ts-node": "8.6.2",
