@@ -509,7 +509,7 @@ export class EventMapper {
    * @param event Message data
    * @returns Content message entity
    */
-  async _mapEventMessageAdd(event: EventRecord) {
+  private async _mapEventMessageAdd(event: EventRecord) {
     const {data: eventData, edited_time: editedTime} = event;
     const messageEntity = new ContentMessage();
 
