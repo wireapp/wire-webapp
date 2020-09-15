@@ -28,7 +28,7 @@ export interface EventRecord {
   conversation: string;
   data: any;
   edited_time?: string;
-  ephemeral_expires?: boolean;
+  ephemeral_expires?: number;
   ephemeral_started?: string;
   error_code?: string;
   from: string;
