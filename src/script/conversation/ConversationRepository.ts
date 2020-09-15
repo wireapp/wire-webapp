@@ -95,7 +95,7 @@ import {Message} from '../entity/message/Message';
 
 import * as trackingHelpers from '../tracking/Helpers';
 
-import {ConversationMapper} from './ConversationMapper';
+import {ConversationMapper, ConversationDatabaseData} from './ConversationMapper';
 import {ConversationStateHandler} from './ConversationStateHandler';
 import {EventInfoEntity} from './EventInfoEntity';
 import {EventMapper} from './EventMapper';
@@ -528,7 +528,7 @@ export class ConversationRepository {
     });
 
     const [localConversations, remoteConversations] = await Promise.all([
-      this.conversation_service.load_conversation_states_from_db(),
+      this.conversation_service.load_conversation_states_from_db<ConversationDatabaseData>(),
       remoteConversationsPromise,
     ]);
     let conversationsData: any[];
@@ -603,13 +603,13 @@ export class ConversationRepository {
         if (message.from && !message.user().id) {
           return this.userRepository.getUserById(message.from).then(userEntity => {
             message.user(userEntity);
-            return message;
+            return message as ContentMessage;
           });
         }
-        return message;
+        return message as ContentMessage;
       });
     }
-    return messagePromise;
+    return messagePromise as Promise<ContentMessage>;
   }
 
   /**
@@ -1225,7 +1225,10 @@ export class ConversationRepository {
     initialTimestamp = this.getLatestEventTimestamp(),
   ) {
     const conversationsData: BackendConversation[] = Array.isArray(payload) ? payload : [payload];
-    const entities = this.conversationMapper.mapConversations(conversationsData, initialTimestamp);
+    const entities = this.conversationMapper.mapConversations(
+      conversationsData as ConversationDatabaseData[],
+      initialTimestamp,
+    );
     entities.forEach(conversationEntity => {
       this._mapGuestStatusSelf(conversationEntity);
       conversationEntity.selfUser(this.selfUser());
@@ -3568,7 +3571,7 @@ export class ConversationRepository {
       });
   }
 
-  private _on1to1Creation(conversationEntity: Conversation, eventJson: Object) {
+  private _on1to1Creation(conversationEntity: Conversation, eventJson: EventRecord) {
     return this.event_mapper
       .mapJsonEvent(eventJson, conversationEntity)
       .then(messageEntity => this._updateMessageUserEntities(messageEntity))
@@ -3645,7 +3648,7 @@ export class ConversationRepository {
     return undefined;
   }
 
-  private async _onGroupCreation(conversationEntity: Conversation, eventJson: Object) {
+  private async _onGroupCreation(conversationEntity: Conversation, eventJson: EventRecord) {
     const messageEntity = await this.event_mapper.mapJsonEvent(eventJson, conversationEntity);
     const creatorId = conversationEntity.creator;
     const createdByParticipant = !!conversationEntity.participating_user_ids().find(userId => userId === creatorId);
@@ -3662,7 +3665,7 @@ export class ConversationRepository {
     conversationEntity.roles(conversationRoles);
 
     if (!creatorIsParticipant) {
-      messageEntity.memberMessageType = SystemMessageType.CONVERSATION_RESUME;
+      (messageEntity as MemberMessage).memberMessageType = SystemMessageType.CONVERSATION_RESUME;
     }
 
     const updatedMessageEntity = await this._updateMessageUserEntities(messageEntity);
@@ -4059,7 +4062,7 @@ export class ConversationRepository {
     }
   }
 
-  private async _initMessageEntity(conversationEntity: Conversation, eventJson: Object): Promise<Message> {
+  private async _initMessageEntity(conversationEntity: Conversation, eventJson: EventRecord): Promise<Message> {
     const messageEntity = await this.event_mapper.mapJsonEvent(eventJson, conversationEntity);
     // eslint-disable-next-line no-return-await
     return this._updateMessageUserEntities(messageEntity);
@@ -4070,7 +4073,10 @@ export class ConversationRepository {
     if (!originalMessage) {
       return undefined;
     }
-    const replacedMessageEntity = await this.event_mapper.updateMessageEvent(originalMessage, newData);
+    const replacedMessageEntity = await this.event_mapper.updateMessageEvent(
+      originalMessage as ContentMessage,
+      newData,
+    );
     await this.ephemeralHandler.validateMessage(replacedMessageEntity);
     return replacedMessageEntity;
   }
