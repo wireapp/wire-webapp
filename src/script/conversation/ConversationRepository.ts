@@ -3118,7 +3118,7 @@ export class ConversationRepository {
           [GENERIC_MESSAGE_TYPE.DELETED]: protoMessageDelete,
           messageId: createRandomUuid(),
         });
-        this._trackContributed(conversationEntity, genericMessage);
+
         return this.messageSender.queueMessage(() => {
           const userIds = Array.isArray(precondition) ? precondition : undefined;
           return this.create_recipients(conversationId, false, userIds).then(recipients => {
@@ -3163,7 +3163,6 @@ export class ConversationRepository {
         });
 
         const eventInfoEntity = new EventInfoEntity(genericMessage, this.self_conversation().id);
-        this._trackContributed(conversationEntity, eventInfoEntity.genericMessage);
         return this.sendGenericMessageToConversation(eventInfoEntity);
       })
       .then(() => {
@@ -4385,10 +4384,6 @@ export class ConversationRepository {
           numberOfMentions = protoText.mentions.length;
         }
         break;
-      }
-
-      case 'deleted': {
-        actionType = 'delete';
       }
 
       default:
