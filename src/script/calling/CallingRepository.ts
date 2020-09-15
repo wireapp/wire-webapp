@@ -607,9 +607,7 @@ export class CallingRepository {
       const success = await loadPreviewPromise;
       if (success) {
         this.wCall.start(this.wUser, conversationId, callType, conversationType, this.cbrEncoding());
-        this.sendCallingEvent(EventName.CALLING.INITIATED_CALL, call, {
-          [Segmentation.CALL.VIDEO]: callType === CALL_TYPE.VIDEO,
-        });
+        this.sendCallingEvent(EventName.CALLING.INITIATED_CALL, call);
       } else {
         this.showNoCameraModal();
         this.removeCall(call);
@@ -680,7 +678,6 @@ export class CallingRepository {
 
       this.sendCallingEvent(EventName.CALLING.JOINED_CALL, call, {
         [Segmentation.CALL.DIRECTION]: this.getCallDirection(call),
-        [Segmentation.CALL.VIDEO]: callType === CALL_TYPE.VIDEO,
       });
     } catch (_) {
       this.rejectCall(call.conversationId);
@@ -905,7 +902,6 @@ export class CallingRepository {
       [Segmentation.CALL.END_REASON]: reason,
       [Segmentation.CALL.PARTICIPANTS]: call.analyticsMaximumParticipants,
       [Segmentation.CALL.SCREEN_SHARE]: call.analyticsScreenSharing,
-      [Segmentation.CALL.VIDEO]: call.initialType === CALL_TYPE.VIDEO,
     });
 
     const selfParticipant = call.getSelfParticipant();
@@ -981,9 +977,7 @@ export class CallingRepository {
 
     this.storeCall(call);
     this.incomingCallCallback(call);
-    this.sendCallingEvent(EventName.CALLING.RECIEVED_CALL, call, {
-      [Segmentation.CALL.VIDEO]: call.initialType === CALL_TYPE.VIDEO,
-    });
+    this.sendCallingEvent(EventName.CALLING.RECIEVED_CALL, call);
   };
 
   private readonly updateCallState = (conversationId: ConversationId, state: number) => {
@@ -1001,7 +995,6 @@ export class CallingRepository {
       case CALL_STATE.MEDIA_ESTAB:
         this.sendCallingEvent(EventName.CALLING.ESTABLISHED_CALL, call, {
           [Segmentation.CALL.DIRECTION]: this.getCallDirection(call),
-          [Segmentation.CALL.VIDEO]: call.initialType === CALL_TYPE.VIDEO,
         });
         call.startedAt(Date.now());
         break;
@@ -1201,7 +1194,11 @@ export class CallingRepository {
       .forEach(participant => participant.videoState(state));
   };
 
-  private readonly sendCallingEvent = (eventName: string, call: Call, customSegmentations: Record<string, any>) => {
+  private readonly sendCallingEvent = (
+    eventName: string,
+    call: Call,
+    customSegmentations: Record<string, any> = {},
+  ) => {
     const conversationEntity = this.conversationRepository.find_conversation_by_id(call.conversationId);
     const participants = conversationEntity.participating_user_ets();
     const selfUserTeamId = call.getSelfParticipant().user.id;
@@ -1215,6 +1212,7 @@ export class CallingRepository {
       [Segmentation.CONVERSATION.SERVICES]: roundLogarithmic(conversationEntity.servicesCount(), 6),
       [Segmentation.CONVERSATION.SIZE]: roundLogarithmic(conversationEntity.participating_user_ets().length, 6),
       [Segmentation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
+      [Segmentation.CALL.VIDEO]: call.getSelfParticipant().sharesCamera(),
       ...customSegmentations,
     };
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, eventName, segmentations);
