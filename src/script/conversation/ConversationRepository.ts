@@ -4398,7 +4398,7 @@ export class ConversationRepository {
       const guestsPro = participants.filter(user => !!user.teamId && user.teamId !== selfUserTeamId).length;
       const services = participants.filter(user => user.isService).length;
 
-      let segmentations = {
+      let segmentations: Record<string, any> = {
         [Segmentation.CONVERSATION.GUESTS]: roundLogarithmic(guests, 6),
         [Segmentation.CONVERSATION.GUESTS_PRO]: roundLogarithmic(guestsPro, 6),
         [Segmentation.CONVERSATION.GUESTS_WIRELESS]: roundLogarithmic(guestsWireless, 6),
@@ -4406,12 +4406,13 @@ export class ConversationRepository {
         [Segmentation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
         [Segmentation.CONVERSATION.SERVICES]: roundLogarithmic(services, 6),
         [Segmentation.MESSAGE.ACTION]: actionType,
-        [Segmentation.MESSAGE.IS_REPLY]: !!genericMessage.text?.quote,
-        [Segmentation.MESSAGE.MENTION]: numberOfMentions,
       };
       const isTeamConversation = !!conversationEntity.team_id;
       if (isTeamConversation) {
-        segmentations = {...segmentations, ...trackingHelpers.getGuestAttributes(conversationEntity)};
+        segmentations = {
+          ...segmentations,
+          ...trackingHelpers.getGuestAttributes(conversationEntity),
+        };
       }
 
       amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CONTRIBUTED, segmentations);
