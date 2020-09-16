@@ -17,7 +17,7 @@
  *
  */
 
-import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
+import {CONV_TYPE} from '@wireapp/avs';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
 import {amplify} from 'amplify';
