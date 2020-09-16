@@ -24,7 +24,7 @@
     "commander": "5.1.0",
     "cross-env": "7.0.2",
     "dotenv": "8.2.0",
-    "faker": "4.1.0",
+    "faker": "5.1.0",
     "istanbul": "1.1.0-alpha.1",
     "jasmine": "3.5.0",
     "karma": "5.1.0",
