@@ -216,8 +216,7 @@ export class ListViewModel {
         },
       });
     } else {
-      const callType = call.getSelfParticipant().sharesCamera() ? call.initialType : CALL_TYPE.NORMAL;
-      this.callingRepository.answerCall(call, callType);
+      this.callingRepository.answerCall(call);
     }
   };
 
