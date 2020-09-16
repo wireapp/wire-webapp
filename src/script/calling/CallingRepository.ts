@@ -893,7 +893,7 @@ export class CallingRepository {
     if (!call) {
       return;
     }
-    const stillActiveState = [REASON.STILL_ONGOING, REASON.ANSWERED_ELSEWHERE];
+    const stillActiveState = [REASON.STILL_ONGOING, REASON.ANSWERED_ELSEWHERE, REASON.REJECTED];
 
     this.sendCallingEvent(EventName.CALLING.ENDED_CALL, call, {
       [Segmentation.CALL.AV_SWITCH_TOGGLE]: call.analyticsAvSwitchToggle,
