@@ -4343,7 +4343,6 @@ export class ConversationRepository {
 
     const messageContentType = genericMessage.content;
     let actionType;
-    let numberOfMentions;
     switch (messageContentType) {
       case 'asset': {
         const protoAsset = genericMessage.asset;
@@ -4381,7 +4380,6 @@ export class ConversationRepository {
         const length = protoText[PROTO_MESSAGE_TYPE.LINK_PREVIEWS].length;
         if (!length) {
           actionType = 'text';
-          numberOfMentions = protoText.mentions.length;
         }
         break;
       }
