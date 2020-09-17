@@ -608,6 +608,9 @@ export class CallingRepository {
       if (success) {
         this.wCall.start(this.wUser, conversationId, callType, conversationType, this.cbrEncoding());
         this.sendCallingEvent(EventName.CALLING.INITIATED_CALL, call);
+        this.sendCallingEvent(EventName.CONTRIBUTED, call, {
+          [Segmentation.MESSAGE.ACTION]: callType === CALL_TYPE.VIDEO ? 'video_call' : 'audio_call',
+        });
       } else {
         this.showNoCameraModal();
         this.removeCall(call);
