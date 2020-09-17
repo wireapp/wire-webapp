@@ -206,9 +206,9 @@ export class CallingRepository {
       [LOG_LEVEL.ERROR]: avsLogger.error,
     };
 
-    wCall.setLogHandler((level: LOG_LEVEL, message: string) => {
+    wCall.setLogHandler((level: LOG_LEVEL, message: string, error: Error) => {
       const trimmedMessage = message.trim();
-      logFunctions[level].call(avsLogger, trimmedMessage);
+      logFunctions[level].call(avsLogger, trimmedMessage, error);
       this.callLog.push(`${new Date().toISOString()} [${logLevels[level]}] ${trimmedMessage}`);
     });
 
