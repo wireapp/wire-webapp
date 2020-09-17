@@ -253,12 +253,12 @@ export class ContentViewModel {
     ko.applyBindings(this, document.getElementById(this.elementId));
   }
 
-  _initSubscriptions() {
+  private _initSubscriptions() {
     amplify.subscribe(WebAppEvents.CONTENT.SWITCH, this.switchContent);
     amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, this.showConversation);
   }
 
-  _shiftContent(contentSelector: string): void {
+  private _shiftContent(contentSelector: string): void {
     const incomingCssClass = 'content-animation-incoming-horizontal-left';
 
     $(contentSelector)

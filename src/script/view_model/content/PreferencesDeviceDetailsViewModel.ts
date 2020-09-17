@@ -82,7 +82,7 @@ export class PreferencesDeviceDetailsViewModel {
     });
   }
 
-  _updateFingerprint = async (): Promise<void> => {
+  private readonly _updateFingerprint = async (): Promise<void> => {
     this.fingerprint([]);
     try {
       const fingerprint = await this.cryptographyRepository.getRemoteFingerprint(this.selfUser().id, this.device().id);

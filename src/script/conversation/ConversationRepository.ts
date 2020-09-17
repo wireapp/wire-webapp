@@ -95,7 +95,7 @@ import {Message} from '../entity/message/Message';
 
 import * as trackingHelpers from '../tracking/Helpers';
 
-import {ConversationMapper} from './ConversationMapper';
+import {ConversationMapper, ConversationDatabaseData} from './ConversationMapper';
 import {ConversationStateHandler} from './ConversationStateHandler';
 import {EventInfoEntity} from './EventInfoEntity';
 import {EventMapper} from './EventMapper';
@@ -528,7 +528,7 @@ export class ConversationRepository {
     });
 
     const [localConversations, remoteConversations] = await Promise.all([
-      this.conversation_service.load_conversation_states_from_db(),
+      this.conversation_service.load_conversation_states_from_db<ConversationDatabaseData>(),
       remoteConversationsPromise,
     ]);
     let conversationsData: any[];
@@ -603,13 +603,13 @@ export class ConversationRepository {
         if (message.from && !message.user().id) {
           return this.userRepository.getUserById(message.from).then(userEntity => {
             message.user(userEntity);
-            return message;
+            return message as ContentMessage;
           });
         }
-        return message;
+        return message as ContentMessage;
       });
     }
-    return messagePromise;
+    return messagePromise as Promise<ContentMessage>;
   }
 
   /**
@@ -1225,7 +1225,10 @@ export class ConversationRepository {
     initialTimestamp = this.getLatestEventTimestamp(),
   ) {
     const conversationsData: BackendConversation[] = Array.isArray(payload) ? payload : [payload];
-    const entities = this.conversationMapper.mapConversations(conversationsData, initialTimestamp);
+    const entities = this.conversationMapper.mapConversations(
+      conversationsData as ConversationDatabaseData[],
+      initialTimestamp,
+    );
     entities.forEach(conversationEntity => {
       this._mapGuestStatusSelf(conversationEntity);
       conversationEntity.selfUser(this.selfUser());
@@ -3115,7 +3118,7 @@ export class ConversationRepository {
           [GENERIC_MESSAGE_TYPE.DELETED]: protoMessageDelete,
           messageId: createRandomUuid(),
         });
-        this._trackContributed(conversationEntity, genericMessage);
+
         return this.messageSender.queueMessage(() => {
           const userIds = Array.isArray(precondition) ? precondition : undefined;
           return this.create_recipients(conversationId, false, userIds).then(recipients => {
@@ -3160,7 +3163,6 @@ export class ConversationRepository {
         });
 
         const eventInfoEntity = new EventInfoEntity(genericMessage, this.self_conversation().id);
-        this._trackContributed(conversationEntity, eventInfoEntity.genericMessage);
         return this.sendGenericMessageToConversation(eventInfoEntity);
       })
       .then(() => {
@@ -3567,7 +3569,7 @@ export class ConversationRepository {
       });
   }
 
-  private _on1to1Creation(conversationEntity: Conversation, eventJson: Object) {
+  private _on1to1Creation(conversationEntity: Conversation, eventJson: EventRecord) {
     return this.event_mapper
       .mapJsonEvent(eventJson, conversationEntity)
       .then(messageEntity => this._updateMessageUserEntities(messageEntity))
@@ -3644,7 +3646,7 @@ export class ConversationRepository {
     return undefined;
   }
 
-  private async _onGroupCreation(conversationEntity: Conversation, eventJson: Object) {
+  private async _onGroupCreation(conversationEntity: Conversation, eventJson: EventRecord) {
     const messageEntity = await this.event_mapper.mapJsonEvent(eventJson, conversationEntity);
     const creatorId = conversationEntity.creator;
     const createdByParticipant = !!conversationEntity.participating_user_ids().find(userId => userId === creatorId);
@@ -3661,7 +3663,7 @@ export class ConversationRepository {
     conversationEntity.roles(conversationRoles);
 
     if (!creatorIsParticipant) {
-      messageEntity.memberMessageType = SystemMessageType.CONVERSATION_RESUME;
+      (messageEntity as MemberMessage).memberMessageType = SystemMessageType.CONVERSATION_RESUME;
     }
 
     const updatedMessageEntity = await this._updateMessageUserEntities(messageEntity);
@@ -4032,7 +4034,7 @@ export class ConversationRepository {
    *
    * @param conversationEntity Conversation entity that will be renamed
    * @param eventJson JSON data of 'conversation.receipt-mode-update' event
-   * @returns>} Resolves when the event was handled
+   * @returns Resolves when the event was handled
    */
   private _onReceiptModeChanged(conversationEntity: Conversation, eventJson: EventJson) {
     return this._addEventToConversation(conversationEntity, eventJson).then(({messageEntity}) => {
@@ -4058,7 +4060,7 @@ export class ConversationRepository {
     }
   }
 
-  private async _initMessageEntity(conversationEntity: Conversation, eventJson: Object): Promise<Message> {
+  private async _initMessageEntity(conversationEntity: Conversation, eventJson: EventRecord): Promise<Message> {
     const messageEntity = await this.event_mapper.mapJsonEvent(eventJson, conversationEntity);
     // eslint-disable-next-line no-return-await
     return this._updateMessageUserEntities(messageEntity);
@@ -4069,7 +4071,10 @@ export class ConversationRepository {
     if (!originalMessage) {
       return undefined;
     }
-    const replacedMessageEntity = await this.event_mapper.updateMessageEvent(originalMessage, newData);
+    const replacedMessageEntity = await this.event_mapper.updateMessageEvent(
+      originalMessage as ContentMessage,
+      newData,
+    );
     await this.ephemeralHandler.validateMessage(replacedMessageEntity);
     return replacedMessageEntity;
   }
@@ -4338,7 +4343,6 @@ export class ConversationRepository {
 
     const messageContentType = genericMessage.content;
     let actionType;
-    let numberOfMentions;
     switch (messageContentType) {
       case 'asset': {
         const protoAsset = genericMessage.asset;
@@ -4376,13 +4380,8 @@ export class ConversationRepository {
         const length = protoText[PROTO_MESSAGE_TYPE.LINK_PREVIEWS].length;
         if (!length) {
           actionType = 'text';
-          numberOfMentions = protoText.mentions.length;
         }
         break;
-      }
-
-      case 'deleted': {
-        actionType = 'delete';
       }
 
       default:
@@ -4397,7 +4396,7 @@ export class ConversationRepository {
       const guestsPro = participants.filter(user => !!user.teamId && user.teamId !== selfUserTeamId).length;
       const services = participants.filter(user => user.isService).length;
 
-      let segmentations = {
+      let segmentations: Record<string, any> = {
         [Segmentation.CONVERSATION.GUESTS]: roundLogarithmic(guests, 6),
         [Segmentation.CONVERSATION.GUESTS_PRO]: roundLogarithmic(guestsPro, 6),
         [Segmentation.CONVERSATION.GUESTS_WIRELESS]: roundLogarithmic(guestsWireless, 6),
@@ -4405,12 +4404,13 @@ export class ConversationRepository {
         [Segmentation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
         [Segmentation.CONVERSATION.SERVICES]: roundLogarithmic(services, 6),
         [Segmentation.MESSAGE.ACTION]: actionType,
-        [Segmentation.MESSAGE.IS_REPLY]: !!genericMessage.text?.quote,
-        [Segmentation.MESSAGE.MENTION]: numberOfMentions,
       };
       const isTeamConversation = !!conversationEntity.team_id;
       if (isTeamConversation) {
-        segmentations = {...segmentations, ...trackingHelpers.getGuestAttributes(conversationEntity)};
+        segmentations = {
+          ...segmentations,
+          ...trackingHelpers.getGuestAttributes(conversationEntity),
+        };
       }
 
       amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CONTRIBUTED, segmentations);

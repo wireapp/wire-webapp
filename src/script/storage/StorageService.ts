@@ -121,7 +121,7 @@ export class StorageService {
     return new SQLeetEngine('/worker/sqleet-worker.js', SQLeetSchemata.getLatest(), encryptionKey);
   }
 
-  _initCrudHooks(): void {
+  private _initCrudHooks(): void {
     const callListener = (
       table: string,
       eventType: string,

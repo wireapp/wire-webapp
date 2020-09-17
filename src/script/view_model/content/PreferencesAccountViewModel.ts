@@ -192,7 +192,7 @@ export class PreferencesAccountViewModel {
     this._initSubscriptions();
   }
 
-  _initSubscriptions = () => {
+  private readonly _initSubscriptions = () => {
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, this.updateProperties);
   };
 
@@ -311,7 +311,7 @@ export class PreferencesAccountViewModel {
       .forEach(({type, notification}) => this._showNotification(type, notification));
   };
 
-  _showNotification = (type: string, aggregatedNotifications: Notification[]) => {
+  private readonly _showNotification = (type: string, aggregatedNotifications: Notification[]) => {
     switch (type) {
       case PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT: {
         modals.showModal(
@@ -521,14 +521,14 @@ export class PreferencesAccountViewModel {
     }
   };
 
-  _showUploadWarning = (title: string, message: string): Promise<never> => {
+  private readonly _showUploadWarning = (title: string, message: string): Promise<never> => {
     const modalOptions = {text: {message, title}};
     modals.showModal(ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions, undefined);
 
     return Promise.reject(new UserError(UserError.TYPE.INVALID_UPDATE, UserError.MESSAGE.INVALID_UPDATE));
   };
 
-  _resetUsernameInput = (): void => {
+  private readonly _resetUsernameInput = (): void => {
     this.usernameState(null);
     this.enteredUsername(null);
     this.submittedUsername(null);

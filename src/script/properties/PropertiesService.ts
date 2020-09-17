@@ -29,7 +29,7 @@ export class PropertiesService {
   /**
    * Clear all properties store for the user.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/clearProperties
-   * @returns {Promise} Resolves when all properties for user have been cleared
+   * @returns Resolves when all properties for user have been cleared
    */
   deleteProperties(): Promise<void> {
     return this.apiClient.user.api.deleteProperties();

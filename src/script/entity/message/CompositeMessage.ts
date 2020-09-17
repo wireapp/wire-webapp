@@ -27,7 +27,7 @@ export class CompositeMessage extends ContentMessage {
   selectedButtonId: ko.Observable<string>;
   waitingButtonId: ko.Observable<string>;
 
-  constructor(id: string) {
+  constructor(id?: string) {
     super(id);
     this.selectedButtonId = ko.observable();
     this.waitingButtonId = ko.observable();

@@ -20,7 +20,7 @@
 import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
 import {LinkPreview, Mention} from '@wireapp/protocol-messaging';
 
-import {getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {base64ToArray} from 'Util/util';
 
@@ -41,7 +41,6 @@ import {Text} from '../entity/message/Text';
 import {FileAsset} from '../entity/message/FileAsset';
 import {Button} from '../entity/message/Button';
 import {ReceiptModeUpdateMessage} from '../entity/message/ReceiptModeUpdateMessage';
-import {LinkPreview as LinkPreviewEntity} from '../entity/message/LinkPreview';
 
 import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
 import {ClientEvent} from '../event/Client';
@@ -57,9 +56,18 @@ import {LegalHoldMessage} from '../entity/message/LegalHoldMessage';
 import {CompositeMessage} from '../entity/message/CompositeMessage';
 import {ConversationError} from '../error/ConversationError';
 import {FileTypeRestrictedMessage} from '../entity/message/FileTypeRestrictedMessage';
+import type {EventRecord} from '../storage';
+import type {Conversation} from '../entity/Conversation';
+import type {Message} from '../entity/message/Message';
+import type {Asset} from '../entity/message/Asset';
+import type {Text as TextAsset} from '../entity/message/Text';
+import type {ITweet} from '@wireapp/protocol-messaging';
+import type {LinkPreviewMetaDataType} from '../links/LinkPreviewMetaDataType';
+import {LinkPreview as LinkPreviewEntity} from '../entity/message/LinkPreview';
 
 // Event Mapper to convert all server side JSON events into core entities.
 export class EventMapper {
+  logger: Logger;
   /**
    * Construct a new Event Mapper.
    */
@@ -70,33 +78,35 @@ export class EventMapper {
   /**
    * Convert multiple JSON events into message entities.
    *
-   * @param {Array} events Event data
-   * @param {Conversation} conversationEntity Conversation entity the events belong to
-   * @returns {Promise<Array<Message>>} Resolves with the mapped message entities
+   * @param events Event data
+   * @param conversationEntity Conversation entity the events belong to
+   * @returns Resolves with the mapped message entities
    */
-  async mapJsonEvents(events, conversationEntity) {
+  async mapJsonEvents(events: EventRecord[], conversationEntity: Conversation): Promise<Message[]> {
     const reversedEvents = events.filter(event => !!event).reverse();
     const mappedEvents = await Promise.all(
-      reversedEvents.map(async event => {
-        try {
-          return await this._mapJsonEvent(event, conversationEntity);
-        } catch (error) {
-          const errorMessage = `Failure while mapping events. Affected '${event.type}' event: ${error.message}`;
-          this.logger.error(errorMessage, {error, event});
-        }
-      }),
+      reversedEvents.map(
+        async (event): Promise<Message | void> => {
+          try {
+            return await this._mapJsonEvent(event, conversationEntity);
+          } catch (error) {
+            const errorMessage = `Failure while mapping events. Affected '${event.type}' event: ${error.message}`;
+            this.logger.error(errorMessage, {error, event});
+          }
+        },
+      ),
     );
-    return mappedEvents.filter(messageEntity => !!messageEntity);
+    return mappedEvents.filter(messageEntity => !!messageEntity) as Message[];
   }
 
   /**
    * Convert JSON event into a message entity.
    *
-   * @param {EventRecord} event Event data
-   * @param {Conversation} conversationEntity Conversation entity the event belong to
-   * @returns {Promise} Resolves with the mapped message entity
+   * @param event Event data
+   * @param conversationEntity Conversation entity the event belong to
+   * @returns Resolves with the mapped message entity
    */
-  mapJsonEvent(event, conversationEntity) {
+  mapJsonEvent(event: EventRecord, conversationEntity: Conversation) {
     return this._mapJsonEvent(event, conversationEntity).catch(error => {
       const isMessageNotFound = error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
       if (isMessageNotFound) {
@@ -116,11 +126,11 @@ export class EventMapper {
    * Will update the content of the originalEntity with the new data given.
    * Will try to do as little updates as possible to avoid to many observable emission.
    *
-   * @param {Message} originalEntity the original message to update
-   * @param {EventRecord} event new json data to feed into the entity
-   * @returns {Promise<Message>} - the updated message entity
+   * @param originalEntity the original message to update
+   * @param event new json data to feed into the entity
+   * @returns the updated message entity
    */
-  async updateMessageEvent(originalEntity, event) {
+  async updateMessageEvent(originalEntity: ContentMessage, event: EventRecord): Promise<ContentMessage> {
     const {id, data: eventData, edited_time: editedTime} = event;
 
     if (eventData.quote) {
@@ -134,14 +144,14 @@ export class EventMapper {
       originalEntity.assets.push(textAsset);
     } else if (originalEntity.get_first_asset) {
       const asset = originalEntity.get_first_asset();
-      if (eventData.status && asset.status) {
+      if (eventData.status && (asset as FileAsset).status) {
         const assetEntity = this._mapAsset(event);
         originalEntity.assets([assetEntity]);
       }
       if (eventData.previews) {
-        if (asset.previews().length !== eventData.previews.length) {
+        if ((asset as TextAsset).previews().length !== eventData.previews.length) {
           const previews = await this._mapAssetLinkPreviews(eventData.previews);
-          asset.previews(previews);
+          (asset as TextAsset).previews(previews as LinkPreviewEntity[]);
         }
       }
 
@@ -150,7 +160,7 @@ export class EventMapper {
         const remoteDataPreview = preview_key
           ? AssetRemoteData.v3(preview_key, preview_otr_key, preview_sha256, preview_token, true)
           : AssetRemoteData.v2(event.conversation, preview_id, preview_otr_key, preview_sha256, true);
-        asset.preview_resource(remoteDataPreview);
+        (asset as FileAsset).preview_resource(remoteDataPreview);
       }
     }
 
@@ -165,7 +175,7 @@ export class EventMapper {
 
     originalEntity.id = id;
 
-    if (originalEntity.is_content() || originalEntity.is_ping()) {
+    if (originalEntity.is_content() || (originalEntity as Message).is_ping()) {
       originalEntity.status(event.status || StatusType.SENT);
     }
 
@@ -180,11 +190,11 @@ export class EventMapper {
   /**
    * Convert JSON event into a message entity.
    *
-   * @param {Object} event Event data
-   * @param {Conversation} conversationEntity Conversation entity the event belong to
-   * @returns {Promise<Message>} Mapped message entity
+   * @param event Event data
+   * @param conversationEntity Conversation entity the event belong to
+   * @returns Mapped message entity
    */
-  async _mapJsonEvent(event, conversationEntity) {
+  async _mapJsonEvent(event: EventRecord, conversationEntity: Conversation) {
     let messageEntity;
 
     switch (event.type) {
@@ -330,7 +340,7 @@ export class EventMapper {
       messageEntity.waitingButtonId(event.waiting_button_id);
     }
     if (messageEntity.isReactable()) {
-      messageEntity.reactions(event.reactions || {});
+      (messageEntity as ContentMessage).reactions(event.reactions || {});
     }
 
     if (event.ephemeral_expires) {
@@ -353,11 +363,10 @@ export class EventMapper {
   /**
    * Maps JSON data of conversation.one2one-creation message into message entity.
    *
-   * @private
-   * @param {Object} eventData Message data
-   * @returns {ContentMessage} Member message entity
+   * @param eventData Message data
+   * @returns Member message entity
    */
-  _mapEvent1to1Creation({data: eventData}) {
+  private _mapEvent1to1Creation({data: eventData}: EventRecord) {
     const {has_service: hasService, userIds} = eventData;
 
     const messageEntity = new MemberMessage();
@@ -374,11 +383,10 @@ export class EventMapper {
   /**
    * Maps JSON data of conversation.asset_add message into message entity.
    *
-   * @private
-   * @param {Object} event Message data
-   * @returns {ContentMessage} Content message entity
+   * @param event Message data
+   * @returns Content message entity
    */
-  _mapEventAssetAdd(event) {
+  private _mapEventAssetAdd(event: EventRecord) {
     const messageEntity = new ContentMessage();
 
     const assetEntity = this._mapAsset(event);
@@ -390,11 +398,10 @@ export class EventMapper {
   /**
    * Maps JSON data of delete everywhere event to message entity.
    *
-   * @private
-   * @param {Object} eventData Message data
-   * @returns {DeleteMessage} Delete message entity
+   * @param eventData Message data
+   * @returns Delete message entity
    */
-  _mapEventDeleteEverywhere({data: eventData}) {
+  private _mapEventDeleteEverywhere({data: eventData}: EventRecord) {
     const messageEntity = new DeleteMessage();
     messageEntity.deleted_timestamp = new Date(eventData.deleted_time).getTime();
     return messageEntity;
@@ -403,11 +410,10 @@ export class EventMapper {
   /**
    * Map JSON ata of group creation event to message entity.
    *
-   * @private
-   * @param {Object} eventData Message data
-   * @returns {MemberMessage} Member message entity
+   * @param eventData Message data
+   * @returns Member message entity
    */
-  _mapEventGroupCreation({data: eventData}) {
+  private _mapEventGroupCreation({data: eventData}: EventRecord) {
     const messageEntity = new MemberMessage();
     messageEntity.memberMessageType = SystemMessageType.CONVERSATION_CREATE;
     messageEntity.name(eventData.name || '');
@@ -416,18 +422,17 @@ export class EventMapper {
     return messageEntity;
   }
 
-  _mapEventLegalHoldUpdate({data, timestamp}) {
+  _mapEventLegalHoldUpdate({data, timestamp}: EventRecord) {
     return new LegalHoldMessage(data.legal_hold_status, timestamp);
   }
 
   /**
    * Maps JSON data of conversation.location message into message entity.
    *
-   * @private
-   * @param {Object} eventData Message data
-   * @returns {ContentMessage} Location message entity
+   * @param eventData Message data
+   * @returns Location message entity
    */
-  _mapEventLocation({data: eventData}) {
+  private _mapEventLocation({data: eventData}: EventRecord) {
     const location = eventData.location;
     const messageEntity = new ContentMessage();
     const assetEntity = new Location();
@@ -445,12 +450,11 @@ export class EventMapper {
   /**
    * Maps JSON data of conversation.member_join message into message entity.
    *
-   * @private
-   * @param {Object} event Message data
-   * @param {Conversation} conversationEntity Conversation entity the event belong to
-   * @returns {MemberMessage} Member message entity
+   * @param event Message data
+   * @param conversationEntity Conversation entity the event belong to
+   * @returns Member message entity
    */
-  _mapEventMemberJoin(event, conversationEntity) {
+  private _mapEventMemberJoin(event: EventRecord, conversationEntity: Conversation) {
     const {data: eventData, from: sender} = event;
     const {has_service: hasService, user_ids: userIds} = eventData;
 
@@ -482,11 +486,10 @@ export class EventMapper {
   /**
    * Maps JSON data of conversation.member_leave message into message entity.
    *
-   * @private
-   * @param {Object} eventData Message data
-   * @returns {MemberMessage} Member message entity
+   * @param eventData Message data
+   * @returns Member message entity
    */
-  _mapEventMemberLeave({data: eventData}) {
+  private _mapEventMemberLeave({data: eventData}: EventRecord) {
     const messageEntity = new MemberMessage();
     messageEntity.userIds(eventData.user_ids);
     return messageEntity;
@@ -495,11 +498,10 @@ export class EventMapper {
   /**
    * Maps JSON data of conversation.message_add message into message entity.
    *
-   * @private
-   * @param {Object} event Message data
-   * @returns {Promise<ContentMessage>} Content message entity
+   * @param event Message data
+   * @returns Content message entity
    */
-  async _mapEventMessageAdd(event) {
+  private async _mapEventMessageAdd(event: EventRecord) {
     const {data: eventData, edited_time: editedTime} = event;
     const messageEntity = new ContentMessage();
 
@@ -516,18 +518,20 @@ export class EventMapper {
     return messageEntity;
   }
 
-  async _mapEventCompositeMessageAdd(event) {
+  private async _mapEventCompositeMessageAdd(event: EventRecord) {
     const {data: eventData} = event;
     const messageEntity = new CompositeMessage();
-    const assets = await Promise.all(
-      eventData.items.map(async item => {
-        if (item.button) {
-          return new Button(item.button.id, item.button.text);
-        }
-        if (item.text) {
-          return this._mapAssetText(item.text);
-        }
-      }),
+    const assets: (Asset | FileAsset | Text | MediumImage)[] = await Promise.all(
+      eventData.items.map(
+        async (item: {button: {id: string; text: string}; text: any}): Promise<void | Button | Text> => {
+          if (item.button) {
+            return new Button(item.button.id, item.button.text);
+          }
+          if (item.text) {
+            return this._mapAssetText(item.text);
+          }
+        },
+      ),
     );
     messageEntity.assets.push(...assets);
     return messageEntity;
@@ -535,30 +539,27 @@ export class EventMapper {
 
   /**
    * Maps JSON data of local missed message event to message entity.
-   * @private
    * @returns {MissedMessage} Missed message entity
    */
-  _mapEventMissedMessages() {
+  private _mapEventMissedMessages() {
     return new MissedMessage();
   }
 
   /**
    * Maps JSON data of conversation.knock message into message entity.
-   * @private
    * @returns {PingMessage} Ping message entity
    */
-  _mapEventPing() {
+  private _mapEventPing() {
     return new PingMessage();
   }
 
   /**
    * Maps JSON data of conversation.rename message into message entity.
    *
-   * @private
-   * @param {Object} eventData Message data
-   * @returns {RenameMessage} Rename message entity
+   * @param eventData Message data
+   * @returns Rename message entity
    */
-  _mapEventRename({data: eventData}) {
+  private _mapEventRename({data: eventData}: EventRecord) {
     const messageEntity = new RenameMessage();
     messageEntity.name = eventData.name;
     return messageEntity;
@@ -567,33 +568,30 @@ export class EventMapper {
   /**
    * Maps JSON data of conversation.receipt-mode-update message into message entity.
    *
-   * @private
-   * @param {Object} eventData Message data
-   * @returns {ReceiptModeUpdateMessage} receipt mode update message entity
+   * @param eventData Message data
+   * @returns receipt mode update message entity
    */
-  _mapEventReceiptModeUpdate({data: eventData}) {
+  private _mapEventReceiptModeUpdate({data: eventData}: EventRecord) {
     return new ReceiptModeUpdateMessage(!!eventData.receipt_mode);
   }
 
   /**
    * Maps JSON data of conversation.message-timer-update message into message entity.
    *
-   * @private
-   * @param {Object} eventData Message data
-   * @returns {MessageTimerUpdateMessage} message timer update message entity
+   * @param eventData Message data
+   * @returns message timer update message entity
    */
-  _mapEventMessageTimerUpdate({data: eventData}) {
+  private _mapEventMessageTimerUpdate({data: eventData}: EventRecord) {
     return new MessageTimerUpdateMessage(eventData.message_timer);
   }
 
   /**
    * Maps JSON data of conversation.team_leave message into message entity.
    *
-   * @private
-   * @param {Object} event Message data
-   * @returns {MemberMessage} Member message entity
+   * @param event Message data
+   * @returns Member message entity
    */
-  _mapEventTeamMemberLeave(event) {
+  private _mapEventTeamMemberLeave(event: EventRecord) {
     const messageEntity = this._mapEventMemberLeave(event);
     const eventData = event.data;
     messageEntity.name(eventData.name || t('conversationSomeone'));
@@ -603,11 +601,10 @@ export class EventMapper {
   /**
    * Maps JSON data of local decrypt errors to message entity.
    *
-   * @private
-   * @param {Object} error_code Error data received as JSON
-   * @returns {DecryptErrorMessage} Decrypt error message entity
+   * @param error_code Error data received as JSON
+   * @returns Decrypt error message entity
    */
-  _mapEventUnableToDecrypt({error_code: errorCode}) {
+  private _mapEventUnableToDecrypt({error_code: errorCode}: EventRecord) {
     const messageEntity = new DecryptErrorMessage();
 
     if (errorCode) {
@@ -622,11 +619,10 @@ export class EventMapper {
   /**
    * Maps JSON data of conversation.verification message into message entity.
    *
-   * @private
-   * @param {Object} eventData Message data
-   * @returns {VerificationMessage} Verification message entity
+   * @param eventData Message data
+   * @returns Verification message entity
    */
-  _mapEventVerification({data: eventData}) {
+  private _mapEventVerification({data: eventData}: EventRecord) {
     const messageEntity = new VerificationMessage();
 
     // Database can contain non-camelCased naming. For backwards compatibility reasons we handle both.
@@ -638,10 +634,9 @@ export class EventMapper {
 
   /**
    * Maps JSON data of conversation.voice-channel-activate message into message entity.
-   * @private
-   * @returns {CallMessage} Call message entity
+   * @returns Call message entity
    */
-  _mapEventVoiceChannelActivate() {
+  private _mapEventVoiceChannelActivate() {
     const messageEntity = new CallMessage(CALL_MESSAGE_TYPE.ACTIVATED);
     messageEntity.visible(false);
     return messageEntity;
@@ -650,11 +645,10 @@ export class EventMapper {
   /**
    * Maps JSON data of conversation.voice-channel-deactivate message into message entity.
    *
-   * @private
-   * @param {Object} eventData Message data
-   * @returns {CallMessage} Call message entity
+   * @param eventData Message data
+   * @returns Call message entity
    */
-  _mapEventVoiceChannelDeactivate({data: eventData}) {
+  private _mapEventVoiceChannelDeactivate({data: eventData}: EventRecord) {
     const messageEntity = new CallMessage(CALL_MESSAGE_TYPE.DEACTIVATED, eventData.reason, eventData.duration);
 
     if (typeof eventData.duration !== 'undefined') {
@@ -672,7 +666,7 @@ export class EventMapper {
   // Asset mappers
   //##############################################################################
 
-  _mapAsset(event) {
+  _mapAsset(event: EventRecord) {
     const eventData = event.data;
     const assetInfo = eventData.info;
     const isMediumImage = assetInfo && assetInfo.tag === 'medium';
@@ -682,11 +676,10 @@ export class EventMapper {
   /**
    * Maps JSON data of file asset into asset entity.
    *
-   * @private
-   * @param {Object} event Asset data received as JSON
-   * @returns {FileAsset} FileAsset entity
+   * @param event Asset data received as JSON
+   * @returns FileAsset entity
    */
-  _mapAssetFile(event) {
+  private _mapAssetFile(event: EventRecord) {
     const {conversation: conversationId, data: eventData} = event;
     const {content_length, content_type, id, info, meta, status} = eventData;
 
@@ -730,18 +723,17 @@ export class EventMapper {
   /**
    * Maps JSON data of medium image asset into asset entity.
    *
-   * @private
-   * @param {Object} event Asset data received as JSON
-   * @returns {MediumImage} Medium image asset entity
+   * @param event Asset data received as JSON
+   * @returns Medium image asset entity
    */
-  _mapAssetImage(event) {
+  private _mapAssetImage(event: EventRecord) {
     const {data: eventData, conversation: conversationId} = event;
     const {content_length, content_type, id: assetId, info} = eventData;
     const assetEntity = new MediumImage(assetId);
 
     assetEntity.file_size = content_length;
     assetEntity.file_type = content_type;
-    assetEntity.ratio = assetEntity.height / assetEntity.width;
+    assetEntity.ratio = +assetEntity.height / +assetEntity.width;
 
     if (info) {
       assetEntity.width = info.width;
@@ -765,20 +757,19 @@ export class EventMapper {
   /**
    * Map link preview from proto message.
    *
-   * @private
-   * @param {LinkPreview} linkPreview Link preview proto message
-   * @returns {LinkPreview} Mapped link preview
+   * @param linkPreview Link preview proto message
+   * @returns Mapped link preview
    */
-  _mapAssetLinkPreview(linkPreview) {
+  private _mapAssetLinkPreview(linkPreview: LinkPreview): LinkPreviewEntity | void {
     if (linkPreview) {
       const {image, title, url} = linkPreview;
       const {image: article_image, title: article_title} = linkPreview.article || {};
 
-      const meta_data = linkPreview.metaData || linkPreview.meta_data;
+      const meta_data: LinkPreviewMetaDataType = linkPreview.metaData || (linkPreview as any).meta_data;
 
       const linkPreviewEntity = new LinkPreviewEntity(title || article_title, url);
       linkPreviewEntity.meta_data_type = meta_data;
-      linkPreviewEntity.meta_data = linkPreview[meta_data];
+      linkPreviewEntity.meta_data = linkPreview[meta_data] as ITweet;
 
       const previewImage = image || article_image;
       if (previewImage && previewImage.uploaded) {
@@ -801,11 +792,10 @@ export class EventMapper {
   /**
    * Map link previews from proto messages.
    *
-   * @private
-   * @param {Array} linkPreviews Link previews as base64 encoded proto messages
-   * @returns {Promise<LinkPreview[]>} Array of mapped link previews
+   * @param linkPreviews Link previews as base64 encoded proto messages
+   * @returns Array of mapped link previews
    */
-  async _mapAssetLinkPreviews(linkPreviews) {
+  private async _mapAssetLinkPreviews(linkPreviews: string[]) {
     const encodedLinkPreviews = await Promise.all(linkPreviews.map(base64 => base64ToArray(base64)));
     return encodedLinkPreviews
       .map(encodedLinkPreview => LinkPreview.decode(encodedLinkPreview))
@@ -816,19 +806,18 @@ export class EventMapper {
   /**
    * Map mentions from proto messages.
    *
-   * @private
-   * @param {Array} mentions Mentions as base64 encoded proto messages
-   * @param {string} messageText Text of message
-   * @returns {Promise<MentionEntity[]>} Array of mapped mentions
+   * @param mentions Mentions as base64 encoded proto messages
+   * @param messageText Text of message
+   * @returns Array of mapped mentions
    */
-  async _mapAssetMentions(mentions, messageText) {
+  private async _mapAssetMentions(mentions: string[], messageText: string) {
     const encodedMentions = await Promise.all(mentions.map(base64 => base64ToArray(base64)));
     return encodedMentions
       .map(encodedMention => {
         const protoMention = Mention.decode(encodedMention);
         return new MentionEntity(protoMention.start, protoMention.length, protoMention.userId);
       })
-      .filter((mentionEntity, _, allMentions) => {
+      .filter((mentionEntity, _, allMentions): boolean | void => {
         if (mentionEntity) {
           try {
             return mentionEntity.validate(messageText, allMentions);
@@ -843,11 +832,10 @@ export class EventMapper {
   /**
    * Maps JSON data of text asset into asset entity.
    *
-   * @private
-   * @param {Object} eventData Asset data received as JSON
-   * @returns {Promise<Text>} Text asset entity
+   * @param eventData Asset data received as JSON
+   * @returns Text asset entity
    */
-  async _mapAssetText(eventData) {
+  private async _mapAssetText(eventData: EventRecord) {
     const {id, content, mentions, message, previews} = eventData;
     const messageText = content || message;
     const assetEntity = new Text(id, messageText);
@@ -857,23 +845,23 @@ export class EventMapper {
       assetEntity.mentions(mappedMentions);
     }
     if (previews && previews.length) {
-      const mappedLinkPreviews = await this._mapAssetLinkPreviews(previews);
+      const mappedLinkPreviews = ((await this._mapAssetLinkPreviews(previews)) as unknown) as LinkPreviewEntity[];
       assetEntity.previews(mappedLinkPreviews);
     }
 
     return assetEntity;
   }
 
-  _mapFileTypeRestricted(event) {
+  _mapFileTypeRestricted(event: EventRecord) {
     const {
       data: {isIncoming, name, fileExt},
       time,
     } = event;
-    return new FileTypeRestrictedMessage(isIncoming, name, fileExt, time);
+    return new FileTypeRestrictedMessage(isIncoming, name, fileExt, +time);
   }
 }
 
-function addMetadata(entity, event) {
+function addMetadata<T extends Message>(entity: T, event: EventRecord): T {
   const {data: eventData, read_receipts} = event;
   if (eventData) {
     entity.expectsReadConfirmation = eventData.expects_read_confirmation;

@@ -31,7 +31,7 @@ import {User} from '../User';
 import {SystemMessage} from './SystemMessage';
 
 export class MemberMessage extends SystemMessage {
-  private readonly allTeamMembers: User[];
+  public allTeamMembers: User[];
   private readonly exceedsMaxVisibleUsers: ko.PureComputed<boolean>;
   private readonly hasUsers: ko.PureComputed<boolean>;
   private readonly hiddenUserCount: ko.PureComputed<number>;

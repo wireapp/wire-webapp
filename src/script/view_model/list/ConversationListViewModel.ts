@@ -220,7 +220,7 @@ export class ConversationListViewModel {
     this._initSubscriptions();
   }
 
-  _initSubscriptions = (): void => {
+  private readonly _initSubscriptions = (): void => {
     amplify.subscribe(WebAppEvents.LIFECYCLE.LOADED, this.onWebappLoaded);
     amplify.subscribe(WebAppEvents.SHORTCUT.START, this.clickOnPeopleButton);
     amplify.subscribe(WebAppEvents.CONTENT.EXPAND_FOLDER, this.expandFolder);

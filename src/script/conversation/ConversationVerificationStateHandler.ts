@@ -243,7 +243,7 @@ export class ConversationVerificationStateHandler {
   /**
    * Check whether to verify conversation and set corresponding state
    *
-   * @param {Conversation} conversationEntity Conversation entity to evaluate
+   * @param conversationEntity Conversation entity to evaluate
    * @returns `true` if conversation state changed to verified
    */
   private willChangeToVerified(conversationEntity: Conversation): boolean {
