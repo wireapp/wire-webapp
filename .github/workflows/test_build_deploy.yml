@@ -209,7 +209,7 @@ jobs:
           fi
 
       - name: Generate changelog
-        if: env.TAG != '' && env.DISTRIBUTION == 'wire'
+        if: contains(env.TAG, 'production') && env.DISTRIBUTION == 'wire'
         run: yarn changelog
 
       - name: Create GitHub production release draft
@@ -234,6 +234,5 @@ jobs:
         with:
           tag_name: ${{env.TAG}}
           release_name: ${{env.TAG}}
-          body_path: ./CHANGELOG.md
           draft: true
           prerelease: true
