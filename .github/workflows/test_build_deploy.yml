@@ -88,7 +88,7 @@ jobs:
           application_name: ${{env.AWS_APPLICATION_NAME}}
           environment_name: wire-webapp-avs
           region: eu-central-1
-          deployment_package: ${{AWS_BUILD_ZIP_PATH}}
+          deployment_package: ${{env.AWS_BUILD_ZIP_PATH}}
           wait_for_deployment: false
           wait_for_environment_recovery: ${{env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS}}
           version_label: ${{github.run_id}}
@@ -104,7 +104,7 @@ jobs:
           application_name: ${{env.AWS_APPLICATION_NAME}}
           environment_name: wire-webapp-edge
           region: eu-central-1
-          deployment_package: ${{AWS_BUILD_ZIP_PATH}}
+          deployment_package: ${{env.AWS_BUILD_ZIP_PATH}}
           wait_for_deployment: false
           wait_for_environment_recovery: ${{env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS}}
           version_label: ${{github.run_id}}
@@ -120,7 +120,7 @@ jobs:
           application_name: ${{env.AWS_APPLICATION_NAME}}
           environment_name: wire-webapp-dev
           region: eu-central-1
-          deployment_package: ${{AWS_BUILD_ZIP_PATH}}
+          deployment_package: ${{env.AWS_BUILD_ZIP_PATH}}
           wait_for_deployment: false
           wait_for_environment_recovery: ${{env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS}}
           version_label: ${{github.run_id}}
@@ -136,7 +136,7 @@ jobs:
           application_name: ${{env.AWS_APPLICATION_NAME}}
           environment_name: wire-webapp-staging
           region: eu-central-1
-          deployment_package: ${{AWS_BUILD_ZIP_PATH}}
+          deployment_package: ${{env.AWS_BUILD_ZIP_PATH}}
           wait_for_deployment: false
           wait_for_environment_recovery: ${{env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS}}
           version_label: ${{env.TAG}}-${{github.run_id}}
@@ -152,7 +152,7 @@ jobs:
           application_name: ${{env.AWS_APPLICATION_NAME}}
           environment_name: wire-webapp-master
           region: eu-central-1
-          deployment_package: ${{AWS_BUILD_ZIP_PATH}}
+          deployment_package: ${{env.AWS_BUILD_ZIP_PATH}}
           wait_for_deployment: false
           wait_for_environment_recovery: ${{env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS}}
           version_label: ${{github.run_id}}
@@ -168,7 +168,7 @@ jobs:
           application_name: ${{env.AWS_APPLICATION_NAME}}
           environment_name: wire-webapp-prod
           region: eu-central-1
-          deployment_package: ${{AWS_BUILD_ZIP_PATH}}
+          deployment_package: ${{env.AWS_BUILD_ZIP_PATH}}
           wait_for_deployment: false
           wait_for_environment_recovery: ${{env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS}}
           version_label: ${{env.TAG}}-${{github.run_id}}
