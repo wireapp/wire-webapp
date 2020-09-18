@@ -1,0 +1,37 @@
+name: Download translations
+
+on:
+  push:
+    branches: [dev]
+  schedule:
+    - cron: '0 8 * * *'
+
+jobs:
+  download_translations:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Download translations
+        uses: crowdin/github-action@1.0.9
+        env:
+          GITHUB_TOKEN: ${{github.token}}
+          CROWDIN_PROJECT_ID: 342359
+          INPUT_DEBUG_MODE: false
+        with:
+          upload_sources: false
+          upload_translations: false
+          download_translations: true
+          skip_untranslated_files: false
+          # Download translations with pushing to branch
+          push_translations: true
+          commit_message: 'chore: Update translations'
+          localization_branch_name: 'translations'
+          create_pull_request: true
+          pull_request_title: 'chore: Update translations'
+          token: ${{secrets.WEB_CROWDIN_TOKEN}}
+          source: 'src/i18n/en-US.json'
+          translation: 'src/i18n/%locale%.json'
+          base_path: '.'
