@@ -46,7 +46,7 @@ module.exports = function (config) {
       'report-config': {
         html: {subdir: 'html'},
       },
-      reports: ['html', 'lcovonly'],
+      reports: ['html', 'lcovonly', 'clover'],
       thresholds: {
         emitWarning: false,
         global: {
