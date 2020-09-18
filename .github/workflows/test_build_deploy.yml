@@ -76,6 +76,7 @@ jobs:
           threshold_warning: ${{env.TEST_COVERAGE_WARNING_THRESHOLD}}
 
       - name: Build
+        if: github.event_name != 'pull_request'
         run: yarn build:prod
 
       # https://wire-webapp-avs.zinfra.io/
