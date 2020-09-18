@@ -38,7 +38,9 @@ jobs:
         run: |
           echo "::set-env name=BRANCH_NAME::$(git branch --show-current)"
           echo "::set-env name=TAG::$(git tag --points-at ${{github.sha}})"
-          echo "::set-env name=TITLE::${{github.event.pull_request.title || github.event.head_commit.message}}"
+          echo "::set-env name=TITLE::$(${{github.event.pull_request.title || github.event.head_commit.message}} | head -n 1)"
+          echo "::set-env name=COMMIT_URL::${{github.event.head_commit.url}}"
+          echo "::set-env name=COMMITTER::${{github.event.head_commit.committer.committer}}"
 
       - name: Print environment variables
         env:
@@ -47,6 +49,7 @@ jobs:
           echo -e "BRANCH_NAME = ${BRANCH_NAME}"
           echo -e "TAG = ${TAG}"
           echo -e "TITLE = ${TITLE}"
+          echo -e "COMMITTER = ${COMMITTER}"
           echo -e "GITHUB_SHA = ${GITHUB_SHA}"
           echo -e "GITHUB_REF = ${GITHUB_REF}"
           echo -e "GITHUB_CONTEXT = ${GITHUB_CONTEXT}"
@@ -237,3 +240,30 @@ jobs:
           release_name: ${{env.TAG}}
           draft: true
           prerelease: true
+
+      - name: Notify staging bump
+        if: contains(env.TAG, 'staging') && env.DISTRIBUTION == 'wire'
+        uses: wireapp/github-action-wire-messenger@v1
+        with:
+          email: ${{secrets.WIRE_BOT_EMAIL}}
+          password: ${{secrets.WIRE_BOT_PASSWORD}}
+          conversation: '4223f57f-0c8d-42fe-bf8a-908d680788ab'
+          text: 'Staging bump for commit **${{github.sha}}** ("${{env.TITLE}}") done! 🏁'
+
+      - name: Notify production release
+        if: env.BRANCH_NAME == 'avs'
+        uses: wireapp/github-action-wire-messenger@v1
+        with:
+          email: ${{secrets.WIRE_BOT_EMAIL}}
+          password: ${{secrets.WIRE_BOT_PASSWORD}}
+          conversation: '5496b04a-afd3-410e-8154-855142bcfb03'
+          text: 'Deployed commit **${{github.sha}}** ("${{env.TITLE}}") on [wire-webapp-avs](https://wire-webapp-avs.zinfra.io/). 🏁'
+
+      - name: Notify CI error
+        if: failure() && github.event_name != 'pull_request'
+        uses: wireapp/github-action-wire-messenger@v1
+        with:
+          email: ${{secrets.WIRE_BOT_EMAIL}}
+          password: ${{secrets.WIRE_BOT_PASSWORD}}
+          conversation: 'b2cc7120-4154-4be4-b0c0-45a8c361c4d1'
+          text: '${{env.COMMITTER}} broke the "${{env.BRANCH_NAME}}" branch on "${{github.repository}}" with [${{env.TITLE}}](${{env.COMMIT_URL}}) 🌵'
