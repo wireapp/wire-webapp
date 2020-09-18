@@ -34,11 +34,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Set BRANCH_NAME, TAG & COMMIT_MESSAGE environment variables
+      - name: Set BRANCH_NAME, TAG & TITLE environment variables
         run: |
           echo "::set-env name=BRANCH_NAME::$(git branch --show-current)"
           echo "::set-env name=TAG::$(git tag --points-at ${{github.sha}})"
-          echo "::set-env name=COMMIT_MESSAGE::$(git log --format=%B -n 1 ${{github.event.after}})"
+          echo "::set-env name=TITLE::${{github.event.pull_request.title || github.event.head_commit.message}}"
 
       - name: Print environment variables
         env:
@@ -46,7 +46,7 @@ jobs:
         run: |
           echo -e "BRANCH_NAME = ${BRANCH_NAME}"
           echo -e "TAG = ${TAG}"
-          echo -e "COMMIT_MESSAGE = ${COMMIT_MESSAGE}"
+          echo -e "TITLE = ${TITLE}"
           echo -e "GITHUB_SHA = ${GITHUB_SHA}"
           echo -e "GITHUB_REF = ${GITHUB_REF}"
           echo -e "GITHUB_CONTEXT = ${GITHUB_CONTEXT}"
