@@ -213,7 +213,7 @@ jobs:
         run: yarn changelog
 
       - name: Create GitHub production release draft
-        id: create_release
+        id: create_release_production
         if: contains(env.TAG, 'production') && env.DISTRIBUTION == 'wire'
         uses: actions/create-release@v1
         env:
@@ -226,7 +226,7 @@ jobs:
           prerelease: false
 
       - name: Create GitHub staging release draft
-        id: create_release
+        id: create_release_staging
         if: contains(env.TAG, 'staging') && env.DISTRIBUTION == 'wire'
         uses: actions/create-release@v1
         env:
