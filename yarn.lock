@@ -2047,17 +2047,17 @@
   resolved "https://registry.yarnpkg.com/@wireapp/antiscroll-2/-/antiscroll-2-1.0.2.tgz#71a78d294ee0c88f42d50477ab61fa39272f5bca"
   integrity sha512-9KeB3yh9k01PjpuuRQsve4yY3+OVS2/hp9j+N13Is5wYCZRkUzZVCs8w9CyA/C6J5o9ukH0EzT7uurysWuhn/A==
 
-"@wireapp/api-client@11.26.1":
-  version "11.26.1"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-11.26.1.tgz#691247a58c8a8c296533aee0adb91423847bead9"
-  integrity sha512-k1jjuux9QEntAMRut4YVn6inzXkWV9/dctvsFWTLUrOOgHZ4f4bmugcP/B7DrHoyBKgs0a9CuIaSrUjwogN2xw==
+"@wireapp/api-client@11.26.2":
+  version "11.26.2"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-11.26.2.tgz#763b9acb5a11b34f16d7c464e411f4b254333aec"
+  integrity sha512-MgmOs6ujJus07tarExZwCzpSl1hNjKMUMpjXfFJ/vVWtc8VUMLn2p7RKdDKBqp3gUhyPVsQhofF6k8fFunrJ5g==
   dependencies:
     "@types/node" "~12"
     "@types/spark-md5" "3.0.2"
     "@types/tough-cookie" "4.0.0"
-    "@wireapp/commons" "3.8.0"
-    "@wireapp/priority-queue" "1.6.7"
-    axios "0.19.2"
+    "@wireapp/commons" "3.8.1"
+    "@wireapp/priority-queue" "1.6.8"
+    axios "0.20.0"
     logdown "3.3.1"
     reconnecting-websocket "4.4.0"
     spark-md5 "3.0.1"
@@ -2074,10 +2074,10 @@
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-4.6.12.tgz#558630e45aa137c1085f487127dbc0a0b8eea85a"
   integrity sha512-XYlPV8FoiWH57j+RztOe8BgPkvJKoggW17GfxsatDI5Hx5HVIsGONd/AARVjHbznGLtl0Dtsal4iy6eeJKiB+g==
 
-"@wireapp/commons@3.8.0":
-  version "3.8.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-3.8.0.tgz#05d48fe2802134fca20d28dc62b71132397780a7"
-  integrity sha512-nHqpcW4OfbLMf2Y1wrX+xdDi417a7ixkMPjmVKvlXN52nAi41m9klG/m30xPWjqd2ySCPvM8t3Leuv0sLZZlCA==
+"@wireapp/commons@3.8.1":
+  version "3.8.1"
+  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-3.8.1.tgz#0d214896d2b6b8abe38bca548342324405a84592"
+  integrity sha512-6uxd07LOTsEk0M7cbc2CvaMbC8jpBhybn8yGJvCRnfZci2h2naHhowBnMekCz9JuvdFTU6t0LzzhlfAleuCh/Q==
   dependencies:
     "@types/fs-extra" "8.1.0"
     "@types/node" "~12"
@@ -2101,34 +2101,34 @@
     logdown "3.3.1"
     rimraf "3.0.2"
 
-"@wireapp/core@16.12.12":
-  version "16.12.12"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-16.12.12.tgz#2410451116692de71a271dce3c0868f1cf63bee5"
-  integrity sha512-cCH0druPM+OYitAXCA0C9yCDS/tfShEKYJJEawNdp9VXqW6xJY5+L+3thTf+xNQHyIGdoLgwWBms5tVgeGtnEg==
+"@wireapp/core@16.12.13":
+  version "16.12.13"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-16.12.13.tgz#3d71355696a93742ec394e7a6357e88edb6aec40"
+  integrity sha512-o5DvbDrPHZouIrTsmfR475+SFARDOUyfXu6vdUrdhopFcqx2zh/odzTN+u91QRbc103Rrg7za/XzluxwSmzxAQ==
   dependencies:
     "@types/long" "4.0.1"
     "@types/node" "~12"
-    "@wireapp/api-client" "11.26.1"
-    "@wireapp/cryptobox" "12.2.23"
+    "@wireapp/api-client" "11.26.2"
+    "@wireapp/cryptobox" "12.2.24"
     "@wireapp/protocol-messaging" "1.25.4"
     "@wireapp/store-engine" "4.5.10"
-    bazinga64 "5.7.11"
+    bazinga64 "5.7.12"
     hash.js "1.1.7"
     logdown "3.3.1"
-    protobufjs "6.9.0"
-    uuidjs "4.2.5"
+    protobufjs "6.10.1"
+    uuidjs "4.2.6"
 
-"@wireapp/cryptobox@12.2.23":
-  version "12.2.23"
-  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-12.2.23.tgz#cd4408c4251928bfa4e6a8f9f7dd5eaae0d14db6"
-  integrity sha512-5lE3kpLYoaZKnRSOSQjtHT0oS7KAYfKmZkZ5TdhcMzH42WKVfyHxieHyxf8I7rwtU1IITUiPmQpwHuDBBhZUQg==
+"@wireapp/cryptobox@12.2.24":
+  version "12.2.24"
+  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-12.2.24.tgz#8b3697078bd0b887ffc713ba71db693dff1ffa6b"
+  integrity sha512-Gnd4xFB4/XyHUj/ZJ1j72wXai6uMQy8ArDOsXlKWeOCFaBa0GOQdGwziVVtWZhXBybN6kXgM0AkBPt+okGstDg==
   dependencies:
     "@types/node" "~12"
     "@wireapp/lru-cache" "3.7.1"
-    "@wireapp/priority-queue" "1.6.7"
-    "@wireapp/proteus" "9.8.15"
+    "@wireapp/priority-queue" "1.6.8"
+    "@wireapp/proteus" "9.8.16"
     "@wireapp/store-engine" "4.5.10"
-    bazinga64 "5.7.11"
+    bazinga64 "5.7.12"
     logdown "3.3.1"
 
 "@wireapp/eslint-config@1.8.0":
@@ -2146,19 +2146,19 @@
   resolved "https://registry.yarnpkg.com/@wireapp/prettier-config/-/prettier-config-0.3.0.tgz#e8129b31021c81d90d564d9c4ff0f7f7b514e943"
   integrity sha512-BFokvX4NZlkhWq5/OoJUCS8Iels+MeRgzpd5V9QR3hj5swwCFGxJOAL7soPXkSNWo91gI1qwiTp8szB1O9aCfQ==
 
-"@wireapp/priority-queue@1.6.7":
-  version "1.6.7"
-  resolved "https://registry.yarnpkg.com/@wireapp/priority-queue/-/priority-queue-1.6.7.tgz#f50f2aa60dc8e4d4745c956153ef6f9a6aaf881b"
-  integrity sha512-aXWfAKCK4YiUv5e2yIHgjwopy+8nENlW1iFYtUB7ttSPhRynhgHYDtYgEY0I8NoNFxvkD22a/eSBaMvLS9Zwcg==
+"@wireapp/priority-queue@1.6.8":
+  version "1.6.8"
+  resolved "https://registry.yarnpkg.com/@wireapp/priority-queue/-/priority-queue-1.6.8.tgz#4665ca7e388d6f31f0a4698ce540ded1fc0cb6cc"
+  integrity sha512-wuT2UkrX65b51+6TTnBNlkk7XmYYjPYazcTQ3nmPDUrMfXs9vNdNkobjHvBWQglQxUtuXQt933h/0LCae7S+cg==
   dependencies:
     "@types/node" "~12"
     logdown "3.3.1"
-    uuidjs "4.2.5"
+    uuidjs "4.2.6"
 
-"@wireapp/proteus@9.8.15":
-  version "9.8.15"
-  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-9.8.15.tgz#6c1c9b38a546aded6a3c56d2caffc30037d22e54"
-  integrity sha512-ZVXCYto6wYPJeWoFTECmbAjbkw1wxKW0laJXe5E3NGEX9AQbqwizm2E+xSXUdhHuiYi53mw29EnLg/3qOoUP3w==
+"@wireapp/proteus@9.8.16":
+  version "9.8.16"
+  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-9.8.16.tgz#ff15d4ee2bb07aeed4ea101685d453c9695e1b80"
+  integrity sha512-54Qy21w7oY74Ev9SMx5alXuY6MDfBNrS9YBXfyXSLxQEmtT31FUmqsxetLWCs4EwNT+XVgVrl1q0P1xlLBl8sg==
   dependencies:
     "@types/chai" "4.2.11"
     "@types/ed2curve" "0.2.2"
@@ -2166,7 +2166,7 @@
     "@types/node" "~12"
     "@wireapp/cbor" "4.6.12"
     ed2curve "0.3.0"
-    libsodium-wrappers-sumo "0.7.6"
+    libsodium-wrappers-sumo "0.7.8"
 
 "@wireapp/protocol-messaging@1.25.4":
   version "1.25.4"
@@ -2830,6 +2830,13 @@ axios@0.19.2:
   dependencies:
     follow-redirects "1.5.10"
 
+axios@0.20.0:
+  version "0.20.0"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-0.20.0.tgz#057ba30f04884694993a8cd07fa394cff11c50bd"
+  integrity sha512-ANA4rr2BDcmmAQLOKft2fufrtuvlqR+cXNNinUmvfeSNCOF98PZL+7M/v1zIdGo7OLjEA9J2gXJL+j4zGsl0bA==
+  dependencies:
+    follow-redirects "^1.10.0"
+
 babel-code-frame@^6.26.0:
   version "6.26.0"
   resolved "https://registry.yarnpkg.com/babel-code-frame/-/babel-code-frame-6.26.0.tgz#63fd43f7dc1e3bb7ce35947db8fe369a3f58c74b"
@@ -3060,6 +3067,11 @@ bazinga64@5.7.11:
   version "5.7.11"
   resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.7.11.tgz#94d129e98fcd2d31531cc03a9fb9a731a598aec2"
   integrity sha512-u4DKSLiKHFVQRMFo701k+Y+BabKyNROHU3fLdNchTXdrsqmbVsiD18oSnZJdOQU9sy+dzmWvVdmg3wL2iS8cGw==
+
+bazinga64@5.7.12:
+  version "5.7.12"
+  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.7.12.tgz#fe46c0cc194e372cb33e1c13395ac493b7e1ed9b"
+  integrity sha512-2lnCmyGxQNngs8sJg50PVwY4M/ts+dTF6qEo4HHvBCjCXs2CUGe57jb9lF6uSw8CEW4+1tMan+y46ZmhxAFc1Q==
 
 bcrypt-pbkdf@^1.0.0:
   version "1.0.2"
@@ -6137,6 +6149,11 @@ follow-redirects@^1.0.0:
   dependencies:
     debug "^3.0.0"
 
+follow-redirects@^1.10.0:
+  version "1.13.0"
+  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.13.0.tgz#b42e8d93a2a7eea5ed88633676d6597bc8e384db"
+  integrity sha512-aq6gF1BEKje4a9i9+5jimNFIpq4Q1WiwBToeRK5NvZBd/TRsmW8BsJfOEGkr76TbOyPVD3OVDN910EcUNtRYEA==
+
 for-in@^1.0.1, for-in@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/for-in/-/for-in-1.0.2.tgz#81068d295a8142ec0ac726c6e2200c30fb6d5e80"
@@ -8254,17 +8271,17 @@ levn@^0.4.1:
     prelude-ls "^1.2.1"
     type-check "~0.4.0"
 
-libsodium-sumo@0.7.6:
-  version "0.7.6"
-  resolved "https://registry.yarnpkg.com/libsodium-sumo/-/libsodium-sumo-0.7.6.tgz#935a80f95165a2f7d33a77bc8f1cde62130d93dc"
-  integrity sha512-1XM2w00YkufeLVhFbw9aV+NTftzqECkEU1Amw2MxCbYuyy4L6MH5y8MWOg3shN6X/9R3e1pp6RCSXPnbFRTVCA==
+libsodium-sumo@^0.7.0:
+  version "0.7.8"
+  resolved "https://registry.yarnpkg.com/libsodium-sumo/-/libsodium-sumo-0.7.8.tgz#66789762e45c521a2373808eb7c8184120f61bab"
+  integrity sha512-5ev5rkfWQwrf77OI0R/qnrqtwF7gyq9mklid46o+sc9YfZBzjg1VgbU56/+nFv8B9tE37OdG6w0fyJuvyNElzg==
 
-libsodium-wrappers-sumo@0.7.6:
-  version "0.7.6"
-  resolved "https://registry.yarnpkg.com/libsodium-wrappers-sumo/-/libsodium-wrappers-sumo-0.7.6.tgz#0fc9f422470d192370c4213f3c46e41ebda35e77"
-  integrity sha512-pwYQ1ZR/UwXBMY4tFDcjYZrBFgexkhRykzcE9Jv0l/J41Tp7PqHYfHA17YpOxIXrAIRBPVSlPo2VxHoGZZKwXA==
+libsodium-wrappers-sumo@0.7.8:
+  version "0.7.8"
+  resolved "https://registry.yarnpkg.com/libsodium-wrappers-sumo/-/libsodium-wrappers-sumo-0.7.8.tgz#5212750e8012b33a48f4c01dd8d22683b2e1fc42"
+  integrity sha512-a36GRLb59E5Zx8br6Xvwk6QsnYWodkCJFvNQxnhrvL9t9i4v6v3V/cv3h0/pxehf35ljVCWqoi0CawMQ8C1JmA==
   dependencies:
-    libsodium-sumo "0.7.6"
+    libsodium-sumo "^0.7.0"
 
 lie@~3.3.0:
   version "3.3.0"
@@ -10730,6 +10747,25 @@ prop-types@^15.6.1, prop-types@^15.6.2, prop-types@^15.7.2:
     object-assign "^4.1.1"
     react-is "^16.8.1"
 
+protobufjs@6.10.1:
+  version "6.10.1"
+  resolved "https://registry.yarnpkg.com/protobufjs/-/protobufjs-6.10.1.tgz#e6a484dd8f04b29629e9053344e3970cccf13cd2"
+  integrity sha512-pb8kTchL+1Ceg4lFd5XUpK8PdWacbvV5SK2ULH2ebrYtl4GjJmS24m6CKME67jzV53tbJxHlnNOSqQHbTsR9JQ==
+  dependencies:
+    "@protobufjs/aspromise" "^1.1.2"
+    "@protobufjs/base64" "^1.1.2"
+    "@protobufjs/codegen" "^2.0.4"
+    "@protobufjs/eventemitter" "^1.1.0"
+    "@protobufjs/fetch" "^1.1.0"
+    "@protobufjs/float" "^1.0.2"
+    "@protobufjs/inquire" "^1.1.0"
+    "@protobufjs/path" "^1.1.2"
+    "@protobufjs/pool" "^1.1.0"
+    "@protobufjs/utf8" "^1.1.0"
+    "@types/long" "^4.0.1"
+    "@types/node" "^13.7.0"
+    long "^4.0.0"
+
 protobufjs@6.8.8:
   version "6.8.8"
   resolved "https://registry.yarnpkg.com/protobufjs/-/protobufjs-6.8.8.tgz#c8b4f1282fd7a90e6f5b109ed11c84af82908e7c"
@@ -10747,25 +10783,6 @@ protobufjs@6.8.8:
     "@protobufjs/utf8" "^1.1.0"
     "@types/long" "^4.0.0"
     "@types/node" "^10.1.0"
-    long "^4.0.0"
-
-protobufjs@6.9.0:
-  version "6.9.0"
-  resolved "https://registry.yarnpkg.com/protobufjs/-/protobufjs-6.9.0.tgz#c08b2bf636682598e6fabbf0edb0b1256ff090bd"
-  integrity sha512-LlGVfEWDXoI/STstRDdZZKb/qusoAWUnmLg9R8OLSO473mBLWHowx8clbX5/+mKDEI+v7GzjoK9tRPZMMcoTrg==
-  dependencies:
-    "@protobufjs/aspromise" "^1.1.2"
-    "@protobufjs/base64" "^1.1.2"
-    "@protobufjs/codegen" "^2.0.4"
-    "@protobufjs/eventemitter" "^1.1.0"
-    "@protobufjs/fetch" "^1.1.0"
-    "@protobufjs/float" "^1.0.2"
-    "@protobufjs/inquire" "^1.1.0"
-    "@protobufjs/path" "^1.1.2"
-    "@protobufjs/pool" "^1.1.0"
-    "@protobufjs/utf8" "^1.1.0"
-    "@types/long" "^4.0.1"
-    "@types/node" "^13.7.0"
     long "^4.0.0"
 
 prr@~1.0.1:
@@ -13676,11 +13693,6 @@ uuid@^3.3.2:
   version "3.3.3"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.3.3.tgz#4568f0216e78760ee1dbf3a4d2cf53e224112866"
   integrity sha512-pW0No1RGHgzlpHJO1nsVrHKpOEIxkGg1xB+v0ZmdNH5OAeAwzAVrCnI2/6Mtx+Uys6iaylxa+D3g4j63IKKjSQ==
-
-uuidjs@4.2.5:
-  version "4.2.5"
-  resolved "https://registry.yarnpkg.com/uuidjs/-/uuidjs-4.2.5.tgz#a80439ece05dfe6ed875a5d62de0820046055713"
-  integrity sha512-0utbJ3L/C/AUv8cRAfFnUC7XhvRvaQaGNPbrroBeXF26BWfYT6aD8/n5UQ4ic3bpkJfVd2W15yQS+YCwvQxtXA==
 
 uuidjs@4.2.6:
   version "4.2.6"
