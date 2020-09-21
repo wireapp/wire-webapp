@@ -2090,10 +2090,10 @@
     tough-cookie "4.0.0"
     ws "7.3.1"
 
-"@wireapp/avs@6.3.8":
-  version "6.3.8"
-  resolved "https://registry.yarnpkg.com/@wireapp/avs/-/avs-6.3.8.tgz#100bf989b30df9091abf50155482328cf0b07a40"
-  integrity sha512-4SZZ6LFkiW3B5dZmLpwlssq1guoSIjQnN0Bnyd3+JJIQon9UcTgWpqsuac2uDbocCcDNmJ6MqhnYI3kUaDMvlw==
+"@wireapp/avs@6.3.9":
+  version "6.3.9"
+  resolved "https://registry.yarnpkg.com/@wireapp/avs/-/avs-6.3.9.tgz#c59a86b8841c41f3e3d636fb20f53668c9ee6da7"
+  integrity sha512-ZG2748V5Oxs8UA2y7G8jjAGfZZOkUg/glX6UR0m431ObNjM/NWv0+Nt6ye17FoYVpcWlBenh0/Zxh2anUiGwfA==
 
 "@wireapp/cbor@4.6.12":
   version "4.6.12"
