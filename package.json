@@ -85,7 +85,7 @@
     "@types/speakingurl": "13.0.2",
     "@types/uint32": "0.2.0",
     "@types/underscore": "1.10.22",
-    "@types/webpack-env": "1.15.2",
+    "@types/webpack-env": "1.15.3",
     "@typescript-eslint/eslint-plugin": "4.1.0",
     "@typescript-eslint/parser": "4.1.0",
     "@wireapp/copy-config": "1.1.1",
