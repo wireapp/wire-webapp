@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "@wireapp/antiscroll-2": "1.0.2",
-    "@wireapp/avs": "6.3.8",
+    "@wireapp/avs": "6.3.9",
     "@wireapp/core": "16.12.13",
     "@wireapp/protocol-messaging": "1.25.4",
     "@wireapp/react-ui-kit": "7.37.2",
@@ -87,7 +87,7 @@
     "@types/underscore": "1.10.23",
     "@types/webpack-env": "1.15.3",
     "@typescript-eslint/eslint-plugin": "4.1.1",
-    "@typescript-eslint/parser": "4.1.0",
+    "@typescript-eslint/parser": "4.1.1",
     "@wireapp/copy-config": "1.1.2",
     "@wireapp/eslint-config": "1.8.0",
     "@wireapp/prettier-config": "0.3.0",

@@ -1,0 +1,269 @@
+name: Test, Build & Deploy
+
+on:
+  push:
+    branches: [master, dev, edge, avs]
+    tags:
+      - '*staging*'
+      - '*production*'
+  pull_request:
+    branches: [master, dev, edge, avs]
+
+jobs:
+  test_build_deploy:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        DISTRIBUTION: ['DISTRIBUTION_0', 'DISTRIBUTION_1']
+
+    env:
+      DISTRIBUTION: ${{secrets[matrix.DISTRIBUTION]}}
+      TEST_COVERAGE_FAIL_THRESHOLD: 45
+      TEST_COVERAGE_WARNING_THRESHOLD: 60
+      DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS: 150
+      AWS_APPLICATION_NAME: Webapp
+      AWS_BUILD_ZIP_PATH: 'server/dist/s3/ebs.zip'
+
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.5.0
+        with:
+          access_token: ${{github.token}}
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set BRANCH_NAME, TAG & TITLE environment variables
+        run: |
+          echo "::set-env name=BRANCH_NAME::$(git branch --show-current)"
+          echo "::set-env name=TAG::$(git tag --points-at ${{github.sha}})"
+          echo "::set-env name=TITLE::$(echo '${{github.event.pull_request.title || github.event.head_commit.message}}' | head -n 1)"
+          echo "::set-env name=COMMIT_URL::${{github.event.head_commit.url}}"
+          echo "::set-env name=COMMITTER::${{github.event.head_commit.committer.committer}}"
+
+      - name: Print environment variables
+        env:
+          GITHUB_CONTEXT: ${{toJson(github)}}
+        run: |
+          echo -e "BRANCH_NAME = ${BRANCH_NAME}"
+          echo -e "TAG = ${TAG}"
+          echo -e "TITLE = ${TITLE}"
+          echo -e "COMMITTER = ${COMMITTER}"
+          echo -e "GITHUB_SHA = ${GITHUB_SHA}"
+          echo -e "GITHUB_REF = ${GITHUB_REF}"
+          echo -e "GITHUB_CONTEXT = ${GITHUB_CONTEXT}"
+
+      - name: Yarn cache
+        uses: c-hive/gha-yarn-cache@v1
+
+      - name: Authenticate git clone
+        env:
+          GH_TOKEN: ${{secrets.OTTO_THE_BOT_GH_TOKEN}}
+        run: echo -e "machine github.com\n  login ${GH_TOKEN}" > ~/.netrc
+
+      - name: Install JS dependencies
+        run: yarn --frozen-lockfile
+
+      - name: Test
+        if: env.DISTRIBUTION == 'wire'
+        run: yarn test
+
+      - name: Monitor coverage
+        if: github.event_name == 'pull_request' && env.DISTRIBUTION == 'wire'
+        uses: slavcodev/coverage-monitor-action@1.2.0
+        with:
+          github_token: ${{github.token}}
+          clover_file: 'docs/coverage/clover.xml'
+          threshold_alert: ${{env.TEST_COVERAGE_FAIL_THRESHOLD}}
+          threshold_warning: ${{env.TEST_COVERAGE_WARNING_THRESHOLD}}
+
+      - name: Build
+        if: github.event_name != 'pull_request'
+        run: yarn build:prod
+
+      # https://wire-webapp-avs.zinfra.io/
+      - name: Deploy avs build to Elastic Beanstalk
+        if: env.BRANCH_NAME == 'avs' && env.DISTRIBUTION == 'wire'
+        uses: einaregilsson/beanstalk-deploy@v11
+        with:
+          aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
+          aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
+          application_name: ${{env.AWS_APPLICATION_NAME}}
+          environment_name: wire-webapp-avs
+          region: eu-central-1
+          deployment_package: ${{env.AWS_BUILD_ZIP_PATH}}
+          wait_for_deployment: false
+          wait_for_environment_recovery: ${{env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS}}
+          version_label: ${{github.run_id}}
+          version_description: ${{github.sha}}
+
+      # Stage 1: https://wire-webapp-edge.zinfra.io/
+      - name: Deploy edge build to Elastic Beanstalk
+        if: env.BRANCH_NAME == 'edge' && env.DISTRIBUTION == 'wire'
+        uses: einaregilsson/beanstalk-deploy@v11
+        with:
+          aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
+          aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
+          application_name: ${{env.AWS_APPLICATION_NAME}}
+          environment_name: wire-webapp-edge
+          region: eu-central-1
+          deployment_package: ${{env.AWS_BUILD_ZIP_PATH}}
+          wait_for_deployment: false
+          wait_for_environment_recovery: ${{env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS}}
+          version_label: ${{github.run_id}}
+          version_description: ${{github.sha}}
+
+      # Stage 2: https://wire-webapp-dev.zinfra.io/
+      - name: Deploy dev build to Elastic Beanstalk
+        if: env.BRANCH_NAME == 'dev' && env.DISTRIBUTION == 'wire'
+        uses: einaregilsson/beanstalk-deploy@v11
+        with:
+          aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
+          aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
+          application_name: ${{env.AWS_APPLICATION_NAME}}
+          environment_name: wire-webapp-dev
+          region: eu-central-1
+          deployment_package: ${{env.AWS_BUILD_ZIP_PATH}}
+          wait_for_deployment: false
+          wait_for_environment_recovery: ${{env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS}}
+          version_label: ${{github.run_id}}
+          version_description: ${{github.sha}}
+
+      # Stage 3: https://wire-webapp-staging.zinfra.io/
+      - name: Deploy staging build to Elastic Beanstalk
+        if: contains(env.TAG, 'staging') && env.DISTRIBUTION == 'wire'
+        uses: einaregilsson/beanstalk-deploy@v11
+        with:
+          aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
+          aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
+          application_name: ${{env.AWS_APPLICATION_NAME}}
+          environment_name: wire-webapp-staging
+          region: eu-central-1
+          deployment_package: ${{env.AWS_BUILD_ZIP_PATH}}
+          wait_for_deployment: false
+          wait_for_environment_recovery: ${{env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS}}
+          version_label: ${{env.TAG}}-${{github.run_id}}
+          version_description: ${{github.sha}}
+
+      # Stage 4: https://wire-webapp-master.zinfra.io/
+      - name: Deploy master build to Elastic Beanstalk
+        if: env.BRANCH_NAME == 'master' && env.DISTRIBUTION == 'wire'
+        uses: einaregilsson/beanstalk-deploy@v11
+        with:
+          aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
+          aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
+          application_name: ${{env.AWS_APPLICATION_NAME}}
+          environment_name: wire-webapp-master
+          region: eu-central-1
+          deployment_package: ${{env.AWS_BUILD_ZIP_PATH}}
+          wait_for_deployment: false
+          wait_for_environment_recovery: ${{env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS}}
+          version_label: ${{github.run_id}}
+          version_description: ${{github.sha}}
+
+      # Stage 5: https://app.wire.com/
+      - name: Deploy production build to Elastic Beanstalk
+        if: contains(env.TAG, 'production') && env.DISTRIBUTION == 'wire'
+        uses: einaregilsson/beanstalk-deploy@v11
+        with:
+          aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
+          aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
+          application_name: ${{env.AWS_APPLICATION_NAME}}
+          environment_name: wire-webapp-prod
+          region: eu-central-1
+          deployment_package: ${{env.AWS_BUILD_ZIP_PATH}}
+          wait_for_deployment: false
+          wait_for_environment_recovery: ${{env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS}}
+          version_label: ${{env.TAG}}-${{github.run_id}}
+          version_description: ${{github.sha}}
+
+      - name: Push master/dev/edge Docker image
+        if: env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'edge'
+        env:
+          DOCKER_PASSWORD: ${{secrets.WEBTEAM_QUAY_PASSWORD}}
+          DOCKER_USERNAME: ${{secrets.WEBTEAM_QUAY_USERNAME}}
+        run: |
+          if [ "$DISTRIBUTION" == "wire" ]; then
+            yarn docker '' "${{env.BRANCH_NAME}}"
+          fi
+
+      - name: Push staging Docker image
+        if: contains(env.TAG, 'staging')
+        env:
+          DOCKER_PASSWORD: ${{secrets.WEBTEAM_QUAY_PASSWORD}}
+          DOCKER_USERNAME: ${{secrets.WEBTEAM_QUAY_USERNAME}}
+        run: |
+          if [ "$DISTRIBUTION" == "wire" ]; then
+            yarn docker '' staging
+          else
+            yarn docker "$DISTRIBUTION" staging
+          fi
+
+      - name: Push production Docker image
+        if: contains(env.TAG, 'production')
+        env:
+          DOCKER_PASSWORD: ${{secrets.WEBTEAM_QUAY_PASSWORD}}
+          DOCKER_USERNAME: ${{secrets.WEBTEAM_QUAY_USERNAME}}
+        run: |
+          if [ "$DISTRIBUTION" == "wire" ]; then
+            yarn docker '' production
+          else
+            yarn docker "$DISTRIBUTION" production
+          fi
+
+      - name: Generate changelog
+        if: contains(env.TAG, 'production') && env.DISTRIBUTION == 'wire'
+        run: yarn changelog
+
+      - name: Create GitHub production release draft
+        id: create_release_production
+        if: contains(env.TAG, 'production') && env.DISTRIBUTION == 'wire'
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{github.token}}
+        with:
+          tag_name: ${{env.TAG}}
+          release_name: ${{env.TAG}}
+          body_path: ./CHANGELOG.md
+          draft: true
+          prerelease: false
+
+      - name: Create GitHub staging release draft
+        id: create_release_staging
+        if: contains(env.TAG, 'staging') && env.DISTRIBUTION == 'wire'
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{github.token}}
+        with:
+          tag_name: ${{env.TAG}}
+          release_name: ${{env.TAG}}
+          draft: true
+          prerelease: true
+
+      - name: Notify staging bump
+        if: contains(env.TAG, 'staging') && env.DISTRIBUTION == 'wire'
+        uses: wireapp/github-action-wire-messenger@v1
+        with:
+          email: ${{secrets.WIRE_BOT_EMAIL}}
+          password: ${{secrets.WIRE_BOT_PASSWORD}}
+          conversation: '4223f57f-0c8d-42fe-bf8a-908d680788ab'
+          text: 'Staging bump for commit **${{github.sha}}** ("${{env.TITLE}}") done! 🏁'
+
+      - name: Notify production release
+        if: env.BRANCH_NAME == 'avs'
+        uses: wireapp/github-action-wire-messenger@v1
+        with:
+          email: ${{secrets.WIRE_BOT_EMAIL}}
+          password: ${{secrets.WIRE_BOT_PASSWORD}}
+          conversation: '5496b04a-afd3-410e-8154-855142bcfb03'
+          text: 'Deployed commit **${{github.sha}}** ("${{env.TITLE}}") on [wire-webapp-avs](https://wire-webapp-avs.zinfra.io/). 🏁'
+
+      - name: Notify CI error
+        if: failure() && github.event_name != 'pull_request' && env.DISTRIBUTION == 'wire'
+        uses: wireapp/github-action-wire-messenger@v1
+        with:
+          email: ${{secrets.WIRE_BOT_EMAIL}}
+          password: ${{secrets.WIRE_BOT_PASSWORD}}
+          conversation: 'b2cc7120-4154-4be4-b0c0-45a8c361c4d1'
+          text: '${{env.COMMITTER}} broke the "${{env.BRANCH_NAME}}" branch on "${{github.repository}}" with [${{env.TITLE}}](${{env.COMMIT_URL}}) 🌵'
