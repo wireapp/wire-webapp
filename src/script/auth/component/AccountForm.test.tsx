@@ -48,7 +48,7 @@ describe('when entering account data', () => {
         }),
       );
 
-      expect(nameInput().props().required).toBe(true);
+      expect(nameInput().props().required).toBe(false);
       expect(emailInput().props().required).toBe(true);
       expect(passwordInput().props().required).toBe(true);
       expect(doTermsCheckbox().props().required).toBe(true);
