@@ -19,6 +19,7 @@
 
 /** @jsx jsx */
 import {ObjectInterpolation, jsx} from '@emotion/core';
+import React from 'react';
 
 export type HeaderProps<T = HTMLHeadingElement> = React.HTMLProps<T>;
 

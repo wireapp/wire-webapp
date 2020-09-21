@@ -18,6 +18,7 @@
  */
 
 /** @jsx jsx */
+import React from 'react';
 import {ObjectInterpolation, jsx} from '@emotion/core';
 import {GlobalStyle} from '../GlobalStyle';
 import {filterProps} from '../util';

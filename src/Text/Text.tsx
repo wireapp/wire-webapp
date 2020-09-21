@@ -19,6 +19,7 @@
 
 /** @jsx jsx */
 import {ObjectInterpolation, jsx} from '@emotion/core';
+import React from 'react';
 import {TextTransformProperty} from 'csstype';
 import {Theme} from '../Layout';
 import {filterProps} from '../util';
