@@ -19,11 +19,12 @@
 
 import * as dotenv from 'dotenv-extended';
 import * as fs from 'fs-extra';
-import type {IHelmetContentSecurityPolicyDirectives as HelmetCSP} from 'helmet';
+import {ContentSecurityPolicyOptions} from 'helmet/dist/middlewares/content-security-policy';
 import * as logdown from 'logdown';
 import * as path from 'path';
 
 import type {ServerConfig} from './ServerConfig';
+type ContentSecurityPolicyDirectives = ContentSecurityPolicyOptions['directives'];
 
 const nodeEnvironment = process.env.NODE_ENV || 'production';
 
@@ -35,7 +36,7 @@ const VERSION_FILE = path.join(__dirname, 'version');
 
 dotenv.load();
 
-const defaultCSP: HelmetCSP = {
+const defaultCSP: ContentSecurityPolicyDirectives = {
   connectSrc: [
     "'self'",
     'blob:',
@@ -94,8 +95,8 @@ function parseCommaSeparatedList(list: string = ''): string[] {
   return cleanedList.split(',');
 }
 
-function mergedCSP(): HelmetCSP {
-  const csp: HelmetCSP = {
+function mergedCSP(): ContentSecurityPolicyDirectives {
+  const csp: ContentSecurityPolicyDirectives = {
     connectSrc: [
       ...defaultCSP.connectSrc,
       process.env.BACKEND_REST,
@@ -115,7 +116,7 @@ function mergedCSP(): HelmetCSP {
     workerSrc: [...defaultCSP.workerSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_WORKER_SRC)],
   };
   return Object.entries(csp)
-    .filter(([key, value]) => !!value.length)
+    .filter(([key, value]) => !!Array.from(value).length)
     .reduce((accumulator, [key, value]) => ({...accumulator, [key]: value}), {});
 }
 
