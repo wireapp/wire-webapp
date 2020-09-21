@@ -40,7 +40,7 @@ jobs:
           echo "::set-env name=TAG::$(git tag --points-at ${{github.sha}})"
           echo "::set-env name=TITLE::$(echo '${{github.event.pull_request.title || github.event.head_commit.message}}' | head -n 1)"
           echo "::set-env name=COMMIT_URL::echo '${{github.event.head_commit.url}}''"
-          echo "::set-env name=COMMITTER::echo '${{github.event.head_commit.committer.committer}}''"
+          echo "::set-env name=COMMITTER::echo '${{github.event.head_commit.committer.name}}''"
 
       - name: Print environment variables
         env:
@@ -49,6 +49,7 @@ jobs:
           echo -e "BRANCH_NAME = ${BRANCH_NAME}"
           echo -e "TAG = ${TAG}"
           echo -e "TITLE = ${TITLE}"
+          echo -e "COMMIT_URL = ${COMMIT_URL}"
           echo -e "COMMITTER = ${COMMITTER}"
           echo -e "GITHUB_SHA = ${GITHUB_SHA}"
           echo -e "GITHUB_REF = ${GITHUB_REF}"
