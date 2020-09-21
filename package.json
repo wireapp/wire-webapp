@@ -84,7 +84,7 @@
     "@types/sort-json": "2.0.0",
     "@types/speakingurl": "13.0.2",
     "@types/uint32": "0.2.0",
-    "@types/underscore": "1.10.22",
+    "@types/underscore": "1.10.23",
     "@types/webpack-env": "1.15.3",
     "@typescript-eslint/eslint-plugin": "4.1.1",
     "@typescript-eslint/parser": "4.1.0",
