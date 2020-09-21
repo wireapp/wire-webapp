@@ -31,5 +31,5 @@
     "start": "ts-node -r tsconfig-paths/register ./src/cli.ts",
     "test": "exit 0"
   },
-  "version": "0.8.3"
+  "version": "0.8.4"
 }
