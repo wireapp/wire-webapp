@@ -38,7 +38,7 @@ jobs:
         run: |
           echo "::set-env name=BRANCH_NAME::$(git branch --show-current)"
           echo "::set-env name=TAG::$(git tag --points-at ${{github.sha}})"
-          echo "::set-env name=TITLE::$('${{github.event.pull_request.title || github.event.head_commit.message}}' | head -n 1)"
+          echo "::set-env name=TITLE::$(echo '${{github.event.pull_request.title || github.event.head_commit.message}}' | head -n 1)"
           echo "::set-env name=COMMIT_URL::${{github.event.head_commit.url}}"
           echo "::set-env name=COMMITTER::${{github.event.head_commit.committer.committer}}"
 
@@ -260,7 +260,7 @@ jobs:
           text: 'Deployed commit **${{github.sha}}** ("${{env.TITLE}}") on [wire-webapp-avs](https://wire-webapp-avs.zinfra.io/). 🏁'
 
       - name: Notify CI error
-        if: failure() && github.event_name != 'pull_request'
+        if: failure() && github.event_name != 'pull_request' && env.DISTRIBUTION == 'wire'
         uses: wireapp/github-action-wire-messenger@v1
         with:
           email: ${{secrets.WIRE_BOT_EMAIL}}
