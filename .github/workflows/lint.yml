@@ -3,9 +3,6 @@ name: Lint
 on:
   push:
     branches: [master, dev, edge, avs]
-    tags:
-      - '*staging*'
-      - '*production*'
   pull_request:
     branches: [master, dev, edge, avs]
 
