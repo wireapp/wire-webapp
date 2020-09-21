@@ -31,7 +31,7 @@ describe('isAndroid', () => {
 
 describe('getBrowserName', () => {
   it('works if platform fails to load properly', () => {
-    spyOn(Runtime, 'getPlatform').and.returnValue({} as Platform);
+    spyOn(Runtime, 'getPlatform').and.returnValue({} as typeof platform);
     expect(Runtime.getBrowserName()).toBe('unknown');
   });
 });

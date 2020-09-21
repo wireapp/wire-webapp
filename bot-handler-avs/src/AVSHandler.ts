@@ -39,7 +39,6 @@ const wrtc = require('wrtc');
 declare global {
   namespace NodeJS {
     interface Global {
-      getUserMedia: NavigatorGetUserMedia;
       MediaStream: MediaStream;
       MediaStreamTrack: MediaStreamTrack;
       navigator: Navigator;

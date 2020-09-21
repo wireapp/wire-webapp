@@ -48,10 +48,12 @@ export class FileSystemEngine implements CRUDEngine {
     }
   }
 
+  // eslint-disable-next-line no-undef
   async init(storeName = '', options?: FileSystemEngineOptions): Promise<FileSystem> {
     await this.isSupported();
     this.config = {...this.config, ...options};
     this.storeName = storeName;
+    // eslint-disable-next-line no-undef
     const fileSystem: FileSystem = await fs.init({bytes: this.config.size, type: this.config.type});
     await fs.mkdir(this.storeName);
     return fileSystem;
@@ -156,6 +158,7 @@ export class FileSystemEngine implements CRUDEngine {
   async readAllPrimaryKeys(tableName: string): Promise<string[]> {
     const directoryPath = this.createDirectoryPath(tableName);
 
+    // eslint-disable-next-line no-undef
     let entries: FileEntry[];
     try {
       entries = await fs.readdir(directoryPath, {deep: true});
@@ -163,6 +166,7 @@ export class FileSystemEngine implements CRUDEngine {
       entries = [];
     }
 
+    // eslint-disable-next-line no-undef
     const names = entries.map((entry: FileEntry) => `${entry.name}`);
 
     const primaryKeys: string[] = [];

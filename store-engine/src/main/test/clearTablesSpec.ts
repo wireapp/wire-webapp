@@ -34,7 +34,7 @@ export const clearTablesSpec = {
     expect(keys.length).toBe(0);
 
     await engine.create(TABLE_NAME, 'two', {name: 'Beta'});
-    const {name} = await engine.read(TABLE_NAME, 'two');
+    const {name} = await engine.read<{name: string}>(TABLE_NAME, 'two');
     expect(name).toBe('Beta');
   },
 };

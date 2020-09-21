@@ -154,7 +154,7 @@ describe('APIClient', () => {
       const context = await client.login(loginData);
       expect(context.userId).toBe(accessTokenData.user);
       // Make access token invalid
-      delete client['accessTokenStore'].accessToken?.access_token;
+      delete (client['accessTokenStore'].accessToken as any)?.access_token;
       const response = await client.user.api.getUsers({handles: [queriedHandle]});
       expect(response[0].name).toBe(userData[0].name);
       expect(client['accessTokenStore'].accessToken?.access_token).toBeDefined();

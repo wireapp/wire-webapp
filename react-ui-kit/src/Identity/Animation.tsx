@@ -18,7 +18,7 @@
  */
 
 const {CSSTransition, TransitionGroup} = require('react-transition-group');
-import {ClassNames} from '@emotion/core';
+import {ClassNames, jsx as JSX} from '@emotion/core';
 import React from 'react';
 import {DURATION, EASE} from './motions';
 

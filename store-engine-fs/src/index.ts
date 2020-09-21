@@ -26,6 +26,7 @@ export interface FileEngineOptions {
 }
 
 export class FileEngine implements CRUDEngine {
+  // eslint-disable-next-line no-undef
   [index: string]: any;
 
   private autoIncrementedPrimaryKey: number = 1;

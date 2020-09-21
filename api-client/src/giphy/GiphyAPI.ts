@@ -40,12 +40,11 @@ export class GiphyAPI {
    */
   public async getGiphyByIds(options: GiphyIdOptions): Promise<GiphyMultipleResult> {
     const allIds = options.ids.join(',');
-
-    delete options.ids;
+    const optionsWithoutIds = {random_id: options.random_id, rating: options.rating};
 
     const config: AxiosRequestConfig = {
       method: 'get',
-      params: options,
+      params: optionsWithoutIds,
       url: `${GiphyAPI.URL.PROXY}/${GiphyAPI.URL.GIPHY}/${allIds}`,
     };
 
