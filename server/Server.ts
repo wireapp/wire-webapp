@@ -23,6 +23,7 @@ import * as hbs from 'hbs';
 import * as helmet from 'helmet';
 import * as http from 'http';
 import * as https from 'https';
+import * as nocache from 'nocache';
 import * as path from 'path';
 import * as fs from 'fs';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
@@ -86,7 +87,7 @@ class Server {
 
   private initCaching() {
     if (this.config.SERVER.DEVELOPMENT) {
-      this.app.use(helmet.noCache());
+      this.app.use(nocache());
     } else {
       this.app.use((req, res, next) => {
         const milliSeconds = 1000;
@@ -134,12 +135,8 @@ class Server {
     );
     this.app.use(
       helmet.contentSecurityPolicy({
-        browserSniff: true,
         directives: this.config.SERVER.CSP,
-        disableAndroid: false,
-        loose: !this.config.SERVER.DEVELOPMENT,
         reportOnly: false,
-        setAllHeaders: false,
       }),
     );
     this.app.use(
