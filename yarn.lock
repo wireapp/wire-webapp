@@ -1780,10 +1780,10 @@
   resolved "https://registry.yarnpkg.com/@types/uint32/-/uint32-0.2.0.tgz#75b33ddca6131469fa7bc1afe04f5649cd655b47"
   integrity sha512-t4ox9/fhkExBs5lw1xpCIpVrhyzhnrOxs/yHsoeW30mnbK1x0V+2did74R1mg+Hga29TFUFflUa9vIXqHHg0Gw==
 
-"@types/underscore@1.10.22":
-  version "1.10.22"
-  resolved "https://registry.yarnpkg.com/@types/underscore/-/underscore-1.10.22.tgz#8e0a134a2df0afe8da24bcf006e7f94925a3e15f"
-  integrity sha512-fiJulOOmc747q+mZwBtLyBu6yBX2uI4biuQ1Y3JvcU7YjmdOEOracUXTiET/PAWI2hhoUH1t4HbwJj42YEnbkg==
+"@types/underscore@1.10.23":
+  version "1.10.23"
+  resolved "https://registry.yarnpkg.com/@types/underscore/-/underscore-1.10.23.tgz#cc672e8864000d288e1e39c609fd9cab84391ff3"
+  integrity sha512-vX1NPekXhrLquFWskH2thcvFAha187F/lM6xYOoEMZWwJ/6alSk0/ttmGP/YRqcqtCv0TMbZjYAdZyHAEcuU4g==
 
 "@types/unist@^2.0.0", "@types/unist@^2.0.2":
   version "2.0.3"
