@@ -26,34 +26,35 @@ jobs:
       AWS_BUILD_ZIP_PATH: 'server/dist/s3/ebs.zip'
 
     steps:
-      - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.5.0
-        with:
-          access_token: ${{github.token}}
-
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Set BRANCH_NAME, TAG & TITLE environment variables
+      - name: Set & print environment variables
+        env:
+          GITHUB_CONTEXT: ${{toJson(github)}}
         run: |
           echo "::set-env name=BRANCH_NAME::$(git branch --show-current)"
           echo "::set-env name=TAG::$(git tag --points-at ${{github.sha}})"
           echo "::set-env name=TITLE::$(echo '${{github.event.pull_request.title || github.event.head_commit.message}}' | head -n 1)"
+          echo "::set-env name=PR_LAST_COMMIT_MESSAGE::$(git log --format=%B -n 1 ${{github.event.after}})"
           echo "::set-env name=COMMIT_URL::${{github.event.head_commit.url}}"
           echo "::set-env name=COMMITTER::${{github.event.head_commit.committer.name}}"
-
-      - name: Print environment variables
-        env:
-          GITHUB_CONTEXT: ${{toJson(github)}}
-        run: |
           echo -e "BRANCH_NAME = ${BRANCH_NAME}"
           echo -e "TAG = ${TAG}"
           echo -e "TITLE = ${TITLE}"
+          echo -e "PR_LAST_COMMIT_MESSAGE = ${PR_LAST_COMMIT_MESSAGE}"
           echo -e "COMMIT_URL = ${COMMIT_URL}"
           echo -e "COMMITTER = ${COMMITTER}"
-          echo -e "GITHUB_SHA = ${GITHUB_SHA}"
-          echo -e "GITHUB_REF = ${GITHUB_REF}"
           echo -e "GITHUB_CONTEXT = ${GITHUB_CONTEXT}"
+
+      - name: Skip CI
+        if: contains(env.TITLE || env.PR_LAST_COMMIT_MESSAGE, '[skip ci]') || contains(env.TITLE || env.PR_LAST_COMMIT_MESSAGE, '[ci skip]')
+        uses: andymckay/cancel-action@0.2
+
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.5.0
+        with:
+          access_token: ${{github.token}}
 
       - name: Yarn cache
         uses: c-hive/gha-yarn-cache@v1

@@ -27,10 +27,10 @@ jobs:
           skip_untranslated_files: false
           # Download translations with pushing to branch
           push_translations: true
-          commit_message: 'chore: Update translations'
+          commit_message: 'chore: Update translations [skip ci]'
           localization_branch_name: 'translations'
           create_pull_request: true
-          pull_request_title: 'chore: Update translations'
+          pull_request_title: 'chore: Update translations [skip ci]'
           token: ${{secrets.WEB_CROWDIN_TOKEN}}
           source: 'src/i18n/en-US.json'
           translation: 'src/i18n/%locale%.json'
