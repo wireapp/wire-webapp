@@ -252,8 +252,8 @@ jobs:
           conversation: '4223f57f-0c8d-42fe-bf8a-908d680788ab'
           text: 'Staging bump for commit **${{github.sha}}** ("${{env.TITLE}}") done! 🏁'
 
-      - name: Notify production release
-        if: env.BRANCH_NAME == 'avs'
+      - name: Notify AVS commit
+        if: env.BRANCH_NAME == 'avs' && env.DISTRIBUTION == 'wire'
         uses: wireapp/github-action-wire-messenger@v1
         with:
           email: ${{secrets.WIRE_BOT_EMAIL}}
