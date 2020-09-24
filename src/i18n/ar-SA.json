@@ -136,7 +136,7 @@
   "authVerifyAccountHeadline": "إضافة عنوان البريد الإلكتروني وكلمة المرور",
   "authVerifyAccountLogout": "تسجيل الخروج",
   "authVerifyCodeChangePhone": "تغيير رقم الهاتف",
-  "authVerifyCodeDescription": "أدخل كود التأكيد الذي أرسلناه إلى {number}.",
+  "authVerifyCodeDescription": "Enter the verification code we sent to {number}.",
   "authVerifyCodeResend": "لم يظهر أي رمز؟",
   "authVerifyCodeResendDetail": "إعادة إرسال",
   "authVerifyCodeResendTimer": "يمكنك طلب كودًا جديدًا {{expiration}}.",

@@ -136,7 +136,7 @@
   "authVerifyAccountHeadline": "ایمیل آدرس خود و رمز عبور جدیدی را وارد کنید.",
   "authVerifyAccountLogout": "خروج",
   "authVerifyCodeChangePhone": "تغییر شماره تلفن",
-  "authVerifyCodeDescription": "کد تاییدی را که برایتان به شماره {number} ارسال کرده ایم را وارد کنید.",
+  "authVerifyCodeDescription": "Enter the verification code we sent to {number}.",
   "authVerifyCodeResend": "هیچ کدی دریافت نشد؟",
   "authVerifyCodeResendDetail": "ارسال مجدد",
   "authVerifyCodeResendTimer": "شما میتوانید یک کد {{expiration}} جدید درخواست کنید.",

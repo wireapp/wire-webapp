@@ -136,7 +136,7 @@
   "authVerifyAccountHeadline": "Pievienot e-pasta adresi un paroli.",
   "authVerifyAccountLogout": "Izžurnalēties",
   "authVerifyCodeChangePhone": "Mainīt tālruņa numuru",
-  "authVerifyCodeDescription": "Enter the verification code\nwe sent to {number}.",
+  "authVerifyCodeDescription": "Enter the verification code we sent to {number}.",
   "authVerifyCodeResend": "Kods nav atsūtīts?",
   "authVerifyCodeResendDetail": "Sūtīt atkārtoti",
   "authVerifyCodeResendTimer": "You can request a new code {{expiration}}.",

@@ -136,7 +136,7 @@
   "authVerifyAccountHeadline": "Přidat emailovou adresu a heslo.",
   "authVerifyAccountLogout": "Odhlásit se",
   "authVerifyCodeChangePhone": "Změnit telefonní číslo",
-  "authVerifyCodeDescription": "Zadejte ověřovací kód,\nkterý byl zaslán na {number}.",
+  "authVerifyCodeDescription": "Enter the verification code we sent to {number}.",
   "authVerifyCodeResend": "Kód nedošel?",
   "authVerifyCodeResendDetail": "Odeslat znovu",
   "authVerifyCodeResendTimer": "Můžete si vyžádat nový kód {{expiration}}.",

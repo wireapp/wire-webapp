@@ -136,7 +136,7 @@
   "authVerifyAccountHeadline": "Lisa meiliaadress ja parool.",
   "authVerifyAccountLogout": "Logi välja",
   "authVerifyCodeChangePhone": "Numbri muutmine",
-  "authVerifyCodeDescription": "Sisesta kinnituskood,\nmille saatsime numbrile {number}.",
+  "authVerifyCodeDescription": "Enter the verification code we sent to {number}.",
   "authVerifyCodeResend": "Kood ei saabu?",
   "authVerifyCodeResendDetail": "Saada uuesti",
   "authVerifyCodeResendTimer": "Sa võid uue koodi tellida {{expiration}} pärast.",

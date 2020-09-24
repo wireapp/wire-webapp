@@ -136,7 +136,7 @@
   "authVerifyAccountHeadline": "E-mailadres en wachtwoord toevoegen.",
   "authVerifyAccountLogout": "Uitloggen",
   "authVerifyCodeChangePhone": "Telefoonnummer wijzigen",
-  "authVerifyCodeDescription": "Voer de verificatiecode in die\nwe naar {number} hebben gestuurd.",
+  "authVerifyCodeDescription": "Enter the verification code we sent to {number}.",
   "authVerifyCodeResend": "Geen code ontvangen?",
   "authVerifyCodeResendDetail": "Opnieuw sturen",
   "authVerifyCodeResendTimer": "Je kunt een nieuwe code aanvragen {{expiration}}.",
