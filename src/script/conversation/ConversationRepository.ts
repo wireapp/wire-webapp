@@ -2536,7 +2536,7 @@ export class ConversationRepository {
     const optimisticEvent = EventBuilder.buildMessageAdd(conversationEntity, currentTimestamp);
     const mappedEvent = await this.cryptography_repository.cryptographyMapper.mapGenericMessage(
       genericMessage,
-      optimisticEvent,
+      optimisticEvent as EventRecord,
     );
     const {KNOCK: TYPE_KNOCK, EPHEMERAL: TYPE_EPHEMERAL} = GENERIC_MESSAGE_TYPE;
     const isPing = (message: GenericMessage) => message.content === TYPE_KNOCK;
