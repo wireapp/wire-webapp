@@ -30,7 +30,7 @@ jobs:
           commit_message: 'chore: Update translations [skip ci]'
           localization_branch_name: 'translations'
           create_pull_request: true
-          pull_request_title: 'chore: Update translations [skip ci]'
+          pull_request_title: 'chore: Update translations'
           token: ${{secrets.WEB_CROWDIN_TOKEN}}
           source: '/src/i18n/en-US.json'
           translation: '/src/i18n/%locale%.json'
