@@ -23,6 +23,7 @@ import * as hbs from 'hbs';
 import * as helmet from 'helmet';
 import * as http from 'http';
 import * as https from 'https';
+import * as nocache from 'nocache';
 import * as path from 'path';
 import * as fs from 'fs';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
@@ -86,7 +87,7 @@ class Server {
 
   private initCaching() {
     if (this.config.SERVER.DEVELOPMENT) {
-      this.app.use(helmet.noCache());
+      this.app.use(nocache());
     } else {
       this.app.use((req, res, next) => {
         const milliSeconds = 1000;
@@ -134,12 +135,8 @@ class Server {
     );
     this.app.use(
       helmet.contentSecurityPolicy({
-        browserSniff: true,
         directives: this.config.SERVER.CSP,
-        disableAndroid: false,
-        loose: !this.config.SERVER.DEVELOPMENT,
         reportOnly: false,
-        setAllHeaders: false,
       }),
     );
     this.app.use(
@@ -147,6 +144,13 @@ class Server {
         policy: 'same-origin',
       }),
     );
+    // With helmet v4 the X-XSS-Protection header is set to `0` by default.
+    // After discussing this with @franziskuskiefer we want to keep this enabled for old browsers.
+    // https://github.com/helmetjs/helmet/issues/230
+    this.app.use((_req, res, next) => {
+      res.setHeader('X-XSS-Protection', '1; mode=block');
+      next();
+    });
   }
 
   private initStaticRoutes() {

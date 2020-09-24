@@ -206,9 +206,9 @@ export class CallingRepository {
       [LOG_LEVEL.ERROR]: avsLogger.error,
     };
 
-    wCall.setLogHandler((level: LOG_LEVEL, message: string) => {
+    wCall.setLogHandler((level: LOG_LEVEL, message: string, error: Error) => {
       const trimmedMessage = message.trim();
-      logFunctions[level].call(avsLogger, trimmedMessage);
+      logFunctions[level].call(avsLogger, trimmedMessage, error);
       this.callLog.push(`${new Date().toISOString()} [${logLevels[level]}] ${trimmedMessage}`);
     });
 
@@ -608,6 +608,9 @@ export class CallingRepository {
       if (success) {
         this.wCall.start(this.wUser, conversationId, callType, conversationType, this.cbrEncoding());
         this.sendCallingEvent(EventName.CALLING.INITIATED_CALL, call);
+        this.sendCallingEvent(EventName.CONTRIBUTED, call, {
+          [Segmentation.MESSAGE.ACTION]: callType === CALL_TYPE.VIDEO ? 'video_call' : 'audio_call',
+        });
       } else {
         this.showNoCameraModal();
         this.removeCall(call);
@@ -893,7 +896,7 @@ export class CallingRepository {
     if (!call) {
       return;
     }
-    const stillActiveState = [REASON.STILL_ONGOING, REASON.ANSWERED_ELSEWHERE];
+    const stillActiveState = [REASON.STILL_ONGOING, REASON.ANSWERED_ELSEWHERE, REASON.REJECTED];
 
     this.sendCallingEvent(EventName.CALLING.ENDED_CALL, call, {
       [Segmentation.CALL.AV_SWITCH_TOGGLE]: call.analyticsAvSwitchToggle,
@@ -1022,7 +1025,7 @@ export class CallingRepository {
     removedMembers.forEach(participant => call.participants.remove(participant));
 
     if (call.participants().length > call.analyticsMaximumParticipants) {
-      call.analyticsMaximumParticipants = call.participants.length;
+      call.analyticsMaximumParticipants = call.participants().length;
     }
   }
 

@@ -136,7 +136,7 @@
   "authVerifyAccountHeadline": "Lägg till e-postadress och lösenord.",
   "authVerifyAccountLogout": "Logga ut",
   "authVerifyCodeChangePhone": "Ändra telefonnummer",
-  "authVerifyCodeDescription": "Fyll i bekräftelsekoden\nsom vi skickade till {number}.",
+  "authVerifyCodeDescription": "Enter the verification code we sent to {number}.",
   "authVerifyCodeResend": "Visas ingen kod?",
   "authVerifyCodeResendDetail": "Skicka igen",
   "authVerifyCodeResendTimer": "Du kan begära en ny kod inom {{expiration}}.",

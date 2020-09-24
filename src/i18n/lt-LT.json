@@ -136,7 +136,7 @@
   "authVerifyAccountHeadline": "Pridėkite el. pašto adresą ir slaptažodį.",
   "authVerifyAccountLogout": "Atsijungti",
   "authVerifyCodeChangePhone": "Pakeisti telefono numerį",
-  "authVerifyCodeDescription": "Įveskite patvirtinimo kodą,\nkurį mes išsiuntėme į {number}.",
+  "authVerifyCodeDescription": "Enter the verification code we sent to {number}.",
   "authVerifyCodeResend": "Negaunate kodo?",
   "authVerifyCodeResendDetail": "Siųsti iš naujo",
   "authVerifyCodeResendTimer": "Jūs galite užklausti naują kodą {{expiration}}.",
