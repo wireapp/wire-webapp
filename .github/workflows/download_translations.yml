@@ -14,6 +14,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Yarn cache
+        uses: c-hive/gha-yarn-cache@v1
+
+      - name: Authenticate git clone
+        env:
+          GH_TOKEN: ${{secrets.OTTO_THE_BOT_GH_TOKEN}}
+        run: echo -e "machine github.com\n  login ${GH_TOKEN}" > ~/.netrc
+
+      - name: Install JS dependencies
+        run: yarn --frozen-lockfile
+
+      - name: Build
+        run: yarn bundle:prod
+
       - name: Download translations
         uses: crowdin/github-action@1.0.9
         env:
@@ -24,18 +38,12 @@ jobs:
           upload_sources: true
           upload_translations: false
           download_translations: true
-          push_translations: false
-          create_pull_request: false
+          push_translations: true
+          create_pull_request: true
+          localization_branch_name: 'translations'
+          pull_request_title: 'chore: Update translations'
+          commit_message: 'chore: Update translations'
           token: ${{secrets.WEB_CROWDIN_TOKEN}}
           source: '/src/i18n/en-US.json'
           translation: '/src/i18n/%locale%.json'
           base_path: '.'
-
-      - name: Commit & push translations
-        run: |
-          git config --global user.email webapp+travis@wire.com
-          git config --global user.name "Wire Travis CI"
-          git status
-          git diff-index --quiet HEAD || git commit -am 'chore: Update translations'
-          git status
-          git push -f
