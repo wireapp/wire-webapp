@@ -30,7 +30,6 @@ jobs:
           source: '/src/i18n/en-US.json'
           translation: '/src/i18n/%locale%.json'
           base_path: '.'
-          dryrun_action: true
 
       - name: Commit & push translations
         run: |
@@ -39,3 +38,4 @@ jobs:
           git status
           git diff-index --quiet HEAD || git commit -am 'chore: Update translations'
           git status
+          git push -f
