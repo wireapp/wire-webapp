@@ -136,7 +136,7 @@
   "authVerifyAccountHeadline": "Lisää sähköpostiosoitteesi ja salasanasi.",
   "authVerifyAccountLogout": "Kirjaudu ulos",
   "authVerifyCodeChangePhone": "Vaihda puhelinnumero",
-  "authVerifyCodeDescription": "Syötä vahvistuskoodi jonka lähetimme {number}.",
+  "authVerifyCodeDescription": "Enter the verification code we sent to {number}.",
   "authVerifyCodeResend": "Eikö koodi ole tullut perille?",
   "authVerifyCodeResendDetail": "Lähetä uudelleen",
   "authVerifyCodeResendTimer": "Voit pyytää uuden koodin {{expiration}} kuluttua.",

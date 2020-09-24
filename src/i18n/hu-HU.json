@@ -136,7 +136,7 @@
   "authVerifyAccountHeadline": "E-mail cím és jelszó megadása.",
   "authVerifyAccountLogout": "Kijelentkezés",
   "authVerifyCodeChangePhone": "Telefonszám módosítása",
-  "authVerifyCodeDescription": "Írd be az ellenőrző kódot,\namit a {number} telefonszámra küldtünk.",
+  "authVerifyCodeDescription": "Enter the verification code we sent to {number}.",
   "authVerifyCodeResend": "Nem kaptál kódot?",
   "authVerifyCodeResendDetail": "Újraküldés",
   "authVerifyCodeResendTimer": "Új kódot kérhetsz {{expiration}} múlva.",

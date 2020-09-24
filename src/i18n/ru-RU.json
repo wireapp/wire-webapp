@@ -136,7 +136,7 @@
   "authVerifyAccountHeadline": "Добавить email и пароль.",
   "authVerifyAccountLogout": "Выход",
   "authVerifyCodeChangePhone": "Изменить номер телефона",
-  "authVerifyCodeDescription": "Введите код подтверждения,\nкоторый мы отправили на {number}.",
+  "authVerifyCodeDescription": "Enter the verification code we sent to {number}.",
   "authVerifyCodeResend": "Не приходит код?",
   "authVerifyCodeResendDetail": "Отправить повторно",
   "authVerifyCodeResendTimer": "Вы можете запросить новый код {{expiration}}.",

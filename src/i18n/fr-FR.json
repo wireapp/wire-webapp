@@ -136,7 +136,7 @@
   "authVerifyAccountHeadline": "Ajouter une adresse e-mail et un mot de passe.",
   "authVerifyAccountLogout": "Se déconnecter",
   "authVerifyCodeChangePhone": "Changer le numéro de téléphone",
-  "authVerifyCodeDescription": "Saisissez le code de vérification que nous avons envoyé au {number}.",
+  "authVerifyCodeDescription": "Enter the verification code we sent to {number}.",
   "authVerifyCodeResend": "Pas de code à l’horizon ?",
   "authVerifyCodeResendDetail": "Renvoyer",
   "authVerifyCodeResendTimer": "Vous pourrez demander un nouveau code {{expiration}}.",
