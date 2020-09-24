@@ -34,5 +34,8 @@ jobs:
 
       - name: Commit & push translations
         run: |
-          git commit -am 'chore: Update translations'
+          git config --global user.email webapp+travis@wire.com
+          git config --global user.name "Wire Travis CI"
+          git status
+          git diff-index --quiet HEAD || git commit -am 'chore: Update translations'
           git status
