@@ -30,8 +30,8 @@ jobs:
       - name: Install JS dependencies
         run: yarn --frozen-lockfile
 
-      - name: Build
-        run: yarn bundle:prod
+      - name: Merge translations
+        run: yarn translate:merge
 
       - name: Download translations
         uses: crowdin/github-action@1.0.9
