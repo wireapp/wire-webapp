@@ -17,11 +17,6 @@
  *
  */
 
-import {AccentColor} from '@wireapp/commons';
-import {UserAsset} from '../user/';
+import {User} from '../user/';
 
-export interface UserUpdate {
-  accent_id?: AccentColor.AccentColorID;
-  assets?: UserAsset[];
-  name: string;
-}
+export type UserUpdate = Pick<User, 'name'> & Partial<Pick<User, 'assets' | 'accent_id'>>;
