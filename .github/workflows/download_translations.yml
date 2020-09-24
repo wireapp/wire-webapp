@@ -21,17 +21,18 @@ jobs:
           CROWDIN_PROJECT_ID: 342359
           INPUT_DEBUG_MODE: false
         with:
-          upload_sources: false
+          upload_sources: true
           upload_translations: false
           download_translations: true
-          skip_untranslated_files: false
-          # Download translations with pushing to branch
-          push_translations: true
-          commit_message: 'chore: Update translations'
-          localization_branch_name: 'translations'
-          create_pull_request: true
-          pull_request_title: 'chore: Update translations'
+          push_translations: false
+          create_pull_request: false
           token: ${{secrets.WEB_CROWDIN_TOKEN}}
           source: '/src/i18n/en-US.json'
           translation: '/src/i18n/%locale%.json'
           base_path: '.'
+          dryrun_action: true
+
+      - name: Commit & push translations
+        run: |
+          git commit -am 'chore: Update translations'
+          git status
