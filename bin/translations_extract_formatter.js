@@ -16,6 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+
 const webappTranslations = require('../src/i18n/en-US.json');
 
 exports.format = function (messages) {
