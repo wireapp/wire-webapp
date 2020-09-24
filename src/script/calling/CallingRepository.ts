@@ -1025,7 +1025,7 @@ export class CallingRepository {
     removedMembers.forEach(participant => call.participants.remove(participant));
 
     if (call.participants().length > call.analyticsMaximumParticipants) {
-      call.analyticsMaximumParticipants = call.participants.length;
+      call.analyticsMaximumParticipants = call.participants().length;
     }
   }
 

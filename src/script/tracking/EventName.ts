@@ -21,6 +21,7 @@
  * Definition of events used for user analytics (defined by Business Intelligence Team)
  */
 export const EventName = {
+  APP_OPEN: 'app.open',
   CALLING: {
     ENDED_CALL: 'calling.ended_call',
     ESTABLISHED_CALL: 'calling.established_call',

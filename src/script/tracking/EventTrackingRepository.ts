@@ -33,11 +33,13 @@ import {loadValue, storeValue} from 'Util/StorageUtil';
 import {getPlatform} from './Helpers';
 import {Config} from '../Config';
 import {roundLogarithmic} from 'Util/NumberUtil';
+import {EventName} from './EventName';
 
 const Countly = require('countly-sdk-web');
 
 export class EventTrackingRepository {
   private isProductReportingActivated: boolean;
+  private sendAppOpenEvent: boolean = true;
   private readonly countlyDeviceId: string;
   private readonly logger: Logger;
   private readonly userRepository: UserRepository;
@@ -155,6 +157,10 @@ export class EventTrackingRepository {
   private startProductReportingSession(): void {
     if (this.isProductReportingActivated === true) {
       Countly.begin_session();
+      if (this.sendAppOpenEvent) {
+        this.sendAppOpenEvent = false;
+        this.trackProductReportingEvent(EventName.APP_OPEN);
+      }
     }
   }
 
