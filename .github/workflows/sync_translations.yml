@@ -1,4 +1,4 @@
-name: Download translations
+name: Sync translations
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     - cron: '0 8 * * *'
 
 jobs:
-  download_translations:
+  sync_translations:
     runs-on: ubuntu-latest
 
     steps:
