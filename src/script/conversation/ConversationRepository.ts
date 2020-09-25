@@ -2715,24 +2715,19 @@ export class ConversationRepository {
         throw error;
       }
 
-      let updatedPayload: NewOTRMessage;
-
       const payloadWithMissingClients = await this.clientMismatchHandler.onClientMismatch(
         eventInfoEntity,
         error,
         payload,
       );
 
-      // eslint-disable-next-line prefer-const
-      updatedPayload = payloadWithMissingClients;
-
       const userIds = Object.keys(error.missing);
       await this._grantOutgoingMessage(eventInfoEntity, userIds);
       this.logger.info(
         `Updated '${messageType}' message (${messageId}) for conversation '${conversationId}'. Will ignore missing receivers.`,
-        updatedPayload,
+        payloadWithMissingClients,
       );
-      return this.conversation_service.post_encrypted_message(conversationId, updatedPayload, true);
+      return this.conversation_service.post_encrypted_message(conversationId, payloadWithMissingClients, true);
     }
   }
 
@@ -4062,7 +4057,6 @@ export class ConversationRepository {
 
   private async _initMessageEntity(conversationEntity: Conversation, eventJson: EventRecord): Promise<Message> {
     const messageEntity = await this.event_mapper.mapJsonEvent(eventJson, conversationEntity);
-    // eslint-disable-next-line no-return-await
     return this._updateMessageUserEntities(messageEntity);
   }
 

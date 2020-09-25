@@ -61,7 +61,7 @@ export class EmojiInputViewModel {
 
   // DO NOT USE COLON WITH LOWERCASE LETTERS IN THE SHORTCUTS, or you will prevent searching emojis.
   // For example, while :D should be replaced with unicode symbol, :d should allow searching for :dancer:
-  /* eslint-disable sort-keys-fix/sort-keys-fix, no-multi-spaces */
+  /* eslint-disable sort-keys-fix/sort-keys-fix */
   static get INLINE_REPLACEMENT(): {name: string; shortcut: string}[] {
     return [
       {shortcut: ':)', name: 'slight smile'},
@@ -125,7 +125,7 @@ export class EmojiInputViewModel {
         : first.shortcut.localeCompare(second.shortcut);
     });
   }
-  /* eslint-enable sort-keys-fix/sort-keys-fix, no-multi-spaces */
+  /* eslint-enable sort-keys-fix/sort-keys-fix */
 
   static INLINE_MAX_LENGTH = Math.max(...EmojiInputViewModel.INLINE_REPLACEMENT.map(({shortcut}) => shortcut.length));
 
