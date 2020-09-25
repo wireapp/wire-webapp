@@ -21,6 +21,7 @@ import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
 import {
   Asset,
   Availability,
+  Composite,
   Confirmation,
   GenericMessage,
   IAsset,
@@ -224,6 +225,10 @@ export class CryptographyMapper {
   async _mapComposite(composite: IComposite) {
     const items = await Promise.all(
       composite.items.map(async item => {
+        if ((item as Composite.Item).content !== GENERIC_MESSAGE_TYPE.TEXT) {
+          return item;
+        }
+
         const {mentions: protoMentions, content} = item.text;
 
         if (protoMentions && protoMentions.length > CryptographyMapper.CONFIG.MAX_MENTIONS_PER_MESSAGE) {
