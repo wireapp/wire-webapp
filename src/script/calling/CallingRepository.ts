@@ -72,6 +72,7 @@ import {flatten} from 'Util/ArrayUtil';
 import {QUERY_KEY} from '../auth/route';
 import {Runtime} from '@wireapp/commons';
 import {roundLogarithmic} from 'Util/NumberUtil';
+import {ClientEntity} from '../client/ClientEntity';
 
 interface MediaStreamQuery {
   audio?: boolean;
@@ -443,11 +444,40 @@ export class CallingRepository {
     amplify.subscribe(WebAppEvents.CALL.STATE.TOGGLE, this.toggleState.bind(this)); // This event needs to be kept, it is sent by the wrapper
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_VBR_ENCODING, this.toggleCbrEncoding.bind(this));
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_SFT_CALLING, this.toggleSftCalling.bind(this));
+    amplify.subscribe(WebAppEvents.CLIENT.VERIFICATION_STATE_CHANGED, this.onClientVerificationChanged);
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, ({settings}: WebappProperties) => {
       this.toggleCbrEncoding(settings.call.enable_vbr_encoding);
       this.toggleSftCalling(settings.call.enable_sft_calling);
     });
   }
+
+  /**
+   * Leave call when a participant is not verfied anymore
+   */
+  private readonly onClientVerificationChanged = (userId: string, clientEntity: ClientEntity, isVerified: boolean) => {
+    this.logger.info('onClientVerificationChanged', {clientEntity, isVerified, userId});
+    const activeCall = this.joinedCall();
+    if (!activeCall) {
+      return;
+    }
+
+    const participant = activeCall.getParticipant(userId, clientEntity.id);
+    this.logger.info('onClientVerificationChanged participant', participant);
+    if (!participant || isVerified) {
+      return;
+    }
+
+    this.leaveCall(activeCall.conversationId);
+    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+      primaryAction: {
+        text: t('callDegradationOk'),
+      },
+      text: {
+        message: t('callDegradationDescription', participant.user.name()),
+        title: t('callDegradationTitle'),
+      },
+    });
+  };
 
   //##############################################################################
   // Inbound call events
