@@ -169,7 +169,6 @@
   "callChooseSharedWindow": "Choose a window to share",
   "callDecline": "Decline",
   "callDegradationTitle": "Call dropped",
-  "callDegradationOk": "Ok",
   "callDegradationDescription": "The call was dropped because {{username}} can not be verified anymore.",
   "callJoin": "Join",
   "callNoCameraAccess": "No camera access",

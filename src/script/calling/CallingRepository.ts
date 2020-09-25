@@ -468,9 +468,6 @@ export class CallingRepository {
 
     this.leaveCall(activeCall.conversationId);
     amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
-      primaryAction: {
-        text: t('callDegradationOk'),
-      },
       text: {
         message: t('callDegradationDescription', participant.user.name()),
         title: t('callDegradationTitle'),
