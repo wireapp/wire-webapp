@@ -1,17 +1,29 @@
+/*
+ * Wire
+ * Copyright (C) 2020 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
 const pkg = require('./package.json');
 const appConfigPkg = require('./app-config/package.json');
 const {execSync} = require('child_process');
 
 /**
- * Selects the configuration by precedence:
- * 1. distribution (other than 'wire')
- * 2. branch (one of 'master', 'staging', 'dev')
- * 3. tagged commit
- * 4. default
- *
- * Scenarios:
- * 1. When executed locally the current commit can be the HEAD of a branch (master, staging, dev) AND a tag. The branch has precedence here.
- * 2. When executed on CI it is either a tagged commit OR a branch.
+ * Selects configuration based on current branch and tagged commits
+ * @returns {string} the configuration name
  */
 const selectConfiguration = () => {
   const distribution = process.env.DISTRIBUTION !== 'wire' && process.env.DISTRIBUTION;
@@ -20,32 +32,39 @@ const selectConfiguration = () => {
     return distribution;
   }
   let currentBranch = '';
+  let currentTag = '';
+
   try {
-    currentBranch = execSync('git rev-parse --abbrev-ref HEAD')
-      .toString()
-      .trim();
+    currentBranch = execSync('git rev-parse --abbrev-ref HEAD').toString().trim();
   } catch (error) {}
+  try {
+    currentTag = execSync('git tag -l --points-at HEAD').toString().trim();
+  } catch (error) {}
+
   switch (currentBranch) {
-    case 'master':
-    case 'staging': {
-      console.log(`Selecting configuration "${currentBranch}" (reason: branch)`);
-      return currentBranch;
-    }
     case 'dev': {
-      console.log('Selecting configuration "staging" (reason: branch)');
+      // On staging bump use production config
+      if (currentTag.includes('staging')) {
+        console.log(`Selecting configuration "master" (reason: branch "${currentBranch}" & tag "${currentTag}")`);
+        return 'master';
+      }
+      // When merging master back to dev with the last commit being a production release tag
+      // And for all other cases
+      console.log(`Selecting configuration "staging" (reason: branch "${currentBranch}")`);
+      return 'staging';
+    }
+    case 'master': {
+      // On production release use production config
+      if (currentTag.includes('production')) {
+        console.log(`Selecting configuration "master" (reason: branch "${currentBranch}" & tag "${currentTag}")`);
+        return 'master';
+      }
+      // When merging dev into master with the last commit being a staging bump tag
+      // And for all other cases
+      console.log(`Selecting configuration "staging" (reason: branch "${currentBranch}")`);
       return 'staging';
     }
     default: {
-      let isTaggedCommit = false;
-      try {
-        isTaggedCommit = !!execSync('git tag -l --points-at HEAD')
-          .toString()
-          .trim();
-      } catch (error) {}
-      if (isTaggedCommit) {
-        console.log('Selecting configuration "master" (reason: tagged commit)');
-        return 'master';
-      }
       console.log('Selecting configuration "staging" (reason: default)');
       return 'staging';
     }
