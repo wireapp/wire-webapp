@@ -461,7 +461,7 @@ export class CallingRepository {
     }
 
     const participant = activeCall.getParticipant(userId, clientEntity.id);
-    this.logger.info('onClientVerificationChanged participant', participant);
+
     if (!participant || isVerified) {
       return;
     }
@@ -472,7 +472,7 @@ export class CallingRepository {
         text: t('callDegradationOk'),
       },
       text: {
-        message: t('callDegradationDescription', 'participant.user.name()'),
+        message: t('callDegradationDescription', participant.user.name()),
         title: t('callDegradationTitle'),
       },
     });
