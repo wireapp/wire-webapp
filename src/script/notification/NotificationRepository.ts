@@ -730,7 +730,6 @@ export class NotificationRepository {
    * Plays the sound from the audio repository.
    *
    * @param messageEntity Message entity
-   * @param No return value
    */
   private notifySound(messageEntity: Message): void {
     const muteSound = !document.hasFocus() && Runtime.isFirefox() && Runtime.isMacOS();
@@ -819,7 +818,6 @@ export class NotificationRepository {
    * Sending the notification.
    *
    * @param notificationContent Content of notification
-   * @returns No return value
    */
   private showNotification(notificationContent: NotificationContent): void {
     amplify.publish(WebAppEvents.NOTIFICATION.SHOW, notificationContent);
@@ -830,7 +828,6 @@ export class NotificationRepository {
    * Sending the browser notification.
    *
    * @param notificationContent Content of notification
-   * @param No return value
    */
   private showNotificationInBrowser(notificationContent: NotificationContent): void {
     /*

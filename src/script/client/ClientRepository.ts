@@ -187,7 +187,7 @@ export class ClientRepository {
   }
 
   /**
-   * Save the a client into the database.
+   * Save a client into the database.
    *
    * @param userId ID of user client to be stored belongs to
    * @param clientPayload Client data to be stored in database
@@ -243,7 +243,7 @@ export class ClientRepository {
   /**
    * Updates a client payload if it does not fit the current database structure.
    *
-   * @param  userId User ID of the client owner
+   * @param userId User ID of the client owner
    * @param clientPayload Client data to be stored in database
    * @returns Resolves with the record stored in database
    */

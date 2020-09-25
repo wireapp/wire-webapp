@@ -696,7 +696,7 @@ export class ConversationRepository {
    *
    * @param conversationEntity Conversation entity
    * @param messageEntity Message entity
-   * @param padding=30 Number of messages to load around the targeted message
+   * @param padding Number of messages to load around the targeted message
    * @returns Resolves with the messages
    */
   async getMessagesWithOffset(
@@ -990,7 +990,7 @@ export class ConversationRepository {
 
   /**
    * Get the most recent event timestamp from any conversation.
-   * @param increment=false Increment by one for unique timestamp
+   * @param increment Increment by one for unique timestamp
    * @returns Timestamp value
    */
   getLatestEventTimestamp(increment = false) {
@@ -1015,7 +1015,7 @@ export class ConversationRepository {
 
   /**
    * Get unarchived conversation with the most recent event.
-   * @param allConversations=false Search all conversations
+   * @param allConversations Search all conversations
    * @returns Most recent conversation
    */
   getMostRecentConversation(allConversations = false) {
@@ -1146,7 +1146,7 @@ export class ConversationRepository {
    *
    * @note If there is no conversation it will request it from the backend
    * @param connectionEntity Connections
-   * @param show_conversation=false Open the new conversation
+   * @param show_conversation Open the new conversation
    * @returns Resolves when connection was mapped return value
    */
   map_connection(connectionEntity: ConnectionEntity, show_conversation = false) {
@@ -1217,7 +1217,7 @@ export class ConversationRepository {
    * Map conversation payload.
    *
    * @param payload Payload to map
-   * @param initialTimestamp=this.getLatestEventTimestamp() Initial server and event timestamp
+   * @param initialTimestamp Initial server and event timestamp
    * @returns Mapped conversation/s
    */
   mapConversations(
@@ -1335,8 +1335,8 @@ export class ConversationRepository {
    * Update participating users in a conversation.
    *
    * @param conversationEntity Conversation to be updated
-   * @param offline=false Should we only look for cached contacts
-   * @param updateGuests=false Update conversation guests
+   * @param offline Should we only look for cached contacts
+   * @param updateGuests Update conversation guests
    * @returns Resolves when users have been updated
    */
   async updateParticipatingUserEntities(conversationEntity?: Conversation, offline = false, updateGuests = false) {
@@ -1447,7 +1447,7 @@ export class ConversationRepository {
    * It will be unarchived once it is opened through search. We use the archive flag to distinguish states.
    *
    * @param conversationEntity Conversation to clear
-   * @param leaveConversation=false Should we leave the conversation before clearing the content?
+   * @param leaveConversation Should we leave the conversation before clearing the content?
    */
   clear_conversation(conversationEntity: Conversation, leaveConversation = false) {
     const isActiveConversation = this.is_active_conversation(conversationEntity);
@@ -1716,7 +1716,7 @@ export class ConversationRepository {
    * Un-archive a conversation.
    *
    * @param conversationEntity Conversation to unarchive
-   * @param forceChange=false Force state change without new message
+   * @param forceChange Force state change without new message
    * @param trigger Trigger for unarchive
    * @returns Resolves when the conversation was unarchived
    */
@@ -2015,7 +2015,7 @@ export class ConversationRepository {
    *
    * @param conversationEntity Conversation that should receive the file
    * @param messageId ID of the metadata message
-   * @param reason=ProtobufAsset.NotUploaded.FAILED Cause for the failed upload (optional)
+   * @param reason Cause for the failed upload (optional)
    * @returns Resolves when the asset failure was sent
    */
   send_asset_upload_failed(
@@ -2493,7 +2493,7 @@ export class ConversationRepository {
    * Create a user client map for a given conversation.
    *
    * @param conversation_id Conversation ID
-   * @param skip_own_clients=false True, if other own clients should be skipped (to not sync messages on own clients)
+   * @param skip_own_clients True, if other own clients should be skipped (to not sync messages on own clients)
    * @param user_ids Optionally the intended recipient users
    * @returns Resolves with a user client map
    */
@@ -3052,7 +3052,7 @@ export class ConversationRepository {
    *
    * @param conversationEntity Conversation to post the files
    * @param files files
-   * @param asImage=false whether or not the file should be treated as an image
+   * @param asImage whether or not the file should be treated as an image
    */
   upload_files(conversationEntity: Conversation, files: File[] | Blob[], asImage?: boolean) {
     if (this._can_upload_assets_to_conversation(conversationEntity)) {
@@ -3065,7 +3065,7 @@ export class ConversationRepository {
    *
    * @param conversationEntity Conversation to post the file
    * @param file File object
-   * @param asImage=false whether or not the file should be treated as an image
+   * @param asImage whether or not the file should be treated as an image
    * @returns Resolves when file was uploaded
    */
 
@@ -3194,7 +3194,7 @@ export class ConversationRepository {
    * Listener for incoming events.
    *
    * @param eventJson JSON data for event
-   * @param eventSource=EventRepository.SOURCE.STREAM Source of event
+   * @param eventSource Source of event
    * @returns Resolves when event was handled
    */
   onConversationEvent(eventJson: EventJson, eventSource = EventRepository.SOURCE.STREAM) {
@@ -4105,7 +4105,7 @@ export class ConversationRepository {
    *
    * @param events Event data
    * @param conversationEntity Conversation entity the events will be added to
-   * @param prepend=true Should existing messages be prepended
+   * @param prepend Should existing messages be prepended
    * @returns Resolves with an array of mapped messages
    */
   private async _addEventsToConversation(events: EventRecord[], conversationEntity: Conversation, prepend = true) {
@@ -4137,7 +4137,7 @@ export class ConversationRepository {
    *
    * @param conversationEntity Conversation that event was received in
    * @param messageEntity Message that has been reacted upon
-   * @param eventJson -] JSON data of received reaction event
+   * @param eventJson JSON data of received reaction event
    * @returns Resolves when the notification was prepared
    */
   private _prepareReactionNotification(
@@ -4261,8 +4261,8 @@ export class ConversationRepository {
    * Update asset in UI and DB as failed
    *
    * @param message_et Message to update
-   * @param reason=AssetTransferState.UPLOAD_FAILED Failure reason
-   * @returns Resolve when message was updated
+   * @param reason Failure reason
+   * @returns Resolves when the message was updated
    */
   async update_message_as_upload_failed(message_et: ContentMessage, reason = AssetTransferState.UPLOAD_FAILED) {
     if (message_et) {

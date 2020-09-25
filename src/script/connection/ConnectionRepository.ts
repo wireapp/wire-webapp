@@ -70,7 +70,6 @@ export class ConnectionRepository {
    *
    * @param eventJson JSON data for event
    * @param source Source of event
-   * @returns No return value
    */
   onUserEvent(eventJson: UserConnectionEvent, source: EventSource): void {
     const eventType = eventJson.type;
@@ -93,7 +92,6 @@ export class ConnectionRepository {
    * @param eventJson JSON data of 'user.connection' event
    * @param source Source of event
    * @param showConversation Should the new conversation be opened?
-   * @returns No return value
    */
   onUserConnection(eventJson: UserConnectionData, source: EventSource, showConversation?: boolean): Promise<void> {
     if (!eventJson) {
@@ -313,7 +311,6 @@ export class ConnectionRepository {
    * @param connectionEntity Connection entity
    * @param source Source of event
    * @param previousStatus Previous connection status
-   * @returns No return value
    */
   private _sendNotification(
     connectionEntity: ConnectionEntity,
