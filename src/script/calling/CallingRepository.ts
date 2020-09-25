@@ -1301,7 +1301,7 @@ export class CallingRepository {
     }
 
     return new Promise((resolve, reject) => {
-      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.INPUT, {
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
         primaryAction: {
           action: () => {
             if (activeCall.state() === CALL_STATE.INCOMING) {
