@@ -388,7 +388,7 @@ export class Message {
     );
   }
 
-  // Start the ephemeral timer for the message.
+  /** Start the ephemeral timer for the message. */
   startMessageTimer = (timeOffset: number): void => {
     if (this.messageTimerStarted) {
       return;

@@ -242,7 +242,7 @@ export class NotificationRepository {
     return Promise.resolve();
   }
 
-  // Remove notifications from the queue that are no longer unread
+  /** Remove notifications from the queue that are no longer unread */
   removeReadNotifications(): void {
     this.notifications.forEach(notification => {
       const {conversationId, messageId, messageType} = notification.data || {};
