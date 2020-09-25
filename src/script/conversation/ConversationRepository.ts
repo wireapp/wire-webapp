@@ -2493,7 +2493,7 @@ export class ConversationRepository {
    * Create a user client map for a given conversation.
    *
    * @param conversation_id Conversation ID
-   * @param skip_own_clients True, if other own clients should be skipped (to not sync messages on own clients)
+   * @param skip_own_clients `true`, if other own clients should be skipped (to not sync messages on own clients)
    * @param user_ids Optionally the intended recipient users
    * @returns Resolves with a user client map
    */
@@ -2660,10 +2660,12 @@ export class ConversationRepository {
   }
 
   /**
-   * Sends otr message to a conversation.
+   * Sends an OTR message to a conversation.
    *
    * @note Options for the precondition check on missing clients are:
-   *   'false' - all clients, 'Array<String>' - only clients of listed users, 'true' - force sending
+   * - `false` - all clients
+   * - `Array<string>` - only clients of listed users
+   * - `true` - force sending
    *
    * @param eventInfoEntity Info about message to be sent
    * @param payload Payload

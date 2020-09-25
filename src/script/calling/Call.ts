@@ -38,11 +38,11 @@ export class Call {
   public readonly isCbrEnabled: ko.Observable<boolean>;
   public blockMessages: boolean = false;
   /**
-   * set to true if anyone has enabled their video during a call (used for analytics)
+   * set to `true` if anyone has enabled their video during a call (used for analytics)
    */
   public analyticsAvSwitchToggle: boolean = false;
   /**
-   * set to true if anyone has shared their screen during a call (used for analytics)
+   * set to `true` if anyone has shared their screen during a call (used for analytics)
    */
   public analyticsScreenSharing: boolean = false;
   /**

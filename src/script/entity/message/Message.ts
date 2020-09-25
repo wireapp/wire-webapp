@@ -409,7 +409,7 @@ export class Message {
   /**
    * Update the status of a message.
    * @param updated_status New status of message
-   * @returns Returns the new status on a successful update, otherwise "false"
+   * @returns Returns the new status on a successful update, `false` otherwise
    */
   update_status(updated_status: StatusType): StatusType | false {
     if (this.status() >= StatusType.SENT) {
