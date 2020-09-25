@@ -455,7 +455,6 @@ export class CallingRepository {
    * Leave call when a participant is not verfied anymore
    */
   private readonly onClientVerificationChanged = (userId: string, clientEntity: ClientEntity, isVerified: boolean) => {
-    this.logger.info('onClientVerificationChanged', {clientEntity, isVerified, userId});
     const activeCall = this.joinedCall();
     if (!activeCall) {
       return;
@@ -468,12 +467,12 @@ export class CallingRepository {
     }
 
     this.leaveCall(activeCall.conversationId);
-    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
       primaryAction: {
         text: t('callDegradationOk'),
       },
       text: {
-        message: t('callDegradationDescription', participant.user.name()),
+        message: t('callDegradationDescription', 'participant.user.name()'),
         title: t('callDegradationTitle'),
       },
     });
@@ -1302,7 +1301,7 @@ export class CallingRepository {
     }
 
     return new Promise((resolve, reject) => {
-      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.INPUT, {
         primaryAction: {
           action: () => {
             if (activeCall.state() === CALL_STATE.INCOMING) {
