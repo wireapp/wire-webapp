@@ -18,6 +18,7 @@
  */
 
 import axios, {AxiosError} from 'axios';
+import {Runtime} from '@wireapp/commons';
 import type {APIClient} from '@wireapp/api-client';
 import type {WebappProperties} from '@wireapp/api-client/dist/user/data';
 import type {CallConfigData} from '@wireapp/api-client/dist/account/CallConfigData';
@@ -43,10 +44,14 @@ import {UrlUtil} from '@wireapp/commons';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import 'webrtc-adapter';
+
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
 import {createRandomUuid} from 'Util/util';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {flatten} from 'Util/ArrayUtil';
+import {roundLogarithmic} from 'Util/NumberUtil';
+
 import {Config} from '../Config';
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
@@ -56,23 +61,20 @@ import {ConversationRepository} from '../conversation/ConversationRepository';
 import {EventBuilder} from '../conversation/EventBuilder';
 import {EventInfoEntity, MessageSendingOptions} from '../conversation/EventInfoEntity';
 import {EventRepository} from '../event/EventRepository';
-import type {MediaStreamHandler} from '../media/MediaStreamHandler';
 import {MediaType} from '../media/MediaType';
-import type {User} from '../entity/User';
-import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import {Call, ConversationId} from './Call';
 import {ClientId, Participant, UserId} from './Participant';
-import type {Recipients} from '../cryptography/CryptographyRepository';
-import type {Conversation} from '../entity/Conversation';
 import {EventName} from '../tracking/EventName';
 import {Segmentation} from '../tracking/Segmentation';
 import * as trackingHelpers from '../tracking/Helpers';
-import {UserRepository} from '../user/UserRepository';
-import {flatten} from 'Util/ArrayUtil';
 import {QUERY_KEY} from '../auth/route';
-import {Runtime} from '@wireapp/commons';
-import {roundLogarithmic} from 'Util/NumberUtil';
 import {ClientEntity} from '../client/ClientEntity';
+import type {MediaStreamHandler} from '../media/MediaStreamHandler';
+import type {User} from '../entity/User';
+import type {ServerTimeHandler} from '../time/serverTimeHandler';
+import type {Recipients} from '../cryptography/CryptographyRepository';
+import type {Conversation} from '../entity/Conversation';
+import type {UserRepository} from '../user/UserRepository';
 
 interface MediaStreamQuery {
   audio?: boolean;
@@ -84,32 +86,33 @@ interface SendMessageTarget {
   clients: WcallClient[];
 }
 
-type ClientListEntry = [string, string];
+type ClientListEntry = [user: string, client: string];
+
+enum CALL_DIRECTION {
+  INCOMING = 'incoming',
+  OUTGOING = 'outgoing',
+}
 
 export class CallingRepository {
-  private poorCallQualityUsers: {[conversationId: string]: string[]} = {};
-
+  private readonly acceptedVersionWarnings: ko.ObservableArray<string>;
+  private readonly acceptVersionWarning: (conversationId: string) => void;
+  private readonly callLog: string[];
+  private readonly cbrEncoding: ko.Observable<number>;
+  private readonly logger: Logger;
   private avsVersion: number;
   private incomingCallCallback: (call: Call) => void;
   private isReady: boolean = false;
+  /** will cache the query to media stream (in order to avoid asking the system for streams multiple times when we have multiple peers) */
+  private mediaStreamQuery?: Promise<MediaStream>;
+  private poorCallQualityUsers: {[conversationId: string]: string[]} = {};
   private selfClientId: ClientId;
   private selfUser: User;
   private wCall?: Wcall;
   private wUser?: number;
-  readonly activeCalls: ko.ObservableArray<Call>;
-  readonly isMuted: ko.Observable<boolean>;
-
-  // will cache the query to media stream (in order to avoid asking the system for streams multiple times when we have multiple peers)
-  private mediaStreamQuery?: Promise<MediaStream>;
-
+  public readonly activeCalls: ko.ObservableArray<Call>;
+  public readonly isMuted: ko.Observable<boolean>;
   public readonly joinedCall: ko.PureComputed<Call | undefined>;
-
-  private readonly logger: Logger;
-  private readonly callLog: string[];
-  private readonly cbrEncoding: ko.Observable<number>;
   public readonly useSftCalling: ko.Observable<boolean>;
-  private readonly acceptedVersionWarnings: ko.ObservableArray<string>;
-  private readonly acceptVersionWarning: (conversationId: string) => void;
 
   static get CONFIG() {
     return {
@@ -159,11 +162,11 @@ export class CallingRepository {
     this.subscribeToEvents();
   }
 
-  toggleCbrEncoding(vbrEnabled: boolean) {
+  toggleCbrEncoding(vbrEnabled: boolean): void {
     this.cbrEncoding(vbrEnabled ? 0 : 1);
   }
 
-  toggleSftCalling(enableSftCalling: boolean) {
+  toggleSftCalling(enableSftCalling: boolean): void {
     const urlSetting = UrlUtil.getURLParameter(QUERY_KEY.ENABLE_SFT_CALLING);
     if (urlSetting) {
       this.logger.warn(
@@ -178,7 +181,7 @@ export class CallingRepository {
     return this.wCall.getStats(conversationId);
   }
 
-  async initAvs(selfUser: any, clientId: ClientId): Promise<{wCall: Wcall; wUser: number}> {
+  async initAvs(selfUser: User, clientId: ClientId): Promise<{wCall: Wcall; wUser: number}> {
     this.selfUser = selfUser;
     this.selfClientId = clientId;
     const callingInstance = await getAvsInstance();
@@ -250,7 +253,7 @@ export class CallingRepository {
     return wUser;
   }
 
-  private async pushClients(conversationId: ConversationId) {
+  private async pushClients(conversationId: ConversationId): Promise<void> {
     try {
       await this.apiClient.conversation.api.postOTRMessage(this.selfClientId, conversationId);
     } catch (error) {
@@ -405,7 +408,7 @@ export class CallingRepository {
         mediaStream.getTracks().forEach(track => track.stop());
       }
       return true;
-    } catch (_) {
+    } catch (_error) {
       return false;
     }
   }
@@ -642,7 +645,7 @@ export class CallingRepository {
         this.removeCall(call);
       }
       return call;
-    } catch (_) {}
+    } catch (_error) {}
   }
 
   /**
@@ -708,7 +711,7 @@ export class CallingRepository {
       this.sendCallingEvent(EventName.CALLING.JOINED_CALL, call, {
         [Segmentation.CALL.DIRECTION]: this.getCallDirection(call),
       });
-    } catch (_) {
+    } catch (_error) {
       this.rejectCall(call.conversationId);
     }
   }
@@ -817,7 +820,7 @@ export class CallingRepository {
 
   private injectActivateEvent(conversationId: ConversationId, userId: UserId, time: string, source: string): void {
     const event = EventBuilder.buildVoiceChannelActivate(conversationId, userId, time, this.avsVersion);
-    this.eventRepository.injectEvent(event, source as any);
+    this.eventRepository.injectEvent(event, source);
   }
 
   private injectDeactivateEvent(
@@ -836,16 +839,16 @@ export class CallingRepository {
       time,
       this.avsVersion,
     );
-    this.eventRepository.injectEvent(event, source as any);
+    this.eventRepository.injectEvent(event, source);
   }
 
   private readonly sendMessage = (
-    context: number,
+    _context: number,
     conversationId: ConversationId,
     userId: UserId,
-    clientId: ClientId,
+    _clientId: ClientId,
     targets: string | null,
-    unused: null,
+    _unused: null,
     payload: string,
   ): number => {
     const protoCalling = new Calling({content: payload});
@@ -888,7 +891,7 @@ export class CallingRepository {
     context: number,
     url: string,
     data: string,
-    dataLength: number,
+    _dataLength: number,
     _: number,
   ): number => {
     (async () => {
@@ -908,7 +911,7 @@ export class CallingRepository {
       try {
         const config = await this.fetchConfig(limit);
         this.wCall.configUpdate(this.wUser, 0, JSON.stringify(config));
-      } catch (_) {
+      } catch (_error) {
         this.wCall.configUpdate(this.wUser, 1, '');
       }
     })();
@@ -942,7 +945,7 @@ export class CallingRepository {
       if (participant.videoState() === VIDEO_STATE.SCREENSHARE && participant.startedScreenSharingAt() > 0) {
         const isSameUser = selfParticipant.doesMatchIds(participant.user.id, participant.clientId);
         this.sendCallingEvent(EventName.CALLING.SCREEN_SHARE, call, {
-          [Segmentation.SCREEN_SHARE.DIRECTION]: isSameUser ? 'outgoing' : 'incoming',
+          [Segmentation.SCREEN_SHARE.DIRECTION]: isSameUser ? CALL_DIRECTION.OUTGOING : CALL_DIRECTION.INCOMING,
           [Segmentation.SCREEN_SHARE.DURATION]:
             Math.ceil((Date.now() - participant.startedScreenSharingAt()) / 5000) * 5,
         });
@@ -1009,7 +1012,7 @@ export class CallingRepository {
     this.sendCallingEvent(EventName.CALLING.RECIEVED_CALL, call);
   };
 
-  private readonly updateCallState = (conversationId: ConversationId, state: number) => {
+  private readonly updateCallState = (conversationId: ConversationId, state: CALL_STATE) => {
     const call = this.findCall(conversationId);
     if (!call) {
       this.logger.warn(`received state for call in conversation '${conversationId}' but no stored call found`);
@@ -1030,15 +1033,15 @@ export class CallingRepository {
     }
   };
 
-  private readonly getCallDirection = (call: Call): 'incoming' | 'outgoing' => {
-    return call.initiator === call.getSelfParticipant().user.id ? 'outgoing' : 'incoming';
+  private readonly getCallDirection = (call: Call): CALL_DIRECTION => {
+    return call.initiator === call.getSelfParticipant().user.id ? CALL_DIRECTION.OUTGOING : CALL_DIRECTION.INCOMING;
   };
 
   private updateParticipantMutedState(call: Call, members: WcallMember[]): void {
     members.forEach(member => call.getParticipant(member.userid, member.clientid)?.isMuted(!!member.muted));
   }
 
-  private updateParticipantList(call: Call, members: WcallMember[]) {
+  private updateParticipantList(call: Call, members: WcallMember[]): void {
     const newMembers = members
       .filter(({userid, clientid}) => !call.getParticipant(userid, clientid))
       .map(({userid, clientid}) => new Participant(this.userRepository.findUserById(userid), clientid));
@@ -1200,7 +1203,7 @@ export class CallingRepository {
         selfParticipant.releaseVideoStream();
       }
       this.sendCallingEvent(EventName.CALLING.SCREEN_SHARE, call, {
-        [Segmentation.SCREEN_SHARE.DIRECTION]: isSameUser ? 'outgoing' : 'incoming',
+        [Segmentation.SCREEN_SHARE.DIRECTION]: isSameUser ? CALL_DIRECTION.OUTGOING : CALL_DIRECTION.INCOMING,
         [Segmentation.SCREEN_SHARE.DURATION]: Math.ceil((Date.now() - participant.startedScreenSharingAt()) / 5000) * 5,
       });
     }
