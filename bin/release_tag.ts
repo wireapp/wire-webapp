@@ -17,8 +17,6 @@
  *
  */
 
-/* eslint-disable no-unused-expressions */
-
 import {APIClient} from '@wireapp/api-client';
 import {ClientType} from '@wireapp/api-client/dist/client';
 import {GIPHY_RATING} from '@wireapp/api-client/dist/giphy/';
@@ -52,7 +50,9 @@ logger.state.isEnabled = true;
 
 const exec = (command: string): string => execSync(command, {stdio: 'pipe'}).toString().trim();
 
-isDryRun && logger.info('Note: Dry run enabled.');
+if (!isDryRun) {
+  logger.info('Note: Dry run enabled.');
+}
 
 switch (firstArgument) {
   case '--help':
@@ -190,10 +190,14 @@ const announceRelease = async (tagName: string, commitId: string): Promise<void>
   );
   if (answer === 'yes') {
     logger.info(`Creating tag "${tagName}" ...`);
-    !isDryRun && exec(`git tag ${tagName} ${commitId}`);
+    if (!isDryRun) {
+      exec(`git tag ${tagName} ${commitId}`);
+    }
 
     logger.info(`Pushing "${tagName}" to "${origin}" ...`);
-    !isDryRun && exec(`git push ${origin} ${tagName}`);
+    if (!isDryRun) {
+      exec(`git push ${origin} ${tagName}`);
+    }
 
     try {
       logger.info(`Announcing release of "${tagName}" ...`);
