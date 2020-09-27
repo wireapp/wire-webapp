@@ -10525,12 +10525,12 @@ postcss-sass@^0.4.4:
     gonzales-pe "^4.3.0"
     postcss "^7.0.21"
 
-postcss-scss@3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/postcss-scss/-/postcss-scss-3.0.0.tgz#81ef90ea6ed50256e095575526cdcc331a1a1d8b"
-  integrity sha512-8k2CgYMR7aUa7nRTEiMpyf6O13P7qiEbht2XBaOKO2Zj6Ko1ZzESWls7tfaqSDqtJQ2S0k9oPFcefuGwdiHtXw==
+postcss-scss@3.0.2:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/postcss-scss/-/postcss-scss-3.0.2.tgz#b43afd45b49dfeb9f6266a0c7b29faf0941d18bd"
+  integrity sha512-gR31pETUW0nHKbciPh/2CU+HI3phdgT5Zw/9Z2Wq/hX1G54PmydF965Hx8X6ZDldrFgMuQageNJfk00V+U8YRQ==
   dependencies:
-    postcss "^8.0.2"
+    postcss "^8.1.0"
 
 postcss-scss@^2.1.1:
   version "2.1.1"
@@ -10651,10 +10651,10 @@ postcss@^7.0.0, postcss@^7.0.1, postcss@^7.0.14, postcss@^7.0.17, postcss@^7.0.2
     source-map "^0.6.1"
     supports-color "^6.1.0"
 
-postcss@^8.0.2:
-  version "8.0.6"
-  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.0.6.tgz#1507160d7df320c77f8f4819cf52491f4748b672"
-  integrity sha512-P4lvqkhoiba/w0JE1t432xlQyeJnnf1elrviZOX0GybserV79IN4skB2nQg+NoOmkq30MNqVv9ggdqVmYjaolA==
+postcss@^8.1.0:
+  version "8.1.0"
+  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.1.0.tgz#1be330c7f6971d49726059b9f51785f45273fa70"
+  integrity sha512-d3RppIo1DI66oHxA1vdckr5qciQbMIrHvyzuvp2cLJHOLwJHg7X9ncrfw2Ri6Sgiwv/GoXtOwEHJ9E9VSRxXWQ==
   dependencies:
     colorette "^1.2.1"
     line-column "^1.0.2"
