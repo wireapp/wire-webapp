@@ -1119,12 +1119,12 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
-"@formatjs/cli@2.11.3":
-  version "2.11.3"
-  resolved "https://registry.yarnpkg.com/@formatjs/cli/-/cli-2.11.3.tgz#b06a740520aa0d5345adb2330d13447b4292840c"
-  integrity sha512-7aV3B/16GkHX5Stna9GoKU2o6/At0zxW7PYATRZujf6gbSsIUMHpUZWnMNk0qaJtXeU+3HLsSquRflCaQruoJw==
+"@formatjs/cli@2.12.0":
+  version "2.12.0"
+  resolved "https://registry.yarnpkg.com/@formatjs/cli/-/cli-2.12.0.tgz#f0bb253db073903634e57e587e0395cd0d0cd681"
+  integrity sha512-F0epNBWCXjKGgej8GL1q4RLGqR38bRCPmGLb3VautkbZ74achB0cVGj2w/AdlQiJJ1mU5rEU13pRroukUBZ+GA==
   dependencies:
-    "@formatjs/ts-transformer" "^2.10.1"
+    "@formatjs/ts-transformer" "^2.11.0"
     "@types/json-stable-stringify" "^1.0.32"
     "@types/lodash" "^4.14.150"
     "@types/loud-rejection" "^2.0.0"
@@ -1178,10 +1178,10 @@
     intl-messageformat "^9.3.8"
     intl-messageformat-parser "^6.0.7"
 
-"@formatjs/ts-transformer@^2.10.1":
-  version "2.10.1"
-  resolved "https://registry.yarnpkg.com/@formatjs/ts-transformer/-/ts-transformer-2.10.1.tgz#883d77c37a6752e3491be3ffdd705beb85cfd6f8"
-  integrity sha512-d5zpKWnk52bgA7Xf3KteiJ4r5RnDnIGUoUXD32yFiJVZRpPyUeEcuuyBS/1mxb7UDRpFB2gDqimYlqhjeURozA==
+"@formatjs/ts-transformer@^2.11.0":
+  version "2.11.0"
+  resolved "https://registry.yarnpkg.com/@formatjs/ts-transformer/-/ts-transformer-2.11.0.tgz#90c4b5afae55fd8b8c7ab6aa08ca94a123eb94b9"
+  integrity sha512-d0++zpEeeCtE+RwbEB+TYw0WnC+jlNniIZu9NcILdgN6LEr9+TRxO+Gz4d7nj3g0D5X1LyNx6P4JI+byGxHqzw==
   dependencies:
     intl-messageformat-parser "^6.0.7"
     typescript "^4.0"
@@ -1629,25 +1629,25 @@
   resolved "https://registry.yarnpkg.com/@types/minimist/-/minimist-1.2.0.tgz#69a23a3ad29caf0097f06eda59b361ee2f0639f6"
   integrity sha1-aaI6OtKcrwCX8G7aWbNh7i8GOfY=
 
-"@types/node@*", "@types/node@^13.7.0":
-  version "13.13.12"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-13.13.12.tgz#9c72e865380a7dc99999ea0ef20fc9635b503d20"
-  integrity sha512-zWz/8NEPxoXNT9YyF2osqyA9WjssZukYpgI4UYZpOjcyqwIUqWGkcCionaEb9Ki+FULyPyvNFpg/329Kd2/pbw==
+"@types/node@*", "@types/node@14":
+  version "14.11.2"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-14.11.2.tgz#2de1ed6670439387da1c9f549a2ade2b0a799256"
+  integrity sha512-jiE3QIxJ8JLNcb1Ps6rDbysDhN4xa8DJJvuC9prr6w+1tIh+QAbYyNF3tyiZNLDBIuBCf4KEcV2UvQm/V60xfA==
 
 "@types/node@13.13.4":
   version "13.13.4"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-13.13.4.tgz#1581d6c16e3d4803eb079c87d4ac893ee7501c2c"
   integrity sha512-x26ur3dSXgv5AwKS0lNfbjpCakGIduWU1DU91Zz58ONRWrIKGunmZBNv4P7N+e27sJkiGDsw/3fT4AtsqQBrBA==
 
-"@types/node@14":
-  version "14.11.2"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-14.11.2.tgz#2de1ed6670439387da1c9f549a2ade2b0a799256"
-  integrity sha512-jiE3QIxJ8JLNcb1Ps6rDbysDhN4xa8DJJvuC9prr6w+1tIh+QAbYyNF3tyiZNLDBIuBCf4KEcV2UvQm/V60xfA==
-
 "@types/node@^10.1.0":
   version "10.14.22"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.14.22.tgz#34bcdf6b6cb5fc0db33d24816ad9d3ece22feea4"
   integrity sha512-9taxKC944BqoTVjE+UT3pQH0nHZlTvITwfsOZqyc+R3sfJuxaTtxWjfn1K2UlxyPcKHf0rnaXcVFrS9F9vf0bw==
+
+"@types/node@^13.7.0":
+  version "13.13.12"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-13.13.12.tgz#9c72e865380a7dc99999ea0ef20fc9635b503d20"
+  integrity sha512-zWz/8NEPxoXNT9YyF2osqyA9WjssZukYpgI4UYZpOjcyqwIUqWGkcCionaEb9Ki+FULyPyvNFpg/329Kd2/pbw==
 
 "@types/node@~12":
   version "12.12.14"
@@ -3852,12 +3852,7 @@ commander@^3.0.1:
   resolved "https://registry.yarnpkg.com/commander/-/commander-3.0.2.tgz#6837c3fb677ad9933d1cfba42dd14d5117d6b39e"
   integrity sha512-Gar0ASD4BDyKC4hl4DwHqDrmvjoxWKZigVnAbn5H1owvm4CxCPdb0HQDehwNYMJpla5+M2tPmPARzhtYuwpHow==
 
-commander@^6.0.0:
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/commander/-/commander-6.0.0.tgz#2b270da94f8fb9014455312f829a1129dbf8887e"
-  integrity sha512-s7EA+hDtTYNhuXkTlhqew4txMZVdszBmKWSPEMxGr8ru8JXR7bLUFIAtPhcSuFdJQ0ILMxnJi8GkQL0yvDy/YA==
-
-commander@^6.1.0:
+commander@^6.0.0, commander@^6.1.0:
   version "6.1.0"
   resolved "https://registry.yarnpkg.com/commander/-/commander-6.1.0.tgz#f8d722b78103141006b66f4c7ba1e97315ba75bc"
   integrity sha512-wl7PNrYWd2y5mp1OK/LhTlv8Ff4kQJQRXXAvF+uU/TPNiVJUxZLRYGj/B0y/lPGAVcSbJqH2Za/cvHmrPMC8mA==
