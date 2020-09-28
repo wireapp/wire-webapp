@@ -114,6 +114,7 @@ export const WebAppEvents = {
     },
     PERSIST_STATE: 'wire.webapp.conversation.persist_state',
     SHOW: 'wire.webapp.conversation.show',
+    VERIFICATION_STATE_CHANGED: 'wire.webapp.conversation.verification_state_changed',
   },
   DEBUG: {
     UPDATE_LAST_CALL_STATUS: 'wire.webapp.debug.update_last_call_status',
