@@ -446,11 +446,43 @@ export class CallingRepository {
     amplify.subscribe(WebAppEvents.CALL.STATE.TOGGLE, this.toggleState.bind(this)); // This event needs to be kept, it is sent by the wrapper
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_VBR_ENCODING, this.toggleCbrEncoding.bind(this));
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_SFT_CALLING, this.toggleSftCalling.bind(this));
+    amplify.subscribe(WebAppEvents.CONVERSATION.VERIFICATION_STATE_CHANGED, this.onClientVerificationChanged);
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, ({settings}: WebappProperties) => {
       this.toggleCbrEncoding(settings.call.enable_vbr_encoding);
       this.toggleSftCalling(settings.call.enable_sft_calling);
     });
   }
+
+  /**
+   * Leave call when a participant is not verified anymore
+   */
+  private readonly onClientVerificationChanged = async (userIds: string, isVerified: boolean) => {
+    const activeCall = this.joinedCall();
+    if (!activeCall || isVerified) {
+      return;
+    }
+
+    for (const userId of userIds) {
+      const clients = this.userRepository.findUserById(userId).devices();
+
+      for (const {id: clientId} of clients) {
+        const participant = activeCall.getParticipant(userId, clientId);
+
+        if (participant) {
+          this.leaveCall(activeCall.conversationId);
+          amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+            action: {
+              title: t('callDegradationAction'),
+            },
+            text: {
+              message: t('callDegradationDescription', participant.user.name()),
+              title: t('callDegradationTitle'),
+            },
+          });
+        }
+      }
+    }
+  };
 
   //##############################################################################
   // Inbound call events
