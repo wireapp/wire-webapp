@@ -472,6 +472,22 @@ export class CallingRepository {
     this.leaveCall(conversationId);
   }
 
+  private warnOutdatedClient(conversationId: string) {
+    const brandName = Config.getConfig().BRAND_NAME;
+    amplify.publish(
+      WebAppEvents.WARNING.MODAL,
+      ModalsViewModel.TYPE.ACKNOWLEDGE,
+      {
+        close: () => this.acceptVersionWarning(conversationId),
+        text: {
+          message: t('modalCallUpdateClientMessage', brandName),
+          title: t('modalCallUpdateClientHeadline', brandName),
+        },
+      },
+      'update-client-warning',
+    );
+  }
+
   /**
    * Handle incoming calling events from backend.
    */
@@ -525,19 +541,7 @@ export class CallingRepository {
         res === ERROR.UNKNOWN_PROTOCOL &&
         event.content.type === 'CONFSTART'
       ) {
-        const brandName = Config.getConfig().BRAND_NAME;
-        amplify.publish(
-          WebAppEvents.WARNING.MODAL,
-          ModalsViewModel.TYPE.ACKNOWLEDGE,
-          {
-            close: () => this.acceptVersionWarning(conversationId),
-            text: {
-              message: t('modalCallUpdateClientMessage', brandName),
-              title: t('modalCallUpdateClientHeadline', brandName),
-            },
-          },
-          'update-client-warning',
-        );
+        this.warnOutdatedClient(conversationId);
       }
       return;
     }
@@ -896,6 +900,11 @@ export class CallingRepository {
     if (!call) {
       return;
     }
+
+    if (reason === REASON.OUTDATED_CLIENT) {
+      this.warnOutdatedClient(conversationId);
+    }
+
     const stillActiveState = [REASON.STILL_ONGOING, REASON.ANSWERED_ELSEWHERE, REASON.REJECTED];
 
     this.sendCallingEvent(EventName.CALLING.ENDED_CALL, call, {
@@ -980,7 +989,7 @@ export class CallingRepository {
 
     this.storeCall(call);
     this.incomingCallCallback(call);
-    this.sendCallingEvent(EventName.CALLING.RECIEVED_CALL, call);
+    this.sendCallingEvent(EventName.CALLING.RECEIVED_CALL, call);
   };
 
   private readonly updateCallState = (conversationId: ConversationId, state: number) => {
