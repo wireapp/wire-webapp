@@ -20,7 +20,7 @@
 const pkg = require('./package.json');
 const appConfigPkg = require('./app-config/package.json');
 const {execSync} = require('child_process');
-const dotenv = require('dotenv-extended');
+const dotenv = require('dotenv');
 
 dotenv.load();
 
