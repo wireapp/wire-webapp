@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.7.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/webapp-events/compare/@wireapp/webapp-events@0.6.1...@wireapp/webapp-events@0.7.0) (2020-09-28)
+
+
+### Features
+
+* **webapp-events:** Add CONVERSATION.VERIFICATION_STATE_CHANGED (WEBAPP-7106) ([#3242](https://github.com/wireapp/wire-web-packages/tree/master/packages/webapp-events/issues/3242)) ([faad6ca](https://github.com/wireapp/wire-web-packages/tree/master/packages/webapp-events/commit/faad6ca36d4615621e138067c4d0d13bdbe9f9d9))
+
+
+
+
+
 ## [0.6.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/webapp-events/compare/@wireapp/webapp-events@0.6.0...@wireapp/webapp-events@0.6.1) (2020-09-21)
 
 **Note:** Version bump only for package @wireapp/webapp-events
