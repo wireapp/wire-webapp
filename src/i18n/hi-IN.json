@@ -136,7 +136,7 @@
   "authVerifyAccountHeadline": "ईमेल पता तथा पासवर्ड को जोड़े|",
   "authVerifyAccountLogout": "लॉग आउट करें",
   "authVerifyCodeChangePhone": "फ़ोन नंबर को बदलें",
-  "authVerifyCodeDescription": "हमने {number} पे जो सत्यापन कोड भेजी है, उसे दर्ज करें|",
+  "authVerifyCodeDescription": "Enter the verification code we sent to {number}.",
   "authVerifyCodeResend": "कोई कोड दिख नहीं रहा?",
   "authVerifyCodeResendDetail": "फिर से भेजें",
   "authVerifyCodeResendTimer": "आप एक नया कोड {{expiration}} का अनुरोध कर सकते हैं|",

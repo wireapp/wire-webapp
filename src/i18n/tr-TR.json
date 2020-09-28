@@ -136,7 +136,7 @@
   "authVerifyAccountHeadline": "Bir e-posta adresi ve şifre ekleyin.",
   "authVerifyAccountLogout": "Çıkış yap",
   "authVerifyCodeChangePhone": "Telefon numarasını değiştir",
-  "authVerifyCodeDescription": "{number} gönderdiğimiz doğrulama kodunu girin.",
+  "authVerifyCodeDescription": "Enter the verification code we sent to {number}.",
   "authVerifyCodeResend": "Kod gelmedi mi?",
   "authVerifyCodeResendDetail": "Tekrar gönder",
   "authVerifyCodeResendTimer": "{{expiration}} içerisinde yeni bir kod isteyebilirsiniz.",

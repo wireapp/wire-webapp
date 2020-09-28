@@ -136,7 +136,7 @@
   "authVerifyAccountHeadline": "添加电子邮件地址和密码。",
   "authVerifyAccountLogout": "退出",
   "authVerifyCodeChangePhone": "更改电话号码",
-  "authVerifyCodeDescription": "请输入我们发送至 {number} 的验证码。",
+  "authVerifyCodeDescription": "Enter the verification code we sent to {number}.",
   "authVerifyCodeResend": "没收到验证码？",
   "authVerifyCodeResendDetail": "重发",
   "authVerifyCodeResendTimer": "您可以在 {{expiration}} 后请求新的验证码。",
