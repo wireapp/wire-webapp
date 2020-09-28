@@ -136,7 +136,7 @@
   "authVerifyAccountHeadline": "メールアドレスとパスワードを追加",
   "authVerifyAccountLogout": "ログアウト",
   "authVerifyCodeChangePhone": "電話番号を変更する",
-  "authVerifyCodeDescription": "{number} に送信された認証コードを入力してください。",
+  "authVerifyCodeDescription": "Enter the verification code we sent to {number}.",
   "authVerifyCodeResend": "コードが表示されていませんか?",
   "authVerifyCodeResendDetail": "再送する",
   "authVerifyCodeResendTimer": "新しいコード \"{{expiration}}\" を要求することができます。",

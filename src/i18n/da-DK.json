@@ -136,7 +136,7 @@
   "authVerifyAccountHeadline": "Tilføj email adresse og adgangskode.",
   "authVerifyAccountLogout": "Log ud",
   "authVerifyCodeChangePhone": "Ændre telefon nummer",
-  "authVerifyCodeDescription": "Indtast bekræftelseskoden vi sendte til {number}.",
+  "authVerifyCodeDescription": "Enter the verification code we sent to {number}.",
   "authVerifyCodeResend": "Ingen kode vist?",
   "authVerifyCodeResendDetail": "Gensend",
   "authVerifyCodeResendTimer": "Du kan anmode om en ny kode {{expiration}}.",

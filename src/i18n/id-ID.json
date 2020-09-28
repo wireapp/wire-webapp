@@ -136,7 +136,7 @@
   "authVerifyAccountHeadline": "Tambahkan alamat email dan sandi.",
   "authVerifyAccountLogout": "Keluar",
   "authVerifyCodeChangePhone": "Ubah nomor telepon",
-  "authVerifyCodeDescription": "Masukkan kode verifikasi yang kami kirim ke {number}.",
+  "authVerifyCodeDescription": "Enter the verification code we sent to {number}.",
   "authVerifyCodeResend": "Tidak ada kode yang muncul?",
   "authVerifyCodeResendDetail": "Kirim lagi",
   "authVerifyCodeResendTimer": "Anda dapat meminta kode baru {{expiration}} .",

@@ -136,7 +136,7 @@
   "authVerifyAccountHeadline": "Adaugă o adresă de e-mail și o parolă.",
   "authVerifyAccountLogout": "Deconectare",
   "authVerifyCodeChangePhone": "Schimbă numărul de telefon",
-  "authVerifyCodeDescription": "Introdu codul de verificare\nl-am trimis la {number}.",
+  "authVerifyCodeDescription": "Enter the verification code we sent to {number}.",
   "authVerifyCodeResend": "Nu e afișat niciun cod?",
   "authVerifyCodeResendDetail": "Retrimite",
   "authVerifyCodeResendTimer": "Poți cere un nou cod de {{expiration}}.",

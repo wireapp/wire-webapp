@@ -136,7 +136,7 @@
   "authVerifyAccountHeadline": "Προσθέστε email και κωδικό πρόσβασης.",
   "authVerifyAccountLogout": "Αποσύνδεση",
   "authVerifyCodeChangePhone": "Αλλαγή αριθμού τηλεφώνου",
-  "authVerifyCodeDescription": "Εισάγετε τον κωδικό επαλήθευσης που στείλαμε στο {number}.",
+  "authVerifyCodeDescription": "Enter the verification code we sent to {number}.",
   "authVerifyCodeResend": "Δεν εμφανίζεται ο κωδικός,",
   "authVerifyCodeResendDetail": "Επαναποστολή",
   "authVerifyCodeResendTimer": "Μπορείτε να ζητήσετε νέο κωδικό {{expiration}}.",

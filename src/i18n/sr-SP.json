@@ -136,7 +136,7 @@
   "authVerifyAccountHeadline": "Додај адресу е-поште и лозинку.",
   "authVerifyAccountLogout": "Одјави се",
   "authVerifyCodeChangePhone": "Промени број телефона",
-  "authVerifyCodeDescription": "Унесите верификациони код\nкоји смо послали на {number}.",
+  "authVerifyCodeDescription": "Enter the verification code we sent to {number}.",
   "authVerifyCodeResend": "Не приказује се код?",
   "authVerifyCodeResendDetail": "Понови",
   "authVerifyCodeResendTimer": "Нови код можете затражити {{expiration}}.",

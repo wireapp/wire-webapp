@@ -136,7 +136,7 @@
   "authVerifyAccountHeadline": "加入電子郵件信箱位址以及密碼。",
   "authVerifyAccountLogout": "登出",
   "authVerifyCodeChangePhone": "更改電話號碼",
-  "authVerifyCodeDescription": "請輸入我們發送到 {number} 的驗證碼。",
+  "authVerifyCodeDescription": "Enter the verification code we sent to {number}.",
   "authVerifyCodeResend": "沒收到驗證碼？",
   "authVerifyCodeResendDetail": "重新發送",
   "authVerifyCodeResendTimer": "您可以在 {{expiration}} 後索取新的驗證碼。",
