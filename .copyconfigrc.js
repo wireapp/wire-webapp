@@ -20,6 +20,7 @@
 const pkg = require('./package.json');
 const appConfigPkg = require('./app-config/package.json');
 const {execSync} = require('child_process');
+require('dotenv').config();
 
 /**
  * Selects configuration based on current branch and tagged commits
@@ -31,48 +32,29 @@ const selectConfiguration = () => {
     console.log(`Selecting configuration "${distribution}" (reason: custom distribution)`);
     return distribution;
   }
-  let currentBranch = '';
   let currentTag = '';
-
-  try {
-    currentBranch = execSync('git rev-parse --abbrev-ref HEAD').toString().trim();
-  } catch (error) {}
   try {
     currentTag = execSync('git tag -l --points-at HEAD').toString().trim();
   } catch (error) {}
 
-  switch (currentBranch) {
-    case 'dev': {
-      // On staging bump use production config
-      if (currentTag.includes('staging')) {
-        console.log(`Selecting configuration "master" (reason: branch "${currentBranch}" & tag "${currentTag}")`);
-        return 'master';
-      }
-      // When merging master back to dev with the last commit being a production release tag
-      // And for all other cases
-      console.log(`Selecting configuration "staging" (reason: branch "${currentBranch}")`);
-      return 'staging';
-    }
-    case 'master': {
-      // On production release use production config
-      if (currentTag.includes('production')) {
-        console.log(`Selecting configuration "master" (reason: branch "${currentBranch}" & tag "${currentTag}")`);
-        return 'master';
-      }
-      // When merging dev into master with the last commit being a staging bump tag
-      // And for all other cases
-      console.log(`Selecting configuration "staging" (reason: branch "${currentBranch}")`);
-      return 'staging';
-    }
-    default: {
-      console.log('Selecting configuration "staging" (reason: default)');
-      return 'staging';
-    }
+  if (currentTag.includes('staging') || currentTag.includes('production')) {
+    console.log(`Selecting configuration "master" (reason: tag "${currentTag}")`);
+    return 'master';
   }
+
+  console.log('Selecting configuration "staging" (reason: default)');
+  return 'staging';
 };
 
-const configurationEntry = `wire-web-config-default-${selectConfiguration()}`;
-const repositoryUrl = appConfigPkg.dependencies[configurationEntry];
+let repositoryUrl;
+const forcedConfigUrl = process.env.FORCED_CONFIG_URL;
+if (forcedConfigUrl) {
+  console.log(`Selecting configuration "${forcedConfigUrl}" (reason: forced config URL)`);
+  repositoryUrl = forcedConfigUrl;
+} else {
+  const configurationEntry = `wire-web-config-default-${selectConfiguration()}`;
+  repositoryUrl = appConfigPkg.dependencies[configurationEntry];
+}
 
 console.log('Repo URL', repositoryUrl);
 

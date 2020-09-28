@@ -17,25 +17,12 @@
  *
  */
 
-/* eslint-disable sort-keys-fix/sort-keys-fix */
 import ko from 'knockout';
 
-import {Logger, getLogger} from 'Util/Logger';
+import {getLogger} from 'Util/Logger';
 
-export interface ServerTimeHandler {
-  computeTimeOffset: (serverTimeString: string) => void;
-  getTimeOffset: () => number;
-  logger: Logger;
-  timeOffset: ko.Observable<number>;
-  toLocalTimestamp: (serverTimestamp?: number) => number;
-  toServerTimestamp: (localTimestamp?: number) => number;
-}
-
-export const serverTimeHandler: ServerTimeHandler = {
-  logger: getLogger('serverTimeHandler'),
-  timeOffset: ko.observable(undefined),
-
-  computeTimeOffset(serverTimeString): void {
+export const serverTimeHandler = {
+  computeTimeOffset(serverTimeString: string): void {
     const timeOffset = Date.now() - new Date(serverTimeString).valueOf();
     this.timeOffset(timeOffset);
     this.logger.info(`Current backend time is '${serverTimeString}'. Time offset updated to '${this.timeOffset()}' ms`);
@@ -49,14 +36,8 @@ export const serverTimeHandler: ServerTimeHandler = {
     return this.timeOffset();
   },
 
-  /**
-   * Converts a local timestamp to a server timestamp.
-   * @param localTimestamp the local timestamp to convert
-   * @returns the timestamp adjusted with the client/server time shift
-   */
-  toServerTimestamp(localTimestamp = Date.now()): number {
-    return localTimestamp - this.getTimeOffset();
-  },
+  logger: getLogger('serverTimeHandler'),
+  timeOffset: ko.observable(undefined) as ko.Observable<number>,
 
   /**
    * Converts a server timestamp to a local timestamp.
@@ -66,4 +47,15 @@ export const serverTimeHandler: ServerTimeHandler = {
   toLocalTimestamp(serverTimestamp = Date.now()): number {
     return serverTimestamp + this.getTimeOffset();
   },
+
+  /**
+   * Converts a local timestamp to a server timestamp.
+   * @param localTimestamp the local timestamp to convert
+   * @returns the timestamp adjusted with the client/server time shift
+   */
+  toServerTimestamp(localTimestamp = Date.now()): number {
+    return localTimestamp - this.getTimeOffset();
+  },
 };
+
+export type ServerTimeHandler = typeof serverTimeHandler;
