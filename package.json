@@ -7,7 +7,7 @@
     "@wireapp/react-ui-kit": "7.37.2",
     "@wireapp/store-engine-dexie": "1.3.14",
     "@wireapp/store-engine-sqleet": "1.3.20",
-    "@wireapp/webapp-events": "0.6.0",
+    "@wireapp/webapp-events": "0.7.0",
     "amplify": "git+https://git@github.com/wireapp/amplify",
     "core-js": "2.6.10",
     "countly-sdk-web": "20.4.0",
