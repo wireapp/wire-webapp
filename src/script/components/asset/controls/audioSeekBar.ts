@@ -27,7 +27,6 @@ interface Params {
   // TODO: replace with proper Type once they are defined
   asset: any;
   disabled: ko.Subscribable<boolean>;
-
   src: HTMLAudioElement;
 }
 

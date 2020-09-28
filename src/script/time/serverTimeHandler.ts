@@ -27,6 +27,7 @@ export const serverTimeHandler = {
     this.timeOffset(timeOffset);
     this.logger.info(`Current backend time is '${serverTimeString}'. Time offset updated to '${this.timeOffset()}' ms`);
   },
+
   getTimeOffset(): number {
     if (this.timeOffset() === undefined) {
       this.logger.warn('Trying to get server/client time offset, but no server time has been set.');
@@ -41,7 +42,7 @@ export const serverTimeHandler = {
   /**
    * Converts a server timestamp to a local timestamp.
    * @param serverTimestamp the server timestamp to convert
-   * @returns localTimestamp - the timestamp adjusted with the client/server time shift
+   * @returns the timestamp adjusted with the client/server time shift
    */
   toLocalTimestamp(serverTimestamp = Date.now()): number {
     return serverTimestamp + this.getTimeOffset();
@@ -50,7 +51,7 @@ export const serverTimeHandler = {
   /**
    * Converts a local timestamp to a server timestamp.
    * @param localTimestamp the local timestamp to convert
-   * @returns serverTimestamp - the timestamp adjusted with the client/server time shift
+   * @returns the timestamp adjusted with the client/server time shift
    */
   toServerTimestamp(localTimestamp = Date.now()): number {
     return localTimestamp - this.getTimeOffset();

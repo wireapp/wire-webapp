@@ -72,34 +72,36 @@ export class Configuration {
   readonly VERSION = env.VERSION || '0.0.0';
   readonly WEBSITE_LABEL = env.WEBSITE_LABEL;
 
-  // 25 megabyte upload limit for personal use (private users & guests)
+  /** 25 megabyte upload limit for personal use (private users & guests) */
   readonly MAXIMUM_ASSET_FILE_SIZE_PERSONAL = 25 * 1024 * 1024;
 
-  // 100 megabyte upload limit for organizations (team members)
+  /** 100 megabyte upload limit for organizations (team members) */
   readonly MAXIMUM_ASSET_FILE_SIZE_TEAM = 100 * 1024 * 1024;
 
-  // 15 megabyte image upload limit
+  /** 15 megabyte image upload limit */
   readonly MAXIMUM_IMAGE_FILE_SIZE = 15 * 1024 * 1024;
 
-  // maximum chars for link preview titles and descriptions
+  /** maximum chars for link preview titles and descriptions */
   readonly MAXIMUM_LINK_PREVIEW_CHARS = 200;
 
-  // Maximum characters per sent message
+  /** Maximum characters per sent message */
   readonly MAXIMUM_MESSAGE_LENGTH = 8000;
 
-  // Maximum characters per received message
-  // Encryption is approx. +40% of the original payload so let's round it at +50%
+  /**
+   * Maximum characters per received message
+   * Encryption is approx. +40% of the original payload so let's round it at +50%
+   */
   readonly MAXIMUM_MESSAGE_LENGTH_RECEIVING = 12000 * 1.5;
 
-  // bigger requests will be split in chunks with a maximum size as defined
+  /** bigger requests will be split in chunks with a maximum size as defined */
   readonly MAXIMUM_USERS_PER_REQUEST = 200;
 
-  // number of messages that will be pulled
+  /** number of messages that will be pulled */
   readonly MESSAGES_FETCH_LIMIT = 30;
 
   readonly MINIMUM_PASSWORD_LENGTH = 8;
 
-  // measured in pixel
+  /** measured in pixel */
   readonly SCROLL_TO_LAST_MESSAGE_THRESHOLD = 100;
 
   readonly ALLOWED_IMAGE_TYPES = ['image/bmp', 'image/gif', 'image/jpeg', 'image/jpg', 'image/png', '.jpg-large'];

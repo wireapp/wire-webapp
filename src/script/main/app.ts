@@ -362,7 +362,6 @@ class App {
 
   /**
    * Subscribe to amplify events.
-   * @returns No return value
    */
   private _subscribeToEvents() {
     amplify.subscribe(WebAppEvents.LIFECYCLE.REFRESH, this.refresh.bind(this));
@@ -393,7 +392,6 @@ class App {
    * @todo Check if we really need to logout the user in all these error cases or how to recover from them
    *
    * @param App init after page reload
-   * @returns No return value
    */
   async initApp() {
     // add body information

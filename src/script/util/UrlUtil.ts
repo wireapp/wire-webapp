@@ -86,7 +86,7 @@ export const getLinksFromHtml = <T extends HTMLElement>(html: string): T[] => {
 };
 
 /**
- * Prepends http to given url if protocol missing
+ * Prepends "http" to given URL if protocol is missing
  * @param url URL to be prepended
  * @returns prepended URL
  */

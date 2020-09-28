@@ -24,7 +24,6 @@ export const COOKIE_NAME_APP_OPENED = 'app_opened';
 
 export const isAppAlreadyOpen = (state: RootState) => {
   const selectedCookie: {[key: string]: any} = getCookies(state)[COOKIE_NAME_APP_OPENED];
-  // @ts-ignore
   return selectedCookie ? selectedCookie['appInstanceId'] !== Config.getConfig().APP_INSTANCE_ID : false;
 };
 export const getCookies = (state: RootState): {[key: string]: object} => state.cookieState.cookies || {};
