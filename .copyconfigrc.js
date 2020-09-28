@@ -20,9 +20,7 @@
 const pkg = require('./package.json');
 const appConfigPkg = require('./app-config/package.json');
 const {execSync} = require('child_process');
-const dotenv = require('dotenv');
-
-dotenv.load();
+require('dotenv').config();
 
 /**
  * Selects configuration based on current branch and tagged commits
