@@ -68,14 +68,14 @@ export class PreferenceNotificationRepository {
         : resetStoreValue(notificationsStorageKey);
     });
 
-    amplify.subscribe(WebAppEvents.USER.CLIENT_ADDED, (userId: string, data: ClientEntity) => {
+    amplify.subscribe(WebAppEvents.USER.CLIENT_ADDED, (userId: string, clientEntity?: ClientEntity) => {
       if (userId === selfUserObservable().id) {
-        this.onClientAdd(userId, data);
+        this.onClientAdd(userId, clientEntity);
       }
     });
-    amplify.subscribe(WebAppEvents.USER.CLIENT_REMOVED, (userId: string, data: string) => {
+    amplify.subscribe(WebAppEvents.USER.CLIENT_REMOVED, (userId: string, clientEntity?: string) => {
       if (userId === selfUserObservable().id) {
-        this.onClientRemove(userId, data);
+        this.onClientRemove(userId, clientEntity);
       }
     });
     amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent.bind(this));
@@ -94,7 +94,7 @@ export class PreferenceNotificationRepository {
       .sort((a, b) => prio(a) - prio(b));
   }
 
-  onClientAdd(userId: string, clientEntity: ClientEntity): void {
+  onClientAdd(_userId: string, clientEntity?: ClientEntity): void {
     if (clientEntity) {
       this.notifications.push({
         data: clientEntity,
@@ -103,7 +103,7 @@ export class PreferenceNotificationRepository {
     }
   }
 
-  onClientRemove(userId: string, clientId: string): void {
+  onClientRemove(_userId: string, clientId: string): void {
     this.notifications.remove(({data: clientEntity}) => {
       const isExpectedId = typeof clientEntity !== 'boolean' && clientEntity.id === clientId;
       return isExpectedId && (clientEntity as ClientEntity).isPermanent();
