@@ -102,16 +102,13 @@ describe('EventRepository', () => {
       spyOn(testFactory.event_repository, '_handleEvent');
       spyOn(testFactory.event_repository, '_distributeEvent');
 
-      spyOn(testFactory.notification_service, 'getNotifications').and.callFake(() => {
+      spyOn(testFactory.notification_service, 'getAllNotificationsForClient').and.callFake(() => {
         return new Promise(resolve => {
           window.setTimeout(() => {
-            resolve({
-              has_more: false,
-              notifications: [
-                {id: createRandomUuid(), payload: []},
-                {id: latestNotificationId, payload: []},
-              ],
-            });
+            resolve([
+              {id: createRandomUuid(), payload: []},
+              {id: latestNotificationId, payload: []},
+            ]);
           }, 10);
         });
       });
@@ -145,7 +142,7 @@ describe('EventRepository', () => {
 
       expect(testFactory.notification_service.getLastNotificationIdFromDb).toBeDefined();
       expect(testFactory.notification_service.getNotificationsLast).toHaveBeenCalledWith(clientId);
-      expect(testFactory.notification_service.getNotifications).toHaveBeenCalledWith(
+      expect(testFactory.notification_service.getAllNotificationsForClient).toHaveBeenCalledWith(
         clientId,
         latestNotificationId,
         EventRepository.CONFIG.NOTIFICATION_BATCHES.INITIAL,
