@@ -178,11 +178,17 @@ export class EventTrackingRepository {
 
   private trackProductReportingEvent(eventName: string, customSegmentations?: any): void {
     if (this.isProductReportingActivated === true) {
-      Countly.userData.set(UserData.IS_TEAM, this.userRepository.isTeam());
-      Countly.userData.set(UserData.CONTACTS, roundLogarithmic(this.userRepository.numberOfContacts(), 6));
-      Countly.userData.set(UserData.TEAM_SIZE, roundLogarithmic(this.userRepository.teamMembers().length, 6));
-      Countly.userData.set(UserData.TEAM_ID, this.userRepository.self().teamId);
-      Countly.userData.set(UserData.USER_TYPE, this.getUserType());
+      const userData = {
+        [UserData.IS_TEAM]: this.userRepository.isTeam(),
+        [UserData.CONTACTS]: roundLogarithmic(this.userRepository.numberOfContacts(), 6),
+        [UserData.TEAM_SIZE]: roundLogarithmic(this.userRepository.teamMembers().length, 6),
+        [UserData.TEAM_ID]: this.userRepository.self().teamId,
+        [UserData.USER_TYPE]: this.getUserType(),
+      };
+      Object.entries(userData).forEach(entry => {
+        const [key, value] = entry;
+        Countly.userData.set(key, value);
+      });
       Countly.userData.save();
 
       const segmentation = {
@@ -197,6 +203,7 @@ export class EventTrackingRepository {
         segmentation,
       });
 
+      this.logger.info(`Custom data for product event ${eventName}@${JSON.stringify(userData)}`);
       this.logger.info(`Reporting product event ${eventName}@${JSON.stringify(segmentation)}`);
     }
   }
