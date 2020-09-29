@@ -74,6 +74,8 @@ import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import type {Recipients} from '../cryptography/CryptographyRepository';
 import type {Conversation} from '../entity/Conversation';
 import type {UserRepository} from '../user/UserRepository';
+import {EventRecord} from '../storage';
+import {EventSource} from '../event/EventSource';
 
 interface MediaStreamQuery {
   audio?: boolean;
@@ -830,7 +832,7 @@ export class CallingRepository {
 
   private injectActivateEvent(conversationId: ConversationId, userId: UserId, time: string, source: string): void {
     const event = EventBuilder.buildVoiceChannelActivate(conversationId, userId, time, this.avsVersion);
-    this.eventRepository.injectEvent(event, source);
+    this.eventRepository.injectEvent((event as unknown) as EventRecord, source as EventSource);
   }
 
   private injectDeactivateEvent(
@@ -849,7 +851,7 @@ export class CallingRepository {
       time,
       this.avsVersion,
     );
-    this.eventRepository.injectEvent(event, source);
+    this.eventRepository.injectEvent((event as unknown) as EventRecord, source as EventSource);
   }
 
   private readonly sendMessage = (

@@ -21,9 +21,12 @@ import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {USER_EVENT} from '@wireapp/api-client/dist/event';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {amplify} from 'amplify';
+import ko from 'knockout';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
+import type {Notification} from '@wireapp/api-client/dist/notification';
 
-import {getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -42,8 +45,31 @@ import {validateEvent} from './EventValidator';
 import {ConversationError} from '../error/ConversationError';
 import {CryptographyError} from '../error/CryptographyError';
 import {EventError} from '../error/EventError';
+import type {EventService} from './EventService';
+import type {WebSocketService, CHANGE_TRIGGER} from './WebSocketService';
+import type {CryptographyRepository} from '../cryptography/CryptographyRepository';
+import type {ServerTimeHandler} from '../time/serverTimeHandler';
+import type {UserRepository} from '../user/UserRepository';
+import type {ClientEntity} from '../client/ClientEntity';
+import type {EventRecord} from '../storage';
+import type {NotificationService} from './NotificationService';
 
 export class EventRepository {
+  logger: Logger;
+  currentClient: ko.Observable<ClientEntity>;
+  notificationHandlingState: ko.Observable<NOTIFICATION_HANDLING_STATE>;
+  previousHandlingState: NOTIFICATION_HANDLING_STATE;
+  notificationsHandled: number;
+  notificationsLoaded: ko.Observable<boolean>;
+  notificationsPromises: [(value?: unknown) => void, (value?: unknown) => void];
+  notificationsTotal: number;
+  notificationsQueue: ko.ObservableArray<Notification>;
+  lastNotificationId: ko.Observable<string>;
+  notificationsBlocked: boolean;
+  webSocketBuffer: Notification[];
+  lastEventDate: ko.Observable<string>;
+  eventProcessMiddlewares: Function[];
+
   static get CONFIG() {
     return {
       E_CALL_EVENT_LIFETIME: TIME_IN_MILLIS.SECOND * 30,
@@ -73,30 +99,14 @@ export class EventRepository {
     };
   }
 
-  /**
-   * Construct a new Event Repository.
-   *
-   * @param {EventService} eventService Service that handles interactions with events
-   * @param {NotificationService} notificationService Service handling the notification stream
-   * @param {WebSocketService} webSocketService Service that connects to WebSocket
-   * @param {CryptographyRepository} cryptographyRepository Repository for all cryptography interactions
-   * @param {serverTimeHandler} serverTimeHandler Handles time shift between server and client
-   * @param {UserRepository} userRepository Repository for all user interactions
-   */
   constructor(
-    eventService,
-    notificationService,
-    webSocketService,
-    cryptographyRepository,
-    serverTimeHandler,
-    userRepository,
+    readonly eventService: EventService,
+    readonly notificationService: NotificationService,
+    private readonly webSocketService: WebSocketService,
+    private readonly cryptographyRepository: CryptographyRepository,
+    private readonly serverTimeHandler: ServerTimeHandler,
+    private readonly userRepository: UserRepository,
   ) {
-    this.eventService = eventService;
-    this.notificationService = notificationService;
-    this.webSocketService = webSocketService;
-    this.cryptographyRepository = cryptographyRepository;
-    this.serverTimeHandler = serverTimeHandler;
-    this.userRepository = userRepository;
     this.logger = getLogger('EventRepository');
 
     this.currentClient = undefined;
@@ -125,9 +135,7 @@ export class EventRepository {
     this.notificationsQueue = ko.observableArray([]);
     this.notificationsBlocked = false;
 
-    this.loadEvent = this.eventService.loadEvent.bind(this.eventService);
-
-    this.notificationsQueue.subscribe(notifications => {
+    this.notificationsQueue.subscribe((notifications): Promise<void> | void => {
       if (notifications.length) {
         if (this.notificationsBlocked) {
           return;
@@ -176,10 +184,9 @@ export class EventRepository {
    * Will set a middleware to run before the EventRepository actually processes the event.
    * Middleware is just a function with the following signature (Event) => Promise<Event>.
    *
-   * @param {Array<Function>} middlewares middlewares to run when a new event is about to be processed
-   * @returns {void} - returns nothing
+   * @param middlewares middlewares to run when a new event is about to be processed
    */
-  setEventProcessMiddlewares(middlewares) {
+  setEventProcessMiddlewares(middlewares: Function[]) {
     this.eventProcessMiddlewares = middlewares;
   }
 
@@ -197,7 +204,7 @@ export class EventRepository {
     }
 
     this.webSocketService.clientId = this.currentClient().id;
-    this.webSocketService.connect(notification => {
+    this.webSocketService.connect((notification): number | void => {
       const isHandlingWebSocket = this.notificationHandlingState() === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
       if (isHandlingWebSocket) {
         return this.notificationsQueue.push(notification);
@@ -208,35 +215,28 @@ export class EventRepository {
 
   /**
    * Close the WebSocket connection.
-   * @param {WebSocketService.CHANGE_TRIGGER} trigger Trigger of the disconnect
-   * @returns {undefined} No return value
+   * @param trigger Trigger of the disconnect
    */
-  disconnectWebSocket(trigger) {
+  disconnectWebSocket(trigger: CHANGE_TRIGGER) {
     this.webSocketService.reset(trigger);
   }
 
   /**
    * Re-connect the WebSocket connection.
-   * @param {WebSocketService.CHANGE_TRIGGER} trigger Trigger of the reconnect
-   * @returns {undefined} No return value
+   * @param trigger Trigger of the reconnect
+   * @returns No return value
    */
-  reconnectWebSocket(trigger) {
+  reconnectWebSocket(trigger: CHANGE_TRIGGER) {
     this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.RECOVERY);
     this.webSocketService.reconnect(trigger);
   }
 
-  /**
-   * Buffer an incoming notification.
-   * @param {Object} notification Notification data
-   * @returns {undefined} No return value
-   */
-  _bufferWebSocketNotification(notification) {
+  _bufferWebSocketNotification(notification: Notification) {
     this.webSocketBuffer.push(notification);
   }
 
   /**
    * Handle buffered notifications.
-   * @returns {undefined} No return value
    */
   _handleBufferedNotifications() {
     this.logger.info(`Received '${this.webSocketBuffer.length}' notifications via WebSocket while handling stream`);
@@ -249,7 +249,6 @@ export class EventRepository {
   //##############################################################################
   // Notification Stream handling
   //##############################################################################
-
   async _handleTimeDrift() {
     try {
       const time = await this.notificationService.getServerTime();
@@ -260,16 +259,15 @@ export class EventRepository {
       }
     }
   }
-
   /**
    * Get notifications for the current client from the stream.
    *
-   * @param {string} notificationId Event ID to start from
-   * @param {number} [limit=EventRepository.CONFIG.NOTIFICATION_BATCHES.MAX] Max. number of notifications to retrieve from backend at once
-   * @returns {Promise} Resolves when all new notifications from the stream have been handled
+   * @param notificationId Event ID to start from
+   * @param [limit=EventRepository.CONFIG.NOTIFICATION_BATCHES.MAX] Max. number of notifications to retrieve from backend at once
+   * @returns Resolves when all new notifications from the stream have been handled
    */
-  async getNotifications(notificationId, limit = EventRepository.CONFIG.NOTIFICATION_BATCHES.MAX) {
-    const processNotifications = notifications => {
+  async getNotifications(notificationId: string, limit = EventRepository.CONFIG.NOTIFICATION_BATCHES.MAX) {
+    const processNotifications = (notifications: Notification[]) => {
       if (notifications.length <= 0) {
         this.logger.info(`No notifications found since '${notificationId}'`);
         this.notificationsLoaded(true);
@@ -294,7 +292,6 @@ export class EventRepository {
       const notificationList = await this.notificationService.getAllNotificationsForClient(
         this.currentClient().id,
         notificationId,
-        limit,
       );
       // Note: `resolve` handle is needed to delay notification handling until buffered notifications from websocket are processed.
       return new Promise((resolve, reject) => {
@@ -411,27 +408,34 @@ export class EventRepository {
   /**
    * Get the last notification ID and set event date for a given client.
    *
-   * @param {string} clientId Client ID to retrieve last notification ID for
-   * @param {boolean} [isInitialization=false] Set initial date to 0 if not found
-   * @returns {Promise} Resolves when stream state has been initialized
+   * @param clientId Client ID to retrieve last notification ID for
+   * @param [isInitialization=false] Set initial date to 0 if not found
+   * @returns Resolves when stream state has been initialized
    */
-  setStreamState(clientId, isInitialization = false) {
-    return this.notificationService.getNotificationsLast(clientId).then(({id: notificationId, payload}) => {
-      const [event] = payload;
-      const isoDateString = this._getIsoDateFromEvent(event, isInitialization);
+  setStreamState(clientId: string, isInitialization = false) {
+    return this.notificationService.getNotificationsLast(clientId).then(
+      ({id: notificationId, payload}): Promise<(string | void)[]> => {
+        const [event] = payload;
+        const isoDateString = this._getIsoDateFromEvent(event as EventRecord, isInitialization) as string;
 
-      if (notificationId) {
-        const logMessage = isoDateString
-          ? `Set starting point on notification stream to '${notificationId}' (isoDateString)`
-          : `Reset starting point on notification stream to '${notificationId}'`;
-        this.logger.info(logMessage);
+        if (notificationId) {
+          const logMessage = isoDateString
+            ? `Set starting point on notification stream to '${notificationId}' (isoDateString)`
+            : `Reset starting point on notification stream to '${notificationId}'`;
+          this.logger.info(logMessage);
 
-        return Promise.all([this._updateLastEventDate(isoDateString), this._updateLastNotificationId(notificationId)]);
-      }
-    });
+          return Promise.all([
+            this._updateLastEventDate(isoDateString),
+            this._updateLastNotificationId(notificationId),
+          ]);
+        }
+
+        return undefined;
+      },
+    );
   }
 
-  _getIsoDateFromEvent(event, defaultValue = false) {
+  _getIsoDateFromEvent(event: EventRecord, defaultValue = false): string | void {
     const {client, connection, time: eventDate, type: eventType} = event;
 
     if (eventDate) {
@@ -457,10 +461,9 @@ export class EventRepository {
    * Get the ID of the last known notification.
    * @note Notifications that have not yet been handled but are in the queue should not be fetched again on recovery
    *
-   * @private
-   * @returns {string} ID of last known notification
+   * @returns ID of last known notification
    */
-  _getLastKnownNotificationId() {
+  private _getLastKnownNotificationId() {
     return this.notificationsQueue().length
       ? this.notificationsQueue()[this.notificationsQueue().length - 1].id
       : this.lastNotificationId();
@@ -479,11 +482,10 @@ export class EventRepository {
   /**
    * Fetch all missed events from the notification stream since the given last notification ID.
    *
-   * @private
-   * @param {string} lastNotificationId Last known notification ID to start update from
-   * @returns {Promise} Resolves with the total number of notifications
+   * @param lastNotificationId Last known notification ID to start update from
+   * @returns Resolves with the total number of notifications
    */
-  _updateFromStream(lastNotificationId) {
+  private _updateFromStream(lastNotificationId: string) {
     this.notificationsTotal = 0;
 
     return this.getNotifications(lastNotificationId, EventRepository.CONFIG.NOTIFICATION_BATCHES.INITIAL)
@@ -510,11 +512,10 @@ export class EventRepository {
   /**
    * Persist updated last event timestamp.
    *
-   * @private
-   * @param {string} eventDate Updated last event date
-   * @returns {Promise} Resolves when the last event date was stored
+   * @param eventDate Updated last event date
+   * @returns Resolves when the last event date was stored
    */
-  _updateLastEventDate(eventDate) {
+  private _updateLastEventDate(eventDate: string): Promise<string> | void {
     const didDateIncrease = eventDate > this.lastEventDate();
     if (didDateIncrease) {
       this.lastEventDate(eventDate);
@@ -525,15 +526,15 @@ export class EventRepository {
   /**
    * Persist updated last notification ID.
    *
-   * @private
-   * @param {string} notificationId Updated last notification ID
-   * @returns {Promise} Resolves when the last notification ID was stored
+   * @param notificationId Updated last notification ID
+   * @returns Resolves when the last notification ID was stored
    */
-  _updateLastNotificationId(notificationId) {
+  private _updateLastNotificationId(notificationId: string): Promise<string | void> {
     if (notificationId) {
       this.lastNotificationId(notificationId);
       return this.notificationService.saveLastNotificationIdToDb(notificationId);
     }
+    return Promise.resolve();
   }
 
   _updateProgress() {
@@ -556,11 +557,11 @@ export class EventRepository {
    * Inject event into a conversation.
    * @note Don't add unable to decrypt to self conversation
    *
-   * @param {ConversationEvent} event Event payload to be injected
-   * @param {string} [source=EventRepository.SOURCE.INJECTED] Source of injection
-   * @returns {Promise<Event>} Resolves when the event has been processed
+   * @param event Event payload to be injected
+   * @param [source=EventRepository.SOURCE.INJECTED] Source of injection
+   * @returns Resolves when the event has been processed
    */
-  injectEvent(event, source = EventRepository.SOURCE.INJECTED) {
+  injectEvent(event: EventRecord, source = EventRepository.SOURCE.INJECTED) {
     if (!event) {
       throw new EventError(EventError.TYPE.NO_EVENT, EventError.MESSAGE.NO_EVENT);
     }
@@ -582,12 +583,10 @@ export class EventRepository {
   /**
    * Distribute the given event.
    *
-   * @private
-   * @param {Object} event Mapped event to be distributed
-   * @param {EventRepository.SOURCE} source Source of notification
-   * @returns {undefined} No return value
+   * @param event Mapped event to be distributed
+   * @param source Source of notification
    */
-  _distributeEvent(event, source) {
+  private _distributeEvent(event: EventRecord, source: EventSource) {
     const {conversation: conversationId, from: userId, type} = event;
 
     const hasIds = conversationId && userId;
@@ -618,14 +617,17 @@ export class EventRepository {
   /**
    * Handle a single event from the notification stream or WebSocket.
    *
-   * @private
-   * @param {JSON} event Event coming from backend
-   * @param {EventRepository.SOURCE} source Source of event
-   * @returns {Promise} Resolves with the saved record or the plain event if the event was skipped
+   * @param event Event coming from backend
+   * @param source Source of event
+   * @returns Resolves with the saved record or the plain event if the event was skipped
    */
-  _handleEvent(event, source) {
+  _handleEvent(event: EventRecord, source: EventSource) {
     const logObject = {eventJson: JSON.stringify(event), eventObject: event};
-    const validationResult = validateEvent(event, source, this.lastEventDate());
+    const validationResult = validateEvent(
+      event as {time: string; type: CONVERSATION_EVENT | USER_EVENT},
+      source,
+      this.lastEventDate(),
+    );
     switch (validationResult) {
       default: {
         return Promise.resolve(event);
@@ -646,11 +648,11 @@ export class EventRepository {
   /**
    * Decrypts, saves and distributes an event received from the backend.
    *
-   * @param {JSON} event Backend event extracted from notification stream
-   * @param {EventRepository.SOURCE} source Source of event
-   * @returns {Promise} Resolves with the saved record or `true` if the event was skipped
+   * @param event Backend event extracted from notification stream
+   * @param source Source of event
+   * @returns Resolves with the saved record or `true` if the event was skipped
    */
-  async processEvent(event, source) {
+  async processEvent(event: EventRecord, source: EventSource) {
     const isEncryptedEvent = event.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD;
     if (isEncryptedEvent) {
       event = await this.cryptographyRepository.handleEncryptedEvent(event);
@@ -660,9 +662,9 @@ export class EventRepository {
       event = await eventProcessMiddleware(event);
     }
 
-    const shouldSaveEvent = EventTypeHandling.STORE.includes(event.type);
+    const shouldSaveEvent = EventTypeHandling.STORE.includes(event.type as CONVERSATION_EVENT);
     if (shouldSaveEvent) {
-      event = await this._handleEventSaving(event, source);
+      event = (await this._handleEventSaving(event)) as EventRecord;
     }
 
     return this._handleEventDistribution(event, source);
@@ -671,12 +673,11 @@ export class EventRepository {
   /**
    * Handle a saved event and distribute it.
    *
-   * @private
-   * @param {JSON} event Backend event extracted from notification stream
-   * @param {EventRepository.SOURCE} source Source of event
-   * @returns {JSON} The distributed event
+   * @param event Backend event extracted from notification stream
+   * @param source Source of event
+   * @returns The distributed event
    */
-  _handleEventDistribution(event, source) {
+  private _handleEventDistribution(event: EventRecord, source: EventSource) {
     const eventDate = this._getIsoDateFromEvent(event);
     const isInjectedEvent = source === EventRepository.SOURCE.INJECTED;
     const canSetEventDate = !isInjectedEvent && eventDate;
@@ -688,7 +689,7 @@ export class EventRepository {
        * modify the last event timestamp which we use to query the backend's notification stream.
        */
       if (event.type !== ClientEvent.CONVERSATION.VOICE_CHANNEL_DEACTIVATE) {
-        this._updateLastEventDate(eventDate);
+        this._updateLastEventDate(eventDate as string);
       }
     }
 
@@ -705,11 +706,10 @@ export class EventRepository {
   /**
    * Handle a mapped event, check for malicious ID use and save it.
    *
-   * @private
-   * @param {JSON} event Backend event extracted from notification stream
-   * @returns {Promise} Resolves with the saved event
+   * @param event Backend event extracted from notification stream
+   * @returns Resolves with the saved event
    */
-  _handleEventSaving(event) {
+  private _handleEventSaving(event: EventRecord) {
     const conversationId = event.conversation;
     const mappedData = event.data || {};
 
@@ -718,7 +718,7 @@ export class EventRepository {
       ? this.eventService.loadEvent(conversationId, mappedData.replacing_message_id)
       : Promise.resolve();
 
-    return findEventToReplacePromise.then(eventToReplace => {
+    return (findEventToReplacePromise as Promise<EventRecord>).then((eventToReplace: EventRecord) => {
       const hasLinkPreview = mappedData.previews && mappedData.previews.length;
       const isReplacementWithoutOriginal = !eventToReplace && mappedData.replacing_message_id;
       if (isReplacementWithoutOriginal && !hasLinkPreview) {
@@ -726,13 +726,13 @@ export class EventRepository {
         this._throwValidationError(event, 'Edit event without original event');
       }
 
-      const handleEvent = newEvent => {
+      const handleEvent = (newEvent: EventRecord) => {
         // check for duplicates (same id)
         const loadEventPromise = newEvent.id
           ? this.eventService.loadEvent(conversationId, newEvent.id)
           : Promise.resolve();
 
-        return loadEventPromise.then(storedEvent => {
+        return (loadEventPromise as Promise<EventRecord>).then((storedEvent: EventRecord) => {
           return storedEvent
             ? this._handleDuplicatedEvent(storedEvent, newEvent)
             : this.eventService.saveEvent(newEvent);
@@ -743,7 +743,7 @@ export class EventRepository {
     });
   }
 
-  _handleEventReplacement(originalEvent, newEvent) {
+  _handleEventReplacement(originalEvent: EventRecord, newEvent: EventRecord) {
     const newData = newEvent.data || {};
     if (originalEvent.data.from !== newData.from) {
       const logMessage = `ID previously used by user '${newEvent.from}'`;
@@ -765,7 +765,7 @@ export class EventRepository {
     return this.eventService.replaceEvent(identifiedUpdates);
   }
 
-  _handleDuplicatedEvent(originalEvent, newEvent) {
+  _handleDuplicatedEvent(originalEvent: EventRecord, newEvent: EventRecord) {
     switch (newEvent.type) {
       case ClientEvent.CONVERSATION.ASSET_ADD:
         return this._handleAssetUpdate(originalEvent, newEvent);
@@ -778,7 +778,7 @@ export class EventRepository {
     }
   }
 
-  _handleAssetUpdate(originalEvent, newEvent) {
+  _handleAssetUpdate(originalEvent: EventRecord, newEvent: EventRecord) {
     const newEventData = newEvent.data;
     // the preview status is not sent by the client so we fake a 'preview' status in order to cleanly handle it in the switch statement
     const ASSET_PREVIEW = 'preview';
@@ -809,7 +809,7 @@ export class EventRepository {
     }
   }
 
-  _handleLinkPreviewUpdate(originalEvent, newEvent) {
+  _handleLinkPreviewUpdate(originalEvent: EventRecord, newEvent: EventRecord) {
     const newEventData = newEvent.data;
     const originalData = originalEvent.data;
     if (originalEvent.from !== newEvent.from) {
@@ -841,7 +841,7 @@ export class EventRepository {
     return this.eventService.replaceEvent(identifiedUpdates);
   }
 
-  _getCommonMessageUpdates(originalEvent, newEvent) {
+  _getCommonMessageUpdates(originalEvent: EventRecord, newEvent: EventRecord) {
     return {
       ...newEvent,
       data: {...newEvent.data, expects_read_confirmation: originalEvent.data.expects_read_confirmation},
@@ -851,11 +851,11 @@ export class EventRepository {
     };
   }
 
-  _getUpdatesForEditMessage(originalEvent, newEvent) {
+  _getUpdatesForEditMessage(originalEvent: EventRecord, newEvent: EventRecord) {
     return {...newEvent, reactions: {}};
   }
 
-  _getUpdatesForLinkPreview(originalEvent, newEvent) {
+  _getUpdatesForLinkPreview(originalEvent: EventRecord, newEvent: EventRecord) {
     const newData = newEvent.data;
     const originalData = originalEvent.data;
     const updatingLinkPreview = !!originalData.previews.length;
@@ -882,7 +882,7 @@ export class EventRepository {
     };
   }
 
-  _throwValidationError(event, errorMessage, logMessage) {
+  _throwValidationError(event: EventRecord, errorMessage: string, logMessage?: string) {
     const baseLogMessage = `Ignored '${event.type}' (${event.id}) in '${event.conversation}' from '${event.from}':'`;
     const baseErrorMessage = 'Event validation failed:';
     this.logger.warn(`${baseLogMessage} ${logMessage || errorMessage}`, event);
@@ -892,13 +892,12 @@ export class EventRepository {
   /**
    * Handle all events from the payload of an incoming notification.
    *
-   * @private
-   * @param {Array} events Events contained in a notification
-   * @param {string} id Notification ID
-   * @param {boolean} transient Type of notification
-   * @returns {Promise} Resolves with the ID of the handled notification
+   * @param events Events contained in a notification
+   * @param id Notification ID
+   * @param transient Type of notification
+   * @returns Resolves with the ID of the handled notification
    */
-  _handleNotification({payload: events, id, transient}) {
+  private _handleNotification({payload: events, id, transient}: Notification): Promise<string | void> {
     const source = transient !== undefined ? EventRepository.SOURCE.WEB_SOCKET : EventRepository.SOURCE.STREAM;
     const isTransientEvent = !!transient;
     this.logger.info(`Handling notification '${id}' from '${source}' containing '${events.length}' events`, events);
@@ -908,7 +907,7 @@ export class EventRepository {
       return isTransientEvent ? Promise.resolve(id) : this._updateLastNotificationId(id);
     }
 
-    return Promise.all(events.map(event => this._handleEvent(event, source)))
+    return Promise.all(events.map(event => this._handleEvent(event as EventRecord, source)))
       .then(() => (isTransientEvent ? id : this._updateLastNotificationId(id)))
       .catch(error => {
         if (error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND) {
@@ -922,18 +921,17 @@ export class EventRepository {
   /**
    * Check if call event is handled within its valid lifespan.
    *
-   * @private
-   * @param {Object} event Event to validate
-   * @returns {true} Returns `true` if event is handled within it's lifetime, otherwise throws error
+   * @param event Event to validate
+   * @returns `true` if event is handled within it's lifetime, otherwise throws error
    */
-  _validateCallEventLifetime(event) {
+  private _validateCallEventLifetime(event: EventRecord): boolean {
     const {content = {}, conversation: conversationId, time, type} = event;
     const forcedEventTypes = [CALL_MESSAGE_TYPE.CANCEL, CALL_MESSAGE_TYPE.GROUP_LEAVE];
 
     const correctedTimestamp = this.serverTimeHandler.toServerTimestamp();
     const thresholdTimestamp = new Date(time).getTime() + EventRepository.CONFIG.E_CALL_EVENT_LIFETIME;
 
-    const isForcedEventType = forcedEventTypes.includes(content.type);
+    const isForcedEventType = forcedEventTypes.includes((content as {type: CALL_MESSAGE_TYPE}).type);
     const eventWithinThreshold = correctedTimestamp < thresholdTimestamp;
     const stateIsWebSocket = this.notificationHandlingState() === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
 

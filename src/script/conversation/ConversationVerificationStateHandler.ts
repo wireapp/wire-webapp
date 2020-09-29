@@ -30,6 +30,7 @@ import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import type {ConversationRepository} from './ConversationRepository';
 import {ConversationVerificationState} from './ConversationVerificationState';
 import {EventBuilder} from '../conversation/EventBuilder';
+import {EventRecord} from '../storage';
 
 export class ConversationVerificationStateHandler {
   conversationRepository: ConversationRepository;
@@ -137,7 +138,7 @@ export class ConversationVerificationStateHandler {
     if (this.willChangeToVerified(conversationEntity)) {
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
       const allVerifiedEvent = EventBuilder.buildAllVerified(conversationEntity, currentTimestamp);
-      this.eventRepository.injectEvent(allVerifiedEvent);
+      this.eventRepository.injectEvent(allVerifiedEvent as EventRecord);
 
       amplify.publish(
         WebAppEvents.CONVERSATION.VERIFICATION_STATE_CHANGED,
@@ -184,7 +185,7 @@ export class ConversationVerificationStateHandler {
 
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
       const event = EventBuilder.buildDegraded(conversationEntity, userIds, type, currentTimestamp);
-      this.eventRepository.injectEvent(event);
+      this.eventRepository.injectEvent(event as EventRecord);
 
       amplify.publish(WebAppEvents.CONVERSATION.VERIFICATION_STATE_CHANGED, userIds, false);
 
