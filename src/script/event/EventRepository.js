@@ -250,6 +250,17 @@ export class EventRepository {
   // Notification Stream handling
   //##############################################################################
 
+  async _handleTimeDrift() {
+    try {
+      const time = await this.notificationService.getServerTime();
+      this.serverTimeHandler.computeTimeOffset(time);
+    } catch (errorResponse) {
+      if (errorResponse.response?.time) {
+        this.serverTimeHandler.computeTimeOffset(errorResponse.response?.time);
+      }
+    }
+  }
+
   /**
    * Get notifications for the current client from the stream.
    *
@@ -257,64 +268,61 @@ export class EventRepository {
    * @param {number} [limit=EventRepository.CONFIG.NOTIFICATION_BATCHES.MAX] Max. number of notifications to retrieve from backend at once
    * @returns {Promise} Resolves when all new notifications from the stream have been handled
    */
-  getNotifications(notificationId, limit = EventRepository.CONFIG.NOTIFICATION_BATCHES.MAX) {
-    return new Promise(async (resolve, reject) => {
-      const _gotNotifications = ({has_more: hasAdditionalNotifications, notifications, time}) => {
-        if (time) {
-          this.serverTimeHandler.computeTimeOffset(time);
-        }
-
-        if (notifications.length > 0) {
-          notificationId = notifications[notifications.length - 1].id;
-
-          this.logger.info(`Added '${notifications.length}' notifications to the queue`);
-          this.notificationsQueue.push(...notifications);
-
-          if (!this.notificationsPromises) {
-            this.notificationsPromises = [resolve, reject];
-          }
-
-          this.notificationsTotal += notifications.length;
-
-          // FIXME: Just one more call to /notifications might not be enough. Consider using "getAllNotificationsForClient" from "NotificationsService".
-          if (hasAdditionalNotifications) {
-            return this.getNotifications(notificationId, EventRepository.CONFIG.NOTIFICATION_BATCHES.SUBSEQUENT);
-          }
-
-          this.notificationsLoaded(true);
-          this.logger.info(`Fetched '${this.notificationsTotal}' notifications from the backend`);
-          return notificationId;
-        }
+  async getNotifications(notificationId, limit = EventRepository.CONFIG.NOTIFICATION_BATCHES.MAX) {
+    const processNotifications = notifications => {
+      if (notifications.length <= 0) {
         this.logger.info(`No notifications found since '${notificationId}'`);
-        return reject(new EventError(EventError.TYPE.NO_NOTIFICATIONS, EventError.MESSAGE.NO_NOTIFICATIONS));
-      };
-
-      try {
-        const notificationList = await this.notificationService.getNotifications(
-          this.currentClient().id,
-          notificationId,
-          limit,
-        );
-        return _gotNotifications(notificationList);
-      } catch (errorResponse) {
-        // When asking for /notifications with a `since` set to a notification ID that the backend doesn't know of (because it does not belong to our client or it is older than the lifetime of the notification stream),
-        // we will receive a HTTP 404 status code with a `notifications` payload
-        // TODO: In the future we should ask the backend for the last known notification id (HTTP GET /notifications/{id}) instead of using the "errorResponse.notifications" payload
-        if (errorResponse.response?.notifications) {
-          this._triggerMissedSystemEventMessageRendering();
-          return _gotNotifications(errorResponse);
-        }
-
-        const isNotFound = errorResponse.response?.status === HTTP_STATUS.NOT_FOUND;
-        if (isNotFound) {
-          this.logger.info(`No notifications found since '${notificationId}'`, errorResponse);
-          return reject(new EventError(EventError.TYPE.NO_NOTIFICATIONS, EventError.MESSAGE.NO_NOTIFICATIONS));
-        }
-
-        this.logger.error(`Failed to get notifications: ${errorResponse.message}`, errorResponse);
-        return reject(new EventError(EventError.TYPE.REQUEST_FAILURE, EventError.MESSAGE.REQUEST_FAILURE));
+        this.notificationsLoaded(true);
+        return notificationId;
       }
-    });
+
+      notificationId = notifications[notifications.length - 1].id;
+
+      this.logger.info(`Added '${notifications.length}' notifications to the queue`);
+      this.notificationsQueue.push(...notifications);
+
+      this.notificationsTotal += notifications.length;
+
+      this.notificationsLoaded(true);
+      this.logger.info(`Fetched '${this.notificationsTotal}' notifications from the backend`);
+      return notificationId;
+    };
+
+    await this._handleTimeDrift();
+
+    try {
+      const notificationList = await this.notificationService.getAllNotificationsForClient(
+        this.currentClient().id,
+        notificationId,
+        limit,
+      );
+      // Note: `resolve` handle is needed to delay notification handling until buffered notifications from websocket are processed.
+      return new Promise((resolve, reject) => {
+        try {
+          this.notificationsPromises = [resolve, reject];
+          resolve(processNotifications(notificationList));
+        } catch (error) {
+          reject(error);
+        }
+      });
+    } catch (errorResponse) {
+      // When asking for /notifications with a `since` set to a notification ID that the backend doesn't know of (because it does not belong to our client or it is older than the lifetime of the notification stream),
+      // we will receive a HTTP 404 status code with a `notifications` payload
+      // TODO: In the future we should ask the backend for the last known notification id (HTTP GET /notifications/{id}) instead of using the "errorResponse.notifications" payload
+      if (errorResponse.response?.notifications) {
+        this._triggerMissedSystemEventMessageRendering();
+        return processNotifications(errorResponse.response?.notifications);
+      }
+
+      const isNotFound = errorResponse.response?.status === HTTP_STATUS.NOT_FOUND;
+      if (isNotFound) {
+        this.logger.info(`No notifications found since '${notificationId}'`, errorResponse);
+        throw new EventError(EventError.TYPE.NO_NOTIFICATIONS, EventError.MESSAGE.NO_NOTIFICATIONS);
+      }
+
+      this.logger.error(`Failed to get notifications: ${errorResponse.message}`, errorResponse);
+      throw new EventError(EventError.TYPE.REQUEST_FAILURE, EventError.MESSAGE.REQUEST_FAILURE);
+    }
   }
 
   /**
