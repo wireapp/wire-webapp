@@ -85,7 +85,7 @@ export class ConversationVerificationStateHandler {
    * Self user removed a client or other participants deleted clients.
    * @param userId ID of user that added client (can be self user ID)
    */
-  onClientRemoved(userId: string): void {
+  onClientRemoved(userId: string, _clientId?: string): void {
     this.getActiveConversationsWithUsers([userId]).forEach(({conversationEntity}) => {
       this.checkChangeToVerified(conversationEntity);
     });

@@ -73,9 +73,9 @@ export class PreferenceNotificationRepository {
         this.onClientAdd(userId, clientEntity);
       }
     });
-    amplify.subscribe(WebAppEvents.USER.CLIENT_REMOVED, (userId: string, clientEntity?: string) => {
+    amplify.subscribe(WebAppEvents.USER.CLIENT_REMOVED, (userId: string, clientId?: string) => {
       if (userId === selfUserObservable().id) {
-        this.onClientRemove(userId, clientEntity);
+        this.onClientRemove(userId, clientId);
       }
     });
     amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent.bind(this));
