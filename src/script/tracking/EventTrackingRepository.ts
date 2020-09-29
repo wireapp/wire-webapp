@@ -203,7 +203,7 @@ export class EventTrackingRepository {
         segmentation,
       });
 
-      this.logger.info(`Custom data for product event ${eventName}@${JSON.stringify(userData)}`);
+      this.logger.info(`Reporting custom data for product event ${eventName}@${JSON.stringify(userData)}`);
       this.logger.info(`Reporting product event ${eventName}@${JSON.stringify(segmentation)}`);
     }
   }
