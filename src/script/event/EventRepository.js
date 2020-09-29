@@ -250,6 +250,17 @@ export class EventRepository {
   // Notification Stream handling
   //##############################################################################
 
+  async _handleTimeDrift() {
+    try {
+      const time = await this.notificationService.getServerTime();
+      this.serverTimeHandler.computeTimeOffset(time);
+    } catch (errorResponse) {
+      if (errorResponse.response?.time) {
+        this.serverTimeHandler.computeTimeOffset(errorResponse.response?.time);
+      }
+    }
+  }
+
   /**
    * Get notifications for the current client from the stream.
    *
@@ -311,17 +322,6 @@ export class EventRepository {
 
       this.logger.error(`Failed to get notifications: ${errorResponse.message}`, errorResponse);
       throw new EventError(EventError.TYPE.REQUEST_FAILURE, EventError.MESSAGE.REQUEST_FAILURE);
-    }
-  }
-
-  async _handleTimeDrift() {
-    try {
-      const time = await this.notificationService.getServerTime();
-      this.serverTimeHandler.computeTimeOffset(time);
-    } catch (errorResponse) {
-      if (errorResponse.response?.time) {
-        this.serverTimeHandler.computeTimeOffset(errorResponse.response?.time);
-      }
     }
   }
 
