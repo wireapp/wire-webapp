@@ -26,25 +26,29 @@ import AdmZip from 'adm-zip';
 import sortJson from 'sort-json';
 
 const rootDir = path.resolve(__dirname, '..');
-const destinationPath = path.join(rootDir, 'electron/locale');
+const destinationPath = path.join(rootDir, 'src/i18n');
 const zipDir = path.join(rootDir, 'temp/i18n');
 const zipPath = path.join(zipDir, 'wire-webapp.zip');
 
 // https://crowdin.com/project/wire-webapp/settings#api
-const getProjectAPIKey = () => {
+const getProjectAuthentication = () => {
   const crowdinYaml = path.join(rootDir, 'keys/crowdin.yaml');
   const crowdinYamlContent = fs.readFileSync(crowdinYaml, 'utf8');
-  const keyRegex = /api_key: ([0-9a-f]+)/;
-  return (crowdinYamlContent.match(keyRegex) || [])[1];
+  const keyRegex = /api_key: ["']?([0-9a-f]+)["']?/;
+  const usernameRegex = /username: ["']?(.+)["']?/;
+  return {
+    apiKey: (crowdinYamlContent.match(keyRegex) || [])[1],
+    username: (crowdinYamlContent.match(usernameRegex) || [])[1],
+  };
 };
 
-const projectAPIKey = getProjectAPIKey();
+const {apiKey: projectAPIKey, username: projectUsername} = getProjectAuthentication();
 
 const CROWDIN_API = 'https://api.crowdin.com/api/project/wire-webapp';
 
 const CROWDIN_URL = {
-  DOWNLOAD: `${CROWDIN_API}/download/all.zip?key=${projectAPIKey}`,
-  EXPORT: `${CROWDIN_API}/export?key=${projectAPIKey}&json`,
+  DOWNLOAD: `${CROWDIN_API}/download/all.zip?login=${projectUsername}&account-key=${projectAPIKey}`,
+  EXPORT: `${CROWDIN_API}/export?login=${projectUsername}&account-key=${projectAPIKey}&json`,
 };
 
 function fetchUpdates(): Promise<void> {
