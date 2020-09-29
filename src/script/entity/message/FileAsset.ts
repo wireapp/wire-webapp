@@ -59,7 +59,7 @@ export class FileAsset extends Asset {
     // contains asset meta data as object
     this.meta = {};
 
-    // asset url, instance of an otr asset this has to be decrypted
+    // asset URL, instance of an OTR asset this has to be decrypted
     this.original_resource = ko.observable();
     this.preview_resource = ko.observable();
 

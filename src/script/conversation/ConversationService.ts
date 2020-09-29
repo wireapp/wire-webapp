@@ -289,7 +289,9 @@ export class ConversationService {
    *
    * @note If "recipients" are not specified you will receive a list of all missing OTR recipients (user-client-map).
    * @note Options for the precondition check on missing clients are:
-   *   'false' - all clients, 'Array<String>' - only clients of listed users, 'true' - force sending
+   * - `false` - all clients
+   * - `Array<string>` - only clients of listed users
+   * - `true` - force sending
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/postOtrMessage
    * @example How to send "recipients" payload

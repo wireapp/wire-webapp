@@ -138,6 +138,13 @@ export class ConversationVerificationStateHandler {
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
       const allVerifiedEvent = EventBuilder.buildAllVerified(conversationEntity, currentTimestamp);
       this.eventRepository.injectEvent(allVerifiedEvent);
+
+      amplify.publish(
+        WebAppEvents.CONVERSATION.VERIFICATION_STATE_CHANGED,
+        conversationEntity.participating_user_ids(),
+        true,
+      );
+
       return true;
     }
 
@@ -178,6 +185,8 @@ export class ConversationVerificationStateHandler {
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
       const event = EventBuilder.buildDegraded(conversationEntity, userIds, type, currentTimestamp);
       this.eventRepository.injectEvent(event);
+
+      amplify.publish(WebAppEvents.CONVERSATION.VERIFICATION_STATE_CHANGED, userIds, false);
 
       return true;
     }
