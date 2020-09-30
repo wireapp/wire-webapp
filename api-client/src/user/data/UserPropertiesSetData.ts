@@ -35,7 +35,6 @@ export interface WebappProperties {
   enable_debugging: boolean;
   settings: {
     call: {
-      enable_sft_calling: boolean;
       enable_vbr_encoding: boolean;
     };
     emoji: {
