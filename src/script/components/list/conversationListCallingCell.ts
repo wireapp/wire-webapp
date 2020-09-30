@@ -226,9 +226,6 @@ ko.components.register('conversation-list-calling-cell', {
    <!-- /ko -->
    <!-- ko if: conversation() && !isDeclined() -->
     <div class="conversation-list-calling-cell-background">
-    <!-- ko if: call.isConferenceCall -->
-      <div class="conversation-list-calling-cell__conference-banner" data-bind="text: t('callStateConferenceCall')" data-uie-name="status-conference-call"></div>
-    <!-- /ko -->
       <div class="conversation-list-calling-cell conversation-list-cell">
         <!-- ko ifnot: temporaryUserStyle -->
           <div class="conversation-list-cell-left" data-bind="link_to: conversationUrl">

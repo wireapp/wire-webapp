@@ -20,6 +20,7 @@
 import {APIClient} from '@wireapp/api-client';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import type {Notification} from '@wireapp/api-client/dist/notification';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {WebSocketClient} from '@wireapp/api-client/dist/tcp/';
@@ -27,7 +28,7 @@ import {WEBSOCKET_STATE} from '@wireapp/api-client/dist/tcp/ReconnectingWebsocke
 
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
 
-export type OnNotificationCallback = (data: string) => void;
+export type OnNotificationCallback = (data: Notification) => void;
 
 export class WebSocketService {
   private readonly apiClient: APIClient;

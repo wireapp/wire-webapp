@@ -33,7 +33,6 @@ export class Call {
   public readonly participants: ko.ObservableArray<Participant>;
   public readonly selfClientId: ClientId;
   public readonly conversationType: CONV_TYPE;
-  public readonly isConferenceCall: boolean;
   public readonly initialType: CALL_TYPE;
   public readonly isCbrEnabled: ko.Observable<boolean>;
   public blockMessages: boolean = false;
@@ -61,7 +60,6 @@ export class Call {
     this.conversationId = conversationId;
     this.state = ko.observable(CALL_STATE.UNKNOWN);
     this.conversationType = conversationType;
-    this.isConferenceCall = conversationType === CONV_TYPE.CONFERENCE;
     this.initialType = callType;
     this.selfClientId = selfParticipant?.clientId;
     this.participants = ko.observableArray([selfParticipant]);

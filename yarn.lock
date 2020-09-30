@@ -1664,11 +1664,6 @@
   resolved "https://registry.yarnpkg.com/@types/parse-json/-/parse-json-4.0.0.tgz#2f8bb441434d163b35fb8ffdccd7138927ffb8c0"
   integrity sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA==
 
-"@types/platform@1.3.2":
-  version "1.3.2"
-  resolved "https://registry.yarnpkg.com/@types/platform/-/platform-1.3.2.tgz#c0404c4e2a08e04295ab3d1241a856c2a3cab06e"
-  integrity sha512-Tn6OuJDAG7bJbyi4R7HqcxXp1w2lmIxVXqyNhPt1Bm0FO2EWIi3CI87JVzF7ncqK0ZMPuUycS3wTMIk85EeF1Q==
-
 "@types/platform@1.3.3":
   version "1.3.3"
   resolved "https://registry.yarnpkg.com/@types/platform/-/platform-1.3.3.tgz#a3d23941770d320e2c4312516a442ab35210d019"
@@ -2038,15 +2033,15 @@
   resolved "https://registry.yarnpkg.com/@wireapp/antiscroll-2/-/antiscroll-2-1.0.2.tgz#71a78d294ee0c88f42d50477ab61fa39272f5bca"
   integrity sha512-9KeB3yh9k01PjpuuRQsve4yY3+OVS2/hp9j+N13Is5wYCZRkUzZVCs8w9CyA/C6J5o9ukH0EzT7uurysWuhn/A==
 
-"@wireapp/api-client@11.26.5":
-  version "11.26.5"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-11.26.5.tgz#eae01b9de101911bbc22926e0629a3302a4aa35d"
-  integrity sha512-F/vWD6JzpmxmOt6FrTwqcA8bNqCkpKY2muT+PBcpjjT5/FdCJD/TmI8yHMj28atktxFrVjhed9dcGjYhqzdwug==
+"@wireapp/api-client@11.27.0":
+  version "11.27.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-11.27.0.tgz#ce914e356d7af32b85ab98af8a41424bacb8dfb2"
+  integrity sha512-KP9ucHoh+EphmbLM2kemm3K6A9jp6U8xkwqEqB4Hr/LkPxVGlevTrdvUyYgqbg/fVqWK1RMD15ZmhcnlWOmoRQ==
   dependencies:
     "@types/node" "~12"
     "@types/spark-md5" "3.0.2"
     "@types/tough-cookie" "4.0.0"
-    "@wireapp/commons" "3.8.2"
+    "@wireapp/commons" "3.8.3"
     "@wireapp/priority-queue" "1.6.9"
     axios "0.20.0"
     logdown "3.3.1"
@@ -2065,14 +2060,14 @@
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-4.6.13.tgz#fcaae3eeffa428fa1d3fa0effa2393b87384d12f"
   integrity sha512-BPXSAL9aFu6gKOHBQYSOx8ly7is58RXvsKMTtADm9uYR62+asWbmVAuHP24tPlP+cv4RIM+XI7qFYcfxoMWJzg==
 
-"@wireapp/commons@3.8.2":
-  version "3.8.2"
-  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-3.8.2.tgz#56d1500c7b7fbe3c2e503d8ad2fba4dd564a98be"
-  integrity sha512-3xJKZDfuBLJ0dgsKCenggCvdYTMw5Lhh3Zdm65J4X7NX25r9ivFedEqdj7sqJZ+xN+Fh6cmZBa5iMzuKyUYNag==
+"@wireapp/commons@3.8.3":
+  version "3.8.3"
+  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-3.8.3.tgz#cac0f98a13dbccd16fb576f9cf64b797b326aba7"
+  integrity sha512-w/pjYDo1vj7/Z5pMajM/6n7I4SHJN6zMDRxMCZp0jcMZlqTNqqOkjnmkAHbKAkKgI4AZeZDLPj/9w2MqmbShxg==
   dependencies:
     "@types/fs-extra" "8.1.0"
     "@types/node" "~12"
-    "@types/platform" "1.3.2"
+    "@types/platform" "1.3.3"
     ansi-regex "5.0.0"
     fs-extra "9.0.1"
     logdown "3.3.1"
@@ -2092,14 +2087,14 @@
     logdown "3.3.1"
     rimraf "3.0.2"
 
-"@wireapp/core@16.12.16":
-  version "16.12.16"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-16.12.16.tgz#7a6027538345988a817cb201f99ed8cf82eb819b"
-  integrity sha512-xzR3QPFmaWpsP+cyY3zI7DtRBts0ohRYFCnnEMP1qcQrnFVuY0dYlaYAmI9Yq/Puk81IlXK4x5nmQ6pX4J4j9A==
+"@wireapp/core@16.12.18":
+  version "16.12.18"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-16.12.18.tgz#26d9af8bb185d6ed5a9e653b53f51c01a51fc507"
+  integrity sha512-2ZEcG7vB8Q3U2cryGcI93ibnOYqTrvZZEVX9RJm+WNF/u8o5ZWcFteTSbj5ILD0s/dg8xiVycN04iKWuHQ4h1g==
   dependencies:
     "@types/long" "4.0.1"
     "@types/node" "~12"
-    "@wireapp/api-client" "11.26.5"
+    "@wireapp/api-client" "11.27.0"
     "@wireapp/cryptobox" "12.2.25"
     "@wireapp/protocol-messaging" "1.25.4"
     "@wireapp/store-engine" "4.5.11"

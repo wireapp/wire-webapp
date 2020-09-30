@@ -40,7 +40,6 @@ import {
 } from '@wireapp/avs';
 import {Calling, GenericMessage} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {UrlUtil} from '@wireapp/commons';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import 'webrtc-adapter';
@@ -67,13 +66,14 @@ import {ClientId, Participant, UserId} from './Participant';
 import {EventName} from '../tracking/EventName';
 import {Segmentation} from '../tracking/Segmentation';
 import * as trackingHelpers from '../tracking/Helpers';
-import {QUERY_KEY} from '../auth/route';
 import type {MediaStreamHandler} from '../media/MediaStreamHandler';
 import type {User} from '../entity/User';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import type {Recipients} from '../cryptography/CryptographyRepository';
 import type {Conversation} from '../entity/Conversation';
 import type {UserRepository} from '../user/UserRepository';
+import type {EventRecord} from '../storage';
+import type {EventSource} from '../event/EventSource';
 
 interface MediaStreamQuery {
   audio?: boolean;
@@ -111,7 +111,6 @@ export class CallingRepository {
   public readonly activeCalls: ko.ObservableArray<Call>;
   public readonly isMuted: ko.Observable<boolean>;
   public readonly joinedCall: ko.PureComputed<Call | undefined>;
-  public readonly useSftCalling: ko.Observable<boolean>;
 
   static get CONFIG() {
     return {
@@ -132,6 +131,29 @@ export class CallingRepository {
     this.isMuted = ko.observable(false);
     this.joinedCall = ko.pureComputed(() => {
       return this.activeCalls().find(call => call.state() === CALL_STATE.MEDIA_ESTAB);
+    });
+
+    /** {<userId>: <isVerified>} */
+    let callParticipants: Record<string, boolean> = {};
+
+    ko.computed(() => {
+      const activeCall = this.joinedCall();
+      if (!activeCall) {
+        callParticipants = {};
+        return;
+      }
+
+      for (const participant of activeCall.participants()) {
+        const wasVerified = callParticipants[participant.user.id];
+        const isVerified = participant.user.is_verified();
+
+        callParticipants[participant.user.id] = isVerified;
+
+        if (wasVerified === true && isVerified === false) {
+          this.leaveCallOnUnverified(participant.user.id);
+          return;
+        }
+      }
     });
 
     this.acceptedVersionWarnings = ko.observableArray<string>();
@@ -156,24 +178,12 @@ export class CallingRepository {
     this.logger = getLogger('CallingRepository');
     this.callLog = [];
     this.cbrEncoding = ko.observable(0);
-    this.useSftCalling = ko.observable(UrlUtil.getURLParameter(QUERY_KEY.ENABLE_SFT_CALLING) === 'true');
 
     this.subscribeToEvents();
   }
 
   toggleCbrEncoding(vbrEnabled: boolean): void {
     this.cbrEncoding(vbrEnabled ? 0 : 1);
-  }
-
-  toggleSftCalling(enableSftCalling: boolean): void {
-    const urlSetting = UrlUtil.getURLParameter(QUERY_KEY.ENABLE_SFT_CALLING);
-    if (urlSetting) {
-      this.logger.warn(
-        `URL config parameter "${QUERY_KEY.ENABLE_SFT_CALLING}" prevents setting SFT calling setting to "${enableSftCalling}" via backend properties.`,
-      );
-    } else {
-      this.useSftCalling(this.supportsConferenceCalling && enableSftCalling);
-    }
   }
 
   getStats(conversationId: ConversationId): Promise<{stats: RTCStatsReport; userid: UserId}[]> {
@@ -445,41 +455,37 @@ export class CallingRepository {
     amplify.subscribe(WebAppEvents.CALL.EVENT_FROM_BACKEND, this.onCallEvent.bind(this));
     amplify.subscribe(WebAppEvents.CALL.STATE.TOGGLE, this.toggleState.bind(this)); // This event needs to be kept, it is sent by the wrapper
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_VBR_ENCODING, this.toggleCbrEncoding.bind(this));
-    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_SFT_CALLING, this.toggleSftCalling.bind(this));
-    amplify.subscribe(WebAppEvents.CONVERSATION.VERIFICATION_STATE_CHANGED, this.onClientVerificationChanged);
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, ({settings}: WebappProperties) => {
       this.toggleCbrEncoding(settings.call.enable_vbr_encoding);
-      this.toggleSftCalling(settings.call.enable_sft_calling);
     });
   }
 
   /**
    * Leave call when a participant is not verified anymore
    */
-  private readonly onClientVerificationChanged = async (userIds: string, isVerified: boolean) => {
+  private readonly leaveCallOnUnverified = (unverifiedUserId: string): void => {
     const activeCall = this.joinedCall();
-    if (!activeCall || isVerified) {
+
+    if (!activeCall) {
       return;
     }
 
-    for (const userId of userIds) {
-      const clients = this.userRepository.findUserById(userId).devices();
+    const clients = this.userRepository.findUserById(unverifiedUserId).devices();
 
-      for (const {id: clientId} of clients) {
-        const participant = activeCall.getParticipant(userId, clientId);
+    for (const {id: clientId} of clients) {
+      const participant = activeCall.getParticipant(unverifiedUserId, clientId);
 
-        if (participant) {
-          this.leaveCall(activeCall.conversationId);
-          amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
-            action: {
-              title: t('callDegradationAction'),
-            },
-            text: {
-              message: t('callDegradationDescription', participant.user.name()),
-              title: t('callDegradationTitle'),
-            },
-          });
-        }
+      if (participant) {
+        this.leaveCall(activeCall.conversationId);
+        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+          action: {
+            title: t('callDegradationAction'),
+          },
+          text: {
+            message: t('callDegradationDescription', participant.user.name()),
+            title: t('callDegradationTitle'),
+          },
+        });
       }
     }
   };
@@ -629,7 +635,9 @@ export class CallingRepository {
     try {
       await this.checkConcurrentJoinedCall(conversationId, CALL_STATE.OUTGOING);
       conversationType =
-        conversationType === CONV_TYPE.GROUP && this.useSftCalling() ? CONV_TYPE.CONFERENCE : conversationType;
+        conversationType === CONV_TYPE.GROUP && this.supportsConferenceCalling
+          ? CONV_TYPE.CONFERENCE
+          : conversationType;
       const rejectedCallInConversation = this.findCall(conversationId);
       if (rejectedCallInConversation) {
         // if there is a rejected call, we can remove it from the store
@@ -830,7 +838,7 @@ export class CallingRepository {
 
   private injectActivateEvent(conversationId: ConversationId, userId: UserId, time: string, source: string): void {
     const event = EventBuilder.buildVoiceChannelActivate(conversationId, userId, time, this.avsVersion);
-    this.eventRepository.injectEvent(event, source);
+    this.eventRepository.injectEvent((event as unknown) as EventRecord, source as EventSource);
   }
 
   private injectDeactivateEvent(
@@ -849,7 +857,7 @@ export class CallingRepository {
       time,
       this.avsVersion,
     );
-    this.eventRepository.injectEvent(event, source);
+    this.eventRepository.injectEvent((event as unknown) as EventRecord, source as EventSource);
   }
 
   private readonly sendMessage = (
