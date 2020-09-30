@@ -40,7 +40,6 @@ import {
 } from '@wireapp/avs';
 import {Calling, GenericMessage} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {UrlUtil} from '@wireapp/commons';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import 'webrtc-adapter';
@@ -66,7 +65,6 @@ import {Call, ConversationId} from './Call';
 import {ClientId, Participant, UserId} from './Participant';
 import {EventName} from '../tracking/EventName';
 import {Segmentation} from '../tracking/Segmentation';
-import {QUERY_KEY} from '../auth/route';
 import * as trackingHelpers from '../tracking/Helpers';
 import type {MediaStreamHandler} from '../media/MediaStreamHandler';
 import type {User} from '../entity/User';
@@ -179,24 +177,12 @@ export class CallingRepository {
     this.logger = getLogger('CallingRepository');
     this.callLog = [];
     this.cbrEncoding = ko.observable(0);
-    this.useSftCalling = ko.observable(UrlUtil.getURLParameter(QUERY_KEY.ENABLE_SFT_CALLING) === 'true');
 
     this.subscribeToEvents();
   }
 
   toggleCbrEncoding(vbrEnabled: boolean): void {
     this.cbrEncoding(vbrEnabled ? 0 : 1);
-  }
-
-  toggleSftCalling(enableSftCalling: boolean): void {
-    const urlSetting = UrlUtil.getURLParameter(QUERY_KEY.ENABLE_SFT_CALLING);
-    if (urlSetting) {
-      this.logger.warn(
-        `URL config parameter "${QUERY_KEY.ENABLE_SFT_CALLING}" prevents setting SFT calling setting to "${enableSftCalling}" via backend properties.`,
-      );
-    } else {
-      this.useSftCalling(this.supportsConferenceCalling && enableSftCalling);
-    }
   }
 
   getStats(conversationId: ConversationId): Promise<{stats: RTCStatsReport; userid: UserId}[]> {
@@ -468,10 +454,8 @@ export class CallingRepository {
     amplify.subscribe(WebAppEvents.CALL.EVENT_FROM_BACKEND, this.onCallEvent.bind(this));
     amplify.subscribe(WebAppEvents.CALL.STATE.TOGGLE, this.toggleState.bind(this)); // This event needs to be kept, it is sent by the wrapper
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_VBR_ENCODING, this.toggleCbrEncoding.bind(this));
-    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_SFT_CALLING, this.toggleSftCalling.bind(this));
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, ({settings}: WebappProperties) => {
       this.toggleCbrEncoding(settings.call.enable_vbr_encoding);
-      this.toggleSftCalling(settings.call.enable_sft_calling);
     });
   }
 
@@ -650,7 +634,9 @@ export class CallingRepository {
     try {
       await this.checkConcurrentJoinedCall(conversationId, CALL_STATE.OUTGOING);
       conversationType =
-        conversationType === CONV_TYPE.GROUP && this.useSftCalling() ? CONV_TYPE.CONFERENCE : conversationType;
+        conversationType === CONV_TYPE.GROUP && this.supportsConferenceCalling
+          ? CONV_TYPE.CONFERENCE
+          : conversationType;
       const rejectedCallInConversation = this.findCall(conversationId);
       if (rejectedCallInConversation) {
         // if there is a rejected call, we can remove it from the store
