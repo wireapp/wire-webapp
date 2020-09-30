@@ -85,7 +85,7 @@ export class PreferencesAVViewModel {
         LEVEL_ADJUSTMENT: 0.075,
         SMOOTHING_TIME_CONSTANT: 0.2,
       },
-      MINIMUM_CALL_LOG_LENGTH: 16,
+      MINIMUM_CALL_LOG_LENGTH: 17,
       OBFUSCATION_TRUNCATE_TO: 4,
     };
   }
