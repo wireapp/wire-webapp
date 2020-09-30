@@ -35,13 +35,12 @@ import type {User} from '../entity/User';
 
 export interface BaseEvent {
   conversation: string;
-  data?: any;
   from: string;
   id?: string;
   time: string | number;
 }
 
-export interface ConversationEvent<T = any> extends BaseEvent {
+export interface ConversationEvent<T> extends BaseEvent {
   data: T;
   id: string;
   type: CONVERSATION;
@@ -55,7 +54,7 @@ export interface CallingEvent {
   type: CALL;
 }
 
-export interface BackendEventMessage<T = any> extends BaseEvent {
+export interface BackendEventMessage<T> extends BaseEvent {
   data: T;
   type: string;
 }
@@ -72,13 +71,6 @@ export interface VoiceChannelActivateEvent extends BaseEvent {
   protocol_version: number;
   type: string;
 }
-
-export type GeneralEvent =
-  | ConversationEvent
-  | (CallingEvent & {data?: any; id: string; time?: string})
-  | BackendEventMessage
-  | ErrorEvent
-  | VoiceChannelActivateEvent;
 
 export type AllVerifiedEvent = ConversationEvent<{type: VerificationMessageType}>;
 export type AssetAddEvent = Omit<ConversationEvent<any>, 'id'> &
