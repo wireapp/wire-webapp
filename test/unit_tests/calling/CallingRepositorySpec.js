@@ -106,13 +106,14 @@ describe('CallingRepository', () => {
 
   describe('joinedCall', () => {
     it('only exposes the current active call', () => {
-      const incomingCall = new Call();
+      const selfParticipant = createSelfParticipant();
+      const incomingCall = new Call('', '', undefined, selfParticipant);
       incomingCall.state(CALL_STATE.INCOMING);
 
-      const activeCall = new Call();
+      const activeCall = new Call('', '', undefined, selfParticipant);
       activeCall.state(CALL_STATE.MEDIA_ESTAB);
 
-      const declinedCall = new Call();
+      const declinedCall = new Call('', '', undefined, selfParticipant);
       declinedCall.state(CALL_STATE.INCOMING);
       declinedCall.reason(REASON.STILL_ONGOING);
 
@@ -142,7 +143,7 @@ describe('CallingRepository', () => {
       });
     });
 
-    it('ask only once for mediastream when queried multiple times', () => {
+    it('asks only once for mediastream when queried multiple times', () => {
       const selfParticipant = createSelfParticipant();
       const call = new Call('', '', undefined, selfParticipant);
       const audioTrack = silence();
@@ -164,7 +165,7 @@ describe('CallingRepository', () => {
   });
 
   describe('stopMediaSource', () => {
-    it('release media streams', () => {
+    it('releases media streams', () => {
       const selfParticipant = createSelfParticipant();
       spyOn(selfParticipant, 'releaseAudioStream');
       spyOn(selfParticipant, 'releaseVideoStream');
@@ -183,7 +184,7 @@ describe('CallingRepository', () => {
   });
 
   describe('incoming call', () => {
-    it('create a stores a new call when an incoming call arrives', done => {
+    it('creates a stores a new call when an incoming call arrives', done => {
       spyOn(callingRepository.conversationRepository, 'grantMessage').and.returnValue(Promise.resolve());
       spyOn(callingRepository.conversationRepository, 'find_conversation_by_id').and.returnValue(new Conversation());
       const event = {
@@ -220,7 +221,7 @@ describe('CallingRepository', () => {
   });
 });
 
-xdescribe('e2e audio call', () => {
+xdescribe('E2E audio call', () => {
   const conversationRepository = {
     find_conversation_by_id: () => new Conversation(),
     grantMessage: () => Promise.resolve(true),
