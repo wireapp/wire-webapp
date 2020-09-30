@@ -134,20 +134,21 @@ export class CallingRepository {
       return this.activeCalls().find(call => call.state() === CALL_STATE.MEDIA_ESTAB);
     });
 
-    let verifiedParticipants: Record<string, boolean> = {};
+    /** {<userId>: <isVerified>} */
+    let callParticipants: Record<string, boolean> = {};
 
     ko.computed(() => {
       const activeCall = this.joinedCall();
       if (!activeCall) {
-        verifiedParticipants = {};
+        callParticipants = {};
         return;
       }
 
       for (const participant of activeCall.participants()) {
-        const wasVerified = verifiedParticipants[participant.user.id];
+        const wasVerified = callParticipants[participant.user.id];
         const isVerified = participant.user.is_verified();
 
-        verifiedParticipants[participant.user.id] = isVerified;
+        callParticipants[participant.user.id] = isVerified;
 
         if (wasVerified === true && isVerified === false) {
           this.leaveCallOnUnverified(participant.user.id);
