@@ -356,7 +356,7 @@ class App {
       integration: new IntegrationService(this.apiClient),
       notification: new NotificationService(this.apiClient, storageService),
       storage: storageService,
-      webSocket: new WebSocketService(this.apiClient, this.backendClient),
+      webSocket: new WebSocketService(this.apiClient),
     };
   }
 
@@ -440,7 +440,6 @@ class App {
 
       await teamRepository.initTeam();
 
-      eventRepository.connectWebSocket();
       const conversationEntities = await conversationRepository.getConversations();
       const connectionEntities = await connectionRepository.getConnections();
       loadingView.updateProgress(25, t('initReceivedUserData'));
@@ -456,7 +455,8 @@ class App {
 
       await userRepository.loadUsers();
 
-      const notificationsCount = await eventRepository.initializeFromStream();
+      await eventRepository.connectWebSocket();
+      const notificationsCount = eventRepository.notificationsTotal;
 
       telemetry.timeStep(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
       telemetry.addStatistic(AppInitStatisticsValue.NOTIFICATIONS, notificationsCount, 100);
@@ -518,11 +518,7 @@ class App {
    */
   onInternetConnectionGained(): void {
     this.logger.info('Internet connection regained. Re-establishing WebSocket connection...');
-    this.backendClient.executeOnConnectivity(BackendClient.CONNECTIVITY_CHECK_TRIGGER.CONNECTION_REGAINED).then(() => {
-      amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.NO_INTERNET);
-      amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
-      this.repository.event.reconnectWebSocket(WebSocketService.CHANGE_TRIGGER.ONLINE);
-    });
+    amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.NO_INTERNET);
   }
 
   /**
@@ -530,7 +526,6 @@ class App {
    */
   onInternetConnectionLost(): void {
     this.logger.warn('Internet connection lost');
-    this.repository.event.disconnectWebSocket(WebSocketService.CHANGE_TRIGGER.OFFLINE);
     amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.NO_INTERNET);
   }
 
@@ -741,7 +736,7 @@ class App {
   private _subscribeToUnloadEvents(): void {
     $(window).on('unload', () => {
       this.logger.info("'window.onunload' was triggered, so we will disconnect from the backend.");
-      this.repository.event.disconnectWebSocket(WebSocketService.CHANGE_TRIGGER.PAGE_NAVIGATION);
+      this.repository.event.disconnectWebSocket();
       this.repository.calling.destroy();
 
       if (this.repository.user.isActivatedAccount()) {
@@ -786,7 +781,7 @@ class App {
 
     const _logout = async () => {
       // Disconnect from our backend, end tracking and clear cached data
-      this.repository.event.disconnectWebSocket(WebSocketService.CHANGE_TRIGGER.LOGOUT);
+      this.repository.event.disconnectWebSocket();
 
       // Clear Local Storage (but don't delete the cookie label if you were logged in with a permanent client)
       const keysToKeep = [StorageKey.AUTH.SHOW_LOGIN];

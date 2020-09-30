@@ -175,10 +175,7 @@ export class TestFactory {
     await this.exposeCryptographyActors();
     await this.exposeUserActors();
 
-    this.web_socket_service = new WebSocketService(
-      container.resolve(APIClientSingleton).getClient(),
-      this.storage_service,
-    );
+    this.web_socket_service = new WebSocketService(container.resolve(APIClientSingleton).getClient());
     this.event_service = new EventService(this.storage_service);
     this.event_service_no_compound = new EventServiceNoCompound(this.storage_service);
     this.notification_service = new NotificationService(

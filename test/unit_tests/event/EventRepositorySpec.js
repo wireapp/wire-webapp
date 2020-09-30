@@ -97,8 +97,6 @@ describe('EventRepository', () => {
 
     beforeEach(() => {
       spyOn(testFactory.event_repository, '_handleNotification').and.callThrough();
-      spyOn(testFactory.event_repository, '_bufferWebSocketNotification').and.callThrough();
-      spyOn(testFactory.event_repository, '_handleBufferedNotifications').and.callThrough();
       spyOn(testFactory.event_repository, '_handleEvent');
       spyOn(testFactory.event_repository, '_distributeEvent');
 
@@ -149,33 +147,6 @@ describe('EventRepository', () => {
       );
 
       expect(missedEventsSpy).toHaveBeenCalled();
-    });
-
-    it('should buffer notifications when notification stream is not processed', () => {
-      last_notification_id = createRandomUuid();
-      testFactory.event_repository.connectWebSocket();
-      websocket_service_mock.publish({id: createRandomUuid(), payload: []});
-
-      expect(testFactory.event_repository._bufferWebSocketNotification).toHaveBeenCalled();
-      expect(testFactory.event_repository._handleNotification).not.toHaveBeenCalled();
-      expect(testFactory.event_repository.notificationHandlingState()).toBe(NOTIFICATION_HANDLING_STATE.STREAM);
-      expect(testFactory.event_repository.webSocketBuffer.length).toBe(1);
-    });
-
-    it('should handle buffered notifications after notifications stream was processed', () => {
-      last_notification_id = createRandomUuid();
-      const last_published_notification_id = createRandomUuid();
-      testFactory.event_repository.lastNotificationId(last_notification_id);
-      testFactory.event_repository.connectWebSocket();
-      websocket_service_mock.publish({id: createRandomUuid(), payload: []});
-
-      websocket_service_mock.publish({id: last_published_notification_id, payload: []});
-      return testFactory.event_repository.initializeFromStream().then(() => {
-        expect(testFactory.event_repository._handleBufferedNotifications).toHaveBeenCalled();
-        expect(testFactory.event_repository.webSocketBuffer.length).toBe(0);
-        expect(testFactory.event_repository.lastNotificationId()).toBe(last_published_notification_id);
-        expect(testFactory.event_repository.notificationHandlingState()).toBe(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
-      });
     });
   });
 
