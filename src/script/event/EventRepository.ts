@@ -189,7 +189,7 @@ export class EventRepository {
    * @param [limit=EventRepository.CONFIG.NOTIFICATION_BATCHES.MAX] Max. number of notifications to retrieve from backend at once
    * @returns Resolves when all new notifications from the stream have been handled
    */
-  async getNotifications(notificationId: string, limit = EventRepository.CONFIG.NOTIFICATION_BATCHES.MAX) {
+  private async getNotifications(notificationId: string, limit = EventRepository.CONFIG.NOTIFICATION_BATCHES.MAX) {
     const processNotifications = async (notifications: Notification[]) => {
       if (notifications.length <= 0) {
         this.logger.info(`No notifications found since '${notificationId}'`);
@@ -239,7 +239,7 @@ export class EventRepository {
    * Get the last notification.
    * @returns Resolves with the last handled notification ID and time
    */
-  getStreamState() {
+  private getStreamState() {
     return this.notificationService
       .getLastNotificationIdFromDb()
       .catch(error => {
@@ -275,7 +275,7 @@ export class EventRepository {
    * Set state for notification stream.
    * @returns Resolves when all notifications have been handled
    */
-  async initializeFromStream() {
+  private async initializeFromStream() {
     try {
       const {notificationId} = await this.getStreamState();
       return this.updateFromStream(notificationId);
@@ -299,7 +299,7 @@ export class EventRepository {
    * @param [isInitialization=false] Set initial date to 0 if not found
    * @returns Resolves when stream state has been initialized
    */
-  setStreamState(clientId: string, isInitialization = false) {
+  private setStreamState(clientId: string, isInitialization = false) {
     return this.notificationService.getNotificationsLast(clientId).then(
       ({id: notificationId, payload}): Promise<(string | void)[]> => {
         const [event] = payload;
@@ -524,7 +524,7 @@ export class EventRepository {
    * @param source Source of event
    * @returns Resolves with the saved record or `true` if the event was skipped
    */
-  async processEvent(event: EventRecord, source: EventSource) {
+  private async processEvent(event: EventRecord, source: EventSource) {
     const isEncryptedEvent = event.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD;
     if (isEncryptedEvent) {
       event = await this.cryptographyRepository.handleEncryptedEvent(event);
@@ -615,7 +615,7 @@ export class EventRepository {
     });
   }
 
-  handleEventReplacement(originalEvent: EventRecord, newEvent: EventRecord) {
+  private handleEventReplacement(originalEvent: EventRecord, newEvent: EventRecord) {
     const newData = newEvent.data || {};
     if (originalEvent.data.from !== newData.from) {
       const logMessage = `ID previously used by user '${newEvent.from}'`;
