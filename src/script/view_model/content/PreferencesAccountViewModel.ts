@@ -295,7 +295,7 @@ export class PreferencesAccountViewModel {
     }
   };
 
-  checkUsernameInput = (username: string, keyboardEvent: KeyboardEvent) => {
+  checkUsernameInput = (_username: string, keyboardEvent: KeyboardEvent) => {
     if (isKey(keyboardEvent, KEY.BACKSPACE)) {
       return true;
     }
