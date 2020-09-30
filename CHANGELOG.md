@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.27.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.26.6...@wireapp/api-client@11.27.0) (2020-09-30)
+
+
+### Features
+
+* **api-client, webapp-events:** Remove SFT beta related stuff ([#3243](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3243)) ([03bfcc8](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/03bfcc805e5cd07891c99dd36ac33a933116b3b4))
+
+
+
+
+
 ## [11.26.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.26.5...@wireapp/api-client@11.26.6) (2020-09-28)
 
 **Note:** Version bump only for package @wireapp/api-client
