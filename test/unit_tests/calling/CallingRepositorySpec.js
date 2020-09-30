@@ -184,7 +184,7 @@ describe('CallingRepository', () => {
   });
 
   describe('incoming call', () => {
-    it('creates a stores a new call when an incoming call arrives', done => {
+    it('creates and stores a new call when an incoming call arrives', done => {
       spyOn(callingRepository.conversationRepository, 'grantMessage').and.returnValue(Promise.resolve());
       spyOn(callingRepository.conversationRepository, 'find_conversation_by_id').and.returnValue(new Conversation());
       const event = {
