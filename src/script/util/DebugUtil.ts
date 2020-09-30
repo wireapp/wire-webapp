@@ -175,7 +175,7 @@ export class DebugUtil {
           wasSentByOurCurrentClient(event) &&
           hasExpectedTimestamp(event, dateTime)
         );
-      });
+      }) as ConversationOtrMessageAddEvent[];
     const recipients = filteredEvents.map(event => event.data.recipient);
     const selfClients = await this.clientRepository.getClientsForSelf();
     const selfClientIds = selfClients.map(client => client.id);

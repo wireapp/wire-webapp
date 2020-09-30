@@ -25,6 +25,7 @@ import {Logger, getLogger} from 'Util/Logger';
 
 import {ConversationVerificationState} from './ConversationVerificationState';
 import {EventBuilder} from '../conversation/EventBuilder';
+import {EventRecord} from '../storage';
 import {VerificationMessageType} from '../message/VerificationMessageType';
 import type {ClientEntity} from '../client/ClientEntity';
 import type {Conversation} from '../entity/Conversation';
@@ -138,7 +139,7 @@ export class ConversationVerificationStateHandler {
     if (this.willChangeToVerified(conversationEntity)) {
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
       const allVerifiedEvent = EventBuilder.buildAllVerified(conversationEntity, currentTimestamp);
-      this.eventRepository.injectEvent(allVerifiedEvent);
+      this.eventRepository.injectEvent(allVerifiedEvent as EventRecord);
 
       amplify.publish(
         WebAppEvents.CONVERSATION.VERIFICATION_STATE_CHANGED,
@@ -185,7 +186,7 @@ export class ConversationVerificationStateHandler {
 
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
       const event = EventBuilder.buildDegraded(conversationEntity, userIds, type, currentTimestamp);
-      this.eventRepository.injectEvent(event);
+      this.eventRepository.injectEvent(event as EventRecord);
 
       return true;
     }

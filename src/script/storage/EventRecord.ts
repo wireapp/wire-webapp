@@ -24,12 +24,15 @@ export interface ReadReceipt {
 
 export interface EventRecord {
   category: number;
+  client?: {time: string};
+  connection?: {lastUpdate: string};
   content?: string;
   conversation: string;
   data: any;
   edited_time?: string;
   ephemeral_expires?: number;
   ephemeral_started?: string;
+  ephemeral_time?: string;
   error_code?: string;
   from: string;
   from_client_id?: string;

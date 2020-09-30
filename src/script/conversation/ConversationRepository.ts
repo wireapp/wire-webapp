@@ -688,7 +688,7 @@ export class ConversationRepository {
       ? EventBuilder.buildGroupCreation(conversationEntity, isTemporaryGuest, timestamp)
       : EventBuilder.build1to1Creation(conversationEntity);
 
-    this.eventRepository.injectEvent(creationEvent, eventSource);
+    this.eventRepository.injectEvent(creationEvent as EventRecord, eventSource);
   }
 
   /**
@@ -1371,7 +1371,7 @@ export class ConversationRepository {
       .postMembers(conversationEntity.id, userIds)
       .then(response => {
         if (response) {
-          this.eventRepository.injectEvent(response, EventRepository.SOURCE.BACKEND_RESPONSE);
+          this.eventRepository.injectEvent(response as EventRecord, EventRepository.SOURCE.BACKEND_RESPONSE);
         }
       })
       .catch(error => this._handleAddToConversationError(error, conversationEntity, userIds));
@@ -1380,7 +1380,7 @@ export class ConversationRepository {
   addMissingMember(conversationEntity: Conversation, userIds: string[], timestamp: number) {
     const [sender] = userIds;
     const event = EventBuilder.buildMemberJoin(conversationEntity, sender, userIds, timestamp);
-    return this.eventRepository.injectEvent(event, EventRepository.SOURCE.INJECTED);
+    return this.eventRepository.injectEvent(event as EventRecord, EventRepository.SOURCE.INJECTED);
   }
 
   /**
@@ -1515,7 +1515,7 @@ export class ConversationRepository {
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
       const event = response || EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
 
-      this.eventRepository.injectEvent(event, EventRepository.SOURCE.BACKEND_RESPONSE);
+      this.eventRepository.injectEvent(event as EventRecord, EventRepository.SOURCE.BACKEND_RESPONSE);
       return event;
     });
   }
@@ -1551,7 +1551,7 @@ export class ConversationRepository {
   async renameConversation(conversationEntity: Conversation, name: string): Promise<ConversationRenameEvent> {
     const response = await this.conversation_service.updateConversationName(conversationEntity.id, name);
     if (response) {
-      this.eventRepository.injectEvent(response, EventRepository.SOURCE.BACKEND_RESPONSE);
+      this.eventRepository.injectEvent(response as EventRecord, EventRepository.SOURCE.BACKEND_RESPONSE);
       return response;
     }
     return undefined;
@@ -1571,7 +1571,7 @@ export class ConversationRepository {
       messageTimer,
     );
     if (response) {
-      this.eventRepository.injectEvent(response, EventRepository.SOURCE.BACKEND_RESPONSE);
+      this.eventRepository.injectEvent(response as EventRecord, EventRepository.SOURCE.BACKEND_RESPONSE);
     }
     return response;
   }
@@ -1582,7 +1582,7 @@ export class ConversationRepository {
   ) {
     const response = await this.conversation_service.updateConversationReceiptMode(conversationEntity.id, receiptMode);
     if (response) {
-      this.eventRepository.injectEvent(response, EventRepository.SOURCE.BACKEND_RESPONSE);
+      this.eventRepository.injectEvent(response as EventRecord, EventRepository.SOURCE.BACKEND_RESPONSE);
     }
     return response;
   }
@@ -1647,7 +1647,7 @@ export class ConversationRepository {
       })
       .forEach(conversationEntity => {
         const leaveEvent = EventBuilder.buildTeamMemberLeave(conversationEntity, userEntity, isoDate);
-        this.eventRepository.injectEvent(leaveEvent);
+        this.eventRepository.injectEvent(leaveEvent as EventRecord);
       });
     userEntity.isDeleted = true;
   }
@@ -2818,7 +2818,7 @@ export class ConversationRepository {
       legalHoldStatus,
       beforeTimestamp,
     );
-    await this.eventRepository.injectEvent(legalHoldUpdateMessage);
+    await this.eventRepository.injectEvent(legalHoldUpdateMessage as EventRecord);
   }
 
   async injectFileTypeRestrictedMessage(
@@ -2829,7 +2829,7 @@ export class ConversationRepository {
     id = createRandomUuid(),
   ) {
     const fileRestrictionMessage = EventBuilder.buildFileTypeRestricted(conversation, user, isIncoming, fileExt, id);
-    await this.eventRepository.injectEvent(fileRestrictionMessage);
+    await this.eventRepository.injectEvent(fileRestrictionMessage as EventRecord);
   }
 
   private async _grantOutgoingMessage(
@@ -3562,7 +3562,7 @@ export class ConversationRepository {
       .forEach(conversationEntity => {
         const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
         const missed_event = EventBuilder.buildMissed(conversationEntity, currentTimestamp);
-        this.eventRepository.injectEvent(missed_event);
+        this.eventRepository.injectEvent(missed_event as EventRecord);
       });
   }
 
@@ -4246,7 +4246,7 @@ export class ConversationRepository {
    */
   private _addDeleteMessage(conversationId: string, messageId: string, time: number, messageEntity: Message) {
     const deleteEvent = EventBuilder.buildDelete(conversationId, messageId, time, messageEntity);
-    this.eventRepository.injectEvent(deleteEvent);
+    this.eventRepository.injectEvent(deleteEvent as EventRecord);
   }
 
   //##############################################################################
