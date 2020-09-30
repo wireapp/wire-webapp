@@ -271,6 +271,7 @@ export class EventRepository {
       if (notifications.length <= 0) {
         this.logger.info(`No notifications found since '${notificationId}'`);
         this.notificationsLoaded(true);
+        this.notificationsQueue.push(...notifications);
         return notificationId;
       }
 

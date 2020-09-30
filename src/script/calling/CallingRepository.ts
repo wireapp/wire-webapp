@@ -66,8 +66,8 @@ import {Call, ConversationId} from './Call';
 import {ClientId, Participant, UserId} from './Participant';
 import {EventName} from '../tracking/EventName';
 import {Segmentation} from '../tracking/Segmentation';
-import * as trackingHelpers from '../tracking/Helpers';
 import {QUERY_KEY} from '../auth/route';
+import * as trackingHelpers from '../tracking/Helpers';
 import type {MediaStreamHandler} from '../media/MediaStreamHandler';
 import type {User} from '../entity/User';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
@@ -134,6 +134,29 @@ export class CallingRepository {
     this.isMuted = ko.observable(false);
     this.joinedCall = ko.pureComputed(() => {
       return this.activeCalls().find(call => call.state() === CALL_STATE.MEDIA_ESTAB);
+    });
+
+    /** {<userId>: <isVerified>} */
+    let callParticipants: Record<string, boolean> = {};
+
+    ko.computed(() => {
+      const activeCall = this.joinedCall();
+      if (!activeCall) {
+        callParticipants = {};
+        return;
+      }
+
+      for (const participant of activeCall.participants()) {
+        const wasVerified = callParticipants[participant.user.id];
+        const isVerified = participant.user.is_verified();
+
+        callParticipants[participant.user.id] = isVerified;
+
+        if (wasVerified === true && isVerified === false) {
+          this.leaveCallOnUnverified(participant.user.id);
+          return;
+        }
+      }
     });
 
     this.acceptedVersionWarnings = ko.observableArray<string>();
@@ -448,7 +471,6 @@ export class CallingRepository {
     amplify.subscribe(WebAppEvents.CALL.STATE.TOGGLE, this.toggleState.bind(this)); // This event needs to be kept, it is sent by the wrapper
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_VBR_ENCODING, this.toggleCbrEncoding.bind(this));
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_SFT_CALLING, this.toggleSftCalling.bind(this));
-    amplify.subscribe(WebAppEvents.CONVERSATION.VERIFICATION_STATE_CHANGED, this.onClientVerificationChanged);
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, ({settings}: WebappProperties) => {
       this.toggleCbrEncoding(settings.call.enable_vbr_encoding);
       this.toggleSftCalling(settings.call.enable_sft_calling);
@@ -458,30 +480,29 @@ export class CallingRepository {
   /**
    * Leave call when a participant is not verified anymore
    */
-  private readonly onClientVerificationChanged = async (userIds: string, isVerified: boolean) => {
+  private readonly leaveCallOnUnverified = (unverifiedUserId: string): void => {
     const activeCall = this.joinedCall();
-    if (!activeCall || isVerified) {
+
+    if (!activeCall) {
       return;
     }
 
-    for (const userId of userIds) {
-      const clients = this.userRepository.findUserById(userId).devices();
+    const clients = this.userRepository.findUserById(unverifiedUserId).devices();
 
-      for (const {id: clientId} of clients) {
-        const participant = activeCall.getParticipant(userId, clientId);
+    for (const {id: clientId} of clients) {
+      const participant = activeCall.getParticipant(unverifiedUserId, clientId);
 
-        if (participant) {
-          this.leaveCall(activeCall.conversationId);
-          amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
-            action: {
-              title: t('callDegradationAction'),
-            },
-            text: {
-              message: t('callDegradationDescription', participant.user.name()),
-              title: t('callDegradationTitle'),
-            },
-          });
-        }
+      if (participant) {
+        this.leaveCall(activeCall.conversationId);
+        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+          action: {
+            title: t('callDegradationAction'),
+          },
+          text: {
+            message: t('callDegradationDescription', participant.user.name()),
+            title: t('callDegradationTitle'),
+          },
+        });
       }
     }
   };
