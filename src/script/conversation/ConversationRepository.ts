@@ -2989,30 +2989,35 @@ export class ConversationRepository {
             }
           }
 
-          amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
-            close: () => {
-              if (!sendAnyway) {
-                reject(
-                  new ConversationError(
-                    ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION,
-                    ConversationError.MESSAGE.DEGRADED_CONVERSATION_CANCELLATION,
-                  ),
-                );
-              }
-            },
-            primaryAction: {
-              action: () => {
-                sendAnyway = true;
-                conversationEntity.verification_state(ConversationVerificationState.UNVERIFIED);
-                resolve(true);
+          amplify.publish(
+            WebAppEvents.WARNING.MODAL,
+            ModalsViewModel.TYPE.CONFIRM,
+            {
+              close: () => {
+                if (!sendAnyway) {
+                  reject(
+                    new ConversationError(
+                      ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION,
+                      ConversationError.MESSAGE.DEGRADED_CONVERSATION_CANCELLATION,
+                    ),
+                  );
+                }
               },
-              text: actionString,
+              primaryAction: {
+                action: () => {
+                  sendAnyway = true;
+                  conversationEntity.verification_state(ConversationVerificationState.UNVERIFIED);
+                  resolve(true);
+                },
+                text: actionString,
+              },
+              text: {
+                message: messageString,
+                title: titleString,
+              },
             },
-            text: {
-              message: messageString,
-              title: titleString,
-            },
-          });
+            `degraded-${eventInfoEntity.conversationId}`,
+          );
         })
         .catch(reject);
     });
