@@ -311,10 +311,7 @@ export class EventRepository {
             : `Reset starting point on notification stream to '${notificationId}'`;
           this.logger.info(logMessage);
 
-          return Promise.all([
-            this._updateLastEventDate(isoDateString),
-            this._updateLastNotificationId(notificationId),
-          ]);
+          return Promise.all([this.updateLastEventDate(isoDateString), this.updateLastNotificationId(notificationId)]);
         }
 
         return undefined;
@@ -390,7 +387,7 @@ export class EventRepository {
    * @param eventDate Updated last event date
    * @returns Resolves when the last event date was stored
    */
-  private _updateLastEventDate(eventDate: string): Promise<string> | void {
+  private updateLastEventDate(eventDate: string): Promise<string> | void {
     const didDateIncrease = eventDate > this.lastEventDate();
     if (didDateIncrease) {
       this.lastEventDate(eventDate);
@@ -404,7 +401,7 @@ export class EventRepository {
    * @param notificationId Updated last notification ID
    * @returns Resolves when the last notification ID was stored
    */
-  private _updateLastNotificationId(notificationId: string): Promise<string | void> {
+  private updateLastNotificationId(notificationId: string): Promise<string | void> {
     if (notificationId) {
       this.lastNotificationId(notificationId);
       return this.notificationService.saveLastNotificationIdToDb(notificationId);
@@ -564,7 +561,7 @@ export class EventRepository {
        * modify the last event timestamp which we use to query the backend's notification stream.
        */
       if (event.type !== ClientEvent.CONVERSATION.VOICE_CHANNEL_DEACTIVATE) {
-        this._updateLastEventDate(eventDate as string);
+        this.updateLastEventDate(eventDate as string);
       }
     }
 
@@ -780,7 +777,7 @@ export class EventRepository {
     if (!events.length) {
       this.logger.warn('Notification payload does not contain any events');
       if (!isTransientEvent) {
-        this._updateLastNotificationId(id);
+        this.updateLastNotificationId(id);
       }
       return;
     }
@@ -788,7 +785,7 @@ export class EventRepository {
     try {
       await Promise.all(events.map(event => this.handleEvent(event as EventRecord, source)));
       if (!isTransientEvent) {
-        this._updateLastNotificationId(id);
+        this.updateLastNotificationId(id);
       }
       this.notificationsHandled++;
       if (this.notificationHandlingState() === NOTIFICATION_HANDLING_STATE.STREAM) {
