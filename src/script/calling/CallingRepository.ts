@@ -74,8 +74,8 @@ import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import type {Recipients} from '../cryptography/CryptographyRepository';
 import type {Conversation} from '../entity/Conversation';
 import type {UserRepository} from '../user/UserRepository';
-import {EventRecord} from '../storage';
-import {EventSource} from '../event/EventSource';
+import type {EventRecord} from '../storage';
+import type {EventSource} from '../event/EventSource';
 
 interface MediaStreamQuery {
   audio?: boolean;
