@@ -109,7 +109,6 @@ export class CallingRepository {
   public readonly activeCalls: ko.ObservableArray<Call>;
   public readonly isMuted: ko.Observable<boolean>;
   public readonly joinedCall: ko.PureComputed<Call | undefined>;
-  public readonly useSftCalling: ko.Observable<boolean>;
 
   static get CONFIG() {
     return {
