@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.8.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/webapp-events/compare/@wireapp/webapp-events@0.7.0...@wireapp/webapp-events@0.8.0) (2020-09-30)
+
+
+### Features
+
+* **api-client, webapp-events:** Remove SFT beta related stuff ([#3243](https://github.com/wireapp/wire-web-packages/tree/master/packages/webapp-events/issues/3243)) ([03bfcc8](https://github.com/wireapp/wire-web-packages/tree/master/packages/webapp-events/commit/03bfcc805e5cd07891c99dd36ac33a933116b3b4))
+
+
+
+
+
 # [0.7.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/webapp-events/compare/@wireapp/webapp-events@0.6.1...@wireapp/webapp-events@0.7.0) (2020-09-28)
 
 
