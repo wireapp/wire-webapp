@@ -145,7 +145,6 @@ describe('EventRepository', () => {
       expect(testFactory.notification_service.getAllNotificationsForClient).toHaveBeenCalledWith(
         clientId,
         latestNotificationId,
-        EventRepository.CONFIG.NOTIFICATION_BATCHES.INITIAL,
       );
 
       expect(missedEventsSpy).toHaveBeenCalled();
