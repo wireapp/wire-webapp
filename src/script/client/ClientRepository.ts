@@ -214,17 +214,6 @@ export class ClientRepository {
   }
 
   /**
-   * Save the local client into the database.
-   *
-   * @param clientPayload Client data to be stored in database
-   * @returns Resolves with the record stored in database
-   */
-  private saveCurrentClientInDb(clientPayload: any): Promise<any> {
-    clientPayload.meta = {is_verified: true};
-    return this.clientService.saveClientInDb(ClientRepository.PRIMARY_KEY_CURRENT_CLIENT, clientPayload);
-  }
-
-  /**
    * Updates a client payload if it does not fit the current database structure.
    *
    * @param userId User ID of the client owner
@@ -242,17 +231,6 @@ export class ClientRepository {
   //##############################################################################
   // Login and registration
   //##############################################################################
-
-  /**
-   * Constructs the value for a cookie label.
-   * @param login Email or phone number of the user
-   * @param clientType Temporary or permanent client type
-   * @returns Cookie label
-   */
-  private constructCookieLabel(login: string, clientType = this.loadCurrentClientType()): string {
-    const loginHash = murmurhash3(login || this.selfUser().id, 42);
-    return `webapp@${loginHash}@${clientType}@${Date.now()}`;
-  }
 
   /**
    * Constructs the key for a cookie label.
