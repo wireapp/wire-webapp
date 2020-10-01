@@ -164,7 +164,7 @@ export class UserRepository {
   /**
    * Listener for incoming user events.
    */
-  onUserEvent(eventJson: any, source: EventSource): void {
+  private onUserEvent(eventJson: any, source: EventSource): void {
     const type = eventJson.type;
 
     const logObject = {eventJson: JSON.stringify(eventJson), eventObject: eventJson};
@@ -234,14 +234,14 @@ export class UserRepository {
   /**
    * Persists a conversation state in the database.
    */
-  saveUserInDb(userEntity: User): Promise<User> {
+  private saveUserInDb(userEntity: User): Promise<User> {
     return this.userService.saveUserInDb(userEntity);
   }
 
   /**
    * Event to delete the matching user.
    */
-  userDelete({id}: {id: string}): void {
+  private userDelete({id}: {id: string}): void {
     // @todo Add user deletion cases for other users
     const isSelfUser = id === this.self().id;
     if (isSelfUser) {
@@ -255,7 +255,7 @@ export class UserRepository {
   /**
    * Event to update availability of a user.
    */
-  onUserAvailability(event: {data: {availability: Availability.Type}; from: string}): void {
+  private onUserAvailability(event: {data: {availability: Availability.Type}; from: string}): void {
     if (this.isTeam()) {
       const {
         from: userId,
@@ -268,7 +268,7 @@ export class UserRepository {
   /**
    * Event to update the matching user.
    */
-  async userUpdate({user}: {user: Partial<APIClientUser>}): Promise<User> {
+  private async userUpdate({user}: {user: Partial<APIClientUser>}): Promise<User> {
     const isSelfUser = user.id === this.self().id;
     const userEntity = isSelfUser ? this.self() : await this.getUserById(user.id);
     this.userMapper.updateUserFromObject(userEntity, user);
@@ -348,14 +348,14 @@ export class UserRepository {
   /**
    * Update clients for given user.
    */
-  updateClientsFromUser(userId: string, clientEntities: ClientEntity[]): void {
+  private updateClientsFromUser(userId: string, clientEntities: ClientEntity[]): void {
     this.getUserById(userId).then(userEntity => {
       userEntity.devices(clientEntities);
       amplify.publish(WebAppEvents.USER.CLIENTS_UPDATED, userId, clientEntities);
     });
   }
 
-  setAvailability(availability: Availability.Type, method: string): void {
+  private setAvailability(availability: Availability.Type, method: string): void {
     const hasAvailabilityChanged = availability !== this.self().availability();
     const newAvailabilityValue = valueFromType(availability);
     if (hasAvailabilityChanged) {
@@ -383,7 +383,7 @@ export class UserRepository {
     amplify.publish(WebAppEvents.BROADCAST.SEND_MESSAGE, {genericMessage, recipients});
   }
 
-  onLegalHoldRequestCanceled(eventJson: any): void {
+  private onLegalHoldRequestCanceled(eventJson: any): void {
     if (this.self().id === eventJson.id) {
       this.self().hasPendingLegalHold(false);
       amplify.publish(HIDE_REQUEST_MODAL);
@@ -397,7 +397,7 @@ export class UserRepository {
     }
   }
 
-  async onLegalHoldRequest(eventJson: any): Promise<void> {
+  private async onLegalHoldRequest(eventJson: any): Promise<void> {
     if (this.self().id !== eventJson.id) {
       return;
     }
@@ -441,7 +441,7 @@ export class UserRepository {
   /**
    * Get users from the backend.
    */
-  async fetchUsersById(userIds: string[] = []): Promise<User[]> {
+  private async fetchUsersById(userIds: string[] = []): Promise<User[]> {
     userIds = userIds.filter(userId => !!userId);
 
     if (!userIds.length) {
@@ -603,7 +603,7 @@ export class UserRepository {
    * Is the user the logged in user?
    * @param isMe `true` if self user
    */
-  saveUser(userEntity: User, isMe: boolean = false): User {
+  private saveUser(userEntity: User, isMe: boolean = false): User {
     const user = this.findUserById(userEntity.id);
     if (!user) {
       if (isMe) {
@@ -619,7 +619,7 @@ export class UserRepository {
    * Save multiple users at once.
    * @returns Resolves with users passed as parameter
    */
-  saveUsers(userEntities: User[]): User[] {
+  private saveUsers(userEntities: User[]): User[] {
     const newUsers = userEntities.filter(userEntity => !this.findUserById(userEntity.id));
     this.users.push(...newUsers);
     return userEntities;
@@ -732,7 +732,7 @@ export class UserRepository {
    * @param usernames Username suggestions
    * @returns A list with usernames that are not taken.
    */
-  verifyUsernames(usernames: string[]): Promise<string[]> {
+  private verifyUsernames(usernames: string[]): Promise<string[]> {
     return this.userService.checkUserHandles(usernames);
   }
 
@@ -796,7 +796,7 @@ export class UserRepository {
     });
   }
 
-  async initMarketingConsent(): Promise<void> {
+  private async initMarketingConsent(): Promise<void> {
     if (!Config.getConfig().FEATURE.CHECK_CONSENT) {
       this.logger.warn(
         `Consent check feature is disabled. Defaulting to '${this.propertyRepository.marketingConsent()}'`,
