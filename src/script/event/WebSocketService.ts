@@ -20,6 +20,7 @@
 import type {APIClient} from '@wireapp/api-client';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import type {Notification} from '@wireapp/api-client/dist/notification';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {loadValue} from 'Util/StorageUtil';
@@ -31,7 +32,7 @@ import type {BackendClient} from '../service/BackendClient';
 import {StorageKey} from '../storage/StorageKey';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
 
-enum CHANGE_TRIGGER {
+export enum CHANGE_TRIGGER {
   CLEANUP = 'CHANGE_TRIGGER.CLEANUP',
   CLOSE = 'CHANGE_TRIGGER.CLOSE',
   ERROR = 'CHANGE_TRIGGER.ERROR',
@@ -44,12 +45,12 @@ enum CHANGE_TRIGGER {
   WARNING_BAR = 'CHANGE_TRIGGER.WARNING_BAR',
 }
 
-export type OnNotificationCallback = (data: string) => void;
+export type OnNotificationCallback = (data: Notification) => void;
 
 export class WebSocketService {
   private readonly apiClient: APIClient;
   private readonly backendClient: BackendClient;
-  private readonly clientId?: string;
+  clientId?: string;
   private readonly logger: Logger;
   private connectionUrl: string;
   private hasAlreadySentUnansweredPing: boolean;

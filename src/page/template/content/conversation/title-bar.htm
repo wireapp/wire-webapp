@@ -25,7 +25,7 @@
     <div class="conversation-title-bar-icons">
       <!-- ko if: showCallControls() -->
         <!-- ko using: callingViewModel -->
-          <!-- ko if: $parent.supportsVideoCall -->
+          <!-- ko if: $parent.supportsVideoCall() -->
             <camera-icon class="conversation-title-bar-icon"
                   data-bind="clickOrDrag: () => callActions.startVideo($parent.conversationEntity()), attr: {title: t('tooltipConversationVideoCall')}"
                   data-uie-name="do-video-call">
