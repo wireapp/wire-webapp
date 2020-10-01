@@ -47,7 +47,7 @@ export class TitleBarViewModel {
   private readonly hasCall: ko.PureComputed<boolean>;
   readonly badgeLabelCopy: ko.PureComputed<string>;
   readonly showCallControls: ko.PureComputed<boolean>;
-  readonly supportsVideoCall: boolean;
+  readonly supportsVideoCall: ko.PureComputed<boolean>;
   readonly peopleTooltip: string;
 
   constructor(
@@ -101,7 +101,9 @@ export class TitleBarViewModel {
       return !this.hasCall() && isSupportedConversation && isActiveConversation;
     });
 
-    this.supportsVideoCall = callingRepository.supportsConferenceCalling;
+    this.supportsVideoCall = ko.pureComputed(() =>
+      this.conversationEntity()?.supportsVideoCall(callingRepository.supportsConferenceCalling),
+    );
 
     const shortcut = Shortcut.getShortcutTooltip(ShortcutType.PEOPLE);
     this.peopleTooltip = t('tooltipConversationPeople', shortcut);
