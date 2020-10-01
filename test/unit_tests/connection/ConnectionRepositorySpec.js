@@ -59,12 +59,12 @@ describe('ConnectionRepository', () => {
       userEntity.connection(connectionEntity);
 
       connectionRepository.connectionEntities.push(connectionEntity);
-      spyOn(connectionRepository, '_updateStatus').and.returnValue(Promise.resolve());
+      spyOn(connectionRepository, 'updateStatus').and.returnValue(Promise.resolve());
     });
 
     it('sets the connection status to cancelled', () => {
       return connectionRepository.cancelRequest(userEntity).then(() => {
-        expect(connectionRepository._updateStatus).toHaveBeenCalled();
+        expect(connectionRepository.updateStatus).toHaveBeenCalled();
       });
     });
 
@@ -73,7 +73,7 @@ describe('ConnectionRepository', () => {
       amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, amplifySpy);
 
       return connectionRepository.cancelRequest(userEntity, new Conversation()).then(() => {
-        expect(connectionRepository._updateStatus).toHaveBeenCalled();
+        expect(connectionRepository.updateStatus).toHaveBeenCalled();
         expect(amplifySpy).toHaveBeenCalled();
       });
     });
