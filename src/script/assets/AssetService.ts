@@ -21,23 +21,24 @@ import {APIClient} from '@wireapp/api-client';
 import {ProgressCallback, RequestCancelable} from '@wireapp/api-client/dist/http';
 import {AssetOptions, AssetUploadData} from '@wireapp/api-client/dist/asset';
 import {singleton, container} from 'tsyringe';
-import {legacyAsset, assetV3} from 'Util/ValidationUtil';
-import {BackendClient} from '../service/BackendClient';
+import {legacyAsset, assetV3, isValidApiPath} from 'Util/ValidationUtil';
 import {APIClientSingleton} from '../service/APIClientSingleton';
 
 @singleton()
 export class AssetService {
   private readonly apiClient: APIClient;
-  private readonly backendClient: BackendClient;
 
   constructor() {
     this.apiClient = container.resolve(APIClientSingleton).getClient();
-    this.backendClient = container.resolve(BackendClient);
   }
 
   async generateAssetUrl(assetId: string, conversationId: string, forceCaching: boolean): Promise<string> {
     legacyAsset(assetId, conversationId);
-    const url = this.backendClient.createUrl(`/assets/${assetId}`);
+
+    const path = `/assets/${assetId}`;
+    isValidApiPath(path);
+
+    const url = `${this.apiClient.config.urls.rest}${path}`;
     const cachingParam = forceCaching ? '&forceCaching=true' : '';
     const conversationIdParam = `&conv_id=${encodeURIComponent(conversationId)}`;
     return `${url}?access_token=${this.apiClient['accessTokenStore'].accessToken?.access_token}${conversationIdParam}${cachingParam}`;
@@ -45,14 +46,22 @@ export class AssetService {
 
   async generateAssetUrlV2(assetId: string, conversationId: string, forceCaching: boolean): Promise<string> {
     legacyAsset(assetId, conversationId);
-    const url = this.backendClient.createUrl(`/conversations/${conversationId}/otr/assets/${assetId}`);
+
+    const path = `/conversations/${conversationId}/otr/assets/${assetId}`;
+    isValidApiPath(path);
+
+    const url = `${this.apiClient.config.urls.rest}${path}`;
     const cachingParam = forceCaching ? '&forceCaching=true' : '';
     return `${url}?access_token=${this.apiClient['accessTokenStore'].accessToken?.access_token}${cachingParam}`;
   }
 
   async generateAssetUrlV3(assetKey: string, assetToken: string, forceCaching: boolean): Promise<string> {
     assetV3(assetKey, assetToken);
-    const url = this.backendClient.createUrl(`/assets/v3/${assetKey}`);
+
+    const path = `/assets/v3/${assetKey}`;
+    isValidApiPath(path);
+
+    const url = `${this.apiClient.config.urls.rest}${path}`;
     const assetTokenParam = assetToken ? `&asset_token=${encodeURIComponent(assetToken)}` : '';
     const cachingParam = forceCaching ? '&forceCaching=true' : '';
     return `${url}?access_token=${this.apiClient['accessTokenStore'].accessToken?.access_token}${assetTokenParam}${cachingParam}`;

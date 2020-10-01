@@ -26,17 +26,13 @@ import {LinkPreviewRepository} from 'src/script/links/LinkPreviewRepository';
 import {APIClientSingleton} from 'src/script/service/APIClientSingleton';
 import {LinkPreviewError} from 'src/script/error/LinkPreviewError';
 import {AssetRepository} from 'src/script/assets/AssetRepository';
-import {BackendClient} from 'src/script/service/BackendClient';
 
 describe('LinkPreviewRepository', () => {
   let link_preview_repository = null;
 
   beforeEach(() => {
     const apiClient = container.resolve(APIClientSingleton).getClient();
-    const assetService = new AssetService(
-      container.resolve(APIClientSingleton).getClient(),
-      container.resolve(BackendClient),
-    );
+    const assetService = new AssetService(container.resolve(APIClientSingleton).getClient());
     const assetRepository = new AssetRepository(assetService);
     const propertiesRepository = new PropertiesRepository(new PropertiesService(apiClient), new SelfService(apiClient));
     link_preview_repository = new LinkPreviewRepository(assetRepository, propertiesRepository);

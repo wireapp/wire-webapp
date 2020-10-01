@@ -68,7 +68,6 @@ import {ServiceMiddleware} from '../event/preprocessor/ServiceMiddleware';
 import {WebSocketService} from '../event/WebSocketService';
 import {ConversationService} from '../conversation/ConversationService';
 
-import {BackendClient} from '../service/BackendClient';
 import {SingleInstanceHandler} from './SingleInstanceHandler';
 
 import {AppInitStatisticsValue} from '../telemetry/app_init/AppInitStatisticsValue';
@@ -144,7 +143,6 @@ function doRedirect(signOutReason: SIGN_OUT_REASON) {
 
 class App {
   apiClient: APIClient;
-  backendClient: BackendClient;
   logger: Logger;
   appContainer: HTMLElement;
   service: {
@@ -181,19 +179,12 @@ class App {
 
   /**
    * @param apiClient Configured backend client
-   * @param backendClient Configured backend client
    * @param appContainer DOM element that will hold the app
    * @param encryptedEngine Encrypted database handler
    */
-  constructor(
-    apiClient: APIClient,
-    backendClient: BackendClient,
-    appContainer: HTMLElement,
-    encryptedEngine?: SQLeetEngine,
-  ) {
+  constructor(apiClient: APIClient, appContainer: HTMLElement, encryptedEngine?: SQLeetEngine) {
     this.apiClient = apiClient;
     this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () => this.logout(SIGN_OUT_REASON.NOT_SIGNED_IN, false));
-    this.backendClient = backendClient;
     this.logger = getLogger('App');
     this.appContainer = appContainer;
 
@@ -563,11 +554,8 @@ class App {
       }
 
       if (isAccessTokenError) {
-        this.logger.warn('Connectivity issues. Trigger reload on regained connectivity.', error);
-        const triggerSource = isAccessTokenError
-          ? BackendClient.CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_RETRIEVAL
-          : BackendClient.CONNECTIVITY_CHECK_TRIGGER.APP_INIT_RELOAD;
-        return this.backendClient.executeOnConnectivity(triggerSource).then(() => window.location.reload());
+        this.logger.warn('Connectivity issues. Trigger reload.', error);
+        return window.location.reload();
       }
     }
 
@@ -886,15 +874,13 @@ class App {
    */
   private _redirectToLogin(signOutReason: SIGN_OUT_REASON): void {
     this.logger.info(`Redirecting to login after connectivity verification. Reason: ${signOutReason}`);
-    this.backendClient.executeOnConnectivity(BackendClient.CONNECTIVITY_CHECK_TRIGGER.LOGIN_REDIRECT).then(() => {
-      const isTemporaryGuestReason = App.CONFIG.SIGN_OUT_REASONS.TEMPORARY_GUEST.includes(signOutReason);
-      const isLeavingGuestRoom = isTemporaryGuestReason && this.repository.user.isTemporaryGuest();
-      if (isLeavingGuestRoom) {
-        return window.location.replace(getWebsiteUrl());
-      }
+    const isTemporaryGuestReason = App.CONFIG.SIGN_OUT_REASONS.TEMPORARY_GUEST.includes(signOutReason);
+    const isLeavingGuestRoom = isTemporaryGuestReason && this.repository.user.isTemporaryGuest();
+    if (isLeavingGuestRoom) {
+      return window.location.replace(getWebsiteUrl());
+    }
 
-      doRedirect(signOutReason);
-    });
+    doRedirect(signOutReason);
   }
 
   //##############################################################################
@@ -920,19 +906,14 @@ $(async () => {
   const appContainer = document.getElementById('wire-main');
   if (appContainer) {
     const apiClient = container.resolve(APIClientSingleton).getClient();
-    const backendClient = container.resolve(BackendClient);
-    backendClient.setSettings({
-      restUrl: Config.getConfig().BACKEND_REST,
-      webSocketUrl: Config.getConfig().BACKEND_WS,
-    });
     const shouldPersist = loadValue<boolean>(StorageKey.AUTH.PERSIST);
     if (shouldPersist === undefined) {
       doRedirect(SIGN_OUT_REASON.NOT_SIGNED_IN);
     } else if (isTemporaryClientAndNonPersistent(shouldPersist)) {
       const engine = await StorageService.getUninitializedEngine();
-      window.wire.app = new App(apiClient, backendClient, appContainer, engine);
+      window.wire.app = new App(apiClient, appContainer, engine);
     } else {
-      window.wire.app = new App(apiClient, backendClient, appContainer);
+      window.wire.app = new App(apiClient, appContainer);
     }
   }
 });

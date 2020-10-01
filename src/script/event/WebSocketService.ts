@@ -81,7 +81,9 @@ export class WebSocketService {
           amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
           return;
         }
-        case WEBSOCKET_STATE.CLOSING:
+        case WEBSOCKET_STATE.CLOSING: {
+          return;
+        }
         case WEBSOCKET_STATE.CLOSED: {
           amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.NO_INTERNET);
           return;
