@@ -119,7 +119,7 @@ export class EventTrackingRepository {
       app_key: window.wire.env.COUNTLY_API_KEY,
       debug: !Environment.frontend.isProduction(),
       device_id: this.countlyDeviceId,
-      url: 'https://wire.count.ly/',
+      url: 'https://countly.wire.com/',
       use_session_cookie: false,
     });
 
