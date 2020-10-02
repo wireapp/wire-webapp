@@ -789,7 +789,7 @@
   "preferencesAccountDataCheckbox": "Отправлять анонимные отчеты о падениях",
   "preferencesAccountDataDetail": "Отправлять анонимные сообщения о сбоях и базовые данные, такие как номер версии и операционная система, чтобы помочь {{brandName}} идентифицировать и решить проблемы с приложением.",
   "preferencesAccountDataTelemetry": "Данные об использовании позволяют {{brandName}} определить, как используется приложение и как его можно улучшить. Эти данные анонимны и не включают в себя содержимое ваших сообщений (например, сообщения, файлы или звонки).",
-  "preferencesAccountDataTelemetryCheckbox": "Отправлять анонимную информацию об использовании",
+  "preferencesAccountDataTelemetryCheckbox": "Отправка анонимных данных об использовании",
   "preferencesAccountDelete": "Удалить аккаунт",
   "preferencesAccountEmailPlaceholder": "Ваш адрес email",
   "preferencesAccountInfo": "Информация",
