@@ -441,7 +441,7 @@
   "groupParticipantActionSelfProfile": "Profil öffnen",
   "groupParticipantActionSendRequest": "Kontakt hinzufügen",
   "groupParticipantActionUnblock": "Freigeben…",
-  "groupSizeInfo": "Up to {{count}} people can join a group conversation.",
+  "groupSizeInfo": "Bis zu {{count}} Personen können an einer Gruppenunterhaltung teilnehmen.",
   "guestOptionsCopyLink": "Link kopieren",
   "guestOptionsCopyLinkDone": "Link kopiert!",
   "guestOptionsCreateLink": "Link erstellen",
