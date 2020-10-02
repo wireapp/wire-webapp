@@ -186,8 +186,6 @@ export class AuthAction {
     localStorageAction: LocalStorageAction,
   ): Promise<void[]> => {
     const persist = clientType === ClientType.PERMANENT;
-    // TODO: Fixed once core v6 is inside
-    // @ts-ignore
     const accessToken = core['apiClient'].accessTokenStore.accessToken;
     const expiresMillis = accessToken.expires_in * 1000;
     const expireTimestamp = Date.now() + expiresMillis;

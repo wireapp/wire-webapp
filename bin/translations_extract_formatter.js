@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2020 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,10 +17,14 @@
  *
  */
 
-export const UserData = {
-  CONTACTS: 'user_contacts',
-  IS_TEAM: 'team_is_team',
-  TEAM_ID: 'team_team_id',
-  TEAM_SIZE: 'team_team_size',
-  USER_TYPE: 'team_user_type',
+const webappTranslations = require('../src/i18n/en-US.json');
+
+exports.format = function (messages) {
+  return Object.entries(messages).reduce(
+    (accumulator, [key, value]) => ({
+      ...accumulator,
+      [key]: value.defaultMessage,
+    }),
+    {...webappTranslations},
+  );
 };

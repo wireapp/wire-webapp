@@ -102,7 +102,7 @@ export class TitleBarViewModel {
     });
 
     this.supportsVideoCall = ko.pureComputed(() =>
-      this.conversationEntity()?.supportsVideoCall(callingRepository.useSftCalling()),
+      this.conversationEntity()?.supportsVideoCall(callingRepository.supportsConferenceCalling),
     );
 
     const shortcut = Shortcut.getShortcutTooltip(ShortcutType.PEOPLE);

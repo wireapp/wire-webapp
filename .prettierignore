@@ -1,0 +1,11 @@
+src/i18n/
+.nyc_output
+/config
+/docs/auth-coverage
+/docs/coverage
+/package-lock.json
+/resource
+/src/ext
+node_modules
+npm-debug.log
+yarn-error.log

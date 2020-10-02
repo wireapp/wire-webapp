@@ -160,7 +160,7 @@ describe('ConversationRepository', () => {
         type: ClientEvent.CONVERSATION.ASSET_ADD,
       };
 
-      return testFactory.conversation_repository._on_asset_upload_complete(conversation_et, event).then(() => {
+      return testFactory.conversation_repository.onAssetUploadComplete(conversation_et, event).then(() => {
         expect(testFactory.event_service.updateEventAsUploadSucceeded).toHaveBeenCalled();
 
         const [firstAsset] = message_et.assets();
@@ -172,7 +172,7 @@ describe('ConversationRepository', () => {
     });
   });
 
-  describe('_checkLegalHoldStatus', () => {
+  describe('checkLegalHoldStatus', () => {
     it('injects legal hold system messages when user A discovers that user B is on legal hold when receiving a message from user B for the very first time', async () => {
       const conversationPartner = UserGenerator.getRandomUser();
       testFactory.user_repository.users.push(conversationPartner);
@@ -258,7 +258,7 @@ describe('ConversationRepository', () => {
       });
 
       await testFactory.conversation_repository.save_conversation(conversationEntity);
-      await testFactory.conversation_repository._checkLegalHoldStatus(conversationEntity, eventJson);
+      await testFactory.conversation_repository.checkLegalHoldStatus(conversationEntity, eventJson);
 
       expect(testFactory.conversation_repository.injectLegalHoldMessage).toHaveBeenCalledTimes(1);
     });
@@ -355,7 +355,7 @@ describe('ConversationRepository', () => {
   describe('deleteMessageForEveryone', () => {
     beforeEach(() => {
       conversation_et = _generate_conversation(CONVERSATION_TYPE.REGULAR);
-      spyOn(testFactory.conversation_repository, '_sendGenericMessage').and.returnValue(Promise.resolve());
+      spyOn(testFactory.conversation_repository, 'sendGenericMessage').and.returnValue(Promise.resolve());
     });
 
     it('should not delete other users messages', done => {
@@ -685,7 +685,7 @@ describe('ConversationRepository', () => {
     });
   });
 
-  describe('_handleConversationEvent', () => {
+  describe('handleConversationEvent', () => {
     it('detects events send by a user not in the conversation', () => {
       const conversationEntity = _generate_conversation(CONVERSATION_TYPE.REGULAR);
       const event = {
@@ -704,7 +704,7 @@ describe('ConversationRepository', () => {
         Promise.resolve(conversationEntity),
       );
 
-      return testFactory.conversation_repository._handleConversationEvent(event).then(() => {
+      return testFactory.conversation_repository.handleConversationEvent(event).then(() => {
         expect(testFactory.conversation_repository.addMissingMember).toHaveBeenCalledWith(
           conversationEntity,
           [event.from],
@@ -835,14 +835,14 @@ describe('ConversationRepository', () => {
           .then(fetched_conversation => {
             expect(fetched_conversation).toBeDefined();
             testFactory.conversation_repository.active_conversation(fetched_conversation);
-            return testFactory.conversation_repository._handleConversationEvent(upload_start);
+            return testFactory.conversation_repository.handleConversationEvent(upload_start);
           })
           .then(() => {
             const number_of_messages = Object.keys(testFactory.conversation_repository.active_conversation().messages())
               .length;
 
             expect(number_of_messages).toBe(1);
-            return testFactory.conversation_repository._handleConversationEvent(upload_failed);
+            return testFactory.conversation_repository.handleConversationEvent(upload_failed);
           })
           .then(() => {
             const number_of_messages = Object.keys(testFactory.conversation_repository.active_conversation().messages())
@@ -858,7 +858,7 @@ describe('ConversationRepository', () => {
       let createEvent = null;
 
       beforeEach(() => {
-        spyOn(testFactory.conversation_repository, '_onCreate').and.callThrough();
+        spyOn(testFactory.conversation_repository, 'onCreate').and.callThrough();
         spyOn(testFactory.conversation_repository, 'mapConversations').and.returnValue(
           new Conversation(createRandomUuid()),
         );
@@ -870,8 +870,8 @@ describe('ConversationRepository', () => {
       });
 
       it('should process create event for a new conversation created locally', () => {
-        return testFactory.conversation_repository._handleConversationEvent(createEvent).then(() => {
-          expect(testFactory.conversation_repository._onCreate).toHaveBeenCalled();
+        return testFactory.conversation_repository.handleConversationEvent(createEvent).then(() => {
+          expect(testFactory.conversation_repository.onCreate).toHaveBeenCalled();
           expect(testFactory.conversation_repository.mapConversations).toHaveBeenCalledWith(createEvent.data, 1);
         });
       });
@@ -880,8 +880,8 @@ describe('ConversationRepository', () => {
         const time = new Date();
         createEvent.time = time.toISOString();
 
-        return testFactory.conversation_repository._handleConversationEvent(createEvent).then(() => {
-          expect(testFactory.conversation_repository._onCreate).toHaveBeenCalled();
+        return testFactory.conversation_repository.handleConversationEvent(createEvent).then(() => {
+          expect(testFactory.conversation_repository.onCreate).toHaveBeenCalled();
           expect(testFactory.conversation_repository.mapConversations).toHaveBeenCalledWith(
             createEvent.data,
             time.getTime(),
@@ -894,7 +894,7 @@ describe('ConversationRepository', () => {
       let memberJoinEvent = null;
 
       beforeEach(() => {
-        spyOn(testFactory.conversation_repository, '_onMemberJoin').and.callThrough();
+        spyOn(testFactory.conversation_repository, 'onMemberJoin').and.callThrough();
         spyOn(testFactory.conversation_repository, 'updateParticipatingUserEntities').and.callThrough();
         spyOn(testFactory.user_repository, 'getUsersById').and.returnValue(Promise.resolve([]));
 
@@ -911,8 +911,8 @@ describe('ConversationRepository', () => {
       });
 
       it('should process member-join event when joining a group conversation', () => {
-        return testFactory.conversation_repository._handleConversationEvent(memberJoinEvent).then(() => {
-          expect(testFactory.conversation_repository._onMemberJoin).toHaveBeenCalled();
+        return testFactory.conversation_repository.handleConversationEvent(memberJoinEvent).then(() => {
+          expect(testFactory.conversation_repository.onMemberJoin).toHaveBeenCalled();
           expect(testFactory.conversation_repository.updateParticipatingUserEntities).toHaveBeenCalled();
         });
       });
@@ -924,8 +924,8 @@ describe('ConversationRepository', () => {
         connectionEntity.status(ConnectionStatus.PENDING);
         testFactory.connection_repository.connectionEntities.push(connectionEntity);
 
-        return testFactory.conversation_repository._handleConversationEvent(memberJoinEvent).then(() => {
-          expect(testFactory.conversation_repository._onMemberJoin).toHaveBeenCalled();
+        return testFactory.conversation_repository.handleConversationEvent(memberJoinEvent).then(() => {
+          expect(testFactory.conversation_repository.onMemberJoin).toHaveBeenCalled();
           expect(testFactory.conversation_repository.updateParticipatingUserEntities).not.toHaveBeenCalled();
         });
       });
@@ -941,8 +941,8 @@ describe('ConversationRepository', () => {
           message_et.from = testFactory.user_repository.self().id;
           conversation_et.add_message(message_et);
 
-          spyOn(testFactory.conversation_repository, '_addDeleteMessage');
-          spyOn(testFactory.conversation_repository, '_onMessageDeleted').and.callThrough();
+          spyOn(testFactory.conversation_repository, 'addDeleteMessage');
+          spyOn(testFactory.conversation_repository, 'onMessageDeleted').and.callThrough();
         });
       });
 
@@ -962,14 +962,14 @@ describe('ConversationRepository', () => {
 
         expect(conversation_et.getMessage(message_et.id)).toBeDefined();
         testFactory.conversation_repository
-          ._handleConversationEvent(message_delete_event)
+          .handleConversationEvent(message_delete_event)
           .then(done.fail)
           .catch(error => {
             expect(error).toEqual(jasmine.any(ConversationError));
             expect(error.type).toBe(ConversationError.TYPE.WRONG_USER);
-            expect(testFactory.conversation_repository._onMessageDeleted).toHaveBeenCalled();
+            expect(testFactory.conversation_repository.onMessageDeleted).toHaveBeenCalled();
             expect(conversation_et.getMessage(message_et.id)).toBeDefined();
-            expect(testFactory.conversation_repository._addDeleteMessage).not.toHaveBeenCalled();
+            expect(testFactory.conversation_repository.addDeleteMessage).not.toHaveBeenCalled();
             done();
           });
       });
@@ -988,10 +988,10 @@ describe('ConversationRepository', () => {
         };
 
         expect(conversation_et.getMessage(message_et.id)).toBeDefined();
-        return testFactory.conversation_repository._handleConversationEvent(message_delete_event).then(() => {
-          expect(testFactory.conversation_repository._onMessageDeleted).toHaveBeenCalled();
+        return testFactory.conversation_repository.handleConversationEvent(message_delete_event).then(() => {
+          expect(testFactory.conversation_repository.onMessageDeleted).toHaveBeenCalled();
           expect(testFactory.event_service.deleteEvent).toHaveBeenCalledTimes(1);
-          expect(testFactory.conversation_repository._addDeleteMessage).not.toHaveBeenCalled();
+          expect(testFactory.conversation_repository.addDeleteMessage).not.toHaveBeenCalled();
         });
       });
 
@@ -1012,10 +1012,10 @@ describe('ConversationRepository', () => {
         };
 
         expect(conversation_et.getMessage(message_et.id)).toBeDefined();
-        return testFactory.conversation_repository._handleConversationEvent(message_delete_event).then(() => {
-          expect(testFactory.conversation_repository._onMessageDeleted).toHaveBeenCalled();
+        return testFactory.conversation_repository.handleConversationEvent(message_delete_event).then(() => {
+          expect(testFactory.conversation_repository.onMessageDeleted).toHaveBeenCalled();
           expect(testFactory.event_service.deleteEvent).toHaveBeenCalledTimes(1);
-          expect(testFactory.conversation_repository._addDeleteMessage).toHaveBeenCalled();
+          expect(testFactory.conversation_repository.addDeleteMessage).toHaveBeenCalled();
         });
       });
 
@@ -1037,10 +1037,10 @@ describe('ConversationRepository', () => {
         };
 
         expect(conversation_et.getMessage(message_et.id)).toBeDefined();
-        return testFactory.conversation_repository._handleConversationEvent(message_delete_event).then(() => {
-          expect(testFactory.conversation_repository._onMessageDeleted).toHaveBeenCalled();
+        return testFactory.conversation_repository.handleConversationEvent(message_delete_event).then(() => {
+          expect(testFactory.conversation_repository.onMessageDeleted).toHaveBeenCalled();
           expect(testFactory.event_service.deleteEvent).toHaveBeenCalledTimes(1);
-          expect(testFactory.conversation_repository._addDeleteMessage).not.toHaveBeenCalled();
+          expect(testFactory.conversation_repository.addDeleteMessage).not.toHaveBeenCalled();
         });
       });
     });
@@ -1056,7 +1056,7 @@ describe('ConversationRepository', () => {
           conversation_et.add_message(messageToHideEt);
 
           messageId = messageToHideEt.id;
-          spyOn(testFactory.conversation_repository, '_onMessageHidden').and.callThrough();
+          spyOn(testFactory.conversation_repository, 'onMessageHidden').and.callThrough();
         });
       });
 
@@ -1076,12 +1076,12 @@ describe('ConversationRepository', () => {
         expect(conversation_et.getMessage(messageId)).toBeDefined();
 
         testFactory.conversation_repository
-          ._handleConversationEvent(messageHiddenEvent)
+          .handleConversationEvent(messageHiddenEvent)
           .then(done.fail)
           .catch(error => {
             expect(error).toEqual(jasmine.any(ConversationError));
             expect(error.type).toBe(ConversationError.TYPE.WRONG_USER);
-            expect(testFactory.conversation_repository._onMessageHidden).toHaveBeenCalled();
+            expect(testFactory.conversation_repository.onMessageHidden).toHaveBeenCalled();
             expect(conversation_et.getMessage(messageId)).toBeDefined();
             done();
           });
@@ -1103,8 +1103,8 @@ describe('ConversationRepository', () => {
 
         expect(conversation_et.getMessage(messageId)).toBeDefined();
 
-        return testFactory.conversation_repository._handleConversationEvent(messageHiddenEvent).then(() => {
-          expect(testFactory.conversation_repository._onMessageHidden).toHaveBeenCalled();
+        return testFactory.conversation_repository.handleConversationEvent(messageHiddenEvent).then(() => {
+          expect(testFactory.conversation_repository.onMessageHidden).toHaveBeenCalled();
           expect(testFactory.event_service.deleteEvent).toHaveBeenCalledTimes(1);
         });
       });
@@ -1125,8 +1125,8 @@ describe('ConversationRepository', () => {
 
         expect(conversation_et.getMessage(messageId)).toBeDefined();
 
-        return testFactory.conversation_repository._onMessageHidden(messageHiddenEvent).then(() => {
-          expect(testFactory.conversation_repository._onMessageHidden).toHaveBeenCalled();
+        return testFactory.conversation_repository.onMessageHidden(messageHiddenEvent).then(() => {
+          expect(testFactory.conversation_repository.onMessageHidden).toHaveBeenCalled();
           expect(testFactory.event_service.deleteEvent).toHaveBeenCalledTimes(1);
         });
       });
@@ -1143,7 +1143,7 @@ describe('ConversationRepository', () => {
         const conversationRepository = testFactory.conversation_repository;
         spyOn(conversationRepository, 'find_conversation_by_id').and.returnValue(conversationEntity);
 
-        conversationRepository._deleteLocalMessageEntity({oldObj: deletedMessagePayload});
+        conversationRepository.deleteLocalMessageEntity({oldObj: deletedMessagePayload});
 
         expect(conversationRepository.find_conversation_by_id).toHaveBeenCalledWith(deletedMessagePayload.conversation);
         expect(conversationEntity.remove_message_by_id).toHaveBeenCalledWith(deletedMessagePayload.id);
@@ -1192,7 +1192,7 @@ describe('ConversationRepository', () => {
     });
   });
 
-  describe('_shouldSendAsExternal', () => {
+  describe('shouldSendAsExternal', () => {
     it('should return true for big payload', () => {
       const largeConversationEntity = _generate_conversation();
       largeConversationEntity.participating_user_ids(
@@ -1214,7 +1214,7 @@ describe('ConversationRepository', () => {
           });
 
           const eventInfoEntity = new EventInfoEntity(genericMessage, largeConversationEntity.id);
-          return testFactory.conversation_repository._shouldSendAsExternal(eventInfoEntity);
+          return testFactory.conversation_repository.shouldSendAsExternal(eventInfoEntity);
         })
         .then(shouldSendAsExternal => {
           expect(shouldSendAsExternal).toBeTruthy();
@@ -1234,7 +1234,7 @@ describe('ConversationRepository', () => {
           });
 
           const eventInfoEntity = new EventInfoEntity(genericMessage, smallConversationEntity.id);
-          return testFactory.conversation_repository._shouldSendAsExternal(eventInfoEntity);
+          return testFactory.conversation_repository.shouldSendAsExternal(eventInfoEntity);
         })
         .then(shouldSendAsExternal => {
           expect(shouldSendAsExternal).toBeFalsy();

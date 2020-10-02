@@ -70,7 +70,6 @@ export class ConnectionRepository {
    *
    * @param eventJson JSON data for event
    * @param source Source of event
-   * @returns No return value
    */
   onUserEvent(eventJson: UserConnectionEvent, source: EventSource): void {
     const eventType = eventJson.type;
@@ -93,7 +92,6 @@ export class ConnectionRepository {
    * @param eventJson JSON data of 'user.connection' event
    * @param source Source of event
    * @param showConversation Should the new conversation be opened?
-   * @returns No return value
    */
   onUserConnection(eventJson: UserConnectionData, source: EventSource, showConversation?: boolean): Promise<void> {
     if (!eventJson) {
@@ -117,7 +115,7 @@ export class ConnectionRepository {
       if (shouldUpdateUser) {
         this.userRepository.updateUserById(connectionEntity.userId);
       }
-      this._sendNotification(connectionEntity, source, previousStatus);
+      this.sendNotification(connectionEntity, source, previousStatus);
       amplify.publish(WebAppEvents.CONVERSATION.MAP_CONNECTION, connectionEntity, showConversation);
     });
   }
@@ -129,7 +127,7 @@ export class ConnectionRepository {
    * @returns Promise that resolves when the connection request was accepted
    */
   acceptRequest(userEntity: User, showConversation: boolean = false): Promise<void> {
-    return this._updateStatus(userEntity, ConnectionStatus.ACCEPTED, showConversation);
+    return this.updateStatus(userEntity, ConnectionStatus.ACCEPTED, showConversation);
   }
 
   /**
@@ -141,7 +139,7 @@ export class ConnectionRepository {
    * @returns Promise that resolves when the user was blocked
    */
   blockUser(userEntity: User, hideConversation: boolean = false, nextConversationEntity?: Conversation): Promise<void> {
-    return this._updateStatus(userEntity, ConnectionStatus.BLOCKED).then(() => {
+    return this.updateStatus(userEntity, ConnectionStatus.BLOCKED).then(() => {
       if (hideConversation) {
         amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversationEntity);
       }
@@ -161,7 +159,7 @@ export class ConnectionRepository {
     hideConversation: boolean = false,
     nextConversationEntity: Conversation,
   ): Promise<void> {
-    return this._updateStatus(userEntity, ConnectionStatus.CANCELLED).then(() => {
+    return this.updateStatus(userEntity, ConnectionStatus.CANCELLED).then(() => {
       if (hideConversation) {
         amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversationEntity);
       }
@@ -227,7 +225,7 @@ export class ConnectionRepository {
    * @returns Promise that resolves when an incoming connection request was ignored
    */
   ignoreRequest(userEntity: User): Promise<void> {
-    return this._updateStatus(userEntity, ConnectionStatus.IGNORED);
+    return this.updateStatus(userEntity, ConnectionStatus.IGNORED);
   }
 
   /**
@@ -238,7 +236,7 @@ export class ConnectionRepository {
    * @returns Promise that resolves when a user was unblocked
    */
   unblockUser(userEntity: User, showConversation = true): Promise<void> {
-    return this._updateStatus(userEntity, ConnectionStatus.ACCEPTED, showConversation);
+    return this.updateStatus(userEntity, ConnectionStatus.ACCEPTED, showConversation);
   }
 
   /**
@@ -283,7 +281,7 @@ export class ConnectionRepository {
    * @param showConversation Show conversation on success
    * @returns Promise that resolves when the connection status was updated
    */
-  private _updateStatus(userEntity: User, connectionStatus: ConnectionStatus, showConversation = false): Promise<void> {
+  private updateStatus(userEntity: User, connectionStatus: ConnectionStatus, showConversation = false): Promise<void> {
     if (!userEntity || !connectionStatus) {
       this.logger.error('Missing parameter to update connection');
       return Promise.reject(new ConnectionError(BaseError.TYPE.MISSING_PARAMETER, BaseError.MESSAGE.MISSING_PARAMETER));
@@ -313,9 +311,8 @@ export class ConnectionRepository {
    * @param connectionEntity Connection entity
    * @param source Source of event
    * @param previousStatus Previous connection status
-   * @returns No return value
    */
-  private _sendNotification(
+  private sendNotification(
     connectionEntity: ConnectionEntity,
     source: EventSource,
     previousStatus: ConnectionStatus,

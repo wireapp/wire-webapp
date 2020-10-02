@@ -262,13 +262,13 @@ export const downloadFile = (url: string, fileName: string, mimeType?: string): 
 
 export const createRandomUuid = (): string => UUID.genV4().toString();
 
-// Note IE10 listens to "transitionend" instead of "animationend"
+// Note: IE10 listens to "transitionend" instead of "animationend"
 export const alias = {
   animationend: 'transitionend animationend oAnimationEnd MSAnimationEnd mozAnimationEnd webkitAnimationEnd',
 };
 
 export const koPushDeferred = (target: ObservableArray, src: any[], number = 100, delay = 300) => {
-  // push array deferred to knockout observableArray
+  /** push array deferred to knockout's `observableArray` */
   let interval: number;
 
   return (interval = window.setInterval(() => {

@@ -47,6 +47,7 @@ export interface ServerConfig {
         SCREEN_ACCESS_DENIED: string;
       };
       TEAMS_BASE: string;
+      TEAMS_CREATE: string;
       TERMS_OF_USE_PERSONAL: string;
       TERMS_OF_USE_TEAMS: string;
       WEBSITE_BASE: string;
