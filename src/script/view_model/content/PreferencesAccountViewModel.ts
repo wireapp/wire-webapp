@@ -182,7 +182,7 @@ export class PreferencesAccountViewModel {
 
     this.isMacOsWrapper = Runtime.isDesktopApp() && Runtime.isMacOS();
     this.manageTeamUrl = getManageTeamUrl('client_settings');
-    this.createTeamUrl = getCreateTeamUrl('client');
+    this.createTeamUrl = getCreateTeamUrl();
 
     this.isTemporaryAndNonPersistent = isTemporaryClientAndNonPersistent(loadValue(StorageKey.AUTH.PERSIST));
     this.isConsentCheckEnabled = () => Config.getConfig().FEATURE.CHECK_CONSENT;
