@@ -2024,10 +2024,10 @@ map-visit@^1.0.0:
   dependencies:
     object-visit "^1.0.0"
 
-maxmind@4.1.4:
-  version "4.1.4"
-  resolved "https://registry.yarnpkg.com/maxmind/-/maxmind-4.1.4.tgz#14fa0cf9a88f15b708edfd1378c5e49e0f0105c1"
-  integrity sha512-DfcZPpc0XJVF1yypRpVqMs9JiSYYShVkfexSjwTbfqZMCEoQlCU83ooX9cRmWMUaLqm4zffi7HtZg7XqcJaL1A==
+maxmind@4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/maxmind/-/maxmind-4.2.0.tgz#912e5ec4a961807d20d7fb541160aeb5ea802c1c"
+  integrity sha512-TADiE11Q10IjvLtlo05tTD52xLqfCJMhE3eYJHmpYIKg668STi/fQZGH9X3FpqpIP/2WPgKFxf899awFvfMtQA==
   dependencies:
     tiny-lru "7.0.6"
 
