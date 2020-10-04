@@ -352,10 +352,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.17.21.tgz#c00e9603399126925806bed2d9a1e37da506965e"
   integrity sha512-PQKsydPxYxF1DsAFWmunaxd3sOi3iMt6Zmx/tgaagHYmwJ/9cRH91hQkeJZaUGWbvn0K5HlSVEXkn5U/llWPpQ==
 
-"@types/platform@1.3.2":
-  version "1.3.2"
-  resolved "https://registry.yarnpkg.com/@types/platform/-/platform-1.3.2.tgz#c0404c4e2a08e04295ab3d1241a856c2a3cab06e"
-  integrity sha512-Tn6OuJDAG7bJbyi4R7HqcxXp1w2lmIxVXqyNhPt1Bm0FO2EWIi3CI87JVzF7ncqK0ZMPuUycS3wTMIk85EeF1Q==
+"@types/platform@1.3.3":
+  version "1.3.3"
+  resolved "https://registry.yarnpkg.com/@types/platform/-/platform-1.3.3.tgz#a3d23941770d320e2c4312516a442ab35210d019"
+  integrity sha512-1fuOulBHWIxAPLBtLms+UtbeRDt6rL7gP5R+Yugfzdg+poCLxXqXTE8i+FpYeiytGRLUEtnFkjsY/j+usbQBqw==
 
 "@types/qs@*":
   version "6.9.4"
@@ -375,14 +375,14 @@
     "@types/express-serve-static-core" "*"
     "@types/mime" "*"
 
-"@wireapp/commons@3.8.2":
-  version "3.8.2"
-  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-3.8.2.tgz#56d1500c7b7fbe3c2e503d8ad2fba4dd564a98be"
-  integrity sha512-3xJKZDfuBLJ0dgsKCenggCvdYTMw5Lhh3Zdm65J4X7NX25r9ivFedEqdj7sqJZ+xN+Fh6cmZBa5iMzuKyUYNag==
+"@wireapp/commons@3.8.3":
+  version "3.8.3"
+  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-3.8.3.tgz#cac0f98a13dbccd16fb576f9cf64b797b326aba7"
+  integrity sha512-w/pjYDo1vj7/Z5pMajM/6n7I4SHJN6zMDRxMCZp0jcMZlqTNqqOkjnmkAHbKAkKgI4AZeZDLPj/9w2MqmbShxg==
   dependencies:
     "@types/fs-extra" "8.1.0"
     "@types/node" "~12"
-    "@types/platform" "1.3.2"
+    "@types/platform" "1.3.3"
     ansi-regex "5.0.0"
     fs-extra "9.0.1"
     logdown "3.3.1"
