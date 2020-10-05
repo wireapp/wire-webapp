@@ -198,13 +198,13 @@ export class EventRepository {
    * Initiate the WebSocket connection.
    * @returns {undefined} No return value
    */
-  connectWebSocket() {
+  async connectWebSocket() {
     if (!this.currentClient().id) {
       throw new EventError(EventError.TYPE.NO_CLIENT_ID, EventError.MESSAGE.NO_CLIENT_ID);
     }
 
     this.webSocketService.clientId = this.currentClient().id;
-    this.webSocketService.connect((notification): number | void => {
+    await this.webSocketService.connect((notification): number | void => {
       const isHandlingWebSocket = this.notificationHandlingState() === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
       if (isHandlingWebSocket) {
         return this.notificationsQueue.push(notification);
@@ -298,7 +298,7 @@ export class EventRepository {
       return new Promise((resolve, reject) => {
         try {
           this.notificationsPromises = [resolve, reject];
-          resolve(processNotifications(notificationList));
+          processNotifications(notificationList);
         } catch (error) {
           reject(error);
         }
@@ -309,7 +309,14 @@ export class EventRepository {
       // TODO: In the future we should ask the backend for the last known notification id (HTTP GET /notifications/{id}) instead of using the "errorResponse.notifications" payload
       if (errorResponse.response?.notifications) {
         this._triggerMissedSystemEventMessageRendering();
-        return processNotifications(errorResponse.response?.notifications);
+        return new Promise((resolve, reject) => {
+          try {
+            this.notificationsPromises = [resolve, reject];
+            processNotifications(errorResponse.response?.notifications);
+          } catch (error) {
+            reject(error);
+          }
+        });
       }
 
       const isNotFound = errorResponse.response?.status === HTTP_STATUS.NOT_FOUND;
@@ -363,20 +370,21 @@ export class EventRepository {
    * Set state for notification stream.
    * @returns {Promise} Resolves when all notifications have been handled
    */
-  initializeFromStream() {
-    return this.getStreamState()
-      .then(({notificationId}) => this._updateFromStream(notificationId))
-      .catch(error => {
-        this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
+  async initializeFromStream() {
+    try {
+      const {notificationId} = await this.getStreamState();
+      return this._updateFromStream(notificationId);
+    } catch (error) {
+      this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
 
-        const isNoLastId = error.type === EventError.TYPE.NO_LAST_ID;
-        if (isNoLastId) {
-          this.logger.info('No notifications found for this user', error);
-          return 0;
-        }
+      const isNoLastId = error.type === EventError.TYPE.NO_LAST_ID;
+      if (isNoLastId) {
+        this.logger.info('No notifications found for this user', error);
+        return 0;
+      }
 
-        throw error;
-      });
+      throw error;
+    }
   }
 
   /**
@@ -486,28 +494,30 @@ export class EventRepository {
    * @param lastNotificationId Last known notification ID to start update from
    * @returns Resolves with the total number of notifications
    */
-  private _updateFromStream(lastNotificationId: string) {
+  private async _updateFromStream(lastNotificationId: string) {
     this.notificationsTotal = 0;
 
-    return this.getNotifications(lastNotificationId, EventRepository.CONFIG.NOTIFICATION_BATCHES.INITIAL)
-      .then(updatedLastNotificationId => {
-        if (updatedLastNotificationId) {
-          this.logger.info(`ID of last notification fetched from stream is '${updatedLastNotificationId}'`);
-        }
-        return this.notificationsTotal;
-      })
-      .catch(error => {
-        this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
+    try {
+      const updatedLastNotificationId = await this.getNotifications(
+        lastNotificationId,
+        EventRepository.CONFIG.NOTIFICATION_BATCHES.INITIAL,
+      );
+      if (updatedLastNotificationId) {
+        this.logger.info(`ID of last notification fetched from stream is '${updatedLastNotificationId}'`);
+      }
+      return this.notificationsTotal;
+    } catch (error) {
+      this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
 
-        const isNoNotifications = error.type === EventError.TYPE.NO_NOTIFICATIONS;
-        if (isNoNotifications) {
-          this.logger.info('No notifications found for this user', error);
-          return 0;
-        }
+      const isNoNotifications = error.type === EventError.TYPE.NO_NOTIFICATIONS;
+      if (isNoNotifications) {
+        this.logger.info('No notifications found for this user', error);
+        return 0;
+      }
 
-        this.logger.error(`Failed to handle notification stream: ${error.message}`, error);
-        throw error;
-      });
+      this.logger.error(`Failed to handle notification stream: ${error.message}`, error);
+      throw error;
+    }
   }
 
   /**
