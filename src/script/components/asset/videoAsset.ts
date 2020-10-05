@@ -75,8 +75,6 @@ class VideoAssetComponent extends AbstractAssetTransferStateTracker {
       {disposeWhenNodeIsRemoved: element},
     );
 
-    this.onPlayButtonClicked = this.onPlayButtonClicked.bind(this);
-    this.onPauseButtonClicked = this.onPauseButtonClicked.bind(this);
     this.displaySmall = ko.observable(!!isQuote);
 
     this.formatSeconds = formatSeconds;
@@ -96,13 +94,14 @@ class VideoAssetComponent extends AbstractAssetTransferStateTracker {
     this.logger.error('Video cannot be played', jqueryEvent);
   }
 
-  onPlayButtonClicked(): void {
+  onPlayButtonClicked = (): void => {
     this.displaySmall(false);
     if (this.videoSrc()) {
       if (this.videoElement) {
         this.videoElement.play();
       }
     } else {
+      this.asset.status(AssetTransferState.DOWNLOADING);
       this.assetRepository
         .load(this.asset.original_resource())
         .then(blob => {
@@ -112,15 +111,16 @@ class VideoAssetComponent extends AbstractAssetTransferStateTracker {
           }
           this.showBottomControls(true);
         })
-        .catch(error => this.logger.error('Failed to load video asset ', error));
+        .catch(error => this.logger.error('Failed to load video asset ', error))
+        .finally(() => this.asset.status(AssetTransferState.UPLOADED));
     }
-  }
+  };
 
-  onPauseButtonClicked(): void {
+  onPauseButtonClicked = (): void => {
     if (this.videoElement) {
       this.videoElement.pause();
     }
-  }
+  };
 
   onVideoPlaying(): void {
     this.videoElement.style.backgroundColor = '#000';

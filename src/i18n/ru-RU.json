@@ -441,7 +441,7 @@
   "groupParticipantActionSelfProfile": "Открыть профиль",
   "groupParticipantActionSendRequest": "Связаться",
   "groupParticipantActionUnblock": "Разблокировать…",
-  "groupSizeInfo": "Up to {{count}} people can join a group conversation.",
+  "groupSizeInfo": "К групповой беседе могут присоединиться до {{count}} человек.",
   "guestOptionsCopyLink": "Копировать ссылку",
   "guestOptionsCopyLinkDone": "Ссылка скопирована!",
   "guestOptionsCreateLink": "Создать ссылку",
