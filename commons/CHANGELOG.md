@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.8.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@3.8.3...@wireapp/commons@3.8.4) (2020-10-05)
+
+
+### Bug Fixes
+
+* **commons:** Ensure value in getOSFamily ([#3248](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/issues/3248)) ([78de3ae](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/commit/78de3aed22bbf4a1761e6b59882bce367cdac28b))
+
+
+
+
+
 ## [3.8.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@3.8.2...@wireapp/commons@3.8.3) (2020-09-28)
 
 **Note:** Version bump only for package @wireapp/commons
