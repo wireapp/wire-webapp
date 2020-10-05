@@ -39,21 +39,24 @@ interface Params {
 }
 
 class MediaButtonComponent extends AbstractAssetTransferStateTracker {
-  mediaElement: HTMLMediaElement;
-  large: boolean;
-  asset: FileAsset;
-  isPlaying: ko.Observable<boolean>;
-  onClickPlay: () => void;
-  onClickPause: () => void;
-  onClickCancel: () => void;
+  private readonly mediaElement: HTMLMediaElement;
+  private readonly large: boolean;
+  readonly asset: FileAsset;
+  private readonly isPlaying: ko.Observable<boolean>;
+  readonly onClickPlay: () => void;
+  readonly onClickPause: () => void;
+  readonly onClickCancel: () => void;
 
-  constructor(params: Params, element: HTMLElement) {
+  constructor(
+    {src, large, asset, uploadProgress, transferState, play = noop, pause = noop, cancel = noop}: Params,
+    element: HTMLElement,
+  ) {
     super();
-    this.mediaElement = params.src;
-    this.large = params.large;
-    this.asset = params.asset;
-    this.uploadProgress = params.uploadProgress;
-    this.transferState = params.transferState;
+    this.mediaElement = src;
+    this.large = large;
+    this.asset = asset;
+    this.uploadProgress = uploadProgress;
+    this.transferState = transferState;
 
     if (this.large) {
       element.classList.add('media-button-lg');
@@ -61,9 +64,9 @@ class MediaButtonComponent extends AbstractAssetTransferStateTracker {
 
     this.isPlaying = ko.observable(false);
 
-    this.onClickPlay = typeof params.play === 'function' ? () => params.play() : noop;
-    this.onClickPause = typeof params.pause === 'function' ? () => params.pause() : noop;
-    this.onClickCancel = typeof params.cancel === 'function' ? () => params.cancel() : noop;
+    this.onClickPlay = () => play();
+    this.onClickPause = () => pause();
+    this.onClickCancel = () => cancel();
 
     this.mediaElement.addEventListener('playing', this.onPlay);
     this.mediaElement.addEventListener('pause', this.onPause);
