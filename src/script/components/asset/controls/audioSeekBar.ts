@@ -25,6 +25,11 @@ import {clamp} from 'Util/NumberUtil';
 
 import {FileAsset} from '../../../entity/message/FileAsset';
 
+/**
+ * A float that must be between 0 and 1
+ */
+type Fraction = number;
+
 interface Params {
   asset: FileAsset;
   disabled: ko.Subscribable<boolean>;
@@ -33,7 +38,7 @@ interface Params {
 
 class AudioSeekBarComponent {
   audioElement: HTMLAudioElement;
-  loudness: number[];
+  loudness: Fraction[];
   private readonly onResizeFired: () => void;
 
   constructor({asset, disabled, src}: Params, private readonly element: HTMLElement) {
@@ -76,7 +81,7 @@ class AudioSeekBarComponent {
     this.element.innerHTML = svg;
   }
 
-  private updateSeekClip(position: number) {
+  private updateSeekClip(position: Fraction) {
     const percent = position * 100;
     this.element.style.setProperty('--seek-bar-clip', `polygon(0 0, ${percent}% 0, ${percent}% 100%, 0 100%)`);
   }
@@ -88,9 +93,9 @@ class AudioSeekBarComponent {
     const scaledLoudness = interpolate(this.loudness, numberOfLevelsFitOnScreen);
     return scaledLoudness
       .map((loudness, index) => {
-        const x1 = index * singleWidth;
+        const x = index * singleWidth;
         const y = 0.5 - loudness / 2;
-        return `M${x1},${y}h${barWidth}V${1 - y}H${x1}z`;
+        return `M${x},${y}h${barWidth}V${1 - y}H${x}z`;
       })
       .join('');
   }
