@@ -234,7 +234,7 @@ export class LegalHoldModalViewModel {
     this.devicesUser(undefined);
   };
 
-  handleInputKey = (_data: LegalHoldModalViewModel, {key}: JQuery.Event): boolean => {
+  handleInputKey = (_data: LegalHoldModalViewModel, {key}: JQuery.Event<HTMLElement, KeyboardEvent>): boolean => {
     if (key !== 'Enter') {
       return true;
     }

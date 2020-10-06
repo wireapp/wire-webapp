@@ -89,7 +89,7 @@ class VideoAssetComponent extends AbstractAssetTransferStateTracker {
     this.videoTime(this.videoElement.currentTime);
   }
 
-  onError(_component: VideoAssetComponent, jqueryEvent: JQueryMouseEventObject): void {
+  onError(_component: VideoAssetComponent, jqueryEvent: JQuery.Event<HTMLElement, MouseEvent>): void {
     this.videoPlaybackError(true);
     this.logger.error('Video cannot be played', jqueryEvent);
   }
