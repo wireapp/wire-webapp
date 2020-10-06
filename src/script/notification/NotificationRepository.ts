@@ -185,12 +185,12 @@ export class NotificationRepository {
     if (Runtime.isSupportingPermissions()) {
       const notificationState = this.permissionRepository.getPermissionState(PermissionType.NOTIFICATIONS);
       const shouldRequestPermission = notificationState === PermissionStatusState.PROMPT;
-      return shouldRequestPermission ? this._requestPermission() : this.checkPermissionState();
+      return shouldRequestPermission ? this.requestPermission() : this.checkPermissionState();
     }
 
     const currentPermission = window.Notification.permission as PermissionState;
     const shouldRequestPermission = currentPermission === PermissionState.DEFAULT;
-    return shouldRequestPermission ? this._requestPermission() : this.updatePermissionState(currentPermission);
+    return shouldRequestPermission ? this.requestPermission() : this.updatePermissionState(currentPermission);
   }
 
   /**
@@ -752,7 +752,7 @@ export class NotificationRepository {
   }
 
   // Request browser permission for notifications.
-  private async _requestPermission(): Promise<void> {
+  private async requestPermission(): Promise<void> {
     amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.REQUEST_NOTIFICATION);
     // Note: The callback will be only triggered in Chrome.
     // If you ignore a permission request on Firefox, then the callback will not be triggered.

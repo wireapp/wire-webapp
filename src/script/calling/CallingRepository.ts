@@ -167,12 +167,6 @@ export class CallingRepository {
       this.acceptedVersionWarnings.remove(acceptedId => !activeCallIds.includes(acceptedId));
     });
 
-    this.apiClient = apiClient;
-    this.conversationRepository = conversationRepository;
-    this.eventRepository = eventRepository;
-    this.serverTimeHandler = serverTimeHandler;
-    // Media Handler
-    this.mediaStreamHandler = mediaStreamHandler;
     this.incomingCallCallback = () => {};
 
     this.logger = getLogger('CallingRepository');
@@ -477,15 +471,20 @@ export class CallingRepository {
 
       if (participant) {
         this.leaveCall(activeCall.conversationId);
-        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
-          action: {
-            title: t('callDegradationAction'),
+        amplify.publish(
+          WebAppEvents.WARNING.MODAL,
+          ModalsViewModel.TYPE.ACKNOWLEDGE,
+          {
+            action: {
+              title: t('callDegradationAction'),
+            },
+            text: {
+              message: t('callDegradationDescription', participant.user.name()),
+              title: t('callDegradationTitle'),
+            },
           },
-          text: {
-            message: t('callDegradationDescription', participant.user.name()),
-            title: t('callDegradationTitle'),
-          },
-        });
+          `degraded-${activeCall.conversationId}`,
+        );
       }
     }
   };

@@ -40,12 +40,12 @@ describe('LinkPreviewRepository', () => {
 
   afterEach(() => (window.openGraphAsync = undefined));
 
-  describe('_getLinkPreview', () => {
+  describe('getLinkPreview', () => {
     it('fetches open graph data if openGraph lib is available', done => {
       window.openGraphAsync = () => Promise.resolve();
 
       link_preview_repository
-        ._getLinkPreview('https://app.wire.com/')
+        .getLinkPreview('https://app.wire.com/')
         .then(done.fail)
         .catch(error => {
           expect(error.type).toBe(LinkPreviewError.TYPE.NO_DATA_AVAILABLE);
@@ -57,7 +57,7 @@ describe('LinkPreviewRepository', () => {
       window.openGraphAsync = () => Promise.resolve();
 
       link_preview_repository
-        ._getLinkPreview('https://www.youtube.com/watch?v=t4gjl-uwUHc')
+        .getLinkPreview('https://www.youtube.com/watch?v=t4gjl-uwUHc')
         .then(done.fail)
         .catch(error => {
           expect(error.type).toBe(LinkPreviewError.TYPE.BLACKLISTED);
@@ -70,7 +70,7 @@ describe('LinkPreviewRepository', () => {
 
       const invalidUrl = 'http:////api/apikey';
       link_preview_repository
-        ._getLinkPreview(invalidUrl)
+        .getLinkPreview(invalidUrl)
         .then(done.fail)
         .catch(error => {
           expect(error.type).toBe(LinkPreviewError.TYPE.UNSUPPORTED_TYPE);

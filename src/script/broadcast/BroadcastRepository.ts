@@ -96,7 +96,7 @@ export class BroadcastRepository {
       return this.cryptographyRepository.encryptGenericMessage(recipients, genericMessage).then(payload => {
         const eventInfoEntity = new EventInfoEntity(genericMessage);
         eventInfoEntity.options.precondition = userEntities.map(user => user.id);
-        this._sendEncryptedMessage(eventInfoEntity, payload);
+        this.sendEncryptedMessage(eventInfoEntity, payload);
       });
     });
   }
@@ -120,7 +120,7 @@ export class BroadcastRepository {
    * @param payload OTR message to broadcast
    * @returns Promise that resolves after sending the encrypted message
    */
-  private _sendEncryptedMessage(eventInfoEntity: EventInfoEntity, payload: NewOTRMessage): Promise<any> {
+  private sendEncryptedMessage(eventInfoEntity: EventInfoEntity, payload: NewOTRMessage): Promise<any> {
     const messageType = eventInfoEntity.getType();
     const receivingUsers = Object.keys(payload.recipients);
     this.logger.info(`Sending '${messageType}' broadcast message to '${receivingUsers.length}' users`, payload);
@@ -145,7 +145,7 @@ export class BroadcastRepository {
         return this.clientMismatchHandler.onClientMismatch(eventInfoEntity, error, payload).then(updatedPayload => {
           this.logger.info(`Updated '${messageType}' message as broadcast`, updatedPayload);
           eventInfoEntity.forceSending();
-          return this._sendEncryptedMessage(eventInfoEntity, updatedPayload);
+          return this.sendEncryptedMessage(eventInfoEntity, updatedPayload);
         });
       });
   }

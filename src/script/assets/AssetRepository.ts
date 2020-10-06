@@ -80,7 +80,7 @@ export class AssetRepository {
   public async load(asset: AssetRemoteData): Promise<void | Blob> {
     try {
       let plaintext: ArrayBuffer;
-      const {buffer, mimeType} = await this._loadBuffer(asset);
+      const {buffer, mimeType} = await this.loadBuffer(asset);
       const isEncryptedAsset = !!asset.otrKey && !!asset.sha256;
 
       if (isEncryptedAsset) {
@@ -128,7 +128,7 @@ export class AssetRepository {
     }
   }
 
-  async _loadBuffer(
+  private async loadBuffer(
     asset: AssetRemoteData,
   ): Promise<{
     buffer: ArrayBuffer;
