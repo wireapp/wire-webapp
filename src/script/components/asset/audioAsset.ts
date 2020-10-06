@@ -48,7 +48,6 @@ class AudioAssetComponent extends AbstractAssetTransferStateTracker {
 
   constructor({message, header = false}: Params, element: HTMLElement) {
     super(ko.unwrap(message));
-    this.dispose = this.dispose.bind(this);
     this.logger = getLogger('AudioAssetComponent');
 
     this.message = ko.unwrap(message);
@@ -77,32 +76,29 @@ class AudioAssetComponent extends AbstractAssetTransferStateTracker {
     this.audioTime(this.audioElement.currentTime);
   }
 
-  onPlayButtonClicked = () => {
-    Promise.resolve()
-      .then(() => {
-        if (!this.audioSrc()) {
-          this.asset.status(AssetTransferState.DOWNLOADING);
-          return this.assetRepository
-            .load(this.asset.original_resource())
-            .then(blob => this.audioSrc(window.URL.createObjectURL(blob)))
-            .then(() => this.asset.status(AssetTransferState.UPLOADED))
-            .catch(() => this.asset.status(AssetTransferState.UPLOADED));
-        }
-        return null;
-      })
-      .then(() => this.audioElement.play())
-      .catch(error => this.logger.error('Failed to load audio asset ', error));
-  };
-
-  onPauseButtonClicked = () => {
-    if (this.audioElement) {
-      this.audioElement.pause();
+  onPlayButtonClicked = async () => {
+    if (this.audioSrc()) {
+      this.audioElement?.play();
+    } else {
+      this.asset.status(AssetTransferState.DOWNLOADING);
+      try {
+        const blob = await this.assetRepository.load(this.asset.original_resource());
+        this.audioSrc(window.URL.createObjectURL(blob));
+        this.audioElement?.play();
+      } catch (error) {
+        this.logger.error('Failed to load audio asset ', error);
+      }
+      this.asset.status(AssetTransferState.UPLOADED);
     }
   };
 
-  dispose(): void {
+  onPauseButtonClicked = () => {
+    this.audioElement?.pause();
+  };
+
+  dispose = (): void => {
     window.URL.revokeObjectURL(this.audioSrc());
-  }
+  };
 }
 
 ko.components.register('audio-asset', {
