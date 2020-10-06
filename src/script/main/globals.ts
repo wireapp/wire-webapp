@@ -108,7 +108,6 @@ declare global {
           SHOW_LOADING_INFORMATION: boolean;
         };
         MAX_GROUP_PARTICIPANTS: number;
-        MAX_SFT_VIDEO_PARTICIPANTS: number;
         MAX_VIDEO_PARTICIPANTS: number;
         NEW_PASSWORD_MINIMUM_LENGTH: number;
         URL: {

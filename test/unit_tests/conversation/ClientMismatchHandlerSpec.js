@@ -35,7 +35,7 @@ describe('ClientMismatchHandler', () => {
     await testFactory.exposeStorageActors();
     return testFactory.exposeConversationActors().then(conversationRepository => {
       conversationEntity = new Conversation(createRandomUuid());
-      return conversationRepository.save_conversation(conversationEntity);
+      return conversationRepository.saveConversation(conversationEntity);
     });
   });
 

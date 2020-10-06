@@ -84,9 +84,9 @@ describe('ConversationVerificationStateHandler', () => {
 
       conversationRepository.conversations.removeAll();
       return Promise.all([
-        conversationRepository.save_conversation(conversationAB),
-        conversationRepository.save_conversation(conversationB),
-        conversationRepository.save_conversation(conversationC),
+        conversationRepository.saveConversation(conversationAB),
+        conversationRepository.saveConversation(conversationB),
+        conversationRepository.saveConversation(conversationC),
       ]);
     });
   });
