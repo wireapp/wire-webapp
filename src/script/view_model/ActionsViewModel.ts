@@ -35,6 +35,7 @@ import type {Conversation} from '../entity/Conversation';
 import type {ClientEntity} from '../client/ClientEntity';
 import type {Message} from '../entity/message/Message';
 import type {ServiceEntity} from '../integration/ServiceEntity';
+import {MessageRepository} from '../conversation/MessageRepository';
 
 export class ActionsViewModel {
   modalsViewModel: ModalsViewModel;
@@ -46,6 +47,7 @@ export class ActionsViewModel {
     private readonly conversationRepository: ConversationRepository,
     private readonly integrationRepository: IntegrationRepository,
     private readonly userRepository: UserRepository,
+    private readonly messageRepository: MessageRepository,
   ) {
     this.modalsViewModel = mainViewModel.modals;
   }
@@ -204,7 +206,7 @@ export class ActionsViewModel {
         amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
           primaryAction: {
             action: () => {
-              this.conversationRepository.deleteMessage(conversationEntity, messageEntity);
+              this.messageRepository.deleteMessage(conversationEntity, messageEntity);
               resolve();
             },
             text: t('modalConversationDeleteMessageAction'),
@@ -226,7 +228,7 @@ export class ActionsViewModel {
         amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
           primaryAction: {
             action: () => {
-              this.conversationRepository.deleteMessageForEveryone(conversationEntity, messageEntity);
+              this.messageRepository.deleteMessageForEveryone(conversationEntity, messageEntity);
               resolve();
             },
             text: t('modalConversationDeleteMessageEveryoneAction'),

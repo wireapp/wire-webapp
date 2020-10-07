@@ -48,6 +48,7 @@ import {ServerTimeHandler} from '../../time/serverTimeHandler';
 import {UserRepository} from '../../user/UserRepository';
 import {ActionsViewModel} from '../ActionsViewModel';
 import {PanelViewModel} from '../PanelViewModel';
+import {MessageRepository} from 'src/script/conversation/MessageRepository';
 
 /*
  * Message list rendering view model.
@@ -76,6 +77,7 @@ export class MessageListViewModel {
     private readonly integrationRepository: IntegrationRepository,
     private readonly serverTimeHandler: ServerTimeHandler,
     private readonly userRepository: UserRepository,
+    private readonly messageRepository: MessageRepository,
   ) {
     this.mainViewModel = mainViewModel;
     this.logger = getLogger('MessageListViewModel');
@@ -113,7 +115,7 @@ export class MessageListViewModel {
           Object.values(groupedMessages).forEach(readMessagesBatch => {
             const {conversation, message: firstMessage} = readMessagesBatch.pop();
             const otherMessages = readMessagesBatch.map(({message}) => message);
-            this.conversationRepository.sendReadReceipt(conversation, firstMessage, otherMessages);
+            this.messageRepository.sendReadReceipt(conversation, firstMessage, otherMessages);
           });
           this.readMessagesBuffer.removeAll();
         }
@@ -345,10 +347,7 @@ export class MessageListViewModel {
 
     if (!messageIsLoaded) {
       const conversationEntity = this.conversation();
-      const messageEntity = await this.conversationRepository.getMessageInConversationById(
-        conversationEntity,
-        messageId,
-      );
+      const messageEntity = await this.messageRepository.getMessageInConversationById(conversationEntity, messageId);
       conversationEntity.remove_messages();
       this.conversationRepository.getMessagesWithOffset(conversationEntity, messageEntity);
     }
@@ -388,11 +387,7 @@ export class MessageListViewModel {
 
     messageEntity.is_resetting_session(true);
     try {
-      await this.conversationRepository.reset_session(
-        messageEntity.from,
-        messageEntity.client_id,
-        this.conversation().id,
-      );
+      await this.messageRepository.reset_session(messageEntity.from, messageEntity.client_id, this.conversation().id);
       resetProgress();
     } catch (error) {
       this.logger.warn('Error while trying to reset_session', error);
@@ -470,7 +465,7 @@ export class MessageListViewModel {
   };
 
   clickOnLike = (messageEntity: ContentMessage): void => {
-    this.conversationRepository.toggle_like(this.conversation(), messageEntity);
+    this.messageRepository.toggle_like(this.conversation(), messageEntity);
   };
 
   clickOnInvitePeople = (): void => {
@@ -550,7 +545,7 @@ export class MessageListViewModel {
     const needsUpdate = conversationLastRead < lastKnownTimestamp;
     if (needsUpdate && this.isLastReceivedMessage(messageEntity, conversationEntity)) {
       conversationEntity.setTimestamp(lastKnownTimestamp, Conversation.TIMESTAMP_TYPE.LAST_READ);
-      this.conversationRepository.markAsRead(conversationEntity);
+      this.messageRepository.markAsRead(conversationEntity);
     }
   };
 

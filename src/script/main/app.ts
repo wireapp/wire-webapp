@@ -128,6 +128,7 @@ import {DebugUtil} from 'Util/DebugUtil';
 import type {BaseError} from '../error/BaseError';
 import type {User} from '../entity/User';
 import {Runtime} from '@wireapp/commons';
+import {MessageRepository} from '../conversation/MessageRepository';
 
 function doRedirect(signOutReason: SIGN_OUT_REASON) {
   let url = `/auth/${location.search}`;
@@ -262,17 +263,28 @@ class App {
 
     repositories.conversation = new ConversationRepository(
       this.service.conversation,
-      repositories.asset,
-      repositories.client,
+      repositories.message,
       repositories.connection,
-      repositories.cryptography,
       repositories.event,
-      new LinkPreviewRepository(repositories.asset, repositories.properties),
       repositories.team,
       repositories.user,
       repositories.properties,
-      sendingMessageQueue,
       serverTimeHandler,
+    );
+
+    repositories.message = new MessageRepository(
+      repositories.client,
+      repositories.conversation,
+      repositories.cryptography,
+      repositories.event,
+      sendingMessageQueue,
+      repositories.properties,
+      serverTimeHandler,
+      repositories.user,
+      repositories.team,
+      this.service.conversation,
+      new LinkPreviewRepository(repositories.asset, repositories.properties),
+      repositories.asset,
     );
 
     const serviceMiddleware = new ServiceMiddleware(repositories.conversation, repositories.user);
@@ -299,13 +311,14 @@ class App {
     repositories.broadcast = new BroadcastRepository(
       new BroadcastService(this.apiClient),
       repositories.client,
-      repositories.conversation,
+      repositories.message,
       repositories.cryptography,
       sendingMessageQueue,
     );
     repositories.calling = new CallingRepository(
       this.apiClient,
       repositories.conversation,
+      repositories.message,
       repositories.event,
       repositories.user,
       repositories.media.streamHandler,
