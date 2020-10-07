@@ -375,10 +375,10 @@
     "@types/express-serve-static-core" "*"
     "@types/mime" "*"
 
-"@wireapp/commons@3.8.3":
-  version "3.8.3"
-  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-3.8.3.tgz#cac0f98a13dbccd16fb576f9cf64b797b326aba7"
-  integrity sha512-w/pjYDo1vj7/Z5pMajM/6n7I4SHJN6zMDRxMCZp0jcMZlqTNqqOkjnmkAHbKAkKgI4AZeZDLPj/9w2MqmbShxg==
+"@wireapp/commons@3.8.4":
+  version "3.8.4"
+  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-3.8.4.tgz#ed8c5259f86e10d57edc7363863be0e51dbee572"
+  integrity sha512-c8NeGSE+Pq4yPoYHJHYcdQNY0SUdw8JQnb86y2MIKTSms9rP4qddhhTLbryFz6Ol0ksC1m1pKggZ44zEyTq4XQ==
   dependencies:
     "@types/fs-extra" "8.1.0"
     "@types/node" "~12"
