@@ -162,19 +162,19 @@ export class CryptographyRepository {
    * @param clientId Client ID
    * @returns Resolves with a map of pre-keys for the requested clients
    */
-  private async getUserPreKeyByIds(userId: string, clientId: string): Promise<BackendPreKey> {
-    try {
-      const response = await this.cryptographyService.getUserPreKeyByIds(userId, clientId);
-      return response.prekey;
-    } catch (error) {
-      const isNotFound = error.code === HTTP_STATUS.NOT_FOUND;
-      if (isNotFound) {
-        throw new UserError(UserError.TYPE.PRE_KEY_NOT_FOUND, UserError.MESSAGE.PRE_KEY_NOT_FOUND);
-      }
+  getUserPreKeyByIds(userId: string, clientId: string): Promise<BackendPreKey> {
+    return this.cryptographyService
+      .getUserPreKeyByIds(userId, clientId)
+      .then(response => response.prekey)
+      .catch(error => {
+        const isNotFound = error.code === HTTP_STATUS.NOT_FOUND;
+        if (isNotFound) {
+          throw new UserError(UserError.TYPE.PRE_KEY_NOT_FOUND, UserError.MESSAGE.PRE_KEY_NOT_FOUND);
+        }
 
-      this.logger.error(`Failed to get pre-key from backend: ${error.message}`);
-      throw new UserError(UserError.TYPE.REQUEST_FAILURE, UserError.MESSAGE.REQUEST_FAILURE);
-    }
+        this.logger.error(`Failed to get pre-key from backend: ${error.message}`);
+        throw new UserError(UserError.TYPE.REQUEST_FAILURE, UserError.MESSAGE.REQUEST_FAILURE);
+      });
   }
 
   /**
@@ -182,10 +182,8 @@ export class CryptographyRepository {
    * @param recipients User client map to request pre-keys for
    * @returns Resolves with a map of pre-keys for the requested clients
    */
-  private async getUsersPreKeys(recipients: UserClients): Promise<UserPreKeyBundleMap> {
-    try {
-      return this.cryptographyService.getUsersPreKeys(recipients);
-    } catch (error) {
+  getUsersPreKeys(recipients: UserClients): Promise<UserPreKeyBundleMap> {
+    return this.cryptographyService.getUsersPreKeys(recipients).catch(error => {
       const isNotFound = error.code === HTTP_STATUS.NOT_FOUND;
       if (isNotFound) {
         throw new UserError(UserError.TYPE.PRE_KEY_NOT_FOUND, UserError.MESSAGE.PRE_KEY_NOT_FOUND);
@@ -193,18 +191,17 @@ export class CryptographyRepository {
 
       this.logger.error(`Failed to get pre-key from backend: ${error.message}`);
       throw new UserError(UserError.TYPE.REQUEST_FAILURE, UserError.MESSAGE.REQUEST_FAILURE);
-    }
+    });
   }
 
-  private async loadSession(userId: string, clientId: string): Promise<CryptoboxSession | void> {
+  private loadSession(userId: string, clientId: string): Promise<CryptoboxSession | void> {
     const sessionId = this.constructSessionId(userId, clientId);
 
-    try {
-      return this.cryptobox.session_load(sessionId);
-    } catch (error) {
-      const preKey = await this.getUserPreKeyByIds(userId, clientId);
-      return this.createSessionFromPreKey(preKey, userId, clientId);
-    }
+    return this.cryptobox.session_load(sessionId).catch(() => {
+      return this.getUserPreKeyByIds(userId, clientId).then(preKey => {
+        return this.createSessionFromPreKey(preKey, userId, clientId);
+      });
+    });
   }
 
   /**
@@ -245,7 +242,7 @@ export class CryptographyRepository {
    * @param payload Object to contain encrypted message payload
    * @returns Resolves with the encrypted payload
    */
-  public async encryptGenericMessage(
+  async encryptGenericMessage(
     recipients: Recipients,
     genericMessage: GenericMessage,
     payload: NewOTRMessage = this.constructPayload(this.currentClient().id),
@@ -283,7 +280,7 @@ export class CryptographyRepository {
    * @param event Backend event to decrypt
    * @returns Resolves with decrypted and mapped message
    */
-  public async handleEncryptedEvent(event: EventRecord) {
+  async handleEncryptedEvent(event: EventRecord) {
     const {data: eventData, from: userId, id} = event;
 
     if (!eventData) {
