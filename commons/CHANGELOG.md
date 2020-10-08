@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.8.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@3.8.4...@wireapp/commons@3.8.5) (2020-10-08)
+
+
+### Bug Fixes
+
+* **commons:** Remove check for deprecated 'createEncodedVideoStreams' ([#3225](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/issues/3225)) ([ac52616](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/commit/ac526166b3862d56fc01213a65bddfa9285e0083))
+
+
+
+
+
 ## [3.8.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@3.8.3...@wireapp/commons@3.8.4) (2020-10-05)
 
 
