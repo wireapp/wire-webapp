@@ -4,7 +4,7 @@
     "fs-extra": "9.0.1"
   },
   "devDependencies": {
-    "@types/jasmine": "3.5.13",
+    "@types/jasmine": "3.5.14",
     "@types/node": "~12",
     "@wireapp/store-engine": "4.5.11",
     "jasmine": "3.5.0",

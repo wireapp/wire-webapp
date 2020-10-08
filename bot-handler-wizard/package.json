@@ -3,7 +3,7 @@
     "wizardy": "0.3.0"
   },
   "devDependencies": {
-    "@types/jasmine": "3.5.13",
+    "@types/jasmine": "3.5.14",
     "@types/node": "~12",
     "@wireapp/bot-api": "7.11.20",
     "cross-env": "7.0.2",
