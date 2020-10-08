@@ -33,11 +33,13 @@ import {loadValue, storeValue} from 'Util/StorageUtil';
 import {getPlatform} from './Helpers';
 import {Config} from '../Config';
 import {roundLogarithmic} from 'Util/NumberUtil';
+import {EventName} from './EventName';
 
 const Countly = require('countly-sdk-web');
 
 export class EventTrackingRepository {
   private isProductReportingActivated: boolean;
+  private sendAppOpenEvent: boolean = true;
   private readonly countlyDeviceId: string;
   private readonly logger: Logger;
   private readonly userRepository: UserRepository;
@@ -117,7 +119,7 @@ export class EventTrackingRepository {
       app_key: window.wire.env.COUNTLY_API_KEY,
       debug: !Environment.frontend.isProduction(),
       device_id: this.countlyDeviceId,
-      url: 'https://wire.count.ly/',
+      url: 'https://countly.wire.com/',
       use_session_cookie: false,
     });
 
@@ -155,6 +157,10 @@ export class EventTrackingRepository {
   private startProductReportingSession(): void {
     if (this.isProductReportingActivated === true) {
       Countly.begin_session();
+      if (this.sendAppOpenEvent) {
+        this.sendAppOpenEvent = false;
+        this.trackProductReportingEvent(EventName.APP_OPEN);
+      }
     }
   }
 
@@ -172,10 +178,17 @@ export class EventTrackingRepository {
 
   private trackProductReportingEvent(eventName: string, customSegmentations?: any): void {
     if (this.isProductReportingActivated === true) {
-      Countly.userData.set(UserData.IS_TEAM, this.userRepository.isTeam());
-      Countly.userData.set(UserData.CONTACTS, roundLogarithmic(this.userRepository.numberOfContacts(), 6));
-      Countly.userData.set(UserData.TEAM_SIZE, this.userRepository.teamMembers().length);
-      Countly.userData.set(UserData.USER_TYPE, this.getUserType());
+      const userData = {
+        [UserData.IS_TEAM]: this.userRepository.isTeam(),
+        [UserData.CONTACTS]: roundLogarithmic(this.userRepository.numberOfContacts(), 6),
+        [UserData.TEAM_SIZE]: roundLogarithmic(this.userRepository.teamMembers().length, 6),
+        [UserData.TEAM_ID]: this.userRepository.self().teamId,
+        [UserData.USER_TYPE]: this.getUserType(),
+      };
+      Object.entries(userData).forEach(entry => {
+        const [key, value] = entry;
+        Countly.userData.set(key, value);
+      });
       Countly.userData.save();
 
       const segmentation = {
@@ -190,6 +203,7 @@ export class EventTrackingRepository {
         segmentation,
       });
 
+      this.logger.info(`Reporting custom data for product event ${eventName}@${JSON.stringify(userData)}`);
       this.logger.info(`Reporting product event ${eventName}@${JSON.stringify(segmentation)}`);
     }
   }

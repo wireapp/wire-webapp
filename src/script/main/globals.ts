@@ -108,7 +108,6 @@ declare global {
           SHOW_LOADING_INFORMATION: boolean;
         };
         MAX_GROUP_PARTICIPANTS: number;
-        MAX_SFT_VIDEO_PARTICIPANTS: number;
         MAX_VIDEO_PARTICIPANTS: number;
         NEW_PASSWORD_MINIMUM_LENGTH: number;
         URL: {
@@ -129,6 +128,7 @@ declare global {
             SCREEN_ACCESS_DENIED: string;
           };
           TEAMS_BASE: string;
+          TEAMS_CREATE: string;
           TERMS_OF_USE_PERSONAL: string;
           TERMS_OF_USE_TEAMS: string;
           WEBSITE_BASE: string;

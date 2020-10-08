@@ -743,7 +743,7 @@ export const phoneLoginStrings = defineMessages({
     id: 'authVerifyCodeChangePhone',
   },
   verifyCodeDescription: {
-    defaultMessage: 'Enter the verification code\nwe sent to {number}.',
+    defaultMessage: 'Enter the verification code we sent to {number}.',
     id: 'authVerifyCodeDescription',
   },
   verifyCodeResend: {

@@ -17,11 +17,12 @@ simpleGit.tags(
   ) => {
     const outputPath = path.join(__dirname, '../CHANGELOG.md');
     const productionTags = tags.all.filter(tag => tag.includes('-production.'));
-    const latestProductionTag = productionTags.sort().reverse()[0];
+    const currentProductionTag = productionTags.sort().reverse()[0];
+    const latestProductionTag = productionTags.sort().reverse()[1];
     const changelog = await Changelog.generate({
       exclude: ['chore', 'docs', 'refactor', 'style', 'test'],
       repoUrl: pkg.repository.url.replace('.git', ''),
-      tag: `${latestProductionTag}...master`,
+      tag: `${latestProductionTag}...${currentProductionTag}`,
     });
     console.info(`Changelog size: ${changelog.length}`);
     fs.outputFileSync(outputPath, changelog, 'utf8');

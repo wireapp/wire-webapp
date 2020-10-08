@@ -185,12 +185,12 @@ export class NotificationRepository {
     if (Runtime.isSupportingPermissions()) {
       const notificationState = this.permissionRepository.getPermissionState(PermissionType.NOTIFICATIONS);
       const shouldRequestPermission = notificationState === PermissionStatusState.PROMPT;
-      return shouldRequestPermission ? this._requestPermission() : this.checkPermissionState();
+      return shouldRequestPermission ? this.requestPermission() : this.checkPermissionState();
     }
 
     const currentPermission = window.Notification.permission as PermissionState;
     const shouldRequestPermission = currentPermission === PermissionState.DEFAULT;
-    return shouldRequestPermission ? this._requestPermission() : this.updatePermissionState(currentPermission);
+    return shouldRequestPermission ? this.requestPermission() : this.updatePermissionState(currentPermission);
   }
 
   /**
@@ -242,7 +242,7 @@ export class NotificationRepository {
     return Promise.resolve();
   }
 
-  // Remove notifications from the queue that are no longer unread
+  /** Remove notifications from the queue that are no longer unread */
   removeReadNotifications(): void {
     this.notifications.forEach(notification => {
       const {conversationId, messageId, messageType} = notification.data || {};
@@ -730,7 +730,6 @@ export class NotificationRepository {
    * Plays the sound from the audio repository.
    *
    * @param messageEntity Message entity
-   * @param No return value
    */
   private notifySound(messageEntity: Message): void {
     const muteSound = !document.hasFocus() && Runtime.isFirefox() && Runtime.isMacOS();
@@ -753,7 +752,7 @@ export class NotificationRepository {
   }
 
   // Request browser permission for notifications.
-  private async _requestPermission(): Promise<void> {
+  private async requestPermission(): Promise<void> {
     amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.REQUEST_NOTIFICATION);
     // Note: The callback will be only triggered in Chrome.
     // If you ignore a permission request on Firefox, then the callback will not be triggered.
@@ -819,7 +818,6 @@ export class NotificationRepository {
    * Sending the notification.
    *
    * @param notificationContent Content of notification
-   * @returns No return value
    */
   private showNotification(notificationContent: NotificationContent): void {
     amplify.publish(WebAppEvents.NOTIFICATION.SHOW, notificationContent);
@@ -830,7 +828,6 @@ export class NotificationRepository {
    * Sending the browser notification.
    *
    * @param notificationContent Content of notification
-   * @param No return value
    */
   private showNotificationInBrowser(notificationContent: NotificationContent): void {
     /*

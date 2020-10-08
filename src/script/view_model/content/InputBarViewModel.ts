@@ -788,10 +788,10 @@ export class InputBarViewModel {
     });
   };
 
-  private readonly _generateQuote = (replyMessageEntity: ContentMessage): Promise<QuoteEntity> => {
+  private readonly _generateQuote = (replyMessageEntity: ContentMessage): Promise<QuoteEntity | undefined> => {
     return !replyMessageEntity
-      ? Promise.resolve()
-      : this.eventRepository
+      ? Promise.resolve(undefined)
+      : this.eventRepository.eventService
           .loadEvent(replyMessageEntity.conversation_id, replyMessageEntity.id)
           .then(MessageHasher.hashEvent)
           .then((messageHash: ArrayBuffer) => {

@@ -1,0 +1,29 @@
+name: Lint
+
+on:
+  push:
+    branches: [master, dev, edge, avs]
+  pull_request:
+    branches: [master, dev, edge, avs]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.5.0
+        with:
+          access_token: ${{github.token}}
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Yarn cache
+        uses: c-hive/gha-yarn-cache@v1
+
+      - name: Install JS dependencies
+        run: yarn --frozen-lockfile
+
+      - name: Lint
+        run: yarn lint

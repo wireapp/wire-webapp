@@ -544,7 +544,7 @@ export class Conversation {
    * @param timestamp Timestamp to be set
    * @param type Type of timestamp to be updated
    * @param forceUpdate set the timestamp regardless of previous timestamp value (no checks)
-   * @returns Timestamp value which can be 'false' (boolean) if there is no timestamp
+   * @returns Timestamp value which can be `false` (boolean) if there is no timestamp
    */
   setTimestamp(timestamp: string | number, type: TIMESTAMP_TYPE, forceUpdate: boolean = false): number | false {
     if (typeof timestamp === 'string') {

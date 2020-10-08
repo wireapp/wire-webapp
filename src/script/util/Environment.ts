@@ -18,6 +18,7 @@
  */
 
 import {Runtime} from '@wireapp/commons';
+import {Config} from '../Config';
 import {BackendEnvironment} from '../service/BackendEnvironment';
 
 const APP_ENV = {
@@ -26,20 +27,10 @@ const APP_ENV = {
   VIRTUAL_HOST: 'wire.ms', // The domain "wire.ms" is our virtual host for testing contact uploads
 };
 
-const getAppVersion = (): string => {
-  const versionElement = document.head.querySelector("[property='wire:version']");
-  return versionElement?.getAttribute('version').trim() || '';
-};
-
 const getElectronVersion = (userAgent: string): string => {
   // [match, version]
   const [, electronVersion] = /Wire(?:Internal)?\/(\S+)/i.exec(userAgent) || [];
   return electronVersion;
-};
-
-const getFormattedAppVersion = (): string => {
-  const [year, month, day, hour, minute] = getAppVersion().split('.');
-  return `${year}.${month}.${day}.${hour}.${minute}`;
 };
 
 const isLocalhost = (): boolean => [APP_ENV.LOCALHOST, APP_ENV.VIRTUAL_HOST].includes(window.location.hostname);
@@ -56,17 +47,13 @@ export const Environment = {
     isLocalhost,
     isProduction,
   },
-  version: (showWrapperVersion = true, doNotFormat = false): string => {
+  version: (showWrapperVersion = true): string => {
     if (Environment.frontend.isLocalhost()) {
       return 'dev';
     }
 
-    if (doNotFormat) {
-      return getAppVersion();
-    }
-
     const electronVersion = getElectronVersion(Runtime.getUserAgent());
     const showElectronVersion = electronVersion && showWrapperVersion;
-    return showElectronVersion ? electronVersion : getFormattedAppVersion();
+    return showElectronVersion ? electronVersion : Config.getConfig().VERSION;
   },
 };

@@ -46,7 +46,7 @@ const _accumulateSummary = (conversationEntity: Conversation, prioritizeMentionA
     selfReplies: unreadSelfReplies,
   } = conversationEntity.unreadState();
 
-  // Sorted in order of alert type priority
+  /** Sorted in order of alert type priority */
   const activities: Record<ACTIVITY_TYPE, number> = {
     [ACTIVITY_TYPE.MENTION]: unreadSelfMentions.length,
     [ACTIVITY_TYPE.REPLY]: unreadSelfReplies.length,

@@ -23,95 +23,106 @@ import {debounce} from 'underscore';
 import {interpolate} from 'Util/ArrayUtil';
 import {clamp} from 'Util/NumberUtil';
 
-interface Params {
-  // TODO: replace with proper Type once they are defined
-  asset: any;
-  disabled: ko.Subscribable<boolean>;
+import {FileAsset} from '../../../entity/message/FileAsset';
 
+/**
+ * A float that must be between 0 and 1
+ */
+type Fraction = number;
+
+interface Params {
+  asset: FileAsset;
+  disabled: ko.Subscribable<boolean>;
   src: HTMLAudioElement;
 }
 
 class AudioSeekBarComponent {
   audioElement: HTMLAudioElement;
-  element: HTMLElement;
-  loudness: number[];
-  levels: HTMLSpanElement[];
-  private readonly _onResizeFired: () => void;
+  loudness: Fraction[];
+  private readonly onResizeFired: () => void;
 
-  constructor(params: Params, element: HTMLElement) {
-    this.audioElement = params.src;
-
-    this.element = element;
+  constructor({asset, disabled, src}: Params, private readonly element: HTMLElement) {
+    this.audioElement = src;
     this.loudness = [];
-    this.levels = [];
 
     ko.computed(
       () => {
-        if (typeof params.disabled === 'function') {
-          this.element.classList.toggle('element-disabled', params.disabled());
+        if (typeof disabled === 'function') {
+          this.element.classList.toggle('element-disabled', disabled());
         }
       },
       {disposeWhenNodeIsRemoved: element},
     );
 
-    const assetMeta = params.asset.meta;
-    if (assetMeta?.loudness !== null) {
-      this.loudness = this._normalizeLoudness(assetMeta.loudness, this.element.clientHeight);
+    if (asset.meta?.loudness !== null) {
+      this.loudness = Array.from(asset.meta.loudness).map(level => level / 256);
     }
 
-    this._onResizeFired = debounce(() => {
-      this._renderLevels();
-      this._onTimeUpdate();
+    this.onResizeFired = debounce(() => {
+      this.renderLevels();
+      this.onTimeUpdate();
     }, 500);
 
-    this._renderLevels();
+    this.renderLevels();
 
-    this.audioElement.addEventListener('ended', this._onAudioEnded);
-    this.audioElement.addEventListener('timeupdate', this._onTimeUpdate);
-    this.element.addEventListener('click', this._onLevelClick);
-    window.addEventListener('resize', this._onResizeFired);
+    this.audioElement.addEventListener('ended', this.onAudioEnded);
+    this.audioElement.addEventListener('timeupdate', this.onTimeUpdate);
+    this.element.addEventListener('click', this.onLevelClick);
+    window.addEventListener('resize', this.onResizeFired);
   }
 
-  private _renderLevels(): void {
-    const numberOfLevelsFitOnScreen = Math.floor(this.element.clientWidth / 3); // 2px + 1px
+  private renderLevels(): void {
+    const path = this.getLevelsPath();
+    const svg = `
+    <svg width="100%" height="100%" viewbox="0 0 1 1" preserveAspectRatio="none">
+      <path d="${path}"/>
+      <path class="active" d="${path}"/>
+    </svg>`;
+    this.element.innerHTML = svg;
+  }
+
+  private updateSeekClip(position: Fraction) {
+    const percent = position * 100;
+    this.element.style.setProperty('--seek-bar-clip', `polygon(0 0, ${percent}% 0, ${percent}% 100%, 0 100%)`);
+  }
+
+  private getLevelsPath(): string {
+    const numberOfLevelsFitOnScreen = Math.floor(this.element.clientWidth / 3);
+    const singleWidth = 1 / numberOfLevelsFitOnScreen;
+    const barWidth = (singleWidth / 3) * 2;
     const scaledLoudness = interpolate(this.loudness, numberOfLevelsFitOnScreen);
-    this.element.innerHTML = '';
-
-    this.levels = scaledLoudness.map(loudness => {
-      const level = document.createElement('span');
-      level.style.height = `${loudness}px`;
-      this.element.appendChild(level);
-      return level;
-    });
+    return scaledLoudness
+      .map((loudness, index) => {
+        const x = index * singleWidth;
+        const y = 0.5 - loudness / 2;
+        return `M${x},${y}h${barWidth}V${1 - y}H${x}z`;
+      })
+      .join('');
   }
 
-  private _normalizeLoudness(loudness: number[], max: number): number[] {
-    const peak = Math.max(...loudness);
-    const scale = max / peak;
-    return peak > max ? loudness.map(level => level * scale) : loudness;
-  }
-
-  private readonly _onLevelClick = (event: JQueryMouseEventObject): void => {
-    const mouse_x = event.pageX - event.currentTarget.getBoundingClientRect().left;
-    const calculatedTime = (this.audioElement.duration * mouse_x) / event.currentTarget.clientWidth;
+  private readonly onLevelClick = (event: MouseEvent): void => {
+    const currentTarget = event.currentTarget as Element;
+    const mouse_x = event.pageX - currentTarget.getBoundingClientRect().left;
+    const calculatedTime = (this.audioElement.duration * mouse_x) / currentTarget.clientWidth;
     const currentTime = isNaN(calculatedTime) ? 0 : calculatedTime;
 
     this.audioElement.currentTime = clamp(currentTime, 0, this.audioElement.duration);
-    this._onTimeUpdate();
+    this.onTimeUpdate();
   };
 
-  private readonly _onTimeUpdate = (): void => {
-    const index = Math.floor((this.audioElement.currentTime / this.audioElement.duration) * this.levels.length);
-    this.levels.forEach((level, levelIndex) => level.classList.toggle('active', levelIndex <= index));
+  private readonly onTimeUpdate = (): void => {
+    if (this.audioElement.duration) {
+      this.updateSeekClip(this.audioElement.currentTime / this.audioElement.duration);
+    }
   };
 
-  private readonly _onAudioEnded = (): void => this.levels.forEach(level => level.classList.remove('active'));
+  private readonly onAudioEnded = (): void => this.updateSeekClip(0);
 
   dispose = (): void => {
-    this.audioElement.removeEventListener('ended', this._onAudioEnded);
-    this.audioElement.removeEventListener('timeupdate', this._onTimeUpdate);
-    this.element.removeEventListener('click', this._onLevelClick);
-    window.removeEventListener('resize', this._onResizeFired);
+    this.audioElement.removeEventListener('ended', this.onAudioEnded);
+    this.audioElement.removeEventListener('timeupdate', this.onTimeUpdate);
+    this.element.removeEventListener('click', this.onLevelClick);
+    window.removeEventListener('resize', this.onResizeFired);
   };
 }
 

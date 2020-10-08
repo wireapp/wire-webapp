@@ -23,13 +23,15 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Logger, getLogger} from 'Util/Logger';
 
-import type {Conversation} from '../entity/Conversation';
-import type {EventRepository} from '../event/EventRepository';
-import {VerificationMessageType} from '../message/VerificationMessageType';
-import type {ServerTimeHandler} from '../time/serverTimeHandler';
-import type {ConversationRepository} from './ConversationRepository';
 import {ConversationVerificationState} from './ConversationVerificationState';
 import {EventBuilder} from '../conversation/EventBuilder';
+import {EventRecord} from '../storage';
+import {VerificationMessageType} from '../message/VerificationMessageType';
+import type {ClientEntity} from '../client/ClientEntity';
+import type {Conversation} from '../entity/Conversation';
+import type {ConversationRepository} from './ConversationRepository';
+import type {EventRepository} from '../event/EventRepository';
+import type {ServerTimeHandler} from '../time/serverTimeHandler';
 
 export class ConversationVerificationStateHandler {
   conversationRepository: ConversationRepository;
@@ -66,7 +68,7 @@ export class ConversationVerificationStateHandler {
    * Self user or other participant added clients.
    * @param userId ID of user that added client (can be self user ID)
    */
-  onClientAdded(userId: string): void {
+  onClientAdded(userId: string, _clientEntity?: ClientEntity): void {
     this.onClientsAdded([userId]);
   }
 
@@ -84,7 +86,7 @@ export class ConversationVerificationStateHandler {
    * Self user removed a client or other participants deleted clients.
    * @param userId ID of user that added client (can be self user ID)
    */
-  onClientRemoved(userId: string): void {
+  onClientRemoved(userId: string, _clientId?: string): void {
     this.getActiveConversationsWithUsers([userId]).forEach(({conversationEntity}) => {
       this.checkChangeToVerified(conversationEntity);
     });
@@ -137,7 +139,14 @@ export class ConversationVerificationStateHandler {
     if (this.willChangeToVerified(conversationEntity)) {
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
       const allVerifiedEvent = EventBuilder.buildAllVerified(conversationEntity, currentTimestamp);
-      this.eventRepository.injectEvent(allVerifiedEvent);
+      this.eventRepository.injectEvent(allVerifiedEvent as EventRecord);
+
+      amplify.publish(
+        WebAppEvents.CONVERSATION.VERIFICATION_STATE_CHANGED,
+        conversationEntity.participating_user_ids(),
+        true,
+      );
+
       return true;
     }
 
@@ -177,7 +186,7 @@ export class ConversationVerificationStateHandler {
 
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
       const event = EventBuilder.buildDegraded(conversationEntity, userIds, type, currentTimestamp);
-      this.eventRepository.injectEvent(event);
+      this.eventRepository.injectEvent(event as EventRecord);
 
       return true;
     }
