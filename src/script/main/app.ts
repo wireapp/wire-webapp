@@ -263,7 +263,7 @@ class App {
 
     repositories.conversation = new ConversationRepository(
       this.service.conversation,
-      repositories.message,
+      () => repositories.message,
       repositories.connection,
       repositories.event,
       repositories.team,
@@ -274,7 +274,7 @@ class App {
 
     repositories.message = new MessageRepository(
       repositories.client,
-      repositories.conversation,
+      () => repositories.conversation,
       repositories.cryptography,
       repositories.event,
       sendingMessageQueue,

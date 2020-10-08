@@ -118,7 +118,7 @@ export class MessageRepository {
 
   constructor(
     private readonly clientRepository: ClientRepository,
-    private readonly conversationRepository: ConversationRepository,
+    private readonly conversationRepositoryProvider: () => ConversationRepository,
     private readonly cryptography_repository: CryptographyRepository,
     private readonly eventRepository: EventRepository,
     private readonly messageSender: MessageSender,
@@ -138,11 +138,11 @@ export class MessageRepository {
     this.team = this.teamRepository.team;
     this.selfUser = this.userRepository.self;
     this.selfConversation = ko.pureComputed(() =>
-      this.conversationRepository.find_conversation_by_id(this.selfUser()?.id),
+      this.conversationRepositoryProvider().find_conversation_by_id(this.selfUser()?.id),
     );
 
     this.clientMismatchHandler = new ClientMismatchHandler(
-      this.conversationRepository,
+      this.conversationRepositoryProvider,
       this.cryptography_repository,
       this.userRepository,
     );
@@ -1108,7 +1108,7 @@ export class MessageRepository {
    */
   private cancel_asset_upload(messageId: string) {
     this.sendAssetUploadFailed(
-      this.conversationRepository.active_conversation(),
+      this.conversationRepositoryProvider().active_conversation(),
       messageId,
       ProtobufAsset.NotUploaded.CANCELLED,
     );
@@ -1140,7 +1140,7 @@ export class MessageRepository {
           conversationEntity.updateTimestamps(messageEntity);
         }
       }
-      this.conversationRepository.checkMessageTimer(messageEntity);
+      this.conversationRepositoryProvider().checkMessageTimer(messageEntity);
       if ((EventTypeHandling.STORE as string[]).includes(messageEntity.type) || messageEntity.has_asset_image()) {
         return this.eventService.updateEvent(messageEntity.primary_key, changes);
       }
@@ -1160,7 +1160,7 @@ export class MessageRepository {
    * @returns Resolves with a user client map
    */
   async create_recipients(conversation_id: string, skip_own_clients = false, user_ids: string[] = null) {
-    const userEntities = await this.conversationRepository.get_all_users_in_conversation(conversation_id);
+    const userEntities = await this.conversationRepositoryProvider().get_all_users_in_conversation(conversation_id);
     const recipients: Recipients = {};
     for (const userEntity of userEntities) {
       if (!(skip_own_clients && userEntity.isMe)) {
@@ -1275,7 +1275,7 @@ export class MessageRepository {
         const isDeleted = user?.deleted === true;
 
         if (isDeleted) {
-          await this.conversationRepository.teamMemberLeave(this.team().id, user.id);
+          await this.conversationRepositoryProvider().teamMemberLeave(this.team().id, user.id);
         }
       }
     }
@@ -1289,7 +1289,9 @@ export class MessageRepository {
 
     // Legal Hold
     if (!skipLegalHold) {
-      const conversationEntity = this.conversationRepository.find_conversation_by_id(eventInfoEntity.conversationId);
+      const conversationEntity = this.conversationRepositoryProvider().find_conversation_by_id(
+        eventInfoEntity.conversationId,
+      );
       const localLegalHoldStatus = conversationEntity.legalHoldStatus();
       await this.updateAllClients(conversationEntity, !isMessageEdit);
       const updatedLocalLegalHoldStatus = conversationEntity.legalHoldStatus();
@@ -1301,7 +1303,7 @@ export class MessageRepository {
 
       if (!isMessageEdit && haveNewClientsChangeLegalHoldStatus) {
         const {conversationId, timestamp: numericTimestamp} = eventInfoEntity;
-        await this.conversationRepository.injectLegalHoldMessage({
+        await this.conversationRepositoryProvider().injectLegalHoldMessage({
           beforeTimestamp: true,
           conversationId,
           legalHoldStatus: updatedLocalLegalHoldStatus,
@@ -1324,7 +1326,9 @@ export class MessageRepository {
     userIds: string[] = null,
     shouldShowLegalHoldWarning = false,
   ): Promise<boolean> {
-    const conversationEntity = await this.conversationRepository.get_conversation_by_id(eventInfoEntity.conversationId);
+    const conversationEntity = await this.conversationRepositoryProvider().get_conversation_by_id(
+      eventInfoEntity.conversationId,
+    );
     const legalHoldMessageTypes: string[] = [
       GENERIC_MESSAGE_TYPE.ASSET,
       GENERIC_MESSAGE_TYPE.EDITED,
@@ -1549,7 +1553,7 @@ export class MessageRepository {
   private async shouldSendAsExternal(eventInfoEntity: EventInfoEntity) {
     const {conversationId, genericMessage} = eventInfoEntity;
 
-    const conversationEntity = await this.conversationRepository.get_conversation_by_id(conversationId);
+    const conversationEntity = await this.conversationRepositoryProvider().get_conversation_by_id(conversationId);
     const messageInBytes = new Uint8Array(GenericMessage.encode(genericMessage).finish()).length;
     const estimatedPayloadInBytes = conversationEntity.getNumberOfClients() * messageInBytes;
     return estimatedPayloadInBytes > ConversationRepository.CONFIG.EXTERNAL_MESSAGE_THRESHOLD;

@@ -148,7 +148,7 @@ export class ConversationRepository {
 
   constructor(
     public readonly conversation_service: ConversationService,
-    private readonly messageRepository: MessageRepository,
+    private readonly messageRepositoryProvider: () => MessageRepository,
     private readonly connectionRepository: ConnectionRepository,
     private readonly eventRepository: EventRepository,
     public readonly teamRepository: TeamRepository,
@@ -531,7 +531,7 @@ export class ConversationRepository {
         const wrongMessageTypeForConversation = groupCreationMessageIn1to1 || one2oneConnectionMessageInGroup;
 
         if (wrongMessageTypeForConversation) {
-          this.messageRepository.deleteMessage(conversationEntity, firstMessage);
+          this.messageRepositoryProvider().deleteMessage(conversationEntity, firstMessage);
           conversationEntity.hasCreationMessage = false;
         } else {
           conversationEntity.hasCreationMessage = true;
@@ -982,7 +982,10 @@ export class ConversationRepository {
 
     try {
       const conversationEntity = await this.get_conversation_by_id(conversation_id);
-      const messageEntity = await this.messageRepository.getMessageInConversationById(conversationEntity, message_id);
+      const messageEntity = await this.messageRepositoryProvider().getMessageInConversationById(
+        conversationEntity,
+        message_id,
+      );
       return conversationEntity.last_read_timestamp() >= messageEntity.timestamp();
     } catch (error) {
       const messageNotFound = error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
@@ -1295,7 +1298,7 @@ export class ConversationRepository {
       this.leaveCall(conversationEntity.id);
     }
 
-    this.messageRepository.updateClearedTimestamp(conversationEntity);
+    this.messageRepositoryProvider().updateClearedTimestamp(conversationEntity);
     this._clear_conversation(conversationEntity);
 
     if (leaveConversation) {
@@ -1832,7 +1835,7 @@ export class ConversationRepository {
       userId,
     });
 
-    await this.messageRepository.updateAllClients(conversationEntity);
+    await this.messageRepositoryProvider().updateAllClients(conversationEntity);
 
     if (messageLegalHoldStatus === conversationEntity.legalHoldStatus()) {
       return conversationEntity;
@@ -1966,7 +1969,11 @@ export class ConversationRepository {
         const isRemoteEvent = eventFromStream || eventFromWebSocket;
 
         if (isRemoteEvent) {
-          this.messageRepository.sendConfirmationStatus(conversationEntity, messageEntity, Confirmation.Type.DELIVERED);
+          this.messageRepositoryProvider().sendConfirmationStatus(
+            conversationEntity,
+            messageEntity,
+            Confirmation.Type.DELIVERED,
+          );
         }
 
         if (!eventFromStream) {
@@ -2335,7 +2342,7 @@ export class ConversationRepository {
   private onMessageDeleted(conversationEntity: Conversation, eventJson: EventJson) {
     const {data: eventData, from, id: eventId, time} = eventJson;
 
-    return this.messageRepository
+    return this.messageRepositoryProvider()
       .getMessageInConversationById(conversationEntity, eventData.message_id)
       .then(deletedMessageEntity => {
         if (deletedMessageEntity.ephemeral_expires()) {
@@ -2353,7 +2360,7 @@ export class ConversationRepository {
         }
       })
       .then(() => {
-        return this.messageRepository._delete_message_by_id(conversationEntity, eventData.message_id);
+        return this.messageRepositoryProvider()._delete_message_by_id(conversationEntity, eventData.message_id);
       })
       .catch(error => {
         const isNotFound = error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
@@ -2387,7 +2394,7 @@ export class ConversationRepository {
         throw new ConversationError(ConversationError.TYPE.WRONG_USER, ConversationError.MESSAGE.WRONG_USER);
       }
       const conversationEntity = await this.get_conversation_by_id(eventData.conversation_id);
-      return this.messageRepository._delete_message_by_id(conversationEntity, eventData.message_id);
+      return this.messageRepositoryProvider()._delete_message_by_id(conversationEntity, eventData.message_id);
     } catch (error) {
       this.logger.info(
         `Failed to delete message '${eventData.message_id}' for conversation '${eventData.conversation_id}'`,
@@ -2410,7 +2417,10 @@ export class ConversationRepository {
     const messageId = eventData.message_id;
 
     try {
-      const messageEntity = await this.messageRepository.getMessageInConversationById(conversationEntity, messageId);
+      const messageEntity = await this.messageRepositoryProvider().getMessageInConversationById(
+        conversationEntity,
+        messageId,
+      );
       if (!messageEntity || !messageEntity.is_content()) {
         const type = messageEntity ? messageEntity.type : 'unknown';
 
@@ -2441,7 +2451,10 @@ export class ConversationRepository {
   private async onButtonActionConfirmation(conversationEntity: Conversation, eventJson: EventJson) {
     const {messageId, buttonId} = eventJson.data;
     try {
-      const messageEntity = await this.messageRepository.getMessageInConversationById(conversationEntity, messageId);
+      const messageEntity = await this.messageRepositoryProvider().getMessageInConversationById(
+        conversationEntity,
+        messageId,
+      );
       if (!messageEntity || !messageEntity.isComposite()) {
         const type = messageEntity ? messageEntity.type : 'unknown';
 
@@ -2498,11 +2511,11 @@ export class ConversationRepository {
         const isPingFromSelf = messageEntity.user().isMe && messageEntity.is_ping();
         const deleteForSelf = isPingFromSelf || conversationEntity.removed_from_conversation();
         if (deleteForSelf) {
-          return this.messageRepository.deleteMessage(conversationEntity, messageEntity);
+          return this.messageRepositoryProvider().deleteMessage(conversationEntity, messageEntity);
         }
 
         const userIds = conversationEntity.isGroup() ? [this.selfUser().id, messageEntity.from] : undefined;
-        return this.messageRepository.deleteMessageForEveryone(conversationEntity, messageEntity, userIds);
+        return this.messageRepositoryProvider().deleteMessageForEveryone(conversationEntity, messageEntity, userIds);
       });
     }
   }
