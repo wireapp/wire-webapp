@@ -135,10 +135,7 @@ export class Runtime {
   };
 
   public static isSupportingConferenceCalling = (): boolean => {
-    if (!Runtime.isSupportingLegacyCalling() || !Runtime.isSupportingRTCInjectableStreams()) {
-      return false;
-    }
-    return true;
+    return Runtime.isSupportingLegacyCalling() && RTCRtpSender.prototype.hasOwnProperty('createEncodedStreams');
   };
 
   public static isSupportingRTCPeerConnection = (): boolean => 'RTCPeerConnection' in window;
@@ -150,12 +147,6 @@ export class Runtime {
 
     const peerConnection = new RTCPeerConnection(undefined);
     return 'createDataChannel' in peerConnection;
-  };
-
-  public static isSupportingRTCInjectableStreams = (): boolean => {
-    const isSupportingEncodedStreams = RTCRtpSender.prototype.hasOwnProperty('createEncodedStreams');
-    const isSupportingEncodedVideoStreams = RTCRtpSender.prototype.hasOwnProperty('createEncodedVideoStreams');
-    return isSupportingEncodedStreams || isSupportingEncodedVideoStreams;
   };
 
   public static isSupportingUserMedia = (): boolean => {
