@@ -16,16 +16,17 @@
   },
   "description": "Command-line interface for Wire's secure messaging platform.",
   "files": [
-    "dist"
+    "src",
+    "!src/**/*.ts"
   ],
   "license": "GPL-3.0",
-  "main": "dist/index.js",
+  "main": "src/index",
   "name": "@wireapp/cli-client",
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client",
   "scripts": {
     "build": "yarn build:node",
     "build:node": "tsc",
-    "clean": "rimraf dist",
+    "clean": "rimraf src/**/*{.js,.js.map,.d.ts}",
     "dist": "yarn clean && yarn build",
     "start": "ts-node -r tsconfig-paths/register src/index.ts",
     "test": "yarn test:node",
