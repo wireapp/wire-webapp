@@ -38,7 +38,7 @@ import {UserRepository} from '../user/UserRepository';
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 import {UserId} from '../calling/Participant';
-import {MessageRepository} from '../conversation/MessageRepository';
+import type {MessageRepository} from '../conversation/MessageRepository';
 
 function downloadText(text: string, filename: string = 'default.txt'): number {
   const url = `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`;

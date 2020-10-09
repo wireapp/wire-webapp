@@ -48,7 +48,7 @@ import {ServerTimeHandler} from '../../time/serverTimeHandler';
 import {UserRepository} from '../../user/UserRepository';
 import {ActionsViewModel} from '../ActionsViewModel';
 import {PanelViewModel} from '../PanelViewModel';
-import {MessageRepository} from 'src/script/conversation/MessageRepository';
+import type {MessageRepository} from 'src/script/conversation/MessageRepository';
 
 /*
  * Message list rendering view model.

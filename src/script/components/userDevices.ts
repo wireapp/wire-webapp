@@ -36,7 +36,7 @@ import type {User} from '../entity/User';
 import {getPrivacyHowUrl, getPrivacyWhyUrl, getPrivacyPolicyUrl} from '../externalRoute';
 import {MotionDuration} from '../motion/MotionDuration';
 import 'Components/deviceCard';
-import {MessageRepository} from '../conversation/MessageRepository';
+import type {MessageRepository} from '../conversation/MessageRepository';
 
 export interface UserDevicesHistory {
   current: ko.PureComputed<UserDevicesState>;

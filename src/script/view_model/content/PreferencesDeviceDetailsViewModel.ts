@@ -35,7 +35,7 @@ import {ClientEntity} from '../../client/ClientEntity';
 import {ActionsViewModel} from '../ActionsViewModel';
 import {User} from '../../entity/User';
 import {getLogger, Logger} from 'Util/Logger';
-import {MessageRepository} from 'src/script/conversation/MessageRepository';
+import type {MessageRepository} from 'src/script/conversation/MessageRepository';
 
 export class PreferencesDeviceDetailsViewModel {
   private readonly logger: Logger;

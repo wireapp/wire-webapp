@@ -29,7 +29,7 @@ import {ConversationError} from '../error/ConversationError';
 import type {Conversation} from '../entity/Conversation';
 import type {ContentMessage} from '../entity/message/ContentMessage';
 import type {User} from '../entity/User';
-import {MessageRepository} from '../conversation/MessageRepository';
+import type {MessageRepository} from '../conversation/MessageRepository';
 
 interface MessageQuoteParams {
   conversation: ko.Observable<Conversation>;

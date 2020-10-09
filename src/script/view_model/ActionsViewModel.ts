@@ -35,7 +35,7 @@ import type {Conversation} from '../entity/Conversation';
 import type {ClientEntity} from '../client/ClientEntity';
 import type {Message} from '../entity/message/Message';
 import type {ServiceEntity} from '../integration/ServiceEntity';
-import {MessageRepository} from '../conversation/MessageRepository';
+import type {MessageRepository} from '../conversation/MessageRepository';
 
 export class ActionsViewModel {
   modalsViewModel: ModalsViewModel;

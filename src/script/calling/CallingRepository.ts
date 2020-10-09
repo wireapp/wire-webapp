@@ -74,7 +74,7 @@ import type {Conversation} from '../entity/Conversation';
 import type {UserRepository} from '../user/UserRepository';
 import type {EventRecord} from '../storage';
 import type {EventSource} from '../event/EventSource';
-import {MessageRepository} from '../conversation/MessageRepository';
+import type {MessageRepository} from '../conversation/MessageRepository';
 
 interface MediaStreamQuery {
   audio?: boolean;

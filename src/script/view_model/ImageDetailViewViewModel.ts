@@ -32,7 +32,7 @@ import type {ActionsViewModel} from './ActionsViewModel';
 import type {Conversation} from '../entity/Conversation';
 import type {ContentMessage} from '../entity/message/ContentMessage';
 import type {MediumImage} from '../entity/message/MediumImage';
-import {MessageRepository} from '../conversation/MessageRepository';
+import type {MessageRepository} from '../conversation/MessageRepository';
 
 export class ImageDetailViewViewModel {
   elementId: 'detail-view';

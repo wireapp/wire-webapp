@@ -34,7 +34,7 @@ import type {Conversation} from 'src/script/entity/Conversation';
 import type {User} from 'src/script/entity/User';
 import type {TeamRepository} from 'src/script/team/TeamRepository';
 import type {UserRepository} from 'src/script/user/UserRepository';
-import {MessageRepository} from 'src/script/conversation/MessageRepository';
+import type {MessageRepository} from 'src/script/conversation/MessageRepository';
 
 export const SHOW_REQUEST_MODAL = 'LegalHold.showRequestModal';
 export const HIDE_REQUEST_MODAL = 'LegalHold.hideRequestModal';

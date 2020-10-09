@@ -31,7 +31,7 @@ import type {User} from '../entity/User';
 import {BackendClientError} from '../error/BackendClientError';
 import type {MessageSender} from '../message/MessageSender';
 import type {BroadcastService} from './BroadcastService';
-import {MessageRepository} from '../conversation/MessageRepository';
+import type {MessageRepository} from '../conversation/MessageRepository';
 
 export class BroadcastRepository {
   private readonly broadcastService: BroadcastService;

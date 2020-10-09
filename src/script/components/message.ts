@@ -53,7 +53,7 @@ import './asset/linkPreviewAsset';
 import './asset/locationAsset';
 import './asset/videoAsset';
 import './asset/messageButton';
-import {MessageRepository} from '../conversation/MessageRepository';
+import type {MessageRepository} from '../conversation/MessageRepository';
 
 interface MessageParams {
   actionsViewModel: ActionsViewModel;
