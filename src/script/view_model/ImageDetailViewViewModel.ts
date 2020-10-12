@@ -43,6 +43,7 @@ export class ImageDetailViewViewModel {
   conversationEntity: ko.Observable<Conversation>;
   items: ko.ObservableArray<ContentMessage>;
   messageEntity: ko.Observable<ContentMessage>;
+  isLiked: ko.PureComputed<boolean>;
 
   constructor(
     mainViewModel: MainViewModel,
@@ -60,7 +61,7 @@ export class ImageDetailViewViewModel {
 
     this.conversationEntity = ko.observable();
     this.items = ko.observableArray();
-    this.messageEntity = ko.observable();
+    this.messageEntity = ko.observable().extend({notify: 'always'});
     this.messageEntity.subscribe(messageEntity => {
       if (messageEntity) {
         const conversationId = messageEntity.conversation_id;
@@ -72,6 +73,8 @@ export class ImageDetailViewViewModel {
         }
       }
     });
+
+    this.isLiked = ko.pureComputed(() => false);
 
     amplify.subscribe(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, this.show);
 
@@ -99,6 +102,7 @@ export class ImageDetailViewViewModel {
   show = (messageEntity: ContentMessage, messageEntities: ContentMessage[], source: string) => {
     this.items(messageEntities);
     this.messageEntity(messageEntity);
+    this.isLiked = messageEntity.is_liked;
     this.source = source;
 
     amplify.subscribe(WebAppEvents.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageExpired);
