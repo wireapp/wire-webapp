@@ -17,6 +17,8 @@
  *
  */
 
+import React from 'react';
+import ReactDOM from 'react-dom';
 import ko from 'knockout';
 import $ from 'jquery';
 import SimpleBar from 'simplebar';
@@ -679,5 +681,15 @@ ko.bindingHandlers.clickOrDrag = {
       }
       isDragging = false;
     });
+  },
+};
+
+ko.bindingHandlers.react = {
+  init() {
+    return {controlsDescendantBindings: true};
+  },
+  update(element, valueAccessor) {
+    const {component, props} = valueAccessor();
+    ReactDOM.render(React.createElement(component, props), element);
   },
 };

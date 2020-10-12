@@ -28,6 +28,7 @@ import type {NotificationService} from '../event/NotificationService';
 import '../Config';
 
 import 'Components/accentColorPicker';
+import 'Components/AccentColorPickerComponent';
 import 'Components/asset/assetHeader';
 import 'Components/asset/controls/audioSeekBar';
 import 'Components/asset/controls/mediaButton';

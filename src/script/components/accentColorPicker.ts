@@ -48,7 +48,7 @@ class AccentColorPicker {
 }
 
 // Knockout registration of the accent color picker component.
-ko.components.register('accent-color-picker', {
+ko.components.register('BBBaccent-color-picker', {
   template: `
     <!-- ko foreach: {data: accentColorIds, as: 'id'} -->
       <input type="radio" name="accent"
