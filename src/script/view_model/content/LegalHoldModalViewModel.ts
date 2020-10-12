@@ -34,6 +34,7 @@ import type {Conversation} from 'src/script/entity/Conversation';
 import type {User} from 'src/script/entity/User';
 import type {TeamRepository} from 'src/script/team/TeamRepository';
 import type {UserRepository} from 'src/script/user/UserRepository';
+import type {MessageRepository} from 'src/script/conversation/MessageRepository';
 
 export const SHOW_REQUEST_MODAL = 'LegalHold.showRequestModal';
 export const HIDE_REQUEST_MODAL = 'LegalHold.hideRequestModal';
@@ -66,6 +67,7 @@ export class LegalHoldModalViewModel {
     public teamRepository: TeamRepository,
     public clientRepository: ClientRepository,
     public cryptographyRepository: CryptographyRepository,
+    public messageRepository: MessageRepository,
   ) {
     this.isVisible = ko.observable(false);
     this.showRequest = ko.observable(false);
@@ -211,7 +213,7 @@ export class LegalHoldModalViewModel {
     this.isSelfInfo(false);
     this.isLoading(true);
     this.isVisible(true);
-    await this.conversationRepository.updateAllClients(conversation, false);
+    await this.messageRepository.updateAllClients(conversation, false);
     const allUsers = await this.conversationRepository.get_all_users_in_conversation(conversation.id);
     const legalHoldUsers = allUsers.filter(user => user.isOnLegalHold());
     if (!legalHoldUsers.length) {

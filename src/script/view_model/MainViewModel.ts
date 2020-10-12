@@ -58,6 +58,7 @@ import type {UserRepository} from '../user/UserRepository';
 import type {AuthRepository} from '../auth/AuthRepository';
 import type {BroadcastRepository} from '../broadcast/BroadcastRepository';
 import type {EventTrackingRepository} from '../tracking/EventTrackingRepository';
+import type {MessageRepository} from '../conversation/MessageRepository';
 
 export interface ViewModelRepositories {
   asset: AssetRepository;
@@ -75,6 +76,7 @@ export interface ViewModelRepositories {
   giphy: GiphyRepository;
   integration: IntegrationRepository;
   media: MediaRepository;
+  message: MessageRepository;
   notification: NotificationRepository;
   permission: PermissionRepository;
   preferenceNotification: PreferenceNotificationRepository;
@@ -160,6 +162,7 @@ export class MainViewModel {
       repositories.conversation,
       repositories.integration,
       repositories.user,
+      repositories.message,
     );
 
     this.panel = new PanelViewModel(this, repositories);
@@ -177,7 +180,12 @@ export class MainViewModel {
     this.content = new ContentViewModel(this, repositories);
     this.list = new ListViewModel(this, repositories);
 
-    this.lightbox = new ImageDetailViewViewModel(this, repositories.conversation, repositories.asset);
+    this.lightbox = new ImageDetailViewViewModel(
+      this,
+      repositories.conversation,
+      repositories.asset,
+      repositories.message,
+    );
     this.title = new WindowTitleViewModel(this, repositories.user, repositories.conversation);
     this.favicon = new FaviconViewModel(amplify);
     this.warnings = new WarningsViewModel();

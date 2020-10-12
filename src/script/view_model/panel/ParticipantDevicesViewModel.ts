@@ -27,11 +27,13 @@ import type {ConversationRepository} from '../../conversation/ConversationReposi
 import type {ClientRepository} from '../../client/ClientRepository';
 import type {CryptographyRepository} from '../../cryptography/CryptographyRepository';
 import type {PanelParams} from '../PanelViewModel';
+import type {MessageRepository} from 'src/script/conversation/MessageRepository';
 
 export class ParticipantDevicesViewModel extends BasePanelViewModel {
   clientRepository: ClientRepository;
   conversationRepository: ConversationRepository;
   cryptographyRepository: CryptographyRepository;
+  messageRepository: MessageRepository;
   userDevicesHistory: UserDevicesHistory;
   showSelfFingerprint: () => boolean;
   showDeviceDetails: () => boolean;
@@ -40,10 +42,11 @@ export class ParticipantDevicesViewModel extends BasePanelViewModel {
 
   constructor(params: PanelViewModelProps) {
     super(params);
-    const {client, conversation, cryptography} = params.repositories;
+    const {client, conversation, cryptography, message} = params.repositories;
     this.clientRepository = client;
     this.conversationRepository = conversation;
     this.cryptographyRepository = cryptography;
+    this.messageRepository = message;
     this.userDevicesHistory = makeUserDevicesHistory();
 
     this.showSelfFingerprint = () => this.userDevicesHistory.current() === UserDevicesState.SELF_FINGERPRINT;

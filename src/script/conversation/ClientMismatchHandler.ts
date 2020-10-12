@@ -31,19 +31,13 @@ import type {EventInfoEntity} from './EventInfoEntity';
 import type {Conversation} from '../entity/Conversation';
 
 export class ClientMismatchHandler {
-  private readonly conversationRepository: ConversationRepository;
-  private readonly cryptographyRepository: CryptographyRepository;
-  private readonly userRepository: UserRepository;
   private readonly logger: Logger;
 
   constructor(
-    conversationRepository: ConversationRepository,
-    cryptographyRepository: CryptographyRepository,
-    userRepository: UserRepository,
+    private readonly conversationRepositoryProvider: () => ConversationRepository,
+    private readonly cryptographyRepository: CryptographyRepository,
+    private readonly userRepository: UserRepository,
   ) {
-    this.conversationRepository = conversationRepository;
-    this.cryptographyRepository = cryptographyRepository;
-    this.userRepository = userRepository;
     this.logger = getLogger('ClientMismatchHandler');
   }
 
@@ -65,7 +59,7 @@ export class ClientMismatchHandler {
     // Note: Broadcast messages have an empty conversation ID
     const conversationEntity: Conversation | undefined =
       eventInfoEntity.conversationId !== ''
-        ? await this.conversationRepository.get_conversation_by_id(eventInfoEntity.conversationId)
+        ? await this.conversationRepositoryProvider().get_conversation_by_id(eventInfoEntity.conversationId)
         : undefined;
     await this.handleRedundant(redundant, conversationEntity, payload);
     await this.handleDeleted(deleted, conversationEntity, payload);
@@ -131,7 +125,7 @@ export class ClientMismatchHandler {
       const unknownUserIds = getDifference(knownUserIds, missingUserIds);
 
       if (unknownUserIds.length > 0) {
-        this.conversationRepository.addMissingMember(conversationEntity, unknownUserIds, timestamp - 1);
+        this.conversationRepositoryProvider().addMissingMember(conversationEntity, unknownUserIds, timestamp - 1);
       }
     }
 
@@ -143,7 +137,7 @@ export class ClientMismatchHandler {
       }),
     );
 
-    this.conversationRepository.verificationStateHandler.onClientsAdded(missingUserIds);
+    this.conversationRepositoryProvider().verificationStateHandler.onClientsAdded(missingUserIds);
 
     if (payload) {
       return this.cryptographyRepository.encryptGenericMessage(recipients, genericMessage, payload);
