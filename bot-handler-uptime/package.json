@@ -14,11 +14,11 @@
     "typescript": "4.0.3"
   },
   "files": [
-    "dist",
-    "!dist/demo"
+    "src",
+    "!src/**/*.ts"
   ],
   "license": "GPL-3.0",
-  "main": "dist/UptimeHandler.js",
+  "main": "src/UptimeHandler",
   "name": "@wireapp/bot-handler-uptime",
   "peerDependencies": {
     "@wireapp/bot-api": "7.x.x"
@@ -30,7 +30,7 @@
   "scripts": {
     "build": "yarn build:node",
     "build:node": "tsc",
-    "clean": "rimraf dist",
+    "clean": "rimraf src/**/*{.js,.js.map,.d.ts}",
     "dist": "yarn clean && yarn build",
     "test": "yarn test:node",
     "test:node": "nyc jasmine --config=jasmine.json",
