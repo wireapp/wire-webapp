@@ -666,7 +666,7 @@ export class CallingRepository {
 
   async answerCall(call: Call, callType?: CALL_TYPE): Promise<void> {
     try {
-      callType = callType ?? call.getSelfParticipant().sharesCamera() ? call.initialType : CALL_TYPE.NORMAL;
+      callType ??= call.getSelfParticipant().sharesCamera() ? call.initialType : CALL_TYPE.NORMAL;
       await this.checkConcurrentJoinedCall(call.conversationId, CALL_STATE.INCOMING);
 
       const isVideoCall = callType === CALL_TYPE.VIDEO;
