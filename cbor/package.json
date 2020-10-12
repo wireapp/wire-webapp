@@ -18,23 +18,25 @@
     "webpack-cli": "3.3.12"
   },
   "files": [
-    "dist"
+    "src",
+    "!src/demo",
+    "!src/**/*.ts"
   ],
   "license": "GPL-3.0",
-  "main": "dist/index.js",
+  "main": "src/main/index",
   "name": "@wireapp/cbor",
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/cbor",
   "scripts": {
     "build:browser": "webpack --progress",
     "build:node": "tsc",
     "build": "yarn build:node && yarn build:browser",
-    "clean": "rimraf dist .nyc_output coverage",
+    "clean": "rimraf src/main/**/*{.js,.js.map,.d.ts} .nyc_output coverage",
     "coverage": "cross-env JASMINE_CONFIG_PATH=jasmine.json istanbul cover --report html ../../node_modules/jasmine/bin/jasmine.js",
     "dist": "yarn clean && yarn build",
-    "test": "yarn test:node && yarn test:browser",
-    "test:project": "yarn dist && yarn test",
-    "test:browser": "karma start",
-    "test:node": "nyc jasmine --config=jasmine.json"
+    "test": "yarn build && yarn test:node && yarn test:browser",
+    "test:project": "yarn build && yarn test",
+    "test:browser": "yarn build && karma start",
+    "test:node": "yarn dist && nyc jasmine --config=jasmine.json"
   },
   "version": "4.6.14"
 }
