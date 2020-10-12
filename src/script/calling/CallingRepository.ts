@@ -727,7 +727,7 @@ export class CallingRepository {
       await this.warmupMediaStreams(call, true, isVideoCall);
       await this.pushClients(call.conversationId);
 
-      if (call.conversationType === CONV_TYPE.CONFERENCE) {
+      if (Config.getConfig().FEATURE.CONFERENCE_AUTO_MUTE && call.conversationType === CONV_TYPE.CONFERENCE) {
         this.wCall.setMute(this.wUser, 1);
       }
 

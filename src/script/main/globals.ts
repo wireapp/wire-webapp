@@ -97,6 +97,7 @@ declare global {
           APPLOCK_SCHEDULED_TIMEOUT: number;
           APPLOCK_UNFOCUS_TIMEOUT: number;
           CHECK_CONSENT: boolean;
+          CONFERENCE_AUTO_MUTE: boolean;
           DEFAULT_LOGIN_TEMPORARY_CLIENT: boolean;
           ENABLE_ACCOUNT_REGISTRATION: boolean;
           ENABLE_ACCOUNT_REGISTRATION_ACCEPT_TERMS_AND_PRIVACY_POLICY: boolean;
