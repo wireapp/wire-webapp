@@ -1,4 +1,4 @@
-import type {IHelmetContentSecurityPolicyDirectives} from 'helmet';
+import {ContentSecurityPolicyOptions} from 'helmet/dist/middlewares/content-security-policy';
 
 export interface ServerConfig {
   CLIENT: {
@@ -47,6 +47,7 @@ export interface ServerConfig {
         SCREEN_ACCESS_DENIED: string;
       };
       TEAMS_BASE: string;
+      TEAMS_CREATE: string;
       TERMS_OF_USE_PERSONAL: string;
       TERMS_OF_USE_TEAMS: string;
       WEBSITE_BASE: string;
@@ -59,7 +60,7 @@ export interface ServerConfig {
   SERVER: {
     APP_BASE: string;
     CACHE_DURATION_SECONDS: number;
-    CSP: IHelmetContentSecurityPolicyDirectives;
+    CSP: ContentSecurityPolicyOptions['directives'];
     DEVELOPMENT?: boolean;
     ENFORCE_HTTPS: boolean;
     ENVIRONMENT: string;

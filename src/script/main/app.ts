@@ -68,7 +68,6 @@ import {ServiceMiddleware} from '../event/preprocessor/ServiceMiddleware';
 import {WebSocketService} from '../event/WebSocketService';
 import {ConversationService} from '../conversation/ConversationService';
 
-import {BackendClient} from '../service/BackendClient';
 import {SingleInstanceHandler} from './SingleInstanceHandler';
 
 import {AppInitStatisticsValue} from '../telemetry/app_init/AppInitStatisticsValue';
@@ -129,6 +128,7 @@ import {DebugUtil} from 'Util/DebugUtil';
 import type {BaseError} from '../error/BaseError';
 import type {User} from '../entity/User';
 import {Runtime} from '@wireapp/commons';
+import {MessageRepository} from '../conversation/MessageRepository';
 
 function doRedirect(signOutReason: SIGN_OUT_REASON) {
   let url = `/auth/${location.search}`;
@@ -144,7 +144,6 @@ function doRedirect(signOutReason: SIGN_OUT_REASON) {
 
 class App {
   apiClient: APIClient;
-  backendClient: BackendClient;
   logger: Logger;
   appContainer: HTMLElement;
   service: {
@@ -181,19 +180,12 @@ class App {
 
   /**
    * @param apiClient Configured backend client
-   * @param backendClient Configured backend client
    * @param appContainer DOM element that will hold the app
    * @param encryptedEngine Encrypted database handler
    */
-  constructor(
-    apiClient: APIClient,
-    backendClient: BackendClient,
-    appContainer: HTMLElement,
-    encryptedEngine?: SQLeetEngine,
-  ) {
+  constructor(apiClient: APIClient, appContainer: HTMLElement, encryptedEngine?: SQLeetEngine) {
     this.apiClient = apiClient;
     this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () => this.logout(SIGN_OUT_REASON.NOT_SIGNED_IN, false));
-    this.backendClient = backendClient;
     this.logger = getLogger('App');
     this.appContainer = appContainer;
 
@@ -271,17 +263,28 @@ class App {
 
     repositories.conversation = new ConversationRepository(
       this.service.conversation,
-      repositories.asset,
-      repositories.client,
+      () => repositories.message,
       repositories.connection,
-      repositories.cryptography,
       repositories.event,
-      new LinkPreviewRepository(repositories.asset, repositories.properties),
       repositories.team,
       repositories.user,
       repositories.properties,
-      sendingMessageQueue,
       serverTimeHandler,
+    );
+
+    repositories.message = new MessageRepository(
+      repositories.client,
+      () => repositories.conversation,
+      repositories.cryptography,
+      repositories.event,
+      sendingMessageQueue,
+      repositories.properties,
+      serverTimeHandler,
+      repositories.user,
+      repositories.team,
+      this.service.conversation,
+      new LinkPreviewRepository(repositories.asset, repositories.properties),
+      repositories.asset,
     );
 
     const serviceMiddleware = new ServiceMiddleware(repositories.conversation, repositories.user);
@@ -308,13 +311,14 @@ class App {
     repositories.broadcast = new BroadcastRepository(
       new BroadcastService(this.apiClient),
       repositories.client,
-      repositories.conversation,
+      repositories.message,
       repositories.cryptography,
       sendingMessageQueue,
     );
     repositories.calling = new CallingRepository(
       this.apiClient,
       repositories.conversation,
+      repositories.message,
       repositories.event,
       repositories.user,
       repositories.media.streamHandler,
@@ -356,13 +360,12 @@ class App {
       integration: new IntegrationService(this.apiClient),
       notification: new NotificationService(this.apiClient, storageService),
       storage: storageService,
-      webSocket: new WebSocketService(this.apiClient, this.backendClient),
+      webSocket: new WebSocketService(this.apiClient),
     };
   }
 
   /**
    * Subscribe to amplify events.
-   * @returns No return value
    */
   private _subscribeToEvents() {
     amplify.subscribe(WebAppEvents.LIFECYCLE.REFRESH, this.refresh.bind(this));
@@ -393,7 +396,6 @@ class App {
    * @todo Check if we really need to logout the user in all these error cases or how to recover from them
    *
    * @param App init after page reload
-   * @returns No return value
    */
   async initApp() {
     // add body information
@@ -442,7 +444,6 @@ class App {
 
       await teamRepository.initTeam();
 
-      eventRepository.connectWebSocket();
       const conversationEntities = await conversationRepository.getConversations();
       const connectionEntities = await connectionRepository.getConnections();
       loadingView.updateProgress(25, t('initReceivedUserData'));
@@ -458,7 +459,8 @@ class App {
 
       await userRepository.loadUsers();
 
-      const notificationsCount = await eventRepository.initializeFromStream();
+      await eventRepository.connectWebSocket();
+      const notificationsCount = eventRepository.notificationsTotal;
 
       telemetry.timeStep(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
       telemetry.addStatistic(AppInitStatisticsValue.NOTIFICATIONS, notificationsCount, 100);
@@ -520,11 +522,7 @@ class App {
    */
   onInternetConnectionGained(): void {
     this.logger.info('Internet connection regained. Re-establishing WebSocket connection...');
-    this.backendClient.executeOnConnectivity(BackendClient.CONNECTIVITY_CHECK_TRIGGER.CONNECTION_REGAINED).then(() => {
-      amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.NO_INTERNET);
-      amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
-      this.repository.event.reconnectWebSocket(WebSocketService.CHANGE_TRIGGER.ONLINE);
-    });
+    amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.NO_INTERNET);
   }
 
   /**
@@ -532,7 +530,6 @@ class App {
    */
   onInternetConnectionLost(): void {
     this.logger.warn('Internet connection lost');
-    this.repository.event.disconnectWebSocket(WebSocketService.CHANGE_TRIGGER.OFFLINE);
     amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.NO_INTERNET);
   }
 
@@ -570,11 +567,8 @@ class App {
       }
 
       if (isAccessTokenError) {
-        this.logger.warn('Connectivity issues. Trigger reload on regained connectivity.', error);
-        const triggerSource = isAccessTokenError
-          ? BackendClient.CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_RETRIEVAL
-          : BackendClient.CONNECTIVITY_CHECK_TRIGGER.APP_INIT_RELOAD;
-        return this.backendClient.executeOnConnectivity(triggerSource).then(() => window.location.reload());
+        this.logger.warn('Connectivity issues. Trigger reload.', error);
+        return window.location.reload();
       }
     }
 
@@ -743,7 +737,7 @@ class App {
   private _subscribeToUnloadEvents(): void {
     $(window).on('unload', () => {
       this.logger.info("'window.onunload' was triggered, so we will disconnect from the backend.");
-      this.repository.event.disconnectWebSocket(WebSocketService.CHANGE_TRIGGER.PAGE_NAVIGATION);
+      this.repository.event.disconnectWebSocket();
       this.repository.calling.destroy();
 
       if (this.repository.user.isActivatedAccount()) {
@@ -788,7 +782,7 @@ class App {
 
     const _logout = async () => {
       // Disconnect from our backend, end tracking and clear cached data
-      this.repository.event.disconnectWebSocket(WebSocketService.CHANGE_TRIGGER.LOGOUT);
+      this.repository.event.disconnectWebSocket();
 
       // Clear Local Storage (but don't delete the cookie label if you were logged in with a permanent client)
       const keysToKeep = [StorageKey.AUTH.SHOW_LOGIN];
@@ -893,15 +887,13 @@ class App {
    */
   private _redirectToLogin(signOutReason: SIGN_OUT_REASON): void {
     this.logger.info(`Redirecting to login after connectivity verification. Reason: ${signOutReason}`);
-    this.backendClient.executeOnConnectivity(BackendClient.CONNECTIVITY_CHECK_TRIGGER.LOGIN_REDIRECT).then(() => {
-      const isTemporaryGuestReason = App.CONFIG.SIGN_OUT_REASONS.TEMPORARY_GUEST.includes(signOutReason);
-      const isLeavingGuestRoom = isTemporaryGuestReason && this.repository.user.isTemporaryGuest();
-      if (isLeavingGuestRoom) {
-        return window.location.replace(getWebsiteUrl());
-      }
+    const isTemporaryGuestReason = App.CONFIG.SIGN_OUT_REASONS.TEMPORARY_GUEST.includes(signOutReason);
+    const isLeavingGuestRoom = isTemporaryGuestReason && this.repository.user.isTemporaryGuest();
+    if (isLeavingGuestRoom) {
+      return window.location.replace(getWebsiteUrl());
+    }
 
-      doRedirect(signOutReason);
-    });
+    doRedirect(signOutReason);
   }
 
   //##############################################################################
@@ -927,19 +919,14 @@ $(async () => {
   const appContainer = document.getElementById('wire-main');
   if (appContainer) {
     const apiClient = container.resolve(APIClientSingleton).getClient();
-    const backendClient = container.resolve(BackendClient);
-    backendClient.setSettings({
-      restUrl: Config.getConfig().BACKEND_REST,
-      webSocketUrl: Config.getConfig().BACKEND_WS,
-    });
     const shouldPersist = loadValue<boolean>(StorageKey.AUTH.PERSIST);
     if (shouldPersist === undefined) {
       doRedirect(SIGN_OUT_REASON.NOT_SIGNED_IN);
     } else if (isTemporaryClientAndNonPersistent(shouldPersist)) {
       const engine = await StorageService.getUninitializedEngine();
-      window.wire.app = new App(apiClient, backendClient, appContainer, engine);
+      window.wire.app = new App(apiClient, appContainer, engine);
     } else {
-      window.wire.app = new App(apiClient, backendClient, appContainer);
+      window.wire.app = new App(apiClient, appContainer);
     }
   }
 });

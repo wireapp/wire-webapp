@@ -26,17 +26,13 @@ import {LinkPreviewRepository} from 'src/script/links/LinkPreviewRepository';
 import {APIClientSingleton} from 'src/script/service/APIClientSingleton';
 import {LinkPreviewError} from 'src/script/error/LinkPreviewError';
 import {AssetRepository} from 'src/script/assets/AssetRepository';
-import {BackendClient} from 'src/script/service/BackendClient';
 
 describe('LinkPreviewRepository', () => {
   let link_preview_repository = null;
 
   beforeEach(() => {
     const apiClient = container.resolve(APIClientSingleton).getClient();
-    const assetService = new AssetService(
-      container.resolve(APIClientSingleton).getClient(),
-      container.resolve(BackendClient),
-    );
+    const assetService = new AssetService(container.resolve(APIClientSingleton).getClient());
     const assetRepository = new AssetRepository(assetService);
     const propertiesRepository = new PropertiesRepository(new PropertiesService(apiClient), new SelfService(apiClient));
     link_preview_repository = new LinkPreviewRepository(assetRepository, propertiesRepository);
@@ -44,12 +40,12 @@ describe('LinkPreviewRepository', () => {
 
   afterEach(() => (window.openGraphAsync = undefined));
 
-  describe('_getLinkPreview', () => {
+  describe('getLinkPreview', () => {
     it('fetches open graph data if openGraph lib is available', done => {
       window.openGraphAsync = () => Promise.resolve();
 
       link_preview_repository
-        ._getLinkPreview('https://app.wire.com/')
+        .getLinkPreview('https://app.wire.com/')
         .then(done.fail)
         .catch(error => {
           expect(error.type).toBe(LinkPreviewError.TYPE.NO_DATA_AVAILABLE);
@@ -61,7 +57,7 @@ describe('LinkPreviewRepository', () => {
       window.openGraphAsync = () => Promise.resolve();
 
       link_preview_repository
-        ._getLinkPreview('https://www.youtube.com/watch?v=t4gjl-uwUHc')
+        .getLinkPreview('https://www.youtube.com/watch?v=t4gjl-uwUHc')
         .then(done.fail)
         .catch(error => {
           expect(error.type).toBe(LinkPreviewError.TYPE.BLACKLISTED);
@@ -74,7 +70,7 @@ describe('LinkPreviewRepository', () => {
 
       const invalidUrl = 'http:////api/apikey';
       link_preview_repository
-        ._getLinkPreview(invalidUrl)
+        .getLinkPreview(invalidUrl)
         .then(done.fail)
         .catch(error => {
           expect(error.type).toBe(LinkPreviewError.TYPE.UNSUPPORTED_TYPE);

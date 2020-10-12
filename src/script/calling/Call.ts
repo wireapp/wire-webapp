@@ -33,16 +33,15 @@ export class Call {
   public readonly participants: ko.ObservableArray<Participant>;
   public readonly selfClientId: ClientId;
   public readonly conversationType: CONV_TYPE;
-  public readonly isConferenceCall: boolean;
   public readonly initialType: CALL_TYPE;
   public readonly isCbrEnabled: ko.Observable<boolean>;
   public blockMessages: boolean = false;
   /**
-   * set to true if anyone has enabled their video during a call (used for analytics)
+   * set to `true` if anyone has enabled their video during a call (used for analytics)
    */
   public analyticsAvSwitchToggle: boolean = false;
   /**
-   * set to true if anyone has shared their screen during a call (used for analytics)
+   * set to `true` if anyone has shared their screen during a call (used for analytics)
    */
   public analyticsScreenSharing: boolean = false;
   /**
@@ -61,7 +60,6 @@ export class Call {
     this.conversationId = conversationId;
     this.state = ko.observable(CALL_STATE.UNKNOWN);
     this.conversationType = conversationType;
-    this.isConferenceCall = conversationType === CONV_TYPE.CONFERENCE;
     this.initialType = callType;
     this.selfClientId = selfParticipant?.clientId;
     this.participants = ko.observableArray([selfParticipant]);

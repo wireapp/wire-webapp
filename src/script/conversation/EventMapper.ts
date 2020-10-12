@@ -539,17 +539,15 @@ export class EventMapper {
 
   /**
    * Maps JSON data of local missed message event to message entity.
-   * @returns {MissedMessage} Missed message entity
    */
-  private _mapEventMissedMessages() {
+  private _mapEventMissedMessages(): MissedMessage {
     return new MissedMessage();
   }
 
   /**
-   * Maps JSON data of conversation.knock message into message entity.
-   * @returns {PingMessage} Ping message entity
+   * Maps JSON data of `conversation.knock` message into message entity.
    */
-  private _mapEventPing() {
+  private _mapEventPing(): PingMessage {
     return new PingMessage();
   }
 

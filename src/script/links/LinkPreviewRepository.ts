@@ -77,7 +77,7 @@ export class LinkPreviewRepository {
     }
 
     try {
-      return await this._getLinkPreview(linkData.url, linkData.offset);
+      return await this.getLinkPreview(linkData.url, linkData.offset);
     } catch (error) {
       const isLinkPreviewError = error instanceof LinkPreviewError;
       if (!isLinkPreviewError) {
@@ -94,12 +94,12 @@ export class LinkPreviewRepository {
    * @param offset starting index of the link
    * @returns Resolves with a link preview if generated
    */
-  async _getLinkPreview(url: string, offset: number = 0): Promise<LinkPreview> {
+  private async getLinkPreview(url: string, offset: number = 0): Promise<LinkPreview> {
     if (isBlacklisted(url)) {
       throw new LinkPreviewError(LinkPreviewError.TYPE.BLACKLISTED, LinkPreviewError.MESSAGE.BLACKLISTED);
     }
 
-    const openGraphData = await this._fetchOpenGraphData(url);
+    const openGraphData = await this.fetchOpenGraphData(url);
     if (!openGraphData) {
       throw new LinkPreviewError(LinkPreviewError.TYPE.NO_DATA_AVAILABLE, LinkPreviewError.MESSAGE.NO_DATA_AVAILABLE);
     }
@@ -110,7 +110,7 @@ export class LinkPreviewRepository {
       throw new LinkPreviewError(LinkPreviewError.TYPE.UNSUPPORTED_TYPE, LinkPreviewError.MESSAGE.UNSUPPORTED_TYPE);
     }
 
-    return this._fetchPreviewImage(linkPreview, openGraphData.image as {data: string});
+    return this.fetchPreviewImage(linkPreview, openGraphData.image as {data: string});
   }
 
   /**
@@ -128,10 +128,10 @@ export class LinkPreviewRepository {
    * @param openGraphImage Open graph image URL
    * @returns Resolves with the link preview proto message
    */
-  private async _fetchPreviewImage(linkPreview: LinkPreview, openGraphImage?: {data: string}): Promise<LinkPreview> {
+  private async fetchPreviewImage(linkPreview: LinkPreview, openGraphImage?: {data: string}): Promise<LinkPreview> {
     if (openGraphImage?.data) {
       try {
-        const asset = await this._uploadPreviewImage(openGraphImage.data);
+        const asset = await this.uploadPreviewImage(openGraphImage.data);
         linkPreview.article[PROTO_MESSAGE_TYPE.LINK_PREVIEW_IMAGE] = asset; // deprecated
         linkPreview[PROTO_MESSAGE_TYPE.LINK_PREVIEW_IMAGE] = asset;
       } catch (error) {
@@ -148,7 +148,7 @@ export class LinkPreviewRepository {
    * @param link Link to fetch open graph data from
    * @returns Resolves with the retrieved open graph data
    */
-  async _fetchOpenGraphData(link: string): Promise<OpenGraphResult | undefined> {
+  private async fetchOpenGraphData(link: string): Promise<OpenGraphResult | undefined> {
     try {
       const data = await window.openGraphAsync(link);
       if (data) {
@@ -170,7 +170,7 @@ export class LinkPreviewRepository {
    * @param dataUri image data as base64 encoded data URI
    * @returns Resolves with the uploaded asset
    */
-  private async _uploadPreviewImage(dataUri: string): Promise<Asset> {
+  private async uploadPreviewImage(dataUri: string): Promise<Asset> {
     const blob = await base64ToBlob(dataUri);
     return this.assetRepository.uploadFile(
       createRandomUuid(),

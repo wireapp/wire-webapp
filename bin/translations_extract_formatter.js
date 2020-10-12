@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2020 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,19 +17,14 @@
  *
  */
 
-audio-seek-bar {
-  position: relative;
-  display: flex;
-  width: 100%;
-  height: 40px;
-  cursor: pointer;
+const webappTranslations = require('../src/i18n/en-US.json');
 
-  svg path {
-    fill: var(--foreground);
-
-    &.active {
-      clip-path: var(--seek-bar-clip, polygon(0 0, 0% 0, 0% 100%, 0 100%));
-      fill: var(--accent-color);
-    }
-  }
-}
+exports.format = function (messages) {
+  return Object.entries(messages).reduce(
+    (accumulator, [key, value]) => ({
+      ...accumulator,
+      [key]: value.defaultMessage,
+    }),
+    {...webappTranslations},
+  );
+};
