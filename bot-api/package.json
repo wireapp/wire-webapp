@@ -6,6 +6,7 @@
   },
   "devDependencies": {
     "cross-env": "7.0.2",
+    "del-cli": "3.0.1",
     "dotenv-defaults": "2.0.1",
     "jasmine": "3.5.0",
     "rimraf": "3.0.2",
@@ -13,20 +14,21 @@
     "typescript": "4.0.3"
   },
   "files": [
-    "dist",
-    "!dist/demo"
+    "src",
+    "!src/demo",
+    "!src/**/*.ts"
   ],
   "license": "GPL-3.0",
-  "main": "dist/index.js",
+  "main": "src/index",
   "name": "@wireapp/bot-api",
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api",
   "scripts": {
     "build": "yarn build:node",
     "build:node": "tsc",
-    "clean": "rimraf dist",
+    "clean": "del-cli \"src/**/*{.js,.js.map,.d.ts}\" \"!src/**/*{.test.node.js}\"",
     "demo:admin": "ts-node -r tsconfig-paths/register src/demo/admin.ts",
     "dist": "yarn clean && yarn build",
-    "test": "yarn test:node",
+    "test": "yarn build && yarn test:node && yarn clean",
     "test:node": "jasmine --config=jasmine.json",
     "test:project": "yarn dist && yarn test"
   },
