@@ -715,8 +715,9 @@ export class CallingRepository {
     }
   };
 
-  async answerCall(call: Call, callType: CALL_TYPE): Promise<void> {
+  async answerCall(call: Call, callType?: CALL_TYPE): Promise<void> {
     try {
+      callType ??= call.getSelfParticipant().sharesCamera() ? call.initialType : CALL_TYPE.NORMAL;
       await this.checkConcurrentJoinedCall(call.conversationId, CALL_STATE.INCOMING);
 
       const isVideoCall = callType === CALL_TYPE.VIDEO;
@@ -725,6 +726,11 @@ export class CallingRepository {
       }
       await this.warmupMediaStreams(call, true, isVideoCall);
       await this.pushClients(call.conversationId);
+
+      if (Config.getConfig().FEATURE.CONFERENCE_AUTO_MUTE && call.conversationType === CONV_TYPE.CONFERENCE) {
+        this.wCall.setMute(this.wUser, 1);
+      }
+
       this.wCall.answer(this.wUser, call.conversationId, callType, this.cbrEncoding());
 
       this.sendCallingEvent(EventName.CALLING.JOINED_CALL, call, {
