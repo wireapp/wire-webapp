@@ -17,8 +17,9 @@
  *
  */
 
-import ko from 'knockout';
 import React from 'react';
+
+import {registerReactComponent} from 'Util/ComponentUtil';
 
 import type {User} from '../entity/User';
 
@@ -27,10 +28,10 @@ interface Props {
   user: User;
 }
 
-export const AccentColorPicker = ({user, setSelected}: Props) => {
+export const AccentColorPicker: React.FunctionComponent<Props> = ({user, setSelected}) => {
   const accentColorIds = [1, 2, 4, 5, 6, 7];
   return (
-    <>
+    <span className="accent-color-picker preferences-account-accent-color preferences-section-account-space-before">
       {accentColorIds.map(id => (
         <span key={id} className="accent-color">
           <input
@@ -43,17 +44,11 @@ export const AccentColorPicker = ({user, setSelected}: Props) => {
           <label htmlFor={`accent${id}`} className={`accent-color-${id}`}></label>
         </span>
       ))}
-    </>
+    </span>
   );
 };
 
-ko.components.register('accent-color-picker', {
-  template: `
-    <span class="accent-color-picker preferences-account-accent-color preferences-section-account-space-before" data-bind="react: { component: AccentColorPicker, props: { user: user(), setSelected: selected }}">
-  `,
-  viewModel: function ({user, selected}: {selected: ko.Observable<number>; user: ko.Observable<User>}) {
-    this.user = user;
-    this.selected = selected;
-    this.AccentColorPicker = AccentColorPicker;
-  },
+registerReactComponent('accent-color-picker', {
+  component: AccentColorPicker,
+  template: '<span data-bind="react: {user: user(), setSelected: selected}"></span>',
 });

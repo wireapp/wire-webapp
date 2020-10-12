@@ -688,8 +688,8 @@ ko.bindingHandlers.react = {
   init() {
     return {controlsDescendantBindings: true};
   },
-  update(element, valueAccessor) {
-    const {component, props} = valueAccessor();
-    ReactDOM.render(React.createElement(component, props), element);
+  update(element, valueAccessor, _allBindings, _viewModel, context) {
+    const props = valueAccessor();
+    ReactDOM.render(React.createElement(context.$component.reactComponent, props), element);
   },
 };
