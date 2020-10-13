@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.56](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-uptime/compare/@wireapp/bot-handler-uptime@0.1.55...@wireapp/bot-handler-uptime@0.1.56) (2020-10-13)
+
+
+### Bug Fixes
+
+* **bot-api,bot-handler-avs,bot-handler-debug,bot-handler-uptime,bot-handler-wizard,cbor,cli-client:** Upload type definitions to npm ([#3266](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-uptime/issues/3266)) ([1338830](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-uptime/commit/1338830008164267f084ee1508b6a6c0e679640a))
+
+
+
+
+
 ## [0.1.55](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-uptime/compare/@wireapp/bot-handler-uptime@0.1.54...@wireapp/bot-handler-uptime@0.1.55) (2020-10-13)
 
 **Note:** Version bump only for package @wireapp/bot-handler-uptime

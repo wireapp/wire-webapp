@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.31](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-wizard/compare/@wireapp/bot-handler-wizard@0.2.30...@wireapp/bot-handler-wizard@0.2.31) (2020-10-13)
+
+
+### Bug Fixes
+
+* **bot-api,bot-handler-avs,bot-handler-debug,bot-handler-uptime,bot-handler-wizard,cbor,cli-client:** Upload type definitions to npm ([#3266](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-wizard/issues/3266)) ([1338830](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-wizard/commit/1338830008164267f084ee1508b6a6c0e679640a))
+
+
+
+
+
 ## [0.2.30](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-wizard/compare/@wireapp/bot-handler-wizard@0.2.29...@wireapp/bot-handler-wizard@0.2.30) (2020-10-13)
 
 **Note:** Version bump only for package @wireapp/bot-handler-wizard

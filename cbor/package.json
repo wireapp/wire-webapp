@@ -38,5 +38,5 @@
     "test:browser": "yarn build && karma start",
     "test:node": "yarn dist && nyc jasmine --config=jasmine.json"
   },
-  "version": "4.6.15"
+  "version": "4.6.16"
 }

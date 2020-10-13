@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.11.27](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@7.11.26...@wireapp/bot-api@7.11.27) (2020-10-13)
+
+
+### Bug Fixes
+
+* **bot-api,bot-handler-avs,bot-handler-debug,bot-handler-uptime,bot-handler-wizard,cbor,cli-client:** Upload type definitions to npm ([#3266](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/issues/3266)) ([1338830](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/commit/1338830008164267f084ee1508b6a6c0e679640a))
+
+
+
+
+
 ## [7.11.26](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@7.11.25...@wireapp/bot-api@7.11.26) (2020-10-13)
 
 **Note:** Version bump only for package @wireapp/bot-api
