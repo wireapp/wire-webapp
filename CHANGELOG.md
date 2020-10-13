@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.27.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.27.5...@wireapp/api-client@11.27.6) (2020-10-13)
+
+
+### Bug Fixes
+
+* **api-client:** Ensure websocket connection before executing `onConnect` ([#3263](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3263)) ([947ff33](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/947ff33a87e950369c4426afa14a2c44669db2a5))
+
+
+
+
+
 ## [11.27.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.27.4...@wireapp/api-client@11.27.5) (2020-10-13)
 
 **Note:** Version bump only for package @wireapp/api-client
