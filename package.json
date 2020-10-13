@@ -197,6 +197,9 @@
     "type": "git",
     "url": "https://github.com/wireapp/wire-webapp.git"
   },
+  "resolutions": {
+    "@wireapp/core/../@wireapp/commons": "3.8.7"
+  },
   "scripts": {
     "build:prod": "yarn build:server && grunt build_prod",
     "build:server": "cd server && yarn build",
