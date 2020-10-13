@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.8.7](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@3.8.6...@wireapp/commons@3.8.7) (2020-10-13)
+
+
+### Bug Fixes
+
+* **commons:** Legacy support for encoded streams in Chrome 83 & 84 ([#3262](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/issues/3262)) ([11257c1](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/commit/11257c10218ffdea9d1d684e5a23b3294ec3de1a))
+
+
+
+
+
 ## [3.8.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@3.8.5...@wireapp/commons@3.8.6) (2020-10-08)
 
 **Note:** Version bump only for package @wireapp/commons
