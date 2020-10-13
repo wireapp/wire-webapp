@@ -135,7 +135,11 @@ export class Runtime {
   };
 
   public static isSupportingConferenceCalling = (): boolean => {
-    return Runtime.isSupportingLegacyCalling() && RTCRtpSender.prototype.hasOwnProperty('createEncodedStreams');
+    /** API 'createEncodedVideoStreams' is important for Chrome 83 but got deprecated in Chrome 86 in favor of 'createEncodedStreams'. The 'createEncodedVideoStreams' API will be completely removed in Chrome 88+. */
+    const isSupportingEncodedVideoStreams = RTCRtpSender.prototype.hasOwnProperty('createEncodedVideoStreams');
+    const isSupportingEncodedStreams = RTCRtpSender.prototype.hasOwnProperty('createEncodedStreams');
+    return isSupportingEncodedStreams || isSupportingEncodedVideoStreams;
+    return Runtime.isSupportingLegacyCalling() && isSupportingEncodedStreams;
   };
 
   public static isSupportingRTCPeerConnection = (): boolean => 'RTCPeerConnection' in window;
