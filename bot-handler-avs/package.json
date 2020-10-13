@@ -14,7 +14,7 @@
   },
   "files": [
     "src",
-    "!src/**/*.ts"
+    "!src/**/!(*.d).ts"
   ],
   "license": "GPL-3.0",
   "main": "src/index",

@@ -16,7 +16,7 @@
   "files": [
     "src",
     "!src/demo",
-    "!src/**/*.ts"
+    "!src/**/!(*.d).ts"
   ],
   "license": "GPL-3.0",
   "main": "src/WizardHandler",
