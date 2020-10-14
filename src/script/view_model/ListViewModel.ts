@@ -17,7 +17,7 @@
  *
  */
 
-import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
+import {CONV_TYPE} from '@wireapp/avs';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
 import {amplify} from 'amplify';
@@ -216,8 +216,7 @@ export class ListViewModel {
         },
       });
     } else {
-      const callType = call.getSelfParticipant().sharesCamera() ? call.initialType : CALL_TYPE.NORMAL;
-      this.callingRepository.answerCall(call, callType);
+      this.callingRepository.answerCall(call);
     }
   };
 
