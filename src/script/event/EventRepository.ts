@@ -124,6 +124,19 @@ export class EventRepository {
     this.eventProcessMiddlewares = [];
   }
 
+  public watchNetworkStatus() {
+    window.addEventListener('online', () => {
+      this.logger.info('Internet connection regained. Re-establishing WebSocket connection...');
+      this.connectWebSocket();
+    });
+
+    window.addEventListener('offline', () => {
+      this.logger.warn('Internet connection lost');
+      this.disconnectWebSocket();
+      amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.NO_INTERNET);
+    });
+  }
+
   /**
    * Will set a middleware to run before the EventRepository actually processes the event.
    * Middleware is just a function with the following signature (Event) => Promise<Event>.
@@ -166,6 +179,7 @@ export class EventRepository {
    * Close the WebSocket connection.
    */
   disconnectWebSocket() {
+    this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.STREAM);
     this.webSocketService.disconnect();
   }
 
@@ -280,8 +294,6 @@ export class EventRepository {
       const {notificationId} = await this.getStreamState();
       return this.updateFromStream(notificationId);
     } catch (error) {
-      this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
-
       const isNoLastId = error.type === EventError.TYPE.NO_LAST_ID;
       if (isNoLastId) {
         this.logger.info('No notifications found for this user', error);
@@ -369,8 +381,6 @@ export class EventRepository {
       }
       return this.notificationsTotal;
     } catch (error) {
-      this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
-
       const isNoNotifications = error.type === EventError.TYPE.NO_NOTIFICATIONS;
       if (isNoNotifications) {
         this.logger.info('No notifications found for this user', error);
