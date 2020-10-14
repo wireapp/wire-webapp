@@ -168,8 +168,12 @@ export class MessageRepository {
 
     if (this.blockNotificationHandling() !== updatedHandlingState) {
       this.blockNotificationHandling(updatedHandlingState);
+      this.logger.info(
+        `Block message sending: ${this.blockNotificationHandling()} (items in queue: ${this.messageSender[
+          'sendingQueue'
+        ].getLength()})`,
+      );
       this.messageSender.pauseQueue(this.blockNotificationHandling());
-      this.logger.info(`Block message sending: ${this.blockNotificationHandling()}`);
     }
   }
 

@@ -162,7 +162,7 @@ export class PromiseQueue {
   /**
    * Resume execution of queue.
    */
-  resume(): void {
+  private resume(): void {
     this.clearInterval();
     this.blocked = false;
     this.pause(false);

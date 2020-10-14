@@ -460,6 +460,7 @@ class App {
       await userRepository.loadUsers();
 
       await eventRepository.connectWebSocket();
+      eventRepository.watchNetworkStatus();
       const notificationsCount = eventRepository.notificationsTotal;
 
       telemetry.timeStep(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
@@ -469,7 +470,6 @@ class App {
       await conversationRepository.initialize_conversations();
       loadingView.updateProgress(97.5, t('initUpdatedFromNotifications', Config.getConfig().BRAND_NAME));
 
-      this._watchOnlineStatus();
       const clientEntities = await clientRepository.updateClientsForSelf();
 
       loadingView.updateProgress(99);
@@ -515,22 +515,6 @@ class App {
         .register(`/sw.js?${Environment.version(false)}`)
         .then(({scope}) => this.logger.info(`ServiceWorker registration successful with scope: ${scope}`));
     }
-  }
-
-  /**
-   * Behavior when internet connection is re-established.
-   */
-  onInternetConnectionGained(): void {
-    this.logger.info('Internet connection regained. Re-establishing WebSocket connection...');
-    amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.NO_INTERNET);
-  }
-
-  /**
-   * Reflect internet connection loss in the UI.
-   */
-  onInternetConnectionLost(): void {
-    this.logger.warn('Internet connection lost');
-    amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.NO_INTERNET);
   }
 
   private _appInitFailure(error: BaseError, isReload: boolean) {
@@ -753,15 +737,6 @@ class App {
 
       this.repository.notification.clearNotifications();
     });
-  }
-
-  /**
-   * Subscribe to 'navigator.onLine' related events.
-   */
-  private _watchOnlineStatus(): void {
-    this.logger.info('Watching internet connectivity status');
-    $(window).on('offline', this.onInternetConnectionLost.bind(this));
-    $(window).on('online', this.onInternetConnectionGained.bind(this));
   }
 
   //##############################################################################

@@ -30,7 +30,7 @@ export class MessageSender {
     return this.sendingQueue.push(sendingFunction);
   }
 
-  pauseQueue(pauseState = true): void {
+  pauseQueue(pauseState: boolean): void {
     this.sendingQueue.pause(pauseState);
   }
 }
