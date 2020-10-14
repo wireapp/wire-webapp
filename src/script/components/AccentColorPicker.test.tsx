@@ -32,6 +32,22 @@ class AccentColorPickerPage extends TestPage<AccentColorPickerProps> {
 }
 
 describe('AccentColorPicker', () => {
+  it('shows expected accent colors', async () => {
+    const expectedAccentColorIdList = [1, 2, 4, 5, 6, 7];
+    const colorPicker = new AccentColorPickerPage({
+      doSetAccentColor: () => {},
+      user: {
+        accent_id: () => 2,
+      } as User,
+    });
+
+    expect(colorPicker.getAccentColors().exists()).toBe(true);
+    expect(colorPicker.getAccentColors().length).toBe(6);
+    expectedAccentColorIdList.forEach(accentColorId =>
+      expect(colorPicker.getAccentColorInput(accentColorId).exists()).toBe(true),
+    );
+  });
+
   it('selects users current accent color', async () => {
     const selectedAccentColorId = 2;
     const colorPicker = new AccentColorPickerPage({
