@@ -578,8 +578,8 @@ class App {
       }
     }
 
-    this.logger.warn('No connectivity. Trigger reload on regained connectivity.', error);
-    this._watchOnlineStatus();
+    this.logger.warn('No connectivity.', error);
+    window.location.reload();
   }
 
   /**
