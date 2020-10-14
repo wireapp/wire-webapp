@@ -26,6 +26,10 @@ export class MessageSender {
     this.sendingQueue = new PromiseQueue({name: 'MessageSender', paused: true});
   }
 
+  get queuedMessages(): number {
+    return this.sendingQueue.getLength();
+  }
+
   queueMessage<T>(sendingFunction: PromiseFn<T>): Promise<T> {
     return this.sendingQueue.push(sendingFunction);
   }

@@ -556,7 +556,7 @@ class App {
       }
     }
 
-    if (navigator.onLine) {
+    if (navigator.onLine === true) {
       switch (type) {
         case AccessTokenError.TYPE.NOT_FOUND_IN_CACHE:
         case AccessTokenError.TYPE.RETRIES_EXCEEDED:
@@ -578,7 +578,7 @@ class App {
       }
     }
 
-    this.logger.warn('No connectivity.', error);
+    this.logger.warn("No internet connectivity. Refreshing the page to show the browser's offline page...", error);
     window.location.reload();
   }
 

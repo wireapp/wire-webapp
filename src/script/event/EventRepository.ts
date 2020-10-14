@@ -129,6 +129,7 @@ export class EventRepository {
       this.logger.info('Internet connection regained. Re-establishing WebSocket connection...');
       this.connectWebSocket();
     });
+
     window.addEventListener('offline', () => {
       this.logger.warn('Internet connection lost');
       this.disconnectWebSocket();
