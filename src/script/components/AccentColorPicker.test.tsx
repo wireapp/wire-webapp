@@ -29,6 +29,7 @@ class AccentColorPickerPage extends TestPage<AccentColorPickerProps> {
   getAccentColors = () => this.get('input[data-uie-name="do-set-accent-color"]');
   getAccentColorInput = (accentColorId: number) =>
     this.get(`input[data-uie-name="do-set-accent-color"][data-uie-value=${accentColorId}]`);
+  clickAccentColorInput = (accentColorId: number) => this.click(this.getAccentColorInput(accentColorId));
 }
 
 describe('AccentColorPicker', () => {
@@ -59,5 +60,20 @@ describe('AccentColorPicker', () => {
 
     expect(colorPicker.getAccentColorInput(selectedAccentColorId).exists()).toBe(true);
     expect(colorPicker.getAccentColorInput(selectedAccentColorId).props().defaultChecked).toBe(true);
+  });
+
+  it('updates users accent color on click', async () => {
+    const expectedAccentColorIdList = [1, 2, 4, 5, 6, 7];
+    const colorPicker = new AccentColorPickerPage({
+      doSetAccentColor: jasmine.createSpy(),
+      user: {
+        accent_id: () => 0,
+      } as User,
+    });
+
+    expectedAccentColorIdList.forEach(accentColorId => {
+      colorPicker.clickAccentColorInput(accentColorId);
+      expect(colorPicker.getProps().doSetAccentColor).toHaveBeenCalledWith(accentColorId);
+    });
   });
 });
