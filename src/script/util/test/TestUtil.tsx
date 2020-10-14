@@ -20,4 +20,4 @@
 import {mount} from 'enzyme';
 import React from 'react';
 
-export const mountComponent = (component: React.ReactNode) => mount(component);
+export const mountComponent = (component: React.ReactElement) => mount(component);
