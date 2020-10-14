@@ -17,7 +17,7 @@
  *
  */
 
-import {ParticipantAvatar} from 'Components/participantAvatar';
+import {AVATAR_SIZE} from 'Components/ParticipantAvatarComponent';
 import ko from 'knockout';
 
 import type {IntegrationRepository} from '../../integration/IntegrationRepository';
@@ -35,7 +35,7 @@ export class ServiceModalViewModel {
   ) {
     this.isVisible = ko.observable(false);
     this.service = ko.observable(null);
-    this.avatarSize = ParticipantAvatar.SIZE.LARGE;
+    this.avatarSize = AVATAR_SIZE.LARGE;
   }
 
   showService = (service: ServiceEntity) => {

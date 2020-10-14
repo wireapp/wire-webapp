@@ -19,7 +19,7 @@
 
 import ko from 'knockout';
 
-import {ParticipantAvatar} from 'Components/participantAvatar';
+import {AVATAR_SIZE} from 'Components/ParticipantAvatarComponent';
 import {UserlistMode} from 'Components/userList';
 import {t} from 'Util/LocalizerUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
@@ -81,7 +81,7 @@ class ParticipantItem {
     }: ParticipantItemParams,
     element: HTMLElement,
   ) {
-    this.avatarSize = ParticipantAvatar.SIZE.SMALL;
+    this.avatarSize = AVATAR_SIZE.SMALL;
     this.participant = ko.unwrap(participant);
     this.isSelf = !!(this.participant as User).isMe;
     this.selfString = `(${capitalizeFirstChar(t('conversationYouNominative'))})`;

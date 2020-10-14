@@ -24,7 +24,7 @@ import {clamp} from 'Util/NumberUtil';
 import {noop} from 'Util/util';
 import {KEY, isEnterKey} from 'Util/KeyboardUtil';
 
-import {ParticipantAvatar} from 'Components/participantAvatar';
+import {AVATAR_SIZE} from 'Components/ParticipantAvatarComponent';
 import type {User} from '../entity/User';
 
 interface MentionSuggestionsParams {
@@ -36,7 +36,7 @@ interface MentionSuggestionsParams {
 class MentionSuggestions {
   isVisible: ko.Observable<boolean>;
   onSelectionValidated: (data: User, element: HTMLInputElement) => void | (() => void);
-  ParticipantAvatar: typeof ParticipantAvatar;
+  AVATAR_SIZE: typeof AVATAR_SIZE;
   position: ko.Observable<{}>;
   scrollElement: Element;
   selectedSuggestion: ko.PureComputed<User>;
@@ -54,7 +54,7 @@ class MentionSuggestions {
     this.suggestions = params.suggestions;
     this.targetInputSelector = params.targetInputSelector;
     this.targetInput = undefined;
-    this.ParticipantAvatar = ParticipantAvatar;
+    this.AVATAR_SIZE = AVATAR_SIZE;
 
     this.position = ko.observable({});
 
@@ -202,7 +202,7 @@ ko.components.register('mention-suggestions', {
           event: { mouseenter: onMouseEnter},
           css: {'mention-suggestion-list__item--highlighted': suggestion === selectedSuggestion()},
           attr: {'data-uie-value': suggestion.id, 'data-uie-selected': suggestion === selectedSuggestion()}" data-uie-name="item-mention-suggestion">
-          <participant-avatar params="participant: suggestion, size: ParticipantAvatar.SIZE.XXX_SMALL"></participant-avatar>
+          <participant-avatar params="participant: suggestion, size: AVATAR_SIZE.XXX_SMALL"></participant-avatar>
           <div class="mention-suggestion-list__item__name" data-bind="text: suggestion.name()" data-uie-name="status-name"></div>
           <!-- ko if: suggestion.isTemporaryGuest() -->
             <div class="mention-suggestion-list__item__remaining"  data-bind="text: suggestion.expirationRemainingText()" data-uie-name="status-remaining"></div>

@@ -34,7 +34,7 @@ import type {CompositeMessage} from '../entity/message/CompositeMessage';
 import type {VerificationMessage} from '../entity/message/VerificationMessage';
 import {StatusType} from '../message/StatusType';
 import type {Text} from '../entity/message/Text';
-import {ParticipantAvatar} from 'Components/participantAvatar';
+import {AVATAR_SIZE} from 'Components/ParticipantAvatarComponent';
 import {SHOW_LEGAL_HOLD_MODAL} from '../view_model/content/LegalHoldModalViewModel';
 import type {ActionsViewModel} from '../view_model/ActionsViewModel';
 import type {Conversation} from '../entity/Conversation';
@@ -104,7 +104,7 @@ class Message {
   onClickResetSession: (messageError: DecryptErrorMessage) => void;
   onClickTimestamp: (messageId: string) => void;
   onLike: (message: ContentMessage, button?: boolean) => void;
-  ParticipantAvatar: typeof ParticipantAvatar;
+  AVATAR_SIZE: typeof AVATAR_SIZE;
   previewSubscription: ko.Subscription;
   readReceiptText: ko.PureComputed<string>;
   readReceiptTooltip: ko.PureComputed<string>;
@@ -163,7 +163,7 @@ class Message {
     this.onClickCancelRequest = onClickCancelRequest;
     this.onLike = onLike;
     this.includesOnlyEmojis = includesOnlyEmojis;
-    this.ParticipantAvatar = ParticipantAvatar;
+    this.AVATAR_SIZE = AVATAR_SIZE;
 
     ko.computed(
       () => {
@@ -366,7 +366,7 @@ const normalTemplate: string = `
   <!-- ko if: shouldShowAvatar -->
     <div class="message-header">
       <div class="message-header-icon">
-        <participant-avatar class="sender-avatar" params="participant: message.user, click: onClickAvatar, size: ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
+        <participant-avatar class="sender-avatar" params="participant: message.user, click: onClickAvatar, size: AVATAR_SIZE.X_SMALL"></participant-avatar>
       </div>
       <div class="message-header-label">
         <span class="message-header-label-sender" data-bind='css: message.accent_color(), text: message.headerSenderName()' data-uie-name="sender-name"></span>
@@ -546,7 +546,7 @@ const pingTemplate: string = `
 const deleteTemplate: string = `
   <div class="message-header">
     <div class="message-header-icon">
-      <participant-avatar class="sender-avatar" params="participant: message.user, click: onClickAvatar, size: ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
+      <participant-avatar class="sender-avatar" params="participant: message.user, click: onClickAvatar, size: AVATAR_SIZE.X_SMALL"></participant-avatar>
     </div>
     <div class="message-header-label">
       <span class="message-header-label-sender" data-bind='text: message.unsafeSenderName()'></span>
@@ -639,7 +639,7 @@ const memberTemplate: string = `
       <!-- /ko -->
       <participant-avatar class="message-connected-avatar avatar-no-badge cursor-default"
                    data-bind="css: {'avatar-no-badge': message.otherUser().isOutgoingRequest()}"
-                   params="participant: message.otherUser, size: ParticipantAvatar.SIZE.X_LARGE"></participant-avatar>
+                   params="participant: message.otherUser, size: AVATAR_SIZE.X_LARGE"></participant-avatar>
       <!-- ko if: message.otherUser().isOutgoingRequest() -->
         <div class="message-connected-cancel accent-text"
              data-bind="click: () => onClickCancelRequest(message),

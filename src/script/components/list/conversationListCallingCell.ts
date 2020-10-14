@@ -26,7 +26,7 @@ import {formatSeconds} from 'Util/TimeUtil';
 import {afterRender} from 'Util/util';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
-import {ParticipantAvatar} from 'Components/participantAvatar';
+import {AVATAR_SIZE} from 'Components/ParticipantAvatarComponent';
 import {generateConversationUrl} from '../../router/routeGenerator';
 
 import 'Components/calling/fullscreenVideoCall';
@@ -75,7 +75,7 @@ class ConversationListCallingCell {
   readonly isOngoing: ko.PureComputed<boolean>;
   readonly isOutgoing: ko.PureComputed<boolean>;
   readonly multitasking: Multitasking;
-  readonly ParticipantAvatar: typeof ParticipantAvatar;
+  readonly AVATAR_SIZE: typeof AVATAR_SIZE;
   readonly participantsButtonLabel: ko.PureComputed<string>;
   readonly showMaximize: ko.PureComputed<boolean>;
   readonly showNoCameraPreview: ko.Computed<boolean>;
@@ -110,7 +110,7 @@ class ConversationListCallingCell {
     this.temporaryUserStyle = temporaryUserStyle;
     this.multitasking = multitasking;
     this.callActions = callActions;
-    this.ParticipantAvatar = ParticipantAvatar;
+    this.AVATAR_SIZE = AVATAR_SIZE;
     this.isSelfVerified = isSelfVerified;
 
     this.conversationUrl = generateConversationUrl(conversation().id);
@@ -233,7 +233,7 @@ ko.components.register('conversation-list-calling-cell', {
               <group-avatar class="conversation-list-cell-avatar-arrow call-ui__avatar" params="users: conversationParticipants(), conversation: conversation"></group-avatar>
             <!-- /ko -->
             <!-- ko if: !conversation().isGroup() && conversationParticipants().length -->
-              <participant-avatar params="participant: conversationParticipants()[0], size: ParticipantAvatar.SIZE.SMALL"></participant-avatar>
+              <participant-avatar params="participant: conversationParticipants()[0], size: PAVATAR_SIZE.SMALL"></participant-avatar>
             <!-- /ko -->
           </div>
         <!-- /ko -->

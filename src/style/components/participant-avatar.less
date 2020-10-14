@@ -27,9 +27,11 @@
   }
 }
 
-participant-avatar {
+.participant-avatar {
   position: relative;
   display: inline-block;
+
+  overflow: hidden;
   transform: translateZ(0);
   user-select: none;
 
@@ -55,63 +57,59 @@ participant-avatar {
     border: 1px solid fade(#000, 8%);
   }
 
-  .participant-avatar {
+  & > div {
     .full-screen;
-
     overflow: hidden;
-    & > div {
-      .full-screen;
+  }
+
+  &.pending,
+  &.blocked,
+  &.unknown,
+  &.ignored {
+    .avatar-image {
+      filter: grayscale(100%);
     }
 
-    &.pending,
-    &.blocked,
-    &.unknown,
-    &.ignored {
-      .avatar-image {
-        filter: grayscale(100%);
-      }
-
-      .avatar-border {
-        display: none;
-      }
+    .avatar-border {
+      display: none;
     }
+  }
 
-    &.selected,
-    &.pending,
-    &.blocked {
-      .avatar-badge {
-        background-color: fade(#000, 56%);
-      }
+  &.selected,
+  &.pending,
+  &.blocked {
+    .avatar-badge {
+      background-color: fade(#000, 56%);
     }
+  }
 
-    &.selected {
-      .avatar-badge::before {
-        .icon-mixin('\e102', @icon-size-sm); // icon-check
-      }
+  &.selected {
+    .avatar-badge::before {
+      .icon-mixin('\e102', @icon-size-sm); // icon-check
     }
+  }
 
-    &.pending {
-      .avatar-badge::before {
-        .icon-mixin('\e165', @icon-size-sm); // icon-pending
-      }
+  &.pending {
+    .avatar-badge::before {
+      .icon-mixin('\e165', @icon-size-sm); // icon-pending
     }
+  }
 
-    &.blocked {
-      .avatar-badge::before {
-        .icon-mixin('\e104', @icon-size-sm); // icon-block
-      }
+  &.blocked {
+    .avatar-badge::before {
+      .icon-mixin('\e104', @icon-size-sm); // icon-block
     }
+  }
 
-    &.camera {
-      .avatar-badge::before {
-        .icon-mixin('\e143', @icon-size-lg); // icon-camera
-      }
+  &.camera {
+    .avatar-badge::before {
+      .icon-mixin('\e143', @icon-size-lg); // icon-camera
     }
+  }
 
-    &.unknown {
-      .avatar-background {
-        background-color: @w-gray;
-      }
+  &.unknown {
+    .avatar-background {
+      background-color: @w-gray;
     }
   }
 
