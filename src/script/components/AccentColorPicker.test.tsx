@@ -42,7 +42,7 @@ describe('AccentColorPicker', () => {
     });
 
     expect(colorPicker.getAccentColors().exists()).toBe(true);
-    expect(colorPicker.getAccentColors().length).toBe(6);
+    expect(colorPicker.getAccentColors().length).toBe(expectedAccentColorIdList.length);
     expectedAccentColorIdList.forEach(accentColorId =>
       expect(colorPicker.getAccentColorInput(accentColorId).exists()).toBe(true),
     );
