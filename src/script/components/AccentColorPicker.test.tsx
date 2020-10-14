@@ -31,7 +31,7 @@ class AccentColorPickerPage extends TestPage<AccentColorPickerProps> {
     this.get(`input[data-uie-name="do-set-accent-color"][data-uie-value=${accentColorId}]`);
 }
 
-fdescribe('AccentColorPicker', () => {
+describe('AccentColorPicker', () => {
   it('selects users current accent color', async () => {
     const selectedAccentColorId = 2;
     const colorPicker = new AccentColorPickerPage({
