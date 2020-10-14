@@ -74,6 +74,7 @@ import type {Conversation} from '../entity/Conversation';
 import type {UserRepository} from '../user/UserRepository';
 import type {EventRecord} from '../storage';
 import type {EventSource} from '../event/EventSource';
+import type {MessageRepository} from '../conversation/MessageRepository';
 
 interface MediaStreamQuery {
   audio?: boolean;
@@ -122,6 +123,7 @@ export class CallingRepository {
   constructor(
     private readonly apiClient: APIClient,
     private readonly conversationRepository: ConversationRepository,
+    private readonly messageRepository: MessageRepository,
     private readonly eventRepository: EventRepository,
     private readonly userRepository: UserRepository,
     private readonly mediaStreamHandler: MediaStreamHandler,
@@ -261,7 +263,7 @@ export class CallingRepository {
       await this.apiClient.conversation.api.postOTRMessage(this.selfClientId, conversationId);
     } catch (error) {
       const mismatch: ClientMismatch = (error as AxiosError).response!.data;
-      const localClients: UserClients = await this.conversationRepository.create_recipients(conversationId);
+      const localClients: UserClients = await this.messageRepository.create_recipients(conversationId);
 
       const makeClientList = (recipients: UserClients): ClientListEntry[] =>
         Object.entries(recipients).reduce(
@@ -298,7 +300,7 @@ export class CallingRepository {
       });
       const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId);
       eventInfoEntity.setType(GENERIC_MESSAGE_TYPE.CALLING);
-      await this.conversationRepository.clientMismatchHandler.onClientMismatch(eventInfoEntity, localMismatch);
+      await this.messageRepository.clientMismatchHandler.onClientMismatch(eventInfoEntity, localMismatch);
 
       type Clients = {clientid: string; userid: string}[];
 
@@ -494,13 +496,13 @@ export class CallingRepository {
   //##############################################################################
 
   private async verificationPromise(conversationId: string, userId: string, isResponse: boolean): Promise<boolean> {
-    const recipients = await this.conversationRepository.create_recipients(conversationId, false, [userId]);
+    const recipients = await this.messageRepository.create_recipients(conversationId, false, [userId]);
     const eventInfoEntity = new EventInfoEntity(undefined, conversationId, {recipients});
     eventInfoEntity.setType(GENERIC_MESSAGE_TYPE.CALLING);
     const consentType = isResponse
       ? ConversationRepository.CONSENT_TYPE.INCOMING_CALL
       : ConversationRepository.CONSENT_TYPE.OUTGOING_CALL;
-    return this.conversationRepository.grantMessage(eventInfoEntity, consentType);
+    return this.messageRepository.grantMessage(eventInfoEntity, consentType);
   }
 
   private abortCall(conversationId: string): void {
@@ -713,8 +715,9 @@ export class CallingRepository {
     }
   };
 
-  async answerCall(call: Call, callType: CALL_TYPE): Promise<void> {
+  async answerCall(call: Call, callType?: CALL_TYPE): Promise<void> {
     try {
+      callType ??= call.getSelfParticipant().sharesCamera() ? call.initialType : CALL_TYPE.NORMAL;
       await this.checkConcurrentJoinedCall(call.conversationId, CALL_STATE.INCOMING);
 
       const isVideoCall = callType === CALL_TYPE.VIDEO;
@@ -723,6 +726,11 @@ export class CallingRepository {
       }
       await this.warmupMediaStreams(call, true, isVideoCall);
       await this.pushClients(call.conversationId);
+
+      if (Config.getConfig().FEATURE.CONFERENCE_AUTO_MUTE && call.conversationType === CONV_TYPE.CONFERENCE) {
+        this.wCall.setMute(this.wUser, 1);
+      }
+
       this.wCall.answer(this.wUser, call.conversationId, callType, this.cbrEncoding());
 
       this.sendCallingEvent(EventName.CALLING.JOINED_CALL, call, {
@@ -897,7 +905,7 @@ export class CallingRepository {
         }
 
         const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId, options);
-        return this.conversationRepository.sendCallingMessage(eventInfoEntity, conversationId);
+        return this.messageRepository.sendCallingMessage(eventInfoEntity, conversationId);
       })
       .catch(() => this.abortCall(conversationId));
 

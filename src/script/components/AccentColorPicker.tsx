@@ -18,17 +18,15 @@
  */
 
 import React from 'react';
-
 import {registerReactComponent} from 'Util/ComponentUtil';
-
 import type {User} from '../entity/User';
 
-interface Props {
-  setSelected: (id: number) => void;
+export interface AccentColorPickerProps {
+  doSetAccentColor: (id: number) => void;
   user: User;
 }
 
-export const AccentColorPicker: React.FunctionComponent<Props> = ({user, setSelected}) => {
+const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({user, doSetAccentColor}) => {
   const accentColorIds = [1, 2, 4, 5, 6, 7];
   return (
     <span className="accent-color-picker preferences-account-accent-color preferences-section-account-space-before">
@@ -39,7 +37,9 @@ export const AccentColorPicker: React.FunctionComponent<Props> = ({user, setSele
             name="accent"
             id={`accent${id}`}
             defaultChecked={user.accent_id() === id}
-            onClick={() => setSelected(id)}
+            onClick={() => doSetAccentColor(id)}
+            data-uie-name="do-set-accent-color"
+            data-uie-value={id}
           />
           <label htmlFor={`accent${id}`} className={`accent-color-${id}`}></label>
         </span>
@@ -48,7 +48,9 @@ export const AccentColorPicker: React.FunctionComponent<Props> = ({user, setSele
   );
 };
 
+export default AccentColorPicker;
+
 registerReactComponent('accent-color-picker', {
   component: AccentColorPicker,
-  template: '<span data-bind="react: {user: user(), setSelected: selected}"></span>',
+  template: '<span data-bind="react: {user: user(), doSetAccentColor: selected}"></span>',
 });

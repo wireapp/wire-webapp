@@ -32,6 +32,7 @@ import type {ActionsViewModel} from './ActionsViewModel';
 import type {Conversation} from '../entity/Conversation';
 import type {ContentMessage} from '../entity/message/ContentMessage';
 import type {MediumImage} from '../entity/message/MediumImage';
+import type {MessageRepository} from '../conversation/MessageRepository';
 
 export class ImageDetailViewViewModel {
   elementId: 'detail-view';
@@ -48,6 +49,7 @@ export class ImageDetailViewViewModel {
     mainViewModel: MainViewModel,
     private readonly conversationRepository: ConversationRepository,
     private readonly assetRepository: AssetRepository,
+    private readonly messageRepository: MessageRepository,
   ) {
     this.elementId = 'detail-view';
 
@@ -183,7 +185,7 @@ export class ImageDetailViewViewModel {
   };
 
   clickOnLike = () => {
-    this.conversationRepository.toggle_like(this.conversationEntity(), this.messageEntity());
+    this.messageRepository.toggle_like(this.conversationEntity(), this.messageEntity());
   };
 
   clickOnReply = () => {

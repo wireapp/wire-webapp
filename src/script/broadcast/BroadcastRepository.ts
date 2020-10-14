@@ -25,19 +25,19 @@ import type {NewOTRMessage} from '@wireapp/api-client/dist/conversation';
 import {Logger, getLogger} from 'Util/Logger';
 import type {ClientRepository} from '../client/ClientRepository';
 import type {ClientMismatchHandler} from '../conversation/ClientMismatchHandler';
-import type {ConversationRepository} from '../conversation/ConversationRepository';
 import {EventInfoEntity} from '../conversation/EventInfoEntity';
 import type {CryptographyRepository, Recipients} from '../cryptography/CryptographyRepository';
 import type {User} from '../entity/User';
 import {BackendClientError} from '../error/BackendClientError';
 import type {MessageSender} from '../message/MessageSender';
 import type {BroadcastService} from './BroadcastService';
+import type {MessageRepository} from '../conversation/MessageRepository';
 
 export class BroadcastRepository {
   private readonly broadcastService: BroadcastService;
   private readonly clientMismatchHandler: ClientMismatchHandler;
   private readonly clientRepository: ClientRepository;
-  private readonly conversationRepository: ConversationRepository;
+  private readonly messageRepository: MessageRepository;
   private readonly cryptographyRepository: CryptographyRepository;
   private readonly logger: Logger;
   private readonly messageSender: MessageSender;
@@ -45,25 +45,25 @@ export class BroadcastRepository {
   /**
    * @param broadcastService Backend REST API broadcast service implementation
    * @param clientRepository Repository for client interactions
-   * @param conversationRepository Repository for conversation interactions
+   * @param messageRepository Repository for message interactions
    * @param cryptographyRepository Repository for all cryptography interactions
    * @param messageSender Responsible for queueing and sending messages
    */
   constructor(
     broadcastService: BroadcastService,
     clientRepository: ClientRepository,
-    conversationRepository: ConversationRepository,
+    messageRepository: MessageRepository,
     cryptographyRepository: CryptographyRepository,
     messageSender: MessageSender,
   ) {
     this.broadcastService = broadcastService;
     this.clientRepository = clientRepository;
-    this.conversationRepository = conversationRepository;
+    this.messageRepository = messageRepository;
     this.cryptographyRepository = cryptographyRepository;
     this.messageSender = messageSender;
     this.logger = getLogger('BroadcastRepository');
 
-    this.clientMismatchHandler = this.conversationRepository.clientMismatchHandler;
+    this.clientMismatchHandler = this.messageRepository.clientMismatchHandler;
 
     /*
      * FIXME this should not be handled by an event. This an action we want to perform, thus should be a direct method call.

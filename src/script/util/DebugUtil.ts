@@ -38,6 +38,7 @@ import {UserRepository} from '../user/UserRepository';
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 import {UserId} from '../calling/Participant';
+import type {MessageRepository} from '../conversation/MessageRepository';
 
 function downloadText(text: string, filename: string = 'default.txt'): number {
   const url = `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`;
@@ -54,6 +55,7 @@ export class DebugUtil {
   private readonly cryptographyRepository: CryptographyRepository;
   private readonly eventRepository: EventRepository;
   private readonly storageRepository: StorageRepository;
+  private readonly messageRepository: MessageRepository;
   /** Used by QA test automation. */
   public readonly userRepository: UserRepository;
   /** Used by QA test automation. */
@@ -65,7 +67,7 @@ export class DebugUtil {
     this.$ = $;
     this.Dexie = Dexie;
 
-    const {calling, client, connection, conversation, cryptography, event, user, storage} = repositories;
+    const {calling, client, connection, conversation, cryptography, event, user, storage, message} = repositories;
     this.callingRepository = calling;
     this.clientRepository = client;
     this.conversationRepository = conversation;
@@ -74,6 +76,7 @@ export class DebugUtil {
     this.eventRepository = event;
     this.storageRepository = storage;
     this.userRepository = user;
+    this.messageRepository = message;
 
     this.logger = getLogger('DebugUtil');
   }
@@ -159,7 +162,7 @@ export class DebugUtil {
     const hasExpectedTimestamp = (notification: ConversationOtrMessageAddEvent, dateTime: Date) =>
       notification.time === dateTime.toISOString();
     const conversation = await this.conversationRepository.get_conversation_by_id(conversationId);
-    const message = await this.conversationRepository.getMessageInConversationById(conversation, messageId);
+    const message = await this.messageRepository.getMessageInConversationById(conversation, messageId);
     const notificationList = await this.eventRepository.notificationService.getNotifications(
       undefined,
       undefined,

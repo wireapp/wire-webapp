@@ -309,6 +309,9 @@ export class CryptographyRepository {
 
     try {
       const genericMessage = await this.decryptEvent(event);
+      this.logger.info(
+        `Decrypted message with ID '${genericMessage.messageId}' for conversation '${event.conversation}'`,
+      );
       const mappedMessage = await this.cryptographyMapper.mapGenericMessage(genericMessage, event);
       return mappedMessage;
     } catch (error) {

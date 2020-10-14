@@ -375,10 +375,10 @@
     "@types/express-serve-static-core" "*"
     "@types/mime" "*"
 
-"@wireapp/commons@3.8.4":
-  version "3.8.4"
-  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-3.8.4.tgz#ed8c5259f86e10d57edc7363863be0e51dbee572"
-  integrity sha512-c8NeGSE+Pq4yPoYHJHYcdQNY0SUdw8JQnb86y2MIKTSms9rP4qddhhTLbryFz6Ol0ksC1m1pKggZ44zEyTq4XQ==
+"@wireapp/commons@3.8.6":
+  version "3.8.6"
+  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-3.8.6.tgz#e68eb76a0b89eb968d6ec06c39daf3ab736acb8d"
+  integrity sha512-d2QNY9WY3egITgY9irVzi0fAhvDzCycd/pyE1XqXBaLchmIHEiD3/DpeFLqCxhzAFAtgmcUwOtTOEaC8pXd1Vg==
   dependencies:
     "@types/fs-extra" "8.1.0"
     "@types/node" "~12"
@@ -2036,11 +2036,12 @@ map-visit@^1.0.0:
   dependencies:
     object-visit "^1.0.0"
 
-maxmind@4.2.0:
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/maxmind/-/maxmind-4.2.0.tgz#912e5ec4a961807d20d7fb541160aeb5ea802c1c"
-  integrity sha512-TADiE11Q10IjvLtlo05tTD52xLqfCJMhE3eYJHmpYIKg668STi/fQZGH9X3FpqpIP/2WPgKFxf899awFvfMtQA==
+maxmind@4.3.0:
+  version "4.3.0"
+  resolved "https://registry.yarnpkg.com/maxmind/-/maxmind-4.3.0.tgz#0e04f00503e3693615efe848e94ec959500d7573"
+  integrity sha512-qYdCsoivX7xGW8L5UhjZNxx57odwzmzFPtSt3YvGwW8moSKoIwnCq2NbmfHdmqYzj5ffzSzxKM3lqURN8INyzA==
   dependencies:
+    mmdb-lib "1.2.0"
     tiny-lru "7.0.6"
 
 media-typer@0.3.0:
@@ -2137,6 +2138,11 @@ mkdirp@1.0.4:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-1.0.4.tgz#3eb5ed62622756d79a5f0e2a221dfebad75c2f7e"
   integrity sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==
+
+mmdb-lib@1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/mmdb-lib/-/mmdb-lib-1.2.0.tgz#0ecd93f4942f65a2d09be0502fa9126939606727"
+  integrity sha512-3XYebkStxqCgWJjsmT9FCaE19Yi4Tvs2SBPKhUks3rJJh52oF1AKAd9kei+LTutud3a6RCZ0o2Um96Fn7o3zVA==
 
 module-details-from-path@^1.0.3:
   version "1.0.3"
