@@ -21,11 +21,20 @@ import ko from 'knockout';
 
 export function registerReactComponent(
   name: string,
-  {template, component}: {component: React.ComponentType; template: string},
+  {
+    template,
+    component,
+    optionalParams = [],
+  }: {component: React.ComponentType; optionalParams?: string[]; template: string},
 ) {
   ko.components.register(name, {
     template: template,
-    viewModel: function (knockoutParams: Object) {
+    viewModel: function (knockoutParams: Record<string, any>) {
+      optionalParams.forEach(param => {
+        if (!knockoutParams.hasOwnProperty(param)) {
+          knockoutParams[param] = null;
+        }
+      });
       Object.assign(this, knockoutParams);
       this.reactComponent = component;
     },
