@@ -18,7 +18,7 @@
  */
 
 import ko from 'knockout';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useMemo} from 'react';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {createRandomUuid} from 'Util/util';
@@ -221,6 +221,7 @@ interface Props {
 }
 
 export const ParticipantAvatar: React.FunctionComponent<Props> = ({
+  assetRepository = container.resolve(AssetRepository),
   participant,
   clickHandler,
   size = AVATAR_SIZE.LARGE,
@@ -228,12 +229,43 @@ export const ParticipantAvatar: React.FunctionComponent<Props> = ({
   const [isUser, setIsUser] = useState(false);
   const [isService, setIsService] = useState(false);
   const [isTemporaryGuest, setIsTemporaryGuest] = useState(false);
-  const [state, setState] = useState(STATE.NONE);
   const [initials, setInitials] = useState('');
   const [timerLength, setTimerLength] = useState(0);
   const [timerOffset, setTimerOffset] = useState(0);
   const [borderRadius, setBorderRadius] = useState(0);
   const [borderWidth, setBorderWidth] = useState(0);
+  const [avatarImage, setAvatarImage] = useState('');
+  const [avatarLoadingBlocked, setAvatarLoadingBlocked] = useState(false);
+
+  const loadAvatarPicture = async () => {
+    if (!avatarLoadingBlocked) {
+      setAvatarLoadingBlocked(true);
+
+      const isSmall = size !== AVATAR_SIZE.LARGE && size !== AVATAR_SIZE.X_LARGE;
+      const loadHiRes = !isSmall && window.devicePixelRatio > 1;
+      const pictureResource: AssetRemoteData = loadHiRes
+        ? participant.mediumPictureResource()
+        : participant.previewPictureResource();
+
+      if (pictureResource) {
+        try {
+          const url = await assetRepository.getObjectUrl(pictureResource);
+          if (url) {
+            setAvatarImage(url);
+          }
+          setAvatarLoadingBlocked(false);
+        } catch (error) {
+          console.warn('Failed to load avatar picture.', error);
+        }
+      } else {
+        setAvatarLoadingBlocked(false);
+      }
+    }
+  };
+
+  useEffect(() => {
+    loadAvatarPicture();
+  }, [participant]);
 
   useEffect(() => {
     const _isUser = participant instanceof User && !participant.isService;
@@ -271,29 +303,25 @@ export const ParticipantAvatar: React.FunctionComponent<Props> = ({
     setBorderWidth(_borderWidth);
   }, [participant]);
 
-  useEffect(() => {
-    if (isService) {
-      return setState(STATE.NONE);
+  const avatarState = useMemo(() => {
+    switch (true) {
+      case isService:
+        return STATE.NONE;
+      case participant.isMe:
+        return STATE.SELF;
+      case participant.isTeamMember():
+        return STATE.NONE;
+      case participant.isBlocked():
+        return STATE.BLOCKED;
+      case participant.isRequest():
+        return STATE.PENDING;
+      case participant.isIgnored():
+        return STATE.IGNORED;
+      case participant.isCanceled() || participant.isUnknown():
+        return STATE.UNKNOWN;
+      default:
+        return STATE.NONE;
     }
-    if (participant.isMe) {
-      return setState(STATE.SELF);
-    }
-    if (participant.isTeamMember()) {
-      return setState(STATE.NONE);
-    }
-    if (participant.isBlocked()) {
-      return setState(STATE.BLOCKED);
-    }
-    if (participant.isRequest()) {
-      return setState(STATE.PENDING);
-    }
-    if (participant.isIgnored()) {
-      return setState(STATE.IGNORED);
-    }
-    if (participant.isCanceled() || participant.isUnknown()) {
-      return setState(STATE.UNKNOWN);
-    }
-    return setState(STATE.NONE);
   }, [participant, isService]);
 
   const onClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -302,13 +330,17 @@ export const ParticipantAvatar: React.FunctionComponent<Props> = ({
     }
   };
 
-  const avatarType = `${isUser ? 'user' : 'service'}-avatar`;
+  const avatarType = useMemo(() => `${isUser ? 'user' : 'service'}-avatar`, [isUser]);
 
-  const cssClasses = isService
-    ? 'accent-color-service'
-    : isTemporaryGuest
-    ? 'accent-color-temporary'
-    : `accent-color-${participant.accent_id()} ${state}`;
+  const cssClasses = useMemo(
+    () =>
+      isService
+        ? 'accent-color-service'
+        : isTemporaryGuest
+        ? 'accent-color-temporary'
+        : `accent-color-${participant.accent_id()} ${avatarState}`,
+    [avatarState, participant, isService, isTemporaryGuest],
+  );
 
   return (
     <div
@@ -321,7 +353,9 @@ export const ParticipantAvatar: React.FunctionComponent<Props> = ({
       <div className="avatar-background" />
       {isUser && <div className="avatar-initials">{initials}</div>}
       {isService && <div className="avatar-service-placeholder">{/* <service-icon></service-icon> */}</div>}
-      <div className="avatar-image" />
+      <div className="avatar-image avatar-image-loaded">
+        {avatarImage && <img className="avatar-image" src={avatarImage} />}
+      </div>
       {isUser && <div className="avatar-badge" />}
       <div className="avatar-border" />
       {isTemporaryGuest && (
