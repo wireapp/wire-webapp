@@ -333,7 +333,12 @@ const ParticipantAvatar: React.FunctionComponent<ParticipantAvatarProps> = ({
       {isUser && <div className="avatar-badge" data-uie-name="element-avatar-user-badge-icon" />}
       <div className="avatar-border" />
       {isTemporaryGuest && (
-        <svg className="avatar-temporary-guest-border" viewBox="0 0 32 32" stroke={participant.accent_color()}>
+        <svg
+          className="avatar-temporary-guest-border"
+          data-uie-name="element-avatar-guest-expiration-circle"
+          viewBox="0 0 32 32"
+          stroke={participant.accent_color()}
+        >
           <circle
             cx="16"
             cy="16"

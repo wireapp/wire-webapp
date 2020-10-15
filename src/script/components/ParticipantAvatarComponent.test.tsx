@@ -17,11 +17,10 @@
  *
  */
 
-import ParticipantAvatar, {ParticipantAvatarProps} from './ParticipantAvatarComponent';
+import ParticipantAvatar, {AVATAR_SIZE, ParticipantAvatarProps} from './ParticipantAvatarComponent';
 import TestPage from 'Util/test/TestPage';
 import {User} from '../entity/User';
 import {AssetRepository} from '../assets/AssetRepository';
-import {ServiceEntity} from '../integration/ServiceEntity';
 
 class ParticipantAvatarPage extends TestPage<ParticipantAvatarProps> {
   constructor(props?: ParticipantAvatarProps) {
@@ -31,6 +30,8 @@ class ParticipantAvatarPage extends TestPage<ParticipantAvatarProps> {
   getAvatar = () => this.get('.participant-avatar');
   getInitials = () => this.get('div[data-uie-name="element-avatar-initials"]');
   getServiceIcon = () => this.get('div[data-uie-name="element-avatar-service-icon"]');
+  getUserBadgeIcon = () => this.get('div[data-uie-name="element-avatar-user-badge-icon"]');
+  getGuestExpirationCircle = () => this.get('svg[data-uie-name="element-avatar-guest-expiration-circle"]');
 
   clickAvatar = () => this.click(this.getAvatar());
 }
@@ -69,20 +70,93 @@ describe('ParticipantAvatar', () => {
       expect(participantAvatar.getInitials().exists()).toBe(true);
       expect(participantAvatar.getInitials().text()).toBe('AB');
     });
-  });
 
-  xdescribe('for a Service', () => {
-    it('shows a service icon', async () => {
+    it('shows single initial character when avatar size is extra small', async () => {
       const assetRepoSpy = (jasmine.createSpy() as unknown) as AssetRepository;
-      const service = new ServiceEntity({});
+      const participant = new User('id');
+      participant.name('Anton Bertha');
 
       const participantAvatar = new ParticipantAvatarPage({
         assetRepository: assetRepoSpy,
-        participant: service as any,
+        participant: participant,
+        size: AVATAR_SIZE.X_SMALL,
+      });
+
+      expect(participantAvatar.getInitials().exists()).toBe(true);
+      expect(participantAvatar.getInitials().text()).toBe('A');
+    });
+
+    it('shows avatar badge', async () => {
+      const assetRepoSpy = (jasmine.createSpy() as unknown) as AssetRepository;
+      const participant = new User('id');
+      participant.name('Anton Bertha');
+
+      const participantAvatar = new ParticipantAvatarPage({
+        assetRepository: assetRepoSpy,
+        participant: participant,
+      });
+
+      expect(participantAvatar.getUserBadgeIcon().exists()).toBe(true);
+    });
+  });
+
+  describe('for a Guest', () => {
+    it('shows expiration circle', async () => {
+      const assetRepoSpy = (jasmine.createSpy() as unknown) as AssetRepository;
+      const participant = new User('id');
+      participant.name('Anton Bertha');
+      participant.isTemporaryGuest(true);
+
+      const participantAvatar = new ParticipantAvatarPage({
+        assetRepository: assetRepoSpy,
+        participant: participant,
+      });
+
+      expect(participantAvatar.getGuestExpirationCircle().exists()).toBe(true);
+    });
+
+    it('shows participant initials', async () => {
+      const assetRepoSpy = (jasmine.createSpy() as unknown) as AssetRepository;
+      const participant = new User('id');
+      participant.name('Anton Bertha');
+      participant.isTemporaryGuest(true);
+
+      const participantAvatar = new ParticipantAvatarPage({
+        assetRepository: assetRepoSpy,
+        participant: participant,
       });
 
       expect(participantAvatar.getInitials().exists()).toBe(true);
       expect(participantAvatar.getInitials().text()).toBe('AB');
+    });
+  });
+
+  describe('for a Service', () => {
+    it('shows a service icon', async () => {
+      const assetRepoSpy = (jasmine.createSpy() as unknown) as AssetRepository;
+      const service = new User('id');
+      service.isService = true;
+
+      const participantAvatar = new ParticipantAvatarPage({
+        assetRepository: assetRepoSpy,
+        participant: service,
+      });
+
+      expect(participantAvatar.getServiceIcon().exists()).toBe(true);
+    });
+
+    it('does not show initials', async () => {
+      const assetRepoSpy = (jasmine.createSpy() as unknown) as AssetRepository;
+      const service = new User('id');
+      service.name('Anton Bertha');
+      service.isService = true;
+
+      const participantAvatar = new ParticipantAvatarPage({
+        assetRepository: assetRepoSpy,
+        participant: service,
+      });
+
+      expect(participantAvatar.getInitials().exists()).toBe(false);
     });
   });
 });
