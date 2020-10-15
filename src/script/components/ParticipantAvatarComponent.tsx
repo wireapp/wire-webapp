@@ -212,7 +212,7 @@ export class ParticipantAvatarKnockout {
   }
 }
 */
-interface Props {
+export interface ParticipantAvatarProps {
   assetRepository: AssetRepository;
   clickHandler?: (participant: User, target: Node) => void;
   delay?: number;
@@ -220,7 +220,7 @@ interface Props {
   size?: AVATAR_SIZE;
 }
 
-export const ParticipantAvatar: React.FunctionComponent<Props> = ({
+const ParticipantAvatar: React.FunctionComponent<ParticipantAvatarProps> = ({
   participant,
   clickHandler,
   size = AVATAR_SIZE.LARGE,
@@ -319,7 +319,11 @@ export const ParticipantAvatar: React.FunctionComponent<Props> = ({
       data-bind="attr: {delay: delay}"
     >
       <div className="avatar-background" />
-      {isUser && <div className="avatar-initials">{initials}</div>}
+      {isUser && (
+        <div className="avatar-initials" data-uie-name="element-avatar-initials">
+          {initials}
+        </div>
+      )}
       {isService && <div className="avatar-service-placeholder">{/* <service-icon></service-icon> */}</div>}
       <div className="avatar-image" />
       {isUser && <div className="avatar-badge" />}
@@ -341,6 +345,8 @@ export const ParticipantAvatar: React.FunctionComponent<Props> = ({
     </div>
   );
 };
+
+export default ParticipantAvatar;
 
 registerReactComponent('participant-avatar', {
   component: ParticipantAvatar,
