@@ -19,6 +19,7 @@
 
 import React from 'react';
 import {registerReactComponent} from 'Util/ComponentUtil';
+import {AccentColor} from '@wireapp/commons';
 import type {User} from '../entity/User';
 
 export interface AccentColorPickerProps {
@@ -27,21 +28,20 @@ export interface AccentColorPickerProps {
 }
 
 const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({user, doSetAccentColor}) => {
-  const accentColorIds = [1, 2, 4, 5, 6, 7];
   return (
     <span className="accent-color-picker preferences-account-accent-color preferences-section-account-space-before">
-      {accentColorIds.map(id => (
-        <span key={id} className="accent-color">
+      {AccentColor.ACCENT_COLORS.map(accentColor => (
+        <span key={accentColor.id} className="accent-color">
           <input
             type="radio"
             name="accent"
-            id={`accent${id}`}
-            checked={user.accent_id() === id}
-            onChange={() => doSetAccentColor(id)}
+            id={`accent${accentColor.id}`}
+            checked={user.accent_id() === accentColor.id}
+            onChange={() => doSetAccentColor(accentColor.id)}
             data-uie-name="do-set-accent-color"
-            data-uie-value={id}
+            data-uie-value={accentColor.id}
           />
-          <label htmlFor={`accent${id}`} className={`accent-color-${id}`}></label>
+          <label htmlFor={`accent${accentColor.id}`} className={`accent-color-${accentColor.id}`}></label>
         </span>
       ))}
     </span>
