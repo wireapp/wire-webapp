@@ -233,7 +233,7 @@ ko.components.register('conversation-list-calling-cell', {
               <group-avatar class="conversation-list-cell-avatar-arrow call-ui__avatar" params="users: conversationParticipants(), conversation: conversation"></group-avatar>
             <!-- /ko -->
             <!-- ko if: !conversation().isGroup() && conversationParticipants().length -->
-              <participant-avatar params="participant: conversationParticipants()[0], size: PAVATAR_SIZE.SMALL"></participant-avatar>
+              <participant-avatar params="participant: conversationParticipants()[0], size: AVATAR_SIZE.SMALL"></participant-avatar>
             <!-- /ko -->
           </div>
         <!-- /ko -->

@@ -21,6 +21,7 @@ import ParticipantAvatar, {ParticipantAvatarProps} from './ParticipantAvatarComp
 import TestPage from 'Util/test/TestPage';
 import {User} from '../entity/User';
 import {AssetRepository} from '../assets/AssetRepository';
+import {ServiceEntity} from '../integration/ServiceEntity';
 
 class ParticipantAvatarPage extends TestPage<ParticipantAvatarProps> {
   constructor(props?: ParticipantAvatarProps) {
@@ -29,6 +30,7 @@ class ParticipantAvatarPage extends TestPage<ParticipantAvatarProps> {
 
   getAvatar = () => this.get('.participant-avatar');
   getInitials = () => this.get('div[data-uie-name="element-avatar-initials"]');
+  getServiceIcon = () => this.get('div[data-uie-name="element-avatar-service-icon"]');
 
   clickAvatar = () => this.click(this.getAvatar());
 }
@@ -62,6 +64,21 @@ describe('ParticipantAvatar', () => {
       const participantAvatar = new ParticipantAvatarPage({
         assetRepository: assetRepoSpy,
         participant: participant,
+      });
+
+      expect(participantAvatar.getInitials().exists()).toBe(true);
+      expect(participantAvatar.getInitials().text()).toBe('AB');
+    });
+  });
+
+  xdescribe('for a Service', () => {
+    it('shows a service icon', async () => {
+      const assetRepoSpy = (jasmine.createSpy() as unknown) as AssetRepository;
+      const service = new ServiceEntity({});
+
+      const participantAvatar = new ParticipantAvatarPage({
+        assetRepository: assetRepoSpy,
+        participant: service as any,
       });
 
       expect(participantAvatar.getInitials().exists()).toBe(true);

@@ -324,9 +324,13 @@ const ParticipantAvatar: React.FunctionComponent<ParticipantAvatarProps> = ({
           {initials}
         </div>
       )}
-      {isService && <div className="avatar-service-placeholder">{/* <service-icon></service-icon> */}</div>}
+      {isService && (
+        <div className="avatar-service-placeholder" data-uie-name="element-avatar-service-icon">
+          {/* <service-icon></service-icon> */}
+        </div>
+      )}
       <div className="avatar-image" />
-      {isUser && <div className="avatar-badge" />}
+      {isUser && <div className="avatar-badge" data-uie-name="element-avatar-user-badge-icon" />}
       <div className="avatar-border" />
       {isTemporaryGuest && (
         <svg className="avatar-temporary-guest-border" viewBox="0 0 32 32" stroke={participant.accent_color()}>
