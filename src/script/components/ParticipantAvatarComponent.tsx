@@ -31,6 +31,7 @@ import {AssetRemoteData} from '../assets/AssetRemoteData';
 import {AssetRepository} from '../assets/AssetRepository';
 import {container} from 'tsyringe';
 import {registerReactComponent} from 'Util/ComponentUtil';
+import SVGProvider from '../auth/util/SVGProvider';
 
 export enum AVATAR_SIZE {
   LARGE = 'avatar-l',
@@ -326,7 +327,11 @@ const ParticipantAvatar: React.FunctionComponent<ParticipantAvatarProps> = ({
       )}
       {isService && (
         <div className="avatar-service-placeholder" data-uie-name="element-avatar-service-icon">
-          {/* <service-icon></service-icon> */}
+          <svg
+            width={32}
+            height={32}
+            dangerouslySetInnerHTML={{__html: SVGProvider['service-icon']?.documentElement?.innerHTML}}
+          ></svg>
         </div>
       )}
       <div className="avatar-image" />
