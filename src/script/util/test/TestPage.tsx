@@ -42,7 +42,7 @@ export default class TestPage<T> {
     this.update();
   };
   click = (element: ReactWrapper) => this.do(() => element.simulate('click'));
-  changeValue = (element: ReactWrapper, value: string) => this.do(() => element.simulate('change', {target: {value}}));
+  changeValue = (element: ReactWrapper, value: any) => this.do(() => element.simulate('change', {target: {value}}));
   changeFiles = (element: ReactWrapper, files: File[]) => this.do(() => element.simulate('change', {target: {files}}));
   submit = (element: ReactWrapper) => this.do(() => element.simulate('submit'));
   mouseEnter = (element: ReactWrapper) => this.do(() => element.simulate('mouseenter'));
