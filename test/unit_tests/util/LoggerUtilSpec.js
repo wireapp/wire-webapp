@@ -30,6 +30,6 @@ describe('enableLogging', () => {
 
     enableLogging(true, '');
 
-    expect(localStorage.getItem('debug')).toBe('@wireapp/*');
+    expect(localStorage.getItem('debug')).toBe('@wireapp/webapp*');
   });
 });
