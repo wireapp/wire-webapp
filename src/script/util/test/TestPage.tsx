@@ -50,6 +50,5 @@ export default class TestPage<T> {
   keyCodeDown = (element: ReactWrapper, keyCode: number) => this.do(() => element.simulate('keydown', {keyCode}));
 
   update = () => this.driver.update();
-  // eslint-disable-next-line no-console
-  debug = (element?: ReactWrapper) => console.log((element ? element : this.driver).debug());
+  debug = (element?: ReactWrapper) => console.info((element ? element : this.driver).debug());
 }
