@@ -23,6 +23,7 @@ import {ClientEntity} from '../client/ClientEntity';
 import {ClientClassification} from '@wireapp/api-client/dist/client';
 import {t} from 'Util/LocalizerUtil';
 import SVGProvider from '../auth/util/SVGProvider';
+import LegalHoldDot from './LegalHoldDot';
 
 export interface ClientCardProps {
   client: ClientEntity;
@@ -75,10 +76,7 @@ const ClientCard: React.FunctionComponent<ClientCardProps> = ({
       data-uie-name={`device-card${isCurrentClient ? '-current' : ''}`}
       data-uie-uid={id}
     >
-      {showLegalHoldIcon && (
-        // <legal-hold-dot ></legal-hold-dot>
-        <span />
-      )}
+      {showLegalHoldIcon && <LegalHoldDot />}
       {showDesktopIcon && (
         <svg
           width={16}

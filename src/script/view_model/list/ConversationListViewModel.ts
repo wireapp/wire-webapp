@@ -20,7 +20,7 @@
 import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import 'Components/availabilityState';
-import 'Components/legalHoldDot';
+import 'Components/LegalHoldDot';
 import 'Components/list/groupedConversations';
 import ko from 'knockout';
 import {amplify} from 'amplify';

@@ -18,23 +18,7 @@
  */
 
 .legal-hold-dot {
-  position: relative;
-  display: flex;
-  width: 16px;
-  height: 16px;
-  align-items: center;
-  justify-content: center;
   background-color: rgba(@w-red, 0.24);
-  border-radius: 50%;
-
-  &--interactive {
-    cursor: pointer;
-  }
-
-  &--large {
-    width: 48px;
-    height: 48px;
-  }
 
   &--active::after {
     display: block;
@@ -45,7 +29,7 @@
     content: '';
   }
 
-  pending-icon {
+  .pending-icon {
     position: relative;
     width: 50%;
     height: 50%;

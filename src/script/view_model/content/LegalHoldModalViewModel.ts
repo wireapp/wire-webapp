@@ -196,7 +196,7 @@ export class LegalHoldModalViewModel {
     }
   };
 
-  showUsers = async (conversation?: Conversation) => {
+  showUsers = async (conversation?: ko.Observable<Conversation> | Conversation) => {
     if (this.skipShowUsers()) {
       return this.skipShowUsers(false);
     }
