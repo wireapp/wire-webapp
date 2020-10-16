@@ -21,7 +21,11 @@ import ko from 'knockout';
 
 export function registerReactComponent(
   name: string,
-  {template, component, optionalParams}: {component: React.ComponentType; optionalParams?: string[]; template: string},
+  {
+    template,
+    component,
+    optionalParams = [],
+  }: {component: React.ComponentType; optionalParams?: string[]; template: string},
 ) {
   ko.components.register(name, {
     template: template,
