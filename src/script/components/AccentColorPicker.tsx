@@ -21,6 +21,7 @@ import React from 'react';
 import {registerReactComponent} from 'Util/ComponentUtil';
 import {AccentColor} from '@wireapp/commons';
 import type {User} from '../entity/User';
+import {CSS_ABSOLUTE_CENTER, CSS_SQUARE} from 'Util/CSSMixin';
 
 export interface AccentColorPickerProps {
   doSetAccentColor: (id: number) => void;
@@ -44,23 +45,18 @@ const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({use
             key={accentColor.id}
             css={{
               '::after': {
+                ...CSS_SQUARE(isChecked ? 16 : 12),
                 border: `0px solid ${accentColor.color}`,
                 borderWidth: isChecked ? 1 : 0,
-                height: isChecked ? 16 : 12,
-                width: isChecked ? 16 : 12,
               },
               '::before': {
+                ...CSS_SQUARE(isChecked ? 10 : 6),
                 backgroundColor: accentColor.color,
-                height: isChecked ? 10 : 6,
-                width: isChecked ? 10 : 6,
               },
               '::before, ::after': {
+                ...CSS_ABSOLUTE_CENTER,
                 borderRadius: '50%',
                 content: '""',
-                left: '50%',
-                position: 'absolute',
-                top: '50%',
-                transform: 'translate(-50%, -50%)',
                 transition: 'all 0.15s ease-out',
               },
               cursor: 'pointer',
