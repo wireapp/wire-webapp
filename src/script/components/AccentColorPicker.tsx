@@ -87,5 +87,5 @@ export default AccentColorPicker;
 
 registerReactComponent('accent-color-picker', {
   component: AccentColorPicker,
-  template: '<span data-bind="react: {user: user(), doSetAccentColor: selected}"></span>',
+  template: '<span data-bind="react: {user: ko.unwrap(user), doSetAccentColor: selected}"></span>',
 });
