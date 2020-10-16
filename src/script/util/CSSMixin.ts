@@ -17,26 +17,16 @@
  *
  */
 
-import ko from 'knockout';
+import {CSSObject} from '@emotion/serialize';
 
-export function registerReactComponent(
-  name: string,
-  {
-    template,
-    component,
-    optionalParams = [],
-  }: {component: React.ComponentType; optionalParams?: string[]; template: string},
-) {
-  ko.components.register(name, {
-    template: template,
-    viewModel: function (knockoutParams: Record<string, any>) {
-      optionalParams.forEach(param => {
-        if (!knockoutParams.hasOwnProperty(param)) {
-          knockoutParams[param] = null;
-        }
-      });
-      Object.assign(this, knockoutParams);
-      this.reactComponent = component;
-    },
-  });
-}
+export const CSS_ABSOLUTE_CENTER: CSSObject = {
+  left: '50%',
+  position: 'absolute',
+  top: '50%',
+  transform: 'translate(-50%, -50%)',
+};
+
+export const CSS_SQUARE: (size: number | string) => CSSObject = size => ({
+  height: size,
+  width: size,
+});

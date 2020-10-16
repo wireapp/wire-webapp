@@ -40,7 +40,7 @@ export function enableLogging(force = false, search = window.location.search): v
   if (namespace) {
     localStorage.setItem('debug', namespace);
   } else if (force) {
-    localStorage.setItem('debug', '@wireapp/*');
+    localStorage.setItem('debug', '@wireapp/webapp*');
   } else {
     localStorage.removeItem('debug');
   }

@@ -20,6 +20,7 @@
 import AccentColorPicker, {AccentColorPickerProps} from './AccentColorPicker';
 import TestPage from 'Util/test/TestPage';
 import {User} from '../entity/User';
+import {AccentColor} from '@wireapp/commons';
 
 class AccentColorPickerPage extends TestPage<AccentColorPickerProps> {
   constructor(props?: AccentColorPickerProps) {
@@ -35,23 +36,22 @@ class AccentColorPickerPage extends TestPage<AccentColorPickerProps> {
 
 describe('AccentColorPicker', () => {
   it('shows expected accent colors', async () => {
-    const expectedAccentColorIdList = [1, 2, 4, 5, 6, 7];
     const colorPicker = new AccentColorPickerPage({
       doSetAccentColor: () => {},
       user: {
-        accent_id: () => 2,
+        accent_id: () => AccentColor.BRIGHT_ORANGE.id,
       } as User,
     });
 
     expect(colorPicker.getAccentColors().exists()).toBe(true);
-    expect(colorPicker.getAccentColors().length).toBe(expectedAccentColorIdList.length);
-    expectedAccentColorIdList.forEach(accentColorId =>
-      expect(colorPicker.getAccentColorInput(accentColorId).exists()).toBe(true),
+    expect(colorPicker.getAccentColors().length).toBe(AccentColor.ACCENT_COLORS.length);
+    AccentColor.ACCENT_COLORS.forEach(accentColor =>
+      expect(colorPicker.getAccentColorInput(accentColor.id).exists()).toBe(true),
     );
   });
 
   it('selects users current accent color', async () => {
-    const selectedAccentColorId = 2;
+    const selectedAccentColorId = AccentColor.BRIGHT_ORANGE.id;
     const colorPicker = new AccentColorPickerPage({
       doSetAccentColor: () => {},
       user: {
@@ -64,7 +64,6 @@ describe('AccentColorPicker', () => {
   });
 
   it('updates users accent color on click', async () => {
-    const expectedAccentColorIdList = [1, 2, 4, 5, 6, 7];
     const colorPicker = new AccentColorPickerPage({
       doSetAccentColor: jasmine.createSpy(),
       user: {
@@ -72,9 +71,27 @@ describe('AccentColorPicker', () => {
       } as User,
     });
 
-    expectedAccentColorIdList.forEach(accentColorId => {
-      colorPicker.changeAccentColorInput(accentColorId);
-      expect(colorPicker.getProps().doSetAccentColor).toHaveBeenCalledWith(accentColorId);
+    AccentColor.ACCENT_COLORS.forEach(accentColor => {
+      colorPicker.changeAccentColorInput(accentColor.id);
+      expect(colorPicker.getProps().doSetAccentColor).toHaveBeenCalledWith(accentColor.id);
+    });
+  });
+
+  it('selects color on remote user accent color update', async () => {
+    const colorPicker = new AccentColorPickerPage({
+      doSetAccentColor: jasmine.createSpy(),
+      user: {
+        accent_id: () => 0,
+      } as User,
+    });
+
+    AccentColor.ACCENT_COLORS.forEach(accentColor => {
+      colorPicker['driver'].setProps({
+        user: {
+          accent_id: () => accentColor.id,
+        },
+      });
+      expect(colorPicker.getAccentColorInput(accentColor.id).props().checked).toBe(true);
     });
   });
 });

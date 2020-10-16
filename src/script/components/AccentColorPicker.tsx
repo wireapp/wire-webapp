@@ -19,7 +19,9 @@
 
 import React from 'react';
 import {registerReactComponent} from 'Util/ComponentUtil';
+import {AccentColor} from '@wireapp/commons';
 import type {User} from '../entity/User';
+import {CSS_ABSOLUTE_CENTER, CSS_SQUARE} from 'Util/CSSMixin';
 
 export interface AccentColorPickerProps {
   doSetAccentColor: (id: number) => void;
@@ -27,23 +29,56 @@ export interface AccentColorPickerProps {
 }
 
 const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({user, doSetAccentColor}) => {
-  const accentColorIds = [1, 2, 4, 5, 6, 7];
   return (
-    <span className="accent-color-picker preferences-account-accent-color preferences-section-account-space-before">
-      {accentColorIds.map(id => (
-        <span key={id} className="accent-color">
-          <input
-            type="radio"
-            name="accent"
-            id={`accent${id}`}
-            checked={user.accent_id() === id}
-            onChange={() => doSetAccentColor(id)}
-            data-uie-name="do-set-accent-color"
-            data-uie-value={id}
-          />
-          <label htmlFor={`accent${id}`} className={`accent-color-${id}`}></label>
-        </span>
-      ))}
+    <span
+      className="preferences-account-accent-color preferences-section-account-space-before"
+      css={{
+        display: 'inline-flex',
+        height: 24,
+        justifyContent: 'space-between',
+      }}
+    >
+      {AccentColor.ACCENT_COLORS.map(accentColor => {
+        const isChecked = user.accent_id() === accentColor.id;
+        return (
+          <label
+            key={accentColor.id}
+            css={{
+              '::after': {
+                ...CSS_SQUARE(isChecked ? 16 : 12),
+                border: `0px solid ${accentColor.color}`,
+                borderWidth: isChecked ? 1 : 0,
+              },
+              '::before': {
+                ...CSS_SQUARE(isChecked ? 10 : 6),
+                backgroundColor: accentColor.color,
+              },
+              '::before, ::after': {
+                ...CSS_ABSOLUTE_CENTER,
+                borderRadius: '50%',
+                content: '""',
+                transition: 'all 0.15s ease-out',
+              },
+              cursor: 'pointer',
+              position: 'relative',
+              width: 16,
+            }}
+          >
+            <input
+              type="radio"
+              name="accent"
+              checked={isChecked}
+              onChange={() => doSetAccentColor(accentColor.id)}
+              data-uie-name="do-set-accent-color"
+              data-uie-value={accentColor.id}
+              css={{
+                opacity: 0,
+                position: 'absolute',
+              }}
+            />
+          </label>
+        );
+      })}
     </span>
   );
 };
@@ -52,5 +87,5 @@ export default AccentColorPicker;
 
 registerReactComponent('accent-color-picker', {
   component: AccentColorPicker,
-  template: '<span data-bind="react: {user: user(), doSetAccentColor: selected}"></span>',
+  template: '<span data-bind="react: {user: ko.unwrap(user), doSetAccentColor: selected}"></span>',
 });
