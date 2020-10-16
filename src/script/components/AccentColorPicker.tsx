@@ -29,21 +29,60 @@ export interface AccentColorPickerProps {
 
 const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({user, doSetAccentColor}) => {
   return (
-    <span className="accent-color-picker preferences-account-accent-color preferences-section-account-space-before">
-      {AccentColor.ACCENT_COLORS.map(accentColor => (
-        <span key={accentColor.id} className="accent-color">
-          <input
-            type="radio"
-            name="accent"
-            id={`accent${accentColor.id}`}
-            checked={user.accent_id() === accentColor.id}
-            onChange={() => doSetAccentColor(accentColor.id)}
-            data-uie-name="do-set-accent-color"
-            data-uie-value={accentColor.id}
-          />
-          <label htmlFor={`accent${accentColor.id}`} className={`accent-color-${accentColor.id}`}></label>
-        </span>
-      ))}
+    <span
+      className="preferences-account-accent-color preferences-section-account-space-before"
+      css={{
+        display: 'inline-flex',
+        height: 24,
+        justifyContent: 'space-between',
+      }}
+    >
+      {AccentColor.ACCENT_COLORS.map(accentColor => {
+        const isChecked = user.accent_id() === accentColor.id;
+        return (
+          <label
+            key={accentColor.id}
+            css={{
+              '::after': {
+                border: `0px solid ${accentColor.color}`,
+                borderWidth: isChecked ? 1 : 0,
+                height: isChecked ? 16 : 12,
+                width: isChecked ? 16 : 12,
+              },
+              '::before': {
+                backgroundColor: accentColor.color,
+                height: isChecked ? 10 : 6,
+                width: isChecked ? 10 : 6,
+              },
+              '::before, ::after': {
+                borderRadius: '50%',
+                content: '""',
+                left: '50%',
+                position: 'absolute',
+                top: '50%',
+                transform: 'translate(-50%, -50%)',
+                transition: 'all 0.15s ease-out',
+              },
+              cursor: 'pointer',
+              position: 'relative',
+              width: 16,
+            }}
+          >
+            <input
+              type="radio"
+              name="accent"
+              checked={isChecked}
+              onChange={() => doSetAccentColor(accentColor.id)}
+              data-uie-name="do-set-accent-color"
+              data-uie-value={accentColor.id}
+              css={{
+                opacity: 0,
+                position: 'absolute',
+              }}
+            />
+          </label>
+        );
+      })}
     </span>
   );
 };
